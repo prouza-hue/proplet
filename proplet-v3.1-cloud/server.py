@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parent
-PUZZLES_PATH = ROOT / "public" / "puzzles.json"
+PUZZLES_PATH = ROOT / "data" / "puzzles.json"
 TZ = ZoneInfo("Europe/Prague")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
@@ -39,7 +39,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35}
 
-app = FastAPI(title="Proplet API", version="3.2.1-cloud")
+app = FastAPI(title="Proplet API", version="3.2.2-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -241,13 +241,21 @@ def home():
 
 @app.get("/api/health")
 def health():
+    puzzle_file = PUZZLES_PATH.exists()
+    base = {
+        "date": current_prague_date().isoformat(),
+        "puzzleFile": puzzle_file,
+        "puzzleSource": "data/puzzles.json",
+    }
+    if not puzzle_file:
+        return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
     if not supabase_ready():
-        return {"ok": False, "database": False, "date": current_prague_date().isoformat(), "message": "Chybí SUPABASE_URL nebo SUPABASE_SECRET_KEY"}
+        return {**base, "ok": False, "database": False, "message": "Chybí SUPABASE_URL nebo SUPABASE_SECRET_KEY"}
     try:
         db_request("GET", "players", params={"select": "id", "limit": "1"})
-        return {"ok": True, "database": True, "date": current_prague_date().isoformat()}
+        return {**base, "ok": True, "database": True}
     except HTTPException as exc:
-        return {"ok": False, "database": False, "date": current_prague_date().isoformat(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "message": exc.detail}
 
 
 @app.get("/api/config")

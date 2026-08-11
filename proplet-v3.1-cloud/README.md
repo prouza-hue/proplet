@@ -1,20 +1,34 @@
-# Proplet v3.2 Cloud
+# Proplet v3.1 Cloud
 
-Česká slovní hra pro Vercel + Supabase.
+Cloud-ready verze Propletu pro **Vercel + Supabase**.
 
-## Co je nové ve v3.2
+- FastAPI běží jako Vercel Function.
+- `public/` obsahuje PWA frontend a puzzle databázi.
+- Supabase (Postgres přes Data REST API) drží hráče a výsledky.
+- Citlivý `SUPABASE_SECRET_KEY` je pouze environment variable na Vercelu a není v browseru ani GitHubu.
+- Daily Challenge se mění automaticky podle data v Europe/Prague a každý hráč ji může dokončit pouze jednou.
+- Volná hra obsahuje 50 unikátních úloh pro každou obtížnost (150 celkem).
 
-- opravená a viditelná synchronizace výsledků
-- automatické retry synchronizace
-- sdílení Daily vždy obsahuje veřejný odkaz na Proplet
-- nový hravější vizuální systém
-- haptika, jemné zvuky, animace a confetti
-- XP levely a achievementy
-- 50 easy + 50 medium + 50 hard volných úloh
-- 365 Daily úloh
+Začni souborem **NASAZENI_CZ.md**.
 
-## Aktualizace z v3.1
+## Environment variables
 
-Databázi **není potřeba měnit**. Nahraď soubory v GitHub repository obsahem tohoto balíčku a Vercel provede nový deployment automaticky.
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
 
-Podrobnosti: `UPDATE_V3_2_CZ.md`.
+## Databáze
+
+Spusť `SUPABASE_SETUP.sql` v Supabase SQL Editoru.
+
+## Lokální vývoj (volitelné)
+
+```bash
+pip install -r requirements.txt
+export SUPABASE_URL='https://...supabase.co'
+export SUPABASE_SECRET_KEY='sb_secret_...'
+uvicorn server:app --reload
+```
+
+## Jazyková data
+
+Viz `NOTICE.md`.
