@@ -1,54 +1,31 @@
-# Proplet v3.4 Cloud
+# Proplet v3.4.2 Cloud
 
 Česká slovní logická hra pro Vercel + Supabase.
 
-## v3.4 v kostce
+## Aktuální obsah
 - 50 Easy (6×6)
 - 50 Medium (7×8)
-- 50 Hard (25× 8×8 + 25× 9×9), křivější „šnečí“ cesty
-- 50 **Mozkožrout** (10×10)
+- 50 Hard (25× 8×8 + 25× 9×9)
+- 50 Mozkožrout (10×10)
 - 365 Daily
-- 30 speciálních 6×6 rescue úloh pro záchranu streaku
-- exact-cover solver a kontrola jednoznačnosti generovaných úloh
-- adaptivní Fold/tablet herní layout bez scrollování během hry
-- „Aktuálně“ stále na obrazovce; délky slov v kompaktním vodorovném pásu
-- interaktivní onboarding
-- 3 úrovně nápovědy + Clean solve
-- Daily leaderboard: Clean → počet nápověd → čas → tahy
-- streak rescue: jeden vynechaný den, 30 sekund, jeden pokus
-- XP level roadmap + streak badges + achievements
-- heslové účty a více současně přihlášených zařízení
+- 30 rescue 6×6 úloh pro záchranu streaku
+- exact-cover solver a unikátní řešení
+- onboarding, 3 stupně nápovědy a Clean solve
+- XP levely, streaky, achievementy a rodinný leaderboard
+- heslové multi-device účty
+- Fold/tablet responsive herní layout
 - offline fronta výsledků a automatická synchronizace
-- výraznější Android haptika + testovací tlačítko
+- **perzistentní rozehrané Free/Daily úlohy**
 
-## Aktualizace z v3.3
-Čti `UPDATE_V3_4_CZ.md`.
+## Důležitá logika cesty
+Cílové slovo se uzná pouze tehdy, když hráč projde jeho konkrétní cestu patřící do unikátního řešení celé plochy. Pokud lze stejný text slova složit jinou cestou, hra tuto alternativní cestu nepřijme a vysvětlí důvod. Tím hráč nemůže přijmout lokálně správné slovo, které by zablokovalo globální řešení.
 
-**Nejdřív spusť `SUPABASE_MIGRATION_V3_4.sql`, potom deployuj kód.**
+## Update z v3.4
+Viz `UPDATE_V3_4_2_CZ.md`. Pro v3.4 → v3.4.2 není potřeba žádná SQL migrace.
+
+## Starší migrace
+- z v3.2.x → nejdřív `SUPABASE_MIGRATION_V3_3.sql`
+- z v3.3 → potom `SUPABASE_MIGRATION_V3_4.sql`
 
 ## Čistá instalace
-Použij aktuální `SUPABASE_SETUP.sql`, nastav ve Vercelu:
-- `SUPABASE_URL`
-- `SUPABASE_SECRET_KEY`
-
-a deployuj celý repozitář.
-
-## Kontrola deploymentu
-`/api/health` má vracet mimo jiné:
-- `ok: true`
-- `database: true`
-- `puzzleFile: true`
-- `accountMigration: true`
-- `featuresMigration: true`
-
-## Generování puzzle
-Generátor zapisuje identická data do `public/puzzles.json` i `data/puzzles.json`.
-
-Běžné zachování existujících bank + vytvoření rescue banky:
-
-```bash
-python tools/generate_puzzles.py --preserve-existing-all --rescue 30
-```
-
-## Haptika
-Web používá Android Vibration API. V profilu je přepínač i tlačítko **Otestovat haptiku**. v3.4 používá výraznější pulzy než v3.3.
+Použij `SUPABASE_SETUP.sql`, nastav `SUPABASE_URL` a `SUPABASE_SECRET_KEY` ve Vercelu a deployuj celý repozitář.

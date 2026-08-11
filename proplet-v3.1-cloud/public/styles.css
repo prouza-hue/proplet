@@ -141,3 +141,9 @@ body.playing .ambient{opacity:.28}
  #screen-daily .streak-card{padding:13px}.badge-rail{padding-top:6px}.badge-step{min-width:68px;padding:8px 6px}
  #screen-daily .mini-stats>div{padding:10px 6px}
 }
+
+/* v3.4.2: pravý progress je skutečně interaktivní */
+.difficulty-progress[role="button"]{cursor:pointer;transition:transform .14s ease,box-shadow .14s ease}
+.difficulty-progress[role="button"]:hover{transform:translateY(-1px) scale(1.035);box-shadow:0 8px 18px rgba(63,51,99,.12)}
+.difficulty-progress[role="button"]:active{transform:scale(.97)}
+.difficulty-progress[role="button"]:focus-visible{outline:3px solid color-mix(in srgb,var(--diff) 50%,white);outline-offset:3px}
