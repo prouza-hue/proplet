@@ -192,6 +192,115 @@ def dense_random_path(rows: int, cols: int, size: int, rng: random.Random) -> li
         return path
     return None
 
+def _direction(a: int, b: int, cols: int) -> tuple[int, int]:
+    ar, ac = divmod(a, cols)
+    br, bc = divmod(b, cols)
+    return br - ar, bc - ac
+
+
+def _turn_sign(d1: tuple[int, int] | None, d2: tuple[int, int]) -> int:
+    if d1 is None or d1 == d2:
+        return 0
+    cross = d1[1] * d2[0] - d1[0] * d2[1]
+    return 1 if cross > 0 else -1 if cross < 0 else 0
+
+
+def winding_random_path(
+    rows: int,
+    cols: int,
+    size: int,
+    rng: random.Random,
+    *,
+    turn_bias: float = 0.28,
+    curl_bias: float = 0.16,
+    node_limit: int = 12_000,
+) -> list[int] | None:
+    """Create a dense self-avoiding path with many bends and occasional spiral-like curls."""
+    all_cells = set(range(rows * cols))
+    center = ((rows - 1) / 2, (cols - 1) / 2)
+
+    for _ in range(18):
+        start = rng.randrange(rows * cols)
+        trail = [start]
+        used = {start}
+        nodes = 0
+
+        def dfs(last_dir: tuple[int, int] | None = None, last_turn: int = 0) -> bool:
+            nonlocal nodes
+            nodes += 1
+            if len(trail) == size:
+                return True
+            if nodes > node_limit:
+                return False
+
+            cur = trail[-1]
+            options = [n for n in neighbours(cur, rows, cols, all_cells) if n not in used]
+            rng.shuffle(options)
+            ranked: list[tuple[float, int, tuple[int, int], int]] = []
+
+            for nxt in options:
+                nd = _direction(cur, nxt, cols)
+                onward = sum(1 for x in neighbours(nxt, rows, cols, all_cells) if x not in used and x != cur)
+                touching = sum(1 for x in neighbours(nxt, rows, cols, all_cells) if x in used and x != cur)
+                nr, nc = divmod(nxt, cols)
+                dist_center = abs(nr - center[0]) + abs(nc - center[1])
+                is_turn = int(last_dir is not None and nd != last_dir)
+                ts = _turn_sign(last_dir, nd)
+                same_curl = int(ts != 0 and last_turn != 0 and ts == last_turn)
+
+                score = (
+                    onward * 0.35
+                    - is_turn * turn_bias
+                    - same_curl * curl_bias
+                    - min(touching, 2) * 0.14
+                    + dist_center * 0.018
+                    + rng.random() * 0.25
+                )
+                if onward == 0 and len(trail) + 1 < size:
+                    score += 50
+                ranked.append((score, nxt, nd, ts or last_turn))
+
+            ranked.sort(key=lambda x: x[0])
+            for _, nxt, nd, new_turn in ranked:
+                trail.append(nxt)
+                used.add(nxt)
+                if dfs(nd, new_turn):
+                    return True
+                used.remove(nxt)
+                trail.pop()
+            return False
+
+        if dfs():
+            return trail.copy()
+    return None
+
+
+def path_turn_metrics(path: list[int], cols: int) -> tuple[int, int]:
+    """Return (turn_count, longest run of turns in the same direction)."""
+    if len(path) < 3:
+        return 0, 0
+    dirs = [_direction(a, b, cols) for a, b in zip(path, path[1:])]
+    signs: list[int] = []
+    turns = 0
+    for d1, d2 in zip(dirs, dirs[1:]):
+        if d1 != d2:
+            turns += 1
+            sign = _turn_sign(d1, d2)
+            if sign:
+                signs.append(sign)
+
+    longest = cur = 0
+    prev = None
+    for sign in signs:
+        if sign == prev:
+            cur += 1
+        else:
+            cur = 1
+            prev = sign
+        longest = max(longest, cur)
+    return turns, longest
+
+
 def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int) -> list[str] | None:
     by_len: dict[int, list[str]] = defaultdict(list)
     for w in pool:
@@ -328,37 +437,84 @@ def solve_count(letters: list[str], rows: int, cols: int, mask_list: list[int], 
 
 
 SPECS = {
-    "easy": dict(rows=6, cols=6, cells=(28, 32), words=(6, 7), min_len=4, max_len=7, dict_size=6500, cand=(5, 32)),
-    "medium": dict(rows=7, cols=8, cells=(40, 46), words=(7, 8), min_len=4, max_len=8, dict_size=8500, cand=(8, 55)),
-    "hard": dict(rows=8, cols=8, cells=(50, 56), words=(9, 10), min_len=4, max_len=8, dict_size=9500, cand=(12, 160)),
+    "easy": [
+        dict(rows=6, cols=6, cells=(28, 32), words=(6, 7), min_len=4, max_len=7, dict_size=6500, cand=(5, 32),
+             style="dense", min_curvy=0, min_spiral=0),
+    ],
+    "medium": [
+        dict(rows=7, cols=8, cells=(40, 46), words=(7, 8), min_len=4, max_len=8, dict_size=8500, cand=(8, 55),
+             style="dense", min_curvy=0, min_spiral=0),
+    ],
+    "hard": [
+        dict(rows=8, cols=8, cells=(50, 56), words=(9, 10), min_len=4, max_len=9, dict_size=9500, cand=(10, 280),
+             style="winding", turn_bias=.28, curl_bias=.16, min_curvy=3, min_spiral=1),
+        dict(rows=9, cols=9, cells=(62, 70), words=(10, 12), min_len=4, max_len=9, dict_size=9500, cand=(12, 380),
+             style="winding", turn_bias=.30, curl_bias=.18, min_curvy=4, min_spiral=1),
+    ],
+    "hardcore": [
+        dict(rows=10, cols=10, cells=(78, 88), words=(12, 15), min_len=4, max_len=10, dict_size=10500, cand=(18, 650),
+             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2),
+    ],
 }
 
 
-def create_puzzle(difficulty: str, seed: int, answer_pool: list[str], dictionary: list[str], puzzle_id: str) -> dict:
-    spec = SPECS[difficulty]
+def spec_for(difficulty: str, variant_index: int | None, rng: random.Random) -> dict:
+    variants = SPECS[difficulty]
+    if variant_index is None:
+        return variants[rng.randrange(len(variants))]
+    return variants[variant_index % len(variants)]
+
+
+def create_puzzle(
+    difficulty: str,
+    seed: int,
+    answer_pool: list[str],
+    dictionary: list[str],
+    puzzle_id: str,
+    *,
+    variant_index: int | None = None,
+) -> dict:
     rng = random.Random(seed)
+    spec = spec_for(difficulty, variant_index, rng)
     lo_cand, hi_cand = spec["cand"]
 
-    for attempt in range(1200):
+    for attempt in range(1600):
         cells = rng.randint(*spec["cells"])
         count = rng.randint(*spec["words"])
-        path = dense_random_path(spec["rows"], spec["cols"], cells, rng)
-        if path is None:
-            continue
         words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"])
         if words is None:
             continue
         rng.shuffle(words)
 
+        if spec["style"] == "winding":
+            path = winding_random_path(
+                spec["rows"], spec["cols"], cells, rng,
+                turn_bias=spec.get("turn_bias", .28),
+                curl_bias=spec.get("curl_bias", .16),
+            )
+        else:
+            path = dense_random_path(spec["rows"], spec["cols"], cells, rng)
+        if path is None:
+            continue
+
         letters = [""] * (spec["rows"] * spec["cols"])
         answers = []
         pos = 0
+        curvy = 0
+        spiral_like = 0
+
         for word in words:
             segment = path[pos: pos + len(word)]
             pos += len(word)
-            answers.append({"word": word.upper(), "path": segment})
+            turns, curl_run = path_turn_metrics(segment, spec["cols"])
+            curvy += int(turns >= 2)
+            spiral_like += int(curl_run >= 2)
+            answers.append({"word": word.upper(), "path": segment, "turns": turns, "curlRun": curl_run})
             for ch, cell in zip(word, segment):
                 letters[cell] = ch.upper()
+
+        if curvy < spec.get("min_curvy", 0) or spiral_like < spec.get("min_spiral", 0):
+            continue
 
         solver_dictionary = list(dict.fromkeys(dictionary[: spec["dict_size"]] + words))
         solutions, candidate_count, search_nodes = solve_count(
@@ -370,8 +526,7 @@ def create_puzzle(difficulty: str, seed: int, answer_pool: list[str], dictionary
         if not (lo_cand <= candidate_count <= hi_cand):
             continue
 
-        # Add a stable, non-spoiler difficulty score for UI sorting.
-        score = round(candidate_count + search_nodes / 10 + (cells - 28) * 0.7)
+        score = round(candidate_count + search_nodes / 10 + max(0, cells - 28) * 0.7 + curvy * 2.2 + spiral_like * 3.5)
         return {
             "id": puzzle_id,
             "difficulty": difficulty,
@@ -388,6 +543,9 @@ def create_puzzle(difficulty: str, seed: int, answer_pool: list[str], dictionary
                 "difficultyScore": score,
                 "generatorSeed": seed,
                 "verifiedUnique": True,
+                "curvyWords": curvy,
+                "spiralWords": spiral_like,
+                "pathStyle": spec["style"],
             },
         }
     raise RuntimeError(f"Could not generate {difficulty} puzzle {puzzle_id} from seed {seed}")
@@ -398,16 +556,17 @@ def main():
     ap.add_argument("--free-per-level", type=int, default=50)
     ap.add_argument("--daily", type=int, default=365)
     ap.add_argument("--seed", type=int, default=20260811)
+    ap.add_argument("--preserve-existing", action="store_true",
+                    help="Keep current Easy/Medium/Daily banks and regenerate Hard + Hardcore.")
     args = ap.parse_args()
 
     freq = load_frequency_words()
     dictionary = [w for w, _ in freq if w not in FUNCTION_WORDS]
-    # Ensure curated words are known to the solver even when absent/low-frequency in subtitle data.
     curated = []
     seen = set()
     for raw in CURATED:
         w = clean_word(raw)
-        if not w or not 3 <= len(w) <= 9 or w in FUNCTION_WORDS or w in seen:
+        if not w or not 3 <= len(w) <= 10 or w in FUNCTION_WORDS or w in seen:
             continue
         seen.add(w)
         curated.append(w)
@@ -415,26 +574,46 @@ def main():
         if w not in dictionary:
             dictionary.append(w)
     dictionary = dictionary[:12000] + [w for w in curated if w not in dictionary[:12000]]
-    # Intended answers are strongly biased toward the curated family-friendly pool. A smaller
-    # slice of common corpus words keeps generation varied; curated terms are repeated here
-    # only as sampling weights, while the solver still uses the large unique dictionary.
-    fallback = [w for w, _ in freq[250:6500] if w not in FUNCTION_WORDS and w not in NAME_BLOCK and 4 <= len(w) <= 8]
-    answer_pool = curated * 12 + fallback[:500]
 
+    fallback = [w for w, _ in freq[250:6500]
+                if w not in FUNCTION_WORDS and w not in NAME_BLOCK and 4 <= len(w) <= 9]
+    answer_pool = curated * 12 + fallback[:500]
     WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
 
-    rng = random.Random(args.seed)
-    free = {"easy": [], "medium": [], "hard": []}
-    daily = []
+    old = json.loads(PUZZLES_SERVER_OUT.read_text(encoding="utf-8")) if args.preserve_existing and PUZZLES_SERVER_OUT.exists() else None
+    rng = random.Random(args.seed + 33)
+
+    if old:
+        free = {"easy": old["free"]["easy"], "medium": old["free"]["medium"], "hard": [], "hardcore": []}
+        daily = old["daily"]
+        legacy = old.get("legacyFree", {})
+        legacy.setdefault("hard", old["free"].get("hard", []))
+    else:
+        free = {"easy": [], "medium": [], "hard": [], "hardcore": []}
+        daily = []
+        legacy = {}
+
     used_signatures = set()
+    for bank in free.values():
+        for p in bank:
+            used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
+    for p in daily:
+        used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
 
     started = time.time()
-    for difficulty in ("easy", "medium", "hard"):
+    levels_to_generate = ("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore")
+    id_prefix = {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
+
+    for difficulty in levels_to_generate:
         for i in range(args.free_per_level):
             while True:
                 seed = rng.randrange(1, 2**31 - 1)
-                p = create_puzzle(difficulty, seed, answer_pool, dictionary, f"{difficulty[0]}-{i+1:03d}")
-                sig = tuple(p["letters"])
+                p = create_puzzle(
+                    difficulty, seed, answer_pool, dictionary,
+                    f"{id_prefix[difficulty]}-{i+1:03d}",
+                    variant_index=i if difficulty == "hard" else None,
+                )
+                sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig not in used_signatures:
                     used_signatures.add(sig)
                     free[difficulty].append(p)
@@ -442,33 +621,34 @@ def main():
             if (i + 1) % 10 == 0:
                 print(f"free {difficulty}: {i+1}/{args.free_per_level}")
 
-    # Weighted daily mix: mostly medium, enough easy/hard to keep the week varied.
-    mix = ["easy", "medium", "medium", "medium", "hard", "hard"]
-    for i in range(args.daily):
-        difficulty = mix[i % len(mix)]
-        while True:
-            seed = rng.randrange(1, 2**31 - 1)
-            p = create_puzzle(difficulty, seed, answer_pool, dictionary, f"d-{i+1:03d}")
-            sig = tuple(p["letters"])
-            if sig not in used_signatures:
-                used_signatures.add(sig)
-                daily.append(p)
-                break
-        if (i + 1) % 25 == 0:
-            print(f"daily: {i+1}/{args.daily}")
+    if not old:
+        mix = ["easy", "medium", "medium", "medium", "hard", "hard"]
+        for i in range(args.daily):
+            difficulty = mix[i % len(mix)]
+            while True:
+                seed = rng.randrange(1, 2**31 - 1)
+                p = create_puzzle(difficulty, seed, answer_pool, dictionary, f"d-{i+1:03d}")
+                sig = (p["rows"], p["cols"], tuple(p["letters"]))
+                if sig not in used_signatures:
+                    used_signatures.add(sig)
+                    daily.append(p)
+                    break
+            if (i + 1) % 25 == 0:
+                print(f"daily: {i+1}/{args.daily}")
 
     payload = {
-        "version": 2,
+        "version": 3,
         "generatedAt": "2026-08-11",
         "dictionarySize": len(dictionary),
         "dailyRotationSize": len(daily),
         "free": free,
+        "legacyFree": legacy,
         "daily": daily,
     }
     payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     PUZZLES_PUBLIC_OUT.write_text(payload_json, encoding="utf-8")
     PUZZLES_SERVER_OUT.write_text(payload_json, encoding="utf-8")
-    print(f"Generated {sum(map(len, free.values()))} free + {len(daily)} daily puzzles in {time.time()-started:.1f}s")
+    print(f"Generated/kept {sum(map(len, free.values()))} free + {len(daily)} daily puzzles in {time.time()-started:.1f}s")
     print(f"Dictionary: {len(dictionary)} words; curated answer pool: {len(curated)} words")
 
 

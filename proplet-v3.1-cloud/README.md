@@ -1,34 +1,30 @@
-# Proplet v3.1 Cloud
+# Proplet v3.3 Cloud
 
-Cloud-ready verze Propletu pro **Vercel + Supabase**.
+Česká slovní logická hra pro Vercel + Supabase.
 
-- FastAPI běží jako Vercel Function.
-- `public/` obsahuje PWA frontend a puzzle databázi.
-- Supabase (Postgres přes Data REST API) drží hráče a výsledky.
-- Citlivý `SUPABASE_SECRET_KEY` je pouze environment variable na Vercelu a není v browseru ani GitHubu.
-- Daily Challenge se mění automaticky podle data v Europe/Prague a každý hráč ji může dokončit pouze jednou.
-- Volná hra obsahuje 50 unikátních úloh pro každou obtížnost (150 celkem).
+## v3.3 v kostce
+- 50 Easy (6×6)
+- 50 Medium (7×8)
+- 50 Hard (25× 8×8 + 25× 9×9), výrazně křivější „šnečí“ cesty
+- 50 **Mozkožrout** (10×10), dlouhé a silně winding cesty
+- 365 Daily — zachované beze změny z v3.2.2
+- exact-cover solver + kontrola jednoznačnosti při generování
+- postup úrovněmi místo náhodného výběru ve free režimu
+- XP level roadmap + streak badges + achievements
+- heslové účty a více současně přihlášených zařízení
+- cloudový merge dokončených úloh, takže Daily nejde zopakovat ani na druhém zařízení
+- offline fronta výsledků, automatická synchronizace a rodinný leaderboard
 
-Začni souborem **NASAZENI_CZ.md**.
+## Aktualizace stávajícího Propletu
+Čti `UPDATE_V3_3_CZ.md`. **Nejdřív spusť `SUPABASE_MIGRATION_V3_3.sql`, potom deployuj kód.**
 
-## Environment variables
+## Čistá instalace
+Použij `SUPABASE_SETUP.sql`, nastav `SUPABASE_URL` a `SUPABASE_SECRET_KEY` ve Vercelu a deployuj celý repozitář.
 
-- `SUPABASE_URL`
-- `SUPABASE_SECRET_KEY`
+## Generování puzzle
+`python tools/generate_puzzles.py --preserve-existing --free-per-level 50`
 
-## Databáze
+Generátor zachová Easy/Medium/Daily, vytvoří novou Hard + Mozkožrout banku a zapíše `public/puzzles.json` i `data/puzzles.json`.
 
-Spusť `SUPABASE_SETUP.sql` v Supabase SQL Editoru.
-
-## Lokální vývoj (volitelné)
-
-```bash
-pip install -r requirements.txt
-export SUPABASE_URL='https://...supabase.co'
-export SUPABASE_SECRET_KEY='sb_secret_...'
-uvicorn server:app --reload
-```
-
-## Jazyková data
-
-Viz `NOTICE.md`.
+## Herní review
+Viz `GAME_REVIEW_V3_3_CZ.md`.

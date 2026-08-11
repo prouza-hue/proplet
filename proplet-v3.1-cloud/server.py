@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import logging
 import os
@@ -37,9 +38,9 @@ BADGES = [
     {"days": 100, "icon": "🚀", "name": "Legenda"},
 ]
 
-POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35}
+POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.2.2-cloud")
+app = FastAPI(title="Proplet API", version="3.3-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -59,6 +60,18 @@ async def unexpected_error_handler(request, exc: Exception):
 class PlayerCreate(BaseModel):
     name: str = Field(min_length=1, max_length=24)
     family_code: str = Field(min_length=2, max_length=24)
+    # Optional keeps a rolling deployment compatible with an older cached PWA.
+    password: Optional[str] = Field(default=None, min_length=8, max_length=128)
+
+
+class PlayerLogin(BaseModel):
+    name: str = Field(min_length=1, max_length=24)
+    family_code: str = Field(min_length=2, max_length=24)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class PasswordSet(BaseModel):
+    password: str = Field(min_length=8, max_length=128)
 
 
 class ResultCreate(BaseModel):
@@ -129,15 +142,69 @@ def norm_family(code: str) -> str:
     return code[:24]
 
 
+SCRYPT_N = 2 ** 14
+SCRYPT_R = 8
+SCRYPT_P = 5
+SCRYPT_MAXMEM = 32 * 1024 * 1024
+
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_bytes(16)
+    digest = hashlib.scrypt(
+        password.encode("utf-8"), salt=salt, n=SCRYPT_N, r=SCRYPT_R, p=SCRYPT_P,
+        maxmem=SCRYPT_MAXMEM, dklen=32,
+    )
+    return f"scrypt${SCRYPT_N}${SCRYPT_R}${SCRYPT_P}${salt.hex()}${digest.hex()}"
+
+
+def verify_password(password: str, encoded: Optional[str]) -> bool:
+    if not encoded:
+        return False
+    try:
+        scheme, n, r, p_cost, salt_hex, digest_hex = encoded.split("$", 5)
+        if scheme != "scrypt":
+            return False
+        digest = hashlib.scrypt(
+            password.encode("utf-8"), salt=bytes.fromhex(salt_hex),
+            n=int(n), r=int(r), p=int(p_cost), maxmem=SCRYPT_MAXMEM, dklen=len(bytes.fromhex(digest_hex)),
+        )
+        return hmac.compare_digest(digest.hex(), digest_hex)
+    except (ValueError, TypeError):
+        return False
+
+
+def new_session(player_id: str) -> str:
+    token = secrets.token_urlsafe(32)
+    db_insert("player_sessions", {
+        "id": str(uuid.uuid4()),
+        "player_id": player_id,
+        "token_hash": hashlib.sha256(token.encode()).hexdigest(),
+        "created_at": datetime.now(TZ).isoformat(),
+    })
+    return token
+
+
 def auth_player(authorization: Optional[str]) -> dict:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(401, "Chybí přihlášení hráče")
     token = authorization[7:].strip()
     token_hash = hashlib.sha256(token.encode()).hexdigest()
+
+    # Legacy/main-device token stays valid forever, so the v3.3 migration does not log anyone out.
     rows = db_select("players", token_hash=token_hash)
-    if not rows:
-        raise HTTPException(401, "Neplatný hráčský token")
-    return rows[0]
+    if rows:
+        return rows[0]
+
+    # Additional devices get independent session tokens.
+    try:
+        sessions = db_select("player_sessions", token_hash=token_hash)
+    except HTTPException:
+        sessions = []
+    if sessions:
+        players = db_select("players", id=sessions[0]["player_id"])
+        if players:
+            return players[0]
+    raise HTTPException(401, "Neplatné přihlášení hráče")
 
 
 def current_prague_date() -> date:
@@ -172,7 +239,7 @@ def player_stats(player_id: str) -> dict:
     """Statistiky počítáme defenzivně, aby jeden starý/poškozený řádek neshodil synchronizaci."""
     rows = db_select("results", player_id=player_id)
     daily_dates: list[str] = []
-    free = {k: 0 for k in ("easy", "medium", "hard")}
+    free = {k: 0 for k in ("easy", "medium", "hard", "hardcore")}
     daily_times: list[int] = []
     total_points = 0
 
@@ -231,7 +298,10 @@ def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     data = load_puzzles()
     if mode == "daily":
         return any(p["id"] == puzzle_id and p["difficulty"] == difficulty for p in data["daily"])
-    return any(p["id"] == puzzle_id for p in data["free"].get(difficulty, []))
+    if any(p["id"] == puzzle_id for p in data["free"].get(difficulty, [])):
+        return True
+    # Keep queued results from older Hard banks syncable after the v3.3 puzzle upgrade.
+    return any(p["id"] == puzzle_id for p in data.get("legacyFree", {}).get(difficulty, []))
 
 
 @app.get("/")
@@ -253,9 +323,14 @@ def health():
         return {**base, "ok": False, "database": False, "message": "Chybí SUPABASE_URL nebo SUPABASE_SECRET_KEY"}
     try:
         db_request("GET", "players", params={"select": "id", "limit": "1"})
-        return {**base, "ok": True, "database": True}
+        account_migration = True
+        try:
+            db_request("GET", "player_sessions", params={"select": "id", "limit": "1"})
+        except HTTPException:
+            account_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -276,7 +351,6 @@ def create_player(payload: PlayerCreate):
     if not name or len(family) < 2:
         raise HTTPException(400, "Vyplň jméno a rodinný kód")
 
-    # Kontrola bez závislosti na case-insensitive PostgREST filtru.
     family_players = db_select("players", family_code=family)
     if any(p["name"].casefold() == name.casefold() for p in family_players):
         raise HTTPException(409, "V této rodině už hráč s tímto jménem existuje")
@@ -285,27 +359,87 @@ def create_player(payload: PlayerCreate):
     token_hash = hashlib.sha256(token.encode()).hexdigest()
     player_id = str(uuid.uuid4())
     now = datetime.now(TZ).isoformat()
+    row = {
+        "id": player_id,
+        "name": name,
+        "family_code": family,
+        "token_hash": token_hash,
+        "created_at": now,
+    }
+    if payload.password:
+        row["password_hash"] = hash_password(payload.password)
+
     try:
-        db_insert("players", {
-            "id": player_id,
-            "name": name,
-            "family_code": family,
-            "token_hash": token_hash,
-            "created_at": now,
-        })
+        db_insert("players", row)
     except HTTPException as exc:
         if exc.status_code == 409:
             raise HTTPException(409, "V této rodině už hráč s tímto jménem existuje")
         raise
+
     stats = player_stats(player_id)
-    return {"id": player_id, "name": name, "familyCode": family, "token": token, "stats": stats}
+    return {
+        "id": player_id, "name": name, "familyCode": family, "token": token,
+        "hasPassword": bool(payload.password), "stats": stats,
+    }
+
+
+@app.post("/api/login")
+def login(payload: PlayerLogin):
+    family = norm_family(payload.family_code)
+    name = " ".join(payload.name.strip().split())
+    family_players = db_select("players", family_code=family)
+    player = next((p for p in family_players if p["name"].casefold() == name.casefold()), None)
+    if not player:
+        raise HTTPException(401, "Jméno, rodinný kód nebo heslo nesedí")
+    if not player.get("password_hash"):
+        raise HTTPException(409, "Tento hráč ještě nemá heslo. Nastav ho na zařízení, kde už je přihlášený.")
+    if not verify_password(payload.password, player.get("password_hash")):
+        raise HTTPException(401, "Jméno, rodinný kód nebo heslo nesedí")
+
+    token = new_session(player["id"])
+    return {
+        "id": player["id"], "name": player["name"], "familyCode": player["family_code"],
+        "token": token, "hasPassword": True, "stats": player_stats(player["id"]),
+    }
+
+
+@app.post("/api/password")
+def set_password(payload: PasswordSet, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    db_update("players", {"id": player["id"]}, {"password_hash": hash_password(payload.password)})
+    return {"ok": True, "hasPassword": True}
 
 
 @app.get("/api/me")
 def me(authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     stats = player_stats(player["id"])
-    return {"id": player["id"], "name": player["name"], "familyCode": player["family_code"], "stats": stats}
+    return {
+        "id": player["id"], "name": player["name"], "familyCode": player["family_code"],
+        "hasPassword": bool(player.get("password_hash")), "stats": stats,
+    }
+
+
+@app.get("/api/progress")
+def progress(authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    rows = db_select("results", player_id=player["id"])
+    return {
+        "completed": [
+            {
+                "puzzleId": r.get("puzzle_id"),
+                "challengeKey": r.get("challenge_key"),
+                "mode": r.get("mode"),
+                "difficulty": r.get("difficulty"),
+                "dailyDate": str(r.get("daily_date"))[:10] if r.get("daily_date") else None,
+                "elapsedMs": int(r.get("best_elapsed_ms") or 1000),
+                "moves": int(r.get("best_moves") or 1),
+                "points": int(r.get("points") or 0),
+                "completedAt": r.get("completed_at"),
+            }
+            for r in rows
+        ]
+    }
 
 
 @app.post("/api/result")
@@ -313,7 +447,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
     player = auth_player(authorization)
     if payload.mode not in ("daily", "free"):
         raise HTTPException(400, "Neplatný režim")
-    if payload.difficulty not in ("easy", "medium", "hard"):
+    if payload.difficulty not in ("easy", "medium", "hard", "hardcore"):
         raise HTTPException(400, "Neplatná obtížnost")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")

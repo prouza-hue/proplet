@@ -82,6 +82,11 @@
       <div class="screen-title"><span class="eyebrow">HRÁČ</span><h1>Moje Proplet kariéra</h1></div>
       <div id="profileCard" class="card profile-card"></div>
 
+      <div class="card level-roadmap-card">
+        <div class="section-head"><div><span class="eyebrow">LEVELY</span><h2>Kam míříš</h2></div></div>
+        <div id="levelRoadmap" class="level-roadmap"></div>
+      </div>
+
       <div class="card achievement-card">
         <div class="section-head"><div><span class="eyebrow">ÚSPĚCHY</span><h2>Co už máš za sebou</h2></div></div>
         <div id="achievementGrid" class="achievement-grid"></div>
@@ -156,13 +161,31 @@
     <div class="modal-card left">
       <button id="closeProfileModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">RODINNÝ LEADERBOARD</span>
-      <h2>Vytvoř hráče</h2>
-      <p class="muted">Na všech telefonech použijte stejný rodinný kód. Jméno každého hráče musí být jiné.</p>
-      <label>Jméno<input id="playerNameInput" maxlength="24" placeholder="např. Ardan" /></label>
+      <div class="account-tabs">
+        <button id="profileModeLogin" class="account-tab active" type="button">Přihlásit se</button>
+        <button id="profileModeCreate" class="account-tab" type="button">Nový hráč</button>
+      </div>
+      <h2 id="profileModalTitle">Přihlásit hráče</h2>
+      <p id="profileModalDesc" class="muted">Stejný účet můžeš použít na mobilu, počítači i tabletu.</p>
+      <label>Jméno<input id="playerNameInput" maxlength="24" autocomplete="username" placeholder="např. Ardan" /></label>
       <label>Rodinný kód<input id="familyCodeInput" maxlength="24" placeholder="např. PROUZOVI" autocapitalize="characters" /></label>
+      <label>Heslo<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
       <div id="profileFormError" class="form-error"></div>
-      <button id="saveProfileBtn" class="primary-btn big">Připojit se</button>
+      <button id="saveProfileBtn" class="primary-btn big">Přihlásit se</button>
       <button id="skipProfileBtn" class="text-btn">Zatím hrát bez leaderboardu</button>
+    </div>
+  </div>
+
+  <div id="passwordModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closePasswordModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">VÍCE ZAŘÍZENÍ</span>
+      <h2>Nastav heslo</h2>
+      <p class="muted">Tím zpřístupníš svůj stávající profil i na notebooku nebo jiném telefonu. Tvoje dosavadní výsledky zůstanou.</p>
+      <label>Nové heslo<input id="setPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="alespoň 8 znaků" /></label>
+      <label>Heslo znovu<input id="setPasswordConfirmInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" /></label>
+      <div id="passwordFormError" class="form-error"></div>
+      <button id="savePasswordBtn" class="primary-btn big">Uložit heslo</button>
     </div>
   </div>
 
