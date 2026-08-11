@@ -44,6 +44,12 @@
         <div id="dailySyncStatus" class="daily-sync hidden"></div>
       </div>
 
+      <div id="rescueCard" class="card rescue-card hidden">
+        <div class="rescue-flame">🔥</div>
+        <div class="rescue-copy"><span class="eyebrow">ZÁCHRANA STREAKU</span><h2 id="rescueTitle">Tvůj streak je v ohrožení</h2><p id="rescueText" class="muted"></p></div>
+        <button id="rescueBtn" class="rescue-btn">Zachránit streak · 30 s</button>
+      </div>
+
       <div id="levelCard" class="card level-card"></div>
 
       <div class="card streak-card">
@@ -103,6 +109,8 @@
           <button id="soundToggle" class="setting-toggle"></button>
           <button id="hapticToggle" class="setting-toggle"></button>
         </div>
+        <button id="hapticTestBtn" class="secondary-btn intro-replay-btn">📳 Otestovat haptiku</button>
+        <button id="replayIntroBtn" class="secondary-btn intro-replay-btn">▶ Ukázat úvod znovu</button>
       </div>
     </section>
 
@@ -113,24 +121,33 @@
         <div class="game-clock"><span id="timer">00:00</span><small id="moves">0 tahů</small></div>
       </div>
 
-      <div class="game-info card">
-        <div><span class="stat-label">Najdi slova</span><div id="lengths" class="lengths"></div></div>
-        <div id="gameProgress" class="game-progress">0 / 0</div>
-      </div>
+      <div class="game-main">
+        <div class="game-board-column">
+          <div class="game-info card">
+            <div class="word-targets"><span class="stat-label">Slova</span><div id="lengths" class="lengths"></div></div>
+            <div id="gameProgress" class="game-progress">0 / 0</div>
+          </div>
 
-      <div class="board-stage card">
-        <div id="boardWrap" class="board-wrap">
-          <svg id="pathLayer" class="path-layer" aria-hidden="true"></svg>
-          <div id="board" class="board" role="grid"></div>
+          <div id="boardStage" class="board-stage card">
+            <div id="boardWrap" class="board-wrap">
+              <svg id="pathLayer" class="path-layer" aria-hidden="true"></svg>
+              <div id="board" class="board" role="grid"></div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="current-word"><span class="stat-label">Aktuálně</span><strong id="currentWord">—</strong></div>
-      <div id="gameMessage" class="game-message" aria-live="polite"></div>
-      <div class="game-actions">
-        <button id="undoBtn" class="secondary-btn">↶ Zpět</button>
-        <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
-        <button id="resetBtn" class="secondary-btn">Reset</button>
+        <aside class="game-control-column">
+          <div class="current-word card">
+            <div><span class="stat-label">Aktuálně</span><strong id="currentWord">—</strong></div>
+            <span id="cleanStatus" class="clean-status">✨ Clean</span>
+          </div>
+          <div id="gameMessage" class="game-message" aria-live="polite"></div>
+          <div class="game-actions">
+            <button id="undoBtn" class="secondary-btn">↶ Zpět</button>
+            <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
+            <button id="resetBtn" class="secondary-btn">Reset</button>
+          </div>
+        </aside>
       </div>
     </section>
   </main>
@@ -149,6 +166,7 @@
       <h2 id="winTitle">Hotovo!</h2>
       <p id="winText" class="muted"></p>
       <div id="winXp" class="win-xp"></div>
+      <div id="winClean" class="win-clean hidden"></div>
       <div id="winWords" class="win-words"></div>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
       <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
@@ -186,6 +204,39 @@
       <label>Heslo znovu<input id="setPasswordConfirmInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" /></label>
       <div id="passwordFormError" class="form-error"></div>
       <button id="savePasswordBtn" class="primary-btn big">Uložit heslo</button>
+    </div>
+  </div>
+
+  <div id="hintModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left hint-card">
+      <button id="closeHintModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">CHYTRÁ NÁPOVĚDA</span>
+      <h2>Kolik pomoci chceš?</h2>
+      <p class="muted">Jakákoli nápověda zruší ✨ Clean solve této úlohy.</p>
+      <button class="hint-choice" data-hint-level="1"><span>💡</span><div><strong>Lehká</strong><small>Ukáže začátek a délku vhodného slova.</small></div></button>
+      <button class="hint-choice" data-hint-level="2"><span>🔦</span><div><strong>Silnější</strong><small>Ukáže první tři políčka cesty.</small></div></button>
+      <button class="hint-choice" data-hint-level="3"><span>🧭</span><div><strong>Odhalit</strong><small>Na chvíli ukáže celé slovo i jeho cestu.</small></div></button>
+    </div>
+  </div>
+
+  <div id="rescueOfferModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card rescue-modal-card">
+      <div class="rescue-big-icon">🔥</div>
+      <span class="eyebrow">STREAK JEŠTĚ ŽIJE</span>
+      <h2 id="rescueOfferTitle">Chceš ho zachránit?</h2>
+      <p id="rescueOfferText" class="muted"></p>
+      <div class="rescue-rule"><strong>30 sekund</strong><span>6×6 · bez nápovědy · jeden pokus</span></div>
+      <button id="confirmRescueBtn" class="primary-btn big">Ano, jdu do toho 🔥</button>
+      <button id="cancelRescueBtn" class="text-btn">Teď ne</button>
+    </div>
+  </div>
+
+  <div id="onboardingModal" class="modal onboarding-modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card onboarding-card">
+      <button id="skipOnboardingBtn" class="modal-close" aria-label="Přeskočit">×</button>
+      <div id="onboardDots" class="onboard-dots"></div>
+      <div id="onboardContent"></div>
+      <button id="onboardNextBtn" class="primary-btn big">Pokračovat</button>
     </div>
   </div>
 

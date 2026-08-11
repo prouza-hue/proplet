@@ -40,7 +40,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.3-cloud")
+app = FastAPI(title="Proplet API", version="3.4-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -82,6 +82,15 @@ class ResultCreate(BaseModel):
     elapsed_ms: int = Field(ge=1000, le=86_400_000)
     moves: int = Field(ge=1, le=10000)
     daily_date: Optional[str] = None
+    hints_used: int = Field(default=0, ge=0, le=99)
+    # Conservative default keeps older cached clients from being falsely marked as Clean.
+    clean_solve: bool = False
+
+
+class RescueFinish(BaseModel):
+    puzzle_id: str
+    completed: bool
+    elapsed_ms: int = Field(ge=0, le=120_000)
 
 
 def supabase_ready() -> bool:
@@ -235,24 +244,45 @@ def streaks(dates: list[str]) -> tuple[int, int]:
     return current, longest
 
 
+def streak_ending_on(date_strings: list[str] | set[str], anchor: date) -> int:
+    vals = set(str(x)[:10] for x in date_strings if x)
+    n = 0
+    d = anchor
+    while d.isoformat() in vals:
+        n += 1
+        d -= timedelta(days=1)
+    return n
+
+
+def rescue_rows(player_id: str) -> list[dict]:
+    return db_select("streak_rescues", player_id=player_id)
+
+
 def player_stats(player_id: str) -> dict:
-    """Statistiky počítáme defenzivně, aby jeden starý/poškozený řádek neshodil synchronizaci."""
+    """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
     rows = db_select("results", player_id=player_id)
     daily_dates: list[str] = []
     free = {k: 0 for k in ("easy", "medium", "hard", "hardcore")}
     daily_times: list[int] = []
     total_points = 0
+    clean_solves = 0
+    clean_daily = 0
 
     for r in rows:
         mode = r.get("mode")
         difficulty = r.get("difficulty")
         total_points += int(r.get("points") or 0)
+        is_clean = r.get("clean_solve") is True
+        if is_clean:
+            clean_solves += 1
 
         if mode == "daily" and r.get("daily_date"):
             raw_date = str(r.get("daily_date"))[:10]
             try:
                 date.fromisoformat(raw_date)
                 daily_dates.append(raw_date)
+                if is_clean:
+                    clean_daily += 1
             except ValueError:
                 logger.warning("Ignoring malformed daily_date for result %s: %r", r.get("id"), r.get("daily_date"))
             try:
@@ -263,7 +293,22 @@ def player_stats(player_id: str) -> dict:
         if mode == "free" and difficulty in free:
             free[difficulty] += 1
 
-    current, longest = streaks(daily_dates)
+    rescued_dates: list[str] = []
+    try:
+        for rr in rescue_rows(player_id):
+            if rr.get("status") == "passed" and rr.get("missed_date"):
+                raw = str(rr.get("missed_date"))[:10]
+                try:
+                    date.fromisoformat(raw)
+                    rescued_dates.append(raw)
+                except ValueError:
+                    pass
+    except HTTPException:
+        # During a rolling deploy before the v3.4 migration, normal gameplay remains readable.
+        rescued_dates = []
+
+    effective_dates = list(set(daily_dates) | set(rescued_dates))
+    current, longest = streaks(effective_dates)
     earned = [b for b in BADGES if longest >= b["days"]]
     next_badge = next((b for b in BADGES if current < b["days"]), None)
     return {
@@ -274,10 +319,60 @@ def player_stats(player_id: str) -> dict:
         "currentStreak": current,
         "longestStreak": longest,
         "bestDailyMs": min(daily_times) if daily_times else None,
+        "cleanSolves": clean_solves,
+        "cleanDaily": clean_daily,
+        "rescuedDays": len(set(rescued_dates)),
         "earnedBadges": earned,
         "nextBadge": next_badge,
     }
 
+
+def rescue_status_for(player_id: str) -> dict:
+    today = current_prague_date()
+    missed = today - timedelta(days=1)
+    before = missed - timedelta(days=1)
+    rows = db_select("results", player_id=player_id)
+    daily_dates = {str(r.get("daily_date"))[:10] for r in rows if r.get("mode") == "daily" and r.get("daily_date")}
+    rescues = rescue_rows(player_id)
+    passed = {str(r.get("missed_date"))[:10] for r in rescues if r.get("status") == "passed" and r.get("missed_date")}
+    effective = daily_dates | passed
+    target = missed.isoformat()
+    existing = next((r for r in rescues if str(r.get("missed_date"))[:10] == target), None)
+    prior_streak = streak_ending_on(effective, before)
+
+    if existing:
+        status = existing.get("status")
+        if status == "started":
+            try:
+                started = datetime.fromisoformat(str(existing.get("started_at")).replace("Z", "+00:00"))
+                now = datetime.now(TZ)
+                if started.tzinfo is None:
+                    started = started.replace(tzinfo=TZ)
+                elapsed = (now - started.astimezone(TZ)).total_seconds()
+                if elapsed > 35:
+                    db_update("streak_rescues", {"id": existing["id"]}, {
+                        "status": "failed", "completed_at": now.isoformat(),
+                        "elapsed_ms": int(max(0, elapsed * 1000)),
+                    })
+                    status = "failed"
+                else:
+                    return {
+                        "eligible": True, "state": "started", "missedDate": target,
+                        "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
+                        "timeLimitMs": 30000, "secondsRemaining": max(0, round(30 - elapsed, 1)),
+                    }
+            except Exception:
+                status = "failed"
+        return {
+            "eligible": False, "state": status or "failed", "missedDate": target,
+            "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
+        }
+
+    eligible = target not in effective and before.isoformat() in effective and prior_streak > 0
+    return {
+        "eligible": eligible, "state": "available" if eligible else "none",
+        "missedDate": target if eligible else None, "priorStreak": prior_streak if eligible else 0,
+    }
 
 def load_puzzles() -> dict:
     return json.loads(PUZZLES_PATH.read_text(encoding="utf-8"))
@@ -328,9 +423,15 @@ def health():
             db_request("GET", "player_sessions", params={"select": "id", "limit": "1"})
         except HTTPException:
             account_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration}
+        features_migration = True
+        try:
+            db_request("GET", "results", params={"select": "id,hints_used,clean_solve", "limit": "1"})
+            db_request("GET", "streak_rescues", params={"select": "id", "limit": "1"})
+        except HTTPException:
+            features_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -341,6 +442,7 @@ def config():
         "points": POINTS,
         "dictionarySize": p["dictionarySize"],
         "dailyRotationSize": p["dailyRotationSize"],
+        "rescueBankSize": len(p.get("rescue", [])),
     }
 
 
@@ -435,6 +537,8 @@ def progress(authorization: Optional[str] = Header(default=None)):
                 "elapsedMs": int(r.get("best_elapsed_ms") or 1000),
                 "moves": int(r.get("best_moves") or 1),
                 "points": int(r.get("points") or 0),
+                "hintsUsed": int(r.get("hints_used") or 0),
+                "cleanSolve": r.get("clean_solve") is True,
                 "completedAt": r.get("completed_at"),
             }
             for r in rows
@@ -442,9 +546,18 @@ def progress(authorization: Optional[str] = Header(default=None)):
     }
 
 
+def merged_hint_count(old_value, new_value: int) -> int:
+    try:
+        old = int(old_value) if old_value is not None else int(new_value)
+    except (TypeError, ValueError):
+        old = int(new_value)
+    return min(old, int(new_value))
+
+
 @app.post("/api/result")
 def result(payload: ResultCreate, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
+    effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
     if payload.mode not in ("daily", "free"):
         raise HTTPException(400, "Neplatný režim")
     if payload.difficulty not in ("easy", "medium", "hard", "hardcore"):
@@ -478,6 +591,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             db_update("results", {"id": old["id"]}, {
                 "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
                 "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
+                "hints_used": merged_hint_count(old.get("hints_used"), payload.hints_used),
+                "clean_solve": bool(old.get("clean_solve") is True or effective_clean),
             })
         first = False
     else:
@@ -493,6 +608,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 "best_elapsed_ms": payload.elapsed_ms,
                 "best_moves": payload.moves,
                 "points": points,
+                "hints_used": payload.hints_used,
+                "clean_solve": effective_clean,
                 "completed_at": datetime.now(TZ).isoformat(),
             })
             first = True
@@ -505,6 +622,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 db_update("results", {"id": old["id"]}, {
                     "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
                     "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
+                    "hints_used": merged_hint_count(old.get("hints_used"), payload.hints_used),
+                    "clean_solve": bool(old.get("clean_solve") is True or effective_clean),
                 })
             first = False
 
@@ -546,6 +665,61 @@ def result_status(
     }
 
 
+@app.get("/api/rescue-status")
+def rescue_status(authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    return rescue_status_for(player["id"])
+
+
+@app.post("/api/rescue/start")
+def rescue_start(authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    status = rescue_status_for(player["id"])
+    if status.get("state") == "started":
+        return status
+    if not status.get("eligible") or status.get("state") != "available":
+        raise HTTPException(409, "Záchrana streaku teď není dostupná")
+    bank = load_puzzles().get("rescue", [])
+    if not bank:
+        raise HTTPException(503, "Rescue úlohy nejsou na serveru")
+    missed = status["missedDate"]
+    digest = hashlib.sha256(f"{player['id']}:{missed}".encode()).digest()
+    puzzle = bank[int.from_bytes(digest[:4], "big") % len(bank)]
+    now = datetime.now(TZ)
+    db_insert("streak_rescues", {
+        "id": str(uuid.uuid4()), "player_id": player["id"], "missed_date": missed,
+        "puzzle_id": puzzle["id"], "status": "started", "started_at": now.isoformat(),
+    })
+    return {
+        "eligible": True, "state": "started", "missedDate": missed,
+        "priorStreak": status.get("priorStreak", 0), "puzzleId": puzzle["id"],
+        "timeLimitMs": 30000, "secondsRemaining": 30,
+    }
+
+
+@app.post("/api/rescue/finish")
+def rescue_finish(payload: RescueFinish, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    rows = db_select("streak_rescues", player_id=player["id"], puzzle_id=payload.puzzle_id)
+    if not rows:
+        raise HTTPException(404, "Záchranný pokus nebyl nalezen")
+    row = sorted(rows, key=lambda r: str(r.get("started_at") or ""), reverse=True)[0]
+    if row.get("status") != "started":
+        return {"ok": row.get("status") == "passed", "state": row.get("status"), "stats": player_stats(player["id"])}
+    started = datetime.fromisoformat(str(row.get("started_at")).replace("Z", "+00:00"))
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=TZ)
+    server_elapsed_ms = int(max(0, (datetime.now(TZ) - started.astimezone(TZ)).total_seconds() * 1000))
+    passed = bool(payload.completed and payload.elapsed_ms <= 30000 and server_elapsed_ms <= 35000)
+    final_elapsed = max(payload.elapsed_ms, min(server_elapsed_ms, 120000))
+    db_update("streak_rescues", {"id": row["id"]}, {
+        "status": "passed" if passed else "failed",
+        "completed_at": datetime.now(TZ).isoformat(),
+        "elapsed_ms": final_elapsed,
+    })
+    return {"ok": passed, "state": "passed" if passed else "failed", "stats": player_stats(player["id"])}
+
+
 @app.get("/api/leaderboard")
 def leaderboard(
     family_code: str = Query(min_length=2, max_length=24),
@@ -566,7 +740,11 @@ def leaderboard(
     player_map = {p["id"]: p for p in players}
     daily_rows = db_select("results", mode="daily", daily_date=daily_date)
     daily_rows = [r for r in daily_rows if r["player_id"] in player_map]
-    daily_rows.sort(key=lambda r: (r["best_elapsed_ms"], r["best_moves"], player_map[r["player_id"]]["name"].casefold()))
+    daily_rows.sort(key=lambda r: (
+        0 if r.get("clean_solve") is True else 1,
+        int(r.get("hints_used") or 0),
+        r["best_elapsed_ms"], r["best_moves"], player_map[r["player_id"]]["name"].casefold(),
+    ))
     daily = [
         {
             "rank": i,
@@ -574,6 +752,8 @@ def leaderboard(
             "name": player_map[r["player_id"]]["name"],
             "elapsedMs": r["best_elapsed_ms"],
             "moves": r["best_moves"],
+            "hintsUsed": int(r.get("hints_used") or 0),
+            "cleanSolve": r.get("clean_solve") is True,
         }
         for i, r in enumerate(daily_rows, 1)
     ]

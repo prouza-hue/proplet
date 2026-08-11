@@ -1,30 +1,54 @@
-# Proplet v3.3 Cloud
+# Proplet v3.4 Cloud
 
 Česká slovní logická hra pro Vercel + Supabase.
 
-## v3.3 v kostce
+## v3.4 v kostce
 - 50 Easy (6×6)
 - 50 Medium (7×8)
-- 50 Hard (25× 8×8 + 25× 9×9), výrazně křivější „šnečí“ cesty
-- 50 **Mozkožrout** (10×10), dlouhé a silně winding cesty
-- 365 Daily — zachované beze změny z v3.2.2
-- exact-cover solver + kontrola jednoznačnosti při generování
-- postup úrovněmi místo náhodného výběru ve free režimu
+- 50 Hard (25× 8×8 + 25× 9×9), křivější „šnečí“ cesty
+- 50 **Mozkožrout** (10×10)
+- 365 Daily
+- 30 speciálních 6×6 rescue úloh pro záchranu streaku
+- exact-cover solver a kontrola jednoznačnosti generovaných úloh
+- adaptivní Fold/tablet herní layout bez scrollování během hry
+- „Aktuálně“ stále na obrazovce; délky slov v kompaktním vodorovném pásu
+- interaktivní onboarding
+- 3 úrovně nápovědy + Clean solve
+- Daily leaderboard: Clean → počet nápověd → čas → tahy
+- streak rescue: jeden vynechaný den, 30 sekund, jeden pokus
 - XP level roadmap + streak badges + achievements
 - heslové účty a více současně přihlášených zařízení
-- cloudový merge dokončených úloh, takže Daily nejde zopakovat ani na druhém zařízení
-- offline fronta výsledků, automatická synchronizace a rodinný leaderboard
+- offline fronta výsledků a automatická synchronizace
+- výraznější Android haptika + testovací tlačítko
 
-## Aktualizace stávajícího Propletu
-Čti `UPDATE_V3_3_CZ.md`. **Nejdřív spusť `SUPABASE_MIGRATION_V3_3.sql`, potom deployuj kód.**
+## Aktualizace z v3.3
+Čti `UPDATE_V3_4_CZ.md`.
+
+**Nejdřív spusť `SUPABASE_MIGRATION_V3_4.sql`, potom deployuj kód.**
 
 ## Čistá instalace
-Použij `SUPABASE_SETUP.sql`, nastav `SUPABASE_URL` a `SUPABASE_SECRET_KEY` ve Vercelu a deployuj celý repozitář.
+Použij aktuální `SUPABASE_SETUP.sql`, nastav ve Vercelu:
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+
+a deployuj celý repozitář.
+
+## Kontrola deploymentu
+`/api/health` má vracet mimo jiné:
+- `ok: true`
+- `database: true`
+- `puzzleFile: true`
+- `accountMigration: true`
+- `featuresMigration: true`
 
 ## Generování puzzle
-`python tools/generate_puzzles.py --preserve-existing --free-per-level 50`
+Generátor zapisuje identická data do `public/puzzles.json` i `data/puzzles.json`.
 
-Generátor zachová Easy/Medium/Daily, vytvoří novou Hard + Mozkožrout banku a zapíše `public/puzzles.json` i `data/puzzles.json`.
+Běžné zachování existujících bank + vytvoření rescue banky:
 
-## Herní review
-Viz `GAME_REVIEW_V3_3_CZ.md`.
+```bash
+python tools/generate_puzzles.py --preserve-existing-all --rescue 30
+```
+
+## Haptika
+Web používá Android Vibration API. V profilu je přepínač i tlačítko **Otestovat haptiku**. v3.4 používá výraznější pulzy než v3.3.

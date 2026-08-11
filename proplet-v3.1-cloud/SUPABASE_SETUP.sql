@@ -1,5 +1,5 @@
--- Proplet v3.3 Cloud – čistá instalace nové databáze.
--- Pro již živý Proplet použij raději SUPABASE_MIGRATION_V3_3.sql.
+-- Proplet v3.4 Cloud – čistá instalace nové databáze.
+-- Pro již živý Proplet v3.3 použij raději SUPABASE_MIGRATION_V3_4.sql.
 
 create table if not exists public.players (
     id uuid primary key,
@@ -37,6 +37,8 @@ create table if not exists public.results (
     best_elapsed_ms integer not null check (best_elapsed_ms >= 1000),
     best_moves integer not null check (best_moves >= 1),
     points integer not null check (points >= 0),
+    hints_used integer check (hints_used is null or hints_used between 0 and 99),
+    clean_solve boolean,
     completed_at timestamptz not null default now(),
     unique(player_id, challenge_key)
 );
@@ -45,6 +47,20 @@ alter table public.results drop constraint if exists results_difficulty_check;
 alter table public.results add constraint results_difficulty_check
     check (difficulty in ('easy','medium','hard','hardcore'));
 
+
+create table if not exists public.streak_rescues (
+    id uuid primary key,
+    player_id uuid not null references public.players(id) on delete cascade,
+    missed_date date not null,
+    puzzle_id text not null,
+    status text not null check (status in ('started','passed','failed')),
+    started_at timestamptz not null default now(),
+    completed_at timestamptz,
+    elapsed_ms integer,
+    unique(player_id, missed_date)
+);
+create index if not exists idx_streak_rescues_player on public.streak_rescues (player_id, missed_date);
+
 create index if not exists idx_results_player on public.results (player_id);
 create index if not exists idx_results_daily on public.results (daily_date, challenge_key);
 
@@ -52,11 +68,14 @@ create index if not exists idx_results_daily on public.results (daily_date, chal
 alter table public.players enable row level security;
 alter table public.player_sessions enable row level security;
 alter table public.results enable row level security;
+alter table public.streak_rescues enable row level security;
 
 revoke all on table public.players from anon, authenticated;
 revoke all on table public.player_sessions from anon, authenticated;
 revoke all on table public.results from anon, authenticated;
+revoke all on table public.streak_rescues from anon, authenticated;
 
 grant all on table public.players to service_role;
 grant all on table public.player_sessions to service_role;
 grant all on table public.results to service_role;
+grant all on table public.streak_rescues to service_role;

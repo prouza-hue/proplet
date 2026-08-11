@@ -437,6 +437,10 @@ def solve_count(letters: list[str], rows: int, cols: int, mask_list: list[int], 
 
 
 SPECS = {
+    "rescue": [
+        dict(rows=6, cols=6, cells=(20, 24), words=(4, 5), min_len=4, max_len=6, dict_size=5000, cand=(4, 28),
+             style="dense", min_curvy=0, min_spiral=0),
+    ],
     "easy": [
         dict(rows=6, cols=6, cells=(28, 32), words=(6, 7), min_len=4, max_len=7, dict_size=6500, cand=(5, 32),
              style="dense", min_curvy=0, min_spiral=0),
@@ -555,9 +559,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--free-per-level", type=int, default=50)
     ap.add_argument("--daily", type=int, default=365)
+    ap.add_argument("--rescue", type=int, default=30)
     ap.add_argument("--seed", type=int, default=20260811)
     ap.add_argument("--preserve-existing", action="store_true",
                     help="Keep current Easy/Medium/Daily banks and regenerate Hard + Hardcore.")
+    ap.add_argument("--preserve-existing-all", action="store_true",
+                    help="Keep all current free/daily banks and only add/regenerate the rescue bank.")
     args = ap.parse_args()
 
     freq = load_frequency_words()
@@ -580,18 +587,26 @@ def main():
     answer_pool = curated * 12 + fallback[:500]
     WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
 
-    old = json.loads(PUZZLES_SERVER_OUT.read_text(encoding="utf-8")) if args.preserve_existing and PUZZLES_SERVER_OUT.exists() else None
+    preserve_any = args.preserve_existing or args.preserve_existing_all
+    old = json.loads(PUZZLES_SERVER_OUT.read_text(encoding="utf-8")) if preserve_any and PUZZLES_SERVER_OUT.exists() else None
     rng = random.Random(args.seed + 33)
 
-    if old:
+    if old and args.preserve_existing_all:
+        free = {k: list(old["free"].get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
+        daily = list(old["daily"])
+        legacy = old.get("legacyFree", {})
+        rescue = []
+    elif old:
         free = {"easy": old["free"]["easy"], "medium": old["free"]["medium"], "hard": [], "hardcore": []}
         daily = old["daily"]
         legacy = old.get("legacyFree", {})
         legacy.setdefault("hard", old["free"].get("hard", []))
+        rescue = []
     else:
         free = {"easy": [], "medium": [], "hard": [], "hardcore": []}
         daily = []
         legacy = {}
+        rescue = []
 
     used_signatures = set()
     for bank in free.values():
@@ -599,9 +614,11 @@ def main():
             used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
     for p in daily:
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
+    for p in old.get("rescue", []) if old else []:
+        used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
 
     started = time.time()
-    levels_to_generate = ("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore")
+    levels_to_generate = () if (old and args.preserve_existing_all) else (("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore"))
     id_prefix = {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
 
     for difficulty in levels_to_generate:
@@ -636,19 +653,34 @@ def main():
             if (i + 1) % 25 == 0:
                 print(f"daily: {i+1}/{args.daily}")
 
+
+    # Streak rescue bank: intentionally short 6×6 boards that are solvable under a 30s pressure timer.
+    while len(rescue) < args.rescue:
+        i = len(rescue)
+        seed = rng.randrange(1, 2**31 - 1)
+        p = create_puzzle("rescue", seed, answer_pool, dictionary, f"r-{i+1:03d}")
+        sig = (p["rows"], p["cols"], tuple(p["letters"]))
+        if sig in used_signatures:
+            continue
+        used_signatures.add(sig)
+        rescue.append(p)
+        if len(rescue) % 10 == 0:
+            print(f"rescue: {len(rescue)}/{args.rescue}")
+
     payload = {
-        "version": 3,
-        "generatedAt": "2026-08-11",
+        "version": 4,
+        "generatedAt": "2026-08-12",
         "dictionarySize": len(dictionary),
         "dailyRotationSize": len(daily),
         "free": free,
         "legacyFree": legacy,
         "daily": daily,
+        "rescue": rescue,
     }
     payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     PUZZLES_PUBLIC_OUT.write_text(payload_json, encoding="utf-8")
     PUZZLES_SERVER_OUT.write_text(payload_json, encoding="utf-8")
-    print(f"Generated/kept {sum(map(len, free.values()))} free + {len(daily)} daily puzzles in {time.time()-started:.1f}s")
+    print(f"Generated/kept {sum(map(len, free.values()))} free + {len(daily)} daily + {len(rescue)} rescue puzzles in {time.time()-started:.1f}s")
     print(f"Dictionary: {len(dictionary)} words; curated answer pool: {len(curated)} words")
 
 
