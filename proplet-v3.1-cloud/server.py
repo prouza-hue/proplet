@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import secrets
 import uuid
@@ -12,7 +13,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Query
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -38,7 +39,21 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35}
 
-app = FastAPI(title="Proplet API", version="3.2-cloud")
+app = FastAPI(title="Proplet API", version="3.2.1-cloud")
+logger = logging.getLogger("proplet")
+
+
+@app.exception_handler(Exception)
+async def unexpected_error_handler(request, exc: Exception):
+    # V osobním projektu je užitečnější bezpečný diagnostický detail než anonymní 500.
+    # Případné tajné hodnoty před odesláním do browseru odstraníme.
+    logger.exception("Unhandled Proplet error on %s", getattr(request, "url", "unknown"))
+    detail = f"{type(exc).__name__}: {str(exc)}"
+    if SUPABASE_SECRET_KEY:
+        detail = detail.replace(SUPABASE_SECRET_KEY, "[secret]")
+    if SUPABASE_URL:
+        detail = detail.replace(SUPABASE_URL, "[supabase]")
+    return JSONResponse(status_code=500, content={"detail": f"Interní chyba serveru: {detail[:220]}"})
 
 
 class PlayerCreate(BaseModel):
@@ -154,22 +169,40 @@ def streaks(dates: list[str]) -> tuple[int, int]:
 
 
 def player_stats(player_id: str) -> dict:
+    """Statistiky počítáme defenzivně, aby jeden starý/poškozený řádek neshodil synchronizaci."""
     rows = db_select("results", player_id=player_id)
-    daily_dates = [str(r["daily_date"]) for r in rows if r["mode"] == "daily" and r.get("daily_date")]
-    current, longest = streaks(daily_dates)
+    daily_dates: list[str] = []
     free = {k: 0 for k in ("easy", "medium", "hard")}
-    daily_times = []
+    daily_times: list[int] = []
+    total_points = 0
+
     for r in rows:
-        if r["mode"] == "free" and r["difficulty"] in free:
-            free[r["difficulty"]] += 1
-        if r["mode"] == "daily":
-            daily_times.append(r["best_elapsed_ms"])
+        mode = r.get("mode")
+        difficulty = r.get("difficulty")
+        total_points += int(r.get("points") or 0)
+
+        if mode == "daily" and r.get("daily_date"):
+            raw_date = str(r.get("daily_date"))[:10]
+            try:
+                date.fromisoformat(raw_date)
+                daily_dates.append(raw_date)
+            except ValueError:
+                logger.warning("Ignoring malformed daily_date for result %s: %r", r.get("id"), r.get("daily_date"))
+            try:
+                daily_times.append(int(r.get("best_elapsed_ms")))
+            except (TypeError, ValueError):
+                logger.warning("Ignoring malformed elapsed time for result %s", r.get("id"))
+
+        if mode == "free" and difficulty in free:
+            free[difficulty] += 1
+
+    current, longest = streaks(daily_dates)
     earned = [b for b in BADGES if longest >= b["days"]]
     next_badge = next((b for b in BADGES if current < b["days"]), None)
     return {
-        "points": sum(r["points"] for r in rows),
+        "points": total_points,
         "totalCompleted": len(rows),
-        "dailyCompleted": len(daily_dates),
+        "dailyCompleted": len(set(daily_dates)),
         "freeCompleted": free,
         "currentStreak": current,
         "longestStreak": longest,
@@ -301,8 +334,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
         # U volných úloh lze opakováním zlepšit osobní rekord.
         if payload.mode == "free":
             db_update("results", {"id": old["id"]}, {
-                "best_elapsed_ms": min(old["best_elapsed_ms"], payload.elapsed_ms),
-                "best_moves": min(old["best_moves"], payload.moves),
+                "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
+                "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
             })
         first = False
     else:
@@ -328,12 +361,27 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             old = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)[0]
             if payload.mode == "free":
                 db_update("results", {"id": old["id"]}, {
-                    "best_elapsed_ms": min(old["best_elapsed_ms"], payload.elapsed_ms),
-                    "best_moves": min(old["best_moves"], payload.moves),
+                    "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
+                    "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
                 })
             first = False
 
-    return {"ok": True, "firstCompletion": first, "stats": player_stats(player["id"])}
+    # Zápis výsledku je primární operace. Selhání dopočtu statistik nesmí
+    # způsobit 500 po již úspěšném uložení a nechat telefon ve falešné frontě.
+    try:
+        stats = player_stats(player["id"])
+        stats_warning = None
+    except Exception as exc:
+        logger.exception("Result saved, but stats refresh failed for player %s", player.get("id"))
+        stats = None
+        stats_warning = f"{type(exc).__name__}: {str(exc)[:160]}"
+
+    return {
+        "ok": True,
+        "firstCompletion": first,
+        "stats": stats,
+        "statsWarning": stats_warning,
+    }
 
 
 @app.get("/api/result-status")
