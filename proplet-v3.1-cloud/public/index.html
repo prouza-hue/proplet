@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f0e8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Proplet</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <button class="brand" data-nav="daily" aria-label="Proplet – domů">
+        <span class="brand-mark">P</span>
+        <span><strong>Proplet</strong><small>česká slovní hra</small></span>
+      </button>
+      <button id="profileChip" class="profile-chip" data-nav="profile"><span>👤</span><span id="profileChipText">Hráč</span></button>
+    </header>
+
+    <section id="screen-daily" class="screen active">
+      <div class="daily-hero card">
+        <div class="hero-topline">
+          <span class="eyebrow">DENNÍ VÝZVA</span>
+          <span id="dailyDate" class="date-pill"></span>
+        </div>
+        <div class="hero-main">
+          <div>
+            <h1>Dnešní Proplet</h1>
+            <p id="dailyMeta" class="muted"></p>
+          </div>
+          <div id="streakBubble" class="streak-bubble"><span class="streak-icon">🔥</span><strong id="streakCount">0</strong><small>dní</small></div>
+        </div>
+        <button id="playDailyBtn" class="primary-btn big">Hrát dnešní výzvu</button>
+        <button id="shareDailyBtn" class="secondary-btn hidden">Sdílet výsledek</button>
+      </div>
+
+      <div class="card streak-card">
+        <div class="section-head">
+          <div><span class="eyebrow">STREAK</span><h2>Další odměna</h2></div>
+          <div id="nextBadgeText" class="muted compact"></div>
+        </div>
+        <div id="badgeRail" class="badge-rail"></div>
+      </div>
+
+      <div class="card mini-stats">
+        <div><span class="stat-label">Daily hotovo</span><strong id="dailyCompletedStat">0</strong></div>
+        <div><span class="stat-label">Nejdelší streak</span><strong id="longestStreakStat">0</strong></div>
+        <div><span class="stat-label">Nejlepší čas</span><strong id="bestDailyStat">—</strong></div>
+      </div>
+    </section>
+
+    <section id="screen-free" class="screen">
+      <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Vyber obtížnost</h1><p class="muted">Volné úlohy streak neovlivňují. Můžeš je hrát kdykoli a kolikrát chceš.</p></div>
+      <div id="difficultyCards" class="difficulty-grid"></div>
+    </section>
+
+    <section id="screen-leaderboard" class="screen">
+      <div class="screen-title"><span class="eyebrow">RODINNÁ LIGA</span><h1>Leaderboard</h1><p class="muted">Každý hraje na svém telefonu, výsledky se potkají tady.</p></div>
+      <div id="leaderboardGate" class="card gate"></div>
+      <div id="leaderboardContent" class="hidden">
+        <div class="leader-tabs">
+          <button class="leader-tab active" data-leader-tab="daily">Dnes</button>
+          <button class="leader-tab" data-leader-tab="overall">Celkem</button>
+        </div>
+        <div id="leaderboardList" class="leaderboard-list"></div>
+      </div>
+    </section>
+
+    <section id="screen-profile" class="screen">
+      <div class="screen-title"><span class="eyebrow">HRÁČ</span><h1>Profil a statistiky</h1></div>
+      <div id="profileCard" class="card profile-card"></div>
+      <div class="card">
+        <div class="section-head"><div><span class="eyebrow">ODZNAKY</span><h2>Sbíráš je Daily streakem</h2></div></div>
+        <div id="profileBadges" class="profile-badges"></div>
+      </div>
+    </section>
+
+    <section id="screen-game" class="screen game-screen">
+      <div class="game-top">
+        <button id="backFromGame" class="icon-btn" aria-label="Zpět">←</button>
+        <div class="game-title"><span id="gameModeLabel" class="eyebrow"></span><strong id="gameDifficulty"></strong></div>
+        <div class="game-clock"><span id="timer">00:00</span><small id="moves">0 tahů</small></div>
+      </div>
+
+      <div class="game-info card">
+        <div><span class="stat-label">Najdi slova</span><div id="lengths" class="lengths"></div></div>
+        <div id="gameProgress" class="game-progress">0 / 0</div>
+      </div>
+
+      <div id="boardWrap" class="board-wrap">
+        <svg id="pathLayer" class="path-layer" aria-hidden="true"></svg>
+        <div id="board" class="board" role="grid"></div>
+      </div>
+
+      <div class="current-word"><span class="stat-label">Aktuálně</span><strong id="currentWord">—</strong></div>
+      <div id="gameMessage" class="game-message" aria-live="polite"></div>
+      <div class="game-actions">
+        <button id="undoBtn" class="secondary-btn">↶ Zpět</button>
+        <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
+        <button id="resetBtn" class="secondary-btn">Reset</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Hlavní navigace">
+    <button data-nav="daily" class="active"><span>☀️</span><small>Dnes</small></button>
+    <button data-nav="free"><span>🧩</span><small>Hrát</small></button>
+    <button data-nav="leaderboard"><span>🏁</span><small>Pořadí</small></button>
+    <button data-nav="profile"><span>🙂</span><small>Já</small></button>
+  </nav>
+
+  <div id="winModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div id="winBadge" class="win-badge">✦</div>
+      <h2 id="winTitle">Hotovo!</h2>
+      <p id="winText" class="muted"></p>
+      <div id="winWords" class="win-words"></div>
+      <div id="newBadgeBox" class="new-badge-box hidden"></div>
+      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
+      <button id="winMenuBtn" class="secondary-btn hidden">Zpět do menu</button>
+      <button id="winShareBtn" class="secondary-btn hidden">Sdílet výsledek</button>
+    </div>
+  </div>
+
+  <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closeProfileModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">RODINNÝ LEADERBOARD</span>
+      <h2>Vytvoř hráče</h2>
+      <p class="muted">Na všech telefonech použijte stejný rodinný kód. Jméno každého hráče musí být jiné.</p>
+      <label>Jméno<input id="playerNameInput" maxlength="24" placeholder="např. Ardan" /></label>
+      <label>Rodinný kód<input id="familyCodeInput" maxlength="24" placeholder="např. PROUZOVI" autocapitalize="characters" /></label>
+      <div id="profileFormError" class="form-error"></div>
+      <button id="saveProfileBtn" class="primary-btn big">Připojit se</button>
+      <button id="skipProfileBtn" class="text-btn">Zatím hrát bez leaderboardu</button>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
