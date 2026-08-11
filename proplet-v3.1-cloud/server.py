@@ -38,7 +38,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35}
 
-app = FastAPI(title="Proplet API", version="3.0-cloud")
+app = FastAPI(title="Proplet API", version="3.2-cloud")
 
 
 class PlayerCreate(BaseModel):
@@ -334,6 +334,26 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             first = False
 
     return {"ok": True, "firstCompletion": first, "stats": player_stats(player["id"])}
+
+
+@app.get("/api/result-status")
+def result_status(
+    challenge_key: str = Query(min_length=3, max_length=80),
+    authorization: Optional[str] = Header(default=None),
+):
+    """Lehký diagnostický endpoint pro ověření, zda je konkrétní výsledek v cloudu."""
+    player = auth_player(authorization)
+    rows = db_select("results", player_id=player["id"], challenge_key=challenge_key)
+    if not rows:
+        return {"synced": False, "challengeKey": challenge_key}
+    r = rows[0]
+    return {
+        "synced": True,
+        "challengeKey": challenge_key,
+        "elapsedMs": r["best_elapsed_ms"],
+        "moves": r["best_moves"],
+        "completedAt": r["completed_at"],
+    }
 
 
 @app.get("/api/leaderboard")
