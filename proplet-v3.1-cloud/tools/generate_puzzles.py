@@ -18,7 +18,8 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "source_cs_50k.txt"
 WORDS_OUT = ROOT / "data" / "words.txt"
-PUZZLES_OUT = ROOT / "public" / "puzzles.json"
+PUZZLES_PUBLIC_OUT = ROOT / "public" / "puzzles.json"
+PUZZLES_SERVER_OUT = ROOT / "data" / "puzzles.json"
 
 CZ_RE = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.I)
 BAD_SUBSTRINGS = (
@@ -464,7 +465,9 @@ def main():
         "free": free,
         "daily": daily,
     }
-    PUZZLES_OUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    PUZZLES_PUBLIC_OUT.write_text(payload_json, encoding="utf-8")
+    PUZZLES_SERVER_OUT.write_text(payload_json, encoding="utf-8")
     print(f"Generated {sum(map(len, free.values()))} free + {len(daily)} daily puzzles in {time.time()-started:.1f}s")
     print(f"Dictionary: {len(dictionary)} words; curated answer pool: {len(curated)} words")
 
