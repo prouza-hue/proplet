@@ -75,3 +75,7 @@ Když později změníš soubor v GitHubu a uděláš commit, Vercel novou verzi
 - Daily Challenge: 365 úloh, každý den jedna, dokončit lze jen jednou.
 - Volná hra: 50 snadných + 50 středních + 50 těžkých úloh.
 - Po dokončení volné úlohy lze zvolit Další úlohu nebo Zpět do menu.
+
+
+## Aktualizace na v3.3
+Pokud už Proplet běží, nepoužívej čistou instalaci. Postupuj podle `UPDATE_V3_3_CZ.md` a nejdřív spusť `SUPABASE_MIGRATION_V3_3.sql`.

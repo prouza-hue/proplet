@@ -50,7 +50,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.7-cloud")
+app = FastAPI(title="Proplet API", version="3.8.1-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -139,6 +139,12 @@ class PushSubscriptionCreate(BaseModel):
 
 class PushUnsubscribe(BaseModel):
     endpoint: str = Field(min_length=20, max_length=2048)
+
+
+class FamilyLeagueSettings(BaseModel):
+    enabled: bool
+    public_name: Optional[str] = Field(default=None, min_length=2, max_length=40)
+    league_pin: str = Field(min_length=4, max_length=32)
 
 
 def supabase_ready() -> bool:
@@ -507,9 +513,14 @@ def health():
             db_request("GET", "push_subscriptions", params={"select": "id", "limit": "1"})
         except HTTPException:
             playtest_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        global_league_migration = True
+        try:
+            db_request("GET", "leagues", params={"select": "code,public_opt_in,public_name,public_enabled_at", "limit": "1"})
+        except HTTPException:
+            global_league_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -522,7 +533,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.7",
+        "version": "3.8.1",
     }
 
 
@@ -1008,6 +1019,174 @@ def rescue_finish(payload: RescueFinish, authorization: Optional[str] = Header(d
         "elapsed_ms": final_elapsed,
     })
     return {"ok": passed, "state": "passed" if passed else "failed", "stats": player_stats(player["id"])}
+
+
+
+def _daily_individual_score(row: dict, day_rows: list[dict]) -> float:
+    """0–100. Completion 55, clean 15, hints up to 10, relative speed up to 20."""
+    elapsed = int(row.get("best_elapsed_ms") or 86_400_000)
+    hints = int(row.get("hints_used") or 0)
+    clean = row.get("clean_solve") is True
+    completion = 55.0
+    clean_bonus = 15.0 if clean else 0.0
+    hint_bonus = max(0.0, 10.0 - 3.0 * hints)
+    times = sorted(int(r.get("best_elapsed_ms") or 86_400_000) for r in day_rows)
+    if len(times) <= 1:
+        speed_bonus = 10.0
+    else:
+        # Equal times receive the same best-position percentile.
+        rank0 = next((i for i, value in enumerate(times) if value >= elapsed), len(times) - 1)
+        percentile = 1.0 - (rank0 / (len(times) - 1))
+        speed_bonus = max(0.0, min(20.0, percentile * 20.0))
+    return round(min(100.0, completion + clean_bonus + hint_bonus + speed_bonus), 1)
+
+
+def _family_league_week(week_offset: int = 0) -> dict:
+    today = current_prague_date()
+    current_week = today - timedelta(days=today.weekday())
+    week_start = current_week + timedelta(days=7 * week_offset)
+    week_end = week_start + timedelta(days=7)
+    dates = [(week_start + timedelta(days=i)).isoformat() for i in range(7)]
+
+    leagues = [r for r in db_select("leagues") if r.get("public_opt_in") is True]
+    players = db_select("players")
+    player_by_id = {p["id"]: p for p in players}
+    members_by_family: dict[str, list[dict]] = {}
+    for p in players:
+        members_by_family.setdefault(norm_family(str(p.get("family_code") or "")), []).append(p)
+
+    daily_results = db_select("results", mode="daily")
+    daily_results = [r for r in daily_results if str(r.get("daily_date") or "")[:10] in dates]
+    rows_by_day: dict[str, list[dict]] = {d: [] for d in dates}
+    for r in daily_results:
+        d = str(r.get("daily_date") or "")[:10]
+        if d in rows_by_day:
+            rows_by_day[d].append(r)
+
+    standings = []
+    for league in leagues:
+        family = norm_family(str(league.get("code") or ""))
+        members = members_by_family.get(family, [])
+        member_ids = {p["id"] for p in members}
+        member_count = len(members)
+        eligible = member_count >= 2
+        try:
+            enabled_date = datetime.fromisoformat(str(league.get("public_enabled_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
+        except Exception:
+            enabled_date = week_start
+        # A team that joined later must not appear retroactively in older weeks.
+        if enabled_date >= week_end:
+            continue
+        daily_scores = []
+        participation_days = 0
+        total_completions = 0
+        for d in dates:
+            world_rows = rows_by_day[d]
+            day_date = date.fromisoformat(d)
+            day_members = []
+            for member in members:
+                try:
+                    created = datetime.fromisoformat(str(member.get("created_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
+                except Exception:
+                    created = date.min
+                if created <= day_date:
+                    day_members.append(member)
+            day_ids = {m["id"] for m in day_members}
+            denominator = min(3, len(day_members)) if day_members else 1
+            day_eligible = len(day_members) >= 2 and day_date >= enabled_date
+            own_rows = [r for r in world_rows if r.get("player_id") in day_ids and day_date >= enabled_date]
+            scored = sorted((_daily_individual_score(r, world_rows) for r in own_rows), reverse=True)
+            top = scored[:3]
+            score = round(sum(top) / denominator, 1) if day_eligible else 0.0
+            if own_rows:
+                participation_days += 1
+                total_completions += len(own_rows)
+            daily_scores.append({"date": d, "score": score, "players": min(len(own_rows), 3)})
+        weekly_score = round(sum(x["score"] for x in daily_scores), 1)
+        if eligible:
+            standings.append({
+                "familyCode": family,
+                "name": league.get("public_name") or league.get("name") or family,
+                "score": weekly_score,
+                "memberCount": member_count,
+                "daysPlayed": participation_days,
+                "daily": daily_scores,
+                "completions": total_completions,
+            })
+    standings.sort(key=lambda x: (-x["score"], -x["daysPlayed"], -x["completions"], str(x["name"]).casefold()))
+    for i, item in enumerate(standings, 1):
+        item["rank"] = i
+    return {
+        "weekStart": week_start.isoformat(), "weekEnd": (week_end - timedelta(days=1)).isoformat(),
+        "weekOffset": week_offset, "maxScore": 700, "standings": standings,
+        "scoring": {"completion": 55, "clean": 15, "hints": 10, "speed": 20, "teamSlots": 3},
+    }
+
+
+@app.get("/api/family-league")
+def family_league(
+    week_offset: int = Query(default=0, ge=-12, le=0),
+    authorization: Optional[str] = Header(default=None),
+):
+    data = _family_league_week(week_offset)
+    my_family = None
+    if authorization:
+        try:
+            player = auth_player(authorization)
+            family = norm_family(str(player.get("family_code") or ""))
+            league_rows = db_select("leagues", code=family)
+            members = db_select("players", family_code=family)
+            league = league_rows[0] if league_rows else {}
+            mine = next((r for r in data["standings"] if r["familyCode"] == family), None)
+            my_family = {
+                "familyCode": family,
+                "leagueName": league.get("name") or family,
+                "publicName": league.get("public_name") or league.get("name") or family,
+                "enabled": league.get("public_opt_in") is True,
+                "hasPin": bool(league.get("pin_hash")),
+                "memberCount": len(members),
+                "eligible": len(members) >= 2,
+                "rank": mine.get("rank") if mine else None,
+                "score": mine.get("score") if mine else 0,
+            }
+        except HTTPException:
+            pass
+    public_rows = []
+    my_code = my_family.get("familyCode") if my_family else None
+    for row in data["standings"]:
+        clean = {k: v for k, v in row.items() if k != "familyCode"}
+        clean["isMine"] = bool(my_code and row.get("familyCode") == my_code)
+        public_rows.append(clean)
+    if my_family:
+        my_family = {k: v for k, v in my_family.items() if k != "familyCode"}
+    return {**data, "standings": public_rows, "myFamily": my_family}
+
+
+@app.post("/api/family-league/settings")
+def family_league_settings(payload: FamilyLeagueSettings, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    family = norm_family(str(player.get("family_code") or ""))
+    rows = db_select("leagues", code=family)
+    if not rows:
+        raise HTTPException(404, "Rodinná liga neexistuje")
+    league = rows[0]
+    pin = payload.league_pin.strip()
+    if league.get("pin_hash"):
+        if not verify_password(pin, league.get("pin_hash")):
+            raise HTTPException(401, "PIN rodinné ligy nesedí")
+    else:
+        # Legacy family: first public-league activation also establishes its league PIN.
+        db_update("leagues", {"code": family}, {"pin_hash": hash_password(pin)})
+    values = {"public_opt_in": bool(payload.enabled)}
+    if payload.enabled:
+        public_name = " ".join((payload.public_name or league.get("name") or family).strip().split())[:40]
+        if len(public_name) < 2:
+            raise HTTPException(400, "Zadej veřejný název týmu")
+        values["public_name"] = public_name
+        if league.get("public_opt_in") is not True:
+            values["public_enabled_at"] = datetime.now(TZ).isoformat()
+    db_update("leagues", {"code": family}, values)
+    return {"ok": True, "enabled": bool(payload.enabled), "publicName": values.get("public_name") or league.get("public_name") or league.get("name") or family}
 
 
 @app.get("/api/puzzle-leaderboard")

@@ -81,15 +81,39 @@
     </section>
 
     <section id="screen-leaderboard" class="screen">
-      <div class="screen-title"><span class="eyebrow">RODINNÁ LIGA</span><h1>Kdo dnes vládne?</h1><p class="muted">Každý hraje na svém telefonu, výsledky se potkají tady.</p></div>
+      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Uvnitř rodiny i proti ostatním týmům Propletu.</p></div>
       <div id="leaderboardGate" class="card gate"></div>
       <div id="leaderboardContent" class="hidden">
-        <div class="leader-tabs">
-          <button class="leader-tab active" data-leader-tab="daily">Dnes</button>
-          <button class="leader-tab" data-leader-tab="weekly">Týden</button>
-          <button class="leader-tab" data-leader-tab="overall">Celkem</button>
+        <div class="league-scope-tabs">
+          <button class="league-scope-tab active" data-league-scope="family">👨‍👩‍👧 Moje liga</button>
+          <button class="league-scope-tab" data-league-scope="global">🌍 Liga rodin</button>
         </div>
-        <div id="leaderboardList" class="leaderboard-list"></div>
+        <div id="familyLeaderboardPanel">
+          <div class="leader-tabs">
+            <button class="leader-tab active" data-leader-tab="daily">Dnes</button>
+            <button class="leader-tab" data-leader-tab="weekly">Týden</button>
+            <button class="leader-tab" data-leader-tab="overall">Celkem</button>
+          </div>
+          <div id="leaderboardList" class="leaderboard-list"></div>
+        </div>
+        <div id="globalLeaguePanel" class="hidden">
+          <div class="global-league-hero card">
+            <div><span class="eyebrow">🌍 LIGA RODIN</span><h2>Týdenní souboj týmů</h2><p>Stejná Denní výzva. Až tři hráči za rodinu. Každé pondělí od nuly.</p></div>
+            <button id="familyLeagueSettingsBtn" class="secondary-btn">Nastavení týmu</button>
+          </div>
+          <div class="leader-tabs global-week-tabs">
+            <button class="global-week-tab active" data-week-offset="0">Tento týden</button>
+            <button class="global-week-tab" data-week-offset="-1">Minulý týden</button>
+          </div>
+          <div id="globalLeagueWeekMeta" class="global-week-meta"></div>
+          <div id="globalLeagueStatus"></div>
+          <div id="globalLeagueList" class="leaderboard-list"></div>
+          <div class="card league-score-explainer">
+            <strong>Jak se boduje?</strong>
+            <span>55 dokončení · až 15 ✨ Čistě · až 10 bez nápověd · až 20 za rychlost.</span>
+            <small>Rodina se 3+ členy má tři bodovací místa. Kdo ten den nehraje, nechá své místo za 0. Maximum je 700 bodů za týden.</small>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -163,7 +187,6 @@
         <aside class="game-control-column">
           <div id="gameMessage" class="game-message" aria-live="polite"></div>
           <div class="game-actions">
-            <button id="undoBtn" class="secondary-btn">↶ Zpět</button>
             <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
             <button id="resetBtn" class="secondary-btn">Reset</button>
           </div>
@@ -173,7 +196,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.7.1</small>
+      <small class="app-version">Proplet v3.8.1</small>
     </footer>
   </main>
 
@@ -332,6 +355,21 @@
       <div class="section-head compact-head"><div><span class="eyebrow">RODINNÁ LIGA</span><h3>Pořadí této úrovně</h3></div></div>
       <div id="levelDetailLeaderboard" class="level-detail-leaderboard"></div>
       <div class="level-detail-actions"><button id="levelDetailReplayBtn" class="primary-btn bigish">Zahrát znovu</button><button id="levelDetailShareBtn" class="secondary-btn bigish">Sdílet a pochlubit se</button></div>
+    </div>
+  </div>
+
+  <div id="familyLeagueModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left family-league-modal-card">
+      <button id="closeFamilyLeagueModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">🌍 LIGA RODIN</span>
+      <h2>Pošli rodinu do světa</h2>
+      <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů, kód ligy ani PIN nikdo cizí neuvidí.</p>
+      <label>Veřejný název týmu<input id="familyLeaguePublicName" maxlength="40" placeholder="např. Prouzovi nebo Brutální Propletači" /></label>
+      <label>PIN rodinné ligy<input id="familyLeaguePin" type="password" minlength="4" maxlength="32" placeholder="PIN potvrzuje, že jsi z týmu" /></label>
+      <button id="familyLeaguePinToggle" class="password-toggle" type="button">👁 Zobrazit PIN</button><small class="field-note">U starší ligy bez PINu se tímto krokem PIN poprvé nastaví.</small>
+      <div id="familyLeagueModalError" class="form-error"></div>
+      <button id="enableFamilyLeagueBtn" class="primary-btn big">Zařadit rodinu do ligy 🌍</button>
+      <button id="disableFamilyLeagueBtn" class="secondary-btn hidden">Vystoupit z Ligy rodin</button>
     </div>
   </div>
 

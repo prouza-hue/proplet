@@ -12087,6 +12087,7 @@ kapr
 štika
 delfín
 velryba
+chobotnice
 medúza
 krab
 želva
@@ -12169,6 +12170,7 @@ pokladna
 vstupenka
 chata
 kino
+restaurace
 kavárna
 cukrárna
 krajina
@@ -12187,4 +12189,5 @@ srpen
 říjen
 listopad
 prosinec
+narozeniny
 výprava

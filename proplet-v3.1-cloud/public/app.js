@@ -1,4 +1,4 @@
-const APP_VERSION='3.7.1';
+const APP_VERSION='3.8.1';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const DIFF={
   easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:10},
@@ -73,6 +73,9 @@ let currentScreen='daily';
 let currentGame=null;
 let timerId=null;
 let leaderTab='daily';
+let leagueScope='family';
+let globalWeekOffset=0;
+let globalLeagueData=null;
 let audioCtx=null;
 let toastTimer=null;
 let syncState={status:'idle',error:null,lastAt:null};
@@ -302,7 +305,7 @@ function renderGameHUD(){
  const remaining=p.answers.map((a,i)=>({len:a.word.length,i})).filter(x=>!g.found.some(f=>f.answerIndex===x.i)).sort((a,b)=>a.len-b.len||a.i-b.i);
  $('#lengths').innerHTML=remaining.length?remaining.map(x=>`<span class="length-pill" title="${countCz(x.len,'písmeno','písmena','písmen')}">${x.len}</span>`).join(''):'<span class="all-found">✓ nic</span>';
  $('#foundWords').innerHTML=g.found.length?g.found.map(f=>`<span class="found-word-chip" style="background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 58%,white)">${esc(f.word)}</span>`).join(''):'<span class="empty-found">zatím nic</span>';
- $('#undoBtn').disabled=!g.found.length;const clean=$('#cleanStatus');clean.textContent=g.mode==='rescue'?'':(g.hints?'💡 S nápovědou':'✨ Čistě');clean.classList.toggle('lost',!!g.hints);$('#hintBtn').textContent=g.hints?`💡 ${g.hints}×`:'💡 Nápověda';
+ const clean=$('#cleanStatus');clean.textContent=g.mode==='rescue'?'':(g.hints?'💡 S nápovědou':'✨ Čistě');clean.classList.toggle('lost',!!g.hints);$('#hintBtn').textContent=g.hints?`💡 ${g.hints}×`:'💡 Nápověda';
 }
 function fitGameBoard(){
  if(!currentGame||currentScreen!=='game')return;const stage=$('#boardStage'),wrap=$('#boardWrap'),board=$('#board');if(!stage||!wrap||!board)return;const p=currentGame.puzzle,cs=getComputedStyle(board),gap=parseFloat(cs.columnGap)||5,ss=getComputedStyle(stage),padX=(parseFloat(ss.paddingLeft)||0)+(parseFloat(ss.paddingRight)||0),padY=(parseFloat(ss.paddingTop)||0)+(parseFloat(ss.paddingBottom)||0),aw=Math.max(80,stage.clientWidth-padX),ah=Math.max(80,stage.clientHeight-padY);const cellByH=Math.max(4,(ah-gap*(p.rows-1))/p.rows),wByH=cellByH*p.cols+gap*(p.cols-1),target=Math.max(80,Math.min(aw,wByH));wrap.style.width=`${target}px`;requestAnimationFrame(drawPaths)
@@ -330,7 +333,6 @@ function submitPath(){
  else{if(word.length>=2)g.wrongAttempts=(g.wrongAttempts||0)+1;message(word.length<3?'Zkus delší slovo.':`„${word}“ do tohohle Propletu nezapadá.`,'bad');fx('wrong')}
  g.path=[];renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';if(g.mode!=='rescue')saveGameProgress();if(g.found.length===g.puzzle.answers.length){if(g.mode==='rescue')finishRescue(true);else finishGame();}
 }
-function undo(){const g=currentGame,f=g.found.pop();if(!f)return;f.path.forEach(i=>g.used.delete(i));g.moves++;message(`Vráceno: ${f.word}`);renderGameBoard();renderGameHUD();saveGameProgress()}
 function resetGame(){const g=currentGame;if(g.mode==='rescue')return;const usedHints=g.hints||0;g.found=[];g.used=new Map();g.path=[];g.moves=0;g.start=performance.now();g.baseElapsedMs=0;g.elapsedMs=0;g.lastFound=[];g.hints=usedHints;g.cleanSolve=usedHints===0;message(usedHints?'Plocha čistá. Jedeme znovu. Čisté řešení už ale zpátky není.':'Plocha čistá. Jedeme znovu.');renderGameBoard();renderGameHUD();saveGameProgress()}
 function openHintModal(){if(!currentGame||currentGame.mode==='rescue'||currentGame.finished)return;$('#hintModal').classList.remove('hidden')}
 function pickHintTarget(){return currentGame.puzzle.answers.map((a,i)=>({a,i})).filter(x=>!currentGame.found.some(f=>f.answerIndex===x.i)).sort((x,y)=>(x.a.turns||0)-(y.a.turns||0)||x.a.word.length-y.a.word.length)[0]}
@@ -505,11 +507,43 @@ function renderSettings(){const s=getSettings(),supported=typeof navigator.vibra
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 async function renderLeaderboard(){
- const p=getProfile(),gate=$('#leaderboardGate'),content=$('#leaderboardContent');if(!p?.familyCode){gate.classList.remove('hidden');content.classList.add('hidden');gate.innerHTML=`<h2>Připoj rodinu</h2><p class="muted">Přihlas se ke svému hráči, nebo vytvoř nový profil.</p><button id="leaderConnectBtn" class="primary-btn big">Přihlásit hráče</button>`;setTimeout(()=>$('#leaderConnectBtn')&&($('#leaderConnectBtn').onclick=()=>openProfileModal('login')),0);return}
- gate.classList.add('hidden');content.classList.remove('hidden');$('#leaderboardList').innerHTML='<div class="gate card">Načítám pořadí…</div>';
+ const p=getProfile(),gate=$('#leaderboardGate'),content=$('#leaderboardContent');content.classList.remove('hidden');
+ $$('.league-scope-tab').forEach(b=>b.classList.toggle('active',b.dataset.leagueScope===leagueScope));
+ const familyPanel=$('#familyLeaderboardPanel'),globalPanel=$('#globalLeaguePanel');
+ if(leagueScope==='global'){
+  gate.classList.add('hidden');familyPanel.classList.add('hidden');globalPanel.classList.remove('hidden');await renderGlobalLeague();return;
+ }
+ globalPanel.classList.add('hidden');familyPanel.classList.remove('hidden');
+ if(!p?.familyCode){gate.classList.remove('hidden');familyPanel.classList.add('hidden');gate.innerHTML=`<h2>Připoj rodinu</h2><p class="muted">Přihlas se ke svému hráči, nebo se zatím podívej na 🌍 Ligu rodin.</p><button id="leaderConnectBtn" class="primary-btn big">Přihlásit hráče</button><button id="leaderGlobalBtn" class="secondary-btn bigish">🌍 Liga rodin</button>`;setTimeout(()=>{if($('#leaderConnectBtn'))$('#leaderConnectBtn').onclick=()=>openProfileModal('login');if($('#leaderGlobalBtn'))$('#leaderGlobalBtn').onclick=()=>{leagueScope='global';renderLeaderboard()}},0);return}
+ gate.classList.add('hidden');familyPanel.classList.remove('hidden');$('#leaderboardList').innerHTML='<div class="gate card">Načítám pořadí…</div>';
  try{const data=await api(`/api/leaderboard?family_code=${encodeURIComponent(p.familyCode)}&daily_date=${pragueDateISO()}`);renderLeaderData(data)}catch(e){$('#leaderboardList').innerHTML=`<div class="gate card"><strong>Rodinná liga je offline.</strong><p class="muted">${esc(e.message)}. Lokální hraní funguje dál.</p></div>`}
 }
 function renderLeaderData(data){const rows=leaderTab==='daily'?data.daily:leaderTab==='weekly'?data.weekly:data.overall;if(!rows.length){$('#leaderboardList').innerHTML='<div class="gate card">Zatím tu nikdo nemá výsledek.</div>';return}$('#leaderboardList').innerHTML=rows.map(r=>{const detail=leaderTab==='daily'?`${r.cleanSolve===true?'✨ Čistě':(r.hintsUsed?`💡 ${r.hintsUsed}×`:'')} ${countCz(r.moves,'tah','tahy','tahů')}`.trim():leaderTab==='weekly'?`☀️ ${countCz(r.daily||0,'výzva','výzvy','výzev')} · ✨ ${r.clean||0} čistě · ${countCz(r.completed||0,'úloha','úlohy','úloh')}`:`🔥 ${countCz(r.currentStreak,'den','dny','dní')} · ${countCz(r.totalCompleted,'úloha','úlohy','úloh')}`,score=leaderTab==='daily'?fmtTime(r.elapsedMs):`${r.points} XP`,label=leaderTab==='daily'?'čas':leaderTab==='weekly'?'tento týden':'celkem';return `<div class="leader-row"><div class="leader-rank">${r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank+'.'}</div><div class="leader-name"><strong>${esc(r.name)}</strong><small>${detail}</small></div><div class="leader-score"><strong>${score}</strong><small>${label}</small></div></div>`}).join('')}
+
+async function renderGlobalLeague(){
+ const list=$('#globalLeagueList'),status=$('#globalLeagueStatus');list.innerHTML='<div class="gate card">Načítám Ligu rodin…</div>';status.innerHTML='';
+ try{
+  const data=await api(`/api/family-league?week_offset=${globalWeekOffset}`);globalLeagueData=data;
+  $('#globalLeagueWeekMeta').textContent=`${formatDateCZ(data.weekStart)} – ${formatDateCZ(data.weekEnd)}`;
+  const my=data.myFamily,p=getProfile();
+  if(my){
+   if(my.enabled){status.innerHTML=`<div class="card my-family-world"><div><span class="eyebrow">TVŮJ TÝM</span><strong>${esc(my.publicName)}</strong><small>${my.eligible?(my.rank?`${my.rank}. místo · ${Math.round(my.score)} / 700 bodů`:'Tento týden zatím bez bodů'):'Liga rodin potřebuje alespoň dva hráče.'}</small></div><button id="editFamilyWorldBtn" class="secondary-btn">Upravit</button></div>`}
+   else{status.innerHTML=`<div class="card global-optin-card"><div><span class="eyebrow">VAŠE RODINA JE ZATÍM V HLEDIŠTI</span><strong>Pošlete ${esc(my.leagueName)} do Ligy rodin?</strong><small>Veřejně bude vidět jen zvolený název týmu a společné skóre.</small></div><button id="joinFamilyWorldBtn" class="primary-btn">Zapojit tým 🌍</button></div>`}
+  }else if(!p?.token){status.innerHTML='<div class="card global-optin-card"><div><strong>Chceš zapojit vlastní rodinu?</strong><small>Přihlas hráče. Samotné pořadí si můžeš prohlížet i bez účtu.</small></div><button id="globalLoginBtn" class="secondary-btn">Přihlásit se</button></div>'}
+  const rows=data.standings||[];
+  if(!rows.length){list.innerHTML='<div class="gate card"><strong>Startovní rošt je zatím prázdný.</strong><p class="muted">První rodina, která se přihlásí, bere dočasně zlato. 😄</p></div>'}
+  else list.innerHTML=rows.map(r=>`<div class="leader-row family-world-row ${r.isMine?'me':''}"><div class="leader-rank">${r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank+'.'}</div><div class="leader-name"><strong>${esc(r.name)}</strong><small>${countCz(r.memberCount,'člen','členové','členů')} · hráno ${r.daysPlayed}/7 dní</small></div><div class="leader-score"><strong>${Math.round(r.score)}</strong><small>/ 700</small></div></div>`).join('');
+  setTimeout(()=>{if($('#editFamilyWorldBtn'))$('#editFamilyWorldBtn').onclick=openFamilyLeagueModal;if($('#joinFamilyWorldBtn'))$('#joinFamilyWorldBtn').onclick=openFamilyLeagueModal;if($('#globalLoginBtn'))$('#globalLoginBtn').onclick=()=>openProfileModal('login')},0);
+ }catch(e){list.innerHTML=`<div class="gate card"><strong>Liga rodin je zrovna mimo hřiště.</strong><p class="muted">${esc(e.message)}</p></div>`}
+}
+function openFamilyLeagueModal(){
+ const p=getProfile();if(!p?.token){openProfileModal('login');return}const my=globalLeagueData?.myFamily;if(!my){showToast('Nejdřív načti Ligu rodin.');return}
+ $('#familyLeaguePublicName').value=my.publicName||my.leagueName||'';$('#familyLeaguePin').value='';$('#familyLeaguePin').type='password';$('#familyLeaguePinToggle').textContent='👁 Zobrazit PIN';$('#familyLeagueModalError').textContent='';$('#enableFamilyLeagueBtn').textContent=my.enabled?'Uložit změny':'Zařadit rodinu do ligy 🌍';$('#disableFamilyLeagueBtn').classList.toggle('hidden',!my.enabled);$('#familyLeagueModal').classList.remove('hidden');
+}
+async function saveFamilyLeagueSettings(enabled){
+ const name=$('#familyLeaguePublicName').value.trim(),pin=$('#familyLeaguePin').value;$('#familyLeagueModalError').textContent='';if(!pin||pin.length<4){$('#familyLeagueModalError').textContent='Zadej PIN rodinné ligy (alespoň 4 znaky).';return}if(enabled&&name.length<2){$('#familyLeagueModalError').textContent='Pojmenuj veřejný tým.';return}
+ try{await api('/api/family-league/settings',{method:'POST',body:JSON.stringify({enabled,public_name:name||null,league_pin:pin})});$('#familyLeagueModal').classList.add('hidden');showToast(enabled?'Tým je v Lize rodin 🌍':'Rodina z veřejné ligy vystoupila.');await renderGlobalLeague()}catch(e){$('#familyLeagueModalError').textContent=e.message}
+}
 
 async function sendPuzzleFeedback(kind,{rating=null,word=null,note=null}={}){
  const p=getProfile(),g=currentGame;if(!p?.token||!g?.puzzle||g.mode==='rescue')throw new Error('Pro hodnocení se přihlas ke svému hráči.');
@@ -551,7 +585,7 @@ function showToast(text){const t=$('#toast');clearTimeout(toastTimer);t.textCont
 const ONBOARD_STEPS=[
  {title:'Vítej v Propletu',html:`<div class="onboard-hero-mark">P</div><div class="onboard-content"><span class="eyebrow">RYCHLÝ ÚVOD</span><h2>Propleť celou plochu</h2><p class="muted">Najdi všechna slova tak, aby každé aktivní políčko patřilo právě jednomu z nich. Táhni jen nahoru, dolů, vlevo nebo vpravo. <b>Pozor: nestačí najít správné slovo. Musíš najít i jeho správnou cestu, která zapadne do jediného řešení celé plochy.</b></p><div class="onboard-points"><div class="onboard-point"><span>↕️</span><div><strong>Jen sousední políčka</strong><small>Nahoru, dolů, vlevo nebo vpravo. Diagonály neplatí.</small></div></div><div class="onboard-point"><span>🎨</span><div><strong>Každé slovo má svou barvu</strong><small>Cílem je obarvit celou aktivní plochu.</small></div></div></div></div>`},
  {title:'Zkus si první tah',interactive:true,html:`<div class="onboard-content"><span class="eyebrow">TEĎ TY</span><h2>Najdi slovo PES</h2><p class="muted">Je schované přes roh. Písmena musí sousedit a cesta může zatáčet.</p><div class="tutorial-wrap"><div class="tutorial-instruction">Najdi PES:</div><div id="tutorialBoard" class="tutorial-board"><div class="tutorial-cell" data-tidx="0">P</div><div class="tutorial-cell" data-tidx="1">E</div><div class="tutorial-cell" data-tidx="2">L</div><div class="tutorial-cell" data-tidx="3">A</div><div class="tutorial-cell" data-tidx="4">S</div><div class="tutorial-cell" data-tidx="5">K</div><div class="tutorial-cell" data-tidx="6">M</div><div class="tutorial-cell" data-tidx="7">O</div><div class="tutorial-cell" data-tidx="8">C</div></div><div id="tutorialSuccess" class="tutorial-success"></div></div></div>`},
- {title:'Jak číst herní obrazovku',html:`<div class="onboard-content"><span class="eyebrow">BĚHEM HRY</span><h2>Všechno důležité je po ruce</h2><p class="muted">Nahoře máš dva jasné řádky: <b>Zbývá</b> ukazuje délky ještě nenalezených slov a <b>Nalezeno</b> skutečná chycená slova. <b>Skládáš</b> ti pořád ukazuje, co právě vedeš prstem. Na velké obrazovce Foldu nebo tabletu zůstává vedle desky pořád na očích.</p><div class="onboard-points"><div class="onboard-point"><span>🔢</span><div><strong>Zbývá / Nalezeno</strong><small>Zbývající délky řadíme od nejkratších. Chycená slova zůstávají barevně vidět.</small></div></div><div class="onboard-point"><span>↶</span><div><strong>Zpět není trest</strong><small>Vrátíš poslední nalezené slovo a můžeš zkusit jinou cestu.</small></div></div></div></div>`},
+ {title:'Jak číst herní obrazovku',html:`<div class="onboard-content"><span class="eyebrow">BĚHEM HRY</span><h2>Všechno důležité je po ruce</h2><p class="muted">Nahoře máš dva jasné řádky: <b>Zbývá</b> ukazuje délky ještě nenalezených slov a <b>Nalezeno</b> skutečná chycená slova. <b>Skládáš</b> ti pořád ukazuje, co právě vedeš prstem. Na velké obrazovce Foldu nebo tabletu zůstává vedle desky pořád na očích.</p><div class="onboard-points"><div class="onboard-point"><span>🔢</span><div><strong>Zbývá / Nalezeno</strong><small>Zbývající délky řadíme od nejkratších. Chycená slova zůstávají barevně vidět.</small></div></div><div class="onboard-point"><span>🔒</span><div><strong>Správná cesta se zamkne</strong><small>Když Proplet slovo přijme, jeho políčka už patří do jediného řešení.</small></div></div></div></div>`},
  {title:'Výzva, čisté řešení a série',html:`<div class="onboard-content"><span class="eyebrow">A JEŠTĚ TŘI VĚCI</span><h2>Teď už víš skoro všechno</h2><div class="onboard-points"><div class="onboard-point"><span>✨</span><div><strong>Čisté řešení</strong><small>Vyřeš úroveň bez nápovědy. V pořadí Denní výzvy má čisté řešení přednost před časem.</small></div></div><div class="onboard-point"><span>💡</span><div><strong>Tři stupně nápovědy</strong><small>Od jemného postrčení až po odhalení celé cesty.</small></div></div><div class="onboard-point"><span>🔥</span><div><strong>Série má jednu záchrannou brzdu</strong><small>Když vynecháš jeden den, můžeš ji zachránit 30sekundovým 6×6 Propletem. Jen jeden pokus.</small></div></div></div></div>`}
 ];
 
@@ -619,7 +653,7 @@ function maybeOfferRescue(){
 
 function bind(){
  $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));$('#playDailyBtn').onclick=startDaily;$('#shareDailyBtn').onclick=()=>{const date=pragueDateISO(),rec=getState().completed[`daily:${date}`];currentGame={puzzle:dailyPuzzleFor(date),mode:'daily',dailyDate:date,elapsedMs:rec?.elapsedMs,moves:rec?.moves,finished:true};shareDaily()};
- $('#backFromGame').onclick=goBackFromGame;$('#undoBtn').onclick=undo;$('#resetBtn').onclick=resetGame;$('#hintBtn').onclick=openHintModal;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;
+ $('#backFromGame').onclick=goBackFromGame;$('#resetBtn').onclick=resetGame;$('#hintBtn').onclick=openHintModal;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;
  $('#closeProfileModal').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromNudge)resumeAfterAccountNudge() };$('#skipProfileBtn').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromNudge)resumeAfterAccountNudge() };$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');$('#joinLeagueModeBtn').onclick=()=>setLeagueCreateMode('join');$('#newLeagueModeBtn').onclick=()=>setLeagueCreateMode('new');$('#leagueSelect').onchange=renderLeaguePinField;$('#profilePasswordToggle').onclick=()=>togglePassword('playerPasswordInput',$('#profilePasswordToggle'));
  $('#nudgeCreateBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeLoginBtn').onclick=()=>openAccountFromNudge('login');$('#nudgeSkipBtn').onclick=dismissAccountNudge;
  $('#closePasswordModal').onclick=()=>$('#passwordModal').classList.add('hidden');$('#savePasswordBtn').onclick=savePassword;$('#setPasswordToggle').onclick=()=>togglePassword(['setPasswordInput','setPasswordConfirmInput'],$('#setPasswordToggle'));
@@ -627,6 +661,7 @@ function bind(){
  $('#rescueBtn').onclick=openRescueOffer;$('#confirmRescueBtn').onclick=beginRescue;$('#cancelRescueBtn').onclick=()=>$('#rescueOfferModal').classList.add('hidden');
  $('#skipOnboardingBtn').onclick=()=>closeOnboarding(false);$('#onboardNextBtn').onclick=onboardingNext;
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
+ $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#familyLeaguePinToggle').onclick=()=>togglePassword('familyLeaguePin',$('#familyLeaguePinToggle'));$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>pendingSW?.postMessage({type:'SKIP_WAITING'});
  $('#soundToggle').onclick=()=>{const s=getSettings();s.sound=!s.sound;saveSettings(s);renderSettings();if(s.sound){ensureAudio();tone(620,.08,.02)}};$('#hapticToggle').onclick=()=>{const s=getSettings();s.haptics=!s.haptics;saveSettings(s);renderSettings();if(s.haptics)vibrate(45)};$('#hapticTestBtn').onclick=testHaptics;$('#replayIntroBtn').onclick=()=>openOnboarding(true);
