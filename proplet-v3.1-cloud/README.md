@@ -1,4 +1,4 @@
-# Proplet v3.6 — Copy & Polish
+# Proplet v3.7 — Playtest release
 
 Česká slovní logická PWA pro Vercel + Supabase.
 
@@ -13,37 +13,31 @@
 
 Celkem: **795 puzzle**.
 
-## Jazyk Propletu
+## Co přináší v3.7
 
-V3.6 sjednocuje terminologii a tón celé hry:
+- povinný první interaktivní tutorial (při ručním zopakování v profilu je zavírací)
+- herní HUD ukazuje konkrétní číslo úrovně, např. **Mozkožrout 5**
+- během hry dva jasné řádky **Zbývá / Nalezeno**
+- Těžká a Mozkožrout 10–100 přegenerované s maximálně 2 čtyřpísmennými slovy
+- každé nové cílové slovo má jedinou lokální cestu a každá deska jediné kompletní řešení
+- u každé obtížnosti seznam **Odehrané úrovně** s nejlepším časem, Clean/hinty a tahy
+- detail úrovně: rodinný žebříček stejného puzzle, sdílení a možnost zahrát znovu
+- výsledkovka volné hry zobrazuje žebříček právě dohrané úrovně
+- Rodinná liga: výběr existující ligy nebo založení nové ligy s PINem
+- kód ligy je case-insensitive (`PROUZA`, `Prouza`, `prouza` = totéž)
+- zobrazení/skrytí hesla při přihlášení i nastavení hesla
+- volitelný Web Push pro novou Denní výzvu
+- server neposílá denní push hráči, který už dnešní výzvu dokončil
 
-- `Daily` → **Denní výzva**
-- `streak` → **série**
-- `Clean solve` → **čisté řešení / ✨ Čistě**
-- herní `level` → **úroveň**
-- XP `level` → **hodnost**
-- `leaderboard` → **pořadí / Rodinná liga**
-- `haptika` → **vibrace**
-- `Aktuálně` → **Skládáš**
+## Co se nemění
 
-Proplet mluví krátce, chytře a lehce hravě; při samotném luštění zůstávají hlášky co nejstručnější.
+- striktní pravidlo: správné slovo se uzná pouze po cestě patřící do jediného řešení
+- Snadná, Střední, Denní výzvy a rescue banka zůstávají obsahově stejné
+- u Těžké/Mozkožrouta zůstávají stejné úrovně 1–9; mění se jen 10–100
+- XP ekonomika a 32 hodností zůstávají z v3.5.2
 
-## Hlavní funkce
+## Aktualizace
 
-- striktní unikátní řešení a unikátní cesta
-- interaktivní onboarding
-- 3 stupně nápovědy + čisté řešení
-- série + jednorázová 30s záchrana
-- XP, úspěchy a 32 hodností
-- heslové multi-device účty
-- Denní, týdenní a celkové rodinné pořadí
-- persistentní rozehraná Free/Denní výzva
-- Fold/tablet responsive herní layout
-- telemetry skutečné obtížnosti + dobrovolný rating
-- hlášení problematických slov
-- History API navigace pro Android/PWA Zpět
-- řízené PWA aktualizace
+Viz `UPDATE_V3_7_CZ.md`.
 
-## Aktualizace z v3.5.2
-
-Viz `UPDATE_V3_6_CZ.md`. **Není potřeba žádná databázová migrace.**
+Pro základní v3.7 je nutné jednou spustit `SUPABASE_MIGRATION_V3_7.sql`. Push notifikace jsou volitelné a mají vlastní krátký setup v témže návodu.

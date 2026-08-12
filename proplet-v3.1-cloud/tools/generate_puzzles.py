@@ -301,7 +301,7 @@ def path_turn_metrics(path: list[int], cols: int) -> tuple[int, int]:
     return turns, longest
 
 
-def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int) -> list[str] | None:
+def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int, max_short_words: int | None = None) -> list[str] | None:
     by_len: dict[int, list[str]] = defaultdict(list)
     for w in pool:
         if min_len <= len(w) <= max_len:
@@ -321,6 +321,8 @@ def choose_words(total: int, count: int, rng: random.Random, pool: list[str], mi
         if len(lengths) != count - 1 or not min_len <= remaining <= max_len:
             continue
         lengths.append(remaining)
+        if max_short_words is not None and sum(1 for x in lengths if x == min_len) > max_short_words:
+            continue
         chosen: list[str] = []
         used: set[str] = set()
         ok = True
@@ -451,13 +453,13 @@ SPECS = {
     ],
     "hard": [
         dict(rows=8, cols=8, cells=(50, 56), words=(9, 10), min_len=4, max_len=9, dict_size=9500, cand=(10, 280),
-             style="winding", turn_bias=.28, curl_bias=.16, min_curvy=3, min_spiral=1),
+             style="winding", turn_bias=.28, curl_bias=.16, min_curvy=3, min_spiral=1, max_short_words=2),
         dict(rows=9, cols=9, cells=(62, 70), words=(10, 12), min_len=4, max_len=9, dict_size=9500, cand=(12, 380),
-             style="winding", turn_bias=.30, curl_bias=.18, min_curvy=4, min_spiral=1),
+             style="winding", turn_bias=.30, curl_bias=.18, min_curvy=4, min_spiral=1, max_short_words=2),
     ],
     "hardcore": [
         dict(rows=10, cols=10, cells=(78, 88), words=(12, 15), min_len=4, max_len=10, dict_size=10500, cand=(18, 650),
-             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2),
+             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2, max_short_words=2),
     ],
 }
 
@@ -485,7 +487,7 @@ def create_puzzle(
     for attempt in range(1600):
         cells = rng.randint(*spec["cells"])
         count = rng.randint(*spec["words"])
-        words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"])
+        words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"], spec.get("max_short_words"))
         if words is None:
             continue
         rng.shuffle(words)

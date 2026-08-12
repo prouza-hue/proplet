@@ -13,10 +13,16 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 import httpx
-from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+
+try:
+    from pywebpush import webpush, WebPushException
+except Exception:  # Push remains optional until dependencies/env are configured.
+    webpush = None
+    WebPushException = Exception
 
 ROOT = Path(__file__).resolve().parent
 PUZZLES_PATH = ROOT / "data" / "puzzles.json"
@@ -24,6 +30,10 @@ TZ = ZoneInfo("Europe/Prague")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_SECRET_KEY = os.environ.get("SUPABASE_SECRET_KEY", "")
+VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "").strip()
+VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
+VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "https://proplet-nine.vercel.app").strip()
+CRON_SECRET = os.environ.get("CRON_SECRET", "").strip()
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -40,7 +50,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.5-cloud")
+app = FastAPI(title="Proplet API", version="3.7-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -54,6 +64,10 @@ async def unexpected_error_handler(request, exc: Exception):
         detail = detail.replace(SUPABASE_SECRET_KEY, "[secret]")
     if SUPABASE_URL:
         detail = detail.replace(SUPABASE_URL, "[supabase]")
+    if VAPID_PRIVATE_KEY:
+        detail = detail.replace(VAPID_PRIVATE_KEY, "[vapid-secret]")
+    if CRON_SECRET:
+        detail = detail.replace(CRON_SECRET, "[cron-secret]")
     return JSONResponse(status_code=500, content={"detail": f"Interní chyba serveru: {detail[:220]}"})
 
 
@@ -62,6 +76,9 @@ class PlayerCreate(BaseModel):
     family_code: str = Field(min_length=2, max_length=24)
     # Optional keeps a rolling deployment compatible with an older cached PWA.
     password: Optional[str] = Field(default=None, min_length=8, max_length=128)
+    league_pin: Optional[str] = Field(default=None, max_length=32)
+    create_league: bool = False
+    league_name: Optional[str] = Field(default=None, max_length=40)
 
 
 class PlayerLogin(BaseModel):
@@ -111,6 +128,17 @@ class RescueFinish(BaseModel):
     puzzle_id: str
     completed: bool
     elapsed_ms: int = Field(ge=0, le=120_000)
+
+
+class PushSubscriptionCreate(BaseModel):
+    endpoint: str = Field(min_length=20, max_length=2048)
+    p256dh: str = Field(min_length=20, max_length=512)
+    auth: str = Field(min_length=8, max_length=256)
+    user_agent: Optional[str] = Field(default=None, max_length=300)
+
+
+class PushUnsubscribe(BaseModel):
+    endpoint: str = Field(min_length=20, max_length=2048)
 
 
 def supabase_ready() -> bool:
@@ -166,9 +194,25 @@ def db_update(table: str, filters: dict, values: dict):
     return db_request("PATCH", table, params=params, body=values, prefer="return=representation")
 
 
+def db_delete(table: str, **filters):
+    params = {key: f"eq.{value}" for key, value in filters.items() if value is not None}
+    return db_request("DELETE", table, params=params, prefer="return=representation")
+
+
 def norm_family(code: str) -> str:
     code = "".join(ch for ch in code.upper().strip() if ch.isalnum() or ch in "-_ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
     return code[:24]
+
+
+def league_name_for(code: str) -> str:
+    try:
+        rows = db_select("leagues", code=norm_family(code))
+        return rows[0].get("name") or norm_family(code) if rows else norm_family(code)
+    except HTTPException:
+        return norm_family(code)
+
+def push_ready() -> bool:
+    return bool(webpush and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY)
 
 
 SCRYPT_N = 2 ** 14
@@ -456,9 +500,16 @@ def health():
             db_request("GET", "puzzle_feedback", params={"select": "id", "limit": "1"})
         except HTTPException:
             quality_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration}
+        playtest_migration = True
+        try:
+            db_request("GET", "leagues", params={"select": "code,name", "limit": "1"})
+            db_request("GET", "puzzle_runs", params={"select": "id", "limit": "1"})
+            db_request("GET", "push_subscriptions", params={"select": "id", "limit": "1"})
+        except HTTPException:
+            playtest_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -470,7 +521,29 @@ def config():
         "dictionarySize": p["dictionarySize"],
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
+        "pushAvailable": push_ready(),
+        "version": "3.7",
     }
+
+
+@app.get("/api/leagues")
+def list_leagues():
+    """Public discovery list: names/codes only, never league PIN hashes."""
+    try:
+        rows = db_select("leagues")
+    except HTTPException:
+        rows = []
+    try:
+        players = db_select("players")
+    except HTTPException:
+        players = []
+    counts: dict[str, int] = {}
+    for p in players:
+        code = norm_family(str(p.get("family_code") or ""))
+        counts[code] = counts.get(code, 0) + 1
+    out = [{"code": r.get("code"), "name": r.get("name") or r.get("code"), "members": counts.get(r.get("code"), 0), "protected": True} for r in rows if r.get("pin_hash")]
+    out.sort(key=lambda x: str(x["name"]).casefold())
+    return {"leagues": out}
 
 
 @app.post("/api/player")
@@ -478,7 +551,24 @@ def create_player(payload: PlayerCreate):
     name = " ".join(payload.name.strip().split())
     family = norm_family(payload.family_code)
     if not name or len(family) < 2:
-        raise HTTPException(400, "Vyplň jméno a rodinný kód")
+        raise HTTPException(400, "Vyplň jméno a ligu")
+
+    league_rows = db_select("leagues", code=family)
+    if payload.create_league:
+        display_name = " ".join((payload.league_name or payload.family_code).strip().split())[:40]
+        if league_rows:
+            raise HTTPException(409, "Liga s tímto názvem už existuje. Přidej se k ní místo zakládání nové.")
+        if not payload.league_pin or len(payload.league_pin.strip()) < 4:
+            raise HTTPException(400, "Nová liga potřebuje PIN alespoň 4 znaky")
+        db_insert("leagues", {"code": family, "name": display_name or family, "pin_hash": hash_password(payload.league_pin.strip()), "created_at": datetime.now(TZ).isoformat()})
+        league_rows = db_select("leagues", code=family)
+    elif not league_rows:
+        # Rolling compatibility for an older cached client: its family code becomes a legacy league.
+        db_insert("leagues", {"code": family, "name": family, "created_at": datetime.now(TZ).isoformat()})
+        league_rows = db_select("leagues", code=family)
+    elif league_rows[0].get("pin_hash"):
+        if not payload.league_pin or not verify_password(payload.league_pin.strip(), league_rows[0].get("pin_hash")):
+            raise HTTPException(401, "PIN rodinné ligy nesedí")
 
     family_players = db_select("players", family_code=family)
     if any(p["name"].casefold() == name.casefold() for p in family_players):
@@ -507,7 +597,7 @@ def create_player(payload: PlayerCreate):
 
     stats = player_stats(player_id)
     return {
-        "id": player_id, "name": name, "familyCode": family, "token": token,
+        "id": player_id, "name": name, "familyCode": family, "leagueName": league_name_for(family), "token": token,
         "hasPassword": bool(payload.password), "stats": stats,
     }
 
@@ -527,7 +617,7 @@ def login(payload: PlayerLogin):
 
     token = new_session(player["id"])
     return {
-        "id": player["id"], "name": player["name"], "familyCode": player["family_code"],
+        "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
         "token": token, "hasPassword": True, "stats": player_stats(player["id"]),
     }
 
@@ -544,7 +634,7 @@ def me(authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     stats = player_stats(player["id"])
     return {
-        "id": player["id"], "name": player["name"], "familyCode": player["family_code"],
+        "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
         "hasPassword": bool(player.get("password_hash")), "stats": stats,
     }
 
@@ -608,7 +698,7 @@ def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(d
     db_insert("puzzle_attempts", {
         "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
         "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.5.2",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.7",
     })
     return {"ok": True, "attemptId": payload.attempt_id}
 
@@ -682,6 +772,40 @@ def quality_report(authorization: Optional[str] = Header(default=None)):
     return {"attempts": len(attempts), "puzzlesMeasured": len(rows), "rows": rows}
 
 
+def run_rank_tuple(r: dict) -> tuple:
+    return (
+        0 if r.get("clean_solve") is True else 1,
+        int(r.get("hints_used") or 0),
+        int(r.get("elapsed_ms") or r.get("best_elapsed_ms") or 10**12),
+        int(r.get("moves") or r.get("best_moves") or 10**9),
+        int(r.get("wrong_attempts") or 0),
+    )
+
+def puzzle_info(puzzle_id: str) -> Optional[dict]:
+    data = load_puzzles()
+    for diff, bank in data.get("free", {}).items():
+        for p in bank:
+            if p.get("id") == puzzle_id:
+                return {"puzzle": p, "difficulty": diff, "mode": "free", "level": int((p.get("meta") or {}).get("level") or 0)}
+    for p in data.get("daily", []):
+        if p.get("id") == puzzle_id:
+            return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None}
+    return None
+
+def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bool):
+    attempt_id = payload.attempt_id or f"run:{player_id}:{payload.challenge_key}:{uuid.uuid4()}"
+    if db_select("puzzle_runs", attempt_id=attempt_id):
+        return
+    db_insert("puzzle_runs", {
+        "id": str(uuid.uuid4()), "attempt_id": attempt_id, "player_id": player_id,
+        "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
+        "mode": payload.mode, "difficulty": payload.difficulty, "elapsed_ms": payload.elapsed_ms,
+        "moves": payload.moves, "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
+        "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+        "completed_at": datetime.now(TZ).isoformat(),
+    })
+
+
 @app.post("/api/result")
 def result(payload: ResultCreate, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
@@ -710,20 +834,27 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             raise HTTPException(400, "Neplatný klíč volné úlohy")
         points = POINTS[payload.difficulty]
 
+    # Each actual completion is stored as one coherent run. Leaderboards never mix a fast hinted
+    # attempt with a slower clean attempt into an impossible synthetic record.
+    try:
+        record_puzzle_run(player["id"], payload, effective_clean)
+    except HTTPException:
+        logger.warning("Could not store puzzle run for %s", payload.attempt_id)
+
     existing = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)
     if existing:
         old = existing[0]
         # Daily Challenge je jednorázová: první dokončený výsledek je finální.
         # U volných úloh lze opakováním zlepšit osobní rekord.
         if payload.mode == "free":
-            db_update("results", {"id": old["id"]}, {
-                "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
-                "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
-                "hints_used": merged_hint_count(old.get("hints_used"), payload.hints_used),
-                "wrong_attempts": min(int(old.get("wrong_attempts") or payload.wrong_attempts), payload.wrong_attempts),
-                "max_hint_level": min(int(old.get("max_hint_level") or payload.max_hint_level), payload.max_hint_level),
-                "clean_solve": bool(old.get("clean_solve") is True or effective_clean),
-            })
+            new_run = {"clean_solve": effective_clean, "hints_used": payload.hints_used, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves, "wrong_attempts": payload.wrong_attempts}
+            old_run = {"clean_solve": old.get("clean_solve") is True, "hints_used": old.get("hints_used"), "elapsed_ms": old.get("best_elapsed_ms"), "moves": old.get("best_moves"), "wrong_attempts": old.get("wrong_attempts")}
+            if run_rank_tuple(new_run) < run_rank_tuple(old_run):
+                db_update("results", {"id": old["id"]}, {
+                    "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
+                    "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
+                    "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+                })
         first = False
     else:
         try:
@@ -751,14 +882,14 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             # Dvojité odeslání ze dvou oken: zachovej idempotenci.
             old = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)[0]
             if payload.mode == "free":
-                db_update("results", {"id": old["id"]}, {
-                    "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
-                    "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
-                    "hints_used": merged_hint_count(old.get("hints_used"), payload.hints_used),
-                    "wrong_attempts": min(int(old.get("wrong_attempts") or payload.wrong_attempts), payload.wrong_attempts),
-                    "max_hint_level": min(int(old.get("max_hint_level") or payload.max_hint_level), payload.max_hint_level),
-                    "clean_solve": bool(old.get("clean_solve") is True or effective_clean),
-                })
+                new_run = {"clean_solve": effective_clean, "hints_used": payload.hints_used, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves, "wrong_attempts": payload.wrong_attempts}
+                old_run = {"clean_solve": old.get("clean_solve") is True, "hints_used": old.get("hints_used"), "elapsed_ms": old.get("best_elapsed_ms"), "moves": old.get("best_moves"), "wrong_attempts": old.get("wrong_attempts")}
+                if run_rank_tuple(new_run) < run_rank_tuple(old_run):
+                    db_update("results", {"id": old["id"]}, {
+                        "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
+                        "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
+                        "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+                    })
             first = False
 
     if payload.attempt_id:
@@ -781,7 +912,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 db_insert("puzzle_attempts", {
                     "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
                     "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.5-offline", **telemetry_values,
+                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.7-offline", **telemetry_values,
                 })
         except HTTPException:
             logger.warning("Could not finalize telemetry attempt %s", payload.attempt_id)
@@ -877,6 +1008,125 @@ def rescue_finish(payload: RescueFinish, authorization: Optional[str] = Header(d
         "elapsed_ms": final_elapsed,
     })
     return {"ok": passed, "state": "passed" if passed else "failed", "stats": player_stats(player["id"])}
+
+
+@app.get("/api/puzzle-leaderboard")
+def puzzle_leaderboard(
+    puzzle_id: str = Query(min_length=2, max_length=80),
+    family_code: str = Query(min_length=2, max_length=24),
+):
+    family = norm_family(family_code)
+    players = db_select("players", family_code=family)
+    pmap = {p["id"]: p for p in players}
+    rows = [r for r in db_select("puzzle_runs", puzzle_id=puzzle_id) if r.get("player_id") in pmap]
+    best: dict[str, dict] = {}
+    for r in rows:
+        pid = r["player_id"]
+        if pid not in best or run_rank_tuple(r) < run_rank_tuple(best[pid]):
+            best[pid] = r
+    ranked = sorted(best.values(), key=lambda r: (*run_rank_tuple(r), pmap[r["player_id"]]["name"].casefold()))
+    board = []
+    for i, r in enumerate(ranked, 1):
+        board.append({
+            "rank": i, "id": r["player_id"], "name": pmap[r["player_id"]]["name"],
+            "elapsedMs": int(r["elapsed_ms"]), "moves": int(r["moves"]),
+            "hintsUsed": int(r.get("hints_used") or 0), "wrongAttempts": int(r.get("wrong_attempts") or 0),
+            "cleanSolve": r.get("clean_solve") is True, "completedAt": r.get("completed_at"),
+        })
+    info = puzzle_info(puzzle_id)
+    return {"familyCode": family, "puzzleId": puzzle_id, "difficulty": info.get("difficulty") if info else None, "level": info.get("level") if info else None, "rows": board}
+
+
+@app.get("/api/played-levels")
+def played_levels(
+    difficulty: str = Query(min_length=3, max_length=20),
+    authorization: Optional[str] = Header(default=None),
+):
+    player = auth_player(authorization)
+    data = load_puzzles()
+    bank = sorted(data.get("free", {}).get(difficulty, []), key=lambda p: int((p.get("meta") or {}).get("level") or 9999))
+    active = {p["id"]: p for p in bank}
+    runs = [r for r in db_select("puzzle_runs", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty and r.get("puzzle_id") in active]
+    grouped: dict[str, list[dict]] = {}
+    for r in runs:
+        grouped.setdefault(r["puzzle_id"], []).append(r)
+    items = []
+    for p in bank:
+        vals = grouped.get(p["id"], [])
+        if not vals:
+            continue
+        best = min(vals, key=run_rank_tuple)
+        items.append({
+            "puzzleId": p["id"], "level": int((p.get("meta") or {}).get("level") or 0),
+            "elapsedMs": int(best["elapsed_ms"]), "moves": int(best["moves"]),
+            "hintsUsed": int(best.get("hints_used") or 0), "wrongAttempts": int(best.get("wrong_attempts") or 0),
+            "cleanSolve": best.get("clean_solve") is True, "attempts": len(vals), "completedAt": best.get("completed_at"),
+        })
+    return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "levels": items}
+
+
+@app.get("/api/push/config")
+def push_config():
+    return {"available": push_ready(), "publicKey": VAPID_PUBLIC_KEY if push_ready() else None}
+
+
+@app.post("/api/push/subscribe")
+def push_subscribe(payload: PushSubscriptionCreate, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    if not push_ready():
+        raise HTTPException(503, "Push notifikace ještě nejsou na serveru nakonfigurované")
+    existing = db_select("push_subscriptions", endpoint=payload.endpoint)
+    row = {"player_id": player["id"], "p256dh": payload.p256dh, "auth": payload.auth, "user_agent": payload.user_agent, "updated_at": datetime.now(TZ).isoformat()}
+    if existing:
+        db_update("push_subscriptions", {"id": existing[0]["id"]}, row)
+    else:
+        db_insert("push_subscriptions", {"id": str(uuid.uuid4()), "endpoint": payload.endpoint, "created_at": datetime.now(TZ).isoformat(), **row})
+    return {"ok": True}
+
+
+@app.post("/api/push/unsubscribe")
+def push_unsubscribe(payload: PushUnsubscribe, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    rows = db_select("push_subscriptions", endpoint=payload.endpoint)
+    for row in rows:
+        if row.get("player_id") == player["id"]:
+            db_delete("push_subscriptions", id=row["id"])
+    return {"ok": True}
+
+
+@app.get("/api/cron/daily-push")
+def cron_daily_push(request: Request, authorization: Optional[str] = Header(default=None)):
+    if not CRON_SECRET or authorization != f"Bearer {CRON_SECRET}":
+        raise HTTPException(401, "Neplatné cron oprávnění")
+    if not push_ready():
+        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný"}
+    today = current_prague_date().isoformat()
+    completed = {r.get("player_id") for r in db_select("results", mode="daily", daily_date=today)}
+    subscriptions = db_select("push_subscriptions")
+    sent = failed = removed = 0
+    payload = json.dumps({
+        "title": "☀️ Nový Proplet je tady",
+        "body": "Dnešní výzva čeká. Propleteš ji čistě?",
+        "url": "/?open=daily", "tag": f"proplet-daily-{today}"
+    }, ensure_ascii=False)
+    for sub in subscriptions:
+        if sub.get("player_id") in completed:
+            continue
+        info = {"endpoint": sub.get("endpoint"), "keys": {"p256dh": sub.get("p256dh"), "auth": sub.get("auth")}}
+        try:
+            webpush(subscription_info=info, data=payload, vapid_private_key=VAPID_PRIVATE_KEY, vapid_claims={"sub": VAPID_SUBJECT}, ttl=43200)
+            sent += 1
+        except Exception as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            if status in (404, 410):
+                try:
+                    db_delete("push_subscriptions", id=sub["id"]); removed += 1
+                except Exception:
+                    pass
+            else:
+                failed += 1
+                logger.warning("Push failed for subscription %s: %s", sub.get("id"), exc)
+    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed}
 
 
 @app.get("/api/leaderboard")

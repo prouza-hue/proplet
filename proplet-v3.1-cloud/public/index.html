@@ -121,6 +121,13 @@
         <button id="hapticTestBtn" class="secondary-btn intro-replay-btn">📳 Otestovat vibrace</button>
         <button id="replayIntroBtn" class="secondary-btn intro-replay-btn">▶ Ukázat úvod znovu</button>
       </div>
+
+      <div class="card settings-card push-card">
+        <div class="section-head"><div><span class="eyebrow">DENNÍ PŘIPOMÍNKA</span><h2>Nový Proplet na mobil</h2></div></div>
+        <p class="muted push-copy">Ráno ti připomeneme novou Denní výzvu. Když ji už máš hotovou, nic neposíláme.</p>
+        <button id="pushToggleBtn" class="secondary-btn intro-replay-btn">🔔 Nastavit připomínku</button>
+        <div id="pushStatusText" class="push-status muted"></div>
+      </div>
     </section>
 
     <section id="screen-game" class="screen game-screen">
@@ -133,7 +140,10 @@
       <div class="game-main">
         <div class="game-board-column">
           <div class="game-info card">
-            <div class="word-targets"><span class="stat-label">Slova</span><div id="lengths" class="lengths"></div></div>
+            <div class="word-status-wrap">
+              <div class="word-status-row remaining-row"><span class="stat-label">Zbývá</span><div id="lengths" class="lengths"></div></div>
+              <div class="word-status-row found-row"><span class="stat-label">Nalezeno</span><div id="foundWords" class="found-words"><span class="empty-found">zatím nic</span></div></div>
+            </div>
             <div id="gameProgress" class="game-progress">0 / 0</div>
           </div>
 
@@ -181,6 +191,7 @@
       <div id="winXp" class="win-xp"></div>
       <div id="winClean" class="win-clean hidden"></div>
       <div id="winWords" class="win-words"></div>
+      <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
       <div id="winDifficultyFeedback" class="win-feedback hidden">
         <small>Jak ti seděla obtížnost?</small>
@@ -225,8 +236,24 @@
       <h2 id="profileModalTitle">Přihlásit hráče</h2>
       <p id="profileModalDesc" class="muted">Stejný účet můžeš použít na mobilu, počítači i tabletu.</p>
       <label>Jméno<input id="playerNameInput" maxlength="24" autocomplete="username" placeholder="např. Ardan" /></label>
-      <label>Rodinný kód<input id="familyCodeInput" maxlength="24" placeholder="např. PROUZOVI" autocapitalize="characters" /></label>
+      <div id="leagueChooser" class="league-chooser">
+        <div id="leagueCreateTabs" class="league-create-tabs hidden">
+          <button id="joinLeagueModeBtn" class="league-create-tab active" type="button">Přidat se k lize</button>
+          <button id="newLeagueModeBtn" class="league-create-tab" type="button">Založit novou</button>
+        </div>
+        <div id="joinLeagueFields">
+          <label>Rodinná liga<select id="leagueSelect"><option value="">Načítám ligy…</option></select></label>
+          <label id="manualLeagueLabel" class="hidden">Kód ligy<input id="familyCodeInput" maxlength="24" placeholder="např. Prouza" /></label>
+          <label id="leaguePinLabel" class="hidden">PIN ligy<input id="leaguePinInput" type="password" minlength="4" maxlength="32" autocomplete="one-time-code" placeholder="PIN pro vstup do ligy" /></label>
+        </div>
+        <div id="newLeagueFields" class="hidden">
+          <label>Název nové ligy<input id="newLeagueNameInput" maxlength="40" placeholder="např. Prouzovi" /></label>
+          <label>PIN nové ligy<input id="newLeaguePinInput" type="password" minlength="4" maxlength="32" placeholder="alespoň 4 znaky" /></label>
+          <small class="field-note">PIN sdílej jen s lidmi, které chceš do ligy pustit.</small>
+        </div>
+      </div>
       <label>Heslo<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
+      <button id="profilePasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
       <div id="profileFormError" class="form-error"></div>
       <button id="saveProfileBtn" class="primary-btn big">Přihlásit se</button>
       <button id="skipProfileBtn" class="text-btn">Zatím hrát bez pořadí</button>
@@ -241,6 +268,7 @@
       <p class="muted">Tím zpřístupníš svůj stávající profil i na notebooku nebo jiném telefonu. Tvoje dosavadní výsledky zůstanou.</p>
       <label>Nové heslo<input id="setPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="alespoň 8 znaků" /></label>
       <label>Heslo znovu<input id="setPasswordConfirmInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" /></label>
+      <button id="setPasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
       <div id="passwordFormError" class="form-error"></div>
       <button id="savePasswordBtn" class="primary-btn big">Uložit heslo</button>
     </div>
@@ -283,9 +311,31 @@
     </div>
   </div>
 
+  <div id="playedLevelsModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left played-levels-card">
+      <button id="closePlayedLevelsModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">ODEHRANÉ ÚROVNĚ</span>
+      <h2 id="playedLevelsTitle">Tvoje kola</h2>
+      <p id="playedLevelsMeta" class="muted"></p>
+      <div id="playedLevelsList" class="played-levels-list"></div>
+    </div>
+  </div>
+
+  <div id="levelDetailModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left level-detail-card">
+      <button id="closeLevelDetailModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span id="levelDetailEyebrow" class="eyebrow">DETAIL ÚROVNĚ</span>
+      <h2 id="levelDetailTitle">Úroveň</h2>
+      <div id="levelDetailResult" class="level-detail-result"></div>
+      <div class="section-head compact-head"><div><span class="eyebrow">RODINNÁ LIGA</span><h3>Pořadí této úrovně</h3></div></div>
+      <div id="levelDetailLeaderboard" class="level-detail-leaderboard"></div>
+      <div class="level-detail-actions"><button id="levelDetailReplayBtn" class="primary-btn bigish">Zahrát znovu</button><button id="levelDetailShareBtn" class="secondary-btn bigish">Sdílet a pochlubit se</button></div>
+    </div>
+  </div>
+
   <div id="onboardingModal" class="modal onboarding-modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card onboarding-card">
-      <button id="skipOnboardingBtn" class="modal-close" aria-label="Přeskočit">×</button>
+      <button id="skipOnboardingBtn" class="modal-close" aria-label="Zavřít úvod">×</button>
       <div id="onboardDots" class="onboard-dots"></div>
       <div id="onboardContent"></div>
       <button id="onboardNextBtn" class="primary-btn big">Pokračovat</button>
