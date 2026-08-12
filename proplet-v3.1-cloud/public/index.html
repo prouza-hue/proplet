@@ -147,6 +147,11 @@
             <div id="gameProgress" class="game-progress">0 / 0</div>
           </div>
 
+          <div class="current-word card">
+            <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
+            <span id="cleanStatus" class="clean-status">✨ Čistě</span>
+          </div>
+
           <div id="boardStage" class="board-stage card">
             <div id="boardWrap" class="board-wrap">
               <svg id="pathLayer" class="path-layer" aria-hidden="true"></svg>
@@ -156,10 +161,6 @@
         </div>
 
         <aside class="game-control-column">
-          <div class="current-word card">
-            <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
-            <span id="cleanStatus" class="clean-status">✨ Čistě</span>
-          </div>
           <div id="gameMessage" class="game-message" aria-live="polite"></div>
           <div class="game-actions">
             <button id="undoBtn" class="secondary-btn">↶ Zpět</button>
@@ -172,6 +173,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
+      <small class="app-version">Proplet v3.7.1</small>
     </footer>
   </main>
 

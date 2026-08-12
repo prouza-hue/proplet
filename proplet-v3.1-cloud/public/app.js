@@ -1,4 +1,4 @@
-const APP_VERSION='3.7';
+const APP_VERSION='3.7.1';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const DIFF={
   easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:10},
