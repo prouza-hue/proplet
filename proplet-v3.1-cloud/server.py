@@ -4,8 +4,10 @@ import hashlib
 import hmac
 import json
 import logging
+import math
 import os
 import secrets
+import statistics
 import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -50,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.8.1-cloud")
+app = FastAPI(title="Proplet API", version="3.13.0-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -110,6 +112,10 @@ class ResultCreate(BaseModel):
     hints_used: int = Field(default=0, ge=0, le=99)
     wrong_attempts: int = Field(default=0, ge=0, le=999)
     max_hint_level: int = Field(default=0, ge=0, le=3)
+    reset_count: int = Field(default=0, ge=0, le=999)
+    first_hint_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
+    first_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
+    last_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
     attempt_id: Optional[str] = Field(default=None, min_length=8, max_length=80)
     # Conservative default keeps older cached clients from being falsely marked as Clean.
     clean_solve: bool = False
@@ -123,6 +129,21 @@ class AttemptStart(BaseModel):
     challenge_key: str
     mode: str
     difficulty: str
+    resuming: bool = False
+
+
+class AttemptCheckpoint(BaseModel):
+    attempt_id: str = Field(min_length=8, max_length=80)
+    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
+    moves: int = Field(default=0, ge=0, le=10000)
+    found_words: int = Field(default=0, ge=0, le=99)
+    hints_used: int = Field(default=0, ge=0, le=99)
+    wrong_attempts: int = Field(default=0, ge=0, le=999)
+    max_hint_level: int = Field(default=0, ge=0, le=3)
+    reset_count: int = Field(default=0, ge=0, le=999)
+    first_hint_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
+    first_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
+    last_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
 
 
 class FeedbackCreate(BaseModel):
@@ -198,6 +219,25 @@ def db_select(table: str, **filters):
         if value is not None:
             params[key] = f"eq.{value}"
     return db_request("GET", table, params=params)
+
+
+def db_select_all(table: str, *, page_size: int = 1000, order: Optional[str] = None, **filters):
+    """Read all rows despite Supabase/PostgREST row limits. Intended for aggregate QA only."""
+    rows = []
+    offset = 0
+    while True:
+        params = {"select": "*", "limit": str(page_size), "offset": str(offset)}
+        if order:
+            params["order"] = order
+        for key, value in filters.items():
+            if value is not None:
+                params[key] = f"eq.{value}"
+        batch = db_request("GET", table, params=params)
+        rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        offset += page_size
+    return rows
 
 
 def db_insert(table: str, row: dict):
@@ -492,7 +532,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.12.0",
+        "version": "3.13.0",
         "vocabularyVersion": pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
@@ -528,6 +568,13 @@ def health():
             db_request("GET", "puzzle_feedback", params={"select": "id", "limit": "1"})
         except HTTPException:
             quality_migration = False
+        analytics_v2_migration = True
+        try:
+            db_request("GET", "puzzle_attempts", params={"select": "id,reset_count,first_hint_at_ms,first_correct_at_ms,last_correct_at_ms,found_words,resume_count,last_activity_at", "limit": "1"})
+            db_request("GET", "puzzle_runs", params={"select": "id,reset_count,first_hint_at_ms,first_correct_at_ms,last_correct_at_ms", "limit": "1"})
+            db_request("GET", "quality_snapshots", params={"select": "id,snapshot_date", "limit": "1"})
+        except HTTPException:
+            analytics_v2_migration = False
         playtest_migration = True
         try:
             db_request("GET", "leagues", params={"select": "code,name", "limit": "1"})
@@ -540,9 +587,9 @@ def health():
             db_request("GET", "leagues", params={"select": "code,public_opt_in,public_name,public_enabled_at", "limit": "1"})
         except HTTPException:
             global_league_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "qualityAnalyticsV2": analytics_v2_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "qualityAnalyticsV2": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -555,7 +602,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.12.0",
+        "version": "3.13.0",
     }
 
 
@@ -771,13 +818,39 @@ def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(d
             raise HTTPException(400, "Tato úloha nepatří k Daily datu")
     existing = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
     if existing:
+        values = {"last_activity_at": datetime.now(TZ).isoformat()}
+        if payload.resuming:
+            values["resume_count"] = int(existing[0].get("resume_count") or 0) + 1
+        try:
+            db_update("puzzle_attempts", {"id": payload.attempt_id}, values)
+        except HTTPException:
+            pass
         return {"ok": True, "attemptId": payload.attempt_id}
+    now = datetime.now(TZ).isoformat()
     db_insert("puzzle_attempts", {
         "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
         "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.7",
+        "started_at": now, "last_activity_at": now, "app_version": "3.13",
     })
     return {"ok": True, "attemptId": payload.attempt_id}
+
+
+@app.post("/api/attempt/checkpoint")
+def attempt_checkpoint(payload: AttemptCheckpoint, authorization: Optional[str] = Header(default=None)):
+    """Low-volume progress telemetry: correct words, hints, resets and app/menu exits."""
+    player = auth_player(authorization)
+    rows = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
+    if not rows:
+        return {"ok": False, "missing": True}
+    values = {
+        "elapsed_ms": payload.elapsed_ms, "moves": payload.moves, "found_words": payload.found_words,
+        "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
+        "max_hint_level": payload.max_hint_level, "reset_count": payload.reset_count,
+        "first_hint_at_ms": payload.first_hint_at_ms, "first_correct_at_ms": payload.first_correct_at_ms,
+        "last_correct_at_ms": payload.last_correct_at_ms, "last_activity_at": datetime.now(TZ).isoformat(),
+    }
+    db_update("puzzle_attempts", {"id": payload.attempt_id}, values)
+    return {"ok": True}
 
 
 @app.post("/api/feedback")
@@ -808,45 +881,262 @@ def _median(vals: list[int]) -> Optional[int]:
 
 @app.get("/api/quality-report")
 def quality_report(authorization: Optional[str] = Header(default=None)):
-    # Aggregate-only telemetry for calibrating puzzle difficulty. No player names are returned.
+    # Aggregate-only internal QA. Any authenticated playtester may technically fetch it; the UI does not expose it.
     auth_player(authorization)
-    attempts = db_select("puzzle_attempts")
-    feedback = db_select("puzzle_feedback", kind="difficulty")
-    fb: dict[str, list[int]] = {}
-    for f in feedback:
-        if f.get("rating") is not None:
-            fb.setdefault(f["puzzle_id"], []).append(int(f["rating"]))
-    groups: dict[str, list[dict]] = {}
+    return build_quality_report(include_previous=True)
+
+
+def _parse_dt(value) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        return dt if dt.tzinfo else dt.replace(tzinfo=TZ)
+    except Exception:
+        return None
+
+
+def _safe_mean(values):
+    vals = [float(v) for v in values if v is not None]
+    return round(sum(vals) / len(vals), 4) if vals else None
+
+
+def _metric_median(values):
+    vals = [float(v) for v in values if v is not None]
+    return statistics.median(vals) if vals else None
+
+
+def _robust_z(value, population):
+    vals = [float(v) for v in population if v is not None]
+    if value is None or len(vals) < 3:
+        return 0.0
+    med = statistics.median(vals)
+    dev = [abs(v - med) for v in vals]
+    mad = statistics.median(dev)
+    if mad > 1e-9:
+        z = 0.67448975 * (float(value) - med) / mad
+    elif len(vals) >= 2:
+        sd = statistics.pstdev(vals)
+        z = (float(value) - med) / sd if sd > 1e-9 else 0.0
+    else:
+        z = 0.0
+    return max(-3.0, min(3.0, z))
+
+
+def _confidence(starts: int):
+    if starts < 5:
+        return {"level": "none", "label": "bez dat", "weight": 0.0}
+    if starts < 10:
+        return {"level": "early", "label": "předběžné", "weight": 0.45}
+    if starts < 20:
+        return {"level": "usable", "label": "použitelné", "weight": 0.7}
+    if starts < 50:
+        return {"level": "reliable", "label": "spolehlivé", "weight": 1.0}
+    return {"level": "strong", "label": "silný vzorek", "weight": 1.0}
+
+
+def _cohort_key(row):
+    return "daily" if row.get("mode") == "daily" else f"free:{row.get('difficulty')}"
+
+
+def build_quality_report(*, include_previous: bool = False):
+    attempts = db_select_all("puzzle_attempts", order="started_at.asc")
+    feedback = db_select_all("puzzle_feedback")
+    runs = db_select_all("puzzle_runs", order="completed_at.asc")
+
+    # Main calibration uses only the first exposure of each player to each puzzle. Replays remain diagnostics.
+    first_by_player_puzzle = {}
     for a in attempts:
-        groups.setdefault(a["puzzle_id"], []).append(a)
+        key = (a.get("player_id"), a.get("puzzle_id"))
+        current = first_by_player_puzzle.get(key)
+        if current is None or (_parse_dt(a.get("started_at")) or datetime.max.replace(tzinfo=TZ)) < (_parse_dt(current.get("started_at")) or datetime.max.replace(tzinfo=TZ)):
+            first_by_player_puzzle[key] = a
+    first_attempts = list(first_by_player_puzzle.values())
+
+    fb_diff = {}
+    fb_words = {}
+    for f in feedback:
+        pid = f.get("puzzle_id")
+        if f.get("kind") == "difficulty" and f.get("rating") is not None:
+            fb_diff.setdefault(pid, []).append(int(f.get("rating")))
+        elif f.get("kind") == "word":
+            fb_words[pid] = fb_words.get(pid, 0) + 1
+
     pdata = load_puzzles()
     puzzle_index = {}
     for p in pdata.get("daily", []):
-        puzzle_index[p["id"]] = p
+        puzzle_index[p["id"]] = {**p, "mode": "daily"}
     for bank in pdata.get("free", {}).values():
         for p in bank:
-            puzzle_index[p["id"]] = p
+            puzzle_index[p["id"]] = {**p, "mode": "free"}
+
+    groups = {}
+    for a in first_attempts:
+        groups.setdefault(a.get("puzzle_id"), []).append(a)
+    run_groups = {}
+    for r in runs:
+        run_groups.setdefault(r.get("puzzle_id"), []).append(r)
+
+    now = datetime.now(TZ)
     rows = []
     for puzzle_id, vals in groups.items():
+        # Retired IDs from older regenerated banks remain syncable, but must not calibrate the active content bank.
+        if puzzle_id not in puzzle_index:
+            continue
         completed = [x for x in vals if x.get("completed_at")]
         times = [int(x["elapsed_ms"]) for x in completed if x.get("elapsed_ms") is not None]
         wrong = [int(x.get("wrong_attempts") or 0) for x in completed]
         hints = [int(x.get("hints_used") or 0) for x in completed]
+        resets = [int(x.get("reset_count") or 0) for x in completed]
         clean = [1 if x.get("clean_solve") is True else 0 for x in completed]
-        ratings = fb.get(puzzle_id, [])
+        first_hint = [int(x.get("first_hint_at_ms")) for x in completed if x.get("first_hint_at_ms") is not None]
+        first_correct = [int(x.get("first_correct_at_ms")) for x in completed if x.get("first_correct_at_ms") is not None]
+        stale = 0
+        for x in vals:
+            if x.get("completed_at"):
+                continue
+            activity = _parse_dt(x.get("last_activity_at")) or _parse_dt(x.get("started_at"))
+            if activity and now - activity >= timedelta(hours=24):
+                stale += 1
+        ratings = fb_diff.get(puzzle_id, [])
         puzzle = puzzle_index.get(puzzle_id, {})
         meta = puzzle.get("meta") or {}
-        rows.append({
-            "puzzleId": puzzle_id, "difficulty": vals[0].get("difficulty"), "starts": len(vals), "completions": len(completed),
-            "completionRate": round(len(completed) / len(vals), 3) if vals else 0, "medianMs": _median(times),
-            "avgWrong": round(sum(wrong) / len(wrong), 2) if wrong else None, "avgHints": round(sum(hints) / len(hints), 2) if hints else None,
-            "cleanRate": round(sum(clean) / len(clean), 3) if clean else None,
-            "difficultyRating": round(sum(ratings) / len(ratings), 2) if ratings else None, "ratings": len(ratings),
+        mode = vals[0].get("mode") or puzzle.get("mode")
+        difficulty = vals[0].get("difficulty") or puzzle.get("difficulty")
+        total_runs = len(run_groups.get(puzzle_id, []))
+        starts = len(vals)
+        completions = len(completed)
+        row = {
+            "puzzleId": puzzle_id, "mode": mode, "difficulty": difficulty,
+            "level": meta.get("level"), "starts": starts, "completions": completions,
+            "completionRate": round(completions / starts, 3) if starts else 0.0,
+            "staleIncomplete": stale, "staleRate": round(stale / starts, 3) if starts else 0.0,
+            "medianMs": _median(times), "avgWrong": _safe_mean(wrong), "avgHints": _safe_mean(hints),
+            "avgResets": _safe_mean(resets), "cleanRate": _safe_mean(clean),
+            "medianFirstHintMs": _median(first_hint), "medianFirstCorrectMs": _median(first_correct),
+            "difficultyRating": _safe_mean(ratings), "ratings": len(ratings),
+            "ratingResponseRate": round(len(ratings) / completions, 3) if completions else 0.0,
+            "wordReports": fb_words.get(puzzle_id, 0), "totalRuns": total_runs,
+            "replays": max(0, total_runs - completions),
             "generatedScore": meta.get("difficultyScore"), "cells": meta.get("cells"),
-            "words": len(puzzle.get("answers") or []), "sample": "early" if len(vals) < 5 else "usable",
-        })
-    rows.sort(key=lambda r: (r["difficulty"] or "", -(r["medianMs"] or 0)))
-    return {"attempts": len(attempts), "puzzlesMeasured": len(rows), "rows": rows}
+            "words": len(puzzle.get("answers") or []), "cohort": None,
+        }
+        row["cohort"] = _cohort_key(row)
+        row["confidence"] = _confidence(starts)
+        rows.append(row)
+
+    # Benchmark every metric only against puzzles played in the same mode/difficulty cohort.
+    cohorts = {}
+    for row in rows:
+        cohorts.setdefault(row["cohort"], []).append(row)
+    cohort_summary = {}
+    weights = {"time": .35, "completion": .20, "hints": .15, "wrong": .10, "clean": .10, "rating": .10}
+    for key, crow in cohorts.items():
+        bench = [r for r in crow if r["starts"] >= 5]
+        pops = {
+            "medianMs": [r["medianMs"] for r in bench if r["medianMs"] is not None],
+            "completionRate": [r["completionRate"] for r in bench],
+            "avgHints": [r["avgHints"] for r in bench if r["avgHints"] is not None],
+            "avgWrong": [r["avgWrong"] for r in bench if r["avgWrong"] is not None],
+            "cleanRate": [r["cleanRate"] for r in bench if r["cleanRate"] is not None],
+        }
+        cohort_summary[key] = {
+            "puzzlesMeasured": len(crow), "benchmarkPuzzles": len(bench),
+            "medianTimeMs": round(_metric_median(pops["medianMs"])) if pops["medianMs"] else None,
+            "medianCompletionRate": _metric_median(pops["completionRate"]),
+            "medianHints": _metric_median(pops["avgHints"]),
+            "medianWrong": _metric_median(pops["avgWrong"]),
+            "medianCleanRate": _metric_median(pops["cleanRate"]),
+        }
+        for r in crow:
+            if r["starts"] < 5 or len(bench) < 3:
+                r["difficultyIndex"] = None
+                r["behaviorIndex"] = None
+                r["status"] = "waiting"
+                r["recommendation"] = "Čekat na více prvních pokusů."
+                continue
+            signals = {
+                "time": _robust_z(r["medianMs"], pops["medianMs"]),
+                "completion": -_robust_z(r["completionRate"], pops["completionRate"]),
+                "hints": _robust_z(r["avgHints"], pops["avgHints"]),
+                "wrong": _robust_z(r["avgWrong"], pops["avgWrong"]),
+                "clean": -_robust_z(r["cleanRate"], pops["cleanRate"]),
+            }
+            behavior = sum(weights[k] * signals[k] for k in ("time", "completion", "hints", "wrong", "clean")) / sum(weights[k] for k in ("time", "completion", "hints", "wrong", "clean"))
+            # Rating is already normalized to -1..+1; scale to roughly the same useful range and shrink small samples.
+            rating_signal = 0.0
+            if r["difficultyRating"] is not None:
+                rating_signal = float(r["difficultyRating"]) * 1.5 * min(1.0, r["ratings"] / 10.0)
+            index = behavior * .90 + rating_signal * .10
+            r["signals"] = {k: round(v, 3) for k, v in signals.items()}
+            r["behaviorIndex"] = round(behavior, 3)
+            r["difficultyIndex"] = round(max(-3.0, min(3.0, index)), 3)
+            reliable = r["starts"] >= 20
+            usable = r["starts"] >= 10
+            if reliable and r["difficultyIndex"] >= 1.25:
+                r["status"] = "too_hard"; r["recommendation"] = "Zkontrolovat geometrii a slovní mix; kandidát na posun výš nebo úpravu."
+            elif reliable and r["difficultyIndex"] <= -1.25:
+                r["status"] = "too_easy"; r["recommendation"] = "Kandidát na posun níž nebo pozdější pořadí v kategorii."
+            elif usable and abs(r["difficultyIndex"]) >= 1.0:
+                r["status"] = "watch"; r["recommendation"] = "Sledovat; signál je výrazný, ale vzorek ještě není dost silný pro zásah."
+            else:
+                r["status"] = "ok"; r["recommendation"] = "Bez zásahu."
+            if r["wordReports"] >= 2:
+                r["status"] = "word_review"; r["recommendation"] = "Prověřit cílová slova; více hráčů je označilo jako divná."
+            if r["ratings"] >= 8 and r["behaviorIndex"] * float(r["difficultyRating"] or 0) < -0.35:
+                r["mixedSignal"] = True
+            else:
+                r["mixedSignal"] = False
+
+    rows.sort(key=lambda r: (0 if r.get("status") in ("too_hard", "too_easy", "word_review") else 1, -(abs(r.get("difficultyIndex") or 0)), -(r.get("starts") or 0)))
+    alerts = [r for r in rows if r.get("status") in ("too_hard", "too_easy", "word_review")]
+    watch = [r for r in rows if r.get("status") == "watch"]
+    result = {
+        "version": 2, "generatedAt": now.isoformat(),
+        "methodology": {
+            "primarySample": "první setkání každého hráče s konkrétním puzzle",
+            "replays": "diagnostika pouze; nevstupují do hlavního Difficulty Indexu",
+            "weights": weights, "reliableFromStarts": 20, "alertThreshold": 1.25, "watchThreshold": 1.0,
+            "cohorts": "Daily zvlášť; Free zvlášť podle obtížnosti",
+        },
+        "summary": {
+            "firstExposures": len(first_attempts), "allAttempts": len(attempts), "runs": len(runs),
+            "puzzlesMeasured": len(rows), "alerts": len(alerts), "watch": len(watch),
+            "difficultyRatings": sum(len(v) for v in fb_diff.values()), "wordReports": sum(fb_words.values()),
+        },
+        "cohorts": cohort_summary, "alerts": alerts, "watch": watch, "rows": rows,
+    }
+    if include_previous:
+        try:
+            snaps = db_select_all("quality_snapshots", order="snapshot_date.desc")
+            previous = snaps[0] if snaps else None
+            if previous:
+                payload = previous.get("report") or {}
+                prior = {r.get("puzzleId"): r for r in payload.get("rows", [])}
+                changed = []
+                for r in rows:
+                    old = prior.get(r.get("puzzleId"))
+                    if old and r.get("difficultyIndex") is not None and old.get("difficultyIndex") is not None:
+                        delta = round(float(r["difficultyIndex"]) - float(old["difficultyIndex"]), 3)
+                        r["indexDelta"] = delta
+                        if abs(delta) >= .35:
+                            changed.append({"puzzleId": r["puzzleId"], "difficulty": r["difficulty"], "delta": delta, "now": r["difficultyIndex"], "before": old["difficultyIndex"]})
+                result["previousSnapshotDate"] = previous.get("snapshot_date")
+                result["notableChanges"] = sorted(changed, key=lambda x: -abs(x["delta"]))[:20]
+        except HTTPException:
+            result["previousSnapshotDate"] = None
+    return result
+
+
+def maybe_save_weekly_quality_snapshot(today: date):
+    if today.weekday() != 0:
+        return {"saved": False, "reason": "not-monday"}
+    iso = today.isoformat()
+    if db_select("quality_snapshots", snapshot_date=iso):
+        return {"saved": False, "reason": "already-exists", "date": iso}
+    report = build_quality_report(include_previous=False)
+    db_insert("quality_snapshots", {"id": str(uuid.uuid4()), "snapshot_date": iso, "report": report})
+    return {"saved": True, "date": iso, "alerts": report.get("summary", {}).get("alerts", 0)}
 
 
 def payload_completed_at(value: Optional[str]) -> str:
@@ -907,7 +1197,9 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty, "elapsed_ms": payload.elapsed_ms,
         "moves": payload.moves, "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
-        "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+        "max_hint_level": payload.max_hint_level, "reset_count": payload.reset_count,
+        "first_hint_at_ms": payload.first_hint_at_ms, "first_correct_at_ms": payload.first_correct_at_ms,
+        "last_correct_at_ms": payload.last_correct_at_ms, "clean_solve": effective_clean,
         "completed_at": completed_at,
     })
 
@@ -1010,6 +1302,9 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 "wrong_attempts": payload.wrong_attempts,
                 "hints_used": payload.hints_used,
                 "max_hint_level": payload.max_hint_level,
+                "reset_count": payload.reset_count, "first_hint_at_ms": payload.first_hint_at_ms,
+                "first_correct_at_ms": payload.first_correct_at_ms, "last_correct_at_ms": payload.last_correct_at_ms,
+                "found_words": len((puzzle_info(payload.puzzle_id) or {}).get("puzzle", {}).get("answers") or []), "last_activity_at": datetime.now(TZ).isoformat(),
                 "clean_solve": effective_clean,
             }
             if attempts:
@@ -1020,7 +1315,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 db_insert("puzzle_attempts", {
                     "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
                     "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.7-offline", **telemetry_values,
+                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.13-offline", **telemetry_values,
                 })
         except HTTPException:
             logger.warning("Could not finalize telemetry attempt %s", payload.attempt_id)
@@ -1370,9 +1665,15 @@ def push_unsubscribe(payload: PushUnsubscribe, authorization: Optional[str] = He
 def cron_daily_push(request: Request, authorization: Optional[str] = Header(default=None)):
     if not CRON_SECRET or authorization != f"Bearer {CRON_SECRET}":
         raise HTTPException(401, "Neplatné cron oprávnění")
+    today_date = current_prague_date()
+    try:
+        quality_snapshot = maybe_save_weekly_quality_snapshot(today_date)
+    except Exception as exc:
+        logger.exception("Weekly quality snapshot failed")
+        quality_snapshot = {"saved": False, "error": type(exc).__name__}
     if not push_ready():
-        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný"}
-    today = current_prague_date().isoformat()
+        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": quality_snapshot}
+    today = today_date.isoformat()
     completed = {r.get("player_id") for r in db_select("results", mode="daily", daily_date=today)}
     subscriptions = db_select("push_subscriptions")
     sent = failed = removed = 0
@@ -1398,7 +1699,7 @@ def cron_daily_push(request: Request, authorization: Optional[str] = Header(defa
             else:
                 failed += 1
                 logger.warning("Push failed for subscription %s: %s", sub.get("id"), exc)
-    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed}
+    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed, "qualitySnapshot": quality_snapshot}
 
 
 @app.get("/api/leaderboard")

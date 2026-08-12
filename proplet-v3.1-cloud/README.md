@@ -1,18 +1,19 @@
-# Proplet v3.12
+# Proplet v3.13
 
-Česká PWA slovní hra Proplet.
+Aktuální release: **v3.13 — Quality Analytics v2**.
 
-Aktuální release: **v3.12 — Přestavba Free banky**.
+Proplet je česká PWA slovní logická hra s FastAPI backendem, Supabase/Postgres a Vercel deploymentem.
 
-Hlavní obsahové změny:
+## v3.13
 
-- ručně kurátorovaný slovník A–D z v3.11 je nyní použit i pro bezpečně nehrané Free úrovně,
-- 275 Free úrovní bylo přestavěno,
-- 125 historicky exponovaných úrovní zůstává zmrazených,
-- nový bankovní anti-repeat systém blokuje opakování odpovědí v předchozích osmi úrovních,
-- všech 275 nových úrovní prošlo nezávislou kontrolou lokální i globální unikátnosti.
+Tato verze přidává automatickou datovou kalibraci obtížnosti bez změny herního obsahu:
 
-Nasazení: `UPDATE_V3_12_CZ.md`.
+- Difficulty Index z prvních pokusů,
+- oddělení replayů,
+- confidence a automatické QA alerty,
+- rating obtížnosti jako doplňkový signál,
+- detailnější telemetry průběhu pokusu,
+- týdenní QA snapshoty,
+- skrytý dashboard `?qa=1`.
 
-Dokumentace slovníku: `VOCABULARY_DESIGN_V3_11_CZ.md`.
-Audit v3.12: `FREE_BANK_AUDIT_V3_12_CZ.md`.
+Viz `QUALITY_ANALYTICS_V3_13_CZ.md` a `UPDATE_V3_13_CZ.md`.
