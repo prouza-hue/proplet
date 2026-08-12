@@ -548,7 +548,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.10.0",
+        "version": "3.10.1",
     }
 
 
