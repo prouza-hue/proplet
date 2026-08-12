@@ -1,19 +1,16 @@
-# Proplet v3.13
+# Proplet v3.14
 
-Aktuální release: **v3.13 — Quality Analytics v2**.
+Aktuální release: **v3.14 — Pomocník & měření nápověd**.
 
-Proplet je česká PWA slovní logická hra s FastAPI backendem, Supabase/Postgres a Vercel deploymentem.
+Hlavní novinky:
 
-## v3.13
+- hráčská Úroveň podpory,
+- proaktivní Pomocník při delším zaseknutí,
+- plná telemetrie nápověd a checkpointů pokusu,
+- dokončený skrytý Quality dashboard `/?qa=1`,
+- automatické týdenní QA snapshoty,
+- žádný limit nápověd ani monetizace zatím není aktivní.
 
-Tato verze přidává automatickou datovou kalibraci obtížnosti bez změny herního obsahu:
-
-- Difficulty Index z prvních pokusů,
-- oddělení replayů,
-- confidence a automatické QA alerty,
-- rating obtížnosti jako doplňkový signál,
-- detailnější telemetry průběhu pokusu,
-- týdenní QA snapshoty,
-- skrytý dashboard `?qa=1`.
-
-Viz `QUALITY_ANALYTICS_V3_13_CZ.md` a `UPDATE_V3_13_CZ.md`.
+Nasazení: `UPDATE_V3_14_CZ.md`  
+Design Pomocníka: `HINT_HELPER_DESIGN_V3_14_CZ.md`  
+Migrace: `SUPABASE_MIGRATION_V3_14.sql`

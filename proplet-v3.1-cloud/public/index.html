@@ -196,7 +196,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.13</small>
+      <small class="app-version">Proplet v3.14</small>
     </footer>
   </main>
 
@@ -323,12 +323,36 @@
     </div>
   </div>
 
+  <div id="supportModeModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left support-mode-modal-card">
+      <button id="closeSupportModeModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">POMOCNÍK</span>
+      <h2>Jak ti má Proplet pomáhat?</h2>
+      <p class="muted">Nemění obtížnost ani XP. Jen určuje, jestli se hra po delším zaseknutí sama ozve s nabídkou malé nápovědy. Přijatá pomoc se počítá jako nápověda a ukončí ✨ čisté řešení.</p>
+      <button class="support-choice" data-support-mode="beginner"><span>🐣</span><div><strong>Začínající čtenář</strong><small>Přibližně 1. třída · nabídka po 45 s bez pokroku.</small></div></button>
+      <button class="support-choice" data-support-mode="younger"><span>🧒</span><div><strong>Mladší školák</strong><small>2.–5. třída · nabídka po 70 s bez pokroku.</small></div></button>
+      <button class="support-choice" data-support-mode="older"><span>🎒</span><div><strong>Starší školák</strong><small>6. třída a výš · nabídka po 100 s bez pokroku.</small></div></button>
+      <button class="support-choice" data-support-mode="none"><span>🧠</span><div><strong>Bez asistence</strong><small>Pomocník se sám neozývá. Nápověda zůstává kdykoli dostupná ručně.</small></div></button>
+    </div>
+  </div>
+
+  <div id="helperOfferModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card helper-offer-card">
+      <div class="helper-big-icon">💡</div>
+      <span class="eyebrow">POMOCNÍK</span>
+      <h2>Zasekl ses?</h2>
+      <p id="helperOfferText" class="muted">Chceš malé postrčení?</p>
+      <button id="helperAcceptBtn" class="primary-btn big">Jo, trochu napovědět 💡</button>
+      <button id="helperDismissBtn" class="text-btn">Ne, zkusím to dál</button>
+    </div>
+  </div>
+
   <div id="hintModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card left hint-card">
       <button id="closeHintModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">CHYTRÁ NÁPOVĚDA</span>
       <h2>Kolik pomoci chceš?</h2>
-      <p class="muted">Jakákoli nápověda zruší ✨ čisté řešení této úrovně.</p>
+      <p class="muted">Jakákoli nápověda zruší ✨ čisté řešení této úrovně. Nápovědy zatím nejsou omezené.</p>
       <button class="hint-choice" data-hint-level="1"><span>💡</span><div><strong>Lehká</strong><small>Ukáže začátek a délku vhodného slova.</small></div></button>
       <button class="hint-choice" data-hint-level="2"><span>🔦</span><div><strong>Silnější</strong><small>Ukáže první tři políčka cesty.</small></div></button>
       <button class="hint-choice" data-hint-level="3"><span>🧭</span><div><strong>Odhalit</strong><small>Na chvíli ukáže celé slovo i jeho cestu.</small></div></button>

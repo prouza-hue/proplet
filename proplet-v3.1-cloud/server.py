@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+import math
 import hmac
 import json
 import logging
-import math
 import os
 import secrets
-import statistics
 import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -52,7 +51,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.13.0-cloud")
+app = FastAPI(title="Proplet API", version="3.14-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -97,6 +96,35 @@ class AvatarSet(BaseModel):
     avatar: str = Field(min_length=1, max_length=16)
 
 
+class SupportModeSet(BaseModel):
+    support_mode: str
+
+
+class HelperEventCreate(BaseModel):
+    attempt_id: str = Field(min_length=8, max_length=80)
+    puzzle_id: str
+    challenge_key: str
+    event_type: str
+    support_mode: str = Field(default="none", max_length=32)
+    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
+    idle_ms: int = Field(default=0, ge=0, le=86_400_000)
+    found_words: int = Field(default=0, ge=0, le=99)
+    total_words: int = Field(default=0, ge=0, le=99)
+
+
+class HintEventCreate(BaseModel):
+    attempt_id: str = Field(min_length=8, max_length=80)
+    puzzle_id: str
+    challenge_key: str
+    hint_level: int = Field(ge=1, le=3)
+    source: str = Field(default="manual", max_length=24)
+    support_mode: str = Field(default="none", max_length=32)
+    complimentary: bool = False
+    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
+    found_words: int = Field(default=0, ge=0, le=99)
+    total_words: int = Field(default=0, ge=0, le=99)
+
+
 class TeamPinSet(BaseModel):
     pin: str = Field(min_length=4, max_length=32)
 
@@ -112,10 +140,6 @@ class ResultCreate(BaseModel):
     hints_used: int = Field(default=0, ge=0, le=99)
     wrong_attempts: int = Field(default=0, ge=0, le=999)
     max_hint_level: int = Field(default=0, ge=0, le=3)
-    reset_count: int = Field(default=0, ge=0, le=999)
-    first_hint_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
-    first_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
-    last_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
     attempt_id: Optional[str] = Field(default=None, min_length=8, max_length=80)
     # Conservative default keeps older cached clients from being falsely marked as Clean.
     clean_solve: bool = False
@@ -129,21 +153,13 @@ class AttemptStart(BaseModel):
     challenge_key: str
     mode: str
     difficulty: str
-    resuming: bool = False
 
 
 class AttemptCheckpoint(BaseModel):
     attempt_id: str = Field(min_length=8, max_length=80)
+    event_type: str
     elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
-    moves: int = Field(default=0, ge=0, le=10000)
     found_words: int = Field(default=0, ge=0, le=99)
-    hints_used: int = Field(default=0, ge=0, le=99)
-    wrong_attempts: int = Field(default=0, ge=0, le=999)
-    max_hint_level: int = Field(default=0, ge=0, le=3)
-    reset_count: int = Field(default=0, ge=0, le=999)
-    first_hint_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
-    first_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
-    last_correct_at_ms: Optional[int] = Field(default=None, ge=0, le=86_400_000)
 
 
 class FeedbackCreate(BaseModel):
@@ -219,25 +235,6 @@ def db_select(table: str, **filters):
         if value is not None:
             params[key] = f"eq.{value}"
     return db_request("GET", table, params=params)
-
-
-def db_select_all(table: str, *, page_size: int = 1000, order: Optional[str] = None, **filters):
-    """Read all rows despite Supabase/PostgREST row limits. Intended for aggregate QA only."""
-    rows = []
-    offset = 0
-    while True:
-        params = {"select": "*", "limit": str(page_size), "offset": str(offset)}
-        if order:
-            params["order"] = order
-        for key, value in filters.items():
-            if value is not None:
-                params[key] = f"eq.{value}"
-        batch = db_request("GET", table, params=params)
-        rows.extend(batch)
-        if len(batch) < page_size:
-            break
-        offset += page_size
-    return rows
 
 
 def db_insert(table: str, row: dict):
@@ -532,7 +529,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.13.0",
+        "version": "3.14.0",
         "vocabularyVersion": pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
@@ -568,13 +565,6 @@ def health():
             db_request("GET", "puzzle_feedback", params={"select": "id", "limit": "1"})
         except HTTPException:
             quality_migration = False
-        analytics_v2_migration = True
-        try:
-            db_request("GET", "puzzle_attempts", params={"select": "id,reset_count,first_hint_at_ms,first_correct_at_ms,last_correct_at_ms,found_words,resume_count,last_activity_at", "limit": "1"})
-            db_request("GET", "puzzle_runs", params={"select": "id,reset_count,first_hint_at_ms,first_correct_at_ms,last_correct_at_ms", "limit": "1"})
-            db_request("GET", "quality_snapshots", params={"select": "id,snapshot_date", "limit": "1"})
-        except HTTPException:
-            analytics_v2_migration = False
         playtest_migration = True
         try:
             db_request("GET", "leagues", params={"select": "code,name", "limit": "1"})
@@ -587,9 +577,18 @@ def health():
             db_request("GET", "leagues", params={"select": "code,public_opt_in,public_name,public_enabled_at", "limit": "1"})
         except HTTPException:
             global_league_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "qualityAnalyticsV2": analytics_v2_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        analytics_v2_migration = True
+        try:
+            db_request("GET", "players", params={"select": "id,support_mode", "limit": "1"})
+            db_request("GET", "helper_events", params={"select": "id", "limit": "1"})
+            db_request("GET", "hint_events", params={"select": "id", "limit": "1"})
+            db_request("GET", "puzzle_attempts", params={"select": "id,first_correct_ms,first_hint_ms,reset_count,resume_count,last_found_words,last_activity_at", "limit": "1"})
+            db_request("GET", "quality_snapshots", params={"select": "id,week_start", "limit": "1"})
+        except HTTPException:
+            analytics_v2_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "qualityAnalyticsV2": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -602,7 +601,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.13.0",
+        "version": "3.14.0",
     }
 
 
@@ -667,6 +666,7 @@ def create_player(payload: PlayerCreate):
         "name": name,
         "family_code": family,
         "avatar": "🙂",
+        "support_mode": "none",
         "token_hash": token_hash,
         "created_at": now,
     }
@@ -683,7 +683,7 @@ def create_player(payload: PlayerCreate):
     stats = player_stats(player_id)
     return {
         "id": player_id, "name": name, "familyCode": family, "leagueName": league_name_for(family), "token": token,
-        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "stats": stats,
+        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "stats": stats,
     }
 
 
@@ -703,7 +703,7 @@ def login(payload: PlayerLogin):
     token = new_session(player["id"])
     return {
         "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
-        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "stats": player_stats(player["id"]),
+        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": player_stats(player["id"]),
     }
 
 
@@ -722,6 +722,96 @@ def set_avatar(payload: AvatarSet, authorization: Optional[str] = Header(default
         raise HTTPException(400, "Vyber avatar")
     db_update("players", {"id": player["id"]}, {"avatar": avatar})
     return {"ok": True, "avatar": avatar}
+
+
+@app.post("/api/support-mode")
+def set_support_mode(payload: SupportModeSet, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    allowed = {"none", "beginner", "younger", "older"}
+    mode = (payload.support_mode or "none").strip().lower()
+    if mode not in allowed:
+        raise HTTPException(400, "Neplatná úroveň podpory")
+    db_update("players", {"id": player["id"]}, {"support_mode": mode})
+    return {"ok": True, "supportMode": mode}
+
+
+def _telemetry_attempt(player_id: str, attempt_id: str, puzzle_id: str, challenge_key: str) -> Optional[dict]:
+    rows = db_select("puzzle_attempts", id=attempt_id, player_id=player_id)
+    if not rows:
+        return None
+    row = rows[0]
+    # Telemetry must describe the real authenticated attempt, not arbitrary client metadata.
+    if row.get("puzzle_id") != puzzle_id or row.get("challenge_key") != challenge_key:
+        raise HTTPException(400, "Telemetry neodpovídá pokusu")
+    return row
+
+
+@app.post("/api/helper-event")
+def helper_event(payload: HelperEventCreate, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    allowed_events = {"offered", "accepted", "dismissed"}
+    if payload.event_type not in allowed_events:
+        raise HTTPException(400, "Neplatný helper event")
+    if not _telemetry_attempt(player["id"], payload.attempt_id, payload.puzzle_id, payload.challenge_key):
+        return {"ok": True, "ignored": True}
+    support_mode = player.get("support_mode") or "none"
+    db_insert("helper_events", {
+        "id": str(uuid.uuid4()),
+        "player_id": player["id"],
+        "attempt_id": payload.attempt_id,
+        "puzzle_id": payload.puzzle_id,
+        "challenge_key": payload.challenge_key,
+        "event_type": payload.event_type,
+        "support_mode": support_mode,
+        "elapsed_ms": payload.elapsed_ms,
+        "idle_ms": payload.idle_ms,
+        "found_words": payload.found_words,
+        "total_words": payload.total_words,
+        "created_at": datetime.now(TZ).isoformat(),
+    })
+    return {"ok": True}
+
+
+@app.post("/api/hint-event")
+def hint_event(payload: HintEventCreate, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    if payload.source not in {"manual", "helper"}:
+        raise HTTPException(400, "Neplatný zdroj nápovědy")
+    if not _telemetry_attempt(player["id"], payload.attempt_id, payload.puzzle_id, payload.challenge_key):
+        return {"ok": True, "ignored": True}
+    support_mode = player.get("support_mode") or "none"
+    # Complimentary is intentionally derived server-side. It has no gameplay effect in v3.14,
+    # but future hint economy must not trust a client-declared free-credit flag.
+    previous_hints = db_select("hint_events", attempt_id=payload.attempt_id, player_id=player["id"])
+    sibling_attempts = db_select("puzzle_attempts", player_id=player["id"], challenge_key=payload.challenge_key)
+    first_attempt_id = None
+    if sibling_attempts:
+        first_attempt_id = min(
+            sibling_attempts,
+            key=lambda a: (str(a.get("started_at") or ""), str(a.get("id") or "")),
+        ).get("id")
+    complimentary = (
+        payload.hint_level == 1
+        and support_mode in {"beginner", "younger"}
+        and payload.attempt_id == first_attempt_id
+        and not previous_hints
+    )
+    db_insert("hint_events", {
+        "id": str(uuid.uuid4()),
+        "player_id": player["id"],
+        "attempt_id": payload.attempt_id,
+        "puzzle_id": payload.puzzle_id,
+        "challenge_key": payload.challenge_key,
+        "hint_level": payload.hint_level,
+        "source": payload.source,
+        "support_mode": support_mode,
+        "complimentary": complimentary,
+        "elapsed_ms": payload.elapsed_ms,
+        "found_words": payload.found_words,
+        "total_words": payload.total_words,
+        "created_at": datetime.now(TZ).isoformat(),
+    })
+    return {"ok": True}
 
 
 @app.post("/api/team-pin")
@@ -759,7 +849,7 @@ def me(authorization: Optional[str] = Header(default=None)):
     stats = player_stats(player["id"])
     return {
         "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
-        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "stats": stats,
+        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": stats,
     }
 
 
@@ -818,37 +908,37 @@ def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(d
             raise HTTPException(400, "Tato úloha nepatří k Daily datu")
     existing = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
     if existing:
-        values = {"last_activity_at": datetime.now(TZ).isoformat()}
-        if payload.resuming:
-            values["resume_count"] = int(existing[0].get("resume_count") or 0) + 1
-        try:
-            db_update("puzzle_attempts", {"id": payload.attempt_id}, values)
-        except HTTPException:
-            pass
         return {"ok": True, "attemptId": payload.attempt_id}
-    now = datetime.now(TZ).isoformat()
     db_insert("puzzle_attempts", {
         "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
         "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": now, "last_activity_at": now, "app_version": "3.13",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.14",
     })
     return {"ok": True, "attemptId": payload.attempt_id}
 
 
 @app.post("/api/attempt/checkpoint")
 def attempt_checkpoint(payload: AttemptCheckpoint, authorization: Optional[str] = Header(default=None)):
-    """Low-volume progress telemetry: correct words, hints, resets and app/menu exits."""
     player = auth_player(authorization)
+    allowed = {"correct", "hint", "reset", "resume", "leave"}
+    if payload.event_type not in allowed:
+        raise HTTPException(400, "Neplatný checkpoint")
     rows = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
     if not rows:
-        return {"ok": False, "missing": True}
+        return {"ok": True, "ignored": True}
+    row = rows[0]
     values = {
-        "elapsed_ms": payload.elapsed_ms, "moves": payload.moves, "found_words": payload.found_words,
-        "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
-        "max_hint_level": payload.max_hint_level, "reset_count": payload.reset_count,
-        "first_hint_at_ms": payload.first_hint_at_ms, "first_correct_at_ms": payload.first_correct_at_ms,
-        "last_correct_at_ms": payload.last_correct_at_ms, "last_activity_at": datetime.now(TZ).isoformat(),
+        "last_found_words": max(int(row.get("last_found_words") or 0), int(payload.found_words)),
+        "last_activity_at": datetime.now(TZ).isoformat(),
     }
+    if payload.event_type == "correct" and row.get("first_correct_ms") is None:
+        values["first_correct_ms"] = int(payload.elapsed_ms)
+    elif payload.event_type == "hint" and row.get("first_hint_ms") is None:
+        values["first_hint_ms"] = int(payload.elapsed_ms)
+    elif payload.event_type == "reset":
+        values["reset_count"] = int(row.get("reset_count") or 0) + 1
+    elif payload.event_type == "resume":
+        values["resume_count"] = int(row.get("resume_count") or 0) + 1
     db_update("puzzle_attempts", {"id": payload.attempt_id}, values)
     return {"ok": True}
 
@@ -879,264 +969,271 @@ def _median(vals: list[int]) -> Optional[int]:
     return vals[n // 2] if n % 2 else round((vals[n // 2 - 1] + vals[n // 2]) / 2)
 
 
-@app.get("/api/quality-report")
-def quality_report(authorization: Optional[str] = Header(default=None)):
-    # Aggregate-only internal QA. Any authenticated playtester may technically fetch it; the UI does not expose it.
-    auth_player(authorization)
-    return build_quality_report(include_previous=True)
+def build_quality_report():
+    """Quality Analytics v2.
 
+    Main calibration metrics use each player's FIRST started attempt on a puzzle.
+    Replays remain available as secondary telemetry, but cannot make a puzzle look easier.
+    """
+    attempts = db_select("puzzle_attempts")
+    feedback = db_select("puzzle_feedback", kind="difficulty")
+    word_feedback = db_select("puzzle_feedback", kind="word")
+    hint_events = db_select("hint_events")
+    helper_events = db_select("helper_events")
 
-def _parse_dt(value) -> Optional[datetime]:
-    if not value:
-        return None
-    try:
-        dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-        return dt if dt.tzinfo else dt.replace(tzinfo=TZ)
-    except Exception:
-        return None
+    def ts(row):
+        raw = row.get("started_at") or ""
+        try:
+            return datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        except Exception:
+            return datetime.max.replace(tzinfo=TZ)
 
+    first_by_player_puzzle: dict[tuple[str, str], dict] = {}
+    for a in sorted(attempts, key=ts):
+        key = (str(a.get("player_id")), str(a.get("puzzle_id")))
+        first_by_player_puzzle.setdefault(key, a)
 
-def _safe_mean(values):
-    vals = [float(v) for v in values if v is not None]
-    return round(sum(vals) / len(vals), 4) if vals else None
-
-
-def _metric_median(values):
-    vals = [float(v) for v in values if v is not None]
-    return statistics.median(vals) if vals else None
-
-
-def _robust_z(value, population):
-    vals = [float(v) for v in population if v is not None]
-    if value is None or len(vals) < 3:
-        return 0.0
-    med = statistics.median(vals)
-    dev = [abs(v - med) for v in vals]
-    mad = statistics.median(dev)
-    if mad > 1e-9:
-        z = 0.67448975 * (float(value) - med) / mad
-    elif len(vals) >= 2:
-        sd = statistics.pstdev(vals)
-        z = (float(value) - med) / sd if sd > 1e-9 else 0.0
-    else:
-        z = 0.0
-    return max(-3.0, min(3.0, z))
-
-
-def _confidence(starts: int):
-    if starts < 5:
-        return {"level": "none", "label": "bez dat", "weight": 0.0}
-    if starts < 10:
-        return {"level": "early", "label": "předběžné", "weight": 0.45}
-    if starts < 20:
-        return {"level": "usable", "label": "použitelné", "weight": 0.7}
-    if starts < 50:
-        return {"level": "reliable", "label": "spolehlivé", "weight": 1.0}
-    return {"level": "strong", "label": "silný vzorek", "weight": 1.0}
-
-
-def _cohort_key(row):
-    return "daily" if row.get("mode") == "daily" else f"free:{row.get('difficulty')}"
-
-
-def build_quality_report(*, include_previous: bool = False):
-    attempts = db_select_all("puzzle_attempts", order="started_at.asc")
-    feedback = db_select_all("puzzle_feedback")
-    runs = db_select_all("puzzle_runs", order="completed_at.asc")
-
-    # Main calibration uses only the first exposure of each player to each puzzle. Replays remain diagnostics.
-    first_by_player_puzzle = {}
-    for a in attempts:
-        key = (a.get("player_id"), a.get("puzzle_id"))
-        current = first_by_player_puzzle.get(key)
-        if current is None or (_parse_dt(a.get("started_at")) or datetime.max.replace(tzinfo=TZ)) < (_parse_dt(current.get("started_at")) or datetime.max.replace(tzinfo=TZ)):
-            first_by_player_puzzle[key] = a
     first_attempts = list(first_by_player_puzzle.values())
+    groups: dict[str, list[dict]] = {}
+    for a in first_attempts:
+        groups.setdefault(a["puzzle_id"], []).append(a)
 
-    fb_diff = {}
-    fb_words = {}
+    word_reports: dict[str, int] = {}
+    for f in word_feedback:
+        word_reports[f["puzzle_id"]] = word_reports.get(f["puzzle_id"], 0) + 1
+
+    fb: dict[str, list[int]] = {}
     for f in feedback:
-        pid = f.get("puzzle_id")
-        if f.get("kind") == "difficulty" and f.get("rating") is not None:
-            fb_diff.setdefault(pid, []).append(int(f.get("rating")))
-        elif f.get("kind") == "word":
-            fb_words[pid] = fb_words.get(pid, 0) + 1
+        if f.get("rating") is not None:
+            fb.setdefault(f["puzzle_id"], []).append(int(f["rating"]))
 
     pdata = load_puzzles()
     puzzle_index = {}
     for p in pdata.get("daily", []):
-        puzzle_index[p["id"]] = {**p, "mode": "daily"}
+        puzzle_index[p["id"]] = p
     for bank in pdata.get("free", {}).values():
         for p in bank:
-            puzzle_index[p["id"]] = {**p, "mode": "free"}
+            puzzle_index[p["id"]] = p
 
+    # Retired IDs remain syncable for historical data, but must not calibrate the active bank.
+    first_attempts = [a for a in first_attempts if a.get("puzzle_id") in puzzle_index]
     groups = {}
     for a in first_attempts:
-        groups.setdefault(a.get("puzzle_id"), []).append(a)
-    run_groups = {}
-    for r in runs:
-        run_groups.setdefault(r.get("puzzle_id"), []).append(r)
+        groups.setdefault(a["puzzle_id"], []).append(a)
 
-    now = datetime.now(TZ)
     rows = []
     for puzzle_id, vals in groups.items():
-        # Retired IDs from older regenerated banks remain syncable, but must not calibrate the active content bank.
-        if puzzle_id not in puzzle_index:
-            continue
         completed = [x for x in vals if x.get("completed_at")]
         times = [int(x["elapsed_ms"]) for x in completed if x.get("elapsed_ms") is not None]
         wrong = [int(x.get("wrong_attempts") or 0) for x in completed]
         hints = [int(x.get("hints_used") or 0) for x in completed]
-        resets = [int(x.get("reset_count") or 0) for x in completed]
         clean = [1 if x.get("clean_solve") is True else 0 for x in completed]
-        first_hint = [int(x.get("first_hint_at_ms")) for x in completed if x.get("first_hint_at_ms") is not None]
-        first_correct = [int(x.get("first_correct_at_ms")) for x in completed if x.get("first_correct_at_ms") is not None]
-        stale = 0
-        for x in vals:
-            if x.get("completed_at"):
-                continue
-            activity = _parse_dt(x.get("last_activity_at")) or _parse_dt(x.get("started_at"))
-            if activity and now - activity >= timedelta(hours=24):
-                stale += 1
-        ratings = fb_diff.get(puzzle_id, [])
+        first_correct = [int(x.get("first_correct_ms")) for x in vals if x.get("first_correct_ms") is not None]
+        resets = [int(x.get("reset_count") or 0) for x in vals]
+        resumes = [int(x.get("resume_count") or 0) for x in vals]
+        ratings = fb.get(puzzle_id, [])
         puzzle = puzzle_index.get(puzzle_id, {})
         meta = puzzle.get("meta") or {}
-        mode = vals[0].get("mode") or puzzle.get("mode")
-        difficulty = vals[0].get("difficulty") or puzzle.get("difficulty")
-        total_runs = len(run_groups.get(puzzle_id, []))
         starts = len(vals)
-        completions = len(completed)
-        row = {
-            "puzzleId": puzzle_id, "mode": mode, "difficulty": difficulty,
-            "level": meta.get("level"), "starts": starts, "completions": completions,
-            "completionRate": round(completions / starts, 3) if starts else 0.0,
-            "staleIncomplete": stale, "staleRate": round(stale / starts, 3) if starts else 0.0,
-            "medianMs": _median(times), "avgWrong": _safe_mean(wrong), "avgHints": _safe_mean(hints),
-            "avgResets": _safe_mean(resets), "cleanRate": _safe_mean(clean),
-            "medianFirstHintMs": _median(first_hint), "medianFirstCorrectMs": _median(first_correct),
-            "difficultyRating": _safe_mean(ratings), "ratings": len(ratings),
-            "ratingResponseRate": round(len(ratings) / completions, 3) if completions else 0.0,
-            "wordReports": fb_words.get(puzzle_id, 0), "totalRuns": total_runs,
-            "replays": max(0, total_runs - completions),
-            "generatedScore": meta.get("difficultyScore"), "cells": meta.get("cells"),
-            "words": len(puzzle.get("answers") or []), "cohort": None,
-        }
-        row["cohort"] = _cohort_key(row)
-        row["confidence"] = _confidence(starts)
-        rows.append(row)
+        sample = "none" if starts < 5 else "early" if starts < 10 else "usable" if starts < 20 else "reliable" if starts < 50 else "strong"
+        rows.append({
+            "puzzleId": puzzle_id,
+            "difficulty": vals[0].get("difficulty"),
+            "starts": starts,
+            "completions": len(completed),
+            "completionRate": round(len(completed) / starts, 3) if starts else 0,
+            "medianMs": _median(times),
+            "avgWrong": round(sum(wrong) / len(wrong), 2) if wrong else None,
+            "avgHints": round(sum(hints) / len(hints), 2) if hints else None,
+            "cleanRate": round(sum(clean) / len(clean), 3) if clean else None,
+            "medianFirstCorrectMs": _median(first_correct),
+            "avgResets": round(sum(resets) / len(resets), 2) if resets else 0,
+            "avgResumes": round(sum(resumes) / len(resumes), 2) if resumes else 0,
+            "difficultyRating": round(sum(ratings) / len(ratings), 2) if ratings else None,
+            "ratings": len(ratings),
+            "wordReports": word_reports.get(puzzle_id, 0),
+            "generatedScore": meta.get("difficultyScore"),
+            "cells": meta.get("cells"),
+            "words": len(puzzle.get("answers") or []),
+            "sample": sample,
+        })
 
-    # Benchmark every metric only against puzzles played in the same mode/difficulty cohort.
-    cohorts = {}
-    for row in rows:
-        cohorts.setdefault(row["cohort"], []).append(row)
-    cohort_summary = {}
-    weights = {"time": .35, "completion": .20, "hints": .15, "wrong": .10, "clean": .10, "rating": .10}
-    for key, crow in cohorts.items():
-        bench = [r for r in crow if r["starts"] >= 5]
-        pops = {
-            "medianMs": [r["medianMs"] for r in bench if r["medianMs"] is not None],
-            "completionRate": [r["completionRate"] for r in bench],
-            "avgHints": [r["avgHints"] for r in bench if r["avgHints"] is not None],
-            "avgWrong": [r["avgWrong"] for r in bench if r["avgWrong"] is not None],
-            "cleanRate": [r["cleanRate"] for r in bench if r["cleanRate"] is not None],
-        }
-        cohort_summary[key] = {
-            "puzzlesMeasured": len(crow), "benchmarkPuzzles": len(bench),
-            "medianTimeMs": round(_metric_median(pops["medianMs"])) if pops["medianMs"] else None,
-            "medianCompletionRate": _metric_median(pops["completionRate"]),
-            "medianHints": _metric_median(pops["avgHints"]),
-            "medianWrong": _metric_median(pops["avgWrong"]),
-            "medianCleanRate": _metric_median(pops["cleanRate"]),
-        }
-        for r in crow:
-            if r["starts"] < 5 or len(bench) < 3:
-                r["difficultyIndex"] = None
-                r["behaviorIndex"] = None
-                r["status"] = "waiting"
-                r["recommendation"] = "Čekat na více prvních pokusů."
-                continue
-            signals = {
-                "time": _robust_z(r["medianMs"], pops["medianMs"]),
-                "completion": -_robust_z(r["completionRate"], pops["completionRate"]),
-                "hints": _robust_z(r["avgHints"], pops["avgHints"]),
-                "wrong": _robust_z(r["avgWrong"], pops["avgWrong"]),
-                "clean": -_robust_z(r["cleanRate"], pops["cleanRate"]),
-            }
-            behavior = sum(weights[k] * signals[k] for k in ("time", "completion", "hints", "wrong", "clean")) / sum(weights[k] for k in ("time", "completion", "hints", "wrong", "clean"))
-            # Rating is already normalized to -1..+1; scale to roughly the same useful range and shrink small samples.
-            rating_signal = 0.0
-            if r["difficultyRating"] is not None:
-                rating_signal = float(r["difficultyRating"]) * 1.5 * min(1.0, r["ratings"] / 10.0)
-            index = behavior * .90 + rating_signal * .10
-            r["signals"] = {k: round(v, 3) for k, v in signals.items()}
-            r["behaviorIndex"] = round(behavior, 3)
-            r["difficultyIndex"] = round(max(-3.0, min(3.0, index)), 3)
-            reliable = r["starts"] >= 20
-            usable = r["starts"] >= 10
-            if reliable and r["difficultyIndex"] >= 1.25:
-                r["status"] = "too_hard"; r["recommendation"] = "Zkontrolovat geometrii a slovní mix; kandidát na posun výš nebo úpravu."
-            elif reliable and r["difficultyIndex"] <= -1.25:
-                r["status"] = "too_easy"; r["recommendation"] = "Kandidát na posun níž nebo pozdější pořadí v kategorii."
-            elif usable and abs(r["difficultyIndex"]) >= 1.0:
-                r["status"] = "watch"; r["recommendation"] = "Sledovat; signál je výrazný, ale vzorek ještě není dost silný pro zásah."
-            else:
-                r["status"] = "ok"; r["recommendation"] = "Bez zásahu."
-            if r["wordReports"] >= 2:
-                r["status"] = "word_review"; r["recommendation"] = "Prověřit cílová slova; více hráčů je označilo jako divná."
-            if r["ratings"] >= 8 and r["behaviorIndex"] * float(r["difficultyRating"] or 0) < -0.35:
-                r["mixedSignal"] = True
-            else:
-                r["mixedSignal"] = False
+    def med(values):
+        xs = [float(v) for v in values if v is not None]
+        if not xs:
+            return None
+        xs.sort()
+        n = len(xs)
+        return xs[n // 2] if n % 2 else (xs[n // 2 - 1] + xs[n // 2]) / 2
 
-    rows.sort(key=lambda r: (0 if r.get("status") in ("too_hard", "too_easy", "word_review") else 1, -(abs(r.get("difficultyIndex") or 0)), -(r.get("starts") or 0)))
-    alerts = [r for r in rows if r.get("status") in ("too_hard", "too_easy", "word_review")]
-    watch = [r for r in rows if r.get("status") == "watch"]
-    result = {
-        "version": 2, "generatedAt": now.isoformat(),
-        "methodology": {
-            "primarySample": "první setkání každého hráče s konkrétním puzzle",
-            "replays": "diagnostika pouze; nevstupují do hlavního Difficulty Indexu",
-            "weights": weights, "reliableFromStarts": 20, "alertThreshold": 1.25, "watchThreshold": 1.0,
-            "cohorts": "Daily zvlášť; Free zvlášť podle obtížnosti",
-        },
-        "summary": {
-            "firstExposures": len(first_attempts), "allAttempts": len(attempts), "runs": len(runs),
-            "puzzlesMeasured": len(rows), "alerts": len(alerts), "watch": len(watch),
-            "difficultyRatings": sum(len(v) for v in fb_diff.values()), "wordReports": sum(fb_words.values()),
-        },
-        "cohorts": cohort_summary, "alerts": alerts, "watch": watch, "rows": rows,
+    def robust_z(value, values):
+        if value is None:
+            return 0.0
+        xs = [float(v) for v in values if v is not None]
+        if len(xs) < 5:
+            return 0.0
+        center = med(xs)
+        deviations = [abs(x - center) for x in xs]
+        mad = med(deviations) or 0.0
+        if mad < 1e-9:
+            mean = sum(xs) / len(xs)
+            variance = sum((x - mean) ** 2 for x in xs) / max(1, len(xs) - 1)
+            sd = variance ** 0.5
+            return 0.0 if sd < 1e-9 else (float(value) - mean) / sd
+        return 0.6745 * (float(value) - center) / mad
+
+    by_diff: dict[str, list[dict]] = {}
+    for r in rows:
+        if r["starts"] >= 5:
+            by_diff.setdefault(r["difficulty"], []).append(r)
+
+    for diff, peers in by_diff.items():
+        metrics = {
+            "logTime": [math.log(max(1, r["medianMs"])) if r["medianMs"] else None for r in peers],
+            "completion": [r["completionRate"] for r in peers],
+            "hints": [r["avgHints"] for r in peers],
+            "wrong": [r["avgWrong"] for r in peers],
+            "clean": [r["cleanRate"] for r in peers],
+            "rating": [r["difficultyRating"] for r in peers],
+        }
+        for r in peers:
+            z_time = robust_z(math.log(max(1, r["medianMs"])) if r["medianMs"] else None, metrics["logTime"])
+            z_completion = -robust_z(r["completionRate"], metrics["completion"])
+            z_hints = robust_z(r["avgHints"], metrics["hints"])
+            z_wrong = robust_z(r["avgWrong"], metrics["wrong"])
+            z_clean = -robust_z(r["cleanRate"], metrics["clean"])
+            z_rating = robust_z(r["difficultyRating"], metrics["rating"]) if r["ratings"] >= 3 else 0.0
+            raw = (0.35*z_time + 0.20*z_completion + 0.15*z_hints + 0.10*z_wrong + 0.10*z_clean + 0.10*z_rating)
+            # Do not overstate tiny samples. Reliability reaches 1.0 at 20 first attempts.
+            confidence = min(1.0, r["starts"] / 20.0)
+            rating_conf = min(1.0, r["ratings"] / 10.0)
+            r["difficultyIndex"] = round(raw * (0.6 + 0.4 * confidence), 2)
+            r["confidence"] = round(confidence, 2)
+            r["ratingConfidence"] = round(rating_conf, 2)
+            idx = r["difficultyIndex"]
+            if r["starts"] >= 20 and idx >= 1.25:
+                r["flag"] = "too_hard"
+                r["recommendation"] = "Zkontrolovat geometrii, slovní mix a případnou potřebu přesunu výš."
+            elif r["starts"] >= 20 and idx <= -1.25:
+                r["flag"] = "too_easy"
+                r["recommendation"] = "Kandidát na jednodušší kategorii nebo pozdější pořadí v bance."
+            elif r["starts"] >= 10 and abs(idx) >= 1.60:
+                r["flag"] = "watch"
+                r["recommendation"] = "Sbírat další data; zatím neměnit automaticky."
+            else:
+                r["flag"] = "ok"
+                r["recommendation"] = "Bez zásahu."
+
+    for r in rows:
+        r.setdefault("difficultyIndex", None)
+        r.setdefault("confidence", min(1.0, r["starts"] / 20.0))
+        r.setdefault("ratingConfidence", min(1.0, r["ratings"] / 10.0))
+        r.setdefault("flag", "insufficient_data" if r["starts"] < 5 else "ok")
+        r.setdefault("recommendation", "Čekat na větší vzorek." if r["starts"] < 5 else "Bez zásahu.")
+
+    rows.sort(key=lambda r: (0 if r["flag"] in {"too_hard","too_easy","watch"} else 1, -(abs(r["difficultyIndex"] or 0)), -(r["starts"] or 0)))
+    priorities = [r for r in rows if r["flag"] in {"too_hard", "too_easy", "watch"}]
+    helper_summary = {}
+    first_attempt_map = {str(a.get("id")): a for a in first_attempts}
+    first_attempt_ids = set(first_attempt_map)
+    helper_events_first = [e for e in helper_events if str(e.get("attempt_id")) in first_attempt_ids]
+    helper_summary["rawEvents"] = len(helper_events)
+    helper_summary["firstAttemptEvents"] = len(helper_events_first)
+    helper_summary["offers"] = sum(1 for e in helper_events_first if e.get("event_type") == "offered")
+    helper_summary["accepted"] = sum(1 for e in helper_events_first if e.get("event_type") == "accepted")
+    helper_summary["dismissed"] = sum(1 for e in helper_events_first if e.get("event_type") == "dismissed")
+    helper_summary["acceptRate"] = round(helper_summary["accepted"] / helper_summary["offers"], 3) if helper_summary["offers"] else None
+    offer_idle = [int(e.get("idle_ms") or 0) for e in helper_events_first if e.get("event_type") == "offered"]
+    helper_summary["medianOfferIdleMs"] = _median(offer_idle)
+    accepted_ids = {str(e.get("attempt_id")) for e in helper_events_first if e.get("event_type") == "accepted"}
+    dismissed_ids = {str(e.get("attempt_id")) for e in helper_events_first if e.get("event_type") == "dismissed"}
+    accepted_attempts = [first_attempt_map[i] for i in accepted_ids if i in first_attempt_map]
+    dismissed_attempts = [first_attempt_map[i] for i in dismissed_ids if i in first_attempt_map]
+    helper_summary["acceptedCompletionRate"] = round(sum(1 for a in accepted_attempts if a.get("completed_at")) / len(accepted_attempts), 3) if accepted_attempts else None
+    helper_summary["dismissedCompletionRate"] = round(sum(1 for a in dismissed_attempts if a.get("completed_at")) / len(dismissed_attempts), 3) if dismissed_attempts else None
+    helper_summary["bySupportMode"] = {}
+    for mode in ("beginner", "younger", "older", "none"):
+        evs = [e for e in helper_events_first if (e.get("support_mode") or "none") == mode]
+        offers = sum(1 for e in evs if e.get("event_type") == "offered")
+        accepted = sum(1 for e in evs if e.get("event_type") == "accepted")
+        helper_summary["bySupportMode"][mode] = {
+            "offers": offers, "accepted": accepted,
+            "dismissed": sum(1 for e in evs if e.get("event_type") == "dismissed"),
+            "acceptRate": round(accepted / offers, 3) if offers else None,
+        }
+
+    completed_first = [a for a in first_attempts if a.get("completed_at")]
+    hint_hist = {"0": 0, "1": 0, "2": 0, "3plus": 0}
+    for a in completed_first:
+        n = int(a.get("hints_used") or 0)
+        hint_hist["0" if n == 0 else "1" if n == 1 else "2" if n == 2 else "3plus"] += 1
+    first_hint_times = [int(a.get("first_hint_ms")) for a in first_attempts if a.get("first_hint_ms") is not None]
+    hint_events_first = [e for e in hint_events if str(e.get("attempt_id")) in first_attempt_ids]
+    hinted_first_ids = {str(e.get("attempt_id")) for e in hint_events_first}
+    hint_summary = {
+        "events": len(hint_events),
+        "firstAttemptEvents": len(hint_events_first),
+        "manual": sum(1 for e in hint_events_first if e.get("source") == "manual"),
+        "helper": sum(1 for e in hint_events_first if e.get("source") == "helper"),
+        "complimentary": sum(1 for e in hint_events_first if e.get("complimentary") is True),
+        "byLevel": {str(level): sum(1 for e in hint_events_first if int(e.get("hint_level") or 0) == level) for level in (1,2,3)},
+        "firstAttemptDistribution": hint_hist,
+        "medianFirstHintMs": _median(first_hint_times),
+        "firstAttemptHintRate": round(len(hinted_first_ids) / len(first_attempts), 3) if first_attempts else None,
     }
-    if include_previous:
-        try:
-            snaps = db_select_all("quality_snapshots", order="snapshot_date.desc")
-            previous = snaps[0] if snaps else None
-            if previous:
-                payload = previous.get("report") or {}
-                prior = {r.get("puzzleId"): r for r in payload.get("rows", [])}
-                changed = []
-                for r in rows:
-                    old = prior.get(r.get("puzzleId"))
-                    if old and r.get("difficultyIndex") is not None and old.get("difficultyIndex") is not None:
-                        delta = round(float(r["difficultyIndex"]) - float(old["difficultyIndex"]), 3)
-                        r["indexDelta"] = delta
-                        if abs(delta) >= .35:
-                            changed.append({"puzzleId": r["puzzleId"], "difficulty": r["difficulty"], "delta": delta, "now": r["difficultyIndex"], "before": old["difficultyIndex"]})
-                result["previousSnapshotDate"] = previous.get("snapshot_date")
-                result["notableChanges"] = sorted(changed, key=lambda x: -abs(x["delta"]))[:20]
-        except HTTPException:
-            result["previousSnapshotDate"] = None
-    return result
+    return {
+        "analyticsVersion": 2,
+        "attemptsRaw": len(attempts),
+        "firstAttempts": len(first_attempts),
+        "puzzlesMeasured": len(rows),
+        "summary": {
+            "tooHard": sum(1 for r in rows if r["flag"] == "too_hard"),
+            "tooEasy": sum(1 for r in rows if r["flag"] == "too_easy"),
+            "watch": sum(1 for r in rows if r["flag"] == "watch"),
+            "reliable": sum(1 for r in rows if r["starts"] >= 20),
+        },
+        "helper": helper_summary,
+        "hints": hint_summary,
+        "priorities": priorities[:30],
+        "rows": rows,
+    }
 
 
-def maybe_save_weekly_quality_snapshot(today: date):
+@app.get("/api/quality-report")
+def quality_report(authorization: Optional[str] = Header(default=None)):
+    auth_player(authorization)
+    return build_quality_report()
+
+
+@app.get("/api/quality-history")
+def quality_history(authorization: Optional[str] = Header(default=None)):
+    auth_player(authorization)
+    rows = db_request("GET", "quality_snapshots", params={"select": "week_start,payload,created_at", "order": "week_start.desc", "limit": "12"})
+    return {"snapshots": rows}
+
+
+def save_quality_snapshot_if_monday() -> dict:
+    today = current_prague_date()
     if today.weekday() != 0:
-        return {"saved": False, "reason": "not-monday"}
-    iso = today.isoformat()
-    if db_select("quality_snapshots", snapshot_date=iso):
-        return {"saved": False, "reason": "already-exists", "date": iso}
-    report = build_quality_report(include_previous=False)
-    db_insert("quality_snapshots", {"id": str(uuid.uuid4()), "snapshot_date": iso, "report": report})
-    return {"saved": True, "date": iso, "alerts": report.get("summary", {}).get("alerts", 0)}
+        return {"saved": False, "reason": "not_monday"}
+    week_start = today.isoformat()
+    if db_select("quality_snapshots", week_start=week_start):
+        return {"saved": False, "reason": "exists"}
+    report = build_quality_report()
+    compact = {
+        "analyticsVersion": report.get("analyticsVersion"),
+        "firstAttempts": report.get("firstAttempts"),
+        "puzzlesMeasured": report.get("puzzlesMeasured"),
+        "summary": report.get("summary"),
+        "helper": report.get("helper"),
+        "hints": report.get("hints"),
+        "priorities": report.get("priorities", [])[:30],
+    }
+    db_insert("quality_snapshots", {
+        "id": str(uuid.uuid4()), "week_start": week_start, "analytics_version": 2,
+        "payload": compact, "created_at": datetime.now(TZ).isoformat(),
+    })
+    return {"saved": True, "weekStart": week_start}
 
 
 def payload_completed_at(value: Optional[str]) -> str:
@@ -1197,9 +1294,7 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty, "elapsed_ms": payload.elapsed_ms,
         "moves": payload.moves, "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
-        "max_hint_level": payload.max_hint_level, "reset_count": payload.reset_count,
-        "first_hint_at_ms": payload.first_hint_at_ms, "first_correct_at_ms": payload.first_correct_at_ms,
-        "last_correct_at_ms": payload.last_correct_at_ms, "clean_solve": effective_clean,
+        "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
         "completed_at": completed_at,
     })
 
@@ -1302,9 +1397,6 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 "wrong_attempts": payload.wrong_attempts,
                 "hints_used": payload.hints_used,
                 "max_hint_level": payload.max_hint_level,
-                "reset_count": payload.reset_count, "first_hint_at_ms": payload.first_hint_at_ms,
-                "first_correct_at_ms": payload.first_correct_at_ms, "last_correct_at_ms": payload.last_correct_at_ms,
-                "found_words": len((puzzle_info(payload.puzzle_id) or {}).get("puzzle", {}).get("answers") or []), "last_activity_at": datetime.now(TZ).isoformat(),
                 "clean_solve": effective_clean,
             }
             if attempts:
@@ -1315,7 +1407,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 db_insert("puzzle_attempts", {
                     "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
                     "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.13-offline", **telemetry_values,
+                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.7-offline", **telemetry_values,
                 })
         except HTTPException:
             logger.warning("Could not finalize telemetry attempt %s", payload.attempt_id)
@@ -1665,15 +1757,10 @@ def push_unsubscribe(payload: PushUnsubscribe, authorization: Optional[str] = He
 def cron_daily_push(request: Request, authorization: Optional[str] = Header(default=None)):
     if not CRON_SECRET or authorization != f"Bearer {CRON_SECRET}":
         raise HTTPException(401, "Neplatné cron oprávnění")
-    today_date = current_prague_date()
-    try:
-        quality_snapshot = maybe_save_weekly_quality_snapshot(today_date)
-    except Exception as exc:
-        logger.exception("Weekly quality snapshot failed")
-        quality_snapshot = {"saved": False, "error": type(exc).__name__}
+    today = current_prague_date().isoformat()
+    snapshot = save_quality_snapshot_if_monday()
     if not push_ready():
-        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": quality_snapshot}
-    today = today_date.isoformat()
+        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": snapshot}
     completed = {r.get("player_id") for r in db_select("results", mode="daily", daily_date=today)}
     subscriptions = db_select("push_subscriptions")
     sent = failed = removed = 0
@@ -1699,7 +1786,7 @@ def cron_daily_push(request: Request, authorization: Optional[str] = Header(defa
             else:
                 failed += 1
                 logger.warning("Push failed for subscription %s: %s", sub.get("id"), exc)
-    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed, "qualitySnapshot": quality_snapshot}
+    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed, "qualitySnapshot": snapshot}
 
 
 @app.get("/api/leaderboard")
