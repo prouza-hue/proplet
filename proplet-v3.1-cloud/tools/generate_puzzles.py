@@ -520,6 +520,23 @@ def create_puzzle(
         if curvy < spec.get("min_curvy", 0) or spiral_like < spec.get("min_spiral", 0):
             continue
 
+        # Fairness guard: every target word must itself have exactly one valid path on the board.
+        # This prevents the player from spelling a correct target word along a different route
+        # that cannot belong to the unique full-board solution.
+        target_candidates = enumerate_candidates(
+            [x.lower() for x in letters], spec["rows"], spec["cols"], path,
+            {len(w) for w in words}, words,
+        )
+        target_paths: dict[str, list[tuple[int, ...]]] = defaultdict(list)
+        for cand in target_candidates:
+            if cand.word in words:
+                target_paths[cand.word].append(cand.path)
+        if any(len(target_paths[w]) != 1 for w in words):
+            continue
+        expected = {a["word"].lower(): tuple(a["path"]) for a in answers}
+        if any(target_paths[w][0] != expected[w] for w in words):
+            continue
+
         solver_dictionary = list(dict.fromkeys(dictionary[: spec["dict_size"]] + words))
         solutions, candidate_count, search_nodes = solve_count(
             [x.lower() for x in letters], spec["rows"], spec["cols"], path,
@@ -557,7 +574,7 @@ def create_puzzle(
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--free-per-level", type=int, default=50)
+    ap.add_argument("--free-per-level", type=int, default=100)
     ap.add_argument("--daily", type=int, default=365)
     ap.add_argument("--rescue", type=int, default=30)
     ap.add_argument("--seed", type=int, default=20260811)
@@ -565,6 +582,8 @@ def main():
                     help="Keep current Easy/Medium/Daily banks and regenerate Hard + Hardcore.")
     ap.add_argument("--preserve-existing-all", action="store_true",
                     help="Keep all current free/daily banks and only add/regenerate the rescue bank.")
+    ap.add_argument("--top-up-existing", action="store_true",
+                    help="Keep all existing banks and append new free puzzles until --free-per-level is reached.")
     args = ap.parse_args()
 
     freq = load_frequency_words()
@@ -587,11 +606,16 @@ def main():
     answer_pool = curated * 12 + fallback[:500]
     WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
 
-    preserve_any = args.preserve_existing or args.preserve_existing_all
+    preserve_any = args.preserve_existing or args.preserve_existing_all or args.top_up_existing
     old = json.loads(PUZZLES_SERVER_OUT.read_text(encoding="utf-8")) if preserve_any and PUZZLES_SERVER_OUT.exists() else None
     rng = random.Random(args.seed + 33)
 
-    if old and args.preserve_existing_all:
+    if old and args.top_up_existing:
+        free = {k: list(old["free"].get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
+        daily = list(old["daily"])
+        legacy = old.get("legacyFree", {})
+        rescue = list(old.get("rescue", []))
+    elif old and args.preserve_existing_all:
         free = {k: list(old["free"].get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
         daily = list(old["daily"])
         legacy = old.get("legacyFree", {})
@@ -618,11 +642,12 @@ def main():
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
 
     started = time.time()
-    levels_to_generate = () if (old and args.preserve_existing_all) else (("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore"))
+    levels_to_generate = ("easy", "medium", "hard", "hardcore") if (old and args.top_up_existing) else (() if (old and args.preserve_existing_all) else (("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore")))
     id_prefix = {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
 
     for difficulty in levels_to_generate:
-        for i in range(args.free_per_level):
+        start_i = len(free[difficulty]) if (old and args.top_up_existing) else 0
+        for i in range(start_i, args.free_per_level):
             while True:
                 seed = rng.randrange(1, 2**31 - 1)
                 p = create_puzzle(
@@ -636,7 +661,7 @@ def main():
                     free[difficulty].append(p)
                     break
             if (i + 1) % 10 == 0:
-                print(f"free {difficulty}: {i+1}/{args.free_per_level}")
+                print(f"free {difficulty}: {i+1}/{args.free_per_level}", flush=True)
 
     if not old:
         mix = ["easy", "medium", "medium", "medium", "hard", "hard"]
@@ -668,7 +693,7 @@ def main():
             print(f"rescue: {len(rescue)}/{args.rescue}")
 
     payload = {
-        "version": 4,
+        "version": 5,
         "generatedAt": "2026-08-12",
         "dictionarySize": len(dictionary),
         "dailyRotationSize": len(daily),

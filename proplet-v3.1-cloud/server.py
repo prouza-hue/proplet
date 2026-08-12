@@ -608,7 +608,7 @@ def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(d
     db_insert("puzzle_attempts", {
         "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
         "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.5",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.5.2",
     })
     return {"ok": True, "attemptId": payload.attempt_id}
 

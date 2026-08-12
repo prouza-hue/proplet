@@ -1,37 +1,53 @@
-# Proplet v3.5 Quality
+# Proplet v3.5.2 — Content & Progression
 
-Česká slovní logická hra pro Vercel + Supabase.
+Česká slovní logická PWA pro Vercel + Supabase.
 
-## Co přináší v3.5
-- výrazně viditelnější **Hraj dál** přímo pod Daily + 4 rychlé volby obtížnosti
-- po dokončení Daily hlavní CTA **Vybrat další hru**
-- telemetry skutečné obtížnosti: start/dokončení, čas, chyby, hinty, Clean
-- dobrovolné hodnocení úlohy: **Lehčí / Akorát / Těžší**
-- hlášení **Divné slovo?** pro čištění slovníku
-- `/api/quality-report` s agregovanými metrikami puzzle
-- férový Daily čas: běží i při odchodu do menu; Free se dál pauzuje
-- robustnější snímání rychlého tahu prstem pomocí coalesced events + mezivzorkování
-- týdenní rodinný leaderboard
-- progres i u dosud nezískaných achievementů
-- řízená PWA aktualizace s bannerem **Aktualizovat**
-- Android/PWA navigace přes History API: systémové Zpět jde o jeden krok, hra → menu; u modalu nejdřív zavře modal
+## Obsah
 
-## Stávající obsah
-- 50 Easy (6×6)
-- 50 Medium (7×8)
-- 50 Hard (25× 8×8 + 25× 9×9)
-- 50 Mozkožrout (10×10)
-- 365 Daily
-- 30 rescue 6×6 úloh
+- 100 Easy (6×6)
+- 100 Medium (7×8)
+- 100 Hard (střídání 8×8 a 9×9)
+- 100 Mozkožrout (10×10)
+- 365 Daily Challenge
+- 30 streak-rescue 6×6 puzzle
+
+Celkem: **795 puzzle**.
+
+Původních prvních 50 free levelů v každé obtížnosti zůstává obsahově beze změny. V3.5.2 pouze přidává levely 51–100.
+
+Nových 200 free levelů je přísněji generovaných: kromě unikátního exact-cover řešení musí mít každé cílové slovo právě jednu možnou lokální trasu.
+
+## XP a levely
+
+- Easy: 10 XP × 100 = 1 000 XP
+- Medium: 20 XP × 100 = 2 000 XP
+- Hard: 35 XP × 100 = 3 500 XP
+- Mozkožrout: 60 XP × 100 = 6 000 XP
+- všechna Free dohromady: **12 500 XP**
+- Daily: 100 XP za každý nový den
+
+XP roadmapa má **32 levelů** od Nováčka až po Absolutního Propletače (47 000 XP). Rozestupy jsou zahuštěné hlavně ve střední části progression.
+
+## Hlavní funkce
+
 - strict unique-solution route logic
-- onboarding, 3 stupně nápovědy, Clean solve
-- XP, streaky, achievementy, rodinný leaderboard
+- interaktivní onboarding
+- 3 stupně nápovědy + Clean solve
+- streak + jednorázová 30s rescue challenge
+- XP, achievementy a level roadmapa
 - heslové multi-device účty
-- Fold/tablet responsive layout
-- lokální persistentní rozehraná Free/Daily
+- Daily, týdenní a celkový rodinný leaderboard
+- persistentní rozehraná Free/Daily
+- Fold/tablet responsive herní layout
+- telemetry skutečné obtížnosti + dobrovolný rating
+- hlášení problematických slov
+- History API navigace pro Android/PWA Zpět
+- řízené PWA aktualizace
 
-## Aktualizace z v3.4.x
-Viz `UPDATE_V3_5_CZ.md`. Před deployem je nutné jednou spustit `SUPABASE_MIGRATION_V3_5.sql`.
+## Aktualizace z v3.5.1
+
+Viz `UPDATE_V3_5_2_CZ.md`. **Není potřeba žádná databázová migrace.**
 
 ## Čistá instalace
+
 Použij `SUPABASE_SETUP.sql`, nastav `SUPABASE_URL` a `SUPABASE_SECRET_KEY` ve Vercelu a deployuj celý repozitář.

@@ -1,4 +1,4 @@
-const CACHE='proplet-v3-5-1-account-nudge';
+const CACHE='proplet-v3-5-2-content';
 const CORE=['/','/index.html','/styles.css','/app.js','/puzzles.json','/manifest.webmanifest','/icon.svg'];
 
 self.addEventListener('install',e=>{

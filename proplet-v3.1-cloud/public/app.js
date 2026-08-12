@@ -1,4 +1,4 @@
-const APP_VERSION='3.5';
+const APP_VERSION='3.5.2';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const DIFF={
   easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:10},
@@ -12,10 +12,38 @@ const BADGES=[
  {days:21,icon:'🦉',name:'Mistr slov'},{days:30,icon:'👑',name:'Koruna'},{days:50,icon:'💎',name:'Diamant'},{days:100,icon:'🚀',name:'Legenda'}
 ];
 const LEVELS=[
- {xp:0,icon:'🌱',name:'Nováček'},{xp:100,icon:'🧩',name:'Písmenkář'},{xp:250,icon:'🔎',name:'Slovolovec'},
- {xp:500,icon:'🪢',name:'Propletač'},{xp:900,icon:'🧠',name:'Mistr cest'},{xp:1500,icon:'✨',name:'Slovní mág'},
- {xp:2500,icon:'👑',name:'Legenda Propletu'},{xp:4000,icon:'🐉',name:'Krotitel'},{xp:6500,icon:'💎',name:'Velmistr Propletu'},
- {xp:10000,icon:'🌌',name:'Nadslovník'}
+ {xp:0,icon:'🌱',name:'Nováček'},
+ {xp:100,icon:'🧩',name:'Písmenkář'},
+ {xp:250,icon:'🔎',name:'Slovolovec'},
+ {xp:400,icon:'🧵',name:'Hledač nití'},
+ {xp:600,icon:'🪢',name:'Propletač'},
+ {xp:850,icon:'↪️',name:'Kličkař'},
+ {xp:1100,icon:'🧭',name:'Mistr cest'},
+ {xp:1400,icon:'♟️',name:'Slovní taktik'},
+ {xp:1750,icon:'✨',name:'Slovní mág'},
+ {xp:2150,icon:'🧶',name:'Uzlovač'},
+ {xp:2600,icon:'👑',name:'Legenda Propletu'},
+ {xp:3100,icon:'🛤️',name:'Cestář'},
+ {xp:3650,icon:'🐉',name:'Krotitel'},
+ {xp:4250,icon:'🌀',name:'Mistr zákrut'},
+ {xp:4900,icon:'🧱',name:'Labyrintník'},
+ {xp:5600,icon:'💎',name:'Velmistr Propletu'},
+ {xp:6350,icon:'🥷',name:'Propletový ninja'},
+ {xp:7150,icon:'⚗️',name:'Slovní alchymista'},
+ {xp:8000,icon:'🐌',name:'Mistr šneků'},
+ {xp:8900,icon:'🔮',name:'Mřížkový mág'},
+ {xp:10000,icon:'🌌',name:'Nadslovník'},
+ {xp:11250,icon:'🤯',name:'Krotitel Mozkožroutů'},
+ {xp:12500,icon:'🏰',name:'Král mřížky'},
+ {xp:14000,icon:'🎓',name:'Arcimistr Propletu'},
+ {xp:16000,icon:'🪄',name:'Slovočaroděj'},
+ {xp:18500,icon:'🗿',name:'Propletový titán'},
+ {xp:21500,icon:'♾️',name:'Mistr nekonečna'},
+ {xp:25000,icon:'🌠',name:'Hvězdný propletač'},
+ {xp:29000,icon:'🛰️',name:'Orbitální luštitel'},
+ {xp:34000,icon:'🚀',name:'Galaktický slovolovec'},
+ {xp:40000,icon:'🛡️',name:'Strážce všech cest'},
+ {xp:47000,icon:'🏆',name:'Absolutní Propletač'}
 ];
 const ACHIEVEMENTS=[
  {icon:'🧩',name:'První Proplet',desc:'Vyřeš první úlohu',value:s=>s.totalCompleted||0,target:1},
