@@ -144,7 +144,7 @@ class PushUnsubscribe(BaseModel):
 class FamilyLeagueSettings(BaseModel):
     enabled: bool
     public_name: Optional[str] = Field(default=None, min_length=2, max_length=40)
-    league_pin: str = Field(min_length=4, max_length=32)
+    league_pin: Optional[str] = Field(default=None, max_length=32)  # backward compatibility with v3.8.1 clients
 
 
 def supabase_ready() -> bool:
@@ -1170,13 +1170,8 @@ def family_league_settings(payload: FamilyLeagueSettings, authorization: Optiona
     if not rows:
         raise HTTPException(404, "Rodinná liga neexistuje")
     league = rows[0]
-    pin = payload.league_pin.strip()
-    if league.get("pin_hash"):
-        if not verify_password(pin, league.get("pin_hash")):
-            raise HTTPException(401, "PIN rodinné ligy nesedí")
-    else:
-        # Legacy family: first public-league activation also establishes its league PIN.
-        db_update("leagues", {"code": family}, {"pin_hash": hash_password(pin)})
+    # Každý přihlášený člen rodiny má stejná práva k veřejnému nastavení týmu.
+    # PIN zůstává pouze jako sdílené pozvání při vytváření NOVÉHO hráče v existující lize.
     values = {"public_opt_in": bool(payload.enabled)}
     if payload.enabled:
         public_name = " ".join((payload.public_name or league.get("name") or family).strip().split())[:40]

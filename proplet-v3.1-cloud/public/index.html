@@ -196,7 +196,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.8.1</small>
+      <small class="app-version">Proplet v3.8.2</small>
     </footer>
   </main>
 
@@ -247,6 +247,17 @@
       <button id="nudgeCreateBtn" class="primary-btn big">Vytvořit hráče</button>
       <button id="nudgeLoginBtn" class="secondary-btn">Už účet mám</button>
       <button id="nudgeSkipBtn" class="text-btn">Teď ne, pokračovat bez účtu</button>
+    </div>
+  </div>
+
+  <div id="pushNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card push-nudge-card">
+      <div class="push-nudge-icon">🔔</div>
+      <span class="eyebrow">ZÍTRA ZASE?</span>
+      <h2>Nový Proplet každý den</h2>
+      <p class="muted">Chceš vědět, až bude připravená další Denní výzva? Připomeneme ji jen tehdy, když ji ještě nemáš hotovou.</p>
+      <button id="pushNudgeEnableBtn" class="primary-btn big">Zapnout připomínku 🔔</button>
+      <button id="pushNudgeLaterBtn" class="text-btn">Teď ne</button>
     </div>
   </div>
 
@@ -363,10 +374,9 @@
       <button id="closeFamilyLeagueModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">🌍 LIGA RODIN</span>
       <h2>Pošli rodinu do světa</h2>
-      <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů, kód ligy ani PIN nikdo cizí neuvidí.</p>
+      <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů ani interní kód ligy nikdo cizí neuvidí. Nastavení může změnit kterýkoli přihlášený člen rodiny.</p>
       <label>Veřejný název týmu<input id="familyLeaguePublicName" maxlength="40" placeholder="např. Prouzovi nebo Brutální Propletači" /></label>
-      <label>PIN rodinné ligy<input id="familyLeaguePin" type="password" minlength="4" maxlength="32" placeholder="PIN potvrzuje, že jsi z týmu" /></label>
-      <button id="familyLeaguePinToggle" class="password-toggle" type="button">👁 Zobrazit PIN</button><small class="field-note">U starší ligy bez PINu se tímto krokem PIN poprvé nastaví.</small>
+      <small class="field-note">PIN rodinné ligy slouží jen jako pozvánka při přidání nového hráče do rodiny.</small>
       <div id="familyLeagueModalError" class="form-error"></div>
       <button id="enableFamilyLeagueBtn" class="primary-btn big">Zařadit rodinu do ligy 🌍</button>
       <button id="disableFamilyLeagueBtn" class="secondary-btn hidden">Vystoupit z Ligy rodin</button>

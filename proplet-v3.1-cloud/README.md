@@ -1,4 +1,9 @@
-# Proplet v3.8.1
+# Proplet v3.8.2
+
+Aktuální release: Liga rodin + aktivní nabídka denních push připomínek + jasnější model PINu ligy.
+
+Viz `UPDATE_V3_8_2_CZ.md` a `RELEASE_V3_8_2_CZ.md`.
+
 
 Česká slovní logická PWA s Denní výzvou, 400 volnými úrovněmi, streakem, XP/hodnostmi, rodinnými účty, žebříčky konkrétních úrovní a nově i dobrovolnou **Ligou rodin**.
 
