@@ -1,31 +1,37 @@
-# Proplet v3.4.2 Cloud
+# Proplet v3.5 Quality
 
 Česká slovní logická hra pro Vercel + Supabase.
 
-## Aktuální obsah
+## Co přináší v3.5
+- výrazně viditelnější **Hraj dál** přímo pod Daily + 4 rychlé volby obtížnosti
+- po dokončení Daily hlavní CTA **Vybrat další hru**
+- telemetry skutečné obtížnosti: start/dokončení, čas, chyby, hinty, Clean
+- dobrovolné hodnocení úlohy: **Lehčí / Akorát / Těžší**
+- hlášení **Divné slovo?** pro čištění slovníku
+- `/api/quality-report` s agregovanými metrikami puzzle
+- férový Daily čas: běží i při odchodu do menu; Free se dál pauzuje
+- robustnější snímání rychlého tahu prstem pomocí coalesced events + mezivzorkování
+- týdenní rodinný leaderboard
+- progres i u dosud nezískaných achievementů
+- řízená PWA aktualizace s bannerem **Aktualizovat**
+- Android/PWA navigace přes History API: systémové Zpět jde o jeden krok, hra → menu; u modalu nejdřív zavře modal
+
+## Stávající obsah
 - 50 Easy (6×6)
 - 50 Medium (7×8)
 - 50 Hard (25× 8×8 + 25× 9×9)
 - 50 Mozkožrout (10×10)
 - 365 Daily
-- 30 rescue 6×6 úloh pro záchranu streaku
-- exact-cover solver a unikátní řešení
-- onboarding, 3 stupně nápovědy a Clean solve
-- XP levely, streaky, achievementy a rodinný leaderboard
+- 30 rescue 6×6 úloh
+- strict unique-solution route logic
+- onboarding, 3 stupně nápovědy, Clean solve
+- XP, streaky, achievementy, rodinný leaderboard
 - heslové multi-device účty
-- Fold/tablet responsive herní layout
-- offline fronta výsledků a automatická synchronizace
-- **perzistentní rozehrané Free/Daily úlohy**
+- Fold/tablet responsive layout
+- lokální persistentní rozehraná Free/Daily
 
-## Důležitá logika cesty
-Cílové slovo se uzná pouze tehdy, když hráč projde jeho konkrétní cestu patřící do unikátního řešení celé plochy. Pokud lze stejný text slova složit jinou cestou, hra tuto alternativní cestu nepřijme a vysvětlí důvod. Tím hráč nemůže přijmout lokálně správné slovo, které by zablokovalo globální řešení.
-
-## Update z v3.4
-Viz `UPDATE_V3_4_2_CZ.md`. Pro v3.4 → v3.4.2 není potřeba žádná SQL migrace.
-
-## Starší migrace
-- z v3.2.x → nejdřív `SUPABASE_MIGRATION_V3_3.sql`
-- z v3.3 → potom `SUPABASE_MIGRATION_V3_4.sql`
+## Aktualizace z v3.4.x
+Viz `UPDATE_V3_5_CZ.md`. Před deployem je nutné jednou spustit `SUPABASE_MIGRATION_V3_5.sql`.
 
 ## Čistá instalace
 Použij `SUPABASE_SETUP.sql`, nastav `SUPABASE_URL` a `SUPABASE_SECRET_KEY` ve Vercelu a deployuj celý repozitář.

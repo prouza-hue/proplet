@@ -40,7 +40,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.4-cloud")
+app = FastAPI(title="Proplet API", version="3.5-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -83,8 +83,28 @@ class ResultCreate(BaseModel):
     moves: int = Field(ge=1, le=10000)
     daily_date: Optional[str] = None
     hints_used: int = Field(default=0, ge=0, le=99)
+    wrong_attempts: int = Field(default=0, ge=0, le=999)
+    max_hint_level: int = Field(default=0, ge=0, le=3)
+    attempt_id: Optional[str] = Field(default=None, min_length=8, max_length=80)
     # Conservative default keeps older cached clients from being falsely marked as Clean.
     clean_solve: bool = False
+
+
+class AttemptStart(BaseModel):
+    attempt_id: str = Field(min_length=8, max_length=80)
+    puzzle_id: str
+    challenge_key: str
+    mode: str
+    difficulty: str
+
+
+class FeedbackCreate(BaseModel):
+    puzzle_id: str
+    challenge_key: str
+    kind: str
+    rating: Optional[int] = Field(default=None, ge=-1, le=1)
+    word: Optional[str] = Field(default=None, max_length=80)
+    note: Optional[str] = Field(default=None, max_length=300)
 
 
 class RescueFinish(BaseModel):
@@ -429,9 +449,16 @@ def health():
             db_request("GET", "streak_rescues", params={"select": "id", "limit": "1"})
         except HTTPException:
             features_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration}
+        quality_migration = True
+        try:
+            db_request("GET", "results", params={"select": "id,wrong_attempts,max_hint_level", "limit": "1"})
+            db_request("GET", "puzzle_attempts", params={"select": "id", "limit": "1"})
+            db_request("GET", "puzzle_feedback", params={"select": "id", "limit": "1"})
+        except HTTPException:
+            quality_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -538,6 +565,8 @@ def progress(authorization: Optional[str] = Header(default=None)):
                 "moves": int(r.get("best_moves") or 1),
                 "points": int(r.get("points") or 0),
                 "hintsUsed": int(r.get("hints_used") or 0),
+                "wrongAttempts": int(r.get("wrong_attempts") or 0),
+                "maxHintLevel": int(r.get("max_hint_level") or 0),
                 "cleanSolve": r.get("clean_solve") is True,
                 "completedAt": r.get("completed_at"),
             }
@@ -552,6 +581,105 @@ def merged_hint_count(old_value, new_value: int) -> int:
     except (TypeError, ValueError):
         old = int(new_value)
     return min(old, int(new_value))
+
+
+@app.post("/api/attempt/start")
+def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS:
+        raise HTTPException(400, "Neplatný pokus")
+    if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
+        raise HTTPException(400, "Neznámá úloha")
+    if payload.mode == "free" and payload.challenge_key != f"free:{payload.puzzle_id}":
+        raise HTTPException(400, "Neplatný klíč pokusu")
+    if payload.mode == "daily":
+        if not payload.challenge_key.startswith("daily:"):
+            raise HTTPException(400, "Neplatný Daily klíč pokusu")
+        daily_date = payload.challenge_key[6:]
+        try:
+            date.fromisoformat(daily_date)
+        except ValueError:
+            raise HTTPException(400, "Neplatné datum Daily pokusu")
+        if payload.puzzle_id != expected_daily_puzzle_id(daily_date):
+            raise HTTPException(400, "Tato úloha nepatří k Daily datu")
+    existing = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
+    if existing:
+        return {"ok": True, "attemptId": payload.attempt_id}
+    db_insert("puzzle_attempts", {
+        "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
+        "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.5",
+    })
+    return {"ok": True, "attemptId": payload.attempt_id}
+
+
+@app.post("/api/feedback")
+def puzzle_feedback(payload: FeedbackCreate, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    if payload.kind not in ("difficulty", "word"):
+        raise HTTPException(400, "Neplatný typ zpětné vazby")
+    data = load_puzzles()
+    known = any(payload.puzzle_id == p["id"] for bank in data.get("free", {}).values() for p in bank) or any(payload.puzzle_id == p["id"] for p in data.get("daily", []))
+    if not known:
+        raise HTTPException(400, "Neznámá úloha")
+    existing = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=payload.puzzle_id, kind=payload.kind)
+    row = {"rating": payload.rating, "word": payload.word, "note": payload.note, "created_at": datetime.now(TZ).isoformat()}
+    if existing:
+        db_update("puzzle_feedback", {"id": existing[0]["id"]}, row)
+    else:
+        db_insert("puzzle_feedback", {"id": str(uuid.uuid4()), "player_id": player["id"], "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "kind": payload.kind, **row})
+    return {"ok": True}
+
+
+def _median(vals: list[int]) -> Optional[int]:
+    if not vals:
+        return None
+    vals = sorted(vals)
+    n = len(vals)
+    return vals[n // 2] if n % 2 else round((vals[n // 2 - 1] + vals[n // 2]) / 2)
+
+
+@app.get("/api/quality-report")
+def quality_report(authorization: Optional[str] = Header(default=None)):
+    # Aggregate-only telemetry for calibrating puzzle difficulty. No player names are returned.
+    auth_player(authorization)
+    attempts = db_select("puzzle_attempts")
+    feedback = db_select("puzzle_feedback", kind="difficulty")
+    fb: dict[str, list[int]] = {}
+    for f in feedback:
+        if f.get("rating") is not None:
+            fb.setdefault(f["puzzle_id"], []).append(int(f["rating"]))
+    groups: dict[str, list[dict]] = {}
+    for a in attempts:
+        groups.setdefault(a["puzzle_id"], []).append(a)
+    pdata = load_puzzles()
+    puzzle_index = {}
+    for p in pdata.get("daily", []):
+        puzzle_index[p["id"]] = p
+    for bank in pdata.get("free", {}).values():
+        for p in bank:
+            puzzle_index[p["id"]] = p
+    rows = []
+    for puzzle_id, vals in groups.items():
+        completed = [x for x in vals if x.get("completed_at")]
+        times = [int(x["elapsed_ms"]) for x in completed if x.get("elapsed_ms") is not None]
+        wrong = [int(x.get("wrong_attempts") or 0) for x in completed]
+        hints = [int(x.get("hints_used") or 0) for x in completed]
+        clean = [1 if x.get("clean_solve") is True else 0 for x in completed]
+        ratings = fb.get(puzzle_id, [])
+        puzzle = puzzle_index.get(puzzle_id, {})
+        meta = puzzle.get("meta") or {}
+        rows.append({
+            "puzzleId": puzzle_id, "difficulty": vals[0].get("difficulty"), "starts": len(vals), "completions": len(completed),
+            "completionRate": round(len(completed) / len(vals), 3) if vals else 0, "medianMs": _median(times),
+            "avgWrong": round(sum(wrong) / len(wrong), 2) if wrong else None, "avgHints": round(sum(hints) / len(hints), 2) if hints else None,
+            "cleanRate": round(sum(clean) / len(clean), 3) if clean else None,
+            "difficultyRating": round(sum(ratings) / len(ratings), 2) if ratings else None, "ratings": len(ratings),
+            "generatedScore": meta.get("difficultyScore"), "cells": meta.get("cells"),
+            "words": len(puzzle.get("answers") or []), "sample": "early" if len(vals) < 5 else "usable",
+        })
+    rows.sort(key=lambda r: (r["difficulty"] or "", -(r["medianMs"] or 0)))
+    return {"attempts": len(attempts), "puzzlesMeasured": len(rows), "rows": rows}
 
 
 @app.post("/api/result")
@@ -592,6 +720,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
                 "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
                 "hints_used": merged_hint_count(old.get("hints_used"), payload.hints_used),
+                "wrong_attempts": min(int(old.get("wrong_attempts") or payload.wrong_attempts), payload.wrong_attempts),
+                "max_hint_level": min(int(old.get("max_hint_level") or payload.max_hint_level), payload.max_hint_level),
                 "clean_solve": bool(old.get("clean_solve") is True or effective_clean),
             })
         first = False
@@ -609,6 +739,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 "best_moves": payload.moves,
                 "points": points,
                 "hints_used": payload.hints_used,
+                "wrong_attempts": payload.wrong_attempts,
+                "max_hint_level": payload.max_hint_level,
                 "clean_solve": effective_clean,
                 "completed_at": datetime.now(TZ).isoformat(),
             })
@@ -623,9 +755,36 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                     "best_elapsed_ms": min(int(old.get("best_elapsed_ms") or payload.elapsed_ms), payload.elapsed_ms),
                     "best_moves": min(int(old.get("best_moves") or payload.moves), payload.moves),
                     "hints_used": merged_hint_count(old.get("hints_used"), payload.hints_used),
+                    "wrong_attempts": min(int(old.get("wrong_attempts") or payload.wrong_attempts), payload.wrong_attempts),
+                    "max_hint_level": min(int(old.get("max_hint_level") or payload.max_hint_level), payload.max_hint_level),
                     "clean_solve": bool(old.get("clean_solve") is True or effective_clean),
                 })
             first = False
+
+    if payload.attempt_id:
+        try:
+            attempts = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
+            telemetry_values = {
+                "completed_at": datetime.now(TZ).isoformat(),
+                "elapsed_ms": payload.elapsed_ms,
+                "moves": payload.moves,
+                "wrong_attempts": payload.wrong_attempts,
+                "hints_used": payload.hints_used,
+                "max_hint_level": payload.max_hint_level,
+                "clean_solve": effective_clean,
+            }
+            if attempts:
+                db_update("puzzle_attempts", {"id": payload.attempt_id}, telemetry_values)
+            else:
+                # Offline start mohl minout server. Při synchronizaci výsledku vytvoř dokončený
+                # pokus dodatečně, aby telemetry nepodhodnocovala completion rate.
+                db_insert("puzzle_attempts", {
+                    "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
+                    "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
+                    "started_at": datetime.now(TZ).isoformat(), "app_version": "3.5-offline", **telemetry_values,
+                })
+        except HTTPException:
+            logger.warning("Could not finalize telemetry attempt %s", payload.attempt_id)
 
     # Zápis výsledku je primární operace. Selhání dopočtu statistik nesmí
     # způsobit 500 po již úspěšném uložení a nechat telefon ve falešné frontě.
@@ -738,6 +897,32 @@ def leaderboard(
         item["rank"] = i
 
     player_map = {p["id"]: p for p in players}
+    today = current_prague_date()
+    week_start = today - timedelta(days=today.weekday())
+    week_end = week_start + timedelta(days=7)
+    weekly = []
+    all_results = db_select("results")
+    family_results = [r for r in all_results if r.get("player_id") in player_map]
+    for p in players:
+        rows = []
+        for r in family_results:
+            if r.get("player_id") != p["id"]:
+                continue
+            try:
+                done = datetime.fromisoformat(str(r.get("completed_at")).replace("Z", "+00:00")).astimezone(TZ).date()
+            except Exception:
+                continue
+            if week_start <= done < week_end:
+                rows.append(r)
+        weekly.append({
+            "id": p["id"], "name": p["name"], "points": sum(int(r.get("points") or 0) for r in rows),
+            "completed": len(rows), "daily": sum(1 for r in rows if r.get("mode") == "daily"),
+            "clean": sum(1 for r in rows if r.get("clean_solve") is True),
+        })
+    weekly.sort(key=lambda x: (-x["points"], -x["daily"], -x["clean"], x["name"].casefold()))
+    for i, item in enumerate(weekly, 1):
+        item["rank"] = i
+
     daily_rows = db_select("results", mode="daily", daily_date=daily_date)
     daily_rows = [r for r in daily_rows if r["player_id"] in player_map]
     daily_rows.sort(key=lambda r: (
@@ -757,7 +942,7 @@ def leaderboard(
         }
         for i, r in enumerate(daily_rows, 1)
     ]
-    return {"familyCode": family, "date": daily_date, "overall": overall, "daily": daily}
+    return {"familyCode": family, "date": daily_date, "weekStart": week_start.isoformat(), "overall": overall, "weekly": weekly, "daily": daily}
 
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.

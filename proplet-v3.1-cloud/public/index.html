@@ -50,6 +50,14 @@
         <button id="rescueBtn" class="rescue-btn">Zachránit streak · 30 s</button>
       </div>
 
+      <div id="quickPlayCard" class="card quick-play-card">
+        <div class="quick-play-head">
+          <div><span class="eyebrow">HRAJ DÁL</span><h2>Daily je jen začátek</h2><p class="muted">Vyber obtížnost a pokračuj kdykoli chceš.</p></div>
+          <button id="openAllGamesBtn" class="quick-all-btn">Všechny hry <span>→</span></button>
+        </div>
+        <div id="quickPlayGrid" class="quick-play-grid"></div>
+      </div>
+
       <div id="levelCard" class="card level-card"></div>
 
       <div class="card streak-card">
@@ -78,6 +86,7 @@
       <div id="leaderboardContent" class="hidden">
         <div class="leader-tabs">
           <button class="leader-tab active" data-leader-tab="daily">Dnes</button>
+          <button class="leader-tab" data-leader-tab="weekly">Týden</button>
           <button class="leader-tab" data-leader-tab="overall">Celkem</button>
         </div>
         <div id="leaderboardList" class="leaderboard-list"></div>
@@ -169,6 +178,15 @@
       <div id="winClean" class="win-clean hidden"></div>
       <div id="winWords" class="win-words"></div>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
+      <div id="winDifficultyFeedback" class="win-feedback hidden">
+        <small>Jak ti seděla obtížnost?</small>
+        <div class="feedback-chips">
+          <button data-difficulty-rating="-1">Lehčí</button>
+          <button data-difficulty-rating="0">Akorát</button>
+          <button data-difficulty-rating="1">Těžší</button>
+        </div>
+      </div>
+      <button id="reportWordBtn" class="text-btn win-report hidden">⚑ Divné slovo?</button>
       <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
       <button id="winMenuBtn" class="secondary-btn hidden">Zpět do menu</button>
       <button id="winShareBtn" class="secondary-btn hidden">Sdílet výsledek</button>
@@ -231,6 +249,19 @@
     </div>
   </div>
 
+  <div id="wordReportModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closeWordReportModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">KVALITA SLOVNÍKU</span>
+      <h2>Divné slovo?</h2>
+      <p class="muted">Nahlášení nám pomůže vyčistit slovník. Neovlivní tvoje XP ani výsledek.</p>
+      <label>Slovo<select id="reportWordSelect"></select></label>
+      <label>Poznámka (volitelné)<textarea id="reportWordNote" maxlength="300" rows="3" placeholder="Co je na něm divné?"></textarea></label>
+      <div id="wordReportError" class="form-error"></div>
+      <button id="saveWordReportBtn" class="primary-btn big">Odeslat</button>
+    </div>
+  </div>
+
   <div id="onboardingModal" class="modal onboarding-modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card onboarding-card">
       <button id="skipOnboardingBtn" class="modal-close" aria-label="Přeskočit">×</button>
@@ -238,6 +269,11 @@
       <div id="onboardContent"></div>
       <button id="onboardNextBtn" class="primary-btn big">Pokračovat</button>
     </div>
+  </div>
+
+  <div id="updateBanner" class="update-banner hidden" role="status">
+    <span>✨ Je připravená nová verze Propletu.</span>
+    <button id="applyUpdateBtn">Aktualizovat</button>
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
