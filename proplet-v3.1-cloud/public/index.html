@@ -22,7 +22,7 @@
         <span class="brand-mark"><span>P</span></span>
         <span class="brand-copy"><strong>Proplet</strong><small>česká slovní hra</small></span>
       </button>
-      <button id="profileChip" class="profile-chip" data-nav="profile"><span class="avatar-dot">🙂</span><span id="profileChipText">Hráč</span></button>
+      <button id="profileChip" class="profile-chip" data-nav="profile"><span id="profileChipAvatar" class="avatar-dot">🙂</span><span id="profileChipText">Hráč</span></button>
     </header>
 
     <section id="screen-daily" class="screen active">
@@ -81,12 +81,12 @@
     </section>
 
     <section id="screen-leaderboard" class="screen">
-      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Uvnitř rodiny i proti ostatním týmům Propletu.</p></div>
+      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Uvnitř svého týmu i proti ostatním týmům Propletu.</p></div>
       <div id="leaderboardGate" class="card gate"></div>
       <div id="leaderboardContent" class="hidden">
         <div class="league-scope-tabs">
-          <button class="league-scope-tab active" data-league-scope="family">👨‍👩‍👧 Moje liga</button>
-          <button class="league-scope-tab" data-league-scope="global">🌍 Liga rodin</button>
+          <button class="league-scope-tab active" data-league-scope="family">👥 Můj tým</button>
+          <button class="league-scope-tab" data-league-scope="global">🌍 Liga týmů</button>
         </div>
         <div id="familyLeaderboardPanel">
           <div class="leader-tabs">
@@ -98,7 +98,7 @@
         </div>
         <div id="globalLeaguePanel" class="hidden">
           <div class="global-league-hero card">
-            <div><span class="eyebrow">🌍 LIGA RODIN</span><h2>Týdenní souboj týmů</h2><p>Stejná Denní výzva. Až tři hráči za rodinu. Každé pondělí od nuly.</p></div>
+            <div><span class="eyebrow">🌍 LIGA TÝMŮ</span><h2>Týdenní souboj týmů</h2><p>Stejná Denní výzva. Až tři hráči za tým. Každé pondělí od nuly.</p></div>
             <button id="familyLeagueSettingsBtn" class="secondary-btn">Nastavení týmu</button>
           </div>
           <div class="leader-tabs global-week-tabs">
@@ -111,7 +111,7 @@
           <div class="card league-score-explainer">
             <strong>Jak se boduje?</strong>
             <span>55 dokončení · až 15 ✨ Čistě · až 10 bez nápověd · až 20 za rychlost.</span>
-            <small>Rodina se 3+ členy má tři bodovací místa. Kdo ten den nehraje, nechá své místo za 0. Maximum je 700 bodů za týden.</small>
+            <small>Tým se 3+ členy má tři bodovací místa. Kdo ten den nehraje, nechá své místo za 0. Maximum je 700 bodů za týden.</small>
           </div>
         </div>
       </div>
@@ -196,7 +196,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.8.2</small>
+      <small class="app-version">Proplet v3.9</small>
     </footer>
   </main>
 
@@ -238,11 +238,11 @@
       <div class="account-nudge-icon">☁️</div>
       <span class="eyebrow">PROGRES BEZ ZTRÁT</span>
       <h2>Ulož si svůj Proplet</h2>
-      <p class="muted">První Proplet je doma. 🎉 Připoj hráče a tenhle i další výsledky se uloží do cloudu, otevřeš je na více zařízeních a započítají se do rodinného pořadí.</p>
+      <p class="muted">První Proplet je doma. 🎉 Připoj hráče a tenhle i další výsledky se uloží do cloudu, otevřeš je na více zařízeních a započítají se do týmového pořadí.</p>
       <div class="account-nudge-benefits">
         <span>✓ XP a výsledky mezi zařízeními</span>
         <span>✓ série a úspěchy</span>
-        <span>✓ rodinné pořadí</span>
+        <span>✓ týmové pořadí</span>
       </div>
       <button id="nudgeCreateBtn" class="primary-btn big">Vytvořit hráče</button>
       <button id="nudgeLoginBtn" class="secondary-btn">Už účet mám</button>
@@ -264,7 +264,7 @@
   <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card left">
       <button id="closeProfileModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">RODINNÁ LIGA</span>
+      <span class="eyebrow">TÝM A HRÁČ</span>
       <div class="account-tabs">
         <button id="profileModeLogin" class="account-tab active" type="button">Přihlásit se</button>
         <button id="profileModeCreate" class="account-tab" type="button">Nový hráč</button>
@@ -274,21 +274,21 @@
       <label>Jméno<input id="playerNameInput" maxlength="24" autocomplete="username" placeholder="např. Ardan" /></label>
       <div id="leagueChooser" class="league-chooser">
         <div id="leagueCreateTabs" class="league-create-tabs hidden">
-          <button id="joinLeagueModeBtn" class="league-create-tab active" type="button">Přidat se k lize</button>
-          <button id="newLeagueModeBtn" class="league-create-tab" type="button">Založit novou</button>
+          <button id="joinLeagueModeBtn" class="league-create-tab active" type="button">Přidat se k týmu</button>
+          <button id="newLeagueModeBtn" class="league-create-tab" type="button">Založit nový tým</button>
         </div>
         <div id="joinLeagueFields">
-          <label>Rodinná liga<select id="leagueSelect"><option value="">Načítám ligy…</option></select></label>
-          <label id="manualLeagueLabel" class="hidden">Kód ligy<input id="familyCodeInput" maxlength="24" placeholder="např. Prouza" /></label>
-          <label id="leaguePinLabel" class="hidden">PIN ligy<input id="leaguePinInput" type="password" minlength="4" maxlength="32" autocomplete="one-time-code" placeholder="PIN pro vstup do ligy" /></label>
+          <label>Tým<select id="leagueSelect"><option value="">Načítám týmy…</option></select></label>
+          <label id="leaguePinLabel" class="hidden">PIN týmu<input id="leaguePinInput" type="password" minlength="4" maxlength="32" autocomplete="one-time-code" placeholder="PIN, který ti sdělil člen týmu" /></label>
+          <small id="teamPinHelp" class="field-note hidden">PIN je potřeba jen při vytvoření nového hráče v tomto týmu.</small>
         </div>
         <div id="newLeagueFields" class="hidden">
-          <label>Název nové ligy<input id="newLeagueNameInput" maxlength="40" placeholder="např. Prouzovi" /></label>
-          <label>PIN nové ligy<input id="newLeaguePinInput" type="password" minlength="4" maxlength="32" placeholder="alespoň 4 znaky" /></label>
-          <small class="field-note">PIN sdílej jen s lidmi, které chceš do ligy pustit.</small>
+          <label>Název nového týmu<input id="newLeagueNameInput" maxlength="40" placeholder="např. Prouzovi" /></label>
+          <label>PIN nového týmu<input id="newLeaguePinInput" type="password" minlength="4" maxlength="32" placeholder="alespoň 4 znaky" /></label>
+          <small class="field-note">První hráč PIN zvolí a sdělí ho dalším lidem, které chce do týmu pustit.</small>
         </div>
       </div>
-      <label>Heslo<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
+      <label>Heslo hráče<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
       <button id="profilePasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
       <div id="profileFormError" class="form-error"></div>
       <button id="saveProfileBtn" class="primary-btn big">Přihlásit se</button>
@@ -307,6 +307,19 @@
       <button id="setPasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
       <div id="passwordFormError" class="form-error"></div>
       <button id="savePasswordBtn" class="primary-btn big">Uložit heslo</button>
+    </div>
+  </div>
+
+  <div id="teamPinModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closeTeamPinModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">POZVÁNKA DO TÝMU</span>
+      <h2>Nastav PIN týmu</h2>
+      <p class="muted">PIN potřebuje jen člověk, který si v tomto týmu vytváří nového hráče. Stávající hráči se přihlašují svým jménem a osobním heslem.</p>
+      <label>Nový PIN týmu<input id="teamPinInput" type="password" minlength="4" maxlength="32" autocomplete="new-password" placeholder="alespoň 4 znaky" /></label>
+      <button id="teamPinToggle" class="password-toggle" type="button">👁 Zobrazit PIN</button>
+      <div id="teamPinError" class="form-error"></div>
+      <button id="saveTeamPinBtn" class="primary-btn big">Uložit PIN týmu</button>
     </div>
   </div>
 
@@ -363,23 +376,23 @@
       <span id="levelDetailEyebrow" class="eyebrow">DETAIL ÚROVNĚ</span>
       <h2 id="levelDetailTitle">Úroveň</h2>
       <div id="levelDetailResult" class="level-detail-result"></div>
-      <div class="section-head compact-head"><div><span class="eyebrow">RODINNÁ LIGA</span><h3>Pořadí této úrovně</h3></div></div>
+      <div class="section-head compact-head"><div><span class="eyebrow">TVŮJ TÝM</span><h3>Pořadí této úrovně</h3></div></div>
       <div id="levelDetailLeaderboard" class="level-detail-leaderboard"></div>
-      <div class="level-detail-actions"><button id="levelDetailReplayBtn" class="primary-btn bigish">Zahrát znovu</button><button id="levelDetailShareBtn" class="secondary-btn bigish">Sdílet a pochlubit se</button></div>
+      <div class="level-detail-actions"><button id="levelDetailReplayBtn" class="primary-btn bigish">Zahrát znovu · trénink</button><button id="levelDetailShareBtn" class="secondary-btn bigish">Sdílet a pochlubit se</button></div>
     </div>
   </div>
 
   <div id="familyLeagueModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card left family-league-modal-card">
       <button id="closeFamilyLeagueModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">🌍 LIGA RODIN</span>
-      <h2>Pošli rodinu do světa</h2>
-      <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů ani interní kód ligy nikdo cizí neuvidí. Nastavení může změnit kterýkoli přihlášený člen rodiny.</p>
+      <span class="eyebrow">🌍 LIGA TÝMŮ</span>
+      <h2>Pošli tým do světa</h2>
+      <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů ani interní kód týmu nikdo cizí neuvidí. Nastavení může změnit kterýkoli přihlášený člen týmu.</p>
       <label>Veřejný název týmu<input id="familyLeaguePublicName" maxlength="40" placeholder="např. Prouzovi nebo Brutální Propletači" /></label>
-      <small class="field-note">PIN rodinné ligy slouží jen jako pozvánka při přidání nového hráče do rodiny.</small>
+      <small class="field-note">PIN týmu slouží jen jako pozvánka při přidání nového hráče do týmu.</small>
       <div id="familyLeagueModalError" class="form-error"></div>
-      <button id="enableFamilyLeagueBtn" class="primary-btn big">Zařadit rodinu do ligy 🌍</button>
-      <button id="disableFamilyLeagueBtn" class="secondary-btn hidden">Vystoupit z Ligy rodin</button>
+      <button id="enableFamilyLeagueBtn" class="primary-btn big">Zařadit tým do Ligy týmů 🌍</button>
+      <button id="disableFamilyLeagueBtn" class="secondary-btn hidden">Vystoupit z Ligy týmů</button>
     </div>
   </div>
 

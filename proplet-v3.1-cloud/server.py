@@ -91,6 +91,14 @@ class PasswordSet(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class AvatarSet(BaseModel):
+    avatar: str = Field(min_length=1, max_length=16)
+
+
+class TeamPinSet(BaseModel):
+    pin: str = Field(min_length=4, max_length=32)
+
+
 class ResultCreate(BaseModel):
     puzzle_id: str
     challenge_key: str
@@ -105,6 +113,8 @@ class ResultCreate(BaseModel):
     attempt_id: Optional[str] = Field(default=None, min_length=8, max_length=80)
     # Conservative default keeps older cached clients from being falsely marked as Clean.
     clean_solve: bool = False
+    # Client timestamp lets delayed/offline sync preserve the actual first completion.
+    completed_at: Optional[str] = Field(default=None, max_length=40)
 
 
 class AttemptStart(BaseModel):
@@ -493,6 +503,11 @@ def health():
             db_request("GET", "player_sessions", params={"select": "id", "limit": "1"})
         except HTTPException:
             account_migration = False
+        profiles_migration = True
+        try:
+            db_request("GET", "players", params={"select": "id,avatar", "limit": "1"})
+        except HTTPException:
+            profiles_migration = False
         features_migration = True
         try:
             db_request("GET", "results", params={"select": "id,hints_used,clean_solve", "limit": "1"})
@@ -518,9 +533,9 @@ def health():
             db_request("GET", "leagues", params={"select": "code,public_opt_in,public_name,public_enabled_at", "limit": "1"})
         except HTTPException:
             global_league_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -533,13 +548,14 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.8.1",
+        "version": "3.9.0",
     }
 
 
+@app.get("/api/teams")
 @app.get("/api/leagues")
 def list_leagues():
-    """Public discovery list: names/codes only, never league PIN hashes."""
+    """Public team discovery: names/codes only, never team PIN hashes."""
     try:
         rows = db_select("leagues")
     except HTTPException:
@@ -552,7 +568,7 @@ def list_leagues():
     for p in players:
         code = norm_family(str(p.get("family_code") or ""))
         counts[code] = counts.get(code, 0) + 1
-    out = [{"code": r.get("code"), "name": r.get("name") or r.get("code"), "members": counts.get(r.get("code"), 0), "protected": True} for r in rows if r.get("pin_hash")]
+    out = [{"code": r.get("code"), "name": r.get("name") or r.get("code"), "members": counts.get(r.get("code"), 0), "protected": bool(r.get("pin_hash"))} for r in rows]
     out.sort(key=lambda x: str(x["name"]).casefold())
     return {"leagues": out}
 
@@ -562,28 +578,31 @@ def create_player(payload: PlayerCreate):
     name = " ".join(payload.name.strip().split())
     family = norm_family(payload.family_code)
     if not name or len(family) < 2:
-        raise HTTPException(400, "Vyplň jméno a ligu")
+        raise HTTPException(400, "Vyplň jméno a tým")
 
     league_rows = db_select("leagues", code=family)
     if payload.create_league:
         display_name = " ".join((payload.league_name or payload.family_code).strip().split())[:40]
         if league_rows:
-            raise HTTPException(409, "Liga s tímto názvem už existuje. Přidej se k ní místo zakládání nové.")
+            raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu místo zakládání nového.")
         if not payload.league_pin or len(payload.league_pin.strip()) < 4:
-            raise HTTPException(400, "Nová liga potřebuje PIN alespoň 4 znaky")
+            raise HTTPException(400, "Nový tým potřebuje PIN alespoň 4 znaky")
         db_insert("leagues", {"code": family, "name": display_name or family, "pin_hash": hash_password(payload.league_pin.strip()), "created_at": datetime.now(TZ).isoformat()})
         league_rows = db_select("leagues", code=family)
     elif not league_rows:
-        # Rolling compatibility for an older cached client: its family code becomes a legacy league.
+        # Backward compatibility for a cached pre-team client. New v3.9 clients always create teams explicitly.
         db_insert("leagues", {"code": family, "name": family, "created_at": datetime.now(TZ).isoformat()})
         league_rows = db_select("leagues", code=family)
-    elif league_rows[0].get("pin_hash"):
+    else:
+        # PIN is the shared invitation secret for adding a NEW player to an existing team.
+        if not league_rows[0].get("pin_hash"):
+            raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN. Některý přihlášený člen ho může nastavit v profilu.")
         if not payload.league_pin or not verify_password(payload.league_pin.strip(), league_rows[0].get("pin_hash")):
-            raise HTTPException(401, "PIN rodinné ligy nesedí")
+            raise HTTPException(401, "PIN týmu nesedí")
 
     family_players = db_select("players", family_code=family)
     if any(p["name"].casefold() == name.casefold() for p in family_players):
-        raise HTTPException(409, "V této rodině už hráč s tímto jménem existuje")
+        raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
 
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode()).hexdigest()
@@ -593,6 +612,7 @@ def create_player(payload: PlayerCreate):
         "id": player_id,
         "name": name,
         "family_code": family,
+        "avatar": "🙂",
         "token_hash": token_hash,
         "created_at": now,
     }
@@ -603,13 +623,13 @@ def create_player(payload: PlayerCreate):
         db_insert("players", row)
     except HTTPException as exc:
         if exc.status_code == 409:
-            raise HTTPException(409, "V této rodině už hráč s tímto jménem existuje")
+            raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
         raise
 
     stats = player_stats(player_id)
     return {
         "id": player_id, "name": name, "familyCode": family, "leagueName": league_name_for(family), "token": token,
-        "hasPassword": bool(payload.password), "stats": stats,
+        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "stats": stats,
     }
 
 
@@ -620,16 +640,16 @@ def login(payload: PlayerLogin):
     family_players = db_select("players", family_code=family)
     player = next((p for p in family_players if p["name"].casefold() == name.casefold()), None)
     if not player:
-        raise HTTPException(401, "Jméno, rodinný kód nebo heslo nesedí")
+        raise HTTPException(401, "Tým, jméno nebo heslo nesedí")
     if not player.get("password_hash"):
         raise HTTPException(409, "Tento hráč ještě nemá heslo. Nastav ho na zařízení, kde už je přihlášený.")
     if not verify_password(payload.password, player.get("password_hash")):
-        raise HTTPException(401, "Jméno, rodinný kód nebo heslo nesedí")
+        raise HTTPException(401, "Tým, jméno nebo heslo nesedí")
 
     token = new_session(player["id"])
     return {
         "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
-        "token": token, "hasPassword": True, "stats": player_stats(player["id"]),
+        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "stats": player_stats(player["id"]),
     }
 
 
@@ -640,13 +660,52 @@ def set_password(payload: PasswordSet, authorization: Optional[str] = Header(def
     return {"ok": True, "hasPassword": True}
 
 
+@app.post("/api/avatar")
+def set_avatar(payload: AvatarSet, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    avatar = payload.avatar.strip()[:16]
+    if not avatar:
+        raise HTTPException(400, "Vyber avatar")
+    db_update("players", {"id": player["id"]}, {"avatar": avatar})
+    return {"ok": True, "avatar": avatar}
+
+
+@app.post("/api/team-pin")
+def set_team_pin(payload: TeamPinSet, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    team = norm_family(str(player.get("family_code") or ""))
+    rows = db_select("leagues", code=team)
+    if not rows:
+        raise HTTPException(404, "Tým neexistuje")
+    db_update("leagues", {"code": team}, {"pin_hash": hash_password(payload.pin.strip())})
+    return {"ok": True, "hasPin": True}
+
+
+@app.post("/api/logout")
+def logout(authorization: Optional[str] = Header(default=None)):
+    if not authorization or not authorization.lower().startswith("bearer "):
+        return {"ok": True}
+    token = authorization.split(" ", 1)[1].strip()
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    sessions = db_select("player_sessions", token_hash=token_hash)
+    if sessions:
+        db_delete("player_sessions", id=sessions[0]["id"])
+        return {"ok": True}
+    # The original device token lives on players. Rotate it so this particular token stops working;
+    # independent sessions on other devices remain valid.
+    players = db_select("players", token_hash=token_hash)
+    if players:
+        db_update("players", {"id": players[0]["id"]}, {"token_hash": hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest()})
+    return {"ok": True}
+
+
 @app.get("/api/me")
 def me(authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     stats = player_stats(player["id"])
     return {
         "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
-        "hasPassword": bool(player.get("password_hash")), "stats": stats,
+        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "stats": stats,
     }
 
 
@@ -783,6 +842,34 @@ def quality_report(authorization: Optional[str] = Header(default=None)):
     return {"attempts": len(attempts), "puzzlesMeasured": len(rows), "rows": rows}
 
 
+def payload_completed_at(value: Optional[str]) -> str:
+    """Return a sane ISO timestamp from the client, falling back to server time."""
+    if value:
+        try:
+            dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=TZ)
+            # Reject absurd timestamps; device clocks can occasionally be wrong.
+            now = datetime.now(TZ)
+            if datetime(2025, 1, 1, tzinfo=TZ) <= dt.astimezone(TZ) <= now + timedelta(days=1):
+                return dt.astimezone(TZ).isoformat()
+        except (TypeError, ValueError):
+            pass
+    return datetime.now(TZ).isoformat()
+
+def completion_time(r: dict) -> datetime:
+    raw = r.get("completed_at")
+    try:
+        dt = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=TZ)
+        return dt.astimezone(TZ)
+    except (TypeError, ValueError):
+        return datetime.max.replace(tzinfo=TZ)
+
+def first_run_key(r: dict) -> tuple:
+    return (completion_time(r), str(r.get("id") or r.get("attempt_id") or ""))
+
 def run_rank_tuple(r: dict) -> tuple:
     return (
         0 if r.get("clean_solve") is True else 1,
@@ -807,13 +894,14 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
     attempt_id = payload.attempt_id or f"run:{player_id}:{payload.challenge_key}:{uuid.uuid4()}"
     if db_select("puzzle_runs", attempt_id=attempt_id):
         return
+    completed_at = payload_completed_at(payload.completed_at)
     db_insert("puzzle_runs", {
         "id": str(uuid.uuid4()), "attempt_id": attempt_id, "player_id": player_id,
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty, "elapsed_ms": payload.elapsed_ms,
         "moves": payload.moves, "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
         "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
-        "completed_at": datetime.now(TZ).isoformat(),
+        "completed_at": completed_at,
     })
 
 
@@ -852,20 +940,24 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
     except HTTPException:
         logger.warning("Could not store puzzle run for %s", payload.attempt_id)
 
+    official_completed_at = payload_completed_at(payload.completed_at)
     existing = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)
     if existing:
         old = existing[0]
-        # Daily Challenge je jednorázová: první dokončený výsledek je finální.
-        # U volných úloh lze opakováním zlepšit osobní rekord.
-        if payload.mode == "free":
-            new_run = {"clean_solve": effective_clean, "hints_used": payload.hints_used, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves, "wrong_attempts": payload.wrong_attempts}
-            old_run = {"clean_solve": old.get("clean_solve") is True, "hints_used": old.get("hints_used"), "elapsed_ms": old.get("best_elapsed_ms"), "moves": old.get("best_moves"), "wrong_attempts": old.get("wrong_attempts")}
-            if run_rank_tuple(new_run) < run_rank_tuple(old_run):
-                db_update("results", {"id": old["id"]}, {
-                    "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
-                    "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
-                    "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
-                })
+        # Daily i volná úloha mají stejnou soutěžní zásadu: oficiální je PRVNÍ dokončení.
+        # Replay se ukládá do puzzle_runs pro telemetry, ale nesmí zlepšit čas/Clean/hinty.
+        # Jediná výjimka je opožděná offline synchronizace skutečně staršího dokončení.
+        try:
+            incoming_is_earlier = completion_time({"completed_at": official_completed_at}) < completion_time(old)
+        except Exception:
+            incoming_is_earlier = False
+        if incoming_is_earlier:
+            db_update("results", {"id": old["id"]}, {
+                "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
+                "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
+                "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+                "completed_at": official_completed_at,
+            })
         first = False
     else:
         try:
@@ -884,23 +976,21 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 "wrong_attempts": payload.wrong_attempts,
                 "max_hint_level": payload.max_hint_level,
                 "clean_solve": effective_clean,
-                "completed_at": datetime.now(TZ).isoformat(),
+                "completed_at": official_completed_at,
             })
             first = True
         except HTTPException as exc:
             if exc.status_code != 409:
                 raise
-            # Dvojité odeslání ze dvou oken: zachovej idempotenci.
+            # Současné odeslání ze dvou zařízení: zachovej chronologicky první dokončení.
             old = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)[0]
-            if payload.mode == "free":
-                new_run = {"clean_solve": effective_clean, "hints_used": payload.hints_used, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves, "wrong_attempts": payload.wrong_attempts}
-                old_run = {"clean_solve": old.get("clean_solve") is True, "hints_used": old.get("hints_used"), "elapsed_ms": old.get("best_elapsed_ms"), "moves": old.get("best_moves"), "wrong_attempts": old.get("wrong_attempts")}
-                if run_rank_tuple(new_run) < run_rank_tuple(old_run):
-                    db_update("results", {"id": old["id"]}, {
-                        "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
-                        "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
-                        "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
-                    })
+            if completion_time({"completed_at": official_completed_at}) < completion_time(old):
+                db_update("results", {"id": old["id"]}, {
+                    "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
+                    "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
+                    "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+                    "completed_at": official_completed_at,
+                })
             first = False
 
     if payload.attempt_id:
@@ -1168,7 +1258,7 @@ def family_league_settings(payload: FamilyLeagueSettings, authorization: Optiona
     family = norm_family(str(player.get("family_code") or ""))
     rows = db_select("leagues", code=family)
     if not rows:
-        raise HTTPException(404, "Rodinná liga neexistuje")
+        raise HTTPException(404, "Tým neexistuje")
     league = rows[0]
     # Každý přihlášený člen rodiny má stejná práva k veřejnému nastavení týmu.
     # PIN zůstává pouze jako sdílené pozvání při vytváření NOVÉHO hráče v existující lize.
@@ -1193,16 +1283,17 @@ def puzzle_leaderboard(
     players = db_select("players", family_code=family)
     pmap = {p["id"]: p for p in players}
     rows = [r for r in db_select("puzzle_runs", puzzle_id=puzzle_id) if r.get("player_id") in pmap]
-    best: dict[str, dict] = {}
+    first: dict[str, dict] = {}
     for r in rows:
         pid = r["player_id"]
-        if pid not in best or run_rank_tuple(r) < run_rank_tuple(best[pid]):
-            best[pid] = r
-    ranked = sorted(best.values(), key=lambda r: (*run_rank_tuple(r), pmap[r["player_id"]]["name"].casefold()))
+        if pid not in first or first_run_key(r) < first_run_key(first[pid]):
+            first[pid] = r
+    # Pořadí srovnává první dokončení každého hráče; replay už výsledek nikdy nezlepší.
+    ranked = sorted(first.values(), key=lambda r: (*run_rank_tuple(r), pmap[r["player_id"]]["name"].casefold()))
     board = []
     for i, r in enumerate(ranked, 1):
         board.append({
-            "rank": i, "id": r["player_id"], "name": pmap[r["player_id"]]["name"],
+            "rank": i, "id": r["player_id"], "name": pmap[r["player_id"]]["name"], "avatar": pmap[r["player_id"]].get("avatar") or "🙂",
             "elapsedMs": int(r["elapsed_ms"]), "moves": int(r["moves"]),
             "hintsUsed": int(r.get("hints_used") or 0), "wrongAttempts": int(r.get("wrong_attempts") or 0),
             "cleanSolve": r.get("clean_solve") is True, "completedAt": r.get("completed_at"),
@@ -1229,12 +1320,12 @@ def played_levels(
         vals = grouped.get(p["id"], [])
         if not vals:
             continue
-        best = min(vals, key=run_rank_tuple)
+        first = min(vals, key=first_run_key)
         items.append({
             "puzzleId": p["id"], "level": int((p.get("meta") or {}).get("level") or 0),
-            "elapsedMs": int(best["elapsed_ms"]), "moves": int(best["moves"]),
-            "hintsUsed": int(best.get("hints_used") or 0), "wrongAttempts": int(best.get("wrong_attempts") or 0),
-            "cleanSolve": best.get("clean_solve") is True, "attempts": len(vals), "completedAt": best.get("completed_at"),
+            "elapsedMs": int(first["elapsed_ms"]), "moves": int(first["moves"]),
+            "hintsUsed": int(first.get("hints_used") or 0), "wrongAttempts": int(first.get("wrong_attempts") or 0),
+            "cleanSolve": first.get("clean_solve") is True, "attempts": len(vals), "completedAt": first.get("completed_at"),
         })
     return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "levels": items}
 
@@ -1315,7 +1406,7 @@ def leaderboard(
     overall = []
     for p in players:
         stats = player_stats(p["id"])
-        overall.append({"id": p["id"], "name": p["name"], **stats})
+        overall.append({"id": p["id"], "name": p["name"], "avatar": p.get("avatar") or "🙂", **stats})
     overall.sort(key=lambda x: (-x["points"], -x["currentStreak"], x["name"].casefold()))
     for i, item in enumerate(overall, 1):
         item["rank"] = i
@@ -1339,7 +1430,7 @@ def leaderboard(
             if week_start <= done < week_end:
                 rows.append(r)
         weekly.append({
-            "id": p["id"], "name": p["name"], "points": sum(int(r.get("points") or 0) for r in rows),
+            "id": p["id"], "name": p["name"], "avatar": p.get("avatar") or "🙂", "points": sum(int(r.get("points") or 0) for r in rows),
             "completed": len(rows), "daily": sum(1 for r in rows if r.get("mode") == "daily"),
             "clean": sum(1 for r in rows if r.get("clean_solve") is True),
         })
@@ -1359,6 +1450,7 @@ def leaderboard(
             "rank": i,
             "id": r["player_id"],
             "name": player_map[r["player_id"]]["name"],
+            "avatar": player_map[r["player_id"]].get("avatar") or "🙂",
             "elapsedMs": r["best_elapsed_ms"],
             "moves": r["best_moves"],
             "hintsUsed": int(r.get("hints_used") or 0),

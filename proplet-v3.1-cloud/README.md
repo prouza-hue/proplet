@@ -1,26 +1,14 @@
-# Proplet v3.8.2
+# Proplet v3.9
 
-Aktuální release: Liga rodin + aktivní nabídka denních push připomínek + jasnější model PINu ligy.
+Česká slovní logická hra s Denní výzvou, 400 volnými úrovněmi, sériemi, XP, týmovým pořadím a Ligou týmů.
 
-Viz `UPDATE_V3_8_2_CZ.md` a `RELEASE_V3_8_2_CZ.md`.
+Aktuální release: **v3.9 — Profily & týmy**.
 
+Hlavní změny v3.9:
+- odhlášení a střídání hráčů na jednom zařízení,
+- avatary,
+- jasný model Tým / PIN týmu / osobní heslo hráče,
+- oprava responsive herní obrazovky,
+- první dokončený pokus je jediný soutěžní výsledek úrovně.
 
-Česká slovní logická PWA s Denní výzvou, 400 volnými úrovněmi, streakem, XP/hodnostmi, rodinnými účty, žebříčky konkrétních úrovní a nově i dobrovolnou **Ligou rodin**.
-
-## Cloud stack
-
-- Vercel — FastAPI + statická PWA
-- Supabase — PostgreSQL
-
-## Aktualizace z v3.7.1
-
-Viz `UPDATE_V3_8_CZ.md`.
-
-## Liga rodin
-
-Globální týdenní soutěž je založená pouze na Denních výzvách. Veřejně se zobrazují jen agregované týmové výsledky a zvolené veřejné jméno rodiny; individuální jména členů, interní kód a PIN zůstávají soukromé.
-
-
-## v3.8.1 — čistší herní logika
-
-Herní tlačítko **↶ Zpět** bylo odstraněno. Proplet přijímá pouze trasu patřící do jediného řešení, takže přijaté slovo není potřeba vracet. Navigační šipka zpět a „Zpět do menu“ zůstávají beze změny.
+Pro aktualizaci existujícího nasazení viz `UPDATE_V3_9_CZ.md`.
