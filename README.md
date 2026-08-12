@@ -1,34 +1,45 @@
-# Proplet v3.1 Cloud
+# Proplet v3.5.2 — Content & Progression
 
-Cloud-ready verze Propletu pro **Vercel + Supabase**.
+Česká slovní logická PWA pro Vercel + Supabase.
 
-- FastAPI běží jako Vercel Function.
-- `public/` obsahuje PWA frontend a puzzle databázi.
-- Supabase (Postgres přes Data REST API) drží hráče a výsledky.
-- Citlivý `SUPABASE_SECRET_KEY` je pouze environment variable na Vercelu a není v browseru ani GitHubu.
-- Daily Challenge se mění automaticky podle data v Europe/Prague a každý hráč ji může dokončit pouze jednou.
-- Volná hra obsahuje 50 unikátních úloh pro každou obtížnost (150 celkem).
+## Obsah
 
-Začni souborem **NASAZENI_CZ.md**.
+- 100 Easy (6×6)
+- 100 Medium (7×8)
+- 100 Hard (střídání 8×8 a 9×9)
+- 100 Mozkožrout (10×10)
+- 365 Daily Challenge
+- 30 streak-rescue 6×6 puzzle
 
-## Environment variables
+Celkem: **795 puzzle**.
 
-- `SUPABASE_URL`
-- `SUPABASE_SECRET_KEY`
+Původních prvních 50 free levelů v každé obtížnosti zůstává obsahově beze změny. V3.5.2 pouze přidává levely 51–100.
 
-## Databáze
+Nových 200 free levelů je přísněji generovaných: kromě unikátního exact-cover řešení musí mít každé cílové slovo právě jednu možnou lokální trasu.
 
-Spusť `SUPABASE_SETUP.sql` v Supabase SQL Editoru.
+## XP a levely
 
-## Lokální vývoj (volitelné)
+- Easy: 10 XP × 100 = 1 000 XP
+- Medium: 20 XP × 100 = 2 000 XP
+- Hard: 35 XP × 100 = 3 500 XP
+- Mozkožrout: 60 XP × 100 = 6 000 XP
+- všechna Free dohromady: **12 500 XP**
+- Daily: 100 XP za každý nový den
 
-```bash
-pip install -r requirements.txt
-export SUPABASE_URL='https://...supabase.co'
-export SUPABASE_SECRET_KEY='sb_secret_...'
-uvicorn server:app --reload
-```
+XP roadmapa má **32 levelů** od Nováčka až po Absolutního Propletače (47 000 XP). Rozestupy jsou zahuštěné hlavně ve střední části progression.
 
-## Jazyková data
+## Hlavní funkce
 
-Viz `NOTICE.md`.
+- strict unique-solution route logic
+- interaktivní onboarding
+- 3 stupně nápovědy + Clean solve
+- streak + jednorázová 30s rescue challenge
+- XP, achievementy a level roadmapa
+- heslové multi-device účty
+- Daily, týdenní a celkový rodinný leaderboard
+- persistentní rozehraná Free/Daily
+- Fold/tablet responsive herní layout
+- telemetry skutečné obtížnosti + dobrovolný rating
+- hlášení problematických slov
+- History API navigace pro Android/PWA Zpět
+- řízené PWA aktualizace
