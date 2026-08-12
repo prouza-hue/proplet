@@ -1,53 +1,49 @@
-# Proplet v3.5.2 — Content & Progression
+# Proplet v3.6 — Copy & Polish
 
 Česká slovní logická PWA pro Vercel + Supabase.
 
 ## Obsah
 
-- 100 Easy (6×6)
-- 100 Medium (7×8)
-- 100 Hard (střídání 8×8 a 9×9)
-- 100 Mozkožrout (10×10)
-- 365 Daily Challenge
-- 30 streak-rescue 6×6 puzzle
+- 100 Snadných (6×6)
+- 100 Středních (7×8)
+- 100 Těžkých (8×8 / 9×9)
+- 100 Mozkožroutů (10×10)
+- 365 Denních výzev
+- 30 záchranných 6×6 úloh pro sérii
 
 Celkem: **795 puzzle**.
 
-Původních prvních 50 free levelů v každé obtížnosti zůstává obsahově beze změny. V3.5.2 pouze přidává levely 51–100.
+## Jazyk Propletu
 
-Nových 200 free levelů je přísněji generovaných: kromě unikátního exact-cover řešení musí mít každé cílové slovo právě jednu možnou lokální trasu.
+V3.6 sjednocuje terminologii a tón celé hry:
 
-## XP a levely
+- `Daily` → **Denní výzva**
+- `streak` → **série**
+- `Clean solve` → **čisté řešení / ✨ Čistě**
+- herní `level` → **úroveň**
+- XP `level` → **hodnost**
+- `leaderboard` → **pořadí / Rodinná liga**
+- `haptika` → **vibrace**
+- `Aktuálně` → **Skládáš**
 
-- Easy: 10 XP × 100 = 1 000 XP
-- Medium: 20 XP × 100 = 2 000 XP
-- Hard: 35 XP × 100 = 3 500 XP
-- Mozkožrout: 60 XP × 100 = 6 000 XP
-- všechna Free dohromady: **12 500 XP**
-- Daily: 100 XP za každý nový den
-
-XP roadmapa má **32 levelů** od Nováčka až po Absolutního Propletače (47 000 XP). Rozestupy jsou zahuštěné hlavně ve střední části progression.
+Proplet mluví krátce, chytře a lehce hravě; při samotném luštění zůstávají hlášky co nejstručnější.
 
 ## Hlavní funkce
 
-- strict unique-solution route logic
+- striktní unikátní řešení a unikátní cesta
 - interaktivní onboarding
-- 3 stupně nápovědy + Clean solve
-- streak + jednorázová 30s rescue challenge
-- XP, achievementy a level roadmapa
+- 3 stupně nápovědy + čisté řešení
+- série + jednorázová 30s záchrana
+- XP, úspěchy a 32 hodností
 - heslové multi-device účty
-- Daily, týdenní a celkový rodinný leaderboard
-- persistentní rozehraná Free/Daily
+- Denní, týdenní a celkové rodinné pořadí
+- persistentní rozehraná Free/Denní výzva
 - Fold/tablet responsive herní layout
 - telemetry skutečné obtížnosti + dobrovolný rating
 - hlášení problematických slov
 - History API navigace pro Android/PWA Zpět
 - řízené PWA aktualizace
 
-## Aktualizace z v3.5.1
+## Aktualizace z v3.5.2
 
-Viz `UPDATE_V3_5_2_CZ.md`. **Není potřeba žádná databázová migrace.**
-
-## Čistá instalace
-
-Použij `SUPABASE_SETUP.sql`, nastav `SUPABASE_URL` a `SUPABASE_SECRET_KEY` ve Vercelu a deployuj celý repozitář.
+Viz `UPDATE_V3_6_CZ.md`. **Není potřeba žádná databázová migrace.**

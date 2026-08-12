@@ -37,7 +37,7 @@
             <h1>Dnešní Proplet</h1>
             <p id="dailyMeta" class="hero-muted"></p>
           </div>
-          <div id="streakBubble" class="streak-bubble hero-streak"><span class="streak-icon">🔥</span><strong id="streakCount">0</strong><small>dní</small></div>
+          <div id="streakBubble" class="streak-bubble hero-streak"><span class="streak-icon">🔥</span><strong id="streakCount">0</strong><small id="streakUnit">dní</small></div>
         </div>
         <button id="playDailyBtn" class="primary-btn hero-btn big">Hrát dnešní výzvu</button>
         <button id="shareDailyBtn" class="hero-secondary hidden">Sdílet výsledek</button>
@@ -46,13 +46,13 @@
 
       <div id="rescueCard" class="card rescue-card hidden">
         <div class="rescue-flame">🔥</div>
-        <div class="rescue-copy"><span class="eyebrow">ZÁCHRANA STREAKU</span><h2 id="rescueTitle">Tvůj streak je v ohrožení</h2><p id="rescueText" class="muted"></p></div>
-        <button id="rescueBtn" class="rescue-btn">Zachránit streak · 30 s</button>
+        <div class="rescue-copy"><span class="eyebrow">ZÁCHRANA SÉRIE</span><h2 id="rescueTitle">Tvoje série je v ohrožení</h2><p id="rescueText" class="muted"></p></div>
+        <button id="rescueBtn" class="rescue-btn">Zachránit sérii · 30 s</button>
       </div>
 
       <div id="quickPlayCard" class="card quick-play-card">
         <div class="quick-play-head">
-          <div><span class="eyebrow">HRAJ DÁL</span><h2>Daily je jen začátek</h2><p class="muted">Vyber obtížnost a pokračuj kdykoli chceš.</p></div>
+          <div><span class="eyebrow">HRAJ DÁL</span><h2>Ještě nekončíme.</h2><p class="muted">Vyber si obtížnost a dej si další Proplet.</p></div>
           <button id="openAllGamesBtn" class="quick-all-btn">Všechny hry <span>→</span></button>
         </div>
         <div id="quickPlayGrid" class="quick-play-grid"></div>
@@ -62,21 +62,21 @@
 
       <div class="card streak-card">
         <div class="section-head">
-          <div><span class="eyebrow">STREAK</span><h2>Další odměna</h2></div>
+          <div><span class="eyebrow">SÉRIE</span><h2>Další odměna</h2></div>
           <div id="nextBadgeText" class="muted compact"></div>
         </div>
         <div id="badgeRail" class="badge-rail"></div>
       </div>
 
       <div class="card mini-stats">
-        <div><span class="stat-label">Daily hotovo</span><strong id="dailyCompletedStat">0</strong></div>
-        <div><span class="stat-label">Nejdelší streak</span><strong id="longestStreakStat">0</strong></div>
+        <div><span class="stat-label">Denní výzvy</span><strong id="dailyCompletedStat">0</strong></div>
+        <div><span class="stat-label">Nejdelší série</span><strong id="longestStreakStat">0</strong></div>
         <div><span class="stat-label">Nejlepší čas</span><strong id="bestDailyStat">—</strong></div>
       </div>
     </section>
 
     <section id="screen-free" class="screen">
-      <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Na co si troufáš?</h1><p class="muted">Vyřešené úlohy dávají XP. Streak ale roste jen Daily výzvou.</p></div>
+      <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Na co si troufáš?</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
       <div id="difficultyCards" class="difficulty-grid"></div>
     </section>
 
@@ -94,11 +94,11 @@
     </section>
 
     <section id="screen-profile" class="screen">
-      <div class="screen-title"><span class="eyebrow">HRÁČ</span><h1>Moje Proplet kariéra</h1></div>
+      <div class="screen-title"><span class="eyebrow">HRÁČ</span><h1>Moje cesta Propletem</h1></div>
       <div id="profileCard" class="card profile-card"></div>
 
       <div class="card level-roadmap-card">
-        <div class="section-head"><div><span class="eyebrow">LEVELY</span><h2>Kam míříš</h2></div></div>
+        <div class="section-head"><div><span class="eyebrow">HODNOSTI</span><h2>Kam míříš</h2></div></div>
         <div id="levelRoadmap" class="level-roadmap"></div>
       </div>
 
@@ -108,17 +108,17 @@
       </div>
 
       <div class="card badge-card">
-        <div class="section-head"><div><span class="eyebrow">STREAK ODZNAKY</span><h2>Každý den o kus dál</h2></div></div>
+        <div class="section-head"><div><span class="eyebrow">ODZNAKY SÉRIE</span><h2>Každý den o kus dál</h2></div></div>
         <div id="profileBadges" class="profile-badges"></div>
       </div>
 
       <div class="card settings-card">
-        <div class="section-head"><div><span class="eyebrow">POCIT ZE HRY</span><h2>Zvuk a haptika</h2></div></div>
+        <div class="section-head"><div><span class="eyebrow">POCIT ZE HRY</span><h2>Zvuk a vibrace</h2></div></div>
         <div class="settings-row">
           <button id="soundToggle" class="setting-toggle"></button>
           <button id="hapticToggle" class="setting-toggle"></button>
         </div>
-        <button id="hapticTestBtn" class="secondary-btn intro-replay-btn">📳 Otestovat haptiku</button>
+        <button id="hapticTestBtn" class="secondary-btn intro-replay-btn">📳 Otestovat vibrace</button>
         <button id="replayIntroBtn" class="secondary-btn intro-replay-btn">▶ Ukázat úvod znovu</button>
       </div>
     </section>
@@ -147,8 +147,8 @@
 
         <aside class="game-control-column">
           <div class="current-word card">
-            <div><span class="stat-label">Aktuálně</span><strong id="currentWord">—</strong></div>
-            <span id="cleanStatus" class="clean-status">✨ Clean</span>
+            <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
+            <span id="cleanStatus" class="clean-status">✨ Čistě</span>
           </div>
           <div id="gameMessage" class="game-message" aria-live="polite"></div>
           <div class="game-actions">
@@ -159,6 +159,10 @@
         </aside>
       </div>
     </section>
+    <footer class="app-footer">
+      <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
+      <strong>Pavel &amp; Sol</strong>
+    </footer>
   </main>
 
   <nav class="bottom-nav" aria-label="Hlavní navigace">
@@ -198,11 +202,11 @@
       <div class="account-nudge-icon">☁️</div>
       <span class="eyebrow">PROGRES BEZ ZTRÁT</span>
       <h2>Ulož si svůj Proplet</h2>
-      <p class="muted">První level je doma. Připoj hráče a tenhle i další výsledky se uloží do cloudu, půjdou otevřít na více zařízeních a započítají se do rodinného leaderboardu.</p>
+      <p class="muted">První Proplet je doma. 🎉 Připoj hráče a tenhle i další výsledky se uloží do cloudu, otevřeš je na více zařízeních a započítají se do rodinného pořadí.</p>
       <div class="account-nudge-benefits">
         <span>✓ XP a výsledky mezi zařízeními</span>
-        <span>✓ streak a achievementy</span>
-        <span>✓ rodinný leaderboard</span>
+        <span>✓ série a úspěchy</span>
+        <span>✓ rodinné pořadí</span>
       </div>
       <button id="nudgeCreateBtn" class="primary-btn big">Vytvořit hráče</button>
       <button id="nudgeLoginBtn" class="secondary-btn">Už účet mám</button>
@@ -213,7 +217,7 @@
   <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card left">
       <button id="closeProfileModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">RODINNÝ LEADERBOARD</span>
+      <span class="eyebrow">RODINNÁ LIGA</span>
       <div class="account-tabs">
         <button id="profileModeLogin" class="account-tab active" type="button">Přihlásit se</button>
         <button id="profileModeCreate" class="account-tab" type="button">Nový hráč</button>
@@ -225,7 +229,7 @@
       <label>Heslo<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
       <div id="profileFormError" class="form-error"></div>
       <button id="saveProfileBtn" class="primary-btn big">Přihlásit se</button>
-      <button id="skipProfileBtn" class="text-btn">Zatím hrát bez leaderboardu</button>
+      <button id="skipProfileBtn" class="text-btn">Zatím hrát bez pořadí</button>
     </div>
   </div>
 
@@ -247,7 +251,7 @@
       <button id="closeHintModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">CHYTRÁ NÁPOVĚDA</span>
       <h2>Kolik pomoci chceš?</h2>
-      <p class="muted">Jakákoli nápověda zruší ✨ Clean solve této úlohy.</p>
+      <p class="muted">Jakákoli nápověda zruší ✨ čisté řešení této úrovně.</p>
       <button class="hint-choice" data-hint-level="1"><span>💡</span><div><strong>Lehká</strong><small>Ukáže začátek a délku vhodného slova.</small></div></button>
       <button class="hint-choice" data-hint-level="2"><span>🔦</span><div><strong>Silnější</strong><small>Ukáže první tři políčka cesty.</small></div></button>
       <button class="hint-choice" data-hint-level="3"><span>🧭</span><div><strong>Odhalit</strong><small>Na chvíli ukáže celé slovo i jeho cestu.</small></div></button>
@@ -257,7 +261,7 @@
   <div id="rescueOfferModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card rescue-modal-card">
       <div class="rescue-big-icon">🔥</div>
-      <span class="eyebrow">STREAK JEŠTĚ ŽIJE</span>
+      <span class="eyebrow">SÉRIE JEŠTĚ ŽIJE</span>
       <h2 id="rescueOfferTitle">Chceš ho zachránit?</h2>
       <p id="rescueOfferText" class="muted"></p>
       <div class="rescue-rule"><strong>30 sekund</strong><span>6×6 · bez nápovědy · jeden pokus</span></div>
