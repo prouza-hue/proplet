@@ -1,4 +1,4 @@
-const APP_VERSION='3.9';
+const APP_VERSION='3.10';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
 const DIFF={
@@ -46,19 +46,91 @@ const LEVELS=[
  {xp:40000,icon:'🛡️',name:'Strážce všech cest'},
  {xp:47000,icon:'🏆',name:'Absolutní Propletač'}
 ];
+const ACHIEVEMENT_GROUPS=[
+ ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],
+ ['daily','Denní výzva'],['clean','Čistá řešení'],['cleanDaily','Čisté Daily'],['xp','XP'],['speed','Rychlost'],['rescue','Záchrana série']
+];
 const ACHIEVEMENTS=[
- {icon:'🧩',name:'První Proplet',desc:'Vyřeš první úlohu',value:s=>s.totalCompleted||0,target:1},
- {icon:'🔟',name:'Rozjezd',desc:'Vyřeš 10 úloh',value:s=>s.totalCompleted||0,target:10},
- {icon:'💯',name:'Stovka',desc:'Nasbírej 100 XP',value:s=>s.points||0,target:100},
- {icon:'🧠',name:'Mozkovna',desc:'5 středních úloh',value:s=>s.freeCompleted?.medium||0,target:5},
- {icon:'🧨',name:'Nebojácný',desc:'3 těžké úlohy',value:s=>s.freeCompleted?.hard||0,target:3},
- {icon:'🤯',name:'Mozkožrout',desc:'Dokonči první Mozkožrout',value:s=>s.freeCompleted?.hardcore||0,target:1},
- {icon:'☀️',name:'Ranní ptáče',desc:'Dokonči 5 denních výzev',value:s=>s.dailyCompleted||0,target:5},
- {icon:'🔥',name:'Držíš nit',desc:'Udrž sérii 7 dní',value:s=>s.longestStreak||0,target:7},
- {icon:'⚡',name:'Rychlík',desc:'Denní výzva pod 2 minuty',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<120000?1:0,target:1},
- {icon:'✨',name:'Bez berliček',desc:'10 čistých řešení bez nápovědy',value:s=>s.cleanSolves||0,target:10}
+ {id:'all-1',group:'general',icon:'🧩',name:'První Proplet',desc:'Vyřeš první úlohu',value:s=>s.totalCompleted||0,target:1},
+ {id:'all-5',group:'general',icon:'🖐️',name:'Pětka v kapse',desc:'Vyřeš 5 úloh',value:s=>s.totalCompleted||0,target:5},
+ {id:'all-10',group:'general',icon:'🔟',name:'Rozjezd',desc:'Vyřeš 10 úloh',value:s=>s.totalCompleted||0,target:10},
+ {id:'all-25',group:'general',icon:'🎯',name:'Čtvrtsto',desc:'Vyřeš 25 úloh',value:s=>s.totalCompleted||0,target:25},
+ {id:'all-50',group:'general',icon:'🛤️',name:'Půl stovky',desc:'Vyřeš 50 úloh',value:s=>s.totalCompleted||0,target:50},
+ {id:'all-100',group:'general',icon:'💯',name:'Stovka úloh',desc:'Vyřeš 100 úloh',value:s=>s.totalCompleted||0,target:100},
+ {id:'all-250',group:'general',icon:'🚂',name:'Nezastavitelný',desc:'Vyřeš 250 úloh',value:s=>s.totalCompleted||0,target:250},
+ {id:'all-400',group:'general',icon:'🏃',name:'Propletový maratonec',desc:'Vyřeš 400 úloh',value:s=>s.totalCompleted||0,target:400},
+
+ {id:'easy-1',group:'easy',icon:'🌱',name:'První klíček',desc:'Dokonči první Snadnou',value:s=>s.freeCompleted?.easy||0,target:1},
+ {id:'easy-10',group:'easy',icon:'🌿',name:'Rozcvička',desc:'Dokonči 10 Snadných',value:s=>s.freeCompleted?.easy||0,target:10},
+ {id:'easy-25',group:'easy',icon:'🍀',name:'Lehká váha',desc:'Dokonči 25 Snadných',value:s=>s.freeCompleted?.easy||0,target:25},
+ {id:'easy-50',group:'easy',icon:'🌳',name:'Půlka zahrady',desc:'Dokonči 50 Snadných',value:s=>s.freeCompleted?.easy||0,target:50},
+ {id:'easy-100',group:'easy',icon:'🏡',name:'Zelený velmistr',desc:'Dokonči všech 100 Snadných',value:s=>s.freeCompleted?.easy||0,target:100},
+
+ {id:'medium-1',group:'medium',icon:'🧠',name:'Hlavička',desc:'Dokonči první Střední',value:s=>s.freeCompleted?.medium||0,target:1},
+ {id:'medium-10',group:'medium',icon:'🤔',name:'Mozkovna',desc:'Dokonči 10 Středních',value:s=>s.freeCompleted?.medium||0,target:10},
+ {id:'medium-25',group:'medium',icon:'🧐',name:'Přemýšlivec',desc:'Dokonči 25 Středních',value:s=>s.freeCompleted?.medium||0,target:25},
+ {id:'medium-50',group:'medium',icon:'🧬',name:'Šedá kůra',desc:'Dokonči 50 Středních',value:s=>s.freeCompleted?.medium||0,target:50},
+ {id:'medium-100',group:'medium',icon:'🎓',name:'Mistr středu',desc:'Dokonči všech 100 Středních',value:s=>s.freeCompleted?.medium||0,target:100},
+
+ {id:'hard-1',group:'hard',icon:'🧨',name:'Odvážlivec',desc:'Dokonči první Těžkou',value:s=>s.freeCompleted?.hard||0,target:1},
+ {id:'hard-5',group:'hard',icon:'💥',name:'Rozbuška',desc:'Dokonči 5 Těžkých',value:s=>s.freeCompleted?.hard||0,target:5},
+ {id:'hard-10',group:'hard',icon:'🦾',name:'Nebojácný',desc:'Dokonči 10 Těžkých',value:s=>s.freeCompleted?.hard||0,target:10},
+ {id:'hard-25',group:'hard',icon:'⛏️',name:'Těžká práce',desc:'Dokonči 25 Těžkých',value:s=>s.freeCompleted?.hard||0,target:25},
+ {id:'hard-50',group:'hard',icon:'🗿',name:'Ocelová hlava',desc:'Dokonči 50 Těžkých',value:s=>s.freeCompleted?.hard||0,target:50},
+ {id:'hard-100',group:'hard',icon:'🏆',name:'Demoliční četa',desc:'Dokonči všech 100 Těžkých',value:s=>s.freeCompleted?.hard||0,target:100},
+
+ {id:'hc-1',group:'hardcore',icon:'🤯',name:'Mozkožrout',desc:'Dokonči první Mozkožrout',value:s=>s.freeCompleted?.hardcore||0,target:1},
+ {id:'hc-5',group:'hardcore',icon:'🍽️',name:'Nakrmil Mozkožrouta',desc:'Dokonči 5 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:5},
+ {id:'hc-10',group:'hardcore',icon:'🔥',name:'Neurony v plamenech',desc:'Dokonči 10 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:10},
+ {id:'hc-25',group:'hardcore',icon:'🐌',name:'Požírač šneků',desc:'Dokonči 25 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:25},
+ {id:'hc-50',group:'hardcore',icon:'🧠',name:'Mozkový kulturista',desc:'Dokonči 50 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:50},
+ {id:'hc-100',group:'hardcore',icon:'👑',name:'Mozkožroutí král',desc:'Dokonči všech 100 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:100},
+
+ {id:'daily-1',group:'daily',icon:'☀️',name:'Dnešní dávka',desc:'Dokonči první Denní výzvu',value:s=>s.dailyCompleted||0,target:1},
+ {id:'daily-3',group:'daily',icon:'🌤️',name:'Tři slunce',desc:'Dokonči 3 Denní výzvy',value:s=>s.dailyCompleted||0,target:3},
+ {id:'daily-7',group:'daily',icon:'📅',name:'Týdenní hráč',desc:'Dokonči 7 Denních výzev',value:s=>s.dailyCompleted||0,target:7},
+ {id:'daily-14',group:'daily',icon:'🗓️',name:'Dva týdny',desc:'Dokonči 14 Denních výzev',value:s=>s.dailyCompleted||0,target:14},
+ {id:'daily-30',group:'daily',icon:'🌞',name:'Měsíčník',desc:'Dokonči 30 Denních výzev',value:s=>s.dailyCompleted||0,target:30},
+ {id:'daily-50',group:'daily',icon:'🌻',name:'Sluneční sběratel',desc:'Dokonči 50 Denních výzev',value:s=>s.dailyCompleted||0,target:50},
+ {id:'daily-100',group:'daily',icon:'💯',name:'Stovka rán',desc:'Dokonči 100 Denních výzev',value:s=>s.dailyCompleted||0,target:100},
+ {id:'daily-200',group:'daily',icon:'🧭',name:'Kalendářní démon',desc:'Dokonči 200 Denních výzev',value:s=>s.dailyCompleted||0,target:200},
+ {id:'daily-365',group:'daily',icon:'🌍',name:'Celý rok',desc:'Dokonči 365 Denních výzev',value:s=>s.dailyCompleted||0,target:365},
+
+ {id:'clean-1',group:'clean',icon:'✨',name:'Bez berliček',desc:'Vyřeš první úlohu bez nápovědy',value:s=>s.cleanSolves||0,target:1},
+ {id:'clean-5',group:'clean',icon:'🫧',name:'Čistá pětka',desc:'5 čistých řešení',value:s=>s.cleanSolves||0,target:5},
+ {id:'clean-10',group:'clean',icon:'🧼',name:'Čistá desítka',desc:'10 čistých řešení',value:s=>s.cleanSolves||0,target:10},
+ {id:'clean-25',group:'clean',icon:'💎',name:'Bez nápovědy',desc:'25 čistých řešení',value:s=>s.cleanSolves||0,target:25},
+ {id:'clean-50',group:'clean',icon:'🦅',name:'Samostatný mozek',desc:'50 čistých řešení',value:s=>s.cleanSolves||0,target:50},
+ {id:'clean-100',group:'clean',icon:'🪞',name:'Čistokrevný propletač',desc:'100 čistých řešení',value:s=>s.cleanSolves||0,target:100},
+ {id:'clean-250',group:'clean',icon:'🧙',name:'Nápovědy jsou pro ostatní',desc:'250 čistých řešení',value:s=>s.cleanSolves||0,target:250},
+
+ {id:'cd-1',group:'cleanDaily',icon:'🌅',name:'Čisté slunce',desc:'Denní výzva čistě',value:s=>s.cleanDaily||0,target:1},
+ {id:'cd-7',group:'cleanDaily',icon:'🌈',name:'Sedm čistých rán',desc:'7 Denních výzev čistě',value:s=>s.cleanDaily||0,target:7},
+ {id:'cd-30',group:'cleanDaily',icon:'☀️',name:'Čistý měsíc',desc:'30 Denních výzev čistě',value:s=>s.cleanDaily||0,target:30},
+ {id:'cd-100',group:'cleanDaily',icon:'🌟',name:'Sluneční purista',desc:'100 Denních výzev čistě',value:s=>s.cleanDaily||0,target:100},
+
+ {id:'xp-100',group:'xp',icon:'💯',name:'První stovka XP',desc:'Nasbírej 100 XP',value:s=>s.points||0,target:100},
+ {id:'xp-500',group:'xp',icon:'🪙',name:'Sběrač XP',desc:'Nasbírej 500 XP',value:s=>s.points||0,target:500},
+ {id:'xp-1000',group:'xp',icon:'💰',name:'Tisícovka',desc:'Nasbírej 1 000 XP',value:s=>s.points||0,target:1000},
+ {id:'xp-2500',group:'xp',icon:'🎒',name:'Pokladnice',desc:'Nasbírej 2 500 XP',value:s=>s.points||0,target:2500},
+ {id:'xp-5000',group:'xp',icon:'🏦',name:'Pět tisíc',desc:'Nasbírej 5 000 XP',value:s=>s.points||0,target:5000},
+ {id:'xp-10000',group:'xp',icon:'🔢',name:'Pěticiferný',desc:'Nasbírej 10 000 XP',value:s=>s.points||0,target:10000},
+ {id:'xp-25000',group:'xp',icon:'💸',name:'XP magnát',desc:'Nasbírej 25 000 XP',value:s=>s.points||0,target:25000},
+ {id:'xp-47000',group:'xp',icon:'🏆',name:'Absolutní sběratel',desc:'Nasbírej 47 000 XP',value:s=>s.points||0,target:47000},
+
+ {id:'speed-300',group:'speed',icon:'🏃',name:'Pohodový sprint',desc:'Denní výzva pod 5 minut',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<300000?1:0,target:1},
+ {id:'speed-180',group:'speed',icon:'💨',name:'Svižník',desc:'Denní výzva pod 3 minuty',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<180000?1:0,target:1},
+ {id:'speed-120',group:'speed',icon:'⚡',name:'Rychlík',desc:'Denní výzva pod 2 minuty',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<120000?1:0,target:1},
+ {id:'speed-60',group:'speed',icon:'🚀',name:'Blesk',desc:'Denní výzva pod 1 minutu',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<60000?1:0,target:1},
+
+ {id:'rescue-1',group:'rescue',icon:'🛟',name:'Ne dnes, série!',desc:'Poprvé zachraň sérii',value:s=>s.rescuedDays||0,target:1},
+ {id:'rescue-3',group:'rescue',icon:'🚒',name:'Záchranář',desc:'Zachraň sérii 3×',value:s=>s.rescuedDays||0,target:3},
+ {id:'rescue-5',group:'rescue',icon:'🐈',name:'Devět životů',desc:'Zachraň sérii 5×',value:s=>s.rescuedDays||0,target:5},
+ {id:'rescue-10',group:'rescue',icon:'🧯',name:'Hasící přístroj',desc:'Zachraň sérii 10×',value:s=>s.rescuedDays||0,target:10}
 ];
 ACHIEVEMENTS.forEach(a=>a.test=s=>a.value(s)>=a.target);
+function achievementCard(a,stats){const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}
+function renderAchievements(stats){return ACHIEVEMENT_GROUPS.map(([id,label])=>{const list=ACHIEVEMENTS.filter(a=>a.group===id);if(!list.length)return '';const earned=list.filter(a=>a.test(stats)).length;return `<section class="achievement-group"><div class="achievement-group-head"><strong>${label}</strong><span>${earned}/${list.length}</span></div><div class="achievement-grid">${list.map(a=>achievementCard(a,stats)).join('')}</div></section>`}).join('')}
 const SHARE_URL='https://proplet-nine.vercel.app/';
 const STORE_KEY='proplet-v2-state';
 const PROFILE_KEY='proplet-v2-profile';
@@ -286,18 +358,18 @@ async function finishRescue(passed){
 function failRescue(){finishRescue(false)}
 
 function freeProgress(diff){
- const s=getState(),list=sortedFreeBank(diff),total=list.length,done=list.filter(p=>s.completed[`free:${p.id}`]).length,resume=resumableFreePuzzle(diff,list),pct=total?Math.round(done/total*100):0;
- return {list,total,done,resume,pct};
+ const s=getState(),list=sortedFreeBank(diff),total=list.length,done=list.filter(p=>s.completed[`free:${p.id}`]).length,resume=resumableFreePuzzle(diff,list),nextUnsolved=list.find(p=>!s.completed[`free:${p.id}`])||null,pct=total?Math.round(done/total*100):0;
+ return {list,total,done,resume,nextUnsolved,pct};
 }
 function renderQuickPlay(){
  const root=$('#quickPlayGrid');if(!root||!puzzleDB)return;
- root.innerHTML=Object.entries(DIFF).map(([key,d])=>{const q=freeProgress(key),status=q.resume?'Pokračovat':q.done===q.total&&q.total?'Hotovo · hrát znovu':`${q.done}/${q.total}`;return `<button class="quick-game" data-quick-free="${key}" data-diff="${key}"><span class="quick-game-icon">${d.icon}</span><span class="quick-game-copy"><strong>${d.label}</strong><small>${status}</small><i><b style="width:${q.pct}%"></b></i></span><span class="quick-game-arrow">›</span></button>`}).join('');
+ root.innerHTML=Object.entries(DIFF).map(([key,d])=>{const q=freeProgress(key),nextLevel=Number((q.resume||q.nextUnsolved)?.meta?.level)||null,status=q.resume?`Pokračovat${nextLevel?` · úroveň ${nextLevel}`:''}`:q.done===q.total&&q.total?'Hotovo · hrát znovu':`Další${nextLevel?` · úroveň ${nextLevel}`:''}`;return `<button class="quick-game" data-quick-free="${key}" data-diff="${key}"><span class="quick-game-icon">${d.icon}</span><span class="quick-game-copy"><strong>${d.label}</strong><small>${status}</small><i><b style="width:${q.pct}%"></b></i></span><span class="quick-game-arrow">›</span></button>`}).join('');
  $$('[data-quick-free]').forEach(b=>b.onclick=()=>startFree(b.dataset.quickFree));
 }
 
 function renderFree(){
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
-  const {total,done,pct,resume}=freeProgress(key),next=Math.min(done+1,total),progressLabel=resume?'ROZEHRÁNO':(done===total?`${done}/${total} HOTOVO`:`ÚROVEŇ ${next} Z ${total}`);
+  const {total,done,pct,resume,nextUnsolved}=freeProgress(key),nextLevel=Number((resume||nextUnsolved)?.meta?.level)||null,progressLabel=resume?`ROZEHRÁNO${nextLevel?` · ÚROVEŇ ${nextLevel}`:''}`:(done===total?`${done}/${total} HOTOVO`:`ÚROVEŇ ${nextLevel||1} Z ${total}`);
   return `<article class="difficulty-card card" data-diff="${key}"><div class="difficulty-copy"><div class="difficulty-title"><span class="difficulty-left-icon">${d.icon}</span><div><span class="eyebrow">${progressLabel}</span><h2>${d.label}</h2></div></div><p class="muted">${d.desc}</p><span class="xp-chip">+${d.xp} XP za novou úroveň</span><div class="progress-line"><span style="width:${pct}%"></span></div><div class="difficulty-actions"><button class="secondary-btn play-next-btn" data-play-free="${key}">${resume?'Pokračovat':(done===total?'Hrát znovu':'Hraj další úroveň')}</button><button class="text-btn played-levels-btn" data-played-levels="${key}" ${done?'':'disabled'}>▦ Odehrané úrovně${done?` · ${done}`:''}</button></div></div><div class="difficulty-progress" data-play-free="${key}" role="button" tabindex="0" aria-label="${resume?'Pokračovat v rozehrané':'Hrát'} ${d.label}" style="--progress:${pct}%"><div><strong>${done}</strong><small>/${total}</small></div><span>›</span></div></article>`
  }).join('');
  $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
@@ -359,7 +431,7 @@ function submitPath(){
  else{if(word.length>=2)g.wrongAttempts=(g.wrongAttempts||0)+1;message(word.length<3?'Zkus delší slovo.':`„${word}“ do tohohle Propletu nezapadá.`,'bad');fx('wrong')}
  g.path=[];renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';if(g.mode!=='rescue')saveGameProgress();if(g.found.length===g.puzzle.answers.length){if(g.mode==='rescue')finishRescue(true);else finishGame();}
 }
-function resetGame(){const g=currentGame;if(g.mode==='rescue')return;const usedHints=g.hints||0;g.found=[];g.used=new Map();g.path=[];g.moves=0;g.start=performance.now();g.baseElapsedMs=0;g.elapsedMs=0;g.lastFound=[];g.hints=usedHints;g.cleanSolve=usedHints===0;message(usedHints?'Plocha čistá. Jedeme znovu. Čisté řešení už ale zpátky není.':'Plocha čistá. Jedeme znovu.');renderGameBoard();renderGameHUD();saveGameProgress()}
+function resetGame(){const g=currentGame;if(g.mode==='rescue')return;const usedHints=g.hints||0,elapsed=gameElapsed(g);g.found=[];g.used=new Map();g.path=[];g.baseElapsedMs=elapsed;g.start=performance.now();g.elapsedMs=elapsed;g.lastFound=[];g.hints=usedHints;g.cleanSolve=usedHints===0;message(usedHints?'Plocha čistá. Čas, tahy i nápovědy běží dál. Čisté řešení už zpátky není.':'Plocha čistá. Čas i tahy běží dál — pořád je to stejný pokus.');renderGameBoard();renderGameHUD();saveGameProgress()}
 function openHintModal(){if(!currentGame||currentGame.mode==='rescue'||currentGame.finished)return;$('#hintModal').classList.remove('hidden')}
 function pickHintTarget(){return currentGame.puzzle.answers.map((a,i)=>({a,i})).filter(x=>!currentGame.found.some(f=>f.answerIndex===x.i)).sort((x,y)=>(x.a.turns||0)-(y.a.turns||0)||x.a.word.length-y.a.word.length)[0]}
 function clearHintTrace(){$$('.cell.hint,.cell.hint-route,.cell.hint-full').forEach(c=>{c.classList.remove('hint','hint-route','hint-full');delete c.dataset.hintOrder})}
@@ -372,13 +444,13 @@ function drawPaths(){
 }
 
 async function finishGame(){
- const g=currentGame;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();const key=challengeKey(g.mode,g.puzzle,g.dailyDate),state=getState(),old=state.completed[key];
+ const g=currentGame;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
  const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString()};
  if(!old)state.completed[key]=rec;if(state.inProgress?.[key])delete state.inProgress[key];saveState(state);queueResult(rec);
- const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null;
+ const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=ACHIEVEMENTS.filter(a=>!a.test(statsBefore)&&a.test(stats));
  $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';$('#winTitle').textContent=g.mode==='daily'?'Dnešní Proplet je doma!':'Propleteno!';const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
  $('#winXp').textContent=old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':`+${rec.points} XP`;const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`;if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
- $('#newBadgeBox').classList.toggle('hidden',!newBadge);if(newBadge)$('#newBadgeBox').innerHTML=`<span class="emoji">${newBadge.icon}</span><strong> Nový odznak: ${newBadge.name}</strong><div>${countCz(newBadge.days,'den','dny','dní')} v řadě</div>`;
+ const celebrations=[];if(newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}$('#newBadgeBox').classList.toggle('hidden',!celebrations.length);$('#newBadgeBox').innerHTML=celebrations.join('');
  $('#winShareBtn').classList.remove('hidden');$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.mode==='daily'?'Zpět na dnešek':'Zpět do menu';$('#winPrimaryBtn').textContent=g.mode==='daily'?'Vybrat další hru':'Hraj další úroveň';$('#winModal').classList.remove('hidden');renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  const sync=syncQueue({announce:false});if(g.mode==='free')sync.finally(()=>loadWinLevelLeaderboard(g.puzzle,rec));else $('#levelLeaderboardBox').classList.add('hidden');
 }
@@ -526,7 +598,7 @@ function renderProfile(){
  $('#levelRoadmap').innerHTML=LEVELS.map((l,i)=>`<div class="level-step ${points>=l.xp?'earned':''} ${i===level.index-1?'current':''}"><span class="level-num">${i+1}</span><span class="level-step-icon">${l.icon}</span><strong>${l.name}</strong><small>${l.xp.toLocaleString('cs-CZ')} XP</small></div>`).join('');
  $('#profileBadges').innerHTML=BADGES.map(b=>`<div class="profile-badge ${longest>=b.days?'earned':''}"><span class="emoji">${b.icon}</span><strong>${b.name}</strong><small>${countCz(b.days,'den','dny','dní')} v řadě</small></div>`).join('');
  updatePushUI();
- $('#achievementGrid').innerHTML=ACHIEVEMENTS.map(a=>{const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}).join('');renderSettings();
+ $('#achievementGrid').innerHTML=renderAchievements(stats);renderSettings();
 }
 
 async function saveAvatar(avatar){

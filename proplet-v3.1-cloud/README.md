@@ -1,14 +1,13 @@
-# Proplet v3.9
+# Proplet v3.10
 
-Česká slovní logická hra s Denní výzvou, 400 volnými úrovněmi, sériemi, XP, týmovým pořadím a Ligou týmů.
+Česká PWA slovní hra Proplet.
 
-Aktuální release: **v3.9 — Profily & týmy**.
+Aktuální release: **v3.10 — Úspěchy & férový postup**.
 
-Hlavní změny v3.9:
-- odhlášení a střídání hráčů na jednom zařízení,
-- avatary,
-- jasný model Tým / PIN týmu / osobní heslo hráče,
-- oprava responsive herní obrazovky,
-- první dokončený pokus je jediný soutěžní výsledek úrovně.
+Hlavní změny:
+- 66 úspěchů v tematických sbírkách,
+- oslava nových úspěchů na výsledkové obrazovce,
+- oprava posloupnosti Free úrovní,
+- Reset už nikdy nerestartuje čas ani tahy.
 
-Pro aktualizaci existujícího nasazení viz `UPDATE_V3_9_CZ.md`.
+Nasazení: `UPDATE_V3_10_CZ.md`.

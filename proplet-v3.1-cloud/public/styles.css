@@ -272,3 +272,10 @@ body.playing .app-header,body.playing .app-footer,body.playing .bottom-nav{displ
 .level-detail-result small{display:block;margin-top:4px;color:var(--muted);font-size:9px;line-height:1.3}
 
 .level-board-head small{grid-column:1/-1;display:block;margin-top:2px;color:var(--muted);font-size:8px;font-weight:650}
+
+
+/* v3.10 — achievement collections + result celebrations */
+.achievement-groups{display:grid;gap:14px;margin-top:11px}
+.achievement-group{min-width:0}.achievement-group-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 7px}.achievement-group-head strong{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#5d576b}.achievement-group-head span{font-size:9px;font-weight:900;color:var(--muted);background:#f0ecf5;border-radius:99px;padding:3px 7px}.achievement-group .achievement-grid{margin-top:0}
+.new-badge-box{display:grid;gap:7px}.unlock-title{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.045em;color:#5e51bd;margin:2px 0}.unlock-row{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:center;text-align:left;padding:8px 9px;border-radius:13px;background:rgba(255,255,255,.72);border:1px solid rgba(121,102,195,.13)}.unlock-row .emoji{font-size:25px}.unlock-row strong,.unlock-row small{display:block}.unlock-row strong{font-size:11px}.unlock-row small{font-size:9px;color:var(--muted);margin-top:1px}.achievement-unlock{background:linear-gradient(135deg,#fff9df,#f4efff);border-color:#e6dcae}
+@media(max-width:390px){.achievement-group .achievement-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
