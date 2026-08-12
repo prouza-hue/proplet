@@ -492,10 +492,12 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.11.0",
+        "version": "3.12.0",
         "vocabularyVersion": pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
+        "freeTieredFromVersion": pdata.get("freeTieredFromVersion"),
+        "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
@@ -553,7 +555,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.11.0",
+        "version": "3.12.0",
     }
 
 

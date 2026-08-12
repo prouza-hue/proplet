@@ -1,17 +1,18 @@
-# Proplet v3.10
+# Proplet v3.12
 
 Česká PWA slovní hra Proplet.
 
-Aktuální release: **v3.10 — Úspěchy & férový postup**.
+Aktuální release: **v3.12 — Přestavba Free banky**.
 
-Hlavní změny:
-- 66 úspěchů v tematických sbírkách,
-- oslava nových úspěchů na výsledkové obrazovce,
-- oprava posloupnosti Free úrovní,
-- Reset už nikdy nerestartuje čas ani tahy.
+Hlavní obsahové změny:
 
-Nasazení: `UPDATE_V3_10_CZ.md`.
+- ručně kurátorovaný slovník A–D z v3.11 je nyní použit i pro bezpečně nehrané Free úrovně,
+- 275 Free úrovní bylo přestavěno,
+- 125 historicky exponovaných úrovní zůstává zmrazených,
+- nový bankovní anti-repeat systém blokuje opakování odpovědí v předchozích osmi úrovních,
+- všech 275 nových úrovní prošlo nezávislou kontrolou lokální i globální unikátnosti.
 
-## v3.11 — Tierovaný český slovník
+Nasazení: `UPDATE_V3_12_CZ.md`.
 
-Nová answer vocabulary A–D je v `data/answer_tiers.json`. Generátor ji používá jako jediný zdroj zamýšlených odpovědí; `data/source_cs_50k.txt` zůstává validator-only. Podrobnosti viz `VOCABULARY_DESIGN_V3_11_CZ.md` a `VOCABULARY_AUDIT_V3_11_CZ.md`.
+Dokumentace slovníku: `VOCABULARY_DESIGN_V3_11_CZ.md`.
+Audit v3.12: `FREE_BANK_AUDIT_V3_12_CZ.md`.
