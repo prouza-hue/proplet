@@ -36,6 +36,7 @@ const PROFILE_KEY='proplet-v2-profile';
 const QUEUE_KEY='proplet-v2-sync-queue';
 const SETTINGS_KEY='proplet-v3-settings';
 const ONBOARD_KEY='proplet-v3-4-onboarding';
+const ACCOUNT_NUDGE_KEY='proplet-v3-5-account-nudge';
 
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -53,6 +54,8 @@ let onboardingStep=0;
 let tutorialState={dragging:false,path:[],done:false};
 let pendingSW=null;
 let winFeedbackSent=false;
+let pendingPostWinAction=null;
+let profileModalFromNudge=false;
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
 function getState(){try{return {...blankState(),...JSON.parse(localStorage.getItem(STORE_KEY)||'{}')}}catch{return blankState()}}
@@ -135,11 +138,17 @@ function initNavigation(){
  history.replaceState({proplet:true,screen:initial},'',location.href);applyScreen(initial);
  window.addEventListener('popstate',e=>{
   const modal=openTransientModal();
-  if(modal){modal.classList.add('hidden');history.pushState({proplet:true,screen:currentScreen},'',location.href);return}
+  if(modal){
+   if(modal.id==='winModal'&&shouldOfferAccountNudge())maybeOfferAccountNudge('menu');
+   else if(modal.id==='accountNudgeModal')dismissAccountNudge();
+   else if(modal.id==='profileModal'&&profileModalFromNudge){modal.classList.add('hidden');resumeAfterAccountNudge()}
+   else modal.classList.add('hidden');
+   history.pushState({proplet:true,screen:currentScreen},'',location.href);return
+  }
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['winModal','profileModal','passwordModal','hintModal','rescueOfferModal','onboardingModal','wordReportModal'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['winModal','accountNudgeModal','profileModal','passwordModal','hintModal','rescueOfferModal','onboardingModal','wordReportModal'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return transientModals().find(el=>!el.classList.contains('hidden'))||null}
 function closeTransientModals(){transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
@@ -287,7 +296,7 @@ function drawPaths(){
 }
 
 async function finishGame(){
- const g=currentGame;g.finished=true;g.elapsedMs=gameElapsed(g);stopTimer();const key=challengeKey(g.mode,g.puzzle,g.dailyDate),state=getState(),old=state.completed[key];
+ const g=currentGame;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();const key=challengeKey(g.mode,g.puzzle,g.dailyDate),state=getState(),old=state.completed[key];
  const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString()};
  if(!old){state.completed[key]=rec}else if(g.mode==='free'){state.completed[key]={...old,elapsedMs:Math.min(old.elapsedMs,rec.elapsedMs),moves:Math.min(old.moves,rec.moves),hintsUsed:Math.min(old.hintsUsed??99,rec.hintsUsed),wrongAttempts:Math.min(old.wrongAttempts??999,rec.wrongAttempts),maxHintLevel:Math.min(old.maxHintLevel??3,rec.maxHintLevel),cleanSolve:old.cleanSolve===true||rec.cleanSolve===true}}if(state.inProgress?.[key])delete state.inProgress[key];saveState(state);queueResult(rec);
  const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats();const newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null;
@@ -296,8 +305,32 @@ async function finishGame(){
  $('#newBadgeBox').classList.toggle('hidden',!newBadge);if(newBadge)$('#newBadgeBox').innerHTML=`<span class="emoji">${newBadge.icon}</span><strong> Nový odznak: ${newBadge.name}</strong><div>${newBadge.days} dní v řadě</div>`;
  $('#winShareBtn').classList.toggle('hidden',g.mode!=='daily');$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.mode==='daily'?'Zpět na dnešek':'Zpět do menu';$('#winPrimaryBtn').textContent=g.mode==='daily'?'Vybrat další hru':'Hraj další úroveň';$('#winModal').classList.remove('hidden');renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();syncQueue({announce:false});
 }
-function closeWinAndContinue(){const mode=currentGame?.mode,diff=currentGame?.puzzle.difficulty;$('#winModal').classList.add('hidden');if(mode==='free')startFree(diff);else if(mode==='rescue')nav('daily',{replace:true});else nav('free',{replace:true})}
-function closeWinToMenu(){const mode=currentGame?.mode;$('#winModal').classList.add('hidden');nav(mode==='daily'||mode==='rescue'?'daily':'free',{replace:currentScreen==='game'})}
+function shouldOfferAccountNudge(){
+ if(getProfile()?.token||currentGame?.mode==='rescue'||currentGame?.justCompleted!==true)return false;
+ return !localStorage.getItem(ACCOUNT_NUDGE_KEY);
+}
+function performPostWinAction(action){
+ const mode=currentGame?.mode,diff=currentGame?.puzzle?.difficulty;
+ if(action==='continue'){if(mode==='free')startFree(diff);else if(mode==='rescue')nav('daily',{replace:true});else nav('free',{replace:true});return}
+ nav(mode==='daily'||mode==='rescue'?'daily':'free',{replace:currentScreen==='game'});
+}
+function maybeOfferAccountNudge(action){
+ if(!shouldOfferAccountNudge())return false;
+ localStorage.setItem(ACCOUNT_NUDGE_KEY,JSON.stringify({shownAt:new Date().toISOString()}));
+ pendingPostWinAction=action;
+ $('#winModal').classList.add('hidden');$('#accountNudgeModal').classList.remove('hidden');
+ return true;
+}
+function resumeAfterAccountNudge(){
+ const action=pendingPostWinAction;pendingPostWinAction=null;profileModalFromNudge=false;
+ if(action)performPostWinAction(action);
+}
+function openAccountFromNudge(mode){
+ $('#accountNudgeModal').classList.add('hidden');profileModalFromNudge=true;openProfileModal(mode);
+}
+function dismissAccountNudge(){$('#accountNudgeModal').classList.add('hidden');resumeAfterAccountNudge()}
+function closeWinAndContinue(){if(maybeOfferAccountNudge('continue'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
+function closeWinToMenu(){if(maybeOfferAccountNudge('menu'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
 function showDailyResult(date,rec){
  const p=dailyPuzzleFor(date);stopTimer();currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};
  $('#winBadge').textContent='☀️';$('#winTitle').textContent='Dnešní Daily už máš hotovou';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${rec.moves} tahů · ${DIFF[p.difficulty].label}`;$('#winXp').textContent='+100 XP';const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Clean solve · bez nápovědy':(hints?`💡 ${hints}× nápověda`:'Výsledek z dřívější verze');if(!knownClean)wc.classList.add('hinted');
@@ -381,6 +414,7 @@ async function saveNewProfile(){
   saveProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});
   $('#profileModal').classList.add('hidden');
   await syncQueue({announce:true});renderProfile();renderDaily();renderFree();renderLeaderboard();
+  if(profileModalFromNudge)resumeAfterAccountNudge();
  }catch(e){$('#profileFormError').textContent=e.message}
 }
 function openPasswordModal(){
@@ -509,7 +543,8 @@ function maybeOfferRescue(){
 function bind(){
  $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));$('#playDailyBtn').onclick=startDaily;$('#shareDailyBtn').onclick=()=>{const date=pragueDateISO(),rec=getState().completed[`daily:${date}`];currentGame={puzzle:dailyPuzzleFor(date),mode:'daily',dailyDate:date,elapsedMs:rec?.elapsedMs,moves:rec?.moves,finished:true};shareDaily()};
  $('#backFromGame').onclick=goBackFromGame;$('#undoBtn').onclick=undo;$('#resetBtn').onclick=resetGame;$('#hintBtn').onclick=openHintModal;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;
- $('#closeProfileModal').onclick=()=>$('#profileModal').classList.add('hidden');$('#skipProfileBtn').onclick=()=>$('#profileModal').classList.add('hidden');$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');
+ $('#closeProfileModal').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromNudge)resumeAfterAccountNudge() };$('#skipProfileBtn').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromNudge)resumeAfterAccountNudge() };$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');
+ $('#nudgeCreateBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeLoginBtn').onclick=()=>openAccountFromNudge('login');$('#nudgeSkipBtn').onclick=dismissAccountNudge;
  $('#closePasswordModal').onclick=()=>$('#passwordModal').classList.add('hidden');$('#savePasswordBtn').onclick=savePassword;
  $('#closeHintModal').onclick=()=>$('#hintModal').classList.add('hidden');$$('[data-hint-level]').forEach(b=>b.onclick=()=>applySmartHint(+b.dataset.hintLevel));
  $('#rescueBtn').onclick=openRescueOffer;$('#confirmRescueBtn').onclick=beginRescue;$('#cancelRescueBtn').onclick=()=>$('#rescueOfferModal').classList.add('hidden');
