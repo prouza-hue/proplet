@@ -1,0 +1,55 @@
+{
+  "easy": {
+    "puzzles": 10,
+    "seconds": 0.12,
+    "answers": 64,
+    "uniqueWords": 59,
+    "repeatRate": 0.078,
+    "tiers": {
+      "A": 64
+    }
+  },
+  "medium": {
+    "puzzles": 10,
+    "seconds": 0.22,
+    "answers": 76,
+    "uniqueWords": 72,
+    "repeatRate": 0.053,
+    "tiers": {
+      "A": 27,
+      "B": 49
+    }
+  },
+  "hard": {
+    "puzzles": 10,
+    "seconds": 4.06,
+    "answers": 98,
+    "uniqueWords": 86,
+    "repeatRate": 0.122,
+    "tiers": {
+      "C": 66,
+      "B": 32
+    }
+  },
+  "hardcore": {
+    "puzzles": 3,
+    "seconds": 14.38,
+    "answers": 39,
+    "uniqueWords": 36,
+    "repeatRate": 0.077,
+    "tiers": {
+      "D": 21,
+      "C": 18
+    }
+  },
+  "rescue": {
+    "puzzles": 10,
+    "seconds": 0.06,
+    "answers": 44,
+    "uniqueWords": 41,
+    "repeatRate": 0.068,
+    "tiers": {
+      "A": 44
+    }
+  }
+}

@@ -487,10 +487,15 @@ def home():
 @app.get("/api/health")
 def health():
     puzzle_file = PUZZLES_PATH.exists()
+    pdata = load_puzzles() if puzzle_file else {}
     base = {
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
+        "version": "3.11.0",
+        "vocabularyVersion": pdata.get("vocabularyVersion"),
+        "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
+        "tieredDailyFrom": pdata.get("tieredDailyFrom"),
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
@@ -548,7 +553,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.10.1",
+        "version": "3.11.0",
     }
 
 

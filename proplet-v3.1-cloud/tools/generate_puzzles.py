@@ -2,7 +2,7 @@
 """Generate Proplet puzzle banks and validate uniqueness with an exact-cover solver.
 
 Dictionary source: hermitdave/FrequencyWords Czech 50k list (CC BY-SA 4.0).
-The runtime game ships a filtered ~12k-word validator lexicon plus a curated answer pool.
+The runtime game ships a filtered ~12k-word validator lexicon plus a manually curated A–D answer vocabulary.
 """
 from __future__ import annotations
 
@@ -18,13 +18,14 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "source_cs_50k.txt"
 WORDS_OUT = ROOT / "data" / "words.txt"
+ANSWER_TIERS = ROOT / "data" / "answer_tiers.json"
 PUZZLES_PUBLIC_OUT = ROOT / "public" / "puzzles.json"
 PUZZLES_SERVER_OUT = ROOT / "data" / "puzzles.json"
 
 CZ_RE = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.I)
 BAD_SUBSTRINGS = (
-    "fuck", "shit", "porn", "sex", "kurev", "kurv", "píč", "pic", "kokot",
-    "hovn", "prdel", "mrdat", "šukat", "sukat", "čurák", "curak", "nacist", "hitler",
+    "fuck", "shit", "porn", "sex", "kurev", "kurv", "píč", "kokot",
+    "hovno", "prdel", "mrdat", "šukat", "sukat", "čurák", "curak", "nacist", "hitler",
 )
 FUNCTION_WORDS = set("""
 aby abych abys abyso abyste ale ani ano asi bez bude budou byl byla byli bylo byly bych bychom
@@ -44,54 +45,36 @@ jan jana petr petra pavel martin tomáš tomas jiří jiri josef josefka karel e
 lucie veronika martin ondřej ondrej michal david jakub lukáš lukas
 """.split())
 
-# Curated, ordinary Czech answer vocabulary. The large frequency dictionary is still used by
-# the solver to reject boards with alternative solutions; this pool keeps intended answers nice.
-CURATED = """
-auto autobus vlak metro loď lodě kolo kočár cesta silnice most tunel letiště výlet mapa směr zatáčka
-město vesnice ulice náměstí park zahrada hřiště škola školka třída lavice tabule sešit kniha dopis pero
-tužka pastelka guma pravítko batoh taška kapsa klíč zámek dveře okno střecha pokoj kuchyně koupelna
-ložnice sklep půda balkon stůl židle křeslo gauč postel deka polštář skříň police lampa koberec obraz
-hrnek sklenice talíř miska lžíce vidlička nůž ubrousek láhev konvice pánev hrnec trouba sporák lednice
-jídlo oběd večeře snídaně svačina chléb rohlík houska máslo sýr šunka vejce mléko jogurt tvaroh med
-cukr sůl pepř mouka rýže těsto pizza salát polévka omáčka maso kuře ryba párek dort koláč sušenka
-čokoláda bonbon zmrzlina ovoce jablko hruška švestka třešeň jahoda malina borůvka banán pomeranč
-citron meloun hrozny zelenina mrkev rajče paprika okurka cibule česnek brambor hrášek fazole zelí
-strom keř tráva květ kytka růže tulipán list větev kořen les louka pole hora kopec skála kámen písek
-řeka potok jezero rybník moře pláž ostrov břeh vlna voda led sníh déšť bouřka mrak duha slunce měsíc
-hvězda nebe vítr vzduch oheň kouř stín světlo ráno večer noc den týden měsíc rok jaro léto podzim zima
-pes kočka kocour štěně kotě myš králík křeček morče kůň kráva ovce koza prase slepice kohout kachna
-husa pták kos sýkora vrabec holub sova orel vrána čáp labuť racek papoušek ryba kapr štika žralok
-delfín velryba chobotnice medúza krab želva žába had ještěrka motýl včela vosa mravenec brouk pavouk
-lev tygr medvěd vlk liška jelen srna zajíc opice slon žirafa zebra panda klokan velbloud
-hlava vlasy čelo oko oči nos ucho ústa zub jazyk krk rameno ruka dlaň prst nehet břicho záda noha
-koleno pata chodidlo srdce mozek tělo tvář vousy úsměv hlas dech zdraví síla bolest radost smutek
-rodina máma táta mamka taťka babička děda sestra bratr dítě kluk holka kamarád soused učitel doktor
-hráč tým parta host člověk lidé jméno věk práce úkol nápad plán cíl chyba pomoc rada otázka odpověď
-slovo věta příběh pohádka vtip zpráva tajemství pravda lež sen přání štěstí smůla strach klid odvaha
-láska smích pláč nálada chuť vůně zvuk hudba píseň film seriál hra karty kostka míč branka gól závod
-sport fotbal hokej tenis squash lyže běh skok plavání kolo lezení výhra prohra bod cena medaile pohár
-telefon mobil tablet počítač monitor myš klávesa kabel baterie nabíječka kamera fotka video rádio hodiny
-barva červená modrá zelená žlutá bílá černá šedá hnědá růžová fialová zlatá stříbrná světlý tmavý
-velký malý dlouhý krátký vysoký nízký široký úzký těžký lehký rychlý pomalý nový starý mladý dobrý
-špatný hezký krásný chytrý veselý smutný tichý hlasitý teplý studený horký suchý mokrý čistý špinavý
-měkký tvrdý sladký slaný kyselý hořký hladový plný prázdný volný silný slabý snadný těžký blízký
-daleký první druhý třetí poslední pravý levý horní dolní rovný křivý kulatý ostrý tupý
-běžet chodit jet letět plavat lézt skákat stát sedět ležet spát vstát jíst pít vařit péct krájet míchat
-hrát kopat házet chytat držet nést táhnout tlačit otevřít zavřít hledat najít vidět koukat slyšet
-mluvit říkat číst psát kreslit malovat učit počítat myslet vědět znát chápat zkusit začít končit
-vyhrát prohrát koupit prodat dát vzít poslat přinést odnést přijít odejít vrátit čekat potkat volat
-smát se plakat bavit těšit přát chtít mít být dělat umět moct muset růst padat svítit foukat pršet
-lesní horský mořský vodní domácí školní dětský český letní zimní ranní večerní denní noční barevný
-papír karton dřevo kov sklo plast látka vlna bavlna provaz nit jehla nůžky lepidlo krabice balík dárek
-peníze mince bankovka účet obchod trh cena sleva pokladna lístek vstupenka pas kufr hotel stan chata
-hrad zámek věž kostel most přístav farma zoo kino divadlo muzeum knihovna restaurace kavárna cukrárna
-příroda krajina svět země planeta vesmír raketa robot stroj motor kolo volant brzda světlo semafor
-číslo nula jedna dva tři čtyři pět šest sedm osm devět deset sto tisíc pár půl celek část řada kruh
-čtverec trojúhelník čára bod roh strana střed začátek konec sever jih východ západ nahoře dole vlevo
-vpravo spolu zvlášť doma venku uvnitř kolem blízko daleko brzy pozdě dnes zítra včera chvíle minuta
-hodina pondělí úterý středa čtvrtek pátek sobota neděle leden únor březen duben květen červen srpen
-září říjen listopad prosinec prázdniny víkend dovolená narozeniny oslava návštěva výprava dobrodružství
-""".split()
+# Intended answers live in data/answer_tiers.json.  The FrequencyWords corpus below is
+# deliberately *validator-only*: it helps the exact-cover solver discover accidental Czech
+# words on a board, but it is never allowed to leak subtitle/dialogue forms into target answers.
+
+VOCAB_POLICIES = {
+    "rescue": {
+        "allowed": ("A",), "weights": {"A": 1},
+    },
+    "easy": {
+        "allowed": ("A",), "weights": {"A": 1},
+    },
+    "medium": {
+        "allowed": ("A", "B"), "weights": {"A": 2, "B": 5},
+        "min_fraction": {"B": 0.45},
+    },
+    "hard": {
+        "allowed": ("B", "C"), "weights": {"B": 2, "C": 5},
+        "min_fraction": {"C": 0.45},
+    },
+    "hardcore": {
+        "allowed": ("C", "D"), "weights": {"C": 2, "D": 5},
+        "min_fraction": {"D": 0.40},
+    },
+    # Daily is deliberately family-wide: mostly B, with easy anchors from A and a restrained C share.
+    "daily": {
+        "allowed": ("A", "B", "C"), "weights": {"A": 3, "B": 5, "C": 1},
+        "min_fraction": {"B": 0.35}, "max_fraction": {"C": 0.25},
+    },
+}
+
 
 
 def clean_word(w: str) -> str | None:
@@ -103,6 +86,56 @@ def clean_word(w: str) -> str | None:
     if w in NAME_BLOCK:
         return None
     return w
+
+
+def load_answer_tiers() -> tuple[dict[str, list[str]], dict[str, str]]:
+    payload = json.loads(ANSWER_TIERS.read_text(encoding="utf-8"))
+    raw_tiers = payload.get("tiers") or {}
+    tiers: dict[str, list[str]] = {}
+    tier_of: dict[str, str] = {}
+    for tier in ("A", "B", "C", "D"):
+        words: list[str] = []
+        for raw in raw_tiers.get(tier, []):
+            word = clean_word(str(raw))
+            if not word or not 4 <= len(word) <= 10:
+                raise RuntimeError(f"Invalid Tier {tier} answer: {raw!r}")
+            if word in FUNCTION_WORDS or word in NAME_BLOCK:
+                raise RuntimeError(f"Blocked Tier {tier} answer: {word}")
+            if word in tier_of:
+                raise RuntimeError(f"Answer appears in both Tier {tier_of[word]} and {tier}: {word}")
+            tier_of[word] = tier
+            words.append(word)
+        tiers[tier] = words
+    if any(len(tiers[t]) < 40 for t in tiers):
+        raise RuntimeError(f"Answer tiers unexpectedly small: { {t: len(v) for t, v in tiers.items()} }")
+    return tiers, tier_of
+
+
+def build_answer_pools(tiers: dict[str, list[str]]) -> dict[str, list[str]]:
+    pools: dict[str, list[str]] = {}
+    for key, policy in VOCAB_POLICIES.items():
+        weighted: list[str] = []
+        for tier in policy["allowed"]:
+            weighted.extend(tiers[tier] * int(policy.get("weights", {}).get(tier, 1)))
+        pools[key] = weighted
+    return pools
+
+
+def tier_mix_ok(words: list[str], tier_of: dict[str, str], policy: dict) -> bool:
+    if not words:
+        return False
+    counts = Counter(tier_of[w] for w in words)
+    allowed = set(policy.get("allowed") or ())
+    if any(t not in allowed for t in counts):
+        return False
+    n = len(words)
+    for tier, fraction in (policy.get("min_fraction") or {}).items():
+        if counts[tier] + 1e-9 < n * float(fraction):
+            return False
+    for tier, fraction in (policy.get("max_fraction") or {}).items():
+        if counts[tier] - 1e-9 > n * float(fraction):
+            return False
+    return True
 
 
 def load_frequency_words() -> list[tuple[str, int]]:
@@ -301,7 +334,7 @@ def path_turn_metrics(path: list[int], cols: int) -> tuple[int, int]:
     return turns, longest
 
 
-def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int, max_short_words: int | None = None) -> list[str] | None:
+def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int, max_short_words: int | None = None, *, tier_of: dict[str, str] | None = None, policy: dict | None = None) -> list[str] | None:
     by_len: dict[int, list[str]] = defaultdict(list)
     for w in pool:
         if min_len <= len(w) <= max_len:
@@ -334,7 +367,7 @@ def choose_words(total: int, count: int, rng: random.Random, pool: list[str], mi
             w = rng.choice(choices)
             used.add(w)
             chosen.append(w)
-        if ok:
+        if ok and (tier_of is None or policy is None or tier_mix_ok(chosen, tier_of, policy)):
             return chosen
     return None
 
@@ -479,6 +512,8 @@ def create_puzzle(
     puzzle_id: str,
     *,
     variant_index: int | None = None,
+    tier_of: dict[str, str] | None = None,
+    vocab_key: str | None = None,
 ) -> dict:
     rng = random.Random(seed)
     spec = spec_for(difficulty, variant_index, rng)
@@ -487,7 +522,8 @@ def create_puzzle(
     for attempt in range(1600):
         cells = rng.randint(*spec["cells"])
         count = rng.randint(*spec["words"])
-        words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"], spec.get("max_short_words"))
+        policy = VOCAB_POLICIES.get(vocab_key or difficulty)
+        words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"], spec.get("max_short_words"), tier_of=tier_of, policy=policy)
         if words is None:
             continue
         rng.shuffle(words)
@@ -569,6 +605,8 @@ def create_puzzle(
                 "curvyWords": curvy,
                 "spiralWords": spiral_like,
                 "pathStyle": spec["style"],
+                "vocabTiers": dict(Counter(tier_of[w] for w in words)) if tier_of else None,
+                "vocabPolicy": vocab_key or difficulty,
             },
         }
     raise RuntimeError(f"Could not generate {difficulty} puzzle {puzzle_id} from seed {seed}")
@@ -589,23 +627,13 @@ def main():
     args = ap.parse_args()
 
     freq = load_frequency_words()
-    dictionary = [w for w, _ in freq if w not in FUNCTION_WORDS]
-    curated = []
-    seen = set()
-    for raw in CURATED:
-        w = clean_word(raw)
-        if not w or not 3 <= len(w) <= 10 or w in FUNCTION_WORDS or w in seen:
-            continue
-        seen.add(w)
-        curated.append(w)
-    for w in curated:
-        if w not in dictionary:
-            dictionary.append(w)
-    dictionary = dictionary[:12000] + [w for w in curated if w not in dictionary[:12000]]
+    tiers, tier_of = load_answer_tiers()
+    answer_pools = build_answer_pools(tiers)
+    all_answers = [w for tier in ("A", "B", "C", "D") for w in tiers[tier]]
 
-    fallback = [w for w, _ in freq[250:6500]
-                if w not in FUNCTION_WORDS and w not in NAME_BLOCK and 4 <= len(w) <= 9]
-    answer_pool = curated * 12 + fallback[:500]
+    dictionary = [w for w, _ in freq if w not in FUNCTION_WORDS]
+    # Every intended answer must be recognized by the solver even when absent from the frequency corpus.
+    dictionary = dictionary[:12000] + [w for w in all_answers if w not in dictionary[:12000]]
     WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
 
     preserve_any = args.preserve_existing or args.preserve_existing_all or args.top_up_existing
@@ -653,9 +681,10 @@ def main():
             while True:
                 seed = rng.randrange(1, 2**31 - 1)
                 p = create_puzzle(
-                    difficulty, seed, answer_pool, dictionary,
+                    difficulty, seed, answer_pools[difficulty], dictionary,
                     f"{id_prefix[difficulty]}-{i+1:03d}",
                     variant_index=i if difficulty == "hard" else None,
+                    tier_of=tier_of, vocab_key=difficulty,
                 )
                 sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig not in used_signatures:
@@ -671,7 +700,7 @@ def main():
             difficulty = mix[i % len(mix)]
             while True:
                 seed = rng.randrange(1, 2**31 - 1)
-                p = create_puzzle(difficulty, seed, answer_pool, dictionary, f"d-{i+1:03d}")
+                p = create_puzzle(difficulty, seed, answer_pools["daily"], dictionary, f"d-{i+1:03d}", tier_of=tier_of, vocab_key="daily")
                 sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig not in used_signatures:
                     used_signatures.add(sig)
@@ -685,7 +714,7 @@ def main():
     while len(rescue) < args.rescue:
         i = len(rescue)
         seed = rng.randrange(1, 2**31 - 1)
-        p = create_puzzle("rescue", seed, answer_pool, dictionary, f"r-{i+1:03d}")
+        p = create_puzzle("rescue", seed, answer_pools["rescue"], dictionary, f"r-{i+1:03d}", tier_of=tier_of, vocab_key="rescue")
         sig = (p["rows"], p["cols"], tuple(p["letters"]))
         if sig in used_signatures:
             continue
@@ -708,7 +737,8 @@ def main():
     PUZZLES_PUBLIC_OUT.write_text(payload_json, encoding="utf-8")
     PUZZLES_SERVER_OUT.write_text(payload_json, encoding="utf-8")
     print(f"Generated/kept {sum(map(len, free.values()))} free + {len(daily)} daily + {len(rescue)} rescue puzzles in {time.time()-started:.1f}s")
-    print(f"Dictionary: {len(dictionary)} words; curated answer pool: {len(curated)} words")
+    print(f"Dictionary: {len(dictionary)} words; tiered answers: {sum(len(v) for v in tiers.values())} "
+          f"(A={len(tiers['A'])}, B={len(tiers['B'])}, C={len(tiers['C'])}, D={len(tiers['D'])})")
 
 
 if __name__ == "__main__":

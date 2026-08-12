@@ -8,17 +8,11 @@ server_out=root/'data/puzzles.json'; public_out=root/'public/puzzles.json'
 d=json.loads(server_out.read_text(encoding='utf-8'))
 
 freq=gp.load_frequency_words()
+tiers,tier_of=gp.load_answer_tiers()
+answer_pools=gp.build_answer_pools(tiers)
+all_answers=[w for tier in ('A','B','C','D') for w in tiers[tier]]
 dictionary=[w for w,_ in freq if w not in gp.FUNCTION_WORDS]
-curated=[];seen=set()
-for raw in gp.CURATED:
-    w=gp.clean_word(raw)
-    if not w or not 3<=len(w)<=10 or w in gp.FUNCTION_WORDS or w in seen: continue
-    seen.add(w);curated.append(w)
-for w in curated:
-    if w not in dictionary: dictionary.append(w)
-dictionary=dictionary[:12000]+[w for w in curated if w not in dictionary[:12000]]
-fallback=[w for w,_ in freq[250:6500] if w not in gp.FUNCTION_WORDS and w not in gp.NAME_BLOCK and 4<=len(w)<=9]
-answer_pool=curated*12+fallback[:500]
+dictionary=dictionary[:12000]+[w for w in all_answers if w not in dictionary[:12000]]
 
 used={(p['rows'],p['cols'],tuple(p['letters'])) for bank in d['free'].values() for p in bank}
 used|={(p['rows'],p['cols'],tuple(p['letters'])) for p in d['daily']}
@@ -41,7 +35,7 @@ for di,diff in enumerate(('easy','medium','hard','hardcore')):
             seed=(2026081200 + di*1000003 + (i+1)*7919 + retry*104729) % (2**31-2) + 1
             retry+=1
             try:
-                p=gp.create_puzzle(diff,seed,answer_pool,dictionary,f"{prefix[diff]}-{i+1:03d}",variant_index=i if diff=='hard' else None)
+                p=gp.create_puzzle(diff,seed,answer_pools[diff],dictionary,f"{prefix[diff]}-{i+1:03d}",variant_index=i if diff=='hard' else None,tier_of=tier_of,vocab_key=diff)
             except RuntimeError:
                 continue
             sig=(p['rows'],p['cols'],tuple(p['letters']))
