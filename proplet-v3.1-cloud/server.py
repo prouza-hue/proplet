@@ -51,7 +51,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.14-cloud")
+app = FastAPI(title="Proplet API", version="3.15-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -125,6 +125,10 @@ class HintEventCreate(BaseModel):
     total_words: int = Field(default=0, ge=0, le=99)
 
 
+class ProductEventCreate(BaseModel):
+    event_type: str = Field(min_length=2, max_length=40)
+
+
 class TeamPinSet(BaseModel):
     pin: str = Field(min_length=4, max_length=32)
 
@@ -160,6 +164,25 @@ class AttemptCheckpoint(BaseModel):
     event_type: str
     elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
     found_words: int = Field(default=0, ge=0, le=99)
+
+
+class AttemptFinishTelemetry(BaseModel):
+    attempt_id: str = Field(min_length=8, max_length=80)
+    puzzle_id: str
+    challenge_key: str
+    mode: str
+    difficulty: str
+    elapsed_ms: int = Field(ge=1000, le=86_400_000)
+    moves: int = Field(ge=1, le=10000)
+    hints_used: int = Field(default=0, ge=0, le=99)
+    wrong_attempts: int = Field(default=0, ge=0, le=999)
+    max_hint_level: int = Field(default=0, ge=0, le=3)
+    clean_solve: bool = False
+    completed_at: Optional[str] = Field(default=None, max_length=40)
+
+
+class AnonymousClaim(BaseModel):
+    anonymous_id: str = Field(min_length=16, max_length=100)
 
 
 class FeedbackCreate(BaseModel):
@@ -331,6 +354,34 @@ def auth_player(authorization: Optional[str]) -> dict:
         if players:
             return players[0]
     raise HTTPException(401, "Neplatné přihlášení hráče")
+
+
+def anonymous_hash(raw: Optional[str]) -> Optional[str]:
+    """Return a non-reversible installation identifier for anonymous telemetry.
+
+    The browser keeps a random UUID; the database only sees this SHA-256 digest.
+    It is not derived from IP, device model, user agent or any other fingerprint.
+    """
+    if not raw:
+        return None
+    value = raw.strip()
+    if len(value) < 16 or len(value) > 100:
+        raise HTTPException(400, "Neplatné anonymní ID")
+    return hashlib.sha256(("proplet-anon-v1:" + value).encode("utf-8")).hexdigest()
+
+
+def telemetry_actor(authorization: Optional[str], anonymous_id: Optional[str]) -> dict:
+    if authorization and authorization.startswith("Bearer "):
+        player = auth_player(authorization)
+        return {"player": player, "player_id": player["id"], "anonymous_id": None, "actor_key": f"p:{player['id']}"}
+    anon = anonymous_hash(anonymous_id)
+    if anon:
+        return {"player": None, "player_id": None, "anonymous_id": anon, "actor_key": f"a:{anon}"}
+    raise HTTPException(401, "Chybí identita telemetry")
+
+
+def actor_filters(actor: dict) -> dict:
+    return {"player_id": actor["player_id"]} if actor.get("player_id") else {"anonymous_id": actor["anonymous_id"]}
 
 
 def current_prague_date() -> date:
@@ -529,7 +580,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.14.0",
+        "version": "3.15.0",
         "vocabularyVersion": pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
@@ -586,9 +637,18 @@ def health():
             db_request("GET", "quality_snapshots", params={"select": "id,week_start", "limit": "1"})
         except HTTPException:
             analytics_v2_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        anonymous_analytics_migration = True
+        try:
+            db_request("GET", "puzzle_attempts", params={"select": "id,anonymous_id", "limit": "1"})
+            db_request("GET", "puzzle_feedback", params={"select": "id,anonymous_id", "limit": "1"})
+            db_request("GET", "helper_events", params={"select": "id,anonymous_id", "limit": "1"})
+            db_request("GET", "hint_events", params={"select": "id,anonymous_id", "limit": "1"})
+            db_request("GET", "product_events", params={"select": "id,anonymous_id,event_type", "limit": "1"})
+        except HTTPException:
+            anonymous_analytics_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -601,7 +661,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.14.0",
+        "version": "3.15.0",
     }
 
 
@@ -707,6 +767,35 @@ def login(payload: PlayerLogin):
     }
 
 
+@app.post("/api/anonymous/claim")
+def claim_anonymous(payload: AnonymousClaim, authorization: Optional[str] = Header(default=None)):
+    """Attach anonymous telemetry from this installation to the newly authenticated player.
+
+    This prevents one person from being counted twice after creating/logging into an account.
+    Official results, XP and leaderboards are never created here; only QA telemetry is reassigned.
+    """
+    player = auth_player(authorization)
+    anon = anonymous_hash(payload.anonymous_id)
+    if not anon:
+        raise HTTPException(400, "Chybí anonymní ID")
+    claimed = {"attempts": 0, "helperEvents": 0, "hintEvents": 0, "productEvents": 0, "feedback": 0}
+    for table, key in (("puzzle_attempts", "attempts"), ("helper_events", "helperEvents"), ("hint_events", "hintEvents"), ("product_events", "productEvents")):
+        rows = db_select(table, anonymous_id=anon)
+        if rows:
+            db_update(table, {"anonymous_id": anon}, {"player_id": player["id"], "anonymous_id": None})
+            claimed[key] = len(rows)
+    # Feedback has a unique player/puzzle/kind constraint. Merge row-by-row so an existing
+    # authenticated vote wins over a duplicate anonymous vote rather than making claim fail.
+    for row in db_select("puzzle_feedback", anonymous_id=anon):
+        existing = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=row.get("puzzle_id"), kind=row.get("kind"))
+        if existing:
+            db_delete("puzzle_feedback", id=row["id"])
+        else:
+            db_update("puzzle_feedback", {"id": row["id"]}, {"player_id": player["id"], "anonymous_id": None})
+        claimed["feedback"] += 1
+    return {"ok": True, "claimed": claimed}
+
+
 @app.post("/api/password")
 def set_password(payload: PasswordSet, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
@@ -735,81 +824,96 @@ def set_support_mode(payload: SupportModeSet, authorization: Optional[str] = Hea
     return {"ok": True, "supportMode": mode}
 
 
-def _telemetry_attempt(player_id: str, attempt_id: str, puzzle_id: str, challenge_key: str) -> Optional[dict]:
-    rows = db_select("puzzle_attempts", id=attempt_id, player_id=player_id)
+def _telemetry_attempt(actor: dict, attempt_id: str, puzzle_id: str, challenge_key: str) -> Optional[dict]:
+    filters = {"id": attempt_id, **actor_filters(actor)}
+    rows = db_select("puzzle_attempts", **filters)
     if not rows:
         return None
     row = rows[0]
-    # Telemetry must describe the real authenticated attempt, not arbitrary client metadata.
     if row.get("puzzle_id") != puzzle_id or row.get("challenge_key") != challenge_key:
         raise HTTPException(400, "Telemetry neodpovídá pokusu")
     return row
 
 
 @app.post("/api/helper-event")
-def helper_event(payload: HelperEventCreate, authorization: Optional[str] = Header(default=None)):
-    player = auth_player(authorization)
+def helper_event(
+    payload: HelperEventCreate,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed_events = {"offered", "accepted", "dismissed"}
     if payload.event_type not in allowed_events:
         raise HTTPException(400, "Neplatný helper event")
-    if not _telemetry_attempt(player["id"], payload.attempt_id, payload.puzzle_id, payload.challenge_key):
+    if not _telemetry_attempt(actor, payload.attempt_id, payload.puzzle_id, payload.challenge_key):
         return {"ok": True, "ignored": True}
-    support_mode = player.get("support_mode") or "none"
+    player = actor.get("player")
+    support_mode = (player or {}).get("support_mode") or "none"
     db_insert("helper_events", {
-        "id": str(uuid.uuid4()),
-        "player_id": player["id"],
-        "attempt_id": payload.attempt_id,
-        "puzzle_id": payload.puzzle_id,
-        "challenge_key": payload.challenge_key,
-        "event_type": payload.event_type,
-        "support_mode": support_mode,
-        "elapsed_ms": payload.elapsed_ms,
-        "idle_ms": payload.idle_ms,
-        "found_words": payload.found_words,
-        "total_words": payload.total_words,
+        "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+        "attempt_id": payload.attempt_id, "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
+        "event_type": payload.event_type, "support_mode": support_mode,
+        "elapsed_ms": payload.elapsed_ms, "idle_ms": payload.idle_ms,
+        "found_words": payload.found_words, "total_words": payload.total_words,
         "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
 
 @app.post("/api/hint-event")
-def hint_event(payload: HintEventCreate, authorization: Optional[str] = Header(default=None)):
-    player = auth_player(authorization)
+def hint_event(
+    payload: HintEventCreate,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.source not in {"manual", "helper"}:
         raise HTTPException(400, "Neplatný zdroj nápovědy")
-    if not _telemetry_attempt(player["id"], payload.attempt_id, payload.puzzle_id, payload.challenge_key):
+    if not _telemetry_attempt(actor, payload.attempt_id, payload.puzzle_id, payload.challenge_key):
         return {"ok": True, "ignored": True}
-    support_mode = player.get("support_mode") or "none"
-    # Complimentary is intentionally derived server-side. It has no gameplay effect in v3.14,
-    # but future hint economy must not trust a client-declared free-credit flag.
-    previous_hints = db_select("hint_events", attempt_id=payload.attempt_id, player_id=player["id"])
-    sibling_attempts = db_select("puzzle_attempts", player_id=player["id"], challenge_key=payload.challenge_key)
+    player = actor.get("player")
+    support_mode = (player or {}).get("support_mode") or "none"
+    af = actor_filters(actor)
+    previous_hints = db_select("hint_events", attempt_id=payload.attempt_id, **af)
+    sibling_attempts = db_select("puzzle_attempts", challenge_key=payload.challenge_key, **af)
     first_attempt_id = None
     if sibling_attempts:
-        first_attempt_id = min(
-            sibling_attempts,
-            key=lambda a: (str(a.get("started_at") or ""), str(a.get("id") or "")),
-        ).get("id")
+        first_attempt_id = min(sibling_attempts, key=lambda a: (str(a.get("started_at") or ""), str(a.get("id") or ""))).get("id")
     complimentary = (
-        payload.hint_level == 1
+        actor.get("player_id") is not None
+        and payload.hint_level == 1
         and support_mode in {"beginner", "younger"}
         and payload.attempt_id == first_attempt_id
         and not previous_hints
     )
     db_insert("hint_events", {
-        "id": str(uuid.uuid4()),
-        "player_id": player["id"],
-        "attempt_id": payload.attempt_id,
-        "puzzle_id": payload.puzzle_id,
-        "challenge_key": payload.challenge_key,
-        "hint_level": payload.hint_level,
-        "source": payload.source,
-        "support_mode": support_mode,
-        "complimentary": complimentary,
-        "elapsed_ms": payload.elapsed_ms,
-        "found_words": payload.found_words,
-        "total_words": payload.total_words,
+        "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+        "attempt_id": payload.attempt_id, "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
+        "hint_level": payload.hint_level, "source": payload.source, "support_mode": support_mode,
+        "complimentary": complimentary, "elapsed_ms": payload.elapsed_ms,
+        "found_words": payload.found_words, "total_words": payload.total_words,
         "created_at": datetime.now(TZ).isoformat(),
+    })
+    return {"ok": True, "complimentary": complimentary}
+
+
+@app.post("/api/product-event")
+def product_event(
+    payload: ProductEventCreate,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
+    allowed = {
+        "app_open", "onboarding_started", "onboarding_completed",
+        "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
+        "account_authenticated",
+    }
+    if payload.event_type not in allowed:
+        raise HTTPException(400, "Neplatný product event")
+    db_insert("product_events", {
+        "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+        "event_type": payload.event_type, "app_version": "3.15", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -888,8 +992,12 @@ def merged_hint_count(old_value, new_value: int) -> int:
 
 
 @app.post("/api/attempt/start")
-def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(default=None)):
-    player = auth_player(authorization)
+def attempt_start(
+    payload: AttemptStart,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS:
         raise HTTPException(400, "Neplatný pokus")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
@@ -906,24 +1014,30 @@ def attempt_start(payload: AttemptStart, authorization: Optional[str] = Header(d
             raise HTTPException(400, "Neplatné datum Daily pokusu")
         if payload.puzzle_id != expected_daily_puzzle_id(daily_date):
             raise HTTPException(400, "Tato úloha nepatří k Daily datu")
-    existing = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
+    filters = {"id": payload.attempt_id, **actor_filters(actor)}
+    existing = db_select("puzzle_attempts", **filters)
     if existing:
         return {"ok": True, "attemptId": payload.attempt_id}
     db_insert("puzzle_attempts", {
-        "id": payload.attempt_id, "player_id": player["id"], "puzzle_id": payload.puzzle_id,
-        "challenge_key": payload.challenge_key, "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.14",
+        "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+        "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
+        "mode": payload.mode, "difficulty": payload.difficulty,
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.15",
     })
-    return {"ok": True, "attemptId": payload.attempt_id}
+    return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
 
 @app.post("/api/attempt/checkpoint")
-def attempt_checkpoint(payload: AttemptCheckpoint, authorization: Optional[str] = Header(default=None)):
-    player = auth_player(authorization)
+def attempt_checkpoint(
+    payload: AttemptCheckpoint,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed = {"correct", "hint", "reset", "resume", "leave"}
     if payload.event_type not in allowed:
         raise HTTPException(400, "Neplatný checkpoint")
-    rows = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
+    rows = db_select("puzzle_attempts", id=payload.attempt_id, **actor_filters(actor))
     if not rows:
         return {"ok": True, "ignored": True}
     row = rows[0]
@@ -943,22 +1057,74 @@ def attempt_checkpoint(payload: AttemptCheckpoint, authorization: Optional[str] 
     return {"ok": True}
 
 
+@app.post("/api/attempt/finish")
+def attempt_finish(
+    payload: AttemptFinishTelemetry,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
+    row = _telemetry_attempt(actor, payload.attempt_id, payload.puzzle_id, payload.challenge_key)
+    if not row:
+        if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS or not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
+            raise HTTPException(400, "Neplatný dokončený pokus")
+        if payload.mode == "free" and payload.challenge_key != f"free:{payload.puzzle_id}":
+            raise HTTPException(400, "Neplatný klíč dokončeného pokusu")
+        if payload.mode == "daily":
+            if not payload.challenge_key.startswith("daily:"):
+                raise HTTPException(400, "Neplatný klíč dokončeného Daily")
+            daily_date = payload.challenge_key[6:]
+            try:
+                date.fromisoformat(daily_date)
+            except ValueError:
+                raise HTTPException(400, "Neplatné datum Daily")
+            if payload.puzzle_id != expected_daily_puzzle_id(daily_date):
+                raise HTTPException(400, "Tato úloha nepatří k Daily datu")
+        db_insert("puzzle_attempts", {
+            "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+            "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.15",
+        })
+    completed_at = payload.completed_at or datetime.now(TZ).isoformat()
+    try:
+        completed_at = datetime.fromisoformat(str(completed_at).replace("Z", "+00:00")).isoformat()
+    except Exception:
+        completed_at = datetime.now(TZ).isoformat()
+    db_update("puzzle_attempts", {"id": payload.attempt_id}, {
+        "completed_at": completed_at, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves,
+        "wrong_attempts": payload.wrong_attempts, "hints_used": payload.hints_used,
+        "max_hint_level": payload.max_hint_level, "clean_solve": payload.clean_solve,
+        "last_activity_at": datetime.now(TZ).isoformat(),
+    })
+    return {"ok": True, "anonymous": actor.get("player_id") is None}
+
+
 @app.post("/api/feedback")
-def puzzle_feedback(payload: FeedbackCreate, authorization: Optional[str] = Header(default=None)):
-    player = auth_player(authorization)
+def puzzle_feedback(
+    payload: FeedbackCreate,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.kind not in ("difficulty", "word"):
         raise HTTPException(400, "Neplatný typ zpětné vazby")
     data = load_puzzles()
     known = any(payload.puzzle_id == p["id"] for bank in data.get("free", {}).values() for p in bank) or any(payload.puzzle_id == p["id"] for p in data.get("daily", []))
     if not known:
         raise HTTPException(400, "Neznámá úloha")
-    existing = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=payload.puzzle_id, kind=payload.kind)
+    if payload.kind == "difficulty" and payload.rating is None:
+        raise HTTPException(400, "Chybí hodnocení obtížnosti")
+    af = actor_filters(actor)
+    existing = db_select("puzzle_feedback", puzzle_id=payload.puzzle_id, kind=payload.kind, **af)
     row = {"rating": payload.rating, "word": payload.word, "note": payload.note, "created_at": datetime.now(TZ).isoformat()}
     if existing:
         db_update("puzzle_feedback", {"id": existing[0]["id"]}, row)
     else:
-        db_insert("puzzle_feedback", {"id": str(uuid.uuid4()), "player_id": player["id"], "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "kind": payload.kind, **row})
-    return {"ok": True}
+        db_insert("puzzle_feedback", {
+            "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+            "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "kind": payload.kind, **row,
+        })
+    return {"ok": True, "anonymous": actor.get("player_id") is None}
 
 
 def _median(vals: list[int]) -> Optional[int]:
@@ -980,6 +1146,7 @@ def build_quality_report():
     word_feedback = db_select("puzzle_feedback", kind="word")
     hint_events = db_select("hint_events")
     helper_events = db_select("helper_events")
+    product_events = db_select("product_events")
 
     def ts(row):
         raw = row.get("started_at") or ""
@@ -988,12 +1155,22 @@ def build_quality_report():
         except Exception:
             return datetime.max.replace(tzinfo=TZ)
 
-    first_by_player_puzzle: dict[tuple[str, str], dict] = {}
-    for a in sorted(attempts, key=ts):
-        key = (str(a.get("player_id")), str(a.get("puzzle_id")))
-        first_by_player_puzzle.setdefault(key, a)
+    def telemetry_identity(row: dict) -> Optional[str]:
+        if row.get("player_id"):
+            return f"p:{row['player_id']}"
+        if row.get("anonymous_id"):
+            return f"a:{row['anonymous_id']}"
+        return None
 
-    first_attempts = list(first_by_player_puzzle.values())
+    first_by_actor_puzzle: dict[tuple[str, str], dict] = {}
+    for a in sorted(attempts, key=ts):
+        identity = telemetry_identity(a)
+        if not identity:
+            continue
+        key = (identity, str(a.get("puzzle_id")))
+        first_by_actor_puzzle.setdefault(key, a)
+
+    first_attempts = list(first_by_actor_puzzle.values())
     groups: dict[str, list[dict]] = {}
     for a in first_attempts:
         groups.setdefault(a["puzzle_id"], []).append(a)
@@ -1170,6 +1347,22 @@ def build_quality_report():
     first_hint_times = [int(a.get("first_hint_ms")) for a in first_attempts if a.get("first_hint_ms") is not None]
     hint_events_first = [e for e in hint_events if str(e.get("attempt_id")) in first_attempt_ids]
     hinted_first_ids = {str(e.get("attempt_id")) for e in hint_events_first}
+    def event_identity(row: dict) -> Optional[str]:
+        if row.get("player_id"):
+            return f"p:{row['player_id']}"
+        if row.get("anonymous_id"):
+            return f"a:{row['anonymous_id']}"
+        return None
+
+    funnel = {}
+    for event_type in (
+        "app_open", "onboarding_started", "onboarding_completed", "account_nudge_shown",
+        "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+    ):
+        identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
+        identities.discard(None)
+        funnel[event_type] = len(identities)
+
     hint_summary = {
         "events": len(hint_events),
         "firstAttemptEvents": len(hint_events_first),
@@ -1185,6 +1378,8 @@ def build_quality_report():
         "analyticsVersion": 2,
         "attemptsRaw": len(attempts),
         "firstAttempts": len(first_attempts),
+        "registeredFirstAttempts": sum(1 for a in first_attempts if a.get("player_id")),
+        "anonymousFirstAttempts": sum(1 for a in first_attempts if a.get("anonymous_id")),
         "puzzlesMeasured": len(rows),
         "summary": {
             "tooHard": sum(1 for r in rows if r["flag"] == "too_hard"),
@@ -1194,6 +1389,7 @@ def build_quality_report():
         },
         "helper": helper_summary,
         "hints": hint_summary,
+        "funnel": funnel,
         "priorities": priorities[:30],
         "rows": rows,
     }
