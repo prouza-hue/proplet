@@ -52,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.18.1-cloud")
+app = FastAPI(title="Proplet API", version="3.19.0-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -576,26 +576,14 @@ def rescue_status_for(player_id: str) -> dict:
     if existing:
         status = existing.get("status")
         if status == "started":
-            try:
-                started = datetime.fromisoformat(str(existing.get("started_at")).replace("Z", "+00:00"))
-                now = datetime.now(TZ)
-                if started.tzinfo is None:
-                    started = started.replace(tzinfo=TZ)
-                elapsed = (now - started.astimezone(TZ)).total_seconds()
-                if elapsed > 35:
-                    db_update("streak_rescues", {"id": existing["id"]}, {
-                        "status": "failed", "completed_at": now.isoformat(),
-                        "elapsed_ms": int(max(0, elapsed * 1000)),
-                    })
-                    status = "failed"
-                else:
-                    return {
-                        "eligible": True, "state": "started", "missedDate": target,
-                        "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
-                        "timeLimitMs": 30000, "secondsRemaining": max(0, round(30 - elapsed, 1)),
-                    }
-            except Exception:
-                status = "failed"
+            # Since v3.19 the rescue clock measures active play, not wall time.
+            # Leaving the PWA therefore cannot silently consume the attempt.
+            elapsed_ms = max(0, int(existing.get("elapsed_ms") or 0))
+            return {
+                "eligible": True, "state": "started", "missedDate": target,
+                "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
+                "timeLimitMs": 30000, "secondsRemaining": max(0, round((30000 - elapsed_ms) / 1000, 1)),
+            }
         return {
             "eligible": False, "state": status or "failed", "missedDate": target,
             "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
@@ -645,13 +633,15 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
 
 def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
     difficulties = ("easy", "medium", "hard", "hardcore")
+    puzzle_data = load_puzzles()
+    maximum_levels = {key: len(puzzle_data.get("free", {}).get(key, [])) for key in difficulties}
     legacy_slots = {key: set() for key in difficulties}
     gen2_slots = {key: set() for key in difficulties}
     for row in rows:
         if row.get("mode") != "free" or row.get("difficulty") not in legacy_slots:
             continue
         info = free_puzzle_info(str(row.get("puzzle_id") or ""), str(row.get("difficulty") or ""))
-        if not info or not 1 <= int(info["level"]) <= 100:
+        if not info or not 1 <= int(info["level"]) <= maximum_levels.get(info["difficulty"], 0):
             continue
         target = gen2_slots if int(info["generation"]) >= 2 else legacy_slots
         target[info["difficulty"]].add(int(info["level"]))
@@ -800,11 +790,12 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.18.1",
+        "version": "3.19.0",
         "adminStatic": all((ROOT / "public" / name).exists() for name in ("admin.html", "admin.css", "admin.js")),
         "vocabularyVersion": pdata.get("lexiconVersion") or pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "freeGeneration": pdata.get("freeGeneration"),
+        "freeLevelsPerDifficulty": pdata.get("freeLevelsPerDifficulty") or min((len(bank) for bank in pdata.get("free", {}).values()), default=0),
         "dailyGeneration": pdata.get("dailyGeneration"),
         "dailyGeneration2From": pdata.get("dailyGeneration2From"),
         "dailyMigration": pdata.get("dailyMigration"),
@@ -899,7 +890,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.18.1",
+        "version": "3.19.0",
     }
 
 
@@ -1156,7 +1147,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.18.1", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.19.0", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1268,7 +1259,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.18.1",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.19.0",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1329,7 +1320,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.18.1",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.19.0",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -2281,12 +2272,11 @@ def rescue_finish(payload: RescueFinish, authorization: Optional[str] = Header(d
     row = sorted(rows, key=lambda r: str(r.get("started_at") or ""), reverse=True)[0]
     if row.get("status") != "started":
         return {"ok": row.get("status") == "passed", "state": row.get("status"), "stats": player_stats(player["id"])}
-    started = datetime.fromisoformat(str(row.get("started_at")).replace("Z", "+00:00"))
-    if started.tzinfo is None:
-        started = started.replace(tzinfo=TZ)
-    server_elapsed_ms = int(max(0, (datetime.now(TZ) - started.astimezone(TZ)).total_seconds() * 1000))
-    passed = bool(payload.completed and payload.elapsed_ms <= 30000 and server_elapsed_ms <= 35000)
-    final_elapsed = max(payload.elapsed_ms, min(server_elapsed_ms, 120000))
+    # The client clock excludes periods while the page is hidden or unfocused.
+    # Rescue results are not part of a speed leaderboard, so wall-clock time is
+    # neither a useful fairness signal nor worth penalising a phone interruption.
+    passed = bool(payload.completed and payload.elapsed_ms <= 30000)
+    final_elapsed = payload.elapsed_ms
     db_update("streak_rescues", {"id": row["id"]}, {
         "status": "passed" if passed else "failed",
         "completed_at": datetime.now(TZ).isoformat(),

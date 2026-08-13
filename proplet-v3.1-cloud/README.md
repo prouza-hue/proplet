@@ -1,13 +1,13 @@
-# Proplet v3.18.1
+# Proplet v3.19.0
 
-Aktuální release: **v3.18.1 — globální pořadí Free úrovní + opravený balíček administrace**.
+Aktuální release: **v3.19.0 — 800 Free úrovní + automatická pauza mimo aktivní okno**.
 
 Hlavní novinky:
 
 - nový kurátorovaný Lexicon v2 s 3 153 cílovými lemmaty a metadaty `familiarity`, `complexity`, `fun`, `theme`, `register` a `age_floor`,
-- úplně nová banka 400 Free úrovní: 100 Snadných, Středních, Těžkých i Mozkožroutů,
+- banka 800 Free úrovní: 200 Snadných, Středních, Těžkých i Mozkožroutů,
 - unikátní Gen2 puzzle ID, přísná jednoznačnost řešení a minimálně 24 mezilehlých úrovní před opakováním slova,
-- hravější Mozkožrout s 679 odpověďmi Tier D a průměrnou zábavností 3,79/5,
+- první stovka Mozkožroutů zůstává odvážná; nová stovka má umírněnější mix C/D a ručně zúžený výběr Tier D,
 - původní Free desky zůstávají v archivu `legacyFree` a jejich časy se nemíchají s Gen2 leaderboardy,
 - postup hráče se převádí po slotech obtížnost + číslo úrovně; XP, hodnost, achievementy i historie zůstávají,
 - převedenou Gen2 desku lze dobrovolně zahrát pro nový čas a leaderboard, ale bez druhé XP odměny.
@@ -31,9 +31,10 @@ Hlavní novinky:
 - do pořadí dál platí pouze první dokončený pokus a replay zůstává tréninkem;
 - vysvětlení pořadí i administrace nově jednotně používají české označení **Čistě / Čisté vyřešení**.
 - hotfix 3.18.1 doplňuje do update balíčku chybějící `admin.html` a `admin.css` a přidává kontrolu `adminStatic` do `/api/health`.
+- v3.19 přidává úrovně 101–200, mírnější slovní profil nových Mozkožroutů a automatickou pauzu při skrytí či ztrátě focusu aplikace.
 
-Nasazení: `UPDATE_V3_18_1_CZ.md`  
-Migrace: `SUPABASE_MIGRATION_V3_17.sql`  
-Release notes: `RELEASE_V3_18_1_CZ.md`  
+Nasazení: `UPDATE_V3_19_CZ.md`  
+Migrace: `SUPABASE_MIGRATION_V3_19.sql`  
+Release notes: `RELEASE_V3_19_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
-Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
+Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `FREE_EXTENSION_V3_19_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
