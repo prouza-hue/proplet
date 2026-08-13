@@ -7,10 +7,12 @@ create table if not exists public.players (
     family_code text not null check (char_length(family_code) between 2 and 24),
     token_hash text not null unique,
     password_hash text,
+    avatar text not null default '🙂',
     created_at timestamptz not null default now()
 );
 
 alter table public.players add column if not exists password_hash text;
+alter table public.players add column if not exists avatar text not null default '🙂';
 
 create unique index if not exists players_family_name_ci
     on public.players (family_code, lower(name));
@@ -200,3 +202,182 @@ revoke all on table public.push_subscriptions from anon, authenticated;
 grant all on table public.leagues to service_role;
 grant all on table public.puzzle_runs to service_role;
 grant all on table public.push_subscriptions to service_role;
+
+-- v3.14 — Pomocník + Quality Analytics v2
+alter table public.players add column if not exists support_mode text not null default 'none';
+alter table public.puzzle_attempts add column if not exists first_correct_ms integer;
+alter table public.puzzle_attempts add column if not exists first_hint_ms integer;
+alter table public.puzzle_attempts add column if not exists reset_count integer not null default 0;
+alter table public.puzzle_attempts add column if not exists resume_count integer not null default 0;
+alter table public.puzzle_attempts add column if not exists last_found_words integer not null default 0;
+alter table public.puzzle_attempts add column if not exists last_activity_at timestamptz;
+
+create table if not exists public.helper_events (
+    id uuid primary key,
+    player_id uuid not null references public.players(id) on delete cascade,
+    attempt_id text not null,
+    puzzle_id text not null,
+    challenge_key text not null,
+    event_type text not null check (event_type in ('offered','accepted','dismissed')),
+    support_mode text not null default 'none',
+    elapsed_ms integer not null default 0,
+    idle_ms integer not null default 0,
+    found_words integer not null default 0,
+    total_words integer not null default 0,
+    created_at timestamptz not null default now()
+);
+create table if not exists public.hint_events (
+    id uuid primary key,
+    player_id uuid not null references public.players(id) on delete cascade,
+    attempt_id text not null,
+    puzzle_id text not null,
+    challenge_key text not null,
+    hint_level integer not null check (hint_level between 1 and 3),
+    source text not null check (source in ('manual','helper')),
+    support_mode text not null default 'none',
+    complimentary boolean not null default false,
+    elapsed_ms integer not null default 0,
+    found_words integer not null default 0,
+    total_words integer not null default 0,
+    created_at timestamptz not null default now()
+);
+create table if not exists public.quality_snapshots (
+    id uuid primary key,
+    week_start date not null unique,
+    analytics_version integer not null default 2,
+    payload jsonb not null,
+    created_at timestamptz not null default now()
+);
+create index if not exists idx_helper_events_attempt on public.helper_events (attempt_id, created_at);
+create index if not exists idx_helper_events_puzzle on public.helper_events (puzzle_id, created_at);
+create index if not exists idx_hint_events_attempt on public.hint_events (attempt_id, created_at);
+create index if not exists idx_hint_events_puzzle on public.hint_events (puzzle_id, created_at);
+create index if not exists idx_quality_snapshots_week on public.quality_snapshots (week_start desc);
+alter table public.helper_events enable row level security;
+alter table public.hint_events enable row level security;
+alter table public.quality_snapshots enable row level security;
+revoke all on table public.helper_events from anon, authenticated;
+revoke all on table public.hint_events from anon, authenticated;
+revoke all on table public.quality_snapshots from anon, authenticated;
+grant all on table public.helper_events to service_role;
+grant all on table public.hint_events to service_role;
+grant all on table public.quality_snapshots to service_role;
+
+-- v3.14 constraint hardening (idempotent)
+alter table public.players drop constraint if exists players_support_mode_check;
+alter table public.players add constraint players_support_mode_check check (support_mode in ('none','beginner','younger','older'));
+alter table public.helper_events drop constraint if exists helper_events_support_mode_check;
+alter table public.helper_events add constraint helper_events_support_mode_check check (support_mode in ('none','beginner','younger','older'));
+alter table public.hint_events drop constraint if exists hint_events_support_mode_check;
+alter table public.hint_events add constraint hint_events_support_mode_check check (support_mode in ('none','beginner','younger','older'));
+
+-- v3.15 — anonymní Quality Analytics
+alter table public.puzzle_attempts alter column player_id drop not null;
+alter table public.puzzle_attempts add column if not exists anonymous_id text;
+alter table public.puzzle_attempts drop constraint if exists puzzle_attempts_exactly_one_identity;
+alter table public.puzzle_attempts add constraint puzzle_attempts_exactly_one_identity
+  check ((player_id is not null) <> (anonymous_id is not null));
+create index if not exists idx_puzzle_attempts_anonymous on public.puzzle_attempts (anonymous_id, started_at);
+
+alter table public.puzzle_feedback alter column player_id drop not null;
+alter table public.puzzle_feedback add column if not exists anonymous_id text;
+alter table public.puzzle_feedback drop constraint if exists puzzle_feedback_exactly_one_identity;
+alter table public.puzzle_feedback add constraint puzzle_feedback_exactly_one_identity
+  check ((player_id is not null) <> (anonymous_id is not null));
+create index if not exists idx_puzzle_feedback_anonymous on public.puzzle_feedback (anonymous_id, created_at);
+create unique index if not exists uq_puzzle_feedback_anonymous_puzzle_kind
+  on public.puzzle_feedback (anonymous_id, puzzle_id, kind)
+  where anonymous_id is not null;
+
+alter table public.helper_events alter column player_id drop not null;
+alter table public.helper_events add column if not exists anonymous_id text;
+alter table public.helper_events drop constraint if exists helper_events_exactly_one_identity;
+alter table public.helper_events add constraint helper_events_exactly_one_identity
+  check ((player_id is not null) <> (anonymous_id is not null));
+create index if not exists idx_helper_events_anonymous on public.helper_events (anonymous_id, created_at);
+
+alter table public.hint_events alter column player_id drop not null;
+alter table public.hint_events add column if not exists anonymous_id text;
+alter table public.hint_events drop constraint if exists hint_events_exactly_one_identity;
+alter table public.hint_events add constraint hint_events_exactly_one_identity
+  check ((player_id is not null) <> (anonymous_id is not null));
+create index if not exists idx_hint_events_anonymous on public.hint_events (anonymous_id, created_at);
+
+create table if not exists public.product_events (
+  id uuid primary key,
+  player_id uuid references public.players(id) on delete cascade,
+  anonymous_id text,
+  event_type text not null,
+  app_version text not null default '3.15',
+  created_at timestamptz not null default now(),
+  constraint product_events_exactly_one_identity check ((player_id is not null) <> (anonymous_id is not null))
+);
+create index if not exists idx_product_events_anonymous on public.product_events (anonymous_id, created_at);
+create index if not exists idx_product_events_player on public.product_events (player_id, created_at);
+create index if not exists idx_product_events_type on public.product_events (event_type, created_at);
+alter table public.product_events enable row level security;
+revoke all on table public.product_events from anon, authenticated;
+grant all on table public.product_events to service_role;
+
+-- v3.16 — jedna ekonomická odměna na slot obtížnost + úroveň
+create table if not exists public.free_slot_rewards (
+  id uuid primary key,
+  player_id uuid not null references public.players(id) on delete cascade,
+  difficulty text not null check (difficulty in ('easy', 'medium', 'hard', 'hardcore')),
+  level integer not null check (level between 1 and 100),
+  source_puzzle_id text not null,
+  content_generation integer not null default 1 check (content_generation >= 1),
+  points integer not null default 0 check (points >= 0),
+  earned_at timestamptz not null default now(),
+  unique (player_id, difficulty, level)
+);
+create index if not exists free_slot_rewards_player_idx on public.free_slot_rewards (player_id, difficulty, level);
+alter table public.free_slot_rewards enable row level security;
+revoke all on table public.free_slot_rewards from anon, authenticated;
+grant all on table public.free_slot_rewards to service_role;
+
+-- v3.17 — oddělená administrace a fronta hlášení slov
+create table if not exists public.admin_accounts (
+  player_id uuid primary key references public.players(id) on delete cascade,
+  role text not null default 'viewer' check (role in ('owner', 'editor', 'viewer')),
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+insert into public.admin_accounts (player_id, role, active)
+select id, 'owner', true from public.players
+where lower(trim(name)) = 'pavel' and lower(trim(family_code)) = 'prouza'
+order by created_at asc limit 1
+on conflict (player_id) do nothing;
+
+create table if not exists public.admin_audit_log (
+  id uuid primary key,
+  admin_player_id uuid not null references public.players(id) on delete restrict,
+  action text not null,
+  target_type text not null,
+  target_id text,
+  details jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_admin_audit_created on public.admin_audit_log (created_at desc);
+create index if not exists idx_admin_audit_admin on public.admin_audit_log (admin_player_id, created_at desc);
+
+alter table public.puzzle_feedback add column if not exists status text not null default 'new';
+alter table public.puzzle_feedback add column if not exists resolution_note text;
+alter table public.puzzle_feedback add column if not exists reviewed_at timestamptz;
+alter table public.puzzle_feedback add column if not exists reviewed_by uuid references public.players(id) on delete set null;
+alter table public.puzzle_feedback drop constraint if exists puzzle_feedback_status_check;
+alter table public.puzzle_feedback add constraint puzzle_feedback_status_check check (status in ('new','reviewing','resolved','dismissed'));
+alter table public.puzzle_feedback drop constraint if exists puzzle_feedback_player_id_puzzle_id_kind_key;
+drop index if exists public.uq_puzzle_feedback_anonymous_puzzle_kind;
+create unique index if not exists uq_feedback_player_difficulty on public.puzzle_feedback (player_id, puzzle_id) where player_id is not null and kind = 'difficulty';
+create unique index if not exists uq_feedback_anon_difficulty on public.puzzle_feedback (anonymous_id, puzzle_id) where anonymous_id is not null and kind = 'difficulty';
+create unique index if not exists uq_feedback_player_word on public.puzzle_feedback (player_id, puzzle_id, lower(coalesce(word, ''))) where player_id is not null and kind = 'word';
+create unique index if not exists uq_feedback_anon_word on public.puzzle_feedback (anonymous_id, puzzle_id, lower(coalesce(word, ''))) where anonymous_id is not null and kind = 'word';
+create index if not exists idx_puzzle_feedback_status on public.puzzle_feedback (kind, status, created_at desc);
+
+alter table public.admin_accounts enable row level security;
+alter table public.admin_audit_log enable row level security;
+revoke all on table public.admin_accounts from anon, authenticated;
+revoke all on table public.admin_audit_log from anon, authenticated;
+grant all on table public.admin_accounts to service_role;
+grant all on table public.admin_audit_log to service_role;

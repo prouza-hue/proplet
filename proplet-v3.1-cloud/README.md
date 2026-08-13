@@ -1,6 +1,6 @@
-# Proplet v3.16.5
+# Proplet v3.17.0
 
-Aktuální release: **v3.16.5 — Daily lze bezpečně zopakovat**.
+Aktuální release: **v3.17.0 — první skutečná administrace**.
 
 Hlavní novinky:
 
@@ -22,9 +22,13 @@ Hlavní novinky:
 - Daily výsledkovka ukazuje anonymní globální pořadí, počet dnešních hráčů, percentil a sousední výsledky bez zveřejnění jmen.
 - výsledkovka Daily nabízí nový tréninkový pokus bez dalších XP a bez přepsání prvního soutěžního výsledku,
 - hráč se starou generací Daily může z výsledkovky spustit aktivní desku a bezpečně převést pořadí bez ručního mazání databáze.
+- samostatná, serverově chráněná administrace `/admin` je navázaná na účet Pavel / Prouza, ale používá oddělený grant;
+- admin obsahuje Přehled, Quality Analytics, frontu hlášení slov, uživatele a audit zásahů;
+- více nahlášených slov z jedné desky se už navzájem nepřepisuje;
+- běžný přihlášený hráč už nemá přístup ke skrytým Quality datům.
 
-Nasazení: `UPDATE_V3_16_2_CZ.md`  
-Migrace: `SUPABASE_MIGRATION_V3_16.sql`  
-Release notes: `RELEASE_V3_16_5_CZ.md`  
+Nasazení: `UPDATE_V3_17_CZ.md`  
+Migrace: `SUPABASE_MIGRATION_V3_17.sql`  
+Release notes: `RELEASE_V3_17_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`

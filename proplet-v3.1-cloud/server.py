@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Query, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -52,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.16.5-cloud")
+app = FastAPI(title="Proplet API", version="3.17.0-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -195,6 +195,11 @@ class FeedbackCreate(BaseModel):
     note: Optional[str] = Field(default=None, max_length=300)
 
 
+class AdminReportUpdate(BaseModel):
+    status: str = Field(min_length=3, max_length=20)
+    resolution_note: Optional[str] = Field(default=None, max_length=500)
+
+
 class RescueFinish(BaseModel):
     puzzle_id: str
     completed: bool
@@ -259,6 +264,23 @@ def db_select(table: str, **filters):
         if value is not None:
             params[key] = f"eq.{value}"
     return db_request("GET", table, params=params)
+
+
+def db_select_all(table: str, **filters):
+    """Read complete analytics/admin datasets past PostgREST's 1,000-row page."""
+    rows: list[dict] = []
+    page_size = 1000
+    offset = 0
+    while True:
+        params = {"select": "*", "limit": str(page_size), "offset": str(offset)}
+        for key, value in filters.items():
+            if value is not None:
+                params[key] = f"eq.{value}"
+        page = db_request("GET", table, params=params)
+        rows.extend(page)
+        if len(page) < page_size:
+            return rows
+        offset += page_size
 
 
 def db_insert(table: str, row: dict):
@@ -355,6 +377,40 @@ def auth_player(authorization: Optional[str]) -> dict:
         if players:
             return players[0]
     raise HTTPException(401, "Neplatné přihlášení hráče")
+
+
+def require_admin(authorization: Optional[str], *, write: bool = False) -> dict:
+    """Authenticate a player and then require an independent admin grant.
+
+    Admin rights deliberately live outside the player row. Team membership, a
+    guessed URL or an ordinary authenticated session can never grant access by
+    itself. The first owner is created by the v3.17 migration.
+    """
+    player = auth_player(authorization)
+    try:
+        rows = db_select("admin_accounts", player_id=player["id"])
+    except HTTPException as exc:
+        raise HTTPException(403, "Administrace ještě není aktivovaná. Spusť migraci v3.17.") from exc
+    rows = [row for row in rows if row.get("active") is True]
+    if not rows:
+        raise HTTPException(403, "Tento hráč nemá přístup do administrace")
+    account = rows[0]
+    role = str(account.get("role") or "viewer")
+    if write and role not in ("owner", "editor"):
+        raise HTTPException(403, "Toto administrátorské oprávnění je pouze pro čtení")
+    return {"player": player, "account": account, "role": role}
+
+
+def record_admin_audit(admin: dict, action: str, target_type: str, target_id: Optional[str], details: Optional[dict] = None) -> None:
+    db_insert("admin_audit_log", {
+        "id": str(uuid.uuid4()),
+        "admin_player_id": admin["player"]["id"],
+        "action": action,
+        "target_type": target_type,
+        "target_id": target_id,
+        "details": details or {},
+        "created_at": datetime.now(TZ).isoformat(),
+    })
 
 
 def anonymous_hash(raw: Optional[str]) -> Optional[str]:
@@ -724,6 +780,12 @@ def home():
     return RedirectResponse(url="/index.html", status_code=307)
 
 
+@app.get("/admin")
+@app.get("/admin/")
+def admin_home():
+    return FileResponse(ROOT / "public" / "admin.html")
+
+
 @app.get("/api/health")
 def health():
     puzzle_file = PUZZLES_PATH.exists()
@@ -732,7 +794,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.16.5",
+        "version": "3.17.0",
         "vocabularyVersion": pdata.get("lexiconVersion") or pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "freeGeneration": pdata.get("freeGeneration"),
@@ -808,9 +870,16 @@ def health():
             db_request("GET", "free_slot_rewards", params={"select": "id,level,content_generation", "limit": "1"})
         except HTTPException:
             free_generation2_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        admin_migration = True
+        try:
+            db_request("GET", "admin_accounts", params={"select": "player_id,role,active", "limit": "1"})
+            db_request("GET", "admin_audit_log", params={"select": "id", "limit": "1"})
+            db_request("GET", "puzzle_feedback", params={"select": "id,status,resolution_note,reviewed_at,reviewed_by", "limit": "1"})
+        except HTTPException:
+            admin_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -823,7 +892,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.16.5",
+        "version": "3.17.0",
     }
 
 
@@ -949,7 +1018,12 @@ def claim_anonymous(payload: AnonymousClaim, authorization: Optional[str] = Head
     # Feedback has a unique player/puzzle/kind constraint. Merge row-by-row so an existing
     # authenticated vote wins over a duplicate anonymous vote rather than making claim fail.
     for row in db_select("puzzle_feedback", anonymous_id=anon):
-        existing = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=row.get("puzzle_id"), kind=row.get("kind"))
+        candidates = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=row.get("puzzle_id"), kind=row.get("kind"))
+        if row.get("kind") == "word":
+            report_word = str(row.get("word") or "").strip().casefold()
+            existing = [candidate for candidate in candidates if str(candidate.get("word") or "").strip().casefold() == report_word]
+        else:
+            existing = candidates
         if existing:
             db_delete("puzzle_feedback", id=row["id"])
         else:
@@ -1075,7 +1149,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.16.5", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.17.0", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1187,7 +1261,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.5",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.17.0",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1248,7 +1322,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.5",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.17.0",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1273,19 +1347,31 @@ def puzzle_feedback(
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.kind not in ("difficulty", "word"):
         raise HTTPException(400, "Neplatný typ zpětné vazby")
-    data = load_puzzles()
-    known = (
-        any(payload.puzzle_id == p["id"] for bank in data.get("free", {}).values() for p in bank)
-        or any(payload.puzzle_id == p["id"] for p in data.get("daily", []))
-        or any(payload.puzzle_id == p.get("id") for bank in legacy_daily_banks(data) for p in bank["puzzles"])
-    )
-    if not known:
+    info = puzzle_info(payload.puzzle_id)
+    if not info:
         raise HTTPException(400, "Neznámá úloha")
     if payload.kind == "difficulty" and payload.rating is None:
         raise HTTPException(400, "Chybí hodnocení obtížnosti")
+    clean_word = " ".join(str(payload.word or "").strip().upper().split()) or None
+    if payload.kind == "word":
+        if not clean_word:
+            raise HTTPException(400, "Vyber slovo, které chceš nahlásit")
+        answers = {str(answer.get("word") or "").strip().upper() for answer in info["puzzle"].get("answers", [])}
+        if clean_word not in answers:
+            raise HTTPException(400, "Toto slovo do úlohy nepatří")
     af = actor_filters(actor)
-    existing = db_select("puzzle_feedback", puzzle_id=payload.puzzle_id, kind=payload.kind, **af)
-    row = {"rating": payload.rating, "word": payload.word, "note": payload.note, "created_at": datetime.now(TZ).isoformat()}
+    candidates = db_select("puzzle_feedback", puzzle_id=payload.puzzle_id, kind=payload.kind, **af)
+    existing = candidates if payload.kind == "difficulty" else [
+        item for item in candidates if str(item.get("word") or "").strip().casefold() == str(clean_word or "").casefold()
+    ]
+    row = {
+        "rating": payload.rating if payload.kind == "difficulty" else None,
+        "word": clean_word if payload.kind == "word" else None,
+        "note": " ".join(str(payload.note or "").strip().split()) or None,
+        "created_at": datetime.now(TZ).isoformat(),
+    }
+    if payload.kind == "word":
+        row.update({"status": "new", "resolution_note": None, "reviewed_at": None, "reviewed_by": None})
     if existing:
         db_update("puzzle_feedback", {"id": existing[0]["id"]}, row)
     else:
@@ -1310,12 +1396,12 @@ def build_quality_report():
     Main calibration metrics use each player's FIRST started attempt on a puzzle.
     Replays remain available as secondary telemetry, but cannot make a puzzle look easier.
     """
-    attempts = db_select("puzzle_attempts")
-    feedback = db_select("puzzle_feedback", kind="difficulty")
-    word_feedback = db_select("puzzle_feedback", kind="word")
-    hint_events = db_select("hint_events")
-    helper_events = db_select("helper_events")
-    product_events = db_select("product_events")
+    attempts = db_select_all("puzzle_attempts")
+    feedback = db_select_all("puzzle_feedback", kind="difficulty")
+    word_feedback = db_select_all("puzzle_feedback", kind="word")
+    hint_events = db_select_all("hint_events")
+    helper_events = db_select_all("helper_events")
+    product_events = db_select_all("product_events")
 
     def ts(row):
         raw = row.get("started_at") or ""
@@ -1397,6 +1483,11 @@ def build_quality_report():
             "avgResumes": round(sum(resumes) / len(resumes), 2) if resumes else 0,
             "difficultyRating": round(sum(ratings) / len(ratings), 2) if ratings else None,
             "ratings": len(ratings),
+            "ratingVotes": {
+                "lighter": sum(1 for rating in ratings if rating == -1),
+                "justRight": sum(1 for rating in ratings if rating == 0),
+                "harder": sum(1 for rating in ratings if rating == 1),
+            },
             "wordReports": word_reports.get(puzzle_id, 0),
             "generatedScore": meta.get("difficultyScore"),
             "cells": meta.get("cells"),
@@ -1564,15 +1655,310 @@ def build_quality_report():
     }
 
 
+def parse_timestamp(value) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=TZ)
+        return parsed.astimezone(TZ)
+    except (TypeError, ValueError):
+        return None
+
+
+def public_admin_identity(admin: dict) -> dict:
+    player = admin["player"]
+    return {
+        "id": player["id"],
+        "name": player.get("name"),
+        "familyCode": player.get("family_code"),
+        "team": league_name_for(str(player.get("family_code") or "")),
+        "avatar": player.get("avatar") or "🙂",
+        "role": admin["role"],
+    }
+
+
+@app.get("/api/admin/me")
+def admin_me(authorization: Optional[str] = Header(default=None)):
+    return public_admin_identity(require_admin(authorization))
+
+
+@app.get("/api/admin/overview")
+def admin_overview(authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    now = datetime.now(TZ)
+    today = current_prague_date()
+    seven_days_ago = now - timedelta(days=7)
+    thirty_days_ago = now - timedelta(days=30)
+    players = db_select_all("players")
+    results = db_select_all("results")
+    attempts = db_select_all("puzzle_attempts")
+    reports = db_select_all("puzzle_feedback", kind="word")
+    ratings = db_select_all("puzzle_feedback", kind="difficulty")
+    leagues = db_select_all("leagues")
+    try:
+        runs = db_select_all("puzzle_runs")
+    except HTTPException:
+        runs = results
+
+    last_activity: dict[str, datetime] = {}
+    for row in attempts:
+        player_id = row.get("player_id")
+        stamp = parse_timestamp(row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
+        if player_id and stamp and (player_id not in last_activity or stamp > last_activity[player_id]):
+            last_activity[player_id] = stamp
+    for row in results:
+        player_id = row.get("player_id")
+        stamp = parse_timestamp(row.get("completed_at"))
+        if player_id and stamp and (player_id not in last_activity or stamp > last_activity[player_id]):
+            last_activity[player_id] = stamp
+
+    run_times = [(row, parse_timestamp(row.get("completed_at"))) for row in runs]
+    today_runs = [row for row, stamp in run_times if stamp and stamp.date() == today]
+    week_runs = [row for row, stamp in run_times if stamp and stamp >= seven_days_ago]
+    primary_daily = expected_daily_puzzle_id(today.isoformat())
+    daily_today = {
+        row.get("player_id") for row in results
+        if row.get("mode") == "daily"
+        and str(row.get("daily_date") or "")[:10] == today.isoformat()
+        and row.get("puzzle_id") == primary_daily
+    }
+    daily_today.discard(None)
+
+    version_counts: dict[str, int] = {}
+    for row in attempts:
+        stamp = parse_timestamp(row.get("started_at"))
+        version = str(row.get("app_version") or "neznámá")
+        if stamp and stamp >= thirty_days_ago:
+            version_counts[version] = version_counts.get(version, 0) + 1
+    versions = [
+        {"version": version, "attempts": count}
+        for version, count in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))
+    ]
+    open_reports = [row for row in reports if str(row.get("status") or "new") in ("new", "reviewing")]
+    vote_counts = {str(value): sum(1 for row in ratings if row.get("rating") == value) for value in (-1, 0, 1)}
+    return {
+        "generatedAt": now.isoformat(),
+        "today": today.isoformat(),
+        "players": {
+            "total": len(players),
+            "active7": sum(1 for stamp in last_activity.values() if stamp >= seven_days_ago),
+            "active30": sum(1 for stamp in last_activity.values() if stamp >= thirty_days_ago),
+        },
+        "games": {"today": len(today_runs), "last7Days": len(week_runs)},
+        "daily": {"todayPlayers": len(daily_today), "puzzleId": primary_daily},
+        "feedback": {"openWordReports": len(open_reports), "wordReportsTotal": len(reports), "ratingsTotal": len(ratings), "votes": vote_counts},
+        "teams": len(leagues),
+        "appVersions": versions[:8],
+    }
+
+
+def admin_user_summaries() -> list[dict]:
+    players = db_select_all("players")
+    results = db_select_all("results")
+    attempts = db_select_all("puzzle_attempts")
+    reports = db_select_all("puzzle_feedback", kind="word")
+    try:
+        leagues = {str(row.get("code")): row.get("name") or row.get("code") for row in db_select_all("leagues")}
+    except HTTPException:
+        leagues = {}
+    results_by_player: dict[str, list[dict]] = {}
+    attempts_by_player: dict[str, list[dict]] = {}
+    reports_by_player: dict[str, list[dict]] = {}
+    for row in results:
+        if row.get("player_id"):
+            results_by_player.setdefault(row["player_id"], []).append(row)
+    for row in attempts:
+        if row.get("player_id"):
+            attempts_by_player.setdefault(row["player_id"], []).append(row)
+    for row in reports:
+        if row.get("player_id"):
+            reports_by_player.setdefault(row["player_id"], []).append(row)
+
+    summaries = []
+    for player in players:
+        player_results = results_by_player.get(player["id"], [])
+        player_attempts = attempts_by_player.get(player["id"], [])
+        activity_candidates = [
+            parse_timestamp(row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
+            for row in player_attempts
+        ] + [parse_timestamp(row.get("completed_at")) for row in player_results]
+        activity = max((stamp for stamp in activity_candidates if stamp), default=None)
+        latest_attempt = max(
+            player_attempts,
+            key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ),
+            default=None,
+        )
+        family = str(player.get("family_code") or "")
+        player_reports = reports_by_player.get(player["id"], [])
+        summaries.append({
+            "id": player["id"],
+            "name": player.get("name"),
+            "avatar": player.get("avatar") or "🙂",
+            "familyCode": family,
+            "team": leagues.get(family) or family,
+            "createdAt": player.get("created_at"),
+            "lastActiveAt": activity.isoformat() if activity else None,
+            "appVersion": latest_attempt.get("app_version") if latest_attempt else None,
+            "supportMode": player.get("support_mode") or "none",
+            "hasPassword": bool(player.get("password_hash")),
+            "points": sum(int(row.get("points") or 0) for row in player_results),
+            "completed": len(player_results),
+            "dailyCompleted": len({str(row.get("daily_date"))[:10] for row in player_results if row.get("mode") == "daily" and row.get("daily_date")}),
+            "openWordReports": sum(1 for row in player_reports if str(row.get("status") or "new") in ("new", "reviewing")),
+        })
+    summaries.sort(key=lambda row: row.get("lastActiveAt") or "", reverse=True)
+    return summaries
+
+
+@app.get("/api/admin/users")
+def admin_users(
+    q: str = Query(default="", max_length=80),
+    limit: int = Query(default=60, ge=1, le=200),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    needle = " ".join(q.strip().casefold().split())
+    rows = admin_user_summaries()
+    if needle:
+        rows = [row for row in rows if needle in " ".join((str(row.get("name") or ""), str(row.get("team") or ""), str(row.get("familyCode") or ""))).casefold()]
+    return {"total": len(rows), "users": rows[:limit]}
+
+
+@app.get("/api/admin/users/{player_id}")
+def admin_user_detail(player_id: str, authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    players = db_select("players", id=player_id)
+    if not players:
+        raise HTTPException(404, "Hráč neexistuje")
+    player = players[0]
+    results = db_select("results", player_id=player_id)
+    results.sort(key=lambda row: parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
+    attempts = db_select("puzzle_attempts", player_id=player_id)
+    attempts.sort(key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
+    reports = db_select("puzzle_feedback", player_id=player_id, kind="word")
+    try:
+        session_count = len(db_select("player_sessions", player_id=player_id))
+    except HTTPException:
+        session_count = 0
+    try:
+        push_count = len(db_select("push_subscriptions", player_id=player_id))
+    except HTTPException:
+        push_count = 0
+    return {
+        "user": {
+            "id": player["id"], "name": player.get("name"), "avatar": player.get("avatar") or "🙂",
+            "familyCode": player.get("family_code"), "team": league_name_for(str(player.get("family_code") or "")),
+            "createdAt": player.get("created_at"), "supportMode": player.get("support_mode") or "none",
+            "hasPassword": bool(player.get("password_hash")), "additionalSessions": session_count, "pushSubscriptions": push_count,
+        },
+        "stats": player_stats(player_id),
+        "latestAppVersion": attempts[0].get("app_version") if attempts else None,
+        "wordReports": {"total": len(reports), "open": sum(1 for row in reports if str(row.get("status") or "new") in ("new", "reviewing"))},
+        "recentResults": [{
+            "puzzleId": row.get("puzzle_id"), "mode": row.get("mode"), "difficulty": row.get("difficulty"),
+            "dailyDate": str(row.get("daily_date"))[:10] if row.get("daily_date") else None,
+            "elapsedMs": row.get("best_elapsed_ms"), "moves": row.get("best_moves"), "points": row.get("points"),
+            "hintsUsed": row.get("hints_used"), "cleanSolve": row.get("clean_solve") is True, "completedAt": row.get("completed_at"),
+        } for row in results[:30]],
+    }
+
+
+@app.get("/api/admin/reports")
+def admin_reports(
+    status: str = Query(default="open", max_length=20),
+    q: str = Query(default="", max_length=80),
+    limit: int = Query(default=100, ge=1, le=300),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    if status not in ("open", "all", "new", "reviewing", "resolved", "dismissed"):
+        raise HTTPException(400, "Neplatný filtr stavu")
+    reports = db_select_all("puzzle_feedback", kind="word")
+    players = {row["id"]: row for row in db_select_all("players")}
+    needle = " ".join(q.strip().casefold().split())
+    output = []
+    for report in reports:
+        report_status = str(report.get("status") or "new")
+        if status == "open" and report_status not in ("new", "reviewing"):
+            continue
+        if status not in ("open", "all") and report_status != status:
+            continue
+        player = players.get(report.get("player_id"))
+        info = puzzle_info(str(report.get("puzzle_id") or ""))
+        puzzle_meta = (info or {}).get("puzzle", {}).get("meta") or {}
+        haystack = " ".join((
+            str(report.get("word") or ""), str(report.get("note") or ""), str(report.get("puzzle_id") or ""),
+            str(player.get("name") if player else "anonym"), str(player.get("family_code") if player else ""),
+        )).casefold()
+        if needle and needle not in haystack:
+            continue
+        output.append({
+            "id": report.get("id"), "status": report_status, "word": report.get("word"), "note": report.get("note"),
+            "puzzleId": report.get("puzzle_id"), "challengeKey": report.get("challenge_key"),
+            "mode": (info or {}).get("mode"), "difficulty": (info or {}).get("difficulty"),
+            "level": (info or {}).get("level") or puzzle_meta.get("level"), "legacy": bool((info or {}).get("legacy")),
+            "reportedBy": {"id": player.get("id"), "name": player.get("name"), "team": player.get("family_code")} if player else {"id": None, "name": "Anonymní hráč", "team": None},
+            "createdAt": report.get("created_at"), "resolutionNote": report.get("resolution_note"),
+            "reviewedAt": report.get("reviewed_at"), "reviewedBy": report.get("reviewed_by"),
+        })
+    status_order = {"new": 0, "reviewing": 1, "resolved": 2, "dismissed": 3}
+    output.sort(key=lambda row: row.get("createdAt") or "", reverse=True)
+    output.sort(key=lambda row: status_order.get(row["status"], 9))
+    return {"total": len(output), "reports": output[:limit]}
+
+
+@app.patch("/api/admin/reports/{report_id}")
+def admin_report_update(report_id: str, payload: AdminReportUpdate, authorization: Optional[str] = Header(default=None)):
+    admin = require_admin(authorization, write=True)
+    if payload.status not in ("new", "reviewing", "resolved", "dismissed"):
+        raise HTTPException(400, "Neplatný stav hlášení")
+    reports = db_select("puzzle_feedback", id=report_id)
+    if not reports or reports[0].get("kind") != "word":
+        raise HTTPException(404, "Hlášení neexistuje")
+    report = reports[0]
+    note = " ".join(str(payload.resolution_note or "").strip().split()) or None
+    values = {"status": payload.status, "resolution_note": note}
+    if payload.status == "new":
+        values.update({"reviewed_at": None, "reviewed_by": None})
+    else:
+        values.update({"reviewed_at": datetime.now(TZ).isoformat(), "reviewed_by": admin["player"]["id"]})
+    db_update("puzzle_feedback", {"id": report_id}, values)
+    record_admin_audit(admin, "word_report_status", "puzzle_feedback", report_id, {
+        "word": report.get("word"), "puzzleId": report.get("puzzle_id"),
+        "from": str(report.get("status") or "new"), "to": payload.status, "resolutionNote": note,
+    })
+    return {"ok": True, "id": report_id, **values}
+
+
+@app.get("/api/admin/audit")
+def admin_audit(
+    limit: int = Query(default=80, ge=1, le=200),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    rows = db_select_all("admin_audit_log")
+    players = {row["id"]: row for row in db_select_all("players")}
+    rows.sort(key=lambda row: parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
+    return {"entries": [{
+        "id": row.get("id"), "action": row.get("action"), "targetType": row.get("target_type"),
+        "targetId": row.get("target_id"), "details": row.get("details") or {}, "createdAt": row.get("created_at"),
+        "admin": (players.get(row.get("admin_player_id")) or {}).get("name") or "Administrátor",
+    } for row in rows[:limit]]}
+
+
+@app.get("/api/admin/quality")
 @app.get("/api/quality-report")
 def quality_report(authorization: Optional[str] = Header(default=None)):
-    auth_player(authorization)
+    require_admin(authorization)
     return build_quality_report()
 
 
+@app.get("/api/admin/quality-history")
 @app.get("/api/quality-history")
 def quality_history(authorization: Optional[str] = Header(default=None)):
-    auth_player(authorization)
+    require_admin(authorization)
     rows = db_request("GET", "quality_snapshots", params={"select": "week_start,payload,created_at", "order": "week_start.desc", "limit": "12"})
     return {"snapshots": rows}
 
