@@ -52,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.16.1-cloud")
+app = FastAPI(title="Proplet API", version="3.16.2-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -694,6 +694,16 @@ def daily_puzzle_matches_date(puzzle_id: str, daily_date: str) -> bool:
     return puzzle_id in valid_daily_puzzle_ids(daily_date)
 
 
+def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
+    """True only when an archived Daily result is replaced by that day's primary board."""
+    return bool(
+        payload.mode == "daily"
+        and payload.daily_date
+        and old.get("puzzle_id") != payload.puzzle_id
+        and payload.puzzle_id == expected_daily_puzzle_id(payload.daily_date)
+    )
+
+
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     data = load_puzzles()
     if mode == "daily":
@@ -722,7 +732,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.16.1",
+        "version": "3.16.2",
         "vocabularyVersion": pdata.get("lexiconVersion") or pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "freeGeneration": pdata.get("freeGeneration"),
@@ -813,7 +823,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.16.1",
+        "version": "3.16.2",
     }
 
 
@@ -1065,7 +1075,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.16.1", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.16.2", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1177,7 +1187,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.1",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.2",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1238,7 +1248,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.1",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.2",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1698,6 +1708,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
         logger.warning("Could not store puzzle run for %s", payload.attempt_id)
 
     official_completed_at = payload_completed_at(payload.completed_at)
+    daily_generation_upgrade = False
     existing = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)
     if existing:
         old = existing[0]
@@ -1708,7 +1719,18 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             incoming_is_earlier = completion_time({"completed_at": official_completed_at}) < completion_time(old)
         except Exception:
             incoming_is_earlier = False
-        if incoming_is_earlier:
+        daily_generation_upgrade = is_daily_generation_upgrade(old, payload)
+        if daily_generation_upgrade:
+            # The date already paid its 100 XP. Replace only the official board/result so
+            # current Daily and weekly leaderboards can count the new generation.
+            db_update("results", {"id": old["id"]}, {
+                "puzzle_id": payload.puzzle_id, "difficulty": payload.difficulty,
+                "daily_date": payload.daily_date, "best_elapsed_ms": payload.elapsed_ms,
+                "best_moves": payload.moves, "hints_used": payload.hints_used,
+                "wrong_attempts": payload.wrong_attempts, "max_hint_level": payload.max_hint_level,
+                "clean_solve": effective_clean, "completed_at": official_completed_at,
+            })
+        elif incoming_is_earlier and old.get("puzzle_id") == payload.puzzle_id:
             db_update("results", {"id": old["id"]}, {
                 "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                 "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
@@ -1741,7 +1763,16 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 raise
             # Současné odeslání ze dvou zařízení: zachovej chronologicky první dokončení.
             old = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)[0]
-            if completion_time({"completed_at": official_completed_at}) < completion_time(old):
+            daily_generation_upgrade = is_daily_generation_upgrade(old, payload)
+            if daily_generation_upgrade:
+                db_update("results", {"id": old["id"]}, {
+                    "puzzle_id": payload.puzzle_id, "difficulty": payload.difficulty,
+                    "daily_date": payload.daily_date, "best_elapsed_ms": payload.elapsed_ms,
+                    "best_moves": payload.moves, "hints_used": payload.hints_used,
+                    "wrong_attempts": payload.wrong_attempts, "max_hint_level": payload.max_hint_level,
+                    "clean_solve": effective_clean, "completed_at": official_completed_at,
+                })
+            elif old.get("puzzle_id") == payload.puzzle_id and completion_time({"completed_at": official_completed_at}) < completion_time(old):
                 db_update("results", {"id": old["id"]}, {
                     "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                     "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
@@ -1789,6 +1820,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
         "ok": True,
         "firstCompletion": first,
         "awardedPoints": points if first else 0,
+        "dailyGenerationUpgrade": daily_generation_upgrade,
         "transferredSlot": bool(payload.mode == "free" and transferred_reward),
         "stats": stats,
         "statsWarning": stats_warning,

@@ -196,7 +196,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.16.1</small>
+      <small class="app-version">Proplet v3.16.2</small>
     </footer>
   </main>
 
@@ -327,12 +327,16 @@
     <div class="modal-card left support-mode-modal-card">
       <button id="closeSupportModeModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">POMOCNÍK</span>
-      <h2>Jak ti má Proplet pomáhat?</h2>
-      <p class="muted">Nemění obtížnost ani XP. Jen určuje, jestli se hra po delším zaseknutí sama ozve s nabídkou malé nápovědy. Přijatá pomoc se počítá jako nápověda a ukončí ✨ čisté řešení.</p>
-      <button class="support-choice" data-support-mode="beginner"><span>🐣</span><div><strong>Začínající čtenář</strong><small>Přibližně 1. třída · nabídka po 45 s bez pokroku.</small></div></button>
-      <button class="support-choice" data-support-mode="younger"><span>🧒</span><div><strong>Mladší školák</strong><small>2.–5. třída · nabídka po 70 s bez pokroku.</small></div></button>
-      <button class="support-choice" data-support-mode="older"><span>🎒</span><div><strong>Starší školák</strong><small>6. třída a výš · nabídka po 100 s bez pokroku.</small></div></button>
-      <button class="support-choice" data-support-mode="none"><span>🧠</span><div><strong>Bez asistence</strong><small>Pomocník se sám neozývá. Nápověda zůstává kdykoli dostupná ručně.</small></div></button>
+      <h2>Kdy se má ozvat?</h2>
+      <div class="support-choice-grid" aria-label="Čas nabídky Pomocníka">
+        <button class="support-choice" data-support-mode="beginner"><span>🐣</span><div><strong>Brzy</strong><small>po 45 sekundách</small></div></button>
+        <button class="support-choice" data-support-mode="younger"><span>🧒</span><div><strong>Vyváženě</strong><small>po 70 sekundách</small></div></button>
+        <button class="support-choice" data-support-mode="older"><span>🎒</span><div><strong>Dát mi čas</strong><small>po 100 sekundách</small></div></button>
+        <button class="support-choice" data-support-mode="none"><span>🧠</span><div><strong>Nenabízet</strong><small>sám se neozve</small></div></button>
+      </div>
+      <div id="supportModeOutcome" class="support-outcome" aria-live="polite"></div>
+      <p class="support-fineprint">XP zůstávají celé. Přijatá pomoc se počítá jako nápověda: ukončí ✨ čisté řešení a ovlivní pořadí. Nastavení můžeš kdykoli změnit.</p>
+      <button id="saveSupportModeBtn" class="primary-btn big">Uložit nastavení</button>
     </div>
   </div>
 

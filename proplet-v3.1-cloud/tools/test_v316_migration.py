@@ -190,6 +190,57 @@ class DailyGeneration2MigrationTests(unittest.TestCase):
         wrong = data["daily"][(index + 1) % 365]["id"]
         self.assertFalse(server.daily_puzzle_matches_date(wrong, daily_date))
 
+    def test_only_primary_board_can_replace_archived_result(self) -> None:
+        data = server.load_puzzles()
+        daily_date = data["dailyGeneration2From"]
+        index = server.daily_rotation_index(daily_date, 365)
+        active = data["daily"][index]
+        archived = data["legacyDaily"][-1]["puzzles"][index]
+        payload = server.ResultCreate(
+            puzzle_id=active["id"], challenge_key=f"daily:{daily_date}", mode="daily",
+            difficulty=active["difficulty"], elapsed_ms=12_000, moves=8, daily_date=daily_date,
+        )
+        self.assertTrue(server.is_daily_generation_upgrade({"puzzle_id": archived["id"]}, payload))
+        self.assertFalse(server.is_daily_generation_upgrade({"puzzle_id": active["id"]}, payload))
+
+        legacy_payload = payload.model_copy(update={"puzzle_id": archived["id"], "difficulty": archived["difficulty"]})
+        self.assertFalse(server.is_daily_generation_upgrade({"puzzle_id": active["id"]}, legacy_payload))
+
+    def test_result_upgrade_replaces_board_without_second_xp(self) -> None:
+        data = server.load_puzzles()
+        daily_date = data["dailyGeneration2From"]
+        index = server.daily_rotation_index(daily_date, 365)
+        active = data["daily"][index]
+        archived = data["legacyDaily"][-1]["puzzles"][index]
+        old = {
+            "id": "result-1", "puzzle_id": archived["id"], "points": 100,
+            "completed_at": f"{daily_date}T00:15:00+02:00",
+        }
+        payload = server.ResultCreate(
+            puzzle_id=active["id"], challenge_key=f"daily:{daily_date}", mode="daily",
+            difficulty=active["difficulty"], elapsed_ms=22_000, moves=10,
+            daily_date=daily_date, completed_at=f"{daily_date}T09:30:00+02:00",
+        )
+        updates = []
+        with (
+            patch.object(server, "auth_player", return_value={"id": "player-1"}),
+            patch.object(server, "puzzle_exists", return_value=True),
+            patch.object(server, "daily_puzzle_matches_date", return_value=True),
+            patch.object(server, "record_puzzle_run"),
+            patch.object(server, "db_select", return_value=[old]),
+            patch.object(server, "db_update", side_effect=lambda table, where, values: updates.append((table, where, values))),
+            patch.object(server, "db_insert") as insert,
+            patch.object(server, "player_stats", return_value={"points": 100}),
+        ):
+            response = server.result(payload, authorization="Bearer test")
+
+        self.assertTrue(response["dailyGenerationUpgrade"])
+        self.assertFalse(response["firstCompletion"])
+        self.assertEqual(response["awardedPoints"], 0)
+        self.assertEqual(updates[0][2]["puzzle_id"], active["id"])
+        self.assertNotIn("points", updates[0][2])
+        insert.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

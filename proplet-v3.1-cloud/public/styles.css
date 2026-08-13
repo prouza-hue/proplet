@@ -308,22 +308,34 @@ body.playing .app-header,body.playing .app-footer,body.playing .bottom-nav{displ
 .support-mode-card strong{font-size:1rem}
 .support-mode-card small{color:var(--muted);line-height:1.35}
 .support-mode-modal-card{max-width:560px}
+.support-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0 12px}
 .support-choice{
   width:100%;display:flex;align-items:center;gap:14px;text-align:left;
   border:1px solid rgba(80,58,120,.14);background:var(--card);border-radius:16px;
-  padding:14px 15px;margin-top:10px;cursor:pointer;color:inherit
+  padding:12px 13px;margin:0;cursor:pointer;color:inherit;min-width:0
 }
-.support-choice>span{font-size:1.7rem;width:36px;text-align:center}
+.support-choice>span{font-size:1.55rem;width:31px;text-align:center;flex:0 0 31px}
 .support-choice>div{display:grid;gap:3px}
-.support-choice strong{font-size:1rem}
-.support-choice small{color:var(--muted);line-height:1.35}
+.support-choice strong{font-size:.94rem;line-height:1.15}
+.support-choice small{color:var(--muted);line-height:1.25;font-size:.72rem}
 .support-choice.selected{outline:3px solid rgba(125,111,231,.22);border-color:#7d6fe7;background:rgba(125,111,231,.07)}
+.support-outcome{min-height:76px;padding:13px 14px;border-radius:15px;background:linear-gradient(135deg,rgba(255,226,111,.3),rgba(125,111,231,.1));border:1px solid rgba(125,95,190,.17);color:#463d6a;line-height:1.42;font-size:.88rem}
+.support-outcome strong{display:block;color:var(--ink);margin-bottom:3px;font-size:.93rem}
+.support-fineprint{margin:10px 2px 13px;color:var(--muted);font-size:.75rem;line-height:1.42}
+.onboard-support-grid{margin-top:11px}
+.onboard-support-grid .support-choice{padding:10px}
+.onboard-support-grid+.support-outcome{margin-top:10px;text-align:left}
+.onboard-support-note{margin:9px 2px 0!important;font-size:.72rem!important;line-height:1.4!important;text-align:left}
 .helper-offer-card{max-width:430px;text-align:center}
 .helper-big-icon{font-size:3rem;margin-bottom:4px}
 .helper-offer-card .primary-btn{margin-top:12px}
 @media (max-width:520px){
   .support-mode-card{align-items:flex-start;flex-direction:column}
   .support-mode-card .secondary-btn{width:100%}
+}
+@media (max-width:360px){
+  .support-choice-grid{grid-template-columns:1fr}
+  .support-outcome{min-height:0}
 }
 
 /* v3.14 — Pomocník telemetry + interní Quality dashboard */
