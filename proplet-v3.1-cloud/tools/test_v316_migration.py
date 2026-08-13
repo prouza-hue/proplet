@@ -241,6 +241,35 @@ class DailyGeneration2MigrationTests(unittest.TestCase):
         self.assertNotIn("points", updates[0][2])
         insert.assert_not_called()
 
+    def test_same_daily_replay_is_training_without_xp_or_official_overwrite(self) -> None:
+        old = {
+            "id": "result-1", "puzzle_id": "daily-active", "points": 100,
+            "completed_at": "2026-08-13T08:00:00+02:00",
+        }
+        payload = server.ResultCreate(
+            puzzle_id="daily-active", challenge_key="daily:2026-08-13", mode="daily",
+            difficulty="medium", elapsed_ms=40_000, moves=8, daily_date="2026-08-13",
+            completed_at="2026-08-13T12:00:00+02:00",
+        )
+        with (
+            patch.object(server, "auth_player", return_value={"id": "player-1"}),
+            patch.object(server, "puzzle_exists", return_value=True),
+            patch.object(server, "daily_puzzle_matches_date", return_value=True),
+            patch.object(server, "record_puzzle_run") as record_run,
+            patch.object(server, "db_select", return_value=[old]),
+            patch.object(server, "db_update") as update,
+            patch.object(server, "db_insert") as insert,
+            patch.object(server, "player_stats", return_value={"points": 100}),
+        ):
+            response = server.result(payload, authorization="Bearer test")
+
+        self.assertFalse(response["firstCompletion"])
+        self.assertEqual(response["awardedPoints"], 0)
+        self.assertFalse(response["dailyGenerationUpgrade"])
+        record_run.assert_called_once()
+        update.assert_not_called()
+        insert.assert_not_called()
+
 
 class DailyGlobalLeaderboardTests(unittest.TestCase):
     def test_global_daily_rank_is_correct_and_never_exposes_identity(self) -> None:

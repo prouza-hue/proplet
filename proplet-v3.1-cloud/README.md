@@ -1,6 +1,6 @@
-# Proplet v3.16.4
+# Proplet v3.16.5
 
-Aktuální release: **v3.16.4 — krásné sdílení a světové Daily pořadí**.
+Aktuální release: **v3.16.5 — Daily lze bezpečně zopakovat**.
 
 Hlavní novinky:
 
@@ -20,9 +20,11 @@ Hlavní novinky:
 - čisté řešení přidává ještě jednu drobnou pochvalu a stejný uložený výsledek si při znovuotevření ponechá stejný text.
 - sdílený odkaz má vlastní velký náhled, favicony a instalační ikony pro Android i iOS,
 - Daily výsledkovka ukazuje anonymní globální pořadí, počet dnešních hráčů, percentil a sousední výsledky bez zveřejnění jmen.
+- výsledkovka Daily nabízí nový tréninkový pokus bez dalších XP a bez přepsání prvního soutěžního výsledku,
+- hráč se starou generací Daily může z výsledkovky spustit aktivní desku a bezpečně převést pořadí bez ručního mazání databáze.
 
 Nasazení: `UPDATE_V3_16_2_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_16.sql`  
-Release notes: `RELEASE_V3_16_4_CZ.md`  
+Release notes: `RELEASE_V3_16_5_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
