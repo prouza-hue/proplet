@@ -1,6 +1,6 @@
-# Proplet v3.18.0
+# Proplet v3.18.1
 
-Aktuální release: **v3.18.0 — globální pořadí každé Free úrovně**.
+Aktuální release: **v3.18.1 — globální pořadí Free úrovní + opravený balíček administrace**.
 
 Hlavní novinky:
 
@@ -30,9 +30,10 @@ Hlavní novinky:
 - výsledkovka a detail úrovně přepínají mezi pohledy **Globálně** a **Můj tým**;
 - do pořadí dál platí pouze první dokončený pokus a replay zůstává tréninkem;
 - vysvětlení pořadí i administrace nově jednotně používají české označení **Čistě / Čisté vyřešení**.
+- hotfix 3.18.1 doplňuje do update balíčku chybějící `admin.html` a `admin.css` a přidává kontrolu `adminStatic` do `/api/health`.
 
-Nasazení: `UPDATE_V3_18_CZ.md`  
+Nasazení: `UPDATE_V3_18_1_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_17.sql`  
-Release notes: `RELEASE_V3_18_CZ.md`  
+Release notes: `RELEASE_V3_18_1_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
