@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6c5ce7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="description" content="Proplet – česká slovní hra. Najdi všechna slova a propleť celou plochu." />
+  <title>Proplet</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <main class="app-shell">
+    <header class="app-header">
+      <button class="brand" data-nav="daily" aria-label="Proplet – domů">
+        <span class="brand-mark"><span>P</span></span>
+        <span class="brand-copy"><strong>Proplet</strong><small>česká slovní hra</small></span>
+      </button>
+      <button id="profileChip" class="profile-chip" data-nav="profile"><span id="profileChipAvatar" class="avatar-dot">🙂</span><span id="profileChipText">Hráč</span></button>
+    </header>
+
+    <section id="screen-daily" class="screen active">
+      <div class="daily-hero card">
+        <div class="hero-decor" aria-hidden="true"><span>Ř</span><span>A</span><span>P</span></div>
+        <div class="hero-topline">
+          <span class="eyebrow light">DENNÍ VÝZVA</span>
+          <span id="dailyDate" class="date-pill light-pill"></span>
+        </div>
+        <div class="hero-main">
+          <div>
+            <h1>Dnešní Proplet</h1>
+            <p id="dailyMeta" class="hero-muted"></p>
+          </div>
+          <div id="streakBubble" class="streak-bubble hero-streak"><span class="streak-icon">🔥</span><strong id="streakCount">0</strong><small id="streakUnit">dní</small></div>
+        </div>
+        <button id="playDailyBtn" class="primary-btn hero-btn big">Hrát dnešní výzvu</button>
+        <button id="shareDailyBtn" class="hero-secondary hidden">Sdílet výsledek</button>
+        <div id="dailySyncStatus" class="daily-sync hidden"></div>
+      </div>
+
+      <div id="rescueCard" class="card rescue-card hidden">
+        <div class="rescue-flame">🔥</div>
+        <div class="rescue-copy"><span class="eyebrow">ZÁCHRANA SÉRIE</span><h2 id="rescueTitle">Tvoje série je v ohrožení</h2><p id="rescueText" class="muted"></p></div>
+        <button id="rescueBtn" class="rescue-btn">Zachránit sérii · 30 s</button>
+      </div>
+
+      <div id="quickPlayCard" class="card quick-play-card">
+        <div class="quick-play-head">
+          <div><span class="eyebrow">HRAJ DÁL</span><h2>Ještě nekončíme.</h2><p class="muted">Vyber si obtížnost a dej si další Proplet.</p></div>
+          <button id="openAllGamesBtn" class="quick-all-btn">Všechny hry <span>→</span></button>
+        </div>
+        <div id="quickPlayGrid" class="quick-play-grid"></div>
+      </div>
+
+      <div id="levelCard" class="card level-card"></div>
+
+      <div class="card streak-card">
+        <div class="section-head">
+          <div><span class="eyebrow">SÉRIE</span><h2>Další odměna</h2></div>
+          <div id="nextBadgeText" class="muted compact"></div>
+        </div>
+        <div id="badgeRail" class="badge-rail"></div>
+      </div>
+
+      <div class="card mini-stats">
+        <div><span class="stat-label">Denní výzvy</span><strong id="dailyCompletedStat">0</strong></div>
+        <div><span class="stat-label">Nejdelší série</span><strong id="longestStreakStat">0</strong></div>
+        <div><span class="stat-label">Nejlepší čas</span><strong id="bestDailyStat">—</strong></div>
+      </div>
+    </section>
+
+    <section id="screen-free" class="screen">
+      <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Na co si troufáš?</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
+      <div id="difficultyCards" class="difficulty-grid"></div>
+    </section>
+
+    <section id="screen-leaderboard" class="screen">
+      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Uvnitř svého týmu i proti ostatním týmům Propletu.</p></div>
+      <div id="leaderboardGate" class="card gate"></div>
+      <div id="leaderboardContent" class="hidden">
+        <div class="league-scope-tabs">
+          <button class="league-scope-tab active" data-league-scope="family">👥 Můj tým</button>
+          <button class="league-scope-tab" data-league-scope="global">🌍 Liga týmů</button>
+        </div>
+        <div id="familyLeaderboardPanel">
+          <div class="leader-tabs">
+            <button class="leader-tab active" data-leader-tab="daily">Dnes</button>
+            <button class="leader-tab" data-leader-tab="weekly">Týden</button>
+            <button class="leader-tab" data-leader-tab="overall">Celkem</button>
+          </div>
+          <div id="leaderboardList" class="leaderboard-list"></div>
+        </div>
+        <div id="globalLeaguePanel" class="hidden">
+          <div class="global-league-hero card">
+            <div><span class="eyebrow">🌍 LIGA TÝMŮ</span><h2>Týdenní souboj týmů</h2><p>Stejná Denní výzva. Až tři hráči za tým. Každé pondělí od nuly.</p></div>
+            <button id="familyLeagueSettingsBtn" class="secondary-btn">Nastavení týmu</button>
+          </div>
+          <div class="leader-tabs global-week-tabs">
+            <button class="global-week-tab active" data-week-offset="0">Tento týden</button>
+            <button class="global-week-tab" data-week-offset="-1">Minulý týden</button>
+          </div>
+          <div id="globalLeagueWeekMeta" class="global-week-meta"></div>
+          <div id="globalLeagueStatus"></div>
+          <div id="globalLeagueList" class="leaderboard-list"></div>
+          <div class="card league-score-explainer">
+            <strong>Jak se boduje?</strong>
+            <span>55 dokončení · až 15 ✨ Čistě · až 10 bez nápověd · až 20 za rychlost.</span>
+            <small>Tým se 3+ členy má tři bodovací místa. Kdo ten den nehraje, nechá své místo za 0. Maximum je 700 bodů za týden.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-profile" class="screen">
+      <div class="screen-title"><span class="eyebrow">HRÁČ</span><h1>Moje cesta Propletem</h1></div>
+      <div id="profileCard" class="card profile-card"></div>
+
+      <div class="card level-roadmap-card">
+        <div class="section-head"><div><span class="eyebrow">HODNOSTI</span><h2>Kam míříš</h2></div></div>
+        <div id="levelRoadmap" class="level-roadmap"></div>
+      </div>
+
+      <div class="card achievement-card">
+        <div class="section-head"><div><span class="eyebrow">ÚSPĚCHY</span><h2>Co už máš za sebou</h2></div></div>
+        <div id="achievementGrid" class="achievement-groups"></div>
+      </div>
+
+      <div class="card badge-card">
+        <div class="section-head"><div><span class="eyebrow">ODZNAKY SÉRIE</span><h2>Každý den o kus dál</h2></div></div>
+        <div id="profileBadges" class="profile-badges"></div>
+      </div>
+
+      <div class="card settings-card">
+        <div class="section-head"><div><span class="eyebrow">POCIT ZE HRY</span><h2>Zvuk a vibrace</h2></div></div>
+        <div class="settings-row">
+          <button id="soundToggle" class="setting-toggle"></button>
+          <button id="hapticToggle" class="setting-toggle"></button>
+        </div>
+        <button id="hapticTestBtn" class="secondary-btn intro-replay-btn">📳 Otestovat vibrace</button>
+        <button id="replayIntroBtn" class="secondary-btn intro-replay-btn">▶ Ukázat úvod znovu</button>
+      </div>
+
+      <div class="card settings-card push-card">
+        <div class="section-head"><div><span class="eyebrow">DENNÍ PŘIPOMÍNKA</span><h2>Nový Proplet na mobil</h2></div></div>
+        <p class="muted push-copy">Ráno ti připomeneme novou Denní výzvu. Když ji už máš hotovou, nic neposíláme.</p>
+        <button id="pushToggleBtn" class="secondary-btn intro-replay-btn">🔔 Nastavit připomínku</button>
+        <div id="pushStatusText" class="push-status muted"></div>
+      </div>
+    </section>
+
+    <section id="screen-game" class="screen game-screen">
+      <div class="game-top">
+        <button id="backFromGame" class="icon-btn" aria-label="Zpět">←</button>
+        <div class="game-title"><span id="gameModeLabel" class="eyebrow"></span><strong id="gameDifficulty"></strong></div>
+        <div class="game-clock"><span id="timer">00:00</span><small id="moves">0 tahů</small></div>
+      </div>
+
+      <div class="game-main">
+        <div class="game-board-column">
+          <div class="game-info card">
+            <div class="word-status-wrap">
+              <div class="word-status-row remaining-row"><span class="stat-label">Zbývá</span><div id="lengths" class="lengths"></div></div>
+              <div class="word-status-row found-row"><span class="stat-label">Nalezeno</span><div id="foundWords" class="found-words"><span class="empty-found">zatím nic</span></div></div>
+            </div>
+            <div id="gameProgress" class="game-progress">0 / 0</div>
+          </div>
+
+          <div class="current-word card">
+            <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
+            <span id="cleanStatus" class="clean-status">✨ Čistě</span>
+          </div>
+
+          <div id="boardStage" class="board-stage card">
+            <div id="boardWrap" class="board-wrap">
+              <svg id="pathLayer" class="path-layer" aria-hidden="true"></svg>
+              <div id="board" class="board" role="grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="game-control-column">
+          <div id="gameMessage" class="game-message" aria-live="polite"></div>
+          <div class="game-actions">
+            <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
+            <button id="resetBtn" class="secondary-btn">Reset</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <footer class="app-footer">
+      <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
+      <strong>Pavel &amp; Sol</strong>
+      <small class="app-version">Proplet v3.16.1</small>
+    </footer>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Hlavní navigace">
+    <button data-nav="daily" class="active"><span>☀️</span><small>Dnes</small></button>
+    <button data-nav="free"><span>🧩</span><small>Hrát</small></button>
+    <button data-nav="leaderboard"><span>🏁</span><small>Pořadí</small></button>
+    <button data-nav="profile"><span>🙂</span><small>Já</small></button>
+  </nav>
+
+  <div id="winModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card win-card">
+      <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
+      <div id="winBadge" class="win-badge">✦</div>
+      <h2 id="winTitle">Hotovo!</h2>
+      <p id="winText" class="muted"></p>
+      <div id="winXp" class="win-xp"></div>
+      <div id="winClean" class="win-clean hidden"></div>
+      <div id="winWords" class="win-words"></div>
+      <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
+      <div id="newBadgeBox" class="new-badge-box hidden"></div>
+      <div id="winDifficultyFeedback" class="win-feedback hidden">
+        <small>Jak ti seděla obtížnost?</small>
+        <div class="feedback-chips">
+          <button data-difficulty-rating="-1">Lehčí</button>
+          <button data-difficulty-rating="0">Akorát</button>
+          <button data-difficulty-rating="1">Těžší</button>
+        </div>
+      </div>
+      <button id="reportWordBtn" class="text-btn win-report hidden">⚑ Divné slovo?</button>
+      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
+      <button id="winMenuBtn" class="secondary-btn hidden">Zpět do menu</button>
+      <button id="winShareBtn" class="secondary-btn hidden">Sdílet výsledek</button>
+    </div>
+  </div>
+
+  <div id="accountNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card account-nudge-card">
+      <div class="account-nudge-icon">☁️</div>
+      <span class="eyebrow">PROGRES BEZ ZTRÁT</span>
+      <h2>Ulož si svůj Proplet</h2>
+      <p class="muted">První Proplet je doma. 🎉 Připoj hráče a tenhle i další výsledky se uloží do cloudu, otevřeš je na více zařízeních a započítají se do týmového pořadí.</p>
+      <div class="account-nudge-benefits">
+        <span>✓ XP a výsledky mezi zařízeními</span>
+        <span>✓ série a úspěchy</span>
+        <span>✓ týmové pořadí</span>
+      </div>
+      <button id="nudgeCreateBtn" class="primary-btn big">Vytvořit hráče</button>
+      <button id="nudgeLoginBtn" class="secondary-btn">Už účet mám</button>
+      <button id="nudgeSkipBtn" class="text-btn">Teď ne, pokračovat bez účtu</button>
+    </div>
+  </div>
+
+  <div id="pushNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card push-nudge-card">
+      <div class="push-nudge-icon">🔔</div>
+      <span class="eyebrow">ZÍTRA ZASE?</span>
+      <h2>Nový Proplet každý den</h2>
+      <p class="muted">Chceš vědět, až bude připravená další Denní výzva? Připomeneme ji jen tehdy, když ji ještě nemáš hotovou.</p>
+      <button id="pushNudgeEnableBtn" class="primary-btn big">Zapnout připomínku 🔔</button>
+      <button id="pushNudgeLaterBtn" class="text-btn">Teď ne</button>
+    </div>
+  </div>
+
+  <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closeProfileModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">TÝM A HRÁČ</span>
+      <div class="account-tabs">
+        <button id="profileModeLogin" class="account-tab active" type="button">Přihlásit se</button>
+        <button id="profileModeCreate" class="account-tab" type="button">Nový hráč</button>
+      </div>
+      <h2 id="profileModalTitle">Přihlásit hráče</h2>
+      <p id="profileModalDesc" class="muted">Stejný účet můžeš použít na mobilu, počítači i tabletu.</p>
+      <label>Jméno<input id="playerNameInput" maxlength="24" autocomplete="username" placeholder="např. Ardan" /></label>
+      <div id="leagueChooser" class="league-chooser">
+        <div id="leagueCreateTabs" class="league-create-tabs hidden">
+          <button id="joinLeagueModeBtn" class="league-create-tab active" type="button">Přidat se k týmu</button>
+          <button id="newLeagueModeBtn" class="league-create-tab" type="button">Založit nový tým</button>
+        </div>
+        <div id="joinLeagueFields">
+          <label>Tým<select id="leagueSelect"><option value="">Načítám týmy…</option></select></label>
+          <label id="leaguePinLabel" class="hidden">PIN týmu<input id="leaguePinInput" type="password" minlength="4" maxlength="32" autocomplete="one-time-code" placeholder="PIN, který ti sdělil člen týmu" /></label>
+          <small id="teamPinHelp" class="field-note hidden">PIN je potřeba jen při vytvoření nového hráče v tomto týmu.</small>
+        </div>
+        <div id="newLeagueFields" class="hidden">
+          <label>Název nového týmu<input id="newLeagueNameInput" maxlength="40" placeholder="např. Prouzovi" /></label>
+          <label>PIN nového týmu<input id="newLeaguePinInput" type="password" minlength="4" maxlength="32" placeholder="alespoň 4 znaky" /></label>
+          <small class="field-note">První hráč PIN zvolí a sdělí ho dalším lidem, které chce do týmu pustit.</small>
+        </div>
+      </div>
+      <label>Heslo hráče<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
+      <button id="profilePasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
+      <div id="profileFormError" class="form-error"></div>
+      <button id="saveProfileBtn" class="primary-btn big">Přihlásit se</button>
+      <button id="skipProfileBtn" class="text-btn">Zatím hrát bez pořadí</button>
+    </div>
+  </div>
+
+  <div id="passwordModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closePasswordModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">VÍCE ZAŘÍZENÍ</span>
+      <h2>Nastav heslo</h2>
+      <p class="muted">Tím zpřístupníš svůj stávající profil i na notebooku nebo jiném telefonu. Tvoje dosavadní výsledky zůstanou.</p>
+      <label>Nové heslo<input id="setPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="alespoň 8 znaků" /></label>
+      <label>Heslo znovu<input id="setPasswordConfirmInput" type="password" minlength="8" maxlength="128" autocomplete="new-password" /></label>
+      <button id="setPasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
+      <div id="passwordFormError" class="form-error"></div>
+      <button id="savePasswordBtn" class="primary-btn big">Uložit heslo</button>
+    </div>
+  </div>
+
+  <div id="teamPinModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closeTeamPinModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">POZVÁNKA DO TÝMU</span>
+      <h2>Nastav PIN týmu</h2>
+      <p class="muted">PIN potřebuje jen člověk, který si v tomto týmu vytváří nového hráče. Stávající hráči se přihlašují svým jménem a osobním heslem.</p>
+      <label>Nový PIN týmu<input id="teamPinInput" type="password" minlength="4" maxlength="32" autocomplete="new-password" placeholder="alespoň 4 znaky" /></label>
+      <button id="teamPinToggle" class="password-toggle" type="button">👁 Zobrazit PIN</button>
+      <div id="teamPinError" class="form-error"></div>
+      <button id="saveTeamPinBtn" class="primary-btn big">Uložit PIN týmu</button>
+    </div>
+  </div>
+
+  <div id="supportModeModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left support-mode-modal-card">
+      <button id="closeSupportModeModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">POMOCNÍK</span>
+      <h2>Jak ti má Proplet pomáhat?</h2>
+      <p class="muted">Nemění obtížnost ani XP. Jen určuje, jestli se hra po delším zaseknutí sama ozve s nabídkou malé nápovědy. Přijatá pomoc se počítá jako nápověda a ukončí ✨ čisté řešení.</p>
+      <button class="support-choice" data-support-mode="beginner"><span>🐣</span><div><strong>Začínající čtenář</strong><small>Přibližně 1. třída · nabídka po 45 s bez pokroku.</small></div></button>
+      <button class="support-choice" data-support-mode="younger"><span>🧒</span><div><strong>Mladší školák</strong><small>2.–5. třída · nabídka po 70 s bez pokroku.</small></div></button>
+      <button class="support-choice" data-support-mode="older"><span>🎒</span><div><strong>Starší školák</strong><small>6. třída a výš · nabídka po 100 s bez pokroku.</small></div></button>
+      <button class="support-choice" data-support-mode="none"><span>🧠</span><div><strong>Bez asistence</strong><small>Pomocník se sám neozývá. Nápověda zůstává kdykoli dostupná ručně.</small></div></button>
+    </div>
+  </div>
+
+  <div id="helperOfferModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card helper-offer-card">
+      <div class="helper-big-icon">💡</div>
+      <span class="eyebrow">POMOCNÍK</span>
+      <h2>Zasekl ses?</h2>
+      <p id="helperOfferText" class="muted">Chceš malé postrčení?</p>
+      <button id="helperAcceptBtn" class="primary-btn big">Jo, trochu napovědět 💡</button>
+      <button id="helperDismissBtn" class="text-btn">Ne, zkusím to dál</button>
+    </div>
+  </div>
+
+  <div id="hintModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left hint-card">
+      <button id="closeHintModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">CHYTRÁ NÁPOVĚDA</span>
+      <h2>Kolik pomoci chceš?</h2>
+      <p class="muted">Jakákoli nápověda zruší ✨ čisté řešení této úrovně. Nápovědy zatím nejsou omezené.</p>
+      <button class="hint-choice" data-hint-level="1"><span>💡</span><div><strong>Lehká</strong><small>Ukáže začátek a délku vhodného slova.</small></div></button>
+      <button class="hint-choice" data-hint-level="2"><span>🔦</span><div><strong>Silnější</strong><small>Ukáže první tři políčka cesty.</small></div></button>
+      <button class="hint-choice" data-hint-level="3"><span>🧭</span><div><strong>Odhalit</strong><small>Na chvíli ukáže celé slovo i jeho cestu.</small></div></button>
+    </div>
+  </div>
+
+  <div id="rescueOfferModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card rescue-modal-card">
+      <div class="rescue-big-icon">🔥</div>
+      <span class="eyebrow">SÉRIE JEŠTĚ ŽIJE</span>
+      <h2 id="rescueOfferTitle">Chceš ho zachránit?</h2>
+      <p id="rescueOfferText" class="muted"></p>
+      <div class="rescue-rule"><strong>30 sekund</strong><span>6×6 · bez nápovědy · jeden pokus</span></div>
+      <button id="confirmRescueBtn" class="primary-btn big">Ano, jdu do toho 🔥</button>
+      <button id="cancelRescueBtn" class="text-btn">Teď ne</button>
+    </div>
+  </div>
+
+  <div id="wordReportModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left">
+      <button id="closeWordReportModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">KVALITA SLOVNÍKU</span>
+      <h2>Divné slovo?</h2>
+      <p class="muted">Nahlášení nám pomůže vyčistit slovník. Neovlivní tvoje XP ani výsledek.</p>
+      <label>Slovo<select id="reportWordSelect"></select></label>
+      <label>Poznámka (volitelné)<textarea id="reportWordNote" maxlength="300" rows="3" placeholder="Co je na něm divné?"></textarea></label>
+      <div id="wordReportError" class="form-error"></div>
+      <button id="saveWordReportBtn" class="primary-btn big">Odeslat</button>
+    </div>
+  </div>
+
+  <div id="playedLevelsModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left played-levels-card">
+      <button id="closePlayedLevelsModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">ODEHRANÉ ÚROVNĚ</span>
+      <h2 id="playedLevelsTitle">Tvoje kola</h2>
+      <p id="playedLevelsMeta" class="muted"></p>
+      <div id="playedLevelsList" class="played-levels-list"></div>
+    </div>
+  </div>
+
+  <div id="levelDetailModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left level-detail-card">
+      <button id="closeLevelDetailModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span id="levelDetailEyebrow" class="eyebrow">DETAIL ÚROVNĚ</span>
+      <h2 id="levelDetailTitle">Úroveň</h2>
+      <div id="levelDetailResult" class="level-detail-result"></div>
+      <div class="section-head compact-head"><div><span class="eyebrow">TVŮJ TÝM</span><h3>Pořadí této úrovně</h3></div></div>
+      <div id="levelDetailLeaderboard" class="level-detail-leaderboard"></div>
+      <div class="level-detail-actions"><button id="levelDetailReplayBtn" class="primary-btn bigish">Zahrát znovu · trénink</button><button id="levelDetailShareBtn" class="secondary-btn bigish">Sdílet a pochlubit se</button></div>
+    </div>
+  </div>
+
+  <div id="familyLeagueModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left family-league-modal-card">
+      <button id="closeFamilyLeagueModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">🌍 LIGA TÝMŮ</span>
+      <h2>Pošli tým do světa</h2>
+      <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů ani interní kód týmu nikdo cizí neuvidí. Nastavení může změnit kterýkoli přihlášený člen týmu.</p>
+      <label>Veřejný název týmu<input id="familyLeaguePublicName" maxlength="40" placeholder="např. Prouzovi nebo Brutální Propletači" /></label>
+      <small class="field-note">PIN týmu slouží jen jako pozvánka při přidání nového hráče do týmu.</small>
+      <div id="familyLeagueModalError" class="form-error"></div>
+      <button id="enableFamilyLeagueBtn" class="primary-btn big">Zařadit tým do Ligy týmů 🌍</button>
+      <button id="disableFamilyLeagueBtn" class="secondary-btn hidden">Vystoupit z Ligy týmů</button>
+    </div>
+  </div>
+
+  <div id="onboardingModal" class="modal onboarding-modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card onboarding-card">
+      <button id="skipOnboardingBtn" class="modal-close" aria-label="Zavřít úvod">×</button>
+      <div id="onboardDots" class="onboard-dots"></div>
+      <div id="onboardContent"></div>
+      <button id="onboardNextBtn" class="primary-btn big">Pokračovat</button>
+    </div>
+  </div>
+
+  <div id="updateBanner" class="update-banner hidden" role="status">
+    <span>✨ Je připravená nová verze Propletu.</span>
+    <button id="applyUpdateBtn">Aktualizovat</button>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

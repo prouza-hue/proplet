@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "freeGeneration": 2,
+  "exactCoverRechecked": 400,
+  "activePuzzleIdsUnique": 400,
+  "activeLegacyIdCollisions": 0,
+  "lexiconEntries": 3153,
+  "lexiconTierCounts": {
+    "A": 510,
+    "B": 750,
+    "C": 1568,
+    "D": 325
+  },
+  "tierDHighFunEntries": 197,
+  "legacyCounts": {
+    "easy": 146,
+    "medium": 150,
+    "hard": 336,
+    "hardcore": 280
+  },
+  "dailyGeneration": 2,
+  "dailyActive": 365,
+  "rescuePreserved": 30,
+  "difficulties": {
+    "easy": {
+      "levels": 100,
+      "answers": 638,
+      "distinctAnswers": 341,
+      "minimumRepeatGapLevels": 25,
+      "averageFun": 3.05,
+      "highFunAnswers": 32,
+      "tierCounts": {
+        "A": 638
+      }
+    },
+    "medium": {
+      "levels": 100,
+      "answers": 745,
+      "distinctAnswers": 542,
+      "minimumRepeatGapLevels": 25,
+      "averageFun": 3.31,
+      "highFunAnswers": 222,
+      "tierCounts": {
+        "B": 588,
+        "A": 157
+      }
+    },
+    "hard": {
+      "levels": 100,
+      "answers": 1009,
+      "distinctAnswers": 833,
+      "minimumRepeatGapLevels": 25,
+      "averageFun": 3.21,
+      "highFunAnswers": 205,
+      "tierCounts": {
+        "C": 807,
+        "B": 202
+      }
+    },
+    "hardcore": {
+      "levels": 100,
+      "answers": 1276,
+      "distinctAnswers": 794,
+      "minimumRepeatGapLevels": 25,
+      "averageFun": 3.79,
+      "highFunAnswers": 585,
+      "tierCounts": {
+        "D": 679,
+        "C": 597
+      }
+    }
+  }
+}

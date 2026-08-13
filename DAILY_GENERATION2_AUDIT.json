@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "dailyGeneration": 2,
+  "exactCoverRechecked": 365,
+  "activeDailyPuzzles": 365,
+  "legacyDailyPuzzlesArchived": 365,
+  "difficultyCounts": {
+    "easy": 61,
+    "medium": 183,
+    "hard": 121
+  },
+  "answers": 2989,
+  "distinctAnswers": 1399,
+  "minimumCircularRepeatGapDays": 25,
+  "averageFun": 3.27,
+  "highFunAnswers": 768,
+  "tierCounts": {
+    "B": 1709,
+    "A": 910,
+    "C": 370
+  },
+  "answersByGeometry": {
+    "easy": 394,
+    "medium": 1371,
+    "hard": 1224
+  },
+  "activeLegacyIdCollisions": 0,
+  "activeOtherBankIdCollisions": 0,
+  "publicServerPuzzleCopiesIdentical": true
+}
