@@ -504,3 +504,15 @@ body:not(.playing) .logout-btn{font-size:11px}
   .win-feedback{padding:5px 6px;margin-top:3px}
   .feedback-chips button{padding:5px 4px}
 }
+
+
+/* v3.20.2 — phone landscape game guard */
+.landscape-game-blocker{display:none;position:fixed;inset:0;z-index:420;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));background:linear-gradient(145deg,#f7f4ff 0%,#eee9ff 58%,#e7f7f1 120%);text-align:center;overscroll-behavior:none;touch-action:none}
+body.landscape-game-blocked .landscape-game-blocker{display:flex}
+body.landscape-game-blocked #screen-game{visibility:hidden;pointer-events:none}
+.landscape-game-card{width:min(100%,430px);padding:22px 24px 20px;border:1px solid #ddd5ef;border-radius:26px;background:rgba(255,254,253,.95);box-shadow:0 18px 48px rgba(67,52,112,.15)}
+.landscape-rotate-icon{width:58px;height:58px;margin:0 auto 11px;display:grid;place-items:center;border-radius:20px;background:linear-gradient(145deg,#6656dc,#8271ef);color:#fff;font-size:34px;font-weight:900;line-height:1;box-shadow:0 9px 23px rgba(97,79,210,.24);transform:rotate(-18deg)}
+.landscape-game-card h2{margin:5px 0 7px;font-size:25px;line-height:1.05;letter-spacing:-.035em}
+.landscape-game-card p{margin:0 auto;max-width:360px;color:var(--muted);font-size:13px;line-height:1.42}
+.landscape-game-card small{display:block;margin-top:12px;color:#5f58a2;font-size:11px;font-weight:850}
+@media(max-height:420px){.landscape-game-card{padding:14px 20px 13px;border-radius:21px}.landscape-rotate-icon{width:45px;height:45px;margin-bottom:7px;border-radius:15px;font-size:27px}.landscape-game-card h2{font-size:21px;margin:3px 0 5px}.landscape-game-card p{font-size:11px;line-height:1.32}.landscape-game-card small{margin-top:8px;font-size:10px}}

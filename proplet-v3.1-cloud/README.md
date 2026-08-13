@@ -1,6 +1,6 @@
-# Proplet v3.20.1
+# Proplet v3.20.2
 
-Aktuální release: **v3.20.1 — UX hotfix: čistší onboarding a výraznější účet přímo ve výsledku**.
+Aktuální release: **v3.20.2 — portrait guard pro hraní na telefonu naležato**.
 
 Hlavní novinky:
 
@@ -34,6 +34,7 @@ Hlavní novinky:
 - v3.19 přidává úrovně 101–200, mírnější slovní profil nových Mozkožroutů a automatickou pauzu při skrytí či ztrátě focusu aplikace.
 - hotfix 3.19.1 obnovuje kompletní HTML aplikace, opravuje vstup `/admin` pro Vercel a přidává kontrolu skutečně spustitelného release shellu.
 - hotfix 3.19.2 doplňuje chybějící nabídku záchrany série a odstraňuje poslední chybu čistého startu v konzoli.
+- v3.20.2 při aktivní hře na telefonu naležato zobrazí čistý portrait guard, pozastaví hru i čas a po otočení zpět automaticky pokračuje; ostatní obrazovky a větší zařízení landscape neblokuje.
 - v3.20.1 opravuje celoplošnou onboarding ukázku na skutečná slova PES / LES / MOC, zmenšuje stránku Pomocníka bez scrollu a dává anonymnímu hráči výrazné uložení účtu přímo vedle globálního pořadí; sekundární akce ve výsledku jsou kompaktní.
 - v3.20 zkracuje onboarding na tři kroky, umožňuje uložit účet bez týmu, nabízí uložení po 1./4./10. dokončení a čistí obrazovky Dnes i výsledkovku bez zásahu do puzzle banky.
 

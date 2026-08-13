@@ -1,0 +1,52 @@
+{
+  "release": "3.20.2",
+  "baseRelease": "3.20.1",
+  "databaseMigrationRequired": false,
+  "puzzleBankSha256": "1dc3547289a0209f96fda78c993d8d12df098daf13b55d78d7edb3e5fdaa2b84",
+  "changedFiles": {
+    "server.py": {
+      "sha256": "af9ca9d318ef5469a273504235d9847047ca6d038effcbb8069b39692d9edb4b",
+      "bytes": 136777
+    },
+    "public/app.js": {
+      "sha256": "16ceb7208a4d3939f4e49fb45c0e58bd6df672711dd40ef3b4b1fb8f23682abc",
+      "bytes": 164574
+    },
+    "public/index.html": {
+      "sha256": "138f5b4d8027d2733e144382bbda27cfab22ba6c6ed05c3da3313a1ac25b95a3",
+      "bytes": 29609
+    },
+    "public/styles.css": {
+      "sha256": "c0a375af7ec8615533e8ec5ec740ddc32c04d172d0d4d2081e802bf97342902b",
+      "bytes": 82778
+    },
+    "public/sw.js": {
+      "sha256": "cde675fbd60b907f4a3a76a88d40dd7e28ed9d0a6c44ff230bc5d0d40fb6a67f",
+      "bytes": 2113
+    },
+    "README.md": {
+      "sha256": "508682e28fbf614bbe228eb291d98323f4a4a77edec5b1bcc1dcc32f5bf81fe4",
+      "bytes": 4758
+    },
+    "UPDATE_V3_20_2_CZ.md": {
+      "sha256": "606b2f3a67e6251ca8ff690a116718d296d2257bc01da7f0287cd3ed1d68d62e",
+      "bytes": 1486
+    },
+    "RELEASE_V3_20_2_CZ.md": {
+      "sha256": "b7e98145e049d50a6d5a889e4184fd5e7f374bdc1a2895ff6b482bc7597ea28b",
+      "bytes": 1207
+    },
+    "QA_V3_20_2_CZ.md": {
+      "sha256": "738648dfe6fb24a288e72ad2d6894f6919359bd37755b4ec81a93cbc091b2b98",
+      "bytes": 1201
+    },
+    "tools/test_v3202_package.py": {
+      "sha256": "6fd32537c32ec51f413b1f7d52dd5c54c86960fd9698204dd3f23e6dd07a2188",
+      "bytes": 2735
+    },
+    "tools/test_v3202_server.py": {
+      "sha256": "86f361b5431d7fbd880ecb44db1466110a7a4732592c0e5ea52859d3bba029ae",
+      "bytes": 5276
+    }
+  }
+}
