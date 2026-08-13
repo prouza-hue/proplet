@@ -1,6 +1,6 @@
-# Proplet v3.16.2
+# Proplet v3.16.3
 
-Aktuální release: **v3.16.2 — Pomocník v onboardingu a bezpečný přechod Daily**.
+Aktuální release: **v3.16.3 — výsledkovka, která umí slavit**.
 
 Hlavní novinky:
 
@@ -16,9 +16,11 @@ Hlavní novinky:
 - původní Daily banka je archivovaná; staré a offline výsledky se bezpečně přijmou, ale leaderboard nemíchá dvě různé desky.
 - Pomocník se nastavuje už v onboardingu podle skutečného času 45 / 70 / 100 sekund nebo „nenabízet“, s přesným popisem dopadu před uložením,
 - hráč se starou Daily pro dnešní datum může dokončit aktivní Gen2 desku; výsledek se započítá do týdne bez druhých 100 XP.
+- každé dokončení dostane krátkou hravou pochvalu podle obtížnosti; Těžká a Mozkožrout mají vlastní výrazně odměňující sadu textů,
+- čisté řešení přidává ještě jednu drobnou pochvalu a stejný uložený výsledek si při znovuotevření ponechá stejný text.
 
 Nasazení: `UPDATE_V3_16_2_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_16.sql`  
-Release notes: `RELEASE_V3_16_2_CZ.md`  
+Release notes: `RELEASE_V3_16_3_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`

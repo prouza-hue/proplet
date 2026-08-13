@@ -1,4 +1,4 @@
-const APP_VERSION='3.16.2';
+const APP_VERSION='3.16.3';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
 const SUPPORT_MODES={
@@ -6,6 +6,51 @@ const SUPPORT_MODES={
  younger:{icon:'🧒',label:'Vyváženě',desc:'Ozve se po 70 s bez nového slova.',idleMs:70000,seconds:70},
  older:{icon:'🎒',label:'Dát mi čas',desc:'Ozve se po 100 s bez nového slova.',idleMs:100000,seconds:100},
  none:{icon:'🧠',label:'Nenabízet',desc:'Pomocník se sám neozve.',idleMs:0,seconds:0}
+};
+const WIN_PRAISE={
+ easy:[
+  {title:'Pěkně propleteno!',line:'Písmena si sedla a neurony se příjemně protáhly.'},
+  {title:'Deska je tvoje.',line:'Ani jedno políčko nezůstalo na ocet.'},
+  {title:'Slova zkrocena.',line:'Tohle cvaklo přesně tam, kam mělo.'},
+  {title:'Hezky odstartováno!',line:'Malý Proplet, poctivá radost.'},
+  {title:'Další uzel rozvázán.',line:'Plynule, elegantně a bez zbytečného rámusu.'}
+ ],
+ medium:[
+  {title:'Mozek příjemně zahřátý.',line:'Tak akorát na pár spokojených závitů.'},
+  {title:'Hezky ses tím propletl.',line:'Deska odporovala jen z povinnosti.'},
+  {title:'Slovní uzel povolil.',line:'Trpělivost, oko, prst. Fungovalo všechno.'},
+  {title:'Další deska kapitulovala.',line:'Písmena pochopila, kdo je tu šéf.'},
+  {title:'Tohle mělo šťávu.',line:'A teď už máš v kapse i celý výsledek.'},
+  {title:'Závity odvedly dobrou práci.',line:'Proplet vyřešen, sebevědomí lehce přifouknuto.'}
+ ],
+ hard:[
+  {title:'Těžká? Už jen bývalá.',line:'Deska kladla odpor. Marně.'},
+  {title:'Tohle už má váhu.',line:'Poctivý slovní kopec — a ty stojíš nahoře.'},
+  {title:'Neurony právě odmakaly směnu.',line:'A teď si zaslouží vítězný taneček. Respekt.'},
+  {title:'Propleteno na vyšší dívčí.',line:'Tohle nebyla rozcvička. Tohle je výkon.'},
+  {title:'Písmena se bránila statečně.',line:'Výsledek: písmena 0, ty 1.'},
+  {title:'Tak tohle bylo výživné.',line:'Malé vítězné gesto je zcela na místě.'},
+  {title:'Těžká deska uznává porážku.',line:'Poctivě vydřené. O to příjemnější.'},
+  {title:'Slovní svaly potvrzeny.',line:'Tahle mřížka se sama rozhodně neudělala.'}
+ ],
+ hardcore:[
+  {title:'Mozkožrout se právě zadávil.',line:'Nečekal, že mu budeš chutnat tak málo.'},
+  {title:'Tak kdo tu koho žere?',line:'Mozkožrout má jasno. A trochu trauma.'},
+  {title:'Neurony kouří. Výsledek stojí za to.',line:'Přesně ten druh vítězství, který si zaslouží konfety.'},
+  {title:'Deset krát deset. Ty jedna, mřížka nula.',line:'Sto políček šlo spát s pocitem dobře vykonané práce.'},
+  {title:'Arcimistr mřížky potvrzen.',line:'Tohle už není luštění. Tohle je drobná mozková magie.'},
+  {title:'Mozkožrout zkrocen.',line:'Může se vrátit do jeskyně a přemýšlet o svých rozhodnutích.'},
+  {title:'Tohle bylo absurdně dobré.',line:'Poctivý kus slovního řemesla. Klobouk dolů.'},
+  {title:'Vstup do klubu těžkých hlav povolen.',line:'Vstupné: jeden poražený Mozkožrout.'},
+  {title:'Mřížka padla. Důstojně, ale padla.',line:'Tahle výhra má velikost deset krát deset.'},
+  {title:'Mozkožrout žádá odvetu.',line:'Dnes ji ale nedostane. Dnes slavíš ty.'}
+ ]
+};
+const CLEAN_PRAISE={
+ easy:['A ještě bez nápovědy. Paráda.','Navíc čistě. Pěkná práce.'],
+ medium:['A ještě čistě. Tohle sedlo.','Bez nápovědy — velmi pěkné.'],
+ hard:['A ještě čistě. To už je trochu machrování.','Bez nápovědy. Těžká právě ztichla.'],
+ hardcore:['A bez nápovědy. Mozkožrout žádá přepočítání.','Čistě. Mozkožrout to nese překvapivě osobně.']
 };
 const DIFF={
   easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:10},
@@ -217,6 +262,13 @@ function saveSettings(s){localStorage.setItem(SETTINGS_KEY,JSON.stringify(s))}
 function fmtTime(ms){if(ms==null)return '—';const sec=Math.floor(ms/1000),m=Math.floor(sec/60),s=sec%60;return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
 function czPlural(n,one,few,many){const a=Math.abs(Number(n)||0);return a===1?one:(a>=2&&a<=4?few:many)}
 function countCz(n,one,few,many){return `${n} ${czPlural(n,one,few,many)}`}
+function stableTextIndex(seed,size){let h=2166136261;for(const ch of String(seed||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return size?(h>>>0)%size:0}
+function completionPraise(difficulty,rec={}){
+ const pool=WIN_PRAISE[difficulty]||WIN_PRAISE.medium,seed=rec.attemptId||`${rec.puzzleId||''}:${rec.completedAt||''}:${rec.elapsedMs||0}:${rec.moves||0}`,chosen=pool[stableTextIndex(seed,pool.length)];let line=chosen.line;
+ if(rec.cleanSolve===true){const clean=CLEAN_PRAISE[difficulty]||CLEAN_PRAISE.medium;line+=` ${clean[stableTextIndex(`${seed}:clean`,clean.length)]}`}
+ return {title:chosen.title,line};
+}
+function renderCompletionPraise(difficulty,rec){const praise=completionPraise(difficulty,rec);$('#winTitle').textContent=praise.title;$('#winPraise').textContent=praise.line;$('#winPraise').classList.remove('hidden')}
 function resultRankTuple(r){return [r?.cleanSolve===true?0:1,Number(r?.hintsUsed??99),Number(r?.elapsedMs??1e15),Number(r?.moves??1e9),Number(r?.wrongAttempts??999)]}
 function betterResult(a,b){if(!a)return b;if(!b)return a;const x=resultRankTuple(a),y=resultRankTuple(b);for(let i=0;i<x.length;i++){if(x[i]!==y[i])return y[i]<x[i]?b:a}return a}
 function firstResult(a,b){
@@ -392,7 +444,7 @@ async function finishRescue(passed){
   if(profile?.token){const r=await api('/api/rescue/finish',{method:'POST',body:JSON.stringify({puzzle_id:g.puzzle.id,completed:!!passed,elapsed_ms:Math.min(120000,elapsed)})});ok=!!r.ok;if(r.stats)saveProfile({...profile,stats:r.stats})}
   else{const st=getState(),missed=g.dailyDate;st.rescues=st.rescues||{};st.rescues[missed]={...(st.rescues[missed]||{}),status:passed&&elapsed<=30000?'passed':'failed',puzzleId:g.puzzle.id,elapsedMs:elapsed,completedAt:new Date().toISOString()};saveState(st);ok=passed&&elapsed<=30000}
  }catch(e){ok=false;showToast(`Záchranu se nepodařilo potvrdit: ${e.message}`)}
- $('#winModal').classList.remove('hidden');$('#winBadge').textContent=ok?'🔥':'💨';$('#winTitle').textContent=ok?'Série zachráněna!':'Série tentokrát padla';$('#winText').textContent=ok?`Hotovo za ${fmtTime(elapsed)}. Tvoje série pokračuje.`:'Pokus je vyčerpaný. Dnešní výzva může odstartovat novou sérii.';$('#winXp').textContent=ok?'Série pokračuje · bez XP':'Nový začátek';$('#winClean').classList.add('hidden');$('#winWords').innerHTML=ok?g.found.map(f=>`<span class="win-word" style="background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join(''):'';$('#newBadgeBox').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').textContent='Zpět na dnešek';renderWinFeedback();if(ok){confetti();fx('win')}else fx('wrong');await refreshRescueStatus();renderProfile();
+ $('#winModal').classList.remove('hidden');$('#winBadge').textContent=ok?'🔥':'💨';$('#winTitle').textContent=ok?'Série zachráněna!':'Série tentokrát padla';$('#winPraise').textContent=ok?'Třicet sekund, žádné výmluvy. Série může dýchat dál.':'Nevadí. I série občas potřebuje nový začátek.';$('#winPraise').classList.remove('hidden');$('#winText').textContent=ok?`Hotovo za ${fmtTime(elapsed)}. Tvoje série pokračuje.`:'Pokus je vyčerpaný. Dnešní výzva může odstartovat novou sérii.';$('#winXp').textContent=ok?'Série pokračuje · bez XP':'Nový začátek';$('#winClean').classList.add('hidden');$('#winWords').innerHTML=ok?g.found.map(f=>`<span class="win-word" style="background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join(''):'';$('#newBadgeBox').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').textContent='Zpět na dnešek';renderWinFeedback();if(ok){confetti();fx('win')}else fx('wrong');await refreshRescueStatus();renderProfile();
 }
 function failRescue(){finishRescue(false)}
 
@@ -498,7 +550,7 @@ async function finishGame(){
  if(dailyGenerationUpgrade)rec.points=old.points??rec.points;if(!old||dailyGenerationUpgrade)state.completed[key]=rec;if(state.inProgress?.[key])delete state.inProgress[key];saveState(state);queueResult(rec);g.finishTelemetryPromise=finishAttemptTelemetry(rec);
  if(g.mode==='free'){const lb=$('#levelLeaderboardBox');if(lb){lb.classList.remove('hidden');lb.innerHTML='<div class="leaderboard-empty"><strong>Aktualizuji pořadí…</strong><small>Započítávám právě dohraný výsledek.</small></div>'}}
  const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=ACHIEVEMENTS.filter(a=>!a.test(statsBefore)&&a.test(stats));
- $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';$('#winTitle').textContent=g.mode==='daily'?'Dnešní Proplet je doma!':'Propleteno!';const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
+ $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';renderCompletionPraise(g.puzzle.difficulty,rec);const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
  $('#winXp').textContent=dailyGenerationUpgrade?'✓ Nová Daily započítaná · 100 XP už máš':old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':g.mode==='free'&&rec.points===0?'✓ Převedený slot · XP už zůstávají z původní banky':`+${rec.points} XP`;const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':(g.helperHintUsed?`💛 S Pomocníkem · ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`:`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`);if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
  const celebrations=[];if(newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}$('#newBadgeBox').classList.toggle('hidden',!celebrations.length);$('#newBadgeBox').innerHTML=celebrations.join('');
  $('#winShareBtn').classList.remove('hidden');$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.mode==='daily'?'Zpět na dnešek':'Zpět do menu';$('#winPrimaryBtn').textContent=g.mode==='daily'?'Vybrat další hru':'Hraj další úroveň';$('#winModal').classList.remove('hidden');renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
@@ -535,7 +587,7 @@ async function closeWinAndContinue(){if(maybeOfferAccountNudge('continue'))retur
 async function closeWinToMenu(){if(maybeOfferAccountNudge('menu'))return;if(await maybeOfferPushNudge('menu'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
 function showDailyResult(date,rec){
  const p=dailyPuzzleFor(date);stopTimer();currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};
- $('#winBadge').textContent='☀️';$('#winTitle').textContent='Dnešní Proplet už máš v kapse';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[p.difficulty].label}`;$('#winXp').textContent='+100 XP';const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Čistě · bez nápovědy':(hints?`💡 ${countCz(hints,'nápověda','nápovědy','nápověd')}`:'Výsledek z dřívější verze');if(!knownClean)wc.classList.add('hinted');
+ $('#winBadge').textContent='☀️';renderCompletionPraise(p.difficulty,rec);$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[p.difficulty].label}`;$('#winXp').textContent='+100 XP';const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Čistě · bez nápovědy':(hints?`💡 ${countCz(hints,'nápověda','nápovědy','nápověd')}`:'Výsledek z dřívější verze');if(!knownClean)wc.classList.add('hinted');
  $('#winWords').innerHTML=p.answers.map((a,i)=>`<span class="win-word" style="background:color-mix(in srgb,${COLORS[i%COLORS.length]} 55%,white)">${a.word}</span>`).join('');
  $('#newBadgeBox').classList.add('hidden');$('#winShareBtn').classList.remove('hidden');$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent='Zpět na dnešek';$('#winPrimaryBtn').textContent='Vybrat další hru';$('#winModal').classList.remove('hidden');renderWinFeedback();
 }
@@ -942,4 +994,5 @@ async function boot(){
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily()}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }
-boot();
+if(typeof window!=='undefined'&&typeof document!=='undefined')boot();
+if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,CLEAN_PRAISE,stableTextIndex,completionPraise};
