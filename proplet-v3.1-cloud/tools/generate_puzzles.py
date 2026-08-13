@@ -21,6 +21,7 @@ WORDS_OUT = ROOT / "data" / "words.txt"
 ANSWER_TIERS = ROOT / "data" / "answer_tiers.json"
 PUZZLES_PUBLIC_OUT = ROOT / "public" / "puzzles.json"
 PUZZLES_SERVER_OUT = ROOT / "data" / "puzzles.json"
+LEGACY_DAILY_ARCHIVE_OUT = ROOT / "data" / "legacy_daily_gen1.json"
 
 CZ_RE = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.I)
 BAD_SUBSTRINGS = (
@@ -51,27 +52,28 @@ lucie veronika martin ondřej ondrej michal david jakub lukáš lukas
 
 VOCAB_POLICIES = {
     "rescue": {
-        "allowed": ("A",), "weights": {"A": 1},
+        "allowed": ("A",), "weights": {"A": 1}, "min_avg_fun": 2.7,
     },
     "easy": {
-        "allowed": ("A",), "weights": {"A": 1},
+        "allowed": ("A",), "weights": {"A": 1}, "min_avg_fun": 2.7,
     },
     "medium": {
         "allowed": ("A", "B"), "weights": {"A": 2, "B": 5},
-        "min_fraction": {"B": 0.45},
+        "min_fraction": {"B": 0.45}, "min_avg_fun": 2.8, "min_fun_words": 1,
     },
     "hard": {
         "allowed": ("B", "C"), "weights": {"B": 2, "C": 5},
-        "min_fraction": {"C": 0.45},
+        "min_fraction": {"C": 0.45}, "min_avg_fun": 2.9, "min_fun_words": 1,
     },
     "hardcore": {
         "allowed": ("C", "D"), "weights": {"C": 2, "D": 5},
-        "min_fraction": {"D": 0.40},
+        "min_fraction": {"D": 0.50}, "min_avg_fun": 3.50, "min_fun_words": 4,
     },
     # Daily is deliberately family-wide: mostly B, with easy anchors from A and a restrained C share.
     "daily": {
         "allowed": ("A", "B", "C"), "weights": {"A": 3, "B": 5, "C": 1},
-        "min_fraction": {"B": 0.35}, "max_fraction": {"C": 0.25},
+        "min_fraction": {"A": 0.15, "B": 0.35}, "max_fraction": {"C": 0.25},
+        "min_avg_fun": 3.0, "min_fun_words": 1,
     },
 }
 
@@ -81,7 +83,9 @@ def clean_word(w: str) -> str | None:
     w = w.strip().lower()
     if not CZ_RE.fullmatch(w):
         return None
-    if any(b in w for b in BAD_SUBSTRINGS):
+    # "sextant" is a perfectly suitable Czech target; only the standalone
+    # explicit term is blocked, while the other stems remain substring guards.
+    if w == "sex" or any(b in w for b in BAD_SUBSTRINGS if b != "sex"):
         return None
     if w in NAME_BLOCK:
         return None
@@ -111,12 +115,21 @@ def load_answer_tiers() -> tuple[dict[str, list[str]], dict[str, str]]:
     return tiers, tier_of
 
 
-def build_answer_pools(tiers: dict[str, list[str]]) -> dict[str, list[str]]:
+def load_answer_metadata() -> dict[str, dict]:
+    payload = json.loads(ANSWER_TIERS.read_text(encoding="utf-8"))
+    return {str(word): dict(meta) for word, meta in (payload.get("metadata") or {}).items()}
+
+
+def build_answer_pools(tiers: dict[str, list[str]], metadata: dict[str, dict] | None = None) -> dict[str, list[str]]:
     pools: dict[str, list[str]] = {}
     for key, policy in VOCAB_POLICIES.items():
         weighted: list[str] = []
         for tier in policy["allowed"]:
-            weighted.extend(tiers[tier] * int(policy.get("weights", {}).get(tier, 1)))
+            tier_weight = int(policy.get("weights", {}).get(tier, 1))
+            for word in tiers[tier]:
+                fun = int((metadata or {}).get(word, {}).get("fun", 3))
+                fun_weight = {1: 1, 2: 1, 3: 2, 4: 4, 5: 6}.get(fun, 2)
+                weighted.extend([word] * tier_weight * fun_weight)
         pools[key] = weighted
     return pools
 
@@ -334,10 +347,10 @@ def path_turn_metrics(path: list[int], cols: int) -> tuple[int, int]:
     return turns, longest
 
 
-def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int, max_short_words: int | None = None, *, tier_of: dict[str, str] | None = None, policy: dict | None = None) -> list[str] | None:
+def choose_words(total: int, count: int, rng: random.Random, pool: list[str], min_len: int, max_len: int, max_short_words: int | None = None, *, tier_of: dict[str, str] | None = None, policy: dict | None = None, fun_of: dict[str, int] | None = None, avoid_words: set[str] | None = None) -> list[str] | None:
     by_len: dict[int, list[str]] = defaultdict(list)
     for w in pool:
-        if min_len <= len(w) <= max_len:
+        if min_len <= len(w) <= max_len and w not in (avoid_words or set()):
             by_len[len(w)].append(w)
     for _ in range(2500):
         lengths: list[int] = []
@@ -367,7 +380,15 @@ def choose_words(total: int, count: int, rng: random.Random, pool: list[str], mi
             w = rng.choice(choices)
             used.add(w)
             chosen.append(w)
-        if ok and (tier_of is None or policy is None or tier_mix_ok(chosen, tier_of, policy)):
+        if not ok or (tier_of is not None and policy is not None and not tier_mix_ok(chosen, tier_of, policy)):
+            continue
+        if policy and fun_of:
+            scores = [int(fun_of.get(word, 3)) for word in chosen]
+            if sum(scores) / len(scores) + 1e-9 < float(policy.get("min_avg_fun", 0)):
+                continue
+            if sum(score >= 4 for score in scores) < int(policy.get("min_fun_words", 0)):
+                continue
+        if ok:
             return chosen
     return None
 
@@ -514,6 +535,8 @@ def create_puzzle(
     variant_index: int | None = None,
     tier_of: dict[str, str] | None = None,
     vocab_key: str | None = None,
+    fun_of: dict[str, int] | None = None,
+    avoid_words: set[str] | None = None,
 ) -> dict:
     rng = random.Random(seed)
     spec = spec_for(difficulty, variant_index, rng)
@@ -523,7 +546,7 @@ def create_puzzle(
         cells = rng.randint(*spec["cells"])
         count = rng.randint(*spec["words"])
         policy = VOCAB_POLICIES.get(vocab_key or difficulty)
-        words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"], spec.get("max_short_words"), tier_of=tier_of, policy=policy)
+        words = choose_words(cells, count, rng, answer_pool, spec["min_len"], spec["max_len"], spec.get("max_short_words"), tier_of=tier_of, policy=policy, fun_of=fun_of, avoid_words=avoid_words)
         if words is None:
             continue
         rng.shuffle(words)
@@ -606,6 +629,8 @@ def create_puzzle(
                 "spiralWords": spiral_like,
                 "pathStyle": spec["style"],
                 "vocabTiers": dict(Counter(tier_of[w] for w in words)) if tier_of else None,
+                "averageFun": round(sum(fun_of.get(w, 3) for w in words) / len(words), 2) if fun_of else None,
+                "highFunWords": sum(fun_of.get(w, 3) >= 4 for w in words) if fun_of else None,
                 "vocabPolicy": vocab_key or difficulty,
             },
         }
@@ -618,6 +643,10 @@ def main():
     ap.add_argument("--daily", type=int, default=365)
     ap.add_argument("--rescue", type=int, default=30)
     ap.add_argument("--seed", type=int, default=20260811)
+    ap.add_argument("--generation-2", action="store_true",
+                    help="Archive the complete active Free bank and generate a new Gen2 bank with new IDs.")
+    ap.add_argument("--daily-generation-2", action="store_true",
+                    help="Archive the active Daily rotation and generate 365 Lexicon-v2 Daily puzzles with new IDs.")
     ap.add_argument("--preserve-existing", action="store_true",
                     help="Keep current Easy/Medium/Daily banks and regenerate Hard + Hardcore.")
     ap.add_argument("--preserve-existing-all", action="store_true",
@@ -628,7 +657,9 @@ def main():
 
     freq = load_frequency_words()
     tiers, tier_of = load_answer_tiers()
-    answer_pools = build_answer_pools(tiers)
+    answer_metadata = load_answer_metadata()
+    fun_of = {word: int(meta.get("fun", 3)) for word, meta in answer_metadata.items()}
+    answer_pools = build_answer_pools(tiers, answer_metadata)
     all_answers = [w for tier in ("A", "B", "C", "D") for w in tiers[tier]]
 
     dictionary = [w for w, _ in freq if w not in FUNCTION_WORDS]
@@ -636,11 +667,60 @@ def main():
     dictionary = dictionary[:12000] + [w for w in all_answers if w not in dictionary[:12000]]
     WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
 
-    preserve_any = args.preserve_existing or args.preserve_existing_all or args.top_up_existing
+    preserve_any = args.generation_2 or args.daily_generation_2 or args.preserve_existing or args.preserve_existing_all or args.top_up_existing
     old = json.loads(PUZZLES_SERVER_OUT.read_text(encoding="utf-8")) if preserve_any and PUZZLES_SERVER_OUT.exists() else None
     rng = random.Random(args.seed + 33)
 
-    if old and args.top_up_existing:
+    if args.daily_generation_2 and not old:
+        raise RuntimeError("--daily-generation-2 requires an existing puzzle bank to archive")
+
+    legacy_daily = list((old or {}).get("legacyDaily", []))
+    archived_daily_puzzles: list[dict] = []
+
+    if old and args.daily_generation_2:
+        free = {k: list(old.get("free", {}).get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
+        daily = []
+        rescue = list(old.get("rescue", []))
+        legacy = {k: list(old.get("legacyFree", {}).get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
+        if int(old.get("dailyGeneration") or 1) < 2:
+            archived_daily_puzzles = json.loads(json.dumps(old.get("daily", [])))
+            archive_payload = {
+                "version": 1,
+                "archivedAt": "2026-08-13",
+                "generation": int(old.get("dailyGeneration") or 1),
+                "generationKey": "daily-gen1",
+                "rotationBaseDate": "2026-01-01",
+                "puzzles": archived_daily_puzzles,
+            }
+            LEGACY_DAILY_ARCHIVE_OUT.write_text(
+                json.dumps(archive_payload, ensure_ascii=False, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            legacy_daily.append({
+                "generation": 1,
+                "generationKey": "daily-gen1",
+                "rotationBaseDate": "2026-01-01",
+                "puzzles": [
+                    {"id": p["id"], "difficulty": p["difficulty"]}
+                    for p in archived_daily_puzzles
+                ],
+            })
+    elif old and args.generation_2:
+        free = {k: [] for k in ("easy", "medium", "hard", "hardcore")}
+        daily = list(old.get("daily", []))
+        rescue = list(old.get("rescue", []))
+        legacy = {k: list(old.get("legacyFree", {}).get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
+        # Re-running the deterministic Gen2 build replaces an unfinished/test
+        # Gen2 bank, but never archives it as another legacy generation.
+        if int(old.get("freeGeneration") or 1) < 2:
+            for difficulty in ("easy", "medium", "hard", "hardcore"):
+                for index, puzzle in enumerate(old.get("free", {}).get(difficulty, []), start=1):
+                    archived = json.loads(json.dumps(puzzle))
+                    archived.setdefault("meta", {})["contentGeneration"] = int(archived.get("meta", {}).get("contentGeneration", 1))
+                    archived["meta"].setdefault("level", index)
+                    archived["meta"]["legacy"] = True
+                    legacy[difficulty].append(archived)
+    elif old and args.top_up_existing:
         free = {k: list(old["free"].get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
         daily = list(old["daily"])
         legacy = old.get("legacyFree", {})
@@ -668,12 +748,16 @@ def main():
             used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
     for p in daily:
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
+    for p in archived_daily_puzzles:
+        used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
     for p in old.get("rescue", []) if old else []:
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
 
     started = time.time()
-    levels_to_generate = ("easy", "medium", "hard", "hardcore") if (old and args.top_up_existing) else (() if (old and args.preserve_existing_all) else (("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore")))
-    id_prefix = {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
+    levels_to_generate = (() if args.daily_generation_2 else (("easy", "medium", "hard", "hardcore") if (old and (args.generation_2 or args.top_up_existing)) else (() if (old and args.preserve_existing_all) else (("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore")))))
+    id_prefix = {"easy": "g2-e", "medium": "g2-m", "hard": "g2-h", "hardcore": "g2-x"} if args.generation_2 else {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
+    repeat_window = 24
+    recent_free: dict[str, list[set[str]]] = {key: [] for key in free}
 
     for difficulty in levels_to_generate:
         start_i = len(free[difficulty]) if (old and args.top_up_existing) else 0
@@ -684,27 +768,55 @@ def main():
                     difficulty, seed, answer_pools[difficulty], dictionary,
                     f"{id_prefix[difficulty]}-{i+1:03d}",
                     variant_index=i if difficulty == "hard" else None,
-                    tier_of=tier_of, vocab_key=difficulty,
+                    tier_of=tier_of, vocab_key=difficulty, fun_of=fun_of,
+                    avoid_words=set().union(*recent_free[difficulty]) if recent_free[difficulty] else set(),
                 )
                 sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig not in used_signatures:
                     used_signatures.add(sig)
+                    p["meta"]["level"] = i + 1
+                    p["meta"]["contentGeneration"] = 2 if args.generation_2 else 1
+                    p["meta"]["generationKey"] = "free-gen2" if args.generation_2 else "free-gen1"
+                    p["meta"]["lexiconVersion"] = 2
                     free[difficulty].append(p)
+                    recent_free[difficulty].append({answer["word"].lower() for answer in p["answers"]})
+                    recent_free[difficulty] = recent_free[difficulty][-repeat_window:]
                     break
             if (i + 1) % 10 == 0:
                 print(f"free {difficulty}: {i+1}/{args.free_per_level}", flush=True)
 
-    if not old:
+    if not old or args.daily_generation_2:
         mix = ["easy", "medium", "medium", "medium", "hard", "hard"]
+        recent_daily: list[set[str]] = []
+        first_daily: list[set[str]] = []
         for i in range(args.daily):
             difficulty = mix[i % len(mix)]
             while True:
                 seed = rng.randrange(1, 2**31 - 1)
-                p = create_puzzle(difficulty, seed, answer_pools["daily"], dictionary, f"d-{i+1:03d}", tier_of=tier_of, vocab_key="daily")
+                circular_prefix_count = max(0, i - (args.daily - repeat_window) + 1) if args.daily_generation_2 else 0
+                avoid = set().union(*recent_daily) if recent_daily else set()
+                if circular_prefix_count:
+                    avoid.update(set().union(*first_daily[:circular_prefix_count]))
+                p = create_puzzle(
+                    difficulty, seed, answer_pools["daily"], dictionary,
+                    f"{'g2-d' if args.daily_generation_2 else 'd'}-{i+1:03d}",
+                    variant_index=i if difficulty == "hard" else None,
+                    tier_of=tier_of, vocab_key="daily", fun_of=fun_of,
+                    avoid_words=avoid,
+                )
                 sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig not in used_signatures:
                     used_signatures.add(sig)
+                    p["meta"]["rotationIndex"] = i + 1
+                    p["meta"]["contentGeneration"] = 2 if args.daily_generation_2 else 1
+                    p["meta"]["generationKey"] = "daily-gen2" if args.daily_generation_2 else "daily-gen1"
+                    p["meta"]["lexiconVersion"] = 2
                     daily.append(p)
+                    word_set = {answer["word"].lower() for answer in p["answers"]}
+                    recent_daily.append(word_set)
+                    recent_daily = recent_daily[-repeat_window:]
+                    if i < repeat_window:
+                        first_daily.append(word_set)
                     break
             if (i + 1) % 25 == 0:
                 print(f"daily: {i+1}/{args.daily}")
@@ -714,7 +826,7 @@ def main():
     while len(rescue) < args.rescue:
         i = len(rescue)
         seed = rng.randrange(1, 2**31 - 1)
-        p = create_puzzle("rescue", seed, answer_pools["rescue"], dictionary, f"r-{i+1:03d}", tier_of=tier_of, vocab_key="rescue")
+        p = create_puzzle("rescue", seed, answer_pools["rescue"], dictionary, f"r-{i+1:03d}", tier_of=tier_of, vocab_key="rescue", fun_of=fun_of)
         sig = (p["rows"], p["cols"], tuple(p["letters"]))
         if sig in used_signatures:
             continue
@@ -724,14 +836,26 @@ def main():
             print(f"rescue: {len(rescue)}/{args.rescue}")
 
     payload = {
-        "version": 5,
-        "generatedAt": "2026-08-12",
+        "version": 7 if args.daily_generation_2 else (6 if args.generation_2 else int((old or {}).get("version", 5))),
+        "generatedAt": "2026-08-13",
         "dictionarySize": len(dictionary),
         "dailyRotationSize": len(daily),
         "free": free,
         "legacyFree": legacy,
         "daily": daily,
+        "legacyDaily": legacy_daily,
         "rescue": rescue,
+        "freeGeneration": 2 if args.generation_2 else int((old or {}).get("freeGeneration", 1)),
+        "dailyGeneration": 2 if args.daily_generation_2 else int((old or {}).get("dailyGeneration", 1)),
+        "lexiconVersion": 2,
+        "vocabularyVersion": 2,
+        "vocabularyTierCounts": {tier: len(tiers[tier]) for tier in ("A", "B", "C", "D")},
+        "tieredDailyFrom": "2026-08-13" if args.daily_generation_2 else (old or {}).get("tieredDailyFrom", "2026-08-13"),
+        "dailyGeneration2From": "2026-08-13" if args.daily_generation_2 else (old or {}).get("dailyGeneration2From"),
+        "dailyTieredFromVersion": "3.16.1" if args.daily_generation_2 else (old or {}).get("dailyTieredFromVersion"),
+        "dailyMigration": {"strategy": "date-boundary-with-legacy-validation", "leaderboard": "active-generation-only", "history": "preserved"} if args.daily_generation_2 else (old or {}).get("dailyMigration"),
+        "freeTieredFromVersion": "3.16" if args.generation_2 else (old or {}).get("freeTieredFromVersion"),
+        "freeMigration": {"strategy": "transferred-slots", "xpPolicy": "once-per-difficulty-level-slot"} if args.generation_2 else (old or {}).get("freeMigration"),
     }
     payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     PUZZLES_PUBLIC_OUT.write_text(payload_json, encoding="utf-8")

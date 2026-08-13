@@ -9,6 +9,7 @@ import os
 import secrets
 import uuid
 from datetime import date, datetime, timedelta
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 from zoneinfo import ZoneInfo
@@ -51,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.15-cloud")
+app = FastAPI(title="Proplet API", version="3.16.1-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -430,7 +431,7 @@ def player_stats(player_id: str) -> dict:
     """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
     rows = db_select("results", player_id=player_id)
     daily_dates: list[str] = []
-    free = {k: 0 for k in ("easy", "medium", "hard", "hardcore")}
+    free_history = {k: 0 for k in ("easy", "medium", "hard", "hardcore")}
     daily_times: list[int] = []
     total_points = 0
     clean_solves = 0
@@ -458,8 +459,10 @@ def player_stats(player_id: str) -> dict:
             except (TypeError, ValueError):
                 logger.warning("Ignoring malformed elapsed time for result %s", r.get("id"))
 
-        if mode == "free" and difficulty in free:
-            free[difficulty] += 1
+        if mode == "free" and difficulty in free_history:
+            free_history[difficulty] += 1
+
+    free_slots = free_slot_summary(rows)
 
     rescued_dates: list[str] = []
     try:
@@ -483,7 +486,13 @@ def player_stats(player_id: str) -> dict:
         "points": total_points,
         "totalCompleted": len(rows),
         "dailyCompleted": len(set(daily_dates)),
-        "freeCompleted": free,
+        # Effective progress is a union of level slots across content generations.
+        # A Gen1 level and its Gen2 replacement therefore count once, while every
+        # actual historical result remains available in the history.
+        "freeCompleted": free_slots["effective"],
+        "freeTransferred": free_slots["transferred"],
+        "freePlayedGen2": free_slots["gen2"],
+        "freeHistoryCompleted": free_history,
         "currentStreak": current,
         "longestStreak": longest,
         "bestDailyMs": min(daily_times) if daily_times else None,
@@ -542,25 +551,158 @@ def rescue_status_for(player_id: str) -> dict:
         "missedDate": target if eligible else None, "priorStreak": prior_streak if eligible else 0,
     }
 
+@lru_cache(maxsize=1)
 def load_puzzles() -> dict:
     return json.loads(PUZZLES_PATH.read_text(encoding="utf-8"))
 
 
+def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Optional[dict]:
+    """Resolve a Free puzzle to its generation and stable difficulty/level slot."""
+    data = load_puzzles()
+    difficulties = (difficulty,) if difficulty in ("easy", "medium", "hard", "hardcore") else ("easy", "medium", "hard", "hardcore")
+    for diff in difficulties:
+        for index, puzzle in enumerate(data.get("free", {}).get(diff, []), start=1):
+            if puzzle.get("id") == puzzle_id:
+                meta = puzzle.get("meta") or {}
+                return {
+                    "puzzle": puzzle, "difficulty": diff, "mode": "free",
+                    "level": int(meta.get("level") or index),
+                    "generation": int(meta.get("contentGeneration") or data.get("freeGeneration") or 1),
+                    "legacy": False,
+                }
+    # Newest archived bank is appended last. This is the best possible mapping for
+    # a handful of IDs that had already been reused before Gen2 introduced unique IDs.
+    for diff in difficulties:
+        bank = data.get("legacyFree", {}).get(diff, [])
+        for index in range(len(bank) - 1, -1, -1):
+            puzzle = bank[index]
+            if puzzle.get("id") == puzzle_id:
+                meta = puzzle.get("meta") or {}
+                return {
+                    "puzzle": puzzle, "difficulty": diff, "mode": "free",
+                    "level": int(meta.get("level") or index + 1),
+                    "generation": int(meta.get("contentGeneration") or 1),
+                    "legacy": True,
+                }
+    return None
+
+
+def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
+    difficulties = ("easy", "medium", "hard", "hardcore")
+    legacy_slots = {key: set() for key in difficulties}
+    gen2_slots = {key: set() for key in difficulties}
+    for row in rows:
+        if row.get("mode") != "free" or row.get("difficulty") not in legacy_slots:
+            continue
+        info = free_puzzle_info(str(row.get("puzzle_id") or ""), str(row.get("difficulty") or ""))
+        if not info or not 1 <= int(info["level"]) <= 100:
+            continue
+        target = gen2_slots if int(info["generation"]) >= 2 else legacy_slots
+        target[info["difficulty"]].add(int(info["level"]))
+    return {
+        "effective": {key: len(legacy_slots[key] | gen2_slots[key]) for key in difficulties},
+        "transferred": {key: len(legacy_slots[key] - gen2_slots[key]) for key in difficulties},
+        "gen2": {key: len(gen2_slots[key]) for key in difficulties},
+    }
+
+
+def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> bool:
+    for row in db_select("results", player_id=player_id):
+        if row.get("mode") != "free" or row.get("difficulty") != difficulty or int(row.get("points") or 0) <= 0:
+            continue
+        info = free_puzzle_info(str(row.get("puzzle_id") or ""), difficulty)
+        if info and int(info["level"]) == int(level):
+            return True
+    return False
+
+
+def claim_free_slot_points(player_id: str, info: dict, points: int, puzzle_id: str) -> tuple[int, bool]:
+    """Award XP once per difficulty/level slot, across all content generations.
+
+    The v3.16 table supplies a concurrency-safe unique constraint. During a
+    rolling deployment without that migration, result-history lookup remains a
+    safe compatibility fallback (apart from a very narrow simultaneous race).
+    """
+    difficulty, level = info["difficulty"], int(info["level"])
+    historical_reward = free_slot_already_rewarded(player_id, difficulty, level)
+    try:
+        claimed = db_select("free_slot_rewards", player_id=player_id, difficulty=difficulty, level=level)
+        if claimed:
+            return 0, True
+        db_insert("free_slot_rewards", {
+            "id": str(uuid.uuid4()), "player_id": player_id, "difficulty": difficulty,
+            "level": level, "source_puzzle_id": puzzle_id,
+            "content_generation": int(info.get("generation") or 1),
+            "points": 0 if historical_reward else int(points),
+            "earned_at": datetime.now(TZ).isoformat(),
+        })
+        return (0, True) if historical_reward else (int(points), False)
+    except HTTPException as exc:
+        if exc.status_code == 409:
+            return 0, True
+        logger.warning("free_slot_rewards unavailable; using result-history fallback: %s", exc.detail)
+        return (0, True) if historical_reward else (int(points), False)
+
+
+def daily_rotation_index(daily_date: str, bank_size: int) -> int:
+    if bank_size <= 0:
+        raise HTTPException(503, "Daily banka je prázdná")
+    try:
+        d = date.fromisoformat(daily_date)
+    except ValueError:
+        raise HTTPException(400, "Neplatné datum")
+    return (d - date(2026, 1, 1)).days % bank_size
+
+
+def legacy_daily_banks(data: Optional[dict] = None) -> list[dict]:
+    pdata = data or load_puzzles()
+    return [bank for bank in pdata.get("legacyDaily", []) if bank.get("puzzles")]
+
+
 def expected_daily_puzzle_id(daily_date: str) -> str:
+    """Return the primary board for a date without rewriting historical Daily."""
     data = load_puzzles()
     try:
         d = date.fromisoformat(daily_date)
     except ValueError:
         raise HTTPException(400, "Neplatné datum")
-    base = date(2026, 1, 1)
-    idx = (d - base).days % len(data["daily"])
-    return data["daily"][idx]["id"]
+    switch_raw = data.get("dailyGeneration2From")
+    try:
+        switch = date.fromisoformat(str(switch_raw)) if switch_raw else date.min
+    except ValueError:
+        switch = date.min
+    if d < switch:
+        banks = legacy_daily_banks(data)
+        if banks:
+            bank = banks[-1]["puzzles"]
+            return bank[daily_rotation_index(daily_date, len(bank))]["id"]
+    bank = data.get("daily", [])
+    return bank[daily_rotation_index(daily_date, len(bank))]["id"]
+
+
+def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
+    """Accept the active board plus archived rotations for cached/offline clients."""
+    data = load_puzzles()
+    ids = {data["daily"][daily_rotation_index(daily_date, len(data.get("daily", [])))]["id"]}
+    for legacy_bank in legacy_daily_banks(data):
+        bank = legacy_bank["puzzles"]
+        ids.add(bank[daily_rotation_index(daily_date, len(bank))]["id"])
+    return ids
+
+
+def daily_puzzle_matches_date(puzzle_id: str, daily_date: str) -> bool:
+    return puzzle_id in valid_daily_puzzle_ids(daily_date)
 
 
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     data = load_puzzles()
     if mode == "daily":
-        return any(p["id"] == puzzle_id and p["difficulty"] == difficulty for p in data["daily"])
+        active = any(p["id"] == puzzle_id and p["difficulty"] == difficulty for p in data.get("daily", []))
+        archived = any(
+            p.get("id") == puzzle_id and p.get("difficulty") == difficulty
+            for bank in legacy_daily_banks(data) for p in bank["puzzles"]
+        )
+        return active or archived
     if any(p["id"] == puzzle_id for p in data["free"].get(difficulty, [])):
         return True
     # Keep queued results from older Hard banks syncable after the v3.3 puzzle upgrade.
@@ -580,9 +722,14 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.15.0",
-        "vocabularyVersion": pdata.get("vocabularyVersion"),
+        "version": "3.16.1",
+        "vocabularyVersion": pdata.get("lexiconVersion") or pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
+        "freeGeneration": pdata.get("freeGeneration"),
+        "dailyGeneration": pdata.get("dailyGeneration"),
+        "dailyGeneration2From": pdata.get("dailyGeneration2From"),
+        "dailyMigration": pdata.get("dailyMigration"),
+        "freeMigration": pdata.get("freeMigration"),
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
         "freeTieredFromVersion": pdata.get("freeTieredFromVersion"),
         "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
@@ -646,9 +793,14 @@ def health():
             db_request("GET", "product_events", params={"select": "id,anonymous_id,event_type", "limit": "1"})
         except HTTPException:
             anonymous_analytics_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        free_generation2_migration = True
+        try:
+            db_request("GET", "free_slot_rewards", params={"select": "id,level,content_generation", "limit": "1"})
+        except HTTPException:
+            free_generation2_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -661,7 +813,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.15.0",
+        "version": "3.16.1",
     }
 
 
@@ -913,7 +1065,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.15", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.16.1", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -961,25 +1113,28 @@ def me(authorization: Optional[str] = Header(default=None)):
 def progress(authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     rows = db_select("results", player_id=player["id"])
+    def completion_payload(r: dict) -> dict:
+        info = free_puzzle_info(str(r.get("puzzle_id") or ""), str(r.get("difficulty") or "")) if r.get("mode") == "free" else None
+        return {
+            "puzzleId": r.get("puzzle_id"),
+            "challengeKey": r.get("challenge_key"),
+            "mode": r.get("mode"),
+            "difficulty": r.get("difficulty"),
+            "dailyDate": str(r.get("daily_date"))[:10] if r.get("daily_date") else None,
+            "elapsedMs": int(r.get("best_elapsed_ms") or 1000),
+            "moves": int(r.get("best_moves") or 1),
+            "points": int(r.get("points") or 0),
+            "hintsUsed": int(r.get("hints_used") or 0),
+            "wrongAttempts": int(r.get("wrong_attempts") or 0),
+            "maxHintLevel": int(r.get("max_hint_level") or 0),
+            "cleanSolve": r.get("clean_solve") is True,
+            "completedAt": r.get("completed_at"),
+            "level": info.get("level") if info else None,
+            "contentGeneration": info.get("generation") if info else None,
+            "legacy": info.get("legacy") if info else False,
+        }
     return {
-        "completed": [
-            {
-                "puzzleId": r.get("puzzle_id"),
-                "challengeKey": r.get("challenge_key"),
-                "mode": r.get("mode"),
-                "difficulty": r.get("difficulty"),
-                "dailyDate": str(r.get("daily_date"))[:10] if r.get("daily_date") else None,
-                "elapsedMs": int(r.get("best_elapsed_ms") or 1000),
-                "moves": int(r.get("best_moves") or 1),
-                "points": int(r.get("points") or 0),
-                "hintsUsed": int(r.get("hints_used") or 0),
-                "wrongAttempts": int(r.get("wrong_attempts") or 0),
-                "maxHintLevel": int(r.get("max_hint_level") or 0),
-                "cleanSolve": r.get("clean_solve") is True,
-                "completedAt": r.get("completed_at"),
-            }
-            for r in rows
-        ]
+        "completed": [completion_payload(r) for r in rows]
     }
 
 
@@ -1012,7 +1167,7 @@ def attempt_start(
             date.fromisoformat(daily_date)
         except ValueError:
             raise HTTPException(400, "Neplatné datum Daily pokusu")
-        if payload.puzzle_id != expected_daily_puzzle_id(daily_date):
+        if not daily_puzzle_matches_date(payload.puzzle_id, daily_date):
             raise HTTPException(400, "Tato úloha nepatří k Daily datu")
     filters = {"id": payload.attempt_id, **actor_filters(actor)}
     existing = db_select("puzzle_attempts", **filters)
@@ -1022,7 +1177,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.15",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.1",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1078,12 +1233,12 @@ def attempt_finish(
                 date.fromisoformat(daily_date)
             except ValueError:
                 raise HTTPException(400, "Neplatné datum Daily")
-            if payload.puzzle_id != expected_daily_puzzle_id(daily_date):
+            if not daily_puzzle_matches_date(payload.puzzle_id, daily_date):
                 raise HTTPException(400, "Tato úloha nepatří k Daily datu")
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.15",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.1",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1109,7 +1264,11 @@ def puzzle_feedback(
     if payload.kind not in ("difficulty", "word"):
         raise HTTPException(400, "Neplatný typ zpětné vazby")
     data = load_puzzles()
-    known = any(payload.puzzle_id == p["id"] for bank in data.get("free", {}).values() for p in bank) or any(payload.puzzle_id == p["id"] for p in data.get("daily", []))
+    known = (
+        any(payload.puzzle_id == p["id"] for bank in data.get("free", {}).values() for p in bank)
+        or any(payload.puzzle_id == p["id"] for p in data.get("daily", []))
+        or any(payload.puzzle_id == p.get("id") for bank in legacy_daily_banks(data) for p in bank["puzzles"])
+    )
     if not known:
         raise HTTPException(400, "Neznámá úloha")
     if payload.kind == "difficulty" and payload.rating is None:
@@ -1470,14 +1629,17 @@ def run_rank_tuple(r: dict) -> tuple:
     )
 
 def puzzle_info(puzzle_id: str) -> Optional[dict]:
+    free_info = free_puzzle_info(puzzle_id)
+    if free_info:
+        return free_info
     data = load_puzzles()
-    for diff, bank in data.get("free", {}).items():
-        for p in bank:
-            if p.get("id") == puzzle_id:
-                return {"puzzle": p, "difficulty": diff, "mode": "free", "level": int((p.get("meta") or {}).get("level") or 0)}
     for p in data.get("daily", []):
         if p.get("id") == puzzle_id:
-            return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None}
+            return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None, "legacy": False, "generation": int(data.get("dailyGeneration") or 1)}
+    for bank in reversed(legacy_daily_banks(data)):
+        for p in bank["puzzles"]:
+            if p.get("id") == puzzle_id:
+                return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None, "legacy": True, "generation": int(bank.get("generation") or 1)}
     return None
 
 def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bool):
@@ -1515,13 +1677,18 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             raise HTTPException(400, "Neplatné datum")
         if payload.challenge_key != f"daily:{payload.daily_date}":
             raise HTTPException(400, "Neplatný daily klíč")
-        if payload.puzzle_id != expected_daily_puzzle_id(payload.daily_date):
+        if not daily_puzzle_matches_date(payload.puzzle_id, payload.daily_date):
             raise HTTPException(400, "Tato úloha nepatří k uvedenému dni")
         points = POINTS["daily"]
     else:
         if payload.challenge_key != f"free:{payload.puzzle_id}":
             raise HTTPException(400, "Neplatný klíč volné úlohy")
-        points = POINTS[payload.difficulty]
+        info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
+        if not info:
+            raise HTTPException(400, "Neznámý slot volné úlohy")
+        points, transferred_reward = claim_free_slot_points(
+            player["id"], info, POINTS[payload.difficulty], payload.puzzle_id,
+        )
 
     # Each actual completion is stored as one coherent run. Leaderboards never mix a fast hinted
     # attempt with a slower clean attempt into an impossible synthetic record.
@@ -1621,6 +1788,8 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
     return {
         "ok": True,
         "firstCompletion": first,
+        "awardedPoints": points if first else 0,
+        "transferredSlot": bool(payload.mode == "free" and transferred_reward),
         "stats": stats,
         "statsWarning": stats_warning,
     }
@@ -1736,7 +1905,11 @@ def _family_league_week(week_offset: int = 0) -> dict:
         members_by_family.setdefault(norm_family(str(p.get("family_code") or "")), []).append(p)
 
     daily_results = db_select("results", mode="daily")
-    daily_results = [r for r in daily_results if str(r.get("daily_date") or "")[:10] in dates]
+    daily_results = [
+        r for r in daily_results
+        if str(r.get("daily_date") or "")[:10] in dates
+        and r.get("puzzle_id") == expected_daily_puzzle_id(str(r.get("daily_date") or "")[:10])
+    ]
     rows_by_day: dict[str, list[dict]] = {d: [] for d in dates}
     for r in daily_results:
         d = str(r.get("daily_date") or "")[:10]
@@ -1901,6 +2074,28 @@ def played_levels(
     data = load_puzzles()
     bank = sorted(data.get("free", {}).get(difficulty, []), key=lambda p: int((p.get("meta") or {}).get("level") or 9999))
     active = {p["id"]: p for p in bank}
+    results = [r for r in db_select("results", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty]
+    legacy_slots: set[int] = set()
+    legacy_history: list[dict] = []
+    gen2_result_by_puzzle: dict[str, dict] = {}
+    for row in results:
+        info = free_puzzle_info(str(row.get("puzzle_id") or ""), difficulty)
+        if not info:
+            continue
+        if int(info["generation"]) >= 2:
+            gen2_result_by_puzzle[str(row.get("puzzle_id"))] = row
+        else:
+            legacy_slots.add(int(info["level"]))
+            legacy_history.append({
+                "puzzleId": row.get("puzzle_id"), "level": int(info["level"]),
+                "contentGeneration": int(info["generation"]),
+                "elapsedMs": int(row.get("best_elapsed_ms") or 1000),
+                "moves": int(row.get("best_moves") or 1),
+                "hintsUsed": int(row.get("hints_used") or 0),
+                "wrongAttempts": int(row.get("wrong_attempts") or 0),
+                "cleanSolve": row.get("clean_solve") is True,
+                "completedAt": row.get("completed_at"),
+            })
     runs = [r for r in db_select("puzzle_runs", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty and r.get("puzzle_id") in active]
     grouped: dict[str, list[dict]] = {}
     for r in runs:
@@ -1908,16 +2103,29 @@ def played_levels(
     items = []
     for p in bank:
         vals = grouped.get(p["id"], [])
-        if not vals:
-            continue
-        first = min(vals, key=first_run_key)
-        items.append({
-            "puzzleId": p["id"], "level": int((p.get("meta") or {}).get("level") or 0),
-            "elapsedMs": int(first["elapsed_ms"]), "moves": int(first["moves"]),
-            "hintsUsed": int(first.get("hints_used") or 0), "wrongAttempts": int(first.get("wrong_attempts") or 0),
-            "cleanSolve": first.get("clean_solve") is True, "attempts": len(vals), "completedAt": first.get("completed_at"),
-        })
-    return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "levels": items}
+        level = int((p.get("meta") or {}).get("level") or 0)
+        result_row = gen2_result_by_puzzle.get(p["id"])
+        if vals:
+            first = min(vals, key=first_run_key)
+            items.append({
+                "puzzleId": p["id"], "level": level, "transferred": False,
+                "elapsedMs": int(first["elapsed_ms"]), "moves": int(first["moves"]),
+                "hintsUsed": int(first.get("hints_used") or 0), "wrongAttempts": int(first.get("wrong_attempts") or 0),
+                "cleanSolve": first.get("clean_solve") is True, "attempts": len(vals), "completedAt": first.get("completed_at"),
+            })
+        elif result_row:
+            items.append({
+                "puzzleId": p["id"], "level": level, "transferred": False,
+                "elapsedMs": int(result_row.get("best_elapsed_ms") or 1000), "moves": int(result_row.get("best_moves") or 1),
+                "hintsUsed": int(result_row.get("hints_used") or 0), "wrongAttempts": int(result_row.get("wrong_attempts") or 0),
+                "cleanSolve": result_row.get("clean_solve") is True, "attempts": 1, "completedAt": result_row.get("completed_at"),
+            })
+        elif level in legacy_slots:
+            items.append({"puzzleId": p["id"], "level": level, "transferred": True, "attempts": 0})
+    actual = sum(not item.get("transferred") for item in items)
+    transferred = sum(bool(item.get("transferred")) for item in items)
+    legacy_history.sort(key=lambda row: (row["level"], str(row.get("completedAt") or ""), str(row.get("puzzleId") or "")))
+    return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "actual": actual, "transferred": transferred, "levels": items, "legacyLevels": legacy_history}
 
 
 @app.get("/api/push/config")
@@ -2030,7 +2238,8 @@ def leaderboard(
         item["rank"] = i
 
     daily_rows = db_select("results", mode="daily", daily_date=daily_date)
-    daily_rows = [r for r in daily_rows if r["player_id"] in player_map]
+    primary_daily_id = expected_daily_puzzle_id(daily_date)
+    daily_rows = [r for r in daily_rows if r["player_id"] in player_map and r.get("puzzle_id") == primary_daily_id]
     daily_rows.sort(key=lambda r: (
         0 if r.get("clean_solve") is True else 1,
         int(r.get("hints_used") or 0),

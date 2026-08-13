@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.15.0-content';
+const CACHE='proplet-v3.16.1-daily-generation2';
 const CORE=['/','/index.html','/styles.css','/app.js','/puzzles.json','/manifest.webmanifest','/icon.svg'];
 
 self.addEventListener('install',e=>{
