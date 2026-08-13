@@ -1,6 +1,6 @@
-# Proplet v3.19.1
+# Proplet v3.19.2
 
-Aktuální release: **v3.19.1 — opravný kompletní balík v3.19**.
+Aktuální release: **v3.19.2 — čistý start a nabídka záchrany série**.
 
 Hlavní novinky:
 
@@ -33,6 +33,7 @@ Hlavní novinky:
 - hotfix 3.18.1 doplňuje do update balíčku chybějící `admin.html` a `admin.css` a přidává kontrolu `adminStatic` do `/api/health`.
 - v3.19 přidává úrovně 101–200, mírnější slovní profil nových Mozkožroutů a automatickou pauzu při skrytí či ztrátě focusu aplikace.
 - hotfix 3.19.1 obnovuje kompletní HTML aplikace, opravuje vstup `/admin` pro Vercel a přidává kontrolu skutečně spustitelného release shellu.
+- hotfix 3.19.2 doplňuje chybějící nabídku záchrany série a odstraňuje poslední chybu čistého startu v konzoli.
 
 Nasazení: `UPDATE_V3_19_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_19.sql`  

@@ -54,7 +54,7 @@ def test_release_schema_and_health_metadata() -> None:
     assert "level between 1 and 200" in migration
     with patch.object(server, "supabase_ready", return_value=False):
         health = server.health()
-    assert health["version"] == "3.19.1"
+    assert health["version"] == "3.19.2"
     assert health["freeLevelsPerDifficulty"] == 200
     assert health["adminStatic"] is True
     assert health["adminEntry"] == "/admin.html"

@@ -1,4 +1,4 @@
-const APP_VERSION='3.19.1';
+const APP_VERSION='3.19.2';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -199,6 +199,7 @@ const HELPER_ONBOARD_KEY='proplet-v3-16-2-helper-onboarding';
 const ACCOUNT_NUDGE_KEY='proplet-v3-5-account-nudge';
 const PUSH_NUDGE_KEY='proplet-v3-8-2-push-nudge';
 const ANON_ID_KEY='proplet-v3-15-anonymous-id';
+const RESCUE_OFFER_KEY='proplet-v3-19-2-rescue-offer';
 
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -433,6 +434,17 @@ function renderRescueCard(){
  card.classList.remove('hidden');$('#rescueTitle').textContent=`Série ${countCz(rs.priorStreak,'den','dny','dní')} je v ohrožení`;
  $('#rescueText').textContent=rs.state==='started'?`Záchranný pokus už běží. Zbývá přibližně ${Math.ceil(rs.secondsRemaining||0)} s.`:`Včerejší Denní výzva ti utekla. Máš jeden pokus, jak navázat tam, kde jsi skončil.`;
  $('#rescueBtn').textContent=rs.state==='started'?`Pokračovat · ${Math.ceil(rs.secondsRemaining||0)} s`:'Zachránit sérii · 30 s';
+}
+function maybeOfferRescue(){
+ const rs=rescueStatus;if(currentScreen!=='daily'||!rs||!['available','started'].includes(rs.state)||!rs.missedDate)return false;
+ const offerId=`${rs.missedDate}:${rs.state}`,storageKey=scopedStorageKey(RESCUE_OFFER_KEY);
+ try{if(localStorage.getItem(storageKey)===offerId)return false}catch{}
+ setTimeout(()=>{
+  const current=rescueStatus;if(currentScreen!=='daily'||!current||current.missedDate!==rs.missedDate||current.state!==rs.state||openTransientModal())return;
+  try{if(localStorage.getItem(storageKey)===offerId)return;localStorage.setItem(storageKey,offerId)}catch{}
+  openRescueOffer();
+ },500);
+ return true;
 }
 function openRescueOffer(){
  const rs=rescueStatus;if(!rs||(rs.state!=='available'&&rs.state!=='started'))return;

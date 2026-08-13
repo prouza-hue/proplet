@@ -26,11 +26,11 @@ migration = (ROOT / "SUPABASE_MIGRATION_V3_19.sql").read_text(encoding="utf-8")
 puzzles_raw = (ROOT / "data/puzzles.json").read_bytes()
 puzzles = json.loads(puzzles_raw)
 
-assert 'version="3.19.1-cloud"' in server
-assert '"version": "3.19.1"' in server
-assert "const APP_VERSION='3.19.1'" in app
-assert "Proplet v3.19.1" in index
-assert "proplet-v3.19.1-recovery-complete-shell" in service_worker
+assert 'version="3.19.2-cloud"' in server
+assert '"version": "3.19.2"' in server
+assert "const APP_VERSION='3.19.2'" in app
+assert "Proplet v3.19.2" in index
+assert "proplet-v3.19.2-rescue-offer-fix" in service_worker
 assert 'return RedirectResponse(url="/admin.html", status_code=307)' in server
 
 # A file can exist and still be unusable: v3.19.0 accidentally shipped an
@@ -59,5 +59,6 @@ assert not new_hardcore_words & {"nocebo", "mastaba"}
 assert "function pauseGameClock(" in app and "function resumeGameClock(" in app
 assert "window.addEventListener('blur',()=>pauseGameClock('blur'))" in app
 assert "window.addEventListener('focus',resumeGameClock)" in app
+assert "function maybeOfferRescue(" in app
 
-print(f"v3.19.1 release completeness and boot shell: OK ({ROOT})")
+print(f"v3.19.2 release completeness and boot shell: OK ({ROOT})")

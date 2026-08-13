@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.19.1-recovery-complete-shell';
+const CACHE='proplet-v3.19.2-rescue-offer-fix';
 const CORE=['/','/index.html','/styles.css','/app.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png'];
 
 self.addEventListener('install',e=>{
