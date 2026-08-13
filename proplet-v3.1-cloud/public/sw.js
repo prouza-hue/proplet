@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.17.0-admin';
+const CACHE='proplet-v3.18.0-free-global';
 const CORE=['/','/index.html','/styles.css','/app.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png'];
 
 self.addEventListener('install',e=>{

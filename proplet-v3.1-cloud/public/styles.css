@@ -361,3 +361,12 @@ body.playing .app-header,body.playing .app-footer,body.playing .bottom-nav{displ
 
 /* v3.16.4 — globální Daily přímo na výsledkovce */
 .level-leaderboard-box.daily-global-board{padding:11px;background:linear-gradient(145deg,#f8f5ff,#f1faf7);border-color:#dcd4f5}.daily-world-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.daily-world-head strong{font-size:11px}.daily-world-head span{padding:4px 7px;border-radius:999px;background:#e8e2ff;color:#5d50c6;font-size:9px;font-weight:950}.daily-world-summary{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;margin-bottom:8px;padding:9px;border-radius:13px;background:#fff}.daily-world-summary>div{min-width:64px;text-align:center}.daily-world-summary>div strong,.daily-world-summary>div span{display:block}.daily-world-summary>div strong{font-size:27px;line-height:1;color:#5c4fc7}.daily-world-summary>div span{margin-top:2px;color:var(--muted);font-size:9px;font-weight:850}.daily-world-summary p{margin:0;text-align:left;font-size:10px;font-weight:850;line-height:1.35}.daily-world-summary p small{display:block;margin-top:3px;color:var(--muted);font-size:8px;font-weight:650}.daily-world-neighbours{display:grid;gap:4px}.daily-world-privacy{display:block;margin-top:6px;color:var(--muted);font-size:8px;text-align:center}
+
+/* v3.18 — globální pořadí jednotlivých Free úrovní */
+.level-leaderboard-box.free-level-board,.level-detail-leaderboard.free-level-board{padding:10px;border:1px solid #ddd5f1;border-radius:15px;background:linear-gradient(145deg,#f8f5ff,#f1faf7)}
+.free-board-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;padding:4px;border-radius:13px;background:#e9e4f2}
+.free-board-tab{min-width:0;border:0;border-radius:10px;padding:8px 6px;background:transparent;color:#746f81;font-size:10px;font-weight:950;cursor:pointer}
+.free-board-tab.active{background:#fff;color:#5044bb;box-shadow:0 3px 9px rgba(70,55,111,.09)}
+.free-board-content{display:grid;gap:4px;min-width:0}
+.free-board-content .daily-world-head,.free-board-content .daily-world-summary{margin-bottom:4px}
+@media(max-width:380px){.free-board-tab{font-size:9px;padding:7px 4px}.free-board-content .daily-world-summary{grid-template-columns:58px minmax(0,1fr);gap:7px}.free-board-content .daily-world-summary>div{min-width:0}.free-board-content .daily-world-summary>div strong{font-size:24px}}

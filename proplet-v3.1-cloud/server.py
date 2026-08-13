@@ -52,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.17.0-cloud")
+app = FastAPI(title="Proplet API", version="3.18.0-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -794,7 +794,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.17.0",
+        "version": "3.18.0",
         "vocabularyVersion": pdata.get("lexiconVersion") or pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "freeGeneration": pdata.get("freeGeneration"),
@@ -892,7 +892,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.17.0",
+        "version": "3.18.0",
     }
 
 
@@ -1149,7 +1149,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.17.0", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.18.0", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1261,7 +1261,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.17.0",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.18.0",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1322,7 +1322,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.17.0",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.18.0",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -2481,6 +2481,82 @@ def puzzle_leaderboard(
         })
     info = puzzle_info(puzzle_id)
     return {"familyCode": family, "puzzleId": puzzle_id, "difficulty": info.get("difficulty") if info else None, "level": info.get("level") if info else None, "rows": board}
+
+
+@app.get("/api/free-global-leaderboard")
+def free_global_leaderboard(
+    puzzle_id: str = Query(min_length=2, max_length=80),
+    authorization: Optional[str] = Header(default=None),
+):
+    """Privacy-safe worldwide standings for one active Free puzzle.
+
+    Every player is represented by their first completed attempt only. The
+    response deliberately contains no names, avatars, team codes or player IDs.
+    """
+    info = free_puzzle_info(puzzle_id)
+    if not info or info.get("legacy") is True:
+        raise HTTPException(404, "Aktivní volná úroveň nebyla nalezena")
+
+    runs = db_select_all("puzzle_runs", puzzle_id=puzzle_id, mode="free")
+    first_by_player: dict[str, dict] = {}
+    for row in runs:
+        player_id = str(row.get("player_id") or "")
+        if not player_id:
+            continue
+        previous = first_by_player.get(player_id)
+        if previous is None or first_run_key(row) < first_run_key(previous):
+            first_by_player[player_id] = row
+
+    ranked = sorted(first_by_player.values(), key=lambda row: (
+        *run_rank_tuple(row),
+        completion_time(row),
+        str(row.get("player_id") or ""),
+    ))
+
+    my_player_id = None
+    if authorization:
+        try:
+            my_player_id = str(auth_player(authorization)["id"])
+        except HTTPException:
+            pass
+    my_index = next(
+        (index for index, row in enumerate(ranked) if str(row.get("player_id")) == my_player_id),
+        None,
+    )
+    total = len(ranked)
+    if my_index is None:
+        visible_indices = list(range(min(3, total)))
+    else:
+        start = max(0, min(my_index - 1, total - 3))
+        visible_indices = list(range(start, min(total, start + 3)))
+
+    board = []
+    for index in visible_indices:
+        row = ranked[index]
+        board.append({
+            "rank": index + 1,
+            "isMine": index == my_index,
+            "elapsedMs": int(row.get("elapsed_ms") or 0),
+            "moves": int(row.get("moves") or 0),
+            "hintsUsed": int(row.get("hints_used") or 0),
+            "cleanSolve": row.get("clean_solve") is True,
+        })
+
+    my_rank = my_index + 1 if my_index is not None else None
+    top_percent = max(1, math.ceil(my_rank / total * 100)) if my_rank and total else None
+    return {
+        "puzzleId": puzzle_id,
+        "difficulty": info.get("difficulty"),
+        "level": info.get("level"),
+        "generation": info.get("generation"),
+        "total": total,
+        "myRank": my_rank,
+        "topPercent": top_percent,
+        "percentileMinimum": 10,
+        "rows": board,
+        "privacy": "anonymous-performance-only",
+        "attemptPolicy": "first-completed-only",
+    }
 
 
 @app.get("/api/daily-global-leaderboard")

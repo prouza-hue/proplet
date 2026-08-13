@@ -1,6 +1,6 @@
-# Proplet v3.17.0
+# Proplet v3.18.0
 
-Aktuální release: **v3.17.0 — první skutečná administrace**.
+Aktuální release: **v3.18.0 — globální pořadí každé Free úrovně**.
 
 Hlavní novinky:
 
@@ -26,9 +26,13 @@ Hlavní novinky:
 - admin obsahuje Přehled, Quality Analytics, frontu hlášení slov, uživatele a audit zásahů;
 - více nahlášených slov z jedné desky se už navzájem nepřepisuje;
 - běžný přihlášený hráč už nemá přístup ke skrytým Quality datům.
+- každá aktivní Gen2 Free úroveň má vlastní anonymní globální pořadí s přesným místem, sousedními výsledky a percentilem od deseti hráčů;
+- výsledkovka a detail úrovně přepínají mezi pohledy **Globálně** a **Můj tým**;
+- do pořadí dál platí pouze první dokončený pokus a replay zůstává tréninkem;
+- vysvětlení pořadí i administrace nově jednotně používají české označení **Čistě / Čisté vyřešení**.
 
-Nasazení: `UPDATE_V3_17_CZ.md`  
+Nasazení: `UPDATE_V3_18_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_17.sql`  
-Release notes: `RELEASE_V3_17_CZ.md`  
+Release notes: `RELEASE_V3_18_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
