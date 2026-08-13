@@ -52,7 +52,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 
-app = FastAPI(title="Proplet API", version="3.19.2-cloud")
+app = FastAPI(title="Proplet API", version="3.20.0-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -75,8 +75,8 @@ async def unexpected_error_handler(request, exc: Exception):
 
 class PlayerCreate(BaseModel):
     name: str = Field(min_length=1, max_length=24)
-    family_code: str = Field(min_length=2, max_length=24)
-    # Optional keeps a rolling deployment compatible with an older cached PWA.
+    # v3.20: team is optional. Keeping these fields preserves older cached clients.
+    family_code: Optional[str] = Field(default=None, max_length=24)
     password: Optional[str] = Field(default=None, min_length=8, max_length=128)
     league_pin: Optional[str] = Field(default=None, max_length=32)
     create_league: bool = False
@@ -85,7 +85,9 @@ class PlayerCreate(BaseModel):
 
 class PlayerLogin(BaseModel):
     name: str = Field(min_length=1, max_length=24)
-    family_code: str = Field(min_length=2, max_length=24)
+    # New accounts log in with name + password. Team remains an optional
+    # disambiguator for legacy duplicate names.
+    family_code: Optional[str] = Field(default=None, max_length=24)
     password: str = Field(min_length=8, max_length=128)
 
 
@@ -132,6 +134,13 @@ class ProductEventCreate(BaseModel):
 
 class TeamPinSet(BaseModel):
     pin: str = Field(min_length=4, max_length=32)
+
+
+class TeamMembershipSet(BaseModel):
+    mode: str = Field(pattern="^(join|new)$")
+    family_code: Optional[str] = Field(default=None, max_length=24)
+    league_pin: str = Field(min_length=4, max_length=32)
+    league_name: Optional[str] = Field(default=None, max_length=40)
 
 
 class ResultCreate(BaseModel):
@@ -299,16 +308,40 @@ def db_delete(table: str, **filters):
 
 
 def norm_family(code: str) -> str:
-    code = "".join(ch for ch in code.upper().strip() if ch.isalnum() or ch in "-_ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
+    code = "".join(ch for ch in str(code or "").upper().strip() if ch.isalnum() or ch in "-_ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
     return code[:24]
 
 
+SOLO_FAMILY_PREFIX = "SOLO_"
+
+
+def is_solo_family(code: Optional[str], team_joined_at: Optional[str] = None) -> bool:
+    # Prefix marks our internal compatibility namespace; team_joined_at protects
+    # any pre-existing real team that could coincidentally have a similar code.
+    return not team_joined_at and norm_family(str(code or "")).startswith(SOLO_FAMILY_PREFIX)
+
+
+def is_solo_player(player: dict) -> bool:
+    return is_solo_family(player.get("family_code"), player.get("team_joined_at"))
+
+
+def public_family_code(code: Optional[str], team_joined_at: Optional[str] = None) -> Optional[str]:
+    normalized = norm_family(str(code or ""))
+    return None if not normalized or is_solo_family(normalized, team_joined_at) else normalized
+
+
+def public_team_name(code: Optional[str], team_joined_at: Optional[str] = None) -> Optional[str]:
+    family = public_family_code(code, team_joined_at)
+    return league_name_for(family) if family else None
+
+
 def league_name_for(code: str) -> str:
+    normalized = norm_family(code)
     try:
-        rows = db_select("leagues", code=norm_family(code))
-        return rows[0].get("name") or norm_family(code) if rows else norm_family(code)
+        rows = db_select("leagues", code=normalized)
+        return rows[0].get("name") or normalized if rows else normalized
     except HTTPException:
-        return norm_family(code)
+        return normalized
 
 def push_ready() -> bool:
     return bool(webpush and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY)
@@ -787,7 +820,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.19.2",
+        "version": "3.20.0",
         "adminStatic": True,
         "adminEntry": "/admin.html",
         "adminDelivery": "vercel-public-static",
@@ -802,6 +835,9 @@ def health():
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
         "freeTieredFromVersion": pdata.get("freeTieredFromVersion"),
         "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
+        "uxSprint": "3.20",
+        "accountWithoutTeam": True,
+        "accountNudgeCompletions": [1, 4, 10],
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
@@ -844,6 +880,11 @@ def health():
             db_request("GET", "leagues", params={"select": "code,public_opt_in,public_name,public_enabled_at", "limit": "1"})
         except HTTPException:
             global_league_migration = False
+        ux_migration = True
+        try:
+            db_request("GET", "players", params={"select": "id,team_joined_at", "limit": "1"})
+        except HTTPException:
+            ux_migration = False
         analytics_v2_migration = True
         try:
             db_request("GET", "players", params={"select": "id,support_mode", "limit": "1"})
@@ -874,9 +915,9 @@ def health():
             db_request("GET", "puzzle_feedback", params={"select": "id,status,resolution_note,reviewed_at,reviewed_by", "limit": "1"})
         except HTTPException:
             admin_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -889,7 +930,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.19.2",
+        "version": "3.20.0",
     }
 
 
@@ -917,33 +958,37 @@ def list_leagues():
 @app.post("/api/player")
 def create_player(payload: PlayerCreate):
     name = " ".join(payload.name.strip().split())
-    family = norm_family(payload.family_code)
-    if not name or len(family) < 2:
-        raise HTTPException(400, "Vyplň jméno a tým")
+    requested_family = norm_family(payload.family_code or "")
+    solo = len(requested_family) < 2
+    family = requested_family if not solo else f"{SOLO_FAMILY_PREFIX}{secrets.token_hex(6).upper()}"
+    if not name:
+        raise HTTPException(400, "Vyplň jméno")
+    if solo and not payload.password:
+        raise HTTPException(400, "Nový účet potřebuje heslo")
 
-    league_rows = db_select("leagues", code=family)
-    if payload.create_league:
-        display_name = " ".join((payload.league_name or payload.family_code).strip().split())[:40]
-        if league_rows:
-            raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu místo zakládání nového.")
-        if not payload.league_pin or len(payload.league_pin.strip()) < 4:
-            raise HTTPException(400, "Nový tým potřebuje PIN alespoň 4 znaky")
-        db_insert("leagues", {"code": family, "name": display_name or family, "pin_hash": hash_password(payload.league_pin.strip()), "created_at": datetime.now(TZ).isoformat()})
+    if not solo:
         league_rows = db_select("leagues", code=family)
-    elif not league_rows:
-        # Backward compatibility for a cached pre-team client. New v3.9 clients always create teams explicitly.
-        db_insert("leagues", {"code": family, "name": family, "created_at": datetime.now(TZ).isoformat()})
-        league_rows = db_select("leagues", code=family)
-    else:
-        # PIN is the shared invitation secret for adding a NEW player to an existing team.
-        if not league_rows[0].get("pin_hash"):
-            raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN. Některý přihlášený člen ho může nastavit v profilu.")
-        if not payload.league_pin or not verify_password(payload.league_pin.strip(), league_rows[0].get("pin_hash")):
-            raise HTTPException(401, "PIN týmu nesedí")
+        if payload.create_league:
+            display_name = " ".join((payload.league_name or payload.family_code or "").strip().split())[:40]
+            if league_rows:
+                raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu místo zakládání nového.")
+            if not payload.league_pin or len(payload.league_pin.strip()) < 4:
+                raise HTTPException(400, "Nový tým potřebuje PIN alespoň 4 znaky")
+            db_insert("leagues", {"code": family, "name": display_name or family, "pin_hash": hash_password(payload.league_pin.strip()), "created_at": datetime.now(TZ).isoformat()})
+            league_rows = db_select("leagues", code=family)
+        elif not league_rows:
+            # Backward compatibility for cached pre-v3.20 clients.
+            db_insert("leagues", {"code": family, "name": family, "created_at": datetime.now(TZ).isoformat()})
+            league_rows = db_select("leagues", code=family)
+        else:
+            if not league_rows[0].get("pin_hash"):
+                raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN. Některý přihlášený člen ho může nastavit v profilu.")
+            if not payload.league_pin or not verify_password(payload.league_pin.strip(), league_rows[0].get("pin_hash")):
+                raise HTTPException(401, "PIN týmu nesedí")
 
-    family_players = db_select("players", family_code=family)
-    if any(p["name"].casefold() == name.casefold() for p in family_players):
-        raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
+        family_players = db_select("players", family_code=family)
+        if any(p["name"].casefold() == name.casefold() for p in family_players):
+            raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
 
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode()).hexdigest()
@@ -958,6 +1003,8 @@ def create_player(payload: PlayerCreate):
         "token_hash": token_hash,
         "created_at": now,
     }
+    if not solo:
+        row["team_joined_at"] = now
     if payload.password:
         row["password_hash"] = hash_password(payload.password)
 
@@ -965,32 +1012,45 @@ def create_player(payload: PlayerCreate):
         db_insert("players", row)
     except HTTPException as exc:
         if exc.status_code == 409:
-            raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
+            raise HTTPException(409, "Takový hráč už existuje")
         raise
 
     stats = player_stats(player_id)
+    public_family = public_family_code(family, row.get("team_joined_at"))
     return {
-        "id": player_id, "name": name, "familyCode": family, "leagueName": league_name_for(family), "token": token,
+        "id": player_id, "name": name, "familyCode": public_family,
+        "leagueName": league_name_for(family) if public_family else None, "token": token,
         "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "stats": stats,
     }
 
 
 @app.post("/api/login")
 def login(payload: PlayerLogin):
-    family = norm_family(payload.family_code)
+    family = norm_family(payload.family_code or "")
     name = " ".join(payload.name.strip().split())
-    family_players = db_select("players", family_code=family)
-    player = next((p for p in family_players if p["name"].casefold() == name.casefold()), None)
-    if not player:
-        raise HTTPException(401, "Tým, jméno nebo heslo nesedí")
-    if not player.get("password_hash"):
-        raise HTTPException(409, "Tento hráč ještě nemá heslo. Nastav ho na zařízení, kde už je přihlášený.")
-    if not verify_password(payload.password, player.get("password_hash")):
-        raise HTTPException(401, "Tým, jméno nebo heslo nesedí")
+    if family:
+        candidates = [p for p in db_select("players", family_code=family) if p.get("name", "").casefold() == name.casefold()]
+    else:
+        # Teamless login is intentionally simple for the player. We only use
+        # team when an old duplicate name needs disambiguation.
+        candidates = [p for p in db_select("players") if p.get("name", "").casefold() == name.casefold()]
+
+    if not candidates:
+        raise HTTPException(401, "Jméno nebo heslo nesedí")
+    password_matches = [p for p in candidates if p.get("password_hash") and verify_password(payload.password, p.get("password_hash"))]
+    if not password_matches:
+        if len(candidates) == 1 and not candidates[0].get("password_hash"):
+            raise HTTPException(409, "Tento hráč ještě nemá heslo. Nastav ho na zařízení, kde už je přihlášený.")
+        raise HTTPException(401, "Jméno nebo heslo nesedí")
+    if len(password_matches) > 1 and not family:
+        raise HTTPException(409, "Našli jsme více účtů se stejným jménem. Otevři volbu pro starší týmový účet a vyber svůj tým.")
+    player = password_matches[0]
 
     token = new_session(player["id"])
+    public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     return {
-        "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
+        "id": player["id"], "name": player["name"], "familyCode": public_family,
+        "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
         "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": player_stats(player["id"]),
     }
 
@@ -1141,12 +1201,13 @@ def product_event(
         "app_open", "onboarding_started", "onboarding_completed",
         "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
         "account_authenticated",
+        *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
     }
     if payload.event_type not in allowed:
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.19.2", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.20.0", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1155,11 +1216,50 @@ def product_event(
 def set_team_pin(payload: TeamPinSet, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     team = norm_family(str(player.get("family_code") or ""))
+    if is_solo_player(player):
+        raise HTTPException(400, "Nejdřív se připoj k týmu nebo ho založ")
     rows = db_select("leagues", code=team)
     if not rows:
         raise HTTPException(404, "Tým neexistuje")
     db_update("leagues", {"code": team}, {"pin_hash": hash_password(payload.pin.strip())})
     return {"ok": True, "hasPin": True}
+
+
+@app.post("/api/team-membership")
+def set_team_membership(payload: TeamMembershipSet, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    current_family = norm_family(str(player.get("family_code") or ""))
+    if not is_solo_player(player):
+        raise HTTPException(409, "Tento hráč už je v týmu")
+
+    if payload.mode == "new":
+        display_name = " ".join((payload.league_name or "").strip().split())[:40]
+        family = norm_family(display_name)
+        if len(family) < 2:
+            raise HTTPException(400, "Pojmenuj nový tým")
+        if db_select("leagues", code=family):
+            raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu.")
+        db_insert("leagues", {
+            "code": family, "name": display_name, "pin_hash": hash_password(payload.league_pin.strip()),
+            "created_at": datetime.now(TZ).isoformat(),
+        })
+    else:
+        family = norm_family(payload.family_code or "")
+        if len(family) < 2:
+            raise HTTPException(400, "Vyber tým")
+        rows = db_select("leagues", code=family)
+        if not rows:
+            raise HTTPException(404, "Tým neexistuje")
+        if not rows[0].get("pin_hash"):
+            raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN")
+        if not verify_password(payload.league_pin.strip(), rows[0].get("pin_hash")):
+            raise HTTPException(401, "PIN týmu nesedí")
+
+    target_players = db_select("players", family_code=family)
+    if any(p.get("id") != player.get("id") and p.get("name", "").casefold() == player.get("name", "").casefold() for p in target_players):
+        raise HTTPException(409, "V tomto týmu už je hráč se stejným jménem")
+    db_update("players", {"id": player["id"]}, {"family_code": family, "team_joined_at": datetime.now(TZ).isoformat()})
+    return {"ok": True, "familyCode": family, "leagueName": league_name_for(family)}
 
 
 @app.post("/api/logout")
@@ -1184,8 +1284,10 @@ def logout(authorization: Optional[str] = Header(default=None)):
 def me(authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     stats = player_stats(player["id"])
+    public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     return {
-        "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
+        "id": player["id"], "name": player["name"], "familyCode": public_family,
+        "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
         "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": stats,
     }
 
@@ -1258,7 +1360,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.19.2",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.20.0",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1319,7 +1421,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.19.2",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.20.0",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1615,6 +1717,7 @@ def build_quality_report():
     for event_type in (
         "app_open", "onboarding_started", "onboarding_completed", "account_nudge_shown",
         "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+        *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
     ):
         identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
         identities.discard(None)
@@ -1666,11 +1769,12 @@ def parse_timestamp(value) -> Optional[datetime]:
 
 def public_admin_identity(admin: dict) -> dict:
     player = admin["player"]
+    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     return {
         "id": player["id"],
         "name": player.get("name"),
-        "familyCode": player.get("family_code"),
-        "team": league_name_for(str(player.get("family_code") or "")),
+        "familyCode": family,
+        "team": public_team_name(player.get("family_code"), player.get("team_joined_at")) or "Bez týmu",
         "avatar": player.get("avatar") or "🙂",
         "role": admin["role"],
     }
@@ -1787,14 +1891,15 @@ def admin_user_summaries() -> list[dict]:
             key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ),
             default=None,
         )
-        family = str(player.get("family_code") or "")
+        raw_family = str(player.get("family_code") or "")
+        family = public_family_code(raw_family, player.get("team_joined_at"))
         player_reports = reports_by_player.get(player["id"], [])
         summaries.append({
             "id": player["id"],
             "name": player.get("name"),
             "avatar": player.get("avatar") or "🙂",
             "familyCode": family,
-            "team": leagues.get(family) or family,
+            "team": (leagues.get(family) or family) if family else "Bez týmu",
             "createdAt": player.get("created_at"),
             "lastActiveAt": activity.isoformat() if activity else None,
             "appVersion": latest_attempt.get("app_version") if latest_attempt else None,
@@ -1846,7 +1951,8 @@ def admin_user_detail(player_id: str, authorization: Optional[str] = Header(defa
     return {
         "user": {
             "id": player["id"], "name": player.get("name"), "avatar": player.get("avatar") or "🙂",
-            "familyCode": player.get("family_code"), "team": league_name_for(str(player.get("family_code") or "")),
+            "familyCode": public_family_code(player.get("family_code"), player.get("team_joined_at")),
+            "team": public_team_name(player.get("family_code"), player.get("team_joined_at")) or "Bez týmu",
             "createdAt": player.get("created_at"), "supportMode": player.get("support_mode") or "none",
             "hasPassword": bool(player.get("password_hash")), "additionalSessions": session_count, "pushSubscriptions": push_count,
         },
@@ -1896,7 +2002,10 @@ def admin_reports(
             "puzzleId": report.get("puzzle_id"), "challengeKey": report.get("challenge_key"),
             "mode": (info or {}).get("mode"), "difficulty": (info or {}).get("difficulty"),
             "level": (info or {}).get("level") or puzzle_meta.get("level"), "legacy": bool((info or {}).get("legacy")),
-            "reportedBy": {"id": player.get("id"), "name": player.get("name"), "team": player.get("family_code")} if player else {"id": None, "name": "Anonymní hráč", "team": None},
+            "reportedBy": {
+                "id": player.get("id"), "name": player.get("name"),
+                "team": public_team_name(player.get("family_code"), player.get("team_joined_at")),
+            } if player else {"id": None, "name": "Anonymní hráč", "team": None},
             "createdAt": report.get("created_at"), "resolutionNote": report.get("resolution_note"),
             "reviewedAt": report.get("reviewed_at"), "reviewedBy": report.get("reviewed_by"),
         })
@@ -2353,7 +2462,7 @@ def _family_league_week(week_offset: int = 0) -> dict:
             day_members = []
             for member in members:
                 try:
-                    created = datetime.fromisoformat(str(member.get("created_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
+                    created = datetime.fromisoformat(str(member.get("team_joined_at") or member.get("created_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
                 except Exception:
                     created = date.min
                 if created <= day_date:
@@ -2401,6 +2510,8 @@ def family_league(
         try:
             player = auth_player(authorization)
             family = norm_family(str(player.get("family_code") or ""))
+            if is_solo_player(player):
+                raise HTTPException(404, "Hráč zatím není v týmu")
             league_rows = db_select("leagues", code=family)
             members = db_select("players", family_code=family)
             league = league_rows[0] if league_rows else {}
@@ -2433,6 +2544,8 @@ def family_league(
 def family_league_settings(payload: FamilyLeagueSettings, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     family = norm_family(str(player.get("family_code") or ""))
+    if is_solo_player(player):
+        raise HTTPException(400, "Nejdřív se připoj k týmu nebo ho založ")
     rows = db_select("leagues", code=family)
     if not rows:
         raise HTTPException(404, "Tým neexistuje")

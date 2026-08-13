@@ -13,11 +13,14 @@ create table if not exists public.players (
 
 alter table public.players add column if not exists password_hash text;
 alter table public.players add column if not exists avatar text not null default '🙂';
+alter table public.players add column if not exists team_joined_at timestamptz;
 
 create unique index if not exists players_family_name_ci
     on public.players (family_code, lower(name));
 create index if not exists idx_players_family
     on public.players (family_code);
+create index if not exists idx_players_team_joined_at
+    on public.players (family_code, team_joined_at);
 
 create table if not exists public.player_sessions (
     id uuid primary key,
@@ -324,7 +327,7 @@ create table if not exists public.free_slot_rewards (
   id uuid primary key,
   player_id uuid not null references public.players(id) on delete cascade,
   difficulty text not null check (difficulty in ('easy', 'medium', 'hard', 'hardcore')),
-  level integer not null check (level between 1 and 100),
+  level integer not null check (level between 1 and 200),
   source_puzzle_id text not null,
   content_generation integer not null default 1 check (content_generation >= 1),
   points integer not null default 0 check (points >= 0),

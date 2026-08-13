@@ -370,3 +370,56 @@ body.playing .app-header,body.playing .app-footer,body.playing .bottom-nav{displ
 .free-board-content{display:grid;gap:4px;min-width:0}
 .free-board-content .daily-world-head,.free-board-content .daily-world-summary{margin-bottom:4px}
 @media(max-width:380px){.free-board-tab{font-size:9px;padding:7px 4px}.free-board-content .daily-world-summary{grid-template-columns:58px minmax(0,1fr);gap:7px}.free-board-content .daily-world-summary>div{min-width:0}.free-board-content .daily-world-summary>div strong{font-size:24px}}
+
+
+/* ==============================
+   v3.20 — UX clarity sprint
+   Keep Proplet playful; reduce dashboard noise.
+   ============================== */
+/* Daily: one hero, one play choice, one quiet progress strip. */
+.daily-hero .hero-main{margin:14px 0 18px;display:block}
+.quick-play-card{box-shadow:0 4px 14px rgba(65,52,106,.055);border-color:#e9e4ef}
+.daily-progress-strip{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,150px) auto;gap:12px;align-items:center;margin-top:12px;padding:12px 14px;border:1px solid #e8e2ee;border-radius:18px;background:rgba(255,255,255,.62)}
+.daily-progress-rank,.daily-progress-streak{display:flex;align-items:center;gap:9px;min-width:0}.daily-progress-rank>span{width:38px;height:38px;display:grid;place-items:center;border-radius:13px;background:#fff0bd;font-size:20px}.daily-progress-rank strong,.daily-progress-rank small,.daily-progress-streak strong,.daily-progress-streak small{display:block}.daily-progress-rank strong{font-size:13px}.daily-progress-rank small,.daily-progress-streak small{margin-top:2px;color:var(--muted);font-size:11px;line-height:1.2}.daily-progress-track i{display:block;height:7px;border-radius:999px;background:#ece8f2;overflow:hidden}.daily-progress-track b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--purple),#9b78ef)}.daily-progress-streak{justify-self:end}.daily-progress-streak>span{font-size:22px}.daily-progress-streak strong{font-size:18px;line-height:1}.daily-progress-streak.at-risk strong,.daily-progress-streak.at-risk small{color:#b65b32}
+@media(max-width:500px){.daily-progress-strip{grid-template-columns:minmax(0,1fr) auto}.daily-progress-track{grid-column:1/-1;grid-row:2}.daily-progress-streak small{max-width:92px}.daily-progress-rank small{font-size:10.5px}}
+
+/* Navigation uses one visual icon language instead of functional emoji. */
+.bottom-nav button svg{display:block;width:21px;height:21px;margin:0 auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.bottom-nav button small{font-size:11px}
+
+/* Win: celebrate first, explain second. */
+.win-card{padding:21px}.win-card h2{margin-bottom:4px}.win-summary{margin:7px 0 10px;padding:10px 12px;border-radius:16px;background:#f8f6fb}.win-summary>p{margin:0 0 7px;font-size:12px}.win-summary-chips{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px}.win-summary-chips .win-xp,.win-summary-chips .win-clean{margin:0}.win-secondary-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}.win-secondary-actions .secondary-btn{margin:0;padding:9px 7px;font-size:11px}.win-details{margin:10px 0 2px;border-top:1px solid #eee8f2;border-bottom:1px solid #eee8f2}.win-details summary{cursor:pointer;padding:9px 2px;color:#726d7e;font-size:11px;font-weight:850;list-style:none}.win-details summary::-webkit-details-marker{display:none}.win-details summary:after{content:' +';color:#8b82a0}.win-details[open] summary:after{content:' −'}.win-details .win-words{margin:1px 0 10px}.win-feedback{margin-top:10px}.win-report{font-size:11px}.level-leaderboard-box{margin:8px 0}.new-badge-box{margin:8px 0}
+@media(max-width:390px){.win-secondary-actions{grid-template-columns:1fr 1fr}.win-secondary-actions .secondary-btn:last-child:nth-child(odd){grid-column:1/-1}}
+
+/* Account: benefit first; team is a later feature. */
+.account-modal-card{max-width:430px}.legacy-login-toggle{padding:5px 0!important;margin:3px 0 0!important;text-align:left;color:#746d87;font-size:11px}.league-chooser{margin-top:5px;padding:9px 11px;border-radius:14px;background:#f8f6fb;border:1px solid #e8e1ef}.team-membership-card{max-width:470px}.team-membership-tabs{margin:14px 0 4px}.team-empty{background:linear-gradient(145deg,#f7f4ff,#eefaf5)}.account-nudge-card .muted{font-size:13px;line-height:1.45}
+.profile-daily-highlights{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.profile-daily-highlights>span{display:grid;gap:3px;padding:9px 5px;border-radius:11px;background:#fff;border:1px solid #e8e1ef;text-align:center}.profile-daily-highlights small{font-size:10.5px;color:var(--muted);font-weight:800}.profile-daily-highlights b{font-size:16px}
+
+/* Onboarding: action → whole-board rule → helper. */
+.onboarding-card{width:min(100%,440px)}.onboard-content h2{font-size:28px}.onboard-content p{font-size:13px}.onboard-fill-demo{width:min(100%,235px);display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:13px auto 14px}.onboard-fill-demo span{aspect-ratio:1;display:grid;place-items:center;border-radius:13px;border:1px solid #ddd6e8;background:#fff;font-size:20px;font-weight:1000;animation:onboardFill 2.7s ease infinite;animation-delay:calc(var(--d)*.08s)}@keyframes onboardFill{0%,12%{background:#fff;transform:scale(.96)}38%,82%{background:color-mix(in srgb,var(--c) 56%,white);border-color:color-mix(in srgb,var(--c) 70%,#ccc);transform:none}100%{background:#fff;transform:scale(.96)}}.onboard-mini-rules{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.onboard-mini-rules span{padding:7px 10px;border-radius:999px;background:#f5f2f8;color:#615b72;font-size:11px;font-weight:850}.tutorial-success{font-size:13px}.support-choice small{font-size:11px}.onboard-support-note{font-size:11px!important}
+
+/* Non-game microtype: no more ant-sized labels. Dense game HUD stays intentionally compact. */
+body:not(.playing) .brand-copy small,body:not(.playing) .level-hint,body:not(.playing) .badge-step small,body:not(.playing) .profile-completion-grid small,body:not(.playing) .profile-badge small,body:not(.playing) .achievement-card small,body:not(.playing) .team-access-card span,body:not(.playing) .account-banner span,body:not(.playing) .push-status,body:not(.playing) .field-note{font-size:11px}
+body:not(.playing) .eyebrow,body:not(.playing) .stat-label{font-size:10.5px}
+/* Readability pass: secondary copy stays compact, but never decorative-micro. */
+body:not(.playing) .team-access-card span,
+body:not(.playing) .account-banner span,
+body:not(.playing) .push-status,
+body:not(.playing) .screen-title p,
+body:not(.playing) .difficulty-card p,
+body:not(.playing) .my-family-world small,
+body:not(.playing) .global-optin-card small,
+body:not(.playing) .league-score-explainer span,
+body:not(.playing) .leaderboard-empty,
+body:not(.playing) .daily-world-summary p,
+body:not(.playing) .level-detail-result span{font-size:12px}
+body:not(.playing) .level-history-main small,
+body:not(.playing) .level-detail-result small,
+body:not(.playing) .mini-leader-row>span small,
+body:not(.playing) .league-score-explainer small,
+body:not(.playing) .admin-entry small,
+body:not(.playing) .daily-world-summary p small,
+body:not(.playing) .daily-world-privacy,
+body:not(.playing) .legacy-history-title small{font-size:11px}
+body:not(.playing) .team-access-card .secondary-btn,
+body:not(.playing) .logout-btn{font-size:11px}
+.game-clock small{font-size:11px}.game-board-column>.current-word .clean-status{font-size:10px}.found-word-chip,.remaining-row .length-pill{font-size:10px}

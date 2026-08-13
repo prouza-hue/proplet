@@ -1,0 +1,22 @@
+{
+  "release": "3.20.0",
+  "base": "3.19.2",
+  "scope": "ux-account-clarity",
+  "puzzleSha256": "1dc3547289a0209f96fda78c993d8d12df098daf13b55d78d7edb3e5fdaa2b84",
+  "accountNudgeCompletions": [1, 4, 10],
+  "databaseMigration": "SUPABASE_MIGRATION_V3_20.sql",
+  "changedRuntimeFiles": [
+    "server.py",
+    "public/app.js",
+    "public/index.html",
+    "public/styles.css",
+    "public/sw.js",
+    "SUPABASE_SETUP.sql"
+  ],
+  "newReleaseFiles": [
+    "SUPABASE_MIGRATION_V3_20.sql",
+    "UPDATE_V3_20_CZ.md",
+    "RELEASE_V3_20_CZ.md",
+    "QA_V3_20_CZ.md"
+  ]
+}

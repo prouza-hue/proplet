@@ -55,7 +55,6 @@
             <h1>Dnešní Proplet</h1>
             <p id="dailyMeta" class="hero-muted"></p>
           </div>
-          <div id="streakBubble" class="streak-bubble hero-streak"><span class="streak-icon">🔥</span><strong id="streakCount">0</strong><small id="streakUnit">dní</small></div>
         </div>
         <button id="playDailyBtn" class="primary-btn hero-btn big">Hrát dnešní výzvu</button>
         <button id="shareDailyBtn" class="hero-secondary hidden">Sdílet výsledek</button>
@@ -76,21 +75,8 @@
         <div id="quickPlayGrid" class="quick-play-grid"></div>
       </div>
 
-      <div id="levelCard" class="card level-card"></div>
+      <div id="levelCard" class="daily-progress-strip"></div>
 
-      <div class="card streak-card">
-        <div class="section-head">
-          <div><span class="eyebrow">SÉRIE</span><h2>Další odměna</h2></div>
-          <div id="nextBadgeText" class="muted compact"></div>
-        </div>
-        <div id="badgeRail" class="badge-rail"></div>
-      </div>
-
-      <div class="card mini-stats">
-        <div><span class="stat-label">Denní výzvy</span><strong id="dailyCompletedStat">0</strong></div>
-        <div><span class="stat-label">Nejdelší série</span><strong id="longestStreakStat">0</strong></div>
-        <div><span class="stat-label">Nejlepší čas</span><strong id="bestDailyStat">—</strong></div>
-      </div>
     </section>
 
     <section id="screen-free" class="screen">
@@ -99,7 +85,7 @@
     </section>
 
     <section id="screen-leaderboard" class="screen">
-      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Uvnitř svého týmu i proti ostatním týmům Propletu.</p></div>
+      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Srovnej se s ostatními — a pokud chceš, spoj síly i se svým týmem.</p></div>
       <div id="leaderboardGate" class="card gate"></div>
       <div id="leaderboardContent" class="hidden">
         <div class="league-scope-tabs">
@@ -214,15 +200,15 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.19.2</small>
+      <small class="app-version">Proplet v3.20</small>
     </footer>
   </main>
 
   <nav class="bottom-nav" aria-label="Hlavní navigace">
-    <button data-nav="daily" class="active"><span>☀️</span><small>Dnes</small></button>
-    <button data-nav="free"><span>🧩</span><small>Hrát</small></button>
-    <button data-nav="leaderboard"><span>🏁</span><small>Pořadí</small></button>
-    <button data-nav="profile"><span>🙂</span><small>Já</small></button>
+    <button data-nav="daily" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></svg><small>Dnes</small></button>
+    <button data-nav="free"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg><small>Hrát</small></button>
+    <button data-nav="leaderboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20v-7H4v7M14 20V8h-4v12M20 20V4h-4v16"/></svg><small>Pořadí</small></button>
+    <button data-nav="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.5-4 2.7-6 6.5-6s6 2 6.5 6"/></svg><small>Já</small></button>
   </nav>
 
   <div id="winModal" class="modal hidden" role="dialog" aria-modal="true">
@@ -231,12 +217,22 @@
       <div id="winBadge" class="win-badge">✦</div>
       <h2 id="winTitle">Hotovo!</h2>
       <p id="winPraise" class="win-praise"></p>
-      <p id="winText" class="muted"></p>
-      <div id="winXp" class="win-xp"></div>
-      <div id="winClean" class="win-clean hidden"></div>
-      <div id="winWords" class="win-words"></div>
+      <div class="win-summary">
+        <p id="winText" class="muted"></p>
+        <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
+      </div>
       <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
+      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
+      <div class="win-secondary-actions">
+        <button id="winShareBtn" class="secondary-btn hidden">Sdílet</button>
+        <button id="winReplayBtn" class="secondary-btn hidden">Zahrát znovu</button>
+        <button id="winMenuBtn" class="secondary-btn hidden">Zpět do menu</button>
+      </div>
+      <details class="win-details">
+        <summary>Nalezená slova</summary>
+        <div id="winWords" class="win-words"></div>
+      </details>
       <div id="winDifficultyFeedback" class="win-feedback hidden">
         <small>Jak ti seděla obtížnost?</small>
         <div class="feedback-chips">
@@ -246,27 +242,23 @@
         </div>
       </div>
       <button id="reportWordBtn" class="text-btn win-report hidden">⚑ Divné slovo?</button>
-      <button id="winReplayBtn" class="secondary-btn hidden">Zahrát znovu · trénink</button>
-      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
-      <button id="winMenuBtn" class="secondary-btn hidden">Zpět do menu</button>
-      <button id="winShareBtn" class="secondary-btn hidden">Sdílet výsledek</button>
     </div>
   </div>
 
   <div id="accountNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card account-nudge-card">
       <div class="account-nudge-icon">☁️</div>
-      <span class="eyebrow">PROGRES BEZ ZTRÁT</span>
-      <h2>Ulož si svůj Proplet</h2>
-      <p class="muted">První Proplet je doma. 🎉 Připoj hráče a tenhle i další výsledky se uloží do cloudu, otevřeš je na více zařízeních a započítají se do týmového pořadí.</p>
+      <span id="accountNudgeEyebrow" class="eyebrow">PROGRES BEZ ZTRÁT</span>
+      <h2 id="accountNudgeTitle">Ulož si postup</h2>
+      <p id="accountNudgeCopy" class="muted"></p>
       <div class="account-nudge-benefits">
-        <span>✓ XP a výsledky mezi zařízeními</span>
-        <span>✓ série a úspěchy</span>
-        <span>✓ týmové pořadí</span>
+        <span>☁️ pokračuj na mobilu i počítači</span>
+        <span>🏁 zapoj se do pořadí</span>
+        <span>🔥 neztrať XP, série ani úspěchy</span>
       </div>
-      <button id="nudgeCreateBtn" class="primary-btn big">Vytvořit hráče</button>
+      <button id="nudgeCreateBtn" class="primary-btn big">Uložit postup</button>
       <button id="nudgeLoginBtn" class="secondary-btn">Už účet mám</button>
-      <button id="nudgeSkipBtn" class="text-btn">Teď ne, pokračovat bez účtu</button>
+      <button id="nudgeSkipBtn" class="text-btn">Pokračovat bez účtu</button>
     </div>
   </div>
 
@@ -282,37 +274,36 @@
   </div>
 
   <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card left">
+    <div class="modal-card left account-modal-card">
       <button id="closeProfileModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">TÝM A HRÁČ</span>
+      <span class="eyebrow">HRÁČSKÝ ÚČET</span>
       <div class="account-tabs">
         <button id="profileModeLogin" class="account-tab active" type="button">Přihlásit se</button>
-        <button id="profileModeCreate" class="account-tab" type="button">Nový hráč</button>
+        <button id="profileModeCreate" class="account-tab" type="button">Uložit postup</button>
       </div>
-      <h2 id="profileModalTitle">Přihlásit hráče</h2>
+      <h2 id="profileModalTitle">Přihlásit se</h2>
       <p id="profileModalDesc" class="muted">Stejný účet můžeš použít na mobilu, počítači i tabletu.</p>
       <label>Jméno<input id="playerNameInput" maxlength="24" autocomplete="username" placeholder="např. Ardan" /></label>
-      <div id="leagueChooser" class="league-chooser">
-        <div id="leagueCreateTabs" class="league-create-tabs hidden">
-          <button id="joinLeagueModeBtn" class="league-create-tab active" type="button">Přidat se k týmu</button>
-          <button id="newLeagueModeBtn" class="league-create-tab" type="button">Založit nový tým</button>
-        </div>
+      <label>Heslo<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
+      <button id="profilePasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
+      <button id="legacyTeamLoginToggle" class="legacy-login-toggle text-btn" type="button">Mám starší účet v týmu</button>
+      <div id="leagueChooser" class="league-chooser hidden">
+        <div id="leagueCreateTabs" class="league-create-tabs hidden"></div>
         <div id="joinLeagueFields">
           <label>Tým<select id="leagueSelect"><option value="">Načítám týmy…</option></select></label>
-          <label id="leaguePinLabel" class="hidden">PIN týmu<input id="leaguePinInput" type="password" minlength="4" maxlength="32" autocomplete="one-time-code" placeholder="PIN, který ti sdělil člen týmu" /></label>
-          <small id="teamPinHelp" class="field-note hidden">PIN je potřeba jen při vytvoření nového hráče v tomto týmu.</small>
+          <label id="leaguePinLabel" class="hidden">PIN týmu<input id="leaguePinInput" type="password" minlength="4" maxlength="32" /></label>
+          <small id="teamPinHelp" class="field-note hidden"></small>
         </div>
         <div id="newLeagueFields" class="hidden">
-          <label>Název nového týmu<input id="newLeagueNameInput" maxlength="40" placeholder="např. Prouzovi" /></label>
-          <label>PIN nového týmu<input id="newLeaguePinInput" type="password" minlength="4" maxlength="32" placeholder="alespoň 4 znaky" /></label>
-          <small class="field-note">První hráč PIN zvolí a sdělí ho dalším lidem, které chce do týmu pustit.</small>
+          <input id="newLeagueNameInput" type="hidden" />
+          <input id="newLeaguePinInput" type="hidden" />
         </div>
+        <button id="joinLeagueModeBtn" class="hidden" type="button"></button>
+        <button id="newLeagueModeBtn" class="hidden" type="button"></button>
       </div>
-      <label>Heslo hráče<input id="playerPasswordInput" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="alespoň 8 znaků" /></label>
-      <button id="profilePasswordToggle" class="password-toggle" type="button">👁 Zobrazit heslo</button>
       <div id="profileFormError" class="form-error"></div>
       <button id="saveProfileBtn" class="primary-btn big">Přihlásit se</button>
-      <button id="skipProfileBtn" class="text-btn">Zatím hrát bez pořadí</button>
+      <button id="skipProfileBtn" class="text-btn">Zatím hrát bez účtu</button>
     </div>
   </div>
 
@@ -335,11 +326,35 @@
       <button id="closeTeamPinModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">POZVÁNKA DO TÝMU</span>
       <h2>Nastav PIN týmu</h2>
-      <p class="muted">PIN potřebuje jen člověk, který si v tomto týmu vytváří nového hráče. Stávající hráči se přihlašují svým jménem a osobním heslem.</p>
+      <p class="muted">PIN je pozvánka pro hráče, který už má účet a chce se do týmu přidat. K běžnému přihlášení stačí jméno a osobní heslo.</p>
       <label>Nový PIN týmu<input id="teamPinInput" type="password" minlength="4" maxlength="32" autocomplete="new-password" placeholder="alespoň 4 znaky" /></label>
       <button id="teamPinToggle" class="password-toggle" type="button">👁 Zobrazit PIN</button>
       <div id="teamPinError" class="form-error"></div>
       <button id="saveTeamPinBtn" class="primary-btn big">Uložit PIN týmu</button>
+    </div>
+  </div>
+
+  <div id="teamMembershipModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card left team-membership-card">
+      <button id="closeTeamMembershipModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">TÝM JE VOLITELNÝ</span>
+      <h2>Hraj s rodinou nebo partou</h2>
+      <p class="muted">Účet už máš bezpečně uložený. Tým potřebuješ jen pro společné pořadí a Ligu týmů.</p>
+      <div class="league-create-tabs team-membership-tabs">
+        <button id="teamMembershipJoinTab" class="league-create-tab active" type="button">Přidat se</button>
+        <button id="teamMembershipNewTab" class="league-create-tab" type="button">Založit tým</button>
+      </div>
+      <div id="teamMembershipJoinFields">
+        <label>Tým<select id="teamMembershipSelect"><option value="">Načítám týmy…</option></select></label>
+        <label>PIN týmu<input id="teamMembershipJoinPin" type="password" minlength="4" maxlength="32" autocomplete="one-time-code" placeholder="PIN od člena týmu" /></label>
+      </div>
+      <div id="teamMembershipNewFields" class="hidden">
+        <label>Název týmu<input id="teamMembershipName" maxlength="40" placeholder="např. Prouzovi" /></label>
+        <label>PIN nového týmu<input id="teamMembershipNewPin" type="password" minlength="4" maxlength="32" autocomplete="new-password" placeholder="alespoň 4 znaky" /></label>
+        <small class="field-note">PIN pak můžeš poslat dalším lidem, které chceš do týmu přidat.</small>
+      </div>
+      <div id="teamMembershipError" class="form-error"></div>
+      <button id="saveTeamMembershipBtn" class="primary-btn big">Přidat se k týmu</button>
     </div>
   </div>
 
@@ -437,7 +452,7 @@
       <h2>Pošli tým do světa</h2>
       <p class="muted">Veřejně se ukáže jen název týmu a společné skóre. Jména hráčů ani interní kód týmu nikdo cizí neuvidí. Nastavení může změnit kterýkoli přihlášený člen týmu.</p>
       <label>Veřejný název týmu<input id="familyLeaguePublicName" maxlength="40" placeholder="např. Prouzovi nebo Brutální Propletači" /></label>
-      <small class="field-note">PIN týmu slouží jen jako pozvánka při přidání nového hráče do týmu.</small>
+      <small class="field-note">PIN týmu slouží jen jako pozvánka při přidání hráče do týmu.</small>
       <div id="familyLeagueModalError" class="form-error"></div>
       <button id="enableFamilyLeagueBtn" class="primary-btn big">Zařadit tým do Ligy týmů 🌍</button>
       <button id="disableFamilyLeagueBtn" class="secondary-btn hidden">Vystoupit z Ligy týmů</button>

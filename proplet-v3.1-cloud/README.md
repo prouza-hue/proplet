@@ -1,6 +1,6 @@
-# Proplet v3.19.2
+# Proplet v3.20
 
-Aktuální release: **v3.19.2 — čistý start a nabídka záchrany série**.
+Aktuální release: **v3.20 — UX clarity sprint: rychlejší onboarding, účet bez povinného týmu a přehlednější hra**.
 
 Hlavní novinky:
 
@@ -34,9 +34,10 @@ Hlavní novinky:
 - v3.19 přidává úrovně 101–200, mírnější slovní profil nových Mozkožroutů a automatickou pauzu při skrytí či ztrátě focusu aplikace.
 - hotfix 3.19.1 obnovuje kompletní HTML aplikace, opravuje vstup `/admin` pro Vercel a přidává kontrolu skutečně spustitelného release shellu.
 - hotfix 3.19.2 doplňuje chybějící nabídku záchrany série a odstraňuje poslední chybu čistého startu v konzoli.
+- v3.20 zkracuje onboarding na tři kroky, umožňuje uložit účet bez týmu, nabízí uložení po 1./4./10. dokončení a čistí obrazovky Dnes i výsledkovku bez zásahu do puzzle banky.
 
-Nasazení: `UPDATE_V3_19_CZ.md`  
-Migrace: `SUPABASE_MIGRATION_V3_19.sql`  
-Release notes: `RELEASE_V3_19_CZ.md`  
+Nasazení: `UPDATE_V3_20_CZ.md`  
+Migrace: `SUPABASE_MIGRATION_V3_20.sql`  
+Release notes: `RELEASE_V3_20_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `FREE_EXTENSION_V3_19_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
