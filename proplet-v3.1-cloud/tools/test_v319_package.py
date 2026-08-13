@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import sys
 
 
@@ -25,11 +26,24 @@ migration = (ROOT / "SUPABASE_MIGRATION_V3_19.sql").read_text(encoding="utf-8")
 puzzles_raw = (ROOT / "data/puzzles.json").read_bytes()
 puzzles = json.loads(puzzles_raw)
 
-assert 'version="3.19.0-cloud"' in server
-assert '"version": "3.19.0"' in server
-assert "const APP_VERSION='3.19.0'" in app
-assert "Proplet v3.19.0" in index
-assert "proplet-v3.19.0-free-200-focus-pause" in service_worker
+assert 'version="3.19.1-cloud"' in server
+assert '"version": "3.19.1"' in server
+assert "const APP_VERSION='3.19.1'" in app
+assert "Proplet v3.19.1" in index
+assert "proplet-v3.19.1-recovery-complete-shell" in service_worker
+assert 'return RedirectResponse(url="/admin.html", status_code=307)' in server
+
+# A file can exist and still be unusable: v3.19.0 accidentally shipped an
+# index truncated before app.js. Check the complete boot shell, not only names.
+assert len(index.encode("utf-8")) > 25_000
+assert index.rstrip().endswith("</html>")
+assert '<script src="/app.js"></script>' in index
+html_ids = set(re.findall(r'id=["\']([^"\']+)', index))
+bind_match = re.search(r"function bind\(\)\{(.*?)\n\}\n\nasync function boot", app, re.S)
+assert bind_match, "could not locate bind() for HTML contract check"
+bound_ids = set(re.findall(r"\$\('#([^']+)'\)", bind_match.group(1)))
+missing_bound_ids = sorted(bound_ids - html_ids)
+assert not missing_bound_ids, f"index is missing controls required by bind(): {missing_bound_ids}"
 assert "level between 1 and 200" in migration
 assert puzzles.get("freeLevelsPerDifficulty") == 200
 assert puzzles.get("freeExtendedFromVersion") == "3.19"
@@ -46,4 +60,4 @@ assert "function pauseGameClock(" in app and "function resumeGameClock(" in app
 assert "window.addEventListener('blur',()=>pauseGameClock('blur'))" in app
 assert "window.addEventListener('focus',resumeGameClock)" in app
 
-print(f"v3.19 release completeness: OK ({ROOT})")
+print(f"v3.19.1 release completeness and boot shell: OK ({ROOT})")

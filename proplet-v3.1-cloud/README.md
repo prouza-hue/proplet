@@ -1,6 +1,6 @@
-# Proplet v3.19.0
+# Proplet v3.19.1
 
-Aktuální release: **v3.19.0 — 800 Free úrovní + automatická pauza mimo aktivní okno**.
+Aktuální release: **v3.19.1 — opravný kompletní balík v3.19**.
 
 Hlavní novinky:
 
@@ -32,6 +32,7 @@ Hlavní novinky:
 - vysvětlení pořadí i administrace nově jednotně používají české označení **Čistě / Čisté vyřešení**.
 - hotfix 3.18.1 doplňuje do update balíčku chybějící `admin.html` a `admin.css` a přidává kontrolu `adminStatic` do `/api/health`.
 - v3.19 přidává úrovně 101–200, mírnější slovní profil nových Mozkožroutů a automatickou pauzu při skrytí či ztrátě focusu aplikace.
+- hotfix 3.19.1 obnovuje kompletní HTML aplikace, opravuje vstup `/admin` pro Vercel a přidává kontrolu skutečně spustitelného release shellu.
 
 Nasazení: `UPDATE_V3_19_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_19.sql`  

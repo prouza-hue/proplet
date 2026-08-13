@@ -54,12 +54,21 @@ def test_release_schema_and_health_metadata() -> None:
     assert "level between 1 and 200" in migration
     with patch.object(server, "supabase_ready", return_value=False):
         health = server.health()
-    assert health["version"] == "3.19.0"
+    assert health["version"] == "3.19.1"
     assert health["freeLevelsPerDifficulty"] == 200
+    assert health["adminStatic"] is True
+    assert health["adminEntry"] == "/admin.html"
+
+
+def test_admin_route_redirects_to_vercel_static_asset() -> None:
+    response = server.admin_home()
+    assert response.status_code == 307
+    assert response.headers["location"] == "/admin.html"
 
 
 if __name__ == "__main__":
     test_free_summary_accepts_second_hundred()
     test_rescue_uses_active_time_not_background_wall_time()
     test_release_schema_and_health_metadata()
+    test_admin_route_redirects_to_vercel_static_asset()
     print("v3.19 server: 200-level slots, health metadata and active-time rescue clock OK")
