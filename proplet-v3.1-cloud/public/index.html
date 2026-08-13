@@ -200,7 +200,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.20</small>
+      <small class="app-version">Proplet v3.20.1</small>
     </footer>
   </main>
 
@@ -222,16 +222,18 @@
         <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
       </div>
       <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
+      <button id="winAccountBtn" class="win-account-btn hidden">☁️ Uložit postup a zobrazit své místo</button>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
       <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
-      <div class="win-secondary-actions">
-        <button id="winShareBtn" class="secondary-btn hidden">Sdílet</button>
-        <button id="winReplayBtn" class="secondary-btn hidden">Zahrát znovu</button>
-        <button id="winMenuBtn" class="secondary-btn hidden">Zpět do menu</button>
+      <div class="win-secondary-actions" aria-label="Další akce">
+        <button id="winShareBtn" class="win-utility-btn hidden">↗ Sdílet</button>
+        <button id="winReplayBtn" class="win-utility-btn hidden">↻ Znovu</button>
+        <button id="winMenuBtn" class="win-utility-btn hidden">← Menu</button>
       </div>
       <details class="win-details">
-        <summary>Nalezená slova</summary>
+        <summary>Detaily výsledku</summary>
         <div id="winWords" class="win-words"></div>
+        <button id="reportWordBtn" class="text-btn win-report hidden">⚑ Divné slovo?</button>
       </details>
       <div id="winDifficultyFeedback" class="win-feedback hidden">
         <small>Jak ti seděla obtížnost?</small>
@@ -241,7 +243,6 @@
           <button data-difficulty-rating="1">Těžší</button>
         </div>
       </div>
-      <button id="reportWordBtn" class="text-btn win-report hidden">⚑ Divné slovo?</button>
     </div>
   </div>
 

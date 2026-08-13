@@ -423,3 +423,84 @@ body:not(.playing) .legacy-history-title small{font-size:11px}
 body:not(.playing) .team-access-card .secondary-btn,
 body:not(.playing) .logout-btn{font-size:11px}
 .game-clock small{font-size:11px}.game-board-column>.current-word .clean-status{font-size:10px}.found-word-chip,.remaining-row .length-pill{font-size:10px}
+
+
+/* ==============================
+   v3.20.1 — onboarding + result density hotfix
+   ============================== */
+/* The whole-board demo contains three real Czech words: PES / LES / MOC. */
+.onboard-fill-demo{width:min(100%,220px);margin:11px auto 12px}
+.onboard-mini-rules{margin-bottom:18px}
+
+/* Helper onboarding must fit on a normal phone without scrolling. */
+.onboarding-card.support-step{padding-top:18px;padding-bottom:18px}
+.onboarding-card.support-step .onboard-dots{margin-bottom:9px}
+.onboarding-card.support-step .onboard-content h2{font-size:24px;margin:3px 0 6px}
+.onboarding-card.support-step .onboard-content p{margin-bottom:8px;font-size:12px;line-height:1.32}
+.onboard-support-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0 7px}
+.onboard-support-grid .support-choice{gap:7px;padding:8px 9px;border-radius:13px;min-height:43px}
+.onboard-support-grid .support-choice>span{width:25px;flex-basis:25px;font-size:1.2rem}
+.onboard-support-grid .support-choice strong{font-size:11px;line-height:1.12}
+.onboard-support-grid+.support-outcome{min-height:0;margin-top:6px;padding:8px 10px;border-radius:12px;font-size:10.5px;line-height:1.27}
+.onboard-support-grid+.support-outcome strong{font-size:11px;margin-bottom:1px}
+.onboarding-card.support-step #onboardNextBtn{min-height:46px;font-size:14px;margin-top:7px}
+@media(max-width:360px){.onboard-support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.onboarding-card.support-step{padding:15px 14px}.onboard-support-grid .support-choice{padding:7px 7px}.onboard-support-grid .support-choice>span{width:22px;flex-basis:22px;font-size:1.05rem}.onboard-support-grid .support-choice strong{font-size:10.5px}}
+
+/* Account conversion belongs next to the ranking, not below the fold. */
+.win-account-btn{width:100%;min-height:44px;margin:2px 0 8px;padding:10px 12px;border:1px solid #c9bfff;border-radius:14px;background:linear-gradient(145deg,#f0ecff,#edf9f4);color:#5548bd;font-weight:950;font-size:12px;cursor:pointer;box-shadow:0 4px 12px rgba(91,73,174,.08)}
+.win-account-btn:active{transform:scale(.98)}
+
+/* Keep every result action, but only the next-game action gets full visual weight. */
+.win-secondary-actions{display:flex;justify-content:center;align-items:center;gap:3px;flex-wrap:wrap;margin-top:5px}
+.win-utility-btn{border:0;background:transparent;color:#716b7d;padding:7px 9px;border-radius:10px;font-size:10.5px;font-weight:850;cursor:pointer}
+.win-utility-btn:hover{background:#f5f2f8;color:#5147aa}
+.win-utility-btn:active{transform:scale(.97)}
+.win-details{margin:5px 0 0;border-top:1px solid #eee8f2;border-bottom:0}
+.win-details summary{padding:7px 2px;font-size:10.5px;text-align:center}
+.win-details .win-words{margin:2px 0 7px}
+.win-details .win-report{margin:0;padding:5px 4px;font-size:10px}
+.win-feedback{margin-top:7px}
+.win-feedback>small{font-size:10px}
+.feedback-chips button{padding:6px 5px;font-size:10.5px}
+@media(max-width:390px){.win-secondary-actions{display:flex}.win-utility-btn{padding:6px 7px;font-size:10px}}
+@media(max-width:340px){
+  .onboarding-card:not(.support-step){padding:15px 14px}
+  .onboarding-card:not(.support-step) .onboard-dots{margin-bottom:10px}
+  .onboarding-card:not(.support-step) .onboard-content h2{font-size:24px;margin:3px 0 6px}
+  .onboarding-card:not(.support-step) .onboard-content p{font-size:12px;line-height:1.35;margin-bottom:10px}
+  .onboard-fill-demo{width:min(100%,184px);gap:4px;margin:7px auto 9px}
+  .onboard-fill-demo span{border-radius:10px;font-size:18px}
+  .onboard-mini-rules{gap:5px;margin-bottom:13px}
+  .onboard-mini-rules span{padding:5px 7px;font-size:10px}
+  .onboarding-card:not(.support-step) #onboardNextBtn{min-height:46px;font-size:14px}
+}
+@media(max-width:420px) and (max-height:680px){
+  .win-card{padding:16px 17px}
+  .win-badge{font-size:38px;line-height:1}
+  .win-card h2{font-size:26px;margin:3px 0 3px}
+  .win-praise{font-size:11.5px;line-height:1.28;margin:0 auto 6px}
+  .win-summary{margin:5px 0 7px;padding:8px 10px}
+  .win-summary>p{margin-bottom:5px;font-size:11px}
+  .level-leaderboard-box{margin:6px 0}
+  .level-leaderboard-box .leaderboard-empty{padding:9px}
+  .win-account-btn{min-height:40px;margin-bottom:6px;padding:8px 10px}
+  .primary-btn.big{min-height:46px}
+  .win-feedback{padding:7px 8px;margin-top:5px}
+  .win-feedback>small{margin-bottom:5px}
+}
+@media(max-width:340px) and (max-height:600px){
+  .win-card{padding:13px 14px}
+  .win-badge{font-size:34px}
+  .win-card h2{font-size:24px}
+  .win-praise{font-size:11px;margin-bottom:4px}
+  .win-summary{margin:4px 0 5px;padding:7px 8px}
+  .daily-world-head{margin-bottom:5px}
+  .level-leaderboard-box .leaderboard-empty{padding:7px}
+  .win-account-btn{min-height:38px;margin-bottom:4px;padding:7px 8px;font-size:11px}
+  .primary-btn.big{min-height:43px;font-size:14px}
+  .win-secondary-actions{margin-top:2px}
+  .win-utility-btn{padding:5px 6px}
+  .win-details summary{padding:5px 2px}
+  .win-feedback{padding:5px 6px;margin-top:3px}
+  .feedback-chips button{padding:5px 4px}
+}
