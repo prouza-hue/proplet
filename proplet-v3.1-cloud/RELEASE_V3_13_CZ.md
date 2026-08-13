@@ -1,18 +1,16 @@
-# Proplet v3.13 — Quality Analytics v2
+# Proplet v3.13 — Quality Analytics & Pomocník
 
-v3.13 nemění obsah puzzle ani pravidla hry. Staví nad existující telemetrií automatickou QA vrstvu pro kalibraci obtížnosti a připravuje měření pro budoucí Pomocník / ekonomiku nápověd.
+v3.13 zavádí druhou generaci datové kalibrace obtížnosti a první skutečnou vrstvu Pomocníka pro děti / hráče, kteří chtějí aktivnější podporu.
 
 ## Hlavní změny
 
-- hlavní difficulty model používá jen první setkání hráče s puzzle,
-- replaye jsou oddělená diagnostika,
-- robustní Difficulty Index relativně k ostatním puzzle stejné cohorty,
-- confidence podle velikosti vzorku,
-- automatické alerty až od 20 prvních pokusů,
-- subjektivní rating obtížnosti je jen 10 % modelu,
-- word reporty se propisují do QA alertů,
-- nové telemetry: čas první správné cesty, čas první nápovědy, resety, návraty, hloubka rozehrání,
-- pondělní QA snapshot přes existující daily cron,
-- skrytý dashboard `?qa=1` + kopírování shrnutí.
+- Quality Analytics v2 nad prvními pokusy hráčů, ne replayi.
+- Robustní Difficulty Index relativně uvnitř každé obtížnosti.
+- Automatické flagy `too_hard`, `too_easy`, `watch` bez automatického zásahu do puzzle banky.
+- Profilové nastavení Pomocníka: Začínající čtenář / Mladší školák / Starší školák / Bez asistence.
+- Nabídka Pomocníka po 45 / 70 / 100 s bez nalezení nového slova.
+- Pomocník se nabízí nejvýš jednou za pokus a nic sám neodhaluje.
+- Detailní telemetry Pomocníka a jednotlivých nápověd.
+- Připravený `complimentary` atribut pro budoucí ekonomiku hintů; v3.13 nápovědy stále nejsou limitované ani placené.
 
-Podrobná metodika: `QUALITY_ANALYTICS_V3_13_CZ.md`.
+Puzzle banka 795 úloh se proti v3.12 nemění.

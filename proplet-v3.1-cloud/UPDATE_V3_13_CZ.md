@@ -2,17 +2,21 @@
 
 ## 1. Supabase
 
-V Supabase otevři **SQL Editor → New query** a spusť celý soubor:
+Před nasazením spusť v **SQL Editoru** celý soubor:
 
 `SUPABASE_MIGRATION_V3_13.sql`
 
-Migrace nic nemaže ani nepřepočítává výsledky. Přidá pouze telemetry sloupce a tabulku týdenních QA snapshotů.
+Migrace přidá:
 
-## 2. GitHub
+- `players.support_mode`,
+- `helper_events`,
+- `hint_events`.
 
-Nahraj obsah `proplet-v3.13-update.zip` do stejného repozitáře a přepiš stejnojmenné soubory.
+Nic nemaže ani nepřepisuje historické výsledky.
 
-Commitni změny. Vercel se nasadí automaticky.
+## 2. GitHub / Vercel
+
+Nahraj obsah `proplet-v3.13-update.zip` do stejného repozitáře a nech přepsat stejnojmenné soubory. Commitni změny; Vercel se nasadí automaticky.
 
 ## 3. Kontrola
 
@@ -20,28 +24,25 @@ Otevři:
 
 `https://proplet-nine.vercel.app/api/health`
 
-Hledej:
+Hledej zejména:
 
 - `"version": "3.13.0"`
-- `"qualityAnalyticsV2": true`
-- `"qualityMigration": true`
-- `"pushConfigured": true` (pokud máš push nakonfigurovaný)
-- `"cronConfigured": true`
+- `"analyticsV2Migration": true`
+- `"database": true`
+- `"ok": true`
 
-V patičce bude `Proplet v3.13`.
+V patičce aplikace bude `Proplet v3.13`.
 
-## 4. QA dashboard
+## 4. Test Pomocníka
 
-Jako přihlášený hráč otevři:
+V profilu **Já → Pomocník → Nastavit** zvol například `Začínající čtenář`.
 
-`https://proplet-nine.vercel.app/?qa=1`
+Spusť normální Free nebo Denní úroveň a 45 sekund nenajdi žádné nové slovo. Objeví se jednorázová nabídka Pomocníka. Rescue režim Pomocníka nepoužívá.
 
-Pokud je zatím málo dat, dashboard správně ukáže hlavně „čeká na data“. Alerty jsou schválně konzervativní a vznikají až při dostatečném vzorku.
+## 5. Quality report
 
-## Co se nemění
+Po nasbírání dat je pro přihlášeného hráče dostupný:
 
-- 795 puzzle je stejné jako ve v3.12,
-- žádné XP ani achievementy se nepřepočítávají,
-- nápovědy zatím nejsou omezené ani monetizované,
-- Pomocník zatím není aktivní,
-- žádná obtížnost se automaticky nepřesouvá.
+`GET /api/quality-report`
+
+Metodika je popsána v `QUALITY_ANALYTICS_V2_CZ.md`.
