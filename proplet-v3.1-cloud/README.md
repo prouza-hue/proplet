@@ -1,6 +1,6 @@
-# Proplet v3.16.3
+# Proplet v3.16.4
 
-Aktuální release: **v3.16.3 — výsledkovka, která umí slavit**.
+Aktuální release: **v3.16.4 — krásné sdílení a světové Daily pořadí**.
 
 Hlavní novinky:
 
@@ -18,9 +18,11 @@ Hlavní novinky:
 - hráč se starou Daily pro dnešní datum může dokončit aktivní Gen2 desku; výsledek se započítá do týdne bez druhých 100 XP.
 - každé dokončení dostane krátkou hravou pochvalu podle obtížnosti; Těžká a Mozkožrout mají vlastní výrazně odměňující sadu textů,
 - čisté řešení přidává ještě jednu drobnou pochvalu a stejný uložený výsledek si při znovuotevření ponechá stejný text.
+- sdílený odkaz má vlastní velký náhled, favicony a instalační ikony pro Android i iOS,
+- Daily výsledkovka ukazuje anonymní globální pořadí, počet dnešních hráčů, percentil a sousední výsledky bez zveřejnění jmen.
 
 Nasazení: `UPDATE_V3_16_2_CZ.md`  
 Migrace: `SUPABASE_MIGRATION_V3_16.sql`  
-Release notes: `RELEASE_V3_16_3_CZ.md`  
+Release notes: `RELEASE_V3_16_4_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`

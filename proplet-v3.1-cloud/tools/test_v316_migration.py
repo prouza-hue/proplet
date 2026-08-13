@@ -242,5 +242,48 @@ class DailyGeneration2MigrationTests(unittest.TestCase):
         insert.assert_not_called()
 
 
+class DailyGlobalLeaderboardTests(unittest.TestCase):
+    def test_global_daily_rank_is_correct_and_never_exposes_identity(self) -> None:
+        rows = [
+            {"player_id": "p1", "puzzle_id": "daily-active", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 60_000, "best_moves": 9, "completed_at": "2026-08-13T08:00:00+02:00", "name": "Never expose me"},
+            {"player_id": "p3", "puzzle_id": "daily-active", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 70_000, "best_moves": 10, "completed_at": "2026-08-13T08:02:00+02:00", "name": "Pavel"},
+            {"player_id": "p2", "puzzle_id": "daily-active", "clean_solve": False, "hints_used": 1, "best_elapsed_ms": 35_000, "best_moves": 7, "completed_at": "2026-08-13T08:01:00+02:00"},
+            {"player_id": "p4", "puzzle_id": "daily-active", "clean_solve": False, "hints_used": 2, "best_elapsed_ms": 30_000, "best_moves": 6, "completed_at": "2026-08-13T08:03:00+02:00"},
+            {"player_id": "legacy", "puzzle_id": "daily-archived", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 10_000, "best_moves": 3, "completed_at": "2026-08-13T00:01:00+02:00"},
+        ]
+        with (
+            patch.object(server, "expected_daily_puzzle_id", return_value="daily-active"),
+            patch.object(server, "db_select", return_value=rows),
+            patch.object(server, "auth_player", return_value={"id": "p3", "name": "Pavel"}),
+        ):
+            result = server.daily_global_leaderboard("2026-08-13", "Bearer test")
+
+        self.assertEqual(result["total"], 4)
+        self.assertEqual(result["myRank"], 2)
+        self.assertEqual(result["topPercent"], 50)
+        self.assertTrue(any(row["isMine"] and row["rank"] == 2 for row in result["rows"]))
+        self.assertEqual(result["privacy"], "anonymous-performance-only")
+        public_text = str(result)
+        self.assertNotIn("Pavel", public_text)
+        self.assertNotIn("Never expose me", public_text)
+        self.assertNotIn("p3", public_text)
+
+    def test_global_daily_without_login_returns_anonymous_podium(self) -> None:
+        rows = [
+            {"player_id": f"p{i}", "puzzle_id": "daily-active", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 60_000 + i, "best_moves": 9}
+            for i in range(5)
+        ]
+        with (
+            patch.object(server, "expected_daily_puzzle_id", return_value="daily-active"),
+            patch.object(server, "db_select", return_value=rows),
+        ):
+            result = server.daily_global_leaderboard("2026-08-13", None)
+
+        self.assertIsNone(result["myRank"])
+        self.assertEqual(result["total"], 5)
+        self.assertEqual([row["rank"] for row in result["rows"]], [1, 2, 3])
+        self.assertTrue(all(row["isMine"] is False for row in result["rows"]))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
