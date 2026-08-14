@@ -1,0 +1,39 @@
+{
+  "version": "3.22.4",
+  "base": "3.22.3",
+  "sqlRequired": false,
+  "files": {
+    "server.py": {
+      "sha256": "8e75e4ef6ae9ba4f1989a460f0573315285e222b83ee8fa830111d83aad8e04a",
+      "bytes": 138791
+    },
+    "public/app.js": {
+      "sha256": "4efa2566c3fb933c9cc7d55fda998e648e02ca1232d0600de4faaa40d0c985e1",
+      "bytes": 176716
+    },
+    "public/index.html": {
+      "sha256": "3fe9ff74e8489dee3b2284d7224f205805849b5533cc9bba9908c88016801de4",
+      "bytes": 31842
+    },
+    "public/styles.css": {
+      "sha256": "29282ae819a6526a8b5c2349e48d6110249c78e4bfc5aeb69980ca9de35edb65",
+      "bytes": 112379
+    },
+    "public/sw.js": {
+      "sha256": "e0e2fc85c1facbb8fa8738f163d4635a34bd434df72b75aac4cfd2bbedfb2b2c",
+      "bytes": 2118
+    },
+    "public/puzzles.json": {
+      "sha256": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+      "bytes": 10101745
+    },
+    "data/puzzles.json": {
+      "sha256": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+      "bytes": 10101745
+    },
+    "SUPABASE_MIGRATION_V3_21.sql": {
+      "sha256": "739f0b7b48fd3c18577b25b5ded7a9ca52f7ca01520f3b70e38adfbce884bed3",
+      "bytes": 1250
+    }
+  }
+}
