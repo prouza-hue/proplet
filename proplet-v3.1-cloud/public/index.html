@@ -56,6 +56,7 @@
             <p id="dailyMeta" class="hero-muted"></p>
           </div>
         </div>
+        <div id="starterDailyNudge" class="starter-daily-nudge hidden">🎓 Trénink hotový · teď je řada na dnešní výzvě</div>
         <button id="playDailyBtn" class="primary-btn hero-btn big">Hrát dnešní výzvu</button>
         <button id="shareDailyBtn" class="hero-secondary hidden">Sdílet výsledek</button>
         <div id="dailySyncStatus" class="daily-sync hidden"></div>
@@ -207,10 +208,11 @@
         </aside>
       </div>
     </section>
+    <div id="gameUndoToast" class="game-undo-toast hidden" role="status" aria-live="polite"><span>Plocha vyčištěna</span><button id="gameUndoBtn" type="button">VRÁTIT</button></div>
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.20.2</small>
+      <small class="app-version">Proplet v3.21</small>
     </footer>
   </main>
 
@@ -240,19 +242,19 @@
         <button id="winReplayBtn" class="win-utility-btn hidden">↻ Znovu</button>
         <button id="winMenuBtn" class="win-utility-btn hidden">← Menu</button>
       </div>
-      <details class="win-details">
+      <details id="winDetails" class="win-details">
         <summary>Detaily výsledku</summary>
         <div id="winWords" class="win-words"></div>
         <button id="reportWordBtn" class="text-btn win-report hidden">⚑ Divné slovo?</button>
       </details>
-      <div id="winDifficultyFeedback" class="win-feedback hidden">
+      <div id="winFeedback"><div id="winDifficultyFeedback" class="win-feedback hidden">
         <small>Jak ti seděla obtížnost?</small>
         <div class="feedback-chips">
           <button data-difficulty-rating="-1">Lehčí</button>
           <button data-difficulty-rating="0">Akorát</button>
           <button data-difficulty-rating="1">Těžší</button>
         </div>
-      </div>
+      </div></div>
     </div>
   </div>
 
@@ -400,9 +402,9 @@
   <div id="hintModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card left hint-card">
       <button id="closeHintModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">CHYTRÁ NÁPOVĚDA</span>
-      <h2>Kolik pomoci chceš?</h2>
-      <p class="muted">Jakákoli nápověda zruší ✨ čisté řešení této úrovně. Nápovědy zatím nejsou omezené.</p>
+      <span id="hintEyebrow" class="eyebrow">CHYTRÁ NÁPOVĚDA</span>
+      <h2 id="hintTitle">Kolik pomoci chceš?</h2>
+      <p id="hintCopy" class="muted">Jakákoli nápověda zruší ✨ čisté řešení této úrovně. Nápovědy zatím nejsou omezené.</p>
       <button class="hint-choice" data-hint-level="1"><span>💡</span><div><strong>Lehká</strong><small>Ukáže začátek a délku vhodného slova.</small></div></button>
       <button class="hint-choice" data-hint-level="2"><span>🔦</span><div><strong>Silnější</strong><small>Ukáže první tři políčka cesty.</small></div></button>
       <button class="hint-choice" data-hint-level="3"><span>🧭</span><div><strong>Odhalit</strong><small>Na chvíli ukáže celé slovo i jeho cestu.</small></div></button>

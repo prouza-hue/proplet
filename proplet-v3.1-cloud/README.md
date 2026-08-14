@@ -1,9 +1,14 @@
-# Proplet v3.20.2
+# Proplet v3.21
 
-Aktuální release: **v3.20.2 — portrait guard pro hraní na telefonu naležato**.
+Aktuální release: **v3.21 — First Touch & Game Feel**.
 
 Hlavní novinky:
 
+- v3.21 přidává samostatný kurátorovaný první Proplet 5×5 (MRAK / JABLKO / ČOKOLÁDA / AUTOBUS), který po onboardingu rovnou učí hru hraním a dává skutečných 10 XP,
+- dokončená deska dostává jemný ambientní progres a krátký solved-board moment před výsledkovkou,
+- chybné cesty jsou lokálně viditelné, tahy kratší než 4 písmena se nepenalizují a Reset má bezpečné `VRÁTIT`,
+- rozložený Fold7 se chová jako tablet v portrait i landscape; složený telefon si zachovává landscape guard,
+- hráčské texty jsou očištěné od interních pojmů jako Gen2 / slot.
 - nový kurátorovaný Lexicon v2 s 3 153 cílovými lemmaty a metadaty `familiarity`, `complexity`, `fun`, `theme`, `register` a `age_floor`,
 - banka 800 Free úrovní: 200 Snadných, Středních, Těžkých i Mozkožroutů,
 - unikátní Gen2 puzzle ID, přísná jednoznačnost řešení a minimálně 24 mezilehlých úrovní před opakováním slova,
@@ -38,8 +43,9 @@ Hlavní novinky:
 - v3.20.1 opravuje celoplošnou onboarding ukázku na skutečná slova PES / LES / MOC, zmenšuje stránku Pomocníka bez scrollu a dává anonymnímu hráči výrazné uložení účtu přímo vedle globálního pořadí; sekundární akce ve výsledku jsou kompaktní.
 - v3.20 zkracuje onboarding na tři kroky, umožňuje uložit účet bez týmu, nabízí uložení po 1./4./10. dokončení a čistí obrazovky Dnes i výsledkovku bez zásahu do puzzle banky.
 
-Nasazení: `UPDATE_V3_20_CZ.md`  
-Migrace: `SUPABASE_MIGRATION_V3_20.sql`  
-Release notes: `RELEASE_V3_20_CZ.md`  
+Nasazení: `UPDATE_V3_21_CZ.md`  
+Migrace: `SUPABASE_MIGRATION_V3_21.sql`  
+Release notes: `RELEASE_V3_21_CZ.md`  
+QA: `QA_V3_21_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `FREE_EXTENSION_V3_19_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`

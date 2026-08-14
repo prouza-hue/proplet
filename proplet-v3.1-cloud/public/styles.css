@@ -516,3 +516,71 @@ body.landscape-game-blocked #screen-game{visibility:hidden;pointer-events:none}
 .landscape-game-card p{margin:0 auto;max-width:360px;color:var(--muted);font-size:13px;line-height:1.42}
 .landscape-game-card small{display:block;margin-top:12px;color:#5f58a2;font-size:11px;font-weight:850}
 @media(max-height:420px){.landscape-game-card{padding:14px 20px 13px;border-radius:21px}.landscape-rotate-icon{width:45px;height:45px;margin-bottom:7px;border-radius:15px;font-size:27px}.landscape-game-card h2{font-size:21px;margin:3px 0 5px}.landscape-game-card p{font-size:11px;line-height:1.32}.landscape-game-card small{margin-top:8px;font-size:10px}}
+
+/* v3.21 — First Touch & Game Feel */
+.board-stage{
+ transition:box-shadow .42s ease,background .42s ease,transform .24s ease;
+ background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(248,246,255,.78));
+ box-shadow:0 12px 30px rgba(76,62,130,var(--board-glow,.025)),0 0 0 1px rgba(85,207,167,var(--board-mint,.02)) inset,var(--shadow);
+}
+.board-stage.near-complete{background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(240,250,247,.83))}
+.board-stage.board-complete{animation:boardCompleteSettle .52s cubic-bezier(.2,.8,.2,1);box-shadow:0 16px 42px rgba(94,78,190,.16),0 0 0 2px rgba(85,207,167,.14) inset,var(--shadow)}
+@keyframes boardCompleteSettle{0%{transform:scale(.994)}46%{transform:scale(1.008)}100%{transform:scale(1)}}
+
+.cell.wrong-flash{background:#fff0ee!important;border-color:#d8665d!important;color:#8d3934;box-shadow:0 0 0 4px rgba(216,102,93,.13),0 4px 12px rgba(130,58,53,.08)!important;animation:wrongCellNudge .21s ease}
+@keyframes wrongCellNudge{0%,100%{transform:translateX(0)}35%{transform:translateX(-2px)}70%{transform:translateX(2px)}}
+.path-wrong{filter:drop-shadow(0 2px 3px rgba(178,71,65,.18))}
+
+.path-guide{stroke-dasharray:7 9;animation:starterGhostFlow 1.15s linear infinite;filter:drop-shadow(0 0 3px rgba(108,92,231,.18))}
+@keyframes starterGhostFlow{to{stroke-dashoffset:-32}}
+.cell.starter-guide:not(.used){animation:starterGuideCell 1.45s ease-in-out infinite;animation-delay:calc(var(--guide-order,0) * 90ms)}
+@keyframes starterGuideCell{0%,65%,100%{box-shadow:0 3px 0 rgba(61,51,92,.055),0 5px 13px rgba(61,51,92,.035)}35%{border-color:#8c80ee;box-shadow:0 0 0 4px rgba(108,92,231,.08),0 6px 16px rgba(108,92,231,.09)}}
+.length-pill.starter-target{background:#e5defd;color:#5848c1;box-shadow:0 0 0 3px rgba(108,92,231,.07)}
+#hintBtn.starter-attention{animation:starterHintAttention 1.2s ease-in-out infinite;background:#f1edff;border-color:#8a7de8;color:#5749bf;box-shadow:0 0 0 5px rgba(108,92,231,.08)}
+@keyframes starterHintAttention{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.starter-mode .clean-status{background:#f0ecff;color:#5d4ed3;border-color:#dcd4ff}
+
+.game-undo-toast{position:fixed;left:50%;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));z-index:360;transform:translateX(-50%);display:flex;align-items:center;gap:14px;min-width:min(330px,calc(100vw - 28px));justify-content:space-between;padding:10px 12px 10px 15px;border-radius:15px;background:#302c42;color:white;box-shadow:0 14px 35px rgba(30,24,54,.28);font-size:12px;font-weight:800}
+.game-undo-toast.hidden{display:none}.game-undo-toast button{border:0;border-radius:10px;padding:8px 10px;background:#8b7bea;color:white;font-weight:950;letter-spacing:.04em;cursor:pointer}
+
+.starter-daily-nudge{position:relative;z-index:3;margin:-3px 0 10px;padding:8px 11px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.14);color:white;font-size:12px;font-weight:900;text-align:center;backdrop-filter:blur(8px);animation:starterNudgeIn .34s ease}
+@keyframes starterNudgeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.daily-hero.starter-next{animation:starterHeroWelcome .72s ease}
+@keyframes starterHeroWelcome{50%{box-shadow:0 22px 52px rgba(93,75,200,.36),0 0 0 5px rgba(85,207,167,.12)}}
+
+#winModal.starter-win .win-card{max-width:460px}
+#winModal.starter-win .win-badge{background:linear-gradient(145deg,#ece7ff,#ddf7ef)}
+#winModal.starter-win .new-badge-box{margin-top:2px}
+.starter-reward{background:linear-gradient(145deg,#f7f4ff,#eefaf6);border:1px solid #e3dbf7;border-radius:14px;padding:10px 12px}
+
+/* Akční tlačítka musí zůstat skutečně dotyková i při nízkém viewportu. */
+.game-actions .secondary-btn,.game-control-column .game-actions .secondary-btn{min-height:42px}
+@media(max-height:650px){
+ .game-actions .secondary-btn,.game-control-column .game-actions .secondary-btn{min-height:40px!important;padding-top:6px!important;padding-bottom:6px!important}
+ .game-control-column{gap:2px}
+}
+@media(max-height:590px) and (max-width:760px){
+ .game-info{padding-top:3px;padding-bottom:3px}.current-word{padding-top:3px;padding-bottom:3px}.game-message{padding-top:2px;padding-bottom:2px}
+}
+
+/* v3.21 — unfolded foldables are tablets, not oversized phones. */
+@media (min-width:700px) and (min-height:700px){
+ body.playing .app-shell{max-width:1280px;padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+ .game-main{grid-template-columns:minmax(0,1fr) clamp(190px,22vw,250px);gap:12px}
+ .game-board-column{max-width:none}
+ .game-control-column .game-message{padding:10px 7px;font-size:12px;line-height:1.42}
+ .game-control-column .game-actions .secondary-btn{min-height:44px}
+}
+@media (min-width:900px) and (min-height:850px){
+ .game-main{grid-template-columns:minmax(0,1fr) clamp(210px,23vw,270px);gap:14px}
+ .game-board-column>.game-info{padding:7px 10px}
+ .game-board-column>.current-word{min-height:48px;padding:7px 11px}
+ .game-board-column>.current-word strong{font-size:24px}
+ .game-control-column .game-message{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .board-stage.board-complete,.path-guide,.cell.starter-guide,#hintBtn.starter-attention,.daily-hero.starter-next,.starter-daily-nudge,.cell.wrong-flash{animation:none!important}
+}
+#hintModal.starter-hint .hint-choice:first-of-type{border-color:#897bea;background:#f4f1ff;box-shadow:0 0 0 4px rgba(108,92,231,.06)}
+#hintModal.starter-hint .hint-choice:first-of-type strong:after{content:" · doporučeno";color:#6757d8;font-size:10px}
+.starter-mode #backFromGame{visibility:hidden}

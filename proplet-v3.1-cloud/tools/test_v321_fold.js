@@ -1,0 +1,15 @@
+const fs=require('fs'),assert=require('assert');
+const src=fs.readFileSync(require('path').join(__dirname,'../public/app.js'),'utf8');
+const m=src.match(/function isTabletSizedViewport\(w,h\)\{[^\n]+\}\nfunction shouldBlockPhoneLandscape\(screen,game,w,h,mobile=isPhoneLikeDevice\(\)\)\{[^\n]+\}/);
+assert(m,'Fold/tablet viewport functions not found');
+eval(m[0]);
+const active={finished:false};
+assert.equal(isTabletSizedViewport(984,1092),true);
+assert.equal(isTabletSizedViewport(1092,984),true);
+assert.equal(shouldBlockPhoneLandscape('game',active,1092,984,true),false,'unfolded Fold landscape must behave like tablet');
+assert.equal(shouldBlockPhoneLandscape('game',active,1260,540,true),true,'folded cover landscape must remain guarded');
+assert.equal(shouldBlockPhoneLandscape('game',active,915,412,true),true,'ordinary phone landscape must remain guarded');
+assert.equal(shouldBlockPhoneLandscape('game',active,412,915,true),false,'phone portrait must play');
+assert.equal(shouldBlockPhoneLandscape('game',{finished:true},1260,540,true),false,'finished result is never blocked');
+assert.equal(shouldBlockPhoneLandscape('daily',active,1260,540,true),false,'menus are never blocked');
+console.log('PASS: v3.21 Fold7 unfolded tablet layout and folded-phone landscape guard');

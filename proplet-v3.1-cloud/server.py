@@ -51,8 +51,9 @@ BADGES = [
 ]
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
+STARTER_XP = 10
 
-app = FastAPI(title="Proplet API", version="3.20.2-cloud")
+app = FastAPI(title="Proplet API", version="3.21.0-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -531,7 +532,7 @@ def player_stats(player_id: str) -> dict:
         difficulty = r.get("difficulty")
         total_points += int(r.get("points") or 0)
         is_clean = r.get("clean_solve") is True
-        if is_clean:
+        if is_clean and mode in ("daily", "free"):
             clean_solves += 1
 
         if mode == "daily" and r.get("daily_date"):
@@ -573,7 +574,7 @@ def player_stats(player_id: str) -> dict:
     next_badge = next((b for b in BADGES if current < b["days"]), None)
     return {
         "points": total_points,
-        "totalCompleted": len(rows),
+        "totalCompleted": sum(1 for r in rows if r.get("mode") in ("daily", "free")),
         "dailyCompleted": len(set(daily_dates)),
         # Effective progress is a union of level slots across content generations.
         # A Gen1 level and its Gen2 replacement therefore count once, while every
@@ -785,6 +786,9 @@ def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
 
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     data = load_puzzles()
+    if mode == "starter":
+        starter = data.get("starter") or {}
+        return starter.get("id") == puzzle_id and starter.get("difficulty") == difficulty
     if mode == "daily":
         active = any(p["id"] == puzzle_id and p["difficulty"] == difficulty for p in data.get("daily", []))
         archived = any(
@@ -820,7 +824,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.20.2",
+        "version": "3.21.0",
         "adminStatic": True,
         "adminEntry": "/admin.html",
         "adminDelivery": "vercel-public-static",
@@ -836,6 +840,9 @@ def health():
         "freeTieredFromVersion": pdata.get("freeTieredFromVersion"),
         "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
         "uxSprint": "3.20",
+        "gameFeelSprint": "3.21",
+        "starterPuzzle": bool(pdata.get("starter")),
+        "starterXp": STARTER_XP,
         "accountWithoutTeam": True,
         "accountNudgeCompletions": [1, 4, 10],
     }
@@ -844,7 +851,7 @@ def health():
     if not supabase_ready():
         return {**base, "ok": False, "database": False, "message": "Chybí SUPABASE_URL nebo SUPABASE_SECRET_KEY"}
     try:
-        db_request("GET", "players", params={"select": "id", "limit": "1"})
+        player_probe = db_request("GET", "players", params={"select": "id", "limit": "1"})
         account_migration = True
         try:
             db_request("GET", "player_sessions", params={"select": "id", "limit": "1"})
@@ -908,6 +915,14 @@ def health():
             db_request("GET", "free_slot_rewards", params={"select": "id,level,content_generation", "limit": "1"})
         except HTTPException:
             free_generation2_migration = False
+        # v3.21 changes the results mode constraint and backfills one starter reward per
+        # pre-existing player. A successful backfill gives us a cheap deployment marker.
+        starter_migration = True
+        try:
+            starter_probe = db_request("GET", "results", params={"select": "id", "mode": "eq.starter", "limit": "1"})
+            starter_migration = (not bool(player_probe)) or bool(starter_probe)
+        except HTTPException:
+            starter_migration = False
         admin_migration = True
         try:
             db_request("GET", "admin_accounts", params={"select": "player_id,role,active", "limit": "1"})
@@ -915,9 +930,9 @@ def health():
             db_request("GET", "puzzle_feedback", params={"select": "id,status,resolution_note,reviewed_at,reviewed_by", "limit": "1"})
         except HTTPException:
             admin_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -925,12 +940,12 @@ def config():
     p = load_puzzles()
     return {
         "badges": BADGES,
-        "points": POINTS,
+        "points": {**POINTS, "starter": STARTER_XP},
         "dictionarySize": p["dictionarySize"],
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.20.2",
+        "version": "3.21.0",
     }
 
 
@@ -1200,14 +1215,14 @@ def product_event(
     allowed = {
         "app_open", "onboarding_started", "onboarding_completed",
         "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
-        "account_authenticated",
+        "account_authenticated", "starter_started", "starter_hint_used", "starter_completed",
         *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
     }
     if payload.event_type not in allowed:
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.20.2", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.21.0", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1360,7 +1375,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.20.2",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.21.0",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1421,7 +1436,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.20.2",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.21.0",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1717,6 +1732,7 @@ def build_quality_report():
     for event_type in (
         "app_open", "onboarding_started", "onboarding_completed", "account_nudge_shown",
         "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+        "starter_started", "starter_hint_used", "starter_completed",
         *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
     ):
         identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
@@ -2163,14 +2179,21 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
 def result(payload: ResultCreate, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
-    if payload.mode not in ("daily", "free"):
+    if payload.mode not in ("daily", "free", "starter"):
         raise HTTPException(400, "Neplatný režim")
     if payload.difficulty not in ("easy", "medium", "hard", "hardcore"):
         raise HTTPException(400, "Neplatná obtížnost")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
 
-    if payload.mode == "daily":
+    transferred_reward = False
+    if payload.mode == "starter":
+        if payload.challenge_key != f"starter:{payload.puzzle_id}":
+            raise HTTPException(400, "Neplatný klíč první úlohy")
+        if payload.daily_date:
+            raise HTTPException(400, "První úloha nemá datum")
+        points = STARTER_XP
+    elif payload.mode == "daily":
         if not payload.daily_date:
             raise HTTPException(400, "Daily výsledek musí mít datum")
         try:
@@ -2187,7 +2210,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             raise HTTPException(400, "Neplatný klíč volné úlohy")
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
         if not info:
-            raise HTTPException(400, "Neznámý slot volné úlohy")
+            raise HTTPException(400, "Neznámá úroveň volné hry")
         points, transferred_reward = claim_free_slot_points(
             player["id"], info, POINTS[payload.difficulty], payload.puzzle_id,
         )
@@ -2909,8 +2932,8 @@ def leaderboard(
                 rows.append(r)
         weekly.append({
             "id": p["id"], "name": p["name"], "avatar": p.get("avatar") or "🙂", "points": sum(int(r.get("points") or 0) for r in rows),
-            "completed": len(rows), "daily": sum(1 for r in rows if r.get("mode") == "daily"),
-            "clean": sum(1 for r in rows if r.get("clean_solve") is True),
+            "completed": sum(1 for r in rows if r.get("mode") in ("daily", "free")), "daily": sum(1 for r in rows if r.get("mode") == "daily"),
+            "clean": sum(1 for r in rows if r.get("mode") in ("daily", "free") and r.get("clean_solve") is True),
         })
     weekly.sort(key=lambda x: (-x["points"], -x["daily"], -x["clean"], x["name"].casefold()))
     for i, item in enumerate(weekly, 1):
