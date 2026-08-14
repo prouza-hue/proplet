@@ -4,6 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#6c5ce7" />
+  <meta name="color-scheme" content="light dark" />
+  <script>
+    (()=>{
+      const LIGHT='#6c5ce7',DARK='#111019';
+      try{
+        const saved=JSON.parse(localStorage.getItem('proplet-v3-settings')||'{}');
+        const pref=['auto','light','dark'].includes(saved.theme)?saved.theme:'auto';
+        const dark=pref==='dark'||(pref==='auto'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+        const resolved=dark?'dark':'light';
+        document.documentElement.dataset.theme=resolved;
+        document.documentElement.dataset.themePreference=pref;
+        document.documentElement.style.colorScheme=resolved;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?DARK:LIGHT);
+      }catch{}
+    })();
+  </script>
+  <style>html[data-theme="dark"],html[data-theme="dark"] body{background:#111019;color:#f4f0fa}</style>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Proplet – česká slovní hra, která umí příjemně zamotat hlavu. Najdi všechna slova a propleť celou plochu." />
@@ -141,6 +158,17 @@
         <div id="profileBadges" class="profile-badges"></div>
       </div>
 
+      <div class="card settings-card appearance-card">
+        <div class="section-head"><div><span class="eyebrow">VZHLED</span><h2>Jak má Proplet svítit?</h2></div></div>
+        <p class="muted appearance-copy">Tmavý režim ztlumí velké plochy, ale nechá písmena a cesty dobře čitelné.</p>
+        <div class="theme-segment" role="radiogroup" aria-label="Vzhled Propletu">
+          <button type="button" class="theme-choice" data-theme-mode="auto" role="radio" aria-checked="false"><span>◐</span><strong>Automaticky</strong><small>Podle zařízení</small></button>
+          <button type="button" class="theme-choice" data-theme-mode="light" role="radio" aria-checked="false"><span>☀</span><strong>Světlý</strong><small>Vždy světlý</small></button>
+          <button type="button" class="theme-choice" data-theme-mode="dark" role="radio" aria-checked="false"><span>☾</span><strong>Tmavý</strong><small>Šetrnější v noci</small></button>
+        </div>
+        <div id="themeModeNote" class="theme-mode-note muted" aria-live="polite"></div>
+      </div>
+
       <div class="card settings-card">
         <div class="section-head"><div><span class="eyebrow">POCIT ZE HRY</span><h2>Zvuk a vibrace</h2></div></div>
         <div class="settings-row">
@@ -207,7 +235,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.21.3</small>
+      <small class="app-version">Proplet v3.22.0</small>
     </footer>
   </main>
 

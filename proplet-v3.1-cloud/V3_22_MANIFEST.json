@@ -1,0 +1,36 @@
+{
+  "release": "3.22.0",
+  "baseRelease": "3.21.3",
+  "name": "Night Mode",
+  "databaseMigrationRequired": false,
+  "newSqlMigration": null,
+  "themeModes": [
+    "auto",
+    "light",
+    "dark"
+  ],
+  "themePreferenceScope": "device",
+  "orientationBlocking": false,
+  "foldResponsiveReflow": true,
+  "immutable": {
+    "data/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "public/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "SUPABASE_MIGRATION_V3_21.sql": "739f0b7b48fd3c18577b25b5ded7a9ca52f7ca01520f3b70e38adfbce884bed3"
+  },
+  "changedFiles": {
+    "server.py": "6f8d01364853046cef798440ce9c7fedc2150b6c647ff90db63f61b78ef26a7a",
+    "README.md": "b42c2586853fc29c4cabcf148a603c490964019c11babf15160f0d2b47f322c0",
+    "public/app.js": "470493e87d96db787e5d5e61e32052f0a95b2a60c6269b5127f6022d224c98e3",
+    "public/index.html": "7b42583175583dd5588917c16a04dcf7e105e05432106c764949762b74709e55",
+    "public/styles.css": "28145abf0f785252ffd74508647f5d32985ba8e9166538e31df3dd645f59445e",
+    "public/admin.html": "14a5fb7cb47bab8ce12dc143b25651de9dfb4833246768c9e61211e5111a08d4",
+    "public/admin.css": "e48c5d10bcb376a85cef807c743f65c66ddc5868236cdbb02bbc20c13c19c043",
+    "public/manifest.webmanifest": "7d5dcfd8550c5e3170f011569cbdb8e33cc57e21983df5e4cd3f1ba3389141d2",
+    "public/sw.js": "d410c15068c30daa8bc2418378bfb9ff88dbaf0514705afcc2a9f1a588f85cbc",
+    "UPDATE_V3_22_CZ.md": "e4d2e8ca9d5ddb6a7f0fe600b3ed537206fe5b6549d3da442b9f3a65f25b6bf7",
+    "RELEASE_V3_22_CZ.md": "f2b62fc4446547c2b500168e10dd8cd5aba4294a330cdef775115444cfa3f0ab",
+    "QA_V3_22_CZ.md": "89db12bf1628d0fd731cfd3062c8da103464638e56c3fcae13f1dc1c3a94862d",
+    "tools/test_v322_package.py": "b14a555128d7fb7ba34463581ffc70a7c263c0c00f46d8c00000b82639f95b46",
+    "tools/test_v322_server.py": "40cc2514ffad1cd0e8660354643a0e1c244520c9a6b4cac839086eb2291b9a4e"
+  }
+}

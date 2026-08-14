@@ -1,4 +1,4 @@
-const APP_VERSION='3.21.3';
+const APP_VERSION='3.22.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -269,8 +269,22 @@ function adoptGuestData(profileId){
  try{const gq=JSON.parse(localStorage.getItem(guestQueueKey)||'[]'),pq=JSON.parse(localStorage.getItem(playerQueueKey)||'[]');const ids=new Set(pq.map(r=>r.attemptId||`${r.challengeKey}:${r.completedAt}`));for(const r of gq){const id=r.attemptId||`${r.challengeKey}:${r.completedAt}`;if(!ids.has(id)){pq.push(r);ids.add(id)}}localStorage.setItem(playerQueueKey,JSON.stringify(pq))}catch{}
  localStorage.removeItem(guestStateKey);localStorage.removeItem(guestQueueKey);
 }
-function getSettings(){try{return {sound:true,haptics:true,...JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')}}catch{return {sound:true,haptics:true}}}
-function saveSettings(s){localStorage.setItem(SETTINGS_KEY,JSON.stringify(s))}
+const THEME_MODES=new Set(['auto','light','dark']);
+const THEME_COLORS={light:'#6c5ce7',dark:'#111019'};
+function normalizeThemeMode(mode){return THEME_MODES.has(mode)?mode:'auto'}
+function getSettings(){try{const s={sound:true,haptics:true,theme:'auto',...JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')};s.theme=normalizeThemeMode(s.theme);return s}catch{return {sound:true,haptics:true,theme:'auto'}}}
+function saveSettings(s){s.theme=normalizeThemeMode(s.theme);localStorage.setItem(SETTINGS_KEY,JSON.stringify(s))}
+function resolvedTheme(mode=getSettings().theme){mode=normalizeThemeMode(mode);if(mode==='dark')return 'dark';if(mode==='light')return 'light';return window.matchMedia?.('(prefers-color-scheme: dark)').matches?'dark':'light'}
+function applyTheme(mode=getSettings().theme,{persist=false}={}){
+ mode=normalizeThemeMode(mode);if(persist){const s=getSettings();s.theme=mode;saveSettings(s)}
+ const resolved=resolvedTheme(mode),root=document.documentElement;root.dataset.theme=resolved;root.dataset.themePreference=mode;root.style.colorScheme=resolved;
+ document.querySelector('meta[name="theme-color"]')?.setAttribute('content',THEME_COLORS[resolved]);
+ renderThemeSettings();return resolved;
+}
+function renderThemeSettings(){
+ const s=getSettings(),resolved=resolvedTheme(s.theme);$$('[data-theme-mode]').forEach(b=>{const active=b.dataset.themeMode===s.theme;b.classList.toggle('active',active);b.setAttribute('aria-checked',active?'true':'false')});
+ const note=$('#themeModeNote');if(note){const labels={light:'světlý',dark:'tmavý'};note.textContent=s.theme==='auto'?`Teď používáme ${labels[resolved]} režim podle nastavení zařízení.`:s.theme==='dark'?'Tmavý režim je zapnutý jen na tomto zařízení.':'Světlý režim je zapnutý jen na tomto zařízení.'}
+}
 
 function fmtTime(ms){if(ms==null)return '—';const sec=Math.floor(ms/1000),m=Math.floor(sec/60),s=sec%60;return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
 function czPlural(n,one,few,many){const a=Math.abs(Number(n)||0);return a===1?one:(a>=2&&a<=4?few:many)}
@@ -865,7 +879,7 @@ async function logoutPlayer(){
  localStorage.removeItem(PROFILE_KEY);rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
 }
 
-function renderSettings(){const s=getSettings(),supported=typeof navigator.vibrate==='function';$('#soundToggle').textContent=`${s.sound?'🔊':'🔇'} Zvuk ${s.sound?'zapnutý':'vypnutý'}`;$('#soundToggle').classList.toggle('on',s.sound);$('#hapticToggle').textContent=supported?`${s.haptics?'📳':'📴'} Vibrace ${s.haptics?'zapnuté':'vypnuté'}`:'📴 Vibrace nepodporovány';$('#hapticToggle').classList.toggle('on',s.haptics&&supported);$('#hapticToggle').disabled=!supported;const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;test.textContent=supported?'📳 Otestovat vibrace':'📴 Prohlížeč vibrace nepodporuje'}}
+function renderSettings(){const s=getSettings(),supported=typeof navigator.vibrate==='function';renderThemeSettings();$('#soundToggle').textContent=`${s.sound?'🔊':'🔇'} Zvuk ${s.sound?'zapnutý':'vypnutý'}`;$('#soundToggle').classList.toggle('on',s.sound);$('#hapticToggle').textContent=supported?`${s.haptics?'📳':'📴'} Vibrace ${s.haptics?'zapnuté':'vypnuté'}`:'📴 Vibrace nepodporovány';$('#hapticToggle').classList.toggle('on',s.haptics&&supported);$('#hapticToggle').disabled=!supported;const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;test.textContent=supported?'📳 Otestovat vibrace':'📴 Prohlížeč vibrace nepodporuje'}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 async function renderLeaderboard(){
@@ -1104,17 +1118,21 @@ function bind(){
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>pendingSW?.postMessage({type:'SKIP_WAITING'});
+ $$('[data-theme-mode]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeMode,{persist:true}));
  $('#soundToggle').onclick=()=>{const s=getSettings();s.sound=!s.sound;saveSettings(s);renderSettings();if(s.sound){ensureAudio();tone(620,.08,.02)}};$('#hapticToggle').onclick=()=>{const s=getSettings();s.haptics=!s.haptics;saveSettings(s);renderSettings();if(s.haptics)vibrate(45)};$('#hapticTestBtn').onclick=testHaptics;$('#replayIntroBtn').onclick=()=>openOnboarding(true);
  $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);
  const handleViewportChange=()=>{fitGameBoard();drawPaths()};
  const settleViewportChange=()=>{handleViewportChange();[60,180,420].forEach(ms=>setTimeout(handleViewportChange,ms))};
  window.addEventListener('resize',settleViewportChange);window.addEventListener('orientationchange',settleViewportChange);window.visualViewport?.addEventListener?.('resize',settleViewportChange);navigator.devicePosture?.addEventListener?.('change',settleViewportChange);
+ const colorSchemeQuery=window.matchMedia?.('(prefers-color-scheme: dark)');const handleSystemThemeChange=()=>{if(getSettings().theme==='auto')applyTheme('auto')};colorSchemeQuery?.addEventListener?.('change',handleSystemThemeChange);
+ window.addEventListener('storage',e=>{if(e.key===SETTINGS_KEY)applyTheme(getSettings().theme)});
  if(typeof ResizeObserver!=='undefined'){const stage=$('#boardStage');if(stage){const ro=new ResizeObserver(()=>{if(currentScreen==='game')requestAnimationFrame(()=>{fitGameBoard();drawPaths()})});ro.observe(stage);window.__propletBoardResizeObserver=ro}}
  window.addEventListener('online',()=>syncQueue({announce:false}));
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){pauseGameClock('hidden');sendAttemptCheckpoint('leave')}else{resumeGameClock();if(getQueue().length)syncQueue({announce:false})}});window.addEventListener('blur',()=>pauseGameClock('blur'));window.addEventListener('focus',resumeGameClock);window.addEventListener('pagehide',()=>{pauseGameClock('pagehide');sendAttemptCheckpoint('leave')});
 }
 
 async function boot(){
+ applyTheme(getSettings().theme);
  try{puzzleDB=await fetch('/puzzles.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error();return r.json()})}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Spusť aplikaci přes server podle README.</p></main>';return}
  document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();initNavigation();updateProfileChip();trackProductEvent('app_open');renderDaily();renderFree();renderProfile();syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);

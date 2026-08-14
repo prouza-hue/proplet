@@ -4,7 +4,7 @@
   "description":"Česká slovní hra, která umí příjemně zamotat hlavu.",
   "start_url":"/",
   "display":"standalone",
-  "background_color":"#f7f4ff",
+  "background_color":"#17151f",
   "theme_color":"#6c5ce7",
   "icons":[
     {"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},

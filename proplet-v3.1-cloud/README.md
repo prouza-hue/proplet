@@ -1,16 +1,18 @@
-# Proplet v3.21.3
+# Proplet v3.22.0
 
-Aktuální release: **v3.21.3 — Orientation Safety Hotfix**.
+Aktuální release: **v3.22.0 — Night Mode**.
 
 Hlavní novinky:
 
+- v3.22 přidává plnohodnotný tmavý režim s volbou Automaticky / Světlý / Tmavý; preference je lokální pro zařízení,
+- tmavá paleta má vlastní povrchy pro herní desku, cesty, výsledky, onboarding, modaly, leaderboardy a administraci,
+- `theme-color` se přepíná podle aktivního režimu a automatická volba živě reaguje na systémové nastavení,
 - v3.21.3 odstraňuje nespolehlivé blokování landscape orientace; Fold, tablet i telefon se při otočení pouze responzivně přepočítají,
 - v3.21.2 opravuje matoucí texty Pomocníka a odstraňuje vynucenou Nápovědu ze starteru; po 10 s nečinnosti může přijít pouze neblokující nabídka,
-
 - v3.21 přidává samostatný kurátorovaný první Proplet 5×5 (MRAK / JABLKO / ČOKOLÁDA / AUTOBUS), který po onboardingu rovnou učí hru hraním a dává skutečných 10 XP,
 - dokončená deska dostává jemný ambientní progres a krátký solved-board moment před výsledkovkou,
 - chybné cesty jsou lokálně viditelné, tahy kratší než 4 písmena se nepenalizují a Reset má bezpečné `VRÁTIT`,
-- rozložený Fold7 se chová jako tablet v portrait i landscape; složený telefon si zachovává landscape guard,
+- otočení telefonu, tabletu i rozloženého Foldu pouze responzivně přepočítá layout; orientace už nikdy hru neblokuje ani nepozastavuje,
 - hráčské texty jsou očištěné od interních pojmů jako Gen2 / slot.
 - nový kurátorovaný Lexicon v2 s 3 153 cílovými lemmaty a metadaty `familiarity`, `complexity`, `fun`, `theme`, `register` a `age_floor`,
 - banka 800 Free úrovní: 200 Snadných, Středních, Těžkých i Mozkožroutů,
@@ -46,12 +48,9 @@ Hlavní novinky:
 - v3.20.1 opravuje celoplošnou onboarding ukázku na skutečná slova PES / LES / MOC, zmenšuje stránku Pomocníka bez scrollu a dává anonymnímu hráči výrazné uložení účtu přímo vedle globálního pořadí; sekundární akce ve výsledku jsou kompaktní.
 - v3.20 zkracuje onboarding na tři kroky, umožňuje uložit účet bez týmu, nabízí uložení po 1./4./10. dokončení a čistí obrazovky Dnes i výsledkovku bez zásahu do puzzle banky.
 
-Nasazení: `UPDATE_V3_21_CZ.md`  
-Migrace: `SUPABASE_MIGRATION_V3_21.sql`  
-Release notes: `RELEASE_V3_21_CZ.md`  
-QA: `QA_V3_21_CZ.md`  
+Nasazení: `UPDATE_V3_22_CZ.md`  
+Databáze: **bez nové SQL migrace** (v3.21 migrace zůstává beze změny)  
+Release notes: `RELEASE_V3_22_CZ.md`  
+QA: `QA_V3_22_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `FREE_EXTENSION_V3_19_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
-
-
-Aktuální hotfix: viz `UPDATE_V3_21_3_CZ.md` a `QA_V3_21_3_CZ.md`.
