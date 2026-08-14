@@ -1,0 +1,32 @@
+{
+  "version": "3.22.1",
+  "release": "Dark Found-Path Legibility Hotfix",
+  "sqlRequired": false,
+  "scope": [
+    "dark-mode found-cell background",
+    "dark-mode found-cell text",
+    "version/cache metadata"
+  ],
+  "immutableChecks": {
+    "puzzlesSha256": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "publicPuzzlesSame": true,
+    "migrationV321Sha256": "739f0b7b48fd3c18577b25b5ded7a9ca52f7ca01520f3b70e38adfbce884bed3"
+  },
+  "files": {
+    "server.py": "c55ba6de8f178d4ff4873dfd260a5e7cfb5f2ac8f79cf0c36d4b5fab3ec8760f",
+    "README.md": "439594af3e2505868b7e2f3320c0f33485d2a47a889d4a195d834f786d6b0d1a",
+    "public/app.js": "02b1a2074dc0a332b2d808f5ae182c661bde9da74ce434ce5a52369d26efc940",
+    "public/index.html": "1381df740c37e5762ee5737d2570a89ec3f8147bdb9a9d5cc385660dbb6e0858",
+    "public/styles.css": "2651facf11a9fa58564a2a5e947780bf7200bd14302b7e69b602b8e1186b7c59",
+    "public/sw.js": "08ef92d616aece74df180e96ab8ba136682b34841b0f34c450b349e2464564f5",
+    "data/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "public/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "SUPABASE_MIGRATION_V3_21.sql": "739f0b7b48fd3c18577b25b5ded7a9ca52f7ca01520f3b70e38adfbce884bed3",
+    "UPDATE_V3_22_1_CZ.md": "5dddde1914cc7f21e70090b26f2ddc7743a332b8d468fc1a593d855e183d25e9",
+    "RELEASE_V3_22_1_CZ.md": "6ce3e199942e276ff7f620affbbaae3d92ac6a249f1299a37fa6d3afd923a9fd",
+    "QA_V3_22_1_CZ.md": "64e18092ed0f63e12ee29c22397fd337d032fc9abc296bf5712bfe502ee997bc",
+    "tools/test_v3221_package.py": "a662551d0f93390de5d57b889861aa8be894205b7f682ea5d38a85490d472391",
+    "tools/test_v3221_server.py": "bab6b0112ec9446374e9bf0692590f84bc99e82722d0ef5c1c1ba705920c4693",
+    "tools/test_v3221_contrast.py": "5b50005dd304407f33e7709f3098effd6ba2224adb540bf991b53c7028ef134a"
+  }
+}

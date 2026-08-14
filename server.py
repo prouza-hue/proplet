@@ -51,8 +51,9 @@ BADGES = [
 ]
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
+STARTER_XP = 10
 
-app = FastAPI(title="Proplet API", version="3.16.1-cloud")
+app = FastAPI(title="Proplet API", version="3.22.1-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -75,8 +76,8 @@ async def unexpected_error_handler(request, exc: Exception):
 
 class PlayerCreate(BaseModel):
     name: str = Field(min_length=1, max_length=24)
-    family_code: str = Field(min_length=2, max_length=24)
-    # Optional keeps a rolling deployment compatible with an older cached PWA.
+    # v3.20: team is optional. Keeping these fields preserves older cached clients.
+    family_code: Optional[str] = Field(default=None, max_length=24)
     password: Optional[str] = Field(default=None, min_length=8, max_length=128)
     league_pin: Optional[str] = Field(default=None, max_length=32)
     create_league: bool = False
@@ -85,7 +86,9 @@ class PlayerCreate(BaseModel):
 
 class PlayerLogin(BaseModel):
     name: str = Field(min_length=1, max_length=24)
-    family_code: str = Field(min_length=2, max_length=24)
+    # New accounts log in with name + password. Team remains an optional
+    # disambiguator for legacy duplicate names.
+    family_code: Optional[str] = Field(default=None, max_length=24)
     password: str = Field(min_length=8, max_length=128)
 
 
@@ -132,6 +135,13 @@ class ProductEventCreate(BaseModel):
 
 class TeamPinSet(BaseModel):
     pin: str = Field(min_length=4, max_length=32)
+
+
+class TeamMembershipSet(BaseModel):
+    mode: str = Field(pattern="^(join|new)$")
+    family_code: Optional[str] = Field(default=None, max_length=24)
+    league_pin: str = Field(min_length=4, max_length=32)
+    league_name: Optional[str] = Field(default=None, max_length=40)
 
 
 class ResultCreate(BaseModel):
@@ -193,6 +203,11 @@ class FeedbackCreate(BaseModel):
     rating: Optional[int] = Field(default=None, ge=-1, le=1)
     word: Optional[str] = Field(default=None, max_length=80)
     note: Optional[str] = Field(default=None, max_length=300)
+
+
+class AdminReportUpdate(BaseModel):
+    status: str = Field(min_length=3, max_length=20)
+    resolution_note: Optional[str] = Field(default=None, max_length=500)
 
 
 class RescueFinish(BaseModel):
@@ -261,6 +276,23 @@ def db_select(table: str, **filters):
     return db_request("GET", table, params=params)
 
 
+def db_select_all(table: str, **filters):
+    """Read complete analytics/admin datasets past PostgREST's 1,000-row page."""
+    rows: list[dict] = []
+    page_size = 1000
+    offset = 0
+    while True:
+        params = {"select": "*", "limit": str(page_size), "offset": str(offset)}
+        for key, value in filters.items():
+            if value is not None:
+                params[key] = f"eq.{value}"
+        page = db_request("GET", table, params=params)
+        rows.extend(page)
+        if len(page) < page_size:
+            return rows
+        offset += page_size
+
+
 def db_insert(table: str, row: dict):
     rows = db_request("POST", table, body=row, prefer="return=representation")
     return rows[0] if rows else row
@@ -277,16 +309,40 @@ def db_delete(table: str, **filters):
 
 
 def norm_family(code: str) -> str:
-    code = "".join(ch for ch in code.upper().strip() if ch.isalnum() or ch in "-_ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
+    code = "".join(ch for ch in str(code or "").upper().strip() if ch.isalnum() or ch in "-_ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
     return code[:24]
 
 
+SOLO_FAMILY_PREFIX = "SOLO_"
+
+
+def is_solo_family(code: Optional[str], team_joined_at: Optional[str] = None) -> bool:
+    # Prefix marks our internal compatibility namespace; team_joined_at protects
+    # any pre-existing real team that could coincidentally have a similar code.
+    return not team_joined_at and norm_family(str(code or "")).startswith(SOLO_FAMILY_PREFIX)
+
+
+def is_solo_player(player: dict) -> bool:
+    return is_solo_family(player.get("family_code"), player.get("team_joined_at"))
+
+
+def public_family_code(code: Optional[str], team_joined_at: Optional[str] = None) -> Optional[str]:
+    normalized = norm_family(str(code or ""))
+    return None if not normalized or is_solo_family(normalized, team_joined_at) else normalized
+
+
+def public_team_name(code: Optional[str], team_joined_at: Optional[str] = None) -> Optional[str]:
+    family = public_family_code(code, team_joined_at)
+    return league_name_for(family) if family else None
+
+
 def league_name_for(code: str) -> str:
+    normalized = norm_family(code)
     try:
-        rows = db_select("leagues", code=norm_family(code))
-        return rows[0].get("name") or norm_family(code) if rows else norm_family(code)
+        rows = db_select("leagues", code=normalized)
+        return rows[0].get("name") or normalized if rows else normalized
     except HTTPException:
-        return norm_family(code)
+        return normalized
 
 def push_ready() -> bool:
     return bool(webpush and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY)
@@ -355,6 +411,40 @@ def auth_player(authorization: Optional[str]) -> dict:
         if players:
             return players[0]
     raise HTTPException(401, "Neplatné přihlášení hráče")
+
+
+def require_admin(authorization: Optional[str], *, write: bool = False) -> dict:
+    """Authenticate a player and then require an independent admin grant.
+
+    Admin rights deliberately live outside the player row. Team membership, a
+    guessed URL or an ordinary authenticated session can never grant access by
+    itself. The first owner is created by the v3.17 migration.
+    """
+    player = auth_player(authorization)
+    try:
+        rows = db_select("admin_accounts", player_id=player["id"])
+    except HTTPException as exc:
+        raise HTTPException(403, "Administrace ještě není aktivovaná. Spusť migraci v3.17.") from exc
+    rows = [row for row in rows if row.get("active") is True]
+    if not rows:
+        raise HTTPException(403, "Tento hráč nemá přístup do administrace")
+    account = rows[0]
+    role = str(account.get("role") or "viewer")
+    if write and role not in ("owner", "editor"):
+        raise HTTPException(403, "Toto administrátorské oprávnění je pouze pro čtení")
+    return {"player": player, "account": account, "role": role}
+
+
+def record_admin_audit(admin: dict, action: str, target_type: str, target_id: Optional[str], details: Optional[dict] = None) -> None:
+    db_insert("admin_audit_log", {
+        "id": str(uuid.uuid4()),
+        "admin_player_id": admin["player"]["id"],
+        "action": action,
+        "target_type": target_type,
+        "target_id": target_id,
+        "details": details or {},
+        "created_at": datetime.now(TZ).isoformat(),
+    })
 
 
 def anonymous_hash(raw: Optional[str]) -> Optional[str]:
@@ -442,7 +532,7 @@ def player_stats(player_id: str) -> dict:
         difficulty = r.get("difficulty")
         total_points += int(r.get("points") or 0)
         is_clean = r.get("clean_solve") is True
-        if is_clean:
+        if is_clean and mode in ("daily", "free"):
             clean_solves += 1
 
         if mode == "daily" and r.get("daily_date"):
@@ -484,7 +574,7 @@ def player_stats(player_id: str) -> dict:
     next_badge = next((b for b in BADGES if current < b["days"]), None)
     return {
         "points": total_points,
-        "totalCompleted": len(rows),
+        "totalCompleted": sum(1 for r in rows if r.get("mode") in ("daily", "free")),
         "dailyCompleted": len(set(daily_dates)),
         # Effective progress is a union of level slots across content generations.
         # A Gen1 level and its Gen2 replacement therefore count once, while every
@@ -520,26 +610,14 @@ def rescue_status_for(player_id: str) -> dict:
     if existing:
         status = existing.get("status")
         if status == "started":
-            try:
-                started = datetime.fromisoformat(str(existing.get("started_at")).replace("Z", "+00:00"))
-                now = datetime.now(TZ)
-                if started.tzinfo is None:
-                    started = started.replace(tzinfo=TZ)
-                elapsed = (now - started.astimezone(TZ)).total_seconds()
-                if elapsed > 35:
-                    db_update("streak_rescues", {"id": existing["id"]}, {
-                        "status": "failed", "completed_at": now.isoformat(),
-                        "elapsed_ms": int(max(0, elapsed * 1000)),
-                    })
-                    status = "failed"
-                else:
-                    return {
-                        "eligible": True, "state": "started", "missedDate": target,
-                        "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
-                        "timeLimitMs": 30000, "secondsRemaining": max(0, round(30 - elapsed, 1)),
-                    }
-            except Exception:
-                status = "failed"
+            # Since v3.19 the rescue clock measures active play, not wall time.
+            # Leaving the PWA therefore cannot silently consume the attempt.
+            elapsed_ms = max(0, int(existing.get("elapsed_ms") or 0))
+            return {
+                "eligible": True, "state": "started", "missedDate": target,
+                "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
+                "timeLimitMs": 30000, "secondsRemaining": max(0, round((30000 - elapsed_ms) / 1000, 1)),
+            }
         return {
             "eligible": False, "state": status or "failed", "missedDate": target,
             "priorStreak": prior_streak, "puzzleId": existing.get("puzzle_id"),
@@ -589,13 +667,15 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
 
 def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
     difficulties = ("easy", "medium", "hard", "hardcore")
+    puzzle_data = load_puzzles()
+    maximum_levels = {key: len(puzzle_data.get("free", {}).get(key, [])) for key in difficulties}
     legacy_slots = {key: set() for key in difficulties}
     gen2_slots = {key: set() for key in difficulties}
     for row in rows:
         if row.get("mode") != "free" or row.get("difficulty") not in legacy_slots:
             continue
         info = free_puzzle_info(str(row.get("puzzle_id") or ""), str(row.get("difficulty") or ""))
-        if not info or not 1 <= int(info["level"]) <= 100:
+        if not info or not 1 <= int(info["level"]) <= maximum_levels.get(info["difficulty"], 0):
             continue
         target = gen2_slots if int(info["generation"]) >= 2 else legacy_slots
         target[info["difficulty"]].add(int(info["level"]))
@@ -694,8 +774,21 @@ def daily_puzzle_matches_date(puzzle_id: str, daily_date: str) -> bool:
     return puzzle_id in valid_daily_puzzle_ids(daily_date)
 
 
+def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
+    """True only when an archived Daily result is replaced by that day's primary board."""
+    return bool(
+        payload.mode == "daily"
+        and payload.daily_date
+        and old.get("puzzle_id") != payload.puzzle_id
+        and payload.puzzle_id == expected_daily_puzzle_id(payload.daily_date)
+    )
+
+
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     data = load_puzzles()
+    if mode == "starter":
+        starter = data.get("starter") or {}
+        return starter.get("id") == puzzle_id and starter.get("difficulty") == difficulty
     if mode == "daily":
         active = any(p["id"] == puzzle_id and p["difficulty"] == difficulty for p in data.get("daily", []))
         archived = any(
@@ -714,6 +807,15 @@ def home():
     return RedirectResponse(url="/index.html", status_code=307)
 
 
+@app.get("/admin")
+@app.get("/admin/")
+def admin_home():
+    # Vercel serves files from public/ through its static CDN; they are not
+    # necessarily present inside the isolated Python function at /var/task.
+    # Redirecting keeps /admin convenient without coupling it to that runtime.
+    return RedirectResponse(url="/admin.html", status_code=307)
+
+
 @app.get("/api/health")
 def health():
     puzzle_file = PUZZLES_PATH.exists()
@@ -722,10 +824,14 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.16.1",
+        "version": "3.22.1",
+        "adminStatic": True,
+        "adminEntry": "/admin.html",
+        "adminDelivery": "vercel-public-static",
         "vocabularyVersion": pdata.get("lexiconVersion") or pdata.get("vocabularyVersion"),
         "vocabularyTierCounts": pdata.get("vocabularyTierCounts"),
         "freeGeneration": pdata.get("freeGeneration"),
+        "freeLevelsPerDifficulty": pdata.get("freeLevelsPerDifficulty") or min((len(bank) for bank in pdata.get("free", {}).values()), default=0),
         "dailyGeneration": pdata.get("dailyGeneration"),
         "dailyGeneration2From": pdata.get("dailyGeneration2From"),
         "dailyMigration": pdata.get("dailyMigration"),
@@ -733,13 +839,27 @@ def health():
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
         "freeTieredFromVersion": pdata.get("freeTieredFromVersion"),
         "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
+        "uxSprint": "3.20",
+        "gameFeelSprint": "3.21",
+        "darkModeSprint": "3.22",
+        "darkFoundTextHotfix": True,
+        "themeModes": ["auto", "light", "dark"],
+        "themePreferenceScope": "device",
+        "orientationBlocking": False,
+        "foldResponsiveReflow": True,
+        "starterPuzzle": bool(pdata.get("starter")),
+        "starterXp": STARTER_XP,
+        "starterHintOptional": True,
+        "starterHintOfferIdleSeconds": 10,
+        "accountWithoutTeam": True,
+        "accountNudgeCompletions": [1, 4, 10],
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
     if not supabase_ready():
         return {**base, "ok": False, "database": False, "message": "Chybí SUPABASE_URL nebo SUPABASE_SECRET_KEY"}
     try:
-        db_request("GET", "players", params={"select": "id", "limit": "1"})
+        player_probe = db_request("GET", "players", params={"select": "id", "limit": "1"})
         account_migration = True
         try:
             db_request("GET", "player_sessions", params={"select": "id", "limit": "1"})
@@ -775,6 +895,11 @@ def health():
             db_request("GET", "leagues", params={"select": "code,public_opt_in,public_name,public_enabled_at", "limit": "1"})
         except HTTPException:
             global_league_migration = False
+        ux_migration = True
+        try:
+            db_request("GET", "players", params={"select": "id,team_joined_at", "limit": "1"})
+        except HTTPException:
+            ux_migration = False
         analytics_v2_migration = True
         try:
             db_request("GET", "players", params={"select": "id,support_mode", "limit": "1"})
@@ -798,9 +923,24 @@ def health():
             db_request("GET", "free_slot_rewards", params={"select": "id,level,content_generation", "limit": "1"})
         except HTTPException:
             free_generation2_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        # v3.21 changes the results mode constraint and backfills one starter reward per
+        # pre-existing player. A successful backfill gives us a cheap deployment marker.
+        starter_migration = True
+        try:
+            starter_probe = db_request("GET", "results", params={"select": "id", "mode": "eq.starter", "limit": "1"})
+            starter_migration = (not bool(player_probe)) or bool(starter_probe)
+        except HTTPException:
+            starter_migration = False
+        admin_migration = True
+        try:
+            db_request("GET", "admin_accounts", params={"select": "player_id,role,active", "limit": "1"})
+            db_request("GET", "admin_audit_log", params={"select": "id", "limit": "1"})
+            db_request("GET", "puzzle_feedback", params={"select": "id,status,resolution_note,reviewed_at,reviewed_by", "limit": "1"})
+        except HTTPException:
+            admin_migration = False
+        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
 
 
 @app.get("/api/config")
@@ -808,12 +948,12 @@ def config():
     p = load_puzzles()
     return {
         "badges": BADGES,
-        "points": POINTS,
+        "points": {**POINTS, "starter": STARTER_XP},
         "dictionarySize": p["dictionarySize"],
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.16.1",
+        "version": "3.22.1",
     }
 
 
@@ -841,33 +981,37 @@ def list_leagues():
 @app.post("/api/player")
 def create_player(payload: PlayerCreate):
     name = " ".join(payload.name.strip().split())
-    family = norm_family(payload.family_code)
-    if not name or len(family) < 2:
-        raise HTTPException(400, "Vyplň jméno a tým")
+    requested_family = norm_family(payload.family_code or "")
+    solo = len(requested_family) < 2
+    family = requested_family if not solo else f"{SOLO_FAMILY_PREFIX}{secrets.token_hex(6).upper()}"
+    if not name:
+        raise HTTPException(400, "Vyplň jméno")
+    if solo and not payload.password:
+        raise HTTPException(400, "Nový účet potřebuje heslo")
 
-    league_rows = db_select("leagues", code=family)
-    if payload.create_league:
-        display_name = " ".join((payload.league_name or payload.family_code).strip().split())[:40]
-        if league_rows:
-            raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu místo zakládání nového.")
-        if not payload.league_pin or len(payload.league_pin.strip()) < 4:
-            raise HTTPException(400, "Nový tým potřebuje PIN alespoň 4 znaky")
-        db_insert("leagues", {"code": family, "name": display_name or family, "pin_hash": hash_password(payload.league_pin.strip()), "created_at": datetime.now(TZ).isoformat()})
+    if not solo:
         league_rows = db_select("leagues", code=family)
-    elif not league_rows:
-        # Backward compatibility for a cached pre-team client. New v3.9 clients always create teams explicitly.
-        db_insert("leagues", {"code": family, "name": family, "created_at": datetime.now(TZ).isoformat()})
-        league_rows = db_select("leagues", code=family)
-    else:
-        # PIN is the shared invitation secret for adding a NEW player to an existing team.
-        if not league_rows[0].get("pin_hash"):
-            raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN. Některý přihlášený člen ho může nastavit v profilu.")
-        if not payload.league_pin or not verify_password(payload.league_pin.strip(), league_rows[0].get("pin_hash")):
-            raise HTTPException(401, "PIN týmu nesedí")
+        if payload.create_league:
+            display_name = " ".join((payload.league_name or payload.family_code or "").strip().split())[:40]
+            if league_rows:
+                raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu místo zakládání nového.")
+            if not payload.league_pin or len(payload.league_pin.strip()) < 4:
+                raise HTTPException(400, "Nový tým potřebuje PIN alespoň 4 znaky")
+            db_insert("leagues", {"code": family, "name": display_name or family, "pin_hash": hash_password(payload.league_pin.strip()), "created_at": datetime.now(TZ).isoformat()})
+            league_rows = db_select("leagues", code=family)
+        elif not league_rows:
+            # Backward compatibility for cached pre-v3.20 clients.
+            db_insert("leagues", {"code": family, "name": family, "created_at": datetime.now(TZ).isoformat()})
+            league_rows = db_select("leagues", code=family)
+        else:
+            if not league_rows[0].get("pin_hash"):
+                raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN. Některý přihlášený člen ho může nastavit v profilu.")
+            if not payload.league_pin or not verify_password(payload.league_pin.strip(), league_rows[0].get("pin_hash")):
+                raise HTTPException(401, "PIN týmu nesedí")
 
-    family_players = db_select("players", family_code=family)
-    if any(p["name"].casefold() == name.casefold() for p in family_players):
-        raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
+        family_players = db_select("players", family_code=family)
+        if any(p["name"].casefold() == name.casefold() for p in family_players):
+            raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
 
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode()).hexdigest()
@@ -882,6 +1026,8 @@ def create_player(payload: PlayerCreate):
         "token_hash": token_hash,
         "created_at": now,
     }
+    if not solo:
+        row["team_joined_at"] = now
     if payload.password:
         row["password_hash"] = hash_password(payload.password)
 
@@ -889,32 +1035,45 @@ def create_player(payload: PlayerCreate):
         db_insert("players", row)
     except HTTPException as exc:
         if exc.status_code == 409:
-            raise HTTPException(409, "V tomto týmu už hráč s tímto jménem existuje")
+            raise HTTPException(409, "Takový hráč už existuje")
         raise
 
     stats = player_stats(player_id)
+    public_family = public_family_code(family, row.get("team_joined_at"))
     return {
-        "id": player_id, "name": name, "familyCode": family, "leagueName": league_name_for(family), "token": token,
+        "id": player_id, "name": name, "familyCode": public_family,
+        "leagueName": league_name_for(family) if public_family else None, "token": token,
         "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "stats": stats,
     }
 
 
 @app.post("/api/login")
 def login(payload: PlayerLogin):
-    family = norm_family(payload.family_code)
+    family = norm_family(payload.family_code or "")
     name = " ".join(payload.name.strip().split())
-    family_players = db_select("players", family_code=family)
-    player = next((p for p in family_players if p["name"].casefold() == name.casefold()), None)
-    if not player:
-        raise HTTPException(401, "Tým, jméno nebo heslo nesedí")
-    if not player.get("password_hash"):
-        raise HTTPException(409, "Tento hráč ještě nemá heslo. Nastav ho na zařízení, kde už je přihlášený.")
-    if not verify_password(payload.password, player.get("password_hash")):
-        raise HTTPException(401, "Tým, jméno nebo heslo nesedí")
+    if family:
+        candidates = [p for p in db_select("players", family_code=family) if p.get("name", "").casefold() == name.casefold()]
+    else:
+        # Teamless login is intentionally simple for the player. We only use
+        # team when an old duplicate name needs disambiguation.
+        candidates = [p for p in db_select("players") if p.get("name", "").casefold() == name.casefold()]
+
+    if not candidates:
+        raise HTTPException(401, "Jméno nebo heslo nesedí")
+    password_matches = [p for p in candidates if p.get("password_hash") and verify_password(payload.password, p.get("password_hash"))]
+    if not password_matches:
+        if len(candidates) == 1 and not candidates[0].get("password_hash"):
+            raise HTTPException(409, "Tento hráč ještě nemá heslo. Nastav ho na zařízení, kde už je přihlášený.")
+        raise HTTPException(401, "Jméno nebo heslo nesedí")
+    if len(password_matches) > 1 and not family:
+        raise HTTPException(409, "Našli jsme více účtů se stejným jménem. Otevři volbu pro starší týmový účet a vyber svůj tým.")
+    player = password_matches[0]
 
     token = new_session(player["id"])
+    public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     return {
-        "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
+        "id": player["id"], "name": player["name"], "familyCode": public_family,
+        "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
         "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": player_stats(player["id"]),
     }
 
@@ -939,7 +1098,12 @@ def claim_anonymous(payload: AnonymousClaim, authorization: Optional[str] = Head
     # Feedback has a unique player/puzzle/kind constraint. Merge row-by-row so an existing
     # authenticated vote wins over a duplicate anonymous vote rather than making claim fail.
     for row in db_select("puzzle_feedback", anonymous_id=anon):
-        existing = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=row.get("puzzle_id"), kind=row.get("kind"))
+        candidates = db_select("puzzle_feedback", player_id=player["id"], puzzle_id=row.get("puzzle_id"), kind=row.get("kind"))
+        if row.get("kind") == "word":
+            report_word = str(row.get("word") or "").strip().casefold()
+            existing = [candidate for candidate in candidates if str(candidate.get("word") or "").strip().casefold() == report_word]
+        else:
+            existing = candidates
         if existing:
             db_delete("puzzle_feedback", id=row["id"])
         else:
@@ -1059,13 +1223,14 @@ def product_event(
     allowed = {
         "app_open", "onboarding_started", "onboarding_completed",
         "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
-        "account_authenticated",
+        "account_authenticated", "starter_started", "starter_hint_used", "starter_completed",
+        *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
     }
     if payload.event_type not in allowed:
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.16.1", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.22.1", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1074,11 +1239,50 @@ def product_event(
 def set_team_pin(payload: TeamPinSet, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     team = norm_family(str(player.get("family_code") or ""))
+    if is_solo_player(player):
+        raise HTTPException(400, "Nejdřív se připoj k týmu nebo ho založ")
     rows = db_select("leagues", code=team)
     if not rows:
         raise HTTPException(404, "Tým neexistuje")
     db_update("leagues", {"code": team}, {"pin_hash": hash_password(payload.pin.strip())})
     return {"ok": True, "hasPin": True}
+
+
+@app.post("/api/team-membership")
+def set_team_membership(payload: TeamMembershipSet, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    current_family = norm_family(str(player.get("family_code") or ""))
+    if not is_solo_player(player):
+        raise HTTPException(409, "Tento hráč už je v týmu")
+
+    if payload.mode == "new":
+        display_name = " ".join((payload.league_name or "").strip().split())[:40]
+        family = norm_family(display_name)
+        if len(family) < 2:
+            raise HTTPException(400, "Pojmenuj nový tým")
+        if db_select("leagues", code=family):
+            raise HTTPException(409, "Tým s tímto názvem už existuje. Přidej se k němu.")
+        db_insert("leagues", {
+            "code": family, "name": display_name, "pin_hash": hash_password(payload.league_pin.strip()),
+            "created_at": datetime.now(TZ).isoformat(),
+        })
+    else:
+        family = norm_family(payload.family_code or "")
+        if len(family) < 2:
+            raise HTTPException(400, "Vyber tým")
+        rows = db_select("leagues", code=family)
+        if not rows:
+            raise HTTPException(404, "Tým neexistuje")
+        if not rows[0].get("pin_hash"):
+            raise HTTPException(409, "Tento tým ještě nemá nastavený vstupní PIN")
+        if not verify_password(payload.league_pin.strip(), rows[0].get("pin_hash")):
+            raise HTTPException(401, "PIN týmu nesedí")
+
+    target_players = db_select("players", family_code=family)
+    if any(p.get("id") != player.get("id") and p.get("name", "").casefold() == player.get("name", "").casefold() for p in target_players):
+        raise HTTPException(409, "V tomto týmu už je hráč se stejným jménem")
+    db_update("players", {"id": player["id"]}, {"family_code": family, "team_joined_at": datetime.now(TZ).isoformat()})
+    return {"ok": True, "familyCode": family, "leagueName": league_name_for(family)}
 
 
 @app.post("/api/logout")
@@ -1103,8 +1307,10 @@ def logout(authorization: Optional[str] = Header(default=None)):
 def me(authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     stats = player_stats(player["id"])
+    public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     return {
-        "id": player["id"], "name": player["name"], "familyCode": player["family_code"], "leagueName": league_name_for(player["family_code"]),
+        "id": player["id"], "name": player["name"], "familyCode": public_family,
+        "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
         "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": stats,
     }
 
@@ -1177,7 +1383,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.1",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.22.1",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1238,7 +1444,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.16.1",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.22.1",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1263,19 +1469,31 @@ def puzzle_feedback(
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.kind not in ("difficulty", "word"):
         raise HTTPException(400, "Neplatný typ zpětné vazby")
-    data = load_puzzles()
-    known = (
-        any(payload.puzzle_id == p["id"] for bank in data.get("free", {}).values() for p in bank)
-        or any(payload.puzzle_id == p["id"] for p in data.get("daily", []))
-        or any(payload.puzzle_id == p.get("id") for bank in legacy_daily_banks(data) for p in bank["puzzles"])
-    )
-    if not known:
+    info = puzzle_info(payload.puzzle_id)
+    if not info:
         raise HTTPException(400, "Neznámá úloha")
     if payload.kind == "difficulty" and payload.rating is None:
         raise HTTPException(400, "Chybí hodnocení obtížnosti")
+    clean_word = " ".join(str(payload.word or "").strip().upper().split()) or None
+    if payload.kind == "word":
+        if not clean_word:
+            raise HTTPException(400, "Vyber slovo, které chceš nahlásit")
+        answers = {str(answer.get("word") or "").strip().upper() for answer in info["puzzle"].get("answers", [])}
+        if clean_word not in answers:
+            raise HTTPException(400, "Toto slovo do úlohy nepatří")
     af = actor_filters(actor)
-    existing = db_select("puzzle_feedback", puzzle_id=payload.puzzle_id, kind=payload.kind, **af)
-    row = {"rating": payload.rating, "word": payload.word, "note": payload.note, "created_at": datetime.now(TZ).isoformat()}
+    candidates = db_select("puzzle_feedback", puzzle_id=payload.puzzle_id, kind=payload.kind, **af)
+    existing = candidates if payload.kind == "difficulty" else [
+        item for item in candidates if str(item.get("word") or "").strip().casefold() == str(clean_word or "").casefold()
+    ]
+    row = {
+        "rating": payload.rating if payload.kind == "difficulty" else None,
+        "word": clean_word if payload.kind == "word" else None,
+        "note": " ".join(str(payload.note or "").strip().split()) or None,
+        "created_at": datetime.now(TZ).isoformat(),
+    }
+    if payload.kind == "word":
+        row.update({"status": "new", "resolution_note": None, "reviewed_at": None, "reviewed_by": None})
     if existing:
         db_update("puzzle_feedback", {"id": existing[0]["id"]}, row)
     else:
@@ -1300,12 +1518,12 @@ def build_quality_report():
     Main calibration metrics use each player's FIRST started attempt on a puzzle.
     Replays remain available as secondary telemetry, but cannot make a puzzle look easier.
     """
-    attempts = db_select("puzzle_attempts")
-    feedback = db_select("puzzle_feedback", kind="difficulty")
-    word_feedback = db_select("puzzle_feedback", kind="word")
-    hint_events = db_select("hint_events")
-    helper_events = db_select("helper_events")
-    product_events = db_select("product_events")
+    attempts = db_select_all("puzzle_attempts")
+    feedback = db_select_all("puzzle_feedback", kind="difficulty")
+    word_feedback = db_select_all("puzzle_feedback", kind="word")
+    hint_events = db_select_all("hint_events")
+    helper_events = db_select_all("helper_events")
+    product_events = db_select_all("product_events")
 
     def ts(row):
         raw = row.get("started_at") or ""
@@ -1387,6 +1605,11 @@ def build_quality_report():
             "avgResumes": round(sum(resumes) / len(resumes), 2) if resumes else 0,
             "difficultyRating": round(sum(ratings) / len(ratings), 2) if ratings else None,
             "ratings": len(ratings),
+            "ratingVotes": {
+                "lighter": sum(1 for rating in ratings if rating == -1),
+                "justRight": sum(1 for rating in ratings if rating == 0),
+                "harder": sum(1 for rating in ratings if rating == 1),
+            },
             "wordReports": word_reports.get(puzzle_id, 0),
             "generatedScore": meta.get("difficultyScore"),
             "cells": meta.get("cells"),
@@ -1517,6 +1740,8 @@ def build_quality_report():
     for event_type in (
         "app_open", "onboarding_started", "onboarding_completed", "account_nudge_shown",
         "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+        "starter_started", "starter_hint_used", "starter_completed",
+        *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
     ):
         identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
         identities.discard(None)
@@ -1554,15 +1779,316 @@ def build_quality_report():
     }
 
 
+def parse_timestamp(value) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=TZ)
+        return parsed.astimezone(TZ)
+    except (TypeError, ValueError):
+        return None
+
+
+def public_admin_identity(admin: dict) -> dict:
+    player = admin["player"]
+    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    return {
+        "id": player["id"],
+        "name": player.get("name"),
+        "familyCode": family,
+        "team": public_team_name(player.get("family_code"), player.get("team_joined_at")) or "Bez týmu",
+        "avatar": player.get("avatar") or "🙂",
+        "role": admin["role"],
+    }
+
+
+@app.get("/api/admin/me")
+def admin_me(authorization: Optional[str] = Header(default=None)):
+    return public_admin_identity(require_admin(authorization))
+
+
+@app.get("/api/admin/overview")
+def admin_overview(authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    now = datetime.now(TZ)
+    today = current_prague_date()
+    seven_days_ago = now - timedelta(days=7)
+    thirty_days_ago = now - timedelta(days=30)
+    players = db_select_all("players")
+    results = db_select_all("results")
+    attempts = db_select_all("puzzle_attempts")
+    reports = db_select_all("puzzle_feedback", kind="word")
+    ratings = db_select_all("puzzle_feedback", kind="difficulty")
+    leagues = db_select_all("leagues")
+    try:
+        runs = db_select_all("puzzle_runs")
+    except HTTPException:
+        runs = results
+
+    last_activity: dict[str, datetime] = {}
+    for row in attempts:
+        player_id = row.get("player_id")
+        stamp = parse_timestamp(row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
+        if player_id and stamp and (player_id not in last_activity or stamp > last_activity[player_id]):
+            last_activity[player_id] = stamp
+    for row in results:
+        player_id = row.get("player_id")
+        stamp = parse_timestamp(row.get("completed_at"))
+        if player_id and stamp and (player_id not in last_activity or stamp > last_activity[player_id]):
+            last_activity[player_id] = stamp
+
+    run_times = [(row, parse_timestamp(row.get("completed_at"))) for row in runs]
+    today_runs = [row for row, stamp in run_times if stamp and stamp.date() == today]
+    week_runs = [row for row, stamp in run_times if stamp and stamp >= seven_days_ago]
+    primary_daily = expected_daily_puzzle_id(today.isoformat())
+    daily_today = {
+        row.get("player_id") for row in results
+        if row.get("mode") == "daily"
+        and str(row.get("daily_date") or "")[:10] == today.isoformat()
+        and row.get("puzzle_id") == primary_daily
+    }
+    daily_today.discard(None)
+
+    version_counts: dict[str, int] = {}
+    for row in attempts:
+        stamp = parse_timestamp(row.get("started_at"))
+        version = str(row.get("app_version") or "neznámá")
+        if stamp and stamp >= thirty_days_ago:
+            version_counts[version] = version_counts.get(version, 0) + 1
+    versions = [
+        {"version": version, "attempts": count}
+        for version, count in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))
+    ]
+    open_reports = [row for row in reports if str(row.get("status") or "new") in ("new", "reviewing")]
+    vote_counts = {str(value): sum(1 for row in ratings if row.get("rating") == value) for value in (-1, 0, 1)}
+    return {
+        "generatedAt": now.isoformat(),
+        "today": today.isoformat(),
+        "players": {
+            "total": len(players),
+            "active7": sum(1 for stamp in last_activity.values() if stamp >= seven_days_ago),
+            "active30": sum(1 for stamp in last_activity.values() if stamp >= thirty_days_ago),
+        },
+        "games": {"today": len(today_runs), "last7Days": len(week_runs)},
+        "daily": {"todayPlayers": len(daily_today), "puzzleId": primary_daily},
+        "feedback": {"openWordReports": len(open_reports), "wordReportsTotal": len(reports), "ratingsTotal": len(ratings), "votes": vote_counts},
+        "teams": len(leagues),
+        "appVersions": versions[:8],
+    }
+
+
+def admin_user_summaries() -> list[dict]:
+    players = db_select_all("players")
+    results = db_select_all("results")
+    attempts = db_select_all("puzzle_attempts")
+    reports = db_select_all("puzzle_feedback", kind="word")
+    try:
+        leagues = {str(row.get("code")): row.get("name") or row.get("code") for row in db_select_all("leagues")}
+    except HTTPException:
+        leagues = {}
+    results_by_player: dict[str, list[dict]] = {}
+    attempts_by_player: dict[str, list[dict]] = {}
+    reports_by_player: dict[str, list[dict]] = {}
+    for row in results:
+        if row.get("player_id"):
+            results_by_player.setdefault(row["player_id"], []).append(row)
+    for row in attempts:
+        if row.get("player_id"):
+            attempts_by_player.setdefault(row["player_id"], []).append(row)
+    for row in reports:
+        if row.get("player_id"):
+            reports_by_player.setdefault(row["player_id"], []).append(row)
+
+    summaries = []
+    for player in players:
+        player_results = results_by_player.get(player["id"], [])
+        player_attempts = attempts_by_player.get(player["id"], [])
+        activity_candidates = [
+            parse_timestamp(row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
+            for row in player_attempts
+        ] + [parse_timestamp(row.get("completed_at")) for row in player_results]
+        activity = max((stamp for stamp in activity_candidates if stamp), default=None)
+        latest_attempt = max(
+            player_attempts,
+            key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ),
+            default=None,
+        )
+        raw_family = str(player.get("family_code") or "")
+        family = public_family_code(raw_family, player.get("team_joined_at"))
+        player_reports = reports_by_player.get(player["id"], [])
+        summaries.append({
+            "id": player["id"],
+            "name": player.get("name"),
+            "avatar": player.get("avatar") or "🙂",
+            "familyCode": family,
+            "team": (leagues.get(family) or family) if family else "Bez týmu",
+            "createdAt": player.get("created_at"),
+            "lastActiveAt": activity.isoformat() if activity else None,
+            "appVersion": latest_attempt.get("app_version") if latest_attempt else None,
+            "supportMode": player.get("support_mode") or "none",
+            "hasPassword": bool(player.get("password_hash")),
+            "points": sum(int(row.get("points") or 0) for row in player_results),
+            "completed": len(player_results),
+            "dailyCompleted": len({str(row.get("daily_date"))[:10] for row in player_results if row.get("mode") == "daily" and row.get("daily_date")}),
+            "openWordReports": sum(1 for row in player_reports if str(row.get("status") or "new") in ("new", "reviewing")),
+        })
+    summaries.sort(key=lambda row: row.get("lastActiveAt") or "", reverse=True)
+    return summaries
+
+
+@app.get("/api/admin/users")
+def admin_users(
+    q: str = Query(default="", max_length=80),
+    limit: int = Query(default=60, ge=1, le=200),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    needle = " ".join(q.strip().casefold().split())
+    rows = admin_user_summaries()
+    if needle:
+        rows = [row for row in rows if needle in " ".join((str(row.get("name") or ""), str(row.get("team") or ""), str(row.get("familyCode") or ""))).casefold()]
+    return {"total": len(rows), "users": rows[:limit]}
+
+
+@app.get("/api/admin/users/{player_id}")
+def admin_user_detail(player_id: str, authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    players = db_select("players", id=player_id)
+    if not players:
+        raise HTTPException(404, "Hráč neexistuje")
+    player = players[0]
+    results = db_select("results", player_id=player_id)
+    results.sort(key=lambda row: parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
+    attempts = db_select("puzzle_attempts", player_id=player_id)
+    attempts.sort(key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
+    reports = db_select("puzzle_feedback", player_id=player_id, kind="word")
+    try:
+        session_count = len(db_select("player_sessions", player_id=player_id))
+    except HTTPException:
+        session_count = 0
+    try:
+        push_count = len(db_select("push_subscriptions", player_id=player_id))
+    except HTTPException:
+        push_count = 0
+    return {
+        "user": {
+            "id": player["id"], "name": player.get("name"), "avatar": player.get("avatar") or "🙂",
+            "familyCode": public_family_code(player.get("family_code"), player.get("team_joined_at")),
+            "team": public_team_name(player.get("family_code"), player.get("team_joined_at")) or "Bez týmu",
+            "createdAt": player.get("created_at"), "supportMode": player.get("support_mode") or "none",
+            "hasPassword": bool(player.get("password_hash")), "additionalSessions": session_count, "pushSubscriptions": push_count,
+        },
+        "stats": player_stats(player_id),
+        "latestAppVersion": attempts[0].get("app_version") if attempts else None,
+        "wordReports": {"total": len(reports), "open": sum(1 for row in reports if str(row.get("status") or "new") in ("new", "reviewing"))},
+        "recentResults": [{
+            "puzzleId": row.get("puzzle_id"), "mode": row.get("mode"), "difficulty": row.get("difficulty"),
+            "dailyDate": str(row.get("daily_date"))[:10] if row.get("daily_date") else None,
+            "elapsedMs": row.get("best_elapsed_ms"), "moves": row.get("best_moves"), "points": row.get("points"),
+            "hintsUsed": row.get("hints_used"), "cleanSolve": row.get("clean_solve") is True, "completedAt": row.get("completed_at"),
+        } for row in results[:30]],
+    }
+
+
+@app.get("/api/admin/reports")
+def admin_reports(
+    status: str = Query(default="open", max_length=20),
+    q: str = Query(default="", max_length=80),
+    limit: int = Query(default=100, ge=1, le=300),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    if status not in ("open", "all", "new", "reviewing", "resolved", "dismissed"):
+        raise HTTPException(400, "Neplatný filtr stavu")
+    reports = db_select_all("puzzle_feedback", kind="word")
+    players = {row["id"]: row for row in db_select_all("players")}
+    needle = " ".join(q.strip().casefold().split())
+    output = []
+    for report in reports:
+        report_status = str(report.get("status") or "new")
+        if status == "open" and report_status not in ("new", "reviewing"):
+            continue
+        if status not in ("open", "all") and report_status != status:
+            continue
+        player = players.get(report.get("player_id"))
+        info = puzzle_info(str(report.get("puzzle_id") or ""))
+        puzzle_meta = (info or {}).get("puzzle", {}).get("meta") or {}
+        haystack = " ".join((
+            str(report.get("word") or ""), str(report.get("note") or ""), str(report.get("puzzle_id") or ""),
+            str(player.get("name") if player else "anonym"), str(player.get("family_code") if player else ""),
+        )).casefold()
+        if needle and needle not in haystack:
+            continue
+        output.append({
+            "id": report.get("id"), "status": report_status, "word": report.get("word"), "note": report.get("note"),
+            "puzzleId": report.get("puzzle_id"), "challengeKey": report.get("challenge_key"),
+            "mode": (info or {}).get("mode"), "difficulty": (info or {}).get("difficulty"),
+            "level": (info or {}).get("level") or puzzle_meta.get("level"), "legacy": bool((info or {}).get("legacy")),
+            "reportedBy": {
+                "id": player.get("id"), "name": player.get("name"),
+                "team": public_team_name(player.get("family_code"), player.get("team_joined_at")),
+            } if player else {"id": None, "name": "Anonymní hráč", "team": None},
+            "createdAt": report.get("created_at"), "resolutionNote": report.get("resolution_note"),
+            "reviewedAt": report.get("reviewed_at"), "reviewedBy": report.get("reviewed_by"),
+        })
+    status_order = {"new": 0, "reviewing": 1, "resolved": 2, "dismissed": 3}
+    output.sort(key=lambda row: row.get("createdAt") or "", reverse=True)
+    output.sort(key=lambda row: status_order.get(row["status"], 9))
+    return {"total": len(output), "reports": output[:limit]}
+
+
+@app.patch("/api/admin/reports/{report_id}")
+def admin_report_update(report_id: str, payload: AdminReportUpdate, authorization: Optional[str] = Header(default=None)):
+    admin = require_admin(authorization, write=True)
+    if payload.status not in ("new", "reviewing", "resolved", "dismissed"):
+        raise HTTPException(400, "Neplatný stav hlášení")
+    reports = db_select("puzzle_feedback", id=report_id)
+    if not reports or reports[0].get("kind") != "word":
+        raise HTTPException(404, "Hlášení neexistuje")
+    report = reports[0]
+    note = " ".join(str(payload.resolution_note or "").strip().split()) or None
+    values = {"status": payload.status, "resolution_note": note}
+    if payload.status == "new":
+        values.update({"reviewed_at": None, "reviewed_by": None})
+    else:
+        values.update({"reviewed_at": datetime.now(TZ).isoformat(), "reviewed_by": admin["player"]["id"]})
+    db_update("puzzle_feedback", {"id": report_id}, values)
+    record_admin_audit(admin, "word_report_status", "puzzle_feedback", report_id, {
+        "word": report.get("word"), "puzzleId": report.get("puzzle_id"),
+        "from": str(report.get("status") or "new"), "to": payload.status, "resolutionNote": note,
+    })
+    return {"ok": True, "id": report_id, **values}
+
+
+@app.get("/api/admin/audit")
+def admin_audit(
+    limit: int = Query(default=80, ge=1, le=200),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    rows = db_select_all("admin_audit_log")
+    players = {row["id"]: row for row in db_select_all("players")}
+    rows.sort(key=lambda row: parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
+    return {"entries": [{
+        "id": row.get("id"), "action": row.get("action"), "targetType": row.get("target_type"),
+        "targetId": row.get("target_id"), "details": row.get("details") or {}, "createdAt": row.get("created_at"),
+        "admin": (players.get(row.get("admin_player_id")) or {}).get("name") or "Administrátor",
+    } for row in rows[:limit]]}
+
+
+@app.get("/api/admin/quality")
 @app.get("/api/quality-report")
 def quality_report(authorization: Optional[str] = Header(default=None)):
-    auth_player(authorization)
+    require_admin(authorization)
     return build_quality_report()
 
 
+@app.get("/api/admin/quality-history")
 @app.get("/api/quality-history")
 def quality_history(authorization: Optional[str] = Header(default=None)):
-    auth_player(authorization)
+    require_admin(authorization)
     rows = db_request("GET", "quality_snapshots", params={"select": "week_start,payload,created_at", "order": "week_start.desc", "limit": "12"})
     return {"snapshots": rows}
 
@@ -1661,14 +2187,21 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
 def result(payload: ResultCreate, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
-    if payload.mode not in ("daily", "free"):
+    if payload.mode not in ("daily", "free", "starter"):
         raise HTTPException(400, "Neplatný režim")
     if payload.difficulty not in ("easy", "medium", "hard", "hardcore"):
         raise HTTPException(400, "Neplatná obtížnost")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
 
-    if payload.mode == "daily":
+    transferred_reward = False
+    if payload.mode == "starter":
+        if payload.challenge_key != f"starter:{payload.puzzle_id}":
+            raise HTTPException(400, "Neplatný klíč první úlohy")
+        if payload.daily_date:
+            raise HTTPException(400, "První úloha nemá datum")
+        points = STARTER_XP
+    elif payload.mode == "daily":
         if not payload.daily_date:
             raise HTTPException(400, "Daily výsledek musí mít datum")
         try:
@@ -1685,7 +2218,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             raise HTTPException(400, "Neplatný klíč volné úlohy")
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
         if not info:
-            raise HTTPException(400, "Neznámý slot volné úlohy")
+            raise HTTPException(400, "Neznámá úroveň volné hry")
         points, transferred_reward = claim_free_slot_points(
             player["id"], info, POINTS[payload.difficulty], payload.puzzle_id,
         )
@@ -1698,6 +2231,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
         logger.warning("Could not store puzzle run for %s", payload.attempt_id)
 
     official_completed_at = payload_completed_at(payload.completed_at)
+    daily_generation_upgrade = False
     existing = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)
     if existing:
         old = existing[0]
@@ -1708,7 +2242,18 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
             incoming_is_earlier = completion_time({"completed_at": official_completed_at}) < completion_time(old)
         except Exception:
             incoming_is_earlier = False
-        if incoming_is_earlier:
+        daily_generation_upgrade = is_daily_generation_upgrade(old, payload)
+        if daily_generation_upgrade:
+            # The date already paid its 100 XP. Replace only the official board/result so
+            # current Daily and weekly leaderboards can count the new generation.
+            db_update("results", {"id": old["id"]}, {
+                "puzzle_id": payload.puzzle_id, "difficulty": payload.difficulty,
+                "daily_date": payload.daily_date, "best_elapsed_ms": payload.elapsed_ms,
+                "best_moves": payload.moves, "hints_used": payload.hints_used,
+                "wrong_attempts": payload.wrong_attempts, "max_hint_level": payload.max_hint_level,
+                "clean_solve": effective_clean, "completed_at": official_completed_at,
+            })
+        elif incoming_is_earlier and old.get("puzzle_id") == payload.puzzle_id:
             db_update("results", {"id": old["id"]}, {
                 "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                 "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
@@ -1741,7 +2286,16 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
                 raise
             # Současné odeslání ze dvou zařízení: zachovej chronologicky první dokončení.
             old = db_select("results", player_id=player["id"], challenge_key=payload.challenge_key)[0]
-            if completion_time({"completed_at": official_completed_at}) < completion_time(old):
+            daily_generation_upgrade = is_daily_generation_upgrade(old, payload)
+            if daily_generation_upgrade:
+                db_update("results", {"id": old["id"]}, {
+                    "puzzle_id": payload.puzzle_id, "difficulty": payload.difficulty,
+                    "daily_date": payload.daily_date, "best_elapsed_ms": payload.elapsed_ms,
+                    "best_moves": payload.moves, "hints_used": payload.hints_used,
+                    "wrong_attempts": payload.wrong_attempts, "max_hint_level": payload.max_hint_level,
+                    "clean_solve": effective_clean, "completed_at": official_completed_at,
+                })
+            elif old.get("puzzle_id") == payload.puzzle_id and completion_time({"completed_at": official_completed_at}) < completion_time(old):
                 db_update("results", {"id": old["id"]}, {
                     "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                     "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
@@ -1789,6 +2343,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
         "ok": True,
         "firstCompletion": first,
         "awardedPoints": points if first else 0,
+        "dailyGenerationUpgrade": daily_generation_upgrade,
         "transferredSlot": bool(payload.mode == "free" and transferred_reward),
         "stats": stats,
         "statsWarning": stats_warning,
@@ -1856,12 +2411,11 @@ def rescue_finish(payload: RescueFinish, authorization: Optional[str] = Header(d
     row = sorted(rows, key=lambda r: str(r.get("started_at") or ""), reverse=True)[0]
     if row.get("status") != "started":
         return {"ok": row.get("status") == "passed", "state": row.get("status"), "stats": player_stats(player["id"])}
-    started = datetime.fromisoformat(str(row.get("started_at")).replace("Z", "+00:00"))
-    if started.tzinfo is None:
-        started = started.replace(tzinfo=TZ)
-    server_elapsed_ms = int(max(0, (datetime.now(TZ) - started.astimezone(TZ)).total_seconds() * 1000))
-    passed = bool(payload.completed and payload.elapsed_ms <= 30000 and server_elapsed_ms <= 35000)
-    final_elapsed = max(payload.elapsed_ms, min(server_elapsed_ms, 120000))
+    # The client clock excludes periods while the page is hidden or unfocused.
+    # Rescue results are not part of a speed leaderboard, so wall-clock time is
+    # neither a useful fairness signal nor worth penalising a phone interruption.
+    passed = bool(payload.completed and payload.elapsed_ms <= 30000)
+    final_elapsed = payload.elapsed_ms
     db_update("streak_rescues", {"id": row["id"]}, {
         "status": "passed" if passed else "failed",
         "completed_at": datetime.now(TZ).isoformat(),
@@ -1939,7 +2493,7 @@ def _family_league_week(week_offset: int = 0) -> dict:
             day_members = []
             for member in members:
                 try:
-                    created = datetime.fromisoformat(str(member.get("created_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
+                    created = datetime.fromisoformat(str(member.get("team_joined_at") or member.get("created_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
                 except Exception:
                     created = date.min
                 if created <= day_date:
@@ -1987,6 +2541,8 @@ def family_league(
         try:
             player = auth_player(authorization)
             family = norm_family(str(player.get("family_code") or ""))
+            if is_solo_player(player):
+                raise HTTPException(404, "Hráč zatím není v týmu")
             league_rows = db_select("leagues", code=family)
             members = db_select("players", family_code=family)
             league = league_rows[0] if league_rows else {}
@@ -2019,6 +2575,8 @@ def family_league(
 def family_league_settings(payload: FamilyLeagueSettings, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
     family = norm_family(str(player.get("family_code") or ""))
+    if is_solo_player(player):
+        raise HTTPException(400, "Nejdřív se připoj k týmu nebo ho založ")
     rows = db_select("leagues", code=family)
     if not rows:
         raise HTTPException(404, "Tým neexistuje")
@@ -2063,6 +2621,158 @@ def puzzle_leaderboard(
         })
     info = puzzle_info(puzzle_id)
     return {"familyCode": family, "puzzleId": puzzle_id, "difficulty": info.get("difficulty") if info else None, "level": info.get("level") if info else None, "rows": board}
+
+
+@app.get("/api/free-global-leaderboard")
+def free_global_leaderboard(
+    puzzle_id: str = Query(min_length=2, max_length=80),
+    authorization: Optional[str] = Header(default=None),
+):
+    """Privacy-safe worldwide standings for one active Free puzzle.
+
+    Every player is represented by their first completed attempt only. The
+    response deliberately contains no names, avatars, team codes or player IDs.
+    """
+    info = free_puzzle_info(puzzle_id)
+    if not info or info.get("legacy") is True:
+        raise HTTPException(404, "Aktivní volná úroveň nebyla nalezena")
+
+    runs = db_select_all("puzzle_runs", puzzle_id=puzzle_id, mode="free")
+    first_by_player: dict[str, dict] = {}
+    for row in runs:
+        player_id = str(row.get("player_id") or "")
+        if not player_id:
+            continue
+        previous = first_by_player.get(player_id)
+        if previous is None or first_run_key(row) < first_run_key(previous):
+            first_by_player[player_id] = row
+
+    ranked = sorted(first_by_player.values(), key=lambda row: (
+        *run_rank_tuple(row),
+        completion_time(row),
+        str(row.get("player_id") or ""),
+    ))
+
+    my_player_id = None
+    if authorization:
+        try:
+            my_player_id = str(auth_player(authorization)["id"])
+        except HTTPException:
+            pass
+    my_index = next(
+        (index for index, row in enumerate(ranked) if str(row.get("player_id")) == my_player_id),
+        None,
+    )
+    total = len(ranked)
+    if my_index is None:
+        visible_indices = list(range(min(3, total)))
+    else:
+        start = max(0, min(my_index - 1, total - 3))
+        visible_indices = list(range(start, min(total, start + 3)))
+
+    board = []
+    for index in visible_indices:
+        row = ranked[index]
+        board.append({
+            "rank": index + 1,
+            "isMine": index == my_index,
+            "elapsedMs": int(row.get("elapsed_ms") or 0),
+            "moves": int(row.get("moves") or 0),
+            "hintsUsed": int(row.get("hints_used") or 0),
+            "cleanSolve": row.get("clean_solve") is True,
+        })
+
+    my_rank = my_index + 1 if my_index is not None else None
+    top_percent = max(1, math.ceil(my_rank / total * 100)) if my_rank and total else None
+    return {
+        "puzzleId": puzzle_id,
+        "difficulty": info.get("difficulty"),
+        "level": info.get("level"),
+        "generation": info.get("generation"),
+        "total": total,
+        "myRank": my_rank,
+        "topPercent": top_percent,
+        "percentileMinimum": 10,
+        "rows": board,
+        "privacy": "anonymous-performance-only",
+        "attemptPolicy": "first-completed-only",
+    }
+
+
+@app.get("/api/daily-global-leaderboard")
+def daily_global_leaderboard(
+    daily_date: Optional[str] = Query(default=None),
+    authorization: Optional[str] = Header(default=None),
+):
+    """Privacy-safe global Daily standings: public performance, never player identity."""
+    selected_date = daily_date or current_prague_date().isoformat()
+    try:
+        date.fromisoformat(selected_date)
+    except ValueError:
+        raise HTTPException(400, "Neplatné datum")
+
+    primary_puzzle_id = expected_daily_puzzle_id(selected_date)
+    results = [
+        row for row in db_select("results", mode="daily", daily_date=selected_date)
+        if row.get("puzzle_id") == primary_puzzle_id
+    ]
+    # results is unique per player/challenge in the current schema. Defensive
+    # deduplication keeps historical inconsistencies out of the public board.
+    by_player: dict[str, dict] = {}
+    for row in results:
+        player_id = str(row.get("player_id") or "")
+        if not player_id:
+            continue
+        previous = by_player.get(player_id)
+        if previous is None or completion_time(row) < completion_time(previous):
+            by_player[player_id] = row
+
+    ranked = sorted(by_player.values(), key=lambda row: (
+        0 if row.get("clean_solve") is True else 1,
+        int(row.get("hints_used") or 0),
+        int(row.get("best_elapsed_ms") or 10**12),
+        int(row.get("best_moves") or 10**9),
+        completion_time(row),
+        str(row.get("player_id") or ""),
+    ))
+
+    my_player_id = None
+    if authorization:
+        try:
+            my_player_id = str(auth_player(authorization)["id"])
+        except HTTPException:
+            pass
+    my_index = next((index for index, row in enumerate(ranked) if str(row.get("player_id")) == my_player_id), None)
+    total = len(ranked)
+    if my_index is None:
+        visible_indices = list(range(min(3, total)))
+    else:
+        start = max(0, min(my_index - 1, total - 3))
+        visible_indices = list(range(start, min(total, start + 3)))
+
+    board = []
+    for index in visible_indices:
+        row = ranked[index]
+        board.append({
+            "rank": index + 1,
+            "isMine": index == my_index,
+            "elapsedMs": int(row.get("best_elapsed_ms") or 0),
+            "moves": int(row.get("best_moves") or 0),
+            "hintsUsed": int(row.get("hints_used") or 0),
+            "cleanSolve": row.get("clean_solve") is True,
+        })
+
+    my_rank = my_index + 1 if my_index is not None else None
+    top_percent = max(1, math.ceil(my_rank / total * 100)) if my_rank and total else None
+    return {
+        "date": selected_date,
+        "puzzleId": primary_puzzle_id,
+        "total": total,
+        "myRank": my_rank,
+        "topPercent": top_percent,
+        "rows": board,
+        "privacy": "anonymous-performance-only",
+    }
 
 
 @app.get("/api/played-levels")
@@ -2230,8 +2940,8 @@ def leaderboard(
                 rows.append(r)
         weekly.append({
             "id": p["id"], "name": p["name"], "avatar": p.get("avatar") or "🙂", "points": sum(int(r.get("points") or 0) for r in rows),
-            "completed": len(rows), "daily": sum(1 for r in rows if r.get("mode") == "daily"),
-            "clean": sum(1 for r in rows if r.get("clean_solve") is True),
+            "completed": sum(1 for r in rows if r.get("mode") in ("daily", "free")), "daily": sum(1 for r in rows if r.get("mode") == "daily"),
+            "clean": sum(1 for r in rows if r.get("mode") in ("daily", "free") and r.get("clean_solve") is True),
         })
     weekly.sort(key=lambda x: (-x["points"], -x["daily"], -x["clean"], x["name"].casefold()))
     for i, item in enumerate(weekly, 1):
