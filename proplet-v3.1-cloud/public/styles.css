@@ -734,7 +734,7 @@ html[data-theme="dark"] .board-stage.near-complete{background:linear-gradient(14
 html[data-theme="dark"] .board-stage.board-complete{box-shadow:0 18px 48px rgba(0,0,0,.38),0 0 0 2px rgba(114,217,183,.13) inset,var(--shadow)}
 html[data-theme="dark"] .cell{background:#292633;border-color:#403b4a;color:#f4f0fa;box-shadow:0 3px 0 rgba(0,0,0,.25),0 6px 15px rgba(0,0,0,.18)}
 html[data-theme="dark"] .cell.active{background:#3a3264;border-color:#9b8cff;box-shadow:0 0 0 4px rgba(155,140,255,.11)}
-html[data-theme="dark"] .cell.used{background:color-mix(in srgb,var(--word-color,#72d9b7) 38%,#211f2c);border-color:color-mix(in srgb,var(--word-color,#72d9b7) 62%,#4d4658);color:#faf7ff;box-shadow:0 2px 0 color-mix(in srgb,var(--word-color,#72d9b7) 30%,#101016)}
+html[data-theme="dark"] .cell.used{background:color-mix(in srgb,var(--word-color,#72d9b7) 70%,#211f2c);border-color:color-mix(in srgb,var(--word-color,#72d9b7) 78%,#342f3d);color:#0c0b10;text-shadow:0 1px 0 rgba(255,255,255,.12);box-shadow:0 2px 0 color-mix(in srgb,var(--word-color,#72d9b7) 34%,#101016)}
 html[data-theme="dark"] .cell.hint{--hint-bg:#594922}
 html[data-theme="dark"] .cell.hint-route{background:#564720!important;border-color:#c9a745!important;box-shadow:0 0 0 4px rgba(235,198,95,.14)!important}
 html[data-theme="dark"] .cell.hint-route:after{background:#8f80f2;border-color:#292633}
@@ -791,6 +791,7 @@ html[data-theme="dark"] .onboard-fill-demo span{animation-name:onboardFillDark}
 @keyframes pulseDark{50%{transform:scale(.84);background:#5a4a22;box-shadow:0 0 0 7px rgba(235,198,95,.13)}}
 html[data-theme="dark"] .cell.hint{animation-name:pulseDark}
 
+/* v3.22.1 — found-word legibility hotfix: dark ink on richer route colours. */
 /* v3.22 — secondary surfaces discovered during full-state visual pass. */
 html[data-theme="dark"] .mini-stats>div{border-color:#373241}
 html[data-theme="dark"] .win-clean{background:#214337;color:#8ce5c0}

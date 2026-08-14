@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.22.0-night-mode';
+const CACHE='proplet-v3.22.1-dark-found-text';
 const CORE=['/','/index.html','/styles.css','/app.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png'];
 
 self.addEventListener('install',e=>{
