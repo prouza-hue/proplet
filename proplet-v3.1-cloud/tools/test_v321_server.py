@@ -12,7 +12,7 @@ def test_starter_exists_and_health():
     assert server.puzzle_exists('starter-v1','free','easy') is False
     with patch.object(server,'supabase_ready',return_value=False):
         h=server.health()
-    assert h['version']=='3.21.1' and h['gameFeelSprint']=='3.21' and h['starterPuzzle'] is True and h['starterXp']==10
+    assert h['version']=='3.21.2' and h['gameFeelSprint']=='3.21' and h['starterPuzzle'] is True and h['starterXp']==10
 
 
 def test_starter_result_pays_once():
@@ -63,7 +63,7 @@ def test_starter_product_events_are_allowed():
     ):
         for event in ('starter_started','starter_hint_used','starter_completed'):
             assert server.product_event(server.ProductEventCreate(event_type=event),x_proplet_anon_id='anon')['ok']
-    assert all(row['app_version']=='3.21.1' for _,row in inserted)
+    assert all(row['app_version']=='3.21.2' for _,row in inserted)
 
 if __name__=='__main__':
     test_starter_exists_and_health();test_starter_result_pays_once();test_starter_xp_does_not_fake_game_counts();test_starter_product_events_are_allowed();print('PASS: v3.21 starter reward, stats isolation and analytics')

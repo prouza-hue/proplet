@@ -25,4 +25,4 @@ assert(src.includes("new ResizeObserver"),'board ResizeObserver missing');
 assert(src.includes("navigator.devicePosture?.addEventListener?.('change'"),'device posture listener missing');
 const css=fs.readFileSync(path.join(__dirname,'../public/styles.css'),'utf8');
 assert(css.includes('@media (min-width:540px) and (min-height:540px)'), 'real viewport tablet breakpoint missing');
-console.log('PASS: v3.21.1 Fold7 real-viewport classification, cover guard and fold reflow');
+console.log('PASS: v3.21.2 Fold7 real-viewport classification, cover guard and fold reflow');

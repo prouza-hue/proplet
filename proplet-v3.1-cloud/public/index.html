@@ -205,6 +205,11 @@
             <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
             <button id="resetBtn" class="secondary-btn">Reset</button>
           </div>
+          <div id="starterHintNudge" class="starter-hint-nudge hidden" role="status" aria-live="polite">
+            <div><strong>💡 Chceš malé postrčení?</strong><small>Je jen na tobě — můžeš dál normálně hrát.</small></div>
+            <button id="starterHintNudgeBtn" type="button">Zkusit</button>
+            <button id="starterHintNudgeDismiss" type="button" aria-label="Skrýt nabídku nápovědy">×</button>
+          </div>
         </aside>
       </div>
     </section>
@@ -212,7 +217,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.21.1</small>
+      <small class="app-version">Proplet v3.21.2</small>
     </footer>
   </main>
 
@@ -375,7 +380,7 @@
     <div class="modal-card left support-mode-modal-card">
       <button id="closeSupportModeModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">POMOCNÍK</span>
-      <h2>Kdy se má ozvat?</h2>
+      <h2>Kdy ti má Pomocník nabídnout nápovědu?</h2>
       <div class="support-choice-grid" aria-label="Čas nabídky Pomocníka">
         <button class="support-choice" data-support-mode="beginner"><span>🐣</span><div><strong>Brzy</strong><small>po 45 sekundách</small></div></button>
         <button class="support-choice" data-support-mode="younger"><span>🧒</span><div><strong>Vyváženě</strong><small>po 70 sekundách</small></div></button>

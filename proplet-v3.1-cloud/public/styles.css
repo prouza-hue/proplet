@@ -584,3 +584,15 @@ body.landscape-game-blocked #screen-game{visibility:hidden;pointer-events:none}
 #hintModal.starter-hint .hint-choice:first-of-type{border-color:#897bea;background:#f4f1ff;box-shadow:0 0 0 4px rgba(108,92,231,.06)}
 #hintModal.starter-hint .hint-choice:first-of-type strong:after{content:" · doporučeno";color:#6757d8;font-size:10px}
 .starter-mode #backFromGame{visibility:hidden}
+
+/* v3.21.2 — optional starter hint nudge */
+.game-control-column .starter-hint-nudge{grid-column:1/-1;grid-row:2}
+.starter-hint-nudge{display:grid;grid-template-columns:minmax(0,1fr) auto 28px;align-items:center;gap:8px;margin-top:8px;padding:8px 9px 8px 11px;border:1px solid #ded6fb;border-radius:13px;background:rgba(247,244,255,.96);box-shadow:0 7px 18px rgba(73,58,128,.08);font-size:11px;color:#5e5780}
+.starter-hint-nudge.hidden{display:none}
+.starter-hint-nudge div{min-width:0}.starter-hint-nudge strong{display:block;color:#51467e;font-size:11px}.starter-hint-nudge small{display:block;margin-top:2px;font-size:10px;line-height:1.25}
+.starter-hint-nudge button{border:0;border-radius:9px;font:inherit;font-weight:900;cursor:pointer}
+#starterHintNudgeBtn{padding:7px 9px;background:#6c5ce7;color:#fff}
+#starterHintNudgeDismiss{width:28px;height:28px;background:transparent;color:#77718c;font-size:18px}
+@media(prefers-reduced-motion:reduce){#hintBtn.starter-attention{animation:none!important}}
+
+@media (min-width:540px) and (min-height:540px){.game-control-column{grid-template-rows:minmax(0,1fr) auto auto}.game-control-column .starter-hint-nudge{grid-row:2}.game-control-column .game-actions{grid-row:3}}
