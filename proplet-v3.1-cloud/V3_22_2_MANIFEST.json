@@ -1,0 +1,23 @@
+{
+  "version": "3.22.2",
+  "baseVersion": "3.22.1",
+  "scope": "dark found-row chip legibility micro-hotfix",
+  "sqlRequired": false,
+  "puzzleContentChanged": false,
+  "files": {
+    "server.py": "613df864eee00da94ef46e47577dad10016f6eceb3ab15c584a6f7a8bee6ef5e",
+    "public/app.js": "e0958a3e9dfe5175195d046f4eeb8bea27da653149f8f396832bef17e06d17af",
+    "public/index.html": "e1e63b28383b79ec64b9af19116486e1210f94c6b879604d9693dfdda9fc4f71",
+    "public/styles.css": "fc394bf343754a1dd782842459caa408781cfb70c82d4be06762ff6f91bbba96",
+    "public/sw.js": "a82827d4af9e486ac7bd10184016db68607301948e1eccfd53ecbe9c17946544",
+    "data/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "public/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "SUPABASE_MIGRATION_V3_21.sql": "739f0b7b48fd3c18577b25b5ded7a9ca52f7ca01520f3b70e38adfbce884bed3"
+  },
+  "checks": {
+    "darkFoundCellTextHotfixPreserved": true,
+    "darkFoundChipTextHotfix": true,
+    "orientationBlocking": false,
+    "foundChipMinContrast": "4.78:1"
+  }
+}
