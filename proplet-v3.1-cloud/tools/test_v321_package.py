@@ -7,8 +7,8 @@ ROOT=Path(__file__).resolve().parents[1]
 required=['server.py','public/app.js','public/index.html','public/styles.css','public/sw.js','SUPABASE_MIGRATION_V3_21.sql','data/puzzles.json','public/puzzles.json']
 for f in required: assert (ROOT/f).exists(), f
 server=(ROOT/'server.py').read_text(); app=(ROOT/'public/app.js').read_text(); html=(ROOT/'public/index.html').read_text(); css=(ROOT/'public/styles.css').read_text(); sw=(ROOT/'public/sw.js').read_text(); sql=(ROOT/'SUPABASE_MIGRATION_V3_21.sql').read_text()
-assert 'version="3.21.0-cloud"' in server and '"version": "3.21.0"' in server
-assert "const APP_VERSION='3.21.0'" in app and 'Proplet v3.21' in html and 'proplet-v3.21-first-touch' in sw
+assert 'version="3.21.1-cloud"' in server and '"version": "3.21.1"' in server
+assert "const APP_VERSION='3.21.1'" in app and 'Proplet v3.21' in html and 'proplet-v3.21.1-fold-hotfix' in sw
 assert 'gameFeelSprint' in server and 'starterXp' in server and 'starterMigration' in server
 assert "mode in ('daily','free','starter')" in sql and "'starter-v1'" in sql and '10' in sql
 

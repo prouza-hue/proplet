@@ -1,4 +1,4 @@
-const APP_VERSION='3.21.0';
+const APP_VERSION='3.21.1';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -376,11 +376,17 @@ function isPhoneLikeDevice(){
  try{if(typeof navigator!=='undefined'&&navigator.userAgentData&&typeof navigator.userAgentData.mobile==='boolean')return navigator.userAgentData.mobile}catch{}
  const ua=typeof navigator!=='undefined'?String(navigator.userAgent||''):'';return /Android.*Mobile|iPhone|iPod|Windows Phone|Mobile/i.test(ua);
 }
+function isHandheldLikeDevice(){
+ let coarse=false;try{coarse=!!window.matchMedia?.('(pointer: coarse)')?.matches}catch{}
+ return coarse||isPhoneLikeDevice();
+}
 function landscapeViewport(){
  const vv=typeof window!=='undefined'?window.visualViewport:null,w=Math.round(vv?.width||window.innerWidth||0),h=Math.round(vv?.height||window.innerHeight||0);return {w,h,landscape:w>h};
 }
-function isTabletSizedViewport(w,h){const short=Math.min(Number(w)||0,Number(h)||0),long=Math.max(Number(w)||0,Number(h)||0);return short>=700&&long>=820}
-function shouldBlockPhoneLandscape(screen,game,w,h,mobile=isPhoneLikeDevice()){return screen==='game'&&!!game&&!game.finished&&!!mobile&&!isTabletSizedViewport(w,h)&&Number(w)>Number(h)}
+// A Fold inner display is close to square and Chrome UI can shrink its *real* viewport
+// well below the panel's nominal CSS resolution. Classify by both usable sides, not UA.
+function isTabletSizedViewport(w,h){const short=Math.min(Number(w)||0,Number(h)||0),long=Math.max(Number(w)||0,Number(h)||0);return short>=540&&long>=700}
+function shouldBlockPhoneLandscape(screen,game,w,h,handheld=isHandheldLikeDevice()){return screen==='game'&&!!game&&!game.finished&&!!handheld&&!isTabletSizedViewport(w,h)&&Number(w)>Number(h)}
 function updateLandscapeGameBlocker(){
  const blocker=$('#landscapeGameBlocker');if(!blocker)return false;const {w,h}=landscapeViewport(),blocked=shouldBlockPhoneLandscape(currentScreen,currentGame,w,h),was=document.body.classList.contains('landscape-game-blocked');
  document.body.classList.toggle('landscape-game-blocked',blocked);blocker.setAttribute('aria-hidden',blocked?'false':'true');
@@ -1116,7 +1122,12 @@ function bind(){
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>pendingSW?.postMessage({type:'SKIP_WAITING'});
  $('#soundToggle').onclick=()=>{const s=getSettings();s.sound=!s.sound;saveSettings(s);renderSettings();if(s.sound){ensureAudio();tone(620,.08,.02)}};$('#hapticToggle').onclick=()=>{const s=getSettings();s.haptics=!s.haptics;saveSettings(s);renderSettings();if(s.haptics)vibrate(45)};$('#hapticTestBtn').onclick=testHaptics;$('#replayIntroBtn').onclick=()=>openOnboarding(true);
- $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);const handleViewportChange=()=>{const blocked=updateLandscapeGameBlocker();if(!blocked){fitGameBoard();drawPaths()}};window.addEventListener('resize',handleViewportChange);window.addEventListener('orientationchange',()=>setTimeout(handleViewportChange,80));window.visualViewport?.addEventListener?.('resize',handleViewportChange);window.addEventListener('online',()=>syncQueue({announce:false}));
+ $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);
+ const handleViewportChange=()=>{const blocked=updateLandscapeGameBlocker();if(!blocked){fitGameBoard();drawPaths()}};
+ const settleViewportChange=()=>{handleViewportChange();[60,180,420].forEach(ms=>setTimeout(handleViewportChange,ms))};
+ window.addEventListener('resize',settleViewportChange);window.addEventListener('orientationchange',settleViewportChange);window.visualViewport?.addEventListener?.('resize',settleViewportChange);navigator.devicePosture?.addEventListener?.('change',settleViewportChange);
+ if(typeof ResizeObserver!=='undefined'){const stage=$('#boardStage');if(stage){const ro=new ResizeObserver(()=>{if(currentScreen==='game'&&!document.body.classList.contains('landscape-game-blocked'))requestAnimationFrame(()=>{fitGameBoard();drawPaths()})});ro.observe(stage);window.__propletBoardResizeObserver=ro}}
+ window.addEventListener('online',()=>syncQueue({announce:false}));
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){pauseGameClock('hidden');sendAttemptCheckpoint('leave')}else{resumeGameClock();if(getQueue().length)syncQueue({announce:false})}});window.addEventListener('blur',()=>pauseGameClock('blur'));window.addEventListener('focus',resumeGameClock);window.addEventListener('pagehide',()=>{pauseGameClock('pagehide');sendAttemptCheckpoint('leave')});
 }
 
@@ -1127,4 +1138,4 @@ async function boot(){
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily()}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }
 if(typeof window!=='undefined'&&typeof document!=='undefined')boot();
-if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,CLEAN_PRAISE,stableTextIndex,completionPraise,isPhoneLikeDevice,isTabletSizedViewport,shouldBlockPhoneLandscape};
+if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,CLEAN_PRAISE,stableTextIndex,completionPraise,isPhoneLikeDevice,isHandheldLikeDevice,isTabletSizedViewport,shouldBlockPhoneLandscape};

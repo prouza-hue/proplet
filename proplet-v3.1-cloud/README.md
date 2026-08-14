@@ -1,9 +1,10 @@
-# Proplet v3.21
+# Proplet v3.21.1
 
-Aktuální release: **v3.21 — First Touch & Game Feel**.
+Aktuální release: **v3.21.1 — Fold viewport hotfix** nad v3.21 First Touch & Game Feel.
 
 Hlavní novinky:
 
+- v3.21.1 opravuje reálný Fold7 viewport: rozložený režim je tablet, složený landscape zůstává chráněný a fold/unfold spouští stabilní reflow,
 - v3.21 přidává samostatný kurátorovaný první Proplet 5×5 (MRAK / JABLKO / ČOKOLÁDA / AUTOBUS), který po onboardingu rovnou učí hru hraním a dává skutečných 10 XP,
 - dokončená deska dostává jemný ambientní progres a krátký solved-board moment před výsledkovkou,
 - chybné cesty jsou lokálně viditelné, tahy kratší než 4 písmena se nepenalizují a Reset má bezpečné `VRÁTIT`,

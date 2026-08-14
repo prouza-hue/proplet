@@ -1,0 +1,67 @@
+{
+  "version": "3.21.1",
+  "base": "3.21.0",
+  "sqlRequired": false,
+  "runtimeChanged": [
+    "server.py",
+    "public/app.js",
+    "public/index.html",
+    "public/styles.css",
+    "public/sw.js"
+  ],
+  "files": {
+    "server.py": {
+      "sha256": "c2a32f3f5b345267ec5c815c91387a92a4b72f84dac91ade9279d133bb15b97e",
+      "bytes": 138385
+    },
+    "public/app.js": {
+      "sha256": "22a03998b2a4ffd10cb39505273cc3dc126e00ba122f86529d79909d716fb755",
+      "bytes": 175922
+    },
+    "public/index.html": {
+      "sha256": "903e48e6f590023f34b5ac8184327f8c3d63584c4329c9f6b313cc1ed57c41ec",
+      "bytes": 30021
+    },
+    "public/styles.css": {
+      "sha256": "5d0a1bde5641ca3b47d698806d17ec8cdbacd23f9ecf4823e49721f4b38a2591",
+      "bytes": 88416
+    },
+    "public/sw.js": {
+      "sha256": "f4abfc0ba0fea08bf1ab33554d34d829b382e4292066a1a0f7899155ee5f5d17",
+      "bytes": 2115
+    },
+    "README.md": {
+      "sha256": "6ce28e17280d367be749e9d994f17b4592a330a09a6d8fa105cc7dcf20fde58c",
+      "bytes": 5553
+    },
+    "UPDATE_V3_21_1_CZ.md": {
+      "sha256": "c337bf14e09b52f54ab13b8b2a5a8e44ccf52eb4b930d052352ee025beccb84c",
+      "bytes": 2100
+    },
+    "RELEASE_V3_21_1_CZ.md": {
+      "sha256": "353b29b4df1748fba5073a77265f4927a229e95b058265d7d2a690f70750dda4",
+      "bytes": 712
+    },
+    "QA_V3_21_1_CZ.md": {
+      "sha256": "2b20e7c3ca81b0c78b5ef383665774265e76ef6595b1f218143fa7fbac13efc0",
+      "bytes": 1659
+    },
+    "tools/test_v3211_fold.js": {
+      "sha256": "b0eb1348ddcc7aae9c570dbd2835543e5e28d8c1a8cd55f3e2892cd1c4c5ceb6",
+      "bytes": 2488
+    },
+    "tools/test_v321_server.py": {
+      "sha256": "d0f3a6515a02a7d391f0fbf633f956ee02b88bafe5d7bdb9c2ea5261c0c6401f",
+      "bytes": 3402
+    },
+    "tools/test_v321_package.py": {
+      "sha256": "96bc79aa32af0bbc4669742b5c49f947a7d3911becfb94297e14fbc79e2e727a",
+      "bytes": 4604
+    }
+  },
+  "unchangedIntegrity": {
+    "data/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "public/puzzles.json": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23",
+    "SUPABASE_MIGRATION_V3_21.sql": "739f0b7b48fd3c18577b25b5ded7a9ca52f7ca01520f3b70e38adfbce884bed3"
+  }
+}

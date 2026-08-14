@@ -59,7 +59,7 @@ body.playing .ambient{opacity:.28}
 @keyframes hintGlow{to{transform:scale(.94)}}
 
 /* Large Fold / tablet: board and controls sit side-by-side and fill the viewport. */
-@media (min-width:700px) and (min-height:560px){
+@media (min-width:540px) and (min-height:540px){
  body.playing .app-shell{padding-left:14px;padding-right:14px}
  .game-screen.active{gap:9px}
  .game-main{grid-template-columns:minmax(0,1fr) 230px;grid-template-rows:minmax(0,1fr);gap:10px}
@@ -99,7 +99,7 @@ body.playing .ambient{opacity:.28}
 .game-screen.rescue-mode .game-actions{display:none}
 
 /* Fold/tablet: use width instead of turning the game into a tall phone column. */
-@media (min-width:700px) and (min-height:560px){
+@media (min-width:540px) and (min-height:540px){
  .game-main{grid-template-columns:minmax(0,1fr) clamp(205px,28vw,285px);grid-template-rows:minmax(0,1fr);gap:10px}
  .game-control-column{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;height:100%;align-content:stretch}
  .current-word{grid-row:1;min-height:94px;padding:13px}.current-word strong{font-size:clamp(23px,3.2vw,31px);margin-top:6px}
@@ -238,7 +238,7 @@ body.playing .app-header,body.playing .app-footer,body.playing .bottom-nav{displ
 .game-screen.rescue-mode .game-actions{display:none}
 .word-status-wrap{gap:3px}.word-status-row{grid-template-columns:58px minmax(0,1fr);gap:5px}.found-row{padding-top:3px}.found-word-chip,.remaining-row .length-pill{min-height:20px;height:20px;padding:1px 5px;font-size:8px}.game-progress{font-size:14px}
 
-@media (min-width:700px) and (min-height:560px){
+@media (min-width:540px) and (min-height:540px){
  body.playing .app-shell{padding-left:14px;padding-right:14px}
  .game-main{grid-template-columns:minmax(0,1fr) clamp(165px,21vw,220px);grid-template-rows:minmax(0,1fr);gap:9px}
  .game-control-column{height:100%;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:7px;align-items:stretch}
