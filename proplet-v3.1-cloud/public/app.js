@@ -1,4 +1,4 @@
-const APP_VERSION='3.22.4';
+const APP_VERSION='3.23.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -188,7 +188,7 @@ const ACHIEVEMENTS=[
 ACHIEVEMENTS.forEach(a=>a.test=s=>a.value(s)>=a.target);
 function achievementCard(a,stats){const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}
 function renderAchievements(stats){return ACHIEVEMENT_GROUPS.map(([id,label])=>{const list=ACHIEVEMENTS.filter(a=>a.group===id);if(!list.length)return '';const earned=list.filter(a=>a.test(stats)).length;return `<section class="achievement-group"><div class="achievement-group-head"><strong>${label}</strong><span>${earned}/${list.length}</span></div><div class="achievement-grid">${list.map(a=>achievementCard(a,stats)).join('')}</div></section>`}).join('')}
-const SHARE_URL='https://proplet-nine.vercel.app/';
+const SHARE_URL=typeof location!=='undefined'?`${location.origin}/`:'https://proplet-nine.vercel.app/';
 const STORE_KEY='proplet-v2-state';
 const PROFILE_KEY='proplet-v2-profile';
 const QUEUE_KEY='proplet-v2-sync-queue';
@@ -722,7 +722,7 @@ async function api(path,opts={}){
  const p=getProfile(),headers={'Content-Type':'application/json',...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);let r;
  try{r=await fetch(path,{...opts,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}
- clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`;try{const body=await r.json();msg=body.detail||body.message||msg}catch{}throw new Error(msg)}return r.json();
+ clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;throw new Error(msg)}return r.json();
 }
 function trackProductEvent(eventType){api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}
 
@@ -760,6 +760,48 @@ async function refreshRemoteProfile({throwOnError=false}={}){
   saveProfile({...p,name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
   return me;
  }catch(e){if(throwOnError)throw e;return null}
+}
+
+
+function renderPrivacyActions(){
+ const p=getProfile();$('#exportDataBtn')?.classList.toggle('hidden',!p?.token);$('#deleteAccountBtn')?.classList.toggle('hidden',!p?.token);
+}
+function openSupportReport(){
+ $('#supportReportCategory').value='bug';$('#supportReportMessage').value='';$('#supportReportReply').value='';$('#supportReportError').textContent='';$('#supportReportModal').classList.remove('hidden');setTimeout(()=>$('#supportReportMessage')?.focus(),0);
+}
+async function saveSupportReport(){
+ const category=$('#supportReportCategory').value,message=$('#supportReportMessage').value.trim(),reply_to=$('#supportReportReply').value.trim(),button=$('#saveSupportReportBtn');$('#supportReportError').textContent='';
+ if(message.length<3){$('#supportReportError').textContent='Napiš prosím aspoň krátce, co se stalo.';return}
+ button.disabled=true;button.textContent='Odesílám…';
+ try{await api('/api/support-report',{method:'POST',body:JSON.stringify({category,message,reply_to:reply_to||null,page:`${location.pathname}${location.search}`.slice(0,120)})});$('#supportReportModal').classList.add('hidden');showToast('Hlášení dorazilo. Díky, podívám se na něj ✓')}catch(e){$('#supportReportError').textContent=e.message}finally{button.disabled=false;button.textContent='Odeslat hlášení'}
+}
+async function exportAccountData(){
+ const p=getProfile();if(!p?.token){openProfileModal('login');return}
+ const button=$('#exportDataBtn');button.disabled=true;button.textContent='Připravuji export…';
+ try{const data=await api('/api/account/export'),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`proplet-data-${pragueDateISO()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('Export dat je připravený ✓')}catch(e){showToast(e.message)}finally{button.disabled=false;button.textContent='⬇ Export mých dat'}
+}
+function openDeleteAccount(){
+ const p=getProfile();if(!p?.token){openProfileModal('login');return}$('#deleteAccountConfirm').value='';$('#deleteAccountPassword').value='';$('#deleteAccountError').textContent='';$('#deleteAccountPasswordLabel').classList.toggle('hidden',!p.hasPassword);$('#deleteAccountModal').classList.remove('hidden');setTimeout(()=>$('#deleteAccountConfirm')?.focus(),0);
+}
+async function deleteAccount(){
+ const p=getProfile();if(!p?.token)return;const confirmation=$('#deleteAccountConfirm').value.trim(),password=$('#deleteAccountPassword').value,button=$('#confirmDeleteAccountBtn');$('#deleteAccountError').textContent='';
+ if(confirmation.toLocaleUpperCase('cs-CZ')!=='SMAZAT'){ $('#deleteAccountError').textContent='Pro potvrzení napiš přesně SMAZAT.';return }
+ if(p.hasPassword&&!password){$('#deleteAccountError').textContent='Zadej také své heslo.';return}
+ button.disabled=true;button.textContent='Mažu účet…';const deletedId=p.id;
+ try{
+  await api('/api/account',{method:'DELETE',body:JSON.stringify({confirmation:'SMAZAT',password:p.hasPassword?password:null})});
+  try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch{}
+  try{const reg=await navigator.serviceWorker?.ready,sub=await reg?.pushManager?.getSubscription?.();if(sub)await sub.unsubscribe()}catch{}
+  localStorage.removeItem(PROFILE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
+ }catch(e){$('#deleteAccountError').textContent=e.message}finally{button.disabled=false;button.textContent='Trvale smazat účet'}
+}
+let reportingClientError=false;
+function reportClientError(code,message){
+ if(reportingClientError||!navigator.onLine)return;reportingClientError=true;const p=getProfile(),headers={'Content-Type':'application/json'};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();
+ fetch('/api/client-error',{method:'POST',headers,body:JSON.stringify({code:String(code||'client_error').slice(0,80),message:String(message||'').slice(0,200),route:`${location.pathname}${location.search}`.slice(0,120)}),keepalive:true,cache:'no-store'}).catch(()=>{}).finally(()=>{reportingClientError=false});
+}
+function bindClientErrorReporting(){
+ window.addEventListener('error',e=>reportClientError('window_error',e?.message||'JavaScript error'));window.addEventListener('unhandledrejection',e=>{const r=e?.reason;reportClientError('unhandled_rejection',r?.message||String(r||'Promise rejection'))});
 }
 
 function updateProfileChip(){const p=getProfile(),chip=$('#profileChip');$('#profileChipText').textContent=p?.name||'Uložit';const a=$('#profileChipAvatar');if(a)a.textContent=p?.avatar||'☁️';if(chip)chip.setAttribute('aria-label',p?`Profil hráče ${p.name}`:'Uložit postup do účtu')}
@@ -825,7 +867,7 @@ function renderProfile(){
   $('#profileCard').innerHTML=`<div class="profile-summary"><div class="profile-identity"><div class="profile-avatar-big">${esc(p.avatar||'🙂')}</div><div><div class="profile-name">${esc(p.name)}</div><div class="profile-family">${inTeam?`Tým: ${esc(p.leagueName||p.familyCode)}`:'Bez týmu · účet je uložený'}</div></div></div><div class="streak-bubble"><span class="streak-icon">🔥</span><strong>${stats.currentStreak||0}</strong><small>${czPlural(stats.currentStreak||0,'den','dny','dní')}</small></div></div><div class="avatar-picker"><span class="stat-label">TVŮJ AVATAR</span><div class="avatar-grid">${avatars}</div></div><div class="profile-grid"><div class="profile-stat"><span class="stat-label">XP</span><strong>${stats.points??local.points}</strong></div><div class="profile-stat profile-rank-stat"><span class="stat-label">Hodnost</span><div class="profile-rank-value"><span class="profile-rank-icon">${level.current.icon}</span><strong>${level.index} · ${esc(level.current.name)}</strong></div></div><div class="profile-stat profile-stat-wide"><span class="stat-label">Hotovo</span><div class="profile-completion-grid"><span><b>${stats.freeCompleted?.easy??local.freeCompleted?.easy??0}</b><small>🌱 Snadná</small></span><span><b>${stats.freeCompleted?.medium??local.freeCompleted?.medium??0}</b><small>🧠 Střední</small></span><span><b>${stats.freeCompleted?.hard??local.freeCompleted?.hard??0}</b><small>🔥 Těžká</small></span><span><b>${stats.freeCompleted?.hardcore??local.freeCompleted?.hardcore??0}</b><small>🤯 Mozkožrout</small></span></div></div><div class="profile-stat profile-stat-wide profile-daily-highlights"><span><small>Denní výzvy</small><b>${stats.dailyCompleted??local.dailyCompleted}</b></span><span><small>Nejdelší série</small><b>${stats.longestStreak??local.longestStreak}</b></span><span><small>Nejlepší Daily</small><b>${fmtTime(stats.bestDailyMs??local.bestDailyMs)}</b></span></div></div>${account}<div class="support-mode-card"><div><span class="stat-label">POMOCNÍK</span><strong>${SUPPORT_MODES[p.supportMode||'none']?.icon||'🧠'} ${esc(SUPPORT_MODES[p.supportMode||'none']?.label||'Nenabízet')}</strong><small>${esc(SUPPORT_MODES[p.supportMode||'none']?.desc||'')}</small></div><button id="supportModeBtn" class="secondary-btn">Nastavit</button></div>${teamAccess}<a id="adminEntryBtn" class="admin-entry hidden" href="/admin"><span>🛠</span><div><strong>Proplet Admin</strong><small>Quality, hlášení a uživatelé</small></div><b>→</b></a><div class="sync-panel"><div class="sync-status ${cls}"><div><strong>${esc(status[0])}</strong><div>${esc(status[1])}</div></div><span>${syncState.status==='syncing'?'↻':q.length?'☁️':'✓'}</span></div><button id="syncBtn" class="secondary-btn" ${syncState.status==='syncing'?'disabled':''}>${syncState.status==='syncing'?'Synchronizuji…':`Synchronizovat${q.length?` (${q.length})`:''}`}</button></div><button id="logoutBtn" class="logout-btn">Odhlásit hráče z tohoto zařízení</button>`;
   setTimeout(()=>{$('#syncBtn')&&($('#syncBtn').onclick=()=>syncQueue({announce:true}));$('#setPasswordBtn')&&($('#setPasswordBtn').onclick=openPasswordModal);$('#supportModeBtn')&&($('#supportModeBtn').onclick=openSupportModeModal);$('#teamPinBtn')&&($('#teamPinBtn').onclick=openTeamPinModal);$('#joinTeamBtn')&&($('#joinTeamBtn').onclick=openTeamMembershipModal);$('#logoutBtn')&&($('#logoutBtn').onclick=logoutPlayer);$$('.avatar-choice').forEach(b=>b.onclick=()=>saveAvatar(b.dataset.avatar));refreshAdminEntry()},0);
  }
- const points=stats.points||0,longest=stats.longestStreak??local.longestStreak;$('#levelRoadmap').innerHTML=LEVELS.map((l,i)=>`<div class="level-step ${points>=l.xp?'earned':''} ${i===level.index-1?'current':''}"><span class="level-num">${i+1}</span><span class="level-step-icon">${l.icon}</span><strong>${l.name}</strong><small>${l.xp.toLocaleString('cs-CZ')} XP</small></div>`).join('');$('#profileBadges').innerHTML=BADGES.map(b=>`<div class="profile-badge ${longest>=b.days?'earned':''}"><span class="emoji">${b.icon}</span><strong>${b.name}</strong><small>${countCz(b.days,'den','dny','dní')} v řadě</small></div>`).join('');updatePushUI();$('#achievementGrid').innerHTML=renderAchievements(stats);renderSettings();
+ const points=stats.points||0,longest=stats.longestStreak??local.longestStreak;$('#levelRoadmap').innerHTML=LEVELS.map((l,i)=>`<div class="level-step ${points>=l.xp?'earned':''} ${i===level.index-1?'current':''}"><span class="level-num">${i+1}</span><span class="level-step-icon">${l.icon}</span><strong>${l.name}</strong><small>${l.xp.toLocaleString('cs-CZ')} XP</small></div>`).join('');$('#profileBadges').innerHTML=BADGES.map(b=>`<div class="profile-badge ${longest>=b.days?'earned':''}"><span class="emoji">${b.icon}</span><strong>${b.name}</strong><small>${countCz(b.days,'den','dny','dní')} v řadě</small></div>`).join('');updatePushUI();$('#achievementGrid').innerHTML=renderAchievements(stats);renderSettings();renderPrivacyActions();
 }
 
 function supportOutcomeHtml(mode,compact=false){const cfg=SUPPORT_MODES[mode]||SUPPORT_MODES.none;if(compact){if(!cfg.seconds)return '<strong>Pomocník nic sám nenabídne.</strong>Nápověda zůstane vždy po ruce.';return `<strong>Po ${cfg.seconds} s bez nového slova nabídne pomoc.</strong>Bez souhlasu nic neukáže.`}if(!cfg.seconds)return '<strong>Pomocník ti pomoc sám nenabídne.</strong>Tlačítko Nápověda zůstane během hry kdykoli dostupné.';return `<strong>Po ${cfg.seconds} sekundách bez nového slova nabídne malé postrčení.</strong>Když souhlasíš, ukáže startovní políčko, první písmeno a délku jednoho slova. Bez souhlasu neukáže nic.`}
@@ -1118,6 +1160,8 @@ function bind(){
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>pendingSW?.postMessage({type:'SKIP_WAITING'});
+ $('#reportIssueBtn').onclick=openSupportReport;$('#closeSupportReportModal').onclick=()=>$('#supportReportModal').classList.add('hidden');$('#saveSupportReportBtn').onclick=saveSupportReport;$('#supportReportModal').onclick=e=>{if(e.target===$('#supportReportModal'))$('#supportReportModal').classList.add('hidden')};$('#exportDataBtn').onclick=exportAccountData;$('#deleteAccountBtn').onclick=openDeleteAccount;$('#closeDeleteAccountModal').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#cancelDeleteAccountBtn').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#confirmDeleteAccountBtn').onclick=deleteAccount;$('#deleteAccountModal').onclick=e=>{if(e.target===$('#deleteAccountModal'))$('#deleteAccountModal').classList.add('hidden')};
+ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
  $$('[data-theme-mode]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeMode,{persist:true}));
  $('#soundToggle').onclick=()=>{const s=getSettings();s.sound=!s.sound;saveSettings(s);renderSettings();if(s.sound){ensureAudio();tone(620,.08,.02)}};$('#hapticToggle').onclick=()=>{const s=getSettings();s.haptics=!s.haptics;saveSettings(s);renderSettings();if(s.haptics)vibrate(45)};$('#hapticTestBtn').onclick=testHaptics;$('#replayIntroBtn').onclick=()=>openOnboarding(true);
  $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);
@@ -1134,7 +1178,7 @@ function bind(){
 async function boot(){
  applyTheme(getSettings().theme);
  try{puzzleDB=await fetch('/puzzles.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error();return r.json()})}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Spusť aplikaci přes server podle README.</p></main>';return}
- document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();initNavigation();updateProfileChip();trackProductEvent('app_open');renderDaily();renderFree();renderProfile();syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
+ document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();bindClientErrorReporting();initNavigation();updateProfileChip();trackProductEvent('app_open');renderDaily();renderFree();renderProfile();syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily()}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }

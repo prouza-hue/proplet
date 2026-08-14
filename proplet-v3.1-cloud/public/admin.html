@@ -3,16 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#2e294b" />
+  <meta name="theme-color" content="#2e294b" data-light-color="#2e294b" />
   <meta name="color-scheme" content="light dark" />
-  <script>
-    (()=>{
-      const media=window.matchMedia?.('(prefers-color-scheme: dark)');
-      const apply=()=>{try{const s=JSON.parse(localStorage.getItem('proplet-v3-settings')||'{}');const pref=['auto','light','dark'].includes(s.theme)?s.theme:'auto';const dark=pref==='dark'||(pref==='auto'&&media?.matches);document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#111019':'#2e294b')}catch{}};
-      apply();media?.addEventListener?.('change',apply);window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
-    })();
-  </script>
-  <style>html[data-theme="dark"],html[data-theme="dark"] body{background:#111019;color:#f4f0fa}</style>
+  <script src="/theme-init.js"></script>
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <title>Proplet Admin</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -41,7 +34,8 @@
 
     <div id="adminApp" class="admin-layout hidden">
       <nav class="admin-nav" aria-label="Administrace">
-        <button class="active" data-tab="overview"><span>◉</span>Přehled</button>
+        <button class="active" data-tab="launch"><span>🚀</span>Launch <b id="launchAlertBadge" class="nav-badge hidden">0</b></button>
+        <button data-tab="overview"><span>◉</span>Přehled</button>
         <button data-tab="quality"><span>◇</span>Quality</button>
         <button data-tab="reports"><span>⚑</span>Hlášení <b id="reportBadge" class="nav-badge hidden">0</b></button>
         <button data-tab="users"><span>◎</span>Uživatelé</button>
@@ -49,7 +43,14 @@
       </nav>
 
       <div class="admin-content">
-        <section id="tab-overview" class="admin-tab active">
+        <section id="tab-launch" class="admin-tab active">
+          <div class="page-head"><div><p class="eyebrow">LINKEDIN LAUNCH</p><h1>Launch radar</h1><p class="muted">Funnel, návraty a chyby, které potřebuješ vidět dřív než komentář na LinkedInu.</p></div><button class="ghost-button" data-refresh="launch">Obnovit</button></div>
+          <div id="launchContent" class="loading-panel panel">Načítám launch radar…</div>
+          <div class="page-head launch-support-head"><div><p class="eyebrow">SUPPORT</p><h2>Hlášení hráčů</h2><p class="muted">Technické chyby, účty, soukromí i nápady z jednoho místa.</p></div><button class="ghost-button" id="refreshSupportBtn">Obnovit</button></div>
+          <div id="launchSupportContent" class="loading-panel panel">Načítám hlášení…</div>
+        </section>
+
+        <section id="tab-overview" class="admin-tab">
           <div class="page-head"><div><p class="eyebrow">CO SE DĚJE</p><h1>Přehled</h1><p class="muted">Nejdůležitější čísla bez datového cirkusu.</p></div><button class="ghost-button" data-refresh="overview">Obnovit</button></div>
           <div id="overviewContent" class="loading-panel panel">Načítám Proplet pod rentgenem…</div>
         </section>

@@ -6,6 +6,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import secrets
 import uuid
 from datetime import date, datetime, timedelta
@@ -52,26 +53,72 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 STARTER_XP = 10
+APP_VERSION = "3.23.0"
+MAX_REQUEST_BYTES = 64 * 1024
+SECONDARY_SESSION_DAYS = 180
 
-app = FastAPI(title="Proplet API", version="3.22.4-cloud")
+app = FastAPI(
+    title="Proplet API",
+    version=f"{APP_VERSION}-cloud",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 logger = logging.getLogger("proplet")
 
 
+@app.middleware("http")
+async def launch_safety_middleware(request: Request, call_next):
+    incoming_id = request.headers.get("x-request-id") or ""
+    request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
+    request.state.request_id = request_id
+    if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        try:
+            content_length = int(request.headers.get("content-length") or 0)
+        except ValueError:
+            content_length = 0
+        too_large = content_length > MAX_REQUEST_BYTES
+        if not too_large:
+            # Do not trust Content-Length alone: proxies/clients may omit it. Starlette caches
+            # request.body(), so downstream FastAPI/Pydantic can safely parse the same bytes.
+            try:
+                too_large = len(await request.body()) > MAX_REQUEST_BYTES
+            except Exception:
+                too_large = False
+        if too_large:
+            return JSONResponse(
+                status_code=413,
+                content={"detail": "Požadavek je příliš velký", "requestId": request_id},
+                headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+            )
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 @app.exception_handler(Exception)
-async def unexpected_error_handler(request, exc: Exception):
-    # V osobním projektu je užitečnější bezpečný diagnostický detail než anonymní 500.
-    # Případné tajné hodnoty před odesláním do browseru odstraníme.
-    logger.exception("Unhandled Proplet error on %s", getattr(request, "url", "unknown"))
-    detail = f"{type(exc).__name__}: {str(exc)}"
-    if SUPABASE_SECRET_KEY:
-        detail = detail.replace(SUPABASE_SECRET_KEY, "[secret]")
-    if SUPABASE_URL:
-        detail = detail.replace(SUPABASE_URL, "[supabase]")
-    if VAPID_PRIVATE_KEY:
-        detail = detail.replace(VAPID_PRIVATE_KEY, "[vapid-secret]")
-    if CRON_SECRET:
-        detail = detail.replace(CRON_SECRET, "[cron-secret]")
-    return JSONResponse(status_code=500, content={"detail": f"Interní chyba serveru: {detail[:220]}"})
+async def unexpected_error_handler(request: Request, exc: Exception):
+    # Public launch: never send exception types/messages or infrastructure details to the browser.
+    request_id = getattr(request.state, "request_id", None) or secrets.token_hex(8)
+    logger.exception("Unhandled Proplet error request_id=%s route=%s", request_id, request.url.path)
+    try:
+        record_operational_event(
+            "server_error",
+            severity="error",
+            request_id=request_id,
+            route=request.url.path,
+            actor_kind="network",
+            code=type(exc).__name__,
+        )
+    except Exception:
+        pass
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Interní chyba serveru. Zkus to prosím znovu.", "requestId": request_id},
+        headers={"X-Request-ID": request_id},
+    )
 
 
 class PlayerCreate(BaseModel):
@@ -205,6 +252,29 @@ class FeedbackCreate(BaseModel):
     note: Optional[str] = Field(default=None, max_length=300)
 
 
+class SupportReportCreate(BaseModel):
+    category: str = Field(pattern="^(bug|account|privacy|idea|other)$")
+    message: str = Field(min_length=3, max_length=1200)
+    reply_to: Optional[str] = Field(default=None, max_length=160)
+    page: Optional[str] = Field(default=None, max_length=120)
+
+
+class SupportReportUpdate(BaseModel):
+    status: str = Field(pattern="^(new|reviewing|resolved|dismissed)$")
+    resolution_note: Optional[str] = Field(default=None, max_length=500)
+
+
+class ClientErrorCreate(BaseModel):
+    code: str = Field(default="client_error", min_length=2, max_length=80)
+    message: Optional[str] = Field(default=None, max_length=240)
+    route: Optional[str] = Field(default=None, max_length=120)
+
+
+class AccountDeleteConfirm(BaseModel):
+    confirmation: str = Field(min_length=4, max_length=20)
+    password: Optional[str] = Field(default=None, max_length=128)
+
+
 class AdminReportUpdate(BaseModel):
     status: str = Field(min_length=3, max_length=20)
     resolution_note: Optional[str] = Field(default=None, max_length=500)
@@ -254,15 +324,18 @@ def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
     except httpx.HTTPError as exc:
         raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if r.status_code >= 400:
-        detail = "Chyba databáze"
+        internal_detail = "database error"
         try:
             payload = r.json()
-            detail = payload.get("message") or payload.get("hint") or detail
+            internal_detail = payload.get("message") or payload.get("hint") or internal_detail
         except Exception:
             pass
+        logger.warning("Supabase request failed method=%s table=%s status=%s detail=%s", method, table, r.status_code, str(internal_detail)[:300])
         if r.status_code == 409:
-            raise HTTPException(409, detail)
-        raise HTTPException(503 if r.status_code >= 500 else 400, detail)
+            raise HTTPException(409, "Konflikt při ukládání dat")
+        if r.status_code >= 500:
+            raise HTTPException(503, "Databáze je momentálně nedostupná")
+        raise HTTPException(400, "Data se nepodařilo zpracovat")
     if not r.content:
         return []
     return r.json()
@@ -306,6 +379,107 @@ def db_update(table: str, filters: dict, values: dict):
 def db_delete(table: str, **filters):
     params = {key: f"eq.{value}" for key, value in filters.items() if value is not None}
     return db_request("DELETE", table, params=params, prefer="return=representation")
+
+
+def db_rpc(function: str, body: Optional[dict] = None):
+    if not supabase_ready():
+        raise HTTPException(503, "Supabase ještě není připojený")
+    # Mirror the existing PostgREST authentication contract. Supabase secret keys are
+    # accepted through apikey; do not assume the key is a JWT suitable for Bearer auth.
+    headers = {
+        "apikey": SUPABASE_SECRET_KEY,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    url = f"{SUPABASE_URL}/rest/v1/rpc/{function}"
+    try:
+        with httpx.Client(timeout=12.0) as client:
+            r = client.post(url, json=body or {}, headers=headers)
+    except httpx.HTTPError as exc:
+        raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+    if r.status_code >= 400:
+        logger.warning("Supabase RPC failed function=%s status=%s", function, r.status_code)
+        raise HTTPException(503 if r.status_code >= 500 else 400, "Bezpečnostní služba databáze není připravená")
+    if not r.content:
+        return None
+    return r.json()
+
+
+def _client_network_id(request: Request) -> str:
+    # Vercel supplies proxy headers; only a keyed digest ever leaves this process.
+    raw = (request.headers.get("x-vercel-forwarded-for") or request.headers.get("x-real-ip") or "").strip()
+    if not raw:
+        raw = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+    if not raw:
+        raw = getattr(getattr(request, "client", None), "host", None) or "unknown"
+    key = (SUPABASE_SECRET_KEY or CRON_SECRET or "proplet-rate-limit").encode("utf-8")
+    return hmac.new(key, raw.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def _rate_actor_hash(request: Request, discriminator: Optional[str] = None) -> str:
+    network = _client_network_id(request)
+    material = f"{network}|{str(discriminator or '').casefold().strip()}"
+    key = (SUPABASE_SECRET_KEY or CRON_SECRET or "proplet-rate-limit").encode("utf-8")
+    return hmac.new(key, material.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def record_operational_event(
+    event_type: str,
+    *,
+    severity: str = "warning",
+    request_id: Optional[str] = None,
+    route: Optional[str] = None,
+    actor_kind: Optional[str] = None,
+    code: Optional[str] = None,
+    metadata: Optional[dict] = None,
+) -> None:
+    safe_metadata = {}
+    for key, value in (metadata or {}).items():
+        if key in {"token", "authorization", "password", "secret", "ip", "email"}:
+            continue
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            safe_metadata[str(key)[:40]] = str(value)[:160] if isinstance(value, str) else value
+    db_insert("operational_events", {
+        "id": str(uuid.uuid4()),
+        "event_type": event_type,
+        "severity": severity,
+        "request_id": str(request_id or "")[:80] or None,
+        "route": str(route or "")[:120] or None,
+        "app_version": APP_VERSION,
+        "actor_kind": actor_kind,
+        "code": str(code or "")[:80] or None,
+        "metadata": safe_metadata,
+        "created_at": datetime.now(TZ).isoformat(),
+    })
+
+
+def enforce_rate_limit(
+    request: Request,
+    scope: str,
+    *,
+    limit: int,
+    window_seconds: int,
+    discriminator: Optional[str] = None,
+) -> None:
+    actor_hash = _rate_actor_hash(request, discriminator)
+    try:
+        result = db_rpc("proplet_rate_limit", {
+            "p_scope": scope,
+            "p_actor_hash": actor_hash,
+            "p_window_seconds": int(window_seconds),
+            "p_limit": int(limit),
+        })
+    except HTTPException:
+        # Auth/abuse-sensitive endpoints should not silently lose their launch protection.
+        raise HTTPException(503, "Bezpečnostní ochrana serveru není připravená. Zkus to za chvíli.")
+    row = result[0] if isinstance(result, list) and result else (result or {})
+    if not bool(row.get("allowed")):
+        request_id = getattr(request.state, "request_id", None)
+        try:
+            record_operational_event("rate_limit", request_id=request_id, route=request.url.path, actor_kind="network", code=scope)
+        except Exception:
+            pass
+        raise HTTPException(429, "Příliš mnoho pokusů. Chvíli počkej a zkus to znovu.")
 
 
 def norm_family(code: str) -> str:
@@ -381,11 +555,14 @@ def verify_password(password: str, encoded: Optional[str]) -> bool:
 
 def new_session(player_id: str) -> str:
     token = secrets.token_urlsafe(32)
+    now = datetime.now(TZ)
     db_insert("player_sessions", {
         "id": str(uuid.uuid4()),
         "player_id": player_id,
         "token_hash": hashlib.sha256(token.encode()).hexdigest(),
-        "created_at": datetime.now(TZ).isoformat(),
+        "created_at": now.isoformat(),
+        "last_used_at": now.isoformat(),
+        "expires_at": (now + timedelta(days=SECONDARY_SESSION_DAYS)).isoformat(),
     })
     return token
 
@@ -401,13 +578,26 @@ def auth_player(authorization: Optional[str]) -> dict:
     if rows:
         return rows[0]
 
-    # Additional devices get independent session tokens.
-    try:
-        sessions = db_select("player_sessions", token_hash=token_hash)
-    except HTTPException:
-        sessions = []
+    # Additional devices get independent session tokens. A database outage must not
+    # masquerade as a bad password/session and accidentally log the user out.
+    sessions = db_select("player_sessions", token_hash=token_hash)
     if sessions:
-        players = db_select("players", id=sessions[0]["player_id"])
+        session = sessions[0]
+        now = datetime.now(TZ)
+        expiry = parse_timestamp(session.get("expires_at"))
+        if expiry and expiry <= now:
+            try:
+                db_delete("player_sessions", id=session["id"])
+            except HTTPException:
+                pass
+            raise HTTPException(401, "Přihlášení vypršelo. Přihlas se znovu.")
+        last_used = parse_timestamp(session.get("last_used_at"))
+        if not last_used or last_used < now - timedelta(hours=24):
+            try:
+                db_update("player_sessions", {"id": session["id"]}, {"last_used_at": now.isoformat()})
+            except HTTPException:
+                pass
+        players = db_select("players", id=session["player_id"])
         if players:
             return players[0]
     raise HTTPException(401, "Neplatné přihlášení hráče")
@@ -802,6 +992,43 @@ def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     return any(p["id"] == puzzle_id for p in data.get("legacyFree", {}).get(difficulty, []))
 
 
+def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict]:
+    data = load_puzzles()
+    if mode == "starter":
+        p = data.get("starter") or {}
+        return p if p.get("id") == puzzle_id and p.get("difficulty") == difficulty else None
+    if mode == "daily":
+        for p in data.get("daily", []):
+            if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
+                return p
+        for bank in legacy_daily_banks(data):
+            for p in bank.get("puzzles", []):
+                if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
+                    return p
+        return None
+    info = free_puzzle_info(puzzle_id, difficulty)
+    return info.get("puzzle") if info else None
+
+
+def validate_result_sanity(payload: ResultCreate) -> None:
+    puzzle = resolved_puzzle(payload.puzzle_id, payload.mode, payload.difficulty)
+    if not puzzle:
+        raise HTTPException(400, "Neznámá úloha")
+    answers = puzzle.get("answers") or []
+    answer_count = len(answers)
+    active_cells = len(puzzle.get("mask") or [])
+    # Every counted move is either one newly found answer or one wrong attempt.
+    # Older cached clients may count harmless short taps too, hence >= rather than equality.
+    if payload.moves < answer_count + payload.wrong_attempts:
+        raise HTTPException(400, "Výsledek má nekonzistentní počet tahů")
+    if payload.hints_used == 0 and payload.max_hint_level > 0:
+        raise HTTPException(400, "Výsledek má nekonzistentní nápovědy")
+    # Blocks trivial 1-second forged leaderboard submissions without punishing legitimate fast humans.
+    min_elapsed = max(2500, active_cells * 90)
+    if payload.elapsed_ms < min_elapsed:
+        raise HTTPException(400, "Výsledek je mimo bezpečný rozsah")
+
+
 @app.get("/")
 def home():
     return RedirectResponse(url="/index.html", status_code=307)
@@ -824,7 +1051,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.22.4",
+        "version": APP_VERSION,
         "adminStatic": True,
         "adminEntry": "/admin.html",
         "adminDelivery": "vercel-public-static",
@@ -857,6 +1084,16 @@ def health():
         "starterHintOfferIdleSeconds": 10,
         "accountWithoutTeam": True,
         "accountNudgeCompletions": [1, 4, 10],
+        "launchReadinessSprint": "3.23",
+        "publicErrorDetails": False,
+        "apiDocsPublic": False,
+        "requestBodyLimitKb": MAX_REQUEST_BYTES // 1024,
+        "secondarySessionDays": SECONDARY_SESSION_DAYS,
+        "securityHeaders": True,
+        "accountExport": True,
+        "accountDeletion": True,
+        "supportChannel": True,
+        "launchDashboard": True,
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
@@ -942,9 +1179,18 @@ def health():
             db_request("GET", "puzzle_feedback", params={"select": "id,status,resolution_note,reviewed_at,reviewed_by", "limit": "1"})
         except HTTPException:
             admin_migration = False
-        return {**base, "ok": True, "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
-    except HTTPException as exc:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "pushConfigured": push_ready(), "message": exc.detail}
+        security_migration = True
+        try:
+            db_request("GET", "player_sessions", params={"select": "id,expires_at,last_used_at", "limit": "1"})
+            db_request("GET", "security_rate_limits", params={"select": "scope,actor_hash,window_start,hits", "limit": "1"})
+            db_request("GET", "operational_events", params={"select": "id,event_type,severity", "limit": "1"})
+            db_request("GET", "support_reports", params={"select": "id,category,status", "limit": "1"})
+            db_rpc("proplet_rate_limit", {"p_scope": "health_probe", "p_actor_hash": hashlib.sha256(b"health-probe").hexdigest(), "p_window_seconds": 60, "p_limit": 10000})
+        except HTTPException:
+            security_migration = False
+        return {**base, "ok": bool(security_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+    except HTTPException:
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "securityMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
 
 
 @app.get("/api/config")
@@ -957,33 +1203,34 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.22.4",
+        "version": APP_VERSION,
     }
 
 
 @app.get("/api/teams")
 @app.get("/api/leagues")
-def list_leagues():
-    """Public team discovery: names/codes only, never team PIN hashes."""
+def list_leagues(request: Request):
+    """Public team discovery: minimal join metadata only; never player rows or PIN hashes."""
+    enforce_rate_limit(request, "team_discovery", limit=120, window_seconds=3600)
     try:
         rows = db_select("leagues")
     except HTTPException:
         rows = []
-    try:
-        players = db_select("players")
-    except HTTPException:
-        players = []
-    counts: dict[str, int] = {}
-    for p in players:
-        code = norm_family(str(p.get("family_code") or ""))
-        counts[code] = counts.get(code, 0) + 1
-    out = [{"code": r.get("code"), "name": r.get("name") or r.get("code"), "members": counts.get(r.get("code"), 0), "protected": bool(r.get("pin_hash"))} for r in rows]
+    out = [
+        {
+            "code": r.get("code"),
+            "name": r.get("name") or r.get("code"),
+            "protected": bool(r.get("pin_hash")),
+        }
+        for r in rows
+    ]
     out.sort(key=lambda x: str(x["name"]).casefold())
     return {"leagues": out}
 
 
 @app.post("/api/player")
-def create_player(payload: PlayerCreate):
+def create_player(payload: PlayerCreate, request: Request):
+    enforce_rate_limit(request, "account_create_ip", limit=8, window_seconds=3600)
     name = " ".join(payload.name.strip().split())
     requested_family = norm_family(payload.family_code or "")
     solo = len(requested_family) < 2
@@ -1052,7 +1299,9 @@ def create_player(payload: PlayerCreate):
 
 
 @app.post("/api/login")
-def login(payload: PlayerLogin):
+def login(payload: PlayerLogin, request: Request):
+    enforce_rate_limit(request, "login_ip", limit=30, window_seconds=300)
+    enforce_rate_limit(request, "login_account", limit=8, window_seconds=300, discriminator=payload.name)
     family = norm_family(payload.family_code or "")
     name = " ".join(payload.name.strip().split())
     if family:
@@ -1083,7 +1332,8 @@ def login(payload: PlayerLogin):
 
 
 @app.post("/api/anonymous/claim")
-def claim_anonymous(payload: AnonymousClaim, authorization: Optional[str] = Header(default=None)):
+def claim_anonymous(payload: AnonymousClaim, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "anonymous_claim", limit=12, window_seconds=3600)
     """Attach anonymous telemetry from this installation to the newly authenticated player.
 
     This prevents one person from being counted twice after creating/logging into an account.
@@ -1117,14 +1367,18 @@ def claim_anonymous(payload: AnonymousClaim, authorization: Optional[str] = Head
 
 
 @app.post("/api/password")
-def set_password(payload: PasswordSet, authorization: Optional[str] = Header(default=None)):
+def set_password(payload: PasswordSet, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "password_set", limit=12, window_seconds=3600)
     player = auth_player(authorization)
+    if player.get("password_hash"):
+        raise HTTPException(409, "Heslo už je nastavené. Změnu hesla zatím řeš přes podporu.")
     db_update("players", {"id": player["id"]}, {"password_hash": hash_password(payload.password)})
     return {"ok": True, "hasPassword": True}
 
 
 @app.post("/api/avatar")
-def set_avatar(payload: AvatarSet, authorization: Optional[str] = Header(default=None)):
+def set_avatar(payload: AvatarSet, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "avatar_update", limit=60, window_seconds=3600)
     player = auth_player(authorization)
     avatar = payload.avatar.strip()[:16]
     if not avatar:
@@ -1134,7 +1388,8 @@ def set_avatar(payload: AvatarSet, authorization: Optional[str] = Header(default
 
 
 @app.post("/api/support-mode")
-def set_support_mode(payload: SupportModeSet, authorization: Optional[str] = Header(default=None)):
+def set_support_mode(payload: SupportModeSet, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "support_mode_update", limit=60, window_seconds=3600)
     player = auth_player(authorization)
     allowed = {"none", "beginner", "younger", "older"}
     mode = (payload.support_mode or "none").strip().lower()
@@ -1158,9 +1413,11 @@ def _telemetry_attempt(actor: dict, attempt_id: str, puzzle_id: str, challenge_k
 @app.post("/api/helper-event")
 def helper_event(
     payload: HelperEventCreate,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "helper_event", limit=120, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed_events = {"offered", "accepted", "dismissed"}
     if payload.event_type not in allowed_events:
@@ -1183,9 +1440,11 @@ def helper_event(
 @app.post("/api/hint-event")
 def hint_event(
     payload: HintEventCreate,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "hint_event", limit=120, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.source not in {"manual", "helper"}:
         raise HTTPException(400, "Neplatný zdroj nápovědy")
@@ -1220,9 +1479,11 @@ def hint_event(
 @app.post("/api/product-event")
 def product_event(
     payload: ProductEventCreate,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "product_event", limit=300, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed = {
         "app_open", "onboarding_started", "onboarding_completed",
@@ -1234,13 +1495,14 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.22.4", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": APP_VERSION, "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
 
 @app.post("/api/team-pin")
-def set_team_pin(payload: TeamPinSet, authorization: Optional[str] = Header(default=None)):
+def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "team_pin_set", limit=12, window_seconds=3600)
     player = auth_player(authorization)
     team = norm_family(str(player.get("family_code") or ""))
     if is_solo_player(player):
@@ -1253,7 +1515,8 @@ def set_team_pin(payload: TeamPinSet, authorization: Optional[str] = Header(defa
 
 
 @app.post("/api/team-membership")
-def set_team_membership(payload: TeamMembershipSet, authorization: Optional[str] = Header(default=None)):
+def set_team_membership(payload: TeamMembershipSet, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "team_membership", limit=15, window_seconds=600, discriminator=payload.family_code or payload.league_name or payload.mode)
     player = auth_player(authorization)
     current_family = norm_family(str(player.get("family_code") or ""))
     if not is_solo_player(player):
@@ -1290,7 +1553,8 @@ def set_team_membership(payload: TeamMembershipSet, authorization: Optional[str]
 
 
 @app.post("/api/logout")
-def logout(authorization: Optional[str] = Header(default=None)):
+def logout(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "logout", limit=60, window_seconds=3600)
     if not authorization or not authorization.lower().startswith("bearer "):
         return {"ok": True}
     token = authorization.split(" ", 1)[1].strip()
@@ -1308,7 +1572,8 @@ def logout(authorization: Optional[str] = Header(default=None)):
 
 
 @app.get("/api/me")
-def me(authorization: Optional[str] = Header(default=None)):
+def me(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "me_read", limit=600, window_seconds=3600)
     player = auth_player(authorization)
     stats = player_stats(player["id"])
     public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
@@ -1320,7 +1585,8 @@ def me(authorization: Optional[str] = Header(default=None)):
 
 
 @app.get("/api/progress")
-def progress(authorization: Optional[str] = Header(default=None)):
+def progress(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "progress_read", limit=240, window_seconds=3600)
     player = auth_player(authorization)
     rows = db_select("results", player_id=player["id"])
     def completion_payload(r: dict) -> dict:
@@ -1348,6 +1614,114 @@ def progress(authorization: Optional[str] = Header(default=None)):
     }
 
 
+@app.get("/api/account/export")
+def account_export(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "account_export", limit=12, window_seconds=3600)
+    player = auth_player(authorization)
+    player_id = player["id"]
+    public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    sessions = db_select("player_sessions", player_id=player_id)
+    pushes = db_select("push_subscriptions", player_id=player_id)
+    return {
+        "exportedAt": datetime.now(TZ).isoformat(),
+        "appVersion": APP_VERSION,
+        "profile": {
+            "id": player_id,
+            "name": player.get("name"),
+            "avatar": player.get("avatar") or "🙂",
+            "familyCode": public_family,
+            "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
+            "supportMode": player.get("support_mode") or "none",
+            "createdAt": player.get("created_at"),
+            "teamJoinedAt": player.get("team_joined_at"),
+            "hasPassword": bool(player.get("password_hash")),
+        },
+        "results": db_select("results", player_id=player_id),
+        "attempts": db_select("puzzle_attempts", player_id=player_id),
+        "runs": db_select("puzzle_runs", player_id=player_id),
+        "feedback": db_select("puzzle_feedback", player_id=player_id),
+        "helperEvents": db_select("helper_events", player_id=player_id),
+        "hintEvents": db_select("hint_events", player_id=player_id),
+        "productEvents": db_select("product_events", player_id=player_id),
+        "rescues": db_select("streak_rescues", player_id=player_id),
+        "supportReports": db_select("support_reports", player_id=player_id),
+        "sessions": [{"createdAt": row.get("created_at"), "lastUsedAt": row.get("last_used_at"), "expiresAt": row.get("expires_at")} for row in sessions],
+        "pushSubscriptions": [{"endpoint": row.get("endpoint"), "userAgent": row.get("user_agent"), "createdAt": row.get("created_at"), "updatedAt": row.get("updated_at")} for row in pushes],
+    }
+
+
+@app.delete("/api/account")
+def delete_account(payload: AccountDeleteConfirm, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "account_delete", limit=5, window_seconds=3600)
+    player = auth_player(authorization)
+    if payload.confirmation.strip().upper() != "SMAZAT":
+        raise HTTPException(400, "Pro smazání napiš přesně SMAZAT")
+    if player.get("password_hash"):
+        if not payload.password or not verify_password(payload.password, player.get("password_hash")):
+            raise HTTPException(401, "Heslo nesedí")
+    active_admin = [row for row in db_select("admin_accounts", player_id=player["id"]) if row.get("active") is True]
+    if active_admin:
+        raise HTTPException(409, "Aktivní administrátorský účet nejde smazat. Nejdřív zruš admin oprávnění.")
+    db_delete("players", id=player["id"])
+    return {"ok": True, "deleted": True}
+
+
+@app.post("/api/support-report")
+def support_report(
+    payload: SupportReportCreate,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    enforce_rate_limit(request, "support_report", limit=8, window_seconds=3600)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
+    message = "\n".join(line.strip() for line in str(payload.message).strip().splitlines() if line.strip())[:1200]
+    if len(message) < 3:
+        raise HTTPException(400, "Popiš prosím problém trochu podrobněji")
+    reply_to = " ".join(str(payload.reply_to or "").strip().split())[:160] or None
+    row = db_insert("support_reports", {
+        "id": str(uuid.uuid4()),
+        "player_id": actor.get("player_id"),
+        "anonymous_id": actor.get("anonymous_id"),
+        "category": payload.category,
+        "message": message,
+        "reply_to": reply_to,
+        "page": str(payload.page or "")[:120] or None,
+        "app_version": APP_VERSION,
+        "status": "new",
+        "created_at": datetime.now(TZ).isoformat(),
+    })
+    return {"ok": True, "reportId": row.get("id")}
+
+
+@app.post("/api/client-error")
+def client_error(
+    payload: ClientErrorCreate,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    enforce_rate_limit(request, "client_error", limit=20, window_seconds=3600)
+    actor_kind = "network"
+    try:
+        actor = telemetry_actor(authorization, x_proplet_anon_id)
+        actor_kind = "player" if actor.get("player_id") else "anonymous"
+    except HTTPException:
+        pass
+    # Message is intentionally truncated; never accept client-supplied stack traces or tokens.
+    message_code = re.sub(r"[^a-zA-Z0-9_.:-]+", "_", str(payload.code or "client_error"))[:80]
+    record_operational_event(
+        "client_error",
+        severity="error",
+        request_id=getattr(request.state, "request_id", None),
+        route=(payload.route or request.url.path)[:120],
+        actor_kind=actor_kind,
+        code=message_code,
+        metadata={"message": str(payload.message or "")[:200]},
+    )
+    return {"ok": True}
+
+
 def merged_hint_count(old_value, new_value: int) -> int:
     try:
         old = int(old_value) if old_value is not None else int(new_value)
@@ -1359,9 +1733,11 @@ def merged_hint_count(old_value, new_value: int) -> int:
 @app.post("/api/attempt/start")
 def attempt_start(
     payload: AttemptStart,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "attempt_start", limit=180, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS:
         raise HTTPException(400, "Neplatný pokus")
@@ -1382,12 +1758,20 @@ def attempt_start(
     filters = {"id": payload.attempt_id, **actor_filters(actor)}
     existing = db_select("puzzle_attempts", **filters)
     if existing:
+        row = existing[0]
+        if any((
+            row.get("puzzle_id") != payload.puzzle_id,
+            row.get("challenge_key") != payload.challenge_key,
+            row.get("mode") != payload.mode,
+            row.get("difficulty") != payload.difficulty,
+        )):
+            raise HTTPException(400, "ID pokusu už patří jiné úloze")
         return {"ok": True, "attemptId": payload.attempt_id}
     db_insert("puzzle_attempts", {
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.22.4",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": APP_VERSION,
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1395,9 +1779,11 @@ def attempt_start(
 @app.post("/api/attempt/checkpoint")
 def attempt_checkpoint(
     payload: AttemptCheckpoint,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "attempt_checkpoint", limit=600, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed = {"correct", "hint", "reset", "resume", "leave"}
     if payload.event_type not in allowed:
@@ -1425,11 +1811,15 @@ def attempt_checkpoint(
 @app.post("/api/attempt/finish")
 def attempt_finish(
     payload: AttemptFinishTelemetry,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "attempt_finish", limit=180, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     row = _telemetry_attempt(actor, payload.attempt_id, payload.puzzle_id, payload.challenge_key)
+    if row and (row.get("mode") != payload.mode or row.get("difficulty") != payload.difficulty):
+        raise HTTPException(400, "Telemetry neodpovídá režimu pokusu")
     if not row:
         if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS or not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
             raise HTTPException(400, "Neplatný dokončený pokus")
@@ -1448,7 +1838,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.22.4",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": APP_VERSION,
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -1467,9 +1857,11 @@ def attempt_finish(
 @app.post("/api/feedback")
 def puzzle_feedback(
     payload: FeedbackCreate,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
+    enforce_rate_limit(request, "puzzle_feedback", limit=30, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     if payload.kind not in ("difficulty", "word"):
         raise HTTPException(400, "Neplatný typ zpětné vazby")
@@ -1811,6 +2203,171 @@ def public_admin_identity(admin: dict) -> dict:
 @app.get("/api/admin/me")
 def admin_me(authorization: Optional[str] = Header(default=None)):
     return public_admin_identity(require_admin(authorization))
+
+
+def _telemetry_actor_key(row: dict) -> Optional[str]:
+    if row.get("player_id"):
+        return f"p:{row['player_id']}"
+    if row.get("anonymous_id"):
+        return f"a:{row['anonymous_id']}"
+    return None
+
+
+def _event_stamp(row: dict) -> Optional[datetime]:
+    return parse_timestamp(row.get("created_at") or row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
+
+
+@app.get("/api/admin/launch")
+def admin_launch(authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    now = datetime.now(TZ)
+    cutoff24 = now - timedelta(hours=24)
+    cutoff7 = now - timedelta(days=7)
+    today = current_prague_date()
+    product = db_select_all("product_events")
+    attempts = db_select_all("puzzle_attempts")
+    players = db_select_all("players")
+    try:
+        ops = db_select_all("operational_events")
+    except HTTPException:
+        ops = []
+    try:
+        support = db_select_all("support_reports")
+    except HTTPException:
+        support = []
+
+    def recent(rows, cutoff):
+        return [row for row in rows if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= cutoff]
+
+    p24, p7 = recent(product, cutoff24), recent(product, cutoff7)
+    a24, a7 = recent(attempts, cutoff24), recent(attempts, cutoff7)
+    op24, op7 = recent(ops, cutoff24), recent(ops, cutoff7)
+
+    def actors(rows):
+        return {key for row in rows if (key := _telemetry_actor_key(row))}
+
+    active24 = actors(p24) | actors(a24)
+    active7 = actors(p7) | actors(a7)
+
+    def event_actors(rows, event):
+        return actors([row for row in rows if row.get("event_type") == event])
+
+    def attempt_actors(rows, mode=None, completed=False):
+        filtered = rows
+        if mode:
+            filtered = [row for row in filtered if row.get("mode") == mode]
+        if completed:
+            filtered = [row for row in filtered if row.get("completed_at")]
+        return actors(filtered)
+
+    starter7 = event_actors(p7, "starter_completed")
+    auth7 = event_actors(p7, "account_authenticated")
+    starter_to_account = len(starter7 & auth7)
+
+    activity_dates: dict[str, set[date]] = {}
+    for row in product + attempts:
+        key = _telemetry_actor_key(row)
+        stamp = _event_stamp(row)
+        if key and stamp:
+            activity_dates.setdefault(key, set()).add(stamp.astimezone(TZ).date())
+    eligible = retained = 0
+    cohort_floor = today - timedelta(days=14)
+    for dates in activity_dates.values():
+        first = min(dates)
+        if cohort_floor <= first <= today - timedelta(days=1):
+            eligible += 1
+            if first + timedelta(days=1) in dates:
+                retained += 1
+
+    version_counts: dict[str, int] = {}
+    for row in a7:
+        version = str(row.get("app_version") or "neznámá")
+        version_counts[version] = version_counts.get(version, 0) + 1
+    versions = [{"version": v, "attempts": c} for v, c in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))][:8]
+
+    def funnel(rows_p, rows_a):
+        app_open = event_actors(rows_p, "app_open")
+        onboard = event_actors(rows_p, "onboarding_completed")
+        starter = event_actors(rows_p, "starter_completed")
+        daily_start = attempt_actors(rows_a, "daily", False)
+        daily_done = attempt_actors(rows_a, "daily", True)
+        free_done = attempt_actors(rows_a, "free", True)
+        auth = event_actors(rows_p, "account_authenticated")
+        return {
+            "appOpen": len(app_open),
+            "onboardingCompleted": len(onboard),
+            "starterCompleted": len(starter),
+            "dailyStarted": len(daily_start),
+            "dailyCompleted": len(daily_done),
+            "freeCompleted": len(free_done),
+            "accountAuthenticated": len(auth),
+        }
+
+    open_support = [row for row in support if str(row.get("status") or "new") in ("new", "reviewing")]
+    errors24 = [row for row in op24 if row.get("event_type") in ("server_error", "client_error")]
+    rate24 = [row for row in op24 if row.get("event_type") == "rate_limit"]
+    return {
+        "generatedAt": now.isoformat(),
+        "active": {"last24h": len(active24), "last7d": len(active7)},
+        "newAccounts24h": sum(1 for row in players if (parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ)) >= cutoff24),
+        "funnel24h": funnel(p24, a24),
+        "funnel7d": funnel(p7, a7),
+        "starterToAccount7d": {"converted": starter_to_account, "starterCompleted": len(starter7), "rate": round(starter_to_account / len(starter7), 3) if starter7 else None},
+        "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
+        "reliability": {
+            "errors24h": len(errors24),
+            "errors7d": sum(1 for row in op7 if row.get("event_type") in ("server_error", "client_error")),
+            "rateLimits24h": len(rate24),
+            "openSupportReports": len(open_support),
+        },
+        "appVersions7d": versions,
+    }
+
+
+@app.get("/api/admin/support")
+def admin_support(
+    status: str = Query(default="open", max_length=20),
+    authorization: Optional[str] = Header(default=None),
+):
+    require_admin(authorization)
+    rows = db_select_all("support_reports")
+    if status == "open":
+        rows = [row for row in rows if str(row.get("status") or "new") in ("new", "reviewing")]
+    elif status != "all":
+        rows = [row for row in rows if str(row.get("status") or "new") == status]
+    players = {row["id"]: row for row in db_select_all("players") if row.get("id")}
+    out = []
+    for row in sorted(rows, key=lambda r: str(r.get("created_at") or ""), reverse=True)[:200]:
+        player = players.get(row.get("player_id"))
+        out.append({
+            "id": row.get("id"), "category": row.get("category"), "message": row.get("message"),
+            "replyTo": row.get("reply_to"), "page": row.get("page"), "appVersion": row.get("app_version"),
+            "status": row.get("status") or "new", "resolutionNote": row.get("resolution_note"),
+            "createdAt": row.get("created_at"),
+            "reportedBy": {"name": player.get("name"), "avatar": player.get("avatar") or "🙂"} if player else None,
+        })
+    return {"reports": out, "total": len(out)}
+
+
+@app.patch("/api/admin/support/{report_id}")
+def admin_support_update(
+    report_id: str,
+    payload: SupportReportUpdate,
+    authorization: Optional[str] = Header(default=None),
+):
+    admin = require_admin(authorization, write=True)
+    rows = db_select("support_reports", id=report_id)
+    if not rows:
+        raise HTTPException(404, "Hlášení neexistuje")
+    old = rows[0]
+    values = {"status": payload.status, "resolution_note": " ".join(str(payload.resolution_note or "").strip().split()) or None}
+    if payload.status in ("resolved", "dismissed"):
+        values.update({"reviewed_at": datetime.now(TZ).isoformat(), "reviewed_by": admin["player"]["id"]})
+    else:
+        values.update({"reviewed_at": None, "reviewed_by": None})
+    db_update("support_reports", {"id": report_id}, values)
+    record_admin_audit(admin, "support_report_status", "support_reports", report_id, {"from": old.get("status"), "to": payload.status, "category": old.get("category")})
+    return {"ok": True}
 
 
 @app.get("/api/admin/overview")
@@ -2188,7 +2745,8 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
 
 
 @app.post("/api/result")
-def result(payload: ResultCreate, authorization: Optional[str] = Header(default=None)):
+def result(payload: ResultCreate, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600)
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
     if payload.mode not in ("daily", "free", "starter"):
@@ -2197,6 +2755,18 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
         raise HTTPException(400, "Neplatná obtížnost")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
+    validate_result_sanity(payload)
+    if payload.attempt_id:
+        bound_attempts = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
+        if bound_attempts:
+            bound = bound_attempts[0]
+            if any((
+                bound.get("puzzle_id") != payload.puzzle_id,
+                bound.get("challenge_key") != payload.challenge_key,
+                bound.get("mode") != payload.mode,
+                bound.get("difficulty") != payload.difficulty,
+            )):
+                raise HTTPException(400, "Výsledek neodpovídá zahájenému pokusu")
 
     transferred_reward = False
     if payload.mode == "starter":
@@ -2341,7 +2911,7 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
     except Exception as exc:
         logger.exception("Result saved, but stats refresh failed for player %s", player.get("id"))
         stats = None
-        stats_warning = f"{type(exc).__name__}: {str(exc)[:160]}"
+        stats_warning = "Statistiky se nepodařilo obnovit. Výsledek je ale bezpečně uložený."
 
     return {
         "ok": True,
@@ -2356,10 +2926,12 @@ def result(payload: ResultCreate, authorization: Optional[str] = Header(default=
 
 @app.get("/api/result-status")
 def result_status(
+    request: Request,
     challenge_key: str = Query(min_length=3, max_length=80),
     authorization: Optional[str] = Header(default=None),
 ):
     """Lehký diagnostický endpoint pro ověření, zda je konkrétní výsledek v cloudu."""
+    enforce_rate_limit(request, "result_status_read", limit=180, window_seconds=3600)
     player = auth_player(authorization)
     rows = db_select("results", player_id=player["id"], challenge_key=challenge_key)
     if not rows:
@@ -2375,13 +2947,15 @@ def result_status(
 
 
 @app.get("/api/rescue-status")
-def rescue_status(authorization: Optional[str] = Header(default=None)):
+def rescue_status(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "rescue_status_read", limit=180, window_seconds=3600)
     player = auth_player(authorization)
     return rescue_status_for(player["id"])
 
 
 @app.post("/api/rescue/start")
-def rescue_start(authorization: Optional[str] = Header(default=None)):
+def rescue_start(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "rescue_start", limit=20, window_seconds=3600)
     player = auth_player(authorization)
     status = rescue_status_for(player["id"])
     if status.get("state") == "started":
@@ -2407,7 +2981,8 @@ def rescue_start(authorization: Optional[str] = Header(default=None)):
 
 
 @app.post("/api/rescue/finish")
-def rescue_finish(payload: RescueFinish, authorization: Optional[str] = Header(default=None)):
+def rescue_finish(payload: RescueFinish, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "rescue_finish", limit=30, window_seconds=3600)
     player = auth_player(authorization)
     rows = db_select("streak_rescues", player_id=player["id"], puzzle_id=payload.puzzle_id)
     if not rows:
@@ -2536,9 +3111,11 @@ def _family_league_week(week_offset: int = 0) -> dict:
 
 @app.get("/api/family-league")
 def family_league(
+    request: Request,
     week_offset: int = Query(default=0, ge=-12, le=0),
     authorization: Optional[str] = Header(default=None),
 ):
+    enforce_rate_limit(request, "family_league_read", limit=120, window_seconds=3600)
     data = _family_league_week(week_offset)
     my_family = None
     if authorization:
@@ -2576,7 +3153,8 @@ def family_league(
 
 
 @app.post("/api/family-league/settings")
-def family_league_settings(payload: FamilyLeagueSettings, authorization: Optional[str] = Header(default=None)):
+def family_league_settings(payload: FamilyLeagueSettings, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "family_league_settings", limit=20, window_seconds=3600)
     player = auth_player(authorization)
     family = norm_family(str(player.get("family_code") or ""))
     if is_solo_player(player):
@@ -2601,10 +3179,17 @@ def family_league_settings(payload: FamilyLeagueSettings, authorization: Optiona
 
 @app.get("/api/puzzle-leaderboard")
 def puzzle_leaderboard(
+    request: Request,
     puzzle_id: str = Query(min_length=2, max_length=80),
     family_code: str = Query(min_length=2, max_length=24),
+    authorization: Optional[str] = Header(default=None),
 ):
+    enforce_rate_limit(request, "team_puzzle_leaderboard_read", limit=240, window_seconds=3600)
+    viewer = auth_player(authorization)
     family = norm_family(family_code)
+    viewer_family = norm_family(str(viewer.get("family_code") or ""))
+    if is_solo_player(viewer) or viewer_family != family:
+        raise HTTPException(403, "Týmové pořadí je dostupné jen členům tohoto týmu")
     players = db_select("players", family_code=family)
     pmap = {p["id"]: p for p in players}
     rows = [r for r in db_select("puzzle_runs", puzzle_id=puzzle_id) if r.get("player_id") in pmap]
@@ -2629,9 +3214,11 @@ def puzzle_leaderboard(
 
 @app.get("/api/free-global-leaderboard")
 def free_global_leaderboard(
+    request: Request,
     puzzle_id: str = Query(min_length=2, max_length=80),
     authorization: Optional[str] = Header(default=None),
 ):
+    enforce_rate_limit(request, "free_global_read", limit=300, window_seconds=3600)
     """Privacy-safe worldwide standings for one active Free puzzle.
 
     Every player is represented by their first completed attempt only. The
@@ -2705,10 +3292,12 @@ def free_global_leaderboard(
 
 @app.get("/api/daily-global-leaderboard")
 def daily_global_leaderboard(
+    request: Request,
     daily_date: Optional[str] = Query(default=None),
     authorization: Optional[str] = Header(default=None),
 ):
     """Privacy-safe global Daily standings: public performance, never player identity."""
+    enforce_rate_limit(request, "daily_global_read", limit=300, window_seconds=3600)
     selected_date = daily_date or current_prague_date().isoformat()
     try:
         date.fromisoformat(selected_date)
@@ -2781,9 +3370,11 @@ def daily_global_leaderboard(
 
 @app.get("/api/played-levels")
 def played_levels(
+    request: Request,
     difficulty: str = Query(min_length=3, max_length=20),
     authorization: Optional[str] = Header(default=None),
 ):
+    enforce_rate_limit(request, "played_levels_read", limit=180, window_seconds=3600)
     player = auth_player(authorization)
     data = load_puzzles()
     bank = sorted(data.get("free", {}).get(difficulty, []), key=lambda p: int((p.get("meta") or {}).get("level") or 9999))
@@ -2848,7 +3439,8 @@ def push_config():
 
 
 @app.post("/api/push/subscribe")
-def push_subscribe(payload: PushSubscriptionCreate, authorization: Optional[str] = Header(default=None)):
+def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "push_subscribe", limit=20, window_seconds=3600)
     player = auth_player(authorization)
     if not push_ready():
         raise HTTPException(503, "Push notifikace ještě nejsou na serveru nakonfigurované")
@@ -2862,7 +3454,8 @@ def push_subscribe(payload: PushSubscriptionCreate, authorization: Optional[str]
 
 
 @app.post("/api/push/unsubscribe")
-def push_unsubscribe(payload: PushUnsubscribe, authorization: Optional[str] = Header(default=None)):
+def push_unsubscribe(payload: PushUnsubscribe, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "push_unsubscribe", limit=30, window_seconds=3600)
     player = auth_player(authorization)
     rows = db_select("push_subscriptions", endpoint=payload.endpoint)
     for row in rows:
@@ -2877,8 +3470,12 @@ def cron_daily_push(request: Request, authorization: Optional[str] = Header(defa
         raise HTTPException(401, "Neplatné cron oprávnění")
     today = current_prague_date().isoformat()
     snapshot = save_quality_snapshot_if_monday()
+    try:
+        housekeeping = db_rpc("proplet_launch_housekeeping")
+    except HTTPException:
+        housekeeping = None
     if not push_ready():
-        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": snapshot}
+        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": snapshot, "housekeeping": housekeeping}
     completed = {r.get("player_id") for r in db_select("results", mode="daily", daily_date=today)}
     subscriptions = db_select("push_subscriptions")
     sent = failed = removed = 0
@@ -2904,15 +3501,22 @@ def cron_daily_push(request: Request, authorization: Optional[str] = Header(defa
             else:
                 failed += 1
                 logger.warning("Push failed for subscription %s: %s", sub.get("id"), exc)
-    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed, "qualitySnapshot": snapshot}
+    return {"ok": True, "date": today, "sent": sent, "failed": failed, "removed": removed, "qualitySnapshot": snapshot, "housekeeping": housekeeping}
 
 
 @app.get("/api/leaderboard")
 def leaderboard(
+    request: Request,
     family_code: str = Query(min_length=2, max_length=24),
     daily_date: Optional[str] = Query(default=None),
+    authorization: Optional[str] = Header(default=None),
 ):
+    enforce_rate_limit(request, "team_leaderboard_read", limit=120, window_seconds=3600)
+    viewer = auth_player(authorization)
     family = norm_family(family_code)
+    viewer_family = norm_family(str(viewer.get("family_code") or ""))
+    if is_solo_player(viewer) or viewer_family != family:
+        raise HTTPException(403, "Týmové pořadí je dostupné jen členům tohoto týmu")
     daily_date = daily_date or current_prague_date().isoformat()
     players = db_select("players", family_code=family)
 

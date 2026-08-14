@@ -1,9 +1,31 @@
-# Proplet v3.22.4
+# Proplet v3.23.0
 
-Aktuální release: **v3.22.4 — Unified Fold Web/PWA Layout**.
+Aktuální release candidate: **v3.23.0 — Launch Ready 🚀**.
 
-Release sjednocuje herní strukturu mezi Chrome a standalone PWA na Foldu/tabletu. Pod 1000 CSS px se UI už nepřepíná do jiné architektury jen proto, že PWA má o něco vyšší viewport než browser. PWA může využít více prostoru na větší desku, ale HUD, board i ovládání zůstávají ve stejné struktuře.
+Tento sprint nepřidává novou herní mechaniku a nemění puzzle banku. Zaměřuje se na veřejný launch:
 
-Součástí zůstává exact 2D fit velkých 10×10 boardů z v3.22.3. Puzzle obsah ani databáze se nemění.
+- security hardening a atomický rate limiting,
+- bezpečné error handling + request ID,
+- session expiry a result/attempt sanity,
+- privacy boundary týmových dat,
+- export a smazání účtu,
+- in-app support,
+- privacy/terms,
+- Launch radar v administraci,
+- CSP/security headers,
+- launch metadata a provozní QA.
 
-Pro update použij `proplet-v3.22.4-update.zip`. **Žádná SQL migrace není potřeba.**
+## Nasazení
+
+**v3.23 vyžaduje SQL migraci.**
+
+Pořadí:
+
+1. `SUPABASE_MIGRATION_V3_23.sql`
+2. `SUPABASE_VERIFY_V3_23.sql` — musí PASS
+3. update ZIP do GitHub adresáře **`proplet-v3.1-cloud/`**
+4. Vercel deploy
+5. `/api/health`
+6. production smoke podle `LAUNCH_CHECKLIST_V3_23_CZ.md`
+
+Podrobnosti: `UPDATE_V3_23_CZ.md`, `SECURITY_AUDIT_V3_23_CZ.md`, `QA_V3_23_CZ.md`.

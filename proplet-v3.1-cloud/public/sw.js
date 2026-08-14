@@ -1,5 +1,5 @@
-const CACHE='proplet-v3.22.4-unified-layout';
-const CORE=['/','/index.html','/styles.css','/app.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png'];
+const CACHE='proplet-v3.23.0-launch-readiness';
+const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{
   // Nevoláme skipWaiting automaticky: hráč dostane v appce viditelnou nabídku aktualizace.

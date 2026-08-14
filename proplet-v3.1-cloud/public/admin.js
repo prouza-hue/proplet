@@ -1,7 +1,7 @@
 const PROFILE_KEY='proplet-v2-profile';
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
-const state={admin:null,overview:null,quality:null,reports:null,users:null,audit:null,activeTab:'overview'};
+const state={admin:null,launch:null,support:null,overview:null,quality:null,reports:null,users:null,audit:null,activeTab:'launch'};
 const DIFF={easy:'🌱 Snadná',medium:'🧠 Střední',hard:'🧨 Těžká',hardcore:'🤯 Mozkožrout'};
 const SUPPORT={none:'Nenabízet',beginner:'Brzy · 45 s',younger:'Vyváženě · 70 s',older:'Dát čas · 100 s'};
 const STATUS={new:'Nové',reviewing:'Prověřuji',resolved:'Vyřešeno',dismissed:'Zamítnuto'};
@@ -22,7 +22,7 @@ async function api(path,options={}){
  try{
   const response=await fetch(path,{...options,headers,signal:controller.signal,cache:'no-store'});
   let body={};try{body=await response.json()}catch{}
-  if(!response.ok)throw new Error(body.detail||`Server vrátil chybu ${response.status}`);
+  if(!response.ok){let message=body.detail||`Server vrátil chybu ${response.status}`;const requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24);if(requestId)message+=` · kód ${requestId}`;throw new Error(message)};
   return body;
  }catch(error){if(error.name==='AbortError')throw new Error('Server se neozval včas');throw error}
  finally{clearTimeout(timer)}
@@ -33,6 +33,29 @@ function showGate(title,text,action=true){
 }
 function kpi(value,label,note=''){return `<div class="kpi panel"><b>${esc(value)}</b><span>${esc(label)}</span>${note?`<em>${esc(note)}</em>`:''}</div>`}
 function barLine(label,value,total,color=''){const width=total?Math.max(2,Math.round(value/total*100)):0;return `<div class="rating-line"><span>${esc(label)}</span><div class="bar"><i style="width:${width}%${color?`;background:${color}`:''}"></i></div><b>${fmtNumber(value)}</b></div>`}
+
+
+function funnelRows(data){
+ const rows=[['Otevřelo Proplet','appOpen'],['Dokončilo onboarding','onboardingCompleted'],['Dokončilo první Proplet','starterCompleted'],['Spustilo Daily','dailyStarted'],['Dokončilo Daily','dailyCompleted'],['Dokončilo Free','freeCompleted'],['Přihlásilo / vytvořilo účet','accountAuthenticated']];const base=Math.max(1,Number(data?.appOpen||0));return rows.map(([label,key])=>`<div class="launch-funnel-row"><span>${esc(label)}</span><div class="bar"><i style="width:${Math.round(Math.min(1,Number(data?.[key]||0)/base)*100)}%"></i></div><b>${fmtNumber(data?.[key]||0)}</b></div>`).join('');
+}
+async function loadLaunch(force=false){
+ const root=$('#launchContent');if(state.launch&&!force){renderLaunch();return}root.className='loading-panel panel';root.textContent='Načítám launch radar…';
+ try{state.launch=await api('/api/admin/launch');renderLaunch();await loadSupport(force)}catch(error){root.innerHTML=`<strong>Launch radar se nenačetl.</strong><p>${esc(error.message)}</p>`}
+}
+function renderLaunch(){
+ const d=state.launch||{},r=d.reliability||{},ret=d.retentionD1||{},conv=d.starterToAccount7d||{},versions=d.appVersions7d||[],root=$('#launchContent');root.className='';const alertCount=Number(r.errors24h||0)+Number(r.openSupportReports||0);$('#launchAlertBadge').textContent=alertCount;$('#launchAlertBadge').classList.toggle('hidden',!alertCount);
+ root.innerHTML=`<div class="kpi-grid launch-kpis">${kpi(d.active?.last24h||0,'aktivních · 24 h',`${d.active?.last7d||0} za 7 dní`)}${kpi(d.newAccounts24h||0,'nových účtů · 24 h')}${kpi(ret.rate==null?'—':fmtPct(ret.rate),'D1 návrat',`${ret.retained||0}/${ret.eligible||0} způsobilých`)}${kpi(r.errors24h||0,'chyb · 24 h',`${r.rateLimits24h||0} rate-limit zásahů`)}</div><div class="launch-grid"><section class="section-panel panel"><h2>Prvních 24 hodin</h2><div class="launch-funnel">${funnelRows(d.funnel24h)}</div></section><section class="section-panel panel"><h2>Posledních 7 dní</h2><div class="launch-funnel">${funnelRows(d.funnel7d)}</div><div class="launch-conversion"><span>Starter → účet</span><b>${conv.rate==null?'—':fmtPct(conv.rate)}</b><small>${conv.converted||0} z ${conv.starterCompleted||0}</small></div></section></div><div class="launch-grid launch-bottom"><section class="section-panel panel"><h2>Spolehlivost</h2><div class="launch-health ${r.errors24h?'warn':'ok'}"><b>${r.errors24h?'Pozor na chyby':'Bez čerstvých chyb ✓'}</b><span>${r.errors7d||0} chyb za 7 dní · ${r.openSupportReports||0} otevřených hlášení</span></div></section><section class="section-panel panel"><h2>Verze hráčů · 7 dní</h2><div class="version-list">${versions.map(v=>barLine(`v${v.version}`,v.attempts,Math.max(...versions.map(x=>x.attempts),1))).join('')||'<p class="muted">Zatím bez pokusů.</p>'}</div></section></div>`;
+}
+async function loadSupport(force=false){
+ const root=$('#launchSupportContent');if(state.support&&!force){renderSupport();return}root.className='loading-panel panel';root.textContent='Načítám hlášení…';try{state.support=await api('/api/admin/support?status=open');renderSupport()}catch(error){root.innerHTML=`<strong>Support se nenačetl.</strong><p>${esc(error.message)}</p>`}
+}
+function renderSupport(){
+ const rows=state.support?.reports||[],root=$('#launchSupportContent');root.className='';if(!rows.length){root.innerHTML='<div class="empty-state panel"><span>🛟</span><strong>Žádné otevřené hlášení.</strong>Pro launch ideální stav.</div>';return}
+ root.innerHTML=`<div class="report-list">${rows.map(row=>`<article class="report-card panel" data-support-id="${esc(row.id)}"><div class="report-top"><div><div class="report-word"><strong>${esc(row.category||'support')}</strong><span class="status-pill status-${esc(row.status)}">${esc(STATUS[row.status]||row.status)}</span></div><div class="report-meta">${fmtDate(row.createdAt)} · ${row.reportedBy?`${esc(row.reportedBy.avatar)} ${esc(row.reportedBy.name)}`:'Anonym'}${row.appVersion?` · v${esc(row.appVersion)}`:''}${row.page?` · ${esc(row.page)}`:''}</div></div>${row.replyTo?`<div class="report-meta">Kontakt: ${esc(row.replyTo)}</div>`:''}</div><div class="report-note">${esc(row.message)}</div><div class="report-actions"><select data-support-status><option value="new" ${row.status==='new'?'selected':''}>Nové</option><option value="reviewing" ${row.status==='reviewing'?'selected':''}>Prověřuji</option><option value="resolved">Vyřešeno</option><option value="dismissed">Zamítnuto</option></select><textarea data-support-resolution placeholder="Interní poznámka…">${esc(row.resolutionNote||'')}</textarea><button class="save-report save-support">Uložit</button></div></article>`).join('')}</div>`;$$('.save-support').forEach(b=>b.onclick=()=>saveSupport(b.closest('[data-support-id]')));
+}
+async function saveSupport(card){
+ const id=card.dataset.supportId,status=card.querySelector('[data-support-status]').value,resolution_note=card.querySelector('[data-support-resolution]').value.trim(),button=card.querySelector('.save-support');button.disabled=true;button.textContent='Ukládám…';try{await api(`/api/admin/support/${encodeURIComponent(id)}`,{method:'PATCH',body:JSON.stringify({status,resolution_note})});toast('Support uložen ✓');state.launch=null;state.support=null;state.audit=null;await loadLaunch(true)}catch(error){toast(error.message);button.disabled=false;button.textContent='Uložit'}
+}
 
 async function loadOverview(force=false){
  const root=$('#overviewContent');if(state.overview&&!force){renderOverview();return}root.className='loading-panel panel';root.textContent='Načítám Proplet pod rentgenem…';
@@ -102,15 +125,15 @@ function renderAudit(){
 
 async function switchTab(tab){
  state.activeTab=tab;$$('.admin-nav button').forEach(button=>button.classList.toggle('active',button.dataset.tab===tab));$$('.admin-tab').forEach(section=>section.classList.toggle('active',section.id===`tab-${tab}`));
- if(tab==='overview')await loadOverview();if(tab==='quality')await loadQuality();if(tab==='reports')await loadReports();if(tab==='users')await loadUsers();if(tab==='audit')await loadAudit();
+ if(tab==='launch')await loadLaunch();if(tab==='overview')await loadOverview();if(tab==='quality')await loadQuality();if(tab==='reports')await loadReports();if(tab==='users')await loadUsers();if(tab==='audit')await loadAudit();
 }
 function debounce(fn,delay=300){let timer;return (...args)=>{clearTimeout(timer);timer=setTimeout(()=>fn(...args),delay)}}
 function bind(){
- $$('.admin-nav button').forEach(button=>button.onclick=()=>switchTab(button.dataset.tab));$$('[data-refresh]').forEach(button=>button.onclick=()=>({overview:loadOverview,quality:loadQuality,reports:loadReports,users:loadUsers,audit:loadAudit}[button.dataset.refresh]||(()=>{}))(true));
- $('#qualityDifficulty').onchange=renderQuality;$('#qualityFlag').onchange=renderQuality;$('#qualitySearch').oninput=debounce(renderQuality,180);$('#reportStatus').onchange=()=>loadReports(true);$('#reportSearch').oninput=debounce(()=>loadReports(true),300);$('#userSearch').oninput=debounce(()=>loadUsers(true),300);$('#closeUserModal').onclick=()=>$('#userModal').classList.add('hidden');$('#userModal').onclick=event=>{if(event.target===$('#userModal'))$('#userModal').classList.add('hidden')};
+ $$('.admin-nav button').forEach(button=>button.onclick=()=>switchTab(button.dataset.tab));$$('[data-refresh]').forEach(button=>button.onclick=()=>({launch:loadLaunch,overview:loadOverview,quality:loadQuality,reports:loadReports,users:loadUsers,audit:loadAudit}[button.dataset.refresh]||(()=>{}))(true));
+ $('#qualityDifficulty').onchange=renderQuality;$('#qualityFlag').onchange=renderQuality;$('#qualitySearch').oninput=debounce(renderQuality,180);$('#reportStatus').onchange=()=>loadReports(true);$('#reportSearch').oninput=debounce(()=>loadReports(true),300);$('#userSearch').oninput=debounce(()=>loadUsers(true),300);$('#refreshSupportBtn').onclick=()=>{state.support=null;loadSupport(true)};$('#closeUserModal').onclick=()=>$('#userModal').classList.add('hidden');$('#userModal').onclick=event=>{if(event.target===$('#userModal'))$('#userModal').classList.add('hidden')};
 }
 async function boot(){
  bind();const p=profile();if(!p?.token){showGate('Nejdřív se přihlas jako Pavel.','Otevři Proplet, přihlas hráče Pavel v týmu Prouza a pak se sem vrať. Oprávnění se ověřuje na serveru.');return}
- try{state.admin=await api('/api/admin/me');$('#adminGate').classList.add('hidden');$('#adminApp').classList.remove('hidden');$('#adminIdentity').classList.remove('hidden');$('#adminIdentity').innerHTML=`<span>${esc(state.admin.avatar)}</span><span class="identity-copy">${esc(state.admin.name)}<small>${esc(state.admin.team)}</small></span><b class="role-pill">${esc(state.admin.role)}</b>`;await loadOverview()}catch(error){showGate('Sem tě server nepustil.',error.message,true)}
+ try{state.admin=await api('/api/admin/me');$('#adminGate').classList.add('hidden');$('#adminApp').classList.remove('hidden');$('#adminIdentity').classList.remove('hidden');$('#adminIdentity').innerHTML=`<span>${esc(state.admin.avatar)}</span><span class="identity-copy">${esc(state.admin.name)}<small>${esc(state.admin.team)}</small></span><b class="role-pill">${esc(state.admin.role)}</b>`;await loadLaunch()}catch(error){showGate('Sem tě server nepustil.',error.message,true)}
 }
 boot();
