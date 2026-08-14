@@ -28,7 +28,7 @@ Otevřít `/api/health` a ověřit minimálně:
 
 ```json
 {
-  "version": "3.23.0",
+  "version": "3.23.1",
   "launchReadinessSprint": "3.23",
   "publicErrorDetails": false,
   "apiDocsPublic": false,
@@ -49,7 +49,7 @@ Otevřít `/api/health` a ověřit minimálně:
 - [ ] `database: true`
 - [ ] `securityMigration: true`
 - [ ] `ok: true`
-- [ ] Patička/PWA skutečně ukazuje v3.23.0.
+- [ ] Patička/PWA skutečně ukazuje v3.23.1.
 
 ## D. HTTP/security smoke
 
@@ -129,7 +129,7 @@ Ideálně dva testovací účty ve dvou různých týmech.
 ## J. PWA/update smoke
 
 - [ ] Stávající instalovaná PWA přijme v3.23 service-worker bundle.
-- [ ] Po úplném zavření/otevření stále ukazuje 3.23.0.
+- [ ] Po úplném zavření/otevření stále ukazuje 3.23.1.
 - [ ] Offline shell se otevře v rozsahu, který podporuje současná PWA.
 - [ ] PWA theme-color respektuje light/dark.
 - [ ] Push reminder test, pokud je push v produkci nakonfigurovaný.

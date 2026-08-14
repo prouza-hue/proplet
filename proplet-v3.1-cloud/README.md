@@ -1,6 +1,6 @@
-# Proplet v3.23.0
+# Proplet v3.23.1
 
-Aktuální release candidate: **v3.23.0 — Launch Ready 🚀**.
+Aktuální release candidate: **v3.23.1 — Launch Ready 🚀**.
 
 Tento sprint nepřidává novou herní mechaniku a nemění puzzle banku. Zaměřuje se na veřejný launch:
 
@@ -29,3 +29,7 @@ Pořadí:
 6. production smoke podle `LAUNCH_CHECKLIST_V3_23_CZ.md`
 
 Podrobnosti: `UPDATE_V3_23_CZ.md`, `SECURITY_AUDIT_V3_23_CZ.md`, `QA_V3_23_CZ.md`.
+
+## v3.23.1
+
+- Liga týmů podporuje i tým s jediným členem; skórování a privacy pravidla jsou stejná jako u větších týmů.

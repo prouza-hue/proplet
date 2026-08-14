@@ -130,7 +130,7 @@ commit;
 
 select jsonb_build_object(
   'verification', 'PASS',
-  'version', '3.23.0',
+  'version', '3.23.1',
   'sessionExpiryColumns', true,
   'securityRateLimits', true,
   'operationalEvents', true,

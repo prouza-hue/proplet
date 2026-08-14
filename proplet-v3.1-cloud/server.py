@@ -53,7 +53,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 STARTER_XP = 10
-APP_VERSION = "3.23.0"
+APP_VERSION = "3.23.1"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -1094,6 +1094,7 @@ def health():
         "accountDeletion": True,
         "supportChannel": True,
         "launchDashboard": True,
+        "singleMemberTeams": True,
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
@@ -3055,7 +3056,7 @@ def _family_league_week(week_offset: int = 0) -> dict:
         members = members_by_family.get(family, [])
         member_ids = {p["id"] for p in members}
         member_count = len(members)
-        eligible = member_count >= 2
+        eligible = member_count >= 1
         try:
             enabled_date = datetime.fromisoformat(str(league.get("public_enabled_at") or "").replace("Z", "+00:00")).astimezone(TZ).date()
         except Exception:
@@ -3079,7 +3080,7 @@ def _family_league_week(week_offset: int = 0) -> dict:
                     day_members.append(member)
             day_ids = {m["id"] for m in day_members}
             denominator = min(3, len(day_members)) if day_members else 1
-            day_eligible = len(day_members) >= 2 and day_date >= enabled_date
+            day_eligible = len(day_members) >= 1 and day_date >= enabled_date
             own_rows = [r for r in world_rows if r.get("player_id") in day_ids and day_date >= enabled_date]
             scored = sorted((_daily_individual_score(r, world_rows) for r in own_rows), reverse=True)
             top = scored[:3]
@@ -3135,7 +3136,7 @@ def family_league(
                 "enabled": league.get("public_opt_in") is True,
                 "hasPin": bool(league.get("pin_hash")),
                 "memberCount": len(members),
-                "eligible": len(members) >= 2,
+                "eligible": len(members) >= 1,
                 "rank": mine.get("rank") if mine else None,
                 "score": mine.get("score") if mine else 0,
             }

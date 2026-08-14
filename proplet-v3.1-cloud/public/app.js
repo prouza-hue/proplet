@@ -1,4 +1,4 @@
-const APP_VERSION='3.23.0';
+const APP_VERSION='3.23.1';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -945,7 +945,7 @@ async function renderGlobalLeague(){
   $('#globalLeagueWeekMeta').textContent=`${formatDateCZ(data.weekStart)} – ${formatDateCZ(data.weekEnd)}`;
   const my=data.myFamily,p=getProfile();
   if(my){
-   if(my.enabled){status.innerHTML=`<div class="card my-family-world"><div><span class="eyebrow">TVŮJ TÝM</span><strong>${esc(my.publicName)}</strong><small>${my.eligible?(my.rank?`${my.rank}. místo · ${Math.round(my.score)} / 700 bodů`:'Tento týden zatím bez bodů'):'Liga týmů potřebuje alespoň dva hráče v týmu.'}</small></div><button id="editFamilyWorldBtn" class="secondary-btn">Upravit</button></div>`}
+   if(my.enabled){status.innerHTML=`<div class="card my-family-world"><div><span class="eyebrow">TVŮJ TÝM</span><strong>${esc(my.publicName)}</strong><small>${my.eligible?(my.rank?`${my.rank}. místo · ${Math.round(my.score)} / 700 bodů`:'Tento týden zatím bez bodů'):'Tým je připravený hrát Ligu týmů.'}</small></div><button id="editFamilyWorldBtn" class="secondary-btn">Upravit</button></div>`}
    else{status.innerHTML=`<div class="card global-optin-card"><div><span class="eyebrow">VÁŠ TÝM JE ZATÍM V HLEDIŠTI</span><strong>Pošlete ${esc(my.leagueName)} do Ligy týmů?</strong><small>Veřejně bude vidět jen zvolený název týmu a společné skóre.</small></div><button id="joinFamilyWorldBtn" class="primary-btn">Zapojit tým 🌍</button></div>`}
   }else if(p?.token&&!p?.familyCode){status.innerHTML='<div class="card global-optin-card"><div><strong>Účet máš. Chybí jen tým.</strong><small>Přidej rodinu nebo partu, pokud chcete soutěžit společně.</small></div><button id="globalTeamBtn" class="secondary-btn">Přidat tým</button></div>'}else if(!p?.token){status.innerHTML='<div class="card global-optin-card"><div><strong>Chceš zapojit vlastní rodinu?</strong><small>Ulož si účet. Samotné pořadí si můžeš prohlížet i bez něj.</small></div><button id="globalLoginBtn" class="secondary-btn">Uložit postup</button></div>'}
   const rows=data.standings||[];

@@ -7,11 +7,11 @@ ROOT=Path(__file__).resolve().parents[1]
 read=lambda p:(ROOT/p).read_text(encoding='utf-8')
 server=read('server.py'); app=read('public/app.js'); html=read('public/index.html'); css=read('public/styles.css'); sw=read('public/sw.js'); admin=read('public/admin.html'); adminjs=read('public/admin.js'); vercel=read('vercel.json'); setup=read('SUPABASE_SETUP.sql'); mig=read('SUPABASE_MIGRATION_V3_23.sql')
 # Version / release markers
-assert 'APP_VERSION = "3.23.0"' in server
-assert "const APP_VERSION='3.23.0'" in app
-assert 'Proplet v3.23.0' in html
-assert 'proplet-v3.23.0-launch-readiness' in sw
-for token in ['"launchReadinessSprint": "3.23"','"publicErrorDetails": False','"apiDocsPublic": False','"securityHeaders": True','"accountExport": True','"accountDeletion": True','"supportChannel": True','"launchDashboard": True']:
+assert 'APP_VERSION = "3.23.1"' in server
+assert "const APP_VERSION='3.23.1'" in app
+assert 'Proplet v3.23.1' in html
+assert 'proplet-v3.23.1-launch-readiness-single-team' in sw
+for token in ['"launchReadinessSprint": "3.23"','"publicErrorDetails": False','"apiDocsPublic": False','"securityHeaders": True','"accountExport": True','"accountDeletion": True','"supportChannel": True','"launchDashboard": True','"singleMemberTeams": True']:
     assert token in server, token
 # Immutable gameplay content / prior migration
 EXPECTED_PUZZLE='ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23'
@@ -27,7 +27,7 @@ for token in ['landscapeGameBlocker','Otoč telefon na výšku','shouldBlockPhon
     assert token not in app+html+css, token
 assert 'display-mode: standalone' not in css.lower()
 # Launch static files / trust controls
-for rel in ['public/theme-init.js','public/privacy.html','public/terms.html','public/legal.css','public/robots.txt','public/sitemap.xml','SUPABASE_MIGRATION_V3_23.sql','SUPABASE_VERIFY_V3_23.sql','SECURITY_AUDIT_V3_23_CZ.md','LAUNCH_CHECKLIST_V3_23_CZ.md','QA_V3_23_CZ.md','RELEASE_V3_23_CZ.md','UPDATE_V3_23_CZ.md','V3_23_MANIFEST.json']:
+for rel in ['public/theme-init.js','public/privacy.html','public/terms.html','public/legal.css','public/robots.txt','public/sitemap.xml','SUPABASE_MIGRATION_V3_23.sql','SUPABASE_VERIFY_V3_23.sql','SECURITY_AUDIT_V3_23_CZ.md','LAUNCH_CHECKLIST_V3_23_CZ.md','QA_V3_23_CZ.md','RELEASE_V3_23_CZ.md','UPDATE_V3_23_CZ.md','V3_23_MANIFEST.json','RELEASE_V3_23_1_CZ.md','QA_V3_23_1_CZ.md','UPDATE_V3_23_1_CZ.md','tools/test_v3231_single_member_teams.py']:
     assert (ROOT/rel).exists(), rel
 for id_ in ['reportIssueBtn','exportDataBtn','deleteAccountBtn','supportReportModal','deleteAccountModal']:
     assert f'id="{id_}"' in html, id_
