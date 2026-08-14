@@ -727,7 +727,7 @@ html[data-theme="dark"] .current-word strong{color:#c5bcff}
 html[data-theme="dark"] .clean-status{background:#1f3b32;color:#83dfbd}html[data-theme="dark"] .starter-mode .clean-status{background:#302a52;color:#c8c0ff}
 html[data-theme="dark"] .clean-status.lost{background:#2b2832;color:#a7a0af}
 html[data-theme="dark"] .found-row{border-top-color:#34303f}
-html[data-theme="dark"] .found-word-chip{color:#e9e4ef;border-color:rgba(220,212,235,.12)}
+html[data-theme="dark"] .found-word-chip{background:color-mix(in srgb,var(--word-color,#72d9b7) 70%,#211f2c)!important;color:#0c0b10;border-color:color-mix(in srgb,var(--word-color,#72d9b7) 72%,#383240);text-shadow:0 1px 0 rgba(255,255,255,.10)}
 html[data-theme="dark"] .game-message{color:#aaa4b5}html[data-theme="dark"] .game-message.good{color:#72d9b7}html[data-theme="dark"] .game-message.bad{color:#ff9286}
 html[data-theme="dark"] .board-stage{background:linear-gradient(145deg,rgba(29,27,42,.96),rgba(24,33,34,.92));box-shadow:0 15px 36px rgba(0,0,0,var(--board-glow,.22)),0 0 0 1px rgba(114,217,183,var(--board-mint,.025)) inset,var(--shadow)}
 html[data-theme="dark"] .board-stage.near-complete{background:linear-gradient(145deg,rgba(31,29,45,.98),rgba(23,40,35,.95))}
@@ -791,7 +791,7 @@ html[data-theme="dark"] .onboard-fill-demo span{animation-name:onboardFillDark}
 @keyframes pulseDark{50%{transform:scale(.84);background:#5a4a22;box-shadow:0 0 0 7px rgba(235,198,95,.13)}}
 html[data-theme="dark"] .cell.hint{animation-name:pulseDark}
 
-/* v3.22.1 — found-word legibility hotfix: dark ink on richer route colours. */
+/* v3.22.2 — found-row chips now match solved-cell dark-ink legibility. */
 /* v3.22 — secondary surfaces discovered during full-state visual pass. */
 html[data-theme="dark"] .mini-stats>div{border-color:#373241}
 html[data-theme="dark"] .win-clean{background:#214337;color:#8ce5c0}

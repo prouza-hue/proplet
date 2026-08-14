@@ -1,4 +1,4 @@
-const APP_VERSION='3.22.1';
+const APP_VERSION='3.22.2';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -568,7 +568,7 @@ function renderGameHUD(){
  const g=currentGame,p=g.puzzle;$('#moves').textContent=countCz(g.moves,'tah','tahy','tahů');$('#gameProgress').textContent=`${g.found.length}/${p.answers.length}`;
  const remaining=p.answers.map((a,i)=>({len:a.word.length,i})).filter(x=>!g.found.some(f=>f.answerIndex===x.i)).sort((a,b)=>a.len-b.len||a.i-b.i);
  $('#lengths').innerHTML=remaining.length?remaining.map(x=>`<span class="length-pill ${g.mode==='starter'&&((g.found.length===0&&x.i===0)||(g.found.length===1&&x.i===1)||(g.found.length===2&&x.i===2)||(g.found.length===3&&x.i===3))?'starter-target':''}" title="${countCz(x.len,'písmeno','písmena','písmen')}">${x.len}</span>`).join(''):'<span class="all-found">✓ nic</span>';
- $('#foundWords').innerHTML=g.found.length?g.found.map(f=>`<span class="found-word-chip" style="background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 58%,white)">${esc(f.word)}</span>`).join(''):'<span class="empty-found">zatím nic</span>';
+ $('#foundWords').innerHTML=g.found.length?g.found.map(f=>`<span class="found-word-chip" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,var(--word-color) 58%,white)">${esc(f.word)}</span>`).join(''):'<span class="empty-found">zatím nic</span>';
  const clean=$('#cleanStatus');clean.textContent=g.mode==='rescue'?'':g.mode==='starter'?'🎓 Trénink':(g.hints?'💡 S nápovědou':'✨ Čistě');clean.classList.toggle('lost',g.mode!=='starter'&&!!g.hints);$('#hintBtn').textContent=g.mode==='starter'?'💡 Nápověda':g.hints?`💡 ${g.hints}×`:'💡 Nápověda';updateGameFeel();
 }
 function fitGameBoard(){
