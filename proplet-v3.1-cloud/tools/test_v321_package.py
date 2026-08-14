@@ -7,8 +7,8 @@ ROOT=Path(__file__).resolve().parents[1]
 required=['server.py','public/app.js','public/index.html','public/styles.css','public/sw.js','SUPABASE_MIGRATION_V3_21.sql','data/puzzles.json','public/puzzles.json']
 for f in required: assert (ROOT/f).exists(), f
 server=(ROOT/'server.py').read_text(); app=(ROOT/'public/app.js').read_text(); html=(ROOT/'public/index.html').read_text(); css=(ROOT/'public/styles.css').read_text(); sw=(ROOT/'public/sw.js').read_text(); sql=(ROOT/'SUPABASE_MIGRATION_V3_21.sql').read_text()
-assert 'version="3.21.2-cloud"' in server and '"version": "3.21.2"' in server
-assert "const APP_VERSION='3.21.2'" in app and 'Proplet v3.21' in html and 'proplet-v3.21.2-starter-choice' in sw
+assert 'version="3.21.3-cloud"' in server and '"version": "3.21.3"' in server
+assert "const APP_VERSION='3.21.3'" in app and 'Proplet v3.21' in html and 'proplet-v3.21.3-orientation-safe' in sw
 assert 'gameFeelSprint' in server and 'starterXp' in server and 'starterMigration' in server
 assert "mode in ('daily','free','starter')" in sql and "'starter-v1'" in sql and '10' in sql
 
@@ -63,10 +63,14 @@ for token in ['gameUndoToast','hintEyebrow','hintTitle','hintCopy','starterDaily
     assert f'id="{token}"' in html, token
 for token in ['path-guide','wrong-flash','boardCompleteSettle','starterHintAttention','game-undo-toast','starter-daily-nudge']:
     assert token in css, token
-# Fold7 inner display must use tablet behavior, while the folded cover remains phone-landscape guarded.
-assert 'function isTabletSizedViewport(w,h)' in app
-assert '!isTabletSizedViewport(w,h)' in app
-assert 'unfolded foldables are tablets' in css
+# Orientation is responsive-only in v3.21.3: no viewport may block play.
+assert 'id="landscapeGameBlocker"' not in html
+assert 'Otoč telefon na výšku' not in html
+assert 'shouldBlockPhoneLandscape' not in app
+assert "pauseGameClock('landscape')" not in app
+assert 'body.landscape-game-blocked .landscape-game-blocker' not in css
+assert 'orientationBlocking' in server and 'foldResponsiveReflow' in server
+assert 'ResizeObserver' in app and 'orientationchange' in app and 'visualViewport' in app
 # Player copy must not expose our implementation history.
 for bad in ['postup Gen2','skutečně hraných v Gen2','Archiv původní banky','Převedený slot','XP za nový slot','Táhni prstem','musí sedět i cesta']:
     assert bad not in app+html, bad

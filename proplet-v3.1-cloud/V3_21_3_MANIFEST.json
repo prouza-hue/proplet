@@ -1,0 +1,69 @@
+{
+  "version": "3.21.3",
+  "baseVersion": "3.21.2",
+  "databaseMigrationRequired": false,
+  "orientationBlocking": false,
+  "files": {
+    "server.py": {
+      "sha256": "63d8aa4414150cb5ae8949d96966e5d1461809d27bbd5192107c1eb064b7c0ca",
+      "bytes": 138467
+    },
+    "public/app.js": {
+      "sha256": "2416a55c8644a46f86082cd8e6ab69f1eb1915ee8114cedc09643dadc73d555b",
+      "bytes": 174340
+    },
+    "public/index.html": {
+      "sha256": "ed422f4fdcdce5ba6054f4331db7d9a8b303cf11ea9c47403ce48c0b21d9bf77",
+      "bytes": 29882
+    },
+    "public/styles.css": {
+      "sha256": "8d5aa1b0ba6207e87e1dbb5e69f2d56d324ee29144d484c013e4cf23d5ae226e",
+      "bytes": 87986
+    },
+    "public/sw.js": {
+      "sha256": "db9dc42dc8ce54275332d8da29b053713e84293b7bcc725f905e92f6673b1f70",
+      "bytes": 2120
+    },
+    "README.md": {
+      "sha256": "31d3537fa50616feafa619bdc1c40d16dc6fd4daeb0eef3902c460949e966ef4",
+      "bytes": 5741
+    },
+    "UPDATE_V3_21_3_CZ.md": {
+      "sha256": "9488642e81155d4044954e9c29bbf47ebc99c98ff7fea3d4716c4d8152b2f268",
+      "bytes": 1419
+    },
+    "RELEASE_V3_21_3_CZ.md": {
+      "sha256": "5ae0b6a3f2b8190008a7128c131ae09805c10b372780155350dbdabfa836d4cf",
+      "bytes": 1290
+    },
+    "QA_V3_21_3_CZ.md": {
+      "sha256": "7f1702c1f233c4f8a8170c2c54b7ac6f4e0e5a8b7068755398f1b22ccc711152",
+      "bytes": 1703
+    },
+    "tools/test_v3213_orientation.py": {
+      "sha256": "e2132e7000e650b2b2236dd2a4136f6e55ff9c4dd1922ba8d5b02797c21d6ffe",
+      "bytes": 1095
+    },
+    "tools/test_v321_package.py": {
+      "sha256": "ab84195221e741f76d1cbfc46ecfe1c05daeeb2d4b025d746d162eaf903e572f",
+      "bytes": 4905
+    },
+    "tools/test_v321_server.py": {
+      "sha256": "81521e2697b8d0548005a9194b8ae72623ed9e09d87274088b40139f96af0db1",
+      "bytes": 3402
+    },
+    "tools/test_v3212_starter_choice.py": {
+      "sha256": "56195045451516e37fa7cfb4e18791401ab5225f40eadf7dc80d9dae4386bb0a",
+      "bytes": 1351
+    },
+    "tools/test_v321_fold.js": {
+      "sha256": "6c9e2c0bb3a283983eb869b2c0c8ee2eaa716959779f9d10c606f60258510e66",
+      "bytes": 1282
+    },
+    "tools/test_v3211_fold.js": {
+      "sha256": "6c9e2c0bb3a283983eb869b2c0c8ee2eaa716959779f9d10c606f60258510e66",
+      "bytes": 1282
+    }
+  },
+  "puzzlesSha256": "ae74c21be87af921bccb0386197eefc1c3274f253f15423848b98f9aeb3aea23"
+}

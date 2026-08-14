@@ -53,7 +53,7 @@ BADGES = [
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 STARTER_XP = 10
 
-app = FastAPI(title="Proplet API", version="3.21.2-cloud")
+app = FastAPI(title="Proplet API", version="3.21.3-cloud")
 logger = logging.getLogger("proplet")
 
 
@@ -824,7 +824,7 @@ def health():
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": "data/puzzles.json",
-        "version": "3.21.2",
+        "version": "3.21.3",
         "adminStatic": True,
         "adminEntry": "/admin.html",
         "adminDelivery": "vercel-public-static",
@@ -841,8 +841,8 @@ def health():
         "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
         "uxSprint": "3.20",
         "gameFeelSprint": "3.21",
-        "foldViewportHotfix": True,
-        "foldTabletShortSidePx": 540,
+        "orientationBlocking": False,
+        "foldResponsiveReflow": True,
         "starterPuzzle": bool(pdata.get("starter")),
         "starterXp": STARTER_XP,
         "starterHintOptional": True,
@@ -949,7 +949,7 @@ def config():
         "dailyRotationSize": p["dailyRotationSize"],
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
-        "version": "3.21.2",
+        "version": "3.21.3",
     }
 
 
@@ -1226,7 +1226,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": "3.21.2", "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": "3.21.3", "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -1379,7 +1379,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.21.2",
+        "started_at": datetime.now(TZ).isoformat(), "app_version": "3.21.3",
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -1440,7 +1440,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.21.2",
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": "3.21.3",
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:

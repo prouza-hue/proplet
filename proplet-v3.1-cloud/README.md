@@ -1,9 +1,10 @@
-# Proplet v3.21.2
+# Proplet v3.21.3
 
-Aktuální release: **v3.21.2 — Starter Choice & Clearer Helper**.
+Aktuální release: **v3.21.3 — Orientation Safety Hotfix**.
 
 Hlavní novinky:
 
+- v3.21.3 odstraňuje nespolehlivé blokování landscape orientace; Fold, tablet i telefon se při otočení pouze responzivně přepočítají,
 - v3.21.2 opravuje matoucí texty Pomocníka a odstraňuje vynucenou Nápovědu ze starteru; po 10 s nečinnosti může přijít pouze neblokující nabídka,
 
 - v3.21 přidává samostatný kurátorovaný první Proplet 5×5 (MRAK / JABLKO / ČOKOLÁDA / AUTOBUS), který po onboardingu rovnou učí hru hraním a dává skutečných 10 XP,
@@ -51,3 +52,6 @@ Release notes: `RELEASE_V3_21_CZ.md`
 QA: `QA_V3_21_CZ.md`  
 Lexikon: `LEXICON_V2_PRODUCTION_CZ.md`  
 Audity: `FREE_GENERATION2_AUDIT_CZ.md`, `FREE_EXTENSION_V3_19_AUDIT_CZ.md`, `DAILY_GENERATION2_AUDIT_CZ.md`
+
+
+Aktuální hotfix: viz `UPDATE_V3_21_3_CZ.md` a `QA_V3_21_3_CZ.md`.
