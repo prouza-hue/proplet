@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
   <title id="title">Těžká</title>
   <defs>
-    <linearGradient id="mountainA" x1="14" y1="49" x2="31" y2="20" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4d82d8"/>
-      <stop offset="1" stop-color="#88b7ff"/>
+    <linearGradient id="flameOuter" x1="18" y1="57" x2="43" y2="7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff7a1a"/>
+      <stop offset="0.58" stop-color="#ff9d18"/>
+      <stop offset="1" stop-color="#ffbf2f"/>
     </linearGradient>
-    <linearGradient id="mountainB" x1="28" y1="52" x2="48" y2="10" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2f68be"/>
-      <stop offset="1" stop-color="#6ea8ff"/>
+    <linearGradient id="flameInner" x1="27" y1="52" x2="35" y2="27" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff4bd"/>
+      <stop offset="1" stop-color="#ffd65c"/>
     </linearGradient>
   </defs>
-  <path d="M6.8 50.7 21.2 26l9.2 14.8 7.8-12.2 14.9 22.1Z" fill="url(#mountainA)" stroke="#29284a" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M18.2 50.7 36.3 12.4l20.9 38.3Z" fill="url(#mountainB)" stroke="#29284a" stroke-width="4" stroke-linejoin="round"/>
-  <path d="m29.8 26 6.5-13.6 7 12.8-4.1-1.8-3.2 3.7-3.4-3.4Z" fill="#fffefd"/>
-  <path d="m15.9 35 5.3-9 5.1 8.3-3.3-1.2-2.6 2.7-2.4-2.4Z" fill="#eef5ff"/>
+  <path d="M31.8 5.8c4.3 7.2 4.8 13.2 1.6 18.2 5.2-2.3 8.2-6.4 9-12.3 7 7.5 9.7 15.5 7.7 23.3 4.2-2 6.4-5.1 7.1-9.2 4.4 8.6 4.2 17-.6 23.8-5.1 7.3-13.7 10.3-23.9 9.3-12.2-1.2-20.7-8.5-21.8-18.7-.8-7.4 2.5-13.4 9.9-20.3-.4 5.8 1.3 10.2 5.1 13.1 1.2-6.1.3-11.7-2.6-16.8 4.4 2 7.2 5.2 8.5 9.7 2-6 2-12.7 0-20.1Z" fill="url(#flameOuter)" stroke="#29284a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M31.4 24.5c3.4 5.2 3.2 9.3-.5 13 3.9-.9 6.6-3.2 8.1-7 4.6 5.1 6 10.2 3.9 15.1-2.1 5-6.2 7.8-11.8 7.8-6.8 0-11.4-4.1-11.4-10 0-4.9 2.9-8.8 8.1-13.5-.1 3.5.8 6.2 2.8 8.1 1.5-4.4 1.8-8.9.8-13.5Z" fill="#ff5f17" stroke="#d84d15" stroke-width="1.9" stroke-linejoin="round"/>
+  <path d="M31.3 34.4c4.2 3.9 5.4 7.6 3.6 11-1.2 2.3-3.2 3.7-5.9 3.7-3.9 0-6.6-2.5-6.6-6 0-3.1 2-5.6 5.5-8.7 0 2.3.7 4 2 5.1.8-1.6 1.3-3.3 1.4-5.1Z" fill="url(#flameInner)"/>
 </svg>

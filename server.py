@@ -53,7 +53,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.27.2"
+APP_VERSION = "3.27.3"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
