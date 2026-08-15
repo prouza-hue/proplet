@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/build-v324-daily.yml
       - tools/apply_v324_patch.py
+      - tools/harden_v324_daily_boundary.py
       - tools/generate_daily_v324.py
       - tools/audit_daily_generation3.py
 
@@ -32,12 +33,15 @@ jobs:
       - name: Prepare production build scripts
         run: |
           cp tools/apply_v324_patch.py proplet-v3.1-cloud/tools/apply_v324_patch.py
+          cp tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py
           cp tools/generate_daily_v324.py proplet-v3.1-cloud/tools/generate_daily_v324.py
           cp tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
           sed -i "s/const APP_VERSION='3.22.1';/const APP_VERSION='3.23.1';/" proplet-v3.1-cloud/tools/apply_v324_patch.py
 
       - name: Apply deterministic runtime patch
-        run: python proplet-v3.1-cloud/tools/apply_v324_patch.py
+        run: |
+          python proplet-v3.1-cloud/tools/apply_v324_patch.py
+          python proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py
 
       - name: Generate Daily Generation 3
         run: python proplet-v3.1-cloud/tools/generate_daily_v324.py
@@ -47,18 +51,23 @@ jobs:
 
       - name: Syntax checks
         run: |
-          python -m py_compile proplet-v3.1-cloud/server.py proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/generate_puzzles.py
+          python -m py_compile proplet-v3.1-cloud/server.py proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/generate_puzzles.py
           node --check proplet-v3.1-cloud/public/app.js
 
       - name: Release invariants
         run: |
           python - <<'PY'
           import json
+          import subprocess
           from datetime import date
           from pathlib import Path
 
           root = Path('proplet-v3.1-cloud')
           data = json.loads((root / 'data/puzzles.json').read_text(encoding='utf-8'))
+          baseline = json.loads(subprocess.check_output([
+              'git', 'show', 'origin/main:proplet-v3.1-cloud/data/puzzles.json'
+          ], text=True))
+
           assert data['dailyGeneration'] == 3
           assert data['dailyGeneration3From'] == '2026-08-17'
           assert data['dailyRotationBaseDate'] == '2026-08-17'
@@ -67,6 +76,11 @@ jobs:
           assert [p['difficulty'] for p in data['daily'][:14]] == data['dailyCadence']['pattern'] * 2
           assert len(data['daily']) == 365
           assert len(data['previousDaily']['puzzles']) == 365
+          assert data['previousDaily']['puzzles'] == baseline['daily']
+          assert data['free'] == baseline['free'], 'Free bank changed unexpectedly'
+          assert data['rescue'] == baseline['rescue'], 'Rescue bank changed unexpectedly'
+          assert data.get('freeGeneration') == baseline.get('freeGeneration')
+          assert data.get('freeLevelsPerDifficulty') == baseline.get('freeLevelsPerDifficulty')
           assert (root / 'data/puzzles.json').read_bytes() == (root / 'public/puzzles.json').read_bytes()
 
           app = (root / 'public/app.js').read_text(encoding='utf-8')
@@ -78,6 +92,7 @@ jobs:
           assert 'APP_VERSION = "3.24.0"' in server
           assert 'dailyBankFor' in app and 'renderDailyWeekRhythm' in app
           assert 'previous_daily_bank' in server and 'dailyGeneration3From' in server
+          assert 'requested_date >= switch3' in server
           assert 'maybeOfferRescue' in app
           assert 'proplet-v3.24.0-daily-weekly-cadence' in sw
           assert 'v3.24 — Monday Daily cadence' in styles
@@ -93,11 +108,11 @@ jobs:
             proplet-v3.1-cloud/public/app.js proplet-v3.1-cloud/public/index.html proplet-v3.1-cloud/public/styles.css proplet-v3.1-cloud/public/sw.js \
             proplet-v3.1-cloud/data/puzzles.json proplet-v3.1-cloud/public/puzzles.json proplet-v3.1-cloud/data/legacy_daily_gen2.json \
             proplet-v3.1-cloud/DAILY_GENERATION3_AUDIT.json proplet-v3.1-cloud/DAILY_GENERATION3_AUDIT_CZ.md \
-            proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
+            proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
           else
-            git commit -m "Build Proplet v3.24.0 Daily Generation 3"
+            git commit -m "Harden Proplet v3.24.0 Daily boundary"
             git push origin HEAD:sol/v3.24-daily-weekly-cadence
           fi
 
