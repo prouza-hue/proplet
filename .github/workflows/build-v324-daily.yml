@@ -9,6 +9,7 @@ on:
       - tools/apply_v324_patch.py
       - tools/harden_v324_daily_boundary.py
       - tools/generate_daily_v324.py
+      - tools/format_v324_puzzles.py
       - tools/audit_daily_generation3.py
 
 permissions:
@@ -35,6 +36,7 @@ jobs:
           cp tools/apply_v324_patch.py proplet-v3.1-cloud/tools/apply_v324_patch.py
           cp tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py
           cp tools/generate_daily_v324.py proplet-v3.1-cloud/tools/generate_daily_v324.py
+          cp tools/format_v324_puzzles.py proplet-v3.1-cloud/tools/format_v324_puzzles.py
           cp tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
           sed -i "s/const APP_VERSION='3.22.1';/const APP_VERSION='3.23.1';/" proplet-v3.1-cloud/tools/apply_v324_patch.py
 
@@ -46,12 +48,15 @@ jobs:
       - name: Generate Daily Generation 3
         run: python proplet-v3.1-cloud/tools/generate_daily_v324.py
 
+      - name: Preserve readable puzzle JSON
+        run: python proplet-v3.1-cloud/tools/format_v324_puzzles.py
+
       - name: Audit all 365 Daily boards
         run: python proplet-v3.1-cloud/tools/audit_daily_generation3.py
 
       - name: Syntax checks
         run: |
-          python -m py_compile proplet-v3.1-cloud/server.py proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/generate_puzzles.py
+          python -m py_compile proplet-v3.1-cloud/server.py proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/format_v324_puzzles.py proplet-v3.1-cloud/tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/generate_puzzles.py
           node --check proplet-v3.1-cloud/public/app.js
 
       - name: Release invariants
@@ -108,11 +113,11 @@ jobs:
             proplet-v3.1-cloud/public/app.js proplet-v3.1-cloud/public/index.html proplet-v3.1-cloud/public/styles.css proplet-v3.1-cloud/public/sw.js \
             proplet-v3.1-cloud/data/puzzles.json proplet-v3.1-cloud/public/puzzles.json proplet-v3.1-cloud/data/legacy_daily_gen2.json \
             proplet-v3.1-cloud/DAILY_GENERATION3_AUDIT.json proplet-v3.1-cloud/DAILY_GENERATION3_AUDIT_CZ.md \
-            proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
+            proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/format_v324_puzzles.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
           else
-            git commit -m "Harden Proplet v3.24.0 Daily boundary"
+            git commit -m "Keep Proplet v3.24 puzzle data reviewable"
             git push origin HEAD:sol/v3.24-daily-weekly-cadence
           fi
 
