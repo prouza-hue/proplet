@@ -1,4 +1,0 @@
-Proplet v3.21.2 update from v3.21.1
-No SQL migration.
-Runtime: server.py, public/app.js, public/index.html, public/styles.css, public/sw.js
-Docs/tests included for verification.
