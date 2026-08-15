@@ -1,0 +1,73 @@
+name: Validate and apply Proplet v3.27.1 icon refinement
+
+on:
+  push:
+    branches:
+      - agent/v3271-icon-refine
+    paths:
+      - .release/v3271-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact v3.27.1 patch
+        run: python .release/v3271_apply.py
+      - name: Validate runtime and refined SVGs
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          node --check public/sw.js
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          app = Path('public/app.js').read_text(encoding='utf-8')
+          server = Path('server.py').read_text(encoding='utf-8')
+          sw = Path('public/sw.js').read_text(encoding='utf-8')
+          medium = Path('public/difficulty/medium.svg').read_text(encoding='utf-8')
+          hardcore = Path('public/difficulty/hardcore.svg').read_text(encoding='utf-8')
+
+          assert "const APP_VERSION='3.27.1';" in app
+          assert 'APP_VERSION = "3.27.1"' in server
+          assert "proplet-v3.27.1-icon-refine" in sw
+          assert '/difficulty/medium.svg' in sw and '/difficulty/hardcore.svg' in sw
+
+          for path in ('public/difficulty/medium.svg','public/difficulty/hardcore.svg'):
+              root = ET.parse(path).getroot()
+              assert root.tag.endswith('svg')
+              assert root.attrib.get('viewBox') == '0 0 64 64'
+
+          # Medium must read unmistakably as a layered flame, not a rounded apple-like blob.
+          assert 'flameOuter' in medium and 'flameInner' in medium
+          assert medium.count('<path') >= 3
+          assert '#ff7a1a' in medium and '#ff5f17' in medium and '#ffd65c' in medium
+
+          # Hardcore must be deep crimson/oxblood and contain no old purple palette.
+          for red in ('#6b0d18','#941522','#c52a36'):
+              assert red in hardcore
+          for old in ('#7c53dc','#b56df0'):
+              assert old not in hardcore
+          assert 'id="horn"' in hardcore
+
+          # Difficulty registry remains asset-based and avatars are untouched.
+          assert "medium:{label:'Střední',icon:'/difficulty/medium.svg'" in app
+          assert "hardcore:{label:'Mozkožrout',icon:'/difficulty/hardcore.svg'" in app
+          assert "const AVATARS=['🙂','😎','🤓','🥳'" in app
+          PY
+          git diff --check
+      - name: Commit validated v3.27.1 runtime changes
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add server.py public/app.js public/sw.js public/difficulty/medium.svg public/difficulty/hardcore.svg
+          git diff --cached --check
+          git commit -m 'Proplet v3.27.1 refine Medium and Mozkozrout icons'
+          git push origin HEAD:agent/v3271-icon-refine
