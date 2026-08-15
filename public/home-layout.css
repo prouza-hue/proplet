@@ -10,12 +10,12 @@ body:not(.playing){height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto
 body:not(.playing) .app-shell{height:auto;min-height:100vh}
 @media(min-width:700px){.app-shell:has(#screen-daily.active.home-layout-active){width:min(100%,900px)}}
 
-/* Compact player status — one quiet strip, not a dashboard. */
+/* Compact player status — secondary to Daily, placed below the hero. */
 #screen-daily.home-layout-active .daily-progress-strip.home-status-strip{
   grid-template-columns:minmax(0,1fr) auto;
   grid-template-rows:auto auto;
   gap:6px 14px;
-  margin:0 0 10px;
+  margin:10px 0 0;
   padding:10px 12px 9px;
   border-radius:17px;
   background:rgba(255,255,255,.70);
