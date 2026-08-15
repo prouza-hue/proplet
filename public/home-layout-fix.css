@@ -1,0 +1,48 @@
+/* Fold/mobile corrective layer for the Dnes preview.
+   Loaded after home-layout.css so the new composition cannot inherit legacy grid/viewport rules. */
+
+/* The outer quick-play host is now a vertical composition. The nested .home-diff-grid owns the actual columns. */
+#screen-daily.home-layout-active #quickPlayGrid.quick-play-grid{
+  display:block!important;
+  grid-template-columns:none!important;
+  gap:0!important;
+  width:100%;
+  min-width:0;
+}
+#screen-daily.home-layout-active .home-continue,
+#screen-daily.home-layout-active .home-difficulty-label,
+#screen-daily.home-layout-active .home-diff-grid{width:100%;min-width:0}
+
+/* Dnes must always be a normal scrolling document, never the fixed game viewport. */
+body:not(.playing){height:auto!important;min-height:100%;overflow-x:hidden;overflow-y:auto!important}
+body:not(.playing) .app-shell{height:auto!important;min-height:100vh!important}
+
+/* Defensive recovery for browser/bfcache states where body.playing outlives the game screen. */
+body.playing:has(#screen-daily.active){height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important}
+body.playing:has(#screen-daily.active) .app-shell{
+  width:min(100%,640px)!important;
+  max-width:640px!important;
+  height:auto!important;
+  min-height:100vh!important;
+  padding:17px 16px 104px!important;
+}
+body.playing:has(#screen-daily.active) .app-header{display:flex!important}
+body.playing:has(#screen-daily.active) .bottom-nav{display:grid!important}
+
+/* Phone: one full-width continuation card, then a clean 2x2 difficulty grid. */
+@media(max-width:559px){
+  #screen-daily.home-layout-active .home-diff-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #screen-daily.home-layout-active .home-continue{grid-template-columns:38px minmax(0,1fr) auto!important}
+}
+
+/* Fold/tablet: continuation stays full width; only the four difficulty choices form a row. */
+@media(min-width:560px){
+  #screen-daily.home-layout-active .home-diff-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+
+/* Short unfolded Fold must scroll instead of trying to compress Dnes into the game-like viewport. */
+@media(min-width:700px) and (max-height:760px){
+  body:not(.playing) .app-shell,
+  body.playing:has(#screen-daily.active) .app-shell{height:auto!important;min-height:100vh!important;overflow:visible!important}
+  #screen-daily.active.home-layout-active{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important}
+}
