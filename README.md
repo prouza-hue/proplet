@@ -1,35 +1,43 @@
-# Proplet v3.23.1
+# Proplet v3.24.0
 
-Aktuální release candidate: **v3.23.1 — Launch Ready 🚀**.
+Aktuální produkční release: **v3.24.0 — Daily 2/3/2 + jednotný production root**.
 
-Tento sprint nepřidává novou herní mechaniku a nemění puzzle banku. Zaměřuje se na veřejný launch:
+## Produkční struktura
 
-- security hardening a atomický rate limiting,
-- bezpečné error handling + request ID,
-- session expiry a result/attempt sanity,
-- privacy boundary týmových dat,
-- export a smazání účtu,
-- in-app support,
-- privacy/terms,
-- Launch radar v administraci,
-- CSP/security headers,
-- launch metadata a provozní QA.
+Od v3.24 je jediným zdrojem pravdy **root tohoto repozitáře**. Vercel má `Root Directory` nastavený na repository root.
 
-## Nasazení
+Hlavní runtime části:
 
-**v3.23 vyžaduje SQL migraci.**
+- `server.py` — FastAPI backend
+- `public/` — web/PWA/admin
+- `data/` — puzzle banky, lexikon a archivované Daily generace
+- `tools/` — generátory, audity a regresní testy
+- `requirements.txt` — pinované Python dependencies
+- `vercel.json` — Vercel konfigurace a security headers
 
-Pořadí:
+Adresář `proplet-v3.1-cloud/` byl historický deployment relikt a od v3.24 se nepoužívá.
 
-1. `SUPABASE_MIGRATION_V3_23.sql`
-2. `SUPABASE_VERIFY_V3_23.sql` — musí PASS
-3. update ZIP do GitHub adresáře **`proplet-v3.1-cloud/`**
-4. Vercel deploy
-5. `/api/health`
-6. production smoke podle `LAUNCH_CHECKLIST_V3_23_CZ.md`
+## v3.24
 
-Podrobnosti: `UPDATE_V3_23_CZ.md`, `SECURITY_AUDIT_V3_23_CZ.md`, `QA_V3_23_CZ.md`.
+Denní výzva má od pondělí 17. 8. 2026 pevný týdenní rytmus:
 
-## v3.23.1
+- Po–Út: Snadná
+- St–Pá: Střední
+- So–Ne: Těžká
 
-- Liga týmů podporuje i tým s jediným členem; skórování a privacy pravidla jsou stejná jako u větších týmů.
+Daily Generation 3 obsahuje 365 nových úloh a Generation 2 zůstává archivovaná kvůli historii a kompatibilitě starších/offline klientů.
+
+Podrobnosti: `RELEASE_V3_24_CZ.md`, `DAILY_GENERATION3_AUDIT_CZ.md`.
+
+## Nasazování
+
+Běžný release:
+
+1. změny připravit v samostatné branchi,
+2. automatické testy / QA,
+3. Pull Request do `main`,
+4. po schválení **Squash and merge**,
+5. Vercel automaticky nasadí `main` z rootu,
+6. ověřit `/api/health` a základní smoke test.
+
+Pokud release vyžaduje změnu databáze, musí být v release dokumentaci výslovně uvedena příslušná `SUPABASE_MIGRATION_*.sql` a pořadí nasazení. **v3.24 žádnou novou Supabase migraci nevyžaduje.**
