@@ -28,7 +28,6 @@ jobs:
           node --check public/sw.js
           python - <<'PY'
           from pathlib import Path
-          import re
           import xml.etree.ElementTree as ET
 
           server=Path('server.py').read_text(encoding='utf-8')
@@ -37,14 +36,15 @@ jobs:
           css=Path('public/styles.css').read_text(encoding='utf-8')
           homecss=Path('public/home-layout.css').read_text(encoding='utf-8')
           sw=Path('public/sw.js').read_text(encoding='utf-8')
+          diff_block=app.split('const DIFF={',1)[1].split('};',1)[0]
 
           assert 'APP_VERSION = "3.27.0"' in server
           assert "const APP_VERSION='3.27.0';" in app
-          assert "icon:'/difficulty/easy.svg'" in app
-          assert "icon:'/difficulty/medium.svg'" in app
-          assert "icon:'/difficulty/hard.svg'" in app
-          assert "icon:'/difficulty/hardcore.svg'" in app
-          assert "icon:'🌱'" not in app and "icon:'🧠'" not in app and "icon:'🧨'" not in app
+          assert "icon:'/difficulty/easy.svg'" in diff_block
+          assert "icon:'/difficulty/medium.svg'" in diff_block
+          assert "icon:'/difficulty/hard.svg'" in diff_block
+          assert "icon:'/difficulty/hardcore.svg'" in diff_block
+          assert "icon:'🌱'" not in diff_block and "icon:'🧠'" not in diff_block and "icon:'🧨'" not in diff_block and "icon:'🤯'" not in diff_block
           assert "function difficultyIconMarkup" in app
           assert "difficultyIconMarkup(diff,'daily-week-icon')" in app
           assert "difficultyIconMarkup(key,'difficulty-icon-img')" in app
