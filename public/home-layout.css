@@ -125,3 +125,11 @@ html[data-theme="dark"] .home-continue[data-diff="medium"],html[data-theme="dark
 html[data-theme="dark"] .home-continue[data-diff="hard"],html[data-theme="dark"] .home-diff-tile[data-diff="hard"]{--q:#ff9286;--qs:#472a2d}
 html[data-theme="dark"] .home-continue[data-diff="hardcore"],html[data-theme="dark"] .home-diff-tile[data-diff="hardcore"]{--q:#d49aff;--qs:#3b2948}
 html[data-theme="dark"] .home-diff-progress{background:#302c3b}
+
+/* v3.27 — custom difficulty assets */
+.home-continue[data-diff="medium"],.home-diff-tile[data-diff="medium"]{--q:#f08a32;--qs:#fff0dc}
+.home-continue[data-diff="hard"],.home-diff-tile[data-diff="hard"]{--q:#4e83d5;--qs:#e5efff}
+.home-continue-icon .home-continue-difficulty-icon{width:30px;height:30px;display:block}
+.home-diff-top>span .home-diff-icon{width:22px;height:22px;display:block}
+html[data-theme="dark"] .home-continue[data-diff="medium"],html[data-theme="dark"] .home-diff-tile[data-diff="medium"]{--q:#ffad5b;--qs:#443025}
+html[data-theme="dark"] .home-continue[data-diff="hard"],html[data-theme="dark"] .home-diff-tile[data-diff="hard"]{--q:#87b5ff;--qs:#25364f}

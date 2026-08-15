@@ -78,7 +78,7 @@
   function difficultyTiles(){
     return Object.entries(DIFF).map(([key,info])=>{
       const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0;
-      return `<button class="home-diff-tile" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${htmlEsc(info.label)}, ${q.done} z ${q.total} hotovo"><span class="home-diff-top"><span>${info.icon}</span><strong>${htmlEsc(info.label)}</strong></span><small>${q.done} / ${q.total}</small><i class="home-diff-progress"><b style="width:${pct}%"></b></i></button>`;
+      return `<button class="home-diff-tile" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${htmlEsc(info.label)}, ${q.done} z ${q.total} hotovo"><span class="home-diff-top"><span>${difficultyIconMarkup(key,'home-diff-icon')}</span><strong>${htmlEsc(info.label)}</strong></span><small>${q.done} / ${q.total}</small><i class="home-diff-progress"><b style="width:${pct}%"></b></i></button>`;
     }).join('');
   }
 
@@ -99,7 +99,7 @@
       const resumed=!!target.resume,complete=target.total>0&&target.done>=target.total;
       const detail=resumed?`Rozehráno · ${target.done} z ${target.total} hotovo`:complete?`Všech ${target.total} hotovo · trénink`:`Další úroveň · ${target.done} z ${target.total} hotovo`;
       const action=resumed?'Pokračovat':complete?'Znovu':'Hrát';
-      root.innerHTML=`<button class="home-continue" type="button" data-home-continue="${targetDiff}" data-diff="${targetDiff}"><span class="home-continue-icon">${d.icon}</span><span class="home-continue-copy"><strong>${htmlEsc(d.label)} ${level}</strong><small>${htmlEsc(detail)}</small></span><span class="home-continue-cta">${action}</span></button><div class="home-alt-label">Jiná obtížnost</div><div class="home-diff-grid">${tiles}</div>`;
+      root.innerHTML=`<button class="home-continue" type="button" data-home-continue="${targetDiff}" data-diff="${targetDiff}"><span class="home-continue-icon">${difficultyIconMarkup(targetDiff,'home-continue-difficulty-icon')}</span><span class="home-continue-copy"><strong>${htmlEsc(d.label)} ${level}</strong><small>${htmlEsc(detail)}</small></span><span class="home-continue-cta">${action}</span></button><div class="home-alt-label">Jiná obtížnost</div><div class="home-diff-grid">${tiles}</div>`;
       root.querySelector('[data-home-continue]')?.addEventListener('click',()=>startFree(targetDiff));
     }
     root.querySelectorAll('[data-home-free]').forEach(btn=>btn.addEventListener('click',()=>startFree(btn.dataset.homeFree)));

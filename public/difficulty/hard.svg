@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Těžká</title>
+  <defs>
+    <linearGradient id="mountainA" x1="14" y1="49" x2="31" y2="20" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4d82d8"/>
+      <stop offset="1" stop-color="#88b7ff"/>
+    </linearGradient>
+    <linearGradient id="mountainB" x1="28" y1="52" x2="48" y2="10" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2f68be"/>
+      <stop offset="1" stop-color="#6ea8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M6.8 50.7 21.2 26l9.2 14.8 7.8-12.2 14.9 22.1Z" fill="url(#mountainA)" stroke="#29284a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M18.2 50.7 36.3 12.4l20.9 38.3Z" fill="url(#mountainB)" stroke="#29284a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="m29.8 26 6.5-13.6 7 12.8-4.1-1.8-3.2 3.7-3.4-3.4Z" fill="#fffefd"/>
+  <path d="m15.9 35 5.3-9 5.1 8.3-3.3-1.2-2.6 2.7-2.4-2.4Z" fill="#eef5ff"/>
+</svg>

@@ -901,3 +901,22 @@ html[data-theme="dark"] .danger-btn{background:#3a2227;border-color:#6a3a3e;colo
 
 /* Result words use the same colour token as solved cells/found chips in night mode. */
 html[data-theme="dark"] .win-word{background:color-mix(in srgb,var(--word-color,#72d9b7) 70%,#211f2c)!important;color:#0c0b10;text-shadow:0 1px 0 rgba(255,255,255,.10);border:1px solid color-mix(in srgb,var(--word-color,#72d9b7) 72%,#383240)}
+
+/* v3.27 — bespoke difficulty icon system */
+.difficulty-icon-img,.daily-week-icon,.game-difficulty-icon{display:block;object-fit:contain}
+.difficulty-title{display:flex;align-items:center;gap:12px}
+.difficulty-left-icon{position:relative;z-index:2;width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:15px;background:var(--diff-soft)}
+.difficulty-left-icon .difficulty-icon-img{width:40px;height:40px}
+.quick-game-icon .difficulty-icon-img{width:30px;height:30px}
+.game-title #gameDifficulty{display:flex;align-items:center;justify-content:center;gap:6px}
+.game-difficulty-icon{width:20px;height:20px;flex:0 0 20px}
+.daily-week-day i{display:grid;place-items:center}
+.daily-week-icon{width:15px;height:15px}
+.difficulty-card[data-diff="easy"]{--diff:#45b98e;--diff-soft:#dff5ec}
+.difficulty-card[data-diff="medium"]{--diff:#f08a32;--diff-soft:#fff0dc}
+.difficulty-card[data-diff="hard"]{--diff:#4e83d5;--diff-soft:#e5efff}
+.difficulty-card[data-diff="hardcore"]{--diff:#8b5ddd;--diff-soft:#efe7ff}
+html[data-theme="dark"] .difficulty-card[data-diff="easy"]{--diff:#70d9b3;--diff-soft:#203a34}
+html[data-theme="dark"] .difficulty-card[data-diff="medium"]{--diff:#ffad5b;--diff-soft:#443025}
+html[data-theme="dark"] .difficulty-card[data-diff="hard"]{--diff:#87b5ff;--diff-soft:#25364f}
+html[data-theme="dark"] .difficulty-card[data-diff="hardcore"]{--diff:#bd92ff;--diff-soft:#372b4d}

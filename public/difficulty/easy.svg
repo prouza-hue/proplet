@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Snadná</title>
+  <defs>
+    <linearGradient id="leaf" x1="14" y1="52" x2="50" y2="10" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3fbd8c"/>
+      <stop offset="1" stop-color="#7ddd79"/>
+    </linearGradient>
+  </defs>
+  <path d="M11.5 44.5C12.6 25.4 27.8 12.3 52 10.2c1.5 20.7-8.9 36.7-27.7 40.1-5.8 1-10.3-1-12.8-5.8Z" fill="url(#leaf)" stroke="#29284a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M13.2 49.8C22.4 40.2 31.8 31.6 44.8 21.8" fill="none" stroke="#fffefd" stroke-width="4" stroke-linecap="round"/>
+  <path d="M27.8 36.3c-.3-5 1-9.4 4.2-13.2M35.6 30.1c4.1.2 7.9-.5 11.2-2.4" fill="none" stroke="#229b70" stroke-width="2.4" stroke-linecap="round" opacity=".9"/>
+</svg>
