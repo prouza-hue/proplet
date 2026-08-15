@@ -24,13 +24,13 @@
 
   const css=document.createElement('link');
   css.rel='stylesheet';
-  css.href='/home-layout.css?v=5';
+  css.href='/home-layout.css?v=6';
   document.head.appendChild(css);
 
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=5';
+    script.src='/home-layout.js?v=6';
     script.dataset.propletHomeLayout='1';
     document.body.appendChild(script);
   };
