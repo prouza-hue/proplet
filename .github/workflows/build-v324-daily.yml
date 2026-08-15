@@ -1,4 +1,4 @@
-name: Build Proplet v3.24 Daily Gen3
+name: Verify Proplet root cutover
 
 on:
   push:
@@ -6,19 +6,26 @@ on:
       - sol/v3.24-daily-weekly-cadence
     paths:
       - .github/workflows/build-v324-daily.yml
-      - tools/apply_v324_patch.py
-      - tools/harden_v324_daily_boundary.py
-      - tools/generate_daily_v324.py
-      - tools/format_v324_puzzles.py
-      - tools/audit_daily_generation3.py
+      - server.py
+      - requirements.txt
+      - vercel.json
+      - public/**
+      - data/**
+      - tools/**
+      - proplet-v3.1-cloud/server.py
+      - proplet-v3.1-cloud/requirements.txt
+      - proplet-v3.1-cloud/vercel.json
+      - proplet-v3.1-cloud/public/**
+      - proplet-v3.1-cloud/data/**
+      - proplet-v3.1-cloud/tools/**
 
 permissions:
   contents: write
 
 jobs:
-  build-and-audit:
+  verify-root:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
@@ -31,94 +38,69 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Prepare production build scripts
+      - name: Render canonical share preview
         run: |
-          cp tools/apply_v324_patch.py proplet-v3.1-cloud/tools/apply_v324_patch.py
-          cp tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py
-          cp tools/generate_daily_v324.py proplet-v3.1-cloud/tools/generate_daily_v324.py
-          cp tools/format_v324_puzzles.py proplet-v3.1-cloud/tools/format_v324_puzzles.py
-          cp tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
-          sed -i "s/const APP_VERSION='3.22.1';/const APP_VERSION='3.23.1';/" proplet-v3.1-cloud/tools/apply_v324_patch.py
-
-      - name: Apply deterministic runtime patch
-        run: |
-          python proplet-v3.1-cloud/tools/apply_v324_patch.py
-          python proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py
-
-      - name: Generate Daily Generation 3
-        run: python proplet-v3.1-cloud/tools/generate_daily_v324.py
-
-      - name: Preserve readable puzzle JSON
-        run: python proplet-v3.1-cloud/tools/format_v324_puzzles.py
-
-      - name: Audit all 365 Daily boards
-        run: python proplet-v3.1-cloud/tools/audit_daily_generation3.py
-
-      - name: Syntax checks
-        run: |
-          python -m py_compile proplet-v3.1-cloud/server.py proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/format_v324_puzzles.py proplet-v3.1-cloud/tools/audit_daily_generation3.py proplet-v3.1-cloud/tools/generate_puzzles.py
-          node --check proplet-v3.1-cloud/public/app.js
-
-      - name: Release invariants
-        run: |
+          python -m pip install --quiet 'cairosvg==2.8.2'
           python - <<'PY'
-          import json
-          import subprocess
-          from datetime import date
+          import cairosvg
           from pathlib import Path
-
-          root = Path('proplet-v3.1-cloud')
-          data = json.loads((root / 'data/puzzles.json').read_text(encoding='utf-8'))
-          baseline = json.loads(subprocess.check_output([
-              'git', 'show', 'origin/main:proplet-v3.1-cloud/data/puzzles.json'
-          ], text=True))
-
-          assert data['dailyGeneration'] == 3
-          assert data['dailyGeneration3From'] == '2026-08-17'
-          assert data['dailyRotationBaseDate'] == '2026-08-17'
-          assert date.fromisoformat(data['dailyRotationBaseDate']).weekday() == 0
-          assert data['dailyCadence']['pattern'] == ['easy','easy','medium','medium','medium','hard','hard']
-          assert [p['difficulty'] for p in data['daily'][:14]] == data['dailyCadence']['pattern'] * 2
-          assert len(data['daily']) == 365
-          assert len(data['previousDaily']['puzzles']) == 365
-          assert data['previousDaily']['puzzles'] == baseline['daily']
-          assert data['free'] == baseline['free'], 'Free bank changed unexpectedly'
-          assert data['rescue'] == baseline['rescue'], 'Rescue bank changed unexpectedly'
-          assert data.get('freeGeneration') == baseline.get('freeGeneration')
-          assert data.get('freeLevelsPerDifficulty') == baseline.get('freeLevelsPerDifficulty')
-          assert (root / 'data/puzzles.json').read_bytes() == (root / 'public/puzzles.json').read_bytes()
-
-          app = (root / 'public/app.js').read_text(encoding='utf-8')
-          server = (root / 'server.py').read_text(encoding='utf-8')
-          sw = (root / 'public/sw.js').read_text(encoding='utf-8')
-          styles = (root / 'public/styles.css').read_text(encoding='utf-8')
-          index = (root / 'public/index.html').read_text(encoding='utf-8')
-          assert "const APP_VERSION='3.24.0';" in app
-          assert 'APP_VERSION = "3.24.0"' in server
-          assert 'dailyBankFor' in app and 'renderDailyWeekRhythm' in app
-          assert 'previous_daily_bank' in server and 'dailyGeneration3From' in server
-          assert 'requested_date >= switch3' in server
-          assert 'maybeOfferRescue' in app
-          assert 'proplet-v3.24.0-daily-weekly-cadence' in sw
-          assert 'v3.24 — Monday Daily cadence' in styles
-          assert 'dailyWeekRhythm' in index and 'Proplet v3.24.0' in index
-          print('Release invariants PASS')
+          svg = Path('public/share-card.svg')
+          png = Path('public/share-card.png')
+          cairosvg.svg2png(url=str(svg), write_to=str(png), output_width=1200, output_height=630)
+          Path('proplet-v3.1-cloud/public/share-card.png').write_bytes(png.read_bytes())
+          print(f'share-card.png: {png.stat().st_size} bytes')
           PY
 
-      - name: Commit generated release assets
+      - name: Verify root is identical to production tree
+        run: |
+          cmp server.py proplet-v3.1-cloud/server.py
+          cmp requirements.txt proplet-v3.1-cloud/requirements.txt
+          cmp vercel.json proplet-v3.1-cloud/vercel.json
+          diff -qr data proplet-v3.1-cloud/data
+          diff -qr public proplet-v3.1-cloud/public
+          diff -qr tools proplet-v3.1-cloud/tools
+          echo 'Root runtime tree == proplet-v3.1-cloud runtime tree'
+
+      - name: Root syntax and cutover invariants
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          server = Path('server.py').read_text(encoding='utf-8')
+          app = Path('public/app.js').read_text(encoding='utf-8')
+          index = Path('public/index.html').read_text(encoding='utf-8')
+          vercel = Path('vercel.json').read_text(encoding='utf-8')
+          req = Path('requirements.txt').read_text(encoding='utf-8')
+          svg = Path('public/share-card.svg').read_text(encoding='utf-8')
+          puzzles = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+
+          assert 'APP_VERSION = "3.24.0"' in server
+          assert "const APP_VERSION='3.24.0';" in app
+          assert 'dailyWeekRhythm' in index
+          assert puzzles['dailyGeneration'] == 3
+          assert puzzles['dailyGeneration3From'] == '2026-08-17'
+          assert puzzles['dailyCadence']['pattern'] == ['easy','easy','medium','medium','medium','hard','hard']
+          assert Path('public/admin.html').is_file()
+          assert Path('public/admin.js').is_file()
+          assert Path('public/admin.css').is_file()
+          assert 'Content-Security-Policy' in vercel
+          assert 'fastapi==0.128.2' in req and 'starlette==0.50.0' in req
+          assert all(word in svg for word in ('PROPLET', 'ZÁBAVNÉ', 'HRAJ'))
+          assert Path('public/share-card.png').stat().st_size > 50000
+          print('Root cutover invariants PASS')
+          PY
+
+      - name: Commit rendered share preview
         run: |
           git config user.name "Proplet Release Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add proplet-v3.1-cloud/server.py \
-            proplet-v3.1-cloud/public/app.js proplet-v3.1-cloud/public/index.html proplet-v3.1-cloud/public/styles.css proplet-v3.1-cloud/public/sw.js \
-            proplet-v3.1-cloud/data/puzzles.json proplet-v3.1-cloud/public/puzzles.json proplet-v3.1-cloud/data/legacy_daily_gen2.json \
-            proplet-v3.1-cloud/DAILY_GENERATION3_AUDIT.json proplet-v3.1-cloud/DAILY_GENERATION3_AUDIT_CZ.md \
-            proplet-v3.1-cloud/tools/apply_v324_patch.py proplet-v3.1-cloud/tools/harden_v324_daily_boundary.py proplet-v3.1-cloud/tools/generate_daily_v324.py proplet-v3.1-cloud/tools/format_v324_puzzles.py proplet-v3.1-cloud/tools/audit_daily_generation3.py
+          git add public/share-card.png proplet-v3.1-cloud/public/share-card.png
           if git diff --cached --quiet; then
-            echo "No generated changes to commit."
+            echo 'Share preview already current.'
           else
-            git commit -m "Keep Proplet v3.24 puzzle data reviewable"
+            git commit -m 'Render corrected Proplet share preview'
             git push origin HEAD:sol/v3.24-daily-weekly-cadence
           fi
-
-# production tree: proplet-v3.1-cloud
