@@ -172,6 +172,13 @@
         <div id="pushStatusText" class="push-status muted"></div>
       </div>
 
+      <div id="installAppCard" class="card settings-card install-app-card hidden">
+        <div class="section-head"><div><span class="eyebrow">APLIKACE</span><h2>Proplet na plochu</h2></div><span class="install-mini-icon" aria-hidden="true">📲</span></div>
+        <p class="muted">Přidej si Proplet na telefon nebo počítač. Otevře se pak jako samostatná aplikace a k Daily se dostaneš jedním klepnutím.</p>
+        <button id="installAppBtn" class="secondary-btn">📲 Nainstalovat Proplet</button>
+        <div id="installAppStatus" class="install-app-status muted"></div>
+      </div>
+
       <div class="card settings-card trust-card">
         <div class="section-head"><div><span class="eyebrow">ÚČET A SOUKROMÍ</span><h2>Data pod kontrolou</h2></div></div>
         <p class="muted">Proplet můžeš hrát bez účtu. Když účet máš, můžeš si jeho serverová data stáhnout nebo ho trvale smazat.</p>
@@ -232,7 +239,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.24.0</small><small class="footer-links"><a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a></small>
+      <small id="appVersionFooter" class="app-version">Proplet</small><small class="footer-links"><a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a></small>
     </footer>
   </main>
 
@@ -303,6 +310,23 @@
       <p class="muted">Chceš vědět, až bude připravená další Denní výzva? Připomeneme ji jen tehdy, když ji ještě nemáš hotovou.</p>
       <button id="pushNudgeEnableBtn" class="primary-btn big">Zapnout připomínku 🔔</button>
       <button id="pushNudgeLaterBtn" class="text-btn">Teď ne</button>
+    </div>
+  </div>
+
+  <div id="installNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card install-nudge-card">
+      <div class="install-nudge-icon">📲</div>
+      <span class="eyebrow">PROPLET V KAPSE</span>
+      <h2 id="installNudgeTitle">Měj Proplet vždy po ruce</h2>
+      <p id="installNudgeCopy" class="muted">Přidej si ho na plochu a k Denní výzvě se dostaneš jedním klepnutím.</p>
+      <div id="installIosSteps" class="install-steps hidden">
+        <div class="install-step"><b>1</b><span>Otevři v prohlížeči nabídku <strong>Sdílet</strong>.</span></div>
+        <div class="install-step"><b>2</b><span>Zvol <strong>Přidat na plochu</strong> a potvrď.</span></div>
+        <small>Pokud „Přidat na plochu“ nevidíš, otevři Proplet v Safari.</small>
+      </div>
+      <p id="installNudgeNote" class="install-nudge-note hidden"></p>
+      <button id="installNudgePrimary" class="primary-btn big">Nainstalovat Proplet</button>
+      <button id="installNudgeLater" class="text-btn">Teď ne</button>
     </div>
   </div>
 

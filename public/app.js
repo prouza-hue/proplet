@@ -1,4 +1,4 @@
-const APP_VERSION='3.25.0';
+const APP_VERSION='3.26.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -198,6 +198,7 @@ const SUPPORT_MODE_KEY='proplet-v3-16-2-helper-mode';
 const HELPER_ONBOARD_KEY='proplet-v3-16-2-helper-onboarding';
 const ACCOUNT_NUDGE_KEY='proplet-v3-5-account-nudge';
 const PUSH_NUDGE_KEY='proplet-v3-8-2-push-nudge';
+const INSTALL_NUDGE_KEY='proplet-v3-26-install-nudge';
 const ANON_ID_KEY='proplet-v3-15-anonymous-id';
 const RESCUE_OFFER_KEY='proplet-v3-19-2-rescue-offer';
 const ACCOUNT_NUDGE_THRESHOLDS=[1,4,10];
@@ -224,6 +225,10 @@ let pendingSW=null;
 let winFeedbackSent=false;
 let pendingPostWinAction=null;
 let pendingPushPostWinAction=null;
+let pendingInstallPostWinAction=null;
+let installModalManual=false;
+let deferredInstallPrompt=null;
+let postWinEngagementNudgeShown=false;
 let profileModalFromNudge=false;
 let profileModalFromWin=false;
 let leagueCreateMode='join';
@@ -411,8 +416,10 @@ function initNavigation(){
    if(modal.id==='onboardingModal'&&onboardingMandatory){history.pushState({proplet:true,screen:currentScreen},'',location.href);return}
    if(modal.id==='winModal'&&shouldOfferAccountNudge())maybeOfferAccountNudge('menu');
    else if(modal.id==='winModal'&&await maybeOfferPushNudge('menu')){} 
+   else if(modal.id==='winModal'&&maybeOfferInstallNudge('menu','daily')){}
    else if(modal.id==='accountNudgeModal')dismissAccountNudge();
    else if(modal.id==='pushNudgeModal')dismissPushNudge();
+   else if(modal.id==='installNudgeModal')dismissInstallNudge();
    else if(modal.id==='profileModal'&&profileModalFromWin){modal.classList.add('hidden');restoreWinAfterAccountModal()}
    else if(modal.id==='profileModal'&&profileModalFromNudge){modal.classList.add('hidden');resumeAfterAccountNudge()}
    else if(modal.id==='helperOfferModal')dismissHelperOffer();
@@ -422,7 +429,7 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['winModal','accountNudgeModal','pushNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['winModal','accountNudgeModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return transientModals().find(el=>!el.classList.contains('hidden'))||null}
 function closeTransientModals(){transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
@@ -634,7 +641,7 @@ async function finishStarterGame(g){
  if(getProfile()?.token&&!old)syncQueue({announce:false}).catch(()=>{});
 }
 async function finishGame(){
- const g=currentGame;if(g?.mode==='starter')return finishStarterGame(g);g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();g.starterGuidePath=[];renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:520);const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
+ const g=currentGame;if(g?.mode==='starter')return finishStarterGame(g);postWinEngagementNudgeShown=false;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();g.starterGuidePath=[];renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:520);const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
  const dailyGenerationUpgrade=g.mode==='daily'&&!!old&&old.puzzleId!==g.puzzle.id;
  const dailyReplay=g.mode==='daily'&&!!old&&!dailyGenerationUpgrade;
  const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,level:g.mode==='free'?Number(g.puzzle.meta?.level)||null:null,contentGeneration:g.mode==='free'?Number(g.puzzle.meta?.contentGeneration)||Number(puzzleDB.freeGeneration)||2:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty,g.puzzle),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString()};
@@ -677,7 +684,7 @@ function performPostWinAction(action){
 }
 function maybeOfferAccountNudge(action){
  const stage=shouldOfferAccountNudge();if(!stage)return false;accountNudgeStage=stage;const state=accountNudgeState(),shown=new Set(state.shown||[]);shown.add(stage);saveAccountNudgeState({...state,shown:[...shown].sort(),lastShownAt:new Date().toISOString()});trackProductEvent('account_nudge_shown');trackProductEvent(`account_nudge_${stage}_shown`);renderAccountNudge(stage);
- pendingPostWinAction=action;$('#winModal').classList.add('hidden');$('#accountNudgeModal').classList.remove('hidden');return true;
+ postWinEngagementNudgeShown=true;pendingPostWinAction=action;$('#winModal').classList.add('hidden');$('#accountNudgeModal').classList.remove('hidden');return true;
 }
 async function resumeAfterAccountNudge(){
  const action=pendingPostWinAction;pendingPostWinAction=null;profileModalFromNudge=false;accountNudgeStage=0;
@@ -691,8 +698,8 @@ function updateWinAccountCta(){const button=$('#winAccountBtn'),show=!!button&&!
 function restoreWinAfterAccountModal(){profileModalFromWin=false;if(!currentGame?.finished)return;$('#winModal').classList.remove('hidden');updateWinAccountCta()}
 function openAccountFromWin(){if(getProfile()?.token)return;trackProductEvent('win_account_cta_create');profileModalFromWin=true;$('#winModal').classList.add('hidden');openProfileModal('create')}
 async function refreshWinLeaderboardAfterAuth(){if(!currentGame?.finished)return;updateWinAccountCta();if(currentGame.mode==='daily')await loadWinDailyGlobalLeaderboard(currentGame.dailyDate||pragueDateISO(),getState().completed[`daily:${currentGame.dailyDate||pragueDateISO()}`]||currentGame);else if(currentGame.mode==='free')await loadWinLevelLeaderboard(currentGame.puzzle,getState().completed[`free:${currentGame.puzzle.id}`]||currentGame)}
-async function closeWinAndContinue(){if(maybeOfferAccountNudge('continue'))return;if(await maybeOfferPushNudge('continue'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
-async function closeWinToMenu(){if(maybeOfferAccountNudge('menu'))return;if(await maybeOfferPushNudge('menu'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
+async function closeWinAndContinue(){if(maybeOfferAccountNudge('continue'))return;if(await maybeOfferPushNudge('continue'))return;if(maybeOfferInstallNudge('continue','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
+async function closeWinToMenu(){if(maybeOfferAccountNudge('menu'))return;if(await maybeOfferPushNudge('menu'))return;if(maybeOfferInstallNudge('menu','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
 function showDailyResult(date,rec){
  const p=dailyPuzzleFor(date);stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};
  $('#winBadge').textContent='☀️';renderCompletionPraise(p.difficulty,rec);$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[p.difficulty].label}`;$('#winXp').textContent='+100 XP';const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Čistě · bez nápovědy':(hints?`💡 ${countCz(hints,'nápověda','nápovědy','nápověd')}`:'Výsledek z dřívější verze');if(!knownClean)wc.classList.add('hinted');
@@ -821,6 +828,7 @@ async function openProfileModal(mode='login'){
  setAccountMode(mode);$('#profileModal').classList.remove('hidden');const p=getProfile();if(p)$('#playerNameInput').value=p.name||'';$('#playerPasswordInput').value='';$('#playerPasswordInput').type='password';$('#profilePasswordToggle').textContent='👁 Zobrazit heslo';if(mode==='login')loadLeagues();
 }
 async function saveNewProfile(){
+ const offerInstallAfterCreate=accountMode==='create'&&!profileModalFromNudge&&!profileModalFromWin;
  const name=$('#playerNameInput').value.trim(),password=$('#playerPasswordInput').value;$('#profileFormError').textContent='';if(!name||!password){$('#profileFormError').textContent='Vyplň jméno a heslo.';return}if(password.length<8){$('#profileFormError').textContent='Heslo musí mít alespoň 8 znaků.';return}
  try{
   const endpoint=accountMode==='create'?'/api/player':'/api/login',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body)});
@@ -828,7 +836,7 @@ async function saveNewProfile(){
   const hadNoProfile=!getProfile();if(hadNoProfile)adoptGuestData(profile.id);const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';saveProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   try{await api('/api/anonymous/claim',{method:'POST',body:JSON.stringify({anonymous_id:anonId})});rotateAnonymousId()}catch{}
-  trackProductEvent('account_authenticated');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();
+  trackProductEvent('account_authenticated');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
  }catch(e){$('#profileFormError').textContent=e.message}
 }
 function toggleLegacyTeamLogin(){legacyTeamLogin=!legacyTeamLogin;$('#leagueChooser').classList.toggle('hidden',!legacyTeamLogin);$('#legacyTeamLoginToggle').textContent=legacyTeamLogin?'Skrýt výběr týmu':'Mám starší účet v týmu';if(legacyTeamLogin)loadLeagues()}
@@ -857,6 +865,7 @@ async function refreshAdminEntry(){
 }
 
 function renderProfile(){
+ renderInstallUI();
  const p=getProfile(),local=currentLocalStats(),stats=effectiveStats(),level=levelFor(stats.points||0),q=getQueue();
  if(!p){
   $('#profileCard').innerHTML=`<h2>Postup je zatím jen tady</h2><p class="muted">Na tomhle zařízení o nic nepřijdeš. Účet navíc uloží XP, výsledky a sérii do cloudu a pustí tě do pořadí.</p><div class="account-actions"><button id="profileCreateBtn" class="primary-btn">☁️ Uložit postup</button><button id="profileLoginBtn" class="secondary-btn">Už účet mám</button></div>`;
@@ -1113,6 +1122,71 @@ async function shareLevelDetail(){const c=levelDetailContext;if(!c)return;const 
 }
 function urlBase64ToUint8Array(base64String){const padding='='.repeat((4-base64String.length%4)%4),base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base64),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
 async function getPushRegistration(){if(!('serviceWorker' in navigator))throw new Error('Tento prohlížeč neumí oznámení PWA.');return navigator.serviceWorker.ready}
+function getInstallNudgeState(){try{return JSON.parse(localStorage.getItem(INSTALL_NUDGE_KEY)||'{}')}catch{return {}}}
+function saveInstallNudgeState(v){localStorage.setItem(INSTALL_NUDGE_KEY,JSON.stringify(v))}
+function isIosDevice(){if(typeof navigator==='undefined')return false;return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+function isStandaloneApp(){if(typeof window==='undefined')return false;return window.matchMedia?.('(display-mode: standalone)')?.matches===true||window.navigator?.standalone===true}
+function installNudgeDue(){const st=getInstallNudgeState();if(st.installed||st.done)return false;const next=Number(st.nextOfferAt||0);return !next||Date.now()>=next}
+function installOfferAvailable(){return !isStandaloneApp()&&(!!deferredInstallPrompt||isIosDevice())}
+function renderInstallUI(){
+ const card=$('#installAppCard'),btn=$('#installAppBtn'),status=$('#installAppStatus');if(!card||!btn||!status)return;
+ if(isStandaloneApp()||getInstallNudgeState().installed){card.classList.add('hidden');return}
+ const ios=isIosDevice(),available=!!deferredInstallPrompt||ios;card.classList.toggle('hidden',!available);if(!available)return;
+ btn.disabled=false;
+ if(ios&&!getProfile()?.token){btn.textContent='☁️ Nejdřív uložit postup';status.textContent='Na iPhonu je bezpečnější přidat Proplet na plochu až po uložení postupu do účtu.';return}
+ btn.textContent=ios?'📲 Přidat Proplet na plochu':'📲 Nainstalovat Proplet';
+ status.textContent=ios?'Otevře se pak jako samostatná aplikace. Kdyby se po prvním spuštění zeptal, přihlas se stejným účtem.':'Otevře se jako běžná aplikace bez adresního řádku a zůstane po ruce na ploše.';
+}
+function renderInstallModal(source='daily'){
+ const ios=isIosDevice(),title=$('#installNudgeTitle'),copy=$('#installNudgeCopy'),steps=$('#installIosSteps'),note=$('#installNudgeNote'),primary=$('#installNudgePrimary');
+ if(ios){
+  title.textContent='Přidej si Proplet na plochu';copy.textContent='Bude pak po ruce stejně jako ostatní aplikace.';steps.classList.remove('hidden');note.classList.remove('hidden');note.textContent='Kdyby se Proplet po prvním otevření z plochy zeptal, přihlas se stejným jménem a heslem.';primary.textContent='Rozumím';
+ }else{
+  title.textContent=source==='account'?'Účet uložen. A Proplet do kapsy?':'Měj Proplet vždy po ruce';copy.textContent='Přidej si ho na plochu. Otevírá se pak jako běžná aplikace a k Denní výzvě se dostaneš jedním klepnutím.';steps.classList.add('hidden');note.classList.add('hidden');note.textContent='';primary.textContent='Nainstalovat Proplet';
+ }
+ primary.disabled=false;
+}
+function shouldOfferInstallNudge(source='daily'){
+ if(!installOfferAvailable()||!installNudgeDue())return false;
+ if(source==='daily'){
+  const g=currentGame;if(g?.mode!=='daily'||g?.justCompleted!==true||postWinEngagementNudgeShown)return false;
+ }
+ if(isIosDevice()&&!getProfile()?.token)return false;
+ return true;
+}
+function maybeOfferInstallNudge(action=null,source='daily'){
+ if(!shouldOfferInstallNudge(source))return false;installModalManual=false;pendingInstallPostWinAction=action;const st=getInstallNudgeState();saveInstallNudgeState({...st,shown:(st.shown||0)+1,lastShownAt:new Date().toISOString(),lastSource:source});trackProductEvent('pwa_install_nudge_shown');renderInstallModal(source);$('#winModal')?.classList.add('hidden');$('#installNudgeModal').classList.remove('hidden');return true;
+}
+function finishInstallNudgeFlow(){
+ const action=pendingInstallPostWinAction;pendingInstallPostWinAction=null;installModalManual=false;$('#installNudgeModal').classList.add('hidden');renderInstallUI();if(action)performPostWinAction(action);
+}
+function dismissInstallNudge(){
+ if(installModalManual){trackProductEvent('pwa_install_profile_closed');finishInstallNudgeFlow();return}
+ const st=getInstallNudgeState(),declines=(st.declines||0)+1;saveInstallNudgeState({...st,declines,done:declines>=2,nextOfferAt:declines>=2?null:Date.now()+7*24*60*60*1000,lastDeclinedAt:new Date().toISOString()});trackProductEvent('pwa_install_nudge_dismissed');finishInstallNudgeFlow();
+}
+async function acceptInstallNudge(){
+ if(isIosDevice()){
+  saveInstallNudgeState({...getInstallNudgeState(),done:true,iosHintSeen:true,iosHintAcceptedAt:new Date().toISOString()});trackProductEvent('pwa_install_ios_hint_ack');finishInstallNudgeFlow();return;
+ }
+ const prompt=deferredInstallPrompt;if(!prompt){showToast('Instalaci teď prohlížeč nenabízí. Zkus to znovu později.');renderInstallUI();return}
+ deferredInstallPrompt=null;const btn=$('#installNudgePrimary');btn.disabled=true;
+ try{
+  await prompt.prompt();const choice=await prompt.userChoice;
+  if(choice.outcome==='accepted'){saveInstallNudgeState({...getInstallNudgeState(),accepted:true,done:true,acceptedAt:new Date().toISOString()});trackProductEvent('pwa_install_native_accepted')}
+  else{const st=getInstallNudgeState(),declines=(st.declines||0)+1;saveInstallNudgeState({...st,declines,done:declines>=2,nextOfferAt:declines>=2?null:Date.now()+7*24*60*60*1000,lastDeclinedAt:new Date().toISOString()});trackProductEvent('pwa_install_native_dismissed')}
+ }catch(e){showToast('Instalaci se nepodařilo otevřít. Zkus ji později z profilu.')}finally{btn.disabled=false;finishInstallNudgeFlow()}
+}
+function openInstallFromProfile(){
+ if(isStandaloneApp())return;
+ if(isIosDevice()&&!getProfile()?.token){openProfileModal('create');return}
+ if(!installOfferAvailable()){showToast('Instalaci teď tento prohlížeč nenabízí.');return}
+ installModalManual=true;pendingInstallPostWinAction=null;trackProductEvent('pwa_install_profile_opened');renderInstallModal('profile');$('#installNudgeModal').classList.remove('hidden');
+}
+if(typeof window!=='undefined'){
+ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;renderInstallUI()});
+ window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;saveInstallNudgeState({...getInstallNudgeState(),installed:true,done:true,installedAt:new Date().toISOString()});trackProductEvent('pwa_installed');renderInstallUI()});
+}
+
 function getPushNudgeState(){try{return JSON.parse(localStorage.getItem(PUSH_NUDGE_KEY)||'{}')}catch{return {}}}
 function savePushNudgeState(v){localStorage.setItem(PUSH_NUDGE_KEY,JSON.stringify(v))}
 function pushNudgeDue(){
@@ -1125,7 +1199,7 @@ async function shouldOfferPushNudge(){
  try{const cfg=await api('/api/push/config');if(!cfg.available)return false;const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub){savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return false}return true}catch{return false}
 }
 async function maybeOfferPushNudge(action){
- if(!(await shouldOfferPushNudge()))return false;pendingPushPostWinAction=action;$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true;
+ if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true;
 }
 function finishPushNudgeFlow(){const action=pendingPushPostWinAction;pendingPushPostWinAction=null;$('#pushNudgeModal').classList.add('hidden');if(action)performPostWinAction(action)}
 function dismissPushNudge(){
@@ -1161,7 +1235,7 @@ function bind(){
  $('#skipOnboardingBtn').onclick=()=>closeOnboarding(false);$('#onboardNextBtn').onclick=onboardingNext;
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);
- $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
+ $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>pendingSW?.postMessage({type:'SKIP_WAITING'});
  $('#reportIssueBtn').onclick=openSupportReport;$('#closeSupportReportModal').onclick=()=>$('#supportReportModal').classList.add('hidden');$('#saveSupportReportBtn').onclick=saveSupportReport;$('#supportReportModal').onclick=e=>{if(e.target===$('#supportReportModal'))$('#supportReportModal').classList.add('hidden')};$('#exportDataBtn').onclick=exportAccountData;$('#deleteAccountBtn').onclick=openDeleteAccount;$('#closeDeleteAccountModal').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#cancelDeleteAccountBtn').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#confirmDeleteAccountBtn').onclick=deleteAccount;$('#deleteAccountModal').onclick=e=>{if(e.target===$('#deleteAccountModal'))$('#deleteAccountModal').classList.add('hidden')};
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
@@ -1181,7 +1255,7 @@ function bind(){
 async function boot(){
  applyTheme(getSettings().theme);
  try{puzzleDB=await fetch('/puzzles.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error();return r.json()})}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Spusť aplikaci přes server podle README.</p></main>';return}
- document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();bindClientErrorReporting();initNavigation();updateProfileChip();trackProductEvent('app_open');renderDaily();renderFree();renderProfile();syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
+ document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();bindClientErrorReporting();initNavigation();updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');renderDaily();renderFree();renderProfile();renderInstallUI();syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily()}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }
