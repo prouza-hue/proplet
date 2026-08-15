@@ -12,8 +12,7 @@
     const screen=document.querySelector('#screen-daily'),hero=screen?.querySelector('.daily-hero'),level=document.querySelector('#levelCard'),quick=screen?.querySelector('#quickPlayCard');
     if(!screen||!hero||!level)return;
     screen.classList.add('home-layout-active');
-    level.classList.add('home-status-strip');
-    level.style.margin='10px 0 0';
+    level.classList.add('home-status-strip','home-status-after-hero');
     if(quick&&level.nextElementSibling!==quick)screen.insertBefore(level,quick);
   }
 
