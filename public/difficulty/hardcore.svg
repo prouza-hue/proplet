@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Mozkožrout</title>
+  <defs>
+    <linearGradient id="monster" x1="18" y1="54" x2="45" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7c53dc"/>
+      <stop offset="1" stop-color="#b56df0"/>
+    </linearGradient>
+  </defs>
+  <path d="M15.7 20.1 11.2 8.8l11 7.2c2.9-1.6 6.3-2.5 10-2.5 3.5 0 6.8.8 9.6 2.3l10.8-7-4.1 11.4c3.3 4 5.2 9.2 5.2 15 0 13.1-9.4 22.6-21.7 22.6S10.5 48.5 10.5 35.3c0-5.8 1.9-11.1 5.2-15.2Z" fill="url(#monster)" stroke="#29284a" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="32.4" cy="31.2" rx="10.2" ry="9" fill="#fffefd" stroke="#29284a" stroke-width="3"/>
+  <circle cx="35" cy="29.5" r="4.2" fill="#29284a"/>
+  <path d="M21.7 42.7c3 5.1 6.9 7.5 11.8 7.5 4.6 0 8.2-2.1 10.8-6.3-3.2.6-7.1 1-11.6 1-4.1 0-7.8-.7-11-2.2Z" fill="#fffefd" stroke="#29284a" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m27.2 44.6 2.2 4 2.3-3.8m4.8-.1 2.1 3.4 2-4" fill="none" stroke="#29284a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
