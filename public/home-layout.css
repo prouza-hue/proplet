@@ -1,67 +1,124 @@
-/* Proplet home layout synthesis
-   Keeps the existing brand language; only reshapes the Dnes hierarchy. */
+/* Proplet Dnes layout synthesis
+   Play-first hierarchy, compact progress, responsive Fold layout. */
 
-#screen-daily.home-layout-active{display:block}
-#screen-daily.home-layout-active .daily-progress-strip.home-status-strip{margin:0 0 12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.68);box-shadow:none}
+/* IMPORTANT: never force Dnes visible when another routed screen is active. */
+#screen-daily.active.home-layout-active{display:block}
+
+/* Home shell: keep the normal document scroll. On an unfolded Fold we use the space
+   instead of leaving a narrow phone column in the middle. */
+body:not(.playing){height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+body:not(.playing) .app-shell{height:auto;min-height:100vh}
+@media(min-width:700px){.app-shell:has(#screen-daily.active.home-layout-active){width:min(100%,900px)}}
+
+/* Compact player status — one quiet strip, not a dashboard. */
+#screen-daily.home-layout-active .daily-progress-strip.home-status-strip{
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-rows:auto auto;
+  gap:6px 14px;
+  margin:0 0 10px;
+  padding:10px 12px 9px;
+  border-radius:17px;
+  background:rgba(255,255,255,.70);
+  box-shadow:none;
+}
+#screen-daily.home-layout-active .daily-progress-rank{grid-column:1;grid-row:1}
+#screen-daily.home-layout-active .daily-progress-track{grid-column:1/-1;grid-row:2}
+#screen-daily.home-layout-active .daily-progress-streak{grid-column:2;grid-row:1;justify-self:end}
 #screen-daily.home-layout-active .daily-progress-rank>span{width:34px;height:34px;border-radius:11px;font-size:18px}
-#screen-daily.home-layout-active .daily-progress-rank strong{font-size:12px}
-#screen-daily.home-layout-active .daily-progress-rank small,#screen-daily.home-layout-active .daily-progress-streak small{font-size:10.5px}
-#screen-daily.home-layout-active .daily-progress-streak>span{font-size:20px}
+#screen-daily.home-layout-active .daily-progress-rank strong{font-size:12.5px}
+#screen-daily.home-layout-active .daily-progress-rank small,#screen-daily.home-layout-active .daily-progress-streak small{font-size:10px;line-height:1.15}
+#screen-daily.home-layout-active .daily-progress-streak>span{font-size:19px}
 #screen-daily.home-layout-active .daily-progress-streak strong{font-size:16px}
+#screen-daily.home-layout-active .daily-progress-track i{height:5px}
 
-#screen-daily.home-layout-active .daily-hero{padding:18px 18px 17px;border-radius:22px}
-#screen-daily.home-layout-active .hero-topline{min-height:18px;margin-bottom:4px;justify-content:flex-start}
-#screen-daily.home-layout-active .hero-topline .eyebrow{font-size:10px;letter-spacing:.12em}
-#screen-daily.home-layout-active .hero-main{margin:4px 0 13px}
-#screen-daily.home-layout-active .hero-main h1{margin:0 0 4px;font-size:31px;max-width:none}
+/* Daily is the hero. No redundant "Denní výzva" label above its title. */
+#screen-daily.home-layout-active .daily-hero{padding:18px;border-radius:23px}
+#screen-daily.home-layout-active .hero-topline{display:none}
+#screen-daily.home-layout-active .hero-main{margin:0 0 11px;display:block}
+#screen-daily.home-layout-active .hero-main h1{margin:0 0 4px;font-size:32px;max-width:none;line-height:1.02}
 #screen-daily.home-layout-active .daily-title-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-height:20px}
-#screen-daily.home-layout-active .daily-inline-date{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:transparent;color:rgba(255,255,255,.88);font-size:12px;font-weight:850;white-space:nowrap}
-#screen-daily.home-layout-active .daily-inline-date:before{content:"◷";font-size:11px;opacity:.82}
-#screen-daily.home-layout-active .daily-title-meta .hero-muted{font-size:12px;color:rgba(255,255,255,.70)}
+#screen-daily.home-layout-active .daily-inline-date{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:transparent;color:rgba(255,255,255,.91);font-size:12px;font-weight:850;white-space:nowrap}
+#screen-daily.home-layout-active .daily-inline-date:before{content:"◷";font-size:10px;opacity:.8}
+#screen-daily.home-layout-active .daily-title-meta .hero-muted{font-size:12px;color:rgba(255,255,255,.72)}
 #screen-daily.home-layout-active .daily-title-meta .hero-muted:before{content:"·";margin-right:7px;color:rgba(255,255,255,.42)}
 
-#screen-daily.home-layout-active .daily-week-rhythm{margin:10px 0 12px;padding:7px 8px;border-radius:12px;background:rgba(255,255,255,.075)}
-#screen-daily.home-layout-active .daily-week-rhythm-head{margin-bottom:5px}
-#screen-daily.home-layout-active .daily-week-rhythm-head strong{font-size:9.5px}
-#screen-daily.home-layout-active .daily-week-rhythm-head span{font-size:9.5px}
+/* Weekly cadence: informative, but visually subordinate to the play button. */
+#screen-daily.home-layout-active .daily-week-rhythm{
+  margin:9px 0 11px;
+  padding:7px 8px;
+  border:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.075);
+  backdrop-filter:none;
+}
+#screen-daily.home-layout-active .daily-week-rhythm-head{margin-bottom:5px;align-items:center}
+#screen-daily.home-layout-active .daily-week-rhythm-head strong{font-size:9px;letter-spacing:.05em}
+#screen-daily.home-layout-active .daily-week-rhythm-head span{font-size:9px}
 #screen-daily.home-layout-active .daily-week-days{gap:3px}
-#screen-daily.home-layout-active .daily-week-day{min-height:27px;border-radius:8px;gap:2px}
-#screen-daily.home-layout-active .daily-week-day b{font-size:8.5px}
-#screen-daily.home-layout-active .daily-week-day i{font-size:10.5px}
-#screen-daily.home-layout-active .daily-week-day.active{box-shadow:0 3px 10px rgba(28,20,78,.17)}
-
+#screen-daily.home-layout-active .daily-week-day{min-height:25px;border-radius:8px;gap:2px}
+#screen-daily.home-layout-active .daily-week-day b{font-size:8px}
+#screen-daily.home-layout-active .daily-week-day i{font-size:10px}
+#screen-daily.home-layout-active .daily-week-day.active{box-shadow:0 3px 9px rgba(28,20,78,.15)}
 #screen-daily.home-layout-active .hero-btn{min-height:48px;font-size:14px}
-#screen-daily.home-layout-active .hero-secondary{width:auto;min-width:0;display:block;margin:8px auto 0;padding:6px 10px;border:0;background:transparent;color:rgba(255,255,255,.9);font-size:11px;box-shadow:none}
+#screen-daily.home-layout-active .hero-secondary{width:auto;min-width:0;display:block;margin:7px auto 0;padding:5px 9px;border:0;background:transparent;color:rgba(255,255,255,.9);font-size:10.5px;box-shadow:none}
 #screen-daily.home-layout-active .hero-secondary:before{content:"↗ ";font-weight:900}
 #screen-daily.home-layout-active .daily-sync.home-sync-benign{display:none!important}
-#screen-daily.home-layout-active .daily-sync:not(.home-sync-benign){margin-top:7px;font-size:10.5px}
+#screen-daily.home-layout-active .daily-sync:not(.home-sync-benign){margin-top:6px;font-size:10px}
 
-#screen-daily.home-layout-active .quick-play-card{margin-top:12px;padding:13px 14px 14px;background:rgba(255,254,253,.88);border-color:#e7e1ee;box-shadow:0 3px 12px rgba(65,52,106,.045)}
-#screen-daily.home-layout-active .quick-play-head{align-items:center;margin-bottom:10px}
-#screen-daily.home-layout-active .quick-play-head h2{font-size:17px;margin:1px 0 0}
-#screen-daily.home-layout-active .quick-play-head p{display:none}
-#screen-daily.home-layout-active .quick-all-btn{padding:6px 8px;background:transparent;font-size:10px;color:#69627f}
+/* Free play is a section, not another large card competing with Daily. */
+#screen-daily.home-layout-active .quick-play-card{
+  margin-top:14px;
+  padding:0 2px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+#screen-daily.home-layout-active .quick-play-head{align-items:center;margin:0 1px 8px;min-height:30px}
+#screen-daily.home-layout-active .quick-play-head .eyebrow,#screen-daily.home-layout-active .quick-play-head p{display:none}
+#screen-daily.home-layout-active .quick-play-head h2{font-size:19px;margin:0;letter-spacing:-.025em}
+#screen-daily.home-layout-active .quick-all-btn{padding:5px 3px;border-radius:0;background:transparent;color:#6b657c;font-size:10.5px}
+#screen-daily.home-layout-active #quickPlayGrid.quick-play-grid{display:block;grid-template-columns:none;gap:0;width:100%;min-width:0}
 
-.home-continue{--q:#6c5ce7;--qs:#eee9ff;width:100%;border:1px solid color-mix(in srgb,var(--q) 20%,#ded8e9);background:linear-gradient(145deg,#fff,#fbf9ff);border-radius:16px;padding:11px;display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;text-align:left;color:var(--ink);cursor:pointer;box-shadow:0 3px 10px rgba(65,52,106,.045)}
+.home-continue{--q:#6c5ce7;--qs:#eee9ff;width:100%;min-width:0;border:1px solid color-mix(in srgb,var(--q) 18%,#ded8e9);background:rgba(255,255,255,.78);border-radius:16px;padding:10px 11px;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:9px;align-items:center;text-align:left;color:var(--ink);cursor:pointer;box-shadow:0 3px 10px rgba(65,52,106,.035)}
 .home-continue:active,.home-diff-tile:active{transform:scale(.985)}
 .home-continue[data-diff="easy"],.home-diff-tile[data-diff="easy"]{--q:#45b98e;--qs:#e5f7f0}
 .home-continue[data-diff="medium"],.home-diff-tile[data-diff="medium"]{--q:#6f64df;--qs:#eeebff}
 .home-continue[data-diff="hard"],.home-diff-tile[data-diff="hard"]{--q:#ee725e;--qs:#ffebe7}
 .home-continue[data-diff="hardcore"],.home-diff-tile[data-diff="hardcore"]{--q:#a04bd8;--qs:#f5eafb}
-.home-continue-icon{width:38px;height:38px;border-radius:12px;background:var(--qs);display:grid;place-items:center;font-size:20px}
-.home-continue-copy{min-width:0}.home-continue-copy strong,.home-continue-copy small{display:block}.home-continue-copy strong{font-size:13px}.home-continue-copy small{margin-top:2px;color:var(--muted);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.home-continue-cta{border-radius:999px;background:var(--qs);color:var(--q);padding:7px 9px;font-size:10px;font-weight:950;white-space:nowrap}
-.home-difficulty-label{margin:11px 2px 7px;color:#777187;font-size:9.5px;font-weight:950;letter-spacing:.11em;text-transform:uppercase}
-.home-diff-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.home-diff-tile{--q:#6c5ce7;--qs:#eee9ff;min-width:0;border:1px solid color-mix(in srgb,var(--q) 16%,#e1dbe9);background:#fff;border-radius:14px;padding:9px 8px;color:var(--ink);text-align:left;cursor:pointer}
-.home-diff-top{display:flex;align-items:center;gap:6px;min-width:0}.home-diff-top span{width:27px;height:27px;flex:0 0 27px;border-radius:9px;background:var(--qs);display:grid;place-items:center;font-size:15px}.home-diff-top strong{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.home-diff-tile small{display:block;margin-top:5px;color:var(--muted);font-size:9.5px}.home-diff-progress{display:block;height:4px;margin-top:6px;border-radius:99px;background:#eeeaf2;overflow:hidden}.home-diff-progress b{display:block;height:100%;border-radius:inherit;background:var(--q)}
+.home-continue-icon{width:36px;height:36px;border-radius:11px;background:var(--qs);display:grid;place-items:center;font-size:19px}
+.home-continue-copy{min-width:0}.home-continue-copy strong,.home-continue-copy small{display:block}.home-continue-copy strong{font-size:12.5px}.home-continue-copy small{margin-top:2px;color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-continue-cta{border-radius:999px;background:var(--qs);color:var(--q);padding:6px 9px;font-size:9.5px;font-weight:950;white-space:nowrap}
+.home-alt-label{margin:9px 2px 6px;color:#7a7488;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.home-diff-grid{width:100%;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.home-diff-tile{--q:#6c5ce7;--qs:#eee9ff;min-width:0;border:1px solid color-mix(in srgb,var(--q) 14%,#e2dce9);background:rgba(255,255,255,.74);border-radius:14px;padding:8px 9px;color:var(--ink);text-align:left;cursor:pointer}
+.home-diff-top{display:flex;align-items:center;gap:7px;min-width:0}.home-diff-top span{width:28px;height:28px;flex:0 0 28px;border-radius:9px;background:var(--qs);display:grid;place-items:center;font-size:15px}.home-diff-top strong{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.home-diff-tile small{display:block;margin-top:4px;color:var(--muted);font-size:9px}.home-diff-progress{display:block;height:3px;margin-top:5px;border-radius:99px;background:#eeeaf2;overflow:hidden}.home-diff-progress b{display:block;height:100%;border-radius:inherit;background:var(--q)}
 
-@media(min-width:560px){#screen-daily.home-layout-active .home-diff-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:390px){#screen-daily.home-layout-active .daily-hero{padding:16px}#screen-daily.home-layout-active .hero-main h1{font-size:29px}#screen-daily.home-layout-active .daily-title-meta{gap:5px}#screen-daily.home-layout-active .daily-title-meta .hero-muted:before{margin-right:5px}#screen-daily.home-layout-active .daily-week-rhythm-head span{font-size:8.7px}.home-continue{grid-template-columns:35px minmax(0,1fr) auto;padding:10px 9px;gap:7px}.home-continue-icon{width:35px;height:35px}.home-continue-cta{padding:6px 7px;font-size:9.5px}}
-@media (min-width:700px) and (max-height:760px){#screen-daily.active.home-layout-active{display:block!important}#screen-daily.home-layout-active #levelCard,#screen-daily.home-layout-active #quickPlayCard,#screen-daily.home-layout-active .daily-hero,#screen-daily.home-layout-active #rescueCard{margin-left:0;margin-right:0}}
+/* New players do not need a fake "continue" card that duplicates Snadná 1. */
+#screen-daily.home-layout-active .quick-play-card.home-free-new .quick-play-head{margin-bottom:7px}
+#screen-daily.home-layout-active .quick-play-card.home-free-new .home-diff-grid{margin-top:0}
+
+@media(min-width:560px){
+  #screen-daily.home-layout-active .home-diff-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #screen-daily.home-layout-active .home-diff-tile{padding:9px 10px}
+}
+@media(max-width:390px){
+  #screen-daily.home-layout-active .daily-progress-strip.home-status-strip{padding:9px 10px 8px}
+  #screen-daily.home-layout-active .daily-hero{padding:16px}
+  #screen-daily.home-layout-active .hero-main h1{font-size:29px}
+  #screen-daily.home-layout-active .daily-title-meta{gap:5px}
+  #screen-daily.home-layout-active .daily-title-meta .hero-muted:before{margin-right:5px}
+  #screen-daily.home-layout-active .daily-week-rhythm-head span{font-size:8.2px}
+  .home-continue{grid-template-columns:34px minmax(0,1fr) auto;padding:9px;gap:7px}
+  .home-continue-icon{width:34px;height:34px}
+  .home-continue-cta{padding:6px 7px}
+}
+@media(min-width:700px) and (max-height:760px){
+  #screen-daily.active.home-layout-active{height:auto;min-height:0;overflow:visible}
+  .app-shell:has(#screen-daily.active.home-layout-active){height:auto;min-height:100vh;overflow:visible}
+}
 
 html[data-theme="dark"] #screen-daily.home-layout-active .daily-progress-strip.home-status-strip{background:rgba(27,25,38,.72);border-color:var(--line)}
-html[data-theme="dark"] #screen-daily.home-layout-active .quick-play-card{background:rgba(27,25,38,.9);border-color:var(--line)}
 html[data-theme="dark"] .home-continue,html[data-theme="dark"] .home-diff-tile{background:#211f2c;color:var(--ink);border-color:color-mix(in srgb,var(--q) 25%,#373244)}
 html[data-theme="dark"] .home-continue[data-diff="easy"],html[data-theme="dark"] .home-diff-tile[data-diff="easy"]{--q:#72d9b7;--qs:#1d3a33}
 html[data-theme="dark"] .home-continue[data-diff="medium"],html[data-theme="dark"] .home-diff-tile[data-diff="medium"]{--q:#a294ff;--qs:#302a52}
