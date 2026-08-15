@@ -8,6 +8,10 @@
     return text.charAt(0).toUpperCase()+text.slice(1);
   };
 
+  function tuneNoviceIcon(){
+    try{if(typeof LEVELS!=='undefined'&&LEVELS[0]?.name==='Nováček')LEVELS[0].icon='🔰'}catch{}
+  }
+
   function placeStatusStrip(){
     const screen=document.querySelector('#screen-daily'),hero=screen?.querySelector('.daily-hero'),level=document.querySelector('#levelCard'),quick=screen?.querySelector('#quickPlayCard');
     if(!screen||!hero||!level)return;
@@ -105,6 +109,7 @@
     if(window.__propletHomeLayoutInstalled)return true;
     if(typeof renderDaily!=='function'||typeof renderQuickPlay!=='function'||typeof freeProgress!=='function'||typeof getState!=='function')return false;
     window.__propletHomeLayoutInstalled=true;
+    tuneNoviceIcon();
     const baseDaily=renderDaily;
     renderQuickPlay=renderHomeQuickPlay;
     renderDaily=function(){
