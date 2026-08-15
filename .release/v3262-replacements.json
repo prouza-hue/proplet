@@ -1,0 +1,38 @@
+[
+  {
+    "path":"server.py",
+    "label":"server version",
+    "old":"APP_VERSION = \"3.26.1\"",
+    "new":"APP_VERSION = \"3.26.2\""
+  },
+  {
+    "path":"public/app.js",
+    "label":"client version",
+    "old":"const APP_VERSION='3.26.1';",
+    "new":"const APP_VERSION='3.26.2';"
+  },
+  {
+    "path":"public/app.js",
+    "label":"celebration copy pool",
+    "old":"const WIN_PRAISE={\n easy:[\n  {title:'Pěkně propleteno!',line:'Písmena si sedla a neurony se příjemně protáhly.'},\n  {title:'Deska je tvoje.',line:'Ani jedno políčko nezůstalo na ocet.'},\n  {title:'Slova zkrocena.',line:'Tohle cvaklo přesně tam, kam mělo.'},\n  {title:'Hezky odstartováno!',line:'Malý Proplet, poctivá radost.'},\n  {title:'Další uzel rozvázán.',line:'Plynule, elegantně a bez zbytečného rámusu.'}\n ],\n medium:[\n  {title:'Mozek příjemně zahřátý.',line:'Tak akorát na pár spokojených závitů.'},\n  {title:'Hezky ses tím propletl.',line:'Deska odporovala jen z povinnosti.'},\n  {title:'Slovní uzel povolil.',line:'Trpělivost, oko, prst. Fungovalo všechno.'},\n  {title:'Další deska kapitulovala.',line:'Písmena pochopila, kdo je tu šéf.'},\n  {title:'Tohle mělo šťávu.',line:'A teď už máš v kapse i celý výsledek.'},\n  {title:'Závity odvedly dobrou práci.',line:'Proplet vyřešen, sebevědomí lehce přifouknuto.'}\n ],\n hard:[\n  {title:'Těžká? Už jen bývalá.',line:'Deska kladla odpor. Marně.'},\n  {title:'Tohle už má váhu.',line:'Poctivý slovní kopec — a ty stojíš nahoře.'},\n  {title:'Neurony právě odmakaly směnu.',line:'A teď si zaslouží vítězný taneček. Respekt.'},\n  {title:'Propleteno na vyšší dívčí.',line:'Tohle nebyla rozcvička. Tohle je výkon.'},\n  {title:'Písmena se bránila statečně.',line:'Výsledek: písmena 0, ty 1.'},\n  {title:'Tak tohle bylo výživné.',line:'Malé vítězné gesto je zcela na místě.'},\n  {title:'Těžká deska uznává porážku.',line:'Poctivě vydřené. O to příjemnější.'},\n  {title:'Slovní svaly potvrzeny.',line:'Tahle mřížka se sama rozhodně neudělala.'}\n ],\n hardcore:[\n  {title:'Mozkožrout se právě zadávil.',line:'Nečekal, že mu budeš chutnat tak málo.'},\n  {title:'Tak kdo tu koho žere?',line:'Mozkožrout má jasno. A trochu trauma.'},\n  {title:'Neurony kouří. Výsledek stojí za to.',line:'Přesně ten druh vítězství, který si zaslouží konfety.'},\n  {title:'Deset krát deset. Ty jedna, mřížka nula.',line:'Sto políček šlo spát s pocitem dobře vykonané práce.'},\n  {title:'Arcimistr mřížky potvrzen.',line:'Tohle už není luštění. Tohle je drobná mozková magie.'},\n  {title:'Mozkožrout zkrocen.',line:'Může se vrátit do jeskyně a přemýšlet o svých rozhodnutích.'},\n  {title:'Tohle bylo absurdně dobré.',line:'Poctivý kus slovního řemesla. Klobouk dolů.'},\n  {title:'Vstup do klubu těžkých hlav povolen.',line:'Vstupné: jeden poražený Mozkožrout.'},\n  {title:'Mřížka padla. Důstojně, ale padla.',line:'Tahle výhra má velikost deset krát deset.'},\n  {title:'Mozkožrout žádá odvetu.',line:'Dnes ji ale nedostane. Dnes slavíš ty.'}\n ]\n};\nconst CLEAN_PRAISE={\n easy:['A ještě bez nápovědy. Paráda.','Navíc čistě. Pěkná práce.'],\n medium:['A ještě čistě. Tohle sedlo.','Bez nápovědy — velmi pěkné.'],\n hard:['A ještě čistě. To už je trochu machrování.','Bez nápovědy. Těžká právě ztichla.'],\n hardcore:['A bez nápovědy. Mozkožrout žádá přepočítání.','Čistě. Mozkožrout to nese překvapivě osobně.']\n};",
+    "new":"const WIN_PRAISE={\n easy:['A je to!','Pěkně.','Hotovo!','Hezky propleteno.','To sedlo.','Další je doma.'],\n medium:['Pěkná práce.','Je to tam!','Hotovo!','Hezky!','Další je doma.','To se povedlo.'],\n hard:['Těžká? Pro tebe ne!','Tohle se počítá.','Pěkný výkon.','Těžká je doma.','Krásná práce.','Tak tohle jo.'],\n hardcore:['Tak kdo s koho?','Fíha. Respekt.','Klobouk dolů!','Je po něm!','Tohle nebyla sranda.','Tvůj mozek odolal.']\n};"
+  },
+  {
+    "path":"public/app.js",
+    "label":"single-line completion praise",
+    "old":"function completionPraise(difficulty,rec={}){\n const pool=WIN_PRAISE[difficulty]||WIN_PRAISE.medium,seed=rec.attemptId||`${rec.puzzleId||''}:${rec.completedAt||''}:${rec.elapsedMs||0}:${rec.moves||0}`,chosen=pool[stableTextIndex(seed,pool.length)];let line=chosen.line;\n if(rec.cleanSolve===true){const clean=CLEAN_PRAISE[difficulty]||CLEAN_PRAISE.medium;line+=` ${clean[stableTextIndex(`${seed}:clean`,clean.length)]}`}\n return {title:chosen.title,line};\n}\nfunction renderCompletionPraise(difficulty,rec){const praise=completionPraise(difficulty,rec);$('#winTitle').textContent=praise.title;$('#winPraise').textContent=praise.line;$('#winPraise').classList.remove('hidden')}",
+    "new":"function completionPraise(difficulty,rec={}){\n const pool=WIN_PRAISE[difficulty]||WIN_PRAISE.medium,seed=rec.attemptId||`${rec.puzzleId||''}:${rec.completedAt||''}:${rec.elapsedMs||0}:${rec.moves||0}`;\n return {title:pool[stableTextIndex(seed,pool.length)],line:''};\n}\nfunction renderCompletionPraise(difficulty,rec){const praise=completionPraise(difficulty,rec);$('#winTitle').textContent=praise.title;$('#winPraise').textContent='';$('#winPraise').classList.add('hidden')}"
+  },
+  {
+    "path":"public/app.js",
+    "label":"module exports",
+    "old":"if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,CLEAN_PRAISE,stableTextIndex,completionPraise};",
+    "new":"if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};"
+  },
+  {
+    "path":"public/sw.js",
+    "label":"service worker cache",
+    "old":"const CACHE='proplet-v3.26.1-free-copy';",
+    "new":"const CACHE='proplet-v3.26.2-celebration-copy';"
+  }
+]
