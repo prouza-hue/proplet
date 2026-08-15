@@ -1,4 +1,8 @@
 (()=>{
+  try{
+    if(history.state?.proplet&&history.state.screen==='game')history.replaceState({...history.state,screen:'daily'},'',location.href);
+  }catch{}
+
   const media=window.matchMedia?.('(prefers-color-scheme: dark)');
   const apply=()=>{
     try{
@@ -20,13 +24,13 @@
 
   const css=document.createElement('link');
   css.rel='stylesheet';
-  css.href='/home-layout.css?v=4';
+  css.href='/home-layout.css?v=5';
   document.head.appendChild(css);
 
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=4';
+    script.src='/home-layout.js?v=5';
     script.dataset.propletHomeLayout='1';
     document.body.appendChild(script);
   };
