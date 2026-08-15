@@ -18,27 +18,16 @@
   media?.addEventListener?.('change',apply);
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
-  const addStyle=href=>{
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href=href;
-    document.head.appendChild(link);
-  };
-  addStyle('/home-layout.css?v=3');
-  addStyle('/home-layout-fix.css?v=3');
+  const css=document.createElement('link');
+  css.rel='stylesheet';
+  css.href='/home-layout.css?v=4';
+  document.head.appendChild(css);
 
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=3';
+    script.src='/home-layout.js?v=4';
     script.dataset.propletHomeLayout='1';
-    script.onload=()=>{
-      if(document.querySelector('script[data-proplet-home-layout-fix]'))return;
-      const fix=document.createElement('script');
-      fix.src='/home-layout-fix.js?v=3';
-      fix.dataset.propletHomeLayoutFix='1';
-      document.body.appendChild(fix);
-    };
     document.body.appendChild(script);
   };
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadHomeLayout,{once:true});
