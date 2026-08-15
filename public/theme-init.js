@@ -27,27 +27,19 @@
   addStyle('/home-layout.css?v=3');
   addStyle('/home-layout-fix.css?v=3');
 
-  const addScript=(src,key)=>{
-    if(document.querySelector(`script[data-${key}]`))return;
-    const script=document.createElement('script');
-    script.src=src;
-    script.dataset[key.replace(/^proplet/,'proplet')]='1';
-    document.body.appendChild(script);
-  };
   const loadHomeLayout=()=>{
-    if(!document.querySelector('script[data-proplet-home-layout]')){
-      const script=document.createElement('script');
-      script.src='/home-layout.js?v=3';
-      script.dataset.propletHomeLayout='1';
-      script.onload=()=>{
-        if(document.querySelector('script[data-proplet-home-layout-fix]'))return;
-        const fix=document.createElement('script');
-        fix.src='/home-layout-fix.js?v=3';
-        fix.dataset.propletHomeLayoutFix='1';
-        document.body.appendChild(fix);
-      };
-      document.body.appendChild(script);
-    }
+    if(document.querySelector('script[data-proplet-home-layout]'))return;
+    const script=document.createElement('script');
+    script.src='/home-layout.js?v=3';
+    script.dataset.propletHomeLayout='1';
+    script.onload=()=>{
+      if(document.querySelector('script[data-proplet-home-layout-fix]'))return;
+      const fix=document.createElement('script');
+      fix.src='/home-layout-fix.js?v=3';
+      fix.dataset.propletHomeLayoutFix='1';
+      document.body.appendChild(fix);
+    };
+    document.body.appendChild(script);
   };
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadHomeLayout,{once:true});
   else loadHomeLayout();
