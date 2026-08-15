@@ -1,2 +1,0 @@
-Build trigger for Proplet v3.24 Daily Generation 3.
-The workflow itself only runs when its guarded source files change; this file intentionally documents the manual trigger attempt.
