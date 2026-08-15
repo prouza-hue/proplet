@@ -30,6 +30,7 @@ def signature(puzzle: dict) -> tuple:
 def main() -> None:
     data = json.loads(PUZZLES.read_text(encoding="utf-8"))
     bank = data.get("daily", [])
+    _, tier_of = generator.load_answer_tiers()
     metadata = generator.load_answer_metadata()
     dictionary = WORDS.read_text(encoding="utf-8").splitlines()
 
@@ -100,9 +101,9 @@ def main() -> None:
         assert targets and len(targets) == len(set(targets))
         assert sum(map(len, targets)) == len(puzzle["mask"])
         assert set().union(*(set(answer["path"]) for answer in puzzle["answers"])) == set(puzzle["mask"])
-        assert all(word in metadata for word in targets)
+        assert all(word in tier_of and word in metadata for word in targets)
 
-        counts = Counter(metadata[word].get("tier") for word in targets)
+        counts = Counter(tier_of[word] for word in targets)
         assert set(counts) <= {"A", "B", "C"}
         assert counts["A"] + 1e-9 >= len(targets) * 0.15
         assert counts["B"] + 1e-9 >= len(targets) * 0.35
@@ -113,7 +114,7 @@ def main() -> None:
 
         for word, score in zip(targets, scores):
             positions[word].append(index - 1)
-            tier_counts[str(metadata[word].get("tier"))] += 1
+            tier_counts[tier_of[word]] += 1
             fun_total += score
             high_fun += int(score >= 4)
 
