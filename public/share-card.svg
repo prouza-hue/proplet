@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Proplet – česká slovní hra</title>
+  <desc id="desc">Hravá fialová karta s logem Propletu a propletenou mřížkou písmen.</desc>
+  <defs>
+    <linearGradient id="bg" x1="70" y1="20" x2="1130" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F9F6FF"/>
+      <stop offset="1" stop-color="#EDE8FF"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="135" y1="128" x2="400" y2="407" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6556DF"/>
+      <stop offset="1" stop-color="#8B75F4"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#493B82" flood-opacity=".18"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#493B82" flood-opacity=".12"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1110" cy="76" r="190" fill="#DCD4FF" opacity=".52"/>
+  <circle cx="102" cy="602" r="205" fill="#CFEFE4" opacity=".72"/>
+  <path d="M0 504C184 436 315 581 484 518C630 464 711 396 866 445C1018 493 1094 452 1200 394V630H0Z" fill="#FFFFFF" opacity=".42"/>
+
+  <g filter="url(#shadow)">
+    <rect x="112" y="121" width="274" height="274" rx="82" fill="url(#purple)" transform="rotate(-3 249 258)"/>
+    <path d="M191 344V177h78c52 0 82 27 82 70 0 45-32 72-86 72h-19v25h-55zm55-70h21c20 0 31-9 31-27 0-16-11-25-31-25h-21v52z" fill="#fff"/>
+    <circle cx="371" cy="136" r="40" fill="#FFD66B" stroke="#F9F6FF" stroke-width="10"/>
+  </g>
+
+  <text x="106" y="486" fill="#25243A" font-family="DejaVu Sans, Arial, sans-serif" font-size="80" font-weight="800" letter-spacing="-4">Proplet</text>
+  <text x="111" y="534" fill="#68647A" font-family="DejaVu Sans, Arial, sans-serif" font-size="25" font-weight="600">Česká slovní hra, která umí</text>
+  <text x="111" y="570" fill="#5D4ED0" font-family="DejaVu Sans, Arial, sans-serif" font-size="29" font-weight="800">příjemně zamotat hlavu.</text>
+
+  <g transform="translate(680 116) rotate(2 196 196)" filter="url(#soft)">
+    <rect x="-34" y="-34" width="460" height="460" rx="62" fill="#FFFEFD" stroke="#E4DDF0" stroke-width="3"/>
+    <g fill="#FFFFFF" stroke="#DCD5E8" stroke-width="2">
+      <rect x="0" y="0" width="68" height="68" rx="18"/><rect x="80" y="0" width="68" height="68" rx="18"/><rect x="160" y="0" width="68" height="68" rx="18"/><rect x="240" y="0" width="68" height="68" rx="18"/><rect x="320" y="0" width="68" height="68" rx="18"/>
+      <rect x="0" y="80" width="68" height="68" rx="18"/><rect x="80" y="80" width="68" height="68" rx="18"/><rect x="160" y="80" width="68" height="68" rx="18"/><rect x="240" y="80" width="68" height="68" rx="18"/><rect x="320" y="80" width="68" height="68" rx="18"/>
+      <rect x="0" y="160" width="68" height="68" rx="18"/><rect x="80" y="160" width="68" height="68" rx="18"/><rect x="160" y="160" width="68" height="68" rx="18"/><rect x="240" y="160" width="68" height="68" rx="18"/><rect x="320" y="160" width="68" height="68" rx="18"/>
+      <rect x="0" y="240" width="68" height="68" rx="18"/><rect x="80" y="240" width="68" height="68" rx="18"/><rect x="160" y="240" width="68" height="68" rx="18"/><rect x="240" y="240" width="68" height="68" rx="18"/><rect x="320" y="240" width="68" height="68" rx="18"/>
+      <rect x="0" y="320" width="68" height="68" rx="18"/><rect x="80" y="320" width="68" height="68" rx="18"/><rect x="160" y="320" width="68" height="68" rx="18"/><rect x="240" y="320" width="68" height="68" rx="18"/><rect x="320" y="320" width="68" height="68" rx="18"/>
+    </g>
+    <path d="M34 34H114V114H194V194H274V274H354" fill="none" stroke="#8B7CF5" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+    <path d="M34 114V194H114V274H194V354H274" fill="none" stroke="#55CFA7" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity=".58"/>
+    <path d="M274 34H354V114H274V194" fill="none" stroke="#FF816F" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+    <g fill="#25243A" font-family="DejaVu Sans, Arial, sans-serif" font-size="31" font-weight="800" text-anchor="middle">
+      <text x="34" y="45">P</text><text x="114" y="45">R</text><text x="194" y="45">O</text><text x="274" y="45">S</text><text x="354" y="45">L</text>
+      <text x="34" y="125">L</text><text x="114" y="125">E</text><text x="194" y="125">T</text><text x="274" y="125">O</text><text x="354" y="125">V</text>
+      <text x="34" y="205">E</text><text x="114" y="205">T</text><text x="194" y="205">E</text><text x="274" y="205">N</text><text x="354" y="205">I</text>
+      <text x="34" y="285">M</text><text x="114" y="285">O</text><text x="194" y="285">Z</text><text x="274" y="285">E</text><text x="354" y="285">K</text>
+      <text x="34" y="365">H</text><text x="114" y="365">R</text><text x="194" y="365">A</text><text x="274" y="365">J</text><text x="354" y="365">!</text>
+    </g>
+  </g>
+
+  <g transform="translate(1006 523) rotate(7)">
+    <rect width="132" height="54" rx="27" fill="#FFD66B"/>
+    <text x="66" y="36" text-anchor="middle" fill="#554516" font-family="DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="800">HRAJ ↓</text>
+  </g>
+</svg>

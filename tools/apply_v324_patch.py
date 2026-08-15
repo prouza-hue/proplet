@@ -208,7 +208,7 @@ def daily_puzzle_matches_date(puzzle_id: str, daily_date: str) -> bool:
 
 
 def patch_app() -> None:
-    replace_once(APP, "const APP_VERSION='3.22.1';", "const APP_VERSION='3.24.0';")
+    replace_once(APP, "const APP_VERSION='3.23.1';", "const APP_VERSION='3.24.0';")
     old = '''function dayNumber(iso){const [y,m,d]=iso.split('-').map(Number);return Math.floor((Date.UTC(y,m-1,d)-Date.UTC(2026,0,1))/86400000)}
 function dailyPuzzleFor(iso){const n=puzzleDB.daily.length;const i=((dayNumber(iso)%n)+n)%n;return puzzleDB.daily[i]}
 '''

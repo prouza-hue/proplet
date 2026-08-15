@@ -1,6 +1,8 @@
-fastapi>=0.115,<1
-uvicorn[standard]>=0.30,<1
-pydantic>=2.8,<3
-httpx>=0.27,<1
-
-pywebpush>=2.0,<3
+# v3.23 launch: direct production dependencies are pinned so identical commits
+# do not silently resolve to different framework versions on a later Vercel build.
+fastapi==0.128.2
+starlette==0.50.0
+uvicorn[standard]==0.48.0
+pydantic==2.13.4
+httpx==0.28.1
+pywebpush==2.3.0

@@ -190,6 +190,129 @@ class DailyGeneration2MigrationTests(unittest.TestCase):
         wrong = data["daily"][(index + 1) % 365]["id"]
         self.assertFalse(server.daily_puzzle_matches_date(wrong, daily_date))
 
+    def test_only_primary_board_can_replace_archived_result(self) -> None:
+        data = server.load_puzzles()
+        daily_date = data["dailyGeneration2From"]
+        index = server.daily_rotation_index(daily_date, 365)
+        active = data["daily"][index]
+        archived = data["legacyDaily"][-1]["puzzles"][index]
+        payload = server.ResultCreate(
+            puzzle_id=active["id"], challenge_key=f"daily:{daily_date}", mode="daily",
+            difficulty=active["difficulty"], elapsed_ms=12_000, moves=8, daily_date=daily_date,
+        )
+        self.assertTrue(server.is_daily_generation_upgrade({"puzzle_id": archived["id"]}, payload))
+        self.assertFalse(server.is_daily_generation_upgrade({"puzzle_id": active["id"]}, payload))
+
+        legacy_payload = payload.model_copy(update={"puzzle_id": archived["id"], "difficulty": archived["difficulty"]})
+        self.assertFalse(server.is_daily_generation_upgrade({"puzzle_id": active["id"]}, legacy_payload))
+
+    def test_result_upgrade_replaces_board_without_second_xp(self) -> None:
+        data = server.load_puzzles()
+        daily_date = data["dailyGeneration2From"]
+        index = server.daily_rotation_index(daily_date, 365)
+        active = data["daily"][index]
+        archived = data["legacyDaily"][-1]["puzzles"][index]
+        old = {
+            "id": "result-1", "puzzle_id": archived["id"], "points": 100,
+            "completed_at": f"{daily_date}T00:15:00+02:00",
+        }
+        payload = server.ResultCreate(
+            puzzle_id=active["id"], challenge_key=f"daily:{daily_date}", mode="daily",
+            difficulty=active["difficulty"], elapsed_ms=22_000, moves=10,
+            daily_date=daily_date, completed_at=f"{daily_date}T09:30:00+02:00",
+        )
+        updates = []
+        with (
+            patch.object(server, "auth_player", return_value={"id": "player-1"}),
+            patch.object(server, "puzzle_exists", return_value=True),
+            patch.object(server, "daily_puzzle_matches_date", return_value=True),
+            patch.object(server, "record_puzzle_run"),
+            patch.object(server, "db_select", return_value=[old]),
+            patch.object(server, "db_update", side_effect=lambda table, where, values: updates.append((table, where, values))),
+            patch.object(server, "db_insert") as insert,
+            patch.object(server, "player_stats", return_value={"points": 100}),
+        ):
+            response = server.result(payload, authorization="Bearer test")
+
+        self.assertTrue(response["dailyGenerationUpgrade"])
+        self.assertFalse(response["firstCompletion"])
+        self.assertEqual(response["awardedPoints"], 0)
+        self.assertEqual(updates[0][2]["puzzle_id"], active["id"])
+        self.assertNotIn("points", updates[0][2])
+        insert.assert_not_called()
+
+    def test_same_daily_replay_is_training_without_xp_or_official_overwrite(self) -> None:
+        old = {
+            "id": "result-1", "puzzle_id": "daily-active", "points": 100,
+            "completed_at": "2026-08-13T08:00:00+02:00",
+        }
+        payload = server.ResultCreate(
+            puzzle_id="daily-active", challenge_key="daily:2026-08-13", mode="daily",
+            difficulty="medium", elapsed_ms=40_000, moves=8, daily_date="2026-08-13",
+            completed_at="2026-08-13T12:00:00+02:00",
+        )
+        with (
+            patch.object(server, "auth_player", return_value={"id": "player-1"}),
+            patch.object(server, "puzzle_exists", return_value=True),
+            patch.object(server, "daily_puzzle_matches_date", return_value=True),
+            patch.object(server, "record_puzzle_run") as record_run,
+            patch.object(server, "db_select", return_value=[old]),
+            patch.object(server, "db_update") as update,
+            patch.object(server, "db_insert") as insert,
+            patch.object(server, "player_stats", return_value={"points": 100}),
+        ):
+            response = server.result(payload, authorization="Bearer test")
+
+        self.assertFalse(response["firstCompletion"])
+        self.assertEqual(response["awardedPoints"], 0)
+        self.assertFalse(response["dailyGenerationUpgrade"])
+        record_run.assert_called_once()
+        update.assert_not_called()
+        insert.assert_not_called()
+
+
+class DailyGlobalLeaderboardTests(unittest.TestCase):
+    def test_global_daily_rank_is_correct_and_never_exposes_identity(self) -> None:
+        rows = [
+            {"player_id": "p1", "puzzle_id": "daily-active", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 60_000, "best_moves": 9, "completed_at": "2026-08-13T08:00:00+02:00", "name": "Never expose me"},
+            {"player_id": "p3", "puzzle_id": "daily-active", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 70_000, "best_moves": 10, "completed_at": "2026-08-13T08:02:00+02:00", "name": "Pavel"},
+            {"player_id": "p2", "puzzle_id": "daily-active", "clean_solve": False, "hints_used": 1, "best_elapsed_ms": 35_000, "best_moves": 7, "completed_at": "2026-08-13T08:01:00+02:00"},
+            {"player_id": "p4", "puzzle_id": "daily-active", "clean_solve": False, "hints_used": 2, "best_elapsed_ms": 30_000, "best_moves": 6, "completed_at": "2026-08-13T08:03:00+02:00"},
+            {"player_id": "legacy", "puzzle_id": "daily-archived", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 10_000, "best_moves": 3, "completed_at": "2026-08-13T00:01:00+02:00"},
+        ]
+        with (
+            patch.object(server, "expected_daily_puzzle_id", return_value="daily-active"),
+            patch.object(server, "db_select", return_value=rows),
+            patch.object(server, "auth_player", return_value={"id": "p3", "name": "Pavel"}),
+        ):
+            result = server.daily_global_leaderboard("2026-08-13", "Bearer test")
+
+        self.assertEqual(result["total"], 4)
+        self.assertEqual(result["myRank"], 2)
+        self.assertEqual(result["topPercent"], 50)
+        self.assertTrue(any(row["isMine"] and row["rank"] == 2 for row in result["rows"]))
+        self.assertEqual(result["privacy"], "anonymous-performance-only")
+        public_text = str(result)
+        self.assertNotIn("Pavel", public_text)
+        self.assertNotIn("Never expose me", public_text)
+        self.assertNotIn("p3", public_text)
+
+    def test_global_daily_without_login_returns_anonymous_podium(self) -> None:
+        rows = [
+            {"player_id": f"p{i}", "puzzle_id": "daily-active", "clean_solve": True, "hints_used": 0, "best_elapsed_ms": 60_000 + i, "best_moves": 9}
+            for i in range(5)
+        ]
+        with (
+            patch.object(server, "expected_daily_puzzle_id", return_value="daily-active"),
+            patch.object(server, "db_select", return_value=rows),
+        ):
+            result = server.daily_global_leaderboard("2026-08-13", None)
+
+        self.assertIsNone(result["myRank"])
+        self.assertEqual(result["total"], 5)
+        self.assertEqual([row["rank"] for row in result["rows"]], [1, 2, 3])
+        self.assertTrue(all(row["isMine"] is False for row in result["rows"]))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

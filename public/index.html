@@ -3,24 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6c5ce7" />
+  <meta name="theme-color" content="#6c5ce7" data-light-color="#6c5ce7" />
   <meta name="color-scheme" content="light dark" />
-  <script>
-    (()=>{
-      const LIGHT='#6c5ce7',DARK='#111019';
-      try{
-        const saved=JSON.parse(localStorage.getItem('proplet-v3-settings')||'{}');
-        const pref=['auto','light','dark'].includes(saved.theme)?saved.theme:'auto';
-        const dark=pref==='dark'||(pref==='auto'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches);
-        const resolved=dark?'dark':'light';
-        document.documentElement.dataset.theme=resolved;
-        document.documentElement.dataset.themePreference=pref;
-        document.documentElement.style.colorScheme=resolved;
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?DARK:LIGHT);
-      }catch{}
-    })();
-  </script>
-  <style>html[data-theme="dark"],html[data-theme="dark"] body{background:#111019;color:#f4f0fa}</style>
+  <script src="/theme-init.js"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Proplet – česká slovní hra, která umí příjemně zamotat hlavu. Najdi všechna slova a propleť celou plochu." />
@@ -71,6 +56,7 @@
           <div>
             <h1>Dnešní Proplet</h1>
             <p id="dailyMeta" class="hero-muted"></p>
+            <div id="dailyWeekRhythm" class="daily-week-rhythm" aria-label="Týdenní rytmus obtížnosti"></div>
           </div>
         </div>
         <div id="starterDailyNudge" class="starter-daily-nudge hidden">🎓 Trénink hotový · teď je řada na dnešní výzvě</div>
@@ -185,6 +171,17 @@
         <button id="pushToggleBtn" class="secondary-btn intro-replay-btn">🔔 Nastavit připomínku</button>
         <div id="pushStatusText" class="push-status muted"></div>
       </div>
+
+      <div class="card settings-card trust-card">
+        <div class="section-head"><div><span class="eyebrow">ÚČET A SOUKROMÍ</span><h2>Data pod kontrolou</h2></div></div>
+        <p class="muted">Proplet můžeš hrát bez účtu. Když účet máš, můžeš si jeho serverová data stáhnout nebo ho trvale smazat.</p>
+        <div class="trust-actions">
+          <button id="reportIssueBtn" class="secondary-btn">🛟 Nahlásit problém</button>
+          <button id="exportDataBtn" class="secondary-btn hidden">⬇ Export mých dat</button>
+          <button id="deleteAccountBtn" class="danger-btn hidden">Smazat účet</button>
+        </div>
+        <div class="trust-links"><a href="/privacy.html">Ochrana soukromí</a><span>·</span><a href="/terms.html">Podmínky používání</a></div>
+      </div>
     </section>
 
     <section id="screen-game" class="screen game-screen">
@@ -235,7 +232,7 @@
     <footer class="app-footer">
       <span>Upleteno s ❤️ během rodinné dovolené v létě 2026</span>
       <strong>Pavel &amp; Sol</strong>
-      <small class="app-version">Proplet v3.22.1</small>
+      <small class="app-version">Proplet v3.24.0</small><small class="footer-links"><a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a></small>
     </footer>
   </main>
 
@@ -501,6 +498,34 @@
       <div id="onboardDots" class="onboard-dots"></div>
       <div id="onboardContent"></div>
       <button id="onboardNextBtn" class="primary-btn big">Pokračovat</button>
+    </div>
+  </div>
+
+  <div id="supportReportModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportReportTitle">
+    <div class="modal-card left">
+      <button id="closeSupportReportModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">POMOC A ZPĚTNÁ VAZBA</span>
+      <h2 id="supportReportTitle">Nahlásit problém</h2>
+      <p class="muted">Napiš, co se stalo. Technické údaje jako heslo nebo PIN sem neposílej.</p>
+      <label>Typ<select id="supportReportCategory"><option value="bug">Technická chyba</option><option value="account">Účet nebo tým</option><option value="privacy">Soukromí / data</option><option value="idea">Nápad</option><option value="other">Něco jiného</option></select></label>
+      <label>Popis<textarea id="supportReportMessage" maxlength="1200" rows="5" placeholder="Co přesně nefungovalo nebo co potřebuješ?"></textarea></label>
+      <label>Kontakt pro odpověď <span class="optional">(volitelné)</span><input id="supportReportReply" maxlength="160" placeholder="e-mail nebo jiný kontakt" /></label>
+      <div id="supportReportError" class="form-error"></div>
+      <button id="saveSupportReportBtn" class="primary-btn big">Odeslat hlášení</button>
+    </div>
+  </div>
+
+  <div id="deleteAccountModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="deleteAccountTitle">
+    <div class="modal-card left">
+      <button id="closeDeleteAccountModal" class="modal-close" aria-label="Zavřít">×</button>
+      <span class="eyebrow">NEVRATNÁ AKCE</span>
+      <h2 id="deleteAccountTitle">Smazat účet?</h2>
+      <p class="muted">Ze serveru se trvale smaže účet, výsledky, XP, série, push zařízení a navázaná herní telemetrie. Tohle nejde vrátit.</p>
+      <label>Pro potvrzení napiš <b>SMAZAT</b><input id="deleteAccountConfirm" autocomplete="off" /></label>
+      <label id="deleteAccountPasswordLabel">Heslo<input id="deleteAccountPassword" type="password" autocomplete="current-password" /></label>
+      <div id="deleteAccountError" class="form-error"></div>
+      <button id="confirmDeleteAccountBtn" class="danger-btn big">Trvale smazat účet</button>
+      <button id="cancelDeleteAccountBtn" class="text-btn">Ne, účet nechám</button>
     </div>
   </div>
 
