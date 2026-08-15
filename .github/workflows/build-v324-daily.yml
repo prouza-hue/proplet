@@ -90,3 +90,5 @@ jobs:
             git commit -m "Build Proplet v3.24.0 Daily Generation 3"
             git push origin HEAD:sol/v3.24-daily-weekly-cadence
           fi
+
+# retrigger: 2026-08-15
