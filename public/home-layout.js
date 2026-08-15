@@ -2,6 +2,11 @@
   if(window.__propletHomeLayoutInstalled)return;
 
   const htmlEsc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const shortHomeDate=iso=>{
+    const [y,m,d]=iso.split('-').map(Number);
+    const text=new Intl.DateTimeFormat('cs-CZ',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Prague'}).format(new Date(Date.UTC(y,m-1,d,12)));
+    return text.charAt(0).toUpperCase()+text.slice(1);
+  };
 
   function moveStatusStrip(){
     const screen=document.querySelector('#screen-daily'),hero=screen?.querySelector('.daily-hero'),level=document.querySelector('#levelCard');
@@ -35,7 +40,9 @@
 
   function tuneDailyState(){
     try{
-      const date=pragueDateISO(),daily=dailyResultState(date),button=document.querySelector('#playDailyBtn'),sync=document.querySelector('#dailySyncStatus');
+      const date=pragueDateISO(),daily=dailyResultState(date),button=document.querySelector('#playDailyBtn'),sync=document.querySelector('#dailySyncStatus'),dateEl=document.querySelector('#dailyDate'),meta=document.querySelector('#dailyMeta');
+      if(dateEl)dateEl.textContent=shortHomeDate(date);
+      if(meta)meta.textContent=DIFF[daily.puzzle.difficulty]?.label||'';
       if(button){
         if(daily.active)button.textContent='Zobrazit dnešní výsledek';
         else if(daily.legacy)button.textContent='Zahrát nový dnešní Proplet';
