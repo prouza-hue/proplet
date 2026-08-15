@@ -51,9 +51,9 @@ BADGES = [
     {"days": 100, "icon": "🚀", "name": "Legenda"},
 ]
 
-POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
+POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.24.0"
+APP_VERSION = "3.25.0"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -379,6 +379,31 @@ def db_update(table: str, filters: dict, values: dict):
 def db_delete(table: str, **filters):
     params = {key: f"eq.{value}" for key, value in filters.items() if value is not None}
     return db_request("DELETE", table, params=params, prefer="return=representation")
+
+
+def xp_economy_migrated() -> bool:
+    """True when every positive historical Free reward uses the current XP economy.
+
+    Zero-point rows are intentional: they represent a Gen1/Gen2 slot that was already
+    rewarded elsewhere. Ordering mismatches descending lets one cheap PostgREST probe
+    distinguish an intentional zero from any stale/invalid positive reward.
+    """
+    targets = {key: value for key, value in POINTS.items() if key != "daily"}
+    for table in ("results", "free_slot_rewards"):
+        for difficulty, target in targets.items():
+            params = {
+                "select": "id,points",
+                "difficulty": f"eq.{difficulty}",
+                "points": f"neq.{target}",
+                "order": "points.desc",
+                "limit": "1",
+            }
+            if table == "results":
+                params["mode"] = "eq.free"
+            rows = db_request("GET", table, params=params)
+            if rows and int(rows[0].get("points") or 0) > 0:
+                return False
+    return True
 
 
 def db_rpc(function: str, body: Optional[dict] = None):
@@ -1158,6 +1183,9 @@ def health():
         "supportChannel": True,
         "launchDashboard": True,
         "singleMemberTeams": True,
+        "xpEconomyVersion": 2,
+        "freeXp": {key: value for key, value in POINTS.items() if key != "daily"},
+        "dailyXp": POINTS["daily"],
     }
     if not puzzle_file:
         return {**base, "ok": False, "database": False, "message": "Serverová databáze úloh není součástí deploymentu"}
@@ -1252,9 +1280,14 @@ def health():
             db_rpc("proplet_rate_limit", {"p_scope": "health_probe", "p_actor_hash": hashlib.sha256(b"health-probe").hexdigest(), "p_window_seconds": 60, "p_limit": 10000})
         except HTTPException:
             security_migration = False
-        return {**base, "ok": bool(security_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        xp_migration = False
+        try:
+            xp_migration = xp_economy_migrated()
+        except HTTPException:
+            xp_migration = False
+        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "securityMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
 
 
 @app.get("/api/config")

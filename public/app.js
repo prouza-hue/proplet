@@ -1,4 +1,4 @@
-const APP_VERSION='3.24.0';
+const APP_VERSION='3.25.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -54,10 +54,10 @@ const CLEAN_PRAISE={
  hardcore:['A bez nápovědy. Mozkožrout žádá přepočítání.','Čistě. Mozkožrout to nese překvapivě osobně.']
 };
 const DIFF={
-  easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:10},
-  medium:{label:'Střední',icon:'🧠',desc:'Větší 7×8 plocha a víc možností.',xp:20},
-  hard:{label:'Těžká',icon:'🧨',desc:'8×8 nebo 9×9. Od 10. úrovně hlavně delší slova a pořádné zákruty.',xp:35},
-  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10. Od 10. úrovně minimum drobků, maximum dlouhých slov a šneků.',xp:60}
+  easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:15},
+  medium:{label:'Střední',icon:'🧠',desc:'Větší 7×8 plocha a víc možností.',xp:25},
+  hard:{label:'Těžká',icon:'🧨',desc:'8×8 nebo 9×9. Od 10. úrovně hlavně delší slova a pořádné zákruty.',xp:50},
+  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10. Od 10. úrovně minimum drobků, maximum dlouhých slov a šneků.',xp:100}
 };
 const BADGES=[
  {days:1,icon:'🥉',name:'První zářez'},{days:3,icon:'❤️',name:'Srdcař'},{days:5,icon:'⭐',name:'Pětka'},
@@ -72,31 +72,31 @@ const LEVELS=[
  {xp:600,icon:'🪢',name:'Propletač'},
  {xp:850,icon:'↪️',name:'Kličkař'},
  {xp:1100,icon:'🧭',name:'Mistr cest'},
- {xp:1400,icon:'♟️',name:'Slovní taktik'},
- {xp:1750,icon:'✨',name:'Slovní mág'},
- {xp:2150,icon:'🧶',name:'Uzlovač'},
- {xp:2600,icon:'👑',name:'Legenda Propletu'},
- {xp:3100,icon:'🛤️',name:'Cestář'},
- {xp:3650,icon:'🐉',name:'Krotitel'},
- {xp:4250,icon:'🌀',name:'Mistr zákrut'},
- {xp:4900,icon:'🧱',name:'Labyrintník'},
- {xp:5600,icon:'💎',name:'Velmistr Propletu'},
- {xp:6350,icon:'🥷',name:'Propletový ninja'},
- {xp:7150,icon:'⚗️',name:'Slovní alchymista'},
- {xp:8000,icon:'🐌',name:'Mistr šneků'},
- {xp:8900,icon:'🔮',name:'Mřížkový mág'},
- {xp:10000,icon:'🌌',name:'Nadslovník'},
- {xp:11250,icon:'🤯',name:'Krotitel Mozkožroutů'},
- {xp:12500,icon:'🏰',name:'Král mřížky'},
- {xp:14000,icon:'🎓',name:'Arcimistr Propletu'},
- {xp:16000,icon:'🪄',name:'Slovočaroděj'},
- {xp:18500,icon:'🗿',name:'Propletový titán'},
- {xp:21500,icon:'♾️',name:'Mistr nekonečna'},
- {xp:25000,icon:'🌠',name:'Hvězdný propletač'},
- {xp:29000,icon:'🛰️',name:'Orbitální luštitel'},
- {xp:34000,icon:'🚀',name:'Galaktický slovolovec'},
- {xp:40000,icon:'🛡️',name:'Strážce všech cest'},
- {xp:47000,icon:'🏆',name:'Absolutní Propletač'}
+ {xp:1450,icon:'♟️',name:'Slovní taktik'},
+ {xp:1800,icon:'✨',name:'Slovní mág'},
+ {xp:2200,icon:'🧶',name:'Uzlovač'},
+ {xp:2700,icon:'👑',name:'Legenda Propletu'},
+ {xp:3250,icon:'🛤️',name:'Cestář'},
+ {xp:3850,icon:'🐉',name:'Krotitel'},
+ {xp:4500,icon:'🌀',name:'Mistr zákrut'},
+ {xp:5200,icon:'🧱',name:'Labyrintník'},
+ {xp:6000,icon:'💎',name:'Velmistr Propletu'},
+ {xp:6800,icon:'🥷',name:'Propletový ninja'},
+ {xp:7700,icon:'⚗️',name:'Slovní alchymista'},
+ {xp:8700,icon:'🐌',name:'Mistr šneků'},
+ {xp:9700,icon:'🔮',name:'Mřížkový mág'},
+ {xp:11000,icon:'🌌',name:'Nadslovník'},
+ {xp:12500,icon:'🤯',name:'Krotitel Mozkožroutů'},
+ {xp:14000,icon:'🏰',name:'Král mřížky'},
+ {xp:15800,icon:'🎓',name:'Arcimistr Propletu'},
+ {xp:18300,icon:'🪄',name:'Slovočaroděj'},
+ {xp:21500,icon:'🗿',name:'Propletový titán'},
+ {xp:25000,icon:'♾️',name:'Mistr nekonečna'},
+ {xp:30000,icon:'🌠',name:'Hvězdný propletač'},
+ {xp:35000,icon:'🛰️',name:'Orbitální luštitel'},
+ {xp:42000,icon:'🚀',name:'Galaktický slovolovec'},
+ {xp:50500,icon:'🛡️',name:'Strážce všech cest'},
+ {xp:61000,icon:'🏆',name:'Absolutní Propletač'}
 ];
 const ACHIEVEMENT_GROUPS=[
  ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],
@@ -173,7 +173,7 @@ const ACHIEVEMENTS=[
  {id:'xp-5000',group:'xp',icon:'🏦',name:'Pět tisíc',desc:'Nasbírej 5 000 XP',value:s=>s.points||0,target:5000},
  {id:'xp-10000',group:'xp',icon:'🔢',name:'Pěticiferný',desc:'Nasbírej 10 000 XP',value:s=>s.points||0,target:10000},
  {id:'xp-25000',group:'xp',icon:'💸',name:'XP magnát',desc:'Nasbírej 25 000 XP',value:s=>s.points||0,target:25000},
- {id:'xp-47000',group:'xp',icon:'🏆',name:'Absolutní sběratel',desc:'Nasbírej 47 000 XP',value:s=>s.points||0,target:47000},
+ {id:'xp-61000',group:'xp',icon:'🏆',name:'Absolutní sběratel',desc:'Nasbírej 61 000 XP',value:s=>s.points||0,target:61000},
 
  {id:'speed-300',group:'speed',icon:'🏃',name:'Pohodový sprint',desc:'Denní výzva pod 5 minut',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<300000?1:0,target:1},
  {id:'speed-180',group:'speed',icon:'💨',name:'Svižník',desc:'Denní výzva pod 3 minuty',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<180000?1:0,target:1},
