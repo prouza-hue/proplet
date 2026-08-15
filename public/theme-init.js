@@ -18,16 +18,36 @@
   media?.addEventListener?.('change',apply);
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
-  const css=document.createElement('link');
-  css.rel='stylesheet';
-  css.href='/home-layout.css?v=1';
-  document.head.appendChild(css);
-  const loadHomeLayout=()=>{
-    if(document.querySelector('script[data-proplet-home-layout]'))return;
+  const addStyle=href=>{
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    document.head.appendChild(link);
+  };
+  addStyle('/home-layout.css?v=3');
+  addStyle('/home-layout-fix.css?v=3');
+
+  const addScript=(src,key)=>{
+    if(document.querySelector(`script[data-${key}]`))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=1';
-    script.dataset.propletHomeLayout='1';
+    script.src=src;
+    script.dataset[key.replace(/^proplet/,'proplet')]='1';
     document.body.appendChild(script);
+  };
+  const loadHomeLayout=()=>{
+    if(!document.querySelector('script[data-proplet-home-layout]')){
+      const script=document.createElement('script');
+      script.src='/home-layout.js?v=3';
+      script.dataset.propletHomeLayout='1';
+      script.onload=()=>{
+        if(document.querySelector('script[data-proplet-home-layout-fix]'))return;
+        const fix=document.createElement('script');
+        fix.src='/home-layout-fix.js?v=3';
+        fix.dataset.propletHomeLayoutFix='1';
+        document.body.appendChild(fix);
+      };
+      document.body.appendChild(script);
+    }
   };
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadHomeLayout,{once:true});
   else loadHomeLayout();
