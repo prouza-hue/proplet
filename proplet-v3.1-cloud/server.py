@@ -997,7 +997,13 @@ def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
     ids = {expected_daily_puzzle_id(daily_date)}
 
     active = data.get("daily", [])
-    if active:
+    switch3_raw = data.get("dailyGeneration3From")
+    try:
+        requested_date = date.fromisoformat(daily_date)
+        switch3 = date.fromisoformat(str(switch3_raw)) if switch3_raw else None
+    except ValueError:
+        raise HTTPException(400, "Neplatné datum")
+    if active and (switch3 is None or requested_date >= switch3):
         base = str(data.get("dailyRotationBaseDate") or data.get("dailyGeneration3From") or "2026-01-01")
         ids.add(active[daily_rotation_index(daily_date, len(active), base)]["id"])
 
