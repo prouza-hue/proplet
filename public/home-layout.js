@@ -8,12 +8,13 @@
     return text.charAt(0).toUpperCase()+text.slice(1);
   };
 
-  function moveStatusStrip(){
-    const screen=document.querySelector('#screen-daily'),hero=screen?.querySelector('.daily-hero'),level=document.querySelector('#levelCard');
+  function placeStatusStrip(){
+    const screen=document.querySelector('#screen-daily'),hero=screen?.querySelector('.daily-hero'),level=document.querySelector('#levelCard'),quick=screen?.querySelector('#quickPlayCard');
     if(!screen||!hero||!level)return;
     screen.classList.add('home-layout-active');
     level.classList.add('home-status-strip');
-    if(level.nextElementSibling!==hero)screen.insertBefore(level,hero);
+    level.style.margin='10px 0 0';
+    if(quick&&level.nextElementSibling!==quick)screen.insertBefore(level,quick);
   }
 
   function compactDailyHero(){
@@ -109,11 +110,11 @@
     renderQuickPlay=renderHomeQuickPlay;
     renderDaily=function(){
       baseDaily();
-      moveStatusStrip();
+      placeStatusStrip();
       compactDailyHero();
       tuneDailyState();
     };
-    moveStatusStrip();
+    placeStatusStrip();
     compactDailyHero();
     try{renderDaily()}catch{}
     return true;
