@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.26.0-pwa-install';
+const CACHE='proplet-v3.26.1-free-copy';
 const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/home-layout.css','/home-layout.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{

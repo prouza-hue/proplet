@@ -1,4 +1,4 @@
-const APP_VERSION='3.26.0';
+const APP_VERSION='3.26.1';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -54,10 +54,10 @@ const CLEAN_PRAISE={
  hardcore:['A bez nápovědy. Mozkožrout žádá přepočítání.','Čistě. Mozkožrout to nese překvapivě osobně.']
 };
 const DIFF={
-  easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:15},
-  medium:{label:'Střední',icon:'🧠',desc:'Větší 7×8 plocha a víc možností.',xp:25},
-  hard:{label:'Těžká',icon:'🧨',desc:'8×8 nebo 9×9. Od 10. úrovně hlavně delší slova a pořádné zákruty.',xp:50},
-  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10. Od 10. úrovně minimum drobků, maximum dlouhých slov a šneků.',xp:100}
+  easy:{label:'Snadná',icon:'🌱',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
+  medium:{label:'Střední',icon:'🧠',desc:'7×8 · větší plocha a víc možných cest.',xp:25},
+  hard:{label:'Těžká',icon:'🧨',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},
+  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100}
 };
 const BADGES=[
  {days:1,icon:'🥉',name:'První zářez'},{days:3,icon:'❤️',name:'Srdcař'},{days:5,icon:'⭐',name:'Pětka'},
