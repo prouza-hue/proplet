@@ -1,0 +1,65 @@
+name: Validate and apply Proplet v3.26.1 Free copy
+
+on:
+  push:
+    branches:
+      - agent/v3261-free-copy
+    paths:
+      - .release/v3261-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact replacements
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          spec=json.loads(Path('.release/v3261-replacements.json').read_text(encoding='utf-8'))
+          for item in spec:
+              path=Path(item['path'])
+              text=path.read_text(encoding='utf-8')
+              count=text.count(item['old'])
+              if count != 1:
+                  raise SystemExit(f"{path}: {item['label']} expected one match, found {count}")
+              path.write_text(text.replace(item['old'],item['new'],1),encoding='utf-8')
+          PY
+      - name: Syntax and copy checks
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          node --check public/sw.js
+          python - <<'PY'
+          from pathlib import Path
+          server=Path('server.py').read_text(encoding='utf-8')
+          app=Path('public/app.js').read_text(encoding='utf-8')
+          sw=Path('public/sw.js').read_text(encoding='utf-8')
+          assert 'APP_VERSION = "3.26.1"' in server
+          assert "const APP_VERSION='3.26.1';" in app
+          for text in [
+              '6×6 · menší plocha a přehlednější cesty.',
+              '7×8 · větší plocha a víc možných cest.',
+              '8×8 až 9×9 · delší slova a ostré zákruty.',
+              '10×10 · dlouhá slova, šneci a minimum krátkých slov.'
+          ]:
+              assert text in app
+          assert 'Od 10. úrovně' not in app
+          assert "proplet-v3.26.1-free-copy" in sw
+          PY
+          git diff --check
+      - name: Commit validated source changes
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add server.py public/app.js public/sw.js
+          git diff --cached --check
+          git commit -m 'Proplet v3.26.1 unify Free difficulty copy'
+          git push origin HEAD:agent/v3261-free-copy
