@@ -85,7 +85,7 @@ body:not(.playing) .app-shell{height:auto;min-height:100vh}
 .home-continue[data-diff="easy"],.home-diff-tile[data-diff="easy"]{--q:#45b98e;--qs:#e5f7f0}
 .home-continue[data-diff="medium"],.home-diff-tile[data-diff="medium"]{--q:#6f64df;--qs:#eeebff}
 .home-continue[data-diff="hard"],.home-diff-tile[data-diff="hard"]{--q:#ee725e;--qs:#ffebe7}
-.home-continue[data-diff="hardcore"],.home-diff-tile[data-diff="hardcore"]{--q:#a04bd8;--qs:#f5eafb}
+.home-continue[data-diff="hardcore"],.home-diff-tile[data-diff="hardcore"]{--q:#941522;--qs:#f8e4e7}
 .home-continue-icon{width:36px;height:36px;border-radius:11px;background:var(--qs);display:grid;place-items:center;font-size:19px}
 .home-continue-copy{min-width:0}.home-continue-copy strong,.home-continue-copy small{display:block}.home-continue-copy strong{font-size:12.5px}.home-continue-copy small{margin-top:2px;color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .home-continue-cta{border-radius:999px;background:var(--qs);color:var(--q);padding:6px 9px;font-size:9.5px;font-weight:950;white-space:nowrap}
@@ -123,7 +123,7 @@ html[data-theme="dark"] .home-continue,html[data-theme="dark"] .home-diff-tile{b
 html[data-theme="dark"] .home-continue[data-diff="easy"],html[data-theme="dark"] .home-diff-tile[data-diff="easy"]{--q:#72d9b7;--qs:#1d3a33}
 html[data-theme="dark"] .home-continue[data-diff="medium"],html[data-theme="dark"] .home-diff-tile[data-diff="medium"]{--q:#a294ff;--qs:#302a52}
 html[data-theme="dark"] .home-continue[data-diff="hard"],html[data-theme="dark"] .home-diff-tile[data-diff="hard"]{--q:#ff9286;--qs:#472a2d}
-html[data-theme="dark"] .home-continue[data-diff="hardcore"],html[data-theme="dark"] .home-diff-tile[data-diff="hardcore"]{--q:#d49aff;--qs:#3b2948}
+html[data-theme="dark"] .home-continue[data-diff="hardcore"],html[data-theme="dark"] .home-diff-tile[data-diff="hardcore"]{--q:#ee6974;--qs:#452128}
 html[data-theme="dark"] .home-diff-progress{background:#302c3b}
 
 /* v3.27 — custom difficulty assets */
