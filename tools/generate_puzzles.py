@@ -69,6 +69,16 @@ VOCAB_POLICIES = {
         "allowed": ("C", "D"), "weights": {"C": 2, "D": 5},
         "min_fraction": {"D": 0.50}, "min_avg_fun": 3.50, "min_fun_words": 4,
     },
+    # The second hundred of Mozkožrout levels keeps the difficult geometry but
+    # uses a calmer vocabulary profile.  Roughly a third to two fifths of a
+    # board comes from a hand-reviewed, recognisable subset of D; the rest is C.
+    # This deliberately excludes specialist curiosities such as NOCEBO or
+    # MASTABA without turning Mozkožrout into another Hard bank.
+    "hardcore_conservative": {
+        "allowed": ("C", "D"), "weights": {"C": 5, "D": 2},
+        "min_fraction": {"D": 0.32}, "max_fraction": {"D": 0.43},
+        "min_avg_fun": 3.20, "min_fun_words": 3,
+    },
     # Daily is deliberately family-wide: mostly B, with easy anchors from A and a restrained C share.
     "daily": {
         "allowed": ("A", "B", "C"), "weights": {"A": 3, "B": 5, "C": 1},
@@ -76,6 +86,37 @@ VOCAB_POLICIES = {
         "min_avg_fun": 3.0, "min_fun_words": 1,
     },
 }
+
+# A word may be perfectly legitimate and still be a poor surprise in a family
+# game.  This allowlist is intentionally editorial rather than frequency-only:
+# it keeps terms that are broadly recognisable or immediately evocative, while
+# omitting narrow linguistic, archaeological and scientific terminology.
+CONSERVATIVE_D_WORDS = set("""
+abstrakce absurdita adaptace akustika almanach ambice amnézie anagram analogie
+analýza anomálie antihmota apokalypsa archetyp argument arkáda artefakt aspekt
+astronaut asymetrie atom atribut automat autonomie autorita axiom axolotl
+balista bazilišek bilance biochemie biometrie bionika biosféra biočip blockchain
+buňka centimetr chaos charisma dedukce deficit definice dilema disciplína
+diverzita dynamika dystopie echolokace efekt efektivita ekonomie element empatie
+entita entropie estetika etika etymologie evidence faktor fenomén feromon fikce
+fraktál frekvence funkce geolog grafit groteska gyroskop harmonie hierarchie
+hieroglyf hromosvod hyperbola idea identita ideologie imaginace impuls index
+instinkt integrál intuice ironie izotop kamufláž kapacita katapult kodex koloseum
+kometa komplex komplexita kompromis koncepce koncept konflikt konsenzus kontext
+kontrast kosmonaut kreativita kritika kritérium kryptoměna krystal kvantum kvark
+limit logaritmus logika lunochod magnet materie mechanika menhir meteoroid model
+mohyla molekula monolit morálka motiv mumie mystérium nanobot narval nekromant
+neutrino norma nuance obelisk objekt observatoř odchylka optimum orbita organismus
+osciloskop oxymóron palindrom panteon parabola paradigma paradox paralela parametr
+patogen pentagram piktogram placebo plankton podstata polarita polygon poměr
+potenciál praxe predátor preference premisa princip priorita proces pseudonym
+ptakopysk radiace radon realita reflexe relativita rezonance režim rovnováha
+rozpor rámec samizdat sarkofág schéma scénář sextant signál simulátor sklípkan
+sloučenina spektrum spirála stabilita standard steampunk stoicismus struktura
+subjekt symbol symetrie syntax syntéza systém sémantika taktika telepatie teleport
+tendence teorie teze trend tsunami téma validita variace varianta vektor verze
+vize vnímání vombat vzorec vědomí xenon závěr červodíra šotek žánr
+""".split())
 
 
 
@@ -126,7 +167,10 @@ def build_answer_pools(tiers: dict[str, list[str]], metadata: dict[str, dict] | 
         weighted: list[str] = []
         for tier in policy["allowed"]:
             tier_weight = int(policy.get("weights", {}).get(tier, 1))
-            for word in tiers[tier]:
+            tier_words = tiers[tier]
+            if key == "hardcore_conservative" and tier == "D":
+                tier_words = [word for word in tier_words if word in CONSERVATIVE_D_WORDS]
+            for word in tier_words:
                 fun = int((metadata or {}).get(word, {}).get("fun", 3))
                 fun_weight = {1: 1, 2: 1, 3: 2, 4: 4, 5: 6}.get(fun, 2)
                 weighted.extend([word] * tier_weight * fun_weight)
@@ -653,10 +697,15 @@ def main():
                     help="Keep all current free/daily banks and only add/regenerate the rescue bank.")
     ap.add_argument("--top-up-existing", action="store_true",
                     help="Keep all existing banks and append new free puzzles until --free-per-level is reached.")
+    ap.add_argument("--conservative-hardcore-extension", action="store_true",
+                    help="Use the calmer reviewed D profile for appended Hardcore levels.")
     args = ap.parse_args()
 
     freq = load_frequency_words()
     tiers, tier_of = load_answer_tiers()
+    missing_conservative = CONSERVATIVE_D_WORDS - set(tiers["D"])
+    if missing_conservative:
+        raise RuntimeError(f"Conservative D allowlist contains unknown/non-D words: {sorted(missing_conservative)}")
     answer_metadata = load_answer_metadata()
     fun_of = {word: int(meta.get("fun", 3)) for word, meta in answer_metadata.items()}
     answer_pools = build_answer_pools(tiers, answer_metadata)
@@ -752,31 +801,47 @@ def main():
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
     for p in old.get("rescue", []) if old else []:
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
+    for bank in legacy.values():
+        for p in bank:
+            used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
 
     started = time.time()
     levels_to_generate = (() if args.daily_generation_2 else (("easy", "medium", "hard", "hardcore") if (old and (args.generation_2 or args.top_up_existing)) else (() if (old and args.preserve_existing_all) else (("hard", "hardcore") if old else ("easy", "medium", "hard", "hardcore")))))
-    id_prefix = {"easy": "g2-e", "medium": "g2-m", "hard": "g2-h", "hardcore": "g2-x"} if args.generation_2 else {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
+    active_free_generation = 2 if args.generation_2 else int((old or {}).get("freeGeneration", 1))
+    id_prefix = {"easy": "g2-e", "medium": "g2-m", "hard": "g2-h", "hardcore": "g2-x"} if active_free_generation >= 2 else {"easy": "e", "medium": "m", "hard": "h3", "hardcore": "x"}
     repeat_window = 24
     recent_free: dict[str, list[set[str]]] = {key: [] for key in free}
+    if old and args.top_up_existing:
+        # Anti-repeat must cross the old/new boundary.  Starting with an empty
+        # window would allow level 101 to reuse a word from level 100.
+        for difficulty, bank in free.items():
+            recent_free[difficulty] = [
+                {answer["word"].lower() for answer in puzzle["answers"]}
+                for puzzle in bank[-repeat_window:]
+            ]
 
     for difficulty in levels_to_generate:
         start_i = len(free[difficulty]) if (old and args.top_up_existing) else 0
         for i in range(start_i, args.free_per_level):
             while True:
                 seed = rng.randrange(1, 2**31 - 1)
+                conservative_extension = difficulty == "hardcore" and args.conservative_hardcore_extension and i >= start_i
+                vocab_key = "hardcore_conservative" if conservative_extension else difficulty
                 p = create_puzzle(
-                    difficulty, seed, answer_pools[difficulty], dictionary,
+                    difficulty, seed, answer_pools[vocab_key], dictionary,
                     f"{id_prefix[difficulty]}-{i+1:03d}",
                     variant_index=i if difficulty == "hard" else None,
-                    tier_of=tier_of, vocab_key=difficulty, fun_of=fun_of,
+                    tier_of=tier_of,
+                    vocab_key=vocab_key,
+                    fun_of=fun_of,
                     avoid_words=set().union(*recent_free[difficulty]) if recent_free[difficulty] else set(),
                 )
                 sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig not in used_signatures:
                     used_signatures.add(sig)
                     p["meta"]["level"] = i + 1
-                    p["meta"]["contentGeneration"] = 2 if args.generation_2 else 1
-                    p["meta"]["generationKey"] = "free-gen2" if args.generation_2 else "free-gen1"
+                    p["meta"]["contentGeneration"] = active_free_generation
+                    p["meta"]["generationKey"] = f"free-gen{active_free_generation}"
                     p["meta"]["lexiconVersion"] = 2
                     free[difficulty].append(p)
                     recent_free[difficulty].append({answer["word"].lower() for answer in p["answers"]})
@@ -836,7 +901,7 @@ def main():
             print(f"rescue: {len(rescue)}/{args.rescue}")
 
     payload = {
-        "version": 7 if args.daily_generation_2 else (6 if args.generation_2 else int((old or {}).get("version", 5))),
+        "version": 8 if args.top_up_existing and args.free_per_level > 100 else (7 if args.daily_generation_2 else (6 if args.generation_2 else int((old or {}).get("version", 5)))),
         "generatedAt": "2026-08-13",
         "dictionarySize": len(dictionary),
         "dailyRotationSize": len(daily),
@@ -845,7 +910,8 @@ def main():
         "daily": daily,
         "legacyDaily": legacy_daily,
         "rescue": rescue,
-        "freeGeneration": 2 if args.generation_2 else int((old or {}).get("freeGeneration", 1)),
+        "freeGeneration": active_free_generation,
+        "freeLevelsPerDifficulty": min((len(bank) for bank in free.values()), default=0),
         "dailyGeneration": 2 if args.daily_generation_2 else int((old or {}).get("dailyGeneration", 1)),
         "lexiconVersion": 2,
         "vocabularyVersion": 2,
@@ -855,6 +921,7 @@ def main():
         "dailyTieredFromVersion": "3.16.1" if args.daily_generation_2 else (old or {}).get("dailyTieredFromVersion"),
         "dailyMigration": {"strategy": "date-boundary-with-legacy-validation", "leaderboard": "active-generation-only", "history": "preserved"} if args.daily_generation_2 else (old or {}).get("dailyMigration"),
         "freeTieredFromVersion": "3.16" if args.generation_2 else (old or {}).get("freeTieredFromVersion"),
+        "freeExtendedFromVersion": "3.19" if args.top_up_existing and args.free_per_level > 100 else (old or {}).get("freeExtendedFromVersion"),
         "freeMigration": {"strategy": "transferred-slots", "xpPolicy": "once-per-difficulty-level-slot"} if args.generation_2 else (old or {}).get("freeMigration"),
     }
     payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))

@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "dailyGeneration": 3,
+  "switchDate": "2026-08-17",
+  "weeklyPattern": [
+    "easy",
+    "easy",
+    "medium",
+    "medium",
+    "medium",
+    "hard",
+    "hard"
+  ],
+  "difficultyCounts": {
+    "easy": 105,
+    "medium": 156,
+    "hard": 104
+  },
+  "exactCoverRechecked": 365,
+  "activeDailyPuzzles": 365,
+  "generation2Archived": 365,
+  "answers": 2886,
+  "distinctAnswers": 1330,
+  "minimumCircularRepeatGapDays": 25,
+  "averageFun": 3.27,
+  "highFunAnswers": 726,
+  "tierCounts": {
+    "B": 1651,
+    "C": 328,
+    "A": 907
+  },
+  "activePreviousIdCollisions": 0,
+  "activeOtherBankIdCollisions": 0,
+  "publicServerPuzzleCopiesIdentical": true
+}

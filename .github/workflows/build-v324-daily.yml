@@ -1,0 +1,106 @@
+name: Verify Proplet root cutover
+
+on:
+  push:
+    branches:
+      - sol/v3.24-daily-weekly-cadence
+    paths:
+      - .github/workflows/build-v324-daily.yml
+      - server.py
+      - requirements.txt
+      - vercel.json
+      - public/**
+      - data/**
+      - tools/**
+      - proplet-v3.1-cloud/server.py
+      - proplet-v3.1-cloud/requirements.txt
+      - proplet-v3.1-cloud/vercel.json
+      - proplet-v3.1-cloud/public/**
+      - proplet-v3.1-cloud/data/**
+      - proplet-v3.1-cloud/tools/**
+
+permissions:
+  contents: write
+
+jobs:
+  verify-root:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: sol/v3.24-daily-weekly-cadence
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Render canonical share preview
+        run: |
+          python -m pip install --quiet 'cairosvg==2.8.2'
+          python - <<'PY'
+          import cairosvg
+          from pathlib import Path
+          svg = Path('public/share-card.svg')
+          png = Path('public/share-card.png')
+          cairosvg.svg2png(url=str(svg), write_to=str(png), output_width=1200, output_height=630)
+          Path('proplet-v3.1-cloud/public/share-card.png').write_bytes(png.read_bytes())
+          print(f'share-card.png: {png.stat().st_size} bytes')
+          PY
+
+      - name: Verify root is identical to production tree
+        run: |
+          cmp server.py proplet-v3.1-cloud/server.py
+          cmp requirements.txt proplet-v3.1-cloud/requirements.txt
+          cmp vercel.json proplet-v3.1-cloud/vercel.json
+          diff -qr data proplet-v3.1-cloud/data
+          diff -qr public proplet-v3.1-cloud/public
+          diff -qr tools proplet-v3.1-cloud/tools
+          echo 'Root runtime tree == proplet-v3.1-cloud runtime tree'
+
+      - name: Root syntax and cutover invariants
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          server = Path('server.py').read_text(encoding='utf-8')
+          app = Path('public/app.js').read_text(encoding='utf-8')
+          index = Path('public/index.html').read_text(encoding='utf-8')
+          vercel = Path('vercel.json').read_text(encoding='utf-8')
+          req = Path('requirements.txt').read_text(encoding='utf-8')
+          svg = Path('public/share-card.svg').read_text(encoding='utf-8')
+          puzzles = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+
+          assert 'APP_VERSION = "3.24.0"' in server
+          assert "const APP_VERSION='3.24.0';" in app
+          assert 'dailyWeekRhythm' in index
+          assert puzzles['dailyGeneration'] == 3
+          assert puzzles['dailyGeneration3From'] == '2026-08-17'
+          assert puzzles['dailyCadence']['pattern'] == ['easy','easy','medium','medium','medium','hard','hard']
+          assert Path('public/admin.html').is_file()
+          assert Path('public/admin.js').is_file()
+          assert Path('public/admin.css').is_file()
+          assert 'Content-Security-Policy' in vercel
+          assert 'fastapi==0.128.2' in req and 'starlette==0.50.0' in req
+          assert all(word in svg for word in ('PROPLET', 'ZÁBAVNÉ', 'HRAJ'))
+          assert Path('public/share-card.png').stat().st_size > 50000
+          print('Root cutover invariants PASS')
+          PY
+
+      - name: Commit rendered share preview
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/share-card.png proplet-v3.1-cloud/public/share-card.png
+          if git diff --cached --quiet; then
+            echo 'Share preview already current.'
+          else
+            git commit -m 'Render corrected Proplet share preview'
+            git push origin HEAD:sol/v3.24-daily-weekly-cadence
+          fi

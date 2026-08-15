@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.23.1-launch-readiness-single-team';
+const CACHE='proplet-v3.24.0-daily-weekly-cadence';
 const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{

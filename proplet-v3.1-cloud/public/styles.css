@@ -887,3 +887,14 @@ html[data-theme="dark"] .logout-btn{color:#ff9c98}
 .trust-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.trust-actions>*{flex:1 1 180px}.trust-links{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:16px;font-size:13px;color:var(--muted)}.trust-links a,.footer-links a{color:inherit;text-underline-offset:3px}.danger-btn{appearance:none;border:1px solid #d97772;background:#fff2f0;color:#9d2d29;border-radius:14px;min-height:44px;padding:0 16px;font:inherit;font-weight:800;cursor:pointer}.danger-btn.big{width:100%;min-height:50px}.danger-btn:disabled{opacity:.55;cursor:default}.optional{font-weight:500;color:var(--muted)}.footer-links{display:block;margin-top:2px}.support-success{padding:12px 14px;border-radius:14px;background:#e7faf3;color:#22654f;font-weight:700}
 html[data-theme="dark"] .danger-btn{background:#3a2227;border-color:#6a3a3e;color:#ffaaa3}html[data-theme="dark"] .support-success{background:#1d3b32;color:#84e2bd}
 @media(max-width:560px){.trust-actions{display:grid}.trust-actions>*{width:100%}}
+
+
+/* ==============================
+   v3.24 — Monday Daily cadence + dark result chips
+   ============================== */
+.daily-week-rhythm{position:relative;z-index:2;margin:-7px 0 13px;padding:9px 10px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+.daily-week-rhythm-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:7px;color:rgba(255,255,255,.92)}.daily-week-rhythm-head strong{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}.daily-week-rhythm-head span{font-size:10px;color:rgba(255,255,255,.68);font-weight:750}.daily-week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.daily-week-day{min-width:0;min-height:31px;display:flex;align-items:center;justify-content:center;gap:3px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.7)}.daily-week-day b{font-size:9px}.daily-week-day i{font-style:normal;font-size:12px;opacity:.78}.daily-week-day.active{background:#fff;color:#5548bd;border-color:#fff;box-shadow:0 4px 12px rgba(28,20,78,.18);transform:translateY(-1px)}.daily-week-day.active i{opacity:1}.daily-week-rhythm.pending .daily-week-day{opacity:.58}.daily-week-rhythm.pending .daily-week-rhythm-head strong{color:#ffe7a4}
+@media(max-width:390px){.daily-week-rhythm{padding:8px;margin-bottom:11px}.daily-week-rhythm-head span{font-size:9px}.daily-week-day{gap:1px}.daily-week-day b{font-size:8.5px}.daily-week-day i{font-size:11px}}
+
+/* Result words use the same colour token as solved cells/found chips in night mode. */
+html[data-theme="dark"] .win-word{background:color-mix(in srgb,var(--word-color,#72d9b7) 70%,#211f2c)!important;color:#0c0b10;text-shadow:0 1px 0 rgba(255,255,255,.10);border:1px solid color-mix(in srgb,var(--word-color,#72d9b7) 72%,#383240)}

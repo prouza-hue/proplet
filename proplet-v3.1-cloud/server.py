@@ -53,7 +53,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 10, "medium": 20, "hard": 35, "hardcore": 60}
 STARTER_XP = 10
-APP_VERSION = "3.23.1"
+APP_VERSION = "3.24.0"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -914,14 +914,15 @@ def claim_free_slot_points(player_id: str, info: dict, points: int, puzzle_id: s
         return (0, True) if historical_reward else (int(points), False)
 
 
-def daily_rotation_index(daily_date: str, bank_size: int) -> int:
+def daily_rotation_index(daily_date: str, bank_size: int, base_date: str = "2026-01-01") -> int:
     if bank_size <= 0:
         raise HTTPException(503, "Daily banka je prázdná")
     try:
         d = date.fromisoformat(daily_date)
+        base = date.fromisoformat(base_date)
     except ValueError:
         raise HTTPException(400, "Neplatné datum")
-    return (d - date(2026, 1, 1)).days % bank_size
+    return (d - base).days % bank_size
 
 
 def legacy_daily_banks(data: Optional[dict] = None) -> list[dict]:
@@ -929,40 +930,94 @@ def legacy_daily_banks(data: Optional[dict] = None) -> list[dict]:
     return [bank for bank in pdata.get("legacyDaily", []) if bank.get("puzzles")]
 
 
+def previous_daily_bank(data: Optional[dict] = None) -> Optional[dict]:
+    pdata = data or load_puzzles()
+    bank = pdata.get("previousDaily") or {}
+    return bank if bank.get("puzzles") else None
+
+
+def legacy_daily_bank_by_generation(generation: int, data: Optional[dict] = None) -> Optional[dict]:
+    pdata = data or load_puzzles()
+    return next((bank for bank in legacy_daily_banks(pdata) if int(bank.get("generation") or 0) == int(generation)), None)
+
+
+def daily_bank_puzzle_id(bank: dict, daily_date: str, fallback_base: str = "2026-01-01") -> str:
+    puzzles = bank.get("puzzles") or []
+    base = str(bank.get("rotationBaseDate") or fallback_base)
+    return puzzles[daily_rotation_index(daily_date, len(puzzles), base)]["id"]
+
+
 def expected_daily_puzzle_id(daily_date: str) -> str:
-    """Return the primary board for a date without rewriting historical Daily."""
+    """Return the primary Daily board for a date without rewriting history."""
     data = load_puzzles()
     try:
         d = date.fromisoformat(daily_date)
     except ValueError:
         raise HTTPException(400, "Neplatné datum")
-    switch_raw = data.get("dailyGeneration2From")
+
+    switch3_raw = data.get("dailyGeneration3From")
     try:
-        switch = date.fromisoformat(str(switch_raw)) if switch_raw else date.min
+        switch3 = date.fromisoformat(str(switch3_raw)) if switch3_raw else None
     except ValueError:
-        switch = date.min
-    if d < switch:
-        banks = legacy_daily_banks(data)
-        if banks:
-            bank = banks[-1]["puzzles"]
+        switch3 = None
+    if switch3 and d >= switch3:
+        bank = data.get("daily", [])
+        base = str(data.get("dailyRotationBaseDate") or switch3.isoformat())
+        return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
+
+    switch2_raw = data.get("dailyGeneration2From")
+    try:
+        switch2 = date.fromisoformat(str(switch2_raw)) if switch2_raw else None
+    except ValueError:
+        switch2 = None
+    if switch2 and d >= switch2:
+        previous = previous_daily_bank(data)
+        if previous and int(previous.get("generation") or 0) == 2:
+            return daily_bank_puzzle_id(previous, daily_date)
+        legacy2 = legacy_daily_bank_by_generation(2, data)
+        if legacy2:
+            return daily_bank_puzzle_id(legacy2, daily_date)
+        if int(data.get("dailyGeneration") or 1) == 2:
+            bank = data.get("daily", [])
             return bank[daily_rotation_index(daily_date, len(bank))]["id"]
+
+    legacy1 = legacy_daily_bank_by_generation(1, data)
+    if legacy1:
+        return daily_bank_puzzle_id(legacy1, daily_date)
+
+    # Defensive fallback for old/local data snapshots without generation metadata.
     bank = data.get("daily", [])
-    return bank[daily_rotation_index(daily_date, len(bank))]["id"]
+    base = str(data.get("dailyRotationBaseDate") or "2026-01-01")
+    return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
 
 
 def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
-    """Accept the active board plus archived rotations for cached/offline clients."""
+    """Accept the primary board plus archived generations for cached/offline clients."""
     data = load_puzzles()
-    ids = {data["daily"][daily_rotation_index(daily_date, len(data.get("daily", [])))]["id"]}
+    ids = {expected_daily_puzzle_id(daily_date)}
+
+    active = data.get("daily", [])
+    switch3_raw = data.get("dailyGeneration3From")
+    try:
+        requested_date = date.fromisoformat(daily_date)
+        switch3 = date.fromisoformat(str(switch3_raw)) if switch3_raw else None
+    except ValueError:
+        raise HTTPException(400, "Neplatné datum")
+    if active and (switch3 is None or requested_date >= switch3):
+        base = str(data.get("dailyRotationBaseDate") or data.get("dailyGeneration3From") or "2026-01-01")
+        ids.add(active[daily_rotation_index(daily_date, len(active), base)]["id"])
+
+    previous = previous_daily_bank(data)
+    if previous:
+        ids.add(daily_bank_puzzle_id(previous, daily_date))
+
     for legacy_bank in legacy_daily_banks(data):
-        bank = legacy_bank["puzzles"]
-        ids.add(bank[daily_rotation_index(daily_date, len(bank))]["id"])
+        ids.add(daily_bank_puzzle_id(legacy_bank, daily_date))
     return ids
 
 
 def daily_puzzle_matches_date(puzzle_id: str, daily_date: str) -> bool:
     return puzzle_id in valid_daily_puzzle_ids(daily_date)
-
 
 def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
     """True only when an archived Daily result is replaced by that day's primary board."""
@@ -1001,6 +1056,11 @@ def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict
         for p in data.get("daily", []):
             if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
                 return p
+        previous = previous_daily_bank(data)
+        if previous:
+            for p in previous.get("puzzles", []):
+                if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
+                    return p
         for bank in legacy_daily_banks(data):
             for p in bank.get("puzzles", []):
                 if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
@@ -1061,6 +1121,9 @@ def health():
         "freeLevelsPerDifficulty": pdata.get("freeLevelsPerDifficulty") or min((len(bank) for bank in pdata.get("free", {}).values()), default=0),
         "dailyGeneration": pdata.get("dailyGeneration"),
         "dailyGeneration2From": pdata.get("dailyGeneration2From"),
+        "dailyGeneration3From": pdata.get("dailyGeneration3From"),
+        "dailyRotationBaseDate": pdata.get("dailyRotationBaseDate"),
+        "dailyCadence": pdata.get("dailyCadence"),
         "dailyMigration": pdata.get("dailyMigration"),
         "freeMigration": pdata.get("freeMigration"),
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
@@ -1202,6 +1265,9 @@ def config():
         "points": {**POINTS, "starter": STARTER_XP},
         "dictionarySize": p["dictionarySize"],
         "dailyRotationSize": p["dailyRotationSize"],
+        "dailyGeneration": p.get("dailyGeneration"),
+        "dailyGeneration3From": p.get("dailyGeneration3From"),
+        "dailyCadence": p.get("dailyCadence"),
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
         "version": APP_VERSION,
@@ -2724,6 +2790,11 @@ def puzzle_info(puzzle_id: str) -> Optional[dict]:
     for p in data.get("daily", []):
         if p.get("id") == puzzle_id:
             return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None, "legacy": False, "generation": int(data.get("dailyGeneration") or 1)}
+    previous = previous_daily_bank(data)
+    if previous:
+        for p in previous.get("puzzles", []):
+            if p.get("id") == puzzle_id:
+                return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None, "legacy": True, "generation": int(previous.get("generation") or 2)}
     for bank in reversed(legacy_daily_banks(data)):
         for p in bank["puzzles"]:
             if p.get("id") == puzzle_id:
