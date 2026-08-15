@@ -1,0 +1,87 @@
+name: Validate and apply Proplet v3.27.3 Medium/Hard swap
+on:
+  push:
+    branches: [agent/v3273-medium-hard-swap]
+    paths:
+      - '.release/v3273-trigger'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3273-medium-hard-swap
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact v3.27.3 patch
+        run: python .release/v3273_apply.py
+      - name: Validate runtime and complete difficulty swap
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          node --check public/sw.js
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import xml.etree.ElementTree as ET
+
+          assert 'APP_VERSION = "3.27.3"' in Path('server.py').read_text()
+          app = Path('public/app.js').read_text()
+          assert "const APP_VERSION='3.27.3';" in app
+          assert "medium:{label:'Střední',icon:'/difficulty/medium.svg'" in app
+          assert "hard:{label:'Těžká',icon:'/difficulty/hard.svg'" in app
+          sw = Path('public/sw.js').read_text()
+          assert "proplet-v3.27.3-medium-hard-swap" in sw
+
+          for p in ('public/difficulty/medium.svg','public/difficulty/hard.svg','public/difficulty/easy.svg','public/difficulty/hardcore.svg'):
+              ET.parse(p)
+          medium = Path('public/difficulty/medium.svg').read_text()
+          hard = Path('public/difficulty/hard.svg').read_text()
+          assert '<title id="title">Střední</title>' in medium and 'mountainA' in medium and 'flameOuter' not in medium
+          assert '<title id="title">Těžká</title>' in hard and 'flameOuter' in hard and 'mountainA' not in hard
+
+          expected = {
+              'medium': {False: ('#4e83d5','#e5efff'), True: ('#87b5ff','#25364f')},
+              'hard': {False: ('#f08a32','#fff0dc'), True: ('#ffad5b','#443025')},
+          }
+          block_re = re.compile(r'(?P<selector>[^{}]+)\{(?P<body>[^{}]*)\}')
+          seen = {d: {False:0, True:0} for d in expected}
+          for css_path in ('public/styles.css','public/home-layout.css'):
+              css = Path(css_path).read_text()
+              for m in block_re.finditer(css):
+                  selector, body = m.group('selector'), m.group('body')
+                  for diff in expected:
+                      if f'data-diff="{diff}"' not in selector: continue
+                      dark = 'data-theme="dark"' in selector
+                      primary, soft = expected[diff][dark]
+                      vars_found = False
+                      for var in ('--diff','--q'):
+                          vals = re.findall(rf'{re.escape(var)}:\s*(#[0-9a-fA-F]{{3,8}})', body)
+                          if vals:
+                              vars_found = True
+                              assert all(v.lower()==primary for v in vals), (css_path, selector, var, vals, primary)
+                      for var in ('--diff-soft','--qs'):
+                          vals = re.findall(rf'{re.escape(var)}:\s*(#[0-9a-fA-F]{{3,8}})', body)
+                          if vals:
+                              vars_found = True
+                              assert all(v.lower()==soft for v in vals), (css_path, selector, var, vals, soft)
+                      if vars_found: seen[diff][dark] += 1
+          assert seen['medium'][False] >= 2 and seen['medium'][True] >= 2, seen
+          assert seen['hard'][False] >= 2 and seen['hard'][True] >= 2, seen
+
+          # Mozkožrout and Snadná assets must remain untouched by this release.
+          assert '#941522' in Path('public/styles.css').read_text()
+          print('v3.27.3 validation PASS', seen)
+          PY
+      - name: Commit validated runtime changes
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add server.py public/app.js public/sw.js public/styles.css public/home-layout.css public/difficulty/medium.svg public/difficulty/hard.svg
+          git diff --cached --check
+          git commit -m 'Proplet v3.27.3 swap Medium and Hard visual identity'
+          git push origin HEAD:agent/v3273-medium-hard-swap
