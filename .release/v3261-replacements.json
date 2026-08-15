@@ -1,0 +1,26 @@
+[
+  {
+    "path":"server.py",
+    "label":"server version",
+    "old":"APP_VERSION = \"3.26.0\"",
+    "new":"APP_VERSION = \"3.26.1\""
+  },
+  {
+    "path":"public/app.js",
+    "label":"client version",
+    "old":"const APP_VERSION='3.26.0';",
+    "new":"const APP_VERSION='3.26.1';"
+  },
+  {
+    "path":"public/app.js",
+    "label":"Free difficulty descriptions",
+    "old":"  easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:15},\n  medium:{label:'Střední',icon:'🧠',desc:'Větší 7×8 plocha a víc možností.',xp:25},\n  hard:{label:'Těžká',icon:'🧨',desc:'8×8 nebo 9×9. Od 10. úrovně hlavně delší slova a pořádné zákruty.',xp:50},\n  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10. Od 10. úrovně minimum drobků, maximum dlouhých slov a šneků.',xp:100}",
+    "new":"  easy:{label:'Snadná',icon:'🌱',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},\n  medium:{label:'Střední',icon:'🧠',desc:'7×8 · větší plocha a víc možných cest.',xp:25},\n  hard:{label:'Těžká',icon:'🧨',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},\n  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100}"
+  },
+  {
+    "path":"public/sw.js",
+    "label":"service worker cache",
+    "old":"const CACHE='proplet-v3.26.0-pwa-install';",
+    "new":"const CACHE='proplet-v3.26.1-free-copy';"
+  }
+]
