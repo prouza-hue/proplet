@@ -1,0 +1,74 @@
+[
+  {
+    "path": "server.py",
+    "label": "server XP/version constants",
+    "old": "POINTS = {\"daily\": 100, \"easy\": 10, \"medium\": 20, \"hard\": 35, \"hardcore\": 60}\nSTARTER_XP = 10\nAPP_VERSION = \"3.24.0\"",
+    "new": "POINTS = {\"daily\": 100, \"easy\": 15, \"medium\": 25, \"hard\": 50, \"hardcore\": 100}\nSTARTER_XP = 10\nAPP_VERSION = \"3.25.0\""
+  },
+  {
+    "path": "server.py",
+    "label": "xp migration helper insertion",
+    "old": "\ndef db_rpc(function: str, body: Optional[dict] = None):\n",
+    "new": "\ndef xp_economy_migrated() -> bool:\n    \"\"\"True when every positive historical Free reward uses the current XP economy.\n\n    Zero-point rows are intentional: they represent a Gen1/Gen2 slot that was already\n    rewarded elsewhere. Ordering mismatches descending lets one cheap PostgREST probe\n    distinguish an intentional zero from any stale/invalid positive reward.\n    \"\"\"\n    targets = {key: value for key, value in POINTS.items() if key != \"daily\"}\n    for table in (\"results\", \"free_slot_rewards\"):\n        for difficulty, target in targets.items():\n            params = {\n                \"select\": \"id,points\",\n                \"difficulty\": f\"eq.{difficulty}\",\n                \"points\": f\"neq.{target}\",\n                \"order\": \"points.desc\",\n                \"limit\": \"1\",\n            }\n            if table == \"results\":\n                params[\"mode\"] = \"eq.free\"\n            rows = db_request(\"GET\", table, params=params)\n            if rows and int(rows[0].get(\"points\") or 0) > 0:\n                return False\n    return True\n\n\ndef db_rpc(function: str, body: Optional[dict] = None):\n"
+  },
+  {
+    "path": "server.py",
+    "label": "health XP metadata",
+    "old": "        \"singleMemberTeams\": True,\n",
+    "new": "        \"singleMemberTeams\": True,\n        \"xpEconomyVersion\": 2,\n        \"freeXp\": {key: value for key, value in POINTS.items() if key != \"daily\"},\n        \"dailyXp\": POINTS[\"daily\"],\n"
+  },
+  {
+    "path": "server.py",
+    "label": "health XP migration probe",
+    "old": "        except HTTPException:\n            security_migration = False\n        return {**base,",
+    "new": "        except HTTPException:\n            security_migration = False\n        xp_migration = False\n        try:\n            xp_migration = xp_economy_migrated()\n        except HTTPException:\n            xp_migration = False\n        return {**base,"
+  },
+  {
+    "path": "server.py",
+    "label": "health ok gate",
+    "old": "\"ok\": bool(security_migration),",
+    "new": "\"ok\": bool(security_migration and xp_migration),"
+  },
+  {
+    "path": "server.py",
+    "label": "health XP migration response",
+    "old": "\"securityMigration\": security_migration, \"helperSystem\":",
+    "new": "\"securityMigration\": security_migration, \"xpMigration\": xp_migration, \"helperSystem\":"
+  },
+  {
+    "path": "server.py",
+    "label": "health XP migration failure response",
+    "old": "\"securityMigration\": False, \"pushConfigured\":",
+    "new": "\"securityMigration\": False, \"xpMigration\": False, \"pushConfigured\":"
+  },
+  {
+    "path": "public/app.js",
+    "label": "client version",
+    "old": "const APP_VERSION='3.24.0';",
+    "new": "const APP_VERSION='3.25.0';"
+  },
+  {
+    "path": "public/app.js",
+    "label": "client Free XP",
+    "old": "  easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:10},\n  medium:{label:'Střední',icon:'🧠',desc:'Větší 7×8 plocha a víc možností.',xp:20},\n  hard:{label:'Těžká',icon:'🧨',desc:'8×8 nebo 9×9. Od 10. úrovně hlavně delší slova a pořádné zákruty.',xp:35},\n  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10. Od 10. úrovně minimum drobků, maximum dlouhých slov a šneků.',xp:60}\n",
+    "new": "  easy:{label:'Snadná',icon:'🌱',desc:'Menší 6×6 plocha, klidnější cesty.',xp:15},\n  medium:{label:'Střední',icon:'🧠',desc:'Větší 7×8 plocha a víc možností.',xp:25},\n  hard:{label:'Těžká',icon:'🧨',desc:'8×8 nebo 9×9. Od 10. úrovně hlavně delší slova a pořádné zákruty.',xp:50},\n  hardcore:{label:'Mozkožrout',icon:'🤯',desc:'10×10. Od 10. úrovně minimum drobků, maximum dlouhých slov a šneků.',xp:100}\n"
+  },
+  {
+    "path": "public/app.js",
+    "label": "rank curve",
+    "old": "const LEVELS=[\n {xp:0,icon:'🌱',name:'Nováček'},\n {xp:100,icon:'🧩',name:'Písmenkář'},\n {xp:250,icon:'🔎',name:'Slovolovec'},\n {xp:400,icon:'🧵',name:'Hledač nití'},\n {xp:600,icon:'🪢',name:'Propletač'},\n {xp:850,icon:'↪️',name:'Kličkař'},\n {xp:1100,icon:'🧭',name:'Mistr cest'},\n {xp:1400,icon:'♟️',name:'Slovní taktik'},\n {xp:1750,icon:'✨',name:'Slovní mág'},\n {xp:2150,icon:'🧶',name:'Uzlovač'},\n {xp:2600,icon:'👑',name:'Legenda Propletu'},\n {xp:3100,icon:'🛤️',name:'Cestář'},\n {xp:3650,icon:'🐉',name:'Krotitel'},\n {xp:4250,icon:'🌀',name:'Mistr zákrut'},\n {xp:4900,icon:'🧱',name:'Labyrintník'},\n {xp:5600,icon:'💎',name:'Velmistr Propletu'},\n {xp:6350,icon:'🥷',name:'Propletový ninja'},\n {xp:7150,icon:'⚗️',name:'Slovní alchymista'},\n {xp:8000,icon:'🐌',name:'Mistr šneků'},\n {xp:8900,icon:'🔮',name:'Mřížkový mág'},\n {xp:10000,icon:'🌌',name:'Nadslovník'},\n {xp:11250,icon:'🤯',name:'Krotitel Mozkožroutů'},\n {xp:12500,icon:'🏰',name:'Král mřížky'},\n {xp:14000,icon:'🎓',name:'Arcimistr Propletu'},\n {xp:16000,icon:'🪄',name:'Slovočaroděj'},\n {xp:18500,icon:'🗿',name:'Propletový titán'},\n {xp:21500,icon:'♾️',name:'Mistr nekonečna'},\n {xp:25000,icon:'🌠',name:'Hvězdný propletač'},\n {xp:29000,icon:'🛰️',name:'Orbitální luštitel'},\n {xp:34000,icon:'🚀',name:'Galaktický slovolovec'},\n {xp:40000,icon:'🛡️',name:'Strážce všech cest'},\n {xp:47000,icon:'🏆',name:'Absolutní Propletač'}\n];",
+    "new": "const LEVELS=[\n {xp:0,icon:'🌱',name:'Nováček'},\n {xp:100,icon:'🧩',name:'Písmenkář'},\n {xp:250,icon:'🔎',name:'Slovolovec'},\n {xp:400,icon:'🧵',name:'Hledač nití'},\n {xp:600,icon:'🪢',name:'Propletač'},\n {xp:850,icon:'↪️',name:'Kličkař'},\n {xp:1100,icon:'🧭',name:'Mistr cest'},\n {xp:1450,icon:'♟️',name:'Slovní taktik'},\n {xp:1800,icon:'✨',name:'Slovní mág'},\n {xp:2200,icon:'🧶',name:'Uzlovač'},\n {xp:2700,icon:'👑',name:'Legenda Propletu'},\n {xp:3250,icon:'🛤️',name:'Cestář'},\n {xp:3850,icon:'🐉',name:'Krotitel'},\n {xp:4500,icon:'🌀',name:'Mistr zákrut'},\n {xp:5200,icon:'🧱',name:'Labyrintník'},\n {xp:6000,icon:'💎',name:'Velmistr Propletu'},\n {xp:6800,icon:'🥷',name:'Propletový ninja'},\n {xp:7700,icon:'⚗️',name:'Slovní alchymista'},\n {xp:8700,icon:'🐌',name:'Mistr šneků'},\n {xp:9700,icon:'🔮',name:'Mřížkový mág'},\n {xp:11000,icon:'🌌',name:'Nadslovník'},\n {xp:12500,icon:'🤯',name:'Krotitel Mozkožroutů'},\n {xp:14000,icon:'🏰',name:'Král mřížky'},\n {xp:15800,icon:'🎓',name:'Arcimistr Propletu'},\n {xp:18300,icon:'🪄',name:'Slovočaroděj'},\n {xp:21500,icon:'🗿',name:'Propletový titán'},\n {xp:25000,icon:'♾️',name:'Mistr nekonečna'},\n {xp:30000,icon:'🌠',name:'Hvězdný propletač'},\n {xp:35000,icon:'🛰️',name:'Orbitální luštitel'},\n {xp:42000,icon:'🚀',name:'Galaktický slovolovec'},\n {xp:50500,icon:'🛡️',name:'Strážce všech cest'},\n {xp:61000,icon:'🏆',name:'Absolutní Propletač'}\n];"
+  },
+  {
+    "path": "public/app.js",
+    "label": "top XP achievement",
+    "old": " {id:'xp-47000',group:'xp',icon:'🏆',name:'Absolutní sběratel',desc:'Nasbírej 47 000 XP',value:s=>s.points||0,target:47000},",
+    "new": " {id:'xp-61000',group:'xp',icon:'🏆',name:'Absolutní sběratel',desc:'Nasbírej 61 000 XP',value:s=>s.points||0,target:61000},"
+  },
+  {
+    "path": "public/sw.js",
+    "label": "service worker cache",
+    "old": "const CACHE='proplet-v3.24.0-home-shell-r2';",
+    "new": "const CACHE='proplet-v3.25.0-xp-v2';"
+  }
+]
