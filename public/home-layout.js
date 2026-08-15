@@ -56,37 +56,48 @@
     }catch{}
   }
 
-  function latestFreeDifficulty(){
+  function freeHistory(){
     const state=getState?.()||{};
-    const progress=Object.values(state.inProgress||{}).filter(r=>r?.mode==='free'&&DIFF[r.difficulty]).sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
+    const progress=Object.values(state.inProgress||{}).filter(r=>r?.mode==='free'&&DIFF[r.difficulty]);
+    const completed=Object.values(state.completed||{}).filter(r=>r?.mode==='free'&&DIFF[r.difficulty]);
+    return {progress,completed,hasAny:progress.length>0||completed.length>0};
+  }
+
+  function latestFreeDifficulty(history=freeHistory()){
+    const progress=[...history.progress].sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
     if(progress[0]?.difficulty)return progress[0].difficulty;
-    const completed=Object.values(state.completed||{}).filter(r=>r?.mode==='free'&&DIFF[r.difficulty]).sort((a,b)=>(Date.parse(b.completedAt||'')||0)-(Date.parse(a.completedAt||'')||0));
+    const completed=[...history.completed].sort((a,b)=>(Date.parse(b.completedAt||'')||0)-(Date.parse(a.completedAt||'')||0));
     if(completed[0]?.difficulty)return completed[0].difficulty;
     return 'easy';
+  }
+
+  function difficultyTiles(){
+    return Object.entries(DIFF).map(([key,info])=>{
+      const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0;
+      return `<button class="home-diff-tile" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${htmlEsc(info.label)}, ${q.done} z ${q.total} hotovo"><span class="home-diff-top"><span>${info.icon}</span><strong>${htmlEsc(info.label)}</strong></span><small>${q.done} / ${q.total}</small><i class="home-diff-progress"><b style="width:${pct}%"></b></i></button>`;
+    }).join('');
   }
 
   function renderHomeQuickPlay(){
     const root=document.querySelector('#quickPlayGrid'),card=document.querySelector('#quickPlayCard');
     if(!root||!card||typeof puzzleDB==='undefined'||!puzzleDB)return;
-    const head=card.querySelector('.quick-play-head'),eyebrow=head?.querySelector('.eyebrow'),title=head?.querySelector('h2'),copy=head?.querySelector('p'),all=head?.querySelector('#openAllGamesBtn');
-    if(eyebrow)eyebrow.textContent='HRAJ DÁL';
-    if(title)title.textContent='Pokračuj';
-    if(copy)copy.textContent='Naváž tam, kde jsi skončil, nebo si vyber jinou obtížnost.';
+    const head=card.querySelector('.quick-play-head'),title=head?.querySelector('h2'),all=head?.querySelector('#openAllGamesBtn');
+    const history=freeHistory();
+    card.classList.toggle('home-free-new',!history.hasAny);
+    if(title)title.textContent=history.hasAny?'Pokračuj':'Volná hra';
     if(all)all.innerHTML='Všechny <span>→</span>';
 
-    const targetDiff=latestFreeDifficulty();
-    const target=freeProgress(targetDiff),d=DIFF[targetDiff],puzzle=target.resume||target.nextUnsolved||target.list?.[0]||null,level=Number(puzzle?.meta?.level)||1;
-    const resumed=!!target.resume,complete=target.total>0&&target.done>=target.total;
-    const detail=resumed?`Rozehráno · ${target.done} z ${target.total} hotovo`:complete?`Všech ${target.total} hotovo · trénink`:`Další úroveň · ${target.done} z ${target.total} hotovo`;
-    const action=resumed?'Pokračovat':complete?'Znovu':'Hrát';
-
-    const tiles=Object.entries(DIFF).map(([key,info])=>{
-      const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0;
-      return `<button class="home-diff-tile" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${htmlEsc(info.label)}, ${q.done} z ${q.total} hotovo"><span class="home-diff-top"><span>${info.icon}</span><strong>${htmlEsc(info.label)}</strong></span><small>${q.done} / ${q.total}</small><i class="home-diff-progress"><b style="width:${pct}%"></b></i></button>`;
-    }).join('');
-
-    root.innerHTML=`<button class="home-continue" type="button" data-home-continue="${targetDiff}" data-diff="${targetDiff}"><span class="home-continue-icon">${d.icon}</span><span class="home-continue-copy"><strong>${htmlEsc(d.label)} ${level}</strong><small>${htmlEsc(detail)}</small></span><span class="home-continue-cta">${action}</span></button><div class="home-difficulty-label">Vyber obtížnost</div><div class="home-diff-grid">${tiles}</div>`;
-    root.querySelector('[data-home-continue]')?.addEventListener('click',()=>startFree(targetDiff));
+    const tiles=difficultyTiles();
+    if(!history.hasAny){
+      root.innerHTML=`<div class="home-diff-grid">${tiles}</div>`;
+    }else{
+      const targetDiff=latestFreeDifficulty(history),target=freeProgress(targetDiff),d=DIFF[targetDiff],puzzle=target.resume||target.nextUnsolved||target.list?.[0]||null,level=Number(puzzle?.meta?.level)||1;
+      const resumed=!!target.resume,complete=target.total>0&&target.done>=target.total;
+      const detail=resumed?`Rozehráno · ${target.done} z ${target.total} hotovo`:complete?`Všech ${target.total} hotovo · trénink`:`Další úroveň · ${target.done} z ${target.total} hotovo`;
+      const action=resumed?'Pokračovat':complete?'Znovu':'Hrát';
+      root.innerHTML=`<button class="home-continue" type="button" data-home-continue="${targetDiff}" data-diff="${targetDiff}"><span class="home-continue-icon">${d.icon}</span><span class="home-continue-copy"><strong>${htmlEsc(d.label)} ${level}</strong><small>${htmlEsc(detail)}</small></span><span class="home-continue-cta">${action}</span></button><div class="home-alt-label">Jiná obtížnost</div><div class="home-diff-grid">${tiles}</div>`;
+      root.querySelector('[data-home-continue]')?.addEventListener('click',()=>startFree(targetDiff));
+    }
     root.querySelectorAll('[data-home-free]').forEach(btn=>btn.addEventListener('click',()=>startFree(btn.dataset.homeFree)));
   }
 
