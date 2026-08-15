@@ -1,4 +1,4 @@
-const APP_VERSION='3.26.1';
+const APP_VERSION='3.26.2';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -9,49 +9,10 @@ const SUPPORT_MODES={
  none:{icon:'🧠',label:'Nenabízet',desc:'Pomocník sám pomoc nenabídne.',idleMs:0,seconds:0}
 };
 const WIN_PRAISE={
- easy:[
-  {title:'Pěkně propleteno!',line:'Písmena si sedla a neurony se příjemně protáhly.'},
-  {title:'Deska je tvoje.',line:'Ani jedno políčko nezůstalo na ocet.'},
-  {title:'Slova zkrocena.',line:'Tohle cvaklo přesně tam, kam mělo.'},
-  {title:'Hezky odstartováno!',line:'Malý Proplet, poctivá radost.'},
-  {title:'Další uzel rozvázán.',line:'Plynule, elegantně a bez zbytečného rámusu.'}
- ],
- medium:[
-  {title:'Mozek příjemně zahřátý.',line:'Tak akorát na pár spokojených závitů.'},
-  {title:'Hezky ses tím propletl.',line:'Deska odporovala jen z povinnosti.'},
-  {title:'Slovní uzel povolil.',line:'Trpělivost, oko, prst. Fungovalo všechno.'},
-  {title:'Další deska kapitulovala.',line:'Písmena pochopila, kdo je tu šéf.'},
-  {title:'Tohle mělo šťávu.',line:'A teď už máš v kapse i celý výsledek.'},
-  {title:'Závity odvedly dobrou práci.',line:'Proplet vyřešen, sebevědomí lehce přifouknuto.'}
- ],
- hard:[
-  {title:'Těžká? Už jen bývalá.',line:'Deska kladla odpor. Marně.'},
-  {title:'Tohle už má váhu.',line:'Poctivý slovní kopec — a ty stojíš nahoře.'},
-  {title:'Neurony právě odmakaly směnu.',line:'A teď si zaslouží vítězný taneček. Respekt.'},
-  {title:'Propleteno na vyšší dívčí.',line:'Tohle nebyla rozcvička. Tohle je výkon.'},
-  {title:'Písmena se bránila statečně.',line:'Výsledek: písmena 0, ty 1.'},
-  {title:'Tak tohle bylo výživné.',line:'Malé vítězné gesto je zcela na místě.'},
-  {title:'Těžká deska uznává porážku.',line:'Poctivě vydřené. O to příjemnější.'},
-  {title:'Slovní svaly potvrzeny.',line:'Tahle mřížka se sama rozhodně neudělala.'}
- ],
- hardcore:[
-  {title:'Mozkožrout se právě zadávil.',line:'Nečekal, že mu budeš chutnat tak málo.'},
-  {title:'Tak kdo tu koho žere?',line:'Mozkožrout má jasno. A trochu trauma.'},
-  {title:'Neurony kouří. Výsledek stojí za to.',line:'Přesně ten druh vítězství, který si zaslouží konfety.'},
-  {title:'Deset krát deset. Ty jedna, mřížka nula.',line:'Sto políček šlo spát s pocitem dobře vykonané práce.'},
-  {title:'Arcimistr mřížky potvrzen.',line:'Tohle už není luštění. Tohle je drobná mozková magie.'},
-  {title:'Mozkožrout zkrocen.',line:'Může se vrátit do jeskyně a přemýšlet o svých rozhodnutích.'},
-  {title:'Tohle bylo absurdně dobré.',line:'Poctivý kus slovního řemesla. Klobouk dolů.'},
-  {title:'Vstup do klubu těžkých hlav povolen.',line:'Vstupné: jeden poražený Mozkožrout.'},
-  {title:'Mřížka padla. Důstojně, ale padla.',line:'Tahle výhra má velikost deset krát deset.'},
-  {title:'Mozkožrout žádá odvetu.',line:'Dnes ji ale nedostane. Dnes slavíš ty.'}
- ]
-};
-const CLEAN_PRAISE={
- easy:['A ještě bez nápovědy. Paráda.','Navíc čistě. Pěkná práce.'],
- medium:['A ještě čistě. Tohle sedlo.','Bez nápovědy — velmi pěkné.'],
- hard:['A ještě čistě. To už je trochu machrování.','Bez nápovědy. Těžká právě ztichla.'],
- hardcore:['A bez nápovědy. Mozkožrout žádá přepočítání.','Čistě. Mozkožrout to nese překvapivě osobně.']
+ easy:['A je to!','Pěkně.','Hotovo!','Hezky propleteno.','To sedlo.','Další je doma.'],
+ medium:['Pěkná práce.','Je to tam!','Hotovo!','Hezky!','Další je doma.','To se povedlo.'],
+ hard:['Těžká? Pro tebe ne!','Tohle se počítá.','Pěkný výkon.','Těžká je doma.','Krásná práce.','Tak tohle jo.'],
+ hardcore:['Tak kdo s koho?','Fíha. Respekt.','Klobouk dolů!','Je po něm!','Tohle nebyla sranda.','Tvůj mozek odolal.']
 };
 const DIFF={
   easy:{label:'Snadná',icon:'🌱',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
@@ -296,11 +257,10 @@ function czPlural(n,one,few,many){const a=Math.abs(Number(n)||0);return a===1?on
 function countCz(n,one,few,many){return `${n} ${czPlural(n,one,few,many)}`}
 function stableTextIndex(seed,size){let h=2166136261;for(const ch of String(seed||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return size?(h>>>0)%size:0}
 function completionPraise(difficulty,rec={}){
- const pool=WIN_PRAISE[difficulty]||WIN_PRAISE.medium,seed=rec.attemptId||`${rec.puzzleId||''}:${rec.completedAt||''}:${rec.elapsedMs||0}:${rec.moves||0}`,chosen=pool[stableTextIndex(seed,pool.length)];let line=chosen.line;
- if(rec.cleanSolve===true){const clean=CLEAN_PRAISE[difficulty]||CLEAN_PRAISE.medium;line+=` ${clean[stableTextIndex(`${seed}:clean`,clean.length)]}`}
- return {title:chosen.title,line};
+ const pool=WIN_PRAISE[difficulty]||WIN_PRAISE.medium,seed=rec.attemptId||`${rec.puzzleId||''}:${rec.completedAt||''}:${rec.elapsedMs||0}:${rec.moves||0}`;
+ return {title:pool[stableTextIndex(seed,pool.length)],line:''};
 }
-function renderCompletionPraise(difficulty,rec){const praise=completionPraise(difficulty,rec);$('#winTitle').textContent=praise.title;$('#winPraise').textContent=praise.line;$('#winPraise').classList.remove('hidden')}
+function renderCompletionPraise(difficulty,rec){const praise=completionPraise(difficulty,rec);$('#winTitle').textContent=praise.title;$('#winPraise').textContent='';$('#winPraise').classList.add('hidden')}
 function configureWinReplay(mode,date,rec){const button=$('#winReplayBtn');if(!button)return;if(mode!=='daily'){button.classList.add('hidden');return}const active=dailyPuzzleFor(date),upgrade=!!rec?.puzzleId&&rec.puzzleId!==active.id;button.classList.remove('hidden');button.textContent=upgrade?'↻ Nová výzva':'↻ Znovu';button.dataset.dailyDate=date;button.dataset.dailyUpgrade=upgrade?'1':'0'}
 function resultRankTuple(r){return [r?.cleanSolve===true?0:1,Number(r?.hintsUsed??99),Number(r?.elapsedMs??1e15),Number(r?.moves??1e9),Number(r?.wrongAttempts??999)]}
 function betterResult(a,b){if(!a)return b;if(!b)return a;const x=resultRankTuple(a),y=resultRankTuple(b);for(let i=0;i<x.length;i++){if(x[i]!==y[i])return y[i]<x[i]?b:a}return a}
@@ -1260,4 +1220,4 @@ async function boot(){
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily()}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }
 if(typeof window!=='undefined'&&typeof document!=='undefined')boot();
-if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,CLEAN_PRAISE,stableTextIndex,completionPraise};
+if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
