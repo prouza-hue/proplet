@@ -1,0 +1,70 @@
+name: Validate and apply Proplet v3.27.2 hardcore colours
+
+on:
+  push:
+    branches:
+      - agent/v3272-hardcore-color-system
+    paths:
+      - '.release/v3272-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3272-hardcore-color-system
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact v3.27.2 patch
+        run: python .release/v3272_apply.py
+      - name: Validate runtime and colour system
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          node --check public/sw.js
+          python - <<'PY'
+          from pathlib import Path
+          app=Path('public/app.js').read_text()
+          server=Path('server.py').read_text()
+          sw=Path('public/sw.js').read_text()
+          css=Path('public/styles.css').read_text()
+          home=Path('public/home-layout.css').read_text()
+          assert "const APP_VERSION='3.27.2';" in app
+          assert 'APP_VERSION = "3.27.2"' in server
+          assert "const CACHE='proplet-v3.27.2-hardcore-crimson';" in sw
+          # Light-mode hardcore token and card treatment.
+          assert css.count('--diff:#941522;--diff-soft:#f8e4e7') >= 2
+          assert '#fff5f6 72%' in css and '#f9e3e6 100%' in css and 'border-color:#ecc5cb' in css
+          assert 'background:#4b1019;color:#fff' in css
+          # Dark-mode hardcore token and card treatment.
+          assert css.count('--diff:#ee6974;--diff-soft:#452128') >= 2
+          assert '#2b1d22 72%' in css and '#341f25 100%' in css and 'border-color:#5c3038' in css
+          assert 'background:#4b2028;color:#ffc4ca' in css
+          # Quick/home Free selectors follow the same system.
+          assert 'quick-game[data-diff="hardcore"]{--q:#941522;--qs:#f8e4e7}' in css
+          assert 'quick-game[data-diff="hardcore"]{--q:#ee6974;--qs:#452128}' in css
+          assert 'home-continue[data-diff="hardcore"],.home-diff-tile[data-diff="hardcore"]{--q:#941522;--qs:#f8e4e7}' in home
+          assert 'home-continue[data-diff="hardcore"],html[data-theme="dark"] .home-diff-tile[data-diff="hardcore"]{--q:#ee6974;--qs:#452128}' in home
+          # No purple hardcore tokens may remain effective in these two stylesheets.
+          forbidden = ['--diff:#8e44d6','--diff:#a04bd8','--diff:#8b5ddd','--diff:#d49aff','--diff:#bd92ff',
+                       'hardcore"]{--q:#a04bd8','hardcore"]{--q:#d49aff']
+          for token in forbidden:
+              assert token not in css, token
+              assert token not in home, token
+          # Brand purple and avatar set are intentionally untouched.
+          assert "const AVATARS=['🙂','😎','🤓'" in app
+          print('v3.27.2 validation PASS')
+          PY
+      - name: Commit validated runtime changes
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add server.py public/app.js public/sw.js public/styles.css public/home-layout.css
+          git commit -m 'Proplet v3.27.2 align Mozkozrout colour system'
+          git push origin HEAD:agent/v3272-hardcore-color-system
