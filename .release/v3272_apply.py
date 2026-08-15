@@ -8,7 +8,7 @@ replacements = {
         ("const APP_VERSION='3.27.1';", "const APP_VERSION='3.27.2';"),
     ],
     'public/sw.js': [
-        ("const CACHE='proplet-v3.27.1-difficulty-icons-refined';", "const CACHE='proplet-v3.27.2-hardcore-crimson';"),
+        ("const CACHE='proplet-v3.27.1-icon-refine';", "const CACHE='proplet-v3.27.2-hardcore-crimson';"),
     ],
     'public/styles.css': [
         ('difficulty-card[data-diff="hardcore"]{--diff:#8e44d6;--diff-soft:#f0dcff;background:linear-gradient(145deg,#fffefd 0%,#faf2ff 72%,#f1e2ff 100%);border-color:#dfc8f0}', 'difficulty-card[data-diff="hardcore"]{--diff:#941522;--diff-soft:#f8e4e7;background:linear-gradient(145deg,#fffefd 0%,#fff5f6 72%,#f9e3e6 100%);border-color:#ecc5cb}'),
