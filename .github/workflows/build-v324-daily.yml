@@ -1,0 +1,92 @@
+name: Build Proplet v3.24 Daily Gen3
+
+on:
+  push:
+    branches:
+      - sol/v3.24-daily-weekly-cadence
+    paths:
+      - .github/workflows/build-v324-daily.yml
+      - tools/apply_v324_patch.py
+      - tools/generate_daily_v324.py
+      - tools/audit_daily_generation3.py
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: sol/v3.24-daily-weekly-cadence
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Apply deterministic runtime patch
+        run: python tools/apply_v324_patch.py
+
+      - name: Generate Daily Generation 3
+        run: python tools/generate_daily_v324.py
+
+      - name: Audit all 365 Daily boards
+        run: python tools/audit_daily_generation3.py
+
+      - name: Syntax checks
+        run: |
+          python -m py_compile server.py tools/apply_v324_patch.py tools/generate_daily_v324.py tools/audit_daily_generation3.py tools/generate_puzzles.py
+          node --check public/app.js
+
+      - name: Release invariants
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import date
+          from pathlib import Path
+
+          data = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          assert data['dailyGeneration'] == 3
+          assert data['dailyGeneration3From'] == '2026-08-17'
+          assert data['dailyRotationBaseDate'] == '2026-08-17'
+          assert date.fromisoformat(data['dailyRotationBaseDate']).weekday() == 0
+          assert data['dailyCadence']['pattern'] == ['easy','easy','medium','medium','medium','hard','hard']
+          assert [p['difficulty'] for p in data['daily'][:14]] == data['dailyCadence']['pattern'] * 2
+          assert len(data['daily']) == 365
+          assert len(data['previousDaily']['puzzles']) == 365
+          assert Path('data/puzzles.json').read_bytes() == Path('public/puzzles.json').read_bytes()
+
+          app = Path('public/app.js').read_text(encoding='utf-8')
+          server = Path('server.py').read_text(encoding='utf-8')
+          sw = Path('public/sw.js').read_text(encoding='utf-8')
+          styles = Path('public/styles.css').read_text(encoding='utf-8')
+          index = Path('public/index.html').read_text(encoding='utf-8')
+          assert "const APP_VERSION='3.24.0';" in app
+          assert 'APP_VERSION = "3.24.0"' in server
+          assert 'dailyBankFor' in app and 'renderDailyWeekRhythm' in app
+          assert 'previous_daily_bank' in server and 'dailyGeneration3From' in server
+          assert 'maybeOfferRescue' in app
+          assert 'proplet-v3.24.0-daily-weekly-cadence' in sw
+          assert 'v3.24 — Monday Daily cadence' in styles
+          assert 'dailyWeekRhythm' in index and 'Proplet v3.24.0' in index
+          print('Release invariants PASS')
+          PY
+
+      - name: Commit generated release assets
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add server.py public/app.js public/index.html public/styles.css public/sw.js \
+            data/puzzles.json public/puzzles.json data/legacy_daily_gen2.json \
+            DAILY_GENERATION3_AUDIT.json DAILY_GENERATION3_AUDIT_CZ.md
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Build Proplet v3.24.0 Daily Generation 3"
+            git push origin HEAD:sol/v3.24-daily-weekly-cadence
+          fi
