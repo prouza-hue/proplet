@@ -20,7 +20,17 @@ jobs:
         with:
           node-version: '22'
       - name: Apply patch
-        run: python scripts/v3315_preview_patch.py
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/v3315_preview_patch.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('s = launch_pattern.sub(launch_replacement, s, count=1)', 's = launch_pattern.sub(lambda _: launch_replacement, s, count=1)')
+          s=s.replace('s = admin_pattern.sub(admin_replacement, s, count=1)', 's = admin_pattern.sub(lambda _: admin_replacement, s, count=1)')
+          p.write_text(s, encoding='utf-8')
+          PY
+          python scripts/v3315_preview_patch.py
       - name: Validate
         shell: bash
         run: |
