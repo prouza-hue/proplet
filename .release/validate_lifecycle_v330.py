@@ -7,6 +7,7 @@ vercel = json.loads((ROOT / 'vercel.json').read_text(encoding='utf-8'))
 
 assert "extras=Object.fromEntries(Object.keys(DIFF).map" in app
 assert "filter(p=>p.meta?.rollingContent)" in app
+assert "function latestContentIsFresh(){const b=latestContentBatch(),today=CONTENT_PREVIEW_DATE||pragueDateISO()" in app
 assert "window.addEventListener('online',()=>{syncQueue({announce:false});refreshRollingContent().catch(()=>{})})" in app
 assert "if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{})}" in app
 assert any(row.get('path') == '/api/cron/content-push' and row.get('schedule') == '0 9 * * 1' for row in vercel.get('crons', []))
