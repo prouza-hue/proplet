@@ -941,3 +941,8 @@ html[data-theme="dark"] .achievement-summary-copy>span{color:#b6a9ff}html[data-t
 html[data-theme="dark"] .achievement-peek{background:#2b2833;border-color:#403a49}html[data-theme="dark"] .achievement-peek.earned{background:#21372f;border-color:#355247}html[data-theme="dark"] .achievement-peek i{border-color:#24212e}
 html[data-theme="dark"] .achievement-details .achievement-groups{border-top-color:#373241}
 @media(max-width:390px){.achievement-toggle-btn{padding:7px 9px}.achievement-summary{padding:10px}.achievement-summary-icons{gap:5px}.achievement-peek{flex-basis:30px;width:30px;height:30px}.achievement-peek b{font-size:17px}}
+
+
+/* v3.28.1 — played-level modal difficulty SVG title */
+#playedLevelsTitle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#playedLevelsTitle .played-levels-title-icon{width:32px;height:32px;flex:0 0 32px;display:block;object-fit:contain}
