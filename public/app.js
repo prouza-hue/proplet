@@ -1,4 +1,4 @@
-const APP_VERSION='3.31.0-preview.1';
+const APP_VERSION='3.31.1-preview.1';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -194,6 +194,7 @@ let rescueStatus=null;
 let onboardingStep=0;
 let tutorialState={dragging:false,path:[],done:false};
 let pendingSW=null;
+let reloadOnServiceWorkerChange=false;
 let winFeedbackSent=false;
 let pendingPostWinAction=null;
 let pendingPushPostWinAction=null;
@@ -1019,7 +1020,7 @@ function registerServiceWorker(){
   reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)showUpdateBanner(w)})});
   reg.update().catch(()=>{});
  }).catch(()=>{});
- let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});
+ let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloadOnServiceWorkerChange||reloading)return;reloading=true;location.reload()});
 }
 
 function ensureAudio(){if(!getSettings().sound)return;try{if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch{}}
@@ -1245,7 +1246,7 @@ function bind(){
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#contentPushToggleBtn').onclick=toggleContentPushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
- $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>pendingSW?.postMessage({type:'SKIP_WAITING'});
+ $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>{if(!pendingSW)return;reloadOnServiceWorkerChange=true;pendingSW.postMessage({type:'SKIP_WAITING'})};
  $('#reportIssueBtn').onclick=openSupportReport;$('#closeSupportReportModal').onclick=()=>$('#supportReportModal').classList.add('hidden');$('#saveSupportReportBtn').onclick=saveSupportReport;$('#supportReportModal').onclick=e=>{if(e.target===$('#supportReportModal'))$('#supportReportModal').classList.add('hidden')};$('#exportDataBtn').onclick=exportAccountData;$('#deleteAccountBtn').onclick=openDeleteAccount;$('#closeDeleteAccountModal').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#cancelDeleteAccountBtn').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#confirmDeleteAccountBtn').onclick=deleteAccount;$('#deleteAccountModal').onclick=e=>{if(e.target===$('#deleteAccountModal'))$('#deleteAccountModal').classList.add('hidden')};
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
  $$('[data-theme-mode]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeMode,{persist:true}));
@@ -1306,7 +1307,7 @@ async function refreshRollingContent(){
 async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
- document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');renderDaily();renderFree();renderProfile();renderInstallUI();refreshRollingContent().catch(()=>{});syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
+ document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');renderDaily();renderFree();renderProfile();renderInstallUI();const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{})}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }

@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.31.0-preview.1-starter-coach';
+const CACHE='proplet-v3.31.1-preview.1-onboarding-boot';
 const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/home-layout.css','/home-layout.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/difficulty/easy.svg','/difficulty/medium.svg','/difficulty/hard.svg','/difficulty/hardcore.svg','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{
