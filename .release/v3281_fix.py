@@ -13,16 +13,16 @@ if len(targets)!=1:
     raise SystemExit(f'Expected exactly 1 title target, found {len(targets)}')
 i,line=targets[0]
 print('TARGET LINE:', i+1, line)
-if 'DIFF[diff].icon' not in line:
-    raise SystemExit('Target no longer contains DIFF[diff].icon leak')
+if '${d.icon}' not in line or '${d.label}' not in line:
+    raise SystemExit('Expected raw difficulty icon/title pattern not found')
 
-# Find the title element assignment on the same line and switch from textContent to innerHTML.
-m=re.search(r"\$\('#([^']+)'\)\.textContent=(`[^`]*DIFF\[diff\]\.icon[^`]*tvoje úrovně[^`]*`)", line)
+# Replace only the played-level modal title assignment: path string -> actual SVG markup.
+m=re.search(r"\$\('#([^']+)'\)\.textContent=`\$\{d\.icon\} \$\{d\.label\} · tvoje úrovně`", line)
 if not m:
     raise SystemExit('Could not safely identify played-level title assignment')
 el_id=m.group(1)
 old=m.group(0)
-new=f"$('#{el_id}').innerHTML=`${{difficultyIconMarkup(diff,'played-levels-title-icon')}}<span>${{esc(DIFF[diff].label)}} · tvoje úrovně</span>`"
+new=f"$('#{el_id}').innerHTML=`${{difficultyIconMarkup(diff,'played-levels-title-icon')}}<span>${{esc(d.label)}} · tvoje úrovně</span>`"
 line=line.replace(old,new,1)
 lines[i]=line
 app='\n'.join(lines)+('\n' if app.endswith('\n') else '')
@@ -53,8 +53,9 @@ sw_path.write_text(sw)
 
 # Regression assertions.
 final=app_path.read_text()
-if 'DIFF[diff].icon' in next(l for l in final.splitlines() if 'tvoje úrovně' in l):
+title=next(l for l in final.splitlines() if 'tvoje úrovně' in l)
+if '${d.icon}' in title or '.textContent=`${d.icon}' in title:
     raise SystemExit('Raw difficulty icon path still leaks in title')
-if "difficultyIconMarkup(diff,'played-levels-title-icon')" not in final:
+if "difficultyIconMarkup(diff,'played-levels-title-icon')" not in title:
     raise SystemExit('SVG title markup missing')
 print('Patched title element:', el_id)
