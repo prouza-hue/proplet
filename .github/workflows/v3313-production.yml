@@ -1,0 +1,76 @@
+name: Proplet v3.31.3 production validation
+on:
+  push:
+    branches: [release/v3313-production]
+permissions:
+  contents: write
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[v3313-built]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python .release/apply_v3313_production.py
+      - run: node --check public/app.js
+      - run: python -m py_compile server.py
+      - name: Validate production invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          app = Path('public/app.js').read_text(encoding='utf-8')
+          index = Path('public/index.html').read_text(encoding='utf-8')
+          css = Path('public/styles.css').read_text(encoding='utf-8')
+          sw = Path('public/sw.js').read_text(encoding='utf-8')
+          server = Path('server.py').read_text(encoding='utf-8')
+
+          assert "const APP_VERSION='3.31.3'" in app
+          assert 'APP_VERSION = "3.31.3"' in server
+          assert "const CACHE='proplet-v3.31.3-onboarding-polish'" in sw
+          assert "const CONTENT_PREVIEW_DATE='';" in app
+          assert "const EXPECTED_PUZZLE_DB_VERSION=9;" in app
+
+          assert "title:'Propleť všechno'" not in app
+          assert 'id="starterCoach"' in index
+          assert 'v3.31 — starter coach' in css
+          assert "function renderStarterCoach" in app
+          assert 'Hotovo je až bez jediného volného políčka.' in app
+          assert "$('#hintBtn')?.classList.toggle('starter-attention',hintFocus)" in app
+
+          assert "let reloadOnServiceWorkerChange=false;" in app
+          assert "if(!reloadOnServiceWorkerChange||reloading)return" in app
+          assert "reloadOnServiceWorkerChange=true;pendingSW.postMessage({type:'SKIP_WAITING'})" in app
+          assert "const initialRollingContent=refreshRollingContent().catch(()=>null)" in app
+          assert "initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80))" in app
+
+          assert "if(mode==='starter'){if(action==='menu'){nav('free',{replace:true});return}startDaily();return}" in app
+          assert "nav('daily',{replace:true});showStarterDailyNudge();return" not in app
+
+          assert "$('#levelDetailTitle').textContent=`${DIFF[diff].label} ${puzzle.meta?.level||''}`.trim();" in app
+          assert "$('#levelDetailTitle').textContent=`${DIFF[diff].icon}" not in app
+
+          assert "u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'" in sw
+          assert "if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}" in sw
+          print('v3.31.3 production invariants PASS')
+          PY
+      - name: Validate runtime-only diff
+        run: |
+          python - <<'PY'
+          import subprocess
+          changed=set(subprocess.check_output(['git','diff','--name-only'], text=True).splitlines())
+          expected={'public/app.js','public/index.html','public/styles.css','public/sw.js','server.py'}
+          assert changed == expected, (changed, expected)
+          print('runtime-only diff PASS:', sorted(changed))
+          PY
+      - name: Commit validated runtime
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/app.js public/index.html public/styles.css public/sw.js server.py
+          git commit -m "Proplet v3.31.3 validated runtime [v3313-built]"
+          git push
