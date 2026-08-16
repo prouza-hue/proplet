@@ -11,6 +11,12 @@ if app.count(old) != 1:
     raise SystemExit(f'base refresh block count={app.count(old)}')
 app = app.replace(old, new, 1)
 
+old = "function latestContentIsFresh(){const b=latestContentBatch(),asOf=puzzleDB?.contentStatus?.asOf;if(!b?.availableFrom||!asOf)return false;return asOf>=b.availableFrom&&asOf<=addDaysISO(b.availableFrom,6)}"
+new = "function latestContentIsFresh(){const b=latestContentBatch(),today=CONTENT_PREVIEW_DATE||pragueDateISO();if(!b?.availableFrom)return false;return today>=b.availableFrom&&today<=addDaysISO(b.availableFrom,6)}"
+if app.count(old) != 1:
+    raise SystemExit(f'fresh-content week block count={app.count(old)}')
+app = app.replace(old, new, 1)
+
 old = "window.addEventListener('online',()=>syncQueue({announce:false}));"
 new = "window.addEventListener('online',()=>{syncQueue({announce:false});refreshRollingContent().catch(()=>{})});"
 if app.count(old) != 1:
