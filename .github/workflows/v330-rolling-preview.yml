@@ -1,0 +1,152 @@
+name: Validate v3.30 Rolling Content Preview
+
+on:
+  push:
+    branches:
+      - preview/v330-rolling-content
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-audit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate 13-week rolling reserve
+        run: python tools/generate_rolling_content.py
+
+      - name: Apply preview runtime
+        run: python .release/apply_v330.py
+
+      - name: Syntax checks
+        run: |
+          python -m py_compile server.py tools/generate_rolling_content.py tools/audit_rolling_content.py .release/apply_v330.py
+          node --check public/app.js
+          python -m json.tool vercel.json >/dev/null
+          python -m json.tool data/puzzles.json >/dev/null
+          python -m json.tool public/puzzles.json >/dev/null
+
+      - name: Independent puzzle QA
+        run: python tools/audit_rolling_content.py
+
+      - name: Release invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          root = Path('.')
+          app = (root/'public/app.js').read_text(encoding='utf-8')
+          sw = (root/'public/sw.js').read_text(encoding='utf-8')
+          server = (root/'server.py').read_text(encoding='utf-8')
+          html = (root/'public/index.html').read_text(encoding='utf-8')
+          css = (root/'public/styles.css').read_text(encoding='utf-8')
+          mig = (root/'SUPABASE_MIGRATION_V3_30.sql').read_text(encoding='utf-8')
+          ver = json.loads((root/'vercel.json').read_text(encoding='utf-8'))
+          data = json.loads((root/'data/puzzles.json').read_text(encoding='utf-8'))
+          public = json.loads((root/'public/puzzles.json').read_text(encoding='utf-8'))
+
+          assert "const APP_VERSION='3.30.0-preview.1'" in app
+          assert 'APP_VERSION = "3.30.0-preview.1"' in server
+          assert 'const EXPECTED_PUZZLE_DB_VERSION=10' in app
+          assert "'/api/puzzles'" in app or '"/api/puzzles"' in app
+          assert '@app.get("/api/puzzles")' in server
+          assert 'is_puzzle_released' in server
+          assert 'zatím nevydaná úroveň' in server
+          assert 'VERCEL_ENV == "production"' in server
+          assert 'X-Proplet-Preview-As-Of' in app
+
+          # Critical v3.28.3 fast-boot invariant.
+          assert 'showPuzzleBootLoading()' in app
+          assert 'caches.match(url)' in app
+          assert "fetch(url,{cache:'no-store'" in app
+          assert "u.pathname==='/api/puzzles'||u.pathname==='/puzzles.json'" in sw
+          assert "if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}" in sw
+          assert "if(u.pathname.startsWith('/api/'))return" in sw
+
+          # Static fallback must never contain the future reserve.
+          assert data['version'] == 10 == public['version']
+          assert {d:len(public['free'][d]) for d in ('easy','medium','hard','hardcore')} == {d:200 for d in ('easy','medium','hard','hardcore')}
+          assert sum(len(data['free'][d])-200 for d in ('easy','medium','hard','hardcore')) == 65
+          assert all(not p.get('meta',{}).get('rollingContent') for d in ('easy','medium','hard','hardcore') for p in public['free'][d])
+
+          # Consent isolation: existing subscriptions remain Daily ON / Content OFF.
+          assert re.search(r'update public\.push_subscriptions set daily_enabled = true where daily_enabled is null', mig, re.I)
+          assert re.search(r'update public\.push_subscriptions set content_enabled = false where content_enabled is null', mig, re.I)
+          assert 'push_delivery_log' in mig
+          assert 'check (level >= 1)' in mig
+          assert 'level between 1 and 200' not in mig.lower()
+          assert 'content_enabled' in server and 'daily_enabled' in server
+          assert '@app.get("/api/cron/content-push")' in server
+          assert 'push_delivery_log' in server
+
+          # UI and legacy achievements.
+          assert 'id="contentPushToggleBtn"' in html
+          assert 'id="newContentBanner"' in html
+          assert '5 nových Propletů' in app
+          assert 'fresh-level-badge' in css
+          assert 'Dokonči všech 200' not in app
+
+          # Weekly cron: Monday content dispatch, separate from Daily cron.
+          crons = {(x['path'],x['schedule']) for x in ver.get('crons',[])}
+          assert ('/api/cron/daily-push','0 7 * * *') in crons
+          assert ('/api/cron/content-push','0 16 * * 1') in crons
+          print('STATIC INVARIANTS PASS')
+          PY
+
+      - name: Server release-gating tests
+        run: |
+          python - <<'PY'
+          from datetime import date
+          import server
+
+          before = server.released_puzzle_payload(date(2026,8,23))
+          first = server.released_puzzle_payload(date(2026,8,24))
+          second = server.released_puzzle_payload(date(2026,8,31))
+          end = server.released_puzzle_payload(date(2026,11,16))
+
+          def counts(x):
+              return {d:len(x['free'][d]) for d in ('easy','medium','hard','hardcore')}
+
+          assert counts(before) == {'easy':200,'medium':200,'hard':200,'hardcore':200}
+          assert counts(first) == {'easy':202,'medium':201,'hard':201,'hardcore':201}
+          assert counts(second) == {'easy':203,'medium':203,'hard':202,'hardcore':202}
+          assert counts(end) == {'easy':217,'medium':216,'hard':216,'hardcore':216}
+          assert first['contentStatus']['latestBatch']['count'] == 5
+          assert first['contentStatus']['latestBatch']['extraDifficulty'] == 'easy'
+          assert first['contentStatus']['nextRelease'] == '2026-08-31'
+          # Payload must not expose future batch metadata.
+          assert 'batches' not in first.get('rollingContent', {})
+          first_ids = {p['id'] for bank in first['free'].values() for p in bank}
+          assert 'g2-m-202' not in first_ids
+          print('RELEASE GATING PASS', counts(first), counts(second), counts(end))
+          PY
+
+      - name: Commit validated preview runtime
+        run: |
+          git config user.name 'Proplet Preview Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add server.py public/app.js public/index.html public/styles.css public/sw.js vercel.json \
+                  data/puzzles.json public/puzzles.json ROLLING_CONTENT_V3_30_AUDIT.json \
+                  tools/generate_rolling_content.py tools/audit_rolling_content.py \
+                  SUPABASE_MIGRATION_V3_30.sql SUPABASE_VERIFY_V3_30.sql
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+          else
+            git commit -m 'Proplet v3.30.0-preview.1 rolling content and notifications v2'
+            git push origin HEAD:preview/v330-rolling-content
+          fi
