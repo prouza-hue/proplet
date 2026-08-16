@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Append a deterministic, pre-QA'd reserve for weekly Proplet Free content drops.
+"""Generate a deterministic, pre-QA'd reserve for weekly Proplet Free content drops.
 
-The server-side data/puzzles.json contains the full reserve. public/puzzles.json deliberately
-remains the current baseline fallback; clients receive released content through /api/puzzles.
+The existing data/puzzles.json and public/puzzles.json stay byte-for-byte untouched. Future
+content lives in data/rolling_content_v1.json and is exposed only as a small release-gated delta.
 
 Rolling content uses a stricter uniqueness gate than the historical generator: every accepted
 candidate is re-solved against the broad 12k-word dictionary used by the independent audit.
@@ -20,6 +20,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "puzzles.json"
 PUBLIC = ROOT / "public" / "puzzles.json"
+ROLLING_DATA = ROOT / "data" / "rolling_content_v1.json"
 GEN = ROOT / "tools" / "generate_puzzles.py"
 FIRST_RELEASE = date(2026, 8, 24)
 WEEKS = 13
@@ -42,17 +43,11 @@ def load_generator():
 
 
 def broad_uniqueness(gp, puzzle: dict, dictionary: list[str]) -> tuple[bool, int, int]:
-    """Re-solve a candidate with the broad dictionary; return unique/candidates/nodes."""
     targets = [a["word"].lower() for a in puzzle["answers"]]
     solver_dictionary = list(dict.fromkeys(dictionary[:WIDE_DICTIONARY_SIZE] + targets))
     solutions, candidate_count, search_nodes = gp.solve_count(
-        [x.lower() for x in puzzle["letters"]],
-        puzzle["rows"],
-        puzzle["cols"],
-        puzzle["mask"],
-        [len(w) for w in targets],
-        solver_dictionary,
-        limit=2,
+        [x.lower() for x in puzzle["letters"]], puzzle["rows"], puzzle["cols"], puzzle["mask"],
+        [len(w) for w in targets], solver_dictionary, limit=2,
     )
     return solutions == 1, candidate_count, search_nodes
 
@@ -60,16 +55,19 @@ def broad_uniqueness(gp, puzzle: dict, dictionary: list[str]) -> tuple[bool, int
 def main() -> None:
     gp = load_generator()
     data = json.loads(DATA.read_text(encoding="utf-8"))
-    baseline = json.loads(PUBLIC.read_text(encoding="utf-8"))
-    if int(data.get("version") or 0) != 9:
-        raise RuntimeError(f"Expected puzzle DB v9, got {data.get('version')}")
+    public = json.loads(PUBLIC.read_text(encoding="utf-8"))
+    if int(data.get("version") or 0) != 9 or int(public.get("version") or 0) != 9:
+        raise RuntimeError("Rolling content expects unchanged base puzzle DB v9")
     if int(data.get("freeGeneration") or 0) != 2:
         raise RuntimeError("Rolling content expects Free generation 2")
     counts = {d: len(data.get("free", {}).get(d, [])) for d in DIFFICULTIES}
     if counts != {d: 200 for d in DIFFICULTIES}:
-        raise RuntimeError(f"Expected 200 current levels per difficulty before first rolling reserve, got {counts}")
-    if baseline.get("free") != data.get("free"):
-        raise RuntimeError("public/data Free banks must match before rolling reserve generation")
+        raise RuntimeError(f"Expected 200 current levels per difficulty, got {counts}")
+    if public.get("free") != data.get("free"):
+        raise RuntimeError("public/data Free banks must match before reserve generation")
+
+    # Work on an in-memory copy only; base files are never rewritten.
+    working = {d: list(data["free"][d]) for d in DIFFICULTIES}
 
     freq = gp.load_frequency_words()
     tiers, tier_of = gp.load_answer_tiers()
@@ -93,15 +91,14 @@ def main() -> None:
         used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))
 
     repeat_window = 24
-    recent: dict[str, list[set[str]]] = {}
-    for difficulty in DIFFICULTIES:
-        recent[difficulty] = [
-            {a["word"].lower() for a in p.get("answers", [])}
-            for p in data["free"][difficulty][-repeat_window:]
-        ]
+    recent = {
+        d: [{a["word"].lower() for a in p.get("answers", [])} for p in working[d][-repeat_window:]]
+        for d in DIFFICULTIES
+    }
 
     rng = random.Random(SEED)
     generated: list[dict] = []
+    generated_by_diff = {d: [] for d in DIFFICULTIES}
     batch_summaries: list[dict] = []
     rejected_broad = Counter()
     rejected_signature = Counter()
@@ -115,27 +112,17 @@ def main() -> None:
         batch_counts = Counter(order)
         batch_rows = []
         for release_index, difficulty in enumerate(order, start=1):
-            level = len(data["free"][difficulty]) + 1
+            level = len(working[difficulty]) + 1
             puzzle_id = f"{ID_PREFIX[difficulty]}-{level:03d}"
             vocab_key = "hardcore_conservative" if difficulty == "hardcore" else difficulty
             avoid = set().union(*recent[difficulty]) if recent[difficulty] else set()
-            # Deterministic retry loop. create_puzzle first applies the historical per-difficulty
-            # solver gate; every returned candidate is then re-solved with the broad 12k corpus.
-            accepted = None
-            accepted_sig = None
+            accepted = accepted_sig = None
             for retry in range(1, MAX_SEED_RETRIES + 1):
                 seed = rng.randrange(1, 2**31 - 1)
                 p = gp.create_puzzle(
-                    difficulty,
-                    seed,
-                    pools[vocab_key],
-                    dictionary,
-                    puzzle_id,
+                    difficulty, seed, pools[vocab_key], dictionary, puzzle_id,
                     variant_index=level - 1 if difficulty == "hard" else None,
-                    tier_of=tier_of,
-                    vocab_key=vocab_key,
-                    fun_of=fun_of,
-                    avoid_words=avoid,
+                    tier_of=tier_of, vocab_key=vocab_key, fun_of=fun_of, avoid_words=avoid,
                 )
                 sig = (p["rows"], p["cols"], tuple(p["letters"]))
                 if sig in used_signatures:
@@ -157,7 +144,7 @@ def main() -> None:
                 accepted, accepted_sig = p, sig
                 break
             if accepted is None or accepted_sig is None:
-                raise RuntimeError(f"Could not generate broad-unique rolling puzzle {puzzle_id} after {MAX_SEED_RETRIES} seeds")
+                raise RuntimeError(f"Could not generate broad-unique {puzzle_id} after {MAX_SEED_RETRIES} seeds")
             p = accepted
             used_signatures.add(accepted_sig)
             p.setdefault("meta", {}).update({
@@ -170,9 +157,9 @@ def main() -> None:
                 "releaseIndex": release_index,
                 "rollingContent": True,
             })
-            data["free"][difficulty].append(p)
-            word_set = {a["word"].lower() for a in p["answers"]}
-            recent[difficulty].append(word_set)
+            working[difficulty].append(p)
+            generated_by_diff[difficulty].append(p)
+            recent[difficulty].append({a["word"].lower() for a in p["answers"]})
             recent[difficulty] = recent[difficulty][-repeat_window:]
             generated.append(p)
             batch_rows.append({"id": puzzle_id, "difficulty": difficulty, "level": level})
@@ -186,8 +173,9 @@ def main() -> None:
         })
         print(f"{batch_id} {release}: {', '.join(x['id'] for x in batch_rows)}", flush=True)
 
-    data["rollingContent"] = {
+    reserve = {
         "version": 1,
+        "basePuzzleVersion": 9,
         "cadence": "weekly",
         "releaseWeekday": "monday",
         "levelsPerDrop": 5,
@@ -198,25 +186,16 @@ def main() -> None:
         "generatedAtVersion": "3.30.0",
         "wideUniquenessDictionarySize": WIDE_DICTIONARY_SIZE,
         "batches": batch_summaries,
+        "puzzles": generated_by_diff,
     }
-    # Bump schema version because clients now understand release metadata and /api/puzzles.
-    data["version"] = 10
-    DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    # Keep the public static fallback deliberately free of unreleased reserve content.
-    baseline["version"] = 10
-    baseline["rollingContent"] = {
-        k: v for k, v in data["rollingContent"].items() if k != "batches"
-    }
-    baseline["rollingContent"]["batches"] = []
-    PUBLIC.write_text(json.dumps(baseline, ensure_ascii=False, indent=2), encoding="utf-8")
+    ROLLING_DATA.write_text(json.dumps(reserve, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     summary = {
         "generated": len(generated),
         "weeks": WEEKS,
         "firstRelease": FIRST_RELEASE.isoformat(),
         "reservedThrough": batch_summaries[-1]["availableFrom"],
-        "finalCounts": {d: len(data["free"][d]) for d in DIFFICULTIES},
+        "finalCounts": {d: len(working[d]) for d in DIFFICULTIES},
         "generatedCounts": dict(Counter(p["difficulty"] for p in generated)),
         "broadAmbiguityRejects": dict(rejected_broad),
         "signatureRejects": dict(rejected_signature),
