@@ -1,0 +1,51 @@
+name: Proplet v3.31.4 equal-choice preview
+on:
+  push:
+    branches: [preview/v3314-first-hard-daily]
+    paths:
+      - '.release/apply_v3314_equal_choice.py'
+      - '.github/workflows/v3314-equal-choice-preview.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/v3314-first-hard-daily
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply equal-weight choice polish
+        run: python .release/apply_v3314_equal_choice.py
+      - name: Validate JavaScript
+        run: node --check public/app.js
+      - name: Validate preview UI invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          app=Path('public/app.js').read_text()
+          html=Path('public/index.html').read_text()
+          css=Path('public/styles.css').read_text()
+          assert 'starterHardActions' in html
+          assert 'starterWarmupBtn' in html and 'starterHardDailyBtn' in html
+          assert "$('#newBadgeBox').classList.add('hidden');$('#newBadgeBox').innerHTML=''" in app
+          assert "$('#winPrimaryBtn').classList.toggle('hidden',hardNext)" in app
+          assert "$('#winMenuBtn').classList.toggle('hidden',hardNext)" in app
+          assert 'starter-choice-warmup' in css and 'starter-choice-hard' in css
+          assert 'grid-template-columns:repeat(2,minmax(0,1fr))' in css
+          assert 'Dneska se zrovna nešetří' not in app
+          print('equal-choice preview validated')
+          PY
+      - name: Commit validated preview runtime
+        run: |
+          git config user.name 'prouza-hue'
+          git config user.email 'prouza@gmail.com'
+          git add public/app.js public/index.html public/styles.css
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Polish v3.31.4 equal Hard Daily choice [v3314-equal-choice]'
+          git push origin HEAD:preview/v3314-first-hard-daily
