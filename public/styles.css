@@ -997,3 +997,11 @@ html[data-theme="dark"] .starter-mode #hintBtn{background:#40365f;border-color:#
 html[data-theme="dark"] .starter-mode #resetBtn{background:#292630;border-color:#625b70;color:#e0dae7}
 html[data-theme="dark"] .starter-mode #hintBtn.starter-attention{background:#54458a;border-color:#c2b7ff;color:white;box-shadow:0 0 0 5px rgba(170,156,255,.14)}
 html[data-theme="dark"] .starter-mode .game-control-column .game-message{color:#cbc4d2}
+
+
+/* v3.31.4 preview — protect first real session when Daily is Hard. */
+.starter-win .starter-hard-choice{margin-top:8px;border:1px solid #efd6c9;background:linear-gradient(135deg,#fff8f3,#fff4ed)}
+.starter-win .starter-hard-choice>.emoji{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#ffe4d7;font-size:21px}
+.starter-win .starter-hard-choice strong{color:#873f2d}.starter-win .starter-hard-choice small{line-height:1.35}
+html[data-theme="dark"] .starter-win .starter-hard-choice{border-color:#65483e;background:linear-gradient(135deg,#342925,#302521)}
+html[data-theme="dark"] .starter-win .starter-hard-choice>.emoji{background:#51352b}html[data-theme="dark"] .starter-win .starter-hard-choice strong{color:#ffc7b4}
