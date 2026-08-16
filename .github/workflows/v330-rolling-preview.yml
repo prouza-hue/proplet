@@ -3,11 +3,11 @@ name: Validate v3.30 Rolling Content Preview
 on:
   push:
     branches:
-      - preview/v330-rolling-content
+      - preview/v330-rolling-final
   workflow_dispatch:
 
 concurrency:
-  group: v330-rolling-preview
+  group: v330-rolling-final
   cancel-in-progress: true
 
 permissions:
@@ -30,10 +30,12 @@ jobs:
       - name: Install runtime dependencies
         run: pip install -r requirements.txt
 
-      - name: Keep generated JSON readable
-        run: python .release/preserve_json_format_v330.py
+      - name: Remember production base puzzle blobs
+        run: |
+          echo "BASE_DATA_SHA=$(git hash-object data/puzzles.json)" >> "$GITHUB_ENV"
+          echo "BASE_PUBLIC_SHA=$(git hash-object public/puzzles.json)" >> "$GITHUB_ENV"
 
-      - name: Generate 13-week rolling reserve
+      - name: Generate 13-week server-only reserve
         run: python tools/generate_rolling_content.py
 
       - name: Apply final preview runtime
@@ -42,6 +44,14 @@ jobs:
           python .release/harden_v330.py
           python .release/split_rolling_delta_v330.py
           python .release/preserve_legacy_push_v330.py
+          python .release/separate_rolling_store_v330.py
+          python .release/final_polish_v330.py
+
+      - name: Base puzzle bank must remain byte-for-byte unchanged
+        run: |
+          test "$BASE_DATA_SHA" = "$(git hash-object data/puzzles.json)"
+          test "$BASE_PUBLIC_SHA" = "$(git hash-object public/puzzles.json)"
+          git diff --exit-code -- data/puzzles.json public/puzzles.json
 
       - name: Syntax checks
         run: |
@@ -49,11 +59,11 @@ jobs:
             tools/generate_rolling_content.py tools/audit_rolling_content.py \
             .release/apply_v330.py .release/harden_v330.py \
             .release/split_rolling_delta_v330.py .release/preserve_legacy_push_v330.py \
-            .release/preserve_json_format_v330.py .release/validate_v330.py
+            .release/separate_rolling_store_v330.py .release/final_polish_v330.py \
+            .release/validate_v330.py
           node --check public/app.js
           python -m json.tool vercel.json >/dev/null
-          python -m json.tool data/puzzles.json >/dev/null
-          python -m json.tool public/puzzles.json >/dev/null
+          python -m json.tool data/rolling_content_v1.json >/dev/null
 
       - name: Independent exact-cover and content QA
         run: python tools/audit_rolling_content.py
@@ -64,19 +74,22 @@ jobs:
       - name: Show reviewable diff stats
         run: |
           git diff --stat
+          echo "--- base puzzle bank diff ---"
           git diff --numstat -- data/puzzles.json public/puzzles.json
+          echo "--- reserve size ---"
+          wc -l data/rolling_content_v1.json
 
       - name: Commit validated preview runtime
         run: |
           git config user.name 'Proplet Preview Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add server.py public/app.js public/index.html public/styles.css public/sw.js vercel.json \
-                  data/puzzles.json public/puzzles.json ROLLING_CONTENT_V3_30_AUDIT.json \
+                  data/rolling_content_v1.json ROLLING_CONTENT_V3_30_AUDIT.json \
                   tools/generate_rolling_content.py tools/audit_rolling_content.py \
                   SUPABASE_MIGRATION_V3_30.sql SUPABASE_VERIFY_V3_30.sql
           if git diff --cached --quiet; then
             echo 'No generated changes to commit.'
           else
             git commit -m 'Proplet v3.30.0-preview.1 rolling content and notifications v2'
-            git push origin HEAD:preview/v330-rolling-content
+            git push origin HEAD:preview/v330-rolling-final
           fi
