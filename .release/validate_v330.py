@@ -57,6 +57,8 @@ def main() -> None:
     assert "caches.match('/api/rolling-content',{ignoreSearch:true})" in app
     assert "function mergeRollingContent" in app
     assert "refreshRollingContent().catch(()=>{})" in app
+    assert "extras=Object.fromEntries(Object.keys(DIFF).map" in app
+    assert "filter(p=>p.meta?.rollingContent)" in app
     assert "u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'" in sw
     assert "Monday week= cache key" in sw
     assert "if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}" in sw
@@ -81,7 +83,7 @@ def main() -> None:
     assert 'len(reserve.get("puzzles", {}).get(key, []))' in server_src
     assert 'bank = sorted(released_free_bank(difficulty, effective_content_date(request))' in server_src
 
-    # Consent isolation, stale-client compatibility, at-most-once weekly delivery.
+    # Consent isolation, stale-client compatibility, at-most-once content delivery.
     assert re.search(r"update public\.push_subscriptions set daily_enabled = true where daily_enabled is null", migration, re.I)
     assert re.search(r"update public\.push_subscriptions set content_enabled = false where content_enabled is null", migration, re.I)
     assert "push_delivery_log" in migration
@@ -104,7 +106,7 @@ def main() -> None:
 
     crons = {(x["path"], x["schedule"]) for x in vercel.get("crons", [])}
     assert ("/api/cron/daily-push", "0 7 * * *") in crons
-    assert ("/api/cron/content-push", "0 16 * * 1") in crons
+    assert ("/api/cron/content-push", "0 9 * * 1") in crons
 
     import server
     before = server.released_rolling_payload(date(2026, 8, 23))
@@ -146,6 +148,7 @@ def main() -> None:
         "secondWeekCounts": counts(second),
         "reservedThroughCounts": counts(end),
         "fastBootPreserved": True,
+        "rollingSurvivesBaseRefresh": True,
         "basePuzzleFilesUnchangedByArchitecture": True,
         "futurePreviewWritesSuppressed": True,
         "existingDailyConsentPreserved": True,
