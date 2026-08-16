@@ -85,6 +85,7 @@
 
     <section id="screen-free" class="screen">
       <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Na co si troufáš?</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
+      <div id="newContentBanner" class="new-content-banner hidden"></div>
       <div id="difficultyCards" class="difficulty-grid"></div>
     </section>
 
@@ -172,10 +173,20 @@
       </div>
 
       <div class="card settings-card push-card">
-        <div class="section-head"><div><span class="eyebrow">DENNÍ PŘIPOMÍNKA</span><h2>Nový Proplet na mobil</h2></div></div>
-        <p class="muted push-copy">Ráno ti připomeneme novou Denní výzvu. Když ji už máš hotovou, nic neposíláme.</p>
-        <button id="pushToggleBtn" class="secondary-btn intro-replay-btn">🔔 Nastavit připomínku</button>
-        <div id="pushStatusText" class="push-status muted"></div>
+        <div class="section-head"><div><span class="eyebrow">UPOZORNĚNÍ</span><h2>Co ti má Proplet připomenout?</h2></div></div>
+        <p class="muted push-copy">Každý typ upozornění ovládáš zvlášť. Současný souhlas s Denní výzvou jsme na nic dalšího nerozšířili.</p>
+        <div class="notification-pref-list">
+          <div class="notification-pref-row">
+            <div class="notification-pref-icon">☀️</div>
+            <div class="notification-pref-copy"><strong>Denní výzva</strong><small>Ráno připomeň jen nevyřešenou Denní výzvu.</small><div id="pushStatusText" class="push-status muted"></div></div>
+            <button id="pushToggleBtn" class="secondary-btn notification-pref-btn">Nastavit</button>
+          </div>
+          <div class="notification-pref-row">
+            <div class="notification-pref-icon">✨</div>
+            <div class="notification-pref-copy"><strong>Nové Proplety</strong><small>Dej mi vědět, když v pondělí přibude nová týdenní várka.</small><div id="contentPushStatusText" class="push-status muted"></div></div>
+            <button id="contentPushToggleBtn" class="secondary-btn notification-pref-btn">Nastavit</button>
+          </div>
+        </div>
       </div>
 
       <div id="installAppCard" class="card settings-card install-app-card hidden">
