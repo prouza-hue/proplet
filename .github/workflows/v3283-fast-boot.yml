@@ -1,0 +1,56 @@
+name: Validate Proplet v3.28.3 fast boot
+
+on:
+  push:
+    branches:
+      - agent/v3283-fast-boot
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3283-fast-boot
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply hotfix
+        run: python .release/v3283_fast_boot.py
+      - name: Validate runtime
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          node --check public/sw.js
+          python - <<'PY'
+          from pathlib import Path
+          app=Path('public/app.js').read_text(encoding='utf-8')
+          sw=Path('public/sw.js').read_text(encoding='utf-8')
+          server=Path('server.py').read_text(encoding='utf-8')
+          checks={
+            'client version': "const APP_VERSION='3.28.3';" in app,
+            'server version': 'APP_VERSION = "3.28.3"' in server,
+            'expected puzzle version': 'const EXPECTED_PUZZLE_DB_VERSION=9;' in app,
+            'cache-first client boot': "const cached=await caches.match(url,{ignoreSearch:true});" in app,
+            'loading state': 'Načítám úrovně…' in app,
+            'background refresh': "fetch(url,{cache:'no-store'})" in app and 'renderDaily();renderFree()' in app,
+            'boot helper': 'try{puzzleDB=await loadPuzzleDatabase()}' in app,
+            'sw cache': "proplet-v3.28.3-fast-puzzle-boot" in sw,
+            'sw puzzle special case': "if(u.pathname==='/puzzles.json')" in sw and 'if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}' in sw,
+            'api remains uncached': "if(u.pathname.startsWith('/api/'))return;" in sw,
+          }
+          missing=[name for name,ok in checks.items() if not ok]
+          if missing: raise SystemExit('FAILED: '+', '.join(missing))
+          print('All v3.28.3 fast boot checks passed')
+          PY
+      - name: Commit validated runtime
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add public/app.js public/sw.js server.py
+          git commit -m 'Proplet v3.28.3 speed up puzzle boot'
+          git push origin HEAD:agent/v3283-fast-boot
