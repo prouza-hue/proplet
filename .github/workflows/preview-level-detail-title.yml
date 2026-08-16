@@ -1,0 +1,37 @@
+name: Preview level detail title fix
+on:
+  push:
+    branches: [family-preview]
+permissions:
+  contents: write
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[level-detail-built]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python .release/apply_v3313_level_detail_title.py
+      - run: node --check public/app.js
+      - run: python -m py_compile server.py
+      - name: Validate level detail title invariants
+        run: |
+          grep -q "const APP_VERSION='3.31.3-preview.1'" public/app.js
+          grep -Fq "$('#levelDetailTitle').textContent=\`${DIFF[diff].label} ${puzzle.meta?.level||''}\`.trim();" public/app.js
+          ! grep -Fq "$('#levelDetailTitle').textContent=\`${DIFF[diff].icon}" public/app.js
+          grep -q "reloadOnServiceWorkerChange=false" public/app.js
+          grep -q "if(mode==='starter'){if(action==='menu'){nav('free',{replace:true});return}startDaily();return}" public/app.js
+          grep -q "proplet-v3.31.3-preview.1-level-detail-title" public/sw.js
+          grep -q 'APP_VERSION = "3.31.3-preview.1"' server.py
+      - name: Commit built preview
+        run: |
+          git config user.name "prouza-hue"
+          git config user.email "prouza@gmail.com"
+          git add public/app.js public/sw.js server.py
+          git commit -m "Preview v3.31.3 level detail title [level-detail-built]"
+          git push
