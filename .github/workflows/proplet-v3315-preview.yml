@@ -40,7 +40,8 @@ jobs:
           node --check public/sw.js
           git diff --check
           git diff --quiet -- data/puzzles.json public/puzzles.json
-          grep -q "caches.match('/puzzles.json')" public/app.js
+          grep -q "caches.match(url,{ignoreSearch:true})" public/app.js
+          grep -q "fetch(url,{cache:'no-store'})" public/app.js
           grep -q "refresh=fetch(e.request,{cache:'no-store'})" public/sw.js
           grep -q '"newPlayerFunnelVersion": 2' server.py
           grep -q "starter_hard_choice_shown" server.py
