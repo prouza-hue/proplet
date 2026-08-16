@@ -60,7 +60,7 @@ jobs:
             .release/apply_v330.py .release/harden_v330.py \
             .release/split_rolling_delta_v330.py .release/preserve_legacy_push_v330.py \
             .release/separate_rolling_store_v330.py .release/final_polish_v330.py \
-            .release/validate_v330.py
+            .release/validate_v330.py .release/validate_lifecycle_v330.py
           node --check public/app.js
           python -m json.tool vercel.json >/dev/null
           python -m json.tool data/rolling_content_v1.json >/dev/null
@@ -69,7 +69,9 @@ jobs:
         run: python tools/audit_rolling_content.py
 
       - name: Runtime, consent, cache and release-gating invariants
-        run: python .release/validate_v330.py
+        run: |
+          python .release/validate_v330.py
+          python .release/validate_lifecycle_v330.py
 
       - name: Show reviewable diff stats
         run: |
