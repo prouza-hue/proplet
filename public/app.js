@@ -1,4 +1,4 @@
-const APP_VERSION='3.28.2';
+const APP_VERSION='3.28.3';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -1223,9 +1223,36 @@ function bind(){
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){pauseGameClock('hidden');sendAttemptCheckpoint('leave')}else{resumeGameClock();if(getQueue().length)syncQueue({announce:false})}});window.addEventListener('blur',()=>pauseGameClock('blur'));window.addEventListener('focus',resumeGameClock);window.addEventListener('pagehide',()=>{pauseGameClock('pagehide');sendAttemptCheckpoint('leave')});
 }
 
+const EXPECTED_PUZZLE_DB_VERSION=9;
+function showPuzzleBootLoading(){
+ const dailyMeta=$('#dailyMeta');if(dailyMeta&&!dailyMeta.textContent)dailyMeta.textContent='Načítám dnešní výzvu…';
+ const grid=$('#difficultyCards');if(grid&&!grid.children.length)grid.innerHTML='<div class="card" style="grid-column:1/-1;padding:24px"><strong>Načítám úrovně…</strong><p class="muted" style="margin:6px 0 0">Připravuju herní banku.</p></div>';
+}
+async function loadPuzzleDatabase(){
+ const url='/puzzles.json';
+ if('caches' in window){
+  try{
+   const cached=await caches.match(url,{ignoreSearch:true});
+   if(cached){
+    const data=await cached.clone().json();
+    if(data?.version===EXPECTED_PUZZLE_DB_VERSION){
+     // Start neblokujeme sítí. Aktuální banku si tiše ověříme na pozadí;
+     // service worker zároveň uloží čerstvou odpověď do své cache.
+     fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{
+      if(fresh?.version===EXPECTED_PUZZLE_DB_VERSION){puzzleDB=fresh;renderDaily();renderFree()}
+     }).catch(()=>{});
+     return data;
+    }
+   }
+  }catch{}
+ }
+ const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');
+ const data=await r.json();if(data?.version!==EXPECTED_PUZZLE_DB_VERSION)throw new Error('puzzle-db-version');return data;
+}
+
 async function boot(){
- applyTheme(getSettings().theme);
- try{puzzleDB=await fetch('/puzzles.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error();return r.json()})}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Spusť aplikaci přes server podle README.</p></main>';return}
+ applyTheme(getSettings().theme);showPuzzleBootLoading();
+ try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();bind();bindClientErrorReporting();initNavigation();updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');renderDaily();renderFree();renderProfile();renderInstallUI();syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>openOnboarding(false),260);
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily()}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
