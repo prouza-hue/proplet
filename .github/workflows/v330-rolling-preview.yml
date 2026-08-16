@@ -6,6 +6,10 @@ on:
       - preview/v330-rolling-content
   workflow_dispatch:
 
+concurrency:
+  group: v330-rolling-preview
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -26,10 +30,13 @@ jobs:
       - name: Install runtime dependencies
         run: pip install -r requirements.txt
 
+      - name: Keep generated JSON readable
+        run: python .release/preserve_json_format_v330.py
+
       - name: Generate 13-week rolling reserve
         run: python tools/generate_rolling_content.py
 
-      - name: Apply and harden preview runtime
+      - name: Apply final preview runtime
         run: |
           python .release/apply_v330.py
           python .release/harden_v330.py
@@ -38,133 +45,26 @@ jobs:
 
       - name: Syntax checks
         run: |
-          python -m py_compile server.py tools/generate_rolling_content.py tools/audit_rolling_content.py .release/apply_v330.py .release/harden_v330.py .release/split_rolling_delta_v330.py .release/preserve_legacy_push_v330.py
+          python -m py_compile server.py \
+            tools/generate_rolling_content.py tools/audit_rolling_content.py \
+            .release/apply_v330.py .release/harden_v330.py \
+            .release/split_rolling_delta_v330.py .release/preserve_legacy_push_v330.py \
+            .release/preserve_json_format_v330.py .release/validate_v330.py
           node --check public/app.js
           python -m json.tool vercel.json >/dev/null
           python -m json.tool data/puzzles.json >/dev/null
           python -m json.tool public/puzzles.json >/dev/null
 
-      - name: Independent puzzle QA
+      - name: Independent exact-cover and content QA
         run: python tools/audit_rolling_content.py
 
-      - name: Release invariants
+      - name: Runtime, consent, cache and release-gating invariants
+        run: python .release/validate_v330.py
+
+      - name: Show reviewable diff stats
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import json, re
-
-          root = Path('.')
-          app = (root/'public/app.js').read_text(encoding='utf-8')
-          sw = (root/'public/sw.js').read_text(encoding='utf-8')
-          server = (root/'server.py').read_text(encoding='utf-8')
-          html = (root/'public/index.html').read_text(encoding='utf-8')
-          css = (root/'public/styles.css').read_text(encoding='utf-8')
-          mig = (root/'SUPABASE_MIGRATION_V3_30.sql').read_text(encoding='utf-8')
-          ver = json.loads((root/'vercel.json').read_text(encoding='utf-8'))
-          data = json.loads((root/'data/puzzles.json').read_text(encoding='utf-8'))
-          public = json.loads((root/'public/puzzles.json').read_text(encoding='utf-8'))
-
-          assert "const APP_VERSION='3.30.0-preview.1'" in app
-          assert 'APP_VERSION = "3.30.0-preview.1"' in server
-          assert 'const EXPECTED_PUZZLE_DB_VERSION=10' in app
-          assert '@app.get("/api/rolling-content")' in server
-          assert '@app.get("/api/puzzles")' not in server
-          assert 'released_rolling_payload' in server
-          assert 'is_puzzle_released' in server
-          assert 'zatím nevydaná úroveň' in server
-          assert 'VERCEL_ENV == "production"' in server
-          assert 'X-Proplet-Preview-As-Of' in app
-
-          # Critical v3.28.3 fast-boot invariant. Base puzzle bank remains a static CDN file;
-          # weekly content arrives as a small separately cached delta.
-          assert 'showPuzzleBootLoading()' in app
-          assert "const url='/puzzles.json'" in app
-          assert "caches.match(url,{ignoreSearch:true})" in app
-          assert "fetch(url,{cache:'no-store'})" in app
-          assert 'function contentWeekKey' in app
-          assert 'function rollingContentUrl' in app
-          assert "new URLSearchParams({week})" in app
-          assert "caches.match('/api/rolling-content',{ignoreSearch:true})" in app
-          assert 'function mergeRollingContent' in app
-          assert 'refreshRollingContent().catch(()=>{})' in app
-          assert "u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'" in sw
-          assert 'Monday week= cache key' in sw
-          assert "if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}" in sw
-          assert "if(u.pathname.startsWith('/api/'))return" in sw
-
-          # Public preview may simulate future weeks but may never write that gameplay into
-          # the production Supabase project shared by the preview environment.
-          assert "if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return" in app
-          assert 'if(CONTENT_PREVIEW_DATE||!rec?.attemptId' in app
-          assert 'if(CONTENT_PREVIEW_DATE)return;api(\'/api/product-event\'' in app
-          assert "simulovaném content preview hodnocení neodesíláme" in app
-
-          # Static base/fallback contains zero future reserve puzzles.
-          assert data['version'] == 10 == public['version']
-          assert {d:len(public['free'][d]) for d in ('easy','medium','hard','hardcore')} == {d:200 for d in ('easy','medium','hard','hardcore')}
-          assert sum(len(data['free'][d])-200 for d in ('easy','medium','hard','hardcore')) == 65
-          rolling = [p for d in ('easy','medium','hard','hardcore') for p in data['free'][d] if p.get('meta',{}).get('rollingContent')]
-          assert len(rolling) == 65
-          assert all(p['meta'].get('wideVerifiedUnique') is True for p in rolling)
-          assert all(p['meta'].get('wideUniquenessDictionarySize') == 12000 for p in rolling)
-          assert all(not p.get('meta',{}).get('rollingContent') for d in ('easy','medium','hard','hardcore') for p in public['free'][d])
-
-          # Consent isolation: existing subscriptions stay Daily ON / Content OFF. A stale
-          # pre-v3.30 client also cannot erase a newer Content preference on the same device.
-          assert re.search(r'update public\.push_subscriptions set daily_enabled = true where daily_enabled is null', mig, re.I)
-          assert re.search(r'update public\.push_subscriptions set content_enabled = false where content_enabled is null', mig, re.I)
-          assert 'push_delivery_log' in mig
-          assert 'check (level >= 1)' in mig
-          assert 'level between 1 and 200' not in mig.lower()
-          assert 'legacy_client = payload.daily_enabled is None and payload.content_enabled is None' in server
-          assert 'content_enabled = bool(existing[0].get("content_enabled", False))' in server
-          assert 'content_enabled' in server and 'daily_enabled' in server
-          assert '@app.get("/api/cron/content-push")' in server
-          assert 'push_delivery_log' in server
-
-          # UX and legacy milestones.
-          assert 'id="contentPushToggleBtn"' in html
-          assert 'id="newContentBanner"' in html
-          assert '5 nových Propletů' in app
-          assert 'fresh-level-badge' in css
-          assert 'Dokonči všech 200' not in app
-          assert 'continueLatestContent' in app
-          assert "contentBatchId:options.contentBatchId||null" in app
-          assert 'latestContentUnplayed().filter' in app
-
-          crons = {(x['path'],x['schedule']) for x in ver.get('crons',[])}
-          assert ('/api/cron/daily-push','0 7 * * *') in crons
-          assert ('/api/cron/content-push','0 16 * * 1') in crons
-          print('STATIC INVARIANTS PASS')
-          PY
-
-      - name: Server release-gating tests
-        run: |
-          python - <<'PY'
-          from datetime import date
-          import server
-
-          before = server.released_rolling_payload(date(2026,8,23))
-          first = server.released_rolling_payload(date(2026,8,24))
-          second = server.released_rolling_payload(date(2026,8,31))
-          end = server.released_rolling_payload(date(2026,11,16))
-
-          def delta_counts(x):
-              return {d:len(x['puzzles'][d]) for d in ('easy','medium','hard','hardcore')}
-
-          assert delta_counts(before) == {'easy':0,'medium':0,'hard':0,'hardcore':0}
-          assert delta_counts(first) == {'easy':2,'medium':1,'hard':1,'hardcore':1}
-          assert delta_counts(second) == {'easy':3,'medium':3,'hard':2,'hardcore':2}
-          assert delta_counts(end) == {'easy':17,'medium':16,'hard':16,'hardcore':16}
-          assert first['latestBatch']['count'] == 5
-          assert first['latestBatch']['extraDifficulty'] == 'easy'
-          assert first['nextRelease'] == '2026-08-31'
-          first_ids = {p['id'] for bank in first['puzzles'].values() for p in bank}
-          assert 'g2-e-201' in first_ids and 'g2-e-202' in first_ids
-          assert 'g2-m-202' not in first_ids
-          assert 'batches' not in first.get('meta', {})
-          print('ROLLING DELTA GATING PASS', delta_counts(first), delta_counts(second), delta_counts(end))
-          PY
+          git diff --stat
+          git diff --numstat -- data/puzzles.json public/puzzles.json
 
       - name: Commit validated preview runtime
         run: |
