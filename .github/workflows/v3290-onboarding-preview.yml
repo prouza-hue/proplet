@@ -1,0 +1,57 @@
+name: Validate Proplet v3.29 onboarding preview
+
+on:
+  push:
+    branches:
+      - preview/onboarding-game-modes-v3290
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/onboarding-game-modes-v3290
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply preview patch
+        run: python .release/v3290_onboarding_preview.py
+      - name: Validate runtime
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          from pathlib import Path
+          app=Path('public/app.js').read_text(encoding='utf-8')
+          css=Path('public/styles.css').read_text(encoding='utf-8')
+          sw=Path('public/sw.js').read_text(encoding='utf-8')
+          server=Path('server.py').read_text(encoding='utf-8')
+          checks={
+            'new first onboarding step': "title:'Co je Proplet'" in app,
+            'daily explanation': 'Každý den nový Proplet' in app,
+            'free explanation': 'Stovky dalších úrovní' in app and 'VOLNÁ HRA' in app,
+            'custom first CTA': "cta:'Ukázat mi, jak se hraje'" in app,
+            'starter daily action': "Hrát dnešní výzvu ☀️" in app,
+            'starter free action': "Vybrat volnou hru" in app and "nav('free',{replace:true})" in app,
+            'mode card CSS': '.onboard-game-modes' in css and '.onboard-free-icons' in css,
+            'dark mode CSS': 'html[data-theme=\\"dark\\"] .onboard-mode-card' in css,
+            'client version': "const APP_VERSION='3.29.0-preview.1';" in app,
+            'server version': 'APP_VERSION = "3.29.0-preview.1"' in server,
+            'cache version': "proplet-v3.29.0-preview.1-onboarding-modes" in sw,
+          }
+          missing=[name for name,ok in checks.items() if not ok]
+          if missing: raise SystemExit('FAILED: '+', '.join(missing))
+          print('All onboarding preview checks passed')
+          PY
+      - name: Commit validated preview runtime
+        run: |
+          git config user.name 'Proplet Preview Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add public/app.js public/styles.css public/sw.js server.py
+          git commit -m 'Proplet v3.29.0 preview onboarding game modes'
+          git push origin HEAD:preview/onboarding-game-modes-v3290
