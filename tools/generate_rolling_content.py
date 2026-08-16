@@ -201,7 +201,7 @@ def main() -> None:
     }
     # Bump schema version because clients now understand release metadata and /api/puzzles.
     data["version"] = 10
-    DATA.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # Keep the public static fallback deliberately free of unreleased reserve content.
     baseline["version"] = 10
@@ -209,7 +209,7 @@ def main() -> None:
         k: v for k, v in data["rollingContent"].items() if k != "batches"
     }
     baseline["rollingContent"]["batches"] = []
-    PUBLIC.write_text(json.dumps(baseline, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    PUBLIC.write_text(json.dumps(baseline, ensure_ascii=False, indent=2), encoding="utf-8")
 
     summary = {
         "generated": len(generated),

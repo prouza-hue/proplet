@@ -1,0 +1,531 @@
+{
+  "generated": 65,
+  "weeks": 13,
+  "firstRelease": "2026-08-24",
+  "reservedThrough": "2026-11-16",
+  "finalCounts": {
+    "easy": 217,
+    "medium": 216,
+    "hard": 216,
+    "hardcore": 216
+  },
+  "generatedCounts": {
+    "easy": 17,
+    "medium": 16,
+    "hard": 16,
+    "hardcore": 16
+  },
+  "broadAmbiguityRejects": {
+    "easy": 2
+  },
+  "signatureRejects": {},
+  "batches": [
+    {
+      "id": "2026-W35",
+      "availableFrom": "2026-08-24",
+      "count": 5,
+      "extraDifficulty": "easy",
+      "byDifficulty": {
+        "easy": 2,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-201",
+          "difficulty": "easy",
+          "level": 201
+        },
+        {
+          "id": "g2-m-201",
+          "difficulty": "medium",
+          "level": 201
+        },
+        {
+          "id": "g2-h-201",
+          "difficulty": "hard",
+          "level": 201
+        },
+        {
+          "id": "g2-x-201",
+          "difficulty": "hardcore",
+          "level": 201
+        },
+        {
+          "id": "g2-e-202",
+          "difficulty": "easy",
+          "level": 202
+        }
+      ]
+    },
+    {
+      "id": "2026-W36",
+      "availableFrom": "2026-08-31",
+      "count": 5,
+      "extraDifficulty": "medium",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 2,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-203",
+          "difficulty": "easy",
+          "level": 203
+        },
+        {
+          "id": "g2-m-202",
+          "difficulty": "medium",
+          "level": 202
+        },
+        {
+          "id": "g2-h-202",
+          "difficulty": "hard",
+          "level": 202
+        },
+        {
+          "id": "g2-x-202",
+          "difficulty": "hardcore",
+          "level": 202
+        },
+        {
+          "id": "g2-m-203",
+          "difficulty": "medium",
+          "level": 203
+        }
+      ]
+    },
+    {
+      "id": "2026-W37",
+      "availableFrom": "2026-09-07",
+      "count": 5,
+      "extraDifficulty": "hard",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 1,
+        "hard": 2,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-204",
+          "difficulty": "easy",
+          "level": 204
+        },
+        {
+          "id": "g2-m-204",
+          "difficulty": "medium",
+          "level": 204
+        },
+        {
+          "id": "g2-h-203",
+          "difficulty": "hard",
+          "level": 203
+        },
+        {
+          "id": "g2-x-203",
+          "difficulty": "hardcore",
+          "level": 203
+        },
+        {
+          "id": "g2-h-204",
+          "difficulty": "hard",
+          "level": 204
+        }
+      ]
+    },
+    {
+      "id": "2026-W38",
+      "availableFrom": "2026-09-14",
+      "count": 5,
+      "extraDifficulty": "hardcore",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 2
+      },
+      "levels": [
+        {
+          "id": "g2-e-205",
+          "difficulty": "easy",
+          "level": 205
+        },
+        {
+          "id": "g2-m-205",
+          "difficulty": "medium",
+          "level": 205
+        },
+        {
+          "id": "g2-h-205",
+          "difficulty": "hard",
+          "level": 205
+        },
+        {
+          "id": "g2-x-204",
+          "difficulty": "hardcore",
+          "level": 204
+        },
+        {
+          "id": "g2-x-205",
+          "difficulty": "hardcore",
+          "level": 205
+        }
+      ]
+    },
+    {
+      "id": "2026-W39",
+      "availableFrom": "2026-09-21",
+      "count": 5,
+      "extraDifficulty": "easy",
+      "byDifficulty": {
+        "easy": 2,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-206",
+          "difficulty": "easy",
+          "level": 206
+        },
+        {
+          "id": "g2-m-206",
+          "difficulty": "medium",
+          "level": 206
+        },
+        {
+          "id": "g2-h-206",
+          "difficulty": "hard",
+          "level": 206
+        },
+        {
+          "id": "g2-x-206",
+          "difficulty": "hardcore",
+          "level": 206
+        },
+        {
+          "id": "g2-e-207",
+          "difficulty": "easy",
+          "level": 207
+        }
+      ]
+    },
+    {
+      "id": "2026-W40",
+      "availableFrom": "2026-09-28",
+      "count": 5,
+      "extraDifficulty": "medium",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 2,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-208",
+          "difficulty": "easy",
+          "level": 208
+        },
+        {
+          "id": "g2-m-207",
+          "difficulty": "medium",
+          "level": 207
+        },
+        {
+          "id": "g2-h-207",
+          "difficulty": "hard",
+          "level": 207
+        },
+        {
+          "id": "g2-x-207",
+          "difficulty": "hardcore",
+          "level": 207
+        },
+        {
+          "id": "g2-m-208",
+          "difficulty": "medium",
+          "level": 208
+        }
+      ]
+    },
+    {
+      "id": "2026-W41",
+      "availableFrom": "2026-10-05",
+      "count": 5,
+      "extraDifficulty": "hard",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 1,
+        "hard": 2,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-209",
+          "difficulty": "easy",
+          "level": 209
+        },
+        {
+          "id": "g2-m-209",
+          "difficulty": "medium",
+          "level": 209
+        },
+        {
+          "id": "g2-h-208",
+          "difficulty": "hard",
+          "level": 208
+        },
+        {
+          "id": "g2-x-208",
+          "difficulty": "hardcore",
+          "level": 208
+        },
+        {
+          "id": "g2-h-209",
+          "difficulty": "hard",
+          "level": 209
+        }
+      ]
+    },
+    {
+      "id": "2026-W42",
+      "availableFrom": "2026-10-12",
+      "count": 5,
+      "extraDifficulty": "hardcore",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 2
+      },
+      "levels": [
+        {
+          "id": "g2-e-210",
+          "difficulty": "easy",
+          "level": 210
+        },
+        {
+          "id": "g2-m-210",
+          "difficulty": "medium",
+          "level": 210
+        },
+        {
+          "id": "g2-h-210",
+          "difficulty": "hard",
+          "level": 210
+        },
+        {
+          "id": "g2-x-209",
+          "difficulty": "hardcore",
+          "level": 209
+        },
+        {
+          "id": "g2-x-210",
+          "difficulty": "hardcore",
+          "level": 210
+        }
+      ]
+    },
+    {
+      "id": "2026-W43",
+      "availableFrom": "2026-10-19",
+      "count": 5,
+      "extraDifficulty": "easy",
+      "byDifficulty": {
+        "easy": 2,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-211",
+          "difficulty": "easy",
+          "level": 211
+        },
+        {
+          "id": "g2-m-211",
+          "difficulty": "medium",
+          "level": 211
+        },
+        {
+          "id": "g2-h-211",
+          "difficulty": "hard",
+          "level": 211
+        },
+        {
+          "id": "g2-x-211",
+          "difficulty": "hardcore",
+          "level": 211
+        },
+        {
+          "id": "g2-e-212",
+          "difficulty": "easy",
+          "level": 212
+        }
+      ]
+    },
+    {
+      "id": "2026-W44",
+      "availableFrom": "2026-10-26",
+      "count": 5,
+      "extraDifficulty": "medium",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 2,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-213",
+          "difficulty": "easy",
+          "level": 213
+        },
+        {
+          "id": "g2-m-212",
+          "difficulty": "medium",
+          "level": 212
+        },
+        {
+          "id": "g2-h-212",
+          "difficulty": "hard",
+          "level": 212
+        },
+        {
+          "id": "g2-x-212",
+          "difficulty": "hardcore",
+          "level": 212
+        },
+        {
+          "id": "g2-m-213",
+          "difficulty": "medium",
+          "level": 213
+        }
+      ]
+    },
+    {
+      "id": "2026-W45",
+      "availableFrom": "2026-11-02",
+      "count": 5,
+      "extraDifficulty": "hard",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 1,
+        "hard": 2,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-214",
+          "difficulty": "easy",
+          "level": 214
+        },
+        {
+          "id": "g2-m-214",
+          "difficulty": "medium",
+          "level": 214
+        },
+        {
+          "id": "g2-h-213",
+          "difficulty": "hard",
+          "level": 213
+        },
+        {
+          "id": "g2-x-213",
+          "difficulty": "hardcore",
+          "level": 213
+        },
+        {
+          "id": "g2-h-214",
+          "difficulty": "hard",
+          "level": 214
+        }
+      ]
+    },
+    {
+      "id": "2026-W46",
+      "availableFrom": "2026-11-09",
+      "count": 5,
+      "extraDifficulty": "hardcore",
+      "byDifficulty": {
+        "easy": 1,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 2
+      },
+      "levels": [
+        {
+          "id": "g2-e-215",
+          "difficulty": "easy",
+          "level": 215
+        },
+        {
+          "id": "g2-m-215",
+          "difficulty": "medium",
+          "level": 215
+        },
+        {
+          "id": "g2-h-215",
+          "difficulty": "hard",
+          "level": 215
+        },
+        {
+          "id": "g2-x-214",
+          "difficulty": "hardcore",
+          "level": 214
+        },
+        {
+          "id": "g2-x-215",
+          "difficulty": "hardcore",
+          "level": 215
+        }
+      ]
+    },
+    {
+      "id": "2026-W47",
+      "availableFrom": "2026-11-16",
+      "count": 5,
+      "extraDifficulty": "easy",
+      "byDifficulty": {
+        "easy": 2,
+        "medium": 1,
+        "hard": 1,
+        "hardcore": 1
+      },
+      "levels": [
+        {
+          "id": "g2-e-216",
+          "difficulty": "easy",
+          "level": 216
+        },
+        {
+          "id": "g2-m-216",
+          "difficulty": "medium",
+          "level": 216
+        },
+        {
+          "id": "g2-h-216",
+          "difficulty": "hard",
+          "level": 216
+        },
+        {
+          "id": "g2-x-216",
+          "difficulty": "hardcore",
+          "level": 216
+        },
+        {
+          "id": "g2-e-217",
+          "difficulty": "easy",
+          "level": 217
+        }
+      ]
+    }
+  ]
+}

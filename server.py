@@ -37,6 +37,7 @@ VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "").strip()
 VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
 VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "https://proplet-nine.vercel.app").strip()
 CRON_SECRET = os.environ.get("CRON_SECRET", "").strip()
+VERCEL_ENV = os.environ.get("VERCEL_ENV", "").strip().lower()
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -53,7 +54,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.29.0"
+APP_VERSION = "3.30.0-preview.1"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -93,7 +94,9 @@ async def launch_safety_middleware(request: Request, call_next):
             )
     response = await call_next(request)
     response.headers["X-Request-ID"] = request_id
-    if request.url.path.startswith("/api/"):
+    if request.url.path == "/api/rolling-content":
+        response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=86400"
+    elif request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
     return response
 
@@ -291,6 +294,9 @@ class PushSubscriptionCreate(BaseModel):
     p256dh: str = Field(min_length=20, max_length=512)
     auth: str = Field(min_length=8, max_length=256)
     user_agent: Optional[str] = Field(default=None, max_length=300)
+    # None means an older client: preserve the historical Daily-only semantics.
+    daily_enabled: Optional[bool] = None
+    content_enabled: Optional[bool] = None
 
 
 class PushUnsubscribe(BaseModel):
@@ -849,6 +855,104 @@ def load_puzzles() -> dict:
     return json.loads(PUZZLES_PATH.read_text(encoding="utf-8"))
 
 
+def _parse_content_date(value: Optional[str]) -> Optional[date]:
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def effective_content_date(request: Optional[Request] = None, requested: Optional[str] = None) -> date:
+    """Production always uses Prague today; preview deployments may simulate a release date."""
+    actual = current_prague_date()
+    if VERCEL_ENV == "production":
+        return actual
+    candidate = requested
+    if not candidate and request is not None:
+        candidate = request.headers.get("x-proplet-preview-as-of")
+    return _parse_content_date(candidate) or actual
+
+
+def puzzle_release_date(puzzle: dict) -> Optional[date]:
+    return _parse_content_date((puzzle.get("meta") or {}).get("availableFrom"))
+
+
+def is_puzzle_released(puzzle: dict, as_of: Optional[date] = None) -> bool:
+    released = puzzle_release_date(puzzle)
+    return released is None or released <= (as_of or current_prague_date())
+
+
+def released_free_bank(difficulty: str, as_of: Optional[date] = None) -> list[dict]:
+    return [p for p in load_puzzles().get("free", {}).get(difficulty, []) if is_puzzle_released(p, as_of)]
+
+
+def _released_batches(as_of: date) -> tuple[list[dict], Optional[str]]:
+    rolling = load_puzzles().get("rollingContent") or {}
+    batches = list(rolling.get("batches") or [])
+    released = [b for b in batches if (_parse_content_date(b.get("availableFrom")) or date.max) <= as_of]
+    future = [b for b in batches if (_parse_content_date(b.get("availableFrom")) or date.min) > as_of]
+    released.sort(key=lambda b: str(b.get("availableFrom") or ""))
+    future.sort(key=lambda b: str(b.get("availableFrom") or ""))
+    return released, (future[0].get("availableFrom") if future else None)
+
+
+def released_puzzle_payload(as_of: date) -> dict:
+    source = load_puzzles()
+    payload = {k: v for k, v in source.items() if k not in {"free", "rollingContent"}}
+    payload["free"] = {d: released_free_bank(d, as_of) for d in ("easy", "medium", "hard", "hardcore")}
+    rolling = dict(source.get("rollingContent") or {})
+    rolling.pop("batches", None)  # never ship future puzzle IDs or batch contents to clients
+    released_batches, next_release = _released_batches(as_of)
+    latest = released_batches[-1] if released_batches else None
+    payload["rollingContent"] = rolling
+    payload["contentStatus"] = {
+        "asOf": as_of.isoformat(),
+        "latestBatch": latest,
+        "nextRelease": next_release,
+        "availableFreeCounts": {d: len(payload["free"][d]) for d in ("easy", "medium", "hard", "hardcore")},
+    }
+    return payload
+
+
+def released_rolling_payload(as_of: date) -> dict:
+    """Only the release-gated Free additions; the large base bank stays on the CDN."""
+    source = load_puzzles()
+    released_batches, next_release = _released_batches(as_of)
+    latest = released_batches[-1] if released_batches else None
+    additions = {
+        d: [
+            p for p in source.get("free", {}).get(d, [])
+            if (p.get("meta") or {}).get("rollingContent") and is_puzzle_released(p, as_of)
+        ]
+        for d in ("easy", "medium", "hard", "hardcore")
+    }
+    rolling = dict(source.get("rollingContent") or {})
+    rolling.pop("batches", None)
+    return {
+        "version": int(rolling.get("version") or 0),
+        "asOf": as_of.isoformat(),
+        "latestBatch": latest,
+        "nextRelease": next_release,
+        "puzzles": additions,
+        "availableFreeCounts": {d: 200 + len(additions[d]) for d in additions},
+        "meta": rolling,
+    }
+
+
+def push_preferences_schema_ready() -> bool:
+    if not supabase_ready():
+        return False
+    try:
+        db_request("GET", "push_subscriptions", params={"select": "id,daily_enabled,content_enabled", "limit": "1"})
+        db_request("GET", "push_delivery_log", params={"select": "id", "limit": "1"})
+        return True
+    except HTTPException:
+        return False
+
+
+
 def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Optional[dict]:
     """Resolve a Free puzzle to its generation and stable difficulty/level slot."""
     data = load_puzzles()
@@ -1128,6 +1232,93 @@ def admin_home():
     return RedirectResponse(url="/admin.html", status_code=307)
 
 
+
+
+def _reserve_push_delivery(sub: dict, event_key: str, category: str) -> Optional[str]:
+    delivery_id = str(uuid.uuid4())
+    try:
+        db_insert("push_delivery_log", {
+            "id": delivery_id,
+            "subscription_id": sub["id"],
+            "player_id": sub["player_id"],
+            "event_key": event_key,
+            "category": category,
+            "status": "pending",
+            "created_at": datetime.now(TZ).isoformat(),
+        })
+        return delivery_id
+    except HTTPException as exc:
+        if exc.status_code == 409:
+            return None
+        raise
+
+
+@app.get("/api/cron/content-push")
+def cron_content_push(request: Request, authorization: Optional[str] = Header(default=None)):
+    if not CRON_SECRET or authorization != f"Bearer {CRON_SECRET}":
+        raise HTTPException(401, "Neplatné cron oprávnění")
+    today = current_prague_date()
+    released, _ = _released_batches(today)
+    batch = released[-1] if released else None
+    if not batch:
+        return {"ok": True, "sent": 0, "message": "Zatím není žádný rolling content batch"}
+    release_date = _parse_content_date(batch.get("availableFrom"))
+    # A weekly cron may be retried later in the same release week, but must never announce
+    # an older drop after the next Monday has begun.
+    if not release_date or not (0 <= (today - release_date).days <= 6):
+        return {"ok": True, "sent": 0, "message": "Tento týden není nový content drop"}
+    if not push_ready():
+        return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný"}
+    if not push_preferences_schema_ready():
+        return {"ok": False, "sent": 0, "message": "Notifications v2 migrace ještě není nasazená", "migrationReady": False}
+    subscriptions = db_request("GET", "push_subscriptions", params={"select": "*", "content_enabled": "eq.true"})
+    event_key = f"content:{batch.get('id')}"
+    payload = json.dumps({
+        "title": "✨ 5 nových Propletů",
+        "body": "Nová týdenní várka je venku. Jedna úroveň od každé obtížnosti a jedna navíc.",
+        "url": f"/?open=free&new={batch.get('id')}",
+        "tag": f"proplet-{event_key}",
+    }, ensure_ascii=False)
+    sent = failed = removed = duplicate = 0
+    for sub in subscriptions:
+        delivery_id = _reserve_push_delivery(sub, event_key, "content")
+        if not delivery_id:
+            duplicate += 1
+            continue
+        info = {"endpoint": sub.get("endpoint"), "keys": {"p256dh": sub.get("p256dh"), "auth": sub.get("auth")}}
+        try:
+            webpush(subscription_info=info, data=payload, vapid_private_key=VAPID_PRIVATE_KEY, vapid_claims={"sub": VAPID_SUBJECT}, ttl=86400)
+        except Exception as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            try:
+                db_delete("push_delivery_log", id=delivery_id)  # send did not succeed; a later cron may retry
+            except Exception:
+                pass
+            if status in (404, 410):
+                try:
+                    db_delete("push_subscriptions", id=sub["id"]); removed += 1
+                except Exception:
+                    pass
+            else:
+                failed += 1
+                logger.warning("Content push failed for subscription %s: %s", sub.get("id"), exc)
+            continue
+        sent += 1
+        try:
+            db_update("push_delivery_log", {"id": delivery_id}, {"status": "sent", "sent_at": datetime.now(TZ).isoformat()})
+        except Exception as exc:
+            # Keep the unique pending reservation. It is safer to miss bookkeeping than to
+            # duplicate a notification that the push provider already accepted.
+            logger.warning("Content push sent but delivery ledger update failed for %s: %s", sub.get("id"), exc)
+    return {
+        "ok": failed == 0,
+        "batch": batch.get("id"),
+        "releaseDate": batch.get("availableFrom"),
+        "sent": sent, "failed": failed, "removed": removed, "duplicate": duplicate,
+        "migrationReady": True,
+    }
+
+
 @app.get("/api/health")
 def health():
     puzzle_file = PUZZLES_PATH.exists()
@@ -1184,6 +1375,12 @@ def health():
         "launchDashboard": True,
         "singleMemberTeams": True,
         "xpEconomyVersion": 2,
+        "rollingContentVersion": int((data.get("rollingContent") or {}).get("version") or 0),
+        "rollingContentCadence": (data.get("rollingContent") or {}).get("cadence"),
+        "rollingContentFirstRelease": (data.get("rollingContent") or {}).get("firstRelease"),
+        "rollingContentReservedThrough": (data.get("rollingContent") or {}).get("reservedThrough"),
+        "rollingContentAvailableCounts": {d: len(released_free_bank(d, current_prague_date())) for d in ("easy", "medium", "hard", "hardcore")},
+        "notificationsV2Migration": push_preferences_schema_ready(),
         "freeXp": {key: value for key, value in POINTS.items() if key != "daily"},
         "dailyXp": POINTS["daily"],
     }
@@ -2896,8 +3093,8 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         if payload.challenge_key != f"free:{payload.puzzle_id}":
             raise HTTPException(400, "Neplatný klíč volné úlohy")
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
-        if not info:
-            raise HTTPException(400, "Neznámá úroveň volné hry")
+        if not info or not is_puzzle_released(info.get("puzzle") or {}, effective_content_date(request)):
+            raise HTTPException(400, "Neznámá nebo zatím nevydaná úroveň volné hry")
         points, transferred_reward = claim_free_slot_points(
             player["id"], info, POINTS[payload.difficulty], payload.puzzle_id,
         )
@@ -3535,12 +3732,44 @@ def played_levels(
     actual = sum(not item.get("transferred") for item in items)
     transferred = sum(bool(item.get("transferred")) for item in items)
     legacy_history.sort(key=lambda row: (row["level"], str(row.get("completedAt") or ""), str(row.get("puzzleId") or "")))
-    return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "actual": actual, "transferred": transferred, "levels": items, "legacyLevels": legacy_history}
+    return {"difficulty": difficulty, "total": sum(1 for p in bank if is_puzzle_released(p, effective_content_date(request))), "completed": len(items), "actual": actual, "transferred": transferred, "levels": items, "legacyLevels": legacy_history}
+
+
+
+@app.get("/api/rolling-content")
+def public_rolling_content(request: Request, preview_as_of: Optional[str] = Query(default=None, max_length=10)):
+    """Small release-gated delta. Future reserve content stays server-side."""
+    as_of = effective_content_date(request, preview_as_of)
+    return released_rolling_payload(as_of)
 
 
 @app.get("/api/push/config")
 def push_config():
-    return {"available": push_ready(), "publicKey": VAPID_PUBLIC_KEY if push_ready() else None}
+    return {"available": push_ready(), "publicKey": VAPID_PUBLIC_KEY if push_ready() else None, "preferencesVersion": 2, "preferencesReady": push_preferences_schema_ready()}
+
+
+
+
+@app.get("/api/push/preferences")
+def push_preferences(
+    request: Request,
+    endpoint: str = Query(min_length=20, max_length=2048),
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "push_preferences_read", limit=120, window_seconds=3600)
+    player = auth_player(authorization)
+    rows = db_select("push_subscriptions", endpoint=endpoint)
+    row = next((r for r in rows if r.get("player_id") == player["id"]), None)
+    ready = bool(row and "daily_enabled" in row and "content_enabled" in row) or push_preferences_schema_ready()
+    if not row:
+        return {"migrationReady": ready, "subscribed": False, "dailyEnabled": False, "contentEnabled": False}
+    return {
+        "migrationReady": ready,
+        "subscribed": True,
+        # Missing fields means a legacy DB row: it represented Daily consent only.
+        "dailyEnabled": bool(row.get("daily_enabled", True)),
+        "contentEnabled": bool(row.get("content_enabled", False)),
+    }
 
 
 @app.post("/api/push/subscribe")
@@ -3550,12 +3779,37 @@ def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorizat
     if not push_ready():
         raise HTTPException(503, "Push notifikace ještě nejsou na serveru nakonfigurované")
     existing = db_select("push_subscriptions", endpoint=payload.endpoint)
-    row = {"player_id": player["id"], "p256dh": payload.p256dh, "auth": payload.auth, "user_agent": payload.user_agent, "updated_at": datetime.now(TZ).isoformat()}
-    if existing:
-        db_update("push_subscriptions", {"id": existing[0]["id"]}, row)
+    legacy_client = payload.daily_enabled is None and payload.content_enabled is None
+    if legacy_client and existing:
+        # A cached pre-v3.30 client only knows the old Daily switch. Do not let that old
+        # client silently erase a Content opt-in that was set by a newer version.
+        daily_enabled = bool(existing[0].get("daily_enabled", True))
+        content_enabled = bool(existing[0].get("content_enabled", False))
     else:
-        db_insert("push_subscriptions", {"id": str(uuid.uuid4()), "endpoint": payload.endpoint, "created_at": datetime.now(TZ).isoformat(), **row})
-    return {"ok": True}
+        daily_enabled = True if payload.daily_enabled is None else bool(payload.daily_enabled)
+        content_enabled = False if payload.content_enabled is None else bool(payload.content_enabled)
+    row = {
+        "player_id": player["id"], "p256dh": payload.p256dh, "auth": payload.auth,
+        "user_agent": payload.user_agent, "updated_at": datetime.now(TZ).isoformat(),
+        "daily_enabled": daily_enabled, "content_enabled": content_enabled,
+    }
+    try:
+        if existing:
+            db_update("push_subscriptions", {"id": existing[0]["id"]}, row)
+        else:
+            db_insert("push_subscriptions", {"id": str(uuid.uuid4()), "endpoint": payload.endpoint, "created_at": datetime.now(TZ).isoformat(), **row})
+    except HTTPException as exc:
+        # Old cached clients can still restore the historical Daily-only subscription before
+        # the v3.30 SQL migration. New category-aware clients wait for the migration instead.
+        if payload.daily_enabled is None and payload.content_enabled is None:
+            legacy_row = {k: v for k, v in row.items() if k not in {"daily_enabled", "content_enabled"}}
+            if existing:
+                db_update("push_subscriptions", {"id": existing[0]["id"]}, legacy_row)
+            else:
+                db_insert("push_subscriptions", {"id": str(uuid.uuid4()), "endpoint": payload.endpoint, "created_at": datetime.now(TZ).isoformat(), **legacy_row})
+        else:
+            raise HTTPException(503, "Nové nastavení upozornění čeká na databázovou migraci") from exc
+    return {"ok": True, "dailyEnabled": daily_enabled, "contentEnabled": content_enabled}
 
 
 @app.post("/api/push/unsubscribe")
@@ -3590,6 +3844,8 @@ def cron_daily_push(request: Request, authorization: Optional[str] = Header(defa
         "url": "/?open=daily", "tag": f"proplet-daily-{today}"
     }, ensure_ascii=False)
     for sub in subscriptions:
+        if sub.get("daily_enabled", True) is False:
+            continue
         if sub.get("player_id") in completed:
             continue
         info = {"endpoint": sub.get("endpoint"), "keys": {"p256dh": sub.get("p256dh"), "auth": sub.get("auth")}}

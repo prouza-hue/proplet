@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "generatedAt": "2026-08-15",
   "dictionarySize": 13939,
   "dailyRotationSize": 365,
@@ -685398,5 +685398,23 @@
         }
       }
     ]
+  },
+  "rollingContent": {
+    "version": 1,
+    "cadence": "weekly",
+    "releaseWeekday": "monday",
+    "levelsPerDrop": 5,
+    "firstRelease": "2026-08-24",
+    "weeksReserved": 13,
+    "reservedThrough": "2026-11-16",
+    "extraRotation": [
+      "easy",
+      "medium",
+      "hard",
+      "hardcore"
+    ],
+    "generatedAtVersion": "3.30.0",
+    "wideUniquenessDictionarySize": 12000,
+    "batches": []
   }
 }
