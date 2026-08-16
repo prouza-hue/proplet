@@ -39,7 +39,7 @@ jobs:
             'starter daily action': "Hrát dnešní výzvu ☀️" in app,
             'starter free action': "Vybrat volnou hru" in app and "nav('free',{replace:true})" in app,
             'mode card CSS': '.onboard-game-modes' in css and '.onboard-free-icons' in css,
-            'dark mode CSS': 'html[data-theme=\\"dark\\"] .onboard-mode-card' in css,
+            'dark mode CSS': 'html[data-theme="dark"] .onboard-mode-card' in css,
             'client version': "const APP_VERSION='3.29.0-preview.1';" in app,
             'server version': 'APP_VERSION = "3.29.0-preview.1"' in server,
             'cache version': "proplet-v3.29.0-preview.1-onboarding-modes" in sw,
