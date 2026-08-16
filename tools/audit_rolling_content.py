@@ -17,6 +17,7 @@ DIFFS = ("easy", "medium", "hard", "hardcore")
 EXPECTED_COUNTS = {"easy": 217, "medium": 216, "hard": 216, "hardcore": 216}
 FIRST = date(2026, 8, 24)
 WEEKS = 13
+WIDE_DICTIONARY_SIZE = 12000
 
 
 def load_generator():
@@ -42,6 +43,7 @@ def main() -> None:
     assert rolling.get("version") == 1
     assert rolling.get("levelsPerDrop") == 5
     assert rolling.get("firstRelease") == FIRST.isoformat()
+    assert rolling.get("wideUniquenessDictionarySize") == WIDE_DICTIONARY_SIZE
     assert len(batches) == WEEKS
 
     rolling_puzzles = [p for d in DIFFS for p in data["free"][d] if p.get("meta", {}).get("rollingContent")]
@@ -90,6 +92,9 @@ def main() -> None:
             assert meta["releaseBatch"] == batch["id"]
             assert meta["releaseIndex"] == pos
             assert meta["verifiedUnique"] is True
+            assert meta["wideVerifiedUnique"] is True
+            assert meta["wideUniquenessDictionarySize"] == WIDE_DICTIONARY_SIZE
+            assert int(meta.get("rollingSeedRetry") or 0) >= 1
             assert meta["contentGeneration"] == 2
             assert meta["lexiconVersion"] == 2
 
@@ -116,10 +121,10 @@ def main() -> None:
     tiers, _ = gp.load_answer_tiers()
     all_answers = [w for tier in ("A", "B", "C", "D") for w in tiers[tier]]
     dictionary = [w for w, _ in freq if w not in gp.FUNCTION_WORDS]
-    dictionary = dictionary[:12000] + [w for w in all_answers if w not in dictionary[:12000]]
+    dictionary = dictionary[:WIDE_DICTIONARY_SIZE] + [w for w in all_answers if w not in dictionary[:WIDE_DICTIONARY_SIZE]]
     for n, p in enumerate(rolling_puzzles, start=1):
         targets = [a["word"].lower() for a in p["answers"]]
-        solver_dictionary = list(dict.fromkeys(dictionary[:12000] + targets))
+        solver_dictionary = list(dict.fromkeys(dictionary[:WIDE_DICTIONARY_SIZE] + targets))
         solutions, _, _ = gp.solve_count(
             [x.lower() for x in p["letters"]], p["rows"], p["cols"], p["mask"],
             [len(w) for w in targets], solver_dictionary, limit=2,
@@ -149,6 +154,7 @@ def main() -> None:
         "finalCounts": EXPECTED_COUNTS,
         "publicFallbackCounts": {d: 200 for d in DIFFS},
         "exactCoverVerified": len(rolling_puzzles),
+        "wideDictionarySize": WIDE_DICTIONARY_SIZE,
     }, ensure_ascii=False, indent=2))
 
 
