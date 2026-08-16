@@ -55,7 +55,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.31.4"
+APP_VERSION = "3.31.5"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -1388,6 +1388,7 @@ def health():
         "accountDeletion": True,
         "supportChannel": True,
         "launchDashboard": True,
+        "newPlayerFunnelVersion": 2,
         "singleMemberTeams": True,
         "xpEconomyVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
@@ -1798,9 +1799,18 @@ def product_event(
     enforce_rate_limit(request, "product_event", limit=300, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed = {
-        "app_open", "onboarding_started", "onboarding_completed",
+        "app_open", "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected",
+        "onboarding_support_selected_none", "onboarding_support_selected_beginner",
+        "onboarding_support_selected_younger", "onboarding_support_selected_older", "onboarding_completed",
+        "helper_onboarding_started",
         "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
-        "account_authenticated", "starter_started", "starter_hint_used", "starter_completed",
+        "account_authenticated", "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
+        "starter_word_1_completed", "starter_word_2_completed", "starter_word_3_completed", "starter_completed",
+        "starter_hard_choice_shown", "starter_hard_direct_selected", "starter_easy_warmup_selected", "starter_easy_warmup_completed",
+        "win_account_cta_shown", "win_account_cta_create", "win_account_cta_authenticated",
+        "pwa_install_nudge_shown", "pwa_install_profile_closed", "pwa_install_nudge_dismissed",
+        "pwa_install_ios_hint_ack", "pwa_install_native_accepted", "pwa_install_native_dismissed",
+        "pwa_install_profile_opened", "pwa_installed",
         *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
     }
     if payload.event_type not in allowed:
@@ -2445,12 +2455,16 @@ def build_quality_report():
         return None
 
     funnel = {}
-    for event_type in (
-        "app_open", "onboarding_started", "onboarding_completed", "account_nudge_shown",
-        "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
-        "starter_started", "starter_hint_used", "starter_completed",
+    quality_funnel_events = (
+        "app_open", "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected", "onboarding_completed",
+        "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+        "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
+        "starter_word_1_completed", "starter_word_2_completed", "starter_word_3_completed", "starter_completed",
+        "starter_hard_choice_shown", "starter_hard_direct_selected", "starter_easy_warmup_selected", "starter_easy_warmup_completed",
+        *[f"onboarding_support_selected_{mode}" for mode in ("none", "beginner", "younger", "older")],
         *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
-    ):
+    )
+    for event_type in quality_funnel_events:
         identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
         identities.discard(None)
         funnel[event_type] = len(identities)
@@ -2529,12 +2543,22 @@ def _event_stamp(row: dict) -> Optional[datetime]:
     return parse_timestamp(row.get("created_at") or row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
 
 
+def _app_version_tuple(value: object) -> tuple[int, int, int]:
+    match = re.search(r"(\d+)\.(\d+)\.(\d+)", str(value or ""))
+    return tuple(int(part) for part in match.groups()) if match else (0, 0, 0)
+
+
+def _app_version_at_least(value: object, minimum: str) -> bool:
+    return _app_version_tuple(value) >= _app_version_tuple(minimum)
+
+
 @app.get("/api/admin/launch")
 def admin_launch(authorization: Optional[str] = Header(default=None)):
     require_admin(authorization)
     now = datetime.now(TZ)
     cutoff24 = now - timedelta(hours=24)
     cutoff7 = now - timedelta(days=7)
+    cutoff30 = now - timedelta(days=30)
     today = current_prague_date()
     product = db_select_all("product_events")
     attempts = db_select_all("puzzle_attempts")
@@ -2551,15 +2575,8 @@ def admin_launch(authorization: Optional[str] = Header(default=None)):
     def recent(rows, cutoff):
         return [row for row in rows if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= cutoff]
 
-    p24, p7 = recent(product, cutoff24), recent(product, cutoff7)
-    a24, a7 = recent(attempts, cutoff24), recent(attempts, cutoff7)
-    op24, op7 = recent(ops, cutoff24), recent(ops, cutoff7)
-
     def actors(rows):
         return {key for row in rows if (key := _telemetry_actor_key(row))}
-
-    active24 = actors(p24) | actors(a24)
-    active7 = actors(p7) | actors(a7)
 
     def event_actors(rows, event):
         return actors([row for row in rows if row.get("event_type") == event])
@@ -2572,9 +2589,41 @@ def admin_launch(authorization: Optional[str] = Header(default=None)):
             filtered = [row for row in filtered if row.get("completed_at")]
         return actors(filtered)
 
-    starter7 = event_actors(p7, "starter_completed")
-    auth7 = event_actors(p7, "account_authenticated")
-    starter_to_account = len(starter7 & auth7)
+    product_sorted = sorted(product, key=lambda row: _event_stamp(row) or datetime.max.replace(tzinfo=TZ))
+    attempts_sorted = sorted(attempts, key=lambda row: parse_timestamp(row.get("started_at")) or datetime.max.replace(tzinfo=TZ))
+    events_by_actor: dict[str, list[dict]] = {}
+    attempts_by_actor: dict[str, list[dict]] = {}
+    for row in product_sorted:
+        key = _telemetry_actor_key(row)
+        if key:
+            events_by_actor.setdefault(key, []).append(row)
+    for row in attempts_sorted:
+        key = _telemetry_actor_key(row)
+        if key:
+            attempts_by_actor.setdefault(key, []).append(row)
+
+    first_onboarding: dict[str, dict] = {}
+    for row in product_sorted:
+        if row.get("event_type") != "onboarding_started":
+            continue
+        key = _telemetry_actor_key(row)
+        if key and key not in first_onboarding:
+            first_onboarding[key] = row
+
+    def event_time(actor_key: str, event_type: str, started_at: datetime):
+        floor = started_at - timedelta(seconds=5)
+        for row in events_by_actor.get(actor_key, []):
+            stamp = _event_stamp(row)
+            if row.get("event_type") == event_type and stamp and stamp >= floor:
+                return stamp
+        return None
+
+    def actor_event_types(actor_key: str, started_at: datetime) -> set[str]:
+        floor = started_at - timedelta(seconds=5)
+        return {
+            str(row.get("event_type")) for row in events_by_actor.get(actor_key, [])
+            if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= floor
+        }
 
     activity_dates: dict[str, set[date]] = {}
     for row in product + attempts:
@@ -2582,6 +2631,169 @@ def admin_launch(authorization: Optional[str] = Header(default=None)):
         stamp = _event_stamp(row)
         if key and stamp:
             activity_dates.setdefault(key, set()).add(stamp.astimezone(TZ).date())
+
+    p24, p7, p30 = recent(product, cutoff24), recent(product, cutoff7), recent(product, cutoff30)
+    a24, a7, a30 = recent(attempts, cutoff24), recent(attempts, cutoff7), recent(attempts, cutoff30)
+    op24, op7 = recent(ops, cutoff24), recent(ops, cutoff7)
+    active24 = actors(p24) | actors(a24)
+    active7 = actors(p7) | actors(a7)
+
+    def legacy_funnel(rows_p, rows_a):
+        app_open = event_actors(rows_p, "app_open")
+        onboard = event_actors(rows_p, "onboarding_completed")
+        starter = event_actors(rows_p, "starter_completed")
+        daily_start = attempt_actors(rows_a, "daily", False)
+        daily_done = attempt_actors(rows_a, "daily", True)
+        free_done = attempt_actors(rows_a, "free", True)
+        auth = event_actors(rows_p, "account_authenticated")
+        return {
+            "appOpen": len(app_open), "onboardingCompleted": len(onboard), "starterCompleted": len(starter),
+            "dailyStarted": len(daily_start), "dailyCompleted": len(daily_done), "freeCompleted": len(free_done),
+            "accountAuthenticated": len(auth),
+        }
+
+    def newcomer_window(cutoff, rows_p, rows_a):
+        cohort: dict[str, datetime] = {}
+        for key, row in first_onboarding.items():
+            stamp = _event_stamp(row)
+            if stamp and stamp >= cutoff and _app_version_at_least(row.get("app_version"), "3.31.5"):
+                cohort[key] = stamp
+
+        event_types = {key: actor_event_types(key, start) for key, start in cohort.items()}
+        current = set(cohort)
+        funnel_rows = []
+
+        def add_step(key, label, matched):
+            nonlocal current
+            previous = len(current)
+            current &= matched
+            count = len(current)
+            funnel_rows.append({
+                "key": key, "label": label, "count": count, "previousCount": previous if funnel_rows else None,
+                "conversionFromPrevious": round(count / previous, 3) if funnel_rows and previous else (None if not funnel_rows else 0.0),
+                "dropOffCount": previous - count if funnel_rows else None,
+                "dropOff": round((previous - count) / previous, 3) if funnel_rows and previous else (None if not funnel_rows else 0.0),
+            })
+
+        add_step("onboardingStarted", "Začalo onboarding", set(cohort))
+        for event_type, key, label in (
+            ("onboarding_tutorial_completed", "tutorialCompleted", "Našlo PES"),
+            ("onboarding_support_selected", "supportSelected", "Vybralo Pomocníka"),
+            ("onboarding_completed", "onboardingCompleted", "Dokončilo onboarding"),
+            ("starter_started", "starterStarted", "Spustilo první Proplet"),
+            ("starter_word_1_completed", "starterWord1", "Našlo MRAK"),
+            ("starter_word_2_completed", "starterWord2", "Našlo JABLKO"),
+            ("starter_word_3_completed", "starterWord3", "Našlo ČOKOLÁDU"),
+            ("starter_completed", "starterCompleted", "Dokončilo první Proplet"),
+        ):
+            add_step(key, label, {actor for actor in cohort if event_type in event_types[actor]})
+
+        real_started = set()
+        real_completed = set()
+        for actor in current:
+            start = cohort[actor]
+            eligible_attempts = [
+                row for row in attempts_by_actor.get(actor, [])
+                if row.get("mode") in ("daily", "free")
+                and (parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ)) >= start - timedelta(seconds=5)
+            ]
+            if eligible_attempts:
+                real_started.add(actor)
+            if any(row.get("completed_at") for row in eligible_attempts):
+                real_completed.add(actor)
+        add_step("firstRealGameStarted", "Spustilo první skutečnou hru", real_started)
+        add_step("firstRealGameCompleted", "Dokončilo první skutečnou hru", real_completed)
+        add_step("accountAuthenticated", "Přihlásilo / vytvořilo účet", {actor for actor in cohort if "account_authenticated" in event_types[actor]})
+
+        choice = {actor for actor in cohort if "starter_hard_choice_shown" in event_types[actor]}
+        easy = choice & {actor for actor in cohort if "starter_easy_warmup_selected" in event_types[actor]}
+        direct = choice & {actor for actor in cohort if "starter_hard_direct_selected" in event_types[actor]}
+        warmup_done = easy & {actor for actor in cohort if "starter_easy_warmup_completed" in event_types[actor]}
+        warmup_to_daily = set()
+        hard_started = set()
+        hard_completed = set()
+        for actor in choice:
+            start = cohort[actor]
+            daily_attempts = [
+                row for row in attempts_by_actor.get(actor, [])
+                if row.get("mode") == "daily" and row.get("difficulty") == "hard"
+                and (parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ)) >= start - timedelta(seconds=5)
+            ]
+            if daily_attempts:
+                hard_started.add(actor)
+                if actor in warmup_done:
+                    warmup_to_daily.add(actor)
+            if any(row.get("completed_at") for row in daily_attempts):
+                hard_completed.add(actor)
+
+        starter_started = {actor for actor in cohort if "starter_started" in event_types[actor]}
+        starter_done = starter_started & {actor for actor in cohort if "starter_completed" in event_types[actor]}
+        hint_offer = starter_started & {actor for actor in cohort if "starter_hint_offer_shown" in event_types[actor]}
+        hint_used = starter_started & {actor for actor in cohort if "starter_hint_used" in event_types[actor]}
+        reset = starter_started & {actor for actor in cohort if "starter_reset" in event_types[actor]}
+        abandon_cutoff = now - timedelta(minutes=30)
+        abandoned = {
+            actor for actor in starter_started - starter_done
+            if (event_time(actor, "starter_started", cohort[actor]) or now) <= abandon_cutoff
+        }
+        starter_times = []
+        for actor in starter_done:
+            start_time = event_time(actor, "starter_started", cohort[actor])
+            done_time = event_time(actor, "starter_completed", cohort[actor])
+            if start_time and done_time and done_time >= start_time:
+                elapsed = int((done_time - start_time).total_seconds() * 1000)
+                if elapsed <= 3_600_000:
+                    starter_times.append(elapsed)
+        support_distribution = {}
+        for mode in ("none", "beginner", "younger", "older"):
+            mode_set = {actor for actor in cohort if f"onboarding_support_selected_{mode}" in event_types[actor]}
+            support_distribution[mode] = {"count": len(mode_set), "share": round(len(mode_set) / len(cohort), 3) if cohort else None}
+
+        eligible = retained = 0
+        for actor, start in cohort.items():
+            first_day = start.astimezone(TZ).date()
+            if first_day <= today - timedelta(days=1):
+                eligible += 1
+                if first_day + timedelta(days=1) in activity_dates.get(actor, set()):
+                    retained += 1
+
+        visitor_actors = event_actors(rows_p, "app_open")
+        first_real_completed = next((row["count"] for row in funnel_rows if row["key"] == "firstRealGameCompleted"), 0)
+        return {
+            "visitors": len(visitor_actors), "newcomers": len(cohort),
+            "returningVisitors": max(0, len(visitor_actors) - len(cohort)),
+            "firstRealGameCompleted": first_real_completed, "funnel": funnel_rows,
+            "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
+            "starter": {
+                "started": len(starter_started), "completed": len(starter_done),
+                "completionRate": round(len(starter_done) / len(starter_started), 3) if starter_started else None,
+                "medianCompletionMs": _median(starter_times), "hintOfferShown": len(hint_offer), "hintUsed": len(hint_used),
+                "hintUseRate": round(len(hint_used) / len(starter_started), 3) if starter_started else None,
+                "resetActors": len(reset), "abandoned": len(abandoned), "supportDistribution": support_distribution,
+            },
+            "hardDaily": {
+                "choiceShown": len(choice), "easySelected": len(easy), "directSelected": len(direct),
+                "easySelectionRate": round(len(easy) / len(choice), 3) if choice else None,
+                "directSelectionRate": round(len(direct) / len(choice), 3) if choice else None,
+                "warmupCompleted": len(warmup_done),
+                "warmupCompletionRate": round(len(warmup_done) / len(easy), 3) if easy else None,
+                "warmupToDailyStarted": len(warmup_to_daily),
+                "warmupToDailyRate": round(len(warmup_to_daily) / len(warmup_done), 3) if warmup_done else None,
+                "hardDailyStarted": len(hard_started), "hardDailyCompleted": len(hard_completed),
+                "hardDailyCompletionRate": round(len(hard_completed) / len(hard_started), 3) if hard_started else None,
+            },
+        }
+
+    windows = {
+        "24h": newcomer_window(cutoff24, p24, a24),
+        "7d": newcomer_window(cutoff7, p7, a7),
+        "30d": newcomer_window(cutoff30, p30, a30),
+    }
+
+    starter7 = event_actors(p7, "starter_completed")
+    auth7 = event_actors(p7, "account_authenticated")
+    starter_to_account = len(starter7 & auth7)
+
     eligible = retained = 0
     cohort_floor = today - timedelta(days=14)
     for dates in activity_dates.values():
@@ -2591,46 +2803,26 @@ def admin_launch(authorization: Optional[str] = Header(default=None)):
             if first + timedelta(days=1) in dates:
                 retained += 1
 
-    version_counts: dict[str, int] = {}
+    version_counts = {}
     for row in a7:
         version = str(row.get("app_version") or "neznámá")
         version_counts[version] = version_counts.get(version, 0) + 1
     versions = [{"version": v, "attempts": c} for v, c in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))][:8]
 
-    def funnel(rows_p, rows_a):
-        app_open = event_actors(rows_p, "app_open")
-        onboard = event_actors(rows_p, "onboarding_completed")
-        starter = event_actors(rows_p, "starter_completed")
-        daily_start = attempt_actors(rows_a, "daily", False)
-        daily_done = attempt_actors(rows_a, "daily", True)
-        free_done = attempt_actors(rows_a, "free", True)
-        auth = event_actors(rows_p, "account_authenticated")
-        return {
-            "appOpen": len(app_open),
-            "onboardingCompleted": len(onboard),
-            "starterCompleted": len(starter),
-            "dailyStarted": len(daily_start),
-            "dailyCompleted": len(daily_done),
-            "freeCompleted": len(free_done),
-            "accountAuthenticated": len(auth),
-        }
-
     open_support = [row for row in support if str(row.get("status") or "new") in ("new", "reviewing")]
     errors24 = [row for row in op24 if row.get("event_type") in ("server_error", "client_error")]
     rate24 = [row for row in op24 if row.get("event_type") == "rate_limit"]
     return {
-        "generatedAt": now.isoformat(),
+        "generatedAt": now.isoformat(), "analyticsVersion": 3, "newcomerInstrumentationFrom": "3.31.5",
         "active": {"last24h": len(active24), "last7d": len(active7)},
         "newAccounts24h": sum(1 for row in players if (parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ)) >= cutoff24),
-        "funnel24h": funnel(p24, a24),
-        "funnel7d": funnel(p7, a7),
+        "funnel24h": legacy_funnel(p24, a24), "funnel7d": legacy_funnel(p7, a7), "windows": windows,
         "starterToAccount7d": {"converted": starter_to_account, "starterCompleted": len(starter7), "rate": round(starter_to_account / len(starter7), 3) if starter7 else None},
         "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
         "reliability": {
             "errors24h": len(errors24),
             "errors7d": sum(1 for row in op7 if row.get("event_type") in ("server_error", "client_error")),
-            "rateLimits24h": len(rate24),
-            "openSupportReports": len(open_support),
+            "rateLimits24h": len(rate24), "openSupportReports": len(open_support),
         },
         "appVersions7d": versions,
     }
