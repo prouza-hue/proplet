@@ -1,0 +1,43 @@
+name: Validate family preview copy v2
+on:
+  push:
+    branches: [agent/family-preview-copy-v2]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply copy tweak
+        run: python .release/family_preview_copy_v2.py
+      - name: Validate
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          from pathlib import Path
+          a=Path('public/app.js').read_text()
+          sw=Path('public/sw.js').read_text()
+          s=Path('server.py').read_text()
+          assert "const APP_VERSION='3.29.0-preview.2';" in a
+          assert 'VÍTEJ V PROPLETU' not in a
+          assert "cta:'Jak hrát'" in a
+          assert '<h2>Spojuj písmena do slov</h2>' in a
+          assert 'APP_VERSION = "3.29.0-preview.2"' in s
+          assert "proplet-v3.29.0-preview.2-onboarding-copy" in sw
+          print('validation ok')
+          PY
+      - name: Commit validated runtime
+        run: |
+          git config user.name 'Proplet Preview Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add public/app.js public/sw.js server.py
+          git commit -m 'Preview v3.29.0-preview.2 simplify onboarding copy'
+          git push
