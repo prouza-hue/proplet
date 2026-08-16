@@ -34,10 +34,11 @@ jobs:
           python .release/apply_v330.py
           python .release/harden_v330.py
           python .release/split_rolling_delta_v330.py
+          python .release/preserve_legacy_push_v330.py
 
       - name: Syntax checks
         run: |
-          python -m py_compile server.py tools/generate_rolling_content.py tools/audit_rolling_content.py .release/apply_v330.py .release/harden_v330.py .release/split_rolling_delta_v330.py
+          python -m py_compile server.py tools/generate_rolling_content.py tools/audit_rolling_content.py .release/apply_v330.py .release/harden_v330.py .release/split_rolling_delta_v330.py .release/preserve_legacy_push_v330.py
           node --check public/app.js
           python -m json.tool vercel.json >/dev/null
           python -m json.tool data/puzzles.json >/dev/null
@@ -108,12 +109,15 @@ jobs:
           assert all(p['meta'].get('wideUniquenessDictionarySize') == 12000 for p in rolling)
           assert all(not p.get('meta',{}).get('rollingContent') for d in ('easy','medium','hard','hardcore') for p in public['free'][d])
 
-          # Consent isolation: existing subscriptions stay Daily ON / Content OFF.
+          # Consent isolation: existing subscriptions stay Daily ON / Content OFF. A stale
+          # pre-v3.30 client also cannot erase a newer Content preference on the same device.
           assert re.search(r'update public\.push_subscriptions set daily_enabled = true where daily_enabled is null', mig, re.I)
           assert re.search(r'update public\.push_subscriptions set content_enabled = false where content_enabled is null', mig, re.I)
           assert 'push_delivery_log' in mig
           assert 'check (level >= 1)' in mig
           assert 'level between 1 and 200' not in mig.lower()
+          assert 'legacy_client = payload.daily_enabled is None and payload.content_enabled is None' in server
+          assert 'content_enabled = bool(existing[0].get("content_enabled", False))' in server
           assert 'content_enabled' in server and 'daily_enabled' in server
           assert '@app.get("/api/cron/content-push")' in server
           assert 'push_delivery_log' in server
@@ -158,7 +162,6 @@ jobs:
           first_ids = {p['id'] for bank in first['puzzles'].values() for p in bank}
           assert 'g2-e-201' in first_ids and 'g2-e-202' in first_ids
           assert 'g2-m-202' not in first_ids
-          # No future batch list is exposed by the public delta.
           assert 'batches' not in first.get('meta', {})
           print('ROLLING DELTA GATING PASS', delta_counts(first), delta_counts(second), delta_counts(end))
           PY
