@@ -1,0 +1,77 @@
+name: Temporary v3.31.5 cohort runtime test
+
+on:
+  push:
+    branches:
+      - preview/v3315-new-player-funnel
+
+jobs:
+  runtime-test:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/v3315-new-player-funnel
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Exercise cohort aggregation with synthetic identities
+        shell: bash
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timedelta
+          import server
+
+          now = datetime.now(server.TZ)
+          t0 = now - timedelta(hours=2)
+          def ev(actor, kind, minutes, version='3.31.5'):
+              row={'event_type':kind,'created_at':(t0+timedelta(minutes=minutes)).isoformat(),'app_version':version}
+              if actor.startswith('p:'): row['player_id']=actor[2:]
+              else: row['anonymous_id']=actor[2:]
+              return row
+          full='p:full-player'
+          drop='a:drop-anon'
+          old='a:legacy-anon'
+          product=[]
+          for actor, kinds in {
+              full:[
+                  'app_open','onboarding_started','onboarding_tutorial_completed','onboarding_support_selected',
+                  'onboarding_support_selected_younger','onboarding_completed','starter_started',
+                  'starter_word_1_completed','starter_word_2_completed','starter_hint_offer_shown',
+                  'starter_word_3_completed','starter_completed','starter_hard_choice_shown',
+                  'starter_hard_direct_selected','account_authenticated'],
+              drop:['app_open','onboarding_started','onboarding_tutorial_completed'],
+          }.items():
+              product += [ev(actor,k,i) for i,k in enumerate(kinds)]
+          product += [ev(old,'app_open',0,'3.31.4'),ev(old,'onboarding_started',1,'3.31.4'),ev(old,'onboarding_completed',2,'3.31.4')]
+          attempts=[
+              {'player_id':'full-player','mode':'daily','difficulty':'hard','started_at':(t0+timedelta(minutes=20)).isoformat(),
+               'completed_at':(t0+timedelta(minutes=26)).isoformat(),'app_version':'3.31.5'},
+          ]
+          tables={'product_events':product,'puzzle_attempts':attempts,'players':[], 'operational_events':[], 'support_reports':[]}
+          server.require_admin=lambda authorization: {'role':'owner','player':{'id':'admin'}}
+          server.db_select_all=lambda table, **filters: list(tables.get(table,[]))
+          result=server.admin_launch(None)
+          w=result['windows']['24h']
+          assert result['analyticsVersion']==3
+          assert w['newcomers']==2, w
+          assert w['visitors']==3, w
+          rows={row['key']:row for row in w['funnel']}
+          assert rows['onboardingStarted']['count']==2
+          assert rows['tutorialCompleted']['count']==2
+          assert rows['supportSelected']['count']==1
+          assert rows['starterCompleted']['count']==1
+          assert rows['firstRealGameStarted']['count']==1
+          assert rows['firstRealGameCompleted']['count']==1
+          assert rows['accountAuthenticated']['count']==1
+          assert rows['supportSelected']['dropOffCount']==1
+          assert w['starter']['hintOfferShown']==1
+          assert w['starter']['supportDistribution']['younger']['count']==1
+          assert w['hardDaily']['choiceShown']==1
+          assert w['hardDaily']['directSelected']==1
+          assert w['hardDaily']['hardDailyCompleted']==1
+          print('v3.31.5 synthetic newcomer cohort PASS')
+          PY
