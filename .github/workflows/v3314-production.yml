@@ -1,0 +1,61 @@
+name: Proplet v3.31.4 production validation
+
+on:
+  push:
+    branches: [release/v3314-production]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[v3314-prod-built]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Productionize approved preview runtime
+        run: python .release/productionize_v3314.py
+      - name: Validate JavaScript
+        run: node --check public/app.js
+      - name: Validate Python
+        run: python -m py_compile server.py
+      - name: Validate production invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          app=Path('public/app.js').read_text()
+          html=Path('public/index.html').read_text()
+          css=Path('public/styles.css').read_text()
+          sw=Path('public/sw.js').read_text()
+          server=Path('server.py').read_text()
+          assert "const APP_VERSION='3.31.4';" in app
+          assert 'PREVIEW_NOW_DATE' not in app
+          assert "const CONTENT_PREVIEW_DATE='';" in app
+          assert 'starterHardActions' in html
+          assert 'starterWarmupBtn' in html and 'starterHardDailyBtn' in html
+          assert 'Dnešní výzva je Těžká.' in html and 'Vyber si tempo.' in html
+          assert 'starter-choice-warmup' in css and 'starter-choice-hard' in css
+          assert "starter_easy_warmup_selected" in app
+          assert "starter_hard_direct_selected" in app
+          assert "starter_easy_warmup_completed" in app
+          assert "if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return;" in app
+          assert "if(CONTENT_PREVIEW_DATE)return {ok:true,left:getQueue().length,preview:true};" not in app
+          assert 'APP_VERSION = "3.31.4"' in server
+          assert "const CACHE='proplet-v3.31.4-hard-daily-onboarding';" in sw
+          assert "u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'" in sw
+          assert 'if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}' in sw
+          print('production invariants OK')
+          PY
+      - name: Commit validated runtime
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/app.js public/index.html public/styles.css public/sw.js server.py
+          git commit -m "Proplet v3.31.4 validated runtime [v3314-prod-built]"
+          git push
