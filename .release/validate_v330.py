@@ -4,8 +4,11 @@ from datetime import date
 from pathlib import Path
 import json
 import re
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 def text(path: str) -> str:
