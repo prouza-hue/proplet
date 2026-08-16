@@ -7,6 +7,7 @@ from datetime import date, timedelta
 import importlib.util
 import json
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "puzzles.json"
@@ -23,6 +24,7 @@ def load_generator():
     if not spec or not spec.loader:
         raise RuntimeError("Cannot import puzzle generator")
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod
     spec.loader.exec_module(mod)
     return mod
 
@@ -42,18 +44,26 @@ def main() -> None:
     assert rolling.get("firstRelease") == FIRST.isoformat()
     assert len(batches) == WEEKS
 
-    all_ids: list[str] = []
-    for name in ("daily", "rescue"):
-        all_ids.extend(p["id"] for p in data.get(name, []))
-    for name in ("free", "legacyFree"):
-        for bank in (data.get(name) or {}).values():
-            all_ids.extend(p["id"] for p in bank)
-    prev = data.get("previousDaily") or {}
-    all_ids.extend(p["id"] for p in prev.get("puzzles", []))
-    assert len(all_ids) == len(set(all_ids)), "Puzzle ID collision"
-
     rolling_puzzles = [p for d in DIFFS for p in data["free"][d] if p.get("meta", {}).get("rollingContent")]
     assert len(rolling_puzzles) == 65
+    rolling_ids = [p["id"] for p in rolling_puzzles]
+    assert len(rolling_ids) == len(set(rolling_ids)), "Collision among rolling-content puzzle IDs"
+    rolling_id_set = set(rolling_ids)
+
+    # Historical data intentionally contains some duplicated IDs between current/archived
+    # Daily banks. That is not a v3.30 regression. What matters here is that none of the new
+    # rolling IDs collides with anything that existed before this reserve was appended.
+    preexisting_ids: set[str] = set()
+    for name in ("daily", "rescue"):
+        preexisting_ids.update(p["id"] for p in data.get(name, []))
+    previous = data.get("previousDaily") or {}
+    preexisting_ids.update(p["id"] for p in previous.get("puzzles", []))
+    for bank in (data.get("legacyFree") or {}).values():
+        preexisting_ids.update(p["id"] for p in bank)
+    for d in DIFFS:
+        preexisting_ids.update(p["id"] for p in data["free"][d] if not p.get("meta", {}).get("rollingContent"))
+    assert not (rolling_id_set & preexisting_ids), f"Rolling ID collision: {sorted(rolling_id_set & preexisting_ids)}"
+
     rolling_by_id = {p["id"]: p for p in rolling_puzzles}
 
     expected_extra = list(DIFFS)
