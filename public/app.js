@@ -1,4 +1,4 @@
-const APP_VERSION='3.30.0-preview.1';
+const APP_VERSION='3.30.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -1260,7 +1260,7 @@ function bind(){
 }
 
 const EXPECTED_PUZZLE_DB_VERSION=9;
-const CONTENT_PREVIEW_DATE=typeof location!=='undefined'?String(new URLSearchParams(location.search).get('contentPreview')||'').slice(0,10):'';
+const CONTENT_PREVIEW_DATE='';
 function contentWeekKey(iso=CONTENT_PREVIEW_DATE||pragueDateISO()){return addDaysISO(iso,-mondayWeekdayIndex(iso))}
 function rollingContentUrl(){const asOf=CONTENT_PREVIEW_DATE||pragueDateISO(),week=contentWeekKey(asOf),q=new URLSearchParams({week});if(CONTENT_PREVIEW_DATE)q.set('preview_as_of',CONTENT_PREVIEW_DATE);return `/api/rolling-content?${q.toString()}`}
 function showPuzzleBootLoading(){
