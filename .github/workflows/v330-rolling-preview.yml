@@ -26,6 +26,22 @@ jobs:
       - name: Install runtime dependencies
         run: pip install -r requirements.txt
 
+      - name: Fix dynamic generator import registration
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for name in ('tools/generate_rolling_content.py','tools/audit_rolling_content.py'):
+              p=Path(name); t=p.read_text(encoding='utf-8')
+              if 'import sys\n' not in t:
+                  t=t.replace('import random\n','import random\nimport sys\n') if 'import random\n' in t else t.replace('import json\n','import json\nimport sys\n')
+              old='    mod = importlib.util.module_from_spec(spec)\n    spec.loader.exec_module(mod)\n'
+              new='    mod = importlib.util.module_from_spec(spec)\n    sys.modules[spec.name] = mod\n    spec.loader.exec_module(mod)\n'
+              if old not in t and new not in t:
+                  raise SystemExit(f'import block missing in {name}')
+              t=t.replace(old,new,1)
+              p.write_text(t,encoding='utf-8')
+          PY
+
       - name: Generate 13-week rolling reserve
         run: python tools/generate_rolling_content.py
 
