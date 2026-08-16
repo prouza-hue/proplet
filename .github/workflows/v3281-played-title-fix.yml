@@ -1,0 +1,42 @@
+name: Validate and apply Proplet v3.28.1 played title fix
+on:
+  push:
+    branches: [agent/v3281-played-title-fix]
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3281-played-title-fix
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact hotfix
+        run: python .release/v3281_fix.py
+      - name: Validate runtime
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          from pathlib import Path
+          a=Path('public/app.js').read_text(); c=Path('public/styles.css').read_text(); s=Path('public/sw.js').read_text(); srv=Path('server.py').read_text()
+          assert "const APP_VERSION='3.28.1';" in a
+          assert 'APP_VERSION = "3.28.1"' in srv
+          assert "proplet-v3.28.1-played-title-fix" in s
+          title=[l for l in a.splitlines() if 'tvoje úrovně' in l]
+          assert len(title)==1
+          assert 'DIFF[diff].icon' not in title[0]
+          assert "difficultyIconMarkup(diff,'played-levels-title-icon')" in title[0]
+          assert 'played-levels-title-icon' in c
+          print('v3.28.1 validation PASS')
+          PY
+      - name: Commit validated runtime changes
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add public/app.js public/styles.css public/sw.js server.py
+          git commit -m 'Proplet v3.28.1 fix played-level difficulty title'
+          git push origin HEAD:agent/v3281-played-title-fix
