@@ -1,0 +1,40 @@
+name: Preview starter coach
+on:
+  push:
+    branches: [family-preview]
+permissions:
+  contents: write
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[starter-coach-built]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python .release/apply_v331_preview.py
+      - run: node --check public/app.js
+      - run: python -m py_compile server.py
+      - name: Validate preview invariants
+        run: |
+          grep -q "const APP_VERSION='3.31.0-preview.1'" public/app.js
+          grep -q "Spojuj písmena do slov" public/app.js
+          ! grep -q "title:'Propleť všechno'" public/app.js
+          grep -q 'id="starterCoach"' public/index.html
+          grep -q 'starter-coach' public/styles.css
+          grep -q 'Hotovo je až bez jediného volného políčka' public/app.js
+          grep -q 'Nápověda' public/app.js
+          grep -q "proplet-v3.31.0-preview.1-starter-coach" public/sw.js
+          grep -q 'APP_VERSION = "3.31.0-preview.1"' server.py
+          grep -q "u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'" public/sw.js
+      - name: Commit built preview
+        run: |
+          git config user.name "prouza-hue"
+          git config user.email "prouza@gmail.com"
+          git add public/app.js public/index.html public/styles.css public/sw.js server.py
+          git commit -m "Preview v3.31.0 starter coach [starter-coach-built]"
+          git push
