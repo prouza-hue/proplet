@@ -1,5 +1,4 @@
-const APP_VERSION='3.31.4-preview.1';
-const PREVIEW_NOW_DATE='2026-08-22';
+const APP_VERSION='3.31.4';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -299,7 +298,7 @@ function normalizeLeagueCode(v){return String(v||'').trim().toLocaleUpperCase('c
 function selectedLeague(){return leaguesCache.find(l=>l.code===$('#leagueSelect')?.value)||null}
 function togglePassword(inputIds,btn){const ids=Array.isArray(inputIds)?inputIds:[inputIds],show=ids.some(id=>$('#'+id)?.type==='password');ids.forEach(id=>{const el=$('#'+id);if(el)el.type=show?'text':'password'});if(btn)btn.textContent=show?'🙈 Skrýt heslo':'👁 Zobrazit heslo'}
 function formatDateCZ(iso){const [y,m,d]=iso.split('-').map(Number);return new Intl.DateTimeFormat('cs-CZ',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Prague'}).format(new Date(Date.UTC(y,m-1,d,12)))}
-function pragueDateISO(){if(PREVIEW_NOW_DATE)return PREVIEW_NOW_DATE;return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+function pragueDateISO(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
 function addDaysISO(iso,days){const [y,m,d]=iso.split('-').map(Number),dt=new Date(Date.UTC(y,m-1,d+days,12));return dt.toISOString().slice(0,10)}
 function dayOffsetISO(iso,base){const [y,m,d]=iso.split('-').map(Number),[by,bm,bd]=base.split('-').map(Number);return Math.floor((Date.UTC(y,m-1,d)-Date.UTC(by,bm-1,bd))/86400000)}
 function dailyBankFor(iso){const switchDate=puzzleDB.dailyGeneration3From||null,previous=puzzleDB.previousDaily;if(switchDate&&iso<switchDate&&previous?.puzzles?.length)return {bank:previous.puzzles,base:previous.rotationBaseDate||'2026-01-01'};return {bank:puzzleDB.daily||[],base:puzzleDB.dailyRotationBaseDate||switchDate||'2026-01-01'}}
@@ -730,7 +729,7 @@ async function shareDaily(){await shareProplet(shareText())}
 function replayDailyFromWin(){const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO(),puzzle=dailyPuzzleFor(date);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}
 
 function queueResult(rec){
- if(CONTENT_PREVIEW_DATE)return;
+ if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return;
  const q=getQueue();if(rec.mode==='daily'){const i=q.findIndex(x=>x.challengeKey===rec.challengeKey);if(i<0)q.push(rec);else if(q[i].puzzleId!==rec.puzzleId)q[i]=rec}else{const id=rec.attemptId||`${rec.challengeKey}:${rec.completedAt}`;if(!q.some(x=>(x.attemptId||`${x.challengeKey}:${x.completedAt}`)===id))q.push(rec)}saveQueue(q);renderDaily();
 }
 async function api(path,opts={}){
@@ -742,7 +741,6 @@ async function api(path,opts={}){
 function trackProductEvent(eventType){if(CONTENT_PREVIEW_DATE)return;api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}
 
 async function syncQueue({announce=false}={}){
- if(CONTENT_PREVIEW_DATE)return {ok:true,left:getQueue().length,preview:true};
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
  const q=getQueue();syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
  if(!q.length){try{await refreshRemoteProfile({throwOnError:true});syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast('Všechno je synchronizované ✓');renderProfile();renderDaily();if(currentScreen==='leaderboard')renderLeaderboard();return {ok:true,left:0}}catch(e){syncState={status:'error',error:e.message,lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace: ${e.message}`);renderProfile();renderDaily();return {ok:false,left:0,error:e.message}}}
@@ -1271,7 +1269,7 @@ function bind(){
 }
 
 const EXPECTED_PUZZLE_DB_VERSION=9;
-const CONTENT_PREVIEW_DATE=PREVIEW_NOW_DATE;
+const CONTENT_PREVIEW_DATE='';
 function contentWeekKey(iso=CONTENT_PREVIEW_DATE||pragueDateISO()){return addDaysISO(iso,-mondayWeekdayIndex(iso))}
 function rollingContentUrl(){const asOf=CONTENT_PREVIEW_DATE||pragueDateISO(),week=contentWeekKey(asOf),q=new URLSearchParams({week});if(CONTENT_PREVIEW_DATE)q.set('preview_as_of',CONTENT_PREVIEW_DATE);return `/api/rolling-content?${q.toString()}`}
 function showPuzzleBootLoading(){
