@@ -1,0 +1,468 @@
+name: Build Proplet v3.31.5 preview
+on:
+  push:
+    branches:
+      - preview/v3315-new-player-funnel
+permissions:
+  contents: write
+jobs:
+  patch-and-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/v3315-new-player-funnel
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply v3.31.5 changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly one match, got {count}')
+              return text.replace(old, new, 1)
+
+          # ---------- server.py ----------
+          path = Path('server.py')
+          s = path.read_text(encoding='utf-8')
+          s = replace_once(s, 'APP_VERSION = "3.31.4"', 'APP_VERSION = "3.31.5"', 'server version')
+          s = replace_once(s, '        "launchDashboard": True,\n', '        "launchDashboard": True,\n        "newPlayerFunnelVersion": 2,\n', 'health funnel marker')
+
+          old_allowed = '''    allowed = {
+        "app_open", "onboarding_started", "onboarding_completed",
+        "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
+        "account_authenticated", "starter_started", "starter_hint_used", "starter_completed",
+        *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
+    }
+'''
+          new_allowed = '''    allowed = {
+        "app_open", "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected",
+        "onboarding_support_selected_none", "onboarding_support_selected_beginner",
+        "onboarding_support_selected_younger", "onboarding_support_selected_older", "onboarding_completed",
+        "helper_onboarding_started",
+        "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
+        "account_authenticated", "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
+        "starter_word_1_completed", "starter_word_2_completed", "starter_word_3_completed", "starter_completed",
+        "starter_hard_choice_shown", "starter_hard_direct_selected", "starter_easy_warmup_selected", "starter_easy_warmup_completed",
+        "win_account_cta_shown", "win_account_cta_create", "win_account_cta_authenticated",
+        "pwa_install_nudge_shown", "pwa_install_profile_closed", "pwa_install_nudge_dismissed",
+        "pwa_install_ios_hint_ack", "pwa_install_native_accepted", "pwa_install_native_dismissed",
+        "pwa_install_profile_opened", "pwa_installed",
+        *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
+    }
+'''
+          s = replace_once(s, old_allowed, new_allowed, 'product event whitelist')
+
+          old_quality = '''    funnel = {}
+    for event_type in (
+        "app_open", "onboarding_started", "onboarding_completed", "account_nudge_shown",
+        "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+        "starter_started", "starter_hint_used", "starter_completed",
+        *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
+    ):
+        identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
+        identities.discard(None)
+        funnel[event_type] = len(identities)
+'''
+          new_quality = '''    funnel = {}
+    quality_funnel_events = (
+        "app_open", "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected", "onboarding_completed",
+        "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed", "account_authenticated",
+        "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
+        "starter_word_1_completed", "starter_word_2_completed", "starter_word_3_completed", "starter_completed",
+        "starter_hard_choice_shown", "starter_hard_direct_selected", "starter_easy_warmup_selected", "starter_easy_warmup_completed",
+        *[f"onboarding_support_selected_{mode}" for mode in ("none", "beginner", "younger", "older")],
+        *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
+    )
+    for event_type in quality_funnel_events:
+        identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
+        identities.discard(None)
+        funnel[event_type] = len(identities)
+'''
+          s = replace_once(s, old_quality, new_quality, 'quality funnel events')
+
+          launch_pattern = re.compile(r'@app\.get\("/api/admin/launch"\)\ndef admin_launch\(authorization: Optional\[str\] = Header\(default=None\)\):\n.*?\n\n@app\.get\("/api/admin/support"\)', re.S)
+          launch_replacement = r'''def _app_version_tuple(value: object) -> tuple[int, int, int]:
+    match = re.search(r"(\d+)\.(\d+)\.(\d+)", str(value or ""))
+    return tuple(int(part) for part in match.groups()) if match else (0, 0, 0)
+
+
+def _app_version_at_least(value: object, minimum: str) -> bool:
+    return _app_version_tuple(value) >= _app_version_tuple(minimum)
+
+
+@app.get("/api/admin/launch")
+def admin_launch(authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    now = datetime.now(TZ)
+    cutoff24 = now - timedelta(hours=24)
+    cutoff7 = now - timedelta(days=7)
+    cutoff30 = now - timedelta(days=30)
+    today = current_prague_date()
+    product = db_select_all("product_events")
+    attempts = db_select_all("puzzle_attempts")
+    players = db_select_all("players")
+    try:
+        ops = db_select_all("operational_events")
+    except HTTPException:
+        ops = []
+    try:
+        support = db_select_all("support_reports")
+    except HTTPException:
+        support = []
+
+    def recent(rows, cutoff):
+        return [row for row in rows if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= cutoff]
+
+    def actors(rows):
+        return {key for row in rows if (key := _telemetry_actor_key(row))}
+
+    def event_actors(rows, event):
+        return actors([row for row in rows if row.get("event_type") == event])
+
+    def attempt_actors(rows, mode=None, completed=False):
+        filtered = rows
+        if mode:
+            filtered = [row for row in filtered if row.get("mode") == mode]
+        if completed:
+            filtered = [row for row in filtered if row.get("completed_at")]
+        return actors(filtered)
+
+    product_sorted = sorted(product, key=lambda row: _event_stamp(row) or datetime.max.replace(tzinfo=TZ))
+    attempts_sorted = sorted(attempts, key=lambda row: parse_timestamp(row.get("started_at")) or datetime.max.replace(tzinfo=TZ))
+    events_by_actor: dict[str, list[dict]] = {}
+    attempts_by_actor: dict[str, list[dict]] = {}
+    for row in product_sorted:
+        key = _telemetry_actor_key(row)
+        if key:
+            events_by_actor.setdefault(key, []).append(row)
+    for row in attempts_sorted:
+        key = _telemetry_actor_key(row)
+        if key:
+            attempts_by_actor.setdefault(key, []).append(row)
+
+    first_onboarding: dict[str, dict] = {}
+    for row in product_sorted:
+        if row.get("event_type") != "onboarding_started":
+            continue
+        key = _telemetry_actor_key(row)
+        if key and key not in first_onboarding:
+            first_onboarding[key] = row
+
+    def event_time(actor_key: str, event_type: str, started_at: datetime) -> Optional[datetime]:
+        floor = started_at - timedelta(seconds=5)
+        for row in events_by_actor.get(actor_key, []):
+            stamp = _event_stamp(row)
+            if row.get("event_type") == event_type and stamp and stamp >= floor:
+                return stamp
+        return None
+
+    def actor_event_types(actor_key: str, started_at: datetime) -> set[str]:
+        floor = started_at - timedelta(seconds=5)
+        return {
+            str(row.get("event_type")) for row in events_by_actor.get(actor_key, [])
+            if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= floor
+        }
+
+    activity_dates: dict[str, set[date]] = {}
+    for row in product + attempts:
+        key = _telemetry_actor_key(row)
+        stamp = _event_stamp(row)
+        if key and stamp:
+            activity_dates.setdefault(key, set()).add(stamp.astimezone(TZ).date())
+
+    p24, p7, p30 = recent(product, cutoff24), recent(product, cutoff7), recent(product, cutoff30)
+    a24, a7, a30 = recent(attempts, cutoff24), recent(attempts, cutoff7), recent(attempts, cutoff30)
+    op24, op7 = recent(ops, cutoff24), recent(ops, cutoff7)
+    active24 = actors(p24) | actors(a24)
+    active7 = actors(p7) | actors(a7)
+
+    # Backward-compatible coarse metrics remain available for older admin clients.
+    def legacy_funnel(rows_p, rows_a):
+        app_open = event_actors(rows_p, "app_open")
+        onboard = event_actors(rows_p, "onboarding_completed")
+        starter = event_actors(rows_p, "starter_completed")
+        daily_start = attempt_actors(rows_a, "daily", False)
+        daily_done = attempt_actors(rows_a, "daily", True)
+        free_done = attempt_actors(rows_a, "free", True)
+        auth = event_actors(rows_p, "account_authenticated")
+        return {
+            "appOpen": len(app_open), "onboardingCompleted": len(onboard), "starterCompleted": len(starter),
+            "dailyStarted": len(daily_start), "dailyCompleted": len(daily_done), "freeCompleted": len(free_done),
+            "accountAuthenticated": len(auth),
+        }
+
+    def newcomer_window(cutoff: datetime, rows_p: list[dict], rows_a: list[dict]) -> dict:
+        cohort: dict[str, datetime] = {}
+        for key, row in first_onboarding.items():
+            stamp = _event_stamp(row)
+            if stamp and stamp >= cutoff and _app_version_at_least(row.get("app_version"), "3.31.5"):
+                cohort[key] = stamp
+
+        event_types = {key: actor_event_types(key, start) for key, start in cohort.items()}
+        current = set(cohort)
+        funnel_rows = []
+
+        def add_step(key: str, label: str, matched: set[str]):
+            nonlocal current
+            previous = len(current)
+            current &= matched
+            count = len(current)
+            funnel_rows.append({
+                "key": key, "label": label, "count": count, "previousCount": previous if funnel_rows else None,
+                "conversionFromPrevious": round(count / previous, 3) if funnel_rows and previous else (None if not funnel_rows else 0.0),
+                "dropOffCount": previous - count if funnel_rows else None,
+                "dropOff": round((previous - count) / previous, 3) if funnel_rows and previous else (None if not funnel_rows else 0.0),
+            })
+
+        add_step("onboardingStarted", "Začalo onboarding", set(cohort))
+        for event_type, key, label in (
+            ("onboarding_tutorial_completed", "tutorialCompleted", "Našlo PES"),
+            ("onboarding_support_selected", "supportSelected", "Vybralo Pomocníka"),
+            ("onboarding_completed", "onboardingCompleted", "Dokončilo onboarding"),
+            ("starter_started", "starterStarted", "Spustilo první Proplet"),
+            ("starter_word_1_completed", "starterWord1", "Našlo MRAK"),
+            ("starter_word_2_completed", "starterWord2", "Našlo JABLKO"),
+            ("starter_word_3_completed", "starterWord3", "Našlo ČOKOLÁDU"),
+            ("starter_completed", "starterCompleted", "Dokončilo první Proplet"),
+        ):
+            add_step(key, label, {actor for actor in cohort if event_type in event_types[actor]})
+
+        real_started: set[str] = set()
+        real_completed: set[str] = set()
+        for actor in current:
+            start = cohort[actor]
+            eligible_attempts = [
+                row for row in attempts_by_actor.get(actor, [])
+                if row.get("mode") in ("daily", "free")
+                and (parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ)) >= start - timedelta(seconds=5)
+            ]
+            if eligible_attempts:
+                real_started.add(actor)
+            if any(row.get("completed_at") for row in eligible_attempts):
+                real_completed.add(actor)
+        add_step("firstRealGameStarted", "Spustilo první skutečnou hru", real_started)
+        add_step("firstRealGameCompleted", "Dokončilo první skutečnou hru", real_completed)
+        add_step("accountAuthenticated", "Přihlásilo / vytvořilo účet", {actor for actor in cohort if "account_authenticated" in event_types[actor]})
+
+        choice = {actor for actor in cohort if "starter_hard_choice_shown" in event_types[actor]}
+        easy = choice & {actor for actor in cohort if "starter_easy_warmup_selected" in event_types[actor]}
+        direct = choice & {actor for actor in cohort if "starter_hard_direct_selected" in event_types[actor]}
+        warmup_done = easy & {actor for actor in cohort if "starter_easy_warmup_completed" in event_types[actor]}
+        warmup_to_daily: set[str] = set()
+        hard_started: set[str] = set()
+        hard_completed: set[str] = set()
+        for actor in choice:
+            start = cohort[actor]
+            daily_attempts = [
+                row for row in attempts_by_actor.get(actor, [])
+                if row.get("mode") == "daily" and row.get("difficulty") == "hard"
+                and (parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ)) >= start - timedelta(seconds=5)
+            ]
+            if daily_attempts:
+                hard_started.add(actor)
+                if actor in warmup_done:
+                    warmup_to_daily.add(actor)
+            if any(row.get("completed_at") for row in daily_attempts):
+                hard_completed.add(actor)
+
+        starter_started = {actor for actor in cohort if "starter_started" in event_types[actor]}
+        starter_done = starter_started & {actor for actor in cohort if "starter_completed" in event_types[actor]}
+        hint_offer = starter_started & {actor for actor in cohort if "starter_hint_offer_shown" in event_types[actor]}
+        hint_used = starter_started & {actor for actor in cohort if "starter_hint_used" in event_types[actor]}
+        reset = starter_started & {actor for actor in cohort if "starter_reset" in event_types[actor]}
+        abandon_cutoff = now - timedelta(minutes=30)
+        abandoned = {
+            actor for actor in starter_started - starter_done
+            if (event_time(actor, "starter_started", cohort[actor]) or now) <= abandon_cutoff
+        }
+        starter_times = []
+        for actor in starter_done:
+            start_time = event_time(actor, "starter_started", cohort[actor])
+            done_time = event_time(actor, "starter_completed", cohort[actor])
+            if start_time and done_time and done_time >= start_time:
+                elapsed = int((done_time - start_time).total_seconds() * 1000)
+                if elapsed <= 3_600_000:
+                    starter_times.append(elapsed)
+        support_distribution = {}
+        for mode in ("none", "beginner", "younger", "older"):
+            mode_set = {actor for actor in cohort if f"onboarding_support_selected_{mode}" in event_types[actor]}
+            support_distribution[mode] = {"count": len(mode_set), "share": round(len(mode_set) / len(cohort), 3) if cohort else None}
+
+        eligible = retained = 0
+        for actor, start in cohort.items():
+            first_day = start.astimezone(TZ).date()
+            if first_day <= today - timedelta(days=1):
+                eligible += 1
+                if first_day + timedelta(days=1) in activity_dates.get(actor, set()):
+                    retained += 1
+
+        visitor_actors = event_actors(rows_p, "app_open")
+        first_real_completed = next((row["count"] for row in funnel_rows if row["key"] == "firstRealGameCompleted"), 0)
+        return {
+            "visitors": len(visitor_actors), "newcomers": len(cohort),
+            "returningVisitors": max(0, len(visitor_actors) - len(cohort)),
+            "firstRealGameCompleted": first_real_completed,
+            "funnel": funnel_rows,
+            "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
+            "starter": {
+                "started": len(starter_started), "completed": len(starter_done),
+                "completionRate": round(len(starter_done) / len(starter_started), 3) if starter_started else None,
+                "medianCompletionMs": _median(starter_times), "hintOfferShown": len(hint_offer), "hintUsed": len(hint_used),
+                "hintUseRate": round(len(hint_used) / len(starter_started), 3) if starter_started else None,
+                "resetActors": len(reset), "abandoned": len(abandoned), "supportDistribution": support_distribution,
+            },
+            "hardDaily": {
+                "choiceShown": len(choice), "easySelected": len(easy), "directSelected": len(direct),
+                "easySelectionRate": round(len(easy) / len(choice), 3) if choice else None,
+                "directSelectionRate": round(len(direct) / len(choice), 3) if choice else None,
+                "warmupCompleted": len(warmup_done),
+                "warmupCompletionRate": round(len(warmup_done) / len(easy), 3) if easy else None,
+                "warmupToDailyStarted": len(warmup_to_daily),
+                "warmupToDailyRate": round(len(warmup_to_daily) / len(warmup_done), 3) if warmup_done else None,
+                "hardDailyStarted": len(hard_started), "hardDailyCompleted": len(hard_completed),
+                "hardDailyCompletionRate": round(len(hard_completed) / len(hard_started), 3) if hard_started else None,
+            },
+        }
+
+    windows = {
+        "24h": newcomer_window(cutoff24, p24, a24),
+        "7d": newcomer_window(cutoff7, p7, a7),
+        "30d": newcomer_window(cutoff30, p30, a30),
+    }
+
+    starter7 = event_actors(p7, "starter_completed")
+    auth7 = event_actors(p7, "account_authenticated")
+    starter_to_account = len(starter7 & auth7)
+
+    # Legacy all-user D1 remains for compatibility; newcomer D1 lives in each window above.
+    eligible = retained = 0
+    cohort_floor = today - timedelta(days=14)
+    for dates in activity_dates.values():
+        first = min(dates)
+        if cohort_floor <= first <= today - timedelta(days=1):
+            eligible += 1
+            if first + timedelta(days=1) in dates:
+                retained += 1
+
+    version_counts: dict[str, int] = {}
+    for row in a7:
+        version = str(row.get("app_version") or "neznámá")
+        version_counts[version] = version_counts.get(version, 0) + 1
+    versions = [{"version": v, "attempts": c} for v, c in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))][:8]
+
+    open_support = [row for row in support if str(row.get("status") or "new") in ("new", "reviewing")]
+    errors24 = [row for row in op24 if row.get("event_type") in ("server_error", "client_error")]
+    rate24 = [row for row in op24 if row.get("event_type") == "rate_limit"]
+    return {
+        "generatedAt": now.isoformat(),
+        "analyticsVersion": 3,
+        "newcomerInstrumentationFrom": "3.31.5",
+        "active": {"last24h": len(active24), "last7d": len(active7)},
+        "newAccounts24h": sum(1 for row in players if (parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ)) >= cutoff24),
+        "funnel24h": legacy_funnel(p24, a24), "funnel7d": legacy_funnel(p7, a7),
+        "windows": windows,
+        "starterToAccount7d": {"converted": starter_to_account, "starterCompleted": len(starter7), "rate": round(starter_to_account / len(starter7), 3) if starter7 else None},
+        "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
+        "reliability": {
+            "errors24h": len(errors24),
+            "errors7d": sum(1 for row in op7 if row.get("event_type") in ("server_error", "client_error")),
+            "rateLimits24h": len(rate24), "openSupportReports": len(open_support),
+        },
+        "appVersions7d": versions,
+    }
+
+
+@app.get("/api/admin/support")'''
+          match = launch_pattern.search(s)
+          if not match:
+              raise SystemExit('admin launch function: pattern not found')
+          s = launch_pattern.sub(launch_replacement, s, count=1)
+          path.write_text(s, encoding='utf-8')
+
+          # ---------- public/app.js ----------
+          path = Path('public/app.js')
+          s = path.read_text(encoding='utf-8')
+          s = replace_once(s, "const APP_VERSION='3.31.4';", "const APP_VERSION='3.31.5';", 'client version')
+          s = replace_once(s, "let onboardingStep=0;\nlet tutorialState={dragging:false,path:[],done:false};", "let onboardingStep=0;\nlet tutorialState={dragging:false,path:[],done:false};\nlet onboardingTutorialTracked=false;\nlet onboardingSupportTracked=false;", 'onboarding tracking guards')
+          s = replace_once(s, "starterHintUsed:false,starterHintOfferShown:false,starterGuidePath:[],undoSnapshot:null};", "starterHintUsed:false,starterHintOfferShown:false,starterTrackedWordCount:0,starterGuidePath:[],undoSnapshot:null};", 'starter word guard')
+          s = replace_once(s, "const idle=performance.now()-(g.lastProgressAt||g.start);if(idle<10000)return;g.starterHintOfferShown=true;$('#starterHintNudge')?.classList.remove('hidden');", "const idle=performance.now()-(g.lastProgressAt||g.start);if(idle<10000)return;g.starterHintOfferShown=true;trackProductEvent('starter_hint_offer_shown');$('#starterHintNudge')?.classList.remove('hidden');", 'starter hint offer')
+          s = replace_once(s, "if(g.mode==='starter'&&ai>=0)updateStarterGuidance();", "if(g.mode==='starter'&&ai>=0){const n=g.found.length;if(n<=3&&n>g.starterTrackedWordCount){g.starterTrackedWordCount=n;trackProductEvent(`starter_word_${n}_completed`)}updateStarterGuidance()}", 'starter word events')
+          s = replace_once(s, "if(!g.found.length){message('Plocha je už prázdná.');return}const usedHints=", "if(!g.found.length){message('Plocha je už prázdná.');return}if(g.mode==='starter')trackProductEvent('starter_reset');const usedHints=", 'starter reset event')
+          s = replace_once(s, "onboardingStep=onboardingFocusedHelper?ONBOARD_STEPS.length-1:0;tutorialState={dragging:false,path:[],done:false};const stored=", "onboardingStep=onboardingFocusedHelper?ONBOARD_STEPS.length-1:0;tutorialState={dragging:false,path:[],done:false};onboardingTutorialTracked=false;onboardingSupportTracked=false;const stored=", 'onboarding guard reset')
+          s = replace_once(s, "if(ok){tutorialState.done=true;$('#tutorialSuccess').textContent='Jo! 🐶 Slovo může i zatáčet.';", "if(ok){tutorialState.done=true;if(onboardingMandatory&&!onboardingTutorialTracked){onboardingTutorialTracked=true;trackProductEvent('onboarding_tutorial_completed')}$('#tutorialSuccess').textContent='Jo! 🐶 Slovo může i zatáčet.';", 'tutorial completion event')
+          s = replace_once(s, "}else{const launchStarter=onboardingMandatory;onboardingMandatory=false;trackProductEvent('onboarding_completed');", "}else{const launchStarter=onboardingMandatory;if(launchStarter&&!onboardingSupportTracked){onboardingSupportTracked=true;trackProductEvent('onboarding_support_selected');trackProductEvent(`onboarding_support_selected_${onboardingSupportMode}`)}onboardingMandatory=false;trackProductEvent('onboarding_completed');", 'support selection event')
+          path.write_text(s, encoding='utf-8')
+
+          # ---------- public/admin.js ----------
+          path = Path('public/admin.js')
+          s = path.read_text(encoding='utf-8')
+          s = replace_once(s, "const state={admin:null,launch:null,support:null,overview:null,quality:null,reports:null,users:null,audit:null,activeTab:'launch'};", "const state={admin:null,launch:null,support:null,overview:null,quality:null,reports:null,users:null,audit:null,activeTab:'launch',launchWindow:'7d'};", 'admin launch state')
+          admin_pattern = re.compile(r'function funnelRows\(data\)\{.*?\nasync function loadSupport', re.S)
+          admin_replacement = r'''function newcomerFunnelRows(rows=[]){
+ return rows.map(row=>`<div class="newcomer-funnel-row"><span><b>${esc(row.label)}</b><small>${row.previousCount==null?'nováčci v cohortě':`${fmtPct(row.conversionFromPrevious)} z předchozího kroku`}</small></span><strong>${fmtNumber(row.count)}</strong><em>${row.dropOffCount==null?'':`−${fmtNumber(row.dropOffCount)} · ${fmtPct(row.dropOff)}`}</em></div>`).join('')||'<p class="muted">První data z 3.31.5 se teprve začnou sbírat.</p>';
+}
+function metricLine(label,value,note=''){return `<div class="launch-metric-line"><span>${esc(label)}</span><b>${esc(value)}</b>${note?`<small>${esc(note)}</small>`:''}</div>`}
+function launchWindowButtons(){return `<div class="launch-window-tabs">${[['24h','24 h'],['7d','7 dní'],['30d','30 dní']].map(([key,label])=>`<button data-launch-window="${key}" class="${state.launchWindow===key?'active':''}">${label}</button>`).join('')}</div>`}
+async function loadLaunch(force=false){
+ const root=$('#launchContent');if(state.launch&&!force){renderLaunch();return}root.className='loading-panel panel';root.textContent='Načítám launch radar…';
+ try{state.launch=await api('/api/admin/launch');renderLaunch();await loadSupport(force)}catch(error){root.innerHTML=`<strong>Launch radar se nenačetl.</strong><p>${esc(error.message)}</p>`}
+}
+function renderLaunch(){
+ const d=state.launch||{},r=d.reliability||{},windowData=d.windows?.[state.launchWindow]||{},ret=windowData.retentionD1||{},starter=windowData.starter||{},hard=windowData.hardDaily||{},versions=d.appVersions7d||[],root=$('#launchContent');root.className='';const alertCount=Number(r.errors24h||0)+Number(r.openSupportReports||0);$('#launchAlertBadge').textContent=alertCount;$('#launchAlertBadge').classList.toggle('hidden',!alertCount);
+ const support=starter.supportDistribution||{};
+ root.innerHTML=`${launchWindowButtons()}<div class="kpi-grid launch-kpis">${kpi(windowData.visitors||0,'návštěvníků',`${windowData.returningVisitors||0} vracejících se`)}${kpi(windowData.newcomers||0,'nových hráčů','cohorta od v3.31.5')}${kpi(windowData.firstRealGameCompleted||0,'aktivovaných','dokončili první skutečnou hru')}${kpi(ret.rate==null?'—':fmtPct(ret.rate),'D1 návrat',`${ret.retained||0}/${ret.eligible||0} způsobilých`)}</div>
+ <div class="launch-grid launch-newcomer-grid"><section class="section-panel panel newcomer-funnel-panel"><p class="eyebrow">NOVÝ HRÁČ</p><h2>Onboarding → první skutečná hra → účet</h2><div class="newcomer-funnel">${newcomerFunnelRows(windowData.funnel)}</div></section><section class="section-panel panel"><p class="eyebrow">PRVNÍ DAILY JE TĚŽKÁ</p><h2>Rozcvička vs. rovnou Těžká</h2><div class="launch-metrics">${metricLine('Volba zobrazena',hard.choiceShown||0)}${metricLine('🌱 Snadná',hard.easySelected||0,hard.easySelectionRate==null?'—':fmtPct(hard.easySelectionRate))}${metricLine('🔥 Rovnou Těžká',hard.directSelected||0,hard.directSelectionRate==null?'—':fmtPct(hard.directSelectionRate))}${metricLine('Rozcvička dokončena',hard.warmupCompleted||0,hard.warmupCompletionRate==null?'—':fmtPct(hard.warmupCompletionRate))}${metricLine('Rozcvička → Daily',hard.warmupToDailyStarted||0,hard.warmupToDailyRate==null?'—':fmtPct(hard.warmupToDailyRate))}${metricLine('Těžká spuštěna',hard.hardDailyStarted||0)}${metricLine('Těžká dokončena',hard.hardDailyCompleted||0,hard.hardDailyCompletionRate==null?'—':fmtPct(hard.hardDailyCompletionRate))}</div></section></div>
+ <div class="launch-grid launch-bottom"><section class="section-panel panel"><p class="eyebrow">STARTER</p><h2>Chování v první úloze</h2><div class="launch-metrics">${metricLine('Dokončení',starter.completed||0,starter.completionRate==null?'—':fmtPct(starter.completionRate))}${metricLine('Medián času',fmtTime(starter.medianCompletionMs))}${metricLine('Nabídka nápovědy',starter.hintOfferShown||0)}${metricLine('Použitá nápověda',starter.hintUsed||0,starter.hintUseRate==null?'—':fmtPct(starter.hintUseRate))}${metricLine('Resetovalo',starter.resetActors||0)}${metricLine('Odpadlo >30 min',starter.abandoned||0)}</div><div class="support-distribution"><small>Pomocník</small>${Object.entries(SUPPORT).map(([key,label])=>`<span>${esc(label)} <b>${fmtNumber(support[key]?.count||0)}</b></span>`).join('')}</div></section><section class="section-panel panel"><p class="eyebrow">SPOLEHLIVOST</p><h2>Produkční signály</h2><div class="launch-health ${r.errors24h?'warn':'ok'}"><b>${r.errors24h?'Pozor na chyby':'Bez čerstvých chyb ✓'}</b><span>${r.errors7d||0} chyb za 7 dní · ${r.openSupportReports||0} otevřených hlášení · ${r.rateLimits24h||0} rate-limit zásahů</span></div><h3 class="launch-subhead">Verze hráčů · 7 dní</h3><div class="version-list">${versions.map(v=>barLine(`v${v.version}`,v.attempts,Math.max(...versions.map(x=>x.attempts),1))).join('')||'<p class="muted">Zatím bez pokusů.</p>'}</div></section></div>`;
+ $$('[data-launch-window]').forEach(button=>button.onclick=()=>{state.launchWindow=button.dataset.launchWindow;renderLaunch()});
+}
+async function loadSupport'''
+          if not admin_pattern.search(s):
+              raise SystemExit('admin launch renderer: pattern not found')
+          s = admin_pattern.sub(admin_replacement, s, count=1)
+          path.write_text(s, encoding='utf-8')
+
+          # ---------- public/admin.css ----------
+          path = Path('public/admin.css')
+          s = path.read_text(encoding='utf-8')
+          s += '''\n\n/* v3.31.5 — cohort-based new player funnel */\n.launch-window-tabs{display:flex;gap:5px;margin:0 0 10px}.launch-window-tabs button{border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:var(--paper);color:var(--muted);font-size:9px;font-weight:900;cursor:pointer}.launch-window-tabs button.active{background:var(--purple);border-color:var(--purple);color:#fff}.launch-newcomer-grid{grid-template-columns:1.35fr .65fr}.newcomer-funnel{display:grid}.newcomer-funnel-row{display:grid;grid-template-columns:minmax(170px,1fr) 52px 78px;align-items:center;gap:9px;padding:8px 0;border-top:1px solid var(--line)}.newcomer-funnel-row:first-child{border-top:0}.newcomer-funnel-row span b,.newcomer-funnel-row span small{display:block}.newcomer-funnel-row span b{font-size:10px}.newcomer-funnel-row span small{margin-top:2px;color:var(--muted);font-size:8px}.newcomer-funnel-row>strong{text-align:right;font-size:15px}.newcomer-funnel-row>em{text-align:right;color:var(--muted);font-size:8px;font-style:normal}.launch-metrics{display:grid}.launch-metric-line{display:grid;grid-template-columns:1fr auto;gap:3px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:10px}.launch-metric-line:first-child{border-top:0}.launch-metric-line b{font-size:13px}.launch-metric-line small{grid-column:1/-1;color:var(--muted);font-size:8px}.support-distribution{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}.support-distribution>small{width:100%;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase}.support-distribution span{padding:4px 7px;border-radius:999px;background:#f0edf5;font-size:8px}.launch-subhead{margin:16px 0 8px;font-size:11px}html[data-theme="dark"] .launch-window-tabs button{background:#23202f}html[data-theme="dark"] .launch-window-tabs button.active{background:var(--purple);color:#15121e}html[data-theme="dark"] .support-distribution span{background:#2b2833}@media(max-width:850px){.launch-newcomer-grid{grid-template-columns:1fr}}@media(max-width:520px){.newcomer-funnel-row{grid-template-columns:minmax(145px,1fr) 42px 64px;gap:6px}.newcomer-funnel-row>strong{font-size:13px}.launch-window-tabs{overflow:auto}}\n'''
+          path.write_text(s, encoding='utf-8')
+
+          # ---------- public/sw.js ----------
+          path = Path('public/sw.js')
+          s = path.read_text(encoding='utf-8')
+          s = replace_once(s, "const CACHE='proplet-v3.31.4-hard-daily-onboarding';", "const CACHE='proplet-v3.31.5-new-player-funnel';", 'service worker cache')
+          path.write_text(s, encoding='utf-8')
+          PY
+      - name: Validate syntax and release invariants
+        shell: bash
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          node --check public/admin.js
+          node --check public/sw.js
+          git diff --check
+          test "$(git diff --name-only | sort | tr '\n' ' ')" = ".github/workflows/proplet-v3315-preview.yml public/admin.css public/admin.js public/app.js public/sw.js server.py "
+          git diff --quiet -- data/puzzles.json public/puzzles.json
+          grep -q "caches.match('/puzzles.json')" public/app.js
+          grep -q "refresh=fetch(e.request,{cache:'no-store'})" public/sw.js
+          grep -q "newPlayerFunnelVersion\": 2" server.py
+          grep -q "starter_hard_choice_shown" server.py
+          grep -q "onboarding_tutorial_completed" public/app.js
+      - name: Commit validated preview
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/proplet-v3315-preview.yml
+          git add -A
+          git commit -m "Proplet v3.31.5 new player funnel analytics"
+          git push origin HEAD:preview/v3315-new-player-funnel
