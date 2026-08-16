@@ -1,0 +1,18 @@
+name: Diagnose live Daily leaderboard
+on:
+  push:
+    branches: [agent/diagnose-daily-live]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check live endpoint
+        run: |
+          set -x
+          curl -sS -D /tmp/headers.txt -o /tmp/body.txt -w '%{http_code}\n' 'https://proplet-nine.vercel.app/api/daily-global-leaderboard?daily_date=2026-08-16' | tee /tmp/status.txt
+          echo '--- HEADERS ---'
+          cat /tmp/headers.txt
+          echo '--- BODY ---'
+          cat /tmp/body.txt
