@@ -1,0 +1,61 @@
+name: Validate v3.29 onboarding production release
+on:
+  push:
+    branches: [agent/v329-onboarding-main]
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v329-onboarding-main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply approved onboarding patch
+        run: python .release/v329_apply.py
+      - name: Validate runtime and fast boot invariant
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          from pathlib import Path
+          app=Path('public/app.js').read_text()
+          css=Path('public/styles.css').read_text()
+          sw=Path('public/sw.js').read_text()
+          server=Path('server.py').read_text()
+          required_app=[
+            "const APP_VERSION='3.29.0';",
+            "cta:'Jak hrát'",
+            '<h2>Spojuj písmena do slov</h2>',
+            'Každý den nový Proplet',
+            'Stovky dalších úrovní',
+            "$('#winMenuBtn').textContent='Vybrat volnou hru'",
+            "$('#winPrimaryBtn').textContent='Hrát dnešní výzvu ☀️'",
+            "if(mode==='starter'){if(action==='menu'){nav('free',{replace:true});return}",
+            'async function loadPuzzleDatabase()',
+            'showPuzzleBootLoading();',
+            "const cached=await caches.match(url,{ignoreSearch:true});",
+            "if(data?.version===EXPECTED_PUZZLE_DB_VERSION)",
+          ]
+          for s in required_app:
+            assert s in app, f'missing app invariant: {s}'
+          assert 'VÍTEJ V PROPLETU' not in app
+          assert "cta:'Ukázat mi, jak se hraje'" not in app
+          assert '/* v3.29 — onboarding explains Daily and Free before teaching controls. */' in css
+          assert "const CACHE='proplet-v3.29.0-onboarding-fast-boot';" in sw
+          assert "if(u.pathname==='/puzzles.json')" in sw
+          assert "if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}" in sw
+          assert "fetch(e.request,{cache:'no-store'})" in sw
+          assert 'APP_VERSION = "3.29.0"' in server
+          print('v3.29 onboarding + v3.28.3 fast boot invariants OK')
+          PY
+      - name: Commit validated runtime
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/app.js public/styles.css public/sw.js server.py
+          git commit -m "Proplet v3.29.0 onboarding game modes" || true
+          git push
