@@ -1,0 +1,85 @@
+name: Productionize v3.30
+
+on:
+  push:
+    branches:
+      - release/v330-production
+
+permissions:
+  contents: write
+
+jobs:
+  productionize:
+    if: ${{ !contains(github.event.head_commit.message, '[v330-productionized]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Convert preview build to production
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          app = Path('public/app.js')
+          s = app.read_text(encoding='utf-8')
+          old = "const APP_VERSION='3.30.0-preview.1';"
+          assert s.count(old) == 1, s.count(old)
+          s = s.replace(old, "const APP_VERSION='3.30.0';")
+          old_preview = "const CONTENT_PREVIEW_DATE=typeof location!=='undefined'?String(new URLSearchParams(location.search).get('contentPreview')||'').slice(0,10):'';"
+          assert s.count(old_preview) == 1, s.count(old_preview)
+          s = s.replace(old_preview, "const CONTENT_PREVIEW_DATE='';")
+          app.write_text(s, encoding='utf-8')
+
+          server = Path('server.py')
+          s = server.read_text(encoding='utf-8')
+          old = 'APP_VERSION = "3.30.0-preview.1"'
+          assert s.count(old) == 1, s.count(old)
+          s = s.replace(old, 'APP_VERSION = "3.30.0"')
+          server.write_text(s, encoding='utf-8')
+
+          sw = Path('public/sw.js')
+          s = sw.read_text(encoding='utf-8')
+          old = "const CACHE='proplet-v3.30.0-preview.1-rolling-content';"
+          assert s.count(old) == 1, s.count(old)
+          s = s.replace(old, "const CACHE='proplet-v3.30.0-rolling-content';")
+          sw.write_text(s, encoding='utf-8')
+          PY
+      - name: Validate production invariants
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          python - <<'PY'
+          from pathlib import Path
+          app = Path('public/app.js').read_text(encoding='utf-8')
+          server = Path('server.py').read_text(encoding='utf-8')
+          sw = Path('public/sw.js').read_text(encoding='utf-8')
+          assert "const APP_VERSION='3.30.0';" in app
+          assert "const CONTENT_PREVIEW_DATE='';" in app
+          assert 'showPuzzleBootLoading' in app
+          assert 'loadPuzzleDatabase' in app
+          assert "/api/rolling-content" in app
+          assert 'APP_VERSION = "3.30.0"' in server
+          assert 'if VERCEL_ENV == "production":' in server
+          assert 'return actual' in server
+          assert 'content_enabled' in server and 'daily_enabled' in server
+          assert '/api/cron/content-push' in server
+          assert "proplet-v3.30.0-rolling-content" in sw
+          assert "u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'" in sw
+          PY
+          test -z "$(git diff origin/main -- data/puzzles.json public/puzzles.json)"
+          grep -q '"schedule": "0 9 \* \* 1"' vercel.json
+          grep -q '"verification":"PASS"\|Expected result: one JSON object with "verification":"PASS"' SUPABASE_VERIFY_V3_30.sql
+      - name: Commit productionized runtime
+        run: |
+          git config user.name 'Proplet Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add public/app.js public/sw.js server.py
+          git commit -m 'Proplet v3.30.0 production runtime [v330-productionized]'
+          git push
