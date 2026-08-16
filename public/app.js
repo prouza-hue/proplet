@@ -1,4 +1,4 @@
-const APP_VERSION='3.31.1-preview.1';
+const APP_VERSION='3.31.2-preview.1';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -675,7 +675,7 @@ function renderAccountNudge(stage){
 }
 function performPostWinAction(action){
  const mode=currentGame?.mode,diff=currentGame?.puzzle?.difficulty;
- if(mode==='starter'){if(action==='menu'){nav('free',{replace:true});return}nav('daily',{replace:true});showStarterDailyNudge();return}
+ if(mode==='starter'){if(action==='menu'){nav('free',{replace:true});return}startDaily();return}
  if(action==='continue'){if(mode==='free'&&currentGame?.contentBatchId){continueLatestContent();return}if(mode==='free')startFree(diff);else if(mode==='rescue')nav('daily',{replace:true});else nav('free',{replace:true});return}
  nav(mode==='daily'||mode==='rescue'?'daily':'free',{replace:currentScreen==='game'});
 }
