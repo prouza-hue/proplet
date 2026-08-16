@@ -1,0 +1,36 @@
+name: Proplet v3.31.4 hard Daily preview polish
+on:
+  push:
+    branches: [preview/v3314-first-hard-daily]
+permissions:
+  contents: write
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[v3314-preview-polished]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python .release/apply_v3314_preview_polish.py
+      - run: node --check public/app.js
+      - name: Validate focused warmup result
+        run: |
+          grep -q "g.mode==='free'&&!g.postStarterWarmup" public/app.js
+          grep -q "else if(g.postStarterWarmup){winBoard.classList.add('hidden')}" public/app.js
+          grep -q "!g.postStarterWarmup&&newBadge" public/app.js
+          grep -q "!g.postStarterWarmup&&newAchievements.length" public/app.js
+          grep -q "Paráda. Teď už jsi rozehřátý." public/app.js
+          grep -q "Jdu na dnešní výzvu" public/app.js
+          grep -q "caches.match(url,{ignoreSearch:true})" public/app.js
+      - name: Commit polished preview runtime
+        run: |
+          git config user.name "prouza-hue"
+          git config user.email "prouza@gmail.com"
+          git add public/app.js
+          git commit -m "Polish v3.31.4 Hard Daily preview [v3314-preview-polished]"
+          git push
