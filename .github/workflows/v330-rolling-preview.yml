@@ -13,7 +13,7 @@ jobs:
   build-and-audit:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,31 +26,17 @@ jobs:
       - name: Install runtime dependencies
         run: pip install -r requirements.txt
 
-      - name: Fix dynamic generator import registration
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          for name in ('tools/generate_rolling_content.py','tools/audit_rolling_content.py'):
-              p=Path(name); t=p.read_text(encoding='utf-8')
-              if 'import sys\n' not in t:
-                  t=t.replace('import random\n','import random\nimport sys\n') if 'import random\n' in t else t.replace('import json\n','import json\nimport sys\n')
-              old='    mod = importlib.util.module_from_spec(spec)\n    spec.loader.exec_module(mod)\n'
-              new='    mod = importlib.util.module_from_spec(spec)\n    sys.modules[spec.name] = mod\n    spec.loader.exec_module(mod)\n'
-              if old not in t and new not in t:
-                  raise SystemExit(f'import block missing in {name}')
-              t=t.replace(old,new,1)
-              p.write_text(t,encoding='utf-8')
-          PY
-
       - name: Generate 13-week rolling reserve
         run: python tools/generate_rolling_content.py
 
-      - name: Apply preview runtime
-        run: python .release/apply_v330.py
+      - name: Apply and harden preview runtime
+        run: |
+          python .release/apply_v330.py
+          python .release/harden_v330.py
 
       - name: Syntax checks
         run: |
-          python -m py_compile server.py tools/generate_rolling_content.py tools/audit_rolling_content.py .release/apply_v330.py
+          python -m py_compile server.py tools/generate_rolling_content.py tools/audit_rolling_content.py .release/apply_v330.py .release/harden_v330.py
           node --check public/app.js
           python -m json.tool vercel.json >/dev/null
           python -m json.tool data/puzzles.json >/dev/null
@@ -79,25 +65,38 @@ jobs:
           assert "const APP_VERSION='3.30.0-preview.1'" in app
           assert 'APP_VERSION = "3.30.0-preview.1"' in server
           assert 'const EXPECTED_PUZZLE_DB_VERSION=10' in app
-          assert "'/api/puzzles'" in app or '"/api/puzzles"' in app
           assert '@app.get("/api/puzzles")' in server
           assert 'is_puzzle_released' in server
           assert 'zatím nevydaná úroveň' in server
           assert 'VERCEL_ENV == "production"' in server
           assert 'X-Proplet-Preview-As-Of' in app
 
-          # Critical v3.28.3 fast-boot invariant.
+          # Critical v3.28.3 fast-boot invariant + Monday cache rollover.
           assert 'showPuzzleBootLoading()' in app
           assert 'caches.match(url)' in app
           assert "fetch(url,{cache:'no-store'" in app
+          assert 'function contentWeekKey' in app
+          assert "new URLSearchParams({week})" in app
+          assert "caches.match('/api/puzzles',{ignoreSearch:true})" in app
           assert "u.pathname==='/api/puzzles'||u.pathname==='/puzzles.json'" in sw
+          assert 'Monday week= cache key' in sw
           assert "if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}" in sw
           assert "if(u.pathname.startsWith('/api/'))return" in sw
+
+          # Public preview must never write simulated future gameplay into production Supabase.
+          assert "if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return" in app
+          assert 'if(CONTENT_PREVIEW_DATE||!rec?.attemptId' in app
+          assert 'if(CONTENT_PREVIEW_DATE)return;api(\'/api/product-event\'' in app
+          assert "simulovaném content preview hodnocení neodesíláme" in app
 
           # Static fallback must never contain the future reserve.
           assert data['version'] == 10 == public['version']
           assert {d:len(public['free'][d]) for d in ('easy','medium','hard','hardcore')} == {d:200 for d in ('easy','medium','hard','hardcore')}
           assert sum(len(data['free'][d])-200 for d in ('easy','medium','hard','hardcore')) == 65
+          rolling = [p for d in ('easy','medium','hard','hardcore') for p in data['free'][d] if p.get('meta',{}).get('rollingContent')]
+          assert len(rolling) == 65
+          assert all(p['meta'].get('wideVerifiedUnique') is True for p in rolling)
+          assert all(p['meta'].get('wideUniquenessDictionarySize') == 12000 for p in rolling)
           assert all(not p.get('meta',{}).get('rollingContent') for d in ('easy','medium','hard','hardcore') for p in public['free'][d])
 
           # Consent isolation: existing subscriptions remain Daily ON / Content OFF.
@@ -110,12 +109,15 @@ jobs:
           assert '@app.get("/api/cron/content-push")' in server
           assert 'push_delivery_log' in server
 
-          # UI and legacy achievements.
+          # UX and legacy achievements.
           assert 'id="contentPushToggleBtn"' in html
           assert 'id="newContentBanner"' in html
           assert '5 nových Propletů' in app
           assert 'fresh-level-badge' in css
           assert 'Dokonči všech 200' not in app
+          assert 'continueLatestContent' in app
+          assert "contentBatchId:options.contentBatchId||null" in app
+          assert 'latestContentUnplayed().filter' in app
 
           # Weekly cron: Monday content dispatch, separate from Daily cron.
           crons = {(x['path'],x['schedule']) for x in ver.get('crons',[])}
@@ -145,9 +147,9 @@ jobs:
           assert first['contentStatus']['latestBatch']['count'] == 5
           assert first['contentStatus']['latestBatch']['extraDifficulty'] == 'easy'
           assert first['contentStatus']['nextRelease'] == '2026-08-31'
-          # Payload must not expose future batch metadata.
           assert 'batches' not in first.get('rollingContent', {})
           first_ids = {p['id'] for bank in first['free'].values() for p in bank}
+          assert 'g2-e-201' in first_ids and 'g2-e-202' in first_ids
           assert 'g2-m-202' not in first_ids
           print('RELEASE GATING PASS', counts(first), counts(second), counts(end))
           PY
