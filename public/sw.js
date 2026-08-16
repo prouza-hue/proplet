@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.28.2-played-title-text-only';
+const CACHE='proplet-v3.28.3-fast-puzzle-boot';
 const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/home-layout.css','/home-layout.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/difficulty/easy.svg','/difficulty/medium.svg','/difficulty/hard.svg','/difficulty/hardcore.svg','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{
@@ -14,6 +14,19 @@ self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const u=new URL(e.request.url);
   if(u.pathname.startsWith('/api/'))return; // API se nikdy necachuje.
+  if(u.pathname==='/puzzles.json'){
+    // Herní banka je velká a mění se jen s releasem. Start aplikace proto nikdy
+    // neblokujeme sítí: použijeme cache a čerstvou kopii obnovíme na pozadí.
+    e.respondWith(caches.match(e.request).then(cached=>{
+      const refresh=fetch(e.request,{cache:'no-store'}).then(r=>{
+        if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
+        return r;
+      });
+      if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}
+      return refresh;
+    }).catch(()=>fetch(e.request,{cache:'no-store'})));
+    return;
+  }
   e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{
     const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r;
   }).catch(()=>caches.match(e.request)));
