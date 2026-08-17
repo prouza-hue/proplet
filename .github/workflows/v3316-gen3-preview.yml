@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-gen3:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,7 +30,7 @@ jobs:
           PY
       - name: Apply source patch
         run: python tools/apply_v3316_gen3_patch.py
-      - name: Harden finalizer quality insertion
+      - name: Harden finalizer and select balanced Hardcore
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -41,16 +41,46 @@ jobs:
           new='''    if marker in text:\n        text = text.replace(marker, ladder, 1)\n    else:\n        anchor = "    helper_summary = {}\\n"\n        if anchor not in text:\n            raise RuntimeError("quality ladder insertion anchor not found")\n        ladder_prefix = ladder.rsplit("    helper_summary = {}", 1)[0]\n        text = text.replace(anchor, ladder_prefix + anchor, 1)\n'''
           if old not in s:
               raise SystemExit('finalizer marker guard not found')
-          p.write_text(s.replace(old,new),encoding='utf-8')
+          s=s.replace(old,new)
+          current='''        dict(rows=10, cols=10, cells=(78, 88), words=(12, 15), min_len=4, max_len=10, dict_size=10500, cand=(18, 700),\n             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2, max_short_words=2),'''
+          balanced='''        dict(rows=10, cols=10, cells=(76, 84), words=(12, 14), min_len=4, max_len=10, dict_size=10500, cand=(18, 650),\n             style="winding", turn_bias=.39, curl_bias=.26, min_curvy=6, min_spiral=2, max_short_words=2),'''
+          if current not in s:
+              raise SystemExit('Hardcore profile marker not found')
+          s=s.replace(current,balanced,1)
+          p.write_text(s,encoding='utf-8')
           PY
       - name: Finalize progression architecture
         run: python tools/finalize_v3316_gen3.py
+      - name: Fix rolling Gen3 metadata and preflight
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          rolling=Path('tools/generate_rolling_content.py')
+          s=rolling.read_text(encoding='utf-8')
+          s=s.replace('"contentGeneration": 2,','"contentGeneration": 3,')
+          s=s.replace('"generationKey": "free-gen2",','"generationKey": "free-gen3",')
+          rolling.write_text(s,encoding='utf-8')
+          checks={
+            'rolling content generation 3':'"contentGeneration": 3,' in s,
+            'rolling generation key 3':'"generationKey": "free-gen3",' in s,
+            'rolling expects gen3':'Rolling content expects Free generation 3' in s,
+            'rolling g3 ids':'"g3-e"' in s and '"g3-x"' in s,
+          }
+          generator=Path('tools/generate_puzzles.py').read_text(encoding='utf-8')
+          checks['balanced hardcore']='cells=(76, 84)' in generator and 'words=(12, 14)' in generator and 'turn_bias=.39' in generator
+          failed=[name for name,ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit('Gen3 preflight failed: '+', '.join(failed))
+          print('Gen3 preflight OK:', ', '.join(checks))
+          PY
       - name: Compile generators and server
         run: |
           python -m py_compile tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py server.py
       - name: Generate Free Gen3
+        timeout-minutes: 30
         run: python tools/generate_free_generation3.py
       - name: Generate Gen3 rolling reserve
+        timeout-minutes: 20
         run: python tools/generate_rolling_content.py
       - name: Audit Free Gen3
         run: python tools/audit_free_generation3.py
@@ -72,6 +102,7 @@ jobs:
           from pathlib import Path
           data=json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
           public=json.loads(Path('public/puzzles.json').read_text(encoding='utf-8'))
+          rolling=json.loads(Path('data/rolling_content_v1.json').read_text(encoding='utf-8'))
           rejected={'NOCEBO','TREBUCHET','SOFISMUS','ČERNODÍRA','PERIGEUM','AEROGEL'}
           assert data['free']==public['free']
           assert all(not bank for bank in public.get('legacyFree',{}).values())
@@ -79,6 +110,7 @@ jobs:
           active_words={a['word'] for bank in data['free'].values() for p in bank for a in p['answers']}
           assert not (rejected & active_words), rejected & active_words
           assert len(public.get('legacyFreeIndex',{})) >= 800
+          assert all(int((p.get('meta') or {}).get('contentGeneration') or 0)==3 for bank in rolling.get('puzzles',{}).values() for p in bank)
           print('public bytes',Path('public/puzzles.json').stat().st_size,'server bytes',Path('data/puzzles.json').stat().st_size)
           PY
           ! grep -Eq 'PŘEVEDENO|Převedeno|převedených|dřívější verze|Původní výsledky' public/app.js
