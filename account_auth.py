@@ -72,7 +72,7 @@ def install_account_auth(
         host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").strip()
         if not host:
             raise HTTPException(400, "Neplatná adresa aplikace")
-        allowed = host == "proplet-nine.vercel.app" or host.endswith("-pavel-prouzas-projects.vercel.app") or host.endswith(".vercel.app")
+        allowed = host == "proplet-nine.vercel.app" or host.endswith("-pavel-prouzas-projects.vercel.app")
         if not allowed and host not in {"localhost", "127.0.0.1:8000", "localhost:8000"}:
             raise HTTPException(400, "Neplatná adresa aplikace")
         scheme = "http" if host.startswith("localhost") or host.startswith("127.0.0.1") else "https"
