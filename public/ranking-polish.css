@@ -1,0 +1,145 @@
+/* v3.31.7 ranking polish r7 */
+.ranking-control-row{
+  grid-template-columns:minmax(0,1fr) 1px minmax(0,1.35fr);
+  gap:12px;
+  align-items:center;
+  margin-top:12px;
+}
+.ranking-control-row::before{
+  content:"";
+  grid-column:2;
+  grid-row:1;
+  width:1px;
+  height:36px;
+  align-self:center;
+  background:var(--line);
+}
+.ranking-control-row>.ranking-segment{
+  position:relative;
+  margin-top:0;
+  border:1px solid transparent;
+}
+
+/* The main stylesheet is parsed after this dynamically injected polish sheet.
+   These selectors deliberately outrank the base .ranking-segment rule so the
+   semantic colors survive the cascade on Android/WebView as well. */
+#screen-leaderboard .ranking-control-row>.ranking-segment:first-child{
+  grid-column:1;
+  background:#ddd8ff !important;
+  border-color:#afa3ff !important;
+  box-shadow:inset 0 0 0 1px rgba(108,92,231,.05);
+}
+#screen-leaderboard .ranking-control-row>.ranking-period-segment{
+  grid-column:3;
+  background:#cff3e5 !important;
+  border-color:#8adabb !important;
+  box-shadow:inset 0 0 0 1px rgba(85,207,167,.06);
+}
+#screen-leaderboard .ranking-control-row>.ranking-segment button,
+#screen-leaderboard .ranking-control-row>.ranking-segment button.active,
+#screen-leaderboard .ranking-daily-segment button,
+#screen-leaderboard .ranking-daily-segment button.active{
+  color:var(--ink);
+}
+#screen-leaderboard .ranking-control-row>.ranking-segment button.active,
+#screen-leaderboard .ranking-daily-segment button.active{
+  background:#fffefd !important;
+  box-shadow:0 3px 10px rgba(39,32,72,.11);
+}
+#screen-leaderboard .ranking-section>.ranking-daily-segment{
+  background:#ddd8ff !important;
+  border:1px solid #afa3ff !important;
+  box-shadow:inset 0 0 0 1px rgba(108,92,231,.05);
+}
+
+/* Onboarding: align mode art to the copy top and replace the font glyph sun
+   with a small purpose-built vector mark. */
+.onboard-game-modes .onboard-mode-card{
+  grid-template-columns:58px minmax(0,1fr) !important;
+  align-items:start !important;
+  gap:12px;
+}
+.onboard-game-modes .onboard-mode-card>div:last-child{
+  padding-top:2px;
+}
+.onboard-game-modes .onboard-mode-card .onboard-mode-mark.daily-mark{
+  width:50px !important;
+  height:50px !important;
+  align-self:start !important;
+  margin-top:0 !important;
+  border-radius:16px;
+  font-size:0 !important;
+  background-color:#f0edff !important;
+  border:1px solid #cfc6ff;
+  box-shadow:inset 0 0 0 1px rgba(108,92,231,.04),0 3px 8px rgba(72,58,133,.06);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='6.5' fill='%23FFD66B' stroke='%236C5CE7' stroke-width='2'/%3E%3Cpath d='M16 2.5v4M16 25.5v4M2.5 16h4M25.5 16h4M6.45 6.45l2.85 2.85M22.7 22.7l2.85 2.85M25.55 6.45L22.7 9.3M9.3 22.7l-2.85 2.85' fill='none' stroke='%236C5CE7' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:31px 31px !important;
+}
+.onboard-game-modes .onboard-mode-card .onboard-free-icons{
+  width:50px !important;
+  align-self:start !important;
+  margin-top:1px;
+}
+
+.ranking-more{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px 10px 3px;
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+.ranking-more>span{font-size:17px}
+.ranking-more strong{color:var(--ink)}
+.ranking-own-divider{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:7px 2px 0;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+.ranking-own-divider::before,.ranking-own-divider::after{
+  content:"";
+  height:1px;
+  background:var(--line);
+  flex:1;
+}
+.ranking-own-divider span{white-space:nowrap}
+#winModal{cursor:pointer}
+#winModal .modal-card{cursor:default}
+
+html[data-theme="dark"] #screen-leaderboard .ranking-control-row>.ranking-segment:first-child,
+html[data-theme="dark"] #screen-leaderboard .ranking-section>.ranking-daily-segment{
+  background:#39315d !important;
+  border-color:#6254a0 !important;
+}
+html[data-theme="dark"] #screen-leaderboard .ranking-control-row>.ranking-period-segment{
+  background:#21493b !important;
+  border-color:#397b63 !important;
+}
+html[data-theme="dark"] #screen-leaderboard .ranking-control-row>.ranking-segment button.active,
+html[data-theme="dark"] #screen-leaderboard .ranking-daily-segment button.active{
+  background:#211f2c !important;
+  color:var(--ink);
+}
+html[data-theme="dark"] .onboard-game-modes .onboard-mode-card .onboard-mode-mark.daily-mark{
+  background-color:#373050 !important;
+  border-color:#554a79;
+}
+
+@media(max-width:520px){
+  .ranking-control-row{grid-template-columns:1fr;gap:8px;margin-top:12px}
+  .ranking-control-row::before{display:none}
+  #screen-leaderboard .ranking-control-row>.ranking-segment:first-child,
+  #screen-leaderboard .ranking-control-row>.ranking-period-segment{grid-column:auto}
+  #screen-leaderboard .ranking-control-row>.ranking-period-segment{order:2;margin-top:8px}
+}

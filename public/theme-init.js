@@ -27,6 +27,11 @@
   css.href='/home-layout.css?v=8';
   document.head.appendChild(css);
 
+  const rankingCss=document.createElement('link');
+  rankingCss.rel='stylesheet';
+  rankingCss.href='/ranking-polish.css?v=5';
+  document.head.appendChild(rankingCss);
+
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
@@ -34,6 +39,16 @@
     script.dataset.propletHomeLayout='1';
     document.body.appendChild(script);
   };
-  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadHomeLayout,{once:true});
-  else loadHomeLayout();
+
+  const loadRankingPolish=()=>{
+    if(document.querySelector('script[data-proplet-ranking-polish]'))return;
+    const script=document.createElement('script');
+    script.src='/ranking-polish.js?v=2';
+    script.dataset.propletRankingPolish='1';
+    document.body.appendChild(script);
+  };
+
+  const loadExtras=()=>{loadHomeLayout();loadRankingPolish()};
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
+  else loadExtras();
 })();

@@ -55,7 +55,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.31.6.1"
+APP_VERSION = "3.31.7"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -308,6 +308,10 @@ class FamilyLeagueSettings(BaseModel):
     enabled: bool
     public_name: Optional[str] = Field(default=None, min_length=2, max_length=40)
     league_pin: Optional[str] = Field(default=None, max_length=32)  # backward compatibility with v3.8.1 clients
+
+
+class PublicRankingsSet(BaseModel):
+    enabled: bool
 
 
 def supabase_ready() -> bool:
@@ -1395,6 +1399,7 @@ def health():
         "newPlayerFunnelVersion": 2,
         "singleMemberTeams": True,
         "xpEconomyVersion": 2,
+        "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
         "rollingContentCadence": load_rolling_content().get("cadence"),
         "rollingContentFirstRelease": load_rolling_content().get("firstRelease"),
@@ -1502,7 +1507,7 @@ def health():
             xp_migration = xp_economy_migrated()
         except HTTPException:
             xp_migration = False
-        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "freeProgressionMigration": free_generation2_migration, "stableFreeLevelSlots": True, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "freeProgressionMigration": free_generation2_migration, "stableFreeLevelSlots": True, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "rankingsV2Migration": rankings_v2_schema_ready(), "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException:
         return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "freeProgressionMigration": False, "stableFreeLevelSlots": True, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
 
@@ -1606,12 +1611,20 @@ def create_player(payload: PlayerCreate, request: Request):
             raise HTTPException(409, "Takový hráč už existuje")
         raise
 
+    if not solo and row.get("team_joined_at"):
+        try:
+            db_insert("team_memberships", {
+                "id": str(uuid.uuid4()), "player_id": player_id, "team_code": family,
+                "joined_at": row["team_joined_at"], "created_at": row["team_joined_at"],
+            })
+        except HTTPException:
+            logger.warning("Could not create initial team_membership for player %s", player_id)
     stats = player_stats(player_id)
     public_family = public_family_code(family, row.get("team_joined_at"))
     return {
         "id": player_id, "name": name, "familyCode": public_family,
         "leagueName": league_name_for(family) if public_family else None, "token": token,
-        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "stats": stats,
+        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "publicRankings": row.get("public_rankings"), "stats": stats,
     }
 
 
@@ -1644,7 +1657,7 @@ def login(payload: PlayerLogin, request: Request):
     return {
         "id": player["id"], "name": player["name"], "familyCode": public_family,
         "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
-        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": player_stats(player["id"]),
+        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": player_stats(player["id"]),
     }
 
 
@@ -1844,6 +1857,8 @@ def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[
 def set_team_membership(payload: TeamMembershipSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_membership", limit=15, window_seconds=600, discriminator=payload.family_code or payload.league_name or payload.mode)
     player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     current_family = norm_family(str(player.get("family_code") or ""))
     if not is_solo_player(player):
         raise HTTPException(409, "Tento hráč už je v týmu")
@@ -1874,7 +1889,17 @@ def set_team_membership(payload: TeamMembershipSet, request: Request, authorizat
     target_players = db_select("players", family_code=family)
     if any(p.get("id") != player.get("id") and p.get("name", "").casefold() == player.get("name", "").casefold() for p in target_players):
         raise HTTPException(409, "V tomto týmu už je hráč se stejným jménem")
-    db_update("players", {"id": player["id"]}, {"family_code": family, "team_joined_at": datetime.now(TZ).isoformat()})
+    joined_at = datetime.now(TZ).isoformat()
+    db_update("players", {"id": player["id"]}, {"family_code": family, "team_joined_at": joined_at})
+    try:
+        db_insert("team_memberships", {
+            "id": str(uuid.uuid4()), "player_id": player["id"], "team_code": family,
+            "joined_at": joined_at, "created_at": joined_at,
+        })
+    except HTTPException as exc:
+        # Avoid a half-switched player if the new history layer is unavailable.
+        db_update("players", {"id": player["id"]}, {"family_code": current_family, "team_joined_at": player.get("team_joined_at")})
+        raise HTTPException(503, "Týmová aktualizace se nepodařila dokončit") from exc
     return {"ok": True, "familyCode": family, "leagueName": league_name_for(family)}
 
 
@@ -1906,7 +1931,7 @@ def me(request: Request, authorization: Optional[str] = Header(default=None)):
     return {
         "id": player["id"], "name": player["name"], "familyCode": public_family,
         "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
-        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": stats,
+        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": stats,
     }
 
 
@@ -1960,6 +1985,7 @@ def account_export(request: Request, authorization: Optional[str] = Header(defau
             "supportMode": player.get("support_mode") or "none",
             "createdAt": player.get("created_at"),
             "teamJoinedAt": player.get("team_joined_at"),
+            "publicRankings": player.get("public_rankings"),
             "hasPassword": bool(player.get("password_hash")),
         },
         "results": db_select("results", player_id=player_id),
@@ -3411,6 +3437,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             })
         elif incoming_is_earlier and old.get("puzzle_id") == payload.puzzle_id:
             db_update("results", {"id": old["id"]}, {
+                **({"team_code_at_completion": team_code_for_player_at(player, official_completed_at)} if rankings_v2_schema_ready() else {}),
                 "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                 "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
                 "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
@@ -3420,6 +3447,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     else:
         try:
             db_insert("results", {
+                **({"team_code_at_completion": team_code_for_player_at(player, official_completed_at)} if rankings_v2_schema_ready() else {}),
                 "id": str(uuid.uuid4()),
                 "player_id": player["id"],
                 "puzzle_id": payload.puzzle_id,
@@ -3738,6 +3766,8 @@ def family_league(
 def family_league_settings(payload: FamilyLeagueSettings, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "family_league_settings", limit=20, window_seconds=3600)
     player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     family = norm_family(str(player.get("family_code") or ""))
     if is_solo_player(player):
         raise HTTPException(400, "Nejdřív se připoj k týmu nebo ho založ")
@@ -3801,10 +3831,10 @@ def free_global_leaderboard(
     authorization: Optional[str] = Header(default=None),
 ):
     enforce_rate_limit(request, "free_global_read", limit=300, window_seconds=3600)
-    """Privacy-safe worldwide standings for one active Free puzzle.
+    """Worldwide standings for one active Free puzzle.
 
-    Every player is represented by their first completed attempt only. The
-    response deliberately contains no names, avatars, team codes or player IDs.
+    Every player is represented by their first completed attempt only. Identity is
+    shown only after explicit opt-in; everyone else receives a per-puzzle alias.
     """
     info = free_puzzle_info(puzzle_id)
     if not info or info.get("legacy") is True:
@@ -3843,12 +3873,19 @@ def free_global_leaderboard(
         start = max(0, min(my_index - 1, total - 3))
         visible_indices = list(range(start, min(total, start + 3)))
 
+    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}
+    used_aliases: set[str] = set()
     board = []
     for index in visible_indices:
         row = ranked[index]
+        pid = str(row.get("player_id") or "")
+        identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"free:{puzzle_id}", used_aliases)
         board.append({
             "rank": index + 1,
             "isMine": index == my_index,
+            "name": identity["name"],
+            "avatar": identity["avatar"],
+            "anonymous": identity["anonymous"],
             "elapsedMs": int(row.get("elapsed_ms") or 0),
             "moves": int(row.get("moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -3867,7 +3904,7 @@ def free_global_leaderboard(
         "topPercent": top_percent,
         "percentileMinimum": 10,
         "rows": board,
-        "privacy": "anonymous-performance-only",
+        "privacy": "opt-in-identity-otherwise-alias",
         "attemptPolicy": "first-completed-only",
     }
 
@@ -3878,7 +3915,7 @@ def daily_global_leaderboard(
     daily_date: Optional[str] = Query(default=None),
     authorization: Optional[str] = Header(default=None),
 ):
-    """Privacy-safe global Daily standings: public performance, never player identity."""
+    """Global Daily standings: opted-in identity, otherwise a privacy-safe playful alias."""
     enforce_rate_limit(request, "daily_global_read", limit=300, window_seconds=3600)
     selected_date = daily_date or current_prague_date().isoformat()
     try:
@@ -3925,12 +3962,19 @@ def daily_global_leaderboard(
         start = max(0, min(my_index - 1, total - 3))
         visible_indices = list(range(start, min(total, start + 3)))
 
+    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}
+    used_aliases: set[str] = set()
     board = []
     for index in visible_indices:
         row = ranked[index]
+        pid = str(row.get("player_id") or "")
+        identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"day:{selected_date}", used_aliases)
         board.append({
             "rank": index + 1,
             "isMine": index == my_index,
+            "name": identity["name"],
+            "avatar": identity["avatar"],
+            "anonymous": identity["anonymous"],
             "elapsedMs": int(row.get("best_elapsed_ms") or 0),
             "moves": int(row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -3946,7 +3990,410 @@ def daily_global_leaderboard(
         "myRank": my_rank,
         "topPercent": top_percent,
         "rows": board,
-        "privacy": "anonymous-performance-only",
+        "privacy": "opt-in-identity-otherwise-alias",
+    }
+
+
+
+
+def _ranking_period_start(period: str) -> datetime | None:
+    now = datetime.now(TZ)
+    if period == "today":
+        return now.replace(hour=0, minute=0, second=0, microsecond=0)
+    if period == "week":
+        start = now - timedelta(days=now.weekday())
+        return start.replace(hour=0, minute=0, second=0, microsecond=0)
+    if period == "all":
+        return None
+    raise HTTPException(400, "Neplatné období pořadí")
+
+
+def _ranking_viewer(authorization: Optional[str]) -> dict | None:
+    if not authorization:
+        return None
+    try:
+        return auth_player(authorization)
+    except HTTPException:
+        return None
+
+
+def rankings_v2_schema_ready() -> bool:
+    try:
+        db_request("GET", "players", params={"select": "id,public_rankings", "limit": "1"})
+        db_request("GET", "results", params={"select": "id,team_code_at_completion", "limit": "1"})
+        db_request("GET", "team_memberships", params={"select": "id,player_id,team_code,joined_at,left_at", "limit": "1"})
+        return True
+    except HTTPException:
+        return False
+
+
+def _ranking_visibility_ready() -> bool:
+    try:
+        db_request("GET", "players", params={"select": "id,public_rankings", "limit": "1"})
+        return True
+    except HTTPException:
+        return False
+
+
+def _ranking_player_visible(player: dict, viewer_id: str | None) -> bool:
+    if viewer_id and str(player.get("id")) == viewer_id:
+        return True
+    # NULL means the player has not answered the one-time visibility notice yet.
+    return player.get("public_rankings") is True
+
+
+_RANKING_ANON_ADJECTIVES = [
+    "Tajemný", "Nenápadný", "Záhadný", "Skrytý", "Maskovaný", "Mlčenlivý",
+    "Tichý", "Neznámý", "Utajený", "Noční", "Kosmický", "Divoký",
+    "Chytrý", "Zvědavý", "Propletený", "Šifrovaný", "Nečekaný", "Potulný",
+    "Rychlý", "Trpělivý",
+]
+_RANKING_ANON_ANIMALS = [
+    ("jezevec", "🦡"), ("mýval", "🦝"), ("sysel", "🐿️"), ("krtek", "🐾"),
+    ("tučňák", "🐧"), ("narval", "🐋"), ("tapír", "🐾"), ("papuchalk", "🐦"),
+    ("albatros", "🕊️"), ("axolotl", "🦎"), ("bobr", "🦫"), ("los", "🫎"),
+    ("lev", "🦁"), ("rys", "🐈"), ("vlk", "🐺"), ("kocour", "🐱"),
+    ("králík", "🐰"), ("delfín", "🐬"), ("hroch", "🦛"), ("šakal", "🐺"),
+    ("lemur", "🐒"), ("sokol", "🦅"), ("datel", "🐦"), ("gekon", "🦎"),
+]
+
+def _ranking_anonymous_identity(player_id: str, scope: str, used_names: set[str] | None = None) -> dict:
+    used_names = used_names if used_names is not None else set()
+    for nonce in range(512):
+        digest = hashlib.sha256(f"proplet-anon-v1:{scope}:{player_id}:{nonce}".encode()).digest()
+        adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]
+        animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]
+        name = f"{adjective} {animal}"
+        if name not in used_names:
+            used_names.add(name)
+            return {"name": name, "avatar": avatar, "anonymous": True}
+    return {"name": "Anonymní propletač", "avatar": "🎭", "anonymous": True}
+
+def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope: str, used_names: set[str] | None = None) -> dict:
+    player = player or {}
+    if _ranking_player_visible(player, viewer_id):
+        return {
+            "name": player.get("name") or "Hráč",
+            "avatar": player.get("avatar") or "🙂",
+            "anonymous": False,
+        }
+    return _ranking_anonymous_identity(str(player.get("id") or "unknown"), scope, used_names)
+
+
+def _ranking_result_team(row: dict, player: dict | None) -> str | None:
+    # v3.31.7 migration stores the authoritative team at XP acquisition. Until the
+    # additive migration is applied, preview falls back to the current one-team model.
+    stored = norm_family(str(row.get("team_code_at_completion") or ""))
+    if stored and not stored.startswith(SOLO_FAMILY_PREFIX):
+        return stored
+    if not player or is_solo_player(player):
+        return None
+    family = norm_family(str(player.get("family_code") or ""))
+    if not family:
+        return None
+    joined = parse_timestamp(player.get("team_joined_at"))
+    completed = parse_timestamp(row.get("completed_at"))
+    if joined and completed and completed < joined:
+        return None
+    return family
+
+
+def team_code_for_player_at(player: dict, completed_at: str | datetime | None) -> str | None:
+    """Resolve the team a player belonged to at the actual completion timestamp.
+
+    This is deliberately time-based so a delayed offline result cannot be credited to
+    a team the player joined only later. After switching teams, old XP never moves.
+    """
+    completed = parse_timestamp(completed_at)
+    player_id = str(player.get("id") or "")
+    if not completed or not player_id:
+        return None
+    try:
+        memberships = db_select("team_memberships", player_id=player_id)
+        for membership in memberships:
+            joined = parse_timestamp(membership.get("joined_at"))
+            left = parse_timestamp(membership.get("left_at"))
+            if joined and joined <= completed and (left is None or completed < left):
+                family = norm_family(str(membership.get("team_code") or ""))
+                if family and not family.startswith(SOLO_FAMILY_PREFIX):
+                    return family
+        return None
+    except HTTPException:
+        # Preview/backward-compatible fallback before the additive migration exists.
+        return _ranking_result_team({"completed_at": completed.isoformat()}, player)
+
+
+def _ranking_badge_counts(results: list[dict], rescues: list[dict]) -> dict[str, int]:
+    dates: dict[str, set[str]] = {}
+    for row in results:
+        if row.get("mode") == "daily" and row.get("daily_date") and row.get("player_id"):
+            dates.setdefault(str(row["player_id"]), set()).add(str(row["daily_date"])[:10])
+    for row in rescues:
+        if row.get("status") == "passed" and row.get("missed_date") and row.get("player_id"):
+            dates.setdefault(str(row["player_id"]), set()).add(str(row["missed_date"])[:10])
+    out = {}
+    for player_id, values in dates.items():
+        _, longest = streaks(list(values))
+        out[player_id] = sum(1 for badge in BADGES if longest >= int(badge["days"]))
+    return out
+
+
+def _ranking_assign_tied_ranks(rows: list[dict], score_key: str) -> None:
+    previous = object()
+    rank = 0
+    for index, row in enumerate(rows, 1):
+        score = row.get(score_key)
+        if score != previous:
+            rank = index
+            previous = score
+        row["rank"] = rank
+
+
+def _ranking_context():
+    players = db_select_all("players")
+    leagues = db_select_all("leagues")
+    results = db_select_all("results")
+    try:
+        rescues = db_select_all("streak_rescues")
+    except HTTPException:
+        rescues = []
+    player_by_id = {str(p.get("id")): p for p in players if p.get("id")}
+    league_by_code = {norm_family(str(l.get("code") or "")): l for l in leagues if l.get("code")}
+    public_team_names = {
+        code: (league.get("public_name") or league.get("name") or code)
+        for code, league in league_by_code.items() if league.get("public_opt_in") is True
+    }
+    return players, results, rescues, player_by_id, league_by_code, public_team_names
+
+
+@app.post("/api/rankings/visibility")
+def rankings_visibility(
+    payload: PublicRankingsSet,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "rankings_visibility", limit=20, window_seconds=3600)
+    player = auth_player(authorization)
+    try:
+        db_update("players", {"id": player["id"]}, {"public_rankings": bool(payload.enabled)})
+    except HTTPException as exc:
+        raise HTTPException(503, "Nové pořadí ještě čeká na databázovou aktualizaci") from exc
+    return {"ok": True, "publicRankings": bool(payload.enabled)}
+
+
+@app.get("/api/team-settings")
+def team_settings(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "team_settings_read", limit=120, window_seconds=3600)
+    player = auth_player(authorization)
+    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    if not family:
+        return {"hasTeam": False}
+    rows = db_select("leagues", code=family)
+    if not rows:
+        raise HTTPException(404, "Tým neexistuje")
+    league = rows[0]
+    return {
+        "hasTeam": True,
+        "leagueName": league.get("name") or family,
+        "publicEnabled": league.get("public_opt_in") is True,
+        "publicName": league.get("public_name") or league.get("name") or family,
+    }
+
+
+@app.post("/api/team-membership/leave")
+def leave_team(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "team_leave", limit=8, window_seconds=3600)
+    player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
+    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    if not family:
+        return {"ok": True, "familyCode": None, "leagueName": None}
+    now = datetime.now(TZ).isoformat()
+    try:
+        memberships = db_select("team_memberships", player_id=player["id"])
+    except HTTPException as exc:
+        raise HTTPException(503, "Změna týmu ještě čeká na databázovou aktualizaci") from exc
+    active = [row for row in memberships if not row.get("left_at")]
+    for membership in active:
+        db_update("team_memberships", {"id": membership["id"]}, {"left_at": now})
+    new_solo = make_solo_family_code()
+    db_update("players", {"id": player["id"]}, {"family_code": new_solo, "team_joined_at": None})
+    return {"ok": True, "familyCode": None, "leagueName": None}
+
+
+@app.get("/api/rankings/xp")
+def rankings_xp(
+    request: Request,
+    period: str = Query(default="today", pattern="^(today|week|all)$"),
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "rankings_xp_read", limit=300, window_seconds=3600)
+    viewer = _ranking_viewer(authorization)
+    viewer_id = str(viewer.get("id")) if viewer else None
+    viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
+    players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
+    period_start = _ranking_period_start(period)
+    period_results = [
+        row for row in results
+        if period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start)
+    ]
+    lifetime_points: dict[str, int] = {}
+    for row in results:
+        pid = str(row.get("player_id") or "")
+        if pid:
+            lifetime_points[pid] = lifetime_points.get(pid, 0) + int(row.get("points") or 0)
+    period_points: dict[str, int] = {}
+    for row in period_results:
+        pid = str(row.get("player_id") or "")
+        if pid:
+            period_points[pid] = period_points.get(pid, 0) + int(row.get("points") or 0)
+    badge_counts = _ranking_badge_counts(results, rescues)
+
+    player_rows = []
+    used_aliases: set[str] = set()
+    alias_scope = f"day:{current_prague_date().isoformat()}" if period == "today" else (f"xp-week:{period_start.date().isoformat()}" if period_start else "xp-all")
+    for player in players:
+        pid = str(player.get("id") or "")
+        score = int(period_points.get(pid, 0))
+        if score <= 0 and pid != viewer_id:
+            continue
+        identity = _ranking_display_identity(player, viewer_id, alias_scope, used_aliases)
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        team_name = public_team_names.get(family or "") if not identity["anonymous"] else None
+        if pid == viewer_id and family and not team_name:
+            league = league_by_code.get(family)
+            team_name = (league or {}).get("name") or family
+        player_rows.append({
+            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],
+            "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),
+            "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),
+            "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,
+        })
+    player_rows.sort(key=lambda row: (-row["xp"], -row["lifetimePoints"], str(row["name"]).casefold()))
+    _ranking_assign_tied_ranks(player_rows, "xp")
+
+    team_points: dict[str, int] = {}
+    for row in period_results:
+        player = player_by_id.get(str(row.get("player_id") or ""))
+        family = _ranking_result_team(row, player)
+        if family:
+            team_points[family] = team_points.get(family, 0) + int(row.get("points") or 0)
+    current_members: dict[str, int] = {}
+    for player in players:
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        if family:
+            current_members[family] = current_members.get(family, 0) + 1
+    team_rows = []
+    for family, score in team_points.items():
+        if score <= 0:
+            continue
+        if family not in public_team_names and family != viewer_team:
+            continue
+        league = league_by_code.get(family) or {}
+        name = public_team_names.get(family) or league.get("name") or family
+        team_rows.append({
+            "name": name, "xp": int(score), "memberCount": int(current_members.get(family, 0)),
+            "isMine": bool(viewer_team and family == viewer_team),
+        })
+    team_rows.sort(key=lambda row: (-row["xp"], -row["memberCount"], str(row["name"]).casefold()))
+    _ranking_assign_tied_ranks(team_rows, "xp")
+    return {
+        "kind": "xp", "period": period, "players": player_rows, "teams": team_rows,
+        "visibilityReady": _ranking_visibility_ready(),
+        "scoring": "awarded-xp",
+        "teamAttribution": "result-team-at-completion" if _ranking_visibility_ready() else "joined-at-compatible-preview",
+    }
+
+
+@app.get("/api/rankings/daily")
+def rankings_daily(
+    request: Request,
+    daily_date: Optional[str] = Query(default=None),
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "rankings_daily_read", limit=300, window_seconds=3600)
+    selected_date = daily_date or current_prague_date().isoformat()
+    try:
+        date.fromisoformat(selected_date)
+    except ValueError:
+        raise HTTPException(400, "Neplatné datum")
+    viewer = _ranking_viewer(authorization)
+    viewer_id = str(viewer.get("id")) if viewer else None
+    viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
+    players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
+    primary_puzzle_id = expected_daily_puzzle_id(selected_date)
+    day_rows = [
+        row for row in results
+        if row.get("mode") == "daily" and str(row.get("daily_date") or "")[:10] == selected_date
+        and row.get("puzzle_id") == primary_puzzle_id
+    ]
+    by_player: dict[str, dict] = {}
+    for row in day_rows:
+        pid = str(row.get("player_id") or "")
+        if not pid:
+            continue
+        previous = by_player.get(pid)
+        if previous is None or completion_time(row) < completion_time(previous):
+            by_player[pid] = row
+    ranked_all = sorted(by_player.values(), key=lambda row: (
+        0 if row.get("clean_solve") is True else 1,
+        int(row.get("hints_used") or 0), int(row.get("best_elapsed_ms") or 10**12),
+        int(row.get("best_moves") or 10**9), completion_time(row), str(row.get("player_id") or ""),
+    ))
+    player_rows = []
+    used_aliases: set[str] = set()
+    for row in ranked_all:
+        pid = str(row.get("player_id") or "")
+        player = player_by_id.get(pid)
+        if not player:
+            continue
+        identity = _ranking_display_identity(player, viewer_id, f"day:{selected_date}", used_aliases)
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        team_name = public_team_names.get(family or "") if not identity["anonymous"] else None
+        if pid == viewer_id and family and not team_name:
+            league = league_by_code.get(family) or {}
+            team_name = league.get("name") or family
+        player_rows.append({
+            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"], "teamName": team_name,
+            "elapsedMs": int(row.get("best_elapsed_ms") or 0), "moves": int(row.get("best_moves") or 0),
+            "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
+            "isMine": pid == viewer_id,
+        })
+    for index, item in enumerate(player_rows, 1):
+        item["rank"] = index
+
+    by_team: dict[str, list[float]] = {}
+    for row in day_rows:
+        player = player_by_id.get(str(row.get("player_id") or ""))
+        family = _ranking_result_team(row, player)
+        if family:
+            by_team.setdefault(family, []).append(_daily_individual_score(row, day_rows))
+    current_members: dict[str, int] = {}
+    for player in players:
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        if family:
+            current_members[family] = current_members.get(family, 0) + 1
+    team_rows = []
+    for family, scores in by_team.items():
+        if family not in public_team_names and family != viewer_team:
+            continue
+        top = sorted(scores, reverse=True)[:3]
+        if not top:
+            continue
+        league = league_by_code.get(family) or {}
+        team_rows.append({
+            "name": public_team_names.get(family) or league.get("name") or family,
+            "score": round(sum(top) / len(top), 1), "players": len(top),
+            "memberCount": int(current_members.get(family, 0)), "isMine": bool(viewer_team and family == viewer_team),
+        })
+    team_rows.sort(key=lambda row: (-row["score"], -row["players"], str(row["name"]).casefold()))
+    _ranking_assign_tied_ranks(team_rows, "score")
+    return {
+        "kind": "daily", "date": selected_date, "puzzleId": primary_puzzle_id,
+        "players": player_rows, "teams": team_rows,
+        "playerScoring": "clean-hints-time-moves",
+        "teamScoring": "average-best-up-to-3-normalized-0-100",
     }
 
 
