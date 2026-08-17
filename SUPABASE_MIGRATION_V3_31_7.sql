@@ -29,15 +29,16 @@ create index if not exists results_team_completion_idx
   on public.results(team_code_at_completion, completed_at);
 
 -- Current product has never allowed switching teams, so team_joined_at is a reliable
--- start boundary for all existing real memberships. SOLO_* namespaces are not teams.
+-- start boundary for all existing real memberships. Internal SOLO_* namespaces are not teams.
 insert into public.team_memberships (player_id, team_code, joined_at)
 select p.id, p.family_code, p.team_joined_at
 from public.players p
 where p.team_joined_at is not null
   and p.family_code is not null
-  and p.family_code not like 'SOLO\_%' escape '\\'
+  and left(p.family_code, 5) <> 'SOLO_'
 on conflict do nothing;
 
+-- Attribute only XP earned at/after the historical team join. Older XP stays personal.
 update public.results r
 set team_code_at_completion = p.family_code
 from public.players p
@@ -45,5 +46,5 @@ where r.player_id = p.id
   and r.team_code_at_completion is null
   and p.team_joined_at is not null
   and p.family_code is not null
-  and p.family_code not like 'SOLO\_%' escape '\\'
+  and left(p.family_code, 5) <> 'SOLO_'
   and r.completed_at >= p.team_joined_at;
