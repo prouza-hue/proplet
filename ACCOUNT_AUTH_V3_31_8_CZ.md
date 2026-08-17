@@ -69,3 +69,4 @@ A service-role-only tabulku `account_auth_challenges` pro `link_email` a `recove
 - Tým má vlastní logický blok a Pomocník je přesunut do „Pocit ze hry“.
 - Úspěšná synchronizace je záměrně vizuálně ztišená; problém/pending stav zůstává viditelný.
 - Dark-mode náhled veřejné identity má explicitní kontrastní barvy.
+- Preview checkpoint: profilový polish prošel Python/JS syntax kontrolou a `git diff --check`; tento commit slouží jen jako povolený Vercel trigger nad stejným kandidátem.
