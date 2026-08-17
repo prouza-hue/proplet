@@ -1,0 +1,85 @@
+/* v3.31.7 ranking polish */
+.ranking-control-row{
+  grid-template-columns:minmax(0,1fr) 1px minmax(0,1.35fr);
+  gap:12px;
+  align-items:end;
+  margin-top:16px;
+}
+.ranking-control-row::before{
+  content:"";
+  grid-column:2;
+  grid-row:1;
+  width:1px;
+  height:38px;
+  margin-bottom:3px;
+  align-self:end;
+  background:var(--line);
+}
+.ranking-control-row>.ranking-segment{
+  position:relative;
+  margin-top:4px;
+}
+.ranking-control-row>.ranking-segment:first-child{
+  grid-column:1;
+  background:#eeeaff;
+}
+.ranking-period-segment{
+  grid-column:3;
+  background:#eaf6f1;
+}
+.ranking-control-row>.ranking-segment:first-child::before,
+.ranking-period-segment::before{
+  position:absolute;
+  top:-18px;
+  left:5px;
+  font-size:9px;
+  line-height:1;
+  letter-spacing:.13em;
+  font-weight:950;
+  color:#8a8597;
+  text-transform:uppercase;
+}
+.ranking-control-row>.ranking-segment:first-child::before{content:"Kdo"}
+.ranking-period-segment::before{content:"Období"}
+.ranking-control-row>.ranking-segment:first-child button.active{
+  color:#5d4ed0;
+  box-shadow:0 3px 9px rgba(93,78,208,.10);
+}
+.ranking-period-segment button.active{
+  color:#26775e;
+  box-shadow:0 3px 9px rgba(38,119,94,.10);
+}
+.ranking-more{
+  padding:13px 10px 2px;
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+.ranking-more strong{color:#5d586d}
+.ranking-own-divider{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:6px 2px -1px;
+  color:#8a8597;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+.ranking-own-divider::before,.ranking-own-divider::after{
+  content:"";
+  height:1px;
+  background:var(--line);
+  flex:1;
+}
+.ranking-own-divider span{white-space:nowrap}
+#winModal{cursor:pointer}
+#winModal .modal-card{cursor:default}
+@media(max-width:520px){
+  .ranking-control-row{grid-template-columns:1fr;gap:8px;margin-top:16px}
+  .ranking-control-row::before{display:none}
+  .ranking-control-row>.ranking-segment:first-child,.ranking-period-segment{grid-column:auto}
+  .ranking-period-segment{order:2;margin-top:14px}
+}
