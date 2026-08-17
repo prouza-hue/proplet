@@ -1,4 +1,4 @@
-name: v3.31.7 ranking polish
+name: v3.31.7 ranking polish runner
 
 on:
   push:
@@ -60,7 +60,7 @@ jobs:
           }
           function rankingMoreHtml(hidden,scope){
            if(!hidden)return '';
-           return `<div class="ranking-more">A dalších <strong>${countCz(hidden,scope==='teams'?'tým':'hráče',scope==='teams'?'týmy':'hráči',scope==='teams'?'týmů':'hráčů')}</strong> si proplétá cestu na vrchol.</div>`
+           return `<div class="ranking-more">A dalších <strong>${countCz(hidden,scope==='teams'?'tým':'hráč',scope==='teams'?'týmy':'hráči',scope==='teams'?'týmů':'hráčů')}</strong> si proplétá cestu na vrchol.</div>`
           }
           function rankingOwnDividerHtml(){return '<div class="ranking-own-divider"><span>Tvoje pozice</span></div>'}
           function renderXpRanking(data){
@@ -91,9 +91,8 @@ jobs:
           }'''
           a = a[:daily_start] + daily_fn + a[daily_end:]
 
-          bind_anchor = 'function bind(){\n'
           if 'winModal.onclick=e=>' not in a:
-              a = a.replace(bind_anchor, bind_anchor + " const winModal=$('#winModal');if(winModal)winModal.onclick=e=>{if(e.target===winModal&&currentGame?.mode!=='starter')closeWinToMenu()};\n", 1)
+              a = a.replace('function bind(){\n', 'function bind(){\n const winModal=$(\'#winModal\');if(winModal)winModal.onclick=e=>{if(e.target===winModal&&currentGame?.mode!==\'starter\')closeWinToMenu()};\n', 1)
           app.write_text(a)
 
           css = Path('public/styles.css')
