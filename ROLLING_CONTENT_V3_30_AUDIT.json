@@ -16,7 +16,7 @@
     "hardcore": 16
   },
   "broadAmbiguityRejects": {
-    "easy": 2
+    "easy": 1
   },
   "signatureRejects": {},
   "batches": [
@@ -33,27 +33,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-201",
+          "id": "g3-e-201",
           "difficulty": "easy",
           "level": 201
         },
         {
-          "id": "g2-m-201",
+          "id": "g3-m-201",
           "difficulty": "medium",
           "level": 201
         },
         {
-          "id": "g2-h-201",
+          "id": "g3-h-201",
           "difficulty": "hard",
           "level": 201
         },
         {
-          "id": "g2-x-201",
+          "id": "g3-x-201",
           "difficulty": "hardcore",
           "level": 201
         },
         {
-          "id": "g2-e-202",
+          "id": "g3-e-202",
           "difficulty": "easy",
           "level": 202
         }
@@ -72,27 +72,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-203",
+          "id": "g3-e-203",
           "difficulty": "easy",
           "level": 203
         },
         {
-          "id": "g2-m-202",
+          "id": "g3-m-202",
           "difficulty": "medium",
           "level": 202
         },
         {
-          "id": "g2-h-202",
+          "id": "g3-h-202",
           "difficulty": "hard",
           "level": 202
         },
         {
-          "id": "g2-x-202",
+          "id": "g3-x-202",
           "difficulty": "hardcore",
           "level": 202
         },
         {
-          "id": "g2-m-203",
+          "id": "g3-m-203",
           "difficulty": "medium",
           "level": 203
         }
@@ -111,27 +111,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-204",
+          "id": "g3-e-204",
           "difficulty": "easy",
           "level": 204
         },
         {
-          "id": "g2-m-204",
+          "id": "g3-m-204",
           "difficulty": "medium",
           "level": 204
         },
         {
-          "id": "g2-h-203",
+          "id": "g3-h-203",
           "difficulty": "hard",
           "level": 203
         },
         {
-          "id": "g2-x-203",
+          "id": "g3-x-203",
           "difficulty": "hardcore",
           "level": 203
         },
         {
-          "id": "g2-h-204",
+          "id": "g3-h-204",
           "difficulty": "hard",
           "level": 204
         }
@@ -150,27 +150,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-205",
+          "id": "g3-e-205",
           "difficulty": "easy",
           "level": 205
         },
         {
-          "id": "g2-m-205",
+          "id": "g3-m-205",
           "difficulty": "medium",
           "level": 205
         },
         {
-          "id": "g2-h-205",
+          "id": "g3-h-205",
           "difficulty": "hard",
           "level": 205
         },
         {
-          "id": "g2-x-204",
+          "id": "g3-x-204",
           "difficulty": "hardcore",
           "level": 204
         },
         {
-          "id": "g2-x-205",
+          "id": "g3-x-205",
           "difficulty": "hardcore",
           "level": 205
         }
@@ -189,27 +189,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-206",
+          "id": "g3-e-206",
           "difficulty": "easy",
           "level": 206
         },
         {
-          "id": "g2-m-206",
+          "id": "g3-m-206",
           "difficulty": "medium",
           "level": 206
         },
         {
-          "id": "g2-h-206",
+          "id": "g3-h-206",
           "difficulty": "hard",
           "level": 206
         },
         {
-          "id": "g2-x-206",
+          "id": "g3-x-206",
           "difficulty": "hardcore",
           "level": 206
         },
         {
-          "id": "g2-e-207",
+          "id": "g3-e-207",
           "difficulty": "easy",
           "level": 207
         }
@@ -228,27 +228,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-208",
+          "id": "g3-e-208",
           "difficulty": "easy",
           "level": 208
         },
         {
-          "id": "g2-m-207",
+          "id": "g3-m-207",
           "difficulty": "medium",
           "level": 207
         },
         {
-          "id": "g2-h-207",
+          "id": "g3-h-207",
           "difficulty": "hard",
           "level": 207
         },
         {
-          "id": "g2-x-207",
+          "id": "g3-x-207",
           "difficulty": "hardcore",
           "level": 207
         },
         {
-          "id": "g2-m-208",
+          "id": "g3-m-208",
           "difficulty": "medium",
           "level": 208
         }
@@ -267,27 +267,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-209",
+          "id": "g3-e-209",
           "difficulty": "easy",
           "level": 209
         },
         {
-          "id": "g2-m-209",
+          "id": "g3-m-209",
           "difficulty": "medium",
           "level": 209
         },
         {
-          "id": "g2-h-208",
+          "id": "g3-h-208",
           "difficulty": "hard",
           "level": 208
         },
         {
-          "id": "g2-x-208",
+          "id": "g3-x-208",
           "difficulty": "hardcore",
           "level": 208
         },
         {
-          "id": "g2-h-209",
+          "id": "g3-h-209",
           "difficulty": "hard",
           "level": 209
         }
@@ -306,27 +306,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-210",
+          "id": "g3-e-210",
           "difficulty": "easy",
           "level": 210
         },
         {
-          "id": "g2-m-210",
+          "id": "g3-m-210",
           "difficulty": "medium",
           "level": 210
         },
         {
-          "id": "g2-h-210",
+          "id": "g3-h-210",
           "difficulty": "hard",
           "level": 210
         },
         {
-          "id": "g2-x-209",
+          "id": "g3-x-209",
           "difficulty": "hardcore",
           "level": 209
         },
         {
-          "id": "g2-x-210",
+          "id": "g3-x-210",
           "difficulty": "hardcore",
           "level": 210
         }
@@ -345,27 +345,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-211",
+          "id": "g3-e-211",
           "difficulty": "easy",
           "level": 211
         },
         {
-          "id": "g2-m-211",
+          "id": "g3-m-211",
           "difficulty": "medium",
           "level": 211
         },
         {
-          "id": "g2-h-211",
+          "id": "g3-h-211",
           "difficulty": "hard",
           "level": 211
         },
         {
-          "id": "g2-x-211",
+          "id": "g3-x-211",
           "difficulty": "hardcore",
           "level": 211
         },
         {
-          "id": "g2-e-212",
+          "id": "g3-e-212",
           "difficulty": "easy",
           "level": 212
         }
@@ -384,27 +384,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-213",
+          "id": "g3-e-213",
           "difficulty": "easy",
           "level": 213
         },
         {
-          "id": "g2-m-212",
+          "id": "g3-m-212",
           "difficulty": "medium",
           "level": 212
         },
         {
-          "id": "g2-h-212",
+          "id": "g3-h-212",
           "difficulty": "hard",
           "level": 212
         },
         {
-          "id": "g2-x-212",
+          "id": "g3-x-212",
           "difficulty": "hardcore",
           "level": 212
         },
         {
-          "id": "g2-m-213",
+          "id": "g3-m-213",
           "difficulty": "medium",
           "level": 213
         }
@@ -423,27 +423,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-214",
+          "id": "g3-e-214",
           "difficulty": "easy",
           "level": 214
         },
         {
-          "id": "g2-m-214",
+          "id": "g3-m-214",
           "difficulty": "medium",
           "level": 214
         },
         {
-          "id": "g2-h-213",
+          "id": "g3-h-213",
           "difficulty": "hard",
           "level": 213
         },
         {
-          "id": "g2-x-213",
+          "id": "g3-x-213",
           "difficulty": "hardcore",
           "level": 213
         },
         {
-          "id": "g2-h-214",
+          "id": "g3-h-214",
           "difficulty": "hard",
           "level": 214
         }
@@ -462,27 +462,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-215",
+          "id": "g3-e-215",
           "difficulty": "easy",
           "level": 215
         },
         {
-          "id": "g2-m-215",
+          "id": "g3-m-215",
           "difficulty": "medium",
           "level": 215
         },
         {
-          "id": "g2-h-215",
+          "id": "g3-h-215",
           "difficulty": "hard",
           "level": 215
         },
         {
-          "id": "g2-x-214",
+          "id": "g3-x-214",
           "difficulty": "hardcore",
           "level": 214
         },
         {
-          "id": "g2-x-215",
+          "id": "g3-x-215",
           "difficulty": "hardcore",
           "level": 215
         }
@@ -501,27 +501,27 @@
       },
       "levels": [
         {
-          "id": "g2-e-216",
+          "id": "g3-e-216",
           "difficulty": "easy",
           "level": 216
         },
         {
-          "id": "g2-m-216",
+          "id": "g3-m-216",
           "difficulty": "medium",
           "level": 216
         },
         {
-          "id": "g2-h-216",
+          "id": "g3-h-216",
           "difficulty": "hard",
           "level": 216
         },
         {
-          "id": "g2-x-216",
+          "id": "g3-x-216",
           "difficulty": "hardcore",
           "level": 216
         },
         {
-          "id": "g2-e-217",
+          "id": "g3-e-217",
           "difficulty": "easy",
           "level": 217
         }

@@ -11,14 +11,14 @@
   "counts": {
     "A": 510,
     "B": 750,
-    "C": 1568,
-    "D": 325
+    "C": 1567,
+    "D": 320
   },
   "fun_counts": {
     "2": 123,
     "3": 2490,
-    "4": 343,
-    "5": 197
+    "4": 342,
+    "5": 192
   },
   "entries": [
     {
@@ -62394,26 +62394,6 @@
       ]
     },
     {
-      "word": "černodíra",
-      "tier": "C",
-      "familiarity": 2,
-      "complexity": 3,
-      "fun": 4,
-      "theme": "space/science",
-      "register": "educated",
-      "age_floor": 10,
-      "part_of_speech": "editorial_lemma",
-      "frequency_evidence": null,
-      "origin": "v2_authored_candidate",
-      "review": "approved",
-      "sources": [
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ]
-    },
-    {
       "word": "čert",
       "tier": "C",
       "familiarity": 3,
@@ -63817,26 +63797,6 @@
           "role": "lemma_and_part_of_speech",
           "license": "CC0-1.0"
         },
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ]
-    },
-    {
-      "word": "aerogel",
-      "tier": "D",
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma",
-      "frequency_evidence": null,
-      "origin": "manual_fun_d",
-      "review": "approved",
-      "sources": [
         {
           "name": "Proplet editorial review",
           "role": "target_approval"
@@ -67874,26 +67834,6 @@
       ]
     },
     {
-      "word": "nocebo",
-      "tier": "D",
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "language/mind/illusion",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma",
-      "frequency_evidence": null,
-      "origin": "manual_fun_d",
-      "review": "approved",
-      "sources": [
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ]
-    },
-    {
       "word": "norma",
       "tier": "D",
       "familiarity": 2,
@@ -68441,26 +68381,6 @@
     },
     {
       "word": "pentagram",
-      "tier": "D",
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma",
-      "frequency_evidence": null,
-      "origin": "manual_fun_d",
-      "review": "approved",
-      "sources": [
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ]
-    },
-    {
-      "word": "perigeum",
       "tier": "D",
       "familiarity": 1,
       "complexity": 4,
@@ -69370,26 +69290,6 @@
       ]
     },
     {
-      "word": "sofismus",
-      "tier": "D",
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma",
-      "frequency_evidence": null,
-      "origin": "manual_fun_d",
-      "review": "approved",
-      "sources": [
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ]
-    },
-    {
       "word": "spektrum",
       "tier": "D",
       "familiarity": 2,
@@ -69946,26 +69846,6 @@
       "complexity": 4,
       "fun": 5,
       "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma",
-      "frequency_evidence": null,
-      "origin": "manual_fun_d",
-      "review": "approved",
-      "sources": [
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ]
-    },
-    {
-      "word": "trebuchet",
-      "tier": "D",
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "mystery/myth/adventure",
       "register": "cultivated_or_specialized",
       "age_floor": 12,
       "part_of_speech": "editorial_lemma",

@@ -30,6 +30,7 @@ hovno idiot kalhotky kokain kozy kurva masturbace mrtvola mučení nádor opilec
 opilý panenství penis pitomec pitomý podprsenka porno potrat prdel prostitut
 prostitutka rakovina sebevrah sebevražda sex slipy soulož tanga tumor vagína
 vole zadek zadnice zabiják zabíjení znásilnění zvrhlost zvrhlý
+nocebo trebuchet sofismus černodíra perigeum aerogel
 body homosexuál house love prdelka union
 angličanka arab babka brokovnice černo černoch černoška čokl čumák dcerka
 dědek děloha drbna fotr gambler haraburdí hašiš hlaveň holčina honda huba
@@ -213,6 +214,8 @@ def main() -> None:
         word = item["word"].casefold()
         if not CZ_WORD.fullmatch(word):
             raise RuntimeError(f"Invalid reviewed seed answer: {word!r}")
+        if word in TARGET_BLOCK:
+            continue
         entries[word] = enrich(
             word,
             item["tier"],

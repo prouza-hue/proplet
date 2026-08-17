@@ -1,0 +1,277 @@
+{
+  "status": "PASS",
+  "freeGeneration": 3,
+  "broadExactCoverRechecked": 800,
+  "rollingRechecked": 65,
+  "rejectedTargetWordsAbsent": [
+    "aerogel",
+    "nocebo",
+    "perigeum",
+    "sofismus",
+    "trebuchet",
+    "černodíra"
+  ],
+  "serverPuzzleBytes": 4958991,
+  "publicPuzzleBytes": 2538534,
+  "publicLegacyIndexEntries": 1707,
+  "bands": {
+    "easy": {
+      "1-50": {
+        "levels": 50,
+        "meanCells": 30,
+        "meanWords": 6.36,
+        "meanDifficultyScore": 21.8,
+        "medianDifficultyScore": 21.5,
+        "meanTurnsPerWord": 0.877,
+        "zeroTurnShare": 0.412,
+        "lowTurnShare": 0.714,
+        "tierShares": {
+          "A": 1.0
+        }
+      },
+      "51-100": {
+        "levels": 50,
+        "meanCells": 30,
+        "meanWords": 6.44,
+        "meanDifficultyScore": 20.96,
+        "medianDifficultyScore": 21.0,
+        "meanTurnsPerWord": 0.839,
+        "zeroTurnShare": 0.41,
+        "lowTurnShare": 0.752,
+        "tierShares": {
+          "A": 1.0
+        }
+      },
+      "101-150": {
+        "levels": 50,
+        "meanCells": 29.88,
+        "meanWords": 6.42,
+        "meanDifficultyScore": 21.68,
+        "medianDifficultyScore": 20.0,
+        "meanTurnsPerWord": 0.872,
+        "zeroTurnShare": 0.393,
+        "lowTurnShare": 0.741,
+        "tierShares": {
+          "A": 1.0
+        }
+      },
+      "151-200": {
+        "levels": 50,
+        "meanCells": 29.9,
+        "meanWords": 6.46,
+        "meanDifficultyScore": 21.7,
+        "medianDifficultyScore": 22.0,
+        "meanTurnsPerWord": 0.851,
+        "zeroTurnShare": 0.421,
+        "lowTurnShare": 0.731,
+        "tierShares": {
+          "A": 1.0
+        }
+      }
+    },
+    "medium": {
+      "1-50": {
+        "levels": 50,
+        "meanCells": 48.6,
+        "meanWords": 8.4,
+        "meanDifficultyScore": 51.66,
+        "medianDifficultyScore": 51.0,
+        "meanTurnsPerWord": 1.119,
+        "zeroTurnShare": 0.34,
+        "lowTurnShare": 0.569,
+        "tierShares": {
+          "A": 0.21,
+          "B": 0.79
+        }
+      },
+      "51-100": {
+        "levels": 50,
+        "meanCells": 54.9,
+        "meanWords": 8.64,
+        "meanDifficultyScore": 60.78,
+        "medianDifficultyScore": 61.0,
+        "meanTurnsPerWord": 1.15,
+        "zeroTurnShare": 0.359,
+        "lowTurnShare": 0.539,
+        "tierShares": {
+          "A": 0.188,
+          "B": 0.812
+        }
+      },
+      "101-150": {
+        "levels": 50,
+        "meanCells": 60.62,
+        "meanWords": 9.46,
+        "meanDifficultyScore": 70.1,
+        "medianDifficultyScore": 67.0,
+        "meanTurnsPerWord": 1.182,
+        "zeroTurnShare": 0.321,
+        "lowTurnShare": 0.524,
+        "tierShares": {
+          "A": 0.18,
+          "B": 0.82
+        }
+      },
+      "151-200": {
+        "levels": 50,
+        "meanCells": 64.88,
+        "meanWords": 10.46,
+        "meanDifficultyScore": 74.44,
+        "medianDifficultyScore": 75.0,
+        "meanTurnsPerWord": 1.002,
+        "zeroTurnShare": 0.39,
+        "lowTurnShare": 0.614,
+        "tierShares": {
+          "A": 0.21,
+          "B": 0.79
+        }
+      }
+    },
+    "hard": {
+      "1-50": {
+        "levels": 50,
+        "meanCells": 67,
+        "meanWords": 10.34,
+        "meanDifficultyScore": 92.76,
+        "medianDifficultyScore": 93.5,
+        "meanTurnsPerWord": 2.346,
+        "zeroTurnShare": 0.151,
+        "lowTurnShare": 0.323,
+        "tierShares": {
+          "B": 0.499,
+          "C": 0.501
+        }
+      },
+      "51-100": {
+        "levels": 50,
+        "meanCells": 69.42,
+        "meanWords": 10.88,
+        "meanDifficultyScore": 97.64,
+        "medianDifficultyScore": 98.0,
+        "meanTurnsPerWord": 2.371,
+        "zeroTurnShare": 0.151,
+        "lowTurnShare": 0.324,
+        "tierShares": {
+          "B": 0.2,
+          "C": 0.8
+        }
+      },
+      "101-150": {
+        "levels": 50,
+        "meanCells": 70.68,
+        "meanWords": 11.36,
+        "meanDifficultyScore": 103.2,
+        "medianDifficultyScore": 105.5,
+        "meanTurnsPerWord": 2.349,
+        "zeroTurnShare": 0.144,
+        "lowTurnShare": 0.308,
+        "tierShares": {
+          "B": 0.185,
+          "C": 0.815
+        }
+      },
+      "151-200": {
+        "levels": 50,
+        "meanCells": 75.82,
+        "meanWords": 11.9,
+        "meanDifficultyScore": 114.36,
+        "medianDifficultyScore": 113.0,
+        "meanTurnsPerWord": 2.755,
+        "zeroTurnShare": 0.096,
+        "lowTurnShare": 0.222,
+        "tierShares": {
+          "B": 0.188,
+          "C": 0.812
+        }
+      }
+    },
+    "hardcore": {
+      "1-50": {
+        "levels": 50,
+        "meanCells": 76.58,
+        "meanWords": 11.38,
+        "meanDifficultyScore": 118.46,
+        "medianDifficultyScore": 119.5,
+        "meanTurnsPerWord": 3.561,
+        "zeroTurnShare": 0.03,
+        "lowTurnShare": 0.109,
+        "tierShares": {
+          "C": 0.645,
+          "D": 0.355
+        }
+      },
+      "51-100": {
+        "levels": 50,
+        "meanCells": 76.46,
+        "meanWords": 11.36,
+        "meanDifficultyScore": 118.92,
+        "medianDifficultyScore": 118.5,
+        "meanTurnsPerWord": 3.768,
+        "zeroTurnShare": 0.039,
+        "lowTurnShare": 0.1,
+        "tierShares": {
+          "C": 0.641,
+          "D": 0.359
+        }
+      },
+      "101-150": {
+        "levels": 50,
+        "meanCells": 76.16,
+        "meanWords": 11.34,
+        "meanDifficultyScore": 118.4,
+        "medianDifficultyScore": 118.5,
+        "meanTurnsPerWord": 3.587,
+        "zeroTurnShare": 0.041,
+        "lowTurnShare": 0.113,
+        "tierShares": {
+          "C": 0.647,
+          "D": 0.353
+        }
+      },
+      "151-200": {
+        "levels": 50,
+        "meanCells": 76.58,
+        "meanWords": 11.32,
+        "meanDifficultyScore": 118.52,
+        "medianDifficultyScore": 117.0,
+        "meanTurnsPerWord": 3.643,
+        "zeroTurnShare": 0.028,
+        "lowTurnShare": 0.102,
+        "tierShares": {
+          "C": 0.641,
+          "D": 0.359
+        }
+      }
+    }
+  },
+  "bridge": {
+    "lateMedium": {
+      "levels": 50,
+      "meanCells": 64.88,
+      "meanWords": 10.46,
+      "meanDifficultyScore": 74.44,
+      "medianDifficultyScore": 75.0,
+      "meanTurnsPerWord": 1.002,
+      "zeroTurnShare": 0.39,
+      "lowTurnShare": 0.614,
+      "tierShares": {
+        "A": 0.21,
+        "B": 0.79
+      }
+    },
+    "earlyHard": {
+      "levels": 50,
+      "meanCells": 67,
+      "meanWords": 10.34,
+      "meanDifficultyScore": 92.76,
+      "medianDifficultyScore": 93.5,
+      "meanTurnsPerWord": 2.346,
+      "zeroTurnShare": 0.151,
+      "lowTurnShare": 0.323,
+      "tierShares": {
+        "B": 0.499,
+        "C": 0.501
+      }
+    }
+  }
+}

@@ -2781,7 +2781,6 @@
       "účetní",
       "časování",
       "čelist",
-      "černodíra",
       "čert",
       "červ",
       "červenec",
@@ -2848,7 +2847,6 @@
       "absurdita",
       "absurdno",
       "adaptace",
-      "aerogel",
       "afázie",
       "agregace",
       "akronym",
@@ -3043,7 +3041,6 @@
       "nekropole",
       "neutrino",
       "nihilismus",
-      "nocebo",
       "norma",
       "nuance",
       "obecnost",
@@ -3071,7 +3068,6 @@
       "pareidolie",
       "patogen",
       "pentagram",
-      "perigeum",
       "piktogram",
       "placebo",
       "plankton",
@@ -3115,7 +3111,6 @@
       "skarabeus",
       "sklípkan",
       "sloučenina",
-      "sofismus",
       "spektrum",
       "spirála",
       "stabilita",
@@ -3143,7 +3138,6 @@
       "teserakt",
       "teze",
       "topologie",
-      "trebuchet",
       "trend",
       "triréma",
       "tsunami",
@@ -28075,15 +28069,6 @@
       "age_floor": 10,
       "part_of_speech": "noun"
     },
-    "černodíra": {
-      "familiarity": 2,
-      "complexity": 3,
-      "fun": 4,
-      "theme": "space/science",
-      "register": "educated",
-      "age_floor": 10,
-      "part_of_speech": "editorial_lemma"
-    },
     "čert": {
       "familiarity": 3,
       "complexity": 3,
@@ -28659,15 +28644,6 @@
       "register": "cultivated",
       "age_floor": 12,
       "part_of_speech": "noun"
-    },
-    "aerogel": {
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma"
     },
     "afázie": {
       "familiarity": 1,
@@ -30415,15 +30391,6 @@
       "age_floor": 12,
       "part_of_speech": "editorial_lemma"
     },
-    "nocebo": {
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "language/mind/illusion",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma"
-    },
     "norma": {
       "familiarity": 2,
       "complexity": 4,
@@ -30659,15 +30626,6 @@
       "part_of_speech": "editorial_lemma"
     },
     "pentagram": {
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma"
-    },
-    "perigeum": {
       "familiarity": 1,
       "complexity": 4,
       "fun": 5,
@@ -31063,15 +31021,6 @@
       "age_floor": 12,
       "part_of_speech": "noun"
     },
-    "sofismus": {
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma"
-    },
     "spektrum": {
       "familiarity": 2,
       "complexity": 4,
@@ -31311,15 +31260,6 @@
       "complexity": 4,
       "fun": 5,
       "theme": "space/science/future",
-      "register": "cultivated_or_specialized",
-      "age_floor": 12,
-      "part_of_speech": "editorial_lemma"
-    },
-    "trebuchet": {
-      "familiarity": 1,
-      "complexity": 4,
-      "fun": 5,
-      "theme": "mystery/myth/adventure",
       "register": "cultivated_or_specialized",
       "age_floor": 12,
       "part_of_speech": "editorial_lemma"
