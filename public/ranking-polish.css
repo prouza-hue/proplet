@@ -2,57 +2,47 @@
 .ranking-control-row{
   grid-template-columns:minmax(0,1fr) 1px minmax(0,1.35fr);
   gap:12px;
-  align-items:end;
-  margin-top:18px;
+  align-items:center;
+  margin-top:12px;
 }
 .ranking-control-row::before{
   content:"";
   grid-column:2;
   grid-row:1;
   width:1px;
-  height:38px;
-  margin-bottom:3px;
-  align-self:end;
+  height:36px;
+  align-self:center;
   background:var(--line);
 }
 .ranking-control-row>.ranking-segment{
   position:relative;
-  margin-top:4px;
+  margin-top:0;
   border:1px solid transparent;
 }
 .ranking-control-row>.ranking-segment:first-child{
   grid-column:1;
-  background:color-mix(in srgb,var(--purple) 11%,var(--paper));
-  border-color:color-mix(in srgb,var(--purple) 18%,var(--line));
+  background:color-mix(in srgb,var(--purple) 14%,var(--paper));
+  border-color:color-mix(in srgb,var(--purple) 24%,var(--line));
 }
 .ranking-period-segment{
   grid-column:3;
-  background:color-mix(in srgb,var(--mint) 13%,var(--paper));
-  border-color:color-mix(in srgb,var(--mint) 20%,var(--line));
+  background:color-mix(in srgb,var(--mint) 18%,var(--paper));
+  border-color:color-mix(in srgb,var(--mint) 28%,var(--line));
 }
-.ranking-control-row>.ranking-segment:first-child::before,
-.ranking-period-segment::before{
-  position:absolute;
-  top:-19px;
-  left:5px;
-  font-size:9px;
-  line-height:1;
-  letter-spacing:.13em;
-  font-weight:950;
-  color:var(--muted);
-  text-transform:uppercase;
+.ranking-control-row>.ranking-segment button,
+.ranking-control-row>.ranking-segment button.active,
+.ranking-daily-segment button,
+.ranking-daily-segment button.active{
+  color:var(--ink);
 }
-.ranking-control-row>.ranking-segment:first-child::before{content:"Kdo"}
-.ranking-period-segment::before{content:"Období"}
-.ranking-control-row>.ranking-segment:first-child button.active{
-  color:var(--purple);
+.ranking-control-row>.ranking-segment button.active,
+.ranking-daily-segment button.active{
   background:var(--paper);
-  box-shadow:0 3px 9px rgba(93,78,208,.10);
+  box-shadow:0 3px 10px rgba(39,32,72,.10);
 }
-.ranking-period-segment button.active{
-  color:color-mix(in srgb,var(--mint) 76%,var(--ink));
-  background:var(--paper);
-  box-shadow:0 3px 9px rgba(38,119,94,.10);
+.ranking-daily-segment{
+  background:color-mix(in srgb,var(--purple) 14%,var(--paper));
+  border:1px solid color-mix(in srgb,var(--purple) 24%,var(--line));
 }
 .ranking-more{
   display:flex;
@@ -89,8 +79,8 @@
 #winModal .modal-card{cursor:default}
 
 @media(max-width:520px){
-  .ranking-control-row{grid-template-columns:1fr;gap:8px;margin-top:18px}
+  .ranking-control-row{grid-template-columns:1fr;gap:8px;margin-top:12px}
   .ranking-control-row::before{display:none}
   .ranking-control-row>.ranking-segment:first-child,.ranking-period-segment{grid-column:auto}
-  .ranking-period-segment{order:2;margin-top:15px}
+  .ranking-period-segment{order:2;margin-top:8px}
 }

@@ -29,7 +29,7 @@
 
   const rankingCss=document.createElement('link');
   rankingCss.rel='stylesheet';
-  rankingCss.href='/ranking-polish.css?v=2';
+  rankingCss.href='/ranking-polish.css?v=3';
   document.head.appendChild(rankingCss);
 
   const loadHomeLayout=()=>{
