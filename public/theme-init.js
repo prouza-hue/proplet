@@ -29,7 +29,7 @@
 
   const rankingCss=document.createElement('link');
   rankingCss.rel='stylesheet';
-  rankingCss.href='/ranking-polish.css?v=1';
+  rankingCss.href='/ranking-polish.css?v=2';
   document.head.appendChild(rankingCss);
 
   const loadHomeLayout=()=>{
@@ -43,7 +43,7 @@
   const loadRankingPolish=()=>{
     if(document.querySelector('script[data-proplet-ranking-polish]'))return;
     const script=document.createElement('script');
-    script.src='/ranking-polish.js?v=1';
+    script.src='/ranking-polish.js?v=2';
     script.dataset.propletRankingPolish='1';
     document.body.appendChild(script);
   };
