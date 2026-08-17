@@ -29,6 +29,17 @@ jobs:
           PY
       - name: Apply source patch
         run: python tools/apply_v3316_gen3_patch.py
+      - name: Normalize archived Daily signature scan
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/generate_free_generation3.py')
+          s=p.read_text(encoding='utf-8')
+          old='''    for bank in data.get("legacyDaily", []):\n        for p in bank.get("puzzles", []):\n            used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))\n'''
+          new='''    for bank in data.get("legacyDaily", []):\n        for p in bank.get("puzzles", []):\n            if p.get("rows") and p.get("cols") and p.get("letters"):\n                used_signatures.add((p["rows"], p["cols"], tuple(p["letters"])))\n'''
+          if old not in s: raise SystemExit('legacyDaily signature block not found')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
       - name: Compile generators
         run: |
           python -m py_compile tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py server.py
