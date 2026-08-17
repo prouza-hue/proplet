@@ -1,8 +1,11 @@
 -- Proplet v3.31.7 Rankings & Teams
 -- Additive migration. Safe to apply while v3.31.6.1 is still serving traffic.
 
+-- NULL = player has not yet answered the one-time public-ranking notice.
+-- TRUE = public avatar + display name may appear globally.
+-- FALSE = keep the individual player out of public global tables.
 alter table public.players
-  add column if not exists public_rankings boolean not null default true;
+  add column if not exists public_rankings boolean;
 
 alter table public.results
   add column if not exists team_code_at_completion text;
