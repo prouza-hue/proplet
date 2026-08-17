@@ -1,0 +1,46 @@
+{
+  "dense_7x8_40_46": {
+    "meanTurnsPerWord": 1.13,
+    "zeroTurnShare": 0.332,
+    "lowTurnShare": 0.561,
+    "meanScore": 43.9,
+    "meanCandidates": 14.1,
+    "meanSolverNodes": 8.4,
+    "meanCells": 42.9,
+    "meanWords": 7.4,
+    "curvyWordsPerBoard": 3.27
+  },
+  "dense_8x8_46_52": {
+    "meanTurnsPerWord": 1.071,
+    "zeroTurnShare": 0.357,
+    "lowTurnShare": 0.603,
+    "meanScore": 52.3,
+    "meanCandidates": 18.1,
+    "meanSolverNodes": 9.4,
+    "meanCells": 49.1,
+    "meanWords": 8.4,
+    "curvyWordsPerBoard": 3.33
+  },
+  "dense_8x9_52_58": {
+    "meanTurnsPerWord": 1.162,
+    "zeroTurnShare": 0.332,
+    "lowTurnShare": 0.536,
+    "meanScore": 63.0,
+    "meanCandidates": 20.4,
+    "meanSolverNodes": 9.8,
+    "meanCells": 54.4,
+    "meanWords": 8.8,
+    "curvyWordsPerBoard": 4.1
+  },
+  "dense_9x9_58_64": {
+    "meanTurnsPerWord": 1.169,
+    "zeroTurnShare": 0.327,
+    "lowTurnShare": 0.532,
+    "meanScore": 70.9,
+    "meanCandidates": 22.2,
+    "meanSolverNodes": 10.5,
+    "meanCells": 60.4,
+    "meanWords": 9.5,
+    "curvyWordsPerBoard": 4.43
+  }
+}
