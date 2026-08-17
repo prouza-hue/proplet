@@ -162,7 +162,7 @@ async function handleAuthReturn(){
 
 function init(){
  ensureModals();ensureLoginEnhancements();
- const card=$('#profileCard');if(card)new MutationObserver(scheduleEnhance).observe(card,{childList:true,subtree:true});
+ const card=$('#profileCard');if(card)new MutationObserver(scheduleEnhance).observe(card,{childList:true});
  document.querySelectorAll('[data-nav="profile"]').forEach(el=>el.addEventListener('click',()=>setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},100)));
  const stored=sessionStorage.getItem('proplet-recovery-context');if(stored)try{recoveryContext=JSON.parse(stored)}catch{}
  handleAuthReturn();setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},160);window.__PROPLET_ACCOUNT_AUTH__={refreshSecurityCard,handleAuthReturn,openProfileEditor};
