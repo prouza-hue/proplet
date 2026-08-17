@@ -34,7 +34,7 @@
 
   const accountCss=document.createElement('link');
   accountCss.rel='stylesheet';
-  accountCss.href='/account-auth.css?v=2';
+  accountCss.href='/account-auth.css?v=3';
   document.head.appendChild(accountCss);
 
   const loadHomeLayout=()=>{
@@ -56,7 +56,7 @@
   const loadAccountAuth=()=>{
     if(document.querySelector('script[data-proplet-account-auth]'))return;
     const script=document.createElement('script');
-    script.src='/account-auth.js?v=2';
+    script.src='/account-auth.js?v=3';
     script.dataset.propletAccountAuth='1';
     document.body.appendChild(script);
   };

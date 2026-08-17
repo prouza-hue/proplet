@@ -74,7 +74,7 @@ function ensureLoginEnhancements(){
    </div>
    <button id="forgotPasswordBtn" type="button" class="account-forgot-btn">Zapomněl jsem heslo</button>
    <div class="account-auth-divider"><span>nebo</span></div>
-   <button id="googleLoginBtn" type="button" class="google-auth-btn"><span class="google-g" aria-hidden="true">G</span><strong>Pokračovat přes Google</strong></button>
+   <button id="googleLoginBtn" type="button" class="google-auth-btn"><img class="google-g" src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button>
   </div>`);
  const original=save.onclick;
  save.onclick=async function(e){
@@ -126,7 +126,7 @@ async function refreshSecurityCard(){
   const d=await call('/api/account/auth-status');
   body.innerHTML=`
    <div class="security-status-row ${d.recoveryReady?'ok':'warn'}"><span>${d.recoveryReady?'✅':'⚠️'}</span><div><strong>${d.recoveryReady?'Obnova hesla je připravená':'Bez záchranného e-mailu'}</strong><small>${d.recoveryReady?esc(d.email):'Když zapomeneš heslo, bez e-mailu účet nepůjde obnovit.'}</small></div>${d.recoveryReady?'':`<button id="addRecoveryEmailBtn" class="secondary-btn">Přidat e-mail</button>`}</div>
-   <div class="security-status-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'G'}</span><div><strong>${d.googleLinked?'Google je propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Můžeš se přihlásit jedním klepnutím.':d.googleAvailable?'Propoj účet a příště neřeš heslo.':'Připravujeme propojení s Googlem.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>`;
+   <div class="security-status-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'<img class="google-g google-g-small" src="/google-g.svg" alt="" aria-hidden="true">'}</span><div><strong>${d.googleLinked?'Google je propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Můžeš se přihlásit jedním klepnutím.':d.googleAvailable?'Propoj účet a příště neřeš heslo.':'Připravujeme propojení s Googlem.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>`;
   $('#addRecoveryEmailBtn')?.addEventListener('click',openAddEmailPrompt);
   $('#linkGoogleBtn')?.addEventListener('click',()=>{location.href='/api/auth/google/start'});
  }catch(e){body.innerHTML=`<p class="account-auth-error">${esc(e.message)}</p>`}

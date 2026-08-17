@@ -183,6 +183,18 @@ def install_account_auth(
             generic_error="Ověřovací e-mail se nepodařilo odeslat",
         )
 
+    def send_recovery_link(email: str, redirect_to: str) -> None:
+        # Use GoTrue's dedicated recovery endpoint so the password-recovery
+        # template and recovery-specific rate limits are used instead of a
+        # generic Magic Link email.
+        auth_request(
+            "POST",
+            "/auth/v1/recover",
+            body={"email": email},
+            params={"redirect_to": redirect_to},
+            generic_error="Obnovovací e-mail se nepodařilo odeslat",
+        )
+
     def verified_email_owner(email: str, exclude_player: Optional[str] = None) -> Optional[dict]:
         for candidate in db_select("players"):
             if exclude_player and candidate.get("id") == exclude_player:
@@ -257,7 +269,7 @@ def install_account_auth(
         challenge = create_challenge(owner["id"], "recover_password", email)
         redirect_to = f"{public_origin(request)}/?auth=recover&challenge={challenge}"
         try:
-            send_magic_link(email, redirect_to, create_user=False)
+            send_recovery_link(email, redirect_to)
         except HTTPException:
             # Keep the public response generic even when the provider refuses the address.
             try:
