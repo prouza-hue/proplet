@@ -1,4 +1,4 @@
-/* v3.31.7 ranking polish */
+/* v3.31.7 ranking polish r4 */
 .ranking-control-row{
   grid-template-columns:minmax(0,1fr) 1px minmax(0,1.35fr);
   gap:12px;
