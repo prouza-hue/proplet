@@ -1,0 +1,36 @@
+name: v3.31.8 auth origin hardening
+
+on:
+  push:
+    branches:
+      - preview/v3318-account-recovery-google
+    paths:
+      - tools/tighten_v3318_auth_origin.py
+      - .github/workflows/v3318-origin-hardening.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/v3318-account-recovery-google
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Harden origin allowlist
+        run: python tools/tighten_v3318_auth_origin.py
+      - name: Validate
+        run: |
+          python -m py_compile account_auth.py server.py
+          git diff --check
+      - name: Commit hardened auth module
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add account_auth.py
+          git commit -m "Harden v3.31.8 auth callback origins"
+          git push origin HEAD:preview/v3318-account-recovery-google
