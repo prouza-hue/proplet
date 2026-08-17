@@ -1,0 +1,54 @@
+name: Proplet v3.31.6 Gen3 preview
+on:
+  push:
+    branches: [preview/v3316-gen3-progression]
+    paths:
+      - tools/apply_v3316_gen3_patch.py
+      - .github/workflows/v3316-gen3-preview.yml
+permissions:
+  contents: write
+jobs:
+  build-gen3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply source patch
+        run: python tools/apply_v3316_gen3_patch.py
+      - name: Compile generators
+        run: |
+          python -m py_compile tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py server.py
+      - name: Generate Free Gen3
+        run: python tools/generate_free_generation3.py
+      - name: Generate Gen3 rolling reserve
+        run: python tools/generate_rolling_content.py
+      - name: Audit Free Gen3
+        run: python tools/audit_free_generation3.py
+      - name: JS syntax
+        run: |
+          node --check public/app.js
+          node --check public/admin.js
+          node --check public/sw.js
+      - name: Release invariants
+        run: |
+          git diff --check
+          cmp data/puzzles.json public/puzzles.json
+          grep -Fq "caches.match(url,{ignoreSearch:true})" public/app.js
+          grep -Fq "freeGeneration\":3" data/puzzles.json
+          grep -Fq "g3-m-201" data/rolling_content_v1.json
+          ! grep -Fq 'NOCEBO' data/puzzles.json
+          ! grep -Fq 'TREBUCHET' data/puzzles.json
+      - name: Commit generated preview
+        run: |
+          git config user.name 'Proplet Gen3 Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          rm -f tools/apply_v3316_gen3_patch.py .github/workflows/v3316-gen3-preview.yml
+          git add tools/build_lexicon_v2.py tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py data/lexicon_v2.json data/answer_tiers.json data/puzzles.json public/puzzles.json data/rolling_content_v1.json public/app.js public/sw.js server.py FREE_GENERATION3_AUDIT.json FREE_GENERATION3_AUDIT_CZ.md ROLLING_CONTENT_V3_30_AUDIT.json
+          git add -u tools/apply_v3316_gen3_patch.py .github/workflows/v3316-gen3-preview.yml
+          git commit -m 'Proplet v3.31.6 Gen3 progression preview'
+          git push
