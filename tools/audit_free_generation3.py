@@ -65,6 +65,9 @@ def main():
     assert public.get("publicLegacyMode") == "compact-index"
     assert all(not bank for bank in (public.get("legacyFree") or {}).values())
     assert int(data.get("version") or 0) == 10
+    app_js = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
+    expected_marker = f"const EXPECTED_PUZZLE_DB_VERSION={int(data.get('version') or 0)};"
+    assert expected_marker in app_js, (expected_marker, "client/server puzzle schema mismatch")
     assert int(data.get("freeGeneration") or 0) == 3
     assert data.get("freeMigration", {}).get("strategy") == "stable-level-slots"
     assert data.get("freeMigration", {}).get("playerFacingGenerationLabels") is False
