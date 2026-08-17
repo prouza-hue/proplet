@@ -1,0 +1,16 @@
+name: v3.31.9 Dnes validation
+on:
+  push:
+    branches: [preview/v3319-today-ia]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Dnes JavaScript
+        run: node --check public/home-layout.js && node --check public/theme-init.js
+      - name: Check diff whitespace
+        run: git diff --check HEAD~1 HEAD
