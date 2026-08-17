@@ -1,0 +1,132 @@
+name: Proplet v3.31.6 Gen3 final preview
+on:
+  push:
+    branches: [preview/v3316-gen3-progression]
+    paths:
+      - .github/workflows/v3316-gen3-final-preview.yml
+permissions:
+  contents: write
+concurrency:
+  group: v3316-gen3-final-preview
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply source patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/apply_v3316_gen3_patch.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('end_marker = " $(\'#playedLevelsList\').innerHTML=currentHtml+archiveHtml;"','end_marker = "$(\'#playedLevelsList\').innerHTML=currentHtml+archiveHtml;"')
+          p.write_text(s,encoding='utf-8')
+          PY
+          python tools/apply_v3316_gen3_patch.py
+      - name: Finalize architecture and generation policy
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/finalize_v3316_gen3.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('"watch"]]', '"watch"}]')
+          old='''    if marker not in text:\n        raise RuntimeError("quality ladder insertion marker not found")\n    text = text.replace(marker, ladder, 1)\n'''
+          new='''    if marker in text:\n        text = text.replace(marker, ladder, 1)\n    else:\n        anchor = "    helper_summary = {}\\n"\n        if anchor not in text:\n            raise RuntimeError("quality ladder insertion anchor not found")\n        ladder_prefix = ladder.rsplit("    helper_summary = {}", 1)[0]\n        text = text.replace(anchor, ladder_prefix + anchor, 1)\n'''
+          if old not in s: raise SystemExit('finalizer marker guard not found')
+          s=s.replace(old,new)
+          current='''        dict(rows=10, cols=10, cells=(78, 88), words=(12, 15), min_len=4, max_len=10, dict_size=10500, cand=(18, 700),\n             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2, max_short_words=2),'''
+          smart='''        dict(rows=10, cols=10, cells=(72, 80), words=(11, 13), min_len=4, max_len=10, dict_size=10250, cand=(16, 540),\n             style="winding", turn_bias=.42, curl_bias=.29, min_curvy=6, min_spiral=2, max_short_words=2),'''
+          if current not in s: raise SystemExit('Hardcore profile marker not found')
+          p.write_text(s.replace(current,smart,1),encoding='utf-8')
+          PY
+          python tools/finalize_v3316_gen3.py
+          python - <<'PY'
+          from pathlib import Path
+          base=Path('tools/generate_free_generation3.py')
+          s=base.read_text(encoding='utf-8')
+          if 'recent[difficulty] = recent[difficulty][-24:]' not in s: raise SystemExit('base repeat marker')
+          base.write_text(s.replace('recent[difficulty] = recent[difficulty][-24:]','recent[difficulty] = recent[difficulty][-16:]',1),encoding='utf-8')
+          rolling=Path('tools/generate_rolling_content.py')
+          s=rolling.read_text(encoding='utf-8')
+          if 'repeat_window = 24' not in s: raise SystemExit('rolling repeat marker')
+          s=s.replace('repeat_window = 24','repeat_window = 16',1).replace('"contentGeneration": 2,','"contentGeneration": 3,').replace('"generationKey": "free-gen2",','"generationKey": "free-gen3",')
+          rolling.write_text(s,encoding='utf-8')
+          audit=Path('tools/audit_free_generation3.py')
+          s=audit.read_text(encoding='utf-8')
+          if s.count('>= 25') != 2: raise SystemExit('audit repeat marker')
+          s=s.replace('24-level anti-repeat window','16-level anti-repeat window').replace('>= 25','>= 17')
+          stale='assert m["151-200"]["meanTurnsPerWord"] > m["1-50"]["meanTurnsPerWord"]'
+          repl='assert m["151-200"]["meanCells"] > m["1-50"]["meanCells"]\n    assert m["151-200"]["meanWords"] > m["1-50"]["meanWords"]'
+          if stale not in s: raise SystemExit('stale Medium guard')
+          s=s.replace(stale,repl,1).replace('Medium grows in search area and later path complexity; Hard starts near late Medium.','Medium grows in search area and word count; Hard changes the challenge with winding geometry.')
+          audit.write_text(s,encoding='utf-8')
+          app=Path('public/app.js')
+          s=app.read_text(encoding='utf-8')
+          replacements={
+            'PŘEVEDENO':'SPLNĚNO',
+            'Převedeno':'Splněno',
+            'převedených':'splněných',
+            'dřívější verze':'předchozího postupu',
+            'Původní výsledky':'Historie výsledků',
+          }
+          for old,new in replacements.items(): s=s.replace(old,new)
+          app.write_text(s,encoding='utf-8')
+          forbidden=[x for x in replacements if x in s]
+          if forbidden: raise SystemExit('player-facing migration terminology remains: '+', '.join(forbidden))
+          print('Gen3 policy OK: repeat=16, smart Hardcore, neutral player-facing progression copy')
+          PY
+      - name: Compile
+        run: python -m py_compile tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py server.py
+      - name: Generate Free Gen3
+        timeout-minutes: 25
+        run: python tools/generate_free_generation3.py
+      - name: Generate rolling reserve
+        timeout-minutes: 15
+        run: python tools/generate_rolling_content.py
+      - name: Independent Gen3 audit
+        timeout-minutes: 15
+        run: python tools/audit_free_generation3.py
+      - name: Runtime syntax and release invariants
+        run: |
+          node --check public/app.js
+          node --check public/admin.js
+          node --check public/sw.js
+          git diff --check
+          grep -Fq "caches.match(url,{ignoreSearch:true})" public/app.js
+          grep -Fq '"freeGeneration":3' data/puzzles.json
+          grep -Fq '"publicLegacyMode":"compact-index"' public/puzzles.json
+          grep -Fq 'g3-m-201' data/rolling_content_v1.json
+          grep -Fq 'stableFreeLevelSlots' server.py
+          if grep -En 'PŘEVEDENO|Převedeno|převedených|dřívější verze|Původní výsledky' public/app.js; then exit 1; fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          public=json.loads(Path('public/puzzles.json').read_text(encoding='utf-8'))
+          rolling=json.loads(Path('data/rolling_content_v1.json').read_text(encoding='utf-8'))
+          rejected={'NOCEBO','TREBUCHET','SOFISMUS','ČERNODÍRA','PERIGEUM','AEROGEL'}
+          assert data['free']==public['free']
+          assert all(not bank for bank in public.get('legacyFree',{}).values())
+          assert Path('public/puzzles.json').stat().st_size < Path('data/puzzles.json').stat().st_size
+          words={a['word'] for bank in data['free'].values() for p in bank for a in p['answers']}
+          assert not (rejected & words)
+          assert len(public.get('legacyFreeIndex',{})) >= 800
+          assert all(int((p.get('meta') or {}).get('contentGeneration') or 0)==3 for bank in rolling.get('puzzles',{}).values() for p in bank)
+          print('release invariants PASS; public bytes',Path('public/puzzles.json').stat().st_size,'server bytes',Path('data/puzzles.json').stat().st_size)
+          PY
+      - name: Commit validated preview
+        run: |
+          git config user.name 'Proplet Gen3 Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          rm -f tools/apply_v3316_gen3_patch.py tools/finalize_v3316_gen3.py .github/workflows/v3316-gen3-preview.yml .github/workflows/v3316-gen3-final-preview.yml
+          git add tools/build_lexicon_v2.py tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py data/lexicon_v2.json data/answer_tiers.json data/puzzles.json public/puzzles.json data/rolling_content_v1.json public/app.js public/admin.js public/sw.js server.py FREE_GENERATION3_AUDIT.json FREE_GENERATION3_AUDIT_CZ.md ROLLING_CONTENT_V3_30_AUDIT.json
+          git add -u tools/apply_v3316_gen3_patch.py tools/finalize_v3316_gen3.py .github/workflows/v3316-gen3-preview.yml .github/workflows/v3316-gen3-final-preview.yml
+          git commit -m 'Proplet v3.31.6 Gen3 progression preview'
+          git push
