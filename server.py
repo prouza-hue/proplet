@@ -3831,10 +3831,10 @@ def free_global_leaderboard(
     authorization: Optional[str] = Header(default=None),
 ):
     enforce_rate_limit(request, "free_global_read", limit=300, window_seconds=3600)
-    """Privacy-safe worldwide standings for one active Free puzzle.
+    """Worldwide standings for one active Free puzzle.
 
-    Every player is represented by their first completed attempt only. The
-    response deliberately contains no names, avatars, team codes or player IDs.
+    Every player is represented by their first completed attempt only. Identity is
+    shown only after explicit opt-in; everyone else receives a per-puzzle alias.
     """
     info = free_puzzle_info(puzzle_id)
     if not info or info.get("legacy") is True:
@@ -3873,12 +3873,19 @@ def free_global_leaderboard(
         start = max(0, min(my_index - 1, total - 3))
         visible_indices = list(range(start, min(total, start + 3)))
 
+    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}
+    used_aliases: set[str] = set()
     board = []
     for index in visible_indices:
         row = ranked[index]
+        pid = str(row.get("player_id") or "")
+        identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"free:{puzzle_id}", used_aliases)
         board.append({
             "rank": index + 1,
             "isMine": index == my_index,
+            "name": identity["name"],
+            "avatar": identity["avatar"],
+            "anonymous": identity["anonymous"],
             "elapsedMs": int(row.get("elapsed_ms") or 0),
             "moves": int(row.get("moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -3897,7 +3904,7 @@ def free_global_leaderboard(
         "topPercent": top_percent,
         "percentileMinimum": 10,
         "rows": board,
-        "privacy": "anonymous-performance-only",
+        "privacy": "opt-in-identity-otherwise-alias",
         "attemptPolicy": "first-completed-only",
     }
 
@@ -3908,7 +3915,7 @@ def daily_global_leaderboard(
     daily_date: Optional[str] = Query(default=None),
     authorization: Optional[str] = Header(default=None),
 ):
-    """Privacy-safe global Daily standings: public performance, never player identity."""
+    """Global Daily standings: opted-in identity, otherwise a privacy-safe playful alias."""
     enforce_rate_limit(request, "daily_global_read", limit=300, window_seconds=3600)
     selected_date = daily_date or current_prague_date().isoformat()
     try:
@@ -3955,12 +3962,19 @@ def daily_global_leaderboard(
         start = max(0, min(my_index - 1, total - 3))
         visible_indices = list(range(start, min(total, start + 3)))
 
+    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}
+    used_aliases: set[str] = set()
     board = []
     for index in visible_indices:
         row = ranked[index]
+        pid = str(row.get("player_id") or "")
+        identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"day:{selected_date}", used_aliases)
         board.append({
             "rank": index + 1,
             "isMine": index == my_index,
+            "name": identity["name"],
+            "avatar": identity["avatar"],
+            "anonymous": identity["anonymous"],
             "elapsedMs": int(row.get("best_elapsed_ms") or 0),
             "moves": int(row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -3976,7 +3990,7 @@ def daily_global_leaderboard(
         "myRank": my_rank,
         "topPercent": top_percent,
         "rows": board,
-        "privacy": "anonymous-performance-only",
+        "privacy": "opt-in-identity-otherwise-alias",
     }
 
 
@@ -4026,6 +4040,44 @@ def _ranking_player_visible(player: dict, viewer_id: str | None) -> bool:
         return True
     # NULL means the player has not answered the one-time visibility notice yet.
     return player.get("public_rankings") is True
+
+
+_RANKING_ANON_ADJECTIVES = [
+    "Tajemný", "Nenápadný", "Záhadný", "Skrytý", "Maskovaný", "Mlčenlivý",
+    "Tichý", "Neznámý", "Utajený", "Noční", "Kosmický", "Divoký",
+    "Chytrý", "Zvědavý", "Propletený", "Šifrovaný", "Nečekaný", "Potulný",
+    "Rychlý", "Trpělivý",
+]
+_RANKING_ANON_ANIMALS = [
+    ("jezevec", "🦡"), ("mýval", "🦝"), ("sysel", "🐿️"), ("krtek", "🐾"),
+    ("tučňák", "🐧"), ("narval", "🐋"), ("tapír", "🐾"), ("papuchalk", "🐦"),
+    ("albatros", "🕊️"), ("axolotl", "🦎"), ("bobr", "🦫"), ("los", "🫎"),
+    ("lev", "🦁"), ("rys", "🐈"), ("vlk", "🐺"), ("kocour", "🐱"),
+    ("králík", "🐰"), ("delfín", "🐬"), ("hroch", "🦛"), ("šakal", "🐺"),
+    ("lemur", "🐒"), ("sokol", "🦅"), ("datel", "🐦"), ("gekon", "🦎"),
+]
+
+def _ranking_anonymous_identity(player_id: str, scope: str, used_names: set[str] | None = None) -> dict:
+    used_names = used_names if used_names is not None else set()
+    for nonce in range(512):
+        digest = hashlib.sha256(f"proplet-anon-v1:{scope}:{player_id}:{nonce}".encode()).digest()
+        adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]
+        animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]
+        name = f"{adjective} {animal}"
+        if name not in used_names:
+            used_names.add(name)
+            return {"name": name, "avatar": avatar, "anonymous": True}
+    return {"name": "Anonymní propletač", "avatar": "🎭", "anonymous": True}
+
+def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope: str, used_names: set[str] | None = None) -> dict:
+    player = player or {}
+    if _ranking_player_visible(player, viewer_id):
+        return {
+            "name": player.get("name") or "Hráč",
+            "avatar": player.get("avatar") or "🙂",
+            "anonymous": False,
+        }
+    return _ranking_anonymous_identity(str(player.get("id") or "unknown"), scope, used_names)
 
 
 def _ranking_result_team(row: dict, player: dict | None) -> str | None:
@@ -4199,20 +4251,21 @@ def rankings_xp(
     badge_counts = _ranking_badge_counts(results, rescues)
 
     player_rows = []
+    used_aliases: set[str] = set()
+    alias_scope = f"day:{current_prague_date().isoformat()}" if period == "today" else (f"xp-week:{period_start.date().isoformat()}" if period_start else "xp-all")
     for player in players:
         pid = str(player.get("id") or "")
         score = int(period_points.get(pid, 0))
         if score <= 0 and pid != viewer_id:
             continue
-        if not _ranking_player_visible(player, viewer_id):
-            continue
+        identity = _ranking_display_identity(player, viewer_id, alias_scope, used_aliases)
         family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
-        team_name = public_team_names.get(family or "")
+        team_name = public_team_names.get(family or "") if not identity["anonymous"] else None
         if pid == viewer_id and family and not team_name:
             league = league_by_code.get(family)
             team_name = (league or {}).get("name") or family
         player_rows.append({
-            "name": player.get("name") or "Hráč", "avatar": player.get("avatar") or "🙂",
+            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],
             "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),
             "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),
             "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,
@@ -4289,18 +4342,20 @@ def rankings_daily(
         int(row.get("best_moves") or 10**9), completion_time(row), str(row.get("player_id") or ""),
     ))
     player_rows = []
+    used_aliases: set[str] = set()
     for row in ranked_all:
         pid = str(row.get("player_id") or "")
         player = player_by_id.get(pid)
-        if not player or not _ranking_player_visible(player, viewer_id):
+        if not player:
             continue
+        identity = _ranking_display_identity(player, viewer_id, f"day:{selected_date}", used_aliases)
         family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
-        team_name = public_team_names.get(family or "")
+        team_name = public_team_names.get(family or "") if not identity["anonymous"] else None
         if pid == viewer_id and family and not team_name:
             league = league_by_code.get(family) or {}
             team_name = league.get("name") or family
         player_rows.append({
-            "name": player.get("name") or "Hráč", "avatar": player.get("avatar") or "🙂", "teamName": team_name,
+            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"], "teamName": team_name,
             "elapsedMs": int(row.get("best_elapsed_ms") or 0), "moves": int(row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
             "isMine": pid == viewer_id,
