@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Compare Medium geometry profiles
+      - name: Compare larger dense Medium profiles
         run: |
           python - <<'PY'
           import json, random, statistics, sys
@@ -25,18 +25,15 @@ jobs:
           dictionary=[w for w,_ in freq if w not in gp.FUNCTION_WORDS][:12000]
           dictionary=list(dict.fromkeys(dictionary+[w for w in all_answers if w not in dictionary]))
           profiles={
-            'dense_current':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,120),style='dense',min_curvy=0,min_spiral=0),
-            'winding_006':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,220),style='winding',turn_bias=.06,curl_bias=.02,min_curvy=1,min_spiral=0,max_short_words=3),
-            'winding_010':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,260),style='winding',turn_bias=.10,curl_bias=.04,min_curvy=1,min_spiral=0,max_short_words=3),
-            'winding_014':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,300),style='winding',turn_bias=.14,curl_bias=.06,min_curvy=2,min_spiral=0,max_short_words=3),
+            'dense_7x8_40_46':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,140),style='dense',min_curvy=0,min_spiral=0),
+            'dense_8x8_46_52':dict(rows=8,cols=8,cells=(46,52),words=(8,9),min_len=4,max_len=8,dict_size=8750,cand=(8,180),style='dense',min_curvy=0,min_spiral=0),
+            'dense_8x9_52_58':dict(rows=8,cols=9,cells=(52,58),words=(8,10),min_len=4,max_len=9,dict_size=9000,cand=(10,240),style='dense',min_curvy=0,min_spiral=0),
+            'dense_9x9_58_64':dict(rows=9,cols=9,cells=(58,64),words=(9,10),min_len=4,max_len=9,dict_size=9250,cand=(10,300),style='dense',min_curvy=0,min_spiral=0),
           }
-          out={}
-          original=gp.SPECS['medium']
+          out={}; original=gp.SPECS['medium']
           for pi,(name,spec) in enumerate(profiles.items()):
-            gp.SPECS['medium']=[spec]
-            puzzles=[]
-            rng=random.Random(2026081700+pi)
-            for i in range(20):
+            gp.SPECS['medium']=[spec]; puzzles=[]; rng=random.Random(2026081800+pi)
+            for i in range(30):
               p=gp.create_puzzle('medium',rng.randrange(1,2**31-1),pools['medium'],dictionary,f'sample-{name}-{i}',variant_index=0,tier_of=tier_of,vocab_key='medium',fun_of=fun)
               puzzles.append(p)
             turns=[a.get('turns',0) for p in puzzles for a in p['answers']]
@@ -46,19 +43,20 @@ jobs:
               'lowTurnShare':round(sum(t<=1 for t in turns)/len(turns),3),
               'meanScore':round(statistics.mean(p['meta']['difficultyScore'] for p in puzzles),1),
               'meanCandidates':round(statistics.mean(p['meta']['candidateCount'] for p in puzzles),1),
+              'meanSolverNodes':round(statistics.mean(p['meta']['solverNodes'] for p in puzzles),1),
               'meanCells':round(statistics.mean(len(p['mask']) for p in puzzles),1),
               'meanWords':round(statistics.mean(len(p['answers']) for p in puzzles),1),
               'curvyWordsPerBoard':round(statistics.mean(p['meta']['curvyWords'] for p in puzzles),2),
             }
           gp.SPECS['medium']=original
-          Path('analysis-output').mkdir(exist_ok=True)
-          Path('analysis-output/gen3-medium-progression-sample.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          path=Path('analysis-output/gen3-medium-dense-size-sample.json')
+          path.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print(json.dumps(out,ensure_ascii=False,indent=2))
           PY
       - name: Commit report
         run: |
           git config user.name 'Proplet Audit Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add analysis-output/gen3-medium-progression-sample.json
-          git commit -m 'Add Medium progression sample results'
+          git add analysis-output/gen3-medium-dense-size-sample.json
+          git commit -m 'Add larger dense Medium sample results'
           git push
