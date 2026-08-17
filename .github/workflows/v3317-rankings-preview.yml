@@ -55,7 +55,7 @@ jobs:
         run: |
           git config user.name 'prouza-hue'
           git config user.email 'prouza@gmail.com'
-          git rm tools/patch_v3317_rankings_preview.py tools/fix_v3317_patcher.py .github/workflows/v3317-rankings-preview.yml
+          git rm -f tools/patch_v3317_rankings_preview.py tools/fix_v3317_patcher.py .github/workflows/v3317-rankings-preview.yml
           git add server.py public/app.js public/index.html public/styles.css public/sw.js SUPABASE_MIGRATION_V3_31_7.sql
           git diff --cached --check
           git commit -m 'Proplet v3.31.7 Rankings & Teams preview'
