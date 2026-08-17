@@ -27,6 +27,11 @@
   css.href='/home-layout.css?v=9';
   document.head.appendChild(css);
 
+  const brandCss=document.createElement('link');
+  brandCss.rel='stylesheet';
+  brandCss.href='/today-brand.css?v=1';
+  document.head.appendChild(brandCss);
+
   const rankingCss=document.createElement('link');
   rankingCss.rel='stylesheet';
   rankingCss.href='/ranking-polish.css?v=5';
