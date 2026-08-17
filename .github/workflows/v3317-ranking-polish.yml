@@ -1,0 +1,151 @@
+name: v3.31.7 ranking polish
+
+on:
+  push:
+    branches:
+      - preview/v3317-rankings-teams
+    paths:
+      - .github/workflows/v3317-ranking-polish.yml
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/v3317-rankings-teams
+          fetch-depth: 0
+      - name: Apply ranking polish
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          server = Path('server.py')
+          s = server.read_text()
+          start = s.index('_RANKING_ANON_ADJECTIVES = [')
+          end = s.index('\ndef _ranking_anonymous_identity', start)
+          replacement = '''_RANKING_ANON_ADJECTIVES = [
+              "Tajemný", "Nenápadný", "Záhadný", "Skrytý", "Maskovaný", "Mlčenlivý",
+              "Tichý", "Neznámý", "Utajený", "Noční", "Kosmický", "Divoký",
+              "Chytrý", "Zvědavý", "Propletený", "Šifrovaný", "Nečekaný", "Potulný",
+              "Rychlý", "Trpělivý", "Rozespalý", "Mazaný", "Zbrklý", "Zasněný",
+              "Hladový", "Statečný", "Rozverný", "Popletený", "Neúnavný", "Ospalý",
+              "Mrštný", "Tvrdohlavý",
+          ]
+          _RANKING_ANON_ANIMALS = [
+              ("jezevec", "🦡"), ("mýval", "🦝"), ("sysel", "🐿️"), ("krtek", "🐾"),
+              ("tučňák", "🐧"), ("narval", "🐋"), ("tapír", "🐾"), ("papuchalk", "🐦"),
+              ("albatros", "🕊️"), ("axolotl", "🦎"), ("bobr", "🦫"), ("los", "🫎"),
+              ("lev", "🦁"), ("rys", "🐈"), ("vlk", "🐺"), ("kocour", "🐱"),
+              ("králík", "🐰"), ("delfín", "🐬"), ("hroch", "🦛"), ("šakal", "🐺"),
+              ("lemur", "🐒"), ("sokol", "🦅"), ("datel", "🐦"), ("gekon", "🦎"),
+              ("mrož", "🦭"), ("dikobraz", "🦔"), ("pásovec", "🐾"), ("mravenečník", "🐾"),
+              ("klokan", "🦘"), ("žralok", "🦈"), ("medvěd", "🐻"), ("plameňák", "🦩"),
+          ]
+          '''
+          s = s[:start] + replacement + s[end:]
+          server.write_text(s)
+
+          app = Path('public/app.js')
+          a = app.read_text()
+          xp_start = a.index('function renderXpRanking(data){')
+          xp_end = a.index('\nfunction renderDailyRanking(data){', xp_start)
+          xp_fn = '''function rankingListSlice(rows,limit=10){
+           const top=rows.slice(0,limit),mine=rows.find(r=>r.isMine),showMine=mine&&!top.includes(mine),visible=showMine?[...top,mine]:top;
+           return {top,visible,mine:showMine?mine:null,hidden:Math.max(0,rows.length-visible.length)}
+          }
+          function rankingMoreHtml(hidden,scope){
+           if(!hidden)return '';
+           return `<div class="ranking-more">A dalších <strong>${countCz(hidden,scope==='teams'?'tým':'hráče',scope==='teams'?'týmy':'hráči',scope==='teams'?'týmů':'hráčů')}</strong> si proplétá cestu na vrchol.</div>`
+          }
+          function rankingOwnDividerHtml(){return '<div class="ranking-own-divider"><span>Tvoje pozice</span></div>'}
+          function renderXpRanking(data){
+           const list=$('#xpLeaderboardList'),rows=rankingRows(data,rankingXpScope);
+           if(!rows.length){list.innerHTML=`<div class="ranking-empty"><strong>${rankingXpScope==='teams'?'Týmy':'Hráči'} zatím nemají XP v tomto období.</strong><small>První body tu udělají pořádek velmi rychle. 😄</small></div>`;return}
+           const sliced=rankingListSlice(rows),rowHtml=r=>{
+            if(rankingXpScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${rankingXpPeriod==='today'?'dnes':rankingXpPeriod==='week'?'tento týden':'celkem'}</small></div></div>`;
+            const level=levelFor(Number(r.lifetimePoints||0)),team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
+            return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small><span class="ranking-rank-chip">${level.current.icon} ${esc(level.current.name)}</span>${r.badgeCount?` · 🏅 ${r.badgeCount}`:''}${team}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${rankingXpPeriod==='today'?'dnes':rankingXpPeriod==='week'?'tento týden':'celkem'}</small></div></div>`
+           };
+           const topHtml=sliced.top.map(rowHtml).join(''),mineHtml=sliced.mine?`${rankingOwnDividerHtml()}${rowHtml(sliced.mine)}`:'';
+           list.innerHTML=topHtml+mineHtml+rankingMoreHtml(sliced.hidden,rankingXpScope)
+          }'''
+          a = a[:xp_start] + xp_fn + a[xp_end:]
+
+          daily_start = a.index('function renderDailyRanking(data){')
+          daily_end = a.index('\nfunction renderRankingTeamCard(){', daily_start)
+          daily_fn = '''function renderDailyRanking(data){
+           const list=$('#dailyLeaderboardList'),rows=rankingRows(data,rankingDailyScope);
+           if(!rows.length){list.innerHTML='<div class="ranking-empty"><strong>Dnešní startovní rošt je zatím prázdný.</strong><small>Stačí dokončit Denní výzvu.</small></div>';return}
+           const sliced=rankingListSlice(rows),rowHtml=r=>{
+            if(rankingDailyScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.players||0,'výkon','výkony','výkonů')} v dnešním skóre · ${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.score||0).toLocaleString('cs-CZ',{maximumFractionDigits:1})}</strong><small>/ 100</small></div></div>`;
+            const quality=r.cleanSolve===true?'✨ Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Bez nápovědy',team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
+            return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small>${quality} · ${countCz(r.moves||0,'tah','tahy','tahů')}${team}</small></div><div class="leader-score"><strong>${fmtTime(r.elapsedMs)}</strong><small>dnešní výzva</small></div></div>`
+           };
+           const topHtml=sliced.top.map(rowHtml).join(''),mineHtml=sliced.mine?`${rankingOwnDividerHtml()}${rowHtml(sliced.mine)}`:'';
+           list.innerHTML=topHtml+mineHtml+rankingMoreHtml(sliced.hidden,rankingDailyScope)
+          }'''
+          a = a[:daily_start] + daily_fn + a[daily_end:]
+
+          bind_anchor = 'function bind(){\n'
+          if 'winModal.onclick=e=>' not in a:
+              a = a.replace(bind_anchor, bind_anchor + " const winModal=$('#winModal');if(winModal)winModal.onclick=e=>{if(e.target===winModal&&currentGame?.mode!=='starter')closeWinToMenu()};\n", 1)
+          app.write_text(a)
+
+          css = Path('public/styles.css')
+          c = css.read_text()
+          polish = r'''
+
+/* v3.31.7 ranking polish: scalable lists, clearer filter hierarchy, dismissible result backdrop */
+.ranking-control-row{grid-template-columns:minmax(0,1fr) 1px minmax(0,1.35fr);gap:12px;align-items:end}
+.ranking-control-row::before{content:"";grid-column:2;grid-row:1;width:1px;height:38px;background:var(--line);align-self:end;margin-bottom:3px}
+.ranking-control-row>.ranking-segment{position:relative;margin-top:16px}
+.ranking-control-row>.ranking-segment:first-child{grid-column:1;background:#eeeaff}
+.ranking-control-row>.ranking-segment:first-child::before,.ranking-period-segment::before{position:absolute;left:4px;top:-16px;font-size:9px;line-height:1;letter-spacing:.12em;font-weight:950;color:#8a8597;text-transform:uppercase}
+.ranking-control-row>.ranking-segment:first-child::before{content:"Kdo"}
+.ranking-period-segment{grid-column:3;background:#eaf6f1}
+.ranking-period-segment::before{content:"Období"}
+.ranking-control-row>.ranking-segment:first-child button.active{color:#5d4ed0;box-shadow:0 3px 9px rgba(93,78,208,.10)}
+.ranking-period-segment button.active{color:#26775e;box-shadow:0 3px 9px rgba(38,119,94,.10)}
+.ranking-more{padding:12px 10px 2px;text-align:center;color:var(--muted);font-size:11px;line-height:1.35}.ranking-more strong{color:#5d586d}
+.ranking-own-divider{display:flex;align-items:center;gap:9px;margin:5px 2px -1px;color:#8a8597;font-size:9px;font-weight:950;letter-spacing:.11em;text-transform:uppercase}.ranking-own-divider::before,.ranking-own-divider::after{content:"";height:1px;background:var(--line);flex:1}.ranking-own-divider span{white-space:nowrap}
+#winModal{cursor:pointer}#winModal .modal-card{cursor:default}
+@media(max-width:520px){.ranking-control-row{grid-template-columns:1fr;gap:8px}.ranking-control-row::before{display:none}.ranking-control-row>.ranking-segment:first-child,.ranking-period-segment{grid-column:auto}.ranking-period-segment{order:2}.ranking-control-row>.ranking-segment{margin-top:16px}}
+'''
+          if 'v3.31.7 ranking polish:' not in c:
+              c += polish
+          css.write_text(c)
+
+          sw = Path('public/sw.js')
+          w = sw.read_text().replace("proplet-v3.31.7-rankings-anon-r2", "proplet-v3.31.7-rankings-polish-r3")
+          sw.write_text(w)
+          PY
+      - name: Contract checks
+        shell: bash
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.py').read_text(); a=Path('public/app.js').read_text(); c=Path('public/styles.css').read_text()
+          assert s.count('"Tajemný"') == 1
+          assert '("plameňák", "🦩")' in s
+          assert 'function rankingListSlice(rows,limit=10)' in a
+          assert 'Tvoje pozice' in a
+          assert 'winModal.onclick=e=>' in a
+          assert 'content:"Kdo"' in c and 'content:"Období"' in c
+          PY
+      - name: Commit product changes and remove runner
+        shell: bash
+        run: |
+          rm .github/workflows/v3317-ranking-polish.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.py public/app.js public/styles.css public/sw.js .github/workflows/v3317-ranking-polish.yml
+          git commit -m 'Polish scalable rankings and result UX'
+          git push origin HEAD:preview/v3317-rankings-teams
