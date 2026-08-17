@@ -1,0 +1,124 @@
+name: v3317 anonymous rankings patch
+
+on:
+  push:
+    branches:
+      - preview/v3317-rankings-teams
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch rankings privacy model
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          server = Path('server.py')
+          s = server.read_text()
+
+          marker = '''def _ranking_player_visible(player: dict, viewer_id: str | None) -> bool:\n    if viewer_id and str(player.get("id")) == viewer_id:\n        return True\n    # NULL means the player has not answered the one-time visibility notice yet.\n    return player.get("public_rankings") is True\n'''
+          helper = marker + '''\n\n_RANKING_ANON_ADJECTIVES = [\n    "Tajemný", "Nenápadný", "Záhadný", "Skrytý", "Maskovaný", "Mlčenlivý",\n    "Tichý", "Neznámý", "Utajený", "Noční", "Kosmický", "Divoký",\n    "Chytrý", "Zvědavý", "Propletený", "Šifrovaný", "Nečekaný", "Potulný",\n    "Rychlý", "Trpělivý",\n]\n_RANKING_ANON_ANIMALS = [\n    ("jezevec", "🦡"), ("mýval", "🦝"), ("sysel", "🐿️"), ("krtek", "🐾"),\n    ("tučňák", "🐧"), ("narval", "🐋"), ("tapír", "🐾"), ("papuchalk", "🐦"),\n    ("albatros", "🕊️"), ("axolotl", "🦎"), ("bobr", "🦫"), ("los", "🫎"),\n    ("lev", "🦁"), ("rys", "🐈"), ("vlk", "🐺"), ("kocour", "🐱"),\n    ("králík", "🐰"), ("delfín", "🐬"), ("hroch", "🦛"), ("šakal", "🐺"),\n    ("lemur", "🐒"), ("sokol", "🦅"), ("datel", "🐦"), ("gekon", "🦎"),\n]\n\ndef _ranking_anonymous_identity(player_id: str, scope: str, used_names: set[str] | None = None) -> dict:\n    used_names = used_names if used_names is not None else set()\n    for nonce in range(512):\n        digest = hashlib.sha256(f"proplet-anon-v1:{scope}:{player_id}:{nonce}".encode()).digest()\n        adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]\n        animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]\n        name = f"{adjective} {animal}"\n        if name not in used_names:\n            used_names.add(name)\n            return {"name": name, "avatar": avatar, "anonymous": True}\n    return {"name": "Anonymní propletač", "avatar": "🎭", "anonymous": True}\n\ndef _ranking_display_identity(player: dict | None, viewer_id: str | None, scope: str, used_names: set[str] | None = None) -> dict:\n    player = player or {}\n    if _ranking_player_visible(player, viewer_id):\n        return {\n            "name": player.get("name") or "Hráč",\n            "avatar": player.get("avatar") or "🙂",\n            "anonymous": False,\n        }\n    return _ranking_anonymous_identity(str(player.get("id") or "unknown"), scope, used_names)\n'''
+          if marker not in s:
+              raise SystemExit('ranking visibility marker missing')
+          s = s.replace(marker, helper, 1)
+
+          old_xp = '''    player_rows = []\n    for player in players:\n        pid = str(player.get("id") or "")\n        score = int(period_points.get(pid, 0))\n        if score <= 0 and pid != viewer_id:\n            continue\n        if not _ranking_player_visible(player, viewer_id):\n            continue\n        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))\n        team_name = public_team_names.get(family or "")\n        if pid == viewer_id and family and not team_name:\n            league = league_by_code.get(family)\n            team_name = (league or {}).get("name") or family\n        player_rows.append({\n            "name": player.get("name") or "Hráč", "avatar": player.get("avatar") or "🙂",\n            "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),\n            "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),\n            "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,\n        })\n'''
+          new_xp = '''    player_rows = []\n    used_aliases: set[str] = set()\n    alias_scope = f"day:{current_prague_date().isoformat()}" if period == "today" else (f"xp-week:{period_start.date().isoformat()}" if period_start else "xp-all")\n    for player in players:\n        pid = str(player.get("id") or "")\n        score = int(period_points.get(pid, 0))\n        if score <= 0 and pid != viewer_id:\n            continue\n        identity = _ranking_display_identity(player, viewer_id, alias_scope, used_aliases)\n        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))\n        team_name = public_team_names.get(family or "") if not identity["anonymous"] else None\n        if pid == viewer_id and family and not team_name:\n            league = league_by_code.get(family)\n            team_name = (league or {}).get("name") or family\n        player_rows.append({\n            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],\n            "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),\n            "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),\n            "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,\n        })\n'''
+          if old_xp not in s:
+              raise SystemExit('xp player block missing')
+          s = s.replace(old_xp, new_xp, 1)
+
+          old_daily = '''    player_rows = []\n    for row in ranked_all:\n        pid = str(row.get("player_id") or "")\n        player = player_by_id.get(pid)\n        if not player or not _ranking_player_visible(player, viewer_id):\n            continue\n        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))\n        team_name = public_team_names.get(family or "")\n        if pid == viewer_id and family and not team_name:\n            league = league_by_code.get(family) or {}\n            team_name = league.get("name") or family\n        player_rows.append({\n            "name": player.get("name") or "Hráč", "avatar": player.get("avatar") or "🙂", "teamName": team_name,\n            "elapsedMs": int(row.get("best_elapsed_ms") or 0), "moves": int(row.get("best_moves") or 0),\n            "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,\n            "isMine": pid == viewer_id,\n        })\n'''
+          new_daily = '''    player_rows = []\n    used_aliases: set[str] = set()\n    for row in ranked_all:\n        pid = str(row.get("player_id") or "")\n        player = player_by_id.get(pid)\n        if not player:\n            continue\n        identity = _ranking_display_identity(player, viewer_id, f"day:{selected_date}", used_aliases)\n        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))\n        team_name = public_team_names.get(family or "") if not identity["anonymous"] else None\n        if pid == viewer_id and family and not team_name:\n            league = league_by_code.get(family) or {}\n            team_name = league.get("name") or family\n        player_rows.append({\n            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"], "teamName": team_name,\n            "elapsedMs": int(row.get("best_elapsed_ms") or 0), "moves": int(row.get("best_moves") or 0),\n            "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,\n            "isMine": pid == viewer_id,\n        })\n'''
+          if old_daily not in s:
+              raise SystemExit('daily player block missing')
+          s = s.replace(old_daily, new_daily, 1)
+
+          # Add opt-in identities (or aliases) to the compact Daily result leaderboard.
+          old_daily_board = '''    board = []\n    for index in visible_indices:\n        row = ranked[index]\n        board.append({\n            "rank": index + 1,\n            "isMine": index == my_index,\n            "elapsedMs": int(row.get("best_elapsed_ms") or 0),\n            "moves": int(row.get("best_moves") or 0),\n            "hintsUsed": int(row.get("hints_used") or 0),\n            "cleanSolve": row.get("clean_solve") is True,\n        })\n\n    my_rank = my_index + 1 if my_index is not None else None\n'''
+          new_daily_board = '''    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}\n    used_aliases: set[str] = set()\n    board = []\n    for index in visible_indices:\n        row = ranked[index]\n        pid = str(row.get("player_id") or "")\n        identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"day:{selected_date}", used_aliases)\n        board.append({\n            "rank": index + 1,\n            "isMine": index == my_index,\n            "name": identity["name"],\n            "avatar": identity["avatar"],\n            "anonymous": identity["anonymous"],\n            "elapsedMs": int(row.get("best_elapsed_ms") or 0),\n            "moves": int(row.get("best_moves") or 0),\n            "hintsUsed": int(row.get("hints_used") or 0),\n            "cleanSolve": row.get("clean_solve") is True,\n        })\n\n    my_rank = my_index + 1 if my_index is not None else None\n'''
+          if old_daily_board not in s:
+              raise SystemExit('daily compact board block missing')
+          s = s.replace(old_daily_board, new_daily_board, 1)
+          s = s.replace('"privacy": "anonymous-performance-only",\n    }\n\n\n\n\ndef _ranking_period_start', '"privacy": "opt-in-identity-otherwise-alias",\n    }\n\n\n\n\ndef _ranking_period_start', 1)
+          s = s.replace('''    """Privacy-safe global Daily standings: public performance, never player identity."""''', '''    """Global Daily standings: opted-in identity, otherwise a privacy-safe playful alias."""''', 1)
+
+          # Do the same for Free-result standings so privacy behavior is consistent everywhere.
+          old_free_board = '''    board = []\n    for index in visible_indices:\n        row = ranked[index]\n        board.append({\n            "rank": index + 1,\n            "isMine": index == my_index,\n            "elapsedMs": int(row.get("elapsed_ms") or 0),\n            "moves": int(row.get("moves") or 0),\n            "hintsUsed": int(row.get("hints_used") or 0),\n            "cleanSolve": row.get("clean_solve") is True,\n        })\n\n    my_rank = my_index + 1 if my_index is not None else None\n'''
+          new_free_board = '''    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}\n    used_aliases: set[str] = set()\n    board = []\n    for index in visible_indices:\n        row = ranked[index]\n        pid = str(row.get("player_id") or "")\n        identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"free:{puzzle_id}", used_aliases)\n        board.append({\n            "rank": index + 1,\n            "isMine": index == my_index,\n            "name": identity["name"],\n            "avatar": identity["avatar"],\n            "anonymous": identity["anonymous"],\n            "elapsedMs": int(row.get("elapsed_ms") or 0),\n            "moves": int(row.get("moves") or 0),\n            "hintsUsed": int(row.get("hints_used") or 0),\n            "cleanSolve": row.get("clean_solve") is True,\n        })\n\n    my_rank = my_index + 1 if my_index is not None else None\n'''
+          if old_free_board not in s:
+              raise SystemExit('free compact board block missing')
+          s = s.replace(old_free_board, new_free_board, 1)
+          s = s.replace('''    """Privacy-safe worldwide standings for one active Free puzzle.\n\n    Every player is represented by their first completed attempt only. The\n    response deliberately contains no names, avatars, team codes or player IDs.\n    """''', '''    """Worldwide standings for one active Free puzzle.\n\n    Every player is represented by their first completed attempt only. Identity is\n    shown only after explicit opt-in; everyone else receives a per-puzzle alias.\n    """''', 1)
+          # The first privacy field in the file belongs to Free.
+          s = s.replace('"privacy": "anonymous-performance-only",\n        "attemptPolicy": "first-completed-only",', '"privacy": "opt-in-identity-otherwise-alias",\n        "attemptPolicy": "first-completed-only",', 1)
+
+          server.write_text(s)
+
+          app = Path('public/app.js')
+          a = app.read_text()
+          a = a.replace("if(!p?.token){box.innerHTML='<span class=\"ranking-privacy-icon\">👀</span><div><strong>Společné pořadí, minimum profilu</strong><small>Veřejný profil tvoří jen emoji avatar, herní jméno a případně veřejný název týmu.</small></div>';return}", "if(!p?.token){box.innerHTML='<span class=\"ranking-privacy-icon\">👀</span><div><strong>Kompletní pořadí, soukromí zůstává</strong><small>Výsledky jsou vždy vidět. Kdo nezveřejní profil, dostane místo jména hravou anonymní přezdívku.</small></div>';return}", 1)
+          a = a.replace("const title=state===true?'Jsi ve veřejném pořadí':state===false?'V globálním pořadí jsi skrytý':'Vyber si, jestli chceš být vidět';", "const title=state===true?'Jsi ve veřejném pořadí':state===false?'V pořadí jsi anonymně':'Vyber si, jestli chceš být vidět';", 1)
+          a = a.replace("const copy=state===true?'Ostatní vidí jen avatar, herní jméno a případně veřejný tým.':state===false?'Tvoje individuální výsledky se ostatním neukazují. Týmové součty tím nejsou ovlivněné.':'Dokud volbu nepotvrdíš, ostatním se tvoje jméno neukáže.';", "const copy=state===true?'Ostatní vidí jen avatar, herní jméno a případně veřejný tým.':state===false?'Tvoje výsledky v pořadí zůstávají, ale ostatní u nich vidí jen anonymní přezdívku.':'Dokud volbu nepotvrdíš, tvoje výsledky se ukazují anonymně.';", 1)
+          a = a.replace("showToast(enabled?'Jsi ve společném pořadí 🏆':'V globálním pořadí jsi skrytý')", "showToast(enabled?'Jsi ve společném pořadí 🏆':'V pořadí jsi anonymně 🎭')", 1)
+
+          old_daily_render = "container.innerHTML=`<div class=\"daily-world-head\"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class=\"daily-world-summary\"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}<small>${RANK_RULES}</small></p></div><div class=\"daily-world-neighbours\">${rows.map(r=>`<div class=\"mini-leader-row ${r.isMine?'me':''}\"><b>${rankBadge(r.rank)}</b><span><strong>${r.isMine?'Ty':'Soupeř'}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class=\"daily-world-privacy\">Jména ostatních hráčů zůstávají soukromá.</small>`;"
+          new_daily_render = "container.innerHTML=`<div class=\"daily-world-head\"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class=\"daily-world-summary\"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}<small>${RANK_RULES}</small></p></div><div class=\"daily-world-neighbours\">${rows.map(r=>`<div class=\"mini-leader-row ${r.isMine?'me':''}\"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class=\"daily-world-privacy\">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;"
+          if old_daily_render not in a:
+              raise SystemExit('daily render block missing')
+          a = a.replace(old_daily_render, new_daily_render, 1)
+
+          # Free-result rows have two render branches; replace both row labels and privacy copy.
+          a = a.replace('<strong>Soupeř</strong><small>${r.cleanSolve?', '<strong>${esc(r.avatar||\'🎭\')} ${esc(r.name||\'Anonymní propletač\')}</strong><small>${r.cleanSolve?', 1)
+          a = a.replace("<strong>${r.isMine?'Ty':'Soupeř'}</strong><small>${r.cleanSolve?", "<strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?", 1)
+          a = a.replace('Jména ostatních hráčů zůstávají soukromá.</small>', 'Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>', 1)
+          a = a.replace('Jména ostatních hráčů zůstávají soukromá · počítá se první dokončený pokus.</small>', 'Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku · počítá se první dokončený pokus.</small>', 1)
+          app.write_text(a)
+
+          index = Path('public/index.html')
+          h = index.read_text()
+          h = h.replace('V preview se ukazuje jen emoji avatar, herní jméno a případně veřejný název týmu. Žádné interní ID ani účetní údaje.', 'Výsledky jsou vždy kompletní. Jméno a avatar se ukážou jen po souhlasu; jinak dostane hráč anonymní přezdívku.', 1)
+          h = h.replace('Když se zapojíš, ostatní uvidí jen tvůj emoji avatar, herní jméno a případně veřejný název týmu. Nic dalšího z účtu nezveřejňujeme.', 'Když se zapojíš, ostatní uvidí jen tvůj emoji avatar, herní jméno a případně veřejný název týmu. Když ne, tvoje výsledky v pořadí zůstanou pod anonymní přezdívkou.', 1)
+          h = h.replace('Nezobrazovat mě</button>', 'Zůstat anonymně</button>', 1)
+          index.write_text(h)
+
+          sw = Path('public/sw.js')
+          w = sw.read_text()
+          w = w.replace("const CACHE='proplet-v3.31.7-rankings-teams';", "const CACHE='proplet-v3.31.7-rankings-anon-r2';", 1)
+          sw.write_text(w)
+          PY
+
+      - name: Contract checks
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.py').read_text(); a=Path('public/app.js').read_text(); h=Path('public/index.html').read_text()
+          assert 'not _ranking_player_visible(player, viewer_id)' not in s
+          assert '_ranking_display_identity' in s
+          assert 'opt-in-identity-otherwise-alias' in s
+          assert 'Anonymní propletač' in a
+          assert 'Zůstat anonymně' in h
+          assert "r.isMine?'Ty':'Soupeř'" not in a
+          print('anonymous ranking contracts ok')
+          PY
+      - name: Commit preview fix and remove patch workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/v3317-anonymous-rankings-patch.yml
+          git add server.py public/app.js public/index.html public/sw.js .github/workflows/v3317-anonymous-rankings-patch.yml
+          git commit -m "Show complete rankings with privacy-safe aliases"
+          git push origin HEAD:preview/v3317-rankings-teams
