@@ -24,7 +24,7 @@
 
   const css=document.createElement('link');
   css.rel='stylesheet';
-  css.href='/home-layout.css?v=8';
+  css.href='/home-layout.css?v=9';
   document.head.appendChild(css);
 
   const rankingCss=document.createElement('link');
@@ -35,7 +35,7 @@
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=8';
+    script.src='/home-layout.js?v=9';
     script.dataset.propletHomeLayout='1';
     document.body.appendChild(script);
   };
