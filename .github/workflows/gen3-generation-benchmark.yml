@@ -8,14 +8,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [current, balanced, compact, lean]
+        profile: [balanced, lean, smart, tight]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Benchmark Hardcore profile
+      - name: Benchmark full Hardcore acceptance loop
         env:
           PROFILE: ${{ matrix.profile }}
         run: |
@@ -25,22 +25,32 @@ jobs:
           import generate_puzzles as gp
           name=os.environ['PROFILE']
           specs={
-            'current':dict(rows=10,cols=10,cells=(78,88),words=(12,15),min_len=4,max_len=10,dict_size=10500,cand=(18,700),style='winding',turn_bias=.38,curl_bias=.25,min_curvy=6,min_spiral=2,max_short_words=2),
             'balanced':dict(rows=10,cols=10,cells=(76,84),words=(12,14),min_len=4,max_len=10,dict_size=10500,cand=(18,650),style='winding',turn_bias=.39,curl_bias=.26,min_curvy=6,min_spiral=2,max_short_words=2),
-            'compact':dict(rows=10,cols=10,cells=(74,82),words=(12,14),min_len=4,max_len=10,dict_size=10500,cand=(18,620),style='winding',turn_bias=.40,curl_bias=.27,min_curvy=6,min_spiral=2,max_short_words=2),
             'lean':dict(rows=10,cols=10,cells=(74,82),words=(11,14),min_len=4,max_len=10,dict_size=10500,cand=(16,600),style='winding',turn_bias=.40,curl_bias=.27,min_curvy=6,min_spiral=2,max_short_words=2),
+            'smart':dict(rows=10,cols=10,cells=(72,80),words=(11,13),min_len=4,max_len=10,dict_size=10250,cand=(16,540),style='winding',turn_bias=.42,curl_bias=.29,min_curvy=6,min_spiral=2,max_short_words=2),
+            'tight':dict(rows=10,cols=10,cells=(70,78),words=(11,13),min_len=4,max_len=10,dict_size=10000,cand=(15,500),style='winding',turn_bias=.43,curl_bias=.30,min_curvy=6,min_spiral=2,max_short_words=2),
           }
           gp.SPECS['hardcore']=[specs[name]]
           tiers,tier_of=gp.load_answer_tiers(); meta=gp.load_answer_metadata(); fun={w:int(m.get('fun',3)) for w,m in meta.items()}; pools=gp.build_answer_pools(tiers,meta)
-          freq=gp.load_frequency_words(); all_answers=[w for t in 'ABCD' for w in tiers[t]]; dictionary=[w for w,_ in freq if w not in gp.FUNCTION_WORDS][:12000]; dictionary=list(dict.fromkeys(dictionary+all_answers))
-          rng=random.Random(20260817); times=[]; scores=[]; candidates=[]; turns=[]; cells=[]; words=[]; curvy=[]; spiral=[]
-          for i in range(12):
-            t=time.perf_counter(); p=gp.create_puzzle('hardcore',rng.randrange(1,2**31-1),pools['hardcore_conservative'],dictionary,f'b-{name}-{i}',variant_index=0,tier_of=tier_of,vocab_key='hardcore_conservative',fun_of=fun); times.append(time.perf_counter()-t)
-            scores.append(p['meta']['difficultyScore']); candidates.append(p['meta']['candidateCount']); cells.append(len(p['mask'])); words.append(len(p['answers'])); curvy.append(p['meta'].get('curvyWords',0)); spiral.append(p['meta'].get('spiralWords',0)); turns.extend(a.get('turns',0) for a in p['answers'])
-            print(i+1,round(times[-1],3),p['meta']['difficultyScore'],p['meta']['candidateCount'],len(p['mask']),len(p['answers']),flush=True)
-          print('SUMMARY',name,
-                'total',round(sum(times),2),'meanSec',round(statistics.mean(times),3),'maxSec',round(max(times),3),
-                'meanScore',round(statistics.mean(scores),1),'meanCandidates',round(statistics.mean(candidates),1),
-                'meanCells',round(statistics.mean(cells),1),'meanWords',round(statistics.mean(words),1),
-                'meanTurns',round(statistics.mean(turns),2),'meanCurvy',round(statistics.mean(curvy),2),'meanSpiral',round(statistics.mean(spiral),2))
+          freq=gp.load_frequency_words(); all_answers=[w for t in 'ABCD' for w in tiers[t]]; dictionary=[w for w,_ in freq if w not in gp.FUNCTION_WORDS]; dictionary=list(dict.fromkeys(dictionary[:12000]+all_answers))
+          def broad_unique(p):
+            targets=[a['word'].lower() for a in p['answers']]
+            solver=list(dict.fromkeys(dictionary[:12000]+targets))
+            solutions,candidates,nodes=gp.solve_count([x.lower() for x in p['letters']],p['rows'],p['cols'],p['mask'],[len(w) for w in targets],solver,limit=2)
+            return solutions==1,candidates,nodes
+          rng=random.Random(20260817); recent=[]; accepted=[]; retries=[]; rejects=0; started=time.perf_counter()
+          for level in range(1,31):
+            avoid=set().union(*recent) if recent else set()
+            for retry in range(1,121):
+              p=gp.create_puzzle('hardcore',rng.randrange(1,2**31-1),pools['hardcore_conservative'],dictionary,f'b-{name}-{level}',variant_index=0,tier_of=tier_of,vocab_key='hardcore_conservative',fun_of=fun,avoid_words=avoid)
+              unique,candidates,nodes=broad_unique(p)
+              if not unique:
+                rejects+=1; continue
+              accepted.append(p); retries.append(retry); recent.append({a['word'].lower() for a in p['answers']}); recent=recent[-24:]
+              print('ACCEPT',level,'retry',retry,'elapsed',round(time.perf_counter()-started,1),'score',p['meta']['difficultyScore'],'cells',len(p['mask']),'words',len(p['answers']),'wideCand',candidates,flush=True)
+              break
+            else:
+              raise RuntimeError(f'could not accept level {level}')
+          elapsed=time.perf_counter()-started; turns=[a.get('turns',0) for p in accepted for a in p['answers']]
+          print('SUMMARY',name,'accepted',len(accepted),'seconds',round(elapsed,1),'secPerAccepted',round(elapsed/len(accepted),2),'meanRetry',round(statistics.mean(retries),2),'rejects',rejects,'meanScore',round(statistics.mean(p['meta']['difficultyScore'] for p in accepted),1),'meanCells',round(statistics.mean(len(p['mask']) for p in accepted),1),'meanWords',round(statistics.mean(len(p['answers']) for p in accepted),1),'meanTurns',round(statistics.mean(turns),2),'meanCurvy',round(statistics.mean(p['meta'].get('curvyWords',0) for p in accepted),2),'meanSpiral',round(statistics.mean(p['meta'].get('spiralWords',0) for p in accepted),2),flush=True)
           PY
