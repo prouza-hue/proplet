@@ -30,6 +30,18 @@ jobs:
           PY
       - name: Apply source patch
         run: python tools/apply_v3316_gen3_patch.py
+      - name: Harden finalizer quality insertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/finalize_v3316_gen3.py')
+          s=p.read_text(encoding='utf-8')
+          old='''    if marker not in text:\n        raise RuntimeError("quality ladder insertion marker not found")\n    text = text.replace(marker, ladder, 1)\n'''
+          new='''    if marker in text:\n        text = text.replace(marker, ladder, 1)\n    else:\n        anchor = "    helper_summary = {}\\n"\n        if anchor not in text:\n            raise RuntimeError("quality ladder insertion anchor not found")\n        ladder_prefix = ladder.rsplit("    helper_summary = {}", 1)[0]\n        text = text.replace(anchor, ladder_prefix + anchor, 1)\n'''
+          if old not in s:
+              raise SystemExit('finalizer marker guard not found')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
       - name: Finalize progression architecture
         run: python tools/finalize_v3316_gen3.py
       - name: Compile generators and server
