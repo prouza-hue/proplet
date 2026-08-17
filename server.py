@@ -55,7 +55,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.31.6.1"
+APP_VERSION = "3.31.7"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -3947,6 +3947,276 @@ def daily_global_leaderboard(
         "topPercent": top_percent,
         "rows": board,
         "privacy": "anonymous-performance-only",
+    }
+
+
+
+
+def _ranking_period_start(period: str) -> datetime | None:
+    now = datetime.now(TZ)
+    if period == "today":
+        return now.replace(hour=0, minute=0, second=0, microsecond=0)
+    if period == "week":
+        start = now - timedelta(days=now.weekday())
+        return start.replace(hour=0, minute=0, second=0, microsecond=0)
+    if period == "all":
+        return None
+    raise HTTPException(400, "Neplatné období pořadí")
+
+
+def _ranking_viewer(authorization: Optional[str]) -> dict | None:
+    if not authorization:
+        return None
+    try:
+        return auth_player(authorization)
+    except HTTPException:
+        return None
+
+
+def _ranking_visibility_ready() -> bool:
+    try:
+        db_request("GET", "players", params={"select": "id,public_rankings", "limit": "1"})
+        return True
+    except HTTPException:
+        return False
+
+
+def _ranking_player_visible(player: dict, viewer_id: str | None) -> bool:
+    if viewer_id and str(player.get("id")) == viewer_id:
+        return True
+    return player.get("public_rankings") is not False
+
+
+def _ranking_result_team(row: dict, player: dict | None) -> str | None:
+    # v3.31.7 migration stores the authoritative team at XP acquisition. Until the
+    # additive migration is applied, preview falls back to the current one-team model.
+    stored = norm_family(str(row.get("team_code_at_completion") or ""))
+    if stored and not stored.startswith(SOLO_FAMILY_PREFIX):
+        return stored
+    if not player or is_solo_player(player):
+        return None
+    family = norm_family(str(player.get("family_code") or ""))
+    if not family:
+        return None
+    joined = parse_timestamp(player.get("team_joined_at"))
+    completed = parse_timestamp(row.get("completed_at"))
+    if joined and completed and completed < joined:
+        return None
+    return family
+
+
+def _ranking_badge_counts(results: list[dict], rescues: list[dict]) -> dict[str, int]:
+    dates: dict[str, set[str]] = {}
+    for row in results:
+        if row.get("mode") == "daily" and row.get("daily_date") and row.get("player_id"):
+            dates.setdefault(str(row["player_id"]), set()).add(str(row["daily_date"])[:10])
+    for row in rescues:
+        if row.get("status") == "passed" and row.get("missed_date") and row.get("player_id"):
+            dates.setdefault(str(row["player_id"]), set()).add(str(row["missed_date"])[:10])
+    out = {}
+    for player_id, values in dates.items():
+        _, longest = streaks(list(values))
+        out[player_id] = sum(1 for badge in BADGES if longest >= int(badge["days"]))
+    return out
+
+
+def _ranking_assign_tied_ranks(rows: list[dict], score_key: str) -> None:
+    previous = object()
+    rank = 0
+    for index, row in enumerate(rows, 1):
+        score = row.get(score_key)
+        if score != previous:
+            rank = index
+            previous = score
+        row["rank"] = rank
+
+
+def _ranking_context():
+    players = db_select_all("players")
+    leagues = db_select_all("leagues")
+    results = db_select_all("results")
+    try:
+        rescues = db_select_all("streak_rescues")
+    except HTTPException:
+        rescues = []
+    player_by_id = {str(p.get("id")): p for p in players if p.get("id")}
+    league_by_code = {norm_family(str(l.get("code") or "")): l for l in leagues if l.get("code")}
+    public_team_names = {
+        code: (league.get("public_name") or league.get("name") or code)
+        for code, league in league_by_code.items() if league.get("public_opt_in") is True
+    }
+    return players, results, rescues, player_by_id, league_by_code, public_team_names
+
+
+@app.get("/api/rankings/xp")
+def rankings_xp(
+    request: Request,
+    period: str = Query(default="today", pattern="^(today|week|all)$"),
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "rankings_xp_read", limit=300, window_seconds=3600)
+    viewer = _ranking_viewer(authorization)
+    viewer_id = str(viewer.get("id")) if viewer else None
+    viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
+    players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
+    period_start = _ranking_period_start(period)
+    period_results = [
+        row for row in results
+        if period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start)
+    ]
+    lifetime_points: dict[str, int] = {}
+    for row in results:
+        pid = str(row.get("player_id") or "")
+        if pid:
+            lifetime_points[pid] = lifetime_points.get(pid, 0) + int(row.get("points") or 0)
+    period_points: dict[str, int] = {}
+    for row in period_results:
+        pid = str(row.get("player_id") or "")
+        if pid:
+            period_points[pid] = period_points.get(pid, 0) + int(row.get("points") or 0)
+    badge_counts = _ranking_badge_counts(results, rescues)
+
+    player_rows = []
+    for player in players:
+        pid = str(player.get("id") or "")
+        score = int(period_points.get(pid, 0))
+        if score <= 0 and pid != viewer_id:
+            continue
+        if not _ranking_player_visible(player, viewer_id):
+            continue
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        team_name = public_team_names.get(family or "")
+        if pid == viewer_id and family and not team_name:
+            league = league_by_code.get(family)
+            team_name = (league or {}).get("name") or family
+        player_rows.append({
+            "name": player.get("name") or "Hráč", "avatar": player.get("avatar") or "🙂",
+            "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),
+            "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),
+            "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,
+        })
+    player_rows.sort(key=lambda row: (-row["xp"], -row["lifetimePoints"], str(row["name"]).casefold()))
+    _ranking_assign_tied_ranks(player_rows, "xp")
+
+    team_points: dict[str, int] = {}
+    for row in period_results:
+        player = player_by_id.get(str(row.get("player_id") or ""))
+        family = _ranking_result_team(row, player)
+        if family:
+            team_points[family] = team_points.get(family, 0) + int(row.get("points") or 0)
+    current_members: dict[str, int] = {}
+    for player in players:
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        if family:
+            current_members[family] = current_members.get(family, 0) + 1
+    team_rows = []
+    for family, score in team_points.items():
+        if score <= 0:
+            continue
+        if family not in public_team_names and family != viewer_team:
+            continue
+        league = league_by_code.get(family) or {}
+        name = public_team_names.get(family) or league.get("name") or family
+        team_rows.append({
+            "name": name, "xp": int(score), "memberCount": int(current_members.get(family, 0)),
+            "isMine": bool(viewer_team and family == viewer_team),
+        })
+    team_rows.sort(key=lambda row: (-row["xp"], -row["memberCount"], str(row["name"]).casefold()))
+    _ranking_assign_tied_ranks(team_rows, "xp")
+    return {
+        "kind": "xp", "period": period, "players": player_rows, "teams": team_rows,
+        "visibilityReady": _ranking_visibility_ready(),
+        "scoring": "awarded-xp",
+        "teamAttribution": "result-team-at-completion" if _ranking_visibility_ready() else "joined-at-compatible-preview",
+    }
+
+
+@app.get("/api/rankings/daily")
+def rankings_daily(
+    request: Request,
+    daily_date: Optional[str] = Query(default=None),
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "rankings_daily_read", limit=300, window_seconds=3600)
+    selected_date = daily_date or current_prague_date().isoformat()
+    try:
+        date.fromisoformat(selected_date)
+    except ValueError:
+        raise HTTPException(400, "Neplatné datum")
+    viewer = _ranking_viewer(authorization)
+    viewer_id = str(viewer.get("id")) if viewer else None
+    viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
+    players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
+    primary_puzzle_id = expected_daily_puzzle_id(selected_date)
+    day_rows = [
+        row for row in results
+        if row.get("mode") == "daily" and str(row.get("daily_date") or "")[:10] == selected_date
+        and row.get("puzzle_id") == primary_puzzle_id
+    ]
+    by_player: dict[str, dict] = {}
+    for row in day_rows:
+        pid = str(row.get("player_id") or "")
+        if not pid:
+            continue
+        previous = by_player.get(pid)
+        if previous is None or completion_time(row) < completion_time(previous):
+            by_player[pid] = row
+    ranked_all = sorted(by_player.values(), key=lambda row: (
+        0 if row.get("clean_solve") is True else 1,
+        int(row.get("hints_used") or 0), int(row.get("best_elapsed_ms") or 10**12),
+        int(row.get("best_moves") or 10**9), completion_time(row), str(row.get("player_id") or ""),
+    ))
+    player_rows = []
+    for row in ranked_all:
+        pid = str(row.get("player_id") or "")
+        player = player_by_id.get(pid)
+        if not player or not _ranking_player_visible(player, viewer_id):
+            continue
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        team_name = public_team_names.get(family or "")
+        if pid == viewer_id and family and not team_name:
+            league = league_by_code.get(family) or {}
+            team_name = league.get("name") or family
+        player_rows.append({
+            "name": player.get("name") or "Hráč", "avatar": player.get("avatar") or "🙂", "teamName": team_name,
+            "elapsedMs": int(row.get("best_elapsed_ms") or 0), "moves": int(row.get("best_moves") or 0),
+            "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
+            "isMine": pid == viewer_id,
+        })
+    for index, item in enumerate(player_rows, 1):
+        item["rank"] = index
+
+    by_team: dict[str, list[float]] = {}
+    for row in day_rows:
+        player = player_by_id.get(str(row.get("player_id") or ""))
+        family = _ranking_result_team(row, player)
+        if family:
+            by_team.setdefault(family, []).append(_daily_individual_score(row, day_rows))
+    current_members: dict[str, int] = {}
+    for player in players:
+        family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+        if family:
+            current_members[family] = current_members.get(family, 0) + 1
+    team_rows = []
+    for family, scores in by_team.items():
+        if family not in public_team_names and family != viewer_team:
+            continue
+        top = sorted(scores, reverse=True)[:3]
+        if not top:
+            continue
+        league = league_by_code.get(family) or {}
+        team_rows.append({
+            "name": public_team_names.get(family) or league.get("name") or family,
+            "score": round(sum(top) / len(top), 1), "players": len(top),
+            "memberCount": int(current_members.get(family, 0)), "isMine": bool(viewer_team and family == viewer_team),
+        })
+    team_rows.sort(key=lambda row: (-row["score"], -row["players"], str(row["name"]).casefold()))
+    _ranking_assign_tied_ranks(team_rows, "score")
+    return {
+        "kind": "daily", "date": selected_date, "puzzleId": primary_puzzle_id,
+        "players": player_rows, "teams": team_rows,
+        "playerScoring": "clean-hints-time-moves",
+        "teamScoring": "average-best-up-to-3-normalized-0-100",
     }
 
 

@@ -90,40 +90,41 @@
     </section>
 
     <section id="screen-leaderboard" class="screen">
-      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">Srovnej se s ostatními — a pokud chceš, spoj síly i se svým týmem.</p></div>
-      <div id="leaderboardGate" class="card gate"></div>
-      <div id="leaderboardContent" class="hidden">
-        <div class="league-scope-tabs">
-          <button class="league-scope-tab active" data-league-scope="family">👥 Můj tým</button>
-          <button class="league-scope-tab" data-league-scope="global">🌍 Liga týmů</button>
-        </div>
-        <div id="familyLeaderboardPanel">
-          <div class="leader-tabs">
-            <button class="leader-tab active" data-leader-tab="daily">Dnes</button>
-            <button class="leader-tab" data-leader-tab="weekly">Týden</button>
-            <button class="leader-tab" data-leader-tab="overall">Celkem</button>
-          </div>
-          <div id="leaderboardList" class="leaderboard-list"></div>
-        </div>
-        <div id="globalLeaguePanel" class="hidden">
-          <div class="global-league-hero card">
-            <div><span class="eyebrow">🌍 LIGA TÝMŮ</span><h2>Týdenní souboj týmů</h2><p>Stejná Denní výzva. Až tři hráči za tým. Každé pondělí od nuly.</p></div>
-            <button id="familyLeagueSettingsBtn" class="secondary-btn">Nastavení týmu</button>
-          </div>
-          <div class="leader-tabs global-week-tabs">
-            <button class="global-week-tab active" data-week-offset="0">Tento týden</button>
-            <button class="global-week-tab" data-week-offset="-1">Minulý týden</button>
-          </div>
-          <div id="globalLeagueWeekMeta" class="global-week-meta"></div>
-          <div id="globalLeagueStatus"></div>
-          <div id="globalLeagueList" class="leaderboard-list"></div>
-          <div class="card league-score-explainer">
-            <strong>Jak se boduje?</strong>
-            <span>55 dokončení · až 15 ✨ Čistě · až 10 bez nápověd · až 20 za rychlost.</span>
-            <small>Tým se 3+ členy má tři bodovací místa. Kdo ten den nehraje, nechá své místo za 0. Maximum je 700 bodů za týden.</small>
-          </div>
-        </div>
+      <div class="screen-title"><span class="eyebrow">POŘADÍ</span><h1>Kdo dnes vládne?</h1><p class="muted">XP ukazuje postup. Denní výzva zase to, kdo stejný Proplet zahrál nejlépe.</p></div>
+
+      <div id="rankingPrivacyNote" class="ranking-privacy-note card">
+        <span class="ranking-privacy-icon">👀</span>
+        <div><strong>Společné pořadí, minimum profilu</strong><small>V preview se ukazuje jen emoji avatar, herní jméno a případně veřejný název týmu. Žádné interní ID ani účetní údaje.</small></div>
       </div>
+
+      <section class="ranking-section card">
+        <div class="ranking-section-head"><div><span class="eyebrow">🏆 XP</span><h2>Nasbírané XP</h2><p class="muted">Jednoduše: kdo v daném období získal nejvíc XP.</p></div></div>
+        <div class="ranking-control-row">
+          <div class="ranking-segment" role="tablist" aria-label="XP pořadí hráči nebo týmy">
+            <button class="ranking-scope-tab active" data-ranking-xp-scope="players">Hráči</button>
+            <button class="ranking-scope-tab" data-ranking-xp-scope="teams">Týmy</button>
+          </div>
+          <div class="ranking-segment ranking-period-segment" role="tablist" aria-label="Období XP pořadí">
+            <button class="ranking-period-tab active" data-ranking-period="today">Dnes</button>
+            <button class="ranking-period-tab" data-ranking-period="week">Týden</button>
+            <button class="ranking-period-tab" data-ranking-period="all">Celkem</button>
+          </div>
+        </div>
+        <div id="xpLeaderboardList" class="leaderboard-list"></div>
+      </section>
+
+      <section class="ranking-section card daily-ranking-card">
+        <div class="ranking-section-head"><div><span class="eyebrow">☀️ DNEŠNÍ VÝZVA</span><h2>Kdo ji zahrál nejlépe?</h2><p class="muted">Čisté řešení → méně nápověd → čas → tahy.</p></div></div>
+        <div class="ranking-segment ranking-daily-segment" role="tablist" aria-label="Denní pořadí hráči nebo týmy">
+          <button class="ranking-daily-tab active" data-ranking-daily-scope="players">Hráči</button>
+          <button class="ranking-daily-tab" data-ranking-daily-scope="teams">Týmy</button>
+        </div>
+        <div id="dailyLeaderboardList" class="leaderboard-list"></div>
+        <div id="dailyTeamMethod" class="ranking-method hidden"><strong>Týmové Daily:</strong> průměr až tří nejlepších dnešních výkonů týmu, každý převedený na 0–100. Menší tým není penalizovaný počtem členů.</div>
+      </section>
+
+      <div id="rankingTeamCard" class="ranking-team-card card"></div>
+      <button id="familyLeagueSettingsBtn" class="hidden" type="button" aria-hidden="true"></button>
     </section>
 
     <section id="screen-profile" class="screen">

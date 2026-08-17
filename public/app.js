@@ -1,4 +1,4 @@
-const APP_VERSION='3.31.6.1';
+const APP_VERSION='3.31.7';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -185,6 +185,9 @@ let leaderTab='daily';
 let leagueScope='family';
 let globalWeekOffset=0;
 let globalLeagueData=null;
+let rankingXpScope='players';
+let rankingXpPeriod='today';
+let rankingDailyScope='players';
 let winDailyGlobalData=null;
 let audioCtx=null;
 let toastTimer=null;
@@ -940,18 +943,56 @@ function renderSettings(){const s=getSettings(),supported=typeof navigator.vibra
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 async function renderLeaderboard(){
- const p=getProfile(),gate=$('#leaderboardGate'),content=$('#leaderboardContent');content.classList.remove('hidden');
- $$('.league-scope-tab').forEach(b=>b.classList.toggle('active',b.dataset.leagueScope===leagueScope));
- const familyPanel=$('#familyLeaderboardPanel'),globalPanel=$('#globalLeaguePanel');
- if(leagueScope==='global'){
-  gate.classList.add('hidden');familyPanel.classList.add('hidden');globalPanel.classList.remove('hidden');await renderGlobalLeague();return;
+ const xpList=$('#xpLeaderboardList'),dailyList=$('#dailyLeaderboardList');
+ if(!xpList||!dailyList)return;
+ $$('.ranking-scope-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingXpScope===rankingXpScope));
+ $$('.ranking-period-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingPeriod===rankingXpPeriod));
+ $$('.ranking-daily-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingDailyScope===rankingDailyScope));
+ $('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams');
+ renderRankingTeamCard();
+ xpList.innerHTML='<div class="ranking-loading">Načítám XP pořadí…</div>';
+ dailyList.innerHTML='<div class="ranking-loading">Načítám dnešní pořadí…</div>';
+ try{
+  const [xp,daily]=await Promise.all([
+   api(`/api/rankings/xp?period=${rankingXpPeriod}`),
+   api(`/api/rankings/daily?daily_date=${pragueDateISO()}`)
+  ]);
+  renderXpRanking(xp);
+  renderDailyRanking(daily);
+  const privacy=$('#rankingPrivacyNote');
+  if(privacy&&xp.visibilityReady===true)privacy.dataset.visibilityReady='true';
+ }catch(e){
+  const msg=`<div class="ranking-empty"><strong>Pořadí se teď nepodařilo načíst.</strong><small>${esc(e.message)}</small></div>`;
+  xpList.innerHTML=msg;dailyList.innerHTML=msg;
  }
- globalPanel.classList.add('hidden');familyPanel.classList.remove('hidden');
- if(!p?.familyCode){gate.classList.remove('hidden');familyPanel.classList.add('hidden');const logged=!!p?.token;gate.innerHTML=`<h2>${logged?'Přidej tým':'Pořadí čeká na účet'}</h2><p class="muted">${logged?'Účet už máš. Tým přidá společné pořadí; globální Ligu týmů si můžeš prohlížet hned.':'Ulož si postup a výsledky se začnou počítat do pořadí. Tým můžeš přidat až později.'}</p><button id="leaderConnectBtn" class="primary-btn big">${logged?'Přidat tým':'Uložit postup'}</button><button id="leaderGlobalBtn" class="secondary-btn bigish">🌍 Liga týmů</button>`;setTimeout(()=>{if($('#leaderConnectBtn'))$('#leaderConnectBtn').onclick=()=>logged?openTeamMembershipModal():openProfileModal('create');if($('#leaderGlobalBtn'))$('#leaderGlobalBtn').onclick=()=>{leagueScope='global';renderLeaderboard()}},0);return}
- gate.classList.add('hidden');familyPanel.classList.remove('hidden');$('#leaderboardList').innerHTML='<div class="gate card">Načítám pořadí…</div>';
- try{const data=await api(`/api/leaderboard?family_code=${encodeURIComponent(p.familyCode)}&daily_date=${pragueDateISO()}`);renderLeaderData(data)}catch(e){$('#leaderboardList').innerHTML=`<div class="gate card"><strong>Týmové pořadí je offline.</strong><p class="muted">${esc(e.message)}. Lokální hraní funguje dál.</p></div>`}
 }
-function renderLeaderData(data){const rows=leaderTab==='daily'?data.daily:leaderTab==='weekly'?data.weekly:data.overall;if(!rows.length){$('#leaderboardList').innerHTML='<div class="gate card">Zatím tu nikdo nemá výsledek.</div>';return}$('#leaderboardList').innerHTML=rows.map(r=>{const detail=leaderTab==='daily'?`${r.cleanSolve===true?'✨ Čistě':(r.hintsUsed?`💡 ${r.hintsUsed}×`:'')} ${countCz(r.moves,'tah','tahy','tahů')}`.trim():leaderTab==='weekly'?`☀️ ${countCz(r.daily||0,'výzva','výzvy','výzev')} · ✨ ${r.clean||0} čistě · ${countCz(r.completed||0,'úloha','úlohy','úloh')}`:`🔥 ${countCz(r.currentStreak,'den','dny','dní')} · ${countCz(r.totalCompleted,'úloha','úlohy','úloh')}`,score=leaderTab==='daily'?fmtTime(r.elapsedMs):`${r.points} XP`,label=leaderTab==='daily'?'čas':leaderTab==='weekly'?'tento týden':'celkem';return `<div class="leader-row"><div class="leader-rank">${r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank+'.'}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}</strong><small>${detail}</small></div><div class="leader-score"><strong>${score}</strong><small>${label}</small></div></div>`}).join('')}
+function rankingRows(data,scope){return scope==='teams'?(data?.teams||[]):(data?.players||[])}
+function rankingRankBadge(rank){return rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':`${rank}.`}
+function renderXpRanking(data){
+ const list=$('#xpLeaderboardList'),rows=rankingRows(data,rankingXpScope);
+ if(!rows.length){list.innerHTML=`<div class="ranking-empty"><strong>${rankingXpScope==='teams'?'Týmy':'Hráči'} zatím nemají XP v tomto období.</strong><small>První body tu udělají pořádek velmi rychle. 😄</small></div>`;return}
+ list.innerHTML=rows.map(r=>{
+  if(rankingXpScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${rankingXpPeriod==='today'?'dnes':rankingXpPeriod==='week'?'tento týden':'celkem'}</small></div></div>`;
+  const level=levelFor(Number(r.lifetimePoints||0)),team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
+  return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small><span class="ranking-rank-chip">${level.current.icon} ${esc(level.current.name)}</span>${r.badgeCount?` · 🏅 ${r.badgeCount}`:''}${team}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${rankingXpPeriod==='today'?'dnes':rankingXpPeriod==='week'?'tento týden':'celkem'}</small></div></div>`
+ }).join('')
+}
+function renderDailyRanking(data){
+ const list=$('#dailyLeaderboardList'),rows=rankingRows(data,rankingDailyScope);
+ if(!rows.length){list.innerHTML='<div class="ranking-empty"><strong>Dnešní startovní rošt je zatím prázdný.</strong><small>Stačí dokončit Denní výzvu.</small></div>';return}
+ list.innerHTML=rows.map(r=>{
+  if(rankingDailyScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.players||0,'výkon','výkony','výkonů')} v dnešním skóre · ${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.score||0).toLocaleString('cs-CZ',{maximumFractionDigits:1})}</strong><small>/ 100</small></div></div>`;
+  const quality=r.cleanSolve===true?'✨ Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Bez nápovědy',team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
+  return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small>${quality} · ${countCz(r.moves||0,'tah','tahy','tahů')}${team}</small></div><div class="leader-score"><strong>${fmtTime(r.elapsedMs)}</strong><small>dnešní výzva</small></div></div>`
+ }).join('')
+}
+function renderRankingTeamCard(){
+ const box=$('#rankingTeamCard'),p=getProfile();if(!box)return;
+ if(!p?.token){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Chceš soutěžit i za partu?</strong><small>Pořadí můžeš sledovat bez účtu. Pro vlastní tým si nejdřív ulož postup.</small></div><button id="rankingAccountBtn" class="secondary-btn">☁️ Uložit postup</button>';setTimeout(()=>$('#rankingAccountBtn')&&($('#rankingAccountBtn').onclick=()=>openProfileModal('create')),0);return}
+ if(!p.familyCode){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Jsi zatím bez týmu</strong><small>Účet funguje samostatně. Tým můžeš přidat kdykoli, bez vlivu na předchozí XP.</small></div><button id="rankingJoinTeamBtn" class="secondary-btn">Přidat / založit tým</button>';setTimeout(()=>$('#rankingJoinTeamBtn')&&($('#rankingJoinTeamBtn').onclick=openTeamMembershipModal),0);return}
+ box.innerHTML=`<div><span class="eyebrow">👥 TVŮJ TÝM</span><strong>${esc(p.leagueName||p.familyCode)}</strong><small>Do týmových XP se počítají jen XP získané během členství.</small></div><button id="rankingTeamSettingsBtn" class="secondary-btn">Nastavení týmu</button>`;
+ setTimeout(()=>$('#rankingTeamSettingsBtn')&&($('#rankingTeamSettingsBtn').onclick=openFamilyLeagueModal),0)
+}
 
 async function renderGlobalLeague(){
  const list=$('#globalLeagueList'),status=$('#globalLeagueStatus');list.innerHTML='<div class="gate card">Načítám Ligu týmů…</div>';status.innerHTML='';
@@ -1249,6 +1290,7 @@ function bind(){
  $('#rescueBtn').onclick=openRescueOffer;$('#confirmRescueBtn').onclick=beginRescue;$('#cancelRescueBtn').onclick=()=>$('#rescueOfferModal').classList.add('hidden');
  $('#skipOnboardingBtn').onclick=()=>closeOnboarding(false);$('#onboardNextBtn').onclick=onboardingNext;
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
+ $$('.ranking-scope-tab').forEach(b=>b.onclick=()=>{rankingXpScope=b.dataset.rankingXpScope;renderLeaderboard()});$$('.ranking-period-tab').forEach(b=>b.onclick=()=>{rankingXpPeriod=b.dataset.rankingPeriod;renderLeaderboard()});$$('.ranking-daily-tab').forEach(b=>b.onclick=()=>{rankingDailyScope=b.dataset.rankingDailyScope;renderLeaderboard()});
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#contentPushToggleBtn').onclick=toggleContentPushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=()=>{if(!pendingSW)return;reloadOnServiceWorkerChange=true;pendingSW.postMessage({type:'SKIP_WAITING'})};
