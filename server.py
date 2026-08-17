@@ -1857,6 +1857,8 @@ def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[
 def set_team_membership(payload: TeamMembershipSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_membership", limit=15, window_seconds=600, discriminator=payload.family_code or payload.league_name or payload.mode)
     player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     current_family = norm_family(str(player.get("family_code") or ""))
     if not is_solo_player(player):
         raise HTTPException(409, "Tento hráč už je v týmu")
@@ -3764,6 +3766,8 @@ def family_league(
 def family_league_settings(payload: FamilyLeagueSettings, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "family_league_settings", limit=20, window_seconds=3600)
     player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     family = norm_family(str(player.get("family_code") or ""))
     if is_solo_player(player):
         raise HTTPException(400, "Nejdřív se připoj k týmu nebo ho založ")
@@ -4148,6 +4152,8 @@ def team_settings(request: Request, authorization: Optional[str] = Header(defaul
 def leave_team(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_leave", limit=8, window_seconds=3600)
     player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     if not family:
         return {"ok": True, "familyCode": None, "leagueName": None}
