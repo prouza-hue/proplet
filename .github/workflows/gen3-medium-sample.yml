@@ -1,0 +1,64 @@
+name: Gen3 Medium progression sample
+on:
+  push:
+    branches: [analysis/gen3-medium-progression-sample]
+    paths: [.github/workflows/gen3-medium-sample.yml]
+permissions:
+  contents: write
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Compare Medium geometry profiles
+        run: |
+          python - <<'PY'
+          import json, random, statistics, sys
+          from pathlib import Path
+          sys.path.insert(0,'tools')
+          import generate_puzzles as gp
+          tiers,tier_of=gp.load_answer_tiers(); meta=gp.load_answer_metadata(); fun={w:int(m.get('fun',3)) for w,m in meta.items()}
+          pools=gp.build_answer_pools(tiers,meta); freq=gp.load_frequency_words(); all_answers=[w for t in 'ABCD' for w in tiers[t]]
+          dictionary=[w for w,_ in freq if w not in gp.FUNCTION_WORDS][:12000]
+          dictionary=list(dict.fromkeys(dictionary+[w for w in all_answers if w not in dictionary]))
+          profiles={
+            'dense_current':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,120),style='dense',min_curvy=0,min_spiral=0),
+            'winding_006':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,220),style='winding',turn_bias=.06,curl_bias=.02,min_curvy=1,min_spiral=0,max_short_words=3),
+            'winding_010':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,260),style='winding',turn_bias=.10,curl_bias=.04,min_curvy=1,min_spiral=0,max_short_words=3),
+            'winding_014':dict(rows=7,cols=8,cells=(40,46),words=(7,8),min_len=4,max_len=8,dict_size=8500,cand=(8,300),style='winding',turn_bias=.14,curl_bias=.06,min_curvy=2,min_spiral=0,max_short_words=3),
+          }
+          out={}
+          original=gp.SPECS['medium']
+          for pi,(name,spec) in enumerate(profiles.items()):
+            gp.SPECS['medium']=[spec]
+            puzzles=[]
+            rng=random.Random(2026081700+pi)
+            for i in range(20):
+              p=gp.create_puzzle('medium',rng.randrange(1,2**31-1),pools['medium'],dictionary,f'sample-{name}-{i}',variant_index=0,tier_of=tier_of,vocab_key='medium',fun_of=fun)
+              puzzles.append(p)
+            turns=[a.get('turns',0) for p in puzzles for a in p['answers']]
+            out[name]={
+              'meanTurnsPerWord':round(statistics.mean(turns),3),
+              'zeroTurnShare':round(sum(t==0 for t in turns)/len(turns),3),
+              'lowTurnShare':round(sum(t<=1 for t in turns)/len(turns),3),
+              'meanScore':round(statistics.mean(p['meta']['difficultyScore'] for p in puzzles),1),
+              'meanCandidates':round(statistics.mean(p['meta']['candidateCount'] for p in puzzles),1),
+              'meanCells':round(statistics.mean(len(p['mask']) for p in puzzles),1),
+              'meanWords':round(statistics.mean(len(p['answers']) for p in puzzles),1),
+              'curvyWordsPerBoard':round(statistics.mean(p['meta']['curvyWords'] for p in puzzles),2),
+            }
+          gp.SPECS['medium']=original
+          Path('analysis-output').mkdir(exist_ok=True)
+          Path('analysis-output/gen3-medium-progression-sample.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - name: Commit report
+        run: |
+          git config user.name 'Proplet Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add analysis-output/gen3-medium-progression-sample.json
+          git commit -m 'Add Medium progression sample results'
+          git push
