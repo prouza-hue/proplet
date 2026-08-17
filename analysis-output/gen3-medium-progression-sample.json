@@ -1,0 +1,42 @@
+{
+  "dense_current": {
+    "meanTurnsPerWord": 1.082,
+    "zeroTurnShare": 0.336,
+    "lowTurnShare": 0.616,
+    "meanScore": 39.9,
+    "meanCandidates": 13.2,
+    "meanCells": 42.3,
+    "meanWords": 7.3,
+    "curvyWordsPerBoard": 2.8
+  },
+  "winding_006": {
+    "meanTurnsPerWord": 2.123,
+    "zeroTurnShare": 0.13,
+    "lowTurnShare": 0.397,
+    "meanScore": 48.8,
+    "meanCandidates": 13.8,
+    "meanCells": 42.7,
+    "meanWords": 7.3,
+    "curvyWordsPerBoard": 4.4
+  },
+  "winding_010": {
+    "meanTurnsPerWord": 2.094,
+    "zeroTurnShare": 0.148,
+    "lowTurnShare": 0.349,
+    "meanScore": 53.2,
+    "meanCandidates": 16.2,
+    "meanCells": 43.1,
+    "meanWords": 7.5,
+    "curvyWordsPerBoard": 4.85
+  },
+  "winding_014": {
+    "meanTurnsPerWord": 1.973,
+    "zeroTurnShare": 0.195,
+    "lowTurnShare": 0.376,
+    "meanScore": 52,
+    "meanCandidates": 14.9,
+    "meanCells": 42.8,
+    "meanWords": 7.5,
+    "curvyWordsPerBoard": 4.65
+  }
+}
