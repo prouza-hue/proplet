@@ -1,5 +1,6 @@
 from pathlib import Path
 
+# Triggered after the first preview run exposed a brittle JS function-boundary regex.
 p = Path('tools/patch_v3317_rankings_preview.py')
 text = p.read_text(encoding='utf-8')
 old = "regex_replace_once('public/app.js', r'async function renderLeaderboard\\(\\)\\{.*?\\n\\}\\nfunction renderLeaderData\\(data\\)\\{.*?\\n\\}\\n\\nasync function renderGlobalLeague\\(\\)\\{', new_render)"
