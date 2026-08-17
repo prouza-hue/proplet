@@ -310,6 +310,10 @@ class FamilyLeagueSettings(BaseModel):
     league_pin: Optional[str] = Field(default=None, max_length=32)  # backward compatibility with v3.8.1 clients
 
 
+class PublicRankingsSet(BaseModel):
+    enabled: bool
+
+
 def supabase_ready() -> bool:
     return bool(SUPABASE_URL and SUPABASE_SECRET_KEY)
 
@@ -1395,6 +1399,7 @@ def health():
         "newPlayerFunnelVersion": 2,
         "singleMemberTeams": True,
         "xpEconomyVersion": 2,
+        "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
         "rollingContentCadence": load_rolling_content().get("cadence"),
         "rollingContentFirstRelease": load_rolling_content().get("firstRelease"),
@@ -1502,7 +1507,7 @@ def health():
             xp_migration = xp_economy_migrated()
         except HTTPException:
             xp_migration = False
-        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "freeProgressionMigration": free_generation2_migration, "stableFreeLevelSlots": True, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "freeProgressionMigration": free_generation2_migration, "stableFreeLevelSlots": True, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "rankingsV2Migration": rankings_v2_schema_ready(), "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException:
         return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "freeProgressionMigration": False, "stableFreeLevelSlots": True, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
 
@@ -1606,12 +1611,20 @@ def create_player(payload: PlayerCreate, request: Request):
             raise HTTPException(409, "Takový hráč už existuje")
         raise
 
+    if not solo and row.get("team_joined_at"):
+        try:
+            db_insert("team_memberships", {
+                "id": str(uuid.uuid4()), "player_id": player_id, "team_code": family,
+                "joined_at": row["team_joined_at"], "created_at": row["team_joined_at"],
+            })
+        except HTTPException:
+            logger.warning("Could not create initial team_membership for player %s", player_id)
     stats = player_stats(player_id)
     public_family = public_family_code(family, row.get("team_joined_at"))
     return {
         "id": player_id, "name": name, "familyCode": public_family,
         "leagueName": league_name_for(family) if public_family else None, "token": token,
-        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "stats": stats,
+        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "publicRankings": row.get("public_rankings"), "stats": stats,
     }
 
 
@@ -1644,7 +1657,7 @@ def login(payload: PlayerLogin, request: Request):
     return {
         "id": player["id"], "name": player["name"], "familyCode": public_family,
         "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
-        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": player_stats(player["id"]),
+        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": player_stats(player["id"]),
     }
 
 
@@ -1874,7 +1887,17 @@ def set_team_membership(payload: TeamMembershipSet, request: Request, authorizat
     target_players = db_select("players", family_code=family)
     if any(p.get("id") != player.get("id") and p.get("name", "").casefold() == player.get("name", "").casefold() for p in target_players):
         raise HTTPException(409, "V tomto týmu už je hráč se stejným jménem")
-    db_update("players", {"id": player["id"]}, {"family_code": family, "team_joined_at": datetime.now(TZ).isoformat()})
+    joined_at = datetime.now(TZ).isoformat()
+    db_update("players", {"id": player["id"]}, {"family_code": family, "team_joined_at": joined_at})
+    try:
+        db_insert("team_memberships", {
+            "id": str(uuid.uuid4()), "player_id": player["id"], "team_code": family,
+            "joined_at": joined_at, "created_at": joined_at,
+        })
+    except HTTPException as exc:
+        # Avoid a half-switched player if the new history layer is unavailable.
+        db_update("players", {"id": player["id"]}, {"family_code": current_family, "team_joined_at": player.get("team_joined_at")})
+        raise HTTPException(503, "Týmová aktualizace se nepodařila dokončit") from exc
     return {"ok": True, "familyCode": family, "leagueName": league_name_for(family)}
 
 
@@ -1906,7 +1929,7 @@ def me(request: Request, authorization: Optional[str] = Header(default=None)):
     return {
         "id": player["id"], "name": player["name"], "familyCode": public_family,
         "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
-        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "stats": stats,
+        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": stats,
     }
 
 
@@ -1960,6 +1983,7 @@ def account_export(request: Request, authorization: Optional[str] = Header(defau
             "supportMode": player.get("support_mode") or "none",
             "createdAt": player.get("created_at"),
             "teamJoinedAt": player.get("team_joined_at"),
+            "publicRankings": player.get("public_rankings"),
             "hasPassword": bool(player.get("password_hash")),
         },
         "results": db_select("results", player_id=player_id),
@@ -3411,6 +3435,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             })
         elif incoming_is_earlier and old.get("puzzle_id") == payload.puzzle_id:
             db_update("results", {"id": old["id"]}, {
+                **({"team_code_at_completion": team_code_for_player_at(player, official_completed_at)} if rankings_v2_schema_ready() else {}),
                 "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                 "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
                 "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
@@ -3420,6 +3445,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     else:
         try:
             db_insert("results", {
+                **({"team_code_at_completion": team_code_for_player_at(player, official_completed_at)} if rankings_v2_schema_ready() else {}),
                 "id": str(uuid.uuid4()),
                 "player_id": player["id"],
                 "puzzle_id": payload.puzzle_id,
@@ -3973,6 +3999,16 @@ def _ranking_viewer(authorization: Optional[str]) -> dict | None:
         return None
 
 
+def rankings_v2_schema_ready() -> bool:
+    try:
+        db_request("GET", "players", params={"select": "id,public_rankings", "limit": "1"})
+        db_request("GET", "results", params={"select": "id,team_code_at_completion", "limit": "1"})
+        db_request("GET", "team_memberships", params={"select": "id,player_id,team_code,joined_at,left_at", "limit": "1"})
+        return True
+    except HTTPException:
+        return False
+
+
 def _ranking_visibility_ready() -> bool:
     try:
         db_request("GET", "players", params={"select": "id,public_rankings", "limit": "1"})
@@ -3984,7 +4020,8 @@ def _ranking_visibility_ready() -> bool:
 def _ranking_player_visible(player: dict, viewer_id: str | None) -> bool:
     if viewer_id and str(player.get("id")) == viewer_id:
         return True
-    return player.get("public_rankings") is not False
+    # NULL means the player has not answered the one-time visibility notice yet.
+    return player.get("public_rankings") is True
 
 
 def _ranking_result_team(row: dict, player: dict | None) -> str | None:
@@ -4003,6 +4040,31 @@ def _ranking_result_team(row: dict, player: dict | None) -> str | None:
     if joined and completed and completed < joined:
         return None
     return family
+
+
+def team_code_for_player_at(player: dict, completed_at: str | datetime | None) -> str | None:
+    """Resolve the team a player belonged to at the actual completion timestamp.
+
+    This is deliberately time-based so a delayed offline result cannot be credited to
+    a team the player joined only later. After switching teams, old XP never moves.
+    """
+    completed = parse_timestamp(completed_at)
+    player_id = str(player.get("id") or "")
+    if not completed or not player_id:
+        return None
+    try:
+        memberships = db_select("team_memberships", player_id=player_id)
+        for membership in memberships:
+            joined = parse_timestamp(membership.get("joined_at"))
+            left = parse_timestamp(membership.get("left_at"))
+            if joined and joined <= completed and (left is None or completed < left):
+                family = norm_family(str(membership.get("team_code") or ""))
+                if family and not family.startswith(SOLO_FAMILY_PREFIX):
+                    return family
+        return None
+    except HTTPException:
+        # Preview/backward-compatible fallback before the additive migration exists.
+        return _ranking_result_team({"completed_at": completed.isoformat()}, player)
 
 
 def _ranking_badge_counts(results: list[dict], rescues: list[dict]) -> dict[str, int]:
@@ -4046,6 +4108,60 @@ def _ranking_context():
         for code, league in league_by_code.items() if league.get("public_opt_in") is True
     }
     return players, results, rescues, player_by_id, league_by_code, public_team_names
+
+
+@app.post("/api/rankings/visibility")
+def rankings_visibility(
+    payload: PublicRankingsSet,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+):
+    enforce_rate_limit(request, "rankings_visibility", limit=20, window_seconds=3600)
+    player = auth_player(authorization)
+    try:
+        db_update("players", {"id": player["id"]}, {"public_rankings": bool(payload.enabled)})
+    except HTTPException as exc:
+        raise HTTPException(503, "Nové pořadí ještě čeká na databázovou aktualizaci") from exc
+    return {"ok": True, "publicRankings": bool(payload.enabled)}
+
+
+@app.get("/api/team-settings")
+def team_settings(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "team_settings_read", limit=120, window_seconds=3600)
+    player = auth_player(authorization)
+    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    if not family:
+        return {"hasTeam": False}
+    rows = db_select("leagues", code=family)
+    if not rows:
+        raise HTTPException(404, "Tým neexistuje")
+    league = rows[0]
+    return {
+        "hasTeam": True,
+        "leagueName": league.get("name") or family,
+        "publicEnabled": league.get("public_opt_in") is True,
+        "publicName": league.get("public_name") or league.get("name") or family,
+    }
+
+
+@app.post("/api/team-membership/leave")
+def leave_team(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "team_leave", limit=8, window_seconds=3600)
+    player = auth_player(authorization)
+    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    if not family:
+        return {"ok": True, "familyCode": None, "leagueName": None}
+    now = datetime.now(TZ).isoformat()
+    try:
+        memberships = db_select("team_memberships", player_id=player["id"])
+    except HTTPException as exc:
+        raise HTTPException(503, "Změna týmu ještě čeká na databázovou aktualizaci") from exc
+    active = [row for row in memberships if not row.get("left_at")]
+    for membership in active:
+        db_update("team_memberships", {"id": membership["id"]}, {"left_at": now})
+    new_solo = make_solo_family_code()
+    db_update("players", {"id": player["id"]}, {"family_code": new_solo, "team_joined_at": None})
+    return {"ok": True, "familyCode": None, "leagueName": None}
 
 
 @app.get("/api/rankings/xp")

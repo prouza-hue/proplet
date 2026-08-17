@@ -1,3 +1,0 @@
-exit_code=1
-
-health success flag: expected 1 occurrence, found 0: '        "xpMigration": xp_migration,\n        "helperSystem": True,\n'
