@@ -1,0 +1,173 @@
+name: Medium difficulty audit
+on:
+  push:
+    branches: [analysis/medium-difficulty-audit-20260817]
+    paths: [.github/workflows/medium-difficulty-audit.yml]
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Analyze current free bank
+        shell: python
+        run: |
+          import json, math, statistics
+          from collections import Counter
+          from pathlib import Path
+
+          db=json.loads(Path('public/puzzles.json').read_text(encoding='utf-8'))
+          free=db['free']
+
+          def pct(v): return round(100*v,1)
+          def q(vals,p):
+              vals=sorted(vals)
+              if not vals: return None
+              pos=(len(vals)-1)*p
+              lo=math.floor(pos); hi=math.ceil(pos)
+              if lo==hi: return vals[lo]
+              return vals[lo]*(hi-pos)+vals[hi]*(pos-lo)
+
+          def row(p):
+              ans=p.get('answers',[])
+              turns=[a.get('turns',0) for a in ans]
+              edge_turn_rates=[]
+              max_run_ratios=[]
+              for a in ans:
+                  path=a.get('path',[]); t=a.get('turns',0)
+                  denom=max(1,len(path)-2)
+                  edge_turn_rates.append(t/denom)
+                  if len(path)<=1:
+                      max_run_ratios.append(1.0); continue
+                  cols=p['cols']; dirs=[]
+                  for x,y in zip(path,path[1:]):
+                      r1,c1=divmod(x,cols); r2,c2=divmod(y,cols)
+                      dirs.append((r2-r1,c2-c1))
+                  best=cur=1
+                  for i in range(1,len(dirs)):
+                      if dirs[i]==dirs[i-1]: cur+=1; best=max(best,cur)
+                      else: cur=1
+                  max_run_ratios.append(best/max(1,len(dirs)))
+              tiers=Counter(p.get('meta',{}).get('vocabTiers',{}))
+              # vocabTiers is already tier->count; normalize into explicit dict
+              tiers={k:int(v) for k,v in p.get('meta',{}).get('vocabTiers',{}).items()}
+              return {
+                'id':p['id'],'level':p.get('meta',{}).get('level'),
+                'difficultyScore':p.get('meta',{}).get('difficultyScore',0),
+                'candidateCount':p.get('meta',{}).get('candidateCount',0),
+                'solverNodes':p.get('meta',{}).get('solverNodes',0),
+                'cells':p.get('meta',{}).get('cells',0),'words':len(ans),
+                'meanTurns':statistics.mean(turns) if turns else 0,
+                'medianTurns':statistics.median(turns) if turns else 0,
+                'zeroTurnShare':sum(t==0 for t in turns)/len(turns) if turns else 0,
+                'lowTurnShare':sum(t<=1 for t in turns)/len(turns) if turns else 0,
+                'meanTurnRate':statistics.mean(edge_turn_rates) if edge_turn_rates else 0,
+                'meanMaxStraightRunRatio':statistics.mean(max_run_ratios) if max_run_ratios else 0,
+                'curvyWords':p.get('meta',{}).get('curvyWords',0),
+                'spiralWords':p.get('meta',{}).get('spiralWords',0),
+                'avgFun':p.get('meta',{}).get('averageFun',0),
+                'tiers':tiers,
+                'answers':[a.get('word','') for a in ans]
+              }
+
+          rows={d:[row(p) for p in free[d]] for d in ('easy','medium','hard','hardcore')}
+
+          def agg(arr):
+              if not arr: return {}
+              def av(k): return round(statistics.mean(x[k] for x in arr),3)
+              tier=Counter()
+              for x in arr: tier.update(x['tiers'])
+              total=sum(tier.values()) or 1
+              return {
+                'n':len(arr),
+                'difficultyScore_mean':av('difficultyScore'),
+                'difficultyScore_p25':round(q([x['difficultyScore'] for x in arr],.25),2),
+                'difficultyScore_p50':round(q([x['difficultyScore'] for x in arr],.5),2),
+                'difficultyScore_p75':round(q([x['difficultyScore'] for x in arr],.75),2),
+                'meanTurns':av('meanTurns'),
+                'zeroTurnShare':av('zeroTurnShare'),
+                'lowTurnShare':av('lowTurnShare'),
+                'meanTurnRate':av('meanTurnRate'),
+                'meanMaxStraightRunRatio':av('meanMaxStraightRunRatio'),
+                'candidateCount':av('candidateCount'),
+                'solverNodes':av('solverNodes'),
+                'cells':av('cells'),
+                'words':av('words'),
+                'avgFun':av('avgFun'),
+                'tierShares':{k:round(v/total,3) for k,v in sorted(tier.items())}
+              }
+
+          groups={
+            'easy_all':rows['easy'],
+            'medium_1_25':rows['medium'][:25],
+            'medium_26_50':rows['medium'][25:50],
+            'medium_1_50':rows['medium'][:50],
+            'medium_51_100':rows['medium'][50:100],
+            'medium_101_150':rows['medium'][100:150],
+            'medium_151_200':rows['medium'][150:200],
+            'medium_all':rows['medium'],
+            'hard_1_25':rows['hard'][:25],
+            'hard_1_50':rows['hard'][:50],
+            'hard_51_100':rows['hard'][50:100],
+            'hard_all':rows['hard'],
+            'hardcore_all':rows['hardcore'],
+          }
+          summary={k:agg(v) for k,v in groups.items()}
+
+          medium_scores=[x['difficultyScore'] for x in rows['medium']]
+          easy_scores=[x['difficultyScore'] for x in rows['easy']]
+          hard_scores=[x['difficultyScore'] for x in rows['hard']]
+          easy_p75=q(easy_scores,.75); hard_p25=q(hard_scores,.25); med_p50=q(medium_scores,.5)
+          overlap={
+            'easy_p75':easy_p75,
+            'medium_median':med_p50,
+            'hard_p25':hard_p25,
+            'medium_first50_below_easy_p75':sum(x['difficultyScore']<=easy_p75 for x in rows['medium'][:50]),
+            'medium_first50_below_medium_median':sum(x['difficultyScore']<=med_p50 for x in rows['medium'][:50]),
+            'medium_all_below_easy_p75':sum(x['difficultyScore']<=easy_p75 for x in rows['medium']),
+            'medium_top50_above_hard_p25':sum(x['difficultyScore']>=hard_p25 for x in rows['medium'][150:]),
+          }
+
+          easiest=sorted(rows['medium'], key=lambda x:(x['difficultyScore'], -x['zeroTurnShare'], -x['lowTurnShare']))[:30]
+          first50=rows['medium'][:50]
+          hardfirst=rows['hard'][:25]
+
+          out={'generatedAt':db.get('generatedAt'),'summary':summary,'overlap':overlap,'easiestMedium':easiest,'mediumFirst50':first50,'hardFirst25':hardfirst}
+          Path('analysis-output').mkdir(exist_ok=True)
+          Path('analysis-output/medium-difficulty-audit.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          lines=['# Medium difficulty structural audit','',f"Puzzle DB generated: {db.get('generatedAt')}",'','## Group summary','',
+                 '| group | n | score mean / p50 | turns/word | 0-turn | <=1 turn | straight-run ratio | candidates | solver nodes | tier mix |',
+                 '|---|---:|---:|---:|---:|---:|---:|---:|---:|---|']
+          for k,a in summary.items():
+              tier=', '.join(f"{t}:{pct(s)}%" for t,s in a['tierShares'].items())
+              lines.append(f"| {k} | {a['n']} | {a['difficultyScore_mean']} / {a['difficultyScore_p50']} | {a['meanTurns']} | {pct(a['zeroTurnShare'])}% | {pct(a['lowTurnShare'])}% | {a['meanMaxStraightRunRatio']} | {a['candidateCount']} | {a['solverNodes']} | {tier} |")
+          lines += ['', '## Distribution overlap','', '```json', json.dumps(overlap,ensure_ascii=False,indent=2), '```','',
+                    '## First 50 Medium levels','',
+                    '| lvl | id | score | turns/word | 0-turn | <=1 turn | straight-run | tiers | words |',
+                    '|---:|---|---:|---:|---:|---:|---:|---|---|']
+          for x in first50:
+              tiers=' '.join(f"{k}{v}" for k,v in sorted(x['tiers'].items()))
+              lines.append(f"| {x['level']} | {x['id']} | {x['difficultyScore']} | {x['meanTurns']:.2f} | {pct(x['zeroTurnShare'])}% | {pct(x['lowTurnShare'])}% | {x['meanMaxStraightRunRatio']:.2f} | {tiers} | {', '.join(x['answers'])} |")
+          lines += ['', '## 30 structurally easiest Medium levels by generator score','',
+                    '| lvl | score | turns/word | 0-turn | <=1 turn | words |',
+                    '|---:|---:|---:|---:|---:|---|']
+          for x in easiest:
+              lines.append(f"| {x['level']} | {x['difficultyScore']} | {x['meanTurns']:.2f} | {pct(x['zeroTurnShare'])}% | {pct(x['lowTurnShare'])}% | {', '.join(x['answers'])} |")
+          lines += ['', '## First 25 Hard levels','',
+                    '| lvl | score | turns/word | 0-turn | <=1 turn | straight-run | tiers | words |',
+                    '|---:|---:|---:|---:|---:|---:|---|---|']
+          for x in hardfirst:
+              tiers=' '.join(f"{k}{v}" for k,v in sorted(x['tiers'].items()))
+              lines.append(f"| {x['level']} | {x['difficultyScore']} | {x['meanTurns']:.2f} | {pct(x['zeroTurnShare'])}% | {pct(x['lowTurnShare'])}% | {x['meanMaxStraightRunRatio']:.2f} | {tiers} | {', '.join(x['answers'])} |")
+          Path('analysis-output/medium-difficulty-audit.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
+      - name: Commit audit output
+        run: |
+          git config user.name 'Proplet Audit Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add analysis-output/medium-difficulty-audit.md analysis-output/medium-difficulty-audit.json
+          git commit -m 'Add generated medium difficulty audit'
+          git push
