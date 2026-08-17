@@ -1,0 +1,270 @@
+name: v3.31.8 profile identity polish
+
+on:
+  push:
+    branches: [preview/v3318-account-recovery-google]
+    paths: [.github/workflows/v3318-profile-polish.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: preview/v3318-account-recovery-google
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply profile and identity polish
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # Backend: editable display name + better Google default.
+          p = Path('account_auth.py')
+          s = p.read_text()
+          old = '''class RecoveryStart(BaseModel):\n    email: str = Field(min_length=5, max_length=254)\n\n\nclass AuthCallback(BaseModel):'''
+          new = '''class RecoveryStart(BaseModel):\n    email: str = Field(min_length=5, max_length=254)\n\n\nclass DisplayNameUpdate(BaseModel):\n    name: str = Field(min_length=1, max_length=24)\n\n\nclass AuthCallback(BaseModel):'''
+          assert old in s
+          s = s.replace(old, new, 1)
+
+          marker = '''    @app.post("/api/account/email/start")\n    def account_email_start'''
+          route = '''    @app.post("/api/account/display-name")\n    def account_display_name(payload: DisplayNameUpdate, request: Request, authorization: Optional[str] = Header(default=None)):\n        enforce_rate_limit(request, "display_name_update", limit=20, window_seconds=3600)\n        player = auth_player(authorization)\n        name = " ".join(payload.name.strip().split())\n        if not name:\n            raise HTTPException(400, "Napiš, jak ti má Proplet říkat")\n        family = player.get("family_code")\n        if family:\n            for candidate in db_select("players", family_code=family):\n                if candidate.get("id") != player.get("id") and str(candidate.get("name") or "").casefold() == name.casefold():\n                    raise HTTPException(409, "V tomto týmu už hráč s touto přezdívkou existuje")\n        db_update("players", {"id": player["id"]}, {"name": name})\n        return {"ok": True, "name": name}\n\n\n    @app.post("/api/account/email/start")\n    def account_email_start'''
+          assert marker in s
+          s = s.replace(marker, route, 1)
+
+          old_name = '''raw_name = str(meta.get("full_name") or meta.get("name") or meta.get("given_name") or "Hráč").strip()'''
+          new_name = '''raw_name = str(meta.get("given_name") or meta.get("full_name") or meta.get("name") or "Hráč").strip()'''
+          assert old_name in s
+          s = s.replace(old_name, new_name, 1)
+          p.write_text(s)
+
+          # Frontend: account hub in the profile hero, editable nickname, logical settings grouping.
+          Path('public/account-auth.js').write_text(r'''(()=>{
+          'use strict';
+
+          const $=s=>document.querySelector(s);
+          const $$=s=>[...document.querySelectorAll(s)];
+          const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+          const validEmail=s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s||'').trim());
+          let recoveryContext=null;
+          let knownAvatars=[];
+          let enhanceScheduled=false;
+
+          function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
+          function authHeaders(){const p=profile();return p?.token?{'Authorization':`Bearer ${p.token}`}:{}}
+          async function call(path,{method='GET',body,auth=true}={}){
+           const headers={'Accept':'application/json',...(body?{'Content-Type':'application/json'}:{}),...(auth?authHeaders():{})};
+           const r=await fetch(path,{method,headers,body:body?JSON.stringify(body):undefined,cache:'no-store'});
+           let d={};try{d=await r.json()}catch{}
+           if(!r.ok)throw new Error(d.detail||'Něco se nepodařilo. Zkus to znovu.');
+           return d;
+          }
+          function toast(text){try{if(typeof showToast==='function')return showToast(text)}catch{} alert(text)}
+          function cleanAuthUrl(){
+           try{history.replaceState(history.state,'',location.pathname+location.search.replace(/([?&])auth=[^&]*/,'$1').replace(/([?&])challenge=[^&]*/,'$1').replace(/[?&]$/,''));if(location.hash)history.replaceState(history.state,'',location.pathname+location.search)}catch{}
+          }
+          function acceptProfile(p){
+           if(!p?.id||!p?.token)return;
+           try{
+            const had=!profile();if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id);
+            if(typeof saveProfile==='function')saveProfile({id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked});
+            if(typeof updateProfileChip==='function')updateProfileChip();
+            if(typeof renderProfile==='function')renderProfile();
+            if(typeof renderDaily==='function')renderDaily();
+            if(typeof renderFree==='function')renderFree();
+            if(typeof renderLeaderboard==='function')renderLeaderboard();
+            if(typeof syncQueue==='function')syncQueue({announce:true}).catch(()=>{});
+           }catch{}
+           setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},90);
+          }
+          function supabaseFragment(){
+           const p=new URLSearchParams(location.hash.replace(/^#/,''));
+           return {accessToken:p.get('access_token')||'',error:p.get('error_description')||p.get('error')||''};
+          }
+          function closeModal(id){$(id)?.classList.add('hidden')}
+          function openModal(id){$(id)?.classList.remove('hidden')}
+
+          function ensureModals(){
+           if($('#forgotPasswordModal'))return;
+           document.body.insertAdjacentHTML('beforeend',`
+            <div id="forgotPasswordModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
+             <button id="closeForgotPassword" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Zapomenuté heslo</h2>
+             <p class="muted">Zadej <b>ověřený e-mail</b> propojený s Propletem. Pošleme ti jednorázový odkaz pro nastavení nového hesla.</p>
+             <label>E-mail<input id="forgotEmailInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz"></label>
+             <div id="forgotPasswordMessage" class="account-auth-message"></div><button id="sendRecoveryBtn" class="primary-btn big">Poslat odkaz</button>
+            </div></div>
+            <div id="resetPasswordModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
+             <span class="eyebrow">NOVÉ HESLO</span><h2>Účet je ověřený</h2><p class="muted">Teď už jen nastav nové heslo. Ostatní aktivní přihlášení pro jistotu odpojíme.</p>
+             <label>Nové heslo<input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8"></label><label>Znovu<input id="recoveryPassword2" type="password" autocomplete="new-password" minlength="8"></label>
+             <div id="resetPasswordMessage" class="account-auth-message"></div><button id="completeRecoveryBtn" class="primary-btn big">Nastavit nové heslo</button>
+            </div></div>
+            <div id="profileEditModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left profile-edit-modal-card">
+             <button id="closeProfileEdit" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">TVŮJ PROFIL</span><h2>Jak ti má Proplet říkat?</h2>
+             <p class="muted">Přezdívka je jen tvoje jméno ve hře. Nemusí odpovídat jménu na Google účtu a můžeš ji kdykoli změnit.</p>
+             <label>Přezdívka<input id="displayNameInput" maxlength="24" autocomplete="nickname" placeholder="např. Pavel nebo Slovožrout"></label>
+             <div id="displayNameMessage" class="account-auth-message"></div><button id="saveDisplayNameBtn" class="primary-btn big">Uložit přezdívku</button>
+             <div class="profile-edit-avatar-block"><span class="stat-label">AVATAR</span><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div></div>
+            </div></div>
+            <div id="recoveryEmailModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
+             <button id="closeRecoveryEmail" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Přidat e-mail</h2>
+             <p class="muted">E-mail použijeme pro obnovu zapomenutého hesla a můžeš se jím také přihlašovat. Nejprve ho ověříš kliknutím na odkaz.</p>
+             <label>E-mail<input id="recoveryEmailAddInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz"></label>
+             <div id="recoveryEmailAddMessage" class="account-auth-message"></div><button id="saveRecoveryEmailBtn" class="primary-btn big">Poslat ověřovací odkaz</button>
+            </div></div>`);
+           $('#closeForgotPassword').onclick=()=>closeModal('#forgotPasswordModal');
+           $('#closeProfileEdit').onclick=()=>closeModal('#profileEditModal');
+           $('#closeRecoveryEmail').onclick=()=>closeModal('#recoveryEmailModal');
+           $('#sendRecoveryBtn').onclick=sendRecovery;
+           $('#completeRecoveryBtn').onclick=completeRecovery;
+           $('#saveDisplayNameBtn').onclick=saveDisplayName;
+           $('#saveRecoveryEmailBtn').onclick=saveRecoveryEmail;
+           ['#forgotPasswordModal','#profileEditModal','#recoveryEmailModal'].forEach(sel=>{$(sel).onclick=e=>{if(e.target===$(sel))closeModal(sel)}});
+          }
+
+          function ensureLoginEnhancements(){
+           const modal=$('#profileModal'),save=$('#saveProfileBtn');if(!modal||!save||$('#accountAuthExtras'))return;
+           save.insertAdjacentHTML('beforebegin',`
+            <div id="accountAuthExtras" class="account-auth-extras">
+             <div id="recoveryEmailField" class="account-email-create hidden"><label>E-mail pro záchranu účtu <span class="optional-tag">nepovinný</span><input id="recoveryEmailInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz"></label><div class="account-email-warning"><span>🛟</span><div><strong>Doporučujeme ho přidat.</strong><small>Bez ověřeného e-mailu účet funguje normálně, ale zapomenuté heslo nepůjde obnovit.</small></div></div></div>
+             <button id="forgotPasswordBtn" type="button" class="account-forgot-btn">Zapomněl jsem heslo</button><div class="account-auth-divider"><span>nebo</span></div>
+             <button id="googleLoginBtn" type="button" class="google-auth-btn"><img class="google-g" src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button>
+            </div>`);
+           const original=save.onclick;
+           save.onclick=async function(e){
+            const create=$('#profileModeCreate')?.classList.contains('active'),email=$('#recoveryEmailInput')?.value.trim()||'';
+            if(create&&email&&!validEmail(email)){const err=$('#profileFormError');if(err)err.textContent='Zkontroluj prosím e-mailovou adresu.';return}
+            const before=profile()?.id||null,result=original?.call(this,e);if(result&&typeof result.then==='function')await result;const after=profile();
+            if(create&&email&&after?.id&&after.id!==before){try{await call('/api/account/email/start',{method:'POST',body:{email}});toast('📬 Účet je uložený. Teď ještě potvrď e-mail v doručené poště.')}catch(err){toast(`Účet je uložený, ale e-mail zatím ne: ${err.message}`)}}
+           };
+           $('#forgotPasswordBtn').onclick=()=>{closeModal('#profileModal');openModal('#forgotPasswordModal');$('#forgotPasswordMessage').textContent='';setTimeout(()=>$('#forgotEmailInput')?.focus(),80)};
+           $('#googleLoginBtn').onclick=()=>{location.href='/api/auth/google/start'};
+           syncLoginMode();new MutationObserver(syncLoginMode).observe($('#profileModeCreate'),{attributes:true,attributeFilter:['class']});
+          }
+          function syncLoginMode(){
+           const create=$('#profileModeCreate')?.classList.contains('active');$('#recoveryEmailField')?.classList.toggle('hidden',!create);$('#forgotPasswordBtn')?.classList.toggle('hidden',!!create);
+           const inp=$('#playerNameInput');if(inp){inp.placeholder=create?'Jak ti má Proplet říkat?':'Jméno nebo ověřený e-mail';inp.setAttribute('autocomplete',create?'nickname':'username')}
+           const label=inp?.closest('label');if(label){for(const n of [...label.childNodes])if(n.nodeType===Node.TEXT_NODE&&n.textContent.trim()){n.textContent=create?'Přezdívka':'Jméno nebo e-mail';break}}
+           const desc=$('#profileModalDesc');if(desc)desc.textContent=create?'Přezdívku můžeš kdykoli změnit. Heslo je povinné; e-mail nepovinný, ale bez něj nepůjde obnovit zapomenuté heslo.':'Přihlas se herním jménem nebo ověřeným e-mailem. Případně použij Google.';
+          }
+
+          function captureAvatars(card){const found=[...card.querySelectorAll('.avatar-choice')].map(b=>b.dataset.avatar).filter(Boolean);if(found.length)knownAvatars=[...new Set(found)]}
+          function settingsCard(label){return $$('#screen-profile .settings-card').find(c=>(c.querySelector('.eyebrow')?.textContent||'').trim().includes(label))||null}
+          function ensureTeamSection(team){
+           let wrap=$('#profileTeamSettingsCard');if(!wrap){wrap=document.createElement('div');wrap.id='profileTeamSettingsCard';wrap.className='card settings-card profile-team-settings';wrap.innerHTML='<div class="section-head"><div><span class="eyebrow">TÝM</span><h2>Tým a společné pořadí</h2></div><span class="profile-section-icon">👥</span></div><div class="profile-team-body"></div>';$('#profileCard')?.insertAdjacentElement('afterend',wrap)}
+           const body=wrap.querySelector('.profile-team-body');body.replaceChildren(team);
+          }
+          function moveSupportSetting(support){
+           const card=settingsCard('POCIT ZE HRY');if(!card)return;let slot=card.querySelector('.profile-support-slot');if(!slot){slot=document.createElement('div');slot.className='profile-support-slot';const row=card.querySelector('.settings-row');row?row.insertAdjacentElement('beforebegin',slot):card.appendChild(slot)}slot.replaceChildren(support);
+          }
+          function moveAdminEntry(admin){
+           const trust=settingsCard('ÚČET A SOUKROMÍ');if(!trust)return;let slot=$('#profileAdminSlot');if(!slot){slot=document.createElement('div');slot.id='profileAdminSlot';slot.className='profile-admin-slot';trust.insertAdjacentElement('afterend',slot)}slot.replaceChildren(admin);
+          }
+          function ensureAccountHub(){
+           const card=$('#profileCard'),p=profile();if(!card||!p)return null;let hub=card.querySelector('#profileAccountHub');if(!hub){hub=document.createElement('section');hub.id='profileAccountHub';hub.className='profile-account-hub';hub.innerHTML='<div class="profile-account-head"><div><span class="stat-label">ÚČET</span><strong>Přihlášení a záchrana</strong></div><span id="profileAccountBadge" class="profile-account-badge">Kontroluju…</span></div><div id="accountSecurityBody" class="profile-account-body"><div class="account-security-loading">Kontroluju účet…</div></div><div id="profileSyncSlot"></div><div id="profileAccountActions" class="profile-account-actions"></div>';const grid=card.querySelector('.profile-grid');grid?grid.insertAdjacentElement('afterend',hub):card.appendChild(hub)}return hub;
+          }
+          function enhanceProfileArchitecture(){
+           const card=$('#profileCard'),p=profile();if(!card||!p)return;captureAvatars(card);
+           card.querySelectorAll('.account-banner,.avatar-picker').forEach(n=>n.remove());
+           const family=card.querySelector('.profile-family');if(family&&!p.familyCode)family.textContent='Bez týmu';
+           const name=card.querySelector('.profile-name');if(name&&!card.querySelector('#editProfileInlineBtn')){const b=document.createElement('button');b.id='editProfileInlineBtn';b.className='profile-edit-inline';b.type='button';b.innerHTML='✎ <span>Upravit profil</span>';b.onclick=openProfileEditor;name.insertAdjacentElement('afterend',b)}
+           const team=card.querySelector('.team-access-card');if(team)ensureTeamSection(team);
+           const support=card.querySelector('.support-mode-card');if(support)moveSupportSetting(support);
+           const admin=card.querySelector('#adminEntryBtn');if(admin)moveAdminEntry(admin);
+           const hub=ensureAccountHub();if(hub){const sync=card.querySelector(':scope > .sync-panel');if(sync){sync.classList.toggle('profile-sync-ok',!!sync.querySelector('.sync-status.success'));hub.querySelector('#profileSyncSlot').replaceChildren(sync)}const logout=card.querySelector(':scope > #logoutBtn');if(logout)hub.querySelector('#profileAccountActions').replaceChildren(logout)}
+           refreshSecurityCard();
+          }
+          function scheduleEnhance(){if(enhanceScheduled)return;enhanceScheduled=true;setTimeout(()=>{enhanceScheduled=false;enhanceProfileArchitecture()},0)}
+
+          async function refreshSecurityCard(){
+           const p=profile();if(!p)return;const hub=ensureAccountHub(),body=hub?.querySelector('#accountSecurityBody');if(!body)return;
+           try{
+            const d=await call('/api/account/auth-status'),badge=hub.querySelector('#profileAccountBadge');if(badge){const strong=!!(d.recoveryReady||d.googleLinked);badge.textContent=strong?'Zabezpečeno':'Doplnit';badge.classList.toggle('ok',strong)}
+            body.innerHTML=`<div class="account-hub-row ${d.recoveryReady?'ok':'warn'}"><span>${d.recoveryReady?'✉️':'⚠️'}</span><div><strong>${d.recoveryReady?'E-mail pro obnovu':'Chybí záchranný e-mail'}</strong><small>${d.recoveryReady?esc(d.email):'Bez něj zapomenuté heslo neobnovíš.'}</small></div>${d.recoveryReady?'':`<button id="addRecoveryEmailBtn" class="secondary-btn">Přidat</button>`}</div><div class="account-hub-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'<img class="google-g google-g-small" src="/google-g.svg" alt="" aria-hidden="true">'}</span><div><strong>${d.googleLinked?'Google propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Příště se přihlásíš jedním klepnutím.':d.googleAvailable?'Propoj účet a nemusíš řešit heslo.':'Google přihlášení teď není dostupné.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>${p.hasPassword?'':`<div class="account-hub-row neutral"><span>🔑</span><div><strong>Heslo je volitelné</strong><small>Google stačí. Heslo můžeš přidat jako další možnost přihlášení.</small></div><button id="setPasswordFromHub" class="secondary-btn">Nastavit</button></div>`}`;
+            $('#addRecoveryEmailBtn')?.addEventListener('click',openRecoveryEmailModal);$('#linkGoogleBtn')?.addEventListener('click',()=>{location.href='/api/auth/google/start'});$('#setPasswordFromHub')?.addEventListener('click',()=>{if(typeof openPasswordModal==='function')openPasswordModal()});
+           }catch(e){body.innerHTML=`<p class="account-auth-error">${esc(e.message)}</p>`}
+          }
+
+          function openProfileEditor(){
+           const p=profile();if(!p)return;ensureModals();$('#displayNameInput').value=p.name||'';$('#displayNameMessage').textContent='';const avatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];const grid=$('#profileEditAvatarGrid');grid.innerHTML=avatars.map(a=>`<button type="button" class="avatar-choice ${a===(p.avatar||'🙂')?'selected':''}" data-edit-avatar="${esc(a)}">${esc(a)}</button>`).join('');grid.querySelectorAll('[data-edit-avatar]').forEach(b=>b.onclick=async()=>{if(typeof saveAvatar==='function'){await saveAvatar(b.dataset.editAvatar);openProfileEditor()}});openModal('#profileEditModal');setTimeout(()=>$('#displayNameInput')?.focus(),60);
+          }
+          async function saveDisplayName(){
+           const input=$('#displayNameInput'),msg=$('#displayNameMessage'),btn=$('#saveDisplayNameBtn'),name=String(input.value||'').trim().replace(/\s+/g,' ');msg.textContent='';if(!name){msg.textContent='Napiš, jak ti má Proplet říkat.';return}if(name.length>24){msg.textContent='Přezdívka může mít nejvýš 24 znaků.';return}btn.disabled=true;
+           try{const d=await call('/api/account/display-name',{method:'POST',body:{name}}),p=profile();if(typeof saveProfile==='function')saveProfile({...p,name:d.name});if(typeof updateProfileChip==='function')updateProfileChip();if(typeof renderProfile==='function')renderProfile();if(typeof renderLeaderboard==='function')renderLeaderboard();closeModal('#profileEditModal');toast(`✎ Teď ti říkáme ${d.name}.`)}catch(e){msg.textContent=e.message}finally{btn.disabled=false}
+          }
+          function openRecoveryEmailModal(){ensureModals();$('#recoveryEmailAddInput').value='';$('#recoveryEmailAddMessage').textContent='';openModal('#recoveryEmailModal');setTimeout(()=>$('#recoveryEmailAddInput')?.focus(),60)}
+          async function saveRecoveryEmail(){const email=$('#recoveryEmailAddInput').value.trim(),msg=$('#recoveryEmailAddMessage'),btn=$('#saveRecoveryEmailBtn');msg.textContent='';if(!validEmail(email)){msg.textContent='Zkontroluj e-mailovou adresu.';return}btn.disabled=true;try{const d=await call('/api/account/email/start',{method:'POST',body:{email}});msg.textContent=d.message||'Odkaz je na cestě.'}catch(e){msg.textContent=e.message}finally{btn.disabled=false}}
+          async function sendRecovery(){const email=$('#forgotEmailInput').value.trim(),msg=$('#forgotPasswordMessage'),btn=$('#sendRecoveryBtn');msg.textContent='';if(!validEmail(email)){msg.textContent='Zadej platný e-mail.';return}btn.disabled=true;try{const d=await call('/api/auth/recovery/start',{method:'POST',body:{email},auth:false});msg.textContent=d.message||'Pokud účet existuje, odkaz je na cestě.'}catch(e){msg.textContent=e.message}finally{btn.disabled=false}}
+          async function completeRecovery(){const p1=$('#recoveryPassword').value,p2=$('#recoveryPassword2').value,msg=$('#resetPasswordMessage'),btn=$('#completeRecoveryBtn');msg.textContent='';if(p1.length<8){msg.textContent='Heslo musí mít alespoň 8 znaků.';return}if(p1!==p2){msg.textContent='Hesla se neshodují.';return}if(!recoveryContext){msg.textContent='Obnovovací odkaz už není aktivní.';return}btn.disabled=true;try{const d=await call('/api/auth/recovery/reset',{method:'POST',body:{challenge:recoveryContext.challenge,accessToken:recoveryContext.accessToken,password:p1},auth:false});acceptProfile(d.profile);recoveryContext=null;sessionStorage.removeItem('proplet-recovery-context');closeModal('#resetPasswordModal');cleanAuthUrl();toast('🔐 Heslo je změněné. Jsi znovu přihlášený.')}catch(e){msg.textContent=e.message}finally{btn.disabled=false}}
+
+          async function handleAuthReturn(){
+           const qs=new URLSearchParams(location.search),kind=qs.get('auth');if(!kind)return;ensureModals();const frag=supabaseFragment();if(frag.error){toast(`Přihlášení se nepodařilo: ${frag.error}`);cleanAuthUrl();return}if(!frag.accessToken)return;
+           try{if(kind==='google'){const d=await call('/api/auth/google/complete',{method:'POST',body:{accessToken:frag.accessToken}});acceptProfile(d.profile);cleanAuthUrl();toast(d.linked?'✅ Google je propojený s tvým Propletem.':'🎉 Přihlášeno přes Google.');return}const challenge=qs.get('challenge')||'';if(kind==='email-link'){const d=await call('/api/account/email/verify',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});acceptProfile(d.profile);cleanAuthUrl();toast('✅ E-mail je ověřený. Zapomenuté heslo už umíme zachránit.');return}if(kind==='recover'){await call('/api/auth/recovery/check',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});recoveryContext={challenge,accessToken:frag.accessToken};sessionStorage.setItem('proplet-recovery-context',JSON.stringify(recoveryContext));openModal('#resetPasswordModal');return}}catch(e){toast(e.message);cleanAuthUrl()}
+          }
+
+          function init(){
+           ensureModals();ensureLoginEnhancements();
+           const card=$('#profileCard');if(card)new MutationObserver(scheduleEnhance).observe(card,{childList:true,subtree:true});
+           document.querySelectorAll('[data-nav="profile"]').forEach(el=>el.addEventListener('click',()=>setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},100)));
+           const stored=sessionStorage.getItem('proplet-recovery-context');if(stored)try{recoveryContext=JSON.parse(stored)}catch{}
+           handleAuthReturn();setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},160);window.__PROPLET_ACCOUNT_AUTH__={refreshSecurityCard,handleAuthReturn,openProfileEditor};
+          }
+          if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,0),{once:true});else setTimeout(init,0);
+          })();
+          ''')
+
+          Path('public/account-auth.css').write_text(r'''/* Proplet v3.31.8 — account recovery, identity and profile IA */
+          .account-auth-extras{display:grid;gap:9px;margin:3px 0 10px}.optional-tag{display:inline-flex;margin-left:5px;padding:2px 6px;border-radius:999px;background:#f0edf5;color:#777286;font-size:9px;font-weight:850;text-transform:none;letter-spacing:0}.account-email-create{display:grid;gap:7px;margin-bottom:2px}.account-email-warning{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid #efdfaa;border-radius:13px;background:#fff9e8}.account-email-warning>span{font-size:18px;line-height:1.15}.account-email-warning strong,.account-email-warning small{display:block}.account-email-warning strong{font-size:11px}.account-email-warning small{margin-top:2px;color:#756c55;font-size:10.5px;line-height:1.35}.account-forgot-btn{justify-self:center;border:0;background:transparent;color:#6258c7;font-size:11px;font-weight:850;padding:5px 8px;cursor:pointer}.account-forgot-btn:hover{text-decoration:underline}.account-auth-divider{display:flex;align-items:center;gap:9px;color:#9a95a8;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.account-auth-divider::before,.account-auth-divider::after{content:"";height:1px;flex:1;background:var(--line)}
+          .google-auth-btn{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #747775;border-radius:14px;background:#fff;color:#1f1f1f;box-shadow:0 3px 10px rgba(46,39,72,.055);cursor:pointer}.google-auth-btn:active{transform:scale(.985)}.google-auth-btn strong{font-size:14px;line-height:20px;font-weight:600}.google-g{display:block;width:20px;height:20px;flex:0 0 20px}.google-g-small{width:17px;height:17px;flex-basis:17px}.account-recovery-modal,.profile-edit-modal-card{max-width:430px}.account-recovery-modal>p,.profile-edit-modal-card>p{font-size:12px;line-height:1.45}.account-auth-message{min-height:18px;margin-top:7px;color:#615d70;font-size:10.5px;line-height:1.35}.account-auth-message:not(:empty){padding:8px 9px;border-radius:11px;background:#f5f2fa}
+          #profileCard>.account-banner,#profileCard>.avatar-picker{display:none!important}.profile-edit-inline{display:inline-flex;align-items:center;gap:5px;margin:4px 0 2px;padding:4px 7px;border:0;border-radius:999px;background:#f0ecff;color:#6255cc;font-size:10.5px;font-weight:850;cursor:pointer}.profile-edit-inline:active{transform:scale(.97)}.profile-edit-avatar-block{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}.profile-edit-avatar-grid{margin-top:8px}.profile-edit-avatar-grid .avatar-choice{cursor:pointer}
+          .profile-account-hub{margin-top:13px;padding:12px;border:1px solid #dcd5f3;border-radius:17px;background:linear-gradient(145deg,#f3efff 0%,#eef9f5 115%)}.profile-account-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.profile-account-head strong{display:block;font-size:14px;margin-top:2px}.profile-account-badge{padding:5px 8px;border-radius:999px;background:#fff4d8;color:#8b6b19;font-size:9.5px;font-weight:900}.profile-account-badge.ok{background:#dff3e9;color:#2d8060}.profile-account-body{display:grid;gap:7px}.account-hub-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px 10px;border:1px solid rgba(88,75,130,.11);border-radius:13px;background:rgba(255,255,255,.72)}.account-hub-row>span{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:#fff;font-size:15px}.account-hub-row strong,.account-hub-row small{display:block}.account-hub-row strong{font-size:11.5px}.account-hub-row small{margin-top:2px;color:var(--muted);font-size:10px;line-height:1.3}.account-hub-row .secondary-btn{padding:7px 9px;font-size:9.5px}.account-hub-row.warn{border-color:#ead9a3;background:#fff9e8}.account-hub-row.ok{border-color:#cce7da;background:#f2fbf7}.profile-account-hub .sync-panel{margin:8px 0 0;padding:8px 9px;background:rgba(255,255,255,.45);border-color:rgba(88,75,130,.10)}.profile-account-hub .sync-status{margin:0}.profile-account-hub .sync-panel.profile-sync-ok .secondary-btn{display:none}.profile-account-hub .sync-panel.profile-sync-ok{padding:7px 9px}.profile-account-actions{display:flex;justify-content:flex-end}.profile-account-actions .logout-btn{margin:8px 0 0;padding:6px 3px;font-size:10px;color:var(--muted)}
+          .profile-team-settings{padding:16px;margin-top:12px}.profile-section-icon{font-size:22px}.profile-team-body{margin-top:10px}.profile-team-body .team-access-card{margin:0}.profile-support-slot{margin:10px 0 4px}.profile-support-slot .support-mode-card{margin:0}.profile-admin-slot{margin-top:12px}.profile-admin-slot .admin-entry{margin:0}.account-auth-error{margin:0;color:#a04d48;font-size:11px}
+          html[data-theme="dark"] .optional-tag{background:#302d3b;color:#b9b4c5}html[data-theme="dark"] .account-email-warning{background:#382f1e;border-color:#5b4a27}html[data-theme="dark"] .account-email-warning small{color:#c6b990}html[data-theme="dark"] .account-forgot-btn{color:#b6aaff}html[data-theme="dark"] .google-auth-btn{background:#fff;border-color:#747775;color:#1f1f1f}html[data-theme="dark"] .account-auth-message:not(:empty){background:#292631}html[data-theme="dark"] .profile-edit-inline{background:#302b49;color:#c7bfff}html[data-theme="dark"] .profile-account-hub{background:linear-gradient(145deg,#29253e,#1d302a);border-color:#3d4550}html[data-theme="dark"] .account-hub-row{background:#24212f;border-color:#403a49}html[data-theme="dark"] .account-hub-row.ok{background:#20342d;border-color:#345144}html[data-theme="dark"] .account-hub-row.warn{background:#382f1e;border-color:#5b4a27}html[data-theme="dark"] .account-hub-row>span{background:rgba(255,255,255,.06)}html[data-theme="dark"] .profile-account-hub .sync-panel{background:rgba(255,255,255,.035);border-color:#403a49}
+          html[data-theme="dark"] .ranking-privacy-preview{background:#292631!important;border:1px solid #403a49!important;color:#f3f0f7!important}html[data-theme="dark"] .ranking-privacy-preview strong{color:#f3f0f7!important}html[data-theme="dark"] .ranking-privacy-preview small{color:#b9b4c5!important}html[data-theme="dark"] .ranking-privacy-preview>span{background:#211f2c!important;color:#f3f0f7!important}
+          @media(max-width:430px){.account-hub-row{grid-template-columns:28px minmax(0,1fr)}.account-hub-row .secondary-btn{grid-column:2;width:max-content}.profile-account-head{align-items:flex-start}.profile-edit-inline span{display:none}}
+          ''')
+
+          # Ensure account CSS is appended after the core stylesheet, not before it.
+          p = Path('public/theme-init.js')
+          s = p.read_text()
+          old = '''  const accountCss=document.createElement('link');\n  accountCss.rel='stylesheet';\n  accountCss.href='/account-auth.css?v=3';\n  document.head.appendChild(accountCss);\n\n'''
+          assert old in s
+          s = s.replace(old, '', 1)
+          old = '''  const loadAccountAuth=()=>{\n    if(document.querySelector('script[data-proplet-account-auth]'))return;\n    const script=document.createElement('script');\n    script.src='/account-auth.js?v=3';'''
+          new = '''  const loadAccountAuth=()=>{\n    if(!document.querySelector('link[data-proplet-account-auth-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css)}\n    if(document.querySelector('script[data-proplet-account-auth]'))return;\n    const script=document.createElement('script');\n    script.src='/account-auth.js?v=4';'''
+          assert old in s
+          s = s.replace(old, new, 1)
+          p.write_text(s)
+
+          p = Path('public/sw.js')
+          s = p.read_text().replace("const CACHE='proplet-v3.31.8-account-auth-r2';", "const CACHE='proplet-v3.31.8-account-profile-r3';", 1)
+          p.write_text(s)
+
+          p = Path('ACCOUNT_AUTH_V3_31_8_CZ.md')
+          s = p.read_text()
+          s += '''\n## Profile / identity polish\n\n- Google při prvním vytvoření účtu preferuje `given_name` před celým jménem.\n- Každý přihlášený hráč může kdykoli změnit herní přezdívku (`/api/account/display-name`) bez změny `player_id`, historie, XP nebo externí identity.\n- Horní profilová karta je znovu uspořádaná: identita + výkon + přihlášení/záchrana účtu.\n- Permanentní avatarová galerie a legacy banner „Účet je v cloudu“ byly z horní karty odstraněny; avatar i přezdívka jsou pod „Upravit profil“.\n- Tým má vlastní logický blok a Pomocník je přesunut do „Pocit ze hry“.\n- Úspěšná synchronizace je záměrně vizuálně ztišená; problém/pending stav zůstává viditelný.\n- Dark-mode náhled veřejné identity má explicitní kontrastní barvy.\n'''
+          p.write_text(s)
+          PY
+      - name: Validate candidate
+        run: |
+          python -m py_compile server.py account_auth.py
+          node --check public/app.js
+          node --check public/account-auth.js
+          node --check public/theme-init.js
+          git diff --check
+      - name: Commit clean candidate
+        run: |
+          git config user.name "Proplet Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/v3318-profile-polish.yml
+          git add account_auth.py public/account-auth.js public/account-auth.css public/theme-init.js public/sw.js ACCOUNT_AUTH_V3_31_8_CZ.md
+          git commit -m "Polish v3.31.8 profile identity and account architecture"
+          git push origin HEAD:preview/v3318-account-recovery-google
