@@ -48,7 +48,16 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadHomeLayout();loadRankingPolish()};
+  const loadAccountAuth=()=>{
+    if(!document.querySelector('link[data-proplet-account-auth-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css)}
+    if(document.querySelector('script[data-proplet-account-auth]'))return;
+    const script=document.createElement('script');
+    script.src='/account-auth.js?v=4';
+    script.dataset.propletAccountAuth='1';
+    document.body.appendChild(script);
+  };
+
+  const loadExtras=()=>{loadHomeLayout();loadRankingPolish();loadAccountAuth()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
