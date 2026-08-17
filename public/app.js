@@ -1,4 +1,4 @@
-const APP_VERSION='3.31.6';
+const APP_VERSION='3.31.6.1';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
 const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
@@ -1268,6 +1268,8 @@ function bind(){
 }
 
 const EXPECTED_PUZZLE_DB_VERSION=10;
+const COMPATIBLE_PUZZLE_DB_VERSIONS=new Set([9,EXPECTED_PUZZLE_DB_VERSION]);
+function compatiblePuzzleDatabase(data){return COMPATIBLE_PUZZLE_DB_VERSIONS.has(Number(data?.version||0))}
 const CONTENT_PREVIEW_DATE='';
 function contentWeekKey(iso=CONTENT_PREVIEW_DATE||pragueDateISO()){return addDaysISO(iso,-mondayWeekdayIndex(iso))}
 function rollingContentUrl(){const asOf=CONTENT_PREVIEW_DATE||pragueDateISO(),week=contentWeekKey(asOf),q=new URLSearchParams({week});if(CONTENT_PREVIEW_DATE)q.set('preview_as_of',CONTENT_PREVIEW_DATE);return `/api/rolling-content?${q.toString()}`}
@@ -1278,9 +1280,9 @@ function showPuzzleBootLoading(){
 async function loadPuzzleDatabase(){
  const url='/puzzles.json';
  if('caches' in window){
-  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(data?.version===EXPECTED_PUZZLE_DB_VERSION){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(fresh?.version===EXPECTED_PUZZLE_DB_VERSION){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
+  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
  }
- const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=await r.json();if(data?.version!==EXPECTED_PUZZLE_DB_VERSION)throw new Error('puzzle-db-version');return data;
+ const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
 }
 function mergeRollingContent(delta){
  if(!puzzleDB||Number(delta?.version||0)!==1)return false;
