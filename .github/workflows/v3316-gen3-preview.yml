@@ -54,7 +54,7 @@ jobs:
           PY
       - name: Finalize progression architecture
         run: python tools/finalize_v3316_gen3.py
-      - name: Set 16-level anti-repeat and fix rolling metadata
+      - name: Set Gen3 generation policy and preflight
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -81,16 +81,27 @@ jobs:
               raise SystemExit(f'unexpected audit anti-repeat checks: {s.count(">= 25")}')
           s=s.replace('24-level anti-repeat window','16-level anti-repeat window')
           s=s.replace('>= 25','>= 17')
+          stale='assert m["151-200"]["meanTurnsPerWord"] > m["1-50"]["meanTurnsPerWord"]'
+          if stale not in s:
+              raise SystemExit('stale Medium turn-progression guard not found')
+          replacement='assert m["151-200"]["meanCells"] > m["1-50"]["meanCells"]\n    assert m["151-200"]["meanWords"] > m["1-50"]["meanWords"]'
+          s=s.replace(stale,replacement,1)
+          s=s.replace('Medium grows in search area and later path complexity; Hard starts near late Medium.','Medium grows in search area and word count; Hard changes the challenge with winding geometry.')
           audit.write_text(s,encoding='utf-8')
 
+          audit_text=audit.read_text(encoding='utf-8')
+          rolling_text=rolling.read_text(encoding='utf-8')
           checks={
             'base repeat 16':'recent[difficulty] = recent[difficulty][-16:]' in base.read_text(encoding='utf-8'),
-            'rolling repeat 16':'repeat_window = 16' in rolling.read_text(encoding='utf-8'),
-            'audit repeat 17 gap':audit.read_text(encoding='utf-8').count('>= 17')==2,
-            'rolling content generation 3':'"contentGeneration": 3,' in rolling.read_text(encoding='utf-8'),
-            'rolling generation key 3':'"generationKey": "free-gen3",' in rolling.read_text(encoding='utf-8'),
-            'rolling expects gen3':'Rolling content expects Free generation 3' in rolling.read_text(encoding='utf-8'),
-            'rolling g3 ids':'"g3-e"' in rolling.read_text(encoding='utf-8') and '"g3-x"' in rolling.read_text(encoding='utf-8'),
+            'rolling repeat 16':'repeat_window = 16' in rolling_text,
+            'audit repeat 17 gap':audit_text.count('>= 17')==2,
+            'Medium area progression':'assert m["151-200"]["meanCells"] > m["1-50"]["meanCells"]' in audit_text,
+            'Medium word progression':'assert m["151-200"]["meanWords"] > m["1-50"]["meanWords"]' in audit_text,
+            'stale Medium turn guard absent':stale not in audit_text,
+            'rolling content generation 3':'"contentGeneration": 3,' in rolling_text,
+            'rolling generation key 3':'"generationKey": "free-gen3",' in rolling_text,
+            'rolling expects gen3':'Rolling content expects Free generation 3' in rolling_text,
+            'rolling g3 ids':'"g3-e"' in rolling_text and '"g3-x"' in rolling_text,
           }
           generator=Path('tools/generate_puzzles.py').read_text(encoding='utf-8')
           checks['smart hardcore']='cells=(72, 80)' in generator and 'words=(11, 13)' in generator and 'turn_bias=.42' in generator and 'curl_bias=.29' in generator
