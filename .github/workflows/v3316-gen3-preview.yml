@@ -36,6 +36,7 @@ jobs:
           from pathlib import Path
           p=Path('tools/finalize_v3316_gen3.py')
           s=p.read_text(encoding='utf-8')
+          s=s.replace('"watch"]]', '"watch"}]')
           old='''    if marker not in text:\n        raise RuntimeError("quality ladder insertion marker not found")\n    text = text.replace(marker, ladder, 1)\n'''
           new='''    if marker in text:\n        text = text.replace(marker, ladder, 1)\n    else:\n        anchor = "    helper_summary = {}\\n"\n        if anchor not in text:\n            raise RuntimeError("quality ladder insertion anchor not found")\n        ladder_prefix = ladder.rsplit("    helper_summary = {}", 1)[0]\n        text = text.replace(anchor, ladder_prefix + anchor, 1)\n'''
           if old not in s:
