@@ -55,7 +55,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.31.5"
+APP_VERSION = "3.31.6"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -803,7 +803,9 @@ def player_stats(player_id: str) -> dict:
         # actual historical result remains available in the history.
         "freeCompleted": free_slots["effective"],
         "freeTransferred": free_slots["transferred"],
-        "freePlayedGen2": free_slots["gen2"],
+        "freePlayedCurrent": free_slots["current"],
+        # Compatibility alias for cached pre-Gen3 clients; semantics are now active-generation plays.
+        "freePlayedGen2": free_slots["current"],
         "freeHistoryCompleted": free_history,
         "currentStreak": current,
         "longestStreak": longest,
@@ -977,7 +979,7 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
                 return {
                     "puzzle": puzzle, "difficulty": diff, "mode": "free",
                     "level": int(meta.get("level") or 0),
-                    "generation": int(meta.get("contentGeneration") or 2),
+                    "generation": int(meta.get("contentGeneration") or data.get("freeGeneration") or 1),
                     "legacy": False, "rolling": True,
                 }
     # Newest archived bank is appended last. This is the best possible mapping for
@@ -998,24 +1000,26 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
 
 
 def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
+    """Summarise stable difficulty+level slots without exposing content generations to players."""
     difficulties = ("easy", "medium", "hard", "hardcore")
     puzzle_data = load_puzzles(); reserve = load_rolling_content()
+    active_generation = int(puzzle_data.get("freeGeneration") or 1)
     maximum_levels = {key: len(puzzle_data.get("free", {}).get(key, [])) + len(reserve.get("puzzles", {}).get(key, [])) for key in difficulties}
-    legacy_slots = {key: set() for key in difficulties}
-    gen2_slots = {key: set() for key in difficulties}
+    prior_slots = {key: set() for key in difficulties}
+    current_slots = {key: set() for key in difficulties}
     for row in rows:
-        if row.get("mode") != "free" or row.get("difficulty") not in legacy_slots:
+        if row.get("mode") != "free" or row.get("difficulty") not in prior_slots:
             continue
         info = free_puzzle_info(str(row.get("puzzle_id") or ""), str(row.get("difficulty") or ""))
         if not info or not 1 <= int(info["level"]) <= maximum_levels.get(info["difficulty"], 0):
             continue
-        target = gen2_slots if int(info["generation"]) >= 2 else legacy_slots
+        is_current = int(info["generation"]) == active_generation and info.get("legacy") is not True
+        target = current_slots if is_current else prior_slots
         target[info["difficulty"]].add(int(info["level"]))
-    return {
-        "effective": {key: len(legacy_slots[key] | gen2_slots[key]) for key in difficulties},
-        "transferred": {key: len(legacy_slots[key] - gen2_slots[key]) for key in difficulties},
-        "gen2": {key: len(gen2_slots[key]) for key in difficulties},
-    }
+    effective = {key: len(prior_slots[key] | current_slots[key]) for key in difficulties}
+    transferred = {key: len(prior_slots[key] - current_slots[key]) for key in difficulties}
+    current = {key: len(current_slots[key]) for key in difficulties}
+    return {"effective": effective, "transferred": transferred, "current": current, "gen2": current}
 
 
 def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> bool:
@@ -1498,9 +1502,9 @@ def health():
             xp_migration = xp_economy_migrated()
         except HTTPException:
             xp_migration = False
-        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
+        return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "freeProgressionMigration": free_generation2_migration, "stableFreeLevelSlots": True, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "freeProgressionMigration": False, "stableFreeLevelSlots": True, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
 
 
 @app.get("/api/config")
@@ -2410,6 +2414,74 @@ def build_quality_report():
 
     rows.sort(key=lambda r: (0 if r["flag"] in {"too_hard","too_easy","watch"} else 1, -(abs(r["difficultyIndex"] or 0)), -(r["starts"] or 0)))
     priorities = [r for r in rows if r["flag"] in {"too_hard", "too_easy", "watch"}]
+
+    band_ranges = ((1, 50), (51, 100), (101, 150), (151, 200))
+    active_free = pdata.get("free") or {}
+    active_level: dict[str, tuple[str, int, dict]] = {}
+    for difficulty, bank in active_free.items():
+        for index, puzzle in enumerate(bank, start=1):
+            level = int((puzzle.get("meta") or {}).get("level") or index)
+            active_level[str(puzzle.get("id"))] = (difficulty, level, puzzle)
+
+    def ladder_average(values):
+        values = [float(value) for value in values if value is not None]
+        return round(sum(values) / len(values), 3) if values else None
+
+    def ladder_band(difficulty: str, start_level: int, end_level: int) -> dict:
+        puzzles = [
+            puzzle for _, level, puzzle in active_level.values()
+            if puzzle.get("difficulty") == difficulty and start_level <= level <= end_level
+        ]
+        puzzle_ids = {str(puzzle.get("id")) for puzzle in puzzles}
+        attempts_band = [a for a in first_attempts if str(a.get("puzzle_id")) in puzzle_ids and a.get("mode") == "free"]
+        completed_band = [a for a in attempts_band if a.get("completed_at")]
+        times = [int(a.get("elapsed_ms")) for a in completed_band if a.get("elapsed_ms") is not None]
+        hints_band = [int(a.get("hints_used") or 0) for a in completed_band]
+        wrong_band = [int(a.get("wrong_attempts") or 0) for a in completed_band]
+        clean_band = [1 if a.get("clean_solve") is True else 0 for a in completed_band]
+        turns = [int(answer.get("turns") or 0) for puzzle in puzzles for answer in (puzzle.get("answers") or [])]
+        scores = [(puzzle.get("meta") or {}).get("difficultyScore") for puzzle in puzzles]
+        cells = [len(puzzle.get("mask") or []) for puzzle in puzzles]
+        words = [len(puzzle.get("answers") or []) for puzzle in puzzles]
+        return {
+            "key": f"{start_level}-{end_level}", "from": start_level, "to": end_level, "puzzles": len(puzzles),
+            "structure": {
+                "meanCells": ladder_average(cells), "meanWords": ladder_average(words),
+                "meanDifficultyScore": ladder_average(scores), "meanTurnsPerWord": ladder_average(turns),
+                "lowTurnShare": round(sum(1 for turn in turns if turn <= 1) / len(turns), 3) if turns else None,
+            },
+            "behavior": {
+                "starts": len(attempts_band), "completed": len(completed_band),
+                "completionRate": round(len(completed_band) / len(attempts_band), 3) if attempts_band else None,
+                "medianMs": _median(times), "avgHints": ladder_average(hints_band),
+                "avgWrong": ladder_average(wrong_band), "cleanRate": ladder_average(clean_band),
+            },
+        }
+
+    difficulty_ladder = {"bands": {}}
+    for difficulty in ("easy", "medium", "hard", "hardcore"):
+        difficulty_ladder["bands"][difficulty] = [ladder_band(difficulty, start, end) for start, end in band_ranges]
+    late_medium = difficulty_ladder["bands"]["medium"][-1]
+    early_hard = difficulty_ladder["bands"]["hard"][0]
+    medium_ms = late_medium["behavior"].get("medianMs")
+    hard_ms = early_hard["behavior"].get("medianMs")
+    time_ratio = round(hard_ms / medium_ms, 2) if medium_ms and hard_ms else None
+    medium_completion = late_medium["behavior"].get("completionRate")
+    hard_completion = early_hard["behavior"].get("completionRate")
+    completion_drop = round(medium_completion - hard_completion, 3) if medium_completion is not None and hard_completion is not None else None
+    if time_ratio is None:
+        bridge_status = "awaiting_data"
+    elif time_ratio > 3.0 or (completion_drop is not None and completion_drop > 0.20):
+        bridge_status = "cliff"
+    elif time_ratio > 2.0 or (completion_drop is not None and completion_drop > 0.12):
+        bridge_status = "watch"
+    else:
+        bridge_status = "healthy"
+    difficulty_ladder["bridge"] = {
+        "status": bridge_status, "timeRatio": time_ratio, "completionDrop": completion_drop,
+        "lateMedium": late_medium, "earlyHard": early_hard,
+    }
+
     helper_summary = {}
     first_attempt_map = {str(a.get("id")): a for a in first_attempts}
     first_attempt_ids = set(first_attempt_map)
@@ -2497,6 +2569,7 @@ def build_quality_report():
         "hints": hint_summary,
         "funnel": funnel,
         "priorities": priorities[:30],
+        "difficultyLadder": difficulty_ladder,
         "rows": rows,
     }
 
@@ -3877,6 +3950,19 @@ def daily_global_leaderboard(
     }
 
 
+@app.get("/api/free-archive")
+def free_archive(
+    request: Request,
+    puzzle_id: str = Query(min_length=2, max_length=80),
+):
+    """Return one historical Free board only when an existing client needs to resume it."""
+    enforce_rate_limit(request, "free_archive_read", limit=60, window_seconds=3600)
+    info = free_puzzle_info(puzzle_id)
+    if not info or info.get("legacy") is not True:
+        raise HTTPException(404, "Archivovaná úroveň nebyla nalezena")
+    return {"puzzle": info["puzzle"], "difficulty": info["difficulty"], "level": info["level"]}
+
+
 @app.get("/api/played-levels")
 def played_levels(
     request: Request,
@@ -3889,18 +3975,19 @@ def played_levels(
     bank = sorted(released_free_bank(difficulty, effective_content_date(request)), key=lambda p: int((p.get("meta") or {}).get("level") or 9999))
     active = {p["id"]: p for p in bank}
     results = [r for r in db_select("results", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty]
-    legacy_slots: set[int] = set()
-    legacy_history: list[dict] = []
-    gen2_result_by_puzzle: dict[str, dict] = {}
+    active_generation = int(data.get("freeGeneration") or 1)
+    prior_slots: set[int] = set()
+    prior_history: list[dict] = []
+    current_result_by_puzzle: dict[str, dict] = {}
     for row in results:
         info = free_puzzle_info(str(row.get("puzzle_id") or ""), difficulty)
         if not info:
             continue
-        if int(info["generation"]) >= 2:
-            gen2_result_by_puzzle[str(row.get("puzzle_id"))] = row
+        if int(info["generation"]) == active_generation and info.get("legacy") is not True:
+            current_result_by_puzzle[str(row.get("puzzle_id"))] = row
         else:
-            legacy_slots.add(int(info["level"]))
-            legacy_history.append({
+            prior_slots.add(int(info["level"]))
+            prior_history.append({
                 "puzzleId": row.get("puzzle_id"), "level": int(info["level"]),
                 "contentGeneration": int(info["generation"]),
                 "elapsedMs": int(row.get("best_elapsed_ms") or 1000),
@@ -3918,7 +4005,7 @@ def played_levels(
     for p in bank:
         vals = grouped.get(p["id"], [])
         level = int((p.get("meta") or {}).get("level") or 0)
-        result_row = gen2_result_by_puzzle.get(p["id"])
+        result_row = current_result_by_puzzle.get(p["id"])
         if vals:
             first = min(vals, key=first_run_key)
             items.append({
@@ -3934,12 +4021,12 @@ def played_levels(
                 "hintsUsed": int(result_row.get("hints_used") or 0), "wrongAttempts": int(result_row.get("wrong_attempts") or 0),
                 "cleanSolve": result_row.get("clean_solve") is True, "attempts": 1, "completedAt": result_row.get("completed_at"),
             })
-        elif level in legacy_slots:
+        elif level in prior_slots:
             items.append({"puzzleId": p["id"], "level": level, "transferred": True, "attempts": 0})
     actual = sum(not item.get("transferred") for item in items)
     transferred = sum(bool(item.get("transferred")) for item in items)
-    legacy_history.sort(key=lambda row: (row["level"], str(row.get("completedAt") or ""), str(row.get("puzzleId") or "")))
-    return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "actual": actual, "transferred": transferred, "levels": items, "legacyLevels": legacy_history}
+    prior_history.sort(key=lambda row: (row["level"], str(row.get("completedAt") or ""), str(row.get("puzzleId") or "")))
+    return {"difficulty": difficulty, "total": len(bank), "completed": len(items), "actual": actual, "transferred": transferred, "levels": items, "legacyLevels": prior_history}
 
 
 

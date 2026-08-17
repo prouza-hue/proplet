@@ -28,6 +28,10 @@ BAD_SUBSTRINGS = (
     "fuck", "shit", "porn", "sex", "kurev", "kurv", "píč", "kokot",
     "hovno", "prdel", "mrdat", "šukat", "sukat", "čurák", "curak", "nacist", "hitler",
 )
+
+# Words removed editorially from target answers still belong in the validator.
+# The solver must see them so an accidental alternative path cannot slip through.
+EDITORIAL_VALIDATOR_WORDS = {"nocebo", "trebuchet", "sofismus", "černodíra", "perigeum", "aerogel"}
 FUNCTION_WORDS = set("""
 aby abych abys abyso abyste ale ani ano asi bez bude budou byl byla byli bylo byly bych bychom
 byste co což do ho i já jak jaká jaké jaký je jeho jej její jsem jsi jsme jste jsou když kdo kde
@@ -60,6 +64,11 @@ VOCAB_POLICIES = {
     "medium": {
         "allowed": ("A", "B"), "weights": {"A": 2, "B": 5},
         "min_fraction": {"B": 0.45}, "min_avg_fun": 2.8, "min_fun_words": 1,
+    },
+    "hard_bridge": {
+        "allowed": ("B", "C"), "weights": {"B": 4, "C": 3},
+        "min_fraction": {"C": 0.30}, "max_fraction": {"C": 0.60},
+        "min_avg_fun": 2.9, "min_fun_words": 1,
     },
     "hard": {
         "allowed": ("B", "C"), "weights": {"B": 2, "C": 5},
@@ -542,31 +551,67 @@ SPECS = {
              style="dense", min_curvy=0, min_spiral=0),
     ],
     "easy": [
-        dict(rows=6, cols=6, cells=(28, 32), words=(6, 7), min_len=4, max_len=7, dict_size=6500, cand=(5, 32),
+        dict(rows=6, cols=6, cells=(28, 32), words=(6, 7), min_len=4, max_len=7, dict_size=6500, cand=(5, 40),
              style="dense", min_curvy=0, min_spiral=0),
     ],
+    # Medium has its own identity: paths stay readable, while search area and the
+    # number of words grow every 50 levels. This raises difficulty without making
+    # Medium feel like a smaller Hard board.
     "medium": [
-        dict(rows=7, cols=8, cells=(40, 46), words=(7, 8), min_len=4, max_len=8, dict_size=8500, cand=(8, 55),
+        dict(rows=8, cols=8, cells=(46, 52), words=(8, 9), min_len=4, max_len=8, dict_size=8750, cand=(8, 180),
+             style="dense", min_curvy=0, min_spiral=0),
+        dict(rows=8, cols=9, cells=(52, 58), words=(8, 10), min_len=4, max_len=9, dict_size=9000, cand=(10, 240),
+             style="dense", min_curvy=0, min_spiral=0),
+        dict(rows=9, cols=9, cells=(58, 64), words=(9, 10), min_len=4, max_len=9, dict_size=9250, cand=(10, 300),
+             style="dense", min_curvy=0, min_spiral=0),
+        dict(rows=9, cols=9, cells=(62, 68), words=(10, 11), min_len=4, max_len=9, dict_size=9500, cand=(12, 380),
              style="dense", min_curvy=0, min_spiral=0),
     ],
+    # Hard starts at roughly the same board scale as late Medium, then changes the
+    # nature of the challenge: winding geometry appears gradually and the vocabulary
+    # begins with a gentler B/C bridge before moving to the normal Hard mix.
     "hard": [
-        dict(rows=8, cols=8, cells=(50, 56), words=(9, 10), min_len=4, max_len=9, dict_size=9500, cand=(10, 280),
-             style="winding", turn_bias=.28, curl_bias=.16, min_curvy=3, min_spiral=1, max_short_words=2),
-        dict(rows=9, cols=9, cells=(62, 70), words=(10, 12), min_len=4, max_len=9, dict_size=9500, cand=(12, 380),
+        dict(rows=9, cols=9, cells=(64, 70), words=(10, 11), min_len=4, max_len=9, dict_size=9500, cand=(12, 480),
+             style="winding", turn_bias=.18, curl_bias=.08, min_curvy=3, min_spiral=1, max_short_words=2),
+        dict(rows=9, cols=9, cells=(66, 72), words=(10, 12), min_len=4, max_len=9, dict_size=9750, cand=(12, 580),
+             style="winding", turn_bias=.24, curl_bias=.13, min_curvy=4, min_spiral=1, max_short_words=2),
+        dict(rows=9, cols=9, cells=(68, 74), words=(11, 12), min_len=4, max_len=9, dict_size=10000, cand=(14, 700),
              style="winding", turn_bias=.30, curl_bias=.18, min_curvy=4, min_spiral=1, max_short_words=2),
+        dict(rows=10, cols=10, cells=(72, 80), words=(11, 13), min_len=4, max_len=9, dict_size=10250, cand=(14, 850),
+             style="winding", turn_bias=.34, curl_bias=.22, min_curvy=5, min_spiral=2, max_short_words=2),
     ],
     "hardcore": [
-        dict(rows=10, cols=10, cells=(78, 88), words=(12, 15), min_len=4, max_len=10, dict_size=10500, cand=(18, 650),
-             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2, max_short_words=2),
+        dict(rows=10, cols=10, cells=(72, 80), words=(11, 13), min_len=4, max_len=10, dict_size=10250, cand=(16, 540),
+             style="winding", turn_bias=.42, curl_bias=.29, min_curvy=6, min_spiral=2, max_short_words=2),
     ],
 }
+
+
+def progression_variant_index(difficulty: str, level: int) -> int | None:
+    if difficulty not in ("medium", "hard"):
+        return None
+    if level <= 50:
+        return 0
+    if level <= 100:
+        return 1
+    if level <= 150:
+        return 2
+    return 3
+
+
+def free_vocab_key(difficulty: str, level: int) -> str:
+    if difficulty == "hardcore":
+        return "hardcore_conservative"
+    if difficulty == "hard" and level <= 50:
+        return "hard_bridge"
+    return difficulty
 
 
 def spec_for(difficulty: str, variant_index: int | None, rng: random.Random) -> dict:
     variants = SPECS[difficulty]
     if variant_index is None:
         return variants[rng.randrange(len(variants))]
-    return variants[variant_index % len(variants)]
+    return variants[max(0, min(int(variant_index), len(variants) - 1))]
 
 
 def create_puzzle(
@@ -713,7 +758,7 @@ def main():
 
     dictionary = [w for w, _ in freq if w not in FUNCTION_WORDS]
     # Every intended answer must be recognized by the solver even when absent from the frequency corpus.
-    dictionary = dictionary[:12000] + [w for w in all_answers if w not in dictionary[:12000]]
+    dictionary = list(dict.fromkeys(dictionary[:12000] + [w for w in all_answers if w not in dictionary[:12000]] + sorted(EDITORIAL_VALIDATOR_WORDS)))
     WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
 
     preserve_any = args.generation_2 or args.daily_generation_2 or args.preserve_existing or args.preserve_existing_all or args.top_up_existing
