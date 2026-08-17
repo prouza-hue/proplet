@@ -69,7 +69,7 @@
   }
 
   function totalXpSlice(rows,limit=10){
-    if(window.rankingXpPeriod!=='all'||rows.length<=limit)return {top:rows,mine:null,hidden:0};
+    if(rankingXpPeriod!=='all'||rows.length<=limit)return {top:rows,mine:null,hidden:0};
     const top=rows.slice(0,limit);
     const mine=rows.find(row=>row.isMine);
     const showMine=!!mine&&!top.includes(mine);
@@ -92,30 +92,27 @@
     return '<div class="ranking-own-divider"><span>Tvoje pozice</span></div>';
   }
 
-  const baseRenderXpRanking=window.renderXpRanking;
-  if(typeof baseRenderXpRanking==='function'){
-    window.renderXpRanking=function(data){
-      if(window.rankingXpPeriod!=='all')return baseRenderXpRanking(data);
-      const rows=window.rankingRows(data,window.rankingXpScope);
-      const list=document.getElementById('xpLeaderboardList');
-      if(!list||rows.length<=10)return baseRenderXpRanking(data);
-      const sliced=totalXpSlice(rows);
-      const rowHtml=r=>{
-        if(window.rankingXpScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${window.rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${window.esc(r.name)}</strong><small>${window.countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>celkem</small></div></div>`;
-        const level=window.levelFor(Number(r.lifetimePoints||0)),team=r.teamName?` · 👥 ${window.esc(r.teamName)}`:'';
-        return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${window.rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${window.esc(r.avatar||'🙂')} ${window.esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small><span class="ranking-rank-chip">${level.current.icon} ${window.esc(level.current.name)}</span>${r.badgeCount?` · 🏅 ${r.badgeCount}`:''}${team}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>celkem</small></div></div>`;
-      };
-      list.innerHTML=sliced.top.map(rowHtml).join('')+(sliced.mine?`${ownRankingDivider()}${rowHtml(sliced.mine)}`:'')+moreRankingHtml(sliced.hidden,window.rankingXpScope);
+  const baseRenderXpRanking=renderXpRanking;
+  renderXpRanking=function(data){
+    if(rankingXpPeriod!=='all')return baseRenderXpRanking(data);
+    const rows=rankingRows(data,rankingXpScope);
+    const list=document.getElementById('xpLeaderboardList');
+    if(!list||rows.length<=10)return baseRenderXpRanking(data);
+    const sliced=totalXpSlice(rows);
+    const rowHtml=r=>{
+      if(rankingXpScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>celkem</small></div></div>`;
+      const level=levelFor(Number(r.lifetimePoints||0)),team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
+      return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small><span class="ranking-rank-chip">${level.current.icon} ${esc(level.current.name)}</span>${r.badgeCount?` · 🏅 ${r.badgeCount}`:''}${team}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>celkem</small></div></div>`;
     };
-  }
+    list.innerHTML=sliced.top.map(rowHtml).join('')+(sliced.mine?`${ownRankingDivider()}${rowHtml(sliced.mine)}`:'')+moreRankingHtml(sliced.hidden,rankingXpScope);
+  };
 
   const winModal=document.getElementById('winModal');
   if(winModal&&!winModal.dataset.backdropClose){
     winModal.dataset.backdropClose='1';
     winModal.addEventListener('click',event=>{
-      if(event.target!==winModal||window.currentGame?.mode==='starter')return;
-      if(typeof window.closeWinToMenu==='function')window.closeWinToMenu();
-      else winModal.classList.add('hidden');
+      if(event.target!==winModal||currentGame?.mode==='starter')return;
+      closeWinToMenu();
     });
   }
 
@@ -127,7 +124,5 @@
     transformRankingPayload
   };
 
-  // If the user restored the Pořadí screen from browser history, refresh once
-  // so even the first paint uses the mixed alias set.
-  try{if(window.currentScreen==='leaderboard'&&typeof window.renderLeaderboard==='function')window.renderLeaderboard()}catch{}
+  try{if(currentScreen==='leaderboard')renderLeaderboard()}catch{}
 })();
