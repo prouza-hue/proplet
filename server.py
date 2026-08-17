@@ -55,7 +55,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.31.7"
+APP_VERSION = "3.31.8"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -136,7 +136,8 @@ class PlayerCreate(BaseModel):
 
 
 class PlayerLogin(BaseModel):
-    name: str = Field(min_length=1, max_length=24)
+    # v3.31.8: accepts either the historical display name or a verified email.
+    name: str = Field(min_length=1, max_length=254)
     # New accounts log in with name + password. Team remains an optional
     # disambiguator for legacy duplicate names.
     family_code: Optional[str] = Field(default=None, max_length=24)
@@ -1633,13 +1634,17 @@ def login(payload: PlayerLogin, request: Request):
     enforce_rate_limit(request, "login_ip", limit=30, window_seconds=300)
     enforce_rate_limit(request, "login_account", limit=8, window_seconds=300, discriminator=payload.name)
     family = norm_family(payload.family_code or "")
-    name = " ".join(payload.name.strip().split())
-    if family:
-        candidates = [p for p in db_select("players", family_code=family) if p.get("name", "").casefold() == name.casefold()]
+    identifier = " ".join(payload.name.strip().split())
+    if "@" in identifier:
+        # Recovery email becomes a login identifier only after ownership was verified.
+        email = identifier.casefold()
+        candidates = [p for p in db_select("players") if p.get("email_verified_at") and str(p.get("email") or "").casefold() == email]
+    elif family:
+        candidates = [p for p in db_select("players", family_code=family) if p.get("name", "").casefold() == identifier.casefold()]
     else:
         # Teamless login is intentionally simple for the player. We only use
         # team when an old duplicate name needs disambiguation.
-        candidates = [p for p in db_select("players") if p.get("name", "").casefold() == name.casefold()]
+        candidates = [p for p in db_select("players") if p.get("name", "").casefold() == identifier.casefold()]
 
     if not candidates:
         raise HTTPException(401, "Jméno nebo heslo nesedí")
@@ -4680,6 +4685,29 @@ def leaderboard(
     ]
     return {"familyCode": family, "date": daily_date, "weekStart": week_start.isoformat(), "overall": overall, "weekly": weekly, "daily": daily}
 
+
+
+
+# v3.31.8 — additive identity bridge. Existing Proplet sessions/passwords stay canonical.
+from account_auth import install_account_auth
+install_account_auth(
+    app,
+    supabase_url=SUPABASE_URL,
+    supabase_key=SUPABASE_SECRET_KEY,
+    tz=TZ,
+    db_select=db_select,
+    db_insert=db_insert,
+    db_update=db_update,
+    db_delete=db_delete,
+    auth_player=auth_player,
+    new_session=new_session,
+    hash_password=hash_password,
+    verify_password=verify_password,
+    enforce_rate_limit=enforce_rate_limit,
+    player_stats=player_stats,
+    public_family_code=public_family_code,
+    league_name_for=league_name_for,
+)
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
 if not os.environ.get("VERCEL"):
