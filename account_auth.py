@@ -25,6 +25,10 @@ class RecoveryStart(BaseModel):
     email: str = Field(min_length=5, max_length=254)
 
 
+class DisplayNameUpdate(BaseModel):
+    name: str = Field(min_length=1, max_length=24)
+
+
 class AuthCallback(BaseModel):
     challenge: Optional[str] = Field(default=None, min_length=24, max_length=160)
     accessToken: str = Field(min_length=40, max_length=8192)
@@ -220,6 +224,22 @@ def install_account_auth(
             "recoveryReady": bool(player.get("email") and player.get("email_verified_at")),
         }
 
+    @app.post("/api/account/display-name")
+    def account_display_name(payload: DisplayNameUpdate, request: Request, authorization: Optional[str] = Header(default=None)):
+        enforce_rate_limit(request, "display_name_update", limit=20, window_seconds=3600)
+        player = auth_player(authorization)
+        name = " ".join(payload.name.strip().split())
+        if not name:
+            raise HTTPException(400, "Napiš, jak ti má Proplet říkat")
+        family = player.get("family_code")
+        if family:
+            for candidate in db_select("players", family_code=family):
+                if candidate.get("id") != player.get("id") and str(candidate.get("name") or "").casefold() == name.casefold():
+                    raise HTTPException(409, "V tomto týmu už hráč s touto přezdívkou existuje")
+        db_update("players", {"id": player["id"]}, {"name": name})
+        return {"ok": True, "name": name}
+
+
     @app.post("/api/account/email/start")
     def account_email_start(payload: EmailStart, request: Request, authorization: Optional[str] = Header(default=None)):
         enforce_rate_limit(request, "account_email_link", limit=5, window_seconds=3600)
@@ -365,7 +385,7 @@ def install_account_auth(
                 db_update("players", {"id": owner["id"]}, {"auth_user_id": uid})
                 player = db_select("players", id=owner["id"])[0]
             else:
-                raw_name = str(meta.get("full_name") or meta.get("name") or meta.get("given_name") or "Hráč").strip()
+                raw_name = str(meta.get("given_name") or meta.get("full_name") or meta.get("name") or "Hráč").strip()
                 name = " ".join(raw_name.split())[:24] or "Hráč"
                 player_id = str(uuid.uuid4())
                 now = datetime.now(tz).isoformat()

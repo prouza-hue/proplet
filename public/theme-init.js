@@ -32,11 +32,6 @@
   rankingCss.href='/ranking-polish.css?v=5';
   document.head.appendChild(rankingCss);
 
-  const accountCss=document.createElement('link');
-  accountCss.rel='stylesheet';
-  accountCss.href='/account-auth.css?v=3';
-  document.head.appendChild(accountCss);
-
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
@@ -54,9 +49,10 @@
   };
 
   const loadAccountAuth=()=>{
+    if(!document.querySelector('link[data-proplet-account-auth-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css)}
     if(document.querySelector('script[data-proplet-account-auth]'))return;
     const script=document.createElement('script');
-    script.src='/account-auth.js?v=3';
+    script.src='/account-auth.js?v=4';
     script.dataset.propletAccountAuth='1';
     document.body.appendChild(script);
   };

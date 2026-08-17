@@ -59,3 +59,13 @@ A service-role-only tabulku `account_auth_challenges` pro `link_email` a `recove
 
 - 2026-08-17: provozovatel potvrdil dokončení Google OAuth + Supabase redirect/provider nastavení.
 - Funkční end-to-end ověření Google callbacku a recovery flow stále patří do preview QA před merge do produkce.
+
+## Profile / identity polish
+
+- Google při prvním vytvoření účtu preferuje `given_name` před celým jménem.
+- Každý přihlášený hráč může kdykoli změnit herní přezdívku (`/api/account/display-name`) bez změny `player_id`, historie, XP nebo externí identity.
+- Horní profilová karta je znovu uspořádaná: identita + výkon + přihlášení/záchrana účtu.
+- Permanentní avatarová galerie a legacy banner „Účet je v cloudu“ byly z horní karty odstraněny; avatar i přezdívka jsou pod „Upravit profil“.
+- Tým má vlastní logický blok a Pomocník je přesunut do „Pocit ze hry“.
+- Úspěšná synchronizace je záměrně vizuálně ztišená; problém/pending stav zůstává viditelný.
+- Dark-mode náhled veřejné identity má explicitní kontrastní barvy.
