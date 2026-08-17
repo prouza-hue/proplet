@@ -6,12 +6,15 @@ on:
       - tools/apply_v3316_gen3_patch.py
       - tools/finalize_v3316_gen3.py
       - .github/workflows/v3316-gen3-preview.yml
+concurrency:
+  group: v3316-gen3-preview
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
   build-gen3:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,7 +33,7 @@ jobs:
           PY
       - name: Apply source patch
         run: python tools/apply_v3316_gen3_patch.py
-      - name: Harden finalizer and select balanced Hardcore
+      - name: Harden finalizer and select smart Hardcore
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -43,31 +46,54 @@ jobs:
               raise SystemExit('finalizer marker guard not found')
           s=s.replace(old,new)
           current='''        dict(rows=10, cols=10, cells=(78, 88), words=(12, 15), min_len=4, max_len=10, dict_size=10500, cand=(18, 700),\n             style="winding", turn_bias=.38, curl_bias=.25, min_curvy=6, min_spiral=2, max_short_words=2),'''
-          balanced='''        dict(rows=10, cols=10, cells=(76, 84), words=(12, 14), min_len=4, max_len=10, dict_size=10500, cand=(18, 650),\n             style="winding", turn_bias=.39, curl_bias=.26, min_curvy=6, min_spiral=2, max_short_words=2),'''
+          smart='''        dict(rows=10, cols=10, cells=(72, 80), words=(11, 13), min_len=4, max_len=10, dict_size=10250, cand=(16, 540),\n             style="winding", turn_bias=.42, curl_bias=.29, min_curvy=6, min_spiral=2, max_short_words=2),'''
           if current not in s:
               raise SystemExit('Hardcore profile marker not found')
-          s=s.replace(current,balanced,1)
+          s=s.replace(current,smart,1)
           p.write_text(s,encoding='utf-8')
           PY
       - name: Finalize progression architecture
         run: python tools/finalize_v3316_gen3.py
-      - name: Fix rolling Gen3 metadata and preflight
+      - name: Set 16-level anti-repeat and fix rolling metadata
         run: |
           python - <<'PY'
           from pathlib import Path
+          base=Path('tools/generate_free_generation3.py')
+          s=base.read_text(encoding='utf-8')
+          old='recent[difficulty] = recent[difficulty][-24:]'
+          if old not in s:
+              raise SystemExit('base anti-repeat marker not found')
+          s=s.replace(old,'recent[difficulty] = recent[difficulty][-16:]',1)
+          base.write_text(s,encoding='utf-8')
+
           rolling=Path('tools/generate_rolling_content.py')
           s=rolling.read_text(encoding='utf-8')
+          if 'repeat_window = 24' not in s:
+              raise SystemExit('rolling anti-repeat marker not found')
+          s=s.replace('repeat_window = 24','repeat_window = 16',1)
           s=s.replace('"contentGeneration": 2,','"contentGeneration": 3,')
           s=s.replace('"generationKey": "free-gen2",','"generationKey": "free-gen3",')
           rolling.write_text(s,encoding='utf-8')
+
+          audit=Path('tools/audit_free_generation3.py')
+          s=audit.read_text(encoding='utf-8')
+          if s.count('>= 25') != 2:
+              raise SystemExit(f'unexpected audit anti-repeat checks: {s.count(">= 25")}')
+          s=s.replace('24-level anti-repeat window','16-level anti-repeat window')
+          s=s.replace('>= 25','>= 17')
+          audit.write_text(s,encoding='utf-8')
+
           checks={
-            'rolling content generation 3':'"contentGeneration": 3,' in s,
-            'rolling generation key 3':'"generationKey": "free-gen3",' in s,
-            'rolling expects gen3':'Rolling content expects Free generation 3' in s,
-            'rolling g3 ids':'"g3-e"' in s and '"g3-x"' in s,
+            'base repeat 16':'recent[difficulty] = recent[difficulty][-16:]' in base.read_text(encoding='utf-8'),
+            'rolling repeat 16':'repeat_window = 16' in rolling.read_text(encoding='utf-8'),
+            'audit repeat 17 gap':audit.read_text(encoding='utf-8').count('>= 17')==2,
+            'rolling content generation 3':'"contentGeneration": 3,' in rolling.read_text(encoding='utf-8'),
+            'rolling generation key 3':'"generationKey": "free-gen3",' in rolling.read_text(encoding='utf-8'),
+            'rolling expects gen3':'Rolling content expects Free generation 3' in rolling.read_text(encoding='utf-8'),
+            'rolling g3 ids':'"g3-e"' in rolling.read_text(encoding='utf-8') and '"g3-x"' in rolling.read_text(encoding='utf-8'),
           }
           generator=Path('tools/generate_puzzles.py').read_text(encoding='utf-8')
-          checks['balanced hardcore']='cells=(76, 84)' in generator and 'words=(12, 14)' in generator and 'turn_bias=.39' in generator
+          checks['smart hardcore']='cells=(72, 80)' in generator and 'words=(11, 13)' in generator and 'turn_bias=.42' in generator and 'curl_bias=.29' in generator
           failed=[name for name,ok in checks.items() if not ok]
           if failed:
               raise SystemExit('Gen3 preflight failed: '+', '.join(failed))
@@ -77,12 +103,13 @@ jobs:
         run: |
           python -m py_compile tools/generate_puzzles.py tools/generate_free_generation3.py tools/generate_rolling_content.py tools/audit_free_generation3.py server.py
       - name: Generate Free Gen3
-        timeout-minutes: 30
+        timeout-minutes: 25
         run: python tools/generate_free_generation3.py
       - name: Generate Gen3 rolling reserve
-        timeout-minutes: 20
+        timeout-minutes: 15
         run: python tools/generate_rolling_content.py
       - name: Audit Free Gen3
+        timeout-minutes: 15
         run: python tools/audit_free_generation3.py
       - name: JS syntax
         run: |
