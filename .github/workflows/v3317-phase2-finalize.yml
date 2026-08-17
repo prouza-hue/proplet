@@ -1,0 +1,88 @@
+name: Finalize Proplet v3.31.7 phase2
+
+on:
+  push:
+    branches: [preview/v3317-rankings-teams]
+    paths:
+      - '.github/workflows/v3317-phase2-finalize.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply repaired patch, verify, and publish result
+        shell: bash
+        run: |
+          git config user.name 'prouza-hue'
+          git config user.email 'prouza@gmail.com'
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/patch_v3317_rankings_phase2.py')
+          s=p.read_text(encoding='utf-8')
+          old="if n!=2: raise SystemExit(f'expected 2 incoming-earlier team patches, got {n}')"
+          new="if n!=1: raise SystemExit(f'expected 1 incoming-earlier team patch, got {n}')"
+          if old in s: s=s.replace(old,new,1)
+          old_block='''s=replace_once(s,\n''' + "'''        \"xpMigration\": xp_migration,\n        \"helperSystem\": True,\n'''" + ''',\n''' + "'''        \"xpMigration\": xp_migration,\n        \"rankingsV2Migration\": rankings_v2_schema_ready(),\n        \"helperSystem\": True,\n'''" + ",'health success flag')"
+          new_block="s=replace_once(s,'\\\"xpMigration\\\": xp_migration, \\\"helperSystem\\\": analytics_v2_migration,','\\\"xpMigration\\\": xp_migration, \\\"rankingsV2Migration\\\": rankings_v2_schema_ready(), \\\"helperSystem\\\": analytics_v2_migration,','health success flag')"
+          if old_block not in s:
+              raise SystemExit('health patcher source anchor not found')
+          s=s.replace(old_block,new_block,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+          set +e
+          python tools/patch_v3317_rankings_phase2.py > /tmp/phase2.out 2>&1
+          patch_code=$?
+          set -e
+          if [ "$patch_code" -ne 0 ]; then
+            printf 'exit_code=%s\n\n' "$patch_code" > V3317_PHASE2_DIAGNOSTIC.txt
+            cat /tmp/phase2.out >> V3317_PHASE2_DIAGNOSTIC.txt
+            git add V3317_PHASE2_DIAGNOSTIC.txt
+            git commit -m 'Update v3.31.7 phase2 diagnostic'
+            git push origin HEAD:preview/v3317-rankings-teams
+            exit 0
+          fi
+
+          python -m py_compile server.py
+          node --check public/app.js
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.py').read_text(encoding='utf-8')
+          a=Path('public/app.js').read_text(encoding='utf-8')
+          h=Path('public/index.html').read_text(encoding='utf-8')
+          m=Path('SUPABASE_MIGRATION_V3_31_7.sql').read_text(encoding='utf-8')
+          assert 'def team_code_for_player_at' in s
+          assert '/api/rankings/visibility' in s
+          assert '/api/team-membership/leave' in s
+          assert '/api/team-settings' in s
+          assert 'rankingsV2Migration' in s
+          assert 'team_code_at_completion' in s
+          assert 'player.get("public_rankings") is True' in s
+          assert 'rankingPrivacyModal' in h and 'leaveTeamBtn' in h
+          assert 'maybeShowRankingPrivacyNotice' in a
+          assert 'Týmové pořadí a Liga týmů' not in a
+          assert "const APP_VERSION='3.31.7';" in a
+          assert 'public_rankings boolean;' in m
+          assert 'boolean not null default true' not in m
+          assert "COMPATIBLE_PUZZLE_DB_VERSIONS=new Set([9,EXPECTED_PUZZLE_DB_VERSION])" in a
+          print('v3.31.7 privacy/team-history contract PASS')
+          PY
+
+          git rm -f tools/patch_v3317_rankings_phase2.py \
+            .github/workflows/v3317-rankings-phase2.yml \
+            .github/workflows/v3317-phase2-repair.yml \
+            .github/workflows/v3317-phase2-diagnose.yml \
+            .github/workflows/v3317-phase2-finalize.yml \
+            V3317_PHASE2_DIAGNOSTIC.txt
+          git add server.py public/app.js public/index.html public/styles.css SUPABASE_MIGRATION_V3_31_7.sql
+          git diff --cached --check
+          git commit -m 'Complete v3.31.7 rankings privacy and durable teams'
+          git push origin HEAD:preview/v3317-rankings-teams
