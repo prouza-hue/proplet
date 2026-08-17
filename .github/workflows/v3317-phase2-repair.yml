@@ -1,0 +1,72 @@
+name: Repair Proplet v3.31.7 privacy phase
+
+on:
+  push:
+    branches: [preview/v3317-rankings-teams]
+    paths:
+      - '.github/workflows/v3317-phase2-repair.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Repair stale patch assertion
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/patch_v3317_rankings_phase2.py')
+          s=p.read_text(encoding='utf-8')
+          old="if n!=2: raise SystemExit(f'expected 2 incoming-earlier team patches, got {n}')"
+          new="if n!=1: raise SystemExit(f'expected 1 incoming-earlier team patch, got {n}')"
+          if s.count(old) != 1:
+              raise SystemExit('repair anchor not found exactly once')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+      - name: Apply privacy and durable-team patch
+        run: python tools/patch_v3317_rankings_phase2.py
+      - name: Verify v3.31.7 contracts
+        shell: bash
+        run: |
+          python -m py_compile server.py
+          node --check public/app.js
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.py').read_text(encoding='utf-8')
+          a=Path('public/app.js').read_text(encoding='utf-8')
+          h=Path('public/index.html').read_text(encoding='utf-8')
+          m=Path('SUPABASE_MIGRATION_V3_31_7.sql').read_text(encoding='utf-8')
+          assert 'def team_code_for_player_at' in s
+          assert '/api/rankings/visibility' in s
+          assert '/api/team-membership/leave' in s
+          assert '/api/team-settings' in s
+          assert 'rankingsV2Migration' in s
+          assert 'team_code_at_completion' in s
+          assert 'player.get("public_rankings") is True' in s
+          assert 'rankingPrivacyModal' in h and 'leaveTeamBtn' in h
+          assert 'maybeShowRankingPrivacyNotice' in a
+          assert 'Týmové pořadí a Liga týmů' not in a
+          assert "const APP_VERSION='3.31.7';" in a
+          assert 'public_rankings boolean;' in m
+          assert 'boolean not null default true' not in m
+          assert "COMPATIBLE_PUZZLE_DB_VERSIONS=new Set([9,EXPECTED_PUZZLE_DB_VERSION])" in a
+          print('v3.31.7 privacy/team-history contract PASS')
+          PY
+      - name: Commit clean preview tree
+        shell: bash
+        run: |
+          git config user.name 'prouza-hue'
+          git config user.email 'prouza@gmail.com'
+          git rm -f tools/patch_v3317_rankings_phase2.py .github/workflows/v3317-rankings-phase2.yml .github/workflows/v3317-phase2-repair.yml
+          git add server.py public/app.js public/index.html public/styles.css SUPABASE_MIGRATION_V3_31_7.sql
+          git diff --cached --check
+          git commit -m 'Complete v3.31.7 rankings privacy and durable teams'
+          git push origin HEAD:preview/v3317-rankings-teams
