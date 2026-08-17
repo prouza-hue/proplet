@@ -8,35 +8,39 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        difficulty: [easy, medium, hard, hardcore]
+        profile: [current, balanced, compact, lean]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Benchmark 10 puzzles
+      - name: Benchmark Hardcore profile
         env:
-          DIFFICULTY: ${{ matrix.difficulty }}
+          PROFILE: ${{ matrix.profile }}
         run: |
           python - <<'PY'
           import os, random, statistics, sys, time
           sys.path.insert(0,'tools')
           import generate_puzzles as gp
-          d=os.environ['DIFFICULTY']
+          name=os.environ['PROFILE']
           specs={
-            'easy':dict(rows=6,cols=6,cells=(28,32),words=(6,7),min_len=4,max_len=7,dict_size=6500,cand=(5,40),style='dense',min_curvy=0,min_spiral=0),
-            'medium':dict(rows=8,cols=8,cells=(46,52),words=(8,9),min_len=4,max_len=8,dict_size=8750,cand=(8,180),style='dense',min_curvy=0,min_spiral=0),
-            'hard':dict(rows=9,cols=9,cells=(64,70),words=(10,11),min_len=4,max_len=9,dict_size=9500,cand=(12,480),style='winding',turn_bias=.18,curl_bias=.08,min_curvy=3,min_spiral=1,max_short_words=2),
-            'hardcore':dict(rows=10,cols=10,cells=(78,88),words=(12,15),min_len=4,max_len=10,dict_size=10500,cand=(18,700),style='winding',turn_bias=.38,curl_bias=.25,min_curvy=6,min_spiral=2,max_short_words=2),
+            'current':dict(rows=10,cols=10,cells=(78,88),words=(12,15),min_len=4,max_len=10,dict_size=10500,cand=(18,700),style='winding',turn_bias=.38,curl_bias=.25,min_curvy=6,min_spiral=2,max_short_words=2),
+            'balanced':dict(rows=10,cols=10,cells=(76,84),words=(12,14),min_len=4,max_len=10,dict_size=10500,cand=(18,650),style='winding',turn_bias=.39,curl_bias=.26,min_curvy=6,min_spiral=2,max_short_words=2),
+            'compact':dict(rows=10,cols=10,cells=(74,82),words=(12,14),min_len=4,max_len=10,dict_size=10500,cand=(18,620),style='winding',turn_bias=.40,curl_bias=.27,min_curvy=6,min_spiral=2,max_short_words=2),
+            'lean':dict(rows=10,cols=10,cells=(74,82),words=(11,14),min_len=4,max_len=10,dict_size=10500,cand=(16,600),style='winding',turn_bias=.40,curl_bias=.27,min_curvy=6,min_spiral=2,max_short_words=2),
           }
-          gp.SPECS[d]=[specs[d]]
+          gp.SPECS['hardcore']=[specs[name]]
           tiers,tier_of=gp.load_answer_tiers(); meta=gp.load_answer_metadata(); fun={w:int(m.get('fun',3)) for w,m in meta.items()}; pools=gp.build_answer_pools(tiers,meta)
           freq=gp.load_frequency_words(); all_answers=[w for t in 'ABCD' for w in tiers[t]]; dictionary=[w for w,_ in freq if w not in gp.FUNCTION_WORDS][:12000]; dictionary=list(dict.fromkeys(dictionary+all_answers))
-          vocab='hardcore_conservative' if d=='hardcore' else ('hard' if d=='hard' else d)
-          rng=random.Random(20260817); times=[]
-          for i in range(10):
-            t=time.perf_counter(); p=gp.create_puzzle(d,rng.randrange(1,2**31-1),pools[vocab],dictionary,f'b-{d}-{i}',variant_index=0,tier_of=tier_of,vocab_key=vocab,fun_of=fun); times.append(time.perf_counter()-t)
-            print(i+1,round(times[-1],3),p['meta']['difficultyScore'],p['meta']['candidateCount'],flush=True)
-          print('SUMMARY',d,'total',round(sum(times),2),'mean',round(statistics.mean(times),3),'max',round(max(times),3))
+          rng=random.Random(20260817); times=[]; scores=[]; candidates=[]; turns=[]; cells=[]; words=[]; curvy=[]; spiral=[]
+          for i in range(12):
+            t=time.perf_counter(); p=gp.create_puzzle('hardcore',rng.randrange(1,2**31-1),pools['hardcore_conservative'],dictionary,f'b-{name}-{i}',variant_index=0,tier_of=tier_of,vocab_key='hardcore_conservative',fun_of=fun); times.append(time.perf_counter()-t)
+            scores.append(p['meta']['difficultyScore']); candidates.append(p['meta']['candidateCount']); cells.append(len(p['mask'])); words.append(len(p['answers'])); curvy.append(p['meta'].get('curvyWords',0)); spiral.append(p['meta'].get('spiralWords',0)); turns.extend(a.get('turns',0) for a in p['answers'])
+            print(i+1,round(times[-1],3),p['meta']['difficultyScore'],p['meta']['candidateCount'],len(p['mask']),len(p['answers']),flush=True)
+          print('SUMMARY',name,
+                'total',round(sum(times),2),'meanSec',round(statistics.mean(times),3),'maxSec',round(max(times),3),
+                'meanScore',round(statistics.mean(scores),1),'meanCandidates',round(statistics.mean(candidates),1),
+                'meanCells',round(statistics.mean(cells),1),'meanWords',round(statistics.mean(words),1),
+                'meanTurns',round(statistics.mean(turns),2),'meanCurvy',round(statistics.mean(curvy),2),'meanSpiral',round(statistics.mean(spiral),2))
           PY
