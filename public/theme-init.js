@@ -29,7 +29,7 @@
 
   const brandCss=document.createElement('link');
   brandCss.rel='stylesheet';
-  brandCss.href='/today-brand.css?v=1';
+  brandCss.href='/today-brand.css?v=2';
   document.head.appendChild(brandCss);
 
   const rankingCss=document.createElement('link');
@@ -40,7 +40,7 @@
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=9';
+    script.src='/home-layout.js?v=10';
     script.dataset.propletHomeLayout='1';
     document.body.appendChild(script);
   };
