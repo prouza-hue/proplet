@@ -55,10 +55,16 @@
   difficultyNudgeCss.dataset.propletDifficultyNudgeCss='1';
   document.head.appendChild(difficultyNudgeCss);
 
+  const winActionsCss=document.createElement('link');
+  winActionsCss.rel='stylesheet';
+  winActionsCss.href='/win-actions-v3324.css?v=1';
+  winActionsCss.dataset.propletWinActionsCss='1';
+  document.head.appendChild(winActionsCss);
+
   const loadVersion=()=>{
     if(document.querySelector('script[data-proplet-version]'))return;
     const script=document.createElement('script');
-    script.src='/version.js?v=1';
+    script.src='/version.js?v=2';
     script.dataset.propletVersion='1';
     document.body.appendChild(script);
   };
@@ -88,15 +94,6 @@
     document.body.appendChild(script);
   };
 
-  const loadReleaseNotes=()=>{
-    if(!document.querySelector('link[data-proplet-release-notes-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/release-notes.css?v=3';css.dataset.propletReleaseNotesCss='1';document.head.appendChild(css)}
-    if(document.querySelector('script[data-proplet-release-notes]'))return;
-    const script=document.createElement('script');
-    script.src='/release-notes.js?v=4';
-    script.dataset.propletReleaseNotes='1';
-    document.body.appendChild(script);
-  };
-
   const loadGameLayout=()=>{
     if(document.querySelector('script[data-proplet-game-layout]'))return;
     const script=document.createElement('script');
@@ -121,7 +118,7 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout();loadStarterCopyHotfix();loadDifficultyNudge()};
+  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadGameLayout();loadStarterCopyHotfix();loadDifficultyNudge()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();

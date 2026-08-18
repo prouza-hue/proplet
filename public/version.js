@@ -1,5 +1,5 @@
 (()=>{
-  const VERSION='3.32.3';
+  const VERSION='3.32.4';
   window.PROPLET_VERSION=VERSION;
 
   const attachFooter=()=>{
