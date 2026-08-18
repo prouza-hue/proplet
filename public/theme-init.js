@@ -51,7 +51,7 @@
 
   const difficultyNudgeCss=document.createElement('link');
   difficultyNudgeCss.rel='stylesheet';
-  difficultyNudgeCss.href='/difficulty-nudge.css?v=1';
+  difficultyNudgeCss.href='/difficulty-nudge.css?v=2';
   difficultyNudgeCss.dataset.propletDifficultyNudgeCss='1';
   document.head.appendChild(difficultyNudgeCss);
 
@@ -116,7 +116,7 @@
   const loadDifficultyNudge=()=>{
     if(document.querySelector('script[data-proplet-difficulty-nudge]'))return;
     const script=document.createElement('script');
-    script.src='/difficulty-nudge.js?v=1';
+    script.src='/difficulty-nudge.js?v=2';
     script.dataset.propletDifficultyNudge='1';
     document.body.appendChild(script);
   };
