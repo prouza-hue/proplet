@@ -1,0 +1,38 @@
+name: Proplet version guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+jobs:
+  version-alignment:
+    if: startsWith(github.event.pull_request.title, 'Proplet v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public release version
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='${{ github.event.pull_request.title }}'
+          expected=$(printf '%s' "$title" | sed -nE 's/^Proplet v([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')
+          if [ -z "$expected" ]; then
+            echo "::error::Release PR title must start with Proplet vX.Y.Z"
+            exit 1
+          fi
+
+          public_version=$(sed -nE "s/.*const VERSION='([^']+)'.*/\1/p" public/version.js | head -n1)
+          sw_version=$(sed -nE "s/.*proplet-v([0-9]+\.[0-9]+\.[0-9]+).*/\1/p" public/sw.js | head -n1)
+
+          echo "PR version:        $expected"
+          echo "Footer version:    $public_version"
+          echo "SW cache version:  $sw_version"
+
+          if [ "$public_version" != "$expected" ]; then
+            echo "::error file=public/version.js::Footer version $public_version does not match release $expected"
+            exit 1
+          fi
+          if [ "$sw_version" != "$expected" ]; then
+            echo "::error file=public/sw.js::Service-worker cache version $sw_version does not match release $expected"
+            exit 1
+          fi
