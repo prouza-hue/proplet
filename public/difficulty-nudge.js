@@ -9,6 +9,12 @@
     medium:{target:'hard',thresholdMs:75000},
     hard:{target:'hardcore',thresholdMs:120000}
   };
+  const TARGET_COPY={
+    medium:{cta:'Zkusit Střední →',sentence:'Střední by tě mohla bavit víc.'},
+    hard:{cta:'Zkusit Těžkou →',sentence:'Těžká by tě mohla bavit víc.'},
+    hardcore:{cta:'Zkusit Mozkožrouta →',sentence:'Mozkožrout by tě mohl bavit víc.'}
+  };
+  const DECLINE_COPY={easy:'Ještě jednu Snadnou',medium:'Ještě jednu Střední',hard:'Ještě jednu Těžkou'};
   let lastRenderedSignature='';
 
   const scopeId=()=>{
@@ -128,7 +134,7 @@
     clearCard();
     lastRenderedSignature=signature;
 
-    const sourceLabel=diffLabel(candidate.source),targetLabel=diffLabel(candidate.target);
+    const sourceLabel=diffLabel(candidate.source),target=TARGET_COPY[candidate.target]||{cta:`Zkusit ${diffLabel(candidate.target)} →`,sentence:`${diffLabel(candidate.target)} by tě mohla bavit víc.`};
     const card=document.createElement('section');
     card.id='difficultyNudgeCard';
     card.className='difficulty-nudge-card';
@@ -136,9 +142,9 @@
     card.innerHTML=`
       <div class="difficulty-nudge-kicker">🔥 ČAS PŘITVRDIT?</div>
       <h3>Tohle ti jde nějak podezřele snadno. 😏</h3>
-      <p><strong>${candidate.fast} z posledních ${WINDOW_SIZE}</strong> ${sourceLabel.toLocaleLowerCase('cs-CZ')} jsi zvládl do <strong>${thresholdLabel(candidate.thresholdMs)}</strong> bez nápovědy. ${targetLabel} by tě mohla bavit víc.</p>
-      <button type="button" class="difficulty-nudge-accept">Zkusit ${targetLabel} →</button>
-      <button type="button" class="difficulty-nudge-decline">Ještě jednu ${sourceLabel}</button>`;
+      <p><strong>${candidate.fast} z posledních ${WINDOW_SIZE}</strong> her na obtížnosti <strong>${sourceLabel}</strong> bylo hotových do <strong>${thresholdLabel(candidate.thresholdMs)}</strong> bez nápovědy. ${target.sentence}</p>
+      <button type="button" class="difficulty-nudge-accept">${target.cta}</button>
+      <button type="button" class="difficulty-nudge-decline">${DECLINE_COPY[candidate.source]||`Ještě jednu ${sourceLabel}`}</button>`;
     primary.parentNode.insertBefore(card,primary);
     modal.classList.add('difficulty-nudge-active');
     card.querySelector('.difficulty-nudge-accept').onclick=()=>accept(candidate);
@@ -158,6 +164,7 @@
   const handleWin=()=>{
     const modal=document.querySelector('#winModal');
     if(!modal||modal.classList.contains('hidden')){clearCard();return}
+    if(document.querySelector('#difficultyNudgeCard')&&modal.classList.contains('difficulty-nudge-active'))return;
     followAcceptedProgress();
     const candidate=evaluate();
     if(candidate)render(candidate);else clearCard();
