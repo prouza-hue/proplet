@@ -63,10 +63,10 @@
   };
 
   const loadReleaseNotes=()=>{
-    if(!document.querySelector('link[data-proplet-release-notes-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/release-notes.css?v=1';css.dataset.propletReleaseNotesCss='1';document.head.appendChild(css)}
+    if(!document.querySelector('link[data-proplet-release-notes-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/release-notes.css?v=2';css.dataset.propletReleaseNotesCss='1';document.head.appendChild(css)}
     if(document.querySelector('script[data-proplet-release-notes]'))return;
     const script=document.createElement('script');
-    script.src='/release-notes.js?v=1';
+    script.src='/release-notes.js?v=2';
     script.dataset.propletReleaseNotes='1';
     document.body.appendChild(script);
   };
