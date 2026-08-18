@@ -37,6 +37,12 @@
   rankingCss.href='/ranking-polish.css?v=5';
   document.head.appendChild(rankingCss);
 
+  const onboardingFitCss=document.createElement('link');
+  onboardingFitCss.rel='stylesheet';
+  onboardingFitCss.href='/onboarding-fit.css?v=1';
+  onboardingFitCss.dataset.propletOnboardingFitCss='1';
+  document.head.appendChild(onboardingFitCss);
+
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
