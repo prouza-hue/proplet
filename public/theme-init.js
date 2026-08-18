@@ -86,7 +86,7 @@
   const loadGameLayout=()=>{
     if(document.querySelector('script[data-proplet-game-layout]'))return;
     const script=document.createElement('script');
-    script.src='/game-layout-v3323.js?v=1';
+    script.src='/game-layout-v3323.js?v=2';
     script.dataset.propletGameLayout='1';
     document.body.appendChild(script);
   };
