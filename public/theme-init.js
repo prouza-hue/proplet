@@ -55,10 +55,16 @@
   difficultyNudgeCss.dataset.propletDifficultyNudgeCss='1';
   document.head.appendChild(difficultyNudgeCss);
 
+  const winActionsCss=document.createElement('link');
+  winActionsCss.rel='stylesheet';
+  winActionsCss.href='/win-actions-v3324.css?v=1';
+  winActionsCss.dataset.propletWinActionsCss='1';
+  document.head.appendChild(winActionsCss);
+
   const loadVersion=()=>{
     if(document.querySelector('script[data-proplet-version]'))return;
     const script=document.createElement('script');
-    script.src='/version.js?v=1';
+    script.src='/version.js?v=2';
     script.dataset.propletVersion='1';
     document.body.appendChild(script);
   };
