@@ -4,6 +4,8 @@
   const FAST_REQUIRED=4;
   const RESHOW_AFTER=10;
   const MAX_DECLINES=2;
+  const ESTABLISHED_TARGET_COMPLETIONS=3;
+  const DIFFICULTY_ORDER=['easy','medium','hard','hardcore'];
   const RULES={
     easy:{target:'medium',thresholdMs:45000},
     medium:{target:'hard',thresholdMs:75000},
@@ -41,7 +43,13 @@
         .sort((a,b)=>String(a.completedAt).localeCompare(String(b.completedAt)));
     }catch{return []}
   };
-  const hasCompleted=diff=>recordsFor(diff).length>0;
+  const higherDifficultyAlreadyEstablished=target=>{
+    const targetRecords=recordsFor(target);
+    if(targetRecords.length>=ESTABLISHED_TARGET_COMPLETIONS)return true;
+    const targetIndex=DIFFICULTY_ORDER.indexOf(target);
+    if(targetIndex<0)return false;
+    return DIFFICULTY_ORDER.slice(targetIndex+1).some(diff=>recordsFor(diff).length>0);
+  };
 
   const previewOverride=()=>{
     try{
@@ -60,7 +68,7 @@
     const rule=RULES[source];
     if(!rule)return null;
     if(!forced&&(!g.justCompleted||g.isReplay))return null;
-    if(!forced&&hasCompleted(rule.target))return null;
+    if(!forced&&higherDifficultyAlreadyEstablished(rule.target))return null;
 
     const records=recordsFor(source),count=records.length,state=readState(),entry=state[source]||{};
     if(!forced){
