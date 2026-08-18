@@ -1,11 +1,25 @@
 (()=>{
-  const RELEASE_ID='3.31.9';
+  const RELEASE_ID='3.32.3';
+  const LEGACY_EQUIVALENT_RELEASE_IDS=['3.31.9'];
   const SEEN_PREFIX='proplet-release-notes-seen';
   let shown=false;
 
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const profileIdentity=p=>p?.playerId||p?.player_id||p?.id||p?.name||p?.displayName||'signed-in';
-  const seenKey=p=>`${SEEN_PREFIX}:${RELEASE_ID}:${encodeURIComponent(String(profileIdentity(p)))}`;
+  const seenKeyFor=(p,releaseId)=>`${SEEN_PREFIX}:${releaseId}:${encodeURIComponent(String(profileIdentity(p)))}`;
+  const seenKey=p=>seenKeyFor(p,RELEASE_ID);
+  const alreadySeen=p=>{
+    try{
+      if(localStorage.getItem(seenKey(p))==='1')return true;
+      for(const legacyId of LEGACY_EQUIVALENT_RELEASE_IDS){
+        if(localStorage.getItem(seenKeyFor(p,legacyId))==='1'){
+          localStorage.setItem(seenKey(p),'1');
+          return true;
+        }
+      }
+    }catch{}
+    return false;
+  };
 
   function canShow(){
     if(shown||document.querySelector('.release-notes-backdrop'))return false;
@@ -14,7 +28,7 @@
     try{
       const p=typeof getProfile==='function'?getProfile():null;
       if(!p?.token)return false;
-      if(localStorage.getItem(seenKey(p))==='1')return false;
+      if(alreadySeen(p))return false;
       return p;
     }catch{return false}
   }
