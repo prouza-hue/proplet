@@ -25,12 +25,8 @@
     const viewportLandscape=w>h;
     const screenDelta=Math.abs(sw-sh)/Math.max(sw,sh);
 
-    /* Fold-safe rule: if the stable SCREEN dimensions and the current viewport agree,
-       trust that geometry before Orientation API. This fixes Samsung Fold inner-display cases
-       where screen.orientation can report the natural orientation rather than the visible one.
-       Browser chrome cannot create a false switch here: it can change viewport height, but not
-       screen.width/screen.height; a portrait Fold with a short Chrome viewport therefore disagrees
-       and falls through to the Orientation API instead of being misclassified as landscape. */
+    /* Fold-safe rule: if stable screen geometry and the viewport agree, trust that before
+       Orientation API. Browser chrome can change viewport height, but not screen geometry. */
     if(screenDelta>=0.035&&screenLandscape===viewportLandscape)return screenLandscape;
 
     try{
@@ -39,7 +35,6 @@
       if(type.startsWith('portrait'))return false;
     }catch{}
 
-    /* Last resort for browsers without usable Screen Orientation metadata. */
     if(screenDelta>=0.035)return screenLandscape;
     return viewportLandscape;
   };
@@ -51,14 +46,11 @@
     const viewLong=Math.max(w,h);
     const viewRatio=viewLong/Math.max(1,viewShort);
 
-    /* A near-square, reasonably large viewport is the characteristic inner Fold shape.
-       It wins over stale/surprising screen metrics so Chrome UI cannot turn an unfolded Fold
-       back into a "phone" simply by reducing available height. */
-    const unfoldedLike=viewLong>=700&&viewShort>=480&&viewRatio<1.55;
+    /* Samsung Fold inner displays are near-square and can be only ~680 CSS px wide depending
+       on display scaling. Recognize that shape before applying phone thresholds. */
+    const unfoldedLike=viewLong>=600&&viewShort>=480&&viewRatio<1.55;
     if(unfoldedLike)return false;
 
-    /* Primary signal: current physical display is phone-sized.
-       Conservative fallback catches a cover display when screen metrics lag a fold transition. */
     return screenShort<600||(viewShort<=560&&viewRatio>=1.6);
   };
 
@@ -129,10 +121,9 @@
       pausedByGuard=false;
     }
 
-    /* Once physical orientation/device class is known, WIDTH selects the Fold/tablet rail.
-       The coarse-pointer gate keeps desktop untouched; browser chrome changing HEIGHT cannot
-       flip the structure by itself. */
-    const tabletLandscape=playing&&landscape&&!phone&&coarsePointer()&&d.w>=700&&d.w<=1280;
+    /* 600px is deliberate: Fold 7 inner landscape can land around 680 CSS px under Samsung
+       display scaling. Phone cover landscape is already excluded above by phoneLike(). */
+    const tabletLandscape=playing&&landscape&&!phone&&coarsePointer()&&d.w>=600&&d.w<=1280;
     document.body.classList.toggle(TABLET_CLASS,tabletLandscape);
     if(tabletLandscape)moveCurrentWordToRail();else restoreCurrentWord();
     setDebugMode(tabletLandscape?'tablet-landscape':playing?'standard':'inactive',d,landscape,phone);
