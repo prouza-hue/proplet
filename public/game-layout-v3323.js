@@ -37,9 +37,15 @@
     const viewShort=Math.min(w,h);
     const viewLong=Math.max(w,h);
     const viewRatio=viewLong/Math.max(1,viewShort);
+
+    /* A near-square, reasonably large viewport is the characteristic inner Fold shape.
+       It wins over stale/surprising screen metrics so Chrome UI cannot turn an unfolded Fold
+       back into a "phone" simply by reducing available height. */
+    const unfoldedLike=viewLong>=700&&viewShort>=480&&viewRatio<1.55;
+    if(unfoldedLike)return false;
+
     /* Primary signal: current physical display is phone-sized.
-       Fallback catches cover-display landscape if a foldable browser reports stale screen metrics.
-       The aspect-ratio guard deliberately excludes the near-square inner Fold display. */
+       Conservative fallback catches a cover display when screen metrics lag a fold transition. */
     return screenShort<600||(viewShort<=560&&viewRatio>=1.6);
   };
 
@@ -101,8 +107,8 @@
       pausedByGuard=false;
     }
 
-    /* This is intentionally width-only once physical orientation/device class is known.
-       Unlike v3.21/v3.22, browser chrome changing only viewport HEIGHT cannot flip the structure. */
+    /* Once physical orientation/device class is known, only WIDTH selects the compact-tablet rail.
+       Browser chrome changing viewport height therefore cannot flip the structure by itself. */
     const tabletLandscape=playing&&landscape&&!phone&&d.w>=700&&d.w<1000;
     document.body.classList.toggle(TABLET_CLASS,tabletLandscape);
     if(tabletLandscape)moveCurrentWordToRail();else restoreCurrentWord();
