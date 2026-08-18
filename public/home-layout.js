@@ -19,9 +19,9 @@
     const brand=document.querySelector('.brand'),mark=brand?.querySelector('.brand-mark');
     if(!brand||!mark)return;
     brand.classList.add('home-brand');
-    if(!mark.dataset.homeMark){
-      mark.dataset.homeMark='1';
-      mark.innerHTML='<i>P</i><i>R</i><i>O</i><i>P</i>';
+    if(mark.dataset.homeMark){
+      mark.innerHTML='<span>P</span>';
+      delete mark.dataset.homeMark;
     }
   }
 
@@ -127,7 +127,7 @@
       card=document.createElement('section');
       card.id='homeCompetitionCard';
       card.className='card home-competition-card';
-      card.innerHTML=`<div class="home-competition-head"><div><span>XP A POŘADÍ</span><h2>Jak si vedeš</h2></div><button type="button" id="homeLeaderboardBtn">Celé pořadí <b>→</b></button></div><div id="homeCompetitionSelf" class="home-competition-self"></div><div id="homeCompetitionRows" class="home-competition-rows"><div class="home-ranking-loading">Načítám pořadí…</div></div>`;
+      card.innerHTML=`<div class="home-competition-head"><div><span>CELKOVÉ XP</span><h2>Jak si vedeš</h2></div><button type="button" id="homeLeaderboardBtn">Celkové pořadí <b>→</b></button></div><div id="homeCompetitionSelf" class="home-competition-self"></div><div id="homeCompetitionRows" class="home-competition-rows"><div class="home-ranking-loading">Načítám pořadí…</div></div>`;
       card.querySelector('#homeLeaderboardBtn').onclick=()=>nav('leaderboard');
     }
     if(quick.nextElementSibling!==card)quick.insertAdjacentElement('afterend',card);
