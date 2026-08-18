@@ -49,6 +49,12 @@
   gameLayoutCss.dataset.propletGameLayoutCss='1';
   document.head.appendChild(gameLayoutCss);
 
+  const difficultyNudgeCss=document.createElement('link');
+  difficultyNudgeCss.rel='stylesheet';
+  difficultyNudgeCss.href='/difficulty-nudge.css?v=2';
+  difficultyNudgeCss.dataset.propletDifficultyNudgeCss='1';
+  document.head.appendChild(difficultyNudgeCss);
+
   const loadVersion=()=>{
     if(document.querySelector('script[data-proplet-version]'))return;
     const script=document.createElement('script');
@@ -107,7 +113,15 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout();loadStarterCopyHotfix()};
+  const loadDifficultyNudge=()=>{
+    if(document.querySelector('script[data-proplet-difficulty-nudge]'))return;
+    const script=document.createElement('script');
+    script.src='/difficulty-nudge.js?v=2';
+    script.dataset.propletDifficultyNudge='1';
+    document.body.appendChild(script);
+  };
+
+  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout();loadStarterCopyHotfix();loadDifficultyNudge()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
