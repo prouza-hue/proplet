@@ -99,7 +99,15 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout()};
+  const loadStarterCopyHotfix=()=>{
+    if(document.querySelector('script[data-proplet-starter-copy-hotfix]'))return;
+    const script=document.createElement('script');
+    script.src='/starter-copy-hotfix.js?v=1';
+    script.dataset.propletStarterCopyHotfix='1';
+    document.body.appendChild(script);
+  };
+
+  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout();loadStarterCopyHotfix()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
