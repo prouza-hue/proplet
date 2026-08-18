@@ -2,3 +2,7 @@
 
 /* Keep rank progression legible on narrow phones: the rank name alone is too ambiguous. */
 @media(max-width:430px){.home-competition-self .home-xp-level small{display:block!important;margin-top:2px;font-size:8.7px;line-height:1.15;white-space:normal;overflow-wrap:anywhere}}
+
+/* Four-column Fold/tablet layout: give the difficulty name the whole title row and move XP below it. */
+@media(min-width:760px){.home-diff-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.home-diff-top{grid-template-columns:36px minmax(0,1fr)}.home-diff-top strong{overflow:visible;text-overflow:clip}.home-diff-xp{grid-column:1/-1;justify-self:start;margin-top:2px}}
+@media(min-width:560px) and (max-width:759px){.home-diff-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
