@@ -49,6 +49,14 @@
   gameLayoutCss.dataset.propletGameLayoutCss='1';
   document.head.appendChild(gameLayoutCss);
 
+  const loadVersion=()=>{
+    if(document.querySelector('script[data-proplet-version]'))return;
+    const script=document.createElement('script');
+    script.src='/version.js?v=1';
+    script.dataset.propletVersion='1';
+    document.body.appendChild(script);
+  };
+
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
@@ -78,7 +86,7 @@
     if(!document.querySelector('link[data-proplet-release-notes-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/release-notes.css?v=3';css.dataset.propletReleaseNotesCss='1';document.head.appendChild(css)}
     if(document.querySelector('script[data-proplet-release-notes]'))return;
     const script=document.createElement('script');
-    script.src='/release-notes.js?v=3';
+    script.src='/release-notes.js?v=4';
     script.dataset.propletReleaseNotes='1';
     document.body.appendChild(script);
   };
@@ -91,7 +99,7 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout()};
+  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
