@@ -107,9 +107,10 @@
       pausedByGuard=false;
     }
 
-    /* Once physical orientation/device class is known, only WIDTH selects the compact-tablet rail.
-       Browser chrome changing viewport height therefore cannot flip the structure by itself. */
-    const tabletLandscape=playing&&landscape&&!phone&&d.w>=700&&d.w<1000;
+    /* Once physical orientation/device class is known, WIDTH selects the Fold/tablet rail.
+       The coarse-pointer gate keeps desktop untouched; browser chrome changing HEIGHT cannot
+       flip the structure by itself. */
+    const tabletLandscape=playing&&landscape&&!phone&&coarsePointer()&&d.w>=700&&d.w<=1280;
     document.body.classList.toggle(TABLET_CLASS,tabletLandscape);
     if(tabletLandscape)moveCurrentWordToRail();else restoreCurrentWord();
     refit();
