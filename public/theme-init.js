@@ -29,7 +29,7 @@
 
   const brandCss=document.createElement('link');
   brandCss.rel='stylesheet';
-  brandCss.href='/today-brand.css?v=2';
+  brandCss.href='/today-brand.css?v=3';
   document.head.appendChild(brandCss);
 
   const rankingCss=document.createElement('link');
