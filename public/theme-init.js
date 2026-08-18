@@ -43,6 +43,12 @@
   onboardingFitCss.dataset.propletOnboardingFitCss='1';
   document.head.appendChild(onboardingFitCss);
 
+  const gameLayoutCss=document.createElement('link');
+  gameLayoutCss.rel='stylesheet';
+  gameLayoutCss.href='/game-layout-v3323.css?v=1';
+  gameLayoutCss.dataset.propletGameLayoutCss='1';
+  document.head.appendChild(gameLayoutCss);
+
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
@@ -77,7 +83,15 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes()};
+  const loadGameLayout=()=>{
+    if(document.querySelector('script[data-proplet-game-layout]'))return;
+    const script=document.createElement('script');
+    script.src='/game-layout-v3323.js?v=2';
+    script.dataset.propletGameLayout='1';
+    document.body.appendChild(script);
+  };
+
+  const loadExtras=()=>{loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes();loadGameLayout()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
