@@ -11,17 +11,6 @@
     try{return !!window.matchMedia?.('(pointer: coarse)')?.matches||navigator.maxTouchPoints>0}catch{return navigator.maxTouchPoints>0}
   };
 
-  const physicalLandscape=()=>{
-    try{
-      const type=screen.orientation?.type||'';
-      if(type.startsWith('landscape'))return true;
-      if(type.startsWith('portrait'))return false;
-    }catch{}
-    const sw=Number(screen.width)||window.innerWidth;
-    const sh=Number(screen.height)||window.innerHeight;
-    return sw>sh;
-  };
-
   const dimensions=()=>{
     const vv=window.visualViewport;
     const w=Math.max(1,Math.round(vv?.width||window.innerWidth||document.documentElement.clientWidth||1));
@@ -29,6 +18,30 @@
     const sw=Math.max(1,Math.round(Number(screen.width)||w));
     const sh=Math.max(1,Math.round(Number(screen.height)||h));
     return {w,h,sw,sh};
+  };
+
+  const physicalLandscape=({w,h,sw,sh})=>{
+    const screenLandscape=sw>sh;
+    const viewportLandscape=w>h;
+    const screenDelta=Math.abs(sw-sh)/Math.max(sw,sh);
+
+    /* Fold-safe rule: if the stable SCREEN dimensions and the current viewport agree,
+       trust that geometry before Orientation API. This fixes Samsung Fold inner-display cases
+       where screen.orientation can report the natural orientation rather than the visible one.
+       Browser chrome cannot create a false switch here: it can change viewport height, but not
+       screen.width/screen.height; a portrait Fold with a short Chrome viewport therefore disagrees
+       and falls through to the Orientation API instead of being misclassified as landscape. */
+    if(screenDelta>=0.035&&screenLandscape===viewportLandscape)return screenLandscape;
+
+    try{
+      const type=screen.orientation?.type||'';
+      if(type.startsWith('landscape'))return true;
+      if(type.startsWith('portrait'))return false;
+    }catch{}
+
+    /* Last resort for browsers without usable Screen Orientation metadata. */
+    if(screenDelta>=0.035)return screenLandscape;
+    return viewportLandscape;
   };
 
   const phoneLike=({w,h,sw,sh})=>{
@@ -81,18 +94,27 @@
     try{if(typeof drawPaths==='function')drawPaths()}catch{}
   });
 
+  const setDebugMode=(mode,d,landscape,phone)=>{
+    const root=document.documentElement;
+    root.dataset.gameLayoutMode=mode;
+    root.dataset.gameLayoutOrientation=landscape?'landscape':'portrait';
+    root.dataset.gameLayoutDevice=phone?'phone':'large-touch';
+    root.dataset.gameLayoutMetrics=`${d.w}x${d.h}|${d.sw}x${d.sh}`;
+  };
+
   const apply=()=>{
     raf=0;
     ensureNodes();
     const playing=document.body.classList.contains('playing');
     const d=dimensions();
-    const landscape=physicalLandscape();
+    const landscape=physicalLandscape(d);
     const phone=phoneLike(d);
     const blocked=playing&&landscape&&phone;
 
     document.body.classList.toggle(PHONE_CLASS,blocked);
 
     if(blocked){
+      setDebugMode('phone-landscape-blocked',d,landscape,phone);
       document.body.classList.remove(TABLET_CLASS);
       restoreCurrentWord();
       if(!pausedByGuard){
@@ -113,6 +135,7 @@
     const tabletLandscape=playing&&landscape&&!phone&&coarsePointer()&&d.w>=700&&d.w<=1280;
     document.body.classList.toggle(TABLET_CLASS,tabletLandscape);
     if(tabletLandscape)moveCurrentWordToRail();else restoreCurrentWord();
+    setDebugMode(tabletLandscape?'tablet-landscape':playing?'standard':'inactive',d,landscape,phone);
     refit();
   };
 
