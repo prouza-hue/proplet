@@ -149,7 +149,7 @@
     card.setAttribute('aria-label','Doporučení obtížnosti');
     card.innerHTML=`
       <div class="difficulty-nudge-kicker">🔥 ČAS PŘITVRDIT?</div>
-      <h3>Tohle ti jde nějak podezřele snadno. 😏</h3>
+      <h3>To je pořádná jízda!</h3>
       <p><strong>${candidate.fast} z posledních ${WINDOW_SIZE}</strong> her na obtížnosti <strong>${sourceLabel}</strong> bylo hotových do <strong>${thresholdLabel(candidate.thresholdMs)}</strong> bez nápovědy. ${target.sentence}</p>
       <button type="button" class="difficulty-nudge-accept">${target.cta}</button>
       <button type="button" class="difficulty-nudge-decline">${DECLINE_COPY[candidate.source]||`Ještě jednu ${sourceLabel}`}</button>`;
