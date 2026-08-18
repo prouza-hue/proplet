@@ -24,8 +24,13 @@
 
   const css=document.createElement('link');
   css.rel='stylesheet';
-  css.href='/home-layout.css?v=8';
+  css.href='/home-layout.css?v=9';
   document.head.appendChild(css);
+
+  const brandCss=document.createElement('link');
+  brandCss.rel='stylesheet';
+  brandCss.href='/today-brand.css?v=4';
+  document.head.appendChild(brandCss);
 
   const rankingCss=document.createElement('link');
   rankingCss.rel='stylesheet';
@@ -35,7 +40,7 @@
   const loadHomeLayout=()=>{
     if(document.querySelector('script[data-proplet-home-layout]'))return;
     const script=document.createElement('script');
-    script.src='/home-layout.js?v=8';
+    script.src='/home-layout.js?v=10';
     script.dataset.propletHomeLayout='1';
     document.body.appendChild(script);
   };
@@ -57,7 +62,16 @@
     document.body.appendChild(script);
   };
 
-  const loadExtras=()=>{loadHomeLayout();loadRankingPolish();loadAccountAuth()};
+  const loadReleaseNotes=()=>{
+    if(!document.querySelector('link[data-proplet-release-notes-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/release-notes.css?v=3';css.dataset.propletReleaseNotesCss='1';document.head.appendChild(css)}
+    if(document.querySelector('script[data-proplet-release-notes]'))return;
+    const script=document.createElement('script');
+    script.src='/release-notes.js?v=3';
+    script.dataset.propletReleaseNotes='1';
+    document.body.appendChild(script);
+  };
+
+  const loadExtras=()=>{loadHomeLayout();loadRankingPolish();loadAccountAuth();loadReleaseNotes()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
