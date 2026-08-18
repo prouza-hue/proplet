@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.32.4-difficulty-nudge-r1';
+const CACHE='proplet-v3.32.4-difficulty-nudge-r2';
 const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/version.js','/home-layout.css','/home-layout.js','/ranking-polish.css','/ranking-polish.js','/account-auth.css','/account-auth.js','/google-g.svg','/today-brand.css','/onboarding-fit.css','/game-layout-v3323.css','/game-layout-v3323.js','/difficulty-nudge.css','/difficulty-nudge.js','/release-notes.css','/release-notes.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/difficulty/easy.svg','/difficulty/medium.svg','/difficulty/hard.svg','/difficulty/hardcore.svg','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{
