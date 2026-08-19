@@ -81,6 +81,7 @@
     loadScript('/valid-word-feedback-v3328.js?v=2','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
+    loadScript('/account-team-v33210.js?v=1','propletAccountTeamIntegrity');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
