@@ -8,11 +8,13 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const META=Object.freeze({
-    version:'3.32.10',
+    version:'3.33.0',
     canonicalOrigin,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
       tabletLandscapeReflow:true,
+      desktopWideLayout:true,
+      desktopGameRail:true,
       embeddedBrowserGestureGuard:true,
       canonicalPushOrigin:true,
       legacyOriginSessionPreservation:true,
@@ -21,6 +23,8 @@
       actionFirstOnboarding:true,
       contextualHelperDefault:true,
       validNonSolutionFailsafe:true,
+      recognitionLexiconV2:true,
+      remoteRecognitionFallback:true,
       pushDeliveryAudit:true,
       pushSelfTest:true,
       iosPwaPushGuidance:true,
@@ -40,9 +44,6 @@
       legacyOriginSession=!!(stored?.id&&stored?.token);
     }catch{}
     if(legacyOriginSession){
-      // v3.32.5 redirected authenticated players before their origin-scoped localStorage could
-      // follow them. Keep existing legacy-origin sessions alive until we ship an explicit,
-      // lossless account migration. New/anonymous traffic still converges on hrajproplet.cz.
       window.PROPLET_LEGACY_ORIGIN_SESSION=true;
     }else{
       const target=new URL(location.href);
