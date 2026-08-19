@@ -9,6 +9,8 @@ create table if not exists public.account_rewards (
   constraint account_rewards_player_reward_key_unique unique (player_id, reward_key)
 );
 
+alter table public.account_rewards enable row level security;
+
 create index if not exists account_rewards_player_id_idx
   on public.account_rewards(player_id);
 
