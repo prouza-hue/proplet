@@ -33,7 +33,8 @@
     ['/win-actions-v3324.css?v=1','propletWinActionsCss'],
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
     ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
-    ['/push-retention-v3329.css?v=1','propletPushRetentionCss']
+    ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
+    ['/desktop-layout-v3330.css?v=1','propletDesktopLayoutCss']
   ];
 
   const loadStyle=(href,key)=>{
@@ -73,12 +74,12 @@
     }
     loadScript('/auth-recovery-guard-v3326.js?v=1','propletAuthRecoveryGuard');
     loadScript('/account-auth.js?v=5','propletAccountAuth');
-    loadScript('/game-layout-v3323.js?v=2','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=1','propletGameLayout');
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
     loadScript('/onboarding-model-v3328.js?v=3','propletOnboardingModel');
     loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
-    loadScript('/valid-word-feedback-v3328.js?v=2','propletValidWordFeedback');
+    loadScript('/valid-word-feedback-v3330.js?v=1','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=1','propletAccountTeamIntegrity');
