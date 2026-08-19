@@ -6,3 +6,6 @@ uvicorn[standard]==0.48.0
 pydantic==2.13.4
 httpx==0.28.1
 pywebpush==2.3.0
+# v3.33.0 recognition hotfix: broad Czech frequency evidence, used only after
+# the strict/static recognition sources miss. Generation Lexicon V2 is unchanged.
+wordfreq==3.1.1
