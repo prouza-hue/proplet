@@ -68,7 +68,8 @@
     if(!document.querySelector('link[data-proplet-account-auth-css]')){
       const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
     }
-    loadScript('/account-auth.js?v=4','propletAccountAuth');
+    loadScript('/auth-recovery-guard-v3326.js?v=1','propletAuthRecoveryGuard');
+    loadScript('/account-auth.js?v=5','propletAccountAuth');
     loadScript('/game-layout-v3323.js?v=2','propletGameLayout');
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
