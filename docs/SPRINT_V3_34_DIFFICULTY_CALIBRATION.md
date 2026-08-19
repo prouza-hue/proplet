@@ -140,6 +140,38 @@ Z ní vybrat reprezentativní blind-playtest s product ownerem. Až po odsouhlas
 5. preview,
 6. production release.
 
+## Aktuální kalibrační stav — V2 balanced
+
+První independent-path prototyp prokázal, že lze odstranit strukturální handoff mezi koncem jednoho slova a začátkem dalšího při zachování target-path uniqueness i broad exact-cover uniqueness. V1 ale přestřelila křivost Střední, proto není kandidátem k hráčskému testu.
+
+V2 (`tools/generate_v334_calibration_v2.py`) je záměrně vyváženější a generuje 10 Středních + 10 Těžkých pouze jako preview fixture. Produkční `data/puzzles.json` se nemění.
+
+Srovnání prvních levelů:
+
+| Profil | mean turns / word | <=1 turn | longest straight share | endpoint → other start |
+|---|---:|---:|---:|---:|
+| Gen3 Střední | 1.16 | 0.59 | 0.74 | 0.89 |
+| Gen4 V2 Střední | 2.69 | 0.28 | 0.42 | 0.00 |
+| Gen3 Těžká | 2.17 | 0.38 | 0.59 | 0.92 |
+| Gen4 V2 Těžká | 3.81 | 0.07 | 0.28 | 0.00 |
+
+Tato čísla nejsou důkaz cílového času. V2 proto musí projít blind browser playtestem; čas a subjektivní pocit mají přednost před dalším laděním geometry score od stolu.
+
+Pro tento účel existuje izolovaná stránka `/calibration-v334.html`:
+- deska je před startem zakrytá;
+- stopky začnou až po explicitním startu;
+- výsledky jsou pouze v `sessionStorage` preview originu;
+- stránka neposílá XP, leaderboard ani produkční analytics;
+- fixture je deterministická a označená jako calibration-only;
+- produkční banky ani hráčský progres se playtestem nemění.
+
+Kalibrační cíle zůstávají:
+- raná Střední přibližně 55–90 s;
+- raná Těžká střed kolem ~120 s, přirozeně cca 90–150 s;
+- subjektivní pocit musí být Střední < Těžká << Mozkožrout.
+
+Lexikální review script současně potvrzuje výslovné kandidáty a jejich současnou expozici: BLOCKCHAIN Tier D aktivně 7×, PULSAR Tier C 2×, TENSOR Tier D 0× a ČERVODÍRA Tier D 7× + 1× v rezervě. Žádný z nich se nemaže automaticky.
+
 ## Release notes / modal v3.34.0
 
 Difficulty redesign je dost velká změna na vlastní krátké release sdělení. V3.34 nahradí starý release modal aktuálním.
