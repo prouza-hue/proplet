@@ -30,7 +30,8 @@
     ['/game-layout-v3323.css?v=1','propletGameLayoutCss'],
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/win-actions-v3324.css?v=1','propletWinActionsCss'],
-    ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss']
+    ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
+    ['/copy-density-v3327.css?v=1','propletCopyDensityCss']
   ];
 
   const loadStyle=(href,key)=>{
@@ -74,6 +75,7 @@
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
     loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
+    loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
