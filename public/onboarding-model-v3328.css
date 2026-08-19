@@ -1,9 +1,21 @@
-.onboard-principle{max-width:560px;margin:0 auto;text-align:left}
-.onboard-principle h2{margin-bottom:10px}
-.onboard-principle-highlight{display:grid;gap:6px;margin:18px 0;padding:16px 17px;border:1px solid color-mix(in srgb,var(--accent,#6c5ce7) 24%,transparent);border-radius:18px;background:color-mix(in srgb,var(--accent,#6c5ce7) 8%,transparent)}
-.onboard-principle-highlight strong{font-size:1.02rem;line-height:1.35}
-.onboard-principle-highlight span{color:var(--muted,#6f6b78);line-height:1.4}
-.onboard-principle-finish{margin:0;font-weight:700;line-height:1.4}
+.onboard-principle{max-width:540px;margin:0 auto;text-align:center}
+.onboard-principle .eyebrow{display:inline-block;margin-bottom:6px}
+.onboard-principle h2{margin:0 0 16px;font-size:clamp(1.55rem,6vw,2rem);line-height:1.12}
+.principle-visual{display:grid;grid-template-columns:auto 30px auto;align-items:center;justify-content:center;gap:10px;margin:4px auto 18px}
+.principle-decoy{display:grid;gap:2px;min-width:88px;padding:10px 12px;border:1px dashed color-mix(in srgb,var(--muted,#6f6b78) 45%,transparent);border-radius:14px;background:color-mix(in srgb,var(--muted,#6f6b78) 6%,transparent);transform:rotate(-2deg);animation:principle-decoy-in .35s ease-out both}
+.principle-decoy strong{font-size:1.08rem;letter-spacing:.05em}
+.principle-decoy small,.principle-solved>small{color:var(--muted,#6f6b78);font-size:.72rem;line-height:1.15}
+.principle-not-equal{font-size:1.55rem;font-weight:900;opacity:.48}
+.principle-solved{display:grid;gap:6px;justify-items:center}
+.mini-solved-board{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;width:132px;padding:6px;border-radius:15px;background:color-mix(in srgb,var(--accent,#6c5ce7) 7%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent,#6c5ce7) 14%,transparent)}
+.mini-word{display:grid;place-items:center;aspect-ratio:1;border-radius:7px;font-size:.76rem;font-weight:900;background:color-mix(in srgb,var(--accent,#6c5ce7) 14%,transparent);transform:scale(.72);opacity:0;animation:principle-tile-in .28s ease-out forwards}
+.mini-word-a{animation-delay:.10s}.mini-word-b{animation-delay:.20s}.mini-word-c{animation-delay:.30s}.mini-word-d{animation-delay:.40s}
+.principle-copy{max-width:430px;margin:0 auto;font-size:1rem;line-height:1.48;color:var(--muted,#6f6b78)}
+.principle-copy strong{color:inherit;font-weight:800}
 .onboard-action-first .tutorial-wrap{margin-top:14px}
 .valid-word-failsafe-card{max-width:520px;text-align:center}
 .valid-word-failsafe-card .valid-word-rule{display:block;margin:14px 0 18px;padding:14px 16px;border-radius:16px;background:color-mix(in srgb,var(--accent,#6c5ce7) 8%,transparent);font-weight:700;line-height:1.4}
+@keyframes principle-decoy-in{from{opacity:0;transform:translateY(5px) rotate(-2deg)}to{opacity:1;transform:translateY(0) rotate(-2deg)}}
+@keyframes principle-tile-in{to{opacity:1;transform:scale(1)}}
+@media(max-width:420px){.principle-visual{grid-template-columns:auto 24px auto;gap:7px}.principle-decoy{min-width:78px;padding:9px 10px}.mini-solved-board{width:120px}.principle-copy{font-size:.96rem}}
+@media(prefers-reduced-motion:reduce){.principle-decoy,.mini-word{animation:none;opacity:1;transform:none}}
