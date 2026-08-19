@@ -8,7 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const META=Object.freeze({
-    version:'3.33.0',
+    version:'3.33.1',
     canonicalOrigin,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
@@ -31,7 +31,10 @@
       accountCreateRaceGuard:true,
       dedupeAwareLogin:true,
       canonicalAccountMetrics:true,
-      teamLeagueOptOutDefault:true
+      teamLeagueOptOutDefault:true,
+      competitiveLevelSharing:true,
+      sharedLevelDeepLinks:true,
+      sharedChallengeReturnToProgress:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
