@@ -46,8 +46,8 @@
         <div class="release-notes-v3331-hero-copy">
           <span>500 XP BONUS</span>
           <h3>${signedIn?'Máš od nás +500 XP':'500 XP je tvoje'}</h3>
-          <p>${signedIn?'Za to, že máš Proplet účet. Díky, že hraješ. 💜':'Vytvoř si účet, zachovej si postup a jako bonus dostaneš <strong>+500 XP</strong>.'}</p>
-          ${signedIn?'<div class="release-notes-v3331-earned">✓ Připsáno k tvému postupu</div>':'<button type="button" class="release-notes-v3331-account">Vytvořit účet · +500 XP</button>'}
+          <p>${signedIn?'Za to, že máš Proplet účet. Díky, že hraješ. 💜':'<strong>Nepřijdi o svoje výsledky.</strong> Účet založíš za pár vteřin, uložíš si celý postup a dostaneš <strong>+500 XP</strong>.'}</p>
+          ${signedIn?'<div class="release-notes-v3331-earned">✓ Připsáno k tvému postupu</div>':'<button type="button" class="release-notes-v3331-account">Založit účet · +500 XP</button>'}
         </div>
       </div>
       <div class="release-notes-v3331-features">
