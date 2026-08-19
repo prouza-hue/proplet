@@ -1,0 +1,139 @@
+/* v3.33.0 — Laptop / desktop presentation.
+   Phone and Fold/tablet rules stay untouched; this layer only activates on genuinely wide viewports. */
+
+@media (min-width:1000px) and (min-height:650px){
+  body:not(.playing) .app-shell{width:min(100%,980px);padding:24px 28px 88px}
+  body:not(.playing) .app-header{margin-bottom:22px}
+  body:not(.playing) .brand-mark{width:50px;height:50px;border-radius:16px;font-size:25px}
+  body:not(.playing) .brand-copy strong{font-size:24px}
+  body:not(.playing) .brand-copy small{font-size:11px;margin-top:5px}
+  body:not(.playing) .profile-chip{padding:8px 14px 8px 8px;font-size:14px;gap:9px}
+  body:not(.playing) .avatar-dot{width:32px;height:32px;font-size:17px}
+
+  body:not(.playing) .screen-title{margin:10px 4px 24px}
+  body:not(.playing) .screen-title h1{font-size:42px;line-height:1.02}
+  body:not(.playing) .screen-title p{font-size:15px;line-height:1.45}
+  body:not(.playing) .eyebrow,body:not(.playing) .stat-label{font-size:11px}
+  body:not(.playing) .card{border-radius:26px}
+  body:not(.playing) .primary-btn.big{min-height:56px;font-size:16px}
+  body:not(.playing) .secondary-btn{font-size:14px;padding:11px 15px}
+
+  /* Dnes already has its own IA. On desktop it becomes comfortably readable instead of simply
+     floating as a 640px mobile column. */
+  .app-shell:has(#screen-daily.active.home-layout-active){width:min(100%,980px)}
+  #screen-daily.home-layout-active .daily-hero{padding:23px 25px;border-radius:27px}
+  #screen-daily.home-layout-active .hero-main h1{font-size:38px;margin-bottom:7px}
+  #screen-daily.home-layout-active .daily-inline-date,
+  #screen-daily.home-layout-active .daily-title-meta .hero-muted{font-size:14px}
+  #screen-daily.home-layout-active .daily-week-rhythm{padding:10px 12px;margin:11px 0 14px}
+  #screen-daily.home-layout-active .daily-week-day{min-height:34px}
+  #screen-daily.home-layout-active .daily-week-day b{font-size:10.5px}
+  #screen-daily.home-layout-active .daily-week-day i{font-size:13px}
+  #screen-daily.home-layout-active .hero-btn{min-height:55px;font-size:16px}
+  #screen-daily.home-layout-active .quick-play-head h2{font-size:24px}
+  #screen-daily.home-layout-active .quick-all-btn{font-size:13px}
+  .home-diff-grid{gap:12px}
+  .home-diff-tile{padding:14px;border-radius:19px}
+  .home-diff-top{grid-template-columns:44px minmax(0,1fr) auto;gap:10px}
+  .home-diff-icon-wrap{width:44px;height:44px;border-radius:14px}
+  .home-diff-icon{width:33px;height:33px}
+  .home-diff-top strong{font-size:15px}
+  .home-diff-xp{font-size:10.5px;padding:5px 7px}
+  .home-diff-meta{font-size:12px;margin-top:10px}
+  .home-diff-progress{height:6px;margin-top:8px}
+  .home-competition-card{padding:18px;border-radius:24px}
+  .home-competition-head h2{font-size:24px}
+  .home-competition-head>div>span,.home-competition-head button{font-size:12px}
+  .home-competition-self{gap:9px;margin-top:14px}
+  .home-competition-self>div{padding:11px;border-radius:15px}
+  .home-xp-level>span{width:38px;height:38px;flex-basis:38px;font-size:21px}
+  .home-xp-level b{font-size:13px}.home-xp-level small{font-size:10.5px}
+  .home-xp-number strong,.home-xp-place strong,.home-xp-streak strong{font-size:18px}
+  .home-xp-number span,.home-xp-place span,.home-xp-streak span{font-size:10.5px}
+  .home-ranking-row{padding:9px 11px;grid-template-columns:28px 36px minmax(0,1fr) auto}
+  .home-ranking-avatar{width:36px;height:36px;font-size:20px}
+  .home-ranking-row>strong,.home-ranking-row>b{font-size:13px}
+
+  /* Volná hra benefits from the width instead of stretching one enormous card at a time. */
+  #screen-free .difficulty-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  #screen-free .difficulty-card{padding:22px 23px;border-radius:25px}
+  #screen-free .difficulty-card h2{font-size:28px}
+  #screen-free .difficulty-card p{font-size:14px;line-height:1.45}
+  #screen-free .difficulty-icon{font-size:42px}
+  #screen-free .difficulty-card .secondary-btn{min-height:46px;font-size:14px}
+  #screen-free .xp-chip{font-size:11px;padding:5px 8px}
+
+  /* Rankings / profile stay reading-oriented single columns, just no longer phone-sized. */
+  #screen-leaderboard .ranking-section,
+  #screen-leaderboard .ranking-team-card,
+  #screen-profile .profile-card,
+  #screen-profile .level-roadmap-card,
+  #screen-profile .achievement-card,
+  #screen-profile .badge-card,
+  #screen-profile .settings-card{padding:20px 22px}
+  #screen-leaderboard .ranking-section h2,#screen-profile .section-head h2{font-size:24px}
+  #screen-leaderboard .leader-row{grid-template-columns:54px minmax(0,1fr) auto;padding:14px 16px;border-radius:20px}
+  #screen-leaderboard .leader-rank{font-size:23px}
+  #screen-leaderboard .leader-name strong,#screen-leaderboard .leader-score strong{font-size:14px}
+  #screen-leaderboard .leader-name small,#screen-leaderboard .leader-score small{font-size:12px}
+  #screen-profile .profile-name{font-size:32px}
+  #screen-profile .profile-family{font-size:13px}
+  #screen-profile .profile-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  #screen-profile .profile-stat{padding:13px 14px}
+  #screen-profile .profile-stat strong{font-size:23px}
+  #screen-profile .settings-row{gap:10px}
+  #screen-profile .setting-toggle{min-height:48px;font-size:14px}
+}
+
+/* The game gets a true desktop rail. Moving "Skládáš" out of the board column gives the board
+   more vertical room, while the rail is large enough to read from normal monitor distance. */
+@media (min-width:1000px) and (min-height:650px){
+  body.game-desktop-wide .app-shell{max-width:1280px;padding:10px 20px 13px}
+  body.game-desktop-wide .game-screen.active{gap:10px}
+  body.game-desktop-wide .game-top{min-height:48px;grid-template-columns:46px minmax(0,1fr) auto;gap:11px}
+  body.game-desktop-wide .game-top .icon-btn{width:46px;height:46px;border-radius:14px;font-size:24px}
+  body.game-desktop-wide .game-title strong{font-size:18px}
+  body.game-desktop-wide .game-title .eyebrow{font-size:10px}
+  body.game-desktop-wide .game-clock span{font-size:20px}
+  body.game-desktop-wide .game-clock small{font-size:11px}
+
+  body.game-desktop-wide .game-main{grid-template-columns:minmax(0,1fr) clamp(275px,23vw,320px);grid-template-rows:minmax(0,1fr);gap:16px}
+  body.game-desktop-wide .game-board-column{grid-template-rows:auto minmax(0,1fr);gap:9px;overflow:hidden}
+  body.game-desktop-wide.starter-mode .game-board-column{grid-template-rows:auto auto minmax(0,1fr)}
+  body.game-desktop-wide .game-board-column>.game-info{padding:8px 12px;border-radius:18px}
+  body.game-desktop-wide .word-status-wrap{gap:5px}
+  body.game-desktop-wide .word-status-row{grid-template-columns:74px minmax(0,1fr);gap:7px}
+  body.game-desktop-wide .word-status-row .stat-label{font-size:10px}
+  body.game-desktop-wide .found-row{padding-top:4px}
+  body.game-desktop-wide .found-word-chip,
+  body.game-desktop-wide .remaining-row .length-pill{min-height:26px;height:26px;padding:2px 7px;font-size:10px}
+  body.game-desktop-wide .game-progress{font-size:17px}
+  body.game-desktop-wide .game-board-column>.board-stage{padding:10px;border-radius:22px}
+  body.game-desktop-wide .board{gap:6px}
+  body.game-desktop-wide .cell{border-radius:13px;font-size:clamp(21px,2.35vw,34px)}
+  body.game-desktop-wide .board.dense-board{gap:5px}
+  body.game-desktop-wide .board.dense-board .cell{border-radius:11px;font-size:clamp(18px,2vw,30px)}
+  body.game-desktop-wide .board.ultra-board{gap:4px}
+  body.game-desktop-wide .board.ultra-board .cell{border-radius:9px;font-size:clamp(16px,1.75vw,26px)}
+
+  body.game-desktop-wide .game-control-column{height:100%;display:grid;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto auto;gap:10px;align-items:stretch;padding:0}
+  body.game-desktop-wide .game-control-column>.current-word{grid-column:1;grid-row:1;width:100%;min-width:0;min-height:84px;margin:0;padding:13px 15px;display:block;text-align:left;border-radius:20px}
+  body.game-desktop-wide .game-control-column>.current-word .stat-label{font-size:10px}
+  body.game-desktop-wide .game-control-column>.current-word strong{display:block;margin:5px 0 0;min-height:29px;font-size:28px;line-height:1.08;letter-spacing:.06em;white-space:normal;overflow-wrap:anywhere}
+  body.game-desktop-wide .game-control-column>.current-word .clean-status{display:inline-flex;margin:10px 0 0;font-size:10px}
+  body.game-desktop-wide .game-control-column>.game-message{grid-column:1;grid-row:2;min-height:0;padding:13px 9px;align-self:start;white-space:normal;font-size:14px;line-height:1.48;text-align:left}
+  body.game-desktop-wide .game-control-column>.starter-hint-nudge{grid-column:1;grid-row:3;margin:0}
+  body.game-desktop-wide .game-control-column>.game-actions{grid-column:1;grid-row:4;display:grid;grid-template-columns:1fr;gap:9px;align-self:end}
+  body.game-desktop-wide .game-control-column>.game-actions .secondary-btn{width:100%;min-height:50px;padding:10px 12px;font-size:14px;border-radius:15px}
+}
+
+@media (min-width:1500px) and (min-height:800px){
+  body:not(.playing) .app-shell,.app-shell:has(#screen-daily.active.home-layout-active){width:min(100%,1040px)}
+  body.game-desktop-wide .app-shell{max-width:1420px;padding-left:28px;padding-right:28px}
+  body.game-desktop-wide .game-main{grid-template-columns:minmax(0,1fr) 330px;gap:20px}
+  body.game-desktop-wide .game-control-column>.current-word strong{font-size:31px}
+  body.game-desktop-wide .game-control-column>.game-message{font-size:15px}
+}
+
+html[data-theme="dark"] body.game-desktop-wide .game-control-column>.current-word{background:linear-gradient(145deg,#262230,#211e2a);border-color:#433c50;box-shadow:0 5px 14px rgba(0,0,0,.24)}
+html[data-theme="dark"] body.game-desktop-wide .game-control-column>.current-word strong{color:#b9adff}
