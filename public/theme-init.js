@@ -34,7 +34,7 @@
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
     ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
-    ['/desktop-layout-v3330.css?v=1','propletDesktopLayoutCss']
+    ['/desktop-layout-v3330.css?v=2','propletDesktopLayoutCss']
   ];
 
   const loadStyle=(href,key)=>{
@@ -74,7 +74,7 @@
     }
     loadScript('/auth-recovery-guard-v3326.js?v=1','propletAuthRecoveryGuard');
     loadScript('/account-auth.js?v=5','propletAccountAuth');
-    loadScript('/game-layout-v3330.js?v=1','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=2','propletGameLayout');
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
     loadScript('/onboarding-model-v3328.js?v=3','propletOnboardingModel');
