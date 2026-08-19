@@ -27,6 +27,7 @@
     ['/today-brand.css?v=4','propletTodayBrandCss'],
     ['/ranking-polish.css?v=5','propletRankingPolishCss'],
     ['/onboarding-fit.css?v=1','propletOnboardingFitCss'],
+    ['/onboarding-model-v3328.css?v=3','propletOnboardingModelCss'],
     ['/game-layout-v3323.css?v=1','propletGameLayoutCss'],
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/win-actions-v3324.css?v=1','propletWinActionsCss'],
@@ -74,7 +75,9 @@
     loadScript('/game-layout-v3323.js?v=2','propletGameLayout');
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
+    loadScript('/onboarding-model-v3328.js?v=3','propletOnboardingModel');
     loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
+    loadScript('/valid-word-feedback-v3328.js?v=2','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
   };
 
