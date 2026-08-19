@@ -32,7 +32,8 @@
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/win-actions-v3324.css?v=1','propletWinActionsCss'],
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
-    ['/copy-density-v3327.css?v=1','propletCopyDensityCss']
+    ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
+    ['/push-retention-v3329.css?v=1','propletPushRetentionCss']
   ];
 
   const loadStyle=(href,key)=>{
@@ -61,8 +62,6 @@
   };
 
   const loadExtras=async()=>{
-    /* Runtime metadata is the single public release marker. Anything displaying/guarding a
-       version loads only after it, so a release cannot drift between footer and cache metadata. */
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=10','propletHomeLayout');
@@ -79,6 +78,7 @@
     loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
     loadScript('/valid-word-feedback-v3328.js?v=2','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
+    loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
