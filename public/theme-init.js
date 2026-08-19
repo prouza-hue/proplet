@@ -62,6 +62,8 @@
   };
 
   const loadExtras=async()=>{
+    /* Runtime metadata is the single public release marker. Anything displaying/guarding a
+       version loads only after it, so a release cannot drift between footer and cache metadata. */
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=10','propletHomeLayout');

@@ -36,6 +36,9 @@
       legacyOriginSession=!!(stored?.id&&stored?.token);
     }catch{}
     if(legacyOriginSession){
+      // v3.32.5 redirected authenticated players before their origin-scoped localStorage could
+      // follow them. Keep existing legacy-origin sessions alive until we ship an explicit,
+      // lossless account migration. New/anonymous traffic still converges on hrajproplet.cz.
       window.PROPLET_LEGACY_ORIGIN_SESSION=true;
     }else{
       const target=new URL(location.href);
