@@ -3,11 +3,12 @@
 /* Fold / tablet: still compact enough for short viewports, but clearly no longer phone-sized. */
 @media (min-width:700px) and (min-height:540px){
   #winModal{padding:22px}
-  #winModal .win-card{width:min(100%,620px);padding:27px 30px 25px;border-radius:30px}
-  #winModal .win-badge{font-size:56px;line-height:1}
-  #winModal .win-card h2{font-size:35px;margin:6px 0 7px}
-  #winModal .win-praise{max-width:500px;font-size:14px;line-height:1.45;margin:0 auto 11px}
-  #winModal .win-summary{margin:11px 0 13px;padding:13px 15px;border-radius:17px}
+  #winModal .win-card{width:min(100%,620px);padding:21px 30px 25px;border-radius:30px}
+  #winModal .win-badge{font-size:56px;line-height:1;margin:0 auto 2px}
+  #winModal .win-card h2{font-size:35px;margin:0 0 15px}
+  #winModal .win-praise{max-width:500px;font-size:14px;line-height:1.45;margin:-7px auto 17px}
+  #winModal .win-praise:empty{display:none}
+  #winModal .win-summary{margin:0 0 13px;padding:13px 15px;border-radius:17px}
   #winModal .win-summary>p{font-size:14px;line-height:1.42}
   #winModal .win-xp,#winModal .win-clean{font-size:14px;padding:8px 12px;min-height:38px;align-items:center}
   #winModal .level-leaderboard-box{font-size:13.5px;line-height:1.42;padding:14px 15px}
@@ -28,13 +29,16 @@
   #winModal .win-card{
     width:min(820px,calc(100vw - 68px));
     max-height:calc(100dvh - 50px);
-    padding:31px 38px 29px;
+    padding:18px 38px 29px;
     border-radius:34px;
     overflow:auto;
   }
-  #winModal .win-badge{font-size:68px;line-height:1;margin-top:0}
-  #winModal .win-card h2{font-size:44px;line-height:1;margin:7px 0 8px;letter-spacing:-.045em}
-  #winModal .win-praise{max-width:620px;margin:0 auto 17px;font-size:17px;line-height:1.45}
+  #winModal .win-badge{font-size:68px;line-height:1;margin:0 auto 1px}
+  #winModal .win-card h2{font-size:44px;line-height:1;margin:0 0 21px;letter-spacing:-.045em}
+  /* When there really is a separate praise sentence, keep it close to the title and let the
+     larger breathing space sit below the whole hero block. Empty praise must not steal space. */
+  #winModal .win-praise{max-width:620px;margin:-10px auto 21px;font-size:17px;line-height:1.45}
+  #winModal .win-praise:empty{display:none}
 
   /* The first result strip is now a genuine headline metric area. */
   #winModal .win-summary{
@@ -63,10 +67,10 @@
 
   /* Comparison view used to deliberately compress the result. Desktop has room, so restore
      breathing space while still avoiding duplicated summary copy. */
-  #winModal.comparison-loaded .win-card{padding-top:28px}
-  #winModal.comparison-loaded .win-badge{font-size:60px}
-  #winModal.comparison-loaded .win-card h2{margin:5px 0 7px;font-size:42px}
-  #winModal.comparison-loaded .win-praise{margin:0 auto 14px}
+  #winModal.comparison-loaded .win-card{padding-top:14px}
+  #winModal.comparison-loaded .win-badge{font-size:60px;margin:0 auto 1px}
+  #winModal.comparison-loaded .win-card h2{margin:0 0 21px;font-size:42px}
+  #winModal.comparison-loaded .win-praise{margin:-10px auto 21px}
   #winModal.comparison-loaded .win-summary{display:flex;justify-content:center;margin:0 0 17px;padding:15px 18px}
   #winModal.comparison-loaded .win-summary>p{display:none}
   #winModal.comparison-loaded .win-summary-chips{justify-content:center}
@@ -148,10 +152,13 @@
 }
 
 @media (min-width:1500px) and (min-height:800px){
-  #winModal .win-card{width:min(880px,calc(100vw - 96px));padding:34px 43px 32px}
-  #winModal .win-badge{font-size:72px}
-  #winModal .win-card h2{font-size:47px}
-  #winModal .win-praise{font-size:18px}
+  #winModal .win-card{width:min(880px,calc(100vw - 96px));padding:18px 43px 32px}
+  #winModal .win-badge{font-size:72px;margin-top:0}
+  #winModal .win-card h2{font-size:47px;margin-bottom:23px}
+  #winModal .win-praise{font-size:18px;margin:-10px auto 23px}
+  #winModal.comparison-loaded .win-card{padding-top:13px}
+  #winModal.comparison-loaded .win-card h2{margin-bottom:23px}
+  #winModal.comparison-loaded .win-praise{margin:-10px auto 23px}
   #winModal .win-summary{padding:20px 22px}
   #winModal .win-summary>p{font-size:18px}
   #winModal .win-xp,#winModal .win-clean{font-size:17px;min-height:46px;padding:11px 17px}
