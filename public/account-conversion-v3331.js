@@ -19,8 +19,9 @@
       block.className='google-primary-auth';
       block.innerHTML='<div class="google-primary-head"><span>NEJRYCHLEJŠÍ ZPŮSOB</span><small>pár vteřin</small></div><div class="google-primary-slot"></div><small class="google-primary-note">Bez vytváření nového hesla.</small>';
     }
-    block.querySelector('.google-primary-slot')?.appendChild(button);
-    desc.insertAdjacentElement('afterend',block);
+    const slot=block.querySelector('.google-primary-slot');
+    if(slot&&button.parentElement!==slot)slot.appendChild(button);
+    if(desc.nextElementSibling!==block)desc.insertAdjacentElement('afterend',block);
 
     let divider=$('#googleManualDivider');
     if(!divider){
@@ -29,10 +30,10 @@
       divider.className='account-auth-divider google-manual-divider';
       divider.innerHTML='<span>nebo jménem a heslem</span>';
     }
-    block.insertAdjacentElement('afterend',divider);
+    if(block.nextElementSibling!==divider)block.insertAdjacentElement('afterend',divider);
 
     const oldDivider=$('#accountAuthExtras .account-auth-divider');
-    if(oldDivider)oldDivider.classList.add('account-auth-divider-obsolete');
+    if(oldDivider&&!oldDivider.classList.contains('account-auth-divider-obsolete'))oldDivider.classList.add('account-auth-divider-obsolete');
     return true;
   }
 
