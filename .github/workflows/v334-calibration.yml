@@ -6,6 +6,7 @@ on:
       - agent/v3340-difficulty-calibration
     paths:
       - 'tools/generate_v334_calibration.py'
+      - 'tools/generate_v334_calibration_v2.py'
       - 'tools/audit_v334_difficulty.py'
       - 'tools/review_v334_lexicon.py'
       - '.github/workflows/v334-calibration.yml'
@@ -14,6 +15,7 @@ on:
       - main
     paths:
       - 'tools/generate_v334_calibration.py'
+      - 'tools/generate_v334_calibration_v2.py'
       - 'tools/audit_v334_difficulty.py'
       - 'tools/review_v334_lexicon.py'
       - '.github/workflows/v334-calibration.yml'
@@ -38,6 +40,7 @@ jobs:
       - name: Syntax check
         run: |
           python -m py_compile tools/generate_v334_calibration.py
+          python -m py_compile tools/generate_v334_calibration_v2.py
           python -m py_compile tools/audit_v334_difficulty.py
           python -m py_compile tools/review_v334_lexicon.py
 
@@ -48,18 +51,18 @@ jobs:
             --source data/puzzles.json \
             --json /tmp/v334/gen3-audit.json
 
-      - name: Generate isolated Generation 4 calibration bank
+      - name: Generate balanced Generation 4 calibration bank
         run: |
-          python tools/generate_v334_calibration.py \
-            --medium 8 \
-            --hard 8 \
-            --output /tmp/v334/calibration.json
+          python tools/generate_v334_calibration_v2.py \
+            --medium 10 \
+            --hard 10 \
+            --output /tmp/v334/calibration-v2.json
 
       - name: Audit calibration bank
         run: |
           python tools/audit_v334_difficulty.py \
-            --source /tmp/v334/calibration.json \
-            --json /tmp/v334/gen4-calibration-audit.json
+            --source /tmp/v334/calibration-v2.json \
+            --json /tmp/v334/gen4-calibration-v2-audit.json
 
       - name: Build lexicon review shortlist
         run: |
@@ -70,7 +73,7 @@ jobs:
       - name: Upload calibration evidence
         uses: actions/upload-artifact@v4
         with:
-          name: v334-calibration-lab
+          name: v334-calibration-lab-v2
           path: /tmp/v334/
           if-no-files-found: error
           retention-days: 14
