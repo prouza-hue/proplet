@@ -4,8 +4,11 @@
   const DESKTOP_CLASS='game-desktop-wide';
   let pausedByGuard=false;
   let currentWord=null;
-  let originalParent=null;
-  let originalNext=null;
+  let currentWordParent=null;
+  let currentWordNext=null;
+  let gameInfo=null;
+  let gameInfoParent=null;
+  let gameInfoNext=null;
   let raf=0;
 
   const coarsePointer=()=>{
@@ -52,7 +55,11 @@
   const ensureNodes=()=>{
     if(!currentWord){
       currentWord=document.querySelector('.game-board-column>.current-word')||document.querySelector('.current-word');
-      if(currentWord){originalParent=currentWord.parentNode;originalNext=currentWord.nextSibling}
+      if(currentWord){currentWordParent=currentWord.parentNode;currentWordNext=currentWord.nextSibling}
+    }
+    if(!gameInfo){
+      gameInfo=document.querySelector('.game-board-column>.game-info')||document.querySelector('.game-info');
+      if(gameInfo){gameInfoParent=gameInfo.parentNode;gameInfoNext=gameInfo.nextSibling}
     }
     if(!document.querySelector('.phone-landscape-guard')){
       const guard=document.createElement('div');
@@ -64,16 +71,36 @@
     }
   };
 
+  const restoreNode=(node,parent,next)=>{
+    if(!node||!parent||node.parentNode===parent)return;
+    if(next&&next.parentNode===parent)parent.insertBefore(node,next);
+    else parent.appendChild(node);
+  };
+
   const moveCurrentWordToRail=()=>{
     ensureNodes();
     const rail=document.querySelector('.game-control-column');
     if(currentWord&&rail&&currentWord.parentNode!==rail)rail.insertBefore(currentWord,rail.firstChild);
   };
 
-  const restoreCurrentWord=()=>{
-    if(!currentWord||!originalParent||currentWord.parentNode===originalParent)return;
-    if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(currentWord,originalNext);
-    else originalParent.appendChild(currentWord);
+  const moveDesktopStatusToRail=()=>{
+    ensureNodes();
+    const rail=document.querySelector('.game-control-column');
+    if(!rail)return;
+    if(currentWord&&currentWord.parentNode!==rail)rail.insertBefore(currentWord,rail.firstChild);
+    if(gameInfo&&gameInfo.parentNode!==rail){
+      const anchor=currentWord?.parentNode===rail?currentWord.nextSibling:rail.firstChild;
+      rail.insertBefore(gameInfo,anchor);
+    }
+  };
+
+  const restoreCurrentWord=()=>restoreNode(currentWord,currentWordParent,currentWordNext);
+  const restoreGameInfo=()=>restoreNode(gameInfo,gameInfoParent,gameInfoNext);
+  const restoreGameBoardNodes=()=>{
+    // Current word was originally directly after game info. Restore it first so the saved
+    // game-info anchor exists again, then put game info back in front of it.
+    restoreCurrentWord();
+    restoreGameInfo();
   };
 
   const refit=()=>requestAnimationFrame(()=>{
@@ -102,7 +129,7 @@
     if(blocked){
       setDebugMode('phone-landscape-blocked',d,landscape,'phone');
       document.body.classList.remove(TABLET_CLASS,DESKTOP_CLASS);
-      restoreCurrentWord();
+      restoreGameBoardNodes();
       if(!pausedByGuard){
         try{if(typeof pauseGameClock==='function')pausedByGuard=!!pauseGameClock('landscape')}catch{}
       }
@@ -121,7 +148,16 @@
     const tabletLandscape=playing&&!desktopWide&&landscape&&!phone&&coarsePointer()&&d.w>=600&&d.w<=1280;
     document.body.classList.toggle(TABLET_CLASS,tabletLandscape);
     document.body.classList.toggle(DESKTOP_CLASS,desktopWide);
-    if(tabletLandscape||desktopWide)moveCurrentWordToRail();else restoreCurrentWord();
+
+    if(desktopWide){
+      moveDesktopStatusToRail();
+    }else if(tabletLandscape){
+      restoreGameInfo();
+      moveCurrentWordToRail();
+    }else{
+      restoreGameBoardNodes();
+    }
+
     setDebugMode(
       desktopWide?'desktop-wide':tabletLandscape?'tablet-landscape':playing?'standard':'inactive',
       d,
