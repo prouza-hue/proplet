@@ -2,6 +2,7 @@
   const PHONE_CLASS='game-phone-landscape-blocked';
   const TABLET_CLASS='game-tablet-landscape';
   const DESKTOP_CLASS='game-desktop-wide';
+  const FREE_CLASS='game-free-mode';
   let pausedByGuard=false;
   let currentWord=null;
   let currentWordParent=null;
@@ -71,6 +72,13 @@
     }
   };
 
+  const syncGameHeader=playing=>{
+    const label=document.querySelector('#gameModeLabel');
+    const isFree=!!playing&&String(label?.textContent||'').trim().toLocaleLowerCase('cs-CZ')==='volná hra';
+    label?.classList.toggle('hidden',isFree);
+    document.body.classList.toggle(FREE_CLASS,isFree);
+  };
+
   const restoreNode=(node,parent,next)=>{
     if(!node||!parent||node.parentNode===parent)return;
     if(next&&next.parentNode===parent)parent.insertBefore(node,next);
@@ -120,6 +128,7 @@
     raf=0;
     ensureNodes();
     const playing=document.body.classList.contains('playing');
+    syncGameHeader(playing);
     const d=dimensions();
     const landscape=physicalLandscape(d);
     const phone=phoneLike(d);
@@ -176,6 +185,8 @@
     ensureNodes();
     const observer=new MutationObserver(schedule);
     observer.observe(document.body,{attributes:true,attributeFilter:['class']});
+    const modeLabel=document.querySelector('#gameModeLabel');
+    if(modeLabel)new MutationObserver(schedule).observe(modeLabel,{childList:true,characterData:true,subtree:true});
     window.addEventListener('resize',schedule,{passive:true});
     window.addEventListener('orientationchange',schedule,{passive:true});
     window.visualViewport?.addEventListener?.('resize',schedule,{passive:true});
