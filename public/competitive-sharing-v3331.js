@@ -39,7 +39,11 @@
     try{sessionStorage.setItem(SESSION_KEY,JSON.stringify(ctx||null))}catch{}
   };
   const loadSession=()=>{
-    try{const v=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');return v?.puzzleId?v:null}catch{return null}
+    try{
+      const v=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+      if(v?.completedTracked){sessionStorage.removeItem(SESSION_KEY);return null}
+      return v?.puzzleId?v:null;
+    }catch{return null}
   };
   const clearSession=()=>{
     activeChallenge=null;
@@ -61,7 +65,16 @@
 
   const track=event=>{try{trackProductEvent(event)}catch{}};
   const diffLabel=diff=>DIFF?.[diff]?.label||diff||'Proplet';
-  const cleanLabel=hints=>Number(hints||0)===0?'✨ čistě':`💡 ${Number(hints||0)}× nápověda`;
+  const cleanLabel=hints=>{
+    const n=Number(hints||0);
+    return n===0?'✨ čistě':`💡 ${countCz(n,'nápověda','nápovědy','nápověd')}`;
+  };
+  const formatDelta=ms=>{
+    const total=Math.max(1,Math.round(Number(ms||0)/1000));
+    if(total<60)return `${total} s`;
+    const min=Math.floor(total/60),sec=total%60;
+    return sec?`${min} min ${sec} s`:`${min} min`;
+  };
 
   const activePuzzleById=id=>{
     try{
@@ -133,8 +146,8 @@
     if(dt!==0){
       const delta=Math.abs(dt);
       return dt<0
-        ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:`Byl jsi o ${fmtTime(delta)} rychlejší.`}
-        :{outcome:'loss',title:'Těsně!',copy:`Chybělo ${fmtTime(delta)}.`};
+        ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:`Byl jsi o ${formatDelta(delta)} rychlejší.`}
+        :{outcome:'loss',title:'Těsně!',copy:`Chybělo ${formatDelta(delta)}.`};
     }
     const dm=Number(attempt.moves||0)-Number(bench.moves||0);
     if(dm!==0)return dm<0
