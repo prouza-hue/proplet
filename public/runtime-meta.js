@@ -18,7 +18,9 @@
       legacyOriginSessionPreservation:true,
       authRecoveryGuard:true,
       copyDensityPolish:true,
-      validNonSolutionFeedback:true
+      actionFirstOnboarding:true,
+      contextualHelperDefault:true,
+      validNonSolutionFailsafe:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
