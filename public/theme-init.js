@@ -75,6 +75,7 @@
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
     loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
+    loadScript('/valid-word-feedback-v3328.js?v=1','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
   };
 
