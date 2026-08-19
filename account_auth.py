@@ -6,10 +6,11 @@ from account_auth_core import *  # noqa: F401,F403
 from account_auth_core import install_account_auth as _install_account_auth_core
 from account_integrity_v33210 import install_account_integrity as _install_account_integrity
 from push_diagnostics_v3329 import install_push_diagnostics as _install_push_diagnostics
+from word_recognition_v3330 import install_word_recognition as _install_word_recognition
 
 
 def install_account_auth(app, **kwargs):
-    """Keep canonical identity/auth intact and attach additive launch safeguards."""
+    """Keep canonical identity/auth intact and attach additive launch/runtime safeguards."""
     _install_account_auth_core(app, **kwargs)
     frame = inspect.currentframe()
     caller_globals = frame.f_back.f_globals if frame and frame.f_back else {}
@@ -25,4 +26,8 @@ def install_account_auth(app, **kwargs):
         app,
         **kwargs,
         norm_family=caller_globals.get("norm_family"),
+    )
+    _install_word_recognition(
+        app,
+        **kwargs,
     )
