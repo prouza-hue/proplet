@@ -36,7 +36,10 @@
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/result-layout-v3330.css?v=2','propletResultLayoutCss'],
-    ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss']
+    ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss'],
+    ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
+    ['/release-notes-v3331.css?v=1','propletReleaseNotesV3331Css'],
+    ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css']
   ];
 
   const loadStyle=(href,key)=>{
@@ -85,6 +88,10 @@
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=1','propletAccountTeamIntegrity');
+    loadScript('/competitive-sharing-v3331.js?v=2','propletCompetitiveSharing');
+    await loadScript('/account-bonus-v3331.js?v=1','propletAccountBonusV3331',{wait:true});
+    await loadScript('/account-conversion-v3331.js?v=1','propletAccountConversionV3331',{wait:true});
+    loadScript('/release-notes-v3331.js?v=2','propletReleaseNotesV3331');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
