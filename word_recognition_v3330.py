@@ -5,9 +5,9 @@ import re
 import unicodedata
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
-from fastapi import HTTPException, Query, Request
+from fastapi import Query, Request
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -23,7 +23,15 @@ RECOGNITION_OVERLAY = {
     "starost",
 }
 
+# Frequency fallback is deliberately recognition-only. It exists to catch ordinary Czech words
+# missing from our finite static sources without making the generation lexicon more permissive.
+# A slightly higher threshold is used for words without Czech diacritics because cross-language
+# noise is materially higher there.
+WORDFREQ_ZIPF_THRESHOLD_DIACRITIC = 2.45
+WORDFREQ_ZIPF_THRESHOLD_PLAIN = 2.85
+
 _CZECH_WORD = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.IGNORECASE)
+_CZECH_DIACRITICS = frozenset("áčďéěíňóřšťúůýž")
 
 
 def _normalize(value: str) -> str:
@@ -36,7 +44,7 @@ def _acceptable(value: str) -> bool:
 
 @lru_cache(maxsize=1)
 def _recognition_index() -> dict[str, str]:
-    """Broad recognition-only lexicon.
+    """Broad static recognition-only lexicon.
 
     Generation remains governed by Lexicon V2. Recognition intentionally uses a wider union:
     - existing permissive gameplay word list (good offline/colloquial coverage),
@@ -90,6 +98,40 @@ def _recognition_index() -> dict[str, str]:
     return out
 
 
+@lru_cache(maxsize=1)
+def _wordfreq_zipf() -> Optional[Callable[[str, str], float]]:
+    """Lazy-load wordfreq so ordinary app requests do not pay its import cost."""
+    try:
+        from wordfreq import zipf_frequency
+
+        return zipf_frequency
+    except Exception:
+        return None
+
+
+def _wordfreq_source(word: str) -> Optional[str]:
+    lookup = _wordfreq_zipf()
+    if lookup is None:
+        return None
+    try:
+        score = float(lookup(word, "cs"))
+    except Exception:
+        return None
+    threshold = (
+        WORDFREQ_ZIPF_THRESHOLD_DIACRITIC
+        if any(ch in _CZECH_DIACRITICS for ch in word)
+        else WORDFREQ_ZIPF_THRESHOLD_PLAIN
+    )
+    return "wordfreq_cs" if score >= threshold else None
+
+
+def _recognize_source(word: str) -> Optional[str]:
+    source = _recognition_index().get(word)
+    if source is not None:
+        return source
+    return _wordfreq_source(word)
+
+
 def install_word_recognition(app, *, enforce_rate_limit=None, **_kwargs):
     @app.get("/api/word-recognition")
     def word_recognition(
@@ -101,7 +143,7 @@ def install_word_recognition(app, *, enforce_rate_limit=None, **_kwargs):
         normalized = _normalize(word)
         if not _acceptable(normalized):
             return {"recognized": False, "word": normalized.upper(), "source": None}
-        source: Optional[str] = _recognition_index().get(normalized)
+        source = _recognize_source(normalized)
         return {
             "recognized": source is not None,
             "word": normalized.upper(),
@@ -114,12 +156,25 @@ def install_word_recognition(app, *, enforce_rate_limit=None, **_kwargs):
         if callable(enforce_rate_limit):
             enforce_rate_limit(request, "word_recognition_status", limit=120, window_seconds=3600)
         index = _recognition_index()
+        regression_words = (
+            "bruska",
+            "pnutí",
+            "padnutí",
+            "hrubka",
+            "tlupa",
+            "pult",
+        )
         return {
             "ok": True,
-            "version": 2,
-            "entries": len(index),
+            "version": 3,
+            "staticEntries": len(index),
+            "frequencyFallback": {
+                "enabled": _wordfreq_zipf() is not None,
+                "language": "cs",
+                "zipfThresholdDiacritic": WORDFREQ_ZIPF_THRESHOLD_DIACRITIC,
+                "zipfThresholdPlain": WORDFREQ_ZIPF_THRESHOLD_PLAIN,
+            },
             "reportedRegressionWords": {
-                word.upper(): word in index
-                for word in ("bruska", "pnutí", "padnutí", "hrubka")
+                word.upper(): _recognize_source(word) is not None for word in regression_words
             },
         }
