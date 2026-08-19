@@ -63,7 +63,9 @@
     }catch{}
   };
 
-  const track=event=>{try{trackProductEvent(event)}catch{}};
+  const track=event=>{
+    try{api('/api/challenge-event',{method:'POST',body:JSON.stringify({event_type:event})}).catch(()=>{})}catch{}
+  };
   const diffLabel=diff=>DIFF?.[diff]?.label||diff||'Proplet';
   const cleanLabel=hints=>{
     const n=Number(hints||0);
