@@ -8,6 +8,8 @@
   let activeProfileId=null;
   let syncInFlight=false;
   let patched=false;
+  let offerTracked=false;
+  let createIntentTracked=false;
 
   const profile=()=>{try{return typeof getProfile==='function'?getProfile():null}catch{return null}};
   const hasAccount=()=>!!profile()?.token;
@@ -16,6 +18,8 @@
       if(typeof api==='function')api('/api/account-bonus-event',{method:'POST',body:JSON.stringify({event_type:event})}).catch(()=>{});
     }catch{}
   };
+  const trackOfferOnce=()=>{if(offerTracked)return;offerTracked=true;bonusEvent('account_bonus_offer_seen')};
+  const trackCreateOnce=()=>{if(createIntentTracked)return;createIntentTracked=true;bonusEvent('account_bonus_create_clicked')};
 
   function patchUiFunctions(){
     if(patched)return true;
@@ -56,6 +60,7 @@
     setAccountMode=function(mode){
       const result=originalSetAccountMode.apply(this,arguments);
       if(mode==='create'){
+        trackOfferOnce();
         const tab=document.querySelector('#profileModeCreate');if(tab)tab.textContent='Uložit + 500 XP';
         const title=document.querySelector('#profileModalTitle');if(title)title.textContent='Ulož si postup a získej 500 XP';
         const desc=document.querySelector('#profileModalDesc');if(desc)desc.textContent='Jméno a heslo stačí. Postup uložíme do cloudu a hned dostaneš +500 XP; tým je volitelný.';
@@ -66,11 +71,21 @@
       return result;
     };
 
+    if(typeof openProfileModal==='function'){
+      const originalOpenProfileModal=openProfileModal;
+      openProfileModal=function(mode='login'){
+        if(mode==='create')trackCreateOnce();
+        return originalOpenProfileModal.apply(this,arguments);
+      };
+    }
+
     if(typeof renderAccountNudge==='function'){
       const originalRenderAccountNudge=renderAccountNudge;
       renderAccountNudge=function(stage){
         originalRenderAccountNudge.apply(this,arguments);
+        trackOfferOnce();
         const count=typeof completedGameCount==='function'?completedGameCount():0;
+        const countText=typeof countCz==='function'?countCz(count,'Proplet','Proplety','Propletů'):`${count} Propletů`;
         const eyebrow=document.querySelector('#accountNudgeEyebrow');
         const title=document.querySelector('#accountNudgeTitle');
         const copy=document.querySelector('#accountNudgeCopy');
@@ -85,7 +100,7 @@
         }else if(stage===2){
           if(eyebrow)eyebrow.textContent='500 XP POŘÁD ČEKÁ';
           if(title)title.textContent='Tenhle postup už stojí za účet';
-          if(copy)copy.textContent=`Máš hotové už ${count} Propletů. Ulož si je a přidej k nim +500 XP.`;
+          if(copy)copy.textContent=`Máš hotové už ${countText}. Ulož si je a přidej k nim +500 XP.`;
         }else{
           if(eyebrow)eyebrow.textContent='POSLEDNÍ PŘIPOMENUTÍ';
           if(title)title.textContent='Nechceš si vzít 500 XP?';
@@ -150,7 +165,7 @@
     bonusXp:()=>bonusXp,
     sync:syncBonus,
     track:bonusEvent,
-    offerSeen:()=>bonusEvent('account_bonus_offer_seen'),
-    createClicked:()=>bonusEvent('account_bonus_create_clicked')
+    offerSeen:trackOfferOnce,
+    createClicked:trackCreateOnce
   });
 })();
