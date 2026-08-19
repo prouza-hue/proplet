@@ -1,0 +1,68 @@
+name: v3.34 calibration lab
+
+on:
+  push:
+    branches:
+      - agent/v3340-difficulty-calibration
+    paths:
+      - 'tools/generate_v334_calibration.py'
+      - 'tools/audit_v334_difficulty.py'
+      - 'tools/review_v334_lexicon.py'
+      - '.github/workflows/v334-calibration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Syntax check
+        run: |
+          python -m py_compile tools/generate_v334_calibration.py
+          python -m py_compile tools/audit_v334_difficulty.py
+          python -m py_compile tools/review_v334_lexicon.py
+
+      - name: Audit current Generation 3
+        run: |
+          mkdir -p /tmp/v334
+          python tools/audit_v334_difficulty.py \
+            --source data/puzzles.json \
+            --json /tmp/v334/gen3-audit.json
+
+      - name: Generate isolated Generation 4 calibration bank
+        run: |
+          python tools/generate_v334_calibration.py \
+            --medium 8 \
+            --hard 8 \
+            --output /tmp/v334/calibration.json
+
+      - name: Audit calibration bank
+        run: |
+          python tools/audit_v334_difficulty.py \
+            --source /tmp/v334/calibration.json \
+            --json /tmp/v334/gen4-calibration-audit.json
+
+      - name: Build lexicon review shortlist
+        run: |
+          python tools/review_v334_lexicon.py \
+            --output /tmp/v334/V334_LEXICON_REVIEW_CANDIDATES.md \
+            --limit 70
+
+      - name: Upload calibration evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v334-calibration-lab
+          path: /tmp/v334/
+          if-no-files-found: error
+          retention-days: 14
