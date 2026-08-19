@@ -1,0 +1,50 @@
+/* v3.32.7 — copy redundancy & density polish */
+#screen-daily.home-layout-active .daily-hero .hero-topline{display:none}
+
+#profileModal .account-modal-card>.eyebrow,
+#profileModal #profileModalTitle{display:none}
+#profileModal .account-tabs{margin-top:0}
+#profileModal #profileModalDesc{margin-top:12px}
+
+#levelDetailEyebrow,
+.level-detail-card .compact-head .eyebrow{display:none}
+.level-detail-card .compact-head{margin-top:7px}
+
+.played-levels-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 8px}
+.played-levels-heading{display:flex;align-items:center;gap:11px;min-width:0}
+.played-levels-heading h2{margin:0!important}
+.played-levels-icon{flex:0 0 auto;width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:#eee9ff}
+.played-levels-difficulty-icon{width:31px;height:31px;display:block}
+.played-levels-card[data-diff="easy"]{--played-diff:#45b98e;--played-soft:#dff5ec}
+.played-levels-card[data-diff="medium"]{--played-diff:#4e83d5;--played-soft:#e5efff}
+.played-levels-card[data-diff="hard"]{--played-diff:#f08a32;--played-soft:#fff0dc}
+.played-levels-card[data-diff="hardcore"]{--played-diff:#941522;--played-soft:#f8e4e7}
+.played-levels-card .played-levels-icon{background:var(--played-soft,#eee9ff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--played-diff,#6c5ce7) 18%,transparent)}
+.played-levels-progress{position:relative;flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--played-diff,#6c5ce7) var(--progress),#eee9f2 0);box-shadow:0 5px 14px rgba(63,51,99,.07)}
+.played-levels-progress:before{content:"";position:absolute;inset:6px;border-radius:50%;background:#fffefd}
+.played-levels-progress>div{position:relative;z-index:1;text-align:center;line-height:1}
+.played-levels-progress strong,.played-levels-progress small{display:block}
+.played-levels-progress strong{font-size:15px}
+.played-levels-progress small{margin-top:2px;font-size:9px;color:var(--muted);font-weight:850}
+.played-levels-meta:empty{display:none}
+
+#winModal.comparison-loaded .win-summary>p{display:none}
+#winModal.comparison-loaded .win-summary{margin:4px 0 7px;padding:8px 10px}
+#winModal.comparison-loaded .win-card{padding-top:17px}
+#winModal.comparison-loaded .win-badge{font-size:40px;line-height:1}
+#winModal.comparison-loaded .win-card h2{margin:1px 0 3px}
+#winModal.comparison-loaded .win-praise{margin:0 auto 5px}
+
+html[data-theme="dark"] .played-levels-progress{background:conic-gradient(var(--played-diff,#9b8cff) var(--progress),#302c3b 0)}
+html[data-theme="dark"] .played-levels-progress:before{background:#1b1926}
+
+@media(max-width:390px){
+  .played-levels-icon{width:40px;height:40px}
+  .played-levels-difficulty-icon{width:28px;height:28px}
+  .played-levels-progress{width:56px;height:56px}
+  .played-levels-head{gap:10px}
+}
+@media(min-width:520px){
+  #winModal.comparison-loaded .win-card{padding-top:14px}
+  #winModal.comparison-loaded .win-badge{font-size:36px}
+}
