@@ -32,7 +32,8 @@
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/win-actions-v3324.css?v=1','propletWinActionsCss'],
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
-    ['/copy-density-v3327.css?v=1','propletCopyDensityCss']
+    ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
+    ['/push-retention-v3329.css?v=1','propletPushRetentionCss']
   ];
 
   const loadStyle=(href,key)=>{
@@ -79,6 +80,7 @@
     loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
     loadScript('/valid-word-feedback-v3328.js?v=2','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
+    loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});

@@ -8,7 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const META=Object.freeze({
-    version:'3.32.8',
+    version:'3.32.9',
     canonicalOrigin,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
@@ -20,7 +20,10 @@
       copyDensityPolish:true,
       actionFirstOnboarding:true,
       contextualHelperDefault:true,
-      validNonSolutionFailsafe:true
+      validNonSolutionFailsafe:true,
+      pushDeliveryAudit:true,
+      pushSelfTest:true,
+      iosPwaPushGuidance:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
