@@ -34,7 +34,8 @@
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
     ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
-    ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss']
+    ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
+    ['/result-layout-v3330.css?v=1','propletResultLayoutCss']
   ];
 
   const loadStyle=(href,key)=>{
