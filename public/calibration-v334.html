@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Proplet v3.34 · kalibrační laboratoř</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/calibration-v334.css?v=1">
+</head>
+<body>
+  <main class="lab-shell">
+    <header class="lab-head">
+      <div>
+        <span class="eyebrow">PROPLET v3.34 · INTERNÍ PLAYTEST</span>
+        <h1>Kalibrace obtížnosti</h1>
+        <p>Čistý blind test nových Středních a Těžkých. Bez účtu, XP, leaderboardu a produkčních analytics.</p>
+      </div>
+      <a class="back-link" href="/">← Běžný Proplet</a>
+    </header>
+
+    <section class="lab-toolbar" aria-label="Výběr testu">
+      <div class="difficulty-tabs">
+        <button class="diff-tab active" data-diff="medium">🧠 Střední</button>
+        <button class="diff-tab" data-diff="hard">🧨 Těžká</button>
+      </div>
+      <label class="level-picker">Úroveň
+        <select id="levelSelect" aria-label="Kalibrační úroveň"></select>
+      </label>
+    </section>
+
+    <section class="game-card">
+      <div class="game-meta">
+        <div><small id="difficultyLabel">Střední</small><strong id="levelLabel">#1</strong></div>
+        <div class="metric"><small>Čas</small><strong id="timer">0:00.0</strong></div>
+        <div class="metric"><small>Nalezeno</small><strong id="progress">0 / 0</strong></div>
+      </div>
+
+      <div class="board-wrap">
+        <div id="board" class="board" aria-label="Kalibrační herní deska"></div>
+        <button id="startOverlay" class="start-overlay">
+          <span>▶</span>
+          <strong>Spustit měření</strong>
+          <small>Deska se odkryje až se stopkami.</small>
+        </button>
+      </div>
+
+      <div id="currentWord" class="current-word">Připraven?</div>
+      <div id="gameMessage" class="game-message">Začni bez prohlížení desky — jde nám hlavně o skutečný čas.</div>
+
+      <div class="game-actions">
+        <button id="restartBtn" class="secondary">↻ Stejná znovu</button>
+        <button id="skipBtn" class="secondary">Přeskočit →</button>
+      </div>
+    </section>
+
+    <section id="resultCard" class="result-card hidden" aria-live="polite">
+      <span class="result-icon">✓</span>
+      <div>
+        <small id="resultEyebrow">STŘEDNÍ #1</small>
+        <h2 id="resultTime">1:20.3</h2>
+        <p id="resultCopy">Hotovo.</p>
+      </div>
+      <button id="nextBtn" class="primary">Další kalibrační úroveň →</button>
+    </section>
+
+    <section class="session-card">
+      <div>
+        <span class="eyebrow">TVOJE DNEŠNÍ MĚŘENÍ</span>
+        <h2>Výsledky playtestu</h2>
+      </div>
+      <div id="sessionResults" class="session-results"><span class="muted">Zatím nic dokončeného.</span></div>
+      <div class="session-actions">
+        <button id="copyResultsBtn" class="secondary">Kopírovat výsledky</button>
+        <button id="clearResultsBtn" class="text-button">Smazat lokální měření</button>
+      </div>
+    </section>
+
+    <footer>Kalibrační fixture v2 · pouze preview · produkční banky se tím nemění.</footer>
+  </main>
+  <script src="/calibration-v334.js?v=1"></script>
+</body>
+</html>
