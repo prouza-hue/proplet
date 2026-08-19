@@ -1,0 +1,9 @@
+.onboard-principle{max-width:560px;margin:0 auto;text-align:left}
+.onboard-principle h2{margin-bottom:10px}
+.onboard-principle-highlight{display:grid;gap:6px;margin:18px 0;padding:16px 17px;border:1px solid color-mix(in srgb,var(--accent,#6c5ce7) 24%,transparent);border-radius:18px;background:color-mix(in srgb,var(--accent,#6c5ce7) 8%,transparent)}
+.onboard-principle-highlight strong{font-size:1.02rem;line-height:1.35}
+.onboard-principle-highlight span{color:var(--muted,#6f6b78);line-height:1.4}
+.onboard-principle-finish{margin:0;font-weight:700;line-height:1.4}
+.onboard-action-first .tutorial-wrap{margin-top:14px}
+.valid-word-failsafe-card{max-width:520px;text-align:center}
+.valid-word-failsafe-card .valid-word-rule{display:block;margin:14px 0 18px;padding:14px 16px;border-radius:16px;background:color-mix(in srgb,var(--accent,#6c5ce7) 8%,transparent);font-weight:700;line-height:1.4}
