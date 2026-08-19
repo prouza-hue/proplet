@@ -65,7 +65,9 @@
       const progress=document.createElement('div');
       progress.id='playedLevelsProgress';
       progress.className='played-levels-progress';
-      progress.setAttribute('aria-label','Postup');
+      progress.setAttribute('aria-label','Načítám postup');
+      progress.style.setProperty('--progress','0%');
+      progress.innerHTML='<div><strong>…</strong><small>z 200</small></div>';
       heading.append(icon,title);
       head.append(heading,progress);
       meta.before(head);
@@ -100,7 +102,7 @@
 
   function polishLevelDetail(){
     const result=$('#levelDetailResult');
-    if(result&&window.levelDetailContext?.result)result.querySelector('small')?.remove();
+    if(result&&typeof levelDetailContext!=='undefined'&&levelDetailContext?.result)result.querySelector('small')?.remove();
   }
 
   function polishProfileSync(){
@@ -124,9 +126,7 @@
       const base=openPlayedLevels;
       const wrapped=async function(diff,...args){
         ensurePlayedHeader();
-        const pending=base.call(this,diff,...args);
-        requestAnimationFrame(()=>polishPlayedLevels(diff));
-        const result=await pending;
+        const result=await base.call(this,diff,...args);
         polishPlayedLevels(diff);
         return result;
       };
