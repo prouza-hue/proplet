@@ -109,7 +109,7 @@
           resetForGame(candidate.game);
           validNonSolutionStreak++;
           track('valid_nonsolution_detected');
-          message(`„${candidate.word}“ je české slovo 👍 Jen není mezi hledanými slovy téhle desky.`,'bad');
+          if(validNonSolutionStreak===1)message(`„${candidate.word}“ je slovo 👍 Jen není mezi hledanými slovy téhle desky.`,'bad');
           if(validNonSolutionStreak>=TRIGGER_STREAK)showFailsafe();
         }).catch(()=>{});
       }
