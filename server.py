@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Optional
 from zoneinfo import ZoneInfo
 
+from proplet_version import APP_VERSION, PHONE_LANDSCAPE_BLOCKING, TABLET_LANDSCAPE_BREAKPOINT_PX
+
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -55,7 +57,6 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
-APP_VERSION = "3.31.9"
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -1376,10 +1377,10 @@ def health():
         "darkFoundChipTextHotfix": True,
         "boardFit2DHotfix": True,
         "foldWebPwaLayoutUnified": True,
-        "tabletGameLayoutBreakpointPx": 1000,
+        "tabletGameLayoutBreakpointPx": TABLET_LANDSCAPE_BREAKPOINT_PX,
         "themeModes": ["auto", "light", "dark"],
         "themePreferenceScope": "device",
-        "orientationBlocking": False,
+        "orientationBlocking": PHONE_LANDSCAPE_BLOCKING,
         "foldResponsiveReflow": True,
         "starterPuzzle": bool(pdata.get("starter")),
         "starterXp": STARTER_XP,

@@ -1,5 +1,6 @@
 (()=>{
-  const VERSION='3.32.4';
+  const VERSION=window.PROPLET_RUNTIME_META?.version||window.PROPLET_VERSION;
+  if(!VERSION)return;
   window.PROPLET_VERSION=VERSION;
 
   const attachFooter=()=>{
