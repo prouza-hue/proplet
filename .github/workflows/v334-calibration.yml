@@ -9,6 +9,14 @@ on:
       - 'tools/audit_v334_difficulty.py'
       - 'tools/review_v334_lexicon.py'
       - '.github/workflows/v334-calibration.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/generate_v334_calibration.py'
+      - 'tools/audit_v334_difficulty.py'
+      - 'tools/review_v334_lexicon.py'
+      - '.github/workflows/v334-calibration.yml'
   workflow_dispatch:
 
 permissions:
