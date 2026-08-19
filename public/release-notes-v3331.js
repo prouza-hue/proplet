@@ -23,6 +23,8 @@
     if(!document.querySelector('#screen-daily.active'))return false;
     try{if(typeof openTransientModal==='function'&&openTransientModal())return false}catch{}
     if(document.querySelector('#onboardingModal:not(.hidden),#winModal:not(.hidden),#profileModal:not(.hidden)'))return false;
+    const signedIn=!!profile()?.token;
+    if(signedIn&&window.PROPLET_ACCOUNT_BONUS?.granted!==true)return false;
     return true;
   }
 
