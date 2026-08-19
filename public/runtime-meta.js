@@ -34,7 +34,10 @@
       teamLeagueOptOutDefault:true,
       competitiveLevelSharing:true,
       sharedLevelDeepLinks:true,
-      sharedChallengeReturnToProgress:true
+      sharedChallengeReturnToProgress:true,
+      accountCreationBonusXp:500,
+      accountBonusLeaderboardExcluded:true,
+      growthReleaseNotes:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
