@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify public release version
+      - name: Verify release runtime metadata
         shell: bash
         run: |
           set -euo pipefail
@@ -21,18 +21,35 @@ jobs:
             exit 1
           fi
 
-          public_version=$(sed -nE "s/.*const VERSION='([^']+)'.*/\1/p" public/version.js | head -n1)
-          sw_version=$(sed -nE "s/.*proplet-v([0-9]+\.[0-9]+\.[0-9]+).*/\1/p" public/sw.js | head -n1)
+          canonical=$(sed -nE 's/^APP_VERSION = "([^"]+)"/\1/p' proplet_version.py | head -n1)
+          runtime=$(sed -nE "s/.*version:'([^']+)'.*/\1/p" public/runtime-meta.js | head -n1)
+          sw=$(sed -nE "s/.*proplet-v([0-9]+\.[0-9]+\.[0-9]+).*/\1/p" public/sw.js | head -n1)
 
           echo "PR version:        $expected"
-          echo "Footer version:    $public_version"
-          echo "SW cache version:  $sw_version"
+          echo "Canonical version: $canonical"
+          echo "Browser runtime:   $runtime"
+          echo "SW cache version:  $sw"
 
-          if [ "$public_version" != "$expected" ]; then
-            echo "::error file=public/version.js::Footer version $public_version does not match release $expected"
+          for value in "$canonical" "$runtime" "$sw"; do
+            if [ "$value" != "$expected" ]; then
+              echo "::error::Release metadata is not aligned to $expected"
+              exit 1
+            fi
+          done
+
+          grep -Fq 'from proplet_version import APP_VERSION, PHONE_LANDSCAPE_BLOCKING, TABLET_LANDSCAPE_BREAKPOINT_PX' server.py || {
+            echo "::error file=server.py::Backend must use canonical runtime metadata"
             exit 1
-          fi
-          if [ "$sw_version" != "$expected" ]; then
-            echo "::error file=public/sw.js::Service-worker cache version $sw_version does not match release $expected"
+          }
+          grep -Fq "const APP_VERSION=window.PROPLET_RUNTIME_META?.version" public/app.js || {
+            echo "::error file=public/app.js::Client APP_VERSION must derive from browser runtime metadata"
             exit 1
-          fi
+          }
+          grep -Fq '"orientationBlocking": PHONE_LANDSCAPE_BLOCKING' server.py || {
+            echo "::error file=server.py::Health orientation marker must use canonical runtime metadata"
+            exit 1
+          }
+          grep -Fq '"tabletGameLayoutBreakpointPx": TABLET_LANDSCAPE_BREAKPOINT_PX' server.py || {
+            echo "::error file=server.py::Health Fold breakpoint must use canonical runtime metadata"
+            exit 1
+          }

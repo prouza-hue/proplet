@@ -22,103 +22,59 @@
   media?.addEventListener?.('change',apply);
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
-  const css=document.createElement('link');
-  css.rel='stylesheet';
-  css.href='/home-layout.css?v=9';
-  document.head.appendChild(css);
+  const styles=[
+    ['/home-layout.css?v=9','propletHomeLayoutCss'],
+    ['/today-brand.css?v=4','propletTodayBrandCss'],
+    ['/ranking-polish.css?v=5','propletRankingPolishCss'],
+    ['/onboarding-fit.css?v=1','propletOnboardingFitCss'],
+    ['/game-layout-v3323.css?v=1','propletGameLayoutCss'],
+    ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
+    ['/win-actions-v3324.css?v=1','propletWinActionsCss'],
+    ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss']
+  ];
 
-  const brandCss=document.createElement('link');
-  brandCss.rel='stylesheet';
-  brandCss.href='/today-brand.css?v=4';
-  document.head.appendChild(brandCss);
+  const loadStyle=(href,key)=>{
+    if(document.querySelector(`link[data-${key.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())}]`))return;
+    const css=document.createElement('link');
+    css.rel='stylesheet';css.href=href;css.dataset[key]='1';document.head.appendChild(css);
+  };
+  styles.forEach(([href,key])=>loadStyle(href,key));
 
-  const rankingCss=document.createElement('link');
-  rankingCss.rel='stylesheet';
-  rankingCss.href='/ranking-polish.css?v=5';
-  document.head.appendChild(rankingCss);
-
-  const onboardingFitCss=document.createElement('link');
-  onboardingFitCss.rel='stylesheet';
-  onboardingFitCss.href='/onboarding-fit.css?v=1';
-  onboardingFitCss.dataset.propletOnboardingFitCss='1';
-  document.head.appendChild(onboardingFitCss);
-
-  const gameLayoutCss=document.createElement('link');
-  gameLayoutCss.rel='stylesheet';
-  gameLayoutCss.href='/game-layout-v3323.css?v=1';
-  gameLayoutCss.dataset.propletGameLayoutCss='1';
-  document.head.appendChild(gameLayoutCss);
-
-  const difficultyNudgeCss=document.createElement('link');
-  difficultyNudgeCss.rel='stylesheet';
-  difficultyNudgeCss.href='/difficulty-nudge.css?v=2';
-  difficultyNudgeCss.dataset.propletDifficultyNudgeCss='1';
-  document.head.appendChild(difficultyNudgeCss);
-
-  const winActionsCss=document.createElement('link');
-  winActionsCss.rel='stylesheet';
-  winActionsCss.href='/win-actions-v3324.css?v=1';
-  winActionsCss.dataset.propletWinActionsCss='1';
-  document.head.appendChild(winActionsCss);
-
-  const loadVersion=()=>{
-    if(document.querySelector('script[data-proplet-version]'))return;
-    const script=document.createElement('script');
-    script.src='/version.js?v=2';
-    script.dataset.propletVersion='1';
-    document.body.appendChild(script);
+  const loadScript=(src,key,{wait=false}={})=>{
+    const selector=`script[data-${key.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())}]`;
+    const existing=document.querySelector(selector);
+    if(existing){
+      if(!wait)return Promise.resolve();
+      if(existing.dataset.loaded==='1')return Promise.resolve();
+      return new Promise(resolve=>existing.addEventListener('load',resolve,{once:true}));
+    }
+    return new Promise(resolve=>{
+      const script=document.createElement('script');
+      script.src=src;script.async=false;script.dataset[key]='1';
+      script.addEventListener('load',()=>{script.dataset.loaded='1';resolve()},{once:true});
+      script.addEventListener('error',resolve,{once:true});
+      document.body.appendChild(script);
+      if(!wait)resolve();
+    });
   };
 
-  const loadHomeLayout=()=>{
-    if(document.querySelector('script[data-proplet-home-layout]'))return;
-    const script=document.createElement('script');
-    script.src='/home-layout.js?v=10';
-    script.dataset.propletHomeLayout='1';
-    document.body.appendChild(script);
+  const loadExtras=async()=>{
+    /* Runtime metadata is the single public release marker. Anything displaying/guarding a
+       version loads only after it, so a release cannot drift between footer and cache metadata. */
+    await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
+    loadScript('/version.js?v=3','propletVersion');
+    loadScript('/home-layout.js?v=10','propletHomeLayout');
+    loadScript('/ranking-polish.js?v=2','propletRankingPolish');
+    if(!document.querySelector('link[data-proplet-account-auth-css]')){
+      const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
+    }
+    loadScript('/account-auth.js?v=4','propletAccountAuth');
+    loadScript('/game-layout-v3323.js?v=2','propletGameLayout');
+    loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
+    loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
+    loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
   };
 
-  const loadRankingPolish=()=>{
-    if(document.querySelector('script[data-proplet-ranking-polish]'))return;
-    const script=document.createElement('script');
-    script.src='/ranking-polish.js?v=2';
-    script.dataset.propletRankingPolish='1';
-    document.body.appendChild(script);
-  };
-
-  const loadAccountAuth=()=>{
-    if(!document.querySelector('link[data-proplet-account-auth-css]')){const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css)}
-    if(document.querySelector('script[data-proplet-account-auth]'))return;
-    const script=document.createElement('script');
-    script.src='/account-auth.js?v=4';
-    script.dataset.propletAccountAuth='1';
-    document.body.appendChild(script);
-  };
-
-  const loadGameLayout=()=>{
-    if(document.querySelector('script[data-proplet-game-layout]'))return;
-    const script=document.createElement('script');
-    script.src='/game-layout-v3323.js?v=2';
-    script.dataset.propletGameLayout='1';
-    document.body.appendChild(script);
-  };
-
-  const loadStarterCopyHotfix=()=>{
-    if(document.querySelector('script[data-proplet-starter-copy-hotfix]'))return;
-    const script=document.createElement('script');
-    script.src='/starter-copy-hotfix.js?v=1';
-    script.dataset.propletStarterCopyHotfix='1';
-    document.body.appendChild(script);
-  };
-
-  const loadDifficultyNudge=()=>{
-    if(document.querySelector('script[data-proplet-difficulty-nudge]'))return;
-    const script=document.createElement('script');
-    script.src='/difficulty-nudge.js?v=2';
-    script.dataset.propletDifficultyNudge='1';
-    document.body.appendChild(script);
-  };
-
-  const loadExtras=()=>{loadVersion();loadHomeLayout();loadRankingPolish();loadAccountAuth();loadGameLayout();loadStarterCopyHotfix();loadDifficultyNudge()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
