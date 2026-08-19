@@ -36,7 +36,8 @@
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/result-layout-v3330.css?v=2','propletResultLayoutCss'],
-    ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss']
+    ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss'],
+    ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss']
   ];
 
   const loadStyle=(href,key)=>{
@@ -85,6 +86,7 @@
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=1','propletAccountTeamIntegrity');
+    loadScript('/competitive-sharing-v3331.js?v=1','propletCompetitiveSharing');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
