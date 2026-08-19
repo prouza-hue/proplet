@@ -1,0 +1,191 @@
+name: v3.32.6 one-shot auth recovery patcher
+
+on:
+  push:
+    branches: [agent/v3326-auth-origin-recovery]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-auth-recovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3326-auth-origin-recovery
+      - name: Apply asserted auth migration fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              text=p.read_text(encoding='utf-8')
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'{path}: expected one match, got {count}: {old[:120]!r}')
+              p.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          # Login identifier is either a 24-char display name OR a standards-sized email.
+          replace_once(
+              'public/index.html',
+              '<input id="playerNameInput" maxlength="24" autocomplete="username" placeholder="např. Ardan" />',
+              '<input id="playerNameInput" maxlength="254" autocomplete="username" placeholder="např. Ardan" />'
+          )
+
+          # Persist the freshly-issued Proplet bearer token before any optional UI/guest-data work.
+          old_accept='''function acceptProfile(p){
+ if(!p?.id||!p?.token)return;
+ try{
+  const had=!profile();if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id);
+  if(typeof saveProfile==='function')saveProfile({id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked});
+  if(typeof updateProfileChip==='function')updateProfileChip();
+  if(typeof renderProfile==='function')renderProfile();
+  if(typeof renderDaily==='function')renderDaily();
+  if(typeof renderFree==='function')renderFree();
+  if(typeof renderLeaderboard==='function')renderLeaderboard();
+  if(typeof syncQueue==='function')syncQueue({announce:true}).catch(()=>{});
+ }catch{}
+ setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},90);
+}'''
+          new_accept='''function acceptProfile(p){
+ if(!p?.id||!p?.token)return false;
+ const had=!profile();
+ const next={id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked};
+ // Authentication state is the critical write. Do it first and never hide a failure behind
+ // unrelated rendering/adoption work; recovery invalidates the old sessions immediately.
+ try{localStorage.setItem('proplet-v2-profile',JSON.stringify(next))}catch{return false}
+ try{if(typeof saveProfile==='function')saveProfile(next)}catch{}
+ try{if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id)}catch{}
+ try{if(typeof updateProfileChip==='function')updateProfileChip()}catch{}
+ try{if(typeof renderProfile==='function')renderProfile()}catch{}
+ try{if(typeof renderDaily==='function')renderDaily()}catch{}
+ try{if(typeof renderFree==='function')renderFree()}catch{}
+ try{if(typeof renderLeaderboard==='function')renderLeaderboard()}catch{}
+ try{if(typeof syncQueue==='function')syncQueue({announce:true}).catch(()=>{})}catch{}
+ setTimeout(()=>{try{enhanceProfileArchitecture();refreshSecurityCard()}catch{}},90);
+ return true;
+}'''
+          replace_once('public/account-auth.js',old_accept,new_accept)
+
+          replace_once(
+              'public/account-auth.js',
+              "return {accessToken:p.get('access_token')||'',error:p.get('error_description')||p.get('error')||''};",
+              "return {accessToken:p.get('access_token')||'',error:p.get('error_description')||p.get('error')||'',originTransfer:p.get('origin_transfer')||''};"
+          )
+          replace_once(
+              'public/account-auth.js',
+              "const inp=$('#playerNameInput');if(inp){inp.placeholder=create?'Jak ti má Proplet říkat?':'Jméno nebo ověřený e-mail';inp.setAttribute('autocomplete',create?'nickname':'username')}",
+              "const inp=$('#playerNameInput');if(inp){inp.maxLength=create?24:254;inp.placeholder=create?'Jak ti má Proplet říkat?':'Jméno nebo ověřený e-mail';inp.setAttribute('autocomplete',create?'nickname':'username')}"
+          )
+          replace_once(
+              'public/account-auth.js',
+              "acceptProfile(d.profile);recoveryContext=null;sessionStorage.removeItem('proplet-recovery-context');",
+              "if(!acceptProfile(d.profile))throw new Error('Nové přihlášení se nepodařilo uložit. Zkus se prosím přihlásit znovu.');recoveryContext=null;sessionStorage.removeItem('proplet-recovery-context');"
+          )
+
+          old_handle="""async function handleAuthReturn(){
+ const qs=new URLSearchParams(location.search),kind=qs.get('auth');if(!kind)return;ensureModals();const frag=supabaseFragment();if(frag.error){toast(`Přihlášení se nepodařilo: ${frag.error}`);cleanAuthUrl();return}if(!frag.accessToken)return;
+ try{if(kind==='google'){const d=await call('/api/auth/google/complete',{method:'POST',body:{accessToken:frag.accessToken}});acceptProfile(d.profile);cleanAuthUrl();toast(d.linked?'✅ Google je propojený s tvým Propletem.':'🎉 Přihlášeno přes Google.');return}const challenge=qs.get('challenge')||'';if(kind==='email-link'){const d=await call('/api/account/email/verify',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});acceptProfile(d.profile);cleanAuthUrl();toast('✅ E-mail je ověřený. Zapomenuté heslo už umíme zachránit.');return}if(kind==='recover'){await call('/api/auth/recovery/check',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});recoveryContext={challenge,accessToken:frag.accessToken};sessionStorage.setItem('proplet-recovery-context',JSON.stringify(recoveryContext));openModal('#resetPasswordModal');return}}catch(e){toast(e.message);cleanAuthUrl()}
+}"""
+          new_handle="""async function handleAuthReturn(){
+ const qs=new URLSearchParams(location.search),kind=qs.get('auth');if(!kind)return;ensureModals();const frag=supabaseFragment();if(frag.error){toast(`Přihlášení se nepodařilo: ${frag.error}`);cleanAuthUrl();return}
+ try{
+  if(kind==='origin-transfer'){
+   if(!frag.originTransfer)throw new Error('Přenos přihlášení vypršel. Přihlas se prosím znovu.');
+   const d=await call('/api/account/origin-transfer/redeem',{method:'POST',body:{challenge:frag.originTransfer},auth:false});
+   if(!acceptProfile(d.profile))throw new Error('Přihlášení se nepodařilo uložit. Přihlas se prosím znovu.');
+   cleanAuthUrl();toast('✅ Přihlášení jsme bezpečně převedli na hrajproplet.cz.');return;
+  }
+  if(!frag.accessToken)return;
+  if(kind==='google'){const d=await call('/api/auth/google/complete',{method:'POST',body:{accessToken:frag.accessToken}});if(!acceptProfile(d.profile))throw new Error('Přihlášení se nepodařilo uložit.');cleanAuthUrl();toast(d.linked?'✅ Google je propojený s tvým Propletem.':'🎉 Přihlášeno přes Google.');return}
+  const challenge=qs.get('challenge')||'';
+  if(kind==='email-link'){const d=await call('/api/account/email/verify',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});if(!acceptProfile(d.profile))throw new Error('Přihlášení se nepodařilo uložit.');cleanAuthUrl();toast('✅ E-mail je ověřený. Zapomenuté heslo už umíme zachránit.');return}
+  if(kind==='recover'){await call('/api/auth/recovery/check',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});recoveryContext={challenge,accessToken:frag.accessToken};sessionStorage.setItem('proplet-recovery-context',JSON.stringify(recoveryContext));openModal('#resetPasswordModal');return}
+ }catch(e){toast(e.message);cleanAuthUrl()}
+}"""
+          replace_once('public/account-auth.js',old_handle,new_handle)
+
+          # Server-side one-time origin transfer reuses the existing challenge table: random secret,
+          # hashed at rest, five-minute expiry, consumed after one redemption. No bearer token in URL.
+          replace_once(
+              'account_auth.py',
+              '''class RecoveryReset(AuthCallback):
+    challenge: str = Field(min_length=24, max_length=160)
+    password: str = Field(min_length=8, max_length=128)
+''',
+              '''class RecoveryReset(AuthCallback):
+    challenge: str = Field(min_length=24, max_length=160)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class OriginTransferRedeem(BaseModel):
+    challenge: str = Field(min_length=24, max_length=160)
+'''
+          )
+          marker='''    @app.get("/api/account/auth-status")
+    def account_auth_status(request: Request, authorization: Optional[str] = Header(default=None)):
+'''
+          addition='''    @app.post("/api/account/origin-transfer/start")
+    def origin_transfer_start(request: Request, authorization: Optional[str] = Header(default=None)):
+        enforce_rate_limit(request, "origin_transfer_start", limit=12, window_seconds=3600)
+        player = auth_player(authorization)
+        challenge = create_challenge(player["id"], "origin_transfer", "origin-transfer@local.invalid", minutes=5)
+        return {"ok": True, "challenge": challenge, "expiresInSeconds": 300}
+
+    @app.post("/api/account/origin-transfer/redeem")
+    def origin_transfer_redeem(payload: OriginTransferRedeem, request: Request):
+        enforce_rate_limit(request, "origin_transfer_redeem", limit=20, window_seconds=3600)
+        row = challenge_row(payload.challenge, "origin_transfer")
+        players = db_select("players", id=row["player_id"])
+        if not players:
+            raise HTTPException(401, "Přihlášení už neexistuje")
+        now = datetime.now(tz).isoformat()
+        db_update("account_auth_challenges", {"id": row["id"]}, {"used_at": now})
+        player = players[0]
+        return {"ok": True, "profile": player_payload(player, new_session(player["id"]))}
+
+'''+marker
+          replace_once('account_auth.py',marker,addition)
+
+          # One public release version everywhere.
+          replace_once('proplet_version.py','APP_VERSION = "3.32.5"','APP_VERSION = "3.32.6"')
+          replace_once('public/sw.js',"const CACHE='proplet-v3.32.5-gesture-runtime-r1';","const CACHE='proplet-v3.32.6-auth-recovery-r1';")
+          replace_once('public/theme-init.js',"loadScript('/account-auth.js?v=4','propletAccountAuth');","loadScript('/account-auth.js?v=5','propletAccountAuth');")
+
+          # runtime-meta gets a purpose-built replacement because it runs before app.js and is the
+          # only code that can still see localStorage on the legacy origin before canonicalisation.
+          Path('public/runtime-meta.js').write_text('''(()=>{\n  \'use strict\';\n  const canonicalOrigin=\'https://hrajproplet.cz\';\n  const productionAliases=new Set([\n    \'www.hrajproplet.cz\',\n    \'proplet-nine.vercel.app\',\n    \'proplet-pavel-prouzas-projects.vercel.app\',\n    \'proplet-git-main-pavel-prouzas-projects.vercel.app\'\n  ]);\n  const META=Object.freeze({\n    version:\'3.32.6\',\n    canonicalOrigin,\n    capabilities:Object.freeze({\n      phoneLandscapeBlocking:true,\n      tabletLandscapeReflow:true,\n      embeddedBrowserGestureGuard:true,\n      canonicalPushOrigin:true,\n      originSessionMigration:true\n    })\n  });\n  window.PROPLET_RUNTIME_META=META;\n  window.PROPLET_VERSION=META.version;\n\n  const canonicalize=async()=>{\n    const target=new URL(location.href);\n    target.protocol=\'https:\';target.host=\'hrajproplet.cz\';target.hash=\'\';\n    try{\n      const stored=JSON.parse(localStorage.getItem(\'proplet-v2-profile\')||\'null\');\n      if(stored?.token){\n        const response=await fetch(\'/api/account/origin-transfer/start\',{\n          method:\'POST\',headers:{\'Accept\':\'application/json\',\'Authorization\':`Bearer ${stored.token}`},cache:\'no-store\'\n        });\n        if(response.ok){\n          const data=await response.json();\n          if(data?.challenge){\n            target.searchParams.set(\'auth\',\'origin-transfer\');\n            target.hash=`origin_transfer=${encodeURIComponent(data.challenge)}`;\n            location.replace(target.href);return;\n          }\n        }\n      }\n    }catch{}\n    location.replace(target.href);\n  };\n\n  // Preserve an authenticated legacy-origin player before moving to the canonical origin.\n  // The URL carries only a five-minute one-time challenge in the fragment, never the bearer token.\n  if(productionAliases.has(location.hostname)&&location.origin!==canonicalOrigin){canonicalize();return;}\n\n  const loadPushOriginGuard=()=>{\n    if(document.querySelector(\'script[data-proplet-push-origin]\'))return;\n    const script=document.createElement(\'script\');\n    script.src=\'/push-origin-v3325.js?v=1\';script.async=false;script.dataset.propletPushOrigin=\'1\';document.body.appendChild(script);\n  };\n  if(document.readyState===\'loading\')window.addEventListener(\'DOMContentLoaded\',loadPushOriginGuard,{once:true});\n  else loadPushOriginGuard();\n})();\n''',encoding='utf-8')
+
+          # One-shot helper must not survive in the final branch state.
+          Path('.github/workflows/v3326-auth-recovery-patcher.yml').unlink()
+          PY
+      - name: Verify syntax and release invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile server.py account_auth.py proplet_version.py
+          node --check public/app.js
+          node --check public/account-auth.js
+          node --check public/runtime-meta.js
+          node --check public/theme-init.js
+          node --check public/sw.js
+          grep -Fq 'APP_VERSION = "3.32.6"' proplet_version.py
+          grep -Fq "version:'3.32.6'" public/runtime-meta.js
+          grep -Fq 'proplet-v3.32.6-auth-recovery-r1' public/sw.js
+          grep -Fq 'inp.maxLength=create?24:254' public/account-auth.js
+          grep -Fq '/api/account/origin-transfer/redeem' public/account-auth.js
+          grep -Fq '/api/account/origin-transfer/start' account_auth.py
+          grep -Fq 'originSessionMigration:true' public/runtime-meta.js
+      - name: Commit final branch state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/index.html public/account-auth.js public/runtime-meta.js public/theme-init.js public/sw.js account_auth.py proplet_version.py .github/workflows/v3326-auth-recovery-patcher.yml
+          git commit -m 'Proplet v3.32.6 — restore legacy auth and email login [skip ci]'
+          git push origin HEAD:agent/v3326-auth-origin-recovery
