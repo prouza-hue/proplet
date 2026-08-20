@@ -1,0 +1,74 @@
+/* v3.33.3 — make competitive sharing read as a challenge, not generic sharing. */
+#winModal .win-main-actions .challenge-share-cta{
+  flex:1 1 100%;
+  max-width:none;
+  min-height:42px;
+  padding:10px 15px;
+  border:1px solid #6b53d8;
+  border-radius:13px;
+  background:linear-gradient(135deg,#6550d8 0%,#7f5ce7 58%,#8f69ee 100%);
+  color:#fff;
+  box-shadow:0 7px 18px rgba(83,61,178,.22),inset 0 1px 0 rgba(255,255,255,.2);
+  font-size:12.5px;
+  font-weight:950;
+  letter-spacing:.01em;
+}
+#winModal .win-main-actions .challenge-share-cta:hover,
+#winModal .win-main-actions .challenge-share-cta:focus-visible{
+  background:linear-gradient(135deg,#5d47cf 0%,#7652df 58%,#8861e9 100%);
+  border-color:#5f47cf;
+  color:#fff;
+  box-shadow:0 9px 22px rgba(83,61,178,.28),inset 0 1px 0 rgba(255,255,255,.22);
+  outline:none;
+}
+#winModal .win-main-actions .challenge-share-cta:active{transform:scale(.985)}
+
+#levelDetailShareBtn.challenge-share-detail-cta{
+  border-color:#6b53d8;
+  background:linear-gradient(135deg,#6550d8,#835fe9);
+  color:#fff;
+  box-shadow:0 5px 14px rgba(83,61,178,.18);
+  font-weight:900;
+}
+#levelDetailShareBtn.challenge-share-detail-cta:hover,
+#levelDetailShareBtn.challenge-share-detail-cta:focus-visible{
+  border-color:#5f47cf;
+  background:linear-gradient(135deg,#5d47cf,#7854df);
+  color:#fff;
+}
+
+html[data-theme="dark"] #winModal .win-main-actions .challenge-share-cta,
+html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
+  border-color:#8d78ef;
+  background:linear-gradient(135deg,#6652c9,#8063dc);
+  color:#fff;
+  box-shadow:0 7px 20px rgba(0,0,0,.28),0 0 0 1px rgba(177,158,255,.08) inset;
+}
+@media(max-width:390px){
+  #winModal .win-main-actions .challenge-share-cta{min-height:40px;padding:9px 12px;font-size:12px}
+}
+
+
+/* Desktop: the next-game action and the challenge CTA share one compact primary row. */
+#winModal .win-main-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:7px;
+  margin-top:0;
+}
+#winModal .win-main-actions>#winPrimaryBtn,
+#winModal .win-main-actions>#winShareBtn{
+  width:100%;
+  margin:0;
+}
+@media(min-width:600px){
+  #winModal .win-main-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+    align-items:stretch;
+  }
+  #winModal .win-main-actions>#winPrimaryBtn,
+  #winModal .win-main-actions>.challenge-share-cta{
+    min-height:50px;
+  }
+}
