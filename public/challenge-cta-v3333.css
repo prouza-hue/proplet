@@ -72,3 +72,43 @@ html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
     min-height:50px;
   }
 }
+
+/* v3.33.5 — Daily challenge entry point and compact action pairing. */
+.daily-hero .daily-main-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.daily-hero .daily-main-actions>#playDailyBtn,
+.daily-hero .daily-main-actions>#shareDailyBtn{
+  width:100%;
+  margin:0;
+}
+.daily-hero #shareDailyBtn.daily-challenge-cta{
+  min-height:44px;
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:13px;
+  background:rgba(255,255,255,.17);
+  color:#fff;
+  font-weight:900;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+}
+.daily-hero #shareDailyBtn.daily-challenge-cta:hover,
+.daily-hero #shareDailyBtn.daily-challenge-cta:focus-visible{
+  border-color:rgba(255,255,255,.82);
+  background:rgba(255,255,255,.25);
+  color:#fff;
+  outline:none;
+}
+.daily-hero #shareDailyBtn.daily-challenge-cta:active{transform:scale(.985)}
+@media(min-width:600px){
+  .daily-hero .daily-main-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    align-items:stretch;
+  }
+  .daily-hero .daily-main-actions>#playDailyBtn,
+  .daily-hero .daily-main-actions>#shareDailyBtn{
+    min-height:50px;
+  }
+}
