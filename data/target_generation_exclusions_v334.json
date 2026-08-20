@@ -37,6 +37,7 @@
   ],
   "remove_from_target_generation": [
     "rock",
+    "frisbee",
     "červodíra",
     "blockchain",
     "tensor",
