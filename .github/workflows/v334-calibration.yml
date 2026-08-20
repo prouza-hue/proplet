@@ -1,0 +1,94 @@
+name: v3.34 calibration lab
+
+on:
+  push:
+    branches:
+      - agent/v3340-difficulty-calibration
+    paths:
+      - 'tools/generate_v334_calibration.py'
+      - 'tools/generate_v334_calibration_v2.py'
+      - 'tools/audit_v334_difficulty.py'
+      - 'tools/review_v334_lexicon.py'
+      - '.github/workflows/v334-calibration.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/generate_v334_calibration.py'
+      - 'tools/generate_v334_calibration_v2.py'
+      - 'tools/audit_v334_difficulty.py'
+      - 'tools/review_v334_lexicon.py'
+      - '.github/workflows/v334-calibration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Syntax check
+        run: |
+          python -m py_compile tools/generate_v334_calibration.py
+          python -m py_compile tools/generate_v334_calibration_v2.py
+          python -m py_compile tools/audit_v334_difficulty.py
+          python -m py_compile tools/review_v334_lexicon.py
+
+      - name: Audit current Generation 3
+        run: |
+          mkdir -p /tmp/v334
+          python tools/audit_v334_difficulty.py \
+            --source data/puzzles.json \
+            --json /tmp/v334/gen3-audit.json
+
+      - name: Generate balanced Generation 4 calibration bank
+        run: |
+          python tools/generate_v334_calibration_v2.py \
+            --medium 10 \
+            --hard 10 \
+            --output /tmp/v334/calibration-v2.json
+
+      - name: Audit calibration bank
+        run: |
+          python tools/audit_v334_difficulty.py \
+            --source /tmp/v334/calibration-v2.json \
+            --json /tmp/v334/gen4-calibration-v2-audit.json
+
+      - name: Build lexicon review shortlist
+        run: |
+          python tools/review_v334_lexicon.py \
+            --output /tmp/v334/V334_LEXICON_REVIEW_CANDIDATES.md \
+            --limit 70
+
+      - name: Upload calibration evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v334-calibration-lab-v2
+          path: /tmp/v334/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish preview-only fixture to calibration branch
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          cp /tmp/v334/calibration-v2.json public/calibration-v334.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/calibration-v334.json
+          if git diff --cached --quiet; then
+            echo 'Calibration fixture already current.'
+            exit 0
+          fi
+          git commit -m 'Refresh v3.34 calibration preview fixture'
+          git push origin HEAD:${GITHUB_REF_NAME}

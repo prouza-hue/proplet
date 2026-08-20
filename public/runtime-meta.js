@@ -8,7 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const META=Object.freeze({
-    version:'3.33.1',
+    version:'3.34.0',
     canonicalOrigin,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
