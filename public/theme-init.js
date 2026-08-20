@@ -39,7 +39,8 @@
     ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/release-notes-v3331.css?v=1','propletReleaseNotesV3331Css'],
-    ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css']
+    ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
+    ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css']
   ];
 
   const loadStyle=(href,key)=>{
@@ -91,6 +92,7 @@
     loadScript('/competitive-sharing-v3331.js?v=2','propletCompetitiveSharing');
     await loadScript('/account-bonus-v3331.js?v=1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=1','propletAccountConversionV3331',{wait:true});
+    loadScript('/onboarding-return-v3332.js?v=1','propletOnboardingReturnV3332');
     loadScript('/release-notes-v3331.js?v=2','propletReleaseNotesV3331');
   };
 
