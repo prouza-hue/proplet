@@ -122,6 +122,7 @@
   };
 
   const observer=new MutationObserver(syncTutorialCopy);
-  observer.observe(document.documentElement,{childList:true,subtree:true});
+  const onboardingContent=document.querySelector('#onboardContent');
+  if(onboardingContent)observer.observe(onboardingContent,{childList:true,subtree:true});
   syncTutorialCopy();
 })();
