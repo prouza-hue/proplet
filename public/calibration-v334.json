@@ -1,0 +1,62 @@
+{
+  "version": 3,
+  "purpose": "v3.34 focused calibration V3 - generation pending",
+  "fixtureId": "v334-calibration-v3-pending",
+  "calibrationGeneration": 4,
+  "seed": 20260821,
+  "targetGenerationExclusions": [
+    "afázie",
+    "alexandr",
+    "anafora",
+    "anamorfóza",
+    "apogeum",
+    "blockchain",
+    "cerberus",
+    "červodíra",
+    "difrakce",
+    "dodekaedr",
+    "ekliptika",
+    "epifora",
+    "feťačka",
+    "foném",
+    "františek",
+    "frisbee",
+    "geodézie",
+    "grafen",
+    "graviton",
+    "heuristika",
+    "chronometr",
+    "ikosaedr",
+    "koherence",
+    "lidar",
+    "lunochod",
+    "magnetit",
+    "mastaba",
+    "metaverzum",
+    "metonymie",
+    "modalita",
+    "nautilus",
+    "nekropole",
+    "orbitál",
+    "pareidolie",
+    "poetika",
+    "pulsar",
+    "rock",
+    "synekdocha",
+    "tensor",
+    "teserakt",
+    "triréma",
+    "zikkurat"
+  ],
+  "puzzles": {
+    "medium": [],
+    "hard": []
+  },
+  "stats": {
+    "counts": {
+      "medium": 0,
+      "hard": 0
+    },
+    "status": "GitHub Actions is generating the deterministic fixture"
+  }
+}
