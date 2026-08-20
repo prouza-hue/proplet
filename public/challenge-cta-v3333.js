@@ -21,6 +21,29 @@
     }
   }
 
+  function syncWinLayout(win,free){
+    const modal=$('#winModal');
+    const primary=$('#winPrimaryBtn');
+    const secondary=modal?.querySelector('.win-secondary-actions');
+    let row=modal?.querySelector('.win-main-actions');
+    if(!modal||!primary||!secondary)return;
+
+    const pair=free&&!modal.classList.contains('hidden')&&!win.classList.contains('hidden');
+    if(pair){
+      if(!row){
+        row=document.createElement('div');
+        row.className='win-main-actions';
+        primary.before(row);
+      }
+      if(primary.parentElement!==row)row.appendChild(primary);
+      if(win.parentElement!==row)row.appendChild(win);
+    }else if(row){
+      row.before(primary);
+      secondary.insertBefore(win,secondary.firstChild);
+      row.remove();
+    }
+  }
+
   function syncShareCtas(){
     const win=$('#winShareBtn');
     const detail=$('#levelDetailShareBtn');
@@ -37,6 +60,7 @@
         setClass(win,'challenge-share-cta',false);
         setAriaLabel(win,'');
       }
+      syncWinLayout(win,free);
     }
 
     if(detail){
@@ -47,22 +71,16 @@
     }
   }
 
-  let syncScheduled=false;
-  function scheduleSync(){
-    if(syncScheduled)return;
-    syncScheduled=true;
-    requestAnimationFrame(()=>{
-      syncScheduled=false;
-      syncShareCtas();
-    });
-  }
-
-  const observer=new MutationObserver(scheduleSync);
   function boot(){
     syncShareCtas();
-    if(document.body)observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+    const observer=new MutationObserver(syncShareCtas);
+    const winModal=$('#winModal');
+    const detailModal=$('#levelDetailModal');
+    if(winModal)observer.observe(winModal,{attributes:true,attributeFilter:['class']});
+    if(detailModal)observer.observe(detailModal,{attributes:true,attributeFilter:['class']});
+    window.addEventListener('pageshow',syncShareCtas);
   }
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
-  [120,400,900,1800].forEach(ms=>setTimeout(scheduleSync,ms));
 })();
