@@ -94,6 +94,7 @@ async function loadIntegrity(){
 }
 
 const boot=()=>{
+  if(!document.getElementById('adminGate'))return;
   wrapAccountSubmit();applyTeamOptOutCopy();loadIntegrity();
   const observer=new MutationObserver(()=>{wrapAccountSubmit();applyTeamOptOutCopy();if(integrity){renderIntegrityCard();correctOverviewCount()}else loadIntegrity()});
   observer.observe(document.body,{childList:true,subtree:true});
