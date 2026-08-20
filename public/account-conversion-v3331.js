@@ -7,6 +7,7 @@
   const $=s=>document.querySelector(s);
 
   function isCreateMode(){return !!$('#profileModeCreate')?.classList.contains('active')}
+  function setText(el,value){if(el&&el.textContent!==value)el.textContent=value}
 
   function positionGoogleFirst(){
     const modal=$('#profileModal'),desc=$('#profileModalDesc'),button=$('#googleLoginBtn');
@@ -44,19 +45,19 @@
     const divider=$('#googleManualDivider span'),head=$('#googlePrimaryBlock .google-primary-head span'),note=$('#googlePrimaryBlock .google-primary-note');
 
     if(create){
-      if(title)title.textContent='Nepřijdi o své výsledky';
-      if(desc)desc.textContent='Založ si účet, trvá to pár vteřin. Uložíme XP, výsledky i sérii — a přidáme ti +500 XP.';
-      if(save)save.textContent='Založit jménem a heslem · +500 XP';
-      if(divider)divider.textContent='nebo přezdívkou a heslem';
-      if(head)head.textContent='NEJRYCHLEJŠÍ ZPŮSOB';
-      if(note)note.textContent='Bez vytváření nového hesla · +500 XP po založení.';
+      setText(title,'Nepřijdi o své výsledky');
+      setText(desc,'Založ si účet, trvá to pár vteřin. Uložíme XP, výsledky i sérii — a přidáme ti +500 XP.');
+      setText(save,'Založit jménem a heslem · +500 XP');
+      setText(divider,'nebo přezdívkou a heslem');
+      setText(head,'NEJRYCHLEJŠÍ ZPŮSOB');
+      setText(note,'Bez vytváření nového hesla · +500 XP po založení.');
     }else{
-      if(title)title.textContent='Přihlásit se';
-      if(desc)desc.textContent='Nejrychleji přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.';
-      if(save)save.textContent='Přihlásit se';
-      if(divider)divider.textContent='nebo jménem a heslem';
-      if(head)head.textContent='NEJRYCHLEJŠÍ PŘIHLÁŠENÍ';
-      if(note)note.textContent='Bez vyplňování jména a hesla.';
+      setText(title,'Přihlásit se');
+      setText(desc,'Nejrychleji přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.');
+      setText(save,'Přihlásit se');
+      setText(divider,'nebo jménem a heslem');
+      setText(head,'NEJRYCHLEJŠÍ PŘIHLÁŠENÍ');
+      setText(note,'Bez vyplňování jména a hesla.');
     }
   }
 
@@ -130,10 +131,19 @@
     polishAuthModal();
   }
 
-  const observer=new MutationObserver(()=>setTimeout(boot,0));
-  if(document.body)observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
+  let bootScheduled=false;
+  function scheduleBoot(){
+    if(bootScheduled)return;
+    bootScheduled=true;
+    queueMicrotask(()=>{bootScheduled=false;boot()});
+  }
+  function start(){
+    boot();
+    const modal=$('#profileModal');
+    if(modal)new MutationObserver(scheduleBoot).observe(modal,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  }
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
   setTimeout(boot,250);
   setTimeout(boot,1000);
 })();

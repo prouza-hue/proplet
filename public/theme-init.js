@@ -85,16 +85,16 @@
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
     loadScript('/onboarding-model-v3328.js?v=3','propletOnboardingModel');
-    loadScript('/gesture-guard-v3325.js?v=1','propletGestureGuard');
+    loadScript('/gesture-guard-v3325.js?v=2','propletGestureGuard');
     loadScript('/valid-word-feedback-v3330.js?v=1','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
-    loadScript('/account-team-v33210.js?v=1','propletAccountTeamIntegrity');
+    loadScript('/account-team-v33210.js?v=2','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=2','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=2','propletChallengeCtaV3333');
     await loadScript('/account-bonus-v3331.js?v=1','propletAccountBonusV3331',{wait:true});
-    await loadScript('/account-conversion-v3331.js?v=1','propletAccountConversionV3331',{wait:true});
-    loadScript('/onboarding-return-v3332.js?v=1','propletOnboardingReturnV3332');
+    await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
+    loadScript('/onboarding-return-v3332.js?v=2','propletOnboardingReturnV3332');
     loadScript('/release-notes-v3331.js?v=2','propletReleaseNotesV3331');
   };
 
