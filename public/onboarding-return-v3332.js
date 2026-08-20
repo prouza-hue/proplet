@@ -5,6 +5,7 @@
 
   const ONBOARD_KEY='proplet-v3-7-required-onboarding';
   const HELPER_ONBOARD_KEY='proplet-v3-16-2-helper-onboarding';
+  const RULE_SEEN_KEY='proplet-v3-32-8-rule-principle-seen';
   const AUTH_INTENT_KEY='proplet-v3-33-2-onboarding-auth-intent';
   const DEFAULT_SUPPORT_MODE='younger';
   let patched=false;
@@ -21,8 +22,8 @@
   function hasPriorLocalPlay(){
     try{
       if(typeof getState!=='function')return false;
-      const completed=getState()?.completed||{};
-      return Object.keys(completed).length>0;
+      const state=getState()||{};
+      return Object.keys(state.completed||{}).length>0||Object.keys(state.inProgress||{}).length>0;
     }catch{return false}
   }
 
@@ -37,6 +38,7 @@
     try{
       localStorage.setItem(ONBOARD_KEY,'done');
       localStorage.setItem(HELPER_ONBOARD_KEY,'done');
+      localStorage.setItem(RULE_SEEN_KEY,'1');
     }catch{}
     rememberDefaultSupport();
     if(eventName)track(eventName);
