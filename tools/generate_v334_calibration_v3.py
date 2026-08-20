@@ -48,28 +48,28 @@ PROFILES = {
     "medium-compact": {
         "rows": 7,
         "cols": 7,
-        "cells": (37, 41),
-        "words": (7, 8),
+        "cells": (33, 37),
+        "words": (7, 7),
         "min_len": 4,
         "max_len": 8,
         "turn_bias": 0.28,
-        "min_bbox_rows": 6,
-        "min_bbox_cols": 6,
+        "min_bbox_rows": 5,
+        "min_bbox_cols": 5,
         "min_curvy_share": 0.14,
         "max_mean_straight_share": 0.66,
         "geometry_profile": "v334-medium-independent-v3-compact-7x7",
         "policy": MEDIUM_POLICY,
         "max_curl_paths": 2,
         "max_curl_run": 2,
-        "min_mean_turns": 1.00,
-        "max_mean_turns": 2.35,
+        "min_mean_turns": 0.75,
+        "max_mean_turns": 2.40,
         "max_blank_components": 3,
         "max_isolated_blanks": 0,
     },
     "medium-cutout": {
         "rows": 8,
         "cols": 8,
-        "cells": (40, 44),
+        "cells": (38, 42),
         "words": (7, 8),
         "min_len": 4,
         "max_len": 8,
@@ -82,8 +82,8 @@ PROFILES = {
         "policy": MEDIUM_POLICY,
         "max_curl_paths": 2,
         "max_curl_run": 2,
-        "min_mean_turns": 0.90,
-        "max_mean_turns": 2.25,
+        "min_mean_turns": 0.70,
+        "max_mean_turns": 2.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 0,
     },
@@ -169,12 +169,6 @@ def guarded_pack_paths(words, difficulty, profile, rng):
     if max(curls, default=0) > profile["max_curl_run"]:
         return None
 
-    occupied = {cell for path in geometry.values() for cell in path}
-    components = blank_component_sizes(profile, occupied)
-    if len(components) > profile["max_blank_components"]:
-        return None
-    if sum(size == 1 for size in components) > profile["max_isolated_blanks"]:
-        return None
     return geometry
 
 
@@ -252,18 +246,32 @@ def main() -> None:
         for level in range(1, counts[difficulty] + 1):
             variant = schedules[difficulty][level - 1]
             cal.PROFILES[difficulty] = deepcopy(PROFILES[variant])
-            puzzle = cal.build_puzzle(
-                gp,
-                difficulty,
-                level,
-                rng,
-                pools[difficulty],
-                dictionary,
-                tier_of,
-                fun_of,
-                used_targets,
-            )
-            annotate(puzzle, variant)
+            puzzle = None
+            # Shape readability is deliberately a second-stage retry. Putting
+            # it inside path packing made small 7x7 candidates needlessly rare.
+            for shape_retry in range(1, 31):
+                candidate = cal.build_puzzle(
+                    gp,
+                    difficulty,
+                    level,
+                    rng,
+                    pools[difficulty],
+                    dictionary,
+                    tier_of,
+                    fun_of,
+                    used_targets,
+                )
+                annotate(candidate, variant)
+                meta = candidate["meta"]
+                if meta["cutoutComponents"] > PROFILES[variant]["max_blank_components"]:
+                    continue
+                if meta["isolatedCutoutCells"] > PROFILES[variant]["max_isolated_blanks"]:
+                    continue
+                puzzle = candidate
+                meta["shapeRetry"] = shape_retry
+                break
+            if puzzle is None:
+                raise RuntimeError(f"Could not generate readable shape for {difficulty} level {level}")
             banks[difficulty].append(puzzle)
             used_targets |= {answer["word"].casefold() for answer in puzzle["answers"]}
             print(
