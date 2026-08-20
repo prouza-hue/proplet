@@ -8,7 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const META=Object.freeze({
-    version:'3.33.2',
+    version:'3.33.3',
     canonicalOrigin,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
@@ -35,6 +35,7 @@
       competitiveLevelSharing:true,
       sharedLevelDeepLinks:true,
       sharedChallengeReturnToProgress:true,
+      challengeFirstShareCta:true,
       accountCreationBonusXp:500,
       accountBonusLeaderboardExcluded:true,
       growthReleaseNotes:true,
