@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scope": "target-generation-only",
-  "review": "v3.34 lexical review — product owner round 1",
+  "review": "v3.34 lexical review — product owner round 1 closed",
   "approved_keep": [
     "agregace",
     "korelace",
@@ -31,7 +31,9 @@
     "synestezie",
     "tautologie",
     "telekineze",
-    "topologie"
+    "topologie",
+    "astroláb",
+    "mnohostěn"
   ],
   "remove_from_target_generation": [
     "rock",
@@ -72,13 +74,10 @@
     "synekdocha",
     "teserakt",
     "triréma",
-    "zikkurat"
+    "zikkurat",
+    "magnetit"
   ],
-  "pending": [
-    "astroláb",
-    "magnetit",
-    "mnohostěn"
-  ],
+  "pending": [],
   "notes": [
     "Removal affects future target generation only.",
     "Recognition vocabulary remains broad and is not reduced by this review.",
