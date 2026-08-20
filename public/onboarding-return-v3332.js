@@ -168,7 +168,10 @@
         if(authIntent()&&profile()?.token)finishReturningAuth();
         else injectActions();
       });
-      observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+      const onboardingModal=$('#onboardingModal');
+      const profileModal=$('#profileModal');
+      if(onboardingModal)observer.observe(onboardingModal,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+      if(profileModal)observer.observe(profileModal,{attributes:true,attributeFilter:['class']});
     }
   }
 
