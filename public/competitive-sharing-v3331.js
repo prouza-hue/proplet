@@ -193,6 +193,42 @@
     return u.href;
   };
 
+  const buildDailyUrl=()=>{
+    const u=new URL(SHARE_URL||`${location.origin}/`);
+    PARAMS.forEach(k=>u.searchParams.delete(k));
+    u.searchParams.set('open','daily');
+    return u.href;
+  };
+
+  const shareDailyChallenge=async()=>{
+    const g=currentGame?.mode==='daily'?currentGame:null;
+    const date=g?.dailyDate||pragueDateISO();
+    let daily=null;
+    try{daily=dailyResultState(date)}catch{}
+    const puzzle=g?.puzzle||daily?.puzzle;
+    const stored=daily?.active||null;
+    const rec=g?.finished?{
+      elapsedMs:g.elapsedMs,
+      moves:g.moves,
+      hintsUsed:g.hints||0,
+      cleanSolve:(g.hints||0)===0
+    }:stored;
+    if(!puzzle||!rec)return baseShareDaily?.();
+
+    const stats=effectiveStats();
+    const rank=winDailyGlobalData?.date===date&&winDailyGlobalData?.myRank
+      ?` · 🌍 ${winDailyGlobalData.myRank}. z ${winDailyGlobalData.total}`
+      :'';
+    const clean=Number(rec.hintsUsed||0)===0?'✨ čistě':`💡 ${countCz(Number(rec.hintsUsed||0),'nápověda','nápovědy','nápověd')}`;
+    const url=buildDailyUrl();
+    const title='Proplet · dnešní výzva';
+    const text=`☀️ Dnešní Proplet mám za ${fmtTime(rec.elapsedMs)}. Překonáš mě?\n📅 ${formatDateCZ(date)} · ${diffLabel(puzzle.difficulty)} · 🔥 ${countCz(stats.currentStreak,'den','dny','dní')}${rank}\n${clean} · ${countCz(rec.moves,'tah','tahy','tahů')}`;
+    try{
+      if(navigator.share)await navigator.share({title,text,url});
+      else{await navigator.clipboard.writeText(`${text}\n${url}`);showToast('Výzva i odkaz jsou ve schránce ✓')}
+    }catch(e){if(e?.name!=='AbortError')showToast('Sdílení se nepovedlo. Zkus to znovu.')}
+  };
+
   const shareCompetitive=async(puzzle,rec,rankText='')=>{
     if(!puzzle||!rec)return;
     const level=Number(puzzle.meta?.level)||'?',diff=diffLabel(puzzle.difficulty),url=buildChallengeUrl(puzzle,rec),clean=Number(rec.hintsUsed||0)===0?'✨ čistě':`💡 ${rec.hintsUsed||0}×`,title=`Proplet výzva · ${diff} #${level}`,text=`🧩 ${title}${rankText?` · ${rankText}`:''}\n⏱ ${fmtTime(rec.elapsedMs)} · ${clean} · ${countCz(rec.moves,'tah','tahy','tahů')}\nDokážeš mě porazit? 👀`;
@@ -205,6 +241,7 @@
 
   const shareCurrent=async()=>{
     const g=currentGame;
+    if(g?.mode==='daily')return shareDailyChallenge();
     if(g?.mode!=='free'||!g?.puzzle){return baseShareDaily?.()}
     const stored=getState().completed?.[`free:${g.puzzle.id}`];
     const rec=g.finished?{elapsedMs:g.elapsedMs,moves:g.moves,hintsUsed:g.hints||0,cleanSolve:(g.hints||0)===0}:(stored||g);
@@ -221,9 +258,10 @@
   };
 
   const bindShareHandlers=()=>{
-    const win=document.querySelector('#winShareBtn'),detail=document.querySelector('#levelDetailShareBtn');
+    const win=document.querySelector('#winShareBtn'),detail=document.querySelector('#levelDetailShareBtn'),daily=document.querySelector('#shareDailyBtn');
     if(win)win.onclick=shareCurrent;
     if(detail)detail.onclick=shareDetail;
+    if(daily)daily.onclick=shareDailyChallenge;
   };
 
   const resolveIncoming=async()=>{
