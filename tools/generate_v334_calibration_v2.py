@@ -7,7 +7,23 @@ around the agreed ~120 s calibration centre. This is still calibration-only.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import generate_v334_calibration as cal
+
+ROOT = Path(__file__).resolve().parents[1]
+LEXICAL_DECISIONS = ROOT / "data" / "target_generation_exclusions_v334.json"
+
+# Product-owner lexical decisions are applied to calibration immediately, while
+# recognition remains untouched. Pending review words are not auto-excluded.
+if LEXICAL_DECISIONS.exists():
+    payload = json.loads(LEXICAL_DECISIONS.read_text(encoding="utf-8"))
+    cal.MUST_REVIEW |= {
+        str(word).casefold()
+        for word in payload.get("remove_from_target_generation", [])
+        if str(word).strip()
+    }
 
 cal.PROFILES["medium"].update({
     "cells": (44, 49),
