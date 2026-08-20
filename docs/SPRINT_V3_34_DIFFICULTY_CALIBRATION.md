@@ -63,8 +63,8 @@ V2 přidala správný princip nezávislých cest, ale současně příliš mnoho
 - nejvýše **2** cesty s `curlRun >= 2`,
 - žádnou cestu s `curlRun > 2`,
 - průměr zatáček zhruba 0,9–2,35 podle varianty,
-- žádné osamocené jednobuňkové díry,
-- nejvýše tři souvislé prázdné komponenty,
+- u 7×7 žádné osamocené jednobuňkové díry; u řidší 8×8 nejvýše jedna,
+- nejvýše tři prázdné komponenty u 7×7 a pět u řidší 8×8,
 - převážně Tier A/B; slovník nemá zachraňovat nebo sabotovat geometrii.
 
 Výkus není jen libovolná díra. Musí desku členit do čitelných oblastí; fragmentované jednotlivé zuby jsou zakázané.

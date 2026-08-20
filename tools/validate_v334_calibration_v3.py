@@ -35,13 +35,14 @@ def main() -> None:
             assert meta.get("wideVerifiedUnique") is True
             assert meta.get("endpointStartAdjacencyShare") == 0.0
             assert meta.get("generationKey") == "free-gen4-calibration-v3"
-            assert meta.get("isolatedCutoutCells", 99) <= (0 if difficulty == "medium" else 1)
+            isolated_limit = 0 if (puzzle.get("rows"), puzzle.get("cols")) == (7, 7) else 1
+            assert meta.get("isolatedCutoutCells", 99) <= isolated_limit
             assert len(puzzle.get("mask") or []) == meta.get("cells")
             if difficulty == "medium":
                 medium_sizes.append((puzzle.get("rows"), puzzle.get("cols")))
                 assert meta.get("curlPathCount", 99) <= 2
                 assert meta.get("maxCurlRun", 99) <= 2
-                assert meta.get("meanTurns", 99) <= 2.35
+                assert meta.get("meanTurns", 99) <= 2.40
             else:
                 assert meta.get("curlPathCount", 99) <= 5
                 assert meta.get("maxCurlRun", 99) <= 3

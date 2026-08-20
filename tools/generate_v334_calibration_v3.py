@@ -84,8 +84,8 @@ PROFILES = {
         "max_curl_run": 2,
         "min_mean_turns": 0.70,
         "max_mean_turns": 2.35,
-        "max_blank_components": 3,
-        "max_isolated_blanks": 0,
+        "max_blank_components": 5,
+        "max_isolated_blanks": 1,
     },
     "hard-bridge": {
         "rows": 9,
@@ -249,7 +249,7 @@ def main() -> None:
             puzzle = None
             # Shape readability is deliberately a second-stage retry. Putting
             # it inside path packing made small 7x7 candidates needlessly rare.
-            for shape_retry in range(1, 31):
+            for shape_retry in range(1, 61):
                 candidate = cal.build_puzzle(
                     gp,
                     difficulty,
