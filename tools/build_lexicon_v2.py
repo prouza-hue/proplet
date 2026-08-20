@@ -31,7 +31,7 @@ opilý panenství penis pitomec pitomý podprsenka porno potrat prdel prostitut
 prostitutka rakovina sebevrah sebevražda sex slipy soulož tanga tumor vagína
 vole zadek zadnice zabiják zabíjení znásilnění zvrhlost zvrhlý
 nocebo trebuchet sofismus černodíra perigeum aerogel
-body frisbee homosexuál house love prdelka union
+body homosexuál house love prdelka union
 angličanka arab babka brokovnice černo černoch černoška čokl čumák dcerka
 dědek děloha drbna fotr gambler haraburdí hašiš hlaveň holčina honda huba
 jump kojení lino lupus machr marod maturiťák maxima milostpaní močení měchýř
