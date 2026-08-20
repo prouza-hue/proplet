@@ -13,9 +13,9 @@
 
     if(win){
       if(free){
-        win.textContent='⚔️ Vyzvat kamaráda';
+        win.textContent='⚔️ Pošli výzvu';
         win.classList.add('challenge-share-cta');
-        win.setAttribute('aria-label','Vyzvat kamaráda na stejný Proplet');
+        win.setAttribute('aria-label','Poslat kamarádovi výzvu na stejný Proplet');
       }else{
         if(win.classList.contains('challenge-share-cta'))win.textContent='↗ Sdílet';
         win.classList.remove('challenge-share-cta');
@@ -24,9 +24,9 @@
     }
 
     if(detail){
-      detail.textContent='⚔️ Vyzvat kamaráda';
+      detail.textContent='⚔️ Pošli výzvu';
       detail.classList.add('challenge-share-cta','challenge-share-detail-cta');
-      detail.setAttribute('aria-label','Vyzvat kamaráda na tuto úroveň');
+      detail.setAttribute('aria-label','Poslat kamarádovi výzvu na tuto úroveň');
     }
   }
 
