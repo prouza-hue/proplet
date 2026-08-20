@@ -249,7 +249,7 @@ def main() -> None:
             puzzle = None
             # Shape readability is deliberately a second-stage retry. Putting
             # it inside path packing made small 7x7 candidates needlessly rare.
-            for shape_retry in range(1, 61):
+            for shape_retry in range(1, 301):
                 candidate = cal.build_puzzle(
                     gp,
                     difficulty,
