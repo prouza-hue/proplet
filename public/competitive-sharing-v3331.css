@@ -13,6 +13,12 @@ body.game-shared-challenge .game-title #gameDifficulty{margin-top:1px}
 .shared-challenge-result.win{background:linear-gradient(145deg,#eefaf5,#f3f0ff);border-color:#cae6d9}
 .shared-challenge-result.tie{background:linear-gradient(145deg,#fff9e9,#f7f3ff);border-color:#eadfb8}
 
+/* Preview: make competitive sharing read as an invitation, not a utility action. */
+#winShareBtn,#levelDetailShareBtn{position:relative;background:linear-gradient(135deg,#6c5ce7,#8c6ff7)!important;border-color:transparent!important;color:#fff!important;font-weight:900!important;box-shadow:0 7px 18px rgba(108,92,231,.24);font-size:0!important;letter-spacing:0;transform:translateZ(0)}
+#winShareBtn::before,#levelDetailShareBtn::before{content:"⚔️ Pošli výzvu";font-size:12px;line-height:1;white-space:nowrap}
+#winShareBtn:hover,#levelDetailShareBtn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+#winShareBtn:active,#levelDetailShareBtn:active{transform:translateY(0);box-shadow:0 4px 12px rgba(108,92,231,.2)}
+
 @media (min-width:700px) and (min-height:540px){
   .shared-challenge-target{margin-top:4px;font-size:11.5px}
   .shared-challenge-result{margin-bottom:15px;padding:14px 16px;grid-template-columns:40px minmax(0,1fr);gap:12px;border-radius:19px}
@@ -20,6 +26,7 @@ body.game-shared-challenge .game-title #gameDifficulty{margin-top:1px}
   .shared-challenge-result strong{font-size:15px}
   .shared-challenge-result p{font-size:12.5px}
   .shared-challenge-result small{font-size:11px}
+  #winShareBtn::before,#levelDetailShareBtn::before{font-size:13px}
 }
 
 @media (min-width:1000px) and (min-height:650px){
@@ -30,6 +37,7 @@ body.game-shared-challenge .game-title #gameDifficulty{margin-top:1px}
   #winModal .shared-challenge-result strong{font-size:19px;line-height:1.2}
   #winModal .shared-challenge-result p{margin-top:4px;font-size:15.5px;line-height:1.4}
   #winModal .shared-challenge-result small{margin-top:6px;font-size:13px;line-height:1.35}
+  #winShareBtn::before,#levelDetailShareBtn::before{font-size:14px}
 }
 
 html[data-theme="dark"] .shared-challenge-target{color:#b8adff}
@@ -39,3 +47,4 @@ html[data-theme="dark"] .shared-challenge-result.win{background:linear-gradient(
 html[data-theme="dark"] .shared-challenge-result.tie{background:linear-gradient(145deg,#3a321f,#28233b);border-color:#554a33}
 html[data-theme="dark"] .shared-challenge-result p{color:#c1bacb}
 html[data-theme="dark"] .shared-challenge-result small{color:#a9a2b4}
+html[data-theme="dark"] #winShareBtn,html[data-theme="dark"] #levelDetailShareBtn{background:linear-gradient(135deg,#7c69ee,#9a80ff)!important;box-shadow:0 7px 20px rgba(80,61,183,.4)}
