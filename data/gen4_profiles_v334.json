@@ -16,8 +16,8 @@
     "starter-onboarding": {
       "rows": 6,
       "cols": 6,
-      "activeCells": [24, 28],
-      "targetWords": [5, 5],
+      "activeCells": [28, 34],
+      "targetWords": [6, 7],
       "targetLength": [4, 7],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
@@ -28,13 +28,13 @@
     "rescue-core": {
       "rows": 6,
       "cols": 6,
-      "activeCells": [25, 30],
-      "targetWords": [5, 6],
+      "activeCells": [28, 34],
+      "targetWords": [6, 7],
       "targetLength": [4, 7],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 7.0],
+      "ambiguityRange": [0.0, 6.5],
       "ambiguityRole": "streak-rescue"
     },
     "easy-core": {
