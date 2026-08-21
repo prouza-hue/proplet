@@ -2,7 +2,7 @@
 
 ## Rozhodnutí
 
-Generation 4 zůstává preview-only, dokud nebude schválená kratší kalibrace V3. Produkční `data/puzzles.json`, postup, XP ani leaderboard se v této větvi nemění.
+Směr Generation 4 byl 21. 8. 2026 po kratší kalibraci V3 schválen product ownerem. Produkční `data/puzzles.json`, postup, XP ani leaderboard se v této větvi stále nemění: následuje produkční kandidát, archivní migrace, preview rehearsal a až potom samostatně schválený release.
 
 Po schválení Gen4 se podle zmrazených profilů nepřegenerují jen Free úrovně. Povinný rozsah je:
 
@@ -10,7 +10,7 @@ Po schválení Gen4 se podle zmrazených profilů nepřegenerují jen Free úrov
 2. denní výzvy,
 3. rolling content banka.
 
-Každá banka musí projít stejnými lexikálními exclusions, exact-cover auditem a migračním QA.
+Povinný rozsah byl rozšířen také o starter/onboarding, rescue obsah a všechny zdroje nových challenge odkazů. Každá banka musí projít stejnými lexikálními exclusions, exact-cover auditem a migračním QA.
 
 ## Co ukázal V2 playtest
 
@@ -101,7 +101,34 @@ Delší sada snížila návratnost testerů. V3 je záměrně deset úrovní a u
 
 Pořadí Medium variant se střídá, aby se vliv učení nepletl s velikostí desky.
 
-### Předběžný approval gate
+### Výsledek V3
+
+Pět testerů dokončilo všech 30 Medium měření. U Hard jsou čtyři kompletní sady a jedna samostatná úroveň, celkem 17 výsledků.
+
+| Obtížnost | N | Průměr | Medián | P75 | Průměr pokusů |
+|---|---:|---:|---:|---:|---:|
+| Střední | 30 | 1:14.7 | 1:10.0 | 1:36.1 | 9.5 |
+| Těžká | 17 | 2:33.4 | 2:05.8 | 3:08.3 | 11.7 |
+| Těžká, čtyři kompletní sady | 16 | 2:16.8 | 2:02.9 | 2:48.2 | 11.6 |
+
+Proti V2 klesl medián Medium o 39 % a Hard o 29 %. U všech čtyř kompletních hráčů byl osobní medián Hard o 53–125 % výše než Medium; typický poměr je 1,91×. Kvalitativně byla V3 opakovaně hodnocena jako zábavnější a méně trestající.
+
+| Úroveň | Medián | Rozhodnutí |
+|---|---:|---|
+| Medium #1 | 1:07.0 | lehčí Medium |
+| Medium #2 | 1:28.0 | core Medium |
+| Medium #3 | 0:36.0 | onboarding / relief, ne core |
+| Medium #4 | 1:18.9 | core Medium |
+| Medium #5 | 1:13.1 | použitelná s vyšší individuální variací |
+| Medium #6 | 1:31.5 | horní Medium kotva |
+| Hard #1 | 2:41.5 | dobrá obtížnost, accessibility trap pro část hráčů |
+| Hard #2 | 1:06.4 | příliš lehká pro core Hard |
+| Hard #3 | 2:14.6 | horní Hard kotva |
+| Hard #4 | 2:03.7 | nejstabilnější core Hard kotva |
+
+Kompaktní 7×7 Medium mělo medián 0:48, cutout 8×8 medián 1:28. Obě varianty zůstávají, ale nejsou zaměnitelné: compact bude přibližně 25–30 % banky, soustředěný na začátek a relief úrovně. Cutout 8×8 tvoří hlavní Medium profil.
+
+### Vyhodnocení approval gate
 
 Absolutní časy jsou bez nápovědy horní odhad. Pro schválení profilu chceme současně:
 
@@ -112,7 +139,13 @@ Absolutní časy jsou bez nápovědy horní odhad. Pro schválení profilu chcem
 - kompaktní i cutout Medium musí být subjektivně čitelné; výhra jen jedné varianty je validní výsledek, ne důvod je uměle míchat,
 - kvalitativní feedback nesmí opakovat „moc velká deska / moc šneků“.
 
-Malý vzorek se nebude vydávat za statistickou jistotu. Gate slouží k odhalení systematických chyb a ke zmrazení směru před drahou masovou generací.
+Gate prošel. Malý vzorek není vydáván za statistickou jistotu, ale společně s kvalitativním feedbackem a výrazným posunem proti V2 je dostatečný ke zmrazení směru. Další velký veřejný playtest se před masovou generací neplánuje.
+
+### Lokální nejednoznačnost
+
+Nový audit `gen4-local-ambiguity-v1` počítá krátké slovníkové prefixy na nevracejících se cestách, odečítá legitimní prefixy targetů a zvýrazňuje alternativní větve přímo u target startů. Na V3 správně seřadil Hard #2 jako nejlehčí (`6.833`), Hard #4 jako core (`7.306`) a Hard #3 jako nejvyšší lokální tlak (`11.167`). Metrika je ranking signal, nikoli převodník na sekundy; používá se společně s velikostí desky, křivostí a slovníkem.
+
+Source of truth finálních profilů je `data/gen4_profiles_v334.json`.
 
 ## Lexikon
 
@@ -123,13 +156,15 @@ Soubor `data/target_generation_exclusions_v334.json` je jediný explicitní sour
 - nezasahuje současnou produkční banku,
 - musí být použito při generování Free, Daily i rolling banky.
 
-## Safe release po schválení
+## Safe release po schválení směru
 
-1. Vyhodnotit V3 po hráčích i po úrovních a vybrat vítězný Medium profil.
-2. Zmrazit geometry, vocabulary a local-ambiguity guardrails.
-3. Vygenerovat Free + Daily + rolling banku.
+1. Zmrazit geometry, vocabulary a local-ambiguity guardrails. **Hotovo.**
+2. Pozastavit vydání Gen3 rolling banky plánované od 24. 8., pokud nebude nahrazena Gen4.
+3. Vygenerovat Free, Daily, rolling, starter a rescue banku.
 4. Exact-cover a target-path uniqueness audit 100 % desek.
 5. Ověřit exclusions a duplicity napříč všemi bankami.
-6. Migration QA: dokončené sloty, XP, historie, rozehrané legacy hry a challenge archive fallback.
-7. Preview deploy, smoke test, runtime/build log check.
-8. Teprve po explicitním schválení sloučit do `main` a znovu ověřit production health.
+6. Vytvořit hashovaný metadata katalog a studený archiv původních bank.
+7. Doplnit explicitní content lineage do výsledků před odstraněním legacy bodies z runtime.
+8. Migration QA: dokončené sloty, XP, historie, rozehrané legacy hry a challenge archive fallback.
+9. Preview deploy, smoke test, runtime/build log check.
+10. Teprve po explicitním schválení sloučit do `main` a znovu ověřit production health.
