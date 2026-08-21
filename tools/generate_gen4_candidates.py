@@ -303,18 +303,23 @@ def main() -> None:
         v3.cal.PROFILES[generation_difficulty] = profile
         avoid = set().union(*recent_by_difficulty) if recent_by_difficulty else set()
         accepted = None
-        for shape_retry in range(1, 401):
-            candidate = v3.cal.build_puzzle(
-                gp,
-                generation_difficulty,
-                level,
-                rng,
-                pools[variant],
-                dictionary,
-                tier_of,
-                fun_of,
-                avoid,
-            )
+        build_failures = 0
+        for shape_retry in range(1, 61):
+            try:
+                candidate = v3.cal.build_puzzle(
+                    gp,
+                    generation_difficulty,
+                    level,
+                    rng,
+                    pools[variant],
+                    dictionary,
+                    tier_of,
+                    fun_of,
+                    avoid,
+                )
+            except RuntimeError:
+                build_failures += 1
+                continue
             annotate(candidate, args.bank, args.difficulty, level, variant, prefixes)
             meta = candidate["meta"]
             if meta["cutoutComponents"] > profile["max_blank_components"]:
@@ -325,6 +330,7 @@ def main() -> None:
             if not ambiguity_min <= float(meta["localAmbiguityScore"]) <= ambiguity_max:
                 continue
             meta["shapeRetry"] = shape_retry
+            meta["buildFailures"] = build_failures
             accepted = candidate
             break
         if accepted is None:
