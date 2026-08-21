@@ -341,6 +341,10 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
         "starter": starter,
         "legacyFreeIndex": legacy_free_index,
         "freeGeneration": 4,
+        "freeMigration": {
+            **deepcopy(production.get("freeMigration") or {}),
+            "activeGeneration": 4,
+        },
         "dailyGeneration": 4,
         "contentGeneration": 4,
         "generationKey": "gen4-v334-release-candidate",

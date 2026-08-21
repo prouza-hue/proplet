@@ -109,7 +109,7 @@ async def launch_safety_middleware(request: Request, call_next):
             )
     response = await call_next(request)
     response.headers["X-Request-ID"] = request_id
-    if request.url.path == "/api/rolling-content":
+    if request.url.path == "/api/rolling-content" and not GEN4_CANDIDATE_PREVIEW:
         response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=86400"
     elif request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
