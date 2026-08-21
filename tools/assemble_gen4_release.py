@@ -268,6 +268,35 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
         "puzzleIds": [puzzle.get("id") for puzzle in production.get("daily") or []],
     })
 
+    slot_candidates: dict[str, set[tuple[str, int]]] = defaultdict(set)
+    generation_candidates: dict[str, set[int]] = defaultdict(set)
+    for difficulty in DIFFICULTIES:
+        sources = [
+            (production.get("free") or {}).get(difficulty) or [],
+            (production.get("legacyFree") or {}).get(difficulty) or [],
+        ]
+        for source in sources:
+            for index, puzzle in enumerate(source, 1):
+                puzzle_id = str(puzzle.get("id") or "")
+                if not puzzle_id:
+                    continue
+                meta = puzzle.get("meta") or {}
+                level = int(meta.get("level") or index)
+                generation = int(meta.get("contentGeneration") or production.get("freeGeneration") or 1)
+                slot_candidates[puzzle_id].add((difficulty, level))
+                generation_candidates[puzzle_id].add(generation)
+    legacy_free_index = {}
+    for puzzle_id, slots in slot_candidates.items():
+        if len(slots) != 1:
+            continue
+        difficulty, level = next(iter(slots))
+        legacy_free_index[puzzle_id] = {
+            "difficulty": difficulty,
+            "level": level,
+            "generation": max(generation_candidates[puzzle_id]),
+            "lineageConfidence": "slot-exact",
+        }
+
     runtime.update({
         "version": 11,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -276,6 +305,7 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
         "daily": daily,
         "rescue": rescue,
         "starter": starter,
+        "legacyFreeIndex": legacy_free_index,
         "freeGeneration": 4,
         "dailyGeneration": 4,
         "contentGeneration": 4,
