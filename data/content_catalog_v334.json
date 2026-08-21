@@ -1,9 +1,10 @@
 {
   "version": 1,
   "kind": "proplet-non-playable-content-catalog",
-  "generatedAt": "2026-08-21T17:36:47.172429+00:00",
+  "generatedAt": "2026-08-21T18:00:42.460635+00:00",
   "contentCount": 4594,
   "contextCount": 4599,
+  "tombstoneCount": 365,
   "duplicateContexts": 5,
   "generationContexts": {
     "1": 401,
@@ -41,6 +42,3293 @@
       "repository": "prouza-hue/proplet",
       "sourceCommit": "a1904574324c714526a5303f6584f3174a789f8e",
       "sourceBlob": "ba5803665701cdd1c5a00d7c269ff91df49c16eb"
+    }
+  ],
+  "tombstones": [
+    {
+      "puzzleId": "d-001",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 1,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/0",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-002",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 2,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/1",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-003",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 3,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/2",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-004",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 4,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/3",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-005",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 5,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/4",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-006",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 6,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/5",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-007",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 7,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/6",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-008",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 8,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/7",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-009",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 9,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/8",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-010",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 10,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/9",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-011",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 11,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/10",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-012",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 12,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/11",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-013",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 13,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/12",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-014",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 14,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/13",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-015",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 15,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/14",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-016",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 16,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/15",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-017",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 17,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/16",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-018",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 18,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/17",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-019",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 19,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/18",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-020",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 20,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/19",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-021",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 21,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/20",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-022",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 22,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/21",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-023",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 23,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/22",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-024",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 24,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/23",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-025",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 25,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/24",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-026",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 26,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/25",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-027",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 27,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/26",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-028",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 28,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/27",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-029",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 29,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/28",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-030",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 30,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/29",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-031",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 31,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/30",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-032",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 32,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/31",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-033",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 33,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/32",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-034",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 34,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/33",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-035",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 35,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/34",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-036",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 36,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/35",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-037",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 37,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/36",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-038",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 38,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/37",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-039",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 39,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/38",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-040",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 40,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/39",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-041",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 41,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/40",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-042",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 42,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/41",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-043",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 43,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/42",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-044",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 44,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/43",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-045",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 45,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/44",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-046",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 46,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/45",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-047",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 47,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/46",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-048",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 48,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/47",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-049",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 49,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/48",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-050",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 50,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/49",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-051",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 51,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/50",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-052",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 52,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/51",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-053",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 53,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/52",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-054",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 54,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/53",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-055",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 55,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/54",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-056",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 56,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/55",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-057",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 57,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/56",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-058",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 58,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/57",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-059",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 59,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/58",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-060",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 60,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/59",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-061",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 61,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/60",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-062",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 62,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/61",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-063",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 63,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/62",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-064",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 64,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/63",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-065",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 65,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/64",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-066",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 66,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/65",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-067",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 67,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/66",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-068",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 68,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/67",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-069",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 69,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/68",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-070",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 70,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/69",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-071",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 71,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/70",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-072",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 72,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/71",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-073",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 73,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/72",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-074",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 74,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/73",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-075",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 75,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/74",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-076",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 76,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/75",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-077",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 77,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/76",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-078",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 78,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/77",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-079",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 79,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/78",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-080",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 80,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/79",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-081",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 81,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/80",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-082",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 82,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/81",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-083",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 83,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/82",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-084",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 84,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/83",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-085",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 85,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/84",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-086",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 86,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/85",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-087",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 87,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/86",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-088",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 88,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/87",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-089",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 89,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/88",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-090",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 90,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/89",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-091",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 91,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/90",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-092",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 92,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/91",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-093",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 93,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/92",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-094",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 94,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/93",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-095",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 95,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/94",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-096",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 96,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/95",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-097",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 97,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/96",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-098",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 98,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/97",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-099",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 99,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/98",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-100",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 100,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/99",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-101",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 101,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/100",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-102",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 102,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/101",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-103",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 103,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/102",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-104",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 104,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/103",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-105",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 105,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/104",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-106",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 106,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/105",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-107",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 107,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/106",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-108",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 108,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/107",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-109",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 109,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/108",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-110",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 110,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/109",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-111",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 111,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/110",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-112",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 112,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/111",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-113",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 113,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/112",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-114",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 114,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/113",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-115",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 115,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/114",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-116",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 116,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/115",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-117",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 117,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/116",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-118",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 118,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/117",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-119",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 119,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/118",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-120",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 120,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/119",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-121",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 121,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/120",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-122",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 122,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/121",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-123",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 123,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/122",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-124",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 124,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/123",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-125",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 125,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/124",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-126",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 126,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/125",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-127",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 127,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/126",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-128",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 128,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/127",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-129",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 129,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/128",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-130",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 130,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/129",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-131",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 131,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/130",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-132",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 132,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/131",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-133",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 133,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/132",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-134",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 134,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/133",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-135",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 135,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/134",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-136",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 136,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/135",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-137",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 137,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/136",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-138",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 138,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/137",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-139",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 139,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/138",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-140",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 140,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/139",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-141",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 141,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/140",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-142",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 142,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/141",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-143",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 143,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/142",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-144",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 144,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/143",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-145",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 145,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/144",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-146",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 146,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/145",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-147",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 147,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/146",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-148",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 148,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/147",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-149",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 149,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/148",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-150",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 150,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/149",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-151",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 151,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/150",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-152",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 152,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/151",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-153",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 153,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/152",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-154",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 154,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/153",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-155",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 155,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/154",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-156",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 156,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/155",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-157",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 157,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/156",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-158",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 158,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/157",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-159",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 159,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/158",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-160",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 160,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/159",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-161",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 161,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/160",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-162",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 162,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/161",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-163",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 163,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/162",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-164",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 164,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/163",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-165",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 165,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/164",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-166",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 166,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/165",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-167",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 167,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/166",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-168",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 168,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/167",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-169",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 169,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/168",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-170",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 170,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/169",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-171",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 171,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/170",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-172",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 172,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/171",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-173",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 173,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/172",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-174",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 174,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/173",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-175",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 175,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/174",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-176",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 176,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/175",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-177",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 177,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/176",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-178",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 178,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/177",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-179",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 179,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/178",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-180",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 180,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/179",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-181",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 181,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/180",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-182",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 182,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/181",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-183",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 183,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/182",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-184",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 184,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/183",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-185",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 185,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/184",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-186",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 186,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/185",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-187",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 187,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/186",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-188",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 188,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/187",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-189",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 189,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/188",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-190",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 190,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/189",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-191",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 191,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/190",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-192",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 192,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/191",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-193",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 193,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/192",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-194",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 194,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/193",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-195",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 195,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/194",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-196",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 196,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/195",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-197",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 197,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/196",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-198",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 198,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/197",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-199",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 199,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/198",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-200",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 200,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/199",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-201",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 201,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/200",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-202",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 202,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/201",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-203",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 203,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/202",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-204",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 204,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/203",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-205",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 205,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/204",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-206",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 206,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/205",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-207",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 207,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/206",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-208",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 208,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/207",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-209",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 209,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/208",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-210",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 210,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/209",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-211",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 211,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/210",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-212",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 212,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/211",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-213",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 213,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/212",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-214",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 214,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/213",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-215",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 215,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/214",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-216",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 216,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/215",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-217",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 217,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/216",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-218",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 218,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/217",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-219",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 219,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/218",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-220",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 220,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/219",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-221",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 221,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/220",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-222",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 222,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/221",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-223",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 223,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/222",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d-224",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 224,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/223",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-225",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 225,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/224",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-226",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 226,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/225",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-227",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 227,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/226",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-228",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 228,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/227",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-229",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 229,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/228",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-230",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 230,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/229",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-231",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 231,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/230",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-232",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 232,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/231",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-233",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 233,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/232",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-234",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 234,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/233",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-235",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 235,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/234",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-236",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 236,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/235",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-237",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 237,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/236",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-238",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 238,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/237",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-239",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 239,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/238",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-240",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 240,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/239",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-241",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 241,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/240",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-242",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 242,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/241",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-243",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 243,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/242",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-244",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 244,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/243",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-245",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 245,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/244",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-246",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 246,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/245",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-247",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 247,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/246",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-248",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 248,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/247",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-249",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 249,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/248",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-250",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 250,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/249",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-251",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 251,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/250",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-252",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 252,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/251",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-253",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 253,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/252",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-254",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 254,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/253",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-255",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 255,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/254",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-256",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 256,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/255",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-257",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 257,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/256",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-258",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 258,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/257",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-259",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 259,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/258",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-260",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 260,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/259",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-261",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 261,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/260",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-262",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 262,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/261",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-263",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 263,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/262",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-264",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 264,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/263",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-265",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 265,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/264",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-266",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 266,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/265",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-267",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 267,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/266",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-268",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 268,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/267",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-269",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 269,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/268",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-270",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 270,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/269",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-271",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 271,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/270",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-272",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 272,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/271",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-273",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 273,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/272",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-274",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 274,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/273",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-275",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 275,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/274",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-276",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 276,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/275",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-277",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 277,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/276",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-278",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 278,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/277",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-279",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 279,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/278",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-280",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 280,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/279",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-281",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 281,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/280",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-282",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 282,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/281",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-283",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 283,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/282",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-284",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 284,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/283",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-285",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 285,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/284",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-286",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 286,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/285",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-287",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 287,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/286",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-288",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 288,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/287",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-289",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 289,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/288",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-290",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 290,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/289",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-291",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 291,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/290",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-292",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 292,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/291",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-293",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 293,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/292",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-294",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 294,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/293",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-295",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 295,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/294",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-296",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 296,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/295",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-297",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 297,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/296",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-298",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 298,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/297",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-299",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 299,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/298",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-300",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 300,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/299",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-301",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 301,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/300",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-302",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 302,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/301",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-303",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 303,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/302",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-304",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 304,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/303",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-305",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 305,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/304",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-306",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 306,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/305",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-307",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 307,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/306",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-308",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 308,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/307",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-309",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 309,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/308",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-310",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 310,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/309",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-311",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 311,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/310",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-312",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 312,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/311",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-313",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 313,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/312",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-314",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 314,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/313",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-315",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 315,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/314",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-316",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 316,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/315",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-317",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 317,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/316",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-318",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 318,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/317",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-319",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 319,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/318",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-320",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 320,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/319",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-321",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 321,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/320",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-322",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 322,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/321",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-323",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 323,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/322",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-324",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 324,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/323",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-325",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 325,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/324",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-326",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 326,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/325",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-327",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 327,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/326",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-328",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 328,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/327",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-329",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 329,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/328",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-330",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 330,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/329",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-331",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 331,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/330",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-332",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 332,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/331",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-333",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 333,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/332",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-334",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 334,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/333",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-335",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 335,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/334",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-336",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 336,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/335",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-337",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 337,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/336",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-338",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 338,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/337",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-339",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 339,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/338",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-340",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 340,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/339",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-341",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 341,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/340",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-342",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 342,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/341",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-343",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 343,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/342",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-344",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 344,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/343",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-345",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 345,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/344",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-346",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 346,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/345",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-347",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 347,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/346",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-348",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 348,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/347",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-349",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 349,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/348",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-350",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 350,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/349",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-351",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 351,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/350",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-352",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 352,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/351",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-353",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 353,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/352",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-354",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 354,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/353",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-355",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 355,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/354",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-356",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 356,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/355",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-357",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 357,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/356",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-358",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 358,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/357",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-359",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 359,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/358",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-360",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 360,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/359",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-361",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "easy",
+      "slot": 361,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/360",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-362",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 362,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/361",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-363",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 363,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/362",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-364",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "medium",
+      "slot": 364,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/363",
+      "reason": "metadata-only-source"
+    },
+    {
+      "puzzleId": "d11-365",
+      "generation": 1,
+      "bank": "daily",
+      "difficulty": "hard",
+      "slot": 365,
+      "sourcePath": "puzzles/legacyDaily/0/puzzles/364",
+      "reason": "metadata-only-source"
     }
   ],
   "content": [

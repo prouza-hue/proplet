@@ -30,6 +30,7 @@ def main() -> None:
     ]
     content_rows = []
     context_rows = []
+    tombstone_rows = []
     for record in catalog.get("content") or []:
         generations = {int(ctx["generation"]) for ctx in record.get("contexts") or [] if ctx.get("generation") is not None}
         status = "active" if 4 in generations else "cold-archive"
@@ -50,6 +51,13 @@ def main() -> None:
                 "null", "null", "null", sql(ctx.get("sourcePath")), sql("exact"),
             ]) + ")")
 
+    for ctx in catalog.get("tombstones") or []:
+        tombstone_rows.append("(" + ",".join([
+            sql(ctx.get("puzzleId")), sql(ctx.get("generation")), sql(ctx.get("bank")),
+            sql(ctx.get("difficulty")), sql(ctx.get("slot")), sql(ctx.get("sourcePath")),
+            sql(ctx.get("reason") or "metadata-only-source"),
+        ]) + ")")
+
     for offset in range(0, len(content_rows), 250):
         lines += [
             "insert into public.content_catalog",
@@ -67,6 +75,15 @@ def main() -> None:
             "   daily_date, published_from, published_to, source_path, lineage_confidence)",
             "values",
             "  " + ",\n  ".join(context_rows[offset:offset + 250]),
+            "on conflict do nothing;",
+            "",
+        ]
+    for offset in range(0, len(tombstone_rows), 250):
+        lines += [
+            "insert into public.content_archive_tombstones",
+            "  (puzzle_id, content_generation, content_bank, difficulty, content_level, source_path, reason)",
+            "values",
+            "  " + ",\n  ".join(tombstone_rows[offset:offset + 250]),
             "on conflict do nothing;",
             "",
         ]
@@ -111,6 +128,39 @@ def main() -> None:
         "  content_lineage_confidence = 'exact'",
         "from exact e where r.puzzle_id = e.puzzle_id and r.content_key is null;",
         "",
+        "with inferred as (",
+        "  select puzzle_id, min(content_generation) as content_generation,",
+        "         min(content_bank) as content_bank, min(content_level) as content_level",
+        "  from public.content_archive_tombstones where puzzle_id is not null",
+        "  group by puzzle_id having count(*) = 1",
+        ")",
+        "update public.results r set",
+        "  content_generation = e.content_generation, content_bank = coalesce(r.mode, e.content_bank),",
+        "  content_level = e.content_level, content_lineage_confidence = 'inferred'",
+        "from inferred e where r.puzzle_id = e.puzzle_id and r.content_key is null;",
+        "",
+        "with inferred as (",
+        "  select puzzle_id, min(content_generation) as content_generation,",
+        "         min(content_bank) as content_bank, min(content_level) as content_level",
+        "  from public.content_archive_tombstones where puzzle_id is not null",
+        "  group by puzzle_id having count(*) = 1",
+        ")",
+        "update public.puzzle_runs r set",
+        "  content_generation = e.content_generation, content_bank = coalesce(r.mode, e.content_bank),",
+        "  content_level = e.content_level, content_lineage_confidence = 'inferred'",
+        "from inferred e where r.puzzle_id = e.puzzle_id and r.content_key is null;",
+        "",
+        "with inferred as (",
+        "  select puzzle_id, min(content_generation) as content_generation,",
+        "         min(content_bank) as content_bank, min(content_level) as content_level",
+        "  from public.content_archive_tombstones where puzzle_id is not null",
+        "  group by puzzle_id having count(*) = 1",
+        ")",
+        "update public.puzzle_attempts r set",
+        "  content_generation = e.content_generation, content_bank = coalesce(r.mode, e.content_bank),",
+        "  content_level = e.content_level, content_lineage_confidence = 'inferred'",
+        "from inferred e where r.puzzle_id = e.puzzle_id and r.content_key is null;",
+        "",
         "commit;",
         "",
     ]
@@ -119,6 +169,7 @@ def main() -> None:
     print(json.dumps({
         "contentRows": len(content_rows),
         "contextRows": len(context_rows),
+        "tombstoneRows": len(tombstone_rows),
         "output": str(args.output),
     }, ensure_ascii=False))
 

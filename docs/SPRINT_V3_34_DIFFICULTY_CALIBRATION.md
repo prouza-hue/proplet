@@ -198,7 +198,7 @@ Runtime po přechodu nesmí obsahovat `legacyFree`, `legacyDaily` ani `previousD
 2. **Nehratelný metadata katalog** — hash obsahu, původní ID, generace, banka, obtížnost, slot, rozměry a počet targetů; bez písmen, odpovědí a cest.
 3. **Historické statistiky** — výsledky, runs a attempts dostanou `content_key` a lineage. Nejednoznačně znovupoužité legacy ID se nesmí označit jako exact.
 
-Vygenerovaný katalog má 4 594 unikátních obsahových hashů a 4 599 kontextů. Nemá pole `letters`, `answers`, `path` ani `mask`. Cold source ukazuje na produkční commit `a1904574324c714526a5303f6584f3174a789f8e` a přesné Git bloby `data/puzzles.json` / `data/rolling_content_v1.json`; gzip kopie mají samostatné SHA-256.
+Vygenerovaný katalog má 4 594 unikátních obsahových hashů, 4 599 přesných kontextů a 365 ID-only tombstonů. Nemá pole `letters`, `answers`, `path` ani `mask`. Tombstone vzniká jen tehdy, když produkční source už obsahuje historické ID a metadata, ale nikoli tělo desky; takovému záznamu se nevymýšlí hash a lineage se označí `inferred`. Read-only census Supabase z 21. 8. 2026 18:06 UTC klasifikoval všech 6 934 tehdejších řádků: 6 908 přesně a 26 přes tři Daily ID jako `inferred`, bez jediného nezmapovaného řádku. Cold source ukazuje na produkční commit `a1904574324c714526a5303f6584f3174a789f8e` a přesné Git bloby `data/puzzles.json` / `data/rolling_content_v1.json`; gzip kopie mají samostatné SHA-256.
 
 Starý challenge odkaz se po cutoveru nebude snažit otevřít odstraněnou desku. Vrátí archivní souhrn/tombstone; historický výkon a leaderboardové statistiky zůstanou zachované. Nové challenge odkazy smějí vznikat jen z aktivních Gen4 zdrojů.
 

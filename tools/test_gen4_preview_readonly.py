@@ -38,6 +38,7 @@ def main() -> None:
     assert "pouze pro čtení" in blocked.json().get("detail", "")
 
     legacy_id = next(iter(puzzles.get("legacyFreeIndex") or {}))
+    server.enforce_rate_limit = lambda *args, **kwargs: None
     archived = client.get("/api/free-archive", params={"puzzle_id": legacy_id})
     assert archived.status_code == 410
     assert archived.json().get("archived") is True
@@ -46,4 +47,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

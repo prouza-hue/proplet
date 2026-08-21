@@ -92,6 +92,33 @@ def iter_puzzles(node: object, path: tuple[str, ...] = ()):
         yield from iter_puzzles(value, path + (str(key),))
 
 
+def iter_metadata_tombstones(
+    node: object,
+    path: tuple[str, ...] = (),
+    inherited: dict | None = None,
+):
+    """Yield archived ID-only records while retaining parent generation metadata."""
+    inherited = dict(inherited or {})
+    if isinstance(node, list):
+        for index, value in enumerate(node):
+            yield from iter_metadata_tombstones(value, path + (str(index),), inherited)
+        return
+    if not isinstance(node, dict):
+        return
+    for key in ("generation", "generationKey", "rotationBaseDate", "activeFrom", "activeUntil"):
+        if node.get(key) is not None:
+            inherited[key] = node.get(key)
+    if (
+        node.get("id")
+        and node.get("difficulty") in {"easy", "medium", "hard", "hardcore", "rescue"}
+        and not (node.get("letters") and node.get("answers"))
+    ):
+        yield path, node, inherited
+        return
+    for key, value in node.items():
+        yield from iter_metadata_tombstones(value, path + (str(key),), inherited)
+
+
 def context(path: tuple[str, ...], puzzle: dict, root: dict) -> dict:
     meta = puzzle.get("meta") or {}
     difficulty = puzzle.get("difficulty")
@@ -108,6 +135,14 @@ def context(path: tuple[str, ...], puzzle: dict, root: dict) -> dict:
         "slot": slot,
         "sourcePath": "/".join(path),
     }
+
+
+def tombstone_context(path: tuple[str, ...], puzzle: dict, root: dict, inherited: dict) -> dict:
+    ctx = context(path, puzzle, root)
+    if inherited.get("generation") is not None:
+        ctx["generation"] = int(inherited["generation"])
+    ctx["reason"] = "metadata-only-source"
+    return ctx
 
 
 def cold_copy(source: Path, destination: Path) -> dict:
@@ -177,6 +212,28 @@ def main() -> None:
                     duplicate_contexts += 1
                 record["contexts"].append(ctx)
 
+    body_ids = {
+        str(ctx.get("puzzleId"))
+        for record in records.values()
+        for ctx in record["contexts"]
+        if ctx.get("puzzleId")
+    }
+    tombstones: dict[tuple, dict] = {}
+    for source_name, _, payload, _ in sources:
+        for path, puzzle, inherited in iter_metadata_tombstones(payload, (source_name,)):
+            puzzle_id = str(puzzle.get("id") or "")
+            if not puzzle_id or puzzle_id in body_ids:
+                continue
+            ctx = tombstone_context(path, puzzle, root, inherited)
+            key = (
+                puzzle_id,
+                ctx.get("generation"),
+                ctx.get("bank"),
+                ctx.get("difficulty"),
+                ctx.get("slot"),
+            )
+            tombstones[key] = ctx
+
     archives = []
     for source_name, source_path, _, cold_archive in sources:
         if cold_archive:
@@ -199,10 +256,19 @@ def main() -> None:
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "contentCount": len(records),
         "contextCount": sum(len(record["contexts"]) for record in records.values()),
+        "tombstoneCount": len(tombstones),
         "duplicateContexts": duplicate_contexts,
         "generationContexts": dict(sorted(generations.items())),
         "bankContexts": dict(sorted(banks.items())),
         "coldArchives": archives,
+        "tombstones": sorted(
+            tombstones.values(),
+            key=lambda item: (
+                int(item.get("generation") or 0),
+                str(item.get("bank") or ""),
+                str(item.get("puzzleId") or ""),
+            ),
+        ),
         "content": sorted(records.values(), key=lambda record: record["contentKey"]),
     }
     args.catalog.parent.mkdir(parents=True, exist_ok=True)
@@ -221,6 +287,7 @@ def main() -> None:
         "catalog": str(args.catalog),
         "contentCount": catalog["contentCount"],
         "contextCount": catalog["contextCount"],
+        "tombstoneCount": catalog["tombstoneCount"],
         "coldArchives": archives,
         "prunedRuntime": str(args.pruned_runtime) if args.pruned_runtime else None,
     }, ensure_ascii=False, indent=2))

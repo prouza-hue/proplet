@@ -32,6 +32,18 @@ create table if not exists public.content_catalog_contexts (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.content_archive_tombstones (
+  puzzle_id text not null,
+  content_generation smallint,
+  content_bank text not null,
+  difficulty text,
+  content_level integer,
+  source_path text,
+  reason text not null default 'metadata-only-source',
+  created_at timestamptz not null default now(),
+  primary key (puzzle_id, content_generation, content_bank)
+);
+
 create unique index if not exists content_catalog_context_exact_uq
   on public.content_catalog_contexts (
     content_key,
@@ -51,8 +63,10 @@ create index if not exists content_catalog_context_daily_idx
 
 alter table public.content_catalog enable row level security;
 alter table public.content_catalog_contexts enable row level security;
+alter table public.content_archive_tombstones enable row level security;
 revoke all on table public.content_catalog from anon, authenticated;
 revoke all on table public.content_catalog_contexts from anon, authenticated;
+revoke all on table public.content_archive_tombstones from anon, authenticated;
 
 alter table public.results
   add column if not exists content_key text,
@@ -86,6 +100,8 @@ comment on table public.content_catalog is
   'Non-playable metadata catalog. Puzzle letters, paths and answers are intentionally absent.';
 comment on table public.content_catalog_contexts is
   'Historical generation/bank/slot aliases for immutable content hashes.';
+comment on table public.content_archive_tombstones is
+  'ID-only historical metadata whose puzzle body is unavailable; never assign an invented content hash.';
 comment on column public.results.content_lineage_confidence is
   'exact, inferred or ambiguous; never fabricate certainty for reused legacy puzzle IDs.';
 
@@ -116,6 +132,18 @@ begin
     new.content_bank := coalesce(new.mode, matched_bank);
     new.content_level := matched_level;
     new.content_lineage_confidence := 'exact';
+    return new;
+  end if;
+  select min(content_generation), min(content_bank), min(content_level)
+  into matched_generation, matched_bank, matched_level
+  from public.content_archive_tombstones
+  where puzzle_id = new.puzzle_id
+  having count(*) = 1;
+  if matched_generation is not null then
+    new.content_generation := matched_generation;
+    new.content_bank := coalesce(new.mode, matched_bank);
+    new.content_level := matched_level;
+    new.content_lineage_confidence := 'inferred';
   end if;
   return new;
 end;
@@ -141,16 +169,36 @@ for each row execute function public.attach_content_lineage();
 create or replace view public.content_archive_stats
 with (security_invoker = true)
 as
-select
-  c.content_generation,
-  c.content_bank,
-  c.difficulty,
-  count(distinct c.content_key) as puzzle_count,
-  count(distinct r.id) as completed_results,
-  count(distinct pr.id) as completed_runs
-from public.content_catalog_contexts c
-left join public.results r on r.content_key = c.content_key
-left join public.puzzle_runs pr on pr.content_key = c.content_key
-group by c.content_generation, c.content_bank, c.difficulty;
+with inventory as (
+  select content_generation, content_bank, difficulty, content_key as identity
+  from public.content_catalog_contexts
+  union all
+  select content_generation, content_bank, difficulty,
+         'tombstone:' || puzzle_id || ':' || coalesce(content_generation::text, '?') as identity
+  from public.content_archive_tombstones
+), puzzle_counts as (
+  select content_generation, content_bank, difficulty, count(distinct identity) as puzzle_count
+  from inventory group by content_generation, content_bank, difficulty
+), result_counts as (
+  select content_generation, content_bank, difficulty, count(distinct id) as completed_results
+  from public.results where content_generation is not null
+  group by content_generation, content_bank, difficulty
+), run_counts as (
+  select content_generation, content_bank, difficulty, count(distinct id) as completed_runs
+  from public.puzzle_runs where content_generation is not null
+  group by content_generation, content_bank, difficulty
+), keys as (
+  select content_generation, content_bank, difficulty from puzzle_counts
+  union select content_generation, content_bank, difficulty from result_counts
+  union select content_generation, content_bank, difficulty from run_counts
+)
+select k.content_generation, k.content_bank, k.difficulty,
+       coalesce(p.puzzle_count, 0) as puzzle_count,
+       coalesce(r.completed_results, 0) as completed_results,
+       coalesce(pr.completed_runs, 0) as completed_runs
+from keys k
+left join puzzle_counts p using (content_generation, content_bank, difficulty)
+left join result_counts r using (content_generation, content_bank, difficulty)
+left join run_counts pr using (content_generation, content_bank, difficulty);
 
 revoke all on table public.content_archive_stats from anon, authenticated;

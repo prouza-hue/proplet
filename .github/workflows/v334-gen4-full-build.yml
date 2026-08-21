@@ -183,6 +183,9 @@ jobs:
           runtime = json.loads(Path('/tmp/gen4-full/puzzles-gen4-candidate.json').read_text())
           assert not {'legacyFree', 'legacyDaily', 'previousDaily'}.intersection(runtime)
           catalog_text = Path('/tmp/gen4-full/content-catalog-v334.json').read_text().casefold()
+          catalog = json.loads(Path('/tmp/gen4-full/content-catalog-v334.json').read_text())
+          assert catalog['tombstoneCount'] == 365
+          assert all(item.get('generation') == 1 for item in catalog['tombstones'])
           for forbidden in ('"letters"', '"answers"', '"path"'):
               assert forbidden not in catalog_text
           report = json.loads(Path('/tmp/gen4-full/full-validation.json').read_text())
