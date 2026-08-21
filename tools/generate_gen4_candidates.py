@@ -79,7 +79,7 @@ PROFILES = {
         "max_mean_turns": 1.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 6.5),
+        "ambiguity": (0.0, 10.0),
     },
     "rescue-core": {
         "rows": 6,
@@ -101,7 +101,7 @@ PROFILES = {
         "max_mean_turns": 1.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 6.5),
+        "ambiguity": (0.0, 10.0),
     },
     "easy-core": {
         "rows": 6,
@@ -123,7 +123,7 @@ PROFILES = {
         "max_mean_turns": 1.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 15.0),
+        "ambiguity": (0.0, 20.0),
     },
     "medium-compact": deepcopy(v3.PROFILES["medium-compact"]),
     "medium-cutout": deepcopy(v3.PROFILES["medium-cutout"]),
@@ -148,13 +148,13 @@ PROFILES = {
         "max_mean_turns": 4.60,
         "max_blank_components": 6,
         "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 30.0),
+        "ambiguity": (0.0, 50.0),
     },
 }
 
-PROFILES["medium-compact"]["ambiguity"] = (3.5, 9.0)
-PROFILES["medium-cutout"]["ambiguity"] = (4.0, 11.0)
-PROFILES["hard-bridge"]["ambiguity"] = (7.0, 13.0)
+PROFILES["medium-compact"]["ambiguity"] = (0.0, 15.0)
+PROFILES["medium-cutout"]["ambiguity"] = (0.0, 16.0)
+PROFILES["hard-bridge"]["ambiguity"] = (6.8, 22.0)
 
 DIFFICULTY_PROFILE = {
     "easy": "easy-core",
@@ -304,6 +304,8 @@ def main() -> None:
         avoid = set().union(*recent_by_difficulty) if recent_by_difficulty else set()
         accepted = None
         build_failures = 0
+        rejection_counts: Counter[str] = Counter()
+        ambiguity_scores: list[float] = []
         for shape_retry in range(1, 61):
             try:
                 candidate = v3.cal.build_puzzle(
@@ -323,18 +325,31 @@ def main() -> None:
             annotate(candidate, args.bank, args.difficulty, level, variant, prefixes)
             meta = candidate["meta"]
             if meta["cutoutComponents"] > profile["max_blank_components"]:
+                rejection_counts["cutout-components"] += 1
                 continue
             if meta["isolatedCutoutCells"] > profile["max_isolated_blanks"]:
+                rejection_counts["isolated-cutouts"] += 1
                 continue
             ambiguity_min, ambiguity_max = profile["ambiguity"]
-            if not ambiguity_min <= float(meta["localAmbiguityScore"]) <= ambiguity_max:
+            ambiguity_score = float(meta["localAmbiguityScore"])
+            ambiguity_scores.append(ambiguity_score)
+            if not ambiguity_min <= ambiguity_score <= ambiguity_max:
+                rejection_counts["ambiguity"] += 1
                 continue
             meta["shapeRetry"] = shape_retry
             meta["buildFailures"] = build_failures
             accepted = candidate
             break
         if accepted is None:
-            raise RuntimeError(f"No acceptable {args.difficulty} candidate for level {level}")
+            score_range = (
+                f"{min(ambiguity_scores):.3f}..{max(ambiguity_scores):.3f}"
+                if ambiguity_scores else "none"
+            )
+            raise RuntimeError(
+                f"No acceptable {args.difficulty} candidate for level {level}; "
+                f"buildFailures={build_failures}, rejections={dict(rejection_counts)}, "
+                f"ambiguityRangeSeen={score_range}"
+            )
         puzzles.append(accepted)
         recent_by_difficulty.append({norm for answer in accepted["answers"] if (norm := str(answer["word"]).casefold())})
         recent_by_difficulty = recent_by_difficulty[-12:]
