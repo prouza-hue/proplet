@@ -17,6 +17,7 @@ on:
       - 'tools/measure_gen4_ambiguity.py'
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
+      - 'tools/build_gen4_catalog_sql.py'
       - 'tools/generate_gen4_candidates.py'
       - 'tools/assemble_gen4_release.py'
       - 'tools/test_v334_rolling_pause.py'
@@ -40,6 +41,7 @@ on:
       - 'tools/measure_gen4_ambiguity.py'
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
+      - 'tools/build_gen4_catalog_sql.py'
       - 'tools/generate_gen4_candidates.py'
       - 'tools/assemble_gen4_release.py'
       - 'tools/test_v334_rolling_pause.py'
@@ -142,6 +144,7 @@ jobs:
           python -m py_compile tools/measure_gen4_ambiguity.py
           python -m py_compile tools/validate_gen4_release.py
           python -m py_compile tools/build_gen4_archive.py
+          python -m py_compile tools/build_gen4_catalog_sql.py
           python -m py_compile tools/generate_gen4_candidates.py
           python -m py_compile tools/assemble_gen4_release.py
           python -m py_compile tools/test_v334_rolling_pause.py
@@ -173,6 +176,8 @@ jobs:
             --rolling data/rolling_content_v1.json \
             --catalog /tmp/gen4-contract/content-catalog.json \
             --cold-dir /tmp/gen4-contract/cold
+          python tools/build_gen4_catalog_sql.py /tmp/gen4-contract/content-catalog.json \
+            --output /tmp/gen4-contract/content-catalog-seed.sql
           python - <<'PY'
           import json
           from pathlib import Path
@@ -180,6 +185,9 @@ jobs:
           assert catalog['contentCount'] > 0
           forbidden = {'letters', 'answers', 'path'}
           assert not forbidden.intersection(json.dumps(catalog).casefold().split('"'))
+          seed = Path('/tmp/gen4-contract/content-catalog-seed.sql').read_text()
+          assert 'insert into public.content_catalog' in seed
+          assert 'update public.results' in seed
           print(f"Catalog clean: {catalog['contentCount']} immutable contents, {catalog['contextCount']} contexts")
           PY
 
