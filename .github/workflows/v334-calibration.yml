@@ -18,6 +18,7 @@ on:
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
       - 'tools/generate_gen4_candidates.py'
+      - 'tools/assemble_gen4_release.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -40,6 +41,7 @@ on:
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
       - 'tools/generate_gen4_candidates.py'
+      - 'tools/assemble_gen4_release.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -141,6 +143,7 @@ jobs:
           python -m py_compile tools/validate_gen4_release.py
           python -m py_compile tools/build_gen4_archive.py
           python -m py_compile tools/generate_gen4_candidates.py
+          python -m py_compile tools/assemble_gen4_release.py
           python -m py_compile tools/test_v334_rolling_pause.py
 
       - name: Install runtime dependencies for rolling regression
@@ -195,13 +198,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - difficulty: easy
+          - bank: free
+            difficulty: easy
             level: 1
-          - difficulty: medium
+          - bank: free
+            difficulty: medium
             level: 2
-          - difficulty: hard
+          - bank: free
+            difficulty: hard
             level: 1
-          - difficulty: hardcore
+          - bank: free
+            difficulty: hardcore
+            level: 1
+          - bank: starter
+            difficulty: easy
+            level: 1
+          - bank: rescue
+            difficulty: rescue
             level: 1
     steps:
       - name: Checkout branch
@@ -216,24 +229,24 @@ jobs:
         run: |
           mkdir -p /tmp/gen4-smoke
           python tools/generate_gen4_candidates.py \
-            --bank free \
+            --bank ${{ matrix.bank }} \
             --difficulty ${{ matrix.difficulty }} \
             --count 1 \
             --start-level ${{ matrix.level }} \
             --seed $((20260822 + ${{ matrix.level }})) \
-            --output /tmp/gen4-smoke/${{ matrix.difficulty }}.json
+            --output /tmp/gen4-smoke/${{ matrix.bank }}-${{ matrix.difficulty }}.json
 
       - name: Validate candidate contract
         run: |
-          python tools/validate_gen4_release.py /tmp/gen4-smoke/${{ matrix.difficulty }}.json \
+          python tools/validate_gen4_release.py /tmp/gen4-smoke/${{ matrix.bank }}-${{ matrix.difficulty }}.json \
             --profiles data/gen4_profiles_v334.json \
             --exclusions data/target_generation_exclusions_v334.json \
-            --report /tmp/gen4-smoke/${{ matrix.difficulty }}-validation.json
+            --report /tmp/gen4-smoke/${{ matrix.bank }}-${{ matrix.difficulty }}-validation.json
 
       - name: Upload smoke candidate
         uses: actions/upload-artifact@v4
         with:
-          name: v334-gen4-smoke-${{ matrix.difficulty }}
+          name: v334-gen4-smoke-${{ matrix.bank }}-${{ matrix.difficulty }}
           path: /tmp/gen4-smoke/
           if-no-files-found: error
           retention-days: 14
