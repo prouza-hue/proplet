@@ -1,5 +1,5 @@
 name: v3.34 Generation 4 full candidate build
-# Iteration 3: local repeat blocking is separated from the 12-board assembly gate.
+# Iteration 4: locally reproduced shape/ambiguity search; uniqueness gates unchanged.
 
 on:
   workflow_dispatch:
