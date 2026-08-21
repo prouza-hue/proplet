@@ -147,6 +147,34 @@ Nový audit `gen4-local-ambiguity-v1` počítá krátké slovníkové prefixy na
 
 Source of truth finálních profilů je `data/gen4_profiles_v334.json`.
 
+Tvrdé ambiguity intervaly jsou kalibrovány pouze pro Medium a Hard, kde máme lidská data. U Easy a Hardcore se metrika povinně měří a reportuje, ale široký bezpečnostní interval se nevydává za lidsky ověřený časový prediktor. Starter a rescue používají prověřenou 6×6 Easy geometrii; jejich lehkost zajišťuje Tier A slovník a nižší strop lokální nejednoznačnosti, nikoli oslabení uniqueness testu.
+
+## Úplné pokrytí aktivního obsahu
+
+Release candidate musí obsahovat přesně **1 261** nových Gen4 desek:
+
+| Banka | Skladba | Počet |
+|---|---|---:|
+| Starter | onboarding | 1 |
+| Rescue | streak rescue | 30 |
+| Free | 4 × 200 | 800 |
+| Daily | 105 Easy + 156 Medium + 104 Hard | 365 |
+| Rolling | 17 Easy + 16 Medium + 16 Hard + 16 Hardcore | 65 |
+
+Assembler zachová stabilní Free sloty 1–200, denní rytmus 2× Easy / 3× Medium / 2× Hard a třináct pětilevelových rolling dropů. Rolling kandidát zůstává `releaseEnabled: false`, bez aktivačního data, dokud Pavel neschválí finální preview a konkrétní release datum.
+
+V každé sekvenci jedné banky se žádný target nesmí opakovat v předchozích dvanácti deskách. Tento spacing se kontroluje až při společném sestavení shardů, aby neunikly duplicity přes hranice paralelních generovacích úloh.
+
+## Archiv bez starého hratelného obsahu
+
+Runtime po přechodu nesmí obsahovat `legacyFree`, `legacyDaily` ani `previousDaily`. Archiv má tři vrstvy:
+
+1. **Neměnný cold source** — přesná stará těla zůstanou obnovitelná z Git commit/blobs a kontrolních SHA-256, ale nebudou doručována hráčům.
+2. **Nehratelný metadata katalog** — hash obsahu, původní ID, generace, banka, obtížnost, slot, rozměry a počet targetů; bez písmen, odpovědí a cest.
+3. **Historické statistiky** — výsledky, runs a attempts dostanou `content_key` a lineage. Nejednoznačně znovupoužité legacy ID se nesmí označit jako exact.
+
+Starý challenge odkaz se po cutoveru nebude snažit otevřít odstraněnou desku. Vrátí archivní souhrn/tombstone; historický výkon a leaderboardové statistiky zůstanou zachované. Nové challenge odkazy smějí vznikat jen z aktivních Gen4 zdrojů.
+
 ## Lexikon
 
 Soubor `data/target_generation_exclusions_v334.json` je jediný explicitní source of truth pro budoucí target generation. Nově obsahuje také `LUNOCHOD`. Vyřazení:
