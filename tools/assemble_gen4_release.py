@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter, defaultdict, deque
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 import json
 from pathlib import Path
 
@@ -63,6 +63,15 @@ def require_levels(grouped: dict, bank: str, difficulty: str, expected: int, sta
 
 def target_words(puzzle: dict) -> set[str]:
     return {str(answer.get("word") or "").casefold() for answer in puzzle.get("answers") or []}
+
+
+def day_before(value: object) -> str | None:
+    if not value:
+        return None
+    try:
+        return (date.fromisoformat(str(value)) - timedelta(days=1)).isoformat()
+    except ValueError:
+        return None
 
 
 def medium_profile(ordinal: int) -> str:
@@ -222,6 +231,43 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
 
     body_keys = {"free", "daily", "rescue", "starter", "legacyFree", "legacyDaily", "previousDaily"}
     runtime = {key: deepcopy(value) for key, value in production.items() if key not in body_keys}
+    legacy_by_generation = {
+        int(bank.get("generation") or 0): bank
+        for bank in production.get("legacyDaily") or []
+        if bank.get("puzzles")
+    }
+    previous = production.get("previousDaily") or {}
+    if previous.get("puzzles"):
+        legacy_by_generation[int(previous.get("generation") or 0)] = previous
+    switch2 = production.get("dailyGeneration2From")
+    switch3 = production.get("dailyGeneration3From")
+    daily_windows = []
+    if 1 in legacy_by_generation:
+        bank = legacy_by_generation[1]
+        daily_windows.append({
+            "generation": 1,
+            "activeFrom": None,
+            "activeUntil": day_before(switch2),
+            "rotationBaseDate": bank.get("rotationBaseDate") or "2026-01-01",
+            "puzzleIds": [puzzle.get("id") for puzzle in bank.get("puzzles") or []],
+        })
+    if 2 in legacy_by_generation:
+        bank = legacy_by_generation[2]
+        daily_windows.append({
+            "generation": 2,
+            "activeFrom": bank.get("activeFrom") or switch2,
+            "activeUntil": bank.get("activeUntil") or day_before(switch3),
+            "rotationBaseDate": bank.get("rotationBaseDate") or "2026-01-01",
+            "puzzleIds": [puzzle.get("id") for puzzle in bank.get("puzzles") or []],
+        })
+    daily_windows.append({
+        "generation": int(production.get("dailyGeneration") or 3),
+        "activeFrom": switch3,
+        "activeUntil": None,
+        "rotationBaseDate": production.get("dailyRotationBaseDate") or switch3,
+        "puzzleIds": [puzzle.get("id") for puzzle in production.get("daily") or []],
+    })
+
     runtime.update({
         "version": 11,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -245,6 +291,7 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
             "historicalStatsPreserved": True,
             "oldChallengeBehavior": "historical-summary-tombstone",
             "coldBackupRequired": True,
+            "dailyWindows": daily_windows,
         },
         "release": {
             "status": "candidate-paused",
