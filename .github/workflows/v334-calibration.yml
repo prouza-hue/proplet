@@ -20,6 +20,8 @@ on:
       - 'tools/build_gen4_catalog_sql.py'
       - 'tools/generate_gen4_candidates.py'
       - 'tools/assemble_gen4_release.py'
+      - 'content_archive.py'
+      - 'tools/test_gen4_content_archive.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -44,6 +46,8 @@ on:
       - 'tools/build_gen4_catalog_sql.py'
       - 'tools/generate_gen4_candidates.py'
       - 'tools/assemble_gen4_release.py'
+      - 'content_archive.py'
+      - 'tools/test_gen4_content_archive.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -147,6 +151,8 @@ jobs:
           python -m py_compile tools/build_gen4_catalog_sql.py
           python -m py_compile tools/generate_gen4_candidates.py
           python -m py_compile tools/assemble_gen4_release.py
+          python -m py_compile content_archive.py
+          python -m py_compile tools/test_gen4_content_archive.py
           python -m py_compile tools/test_v334_rolling_pause.py
 
       - name: Install runtime dependencies for rolling regression
@@ -154,6 +160,9 @@ jobs:
 
       - name: Verify Gen3 rolling release is paused
         run: python tools/test_v334_rolling_pause.py
+
+      - name: Verify metadata-only archive resolution
+        run: python tools/test_gen4_content_archive.py
 
       - name: Measure calibrated local ambiguity
         run: |
