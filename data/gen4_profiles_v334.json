@@ -14,12 +14,12 @@
   },
   "profiles": {
     "starter-onboarding": {
-      "rows": 5,
-      "cols": 5,
-      "activeCells": [23, 25],
+      "rows": 6,
+      "cols": 6,
+      "activeCells": [24, 28],
       "targetWords": [5, 5],
-      "targetLength": [4, 6],
-      "maxCurlPaths": 0,
+      "targetLength": [4, 7],
+      "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
       "ambiguityRange": [0.0, 5.0],
@@ -28,13 +28,13 @@
     "rescue-core": {
       "rows": 6,
       "cols": 6,
-      "activeCells": [26, 31],
+      "activeCells": [25, 30],
       "targetWords": [5, 6],
       "targetLength": [4, 7],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 6.5],
+      "ambiguityRange": [0.0, 7.0],
       "ambiguityRole": "streak-rescue"
     },
     "easy-core": {
