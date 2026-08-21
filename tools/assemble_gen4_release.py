@@ -22,6 +22,10 @@ DAILY_CADENCE = ("easy", "easy", "medium", "medium", "medium", "hard", "hard")
 DAILY_COUNTS = {"easy": 105, "medium": 156, "hard": 104}
 ROLLING_COUNTS = {"easy": 17, "medium": 16, "hard": 16, "hardcore": 16}
 ROLLING_EXTRA = ("easy", "medium", "hard", "hardcore")
+FREE_TARGET_COOLDOWN = {"easy": 3, "medium": 8, "hard": 12, "hardcore": 12}
+DAILY_TARGET_COOLDOWN = 5
+RESCUE_TARGET_COOLDOWN = 3
+ROLLING_TARGET_COOLDOWN = 4
 
 
 def load_shards(root: Path) -> dict[tuple[str, str], list[dict]]:
@@ -82,29 +86,43 @@ def medium_profile(ordinal: int) -> str:
     return "medium-compact" if (ordinal - 121) % 7 == 6 else "medium-cutout"
 
 
-def take_candidate(remaining: list[dict], recent: deque[set[str]], required_profile: str | None = None) -> dict:
+def take_candidate(
+    remaining: list[dict],
+    recent: deque[set[str]],
+    cooldown: int,
+    required_profile: str | None = None,
+    context: str = "candidate",
+) -> dict:
     blocked = set().union(*recent) if recent else set()
+    target_frequency = Counter(
+        word
+        for candidate in remaining
+        for word in target_words(candidate)
+    )
     ranked = []
     for index, puzzle in enumerate(remaining):
         profile = str((puzzle.get("meta") or {}).get("generationProfile") or "")
         if required_profile and profile != required_profile:
             continue
-        overlap = len(target_words(puzzle) & blocked)
+        words = target_words(puzzle)
+        overlap = len(words & blocked)
+        pressure = sum(target_frequency[word] - 1 for word in words)
         original_level = int((puzzle.get("meta") or {}).get("level") or 0)
-        ranked.append((overlap, original_level, canonical_hash(puzzle), index))
+        ranked.append((overlap, -pressure, original_level, canonical_hash(puzzle), index))
     if not ranked:
         raise SystemExit(f"No candidate remains for required profile {required_profile}")
-    overlap, _, _, index = min(ranked)
+    overlap, _, _, _, index = min(ranked)
     if overlap:
         raise SystemExit(
-            f"Target-spacing gate failed: best remaining {required_profile or 'candidate'} repeats {overlap} "
-            "target(s) inside the previous 12 boards"
+            f"Target-spacing gate failed at {context}: best remaining "
+            f"{required_profile or 'candidate'} repeats {overlap} "
+            f"target(s) inside the previous {cooldown} boards"
         )
     puzzle = remaining.pop(index)
     meta = puzzle.setdefault("meta", {})
     meta["generatedLevel"] = int(meta.get("level") or 0)
     recent.append(target_words(puzzle))
-    while len(recent) > 12:
+    while len(recent) > cooldown:
         recent.popleft()
     return puzzle
 
@@ -116,7 +134,10 @@ def ordered_bank(puzzles: list[dict], bank: str, difficulty: str, start_level: i
     for offset in range(len(puzzles)):
         level = start_level + offset
         required = medium_profile(level) if difficulty == "medium" else None
-        puzzle = take_candidate(remaining, recent, required)
+        cooldown = RESCUE_TARGET_COOLDOWN if bank == "rescue" else FREE_TARGET_COOLDOWN[difficulty]
+        puzzle = take_candidate(
+            remaining, recent, cooldown, required, f"{bank}/{difficulty} level {level}"
+        )
         puzzle["id"] = (
             f"rescue-g4-{level:03d}" if bank == "rescue"
             else f"g4-{'emhx'[DIFFICULTIES.index(difficulty)]}-{level:03d}"
@@ -138,7 +159,10 @@ def build_daily(grouped: dict) -> list[dict]:
         difficulty = DAILY_CADENCE[(index - 1) % len(DAILY_CADENCE)]
         ordinals[difficulty] += 1
         required = medium_profile(ordinals[difficulty]) if difficulty == "medium" else None
-        puzzle = take_candidate(pools[difficulty], recent, required)
+        puzzle = take_candidate(
+            pools[difficulty], recent, DAILY_TARGET_COOLDOWN, required,
+            f"daily level {index} ({difficulty})",
+        )
         puzzle["id"] = f"g4-d-{index:03d}"
         meta = puzzle.setdefault("meta", {})
         meta.update({
@@ -166,13 +190,19 @@ def build_rolling(grouped: dict) -> dict:
     batches = []
     release_index = 0
     for week in range(13):
+        # Rolling is consumed as a weekly five-level drop.  Enforce the target
+        # cooldown inside each drop; a new release batch starts a new window.
+        recent.clear()
         extra = ROLLING_EXTRA[week % len(ROLLING_EXTRA)]
         week_difficulties = [*DIFFICULTIES, extra]
         levels = []
         for difficulty in week_difficulties:
             ordinals[difficulty] += 1
             required = medium_profile(200 + ordinals[difficulty]) if difficulty == "medium" else None
-            puzzle = take_candidate(pools[difficulty], recent, required)
+            puzzle = take_candidate(
+                pools[difficulty], recent, ROLLING_TARGET_COOLDOWN, required,
+                f"rolling week {week + 1} ({difficulty})",
+            )
             release_index += 1
             level = 200 + ordinals[difficulty]
             puzzle["id"] = f"g4-{'emhx'[DIFFICULTIES.index(difficulty)]}-{level:03d}"
@@ -212,6 +242,10 @@ def build_rolling(grouped: dict) -> dict:
         "releaseEnabled": False,
         "releasePauseReason": "Awaiting explicit Generation 4 production approval and release-date binding",
         "contentGeneration": 4,
+        "targetCooldownPolicy": {
+            "withinEachBatch": ROLLING_TARGET_COOLDOWN,
+            "semantics": "no target repeats inside one five-level weekly drop",
+        },
         "batches": batches,
         "puzzles": by_difficulty,
     }
@@ -314,6 +348,12 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
             "weekdays": list(DAILY_CADENCE),
             "counts": DAILY_COUNTS,
         },
+        "targetCooldownPolicy": {
+            "free": FREE_TARGET_COOLDOWN,
+            "rescue": RESCUE_TARGET_COOLDOWN,
+            "daily": DAILY_TARGET_COOLDOWN,
+            "semantics": "no target may repeat inside the stated number of previous playable boards",
+        },
         "archive": {
             "catalogVersion": 1,
             "catalogPath": "data/content_catalog_v334.json",
@@ -386,6 +426,12 @@ def main() -> None:
         "duplicateIds": 0,
         "duplicateBoardHashes": 0,
         "legacyPuzzleBodiesInRuntime": False,
+        "targetCooldownPolicy": {
+            "free": FREE_TARGET_COOLDOWN,
+            "rescue": RESCUE_TARGET_COOLDOWN,
+            "daily": DAILY_TARGET_COOLDOWN,
+            "rollingWithinBatch": ROLLING_TARGET_COOLDOWN,
+        },
     }
     args.manifest_output.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, ensure_ascii=False, indent=2))

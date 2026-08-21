@@ -136,6 +136,9 @@ def main() -> None:
     parser.add_argument("--rolling", type=Path)
     parser.add_argument("--active-source", type=Path)
     parser.add_argument("--active-rolling", type=Path)
+    parser.add_argument("--source-commit")
+    parser.add_argument("--source-blob")
+    parser.add_argument("--rolling-blob")
     parser.add_argument("--catalog", type=Path, required=True)
     parser.add_argument("--cold-dir", type=Path, required=True)
     parser.add_argument("--pruned-runtime", type=Path)
@@ -177,7 +180,11 @@ def main() -> None:
     archives = []
     for source_name, source_path, _, cold_archive in sources:
         if cold_archive:
-            archives.append(cold_copy(source_path, args.cold_dir / f"{source_name}.json.gz"))
+            archive = cold_copy(source_path, args.cold_dir / f"{source_name}.json.gz")
+            archive["repository"] = "prouza-hue/proplet"
+            archive["sourceCommit"] = args.source_commit
+            archive["sourceBlob"] = args.source_blob if source_name == "puzzles" else args.rolling_blob
+            archives.append(archive)
 
     generations: Counter[str] = Counter()
     banks: Counter[str] = Counter()

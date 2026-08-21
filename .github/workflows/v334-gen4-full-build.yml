@@ -1,5 +1,5 @@
 name: v3.34 Generation 4 full candidate build
-# Iteration 4: locally reproduced shape/ambiguity search; uniqueness gates unchanged.
+# Iteration 5: complete locally audited 1,261-board contract and archive provenance.
 
 on:
   workflow_dispatch:
@@ -44,6 +44,9 @@ jobs:
           add("daily", "easy", ((1, 21), (22, 21), (43, 21), (64, 21), (85, 21)), 2026083000)
           add("daily", "medium", ((1, 26), (27, 26), (53, 26), (79, 26), (105, 26), (131, 26)), 2026083100)
           add("daily", "hard", ((1, 26), (27, 26), (53, 26), (79, 26)), 2026083200)
+          # The first deterministic Hard family is shape-pathological even at
+          # the frozen profile; use the locally verified replacement seed.
+          next(item for item in items if item["key"] == "daily-hard-01")["seed"] = 2026083215
           for index, (difficulty, count) in enumerate((("easy", 17), ("medium", 16), ("hard", 16), ("hardcore", 16))):
               add("rolling", difficulty, ((201, count),), 2026083300 + index * 10)
           add("rescue", "rescue", ((1, 15), (16, 15)), 2026083400)
@@ -141,6 +144,9 @@ jobs:
             --rolling /tmp/gen4-legacy-source/rolling_content_v1.json \
             --active-source /tmp/gen4-full/puzzles-gen4-candidate.json \
             --active-rolling /tmp/gen4-full/rolling-content-gen4-candidate.json \
+            --source-commit a1904574324c714526a5303f6584f3174a789f8e \
+            --source-blob 2836e666df3616446a5caaf2bed6df7c4c5010d8 \
+            --rolling-blob ba5803665701cdd1c5a00d7c269ff91df49c16eb \
             --catalog /tmp/gen4-full/content-catalog-v334.json \
             --cold-dir /tmp/gen4-full/cold
           python tools/build_gen4_catalog_sql.py /tmp/gen4-full/content-catalog-v334.json \

@@ -64,7 +64,7 @@ V2 přidala správný princip nezávislých cest, ale současně příliš mnoho
 - žádnou cestu s `curlRun > 2`,
 - průměr zatáček zhruba 0,9–2,35 podle varianty,
 - u 7×7 žádné osamocené jednobuňkové díry; u řidší 8×8 nejvýše jedna,
-- nejvýše tři prázdné komponenty u 7×7 a pět u řidší 8×8,
+- nejvýše čtyři prázdné komponenty u 7×7 a pět u řidší 8×8,
 - převážně Tier A/B; slovník nemá zachraňovat nebo sabotovat geometrii.
 
 Výkus není jen libovolná díra. Musí desku členit do čitelných oblastí; fragmentované jednotlivé zuby jsou zakázané.
@@ -163,7 +163,32 @@ Release candidate musí obsahovat přesně **1 261** nových Gen4 desek:
 
 Assembler zachová stabilní Free sloty 1–200, denní rytmus 2× Easy / 3× Medium / 2× Hard a třináct pětilevelových rolling dropů. Rolling kandidát zůstává `releaseEnabled: false`, bez aktivačního data, dokud Pavel neschválí finální preview a konkrétní release datum.
 
-V každé sekvenci jedné banky se žádný target nesmí opakovat v předchozích dvanácti deskách. Tento spacing se kontroluje až při společném sestavení shardů, aby neunikly duplicity přes hranice paralelních generovacích úloh.
+Původní návrh jednotného dvanáctideskového cooldownu byl při full-bank auditu zamítnut jako matematicky nesplnitelný: Free Easy má 200 desek a nejčastější target 42 výskytů, zatímco cooldown 12 dovoluje maximálně 16. Gen4 proto používá explicitní kontrakt podle způsobu spotřeby a šířky slovníku:
+
+| Sekvence | Předchozí desky bez opakování targetu |
+|---|---:|
+| Free Easy / Rescue | 3 |
+| Free Medium | 8 |
+| Free Hard / Hardcore | 12 |
+| Daily | 5 |
+| Rolling | celý pětiúrovňový týdenní drop |
+
+Spacing se kontroluje při společném sestavení shardů a podruhé nezávislým strict validátorem. Nejde o změkčení uniqueness: každá jednotlivá deska nadále musí mít právě jedno široce ověřené exact-cover řešení.
+
+### Výsledek úplné generace
+
+Pozastavený kandidát obsahuje všech **1 261** desek. Strict validator ověřil přesné počty, cesty, pokrytí masky, endpoint adjacency, profily, exclusions, cooldowny, globálně unikátní ID i board hashe; výsledek je 0 chyb. Runtime část má 1 196 desek a oddělená Rolling rezerva 65. `LUNOCHOD` ani `FRISBEE` se v žádném targetu nevyskytují.
+
+Nezávisle přepočtená lokální nejednoznačnost potvrzuje gradaci:
+
+| Profil | N | Medián | P75 | Maximum |
+|---|---:|---:|---:|---:|
+| Easy | 305 | 7,46 | 9,00 | 15,00 |
+| Medium compact | 104 | 7,68 | 8,43 | 10,14 |
+| Medium cutout | 252 | 8,06 | 9,22 | 11,71 |
+| Hard bridge | 304 | 10,17 | 11,06 | 13,25 |
+| Hardcore | 200 | 14,58 | 17,01 | 26,58 |
+| Rescue | 30 | 6,18 | 6,60 | 7,71 |
 
 ## Archiv bez starého hratelného obsahu
 
@@ -172,6 +197,8 @@ Runtime po přechodu nesmí obsahovat `legacyFree`, `legacyDaily` ani `previousD
 1. **Neměnný cold source** — přesná stará těla zůstanou obnovitelná z Git commit/blobs a kontrolních SHA-256, ale nebudou doručována hráčům.
 2. **Nehratelný metadata katalog** — hash obsahu, původní ID, generace, banka, obtížnost, slot, rozměry a počet targetů; bez písmen, odpovědí a cest.
 3. **Historické statistiky** — výsledky, runs a attempts dostanou `content_key` a lineage. Nejednoznačně znovupoužité legacy ID se nesmí označit jako exact.
+
+Vygenerovaný katalog má 4 594 unikátních obsahových hashů a 4 599 kontextů. Nemá pole `letters`, `answers`, `path` ani `mask`. Cold source ukazuje na produkční commit `a1904574324c714526a5303f6584f3174a789f8e` a přesné Git bloby `data/puzzles.json` / `data/rolling_content_v1.json`; gzip kopie mají samostatné SHA-256.
 
 Starý challenge odkaz se po cutoveru nebude snažit otevřít odstraněnou desku. Vrátí archivní souhrn/tombstone; historický výkon a leaderboardové statistiky zůstanou zachované. Nové challenge odkazy smějí vznikat jen z aktivních Gen4 zdrojů.
 
@@ -188,10 +215,10 @@ Soubor `data/target_generation_exclusions_v334.json` je jediný explicitní sour
 
 1. Zmrazit geometry, vocabulary a local-ambiguity guardrails. **Hotovo.**
 2. Pozastavit vydání Gen3 rolling banky plánované od 24. 8., pokud nebude nahrazena Gen4.
-3. Vygenerovat Free, Daily, rolling, starter a rescue banku.
-4. Exact-cover a target-path uniqueness audit 100 % desek.
-5. Ověřit exclusions a duplicity napříč všemi bankami.
-6. Vytvořit hashovaný metadata katalog a studený archiv původních bank.
+3. Vygenerovat Free, Daily, rolling, starter a rescue banku. **Hotovo v pozastaveném kandidátu.**
+4. Exact-cover a target-path uniqueness audit 100 % desek. **Hotovo, 1 261/1 261.**
+5. Ověřit exclusions, cooldowny a duplicity napříč všemi bankami. **Hotovo, 0 chyb.**
+6. Vytvořit hashovaný metadata katalog a studený archiv původních bank. **Hotovo jako release artifact; zatím neaplikováno do produkce.**
 7. Doplnit explicitní content lineage do výsledků před odstraněním legacy bodies z runtime.
 8. Migration QA: dokončené sloty, XP, historie, rozehrané legacy hry a challenge archive fallback.
 9. Preview deploy, smoke test, runtime/build log check.

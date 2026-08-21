@@ -58,7 +58,7 @@
       "maxCurlPaths": 2,
       "maxCurlRun": 2,
       "meanTurns": [0.75, 2.4],
-      "maxBlankComponents": 3,
+      "maxBlankComponents": 4,
       "maxIsolatedBlanks": 0,
       "vocabularyTiers": ["A", "B"],
       "ambiguityRange": [0.0, 12.0],

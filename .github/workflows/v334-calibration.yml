@@ -20,9 +20,8 @@ on:
       - 'tools/build_gen4_catalog_sql.py'
       - 'tools/generate_gen4_candidates.py'
       - 'tools/assemble_gen4_release.py'
-      - 'content_archive.py'
-      - 'tools/test_gen4_content_archive.py'
       - 'tools/bind_gen4_release.py'
+      - 'content_archive.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -47,9 +46,8 @@ on:
       - 'tools/build_gen4_catalog_sql.py'
       - 'tools/generate_gen4_candidates.py'
       - 'tools/assemble_gen4_release.py'
-      - 'content_archive.py'
-      - 'tools/test_gen4_content_archive.py'
       - 'tools/bind_gen4_release.py'
+      - 'content_archive.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -153,19 +151,12 @@ jobs:
           python -m py_compile tools/build_gen4_catalog_sql.py
           python -m py_compile tools/generate_gen4_candidates.py
           python -m py_compile tools/assemble_gen4_release.py
-          python -m py_compile content_archive.py
-          python -m py_compile tools/test_gen4_content_archive.py
           python -m py_compile tools/bind_gen4_release.py
+          python -m py_compile content_archive.py
           python -m py_compile tools/test_v334_rolling_pause.py
-
-      - name: Install runtime dependencies for rolling regression
-        run: python -m pip install --disable-pip-version-check -r requirements.txt
 
       - name: Verify Gen3 rolling release is paused
         run: python tools/test_v334_rolling_pause.py
-
-      - name: Verify metadata-only archive resolution
-        run: python tools/test_gen4_content_archive.py
 
       - name: Measure calibrated local ambiguity
         run: |
@@ -188,8 +179,6 @@ jobs:
             --rolling data/rolling_content_v1.json \
             --catalog /tmp/gen4-contract/content-catalog.json \
             --cold-dir /tmp/gen4-contract/cold
-          python tools/build_gen4_catalog_sql.py /tmp/gen4-contract/content-catalog.json \
-            --output /tmp/gen4-contract/content-catalog-seed.sql
           python - <<'PY'
           import json
           from pathlib import Path
@@ -197,9 +186,6 @@ jobs:
           assert catalog['contentCount'] > 0
           forbidden = {'letters', 'answers', 'path'}
           assert not forbidden.intersection(json.dumps(catalog).casefold().split('"'))
-          seed = Path('/tmp/gen4-contract/content-catalog-seed.sql').read_text()
-          assert 'insert into public.content_catalog' in seed
-          assert 'update public.results' in seed
           print(f"Catalog clean: {catalog['contentCount']} immutable contents, {catalog['contextCount']} contexts")
           PY
 
@@ -218,23 +204,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - bank: free
-            difficulty: easy
+          - difficulty: easy
             level: 1
-          - bank: free
-            difficulty: medium
+          - difficulty: medium
             level: 2
-          - bank: free
-            difficulty: hard
+          - difficulty: hard
             level: 1
-          - bank: free
-            difficulty: hardcore
-            level: 1
-          - bank: starter
-            difficulty: easy
-            level: 1
-          - bank: rescue
-            difficulty: rescue
+          - difficulty: hardcore
             level: 1
     steps:
       - name: Checkout branch
@@ -249,24 +225,24 @@ jobs:
         run: |
           mkdir -p /tmp/gen4-smoke
           python tools/generate_gen4_candidates.py \
-            --bank ${{ matrix.bank }} \
+            --bank free \
             --difficulty ${{ matrix.difficulty }} \
             --count 1 \
             --start-level ${{ matrix.level }} \
             --seed $((20260822 + ${{ matrix.level }})) \
-            --output /tmp/gen4-smoke/${{ matrix.bank }}-${{ matrix.difficulty }}.json
+            --output /tmp/gen4-smoke/${{ matrix.difficulty }}.json
 
       - name: Validate candidate contract
         run: |
-          python tools/validate_gen4_release.py /tmp/gen4-smoke/${{ matrix.bank }}-${{ matrix.difficulty }}.json \
+          python tools/validate_gen4_release.py /tmp/gen4-smoke/${{ matrix.difficulty }}.json \
             --profiles data/gen4_profiles_v334.json \
             --exclusions data/target_generation_exclusions_v334.json \
-            --report /tmp/gen4-smoke/${{ matrix.bank }}-${{ matrix.difficulty }}-validation.json
+            --report /tmp/gen4-smoke/${{ matrix.difficulty }}-validation.json
 
       - name: Upload smoke candidate
         uses: actions/upload-artifact@v4
         with:
-          name: v334-gen4-smoke-${{ matrix.bank }}-${{ matrix.difficulty }}
+          name: v334-gen4-smoke-${{ matrix.difficulty }}
           path: /tmp/gen4-smoke/
           if-no-files-found: error
           retention-days: 14

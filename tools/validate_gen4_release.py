@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, deque
 import hashlib
 import json
 from pathlib import Path
@@ -12,6 +12,12 @@ import re
 
 LEGACY_KEYS = {"legacyFree", "legacyDaily", "previousDaily"}
 GEN4_ID = re.compile(r"^(?:g4-|gen4-|starter-g4-|rescue-g4-)")
+EXPECTED_TARGET_COOLDOWN = {
+    "free": {"easy": 3, "medium": 8, "hard": 12, "hardcore": 12},
+    "rescue": 3,
+    "daily": 5,
+    "rollingWithinBatch": 4,
+}
 
 
 def norm(value: object) -> str:
@@ -166,6 +172,21 @@ def validate_profile(path: tuple[str, ...], puzzle: dict, profiles: dict, allow_
     return errors
 
 
+def validate_target_cooldown(puzzles: list[dict], cooldown: int, label: str) -> list[str]:
+    errors: list[str] = []
+    recent: deque[set[str]] = deque()
+    for index, puzzle in enumerate(puzzles, 1):
+        words = {norm(answer.get("word")) for answer in puzzle.get("answers") or []}
+        blocked = set().union(*recent) if recent else set()
+        overlap = sorted(words & blocked)
+        if overlap:
+            errors.append(f"{label}/{index}: target cooldown {cooldown} violated by {overlap[:4]}")
+        recent.append(words)
+        while len(recent) > cooldown:
+            recent.popleft()
+    return errors
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
@@ -235,6 +256,39 @@ def main() -> None:
         rescue = payload.get("rescue") or []
         if len(rescue) != 30:
             errors.append(f"rescue: expected 30, got {len(rescue)}")
+
+        policy = payload.get("targetCooldownPolicy") or {}
+        if policy.get("free") != EXPECTED_TARGET_COOLDOWN["free"]:
+            errors.append("runtime targetCooldownPolicy.free does not match the Gen4 contract")
+        if policy.get("rescue") != EXPECTED_TARGET_COOLDOWN["rescue"]:
+            errors.append("runtime targetCooldownPolicy.rescue does not match the Gen4 contract")
+        if policy.get("daily") != EXPECTED_TARGET_COOLDOWN["daily"]:
+            errors.append("runtime targetCooldownPolicy.daily does not match the Gen4 contract")
+        for difficulty, cooldown in EXPECTED_TARGET_COOLDOWN["free"].items():
+            errors.extend(validate_target_cooldown(free.get(difficulty) or [], cooldown, f"free/{difficulty}"))
+        errors.extend(validate_target_cooldown(rescue, EXPECTED_TARGET_COOLDOWN["rescue"], "rescue"))
+        errors.extend(validate_target_cooldown(payload.get("daily") or [], EXPECTED_TARGET_COOLDOWN["daily"], "daily"))
+
+        if rolling_payload is not None:
+            rolling_policy = rolling_payload.get("targetCooldownPolicy") or {}
+            if rolling_policy.get("withinEachBatch") != EXPECTED_TARGET_COOLDOWN["rollingWithinBatch"]:
+                errors.append("rolling targetCooldownPolicy does not match the Gen4 contract")
+            rolling_by_id = {
+                str(puzzle.get("id") or ""): puzzle
+                for values in (rolling_payload.get("puzzles") or {}).values()
+                for puzzle in values or []
+            }
+            for batch in rolling_payload.get("batches") or []:
+                batch_id = str(batch.get("id") or "unknown")
+                batch_puzzles = [
+                    rolling_by_id.get(str(level.get("id") or ""), {})
+                    for level in batch.get("levels") or []
+                ]
+                errors.extend(validate_target_cooldown(
+                    batch_puzzles,
+                    EXPECTED_TARGET_COOLDOWN["rollingWithinBatch"],
+                    f"rolling/{batch_id}",
+                ))
 
     report = {
         "version": 1,

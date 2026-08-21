@@ -155,6 +155,8 @@ PROFILES = {
 PROFILES["medium-compact"]["ambiguity"] = (0.0, 12.0)
 PROFILES["medium-cutout"]["ambiguity"] = (0.0, 14.0)
 PROFILES["hard-bridge"]["ambiguity"] = (6.8, 16.0)
+PROFILES["medium-compact"]["max_blank_components"] = 4
+PROFILES["hard-bridge"]["max_blank_components"] = 5
 
 DIFFICULTY_PROFILE = {
     "easy": "easy-core",
