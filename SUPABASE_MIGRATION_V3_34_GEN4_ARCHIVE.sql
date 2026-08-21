@@ -89,3 +89,68 @@ comment on table public.content_catalog_contexts is
 comment on column public.results.content_lineage_confidence is
   'exact, inferred or ambiguous; never fabricate certainty for reused legacy puzzle IDs.';
 
+create or replace function public.attach_content_lineage()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  matched_key text;
+  matched_generation smallint;
+  matched_bank text;
+  matched_level integer;
+begin
+  if new.content_key is not null or new.puzzle_id is null then
+    return new;
+  end if;
+  select
+    min(content_key), min(content_generation), min(content_bank), min(content_level)
+  into matched_key, matched_generation, matched_bank, matched_level
+  from public.content_catalog_contexts
+  where puzzle_id = new.puzzle_id
+  having count(distinct content_key) = 1;
+  if matched_key is not null then
+    new.content_key := matched_key;
+    new.content_generation := matched_generation;
+    new.content_bank := coalesce(new.mode, matched_bank);
+    new.content_level := matched_level;
+    new.content_lineage_confidence := 'exact';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function public.attach_content_lineage() from public, anon, authenticated;
+
+drop trigger if exists results_attach_content_lineage on public.results;
+create trigger results_attach_content_lineage
+before insert or update of puzzle_id on public.results
+for each row execute function public.attach_content_lineage();
+
+drop trigger if exists puzzle_runs_attach_content_lineage on public.puzzle_runs;
+create trigger puzzle_runs_attach_content_lineage
+before insert or update of puzzle_id on public.puzzle_runs
+for each row execute function public.attach_content_lineage();
+
+drop trigger if exists puzzle_attempts_attach_content_lineage on public.puzzle_attempts;
+create trigger puzzle_attempts_attach_content_lineage
+before insert or update of puzzle_id on public.puzzle_attempts
+for each row execute function public.attach_content_lineage();
+
+create or replace view public.content_archive_stats
+with (security_invoker = true)
+as
+select
+  c.content_generation,
+  c.content_bank,
+  c.difficulty,
+  count(distinct c.content_key) as puzzle_count,
+  count(distinct r.id) as completed_results,
+  count(distinct pr.id) as completed_runs
+from public.content_catalog_contexts c
+left join public.results r on r.content_key = c.content_key
+left join public.puzzle_runs pr on pr.content_key = c.content_key
+group by c.content_generation, c.content_bank, c.difficulty;
+
+revoke all on table public.content_archive_stats from anon, authenticated;
