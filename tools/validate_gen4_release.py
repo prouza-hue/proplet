@@ -124,6 +124,7 @@ def validate_puzzle(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
+    parser.add_argument("--rolling", type=Path)
     parser.add_argument("--profiles", type=Path, required=True)
     parser.add_argument("--exclusions", type=Path, required=True)
     parser.add_argument("--strict-counts", action="store_true")
@@ -142,6 +143,14 @@ def main() -> None:
         errors.append(f"runtime pack still contains legacy bodies: {', '.join(present_legacy)}")
 
     puzzles = list(iter_active(payload))
+    rolling_payload = None
+    if args.rolling:
+        rolling_payload = json.loads(args.rolling.read_text(encoding="utf-8"))
+        if rolling_payload.get("releaseEnabled") is not False:
+            errors.append("release candidate rolling bank must remain paused")
+        if int(rolling_payload.get("contentGeneration") or 0) != 4:
+            errors.append("rolling contentGeneration != 4")
+        puzzles.extend(iter_active(rolling_payload, ("rolling",)))
     ids: Counter[str] = Counter()
     hashes: Counter[str] = Counter()
     difficulties: Counter[str] = Counter()
@@ -168,9 +177,18 @@ def main() -> None:
                 errors.append(f"free/{difficulty}: expected {expected}, got {actual}")
         for bank in ("daily", "rolling"):
             expected = required.get(bank)
-            actual = len(payload.get(bank) or [])
+            if bank == "rolling" and rolling_payload is not None:
+                actual = sum(len(values or []) for values in (rolling_payload.get("puzzles") or {}).values())
+            else:
+                actual = len(payload.get(bank) or [])
             if isinstance(expected, int) and actual != expected:
                 errors.append(f"{bank}: expected {expected}, got {actual}")
+        starter = payload.get("starter")
+        if not isinstance(starter, dict) or not starter.get("letters"):
+            errors.append("starter: expected one active Gen4 puzzle")
+        rescue = payload.get("rescue") or []
+        if len(rescue) != 30:
+            errors.append(f"rescue: expected 30, got {len(rescue)}")
 
     report = {
         "version": 1,
