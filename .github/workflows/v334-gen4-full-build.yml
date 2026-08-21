@@ -1,0 +1,185 @@
+name: v3.34 Generation 4 full candidate build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/v3340-medium-calibration-v3
+    paths:
+      - '.github/workflows/v334-gen4-full-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - id: matrix
+        name: Build deterministic shard matrix
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+
+          items = []
+          def add(bank, difficulty, parts, seed_base):
+              for part, (start, count) in enumerate(parts, 1):
+                  key = f"{bank}-{difficulty}-{part:02d}"
+                  items.append({
+                      "key": key, "bank": bank, "difficulty": difficulty,
+                      "start": start, "count": count, "seed": seed_base + part,
+                  })
+
+          for index, difficulty in enumerate(("easy", "medium", "hard", "hardcore")):
+              add("free", difficulty, ((1, 50), (51, 50), (101, 50), (151, 50)), 2026082200 + index * 100)
+          add("daily", "easy", ((1, 35), (36, 35), (71, 35)), 2026083000)
+          add("daily", "medium", ((1, 39), (40, 39), (79, 39), (118, 39)), 2026083100)
+          add("daily", "hard", ((1, 26), (27, 26), (53, 26), (79, 26)), 2026083200)
+          for index, (difficulty, count) in enumerate((("easy", 17), ("medium", 16), ("hard", 16), ("hardcore", 16))):
+              add("rolling", difficulty, ((201, count),), 2026083300 + index * 10)
+          add("rescue", "rescue", ((1, 15), (16, 15)), 2026083400)
+          add("starter", "easy", ((1, 1),), 2026083500)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write("matrix=" + json.dumps({"include": items}, separators=(",", ":")) + "\n")
+          print(f"Planned {len(items)} deterministic shards")
+          PY
+
+  generate:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate ${{ matrix.key }}
+        run: |
+          mkdir -p /tmp/gen4-shard
+          python tools/generate_gen4_candidates.py \
+            --bank '${{ matrix.bank }}' \
+            --difficulty '${{ matrix.difficulty }}' \
+            --count '${{ matrix.count }}' \
+            --start-level '${{ matrix.start }}' \
+            --seed '${{ matrix.seed }}' \
+            --output '/tmp/gen4-shard/${{ matrix.key }}.json'
+      - name: Validate shard
+        run: |
+          python tools/validate_gen4_release.py '/tmp/gen4-shard/${{ matrix.key }}.json' \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --report '/tmp/gen4-shard/${{ matrix.key }}-validation.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gen4-shard-${{ matrix.key }}
+          path: /tmp/gen4-shard/
+          if-no-files-found: error
+          retention-days: 14
+
+  assemble-and-audit:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: gen4-shard-*
+          path: /tmp/gen4-shards
+          merge-multiple: true
+      - name: Preserve exact pre-Gen4 production source
+        run: |
+          mkdir -p /tmp/gen4-legacy-source /tmp/gen4-full
+          git show a1904574324c714526a5303f6584f3174a789f8e:data/puzzles.json > /tmp/gen4-legacy-source/puzzles.json
+          git show a1904574324c714526a5303f6584f3174a789f8e:data/rolling_content_v1.json > /tmp/gen4-legacy-source/rolling_content_v1.json
+      - name: Assemble paused runtime candidates
+        run: |
+          python tools/assemble_gen4_release.py \
+            --shards /tmp/gen4-shards \
+            --production /tmp/gen4-legacy-source/puzzles.json \
+            --puzzles-output /tmp/gen4-full/puzzles-gen4-candidate.json \
+            --rolling-output /tmp/gen4-full/rolling-content-gen4-candidate.json \
+            --manifest-output /tmp/gen4-full/release-candidate-manifest.json
+      - name: Validate every active board and bank count
+        run: |
+          python tools/validate_gen4_release.py /tmp/gen4-full/puzzles-gen4-candidate.json \
+            --rolling /tmp/gen4-full/rolling-content-gen4-candidate.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --strict-counts \
+            --report /tmp/gen4-full/full-validation.json
+      - name: Measure complete-bank local ambiguity
+        run: |
+          python tools/measure_gen4_ambiguity.py /tmp/gen4-full/puzzles-gen4-candidate.json \
+            --lexicon data/answer_tiers.json \
+            --output /tmp/gen4-full/ambiguity-runtime.json
+          python tools/measure_gen4_ambiguity.py /tmp/gen4-full/rolling-content-gen4-candidate.json \
+            --lexicon data/answer_tiers.json \
+            --output /tmp/gen4-full/ambiguity-rolling.json
+      - name: Build combined catalog, cold archive and seed SQL
+        run: |
+          python tools/build_gen4_archive.py /tmp/gen4-legacy-source/puzzles.json \
+            --rolling /tmp/gen4-legacy-source/rolling_content_v1.json \
+            --active-source /tmp/gen4-full/puzzles-gen4-candidate.json \
+            --active-rolling /tmp/gen4-full/rolling-content-gen4-candidate.json \
+            --catalog /tmp/gen4-full/content-catalog-v334.json \
+            --cold-dir /tmp/gen4-full/cold
+          python tools/build_gen4_catalog_sql.py /tmp/gen4-full/content-catalog-v334.json \
+            --output /tmp/gen4-full/content-catalog-seed-v334.sql
+      - name: Record immutable archive source
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('/tmp/gen4-legacy-source')
+          manifest = {
+              "version": 1,
+              "kind": "proplet-pre-gen4-cold-archive",
+              "sourceCommit": "a1904574324c714526a5303f6584f3174a789f8e",
+              "sourceBlobs": {
+                  "data/puzzles.json": "2836e666df3616446a5caaf2bed6df7c4c5010d8",
+                  "data/rolling_content_v1.json": "ba5803665701cdd1c5a00d7c269ff91df49c16eb",
+              },
+              "files": {},
+              "recovery": "Restore exact bodies from the immutable Git commit/blob; runtime ships metadata only.",
+          }
+          for path in sorted(root.iterdir()):
+              raw = path.read_bytes()
+              manifest["files"][path.name] = {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+          Path('/tmp/gen4-full/archive-source-manifest.json').write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          PY
+      - name: Fail closed on forbidden runtime legacy bodies
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          runtime = json.loads(Path('/tmp/gen4-full/puzzles-gen4-candidate.json').read_text())
+          assert not {'legacyFree', 'legacyDaily', 'previousDaily'}.intersection(runtime)
+          catalog_text = Path('/tmp/gen4-full/content-catalog-v334.json').read_text().casefold()
+          for forbidden in ('"letters"', '"answers"', '"path"'):
+              assert forbidden not in catalog_text
+          report = json.loads(Path('/tmp/gen4-full/full-validation.json').read_text())
+          assert report['ok'] is True and report['puzzleCount'] == 1261
+          print('Final fail-closed gates passed for all 1,261 active/reserved Gen4 boards.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v334-gen4-full-release-candidate
+          path: /tmp/gen4-full/
+          if-no-files-found: error
+          retention-days: 90
