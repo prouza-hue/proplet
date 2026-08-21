@@ -22,7 +22,7 @@
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 6.5],
+      "ambiguityRange": [0.0, 10.0],
       "ambiguityRole": "onboarding"
     },
     "rescue-core": {
@@ -34,7 +34,7 @@
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 6.5],
+      "ambiguityRange": [0.0, 10.0],
       "ambiguityRole": "streak-rescue"
     },
     "easy-core": {
@@ -46,7 +46,7 @@
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 15.0],
+      "ambiguityRange": [0.0, 20.0],
       "ambiguityRole": "low"
     },
     "medium-compact": {
@@ -61,7 +61,7 @@
       "maxBlankComponents": 3,
       "maxIsolatedBlanks": 0,
       "vocabularyTiers": ["A", "B"],
-      "ambiguityRange": [3.5, 9.0],
+      "ambiguityRange": [0.0, 15.0],
       "ambiguityRole": "early-or-relief"
     },
     "medium-cutout": {
@@ -76,7 +76,7 @@
       "maxBlankComponents": 5,
       "maxIsolatedBlanks": 1,
       "vocabularyTiers": ["A", "B"],
-      "ambiguityRange": [4.0, 11.0],
+      "ambiguityRange": [0.0, 16.0],
       "ambiguityRole": "medium-core"
     },
     "hard-bridge": {
@@ -91,7 +91,7 @@
       "maxBlankComponents": 5,
       "maxIsolatedBlanks": 1,
       "vocabularyTiers": ["A", "B", "C"],
-      "ambiguityRange": [7.0, 13.0],
+      "ambiguityRange": [6.8, 22.0],
       "ambiguityRole": "hard-core-with-bounded-upper-tail"
     },
     "hardcore-core": {
@@ -103,7 +103,7 @@
       "maxCurlPaths": 7,
       "maxCurlRun": 4,
       "vocabularyTiers": ["A", "B", "C", "D"],
-      "ambiguityRange": [0.0, 30.0],
+      "ambiguityRange": [0.0, 50.0],
       "ambiguityRole": "high-but-bounded"
     }
   },
