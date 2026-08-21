@@ -13,6 +13,30 @@
     "localAmbiguityMetric": "gen4-local-ambiguity-v1"
   },
   "profiles": {
+    "starter-onboarding": {
+      "rows": 5,
+      "cols": 5,
+      "activeCells": [23, 25],
+      "targetWords": [5, 5],
+      "targetLength": [4, 6],
+      "maxCurlPaths": 0,
+      "maxCurlRun": 1,
+      "vocabularyTiers": ["A"],
+      "ambiguityRange": [0.0, 5.0],
+      "ambiguityRole": "onboarding"
+    },
+    "rescue-core": {
+      "rows": 6,
+      "cols": 6,
+      "activeCells": [26, 31],
+      "targetWords": [5, 6],
+      "targetLength": [4, 7],
+      "maxCurlPaths": 1,
+      "maxCurlRun": 1,
+      "vocabularyTiers": ["A"],
+      "ambiguityRange": [0.0, 6.5],
+      "ambiguityRole": "streak-rescue"
+    },
     "easy-core": {
       "rows": [5, 6],
       "cols": [5, 6],
@@ -22,6 +46,7 @@
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
+      "ambiguityRange": [0.0, 7.5],
       "ambiguityRole": "low"
     },
     "medium-compact": {
@@ -36,6 +61,7 @@
       "maxBlankComponents": 3,
       "maxIsolatedBlanks": 0,
       "vocabularyTiers": ["A", "B"],
+      "ambiguityRange": [3.5, 9.0],
       "ambiguityRole": "early-or-relief"
     },
     "medium-cutout": {
@@ -50,6 +76,7 @@
       "maxBlankComponents": 5,
       "maxIsolatedBlanks": 1,
       "vocabularyTiers": ["A", "B"],
+      "ambiguityRange": [4.0, 11.0],
       "ambiguityRole": "medium-core"
     },
     "hard-bridge": {
@@ -64,6 +91,7 @@
       "maxBlankComponents": 5,
       "maxIsolatedBlanks": 1,
       "vocabularyTiers": ["A", "B", "C"],
+      "ambiguityRange": [7.0, 13.0],
       "ambiguityRole": "hard-core-with-bounded-upper-tail"
     },
     "hardcore-core": {
@@ -75,6 +103,7 @@
       "maxCurlPaths": 7,
       "maxCurlRun": 4,
       "vocabularyTiers": ["A", "B", "C", "D"],
+      "ambiguityRange": [8.0, 20.0],
       "ambiguityRole": "high-but-bounded"
     }
   },
