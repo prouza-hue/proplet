@@ -17,7 +17,7 @@ from typing import Optional
 def load_catalog(path_value: str) -> dict:
     path = Path(path_value)
     if not path.exists():
-        return {"version": 0, "content": [], "byPuzzleId": {}}
+        return {"version": 0, "content": [], "byPuzzleId": {}, "tombstonesByPuzzleId": {}}
     payload = json.loads(path.read_text(encoding="utf-8"))
     index: dict[str, list[dict]] = {}
     for record in payload.get("content") or []:
@@ -33,6 +33,12 @@ def load_catalog(path_value: str) -> dict:
                     **context,
                 })
     payload["byPuzzleId"] = index
+    tombstone_index: dict[str, list[dict]] = {}
+    for tombstone in payload.get("tombstones") or []:
+        puzzle_id = str(tombstone.get("puzzleId") or "")
+        if puzzle_id:
+            tombstone_index.setdefault(puzzle_id, []).append(tombstone)
+    payload["tombstonesByPuzzleId"] = tombstone_index
     return payload
 
 
@@ -59,15 +65,40 @@ def exact_context(
     return contexts[0] if contexts else None
 
 
-def archived_puzzle_info(catalog: dict, puzzle_id: str, difficulty: str, bank: str, active_generation: int) -> Optional[dict]:
+def archived_puzzle_info(
+    catalog: dict,
+    puzzle_id: str,
+    difficulty: Optional[str],
+    bank: str,
+    active_generation: int,
+) -> Optional[dict]:
     context = exact_context(catalog, puzzle_id, difficulty, bank, active_generation)
+    confidence = "exact"
     if not context:
-        return None
+        tombstones = list((catalog.get("tombstonesByPuzzleId") or {}).get(str(puzzle_id), []))
+        tombstones = [item for item in tombstones if item.get("bank") == bank]
+        if difficulty:
+            tombstones = [item for item in tombstones if item.get("difficulty") == difficulty]
+        tombstones = [item for item in tombstones if int(item.get("generation") or 0) < active_generation]
+        identities = {
+            (
+                int(item.get("generation") or 0),
+                str(item.get("bank") or ""),
+                str(item.get("difficulty") or ""),
+                int(item.get("slot") or 0),
+            )
+            for item in tombstones
+        }
+        if len(tombstones) != 1 or len(identities) != 1:
+            return None
+        context = tombstones[0]
+        confidence = "inferred"
+    resolved_difficulty = str(context.get("difficulty") or difficulty or "")
     # Minimal internal-only shape for anti-forgery sanity limits. It is never
     # returned as a playable puzzle and contains no lexical content.
     summary = {
         "id": puzzle_id,
-        "difficulty": difficulty,
+        "difficulty": resolved_difficulty,
         "rows": int(context.get("rows") or 0),
         "cols": int(context.get("cols") or 0),
         "mask": [None] * int(context.get("activeCells") or 0),
@@ -77,18 +108,30 @@ def archived_puzzle_info(catalog: dict, puzzle_id: str, difficulty: str, bank: s
             "contentGeneration": context.get("generation"),
             "level": context.get("slot"),
             "archiveSummaryOnly": True,
+            "lineageConfidence": confidence,
         },
     }
     return {
         "puzzle": summary,
-        "difficulty": difficulty,
+        "difficulty": resolved_difficulty,
         "mode": bank,
         "level": int(context.get("slot") or 0),
         "generation": int(context.get("generation") or 0),
         "legacy": True,
         "archived": True,
         "contentKey": context.get("contentKey"),
+        "lineageConfidence": confidence,
     }
+
+
+def daily_window_puzzle_id(window: dict, daily_date: str) -> Optional[str]:
+    try:
+        selected = date.fromisoformat(daily_date)
+        base = date.fromisoformat(str(window.get("rotationBaseDate") or "2026-01-01"))
+    except ValueError:
+        return None
+    ids = list(window.get("puzzleIds") or [])
+    return str(ids[(selected - base).days % len(ids)]) if ids else None
 
 
 def daily_window_id(runtime: dict, daily_date: str) -> Optional[str]:
@@ -102,12 +145,10 @@ def daily_window_id(runtime: dict, daily_date: str) -> Optional[str]:
         try:
             start = date.fromisoformat(start_raw) if start_raw else date.min
             end = date.fromisoformat(end_raw) if end_raw else date.max
-            base = date.fromisoformat(str(window.get("rotationBaseDate") or "2026-01-01"))
         except ValueError:
             continue
-        ids = list(window.get("puzzleIds") or [])
-        if start <= selected <= end and ids:
-            return str(ids[(selected - base).days % len(ids)])
+        if start <= selected <= end:
+            return daily_window_puzzle_id(window, daily_date)
     return None
 
 

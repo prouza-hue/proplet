@@ -23,6 +23,8 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from content_archive import archived_puzzle_info, daily_window_id, daily_window_puzzle_id, load_catalog
+
 try:
     from pywebpush import webpush, WebPushException
 except Exception:  # Push remains optional until dependencies/env are configured.
@@ -48,6 +50,7 @@ PUZZLES_PATH = ROOT / "data" / (
 ROLLING_CONTENT_PATH = ROOT / "data" / (
     "rolling_content_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "rolling_content_v1.json"
 )
+CONTENT_CATALOG_PATH = ROOT / "data" / "content_catalog_v334.json"
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -884,6 +887,11 @@ def load_rolling_content() -> dict:
     return json.loads(ROLLING_CONTENT_PATH.read_text(encoding="utf-8"))
 
 
+@lru_cache(maxsize=1)
+def load_content_catalog() -> dict:
+    return load_catalog(str(CONTENT_CATALOG_PATH))
+
+
 def rolling_content_release_enabled() -> bool:
     """Fail closed when a reserved bank is paused during a content-generation migration."""
     return load_rolling_content().get("releaseEnabled", True) is not False
@@ -1145,6 +1153,31 @@ def expected_daily_puzzle_id(daily_date: str) -> str:
     except ValueError:
         raise HTTPException(400, "Neplatné datum")
 
+    if int(data.get("dailyGeneration") or 0) == 4:
+        release = data.get("release") or {}
+        switch4_raw = data.get("dailyGeneration4From") or release.get("dailyGeneration4From")
+        try:
+            switch4 = date.fromisoformat(str(switch4_raw)) if switch4_raw else None
+        except ValueError:
+            switch4 = None
+        # The branch preview intentionally exposes the paused candidate. A bound
+        # production release, however, must preserve the historical Daily window
+        # until the explicitly approved cutover date.
+        if switch4 is None and GEN4_CANDIDATE_PREVIEW:
+            bank = data.get("daily", [])
+            base = str(data.get("dailyRotationBaseDate") or "2026-01-01")
+            return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
+        if switch4 is None:
+            raise HTTPException(503, "Generation 4 Daily nemá schválené datum spuštění")
+        if d >= switch4:
+            bank = data.get("daily", [])
+            base = str(data.get("dailyRotationBaseDate") or switch4.isoformat())
+            return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
+        archived_id = daily_window_id(data, daily_date)
+        if archived_id:
+            return archived_id
+        raise HTTPException(503, "Pro datum chybí bezpečně svázané Daily okno")
+
     switch3_raw = data.get("dailyGeneration3From")
     try:
         switch3 = date.fromisoformat(str(switch3_raw)) if switch3_raw else None
@@ -1185,6 +1218,26 @@ def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
     """Accept the primary board plus archived generations for cached/offline clients."""
     data = load_puzzles()
     ids = {expected_daily_puzzle_id(daily_date)}
+
+    if int(data.get("dailyGeneration") or 0) == 4:
+        # A client may open Gen3 just before deployment and sync after cutover.
+        # Only the immediately preceding generation receives this compatibility
+        # exception; older generations remain valid solely inside their historic
+        # date windows and therefore cannot be replayed as a current Daily.
+        release = data.get("release") or {}
+        switch4_raw = data.get("dailyGeneration4From") or release.get("dailyGeneration4From")
+        try:
+            requested_date = date.fromisoformat(daily_date)
+            switch4 = date.fromisoformat(str(switch4_raw)) if switch4_raw else None
+        except ValueError:
+            raise HTTPException(400, "Neplatné datum")
+        windows = list((data.get("archive") or {}).get("dailyWindows") or [])
+        if switch4 and requested_date >= switch4 and windows:
+            previous = max(windows, key=lambda item: int(item.get("generation") or 0))
+            archived_id = daily_window_puzzle_id(previous, daily_date)
+            if archived_id:
+                ids.add(archived_id)
+        return ids
 
     active = data.get("daily", [])
     switch3_raw = data.get("dailyGeneration3From")
@@ -1230,7 +1283,10 @@ def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
             p.get("id") == puzzle_id and p.get("difficulty") == difficulty
             for bank in legacy_daily_banks(data) for p in bank["puzzles"]
         )
-        return active or archived
+        return active or archived or bool(archived_puzzle_info(
+            load_content_catalog(), puzzle_id, difficulty, "daily",
+            int(data.get("dailyGeneration") or data.get("contentGeneration") or 1),
+        ))
     info = free_puzzle_info(puzzle_id, difficulty)
     if info and info.get("legacy") is not True:
         # Never let a guessed future reserve ID enter telemetry/results before its real release.
@@ -1257,7 +1313,11 @@ def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict
             for p in bank.get("puzzles", []):
                 if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
                     return p
-        return None
+        info = archived_puzzle_info(
+            load_content_catalog(), puzzle_id, difficulty, "daily",
+            int(data.get("dailyGeneration") or data.get("contentGeneration") or 1),
+        )
+        return info.get("puzzle") if info else None
     info = free_puzzle_info(puzzle_id, difficulty)
     return info.get("puzzle") if info else None
 
@@ -3394,7 +3454,10 @@ def puzzle_info(puzzle_id: str) -> Optional[dict]:
         for p in bank["puzzles"]:
             if p.get("id") == puzzle_id:
                 return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None, "legacy": True, "generation": int(bank.get("generation") or 1)}
-    return None
+    return archived_puzzle_info(
+        load_content_catalog(), puzzle_id, None, "daily",
+        int(data.get("dailyGeneration") or data.get("contentGeneration") or 1),
+    )
 
 def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bool):
     attempt_id = payload.attempt_id or f"run:{player_id}:{payload.challenge_key}:{uuid.uuid4()}"

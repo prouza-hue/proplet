@@ -81,6 +81,14 @@ def main() -> None:
             "reason": "metadata-only-source",
         }]
         assert "letters" not in json.dumps(built["tombstones"]).casefold()
+        content_archive.load_catalog.cache_clear()
+        tombstone_catalog = content_archive.load_catalog(str(catalog_path))
+        inferred = content_archive.archived_puzzle_info(
+            tombstone_catalog, "missing-body-2", "medium", "daily", 4,
+        )
+        assert inferred and inferred["lineageConfidence"] == "inferred"
+        assert inferred["puzzle"]["meta"]["archiveSummaryOnly"] is True
+        assert inferred["puzzle"]["mask"] == [] and inferred["puzzle"]["answers"] == []
         subprocess.run([
             sys.executable, str(ROOT / "tools/build_gen4_catalog_sql.py"), str(catalog_path),
             "--output", str(seed_path),
