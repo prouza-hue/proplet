@@ -352,7 +352,10 @@ def main() -> None:
             )
         puzzles.append(accepted)
         recent_by_difficulty.append({norm for answer in accepted["answers"] if (norm := str(answer["word"]).casefold())})
-        recent_by_difficulty = recent_by_difficulty[-12:]
+        # Keep generation feasible for the Tier-A-only pools. The full-bank
+        # assembler performs the stronger 12-board spacing pass across shard
+        # boundaries; generation itself only blocks immediate local repeats.
+        recent_by_difficulty = recent_by_difficulty[-3:]
         print(
             f"Gen4 {args.bank}/{args.difficulty} {offset + 1}/{args.count} "
             f"level={level} profile={variant} ambiguity={accepted['meta']['localAmbiguityScore']}",
