@@ -152,9 +152,9 @@ PROFILES = {
     },
 }
 
-PROFILES["medium-compact"]["ambiguity"] = (0.0, 15.0)
-PROFILES["medium-cutout"]["ambiguity"] = (0.0, 16.0)
-PROFILES["hard-bridge"]["ambiguity"] = (6.8, 22.0)
+PROFILES["medium-compact"]["ambiguity"] = (0.0, 12.0)
+PROFILES["medium-cutout"]["ambiguity"] = (0.0, 14.0)
+PROFILES["hard-bridge"]["ambiguity"] = (6.8, 16.0)
 
 DIFFICULTY_PROFILE = {
     "easy": "easy-core",
@@ -306,7 +306,7 @@ def main() -> None:
         build_failures = 0
         rejection_counts: Counter[str] = Counter()
         ambiguity_scores: list[float] = []
-        for shape_retry in range(1, 61):
+        for shape_retry in range(1, 401):
             try:
                 candidate = v3.cal.build_puzzle(
                     gp,
