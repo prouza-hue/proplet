@@ -1,0 +1,1152 @@
+{
+  "version": 1,
+  "metric": "gen4-local-ambiguity-v1",
+  "source": "gen4_full/rolling-content-gen4-candidate.json",
+  "lexicon": "data/answer_tiers.json",
+  "maxDepth": 4,
+  "boardCount": 65,
+  "summary": {
+    "gen4-easy-core-6x6": {
+      "count": 17,
+      "min": 4.964,
+      "median": 7.286,
+      "p75": 10.107,
+      "max": 12.786
+    },
+    "gen4-hardcore-core-10x10": {
+      "count": 16,
+      "min": 10.85,
+      "median": 15.454,
+      "p75": 16.796,
+      "max": 20.932
+    },
+    "v334-hard-independent-v3-bridge-9x9": {
+      "count": 16,
+      "min": 5.75,
+      "median": 10.986,
+      "p75": 11.5,
+      "max": 12.333
+    },
+    "v334-medium-independent-v3-compact-7x7": {
+      "count": 2,
+      "min": 5.429,
+      "median": 6.179,
+      "p75": 6.554,
+      "max": 6.929
+    },
+    "v334-medium-independent-v3-cutout-8x8": {
+      "count": 14,
+      "min": 5.781,
+      "median": 8.938,
+      "p75": 10.078,
+      "max": 10.969
+    }
+  },
+  "boards": [
+    {
+      "id": "g4-e-201",
+      "difficulty": "easy",
+      "level": 201,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 35,
+        "3": 19,
+        "4": 2
+      },
+      "falseStartCells": 23,
+      "targetAlternativeBranches": 8,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 71,
+      "localAmbiguityScore": 6.0
+    },
+    {
+      "id": "g4-e-202",
+      "difficulty": "easy",
+      "level": 202,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 42,
+        "3": 17,
+        "4": 5
+      },
+      "falseStartCells": 21,
+      "targetAlternativeBranches": 6,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 80,
+      "localAmbiguityScore": 6.107
+    },
+    {
+      "id": "g4-e-203",
+      "difficulty": "easy",
+      "level": 203,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 49,
+        "3": 45,
+        "4": 15
+      },
+      "falseStartCells": 24,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 126,
+      "localAmbiguityScore": 12.786
+    },
+    {
+      "id": "g4-e-204",
+      "difficulty": "easy",
+      "level": 204,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 30,
+        "3": 15,
+        "4": 1
+      },
+      "falseStartCells": 21,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 60,
+      "localAmbiguityScore": 4.964
+    },
+    {
+      "id": "g4-e-205",
+      "difficulty": "easy",
+      "level": 205,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 51,
+        "3": 37,
+        "4": 10
+      },
+      "falseStartCells": 25,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 113,
+      "localAmbiguityScore": 10.071
+    },
+    {
+      "id": "g4-e-206",
+      "difficulty": "easy",
+      "level": 206,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 45,
+        "3": 28,
+        "4": 8
+      },
+      "falseStartCells": 25,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 98,
+      "localAmbiguityScore": 8.893
+    },
+    {
+      "id": "g4-e-207",
+      "difficulty": "easy",
+      "level": 207,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 40,
+        "3": 23,
+        "4": 3
+      },
+      "falseStartCells": 21,
+      "targetAlternativeBranches": 5,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 81,
+      "localAmbiguityScore": 5.964
+    },
+    {
+      "id": "g4-e-208",
+      "difficulty": "easy",
+      "level": 208,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 34,
+        "3": 22,
+        "4": 1
+      },
+      "falseStartCells": 19,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 73,
+      "localAmbiguityScore": 5.786
+    },
+    {
+      "id": "g4-e-209",
+      "difficulty": "easy",
+      "level": 209,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 54,
+        "3": 35,
+        "4": 7
+      },
+      "falseStartCells": 24,
+      "targetAlternativeBranches": 12,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 112,
+      "localAmbiguityScore": 10.75
+    },
+    {
+      "id": "g4-e-210",
+      "difficulty": "easy",
+      "level": 210,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 44,
+        "3": 33,
+        "4": 11
+      },
+      "falseStartCells": 24,
+      "targetAlternativeBranches": 14,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 104,
+      "localAmbiguityScore": 11.536
+    },
+    {
+      "id": "g4-e-211",
+      "difficulty": "easy",
+      "level": 211,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 40,
+        "3": 25,
+        "4": 2
+      },
+      "falseStartCells": 20,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 82,
+      "localAmbiguityScore": 6.536
+    },
+    {
+      "id": "g4-e-212",
+      "difficulty": "easy",
+      "level": 212,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 47,
+        "3": 24,
+        "4": 5
+      },
+      "falseStartCells": 25,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 92,
+      "localAmbiguityScore": 7.393
+    },
+    {
+      "id": "g4-e-213",
+      "difficulty": "easy",
+      "level": 213,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 44,
+        "3": 39,
+        "4": 13
+      },
+      "falseStartCells": 24,
+      "targetAlternativeBranches": 5,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 114,
+      "localAmbiguityScore": 10.107
+    },
+    {
+      "id": "g4-e-214",
+      "difficulty": "easy",
+      "level": 214,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 40,
+        "3": 26,
+        "4": 6
+      },
+      "falseStartCells": 24,
+      "targetAlternativeBranches": 6,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 89,
+      "localAmbiguityScore": 7.286
+    },
+    {
+      "id": "g4-e-215",
+      "difficulty": "easy",
+      "level": 215,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 33,
+        "3": 13,
+        "4": 2
+      },
+      "falseStartCells": 21,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 62,
+      "localAmbiguityScore": 5.143
+    },
+    {
+      "id": "g4-e-216",
+      "difficulty": "easy",
+      "level": 216,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 44,
+        "3": 19,
+        "4": 0
+      },
+      "falseStartCells": 21,
+      "targetAlternativeBranches": 11,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 79,
+      "localAmbiguityScore": 6.821
+    },
+    {
+      "id": "g4-e-217",
+      "difficulty": "easy",
+      "level": 217,
+      "profile": "gen4-easy-core-6x6",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 59,
+        "3": 40,
+        "4": 12
+      },
+      "falseStartCells": 26,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 127,
+      "localAmbiguityScore": 11.893
+    },
+    {
+      "id": "g4-m-201",
+      "difficulty": "medium",
+      "level": 201,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 63,
+        "3": 40,
+        "4": 7
+      },
+      "falseStartCells": 33,
+      "targetAlternativeBranches": 12,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 132,
+      "localAmbiguityScore": 10.031
+    },
+    {
+      "id": "g4-m-202",
+      "difficulty": "medium",
+      "level": 202,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 60,
+        "3": 38,
+        "4": 5
+      },
+      "falseStartCells": 34,
+      "targetAlternativeBranches": 14,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 124,
+      "localAmbiguityScore": 10.0
+    },
+    {
+      "id": "g4-m-203",
+      "difficulty": "medium",
+      "level": 203,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 57,
+        "3": 27,
+        "4": 9
+      },
+      "falseStartCells": 31,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 111,
+      "localAmbiguityScore": 8.688
+    },
+    {
+      "id": "g4-m-204",
+      "difficulty": "medium",
+      "level": 204,
+      "profile": "v334-medium-independent-v3-compact-7x7",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 40,
+        "3": 14,
+        "4": 1
+      },
+      "falseStartCells": 24,
+      "targetAlternativeBranches": 8,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 71,
+      "localAmbiguityScore": 5.429
+    },
+    {
+      "id": "g4-m-205",
+      "difficulty": "medium",
+      "level": 205,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 65,
+        "3": 42,
+        "4": 11
+      },
+      "falseStartCells": 35,
+      "targetAlternativeBranches": 11,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 137,
+      "localAmbiguityScore": 10.969
+    },
+    {
+      "id": "g4-m-206",
+      "difficulty": "medium",
+      "level": 206,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 53,
+        "3": 33,
+        "4": 6
+      },
+      "falseStartCells": 33,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 111,
+      "localAmbiguityScore": 7.688
+    },
+    {
+      "id": "g4-m-207",
+      "difficulty": "medium",
+      "level": 207,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 62,
+        "3": 43,
+        "4": 8
+      },
+      "falseStartCells": 32,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 132,
+      "localAmbiguityScore": 10.094
+    },
+    {
+      "id": "g4-m-208",
+      "difficulty": "medium",
+      "level": 208,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 68,
+        "3": 44,
+        "4": 12
+      },
+      "falseStartCells": 35,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 144,
+      "localAmbiguityScore": 10.75
+    },
+    {
+      "id": "g4-m-209",
+      "difficulty": "medium",
+      "level": 209,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 61,
+        "3": 43,
+        "4": 5
+      },
+      "falseStartCells": 35,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 129,
+      "localAmbiguityScore": 9.188
+    },
+    {
+      "id": "g4-m-210",
+      "difficulty": "medium",
+      "level": 210,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 67,
+        "3": 52,
+        "4": 13
+      },
+      "falseStartCells": 36,
+      "targetAlternativeBranches": 6,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 154,
+      "localAmbiguityScore": 10.906
+    },
+    {
+      "id": "g4-m-211",
+      "difficulty": "medium",
+      "level": 211,
+      "profile": "v334-medium-independent-v3-compact-7x7",
+      "targetCount": 7,
+      "falsePrefixes": {
+        "2": 49,
+        "3": 19,
+        "4": 5
+      },
+      "falseStartCells": 30,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 92,
+      "localAmbiguityScore": 6.929
+    },
+    {
+      "id": "g4-m-212",
+      "difficulty": "medium",
+      "level": 212,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 48,
+        "3": 23,
+        "4": 3
+      },
+      "falseStartCells": 29,
+      "targetAlternativeBranches": 6,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 93,
+      "localAmbiguityScore": 5.781
+    },
+    {
+      "id": "g4-m-213",
+      "difficulty": "medium",
+      "level": 213,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 54,
+        "3": 27,
+        "4": 4
+      },
+      "falseStartCells": 34,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 105,
+      "localAmbiguityScore": 7.531
+    },
+    {
+      "id": "g4-m-214",
+      "difficulty": "medium",
+      "level": 214,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 52,
+        "3": 25,
+        "4": 4
+      },
+      "falseStartCells": 29,
+      "targetAlternativeBranches": 7,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 101,
+      "localAmbiguityScore": 6.531
+    },
+    {
+      "id": "g4-m-215",
+      "difficulty": "medium",
+      "level": 215,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 49,
+        "3": 33,
+        "4": 9
+      },
+      "falseStartCells": 29,
+      "targetAlternativeBranches": 5,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 110,
+      "localAmbiguityScore": 7.625
+    },
+    {
+      "id": "g4-m-216",
+      "difficulty": "medium",
+      "level": 216,
+      "profile": "v334-medium-independent-v3-cutout-8x8",
+      "targetCount": 8,
+      "falsePrefixes": {
+        "2": 61,
+        "3": 29,
+        "4": 4
+      },
+      "falseStartCells": 35,
+      "targetAlternativeBranches": 8,
+      "startLetterCollisions": 0,
+      "matchingShortPaths": 113,
+      "localAmbiguityScore": 7.375
+    },
+    {
+      "id": "g4-h-201",
+      "difficulty": "hard",
+      "level": 201,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 74,
+        "3": 51,
+        "4": 21
+      },
+      "falseStartCells": 41,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 172,
+      "localAmbiguityScore": 11.972
+    },
+    {
+      "id": "g4-h-202",
+      "difficulty": "hard",
+      "level": 202,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 74,
+        "3": 34,
+        "4": 8
+      },
+      "falseStartCells": 43,
+      "targetAlternativeBranches": 13,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 141,
+      "localAmbiguityScore": 9.278
+    },
+    {
+      "id": "g4-h-203",
+      "difficulty": "hard",
+      "level": 203,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 66,
+        "3": 40,
+        "4": 4
+      },
+      "falseStartCells": 39,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 135,
+      "localAmbiguityScore": 7.889
+    },
+    {
+      "id": "g4-h-204",
+      "difficulty": "hard",
+      "level": 204,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 83,
+        "3": 57,
+        "4": 10
+      },
+      "falseStartCells": 44,
+      "targetAlternativeBranches": 12,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 176,
+      "localAmbiguityScore": 11.5
+    },
+    {
+      "id": "g4-h-205",
+      "difficulty": "hard",
+      "level": 205,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 78,
+        "3": 45,
+        "4": 12
+      },
+      "falseStartCells": 43,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 160,
+      "localAmbiguityScore": 9.972
+    },
+    {
+      "id": "g4-h-206",
+      "difficulty": "hard",
+      "level": 206,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 78,
+        "3": 50,
+        "4": 12
+      },
+      "falseStartCells": 41,
+      "targetAlternativeBranches": 13,
+      "startLetterCollisions": 5,
+      "matchingShortPaths": 166,
+      "localAmbiguityScore": 11.5
+    },
+    {
+      "id": "g4-h-207",
+      "difficulty": "hard",
+      "level": 207,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 73,
+        "3": 57,
+        "4": 19
+      },
+      "falseStartCells": 40,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 175,
+      "localAmbiguityScore": 12.333
+    },
+    {
+      "id": "g4-h-208",
+      "difficulty": "hard",
+      "level": 208,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 88,
+        "3": 51,
+        "4": 11
+      },
+      "falseStartCells": 47,
+      "targetAlternativeBranches": 11,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 175,
+      "localAmbiguityScore": 11.083
+    },
+    {
+      "id": "g4-h-209",
+      "difficulty": "hard",
+      "level": 209,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 84,
+        "3": 46,
+        "4": 14
+      },
+      "falseStartCells": 41,
+      "targetAlternativeBranches": 12,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 170,
+      "localAmbiguityScore": 11.333
+    },
+    {
+      "id": "g4-h-210",
+      "difficulty": "hard",
+      "level": 210,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 77,
+        "3": 43,
+        "4": 5
+      },
+      "falseStartCells": 42,
+      "targetAlternativeBranches": 8,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 152,
+      "localAmbiguityScore": 8.389
+    },
+    {
+      "id": "g4-h-211",
+      "difficulty": "hard",
+      "level": 211,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 83,
+        "3": 47,
+        "4": 14
+      },
+      "falseStartCells": 45,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 169,
+      "localAmbiguityScore": 10.889
+    },
+    {
+      "id": "g4-h-212",
+      "difficulty": "hard",
+      "level": 212,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 81,
+        "3": 56,
+        "4": 15
+      },
+      "falseStartCells": 44,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 178,
+      "localAmbiguityScore": 11.528
+    },
+    {
+      "id": "g4-h-213",
+      "difficulty": "hard",
+      "level": 213,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 83,
+        "3": 56,
+        "4": 12
+      },
+      "falseStartCells": 44,
+      "targetAlternativeBranches": 11,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 176,
+      "localAmbiguityScore": 11.472
+    },
+    {
+      "id": "g4-h-214",
+      "difficulty": "hard",
+      "level": 214,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 58,
+        "3": 24,
+        "4": 4
+      },
+      "falseStartCells": 38,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 112,
+      "localAmbiguityScore": 6.611
+    },
+    {
+      "id": "g4-h-215",
+      "difficulty": "hard",
+      "level": 215,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 57,
+        "3": 26,
+        "4": 5
+      },
+      "falseStartCells": 40,
+      "targetAlternativeBranches": 5,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 114,
+      "localAmbiguityScore": 5.75
+    },
+    {
+      "id": "g4-h-216",
+      "difficulty": "hard",
+      "level": 216,
+      "profile": "v334-hard-independent-v3-bridge-9x9",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 80,
+        "3": 41,
+        "4": 8
+      },
+      "falseStartCells": 41,
+      "targetAlternativeBranches": 5,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 155,
+      "localAmbiguityScore": 8.139
+    },
+    {
+      "id": "g4-x-201",
+      "difficulty": "hardcore",
+      "level": 201,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 100,
+        "3": 64,
+        "4": 14
+      },
+      "falseStartCells": 51,
+      "targetAlternativeBranches": 8,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 202,
+      "localAmbiguityScore": 12.278
+    },
+    {
+      "id": "g4-x-202",
+      "difficulty": "hardcore",
+      "level": 202,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 128,
+        "3": 106,
+        "4": 33
+      },
+      "falseStartCells": 60,
+      "targetAlternativeBranches": 12,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 298,
+      "localAmbiguityScore": 16.864
+    },
+    {
+      "id": "g4-x-203",
+      "difficulty": "hardcore",
+      "level": 203,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 136,
+        "3": 110,
+        "4": 29
+      },
+      "falseStartCells": 66,
+      "targetAlternativeBranches": 12,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 305,
+      "localAmbiguityScore": 16.773
+    },
+    {
+      "id": "g4-x-204",
+      "difficulty": "hardcore",
+      "level": 204,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 10,
+      "falsePrefixes": {
+        "2": 117,
+        "3": 79,
+        "4": 17
+      },
+      "falseStartCells": 57,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 1,
+      "matchingShortPaths": 241,
+      "localAmbiguityScore": 13.45
+    },
+    {
+      "id": "g4-x-205",
+      "difficulty": "hardcore",
+      "level": 205,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 10,
+      "falsePrefixes": {
+        "2": 124,
+        "3": 91,
+        "4": 41
+      },
+      "falseStartCells": 60,
+      "targetAlternativeBranches": 9,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 283,
+      "localAmbiguityScore": 17.975
+    },
+    {
+      "id": "g4-x-206",
+      "difficulty": "hardcore",
+      "level": 206,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 108,
+        "3": 63,
+        "4": 15
+      },
+      "falseStartCells": 58,
+      "targetAlternativeBranches": 11,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 212,
+      "localAmbiguityScore": 13.306
+    },
+    {
+      "id": "g4-x-207",
+      "difficulty": "hardcore",
+      "level": 207,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 10,
+      "falsePrefixes": {
+        "2": 116,
+        "3": 104,
+        "4": 27
+      },
+      "falseStartCells": 56,
+      "targetAlternativeBranches": 14,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 275,
+      "localAmbiguityScore": 17.7
+    },
+    {
+      "id": "g4-x-208",
+      "difficulty": "hardcore",
+      "level": 208,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 10,
+      "falsePrefixes": {
+        "2": 103,
+        "3": 55,
+        "4": 13
+      },
+      "falseStartCells": 54,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 4,
+      "matchingShortPaths": 199,
+      "localAmbiguityScore": 10.85
+    },
+    {
+      "id": "g4-x-209",
+      "difficulty": "hardcore",
+      "level": 209,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 10,
+      "falsePrefixes": {
+        "2": 114,
+        "3": 72,
+        "4": 13
+      },
+      "falseStartCells": 61,
+      "targetAlternativeBranches": 15,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 226,
+      "localAmbiguityScore": 13.3
+    },
+    {
+      "id": "g4-x-210",
+      "difficulty": "hardcore",
+      "level": 210,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 10,
+      "falsePrefixes": {
+        "2": 114,
+        "3": 90,
+        "4": 21
+      },
+      "falseStartCells": 54,
+      "targetAlternativeBranches": 16,
+      "startLetterCollisions": 6,
+      "matchingShortPaths": 251,
+      "localAmbiguityScore": 16.25
+    },
+    {
+      "id": "g4-x-211",
+      "difficulty": "hardcore",
+      "level": 211,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 127,
+        "3": 120,
+        "4": 51
+      },
+      "falseStartCells": 58,
+      "targetAlternativeBranches": 15,
+      "startLetterCollisions": 4,
+      "matchingShortPaths": 328,
+      "localAmbiguityScore": 20.932
+    },
+    {
+      "id": "g4-x-212",
+      "difficulty": "hardcore",
+      "level": 212,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 114,
+        "3": 79,
+        "4": 31
+      },
+      "falseStartCells": 55,
+      "targetAlternativeBranches": 17,
+      "startLetterCollisions": 7,
+      "matchingShortPaths": 252,
+      "localAmbiguityScore": 15.614
+    },
+    {
+      "id": "g4-x-213",
+      "difficulty": "hardcore",
+      "level": 213,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 9,
+      "falsePrefixes": {
+        "2": 94,
+        "3": 61,
+        "4": 14
+      },
+      "falseStartCells": 51,
+      "targetAlternativeBranches": 10,
+      "startLetterCollisions": 2,
+      "matchingShortPaths": 195,
+      "localAmbiguityScore": 12.361
+    },
+    {
+      "id": "g4-x-214",
+      "difficulty": "hardcore",
+      "level": 214,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 113,
+        "3": 85,
+        "4": 16
+      },
+      "falseStartCells": 57,
+      "targetAlternativeBranches": 18,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 243,
+      "localAmbiguityScore": 13.955
+    },
+    {
+      "id": "g4-x-215",
+      "difficulty": "hardcore",
+      "level": 215,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 115,
+        "3": 99,
+        "4": 26
+      },
+      "falseStartCells": 55,
+      "targetAlternativeBranches": 20,
+      "startLetterCollisions": 3,
+      "matchingShortPaths": 269,
+      "localAmbiguityScore": 16.682
+    },
+    {
+      "id": "g4-x-216",
+      "difficulty": "hardcore",
+      "level": 216,
+      "profile": "gen4-hardcore-core-10x10",
+      "targetCount": 11,
+      "falsePrefixes": {
+        "2": 113,
+        "3": 90,
+        "4": 35
+      },
+      "falseStartCells": 58,
+      "targetAlternativeBranches": 8,
+      "startLetterCollisions": 8,
+      "matchingShortPaths": 268,
+      "localAmbiguityScore": 15.295
+    }
+  ]
+}
