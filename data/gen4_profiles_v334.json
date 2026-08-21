@@ -22,7 +22,7 @@
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 5.0],
+      "ambiguityRange": [0.0, 6.5],
       "ambiguityRole": "onboarding"
     },
     "rescue-core": {
@@ -46,7 +46,7 @@
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 7.5],
+      "ambiguityRange": [0.0, 15.0],
       "ambiguityRole": "low"
     },
     "medium-compact": {
@@ -103,7 +103,7 @@
       "maxCurlPaths": 7,
       "maxCurlRun": 4,
       "vocabularyTiers": ["A", "B", "C", "D"],
-      "ambiguityRange": [8.0, 20.0],
+      "ambiguityRange": [0.0, 30.0],
       "ambiguityRole": "high-but-bounded"
     }
   },
