@@ -894,7 +894,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -1080,7 +1080,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -1280,7 +1280,7 @@
           "vocabTiers": {
             "A": 7
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -1478,7 +1478,7 @@
           "vocabTiers": {
             "A": 7
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -1666,7 +1666,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -1858,7 +1858,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -2050,7 +2050,7 @@
           "vocabTiers": {
             "A": 7
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -2240,7 +2240,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -2424,7 +2424,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -2798,7 +2798,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -2982,7 +2982,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -3178,7 +3178,7 @@
           "vocabTiers": {
             "A": 7
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -3370,7 +3370,7 @@
           "vocabTiers": {
             "A": 6
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -3564,7 +3564,7 @@
           "vocabTiers": {
             "A": 7
           },
-          "averageFun": 3.0,
+          "averageFun": 3,
           "highFunWords": 0,
           "vocabPolicy": "easy",
           "wideVerifiedUnique": true,
@@ -21649,5 +21649,8 @@
         }
       }
     ]
-  }
+  },
+  "releaseEnabled": false,
+  "releasePauseReason": "Generation 3 rolling bank held while approved Generation 4 banks are built and audited",
+  "contentGeneration": 3
 }
