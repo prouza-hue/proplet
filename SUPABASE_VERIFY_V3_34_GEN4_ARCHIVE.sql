@@ -26,3 +26,18 @@ select
   (select count(*) from public.puzzle_runs where content_key is not null) as runs_backfilled,
   (select count(*) from public.puzzle_attempts where content_key is not null) as attempts_backfilled;
 
+select
+  content_generation,
+  content_bank,
+  difficulty,
+  puzzle_count,
+  completed_results,
+  completed_runs
+from public.content_archive_stats
+order by content_generation, content_bank, difficulty;
+
+select event_object_table, trigger_name
+from information_schema.triggers
+where trigger_schema = 'public'
+  and trigger_name like '%attach_content_lineage'
+order by event_object_table;
