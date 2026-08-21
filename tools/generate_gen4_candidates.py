@@ -79,7 +79,7 @@ PROFILES = {
         "max_mean_turns": 1.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 5.0),
+        "ambiguity": (0.0, 6.5),
     },
     "rescue-core": {
         "rows": 6,
@@ -123,7 +123,7 @@ PROFILES = {
         "max_mean_turns": 1.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 7.5),
+        "ambiguity": (0.0, 15.0),
     },
     "medium-compact": deepcopy(v3.PROFILES["medium-compact"]),
     "medium-cutout": deepcopy(v3.PROFILES["medium-cutout"]),
@@ -148,7 +148,7 @@ PROFILES = {
         "max_mean_turns": 4.60,
         "max_blank_components": 6,
         "max_isolated_blanks": 1,
-        "ambiguity": (8.0, 20.0),
+        "ambiguity": (0.0, 30.0),
     },
 }
 
