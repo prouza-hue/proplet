@@ -15,6 +15,7 @@ on:
       - 'tools/measure_gen4_ambiguity.py'
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
+      - 'tools/generate_gen4_candidates.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -33,6 +34,7 @@ on:
       - 'tools/measure_gen4_ambiguity.py'
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
+      - 'tools/generate_gen4_candidates.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -132,6 +134,7 @@ jobs:
           python -m py_compile tools/measure_gen4_ambiguity.py
           python -m py_compile tools/validate_gen4_release.py
           python -m py_compile tools/build_gen4_archive.py
+          python -m py_compile tools/generate_gen4_candidates.py
 
       - name: Measure calibrated local ambiguity
         run: |
@@ -171,3 +174,53 @@ jobs:
           path: /tmp/gen4-contract/
           if-no-files-found: error
           retention-days: 30
+
+  gen4-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - difficulty: easy
+            level: 1
+          - difficulty: medium
+            level: 2
+          - difficulty: hard
+            level: 1
+          - difficulty: hardcore
+            level: 1
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate one production-shaped candidate
+        run: |
+          mkdir -p /tmp/gen4-smoke
+          python tools/generate_gen4_candidates.py \
+            --bank free \
+            --difficulty ${{ matrix.difficulty }} \
+            --count 1 \
+            --start-level ${{ matrix.level }} \
+            --seed $((20260822 + ${{ matrix.level }})) \
+            --output /tmp/gen4-smoke/${{ matrix.difficulty }}.json
+
+      - name: Validate candidate contract
+        run: |
+          python tools/validate_gen4_release.py /tmp/gen4-smoke/${{ matrix.difficulty }}.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --report /tmp/gen4-smoke/${{ matrix.difficulty }}-validation.json
+
+      - name: Upload smoke candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: v334-gen4-smoke-${{ matrix.difficulty }}
+          path: /tmp/gen4-smoke/
+          if-no-files-found: error
+          retention-days: 14
