@@ -18,6 +18,10 @@ concurrency:
 
 jobs:
   plan:
+    # Full 1,261-board generation is intentionally approval-only. Keep the
+    # pull_request event solely so a new PR synchronization joins the same
+    # concurrency group and cancels any previously queued/running matrix.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
