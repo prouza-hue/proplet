@@ -121,6 +121,51 @@ def validate_puzzle(
     return errors
 
 
+def in_declared_range(value: float, declared: object) -> bool:
+    if isinstance(declared, list) and len(declared) == 2:
+        return float(declared[0]) <= value <= float(declared[1])
+    return value == float(declared)
+
+
+def validate_profile(path: tuple[str, ...], puzzle: dict, profiles: dict, allow_calibration_ids: bool) -> list[str]:
+    puzzle_id = str(puzzle.get("id") or "")
+    if allow_calibration_ids and puzzle_id.startswith("cal-v334-"):
+        return []
+    label = "/".join(path) or puzzle_id
+    meta = puzzle.get("meta") or {}
+    profile_name = str(meta.get("generationProfile") or "")
+    profile = (profiles.get("profiles") or {}).get(profile_name)
+    if not profile:
+        return [f"{label}: unknown or missing generationProfile {profile_name!r}"]
+    errors = []
+    checks = (
+        ("rows", float(puzzle.get("rows") or 0), profile.get("rows")),
+        ("cols", float(puzzle.get("cols") or 0), profile.get("cols")),
+        ("activeCells", float(len(puzzle.get("mask") or [])), profile.get("activeCells")),
+        ("targetWords", float(len(puzzle.get("answers") or [])), profile.get("targetWords")),
+    )
+    for name, value, declared in checks:
+        if declared is None or not in_declared_range(value, declared):
+            errors.append(f"{label}: {name} {value:g} outside profile {declared}")
+    length_range = profile.get("targetLength") or []
+    for answer in puzzle.get("answers") or []:
+        length = len(norm(answer.get("word")))
+        if not in_declared_range(length, length_range):
+            errors.append(f"{label}: target length {length} outside profile {length_range}")
+    curls = [int(answer.get("curlRun") or 0) for answer in puzzle.get("answers") or []]
+    if sum(value >= 2 for value in curls) > int(profile.get("maxCurlPaths") or 0):
+        errors.append(f"{label}: curl-path count exceeds profile")
+    if max(curls, default=0) > int(profile.get("maxCurlRun") or 0):
+        errors.append(f"{label}: max curl run exceeds profile")
+    ambiguity_range = profile.get("ambiguityRange")
+    ambiguity_score = float(meta.get("localAmbiguityScore") or -1)
+    if ambiguity_range is None or not in_declared_range(ambiguity_score, ambiguity_range):
+        errors.append(f"{label}: ambiguity {ambiguity_score:g} outside profile {ambiguity_range}")
+    if "meanTurns" in profile and not in_declared_range(float(meta.get("meanTurns") or -1), profile["meanTurns"]):
+        errors.append(f"{label}: meanTurns outside profile")
+    return errors
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
@@ -159,6 +204,7 @@ def main() -> None:
         hashes[canonical_hash(puzzle)] += 1
         difficulties[str(puzzle.get("difficulty") or "unknown")] += 1
         errors.extend(validate_puzzle(path, puzzle, exclusions, args.allow_calibration_ids))
+        errors.extend(validate_profile(path, puzzle, profiles, args.allow_calibration_ids))
 
     duplicates = sorted(key for key, count in ids.items() if not key or count > 1)
     duplicate_hashes = sorted(key for key, count in hashes.items() if count > 1)
