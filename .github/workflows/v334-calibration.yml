@@ -7,6 +7,8 @@ on:
     paths:
       - 'data/target_generation_exclusions_v334.json'
       - 'data/gen4_profiles_v334.json'
+      - 'data/rolling_content_v1.json'
+      - 'server.py'
       - 'tools/generate_v334_calibration.py'
       - 'tools/generate_v334_calibration_v3.py'
       - 'tools/validate_v334_calibration_v3.py'
@@ -16,6 +18,7 @@ on:
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
       - 'tools/generate_gen4_candidates.py'
+      - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -26,6 +29,8 @@ on:
     paths:
       - 'data/target_generation_exclusions_v334.json'
       - 'data/gen4_profiles_v334.json'
+      - 'data/rolling_content_v1.json'
+      - 'server.py'
       - 'tools/generate_v334_calibration.py'
       - 'tools/generate_v334_calibration_v3.py'
       - 'tools/validate_v334_calibration_v3.py'
@@ -35,6 +40,7 @@ on:
       - 'tools/validate_gen4_release.py'
       - 'tools/build_gen4_archive.py'
       - 'tools/generate_gen4_candidates.py'
+      - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -135,6 +141,10 @@ jobs:
           python -m py_compile tools/validate_gen4_release.py
           python -m py_compile tools/build_gen4_archive.py
           python -m py_compile tools/generate_gen4_candidates.py
+          python -m py_compile tools/test_v334_rolling_pause.py
+
+      - name: Verify Gen3 rolling release is paused
+        run: python tools/test_v334_rolling_pause.py
 
       - name: Measure calibrated local ambiguity
         run: |
