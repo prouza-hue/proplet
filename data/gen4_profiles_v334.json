@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "contentGeneration": 4,
+  "status": "approved-direction-production-candidate",
+  "calibrationFixture": "v334-calibration-v3-20260821",
+  "principles": {
+    "pathStyle": "independent-packed",
+    "exactCoverSolutions": 1,
+    "targetPathsPerWord": 1,
+    "endpointToOtherStartAdjacency": 0,
+    "recognitionLexiconRemainsBroad": true,
+    "targetExclusions": "data/target_generation_exclusions_v334.json",
+    "localAmbiguityMetric": "gen4-local-ambiguity-v1"
+  },
+  "profiles": {
+    "easy-core": {
+      "rows": [5, 6],
+      "cols": [5, 6],
+      "activeCells": [20, 30],
+      "targetWords": [4, 6],
+      "targetLength": [3, 7],
+      "maxCurlPaths": 1,
+      "maxCurlRun": 1,
+      "vocabularyTiers": ["A"],
+      "ambiguityRole": "low"
+    },
+    "medium-compact": {
+      "rows": 7,
+      "cols": 7,
+      "activeCells": [33, 37],
+      "targetWords": [7, 7],
+      "targetLength": [4, 8],
+      "maxCurlPaths": 2,
+      "maxCurlRun": 2,
+      "meanTurns": [0.75, 2.4],
+      "maxBlankComponents": 3,
+      "maxIsolatedBlanks": 0,
+      "vocabularyTiers": ["A", "B"],
+      "ambiguityRole": "early-or-relief"
+    },
+    "medium-cutout": {
+      "rows": 8,
+      "cols": 8,
+      "activeCells": [38, 42],
+      "targetWords": [7, 8],
+      "targetLength": [4, 8],
+      "maxCurlPaths": 2,
+      "maxCurlRun": 2,
+      "meanTurns": [0.7, 2.35],
+      "maxBlankComponents": 5,
+      "maxIsolatedBlanks": 1,
+      "vocabularyTiers": ["A", "B"],
+      "ambiguityRole": "medium-core"
+    },
+    "hard-bridge": {
+      "rows": 9,
+      "cols": 9,
+      "activeCells": [50, 56],
+      "targetWords": [8, 9],
+      "targetLength": [4, 9],
+      "maxCurlPaths": 5,
+      "maxCurlRun": 3,
+      "meanTurns": [1.8, 3.35],
+      "maxBlankComponents": 5,
+      "maxIsolatedBlanks": 1,
+      "vocabularyTiers": ["A", "B", "C"],
+      "ambiguityRole": "hard-core-with-bounded-upper-tail"
+    },
+    "hardcore-core": {
+      "rows": [9, 10],
+      "cols": [9, 10],
+      "activeCells": [58, 72],
+      "targetWords": [9, 11],
+      "targetLength": [4, 10],
+      "maxCurlPaths": 7,
+      "maxCurlRun": 4,
+      "vocabularyTiers": ["A", "B", "C", "D"],
+      "ambiguityRole": "high-but-bounded"
+    }
+  },
+  "freeMediumMix": {
+    "levels1To40": {"medium-compact": 0.6, "medium-cutout": 0.4},
+    "levels41To120": {"medium-compact": 0.25, "medium-cutout": 0.75},
+    "levels121To200": {"medium-compact": 0.15, "medium-cutout": 0.85},
+    "ordering": "deterministic-sawtooth-with-relief-levels"
+  },
+  "requiredActiveBanks": {
+    "starter": "all entries Gen4",
+    "free": {"easy": 200, "medium": 200, "hard": 200, "hardcore": 200},
+    "daily": 365,
+    "rolling": 65,
+    "rescue": "all entries Gen4",
+    "newChallenges": "Gen4 sources only"
+  },
+  "archivePolicy": {
+    "legacyPlayable": false,
+    "runtimeContainsLegacyPuzzleBodies": false,
+    "historicalStatsPreserved": true,
+    "oldChallengeBehavior": "historical-summary-tombstone",
+    "coldBackupRequired": true,
+    "stableSlotXpPreserved": true
+  },
+  "releaseGates": {
+    "allActiveContentGeneration": 4,
+    "crossBankTargetExclusionsClean": true,
+    "crossBankDuplicatePuzzleHashes": 0,
+    "migrationRehearsalRequired": true,
+    "previewApprovalRequired": true,
+    "productionHealthVerificationRequired": true
+  }
+}
