@@ -31,6 +31,24 @@ EASY_POLICY = {
     "min_fun_words": 1,
 }
 
+STARTER_POLICY = {
+    "allowed": ("A",),
+    "weights": {"A": 1},
+    "min_fraction": {"A": 1.0},
+    "max_fraction": {},
+    "min_avg_fun": 3.4,
+    "min_fun_words": 3,
+}
+
+RESCUE_POLICY = {
+    "allowed": ("A",),
+    "weights": {"A": 1},
+    "min_fraction": {"A": 1.0},
+    "max_fraction": {},
+    "min_avg_fun": 3.0,
+    "min_fun_words": 2,
+}
+
 HARDCORE_POLICY = {
     "allowed": ("A", "B", "C", "D"),
     "weights": {"A": 1, "B": 4, "C": 3, "D": 1},
@@ -41,6 +59,50 @@ HARDCORE_POLICY = {
 }
 
 PROFILES = {
+    "starter-onboarding": {
+        "rows": 5,
+        "cols": 5,
+        "cells": (23, 25),
+        "words": (5, 5),
+        "min_len": 4,
+        "max_len": 6,
+        "turn_bias": 0.04,
+        "min_bbox_rows": 5,
+        "min_bbox_cols": 5,
+        "min_curvy_share": 0.0,
+        "max_mean_straight_share": 0.94,
+        "geometry_profile": "gen4-starter-onboarding-5x5",
+        "policy": STARTER_POLICY,
+        "max_curl_paths": 0,
+        "max_curl_run": 1,
+        "min_mean_turns": 0.0,
+        "max_mean_turns": 1.0,
+        "max_blank_components": 2,
+        "max_isolated_blanks": 0,
+        "ambiguity": (0.0, 5.0),
+    },
+    "rescue-core": {
+        "rows": 6,
+        "cols": 6,
+        "cells": (26, 31),
+        "words": (5, 6),
+        "min_len": 4,
+        "max_len": 7,
+        "turn_bias": 0.08,
+        "min_bbox_rows": 5,
+        "min_bbox_cols": 5,
+        "min_curvy_share": 0.0,
+        "max_mean_straight_share": 0.92,
+        "geometry_profile": "gen4-rescue-core-6x6",
+        "policy": RESCUE_POLICY,
+        "max_curl_paths": 1,
+        "max_curl_run": 1,
+        "min_mean_turns": 0.0,
+        "max_mean_turns": 1.25,
+        "max_blank_components": 3,
+        "max_isolated_blanks": 1,
+        "ambiguity": (0.0, 6.5),
+    },
     "easy-core": {
         "rows": 6,
         "cols": 6,
@@ -61,6 +123,7 @@ PROFILES = {
         "max_mean_turns": 1.35,
         "max_blank_components": 3,
         "max_isolated_blanks": 1,
+        "ambiguity": (0.0, 7.5),
     },
     "medium-compact": deepcopy(v3.PROFILES["medium-compact"]),
     "medium-cutout": deepcopy(v3.PROFILES["medium-cutout"]),
@@ -85,8 +148,13 @@ PROFILES = {
         "max_mean_turns": 4.60,
         "max_blank_components": 6,
         "max_isolated_blanks": 1,
+        "ambiguity": (8.0, 20.0),
     },
 }
+
+PROFILES["medium-compact"]["ambiguity"] = (3.5, 9.0)
+PROFILES["medium-cutout"]["ambiguity"] = (4.0, 11.0)
+PROFILES["hard-bridge"]["ambiguity"] = (7.0, 13.0)
 
 DIFFICULTY_PROFILE = {
     "easy": "easy-core",
@@ -94,7 +162,7 @@ DIFFICULTY_PROFILE = {
     "hardcore": "hardcore-core",
 }
 
-PREFIXES = {"easy": "e", "medium": "m", "hard": "h", "hardcore": "x"}
+PREFIXES = {"easy": "e", "medium": "m", "hard": "h", "hardcore": "x", "rescue": "r"}
 
 
 def min_turns(length: int, difficulty: str) -> int:
@@ -122,7 +190,11 @@ def medium_variant(level: int) -> str:
     return "medium-compact" if (level - 121) % 7 == 6 else "medium-cutout"
 
 
-def profile_for(difficulty: str, level: int) -> str:
+def profile_for(bank: str, difficulty: str, level: int) -> str:
+    if bank == "starter":
+        return "starter-onboarding"
+    if bank == "rescue":
+        return "rescue-core"
     return medium_variant(level) if difficulty == "medium" else DIFFICULTY_PROFILE[difficulty]
 
 
@@ -178,7 +250,7 @@ def annotate(puzzle: dict, bank: str, difficulty: str, level: int, variant: str,
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--bank", choices=("free", "daily", "rolling", "starter", "rescue"), required=True)
-    parser.add_argument("--difficulty", choices=("easy", "medium", "hard", "hardcore"), required=True)
+    parser.add_argument("--difficulty", choices=("easy", "medium", "hard", "hardcore", "rescue"), required=True)
     parser.add_argument("--count", type=int, required=True)
     parser.add_argument("--start-level", type=int, default=1)
     parser.add_argument("--seed", type=int, default=SEED)
@@ -189,6 +261,12 @@ def main() -> None:
         raise SystemExit("--count must be positive")
     if args.bank == "daily" and args.difficulty == "hardcore":
         raise SystemExit("Daily cadence does not contain Hardcore")
+    if args.bank == "starter" and (args.difficulty != "easy" or args.count != 1):
+        raise SystemExit("Starter is exactly one Easy onboarding puzzle")
+    if args.bank == "rescue" and args.difficulty != "rescue":
+        raise SystemExit("Rescue bank must use --difficulty rescue")
+    if args.difficulty == "rescue" and args.bank != "rescue":
+        raise SystemExit("Rescue difficulty is only valid for the rescue bank")
 
     approved = json.loads(args.profiles.read_text(encoding="utf-8"))
     if approved.get("contentGeneration") != 4:
@@ -218,16 +296,17 @@ def main() -> None:
     started = time.time()
     for offset in range(args.count):
         level = args.start_level + offset
-        variant = profile_for(args.difficulty, level)
+        variant = profile_for(args.bank, args.difficulty, level)
         profile = deepcopy(PROFILES[variant])
         v3.PROFILES[variant] = profile
-        v3.cal.PROFILES[args.difficulty] = profile
+        generation_difficulty = "easy" if args.difficulty == "rescue" else args.difficulty
+        v3.cal.PROFILES[generation_difficulty] = profile
         avoid = set().union(*recent_by_difficulty) if recent_by_difficulty else set()
         accepted = None
         for shape_retry in range(1, 401):
             candidate = v3.cal.build_puzzle(
                 gp,
-                args.difficulty,
+                generation_difficulty,
                 level,
                 rng,
                 pools[variant],
@@ -241,6 +320,9 @@ def main() -> None:
             if meta["cutoutComponents"] > profile["max_blank_components"]:
                 continue
             if meta["isolatedCutoutCells"] > profile["max_isolated_blanks"]:
+                continue
+            ambiguity_min, ambiguity_max = profile["ambiguity"]
+            if not ambiguity_min <= float(meta["localAmbiguityScore"]) <= ambiguity_max:
                 continue
             meta["shapeRetry"] = shape_retry
             accepted = candidate
