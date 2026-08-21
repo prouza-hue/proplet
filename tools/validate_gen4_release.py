@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, deque
+from datetime import date, timedelta
 import hashlib
 import json
 from pathlib import Path
@@ -187,6 +188,77 @@ def validate_target_cooldown(puzzles: list[dict], cooldown: int, label: str) -> 
     return errors
 
 
+def validate_release_state(payload: dict, rolling: dict, approved: bool) -> list[str]:
+    errors: list[str] = []
+    release = payload.get("release") or {}
+    if not approved:
+        if rolling.get("releaseEnabled") is not False:
+            errors.append("release candidate rolling bank must remain paused")
+        if release.get("productionApproved") is not False or release.get("status") != "candidate-paused":
+            errors.append("release candidate runtime must remain paused and unapproved")
+        if release.get("dailyGeneration4From") or release.get("rollingFirstRelease"):
+            errors.append("release candidate must not contain bound release dates")
+        if rolling.get("firstRelease") or rolling.get("reservedThrough"):
+            errors.append("release candidate rolling bank must not contain release dates")
+        return errors
+
+    if rolling.get("releaseEnabled") is not True:
+        errors.append("approved release must enable the rolling schedule")
+    if release.get("productionApproved") is not True or release.get("status") != "approved-bound":
+        errors.append("approved release metadata is incomplete")
+    if str(release.get("approvedBy") or "").casefold() != "pavel":
+        errors.append("approved release is not attributed to Pavel")
+    try:
+        release_date = date.fromisoformat(str(release.get("dailyGeneration4From") or ""))
+        rotation_base = date.fromisoformat(str(payload.get("dailyRotationBaseDate") or ""))
+        first_rolling = date.fromisoformat(str(rolling.get("firstRelease") or ""))
+        reserved_through = date.fromisoformat(str(rolling.get("reservedThrough") or ""))
+    except ValueError:
+        errors.append("approved release dates are missing or invalid")
+        return errors
+    expected_rotation = release_date - timedelta(days=release_date.weekday())
+    expected_rolling = release_date + timedelta(days=(7 - release_date.weekday()) or 7)
+    if rotation_base != expected_rotation:
+        errors.append("daily rotation base is not the Monday on/before cutover")
+    if first_rolling != expected_rolling or first_rolling.weekday() != 0:
+        errors.append("first rolling release is not the next Monday after cutover")
+    if release.get("rollingFirstRelease") != first_rolling.isoformat():
+        errors.append("runtime and rolling first-release dates disagree")
+    if payload.get("dailyGeneration4From") != release_date.isoformat():
+        errors.append("root and release Daily cutover dates disagree")
+    gen3_windows = [
+        item for item in (payload.get("archive") or {}).get("dailyWindows") or []
+        if int(item.get("generation") or 0) == 3
+    ]
+    expected_gen3_end = (release_date - timedelta(days=1)).isoformat()
+    if len(gen3_windows) != 1 or gen3_windows[0].get("activeUntil") != expected_gen3_end:
+        errors.append("Generation 3 Daily archive window does not end before cutover")
+    if reserved_through != first_rolling + timedelta(weeks=12):
+        errors.append("rolling reservation does not cover exactly thirteen weekly drops")
+    batches = list(rolling.get("batches") or [])
+    if len(batches) != 13:
+        errors.append(f"approved rolling schedule must contain 13 batches, got {len(batches)}")
+    for week, batch in enumerate(batches):
+        expected = first_rolling + timedelta(weeks=week)
+        expected_id = f"{expected.isocalendar().year}-W{expected.isocalendar().week:02d}"
+        if batch.get("id") != expected_id or batch.get("availableFrom") != expected.isoformat():
+            errors.append(f"rolling batch {week + 1} is not bound to {expected.isoformat()}")
+        for level in batch.get("levels") or []:
+            puzzle = next(
+                (
+                    item
+                    for values in (rolling.get("puzzles") or {}).values()
+                    for item in values or []
+                    if item.get("id") == level.get("id")
+                ),
+                None,
+            )
+            meta = (puzzle or {}).get("meta") or {}
+            if meta.get("availableFrom") != expected.isoformat() or meta.get("releaseBatch") != expected_id:
+                errors.append(f"rolling puzzle {level.get('id')} has inconsistent bound metadata")
+    return errors
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
@@ -195,6 +267,7 @@ def main() -> None:
     parser.add_argument("--exclusions", type=Path, required=True)
     parser.add_argument("--strict-counts", action="store_true")
     parser.add_argument("--allow-calibration-ids", action="store_true")
+    parser.add_argument("--approved-release", action="store_true")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
 
@@ -212,8 +285,7 @@ def main() -> None:
     rolling_payload = None
     if args.rolling:
         rolling_payload = json.loads(args.rolling.read_text(encoding="utf-8"))
-        if rolling_payload.get("releaseEnabled") is not False:
-            errors.append("release candidate rolling bank must remain paused")
+        errors.extend(validate_release_state(payload, rolling_payload, args.approved_release))
         if int(rolling_payload.get("contentGeneration") or 0) != 4:
             errors.append("rolling contentGeneration != 4")
         puzzles.extend(iter_active(rolling_payload, ("rolling",)))
@@ -298,6 +370,7 @@ def main() -> None:
         "excludedTargets": len(exclusions),
         "duplicateIds": len(duplicates),
         "duplicateBoardHashes": len(duplicate_hashes),
+        "approvedRelease": args.approved_release,
         "errors": errors,
         "ok": not errors,
     }

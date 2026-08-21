@@ -52,7 +52,7 @@ The assembler enforces this contract and the release validator recomputes it ind
 
 ## Preview rehearsal
 
-Vercel Preview commit `2c0d68b34fd1605f85c4cf4e33ba38e2a1528327` is branch-scoped and read-only. Live checks passed:
+The Vercel Preview is branch-scoped and read-only. Live checks passed:
 
 - `/api/health`: Gen4 Free + Daily, `activeGeneration: 4`, `candidate-paused`, database healthy;
 - `/api/puzzle-database`: schema v11, 4 × 200 Free and 365 Daily, no legacy bodies, `productionApproved: false`;
@@ -61,6 +61,7 @@ Vercel Preview commit `2c0d68b34fd1605f85c4cf4e33ba38e2a1528327` is branch-scope
 - a live `POST /api/health` probe is rejected before routing with HTTP 409;
 - archived Free body request returns the intended HTTP 410 metadata tombstone;
 - Vercel reported no runtime error clusters in the verification window.
+- the approval-only binder was rehearsed for a sample Monday cutover and its bound 13-week schedule passed the same strict validator in `--approved-release` mode.
 
 GitHub Actions is currently unavailable at runner start: every matrix job is created and fails with zero executed steps and no job log. This is an account/runner infrastructure gate, not a failing assertion. Equivalent local checks passed with the pinned runtime dependencies, including the preview read-only regression, archive pipeline test, strict 1,261-board validator, Python syntax checks and JavaScript syntax check. The Actions gate remains mandatory before merge.
 

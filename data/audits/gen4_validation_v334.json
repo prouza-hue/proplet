@@ -12,6 +12,7 @@
   "excludedTargets": 42,
   "duplicateIds": 0,
   "duplicateBoardHashes": 0,
+  "approvedRelease": false,
   "errors": [],
   "ok": true
 }

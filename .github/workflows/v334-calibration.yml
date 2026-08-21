@@ -28,6 +28,7 @@ on:
       - 'tools/test_v334_rolling_pause.py'
       - 'tools/test_gen4_preview_readonly.py'
       - 'tools/test_gen4_content_archive.py'
+      - 'tools/test_gen4_release_binder.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -59,6 +60,7 @@ on:
       - 'tools/test_v334_rolling_pause.py'
       - 'tools/test_gen4_preview_readonly.py'
       - 'tools/test_gen4_content_archive.py'
+      - 'tools/test_gen4_release_binder.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -166,6 +168,7 @@ jobs:
           python -m py_compile tools/test_v334_rolling_pause.py
           python -m py_compile tools/test_gen4_preview_readonly.py
           python -m py_compile tools/test_gen4_content_archive.py
+          python -m py_compile tools/test_gen4_release_binder.py
           node --check public/app.js
 
       - name: Verify Gen3 rolling release is paused
@@ -176,6 +179,9 @@ jobs:
 
       - name: Verify exact and metadata-only archive lineage
         run: python tools/test_gen4_content_archive.py
+
+      - name: Verify approval-only release binder
+        run: python tools/test_gen4_release_binder.py
 
       - name: Measure calibrated local ambiguity
         run: |
