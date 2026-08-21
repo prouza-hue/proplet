@@ -30,8 +30,6 @@ except Exception:  # Push remains optional until dependencies/env are configured
     WebPushException = Exception
 
 ROOT = Path(__file__).resolve().parent
-PUZZLES_PATH = ROOT / "data" / "puzzles.json"
-ROLLING_CONTENT_PATH = ROOT / "data" / "rolling_content_v1.json"
 TZ = ZoneInfo("Europe/Prague")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
@@ -41,6 +39,15 @@ VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
 VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "https://proplet-nine.vercel.app").strip()
 CRON_SECRET = os.environ.get("CRON_SECRET", "").strip()
 VERCEL_ENV = os.environ.get("VERCEL_ENV", "").strip().lower()
+VERCEL_GIT_COMMIT_REF = os.environ.get("VERCEL_GIT_COMMIT_REF", "").strip()
+GEN4_PREVIEW_BRANCH = "agent/v3340-medium-calibration-v3"
+GEN4_CANDIDATE_PREVIEW = VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == GEN4_PREVIEW_BRANCH
+PUZZLES_PATH = ROOT / "data" / (
+    "puzzles_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "puzzles.json"
+)
+ROLLING_CONTENT_PATH = ROOT / "data" / (
+    "rolling_content_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "rolling_content_v1.json"
+)
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -75,6 +82,12 @@ async def launch_safety_middleware(request: Request, call_next):
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
     request.state.request_id = request_id
+    if GEN4_CANDIDATE_PREVIEW and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Generation 4 preview je pouze pro čtení", "requestId": request_id},
+            headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        )
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
         try:
             content_length = int(request.headers.get("content-length") or 0)
@@ -1016,6 +1029,17 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
                     "generation": int(meta.get("contentGeneration") or 1),
                     "legacy": True,
                 }
+    indexed = (data.get("legacyFreeIndex") or {}).get(puzzle_id)
+    if indexed and (difficulty is None or indexed.get("difficulty") == difficulty):
+        return {
+            "puzzle": None,
+            "difficulty": indexed.get("difficulty"),
+            "mode": "free",
+            "level": int(indexed.get("level") or 0),
+            "generation": int(indexed.get("generation") or 1),
+            "legacy": True,
+            "lineageConfidence": indexed.get("lineageConfidence") or "slot-exact",
+        }
     return None
 
 
@@ -1257,6 +1281,17 @@ def validate_result_sanity(payload: ResultCreate) -> None:
         raise HTTPException(400, "Výsledek je mimo bezpečný rozsah")
 
 
+@app.get("/api/puzzle-database")
+def puzzle_database_preview(request: Request):
+    """Serve the candidate pack only on the read-only Gen4 branch preview."""
+    if not GEN4_CANDIDATE_PREVIEW:
+        raise HTTPException(404, "Preview databáze není v tomto prostředí dostupná")
+    return JSONResponse(
+        content=released_puzzle_payload(effective_content_date(request)),
+        headers={"Cache-Control": "no-store"},
+    )
+
+
 @app.get("/")
 def home():
     return RedirectResponse(url="/index.html", status_code=307)
@@ -1365,7 +1400,10 @@ def health():
     base = {
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
-        "puzzleSource": "data/puzzles.json",
+        "puzzleSource": str(PUZZLES_PATH.relative_to(ROOT)),
+        "gen4CandidatePreview": GEN4_CANDIDATE_PREVIEW,
+        "gen4CandidateReadOnly": GEN4_CANDIDATE_PREVIEW,
+        "gen4ReleaseStatus": (pdata.get("release") or {}).get("status"),
         "version": APP_VERSION,
         "adminStatic": True,
         "adminEntry": "/admin.html",
@@ -4428,6 +4466,18 @@ def free_archive(
     info = free_puzzle_info(puzzle_id)
     if not info or info.get("legacy") is not True:
         raise HTTPException(404, "Archivovaná úroveň nebyla nalezena")
+    if not info.get("puzzle"):
+        return JSONResponse(
+            status_code=410,
+            content={
+                "detail": "Tato historická úroveň už není hratelná",
+                "archived": True,
+                "puzzleId": puzzle_id,
+                "difficulty": info.get("difficulty"),
+                "level": info.get("level"),
+                "generation": info.get("generation"),
+            },
+        )
     return {"puzzle": info["puzzle"], "difficulty": info["difficulty"], "level": info["level"]}
 
 
