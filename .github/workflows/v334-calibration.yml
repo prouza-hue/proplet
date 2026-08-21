@@ -22,6 +22,7 @@ on:
       - 'tools/assemble_gen4_release.py'
       - 'content_archive.py'
       - 'tools/test_gen4_content_archive.py'
+      - 'tools/bind_gen4_release.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -48,6 +49,7 @@ on:
       - 'tools/assemble_gen4_release.py'
       - 'content_archive.py'
       - 'tools/test_gen4_content_archive.py'
+      - 'tools/bind_gen4_release.py'
       - 'tools/test_v334_rolling_pause.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
@@ -153,6 +155,7 @@ jobs:
           python -m py_compile tools/assemble_gen4_release.py
           python -m py_compile content_archive.py
           python -m py_compile tools/test_gen4_content_archive.py
+          python -m py_compile tools/bind_gen4_release.py
           python -m py_compile tools/test_v334_rolling_pause.py
 
       - name: Install runtime dependencies for rolling regression
