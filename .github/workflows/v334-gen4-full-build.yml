@@ -2,9 +2,9 @@ name: v3.34 Generation 4 full candidate build
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
-      - agent/v3340-medium-calibration-v3
+      - main
     paths:
       - '.github/workflows/v334-gen4-full-build.yml'
 
