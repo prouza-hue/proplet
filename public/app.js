@@ -1355,11 +1355,8 @@ function showPuzzleBootLoading(){
 }
 async function loadPuzzleDatabase(){
  let url='/puzzles.json';
- try{
-  const health=await fetch('/api/health',{cache:'no-store'}).then(r=>r.ok?r.json():null);
-  GEN4_CANDIDATE_PREVIEW=health?.gen4CandidatePreview===true;
-  if(GEN4_CANDIDATE_PREVIEW)url='/api/puzzle-database';
- }catch{}
+ GEN4_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
+ if(GEN4_CANDIDATE_PREVIEW)url='/api/puzzle-database';
  if(GEN4_CANDIDATE_PREVIEW){
   const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('gen4-preview-db');const data=await r.json();if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('gen4-preview-db-version');return data;
  }

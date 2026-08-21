@@ -29,6 +29,7 @@ on:
       - 'tools/test_gen4_preview_readonly.py'
       - 'tools/test_gen4_content_archive.py'
       - 'tools/test_gen4_release_binder.py'
+      - 'tools/test_gen4_preview_runtime_meta.js'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -61,6 +62,7 @@ on:
       - 'tools/test_gen4_preview_readonly.py'
       - 'tools/test_gen4_content_archive.py'
       - 'tools/test_gen4_release_binder.py'
+      - 'tools/test_gen4_preview_runtime_meta.js'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -170,12 +172,17 @@ jobs:
           python -m py_compile tools/test_gen4_content_archive.py
           python -m py_compile tools/test_gen4_release_binder.py
           node --check public/app.js
+          node --check public/runtime-meta.js
+          node --check tools/test_gen4_preview_runtime_meta.js
 
       - name: Verify Gen3 rolling release is paused
         run: python tools/test_v334_rolling_pause.py
 
       - name: Verify branch-scoped Gen4 preview is read-only
         run: python tools/test_gen4_preview_readonly.py
+
+      - name: Verify zero-round-trip preview routing metadata
+        run: node tools/test_gen4_preview_runtime_meta.js
 
       - name: Verify exact and metadata-only archive lineage
         run: python tools/test_gen4_content_archive.py

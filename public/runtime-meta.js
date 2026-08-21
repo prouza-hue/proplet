@@ -7,9 +7,11 @@
     'proplet-pavel-prouzas-projects.vercel.app',
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
+  const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
   const META=Object.freeze({
-    version:'3.33.5',
+    version:'3.34.0',
     canonicalOrigin,
+    gen4CandidatePreview,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
       tabletLandscapeReflow:true,
