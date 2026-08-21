@@ -36,8 +36,8 @@ STARTER_POLICY = {
     "weights": {"A": 1},
     "min_fraction": {"A": 1.0},
     "max_fraction": {},
-    "min_avg_fun": 3.4,
-    "min_fun_words": 3,
+    "min_avg_fun": 3.0,
+    "min_fun_words": 1,
 }
 
 RESCUE_POLICY = {
@@ -45,8 +45,8 @@ RESCUE_POLICY = {
     "weights": {"A": 1},
     "min_fraction": {"A": 1.0},
     "max_fraction": {},
-    "min_avg_fun": 3.0,
-    "min_fun_words": 2,
+    "min_avg_fun": 2.8,
+    "min_fun_words": 1,
 }
 
 HARDCORE_POLICY = {
@@ -60,31 +60,31 @@ HARDCORE_POLICY = {
 
 PROFILES = {
     "starter-onboarding": {
-        "rows": 5,
-        "cols": 5,
-        "cells": (23, 25),
+        "rows": 6,
+        "cols": 6,
+        "cells": (24, 28),
         "words": (5, 5),
         "min_len": 4,
-        "max_len": 6,
+        "max_len": 7,
         "turn_bias": 0.04,
         "min_bbox_rows": 5,
         "min_bbox_cols": 5,
         "min_curvy_share": 0.0,
         "max_mean_straight_share": 0.94,
-        "geometry_profile": "gen4-starter-onboarding-5x5",
+        "geometry_profile": "gen4-starter-onboarding-6x6",
         "policy": STARTER_POLICY,
-        "max_curl_paths": 0,
+        "max_curl_paths": 1,
         "max_curl_run": 1,
         "min_mean_turns": 0.0,
-        "max_mean_turns": 1.0,
-        "max_blank_components": 2,
-        "max_isolated_blanks": 0,
+        "max_mean_turns": 1.25,
+        "max_blank_components": 5,
+        "max_isolated_blanks": 2,
         "ambiguity": (0.0, 5.0),
     },
     "rescue-core": {
         "rows": 6,
         "cols": 6,
-        "cells": (26, 31),
+        "cells": (25, 30),
         "words": (5, 6),
         "min_len": 4,
         "max_len": 7,
@@ -99,9 +99,9 @@ PROFILES = {
         "max_curl_run": 1,
         "min_mean_turns": 0.0,
         "max_mean_turns": 1.25,
-        "max_blank_components": 3,
-        "max_isolated_blanks": 1,
-        "ambiguity": (0.0, 6.5),
+        "max_blank_components": 5,
+        "max_isolated_blanks": 2,
+        "ambiguity": (0.0, 7.0),
     },
     "easy-core": {
         "rows": 6,
