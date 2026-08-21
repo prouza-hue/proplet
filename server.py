@@ -867,8 +867,13 @@ def load_puzzles() -> dict:
 @lru_cache(maxsize=1)
 def load_rolling_content() -> dict:
     if not ROLLING_CONTENT_PATH.exists():
-        return {"version": 1, "batches": [], "puzzles": {d: [] for d in ("easy", "medium", "hard", "hardcore")}}
+        return {"version": 1, "releaseEnabled": False, "batches": [], "puzzles": {d: [] for d in ("easy", "medium", "hard", "hardcore")}}
     return json.loads(ROLLING_CONTENT_PATH.read_text(encoding="utf-8"))
+
+
+def rolling_content_release_enabled() -> bool:
+    """Fail closed when a reserved bank is paused during a content-generation migration."""
+    return load_rolling_content().get("releaseEnabled", True) is not False
 
 
 def _parse_content_date(value: Optional[str]) -> Optional[date]:
@@ -902,12 +907,17 @@ def is_puzzle_released(puzzle: dict, as_of: Optional[date] = None) -> bool:
 
 def released_free_bank(difficulty: str, as_of: Optional[date] = None) -> list[dict]:
     base = list(load_puzzles().get("free", {}).get(difficulty, []))
-    extras = [p for p in load_rolling_content().get("puzzles", {}).get(difficulty, []) if is_puzzle_released(p, as_of)]
+    rolling = load_rolling_content()
+    extras = [] if not rolling_content_release_enabled() else [
+        p for p in rolling.get("puzzles", {}).get(difficulty, []) if is_puzzle_released(p, as_of)
+    ]
     return base + extras
 
 
 def _released_batches(as_of: date) -> tuple[list[dict], Optional[str]]:
     rolling = load_rolling_content()
+    if not rolling_content_release_enabled():
+        return [], None
     batches = list(rolling.get("batches") or [])
     released = [b for b in batches if (_parse_content_date(b.get("availableFrom")) or date.max) <= as_of]
     future = [b for b in batches if (_parse_content_date(b.get("availableFrom")) or date.min) > as_of]
@@ -938,7 +948,11 @@ def released_rolling_payload(as_of: date) -> dict:
     released_batches, next_release = _released_batches(as_of)
     latest = released_batches[-1] if released_batches else None
     additions = {
-        d: [p for p in source.get("puzzles", {}).get(d, []) if is_puzzle_released(p, as_of)]
+        d: (
+            [p for p in source.get("puzzles", {}).get(d, []) if is_puzzle_released(p, as_of)]
+            if rolling_content_release_enabled()
+            else []
+        )
         for d in ("easy", "medium", "hard", "hardcore")
     }
     meta = {k: v for k, v in source.items() if k not in {"batches", "puzzles"}}
@@ -1403,6 +1417,7 @@ def health():
         "xpEconomyVersion": 2,
         "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
+        "rollingContentReleaseEnabled": rolling_content_release_enabled(),
         "rollingContentCadence": load_rolling_content().get("cadence"),
         "rollingContentFirstRelease": load_rolling_content().get("firstRelease"),
         "rollingContentReservedThrough": load_rolling_content().get("reservedThrough"),
