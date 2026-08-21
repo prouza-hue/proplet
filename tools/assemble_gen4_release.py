@@ -61,15 +61,75 @@ def require_levels(grouped: dict, bank: str, difficulty: str, expected: int, sta
     return puzzles
 
 
+def target_words(puzzle: dict) -> set[str]:
+    return {str(answer.get("word") or "").casefold() for answer in puzzle.get("answers") or []}
+
+
+def medium_profile(ordinal: int) -> str:
+    if ordinal <= 40:
+        return "medium-compact" if (ordinal - 1) % 5 in {0, 2, 4} else "medium-cutout"
+    if ordinal <= 120:
+        return "medium-compact" if (ordinal - 41) % 4 == 3 else "medium-cutout"
+    return "medium-compact" if (ordinal - 121) % 7 == 6 else "medium-cutout"
+
+
+def take_candidate(remaining: list[dict], recent: deque[set[str]], required_profile: str | None = None) -> dict:
+    blocked = set().union(*recent) if recent else set()
+    ranked = []
+    for index, puzzle in enumerate(remaining):
+        profile = str((puzzle.get("meta") or {}).get("generationProfile") or "")
+        if required_profile and profile != required_profile:
+            continue
+        overlap = len(target_words(puzzle) & blocked)
+        original_level = int((puzzle.get("meta") or {}).get("level") or 0)
+        ranked.append((overlap, original_level, canonical_hash(puzzle), index))
+    if not ranked:
+        raise SystemExit(f"No candidate remains for required profile {required_profile}")
+    overlap, _, _, index = min(ranked)
+    if overlap:
+        raise SystemExit(
+            f"Target-spacing gate failed: best remaining {required_profile or 'candidate'} repeats {overlap} "
+            "target(s) inside the previous 12 boards"
+        )
+    puzzle = remaining.pop(index)
+    meta = puzzle.setdefault("meta", {})
+    meta["generatedLevel"] = int(meta.get("level") or 0)
+    recent.append(target_words(puzzle))
+    while len(recent) > 12:
+        recent.popleft()
+    return puzzle
+
+
+def ordered_bank(puzzles: list[dict], bank: str, difficulty: str, start_level: int = 1) -> list[dict]:
+    remaining = list(puzzles)
+    recent: deque[set[str]] = deque()
+    ordered = []
+    for offset in range(len(puzzles)):
+        level = start_level + offset
+        required = medium_profile(level) if difficulty == "medium" else None
+        puzzle = take_candidate(remaining, recent, required)
+        puzzle["id"] = (
+            f"rescue-g4-{level:03d}" if bank == "rescue"
+            else f"g4-{'emhx'[DIFFICULTIES.index(difficulty)]}-{level:03d}"
+        )
+        puzzle["meta"]["level"] = level
+        ordered.append(puzzle)
+    return ordered
+
+
 def build_daily(grouped: dict) -> list[dict]:
     pools = {
-        difficulty: deque(require_levels(grouped, "daily", difficulty, expected))
+        difficulty: list(require_levels(grouped, "daily", difficulty, expected))
         for difficulty, expected in DAILY_COUNTS.items()
     }
+    ordinals = Counter()
+    recent: deque[set[str]] = deque()
     daily: list[dict] = []
     for index in range(1, 366):
         difficulty = DAILY_CADENCE[(index - 1) % len(DAILY_CADENCE)]
-        puzzle = pools[difficulty].popleft()
+        ordinals[difficulty] += 1
+        required = medium_profile(ordinals[difficulty]) if difficulty == "medium" else None
+        puzzle = take_candidate(pools[difficulty], recent, required)
         puzzle["id"] = f"g4-d-{index:03d}"
         meta = puzzle.setdefault("meta", {})
         meta.update({
@@ -88,9 +148,11 @@ def build_daily(grouped: dict) -> list[dict]:
 
 def build_rolling(grouped: dict) -> dict:
     pools = {
-        difficulty: deque(require_levels(grouped, "rolling", difficulty, expected, 201))
+        difficulty: list(require_levels(grouped, "rolling", difficulty, expected, 201))
         for difficulty, expected in ROLLING_COUNTS.items()
     }
+    ordinals = Counter()
+    recent: deque[set[str]] = deque()
     by_difficulty: dict[str, list[dict]] = {difficulty: [] for difficulty in DIFFICULTIES}
     batches = []
     release_index = 0
@@ -99,10 +161,14 @@ def build_rolling(grouped: dict) -> dict:
         week_difficulties = [*DIFFICULTIES, extra]
         levels = []
         for difficulty in week_difficulties:
-            puzzle = pools[difficulty].popleft()
+            ordinals[difficulty] += 1
+            required = medium_profile(200 + ordinals[difficulty]) if difficulty == "medium" else None
+            puzzle = take_candidate(pools[difficulty], recent, required)
             release_index += 1
-            level = int(puzzle["meta"]["level"])
+            level = 200 + ordinals[difficulty]
+            puzzle["id"] = f"g4-{'emhx'[DIFFICULTIES.index(difficulty)]}-{level:03d}"
             puzzle["meta"].update({
+                "level": level,
                 "contentGeneration": 4,
                 "generationKey": "free-gen4-v334",
                 "availableFrom": None,
@@ -144,11 +210,13 @@ def build_rolling(grouped: dict) -> dict:
 
 def assemble_runtime(production: dict, grouped: dict) -> dict:
     free = {
-        difficulty: require_levels(grouped, "free", difficulty, 200)
+        difficulty: ordered_bank(require_levels(grouped, "free", difficulty, 200), "free", difficulty)
         for difficulty in DIFFICULTIES
     }
     daily = build_daily(grouped)
-    rescue = require_levels(grouped, "rescue", "rescue", 30)
+    rescue = ordered_bank(require_levels(grouped, "rescue", "rescue", 30), "rescue", "easy")
+    for puzzle in rescue:
+        puzzle["difficulty"] = "rescue"
     starter = require_levels(grouped, "starter", "easy", 1)[0]
     starter["meta"]["rewardXp"] = int((production.get("starter") or {}).get("meta", {}).get("rewardXp") or 10)
 
