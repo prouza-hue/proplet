@@ -1,0 +1,69 @@
+name: Publish public V3 preview
+
+on:
+  push:
+    branches:
+      - agent/v3340-medium-calibration-v3
+    paths:
+      - '.github/workflows/v334-public-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  public-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TEAM_ID: team_5WMqzMhPV9vWfkNAWCygaeap
+      VERCEL_PROJECT_ID: prj_0XHgnCQhdPS3pPETrxIpoXn0McMG
+      PREVIEW_URL: https://proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app/calibration-v334.html
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Disable Vercel Authentication for project previews
+        shell: bash
+        run: |
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::error::Repository secret VERCEL_TOKEN is not configured."
+            exit 1
+          fi
+          status=$(curl --silent --show-error --output /tmp/vercel-project.json --write-out '%{http_code}' \
+            --request PATCH \
+            --url "https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}?teamId=${VERCEL_TEAM_ID}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            --header 'Content-Type: application/json' \
+            --data '{"ssoProtection":null}')
+          if [ "${status}" != "200" ]; then
+            echo "::error::Vercel project update returned HTTP ${status}."
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('/tmp/vercel-project.json').read_text())
+          print({'error': payload.get('error')})
+          PY
+            exit 1
+          fi
+
+      - name: Verify public branch alias without credentials
+        shell: bash
+        run: |
+          for attempt in $(seq 1 12); do
+            if curl --silent --show-error --location --max-time 15 "${PREVIEW_URL}" | grep --quiet 'PLAYTEST V3'; then
+              echo 'Public preview is reachable without Vercel Authentication.'
+              exit 0
+            fi
+            sleep 5
+          done
+          echo '::error::Preview still requires authentication.'
+          exit 1
+
+      - name: Remove one-shot workflow
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/v334-public-preview.yml
+          git commit -m 'Remove one-shot public preview workflow'
+          git push origin HEAD:${GITHUB_REF_NAME}
