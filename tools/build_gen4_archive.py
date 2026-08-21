@@ -134,20 +134,28 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("--rolling", type=Path)
+    parser.add_argument("--active-source", type=Path)
+    parser.add_argument("--active-rolling", type=Path)
     parser.add_argument("--catalog", type=Path, required=True)
     parser.add_argument("--cold-dir", type=Path, required=True)
     parser.add_argument("--pruned-runtime", type=Path)
     args = parser.parse_args()
 
     root = json.loads(args.source.read_text(encoding="utf-8"))
-    sources: list[tuple[str, Path, dict]] = [("puzzles", args.source, root)]
+    sources: list[tuple[str, Path, dict, bool]] = [("puzzles", args.source, root, True)]
     if args.rolling:
         rolling = json.loads(args.rolling.read_text(encoding="utf-8"))
-        sources.append(("rolling", args.rolling, rolling))
+        sources.append(("rolling", args.rolling, rolling, True))
+    if args.active_source:
+        active = json.loads(args.active_source.read_text(encoding="utf-8"))
+        sources.append(("active", args.active_source, active, False))
+    if args.active_rolling:
+        active_rolling = json.loads(args.active_rolling.read_text(encoding="utf-8"))
+        sources.append(("active-rolling", args.active_rolling, active_rolling, False))
 
     records: dict[str, dict] = {}
     duplicate_contexts = 0
-    for source_name, _, payload in sources:
+    for source_name, _, payload, _ in sources:
         for path, puzzle in iter_puzzles(payload, (source_name,)):
             digest = puzzle_hash(puzzle)
             content_key = f"sha256:{digest}"
@@ -167,8 +175,9 @@ def main() -> None:
                 record["contexts"].append(ctx)
 
     archives = []
-    for source_name, source_path, _ in sources:
-        archives.append(cold_copy(source_path, args.cold_dir / f"{source_name}.json.gz"))
+    for source_name, source_path, _, cold_archive in sources:
+        if cold_archive:
+            archives.append(cold_copy(source_path, args.cold_dir / f"{source_name}.json.gz"))
 
     generations: Counter[str] = Counter()
     banks: Counter[str] = Counter()
