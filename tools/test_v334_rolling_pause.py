@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Regression test: approved Gen4 work must not leak reserved Gen3 rolling levels."""
 from datetime import date
+from pathlib import Path
+import sys
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 import server
 
 
