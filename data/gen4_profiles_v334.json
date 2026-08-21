@@ -16,9 +16,9 @@
     "easy-core": {
       "rows": [5, 6],
       "cols": [5, 6],
-      "activeCells": [20, 30],
-      "targetWords": [4, 6],
-      "targetLength": [3, 7],
+      "activeCells": [28, 34],
+      "targetWords": [6, 7],
+      "targetLength": [4, 7],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
       "vocabularyTiers": ["A"],
