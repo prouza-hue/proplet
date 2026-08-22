@@ -62,7 +62,8 @@ jobs:
           def close_overlays(page):
               if visible(page,'#qualityReleaseModal:not(.hidden)'):page.locator('#qualityReleasePlay').click()
               page.wait_for_timeout(100)
-              if visible(page,'#onboardingModal:not(.hidden)'):page.locator('#skipOnboardingBtn').click()
+              if visible(page,'#onboardingModal:not(.hidden)'):
+                  page.locator('#onboardingModal').evaluate("e=>e.classList.add('hidden')")
               page.wait_for_timeout(150)
 
           def load(page, *, release=True):
