@@ -60,10 +60,14 @@ jobs:
               return errors
 
           def close_overlays(page):
+              page.evaluate("localStorage.setItem('proplet-release-notes-seen:3.33.1','1')")
               if visible(page,'#qualityReleaseModal:not(.hidden)'):page.locator('#qualityReleasePlay').click()
               page.wait_for_timeout(100)
               if visible(page,'#onboardingModal:not(.hidden)'):
                   page.locator('#onboardingModal').evaluate("e=>e.classList.add('hidden')")
+              if visible(page,'.release-notes-v3331-backdrop'):
+                  page.locator('.release-notes-v3331-backdrop').evaluate("e=>e.remove()")
+                  page.locator('body').evaluate("e=>e.classList.remove('release-notes-v3331-open')")
               page.wait_for_timeout(150)
 
           def load(page, *, release=True):
