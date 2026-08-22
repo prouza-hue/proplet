@@ -40,11 +40,16 @@ jobs:
               raise AssertionError(f'{label}: {last!r}')
 
           def prep(page):
+              page.add_init_script("""()=>{
+                localStorage.setItem('proplet-v3-7-required-onboarding','done');
+                localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
+                localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
+                localStorage.setItem('proplet-release-notes-seen:3.33.1','1');
+              }""")
               page.route('**/api/**',lambda route: route.fulfill(status=200,content_type='application/json',body='{}') if route.request.method!='GET' else route.continue_())
               page.goto(URL,wait_until='domcontentloaded',timeout=30000)
               wait(lambda:page.evaluate("typeof startStarter==='function' && !!window.PROPLET_RUNTIME_META && !!puzzleDB"),12000,'runtime')
               page.evaluate("""()=>{
-                localStorage.setItem('proplet-release-notes-seen:3.33.1','1');
                 document.querySelector('#onboardingModal')?.classList.add('hidden');
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
