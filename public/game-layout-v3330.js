@@ -1,6 +1,7 @@
 (()=>{
   const PHONE_CLASS='game-phone-landscape-blocked';
   const TABLET_CLASS='game-tablet-landscape';
+  const TABLET_PORTRAIT_CLASS='game-tablet-portrait';
   const DESKTOP_CLASS='game-desktop-wide';
   const FREE_CLASS='game-free-mode';
   let pausedByGuard=false;
@@ -48,8 +49,11 @@
     const viewShort=Math.min(w,h);
     const viewLong=Math.max(w,h);
     const viewRatio=viewLong/Math.max(1,viewShort);
-    const unfoldedLike=viewLong>=600&&viewShort>=480&&viewRatio<1.55;
-    if(unfoldedLike)return false;
+    /* Real Fold browsers can keep a phone-like screen.width after unfolding even though the
+       actual visual viewport is tablet-sized. Trust the usable viewport first. Ordinary phones
+       stay below this short-side threshold in both orientations. */
+    const unfoldedLike=viewShort>=520&&viewLong>=600&&viewRatio<1.8;
+    if(unfoldedLike||viewShort>=600)return false;
     return screenShort<600||(viewShort<=560&&viewRatio>=1.6);
   };
 
@@ -111,8 +115,31 @@
     restoreGameInfo();
   };
 
+  const centerDesktopMask=()=>{
+    const wrap=document.querySelector('#boardWrap');
+    if(!wrap)return;
+    wrap.style.removeProperty('--mask-center-y');
+    if(!document.body.classList.contains(DESKTOP_CLASS))return;
+    let g=null;
+    try{g=typeof currentGame!=='undefined'?currentGame:null}catch{}
+    const p=g?.puzzle,mask=p?.mask;
+    if(!p||!Array.isArray(mask)||!mask.length)return;
+    const board=document.querySelector('#board');
+    if(!board)return;
+    const cs=getComputedStyle(board),rowGap=parseFloat(cs.rowGap)||parseFloat(cs.gap)||0;
+    const cell=parseFloat(board.style.getPropertyValue('--cell-size'))||0;
+    if(!(cell>0))return;
+    let minRow=p.rows,maxRow=-1;
+    for(const raw of mask){const idx=Number(raw);if(!Number.isFinite(idx))continue;const row=Math.floor(idx/p.cols);minRow=Math.min(minRow,row);maxRow=Math.max(maxRow,row)}
+    if(maxRow<minRow)return;
+    const visibleTop=minRow*(cell+rowGap),visibleBottom=maxRow*(cell+rowGap)+cell;
+    const offset=(wrap.clientHeight/2)-((visibleTop+visibleBottom)/2);
+    if(Number.isFinite(offset)&&Math.abs(offset)>.5)wrap.style.setProperty('--mask-center-y',`${offset.toFixed(2)}px`);
+  };
+
   const refit=()=>requestAnimationFrame(()=>{
     try{if(typeof fitGameBoard==='function')fitGameBoard()}catch{}
+    try{centerDesktopMask()}catch{}
     try{if(typeof drawPaths==='function')drawPaths()}catch{}
   });
 
@@ -137,7 +164,7 @@
     document.body.classList.toggle(PHONE_CLASS,blocked);
     if(blocked){
       setDebugMode('phone-landscape-blocked',d,landscape,'phone');
-      document.body.classList.remove(TABLET_CLASS,DESKTOP_CLASS);
+      document.body.classList.remove(TABLET_CLASS,TABLET_PORTRAIT_CLASS,DESKTOP_CLASS);
       restoreGameBoardNodes();
       if(!pausedByGuard){
         try{if(typeof pauseGameClock==='function')pausedByGuard=!!pauseGameClock('landscape')}catch{}
@@ -152,11 +179,13 @@
     }
 
     /* Fine-pointer wide screens keep the dedicated desktop composition. Touch-first unfolded
-       Fold/tablet screens use the proven compact rail in BOTH orientations once there is at
-       least 600 CSS px of viewport width. phoneLike() keeps ordinary phones out of this path. */
+       Fold/tablet screens use the proven compact rail in both orientations. 540px is intentional:
+       a real unfolded Fold may expose a narrower CSS viewport than its physical panel suggests. */
     const desktopWide=playing&&!phone&&finePointer()&&d.w>=1000&&d.h>=650;
-    const largeTouchRail=playing&&!desktopWide&&!phone&&coarsePointer()&&d.w>=600&&d.w<=1280;
+    const largeTouchRail=playing&&!desktopWide&&!phone&&coarsePointer()&&d.w>=540&&d.w<=1280;
+    const portraitRail=largeTouchRail&&!landscape;
     document.body.classList.toggle(TABLET_CLASS,largeTouchRail);
+    document.body.classList.toggle(TABLET_PORTRAIT_CLASS,portraitRail);
     document.body.classList.toggle(DESKTOP_CLASS,desktopWide);
 
     if(desktopWide){
