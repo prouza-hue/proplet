@@ -78,13 +78,20 @@ assert "/api/attempt/checkpoint" in client
 assert "sendAttemptCheckpoint('resume')" in client
 assert "calmModeLeaderboardExcluded:true" in runtime
 
-# Preview auth is narrow: canonical auth requests are bridged, gameplay POSTs remain blocked.
+# Preview auth stays narrow, but uses ordinary browser POST. No PROPFIND/fetch monkeypatch.
 assert "gen4PreviewAuthTesting:true" in runtime
-for source_path, action in (("/api/login", "login"), ("/api/player", "player"), ("/api/auth/google/complete", "google-complete")):
-    assert source_path in runtime and action in runtime
-assert 'methods=["PROPFIND"]' in preview_auth
-for action in ("login", "player", "google-complete"):
-    assert f'"{action}"' in preview_auth
+assert "__PROPLET_PREVIEW_FETCH_GUARD__" not in runtime
+assert 'methods=["PROPFIND"]' not in preview_auth
+assert '@app.middleware("http")' in preview_auth
+assert 'request.method == "POST"' in preview_auth
+for path in (
+    "/api/login",
+    "/api/player",
+    "/api/auth/google/complete",
+    "/api/account/email/start",
+    "/api/account-bonus/claim",
+):
+    assert path in preview_auth, path
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
