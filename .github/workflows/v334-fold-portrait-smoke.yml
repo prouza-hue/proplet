@@ -104,18 +104,19 @@ jobs:
               assert 'game-board-column' in s['currentParent'],s
               result['phonePortrait']=s;ctx.close()
 
-              # #4 is a HOME-header control. The fresh page is already on Dnes; don't re-enter the route during boot.
+              # #4 is a HOME-header control. Wait until the Gen4 boot guard actually reveals the app.
               ctx=b.new_context(viewport={'width':390,'height':844},screen={'width':390,'height':844},has_touch=True,is_mobile=True,service_workers='block')
               page=ctx.new_page();page.goto(URL,wait_until='domcontentloaded',timeout=30000)
               wait(page,"!!document.querySelector('#rankingPrivacyMini') && !!document.querySelector('#screen-daily')?.classList.contains('active')")
+              wait(page,"!document.documentElement.classList.contains('gen4-preview-booting')")
               dismiss_overlays(page);page.wait_for_timeout(350)
               icon=page.evaluate("""()=>{
                 const b=document.querySelector('#rankingPrivacyMini');
                 b.textContent='👀 Veřejně';b.setAttribute('aria-label','Pořadí: 👀 Veřejně');
                 const r=b.getBoundingClientRect(),before=getComputedStyle(b,'::before');
-                return {display:getComputedStyle(b).display,width:r.width,height:r.height,font:getComputedStyle(b).fontSize,before:before.content,beforeSize:before.fontSize};
+                return {display:getComputedStyle(b).display,visibility:getComputedStyle(b).visibility,width:r.width,height:r.height,font:getComputedStyle(b).fontSize,before:before.content,beforeSize:before.fontSize};
               }""")
-              assert icon['display']!='none' and icon['width']>=34 and icon['height']>=34,icon
+              assert icon['display']!='none' and icon['visibility']=='visible' and icon['width']>=34 and icon['height']>=34,icon
               assert '👀' in icon['before'],icon
               assert float(icon['beforeSize'].replace('px',''))>=15,icon
               page.screenshot(path=f'{OUT}/privacy-icon-mobile.png',full_page=True)
