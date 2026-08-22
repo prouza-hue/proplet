@@ -136,3 +136,5 @@ app = FastAPI('''
           git add server.py tools/test_gen4_preview_readonly.py tools/test_v334_canonical_starter.py .github/workflows/v334-calibration.yml .github/workflows/v334-finalize-preview-auth-fix.yml
           git commit -m "fix: allow canonical auth QA while keeping Gen4 gameplay read-only"
           git push origin HEAD:agent/v3340-medium-calibration-v3
+
+# retry on latest head
