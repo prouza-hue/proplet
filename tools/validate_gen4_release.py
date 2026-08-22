@@ -77,14 +77,21 @@ def validate_puzzle(
     answers = list(puzzle.get("answers") or [])
     meta = puzzle.get("meta") or {}
 
-    if not GEN4_ID.match(puzzle_id) and not (allow_calibration_ids and puzzle_id.startswith("cal-v334-")):
-        errors.append(f"{label}: non-Gen4 id {puzzle_id!r}")
-    if int(meta.get("contentGeneration") or 0) != 4:
-        errors.append(f"{label}: contentGeneration != 4")
-    if meta.get("verifiedUnique") is not True or meta.get("wideVerifiedUnique") is not True:
-        errors.append(f"{label}: uniqueness evidence missing")
-    if float(meta.get("endpointStartAdjacencyShare", -1)) != 0.0:
-        errors.append(f"{label}: endpoint/start adjacency is not zero")
+    canonical_starter = bool(path and path[-1] == "starter" and puzzle_id == "starter-v1")
+    if canonical_starter:
+        if (rows, cols) != (5, 5):
+            errors.append(f"{label}: canonical starter must remain 5x5")
+        if [norm(answer.get("word")) for answer in answers] != ["mrak", "jablko", "čokoláda", "autobus"]:
+            errors.append(f"{label}: canonical starter word script changed")
+    else:
+        if not GEN4_ID.match(puzzle_id) and not (allow_calibration_ids and puzzle_id.startswith("cal-v334-")):
+            errors.append(f"{label}: non-Gen4 id {puzzle_id!r}")
+        if int(meta.get("contentGeneration") or 0) != 4:
+            errors.append(f"{label}: contentGeneration != 4")
+        if meta.get("verifiedUnique") is not True or meta.get("wideVerifiedUnique") is not True:
+            errors.append(f"{label}: uniqueness evidence missing")
+        if float(meta.get("endpointStartAdjacencyShare", -1)) != 0.0:
+            errors.append(f"{label}: endpoint/start adjacency is not zero")
     if rows <= 0 or cols <= 0 or len(letters) != rows * cols:
         errors.append(f"{label}: invalid board dimensions")
         return errors
@@ -121,10 +128,11 @@ def validate_puzzle(
 
     if covered != mask:
         errors.append(f"{label}: answer paths do not exactly cover mask")
-    for i, endpoint in enumerate(endpoints):
-        for j, start in enumerate(starts):
-            if i != j and neighbours(endpoint, start, cols):
-                errors.append(f"{label}: answer {i} endpoint touches answer {j} start")
+    if not canonical_starter:
+        for i, endpoint in enumerate(endpoints):
+            for j, start in enumerate(starts):
+                if i != j and neighbours(endpoint, start, cols):
+                    errors.append(f"{label}: answer {i} endpoint touches answer {j} start")
     return errors
 
 
@@ -136,6 +144,8 @@ def in_declared_range(value: float, declared: object) -> bool:
 
 def validate_profile(path: tuple[str, ...], puzzle: dict, profiles: dict, allow_calibration_ids: bool) -> list[str]:
     puzzle_id = str(puzzle.get("id") or "")
+    if path and path[-1] == "starter" and puzzle_id == "starter-v1":
+        return []
     if allow_calibration_ids and puzzle_id.startswith("cal-v334-"):
         return []
     label = "/".join(path) or puzzle_id
