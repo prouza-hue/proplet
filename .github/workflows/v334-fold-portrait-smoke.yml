@@ -42,20 +42,23 @@ jobs:
                   time.sleep(.1)
               raise AssertionError(f'timeout: {expr}; last={last!r}')
 
-          def boot_game(browser,w,h,sw,sh,touch,label):
-              ctx=browser.new_context(viewport={'width':w,'height':h},screen={'width':sw,'height':sh},has_touch=touch,is_mobile=touch,service_workers='block')
-              page=ctx.new_page();errs=[]
-              page.on('pageerror',lambda e:errs.append(str(e)))
-              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-              wait(page,"typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]")
+          def dismiss_overlays(page):
               page.evaluate("""()=>{
                 try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');localStorage.setItem('proplet-release-notes-seen:3.33.1','1');sessionStorage.setItem('proplet-gen4-release-modal-v1','1')}catch(e){}
                 document.querySelector('#qualityReleaseModal')?.classList.add('hidden');
                 document.querySelector('#onboardingModal')?.classList.add('hidden');
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
-                startGame(puzzleDB.free.medium[0],'free');
               }""")
+
+          def boot_game(browser,w,h,sw,sh,touch,label):
+              ctx=browser.new_context(viewport={'width':w,'height':h},screen={'width':sw,'height':sh},has_touch=touch,is_mobile=touch,service_workers='block')
+              page=ctx.new_page();errs=[]
+              page.on('pageerror',lambda e:errs.append(str(e)))
+              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+              wait(page,"typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]")
+              dismiss_overlays(page)
+              page.evaluate("startGame(puzzleDB.free.medium[0],'free')")
               wait(page,"document.body.classList.contains('playing')")
               page.wait_for_timeout(850)
               state=page.evaluate("""()=>({
@@ -102,10 +105,16 @@ jobs:
               assert s['mode']=='standard',s
               assert len(s['cols'].split())==1,s
               assert 'game-board-column' in s['currentParent'],s
-              result['phonePortrait']=s
+              result['phonePortrait']=s;ctx.close()
 
-              # #4: compact mobile visibility control must visibly render a real emoji, not blank circle.
-              wait(page,"!!document.querySelector('#rankingPrivacyMini')")
+              # #4 is a HOME-header control, so test it on a fresh non-game mobile page.
+              ctx=b.new_context(viewport={'width':390,'height':844},screen={'width':390,'height':844},has_touch=True,is_mobile=True,service_workers='block')
+              page=ctx.new_page();page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+              wait(page,"typeof nav==='function' && !!document.querySelector('#rankingPrivacyMini')")
+              dismiss_overlays(page)
+              page.evaluate("nav('daily',{replace:true})")
+              wait(page,"document.querySelector('#screen-daily')?.classList.contains('active')")
+              page.wait_for_timeout(300)
               icon=page.evaluate("""()=>{
                 const b=document.querySelector('#rankingPrivacyMini');
                 b.textContent='👀 Veřejně';b.setAttribute('aria-label','Pořadí: 👀 Veřejně');
