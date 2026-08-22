@@ -1,0 +1,21 @@
+/* Proplet v3.33.6 — production P0 hotfixes only. */
+
+/* Keep board cells rounded-square at every fitted cell size. Fixed pixel radii turn tiny
+   web-viewport cells into circles; a proportional radius preserves the intended geometry. */
+body.playing .board .cell{border-radius:24%}
+body.playing .board.dense-board .cell{border-radius:22%}
+body.playing .board.ultra-board .cell{border-radius:20%}
+
+/* Fold/tablet composition is a width decision, not a height decision. Browser chrome can make
+   the same unfolded device substantially shorter than its PWA viewport. */
+@media (min-width:540px){
+  body.playing .app-shell{padding-left:14px;padding-right:14px}
+  body.playing .game-main{grid-template-columns:minmax(0,1fr) clamp(165px,21vw,220px)!important;grid-template-rows:minmax(0,1fr)!important;gap:9px!important}
+  body.playing .game-control-column{height:100%;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:7px;align-items:stretch}
+  body.playing .game-control-column .game-message{grid-column:1;grid-row:1;min-height:0;padding:8px 5px;text-align:center;align-self:start;white-space:normal}
+  body.playing .game-control-column .game-actions{grid-column:1;grid-row:2;grid-template-columns:1fr;align-self:end}
+  body.playing .game-control-column .game-actions .secondary-btn{width:100%;min-height:40px}
+  body.playing .game-board-column>.current-word{min-height:44px;padding:5px 10px}
+  body.playing .game-board-column>.current-word strong{font-size:clamp(18px,2.2vw,24px)}
+  body.playing .game-board-column>.game-info{padding:5px 9px}
+}
