@@ -118,17 +118,23 @@ jobs:
               summary['checks']['google_login']={'target':target,'oauthRequests':hits,'errors':errs};ctx.close()
 
           def account_flow(browser):
-              ctx=browser.new_context(viewport={'width':1280,'height':900});page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page)
               suffix=uuid.uuid4().hex[:7];name=('QA34'+suffix)[:24];password='Qa34!'+suffix+'Smoke'
-              open_auth(page,'create');page.locator('#playerNameInput').fill(name);page.locator('#playerPasswordInput').fill(password);page.locator('#saveProfileBtn').click()
-              wait_py(lambda:bool(page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token")),15000,label='created account token')
-              created=page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))");assert created.get('token'),created
-              page.evaluate("localStorage.removeItem('proplet-v2-profile')");page.reload(wait_until='domcontentloaded');page.wait_for_timeout(800);close_overlays(page)
-              open_auth(page,'login');page.locator('#playerNameInput').fill(name);page.locator('#playerPasswordInput').fill(password);page.locator('#saveProfileBtn').click()
-              wait_py(lambda:bool(page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token")),15000,label='password login token')
-              logged=page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))");assert logged.get('token'),logged
-              shot=f'{OUT}/account-login.png';page.screenshot(path=shot,full_page=True);summary['screenshots'].append(shot)
-              app_errs=[e for e in errs if 'favicon' not in e.lower()];summary['checks']['account_create_password_login']={'name':name,'created':True,'loggedIn':True,'errors':app_errs};assert not app_errs,app_errs;ctx.close()
+
+              # Device/context A: create account.
+              create_ctx=browser.new_context(viewport={'width':1280,'height':900});create_page=create_ctx.new_page();create_errs=errors_for(create_page);load(create_page);close_overlays(create_page)
+              open_auth(create_page,'create');create_page.locator('#playerNameInput').fill(name);create_page.locator('#playerPasswordInput').fill(password);create_page.locator('#saveProfileBtn').click()
+              wait_py(lambda:bool(create_page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token")),15000,label='created account token')
+              created=create_page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))");assert created.get('token'),created
+              create_app_errs=[e for e in create_errs if 'favicon' not in e.lower()];assert not create_app_errs,create_app_errs
+              create_ctx.close()
+
+              # Device/context B: genuinely empty browser storage, then password login.
+              login_ctx=browser.new_context(viewport={'width':1280,'height':900});login_page=login_ctx.new_page();login_errs=errors_for(login_page);load(login_page);close_overlays(login_page)
+              open_auth(login_page,'login');login_page.locator('#playerNameInput').fill(name);login_page.locator('#playerPasswordInput').fill(password);login_page.locator('#saveProfileBtn').click()
+              wait_py(lambda:bool(login_page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token")),15000,label='password login token')
+              logged=login_page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))");assert logged.get('token'),logged
+              shot=f'{OUT}/account-login.png';login_page.screenshot(path=shot,full_page=True);summary['screenshots'].append(shot)
+              login_app_errs=[e for e in login_errs if 'favicon' not in e.lower()];summary['checks']['account_create_password_login']={'name':name,'created':True,'loggedInOnFreshContext':True,'errors':create_app_errs+login_app_errs};assert not login_app_errs,login_app_errs;login_ctx.close()
 
           def cell_for(page,idx,total):
               for attr in ('data-index','data-cell','data-cell-index','data-idx'):
