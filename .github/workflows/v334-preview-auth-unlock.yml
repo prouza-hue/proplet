@@ -1,0 +1,62 @@
+name: v3.34 preview auth unlock
+
+on:
+  push:
+    branches:
+      - agent/v3340-medium-calibration-v3
+    paths:
+      - .github/workflows/v334-preview-auth-unlock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-preview-auth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3340-medium-calibration-v3
+          fetch-depth: 0
+      - name: Allow only auth writes in Gen4 preview
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('server.py')
+          s = p.read_text(encoding='utf-8')
+          old = '''    if GEN4_CANDIDATE_PREVIEW and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Generation 4 preview je pouze pro čtení", "requestId": request_id},
+            headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        )
+'''
+          new = '''    if (
+        GEN4_CANDIDATE_PREVIEW
+        and request.method in {"POST", "PUT", "PATCH", "DELETE"}
+        and request.url.path not in {"/api/login", "/api/player", "/api/auth/google/complete", "/api/logout"}
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Gen4 preview povoluje zápis jen pro přihlášení a test účtu", "requestId": request_id},
+            headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        )
+'''
+          if old not in s:
+              raise SystemExit('expected preview middleware block not found')
+          s = s.replace(old, new, 1)
+          s = s.replace('"gen4CandidateReadOnly": GEN4_CANDIDATE_PREVIEW,', '"gen4CandidateReadOnly": False,\n        "gen4PreviewWriteScope": "auth-only" if GEN4_CANDIDATE_PREVIEW else None,', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          python -m py_compile server.py
+      - name: Commit narrow preview auth scope
+        run: |
+          if git diff --quiet -- server.py; then
+            echo "No server change needed"
+            exit 0
+          fi
+          git config user.name "proplet-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add server.py
+          git commit -m "fix: allow auth testing in Gen4 preview"
+          git push origin HEAD:agent/v3340-medium-calibration-v3
