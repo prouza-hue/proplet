@@ -1,7 +1,7 @@
 name: v3.34 direct quality patch
 
 # Directly apply the release-quality code to the existing PR branch.
-# No content generation, no production writes, no temporary preview branch.
+# No content generation and no production writes.
 on:
   pull_request:
     branches:
@@ -32,23 +32,33 @@ jobs:
           section = '# Existing-result updates only adopt calm_mode when they replace the chronologically official'
           start = s.index('text = text.replace(', s.index(section))
           end = s.index('# ---- Competitive helpers', start)
-          robust = r'''# Patch every official-result persistence shape inside /api/result without depending on indentation.
+          robust = r'''# Patch all result dictionaries semantically, not by whitespace shape.
           result_start = text.index('@app.post("/api/result")')
           next_route = text.find('\n\n@app.', result_start + 20)
           result_end = next_route if next_route != -1 else len(text)
           result_block = text[result_start:result_end]
-
-          inline_old = '"clean_solve": effective_clean, "completed_at": official_completed_at,'
-          inline_new = '"clean_solve": effective_clean, "calm_mode": bool(payload.calm_mode), "completed_at": official_completed_at,'
-          inline_count = result_block.count(inline_old)
-          result_block = result_block.replace(inline_old, inline_new)
-
-          import re
-          wrapped_re = re.compile(r'(?m)^(?P<i>\s*)"clean_solve": effective_clean,\n(?P=i)"completed_at": official_completed_at,')
-          wrapped_count = len(wrapped_re.findall(result_block))
-          result_block = wrapped_re.sub(lambda m: f'{m.group("i")}"clean_solve": effective_clean,\n{m.group("i")}"calm_mode": bool(payload.calm_mode),\n{m.group("i")}"completed_at": official_completed_at,', result_block)
-          if inline_count + wrapped_count < 5:
-              raise SystemExit(f'result persistence: expected at least 5 official writes, got {inline_count + wrapped_count}')
+          lines = result_block.splitlines()
+          patched_official = 0
+          i = 0
+          while i < len(lines):
+              line = lines[i]
+              if '"clean_solve": effective_clean,' in line and 'calm_mode' not in line:
+                  # Stay inside the current dict and look for the official completion timestamp.
+                  probe = '\n'.join(lines[i:min(len(lines), i + 12)])
+                  close_pos = probe.find('\n            }')
+                  completed_pos = probe.find('"completed_at": official_completed_at')
+                  if completed_pos != -1 and (close_pos == -1 or completed_pos < close_pos):
+                      indent = line[:len(line)-len(line.lstrip())]
+                      if '"completed_at": official_completed_at' in line:
+                          lines[i] = line.replace('"clean_solve": effective_clean,', '"clean_solve": effective_clean, "calm_mode": bool(payload.calm_mode),', 1)
+                      else:
+                          lines.insert(i + 1, indent + '"calm_mode": bool(payload.calm_mode),')
+                          i += 1
+                      patched_official += 1
+              i += 1
+          if patched_official < 3:
+              raise SystemExit(f'result persistence: expected multiple official writes, patched {patched_official}')
+          result_block = '\n'.join(lines)
 
           telemetry_old = '                "clean_solve": effective_clean,\n            }\n            if attempts:'
           telemetry_new = '                "clean_solve": effective_clean,\n                "calm_mode": bool(payload.calm_mode),\n            }\n            if attempts:'
@@ -56,9 +66,8 @@ jobs:
               raise SystemExit('result telemetry calm persistence anchor missing')
           result_block = result_block.replace(telemetry_old, telemetry_new, 1)
           text = text[:result_start] + result_block + text[result_end:]
-
           '''
-          s = s[:start] + robust + s[end:]
+          s = s[:start] + robust + '\n\n' + s[end:]
           p.write_text(s, encoding='utf-8')
           print('server patch made resilient')
           PY
