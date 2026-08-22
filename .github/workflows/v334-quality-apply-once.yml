@@ -1,0 +1,71 @@
+name: v3.34 one-shot quality patch
+
+on:
+  push:
+    branches:
+      - agent/v3340-medium-calibration-v3
+    paths:
+      - '.github/workflows/v334-quality-apply-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3340-medium-calibration-v3
+          fetch-depth: 0
+
+      - name: Apply deterministic server and client patches
+        run: |
+          python tools/apply_v334_quality_server_patch.py
+          python tools/apply_v334_quality_client_patch.py
+          python -m py_compile server.py
+          node --check public/quality-v334.js
+          node --check public/runtime-meta.js
+
+      - name: Extend cheap Gen4 contract with quality checks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/v334-calibration.yml')
+          text = path.read_text(encoding='utf-8')
+          def once(old, new, label):
+              global text
+              if text.count(old) != 1:
+                  raise SystemExit(f'{label}: expected one match, got {text.count(old)}')
+              text = text.replace(old, new, 1)
+          once("      - 'public/app.js'\n", "      - 'public/app.js'\n      - 'public/runtime-meta.js'\n      - 'public/quality-v334.js'\n      - 'public/quality-v334.css'\n      - 'public/sw.js'\n", 'quality paths')
+          once("      - 'tools/test_gen4_preview_runtime_meta.js'\n", "      - 'tools/test_gen4_preview_runtime_meta.js'\n      - 'tools/test_v334_quality_release.py'\n", 'quality test path')
+          once("          python -m py_compile tools/test_gen4_release_binder.py\n          node --check public/app.js\n", "          python -m py_compile tools/test_gen4_release_binder.py\n          python -m py_compile tools/test_v334_quality_release.py\n          node --check public/app.js\n          node --check public/quality-v334.js\n", 'quality syntax')
+          once("      - name: Verify zero-round-trip preview routing metadata\n        run: node tools/test_gen4_preview_runtime_meta.js\n", "      - name: Verify zero-round-trip preview routing metadata\n        run: node tools/test_gen4_preview_runtime_meta.js\n\n      - name: Verify release-quality UX, archive and Calm Mode contract\n        run: python tools/test_v334_quality_release.py\n", 'quality contract step')
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Cheap pre-commit checks
+        run: |
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.py').read_text(encoding='utf-8')
+          assert 'def competitive_row(row: dict) -> bool:' in s
+          assert '"calm_mode": bool(payload.calm_mode)' in s
+          assert '"calmMode": calm_mode_summary' in s
+          assert 'db_select_all("puzzle_runs", mode="daily")' in s
+          print('one-shot source checks: OK')
+          PY
+
+      - name: Remove one-shot machinery and commit result
+        run: |
+          git rm tools/apply_v334_quality_server_patch.py tools/apply_v334_quality_client_patch.py .github/workflows/v334-quality-apply-once.yml
+          git config user.name 'proplet-release-bot'
+          git config user.email 'proplet-release-bot@users.noreply.github.com'
+          git add server.py public/quality-v334.js .github/workflows/v334-calibration.yml
+          git diff --cached --check
+          git commit -m 'feat: add v3.34 release-quality UX and calm mode'
+          git push origin HEAD:agent/v3340-medium-calibration-v3

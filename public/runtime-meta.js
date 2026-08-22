@@ -44,11 +44,31 @@
       accountBonusLeaderboardExcluded:true,
       growthReleaseNotes:true,
       returningPlayerOnboardingSkip:true,
-      onboardingLoginEscape:true
+      onboardingLoginEscape:true,
+      gen4ReleaseQualityPass:true,
+      calmMode:true,
+      calmModeLeaderboardExcluded:true,
+      gen4ProgressArchiveUx:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
   window.PROPLET_VERSION=META.version;
+
+  /* v3.34 quality layer stays additive so the candidate content remains frozen while
+     presentation, migration communication and calm-mode UX can iterate independently. */
+  if(!document.querySelector('link[data-proplet-quality-v334]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';link.href='/quality-v334.css?v=1';link.dataset.propletQualityV334='1';
+    document.head.appendChild(link);
+  }
+  const loadQualityLayer=()=>{
+    if(document.querySelector('script[data-proplet-quality-v334]'))return;
+    const script=document.createElement('script');
+    script.src='/quality-v334.js?v=1';script.async=false;script.dataset.propletQualityV334='1';
+    document.body.appendChild(script);
+  };
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadQualityLayer,{once:true});
+  else loadQualityLayer();
 
   let legacyOriginSession=false;
   if(productionAliases.has(location.hostname)&&location.origin!==canonicalOrigin){
