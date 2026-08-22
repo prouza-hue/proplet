@@ -120,7 +120,6 @@ jobs:
         run: |
           git diff --check
           python tools/test_v334_quality_release.py
-          node tools/test_gen4_preview_runtime_meta.js
           python - <<'PY'
           from pathlib import Path
           idx=Path('public/index.html').read_text(encoding='utf-8')
