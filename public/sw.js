@@ -1,34 +1,83 @@
-const CACHE='proplet-v4.00.0-r1';
-const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js','/version.js','/home-layout.css','/home-layout.js','/ranking-polish.css','/ranking-polish.js','/account-auth.css','/account-auth.js','/auth-recovery-guard-v3326.js','/copy-density-v3327.css','/copy-density-v3327.js','/onboarding-model-v3328.css','/onboarding-model-v3328.js','/valid-word-feedback-v3330.js','/valid-words-v3328.txt','/push-retention-v3329.css','/push-retention-v3329.js','/account-team-v33210.js','/desktop-layout-v3330.css','/result-layout-v3330.css','/profile-layout-v3330.css','/competitive-sharing-v3331.css','/competitive-sharing-v3331.js','/challenge-cta-v3333.css','/challenge-cta-v3333.js','/account-bonus-v3331.js','/release-notes-v3331.css','/release-notes-v3331.js','/account-conversion-v3331.css','/account-conversion-v3331.js','/onboarding-return-v3332.css','/onboarding-return-v3332.js','/google-g.svg','/today-brand.css','/onboarding-fit.css','/game-layout-v3323.css','/game-layout-v3330.js','/difficulty-nudge.css','/difficulty-nudge.js','/win-actions-v3324.css','/gesture-guard-v3325.css','/gesture-guard-v3325.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/difficulty/easy.svg','/difficulty/medium.svg','/difficulty/hard.svg','/difficulty/hardcore.svg','/privacy.html','/terms.html','/legal.css'];
+const SHELL_CACHE='proplet-v4.00.1-shell';
+const DATA_CACHE='proplet-data-v11';
+const CACHE_PREFIX='proplet-';
+const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js'];
+
+async function putIfOk(cacheName,request,response){
+  if(!response?.ok)return response;
+  const cache=await caches.open(cacheName);
+  await cache.put(request,response.clone());
+  return response;
+}
+
+async function precacheShell(){
+  const cache=await caches.open(SHELL_CACHE);
+  await Promise.all(SHELL.map(async path=>{
+    try{
+      const response=await fetch(path,{cache:'no-store'});
+      if(response.ok)await cache.put(path,response);
+    }catch{}
+  }));
+}
+
+async function preserveExistingPuzzleDatabase(){
+  try{
+    const existing=await caches.match('/puzzles.json',{ignoreSearch:true});
+    if(existing?.ok)await (await caches.open(DATA_CACHE)).put('/puzzles.json',existing.clone());
+  }catch{}
+}
 
 self.addEventListener('install',e=>{
-  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
+  e.waitUntil(Promise.all([precacheShell(),preserveExistingPuzzleDatabase()]).then(()=>self.skipWaiting()));
 });
 self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting()});
 self.addEventListener('activate',e=>e.waitUntil((async()=>{
-  await caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))));
+  const keep=new Set([SHELL_CACHE,DATA_CACHE]);
+  await caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&!keep.has(k)).map(k=>caches.delete(k))));
   await self.clients.claim();
-  const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});
-  await Promise.all(windows.map(client=>client.navigate(client.url).catch(()=>{})));
 })()));
+
+async function networkFirst(request,cacheName,fallback){
+  try{return await putIfOk(cacheName,request,await fetch(request))}
+  catch{
+    const cached=await caches.match(request,{ignoreSearch:request.mode==='navigate'});
+    if(cached)return cached;
+    if(fallback)return (await caches.match(fallback))||Response.error();
+    return Response.error();
+  }
+}
+
+async function cacheFirst(request){
+  const cached=await caches.match(request);
+  if(cached)return cached;
+  return putIfOk(SHELL_CACHE,request,await fetch(request));
+}
+
+async function staleWhileRevalidate(event){
+  const cached=await caches.match(event.request);
+  const refresh=fetch(event.request,{cache:'no-store'}).then(r=>putIfOk(DATA_CACHE,event.request,r));
+  if(cached){event.waitUntil(refresh.catch(()=>{}));return cached}
+  return refresh;
+}
+
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const u=new URL(e.request.url);
-  if(u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'){
-    const refresh=fetch(e.request,{cache:'no-store'}).then(r=>{
-      if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
-      return r;
-    });
-    e.respondWith(caches.match(e.request).then(cached=>{
-      if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}
-      return refresh;
-    }).catch(()=>fetch(e.request,{cache:'no-store'})));
+  if(u.origin!==self.location.origin)return;
+  if(u.pathname==='/api/rolling-content'){
+    e.respondWith(staleWhileRevalidate(e).catch(async()=>await caches.match(e.request)||Response.error()));
+    return;
+  }
+  if(u.pathname==='/puzzles.json'){
+    e.respondWith(networkFirst(e.request,DATA_CACHE));
     return;
   }
   if(u.pathname.startsWith('/api/'))return;
-  e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{
-    const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r;
-  }).catch(()=>caches.match(e.request)));
+  if(e.request.mode==='navigate'){
+    e.respondWith(networkFirst(e.request,SHELL_CACHE,'/'));
+    return;
+  }
+  e.respondWith(cacheFirst(e.request).catch(async()=>await caches.match(e.request)||Response.error()));
 });
 
 self.addEventListener('push',event=>{
