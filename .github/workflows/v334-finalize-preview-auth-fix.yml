@@ -1,0 +1,138 @@
+name: v3.34 finalize preview auth fix
+
+on:
+  push:
+    branches:
+      - agent/v3340-medium-calibration-v3
+    paths:
+      - .github/workflows/v334-finalize-preview-auth-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix-preview-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3340-medium-calibration-v3
+          fetch-depth: 0
+
+      - name: Replace method bridge with narrow canonical POST allowlist
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          server_path=Path('server.py')
+          s=server_path.read_text(encoding='utf-8')
+          anchor='SECONDARY_SESSION_DAYS = 180\n\napp = FastAPI('
+          replacement='''SECONDARY_SESSION_DAYS = 180
+PREVIEW_AUTH_WRITE_PATHS = frozenset({
+    "/api/login",
+    "/api/player",
+    "/api/auth/google/complete",
+    "/api/logout",
+    "/api/account/email/start",
+    "/api/account/email/verify",
+    "/api/auth/recovery/start",
+    "/api/auth/recovery/check",
+    "/api/auth/recovery/reset",
+    "/api/account-bonus/claim",
+})
+
+app = FastAPI('''
+          if 'PREVIEW_AUTH_WRITE_PATHS = frozenset({' not in s:
+              if anchor not in s:
+                  raise SystemExit('server constant anchor not found')
+              s=s.replace(anchor,replacement,1)
+
+          old='''    if GEN4_CANDIDATE_PREVIEW and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Generation 4 preview je pouze pro čtení", "requestId": request_id},
+            headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        )
+'''
+          new='''    if (
+        GEN4_CANDIDATE_PREVIEW
+        and request.method in {"POST", "PUT", "PATCH", "DELETE"}
+        and request.url.path not in PREVIEW_AUTH_WRITE_PATHS
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Generation 4 preview je pouze pro čtení", "requestId": request_id},
+            headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        )
+'''
+          if old in s:
+              s=s.replace(old,new,1)
+          elif 'and request.url.path not in PREVIEW_AUTH_WRITE_PATHS' not in s:
+              raise SystemExit('preview middleware block not found')
+          server_path.write_text(s,encoding='utf-8')
+
+          test=Path('tools/test_gen4_preview_readonly.py')
+          t=test.read_text(encoding='utf-8')
+          marker='''    assert "pouze pro čtení" in blocked.json().get("detail", "")
+
+'''
+          addition='''    assert "pouze pro čtení" in blocked.json().get("detail", "")
+
+    # Auth/account bootstrap must remain testable on preview; invalid payloads should
+    # reach the canonical FastAPI routes (422/401), never the preview write blocker (409).
+    for path in (
+        "/api/login",
+        "/api/player",
+        "/api/auth/google/complete",
+        "/api/account/email/start",
+        "/api/auth/recovery/start",
+        "/api/account-bonus/claim",
+    ):
+        response = client.post(path, json={})
+        assert response.status_code != 409, (path, response.status_code, response.text)
+
+'''
+          if addition not in t:
+              if marker not in t:
+                  raise SystemExit('readonly test marker not found')
+              t=t.replace(marker,addition,1)
+          test.write_text(t,encoding='utf-8')
+
+          wf=Path('.github/workflows/v334-calibration.yml')
+          w=wf.read_text(encoding='utf-8')
+          compile_anchor='          python -m py_compile tools/test_v334_quality_release.py\n'
+          if 'python -m py_compile tools/test_v334_canonical_starter.py' not in w:
+              if compile_anchor not in w:
+                  raise SystemExit('contract compile anchor not found')
+              w=w.replace(compile_anchor,compile_anchor+'          python -m py_compile tools/test_v334_canonical_starter.py\n',1)
+          run_anchor='''      - name: Verify branch-scoped Gen4 preview is read-only
+        run: python tools/test_gen4_preview_readonly.py
+
+'''
+          starter_step='''      - name: Verify canonical scripted onboarding starter
+        run: python tools/test_v334_canonical_starter.py
+
+'''
+          if starter_step not in w:
+              if run_anchor not in w:
+                  raise SystemExit('contract run anchor not found')
+              w=w.replace(run_anchor,run_anchor+starter_step,1)
+          path_anchor="      - 'tools/test_v334_quality_release.py'\n"
+          if "      - 'tools/test_v334_canonical_starter.py'" not in w:
+              if path_anchor not in w:
+                  raise SystemExit('contract path anchor not found')
+              w=w.replace(path_anchor,path_anchor+"      - 'tools/test_v334_canonical_starter.py'\n",1)
+          wf.write_text(w,encoding='utf-8')
+          PY
+          python -m py_compile server.py tools/test_gen4_preview_readonly.py tools/test_v334_canonical_starter.py
+          python tools/test_v334_canonical_starter.py
+
+      - name: Commit clean preview auth fix and remove one-shot workflow
+        run: |
+          rm .github/workflows/v334-finalize-preview-auth-fix.yml
+          git config user.name "proplet-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add server.py tools/test_gen4_preview_readonly.py tools/test_v334_canonical_starter.py .github/workflows/v334-calibration.yml .github/workflows/v334-finalize-preview-auth-fix.yml
+          git commit -m "fix: allow canonical auth QA while keeping Gen4 gameplay read-only"
+          git push origin HEAD:agent/v3340-medium-calibration-v3
