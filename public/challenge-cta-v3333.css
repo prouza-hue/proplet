@@ -9,7 +9,7 @@
   background:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);
   color:#fff;
   box-shadow:0 9px 23px rgba(139,36,70,.33),inset 0 1px 0 rgba(255,255,255,.2);
-  font-size:12.5px;
+  font-size:15px!important;
   font-weight:950;
   letter-spacing:.01em;
 }
@@ -45,7 +45,10 @@ html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
   box-shadow:0 7px 20px rgba(0,0,0,.28),0 0 0 1px rgba(177,158,255,.08) inset;
 }
 @media(max-width:390px){
-  #winModal .win-main-actions .challenge-share-cta{min-height:40px;padding:9px 12px;font-size:12px}
+  #winModal .win-main-actions .challenge-share-cta{min-height:40px;padding:9px 12px}
+}
+@media (min-width:1000px) and (min-height:650px){
+  #winModal .win-main-actions .challenge-share-cta{font-size:16px!important}
 }
 
 

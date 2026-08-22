@@ -93,4 +93,4 @@ with (
 assert [row["elapsedMs"] for row in free["rows"]] == [54_000, 119_000, 129_000], free
 assert free["myRank"] == 1, free
 
-print("Proplet v4.00.5 Daily and Free rank order: OK")
+print("Proplet v4.00.6 Daily and Free rank order: OK")
