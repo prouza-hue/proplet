@@ -1,9 +1,7 @@
 name: v3.34 canonical starter onboarding smoke
 
 on:
-  pull_request:
-    branches: [main]
-    paths: ['.github/workflows/v334-starter-onboarding-smoke.yml']
+  workflow_dispatch:
 
 permissions:
   contents: read
