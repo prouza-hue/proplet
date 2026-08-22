@@ -1,5 +1,4 @@
-/* v3.34 preview/release hotfixes: ranking privacy indicator + read-only preview guard. */
-html.gen4-preview-no-ranking-privacy #rankingPrivacyModal{display:none!important}
+/* v3.34 quality hotfix: reliable compact ranking-visibility indicator. */
 
 @media (max-width:520px){
   .ranking-privacy-mini::first-letter{font-size:0!important}
