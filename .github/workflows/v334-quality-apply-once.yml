@@ -43,7 +43,6 @@ jobs:
           while i < len(lines):
               line = lines[i]
               if '"clean_solve": effective_clean,' in line and 'calm_mode' not in line:
-                  # Stay inside the current dict and look for the official completion timestamp.
                   probe = '\n'.join(lines[i:min(len(lines), i + 12)])
                   close_pos = probe.find('\n            }')
                   completed_pos = probe.find('"completed_at": official_completed_at')
@@ -78,6 +77,8 @@ jobs:
           python tools/apply_v334_quality_client_patch.py
           python - <<'PY'
           from pathlib import Path
+
+          # Load the additive quality layer from the real app shell.
           p = Path('public/index.html')
           s = p.read_text(encoding='utf-8')
           if '/quality-v334.css' not in s:
@@ -85,6 +86,33 @@ jobs:
           if '/quality-v334.js' not in s:
               s = s.replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n  <script src="/quality-v334.js"></script>', 1)
           p.write_text(s, encoding='utf-8')
+
+          # Calm Mode is an additive flag on gameplay history. The migration is prepared here,
+          # but is NOT applied to production by this workflow.
+          m = Path('SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql')
+          sql = m.read_text(encoding='utf-8')
+          for table in ('results','puzzle_runs','puzzle_attempts'):
+              anchor = 'alter table public.' + table
+              start = sql.index(anchor)
+              end = sql.index(';', start)
+              block = sql[start:end]
+              if 'calm_mode boolean not null default false' not in block:
+                  old = '  add column if not exists content_lineage_confidence text'
+                  pos = sql.index(old, start, end)
+                  sql = sql[:pos] + old + ',\n  add column if not exists calm_mode boolean not null default false' + sql[pos+len(old):]
+          if 'results_competitive_rank_idx' not in sql:
+              marker = 'create index if not exists puzzle_attempts_content_lineage_idx\n  on public.puzzle_attempts (content_generation, content_bank, difficulty, content_level);\n'
+              extra = marker + '\ncreate index if not exists results_competitive_rank_idx\n  on public.results (mode, daily_date, completed_at) where calm_mode = false;\ncreate index if not exists puzzle_runs_competitive_rank_idx\n  on public.puzzle_runs (mode, puzzle_id, completed_at) where calm_mode = false;\n'
+              sql = sql.replace(marker, extra, 1)
+          m.write_text(sql, encoding='utf-8')
+
+          v = Path('SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql')
+          verify = v.read_text(encoding='utf-8')
+          if "'calm_mode'" not in verify:
+              verify = verify.replace("    'content_lineage_confidence'\n", "    'content_lineage_confidence',\n    'calm_mode'\n", 1)
+          if 'calm_results' not in verify:
+              verify += "\nselect\n  (select count(*) from public.results where calm_mode) as calm_results,\n  (select count(*) from public.puzzle_runs where calm_mode) as calm_runs,\n  (select count(*) from public.puzzle_attempts where calm_mode) as calm_attempts;\n"
+          v.write_text(verify, encoding='utf-8')
           PY
           python -m py_compile server.py
           node --check public/app.js
