@@ -10,6 +10,10 @@ on:
       - 'data/rolling_content_v1.json'
       - 'server.py'
       - 'public/app.js'
+      - 'public/runtime-meta.js'
+      - 'public/quality-v334.js'
+      - 'public/quality-v334.css'
+      - 'public/sw.js'
       - 'data/puzzles_gen4_candidate_v334.json'
       - 'data/rolling_content_gen4_candidate_v334.json'
       - 'tools/generate_v334_calibration.py'
@@ -31,6 +35,7 @@ on:
       - 'tools/test_gen4_progress_migration.py'
       - 'tools/test_gen4_release_binder.py'
       - 'tools/test_gen4_preview_runtime_meta.js'
+      - 'tools/test_v334_quality_release.py'
       - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
       - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
       - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
@@ -129,7 +134,9 @@ jobs:
           python -m py_compile tools/test_gen4_content_archive.py
           python -m py_compile tools/test_gen4_progress_migration.py
           python -m py_compile tools/test_gen4_release_binder.py
+          python -m py_compile tools/test_v334_quality_release.py
           node --check public/app.js
+          node --check public/quality-v334.js
           node --check public/runtime-meta.js
           node --check tools/test_gen4_preview_runtime_meta.js
 
@@ -141,6 +148,9 @@ jobs:
 
       - name: Verify zero-round-trip preview routing metadata
         run: node tools/test_gen4_preview_runtime_meta.js
+
+      - name: Verify release-quality UX, archive and Calm Mode contract
+        run: python tools/test_v334_quality_release.py
 
       - name: Verify exact and metadata-only archive lineage
         run: python tools/test_gen4_content_archive.py
