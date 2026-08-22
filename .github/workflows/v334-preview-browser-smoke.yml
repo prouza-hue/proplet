@@ -2,10 +2,8 @@ name: v3.34 preview browser smoke
 
 on:
   pull_request:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/v334-preview-browser-smoke.yml'
+    branches: [main]
+    paths: ['.github/workflows/v334-preview-browser-smoke.yml']
 
 permissions:
   contents: read
@@ -38,8 +36,7 @@ jobs:
           summary={'url':URL,'checks':{},'screenshots':[]}
 
           def wait_py(predicate, timeout=10000, step=100, label='condition'):
-              deadline=time.time()+timeout/1000
-              last=None
+              deadline=time.time()+timeout/1000; last=None
               while time.time()<deadline:
                   try:
                       value=predicate()
@@ -49,7 +46,7 @@ jobs:
                   time.sleep(step/1000)
               raise AssertionError(f'timeout waiting for {label}; last={last!r}')
 
-          def visible(page, sel):
+          def visible(page,sel):
               try:return page.locator(sel).is_visible()
               except:return False
 
@@ -63,27 +60,34 @@ jobs:
               page.evaluate("localStorage.setItem('proplet-release-notes-seen:3.33.1','1')")
               if visible(page,'#qualityReleaseModal:not(.hidden)'):page.locator('#qualityReleasePlay').click()
               page.wait_for_timeout(100)
-              if visible(page,'#onboardingModal:not(.hidden)'):
-                  page.locator('#onboardingModal').evaluate("e=>e.classList.add('hidden')")
+              if visible(page,'#onboardingModal:not(.hidden)'):page.locator('#onboardingModal').evaluate("e=>e.classList.add('hidden')")
               if visible(page,'.release-notes-v3331-backdrop'):
                   page.locator('.release-notes-v3331-backdrop').evaluate("e=>e.remove()")
                   page.locator('body').evaluate("e=>e.classList.remove('release-notes-v3331-open')")
               page.wait_for_timeout(150)
 
-          def load(page, *, release=True):
+          def load(page,release=True):
               page.goto(URL,wait_until='domcontentloaded',timeout=30000)
               page.locator('body').wait_for(state='attached',timeout=10000)
               wait_py(lambda:len(page.locator('body').inner_text().strip())>50,10000,label='non-empty body')
               if release:page.locator('#qualityReleaseModal:not(.hidden)').wait_for(state='visible',timeout=8000)
               page.wait_for_timeout(250)
 
+          def open_auth(page,mode):
+              page.locator('#profileChip').click()
+              page.locator('#screen-profile.active').wait_for(state='visible',timeout=5000)
+              button='#profileLoginBtn' if mode=='login' else '#profileCreateBtn'
+              page.locator(button).wait_for(state='visible',timeout=5000)
+              page.locator(button).click()
+              page.locator('#profileModal:not(.hidden)').wait_for(state='visible',timeout=5000)
+              page.locator('#profileModeLogin' if mode=='login' else '#profileModeCreate').click()
+
           def modal_viewport_check(browser,w,h,label):
-              ctx=browser.new_context(viewport={'width':w,'height':h})
-              page=ctx.new_page();errs=errors_for(page)
+              ctx=browser.new_context(viewport={'width':w,'height':h}); page=ctx.new_page(); errs=errors_for(page)
               page.add_init_script("""
                 window.__bootSamples=[];
                 document.addEventListener('DOMContentLoaded',()=>{
-                  const sample=()=>{const shell=document.querySelector('.app-shell');window.__bootSamples.push({t:performance.now(),boot:document.documentElement.classList.contains('gen4-preview-booting'),vis:shell?getComputedStyle(shell).visibility:null,modal:!!document.querySelector('#qualityReleaseModal:not(.hidden)')});};
+                  const sample=()=>{const shell=document.querySelector('.app-shell');window.__bootSamples.push({boot:document.documentElement.classList.contains('gen4-preview-booting'),vis:shell?getComputedStyle(shell).visibility:null});};
                   sample();let n=0;const tick=()=>{sample();if(++n<100)requestAnimationFrame(tick)};requestAnimationFrame(tick);
                   new MutationObserver(sample).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
                 },{once:true});
@@ -93,7 +97,7 @@ jobs:
               assert card['x']>=-1 and card['y']>=-1 and card['x']+card['width']<=w+1 and card['y']+card['height']<=h+1,(label,card)
               cols=page.locator('.quality-release-points').evaluate("e=>getComputedStyle(e).gridTemplateColumns.split(' ').filter(Boolean).length")
               assert cols==(1 if w<720 else 2),(label,cols)
-              samples=page.evaluate('window.__bootSamples');bad=[s for s in samples if s.get('boot') and s.get('vis') not in (None,'hidden')]
+              bad=[s for s in page.evaluate('window.__bootSamples') if s.get('boot') and s.get('vis') not in (None,'hidden')]
               assert not bad,f'{label}: app shell visible during Gen4 boot guard: {bad[:3]}'
               assert elapsed<8.0,f'{label}: release modal slow/hanging: {elapsed:.2f}s'
               shot=f'{OUT}/modal-{label}.png';page.screenshot(path=shot,full_page=True);summary['screenshots'].append(shot)
@@ -101,32 +105,26 @@ jobs:
               assert not errs,(label,errs);ctx.close()
 
           def google_flow(browser):
-              ctx=browser.new_context(viewport={'width':1280,'height':900})
-              page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page)
-              page.locator('#profileChip').click();page.locator('#profileModal:not(.hidden)').wait_for(state='visible')
-              page.locator('#profileModeLogin').click();page.locator('#googleLoginBtn').wait_for(state='visible',timeout=5000)
-              origin_hit=[];page.on('request',lambda r:origin_hit.append(r.url) if '/api/auth/google' in r.url else None)
-              target=''
+              ctx=browser.new_context(viewport={'width':1280,'height':900});page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page);open_auth(page,'login')
+              page.locator('#googleLoginBtn').wait_for(state='visible',timeout=5000)
+              hits=[];page.on('request',lambda r:hits.append(r.url) if '/api/auth/google' in r.url else None);target=''
               try:
-                  with page.expect_popup(timeout=4000) as pi:page.locator('#googleLoginBtn').click()
+                  with page.expect_popup(timeout=5000) as pi:page.locator('#googleLoginBtn').click()
                   pop=pi.value;pop.wait_for_load_state('domcontentloaded',timeout=15000);target=pop.url;pop.close()
               except PlaywrightTimeoutError:
-                  page.wait_for_timeout(1500);target=page.url
+                  page.wait_for_timeout(1200);target=page.url
               host=urlparse(target).netloc.casefold();googleish=('google.' in host or host.endswith('google.com') or host.endswith('accounts.google.com'))
-              assert origin_hit or googleish,{'target':target,'origin_hit':origin_hit}
-              summary['checks']['google_login']={'target':target,'oauthRequests':origin_hit,'errors':errs};ctx.close()
+              assert hits or googleish,{'target':target,'oauthRequests':hits}
+              summary['checks']['google_login']={'target':target,'oauthRequests':hits,'errors':errs};ctx.close()
 
           def account_flow(browser):
-              ctx=browser.new_context(viewport={'width':1280,'height':900})
-              page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page)
+              ctx=browser.new_context(viewport={'width':1280,'height':900});page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page)
               suffix=uuid.uuid4().hex[:7];name=('QA34'+suffix)[:24];password='Qa34!'+suffix+'Smoke'
-              page.locator('#profileChip').click();page.locator('#profileModal:not(.hidden)').wait_for(state='visible')
-              page.locator('#profileModeCreate').click();page.locator('#playerNameInput').fill(name);page.locator('#playerPasswordInput').fill(password);page.locator('#saveProfileBtn').click()
+              open_auth(page,'create');page.locator('#playerNameInput').fill(name);page.locator('#playerPasswordInput').fill(password);page.locator('#saveProfileBtn').click()
               wait_py(lambda:bool(page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token")),15000,label='created account token')
               created=page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))");assert created.get('token'),created
-              page.evaluate("localStorage.removeItem('proplet-v2-profile')");page.reload(wait_until='domcontentloaded');page.wait_for_timeout(700);close_overlays(page)
-              page.locator('#profileChip').click();page.locator('#profileModal:not(.hidden)').wait_for(state='visible')
-              page.locator('#profileModeLogin').click();page.locator('#playerNameInput').fill(name);page.locator('#playerPasswordInput').fill(password);page.locator('#saveProfileBtn').click()
+              page.evaluate("localStorage.removeItem('proplet-v2-profile')");page.reload(wait_until='domcontentloaded');page.wait_for_timeout(800);close_overlays(page)
+              open_auth(page,'login');page.locator('#playerNameInput').fill(name);page.locator('#playerPasswordInput').fill(password);page.locator('#saveProfileBtn').click()
               wait_py(lambda:bool(page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token")),15000,label='password login token')
               logged=page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))");assert logged.get('token'),logged
               shot=f'{OUT}/account-login.png';page.screenshot(path=shot,full_page=True);summary['screenshots'].append(shot)
@@ -141,22 +139,21 @@ jobs:
               assert idx<kids.count(),{'idx':idx,'children':kids.count(),'total':total};return kids.nth(idx)
 
           def drag_path(page,path,total):
-              locs=[cell_for(page,int(i),total) for i in path];boxes=[l.bounding_box() for l in locs];assert all(boxes),boxes
+              boxes=[cell_for(page,int(i),total).bounding_box() for i in path];assert all(boxes),boxes
               pts=[(b['x']+b['width']/2,b['y']+b['height']/2) for b in boxes];page.mouse.move(*pts[0]);page.mouse.down()
               for pt in pts[1:]:page.mouse.move(*pt,steps=4)
-              page.mouse.up();page.wait_for_timeout(180)
+              page.mouse.up();page.wait_for_timeout(220)
 
           def gameplay_calm(browser):
-              ctx=browser.new_context(viewport={'width':1280,'height':900})
-              page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page)
-              page.locator('[data-nav="free"]').click();page.locator('#screen-free.active').wait_for(state='visible',timeout=5000)
+              ctx=browser.new_context(viewport={'width':1280,'height':900});page=ctx.new_page();errs=errors_for(page);load(page);close_overlays(page)
+              page.locator('[data-nav="free"]').first.click();page.locator('#screen-free.active').wait_for(state='visible',timeout=5000)
               wait_py(lambda:bool(page.evaluate("typeof puzzleDB!=='undefined' && puzzleDB?.free?.easy?.length")),5000,label='Gen4 free bank')
               info=page.evaluate("()=>{const p=puzzleDB.free.easy[0];startGame(p,'free');return {id:p.id,gen:p.meta?.contentGeneration,rows:p.rows,cols:p.cols,answers:p.answers.map(a=>({word:a.word,path:a.path}))}}")
               assert info['gen']==4 and info['id']!='starter-v1',info;page.locator('#screen-game.active').wait_for(state='visible',timeout=5000)
               total=info['rows']*info['cols'];assert page.locator('#board > *').count()>0
-              drag_path(page,info['answers'][0]['path'],total);wait_py(lambda:'zatím nic' not in page.locator('#foundWords').inner_text(),4000,label='first found word')
+              drag_path(page,info['answers'][0]['path'],total);wait_py(lambda:'zatím nic' not in page.locator('#foundWords').inner_text().lower(),4000,label='first found word')
               progress_before=page.locator('#gameProgress').inner_text();assert progress_before and not progress_before.startswith('0 /'),progress_before
-              page.locator('#calmRunBtn').click();page.wait_for_timeout(150)
+              page.locator('#calmRunBtn').click();page.wait_for_timeout(180)
               calm=page.evaluate("()=>({body:document.body.classList.contains('calm-run-v334'),timer:getComputedStyle(document.querySelector('#timer')).display,current:currentGame?.calmMode,button:document.querySelector('#calmRunBtn')?.classList.contains('hidden')})")
               assert calm['body'] and calm['timer']=='none' and calm['current'] is True and calm['button'],calm
               if len(info['answers'])>1:drag_path(page,info['answers'][1]['path'],total)
