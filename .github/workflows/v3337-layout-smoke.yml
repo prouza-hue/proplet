@@ -1,0 +1,75 @@
+name: v3.33.7 layout regression smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/v3337-layout-smoke.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PREVIEW_URL: https://proplet-git-hotfix-v3337-layout-r-fe51e6-pavel-prouzas-projects.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Verify portrait Fold, landscape Fold, desktop
+        shell: bash
+        run: |
+          cat > /tmp/layout_smoke.py <<'PY'
+          import os,time,json
+          from playwright.sync_api import sync_playwright
+          URL=os.environ['PREVIEW_URL']
+          CHROME=next(p for p in ['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium'] if os.path.exists(p))
+          def wait(page,expr,timeout=12000):
+              end=time.time()+timeout/1000
+              while time.time()<end:
+                  try:
+                      if page.evaluate(expr): return
+                  except: pass
+                  time.sleep(.1)
+              raise AssertionError(expr)
+          def prep(page):
+              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+              wait(page,"typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]")
+              page.evaluate("""()=>{try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');localStorage.setItem('proplet-release-notes-seen:3.33.1','1')}catch(e){};document.querySelector('#onboardingModal')?.classList.add('hidden');startGame(puzzleDB.free.medium[0],'free')}""")
+              wait(page,"document.body.classList.contains('playing')")
+              page.wait_for_timeout(800)
+          with sync_playwright() as p:
+              b=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox'])
+              out={}
+              # Fold portrait: no forced rail.
+              c=b.new_context(viewport={'width':720,'height':900},screen={'width':720,'height':900},has_touch=True,is_mobile=True)
+              pg=c.new_page();prep(pg)
+              out['portrait']=pg.evaluate("""()=>({mode:document.documentElement.dataset.gameLayoutMode,cols:getComputedStyle(document.querySelector('.game-main')).gridTemplateColumns,currentParent:document.querySelector('.current-word')?.parentElement?.className,cellRadius:getComputedStyle(document.querySelector('#board .cell')).borderRadius})""")
+              assert out['portrait']['mode']=='standard',out
+              assert len(out['portrait']['cols'].split())==1,out
+              assert 'game-board-column' in out['portrait']['currentParent'],out
+              c.close()
+              # Fold landscape: existing tablet rail remains.
+              c=b.new_context(viewport={'width':900,'height':650},screen={'width':900,'height':650},has_touch=True,is_mobile=True)
+              pg=c.new_page();prep(pg)
+              out['landscape']=pg.evaluate("""()=>({mode:document.documentElement.dataset.gameLayoutMode,cols:getComputedStyle(document.querySelector('.game-main')).gridTemplateColumns,currentParent:document.querySelector('.current-word')?.parentElement?.className})""")
+              assert out['landscape']['mode']=='tablet-landscape',out
+              assert len(out['landscape']['cols'].split())==2,out
+              assert 'game-control-column' in out['landscape']['currentParent'],out
+              c.close()
+              # Desktop: original desktop-wide rail, not 165-220px override.
+              c=b.new_context(viewport={'width':1600,'height':900},screen={'width':1600,'height':900},has_touch=False,is_mobile=False)
+              pg=c.new_page();prep(pg)
+              out['desktop']=pg.evaluate("""()=>({mode:document.documentElement.dataset.gameLayoutMode,cols:getComputedStyle(document.querySelector('.game-main')).gridTemplateColumns,currentParent:document.querySelector('.current-word')?.parentElement?.className,rail:document.querySelector('.game-control-column')?.getBoundingClientRect().width})""")
+              assert out['desktop']['mode']=='desktop-wide',out
+              assert len(out['desktop']['cols'].split())==2,out
+              assert 'game-control-column' in out['desktop']['currentParent'],out
+              assert out['desktop']['rail']>=285,out
+              print(json.dumps(out,ensure_ascii=False,indent=2));b.close()
+          PY
+          python /tmp/layout_smoke.py
