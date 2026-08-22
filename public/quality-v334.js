@@ -37,7 +37,7 @@ function toggleInfoPopover(btn){
   const pop=document.createElement('div');pop.id='qualityInfoPopover';pop.className='quality-info-popover';pop.setAttribute('role','tooltip');
   pop.innerHTML='<strong>Jak se řadí Dnešní výzva</strong>Čisté řešení → méně nápověd → čas → tahy.';
   document.body.appendChild(pop);
-  const r=btn.getBoundingClientRect();const left=Math.min(window.innerWidth-pop.offsetWidth-12,Math.max(12,r.left));
+  const r=btn.getBoundingClientRect(),left=Math.min(window.innerWidth-pop.offsetWidth-12,Math.max(12,r.left));
   pop.style.left=`${left+window.scrollX}px`;pop.style.top=`${r.bottom+8+window.scrollY}px`;setAttr(btn,'aria-expanded','true');
   setTimeout(()=>document.addEventListener('click',closeInfoPopover,{once:true}),0);
 }
@@ -52,6 +52,7 @@ function polishHierarchy(){
   compactHeading(q('#levelRoadmap')?.closest('.card'),'Dosažená hodnost');
   compactHeading(q('#achievementSummary')?.closest('.card'),'Propletené úspěchy');
   compactHeading(q('#profileBadges')?.closest('.card'),'Odznaky za věrnost');
+  q('#screen-profile .appearance-card .section-head .eyebrow')?.remove();
   qa('#screen-profile .eyebrow').forEach(el=>{if(el.textContent.trim().toUpperCase()==='TÝM'&&el.parentElement?.textContent.includes('Tým a společné pořadí'))el.remove()});
 }
 
@@ -65,25 +66,24 @@ function ensurePrivacyMini(){
   const label=privacyLabel();setText(btn,label);btn.title='Viditelnost v pořadí';setAttr(btn,'aria-label',`Pořadí: ${label}`);setDisplay(btn,calmPreference()?'none':'');
 }
 
-function calmControlMarkup(id,context){
-  const copy=context==='daily'?'Hraj dnešek bez závodu.':context==='free'?'Bez časomíry a pořadí.':'Hraj bez časomíry a pořadí. XP i postup zůstávají.';
-  return `<div class="calm-quick" id="${id}"><div><strong>🫧 Klidný režim</strong><small>${copy}</small></div><button type="button" class="calm-quick-toggle" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>`;
+function calmControlMarkup(id){
+  return `<div class="calm-quick" id="${id}"><strong>🫧 Klidný režim <span>– bez časomíry a žebříčku.</span></strong><button type="button" class="calm-quick-toggle" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>`;
 }
 function bindCalmSwitch(root){const b=root?.querySelector('.calm-quick-toggle');if(!b||b.dataset.bound==='1')return;b.dataset.bound='1';b.onclick=()=>setCalmPreference(!calmPreference())}
 function ensureQuickCalmControls(){
-  const grid=q('#difficultyCards');if(grid&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick','free'));bindCalmSwitch(q('#freeCalmQuick'))}
-  const hero=q('.daily-hero'),anchor=q('#dailySyncStatus');if(hero&&!q('#dailyCalmQuick')){const html=calmControlMarkup('dailyCalmQuick','daily');if(anchor)anchor.insertAdjacentHTML('beforebegin',html);else hero.insertAdjacentHTML('beforeend',html);bindCalmSwitch(q('#dailyCalmQuick'))}
+  const grid=q('#difficultyCards');if(grid&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick'));bindCalmSwitch(q('#freeCalmQuick'))}
+  const hero=q('.daily-hero'),anchor=q('#dailySyncStatus');if(hero&&!q('#dailyCalmQuick')){const html=calmControlMarkup('dailyCalmQuick');if(anchor)anchor.insertAdjacentHTML('beforebegin',html);else hero.insertAdjacentHTML('beforeend',html);bindCalmSwitch(q('#dailyCalmQuick'))}
 }
 function ensureCalmSettings(){
   if(q('#calmModeCard'))return;
   const sound=q('#soundToggle')?.closest('.settings-card');if(!sound)return;
   const card=document.createElement('div');card.id='calmModeCard';card.className='card settings-card calm-settings-card';
-  card.innerHTML='<div class="quality-setting-line"><span class="calm-settings-icon">🫧</span><div class="calm-settings-copy"><strong>Klidný režim</strong><small>Hraj bez časomíry a pořadí. XP i postup zůstávají.</small></div><button id="calmModeToggle" class="calm-setting-toggle" type="button" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>';
+  card.innerHTML='<div class="quality-setting-line"><span class="calm-settings-icon">🫧</span><div class="calm-settings-copy"><strong>Klidný režim</strong><small>Hraj bez časomíry a žebříčku. XP i postup zůstávají.</small></div><button id="calmModeToggle" class="calm-setting-toggle" type="button" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>';
   sound.before(card);q('#calmModeToggle',card).onclick=()=>setCalmPreference(!calmPreference());
 }
 function ensureCalmRunButton(){
   const actions=q('.game-actions');if(!actions||q('#calmRunBtn',actions))return;
-  const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.onclick=enableCalmForCurrentRun;actions.appendChild(btn);
+  const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.textContent='🫧 Přepnout do klidného režimu';btn.onclick=enableCalmForCurrentRun;actions.appendChild(btn);
 }
 function syncCalmControls(){
   const on=calmPreference();document.documentElement.classList.toggle('calm-preference-v334',on);
@@ -104,7 +104,7 @@ function applyCalmRunUi(){
   let g=null;try{g=currentGame}catch{}
   const eligible=!!g&&['daily','free'].includes(g.mode)&&!g.finished,calm=eligible&&g.calmMode===true;
   document.body.classList.toggle('calm-run-v334',calm);
-  const btn=q('#calmRunBtn');if(btn){btn.classList.toggle('hidden',!eligible);btn.classList.toggle('on',calm);btn.disabled=calm;setText(btn,calm?'🫧 Klidný režim':'🫧 Přepnout do klidu')}
+  const btn=q('#calmRunBtn');if(btn){btn.classList.toggle('hidden',!eligible||calm);btn.disabled=false}
 }
 function calmForPayload(body,path){
   let calm=pendingCalmLaunch===true;
@@ -114,7 +114,7 @@ function calmForPayload(body,path){
 }
 function installNetworkCalmFlag(){
   if(typeof api!=='function'||api.__calmWrapped)return;
-  const base=api;const wrapped=async function(path,opts={}){
+  const base=api,wrapped=async function(path,opts={}){
     if((path==='/api/result'||path==='/api/attempt/start'||path==='/api/attempt/checkpoint'||path==='/api/attempt/finish')&&opts?.body){try{const body=JSON.parse(opts.body);body.calm_mode=calmForPayload(body,path);opts={...opts,body:JSON.stringify(body)}}catch{}}
     return base(path,opts);
   };wrapped.__calmWrapped=true;api=wrapped;
@@ -124,34 +124,35 @@ function applyCalmWin(g){
   const details=q('#winDetails');if(details&&!q('.calm-win-note',details))details.insertAdjacentHTML('afterbegin','<div class="calm-win-note">🫧 Hráno v klidu · XP a postup se počítají, pořadí ne.</div>');
 }
 function installGameWrappers(){
-  if(typeof startGame==='function'&&!startGame.__calmWrapped){const base=startGame;const wrapped=function(puzzle,mode,dailyDate,options={}){let restored=null;try{restored=typeof savedProgressFor==='function'?savedProgressFor(puzzle,mode,dailyDate):null}catch{}const eligible=mode==='daily'||mode==='free',calm=eligible&&(restored?.calmMode===true||options?.calmMode===true||calmPreference());pendingCalmLaunch=calm;try{const out=base(puzzle,mode,dailyDate,options);try{if(currentGame&&eligible)currentGame.calmMode=calm}catch{}applyCalmRunUi();return out}finally{pendingCalmLaunch=false}};wrapped.__calmWrapped=true;startGame=wrapped}
-  if(typeof saveGameProgress==='function'&&!saveGameProgress.__calmWrapped){const base=saveGameProgress;const wrapped=function(...args){const out=base(...args);saveCalmIntoProgress();return out};wrapped.__calmWrapped=true;saveGameProgress=wrapped}
-  if(typeof queueResult==='function'&&!queueResult.__calmWrapped){const base=queueResult;const wrapped=function(rec){let calm=false;try{calm=!!(currentGame&&currentGame.attemptId===rec?.attemptId&&currentGame.calmMode)}catch{}if(rec)rec.calmMode=calm;const out=base(rec);try{const s=getState(),stored=s.completed?.[rec.challengeKey];if(stored&&stored.attemptId===rec.attemptId){stored.calmMode=calm;saveState(s)}}catch{}return out};wrapped.__calmWrapped=true;queueResult=wrapped}
-  if(typeof loadWinLevelLeaderboard==='function'&&!loadWinLevelLeaderboard.__calmWrapped){const base=loadWinLevelLeaderboard;const wrapped=async function(puzzle,rec){if(rec?.calmMode===true||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(puzzle,rec)};wrapped.__calmWrapped=true;loadWinLevelLeaderboard=wrapped}
-  if(typeof loadWinDailyGlobalLeaderboard==='function'&&!loadWinDailyGlobalLeaderboard.__calmWrapped){const base=loadWinDailyGlobalLeaderboard;const wrapped=async function(date,rec){if(calmPreference()||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(date,rec)};wrapped.__calmWrapped=true;loadWinDailyGlobalLeaderboard=wrapped}
-  if(typeof finishGame==='function'&&!finishGame.__calmWrapped){const base=finishGame;const wrapped=async function(...args){let g=null;try{g=currentGame}catch{}const out=await base(...args);if(g?.calmMode)applyCalmWin(g);applyCalmRunUi();return out};wrapped.__calmWrapped=true;finishGame=wrapped}
-  if(typeof showDailyResult==='function'&&!showDailyResult.__calmWrapped){const base=showDailyResult;const wrapped=function(date,rec,...rest){const out=base(date,rec,...rest);if(rec?.calmMode===true)applyCalmWin(rec);return out};wrapped.__calmWrapped=true;showDailyResult=wrapped}
+  if(typeof startGame==='function'&&!startGame.__calmWrapped){const base=startGame,wrapped=function(puzzle,mode,dailyDate,options={}){let restored=null;try{restored=typeof savedProgressFor==='function'?savedProgressFor(puzzle,mode,dailyDate):null}catch{}const eligible=mode==='daily'||mode==='free',calm=eligible&&(restored?.calmMode===true||options?.calmMode===true||calmPreference());pendingCalmLaunch=calm;try{const out=base(puzzle,mode,dailyDate,options);try{if(currentGame&&eligible)currentGame.calmMode=calm}catch{}applyCalmRunUi();return out}finally{pendingCalmLaunch=false}};wrapped.__calmWrapped=true;startGame=wrapped}
+  if(typeof saveGameProgress==='function'&&!saveGameProgress.__calmWrapped){const base=saveGameProgress,wrapped=function(...args){const out=base(...args);saveCalmIntoProgress();return out};wrapped.__calmWrapped=true;saveGameProgress=wrapped}
+  if(typeof queueResult==='function'&&!queueResult.__calmWrapped){const base=queueResult,wrapped=function(rec){let calm=false;try{calm=!!(currentGame&&currentGame.attemptId===rec?.attemptId&&currentGame.calmMode)}catch{}if(rec)rec.calmMode=calm;const out=base(rec);try{const s=getState(),stored=s.completed?.[rec.challengeKey];if(stored&&stored.attemptId===rec.attemptId){stored.calmMode=calm;saveState(s)}}catch{}return out};wrapped.__calmWrapped=true;queueResult=wrapped}
+  if(typeof loadWinLevelLeaderboard==='function'&&!loadWinLevelLeaderboard.__calmWrapped){const base=loadWinLevelLeaderboard,wrapped=async function(puzzle,rec){if(rec?.calmMode===true||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(puzzle,rec)};wrapped.__calmWrapped=true;loadWinLevelLeaderboard=wrapped}
+  if(typeof loadWinDailyGlobalLeaderboard==='function'&&!loadWinDailyGlobalLeaderboard.__calmWrapped){const base=loadWinDailyGlobalLeaderboard,wrapped=async function(date,rec){if(calmPreference()||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(date,rec)};wrapped.__calmWrapped=true;loadWinDailyGlobalLeaderboard=wrapped}
+  if(typeof finishGame==='function'&&!finishGame.__calmWrapped){const base=finishGame,wrapped=async function(...args){let g=null;try{g=currentGame}catch{}const out=await base(...args);if(g?.calmMode)applyCalmWin(g);applyCalmRunUi();return out};wrapped.__calmWrapped=true;finishGame=wrapped}
+  if(typeof showDailyResult==='function'&&!showDailyResult.__calmWrapped){const base=showDailyResult,wrapped=function(date,rec,...rest){const out=base(date,rec,...rest);if(rec?.calmMode===true)applyCalmWin(rec);return out};wrapped.__calmWrapped=true;showDailyResult=wrapped}
 }
 
 async function enrichPlayedLevels(diff){
   const list=q('#playedLevelsList'),meta=q('#playedLevelsMeta');if(!list)return;
   let data=null;try{const p=safeProfile();if(p?.token&&typeof api==='function')data=await api(`/api/played-levels?difficulty=${encodeURIComponent(diff)}`)}catch{}
-  const legacy=data?.legacyLevels||[];const transferred=Number(data?.transferred||0);
+  const legacy=data?.legacyLevels||[],transferred=Number(data?.transferred||0);
   if(meta&&data)setText(meta,`Postup ${Number(data.completed||0)}/${Number(data.total||0)}${transferred?` · ${transferred} převedeno`:''}`);
   q('.legacy-history-v334',list)?.remove();if(!legacy.length)return;
   const section=document.createElement('section');section.className='legacy-history-v334';
   section.innerHTML=`<h3>Dříve odehrané</h3><p>Tvoje starší výsledky zůstávají v historii. Původní desky už nemusí být znovu hratelné.</p>${legacy.slice().sort((a,b)=>(a.level||0)-(b.level||0)).map(r=>`<div class="legacy-history-row"><span class="level-index">${Number(r.level)||'–'}.</span><span><strong>${r.elapsedMs&&typeof fmtTime==='function'?fmtTime(r.elapsedMs):'Dokončeno'}</strong><small>${r.cleanSolve?'✨ Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Dokončeno'} · ${Number(r.moves||0)} tahů${r.calmMode?' · 🫧 Klid':''}</small></span><em>archiv</em></div>`).join('')}`;
   list.appendChild(section);
 }
-function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openPlayedLevels.__qualityWrapped){const base=openPlayedLevels;const wrapped=async function(diff){const out=await base(diff);await enrichPlayedLevels(diff);return out};wrapped.__qualityWrapped=true;openPlayedLevels=wrapped}}
+function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openPlayedLevels.__qualityWrapped){const base=openPlayedLevels,wrapped=async function(diff){const out=await base(diff);await enrichPlayedLevels(diff);return out};wrapped.__qualityWrapped=true;openPlayedLevels=wrapped}}
 
 function transferredCount(){try{return Object.keys(DIFF).reduce((sum,d)=>sum+localFreeSlotState(d).transferred.size,0)}catch{return 0}}
 function releaseModalStorage(){return window.PROPLET_RUNTIME_META?.gen4CandidatePreview?sessionStorage:localStorage}
 function shouldShowReleaseModal(){try{const gen=Number(puzzleDB?.freeGeneration||puzzleDB?.contentGeneration||0);return gen>=4&&!releaseModalStorage().getItem(GEN4_MODAL_KEY)}catch{return false}}
-function closeReleaseModal(){q('#qualityReleaseModal')?.classList.add('hidden');try{releaseModalStorage().setItem(GEN4_MODAL_KEY,'1')}catch{}}
+function revealApp(){document.documentElement.classList.remove('gen4-preview-booting')}
+function closeReleaseModal(){q('#qualityReleaseModal')?.classList.add('hidden');try{releaseModalStorage().setItem(GEN4_MODAL_KEY,'1')}catch{}revealApp()}
 function renderReleaseMain(){
   const card=q('#qualityReleaseCard');if(!card)return;
-  card.innerHTML='<div class="quality-release-art" aria-hidden="true"><span class="quality-release-tile">P</span><span class="quality-release-tile">L</span><span class="quality-release-tile">T</span></div><h2 id="qualityReleaseTitle">Nové úrovně jsou tady</h2><p class="quality-release-lead"><strong>Víc zábavy, menší frustrace!</strong>Vyladili jsme obtížnost a komplet předělali všechny úrovně.</p><div class="quality-release-points"><div class="quality-release-point"><span>🧩</span><strong>800 nových volných úrovní</strong></div><div class="quality-release-point"><span>🎯</span><strong>Vyladěná obtížnost napříč všemi režimy</strong></div><div class="quality-release-point"><span>🛡️</span><strong>Tvé XP, postup, historie i odznaky zůstávají</strong></div></div><button id="qualityReleasePlay" class="quality-release-primary" type="button">Jdu si zahrát!</button><button id="qualityReleaseArchive" class="quality-release-link" type="button">Jak se změnil archiv a postup</button>';
+  card.innerHTML='<div class="quality-release-art" aria-hidden="true"><span class="quality-release-tile">P</span><span class="quality-release-tile">L</span><span class="quality-release-tile">T</span></div><h2 id="qualityReleaseTitle">Nové úrovně jsou tady!</h2><p class="quality-release-lead">Vyladěná obtížnost pro více zábavy</p><div class="quality-release-points"><div class="quality-release-point"><span>🧩</span><strong>800 nových volných úrovní</strong></div><div class="quality-release-point"><span>🎯</span><strong>Vyladěná obtížnost napříč všemi režimy</strong></div><div class="quality-release-point"><span>🛡️</span><strong>Tvé XP, postup, historie i odznaky zůstávají</strong></div><div class="quality-release-point"><span>🫧</span><strong>Klidný režim, když si chceš oddechnout od žebříčku</strong></div></div><button id="qualityReleasePlay" class="quality-release-primary" type="button">Jdu si zahrát!</button><button id="qualityReleaseArchive" class="quality-release-link" type="button">Jak se změnil archiv a postup</button>';
   q('#qualityReleasePlay').onclick=closeReleaseModal;q('#qualityReleaseArchive').onclick=renderArchiveExplainer;
 }
 function renderArchiveExplainer(){
@@ -160,15 +161,19 @@ function renderArchiveExplainer(){
   q('#qualityReleaseBack').onclick=renderReleaseMain;q('#qualityReleaseDone').onclick=closeReleaseModal;
 }
 function ensureReleaseModal(){if(q('#qualityReleaseModal'))return;const modal=document.createElement('div');modal.id='qualityReleaseModal';modal.className='quality-modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','qualityReleaseTitle');modal.innerHTML='<div id="qualityReleaseCard" class="quality-release-card"></div>';document.body.appendChild(modal);modal.onclick=e=>{if(e.target===modal)closeReleaseModal()};renderReleaseMain()}
-function maybeShowReleaseModal(){ensureReleaseModal();if(shouldShowReleaseModal())q('#qualityReleaseModal')?.classList.remove('hidden')}
-
-function polish(){
-  polishQueued=false;polishHierarchy();ensurePrivacyMini();ensureQuickCalmControls();ensureCalmSettings();ensureCalmRunButton();syncCalmControls();
+function maybeShowReleaseModal(){
+  ensureReleaseModal();
+  if(!puzzleDB)return;
+  if(shouldShowReleaseModal())q('#qualityReleaseModal')?.classList.remove('hidden');
+  revealApp();
 }
+
+function polish(){polishQueued=false;polishHierarchy();ensurePrivacyMini();ensureQuickCalmControls();ensureCalmSettings();ensureCalmRunButton();syncCalmControls()}
 function schedulePolish(delay=0){if(polishQueued&&delay===0)return;polishQueued=true;setTimeout(polish,delay)}
 function bootQuality(){
   installNetworkCalmFlag();installGameWrappers();installHistoryWrapper();polish();
-  [250,700,1500,3000].forEach(ms=>setTimeout(()=>{polish();maybeShowReleaseModal()},ms));
+  [120,300,700,1500,3000].forEach(ms=>setTimeout(()=>{polish();maybeShowReleaseModal()},ms));
+  setTimeout(revealApp,4200);
   document.addEventListener('click',e=>{if(e.target.closest('[data-nav],#profileChip,#saveProfileBtn,#acceptRankingPrivacyBtn,#hideRankingPrivacyBtn'))schedulePolish(80)});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfoPopover();if(!q('#qualityReleaseModal')?.classList.contains('hidden'))closeReleaseModal()}});
 }
