@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.00.1-shell';
+const SHELL_CACHE='proplet-v4.00.2-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js'];
@@ -35,6 +35,11 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   const keep=new Set([SHELL_CACHE,DATA_CACHE]);
   await caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&!keep.has(k)).map(k=>caches.delete(k))));
   await self.clients.claim();
+  // v4.00.1 could show its update banner after the new worker had already
+  // activated, leaving its button with no waiting worker to promote. This
+  // one-time handover actively refreshes controlled windows onto the P0 fix.
+  const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  await Promise.all(clients.map(client=>client.navigate(client.url).catch(()=>null)));
 })()));
 
 async function networkFirst(request,cacheName,fallback){

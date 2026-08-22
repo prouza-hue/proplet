@@ -10,10 +10,10 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (root / "proplet_version.py").read_text(encoding="utf-8")
 vercel = json.loads((root / "vercel.json").read_text(encoding="utf-8"))
 
-assert 'APP_VERSION = "4.00.1"' in version
-assert "version:'4.00.1'" in runtime
+assert 'APP_VERSION = "4.00.2"' in version
+assert "version:'4.00.2'" in runtime
 assert "pwaStartupHotfixV4001:true" in runtime
-assert "const SHELL_CACHE='proplet-v4.00.1-shell'" in sw
+assert "const SHELL_CACHE='proplet-v4.00.2-shell'" in sw
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)
@@ -25,7 +25,7 @@ for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.pn
 
 assert "preserveExistingPuzzleDatabase" in sw
 assert "caches.match('/puzzles.json',{ignoreSearch:true})" in sw
-assert "client.navigate(client.url)" not in sw
+assert "client.navigate(client.url)" in sw
 assert "cacheFirst(e.request)" in sw
 assert "fetch(e.request,{cache:'no-store'}).then" not in sw
 
@@ -34,4 +34,4 @@ assert len(sw_headers) == 1
 cache_control = [h["value"] for h in sw_headers[0]["headers"] if h["key"].lower() == "cache-control"]
 assert cache_control == ["no-cache, no-store, must-revalidate"]
 
-print("Proplet v4.00.1 PWA startup contract: OK")
+print("Proplet v4.00.2 PWA startup contract: OK")
