@@ -1,0 +1,10 @@
+/* v3.34 preview/release hotfixes: ranking privacy indicator + read-only preview guard. */
+html.gen4-preview-no-ranking-privacy #rankingPrivacyModal{display:none!important}
+
+@media (max-width:520px){
+  .ranking-privacy-mini::first-letter{font-size:0!important}
+  .ranking-privacy-mini::before{content:'👀';font-size:17px;line-height:1;display:block}
+  .ranking-privacy-mini[aria-label*='Anonymně']::before,
+  .ranking-privacy-mini[aria-label*='Soukromě']::before{content:'🎭'}
+  .ranking-privacy-mini[aria-label*='Veřejně']::before{content:'👀'}
+}
