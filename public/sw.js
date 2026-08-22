@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.00.1-shell';
+const SHELL_CACHE='proplet-v4.00.2-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js'];
@@ -28,9 +28,13 @@ async function preserveExistingPuzzleDatabase(){
 }
 
 self.addEventListener('install',e=>{
-  e.waitUntil(Promise.all([precacheShell(),preserveExistingPuzzleDatabase()]).then(()=>self.skipWaiting()));
+  // The visible update button performs the handover. Staying in "waiting" is
+  // required so clients still running v4.00.1 can send SKIP_WAITING successfully.
+  e.waitUntil(Promise.all([precacheShell(),preserveExistingPuzzleDatabase()]));
 });
-self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting()});
+self.addEventListener('message',e=>{
+  if(e.data?.type==='SKIP_WAITING')e.waitUntil(self.skipWaiting());
+});
 self.addEventListener('activate',e=>e.waitUntil((async()=>{
   const keep=new Set([SHELL_CACHE,DATA_CACHE]);
   await caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&!keep.has(k)).map(k=>caches.delete(k))));
@@ -40,21 +44,24 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
 async function networkFirst(request,cacheName,fallback){
   try{return await putIfOk(cacheName,request,await fetch(request))}
   catch{
-    const cached=await caches.match(request,{ignoreSearch:request.mode==='navigate'});
+    const cache=await caches.open(cacheName);
+    const cached=await cache.match(request,{ignoreSearch:request.mode==='navigate'});
     if(cached)return cached;
-    if(fallback)return (await caches.match(fallback))||Response.error();
+    if(fallback)return (await cache.match(fallback))||Response.error();
     return Response.error();
   }
 }
 
 async function cacheFirst(request){
-  const cached=await caches.match(request);
+  const cache=await caches.open(SHELL_CACHE);
+  const cached=await cache.match(request);
   if(cached)return cached;
   return putIfOk(SHELL_CACHE,request,await fetch(request));
 }
 
 async function staleWhileRevalidate(event){
-  const cached=await caches.match(event.request);
+  const cache=await caches.open(DATA_CACHE);
+  const cached=await cache.match(event.request);
   const refresh=fetch(event.request,{cache:'no-store'}).then(r=>putIfOk(DATA_CACHE,event.request,r));
   if(cached){event.waitUntil(refresh.catch(()=>{}));return cached}
   return refresh;
