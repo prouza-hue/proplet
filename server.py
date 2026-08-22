@@ -4154,8 +4154,8 @@ def daily_global_leaderboard(
     ranked = sorted(by_player.values(), key=lambda row: (
         0 if row.get("clean_solve") is True else 1,
         int(row.get("hints_used") or 0),
-        int(row.get("best_elapsed_ms") or 10**12),
-        int(row.get("best_moves") or 10**9),
+        int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 10**12),
+        int(row.get("moves") or row.get("best_moves") or 10**9),
         completion_time(row),
         str(row.get("player_id") or ""),
     ))
