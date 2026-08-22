@@ -1,7 +1,7 @@
 name: v3.34 one-shot quality patch
 
 # Run once from the same-repository PR, apply the deterministic quality patch,
-# validate it, then delete this workflow and its temporary patch scripts. Final patcher retry.
+# validate it, then delete this workflow and its temporary patch scripts. Persistence retry.
 on:
   pull_request:
     branches:
