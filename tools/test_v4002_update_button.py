@@ -18,6 +18,7 @@ assert "$('#applyUpdateBtn').onclick=()=>{if(!pendingSW)return" not in app
 
 install_block = re.search(r"self\.addEventListener\('install'.*?\n\}\);", sw, re.S)
 assert install_block and "skipWaiting" not in install_block.group(0)
-assert "if(e.data?.type==='SKIP_WAITING')self.skipWaiting()" in sw
+assert "if(e.data?.type==='SKIP_WAITING')e.waitUntil(self.skipWaiting())" in sw
+assert "const cache=await caches.open(SHELL_CACHE)" in sw
 
 print("Proplet v4.00.2 update-button contract: OK")
