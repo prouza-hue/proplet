@@ -1,11 +1,9 @@
-/* Proplet v3.33.7 — production P0 layout correction. */
+/* Production P0 fixes carried into the v3.34 preview. */
 
-/* Keep board cells rounded-square at every fitted cell size. Fixed pixel radii can turn
-   compressed web-viewport cells into circles; a proportional radius preserves geometry. */
+/* Keep board cells rounded-square at every fitted cell size. */
 body.playing .board .cell{border-radius:24%}
 body.playing .board.dense-board .cell{border-radius:22%}
 body.playing .board.ultra-board .cell{border-radius:20%}
 
-/* IMPORTANT: rail composition remains owned by the existing device/orientation classifier.
-   Do not force a side rail from width alone: portrait Fold and desktop both have different
-   DOM movement/layout contracts and are broken by a generic min-width override. */
+/* Rail composition intentionally remains owned by game-layout-v3330.js and its existing
+   portrait / Fold-landscape / desktop contracts. Do not force a side rail from width alone. */

@@ -7,9 +7,12 @@
     'proplet-pavel-prouzas-projects.vercel.app',
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
+  const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
+  if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'3.33.7',
+    version:'4.00.0',
     canonicalOrigin,
+    gen4CandidatePreview,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
       tabletLandscapeReflow:true,
@@ -45,7 +48,16 @@
       accountBonusLeaderboardExcluded:true,
       growthReleaseNotes:true,
       returningPlayerOnboardingSkip:true,
-      onboardingLoginEscape:true
+      onboardingLoginEscape:true,
+      gen4ReleaseQualityPass:true,
+      calmMode:true,
+      calmModeLeaderboardExcluded:true,
+      gen4ProgressArchiveUx:true,
+      gen4FlashFreeBoot:true,
+      gen4PreviewAuthTesting:true,
+      canonicalStarterPinned:true,
+      mobileRankingPrivacyIconFix:true,
+      forcedClientUpdateV400:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
@@ -68,21 +80,30 @@
     }
   }
 
-  const loadP0Hotfix=()=>{
-    if(!document.querySelector('link[data-proplet-p0-v3336]')){
-      const link=document.createElement('link');
-      link.rel='stylesheet';
-      link.href='/p0-hotfix-v3336.css';
-      link.dataset.propletP0V3336='1';
-      document.head.appendChild(link);
-    }
-    if(!document.querySelector('script[data-proplet-p0-v3336]')){
-      const script=document.createElement('script');
-      script.src='/p0-hotfix-v3336.js';
-      script.dataset.propletP0V3336='1';
-      document.body.appendChild(script);
-    }
+  const loadStyle=(href,key)=>{
+    if(document.querySelector(`link[data-${key}]`))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    link.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';
+    document.head.appendChild(link);
   };
+
+  const loadScript=(src,key)=>{
+    if(document.querySelector(`script[data-${key}]`))return;
+    const script=document.createElement('script');
+    script.src=src;
+    script.async=false;
+    script.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';
+    document.body.appendChild(script);
+  };
+
+  const loadP0Hotfix=()=>{
+    loadStyle('/p0-hotfix-v3336.css','proplet-p0-v3336');
+    loadScript('/p0-hotfix-v3336.js','proplet-p0-v3336');
+  };
+
+  const loadQualityHotfix=()=>loadStyle('/quality-hotfix-v334.css','proplet-quality-hotfix-v334');
 
   const loadPushOriginGuard=()=>{
     if(legacyOriginSession)return;
@@ -93,7 +114,7 @@
     script.dataset.propletPushOrigin='1';
     document.body.appendChild(script);
   };
-  const bootRuntimeExtras=()=>{loadP0Hotfix();loadPushOriginGuard()};
+  const bootRuntimeExtras=()=>{loadP0Hotfix();loadQualityHotfix();loadPushOriginGuard()};
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',bootRuntimeExtras,{once:true});
   else bootRuntimeExtras();
 })();

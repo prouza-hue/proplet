@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "kind": "gen4-release-candidate-manifest",
+  "contentGeneration": 4,
+  "activation": "paused",
+  "runtimePuzzleCount": 1196,
+  "rollingPuzzleCount": 65,
+  "totalPuzzleCount": 1261,
+  "counts": {
+    "starter": 1,
+    "rescue": 30,
+    "free": {
+      "easy": 200,
+      "medium": 200,
+      "hard": 200,
+      "hardcore": 200
+    },
+    "daily": {
+      "easy": 105,
+      "medium": 156,
+      "hard": 104
+    },
+    "rolling": {
+      "easy": 17,
+      "medium": 16,
+      "hard": 16,
+      "hardcore": 16
+    }
+  },
+  "duplicateIds": 0,
+  "duplicateBoardHashes": 0,
+  "legacyPuzzleBodiesInRuntime": false,
+  "targetCooldownPolicy": {
+    "free": {
+      "easy": 3,
+      "medium": 8,
+      "hard": 12,
+      "hardcore": 12
+    },
+    "rescue": 3,
+    "daily": 5,
+    "rollingWithinBatch": 4
+  }
+}

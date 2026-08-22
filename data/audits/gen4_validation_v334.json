@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "gen4_full/puzzles-gen4-candidate.json",
+  "puzzleCount": 1261,
+  "difficultyCounts": {
+    "easy": 323,
+    "medium": 372,
+    "hard": 320,
+    "hardcore": 216,
+    "rescue": 30
+  },
+  "excludedTargets": 42,
+  "duplicateIds": 0,
+  "duplicateBoardHashes": 0,
+  "approvedRelease": false,
+  "errors": [],
+  "ok": true
+}

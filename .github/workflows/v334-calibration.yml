@@ -1,0 +1,261 @@
+name: v3.34 Generation 4 contract
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/target_generation_exclusions_v334.json'
+      - 'data/gen4_profiles_v334.json'
+      - 'data/rolling_content_v1.json'
+      - 'server.py'
+      - 'public/app.js'
+      - 'public/runtime-meta.js'
+      - 'public/quality-v334.js'
+      - 'public/quality-v334.css'
+      - 'public/sw.js'
+      - 'data/puzzles_gen4_candidate_v334.json'
+      - 'data/rolling_content_gen4_candidate_v334.json'
+      - 'tools/generate_v334_calibration.py'
+      - 'tools/generate_v334_calibration_v3.py'
+      - 'tools/validate_v334_calibration_v3.py'
+      - 'tools/audit_v334_difficulty.py'
+      - 'tools/review_v334_lexicon.py'
+      - 'tools/measure_gen4_ambiguity.py'
+      - 'tools/validate_gen4_release.py'
+      - 'tools/build_gen4_archive.py'
+      - 'tools/build_gen4_catalog_sql.py'
+      - 'tools/generate_gen4_candidates.py'
+      - 'tools/assemble_gen4_release.py'
+      - 'tools/bind_gen4_release.py'
+      - 'content_archive.py'
+      - 'tools/test_v334_rolling_pause.py'
+      - 'tools/test_gen4_preview_readonly.py'
+      - 'tools/test_gen4_content_archive.py'
+      - 'tools/test_gen4_progress_migration.py'
+      - 'tools/test_gen4_release_binder.py'
+      - 'tools/test_gen4_preview_runtime_meta.js'
+      - 'tools/test_v334_quality_release.py'
+      - 'SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql'
+      - 'SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql'
+      - 'docs/SPRINT_V3_34_DIFFICULTY_CALIBRATION.md'
+      - '.github/workflows/v334-calibration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calibration:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Syntax check
+        run: |
+          python -m py_compile tools/generate_v334_calibration.py
+          python -m py_compile tools/generate_v334_calibration_v3.py
+          python -m py_compile tools/validate_v334_calibration_v3.py
+          python -m py_compile tools/audit_v334_difficulty.py
+          python -m py_compile tools/review_v334_lexicon.py
+
+      - name: Audit current Generation 3
+        run: |
+          mkdir -p /tmp/v334
+          python tools/audit_v334_difficulty.py \
+            --source data/puzzles.json \
+            --json /tmp/v334/gen3-audit.json
+
+      - name: Generate frozen V3 calibration fixture
+        run: |
+          python tools/generate_v334_calibration_v3.py \
+            --medium 6 \
+            --hard 4 \
+            --output /tmp/v334/calibration-v3.json
+
+      - name: Validate V3 playtest contract
+        run: python tools/validate_v334_calibration_v3.py /tmp/v334/calibration-v3.json
+
+      - name: Audit calibration bank
+        run: |
+          python tools/audit_v334_difficulty.py \
+            --source /tmp/v334/calibration-v3.json \
+            --json /tmp/v334/gen4-calibration-v3-audit.json
+
+      - name: Build lexicon review shortlist
+        run: |
+          python tools/review_v334_lexicon.py \
+            --output /tmp/v334/V334_LEXICON_REVIEW_CANDIDATES.md \
+            --limit 70
+
+      - name: Upload calibration evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v334-calibration-lab-v3
+          path: /tmp/v334/
+          if-no-files-found: error
+          retention-days: 14
+
+  gen4-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned runtime test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Syntax check Gen4 release tooling
+        run: |
+          python -m py_compile tools/measure_gen4_ambiguity.py
+          python -m py_compile tools/validate_gen4_release.py
+          python -m py_compile tools/build_gen4_archive.py
+          python -m py_compile tools/build_gen4_catalog_sql.py
+          python -m py_compile tools/generate_gen4_candidates.py
+          python -m py_compile tools/assemble_gen4_release.py
+          python -m py_compile tools/bind_gen4_release.py
+          python -m py_compile content_archive.py
+          python -m py_compile tools/test_v334_rolling_pause.py
+          python -m py_compile tools/test_gen4_preview_readonly.py
+          python -m py_compile tools/test_gen4_content_archive.py
+          python -m py_compile tools/test_gen4_progress_migration.py
+          python -m py_compile tools/test_gen4_release_binder.py
+          python -m py_compile tools/test_v334_quality_release.py
+          node --check public/app.js
+          node --check public/quality-v334.js
+          node --check public/runtime-meta.js
+          node --check tools/test_gen4_preview_runtime_meta.js
+
+      - name: Verify Gen3 rolling release is paused
+        run: python tools/test_v334_rolling_pause.py
+
+      - name: Verify branch-scoped Gen4 preview is read-only
+        run: python tools/test_gen4_preview_readonly.py
+
+      - name: Verify zero-round-trip preview routing metadata
+        run: node tools/test_gen4_preview_runtime_meta.js
+
+      - name: Verify release-quality UX, archive and Calm Mode contract
+        run: python tools/test_v334_quality_release.py
+
+      - name: Verify exact and metadata-only archive lineage
+        run: python tools/test_gen4_content_archive.py
+
+      - name: Verify Daily and Free progress migration
+        run: python tools/test_gen4_progress_migration.py
+
+      - name: Verify approval-only release binder
+        run: python tools/test_gen4_release_binder.py
+
+      - name: Measure calibrated local ambiguity
+        run: |
+          mkdir -p /tmp/gen4-contract
+          python tools/measure_gen4_ambiguity.py public/calibration-v334.json \
+            --lexicon data/answer_tiers.json \
+            --output /tmp/gen4-contract/ambiguity-v3.json
+
+      - name: Validate frozen fixture through release validator
+        run: |
+          python tools/validate_gen4_release.py public/calibration-v334.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --allow-calibration-ids \
+            --report /tmp/gen4-contract/release-contract-v3.json
+
+      - name: Validate committed complete paused Gen4 candidate
+        run: |
+          python tools/validate_gen4_release.py data/puzzles_gen4_candidate_v334.json \
+            --rolling data/rolling_content_gen4_candidate_v334.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --strict-counts \
+            --report /tmp/gen4-contract/full-candidate-validation.json
+
+      - name: Rehearse metadata catalog and cold archive
+        run: |
+          python tools/build_gen4_archive.py data/puzzles.json \
+            --rolling data/rolling_content_v1.json \
+            --catalog /tmp/gen4-contract/content-catalog.json \
+            --cold-dir /tmp/gen4-contract/cold
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          catalog = json.loads(Path('/tmp/gen4-contract/content-catalog.json').read_text())
+          assert catalog['contentCount'] > 0
+          forbidden = {'letters', 'answers', 'path'}
+          assert not forbidden.intersection(json.dumps(catalog).casefold().split('"'))
+          print(f"Catalog clean: {catalog['contentCount']} immutable contents, {catalog['contextCount']} contexts")
+          PY
+
+      - name: Upload Gen4 contract evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v334-gen4-contract
+          path: /tmp/gen4-contract/
+          if-no-files-found: error
+          retention-days: 30
+
+  gen4-smoke:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - difficulty: easy
+            level: 1
+          - difficulty: medium
+            level: 2
+          - difficulty: hard
+            level: 1
+          - difficulty: hardcore
+            level: 1
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate one production-shaped candidate
+        run: |
+          mkdir -p /tmp/gen4-smoke
+          python tools/generate_gen4_candidates.py \
+            --bank free \
+            --difficulty ${{ matrix.difficulty }} \
+            --count 1 \
+            --start-level ${{ matrix.level }} \
+            --seed $((20260822 + ${{ matrix.level }})) \
+            --output /tmp/gen4-smoke/${{ matrix.difficulty }}.json
+
+      - name: Validate candidate contract
+        run: |
+          python tools/validate_gen4_release.py /tmp/gen4-smoke/${{ matrix.difficulty }}.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --report /tmp/gen4-smoke/${{ matrix.difficulty }}-validation.json
+
+      - name: Upload smoke candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: v334-gen4-smoke-${{ matrix.difficulty }}
+          path: /tmp/gen4-smoke/
+          if-no-files-found: error
+          retention-days: 14

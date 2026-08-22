@@ -1,0 +1,138 @@
+name: v3.34 canonical starter onboarding smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  starter-onboarding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PREVIEW_URL: https://proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser driver
+        run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Verify canonical starter UI and guidance
+        shell: bash
+        run: |
+          cat > /tmp/starter_smoke.py <<'PY'
+          import json, os, time
+          from playwright.sync_api import sync_playwright
+
+          URL=os.environ['PREVIEW_URL'].rstrip('/')
+          CHROME=next((p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p)),None)
+          assert CHROME, 'Chrome/Chromium not present on runner'
+          OUT='/tmp/proplet-starter-smoke'; os.makedirs(OUT,exist_ok=True)
+
+          def wait_until(fn, timeout=10000, label='condition'):
+              deadline=time.time()+timeout/1000
+              last=None
+              while time.time()<deadline:
+                  try:
+                      last=fn()
+                      if last:return last
+                  except Exception as exc:last=repr(exc)
+                  time.sleep(.1)
+              raise AssertionError(f'timeout waiting for {label}; last={last!r}')
+
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
+              ctx=browser.new_context(viewport={'width':1440,'height':900})
+              page=ctx.new_page(); errors=[]
+              page.on('pageerror',lambda e:errors.append('pageerror: '+str(e)))
+              page.on('console',lambda m:errors.append('console: '+m.text) if m.type=='error' else None)
+              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+              page.locator('body').wait_for(state='attached',timeout=10000)
+              wait_until(lambda:page.evaluate("typeof startStarter==='function' && typeof puzzleDB!=='undefined' && !!puzzleDB?.starter"),12000,'starter runtime')
+
+              # Remove unrelated overlays, then enter the real product starter path.
+              page.evaluate("""
+                try{sessionStorage.setItem('proplet-gen4-release-modal-v1','1')}catch(e){}
+                document.querySelector('#qualityReleaseModal')?.classList.add('hidden');
+                document.querySelector('#onboardingModal')?.classList.add('hidden');
+                document.querySelector('.release-notes-v3331-backdrop')?.remove();
+                document.body.classList.remove('release-notes-v3331-open');
+                startStarter();
+              """)
+              page.locator('#screen-game.active').wait_for(state='visible',timeout=5000)
+              page.locator('#starterCoach:not(.hidden)').wait_for(state='visible',timeout=5000)
+              page.wait_for_timeout(300)
+
+              state=page.evaluate("""()=>({
+                mode:currentGame?.mode,
+                id:currentGame?.puzzle?.id,
+                rows:currentGame?.puzzle?.rows,
+                cols:currentGame?.puzzle?.cols,
+                words:currentGame?.puzzle?.answers?.map(a=>a.word),
+                label:document.querySelector('#gameModeLabel')?.textContent.trim(),
+                difficulty:document.querySelector('#gameDifficulty')?.textContent.trim(),
+                step:document.querySelector('#starterCoachStep')?.textContent.trim(),
+                title:document.querySelector('#starterCoachTitle')?.textContent.trim(),
+                copy:document.querySelector('#starterCoachCopy')?.textContent.trim(),
+                guideCells:[...document.querySelectorAll('#board .cell.starter-guide')].map(e=>Number(e.dataset.index)),
+                guidePath:currentGame?.starterGuidePath,
+                guideLine:!!document.querySelector('#pathLayer .path-guide'),
+                targetLengths:[...document.querySelectorAll('#lengths .starter-target')].map(e=>e.textContent.trim()),
+                cleanBadge:document.querySelector('#cleanStatus')?.textContent.trim()
+              })""")
+              assert state['mode']=='starter',state
+              assert state['id']=='starter-v1',state
+              assert (state['rows'],state['cols'])==(5,5),state
+              assert state['words']==['MRAK','JABLKO','ČOKOLÁDA','AUTOBUS'],state
+              assert state['label']=='První Proplet',state
+              assert state['difficulty']=='🎓 Trénink · 5×5',state
+              assert state['step']=='1 / 4',state
+              assert state['title']=='Začni slovem MRAK',state
+              assert state['copy']=='Táhni přes sousední písmena. Fialová stopa ti ukáže první cestu.',state
+              assert state['guideCells']==state['guidePath'] and len(state['guideCells'])==4,state
+              assert state['guideLine'] is True,state
+              assert state['targetLengths']==['4'],state
+              assert state['cleanBadge']=='🎓 Trénink',state
+              page.screenshot(path=f'{OUT}/starter-step-1.png',full_page=True)
+
+              # Exercise the same submit/progression path after a successful MRAK draw.
+              page.evaluate("""()=>{
+                currentGame.path=[...currentGame.puzzle.answers[0].path];
+                submitPath();
+              }""")
+              wait_until(lambda:page.locator('#starterCoachStep').inner_text().strip()=='2 / 4',5000,'starter step 2')
+              page.wait_for_timeout(250)
+              after=page.evaluate("""()=>({
+                step:document.querySelector('#starterCoachStep')?.textContent.trim(),
+                title:document.querySelector('#starterCoachTitle')?.textContent.trim(),
+                copy:document.querySelector('#starterCoachCopy')?.textContent.trim(),
+                found:document.querySelector('#foundWords')?.textContent.trim(),
+                targetLengths:[...document.querySelectorAll('#lengths .starter-target')].map(e=>e.textContent.trim()),
+                guideCount:document.querySelectorAll('#board .cell.starter-guide').length,
+                guideLine:!!document.querySelector('#pathLayer .path-guide')
+              })""")
+              assert after['step']=='2 / 4',after
+              assert after['title']=='Teď najdi JABLKO',after
+              assert 'Čísla nahoře ukazují délky zbývajících slov.' in after['copy'],after
+              assert 'MRAK' in after['found'],after
+              assert after['targetLengths']==['6'],after
+              assert after['guideCount']==3 and after['guideLine'] is True,after
+              page.screenshot(path=f'{OUT}/starter-step-2.png',full_page=True)
+
+              app_errors=[e for e in errors if 'favicon' not in e.lower()]
+              assert not app_errors,app_errors
+              result={'ok':True,'step1':state,'step2':after,'errors':app_errors}
+              with open(f'{OUT}/summary.json','w',encoding='utf-8') as f:json.dump(result,f,ensure_ascii=False,indent=2)
+              print(json.dumps(result,ensure_ascii=False,indent=2))
+              ctx.close();browser.close()
+          PY
+          python /tmp/starter_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v334-starter-onboarding-smoke
+          path: /tmp/proplet-starter-smoke/
+          if-no-files-found: warn
+          retention-days: 7

@@ -23,6 +23,8 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from content_archive import archived_puzzle_info, daily_window_id, daily_window_puzzle_id, load_catalog
+
 try:
     from pywebpush import webpush, WebPushException
 except Exception:  # Push remains optional until dependencies/env are configured.
@@ -30,8 +32,6 @@ except Exception:  # Push remains optional until dependencies/env are configured
     WebPushException = Exception
 
 ROOT = Path(__file__).resolve().parent
-PUZZLES_PATH = ROOT / "data" / "puzzles.json"
-ROLLING_CONTENT_PATH = ROOT / "data" / "rolling_content_v1.json"
 TZ = ZoneInfo("Europe/Prague")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
@@ -41,6 +41,16 @@ VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
 VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "https://proplet-nine.vercel.app").strip()
 CRON_SECRET = os.environ.get("CRON_SECRET", "").strip()
 VERCEL_ENV = os.environ.get("VERCEL_ENV", "").strip().lower()
+VERCEL_GIT_COMMIT_REF = os.environ.get("VERCEL_GIT_COMMIT_REF", "").strip()
+GEN4_PREVIEW_BRANCH = "agent/v3340-medium-calibration-v3"
+GEN4_CANDIDATE_PREVIEW = VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == GEN4_PREVIEW_BRANCH
+PUZZLES_PATH = ROOT / "data" / (
+    "puzzles_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "puzzles.json"
+)
+ROLLING_CONTENT_PATH = ROOT / "data" / (
+    "rolling_content_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "rolling_content_v1.json"
+)
+CONTENT_CATALOG_PATH = ROOT / "data" / "content_catalog_v334.json"
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -75,6 +85,12 @@ async def launch_safety_middleware(request: Request, call_next):
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
     request.state.request_id = request_id
+    if GEN4_CANDIDATE_PREVIEW and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Generation 4 preview je pouze pro čtení", "requestId": request_id},
+            headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        )
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
         try:
             content_length = int(request.headers.get("content-length") or 0)
@@ -96,7 +112,7 @@ async def launch_safety_middleware(request: Request, call_next):
             )
     response = await call_next(request)
     response.headers["X-Request-ID"] = request_id
-    if request.url.path == "/api/rolling-content":
+    if request.url.path == "/api/rolling-content" and not GEN4_CANDIDATE_PREVIEW:
         response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=86400"
     elif request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
@@ -213,6 +229,8 @@ class ResultCreate(BaseModel):
     clean_solve: bool = False
     # Client timestamp lets delayed/offline sync preserve the actual first completion.
     completed_at: Optional[str] = Field(default=None, max_length=40)
+    # Klidny rezim keeps XP/progress but is excluded from competitive standings.
+    calm_mode: bool = False
 
 
 class AttemptStart(BaseModel):
@@ -221,6 +239,7 @@ class AttemptStart(BaseModel):
     challenge_key: str
     mode: str
     difficulty: str
+    calm_mode: bool = False
 
 
 class AttemptCheckpoint(BaseModel):
@@ -228,6 +247,7 @@ class AttemptCheckpoint(BaseModel):
     event_type: str
     elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
     found_words: int = Field(default=0, ge=0, le=99)
+    calm_mode: Optional[bool] = None
 
 
 class AttemptFinishTelemetry(BaseModel):
@@ -243,6 +263,7 @@ class AttemptFinishTelemetry(BaseModel):
     max_hint_level: int = Field(default=0, ge=0, le=3)
     clean_solve: bool = False
     completed_at: Optional[str] = Field(default=None, max_length=40)
+    calm_mode: bool = False
 
 
 class AnonymousClaim(BaseModel):
@@ -867,8 +888,18 @@ def load_puzzles() -> dict:
 @lru_cache(maxsize=1)
 def load_rolling_content() -> dict:
     if not ROLLING_CONTENT_PATH.exists():
-        return {"version": 1, "batches": [], "puzzles": {d: [] for d in ("easy", "medium", "hard", "hardcore")}}
+        return {"version": 1, "releaseEnabled": False, "batches": [], "puzzles": {d: [] for d in ("easy", "medium", "hard", "hardcore")}}
     return json.loads(ROLLING_CONTENT_PATH.read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=1)
+def load_content_catalog() -> dict:
+    return load_catalog(str(CONTENT_CATALOG_PATH))
+
+
+def rolling_content_release_enabled() -> bool:
+    """Fail closed when a reserved bank is paused during a content-generation migration."""
+    return load_rolling_content().get("releaseEnabled", True) is not False
 
 
 def _parse_content_date(value: Optional[str]) -> Optional[date]:
@@ -902,12 +933,17 @@ def is_puzzle_released(puzzle: dict, as_of: Optional[date] = None) -> bool:
 
 def released_free_bank(difficulty: str, as_of: Optional[date] = None) -> list[dict]:
     base = list(load_puzzles().get("free", {}).get(difficulty, []))
-    extras = [p for p in load_rolling_content().get("puzzles", {}).get(difficulty, []) if is_puzzle_released(p, as_of)]
+    rolling = load_rolling_content()
+    extras = [] if not rolling_content_release_enabled() else [
+        p for p in rolling.get("puzzles", {}).get(difficulty, []) if is_puzzle_released(p, as_of)
+    ]
     return base + extras
 
 
 def _released_batches(as_of: date) -> tuple[list[dict], Optional[str]]:
     rolling = load_rolling_content()
+    if not rolling_content_release_enabled():
+        return [], None
     batches = list(rolling.get("batches") or [])
     released = [b for b in batches if (_parse_content_date(b.get("availableFrom")) or date.max) <= as_of]
     future = [b for b in batches if (_parse_content_date(b.get("availableFrom")) or date.min) > as_of]
@@ -938,7 +974,11 @@ def released_rolling_payload(as_of: date) -> dict:
     released_batches, next_release = _released_batches(as_of)
     latest = released_batches[-1] if released_batches else None
     additions = {
-        d: [p for p in source.get("puzzles", {}).get(d, []) if is_puzzle_released(p, as_of)]
+        d: (
+            [p for p in source.get("puzzles", {}).get(d, []) if is_puzzle_released(p, as_of)]
+            if rolling_content_release_enabled()
+            else []
+        )
         for d in ("easy", "medium", "hard", "hardcore")
     }
     meta = {k: v for k, v in source.items() if k not in {"batches", "puzzles"}}
@@ -1002,6 +1042,17 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
                     "generation": int(meta.get("contentGeneration") or 1),
                     "legacy": True,
                 }
+    indexed = (data.get("legacyFreeIndex") or {}).get(puzzle_id)
+    if indexed and (difficulty is None or indexed.get("difficulty") == difficulty):
+        return {
+            "puzzle": None,
+            "difficulty": indexed.get("difficulty"),
+            "mode": "free",
+            "level": int(indexed.get("level") or 0),
+            "generation": int(indexed.get("generation") or 1),
+            "legacy": True,
+            "lineageConfidence": indexed.get("lineageConfidence") or "slot-exact",
+        }
     return None
 
 
@@ -1107,6 +1158,31 @@ def expected_daily_puzzle_id(daily_date: str) -> str:
     except ValueError:
         raise HTTPException(400, "Neplatné datum")
 
+    if int(data.get("dailyGeneration") or 0) == 4:
+        release = data.get("release") or {}
+        switch4_raw = data.get("dailyGeneration4From") or release.get("dailyGeneration4From")
+        try:
+            switch4 = date.fromisoformat(str(switch4_raw)) if switch4_raw else None
+        except ValueError:
+            switch4 = None
+        # The branch preview intentionally exposes the paused candidate. A bound
+        # production release, however, must preserve the historical Daily window
+        # until the explicitly approved cutover date.
+        if switch4 is None and GEN4_CANDIDATE_PREVIEW:
+            bank = data.get("daily", [])
+            base = str(data.get("dailyRotationBaseDate") or "2026-01-01")
+            return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
+        if switch4 is None:
+            raise HTTPException(503, "Generation 4 Daily nemá schválené datum spuštění")
+        if d >= switch4:
+            bank = data.get("daily", [])
+            base = str(data.get("dailyRotationBaseDate") or switch4.isoformat())
+            return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
+        archived_id = daily_window_id(data, daily_date)
+        if archived_id:
+            return archived_id
+        raise HTTPException(503, "Pro datum chybí bezpečně svázané Daily okno")
+
     switch3_raw = data.get("dailyGeneration3From")
     try:
         switch3 = date.fromisoformat(str(switch3_raw)) if switch3_raw else None
@@ -1147,6 +1223,26 @@ def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
     """Accept the primary board plus archived generations for cached/offline clients."""
     data = load_puzzles()
     ids = {expected_daily_puzzle_id(daily_date)}
+
+    if int(data.get("dailyGeneration") or 0) == 4:
+        # A client may open Gen3 just before deployment and sync after cutover.
+        # Only the immediately preceding generation receives this compatibility
+        # exception; older generations remain valid solely inside their historic
+        # date windows and therefore cannot be replayed as a current Daily.
+        release = data.get("release") or {}
+        switch4_raw = data.get("dailyGeneration4From") or release.get("dailyGeneration4From")
+        try:
+            requested_date = date.fromisoformat(daily_date)
+            switch4 = date.fromisoformat(str(switch4_raw)) if switch4_raw else None
+        except ValueError:
+            raise HTTPException(400, "Neplatné datum")
+        windows = list((data.get("archive") or {}).get("dailyWindows") or [])
+        if switch4 and requested_date >= switch4 and windows:
+            previous = max(windows, key=lambda item: int(item.get("generation") or 0))
+            archived_id = daily_window_puzzle_id(previous, daily_date)
+            if archived_id:
+                ids.add(archived_id)
+        return ids
 
     active = data.get("daily", [])
     switch3_raw = data.get("dailyGeneration3From")
@@ -1192,7 +1288,10 @@ def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
             p.get("id") == puzzle_id and p.get("difficulty") == difficulty
             for bank in legacy_daily_banks(data) for p in bank["puzzles"]
         )
-        return active or archived
+        return active or archived or bool(archived_puzzle_info(
+            load_content_catalog(), puzzle_id, difficulty, "daily",
+            int(data.get("dailyGeneration") or data.get("contentGeneration") or 1),
+        ))
     info = free_puzzle_info(puzzle_id, difficulty)
     if info and info.get("legacy") is not True:
         # Never let a guessed future reserve ID enter telemetry/results before its real release.
@@ -1219,7 +1318,11 @@ def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict
             for p in bank.get("puzzles", []):
                 if p.get("id") == puzzle_id and p.get("difficulty") == difficulty:
                     return p
-        return None
+        info = archived_puzzle_info(
+            load_content_catalog(), puzzle_id, difficulty, "daily",
+            int(data.get("dailyGeneration") or data.get("contentGeneration") or 1),
+        )
+        return info.get("puzzle") if info else None
     info = free_puzzle_info(puzzle_id, difficulty)
     return info.get("puzzle") if info else None
 
@@ -1241,6 +1344,17 @@ def validate_result_sanity(payload: ResultCreate) -> None:
     min_elapsed = max(2500, active_cells * 90)
     if payload.elapsed_ms < min_elapsed:
         raise HTTPException(400, "Výsledek je mimo bezpečný rozsah")
+
+
+@app.get("/api/puzzle-database")
+def puzzle_database_preview(request: Request):
+    """Serve the candidate pack only on the read-only Gen4 branch preview."""
+    if not GEN4_CANDIDATE_PREVIEW:
+        raise HTTPException(404, "Preview databáze není v tomto prostředí dostupná")
+    return JSONResponse(
+        content=released_puzzle_payload(effective_content_date(request)),
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get("/")
@@ -1351,7 +1465,10 @@ def health():
     base = {
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
-        "puzzleSource": "data/puzzles.json",
+        "puzzleSource": str(PUZZLES_PATH.relative_to(ROOT)),
+        "gen4CandidatePreview": GEN4_CANDIDATE_PREVIEW,
+        "gen4CandidateReadOnly": GEN4_CANDIDATE_PREVIEW,
+        "gen4ReleaseStatus": (pdata.get("release") or {}).get("status"),
         "version": APP_VERSION,
         "adminStatic": True,
         "adminEntry": "/admin.html",
@@ -1403,6 +1520,7 @@ def health():
         "xpEconomyVersion": 2,
         "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
+        "rollingContentReleaseEnabled": rolling_content_release_enabled(),
         "rollingContentCadence": load_rolling_content().get("cadence"),
         "rollingContentFirstRelease": load_rolling_content().get("firstRelease"),
         "rollingContentReservedThrough": load_rolling_content().get("reservedThrough"),
@@ -2130,6 +2248,7 @@ def attempt_start(
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
         "started_at": datetime.now(TZ).isoformat(), "app_version": APP_VERSION,
+        "calm_mode": bool(payload.calm_mode),
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
 
@@ -2154,6 +2273,9 @@ def attempt_checkpoint(
         "last_found_words": max(int(row.get("last_found_words") or 0), int(payload.found_words)),
         "last_activity_at": datetime.now(TZ).isoformat(),
     }
+    if payload.calm_mode is not None:
+        # A run may switch into calm mode mid-game; it never switches back within that run.
+        values["calm_mode"] = bool(row.get("calm_mode") is True or payload.calm_mode)
     if payload.event_type == "correct" and row.get("first_correct_ms") is None:
         values["first_correct_ms"] = int(payload.elapsed_ms)
     elif payload.event_type == "hint" and row.get("first_hint_ms") is None:
@@ -2197,6 +2319,7 @@ def attempt_finish(
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
             "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": APP_VERSION,
+            "calm_mode": bool(payload.calm_mode),
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
     try:
@@ -2207,6 +2330,7 @@ def attempt_finish(
         "completed_at": completed_at, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves,
         "wrong_attempts": payload.wrong_attempts, "hints_used": payload.hints_used,
         "max_hint_level": payload.max_hint_level, "clean_solve": payload.clean_solve,
+        "calm_mode": bool(payload.calm_mode),
         "last_activity_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True, "anonymous": actor.get("player_id") is None}
@@ -2323,8 +2447,29 @@ def build_quality_report():
         for p in bank:
             puzzle_index[p["id"]] = p
 
-    # Retired IDs remain syncable for historical data, but must not calibrate the active bank.
-    first_attempts = [a for a in first_attempts if a.get("puzzle_id") in puzzle_index]
+    # Retired IDs remain syncable for historical data. Calm runs stay in their own cohort so
+    # interruptions and intentionally unhurried play never distort the difficulty calibration.
+    active_first_attempts = [a for a in first_attempts if a.get("puzzle_id") in puzzle_index]
+
+    def calm_cohort(rows: list[dict]) -> dict:
+        completed = [row for row in rows if row.get("completed_at")]
+        times = [int(row.get("elapsed_ms")) for row in completed if row.get("elapsed_ms") is not None]
+        hints = [int(row.get("hints_used") or 0) for row in completed]
+        clean = [1 if row.get("clean_solve") is True else 0 for row in completed]
+        return {
+            "starts": len(rows),
+            "completed": len(completed),
+            "completionRate": round(len(completed) / len(rows), 3) if rows else None,
+            "medianMs": _median(times),
+            "avgHints": round(sum(hints) / len(hints), 2) if hints else None,
+            "cleanRate": round(sum(clean) / len(clean), 3) if clean else None,
+        }
+
+    calm_mode_summary = {
+        "standard": calm_cohort([a for a in active_first_attempts if a.get("calm_mode") is not True]),
+        "calm": calm_cohort([a for a in active_first_attempts if a.get("calm_mode") is True]),
+    }
+    first_attempts = [a for a in active_first_attempts if a.get("calm_mode") is not True]
     groups = {}
     for a in first_attempts:
         groups.setdefault(a["puzzle_id"], []).append(a)
@@ -2599,6 +2744,7 @@ def build_quality_report():
         },
         "helper": helper_summary,
         "hints": hint_summary,
+        "calmMode": calm_mode_summary,
         "funnel": funnel,
         "priorities": priorities[:30],
         "difficultyLadder": difficulty_ladder,
@@ -3315,6 +3461,21 @@ def completion_time(r: dict) -> datetime:
 def first_run_key(r: dict) -> tuple:
     return (completion_time(r), str(r.get("id") or r.get("attempt_id") or ""))
 
+def competitive_row(row: dict) -> bool:
+    """Klidny rezim counts for personal progression, never for competitive standings."""
+    return row.get("calm_mode") is not True
+
+def daily_run_date(row: dict) -> Optional[str]:
+    key = str(row.get("challenge_key") or "")
+    if not key.startswith("daily:"):
+        return None
+    value = key[6:16]
+    try:
+        date.fromisoformat(value)
+        return value
+    except ValueError:
+        return None
+
 def run_rank_tuple(r: dict) -> tuple:
     return (
         0 if r.get("clean_solve") is True else 1,
@@ -3341,7 +3502,10 @@ def puzzle_info(puzzle_id: str) -> Optional[dict]:
         for p in bank["puzzles"]:
             if p.get("id") == puzzle_id:
                 return {"puzzle": p, "difficulty": p.get("difficulty"), "mode": "daily", "level": None, "legacy": True, "generation": int(bank.get("generation") or 1)}
-    return None
+    return archived_puzzle_info(
+        load_content_catalog(), puzzle_id, None, "daily",
+        int(data.get("dailyGeneration") or data.get("contentGeneration") or 1),
+    )
 
 def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bool):
     attempt_id = payload.attempt_id or f"run:{player_id}:{payload.challenge_key}:{uuid.uuid4()}"
@@ -3354,7 +3518,7 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
         "mode": payload.mode, "difficulty": payload.difficulty, "elapsed_ms": payload.elapsed_ms,
         "moves": payload.moves, "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
         "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
-        "completed_at": completed_at,
+        "calm_mode": bool(payload.calm_mode), "completed_at": completed_at,
     })
 
 
@@ -3439,7 +3603,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                 "daily_date": payload.daily_date, "best_elapsed_ms": payload.elapsed_ms,
                 "best_moves": payload.moves, "hints_used": payload.hints_used,
                 "wrong_attempts": payload.wrong_attempts, "max_hint_level": payload.max_hint_level,
-                "clean_solve": effective_clean, "completed_at": official_completed_at,
+                "clean_solve": effective_clean, "calm_mode": bool(payload.calm_mode), "completed_at": official_completed_at,
             })
         elif incoming_is_earlier and old.get("puzzle_id") == payload.puzzle_id:
             db_update("results", {"id": old["id"]}, {
@@ -3447,6 +3611,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                 "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                 "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
                 "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+                "calm_mode": bool(payload.calm_mode),
                 "completed_at": official_completed_at,
             })
         first = False
@@ -3468,6 +3633,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                 "wrong_attempts": payload.wrong_attempts,
                 "max_hint_level": payload.max_hint_level,
                 "clean_solve": effective_clean,
+                "calm_mode": bool(payload.calm_mode),
                 "completed_at": official_completed_at,
             })
             first = True
@@ -3483,13 +3649,14 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                     "daily_date": payload.daily_date, "best_elapsed_ms": payload.elapsed_ms,
                     "best_moves": payload.moves, "hints_used": payload.hints_used,
                     "wrong_attempts": payload.wrong_attempts, "max_hint_level": payload.max_hint_level,
-                    "clean_solve": effective_clean, "completed_at": official_completed_at,
+                    "clean_solve": effective_clean, "calm_mode": bool(payload.calm_mode), "completed_at": official_completed_at,
                 })
             elif old.get("puzzle_id") == payload.puzzle_id and completion_time({"completed_at": official_completed_at}) < completion_time(old):
                 db_update("results", {"id": old["id"]}, {
                     "best_elapsed_ms": payload.elapsed_ms, "best_moves": payload.moves,
                     "hints_used": payload.hints_used, "wrong_attempts": payload.wrong_attempts,
                     "max_hint_level": payload.max_hint_level, "clean_solve": effective_clean,
+                    "calm_mode": bool(payload.calm_mode),
                     "completed_at": official_completed_at,
                 })
             first = False
@@ -3505,6 +3672,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                 "hints_used": payload.hints_used,
                 "max_hint_level": payload.max_hint_level,
                 "clean_solve": effective_clean,
+                "calm_mode": bool(payload.calm_mode),
             }
             if attempts:
                 db_update("puzzle_attempts", {"id": payload.attempt_id}, telemetry_values)
@@ -3538,7 +3706,6 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         "stats": stats,
         "statsWarning": stats_warning,
     }
-
 
 @app.get("/api/result-status")
 def result_status(
@@ -3622,7 +3789,7 @@ def rescue_finish(payload: RescueFinish, request: Request, authorization: Option
 
 def _daily_individual_score(row: dict, day_rows: list[dict]) -> float:
     """0–100. Completion 55, clean 15, hints up to 10, relative speed up to 20."""
-    elapsed = int(row.get("best_elapsed_ms") or 86_400_000)
+    elapsed = int(row.get("best_elapsed_ms") or row.get("elapsed_ms") or 86_400_000)
     hints = int(row.get("hints_used") or 0)
     clean = row.get("clean_solve") is True
     completion = 55.0
@@ -3653,17 +3820,27 @@ def _family_league_week(week_offset: int = 0) -> dict:
     for p in players:
         members_by_family.setdefault(norm_family(str(p.get("family_code") or "")), []).append(p)
 
-    daily_results = db_select("results", mode="daily")
+    daily_results = [r for r in db_select_all("puzzle_runs", mode="daily") if competitive_row(r)]
     daily_results = [
         r for r in daily_results
-        if str(r.get("daily_date") or "")[:10] in dates
-        and r.get("puzzle_id") == expected_daily_puzzle_id(str(r.get("daily_date") or "")[:10])
+        if daily_run_date(r) in dates
+        and r.get("puzzle_id") == expected_daily_puzzle_id(daily_run_date(r))
     ]
     rows_by_day: dict[str, list[dict]] = {d: [] for d in dates}
     for r in daily_results:
-        d = str(r.get("daily_date") or "")[:10]
+        d = daily_run_date(r)
         if d in rows_by_day:
             rows_by_day[d].append(r)
+    for d, day_rows in rows_by_day.items():
+        first_by_player: dict[str, dict] = {}
+        for row in day_rows:
+            pid = str(row.get("player_id") or "")
+            if not pid:
+                continue
+            previous = first_by_player.get(pid)
+            if previous is None or first_run_key(row) < first_run_key(previous):
+                first_by_player[pid] = row
+        rows_by_day[d] = list(first_by_player.values())
 
     standings = []
     for league in leagues:
@@ -3810,7 +3987,7 @@ def puzzle_leaderboard(
         raise HTTPException(403, "Týmové pořadí je dostupné jen členům tohoto týmu")
     players = db_select("players", family_code=family)
     pmap = {p["id"]: p for p in players}
-    rows = [r for r in db_select("puzzle_runs", puzzle_id=puzzle_id) if r.get("player_id") in pmap]
+    rows = [r for r in db_select("puzzle_runs", puzzle_id=puzzle_id) if r.get("player_id") in pmap and competitive_row(r)]
     first: dict[str, dict] = {}
     for r in rows:
         pid = r["player_id"]
@@ -3846,7 +4023,7 @@ def free_global_leaderboard(
     if not info or info.get("legacy") is True:
         raise HTTPException(404, "Aktivní volná úroveň nebyla nalezena")
 
-    runs = db_select_all("puzzle_runs", puzzle_id=puzzle_id, mode="free")
+    runs = [row for row in db_select_all("puzzle_runs", puzzle_id=puzzle_id, mode="free") if competitive_row(row)]
     first_by_player: dict[str, dict] = {}
     for row in runs:
         player_id = str(row.get("player_id") or "")
@@ -3931,11 +4108,13 @@ def daily_global_leaderboard(
 
     primary_puzzle_id = expected_daily_puzzle_id(selected_date)
     results = [
-        row for row in db_select("results", mode="daily", daily_date=selected_date)
-        if row.get("puzzle_id") == primary_puzzle_id
+        row for row in db_select_all("puzzle_runs", mode="daily")
+        if competitive_row(row)
+        and daily_run_date(row) == selected_date
+        and row.get("puzzle_id") == primary_puzzle_id
     ]
-    # results is unique per player/challenge in the current schema. Defensive
-    # deduplication keeps historical inconsistencies out of the public board.
+    # A calm first completion may be followed by a standard replay. Rank each player by
+    # their first non-calm completion only; replays never improve an existing standard result.
     by_player: dict[str, dict] = {}
     for row in results:
         player_id = str(row.get("player_id") or "")
@@ -3981,8 +4160,8 @@ def daily_global_leaderboard(
             "name": identity["name"],
             "avatar": identity["avatar"],
             "anonymous": identity["anonymous"],
-            "elapsedMs": int(row.get("best_elapsed_ms") or 0),
-            "moves": int(row.get("best_moves") or 0),
+            "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0),
+            "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
             "cleanSolve": row.get("clean_solve") is True,
         })
@@ -4242,7 +4421,8 @@ def rankings_xp(
     period_start = _ranking_period_start(period)
     period_results = [
         row for row in results
-        if period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start)
+        if competitive_row(row)
+        and (period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start))
     ]
     lifetime_points: dict[str, int] = {}
     for row in results:
@@ -4330,8 +4510,8 @@ def rankings_daily(
     players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
     primary_puzzle_id = expected_daily_puzzle_id(selected_date)
     day_rows = [
-        row for row in results
-        if row.get("mode") == "daily" and str(row.get("daily_date") or "")[:10] == selected_date
+        row for row in db_select_all("puzzle_runs", mode="daily")
+        if competitive_row(row) and daily_run_date(row) == selected_date
         and row.get("puzzle_id") == primary_puzzle_id
     ]
     by_player: dict[str, dict] = {}
@@ -4344,9 +4524,10 @@ def rankings_daily(
             by_player[pid] = row
     ranked_all = sorted(by_player.values(), key=lambda row: (
         0 if row.get("clean_solve") is True else 1,
-        int(row.get("hints_used") or 0), int(row.get("best_elapsed_ms") or 10**12),
-        int(row.get("best_moves") or 10**9), completion_time(row), str(row.get("player_id") or ""),
+        int(row.get("hints_used") or 0), int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 10**12),
+        int(row.get("moves") or row.get("best_moves") or 10**9), completion_time(row), str(row.get("player_id") or ""),
     ))
+    day_rows = list(by_player.values())
     player_rows = []
     used_aliases: set[str] = set()
     for row in ranked_all:
@@ -4362,7 +4543,7 @@ def rankings_daily(
             team_name = league.get("name") or family
         player_rows.append({
             "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"], "teamName": team_name,
-            "elapsedMs": int(row.get("best_elapsed_ms") or 0), "moves": int(row.get("best_moves") or 0),
+            "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0), "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
             "isMine": pid == viewer_id,
         })
@@ -4372,7 +4553,7 @@ def rankings_daily(
     by_team: dict[str, list[float]] = {}
     for row in day_rows:
         player = player_by_id.get(str(row.get("player_id") or ""))
-        family = _ranking_result_team(row, player)
+        family = team_code_for_player_at(player or {}, row.get("completed_at")) if player else None
         if family:
             by_team.setdefault(family, []).append(_daily_individual_score(row, day_rows))
     current_members: dict[str, int] = {}
@@ -4413,6 +4594,18 @@ def free_archive(
     info = free_puzzle_info(puzzle_id)
     if not info or info.get("legacy") is not True:
         raise HTTPException(404, "Archivovaná úroveň nebyla nalezena")
+    if not info.get("puzzle"):
+        return JSONResponse(
+            status_code=410,
+            content={
+                "detail": "Tato historická úroveň už není hratelná",
+                "archived": True,
+                "puzzleId": puzzle_id,
+                "difficulty": info.get("difficulty"),
+                "level": info.get("level"),
+                "generation": info.get("generation"),
+            },
+        )
     return {"puzzle": info["puzzle"], "difficulty": info["difficulty"], "level": info["level"]}
 
 
@@ -4447,7 +4640,7 @@ def played_levels(
                 "moves": int(row.get("best_moves") or 1),
                 "hintsUsed": int(row.get("hints_used") or 0),
                 "wrongAttempts": int(row.get("wrong_attempts") or 0),
-                "cleanSolve": row.get("clean_solve") is True,
+                "cleanSolve": row.get("clean_solve") is True, "calmMode": row.get("calm_mode") is True,
                 "completedAt": row.get("completed_at"),
             })
     runs = [r for r in db_select("puzzle_runs", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty and r.get("puzzle_id") in active]
@@ -4465,14 +4658,16 @@ def played_levels(
                 "puzzleId": p["id"], "level": level, "transferred": False,
                 "elapsedMs": int(first["elapsed_ms"]), "moves": int(first["moves"]),
                 "hintsUsed": int(first.get("hints_used") or 0), "wrongAttempts": int(first.get("wrong_attempts") or 0),
-                "cleanSolve": first.get("clean_solve") is True, "attempts": len(vals), "completedAt": first.get("completed_at"),
+                "cleanSolve": first.get("clean_solve") is True, "calmMode": first.get("calm_mode") is True,
+                "attempts": len(vals), "completedAt": first.get("completed_at"),
             })
         elif result_row:
             items.append({
                 "puzzleId": p["id"], "level": level, "transferred": False,
                 "elapsedMs": int(result_row.get("best_elapsed_ms") or 1000), "moves": int(result_row.get("best_moves") or 1),
                 "hintsUsed": int(result_row.get("hints_used") or 0), "wrongAttempts": int(result_row.get("wrong_attempts") or 0),
-                "cleanSolve": result_row.get("clean_solve") is True, "attempts": 1, "completedAt": result_row.get("completed_at"),
+                "cleanSolve": result_row.get("clean_solve") is True, "calmMode": result_row.get("calm_mode") is True,
+                "attempts": 1, "completedAt": result_row.get("completed_at"),
             })
         elif level in prior_slots:
             items.append({"puzzleId": p["id"], "level": level, "transferred": True, "attempts": 0})

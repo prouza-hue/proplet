@@ -1,0 +1,51 @@
+/* v3.34 quality hotfix: Fold portrait rail, visible-mask centering and compact privacy icon. */
+
+/* The layout JS deliberately reuses the proven Fold/tablet rail DOM composition in portrait.
+   Portrait gets a slightly tighter rail and restrained letter scale so large folded-browser
+   CSS viewports do not inflate glyphs just because they crossed the generic 700px breakpoint. */
+body.game-tablet-portrait.game-tablet-landscape .game-main{
+  grid-template-columns:minmax(0,1fr) clamp(150px,23vw,172px)!important;
+  gap:8px!important;
+}
+body.game-tablet-portrait .cell{font-size:clamp(16px,2.2vw,22px)!important}
+body.game-tablet-portrait .board.dense-board .cell{font-size:clamp(15px,2vw,20px)!important}
+body.game-tablet-portrait .board.ultra-board .cell{font-size:clamp(14px,1.8vw,18px)!important}
+body.game-tablet-portrait .game-control-column>.current-word{min-height:68px!important}
+body.game-tablet-portrait .game-control-column>.current-word strong{font-size:clamp(16px,2.1vw,20px)!important}
+
+/* fitGameBoard centers the full rectangular grid. Some irregular masks occupy that rectangle
+   asymmetrically, so the layout JS computes the occupied-mask centre and exposes this offset. */
+body.game-desktop-wide .board-wrap{transform:translateY(var(--mask-center-y,0px))}
+
+@media (max-width:520px){
+  .ranking-privacy-mini{
+    width:36px!important;
+    height:36px!important;
+    min-width:36px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    line-height:1!important;
+    overflow:hidden;
+  }
+  .ranking-privacy-mini-label{display:none!important}
+  .ranking-privacy-mini-icon{
+    width:100%;
+    height:100%;
+    display:grid;
+    place-items:center;
+    font-size:18px;
+    line-height:1;
+    transform:none;
+  }
+}
+
+/* Result actions share the same readable type size as the primary next-level action. */
+#winModal #winPrimaryBtn,
+#winModal .win-account-btn,
+#winModal .win-secondary-actions .win-utility-btn{font-size:15px!important}
+@media (min-width:1000px) and (min-height:650px){
+  #winModal #winPrimaryBtn,
+  #winModal .win-account-btn,
+  #winModal .win-secondary-actions .win-utility-btn{font-size:16px!important}
+}

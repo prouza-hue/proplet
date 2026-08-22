@@ -4,9 +4,9 @@
   "cadence": "weekly",
   "releaseWeekday": "monday",
   "levelsPerDrop": 5,
-  "firstRelease": "2026-08-31",
+  "firstRelease": null,
   "weeksReserved": 13,
-  "reservedThrough": "2026-11-23",
+  "reservedThrough": null,
   "extraRotation": [
     "easy",
     "medium",
@@ -15,8 +15,8 @@
   ],
   "generatedAtVersion": "v3.34.0-gen4-candidate",
   "wideUniquenessDictionarySize": 12000,
-  "releaseEnabled": true,
-  "releasePauseReason": null,
+  "releaseEnabled": false,
+  "releasePauseReason": "Awaiting explicit Generation 4 production approval and release-date binding",
   "contentGeneration": 4,
   "targetCooldownPolicy": {
     "withinEachBatch": 4,
@@ -24,8 +24,8 @@
   },
   "batches": [
     {
-      "id": "2026-W36",
-      "availableFrom": "2026-08-31",
+      "id": "pending-gen4-W01",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "easy",
       "byDifficulty": {
@@ -63,8 +63,8 @@
       ]
     },
     {
-      "id": "2026-W37",
-      "availableFrom": "2026-09-07",
+      "id": "pending-gen4-W02",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "medium",
       "byDifficulty": {
@@ -102,8 +102,8 @@
       ]
     },
     {
-      "id": "2026-W38",
-      "availableFrom": "2026-09-14",
+      "id": "pending-gen4-W03",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "hard",
       "byDifficulty": {
@@ -141,8 +141,8 @@
       ]
     },
     {
-      "id": "2026-W39",
-      "availableFrom": "2026-09-21",
+      "id": "pending-gen4-W04",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "hardcore",
       "byDifficulty": {
@@ -180,8 +180,8 @@
       ]
     },
     {
-      "id": "2026-W40",
-      "availableFrom": "2026-09-28",
+      "id": "pending-gen4-W05",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "easy",
       "byDifficulty": {
@@ -219,8 +219,8 @@
       ]
     },
     {
-      "id": "2026-W41",
-      "availableFrom": "2026-10-05",
+      "id": "pending-gen4-W06",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "medium",
       "byDifficulty": {
@@ -258,8 +258,8 @@
       ]
     },
     {
-      "id": "2026-W42",
-      "availableFrom": "2026-10-12",
+      "id": "pending-gen4-W07",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "hard",
       "byDifficulty": {
@@ -297,8 +297,8 @@
       ]
     },
     {
-      "id": "2026-W43",
-      "availableFrom": "2026-10-19",
+      "id": "pending-gen4-W08",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "hardcore",
       "byDifficulty": {
@@ -336,8 +336,8 @@
       ]
     },
     {
-      "id": "2026-W44",
-      "availableFrom": "2026-10-26",
+      "id": "pending-gen4-W09",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "easy",
       "byDifficulty": {
@@ -375,8 +375,8 @@
       ]
     },
     {
-      "id": "2026-W45",
-      "availableFrom": "2026-11-02",
+      "id": "pending-gen4-W10",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "medium",
       "byDifficulty": {
@@ -414,8 +414,8 @@
       ]
     },
     {
-      "id": "2026-W46",
-      "availableFrom": "2026-11-09",
+      "id": "pending-gen4-W11",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "hard",
       "byDifficulty": {
@@ -453,8 +453,8 @@
       ]
     },
     {
-      "id": "2026-W47",
-      "availableFrom": "2026-11-16",
+      "id": "pending-gen4-W12",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "hardcore",
       "byDifficulty": {
@@ -492,8 +492,8 @@
       ]
     },
     {
-      "id": "2026-W48",
-      "availableFrom": "2026-11-23",
+      "id": "pending-gen4-W13",
+      "availableFrom": null,
       "count": 5,
       "extraDifficulty": "easy",
       "byDifficulty": {
@@ -737,8 +737,8 @@
           "shapeRetry": 7,
           "buildFailures": 2,
           "generatedLevel": 207,
-          "availableFrom": "2026-08-31",
-          "releaseBatch": "2026-W36",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W01",
           "releaseIndex": 1,
           "rollingContent": true
         }
@@ -947,8 +947,8 @@
           "shapeRetry": 2,
           "buildFailures": 0,
           "generatedLevel": 204,
-          "availableFrom": "2026-08-31",
-          "releaseBatch": "2026-W36",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W01",
           "releaseIndex": 5,
           "rollingContent": true
         }
@@ -1161,8 +1161,8 @@
           "shapeRetry": 5,
           "buildFailures": 2,
           "generatedLevel": 202,
-          "availableFrom": "2026-09-07",
-          "releaseBatch": "2026-W37",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W02",
           "releaseIndex": 6,
           "rollingContent": true
         }
@@ -1371,8 +1371,8 @@
           "shapeRetry": 9,
           "buildFailures": 1,
           "generatedLevel": 209,
-          "availableFrom": "2026-09-14",
-          "releaseBatch": "2026-W38",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W03",
           "releaseIndex": 11,
           "rollingContent": true
         }
@@ -1583,8 +1583,8 @@
           "shapeRetry": 6,
           "buildFailures": 2,
           "generatedLevel": 216,
-          "availableFrom": "2026-09-21",
-          "releaseBatch": "2026-W39",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W04",
           "releaseIndex": 16,
           "rollingContent": true
         }
@@ -1795,8 +1795,8 @@
           "shapeRetry": 3,
           "buildFailures": 0,
           "generatedLevel": 206,
-          "availableFrom": "2026-09-28",
-          "releaseBatch": "2026-W40",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W05",
           "releaseIndex": 21,
           "rollingContent": true
         }
@@ -2005,8 +2005,8 @@
           "shapeRetry": 8,
           "buildFailures": 3,
           "generatedLevel": 203,
-          "availableFrom": "2026-09-28",
-          "releaseBatch": "2026-W40",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W05",
           "releaseIndex": 25,
           "rollingContent": true
         }
@@ -2215,8 +2215,8 @@
           "shapeRetry": 4,
           "buildFailures": 3,
           "generatedLevel": 208,
-          "availableFrom": "2026-10-05",
-          "releaseBatch": "2026-W41",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W06",
           "releaseIndex": 26,
           "rollingContent": true
         }
@@ -2431,8 +2431,8 @@
           "shapeRetry": 1,
           "buildFailures": 0,
           "generatedLevel": 201,
-          "availableFrom": "2026-10-12",
-          "releaseBatch": "2026-W42",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W07",
           "releaseIndex": 31,
           "rollingContent": true
         }
@@ -2643,8 +2643,8 @@
           "shapeRetry": 8,
           "buildFailures": 4,
           "generatedLevel": 210,
-          "availableFrom": "2026-10-19",
-          "releaseBatch": "2026-W43",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W08",
           "releaseIndex": 36,
           "rollingContent": true
         }
@@ -2853,8 +2853,8 @@
           "shapeRetry": 4,
           "buildFailures": 1,
           "generatedLevel": 213,
-          "availableFrom": "2026-10-26",
-          "releaseBatch": "2026-W44",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W09",
           "releaseIndex": 41,
           "rollingContent": true
         }
@@ -3065,8 +3065,8 @@
           "shapeRetry": 1,
           "buildFailures": 0,
           "generatedLevel": 205,
-          "availableFrom": "2026-10-26",
-          "releaseBatch": "2026-W44",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W09",
           "releaseIndex": 45,
           "rollingContent": true
         }
@@ -3279,8 +3279,8 @@
           "shapeRetry": 3,
           "buildFailures": 0,
           "generatedLevel": 211,
-          "availableFrom": "2026-11-02",
-          "releaseBatch": "2026-W45",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W10",
           "releaseIndex": 46,
           "rollingContent": true
         }
@@ -3491,8 +3491,8 @@
           "shapeRetry": 7,
           "buildFailures": 2,
           "generatedLevel": 212,
-          "availableFrom": "2026-11-09",
-          "releaseBatch": "2026-W46",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W11",
           "releaseIndex": 51,
           "rollingContent": true
         }
@@ -3701,8 +3701,8 @@
           "shapeRetry": 1,
           "buildFailures": 0,
           "generatedLevel": 214,
-          "availableFrom": "2026-11-16",
-          "releaseBatch": "2026-W47",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W12",
           "releaseIndex": 56,
           "rollingContent": true
         }
@@ -3913,8 +3913,8 @@
           "shapeRetry": 8,
           "buildFailures": 1,
           "generatedLevel": 215,
-          "availableFrom": "2026-11-23",
-          "releaseBatch": "2026-W48",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W13",
           "releaseIndex": 61,
           "rollingContent": true
         }
@@ -4125,8 +4125,8 @@
           "shapeRetry": 5,
           "buildFailures": 2,
           "generatedLevel": 217,
-          "availableFrom": "2026-11-23",
-          "releaseBatch": "2026-W48",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W13",
           "releaseIndex": 65,
           "rollingContent": true
         }
@@ -4398,8 +4398,8 @@
           "shapeRetry": 14,
           "buildFailures": 0,
           "generatedLevel": 202,
-          "availableFrom": "2026-08-31",
-          "releaseBatch": "2026-W36",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W01",
           "releaseIndex": 2,
           "rollingContent": true
         }
@@ -4667,8 +4667,8 @@
           "shapeRetry": 1,
           "buildFailures": 0,
           "generatedLevel": 210,
-          "availableFrom": "2026-09-07",
-          "releaseBatch": "2026-W37",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W02",
           "releaseIndex": 7,
           "rollingContent": true
         }
@@ -4934,8 +4934,8 @@
           "shapeRetry": 15,
           "buildFailures": 0,
           "generatedLevel": 205,
-          "availableFrom": "2026-09-07",
-          "releaseBatch": "2026-W37",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W02",
           "releaseIndex": 10,
           "rollingContent": true
         }
@@ -5168,8 +5168,8 @@
           "shapeRetry": 71,
           "buildFailures": 0,
           "generatedLevel": 211,
-          "availableFrom": "2026-09-14",
-          "releaseBatch": "2026-W38",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W03",
           "releaseIndex": 12,
           "rollingContent": true
         }
@@ -5435,8 +5435,8 @@
           "shapeRetry": 10,
           "buildFailures": 0,
           "generatedLevel": 201,
-          "availableFrom": "2026-09-21",
-          "releaseBatch": "2026-W39",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W04",
           "releaseIndex": 17,
           "rollingContent": true
         }
@@ -5702,8 +5702,8 @@
           "shapeRetry": 2,
           "buildFailures": 0,
           "generatedLevel": 203,
-          "availableFrom": "2026-09-28",
-          "releaseBatch": "2026-W40",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W05",
           "releaseIndex": 22,
           "rollingContent": true
         }
@@ -5969,8 +5969,8 @@
           "shapeRetry": 2,
           "buildFailures": 0,
           "generatedLevel": 206,
-          "availableFrom": "2026-10-05",
-          "releaseBatch": "2026-W41",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W06",
           "releaseIndex": 27,
           "rollingContent": true
         }
@@ -6240,8 +6240,8 @@
           "shapeRetry": 4,
           "buildFailures": 0,
           "generatedLevel": 207,
-          "availableFrom": "2026-10-05",
-          "releaseBatch": "2026-W41",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W06",
           "releaseIndex": 30,
           "rollingContent": true
         }
@@ -6511,8 +6511,8 @@
           "shapeRetry": 16,
           "buildFailures": 0,
           "generatedLevel": 208,
-          "availableFrom": "2026-10-12",
-          "releaseBatch": "2026-W42",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W07",
           "releaseIndex": 32,
           "rollingContent": true
         }
@@ -6786,8 +6786,8 @@
           "shapeRetry": 6,
           "buildFailures": 0,
           "generatedLevel": 209,
-          "availableFrom": "2026-10-19",
-          "releaseBatch": "2026-W43",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W08",
           "releaseIndex": 37,
           "rollingContent": true
         }
@@ -7024,8 +7024,8 @@
           "shapeRetry": 85,
           "buildFailures": 0,
           "generatedLevel": 204,
-          "availableFrom": "2026-10-26",
-          "releaseBatch": "2026-W44",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W09",
           "releaseIndex": 42,
           "rollingContent": true
         }
@@ -7291,8 +7291,8 @@
           "shapeRetry": 2,
           "buildFailures": 0,
           "generatedLevel": 212,
-          "availableFrom": "2026-11-02",
-          "releaseBatch": "2026-W45",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W10",
           "releaseIndex": 47,
           "rollingContent": true
         }
@@ -7560,8 +7560,8 @@
           "shapeRetry": 12,
           "buildFailures": 0,
           "generatedLevel": 213,
-          "availableFrom": "2026-11-02",
-          "releaseBatch": "2026-W45",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W10",
           "releaseIndex": 50,
           "rollingContent": true
         }
@@ -7827,8 +7827,8 @@
           "shapeRetry": 6,
           "buildFailures": 0,
           "generatedLevel": 214,
-          "availableFrom": "2026-11-09",
-          "releaseBatch": "2026-W46",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W11",
           "releaseIndex": 52,
           "rollingContent": true
         }
@@ -8094,8 +8094,8 @@
           "shapeRetry": 3,
           "buildFailures": 0,
           "generatedLevel": 215,
-          "availableFrom": "2026-11-16",
-          "releaseBatch": "2026-W47",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W12",
           "releaseIndex": 57,
           "rollingContent": true
         }
@@ -8367,8 +8367,8 @@
           "shapeRetry": 18,
           "buildFailures": 0,
           "generatedLevel": 216,
-          "availableFrom": "2026-11-23",
-          "releaseBatch": "2026-W48",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W13",
           "releaseIndex": 62,
           "rollingContent": true
         }
@@ -8686,8 +8686,8 @@
           "shapeRetry": 111,
           "buildFailures": 0,
           "generatedLevel": 201,
-          "availableFrom": "2026-08-31",
-          "releaseBatch": "2026-W36",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W01",
           "releaseIndex": 3,
           "rollingContent": true
         }
@@ -9003,8 +9003,8 @@
           "shapeRetry": 42,
           "buildFailures": 0,
           "generatedLevel": 205,
-          "availableFrom": "2026-09-07",
-          "releaseBatch": "2026-W37",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W02",
           "releaseIndex": 8,
           "rollingContent": true
         }
@@ -9324,8 +9324,8 @@
           "shapeRetry": 17,
           "buildFailures": 0,
           "generatedLevel": 206,
-          "availableFrom": "2026-09-14",
-          "releaseBatch": "2026-W38",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W03",
           "releaseIndex": 13,
           "rollingContent": true
         }
@@ -9643,8 +9643,8 @@
           "shapeRetry": 44,
           "buildFailures": 0,
           "generatedLevel": 208,
-          "availableFrom": "2026-09-14",
-          "releaseBatch": "2026-W38",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W03",
           "releaseIndex": 15,
           "rollingContent": true
         }
@@ -9960,8 +9960,8 @@
           "shapeRetry": 42,
           "buildFailures": 0,
           "generatedLevel": 202,
-          "availableFrom": "2026-09-21",
-          "releaseBatch": "2026-W39",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W04",
           "releaseIndex": 18,
           "rollingContent": true
         }
@@ -10277,8 +10277,8 @@
           "shapeRetry": 22,
           "buildFailures": 0,
           "generatedLevel": 204,
-          "availableFrom": "2026-09-28",
-          "releaseBatch": "2026-W40",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W05",
           "releaseIndex": 23,
           "rollingContent": true
         }
@@ -10594,8 +10594,8 @@
           "shapeRetry": 155,
           "buildFailures": 0,
           "generatedLevel": 203,
-          "availableFrom": "2026-10-05",
-          "releaseBatch": "2026-W41",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W06",
           "releaseIndex": 28,
           "rollingContent": true
         }
@@ -10923,8 +10923,8 @@
           "shapeRetry": 1,
           "buildFailures": 0,
           "generatedLevel": 207,
-          "availableFrom": "2026-10-12",
-          "releaseBatch": "2026-W42",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W07",
           "releaseIndex": 33,
           "rollingContent": true
         }
@@ -11240,8 +11240,8 @@
           "shapeRetry": 6,
           "buildFailures": 0,
           "generatedLevel": 209,
-          "availableFrom": "2026-10-12",
-          "releaseBatch": "2026-W42",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W07",
           "releaseIndex": 35,
           "rollingContent": true
         }
@@ -11557,8 +11557,8 @@
           "shapeRetry": 6,
           "buildFailures": 0,
           "generatedLevel": 210,
-          "availableFrom": "2026-10-19",
-          "releaseBatch": "2026-W43",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W08",
           "releaseIndex": 38,
           "rollingContent": true
         }
@@ -11878,8 +11878,8 @@
           "shapeRetry": 90,
           "buildFailures": 0,
           "generatedLevel": 212,
-          "availableFrom": "2026-10-26",
-          "releaseBatch": "2026-W44",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W09",
           "releaseIndex": 43,
           "rollingContent": true
         }
@@ -12197,8 +12197,8 @@
           "shapeRetry": 74,
           "buildFailures": 0,
           "generatedLevel": 211,
-          "availableFrom": "2026-11-02",
-          "releaseBatch": "2026-W45",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W10",
           "releaseIndex": 48,
           "rollingContent": true
         }
@@ -12516,8 +12516,8 @@
           "shapeRetry": 31,
           "buildFailures": 0,
           "generatedLevel": 213,
-          "availableFrom": "2026-11-09",
-          "releaseBatch": "2026-W46",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W11",
           "releaseIndex": 53,
           "rollingContent": true
         }
@@ -12835,8 +12835,8 @@
           "shapeRetry": 165,
           "buildFailures": 0,
           "generatedLevel": 214,
-          "availableFrom": "2026-11-09",
-          "releaseBatch": "2026-W46",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W11",
           "releaseIndex": 55,
           "rollingContent": true
         }
@@ -13156,8 +13156,8 @@
           "shapeRetry": 61,
           "buildFailures": 0,
           "generatedLevel": 215,
-          "availableFrom": "2026-11-16",
-          "releaseBatch": "2026-W47",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W12",
           "releaseIndex": 58,
           "rollingContent": true
         }
@@ -13477,8 +13477,8 @@
           "shapeRetry": 13,
           "buildFailures": 0,
           "generatedLevel": 216,
-          "availableFrom": "2026-11-23",
-          "releaseBatch": "2026-W48",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W13",
           "releaseIndex": 63,
           "rollingContent": true
         }
@@ -13840,8 +13840,8 @@
           "shapeRetry": 35,
           "buildFailures": 0,
           "generatedLevel": 210,
-          "availableFrom": "2026-08-31",
-          "releaseBatch": "2026-W36",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W01",
           "releaseIndex": 4,
           "rollingContent": true
         }
@@ -14232,8 +14232,8 @@
           "shapeRetry": 12,
           "buildFailures": 0,
           "generatedLevel": 204,
-          "availableFrom": "2026-09-07",
-          "releaseBatch": "2026-W37",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W02",
           "releaseIndex": 9,
           "rollingContent": true
         }
@@ -14623,8 +14623,8 @@
           "shapeRetry": 2,
           "buildFailures": 0,
           "generatedLevel": 207,
-          "availableFrom": "2026-09-14",
-          "releaseBatch": "2026-W38",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W03",
           "releaseIndex": 14,
           "rollingContent": true
         }
@@ -15001,8 +15001,8 @@
           "shapeRetry": 99,
           "buildFailures": 0,
           "generatedLevel": 201,
-          "availableFrom": "2026-09-21",
-          "releaseBatch": "2026-W39",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W04",
           "releaseIndex": 19,
           "rollingContent": true
         }
@@ -15370,8 +15370,8 @@
           "shapeRetry": 7,
           "buildFailures": 0,
           "generatedLevel": 202,
-          "availableFrom": "2026-09-21",
-          "releaseBatch": "2026-W39",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W04",
           "releaseIndex": 20,
           "rollingContent": true
         }
@@ -15732,8 +15732,8 @@
           "shapeRetry": 81,
           "buildFailures": 0,
           "generatedLevel": 203,
-          "availableFrom": "2026-09-28",
-          "releaseBatch": "2026-W40",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W05",
           "releaseIndex": 24,
           "rollingContent": true
         }
@@ -16105,8 +16105,8 @@
           "shapeRetry": 59,
           "buildFailures": 0,
           "generatedLevel": 205,
-          "availableFrom": "2026-10-05",
-          "releaseBatch": "2026-W41",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W06",
           "releaseIndex": 29,
           "rollingContent": true
         }
@@ -16480,8 +16480,8 @@
           "shapeRetry": 9,
           "buildFailures": 0,
           "generatedLevel": 206,
-          "availableFrom": "2026-10-12",
-          "releaseBatch": "2026-W42",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W07",
           "releaseIndex": 34,
           "rollingContent": true
         }
@@ -16863,8 +16863,8 @@
           "shapeRetry": 11,
           "buildFailures": 0,
           "generatedLevel": 208,
-          "availableFrom": "2026-10-19",
-          "releaseBatch": "2026-W43",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W08",
           "releaseIndex": 39,
           "rollingContent": true
         }
@@ -17234,8 +17234,8 @@
           "shapeRetry": 10,
           "buildFailures": 0,
           "generatedLevel": 209,
-          "availableFrom": "2026-10-19",
-          "releaseBatch": "2026-W43",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W08",
           "releaseIndex": 40,
           "rollingContent": true
         }
@@ -17617,8 +17617,8 @@
           "shapeRetry": 37,
           "buildFailures": 0,
           "generatedLevel": 211,
-          "availableFrom": "2026-10-26",
-          "releaseBatch": "2026-W44",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W09",
           "releaseIndex": 44,
           "rollingContent": true
         }
@@ -17996,8 +17996,8 @@
           "shapeRetry": 5,
           "buildFailures": 0,
           "generatedLevel": 212,
-          "availableFrom": "2026-11-02",
-          "releaseBatch": "2026-W45",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W10",
           "releaseIndex": 49,
           "rollingContent": true
         }
@@ -18356,8 +18356,8 @@
           "shapeRetry": 15,
           "buildFailures": 0,
           "generatedLevel": 213,
-          "availableFrom": "2026-11-09",
-          "releaseBatch": "2026-W46",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W11",
           "releaseIndex": 54,
           "rollingContent": true
         }
@@ -18736,8 +18736,8 @@
           "shapeRetry": 73,
           "buildFailures": 0,
           "generatedLevel": 214,
-          "availableFrom": "2026-11-16",
-          "releaseBatch": "2026-W47",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W12",
           "releaseIndex": 59,
           "rollingContent": true
         }
@@ -19115,8 +19115,8 @@
           "shapeRetry": 109,
           "buildFailures": 0,
           "generatedLevel": 215,
-          "availableFrom": "2026-11-16",
-          "releaseBatch": "2026-W47",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W12",
           "releaseIndex": 60,
           "rollingContent": true
         }
@@ -19495,8 +19495,8 @@
           "shapeRetry": 23,
           "buildFailures": 0,
           "generatedLevel": 216,
-          "availableFrom": "2026-11-23",
-          "releaseBatch": "2026-W48",
+          "availableFrom": null,
+          "releaseBatch": "pending-gen4-W13",
           "releaseIndex": 64,
           "rollingContent": true
         }

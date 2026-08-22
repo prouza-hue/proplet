@@ -16,8 +16,16 @@
   };
   const alreadySeen=()=>{try{return localStorage.getItem(SEEN_KEY)==='1'}catch{return false}};
   const markSeen=()=>{try{localStorage.setItem(SEEN_KEY,'1')}catch{}};
+  const supersededByGen4=()=>{
+    try{
+      if(window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true)return true;
+      const db=typeof puzzleDB!=='undefined'?puzzleDB:null;
+      return Number(db?.freeGeneration||db?.contentGeneration||0)>=4;
+    }catch{return false}
+  };
 
   function canShow(){
+    if(supersededByGen4())return false;
     if(shown||alreadySeen()||document.querySelector('.release-notes-v3331-backdrop'))return false;
     if(document.body.classList.contains('playing'))return false;
     if(!document.querySelector('#screen-daily.active'))return false;
@@ -29,7 +37,7 @@
   }
 
   function show(){
-    if(shown)return;
+    if(shown||supersededByGen4())return;
     shown=true;
     const signedIn=!!profile()?.token;
     const backdrop=document.createElement('div');
@@ -90,6 +98,7 @@
 
   let tries=0;
   const tick=()=>{
+    if(supersededByGen4()){markSeen();return}
     if(canShow()){show();return}
     if(++tries<360)setTimeout(tick,250);
   };
