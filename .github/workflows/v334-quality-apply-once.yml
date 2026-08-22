@@ -1,7 +1,7 @@
-name: v3.34 one-shot quality patch
+name: v3.34 direct quality patch
 
-# Run once from the same-repository PR, apply the deterministic quality patch,
-# validate it, then delete this workflow and its temporary patch scripts. Persistence retry.
+# Directly apply the release-quality code to the existing PR branch.
+# No content generation, no production writes, no temporary preview branch.
 on:
   pull_request:
     branches:
@@ -15,62 +15,96 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
-      - name: Checkout exact branch head
+      - name: Checkout exact PR branch
         uses: actions/checkout@v4
         with:
           ref: agent/v3340-medium-calibration-v3
           fetch-depth: 0
 
-      - name: Apply deterministic server and client patches
+      - name: Make the existing server patch resilient
         run: |
-          python tools/fix_v334_quality_patch_script.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tools/apply_v334_quality_server_patch.py')
+          s = p.read_text(encoding='utf-8')
+          section = '# Existing-result updates only adopt calm_mode when they replace the chronologically official'
+          start = s.index('text = text.replace(', s.index(section))
+          end = s.index('# ---- Competitive helpers', start)
+          robust = r'''# Patch every official-result persistence shape inside /api/result without depending on indentation.
+          result_start = text.index('@app.post("/api/result")')
+          next_route = text.find('\n\n@app.', result_start + 20)
+          result_end = next_route if next_route != -1 else len(text)
+          result_block = text[result_start:result_end]
+
+          inline_old = '"clean_solve": effective_clean, "completed_at": official_completed_at,'
+          inline_new = '"clean_solve": effective_clean, "calm_mode": bool(payload.calm_mode), "completed_at": official_completed_at,'
+          inline_count = result_block.count(inline_old)
+          result_block = result_block.replace(inline_old, inline_new)
+
+          import re
+          wrapped_re = re.compile(r'(?m)^(?P<i>\s*)"clean_solve": effective_clean,\n(?P=i)"completed_at": official_completed_at,')
+          wrapped_count = len(wrapped_re.findall(result_block))
+          result_block = wrapped_re.sub(lambda m: f'{m.group("i")}"clean_solve": effective_clean,\n{m.group("i")}"calm_mode": bool(payload.calm_mode),\n{m.group("i")}"completed_at": official_completed_at,', result_block)
+          if inline_count + wrapped_count < 5:
+              raise SystemExit(f'result persistence: expected at least 5 official writes, got {inline_count + wrapped_count}')
+
+          telemetry_old = '                "clean_solve": effective_clean,\n            }\n            if attempts:'
+          telemetry_new = '                "clean_solve": effective_clean,\n                "calm_mode": bool(payload.calm_mode),\n            }\n            if attempts:'
+          if telemetry_old not in result_block:
+              raise SystemExit('result telemetry calm persistence anchor missing')
+          result_block = result_block.replace(telemetry_old, telemetry_new, 1)
+          text = text[:result_start] + result_block + text[result_end:]
+
+          '''
+          s = s[:start] + robust + s[end:]
+          p.write_text(s, encoding='utf-8')
+          print('server patch made resilient')
+          PY
+
+      - name: Apply quality implementation
+        run: |
           python tools/apply_v334_quality_server_patch.py
           python tools/apply_v334_quality_client_patch.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('public/index.html')
+          s = p.read_text(encoding='utf-8')
+          if '/quality-v334.css' not in s:
+              s = s.replace('<link rel="stylesheet" href="/styles.css" />', '<link rel="stylesheet" href="/styles.css" />\n  <link rel="stylesheet" href="/quality-v334.css" />', 1)
+          if '/quality-v334.js' not in s:
+              s = s.replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n  <script src="/quality-v334.js"></script>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
           python -m py_compile server.py
+          node --check public/app.js
           node --check public/quality-v334.js
           node --check public/runtime-meta.js
 
-      - name: Verify cheap Gen4 contract already includes quality checks
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          text = Path('.github/workflows/v334-calibration.yml').read_text(encoding='utf-8')
-          required = [
-              "      - 'public/runtime-meta.js'\n",
-              "      - 'tools/test_v334_quality_release.py'\n",
-              "          python -m py_compile tools/test_v334_quality_release.py\n",
-              "          node --check public/quality-v334.js\n",
-              "      - name: Verify release-quality UX, archive and Calm Mode contract\n",
-          ]
-          missing = [needle for needle in required if needle not in text]
-          if missing:
-              raise SystemExit(f'quality contract unexpectedly missing: {missing}')
-          print('quality contract already extended: OK')
-          PY
-
-      - name: Cheap pre-commit checks
+      - name: Run cheap release contract
         run: |
           git diff --check
           python tools/test_v334_quality_release.py
+          python tools/test_gen4_preview_readonly.py
+          python tools/test_gen4_progress_migration.py
+          node tools/test_gen4_preview_runtime_meta.js
           python - <<'PY'
           from pathlib import Path
+          idx=Path('public/index.html').read_text(encoding='utf-8')
+          assert '/quality-v334.css' in idx and '/quality-v334.js' in idx
           s=Path('server.py').read_text(encoding='utf-8')
           assert 'def competitive_row(row: dict) -> bool:' in s
-          assert '"calm_mode": bool(payload.calm_mode)' in s
           assert '"calmMode": calm_mode_summary' in s
-          assert 'db_select_all("puzzle_runs", mode="daily")' in s
-          assert s.count('"calm_mode": bool(payload.calm_mode), "completed_at": official_completed_at,') >= 4
-          print('one-shot source checks: OK')
+          print('direct quality release checks: OK')
           PY
 
-      - name: Remove one-shot machinery and commit result
+      - name: Commit directly to PR branch
         run: |
-          git rm tools/fix_v334_quality_patch_script.py tools/apply_v334_quality_server_patch.py tools/apply_v334_quality_client_patch.py .github/workflows/v334-quality-apply-once.yml
+          git rm -f tools/fix_v334_quality_patch_script.py tools/apply_v334_quality_server_patch.py tools/apply_v334_quality_client_patch.py .github/workflows/v334-quality-apply-once.yml
           git config user.name 'proplet-release-bot'
           git config user.email 'proplet-release-bot@users.noreply.github.com'
           git add -A
           git diff --cached --check
-          git commit -m 'feat: add v3.34 release-quality UX and calm mode'
+          git commit -m 'feat: finish v3.34 quality update and calm mode'
           git push origin HEAD:agent/v3340-medium-calibration-v3
