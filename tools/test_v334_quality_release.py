@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Cheap release contract for the v3.34 UX/archive/Calm Mode quality pass."""
 from pathlib import Path
+import json
 import re
 
 root = Path(__file__).resolve().parents[1]
@@ -12,6 +13,17 @@ preview_auth = (root / "preview_auth_v334.py").read_text(encoding="utf-8")
 account_auth = (root / "account_auth.py").read_text(encoding="utf-8")
 migration = (root / "SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
 verify = (root / "SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
+production_puzzles = json.loads((root / "data" / "puzzles.json").read_text(encoding="utf-8"))
+gen4_puzzles = json.loads((root / "data" / "puzzles_gen4_candidate_v334.json").read_text(encoding="utf-8"))
+
+# The scripted onboarding puzzle is a UX asset, never generated content.
+canonical_starter = production_puzzles["starter"]
+assert gen4_puzzles["starter"] == canonical_starter
+assert canonical_starter["id"] == "starter-v1"
+assert (canonical_starter["rows"], canonical_starter["cols"]) == (5, 5)
+assert [a["word"] for a in canonical_starter["answers"]] == ["MRAK", "JABLKO", "ČOKOLÁDA", "AUTOBUS"]
+starter_cells = [i for answer in canonical_starter["answers"] for i in answer["path"]]
+assert len(starter_cells) == 25 and len(set(starter_cells)) == 25
 
 # API + telemetry contract.
 for model in ("ResultCreate", "AttemptStart", "AttemptFinishTelemetry"):
