@@ -8,6 +8,8 @@ server = (root / "server.py").read_text(encoding="utf-8")
 client = (root / "public" / "quality-v334.js").read_text(encoding="utf-8")
 css = (root / "public" / "quality-v334.css").read_text(encoding="utf-8")
 runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
+preview_auth = (root / "preview_auth_v334.py").read_text(encoding="utf-8")
+account_auth = (root / "account_auth.py").read_text(encoding="utf-8")
 migration = (root / "SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
 verify = (root / "SUPABASE_VERIFY_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
 
@@ -39,12 +41,12 @@ assert verify.count("calm_mode") >= 4
 
 # Player-facing contract: exact approved copy + compact hierarchy + archive reassurance.
 for phrase in (
-    "Nové úrovně jsou tady",
-    "Víc zábavy, menší frustrace!",
-    "Vyladili jsme obtížnost a komplet předělali všechny úrovně.",
+    "Nové úrovně jsou tady!",
+    "Vyladěná obtížnost pro více zábavy",
     "800 nových volných úrovní",
     "Vyladěná obtížnost napříč všemi režimy",
     "Tvé XP, postup, historie i odznaky zůstávají",
+    "Klidný režim, když si chceš oddechnout od žebříčku",
     "Jdu si zahrát!",
     "Jak se změnil archiv a postup",
     "Dosažená hodnost",
@@ -53,16 +55,37 @@ for phrase in (
     "Dříve odehrané",
 ):
     assert phrase in client, phrase
+assert "Víc zábavy, menší frustrace!" not in client
+assert "Vyladili jsme obtížnost a komplet předělali všechny úrovně." not in client
 assert "Čisté řešení → méně nápověd → čas → tahy." in client
 assert "#screen-free>.screen-title" in css and "#screen-leaderboard>.screen-title" in css
+assert "appearance-card .section-head .eyebrow" in client
 
-# Calm Mode UX/data: timer hidden, leaderboard hidden while calm, and mid-run switch is persisted.
-for phrase in ("Klidný režim", "Hraj bez časomíry a pořadí. XP i postup zůstávají.", "calm_mode"):
+# Responsive modal and flash-free boot are explicit release contracts.
+for token in ("clamp(30px,3.2vw,42px)", "@media (min-width:720px)", "grid-template-columns:1fr 1fr"):
+    assert token in css, token
+assert "gen4-preview-booting" in runtime and "gen4-preview-booting" in css
+assert "revealApp" in client
+
+# Calm Mode UX/data: timer hidden, leaderboard hidden while calm, mid-run switch persisted.
+for phrase in ("Klidný režim", "bez časomíry a žebříčku", "calm_mode"):
     assert phrase in client, phrase
 assert "body.calm-run-v334 #timer" in css
 assert "body.calm-run-v334 #levelLeaderboardBox" in css
+assert 'content:"🫧 Klidný režim"' in css
+assert "!eligible||calm" in client
 assert "/api/attempt/checkpoint" in client
 assert "sendAttemptCheckpoint('resume')" in client
 assert "calmModeLeaderboardExcluded:true" in runtime
+
+# Preview auth is narrow: canonical auth requests are bridged, gameplay POSTs remain blocked.
+assert "gen4PreviewAuthTesting:true" in runtime
+for source_path, action in (("/api/login", "login"), ("/api/player", "player"), ("/api/auth/google/complete", "google-complete")):
+    assert source_path in runtime and action in runtime
+assert 'methods=["PROPFIND"]' in preview_auth
+for action in ("login", "player", "google-complete"):
+    assert f'"{action}"' in preview_auth
+assert "_install_preview_auth_v334(app)" in account_auth
+assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
 print("v3.34 quality release contract: OK")
