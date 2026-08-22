@@ -40,12 +40,12 @@ jobs:
               raise AssertionError(f'{label}: {last!r}')
 
           def prep(page):
-              page.add_init_script("""()=>{
+              page.add_init_script("""
                 localStorage.setItem('proplet-v3-7-required-onboarding','done');
                 localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
                 localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
                 localStorage.setItem('proplet-release-notes-seen:3.33.1','1');
-              }""")
+              """)
               page.route('**/api/**',lambda route: route.fulfill(status=200,content_type='application/json',body='{}') if route.request.method!='GET' else route.continue_())
               page.goto(URL,wait_until='domcontentloaded',timeout=30000)
               wait(lambda:page.evaluate("typeof startStarter==='function' && !!window.PROPLET_RUNTIME_META && !!puzzleDB"),12000,'runtime')
@@ -68,7 +68,6 @@ jobs:
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
 
-              # P0-1: both hard-day starter choices must dismiss the interstitial before the next board starts.
               ctx=browser.new_context(viewport={'width':390,'height':844}); page=ctx.new_page(); prep(page)
               finish_starter(page)
               page.locator('#starterWarmupBtn').click()
@@ -80,19 +79,18 @@ jobs:
               assert page.locator('#screen-game.active').is_visible()
               ctx.close()
 
-              # P0-2: unfolded Fold browser = wide but short viewport. Keep rail and rounded-square cells.
               ctx=browser.new_context(viewport={'width':720,'height':500}); page=ctx.new_page(); prep(page)
               page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
-              page.locator('#screen-game.active').wait_for(state='visible',timeout=5000);page.wait_for_timeout(350)
+              page.locator('#screen-game.active').wait_for(state='visible',timeout=5000);page.wait_for_timeout(800)
               layout=page.evaluate("""()=>{
                 const main=getComputedStyle(document.querySelector('.game-main'));
                 const c=document.querySelector('#board .cell'); const cs=getComputedStyle(c); const r=c.getBoundingClientRect();
-                const radius=parseFloat(cs.borderTopLeftRadius)||0;
-                return {cols:main.gridTemplateColumns,width:r.width,height:r.height,radius,ratio:radius/Math.min(r.width,r.height),actionsX:document.querySelector('.game-control-column').getBoundingClientRect().x,boardRight:document.querySelector('.game-board-column').getBoundingClientRect().right};
+                return {innerWidth,innerHeight,wide:matchMedia('(min-width:540px)').matches,cols:main.gridTemplateColumns,width:r.width,height:r.height,radius:cs.borderTopLeftRadius,actionsX:document.querySelector('.game-control-column').getBoundingClientRect().x,boardRight:document.querySelector('.game-board-column').getBoundingClientRect().right};
               }""")
+              assert layout['wide'] is True,layout
               assert len(layout['cols'].split())>=2,layout
               assert layout['actionsX']>=layout['boardRight']-2,layout
-              assert layout['ratio']<0.35,layout
+              assert layout['radius'].endswith('%') and float(layout['radius'][:-1])<=24,layout
               print(json.dumps({'ok':True,'fold':layout},ensure_ascii=False))
               ctx.close();browser.close()
           PY
