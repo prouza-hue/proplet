@@ -8,6 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
+  if(gen4CandidatePreview)document.documentElement.classList.add('gen4-preview-booting');
   const META=Object.freeze({
     version:'3.34.0',
     canonicalOrigin,
@@ -48,27 +49,12 @@
       gen4ReleaseQualityPass:true,
       calmMode:true,
       calmModeLeaderboardExcluded:true,
-      gen4ProgressArchiveUx:true
+      gen4ProgressArchiveUx:true,
+      gen4FlashFreeBoot:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
   window.PROPLET_VERSION=META.version;
-
-  /* v3.34 quality layer stays additive so the candidate content remains frozen while
-     presentation, migration communication and calm-mode UX can iterate independently. */
-  if(!document.querySelector('link[data-proplet-quality-v334]')){
-    const link=document.createElement('link');
-    link.rel='stylesheet';link.href='/quality-v334.css?v=1';link.dataset.propletQualityV334='1';
-    document.head.appendChild(link);
-  }
-  const loadQualityLayer=()=>{
-    if(document.querySelector('script[data-proplet-quality-v334]'))return;
-    const script=document.createElement('script');
-    script.src='/quality-v334.js?v=1';script.async=false;script.dataset.propletQualityV334='1';
-    document.body.appendChild(script);
-  };
-  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadQualityLayer,{once:true});
-  else loadQualityLayer();
 
   let legacyOriginSession=false;
   if(productionAliases.has(location.hostname)&&location.origin!==canonicalOrigin){
