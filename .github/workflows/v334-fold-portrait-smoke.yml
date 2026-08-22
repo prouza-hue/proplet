@@ -1,0 +1,140 @@
+name: v3.34 Fold portrait + privacy icon smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/v334-fold-portrait-smoke.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  fold-and-icon:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PREVIEW_URL: https://proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Verify Fold portrait rail, other layouts, mobile privacy icon
+        shell: bash
+        run: |
+          cat > /tmp/fold_smoke.py <<'PY'
+          import json, os, time
+          from playwright.sync_api import sync_playwright
+
+          URL=os.environ['PREVIEW_URL'].rstrip('/')
+          CHROME=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
+          OUT='/tmp/proplet-fold-smoke';os.makedirs(OUT,exist_ok=True)
+          result={}
+
+          def wait(page,expr,timeout=12000):
+              end=time.time()+timeout/1000;last=None
+              while time.time()<end:
+                  try:
+                      last=page.evaluate(expr)
+                      if last:return last
+                  except Exception as e:last=repr(e)
+                  time.sleep(.1)
+              raise AssertionError(f'timeout: {expr}; last={last!r}')
+
+          def boot_game(browser,w,h,sw,sh,touch,label):
+              ctx=browser.new_context(viewport={'width':w,'height':h},screen={'width':sw,'height':sh},has_touch=touch,is_mobile=touch,service_workers='block')
+              page=ctx.new_page();errs=[]
+              page.on('pageerror',lambda e:errs.append(str(e)))
+              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+              wait(page,"typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]")
+              page.evaluate("""()=>{
+                try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');localStorage.setItem('proplet-release-notes-seen:3.33.1','1');sessionStorage.setItem('proplet-gen4-release-modal-v1','1')}catch(e){}
+                document.querySelector('#qualityReleaseModal')?.classList.add('hidden');
+                document.querySelector('#onboardingModal')?.classList.add('hidden');
+                document.querySelector('.release-notes-v3331-backdrop')?.remove();
+                document.body.classList.remove('release-notes-v3331-open');
+                startGame(puzzleDB.free.medium[0],'free');
+              """)
+              wait(page,"document.body.classList.contains('playing')")
+              page.wait_for_timeout(850)
+              state=page.evaluate("""()=>({
+                mode:document.documentElement.dataset.gameLayoutMode,
+                orient:document.documentElement.dataset.gameLayoutOrientation,
+                device:document.documentElement.dataset.gameLayoutDevice,
+                metrics:document.documentElement.dataset.gameLayoutMetrics,
+                cols:getComputedStyle(document.querySelector('.game-main')).gridTemplateColumns,
+                currentParent:document.querySelector('.current-word')?.parentElement?.className||'',
+                infoParent:document.querySelector('.game-info')?.parentElement?.className||'',
+                rail:document.querySelector('.game-control-column')?.getBoundingClientRect().width||0,
+                board:document.querySelector('.board-stage')?.getBoundingClientRect(),
+                cellRadius:getComputedStyle(document.querySelector('#board .cell')).borderRadius,
+                overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth
+              })""")
+              page.screenshot(path=f'{OUT}/{label}.png',full_page=True)
+              assert not errs,(label,errs)
+              return ctx,page,state
+
+          with sync_playwright() as p:
+              b=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
+
+              # Unfolded Fold portrait: real compact rail, populated by existing DOM move logic.
+              ctx,page,s=boot_game(b,656,728,656,728,True,'fold-portrait')
+              assert s['mode']=='tablet-portrait-rail',s
+              assert s['orient']=='portrait' and s['device']=='large-touch',s
+              assert len(s['cols'].split())==2,s
+              assert 'game-control-column' in s['currentParent'],s
+              assert 'game-board-column' in s['infoParent'],s
+              assert 150<=s['rail']<=200,s
+              assert s['board']['width']>360,s
+              assert s['overflowX']<=1,s
+              result['foldPortrait']=s;ctx.close()
+
+              # Fold landscape keeps the already-proven compact rail.
+              ctx,page,s=boot_game(b,728,656,728,656,True,'fold-landscape')
+              assert s['mode']=='tablet-landscape',s
+              assert len(s['cols'].split())==2 and 'game-control-column' in s['currentParent'],s
+              assert s['overflowX']<=1,s
+              result['foldLandscape']=s;ctx.close()
+
+              # Ordinary phone portrait stays single-column and does not inherit Fold rail.
+              ctx,page,s=boot_game(b,390,844,390,844,True,'phone-portrait')
+              assert s['mode']=='standard',s
+              assert len(s['cols'].split())==1,s
+              assert 'game-board-column' in s['currentParent'],s
+              result['phonePortrait']=s
+
+              # #4: compact mobile visibility control must visibly render a real emoji, not blank circle.
+              wait(page,"!!document.querySelector('#rankingPrivacyMini')")
+              icon=page.evaluate("""()=>{
+                const b=document.querySelector('#rankingPrivacyMini');
+                b.textContent='👀 Veřejně';b.setAttribute('aria-label','Pořadí: 👀 Veřejně');
+                const r=b.getBoundingClientRect(),before=getComputedStyle(b,'::before');
+                return {display:getComputedStyle(b).display,width:r.width,height:r.height,font:getComputedStyle(b).fontSize,before:before.content,beforeSize:before.fontSize};
+              }""")
+              assert icon['display']!='none' and icon['width']>=34 and icon['height']>=34,icon
+              assert '👀' in icon['before'],icon
+              assert float(icon['beforeSize'].replace('px',''))>=15,icon
+              page.screenshot(path=f'{OUT}/privacy-icon-mobile.png',full_page=True)
+              result['privacyIcon']=icon;ctx.close()
+
+              # Fine-pointer desktop keeps desktop-specific rail and full width.
+              ctx,page,s=boot_game(b,1600,900,1600,900,False,'desktop-wide')
+              assert s['mode']=='desktop-wide',s
+              assert len(s['cols'].split())==2,s
+              assert 'game-control-column' in s['currentParent'] and 'game-control-column' in s['infoParent'],s
+              assert s['rail']>=285,s
+              assert s['overflowX']<=1,s
+              result['desktop']=s;ctx.close();b.close()
+
+          with open(f'{OUT}/summary.json','w',encoding='utf-8') as f:json.dump(result,f,ensure_ascii=False,indent=2)
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          python /tmp/fold_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v334-fold-portrait-smoke
+          path: /tmp/proplet-fold-smoke/
+          if-no-files-found: warn
+          retention-days: 7
