@@ -105,17 +105,20 @@ assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
-# v4.00.1 hands over immediately without blocking on the full content bundle or
-# navigating an already open game. Static assets become cache-first afterwards.
-assert 'version:\'4.00.1\'' in runtime
-assert "proplet-v4.00.1-shell" in sw
+# v4.00.2 keeps the lean v4.00.1 cache, but waits for the visible update action
+# so old clients can complete the handover instead of messaging an active worker.
+assert 'version:\'4.00.2\'' in runtime
+assert "proplet-v4.00.2-shell" in sw
 assert "self.skipWaiting()" in sw
+install_block = re.search(r"self\.addEventListener\('install'.*?\n\}\);", sw, re.S)
+assert install_block and "skipWaiting" not in install_block.group(0)
 assert "client.navigate(client.url)" not in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 assert "preserveExistingPuzzleDatabase" in sw
 assert "forcedClientUpdateV400:true" in runtime
 assert "pwaStartupHotfixV4001:true" in runtime
+assert "pwaUpdateButtonHotfixV4002:true" in runtime
 
 # Preview auth stays narrow, but uses ordinary browser POST. No PROPFIND/fetch monkeypatch.
 assert "gen4PreviewAuthTesting:true" in runtime
@@ -134,4 +137,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.00.1 quality release contract: OK")
+print("Proplet v4.00.2 quality release contract: OK")

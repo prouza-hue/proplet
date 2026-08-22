@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.00.1-shell';
+const SHELL_CACHE='proplet-v4.00.2-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js'];
@@ -28,7 +28,9 @@ async function preserveExistingPuzzleDatabase(){
 }
 
 self.addEventListener('install',e=>{
-  e.waitUntil(Promise.all([precacheShell(),preserveExistingPuzzleDatabase()]).then(()=>self.skipWaiting()));
+  // The visible update button performs the handover. Staying in "waiting" is
+  // required so clients still running v4.00.1 can send SKIP_WAITING successfully.
+  e.waitUntil(Promise.all([precacheShell(),preserveExistingPuzzleDatabase()]));
 });
 self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting()});
 self.addEventListener('activate',e=>e.waitUntil((async()=>{
