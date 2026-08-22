@@ -260,8 +260,12 @@ def assemble_runtime(production: dict, grouped: dict) -> dict:
     rescue = ordered_bank(require_levels(grouped, "rescue", "rescue", 30), "rescue", "easy")
     for puzzle in rescue:
         puzzle["difficulty"] = "rescue"
-    starter = require_levels(grouped, "starter", "easy", 1)[0]
-    starter["meta"]["rewardXp"] = int((production.get("starter") or {}).get("meta", {}).get("rewardXp") or 10)
+    # Starter is a curated, scripted onboarding asset — never generated with a content generation.
+    starter = deepcopy(production.get("starter") or {})
+    if starter.get("id") != "starter-v1" or (starter.get("rows"), starter.get("cols")) != (5, 5):
+        raise SystemExit("Canonical starter-v1 5x5 is missing from production source")
+    if [answer.get("word") for answer in starter.get("answers") or []] != ["MRAK", "JABLKO", "ČOKOLÁDA", "AUTOBUS"]:
+        raise SystemExit("Canonical starter answers changed unexpectedly")
 
     body_keys = {"free", "daily", "rescue", "starter", "legacyFree", "legacyDaily", "previousDaily"}
     runtime = {key: deepcopy(value) for key, value in production.items() if key not in body_keys}
