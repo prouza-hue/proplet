@@ -81,7 +81,6 @@ jobs:
           with sync_playwright() as p:
               b=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
 
-              # Unfolded Fold portrait: real compact rail, populated by existing DOM move logic.
               ctx,page,s=boot_game(b,656,728,656,728,True,'fold-portrait')
               assert s['mode']=='tablet-portrait-rail',s
               assert s['orient']=='portrait' and s['device']=='large-touch',s
@@ -93,28 +92,23 @@ jobs:
               assert s['overflowX']<=1,s
               result['foldPortrait']=s;ctx.close()
 
-              # Fold landscape keeps the already-proven compact rail.
               ctx,page,s=boot_game(b,728,656,728,656,True,'fold-landscape')
               assert s['mode']=='tablet-landscape',s
               assert len(s['cols'].split())==2 and 'game-control-column' in s['currentParent'],s
               assert s['overflowX']<=1,s
               result['foldLandscape']=s;ctx.close()
 
-              # Ordinary phone portrait stays single-column and does not inherit Fold rail.
               ctx,page,s=boot_game(b,390,844,390,844,True,'phone-portrait')
               assert s['mode']=='standard',s
               assert len(s['cols'].split())==1,s
               assert 'game-board-column' in s['currentParent'],s
               result['phonePortrait']=s;ctx.close()
 
-              # #4 is a HOME-header control, so test it on a fresh non-game mobile page.
+              # #4 is a HOME-header control. The fresh page is already on Dnes; don't re-enter the route during boot.
               ctx=b.new_context(viewport={'width':390,'height':844},screen={'width':390,'height':844},has_touch=True,is_mobile=True,service_workers='block')
               page=ctx.new_page();page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-              wait(page,"typeof nav==='function' && !!document.querySelector('#rankingPrivacyMini')")
-              dismiss_overlays(page)
-              page.evaluate("nav('daily',{replace:true})")
-              wait(page,"document.querySelector('#screen-daily')?.classList.contains('active')")
-              page.wait_for_timeout(300)
+              wait(page,"!!document.querySelector('#rankingPrivacyMini') && !!document.querySelector('#screen-daily')?.classList.contains('active')")
+              dismiss_overlays(page);page.wait_for_timeout(350)
               icon=page.evaluate("""()=>{
                 const b=document.querySelector('#rankingPrivacyMini');
                 b.textContent='👀 Veřejně';b.setAttribute('aria-label','Pořadí: 👀 Veřejně');
@@ -127,7 +121,6 @@ jobs:
               page.screenshot(path=f'{OUT}/privacy-icon-mobile.png',full_page=True)
               result['privacyIcon']=icon;ctx.close()
 
-              # Fine-pointer desktop keeps desktop-specific rail and full width.
               ctx,page,s=boot_game(b,1600,900,1600,900,False,'desktop-wide')
               assert s['mode']=='desktop-wide',s
               assert len(s['cols'].split())==2,s
