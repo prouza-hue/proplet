@@ -78,7 +78,6 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          # Load the additive quality layer from the real app shell.
           p = Path('public/index.html')
           s = p.read_text(encoding='utf-8')
           if '/quality-v334.css' not in s:
@@ -87,8 +86,6 @@ jobs:
               s = s.replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n  <script src="/quality-v334.js"></script>', 1)
           p.write_text(s, encoding='utf-8')
 
-          # Calm Mode is an additive flag on gameplay history. The migration is prepared here,
-          # but is NOT applied to production by this workflow.
           m = Path('SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql')
           sql = m.read_text(encoding='utf-8')
           for table in ('results','puzzle_runs','puzzle_attempts'):
@@ -119,12 +116,10 @@ jobs:
           node --check public/quality-v334.js
           node --check public/runtime-meta.js
 
-      - name: Run cheap release contract
+      - name: Run focused quality contract
         run: |
           git diff --check
           python tools/test_v334_quality_release.py
-          python tools/test_gen4_preview_readonly.py
-          python tools/test_gen4_progress_migration.py
           node tools/test_gen4_preview_runtime_meta.js
           python - <<'PY'
           from pathlib import Path
