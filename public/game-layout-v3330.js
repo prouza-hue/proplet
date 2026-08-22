@@ -151,27 +151,29 @@
       pausedByGuard=false;
     }
 
-    /* A fine pointer plus a genuinely wide viewport gets its own laptop/monitor composition.
-       Touch-first Fold/tablet behavior remains unchanged and takes precedence below 1000px. */
+    /* Fine-pointer wide screens keep the dedicated desktop composition. Touch-first unfolded
+       Fold/tablet screens use the proven compact rail in BOTH orientations once there is at
+       least 600 CSS px of viewport width. phoneLike() keeps ordinary phones out of this path. */
     const desktopWide=playing&&!phone&&finePointer()&&d.w>=1000&&d.h>=650;
-    const tabletLandscape=playing&&!desktopWide&&landscape&&!phone&&coarsePointer()&&d.w>=600&&d.w<=1280;
-    document.body.classList.toggle(TABLET_CLASS,tabletLandscape);
+    const largeTouchRail=playing&&!desktopWide&&!phone&&coarsePointer()&&d.w>=600&&d.w<=1280;
+    document.body.classList.toggle(TABLET_CLASS,largeTouchRail);
     document.body.classList.toggle(DESKTOP_CLASS,desktopWide);
 
     if(desktopWide){
       moveDesktopStatusToRail();
-    }else if(tabletLandscape){
+    }else if(largeTouchRail){
       restoreGameInfo();
       moveCurrentWordToRail();
     }else{
       restoreGameBoardNodes();
     }
 
+    const largeTouchMode=landscape?'tablet-landscape':'tablet-portrait-rail';
     setDebugMode(
-      desktopWide?'desktop-wide':tabletLandscape?'tablet-landscape':playing?'standard':'inactive',
+      desktopWide?'desktop-wide':largeTouchRail?largeTouchMode:playing?'standard':'inactive',
       d,
       landscape,
-      desktopWide?'desktop':tabletLandscape?'large-touch':phone?'phone':'standard',
+      desktopWide?'desktop':largeTouchRail?'large-touch':phone?'phone':'standard',
     );
     refit();
   };
