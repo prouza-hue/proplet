@@ -1,0 +1,71 @@
+name: v3.34 restore canonical starter
+
+on:
+  push:
+    branches:
+      - agent/v3340-medium-calibration-v3
+    paths:
+      - .github/workflows/v334-restore-canonical-starter.yml
+
+permissions:
+  contents: write
+
+jobs:
+  restore-starter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3340-medium-calibration-v3
+          fetch-depth: 0
+
+      - name: Pin starter to production canonical asset
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          from pathlib import Path
+          import json
+
+          baseline_path = Path('data/puzzles.json')
+          candidate_path = Path('data/puzzles_gen4_candidate_v334.json')
+          assembler_path = Path('tools/assemble_gen4_release.py')
+
+          baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
+          candidate = json.loads(candidate_path.read_text(encoding='utf-8'))
+          starter = baseline.get('starter') or {}
+          expected = ['MRAK', 'JABLKO', 'ČOKOLÁDA', 'AUTOBUS']
+
+          assert starter.get('id') == 'starter-v1', starter.get('id')
+          assert (starter.get('rows'), starter.get('cols')) == (5, 5)
+          assert [a.get('word') for a in starter.get('answers', [])] == expected
+          paths = [i for a in starter['answers'] for i in a['path']]
+          assert len(paths) == 25 and len(set(paths)) == 25
+
+          candidate['starter'] = deepcopy(starter)
+          candidate_path.write_text(
+              json.dumps(candidate, ensure_ascii=False, separators=(',', ':')),
+              encoding='utf-8'
+          )
+
+          source = assembler_path.read_text(encoding='utf-8')
+          old = '''    starter = require_levels(grouped, "starter", "easy", 1)[0]\n    starter["meta"]["rewardXp"] = int((production.get("starter") or {}).get("meta", {}).get("rewardXp") or 10)\n'''
+          new = '''    # Starter is a curated, scripted onboarding asset — never generated with a content generation.\n    starter = deepcopy(production.get("starter") or {})\n    if starter.get("id") != "starter-v1" or (starter.get("rows"), starter.get("cols")) != (5, 5):\n        raise SystemExit("Canonical starter-v1 5x5 is missing from production source")\n    if [answer.get("word") for answer in starter.get("answers") or []] != ["MRAK", "JABLKO", "ČOKOLÁDA", "AUTOBUS"]:\n        raise SystemExit("Canonical starter answers changed unexpectedly")\n'''
+          if old not in source:
+              raise SystemExit('Expected generated-starter assembler block not found')
+          assembler_path.write_text(source.replace(old, new, 1), encoding='utf-8')
+
+          # Cheap permanent regression guard: candidate and production starter must match byte-for-byte as JSON values.
+          test_path = Path('tools/test_v334_canonical_starter.py')
+          test_path.write_text('''#!/usr/bin/env python3\nfrom pathlib import Path\nimport json\n\nroot=Path(__file__).resolve().parents[1]\nbase=json.loads((root/"data/puzzles.json").read_text(encoding="utf-8"))["starter"]\ngen4=json.loads((root/"data/puzzles_gen4_candidate_v334.json").read_text(encoding="utf-8"))["starter"]\nassert base==gen4, "Gen4 must preserve canonical starter exactly"\nassert base["id"]=="starter-v1"\nassert (base["rows"],base["cols"])==(5,5)\nassert [a["word"] for a in base["answers"]]==["MRAK","JABLKO","ČOKOLÁDA","AUTOBUS"]\npaths=[i for a in base["answers"] for i in a["path"]]\nassert len(paths)==25 and len(set(paths))==25\nprint("Canonical starter preserved: starter-v1 5x5")\n''', encoding='utf-8')
+          PY
+          python tools/test_v334_canonical_starter.py
+          python -m py_compile tools/assemble_gen4_release.py tools/test_v334_canonical_starter.py
+
+      - name: Commit restored starter
+        run: |
+          git config user.name "proplet-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/puzzles_gen4_candidate_v334.json tools/assemble_gen4_release.py tools/test_v334_canonical_starter.py
+          git commit -m "fix: preserve canonical onboarding starter in Gen4"
+          git push origin HEAD:agent/v3340-medium-calibration-v3
