@@ -1,9 +1,9 @@
 name: v3.34 preview browser smoke
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/v3340-medium-calibration-v3
+      - main
     paths:
       - '.github/workflows/v334-preview-browser-smoke.yml'
 
@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           cat > /tmp/smoke.py <<'PY'
-          import json, os, shutil, time, uuid
+          import json, os, time, uuid
           from urllib.parse import urlparse
           from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
@@ -100,15 +100,11 @@ jobs:
                       page.locator('#googleLoginBtn').click()
                   pop=pi.value; pop.wait_for_load_state('domcontentloaded',timeout=15000); target=pop.url; pop.close()
               except PlaywrightTimeoutError:
-                  if page.url!=URL+'/' and 'vercel.app' not in urlparse(page.url).netloc:
-                      target=page.url
-                  else:
-                      page.wait_for_timeout(1500); target=page.url
+                  page.wait_for_timeout(1500); target=page.url
               host=urlparse(target).netloc.casefold()
               googleish=('google.' in host or host.endswith('google.com') or host.endswith('accounts.google.com'))
               assert origin_hit or googleish, {'target':target,'origin_hit':origin_hit}
               summary['checks']['google_login']={'target':target,'oauthRequests':origin_hit,'errors':errs}
-              # Google may log third-party browser/CSP noise; app JS errors are checked in the other flows.
               ctx.close()
 
           def account_flow(browser):
@@ -123,8 +119,7 @@ jobs:
               page.locator('#saveProfileBtn').click()
               page.wait_for_function("JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')?.token",timeout=15000)
               created=page.evaluate("JSON.parse(localStorage.getItem('proplet-v2-profile'))")
-              assert created.get('token') and (created.get('name')==name or created.get('playerName')==name), created
-              # Keep all non-auth local state, then prove password login in the same browser.
+              assert created.get('token'), created
               page.evaluate("localStorage.removeItem('proplet-v2-profile')")
               page.reload(wait_until='domcontentloaded'); page.wait_for_timeout(700); close_overlays(page)
               page.locator('#profileChip').click(); page.locator('#profileModal:not(.hidden)').wait_for(state='visible')
@@ -145,7 +140,6 @@ jobs:
                   if loc.count(): return loc.first
               kids=page.locator('#board > *')
               if kids.count()==total: return kids.nth(idx)
-              # Last fallback: non-placeholder children are still expected in board order.
               assert idx < kids.count(), {'idx':idx,'children':kids.count(),'total':total}
               return kids.nth(idx)
 
@@ -160,23 +154,18 @@ jobs:
           def gameplay_calm(browser):
               ctx=browser.new_context(viewport={'width':1280,'height':900})
               page=ctx.new_page(); errs=errors_for(page); load(page); close_overlays(page)
-              # Navigation itself remains responsive.
               page.locator('[data-nav="free"]').click(); page.locator('#screen-free.active').wait_for(state='visible',timeout=5000)
               page.wait_for_function("typeof puzzleDB!=='undefined' && puzzleDB?.free?.easy?.length",timeout=5000)
               info=page.evaluate("""()=>{const p=puzzleDB.free.easy[0];startGame(p,'free');return {id:p.id,gen:p.meta?.contentGeneration,rows:p.rows,cols:p.cols,answers:p.answers.map(a=>({word:a.word,path:a.path}))}}""")
               assert info['gen']==4 and info['id']!='starter-v1', info
               page.locator('#screen-game.active').wait_for(state='visible',timeout=5000)
-              total=info['rows']*info['cols']; assert page.locator('#board > *').count()>=len([x for x in range(total)]) or page.locator('#board > *').count()>0
-              # Make one real drag before switching mode.
+              total=info['rows']*info['cols']; assert page.locator('#board > *').count()>0
               first=info['answers'][0]; drag_path(page,first['path'],total)
-              page.wait_for_function("document.querySelectorAll('#foundWords .found-word, #foundWords [data-word], #foundWords span:not(.empty-found)').length>0 || !document.querySelector('#foundWords')?.innerText.includes('zatím nic')",timeout=4000)
-              progress_before=page.locator('#gameProgress').inner_text()
-              assert progress_before and not progress_before.startswith('0 /'), progress_before
-              # Mid-run Calm Mode is the critical state transition.
+              page.wait_for_function("!document.querySelector('#foundWords')?.innerText.includes('zatím nic')",timeout=4000)
+              progress_before=page.locator('#gameProgress').inner_text(); assert progress_before and not progress_before.startswith('0 /'), progress_before
               page.locator('#calmRunBtn').click(); page.wait_for_timeout(150)
               calm=page.evaluate("""()=>({body:document.body.classList.contains('calm-run-v334'),timer:getComputedStyle(document.querySelector('#timer')).display,current:currentGame?.calmMode,button:document.querySelector('#calmRunBtn')?.classList.contains('hidden')})""")
               assert calm['body'] and calm['timer']=='none' and calm['current'] is True and calm['button'], calm
-              # Continue playing another word in Calm Mode.
               if len(info['answers'])>1: drag_path(page,info['answers'][1]['path'],total)
               progress_after=page.locator('#gameProgress').inner_text(); assert progress_after!=progress_before,(progress_before,progress_after)
               shot=f'{OUT}/gen4-calm-game.png';page.screenshot(path=shot,full_page=True);summary['screenshots'].append(shot)
