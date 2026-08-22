@@ -8,7 +8,13 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
-  if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
+  if(gen4CandidatePreview){
+    document.documentElement?.classList?.add('gen4-preview-booting','gen4-preview-no-ranking-privacy');
+    const guard=document.createElement('style');
+    guard.dataset.propletGen4PrivacyBootGuard='1';
+    guard.textContent='html.gen4-preview-no-ranking-privacy #rankingPrivacyModal{display:none!important}';
+    document.head?.appendChild(guard);
+  }
   const META=Object.freeze({
     version:'3.34.0',
     canonicalOrigin,
@@ -41,6 +47,9 @@
       challengeFirstShareCta:true,
       dailyChallengeShareCta:true,
       clientObserverScopeV3334:true,
+      p0StarterTransitionFixV3336:true,
+      foldShortViewportRailFixV3336:true,
+      adaptiveCellRadiusV3336:true,
       accountCreationBonusXp:500,
       accountBonusLeaderboardExcluded:true,
       growthReleaseNotes:true,
@@ -52,7 +61,9 @@
       gen4ProgressArchiveUx:true,
       gen4FlashFreeBoot:true,
       gen4PreviewAuthTesting:true,
-      canonicalStarterPinned:true
+      canonicalStarterPinned:true,
+      gen4PreviewPrivacyPromptSuppressed:true,
+      mobileRankingPrivacyIconFix:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
@@ -75,6 +86,34 @@
     }
   }
 
+  const loadStyle=(href,key)=>{
+    if(document.querySelector(`link[data-${key}]`))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    link.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';
+    document.head.appendChild(link);
+  };
+
+  const loadScript=(src,key)=>{
+    if(document.querySelector(`script[data-${key}]`))return;
+    const script=document.createElement('script');
+    script.src=src;
+    script.async=false;
+    script.dataset[key.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]='1';
+    document.body.appendChild(script);
+  };
+
+  const loadP0Hotfix=()=>{
+    loadStyle('/p0-hotfix-v3336.css','proplet-p0-v3336');
+    loadScript('/p0-hotfix-v3336.js','proplet-p0-v3336');
+  };
+
+  const loadQualityHotfix=()=>{
+    loadStyle('/quality-hotfix-v334.css','proplet-quality-hotfix-v334');
+    loadScript('/quality-hotfix-v334.js','proplet-quality-hotfix-v334');
+  };
+
   const loadPushOriginGuard=()=>{
     if(legacyOriginSession)return;
     if(document.querySelector('script[data-proplet-push-origin]'))return;
@@ -84,6 +123,7 @@
     script.dataset.propletPushOrigin='1';
     document.body.appendChild(script);
   };
-  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadPushOriginGuard,{once:true});
-  else loadPushOriginGuard();
+  const bootRuntimeExtras=()=>{loadP0Hotfix();loadQualityHotfix();loadPushOriginGuard()};
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',bootRuntimeExtras,{once:true});
+  else bootRuntimeExtras();
 })();
