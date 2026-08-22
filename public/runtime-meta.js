@@ -8,13 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
-  if(gen4CandidatePreview){
-    document.documentElement?.classList?.add('gen4-preview-booting','gen4-preview-no-ranking-privacy');
-    const guard=document.createElement('style');
-    guard.dataset.propletGen4PrivacyBootGuard='1';
-    guard.textContent='html.gen4-preview-no-ranking-privacy #rankingPrivacyModal{display:none!important}';
-    document.head?.appendChild(guard);
-  }
+  if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
     version:'3.34.0',
     canonicalOrigin,
@@ -48,8 +42,8 @@
       dailyChallengeShareCta:true,
       clientObserverScopeV3334:true,
       p0StarterTransitionFixV3336:true,
-      foldShortViewportRailFixV3336:true,
       adaptiveCellRadiusV3336:true,
+      layoutRegressionRollbackV3337:true,
       accountCreationBonusXp:500,
       accountBonusLeaderboardExcluded:true,
       growthReleaseNotes:true,
@@ -62,7 +56,6 @@
       gen4FlashFreeBoot:true,
       gen4PreviewAuthTesting:true,
       canonicalStarterPinned:true,
-      gen4PreviewPrivacyPromptSuppressed:true,
       mobileRankingPrivacyIconFix:true
     })
   });
@@ -109,10 +102,7 @@
     loadScript('/p0-hotfix-v3336.js','proplet-p0-v3336');
   };
 
-  const loadQualityHotfix=()=>{
-    loadStyle('/quality-hotfix-v334.css','proplet-quality-hotfix-v334');
-    loadScript('/quality-hotfix-v334.js','proplet-quality-hotfix-v334');
-  };
+  const loadQualityHotfix=()=>loadStyle('/quality-hotfix-v334.css','proplet-quality-hotfix-v334');
 
   const loadPushOriginGuard=()=>{
     if(legacyOriginSession)return;
