@@ -55,7 +55,7 @@ jobs:
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
                 startGame(puzzleDB.free.medium[0],'free');
-              """)
+              }""")
               wait(page,"document.body.classList.contains('playing')")
               page.wait_for_timeout(850)
               state=page.evaluate("""()=>({
