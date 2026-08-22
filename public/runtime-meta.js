@@ -8,7 +8,7 @@
     'proplet-git-main-pavel-prouzas-projects.vercel.app'
   ]);
   const META=Object.freeze({
-    version:'3.33.5',
+    version:'3.33.6',
     canonicalOrigin,
     capabilities:Object.freeze({
       phoneLandscapeBlocking:true,
@@ -38,6 +38,9 @@
       challengeFirstShareCta:true,
       dailyChallengeShareCta:true,
       clientObserverScopeV3334:true,
+      p0StarterTransitionFixV3336:true,
+      foldShortViewportRailFixV3336:true,
+      adaptiveCellRadiusV3336:true,
       accountCreationBonusXp:500,
       accountBonusLeaderboardExcluded:true,
       growthReleaseNotes:true,
@@ -65,6 +68,22 @@
     }
   }
 
+  const loadP0Hotfix=()=>{
+    if(!document.querySelector('link[data-proplet-p0-v3336]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href='/p0-hotfix-v3336.css';
+      link.dataset.propletP0V3336='1';
+      document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-proplet-p0-v3336]')){
+      const script=document.createElement('script');
+      script.src='/p0-hotfix-v3336.js';
+      script.dataset.propletP0V3336='1';
+      document.body.appendChild(script);
+    }
+  };
+
   const loadPushOriginGuard=()=>{
     if(legacyOriginSession)return;
     if(document.querySelector('script[data-proplet-push-origin]'))return;
@@ -74,6 +93,7 @@
     script.dataset.propletPushOrigin='1';
     document.body.appendChild(script);
   };
-  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadPushOriginGuard,{once:true});
-  else loadPushOriginGuard();
+  const bootRuntimeExtras=()=>{loadP0Hotfix();loadPushOriginGuard()};
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',bootRuntimeExtras,{once:true});
+  else bootRuntimeExtras();
 })();
