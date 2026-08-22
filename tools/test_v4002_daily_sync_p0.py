@@ -47,4 +47,4 @@ assert "applyPendingUpdate" in APP
 assert "client.navigate(client.url)" in SW
 assert "await Promise.all(clients.map(client=>client.navigate" not in SW
 
-print("Proplet v4.00.4 Daily sync P0 contract: OK")
+print("Proplet v4.00.5 Daily sync P0 contract: OK")

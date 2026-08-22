@@ -4,43 +4,43 @@
   max-width:none;
   min-height:42px;
   padding:10px 15px;
-  border:1px solid #6b53d8;
+  border:1px solid #d05677;
   border-radius:13px;
-  background:linear-gradient(135deg,#6550d8 0%,#7f5ce7 58%,#8f69ee 100%);
+  background:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);
   color:#fff;
-  box-shadow:0 7px 18px rgba(83,61,178,.22),inset 0 1px 0 rgba(255,255,255,.2);
+  box-shadow:0 9px 23px rgba(139,36,70,.33),inset 0 1px 0 rgba(255,255,255,.2);
   font-size:12.5px;
   font-weight:950;
   letter-spacing:.01em;
 }
 #winModal .win-main-actions .challenge-share-cta:hover,
 #winModal .win-main-actions .challenge-share-cta:focus-visible{
-  background:linear-gradient(135deg,#5d47cf 0%,#7652df 58%,#8861e9 100%);
-  border-color:#5f47cf;
+  background:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%);
+  border-color:#c34266;
   color:#fff;
-  box-shadow:0 9px 22px rgba(83,61,178,.28),inset 0 1px 0 rgba(255,255,255,.22);
+  box-shadow:0 10px 24px rgba(139,36,70,.4),inset 0 1px 0 rgba(255,255,255,.22);
   outline:none;
 }
 #winModal .win-main-actions .challenge-share-cta:active{transform:scale(.985)}
 
 #levelDetailShareBtn.challenge-share-detail-cta{
-  border-color:#6b53d8;
-  background:linear-gradient(135deg,#6550d8,#835fe9);
+  border-color:#d05677;
+  background:linear-gradient(135deg,#a93262,#d54d6b);
   color:#fff;
-  box-shadow:0 5px 14px rgba(83,61,178,.18);
+  box-shadow:0 6px 16px rgba(139,36,70,.28);
   font-weight:900;
 }
 #levelDetailShareBtn.challenge-share-detail-cta:hover,
 #levelDetailShareBtn.challenge-share-detail-cta:focus-visible{
-  border-color:#5f47cf;
-  background:linear-gradient(135deg,#5d47cf,#7854df);
+  border-color:#c34266;
+  background:linear-gradient(135deg,#9e2c59,#ca4264);
   color:#fff;
 }
 
 html[data-theme="dark"] #winModal .win-main-actions .challenge-share-cta,
 html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
-  border-color:#8d78ef;
-  background:linear-gradient(135deg,#6652c9,#8063dc);
+  border-color:#df6a8b;
+  background:linear-gradient(135deg,#a93262,#ca4968);
   color:#fff;
   box-shadow:0 7px 20px rgba(0,0,0,.28),0 0 0 1px rgba(177,158,255,.08) inset;
 }
