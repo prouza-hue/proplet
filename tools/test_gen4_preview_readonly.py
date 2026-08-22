@@ -37,12 +37,25 @@ def main() -> None:
     assert blocked.status_code == 409
     assert "pouze pro čtení" in blocked.json().get("detail", "")
 
+    # Auth/account QA is deliberately exempt from the gameplay write lock. Empty payloads
+    # must reach canonical validation/auth (422/401), not the Gen4 409 middleware blocker.
+    for path in (
+        "/api/login",
+        "/api/player",
+        "/api/auth/google/complete",
+        "/api/account/email/start",
+        "/api/auth/recovery/start",
+        "/api/account-bonus/claim",
+    ):
+        response = client.post(path, json={})
+        assert response.status_code != 409, (path, response.status_code, response.text)
+
     legacy_id = next(iter(puzzles.get("legacyFreeIndex") or {}))
     server.enforce_rate_limit = lambda *args, **kwargs: None
     archived = client.get("/api/free-archive", params={"puzzle_id": legacy_id})
     assert archived.status_code == 410
     assert archived.json().get("archived") is True
-    print("Gen4 preview verified: branch-scoped candidate, no-store reads, writes blocked, legacy tombstone.")
+    print("Gen4 preview verified: Gen4 reads, gameplay writes blocked, auth POST QA enabled, legacy tombstone intact.")
 
 
 if __name__ == "__main__":
