@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.00.2-shell';
+const SHELL_CACHE='proplet-v4.00.3-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js'];
@@ -39,7 +39,9 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   // activated, leaving its button with no waiting worker to promote. This
   // one-time handover actively refreshes controlled windows onto the P0 fix.
   const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
-  await Promise.all(clients.map(client=>client.navigate(client.url).catch(()=>null)));
+  // Do not await navigation from inside activate: an older controlled page can
+  // wait for activation while activation waits for that page, deadlocking both.
+  clients.forEach(client=>client.navigate(client.url).catch(()=>null));
 })()));
 
 async function networkFirst(request,cacheName,fallback){
