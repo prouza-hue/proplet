@@ -50,11 +50,36 @@
       calmMode:true,
       calmModeLeaderboardExcluded:true,
       gen4ProgressArchiveUx:true,
-      gen4FlashFreeBoot:true
+      gen4FlashFreeBoot:true,
+      gen4PreviewAuthTesting:true
     })
   });
   window.PROPLET_RUNTIME_META=META;
   window.PROPLET_VERSION=META.version;
+
+  /* Gen4 preview keeps gameplay mutations blocked, but auth must be testable.
+     Rewrite only the three canonical auth POSTs into the preview-only bridge. */
+  if(gen4CandidatePreview&&typeof window.fetch==='function'&&!window.__PROPLET_PREVIEW_AUTH_FETCH__){
+    const nativeFetch=window.fetch.bind(window);
+    const authRoutes=new Map([
+      ['/api/login','login'],
+      ['/api/player','player'],
+      ['/api/auth/google/complete','google-complete']
+    ]);
+    window.fetch=function(input,init={}){
+      try{
+        const raw=typeof input==='string'||input instanceof URL?String(input):input?.url;
+        const url=new URL(raw,location.origin),method=String(init?.method||input?.method||'GET').toUpperCase();
+        const action=url.origin===location.origin&&method==='POST'?authRoutes.get(url.pathname):null;
+        if(action){
+          const bridge=`/api/preview-auth/${action}`;
+          return nativeFetch(bridge,{...init,method:'PROPFIND'});
+        }
+      }catch{}
+      return nativeFetch(input,init);
+    };
+    window.__PROPLET_PREVIEW_AUTH_FETCH__=true;
+  }
 
   let legacyOriginSession=false;
   if(productionAliases.has(location.hostname)&&location.origin!==canonicalOrigin){
