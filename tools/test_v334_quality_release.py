@@ -13,6 +13,7 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 index = (root / "public" / "index.html").read_text(encoding="utf-8")
 app = (root / "public" / "app.js").read_text(encoding="utf-8")
 sw = (root / "public" / "sw.js").read_text(encoding="utf-8")
+challenge_css = (root / "public" / "challenge-cta-v3333.css").read_text(encoding="utf-8")
 preview_auth = (root / "preview_auth_v334.py").read_text(encoding="utf-8")
 account_auth = (root / "account_auth.py").read_text(encoding="utf-8")
 migration = (root / "SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
@@ -105,11 +106,15 @@ assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
-# v4.00.4 keeps the non-blocking handover and fixes Daily run-field ranking.
+# v4.00.5 keeps the P0 fixes and applies the approved competitive CTA colour.
 # Its one-time navigation repairs the already-activated v4.00.1 update handover.
-assert 'version:\'4.00.4\'' in runtime
-assert "proplet-v4.00.4-shell" in sw
+assert 'version:\'4.00.5\'' in runtime
+assert "proplet-v4.00.5-shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
+assert "challengeCtaRaspberryV4005:true" in runtime
+assert "linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%)" in challenge_css
+assert "#winModal .win-main-actions .challenge-share-cta" in challenge_css
+assert ".daily-hero #shareDailyBtn.daily-challenge-cta" in challenge_css
 assert "self.skipWaiting()" in sw
 assert "client.navigate(client.url)" in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)
@@ -135,4 +140,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.00.4 quality release contract: OK")
+print("Proplet v4.00.5 quality release contract: OK")
