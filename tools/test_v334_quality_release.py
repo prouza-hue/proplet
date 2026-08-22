@@ -105,10 +105,11 @@ assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
-# v4.00.3 hands over immediately without blocking on the full content bundle.
+# v4.00.4 keeps the non-blocking handover and fixes Daily run-field ranking.
 # Its one-time navigation repairs the already-activated v4.00.1 update handover.
-assert 'version:\'4.00.3\'' in runtime
-assert "proplet-v4.00.3-shell" in sw
+assert 'version:\'4.00.4\'' in runtime
+assert "proplet-v4.00.4-shell" in sw
+assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "self.skipWaiting()" in sw
 assert "client.navigate(client.url)" in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)
@@ -134,4 +135,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.00.3 quality release contract: OK")
+print("Proplet v4.00.4 quality release contract: OK")
