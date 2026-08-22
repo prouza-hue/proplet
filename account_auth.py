@@ -7,6 +7,7 @@ from account_auth_core import install_account_auth as _install_account_auth_core
 from account_bonus_v3331 import install_account_bonus as _install_account_bonus
 from account_integrity_v33210 import install_account_integrity as _install_account_integrity
 from competitive_sharing_v3331 import install_competitive_sharing as _install_competitive_sharing
+from preview_auth_v334 import install_preview_auth_v334 as _install_preview_auth_v334
 from push_diagnostics_v3329 import install_push_diagnostics as _install_push_diagnostics
 from word_recognition_v3330 import install_word_recognition as _install_word_recognition
 
@@ -47,3 +48,6 @@ def install_account_auth(app, **kwargs):
         app_version=caller_globals.get("APP_VERSION") or "",
         vercel_env=caller_globals.get("VERCEL_ENV") or "",
     )
+    # Preview-only bridge is installed last so it can reuse the already-registered
+    # canonical login/player/Google handlers without changing production routing.
+    _install_preview_auth_v334(app)
