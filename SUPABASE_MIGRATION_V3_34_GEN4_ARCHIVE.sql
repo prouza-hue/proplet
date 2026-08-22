@@ -73,21 +73,24 @@ alter table public.results
   add column if not exists content_generation smallint,
   add column if not exists content_bank text,
   add column if not exists content_level integer,
-  add column if not exists content_lineage_confidence text;
+  add column if not exists content_lineage_confidence text,
+  add column if not exists calm_mode boolean not null default false;
 
 alter table public.puzzle_runs
   add column if not exists content_key text,
   add column if not exists content_generation smallint,
   add column if not exists content_bank text,
   add column if not exists content_level integer,
-  add column if not exists content_lineage_confidence text;
+  add column if not exists content_lineage_confidence text,
+  add column if not exists calm_mode boolean not null default false;
 
 alter table public.puzzle_attempts
   add column if not exists content_key text,
   add column if not exists content_generation smallint,
   add column if not exists content_bank text,
   add column if not exists content_level integer,
-  add column if not exists content_lineage_confidence text;
+  add column if not exists content_lineage_confidence text,
+  add column if not exists calm_mode boolean not null default false;
 
 create index if not exists results_content_lineage_idx
   on public.results (content_generation, content_bank, difficulty, content_level);
@@ -95,6 +98,11 @@ create index if not exists puzzle_runs_content_lineage_idx
   on public.puzzle_runs (content_generation, content_bank, difficulty, content_level);
 create index if not exists puzzle_attempts_content_lineage_idx
   on public.puzzle_attempts (content_generation, content_bank, difficulty, content_level);
+
+create index if not exists results_competitive_rank_idx
+  on public.results (mode, daily_date, completed_at) where calm_mode = false;
+create index if not exists puzzle_runs_competitive_rank_idx
+  on public.puzzle_runs (mode, puzzle_id, completed_at) where calm_mode = false;
 
 comment on table public.content_catalog is
   'Non-playable metadata catalog. Puzzle letters, paths and answers are intentionally absent.';

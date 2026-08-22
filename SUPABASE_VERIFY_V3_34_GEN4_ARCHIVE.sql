@@ -15,7 +15,8 @@ where table_schema = 'public'
     'content_generation',
     'content_bank',
     'content_level',
-    'content_lineage_confidence'
+    'content_lineage_confidence',
+    'calm_mode'
   )
 order by table_name, column_name;
 
@@ -51,3 +52,8 @@ from information_schema.triggers
 where trigger_schema = 'public'
   and trigger_name like '%attach_content_lineage'
 order by event_object_table;
+
+select
+  (select count(*) from public.results where calm_mode) as calm_results,
+  (select count(*) from public.puzzle_runs where calm_mode) as calm_runs,
+  (select count(*) from public.puzzle_attempts where calm_mode) as calm_attempts;

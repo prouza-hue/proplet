@@ -95,7 +95,7 @@ function syncCalmControls(){
   ensurePrivacyMini();applyCalmRunUi()
 }
 function enableCalmForCurrentRun(){
-  try{if(!currentGame||currentGame.finished||!['daily','free'].includes(currentGame.mode))return;currentGame.calmMode=true;saveCalmIntoProgress();applyCalmRunUi();if(typeof showToast==='function')showToast('Klidný režim zapnutý. Tenhle pokus už není soutěžní 🫧')}catch{}
+  try{if(!currentGame||currentGame.finished||!['daily','free'].includes(currentGame.mode))return;currentGame.calmMode=true;saveCalmIntoProgress();try{if(typeof sendAttemptCheckpoint==='function')sendAttemptCheckpoint('resume')}catch{};applyCalmRunUi();if(typeof showToast==='function')showToast('Klidný režim zapnutý. Tenhle pokus už není soutěžní 🫧')}catch{}
 }
 function applyCalmRunUi(){
   let g=null;try{g=currentGame}catch{}
@@ -118,7 +118,7 @@ function calmForPayload(body,path){
 function installNetworkCalmFlag(){
   if(typeof api!=='function'||api.__calmWrapped)return;
   const base=api;const wrapped=async function(path,opts={}){
-    if((path==='/api/result'||path==='/api/attempt/start'||path==='/api/attempt/finish')&&opts?.body){
+    if((path==='/api/result'||path==='/api/attempt/start'||path==='/api/attempt/checkpoint'||path==='/api/attempt/finish')&&opts?.body){
       try{const body=JSON.parse(opts.body);body.calm_mode=calmForPayload(body,path);opts={...opts,body:JSON.stringify(body)}}catch{}
     }
     return base(path,opts)
@@ -145,10 +145,10 @@ function installGameWrappers(){
     };wrapped.__calmWrapped=true;queueResult=wrapped
   }
   if(typeof loadWinLevelLeaderboard==='function'&&!loadWinLevelLeaderboard.__calmWrapped){const base=loadWinLevelLeaderboard;const wrapped=async function(puzzle,rec){if(rec?.calmMode===true||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(puzzle,rec)};wrapped.__calmWrapped=true;loadWinLevelLeaderboard=wrapped}
-  if(typeof loadWinDailyGlobalLeaderboard==='function'&&!loadWinDailyGlobalLeaderboard.__calmWrapped){const base=loadWinDailyGlobalLeaderboard;const wrapped=async function(date,rec){if(rec?.calmMode===true||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(date,rec)};wrapped.__calmWrapped=true;loadWinDailyGlobalLeaderboard=wrapped}
+  if(typeof loadWinDailyGlobalLeaderboard==='function'&&!loadWinDailyGlobalLeaderboard.__calmWrapped){const base=loadWinDailyGlobalLeaderboard;const wrapped=async function(date,rec){if(calmPreference()||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(date,rec)};wrapped.__calmWrapped=true;loadWinDailyGlobalLeaderboard=wrapped}
   if(typeof finishGame==='function'&&!finishGame.__calmWrapped){const base=finishGame;const wrapped=async function(...args){let g=null;try{g=currentGame}catch{};const out=await base(...args);if(g?.calmMode)applyCalmWin(g);applyCalmRunUi();return out};wrapped.__calmWrapped=true;finishGame=wrapped}
-  if(typeof showDailyResult==='function'&&!showDailyResult.__calmWrapped){const base=showDailyResult;const wrapped=function(date,rec,...rest){const out=base(date,rec,...rest);if(rec?.calmMode===true)applyCalmWin(rec);return out};wrapped.__calmWrapped=true;showDailyResult=wrapped}
-  if(typeof openLevelDetail==='function'&&!openLevelDetail.__calmWrapped){const base=openLevelDetail;const wrapped=async function(...args){const out=await base(...args);try{if(levelDetailContext?.result?.calmMode===true){q('#levelDetailLeaderboard')?.classList.add('hidden');const result=q('#levelDetailResult');if(result&&!q('.calm-win-note',result.parentElement))result.insertAdjacentHTML('afterend','<div class="calm-win-note">🫧 Tento pokus byl odehraný v Klidném režimu a není v pořadí.</div>')}}catch{};return out};wrapped.__calmWrapped=true;openLevelDetail=wrapped}
+  if(typeof showDailyResult==='function'&&!showDailyResult.__calmWrapped){const base=showDailyResult;const wrapped=function(date,rec,...rest){const out=base(date,rec,...rest);if(rec?.calmMode===true&&calmPreference())applyCalmWin(rec);return out};wrapped.__calmWrapped=true;showDailyResult=wrapped}
+  if(typeof openLevelDetail==='function'&&!openLevelDetail.__calmWrapped){const base=openLevelDetail;const wrapped=async function(...args){const out=await base(...args);try{if(calmPreference())q('#levelDetailLeaderboard')?.classList.add('hidden');if(levelDetailContext?.result?.calmMode===true){const result=q('#levelDetailResult');if(result&&!q('.calm-win-note',result.parentElement))result.insertAdjacentHTML('afterend','<div class="calm-win-note">🫧 První dokončení bylo v Klidném režimu a do pořadí se nepočítá.</div>')}}catch{};return out};wrapped.__calmWrapped=true;openLevelDetail=wrapped}
   if(typeof maybeOfferHelper==='function'&&!maybeOfferHelper.__calmWrapped){const base=maybeOfferHelper;const wrapped=function(...args){const out=base(...args);try{if(currentGame?.calmMode&&!q('#helperOfferModal')?.classList.contains('hidden'))q('#helperOfferText').textContent='Chvíli se nic nového nezamklo. Můžu ukázat začátek jednoho slova — bez spěchu.'}catch{};return out};wrapped.__calmWrapped=true;maybeOfferHelper=wrapped}
 }
 function applyCalmWin(g){
