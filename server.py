@@ -1242,6 +1242,16 @@ def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
             archived_id = daily_window_puzzle_id(previous, daily_date)
             if archived_id:
                 ids.add(archived_id)
+        # v4.00.0/4.00.1 clients selected the active Gen4 bank one day before the
+        # approved Monday cutover because their local selector did not understand
+        # dailyGeneration4From. Preserve only that exact, already-served board so
+        # honest Sunday completions can leave the offline queue. It remains a
+        # separate leaderboard cohort from the official Gen3 Sunday board.
+        if switch4 and requested_date == switch4 - timedelta(days=1):
+            active = data.get("daily") or []
+            if active:
+                base = str(data.get("dailyRotationBaseDate") or switch4.isoformat())
+                ids.add(active[daily_rotation_index(daily_date, len(active), base)]["id"])
         return ids
 
     active = data.get("daily", [])
@@ -1266,6 +1276,17 @@ def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
 
 def daily_puzzle_matches_date(puzzle_id: str, daily_date: str) -> bool:
     return puzzle_id in valid_daily_puzzle_ids(daily_date)
+
+
+def daily_leaderboard_puzzle_id(daily_date: str, player_id: Optional[str] = None) -> str:
+    """Keep the emergency pre-cutover board separate from the official Daily."""
+    primary = expected_daily_puzzle_id(daily_date)
+    if not player_id:
+        return primary
+    valid_ids = valid_daily_puzzle_ids(daily_date)
+    rows = db_select("results", player_id=player_id, mode="daily", daily_date=daily_date)
+    own = next((row.get("puzzle_id") for row in rows if row.get("puzzle_id") in valid_ids), None)
+    return str(own or primary)
 
 def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
     """True only when an archived Daily result is replaced by that day's primary board."""
@@ -4106,7 +4127,13 @@ def daily_global_leaderboard(
     except ValueError:
         raise HTTPException(400, "Neplatné datum")
 
-    primary_puzzle_id = expected_daily_puzzle_id(selected_date)
+    my_player_id = None
+    if authorization:
+        try:
+            my_player_id = str(auth_player(authorization)["id"])
+        except HTTPException:
+            pass
+    primary_puzzle_id = daily_leaderboard_puzzle_id(selected_date, my_player_id)
     results = [
         row for row in db_select_all("puzzle_runs", mode="daily")
         if competitive_row(row)
@@ -4133,12 +4160,6 @@ def daily_global_leaderboard(
         str(row.get("player_id") or ""),
     ))
 
-    my_player_id = None
-    if authorization:
-        try:
-            my_player_id = str(auth_player(authorization)["id"])
-        except HTTPException:
-            pass
     my_index = next((index for index, row in enumerate(ranked) if str(row.get("player_id")) == my_player_id), None)
     total = len(ranked)
     if my_index is None:
@@ -4171,6 +4192,7 @@ def daily_global_leaderboard(
     return {
         "date": selected_date,
         "puzzleId": primary_puzzle_id,
+        "boardCohort": "primary" if primary_puzzle_id == expected_daily_puzzle_id(selected_date) else "pre-cutover-compat",
         "total": total,
         "myRank": my_rank,
         "topPercent": top_percent,
@@ -4508,7 +4530,7 @@ def rankings_daily(
     viewer_id = str(viewer.get("id")) if viewer else None
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
     players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
-    primary_puzzle_id = expected_daily_puzzle_id(selected_date)
+    primary_puzzle_id = daily_leaderboard_puzzle_id(selected_date, viewer_id)
     day_rows = [
         row for row in db_select_all("puzzle_runs", mode="daily")
         if competitive_row(row) and daily_run_date(row) == selected_date
