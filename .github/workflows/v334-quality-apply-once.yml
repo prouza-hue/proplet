@@ -25,27 +25,26 @@ jobs:
 
       - name: Apply deterministic server and client patches
         run: |
+          python tools/fix_v334_quality_patch_script.py
           python tools/apply_v334_quality_server_patch.py
           python tools/apply_v334_quality_client_patch.py
           python -m py_compile server.py
           node --check public/quality-v334.js
           node --check public/runtime-meta.js
 
-      - name: Extend cheap Gen4 contract with quality checks
+      - name: Verify cheap Gen4 contract already includes quality checks
         run: |
           python - <<'PY'
           from pathlib import Path
-          path = Path('.github/workflows/v334-calibration.yml')
-          text = path.read_text(encoding='utf-8')
-          # The contract may already have been extended while preparing this one-shot job.
-          additions = {
-              "      - 'public/runtime-meta.js'\n": "      - 'public/app.js'\n",
-              "      - 'tools/test_v334_quality_release.py'\n": "      - 'tools/test_gen4_preview_runtime_meta.js'\n",
-              "          python -m py_compile tools/test_v334_quality_release.py\n": "          python -m py_compile tools/test_gen4_release_binder.py\n",
-              "          node --check public/quality-v334.js\n": "          node --check public/app.js\n",
-              "      - name: Verify release-quality UX, archive and Calm Mode contract\n": "      - name: Verify zero-round-trip preview routing metadata\n",
-          }
-          missing = [needle for needle in additions if needle not in text]
+          text = Path('.github/workflows/v334-calibration.yml').read_text(encoding='utf-8')
+          required = [
+              "      - 'public/runtime-meta.js'\n",
+              "      - 'tools/test_v334_quality_release.py'\n",
+              "          python -m py_compile tools/test_v334_quality_release.py\n",
+              "          node --check public/quality-v334.js\n",
+              "      - name: Verify release-quality UX, archive and Calm Mode contract\n",
+          ]
+          missing = [needle for needle in required if needle not in text]
           if missing:
               raise SystemExit(f'quality contract unexpectedly missing: {missing}')
           print('quality contract already extended: OK')
@@ -62,12 +61,13 @@ jobs:
           assert '"calm_mode": bool(payload.calm_mode)' in s
           assert '"calmMode": calm_mode_summary' in s
           assert 'db_select_all("puzzle_runs", mode="daily")' in s
+          assert s.count('"calm_mode": bool(payload.calm_mode), "completed_at": official_completed_at,') >= 4
           print('one-shot source checks: OK')
           PY
 
       - name: Remove one-shot machinery and commit result
         run: |
-          git rm tools/apply_v334_quality_server_patch.py tools/apply_v334_quality_client_patch.py .github/workflows/v334-quality-apply-once.yml
+          git rm tools/fix_v334_quality_patch_script.py tools/apply_v334_quality_server_patch.py tools/apply_v334_quality_client_patch.py .github/workflows/v334-quality-apply-once.yml
           git config user.name 'proplet-release-bot'
           git config user.email 'proplet-release-bot@users.noreply.github.com'
           git add -A
