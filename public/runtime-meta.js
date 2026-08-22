@@ -10,7 +10,7 @@
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'3.34.0',
+    version:'4.00.0',
     canonicalOrigin,
     gen4CandidatePreview,
     capabilities:Object.freeze({
@@ -56,7 +56,8 @@
       gen4FlashFreeBoot:true,
       gen4PreviewAuthTesting:true,
       canonicalStarterPinned:true,
-      mobileRankingPrivacyIconFix:true
+      mobileRankingPrivacyIconFix:true,
+      forcedClientUpdateV400:true
     })
   });
   window.PROPLET_RUNTIME_META=META;

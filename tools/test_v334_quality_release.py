@@ -8,7 +8,11 @@ root = Path(__file__).resolve().parents[1]
 server = (root / "server.py").read_text(encoding="utf-8")
 client = (root / "public" / "quality-v334.js").read_text(encoding="utf-8")
 css = (root / "public" / "quality-v334.css").read_text(encoding="utf-8")
+hotfix_css = (root / "public" / "quality-hotfix-v334.css").read_text(encoding="utf-8")
 runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
+index = (root / "public" / "index.html").read_text(encoding="utf-8")
+app = (root / "public" / "app.js").read_text(encoding="utf-8")
+sw = (root / "public" / "sw.js").read_text(encoding="utf-8")
 preview_auth = (root / "preview_auth_v334.py").read_text(encoding="utf-8")
 account_auth = (root / "account_auth.py").read_text(encoding="utf-8")
 migration = (root / "SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
@@ -90,6 +94,24 @@ assert "/api/attempt/checkpoint" in client
 assert "sendAttemptCheckpoint('resume')" in client
 assert "calmModeLeaderboardExcluded:true" in runtime
 
+# Final v4 interaction polish: no obsolete reset, calm-mode confirmation, stable privacy icon.
+assert 'id="resetBtn"' not in index
+assert "$('#resetBtn').onclick" not in app
+assert "🫧 Klidný režim" in client and "Přepnout do klidného režimu" not in client
+assert "Zapnout Klidný režim?" in client
+assert "tento pokus se nebude počítat do žebříčku" in client
+assert "ranking-privacy-mini-icon" in client and "ranking-privacy-mini-label" in client
+assert "label:'Anonymní'" in client
+assert "transform:none" in hotfix_css
+assert "Hrát další úroveň" in app
+
+# v4 is a forced service-worker handover before the Monday Daily cutover.
+assert 'version:\'4.00.0\'' in runtime
+assert "proplet-v4.00.0" in sw
+assert "self.skipWaiting()" in sw
+assert "client.navigate(client.url)" in sw
+assert "forcedClientUpdateV400:true" in runtime
+
 # Preview auth stays narrow, but uses ordinary browser POST. No PROPFIND/fetch monkeypatch.
 assert "gen4PreviewAuthTesting:true" in runtime
 assert "__PROPLET_PREVIEW_FETCH_GUARD__" not in runtime
@@ -107,4 +129,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("v3.34 quality release contract: OK")
+print("Proplet v4.00.0 quality release contract: OK")

@@ -13,7 +13,8 @@ html.quality-v334 #screen-leaderboard .ranking-section{margin-top:12px}
 html.quality-v334 #screen-leaderboard .ranking-section:first-of-type{margin-top:4px}
 
 .quality-header-actions{display:flex;align-items:center;gap:7px;margin-left:auto}
-.ranking-privacy-mini{border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);color:var(--muted);border-radius:999px;padding:7px 10px;font-size:10px;font-weight:850;cursor:pointer;white-space:nowrap;box-shadow:var(--soft-shadow)}
+.ranking-privacy-mini{border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);color:var(--muted);border-radius:999px;padding:7px 10px;font-size:10px;font-weight:850;cursor:pointer;white-space:nowrap;box-shadow:var(--soft-shadow);display:inline-flex;align-items:center;justify-content:center;gap:5px;line-height:1}
+.ranking-privacy-mini-icon{display:grid;place-items:center;line-height:1}
 .ranking-privacy-mini:hover{color:var(--ink);border-color:color-mix(in srgb,var(--purple) 28%,var(--line))}
 html.calm-preference-v334 .ranking-privacy-mini{display:none}
 
@@ -45,7 +46,12 @@ html.calm-preference-v334 .ranking-privacy-mini{display:none}
 .calm-settings-copy strong,.calm-settings-copy small{display:block}
 .calm-settings-copy strong{font-size:15px}
 .calm-settings-copy small{font-size:12px;color:var(--muted);line-height:1.35;margin-top:3px}
-#calmRunBtn{grid-column:1/-1;min-height:42px!important;padding:9px 12px!important;font-size:12px!important;background:color-mix(in srgb,var(--purple) 7%,var(--paper))!important}
+#calmRunBtn{background:color-mix(in srgb,var(--purple) 7%,var(--paper))!important}
+.calm-confirm-card{width:min(100%,390px);padding:25px 23px 22px}
+.calm-confirm-icon{width:58px;height:58px;margin:0 auto 8px;border-radius:19px;display:grid;place-items:center;background:linear-gradient(145deg,#eeeaff,#e4f7ef);font-size:30px}
+.calm-confirm-card h2{font-size:27px;margin:4px 0 8px}
+.calm-confirm-card p{max-width:315px;margin:0 auto 17px;font-size:13px;line-height:1.45}
+.calm-confirm-card .secondary-btn{margin-top:8px}
 body.calm-run-v334 #timer{display:none!important}
 body.calm-run-v334 #cleanStatus{display:none!important}
 body.calm-run-v334 .game-clock:before{content:"🫧 Klidný režim";display:block;color:var(--muted);font-size:11px;font-weight:850;margin-bottom:2px;white-space:nowrap}
@@ -125,8 +131,9 @@ body.calm-run-v334 #levelLeaderboardBox{display:none!important}
 }
 
 @media (max-width:520px){
-  .ranking-privacy-mini{font-size:0;width:36px;height:36px;padding:0;display:grid;place-items:center}
-  .ranking-privacy-mini::first-letter{font-size:15px}
+  .ranking-privacy-mini{width:36px;height:36px;min-width:36px;padding:0;display:grid;place-items:center}
+  .ranking-privacy-mini-label{display:none}
+  .ranking-privacy-mini-icon{width:100%;height:100%;font-size:18px;line-height:1}
   .quality-release-card{width:min(96vw,500px);padding:21px 18px}
   .quality-release-art{height:76px;margin-bottom:4px}
   .quality-release-card h2{font-size:29px}

@@ -28,15 +28,24 @@ body.game-desktop-wide .board-wrap{transform:translateY(var(--mask-center-y,0px)
     line-height:1!important;
     overflow:hidden;
   }
-  .ranking-privacy-mini::first-letter{font-size:0!important}
-  .ranking-privacy-mini::before{
-    content:'🎭'!important;
+  .ranking-privacy-mini-label{display:none!important}
+  .ranking-privacy-mini-icon{
     width:100%;
     height:100%;
     display:grid;
     place-items:center;
     font-size:18px;
     line-height:1;
-    transform:translateY(-1px);
+    transform:none;
   }
+}
+
+/* Result actions share the same readable type size as the primary next-level action. */
+#winModal #winPrimaryBtn,
+#winModal .win-account-btn,
+#winModal .win-secondary-actions .win-utility-btn{font-size:15px!important}
+@media (min-width:1000px) and (min-height:650px){
+  #winModal #winPrimaryBtn,
+  #winModal .win-account-btn,
+  #winModal .win-secondary-actions .win-utility-btn{font-size:16px!important}
 }

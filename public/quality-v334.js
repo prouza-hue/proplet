@@ -12,6 +12,7 @@ const safeProfile=()=>{try{return typeof getProfile==='function'?getProfile():JS
 const calmPreference=()=>{try{return localStorage.getItem(CALM_KEY)==='1'}catch{return false}};
 let pendingCalmLaunch=false;
 let polishQueued=false;
+let calmConfirmKind=null;
 
 function setText(el,text){if(el&&el.textContent!==text)el.textContent=text}
 function setAttr(el,name,value){if(el&&el.getAttribute(name)!==String(value))el.setAttribute(name,String(value))}
@@ -56,20 +57,22 @@ function polishHierarchy(){
   qa('#screen-profile .eyebrow').forEach(el=>{if(el.textContent.trim().toUpperCase()==='TÝM'&&el.parentElement?.textContent.includes('Tým a společné pořadí'))el.remove()});
 }
 
-function privacyLabel(){const p=safeProfile();if(!p?.token)return '🎭 Soukromě';if(p.publicRankings===true)return '👀 Veřejně';return '🎭 Anonymně'}
+function privacyState(){const p=safeProfile();if(p?.publicRankings===true)return {icon:'👀',label:'Veřejně'};return {icon:'🎭',label:'Anonymní'}}
 function ensurePrivacyMini(){
   const header=q('.app-header'),profile=q('#profileChip');if(!header||!profile)return;
   let group=q('.quality-header-actions',header);
   if(!group){group=document.createElement('div');group.className='quality-header-actions';profile.before(group);group.appendChild(profile)}
   let btn=q('#rankingPrivacyMini',group);
   if(!btn){btn=document.createElement('button');btn.id='rankingPrivacyMini';btn.className='ranking-privacy-mini';btn.type='button';btn.onclick=()=>{const p=safeProfile();if(!p?.token){if(typeof openProfileModal==='function')openProfileModal('create');return}if(typeof openRankingPrivacyModal==='function')openRankingPrivacyModal()};group.insertBefore(btn,profile)}
-  const label=privacyLabel();setText(btn,label);btn.title='Viditelnost v pořadí';setAttr(btn,'aria-label',`Pořadí: ${label}`);setDisplay(btn,calmPreference()?'none':'');
+  let icon=q('.ranking-privacy-mini-icon',btn),label=q('.ranking-privacy-mini-label',btn);
+  if(!icon||!label){btn.replaceChildren();icon=document.createElement('span');icon.className='ranking-privacy-mini-icon';label=document.createElement('span');label.className='ranking-privacy-mini-label';btn.append(icon,label)}
+  const state=privacyState();setText(icon,state.icon);setText(label,state.label);btn.title='Viditelnost v pořadí';setAttr(btn,'aria-label',`Pořadí: ${state.label}`);setDisplay(btn,calmPreference()?'none':'');
 }
 
 function calmControlMarkup(id){
   return `<div class="calm-quick" id="${id}"><strong>🫧 Klidný režim <span>– bez časomíry a žebříčku.</span></strong><button type="button" class="calm-quick-toggle" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>`;
 }
-function bindCalmSwitch(root){const b=root?.querySelector('.calm-quick-toggle');if(!b||b.dataset.bound==='1')return;b.dataset.bound='1';b.onclick=()=>setCalmPreference(!calmPreference())}
+function bindCalmSwitch(root){const b=root?.querySelector('.calm-quick-toggle');if(!b||b.dataset.bound==='1')return;b.dataset.bound='1';b.onclick=toggleCalmPreference}
 function ensureQuickCalmControls(){
   const grid=q('#difficultyCards');if(grid&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick'));bindCalmSwitch(q('#freeCalmQuick'))}
   const hero=q('.daily-hero'),anchor=q('#dailySyncStatus');if(hero&&!q('#dailyCalmQuick')){const html=calmControlMarkup('dailyCalmQuick');if(anchor)anchor.insertAdjacentHTML('beforebegin',html);else hero.insertAdjacentHTML('beforeend',html);bindCalmSwitch(q('#dailyCalmQuick'))}
@@ -79,12 +82,26 @@ function ensureCalmSettings(){
   const sound=q('#soundToggle')?.closest('.settings-card');if(!sound)return;
   const card=document.createElement('div');card.id='calmModeCard';card.className='card settings-card calm-settings-card';
   card.innerHTML='<div class="quality-setting-line"><span class="calm-settings-icon">🫧</span><div class="calm-settings-copy"><strong>Klidný režim</strong><small>Hraj bez časomíry a žebříčku. XP i postup zůstávají.</small></div><button id="calmModeToggle" class="calm-setting-toggle" type="button" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>';
-  sound.before(card);q('#calmModeToggle',card).onclick=()=>setCalmPreference(!calmPreference());
+  sound.before(card);q('#calmModeToggle',card).onclick=toggleCalmPreference;
 }
 function ensureCalmRunButton(){
   const actions=q('.game-actions');if(!actions||q('#calmRunBtn',actions))return;
-  const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.textContent='🫧 Přepnout do klidného režimu';btn.onclick=enableCalmForCurrentRun;actions.appendChild(btn);
+  const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.textContent='🫧 Klidný režim';btn.onclick=()=>openCalmConfirmation('run');actions.appendChild(btn);
 }
+function ensureCalmConfirmation(){
+  if(q('#calmConfirmModal'))return;
+  const modal=document.createElement('div');modal.id='calmConfirmModal';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','calmConfirmTitle');
+  modal.innerHTML='<div class="modal-card calm-confirm-card"><div class="calm-confirm-icon" aria-hidden="true">🫧</div><h2 id="calmConfirmTitle">Zapnout Klidný režim?</h2><p id="calmConfirmCopy" class="muted">Časomíru schováme a tento pokus se nebude počítat do žebříčku. XP a postup zůstávají.</p><button id="confirmCalmBtn" class="primary-btn big" type="button">Ano, zapnout</button><button id="cancelCalmBtn" class="secondary-btn bigish" type="button">Zůstat soutěžně</button></div>';
+  document.body.appendChild(modal);q('#confirmCalmBtn',modal).onclick=confirmCalmMode;q('#cancelCalmBtn',modal).onclick=closeCalmConfirmation;modal.onclick=e=>{if(e.target===modal)closeCalmConfirmation()};
+}
+function openCalmConfirmation(kind){
+  ensureCalmConfirmation();calmConfirmKind=kind;
+  setText(q('#calmConfirmCopy'),kind==='run'?'Časomíru schováme a tento pokus se nebude počítat do žebříčku. XP a postup zůstávají.':'Nové hry poběží bez časomíry a nebudou se počítat do žebříčku. XP a postup zůstávají.');
+  q('#calmConfirmModal')?.classList.remove('hidden');setTimeout(()=>q('#confirmCalmBtn')?.focus(),0);
+}
+function closeCalmConfirmation(){q('#calmConfirmModal')?.classList.add('hidden');calmConfirmKind=null}
+function confirmCalmMode(){const kind=calmConfirmKind;closeCalmConfirmation();if(kind==='run')enableCalmForCurrentRun();else if(kind==='preference')setCalmPreference(true)}
+function toggleCalmPreference(){if(calmPreference())setCalmPreference(false);else openCalmConfirmation('preference')}
 function syncCalmControls(){
   const on=calmPreference();document.documentElement.classList.toggle('calm-preference-v334',on);
   ['#freeCalmQuick .calm-quick-toggle','#dailyCalmQuick .calm-quick-toggle','#calmModeToggle'].forEach(sel=>setAttr(q(sel),'aria-checked',on?'true':'false'));
