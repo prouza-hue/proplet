@@ -1,4 +1,4 @@
-const CACHE='proplet-v3.34-quality-r5';
+const CACHE='proplet-v3.34-quality-r4';
 const CORE=['/','/index.html','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js','/version.js','/home-layout.css','/home-layout.js','/ranking-polish.css','/ranking-polish.js','/account-auth.css','/account-auth.js','/auth-recovery-guard-v3326.js','/copy-density-v3327.css','/copy-density-v3327.js','/onboarding-model-v3328.css','/onboarding-model-v3328.js','/valid-word-feedback-v3330.js','/valid-words-v3328.txt','/push-retention-v3329.css','/push-retention-v3329.js','/account-team-v33210.js','/desktop-layout-v3330.css','/result-layout-v3330.css','/profile-layout-v3330.css','/competitive-sharing-v3331.css','/competitive-sharing-v3331.js','/challenge-cta-v3333.css','/challenge-cta-v3333.js','/account-bonus-v3331.js','/release-notes-v3331.css','/release-notes-v3331.js','/account-conversion-v3331.css','/account-conversion-v3331.js','/onboarding-return-v3332.css','/onboarding-return-v3332.js','/google-g.svg','/today-brand.css','/onboarding-fit.css','/game-layout-v3323.css','/game-layout-v3330.js','/difficulty-nudge.css','/difficulty-nudge.js','/win-actions-v3324.css','/gesture-guard-v3325.css','/gesture-guard-v3325.js','/puzzles.json','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/favicon.svg','/favicon-32.png','/share-card.png','/difficulty/easy.svg','/difficulty/medium.svg','/difficulty/hard.svg','/difficulty/hardcore.svg','/privacy.html','/terms.html','/legal.css'];
 
 self.addEventListener('install',e=>{
@@ -13,13 +13,15 @@ self.addEventListener('activate',e=>e.waitUntil(Promise.all([
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const u=new URL(e.request.url);
-  // Preview content must never show the previous candidate on first load after a deploy.
-  // Network-first keeps /puzzles.json canonical while the cache remains an offline fallback.
   if(u.pathname==='/api/rolling-content'||u.pathname==='/puzzles.json'){
-    e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{
+    const refresh=fetch(e.request,{cache:'no-store'}).then(r=>{
       if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
       return r;
-    }).catch(()=>caches.match(e.request)));
+    });
+    e.respondWith(caches.match(e.request).then(cached=>{
+      if(cached){e.waitUntil(refresh.catch(()=>{}));return cached;}
+      return refresh;
+    }).catch(()=>fetch(e.request,{cache:'no-store'})));
     return;
   }
   if(u.pathname.startsWith('/api/'))return;
