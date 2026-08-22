@@ -45,5 +45,6 @@ assert "dailyGeneration4From" in APP
 assert "failedKeys" in APP
 assert "applyPendingUpdate" in APP
 assert "client.navigate(client.url)" in SW
+assert "await Promise.all(clients.map(client=>client.navigate" not in SW
 
-print("Proplet v4.00.2 Daily sync P0 contract: OK")
+print("Proplet v4.00.3 Daily sync P0 contract: OK")
