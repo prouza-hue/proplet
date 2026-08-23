@@ -74,4 +74,4 @@ assert ranking["players"][0]["xp"] == 12_495
 assert ranking["players"][0]["lifetimePoints"] == 12_495
 assert ranking["players"][0]["rank"] == 1
 
-print("Proplet v4.01.6 home progress and total-XP leaderboard contract: OK")
+print("Proplet v4.01.7 home progress and total-XP leaderboard contract: OK")

@@ -539,7 +539,13 @@ function latestContentUnplayed(){const s=getState();return latestContentPuzzles(
 function newContentCount(diff){return latestContentUnplayed().filter(p=>p.difficulty===diff).length}
 function startLatestContent(){const batch=latestContentBatch(),list=latestContentUnplayed(),all=latestContentPuzzles(),p=list[0]||all[0];if(p)startGame(p,'free',null,{contentBatchId:batch?.id||null})}
 function continueLatestContent(){const batch=latestContentBatch(),p=latestContentUnplayed()[0];if(p&&currentGame?.contentBatchId===batch?.id)startGame(p,'free',null,{contentBatchId:batch.id});else nav('free',{replace:true})}
-function renderNewContentBanner(){const root=$('#newContentBanner');if(!root)return;root.classList.add('hidden');root.innerHTML=''}
+function renderNewContentBanner(){
+ const root=$('#newContentBanner');if(!root)return;root.classList.add('hidden');root.innerHTML='';
+ const batch=latestContentBatch();if(!batch||!latestContentIsFresh())return;
+ const all=latestContentPuzzles(),left=latestContentUnplayed(),done=Math.max(0,all.length-left.length),count=Number(batch.count)||all.length||5;
+ root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>${left.length?`${count} nových Propletů je tady`:'Týdenní várka dohraná'}</h2><p>${left.length?`${done?`${done} hotovo · `:''}${left.length} ještě čeká.`:`Všech ${count} nových úrovní máš hotových.`}</p></div></div><div class="new-content-actions"><button id="playNewContentBtn" class="primary-btn">${left.length?'Hrát novinky':'Zahrát znovu'}</button></div>`;
+ root.classList.remove('hidden');$('#playNewContentBtn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
+}
 
 function renderFree(){
  renderNewContentBanner();
@@ -1368,41 +1374,46 @@ async function browserPushState(){
  const p=getProfile();if(!p?.token)return {account:false,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:false};
  if(!('Notification' in window)||!('PushManager' in window))return {account:true,unsupported:true,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:false};
  const cfg=await api('/api/push/config');if(!cfg.available)return {account:true,unavailable:true,config:cfg,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
- const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(!sub)return {account:true,config:cfg,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
- try{const pref=await api(`/api/push/preferences?endpoint=${encodeURIComponent(sub.endpoint)}`);return {account:true,config:cfg,sub,dailyEnabled:!!pref.dailyEnabled,contentEnabled:!!pref.contentEnabled,migrationReady:!!pref.migrationReady}}catch{return {account:true,config:cfg,sub,dailyEnabled:true,contentEnabled:false,migrationReady:false}}
+ const reg=await getPushRegistration();let sub=await reg.pushManager.getSubscription(),intent=getPushNudgeState(),deliberatelyOff=!!intent.disabledByUser;
+ if(!sub&&Notification.permission==='granted'&&!deliberatelyOff){
+  try{const prior=await api('/api/push/account-state');if(prior.enabled){await persistPushEnabled(true);savePushNudgeState({...intent,accepted:true,repairNeeded:false,repairedAt:new Date().toISOString()});trackProductEvent('push_notifications_auto_repaired');sub=await reg.pushManager.getSubscription()}}catch{}
+ }
+ if(!sub)return {account:true,config:cfg,sub:null,enabled:false,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
+ try{
+  let pref=await api(`/api/push/preferences?endpoint=${encodeURIComponent(sub.endpoint)}`);
+  if(!pref.subscribed&&Notification.permission==='granted'&&!deliberatelyOff){await sub.unsubscribe();await persistPushEnabled(true);savePushNudgeState({...intent,accepted:true,repairNeeded:false,repairedAt:new Date().toISOString()});trackProductEvent('push_notifications_auto_repaired');sub=await reg.pushManager.getSubscription();pref=await api(`/api/push/preferences?endpoint=${encodeURIComponent(sub.endpoint)}`)}
+  const enabled=!!(pref.dailyEnabled||pref.contentEnabled);if(enabled&&(!pref.dailyEnabled||!pref.contentEnabled)){await persistPushEnabled(true);pref={...pref,dailyEnabled:true,contentEnabled:true}}
+  return {account:true,config:cfg,sub,enabled,dailyEnabled:!!pref.dailyEnabled,contentEnabled:!!pref.contentEnabled,migrationReady:!!pref.migrationReady}
+ }catch{return {account:true,config:cfg,sub,enabled:true,dailyEnabled:true,contentEnabled:true,migrationReady:false}}
 }
-async function persistPushCategories(dailyEnabled,contentEnabled){
+async function persistPushEnabled(enabled){
  const cfg=await api('/api/push/config');if(!cfg.available)throw new Error('Push ještě není nakonfigurovaný na serveru.');if(!cfg.preferencesReady)throw new Error('Nové nastavení upozornění čeká na databázovou migraci.');
  const reg=await getPushRegistration();let sub=await reg.pushManager.getSubscription();
- if(!dailyEnabled&&!contentEnabled){if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}return {dailyEnabled:false,contentEnabled:false}}
+ if(!enabled){if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}return {enabled:false,dailyEnabled:false,contentEnabled:false}}
  if(!sub){const permission=await Notification.requestPermission();if(permission!=='granted'){savePushNudgeState({...getPushNudgeState(),done:true,systemDenied:true,deniedAt:new Date().toISOString()});throw new Error('Oznámení nejsou povolená. Později je můžeš zapnout v nastavení webu/prohlížeče.')}sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(cfg.publicKey)})}
- const j=sub.toJSON();await api('/api/push/subscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint,p256dh:j.keys?.p256dh,auth:j.keys?.auth,user_agent:navigator.userAgent.slice(0,240),daily_enabled:!!dailyEnabled,content_enabled:!!contentEnabled})});return {dailyEnabled:!!dailyEnabled,contentEnabled:!!contentEnabled}
+ const j=sub.toJSON();await api('/api/push/subscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint,p256dh:j.keys?.p256dh,auth:j.keys?.auth,user_agent:navigator.userAgent.slice(0,240),daily_enabled:true,content_enabled:true})});return {enabled:true,dailyEnabled:true,contentEnabled:true}
 }
 async function shouldOfferPushNudge(){
  const p=getProfile(),g=currentGame;if(!p?.token||g?.mode!=='daily'||g?.justCompleted!==true||!pushNudgeDue())return false;if(!('Notification' in window)||!('PushManager' in window)||Notification.permission==='denied')return false;
- try{const state=await browserPushState();if(state.dailyEnabled){savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return false}return !!state.config?.available}catch{return false}
+ try{const state=await browserPushState();if(state.enabled){savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return false}return !!state.config?.available}catch{return false}
 }
 async function maybeOfferPushNudge(action){if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;trackProductEvent('push_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
 function finishPushNudgeFlow(){const action=pendingPushPostWinAction;pendingPushPostWinAction=null;$('#pushNudgeModal').classList.add('hidden');if(action)performPostWinAction(action)}
 function dismissPushNudge(){const st=getPushNudgeState(),declines=(st.declines||0)+1,today=pragueDateISO();trackProductEvent('push_nudge_dismissed');if(declines>=3)savePushNudgeState({...st,declines,done:true,lastDeclinedAt:new Date().toISOString()});else savePushNudgeState({...st,declines,nextOfferDate:addDaysISO(today,declines===1?1:7),lastDeclinedAt:new Date().toISOString()});finishPushNudgeFlow()}
-async function enablePushReminder(){const state=await browserPushState(),result=await persistPushCategories(true,!!state.contentEnabled);savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return result}
-async function acceptPushNudge(){if(pushUiBusy)return;pushUiBusy=true;$('#pushNudgeEnableBtn').disabled=true;try{await enablePushReminder();trackProductEvent('push_nudge_accepted');showToast('Denní připomínka zapnutá 🔔');finishPushNudgeFlow()}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;$('#pushNudgeEnableBtn').disabled=false;updatePushUI()}}
+async function enablePushReminder(){const result=await persistPushEnabled(true);savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return result}
+async function acceptPushNudge(){if(pushUiBusy)return;pushUiBusy=true;$('#pushNudgeEnableBtn').disabled=true;try{await enablePushReminder();trackProductEvent('push_nudge_accepted');trackProductEvent('push_notifications_enabled');showToast('Upozornění zapnutá 🔔');finishPushNudgeFlow()}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;$('#pushNudgeEnableBtn').disabled=false;updatePushUI()}}
 async function updatePushUI(){
- const dailyBtn=$('#pushToggleBtn'),contentBtn=$('#contentPushToggleBtn'),dailyText=$('#pushStatusText'),contentText=$('#contentPushStatusText'),dropBtn=$('#contentDropNotifyBtn');if(!dailyBtn||!contentBtn||pushUiBusy)return;
- const p=getProfile();if(!p?.token){dailyBtn.disabled=false;contentBtn.disabled=false;dailyBtn.textContent='☁️ Uložit postup';contentBtn.textContent='☁️ Uložit postup';dailyText.textContent='Připomínka se váže k tvému uloženému účtu.';contentText.textContent='Nové Proplety jsou samostatný opt-in.';dropBtn?.classList.remove('hidden');return}
- if(!('Notification' in window)||!('PushManager' in window)){dailyBtn.disabled=true;contentBtn.disabled=true;dailyBtn.textContent=contentBtn.textContent='🔕 Nepodporováno';dailyText.textContent=contentText.textContent='Na tomto zařízení/prohlížeči Web Push není dostupný.';return}
- try{const state=await browserPushState();if(state.unavailable){dailyBtn.disabled=true;contentBtn.disabled=true;dailyBtn.textContent=contentBtn.textContent='🔔 Push čeká na server';dailyText.textContent=contentText.textContent='Hraní funguje normálně. Push není nakonfigurovaný.';return}
-  dailyBtn.disabled=false;dailyBtn.textContent=state.dailyEnabled?'Vypnout':'Zapnout';dailyText.textContent=state.dailyEnabled?'Zapnuto · nevyřešenou Daily připomeneme ráno.':Notification.permission==='denied'?'Oznámení jsou v prohlížeči zablokovaná.':'Vypnuto.';
-  contentBtn.disabled=!state.migrationReady;contentBtn.textContent=state.contentEnabled?'Vypnout':'Zapnout';contentText.textContent=!state.migrationReady?'Čeká na Notifications v2 migraci.':state.contentEnabled?'Zapnuto · v pondělí dáme vědět o nové várce.':'Vypnuto · současný Daily souhlas jsme nerozšířili.';dropBtn?.classList.toggle('hidden',!!state.contentEnabled||!state.migrationReady);
- }catch(e){dailyBtn.disabled=true;contentBtn.disabled=true;dailyText.textContent=contentText.textContent=e.message}
+ const btn=$('#pushToggleBtn'),status=$('#pushStatusText');if(!btn||pushUiBusy)return;
+ const p=getProfile();if(!p?.token){btn.disabled=false;btn.textContent='☁️ Uložit postup';status.textContent='Upozornění se vážou k uloženému účtu.';return}
+ if(!('Notification' in window)||!('PushManager' in window)){btn.disabled=true;btn.textContent='🔕 Nepodporováno';status.textContent='Na tomto zařízení/prohlížeči Web Push není dostupný.';return}
+ try{const state=await browserPushState();if(state.unavailable){btn.disabled=true;btn.textContent='🔔 Push čeká na server';status.textContent='Hraní funguje normálně. Push není nakonfigurovaný.';return}
+  btn.disabled=false;btn.textContent=state.enabled?'Vypnout':'Zapnout';status.textContent=state.enabled?'Zapnuto · Daily i pondělní novinky.':Notification.permission==='denied'?'Oznámení jsou v prohlížeči zablokovaná.':'Vypnuto.';
+ }catch(e){btn.disabled=true;status.textContent=e.message}
 }
-async function togglePushCategory(category){
- const p=getProfile();if(!p?.token){openProfileModal('create');return}if(pushUiBusy)return;pushUiBusy=true;const dailyBtn=$('#pushToggleBtn'),contentBtn=$('#contentPushToggleBtn');dailyBtn.disabled=true;contentBtn.disabled=true;
- try{const state=await browserPushState();if(!state.migrationReady)throw new Error('Nové nastavení upozornění čeká na databázovou migraci.');let daily=!!state.dailyEnabled,content=!!state.contentEnabled;if(category==='daily')daily=!daily;else content=!content;await persistPushCategories(daily,content);const enabled=category==='daily'?daily:content;trackProductEvent(`push_${category}_${enabled?'enabled':'disabled'}`);if(category==='daily'){if(daily)savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});else savePushNudgeState({...getPushNudgeState(),done:true,disabledByUser:true,disabledAt:new Date().toISOString()})}showToast(category==='daily'?(daily?'Denní připomínka zapnutá 🔔':'Denní připomínka vypnutá.'):(content?'Upozornění na nové Proplety zapnuté ✨':'Upozornění na nové Proplety vypnuté.'))}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}
+async function togglePushReminder(){
+ const p=getProfile();if(!p?.token){openProfileModal('create');return}if(pushUiBusy)return;pushUiBusy=true;const btn=$('#pushToggleBtn');btn.disabled=true;
+ try{const state=await browserPushState();if(!state.migrationReady)throw new Error('Nastavení upozornění čeká na databázovou migraci.');const enabled=!state.enabled;await persistPushEnabled(enabled);trackProductEvent(`push_notifications_${enabled?'enabled':'disabled'}`);if(enabled)savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});else savePushNudgeState({...getPushNudgeState(),accepted:false,done:true,disabledByUser:true,disabledAt:new Date().toISOString()});showToast(enabled?'Upozornění zapnutá 🔔':'Upozornění vypnutá.')}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}
 }
-async function togglePushReminder(){return togglePushCategory('daily')}
-async function toggleContentPushReminder(){return togglePushCategory('content')}
-async function enableContentPushFromDrop(){const p=getProfile();if(!p?.token){openProfileModal('create');return}if(pushUiBusy)return;pushUiBusy=true;try{const state=await browserPushState();if(state.contentEnabled){showToast('Upozornění na nové Proplety už máš zapnuté ✨');return}await persistPushCategories(!!state.dailyEnabled,true);showToast('Dáme vědět o další várce ✨')}catch(e){showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}}
 
 
 function bind(){
@@ -1419,7 +1430,7 @@ function bind(){
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
  $$('.ranking-scope-tab').forEach(b=>b.onclick=()=>{rankingXpScope=b.dataset.rankingXpScope;renderLeaderboard()});$$('.ranking-period-tab').forEach(b=>b.onclick=()=>{rankingXpPeriod=b.dataset.rankingPeriod;renderLeaderboard()});$$('.ranking-daily-tab').forEach(b=>b.onclick=()=>{rankingDailyScope=b.dataset.rankingDailyScope;renderLeaderboard()});
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);$('#leaveTeamBtn').onclick=leaveCurrentTeam;$('#closeRankingPrivacyModal').onclick=()=>$('#rankingPrivacyModal').classList.add('hidden');$('#acceptRankingPrivacyBtn').onclick=()=>saveRankingVisibility(true);$('#hideRankingPrivacyBtn').onclick=()=>saveRankingVisibility(false);
- $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#contentPushToggleBtn').onclick=toggleContentPushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
+ $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=applyPendingUpdate;
  $('#reportIssueBtn').onclick=openSupportReport;$('#closeSupportReportModal').onclick=()=>$('#supportReportModal').classList.add('hidden');$('#saveSupportReportBtn').onclick=saveSupportReport;$('#supportReportModal').onclick=e=>{if(e.target===$('#supportReportModal'))$('#supportReportModal').classList.add('hidden')};$('#exportDataBtn').onclick=exportAccountData;$('#deleteAccountBtn').onclick=openDeleteAccount;$('#closeDeleteAccountModal').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#cancelDeleteAccountBtn').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#confirmDeleteAccountBtn').onclick=deleteAccount;$('#deleteAccountModal').onclick=e=>{if(e.target===$('#deleteAccountModal'))$('#deleteAccountModal').classList.add('hidden')};
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const guard=$('#progressGuardModal'),support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(guard&&!guard.classList.contains('hidden')){dismissProgressGuard();return}if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
@@ -1439,7 +1450,8 @@ function bind(){
 const EXPECTED_PUZZLE_DB_VERSION=11;
 const COMPATIBLE_PUZZLE_DB_VERSIONS=new Set([9,10,EXPECTED_PUZZLE_DB_VERSION]);
 function compatiblePuzzleDatabase(data){return COMPATIBLE_PUZZLE_DB_VERSIONS.has(Number(data?.version||0))}
-const CONTENT_PREVIEW_DATE='';
+const requestedContentPreview=new URLSearchParams(location.search).get('content_preview')||'';
+const CONTENT_PREVIEW_DATE=location.hostname.endsWith('.vercel.app')&&/^\d{4}-\d{2}-\d{2}$/.test(requestedContentPreview)?requestedContentPreview:'';
 function contentWeekKey(iso=CONTENT_PREVIEW_DATE||pragueDateISO()){return addDaysISO(iso,-mondayWeekdayIndex(iso))}
 function rollingContentUrl(){const asOf=CONTENT_PREVIEW_DATE||pragueDateISO(),week=contentWeekKey(asOf),q=new URLSearchParams({week});if(CONTENT_PREVIEW_DATE)q.set('preview_as_of',CONTENT_PREVIEW_DATE);return `/api/rolling-content?${q.toString()}`}
 function showPuzzleBootLoading(){
@@ -1459,7 +1471,7 @@ async function loadPuzzleDatabase(){
  const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
 }
 function mergeRollingContent(delta){
- if(!puzzleDB||Number(delta?.version||0)!==1)return false;
+ if(!puzzleDB||![1,2].includes(Number(delta?.version||0)))return false;
  for(const diff of Object.keys(DIFF)){
   const base=puzzleDB.free?.[diff]||[],incoming=delta.puzzles?.[diff]||[],seen=new Set(base.map(p=>p.id));
   for(const p of incoming)if(!seen.has(p.id)){base.push(p);seen.add(p.id)}

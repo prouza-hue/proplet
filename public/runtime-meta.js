@@ -10,7 +10,7 @@
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'4.01.6',
+    version:'4.01.7',
     canonicalOrigin,
     gen4CandidatePreview,
     capabilities:Object.freeze({
@@ -29,6 +29,9 @@
       analyticsCoverageV4016:true,
       vercelWebAnalyticsV4016:true,
       vercelSpeedInsightsV4016:true,
+      unifiedPushV4017:true,
+      pushAutoRepairV4017:true,
+      weeklyContentBannerV4017:true,
       copyDensityPolish:true,
       actionFirstOnboarding:true,
       contextualHelperDefault:true,
@@ -132,7 +135,7 @@
     if(legacyOriginSession)return;
     if(document.querySelector('script[data-proplet-push-origin]'))return;
     const script=document.createElement('script');
-    script.src='/push-origin-v3325.js?v=1';
+    script.src='/push-origin-v3325.js?v=2';
     script.async=false;
     script.dataset.propletPushOrigin='1';
     document.body.appendChild(script);

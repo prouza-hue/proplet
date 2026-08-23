@@ -3,10 +3,7 @@
   const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
   const isCanonical=location.origin===canonicalOrigin;
   const dailyBtn=()=>document.querySelector('#pushToggleBtn');
-  const contentBtn=()=>document.querySelector('#contentPushToggleBtn');
   const dailyText=()=>document.querySelector('#pushStatusText');
-  const contentText=()=>document.querySelector('#contentPushStatusText');
-  const dropBtn=()=>document.querySelector('#contentDropNotifyBtn');
 
   const readPushIntent=()=>{
     try{return JSON.parse(localStorage.getItem('proplet-v3-8-2-push-nudge')||'{}')}catch{return {}}
@@ -22,13 +19,11 @@
   };
 
   const renderPreviewState=()=>{
-    const d=dailyBtn(),c=contentBtn(),dt=dailyText(),ct=contentText(),drop=dropBtn();
-    if(!d||!c)return;
-    d.disabled=true;c.disabled=true;
-    d.textContent='Jen na produkci';c.textContent='Jen na produkci';
+    const d=dailyBtn(),dt=dailyText();
+    if(!d)return;
+    d.disabled=true;
+    d.textContent='Jen na produkci';
     if(dt)dt.textContent='Preview má vlastní webový origin. Produkční notifikace na hrajproplet.cz se tu nemění.';
-    if(ct)ct.textContent='Nastavení upozornění ověřuj na hrajproplet.cz; preview ho záměrně nespravuje.';
-    drop?.classList.add('hidden');
   };
 
   const renderCanonicalState=async()=>{
@@ -52,11 +47,11 @@
       writePushIntent({...intent,accepted:false,repairNeeded:true,lastRepairDetectedAt:new Date().toISOString()});
       d.disabled=false;
       d.textContent='Obnovit';
-      dt.textContent='Dřív zapnuto, ale prohlížeč ztratil push registraci. Klepni na Obnovit.';
+      dt.textContent='Prohlížeč ztratil push registraci. Proplet ji automaticky obnovuje; případně klepni na Obnovit.';
       return;
     }
 
-    if(sub&&d.textContent==='Vypnout')dt.textContent='Zapnuto na tomto zařízení · nevyřešenou Daily připomeneme ráno.';
+    if(sub&&d.textContent==='Vypnout')dt.textContent='Zapnuto na tomto zařízení · Daily i pondělní novinky.';
     else if(!sub&&permission!=='denied'&&d.textContent==='Zapnout')dt.textContent='Vypnuto na tomto zařízení.';
   };
 
