@@ -28,4 +28,4 @@ assert "location.href='/api/auth/google/start'" in app
 assert ".progress-guard-card" in css
 assert "anonymousProgressGuardV4014:true" in runtime
 
-print("Proplet v4.01.6 anonymous desktop exit intent and mobile return guard: OK")
+print("Proplet v4.01.7 anonymous desktop exit intent and mobile return guard: OK")

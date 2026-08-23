@@ -12,10 +12,10 @@ sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.6"' in version
-assert "version:'4.01.6'" in runtime
+assert 'APP_VERSION = "4.01.7"' in version
+assert "version:'4.01.7'" in runtime
 assert "analyticsCoverageV4016:true" in runtime
-assert "proplet-v4.01.6-shell" in sw
+assert "proplet-v4.01.7-shell" in sw
 
 for path in ("/_vercel/insights/script.js", "/_vercel/speed-insights/script.js"):
     assert path in index
@@ -37,4 +37,4 @@ assert "calm_preference_enabled" in quality and "calm_run_enabled" in quality
 assert "Vercel Web Analytics a Speed Insights" in privacy
 assert "identifikátor návštěvníka se automaticky mění po 24 hodinách" in privacy
 
-print("PASS: v4.01.6 first-party analytics, complete event coverage and privacy contract")
+print("PASS: v4.01.7 first-party analytics, complete event coverage and privacy contract")

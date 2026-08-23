@@ -2070,6 +2070,8 @@ def product_event(
         "pwa_install_profile_opened", "pwa_installed",
         "push_nudge_shown", "push_nudge_accepted", "push_nudge_dismissed", "push_permission_denied",
         "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
+        "push_notifications_enabled", "push_notifications_disabled", "push_notifications_auto_repaired",
+        "content_drop_cta_clicked",
         "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
         "progress_guard_google_selected", "progress_guard_other_account_selected",
         "calm_preference_enabled", "calm_preference_disabled", "calm_run_enabled",
@@ -4864,6 +4866,17 @@ def push_preferences(
     }
 
 
+@app.get("/api/push/account-state")
+def push_account_state(request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "push_account_state", limit=120, window_seconds=3600)
+    player = auth_player(authorization)
+    rows = db_select("push_subscriptions", player_id=player["id"])
+    return {
+        "enabled": any(bool(row.get("daily_enabled", True) or row.get("content_enabled", False)) for row in rows),
+        "devices": len(rows),
+    }
+
+
 @app.post("/api/push/subscribe")
 def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "push_subscribe", limit=20, window_seconds=3600)
@@ -4871,15 +4884,11 @@ def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorizat
     if not push_ready():
         raise HTTPException(503, "Push notifikace ještě nejsou na serveru nakonfigurované")
     existing = db_select("push_subscriptions", endpoint=payload.endpoint)
-    legacy_client = payload.daily_enabled is None and payload.content_enabled is None
-    if legacy_client and existing:
-        # A cached pre-v3.30 client only knows the old Daily switch. Do not let that old
-        # client silently erase a Content opt-in that was set by a newer version.
-        daily_enabled = bool(existing[0].get("daily_enabled", True))
-        content_enabled = bool(existing[0].get("content_enabled", False))
-    else:
-        daily_enabled = True if payload.daily_enabled is None else bool(payload.daily_enabled)
-        content_enabled = False if payload.content_enabled is None else bool(payload.content_enabled)
+    # Od v4.01.7 má hráč jeden srozumitelný souhlas. Dvě DB pole zůstávají jen proto,
+    # že Daily a pondělní drop mají odlišný plán doručení. Starý klient při zapnutí
+    # rovněž aktivuje obě kategorie; vypnutí stále používá /unsubscribe.
+    enabled = True if payload.daily_enabled is None and payload.content_enabled is None else bool(payload.daily_enabled or payload.content_enabled)
+    daily_enabled = content_enabled = enabled
     row = {
         "player_id": player["id"], "p256dh": payload.p256dh, "auth": payload.auth,
         "user_agent": payload.user_agent, "updated_at": datetime.now(TZ).isoformat(),
