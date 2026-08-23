@@ -18,9 +18,9 @@ assert "Nový postup ${actual}/${total}" in quality
 assert "data.completed" not in quality.split("async function enrichPlayedLevels", 1)[1].split("function installHistoryWrapper", 1)[0]
 
 # Release copy matches the fresh-start decision as well.
-assert "Nový postup od jedničky" in quality
+assert "Nové desky, nové XP" in quality
 assert "Každá obtížnost začíná úrovní 1" in quality
 assert "Splněné úrovně zůstávají splněné" not in quality
 assert "levelOverviewRenderFixV4008:true" in runtime
 
-print("Proplet v4.00.9 level overview late-render regression: OK")
+print("Proplet v4.01.0 level overview late-render regression: OK")
