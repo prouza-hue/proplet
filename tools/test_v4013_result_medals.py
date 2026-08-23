@@ -18,4 +18,4 @@ assert "width:40px;height:40px" in css
 assert "grid-template-columns:44px minmax(0,1fr) auto" in css
 assert "resultMedalBadgesV4013:true" in runtime
 
-print("Proplet v4.01.3 result medal badges: OK")
+print("Proplet v4.01.4 result medal badges: OK")

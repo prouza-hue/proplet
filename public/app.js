@@ -169,11 +169,14 @@ const ONBOARD_KEY='proplet-v3-7-required-onboarding';
 const SUPPORT_MODE_KEY='proplet-v3-16-2-helper-mode';
 const HELPER_ONBOARD_KEY='proplet-v3-16-2-helper-onboarding';
 const ACCOUNT_NUDGE_KEY='proplet-v3-5-account-nudge';
+const PROGRESS_GUARD_KEY='proplet-v4-01-4-progress-guard';
 const PUSH_NUDGE_KEY='proplet-v3-8-2-push-nudge';
 const INSTALL_NUDGE_KEY='proplet-v3-26-install-nudge';
 const ANON_ID_KEY='proplet-v3-15-anonymous-id';
 const RESCUE_OFFER_KEY='proplet-v3-19-2-rescue-offer';
 const ACCOUNT_NUDGE_THRESHOLDS=[1,4,10];
+const PROGRESS_GUARD_COOLDOWN_MS=14*24*60*60*1000;
+const PROGRESS_GUARD_MOBILE_AWAY_MS=20*1000;
 
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -217,6 +220,7 @@ let onboardingFocusedHelper=false;
 let onboardingSupportMode=null;
 let supportModeDraft='none';
 let accountNudgeStage=0;
+let progressGuardHiddenAt=0;
 let legacyTeamLogin=false;
 let teamMembershipMode='join';
 let levelDetailContext=null;
@@ -426,6 +430,7 @@ function initNavigation(){
    else if(modal.id==='winModal'&&await maybeOfferPushNudge('menu')){} 
    else if(modal.id==='winModal'&&maybeOfferInstallNudge('menu','daily')){}
    else if(modal.id==='accountNudgeModal')dismissAccountNudge();
+   else if(modal.id==='progressGuardModal')dismissProgressGuard();
    else if(modal.id==='pushNudgeModal')dismissPushNudge();
    else if(modal.id==='installNudgeModal')dismissInstallNudge();
    else if(modal.id==='profileModal'&&profileModalFromWin){modal.classList.add('hidden');restoreWinAfterAccountModal()}
@@ -437,7 +442,7 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['winModal','accountNudgeModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return transientModals().find(el=>!el.classList.contains('hidden'))||null}
 function closeTransientModals(){transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
@@ -696,6 +701,7 @@ function dueAccountNudgeStage(){
 }
 function shouldOfferAccountNudge(){
  if(getProfile()?.token||currentGame?.mode==='rescue'||currentGame?.mode==='starter'||currentGame?.postStarterWarmup||currentGame?.justCompleted!==true)return 0;
+ const guardShownAt=Date.parse(progressGuardState().lastShownAt||'');if(Number.isFinite(guardShownAt)&&Date.now()-guardShownAt<PROGRESS_GUARD_COOLDOWN_MS)return 0;
  return dueAccountNudgeStage();
 }
 function renderAccountNudge(stage){
@@ -724,6 +730,44 @@ function openAccountFromNudge(mode){
  trackProductEvent(mode==='create'?'account_nudge_create':'account_nudge_login');if(accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_${mode==='create'?'create':'login'}`);$('#accountNudgeModal').classList.add('hidden');profileModalFromNudge=true;openProfileModal(mode);
 }
 function dismissAccountNudge(){trackProductEvent('account_nudge_dismissed');if(accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_dismissed`);$('#accountNudgeModal').classList.add('hidden');resumeAfterAccountNudge()}
+function progressGuardState(){try{return JSON.parse(localStorage.getItem(PROGRESS_GUARD_KEY)||'{}')||{}}catch{return {}}}
+function saveProgressGuardState(state){try{localStorage.setItem(PROGRESS_GUARD_KEY,JSON.stringify(state))}catch{}}
+function progressGuardHasCoarsePointer(){return !!window.matchMedia?.('(hover: none), (pointer: coarse)')?.matches}
+function progressGuardLastPromptAt(){
+ const times=[progressGuardState().lastShownAt,accountNudgeState().lastShownAt].map(value=>Date.parse(value||'')).filter(Number.isFinite);return times.length?Math.max(...times):0;
+}
+function canOfferProgressGuard(source){
+ if(getProfile()?.token||completedGameCount()<1||currentScreen==='game'||openTransientModal())return false;
+ if(source==='desktop'&&progressGuardHasCoarsePointer())return false;
+ if(source==='mobile'&&!progressGuardHasCoarsePointer())return false;
+ const last=progressGuardLastPromptAt();return !last||Date.now()-last>=PROGRESS_GUARD_COOLDOWN_MS;
+}
+function renderProgressGuard(source){
+ const stats=currentLocalStats(),count=stats.totalCompleted||completedGameCount();
+ $('#progressGuardEyebrow').textContent=source==='mobile'?'VÍTEJ ZPÁTKY':'NEŽ ODEJDEŠ';
+ $('#progressGuardCopy').textContent=source==='mobile'?'Postup zůstává jen v tomto zařízení. Ulož si ho, než se zase vydáš hrát.':'Bez účtu zůstává postup jen v tomto zařízení. Ulož si ho dřív, než zavřeš Proplet.';
+ $('#progressGuardGames').textContent=String(count);
+ $('#progressGuardGames').nextElementSibling.textContent=czPlural(count,'hotová hra','hotové hry','hotových her');
+ $('#progressGuardXp').textContent=`${Number(stats.points||0).toLocaleString('cs-CZ')} XP`;
+}
+function maybeOfferProgressGuard(source){
+ if(!canOfferProgressGuard(source))return false;
+ renderProgressGuard(source);saveProgressGuardState({...progressGuardState(),lastShownAt:new Date().toISOString(),lastSource:source});trackProductEvent(`progress_guard_${source}_shown`);$('#progressGuardModal').classList.remove('hidden');return true;
+}
+function dismissProgressGuard(){trackProductEvent('progress_guard_dismissed');$('#progressGuardModal').classList.add('hidden')}
+function openProgressGuardGoogle(){trackProductEvent('progress_guard_google_selected');location.href='/api/auth/google/start'}
+function openProgressGuardAccount(){trackProductEvent('progress_guard_other_account_selected');$('#progressGuardModal').classList.add('hidden');openProfileModal('create')}
+function rememberProgressGuardDeparture(){
+ if(!progressGuardHasCoarsePointer())return;progressGuardHiddenAt=Date.now();saveProgressGuardState({...progressGuardState(),lastHiddenAt:new Date(progressGuardHiddenAt).toISOString()});
+}
+function consumeProgressGuardAwayTime(){
+ const state=progressGuardState(),persisted=Date.parse(state.lastHiddenAt||''),started=progressGuardHiddenAt||(Number.isFinite(persisted)?persisted:0),away=started?Date.now()-started:0;progressGuardHiddenAt=0;if(state.lastHiddenAt)saveProgressGuardState({...state,lastHiddenAt:null});return away;
+}
+function bindProgressGuard(){
+ document.addEventListener('mouseout',e=>{if(e.relatedTarget||e.clientY>4||performance.now()<15000)return;maybeOfferProgressGuard('desktop')});
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){rememberProgressGuardDeparture();return}const away=consumeProgressGuardAwayTime();if(away>=PROGRESS_GUARD_MOBILE_AWAY_MS)setTimeout(()=>maybeOfferProgressGuard('mobile'),500)});
+ if(document.visibilityState==='visible'&&progressGuardHasCoarsePointer()){const away=consumeProgressGuardAwayTime();if(away>=PROGRESS_GUARD_MOBILE_AWAY_MS)setTimeout(()=>maybeOfferProgressGuard('mobile'),900)}
+}
 function updateWinAccountCta(){const button=$('#winAccountBtn'),show=!!button&&!getProfile()?.token&&!!currentGame?.finished&&currentGame.mode!=='rescue'&&currentGame.mode!=='starter'&&!currentGame?.postStarterWarmup;button?.classList.toggle('hidden',!show);if(show&&!button.dataset.impression){button.dataset.impression='1';trackProductEvent('win_account_cta_shown')}else if(!show&&button)delete button.dataset.impression}
 function restoreWinAfterAccountModal(){profileModalFromWin=false;if(!currentGame?.finished)return;$('#winModal').classList.remove('hidden');updateWinAccountCta()}
 function openAccountFromWin(){if(getProfile()?.token)return;trackProductEvent('win_account_cta_create');profileModalFromWin=true;$('#winModal').classList.add('hidden');openProfileModal('create')}
@@ -837,7 +881,7 @@ async function deleteAccount(){
   await api('/api/account',{method:'DELETE',body:JSON.stringify({confirmation:'SMAZAT',password:p.hasPassword?password:null})});
   try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch{}
   try{const reg=await navigator.serviceWorker?.ready,sub=await reg?.pushManager?.getSubscription?.();if(sub)await sub.unsubscribe()}catch{}
-  localStorage.removeItem(PROFILE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
+  localStorage.removeItem(PROFILE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
  }catch(e){$('#deleteAccountError').textContent=e.message}finally{button.disabled=false;button.textContent='Trvale smazat účet'}
 }
 let reportingClientError=false;
@@ -965,7 +1009,7 @@ async function logoutPlayer(){
  // aby nový hráč nedostával připomínky podle cizí Denní výzvy.
  try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}}catch{}
  try{await api('/api/logout',{method:'POST'})}catch{}
- localStorage.removeItem(PROFILE_KEY);rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
+ localStorage.removeItem(PROFILE_KEY);rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
 }
 
 function renderSettings(){const s=getSettings(),supported=typeof navigator.vibrate==='function';renderThemeSettings();$('#soundToggle').textContent=`${s.sound?'🔊':'🔇'} Zvuk ${s.sound?'zapnutý':'vypnutý'}`;$('#soundToggle').classList.toggle('on',s.sound);$('#hapticToggle').textContent=supported?`${s.haptics?'📳':'📴'} Vibrace ${s.haptics?'zapnuté':'vypnuté'}`:'📴 Vibrace nepodporovány';$('#hapticToggle').classList.toggle('on',s.haptics&&supported);$('#hapticToggle').disabled=!supported;const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;test.textContent=supported?'📳 Otestovat vibrace':'📴 Prohlížeč vibrace nepodporuje'}}
@@ -1359,6 +1403,7 @@ function bind(){
  $('#backFromGame').onclick=goBackFromGame;$('#hintBtn').onclick=openHintModal;$('#starterHintNudgeBtn').onclick=acceptStarterHintNudge;$('#starterHintNudgeDismiss').onclick=dismissStarterHintNudge;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winAccountBtn').onclick=openAccountFromWin;$('#winReplayBtn').onclick=replayDailyFromWin;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;$('#starterWarmupBtn').onclick=()=>{trackProductEvent('starter_easy_warmup_selected');startStarterWarmup()};$('#starterHardDailyBtn').onclick=()=>{trackProductEvent('starter_hard_direct_selected');startDaily({starterHardDirect:true})};
  $('#closeProfileModal').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#skipProfileBtn').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');$('#legacyTeamLoginToggle').onclick=toggleLegacyTeamLogin;$('#joinLeagueModeBtn').onclick=()=>setLeagueCreateMode('join');$('#newLeagueModeBtn').onclick=()=>setLeagueCreateMode('new');$('#leagueSelect').onchange=renderLeaguePinField;$('#profilePasswordToggle').onclick=()=>togglePassword('playerPasswordInput',$('#profilePasswordToggle'));
  $('#nudgeCreateBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeLoginBtn').onclick=()=>openAccountFromNudge('login');$('#nudgeSkipBtn').onclick=dismissAccountNudge;
+ $('#progressGuardGoogleBtn').onclick=openProgressGuardGoogle;$('#progressGuardCreateBtn').onclick=openProgressGuardAccount;$('#progressGuardDismissBtn').onclick=dismissProgressGuard;$('#closeProgressGuardModal').onclick=dismissProgressGuard;$('#progressGuardModal').onclick=e=>{if(e.target===$('#progressGuardModal'))dismissProgressGuard()};bindProgressGuard();
  $('#closePasswordModal').onclick=()=>$('#passwordModal').classList.add('hidden');$('#savePasswordBtn').onclick=savePassword;$('#setPasswordToggle').onclick=()=>togglePassword(['setPasswordInput','setPasswordConfirmInput'],$('#setPasswordToggle'));
  $('#closeTeamPinModal').onclick=()=>$('#teamPinModal').classList.add('hidden');$('#saveTeamPinBtn').onclick=saveTeamPin;$('#teamPinToggle').onclick=()=>togglePassword('teamPinInput',$('#teamPinToggle'));$('#closeTeamMembershipModal').onclick=()=>$('#teamMembershipModal').classList.add('hidden');$('#teamMembershipJoinTab').onclick=()=>setTeamMembershipMode('join');$('#teamMembershipNewTab').onclick=()=>setTeamMembershipMode('new');$('#saveTeamMembershipBtn').onclick=saveTeamMembership;
  $('#closeHintModal').onclick=()=>{$('#hintModal').classList.add('hidden');if(currentGame)currentGame.nextHintSource='manual'};$$('[data-hint-level]').forEach(b=>b.onclick=()=>applySmartHint(+b.dataset.hintLevel));$('#closeSupportModeModal').onclick=()=>$('#supportModeModal').classList.add('hidden');$('#supportModeModal').querySelectorAll('[data-support-mode]').forEach(b=>b.onclick=()=>selectSupportModeDraft(b.dataset.supportMode));$('#saveSupportModeBtn').onclick=saveSupportMode;$('#helperAcceptBtn').onclick=acceptHelperOffer;$('#helperDismissBtn').onclick=dismissHelperOffer;
@@ -1370,7 +1415,7 @@ function bind(){
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#contentPushToggleBtn').onclick=toggleContentPushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=applyPendingUpdate;
  $('#reportIssueBtn').onclick=openSupportReport;$('#closeSupportReportModal').onclick=()=>$('#supportReportModal').classList.add('hidden');$('#saveSupportReportBtn').onclick=saveSupportReport;$('#supportReportModal').onclick=e=>{if(e.target===$('#supportReportModal'))$('#supportReportModal').classList.add('hidden')};$('#exportDataBtn').onclick=exportAccountData;$('#deleteAccountBtn').onclick=openDeleteAccount;$('#closeDeleteAccountModal').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#cancelDeleteAccountBtn').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#confirmDeleteAccountBtn').onclick=deleteAccount;$('#deleteAccountModal').onclick=e=>{if(e.target===$('#deleteAccountModal'))$('#deleteAccountModal').classList.add('hidden')};
- document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
+ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const guard=$('#progressGuardModal'),support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(guard&&!guard.classList.contains('hidden')){dismissProgressGuard();return}if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
  $$('[data-theme-mode]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeMode,{persist:true}));
  $('#soundToggle').onclick=()=>{const s=getSettings();s.sound=!s.sound;saveSettings(s);renderSettings();if(s.sound){ensureAudio();tone(620,.08,.02)}};$('#hapticToggle').onclick=()=>{const s=getSettings();s.haptics=!s.haptics;saveSettings(s);renderSettings();if(s.haptics)vibrate(45)};$('#hapticTestBtn').onclick=testHaptics;$('#replayIntroBtn').onclick=()=>openOnboarding(true);
  $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);
