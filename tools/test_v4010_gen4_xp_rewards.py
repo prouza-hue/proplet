@@ -68,4 +68,4 @@ finally:
     server.free_puzzle_info = original_free_puzzle_info
     server.db_update = original_db_update
 
-print("Proplet v4.01.0 Gen4 XP reward contract: OK")
+print("Proplet v4.01.1 Gen4 XP reward contract: OK")

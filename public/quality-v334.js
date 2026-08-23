@@ -5,7 +5,8 @@ window.__PROPLET_QUALITY_V334__=true;
 document.documentElement.classList.add('quality-v334');
 
 const CALM_KEY='proplet-calm-mode-v1';
-const GEN4_MODAL_KEY='proplet-gen4-xp-reward-modal-v1';
+const GEN4_MODAL_KEY='proplet-gen4-release-modal-v1';
+const GEN4_XP_MODAL_KEY='proplet-gen4-xp-reward-modal-v1';
 const q=(s,r=document)=>r.querySelector(s);
 const qa=(s,r=document)=>[...r.querySelectorAll(s)];
 const safeProfile=()=>{try{return typeof getProfile==='function'?getProfile():JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')}catch{return null}};
@@ -165,23 +166,30 @@ function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openP
 function transferredCount(){try{return Object.keys(DIFF).reduce((sum,d)=>sum+localFreeSlotState(d).transferred.size,0)}catch{return 0}}
 function releaseModalStorage(){return window.PROPLET_RUNTIME_META?.gen4CandidatePreview?sessionStorage:localStorage}
 function shouldShowReleaseModal(){try{const gen=Number(puzzleDB?.freeGeneration||puzzleDB?.contentGeneration||0);return gen>=4&&!releaseModalStorage().getItem(GEN4_MODAL_KEY)}catch{return false}}
+function xpModalKey(){return `${GEN4_XP_MODAL_KEY}:${safeProfile()?.id||'anonymous'}`}
+function xpRepairAffected(){try{const stats=safeProfile()?.stats||{},boardRepair=Number(stats.gen4RewardRepairXp||0)-Number(stats.gen4ReturnBonusAwardedNow||0);return boardRepair>0||getState()?.gen4XpRepairNotice===true}catch{return false}}
+function shouldShowXpModal(){try{return xpRepairAffected()&&!releaseModalStorage().getItem(GEN4_XP_MODAL_KEY)&&!releaseModalStorage().getItem(xpModalKey())}catch{return false}}
 function revealApp(){document.documentElement.classList.remove('gen4-preview-booting')}
-function closeReleaseModal(){q('#qualityReleaseModal')?.classList.add('hidden');try{releaseModalStorage().setItem(GEN4_MODAL_KEY,'1')}catch{}revealApp()}
+let activeReleaseModal='release';
+function closeReleaseModal(){q('#qualityReleaseModal')?.classList.add('hidden');try{releaseModalStorage().setItem(activeReleaseModal==='xp'?xpModalKey():GEN4_MODAL_KEY,'1')}catch{}revealApp();setTimeout(maybeShowReleaseModal,100)}
 function renderReleaseMain(){
-  const card=q('#qualityReleaseCard');if(!card)return;
-  card.innerHTML='<div class="quality-release-art" aria-hidden="true"><span class="quality-release-tile">X</span><span class="quality-release-tile">P</span><span class="quality-release-tile">!</span></div><h2 id="qualityReleaseTitle">Nové desky teď dávají XP!</h2><p class="quality-release-lead">Nový obsah si zaslouží novou odměnu.</p><div class="quality-release-points"><div class="quality-release-point"><span>✨</span><strong>Plné XP za každou novou Gen4 desku</strong></div><div class="quality-release-point"><span>↩️</span><strong>Už odehrané Gen4 desky jsme dopočítali zpětně</strong></div><div class="quality-release-point"><span>🎁</span><strong>Vracejícím se hráčům přidáváme 500 XP</strong></div><div class="quality-release-point"><span>🏆</span><strong>Nové výsledky znovu plní žebříčky</strong></div></div><button id="qualityReleasePlay" class="quality-release-primary" type="button">Jdu pro XP!</button><button id="qualityReleaseArchive" class="quality-release-link" type="button">Jak teď fungují odměny</button>';
+  const card=q('#qualityReleaseCard');if(!card)return;activeReleaseModal='release';
+  card.innerHTML='<div class="quality-release-art" aria-hidden="true"><span class="quality-release-tile">P</span><span class="quality-release-tile">L</span><span class="quality-release-tile">T</span></div><h2 id="qualityReleaseTitle">Nové úrovně jsou tady!</h2><p class="quality-release-lead">Vyladěná obtížnost pro více zábavy</p><div class="quality-release-points"><div class="quality-release-point"><span>🧩</span><strong>800 nových volných úrovní</strong></div><div class="quality-release-point"><span>🎯</span><strong>Vyladěná obtížnost napříč všemi režimy</strong></div><div class="quality-release-point"><span>🛡️</span><strong>Tvé XP, historie i odznaky zůstávají</strong></div><div class="quality-release-point"><span>🫧</span><strong>Klidný režim, když si chceš oddechnout od žebříčku</strong></div></div><button id="qualityReleasePlay" class="quality-release-primary" type="button">Jdu si zahrát!</button><button id="qualityReleaseArchive" class="quality-release-link" type="button">Jak se změnil archiv a postup</button>';
   q('#qualityReleasePlay').onclick=closeReleaseModal;q('#qualityReleaseArchive').onclick=renderArchiveExplainer;
 }
 function renderArchiveExplainer(){
   const card=q('#qualityReleaseCard');if(!card)return;
-  card.innerHTML='<button id="qualityReleaseBack" class="quality-release-back" type="button">← Zpět</button><h2>Nové desky, nové XP</h2><p class="quality-release-lead">Starý postup tě o odměny nepřipraví.</p><div class="quality-archive-copy"><div><strong>🧩 Každá obtížnost začíná úrovní 1</strong><p>O žádnou z 800 nových desek tak nepřijdeš.</p></div><div><strong>✨ Každá Gen4 deska má vlastní XP</strong><p>Plnou odměnu získáš i za číslo úrovně, které jsi hrál ve starší verzi.</p></div><div><strong>🕘 Staré výsledky zůstávají</strong><p>Časy, tahy i dříve získané XP nemažeme.</p></div><div><strong>🎁 500 XP na uvítanou</strong><p>Vracejícím se hráčům je připíšeme automaticky.</p></div></div><button id="qualityReleaseDone" class="quality-release-primary" type="button">Rozumím</button>';
+  card.innerHTML='<button id="qualityReleaseBack" class="quality-release-back" type="button">← Zpět</button><h2>Nový postup od jedničky</h2><p class="quality-release-lead">Všechny nové desky na tebe čekají.</p><div class="quality-archive-copy"><div><strong>🧩 Každá obtížnost začíná úrovní 1</strong><p>O žádnou z 800 nových desek tak nepřijdeš a nové žebříčky se znovu zaplní.</p></div><div><strong>🕘 Staré výsledky nezmizely</strong><p>Časy, tahy, XP a další historie zůstávají uložené.</p></div><div><strong>✨ Nové desky dávají nové XP</strong><p>Plnou odměnu získáš i za úroveň, kterou jsi hrál v dřívější verzi.</p></div></div><button id="qualityReleaseDone" class="quality-release-primary" type="button">Rozumím</button>';
   q('#qualityReleaseBack').onclick=renderReleaseMain;q('#qualityReleaseDone').onclick=closeReleaseModal;
 }
-function ensureReleaseModal(){if(q('#qualityReleaseModal'))return;const modal=document.createElement('div');modal.id='qualityReleaseModal';modal.className='quality-modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','qualityReleaseTitle');modal.innerHTML='<div id="qualityReleaseCard" class="quality-release-card"></div>';document.body.appendChild(modal);modal.onclick=e=>{if(e.target===modal)closeReleaseModal()};renderReleaseMain()}
+function renderXpRewardMain(){const card=q('#qualityReleaseCard');if(!card)return;activeReleaseModal='xp';card.innerHTML='<div class="quality-release-art" aria-hidden="true"><span class="quality-release-tile">X</span><span class="quality-release-tile">P</span><span class="quality-release-tile">!</span></div><h2 id="qualityReleaseTitle">Tvoje nové desky už dávají XP!</h2><p class="quality-release-lead">Odehrané odměny jsme ti dopočítali.</p><div class="quality-release-points"><div class="quality-release-point"><span>↩️</span><strong>XP za dříve odehrané Gen4 desky jsou připsané</strong></div><div class="quality-release-point"><span>🎁</span><strong>Přidáváme ti také návratový bonus 500 XP</strong></div><div class="quality-release-point"><span>✨</span><strong>Každá další nová Gen4 deska dá plné XP</strong></div></div><button id="qualityReleasePlay" class="quality-release-primary" type="button">Paráda!</button>';q('#qualityReleasePlay').onclick=closeReleaseModal}
+function ensureReleaseModal(){if(q('#qualityReleaseModal'))return;const modal=document.createElement('div');modal.id='qualityReleaseModal';modal.className='quality-modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','qualityReleaseTitle');modal.innerHTML='<div id="qualityReleaseCard" class="quality-release-card"></div>';document.body.appendChild(modal);modal.onclick=e=>{if(e.target===modal)closeReleaseModal()}}
 function maybeShowReleaseModal(){
   ensureReleaseModal();
   if(!puzzleDB)return;
-  if(shouldShowReleaseModal())q('#qualityReleaseModal')?.classList.remove('hidden');
+  const modal=q('#qualityReleaseModal');if(!modal?.classList.contains('hidden'))return;
+  if(shouldShowReleaseModal()){renderReleaseMain();modal.classList.remove('hidden')}
+  else if(shouldShowXpModal()){renderXpRewardMain();modal.classList.remove('hidden')}
   revealApp();
 }
 
@@ -189,6 +197,8 @@ function polish(){polishQueued=false;polishHierarchy();ensurePrivacyMini();ensur
 function schedulePolish(delay=0){if(polishQueued&&delay===0)return;polishQueued=true;setTimeout(polish,delay)}
 function bootQuality(){
   installNetworkCalmFlag();installGameWrappers();installHistoryWrapper();polish();
+  document.addEventListener('proplet:gen4-xp-repair',maybeShowReleaseModal);
+  document.addEventListener('proplet:profile-refreshed',maybeShowReleaseModal);
   [120,300,700,1500,3000].forEach(ms=>setTimeout(()=>{polish();maybeShowReleaseModal()},ms));
   setTimeout(revealApp,4200);
   document.addEventListener('click',e=>{if(e.target.closest('[data-nav],#profileChip,#saveProfileBtn,#acceptRankingPrivacyBtn,#hideRankingPrivacyBtn'))schedulePolish(80)});

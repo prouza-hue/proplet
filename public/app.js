@@ -312,8 +312,9 @@ function reconcileLocalGen4Rewards(){
   if(info.generation===activeGeneration&&!info.legacy)current.push({row,base:DIFF[diff].xp});else priorGenerationPlayed=true;
  }
  if(!current.length)return {repairedXp:0,returnBonusXp:0};
- const bonusAlready=current.some(({row,base})=>Number(row.points||0)>=base+500),earliest=[...current].sort((a,b)=>String(a.row.completedAt||'').localeCompare(String(b.row.completedAt||'')))[0];let repairedXp=0;
- for(const item of current){const oldPoints=Math.max(0,Number(item.row.points)||0);let target=Math.max(oldPoints,item.base);if(priorGenerationPlayed&&!bonusAlready&&item===earliest)target+=500;if(target!==oldPoints){item.row.points=target;repairedXp+=target-oldPoints}}
+ const bonusAlready=current.some(({row,base})=>Number(row.points||0)>=base+500),earliest=[...current].sort((a,b)=>String(a.row.completedAt||'').localeCompare(String(b.row.completedAt||'')))[0];let repairedXp=0,missingBoardXp=false;
+ for(const item of current){const oldPoints=Math.max(0,Number(item.row.points)||0);if(oldPoints<item.base)missingBoardXp=true;let target=Math.max(oldPoints,item.base);if(priorGenerationPlayed&&!bonusAlready&&item===earliest)target+=500;if(target!==oldPoints){item.row.points=target;repairedXp+=target-oldPoints}}
+ if(missingBoardXp)state.gen4XpRepairNotice=true;
  if(repairedXp)saveState(state);
  return {repairedXp,returnBonusXp:priorGenerationPlayed?500:0};
 }
@@ -799,7 +800,9 @@ async function refreshRemoteProfile({throwOnError=false}={}){
   const [me,progress]=await Promise.all([api('/api/me'),api('/api/progress')]);
   mergeRemoteProgress(progress.completed||[]);
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
+  const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
   saveProfile({...p,name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
+  document.dispatchEvent(new CustomEvent('proplet:profile-refreshed'));
   return me;
  }catch(e){if(throwOnError)throw e;return null}
 }

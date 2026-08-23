@@ -58,14 +58,16 @@ assert verify.count("calm_mode") >= 4
 
 # Player-facing contract: exact approved copy + compact hierarchy + archive reassurance.
 for phrase in (
-    "Nové desky teď dávají XP!",
-    "Nový obsah si zaslouží novou odměnu.",
-    "Plné XP za každou novou Gen4 desku",
-    "Už odehrané Gen4 desky jsme dopočítali zpětně",
-    "Vracejícím se hráčům přidáváme 500 XP",
-    "Nové výsledky znovu plní žebříčky",
-    "Jdu pro XP!",
-    "Jak teď fungují odměny",
+    "Nové úrovně jsou tady!",
+    "Vyladěná obtížnost pro více zábavy",
+    "800 nových volných úrovní",
+    "Vyladěná obtížnost napříč všemi režimy",
+    "Tvé XP, historie i odznaky zůstávají",
+    "Klidný režim, když si chceš oddechnout od žebříčku",
+    "Jdu si zahrát!",
+    "Jak se změnil archiv a postup",
+    "Tvoje nové desky už dávají XP!",
+    "Odehrané odměny jsme ti dopočítali.",
     "Dosažená hodnost",
     "Propletené úspěchy",
     "Odznaky za věrnost",
@@ -106,10 +108,10 @@ assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
-# v4.01.0 keeps the approved CTA colour and matches the larger primary type size.
+# v4.01.1 keeps the approved CTA colour and matches the larger primary type size.
 # Its one-time navigation repairs the already-activated v4.00.1 update handover.
-assert 'version:\'4.01.0\'' in runtime
-assert "proplet-v4.01.0-shell" in sw
+assert 'version:\'4.01.1\'' in runtime
+assert "proplet-v4.01.1-shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "challengeCtaRaspberryV4005:true" in runtime
 assert "resultCtaFontParityV4006:true" in runtime
@@ -117,6 +119,7 @@ assert "conciseFooterCopyV4009:true" in runtime
 assert "gen4PerBoardXpV4010:true" in runtime
 assert "gen4RetroactiveXpRepairV4010:true" in runtime
 assert "gen4ReturningBonusXp:500" in runtime
+assert "releaseModalCohortsV4011:true" in runtime
 assert "Upleteno s ❤️</span>" in index
 assert "rodinné dovolené" not in index
 assert "linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%)" in challenge_css
@@ -149,4 +152,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.01.0 quality release contract: OK")
+print("Proplet v4.01.1 quality release contract: OK")
