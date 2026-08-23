@@ -67,6 +67,7 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
+GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
 
@@ -416,11 +417,12 @@ def db_delete(table: str, **filters):
 
 
 def xp_economy_migrated() -> bool:
-    """True when every positive historical Free reward uses the current XP economy.
+    """True when every positive Free reward uses the current XP economy.
 
     Zero-point rows are intentional: they represent a Gen1/Gen2 slot that was already
-    rewarded elsewhere. Ordering mismatches descending lets one cheap PostgREST probe
-    distinguish an intentional zero from any stale/invalid positive reward.
+    rewarded elsewhere. One Gen4 result may also carry the 500 XP returning-player
+    bonus. Ordering mismatches descending distinguishes those valid values from stale
+    or invalid positive rewards with one cheap PostgREST probe per difficulty.
     """
     targets = {key: value for key, value in POINTS.items() if key != "daily"}
     for table in ("results", "free_slot_rewards"):
@@ -428,7 +430,11 @@ def xp_economy_migrated() -> bool:
             params = {
                 "select": "id,points",
                 "difficulty": f"eq.{difficulty}",
-                "points": f"neq.{target}",
+                "points": (
+                    f"not.in.({target},{target + GEN4_RETURNING_BONUS_XP})"
+                    if table == "results"
+                    else f"neq.{target}"
+                ),
                 "order": "points.desc",
                 "limit": "1",
             }
@@ -769,6 +775,7 @@ def rescue_rows(player_id: str) -> list[dict]:
 def player_stats(player_id: str) -> dict:
     """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
     rows = db_select("results", player_id=player_id)
+    gen4_rewards = reconcile_gen4_free_rewards(player_id, rows)
     daily_dates: list[str] = []
     free_history = {k: 0 for k in ("easy", "medium", "hard", "hardcore")}
     daily_times: list[int] = []
@@ -842,6 +849,10 @@ def player_stats(player_id: str) -> dict:
         "rescuedDays": len(set(rescued_dates)),
         "earnedBadges": earned,
         "nextBadge": next_badge,
+        "gen4RewardPolicy": "per-board",
+        "gen4RewardRepairXp": gen4_rewards["repairedXp"],
+        "gen4ReturnBonusXp": gen4_rewards["returnBonusXp"],
+        "gen4ReturnBonusAwardedNow": gen4_rewards["bonusAwardedNow"],
     }
 
 
@@ -1089,14 +1100,86 @@ def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> b
     return False
 
 
+def reconcile_gen4_free_rewards(player_id: str, rows: list[dict]) -> dict:
+    """Repair already-finished Gen4 boards and grant one returning-player bonus.
+
+    The bonus is stored on the player's earliest Gen4 result. A points value of
+    at least that board's base reward plus the bonus is the persistent claim
+    marker, so retries and concurrent profile reads cannot award it twice.
+    """
+    puzzle_data = load_puzzles()
+    active_generation = int(puzzle_data.get("freeGeneration") or 1)
+    empty = {"repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": 0}
+    if active_generation < 4:
+        return empty
+
+    active_ids = {
+        difficulty: {
+            str(puzzle.get("id") or "")
+            for puzzle in (
+                list(puzzle_data.get("free", {}).get(difficulty, []))
+                + list(load_rolling_content().get("puzzles", {}).get(difficulty, []))
+            )
+        }
+        for difficulty in ("easy", "medium", "hard", "hardcore")
+    }
+    prior_generation_played = False
+    current_results: list[tuple[dict, int]] = []
+    for row in rows:
+        difficulty = str(row.get("difficulty") or "")
+        if row.get("mode") != "free" or difficulty not in POINTS:
+            continue
+        if str(row.get("puzzle_id") or "") in active_ids[difficulty]:
+            current_results.append((row, int(POINTS[difficulty])))
+        else:
+            prior_generation_played = True
+
+    if not current_results:
+        return empty
+
+    bonus_already_awarded = any(
+        int(row.get("points") or 0) >= base_points + GEN4_RETURNING_BONUS_XP
+        for row, base_points in current_results
+    )
+    earliest_row = min(
+        current_results,
+        key=lambda item: (str(item[0].get("completed_at") or ""), str(item[0].get("id") or "")),
+    )[0]
+    repaired_xp = 0
+    bonus_awarded_now = 0
+    for row, base_points in current_results:
+        old_points = max(0, int(row.get("points") or 0))
+        target_points = max(old_points, base_points)
+        if prior_generation_played and not bonus_already_awarded and row is earliest_row:
+            target_points += GEN4_RETURNING_BONUS_XP
+            bonus_awarded_now = GEN4_RETURNING_BONUS_XP
+        if target_points == old_points:
+            continue
+        db_update("results", {"id": row["id"], "player_id": player_id}, {"points": target_points})
+        row["points"] = target_points
+        repaired_xp += target_points - old_points
+
+    return {
+        "repairedXp": repaired_xp,
+        "returnBonusXp": GEN4_RETURNING_BONUS_XP if prior_generation_played else 0,
+        "bonusAwardedNow": bonus_awarded_now,
+    }
+
+
 def claim_free_slot_points(player_id: str, info: dict, points: int, puzzle_id: str) -> tuple[int, bool]:
-    """Award XP once per difficulty/level slot, across all content generations.
+    """Award Gen4 once per concrete board; preserve the legacy slot policy before Gen4.
 
     The v3.16 table supplies a concurrency-safe unique constraint. During a
     rolling deployment without that migration, result-history lookup remains a
     safe compatibility fallback (apart from a very narrow simultaneous race).
     """
     difficulty, level = info["difficulty"], int(info["level"])
+    active_generation = int(load_puzzles().get("freeGeneration") or 1)
+    is_current = int(info.get("generation") or 1) == active_generation and info.get("legacy") is not True
+    if active_generation >= 4 and is_current:
+        # Result.challenge_key (free:<puzzle id>) is the concurrency-safe claim.
+        # The result endpoint awards this value only when that row is first inserted.
+        return int(points), False
     historical_reward = free_slot_already_rewarded(player_id, difficulty, level)
     try:
         claimed = db_select("free_slot_rewards", player_id=player_id, difficulty=difficulty, level=level)
@@ -1504,7 +1587,14 @@ def health():
         "dailyRotationBaseDate": pdata.get("dailyRotationBaseDate"),
         "dailyCadence": pdata.get("dailyCadence"),
         "dailyMigration": pdata.get("dailyMigration"),
-        "freeMigration": pdata.get("freeMigration"),
+        "freeMigration": {
+            **(pdata.get("freeMigration") or {}),
+            "strategy": "fresh-generation-progress",
+            "xpPolicy": "once-per-current-board",
+            "activeGeneration": pdata.get("freeGeneration"),
+            "returningPlayerBonusXp": GEN4_RETURNING_BONUS_XP,
+            "retroactiveCurrentGenerationXp": True,
+        },
         "tieredDailyFrom": pdata.get("tieredDailyFrom"),
         "freeTieredFromVersion": pdata.get("freeTieredFromVersion"),
         "freeFreezeCutoffs": pdata.get("freeFreezeCutoffs"),
@@ -1538,7 +1628,7 @@ def health():
         "launchDashboard": True,
         "newPlayerFunnelVersion": 2,
         "singleMemberTeams": True,
-        "xpEconomyVersion": 2,
+        "xpEconomyVersion": 3,
         "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
         "rollingContentReleaseEnabled": rolling_content_release_enabled(),
