@@ -1128,10 +1128,15 @@ function applyPendingUpdate(){
 }
 function registerServiceWorker(){
  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
- navigator.serviceWorker.register('/sw.js').then(reg=>{
+ navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
   if(reg.waiting)showUpdateBanner(reg.waiting);
   reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)showUpdateBanner(w)})});
-  reg.update().catch(()=>{});
+  const checkForUpdate=()=>reg.update().catch(()=>{}),checkWhenVisible=()=>{if(document.visibilityState==='visible')checkForUpdate()};
+  checkForUpdate();
+  document.addEventListener('visibilitychange',checkWhenVisible);
+  window.addEventListener('pageshow',checkForUpdate);
+  window.addEventListener('online',checkForUpdate);
+  setInterval(checkForUpdate,15*60*1000);
  }).catch(()=>{});
  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloadOnServiceWorkerChange||reloading)return;reloading=true;location.reload()});
 }
