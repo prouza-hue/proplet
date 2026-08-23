@@ -1,7 +1,7 @@
-const SHELL_CACHE='proplet-v4.01.5-shell';
+const SHELL_CACHE='proplet-v4.01.6-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
-const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/quality-v334.css','/quality-v334.js'];
+const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/analytics-init.js','/quality-v334.css','/quality-v334.js'];
 
 async function putIfOk(cacheName,request,response){
   if(!response?.ok)return response;
@@ -71,6 +71,7 @@ self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const u=new URL(e.request.url);
   if(u.origin!==self.location.origin)return;
+  if(u.pathname.startsWith('/_vercel/'))return;
   if(u.pathname==='/api/rolling-content'){
     e.respondWith(staleWhileRevalidate(e).catch(async()=>await caches.match(e.request)||Response.error()));
     return;

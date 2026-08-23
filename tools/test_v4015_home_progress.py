@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Focused contract for the v4.01.5 home progress redesign and XP parity."""
+"""Focused contract for the home progress redesign and XP parity."""
 from pathlib import Path
 import sys
 from unittest.mock import patch
@@ -74,4 +74,4 @@ assert ranking["players"][0]["xp"] == 12_495
 assert ranking["players"][0]["lifetimePoints"] == 12_495
 assert ranking["players"][0]["rank"] == 1
 
-print("Proplet v4.01.5 home progress and total-XP leaderboard contract: OK")
+print("Proplet v4.01.6 home progress and total-XP leaderboard contract: OK")

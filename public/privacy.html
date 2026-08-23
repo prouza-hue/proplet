@@ -5,7 +5,7 @@
 <title>Ochrana soukromí · Proplet</title><meta name="description" content="Jak Proplet pracuje s účty, herními výsledky, anonymní analytikou a notifikacemi."/>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"/><link rel="stylesheet" href="/legal.css"/></head><body>
 <main class="legal-shell"><a class="legal-brand" href="/"><span class="legal-logo">P</span><span>Proplet</span></a>
-<article class="legal-card"><span class="eyebrow">Soukromí bez mlhy</span><h1>Ochrana soukromí</h1><p class="muted">Platné od 14. srpna 2026.</p>
+<article class="legal-card"><span class="eyebrow">Soukromí bez mlhy</span><h1>Ochrana soukromí</h1><p class="muted">Platné od 23. srpna 2026.</p>
 <div class="legal-note"><strong>Krátká verze:</strong> Proplet neprodává data, nepoužívá reklamní tracking ani fingerprinting. Hrát můžeš i bez účtu a svůj účet můžeš exportovat nebo smazat přímo v aplikaci.</div>
 
 <h2>Kdo je správcem a jak se ozvat</h2>
@@ -13,18 +13,19 @@
 
 <h2>Co Proplet ukládá</h2><ul>
 <li><strong>Bez účtu:</strong> náhodné instalační ID zůstává v telefonu; server ukládá pouze jeho jednosměrný hash spolu s herní telemetrií (např. start/dokončení, čas, tahy, nápovědy a anonymní produktové události).</li>
+<li><strong>Návštěvnost a rychlost:</strong> Vercel Web Analytics a Speed Insights ukládají agregované návštěvy, zdroj návštěvy, obecný typ zařízení/prohlížeče, přibližnou zemi nebo oblast a technické metriky načítání a odezvy. Nepoužívají reklamní cookies; adresy stránek před odesláním zbavujeme parametrů a fragmentů.</li>
 <li><strong>S účtem:</strong> zvolenou přezdívku, avatar, případný tým, hash hesla, herní výsledky, XP, sérii a související herní telemetrii.</li>
 <li><strong>Push notifikace:</strong> pokud je dobrovolně zapneš, uloží se technický push endpoint a klíče potřebné k doručení připomínky.</li>
 <li><strong>Podpora:</strong> pokud odešleš „Nahlásit problém“, uloží se text hlášení a případný dobrovolný kontakt pro odpověď.</li>
 <li><strong>Bezpečnost a spolehlivost:</strong> krátkodobé zahashované počítadlo pro omezení zneužití a sanitizované technické chybové události. Neukládáme do nich hesla, auth tokeny ani surové IP adresy.</li>
 </ul>
 
-<h2>Co Proplet záměrně nedělá</h2><p>Do anonymní identity nevstupuje IP adresa, model telefonu, rozlišení ani jiné fingerprintingové znaky. Proplet nemá reklamní síť ani reklamní cookies. Herní data nepoužíváme k automatizovanému rozhodování, které by pro tebe mělo právní nebo obdobně závažný účinek.</p>
+<h2>Co Proplet záměrně nedělá</h2><p>Do vlastní anonymní herní identity nevstupuje IP adresa, model telefonu, přesné rozlišení ani jiné fingerprintingové znaky. Proplet nemá reklamní síť ani reklamní cookies a analytická data neposílá reklamním platformám. Herní data nepoužíváme k automatizovanému rozhodování, které by pro tebe mělo právní nebo obdobně závažný účinek.</p>
 
 <h2>Proč data používáme a na jakém základě</h2>
 <ul>
 <li><strong>Účet, postup, výsledky a týmové funkce:</strong> abychom poskytli funkce, které si hráč vyžádal; právním základem je plnění služby / kroků na žádost uživatele.</li>
-<li><strong>Bezpečnost, prevence zneužití, diagnostika a základní herní analytika:</strong> oprávněný zájem na bezpečném provozu, opravách chyb a zlepšování kvality hry. Analytiku držíme záměrně pseudonymní a bez fingerprintingu.</li>
+<li><strong>Bezpečnost, prevence zneužití, diagnostika, návštěvnost a herní analytika:</strong> oprávněný zájem na bezpečném provozu, opravách chyb, pochopení používání hry a zlepšování její kvality. Vlastní herní analytiku držíme pseudonymní a návštěvnost vyhodnocujeme agregovaně bez reklamních cookies.</li>
 <li><strong>Push notifikace:</strong> pouze po dobrovolném zapnutí. Souhlas můžeš kdykoli odvolat vypnutím notifikací nebo odebráním oprávnění v zařízení/prohlížeči.</li>
 <li><strong>Podpora a dotazy:</strong> abychom mohli vyřešit tvoje hlášení nebo žádost; případný kontakt použijeme jen pro odpověď k danému podnětu.</li>
 </ul>
@@ -33,7 +34,7 @@
 
 <h2>Kdo data technicky zpracovává</h2><p>Web a backend běží přes <strong>Vercel</strong> a databázová vrstva přes <strong>Supabase</strong>. Supabase ukládá databázová data v primárním regionu nakonfigurovaném pro projekt. Vercel může v rámci poskytování své infrastruktury zpracovávat data také mimo Evropský hospodářský prostor; pro takové přenosy uvádí smluvní ochranné mechanismy včetně standardních smluvních doložek. Push notifikace následně doručuje push infrastruktura konkrétního prohlížeče nebo operačního systému.</p>
 
-<h2>Jak dlouho data zůstávají</h2><p>Účet a jeho herní historie zůstávají uložené, dokud účet nesmažeš. Anonymní herní analytika může být uchována dlouhodobě pro vyhodnocení kvality hry. Otevřená support hlášení se uchovávají do vyřízení; vyřešená nebo odmítnutá hlášení se automaticky smažou nejpozději po 12 měsících od vyřízení. Technické rate-limit a chybové záznamy mají výše uvedené krátké retenční lhůty.</p>
+<h2>Jak dlouho data zůstávají</h2><p>Účet a jeho herní historie zůstávají uložené, dokud účet nesmažeš. Pseudonymní herní analytika může být uchována dlouhodobě pro porovnávání kvality hry v čase; po smazání účtu se smaže i telemetrie navázaná na tento účet. Vercelův anonymní identifikátor návštěvníka se automaticky mění po 24 hodinách. Otevřená support hlášení se uchovávají do vyřízení; vyřešená nebo odmítnutá hlášení se automaticky smažou nejpozději po 12 měsících od vyřízení. Technické rate-limit a chybové záznamy mají výše uvedené krátké retenční lhůty.</p>
 
 <h2>Tvoje práva a možnosti</h2><p>V části <strong>Já → Účet a soukromí</strong> si můžeš stáhnout export svých serverových dat nebo účet trvale smazat. V rozsahu, v jakém se na konkrétní zpracování vztahuje GDPR, můžeš také požádat o přístup, opravu, výmaz, omezení zpracování nebo přenositelnost, vznést námitku proti zpracování založenému na oprávněném zájmu a odvolat souhlas tam, kde je zpracování na souhlasu založené. Žádost pošli přes kategorii <strong>Soukromí</strong>.</p>
 <p>Pokud máš za to, že s osobními údaji není nakládáno správně, můžeš se obrátit také na <a href="https://uoou.gov.cz/" rel="noopener">Úřad pro ochranu osobních údajů</a>.</p>

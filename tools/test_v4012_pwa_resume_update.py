@@ -16,4 +16,4 @@ assert "pwaResumeUpdateCheckV4012:true" in runtime
 assert '"source": "/sw.js"' in vercel
 assert '"value": "no-cache, no-store, must-revalidate"' in vercel
 
-print("Proplet v4.01.5 PWA resume update contract: OK")
+print("Proplet v4.01.6 PWA resume update contract: OK")
