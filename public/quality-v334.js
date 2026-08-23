@@ -112,11 +112,12 @@ function setCalmPreference(enabled,{announce=true}={}){
   try{localStorage.setItem(CALM_KEY,enabled?'1':'0')}catch{}
   syncCalmControls();
   if(enabled&&typeof currentScreen!=='undefined'&&currentScreen==='leaderboard'&&typeof nav==='function')nav('daily',{replace:true});
+  try{if(typeof trackProductEvent==='function')trackProductEvent(enabled?'calm_preference_enabled':'calm_preference_disabled')}catch{}
   if(announce&&typeof showToast==='function')showToast(enabled?'Klidný režim zapnutý 🫧':'Soutěžní režim je zpátky 🏆');
 }
 function saveCalmIntoProgress(){try{const g=currentGame;if(!g||!['daily','free'].includes(g.mode))return;const key=challengeKey(g.mode,g.puzzle,g.dailyDate),s=getState();if(s.inProgress?.[key]){s.inProgress[key].calmMode=!!g.calmMode;saveState(s)}}catch{}}
 function enableCalmForCurrentRun(){
-  try{if(!currentGame||currentGame.finished||!['daily','free'].includes(currentGame.mode))return;currentGame.calmMode=true;saveCalmIntoProgress();try{if(typeof sendAttemptCheckpoint==='function')sendAttemptCheckpoint('resume')}catch{};applyCalmRunUi();if(typeof showToast==='function')showToast('Klidný režim zapnutý. Tenhle pokus už není soutěžní 🫧')}catch{}
+  try{if(!currentGame||currentGame.finished||!['daily','free'].includes(currentGame.mode))return;currentGame.calmMode=true;try{if(typeof trackProductEvent==='function')trackProductEvent('calm_run_enabled')}catch{};saveCalmIntoProgress();try{if(typeof sendAttemptCheckpoint==='function')sendAttemptCheckpoint('resume')}catch{};applyCalmRunUi();if(typeof showToast==='function')showToast('Klidný režim zapnutý. Tenhle pokus už není soutěžní 🫧')}catch{}
 }
 function applyCalmRunUi(){
   let g=null;try{g=currentGame}catch{}

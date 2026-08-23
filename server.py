@@ -2051,19 +2051,34 @@ def product_event(
     enforce_rate_limit(request, "product_event", limit=300, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     allowed = {
-        "app_open", "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected",
+        "app_open", "app_session_started",
+        "screen_daily_viewed", "screen_free_viewed", "screen_leaderboard_viewed", "screen_profile_viewed",
+        "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected",
         "onboarding_support_selected_none", "onboarding_support_selected_beginner",
         "onboarding_support_selected_younger", "onboarding_support_selected_older", "onboarding_completed",
-        "helper_onboarding_started",
+        "helper_onboarding_started", "helper_default_applied", "onboarding_principle_shown", "onboarding_principle_completed",
+        "onboarding_login_clicked", "onboarding_login_authenticated", "onboarding_skipped_known_player",
+        "onboarding_returning_state_detected", "onboarding_skipped_returning_state",
         "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
-        "account_authenticated", "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
+        "account_authenticated", "account_created", "account_logged_in",
+        "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
         "starter_word_1_completed", "starter_word_2_completed", "starter_word_3_completed", "starter_completed",
         "starter_hard_choice_shown", "starter_hard_direct_selected", "starter_easy_warmup_selected", "starter_easy_warmup_completed",
         "win_account_cta_shown", "win_account_cta_create", "win_account_cta_authenticated",
         "pwa_install_nudge_shown", "pwa_install_profile_closed", "pwa_install_nudge_dismissed",
         "pwa_install_ios_hint_ack", "pwa_install_native_accepted", "pwa_install_native_dismissed",
         "pwa_install_profile_opened", "pwa_installed",
+        "push_nudge_shown", "push_nudge_accepted", "push_nudge_dismissed", "push_permission_denied",
+        "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
+        "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
+        "progress_guard_google_selected", "progress_guard_other_account_selected",
+        "calm_preference_enabled", "calm_preference_disabled", "calm_run_enabled",
+        "difficulty_nudge_shown", "difficulty_nudge_accepted", "difficulty_nudge_declined",
+        "valid_nonsolution_failsafe_shown", "valid_nonsolution_detected",
         *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
+        *{f"difficulty_nudge_{action}_{source}_{target}" for action in ("shown", "accepted", "declined") for source, target in (("easy", "medium"), ("medium", "hard"), ("hard", "hardcore"))},
+        *{f"difficulty_nudge_followup_{step}" for step in (1, 2, 3)},
+        *{f"difficulty_nudge_followup_{step}_{target}" for step in (1, 2, 3) for target in ("medium", "hard", "hardcore")},
     }
     if payload.event_type not in allowed:
         raise HTTPException(400, "Neplatný product event")
