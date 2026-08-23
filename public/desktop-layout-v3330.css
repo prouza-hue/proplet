@@ -43,14 +43,11 @@
   .home-diff-progress{height:6px;margin-top:8px}
   .home-competition-card{padding:18px;border-radius:24px}
   .home-competition-head h2{font-size:24px}
-  .home-competition-head>div>span,.home-competition-head button{font-size:12px}
+  .home-competition-head button{font-size:12px}
   .home-competition-self{gap:9px;margin-top:14px}
-  .home-competition-self>div{padding:11px;border-radius:15px}
-  .home-xp-level>span{width:38px;height:38px;flex-basis:38px;font-size:21px}
-  .home-xp-level b{font-size:13px}.home-xp-level small{font-size:10.5px}
-  .home-xp-number strong,.home-xp-place strong,.home-xp-streak strong{font-size:18px}
-  .home-xp-number span,.home-xp-place span,.home-xp-streak span{font-size:10.5px}
-  .home-ranking-row{padding:9px 11px;grid-template-columns:28px 36px minmax(0,1fr) auto}
+  .home-progress-level{padding:15px}.home-progress-level-icon{width:50px;height:50px;font-size:28px}.home-progress-level-copy strong{font-size:15px}.home-progress-level-copy>span{font-size:11px}
+  .home-progress-metric{padding:14px}.home-progress-metric>strong{font-size:20px}.home-progress-total>strong{font-size:25px}
+  .home-ranking-row{padding:9px 12px;grid-template-columns:32px 36px minmax(0,1fr) auto}
   .home-ranking-avatar{width:36px;height:36px;font-size:20px}
   .home-ranking-row>strong,.home-ranking-row>b{font-size:13px}
 

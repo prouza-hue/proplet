@@ -23,7 +23,7 @@
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
   const styles=[
-    ['/home-layout.css?v=9','propletHomeLayoutCss'],
+    ['/home-layout.css?v=10','propletHomeLayoutCss'],
     ['/today-brand.css?v=4','propletTodayBrandCss'],
     ['/ranking-polish.css?v=5','propletRankingPolishCss'],
     ['/onboarding-fit.css?v=1','propletOnboardingFitCss'],
@@ -74,7 +74,7 @@
        version loads only after it, so a release cannot drift between footer and cache metadata. */
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=10','propletHomeLayout');
+    loadScript('/home-layout.js?v=11','propletHomeLayout');
     loadScript('/ranking-polish.js?v=2','propletRankingPolish');
     if(!document.querySelector('link[data-proplet-account-auth-css]')){
       const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);

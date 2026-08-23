@@ -38,9 +38,9 @@ def install_account_bonus(
 ):
     """Install the v3.33.1 account-creation reward.
 
-    The reward lives outside `results`, so it can increase personal lifetime XP / rank without
-    entering competitive XP scoring. A unique `(player_id, reward_key)` constraint is the
-    server-side source of truth for exactly-once granting.
+    The reward lives outside `results`, so it cannot masquerade as a completed puzzle. The XP
+    leaderboard adds these reward rows separately, while a unique `(player_id, reward_key)`
+    constraint remains the server-side source of truth for exactly-once granting.
     """
 
     def rows_for(player_id: str) -> list[dict]:

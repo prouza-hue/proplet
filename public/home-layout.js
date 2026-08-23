@@ -127,7 +127,7 @@
       card=document.createElement('section');
       card.id='homeCompetitionCard';
       card.className='card home-competition-card';
-      card.innerHTML=`<div class="home-competition-head"><div><span>CELKOVÉ XP</span><h2>Jak si vedeš</h2></div><button type="button" id="homeLeaderboardBtn">Celkové pořadí <b>→</b></button></div><div id="homeCompetitionSelf" class="home-competition-self"></div><div id="homeCompetitionRows" class="home-competition-rows"><div class="home-ranking-loading">Načítám pořadí…</div></div>`;
+      card.innerHTML=`<div class="home-competition-head"><h2>Tvůj postup</h2><button type="button" id="homeLeaderboardBtn">Celkové pořadí <b>→</b></button></div><div id="homeCompetitionSelf" class="home-competition-self"></div><div id="homeCompetitionRows" class="home-competition-rows"><div class="home-ranking-loading">Načítám pořadí…</div></div>`;
       card.querySelector('#homeLeaderboardBtn').onclick=()=>nav('leaderboard');
     }
     if(quick.nextElementSibling!==card)quick.insertAdjacentElement('afterend',card);
@@ -137,17 +137,18 @@
   function renderCompetitionSelf(selfRow=null){
     const root=document.querySelector('#homeCompetitionSelf');if(!root)return;
     const stats=effectiveStats(),points=stats.points||0,streak=stats.currentStreak||0,l=levelFor(points),p=getProfile?.();
-    const place=selfRow?.rank?`#${selfRow.rank}`:(p?.token?'—':'bez pořadí');
-    root.innerHTML=`<div class="home-xp-level"><span>${l.current.icon}</span><div><b>${htmlEsc(l.current.name)}</b><small>${l.next?`${Math.max(0,l.next.xp-points).toLocaleString('cs-CZ')} XP do ${htmlEsc(l.next.name)}`:'Nejvyšší hodnost'}</small></div></div><div class="home-xp-number"><strong>${points.toLocaleString('cs-CZ')}</strong><span>XP</span></div><div class="home-xp-place"><strong>${place}</strong><span>pořadí</span></div><div class="home-xp-streak"><strong>🔥 ${streak}</strong><span>${streak===1?'den':streak>=2&&streak<=4?'dny':'dní'}</span></div>`;
+    const place=selfRow?.rank?`${selfRow.rank}. místo`:'—',days=streak===1?'den':streak>=2&&streak<=4?'dny':'dní';
+    const levelCopy=l.next?`Ještě ${Math.max(0,l.next.xp-points).toLocaleString('cs-CZ')} XP do hodnosti ${htmlEsc(l.next.name)}`:'Dosáhl jsi nejvyšší hodnosti';
+    root.innerHTML=`<div class="home-progress-level"><span class="home-progress-level-icon">${l.current.icon}</span><div class="home-progress-level-copy"><small>TVOJE HODNOST</small><strong>${htmlEsc(l.current.name)}</strong><span>${levelCopy}</span><i class="home-progress-level-track" aria-label="Postup k další hodnosti"><b style="width:${l.pct}%"></b></i></div></div><div class="home-progress-metrics"><div class="home-progress-metric home-progress-total"><span>CELKEM ZÍSKÁNO</span><strong>${points.toLocaleString('cs-CZ')} <em>XP</em></strong></div><div class="home-progress-metric"><span>GLOBÁLNÍ POŘADÍ</span><strong>${place}</strong>${!selfRow?.rank&&!p?.token?'<small>po přihlášení</small>':''}</div><div class="home-progress-metric home-progress-streak"><span>AKTUÁLNÍ SÉRIE</span><strong><i>🔥</i> ${streak} <em>${days}</em></strong></div></div>`;
   }
 
   function renderCompetitionRows(data){
     const root=document.querySelector('#homeCompetitionRows');if(!root)return;
     const players=Array.isArray(data?.players)?data.players:[],top=players.slice(0,3),self=players.find(r=>r.isMine)||null;
     renderCompetitionSelf(self);
-    if(!top.length){root.innerHTML='<div class="home-ranking-empty"><strong>Pořadí se právě rozjíždí.</strong><span>Nasbírej XP a zabydli se nahoře.</span></div>';return}
+    if(!top.length){root.innerHTML='<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-empty"><strong>Pořadí se právě rozjíždí.</strong><span>Nasbírej XP a zabydli se nahoře.</span></div>';return}
     const medals=['🥇','🥈','🥉'];
-    root.innerHTML=top.map((r,i)=>`<div class="home-ranking-row ${r.isMine?'mine':''}"><span class="home-ranking-medal">${medals[i]}</span><span class="home-ranking-avatar">${htmlEsc(r.avatar||'🙂')}</span><strong>${htmlEsc(r.name||'Hráč')}</strong><b>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</b></div>`).join('')+((self&&self.rank>3)?`<div class="home-ranking-selfline"><span>Tvoje místo</span><strong>#${self.rank} · ${Number(self.xp||0).toLocaleString('cs-CZ')} XP</strong></div>`:(!getProfile?.()?.token?'<button type="button" class="home-ranking-login" data-home-profile>Přihlas se a ukaž svoje místo v pořadí →</button>':''));
+    root.innerHTML=`<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-list">${top.map((r,i)=>`<div class="home-ranking-row ${r.isMine?'mine':''}"><span class="home-ranking-medal">${medals[i]}</span><span class="home-ranking-avatar">${htmlEsc(r.avatar||'🙂')}</span><strong>${htmlEsc(r.name||'Hráč')}${r.isMine?' <span class="home-ranking-you">TY</span>':''}</strong><b>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</b></div>`).join('')}</div>`+((self&&self.rank>3)?`<div class="home-ranking-selfline"><span>Tvoje místo</span><strong>${self.rank}. místo · ${Number(self.xp||0).toLocaleString('cs-CZ')} XP</strong></div>`:(!getProfile?.()?.token?'<button type="button" class="home-ranking-login" data-home-profile>Přihlas se a ukaž svoje místo v pořadí →</button>':''));
     root.querySelector('[data-home-profile]')?.addEventListener('click',()=>nav('profile'));
   }
 
