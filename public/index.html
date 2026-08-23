@@ -330,6 +330,24 @@
     </div>
   </div>
 
+  <div id="progressGuardModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="progressGuardTitle">
+    <div class="modal-card progress-guard-card">
+      <button id="closeProgressGuardModal" class="modal-close" aria-label="Zavřít">×</button>
+      <div class="progress-guard-icon" aria-hidden="true"><span>☁️</span><b>✓</b></div>
+      <span id="progressGuardEyebrow" class="eyebrow">NEŽ ODEJDEŠ</span>
+      <h2 id="progressGuardTitle">Ať o svůj postup nepřijdeš</h2>
+      <p id="progressGuardCopy" class="muted">Bez účtu zůstává postup jen na tomto zařízení.</p>
+      <div class="progress-guard-summary" aria-label="Neuložený postup">
+        <span><b id="progressGuardGames">0</b><small>hotových her</small></span>
+        <span><b id="progressGuardXp">0 XP</b><small>čeká na uložení</small></span>
+      </div>
+      <button id="progressGuardGoogleBtn" type="button" class="google-auth-btn progress-guard-google"><img class="google-g" src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button>
+      <small class="progress-guard-bonus">Pár vteřin · bez nového hesla · +500 XP</small>
+      <button id="progressGuardCreateBtn" class="secondary-btn" type="button">Založit účet jinak</button>
+      <button id="progressGuardDismissBtn" class="text-btn" type="button">Teď ne</button>
+    </div>
+  </div>
+
   <div id="pushNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card push-nudge-card">
       <div class="push-nudge-icon">🔔</div>

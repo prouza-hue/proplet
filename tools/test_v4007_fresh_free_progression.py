@@ -29,4 +29,4 @@ assert "new-board-visual" in styles
 assert "freshGen4FreeProgressionV4007:true" in runtime
 assert "legacyBoardDetailRedesignV4007:true" in runtime
 
-print("Proplet v4.01.3 fresh Gen4 progression and legacy-board detail: OK")
+print("Proplet v4.01.4 fresh Gen4 progression and legacy-board detail: OK")
