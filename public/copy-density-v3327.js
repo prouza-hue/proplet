@@ -84,7 +84,7 @@
     const meta=$('#playedLevelsMeta');
     const rows=$$('#playedLevelsList .played-level-row');
     const total=typeof sortedFreeBank==='function'?sortedFreeBank(diff).length:200;
-    const done=rows.length;
+    const done=typeof freeProgress==='function'?freeProgress(diff).done:rows.filter(row=>!row.classList.contains('transferred')).length;
     const pct=total?Math.round(done/total*100):0;
     if(card)card.dataset.diff=diff;
     if(icon&&typeof difficultyIconMarkup==='function')icon.innerHTML=difficultyIconMarkup(diff,'played-levels-difficulty-icon');
@@ -94,10 +94,6 @@
       progress.setAttribute('aria-label',`${done} z ${total} odehraných úrovní`);
     }
     if(meta&&/^Postup\s+\d+\//.test(meta.textContent.trim()))meta.textContent='';
-    rows.filter(row=>row.classList.contains('transferred')).forEach(row=>{
-      const main=row.querySelector('.level-history-main');
-      if(main)main.innerHTML='<strong>Splněno</strong><small>Lze zahrát znovu · bez XP</small>';
-    });
   }
 
   function polishLevelDetail(){
