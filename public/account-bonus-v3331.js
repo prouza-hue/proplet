@@ -37,6 +37,7 @@
       const originalRenderXpRanking=renderXpRanking;
       renderXpRanking=function(data){
         if(!data||!Array.isArray(data.players))return originalRenderXpRanking.apply(this,arguments);
+        if(data.accountRewardsIncluded===true)return originalRenderXpRanking.apply(this,arguments);
         const adjusted={...data,players:data.players.map(row=>({...row,lifetimePoints:Number(row.lifetimePoints||0)+BONUS_XP}))};
         return originalRenderXpRanking.call(this,adjusted);
       };

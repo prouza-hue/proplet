@@ -4531,6 +4531,18 @@ def rankings_xp(
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
     players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
     period_start = _ranking_period_start(period)
+    # Account rewards are real lifetime XP too. They live outside `results` so
+    # the exactly-once account bonus cannot masquerade as a completed puzzle,
+    # but player XP rankings must still include them or the profile total and
+    # leaderboard total visibly disagree.
+    try:
+        account_rewards = db_select_all("account_rewards")
+        account_rewards_included = True
+    except HTTPException:
+        # Keep ranking reads available during a rolling deployment before the
+        # additive reward table exists. New clients can expose this state.
+        account_rewards = []
+        account_rewards_included = False
     period_results = [
         row for row in results
         if competitive_row(row)
@@ -4541,11 +4553,20 @@ def rankings_xp(
         pid = str(row.get("player_id") or "")
         if pid:
             lifetime_points[pid] = lifetime_points.get(pid, 0) + int(row.get("points") or 0)
+    for reward in account_rewards:
+        pid = str(reward.get("player_id") or "")
+        if pid:
+            lifetime_points[pid] = lifetime_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
     period_points: dict[str, int] = {}
     for row in period_results:
         pid = str(row.get("player_id") or "")
         if pid:
             period_points[pid] = period_points.get(pid, 0) + int(row.get("points") or 0)
+    for reward in account_rewards:
+        pid = str(reward.get("player_id") or "")
+        granted_at = parse_timestamp(reward.get("granted_at"))
+        if pid and (period_start is None or (granted_at and granted_at >= period_start)):
+            period_points[pid] = period_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
     badge_counts = _ranking_badge_counts(results, rescues)
 
     player_rows = []
@@ -4599,7 +4620,9 @@ def rankings_xp(
     return {
         "kind": "xp", "period": period, "players": player_rows, "teams": team_rows,
         "visibilityReady": _ranking_visibility_ready(),
-        "scoring": "awarded-xp",
+        "scoring": "all-awarded-player-xp",
+        "accountRewardsIncluded": account_rewards_included,
+        "teamScoring": "gameplay-xp",
         "teamAttribution": "result-team-at-completion" if _ranking_visibility_ready() else "joined-at-compatible-preview",
     }
 
