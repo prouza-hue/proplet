@@ -23,4 +23,4 @@ assert "proplet:gen4-xp-repair" in app and "proplet:gen4-xp-repair" in quality
 assert "proplet:profile-refreshed" in app and "proplet:profile-refreshed" in quality
 assert "releaseModalCohortsV4011:true" in runtime
 
-print("Proplet v4.01.2 release modal cohorts: OK")
+print("Proplet v4.01.3 release modal cohorts: OK")
