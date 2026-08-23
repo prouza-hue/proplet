@@ -106,10 +106,10 @@ assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
-# v4.00.6 keeps the approved CTA colour and matches the larger primary type size.
+# v4.00.7 keeps the approved CTA colour and matches the larger primary type size.
 # Its one-time navigation repairs the already-activated v4.00.1 update handover.
-assert 'version:\'4.00.6\'' in runtime
-assert "proplet-v4.00.6-shell" in sw
+assert 'version:\'4.00.7\'' in runtime
+assert "proplet-v4.00.7-shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "challengeCtaRaspberryV4005:true" in runtime
 assert "resultCtaFontParityV4006:true" in runtime
@@ -143,4 +143,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.00.6 quality release contract: OK")
+print("Proplet v4.00.7 quality release contract: OK")
