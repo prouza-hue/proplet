@@ -23,4 +23,4 @@ assert "Každá obtížnost začíná úrovní 1" in quality
 assert "Splněné úrovně zůstávají splněné" not in quality
 assert "levelOverviewRenderFixV4008:true" in runtime
 
-print("Proplet v4.00.8 level overview late-render regression: OK")
+print("Proplet v4.00.9 level overview late-render regression: OK")
