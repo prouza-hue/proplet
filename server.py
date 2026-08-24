@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import secrets
+import time
 import uuid
 from datetime import date, datetime, timedelta
 from functools import lru_cache
@@ -42,6 +43,10 @@ VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "https://proplet-nine.vercel.app
 CRON_SECRET = os.environ.get("CRON_SECRET", "").strip()
 VERCEL_ENV = os.environ.get("VERCEL_ENV", "").strip().lower()
 VERCEL_GIT_COMMIT_REF = os.environ.get("VERCEL_GIT_COMMIT_REF", "").strip()
+DB_HTTP_CLIENT = httpx.Client(
+    timeout=12.0,
+    limits=httpx.Limits(max_connections=40, max_keepalive_connections=20),
+)
 GEN4_PREVIEW_BRANCH = "agent/v3340-medium-calibration-v3"
 GEN4_CANDIDATE_PREVIEW = VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == GEN4_PREVIEW_BRANCH
 PUZZLES_PATH = ROOT / "data" / (
@@ -354,8 +359,7 @@ def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
         headers["Prefer"] = prefer
     url = f"{SUPABASE_URL}/rest/v1/{table}"
     try:
-        with httpx.Client(timeout=12.0) as client:
-            r = client.request(method, url, params=params, json=body, headers=headers)
+        r = DB_HTTP_CLIENT.request(method, url, params=params, json=body, headers=headers)
     except httpx.HTTPError as exc:
         raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if r.status_code >= 400:
@@ -458,8 +462,7 @@ def db_rpc(function: str, body: Optional[dict] = None):
     }
     url = f"{SUPABASE_URL}/rest/v1/rpc/{function}"
     try:
-        with httpx.Client(timeout=12.0) as client:
-            r = client.post(url, json=body or {}, headers=headers)
+        r = DB_HTTP_CLIENT.post(url, json=body or {}, headers=headers)
     except httpx.HTTPError as exc:
         raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if r.status_code >= 400:
@@ -4413,7 +4416,11 @@ def _ranking_result_team(row: dict, player: dict | None) -> str | None:
     return family
 
 
-def team_code_for_player_at(player: dict, completed_at: str | datetime | None) -> str | None:
+def team_code_for_player_at(
+    player: dict,
+    completed_at: str | datetime | None,
+    memberships_by_player: dict[str, list[dict]] | None = None,
+) -> str | None:
     """Resolve the team a player belonged to at the actual completion timestamp.
 
     This is deliberately time-based so a delayed offline result cannot be credited to
@@ -4424,7 +4431,11 @@ def team_code_for_player_at(player: dict, completed_at: str | datetime | None) -
     if not completed or not player_id:
         return None
     try:
-        memberships = db_select("team_memberships", player_id=player_id)
+        memberships = (
+            memberships_by_player.get(player_id, [])
+            if memberships_by_player is not None
+            else db_select("team_memberships", player_id=player_id)
+        )
         for membership in memberships:
             joined = parse_timestamp(membership.get("joined_at"))
             left = parse_timestamp(membership.get("left_at"))
@@ -4464,14 +4475,16 @@ def _ranking_assign_tied_ranks(rows: list[dict], score_key: str) -> None:
         row["rank"] = rank
 
 
-def _ranking_context():
+def _ranking_context(*, include_results: bool = True, include_rescues: bool = True):
     players = db_select_all("players")
     leagues = db_select_all("leagues")
-    results = db_select_all("results")
-    try:
-        rescues = db_select_all("streak_rescues")
-    except HTTPException:
-        rescues = []
+    results = db_select_all("results") if include_results else []
+    rescues = []
+    if include_rescues:
+        try:
+            rescues = db_select_all("streak_rescues")
+        except HTTPException:
+            rescues = []
     player_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     league_by_code = {norm_family(str(l.get("code") or "")): l for l in leagues if l.get("code")}
     public_team_names = {
@@ -4543,6 +4556,7 @@ def rankings_xp(
     period: str = Query(default="today", pattern="^(today|week|all)$"),
     authorization: Optional[str] = Header(default=None),
 ):
+    started = time.perf_counter()
     enforce_rate_limit(request, "rankings_xp_read", limit=300, window_seconds=3600)
     viewer = _ranking_viewer(authorization)
     viewer_id = str(viewer.get("id")) if viewer else None
@@ -4635,14 +4649,20 @@ def rankings_xp(
         })
     team_rows.sort(key=lambda row: (-row["xp"], -row["memberCount"], str(row["name"]).casefold()))
     _ranking_assign_tied_ranks(team_rows, "xp")
-    return {
+    visibility_ready = _ranking_visibility_ready()
+    response = {
         "kind": "xp", "period": period, "players": player_rows, "teams": team_rows,
-        "visibilityReady": _ranking_visibility_ready(),
+        "visibilityReady": visibility_ready,
         "scoring": "all-awarded-player-xp",
         "accountRewardsIncluded": account_rewards_included,
         "teamScoring": "gameplay-xp",
-        "teamAttribution": "result-team-at-completion" if _ranking_visibility_ready() else "joined-at-compatible-preview",
+        "teamAttribution": "result-team-at-completion" if visibility_ready else "joined-at-compatible-preview",
     }
+    logger.info(
+        "rankings_xp completed period=%s players=%s teams=%s ms=%s",
+        period, len(player_rows), len(team_rows), round((time.perf_counter() - started) * 1000),
+    )
+    return response
 
 
 @app.get("/api/rankings/daily")
@@ -4651,6 +4671,7 @@ def rankings_daily(
     daily_date: Optional[str] = Query(default=None),
     authorization: Optional[str] = Header(default=None),
 ):
+    started = time.perf_counter()
     enforce_rate_limit(request, "rankings_daily_read", limit=300, window_seconds=3600)
     selected_date = daily_date or current_prague_date().isoformat()
     try:
@@ -4660,12 +4681,14 @@ def rankings_daily(
     viewer = _ranking_viewer(authorization)
     viewer_id = str(viewer.get("id")) if viewer else None
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
-    players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
+    players, _, _, player_by_id, league_by_code, public_team_names = _ranking_context(
+        include_results=False,
+        include_rescues=False,
+    )
     primary_puzzle_id = daily_leaderboard_puzzle_id(selected_date, viewer_id)
     day_rows = [
-        row for row in db_select_all("puzzle_runs", mode="daily")
+        row for row in db_select_all("puzzle_runs", mode="daily", puzzle_id=primary_puzzle_id)
         if competitive_row(row) and daily_run_date(row) == selected_date
-        and row.get("puzzle_id") == primary_puzzle_id
     ]
     by_player: dict[str, dict] = {}
     for row in day_rows:
@@ -4703,10 +4726,20 @@ def rankings_daily(
     for index, item in enumerate(player_rows, 1):
         item["rank"] = index
 
+    try:
+        memberships = db_select_all("team_memberships")
+        memberships_by_player: dict[str, list[dict]] | None = {}
+        for membership in memberships:
+            if membership.get("player_id"):
+                memberships_by_player.setdefault(str(membership["player_id"]), []).append(membership)
+    except HTTPException:
+        memberships_by_player = None
     by_team: dict[str, list[float]] = {}
     for row in day_rows:
         player = player_by_id.get(str(row.get("player_id") or ""))
-        family = team_code_for_player_at(player or {}, row.get("completed_at")) if player else None
+        family = team_code_for_player_at(
+            player or {}, row.get("completed_at"), memberships_by_player
+        ) if player else None
         if family:
             by_team.setdefault(family, []).append(_daily_individual_score(row, day_rows))
     current_members: dict[str, int] = {}
@@ -4729,12 +4762,17 @@ def rankings_daily(
         })
     team_rows.sort(key=lambda row: (-row["score"], -row["players"], str(row["name"]).casefold()))
     _ranking_assign_tied_ranks(team_rows, "score")
-    return {
+    response = {
         "kind": "daily", "date": selected_date, "puzzleId": primary_puzzle_id,
         "players": player_rows, "teams": team_rows,
         "playerScoring": "clean-hints-time-moves",
         "teamScoring": "average-best-up-to-3-normalized-0-100",
     }
+    logger.info(
+        "rankings_daily completed date=%s players=%s teams=%s ms=%s",
+        selected_date, len(player_rows), len(team_rows), round((time.perf_counter() - started) * 1000),
+    )
+    return response
 
 
 @app.get("/api/free-archive")
