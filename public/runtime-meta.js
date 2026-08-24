@@ -10,7 +10,7 @@
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'4.01.9',
+    version:'4.01.10',
     canonicalOrigin,
     gen4CandidatePreview,
     capabilities:Object.freeze({
@@ -34,6 +34,7 @@
       weeklyContentBannerV4017:true,
       adminReportNullGuardV4018:true,
       rankingLatencyV4019:true,
+      xpRankingAggregateV40110:true,
       copyDensityPolish:true,
       actionFirstOnboarding:true,
       contextualHelperDefault:true,

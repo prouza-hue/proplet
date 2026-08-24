@@ -61,10 +61,9 @@ def identity(row, viewer_id, scope, used_aliases):
 with (
     patch.object(server, "enforce_rate_limit"),
     patch.object(server, "_ranking_viewer", return_value=player),
-    patch.object(server, "_ranking_context", return_value=([player], [result], [], {"pavel": player}, {}, {})),
-    patch.object(server, "db_select_all", side_effect=lambda table: [reward] if table == "account_rewards" else []),
+    patch.object(server, "_ranking_context", return_value=([player], [], [], {"pavel": player}, {}, {})),
+    patch.object(server, "_ranking_xp_aggregates", return_value=({"pavel": 12_495}, {"pavel": 12_495}, {}, {})),
     patch.object(server, "_ranking_display_identity", side_effect=identity),
-    patch.object(server, "_ranking_visibility_ready", return_value=True),
 ):
     ranking = server.rankings_xp(object(), "all", "Bearer test")
 
@@ -73,5 +72,6 @@ assert ranking["scoring"] == "all-awarded-player-xp"
 assert ranking["players"][0]["xp"] == 12_495
 assert ranking["players"][0]["lifetimePoints"] == 12_495
 assert ranking["players"][0]["rank"] == 1
+assert ranking["aggregation"] == "database-rpc-v1"
 
 print("Proplet v4.01.7 home progress and total-XP leaderboard contract: OK")
