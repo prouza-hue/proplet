@@ -3458,7 +3458,8 @@ def admin_reports(
             continue
         player = players.get(report.get("player_id"))
         info = puzzle_info(str(report.get("puzzle_id") or ""))
-        puzzle_meta = (info or {}).get("puzzle", {}).get("meta") or {}
+        puzzle = (info or {}).get("puzzle") or {}
+        puzzle_meta = puzzle.get("meta") or {}
         haystack = " ".join((
             str(report.get("word") or ""), str(report.get("note") or ""), str(report.get("puzzle_id") or ""),
             str(player.get("name") if player else "anonym"), str(player.get("family_code") if player else ""),
