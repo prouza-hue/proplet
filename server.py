@@ -4494,6 +4494,30 @@ def _ranking_context(*, include_results: bool = True, include_rescues: bool = Tr
     return players, results, rescues, player_by_id, league_by_code, public_team_names
 
 
+def _ranking_xp_aggregates(period_start: datetime | None):
+    rows = db_rpc("proplet_rankings_xp_aggregate", {
+        "p_period_start": period_start.isoformat() if period_start else None,
+    })
+    if not isinstance(rows, list):
+        raise HTTPException(503, "Databázový souhrn pořadí není dostupný")
+    period_points: dict[str, int] = {}
+    lifetime_points: dict[str, int] = {}
+    badge_counts: dict[str, int] = {}
+    team_points: dict[str, int] = {}
+    for row in rows:
+        entity_id = str(row.get("entity_id") or "")
+        if not entity_id:
+            continue
+        if row.get("row_kind") == "team":
+            team_points[entity_id] = int(row.get("period_xp") or 0)
+            continue
+        if row.get("row_kind") == "player":
+            period_points[entity_id] = int(row.get("period_xp") or 0)
+            lifetime_points[entity_id] = int(row.get("lifetime_xp") or 0)
+            badge_counts[entity_id] = int(row.get("badge_count") or 0)
+    return period_points, lifetime_points, badge_counts, team_points
+
+
 @app.post("/api/rankings/visibility")
 def rankings_visibility(
     payload: PublicRankingsSet,
@@ -4561,45 +4585,58 @@ def rankings_xp(
     viewer = _ranking_viewer(authorization)
     viewer_id = str(viewer.get("id")) if viewer else None
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
-    players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
     period_start = _ranking_period_start(period)
-    # Account rewards are real lifetime XP too. They live outside `results` so
-    # the exactly-once account bonus cannot masquerade as a completed puzzle,
-    # but player XP rankings must still include them or the profile total and
-    # leaderboard total visibly disagree.
     try:
-        account_rewards = db_select_all("account_rewards")
+        period_points, lifetime_points, badge_counts, team_points = _ranking_xp_aggregates(period_start)
+        players, _, _, player_by_id, league_by_code, public_team_names = _ranking_context(
+            include_results=False,
+            include_rescues=False,
+        )
         account_rewards_included = True
-    except HTTPException:
-        # Keep ranking reads available during a rolling deployment before the
-        # additive reward table exists. New clients can expose this state.
-        account_rewards = []
-        account_rewards_included = False
-    period_results = [
-        row for row in results
-        if competitive_row(row)
-        and (period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start))
-    ]
-    lifetime_points: dict[str, int] = {}
-    for row in results:
-        pid = str(row.get("player_id") or "")
-        if pid:
-            lifetime_points[pid] = lifetime_points.get(pid, 0) + int(row.get("points") or 0)
-    for reward in account_rewards:
-        pid = str(reward.get("player_id") or "")
-        if pid:
-            lifetime_points[pid] = lifetime_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
-    period_points: dict[str, int] = {}
-    for row in period_results:
-        pid = str(row.get("player_id") or "")
-        if pid:
-            period_points[pid] = period_points.get(pid, 0) + int(row.get("points") or 0)
-    for reward in account_rewards:
-        pid = str(reward.get("player_id") or "")
-        granted_at = parse_timestamp(reward.get("granted_at"))
-        if pid and (period_start is None or (granted_at and granted_at >= period_start)):
-            period_points[pid] = period_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
-    badge_counts = _ranking_badge_counts(results, rescues)
+        aggregation_mode = "database-rpc-v1"
+    except HTTPException as exc:
+        # Rolling-deploy fallback: v4.01.10 can start safely before the additive
+        # function reaches a database, and the established calculation remains valid.
+        logger.warning("rankings_xp aggregate unavailable; using legacy path: %s", exc.detail)
+        players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
+        try:
+            account_rewards = db_select_all("account_rewards")
+            account_rewards_included = True
+        except HTTPException:
+            account_rewards = []
+            account_rewards_included = False
+        period_results = [
+            row for row in results
+            if competitive_row(row)
+            and (period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start))
+        ]
+        lifetime_points = {}
+        for row in results:
+            pid = str(row.get("player_id") or "")
+            if pid:
+                lifetime_points[pid] = lifetime_points.get(pid, 0) + int(row.get("points") or 0)
+        for reward in account_rewards:
+            pid = str(reward.get("player_id") or "")
+            if pid:
+                lifetime_points[pid] = lifetime_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
+        period_points = {}
+        for row in period_results:
+            pid = str(row.get("player_id") or "")
+            if pid:
+                period_points[pid] = period_points.get(pid, 0) + int(row.get("points") or 0)
+        for reward in account_rewards:
+            pid = str(reward.get("player_id") or "")
+            granted_at = parse_timestamp(reward.get("granted_at"))
+            if pid and (period_start is None or (granted_at and granted_at >= period_start)):
+                period_points[pid] = period_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
+        badge_counts = _ranking_badge_counts(results, rescues)
+        team_points = {}
+        for row in period_results:
+            player = player_by_id.get(str(row.get("player_id") or ""))
+            family = _ranking_result_team(row, player)
+            if family:
+                team_points[family] = team_points.get(family, 0) + int(row.get("points") or 0)
+        aggregation_mode = "legacy-fallback"
 
     player_rows = []
     used_aliases: set[str] = set()
@@ -4624,12 +4661,6 @@ def rankings_xp(
     player_rows.sort(key=lambda row: (-row["xp"], -row["lifetimePoints"], str(row["name"]).casefold()))
     _ranking_assign_tied_ranks(player_rows, "xp")
 
-    team_points: dict[str, int] = {}
-    for row in period_results:
-        player = player_by_id.get(str(row.get("player_id") or ""))
-        family = _ranking_result_team(row, player)
-        if family:
-            team_points[family] = team_points.get(family, 0) + int(row.get("points") or 0)
     current_members: dict[str, int] = {}
     for player in players:
         family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
@@ -4649,7 +4680,7 @@ def rankings_xp(
         })
     team_rows.sort(key=lambda row: (-row["xp"], -row["memberCount"], str(row["name"]).casefold()))
     _ranking_assign_tied_ranks(team_rows, "xp")
-    visibility_ready = _ranking_visibility_ready()
+    visibility_ready = all("public_rankings" in player for player in players)
     response = {
         "kind": "xp", "period": period, "players": player_rows, "teams": team_rows,
         "visibilityReady": visibility_ready,
@@ -4657,6 +4688,7 @@ def rankings_xp(
         "accountRewardsIncluded": account_rewards_included,
         "teamScoring": "gameplay-xp",
         "teamAttribution": "result-team-at-completion" if visibility_ready else "joined-at-compatible-preview",
+        "aggregation": aggregation_mode,
     }
     logger.info(
         "rankings_xp completed period=%s players=%s teams=%s ms=%s",
