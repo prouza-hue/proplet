@@ -10,9 +10,9 @@ sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 vercel = (ROOT / "vercel.json").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.10"' in version
-assert "version:'4.01.10'" in runtime
-assert "proplet-v4.01.10-shell" in sw
+assert 'APP_VERSION = "4.01.11"' in version
+assert "version:'4.01.11'" in runtime
+assert "proplet-v4.01.11-shell" in sw
 assert "unifiedPushV4017:true" in runtime
 assert "pushAutoRepairV4017:true" in runtime
 assert "weeklyContentBannerV4017:true" in runtime
