@@ -26,8 +26,8 @@ assert "r.calm_mode = false" in sql
 assert "public.account_rewards" in sql
 assert "public.streak_rescues" in sql
 assert "team_code_at_completion" in sql
-assert 'APP_VERSION = "4.01.10"' in version
-assert "version:'4.01.10'" in runtime
+assert 'APP_VERSION = "4.01.11"' in version
+assert "version:'4.01.11'" in runtime
 assert "xpRankingAggregateV40110:true" in runtime
 
 rpc_rows = [

@@ -22,6 +22,9 @@
   media?.addEventListener?.('change',apply);
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
+  // Standalone documents share theme resolution, but must not boot the game shell.
+  if(document.documentElement.hasAttribute('data-proplet-theme-only'))return;
+
   const styles=[
     ['/home-layout.css?v=10','propletHomeLayoutCss'],
     ['/today-brand.css?v=4','propletTodayBrandCss'],
