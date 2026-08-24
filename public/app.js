@@ -1065,19 +1065,17 @@ async function renderLeaderboard(){
  renderRankingTeamCard();
  xpList.innerHTML='<div class="ranking-loading">Načítám XP pořadí…</div>';
  dailyList.innerHTML='<div class="ranking-loading">Načítám dnešní pořadí…</div>';
- try{
-  const [xp,daily]=await Promise.all([
+ const [xpResult,dailyResult]=await Promise.allSettled([
    api(`/api/rankings/xp?period=${rankingXpPeriod}`),
    api(`/api/rankings/daily?daily_date=${pragueDateISO()}`)
   ]);
-  renderXpRanking(xp);
-  renderDailyRanking(daily);
+ if(xpResult.status==='fulfilled'){
+  renderXpRanking(xpResult.value);
   const privacy=$('#rankingPrivacyNote');
-  if(privacy&&xp.visibilityReady===true)privacy.dataset.visibilityReady='true';
- }catch(e){
-  const msg=`<div class="ranking-empty"><strong>Pořadí se teď nepodařilo načíst.</strong><small>${esc(e.message)}</small></div>`;
-  xpList.innerHTML=msg;dailyList.innerHTML=msg;
- }
+  if(privacy&&xpResult.value.visibilityReady===true)privacy.dataset.visibilityReady='true';
+ }else xpList.innerHTML=`<div class="ranking-empty"><strong>XP pořadí se teď nepodařilo načíst.</strong><small>${esc(xpResult.reason?.message||'Zkus to prosím znovu.')}</small></div>`;
+ if(dailyResult.status==='fulfilled')renderDailyRanking(dailyResult.value);
+ else dailyList.innerHTML=`<div class="ranking-empty"><strong>Dnešní pořadí se teď nepodařilo načíst.</strong><small>${esc(dailyResult.reason?.message||'Zkus to prosím znovu.')}</small></div>`;
 }
 function rankingRows(data,scope){return scope==='teams'?(data?.teams||[]):(data?.players||[])}
 function rankingRankBadge(rank){return rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':`${rank}.`}
