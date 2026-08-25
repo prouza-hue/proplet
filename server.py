@@ -3634,14 +3634,36 @@ def daily_run_date(row: dict) -> Optional[str]:
     except ValueError:
         return None
 
+def ranking_elapsed_ms(r: dict) -> int:
+    return int(r.get("elapsed_ms") or r.get("best_elapsed_ms") or 10**12)
+
+
+def displayed_elapsed_seconds(r: dict) -> int:
+    """Use exactly the whole-second precision players see in the leaderboard UI."""
+    return ranking_elapsed_ms(r) // 1000
+
+
 def run_rank_tuple(r: dict) -> tuple:
     return (
         0 if r.get("clean_solve") is True else 1,
         int(r.get("hints_used") or 0),
-        int(r.get("elapsed_ms") or r.get("best_elapsed_ms") or 10**12),
+        displayed_elapsed_seconds(r),
         int(r.get("moves") or r.get("best_moves") or 10**9),
-        int(r.get("wrong_attempts") or 0),
     )
+
+
+def competition_ranks(rows: list[dict]) -> list[int]:
+    """Equal player-visible results share a rank (1, 1, 3 competition ranking)."""
+    ranks: list[int] = []
+    previous = None
+    current_rank = 0
+    for position, row in enumerate(rows, 1):
+        visible_result = run_rank_tuple(row)
+        if visible_result != previous:
+            current_rank = position
+            previous = visible_result
+        ranks.append(current_rank)
+    return ranks
 
 def puzzle_info(puzzle_id: str) -> Optional[dict]:
     free_info = free_puzzle_info(puzzle_id)
@@ -4158,10 +4180,11 @@ def puzzle_leaderboard(
             first[pid] = r
     # Pořadí srovnává první dokončení každého hráče; replay už výsledek nikdy nezlepší.
     ranked = sorted(first.values(), key=lambda r: (*run_rank_tuple(r), pmap[r["player_id"]]["name"].casefold()))
+    ranks = competition_ranks(ranked)
     board = []
-    for i, r in enumerate(ranked, 1):
+    for i, r in enumerate(ranked):
         board.append({
-            "rank": i, "id": r["player_id"], "name": pmap[r["player_id"]]["name"], "avatar": pmap[r["player_id"]].get("avatar") or "🙂",
+            "rank": ranks[i], "id": r["player_id"], "name": pmap[r["player_id"]]["name"], "avatar": pmap[r["player_id"]].get("avatar") or "🙂",
             "elapsedMs": int(r["elapsed_ms"]), "moves": int(r["moves"]),
             "hintsUsed": int(r.get("hints_used") or 0), "wrongAttempts": int(r.get("wrong_attempts") or 0),
             "cleanSolve": r.get("clean_solve") is True, "completedAt": r.get("completed_at"),
@@ -4201,6 +4224,7 @@ def free_global_leaderboard(
         completion_time(row),
         str(row.get("player_id") or ""),
     ))
+    ranks = competition_ranks(ranked)
 
     my_player_id = None
     if authorization:
@@ -4227,7 +4251,7 @@ def free_global_leaderboard(
         pid = str(row.get("player_id") or "")
         identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"free:{puzzle_id}", used_aliases)
         board.append({
-            "rank": index + 1,
+            "rank": ranks[index],
             "isMine": index == my_index,
             "name": identity["name"],
             "avatar": identity["avatar"],
@@ -4238,7 +4262,7 @@ def free_global_leaderboard(
             "cleanSolve": row.get("clean_solve") is True,
         })
 
-    my_rank = my_index + 1 if my_index is not None else None
+    my_rank = ranks[my_index] if my_index is not None else None
     top_percent = max(1, math.ceil(my_rank / total * 100)) if my_rank and total else None
     return {
         "puzzleId": puzzle_id,
@@ -4294,13 +4318,11 @@ def daily_global_leaderboard(
             by_player[player_id] = row
 
     ranked = sorted(by_player.values(), key=lambda row: (
-        0 if row.get("clean_solve") is True else 1,
-        int(row.get("hints_used") or 0),
-        int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 10**12),
-        int(row.get("moves") or row.get("best_moves") or 10**9),
+        *run_rank_tuple(row),
         completion_time(row),
         str(row.get("player_id") or ""),
     ))
+    ranks = competition_ranks(ranked)
 
     my_index = next((index for index, row in enumerate(ranked) if str(row.get("player_id")) == my_player_id), None)
     total = len(ranked)
@@ -4318,7 +4340,7 @@ def daily_global_leaderboard(
         pid = str(row.get("player_id") or "")
         identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"day:{selected_date}", used_aliases)
         board.append({
-            "rank": index + 1,
+            "rank": ranks[index],
             "isMine": index == my_index,
             "name": identity["name"],
             "avatar": identity["avatar"],
@@ -4329,7 +4351,7 @@ def daily_global_leaderboard(
             "cleanSolve": row.get("clean_solve") is True,
         })
 
-    my_rank = my_index + 1 if my_index is not None else None
+    my_rank = ranks[my_index] if my_index is not None else None
     top_percent = max(1, math.ceil(my_rank / total * 100)) if my_rank and total else None
     return {
         "date": selected_date,
@@ -4762,14 +4784,14 @@ def rankings_daily(
         if previous is None or completion_time(row) < completion_time(previous):
             by_player[pid] = row
     ranked_all = sorted(by_player.values(), key=lambda row: (
-        0 if row.get("clean_solve") is True else 1,
-        int(row.get("hints_used") or 0), int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 10**12),
-        int(row.get("moves") or row.get("best_moves") or 10**9), completion_time(row), str(row.get("player_id") or ""),
+        *run_rank_tuple(row),
+        completion_time(row), str(row.get("player_id") or ""),
     ))
+    ranks = competition_ranks(ranked_all)
     day_rows = list(by_player.values())
     player_rows = []
     used_aliases: set[str] = set()
-    for row in ranked_all:
+    for row_index, row in enumerate(ranked_all):
         pid = str(row.get("player_id") or "")
         player = player_by_id.get(pid)
         if not player:
@@ -4784,10 +4806,8 @@ def rankings_daily(
             "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"], "teamName": team_name,
             "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0), "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
-            "isMine": pid == viewer_id,
+            "isMine": pid == viewer_id, "rank": ranks[row_index],
         })
-    for index, item in enumerate(player_rows, 1):
-        item["rank"] = index
 
     try:
         memberships = db_select_all("team_memberships")
@@ -5134,14 +5154,11 @@ def leaderboard(
     daily_rows = db_select("results", mode="daily", daily_date=daily_date)
     primary_daily_id = expected_daily_puzzle_id(daily_date)
     daily_rows = [r for r in daily_rows if r["player_id"] in player_map and r.get("puzzle_id") == primary_daily_id]
-    daily_rows.sort(key=lambda r: (
-        0 if r.get("clean_solve") is True else 1,
-        int(r.get("hints_used") or 0),
-        r["best_elapsed_ms"], r["best_moves"], player_map[r["player_id"]]["name"].casefold(),
-    ))
+    daily_rows.sort(key=lambda r: (*run_rank_tuple(r), player_map[r["player_id"]]["name"].casefold()))
+    daily_ranks = competition_ranks(daily_rows)
     daily = [
         {
-            "rank": i,
+            "rank": daily_ranks[index],
             "id": r["player_id"],
             "name": player_map[r["player_id"]]["name"],
             "avatar": player_map[r["player_id"]].get("avatar") or "🙂",
@@ -5150,7 +5167,7 @@ def leaderboard(
             "hintsUsed": int(r.get("hints_used") or 0),
             "cleanSolve": r.get("clean_solve") is True,
         }
-        for i, r in enumerate(daily_rows, 1)
+        for index, r in enumerate(daily_rows)
     ]
     return {"familyCode": family, "date": daily_date, "weekStart": week_start.isoformat(), "overall": overall, "weekly": weekly, "daily": daily}
 
