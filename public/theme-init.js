@@ -41,7 +41,7 @@
     ['/result-layout-v3330.css?v=2','propletResultLayoutCss'],
     ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
-    ['/challenge-cta-v3333.css?v=3','propletChallengeCtaV3333Css'],
+    ['/challenge-cta-v3333.css?v=4','propletChallengeCtaV3333Css'],
     ['/release-notes-v3331.css?v=1','propletReleaseNotesV3331Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css']

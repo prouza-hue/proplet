@@ -3947,7 +3947,12 @@ def _daily_individual_score(row: dict, day_rows: list[dict]) -> float:
     completion = 55.0
     clean_bonus = 15.0 if clean else 0.0
     hint_bonus = max(0.0, 10.0 - 3.0 * hints)
-    times = sorted(int(r.get("best_elapsed_ms") or 86_400_000) for r in day_rows)
+    # `puzzle_runs` stores the first competitive run in `elapsed_ms`. Older
+    # aggregate result rows may expose `best_elapsed_ms`, so keep that as a
+    # compatibility preference but never discard the real run time. Without
+    # this fallback every puzzle_run looked like 24 h and every clean solve
+    # incorrectly received the full 100 points.
+    times = sorted(int(r.get("best_elapsed_ms") or r.get("elapsed_ms") or 86_400_000) for r in day_rows)
     if len(times) <= 1:
         speed_bonus = 10.0
     else:

@@ -36,11 +36,6 @@ html.calm-preference-v334 .ranking-privacy-mini{display:none}
 .calm-quick-toggle[aria-checked="true"],.calm-setting-toggle[aria-checked="true"]{background:linear-gradient(90deg,var(--purple),var(--mint))}
 .calm-quick-toggle[aria-checked="true"]::before,.calm-setting-toggle[aria-checked="true"]::before{transform:translateX(19px)}
 #freeCalmQuick{margin:0 0 12px}
-#dailyCalmQuick{position:relative;z-index:3;margin:10px 0 0;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.8)}
-#dailyCalmQuick strong,#dailyCalmQuick strong span{color:white}
-#dailyCalmQuick strong span{opacity:.82}
-#dailyCalmQuick .calm-quick-toggle{background:rgba(255,255,255,.28)}
-#dailyCalmQuick .calm-quick-toggle[aria-checked="true"]{background:#7de0bf}
 .calm-settings-card .quality-setting-line{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px}
 .calm-settings-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#eeeaff,#e4f7ef);font-size:23px}
 .calm-settings-copy strong,.calm-settings-copy small{display:block}
@@ -153,7 +148,6 @@ html[data-theme="dark"] .quality-info-button,
 html[data-theme="dark"] .quality-info-popover,
 html[data-theme="dark"] .quality-release-card{background:#201d28;border-color:#3f394b;color:#f4f0f8}
 html[data-theme="dark"] .calm-quick{background:#201d28;border-color:#3d3748}
-html[data-theme="dark"] #dailyCalmQuick{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.13)}
 html[data-theme="dark"] .calm-settings-icon{background:linear-gradient(145deg,#302a43,#203e38)}
 html[data-theme="dark"] .quality-release-point,
 html[data-theme="dark"] .quality-archive-copy>div,

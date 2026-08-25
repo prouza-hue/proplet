@@ -76,7 +76,7 @@ function calmControlMarkup(id){
 function bindCalmSwitch(root){const b=root?.querySelector('.calm-quick-toggle');if(!b||b.dataset.bound==='1')return;b.dataset.bound='1';b.onclick=toggleCalmPreference}
 function ensureQuickCalmControls(){
   const grid=q('#difficultyCards');if(grid&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick'));bindCalmSwitch(q('#freeCalmQuick'))}
-  const hero=q('.daily-hero'),anchor=q('#dailySyncStatus');if(hero&&!q('#dailyCalmQuick')){const html=calmControlMarkup('dailyCalmQuick');if(anchor)anchor.insertAdjacentHTML('beforebegin',html);else hero.insertAdjacentHTML('beforeend',html);bindCalmSwitch(q('#dailyCalmQuick'))}
+  q('#dailyCalmQuick')?.remove();
 }
 function ensureCalmSettings(){
   if(q('#calmModeCard'))return;
@@ -105,7 +105,7 @@ function confirmCalmMode(){const kind=calmConfirmKind;closeCalmConfirmation();if
 function toggleCalmPreference(){if(calmPreference())setCalmPreference(false);else openCalmConfirmation('preference')}
 function syncCalmControls(){
   const on=calmPreference();document.documentElement.classList.toggle('calm-preference-v334',on);
-  ['#freeCalmQuick .calm-quick-toggle','#dailyCalmQuick .calm-quick-toggle','#calmModeToggle'].forEach(sel=>setAttr(q(sel),'aria-checked',on?'true':'false'));
+  ['#freeCalmQuick .calm-quick-toggle','#calmModeToggle'].forEach(sel=>setAttr(q(sel),'aria-checked',on?'true':'false'));
   setDisplay(q('[data-nav="leaderboard"]'),on?'none':'');ensurePrivacyMini();applyCalmRunUi();
 }
 function setCalmPreference(enabled,{announce=true}={}){

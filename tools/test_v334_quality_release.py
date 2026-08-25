@@ -6,7 +6,10 @@ import re
 
 root = Path(__file__).resolve().parents[1]
 server = (root / "server.py").read_text(encoding="utf-8")
-client = (root / "public" / "quality-v334.js").read_text(encoding="utf-8")
+client = (
+    (root / "public" / "quality-v334.js").read_text(encoding="utf-8")
+    + (root / "public" / "quality-v334-core-v40114.js").read_text(encoding="utf-8")
+)
 css = (root / "public" / "quality-v334.css").read_text(encoding="utf-8")
 hotfix_css = (root / "public" / "quality-hotfix-v334.css").read_text(encoding="utf-8")
 runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
@@ -110,8 +113,8 @@ assert "Hrát další úroveň" in app
 
 # v4.01.5 keeps the approved CTA colour and matches the larger primary type size.
 # Its one-time navigation repairs the already-activated v4.00.1 update handover.
-assert 'version:\'4.01.14\'' in runtime
-assert "proplet-v4.01.14-shell" in sw
+assert 'version:\'4.01.16\'' in runtime
+assert "proplet-v4.01.16-shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "challengeCtaRaspberryV4005:true" in runtime
 assert "resultCtaFontParityV4006:true" in runtime
