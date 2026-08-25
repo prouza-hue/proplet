@@ -3,7 +3,7 @@
   "regions": ["arn1"],
   "crons": [
     {
-      "path": "/api/cron/daily-push",
+      "path": "/api/cron/daily-push-v2",
       "schedule": "0 7 * * *"
     },
     {

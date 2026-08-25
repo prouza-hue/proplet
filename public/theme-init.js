@@ -93,7 +93,7 @@
     loadScript('/copy-density-v3327.js?v=1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=2','propletAccountTeamIntegrity');
-    loadScript('/competitive-sharing-v3331.js?v=3','propletCompetitiveSharing');
+    loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=3','propletChallengeCtaV3333');
     await loadScript('/account-bonus-v3331.js?v=1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});

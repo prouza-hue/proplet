@@ -1010,8 +1010,8 @@ def push_preferences_schema_ready() -> bool:
     if not supabase_ready():
         return False
     try:
-        db_request("GET", "push_subscriptions", params={"select": "id,daily_enabled,content_enabled", "limit": "1"})
-        db_request("GET", "push_delivery_log", params={"select": "id", "limit": "1"})
+        db_request("GET", "push_subscriptions", params={"select": "id,daily_enabled,content_enabled,anonymous_id", "limit": "1"})
+        db_request("GET", "push_delivery_log", params={"select": "id,anonymous_id", "limit": "1"})
         return True
     except HTTPException:
         return False
@@ -1488,6 +1488,7 @@ def _reserve_push_delivery(sub: dict, event_key: str, category: str) -> Optional
             "id": delivery_id,
             "subscription_id": sub["id"],
             "player_id": sub["player_id"],
+            "anonymous_id": sub.get("anonymous_id"),
             "event_key": event_key,
             "category": category,
             "status": "pending",
@@ -1523,7 +1524,7 @@ def cron_content_push(request: Request, authorization: Optional[str] = Header(de
     payload = json.dumps({
         "title": "✨ 5 nových Propletů",
         "body": "Nová týdenní várka je venku. Jedna úroveň od každé obtížnosti a jedna navíc.",
-        "url": f"/?open=free&new={batch.get('id')}",
+        "url": f"/?open=free&new={batch.get('id')}&via=push-content",
         "tag": f"proplet-{event_key}",
     }, ensure_ascii=False)
     sent = failed = removed = duplicate = 0
@@ -1915,7 +1916,7 @@ def claim_anonymous(payload: AnonymousClaim, request: Request, authorization: Op
     anon = anonymous_hash(payload.anonymous_id)
     if not anon:
         raise HTTPException(400, "Chybí anonymní ID")
-    claimed = {"attempts": 0, "helperEvents": 0, "hintEvents": 0, "productEvents": 0, "feedback": 0}
+    claimed = {"attempts": 0, "helperEvents": 0, "hintEvents": 0, "productEvents": 0, "feedback": 0, "pushSubscriptions": 0}
     for table, key in (("puzzle_attempts", "attempts"), ("helper_events", "helperEvents"), ("hint_events", "hintEvents"), ("product_events", "productEvents")):
         rows = db_select(table, anonymous_id=anon)
         if rows:
@@ -1935,6 +1936,13 @@ def claim_anonymous(payload: AnonymousClaim, request: Request, authorization: Op
         else:
             db_update("puzzle_feedback", {"id": row["id"]}, {"player_id": player["id"], "anonymous_id": None})
         claimed["feedback"] += 1
+    push_rows = db_select("push_subscriptions", anonymous_id=anon)
+    if push_rows:
+        delivery_rows = db_select("push_delivery_log", anonymous_id=anon)
+        if delivery_rows:
+            db_update("push_delivery_log", {"anonymous_id": anon}, {"player_id": player["id"], "anonymous_id": None})
+        db_update("push_subscriptions", {"anonymous_id": anon}, {"player_id": player["id"], "anonymous_id": None})
+        claimed["pushSubscriptions"] = len(push_rows)
     return {"ok": True, "claimed": claimed}
 
 
@@ -2083,6 +2091,7 @@ def product_event(
         "push_nudge_shown", "push_nudge_accepted", "push_nudge_dismissed", "push_permission_denied",
         "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
         "push_notifications_enabled", "push_notifications_disabled", "push_notifications_auto_repaired",
+        "push_daily_opened", "push_weekly_opened", "push_content_opened",
         "content_drop_cta_clicked",
         "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
         "progress_guard_google_selected", "progress_guard_other_account_selected",
@@ -4931,11 +4940,12 @@ def push_preferences(
     request: Request,
     endpoint: str = Query(min_length=20, max_length=2048),
     authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
 ):
     enforce_rate_limit(request, "push_preferences_read", limit=120, window_seconds=3600)
-    player = auth_player(authorization)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     rows = db_select("push_subscriptions", endpoint=endpoint)
-    row = next((r for r in rows if r.get("player_id") == player["id"]), None)
+    row = next((r for r in rows if r.get("player_id") == actor.get("player_id") and r.get("anonymous_id") == actor.get("anonymous_id")), None)
     ready = bool(row and "daily_enabled" in row and "content_enabled" in row) or push_preferences_schema_ready()
     if not row:
         return {"migrationReady": ready, "subscribed": False, "dailyEnabled": False, "contentEnabled": False}
@@ -4960,9 +4970,14 @@ def push_account_state(request: Request, authorization: Optional[str] = Header(d
 
 
 @app.post("/api/push/subscribe")
-def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorization: Optional[str] = Header(default=None)):
+def push_subscribe(
+    payload: PushSubscriptionCreate,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
     enforce_rate_limit(request, "push_subscribe", limit=20, window_seconds=3600)
-    player = auth_player(authorization)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     if not push_ready():
         raise HTTPException(503, "Push notifikace ještě nejsou na serveru nakonfigurované")
     existing = db_select("push_subscriptions", endpoint=payload.endpoint)
@@ -4972,7 +4987,8 @@ def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorizat
     enabled = True if payload.daily_enabled is None and payload.content_enabled is None else bool(payload.daily_enabled or payload.content_enabled)
     daily_enabled = content_enabled = enabled
     row = {
-        "player_id": player["id"], "p256dh": payload.p256dh, "auth": payload.auth,
+        "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
+        "p256dh": payload.p256dh, "auth": payload.auth,
         "user_agent": payload.user_agent, "updated_at": datetime.now(TZ).isoformat(),
         "daily_enabled": daily_enabled, "content_enabled": content_enabled,
     }
@@ -4996,12 +5012,17 @@ def push_subscribe(payload: PushSubscriptionCreate, request: Request, authorizat
 
 
 @app.post("/api/push/unsubscribe")
-def push_unsubscribe(payload: PushUnsubscribe, request: Request, authorization: Optional[str] = Header(default=None)):
+def push_unsubscribe(
+    payload: PushUnsubscribe,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
     enforce_rate_limit(request, "push_unsubscribe", limit=30, window_seconds=3600)
-    player = auth_player(authorization)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
     rows = db_select("push_subscriptions", endpoint=payload.endpoint)
     for row in rows:
-        if row.get("player_id") == player["id"]:
+        if row.get("player_id") == actor.get("player_id") and row.get("anonymous_id") == actor.get("anonymous_id"):
             db_delete("push_subscriptions", id=row["id"])
     return {"ok": True}
 

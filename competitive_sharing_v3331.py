@@ -9,7 +9,21 @@ from pydantic import BaseModel, Field
 
 
 ALLOWED_CHALLENGE_EVENTS = {
+    "daily_share_clicked",
+    "daily_share_created",
+    "daily_share_native_completed",
+    "daily_share_clipboard_completed",
+    "daily_share_cancelled",
+    "daily_share_failed",
+    "level_share_clicked",
     "level_share_created",
+    "level_share_native_completed",
+    "level_share_clipboard_completed",
+    "level_share_cancelled",
+    "level_share_failed",
+    "shared_daily_opened",
+    "shared_daily_started",
+    "shared_daily_completed",
     "shared_level_opened",
     "shared_level_started",
     "shared_level_completed",
