@@ -34,6 +34,7 @@ def install_push_diagnostics(
     db_rpc=None,
     save_quality_snapshot_if_monday=None,
     current_prague_date=None,
+    released_batches=None,
     logger=None,
     **_kwargs,
 ):
@@ -82,6 +83,7 @@ def install_push_diagnostics(
             "id": delivery_id,
             "subscription_id": sub["id"],
             "player_id": sub["player_id"],
+            "anonymous_id": sub.get("anonymous_id"),
             "event_key": event_key,
             "category": category,
             "status": "pending",
@@ -161,31 +163,67 @@ def install_push_diagnostics(
             return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": snapshot, "housekeeping": housekeeping}
 
         today = today_iso()
-        completed = {row.get("player_id") for row in db_select("results", mode="daily", daily_date=today)}
+        today_date = now().date()
+        batch = None
+        if callable(released_batches):
+            try:
+                released, _ = released_batches(today_date)
+                latest = released[-1] if released else None
+                if latest and str(latest.get("availableFrom") or "") == today:
+                    batch = latest
+            except Exception as exc:
+                log.warning("Unified weekly push lookup failed: %s", exc)
+
+        completed = {f"p:{row.get('player_id')}" for row in db_select("results", mode="daily", daily_date=today) if row.get("player_id")}
+        try:
+            for row in db_select("puzzle_attempts", mode="daily", challenge_key=f"daily:{today}"):
+                if not row.get("completed_at"):
+                    continue
+                if row.get("player_id"):
+                    completed.add(f"p:{row['player_id']}")
+                elif row.get("anonymous_id"):
+                    completed.add(f"a:{row['anonymous_id']}")
+        except HTTPException:
+            pass
         subscriptions = db_select("push_subscriptions")
-        payload = {
-            "title": "☀️ Nový Proplet je tady",
-            "body": "Dnešní výzva čeká. Propleteš ji čistě?",
-            "url": "/?open=daily",
-            "tag": f"proplet-daily-{today}",
-        }
-        event_key = f"daily:{today}"
+        if batch:
+            payload = {
+                "title": "✨ Nové úrovně jsou tady",
+                "body": "Pět čerstvých Propletů i dnešní výzva čekají. Čím začneš?",
+                "url": f"/?open=free&new={batch.get('id')}&via=push-weekly",
+                "tag": f"proplet-content-{batch.get('id')}",
+            }
+            event_key = f"content:{batch.get('id')}"
+            category = "content"
+        else:
+            payload = {
+                "title": "☀️ Nový Proplet je tady",
+                "body": "Dnešní výzva čeká. Propleteš ji čistě?",
+                "url": "/?open=daily&via=push-daily",
+                "tag": f"proplet-daily-{today}",
+            }
+            event_key = f"daily:{today}"
+            category = "daily"
         opted_in = already_completed = eligible = 0
         counts = {"sent": 0, "failed": 0, "removed": 0, "duplicate": 0}
         for sub in subscriptions:
-            if sub.get("daily_enabled", True) is False:
+            enabled = bool(sub.get("daily_enabled", True) or (batch and sub.get("content_enabled", False)))
+            if not enabled:
                 continue
             opted_in += 1
-            if sub.get("player_id") in completed:
+            actor_key = f"p:{sub['player_id']}" if sub.get("player_id") else f"a:{sub.get('anonymous_id')}"
+            if not batch and actor_key in completed:
                 already_completed += 1
                 continue
             eligible += 1
-            outcome = send_one(sub, payload, event_key=event_key, category="daily", ttl=43200)
+            outcome = send_one(sub, payload, event_key=event_key, category=category, ttl=86400 if batch else 43200)
             counts[outcome] = counts.get(outcome, 0) + 1
         return {
             "ok": counts["failed"] == 0,
             "date": today,
             "eventKey": event_key,
+            "category": category,
+            "batch": batch.get("id") if batch else None,
             "subscriptions": len(subscriptions),
             "optedIn": opted_in,
             "alreadyCompleted": already_completed,
@@ -212,7 +250,7 @@ def install_push_diagnostics(
             {
                 "title": "🔔 Test Propletu",
                 "body": "Funguje to. Takhle dorazí připomínka na Denní výzvu.",
-                "url": "/?open=daily",
+                "url": "/?open=daily&via=push-test",
                 "tag": f"proplet-test-{test_id}",
             },
             event_key=f"test:{player['id']}:{test_id}",
@@ -285,7 +323,7 @@ def install_push_diagnostics(
             except Exception:
                 host = ""
             subscription_rows.append({
-                "playerName": owner.get("name") or "Hráč",
+                "playerName": owner.get("name") or ("Anonymní hráč" if sub.get("anonymous_id") else "Hráč"),
                 "device": device_label(sub.get("user_agent") or ""),
                 "dailyEnabled": sub.get("daily_enabled", True) is not False,
                 "contentEnabled": sub.get("content_enabled", False) is True,

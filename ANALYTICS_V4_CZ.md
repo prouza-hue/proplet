@@ -28,6 +28,8 @@ Vlastní herní identita je pseudonymní. Vercelová návštěvnost je agregovan
 - Konverze: rozlišujeme vytvoření účtu od přihlášení; měříme nabídku, kliknutí i úspěch.
 - Retence: nabídka a volba push notifikace, PWA instalace a každé další aktivní datum.
 - Virální smyčka: vytvoření odkazu, otevření, start, dokončení a překonání sdílené úrovně.
+- Od v4.01.14 se zvlášť měří kliknutí na sdílení, úspěšné systémové sdílení / zkopírování odkazu, zrušení a chyba. U příjemce se pro Daily i Volnou hru měří otevření, start a dokončení. Starší období proto není pro outbound share funnel plně srovnatelné.
+- Push funnel od v4.01.14 spojuje auditované přijetí push službou (`push_delivery_log`) s otevřením Daily, pondělního balíčku nebo náhradní content zprávy (`push_*_opened`). Pondělní Daily a nové úrovně používají jednu společnou zprávu, aby hráč nedostal dvě notifikace.
 - UX: zapnutí Klidného režimu, doporučení vyšší obtížnosti a ochrana anonymního postupu.
 
 ## Denní manažerské vyhodnocení v 9:00
@@ -55,6 +57,15 @@ Report porovnává včerejšek s předchozím dnem a s klouzavým 7denním prům
 - Pseudonymní produktová a herní telemetrie může zůstat dlouhodobě pro srovnávání verzí a kvality; data navázaná na účet se smažou spolu s účtem. Pokud objem výrazně naroste, zavedeme časově omezenou surovou vrstvu a dlouhodobé anonymní agregace.
 - Provozní chyby: 30 dní. Rate-limit data: přibližně 2 dny. Vyřešený support: nejvýše 12 měsíců.
 - Události doplněné ve v4.01.6 nemají spolehlivou historii před tímto releasem. Starší aktivitu proto měříme z `puzzle_attempts` a `results`, ne zpětným dopočtem chybějících eventů.
+- Retenci uvádíme ve dvou kohortách: všichni noví návštěvníci a **aktivovaní noví hráči**, kteří v první den dokončili Daily nebo Volnou hru. Push zásah lze vyhodnotit jen u lidí, kteří jej dobrovolně zapnuli; anonymní instalace mohou souhlas udělit od v4.01.14 bez založení účtu.
+
+## PWA, push a share funnel od v4.01.14
+
+- PWA: `pwa_install_nudge_shown` → `pwa_install_native_accepted` / `pwa_install_ios_hint_ack` → `pwa_installed`.
+- Push: `push_nudge_shown` → `push_nudge_accepted` → auditované `push_delivery_log.status=sent` → `push_daily_opened` / `push_weekly_opened` / `push_content_opened`.
+- Daily share: `daily_share_clicked` → `daily_share_created` → `shared_daily_opened` → `shared_daily_started` → `shared_daily_completed`.
+- Level share: `level_share_clicked` → `level_share_created` → `shared_level_opened` → `shared_level_started` → `shared_level_completed` → volitelně `shared_level_beaten`.
+- Vždy se reportují unikátní aktéři a vedle nich absolutní počet doručení. `*_cancelled` a `*_failed` jsou diagnostické větve, ne konverze.
 
 ## Náklady a škálování
 

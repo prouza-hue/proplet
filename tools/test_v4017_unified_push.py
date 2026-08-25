@@ -10,9 +10,9 @@ sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 vercel = (ROOT / "vercel.json").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.13"' in version
-assert "version:'4.01.13'" in runtime
-assert "proplet-v4.01.13-shell" in sw
+assert 'APP_VERSION = "4.01.14"' in version
+assert "version:'4.01.14'" in runtime
+assert "proplet-v4.01.14-shell" in sw
 assert "unifiedPushV4017:true" in runtime
 assert "pushAutoRepairV4017:true" in runtime
 assert "weeklyContentBannerV4017:true" in runtime
@@ -37,9 +37,10 @@ assert "nových Propletů je tady" in app
 assert "PONDĚLNÍ NOVINKY" in app
 assert "content_drop_cta_clicked" in app
 assert '@app.get("/api/cron/content-push")' in server
-assert '"path": "/api/cron/daily-push"' in vercel
-assert "daily-push-v2" not in vercel
+assert '"path": "/api/cron/daily-push-v2"' in vercel
+assert "push_weekly_opened" in app
+assert "['daily','free'].includes(g?.mode)" in app
 assert "![1,2].includes(Number(delta?.version||0))" in app
 assert "content_preview" in app
 
-print("Proplet v4.01.7 unified push, auto-repair and weekly content CTA: OK")
+print("Proplet v4.01.14 unified push, anonymous opt-in and weekly content CTA: OK")

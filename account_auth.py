@@ -23,6 +23,7 @@ def install_account_auth(app, **kwargs):
         db_rpc=caller_globals.get("db_rpc"),
         save_quality_snapshot_if_monday=caller_globals.get("save_quality_snapshot_if_monday"),
         current_prague_date=caller_globals.get("current_prague_date"),
+        released_batches=caller_globals.get("_released_batches"),
         logger=caller_globals.get("logger"),
     )
     _install_account_integrity(

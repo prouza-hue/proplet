@@ -827,6 +827,9 @@ async function api(path,opts={}){
  clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;throw new Error(msg)}return r.json();
 }
 function trackProductEvent(eventType){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)return;api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}
+function trackInboundCampaign(){
+ try{const u=new URL(location.href),via=u.searchParams.get('via'),event={"push-daily":"push_daily_opened","push-weekly":"push_weekly_opened","push-content":"push_content_opened"}[via];if(!event)return;trackProductEvent(event);u.searchParams.delete('via');history.replaceState(history.state,'',`${u.pathname}${u.search}${u.hash}`)}catch{}
+}
 function trackAppSession(){
  try{if(sessionStorage.getItem(ANALYTICS_SESSION_KEY)==='1')return;sessionStorage.setItem(ANALYTICS_SESSION_KEY,'1')}catch{}
  trackProductEvent('app_session_started');
@@ -1381,11 +1384,11 @@ function pushNudgeDue(){
  if(!st.nextOfferDate)return true;return pragueDateISO()>=st.nextOfferDate;
 }
 async function browserPushState(){
- const p=getProfile();if(!p?.token)return {account:false,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:false};
+ const p=getProfile();
  if(!('Notification' in window)||!('PushManager' in window))return {account:true,unsupported:true,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:false};
  const cfg=await api('/api/push/config');if(!cfg.available)return {account:true,unavailable:true,config:cfg,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
  const reg=await getPushRegistration();let sub=await reg.pushManager.getSubscription(),intent=getPushNudgeState(),deliberatelyOff=!!intent.disabledByUser;
- if(!sub&&Notification.permission==='granted'&&!deliberatelyOff){
+ if(p?.token&&!sub&&Notification.permission==='granted'&&!deliberatelyOff){
   try{const prior=await api('/api/push/account-state');if(prior.enabled){await persistPushEnabled(true);savePushNudgeState({...intent,accepted:true,repairNeeded:false,repairedAt:new Date().toISOString()});trackProductEvent('push_notifications_auto_repaired');sub=await reg.pushManager.getSubscription()}}catch{}
  }
  if(!sub)return {account:true,config:cfg,sub:null,enabled:false,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
@@ -1404,7 +1407,7 @@ async function persistPushEnabled(enabled){
  const j=sub.toJSON();await api('/api/push/subscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint,p256dh:j.keys?.p256dh,auth:j.keys?.auth,user_agent:navigator.userAgent.slice(0,240),daily_enabled:true,content_enabled:true})});return {enabled:true,dailyEnabled:true,contentEnabled:true}
 }
 async function shouldOfferPushNudge(){
- const p=getProfile(),g=currentGame;if(!p?.token||g?.mode!=='daily'||g?.justCompleted!==true||!pushNudgeDue())return false;if(!('Notification' in window)||!('PushManager' in window)||Notification.permission==='denied')return false;
+ const g=currentGame;if(!['daily','free'].includes(g?.mode)||g?.justCompleted!==true||!pushNudgeDue())return false;if(!('Notification' in window)||!('PushManager' in window)||Notification.permission==='denied')return false;
  try{const state=await browserPushState();if(state.enabled){savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return false}return !!state.config?.available}catch{return false}
 }
 async function maybeOfferPushNudge(action){if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;trackProductEvent('push_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
@@ -1414,14 +1417,13 @@ async function enablePushReminder(){const result=await persistPushEnabled(true);
 async function acceptPushNudge(){if(pushUiBusy)return;pushUiBusy=true;$('#pushNudgeEnableBtn').disabled=true;try{await enablePushReminder();trackProductEvent('push_nudge_accepted');trackProductEvent('push_notifications_enabled');showToast('Upozornění zapnutá 🔔');finishPushNudgeFlow()}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;$('#pushNudgeEnableBtn').disabled=false;updatePushUI()}}
 async function updatePushUI(){
  const btn=$('#pushToggleBtn'),status=$('#pushStatusText');if(!btn||pushUiBusy)return;
- const p=getProfile();if(!p?.token){btn.disabled=false;btn.textContent='☁️ Uložit postup';status.textContent='Upozornění se vážou k uloženému účtu.';return}
  if(!('Notification' in window)||!('PushManager' in window)){btn.disabled=true;btn.textContent='🔕 Nepodporováno';status.textContent='Na tomto zařízení/prohlížeči Web Push není dostupný.';return}
  try{const state=await browserPushState();if(state.unavailable){btn.disabled=true;btn.textContent='🔔 Push čeká na server';status.textContent='Hraní funguje normálně. Push není nakonfigurovaný.';return}
   btn.disabled=false;btn.textContent=state.enabled?'Vypnout':'Zapnout';status.textContent=state.enabled?'Zapnuto · Daily i pondělní novinky.':Notification.permission==='denied'?'Oznámení jsou v prohlížeči zablokovaná.':'Vypnuto.';
  }catch(e){btn.disabled=true;status.textContent=e.message}
 }
 async function togglePushReminder(){
- const p=getProfile();if(!p?.token){openProfileModal('create');return}if(pushUiBusy)return;pushUiBusy=true;const btn=$('#pushToggleBtn');btn.disabled=true;
+ if(pushUiBusy)return;pushUiBusy=true;const btn=$('#pushToggleBtn');btn.disabled=true;
  try{const state=await browserPushState();if(!state.migrationReady)throw new Error('Nastavení upozornění čeká na databázovou migraci.');const enabled=!state.enabled;await persistPushEnabled(enabled);trackProductEvent(`push_notifications_${enabled?'enabled':'disabled'}`);if(enabled)savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});else savePushNudgeState({...getPushNudgeState(),accepted:false,done:true,disabledByUser:true,disabledAt:new Date().toISOString()});showToast(enabled?'Upozornění zapnutá 🔔':'Upozornění vypnutá.')}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}
 }
 
@@ -1510,7 +1512,7 @@ async function refreshRollingContent(){
 async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
- document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
+ document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{})}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }
