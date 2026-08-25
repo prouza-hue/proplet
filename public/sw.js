@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.01.12-shell';
+const SHELL_CACHE='proplet-v4.01.13-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/analytics-init.js','/quality-v334.css','/quality-v334.js'];
@@ -23,7 +23,7 @@ async function precacheShell(){
 async function preserveExistingPuzzleDatabase(){
   try{
     const existing=await caches.match('/puzzles.json',{ignoreSearch:true});
-    if(existing?.ok)await (await caches.open(DATA_CACHE)).put('/puzzles.json',existing.clone());
+    if(existing?.ok){const data=await existing.clone().json();if(Number(data?.contentGeneration)===4&&Number(data?.dailyGeneration)===4)await (await caches.open(DATA_CACHE)).put('/puzzles.json',existing.clone())}
   }catch{}
 }
 

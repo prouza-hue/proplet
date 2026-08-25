@@ -172,7 +172,8 @@ class PasswordSet(BaseModel):
 
 
 class AvatarSet(BaseModel):
-    avatar: str = Field(min_length=1, max_length=16)
+    avatar: Optional[str] = Field(default=None, min_length=1, max_length=16)
+    use_google_avatar: bool = False
 
 
 class SupportModeSet(BaseModel):
@@ -1858,7 +1859,8 @@ def create_player(payload: PlayerCreate, request: Request):
     return {
         "id": player_id, "name": name, "familyCode": public_family,
         "leagueName": league_name_for(family) if public_family else None, "token": token,
-        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "supportMode": row.get("support_mode") or "none", "publicRankings": row.get("public_rankings"), "stats": stats,
+        "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "googleLinked": False, "googleAvatarUrl": None, "useGoogleAvatar": False,
+        "supportMode": row.get("support_mode") or "none", "publicRankings": row.get("public_rankings"), "stats": stats,
     }
 
 
@@ -1895,7 +1897,9 @@ def login(payload: PlayerLogin, request: Request):
     return {
         "id": player["id"], "name": player["name"], "familyCode": public_family,
         "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
-        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": player_stats(player["id"]),
+        "token": token, "hasPassword": True, "avatar": player.get("avatar") or "🙂",
+        "googleLinked": bool(player.get("auth_user_id")), "googleAvatarUrl": player.get("google_avatar_url"), "useGoogleAvatar": bool(player.get("use_google_avatar")),
+        "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": player_stats(player["id"]),
     }
 
 
@@ -1948,11 +1952,16 @@ def set_password(payload: PasswordSet, request: Request, authorization: Optional
 def set_avatar(payload: AvatarSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "avatar_update", limit=60, window_seconds=3600)
     player = auth_player(authorization)
-    avatar = payload.avatar.strip()[:16]
+    if payload.use_google_avatar:
+        if not player.get("google_avatar_url"):
+            raise HTTPException(400, "Google fotka zatím není dostupná. Přihlas se znovu přes Google.")
+        db_update("players", {"id": player["id"]}, {"use_google_avatar": True})
+        return {"ok": True, "avatar": player.get("avatar") or "🙂", "useGoogleAvatar": True, "googleAvatarUrl": player["google_avatar_url"]}
+    avatar = (payload.avatar or "").strip()[:16]
     if not avatar:
         raise HTTPException(400, "Vyber avatar")
-    db_update("players", {"id": player["id"]}, {"avatar": avatar})
-    return {"ok": True, "avatar": avatar}
+    db_update("players", {"id": player["id"]}, {"avatar": avatar, "use_google_avatar": False})
+    return {"ok": True, "avatar": avatar, "useGoogleAvatar": False, "googleAvatarUrl": player.get("google_avatar_url")}
 
 
 @app.post("/api/support-mode")
@@ -2186,7 +2195,9 @@ def me(request: Request, authorization: Optional[str] = Header(default=None)):
     return {
         "id": player["id"], "name": player["name"], "familyCode": public_family,
         "leagueName": league_name_for(player.get("family_code") or "") if public_family else None,
-        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂", "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": stats,
+        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂",
+        "googleLinked": bool(player.get("auth_user_id")), "googleAvatarUrl": player.get("google_avatar_url"), "useGoogleAvatar": bool(player.get("use_google_avatar")),
+        "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"), "stats": stats,
     }
 
 
