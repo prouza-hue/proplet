@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.01.20-shell';
+const SHELL_CACHE='proplet-v4.01.21-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/analytics-init.js','/quality-v334.css','/quality-v334.js','/quality-v334-core-v40114.js?v=2'];
