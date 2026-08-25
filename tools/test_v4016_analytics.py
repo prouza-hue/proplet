@@ -15,10 +15,10 @@ sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.16"' in version
-assert "version:'4.01.16'" in runtime
+assert 'APP_VERSION = "4.01.17"' in version
+assert "version:'4.01.17'" in runtime
 assert "analyticsCoverageV4016:true" in runtime
-assert "proplet-v4.01.16-shell" in sw
+assert "proplet-v4.01.17-shell" in sw
 
 for path in ("/_vercel/insights/script.js", "/_vercel/speed-insights/script.js"):
     assert path in index

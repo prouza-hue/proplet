@@ -120,6 +120,12 @@ async def launch_safety_middleware(request: Request, call_next):
     response.headers["X-Request-ID"] = request_id
     if request.url.path == "/api/rolling-content" and not GEN4_CANDIDATE_PREVIEW:
         response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=86400"
+    elif request.url.path == "/api/push/config":
+        # This endpoint contains only public capability flags and the public VAPID key.
+        # Let browsers reuse it briefly and let Vercel's CDN absorb repeat app opens.
+        response.headers["Cache-Control"] = (
+            "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
+        )
     elif request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
     return response

@@ -575,7 +575,16 @@ function newAttemptId(){try{return crypto.randomUUID()}catch{return `a-${Date.no
 async function startAttemptTelemetry(g){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||!g||g.mode==='rescue'||g.mode==='starter')return;try{await api('/api/attempt/start',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,puzzle_id:g.puzzle.id,challenge_key:challengeKey(g.mode,g.puzzle,g.dailyDate),mode:g.mode,difficulty:g.puzzle.difficulty})})}catch{}}
 async function sendAttemptCheckpoint(eventType){
  const g=currentGame;if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||!g||g.mode==='rescue'||g.mode==='starter'||g.finished)return;
- try{await api('/api/attempt/checkpoint',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,event_type:eventType,elapsed_ms:Math.max(0,Math.round(gameElapsed(g))),found_words:g.found.length})})}catch{}
+ const foundWords=g.found.length;
+ // The server still sees the first correct word immediately. Later correct-word
+ // checkpoints are sampled; leave/hint/reset/resume and the final result stay exact.
+ if(eventType==='correct'&&foundWords!==1&&(foundWords-1)%3!==0)return;
+ if(eventType==='leave'){
+  const now=Date.now(),key=`leave:${foundWords}`;
+  if(g.lastCheckpointKey===key&&now-(g.lastCheckpointAt||0)<1500)return;
+  g.lastCheckpointKey=key;g.lastCheckpointAt=now;
+ }
+ try{await api('/api/attempt/checkpoint',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,event_type:eventType,elapsed_ms:Math.max(0,Math.round(gameElapsed(g))),found_words:foundWords})})}catch{}
 }
 function startGame(puzzle,mode,dailyDate,options={}){
  stopTimer();hideGameUndo();
@@ -964,9 +973,17 @@ async function savePassword(){
  }catch(e){$('#passwordFormError').textContent=e.message}
 }
 
+const adminAccessCache=new Map();
+let adminEntryPromise=null,adminEntryPromiseProfile=null;
+function renderAdminEntryAccess(allowed){$('#adminEntryBtn')?.classList.toggle('hidden',!allowed)}
 async function refreshAdminEntry(){
- const button=$('#adminEntryBtn'),p=getProfile();if(!button||!p?.token)return;
- try{await api('/api/admin/me');button.classList.remove('hidden')}catch{button.classList.add('hidden')}
+ const p=getProfile();
+ if(currentScreen!=='profile'||!p?.token){renderAdminEntryAccess(false);return}
+ if(adminAccessCache.has(p.id)){renderAdminEntryAccess(adminAccessCache.get(p.id));return}
+ if(adminEntryPromise&&adminEntryPromiseProfile===p.id){await adminEntryPromise;renderAdminEntryAccess(!!adminAccessCache.get(p.id));return}
+ adminEntryPromiseProfile=p.id;
+ adminEntryPromise=api('/api/admin/me').then(()=>true).catch(()=>false).then(allowed=>{adminAccessCache.set(p.id,allowed);return allowed}).finally(()=>{adminEntryPromise=null;adminEntryPromiseProfile=null});
+ const allowed=await adminEntryPromise;if(getProfile()?.id===p.id)renderAdminEntryAccess(allowed);
 }
 
 function renderProfile({focusRoadmap=false}={}){
@@ -1379,6 +1396,16 @@ if(typeof window!=='undefined'){
 
 function getPushNudgeState(){try{return JSON.parse(localStorage.getItem(PUSH_NUDGE_KEY)||'{}')}catch{return {}}}
 function savePushNudgeState(v){localStorage.setItem(PUSH_NUDGE_KEY,JSON.stringify(v))}
+let pushConfigPromise=null;
+async function loadPushConfig(){
+ if(pushConfigPromise)return pushConfigPromise;
+ pushConfigPromise=(async()=>{
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);let r;
+  try{r=await fetch('/api/push/config',{headers:{Accept:'application/json'},signal:controller.signal})}catch(e){if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}finally{clearTimeout(timeout)}
+  if(!r.ok)throw new Error(`Server vrátil chybu ${r.status}`);return r.json();
+ })().catch(e=>{pushConfigPromise=null;throw e});
+ return pushConfigPromise;
+}
 function pushNudgeDue(){
  const st=getPushNudgeState();if(st.accepted||st.done||st.disabledByUser||st.systemDenied)return false;
  if(!st.nextOfferDate)return true;return pragueDateISO()>=st.nextOfferDate;
@@ -1386,7 +1413,7 @@ function pushNudgeDue(){
 async function browserPushState(){
  const p=getProfile();
  if(!('Notification' in window)||!('PushManager' in window))return {account:true,unsupported:true,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:false};
- const cfg=await api('/api/push/config');if(!cfg.available)return {account:true,unavailable:true,config:cfg,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
+ const cfg=await loadPushConfig();if(!cfg.available)return {account:true,unavailable:true,config:cfg,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
  const reg=await getPushRegistration();let sub=await reg.pushManager.getSubscription(),intent=getPushNudgeState(),deliberatelyOff=!!intent.disabledByUser;
  if(p?.token&&!sub&&Notification.permission==='granted'&&!deliberatelyOff){
   try{const prior=await api('/api/push/account-state');if(prior.enabled){await persistPushEnabled(true);savePushNudgeState({...intent,accepted:true,repairNeeded:false,repairedAt:new Date().toISOString()});trackProductEvent('push_notifications_auto_repaired');sub=await reg.pushManager.getSubscription()}}catch{}
@@ -1400,7 +1427,7 @@ async function browserPushState(){
  }catch{return {account:true,config:cfg,sub,enabled:true,dailyEnabled:true,contentEnabled:true,migrationReady:false}}
 }
 async function persistPushEnabled(enabled){
- const cfg=await api('/api/push/config');if(!cfg.available)throw new Error('Push ještě není nakonfigurovaný na serveru.');if(!cfg.preferencesReady)throw new Error('Nové nastavení upozornění čeká na databázovou migraci.');
+ const cfg=await loadPushConfig();if(!cfg.available)throw new Error('Push ještě není nakonfigurovaný na serveru.');if(!cfg.preferencesReady)throw new Error('Nové nastavení upozornění čeká na databázovou migraci.');
  const reg=await getPushRegistration();let sub=await reg.pushManager.getSubscription();
  if(!enabled){if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}return {enabled:false,dailyEnabled:false,contentEnabled:false}}
  if(!sub){const permission=await Notification.requestPermission();if(permission!=='granted'){savePushNudgeState({...getPushNudgeState(),done:true,systemDenied:true,deniedAt:new Date().toISOString()});throw new Error('Oznámení nejsou povolená. Později je můžeš zapnout v nastavení webu/prohlížeče.')}sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(cfg.publicKey)})}

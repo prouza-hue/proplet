@@ -8,8 +8,10 @@ const validEmail=s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s||'').trim());
 let recoveryContext=null;
 let knownAvatars=[];
 let enhanceScheduled=false;
+let securityRefreshPromise=null;
 
 function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
+function profileScreenActive(){return !!$('#screen-profile')?.classList.contains('active')}
 function authHeaders(){const p=profile();return p?.token?{'Authorization':`Bearer ${p.token}`}:{}}
 async function call(path,{method='GET',body,auth=true}={}){
  const headers={'Accept':'application/json',...(body?{'Content-Type':'application/json'}:{}),...(auth?authHeaders():{})};
@@ -34,7 +36,7 @@ function acceptProfile(p){
   if(typeof renderLeaderboard==='function')renderLeaderboard();
   if(typeof syncQueue==='function')syncQueue({announce:true}).catch(()=>{});
  }catch{}
- setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},90);
+ setTimeout(enhanceProfileArchitecture,90);
 }
 function supabaseFragment(){
  const p=new URLSearchParams(location.hash.replace(/^#/,''));
@@ -135,12 +137,17 @@ function enhanceProfileArchitecture(){
 function scheduleEnhance(){if(enhanceScheduled)return;enhanceScheduled=true;setTimeout(()=>{enhanceScheduled=false;enhanceProfileArchitecture()},0)}
 
 async function refreshSecurityCard(){
- const p=profile();if(!p)return;const hub=ensureAccountHub(),body=hub?.querySelector('#accountSecurityBody');if(!body)return;
- try{
-  const d=await call('/api/account/auth-status'),badge=hub.querySelector('#profileAccountBadge');if(badge){const strong=!!(d.recoveryReady||d.googleLinked);badge.textContent=strong?'Zabezpečeno':'Doplnit';badge.classList.toggle('ok',strong)}
-  body.innerHTML=`<div class="account-hub-row ${d.recoveryReady?'ok':'warn'}"><span>${d.recoveryReady?'✉️':'⚠️'}</span><div><strong>${d.recoveryReady?'E-mail pro obnovu':'Chybí záchranný e-mail'}</strong><small>${d.recoveryReady?esc(d.email):'Bez něj zapomenuté heslo neobnovíš.'}</small></div>${d.recoveryReady?'':`<button id="addRecoveryEmailBtn" class="secondary-btn">Přidat</button>`}</div><div class="account-hub-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'<img class="google-g google-g-small" src="/google-g.svg" alt="" aria-hidden="true">'}</span><div><strong>${d.googleLinked?'Google propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Příště se přihlásíš jedním klepnutím.':d.googleAvailable?'Propoj účet a nemusíš řešit heslo.':'Google přihlášení teď není dostupné.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>${p.hasPassword?'':`<div class="account-hub-row neutral"><span>🔑</span><div><strong>Heslo je volitelné</strong><small>Google stačí. Heslo můžeš přidat jako další možnost přihlášení.</small></div><button id="setPasswordFromHub" class="secondary-btn">Nastavit</button></div>`}`;
-  $('#addRecoveryEmailBtn')?.addEventListener('click',openRecoveryEmailModal);$('#linkGoogleBtn')?.addEventListener('click',()=>{location.href='/api/auth/google/start'});$('#setPasswordFromHub')?.addEventListener('click',()=>{if(typeof openPasswordModal==='function')openPasswordModal()});
- }catch(e){body.innerHTML=`<p class="account-auth-error">${esc(e.message)}</p>`}
+ if(!profileScreenActive())return;
+ if(securityRefreshPromise)return securityRefreshPromise;
+ securityRefreshPromise=(async()=>{
+  const p=profile();if(!p)return;const hub=ensureAccountHub(),body=hub?.querySelector('#accountSecurityBody');if(!body)return;
+  try{
+   const d=await call('/api/account/auth-status'),badge=hub.querySelector('#profileAccountBadge');if(badge){const strong=!!(d.recoveryReady||d.googleLinked);badge.textContent=strong?'Zabezpečeno':'Doplnit';badge.classList.toggle('ok',strong)}
+   body.innerHTML=`<div class="account-hub-row ${d.recoveryReady?'ok':'warn'}"><span>${d.recoveryReady?'✉️':'⚠️'}</span><div><strong>${d.recoveryReady?'E-mail pro obnovu':'Chybí záchranný e-mail'}</strong><small>${d.recoveryReady?esc(d.email):'Bez něj zapomenuté heslo neobnovíš.'}</small></div>${d.recoveryReady?'':`<button id="addRecoveryEmailBtn" class="secondary-btn">Přidat</button>`}</div><div class="account-hub-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'<img class="google-g google-g-small" src="/google-g.svg" alt="" aria-hidden="true">'}</span><div><strong>${d.googleLinked?'Google propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Příště se přihlásíš jedním klepnutím.':d.googleAvailable?'Propoj účet a nemusíš řešit heslo.':'Google přihlášení teď není dostupné.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>${p.hasPassword?'':`<div class="account-hub-row neutral"><span>🔑</span><div><strong>Heslo je volitelné</strong><small>Google stačí. Heslo můžeš přidat jako další možnost přihlášení.</small></div><button id="setPasswordFromHub" class="secondary-btn">Nastavit</button></div>`}`;
+   $('#addRecoveryEmailBtn')?.addEventListener('click',openRecoveryEmailModal);$('#linkGoogleBtn')?.addEventListener('click',()=>{location.href='/api/auth/google/start'});$('#setPasswordFromHub')?.addEventListener('click',()=>{if(typeof openPasswordModal==='function')openPasswordModal()});
+  }catch(e){body.innerHTML=`<p class="account-auth-error">${esc(e.message)}</p>`}
+ })().finally(()=>{securityRefreshPromise=null});
+ return securityRefreshPromise;
 }
 
 function openProfileEditor(){
@@ -163,9 +170,9 @@ async function handleAuthReturn(){
 function init(){
  ensureModals();ensureLoginEnhancements();
  const card=$('#profileCard');if(card)new MutationObserver(scheduleEnhance).observe(card,{childList:true});
- document.querySelectorAll('[data-nav="profile"]').forEach(el=>el.addEventListener('click',()=>setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},100)));
+ document.querySelectorAll('[data-nav="profile"]').forEach(el=>el.addEventListener('click',()=>setTimeout(enhanceProfileArchitecture,100)));
  const stored=sessionStorage.getItem('proplet-recovery-context');if(stored)try{recoveryContext=JSON.parse(stored)}catch{}
- handleAuthReturn();setTimeout(()=>{enhanceProfileArchitecture();refreshSecurityCard()},160);window.__PROPLET_ACCOUNT_AUTH__={refreshSecurityCard,handleAuthReturn,openProfileEditor};
+ handleAuthReturn();setTimeout(enhanceProfileArchitecture,160);window.__PROPLET_ACCOUNT_AUTH__={refreshSecurityCard,handleAuthReturn,openProfileEditor};
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,0),{once:true});else setTimeout(init,0);
 })();
