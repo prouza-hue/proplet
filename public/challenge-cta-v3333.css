@@ -89,21 +89,28 @@ html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
 }
 .daily-hero #shareDailyBtn.daily-challenge-cta{
   min-height:44px;
-  border:1px solid rgba(255,255,255,.55);
+  border:1px solid #d05677;
   border-radius:13px;
-  background:rgba(255,255,255,.17);
+  background:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);
   color:#fff;
   font-weight:900;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  box-shadow:none;
 }
 .daily-hero #shareDailyBtn.daily-challenge-cta:hover,
 .daily-hero #shareDailyBtn.daily-challenge-cta:focus-visible{
-  border-color:rgba(255,255,255,.82);
-  background:rgba(255,255,255,.25);
+  border-color:#c34266;
+  background:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%);
   color:#fff;
+  box-shadow:none;
   outline:none;
 }
 .daily-hero #shareDailyBtn.daily-challenge-cta:active{transform:scale(.985)}
+html[data-theme="dark"] .daily-hero #shareDailyBtn.daily-challenge-cta{
+  border-color:#df6a8b;
+  background:linear-gradient(135deg,#a93262,#ca4968);
+  color:#fff;
+  box-shadow:none;
+}
 @media(min-width:600px){
   .daily-hero .daily-main-actions{
     grid-template-columns:repeat(2,minmax(0,1fr));
