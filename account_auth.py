@@ -9,6 +9,7 @@ from account_integrity_v33210 import install_account_integrity as _install_accou
 from competitive_sharing_v3331 import install_competitive_sharing as _install_competitive_sharing
 from preview_auth_v334 import install_preview_auth_v334 as _install_preview_auth_v334
 from push_diagnostics_v3329 import install_push_diagnostics as _install_push_diagnostics
+from rescue_limit_v40115 import install_rescue_limit_v40115 as _install_rescue_limit_v40115
 from word_recognition_v3330 import install_word_recognition as _install_word_recognition
 
 
@@ -48,5 +49,14 @@ def install_account_auth(app, **kwargs):
         telemetry_actor=caller_globals.get("telemetry_actor"),
         app_version=caller_globals.get("APP_VERSION") or "",
         vercel_env=caller_globals.get("VERCEL_ENV") or "",
+    )
+    _install_rescue_limit_v40115(
+        app,
+        db_select=caller_globals.get("db_select"),
+        db_update=caller_globals.get("db_update"),
+        auth_player=caller_globals.get("auth_player"),
+        enforce_rate_limit=caller_globals.get("enforce_rate_limit"),
+        player_stats=caller_globals.get("player_stats"),
+        tz=caller_globals.get("TZ"),
     )
     _install_preview_auth_v334(app)
