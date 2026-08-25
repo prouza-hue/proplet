@@ -26,7 +26,7 @@ function acceptProfile(p){
  if(!p?.id||!p?.token)return;
  try{
   const had=!profile();if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id);
-  if(typeof saveProfile==='function')saveProfile({id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked});
+  if(typeof saveProfile==='function')saveProfile({id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',googleAvatarUrl:p.googleAvatarUrl||null,useGoogleAvatar:!!p.useGoogleAvatar,supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked});
   if(typeof updateProfileChip==='function')updateProfileChip();
   if(typeof renderProfile==='function')renderProfile();
   if(typeof renderDaily==='function')renderDaily();
@@ -62,7 +62,7 @@ function ensureModals(){
    <p class="muted">Přezdívka je jen tvoje jméno ve hře. Nemusí odpovídat jménu na Google účtu a můžeš ji kdykoli změnit.</p>
    <label>Přezdívka<input id="displayNameInput" maxlength="24" autocomplete="nickname" placeholder="např. Pavel nebo Slovožrout"></label>
    <div id="displayNameMessage" class="account-auth-message"></div><button id="saveDisplayNameBtn" class="primary-btn big">Uložit přezdívku</button>
-   <div class="profile-edit-avatar-block"><span class="stat-label">AVATAR</span><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div></div>
+   <div class="profile-edit-avatar-block"><span class="stat-label">AVATAR</span><div id="profileEditGoogleAvatar"></div><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div><small class="field-note">Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolené emoji.</small></div>
   </div></div>
   <div id="recoveryEmailModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
    <button id="closeRecoveryEmail" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Přidat e-mail</h2>
@@ -144,7 +144,7 @@ async function refreshSecurityCard(){
 }
 
 function openProfileEditor(){
- const p=profile();if(!p)return;ensureModals();$('#displayNameInput').value=p.name||'';$('#displayNameMessage').textContent='';const avatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];const grid=$('#profileEditAvatarGrid');grid.innerHTML=avatars.map(a=>`<button type="button" class="avatar-choice ${a===(p.avatar||'🙂')?'selected':''}" data-edit-avatar="${esc(a)}">${esc(a)}</button>`).join('');grid.querySelectorAll('[data-edit-avatar]').forEach(b=>b.onclick=async()=>{if(typeof saveAvatar==='function'){await saveAvatar(b.dataset.editAvatar);openProfileEditor()}});openModal('#profileEditModal');setTimeout(()=>$('#displayNameInput')?.focus(),60);
+ const p=profile();if(!p)return;ensureModals();$('#displayNameInput').value=p.name||'';$('#displayNameMessage').textContent='';const avatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];const google=$('#profileEditGoogleAvatar'),safeUrl=typeof safeGoogleAvatarUrl==='function'?safeGoogleAvatarUrl(p.googleAvatarUrl):'';google.innerHTML=safeUrl?`<button type="button" id="useGoogleAvatarBtn" class="google-avatar-choice ${p.useGoogleAvatar?'selected':''}"><img src="${esc(safeUrl)}" alt="" referrerpolicy="no-referrer"><span><strong>Fotka z Googlu</strong><small>${p.useGoogleAvatar?'Používáš v Propletu':'Použít jako avatar'}</small></span></button>`:(p.googleLinked?'<div class="google-avatar-unavailable"><strong>Fotku z Googlu načteme při příštím přihlášení přes Google.</strong></div>':'');$('#useGoogleAvatarBtn')?.addEventListener('click',async()=>{if(typeof saveGoogleAvatar==='function'){await saveGoogleAvatar();openProfileEditor()}});const grid=$('#profileEditAvatarGrid');grid.innerHTML=avatars.map(a=>`<button type="button" class="avatar-choice ${!p.useGoogleAvatar&&a===(p.avatar||'🙂')?'selected':''}" data-edit-avatar="${esc(a)}">${esc(a)}</button>`).join('');grid.querySelectorAll('[data-edit-avatar]').forEach(b=>b.onclick=async()=>{if(typeof saveAvatar==='function'){await saveAvatar(b.dataset.editAvatar);openProfileEditor()}});openModal('#profileEditModal');setTimeout(()=>$('#displayNameInput')?.focus(),60);
 }
 async function saveDisplayName(){
  const input=$('#displayNameInput'),msg=$('#displayNameMessage'),btn=$('#saveDisplayNameBtn'),name=String(input.value||'').trim().replace(/\s+/g,' ');msg.textContent='';if(!name){msg.textContent='Napiš, jak ti má Proplet říkat.';return}if(name.length>24){msg.textContent='Přezdívka může mít nejvýš 24 znaků.';return}btn.disabled=true;

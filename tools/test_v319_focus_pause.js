@@ -75,7 +75,7 @@ assertEqual(context.currentGame.rescueElapsedMs, 10000, 'rescue elapsed snapshot
 assertEqual(context.rescueSaved, 1, 'rescue pause is persisted');
 
 if (/Date\.now\(\)-g\.wallStartedAt/.test(app)) throw new Error('Daily still uses wall-clock timing');
-if (!app.includes("window.addEventListener('blur',()=>pauseGameClock('blur'))")) throw new Error('Missing blur pause binding');
-if (!app.includes("window.addEventListener('focus',resumeGameClock)")) throw new Error('Missing focus resume binding');
+if (!app.includes("window.addEventListener('blur',()=>{releaseGameWakeLock();pauseGameClock('blur')})")) throw new Error('Missing blur pause/wake-lock binding');
+if (!app.includes("window.addEventListener('focus',()=>{resumeGameClock();syncGameWakeLock()})")) throw new Error('Missing focus resume/wake-lock binding');
 
 console.log('PASS: active gameplay clock pauses while the app is hidden or unfocused.');

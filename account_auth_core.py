@@ -6,7 +6,7 @@ import secrets
 import uuid
 from datetime import datetime, timedelta
 from typing import Optional
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 import httpx
 from fastapi import Header, HTTPException, Request
@@ -71,6 +71,24 @@ def install_account_auth(
             raise HTTPException(400, "Zadej platnou e-mailovou adresu")
         return email
 
+    def trusted_google_avatar(user: dict) -> Optional[str]:
+        """Return only Google's HTTPS profile image, never arbitrary user metadata."""
+        identities = user.get("identities") or []
+        google_identity = next((item for item in identities if str(item.get("provider") or "").casefold() == "google"), None)
+        identity_data = (google_identity or {}).get("identity_data") or {}
+        metadata = user.get("user_metadata") or {}
+        raw = str(identity_data.get("avatar_url") or identity_data.get("picture") or metadata.get("avatar_url") or metadata.get("picture") or "").strip()
+        if not raw or len(raw) > 2048:
+            return None
+        try:
+            parsed = urlparse(raw)
+        except ValueError:
+            return None
+        host = (parsed.hostname or "").casefold()
+        if parsed.scheme != "https" or not (host == "googleusercontent.com" or host.endswith(".googleusercontent.com")):
+            return None
+        return raw
+
     def public_origin(request: Request) -> str:
         # Vercel supplies the public host; never trust arbitrary forwarded schemes.
         host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").strip()
@@ -126,6 +144,8 @@ def install_account_auth(
             "leagueName": league_name_for(player.get("family_code") or "") if family else None,
             "hasPassword": bool(player.get("password_hash")),
             "avatar": player.get("avatar") or "🙂",
+            "googleAvatarUrl": player.get("google_avatar_url"),
+            "useGoogleAvatar": bool(player.get("use_google_avatar")),
             "supportMode": player.get("support_mode") or "none",
             "publicRankings": player.get("public_rankings"),
             "stats": player_stats(player["id"]),
@@ -356,6 +376,7 @@ def install_account_auth(
         uid = str(user.get("id"))
         email = norm_email(str(user.get("email") or ""))
         meta = user.get("user_metadata") or {}
+        google_avatar_url = trusted_google_avatar(user)
 
         current = None
         if authorization:
@@ -397,6 +418,8 @@ def install_account_auth(
                     "name": name,
                     "family_code": f"SOLO_{secrets.token_hex(6).upper()}",
                     "avatar": "🙂",
+                    "google_avatar_url": google_avatar_url,
+                    "use_google_avatar": False,
                     "support_mode": "none",
                     # Primary legacy token is intentionally unreachable; OAuth uses player_sessions.
                     "token_hash": hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest(),
@@ -406,6 +429,12 @@ def install_account_auth(
                     "auth_user_id": uid,
                 })
                 player = db_select("players", id=player_id)[0]
+
+        # Refresh the optional Google photo candidate on every Google login/link,
+        # but never switch the player's chosen avatar automatically.
+        if google_avatar_url and player.get("google_avatar_url") != google_avatar_url:
+            db_update("players", {"id": player["id"]}, {"google_avatar_url": google_avatar_url})
+            player = db_select("players", id=player["id"])[0]
 
         token = new_session(player["id"])
         return {"ok": True, "profile": player_payload(player, token), "linked": bool(current), "provider": "google"}

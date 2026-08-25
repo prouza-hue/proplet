@@ -80,10 +80,10 @@
     loadScript('/home-layout.js?v=11','propletHomeLayout');
     loadScript('/ranking-polish.js?v=2','propletRankingPolish');
     if(!document.querySelector('link[data-proplet-account-auth-css]')){
-      const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=4';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
+      const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=5';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
     }
     loadScript('/auth-recovery-guard-v3326.js?v=1','propletAuthRecoveryGuard');
-    loadScript('/account-auth.js?v=5','propletAccountAuth');
+    loadScript('/account-auth.js?v=6','propletAccountAuth');
     loadScript('/game-layout-v3330.js?v=3','propletGameLayout');
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
