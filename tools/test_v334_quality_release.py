@@ -111,10 +111,9 @@ assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
-# v4.01.5 keeps the approved CTA colour and matches the larger primary type size.
-# Its one-time navigation repairs the already-activated v4.00.1 update handover.
-assert 'version:\'4.01.18\'' in runtime
-assert "proplet-v4.01.18-shell" in sw
+# v4.01.x keeps the approved CTA colour and the primary interaction contracts.
+assert 'version:\'4.01.19\'' in runtime
+assert "proplet-v4.01.19-shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "challengeCtaRaspberryV4005:true" in runtime
 assert "resultCtaFontParityV4006:true" in runtime
@@ -124,6 +123,7 @@ assert "gen4RetroactiveXpRepairV4010:true" in runtime
 assert "gen4ReturningBonusXp:500" in runtime
 assert "releaseModalCohortsV4011:true" in runtime
 assert "pwaResumeUpdateCheckV4012:true" in runtime
+assert "dailyHeroCtaParityV40119:true" in runtime
 assert "Upleteno s ❤️</span>" in index
 assert "rodinné dovolené" not in index
 assert "linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%)" in challenge_css
@@ -131,6 +131,9 @@ assert "#winModal .win-main-actions .challenge-share-cta" in challenge_css
 assert "font-size:15px!important" in challenge_css
 assert "font-size:16px!important" in challenge_css
 assert ".daily-hero #shareDailyBtn.daily-challenge-cta" in challenge_css
+assert "min-height:50px" in challenge_css
+assert "padding:12px 16px" in challenge_css
+assert "border-radius:14px" in challenge_css
 assert "self.skipWaiting()" in sw
 assert "client.navigate(client.url)" in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)
@@ -156,4 +159,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.01.7 quality release contract: OK")
+print("Proplet v4.01.19 quality release contract: OK")
