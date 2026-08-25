@@ -51,7 +51,6 @@ html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
   #winModal .win-main-actions .challenge-share-cta{font-size:16px!important}
 }
 
-
 /* Desktop: the next-game action and the challenge CTA share one compact primary row. */
 #winModal .win-main-actions{
   display:grid;
@@ -76,32 +75,42 @@ html[data-theme="dark"] #levelDetailShareBtn.challenge-share-detail-cta{
   }
 }
 
-/* v3.33.5 — Daily challenge entry point and compact action pairing. */
+/* v4.01.19 — Daily hero actions use the same visual grammar and typography. */
 .daily-hero .daily-main-actions{
   display:grid;
   grid-template-columns:1fr;
-  gap:8px;
+  gap:10px;
 }
 .daily-hero .daily-main-actions>#playDailyBtn,
 .daily-hero .daily-main-actions>#shareDailyBtn{
   width:100%;
+  min-height:50px;
   margin:0;
+  padding:12px 16px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:15px!important;
+  font-weight:900;
+  line-height:1.1;
+  text-align:center;
 }
 .daily-hero #shareDailyBtn.daily-challenge-cta{
-  min-height:44px;
   border:1px solid #d05677;
-  border-radius:13px;
   background:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);
   color:#fff;
-  font-weight:900;
-  box-shadow:none;
+  box-shadow:0 7px 22px rgba(139,36,70,.25),inset 0 1px 0 rgba(255,255,255,.18);
+  letter-spacing:.01em;
 }
+.daily-hero #shareDailyBtn.daily-challenge-cta::before{content:none!important}
 .daily-hero #shareDailyBtn.daily-challenge-cta:hover,
 .daily-hero #shareDailyBtn.daily-challenge-cta:focus-visible{
   border-color:#c34266;
   background:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%);
   color:#fff;
-  box-shadow:none;
+  box-shadow:0 8px 23px rgba(139,36,70,.32),inset 0 1px 0 rgba(255,255,255,.2);
   outline:none;
 }
 .daily-hero #shareDailyBtn.daily-challenge-cta:active{transform:scale(.985)}
@@ -109,16 +118,12 @@ html[data-theme="dark"] .daily-hero #shareDailyBtn.daily-challenge-cta{
   border-color:#df6a8b;
   background:linear-gradient(135deg,#a93262,#ca4968);
   color:#fff;
-  box-shadow:none;
+  box-shadow:0 7px 20px rgba(0,0,0,.25),0 0 0 1px rgba(177,158,255,.08) inset;
 }
 @media(min-width:600px){
   .daily-hero .daily-main-actions{
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;
     align-items:stretch;
-  }
-  .daily-hero .daily-main-actions>#playDailyBtn,
-  .daily-hero .daily-main-actions>#shareDailyBtn{
-    min-height:50px;
   }
 }
