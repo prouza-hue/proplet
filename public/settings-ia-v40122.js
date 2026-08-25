@@ -5,6 +5,7 @@
 
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>[...r.querySelectorAll(s)];
+  const setText=(el,text)=>{if(el&&el.textContent!==text)el.textContent=text};
   const gearSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path></svg>';
   let scheduled=false;
 
@@ -48,9 +49,7 @@
     if(trust){
       trust.classList.add('settings-data-card');
       const eyebrow=q('.section-head .eyebrow',trust),h2=q('.section-head h2',trust),copy=q(':scope>p.muted',trust);
-      if(eyebrow&&eyebrow.textContent!=='DATA A PODPORA')eyebrow.textContent='DATA A PODPORA';
-      if(h2&&h2.textContent!=='Data pod kontrolou')h2.textContent='Data pod kontrolou';
-      if(copy&&copy.textContent!=='Stáhni svá data, nahlas problém nebo účet trvale smaž.')copy.textContent='Stáhni svá data, nahlas problém nebo účet trvale smaž.';
+      setText(eyebrow,'DATA A PODPORA');setText(h2,'Data pod kontrolou');setText(copy,'Stáhni svá data, nahlas problém nebo účet trvale smaž.');
     }
   }
 
@@ -63,9 +62,9 @@
       card.innerHTML='<div class="settings-privacy-line"><span class="settings-privacy-icon"></span><div class="settings-privacy-copy"><strong></strong><small></small></div><button class="settings-privacy-action" type="button">Změnit</button></div>';
       screen.appendChild(card);q('.settings-privacy-action',card).onclick=()=>{const p=profile();if(!p?.token){try{openProfileModal('create')}catch{};return}try{openRankingPrivacyModal()}catch{}};
     }
-    const state=privacyState(),p=profile();q('.settings-privacy-icon',card).textContent=state.icon;q('.settings-privacy-copy strong',card).textContent='Soukromí a pořadí';
-    q('.settings-privacy-copy small',card).textContent=p?.token?`${state.title} · ${state.copy}`:'Po uložení účtu si zvolíš, jestli se v pořadí ukáže tvoje herní jméno.';
-    const action=q('.settings-privacy-action',card);if(action)action.textContent=p?.token?'Změnit':'Uložit postup';
+    const state=privacyState(),p=profile();setText(q('.settings-privacy-icon',card),state.icon);setText(q('.settings-privacy-copy strong',card),'Soukromí a pořadí');
+    setText(q('.settings-privacy-copy small',card),p?.token?`${state.title} · ${state.copy}`:'Po uložení účtu si zvolíš, jestli se v pořadí ukáže tvoje herní jméno.');
+    setText(q('.settings-privacy-action',card),p?.token?'Změnit':'Uložit postup');
   }
 
   function syncGuestState(){profileScreen()?.classList.toggle('settings-guest',!profile()?.token)}
@@ -78,31 +77,19 @@
     details.innerHTML='<summary>ⓘ Pravidla pořadí</summary><p>Čisté řešení → méně nápověd → čas → tahy. Počítá se první dokončený pokus. Jméno se ukáže jen po souhlasu; jinak zůstává anonymní přezdívka.</p>';
     el.appendChild(details);
   }
-  function compactRankingExplanations(){
-    qa('.daily-world-privacy').forEach(compactRankingNode);
-    qa('.level-board-head>small').forEach(compactRankingNode);
-  }
+  function compactRankingExplanations(){qa('.daily-world-privacy').forEach(compactRankingNode);qa('.level-board-head>small').forEach(compactRankingNode)}
 
-  function ensureUi(){
-    ensureHeaderGear();ensureProfileSettingsEntry();ensureSettingsHeader();classifySettingsCards();ensurePrivacyCard();syncGuestState();compactRankingExplanations();
-  }
+  function ensureUi(){ensureHeaderGear();ensureProfileSettingsEntry();ensureSettingsHeader();classifySettingsCards();ensurePrivacyCard();syncGuestState();compactRankingExplanations()}
 
   function openSettings(){
     try{if(typeof nav==='function')nav('profile')}catch{}
     setTimeout(()=>{const screen=profileScreen();if(!screen)return;ensureUi();screen.classList.add('settings-open');syncGuestState();window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBack')?.focus({preventScroll:true})},20);
   }
-  function closeSettings(){
-    const screen=profileScreen();if(!screen)return;screen.classList.remove('settings-open');window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBtn')?.focus({preventScroll:true});
-  }
+  function closeSettings(){const screen=profileScreen();if(!screen)return;screen.classList.remove('settings-open');window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBtn')?.focus({preventScroll:true})}
 
-  document.addEventListener('click',event=>{
-    const navEl=event.target.closest?.('[data-nav]');if(!navEl||!settingsOpen())return;
-    closeSettings();
-  },true);
+  document.addEventListener('click',event=>{const navEl=event.target.closest?.('[data-nav]');if(!navEl||!settingsOpen())return;closeSettings()},true);
 
-  const observer=new MutationObserver(()=>{
-    if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;ensureUi()});
-  });
+  const observer=new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;ensureUi()})});
   observer.observe(document.documentElement,{subtree:true,childList:true,characterData:false,attributes:false});
 
   const boot=()=>{ensureUi();setTimeout(ensureUi,120);setTimeout(ensureUi,500)};
