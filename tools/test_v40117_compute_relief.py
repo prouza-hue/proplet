@@ -12,10 +12,10 @@ server = (ROOT / "server.py").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
 
-assert 'APP_VERSION = "4.01.19"' in version
-assert "version:'4.01.19'" in runtime
+assert 'APP_VERSION = "4.01.24"' in version
+assert "version:'4.01.24'" in runtime
 assert "vercelComputeReliefV40117:true" in runtime
-assert "proplet-v4.01.19-shell" in service_worker
+assert "proplet-v4.01.24-shell" in service_worker
 
 # Public push configuration can be reused without leaking any account state.
 assert 'request.url.path == "/api/push/config"' in server

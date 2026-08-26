@@ -354,14 +354,27 @@ def supabase_ready() -> bool:
     return bool(SUPABASE_URL and SUPABASE_SECRET_KEY)
 
 
-def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
-    if not supabase_ready():
-        raise HTTPException(503, "Supabase ještě není připojený")
+def _supabase_headers() -> dict[str, str]:
+    """Build server-only Supabase headers for both current and legacy keys.
+
+    Opaque ``sb_secret_*`` keys must stay in ``apikey``; they are not JWTs.  A
+    legacy service-role JWT, on the other hand, should also be sent as Bearer so
+    PostgREST consistently assumes ``service_role`` for protected RPC calls.
+    """
     headers = {
         "apikey": SUPABASE_SECRET_KEY,
         "Accept": "application/json",
         "Content-Type": "application/json",
     }
+    if SUPABASE_SECRET_KEY.count(".") == 2 and SUPABASE_SECRET_KEY.startswith("eyJ"):
+        headers["Authorization"] = f"Bearer {SUPABASE_SECRET_KEY}"
+    return headers
+
+
+def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
+    if not supabase_ready():
+        raise HTTPException(503, "Supabase ještě není připojený")
+    headers = _supabase_headers()
     if prefer:
         headers["Prefer"] = prefer
     url = f"{SUPABASE_URL}/rest/v1/{table}"
@@ -460,18 +473,23 @@ def xp_economy_migrated() -> bool:
 def db_rpc(function: str, body: Optional[dict] = None):
     if not supabase_ready():
         raise HTTPException(503, "Supabase ještě není připojený")
-    # Mirror the existing PostgREST authentication contract. Supabase secret keys are
-    # accepted through apikey; do not assume the key is a JWT suitable for Bearer auth.
-    headers = {
-        "apikey": SUPABASE_SECRET_KEY,
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    }
+    headers = _supabase_headers()
     url = f"{SUPABASE_URL}/rest/v1/rpc/{function}"
     try:
         r = DB_HTTP_CLIENT.post(url, json=body or {}, headers=headers)
     except httpx.HTTPError as exc:
         raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+    if r.status_code == 401:
+        # Supabase can transiently reject a newly propagated/rotated secret on one
+        # gateway node. A 401 is returned before PostgREST executes the function, so
+        # one fresh-connection retry cannot duplicate the RPC side effect.
+        logger.warning("Supabase RPC auth retry function=%s status=401", function)
+        retry_headers = {**headers, "Connection": "close"}
+        try:
+            with httpx.Client(timeout=12.0) as retry_client:
+                r = retry_client.post(url, json=body or {}, headers=retry_headers)
+        except httpx.HTTPError as exc:
+            raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if r.status_code >= 400:
         logger.warning("Supabase RPC failed function=%s status=%s", function, r.status_code)
         raise HTTPException(503 if r.status_code >= 500 else 400, "Bezpečnostní služba databáze není připravená")
