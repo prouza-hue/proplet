@@ -1,4 +1,4 @@
-const SHELL_CACHE='proplet-v4.01.24-shell';
+const SHELL_CACHE='proplet-v4.01.25-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
 const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/analytics-init.js','/quality-v334.css','/quality-v334.js','/quality-v334-core-v40114.js?v=2','/daily-win-menu-v40123.js?v=1'];
@@ -98,7 +98,7 @@ self.addEventListener('push',event=>{
     badge:'/icon.svg',
     tag:data.tag||'proplet-daily',
     renotify:false,
-    data:{url:data.url||'/?open=daily'}
+    data:{url:data.url||'/?open=daily',deliveryId:data.deliveryId||null}
   };
   event.waitUntil(self.registration.showNotification(title,options));
 });
@@ -106,12 +106,17 @@ self.addEventListener('push',event=>{
 self.addEventListener('notificationclick',event=>{
   event.notification.close();
   const target=new URL(event.notification.data?.url||'/?open=daily',self.location.origin).href;
-  event.waitUntil((async()=>{
+  const deliveryId=event.notification.data?.deliveryId;
+  const trackOpen=deliveryId
+    ?fetch(`https://hrajproplet.cz/api/push/open?delivery_id=${encodeURIComponent(deliveryId)}`,{method:'POST',mode:'no-cors',keepalive:true}).catch(()=>null)
+    :Promise.resolve(null);
+  const openTarget=(async()=>{
     const clientsList=await self.clients.matchAll({type:'window',includeUncontrolled:true});
     for(const client of clientsList){
       if('navigate' in client){try{await client.navigate(target)}catch{}}
       if('focus' in client)return client.focus();
     }
     return self.clients.openWindow(target);
-  })());
+  })();
+  event.waitUntil(Promise.all([trackOpen,openTarget]));
 });

@@ -29,7 +29,7 @@ Vlastní herní identita je pseudonymní. Vercelová návštěvnost je agregovan
 - Retence: nabídka a volba push notifikace, PWA instalace a každé další aktivní datum.
 - Virální smyčka: vytvoření odkazu, otevření, start, dokončení a překonání sdílené úrovně.
 - Od v4.01.14 se zvlášť měří kliknutí na sdílení, úspěšné systémové sdílení / zkopírování odkazu, zrušení a chyba. U příjemce se pro Daily i Volnou hru měří otevření, start a dokončení. Starší období proto není pro outbound share funnel plně srovnatelné.
-- Push funnel od v4.01.14 spojuje auditované přijetí push službou (`push_delivery_log`) s otevřením Daily, pondělního balíčku nebo náhradní content zprávy (`push_*_opened`). Pondělní Daily a nové úrovně používají jednu společnou zprávu, aby hráč nedostal dvě notifikace.
+- Push funnel od v4.01.25 spojuje auditované přijetí push službou s otevřením konkrétní notifikace (`push_delivery_log.sent_at` → `opened_at`). Klientské `push_*_opened` zůstávají pomocnou diagnostikou cílové obrazovky, ne zdrojem pravdy pro open rate. Pondělní Daily a nové úrovně používají jednu společnou zprávu, aby hráč nedostal dvě notifikace.
 - UX: zapnutí Klidného režimu, doporučení vyšší obtížnosti a ochrana anonymního postupu.
 
 ## Denní manažerské vyhodnocení v 9:00
@@ -62,10 +62,12 @@ Report porovnává včerejšek s předchozím dnem a s klouzavým 7denním prům
 ## PWA, push a share funnel od v4.01.14
 
 - PWA: `pwa_install_nudge_shown` → `pwa_install_native_accepted` / `pwa_install_ios_hint_ack` → `pwa_installed`.
-- Push: `push_nudge_shown` → `push_nudge_accepted` → auditované `push_delivery_log.status=sent` → `push_daily_opened` / `push_weekly_opened` / `push_content_opened`.
+- Push: `push_nudge_shown` → `push_nudge_accepted` → `push_delivery_log.status=sent` → `push_delivery_log.opened_at`. U doručení i otevření se reportuje kategorie `daily` / `content`; klientské `push_*_opened` slouží ke kontrole cílové navigace.
 - Daily share: `daily_share_clicked` → `daily_share_created` → `shared_daily_opened` → `shared_daily_started` → `shared_daily_completed`.
 - Level share: `level_share_clicked` → `level_share_created` → `shared_level_opened` → `shared_level_started` → `shared_level_completed` → volitelně `shared_level_beaten`.
 - Vždy se reportují unikátní aktéři a vedle nich absolutní počet doručení. `*_cancelled` a `*_failed` jsou diagnostické větve, ne konverze.
+- Retenční čtení pushů sleduje tři kroky: doručeno → otevřeno → hráč dokončil Daily nebo Volnou hru ve stejný či následující pražský kalendářní den. Při jmenovateli pod 10 se zobrazí jen absolutní čísla.
+- `product_events.app_version` popisuje server/deployment, který událost přijal. Pro rozpoznání klientů připoutaných ke starým neměnným deploymentům se proto kombinuje s Vercel runtime logy; samotný údaj nelze vydávat za verzi JavaScriptu bez této kontroly.
 
 ## Náklady a škálování
 

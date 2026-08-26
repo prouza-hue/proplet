@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Optional
 from urllib.parse import urlparse
 
-from fastapi import Header, HTTPException, Request
+from fastapi import Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
 try:
@@ -48,6 +48,7 @@ def install_push_diagnostics(
     vapid_subject = os.environ.get("VAPID_SUBJECT", "https://hrajproplet.cz").strip()
     cron_secret = os.environ.get("CRON_SECRET", "").strip()
     vercel_env = os.environ.get("VERCEL_ENV", "").strip().lower()
+    canonical_origin = str(_kwargs.get("canonical_origin") or "https://hrajproplet.cz").rstrip("/")
 
     def now():
         return datetime.now(tz)
@@ -117,10 +118,11 @@ def install_push_diagnostics(
             "endpoint": sub.get("endpoint"),
             "keys": {"p256dh": sub.get("p256dh"), "auth": sub.get("auth")},
         }
+        delivery_payload = {**payload, "deliveryId": delivery_id}
         try:
             webpush(
                 subscription_info=info,
-                data=json.dumps(payload, ensure_ascii=False),
+                data=json.dumps(delivery_payload, ensure_ascii=False),
                 vapid_private_key=vapid_private,
                 vapid_claims={"sub": vapid_subject},
                 ttl=ttl,
@@ -136,6 +138,21 @@ def install_push_diagnostics(
             return "failed"
         mark_delivery(delivery_id, "sent")
         return "sent"
+
+    @app.post("/api/push/open")
+    def push_open(
+        request: Request,
+        delivery_id: str = Query(min_length=36, max_length=36, pattern=r"^[0-9a-fA-F-]{36}$"),
+    ):
+        enforce_rate_limit(request, "push_open", limit=120, window_seconds=3600)
+        rows = db_select("push_delivery_log", id=delivery_id)
+        if not rows:
+            # A stale or forged click must not reveal whether any player/subscription exists.
+            return {"ok": True, "tracked": False}
+        row = rows[0]
+        if not row.get("opened_at"):
+            db_update("push_delivery_log", {"id": delivery_id}, {"opened_at": now().isoformat()})
+        return {"ok": True, "tracked": True}
 
     def run_housekeeping():
         snapshot = None
@@ -188,18 +205,18 @@ def install_push_diagnostics(
         subscriptions = db_select("push_subscriptions")
         if batch:
             payload = {
-                "title": "✨ Nové úrovně jsou tady",
-                "body": "Pět čerstvých Propletů i dnešní výzva čekají. Čím začneš?",
-                "url": f"/?open=free&new={batch.get('id')}&via=push-weekly",
+                "title": "✨ Pondělní balíček je venku",
+                "body": "Pět nových desek právě přistálo. Vrať se do Propletu a vyber si, čím začneš.",
+                "url": f"{canonical_origin}/?open=free&new={batch.get('id')}&via=push-weekly",
                 "tag": f"proplet-content-{batch.get('id')}",
             }
             event_key = f"content:{batch.get('id')}"
             category = "content"
         else:
             payload = {
-                "title": "☀️ Nový Proplet je tady",
-                "body": "Dnešní výzva čeká. Propleteš ji čistě?",
-                "url": "/?open=daily&via=push-daily",
+                "title": "☀️ Dnešní Proplet čeká",
+                "body": "Stejná deska pro všechny. Zahraješ ji dnes čistě?",
+                "url": f"{canonical_origin}/?open=daily&via=push-daily",
                 "tag": f"proplet-daily-{today}",
             }
             event_key = f"daily:{today}"
@@ -250,7 +267,7 @@ def install_push_diagnostics(
             {
                 "title": "🔔 Test Propletu",
                 "body": "Funguje to. Takhle dorazí připomínka na Denní výzvu.",
-                "url": "/?open=daily&via=push-test",
+                "url": f"{canonical_origin}/?open=daily&via=push-test",
                 "tag": f"proplet-test-{test_id}",
             },
             event_key=f"test:{player['id']}:{test_id}",
@@ -306,10 +323,12 @@ def install_push_diagnostics(
             if row.get("category") != "daily":
                 continue
             key = str(row.get("event_key") or "")
-            group = daily_groups.setdefault(key, {"eventKey": key, "eligible": 0, "sent": 0, "failed": 0, "removed": 0, "pending": 0, "firstAt": row.get("created_at"), "lastAt": row.get("created_at")})
+            group = daily_groups.setdefault(key, {"eventKey": key, "eligible": 0, "sent": 0, "opened": 0, "failed": 0, "removed": 0, "pending": 0, "firstAt": row.get("created_at"), "lastAt": row.get("created_at")})
             group["eligible"] += 1
             status = str(row.get("status") or "pending")
             group[status] = group.get(status, 0) + 1
+            if row.get("opened_at"):
+                group["opened"] += 1
             stamp = str(row.get("created_at") or "")
             if stamp and (not group.get("firstAt") or stamp < group["firstAt"]): group["firstAt"] = stamp
             if stamp and (not group.get("lastAt") or stamp > group["lastAt"]): group["lastAt"] = stamp

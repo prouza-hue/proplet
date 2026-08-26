@@ -8,11 +8,11 @@ theme = (ROOT / 'public/theme-init.js').read_text(encoding='utf-8')
 sw = (ROOT / 'public/sw.js').read_text(encoding='utf-8')
 hotfix = (ROOT / 'public/daily-win-menu-v40123.js').read_text(encoding='utf-8')
 
-assert 'APP_VERSION = "4.01.24"' in version
-assert "version:'4.01.24'" in runtime
+assert 'APP_VERSION = "4.01.25"' in version
+assert "version:'4.01.25'" in runtime
 assert 'dailyWinMenuParityV40123:true' in runtime
 assert "/daily-win-menu-v40123.js?v=1" in theme
-assert "proplet-v4.01.24-shell" in sw
+assert "proplet-v4.01.25-shell" in sw
 assert "'← Dnes'" in hotfix
 assert "'← Menu'" in hotfix
 assert "#winMenuBtn" in hotfix

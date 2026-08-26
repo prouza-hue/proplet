@@ -1041,6 +1041,16 @@ def push_preferences_schema_ready() -> bool:
         return False
 
 
+def push_open_tracking_schema_ready() -> bool:
+    if not supabase_ready():
+        return False
+    try:
+        db_request("GET", "push_delivery_log", params={"select": "id,opened_at", "limit": "1"})
+        return True
+    except HTTPException:
+        return False
+
+
 
 def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Optional[dict]:
     """Resolve a Free puzzle to its generation and stable difficulty/level slot."""
@@ -1545,12 +1555,12 @@ def cron_content_push(request: Request, authorization: Optional[str] = Header(de
         return {"ok": False, "sent": 0, "message": "Notifications v2 migrace ještě není nasazená", "migrationReady": False}
     subscriptions = db_request("GET", "push_subscriptions", params={"select": "*", "content_enabled": "eq.true"})
     event_key = f"content:{batch.get('id')}"
-    payload = json.dumps({
+    payload = {
         "title": "✨ 5 nových Propletů",
         "body": "Nová týdenní várka je venku. Jedna úroveň od každé obtížnosti a jedna navíc.",
-        "url": f"/?open=free&new={batch.get('id')}&via=push-content",
+        "url": f"https://hrajproplet.cz/?open=free&new={batch.get('id')}&via=push-content",
         "tag": f"proplet-{event_key}",
-    }, ensure_ascii=False)
+    }
     sent = failed = removed = duplicate = 0
     for sub in subscriptions:
         delivery_id = _reserve_push_delivery(sub, event_key, "content")
@@ -1559,7 +1569,7 @@ def cron_content_push(request: Request, authorization: Optional[str] = Header(de
             continue
         info = {"endpoint": sub.get("endpoint"), "keys": {"p256dh": sub.get("p256dh"), "auth": sub.get("auth")}}
         try:
-            webpush(subscription_info=info, data=payload, vapid_private_key=VAPID_PRIVATE_KEY, vapid_claims={"sub": VAPID_SUBJECT}, ttl=86400)
+            webpush(subscription_info=info, data=json.dumps({**payload, "deliveryId": delivery_id}, ensure_ascii=False), vapid_private_key=VAPID_PRIVATE_KEY, vapid_claims={"sub": VAPID_SUBJECT}, ttl=86400)
         except Exception as exc:
             status = getattr(getattr(exc, "response", None), "status_code", None)
             try:
@@ -1666,6 +1676,7 @@ def health():
         "rollingContentReservedThrough": load_rolling_content().get("reservedThrough"),
         "rollingContentAvailableCounts": {d: len(released_free_bank(d, current_prague_date())) for d in ("easy", "medium", "hard", "hardcore")},
         "notificationsV2Migration": push_preferences_schema_ready(),
+        "pushOpenTrackingMigration": push_open_tracking_schema_ready(),
         "freeXp": {key: value for key, value in POINTS.items() if key != "daily"},
         "dailyXp": POINTS["daily"],
     }
@@ -1769,7 +1780,7 @@ def health():
             xp_migration = False
         return {**base, "ok": bool(security_migration and xp_migration), "database": True, "accountMigration": account_migration, "featuresMigration": features_migration, "qualityMigration": quality_migration, "playtestMigration": playtest_migration, "globalLeagueMigration": global_league_migration, "uxMigration": ux_migration, "profilesMigration": profiles_migration, "analyticsV2Migration": analytics_v2_migration, "anonymousAnalyticsMigration": anonymous_analytics_migration, "anonymousAnalytics": anonymous_analytics_migration, "freeGeneration2Migration": free_generation2_migration, "freeProgressionMigration": free_generation2_migration, "stableFreeLevelSlots": True, "starterMigration": starter_migration, "adminMigration": admin_migration, "securityMigration": security_migration, "xpMigration": xp_migration, "rankingsV2Migration": rankings_v2_schema_ready(), "helperSystem": analytics_v2_migration, "pushConfigured": push_ready(), "cronConfigured": bool(CRON_SECRET)}
     except HTTPException:
-        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "freeProgressionMigration": False, "stableFreeLevelSlots": True, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "message": "Databázový health check selhal"}
+        return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "freeProgressionMigration": False, "stableFreeLevelSlots": True, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "pushOpenTrackingMigration": False, "message": "Databázový health check selhal"}
 
 
 @app.get("/api/config")
@@ -1785,6 +1796,7 @@ def config():
         "dailyCadence": p.get("dailyCadence"),
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
+        "environment": VERCEL_ENV or "local",
         "version": APP_VERSION,
     }
 
@@ -2116,6 +2128,7 @@ def product_event(
         "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
         "push_notifications_enabled", "push_notifications_disabled", "push_notifications_auto_repaired",
         "push_daily_opened", "push_weekly_opened", "push_content_opened",
+        "pwa_update_detected", "pwa_update_applied", "legacy_origin_update_shown", "legacy_origin_update_opened",
         "content_drop_cta_clicked",
         "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
         "progress_guard_google_selected", "progress_guard_other_account_selected",

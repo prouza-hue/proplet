@@ -73,9 +73,16 @@ assert result["ok"] is True
 assert result["category"] == "content"
 assert result["batch"] == "back-to-school"
 assert result["sent"] == 1
+assert sent_payloads[0]["url"].startswith("https://hrajproplet.cz/")
 assert sent_payloads[0]["url"].endswith("via=push-weekly")
+assert sent_payloads[0]["deliveryId"] == tables["push_delivery_log"][0]["id"]
 assert tables["push_delivery_log"][0]["anonymous_id"] == "anon-hash"
 assert tables["push_delivery_log"][0]["player_id"] is None
 assert tables["push_delivery_log"][0]["status"] == "sent"
 
-print("PASS: anonymous Monday push is unified, audited and opens the weekly content CTA.")
+open_route = next(route for route in app.routes if getattr(route, "path", None) == "/api/push/open")
+opened = open_route.endpoint(None, tables["push_delivery_log"][0]["id"])
+assert opened == {"ok": True, "tracked": True}
+assert tables["push_delivery_log"][0]["opened_at"]
+
+print("PASS: Monday push is unified, canonical, audited and records an idempotent open.")

@@ -26,6 +26,7 @@ def install_account_auth(app, **kwargs):
         current_prague_date=caller_globals.get("current_prague_date"),
         released_batches=caller_globals.get("_released_batches"),
         logger=caller_globals.get("logger"),
+        canonical_origin="https://hrajproplet.cz",
     )
     _install_account_integrity(
         app,

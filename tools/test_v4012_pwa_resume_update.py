@@ -9,8 +9,8 @@ vercel = (root / "vercel.json").read_text(encoding="utf-8")
 
 assert "navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'})" in app
 assert "document.addEventListener('visibilitychange',checkWhenVisible)" in app
-assert "window.addEventListener('pageshow',checkForUpdate)" in app
-assert "window.addEventListener('online',checkForUpdate)" in app
+assert "window.addEventListener('pageshow',()=>{probeCanonicalRelease(true);checkForUpdate()})" in app
+assert "window.addEventListener('online',()=>{probeCanonicalRelease(true);checkForUpdate()})" in app
 assert "setInterval(checkForUpdate,15*60*1000)" in app
 assert "pwaResumeUpdateCheckV4012:true" in runtime
 assert '"source": "/sw.js"' in vercel

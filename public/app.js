@@ -204,6 +204,10 @@ let tutorialState={dragging:false,path:[],done:false};
 let onboardingTutorialTracked=false;
 let onboardingSupportTracked=false;
 let pendingSW=null;
+let canonicalUpdateTarget=null;
+let runtimeRecoveryBusy=false;
+let releaseProbeBusy=false;
+let lastReleaseProbeAt=0;
 let reloadOnServiceWorkerChange=false;
 let winFeedbackSent=false;
 let pendingPostWinAction=null;
@@ -1205,24 +1209,61 @@ async function maybeOpenQaDashboard(){
  }catch(e){root.querySelector('.qa-loading').innerHTML=`<strong>QA dashboard se nenačetl.</strong><p class="muted">${esc(e.message)}</p>`}
 }
 
-function showUpdateBanner(worker){pendingSW=worker;$('#updateBanner')?.classList.remove('hidden')}
-function applyPendingUpdate(){
+function showUpdateBanner(worker,message='✨ Je připravená nová verze Propletu.',action='Aktualizovat'){
+ if(worker)pendingSW=worker;
+ const banner=$('#updateBanner'),label=banner?.querySelector('span'),button=$('#applyUpdateBtn');
+ if(label)label.textContent=message;if(button){button.disabled=false;button.textContent=action}banner?.classList.remove('hidden');
+}
+async function recoverRuntimeUpdate(){
+ if(runtimeRecoveryBusy)return;runtimeRecoveryBusy=true;
  const button=$('#applyUpdateBtn');if(button){button.disabled=true;button.textContent='Aktualizuji…'}
- reloadOnServiceWorkerChange=true;
- if(!pendingSW||pendingSW.state==='activated'||pendingSW.state==='redundant'){location.reload();return}
- pendingSW.postMessage({type:'SKIP_WAITING'});
- setTimeout(()=>location.reload(),1800);
+ trackProductEvent('pwa_update_applied');
+ try{
+  const keys=await caches.keys();
+  await Promise.all(keys.filter(key=>key.startsWith('proplet-')&&!key.startsWith('proplet-data-')).map(key=>caches.delete(key)));
+ }catch{}
+ try{
+  const reg=await navigator.serviceWorker?.getRegistration?.();
+  await reg?.update?.();
+  if(reg?.waiting){pendingSW=reg.waiting;reloadOnServiceWorkerChange=true;reg.waiting.postMessage({type:'SKIP_WAITING'});setTimeout(()=>location.reload(),1800);return}
+ }catch{}
+ location.reload();
+}
+function applyPendingUpdate(){
+ if(canonicalUpdateTarget){trackProductEvent('legacy_origin_update_opened');location.assign(canonicalUpdateTarget);return}
+ recoverRuntimeUpdate();
+}
+async function probeCanonicalRelease(force=false){
+ const now=Date.now();if(releaseProbeBusy||(!force&&now-lastReleaseProbeAt<60000))return;releaseProbeBusy=true;lastReleaseProbeAt=now;
+ try{
+  const local=await fetch(`/api/config?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.json():null);
+  if(!local||local.environment==='preview')return;
+  const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
+  const source=await fetch(`${canonicalOrigin}/runtime-meta.js?release_probe=${now}`,{cache:'no-store',mode:'cors'}).then(r=>r.ok?r.text():'');
+  const canonicalVersion=source.match(/version:\s*['\"]([^'\"]+)['\"]/)?.[1];if(!canonicalVersion)return;
+  if(location.origin!==canonicalOrigin){
+   canonicalUpdateTarget=`${canonicalOrigin}${location.pathname}${location.search}${location.hash}`;
+   showUpdateBanner(null,'Proplet běží na starší adrese. Otevři aktuální verzi.','Otevřít aktuální');
+   try{if(sessionStorage.getItem('proplet-legacy-origin-shown')!=='1'){sessionStorage.setItem('proplet-legacy-origin-shown','1');trackProductEvent('legacy_origin_update_shown')}}catch{}
+   return;
+  }
+  if(canonicalVersion!==APP_VERSION){
+   showUpdateBanner(pendingSW);
+   try{const key=`proplet-update-detected-${canonicalVersion}`;if(sessionStorage.getItem(key)!=='1'){sessionStorage.setItem(key,'1');trackProductEvent('pwa_update_detected')}}catch{}
+   if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>recoverRuntimeUpdate(),1200);
+  }
+ }catch{}finally{releaseProbeBusy=false}
 }
 function registerServiceWorker(){
  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
  navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
   if(reg.waiting)showUpdateBanner(reg.waiting);
   reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)showUpdateBanner(w)})});
-  const checkForUpdate=()=>reg.update().catch(()=>{}),checkWhenVisible=()=>{if(document.visibilityState==='visible')checkForUpdate()};
+  const checkForUpdate=()=>Promise.allSettled([reg.update(),probeCanonicalRelease()]),checkWhenVisible=()=>{if(document.visibilityState==='visible')checkForUpdate()};
   checkForUpdate();
   document.addEventListener('visibilitychange',checkWhenVisible);
-  window.addEventListener('pageshow',checkForUpdate);
-  window.addEventListener('online',checkForUpdate);
+  window.addEventListener('pageshow',()=>{probeCanonicalRelease(true);checkForUpdate()});
+  window.addEventListener('online',()=>{probeCanonicalRelease(true);checkForUpdate()});
   setInterval(checkForUpdate,15*60*1000);
  }).catch(()=>{});
  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloadOnServiceWorkerChange||reloading)return;reloading=true;location.reload()});
