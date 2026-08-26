@@ -35,7 +35,12 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   const keep=new Set([SHELL_CACHE,DATA_CACHE]);
   await caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&!keep.has(k)).map(k=>caches.delete(k))));
   await self.clients.claim();
+  // v4.00.1 could show its update banner after the new worker had already
+  // activated, leaving its button with no waiting worker to promote. This
+  // one-time handover actively refreshes controlled windows onto the P0 fix.
   const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  // Do not await navigation from inside activate: an older controlled page can
+  // wait for activation while activation waits for that page, deadlocking both.
   clients.forEach(client=>client.navigate(client.url).catch(()=>null));
 })()));
 
