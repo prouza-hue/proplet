@@ -2130,6 +2130,7 @@ def product_event(
         "push_daily_opened", "push_weekly_opened", "push_content_opened",
         "pwa_update_detected", "pwa_update_applied", "legacy_origin_update_shown", "legacy_origin_update_opened",
         "content_drop_cta_clicked",
+        "tajenka_viewed", "tajenka_started", "tajenka_word_found", "tajenka_completed", "tajenka_abandoned",
         "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
         "progress_guard_google_selected", "progress_guard_other_account_selected",
         "calm_preference_enabled", "calm_preference_disabled", "calm_run_enabled",
