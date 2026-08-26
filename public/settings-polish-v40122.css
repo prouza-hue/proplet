@@ -1,41 +1,42 @@
 /* v4.01.22 preview follow-up — mobile profile + settings polish. */
 
-/* Pomocník belongs to Settings and should read as a compact setting, not a profile achievement. */
-#screen-profile.settings-open .settings-support-compact{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) auto!important;
-  gap:10px!important;
-  align-items:center!important;
-  margin:0 0 12px!important;
-  padding:10px 12px!important;
-  border-radius:14px!important;
+/* Legacy helper cards are generated inside the profile by the base renderer. They must never be
+   moved into Settings; moving them causes the renderer to recreate them and produces duplicates. */
+#screen-profile .support-mode-card{display:none!important}
+#screen-profile.settings-open .settings-helper-control{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  margin:0 0 12px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:color-mix(in srgb,var(--bg) 46%,var(--paper));
 }
-#screen-profile.settings-open .settings-support-compact>div{min-width:0}
-#screen-profile.settings-open .settings-support-compact .support-mode-title{
-  display:block!important;
-  margin:0 0 2px!important;
-  color:var(--ink)!important;
-  font-size:15.5px!important;
-  line-height:1.15!important;
-  font-weight:950!important;
-  letter-spacing:0!important;
-  text-transform:none!important;
+#screen-profile.settings-open .settings-helper-copy{min-width:0}
+#screen-profile.settings-open .settings-helper-copy strong,
+#screen-profile.settings-open .settings-helper-copy small{display:block}
+#screen-profile.settings-open .settings-helper-copy strong{
+  margin:0;
+  color:var(--ink);
+  font-size:15.5px;
+  line-height:1.15;
+  font-weight:950;
 }
-#screen-profile.settings-open .settings-support-compact strong{
-  display:block!important;
-  margin:0!important;
-  color:var(--muted)!important;
-  font-size:12px!important;
-  line-height:1.25!important;
-  font-weight:800!important;
+#screen-profile.settings-open .settings-helper-copy small{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.25;
+  font-weight:800;
 }
-#screen-profile.settings-open .settings-support-compact .support-mode-desc-pruned{display:none!important}
-#screen-profile.settings-open .settings-support-compact .secondary-btn{
-  width:auto!important;
-  min-width:0!important;
-  min-height:36px!important;
-  padding:7px 11px!important;
-  font-size:11.5px!important;
+#screen-profile.settings-open .settings-helper-control .secondary-btn{
+  width:auto;
+  min-width:0;
+  min-height:36px;
+  padding:7px 11px;
+  font-size:11.5px;
   white-space:nowrap;
 }
 
@@ -106,6 +107,7 @@
   #screen-profile:not(.settings-open) .streak-bubble{width:68px!important;height:68px!important;padding-inline:9px!important}
 }
 
+html[data-theme="dark"] #screen-profile.settings-open .settings-helper-control{background:#211f2a}
 html[data-theme="dark"] #screen-profile:not(.settings-open) .streak-bubble{
   background:color-mix(in srgb,#d89c28 18%,#2a2419)!important;
   border-color:color-mix(in srgb,#d89c28 34%,#51452a)!important;
