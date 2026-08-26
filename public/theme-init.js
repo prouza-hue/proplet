@@ -22,7 +22,6 @@
   media?.addEventListener?.('change',apply);
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
-  // Standalone documents share theme resolution, but must not boot the game shell.
   if(document.documentElement.hasAttribute('data-proplet-theme-only'))return;
 
   const styles=[
@@ -46,7 +45,7 @@
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/settings-ia-v40122.css?v=2','propletSettingsIaV40122Css'],
-    ['/settings-polish-v40122.css?v=1','propletSettingsPolishV40122Css']
+    ['/settings-polish-v40122.css?v=2','propletSettingsPolishV40122Css']
   ];
 
   const loadStyle=(href,key)=>{
@@ -75,8 +74,6 @@
   };
 
   const loadExtras=async()=>{
-    /* Runtime metadata is the single public release marker. Anything displaying/guarding a
-       version loads only after it, so a release cannot drift between footer and cache metadata. */
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=11','propletHomeLayout');
@@ -103,7 +100,7 @@
     loadScript('/onboarding-return-v3332.js?v=2','propletOnboardingReturnV3332');
     loadScript('/release-notes-v3331.js?v=2','propletReleaseNotesV3331');
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
-    loadScript('/settings-polish-v40122.js?v=1','propletSettingsPolishV40122');
+    loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
