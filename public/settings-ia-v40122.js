@@ -6,12 +6,14 @@
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>[...r.querySelectorAll(s)];
   const setText=(el,text)=>{if(el&&el.textContent!==text)el.textContent=text};
+  const setClass=(el,name,on)=>{if(el)el.classList.toggle(name,!!on)};
   const gearSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path></svg>';
   let scheduled=false;
 
   function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
   function profileScreen(){return q('#screen-profile')}
   function settingsOpen(){return !!profileScreen()?.classList.contains('settings-open')}
+  function removeEyebrow(root){q('.section-head .eyebrow',root)?.remove()}
 
   function ensureHeaderGear(){
     const header=q('.app-header'),profileChip=q('#profileChip');if(!header||!profileChip)return;
@@ -22,15 +24,7 @@
       btn=document.createElement('button');btn.id='settingsHeaderBtn';btn.type='button';btn.className='settings-header-gear';btn.innerHTML=gearSvg;
       btn.setAttribute('aria-label','Nastavení');btn.title='Nastavení';btn.onclick=openSettings;group.insertBefore(btn,profileChip);
     }
-  }
-
-  function ensureProfileSettingsEntry(){
-    const title=q('#screen-profile>.screen-title');if(!title)return;
-    let btn=q('#profileSettingsBtn',title);
-    if(!btn){
-      btn=document.createElement('button');btn.id='profileSettingsBtn';btn.type='button';btn.className='profile-settings-entry';
-      btn.innerHTML=`${gearSvg}<span>Nastavení</span>`;btn.setAttribute('aria-label','Otevřít nastavení');btn.onclick=openSettings;title.appendChild(btn);
-    }
+    q('#profileSettingsBtn')?.remove();
   }
 
   function ensureSettingsHeader(){
@@ -43,14 +37,55 @@
     }
   }
 
+  function polishGameplayCard(){
+    const card=q('#soundToggle')?.closest('.settings-card');if(!card)return;
+    card.classList.add('settings-gameplay-card');removeEyebrow(card);
+    q('#wakeLockNote')?.classList.add('settings-copy-pruned');
+    const support=q('.support-mode-card',card);if(!support)return;
+    support.classList.add('settings-support-polished');
+    const label=q('.stat-label',support);if(label){setText(label,'Pomocník');label.classList.add('support-mode-title')}
+  }
+
+  function polishAppearanceCard(){
+    const card=q('.appearance-card');if(!card)return;
+    q('.appearance-copy',card)?.classList.add('settings-copy-pruned');
+    q('#themeModeNote',card)?.classList.add('settings-copy-pruned');
+  }
+
+  function polishPushCard(){
+    const card=q('.push-card');if(!card)return;
+    removeEyebrow(card);
+    q(':scope>p.push-copy',card)?.classList.add('settings-copy-pruned');
+    const detail=q('.notification-pref-copy>small',card);
+    setText(detail,'Dáme vědět o Denní výzvě a každé pondělí o nové várce úrovní.');
+    const status=q('#pushStatusText',card),statusText=(status?.textContent||'').trim();
+    const redundant=/^(Zapnuto na tomto zařízení|Vypnuto na tomto zařízení)/.test(statusText);
+    setClass(status,'settings-status-redundant',redundant);
+  }
+
+  function polishDataCard(){
+    const card=q('#reportIssueBtn')?.closest('.settings-card');if(!card)return;
+    card.classList.add('settings-data-card');removeEyebrow(card);
+    setText(q('.section-head h2',card),'Data pod kontrolou');
+    setText(q(':scope>p.muted',card),'Stáhni svá data, nahlas problém nebo účet trvale smaž.');
+  }
+
+  function polishAccountHub(){
+    const hub=q('#profileAccountHub');if(!hub)return;
+    const head=q('.profile-account-head',hub);if(!head)return;
+    q('.stat-label',head)?.remove();
+    setText(q('strong',head),'Tvůj účet');
+  }
+
+  function ensureAdminPlacement(){
+    const screen=profileScreen(),admin=q('#adminEntryBtn');if(!screen||!admin)return;
+    let slot=q('#settingsAdminSlot',screen);
+    if(!slot){slot=document.createElement('div');slot.id='settingsAdminSlot';slot.className='settings-admin-slot';screen.appendChild(slot)}
+    if(admin.parentElement!==slot)slot.appendChild(admin);
+  }
+
   function classifySettingsCards(){
-    q('#soundToggle')?.closest('.settings-card')?.classList.add('settings-gameplay-card');
-    const trust=q('#reportIssueBtn')?.closest('.settings-card');
-    if(trust){
-      trust.classList.add('settings-data-card');
-      const eyebrow=q('.section-head .eyebrow',trust),h2=q('.section-head h2',trust),copy=q(':scope>p.muted',trust);
-      setText(eyebrow,'DATA A PODPORA');setText(h2,'Data pod kontrolou');setText(copy,'Stáhni svá data, nahlas problém nebo účet trvale smaž.');
-    }
+    polishGameplayCard();polishAppearanceCard();polishPushCard();polishDataCard();polishAccountHub();ensureAdminPlacement();
   }
 
   function privacyState(){const p=profile();return p?.publicRankings===true?{icon:'👀',title:'Veřejný profil',copy:'V pořadí se ukáže tvoje herní jméno a emoji avatar.'}:{icon:'🎭',title:'Anonymní profil',copy:'Výsledky zůstávají v pořadí pod anonymní přezdívkou.'}}
@@ -79,13 +114,17 @@
   }
   function compactRankingExplanations(){qa('.daily-world-privacy').forEach(compactRankingNode);qa('.level-board-head>small').forEach(compactRankingNode)}
 
-  function ensureUi(){ensureHeaderGear();ensureProfileSettingsEntry();ensureSettingsHeader();classifySettingsCards();ensurePrivacyCard();syncGuestState();compactRankingExplanations()}
+  function ensureUi(){
+    ensureHeaderGear();ensureSettingsHeader();classifySettingsCards();ensurePrivacyCard();syncGuestState();compactRankingExplanations();
+  }
 
   function openSettings(){
     try{if(typeof nav==='function')nav('profile')}catch{}
     setTimeout(()=>{const screen=profileScreen();if(!screen)return;ensureUi();screen.classList.add('settings-open');syncGuestState();window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBack')?.focus({preventScroll:true})},20);
   }
-  function closeSettings(){const screen=profileScreen();if(!screen)return;screen.classList.remove('settings-open');window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBtn')?.focus({preventScroll:true})}
+  function closeSettings(){
+    const screen=profileScreen();if(!screen)return;screen.classList.remove('settings-open');window.scrollTo({top:0,behavior:'auto'});q('#settingsHeaderBtn')?.focus({preventScroll:true});
+  }
 
   document.addEventListener('click',event=>{const navEl=event.target.closest?.('[data-nav]');if(!navEl||!settingsOpen())return;closeSettings()},true);
 
