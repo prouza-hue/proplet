@@ -1,7 +1,7 @@
-const SHELL_CACHE='proplet-v4.01.22-shell';
+const SHELL_CACHE='proplet-v4.01.23-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
-const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/analytics-init.js','/quality-v334.css','/quality-v334.js','/quality-v334-core-v40114.js?v=2'];
+const SHELL=['/','/styles.css','/app.js','/theme-init.js','/runtime-meta.js','/analytics-init.js','/quality-v334.css','/quality-v334.js','/quality-v334-core-v40114.js?v=2','/daily-win-menu-v40123.js?v=1'];
 
 async function putIfOk(cacheName,request,response){
   if(!response?.ok)return response;
@@ -35,12 +35,7 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   const keep=new Set([SHELL_CACHE,DATA_CACHE]);
   await caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&!keep.has(k)).map(k=>caches.delete(k))));
   await self.clients.claim();
-  // v4.00.1 could show its update banner after the new worker had already
-  // activated, leaving its button with no waiting worker to promote. This
-  // one-time handover actively refreshes controlled windows onto the P0 fix.
   const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
-  // Do not await navigation from inside activate: an older controlled page can
-  // wait for activation while activation waits for that page, deadlocking both.
   clients.forEach(client=>client.navigate(client.url).catch(()=>null));
 })()));
 
