@@ -1,0 +1,112 @@
+/* v4.01.22 preview follow-up — mobile profile + settings polish. */
+
+/* Pomocník belongs to Settings and should read as a compact setting, not a profile achievement. */
+#screen-profile.settings-open .settings-support-compact{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:10px!important;
+  align-items:center!important;
+  margin:0 0 12px!important;
+  padding:10px 12px!important;
+  border-radius:14px!important;
+}
+#screen-profile.settings-open .settings-support-compact>div{min-width:0}
+#screen-profile.settings-open .settings-support-compact .support-mode-title{
+  display:block!important;
+  margin:0 0 2px!important;
+  color:var(--ink)!important;
+  font-size:15.5px!important;
+  line-height:1.15!important;
+  font-weight:950!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+}
+#screen-profile.settings-open .settings-support-compact strong{
+  display:block!important;
+  margin:0!important;
+  color:var(--muted)!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+  font-weight:800!important;
+}
+#screen-profile.settings-open .settings-support-compact .support-mode-desc-pruned{display:none!important}
+#screen-profile.settings-open .settings-support-compact .secondary-btn{
+  width:auto!important;
+  min-width:0!important;
+  min-height:36px!important;
+  padding:7px 11px!important;
+  font-size:11.5px!important;
+  white-space:nowrap;
+}
+
+/* PWA install card: one headline + one useful sentence. */
+#screen-profile.settings-open .install-app-card .section-head{margin-bottom:9px!important}
+#screen-profile.settings-open .install-app-card>p.muted{margin:0 0 14px!important;font-size:13px!important;line-height:1.45!important}
+#screen-profile.settings-open .install-app-card .install-mini-icon{font-size:22px}
+#screen-profile.settings-open #installAppStatus.settings-install-status-redundant{display:none!important}
+
+/* Fold closed / ordinary phone: preserve desktop hierarchy but re-balance the available width. */
+@media(max-width:520px){
+  #screen-profile:not(.settings-open) .profile-summary{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:10px!important;
+    align-items:center!important;
+  }
+  #screen-profile:not(.settings-open) .profile-identity{min-width:0}
+  #screen-profile:not(.settings-open) .profile-name{font-size:25px}
+
+  #screen-profile:not(.settings-open) .streak-bubble{
+    width:72px!important;
+    height:72px!important;
+    padding:8px 10px!important;
+    border-radius:21px!important;
+    grid-template-columns:auto auto!important;
+    grid-template-rows:1fr auto!important;
+    column-gap:5px!important;
+    justify-content:center!important;
+    background:color-mix(in srgb,#f2b83f 14%,var(--paper))!important;
+    border-color:color-mix(in srgb,#f2b83f 32%,var(--line))!important;
+    box-shadow:none!important;
+  }
+  #screen-profile:not(.settings-open) .streak-bubble .streak-icon{font-size:21px!important}
+  #screen-profile:not(.settings-open) .streak-bubble strong{font-size:24px!important;line-height:1!important}
+  #screen-profile:not(.settings-open) .streak-bubble small{font-size:10px!important;line-height:1.1!important}
+
+  #screen-profile:not(.settings-open) .profile-grid{
+    grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr)!important;
+    gap:8px!important;
+  }
+  #screen-profile:not(.settings-open) .profile-stat{min-width:0!important;padding:11px 12px!important}
+  #screen-profile:not(.settings-open) .profile-stat>strong{font-size:21px!important;line-height:1.1!important}
+  #screen-profile:not(.settings-open) .profile-rank-stat{min-width:0!important}
+  #screen-profile:not(.settings-open) .profile-rank-value{
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    min-width:0!important;
+  }
+  #screen-profile:not(.settings-open) .profile-rank-icon{flex:0 0 auto!important;font-size:19px!important;line-height:1!important}
+  #screen-profile:not(.settings-open) .profile-rank-value strong{
+    min-width:0!important;
+    font-size:14.5px!important;
+    line-height:1.2!important;
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+    hyphens:none!important;
+  }
+  #screen-profile:not(.settings-open) .profile-stat-wide{grid-column:1/-1!important}
+  #screen-profile:not(.settings-open) .profile-daily-highlights small{font-size:10.5px!important;line-height:1.22!important}
+  #screen-profile:not(.settings-open) .profile-daily-highlights b{font-size:18px!important;line-height:1.1!important}
+}
+
+@media(max-width:380px){
+  #screen-profile:not(.settings-open) .profile-grid{grid-template-columns:minmax(0,.66fr) minmax(0,1.34fr)!important}
+  #screen-profile:not(.settings-open) .profile-rank-value strong{font-size:14px!important}
+  #screen-profile:not(.settings-open) .streak-bubble{width:68px!important;height:68px!important;padding-inline:9px!important}
+}
+
+html[data-theme="dark"] #screen-profile:not(.settings-open) .streak-bubble{
+  background:color-mix(in srgb,#d89c28 18%,#2a2419)!important;
+  border-color:color-mix(in srgb,#d89c28 34%,#51452a)!important;
+}
