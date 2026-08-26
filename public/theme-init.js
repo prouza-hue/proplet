@@ -45,7 +45,8 @@
     ['/release-notes-v3331.css?v=1','propletReleaseNotesV3331Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
-    ['/settings-ia-v40122.css?v=2','propletSettingsIaV40122Css']
+    ['/settings-ia-v40122.css?v=2','propletSettingsIaV40122Css'],
+    ['/settings-polish-v40122.css?v=1','propletSettingsPolishV40122Css']
   ];
 
   const loadStyle=(href,key)=>{
@@ -102,6 +103,7 @@
     loadScript('/onboarding-return-v3332.js?v=2','propletOnboardingReturnV3332');
     loadScript('/release-notes-v3331.js?v=2','propletReleaseNotesV3331');
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
+    loadScript('/settings-polish-v40122.js?v=1','propletSettingsPolishV40122');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
