@@ -31,6 +31,7 @@ TARGET_COOLDOWN = 12  # Same spacing discipline as late Gen4 Hard/Mozkozrout.
 # v4.01.29 bank is deterministic; reruns with this seed must reproduce the same 100 boards.
 # Fastgen can split targets into stable SHA-256 vocabulary partitions without changing puzzle rules.
 # Scratch PR synchronization intentionally triggers the branch-scoped matrix workflow.
+# Savefix rerun: generated bank is committed back to the clean PR head.
 
 MOZKOMOR_POLICY = {
     "allowed": ("A", "B", "C", "D"),
