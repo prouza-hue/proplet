@@ -1,13 +1,7 @@
 name: Mozkomor brutal10 playtest
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'tools/generate_mozkomor_brutal10.py'
-      - 'data/gen4_profiles_v334.json'
-      - '.github/workflows/mozkomor-brutal10.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,16 +12,15 @@ concurrency:
 
 jobs:
   generate:
-    if: ${{ github.head_ref == 'agent/v40129-mozkomor-brutal10' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -161,7 +154,7 @@ jobs:
           cp /tmp/mozkomor-brutal10/bank.json public/playtests/mozkomor-brutal10.json
           cp /tmp/mozkomor-brutal10/audit.json data/audits/mozkomor_brutal10_v1.json
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: mozkomor-brutal10
           path: /tmp/mozkomor-brutal10/
