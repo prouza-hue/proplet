@@ -271,8 +271,8 @@
       "rows": 10,
       "cols": 10,
       "activeCells": [
-        80,
-        88
+        78,
+        86
       ],
       "targetWords": [
         9,
@@ -285,8 +285,8 @@
       "maxCurlPaths": 10,
       "maxCurlRun": 6,
       "meanTurns": [
-        5.2,
-        6.4
+        5,
+        6.2
       ],
       "maxBlankComponents": 7,
       "maxIsolatedBlanks": 1,
@@ -296,10 +296,10 @@
         "C"
       ],
       "ambiguityRange": [
-        30,
-        70
+        28,
+        65
       ],
-      "ambiguityRole": "hardcore-playtest-extreme-above-mozkomor-tail"
+      "ambiguityRole": "hardcore-playtest-extreme-feasible-above-mozkomor-tail"
     }
   },
   "freeMediumMix": {
@@ -367,6 +367,7 @@
     "seed": 2026082801,
     "noTierD": true,
     "excludeCurrentMozkomorTargets": true,
-    "designIntent": "Approximate old Gen3 Mozkozrout brutality through geometry and false branches, without obscure targets."
+    "designIntent": "Approximate old Gen3 Mozkozrout brutality through geometry and false branches, without obscure targets.",
+    "calibration": "v1b-feasible-extreme"
   }
 }
