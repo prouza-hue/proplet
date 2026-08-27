@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate the committed v4.01.29 Mozkomor bank as a Gen4 endgame extension."""
+# The committed bank is the release source; generation is intentionally not repeated in CI.
 from __future__ import annotations
 
 from collections import Counter, deque
