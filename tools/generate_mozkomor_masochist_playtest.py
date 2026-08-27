@@ -29,10 +29,10 @@ PUZZLES_PATH=ROOT/"data"/"puzzles.json"
 PROFILE_NAME="mozkomor-masochist-playtest"
 
 POLICY={
-    "allowed":("A","B","C"),
-    "weights":{"A":1,"B":4,"C":5},
-    "min_fraction":{"B":0.25,"C":0.35},
-    "max_fraction":{"C":0.62},
+    "allowed":("B","C","D"),
+    "weights":{"B":1,"C":5,"D":4},
+    "min_fraction":{"C":0.50,"D":0.20},
+    "max_fraction":{"B":0.15,"C":0.70,"D":0.40},
     "min_avg_fun":3.0,
     "min_fun_words":2,
 }
@@ -40,7 +40,7 @@ POLICY={
 PROFILE={
     "rows":10,
     "cols":10,
-    "cells":(78,84),
+    "cells":(80,86),
     "words":(10,11),
     "min_len":6,
     "max_len":11,
@@ -57,11 +57,11 @@ PROFILE={
     "max_mean_turns":6.80,
     "max_blank_components":8,
     "max_isolated_blanks":1,
-    "ambiguity":(28.0,65.0),
+    "ambiguity":(30.0,70.0),
 }
 
 MIN_CURL_PATHS=9
-MIN_AVG_WORD_LENGTH=7.45
+MIN_AVG_WORD_LENGTH=7.60
 MIN_MAX_WORD_LENGTH=9
 TARGET_ACCEPTED_PER_LEVEL=2
 
@@ -125,6 +125,19 @@ def main()->None:
     ))
     prefixes=g4.prefix_index(set(dictionary))
     weighted=g4.v3.cal.weighted_pool(tiers,metadata,POLICY)
+
+    existing=json.loads(PUZZLES_PATH.read_text(encoding="utf-8"))
+    current_mozkomor_words={
+        str(a.get("word") or "").casefold()
+        for p in (existing.get("free") or {}).get("mozkomor") or []
+        for a in p.get("answers") or []
+    }
+    hardcore_tail_words={
+        str(a.get("word") or "").casefold()
+        for p in list((existing.get("free") or {}).get("hardcore") or [])[-12:]
+        for a in p.get("answers") or []
+    }
+    avoid_words=current_mozkomor_words|hardcore_tail_words
     pool=[w for w in weighted if target_bucket(w,args.partition_count)==args.partition_index]
     unique_pool=set(pool)
     if len(unique_pool)<170:
@@ -145,15 +158,15 @@ def main()->None:
     for shape_retry in range(1,args.max_shape_retries+1):
         try:
             candidate=g4.v3.cal.build_puzzle(
-                gp,"hardcore",args.level,rng,pool,dictionary,tier_of,fun_of,set()
+                gp,"hardcore",args.level,rng,pool,dictionary,tier_of,fun_of,avoid_words
             )
         except RuntimeError:
             reject["build"]+=1
             continue
 
-        candidate["id"]=f"mzpt-brutal-{args.level:02d}"
         candidate["difficulty"]="mozkomor"
         g4.annotate(candidate,"free","mozkomor",args.level,PROFILE_NAME,prefixes)
+        candidate["id"]=f"g4-mt-{args.level:03d}"
         meta=candidate["meta"]
         ambiguity=float(meta.get("localAmbiguityScore") or 0)
         ambiguity_seen.append(ambiguity)
@@ -178,8 +191,18 @@ def main()->None:
             reject["avg-word-length"]+=1;continue
         if max(lengths)<MIN_MAX_WORD_LENGTH:
             reject["no-long-anchor"]+=1;continue
-        if any(tier_of.get(str(a.get("word") or "").casefold())=="D" for a in candidate["answers"]):
-            reject["tier-d"]+=1;continue
+        board_tiers=Counter(
+            tier_of.get(str(a.get("word") or "").casefold())
+            for a in candidate["answers"]
+        )
+        if any(t not in {"B","C","D"} for t in board_tiers):
+            reject["tier-outside-bcd"]+=1;continue
+        if board_tiers["D"]<2 or board_tiers["D"]>4:
+            reject["tier-d-share"]+=1;continue
+        if board_tiers["B"]>2:
+            reject["tier-b-relief"]+=1;continue
+        if board_tiers["C"]<5:
+            reject["tier-c-core"]+=1;continue
 
         meta.update({
             "calibrationOnly":True,
@@ -189,6 +212,7 @@ def main()->None:
             "playtestPartition":{"index":args.partition_index,"count":args.partition_count},
             "shapeRetry":shape_retry,
             "brutalityScore":brutality_score(candidate),
+            "vocabTiers":dict(board_tiers),
         })
         accepted.append(candidate)
         print(
