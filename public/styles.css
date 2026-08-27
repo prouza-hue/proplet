@@ -1091,7 +1091,7 @@ html[data-theme="dark"] .magnifier-quick-btn.on{background:var(--purple-soft)!im
 }
 .difficulty-card[data-diff="mozkomor"]:before{
   content:"ENDGAME";position:absolute;z-index:3;right:92px;top:17px;padding:4px 7px;border-radius:999px;
-  background:#31285f;color:#fff;font-size:8px;letter-spacing:.12em;font-weight:1000;
+  background:#31285f;color:#fff;font-size:8px;letter-spacing:.12em;font-weight:1000;pointer-events:none;
 }
 .difficulty-card[data-diff="mozkomor"] .difficulty-left-icon{
   background:linear-gradient(145deg,#eeeaff,#ded6ff);
@@ -1099,6 +1099,7 @@ html[data-theme="dark"] .magnifier-quick-btn.on{background:var(--purple-soft)!im
 }
 .difficulty-card[data-diff="mozkomor"] .difficulty-icon-img{filter:drop-shadow(0 6px 10px rgba(64,48,128,.18))}
 .difficulty-card.mozkomor-locked{background:linear-gradient(145deg,#fbfafc,#f2eff8 62%,#e8e3f1);border-style:dashed}
+.difficulty-card.mozkomor-unlocked{cursor:pointer}
 .difficulty-card.mozkomor-locked .difficulty-copy{opacity:.88}
 .difficulty-card.mozkomor-locked .difficulty-left-icon{filter:grayscale(.18);opacity:.82}
 .difficulty-card.mozkomor-locked .locked-progress{cursor:default}
