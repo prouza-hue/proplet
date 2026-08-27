@@ -1,12 +1,6 @@
 name: Mozkomor masochist playtest
 
 on:
-  pull_request:
-    branches:
-      - agent/v40129-mozkomor
-    paths:
-      - 'tools/generate_mozkomor_masochist_playtest.py'
-      - '.github/workflows/mozkomor-masochist-playtest.yml'
   workflow_dispatch:
 
 permissions:
@@ -18,7 +12,7 @@ concurrency:
 
 jobs:
   generate:
-    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'agent/v40129-mozkomor-masochist') }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -268,7 +262,7 @@ jobs:
           if-no-files-found: error
 
       - name: Commit playtest bank back to branch
-        if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'agent/v40129-mozkomor-masochist') }}
+        if: ${{ false }}
         run: |
           git config user.name "proplet-playtest-bot"
           git config user.email "actions@users.noreply.github.com"
