@@ -22,6 +22,7 @@ html.calm-preference-v334 .ranking-privacy-mini{display:none}
 .quality-single-head h2{margin:0!important}
 .quality-single-head.section-head{min-height:34px}
 .quality-ranking-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+html.quality-v334 #screen-leaderboard .ranking-section-head{margin-bottom:14px}
 .quality-ranking-head h2{margin:0;font-size:21px;letter-spacing:-.025em}
 .quality-info-button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);color:var(--muted);display:inline-grid;place-items:center;font-size:14px;font-weight:950;cursor:pointer;padding:0}
 .quality-info-button:hover,.quality-info-button[aria-expanded="true"]{color:var(--purple);border-color:color-mix(in srgb,var(--purple) 40%,var(--line));background:color-mix(in srgb,var(--purple) 7%,var(--paper))}
