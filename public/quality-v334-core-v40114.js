@@ -48,9 +48,9 @@ function polishHierarchy(){
   q('#screen-leaderboard>.screen-title')?.remove();
   q('#rankingPrivacyNote')?.classList.add('hidden');
   const xp=q('#xpLeaderboardList')?.closest('.ranking-section');
-  if(xp){const wrap=xp.querySelector('.ranking-section-head>div');wrap?.querySelector('.eyebrow')?.remove();wrap?.querySelector('p.muted')?.remove();setText(wrap?.querySelector('h2'),'🏆 Nasbírané XP')}
+  if(xp){const wrap=xp.querySelector('.ranking-section-head>div');wrap?.querySelector('.eyebrow')?.remove();wrap?.querySelector('p.muted')?.remove();setText(q('#xpRankingTitle',xp)||wrap?.querySelector('h2'),'🏆 Nasbírané XP')}
   const daily=q('#dailyLeaderboardList')?.closest('.ranking-section');
-  if(daily){const wrap=daily.querySelector('.ranking-section-head>div');if(wrap){wrap.classList.add('quality-ranking-head');wrap.querySelector('.eyebrow')?.remove();wrap.querySelector('p.muted')?.remove();setText(wrap.querySelector('h2'),'☀️ Dnešní výzva');ensureRankingInfoButton(wrap)}}
+  if(daily){const wrap=daily.querySelector('.ranking-section-head>div');if(wrap){wrap.classList.add('quality-ranking-head');wrap.querySelector('.eyebrow')?.remove();wrap.querySelector('p.muted')?.remove();setText(q('#dailyRankingTitle',daily)||wrap.querySelector('h2'),'☀️ Dnešní výzva');ensureRankingInfoButton(wrap)}}
   compactHeading(q('#levelRoadmap')?.closest('.card'),'Dosažená hodnost');
   compactHeading(q('#achievementSummary')?.closest('.card'),'Propletené úspěchy');
   compactHeading(q('#profileBadges')?.closest('.card'),'Odznaky za věrnost');
