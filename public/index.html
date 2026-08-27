@@ -99,6 +99,16 @@
         <div><strong>Společné pořadí, minimum profilu</strong><small>Výsledky jsou vždy kompletní. Jméno a avatar se ukážou jen po souhlasu; jinak dostane hráč anonymní přezdívku.</small></div>
       </div>
 
+      <section class="ranking-section card daily-ranking-card">
+        <div class="ranking-section-head"><div><span class="eyebrow">☀️ DNEŠNÍ VÝZVA</span><h2>Kdo ji zahrál nejlépe?</h2><p class="muted">Čisté řešení → méně nápověd → čas → tahy.</p></div></div>
+        <div class="ranking-segment ranking-daily-segment" role="tablist" aria-label="Denní pořadí hráči nebo týmy">
+          <button class="ranking-daily-tab active" data-ranking-daily-scope="players">Hráči</button>
+          <button class="ranking-daily-tab" data-ranking-daily-scope="teams">Týmy</button>
+        </div>
+        <div id="dailyLeaderboardList" class="leaderboard-list"></div>
+        <div id="dailyTeamMethod" class="ranking-method hidden"><strong>Týmové Daily:</strong> průměr až tří nejlepších dnešních výkonů týmu, každý převedený na 0–100. Menší tým není penalizovaný počtem členů.</div>
+      </section>
+
       <section class="ranking-section card">
         <div class="ranking-section-head"><div><span class="eyebrow">🏆 XP</span><h2>Nasbírané XP</h2><p class="muted">Jednoduše: kdo v daném období získal nejvíc XP.</p></div></div>
         <div class="ranking-control-row">
@@ -113,16 +123,6 @@
           </div>
         </div>
         <div id="xpLeaderboardList" class="leaderboard-list"></div>
-      </section>
-
-      <section class="ranking-section card daily-ranking-card">
-        <div class="ranking-section-head"><div><span class="eyebrow">☀️ DNEŠNÍ VÝZVA</span><h2>Kdo ji zahrál nejlépe?</h2><p class="muted">Čisté řešení → méně nápověd → čas → tahy.</p></div></div>
-        <div class="ranking-segment ranking-daily-segment" role="tablist" aria-label="Denní pořadí hráči nebo týmy">
-          <button class="ranking-daily-tab active" data-ranking-daily-scope="players">Hráči</button>
-          <button class="ranking-daily-tab" data-ranking-daily-scope="teams">Týmy</button>
-        </div>
-        <div id="dailyLeaderboardList" class="leaderboard-list"></div>
-        <div id="dailyTeamMethod" class="ranking-method hidden"><strong>Týmové Daily:</strong> průměr až tří nejlepších dnešních výkonů týmu, každý převedený na 0–100. Menší tým není penalizovaný počtem členů.</div>
       </section>
 
       <div id="rankingTeamCard" class="ranking-team-card card"></div>
