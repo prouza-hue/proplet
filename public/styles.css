@@ -1090,7 +1090,7 @@ html[data-theme="dark"] .magnifier-quick-btn.on{background:var(--purple-soft)!im
   border-color:#d7cff8;
 }
 .difficulty-card[data-diff="mozkomor"]:before{
-  content:"ENDGAME";position:absolute;right:13px;bottom:61px;padding:4px 7px;border-radius:999px;
+  content:"ENDGAME";position:absolute;z-index:3;right:92px;top:17px;padding:4px 7px;border-radius:999px;
   background:#31285f;color:#fff;font-size:8px;letter-spacing:.12em;font-weight:1000;
 }
 .difficulty-card[data-diff="mozkomor"] .difficulty-left-icon{
@@ -1114,3 +1114,4 @@ html[data-theme="dark"] .difficulty-card[data-diff="mozkomor"]:before{background
 html[data-theme="dark"] .difficulty-card[data-diff="mozkomor"] .difficulty-left-icon{background:linear-gradient(145deg,#302a52,#24203d)}
 html[data-theme="dark"] .difficulty-card.mozkomor-locked{background:linear-gradient(145deg,#1c1a23,#211e2c);border-color:#423c50}
 html[data-theme="dark"] .quick-game[data-diff="mozkomor"]{--q:#a896ff;--qs:#302956}
+@media(max-width:390px){.difficulty-card[data-diff="mozkomor"]:before{right:80px;top:14px}}
