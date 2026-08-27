@@ -593,6 +593,7 @@ async function sendAttemptCheckpoint(eventType){
  try{await api('/api/attempt/checkpoint',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,event_type:eventType,elapsed_ms:Math.max(0,Math.round(gameElapsed(g))),found_words:foundWords})})}catch{}
 }
 function startGame(puzzle,mode,dailyDate,options={}){
+ hideTouchMagnifier();
  if(runtimeUpdateRequired){showToast('Nejdřív dokončím aktualizaci Propletu…');recoverRuntimeUpdate();return}
  stopTimer();hideGameUndo();
  // Když hráč otevře Free hru z rychlé nabídky na Daily, vytvoř v historii mezikrok Free menu.
@@ -651,13 +652,41 @@ function renderGameBoard(){
  for(let i=0;i<p.rows*p.cols;i++){if(!mask.has(i)){const v=document.createElement('div');v.className='void-cell';board.appendChild(v);continue}const c=document.createElement('div');c.className='cell';c.dataset.index=i;c.textContent=p.letters[i];const color=g.used.get(i);if(color!=null){c.classList.add('used');c.style.setProperty('--word-color',COLORS[color%COLORS.length])}if(g.lastFound?.includes(i))c.classList.add('just-found');if(g.wrongPath?.includes(i))c.classList.add('wrong-flash');if(g.mode==='starter'&&g.starterGuidePath?.includes(i)&&!g.used.has(i)){c.classList.add('starter-guide');c.style.setProperty('--guide-order',String(g.starterGuidePath.indexOf(i)))}c.addEventListener('pointerdown',pointerDown);c.addEventListener('pointerenter',pointerEnter);board.appendChild(c)}requestAnimationFrame(()=>{fitGameBoard();drawPaths()});if(g.lastFound?.length)setTimeout(()=>{g.lastFound=[];$$('.just-found').forEach(c=>c.classList.remove('just-found'))},460)
 }
 function pNeighbours(i){const p=currentGame.puzzle,r=Math.floor(i/p.cols),c=i%p.cols,mask=new Set(p.mask),out=[];[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{const j=rr*p.cols+cc;if(rr>=0&&rr<p.rows&&cc>=0&&cc<p.cols&&mask.has(j))out.push(j)});return out}
-function pointerDown(e){e.preventDefault();ensureAudio();const g=currentGame,i=+e.currentTarget.dataset.index;if(!g||g.finished||g.used.has(i)||g.wrongPath?.length)return;if(g.undoSnapshot)hideGameUndo();g.dragging=true;g.path=[i];g.lastPointer={x:e.clientX,y:e.clientY};fx('tap');updateActive();try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}
+function touchMagnifierEnabled(g=currentGame){
+ if(!g||g.finished||!['hard','hardcore'].includes(g.puzzle?.difficulty))return false;
+ const coarse=window.matchMedia?.('(pointer: coarse)')?.matches===true,touchCapable=(navigator.maxTouchPoints||0)>0,shortSide=Math.min(window.visualViewport?.width||window.innerWidth||9999,window.visualViewport?.height||window.innerHeight||9999);
+ return coarse&&touchCapable&&shortSide<=600;
+}
+function ensureTouchMagnifier(){
+ let el=$('#touchMagnifier');if(el)return el;
+ el=document.createElement('div');el.id='touchMagnifier';el.className='touch-magnifier hidden';el.setAttribute('aria-hidden','true');el.innerHTML='<div class="touch-magnifier-grid"></div>';document.body.appendChild(el);return el;
+}
+function renderTouchMagnifier(centerIndex){
+ const g=currentGame;if(!g||centerIndex==null)return;const p=g.puzzle,mask=new Set(p.mask),row=Math.floor(centerIndex/p.cols),col=centerIndex%p.cols,grid=ensureTouchMagnifier().querySelector('.touch-magnifier-grid'),cells=[],backIndex=g.path.length>1?g.path.at(-2):null;
+ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+  if(Math.abs(dr)+Math.abs(dc)>1){cells.push('<span class="touch-mag-cell void"></span>');continue}
+  const rr=row+dr,cc=col+dc,j=rr*p.cols+cc;
+  if(rr<0||rr>=p.rows||cc<0||cc>=p.cols||!mask.has(j)){cells.push('<span class="touch-mag-cell void"></span>');continue}
+  const cls=['touch-mag-cell'],isCenter=j===centerIndex,isBack=j===backIndex,isBlocked=!isCenter&&!isBack&&(g.used.has(j)||g.path.includes(j));
+  if(isCenter)cls.push('focus','active');else if(isBack)cls.push('backtrack');else if(isBlocked)cls.push('blocked');else cls.push('candidate');
+  const color=g.used.get(j),style=color!=null?` style="--word-color:${COLORS[color%COLORS.length]}"`:'';
+  cells.push(`<span class="${cls.join(' ')}"${style}>${esc(p.letters[j])}</span>`)
+ }
+ grid.innerHTML=cells.join('');
+}
+function showTouchMagnifier(centerIndex){
+ if(!touchMagnifierEnabled()){hideTouchMagnifier();return}
+ const el=ensureTouchMagnifier(),board=$('#board'),boardTop=board?.getBoundingClientRect?.().top??220,magHeight=144,gap=12,top=Math.max(8,Math.floor(boardTop-magHeight-gap));
+ el.style.setProperty('--magnifier-top',`${top}px`);renderTouchMagnifier(centerIndex);el.classList.remove('hidden');
+}
+function hideTouchMagnifier(){const el=$('#touchMagnifier');el?.classList.add('hidden')}
+function pointerDown(e){e.preventDefault();ensureAudio();const g=currentGame,i=+e.currentTarget.dataset.index;if(!g||g.finished||g.used.has(i)||g.wrongPath?.length)return;if(g.undoSnapshot)hideGameUndo();g.dragging=true;g.path=[i];g.lastPointer={x:e.clientX,y:e.clientY};fx('tap');updateActive();showTouchMagnifier(i);try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}
 }
 function pointerEnter(e){if(currentGame?.dragging)extendPath(+e.currentTarget.dataset.index)}
 function samplePointer(x,y){const g=currentGame;if(!g?.dragging)return;const prev=g.lastPointer||{x,y},dx=x-prev.x,dy=y-prev.y,dist=Math.hypot(dx,dy),steps=Math.max(1,Math.ceil(dist/6));for(let n=1;n<=steps;n++){const px=prev.x+dx*n/steps,py=prev.y+dy*n/steps,el=document.elementFromPoint(px,py)?.closest?.('.cell');if(el)extendPath(+el.dataset.index)}g.lastPointer={x,y}}
 function pointerMove(e){if(!currentGame?.dragging)return;const evs=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[e];for(const ev of evs)samplePointer(ev.clientX,ev.clientY)}
-function extendPath(i){const g=currentGame,path=g.path,last=path.at(-1);if(i===last)return;if(path.length>1&&i===path.at(-2)){path.pop();updateActive();return}if(g.used.has(i)||path.includes(i)||!pNeighbours(last).includes(i))return;path.push(i);fx('step');updateActive()}
-function pointerUp(){if(!currentGame?.dragging)return;currentGame.dragging=false;currentGame.lastPointer=null;submitPath()}
+function extendPath(i){const g=currentGame,path=g.path,last=path.at(-1);if(i===last)return;if(path.length>1&&i===path.at(-2)){path.pop();updateActive();renderTouchMagnifier(path.at(-1));return}if(g.used.has(i)||path.includes(i)||!pNeighbours(last).includes(i))return;path.push(i);fx('step');updateActive();renderTouchMagnifier(i)}
+function pointerUp(){hideTouchMagnifier();if(!currentGame?.dragging)return;currentGame.dragging=false;currentGame.lastPointer=null;submitPath()}
 function currentWord(){return currentGame.path.map(i=>currentGame.puzzle.letters[i]).join('')}
 function updateActive(){$$('.cell').forEach(c=>c.classList.toggle('active',currentGame.path.includes(+c.dataset.index)));$('#currentWord').textContent=currentGame.path.length?currentWord():'—';drawPaths()}
 function samePath(a,b){return a.length===b.length&&a.every((v,i)=>v===b[i])}
@@ -1522,7 +1551,7 @@ function bind(){
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const guard=$('#progressGuardModal'),support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(guard&&!guard.classList.contains('hidden')){dismissProgressGuard();return}if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});
  $$('[data-theme-mode]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeMode,{persist:true}));
  $('#soundToggle').onclick=()=>{const s=getSettings();s.sound=!s.sound;saveSettings(s);renderSettings();if(s.sound){ensureAudio();tone(620,.08,.02)}};$('#hapticToggle').onclick=()=>{const s=getSettings();s.haptics=!s.haptics;saveSettings(s);renderSettings();if(s.haptics)vibrate(45)};$('#wakeLockToggle').onclick=()=>{const s=getSettings();s.wakeLock=!s.wakeLock;saveSettings(s);syncGameWakeLock();renderSettings()};$('#hapticTestBtn').onclick=testHaptics;$('#replayIntroBtn').onclick=()=>openOnboarding(true);
- $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);
+ $('#board').addEventListener('pointermove',pointerMove);window.addEventListener('pointerup',pointerUp);window.addEventListener('pointercancel',hideTouchMagnifier);
  const handleViewportChange=()=>{fitGameBoard();drawPaths()};
  const settleViewportChange=()=>{handleViewportChange();[60,180,420].forEach(ms=>setTimeout(handleViewportChange,ms))};
  window.addEventListener('resize',settleViewportChange);window.addEventListener('orientationchange',settleViewportChange);window.visualViewport?.addEventListener?.('resize',settleViewportChange);navigator.devicePosture?.addEventListener?.('change',settleViewportChange);
