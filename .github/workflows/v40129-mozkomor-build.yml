@@ -2,9 +2,9 @@ name: v4.01.29 Mozkomor Gen4 build
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
-      - agent/v40129-mozkomor
+      - main
     paths:
       - 'tools/generate_mozkomor_gen4.py'
       - 'tools/validate_gen4_release.py'
@@ -20,13 +20,14 @@ concurrency:
 
 jobs:
   build-and-bind:
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[mozkomor-generated]') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/v40129-mozkomor' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -174,7 +175,7 @@ jobs:
           if-no-files-found: error
 
       - name: Commit generated bank back to preview branch
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'agent/v40129-mozkomor' }}
         run: |
           git config user.name "proplet-generation-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -184,4 +185,4 @@ jobs:
             exit 0
           fi
           git commit -m "[mozkomor-generated] Bind 100 audited Gen4 endgame levels"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${{ github.head_ref }}"
