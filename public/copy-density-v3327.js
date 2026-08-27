@@ -12,13 +12,6 @@
 
     const rankingTitle=$('#screen-leaderboard .screen-title');
     rankingTitle?.querySelector('.muted')?.remove();
-    const xpSection=$('#screen-leaderboard .ranking-section');
-    if(xpSection){
-      xpSection.querySelector('.ranking-section-head .eyebrow')?.remove();
-      const title=xpSection.querySelector('.ranking-section-head h2');
-      if(title)title.textContent='🏆 Nasbírané XP';
-      xpSection.querySelector('.ranking-section-head .muted')?.remove();
-    }
 
     const profileModal=$('#profileModal');
     profileModal?.setAttribute('aria-label','Hráčský účet');
