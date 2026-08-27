@@ -674,16 +674,16 @@ function renderTouchMagnifier(centerIndex){
  }
  grid.innerHTML=cells.join('');
 }
-function showTouchMagnifier(x,y,centerIndex){
- if(!touchMagnifierEnabled()){hideTouchMagnifier();return}const el=ensureTouchMagnifier(),w=144,h=144,gap=34,vw=document.documentElement.clientWidth||window.innerWidth,vh=document.documentElement.clientHeight||window.innerHeight,below=y<h+gap+12,left=Math.max(8,Math.min(vw-w-8,x-w/2)),top=Math.max(8,Math.min(vh-h-8,below?y+gap:y-h-gap));el.style.left=`${left}px`;el.style.top=`${top}px`;el.classList.toggle('below',below);renderTouchMagnifier(centerIndex);el.classList.remove('hidden');
+function showTouchMagnifier(centerIndex){
+ if(!touchMagnifierEnabled()){hideTouchMagnifier();return}const el=ensureTouchMagnifier();renderTouchMagnifier(centerIndex);el.classList.remove('hidden');
 }
 function hideTouchMagnifier(){const el=$('#touchMagnifier');el?.classList.add('hidden')}
-function pointerDown(e){e.preventDefault();ensureAudio();const g=currentGame,i=+e.currentTarget.dataset.index;if(!g||g.finished||g.used.has(i)||g.wrongPath?.length)return;if(g.undoSnapshot)hideGameUndo();g.dragging=true;g.path=[i];g.lastPointer={x:e.clientX,y:e.clientY};fx('tap');updateActive();showTouchMagnifier(e.clientX,e.clientY,i);try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}
+function pointerDown(e){e.preventDefault();ensureAudio();const g=currentGame,i=+e.currentTarget.dataset.index;if(!g||g.finished||g.used.has(i)||g.wrongPath?.length)return;if(g.undoSnapshot)hideGameUndo();g.dragging=true;g.path=[i];g.lastPointer={x:e.clientX,y:e.clientY};fx('tap');updateActive();showTouchMagnifier(i);try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}
 }
 function pointerEnter(e){if(currentGame?.dragging)extendPath(+e.currentTarget.dataset.index)}
 function samplePointer(x,y){const g=currentGame;if(!g?.dragging)return;const prev=g.lastPointer||{x,y},dx=x-prev.x,dy=y-prev.y,dist=Math.hypot(dx,dy),steps=Math.max(1,Math.ceil(dist/6));for(let n=1;n<=steps;n++){const px=prev.x+dx*n/steps,py=prev.y+dy*n/steps,el=document.elementFromPoint(px,py)?.closest?.('.cell');if(el)extendPath(+el.dataset.index)}g.lastPointer={x,y}}
-function pointerMove(e){if(!currentGame?.dragging)return;const evs=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[e];for(const ev of evs)samplePointer(ev.clientX,ev.clientY);const last=evs.at(-1)||e;showTouchMagnifier(last.clientX,last.clientY,currentGame.path.at(-1))}
-function extendPath(i){const g=currentGame,path=g.path,last=path.at(-1);if(i===last)return;if(path.length>1&&i===path.at(-2)){path.pop();updateActive();return}if(g.used.has(i)||path.includes(i)||!pNeighbours(last).includes(i))return;path.push(i);fx('step');updateActive()}
+function pointerMove(e){if(!currentGame?.dragging)return;const evs=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[e];for(const ev of evs)samplePointer(ev.clientX,ev.clientY)}
+function extendPath(i){const g=currentGame,path=g.path,last=path.at(-1);if(i===last)return;if(path.length>1&&i===path.at(-2)){path.pop();updateActive();renderTouchMagnifier(path.at(-1));return}if(g.used.has(i)||path.includes(i)||!pNeighbours(last).includes(i))return;path.push(i);fx('step');updateActive();renderTouchMagnifier(i)}
 function pointerUp(){hideTouchMagnifier();if(!currentGame?.dragging)return;currentGame.dragging=false;currentGame.lastPointer=null;submitPath()}
 function currentWord(){return currentGame.path.map(i=>currentGame.puzzle.letters[i]).join('')}
 function updateActive(){$$('.cell').forEach(c=>c.classList.toggle('active',currentGame.path.includes(+c.dataset.index)));$('#currentWord').textContent=currentGame.path.length?currentWord():'—';drawPaths()}
