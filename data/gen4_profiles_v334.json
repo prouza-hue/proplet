@@ -250,11 +250,11 @@
       "maxCurlPaths": 9,
       "maxCurlRun": 5,
       "meanTurns": [
-        2.9,
+        3.8,
         5.3
       ],
-      "maxBlankComponents": 5,
-      "maxIsolatedBlanks": 0,
+      "maxBlankComponents": 8,
+      "maxIsolatedBlanks": 1,
       "vocabularyTiers": [
         "A",
         "B",
@@ -262,10 +262,10 @@
         "D"
       ],
       "ambiguityRange": [
-        12,
+        18,
         60
       ],
-      "ambiguityRole": "endgame-high-with-bounded-false-branches"
+      "ambiguityRole": "endgame-high-above-mozkozrout-floor-with-bounded-false-branches"
     }
   },
   "freeMediumMix": {
