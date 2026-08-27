@@ -1,0 +1,321 @@
+name: Mozkomor masochist playtest generation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/generate_mozkomor_masochist_playtest.py'
+      - '.github/workflows/mozkomor-masochist-playtest.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mozkomor-masochist-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/v40129-mozkomor-masochist-playtest' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - level: 1
+            partition: 0
+            seed: 2026082801
+          - level: 2
+            partition: 1
+            seed: 2026082802
+          - level: 3
+            partition: 2
+            seed: 2026082803
+          - level: 4
+            partition: 3
+            seed: 2026082804
+          - level: 5
+            partition: 4
+            seed: 2026082805
+          - level: 6
+            partition: 5
+            seed: 2026082806
+          - level: 7
+            partition: 6
+            seed: 2026082807
+          - level: 8
+            partition: 7
+            seed: 2026082808
+          - level: 9
+            partition: 8
+            seed: 2026082809
+          - level: 10
+            partition: 9
+            seed: 2026082810
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Generate brutal level ${{ matrix.level }}
+        run: |
+          mkdir -p /tmp/masochist
+          python tools/generate_mozkomor_masochist_playtest.py \
+            --level '${{ matrix.level }}' \
+            --seed '${{ matrix.seed }}' \
+            --partition-index '${{ matrix.partition }}' \
+            --partition-count 10 \
+            --output '/tmp/masochist/level-${{ matrix.level }}.json'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mozkomor-masochist-level-${{ matrix.level }}
+          path: /tmp/masochist/
+          retention-days: 14
+          if-no-files-found: error
+
+  assemble:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: mozkomor-masochist-level-*
+          path: /tmp/masochist-levels
+          merge-multiple: true
+
+      - name: Assemble, compare and audit the 10-level set
+        run: |
+          python - <<'PY'
+          import json, statistics, sys
+          from collections import Counter
+          from pathlib import Path
+
+          sys.path.insert(0,'tools')
+          from validate_gen4_release import canonical_hash
+
+          root=Path('.')
+          files=sorted(Path('/tmp/masochist-levels').glob('level-*.json'))
+          if len(files)!=10:
+              raise SystemExit(f'Expected 10 generated level files, got {len(files)}: {files}')
+
+          payloads=[json.loads(p.read_text(encoding='utf-8')) for p in files]
+          puzzles=[x['puzzle'] for x in payloads]
+          puzzles.sort(key=lambda p:int((p.get('meta') or {}).get('level') or 0))
+
+          assert [int(p['meta']['level']) for p in puzzles]==list(range(1,11))
+          assert len({p['id'] for p in puzzles})==10
+          assert all(p.get('difficulty')=='mozkomor' for p in puzzles)
+          assert all(p['meta'].get('verifiedUnique') is True for p in puzzles)
+          assert all(p['meta'].get('wideVerifiedUnique') is True for p in puzzles)
+          assert all(p['meta'].get('masochistPlaytest') is True for p in puzzles)
+
+          prod=json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          current=list((prod.get('free') or {}).get('mozkomor') or [])
+          hardcore=list((prod.get('free') or {}).get('hardcore') or [])
+          assert len(current)==100
+          assert len(hardcore)==200
+
+          old=[
+              p for bank in (prod.get('free') or {}).values()
+              for p in (bank or [])
+          ]+list(prod.get('daily') or [])+list(prod.get('rescue') or [])
+          old_hashes={canonical_hash(p) for p in old}
+          new_hashes=[canonical_hash(p) for p in puzzles]
+          assert len(set(new_hashes))==10
+          assert not (set(new_hashes)&old_hashes)
+
+          tiers=json.loads(Path('data/answer_tiers.json').read_text(encoding='utf-8')).get('tiers') or {}
+          tier_of={str(w).casefold():tier for tier,words in tiers.items() for w in words}
+          targets=[]
+          tier_counts=Counter()
+          for p in puzzles:
+              for a in p.get('answers') or []:
+                  word=str(a.get('word') or '').casefold()
+                  if word in targets:
+                      raise AssertionError(f'Repeated target across playtest set: {word}')
+                  targets.append(word)
+                  tier=tier_of.get(word)
+                  assert tier in {'A','B','C'}, f'Unreviewed or Tier-D target: {word} ({tier})'
+                  tier_counts[tier]+=1
+
+          def vals(bank,key):
+              return [float((p.get('meta') or {}).get(key) or 0) for p in bank]
+          def median(v):
+              return round(float(statistics.median(v)),3)
+          def pct(v,p):
+              s=sorted(v)
+              return round(float(s[round((len(s)-1)*p)]),3)
+
+          amb=vals(puzzles,'localAmbiguityScore')
+          turns=vals(puzzles,'meanTurns')
+          cells=[len(p.get('mask') or []) for p in puzzles]
+          lengths=[len(str(a.get('word') or '')) for p in puzzles for a in p.get('answers') or []]
+          current_amb=vals(current,'localAmbiguityScore')
+          current_turns=vals(current,'meanTurns')
+          current_cells=[len(p.get('mask') or []) for p in current]
+          hc_amb=vals(hardcore,'localAmbiguityScore')
+          hc_turns=vals(hardcore,'meanTurns')
+          hc_cells=[len(p.get('mask') or []) for p in hardcore]
+
+          assert min(amb)>=28.0
+          assert median(amb)>=28.0
+          assert min(turns)>=5.2
+          assert median(turns)>=5.2
+          assert min(cells)>=78
+          assert median(cells)>=78
+          assert min(lengths)>=6
+          assert statistics.mean(lengths)>=7.45
+          assert tier_counts.get('D',0)==0
+
+          # The experiment must clearly sit above the current Mozkomor bank,
+          # not merely equal its upper tail.
+          assert median(amb)>median(current_amb)
+          assert median(turns)>median(current_turns)
+          assert median(cells)>median(current_cells)
+
+          rows=[]
+          for p in puzzles:
+              lens=[len(str(a.get('word') or '')) for a in p.get('answers') or []]
+              rows.append({
+                  'level':int(p['meta']['level']),
+                  'id':p['id'],
+                  'brutalityScore':p['meta']['brutalityScore'],
+                  'ambiguity':p['meta']['localAmbiguityScore'],
+                  'meanTurns':p['meta']['meanTurns'],
+                  'activeCells':len(p['mask']),
+                  'curlPathCount':p['meta'].get('curlPathCount'),
+                  'maxCurlRun':p['meta'].get('maxCurlRun'),
+                  'minWordLength':min(lens),
+                  'avgWordLength':round(statistics.mean(lens),2),
+                  'words':[a['word'].lower() for a in p['answers']],
+              })
+
+          audit={
+              'version':1,
+              'kind':'mozkomor-masochist-playtest',
+              'purpose':'10-level hardcore calibration; NOT FOR PRODUCTION',
+              'count':10,
+              'profile':payloads[0]['profile'],
+              'tierCounts':dict(sorted(tier_counts.items())),
+              'wordLength':{
+                  'min':min(lengths),
+                  'median':median(lengths),
+                  'mean':round(statistics.mean(lengths),3),
+                  'max':max(lengths),
+              },
+              'ambiguity':{
+                  'min':round(min(amb),3),
+                  'median':median(amb),
+                  'p90':pct(amb,.9),
+                  'max':round(max(amb),3),
+              },
+              'meanTurns':{
+                  'min':round(min(turns),3),
+                  'median':median(turns),
+                  'p90':pct(turns,.9),
+                  'max':round(max(turns),3),
+              },
+              'activeCells':{
+                  'min':min(cells),
+                  'median':median(cells),
+                  'max':max(cells),
+              },
+              'comparison':{
+                  'mozkozrout':{
+                      'ambiguityMedian':median(hc_amb),
+                      'meanTurnsMedian':median(hc_turns),
+                      'activeCellsMedian':median(hc_cells),
+                  },
+                  'currentMozkomor':{
+                      'ambiguityMedian':median(current_amb),
+                      'meanTurnsMedian':median(current_turns),
+                      'activeCellsMedian':median(current_cells),
+                  },
+                  'masochist10':{
+                      'ambiguityMedian':median(amb),
+                      'meanTurnsMedian':median(turns),
+                      'activeCellsMedian':median(cells),
+                  },
+              },
+              'levels':rows,
+          }
+
+          Path('data/mozkomor_masochist_playtest.json').write_text(
+              json.dumps({'audit':audit,'puzzles':puzzles},ensure_ascii=False,indent=2)+'\n',
+              encoding='utf-8',
+          )
+          Path('public/mozkomor-masochist-playtest.json').write_text(
+              json.dumps({'audit':audit,'puzzles':puzzles},ensure_ascii=False,separators=(',',':'))+'\n',
+              encoding='utf-8',
+          )
+
+          preview=json.loads(Path('public/puzzles.json').read_text(encoding='utf-8'))
+          preview.setdefault('free',{})['mozkomor']=puzzles
+          preview['mozkomorPlaytest']={
+              'kind':'masochist-10',
+              'count':10,
+              'xpEnabled':False,
+              'productionCandidate':False,
+          }
+          Path('public/puzzles-masochist.json').write_text(
+              json.dumps(preview,ensure_ascii=False,separators=(',',':'))+'\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(audit,ensure_ascii=False,indent=2))
+          PY
+
+      - name: Verify playtest runtime assets
+        run: |
+          node --check public/app.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('public/puzzles-masochist.json').read_text(encoding='utf-8'))
+          assert len(p['free']['mozkomor'])==10
+          assert p['mozkomorPlaytest']['xpEnabled'] is False
+          assert all(x['meta']['masochistPlaytest'] is True for x in p['free']['mozkomor'])
+          print('Mozkomor masochist runtime bundle: OK')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mozkomor-masochist-playtest-complete
+          path: |
+            data/mozkomor_masochist_playtest.json
+            public/mozkomor-masochist-playtest.json
+            public/puzzles-masochist.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Commit playtest bank back to branch
+        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'agent/v40129-mozkomor-masochist-playtest' }}
+        run: |
+          git config user.name "proplet-playtest-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/mozkomor_masochist_playtest.json public/mozkomor-masochist-playtest.json public/puzzles-masochist.json
+          if git diff --cached --quiet; then
+            echo "Masochist playtest bank is already current."
+            exit 0
+          fi
+          git commit -m "[mozkomor-masochist] Bind 10 hardcore playtest levels"
+          git push origin "HEAD:${{ github.head_ref }}"
