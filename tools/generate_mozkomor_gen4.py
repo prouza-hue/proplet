@@ -27,6 +27,7 @@ PUZZLES_PATH = ROOT / "data" / "puzzles.json"
 PROFILE_NAME = "mozkomor-core"
 SEED = 2026082701
 TARGET_COOLDOWN = 12  # Same spacing discipline as late Gen4 Hard/Mozkozrout.
+# v4.01.29 bank is deterministic; reruns with this seed must reproduce the same 100 boards.
 
 MOZKOMOR_POLICY = {
     "allowed": ("A", "B", "C", "D"),
