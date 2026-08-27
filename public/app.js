@@ -184,6 +184,7 @@ const $$=s=>[...document.querySelectorAll(s)];
 let puzzleDB=null;
 let GEN4_CANDIDATE_PREVIEW=false;
 let currentScreen='daily';
+let runtimeUpdateRequired=false;
 let currentGame=null;
 let timerId=null;
 let leaderTab='daily';
@@ -430,6 +431,7 @@ function applyScreen(screen){
 }
 function nav(screen,{replace=false,fromPop=false}={}){
  screen=ROUTE_SCREENS.has(screen)?screen:'daily';
+ if(runtimeUpdateRequired&&screen!=='game'){recoverRuntimeUpdate();return}
  if(!fromPop&&screen!==currentScreen){const state={proplet:true,screen};if(replace)history.replaceState(state,'',location.href);else history.pushState(state,'',location.href)}
  applyScreen(screen);
 }
@@ -591,6 +593,7 @@ async function sendAttemptCheckpoint(eventType){
  try{await api('/api/attempt/checkpoint',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,event_type:eventType,elapsed_ms:Math.max(0,Math.round(gameElapsed(g))),found_words:foundWords})})}catch{}
 }
 function startGame(puzzle,mode,dailyDate,options={}){
+ if(runtimeUpdateRequired){showToast('Nejdřív dokončím aktualizaci Propletu…');recoverRuntimeUpdate();return}
  stopTimer();hideGameUndo();
  // Když hráč otevře Free hru z rychlé nabídky na Daily, vytvoř v historii mezikrok Free menu.
  // Android/PWA tlačítko Zpět pak vrátí hra → výběr her, ne rovnou na Daily.
@@ -834,14 +837,14 @@ function queueResult(rec){
  const q=getQueue();if(rec.mode==='daily'){const i=q.findIndex(x=>x.challengeKey===rec.challengeKey);if(i<0)q.push(rec);else if(q[i].puzzleId!==rec.puzzleId)q[i]=rec}else{const id=rec.attemptId||`${rec.challengeKey}:${rec.completedAt}`;if(!q.some(x=>(x.attemptId||`${x.challengeKey}:${x.completedAt}`)===id))q.push(rec)}saveQueue(q);renderDaily();
 }
 async function api(path,opts={}){
- const p=getProfile(),headers={'Content-Type':'application/json',...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
+ const p=getProfile(),headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);let r;
  try{r=await fetch(path,{...opts,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}
  clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;throw new Error(msg)}return r.json();
 }
 function trackProductEvent(eventType){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)return;api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}
 function trackInboundCampaign(){
- try{const u=new URL(location.href),via=u.searchParams.get('via'),event={"push-daily":"push_daily_opened","push-weekly":"push_weekly_opened","push-content":"push_content_opened"}[via];if(!event)return;trackProductEvent(event);u.searchParams.delete('via');history.replaceState(history.state,'',`${u.pathname}${u.search}${u.hash}`)}catch{}
+ try{const u=new URL(location.href),via=u.searchParams.get('via'),event={"push-daily":"push_daily_opened","push-weekly":"push_weekly_opened","push-content":"push_content_opened","push-return":"push_return_opened"}[via];if(!event)return;trackProductEvent(event);u.searchParams.delete('via');history.replaceState(history.state,'',`${u.pathname}${u.search}${u.hash}`)}catch{}
 }
 function trackAppSession(){
  try{if(sessionStorage.getItem(ANALYTICS_SESSION_KEY)==='1')return;sessionStorage.setItem(ANALYTICS_SESSION_KEY,'1')}catch{}
@@ -1214,9 +1217,11 @@ function showUpdateBanner(worker,message='✨ Je připravená nová verze Prople
  const banner=$('#updateBanner'),label=banner?.querySelector('span'),button=$('#applyUpdateBtn');
  if(label)label.textContent=message;if(button){button.disabled=false;button.textContent=action}banner?.classList.remove('hidden');
 }
-async function recoverRuntimeUpdate(){
+async function recoverRuntimeUpdate({automatic=false,targetVersion=''}={}){
  if(runtimeRecoveryBusy)return;runtimeRecoveryBusy=true;
  const button=$('#applyUpdateBtn');if(button){button.disabled=true;button.textContent='Aktualizuji…'}
+ const automaticKey=targetVersion?`proplet-auto-update-${targetVersion}`:'';
+ if(automatic&&automaticKey){try{if(sessionStorage.getItem(automaticKey)==='1'){runtimeRecoveryBusy=false;if(button){button.disabled=false;button.textContent='Aktualizovat'}return}sessionStorage.setItem(automaticKey,'1')}catch{}}
  trackProductEvent('pwa_update_applied');
  try{
   const keys=await caches.keys();
@@ -1248,9 +1253,10 @@ async function probeCanonicalRelease(force=false){
    return;
   }
   if(canonicalVersion!==APP_VERSION){
+   runtimeUpdateRequired=true;
    showUpdateBanner(pendingSW);
    try{const key=`proplet-update-detected-${canonicalVersion}`;if(sessionStorage.getItem(key)!=='1'){sessionStorage.setItem(key,'1');trackProductEvent('pwa_update_detected')}}catch{}
-   if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>recoverRuntimeUpdate(),1200);
+   if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>recoverRuntimeUpdate({automatic:true,targetVersion:canonicalVersion}),1200);
   }
  }catch{}finally{releaseProbeBusy=false}
 }
@@ -1264,7 +1270,7 @@ function registerServiceWorker(){
   document.addEventListener('visibilitychange',checkWhenVisible);
   window.addEventListener('pageshow',()=>{probeCanonicalRelease(true);checkForUpdate()});
   window.addEventListener('online',()=>{probeCanonicalRelease(true);checkForUpdate()});
-  setInterval(checkForUpdate,15*60*1000);
+  setInterval(checkForUpdate,5*60*1000);
  }).catch(()=>{});
  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloadOnServiceWorkerChange||reloading)return;reloading=true;location.reload()});
 }
