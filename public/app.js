@@ -659,8 +659,9 @@ function touchMagnifierDeviceSupported(){
 function touchMagnifierAvailable(g=currentGame){return !!g&&!g.finished&&['hard','hardcore'].includes(g.puzzle?.difficulty)&&touchMagnifierDeviceSupported()}
 function touchMagnifierEnabled(g=currentGame){return touchMagnifierAvailable(g)&&getSettings().magnifier!==false}
 function renderMagnifierControls(){
- const s=getSettings(),available=touchMagnifierAvailable(),btn=$('#magnifierQuickBtn');
+ const s=getSettings(),available=touchMagnifierAvailable(),btn=$('#magnifierQuickBtn'),actions=btn?.closest('.game-actions');
  if(btn){btn.classList.toggle('hidden',!available);btn.classList.toggle('on',s.magnifier);btn.setAttribute('aria-pressed',s.magnifier?'true':'false');btn.setAttribute('aria-label',s.magnifier?'Vypnout lupu při tahu':'Zapnout lupu při tahu');btn.title=s.magnifier?'Lupa při tahu zapnutá':'Lupa při tahu vypnutá'}
+ actions?.classList.toggle('magnifier-control-visible',available);
 }
 function setMagnifierPreference(enabled,{announce=true}={}){
  const s=getSettings();s.magnifier=!!enabled;saveSettings(s);if(!s.magnifier)hideTouchMagnifier();renderMagnifierControls();renderSettings();if(announce)showToast(s.magnifier?'Lupa při tahu zapnutá 🔍':'Lupa při tahu vypnutá');
