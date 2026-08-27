@@ -169,6 +169,19 @@ def install_push_diagnostics(
                 housekeeping = None
         return snapshot, housekeeping
 
+    def return_player_ids() -> set[str]:
+        if not callable(db_rpc):
+            return set()
+        try:
+            rows = db_rpc("proplet_push_return_cohort", {
+                "p_inactive_days": 3,
+                "p_min_activation_age_days": 7,
+            }) or []
+            return {str(row.get("player_id")) for row in rows if row.get("player_id")}
+        except HTTPException as exc:
+            log.warning("Return push cohort unavailable: %s", exc.detail)
+            return set()
+
     @app.get("/api/cron/daily-push-v2")
     def cron_daily_push_v2(request: Request, authorization: Optional[str] = Header(default=None)):
         if not cron_secret or authorization != f"Bearer {cron_secret}":
@@ -203,6 +216,7 @@ def install_push_diagnostics(
         except HTTPException:
             pass
         subscriptions = db_select("push_subscriptions")
+        return_players = return_player_ids() if not batch else set()
         if batch:
             payload = {
                 "title": "✨ Pondělní balíček je venku",
@@ -221,7 +235,7 @@ def install_push_diagnostics(
             }
             event_key = f"daily:{today}"
             category = "daily"
-        opted_in = already_completed = eligible = 0
+        opted_in = already_completed = eligible = retention_targeted = 0
         counts = {"sent": 0, "failed": 0, "removed": 0, "duplicate": 0}
         for sub in subscriptions:
             enabled = bool(sub.get("daily_enabled", True) or (batch and sub.get("content_enabled", False)))
@@ -233,13 +247,24 @@ def install_push_diagnostics(
                 already_completed += 1
                 continue
             eligible += 1
-            outcome = send_one(sub, payload, event_key=event_key, category=category, ttl=86400 if batch else 43200)
+            target_payload, target_category = payload, category
+            if not batch and str(sub.get("player_id") or "") in return_players:
+                target_payload = {
+                    "title": "🧩 Proplet na tebe čeká",
+                    "body": "Dnešní výzva i nové desky jsou připravené. Navážeš tam, kde jsi skončil?",
+                    "url": f"{canonical_origin}/?open=daily&via=push-return",
+                    "tag": f"proplet-daily-{today}",
+                }
+                target_category = "return"
+                retention_targeted += 1
+            outcome = send_one(sub, target_payload, event_key=event_key, category=target_category, ttl=86400 if batch else 43200)
             counts[outcome] = counts.get(outcome, 0) + 1
         return {
             "ok": counts["failed"] == 0,
             "date": today,
             "eventKey": event_key,
             "category": category,
+            "retentionTargeted": retention_targeted,
             "batch": batch.get("id") if batch else None,
             "subscriptions": len(subscriptions),
             "optedIn": opted_in,
@@ -320,11 +345,14 @@ def install_push_diagnostics(
 
         daily_groups = {}
         for row in logs:
-            if row.get("category") != "daily":
+            category = str(row.get("category") or "")
+            if category not in {"daily", "return"}:
                 continue
             key = str(row.get("event_key") or "")
-            group = daily_groups.setdefault(key, {"eventKey": key, "eligible": 0, "sent": 0, "opened": 0, "failed": 0, "removed": 0, "pending": 0, "firstAt": row.get("created_at"), "lastAt": row.get("created_at")})
+            group = daily_groups.setdefault(key, {"eventKey": key, "eligible": 0, "sent": 0, "opened": 0, "failed": 0, "removed": 0, "pending": 0, "returnTargeted": 0, "firstAt": row.get("created_at"), "lastAt": row.get("created_at")})
             group["eligible"] += 1
+            if category == "return":
+                group["returnTargeted"] += 1
             status = str(row.get("status") or "pending")
             group[status] = group.get(status, 0) + 1
             if row.get("opened_at"):

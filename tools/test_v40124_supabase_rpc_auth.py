@@ -18,10 +18,10 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 service_worker = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.25"' in version
-assert "version:'4.01.25'" in runtime
+assert 'APP_VERSION = "4.01.26"' in version
+assert "version:'4.01.26'" in runtime
 assert "supabaseRpcAuthRetryV40124:true" in runtime
-assert "proplet-v4.01.25-shell" in service_worker
+assert "proplet-v4.01.26-shell" in service_worker
 
 
 with patch.object(server, "SUPABASE_SECRET_KEY", "sb_secret_opaque"):
@@ -60,4 +60,4 @@ pooled_post.assert_called_once()
 fresh_client.assert_called_once_with(timeout=12.0)
 assert retry_client.post.call_args.kwargs["headers"]["Connection"] == "close"
 
-print("PASS: v4.01.25 retries one transient Supabase RPC 401 without weakening rate limits.")
+print("PASS: current release retries one transient Supabase RPC 401 without weakening rate limits.")

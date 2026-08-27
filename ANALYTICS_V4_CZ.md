@@ -67,7 +67,8 @@ Report porovnává včerejšek s předchozím dnem a s klouzavým 7denním prům
 - Level share: `level_share_clicked` → `level_share_created` → `shared_level_opened` → `shared_level_started` → `shared_level_completed` → volitelně `shared_level_beaten`.
 - Vždy se reportují unikátní aktéři a vedle nich absolutní počet doručení. `*_cancelled` a `*_failed` jsou diagnostické větve, ne konverze.
 - Retenční čtení pushů sleduje tři kroky: doručeno → otevřeno → hráč dokončil Daily nebo Volnou hru ve stejný či následující pražský kalendářní den. Při jmenovateli pod 10 se zobrazí jen absolutní čísla.
-- `product_events.app_version` popisuje server/deployment, který událost přijal. Pro rozpoznání klientů připoutaných ke starým neměnným deploymentům se proto kombinuje s Vercel runtime logy; samotný údaj nelze vydávat za verzi JavaScriptu bez této kontroly.
+- Do v4.01.25 `product_events.app_version` a `puzzle_attempts.app_version` popisují server/deployment, který zápis přijal. Od v4.01.26 klient posílá `X-Proplet-Version` a tato pole měří skutečnou verzi JavaScriptu; starší klient bez hlavičky se ukládá jako `legacy-unknown`. Historická a nová data se proto nesmí míchat do jedné distribuce klientů.
+- Cílený návratový push se pozná podle `push_delivery_log.category=return` a klientského `push_return_opened`. Nahrazuje běžnou Daily zprávu pro způsobilého hráče; nikdy se neposílají dvě notifikace v jeden den.
 
 ## Náklady a škálování
 
