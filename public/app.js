@@ -327,6 +327,7 @@ function localFreeSlotState(diff){
  return {actual,legacy:prior,prior,effective,transferred};
 }
 function reconcileLocalGen4Rewards(){
+ if(MOZKOMOR_MASOCHIST_PREVIEW)return {repairedXp:0,returnBonusXp:0};
  const state=getState(),rows=Object.values(state.completed||{}),activeGeneration=Number(puzzleDB?.freeGeneration)||1;
  if(activeGeneration<4)return {repairedXp:0,returnBonusXp:0};
  let priorGenerationPlayed=false;const current=[];
@@ -1616,8 +1617,15 @@ async function loadPuzzleDatabase(){
  let url='/puzzles.json';
  GEN4_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
  if(MOZKOMOR_MASOCHIST_PREVIEW){
-  const r=await fetch('/puzzles-masochist.json',{cache:'no-store'});if(!r.ok)throw new Error('mozkomor-masochist-db');
-  const data=await r.json();if(!compatiblePuzzleDatabase(data)||data?.mozkomorPlaytest?.kind!=='masochist-10'||(data?.free?.mozkomor||[]).length!==10)throw new Error('mozkomor-masochist-db-version');
+  const [baseResponse,playtestResponse]=await Promise.all([
+   fetch('/puzzles.json',{cache:'no-store'}),
+   fetch('/mozkomor-masochist-playtest.json',{cache:'no-store'})
+  ]);
+  if(!baseResponse.ok||!playtestResponse.ok)throw new Error('mozkomor-masochist-db');
+  const data=await baseResponse.json(),playtest=await playtestResponse.json(),bank=playtest?.puzzles||[];
+  if(!compatiblePuzzleDatabase(data)||playtest?.audit?.kind!=='mozkomor-masochist-playtest'||bank.length!==10)throw new Error('mozkomor-masochist-db-version');
+  data.free={...(data.free||{}),mozkomor:bank};
+  data.mozkomorPlaytest={kind:'masochist-10',count:10,xpEnabled:false,productionCandidate:false};
   return data;
  }
  if(GEN4_CANDIDATE_PREVIEW)url='/api/puzzle-database';
