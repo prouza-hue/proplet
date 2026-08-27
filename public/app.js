@@ -675,7 +675,9 @@ function renderTouchMagnifier(centerIndex){
  grid.innerHTML=cells.join('');
 }
 function showTouchMagnifier(centerIndex){
- if(!touchMagnifierEnabled()){hideTouchMagnifier();return}const el=ensureTouchMagnifier();renderTouchMagnifier(centerIndex);el.classList.remove('hidden');
+ if(!touchMagnifierEnabled()){hideTouchMagnifier();return}
+ const el=ensureTouchMagnifier(),board=$('#board'),boardTop=board?.getBoundingClientRect?.().top??220,magHeight=144,gap=12,top=Math.max(8,Math.floor(boardTop-magHeight-gap));
+ el.style.setProperty('--magnifier-top',`${top}px`);renderTouchMagnifier(centerIndex);el.classList.remove('hidden');
 }
 function hideTouchMagnifier(){const el=$('#touchMagnifier');el?.classList.add('hidden')}
 function pointerDown(e){e.preventDefault();ensureAudio();const g=currentGame,i=+e.currentTarget.dataset.index;if(!g||g.finished||g.used.has(i)||g.wrongPath?.length)return;if(g.undoSnapshot)hideGameUndo();g.dragging=true;g.path=[i];g.lastPointer={x:e.clientX,y:e.clientY};fx('tap');updateActive();showTouchMagnifier(i);try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}
