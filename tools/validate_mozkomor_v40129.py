@@ -75,6 +75,7 @@ def main()->None:
     tier_counts=Counter()
     lengths=[]
     answer_turns=[]
+    candidate_rows=[]
     for p in bank:
         meta=p.get("meta") or {}
         assert meta.get("generationProfile")=="mozkomor-core"
@@ -84,12 +85,50 @@ def main()->None:
         assert 10<=len(p.get("answers") or [])<=11
         assert 18.0<=float(meta.get("localAmbiguityScore") or 0)<=60.0
         assert 3.8<=float(meta.get("meanTurns") or 0)<=5.3
+        puzzle_words=[]
+        puzzle_tiers=[]
+        puzzle_turns=[]
         for a in p.get("answers") or []:
             word=str(a.get("word") or "").casefold()
             assert word in tier_of, f"Target missing from reviewed tiers: {word}"
-            tier_counts[tier_of[word]]+=1
+            tier=tier_of[word]
+            tier_counts[tier]+=1
             lengths.append(len(word))
             answer_turns.append(int(a.get("turns") or 0))
+            puzzle_words.append(word)
+            puzzle_tiers.append(tier)
+            puzzle_turns.append(int(a.get("turns") or 0))
+        min_len=min(map(len,puzzle_words))
+        avg_len=sum(map(len,puzzle_words))/len(puzzle_words)
+        ambiguity=float(meta.get("localAmbiguityScore") or 0)
+        mean_turns=float(meta.get("meanTurns") or 0)
+        cells=len(p.get("mask") or [])
+        curl_paths=int(meta.get("curlPathCount") or 0)
+        max_curl=int(meta.get("maxCurlRun") or 0)
+        short_anchors=sum(1 for w in puzzle_words if len(w)<=5)
+        brutality=(
+            ambiguity*1.25
+            + mean_turns*8.0
+            + cells*0.35
+            + avg_len*2.2
+            + curl_paths*1.1
+            + max_curl*1.8
+            - short_anchors*4.5
+        )
+        candidate_rows.append({
+            "id":p["id"],
+            "level":int(meta["level"]),
+            "score":round(brutality,3),
+            "ambiguity":round(ambiguity,3),
+            "meanTurns":round(mean_turns,3),
+            "activeCells":cells,
+            "minWordLength":min_len,
+            "avgWordLength":round(avg_len,3),
+            "curlPathCount":curl_paths,
+            "maxCurlRun":max_curl,
+            "tierDTargets":puzzle_tiers.count("D"),
+            "words":puzzle_words,
+        })
     assert min(lengths)>=5
     assert max(lengths)<=11
     total=sum(tier_counts.values())
@@ -107,6 +146,18 @@ def main()->None:
     assert median(mz_turns)>median(hc_turns)
     assert median(mz_cells)>median(hc_cells)
 
+    # Hardcore playtest: first try the genuinely hardest, clean-vocabulary tail
+    # of the committed bank before deciding to throw away/regenerate all 100 boards.
+    clean=[r for r in candidate_rows if r["tierDTargets"]==0 and r["minWordLength"]>=6]
+    if len(clean)<10:
+        clean=[r for r in candidate_rows if r["tierDTargets"]==0]
+    brutal10=sorted(clean,key=lambda r:(r["score"],r["ambiguity"],r["meanTurns"]),reverse=True)[:10]
+    assert len(brutal10)==10
+    brutal_amb=[r["ambiguity"] for r in brutal10]
+    brutal_turns=[r["meanTurns"] for r in brutal10]
+    brutal_cells=[r["activeCells"] for r in brutal10]
+    assert all(r["tierDTargets"]==0 for r in brutal10)
+
     audit={
         "version":2,
         "kind":"mozkomor-v40129-committed-bank-audit",
@@ -121,6 +172,14 @@ def main()->None:
         "ambiguity":{"min":min(mz_amb),"median":round(median(mz_amb),3),"p90":pct(mz_amb,.9),"max":max(mz_amb)},
         "meanTurns":{"min":min(mz_turns),"median":round(median(mz_turns),3),"p90":pct(mz_turns,.9),"max":max(mz_turns)},
         "activeCells":{"min":min(mz_cells),"median":round(median(mz_cells),3),"max":max(mz_cells)},
+        "brutal10Playtest":{
+            "selectionRule":"top composite brutality; zero Tier D; prefer min target length >= 6",
+            "count":10,
+            "ambiguityMedian":round(median(brutal_amb),3),
+            "meanTurnsMedian":round(median(brutal_turns),3),
+            "activeCellsMedian":round(median(brutal_cells),3),
+            "levels":brutal10,
+        },
         "comparisonToMozkozrout":{
             "mozkozroutAmbiguityMedian":round(median(hc_amb),3),
             "mozkomorAmbiguityMedian":round(median(mz_amb),3),
