@@ -36,7 +36,7 @@ create table if not exists public.results (
     player_id uuid not null references public.players(id) on delete cascade,
     puzzle_id text not null,
     challenge_key text not null,
-    mode text not null check (mode in ('daily','free','starter')),
+    mode text not null check (mode in ('daily','free','starter','tajenka')),
     difficulty text not null,
     daily_date date,
     best_elapsed_ms integer not null check (best_elapsed_ms >= 1000),

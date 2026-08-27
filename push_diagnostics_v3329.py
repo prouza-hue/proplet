@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -48,6 +48,8 @@ def install_push_diagnostics(
     vapid_subject = os.environ.get("VAPID_SUBJECT", "https://hrajproplet.cz").strip()
     cron_secret = os.environ.get("CRON_SECRET", "").strip()
     vercel_env = os.environ.get("VERCEL_ENV", "").strip().lower()
+    tajenka_release_enabled = vercel_env == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "").strip().lower() in {"1", "true", "yes"}
+    tajenka_first_saturday = date(2026, 8, 29)
     canonical_origin = str(_kwargs.get("canonical_origin") or "https://hrajproplet.cz").rstrip("/")
 
     def now():
@@ -193,7 +195,11 @@ def install_push_diagnostics(
             return {"ok": False, "sent": 0, "message": "VAPID není nakonfigurovaný", "qualitySnapshot": snapshot, "housekeeping": housekeeping}
 
         today = today_iso()
-        today_date = now().date()
+        today_date = date.fromisoformat(today)
+        tajenka_week = None
+        if tajenka_release_enabled and today_date >= tajenka_first_saturday and today_date.weekday() == 5:
+            tajenka_week = ((today_date - tajenka_first_saturday).days // 7) % 10 + 1
+        tajenka_id = f"tajenka-week-{tajenka_week:02d}" if tajenka_week else None
         batch = None
         if callable(released_batches):
             try:
@@ -204,19 +210,26 @@ def install_push_diagnostics(
             except Exception as exc:
                 log.warning("Unified weekly push lookup failed: %s", exc)
 
-        completed = {f"p:{row.get('player_id')}" for row in db_select("results", mode="daily", daily_date=today) if row.get("player_id")}
-        try:
-            for row in db_select("puzzle_attempts", mode="daily", challenge_key=f"daily:{today}"):
-                if not row.get("completed_at"):
-                    continue
-                if row.get("player_id"):
-                    completed.add(f"p:{row['player_id']}")
-                elif row.get("anonymous_id"):
-                    completed.add(f"a:{row['anonymous_id']}")
-        except HTTPException:
-            pass
+        if tajenka_id and not batch:
+            completed = {
+                f"p:{row.get('player_id')}"
+                for row in db_select("results", mode="tajenka", challenge_key=f"tajenka:{tajenka_id}")
+                if row.get("player_id")
+            }
+        else:
+            completed = {f"p:{row.get('player_id')}" for row in db_select("results", mode="daily", daily_date=today) if row.get("player_id")}
+            try:
+                for row in db_select("puzzle_attempts", mode="daily", challenge_key=f"daily:{today}"):
+                    if not row.get("completed_at"):
+                        continue
+                    if row.get("player_id"):
+                        completed.add(f"p:{row['player_id']}")
+                    elif row.get("anonymous_id"):
+                        completed.add(f"a:{row['anonymous_id']}")
+            except HTTPException:
+                pass
         subscriptions = db_select("push_subscriptions")
-        return_players = return_player_ids() if not batch else set()
+        return_players = return_player_ids() if not batch and not tajenka_id else set()
         if batch:
             payload = {
                 "title": "✨ Pondělní balíček je venku",
@@ -226,6 +239,15 @@ def install_push_diagnostics(
             }
             event_key = f"content:{batch.get('id')}"
             category = "content"
+        elif tajenka_id:
+            payload = {
+                "title": "✨ Víkendová Tajenka je tady",
+                "body": "Pět slov, jedna myšlenka a 200 XP. Odhalíš ji?",
+                "url": f"{canonical_origin}/?open=tajenka&via=push-tajenka",
+                "tag": f"proplet-{tajenka_id}",
+            }
+            event_key = f"tajenka:{tajenka_id}"
+            category = "tajenka"
         else:
             payload = {
                 "title": "☀️ Dnešní Proplet čeká",
@@ -238,7 +260,8 @@ def install_push_diagnostics(
         opted_in = already_completed = eligible = retention_targeted = 0
         counts = {"sent": 0, "failed": 0, "removed": 0, "duplicate": 0}
         for sub in subscriptions:
-            enabled = bool(sub.get("daily_enabled", True) or (batch and sub.get("content_enabled", False)))
+            content_message = bool(batch or tajenka_id)
+            enabled = bool(sub.get("daily_enabled", True) or (content_message and sub.get("content_enabled", False)))
             if not enabled:
                 continue
             opted_in += 1
@@ -248,7 +271,7 @@ def install_push_diagnostics(
                 continue
             eligible += 1
             target_payload, target_category = payload, category
-            if not batch and str(sub.get("player_id") or "") in return_players:
+            if not batch and not tajenka_id and str(sub.get("player_id") or "") in return_players:
                 target_payload = {
                     "title": "🧩 Proplet na tebe čeká",
                     "body": "Dnešní výzva i nové desky jsou připravené. Navážeš tam, kde jsi skončil?",
@@ -257,7 +280,7 @@ def install_push_diagnostics(
                 }
                 target_category = "return"
                 retention_targeted += 1
-            outcome = send_one(sub, target_payload, event_key=event_key, category=target_category, ttl=86400 if batch else 43200)
+            outcome = send_one(sub, target_payload, event_key=event_key, category=target_category, ttl=86400 if (batch or tajenka_id) else 43200)
             counts[outcome] = counts.get(outcome, 0) + 1
         return {
             "ok": counts["failed"] == 0,
@@ -266,6 +289,7 @@ def install_push_diagnostics(
             "category": category,
             "retentionTargeted": retention_targeted,
             "batch": batch.get("id") if batch else None,
+            "tajenka": tajenka_id,
             "subscriptions": len(subscriptions),
             "optedIn": opted_in,
             "alreadyCompleted": already_completed,
