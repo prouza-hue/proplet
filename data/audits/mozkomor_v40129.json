@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "kind": "mozkomor-v40129-fastgen-audit",
+  "count": 100,
+  "generation": "4x25 deterministic vocabulary partitions",
+  "duplicateBoardHashesVsActiveGen4": 0,
+  "transitionCooldownViolations": 0,
+  "ambiguity": {
+    "min": 18.045,
+    "median": 24.1,
+    "p75": 27.159,
+    "p90": 29.4,
+    "max": 32.45
+  },
+  "meanTurns": {
+    "min": 4.0,
+    "median": 4.727,
+    "p90": 5.2,
+    "max": 5.3
+  },
+  "activeCells": {
+    "min": 72,
+    "max": 80
+  },
+  "targetWords": {
+    "min": 10,
+    "max": 11
+  },
+  "tierCountsFromAnswers": {
+    "?": 1037
+  },
+  "shardStats": [
+    {
+      "count": 25,
+      "seconds": 202.11,
+      "tierCounts": {
+        "D": 18,
+        "C": 119,
+        "B": 110,
+        "A": 15
+      },
+      "ambiguity": {
+        "min": 18.045,
+        "median": 24.545,
+        "p75": 26.477,
+        "p90": 29.325,
+        "max": 31.725
+      },
+      "meanTurns": {
+        "min": 4.091,
+        "median": 4.636,
+        "p90": 5.3,
+        "max": 5.3
+      },
+      "rejections": {
+        "cutout-components": 1540,
+        "isolated-cutouts": 310,
+        "ambiguity": 1
+      }
+    },
+    {
+      "count": 25,
+      "seconds": 260.28,
+      "tierCounts": {
+        "C": 115,
+        "D": 18,
+        "B": 107,
+        "A": 18
+      },
+      "ambiguity": {
+        "min": 18.545,
+        "median": 24.225,
+        "p75": 27.575,
+        "p90": 29.4,
+        "max": 30.55
+      },
+      "meanTurns": {
+        "min": 4.273,
+        "median": 4.727,
+        "p90": 5.2,
+        "max": 5.3
+      },
+      "rejections": {
+        "cutout-components": 1608,
+        "isolated-cutouts": 362
+      }
+    },
+    {
+      "count": 25,
+      "seconds": 190.87,
+      "tierCounts": {
+        "C": 116,
+        "D": 18,
+        "B": 104,
+        "A": 20
+      },
+      "ambiguity": {
+        "min": 19.886,
+        "median": 23.864,
+        "p75": 26.2,
+        "p90": 29.2,
+        "max": 30.35
+      },
+      "meanTurns": {
+        "min": 4.0,
+        "median": 4.818,
+        "p90": 5.2,
+        "max": 5.3
+      },
+      "rejections": {
+        "isolated-cutouts": 330,
+        "cutout-components": 1626
+      }
+    },
+    {
+      "count": 25,
+      "seconds": 322.25,
+      "tierCounts": {
+        "B": 106,
+        "D": 14,
+        "C": 120,
+        "A": 19
+      },
+      "ambiguity": {
+        "min": 19.25,
+        "median": 23.25,
+        "p75": 26.725,
+        "p90": 30.091,
+        "max": 32.45
+      },
+      "meanTurns": {
+        "min": 4.182,
+        "median": 4.8,
+        "p90": 5.1,
+        "max": 5.2
+      },
+      "rejections": {
+        "cutout-components": 2022,
+        "isolated-cutouts": 415,
+        "ambiguity": 3
+      }
+    }
+  ]
+}
