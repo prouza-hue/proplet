@@ -75,7 +75,7 @@ jobs:
             --partition-count 10 \
             --output '/tmp/masochist/level-${{ matrix.level }}.json'
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: mozkomor-masochist-level-${{ matrix.level }}
           path: /tmp/masochist/
@@ -97,7 +97,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           pattern: mozkomor-masochist-level-*
           path: /tmp/masochist-levels
@@ -297,7 +297,7 @@ jobs:
           print('Mozkomor masochist runtime bundle: OK')
           PY
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: mozkomor-masochist-playtest-complete
           path: |
