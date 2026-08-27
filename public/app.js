@@ -1611,17 +1611,27 @@ function showPuzzleBootLoading(){
  const dailyMeta=$('#dailyMeta');if(dailyMeta&&!dailyMeta.textContent)dailyMeta.textContent='Načítám dnešní výzvu…';
  const grid=$('#difficultyCards');if(grid&&!grid.children.length)grid.innerHTML='<div class="card" style="grid-column:1/-1;padding:24px"><strong>Načítám úrovně…</strong><p class="muted" style="margin:6px 0 0">Připravuju herní banku.</p></div>';
 }
+function prepareMozkomorMasochistDatabase(data){
+ if(!MOZKOMOR_MASOCHIST_PLAYTEST||!data)return data;
+ for(const p of data.free?.mozkomor||[]){
+  const level=Number(p.meta?.level)||0;
+  p.id=`mzpt-brutal-${String(level).padStart(2,'0')}`;
+  p.meta={...(p.meta||{}),masochistPlaytest:true,calibrationOnly:true};
+ }
+ data.mozkomorPlaytest={...(data.mozkomorPlaytest||{}),kind:'masochist-10',count:(data.free?.mozkomor||[]).length,xpEnabled:false,productionCandidate:false};
+ return data;
+}
 async function loadPuzzleDatabase(){
  let url=MOZKOMOR_MASOCHIST_PLAYTEST?'/puzzles-masochist.json':'/puzzles.json';
  GEN4_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
  if(GEN4_CANDIDATE_PREVIEW)url='/api/puzzle-database';
  if(GEN4_CANDIDATE_PREVIEW){
-  const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('gen4-preview-db');const data=await r.json();if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('gen4-preview-db-version');return data;
+  const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('gen4-preview-db');const data=prepareMozkomorMasochistDatabase(await r.json());if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('gen4-preview-db-version');return data;
  }
  if('caches' in window){
-  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
+  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=prepareMozkomorMasochistDatabase(await cached.clone().json());if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{fresh=prepareMozkomorMasochistDatabase(fresh);if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
  }
- const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
+ const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=prepareMozkomorMasochistDatabase(await r.json());if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
 }
 function mergeRollingContent(delta){
  if(!puzzleDB||![1,2].includes(Number(delta?.version||0)))return false;
