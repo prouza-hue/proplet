@@ -266,6 +266,40 @@
         60
       ],
       "ambiguityRole": "endgame-high-above-mozkozrout-floor-with-bounded-false-branches"
+    },
+    "mozkomor-brutal10-v1": {
+      "rows": 10,
+      "cols": 10,
+      "activeCells": [
+        80,
+        88
+      ],
+      "targetWords": [
+        9,
+        10
+      ],
+      "targetLength": [
+        6,
+        12
+      ],
+      "maxCurlPaths": 10,
+      "maxCurlRun": 6,
+      "meanTurns": [
+        5.2,
+        6.4
+      ],
+      "maxBlankComponents": 7,
+      "maxIsolatedBlanks": 1,
+      "vocabularyTiers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ambiguityRange": [
+        30,
+        70
+      ],
+      "ambiguityRole": "hardcore-playtest-extreme-above-mozkomor-tail"
     }
   },
   "freeMediumMix": {
@@ -325,5 +359,14 @@
     "designIntent": "Harder than Mozkožrout through geometry and ambiguity, not obscure vocabulary.",
     "targetCooldown": 12,
     "requiredLevels": 100
+  },
+  "mozkomorBrutal10Playtest": {
+    "label": "Mozkomor masochist v1",
+    "role": "experimental-calibration",
+    "count": 10,
+    "seed": 2026082801,
+    "noTierD": true,
+    "excludeCurrentMozkomorTargets": true,
+    "designIntent": "Approximate old Gen3 Mozkozrout brutality through geometry and false branches, without obscure targets."
   }
 }
