@@ -1,5 +1,6 @@
 (()=>{
   'use strict';
+  // v4.01.29 Mozkomor preview release candidate — final UI RC2
   const canonicalOrigin='https://hrajproplet.cz';
   const productionAliases=new Set([
     'www.hrajproplet.cz',
@@ -10,7 +11,7 @@
   const gen4CandidatePreview=location.hostname==='proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app';
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'4.01.28',
+    version:'4.01.29',
     canonicalOrigin,
     gen4CandidatePreview,
     capabilities:Object.freeze({
@@ -58,6 +59,7 @@
       targetedReturnPushV40126:true,
       mobileTouchMagnifierV40127:true,
       magnifierToggleV40128:true,
+      mozkomorEndgameV40129:true,
       copyDensityPolish:true,
       actionFirstOnboarding:true,
       contextualHelperDefault:true,

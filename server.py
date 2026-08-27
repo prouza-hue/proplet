@@ -70,7 +70,10 @@ BADGES = [
     {"days": 100, "icon": "🚀", "name": "Legenda"},
 ]
 
-POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
+FREE_DIFFICULTIES = ("easy", "medium", "hard", "hardcore", "mozkomor")
+ROLLING_DIFFICULTIES = ("easy", "medium", "hard", "hardcore")
+POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100, "mozkomor": 200}
+MOZKOMOR_UNLOCK_BASE_LEVELS = 200
 STARTER_XP = 10
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
@@ -846,7 +849,7 @@ def player_stats(player_id: str) -> dict:
     rows = db_select("results", player_id=player_id)
     gen4_rewards = reconcile_gen4_free_rewards(player_id, rows)
     daily_dates: list[str] = []
-    free_history = {k: 0 for k in ("easy", "medium", "hard", "hardcore")}
+    free_history = {k: 0 for k in FREE_DIFFICULTIES}
     daily_times: list[int] = []
     total_points = 0
     clean_solves = 0
@@ -907,6 +910,8 @@ def player_stats(player_id: str) -> dict:
         "freeCompleted": free_slots["effective"],
         "freeTransferred": free_slots["transferred"],
         "freePlayedCurrent": free_slots["current"],
+        "freeBasePlayedCurrent": free_slots["baseCurrent"],
+        "mozkomorUnlocked": mozkomor_unlocked_from_rows(rows),
         # Compatibility alias for cached pre-Gen3 clients; semantics are now active-generation plays.
         "freePlayedGen2": free_slots["current"],
         "freeHistoryCompleted": free_history,
@@ -968,7 +973,7 @@ def load_puzzles() -> dict:
 @lru_cache(maxsize=1)
 def load_rolling_content() -> dict:
     if not ROLLING_CONTENT_PATH.exists():
-        return {"version": 1, "releaseEnabled": False, "batches": [], "puzzles": {d: [] for d in ("easy", "medium", "hard", "hardcore")}}
+        return {"version": 1, "releaseEnabled": False, "batches": [], "puzzles": {d: [] for d in ROLLING_DIFFICULTIES}}
     return json.loads(ROLLING_CONTENT_PATH.read_text(encoding="utf-8"))
 
 
@@ -1035,7 +1040,7 @@ def _released_batches(as_of: date) -> tuple[list[dict], Optional[str]]:
 def released_puzzle_payload(as_of: date) -> dict:
     source = load_puzzles()
     payload = {k: v for k, v in source.items() if k != "free"}
-    payload["free"] = {d: released_free_bank(d, as_of) for d in ("easy", "medium", "hard", "hardcore")}
+    payload["free"] = {d: released_free_bank(d, as_of) for d in FREE_DIFFICULTIES}
     rolling = dict(load_rolling_content())
     rolling.pop("batches", None); rolling.pop("puzzles", None)
     released_batches, next_release = _released_batches(as_of)
@@ -1043,7 +1048,7 @@ def released_puzzle_payload(as_of: date) -> dict:
     payload["rollingContent"] = rolling
     payload["contentStatus"] = {
         "asOf": as_of.isoformat(), "latestBatch": latest, "nextRelease": next_release,
-        "availableFreeCounts": {d: len(payload["free"][d]) for d in ("easy", "medium", "hard", "hardcore")},
+        "availableFreeCounts": {d: len(payload["free"][d]) for d in FREE_DIFFICULTIES},
     }
     return payload
 
@@ -1059,7 +1064,7 @@ def released_rolling_payload(as_of: date) -> dict:
             if rolling_content_release_enabled()
             else []
         )
-        for d in ("easy", "medium", "hard", "hardcore")
+        for d in ROLLING_DIFFICULTIES
     }
     meta = {k: v for k, v in source.items() if k not in {"batches", "puzzles"}}
     base = load_puzzles().get("free", {})
@@ -1096,7 +1101,7 @@ def push_open_tracking_schema_ready() -> bool:
 def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Optional[dict]:
     """Resolve a Free puzzle to its generation and stable difficulty/level slot."""
     data = load_puzzles()
-    difficulties = (difficulty,) if difficulty in ("easy", "medium", "hard", "hardcore") else ("easy", "medium", "hard", "hardcore")
+    difficulties = (difficulty,) if difficulty in FREE_DIFFICULTIES else FREE_DIFFICULTIES
     for diff in difficulties:
         for index, puzzle in enumerate(data.get("free", {}).get(diff, []), start=1):
             if puzzle.get("id") == puzzle_id:
@@ -1148,12 +1153,14 @@ def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Option
 
 def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
     """Summarise stable difficulty+level slots without exposing content generations to players."""
-    difficulties = ("easy", "medium", "hard", "hardcore")
+    difficulties = FREE_DIFFICULTIES
     puzzle_data = load_puzzles(); reserve = load_rolling_content()
     active_generation = int(puzzle_data.get("freeGeneration") or 1)
-    maximum_levels = {key: len(puzzle_data.get("free", {}).get(key, [])) + len(reserve.get("puzzles", {}).get(key, [])) for key in difficulties}
+    base_levels = {key: len(puzzle_data.get("free", {}).get(key, [])) for key in difficulties}
+    maximum_levels = {key: base_levels[key] + len(reserve.get("puzzles", {}).get(key, [])) for key in difficulties}
     prior_slots = {key: set() for key in difficulties}
     current_slots = {key: set() for key in difficulties}
+    base_current_slots = {key: set() for key in difficulties}
     for row in rows:
         if row.get("mode") != "free" or row.get("difficulty") not in prior_slots:
             continue
@@ -1163,10 +1170,21 @@ def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
         is_current = int(info["generation"]) == active_generation and info.get("legacy") is not True
         target = current_slots if is_current else prior_slots
         target[info["difficulty"]].add(int(info["level"]))
+        if is_current and info.get("rolling") is not True and int(info["level"]) <= base_levels.get(info["difficulty"], 0):
+            base_current_slots[info["difficulty"]].add(int(info["level"]))
     effective = {key: len(prior_slots[key] | current_slots[key]) for key in difficulties}
     transferred = {key: len(prior_slots[key] - current_slots[key]) for key in difficulties}
     current = {key: len(current_slots[key]) for key in difficulties}
-    return {"effective": effective, "transferred": transferred, "current": current, "gen2": current}
+    base_current = {key: len(base_current_slots[key]) for key in difficulties}
+    return {"effective": effective, "transferred": transferred, "current": current, "baseCurrent": base_current, "gen2": current}
+
+
+def mozkomor_unlocked_from_rows(rows: list[dict]) -> bool:
+    """Unlock only after all 200 base Gen4 Mozkozrout slots; rolling Hardcore does not count."""
+    if any(r.get("mode") == "free" and r.get("difficulty") == "mozkomor" for r in rows):
+        return True
+    slots = free_slot_summary(rows)
+    return int((slots.get("baseCurrent") or {}).get("hardcore") or 0) >= MOZKOMOR_UNLOCK_BASE_LEVELS
 
 
 def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> bool:
@@ -1200,7 +1218,7 @@ def reconcile_gen4_free_rewards(player_id: str, rows: list[dict]) -> dict:
                 + list(load_rolling_content().get("puzzles", {}).get(difficulty, []))
             )
         }
-        for difficulty in ("easy", "medium", "hard", "hardcore")
+        for difficulty in FREE_DIFFICULTIES
     }
     prior_generation_played = False
     current_results: list[tuple[dict, int]] = []
@@ -1715,7 +1733,9 @@ def health():
         "rollingContentCadence": load_rolling_content().get("cadence"),
         "rollingContentFirstRelease": load_rolling_content().get("firstRelease"),
         "rollingContentReservedThrough": load_rolling_content().get("reservedThrough"),
-        "rollingContentAvailableCounts": {d: len(released_free_bank(d, current_prague_date())) for d in ("easy", "medium", "hard", "hardcore")},
+        "rollingContentAvailableCounts": {d: len(released_free_bank(d, current_prague_date())) for d in ROLLING_DIFFICULTIES},
+        "freeBaseLevelCounts": {d: len(load_puzzles().get("free", {}).get(d, [])) for d in FREE_DIFFICULTIES},
+        "mozkomorUnlock": load_puzzles().get("mozkomorUnlock"),
         "notificationsV2Migration": push_preferences_schema_ready(),
         "pushOpenTrackingMigration": push_open_tracking_schema_ready(),
         "freeXp": {key: value for key, value in POINTS.items() if key != "daily"},
@@ -2865,7 +2885,7 @@ def build_quality_report():
         }
 
     difficulty_ladder = {"bands": {}}
-    for difficulty in ("easy", "medium", "hard", "hardcore"):
+    for difficulty in FREE_DIFFICULTIES:
         difficulty_ladder["bands"][difficulty] = [ladder_band(difficulty, start, end) for start, end in band_ranges]
     late_medium = difficulty_ladder["bands"]["medium"][-1]
     early_hard = difficulty_ladder["bands"]["hard"][0]
@@ -3781,7 +3801,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
     if payload.mode not in ("daily", "free", "starter"):
         raise HTTPException(400, "Neplatný režim")
-    if payload.difficulty not in ("easy", "medium", "hard", "hardcore"):
+    if payload.difficulty not in FREE_DIFFICULTIES:
         raise HTTPException(400, "Neplatná obtížnost")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
@@ -3823,6 +3843,10 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
         if not info or not is_puzzle_released(info.get("puzzle") or {}, effective_content_date(request)):
             raise HTTPException(400, "Neznámá nebo zatím nevydaná úroveň volné hry")
+        if payload.difficulty == "mozkomor":
+            unlock_rows = db_select("results", player_id=player["id"])
+            if not mozkomor_unlocked_from_rows(unlock_rows):
+                raise HTTPException(403, "Mozkomor se odemkne po dokončení všech Mozkožroutů")
         points, transferred_reward = claim_free_slot_points(
             player["id"], info, POINTS[payload.difficulty], payload.puzzle_id,
         )

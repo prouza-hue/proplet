@@ -16,106 +16,315 @@
     "starter-onboarding": {
       "rows": 6,
       "cols": 6,
-      "activeCells": [28, 34],
-      "targetWords": [6, 7],
-      "targetLength": [4, 7],
+      "activeCells": [
+        28,
+        34
+      ],
+      "targetWords": [
+        6,
+        7
+      ],
+      "targetLength": [
+        4,
+        7
+      ],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
-      "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 10.0],
+      "vocabularyTiers": [
+        "A"
+      ],
+      "ambiguityRange": [
+        0,
+        10
+      ],
       "ambiguityRole": "onboarding"
     },
     "rescue-core": {
       "rows": 6,
       "cols": 6,
-      "activeCells": [28, 34],
-      "targetWords": [6, 7],
-      "targetLength": [4, 7],
+      "activeCells": [
+        28,
+        34
+      ],
+      "targetWords": [
+        6,
+        7
+      ],
+      "targetLength": [
+        4,
+        7
+      ],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
-      "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 10.0],
+      "vocabularyTiers": [
+        "A"
+      ],
+      "ambiguityRange": [
+        0,
+        10
+      ],
       "ambiguityRole": "streak-rescue"
     },
     "easy-core": {
-      "rows": [5, 6],
-      "cols": [5, 6],
-      "activeCells": [28, 34],
-      "targetWords": [6, 7],
-      "targetLength": [4, 7],
+      "rows": [
+        5,
+        6
+      ],
+      "cols": [
+        5,
+        6
+      ],
+      "activeCells": [
+        28,
+        34
+      ],
+      "targetWords": [
+        6,
+        7
+      ],
+      "targetLength": [
+        4,
+        7
+      ],
       "maxCurlPaths": 1,
       "maxCurlRun": 1,
-      "vocabularyTiers": ["A"],
-      "ambiguityRange": [0.0, 20.0],
+      "vocabularyTiers": [
+        "A"
+      ],
+      "ambiguityRange": [
+        0,
+        20
+      ],
       "ambiguityRole": "low"
     },
     "medium-compact": {
       "rows": 7,
       "cols": 7,
-      "activeCells": [33, 37],
-      "targetWords": [7, 7],
-      "targetLength": [4, 8],
+      "activeCells": [
+        33,
+        37
+      ],
+      "targetWords": [
+        7,
+        7
+      ],
+      "targetLength": [
+        4,
+        8
+      ],
       "maxCurlPaths": 2,
       "maxCurlRun": 2,
-      "meanTurns": [0.75, 2.4],
+      "meanTurns": [
+        0.75,
+        2.4
+      ],
       "maxBlankComponents": 4,
       "maxIsolatedBlanks": 0,
-      "vocabularyTiers": ["A", "B"],
-      "ambiguityRange": [0.0, 12.0],
+      "vocabularyTiers": [
+        "A",
+        "B"
+      ],
+      "ambiguityRange": [
+        0,
+        12
+      ],
       "ambiguityRole": "early-or-relief"
     },
     "medium-cutout": {
       "rows": 8,
       "cols": 8,
-      "activeCells": [38, 42],
-      "targetWords": [7, 8],
-      "targetLength": [4, 8],
+      "activeCells": [
+        38,
+        42
+      ],
+      "targetWords": [
+        7,
+        8
+      ],
+      "targetLength": [
+        4,
+        8
+      ],
       "maxCurlPaths": 2,
       "maxCurlRun": 2,
-      "meanTurns": [0.7, 2.35],
+      "meanTurns": [
+        0.7,
+        2.35
+      ],
       "maxBlankComponents": 5,
       "maxIsolatedBlanks": 1,
-      "vocabularyTiers": ["A", "B"],
-      "ambiguityRange": [0.0, 14.0],
+      "vocabularyTiers": [
+        "A",
+        "B"
+      ],
+      "ambiguityRange": [
+        0,
+        14
+      ],
       "ambiguityRole": "medium-core"
     },
     "hard-bridge": {
       "rows": 9,
       "cols": 9,
-      "activeCells": [50, 56],
-      "targetWords": [8, 9],
-      "targetLength": [4, 9],
+      "activeCells": [
+        50,
+        56
+      ],
+      "targetWords": [
+        8,
+        9
+      ],
+      "targetLength": [
+        4,
+        9
+      ],
       "maxCurlPaths": 5,
       "maxCurlRun": 3,
-      "meanTurns": [1.8, 3.35],
+      "meanTurns": [
+        1.8,
+        3.35
+      ],
       "maxBlankComponents": 5,
       "maxIsolatedBlanks": 1,
-      "vocabularyTiers": ["A", "B", "C"],
-      "ambiguityRange": [6.8, 16.0],
+      "vocabularyTiers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ambiguityRange": [
+        6.8,
+        16
+      ],
       "ambiguityRole": "hard-core-with-bounded-upper-tail"
     },
     "hardcore-core": {
-      "rows": [9, 10],
-      "cols": [9, 10],
-      "activeCells": [58, 72],
-      "targetWords": [9, 11],
-      "targetLength": [4, 10],
+      "rows": [
+        9,
+        10
+      ],
+      "cols": [
+        9,
+        10
+      ],
+      "activeCells": [
+        58,
+        72
+      ],
+      "targetWords": [
+        9,
+        11
+      ],
+      "targetLength": [
+        4,
+        10
+      ],
       "maxCurlPaths": 7,
       "maxCurlRun": 4,
-      "vocabularyTiers": ["A", "B", "C", "D"],
-      "ambiguityRange": [0.0, 50.0],
+      "vocabularyTiers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "ambiguityRange": [
+        0,
+        50
+      ],
       "ambiguityRole": "high-but-bounded"
+    },
+    "mozkomor-core": {
+      "rows": 10,
+      "cols": 10,
+      "activeCells": [
+        72,
+        80
+      ],
+      "targetWords": [
+        10,
+        11
+      ],
+      "targetLength": [
+        5,
+        11
+      ],
+      "maxCurlPaths": 9,
+      "maxCurlRun": 5,
+      "meanTurns": [
+        3.8,
+        5.3
+      ],
+      "maxBlankComponents": 8,
+      "maxIsolatedBlanks": 1,
+      "vocabularyTiers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "ambiguityRange": [
+        18,
+        60
+      ],
+      "ambiguityRole": "endgame-high-above-mozkozrout-floor-with-bounded-false-branches"
+    },
+    "mozkomor-brutal10-v1": {
+      "rows": 10,
+      "cols": 10,
+      "activeCells": [
+        78,
+        86
+      ],
+      "targetWords": [
+        9,
+        10
+      ],
+      "targetLength": [
+        6,
+        12
+      ],
+      "maxCurlPaths": 10,
+      "maxCurlRun": 6,
+      "meanTurns": [
+        5,
+        6.2
+      ],
+      "maxBlankComponents": 7,
+      "maxIsolatedBlanks": 1,
+      "vocabularyTiers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ambiguityRange": [
+        28,
+        65
+      ],
+      "ambiguityRole": "hardcore-playtest-extreme-feasible-above-mozkomor-tail"
     }
   },
   "freeMediumMix": {
-    "levels1To40": {"medium-compact": 0.6, "medium-cutout": 0.4},
-    "levels41To120": {"medium-compact": 0.25, "medium-cutout": 0.75},
-    "levels121To200": {"medium-compact": 0.15, "medium-cutout": 0.85},
+    "levels1To40": {
+      "medium-compact": 0.6,
+      "medium-cutout": 0.4
+    },
+    "levels41To120": {
+      "medium-compact": 0.25,
+      "medium-cutout": 0.75
+    },
+    "levels121To200": {
+      "medium-compact": 0.15,
+      "medium-cutout": 0.85
+    },
     "ordering": "deterministic-sawtooth-with-relief-levels"
   },
   "requiredActiveBanks": {
     "starter": "all entries Gen4",
-    "free": {"easy": 200, "medium": 200, "hard": 200, "hardcore": 200},
+    "free": {
+      "easy": 200,
+      "medium": 200,
+      "hard": 200,
+      "hardcore": 200
+    },
     "daily": 365,
     "rolling": 65,
     "rescue": "all entries Gen4",
@@ -136,5 +345,29 @@
     "migrationRehearsalRequired": true,
     "previewApprovalRequired": true,
     "productionHealthVerificationRequired": true
+  },
+  "mozkomorPolicy": {
+    "label": "Mozkomor",
+    "role": "locked-endgame",
+    "unlock": {
+      "requiresDifficulty": "hardcore",
+      "requiresCurrentBaseLevels": 200,
+      "persistentOnceEarned": true
+    },
+    "xpPerNewLevel": 200,
+    "rollingContent": false,
+    "designIntent": "Harder than Mozkožrout through geometry and ambiguity, not obscure vocabulary.",
+    "targetCooldown": 12,
+    "requiredLevels": 100
+  },
+  "mozkomorBrutal10Playtest": {
+    "label": "Mozkomor masochist v1",
+    "role": "experimental-calibration",
+    "count": 10,
+    "seed": 2026082801,
+    "noTierD": true,
+    "excludeCurrentMozkomorTargets": true,
+    "designIntent": "Approximate old Gen3 Mozkozrout brutality through geometry and false branches, without obscure targets.",
+    "calibration": "v1b-feasible-extreme"
   }
 }
