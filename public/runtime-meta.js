@@ -1,6 +1,6 @@
 (()=>{
   'use strict';
-  // v4.01.29 Mozkomor preview release candidate
+  // v4.01.29 Mozkomor preview release candidate — final UI RC2
   const canonicalOrigin='https://hrajproplet.cz';
   const productionAliases=new Set([
     'www.hrajproplet.cz',
