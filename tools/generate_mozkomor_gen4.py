@@ -54,11 +54,11 @@ PROFILE = {
     "policy": MOZKOMOR_POLICY,
     "max_curl_paths": 9,
     "max_curl_run": 5,
-    "min_mean_turns": 2.90,
+    "min_mean_turns": 3.80,
     "max_mean_turns": 5.30,
-    "max_blank_components": 5,
-    "max_isolated_blanks": 0,
-    "ambiguity": (12.0, 60.0),
+    "max_blank_components": 8,
+    "max_isolated_blanks": 1,
+    "ambiguity": (18.0, 60.0),
 }
 
 
