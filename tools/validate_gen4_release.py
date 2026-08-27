@@ -14,7 +14,7 @@ import re
 LEGACY_KEYS = {"legacyFree", "legacyDaily", "previousDaily"}
 GEN4_ID = re.compile(r"^(?:g4-|gen4-|starter-g4-|rescue-g4-)")
 EXPECTED_TARGET_COOLDOWN = {
-    "free": {"easy": 3, "medium": 8, "hard": 12, "hardcore": 12},
+    "free": {"easy": 3, "medium": 8, "hard": 12, "hardcore": 12, "mozkomor": 12},
     "rescue": 3,
     "daily": 5,
     "rollingWithinBatch": 4,
