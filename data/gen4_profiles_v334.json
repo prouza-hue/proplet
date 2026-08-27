@@ -289,8 +289,7 @@
       "easy": 200,
       "medium": 200,
       "hard": 200,
-      "hardcore": 200,
-      "mozkomor": 100
+      "hardcore": 200
     },
     "daily": 365,
     "rolling": 65,
@@ -323,6 +322,8 @@
     },
     "xpPerNewLevel": 200,
     "rollingContent": false,
-    "designIntent": "Harder than Mozkožrout through geometry and ambiguity, not obscure vocabulary."
+    "designIntent": "Harder than Mozkožrout through geometry and ambiguity, not obscure vocabulary.",
+    "targetCooldown": 12,
+    "requiredLevels": 100
   }
 }
