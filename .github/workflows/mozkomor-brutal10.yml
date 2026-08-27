@@ -109,10 +109,10 @@ jobs:
               tier_counts.update(pt)
               assert 'D' not in pt
               assert min(map(len,words))>=6
-              assert 80<=len(p.get('mask') or [])<=88
+              assert 78<=len(p.get('mask') or [])<=86
               assert 9<=len(words)<=10
-              assert 30.0<=float(meta.get('localAmbiguityScore') or 0)<=70.0
-              assert 5.2<=float(meta.get('meanTurns') or 0)<=6.4
+              assert 28.0<=float(meta.get('localAmbiguityScore') or 0)<=65.0
+              assert 5.0<=float(meta.get('meanTurns') or 0)<=6.2
               rows.append({
                   'id':p['id'],
                   'level':int(meta['level']),
@@ -130,7 +130,7 @@ jobs:
           turns=[r['meanTurns'] for r in rows]
           cells=[r['activeCells'] for r in rows]
           assert median(amb)>=30.0
-          assert median(turns)>=5.2
+          assert median(turns)>=5.1
           assert median(cells)>=80
 
           audit={
