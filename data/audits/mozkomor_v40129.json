@@ -1,8 +1,7 @@
 {
-  "version": 1,
-  "kind": "mozkomor-v40129-generation-audit",
+  "version": 2,
+  "kind": "mozkomor-v40129-committed-bank-audit",
   "count": 100,
-  "seed": 2026082701,
   "unlock": {
     "difficulty": "hardcore",
     "baseLevels": 200
@@ -10,10 +9,21 @@
   "targetCooldown": 12,
   "duplicateBoardHashesVsActiveGen4": 0,
   "transitionCooldownViolations": 0,
+  "tierCounts": {
+    "A": 64,
+    "B": 441,
+    "C": 471,
+    "D": 58
+  },
+  "tierDShare": 0.0561,
+  "wordLength": {
+    "min": 5,
+    "median": 7.0,
+    "max": 10
+  },
   "ambiguity": {
     "min": 18.15,
-    "median": 23.65,
-    "p75": 26.341,
+    "median": 23.612499999999997,
     "p90": 29.1,
     "max": 37.825
   },
@@ -25,42 +35,15 @@
   },
   "activeCells": {
     "min": 72,
+    "median": 74.0,
     "max": 80
   },
-  "targetWords": {
-    "min": 10,
-    "max": 11
-  },
-  "tierCounts": {
-    "?": 1034
-  },
-  "tierDShare": 0.0,
-  "generatorStats": {
-    "count": 100,
-    "seconds": 1223.72,
-    "tierCounts": {
-      "C": 471,
-      "A": 64,
-      "B": 441,
-      "D": 58
-    },
-    "ambiguity": {
-      "min": 18.15,
-      "median": 23.612,
-      "p75": 26.341,
-      "p90": 29.1,
-      "max": 37.825
-    },
-    "meanTurns": {
-      "min": 4.0,
-      "median": 4.9,
-      "p90": 5.2,
-      "max": 5.3
-    },
-    "rejections": {
-      "cutout-components": 6227,
-      "isolated-cutouts": 1223,
-      "ambiguity": 5
-    }
+  "comparisonToMozkozrout": {
+    "mozkozroutAmbiguityMedian": 20.284,
+    "mozkomorAmbiguityMedian": 23.612499999999997,
+    "mozkozroutMeanTurnsMedian": 4.0,
+    "mozkomorMeanTurnsMedian": 4.9,
+    "mozkozroutActiveCellsMedian": 64.0,
+    "mozkomorActiveCellsMedian": 74.0
   }
 }
