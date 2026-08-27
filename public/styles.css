@@ -1044,14 +1044,11 @@ html[data-theme="dark"] .starter-hard-prompt{color:#c9c0cc}html[data-theme="dark
 
 /* v4.01.9 — mobile touch magnifier for dense Hard / Mozkožrout boards */
 .touch-magnifier{
- position:fixed;z-index:160;width:144px;height:144px;padding:8px;border:1px solid rgba(89,76,142,.24);border-radius:24px;
+ position:fixed;z-index:160;left:50%;top:max(calc(env(safe-area-inset-top) + 56px),64px);width:144px;height:144px;padding:8px;border:1px solid rgba(89,76,142,.24);border-radius:24px;
  background:rgba(255,254,253,.96);box-shadow:0 18px 42px rgba(45,36,82,.22),0 4px 14px rgba(45,36,82,.12);
- backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;transform-origin:50% 100%;
+ backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;transform:translateX(-50%);
  animation:touchMagnifierIn .11s ease-out
 }
-.touch-magnifier:after{content:"";position:absolute;left:50%;bottom:-8px;width:16px;height:16px;background:inherit;border-right:1px solid rgba(89,76,142,.18);border-bottom:1px solid rgba(89,76,142,.18);transform:translateX(-50%) rotate(45deg);border-radius:0 0 4px 0}
-.touch-magnifier.below{transform-origin:50% 0}
-.touch-magnifier.below:after{top:-8px;bottom:auto;border:0;border-left:1px solid rgba(89,76,142,.18);border-top:1px solid rgba(89,76,142,.18);border-radius:4px 0 0 0}
 .touch-magnifier-grid{position:relative;z-index:1;width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:4px}
 .touch-mag-cell{min-width:0;min-height:0;border:1px solid #d7d0e0;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;font-weight:1000;color:var(--ink);box-shadow:0 2px 6px rgba(61,51,92,.06)}
 .touch-mag-cell.void{visibility:hidden}
@@ -1061,7 +1058,7 @@ html[data-theme="dark"] .starter-hard-prompt{color:#c9c0cc}html[data-theme="dark
 .touch-mag-cell.active{background:#efecff;border-color:#8577e8;box-shadow:0 0 0 2px rgba(108,92,231,.10)}
 .touch-mag-cell.used{background:color-mix(in srgb,var(--word-color,#dfe9e3) 57%,white);border-color:color-mix(in srgb,var(--word-color,#dfe9e3) 80%,#716c7a)}
 .touch-mag-cell.focus{position:relative;z-index:2;opacity:1;filter:none;background:#efecff;border-color:#6c5ce7;outline:3px solid rgba(108,92,231,.18);transform:scale(1.07);box-shadow:0 5px 13px rgba(78,62,156,.16)}
-@keyframes touchMagnifierIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@keyframes touchMagnifierIn{from{opacity:0}to{opacity:1}}
 html[data-theme="dark"] .touch-magnifier{background:rgba(27,25,38,.97);border-color:#4b445b;box-shadow:0 18px 42px rgba(0,0,0,.42),0 4px 14px rgba(0,0,0,.25)}
 html[data-theme="dark"] .touch-mag-cell{background:#242130;border-color:#474052;color:var(--ink);box-shadow:none}
 html[data-theme="dark"] .touch-mag-cell.candidate{background:#242130;border-color:#595164}
