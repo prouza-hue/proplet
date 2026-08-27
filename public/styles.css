@@ -1067,3 +1067,18 @@ html[data-theme="dark"] .touch-mag-cell.active{background:#302a52;border-color:#
 html[data-theme="dark"] .touch-mag-cell.used{background:color-mix(in srgb,var(--word-color,#dfe9e3) 42%,#1b1926);border-color:color-mix(in srgb,var(--word-color,#dfe9e3) 65%,#716c7a)}
 @media (hover:hover) and (pointer:fine){.touch-magnifier{display:none!important}}
 @media (prefers-reduced-motion:reduce){.touch-magnifier{animation:none}}
+
+/* v4.01.28 preview — optional mobile magnifier */
+.magnifier-setting-wrap{margin-top:9px}
+.magnifier-setting-wrap .field-note{display:block;margin:6px 2px 0;line-height:1.35}
+.magnifier-quick-btn{position:relative;order:3;min-width:46px!important;width:46px!important;padding:6px!important;font-size:20px!important;line-height:1}
+.magnifier-quick-btn.on{background:color-mix(in srgb,var(--purple) 10%,var(--paper))!important;border-color:color-mix(in srgb,var(--purple) 38%,var(--line))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--purple) 10%,transparent)}
+.magnifier-quick-btn:not(.on){opacity:.62;filter:saturate(.55)}
+.magnifier-quick-btn:not(.on)::after{content:"";position:absolute;width:24px;height:2px;border-radius:2px;background:currentColor;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-45deg);opacity:.75;pointer-events:none}
+@media (max-width:999px){
+  .game-control-column .game-actions.magnifier-control-visible{display:flex!important;align-items:center!important;gap:5px!important}
+  .game-control-column .game-actions.magnifier-control-visible #hintBtn{order:1;flex:1 1 auto;width:auto!important}
+  .game-control-column .game-actions.magnifier-control-visible #calmRunBtn{order:2;flex:1 1 auto;width:auto!important}
+  .game-control-column .game-actions.magnifier-control-visible #magnifierQuickBtn{order:3;flex:0 0 46px;width:46px!important;min-width:46px!important}
+}
+html[data-theme="dark"] .magnifier-quick-btn.on{background:var(--purple-soft)!important;border-color:#5a4f8b!important;color:#c5bcff}
