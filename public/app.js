@@ -12,14 +12,21 @@ const WIN_PRAISE={
  easy:['A je to!','Pěkně.','Hotovo!','Hezky propleteno.','To sedlo.','Další je doma.'],
  medium:['Pěkná práce.','Je to tam!','Hotovo!','Hezky!','Další je doma.','To se povedlo.'],
  hard:['Těžká? Pro tebe ne!','Tohle se počítá.','Pěkný výkon.','Těžká je doma.','Krásná práce.','Tak tohle jo.'],
- hardcore:['Tak kdo s koho?','Fíha. Respekt.','Klobouk dolů!','Je po něm!','Tohle nebyla sranda.','Tvůj mozek odolal.']
+ hardcore:['Tak kdo s koho?','Fíha. Respekt.','Klobouk dolů!','Je po něm!','Tohle nebyla sranda.','Tvůj mozek odolal.'],
+ mozkomor:['Mozkomor padl.','Tohle už je jiná liga.','Neuvěřitelné.','Mozek přežil.','Klobouk dolů. Opravdu.','Ani Mozkomor tě nedostal.']
 };
 const DIFF={
   easy:{label:'Snadná',icon:'/difficulty/easy.svg',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
   medium:{label:'Střední',icon:'/difficulty/medium.svg',desc:'Postupně větší plocha · od přehledných cest k prvním zákrutám.',xp:25},
   hard:{label:'Těžká',icon:'/difficulty/hard.svg',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},
-  hardcore:{label:'Mozkožrout',icon:'/difficulty/hardcore.svg',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100}
+  hardcore:{label:'Mozkožrout',icon:'/difficulty/hardcore.svg',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100},
+  mozkomor:{label:'Mozkomor',icon:'/difficulty/mozkomor.svg',desc:'10×10 · hustší labyrint, delší cesty a minimum jistých začátků.',xp:200}
 };
+const MOZKOMOR_UNLOCK_KEY='proplet-v4-01-29-mozkomor-unlocked';
+const MOZKOMOR_UNLOCK_BASE=200;
+const MOZKOMOR_PREVIEW_MODE=location.hostname.endsWith('.vercel.app')?new URLSearchParams(location.search).get('mozkomor'):'';
+const MOZKOMOR_MASOCHIST_PLAYTEST=MOZKOMOR_PREVIEW_MODE==='masochist';
+const MOZKOMOR_PREVIEW_UNLOCK=MOZKOMOR_PREVIEW_MODE==='unlocked'||MOZKOMOR_MASOCHIST_PLAYTEST;
 function difficultyIconMarkup(diff,className='difficulty-icon-img'){
  const d=DIFF[diff];return d?`<img class="${className}" src="${d.icon}" alt="" aria-hidden="true" draggable="false">`:'';
 }
@@ -63,7 +70,7 @@ const LEVELS=[
  {xp:61000,icon:'🏆',name:'Absolutní Propletač'}
 ];
 const ACHIEVEMENT_GROUPS=[
- ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],
+ ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],['mozkomor','Mozkomor'],
  ['daily','Denní výzva'],['clean','Čistá řešení'],['cleanDaily','Čisté Daily'],['xp','XP'],['speed','Rychlost'],['rescue','Záchrana série']
 ];
 const ACHIEVEMENTS=[
@@ -106,6 +113,12 @@ const ACHIEVEMENTS=[
  {id:'hc-50',group:'hardcore',icon:'🧠',name:'Mozkový kulturista',desc:'Dokonči 50 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:50},
  {id:'hc-100',group:'hardcore',icon:'👑',name:'Mozkožroutí král',desc:'Dokonči 100 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:100},
  {id:'hc-200',group:'hardcore',icon:'🧠',name:'Mozkožroutí nesmrtelný',desc:'Dokonči 200 Mozkožroutů',value:s=>s.freeCompleted?.hardcore||0,target:200},
+
+ {id:'mz-1',group:'mozkomor',icon:'🌑',name:'Za branou',desc:'Dokonči první Mozkomor',value:s=>s.freeCompleted?.mozkomor||0,target:1},
+ {id:'mz-10',group:'mozkomor',icon:'🕳️',name:'Deset do temnoty',desc:'Dokonči 10 Mozkomorů',value:s=>s.freeCompleted?.mozkomor||0,target:10},
+ {id:'mz-25',group:'mozkomor',icon:'🧠',name:'Mozek drží',desc:'Dokonči 25 Mozkomorů',value:s=>s.freeCompleted?.mozkomor||0,target:25},
+ {id:'mz-50',group:'mozkomor',icon:'🌀',name:'Půl cesty peklem',desc:'Dokonči 50 Mozkomorů',value:s=>s.freeCompleted?.mozkomor||0,target:50},
+ {id:'mz-100',group:'mozkomor',icon:'👁️',name:'Mozkomorův pán',desc:'Dokonči všech 100 Mozkomorů',value:s=>s.freeCompleted?.mozkomor||0,target:100},
 
  {id:'daily-1',group:'daily',icon:'☀️',name:'Dnešní dávka',desc:'Dokonči první Denní výzvu',value:s=>s.dailyCompleted||0,target:1},
  {id:'daily-3',group:'daily',icon:'🌤️',name:'Tři slunce',desc:'Dokonči 3 Denní výzvy',value:s=>s.dailyCompleted||0,target:3},
@@ -351,6 +364,7 @@ function renderDailyWeekRhythm(iso){const root=$('#dailyWeekRhythm');if(!root)re
 function dailyResultState(iso){const puzzle=dailyPuzzleFor(iso),stored=getState().completed[`daily:${iso}`]||null;return {puzzle,stored,active:stored?.puzzleId===puzzle.id?stored:null,legacy:stored&&stored.puzzleId!==puzzle.id?stored:null}}
 function challengeKey(mode,puzzle,date){return mode==='daily'?`daily:${date}`:mode==='starter'?`starter:${puzzle.id}`:`free:${puzzle.id}`}
 function pointsFor(mode,difficulty,puzzle=null){
+ if(MOZKOMOR_MASOCHIST_PLAYTEST&&mode==='free'&&difficulty==='mozkomor')return 0;
  if(mode==='daily')return 100;if(mode==='starter')return Number(puzzle?.meta?.rewardXp)||10;if(mode!=='free')return DIFF[difficulty].xp;
  const info=freePuzzleSlot(puzzle?.id,difficulty),slots=localFreeSlotState(difficulty);
  return info&&slots.actual.has(info.level)?0:DIFF[difficulty].xp;
@@ -392,13 +406,13 @@ function currentLocalStats(){
  const s=getState(),rows=Object.values(s.completed),dailyDates=[...new Set(rows.filter(r=>r.mode==='daily').map(r=>r.dailyDate).filter(Boolean))];
  const rescueDates=Object.entries(s.rescues||{}).filter(([,r])=>r?.status==='passed').map(([d])=>d),effectiveDates=[...new Set([...dailyDates,...rescueDates])];
  const streak=calcStreak(effectiveDates),longest=calcLongest(effectiveDates),dailyTimes=rows.filter(r=>r.mode==='daily').map(r=>r.elapsedMs);
- const free={easy:0,medium:0,hard:0,hardcore:0},freeTransferred={...free},freePlayedGen2={...free};for(const diff of Object.keys(free)){const slots=localFreeSlotState(diff);free[diff]=slots.effective.size;freeTransferred[diff]=slots.transferred.size;freePlayedGen2[diff]=slots.actual.size}
+ const free={easy:0,medium:0,hard:0,hardcore:0,mozkomor:0},freeTransferred={...free},freePlayedGen2={...free};for(const diff of Object.keys(free)){const slots=localFreeSlotState(diff);free[diff]=slots.effective.size;freeTransferred[diff]=slots.transferred.size;freePlayedGen2[diff]=slots.actual.size}
  const gameRows=rows.filter(r=>r.mode==='daily'||r.mode==='free'),cleanRows=gameRows.filter(r=>r.cleanSolve===true);
  return {points:rows.reduce((a,r)=>a+(r.points||0),0),totalCompleted:gameRows.length,dailyCompleted:dailyDates.length,freeCompleted:free,freeTransferred,freePlayedGen2,currentStreak:streak,longestStreak:longest,bestDailyMs:dailyTimes.length?Math.min(...dailyTimes):null,cleanSolves:cleanRows.length,cleanDaily:cleanRows.filter(r=>r.mode==='daily').length,rescuedDays:rescueDates.length};
 }
 function effectiveStats(){
  const local=currentLocalStats(),remote=getProfile()?.stats;if(!remote)return local;
- const free={easy:0,medium:0,hard:0,hardcore:0},freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
+ const free={easy:0,medium:0,hard:0,hardcore:0,mozkomor:0},freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
  return {
   points:Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
   dailyCompleted:Math.max(local.dailyCompleted||0,remote.dailyCompleted||0),freeCompleted:free,freeTransferred,freePlayedGen2,
@@ -536,10 +550,21 @@ function freeProgress(diff){
  const list=sortedFreeBank(diff),total=list.length,slots=localFreeSlotState(diff),done=slots.actual.size,resume=resumableFreePuzzle(diff,list),nextUnsolved=list.find(p=>!slots.actual.has(Number(p.meta?.level)))||null,pct=total?Math.round(done/total*100):0;
  return {list,total,done,actual:slots.actual.size,transferred:slots.transferred.size,resume,nextUnsolved,pct,slots};
 }
+function localMozkomorBaseDone(){
+ const slots=localFreeSlotState('hardcore');
+ return [...slots.actual].filter(level=>level>=1&&level<=MOZKOMOR_UNLOCK_BASE).length;
+}
+function mozkomorUnlockState(){
+ const required=Number(puzzleDB?.mozkomorUnlock?.requiresCurrentBaseLevels)||MOZKOMOR_UNLOCK_BASE,remote=getProfile()?.stats||{},localDone=localMozkomorBaseDone(),remoteDone=Number(remote.freeBasePlayedCurrent?.hardcore||0),done=Math.min(required,Math.max(localDone,remoteDone));
+ const key=scopedStorageKey(MOZKOMOR_UNLOCK_KEY),remembered=(()=>{try{return localStorage.getItem(key)==='1'}catch{return false}})();
+ const unlocked=MOZKOMOR_PREVIEW_UNLOCK||remembered||remote.mozkomorUnlocked===true||done>=required;
+ if(unlocked&&!MOZKOMOR_PREVIEW_UNLOCK)try{localStorage.setItem(key,'1')}catch{}
+ return {unlocked,done,required};
+}
 function renderQuickPlay(){
  const root=$('#quickPlayGrid');if(!root||!puzzleDB)return;
- root.innerHTML=Object.entries(DIFF).map(([key,d])=>{const q=freeProgress(key),nextLevel=Number((q.resume||q.nextUnsolved)?.meta?.level)||null,status=q.resume?`Pokračovat${nextLevel?` · úroveň ${nextLevel}`:''}`:q.done===q.total&&q.total?'Hotovo · hrát znovu':`Další · úroveň ${nextLevel||1}`;return `<button class="quick-game" data-quick-free="${key}" data-diff="${key}"><span class="quick-game-icon">${difficultyIconMarkup(key,'difficulty-icon-img')}</span><span class="quick-game-copy"><strong>${d.label}</strong><small>${status}</small><i><b style="width:${q.pct}%"></b></i></span><span class="quick-game-arrow">›</span></button>`}).join('');
- $$('[data-quick-free]').forEach(b=>b.onclick=()=>startFree(b.dataset.quickFree));
+ root.innerHTML=Object.entries(DIFF).filter(([key])=>key!=='mozkomor').map(([key,d])=>{const q=freeProgress(key),nextLevel=Number((q.resume||q.nextUnsolved)?.meta?.level)||null,status=q.resume?`Pokračovat${nextLevel?` · úroveň ${nextLevel}`:''}`:q.done===q.total&&q.total?'Hotovo · hrát znovu':`Další · úroveň ${nextLevel||1}`;return `<button class="quick-game" data-quick-free="${key}" data-diff="${key}"><span class="quick-game-icon">${difficultyIconMarkup(key,'difficulty-icon-img')}</span><span class="quick-game-copy"><strong>${d.label}</strong><small>${status}</small><i><b style="width:${q.pct}%"></b></i></span><span class="quick-game-arrow">›</span></button>`}).join('');
+ $('[data-quick-free]').forEach(b=>b.onclick=()=>startFree(b.dataset.quickFree));
 }
 
 
@@ -562,15 +587,17 @@ function renderNewContentBanner(){
 }
 
 function renderFree(){
- renderNewContentBanner();
+ renderNewContentBanner();const unlock=mozkomorUnlockState();
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
-  const {total,done,actual,transferred,pct,resume,nextUnsolved}=freeProgress(key),nextLevel=Number((resume||nextUnsolved)?.meta?.level)||null,progressLabel=resume?`ROZEHRÁNO${nextLevel?` · ÚROVEŇ ${nextLevel}`:''}`:(done===total?`${done}/${total} HOTOVO`:`ÚROVEŇ ${nextLevel||1} Z ${total}`),xpLabel=`+${d.xp} XP za novou úroveň`;
-  return `<article class="difficulty-card card" data-diff="${key}"><div class="difficulty-copy"><div class="difficulty-title"><span class="difficulty-left-icon">${difficultyIconMarkup(key,'difficulty-icon-img')}</span><div><span class="eyebrow">${progressLabel}</span><div class="difficulty-heading-line"><h2>${d.label}</h2></div></div></div><p class="muted">${d.desc}</p><span class="xp-chip">${xpLabel}</span><div class="progress-line"><span style="width:${pct}%"></span></div><div class="difficulty-actions"><button class="secondary-btn play-next-btn" data-play-free="${key}">${resume?'Pokračovat':(done===total?'Hrát znovu':'Hrát další úroveň')}</button><button class="text-btn played-levels-btn" data-played-levels="${key}" ${done||transferred?'':'disabled'}>▦ Postup a úrovně${done?` · ${done} splněných`:''}</button></div></div><div class="difficulty-progress" data-play-free="${key}" role="button" tabindex="0" aria-label="${resume?'Pokračovat v rozehrané':'Hrát'} ${d.label}" style="--progress:${pct}%"><div><strong>${done}</strong><small>/${total}</small></div><span>›</span></div></article>`
+  if(key==='mozkomor'&&!unlock.unlocked){const pct=Math.round(unlock.done/unlock.required*100),left=Math.max(0,unlock.required-unlock.done);return `<article class="difficulty-card card mozkomor-locked" data-diff="mozkomor"><div class="difficulty-copy"><div class="difficulty-title"><span class="difficulty-left-icon">${difficultyIconMarkup('mozkomor','difficulty-icon-img')}</span><div><span class="eyebrow">🔒 ZAMČENO</span><div class="difficulty-heading-line"><h2>Mozkomor</h2></div></div></div><p class="muted">Odemkne se, až dokončíš všech ${unlock.required} Mozkožroutů.</p><span class="xp-chip">${left?`Ještě ${left} ${left===1?'Mozkožrout':left<5?'Mozkožrouti':'Mozkožroutů'}`:'Brána je připravená'}</span><div class="progress-line"><span style="width:${pct}%"></span></div><div class="mozkomor-lock-note">Endgame · 100 nových úrovní · +${d.xp} XP za každou</div></div><div class="difficulty-progress locked-progress" aria-label="Mozkomor zamčený" style="--progress:${pct}%"><div><strong>${unlock.done}</strong><small>/${unlock.required}</small></div><span>🔒</span></div></article>`}
+  const {total,done,actual,transferred,pct,resume,nextUnsolved}=freeProgress(key),nextLevel=Number((resume||nextUnsolved)?.meta?.level)||null,progressLabel=key==='mozkomor'&&MOZKOMOR_MASOCHIST_PLAYTEST?`🧪 PLAYTEST · ${done}/${total}`:resume?`ROZEHRÁNO${nextLevel?` · ÚROVEŇ ${nextLevel}`:''}`:(done===total?`${done}/${total} HOTOVO`:`ÚROVEŇ ${nextLevel||1} Z ${total}`),xpLabel=key==='mozkomor'&&MOZKOMOR_MASOCHIST_PLAYTEST?'PLAYTEST · bez XP':`+${d.xp} XP za novou úroveň`,cardPlayAttr=key==='mozkomor'?` data-play-free="mozkomor" role="button" tabindex="0" aria-label="Hrát Mozkomor"`:'';
+  return `<article class="difficulty-card card ${key==='mozkomor'?'mozkomor-unlocked':''}" data-diff="${key}"${cardPlayAttr}><div class="difficulty-copy"><div class="difficulty-title"><span class="difficulty-left-icon">${difficultyIconMarkup(key,'difficulty-icon-img')}</span><div><span class="eyebrow">${key==='mozkomor'&&!done?'🌑 ODEMČENO · ENDGAME':progressLabel}</span><div class="difficulty-heading-line"><h2>${d.label}</h2></div></div></div><p class="muted">${d.desc}</p><span class="xp-chip">${xpLabel}</span><div class="progress-line"><span style="width:${pct}%"></span></div><div class="difficulty-actions"><button class="secondary-btn play-next-btn" data-play-free="${key}">${resume?'Pokračovat':(done===total?'Hrát znovu':'Hrát další úroveň')}</button><button class="text-btn played-levels-btn" data-played-levels="${key}" ${done||transferred?'':'disabled'}>▦ Postup a úrovně${done?` · ${done} splněných`:''}</button></div></div><div class="difficulty-progress" data-play-free="${key}" role="button" tabindex="0" aria-label="${resume?'Pokračovat v rozehrané':'Hrát'} ${d.label}" style="--progress:${pct}%"><div><strong>${done}</strong><small>/${total}</small></div><span>›</span></div></article>`
  }).join('');
  $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
 }
 async function startFree(diff){
+ if(diff==='mozkomor'&&!mozkomorUnlockState().unlocked){showToast('🔒 Mozkomor se odemkne po dokončení všech Mozkožroutů.');return}
  const list=sortedFreeBank(diff),slots=localFreeSlotState(diff),resume=resumableFreePuzzle(diff,list),unplayed=list.filter(p=>!slots.actual.has(Number(p.meta?.level))),p=resume||(unplayed[0]||list[0]);if(p)startGame(p,'free',null);
 }
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
@@ -578,9 +605,9 @@ function startDaily(options={}){$('#starterDailyNudge')?.classList.add('hidden')
 function startStarterWarmup(){const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has(Number(x.meta?.level)))||list[0];if(!p){nav('free',{replace:true});return}startGame(p,'free',null,{postStarterWarmup:true})}
 
 function newAttemptId(){try{return crypto.randomUUID()}catch{return `a-${Date.now()}-${Math.random().toString(36).slice(2,10)}`}}
-async function startAttemptTelemetry(g){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||!g||g.mode==='rescue'||g.mode==='starter')return;try{await api('/api/attempt/start',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,puzzle_id:g.puzzle.id,challenge_key:challengeKey(g.mode,g.puzzle,g.dailyDate),mode:g.mode,difficulty:g.puzzle.difficulty})})}catch{}}
+async function startAttemptTelemetry(g){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||(MOZKOMOR_MASOCHIST_PLAYTEST&&g?.difficulty==='mozkomor')||!g||g.mode==='rescue'||g.mode==='starter')return;try{await api('/api/attempt/start',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,puzzle_id:g.puzzle.id,challenge_key:challengeKey(g.mode,g.puzzle,g.dailyDate),mode:g.mode,difficulty:g.puzzle.difficulty})})}catch{}}
 async function sendAttemptCheckpoint(eventType){
- const g=currentGame;if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||!g||g.mode==='rescue'||g.mode==='starter'||g.finished)return;
+ const g=currentGame;if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||(MOZKOMOR_MASOCHIST_PLAYTEST&&g?.puzzle?.difficulty==='mozkomor')||!g||g.mode==='rescue'||g.mode==='starter'||g.finished)return;
  const foundWords=g.found.length;
  // The server still sees the first correct word immediately. Later correct-word
  // checkpoints are sampled; leave/hint/reset/resume and the final result stay exact.
@@ -656,7 +683,7 @@ function touchMagnifierDeviceSupported(){
  const coarse=window.matchMedia?.('(pointer: coarse)')?.matches===true,touchCapable=(navigator.maxTouchPoints||0)>0,shortSide=Math.min(window.visualViewport?.width||window.innerWidth||9999,window.visualViewport?.height||window.innerHeight||9999);
  return coarse&&touchCapable&&shortSide<=600;
 }
-function touchMagnifierAvailable(g=currentGame){return !!g&&!g.finished&&['hard','hardcore'].includes(g.puzzle?.difficulty)&&touchMagnifierDeviceSupported()}
+function touchMagnifierAvailable(g=currentGame){return !!g&&!g.finished&&['hard','hardcore','mozkomor'].includes(g.puzzle?.difficulty)&&touchMagnifierDeviceSupported()}
 function touchMagnifierEnabled(g=currentGame){return touchMagnifierAvailable(g)&&getSettings().magnifier!==false}
 function renderMagnifierControls(){
  const s=getSettings(),available=touchMagnifierAvailable(),btn=$('#magnifierQuickBtn'),actions=btn?.closest('.game-actions');
@@ -729,7 +756,7 @@ function drawPaths(){
  paths.forEach(({path,color,kind})=>{if(path.length<2)return;const pts=path.map(i=>{const c=$(`.cell[data-index="${i}"]`),r=c?.getBoundingClientRect();return r?`${r.left-br.left+r.width/2},${r.top-br.top+r.height/2}`:null}).filter(Boolean).join(' ');if(!pts)return;const pl=document.createElementNS('http://www.w3.org/2000/svg','polyline');pl.setAttribute('points',pts);pl.setAttribute('fill','none');pl.setAttribute('stroke',color);pl.setAttribute('stroke-width',kind==='guide'?'7':'9');pl.setAttribute('stroke-linecap','round');pl.setAttribute('stroke-linejoin','round');pl.setAttribute('opacity',kind==='guide'?'.28':kind==='wrong'?'.78':'.52');pl.classList.add(`path-${kind}`);svg.appendChild(pl)});
 }
 async function finishAttemptTelemetry(rec){
- if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||!rec?.attemptId||rec.mode==='rescue'||rec.mode==='starter')return;
+ if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||(MOZKOMOR_MASOCHIST_PLAYTEST&&rec?.difficulty==='mozkomor')||!rec?.attemptId||rec.mode==='rescue'||rec.mode==='starter')return;
  try{await api('/api/attempt/finish',{method:'POST',body:JSON.stringify({attempt_id:rec.attemptId,puzzle_id:rec.puzzleId,challenge_key:rec.challengeKey,mode:rec.mode,difficulty:rec.difficulty,elapsed_ms:rec.elapsedMs,moves:rec.moves,hints_used:rec.hintsUsed||0,wrong_attempts:rec.wrongAttempts||0,max_hint_level:rec.maxHintLevel||0,clean_solve:rec.cleanSolve===true,completed_at:rec.completedAt})})}catch{}
 }
 
@@ -752,7 +779,7 @@ async function finishGame(){
  $('#winModal').classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');winDailyGlobalData=null;const winBoard=$('#levelLeaderboardBox');if(winBoard){winBoard.classList.remove('daily-global-board','free-level-board');if(g.mode==='free'&&!g.postStarterWarmup){winBoard.classList.remove('hidden');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Aktualizuji pořadí…</strong><small>Započítávám právě dohraný výsledek.</small></div>'}else if(g.postStarterWarmup){winBoard.classList.add('hidden')}else if(g.mode==='daily'){winBoard.classList.remove('hidden');winBoard.classList.add('daily-global-board');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Hledám tvoje místo ve světě…</strong><small>Nejdřív bezpečně ukládám výsledek.</small></div>'}else winBoard.classList.add('hidden')}
  const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=ACHIEVEMENTS.filter(a=>!a.test(statsBefore)&&a.test(stats));
  $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';renderCompletionPraise(g.puzzle.difficulty,rec);if(g.postStarterWarmup){trackProductEvent('starter_easy_warmup_completed');$('#winTitle').textContent='Paráda. Teď už jsi rozehřátý.';}const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
- $('#winXp').textContent=dailyGenerationUpgrade?'✓ Nová Daily započítaná · 100 XP už máš':dailyReplay?'Tréninkový pokus · 100 XP už máš':old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':g.mode==='free'&&rec.points===0?'Tréninkový pokus · XP už máš':`+${rec.points} XP`;const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':(g.helperHintUsed?`💛 S Pomocníkem · ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`:`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`);if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
+ $('#winXp').textContent=MOZKOMOR_MASOCHIST_PLAYTEST&&g.mode==='free'&&g.puzzle.difficulty==='mozkomor'?'PLAYTEST · bez XP':dailyGenerationUpgrade?'✓ Nová Daily započítaná · 100 XP už máš':dailyReplay?'Tréninkový pokus · 100 XP už máš':old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':g.mode==='free'&&rec.points===0?'Tréninkový pokus · XP už máš':`+${rec.points} XP`;const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':(g.helperHintUsed?`💛 S Pomocníkem · ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`:`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`);if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
  const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}$('#newBadgeBox').classList.toggle('hidden',!celebrations.length);$('#newBadgeBox').innerHTML=celebrations.join('');
  configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':g.mode==='daily'?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hrát další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.mode==='free'&&!g.postStarterWarmup){
@@ -872,7 +899,7 @@ async function shareDaily(){await shareProplet(shareText())}
 function replayDailyFromWin(){const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO(),puzzle=dailyPuzzleFor(date);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}
 
 function queueResult(rec){
- if(GEN4_CANDIDATE_PREVIEW)return;
+ if(GEN4_CANDIDATE_PREVIEW||(MOZKOMOR_MASOCHIST_PLAYTEST&&rec?.difficulty==='mozkomor'))return;
  if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return;
  const q=getQueue();if(rec.mode==='daily'){const i=q.findIndex(x=>x.challengeKey===rec.challengeKey);if(i<0)q.push(rec);else if(q[i].puzzleId!==rec.puzzleId)q[i]=rec}else{const id=rec.attemptId||`${rec.challengeKey}:${rec.completedAt}`;if(!q.some(x=>(x.attemptId||`${x.challengeKey}:${x.completedAt}`)===id))q.push(rec)}saveQueue(q);renderDaily();
 }
@@ -1584,17 +1611,27 @@ function showPuzzleBootLoading(){
  const dailyMeta=$('#dailyMeta');if(dailyMeta&&!dailyMeta.textContent)dailyMeta.textContent='Načítám dnešní výzvu…';
  const grid=$('#difficultyCards');if(grid&&!grid.children.length)grid.innerHTML='<div class="card" style="grid-column:1/-1;padding:24px"><strong>Načítám úrovně…</strong><p class="muted" style="margin:6px 0 0">Připravuju herní banku.</p></div>';
 }
+function prepareMozkomorMasochistDatabase(data){
+ if(!MOZKOMOR_MASOCHIST_PLAYTEST||!data)return data;
+ for(const p of data.free?.mozkomor||[]){
+  const level=Number(p.meta?.level)||0;
+  p.id=`mzpt-brutal-${String(level).padStart(2,'0')}`;
+  p.meta={...(p.meta||{}),masochistPlaytest:true,calibrationOnly:true};
+ }
+ data.mozkomorPlaytest={...(data.mozkomorPlaytest||{}),kind:'masochist-10',count:(data.free?.mozkomor||[]).length,xpEnabled:false,productionCandidate:false};
+ return data;
+}
 async function loadPuzzleDatabase(){
- let url='/puzzles.json';
+ let url=MOZKOMOR_MASOCHIST_PLAYTEST?'/puzzles-masochist.json':'/puzzles.json';
  GEN4_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
  if(GEN4_CANDIDATE_PREVIEW)url='/api/puzzle-database';
  if(GEN4_CANDIDATE_PREVIEW){
-  const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('gen4-preview-db');const data=await r.json();if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('gen4-preview-db-version');return data;
+  const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('gen4-preview-db');const data=prepareMozkomorMasochistDatabase(await r.json());if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('gen4-preview-db-version');return data;
  }
  if('caches' in window){
-  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
+  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=prepareMozkomorMasochistDatabase(await cached.clone().json());if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{fresh=prepareMozkomorMasochistDatabase(fresh);if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
  }
- const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
+ const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=prepareMozkomorMasochistDatabase(await r.json());if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
 }
 function mergeRollingContent(delta){
  if(!puzzleDB||![1,2].includes(Number(delta?.version||0)))return false;
