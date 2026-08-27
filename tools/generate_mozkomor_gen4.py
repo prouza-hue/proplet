@@ -26,7 +26,7 @@ PROFILE_PATH = ROOT / "data" / "gen4_profiles_v334.json"
 PUZZLES_PATH = ROOT / "data" / "puzzles.json"
 PROFILE_NAME = "mozkomor-core"
 SEED = 2026082701
-TARGET_COOLDOWN = 12
+TARGET_COOLDOWN = 12  # Same spacing discipline as late Gen4 Hard/Mozkozrout.
 
 MOZKOMOR_POLICY = {
     "allowed": ("A", "B", "C", "D"),
