@@ -53,6 +53,7 @@ def main() -> None:
     for answer_index, answer in enumerate(data["answers"]):
         path = answer["path"]
         assert len(path) == len(answer["word"])
+        assert isinstance(answer.get("clue"), str) and len(answer["clue"]) >= 12
         assert len(set(path)) == len(path)
         assert set(path) <= mask
         assert all(adjacent(path[i - 1], path[i], cols) for i in range(1, len(path)))
@@ -101,6 +102,13 @@ def main() -> None:
         "if(mode==='tajenka')return savedTajenkaProgress(puzzle)",
         "if(g.mode==='tajenka')return saveTajenkaGameProgress(g)",
         "trackProductEvent('tajenka_completed')",
+        "Jiná pravidla",
+        "Některá písmena na desce zůstanou nevyužitá.",
+        "tajenka-progress",
+        "newly-revealed",
+        "tajenka-unused",
+        "Významová stopa",
+        "Každý víkend nová",
     ):
         assert marker in app, marker
 
@@ -113,7 +121,7 @@ def main() -> None:
     ):
         assert f'"{event}"' in server, event
 
-    assert "proplet-v4.01.28-tajenka-preview-v4-shell" in sw
+    assert "proplet-v4.01.28-tajenka-preview-v5-shell" in sw
     assert "'/tajenka-test.json'" in sw
 
     # The gate must explicitly list production origins so ?tajenka=1 cannot expose it there.
