@@ -13,6 +13,10 @@ client = (
 css = (root / "public" / "quality-v334.css").read_text(encoding="utf-8")
 hotfix_css = (root / "public" / "quality-hotfix-v334.css").read_text(encoding="utf-8")
 runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
+version_source = (root / "proplet_version.py").read_text(encoding="utf-8")
+version_match = re.search(r'^APP_VERSION = "([^"]+)"', version_source, re.M)
+assert version_match, "Canonical APP_VERSION missing"
+expected_version = version_match.group(1)
 index = (root / "public" / "index.html").read_text(encoding="utf-8")
 app = (root / "public" / "app.js").read_text(encoding="utf-8")
 sw = (root / "public" / "sw.js").read_text(encoding="utf-8")
@@ -112,8 +116,8 @@ assert "transform:none" in hotfix_css
 assert "Hrát další úroveň" in app
 
 # v4.01.x keeps the approved CTA colour and the primary interaction contracts.
-assert 'version:\'4.01.25\'' in runtime
-assert "proplet-v4.01.25-shell" in sw
+assert f"version:'{expected_version}'" in runtime
+assert f"proplet-v{expected_version}" in sw and "shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "challengeCtaRaspberryV4005:true" in runtime
 assert "resultCtaFontParityV4006:true" in runtime
@@ -159,4 +163,4 @@ for path in (
 assert "_install_preview_auth_v334(app)" in account_auth
 assert "GEN4_CANDIDATE_PREVIEW and request.method" in server
 
-print("Proplet v4.01.25 quality release contract: OK")
+print("Proplet current quality release contract: OK")

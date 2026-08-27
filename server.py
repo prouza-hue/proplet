@@ -118,6 +118,20 @@ async def launch_safety_middleware(request: Request, call_next):
             )
     response = await call_next(request)
     response.headers["X-Request-ID"] = request_id
+    response.headers["X-Proplet-Version"] = APP_VERSION
+    if response.status_code >= 500:
+        # Vercel's pre-aggregated runtime error view only sees uncaught exceptions.
+        # HTTPException/JSONResponse 5xx responses are therefore logged explicitly.
+        logger.error(
+            "proplet_http_5xx status=%s method=%s route=%s request_id=%s version=%s",
+            response.status_code,
+            request.method,
+            request.url.path,
+            request_id,
+            APP_VERSION,
+        )
+        # Do not synchronously write this alarm back to Supabase: Supabase may be
+        # the failed dependency, and a second DB attempt would delay the response.
     if request.url.path == "/api/rolling-content" and not GEN4_CANDIDATE_PREVIEW:
         response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=86400"
     elif request.url.path == "/api/push/config":
@@ -430,6 +444,25 @@ def db_insert(table: str, row: dict):
     return rows[0] if rows else row
 
 
+def db_upsert_push_subscription(row: dict):
+    """Atomically create or refresh one browser endpoint without changing its id."""
+    result = db_rpc("proplet_upsert_push_subscription", {
+        "p_endpoint": row["endpoint"],
+        "p_player_id": row.get("player_id"),
+        "p_anonymous_id": row.get("anonymous_id"),
+        "p_p256dh": row["p256dh"],
+        "p_auth": row["auth"],
+        "p_user_agent": row.get("user_agent"),
+        "p_daily_enabled": bool(row.get("daily_enabled", True)),
+        "p_content_enabled": bool(row.get("content_enabled", True)),
+    })
+    if isinstance(result, list) and result:
+        return result[0]
+    if isinstance(result, dict):
+        return result
+    raise HTTPException(503, "Registraci upozornění se nepodařilo potvrdit")
+
+
 def db_update(table: str, filters: dict, values: dict):
     params = {key: f"eq.{value}" for key, value in filters.items()}
     return db_request("PATCH", table, params=params, body=values, prefer="return=representation")
@@ -544,6 +577,14 @@ def record_operational_event(
         "metadata": safe_metadata,
         "created_at": datetime.now(TZ).isoformat(),
     })
+
+
+def client_app_version(request: Request) -> str:
+    """Return measured client runtime version; never confuse it with server version."""
+    raw = str(request.headers.get("x-proplet-version") or "").strip()
+    if re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?", raw):
+        return raw[:40]
+    return "legacy-unknown"
 
 
 def enforce_rate_limit(
@@ -2127,7 +2168,7 @@ def product_event(
         "push_nudge_shown", "push_nudge_accepted", "push_nudge_dismissed", "push_permission_denied",
         "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
         "push_notifications_enabled", "push_notifications_disabled", "push_notifications_auto_repaired",
-        "push_daily_opened", "push_weekly_opened", "push_content_opened",
+        "push_daily_opened", "push_weekly_opened", "push_content_opened", "push_return_opened",
         "pwa_update_detected", "pwa_update_applied", "legacy_origin_update_shown", "legacy_origin_update_opened",
         "content_drop_cta_clicked",
         "tajenka_viewed", "tajenka_started", "tajenka_word_found", "tajenka_completed", "tajenka_abandoned",
@@ -2145,7 +2186,7 @@ def product_event(
         raise HTTPException(400, "Neplatný product event")
     db_insert("product_events", {
         "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": APP_VERSION, "created_at": datetime.now(TZ).isoformat(),
+        "event_type": payload.event_type, "app_version": client_app_version(request), "created_at": datetime.now(TZ).isoformat(),
     })
     return {"ok": True}
 
@@ -2352,7 +2393,7 @@ def support_report(
         "message": message,
         "reply_to": reply_to,
         "page": str(payload.page or "")[:120] or None,
-        "app_version": APP_VERSION,
+        "app_version": client_app_version(request),
         "status": "new",
         "created_at": datetime.now(TZ).isoformat(),
     })
@@ -2436,7 +2477,7 @@ def attempt_start(
         "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
         "mode": payload.mode, "difficulty": payload.difficulty,
-        "started_at": datetime.now(TZ).isoformat(), "app_version": APP_VERSION,
+        "started_at": datetime.now(TZ).isoformat(), "app_version": client_app_version(request),
         "calm_mode": bool(payload.calm_mode),
     })
     return {"ok": True, "attemptId": payload.attempt_id, "anonymous": actor.get("player_id") is None}
@@ -2507,7 +2548,7 @@ def attempt_finish(
         db_insert("puzzle_attempts", {
             "id": payload.attempt_id, "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
             "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key, "mode": payload.mode,
-            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": APP_VERSION,
+            "difficulty": payload.difficulty, "started_at": datetime.now(TZ).isoformat(), "app_version": client_app_version(request),
             "calm_mode": bool(payload.calm_mode),
         })
     completed_at = payload.completed_at or datetime.now(TZ).isoformat()
@@ -5043,34 +5084,22 @@ def push_subscribe(
     actor = telemetry_actor(authorization, x_proplet_anon_id)
     if not push_ready():
         raise HTTPException(503, "Push notifikace ještě nejsou na serveru nakonfigurované")
-    existing = db_select("push_subscriptions", endpoint=payload.endpoint)
     # Od v4.01.7 má hráč jeden srozumitelný souhlas. Dvě DB pole zůstávají jen proto,
     # že Daily a pondělní drop mají odlišný plán doručení. Starý klient při zapnutí
     # rovněž aktivuje obě kategorie; vypnutí stále používá /unsubscribe.
     enabled = True if payload.daily_enabled is None and payload.content_enabled is None else bool(payload.daily_enabled or payload.content_enabled)
     daily_enabled = content_enabled = enabled
     row = {
+        "endpoint": payload.endpoint,
         "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
         "p256dh": payload.p256dh, "auth": payload.auth,
         "user_agent": payload.user_agent, "updated_at": datetime.now(TZ).isoformat(),
         "daily_enabled": daily_enabled, "content_enabled": content_enabled,
     }
     try:
-        if existing:
-            db_update("push_subscriptions", {"id": existing[0]["id"]}, row)
-        else:
-            db_insert("push_subscriptions", {"id": str(uuid.uuid4()), "endpoint": payload.endpoint, "created_at": datetime.now(TZ).isoformat(), **row})
+        db_upsert_push_subscription(row)
     except HTTPException as exc:
-        # Old cached clients can still restore the historical Daily-only subscription before
-        # the v3.30 SQL migration. New category-aware clients wait for the migration instead.
-        if payload.daily_enabled is None and payload.content_enabled is None:
-            legacy_row = {k: v for k, v in row.items() if k not in {"daily_enabled", "content_enabled"}}
-            if existing:
-                db_update("push_subscriptions", {"id": existing[0]["id"]}, legacy_row)
-            else:
-                db_insert("push_subscriptions", {"id": str(uuid.uuid4()), "endpoint": payload.endpoint, "created_at": datetime.now(TZ).isoformat(), **legacy_row})
-        else:
-            raise HTTPException(503, "Nové nastavení upozornění čeká na databázovou migraci") from exc
+        raise HTTPException(503, "Registrace upozornění čeká na dokončení serverové aktualizace") from exc
     return {"ok": True, "dailyEnabled": daily_enabled, "contentEnabled": content_enabled}
 
 

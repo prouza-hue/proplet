@@ -113,7 +113,7 @@ def main() -> None:
     ):
         assert f'"{event}"' in server, event
 
-    assert "proplet-v4.01.25-tajenka-preview-v3-shell" in sw
+    assert "proplet-v4.01.28-tajenka-preview-v4-shell" in sw
     assert "'/tajenka-test.json'" in sw
 
     # The gate must explicitly list production origins so ?tajenka=1 cannot expose it there.

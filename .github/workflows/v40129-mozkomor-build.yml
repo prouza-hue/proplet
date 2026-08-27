@@ -1,0 +1,188 @@
+name: v4.01.29 Mozkomor Gen4 build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/generate_mozkomor_gen4.py'
+      - 'tools/validate_gen4_release.py'
+      - 'data/gen4_profiles_v334.json'
+      - '.github/workflows/v40129-mozkomor-build.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v40129-mozkomor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-bind:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/v40129-mozkomor' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate 100 deterministic Mozkomor boards
+        run: |
+          mkdir -p /tmp/mozkomor
+          python tools/generate_mozkomor_gen4.py \
+            --count 100 \
+            --start-level 1 \
+            --seed 2026082701 \
+            --output /tmp/mozkomor/mozkomor.json
+
+      - name: Validate the standalone Gen4 bank
+        run: |
+          python tools/validate_gen4_release.py /tmp/mozkomor/mozkomor.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --report /tmp/mozkomor/validation.json
+
+      - name: Audit endgame spacing, uniqueness and calibration
+        run: |
+          python - <<'PY'
+          import json, sys
+          from collections import Counter, deque
+          from pathlib import Path
+          sys.path.insert(0, 'tools')
+          from validate_gen4_release import canonical_hash
+
+          generated = json.loads(Path('/tmp/mozkomor/mozkomor.json').read_text(encoding='utf-8'))
+          production = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          puzzles = list(generated['puzzles'])
+          assert len(puzzles) == 100
+          assert [int(p['meta']['level']) for p in puzzles] == list(range(1, 101))
+          assert all(p.get('difficulty') == 'mozkomor' for p in puzzles)
+          assert len({p['id'] for p in puzzles}) == 100
+
+          existing = [
+              p for bank in (production.get('free') or {}).values()
+              for p in (bank or [])
+          ] + list(production.get('daily') or []) + list(production.get('rescue') or [])
+          existing_hashes = {canonical_hash(p) for p in existing}
+          new_hashes = [canonical_hash(p) for p in puzzles]
+          assert len(set(new_hashes)) == 100
+          assert not (set(new_hashes) & existing_hashes)
+
+          # The transition from Mozkozrout #200 into Mozkomor obeys the same
+          # 12-board target cooldown as the endgame bank itself.
+          history = deque(maxlen=12)
+          hardcore = list((production.get('free') or {}).get('hardcore') or [])
+          for p in hardcore[-12:]:
+              history.append({str(a['word']).casefold() for a in p.get('answers') or []})
+          cooldown_errors = []
+          for level, puzzle in enumerate(puzzles, 1):
+              words = {str(a['word']).casefold() for a in puzzle.get('answers') or []}
+              blocked = set().union(*history) if history else set()
+              overlap = sorted(words & blocked)
+              if overlap:
+                  cooldown_errors.append({'level': level, 'words': overlap})
+              history.append(words)
+          assert not cooldown_errors, cooldown_errors[:5]
+
+          amb = sorted(float(p['meta']['localAmbiguityScore']) for p in puzzles)
+          turns = sorted(float(p['meta']['meanTurns']) for p in puzzles)
+          cells = [len(p.get('mask') or []) for p in puzzles]
+          words_n = [len(p.get('answers') or []) for p in puzzles]
+          tiers = Counter(
+              str(a.get('tier') or '?')
+              for p in puzzles
+              for a in p.get('answers') or []
+          )
+          all_words = sum(words_n)
+          d_share = tiers.get('D', 0) / all_words if all_words else 0
+          assert amb[0] >= 12.0 and amb[-1] <= 60.0
+          assert min(cells) >= 72 and max(cells) <= 80
+          assert min(words_n) >= 10 and max(words_n) <= 11
+          assert d_share <= 0.18 + 1e-9
+
+          def pct(vals, p):
+              i = round((len(vals) - 1) * p)
+              return round(vals[i], 3)
+
+          audit = {
+              'version': 1,
+              'kind': 'mozkomor-v40129-generation-audit',
+              'count': len(puzzles),
+              'seed': generated['seed'],
+              'unlock': generated['unlock'],
+              'targetCooldown': generated['targetCooldown'],
+              'duplicateBoardHashesVsActiveGen4': 0,
+              'transitionCooldownViolations': 0,
+              'ambiguity': {'min': amb[0], 'median': pct(amb, .5), 'p75': pct(amb, .75), 'p90': pct(amb, .9), 'max': amb[-1]},
+              'meanTurns': {'min': turns[0], 'median': pct(turns, .5), 'p90': pct(turns, .9), 'max': turns[-1]},
+              'activeCells': {'min': min(cells), 'max': max(cells)},
+              'targetWords': {'min': min(words_n), 'max': max(words_n)},
+              'tierCounts': dict(tiers),
+              'tierDShare': round(d_share, 4),
+              'generatorStats': generated.get('stats') or {},
+          }
+          Path('/tmp/mozkomor/audit.json').write_text(json.dumps(audit, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(audit, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Bind Mozkomor into the runtime bank
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          source_path = Path('data/puzzles.json')
+          source = json.loads(source_path.read_text(encoding='utf-8'))
+          generated = json.loads(Path('/tmp/mozkomor/mozkomor.json').read_text(encoding='utf-8'))
+          source.setdefault('free', {})['mozkomor'] = generated['puzzles']
+          source['mozkomorGeneration'] = 4
+          source['mozkomorUnlock'] = {
+              'requiresDifficulty': 'hardcore',
+              'requiresCurrentBaseLevels': 200,
+              'persistentOnceEarned': True,
+          }
+          source.setdefault('targetCooldownPolicy', {}).setdefault('free', {})['mozkomor'] = 12
+          rendered = json.dumps(source, ensure_ascii=False, separators=(',', ':')) + '\n'
+          source_path.write_text(rendered, encoding='utf-8')
+          Path('public/puzzles.json').write_text(rendered, encoding='utf-8')
+          Path('data/audits/mozkomor_v40129.json').write_text(
+              Path('/tmp/mozkomor/audit.json').read_text(encoding='utf-8'),
+              encoding='utf-8',
+          )
+          PY
+
+      - name: Validate the complete approved runtime after binding
+        run: |
+          python tools/validate_gen4_release.py data/puzzles.json \
+            --rolling data/rolling_content_v1.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --strict-counts \
+            --approved-release \
+            --report /tmp/mozkomor/full-validation.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v40129-mozkomor-bank
+          path: /tmp/mozkomor/
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Commit generated bank back to preview branch
+        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'agent/v40129-mozkomor' }}
+        run: |
+          git config user.name "proplet-generation-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/puzzles.json public/puzzles.json data/audits/mozkomor_v40129.json
+          if git diff --cached --quiet; then
+            echo "Generated Mozkomor bank is already current."
+            exit 0
+          fi
+          git commit -m "[mozkomor-generated] Bind 100 audited Gen4 endgame levels"
+          git push origin "HEAD:${{ github.head_ref }}"
