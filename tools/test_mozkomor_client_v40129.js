@@ -56,3 +56,5 @@ if(!css.includes('right:92px;top:17px'))
 if(!css.includes('pointer-events:none'))
   throw new Error('ENDGAME badge must never intercept Mozkomor clicks');
 console.log('Mozkomor v4.01.29 client contract: OK');
+
+// Node-24 CI rerun sentinel: handler regression fixed.
