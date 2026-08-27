@@ -7,6 +7,7 @@ both production Mozkozrout and the current v4.01.29 Mozkomor bank.
 
 Ten playtest levels are generated independently from deterministic, disjoint
 SHA-256 vocabulary partitions so target words cannot repeat across the set.
+Tier D is intentionally preserved as the hardest reviewed vocabulary tier.
 """
 from __future__ import annotations
 
