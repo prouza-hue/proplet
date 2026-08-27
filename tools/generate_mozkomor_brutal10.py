@@ -25,6 +25,7 @@ PROFILE_PATH = ROOT / "data" / "gen4_profiles_v334.json"
 PUZZLES_PATH = ROOT / "data" / "puzzles.json"
 PROFILE_NAME = "mozkomor-brutal10-v1"
 SEED = 2026082801
+# v1b: feasible extreme calibration after the first profile proved non-generable.
 TARGET_COOLDOWN = 12  # Same spacing discipline as late Gen4 Hard/Mozkozrout.
 # v4.01.29 bank is deterministic; reruns with this seed must reproduce the same 100 boards.
 
