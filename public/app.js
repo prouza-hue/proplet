@@ -561,7 +561,7 @@ function mozkomorUnlockState(){
 function renderQuickPlay(){
  const root=$('#quickPlayGrid');if(!root||!puzzleDB)return;
  root.innerHTML=Object.entries(DIFF).filter(([key])=>key!=='mozkomor').map(([key,d])=>{const q=freeProgress(key),nextLevel=Number((q.resume||q.nextUnsolved)?.meta?.level)||null,status=q.resume?`Pokračovat${nextLevel?` · úroveň ${nextLevel}`:''}`:q.done===q.total&&q.total?'Hotovo · hrát znovu':`Další · úroveň ${nextLevel||1}`;return `<button class="quick-game" data-quick-free="${key}" data-diff="${key}"><span class="quick-game-icon">${difficultyIconMarkup(key,'difficulty-icon-img')}</span><span class="quick-game-copy"><strong>${d.label}</strong><small>${status}</small><i><b style="width:${q.pct}%"></b></i></span><span class="quick-game-arrow">›</span></button>`}).join('');
- $('[data-quick-free]').forEach(b=>b.onclick=()=>startFree(b.dataset.quickFree));
+ $$('[data-quick-free]').forEach(b=>b.onclick=()=>startFree(b.dataset.quickFree));
 }
 
 
