@@ -22,7 +22,7 @@ on:
       - '.github/workflows/v40129-mozkomor-build.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: v40129-mozkomor-contract-${{ github.event.pull_request.number || github.ref }}
@@ -46,34 +46,32 @@ jobs:
       - name: Install runtime test dependencies
         run: pip install -r requirements.txt
 
-      - name: Normalize Mozkomor runtime metadata
+      - name: Verify committed Mozkomor runtime metadata
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          source_path=Path('data/puzzles.json')
-          public_path=Path('public/puzzles.json')
-          source=json.loads(source_path.read_text(encoding='utf-8'))
+          source=json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          public=json.loads(Path('public/puzzles.json').read_text(encoding='utf-8'))
           bank=list((source.get('free') or {}).get('mozkomor') or [])
-          if len(bank)!=100:
-              raise SystemExit(f'Expected 100 committed Mozkomor boards, got {len(bank)}')
-          source['mozkomorGeneration']=4
-          source['mozkomorUnlock']={
-              'requiresDifficulty':'hardcore',
-              'requiresCurrentBaseLevels':200,
-              'persistentOnceEarned':True,
-          }
-          source['mozkomorPolicy']={
-              'requiredLevels':100,
-              'targetCooldown':12,
-              'rollingContent':False,
-          }
-          free_policy=(source.get('targetCooldownPolicy') or {}).get('free') or {}
-          free_policy.pop('mozkomor',None)
-          rendered=json.dumps(source,ensure_ascii=False,separators=(',',':'))+'\n'
-          source_path.write_text(rendered,encoding='utf-8')
-          public_path.write_text(rendered,encoding='utf-8')
+          public_bank=list((public.get('free') or {}).get('mozkomor') or [])
+          assert len(bank)==100, f'Expected 100 committed Mozkomor boards, got {len(bank)}'
+          assert len(public_bank)==100, f'Expected 100 public Mozkomor boards, got {len(public_bank)}'
+          assert source.get('mozkomorGeneration')==4
+          unlock=source.get('mozkomorUnlock') or {}
+          assert unlock.get('requiresDifficulty')=='hardcore'
+          assert int(unlock.get('requiresCurrentBaseLevels') or 0)==200
+          assert unlock.get('persistentOnceEarned') is True
+          policy=source.get('mozkomorPolicy') or {}
+          assert int(policy.get('requiredLevels') or 0)==100
+          assert int(policy.get('targetCooldown') or 0)==12
+          assert policy.get('rollingContent') is False
+          assert 'mozkomor' not in (((source.get('targetCooldownPolicy') or {}).get('free') or {}))
+          assert public.get('mozkomorGeneration')==source.get('mozkomorGeneration')
+          assert public.get('mozkomorUnlock')==source.get('mozkomorUnlock')
+          assert public.get('mozkomorPolicy')==source.get('mozkomorPolicy')
+          print('Committed Mozkomor runtime metadata: OK')
           PY
 
       - name: Syntax checks
@@ -109,16 +107,3 @@ jobs:
             /tmp/mozkomor-full-validation.json
           retention-days: 30
           if-no-files-found: error
-
-      - name: Commit normalized metadata and audit back to preview branch
-        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'agent/v40129-mozkomor' }}
-        run: |
-          git config user.name "proplet-contract-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add data/puzzles.json public/puzzles.json data/audits/mozkomor_v40129.json
-          if git diff --cached --quiet; then
-            echo "Mozkomor runtime metadata and audit already current."
-            exit 0
-          fi
-          git commit -m "[mozkomor-contract] Normalize bank metadata and audit"
-          git push origin "HEAD:${{ github.head_ref }}"
