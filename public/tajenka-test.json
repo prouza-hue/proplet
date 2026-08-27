@@ -1,36 +1,39 @@
 {
   "version": 1,
-  "id": "tajenka-test-002",
+  "id": "tajenka-test-003",
   "kind": "weekend_bonus",
   "title": "První krok",
-  "description": "Najdi pět propletených slov. Každé odhalí další část tajenky.",
-  "rows": 5,
+  "description": "Najdi pět propletených slov mezi falešnými odbočkami. Každé odhalí další část tajenky.",
+  "rows": 6,
   "cols": 6,
-  "mask": [1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],
+  "mask": [1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34],
   "letters": [
-    "","E","C","K","A","",
-    "Z","S","T","P","Ž","D",
-    "A","Č","A","R","V","Á",
-    "N","Í","O","K","N","Í",
-    "Á","K","R","E","M","M"
+    "","A","K","V","R","",
+    "D","Ž","Í","N","P","O",
+    "Á","M","M","E","N","Á",
+    "C","E","K","K","Í","Č",
+    "E","S","O","R","Z","A",
+    "","T","A","L","O",""
   ],
   "lengths": [5,5,6,6,6],
   "answers": [
-    {"word":"KAŽDÁ","path":[3,4,10,11,17],"turns":3,"curlRun":1},
-    {"word":"CESTA","path":[2,1,7,8,14],"turns":3,"curlRun":1},
-    {"word":"ZAČÍNÁ","path":[6,12,13,19,18,24],"turns":4,"curlRun":1},
-    {"word":"PRVNÍM","path":[9,15,16,22,23,29],"turns":4,"curlRun":1},
-    {"word":"KROKEM","path":[25,26,20,21,27,28],"turns":4,"curlRun":1}
+    {"word":"KAŽDÁ","path":[2,1,7,6,12],"turns":3,"curlRun":1},
+    {"word":"CESTA","path":[18,24,25,31,32],"turns":3,"curlRun":1},
+    {"word":"ZAČÍNÁ","path":[28,29,23,22,16,17],"turns":4,"curlRun":1},
+    {"word":"PRVNÍM","path":[10,4,3,9,8,14],"turns":4,"curlRun":1},
+    {"word":"KROKEM","path":[21,27,26,20,19,13],"turns":4,"curlRun":1}
   ],
   "tajenka": {
     "phrase": "KAŽDÁ CESTA ZAČÍNÁ PRVNÍM KROKEM",
     "answerOrder": [0,1,2,3,4]
   },
   "meta": {
-    "cells": 28,
+    "cells": 32,
+    "phraseCells": 28,
+    "decoyCells": 4,
     "verified": true,
     "curvyWords": 5,
-    "pathStyle": "winding",
+    "pathStyle": "winding_with_decoys",
     "previewOnly": true
   }
 }

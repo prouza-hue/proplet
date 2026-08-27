@@ -37,11 +37,12 @@ def longest_straight_run(path: list[int], cols: int) -> int:
 def main() -> None:
     data = json.loads(FIXTURE.read_text(encoding="utf-8"))
     assert data["version"] == 1
-    assert data["id"] == "tajenka-test-002"
+    assert data["id"] == "tajenka-test-003"
     assert data["kind"] == "weekend_bonus"
     assert data["meta"]["previewOnly"] is True
 
     rows, cols = data["rows"], data["cols"]
+    assert (rows, cols) == (6, 6)
     assert len(data["letters"]) == rows * cols
     mask = set(data["mask"])
     assert len(mask) == len(data["mask"]) == data["meta"]["cells"]
@@ -65,15 +66,18 @@ def main() -> None:
             assert cell not in answer_owner
             answer_owner[cell] = answer_index
 
-    # This is a game-design contract, not just a data-integrity test: every cell
-    # belongs to one answer, the words visibly intermingle, and the board can no
-    # longer regress into five independently readable straight rows.
-    assert set(answer_owner) == mask
+    # This is a game-design contract, not just a data-integrity test: the 6x6
+    # silhouette has visible bites, four deliberate decoys create plausible
+    # false branches, and none of the words can regress into a straight row.
+    decoys = mask - set(answer_owner)
+    assert len(set(range(rows * cols)) - mask) == 4
+    assert len(decoys) == data["meta"]["decoyCells"] == 4
+    assert len(answer_owner) == data["meta"]["phraseCells"] == 28
     assert sum(measured_turns) >= 18
     cross_word_edges = sum(
         1
-        for cell in mask
-        for neighbour in mask
+        for cell in answer_owner
+        for neighbour in answer_owner
         if cell < neighbour and adjacent(cell, neighbour, cols)
         and answer_owner[cell] != answer_owner[neighbour]
     )
@@ -109,7 +113,7 @@ def main() -> None:
     ):
         assert f'"{event}"' in server, event
 
-    assert "proplet-v4.01.25-tajenka-preview-v2-shell" in sw
+    assert "proplet-v4.01.25-tajenka-preview-v3-shell" in sw
     assert "'/tajenka-test.json'" in sw
 
     # The gate must explicitly list production origins so ?tajenka=1 cannot expose it there.

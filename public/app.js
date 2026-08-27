@@ -1561,7 +1561,7 @@ const TAJENKA_PREVIEW=new URLSearchParams(location.search).get('tajenka')==='1'&
 let tajenkaPuzzle=null;
 
 function tajenkaFixtureValid(data){
- if(!data||data.version!==1||data.id!=='tajenka-test-002'||data.kind!=='weekend_bonus'||data.meta?.previewOnly!==true)return false;
+ if(!data||data.version!==1||data.id!=='tajenka-test-003'||data.kind!=='weekend_bonus'||data.meta?.previewOnly!==true)return false;
  if(!Number.isInteger(data.rows)||!Number.isInteger(data.cols)||!Array.isArray(data.mask)||!Array.isArray(data.letters)||!Array.isArray(data.answers))return false;
  if(data.letters.length!==data.rows*data.cols||data.mask.length!==Number(data.meta?.cells)||data.answers.length<1)return false;
  const mask=new Set(data.mask);if(mask.size!==data.mask.length||data.mask.some(i=>!Number.isInteger(i)||i<0||i>=data.letters.length))return false;
@@ -1585,7 +1585,7 @@ function renderTajenkaEntry(){
  const root=$('#tajenkaPreviewCard');if(!root)return;
  if(!TAJENKA_PREVIEW||!tajenkaPuzzle){root.classList.add('hidden');root.innerHTML='';return}
  const state=tajenkaState(),inProgress=state.inProgress?.puzzleId===tajenkaPuzzle.id,completed=state.completed?.puzzleId===tajenkaPuzzle.id;
- root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✦</div><div class="tajenka-entry-copy"><span class="eyebrow">VÍKENDOVÝ BONUS</span><h2>Tajenka</h2><p>${inProgress?'Pokračuj v hledání slov a odhal skrytou frázi.':'Najdi slova, která společně vytvoří smysluplnou větu.'}</p>${completed?'<small class="tajenka-entry-done">✓ Tajenku už máš odhalenou · můžeš si ji zahrát znovu</small>':''}</div><button id="tajenkaPreviewBtn" class="primary-btn">${inProgress?'Pokračovat v tajence':completed?'Zahrát znovu':'Hrát tajenku'}</button>`;
+ root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✦</div><div class="tajenka-entry-copy"><span class="eyebrow"><b>NOVINKA</b> · VÍKENDOVÝ BONUS</span><h2>Tajenka</h2><p>${inProgress?'Pokračuj v hledání slov a odhal skrytou frázi.':'Najdi pět propletených slov a odhal společnou myšlenku.'}</p>${completed?'<small class="tajenka-entry-done">✓ Tajenku už máš odhalenou · můžeš si ji zahrát znovu</small>':''}</div><button id="tajenkaPreviewBtn" class="primary-btn">${inProgress?'Pokračovat':completed?'Zahrát znovu':'Hrát tajenku'}</button>`;
  root.classList.remove('hidden');root.querySelector('#tajenkaPreviewBtn').onclick=startTajenka;trackTajenkaView();
 }
 async function loadTajenkaFixture(){
