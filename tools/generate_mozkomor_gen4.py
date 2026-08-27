@@ -14,6 +14,7 @@ import argparse
 from collections import Counter
 from copy import deepcopy
 import json
+import hashlib
 from pathlib import Path
 import random
 from statistics import median
@@ -103,9 +104,15 @@ def main() -> None:
     parser.add_argument("--start-level", type=int, default=1)
     parser.add_argument("--seed", type=int, default=SEED)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--partition-index", type=int, default=None)
+    parser.add_argument("--partition-count", type=int, default=None)
     args = parser.parse_args()
     if args.count < 1:
         raise SystemExit("--count must be positive")
+    if (args.partition_index is None) != (args.partition_count is None):
+        raise SystemExit("--partition-index and --partition-count must be used together")
+    if args.partition_count is not None and not (1 <= args.partition_count <= 16 and 0 <= args.partition_index < args.partition_count):
+        raise SystemExit("invalid target vocabulary partition")
 
     approved = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
     declared = (approved.get("profiles") or {}).get(PROFILE_NAME)
@@ -142,6 +149,15 @@ def main() -> None:
     ))
     prefixes = g4.prefix_index(set(dictionary))
     pool = g4.v3.cal.weighted_pool(tiers, metadata, MOZKOMOR_POLICY)
+    if args.partition_count is not None:
+        def target_bucket(word: str) -> int:
+            digest = hashlib.sha256(word.casefold().encode("utf-8")).digest()
+            return int.from_bytes(digest[:4], "big") % args.partition_count
+        pool = [word for word in pool if target_bucket(word) == args.partition_index]
+        if len(set(pool)) < 350:
+            raise SystemExit(
+                f"Mozkomor target partition too small: {len(set(pool))} unique words"
+            )
 
     g4.PROFILES[PROFILE_NAME] = deepcopy(PROFILE)
     g4.PREFIXES["mozkomor"] = "z"
@@ -247,6 +263,7 @@ def main() -> None:
         "seed": args.seed,
         "startLevel": args.start_level,
         "targetCooldown": TARGET_COOLDOWN,
+        "targetPartition": {"index": args.partition_index, "count": args.partition_count} if args.partition_count is not None else None,
         "unlock": {"difficulty": "hardcore", "baseLevels": 200},
         "puzzles": puzzles,
         "stats": {
