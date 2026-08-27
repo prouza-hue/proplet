@@ -662,8 +662,16 @@ function ensureTouchMagnifier(){
  el=document.createElement('div');el.id='touchMagnifier';el.className='touch-magnifier hidden';el.setAttribute('aria-hidden','true');el.innerHTML='<div class="touch-magnifier-grid"></div>';document.body.appendChild(el);return el;
 }
 function renderTouchMagnifier(centerIndex){
- const g=currentGame;if(!g||centerIndex==null)return;const p=g.puzzle,mask=new Set(p.mask),row=Math.floor(centerIndex/p.cols),col=centerIndex%p.cols,grid=ensureTouchMagnifier().querySelector('.touch-magnifier-grid'),cells=[];
- for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const rr=row+dr,cc=col+dc,j=rr*p.cols+cc;if(rr<0||rr>=p.rows||cc<0||cc>=p.cols||!mask.has(j)){cells.push('<span class="touch-mag-cell void"></span>');continue}const cls=['touch-mag-cell'];if(j===centerIndex)cls.push('focus');if(g.path.includes(j))cls.push('active');if(g.used.has(j))cls.push('used');const color=g.used.get(j),style=color!=null?` style="--word-color:${COLORS[color%COLORS.length]}"`:'';cells.push(`<span class="${cls.join(' ')}"${style}>${esc(p.letters[j])}</span>`)}
+ const g=currentGame;if(!g||centerIndex==null)return;const p=g.puzzle,mask=new Set(p.mask),row=Math.floor(centerIndex/p.cols),col=centerIndex%p.cols,grid=ensureTouchMagnifier().querySelector('.touch-magnifier-grid'),cells=[],backIndex=g.path.length>1?g.path.at(-2):null;
+ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+  if(Math.abs(dr)+Math.abs(dc)>1){cells.push('<span class="touch-mag-cell void"></span>');continue}
+  const rr=row+dr,cc=col+dc,j=rr*p.cols+cc;
+  if(rr<0||rr>=p.rows||cc<0||cc>=p.cols||!mask.has(j)){cells.push('<span class="touch-mag-cell void"></span>');continue}
+  const cls=['touch-mag-cell'],isCenter=j===centerIndex,isBack=j===backIndex,isBlocked=!isCenter&&!isBack&&(g.used.has(j)||g.path.includes(j));
+  if(isCenter)cls.push('focus','active');else if(isBack)cls.push('backtrack');else if(isBlocked)cls.push('blocked');else cls.push('candidate');
+  const color=g.used.get(j),style=color!=null?` style="--word-color:${COLORS[color%COLORS.length]}"`:'';
+  cells.push(`<span class="${cls.join(' ')}"${style}>${esc(p.letters[j])}</span>`)
+ }
  grid.innerHTML=cells.join('');
 }
 function showTouchMagnifier(x,y,centerIndex){
@@ -674,7 +682,7 @@ function pointerDown(e){e.preventDefault();ensureAudio();const g=currentGame,i=+
 }
 function pointerEnter(e){if(currentGame?.dragging)extendPath(+e.currentTarget.dataset.index)}
 function samplePointer(x,y){const g=currentGame;if(!g?.dragging)return;const prev=g.lastPointer||{x,y},dx=x-prev.x,dy=y-prev.y,dist=Math.hypot(dx,dy),steps=Math.max(1,Math.ceil(dist/6));for(let n=1;n<=steps;n++){const px=prev.x+dx*n/steps,py=prev.y+dy*n/steps,el=document.elementFromPoint(px,py)?.closest?.('.cell');if(el)extendPath(+el.dataset.index)}g.lastPointer={x,y}}
-function pointerMove(e){if(!currentGame?.dragging)return;const evs=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[e];for(const ev of evs)samplePointer(ev.clientX,ev.clientY);const last=evs.at(-1)||e,el=document.elementFromPoint(last.clientX,last.clientY)?.closest?.('.cell'),center=el?+el.dataset.index:currentGame.path.at(-1);showTouchMagnifier(last.clientX,last.clientY,center)}
+function pointerMove(e){if(!currentGame?.dragging)return;const evs=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[e];for(const ev of evs)samplePointer(ev.clientX,ev.clientY);const last=evs.at(-1)||e;showTouchMagnifier(last.clientX,last.clientY,currentGame.path.at(-1))}
 function extendPath(i){const g=currentGame,path=g.path,last=path.at(-1);if(i===last)return;if(path.length>1&&i===path.at(-2)){path.pop();updateActive();return}if(g.used.has(i)||path.includes(i)||!pNeighbours(last).includes(i))return;path.push(i);fx('step');updateActive()}
 function pointerUp(){hideTouchMagnifier();if(!currentGame?.dragging)return;currentGame.dragging=false;currentGame.lastPointer=null;submitPath()}
 function currentWord(){return currentGame.path.map(i=>currentGame.puzzle.letters[i]).join('')}
