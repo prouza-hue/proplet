@@ -6,6 +6,8 @@ const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8');
 const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
 const home=fs.readFileSync(path.join(root,'public/home-layout.js'),'utf8');
+const theme=fs.readFileSync(path.join(root,'public/theme-init.js'),'utf8');
+const sw=fs.readFileSync(path.join(root,'public/sw.js'),'utf8');
 const puzzles=JSON.parse(fs.readFileSync(path.join(root,'public/puzzles.json'),'utf8'));
 
 const must=[
@@ -29,6 +31,10 @@ if(!home.includes("Object.entries(DIFF).filter(([key])=>key!=='mozkomor')"))
   throw new Error('Dnes home renderer must exclude Mozkomor tiles');
 if(!home.includes("r.difficulty!=='mozkomor'"))
   throw new Error('Dnes resume card must exclude Mozkomor sessions');
+if(!theme.includes("/home-layout.js?v=12"))
+  throw new Error('Dnes home renderer cache bust must be v12');
+if(!sw.includes("proplet-v4.01.29-shell-mozkomor-rc2")||!sw.includes("/home-layout.js?v=12"))
+  throw new Error('Mozkomor RC service worker must rotate and precache the fixed Dnes renderer');
 if((puzzles.free?.mozkomor||[]).length!==100)
   throw new Error('Preview public puzzle bank must contain exactly 100 Mozkomor boards');
 if(!app.includes("scopedStorageKey(MOZKOMOR_UNLOCK_KEY)"))
