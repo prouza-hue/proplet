@@ -7,6 +7,12 @@ on:
     paths:
       - 'tools/generate_mozkomor_gen4.py'
       - '.github/workflows/mozkomor-fastgen.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/generate_mozkomor_gen4.py'
+      - '.github/workflows/mozkomor-fastgen.yml'
 
 permissions:
   contents: write
@@ -17,6 +23,7 @@ concurrency:
 
 jobs:
   generate:
+    if: ${{ github.event_name == 'push' || github.head_ref == 'agent/v40129-mozkomor-fastgen' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
