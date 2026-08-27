@@ -43,7 +43,7 @@ if(!app.includes('data-play-free="mozkomor" role="button" tabindex="0" aria-labe
   throw new Error('Unlocked Mozkomor card must be directly playable from Hrát');
 if(!app.includes("$('[data-play-free]').forEach"))
   throw new Error('Hrát must bind click handlers to all Free game controls');
-if(app.includes("$('[data-play-free]').forEach"))
+if(/(^|[^$])\$\('\[data-play-free\]'\)\.forEach/m.test(app))
   throw new Error('querySelector cannot be used with forEach for Free game controls');
 if(!app.includes("$('[data-played-levels]').forEach"))
   throw new Error('Hrát must bind played-level handlers to all controls');
