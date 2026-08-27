@@ -23,7 +23,7 @@
   },
   "ambiguity": {
     "min": 18.15,
-    "median": 23.612499999999997,
+    "median": 23.612,
     "p90": 29.1,
     "max": 37.825
   },
@@ -40,7 +40,7 @@
   },
   "comparisonToMozkozrout": {
     "mozkozroutAmbiguityMedian": 20.284,
-    "mozkomorAmbiguityMedian": 23.612499999999997,
+    "mozkomorAmbiguityMedian": 23.612,
     "mozkozroutMeanTurnsMedian": 4.0,
     "mozkomorMeanTurnsMedian": 4.9,
     "mozkozroutActiveCellsMedian": 64.0,
