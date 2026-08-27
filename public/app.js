@@ -1561,7 +1561,7 @@ const TAJENKA_PREVIEW=new URLSearchParams(location.search).get('tajenka')==='1'&
 let tajenkaPuzzle=null;
 
 function tajenkaFixtureValid(data){
- if(!data||data.version!==1||data.id!=='tajenka-test-001'||data.kind!=='weekend_bonus'||data.meta?.previewOnly!==true)return false;
+ if(!data||data.version!==1||data.id!=='tajenka-test-002'||data.kind!=='weekend_bonus'||data.meta?.previewOnly!==true)return false;
  if(!Number.isInteger(data.rows)||!Number.isInteger(data.cols)||!Array.isArray(data.mask)||!Array.isArray(data.letters)||!Array.isArray(data.answers))return false;
  if(data.letters.length!==data.rows*data.cols||data.mask.length!==Number(data.meta?.cells)||data.answers.length<1)return false;
  const mask=new Set(data.mask);if(mask.size!==data.mask.length||data.mask.some(i=>!Number.isInteger(i)||i<0||i>=data.letters.length))return false;
