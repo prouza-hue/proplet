@@ -68,8 +68,9 @@
 
   function freeHistory(){
     const state=getState?.()||{};
-    const progress=Object.values(state.inProgress||{}).filter(r=>r?.mode==='free'&&DIFF[r.difficulty]);
-    const completed=Object.values(state.completed||{}).filter(r=>r?.mode==='free'&&DIFF[r.difficulty]);
+    const visibleOnToday=r=>r?.mode==='free'&&r.difficulty!=='mozkomor'&&DIFF[r.difficulty];
+    const progress=Object.values(state.inProgress||{}).filter(visibleOnToday);
+    const completed=Object.values(state.completed||{}).filter(visibleOnToday);
     return {progress,completed,hasAny:progress.length>0||completed.length>0};
   }
 
@@ -82,7 +83,7 @@
   }
 
   function difficultyTiles(){
-    return Object.entries(DIFF).map(([key,info])=>{
+    return Object.entries(DIFF).filter(([key])=>key!=='mozkomor').map(([key,info])=>{
       const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0,next=Number((q.resume||q.nextUnsolved)?.meta?.level)||1;
       const state=q.resume?'Rozehráno':q.done>=q.total&&q.total?'Dokončeno':`Další: ${next}`;
       return `<button class="home-diff-tile" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${htmlEsc(info.label)}, ${q.done} z ${q.total} hotovo"><span class="home-diff-top"><span class="home-diff-icon-wrap">${difficultyIconMarkup(key,'home-diff-icon')}</span><strong>${htmlEsc(info.label)}</strong><b class="home-diff-xp">+${info.xp} XP</b></span><span class="home-diff-meta"><b>${htmlEsc(state)}</b><span>${q.done} / ${q.total}</span></span><i class="home-diff-progress"><b style="width:${pct}%"></b></i></button>`;
