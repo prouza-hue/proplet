@@ -6,6 +6,8 @@
   const FAILSAFE_SHOWN_KEY='proplet-v3-32-8-valid-nonsolution-failsafe-shown';
   const DISCOVERY_STORE_BASE='proplet-v4-word-discovery-v1';
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
+  const BOARD_XP_LIMIT=5;
+  const DAILY_XP_LIMIT=20;
   const TRIGGER_STREAK=3;
   let localWords=null;
   let localWordsPromise=null;
@@ -30,7 +32,9 @@
   const readDiscoveryStore=(s=scope())=>{
     try{
       const parsed=JSON.parse(localStorage.getItem(discoveryStoreKey(s))||'{}');
-      return {entries:{},serverTotalXp:0,...parsed,entries:{...(parsed?.entries||{})}};
+      const entries={...(parsed?.entries||{})};
+      if(s==='guest')for(const [key,row] of Object.entries(entries))if(row?.status==='pending')entries[key]={...row,status:'local'};
+      return {entries:{},serverTotalXp:0,...parsed,entries};
     }catch{return {entries:{},serverTotalXp:0}}
   };
   const writeDiscoveryStore=(value,s=scope())=>{
@@ -49,10 +53,18 @@
   const currentDiscoveryXp=()=>{
     const store=readDiscoveryStore();
     const entries=Object.values(store.entries||{});
-    const localTotal=entries.length;
-    if(!profile()?.token)return localTotal;
-    const pending=entries.filter(row=>row?.status==='pending').length;
-    return Math.max(localTotal,Math.max(0,Number(discoveryServerXp||store.serverTotalXp||0))+pending);
+    if(!profile()?.token)return entries.filter(row=>row?.status==='local').length;
+    return Math.max(0,Number(discoveryServerXp||store.serverTotalXp||0));
+  };
+
+  const localDay=()=>{try{return typeof pragueDateISO==='function'?pragueDateISO():new Date().toISOString().slice(0,10)}catch{return new Date().toISOString().slice(0,10)}};
+  const localLimitReason=(candidate,store)=>{
+    const entries=Object.values(store.entries||{}).filter(row=>row?.status!=='capped');
+    const board=entries.filter(row=>row?.puzzleId===candidate.puzzleId).length;
+    const daily=entries.filter(row=>(row?.rewardDay||String(row?.createdAt||'').slice(0,10))===localDay()).length;
+    if(board>=BOARD_XP_LIMIT)return 'board_limit';
+    if(daily>=DAILY_XP_LIMIT)return 'daily_limit';
+    return null;
   };
 
   const refreshVisibleUi=()=>{
@@ -71,7 +83,10 @@
       const stats=originalEffectiveStats.apply(this,arguments);
       const xp=rewardDisabled()?0:currentDiscoveryXp();
       if(!stats||xp<=0)return stats;
-      return {...stats,points:Number(stats.points||0)+xp,wordDiscoveryXp:xp};
+      const included=Math.max(0,Number(stats.wordDiscoveryXp||0));
+      const missing=Math.max(0,xp-included);
+      if(!missing)return stats;
+      return {...stats,points:Number(stats.points||0)+missing,wordDiscoveryXp:included+missing};
     };
     return true;
   };
@@ -214,7 +229,8 @@
         }
         try{
           const result=await api('/api/word-discovery/claim',{method:'POST',body:JSON.stringify(claimPayload(row))});
-          store.entries[key]={...row,status:'confirmed'};changed=true;
+          const limit=result?.limitReason;
+          store.entries[key]={...row,status:limit==='board_limit'||limit==='daily_limit'?'capped':'confirmed',limitReason:limit||null};changed=true;
           store.serverTotalXp=Math.max(Number(store.serverTotalXp||0),Number(result?.totalDiscoveryXp||0));
           markServerState(result,id);
         }catch{}
@@ -226,15 +242,18 @@
   };
 
   const awardDiscovery=async candidate=>{
-    if(rewardDisabled())return false;
+    if(rewardDisabled())return 'disabled';
     patchEffectiveStats();
     const key=discoveryRewardKey(candidate.puzzleId,candidate.word);
     const s=scope();
     const store=readDiscoveryStore(s);
     if(store.entries[key]){
       if(store.entries[key].status==='pending'&&profile()?.token)syncDiscoveries();
-      return false;
+      return 'duplicate';
     }
+
+    const limitReason=localLimitReason(candidate,store);
+    if(limitReason)return limitReason;
 
     const row={
       puzzleId:candidate.puzzleId,
@@ -243,45 +262,53 @@
       dailyDate:candidate.dailyDate||null,
       word:normalize(candidate.word),
       path:[...(candidate.path||[])],
-      status:'pending',
+      status:profile()?.token?'pending':'local',
+      rewardDay:localDay(),
       createdAt:new Date().toISOString()
     };
 
-    if(!profile()?.token||typeof api!=='function'||navigator.onLine===false){
+    if(!profile()?.token){
       store.entries[key]=row;
       writeDiscoveryStore(store,s);
       showXpPop();
       refreshVisibleUi();
-      return true;
+      return 'awarded';
+    }
+
+    if(typeof api!=='function'||navigator.onLine===false){
+      store.entries[key]=row;
+      writeDiscoveryStore(store,s);
+      setTimeout(syncDiscoveries,1400);
+      return 'pending';
     }
 
     if(discoveryKnownKeys.has(key)){
       store.entries[key]={...row,status:'confirmed'};
       writeDiscoveryStore(store,s);
-      return false;
+      return 'duplicate';
     }
 
     try{
       const data=await api('/api/word-discovery/claim',{method:'POST',body:JSON.stringify(claimPayload(row))});
-      store.entries[key]={...row,status:'confirmed'};
+      const serverLimit=data?.limitReason;
+      const status=serverLimit==='board_limit'||serverLimit==='daily_limit'?'capped':'confirmed';
+      store.entries[key]={...row,status,limitReason:serverLimit||null};
       writeDiscoveryStore(store,s);
       markServerState(data,s);
       if(data?.newlyGranted===true){
         showXpPop();
         refreshVisibleUi();
-        return true;
+        return 'awarded';
       }
       refreshVisibleUi();
-      return false;
+      return serverLimit||'duplicate';
     }catch{
-      // Offline/transient failure: keep one provisional local XP and let the account sync settle
-      // the unique server claim later. The reward key prevents replay/device farming.
+      // A signed-in player's XP is server-authoritative. Keep the claim queued, but do not
+      // temporarily inflate the profile before the atomic server decision arrives.
       store.entries[key]=row;
       writeDiscoveryStore(store,s);
-      showXpPop();
-      refreshVisibleUi();
       setTimeout(syncDiscoveries,1400);
-      return true;
+      return 'pending';
     }
   };
 
@@ -371,11 +398,14 @@
           // It remains a wrong attempt for this board. Clean is unchanged because Clean is
           // defined by hints, not by exploratory traces. Award first so the acknowledgement can
           // state unambiguously whether this particular discovery actually earned XP.
-          const awarded=await awardDiscovery(candidate);
+          const awardState=await awardDiscovery(candidate);
           if(currentGame!==candidate.game||candidate.game.finished)return;
-          message(awarded
-            ? `„${candidate.word}“ je slovo 👍 Jen nepatří do řešení. · +1 XP`
-            : `„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.`);
+          const suffix=awardState==='awarded'?' · +1 XP'
+            :awardState==='board_limit'?' · Limit 5 XP na této desce už máš.'
+            :awardState==='daily_limit'?' · Dnešní limit 20 XP už máš.'
+            :awardState==='pending'?' · XP ověříme po připojení.'
+            :'';
+          message(`„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.${suffix}`);
           if(validNonSolutionStreak>=TRIGGER_STREAK&&!failsafeShown())showFailsafe();
         }).catch(()=>{});
       }

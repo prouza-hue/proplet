@@ -30,7 +30,10 @@
     effectiveStats=function(){
       const stats=originalEffectiveStats.apply(this,arguments);
       if(!stats||!hasAccount()||bonusXp<=0)return stats;
-      return {...stats,points:Number(stats.points||0)+bonusXp,accountBonusXp:bonusXp};
+      const alreadyIncluded=Math.max(0,Number(stats.accountBonusXp||0));
+      const missing=Math.max(0,bonusXp-alreadyIncluded);
+      if(!missing)return stats;
+      return {...stats,points:Number(stats.points||0)+missing,accountBonusXp:alreadyIncluded+missing};
     };
 
     if(typeof renderXpRanking==='function'){

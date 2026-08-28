@@ -74,6 +74,7 @@ BADGES = [
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
+MOZKOMOR_PLANNED_REWARD_XP = 150
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
 TAJENKA_RELEASE_ENABLED = VERCEL_ENV == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
 GEN4_RETURNING_BONUS_XP = 500
@@ -845,6 +846,47 @@ def rescue_rows(player_id: str) -> list[dict]:
     return db_select("streak_rescues", player_id=player_id)
 
 
+def player_reward_stats(player_id: str) -> dict:
+    """One server-owned breakdown for every non-result XP source."""
+    try:
+        rewards = db_select("account_rewards", player_id=player_id)
+        included = True
+    except HTTPException:
+        # Rolling-deploy compatibility only. Clients may temporarily retain their legacy
+        # bonus adapters until the additive account_rewards migration is available.
+        rewards = []
+        included = False
+
+    account_bonus_xp = 0
+    word_discovery_xp = 0
+    other_reward_xp = 0
+    discovered_words: set[str] = set()
+    discovery_rewards = 0
+    for reward in rewards:
+        points = max(0, int(reward.get("points") or 0))
+        key = str(reward.get("reward_key") or "")
+        if key == "account_creation_v1":
+            account_bonus_xp += points
+        elif key.startswith("word_discovery_v1:"):
+            word_discovery_xp += points
+            discovery_rewards += 1
+            word = str(reward.get("reward_word") or key.rpartition(":")[2]).strip().casefold()
+            if word:
+                discovered_words.add(word)
+        else:
+            other_reward_xp += points
+    reward_xp = account_bonus_xp + word_discovery_xp + other_reward_xp
+    return {
+        "rewardXp": reward_xp,
+        "accountBonusXp": account_bonus_xp,
+        "wordDiscoveryXp": word_discovery_xp,
+        "otherRewardXp": other_reward_xp,
+        "wordDiscoveryRewards": discovery_rewards,
+        "discoveredWords": len(discovered_words),
+        "accountRewardsIncluded": included,
+    }
+
+
 def player_stats(player_id: str) -> dict:
     """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
     rows = db_select("results", player_id=player_id)
@@ -855,6 +897,8 @@ def player_stats(player_id: str) -> dict:
     total_points = 0
     clean_solves = 0
     clean_daily = 0
+    tajenka_completed = 0
+    mozkomor_completed = 0
 
     for r in rows:
         mode = r.get("mode")
@@ -880,8 +924,13 @@ def player_stats(player_id: str) -> dict:
 
         if mode == "free" and difficulty in free_history:
             free_history[difficulty] += 1
+        elif mode == "tajenka":
+            tajenka_completed += 1
+        elif mode == "mozkomor":
+            mozkomor_completed += 1
 
     free_slots = free_slot_summary(rows)
+    reward_stats = player_reward_stats(player_id)
 
     rescued_dates: list[str] = []
     try:
@@ -902,7 +951,10 @@ def player_stats(player_id: str) -> dict:
     earned = [b for b in BADGES if longest >= b["days"]]
     next_badge = next((b for b in BADGES if current < b["days"]), None)
     return {
-        "points": total_points,
+        "points": total_points + reward_stats["rewardXp"],
+        "resultXp": total_points,
+        "xpAuthoritative": reward_stats["accountRewardsIncluded"],
+        **reward_stats,
         "totalCompleted": sum(1 for r in rows if r.get("mode") in ("daily", "free")),
         "dailyCompleted": len(set(daily_dates)),
         # Effective progress is a union of level slots across content generations.
@@ -919,6 +971,8 @@ def player_stats(player_id: str) -> dict:
         "bestDailyMs": min(daily_times) if daily_times else None,
         "cleanSolves": clean_solves,
         "cleanDaily": clean_daily,
+        "tajenkaCompleted": tajenka_completed,
+        "mozkomorCompleted": mozkomor_completed,
         "rescuedDays": len(set(rescued_dates)),
         "earnedBadges": earned,
         "nextBadge": next_badge,
@@ -1770,7 +1824,11 @@ def health():
         "launchDashboard": True,
         "newPlayerFunnelVersion": 2,
         "singleMemberTeams": True,
-        "xpEconomyVersion": 3,
+        "xpEconomyVersion": 4,
+        "wordDiscoveryXp": 1,
+        "wordDiscoveryBoardXpLimit": 5,
+        "wordDiscoveryDailyXpLimit": 20,
+        "mozkomorPlannedXp": MOZKOMOR_PLANNED_REWARD_XP,
         "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),
         "rollingContentReleaseEnabled": rolling_content_release_enabled(),

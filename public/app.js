@@ -60,11 +60,15 @@ const LEVELS=[
  {xp:35000,icon:'🛰️',name:'Orbitální luštitel'},
  {xp:42000,icon:'🚀',name:'Galaktický slovolovec'},
  {xp:50500,icon:'🛡️',name:'Strážce všech cest'},
- {xp:61000,icon:'🏆',name:'Absolutní Propletač'}
+ {xp:61000,icon:'🏆',name:'Absolutní Propletač'},
+ {xp:75000,icon:'🗝️',name:'Strážce tajných cest'},
+ {xp:95000,icon:'🕸️',name:'Architekt labyrintu'},
+ {xp:120000,icon:'🌌',name:'Legenda beze konce'}
 ];
 const ACHIEVEMENT_GROUPS=[
  ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],
- ['daily','Denní výzva'],['clean','Čistá řešení'],['cleanDaily','Čisté Daily'],['xp','XP'],['speed','Rychlost'],['rescue','Záchrana série']
+ ['daily','Denní výzva'],['tajenka','Tajenka'],['mozkomor','Mozkomor'],['discovery','Objevená slova'],
+ ['clean','Čistá řešení'],['cleanDaily','Čisté Daily'],['xp','XP'],['speed','Rychlost'],['rescue','Záchrana série']
 ];
 const ACHIEVEMENTS=[
  {id:'all-1',group:'general',icon:'🧩',name:'První Proplet',desc:'Vyřeš první úlohu',value:s=>s.totalCompleted||0,target:1},
@@ -117,6 +121,23 @@ const ACHIEVEMENTS=[
  {id:'daily-200',group:'daily',icon:'🧭',name:'Kalendářní démon',desc:'Dokonči 200 Denních výzev',value:s=>s.dailyCompleted||0,target:200},
  {id:'daily-365',group:'daily',icon:'🌍',name:'Celý rok',desc:'Dokonči 365 Denních výzev',value:s=>s.dailyCompleted||0,target:365},
 
+ {id:'tajenka-1',group:'tajenka',icon:'✦',name:'První tajemství',desc:'Odhal první Tajenku',value:s=>s.tajenkaCompleted||0,target:1},
+ {id:'tajenka-3',group:'tajenka',icon:'🗝️',name:'Čtenář mezi řádky',desc:'Odhal 3 Tajenky',value:s=>s.tajenkaCompleted||0,target:3},
+ {id:'tajenka-5',group:'tajenka',icon:'💭',name:'Sběratel myšlenek',desc:'Odhal 5 Tajenek',value:s=>s.tajenkaCompleted||0,target:5},
+ {id:'tajenka-10',group:'tajenka',icon:'📜',name:'Mistr skrytých vět',desc:'Odhal 10 Tajenek',value:s=>s.tajenkaCompleted||0,target:10},
+
+ {id:'mozkomor-1',group:'mozkomor',icon:'🕳️',name:'Vstup do Hlubiny',desc:'Dokonči první Mozkomor',value:s=>s.mozkomorCompleted||0,target:1},
+ {id:'mozkomor-5',group:'mozkomor',icon:'🧠',name:'Pětkrát bez milosti',desc:'Dokonči 5 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:5},
+ {id:'mozkomor-10',group:'mozkomor',icon:'🌀',name:'Krotitel chaosu',desc:'Dokonči 10 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:10},
+ {id:'mozkomor-25',group:'mozkomor',icon:'🕸️',name:'Pán zákrut',desc:'Dokonči 25 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:25},
+ {id:'mozkomor-50',group:'mozkomor',icon:'⚙️',name:'Neuron z ocele',desc:'Dokonči 50 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:50},
+ {id:'mozkomor-100',group:'mozkomor',icon:'👁️',name:'Mozkomorova Nemesis',desc:'Dokonči všech 100 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:100},
+
+ {id:'discovery-1',group:'discovery',icon:'👍',name:'Slovo navíc',desc:'Objev první platné vedlejší slovo',value:s=>s.discoveredWords||0,target:1},
+ {id:'discovery-10',group:'discovery',icon:'🌿',name:'Boční stezka',desc:'Objev 10 různých vedlejších slov',value:s=>s.discoveredWords||0,target:10},
+ {id:'discovery-50',group:'discovery',icon:'🔦',name:'Lovec skrytých slov',desc:'Objev 50 různých vedlejších slov',value:s=>s.discoveredWords||0,target:50},
+ {id:'discovery-100',group:'discovery',icon:'🏺',name:'Slovní archeolog',desc:'Objev 100 různých vedlejších slov',value:s=>s.discoveredWords||0,target:100},
+
  {id:'clean-1',group:'clean',icon:'✨',name:'Bez berliček',desc:'Vyřeš první úlohu bez nápovědy',value:s=>s.cleanSolves||0,target:1},
  {id:'clean-5',group:'clean',icon:'🫧',name:'Čistá pětka',desc:'5 čistých řešení',value:s=>s.cleanSolves||0,target:5},
  {id:'clean-10',group:'clean',icon:'🧼',name:'Čistá desítka',desc:'10 čistých řešení',value:s=>s.cleanSolves||0,target:10},
@@ -137,7 +158,12 @@ const ACHIEVEMENTS=[
  {id:'xp-5000',group:'xp',icon:'🏦',name:'Pět tisíc',desc:'Nasbírej 5 000 XP',value:s=>s.points||0,target:5000},
  {id:'xp-10000',group:'xp',icon:'🔢',name:'Pěticiferný',desc:'Nasbírej 10 000 XP',value:s=>s.points||0,target:10000},
  {id:'xp-25000',group:'xp',icon:'💸',name:'XP magnát',desc:'Nasbírej 25 000 XP',value:s=>s.points||0,target:25000},
+ {id:'xp-40000',group:'xp',icon:'🛡️',name:'Čtyřicet tisíc cest',desc:'Nasbírej 40 000 XP',value:s=>s.points||0,target:40000},
+ {id:'xp-50000',group:'xp',icon:'🚀',name:'Padesátitisícový let',desc:'Nasbírej 50 000 XP',value:s=>s.points||0,target:50000},
  {id:'xp-61000',group:'xp',icon:'🏆',name:'Absolutní sběratel',desc:'Nasbírej 61 000 XP',value:s=>s.points||0,target:61000},
+ {id:'xp-75000',group:'xp',icon:'🗝️',name:'Klíč ke všem cestám',desc:'Nasbírej 75 000 XP',value:s=>s.points||0,target:75000},
+ {id:'xp-95000',group:'xp',icon:'🕸️',name:'Architekt XP',desc:'Nasbírej 95 000 XP',value:s=>s.points||0,target:95000},
+ {id:'xp-120000',group:'xp',icon:'🌌',name:'Za hranicí mřížky',desc:'Nasbírej 120 000 XP',value:s=>s.points||0,target:120000},
 
  {id:'speed-300',group:'speed',icon:'🏃',name:'Pohodový sprint',desc:'Denní výzva pod 5 minut',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<300000?1:0,target:1},
  {id:'speed-180',group:'speed',icon:'💨',name:'Svižník',desc:'Denní výzva pod 3 minuty',value:s=>s.bestDailyMs!=null&&s.bestDailyMs<180000?1:0,target:1},
@@ -402,17 +428,19 @@ function currentLocalStats(){
  const streak=calcStreak(effectiveDates),longest=calcLongest(effectiveDates),dailyTimes=rows.filter(r=>r.mode==='daily').map(r=>r.elapsedMs);
  const free={easy:0,medium:0,hard:0,hardcore:0},freeTransferred={...free},freePlayedGen2={...free};for(const diff of Object.keys(free)){const slots=localFreeSlotState(diff);free[diff]=slots.effective.size;freeTransferred[diff]=slots.transferred.size;freePlayedGen2[diff]=slots.actual.size}
  const gameRows=rows.filter(r=>r.mode==='daily'||r.mode==='free'),cleanRows=gameRows.filter(r=>r.cleanSolve===true);
- return {points:rows.reduce((a,r)=>a+(r.points||0),0),totalCompleted:gameRows.length,dailyCompleted:dailyDates.length,freeCompleted:free,freeTransferred,freePlayedGen2,currentStreak:streak,longestStreak:longest,bestDailyMs:dailyTimes.length?Math.min(...dailyTimes):null,cleanSolves:cleanRows.length,cleanDaily:cleanRows.filter(r=>r.mode==='daily').length,rescuedDays:rescueDates.length};
+ const tajenkaCompleted=Object.keys(tajenkaState()?.completions||{}).length;
+ return {points:rows.reduce((a,r)=>a+(r.points||0),0),totalCompleted:gameRows.length,dailyCompleted:dailyDates.length,freeCompleted:free,freeTransferred,freePlayedGen2,currentStreak:streak,longestStreak:longest,bestDailyMs:dailyTimes.length?Math.min(...dailyTimes):null,cleanSolves:cleanRows.length,cleanDaily:cleanRows.filter(r=>r.mode==='daily').length,rescuedDays:rescueDates.length,tajenkaCompleted,mozkomorCompleted:0,discoveredWords:0};
 }
 function effectiveStats(){
  const local=currentLocalStats(),remote=getProfile()?.stats;if(!remote)return local;
  const free={easy:0,medium:0,hard:0,hardcore:0},freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
- return {
+ return {...remote,
   points:Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
   dailyCompleted:Math.max(local.dailyCompleted||0,remote.dailyCompleted||0),freeCompleted:free,freeTransferred,freePlayedGen2,
   currentStreak:Math.max(local.currentStreak||0,remote.currentStreak||0),longestStreak:Math.max(local.longestStreak||0,remote.longestStreak||0),
   bestDailyMs:[local.bestDailyMs,remote.bestDailyMs].filter(v=>v!=null).sort((a,b)=>a-b)[0]??null,
-  cleanSolves:Math.max(local.cleanSolves||0,remote.cleanSolves||0),cleanDaily:Math.max(local.cleanDaily||0,remote.cleanDaily||0),rescuedDays:Math.max(local.rescuedDays||0,remote.rescuedDays||0)
+  cleanSolves:Math.max(local.cleanSolves||0,remote.cleanSolves||0),cleanDaily:Math.max(local.cleanDaily||0,remote.cleanDaily||0),rescuedDays:Math.max(local.rescuedDays||0,remote.rescuedDays||0),
+  tajenkaCompleted:Math.max(local.tajenkaCompleted||0,remote.tajenkaCompleted||0),mozkomorCompleted:Math.max(local.mozkomorCompleted||0,remote.mozkomorCompleted||0),discoveredWords:Math.max(local.discoveredWords||0,remote.discoveredWords||0)
  };
 }
 function isoShift(iso,days){const d=new Date(`${iso}T12:00:00Z`);return new Date(d.getTime()+days*86400000).toISOString().slice(0,10)}

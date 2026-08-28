@@ -39,6 +39,7 @@ def install_account_auth(app, **kwargs):
         resolved_puzzle=caller_globals.get("resolved_puzzle"),
         puzzle_exists=caller_globals.get("puzzle_exists"),
         daily_puzzle_matches_date=caller_globals.get("daily_puzzle_matches_date"),
+        db_rpc=caller_globals.get("db_rpc"),
         vercel_env=caller_globals.get("VERCEL_ENV") or "",
     )
     _install_competitive_sharing(

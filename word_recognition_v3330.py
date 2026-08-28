@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
-import uuid
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -35,6 +34,8 @@ WORDFREQ_ZIPF_THRESHOLD_PLAIN = 2.85
 
 WORD_DISCOVERY_REWARD_PREFIX = "word_discovery_v1:"
 WORD_DISCOVERY_XP = 1
+WORD_DISCOVERY_BOARD_XP_LIMIT = 5
+WORD_DISCOVERY_DAILY_XP_LIMIT = 20
 RECOGNITION_VERSION = 4
 
 _CZECH_WORD = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.IGNORECASE)
@@ -67,6 +68,57 @@ def _discovery_rows(rows: list[dict]) -> list[dict]:
         row for row in rows
         if str(row.get("reward_key") or "").startswith(WORD_DISCOVERY_REWARD_PREFIX)
     ]
+
+
+def _discovery_metadata(row: dict) -> tuple[str, str]:
+    """Return puzzle id and canonical word for old and structured reward rows."""
+    puzzle_id = str(row.get("puzzle_id") or "").strip()
+    word = _normalize(row.get("reward_word") or "")
+    if puzzle_id and word:
+        return puzzle_id, word
+    key = str(row.get("reward_key") or "")
+    if not key.startswith(WORD_DISCOVERY_REWARD_PREFIX):
+        return "", ""
+    payload = key[len(WORD_DISCOVERY_REWARD_PREFIX):]
+    parsed_puzzle, separator, parsed_word = payload.rpartition(":")
+    return (parsed_puzzle.strip(), _normalize(parsed_word)) if separator else ("", "")
+
+
+def _reward_day(row: dict, tz) -> Optional[str]:
+    raw = str(row.get("granted_at") or "").strip()
+    if not raw:
+        return None
+    try:
+        stamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        if tz:
+            stamp = stamp.astimezone(tz)
+        return stamp.date().isoformat()
+    except (TypeError, ValueError):
+        return raw[:10] or None
+
+
+def _discovery_summary(rows: list[dict], *, puzzle_id: str = "", today: str = "", tz=None) -> dict:
+    discovery = _discovery_rows(rows)
+    total_xp = sum(max(0, int(row.get("points") or 0)) for row in discovery)
+    words = {word for row in discovery for _puzzle, word in [_discovery_metadata(row)] if word}
+    board_xp = sum(
+        max(0, int(row.get("points") or 0))
+        for row in discovery
+        if puzzle_id and _discovery_metadata(row)[0] == puzzle_id
+    )
+    daily_xp = sum(
+        max(0, int(row.get("points") or 0))
+        for row in discovery
+        if today and _reward_day(row, tz) == today
+    )
+    return {
+        "totalDiscoveryXp": total_xp,
+        "discoveredWords": len(words),
+        "boardDiscoveryXp": board_xp,
+        "dailyDiscoveryXp": daily_xp,
+        "boardRemainingXp": max(0, WORD_DISCOVERY_BOARD_XP_LIMIT - board_xp),
+        "dailyRemainingXp": max(0, WORD_DISCOVERY_DAILY_XP_LIMIT - daily_xp),
+    }
 
 
 def _valid_discovery_trace(puzzle: dict, word: str, path: list[int]) -> bool:
@@ -217,6 +269,7 @@ def install_word_recognition(
     enforce_rate_limit=None,
     db_select=None,
     db_insert=None,
+    db_rpc=None,
     auth_player=None,
     tz=None,
     resolved_puzzle=None,
@@ -226,7 +279,7 @@ def install_word_recognition(
     **_kwargs,
 ):
     def require_discovery_dependencies() -> None:
-        if not all(callable(fn) for fn in (db_select, db_insert, auth_player, resolved_puzzle, puzzle_exists)):
+        if not all(callable(fn) for fn in (db_select, auth_player, resolved_puzzle, puzzle_exists)):
             raise HTTPException(503, "Odměny za objevená slova ještě nejsou připravené")
 
     def reward_state(player_id: str) -> tuple[list[dict], set[str]]:
@@ -234,13 +287,18 @@ def install_word_recognition(
         keys = {str(row.get("reward_key") or "") for row in rows if row.get("reward_key")}
         return rows, keys
 
-    def response_state(player_id: str, *, extra_key: Optional[str] = None) -> dict:
+    def response_state(player_id: str, *, puzzle_id: str = "", extra_row: Optional[dict] = None) -> dict:
         rows, keys = reward_state(player_id)
-        if extra_key:
-            keys.add(extra_key)
+        if extra_row:
+            rows = [*rows, extra_row]
+            keys.add(str(extra_row.get("reward_key") or ""))
+        now = datetime.now(tz) if tz else datetime.now().astimezone()
         return {
-            "totalDiscoveryXp": len(keys) * WORD_DISCOVERY_XP,
             "rewardKeys": sorted(keys),
+            "xpPerWord": WORD_DISCOVERY_XP,
+            "boardXpLimit": WORD_DISCOVERY_BOARD_XP_LIMIT,
+            "dailyXpLimit": WORD_DISCOVERY_DAILY_XP_LIMIT,
+            **_discovery_summary(rows, puzzle_id=puzzle_id, today=now.date().isoformat(), tz=tz),
         }
 
     @app.get("/api/word-recognition")
@@ -299,7 +357,7 @@ def install_word_recognition(
         if callable(enforce_rate_limit):
             enforce_rate_limit(request, "word_discovery_status", limit=180, window_seconds=3600)
         player = auth_player(authorization)
-        return {"ok": True, "xpPerWord": WORD_DISCOVERY_XP, **response_state(player["id"])}
+        return {"ok": True, **response_state(player["id"])}
 
     @app.post("/api/word-discovery/claim")
     def word_discovery_claim(
@@ -341,13 +399,45 @@ def install_word_recognition(
                 "newlyGranted": False,
                 "awardedPoints": 0,
                 "rewardKey": reward_key,
-                **response_state(player["id"]),
+                "limitReason": "duplicate",
+                **response_state(player["id"], puzzle_id=payload.puzzle_id),
+            }
+
+        now = datetime.now(tz) if tz else datetime.now().astimezone()
+        usage = _discovery_summary(
+            _rows,
+            puzzle_id=payload.puzzle_id,
+            today=now.date().isoformat(),
+            tz=tz,
+        )
+        limit_reason = None
+        if usage["boardDiscoveryXp"] >= WORD_DISCOVERY_BOARD_XP_LIMIT:
+            limit_reason = "board_limit"
+        elif usage["dailyDiscoveryXp"] >= WORD_DISCOVERY_DAILY_XP_LIMIT:
+            limit_reason = "daily_limit"
+        if limit_reason:
+            return {
+                "ok": True,
+                "recognized": True,
+                "source": source,
+                "newlyGranted": False,
+                "awardedPoints": 0,
+                "rewardKey": reward_key,
+                "limitReason": limit_reason,
+                **response_state(player["id"], puzzle_id=payload.puzzle_id),
             }
 
         # Preview deployments share the production database. QA may exercise the complete UX,
         # but never writes reward rows. The dedicated Mozkomor calibration client disables XP
         # altogether, so this simulation is only for normal preview regression testing.
         if str(vercel_env or "").strip().lower() == "preview":
+            simulated_row = {
+                "reward_key": reward_key,
+                "points": WORD_DISCOVERY_XP,
+                "granted_at": now.isoformat(),
+                "puzzle_id": payload.puzzle_id,
+                "reward_word": normalized,
+            }
             return {
                 "ok": True,
                 "recognized": True,
@@ -356,41 +446,29 @@ def install_word_recognition(
                 "awardedPoints": WORD_DISCOVERY_XP,
                 "rewardKey": reward_key,
                 "simulated": True,
-                **response_state(player["id"], extra_key=reward_key),
+                "limitReason": None,
+                **response_state(player["id"], puzzle_id=payload.puzzle_id, extra_row=simulated_row),
             }
 
-        try:
-            db_insert(
-                "account_rewards",
-                {
-                    "id": str(uuid.uuid4()),
-                    "player_id": player["id"],
-                    "reward_key": reward_key,
-                    "points": WORD_DISCOVERY_XP,
-                    "granted_at": datetime.now(tz).isoformat() if tz else datetime.now().astimezone().isoformat(),
-                },
-            )
-            return {
-                "ok": True,
-                "recognized": True,
-                "source": source,
-                "newlyGranted": True,
-                "awardedPoints": WORD_DISCOVERY_XP,
-                "rewardKey": reward_key,
-                **response_state(player["id"]),
-            }
-        except HTTPException as exc:
-            # Concurrent tabs/devices can race. The existing unique (player_id, reward_key)
-            # constraint is the authoritative exactly-once guard.
-            _rows, canonical_keys = reward_state(player["id"])
-            if reward_key in canonical_keys:
-                return {
-                    "ok": True,
-                    "recognized": True,
-                    "source": source,
-                    "newlyGranted": False,
-                    "awardedPoints": 0,
-                    "rewardKey": reward_key,
-                    **response_state(player["id"]),
-                }
-            raise exc
+        if not callable(db_rpc):
+            raise HTTPException(503, "Odměnu teď nelze bezpečně potvrdit")
+        result = db_rpc(
+            "proplet_claim_word_discovery",
+            {
+                "p_player_id": player["id"],
+                "p_puzzle_id": payload.puzzle_id,
+                "p_word": normalized,
+            },
+        )
+        canonical = result[0] if isinstance(result, list) and result else (result or {})
+        reason = str(canonical.get("reason") or "") or None
+        return {
+            "ok": True,
+            "recognized": True,
+            "source": source,
+            "newlyGranted": bool(canonical.get("newly_granted")),
+            "awardedPoints": int(canonical.get("awarded_points") or 0),
+            "rewardKey": str(canonical.get("reward_key") or reward_key),
+            "limitReason": reason,
+            **response_state(player["id"], puzzle_id=payload.puzzle_id),
+        }
