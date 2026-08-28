@@ -1,0 +1,95 @@
+name: v4.01.32 Mozkomor assemble only
+
+on:
+  push:
+    branches:
+      - agent/v40132-mozkomor-assemble-fix
+    paths:
+      - '.github/workflows/v40132-mozkomor-assemble-only.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+      - name: Reuse completed candidate artifacts
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 33217108131
+          pattern: v40132-mozkomor-candidates-*
+          path: /tmp/mozkomor-candidates
+          merge-multiple: true
+      - name: Fetch audited historical candidate banks
+        run: |
+          git fetch origin agent/v40131-mozkomor-refresh:refs/remotes/origin/agent/v40131-mozkomor-refresh
+          git fetch origin agent/v40129-mozkomor-fastgen:refs/remotes/origin/agent/v40129-mozkomor-fastgen
+          git show origin/agent/v40131-mozkomor-refresh:data/puzzles.json > /tmp/mozkomor-refresh-source.json
+          git show origin/agent/v40131-mozkomor-refresh:data/mozkomor_refresh_playtest.json > /tmp/mozkomor-approved-playtest.json
+          git show origin/agent/v40129-mozkomor-fastgen:data/puzzles.json > /tmp/mozkomor-fastgen-source.json
+      - name: Combine candidate pool
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          files = sorted(Path('/tmp/mozkomor-candidates').glob('shard-*.json'))
+          assert len(files) == 8, files
+          puzzles = []
+          stats = []
+          for shard, path in enumerate(files):
+              payload = json.loads(path.read_text(encoding='utf-8'))
+              stats.append(payload.get('stats') or {})
+              for local, puzzle in enumerate(payload.get('puzzles') or [], 1):
+                  puzzle['id'] = f"fresh-s{shard}-{local:03d}"
+                  puzzle.setdefault('meta', {})['candidateShard'] = shard
+                  puzzles.append(puzzle)
+          assert len(puzzles) == 264, len(puzzles)
+          fastgen = json.loads(Path('/tmp/mozkomor-fastgen-source.json').read_text(encoding='utf-8'))
+          fast_bank = list((fastgen.get('free') or {}).get('mozkomor') or [])
+          assert len(fast_bank) == 100, len(fast_bank)
+          for local, puzzle in enumerate(fast_bank, 1):
+              puzzle['id'] = f"historical-fastgen-{local:03d}"
+              puzzle.setdefault('meta', {})['historicalCandidateSource'] = 'v40129-fastgen'
+              puzzles.append(puzzle)
+          assert len(puzzles) == 364, len(puzzles)
+          Path('/tmp/mozkomor-candidate-pool.json').write_text(
+              json.dumps({'version':1,'kind':'gen4-mozkomor-candidate-pool','puzzles':puzzles,'shardStats':stats},ensure_ascii=False,indent=2)+'\n',
+              encoding='utf-8'
+          )
+          print('combined', len(puzzles))
+          PY
+      - name: Syntax preflight
+        run: |
+          python -m py_compile             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
+      - name: Select final human-calibrated 100
+        run: |
+          python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-candidate-pool.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
+      - name: Cheap final-bank contract
+        run: python tools/test_mozkomor_final_v40132.py
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40132-mozkomor-final-bank-assemble-fix
+          path: |
+            data/mozkomor_final_v40132.json
+            data/audits/mozkomor_final_v40132.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Commit selected bank
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/mozkomor_final_v40132.json data/audits/mozkomor_final_v40132.json
+          git commit -m "Generate human-calibrated Mozkomor final bank [mozkomor-generated]"
+          git push origin HEAD:agent/v40132-mozkomor-assemble-fix
