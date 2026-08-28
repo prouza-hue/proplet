@@ -16,8 +16,8 @@ def main() -> None:
     puzzles = bank.get("puzzles") or []
     assert bank["status"] == "PLAYTEST_ONLY_NOT_FOR_PRODUCTION"
     assert bank["xpPerFirstCompletionPlanned"] == 150
-    assert bank["targetCooldown"] == 9
-    assert int(report["selectionRules"]["targetCooldown"]) == 9
+    assert bank["targetCooldown"] == 8
+    assert int(report["selectionRules"]["targetCooldown"]) == 8
     assert len(puzzles) == 100
     assert [p["id"] for p in puzzles] == [f"g4-z-{i:03d}" for i in range(1, 101)]
     assert len({p["id"] for p in puzzles}) == 100
