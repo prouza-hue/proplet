@@ -38,10 +38,13 @@ def norm(value: object) -> str:
     return str(value or "").strip().casefold()
 
 
+LEGACY_KEYS = {"legacyFree", "legacyDaily", "previousDaily"}
+
+
 def board_signature(puzzle: dict) -> str:
     payload = {
-        "rows": int(puzzle["rows"]),
-        "cols": int(puzzle["cols"]),
+        "rows": int(puzzle.get("rows") or 0),
+        "cols": int(puzzle.get("cols") or 0),
         "mask": [int(x) for x in puzzle.get("mask") or []],
         "letters": [str(x) for x in puzzle.get("letters") or []],
     }
@@ -49,15 +52,20 @@ def board_signature(puzzle: dict) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def all_active_puzzles(payload: dict) -> Iterable[dict]:
-    for section in ("free", "daily", "rescue", "starter"):
-        value = payload.get(section)
-        if isinstance(value, dict):
-            for items in value.values():
-                if isinstance(items, list):
-                    yield from (x for x in items if isinstance(x, dict))
-        elif isinstance(value, list):
-            yield from (x for x in value if isinstance(x, dict))
+def all_active_puzzles(node: object) -> Iterable[dict]:
+    if isinstance(node, list):
+        for value in node:
+            yield from all_active_puzzles(value)
+        return
+    if not isinstance(node, dict):
+        return
+    if node.get("letters") and node.get("answers"):
+        yield node
+        return
+    for key, value in node.items():
+        if key in LEGACY_KEYS or key in {"archive", "contentCatalog", "profiles", "stats", "meta"}:
+            continue
+        yield from all_active_puzzles(value)
 
 
 def tier_d_count(row: dict) -> int:
