@@ -215,7 +215,12 @@ def main() -> None:
     pool = list(by_sig.values())
 
     selected: list[dict] = []
-    recent_words: list[set[str]] = []
+    # Cooldown crosses the difficulty boundary: final Mozkomor level 1 must not
+    # reuse a target from the last 12 active Mozkožrout levels.
+    recent_words: list[set[str]] = [
+        {norm(answer.get("word")) for answer in puzzle.get("answers") or []}
+        for puzzle in hardcore[-TARGET_COOLDOWN:]
+    ]
     word_usage: Counter[str] = Counter()
 
     for level in range(1, TARGET_COUNT + 1):
