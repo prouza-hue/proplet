@@ -67,6 +67,8 @@
         <div id="dailySyncStatus" class="daily-sync hidden"></div>
       </div>
 
+      <div id="tajenkaPreviewCard" class="card tajenka-preview-card hidden"></div>
+
       <div id="rescueCard" class="card rescue-card hidden">
         <div class="rescue-flame">🔥</div>
         <div class="rescue-copy"><span class="eyebrow">ZÁCHRANA SÉRIE</span><h2 id="rescueTitle">Tvoje série je v ohrožení</h2><p id="rescueText" class="muted"></p></div>
@@ -234,6 +236,8 @@
             <span id="cleanStatus" class="clean-status">✨ Čistě</span>
           </div>
 
+          <div id="tajenkaPhrase" class="tajenka-phrase card hidden" aria-live="polite"></div>
+
           <div id="starterCoach" class="starter-coach hidden" role="status" aria-live="polite">
             <div id="starterCoachStep" class="starter-coach-step">1 / 4</div>
             <div class="starter-coach-copy"><strong id="starterCoachTitle">Začni slovem MRAK</strong><span id="starterCoachCopy">Táhni přes sousední písmena.</span></div>
@@ -285,6 +289,7 @@
         <p id="winText" class="muted"></p>
         <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
       </div>
+      <div id="tajenkaWinPhrase" class="tajenka-win-phrase hidden" aria-live="polite"></div>
       <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
       <button id="winAccountBtn" class="win-account-btn hidden">☁️ Uložit postup a zobrazit své místo</button>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
@@ -626,6 +631,6 @@
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <script src="/app.js"></script>
-  <script src="/quality-v334.js?v=3"></script>
+  <script src="/quality-v334.js?v=4"></script>
 </body>
 </html>

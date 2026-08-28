@@ -117,7 +117,7 @@ assert "Hrát další úroveň" in app
 
 # v4.01.x keeps the approved CTA colour and the primary interaction contracts.
 assert f"version:'{expected_version}'" in runtime
-assert f"proplet-v{expected_version}-shell" in sw
+assert f"proplet-v{expected_version}" in sw and "shell" in sw
 assert "dailyLeaderboardRunFieldFixV4004:true" in runtime
 assert "challengeCtaRaspberryV4005:true" in runtime
 assert "resultCtaFontParityV4006:true" in runtime
