@@ -1,0 +1,49 @@
+name: v4.01.32 Mozkomor extra candidates
+
+on:
+  push:
+    branches:
+      - agent/v40132-mozkomor-assemble-fix
+    paths:
+      - '.github/workflows/v40132-mozkomor-extra-candidates.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { shard: 8, seed: 40132037 }
+          - { shard: 9, seed: 40132038 }
+          - { shard: 10, seed: 40132039 }
+          - { shard: 11, seed: 40132040 }
+          - { shard: 12, seed: 40132041 }
+          - { shard: 13, seed: 40132042 }
+          - { shard: 14, seed: 40132043 }
+          - { shard: 15, seed: 40132044 }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Syntax preflight
+        run: python -m py_compile tools/generate_mozkomor_gen4.py
+      - name: Generate extra candidate shard ${{ matrix.shard }}
+        run: |
+          mkdir -p /tmp/mozkomor-extra
+          python tools/generate_mozkomor_gen4.py \
+            --count 40 \
+            --start-level 1 \
+            --seed '${{ matrix.seed }}' \
+            --output '/tmp/mozkomor-extra/shard-${{ matrix.shard }}.json'
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40132-mozkomor-extra-${{ matrix.shard }}
+          path: /tmp/mozkomor-extra/
+          retention-days: 14
+          if-no-files-found: error
