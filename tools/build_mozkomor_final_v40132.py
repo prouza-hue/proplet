@@ -163,7 +163,7 @@ def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict],
     frames: list[dict] = []
     level = 1
     explored = 0
-    max_nodes = 500_000
+    max_nodes = 2_500_000
 
     def candidate_indices(level_no: int) -> list[int]:
         low, high = band_for(level_no)
@@ -192,9 +192,15 @@ def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict],
                 score = float(row["humanDecisionScore"])
                 if next_low <= score <= next_high and not (row_words[j] & next_blocked):
                     future_count += 1
-            # Future flexibility is only a tiebreaker/guardrail; quality cost remains dominant.
+            # All choices already satisfy the same quality filters and score band.
+            # Prefer the least-constraining board so the 9-level cooldown remains
+            # satisfiable deep into the 100-level sequence.
             score = candidate_cost(pool[idx], level_no, word_usage)
-            adjusted = score + (0.0 if future_count >= 8 else (8 - future_count) * 0.35)
+            remaining = TARGET_COUNT - level_no
+            flex_target = min(24, max(6, remaining + 2))
+            shortage = max(0, flex_target - future_count)
+            flex_weight = 0.055 if level_no >= 61 else 0.025
+            adjusted = score + shortage * 0.45 - min(future_count, 40) * flex_weight
             return adjusted, -future_count
 
         return sorted(choices, key=rank)
