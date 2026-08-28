@@ -78,8 +78,8 @@ def eligible(row: dict) -> bool:
         and int(row["easyAnchorCount"]) <= 2
         and float(row["longWordShare"]) <= 0.50
         and int(row["forcedLongWordCount"]) <= 3
-        and float(row["averageFun"]) >= 3.20
-        and int(row["lowFunCount"]) == 0
+        and float(row["averageFun"]) >= 3.10
+        and int(row["lowFunCount"]) <= 1
         and int(row["explicitVerbOrAdjectiveCount"]) <= 1
         and tier_d_count(row) <= 1
     )
@@ -134,7 +134,10 @@ def candidate_cost(row: dict, level: int, word_usage: Counter[str]) -> float:
     # Prefer the successful refresh's balanced word-length shape.
     medium_bonus = -0.18 * float(row["mediumWordShare"])
     long_penalty = 0.25 * float(row["longWordShare"])
-    return abs(score - target) * 5.0 + reuse * 0.08 + medium_bonus + long_penalty + source_bonus
+    # Prefer the stricter successful-refresh lexical shape whenever possible.
+    lexical_penalty = max(0.0, 3.20 - float(row["averageFun"])) * 2.0
+    lexical_penalty += int(row["lowFunCount"]) * 0.85
+    return abs(score - target) * 5.0 + reuse * 0.08 + medium_bonus + long_penalty + lexical_penalty + source_bonus
 
 
 def main() -> None:
@@ -338,8 +341,8 @@ def main() -> None:
             "easyAnchorMax": 2,
             "longWordShareMax": 0.50,
             "forcedLongWordMax": 3,
-            "averageFunMin": 3.20,
-            "lowFunMax": 0,
+            "averageFunMin": 3.10,
+            "lowFunMax": 1,
             "verbAdjectiveAdverbMax": 1,
             "tierDMax": 1,
             "targetCooldown": TARGET_COOLDOWN,
