@@ -30,7 +30,9 @@
       const progress=freeProgress(diff);
       const eyebrow=card.querySelector('.difficulty-title .eyebrow');
       if(eyebrow){
-        if(progress.resume){
+        if(typeof MOZKOMOR_REFRESH_PREVIEW!=='undefined'&&MOZKOMOR_REFRESH_PREVIEW&&diff==='mozkomor'){
+          eyebrow.textContent='🧪 PLAYTEST · REFRESH 10';
+        }else if(progress.resume){
           const level=Number(progress.resume?.meta?.level)||null;
           eyebrow.textContent=`ROZEHRÁNO${level?` · ÚROVEŇ ${level}`:''}`;
         }else eyebrow.remove();
