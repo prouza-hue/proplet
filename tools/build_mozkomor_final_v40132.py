@@ -140,6 +140,125 @@ def candidate_cost(row: dict, level: int, word_usage: Counter[str]) -> float:
     return abs(score - target) * 5.0 + reuse * 0.08 + medium_bonus + long_penalty + lexical_penalty + source_bonus
 
 
+
+def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict], int]:
+    """Find a full 100-board ordering under score bands + 9-level word cooldown.
+
+    The previous purely greedy selector could paint itself into a corner even
+    when a valid sequence existed. This bounded DFS keeps the same quality
+    rules, but backtracks across local ordering choices.
+    """
+    row_words = [
+        {norm(word["word"]) for word in row["words"]}
+        for row in pool
+    ]
+    selected_rows: list[dict] = []
+    selected_indices: list[int] = []
+    selected_set: set[int] = set()
+    recent_words: list[set[str]] = [
+        {norm(answer.get("word")) for answer in puzzle.get("answers") or []}
+        for puzzle in hardcore[-TARGET_COOLDOWN:]
+    ]
+    word_usage: Counter[str] = Counter()
+    frames: list[dict] = []
+    level = 1
+    explored = 0
+    max_nodes = 500_000
+
+    def candidate_indices(level_no: int) -> list[int]:
+        low, high = band_for(level_no)
+        blocked = set().union(*recent_words[-TARGET_COOLDOWN:]) if recent_words else set()
+        choices = [
+            idx for idx, row in enumerate(pool)
+            if idx not in selected_set
+            and low <= float(row["humanDecisionScore"]) <= high
+            and not (row_words[idx] & blocked)
+        ]
+        if not choices:
+            return []
+
+        if level_no >= TARGET_COUNT:
+            return sorted(choices, key=lambda idx: candidate_cost(pool[idx], level_no, word_usage))
+
+        next_low, next_high = band_for(level_no + 1)
+        recent_tail = recent_words[-(TARGET_COOLDOWN - 1):] if TARGET_COOLDOWN > 1 else []
+
+        def rank(idx: int) -> tuple[float, float]:
+            next_blocked = set().union(*(recent_tail + [row_words[idx]])) if (recent_tail or row_words[idx]) else set()
+            future_count = 0
+            for j, row in enumerate(pool):
+                if j == idx or j in selected_set:
+                    continue
+                score = float(row["humanDecisionScore"])
+                if next_low <= score <= next_high and not (row_words[j] & next_blocked):
+                    future_count += 1
+            # Future flexibility is only a tiebreaker/guardrail; quality cost remains dominant.
+            score = candidate_cost(pool[idx], level_no, word_usage)
+            adjusted = score + (0.0 if future_count >= 8 else (8 - future_count) * 0.35)
+            return adjusted, -future_count
+
+        return sorted(choices, key=rank)
+
+    while 1 <= level <= TARGET_COUNT:
+        if len(frames) < level:
+            frames.append({"choices": candidate_indices(level), "next": 0})
+
+        frame = frames[level - 1]
+        picked = False
+        while frame["next"] < len(frame["choices"]):
+            idx = frame["choices"][frame["next"]]
+            frame["next"] += 1
+            explored += 1
+            if explored > max_nodes:
+                raise RuntimeError(
+                    f"Selector exceeded {max_nodes} search nodes at level {level}; "
+                    f"selected={len(selected_rows)}, pool={len(pool)}"
+                )
+
+            # Recheck against the current state; the frame can survive a backtrack.
+            if idx in selected_set:
+                continue
+            low, high = band_for(level)
+            score = float(pool[idx]["humanDecisionScore"])
+            blocked = set().union(*recent_words[-TARGET_COOLDOWN:]) if recent_words else set()
+            if not (low <= score <= high) or (row_words[idx] & blocked):
+                continue
+
+            selected_rows.append(pool[idx])
+            selected_indices.append(idx)
+            selected_set.add(idx)
+            recent_words.append(row_words[idx])
+            word_usage.update(row_words[idx])
+            level += 1
+            picked = True
+            break
+
+        if picked:
+            continue
+
+        # Exhausted this level: discard its frame and try the next alternative
+        # at the previous level.
+        frames.pop()
+        if level == 1:
+            break
+        level -= 1
+        prev_idx = selected_indices.pop()
+        prev_words = row_words[prev_idx]
+        selected_set.remove(prev_idx)
+        selected_rows.pop()
+        recent_words.pop()
+        word_usage.subtract(prev_words)
+        word_usage += Counter()  # prune zero/negative entries
+
+    if len(selected_rows) != TARGET_COUNT:
+        low, high = band_for(max(1, min(level, TARGET_COUNT)))
+        raise RuntimeError(
+            f"No full Mozkomor ordering found; stopped at level {level}; "
+            f"band={low:.2f}..{high:.2f}, selected={len(selected_rows)}, pool={len(pool)}, explored={explored}"
+        )
+    return selected_rows, explored
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--current", type=Path, required=True)
@@ -226,41 +345,7 @@ def main() -> None:
             by_sig[row["_signature"]] = row
     pool = list(by_sig.values())
 
-    selected: list[dict] = []
-    # Cooldown crosses the difficulty boundary: final Mozkomor level 1 must not
-    # reuse a target from the last 9 active Mozkožrout levels.
-    recent_words: list[set[str]] = [
-        {norm(answer.get("word")) for answer in puzzle.get("answers") or []}
-        for puzzle in hardcore[-TARGET_COOLDOWN:]
-    ]
-    word_usage: Counter[str] = Counter()
-
-    for level in range(1, TARGET_COUNT + 1):
-        low, high = band_for(level)
-        blocked = set().union(*recent_words[-TARGET_COOLDOWN:]) if recent_words else set()
-        choices = []
-        for row in pool:
-            if row in selected:
-                continue
-            score = float(row["humanDecisionScore"])
-            if not (low <= score <= high):
-                continue
-            words = {norm(word["word"]) for word in row["words"]}
-            if words & blocked:
-                continue
-            choices.append(row)
-
-        if not choices:
-            raise RuntimeError(
-                f"No candidate for level {level}; band={low:.2f}..{high:.2f}, "
-                f"selected={len(selected)}, pool={len(pool)}"
-            )
-
-        chosen = min(choices, key=lambda row: candidate_cost(row, level, word_usage))
-        selected.append(chosen)
-        words = {norm(word["word"]) for word in chosen["words"]}
-        recent_words.append(words)
-        word_usage.update(words)
+    selected, search_nodes = select_sequence(pool, hardcore)
 
     final_puzzles = []
     selected_details = []
@@ -331,6 +416,7 @@ def main() -> None:
         "kind": "mozkomor-final-bank-human-v40132",
         "principle": "human decision pressure over forced long-word difficulty",
         "currentMozkozroutScore": human.distribution(hardcore_scores),
+        "selectorSearchNodes": search_nodes,
         "candidateCounts": {
             "refreshOriginal": len(old_mozkomor),
             "freshGenerated": len(fresh),
@@ -385,6 +471,7 @@ def main() -> None:
         "eligiblePool": len(pool),
         "sources": report["selectedSourceCounts"],
         "approvedAnchors": len(report["approvedRefreshAnchorsSelected"]),
+        "selectorSearchNodes": search_nodes,
         "bands": report["bands"],
     }, ensure_ascii=False, indent=2))
 
