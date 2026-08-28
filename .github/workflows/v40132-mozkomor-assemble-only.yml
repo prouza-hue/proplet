@@ -1,4 +1,4 @@
-name: v4.01.32 Mozkomor assemble only
+name: v4.01.32 Mozkomor assemble only # schema-safe rerun
 
 on:
   push:
@@ -78,12 +78,32 @@ jobs:
           python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-candidate-pool.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
       - name: Cheap final-bank contract
         run: python tools/test_mozkomor_final_v40132.py
+      - name: Full Generation 4 validation against current main content
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          final = json.loads(Path('data/mozkomor_final_v40132.json').read_text(encoding='utf-8'))
+          current.setdefault('free', {})['mozkomor'] = final['puzzles']
+          Path('/tmp/puzzles-with-final-mozkomor.json').write_text(
+              json.dumps(current, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+          PY
+          python tools/validate_gen4_release.py /tmp/puzzles-with-final-mozkomor.json \
+            --rolling data/rolling_content_v1.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --approved-release \
+            --report /tmp/mozkomor-final-full-validation.json
       - uses: actions/upload-artifact@v6
         with:
           name: v40132-mozkomor-final-bank-assemble-fix
           path: |
             data/mozkomor_final_v40132.json
             data/audits/mozkomor_final_v40132.json
+            /tmp/mozkomor-final-full-validation.json
           retention-days: 30
           if-no-files-found: error
       - name: Commit selected bank
