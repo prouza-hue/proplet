@@ -1,0 +1,97 @@
+name: v4.01.32 Mozkomor final bank build
+
+on:
+  push:
+    branches:
+      - agent/v40132-mozkomor-final-bank
+    paths:
+      - 'data/gen4_profiles_v334.json'
+      - 'tools/generate_mozkomor_gen4.py'
+      - 'tools/audit_mozkomor_human_v40131.py'
+      - 'tools/build_mozkomor_final_v40132.py'
+      - 'tools/test_mozkomor_final_v40132.py'
+      - '.github/workflows/v40132-mozkomor-final-bank.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v40132-mozkomor-final-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[mozkomor-generated]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch the audited refresh source only
+        run: |
+          git fetch origin agent/v40131-mozkomor-refresh:refs/remotes/origin/agent/v40131-mozkomor-refresh
+          git show origin/agent/v40131-mozkomor-refresh:data/puzzles.json > /tmp/mozkomor-refresh-source.json
+          git show origin/agent/v40131-mozkomor-refresh:data/mozkomor_refresh_playtest.json > /tmp/mozkomor-approved-playtest.json
+
+      - name: Syntax preflight
+        run: |
+          python -m py_compile             tools/generate_mozkomor_gen4.py             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
+
+      - name: Generate fresh candidate pool
+        run: |
+          python tools/generate_mozkomor_gen4.py             --count 260             --start-level 1             --seed 40132029             --output /tmp/mozkomor-fresh-candidates.json
+
+      - name: Select final human-calibrated 100
+        run: |
+          python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-fresh-candidates.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
+
+      - name: Cheap final-bank contract
+        run: python tools/test_mozkomor_final_v40132.py
+
+      - name: Full Generation 4 validation against current main content
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          final = json.loads(Path('data/mozkomor_final_v40132.json').read_text(encoding='utf-8'))
+          current.setdefault('free', {})['mozkomor'] = final['puzzles']
+          Path('/tmp/puzzles-with-final-mozkomor.json').write_text(
+              json.dumps(current, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+          PY
+          python tools/validate_gen4_release.py /tmp/puzzles-with-final-mozkomor.json             --rolling data/rolling_content_v1.json             --profiles data/gen4_profiles_v334.json             --exclusions data/target_generation_exclusions_v334.json             --approved-release             --report /tmp/mozkomor-final-full-validation.json
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40132-mozkomor-final-bank
+          path: |
+            data/mozkomor_final_v40132.json
+            data/audits/mozkomor_final_v40132.json
+            /tmp/mozkomor-fresh-candidates.json
+            /tmp/mozkomor-final-full-validation.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Commit reproducible bank to preview branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/mozkomor_final_v40132.json data/audits/mozkomor_final_v40132.json
+          if git diff --cached --quiet; then
+            echo "Generated bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate human-calibrated Mozkomor 100-bank [mozkomor-generated]"
+          git push origin HEAD:agent/v40132-mozkomor-final-bank
