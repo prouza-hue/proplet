@@ -1,4 +1,4 @@
-"""Static and game-design contracts for the preview-only Tajenka bank."""
+"""Static, release-safety, and game-design contracts for the Tajenka bank."""
 
 import json
 import re
@@ -6,13 +6,14 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "public" / "tajenka-test.json"
+FIXTURE = ROOT / "data" / "tajenka_weekend_v1.json"
 APP = ROOT / "public" / "app.js"
 STYLES = ROOT / "public" / "styles.css"
 SERVER = ROOT / "server.py"
 PUSH = ROOT / "push_diagnostics_v3329.py"
 RUNTIME = ROOT / "public" / "runtime-meta.js"
 SW = ROOT / "public" / "sw.js"
+RELEASE_NOTES = ROOT / "public" / "release-notes-v3331.js"
 REWARD_XP = 200
 
 
@@ -175,13 +176,16 @@ def main() -> None:
     push = PUSH.read_text(encoding="utf-8")
     runtime = RUNTIME.read_text(encoding="utf-8")
     sw = SW.read_text(encoding="utf-8")
+    release_notes = RELEASE_NOTES.read_text(encoding="utf-8")
     for marker in (
         "const TAJENKA_PREVIEW=",
-        "const TAJENKA_AVAILABLE=",
+        "let TAJENKA_AVAILABLE=",
         "const requestedTajenkaWeek=",
         "!TAJENKA_PRODUCTION_HOSTS.has(location.hostname)",
-        "bank.kind!=='weekend_bonus_bank'",
-        "puzzles.length!==10",
+        "const TAJENKA_FIRST_SATURDAY=",
+        "function refreshTajenkaAvailability(",
+        "`/api/tajenka?week=${activeTajenkaWeek}`",
+        "const puzzle=await response.json()",
         "mode==='tajenka'?`tajenka:${puzzle.id}`",
         "TAJENKA_REWARD_XP=200",
         "state.completions[g.puzzle.id]=completion",
@@ -207,13 +211,29 @@ def main() -> None:
     assert "TAJENKA_REWARD_XP = 200" in server
     assert 'payload.mode not in ("daily", "free", "starter", "tajenka")' in server
     assert 'payload.challenge_key != f"tajenka:{payload.puzzle_id}"' in server
+    assert 'TAJENKA_BANK_PATH = ROOT / "data" / "tajenka_weekend_v1.json"' in server
+    assert '@app.get("/api/tajenka")' in server
+    assert 'headers={"Cache-Control": "private, no-store"}' in server
+    assert "week if 1 <= week <= prepared else None" in server
     assert '"title": "✨ Víkendová Tajenka je tady"' in push
     assert '"body": "Pět slov, jedna myšlenka a 200 XP. Odhalíš ji?"' in push
     assert '"url": f"{canonical_origin}/?open=tajenka&via=push-tajenka"' in push
-    assert "tajenkaReleaseEnabled:false" in runtime
+    assert "tajenkaReleaseEnabled:true" in runtime
+    assert "tajenkaFirstSaturday:'2026-08-29'" in runtime
     assert "tajenkaRewardXp:200" in runtime
-    assert "proplet-v4.01.28-tajenka-preview-v7-curated-shell" in sw
-    assert "'/tajenka-test.json'" in sw
+    assert "proplet-v4.01.31-tajenka-shell" in sw
+    assert "tajenka-test.json" not in sw
+    assert not (ROOT / "public" / "tajenka-test.json").exists()
+    for marker in (
+        "const RELEASE_ID='4.01.31'",
+        "const RELEASE_DATE='2026-08-29'",
+        "Tajenka je tady",
+        "Hrát Tajenku · +200 XP",
+        "Platné slovo má cenu",
+        "Mozkomor je tady",
+        "mozkomorReleaseEnabled===true",
+    ):
+        assert marker in release_notes, marker
 
     assert re.search(r"\.tajenka-rule-note\{[^}]*font-size:14px", styles)
     assert re.search(r"@media\(max-width:600px\)\{\.tajenka-rule-note,[^}]*font-size:15px", styles)
@@ -221,7 +241,7 @@ def main() -> None:
 
     hosts = re.search(r"const TAJENKA_PRODUCTION_HOSTS=new Set\(\[(.*?)\]\)", app, re.S)
     assert hosts and "hrajproplet.cz" in hosts.group(1)
-    print("PASS: 10 winding Tajenka boards, readable rules, 200 XP contract, dormant Saturday push")
+    print("PASS: 10 winding Tajenka boards, private finite release, readable rules, 200 XP and Saturday push")
 
 
 if __name__ == "__main__":

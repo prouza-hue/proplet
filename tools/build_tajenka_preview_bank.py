@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "public" / "tajenka-test.json"
+OUTPUT = ROOT / "data" / "tajenka_weekend_v1.json"
 ROWS = COLS = 6
 REWARD_XP = 200
 LEXICON = ROOT / "data" / "lexicon_v2.json"

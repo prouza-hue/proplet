@@ -198,7 +198,8 @@ def install_push_diagnostics(
         today_date = date.fromisoformat(today)
         tajenka_week = None
         if tajenka_release_enabled and today_date >= tajenka_first_saturday and today_date.weekday() == 5:
-            tajenka_week = ((today_date - tajenka_first_saturday).days // 7) % 10 + 1
+            candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1
+            tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None
         tajenka_id = f"tajenka-v2-week-{tajenka_week:02d}" if tajenka_week else None
         batch = None
         if callable(released_batches):
