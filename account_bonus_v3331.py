@@ -49,7 +49,7 @@ def install_account_bonus(
     def reward_summary(player_id: str) -> dict:
         rows = rows_for(player_id)
         creation = next((row for row in rows if row.get("reward_key") == ACCOUNT_CREATION_BONUS_KEY), None)
-        total = sum(max(0, int(row.get("points") or 0)) for row in rows)
+        total = max(0, int(creation.get("points") or 0)) if creation else 0
         return {
             "accountCreationBonusXp": ACCOUNT_CREATION_BONUS_XP,
             "accountCreationBonusGranted": creation is not None,
