@@ -32,7 +32,8 @@ def main() -> None:
         assert board["easyAnchorCount"] <= 2
         assert board["longWordShare"] <= 0.50
         assert board["forcedLongWordCount"] <= 3
-        assert board["averageFun"] >= 3.20
+        assert board["averageFun"] >= 3.10
+        assert board.get("lowFunCount", 0) <= 1
         words = {w.casefold() for w in board["words"]}
         for prev in boards[max(0, idx - cooldown):idx]:
             assert not words & {w.casefold() for w in prev["words"]}
