@@ -94,7 +94,7 @@
     loadScript('/account-team-v33210.js?v=2','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=4','propletChallengeCtaV3333');
-    loadScript('/footer-hotfix-v40120.js?v=2','propletFooterHotfixV40120');
+    loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');
     loadScript('/daily-win-menu-v40123.js?v=1','propletDailyWinMenuV40123');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
