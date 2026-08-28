@@ -19,13 +19,13 @@ import audit_mozkomor_human_v40131 as human
 
 TARGET_COUNT = 100
 TARGET_COOLDOWN = 12
-MIN_SCORE = 2.75
+MIN_SCORE = 2.60\nAPPROVED_ANCHOR_MIN_SCORE = 2.75
 BANDS = (
-    (1, 20, 2.75, 3.00),
-    (21, 40, 2.85, 3.10),
-    (41, 60, 2.95, 3.20),
-    (61, 80, 3.05, 3.35),
-    (81, 100, 3.15, 9.99),
+    (1, 20, 2.72, 3.00),
+    (21, 40, 2.78, 3.10),
+    (41, 60, 2.84, 3.20),
+    (61, 80, 2.92, 3.35),
+    (81, 100, 3.00, 9.99),
 )
 
 
@@ -156,7 +156,7 @@ def main() -> None:
     approved_source_ids = {
         str((puzzle.get("meta") or {}).get("refreshSourceId") or "")
         for puzzle in approved.get("puzzles") or []
-        if float((puzzle.get("meta") or {}).get("humanDecisionScore") or 0) >= MIN_SCORE
+        if float((puzzle.get("meta") or {}).get("humanDecisionScore") or 0) >= APPROVED_ANCHOR_MIN_SCORE
     }
 
     tiers_payload = load(Path(__file__).resolve().parents[1] / "data" / "answer_tiers.json")

@@ -20,44 +20,100 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  generate:
     if: ${{ !contains(github.event.head_commit.message, '[mozkomor-generated]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 0
+            seed: 40132029
+          - shard: 1
+            seed: 40132030
+          - shard: 2
+            seed: 40132031
+          - shard: 3
+            seed: 40132032
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Syntax preflight
+        run: python -m py_compile tools/generate_mozkomor_gen4.py
+      - name: Generate candidate shard ${{ matrix.shard }}
+        run: |
+          mkdir -p /tmp/mozkomor-candidates
+          python tools/generate_mozkomor_gen4.py             --count 65             --start-level 1             --seed '${{ matrix.seed }}'             --output '/tmp/mozkomor-candidates/shard-${{ matrix.shard }}.json'
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40132-mozkomor-candidates-${{ matrix.shard }}
+          path: /tmp/mozkomor-candidates/
+          retention-days: 14
+          if-no-files-found: error
 
+  assemble:
+    if: ${{ !contains(github.event.head_commit.message, '[mozkomor-generated]') }}
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-
       - name: Install runtime dependencies
         run: pip install -r requirements.txt
-
-      - name: Fetch the audited refresh source only
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: v40132-mozkomor-candidates-*
+          path: /tmp/mozkomor-candidates
+          merge-multiple: true
+      - name: Fetch audited refresh source only
         run: |
           git fetch origin agent/v40131-mozkomor-refresh:refs/remotes/origin/agent/v40131-mozkomor-refresh
           git show origin/agent/v40131-mozkomor-refresh:data/puzzles.json > /tmp/mozkomor-refresh-source.json
           git show origin/agent/v40131-mozkomor-refresh:data/mozkomor_refresh_playtest.json > /tmp/mozkomor-approved-playtest.json
-
+      - name: Combine fresh candidate shards
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          files = sorted(Path('/tmp/mozkomor-candidates').glob('shard-*.json'))
+          assert len(files) == 4, files
+          puzzles = []
+          stats = []
+          for shard, path in enumerate(files):
+              payload = json.loads(path.read_text(encoding='utf-8'))
+              stats.append(payload.get('stats') or {})
+              for local, puzzle in enumerate(payload.get('puzzles') or [], 1):
+                  puzzle['id'] = f"fresh-s{shard}-{local:03d}"
+                  puzzle.setdefault('meta', {})['candidateShard'] = shard
+                  puzzles.append(puzzle)
+          assert len(puzzles) == 260, len(puzzles)
+          Path('/tmp/mozkomor-fresh-candidates.json').write_text(
+              json.dumps({
+                  'version': 1,
+                  'kind': 'gen4-mozkomor-candidate-pool',
+                  'puzzles': puzzles,
+                  'shardStats': stats,
+              }, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+          print(f"Combined {len(puzzles)} fresh candidates")
+          PY
       - name: Syntax preflight
         run: |
-          python -m py_compile             tools/generate_mozkomor_gen4.py             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
-
-      - name: Generate fresh candidate pool
-        run: |
-          python tools/generate_mozkomor_gen4.py             --count 260             --start-level 1             --seed 40132029             --output /tmp/mozkomor-fresh-candidates.json
-
+          python -m py_compile             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
       - name: Select final human-calibrated 100
         run: |
           python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-fresh-candidates.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
-
       - name: Cheap final-bank contract
         run: python tools/test_mozkomor_final_v40132.py
-
       - name: Full Generation 4 validation against current main content
         run: |
           python - <<'PY'
@@ -72,7 +128,6 @@ jobs:
           )
           PY
           python tools/validate_gen4_release.py /tmp/puzzles-with-final-mozkomor.json             --rolling data/rolling_content_v1.json             --profiles data/gen4_profiles_v334.json             --exclusions data/target_generation_exclusions_v334.json             --approved-release             --report /tmp/mozkomor-final-full-validation.json
-
       - uses: actions/upload-artifact@v6
         with:
           name: v40132-mozkomor-final-bank
@@ -83,7 +138,6 @@ jobs:
             /tmp/mozkomor-final-full-validation.json
           retention-days: 30
           if-no-files-found: error
-
       - name: Commit reproducible bank to preview branch
         run: |
           git config user.name "github-actions[bot]"
