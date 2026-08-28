@@ -219,6 +219,7 @@
         try{
           const result=await api('/api/word-discovery/claim',{method:'POST',body:JSON.stringify(claimPayload(row))});
           store.entries[key]={...row,status:'confirmed'};changed=true;
+          store.serverTotalXp=Math.max(Number(store.serverTotalXp||0),Number(result?.totalDiscoveryXp||0));
           markServerState(result,id);
         }catch{}
       }
@@ -396,7 +397,6 @@
   const boot=()=>{
     if(install()){
       syncDiscoveries();
-      if(++tries<40)setTimeout(boot,1500);
       return;
     }
     if(++tries<100)setTimeout(boot,50);
