@@ -8,6 +8,7 @@ theme=(root/"public/theme-init.js").read_text(encoding="utf-8")
 quality=(root/"public/quality-v334-core-v40114.js").read_text(encoding="utf-8")
 notes=(root/"public/release-notes-v3331.js").read_text(encoding="utf-8")
 css=(root/"public/release-notes-v3331.css").read_text(encoding="utf-8")
+server=(root/"server.py").read_text(encoding="utf-8")
 
 # Exactly one active release CTA: the v4.01.32 card suppresses both legacy Gen4/XP modals.
 assert "window.PROPLET_SINGLE_RELEASE_CTA_V40132=true" in theme
@@ -46,6 +47,15 @@ assert "location.hostname.endsWith('.vercel.app')" in app
 assert "MOZKOMOR_QA_PARAM==='final'||MOZKOMOR_QA_PARAM==='unlocked'" in app
 assert "MOZKOMOR_QA_PREVIEW&&rec?.difficulty==='mozkomor'" in app
 assert "MOZKOMOR_QA_PREVIEW&&g?.puzzle?.difficulty==='mozkomor'" in app
+
+# Server-authoritative production gate.
+assert 'FREE_DIFFICULTIES = ("easy", "medium", "hard", "hardcore", "mozkomor")' in server
+assert '"mozkomor": 150' in server
+assert "MOZKOMOR_UNLOCK_BASE_LEVELS = 200" in server
+assert '"freeBasePlayedCurrent": free_slots["baseCurrent"]' in server
+assert '"mozkomorUnlocked": mozkomor_unlocked_from_rows(rows)' in server
+assert 'if payload.difficulty == "mozkomor":' in server
+assert 'raise HTTPException(403, "Mozkomor se odemkne po dokončení všech 200 Mozkožroutů")' in server
 
 # Compact visual release card contract.
 assert ".release-notes-v3331-features" in css
