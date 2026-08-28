@@ -81,9 +81,9 @@
     const style=document.createElement('style');
     style.id='wordDiscoveryXpStyle';
     style.textContent=`
-      .word-discovery-xp-pop{position:fixed;z-index:1600;pointer-events:none;font-weight:900;font-size:19px;line-height:1;padding:9px 12px;border-radius:999px;background:rgba(75,181,113,.98);color:#fff;box-shadow:0 8px 24px rgba(20,80,45,.24);transform:translate(-50%,0) scale(.94);opacity:0;animation:wordDiscoveryXpPop .95s cubic-bezier(.2,.8,.2,1) forwards}
-      @keyframes wordDiscoveryXpPop{0%{opacity:0;transform:translate(-50%,8px) scale(.92)}15%{opacity:1;transform:translate(-50%,0) scale(1.03)}72%{opacity:1;transform:translate(-50%,-10px) scale(1)}100%{opacity:0;transform:translate(-50%,-20px) scale(.98)}}
-      @media (prefers-reduced-motion:reduce){.word-discovery-xp-pop{animation:wordDiscoveryXpFade .5s linear forwards}@keyframes wordDiscoveryXpFade{0%,100%{opacity:0}20%,75%{opacity:1}}}
+      .word-discovery-xp-pop{position:fixed;left:50%;top:50%;z-index:1600;pointer-events:none;font-weight:900;font-size:19px;line-height:1;padding:9px 12px;border-radius:999px;background:rgba(75,181,113,.98);color:#fff;box-shadow:0 8px 24px rgba(20,80,45,.24);transform:translate(-50%,-50%) scale(.94);opacity:0;animation:wordDiscoveryXpPop 1s cubic-bezier(.2,.8,.2,1) forwards}
+      @keyframes wordDiscoveryXpPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.92)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-54%) scale(.98)}}
+      @media (prefers-reduced-motion:reduce){.word-discovery-xp-pop{animation:wordDiscoveryXpFade 1s linear forwards}@keyframes wordDiscoveryXpFade{0%,100%{opacity:0}12%,82%{opacity:1}}}
     `;
     document.head.appendChild(style);
   };
@@ -91,16 +91,12 @@
   const showXpPop=()=>{
     if(rewardDisabled())return;
     ensureXpStyle();
-    const anchor=document.querySelector('#gameMessage')||document.querySelector('#currentWord')||document.querySelector('#board');
-    const rect=anchor?.getBoundingClientRect?.();
     const pop=document.createElement('div');
     pop.className='word-discovery-xp-pop';
     pop.textContent='+1 XP';
     pop.setAttribute('aria-hidden','true');
-    pop.style.left=`${Math.round(rect?.left+(rect?.width||0)/2||window.innerWidth/2)}px`;
-    pop.style.top=`${Math.round((rect?.top||window.innerHeight*.55)-10)}px`;
     document.body.appendChild(pop);
-    setTimeout(()=>pop.remove(),720);
+    setTimeout(()=>pop.remove(),1100);
   };
 
   const failsafeShown=()=>{
