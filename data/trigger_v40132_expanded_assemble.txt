@@ -1,1 +1,1 @@
-trigger expanded assemble v5 cooldown 8
+trigger reverse assemble cooldown 8
