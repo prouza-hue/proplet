@@ -3,6 +3,7 @@ const fs=require('fs');
 const path=require('path');
 const root=path.resolve(__dirname,'..');
 const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8');
+const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'public/sw.js'),'utf8');
 const playtest=JSON.parse(fs.readFileSync(path.join(root,'public/mozkomor-refresh-playtest.json'),'utf8'));
 
@@ -27,6 +28,8 @@ if(app.includes('mozkomor-masochist')||app.includes('MOZKOMOR_MASOCHIST_PREVIEW'
   throw new Error('Obsolete masochist preview contract remains in the client');
 if(!sw.includes("proplet-v4.01.31-shell-mozkomor-refresh"))
   throw new Error('Refresh preview must rotate the service-worker shell cache');
+if(!html.includes('/app.js?v=mozkomor-refresh-v40131')||!sw.includes('/app.js?v=mozkomor-refresh-v40131'))
+  throw new Error('Refresh preview must load and precache the same cache-busted client');
 if(playtest.kind!=='mozkomor-human-refresh-playtest'||playtest.puzzles?.length!==10)
   throw new Error('Refresh public payload must contain exactly ten isolated boards');
 console.log('Mozkomor v4.01.31 refresh client contract: OK');
