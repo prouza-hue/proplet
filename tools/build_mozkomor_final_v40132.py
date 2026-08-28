@@ -19,7 +19,8 @@ import audit_mozkomor_human_v40131 as human
 
 TARGET_COUNT = 100
 TARGET_COOLDOWN = 12
-MIN_SCORE = 2.60\nAPPROVED_ANCHOR_MIN_SCORE = 2.75
+MIN_SCORE = 2.60
+APPROVED_ANCHOR_MIN_SCORE = 2.75
 BANDS = (
     (1, 20, 2.72, 3.00),
     (21, 40, 2.78, 3.10),
