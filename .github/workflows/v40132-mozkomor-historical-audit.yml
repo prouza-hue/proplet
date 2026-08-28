@@ -1,0 +1,83 @@
+name: v4.01.32 Mozkomor historical pool audit
+
+on:
+  push:
+    branches:
+      - agent/v40132-mozkomor-historical-audit
+    paths:
+      - '.github/workflows/v40132-mozkomor-historical-audit.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+      - name: Fetch historical validated banks
+        run: |
+          git fetch origin agent/v40131-mozkomor-refresh:refs/remotes/origin/agent/v40131-mozkomor-refresh
+          git fetch origin agent/v40129-mozkomor-fastgen:refs/remotes/origin/agent/v40129-mozkomor-fastgen
+          git fetch origin agent/mozkomor-fastgen-ci:refs/remotes/origin/agent/mozkomor-fastgen-ci
+          git show origin/agent/v40131-mozkomor-refresh:data/puzzles.json > /tmp/refresh.json
+          git show origin/agent/v40131-mozkomor-refresh:data/mozkomor_refresh_playtest.json > /tmp/approved.json
+          git show origin/agent/v40129-mozkomor-fastgen:data/puzzles.json > /tmp/fastgen.json
+          git show origin/agent/mozkomor-fastgen-ci:data/puzzles.json > /tmp/fastgen-ci.json
+      - name: Build historical candidate payload
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          puzzles=[]
+          sources=[]
+          for label,path in [('fastgen','/tmp/fastgen.json'),('fastgen-ci','/tmp/fastgen-ci.json')]:
+              payload=json.loads(Path(path).read_text(encoding='utf-8'))
+              bank=list((payload.get('free') or {}).get('mozkomor') or [])
+              print(label, len(bank))
+              if len(bank)!=100:
+                  continue
+              for idx,p in enumerate(bank,1):
+                  p['id']=f"{label}-{idx:03d}"
+                  p.setdefault('meta',{})['historicalCandidateSource']=label
+                  puzzles.append(p)
+              sources.append(label)
+          assert len(puzzles)>=100, len(puzzles)
+          Path('/tmp/historical-candidates.json').write_text(
+              json.dumps({'version':1,'kind':'mozkomor-historical-candidate-pool','sources':sources,'puzzles':puzzles},ensure_ascii=False,indent=2)+'\n',
+              encoding='utf-8'
+          )
+          print('historical candidates',len(puzzles),sources)
+          PY
+      - name: Select from historical pool only
+        run: |
+          python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/refresh.json             --approved /tmp/approved.json             --generated /tmp/historical-candidates.json             --output data/mozkomor_historical_candidate_v40132.json             --report data/audits/mozkomor_historical_candidate_v40132.json
+      - name: Reuse cheap final contract
+        run: |
+          cp data/mozkomor_historical_candidate_v40132.json data/mozkomor_final_v40132.json
+          cp data/audits/mozkomor_historical_candidate_v40132.json data/audits/mozkomor_final_v40132.json
+          python tools/test_mozkomor_final_v40132.py
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40132-mozkomor-historical-audit
+          path: |
+            data/mozkomor_historical_candidate_v40132.json
+            data/audits/mozkomor_historical_candidate_v40132.json
+            /tmp/historical-candidates.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Commit successful historical selection
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/mozkomor_historical_candidate_v40132.json data/audits/mozkomor_historical_candidate_v40132.json
+          git commit -m "Audit historical Mozkomor candidate pool" || exit 0
+          git push origin HEAD:agent/v40132-mozkomor-historical-audit
