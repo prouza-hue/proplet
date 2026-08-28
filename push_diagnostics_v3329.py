@@ -48,7 +48,7 @@ def install_push_diagnostics(
     vapid_subject = os.environ.get("VAPID_SUBJECT", "https://hrajproplet.cz").strip()
     cron_secret = os.environ.get("CRON_SECRET", "").strip()
     vercel_env = os.environ.get("VERCEL_ENV", "").strip().lower()
-    tajenka_release_enabled = vercel_env == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "").strip().lower() in {"1", "true", "yes"}
+    tajenka_release_enabled = vercel_env == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
     tajenka_first_saturday = date(2026, 8, 29)
     canonical_origin = str(_kwargs.get("canonical_origin") or "https://hrajproplet.cz").rstrip("/")
 

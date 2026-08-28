@@ -75,7 +75,7 @@ POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
-TAJENKA_RELEASE_ENABLED = VERCEL_ENV == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "").strip().lower() in {"1", "true", "yes"}
+TAJENKA_RELEASE_ENABLED = VERCEL_ENV == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
