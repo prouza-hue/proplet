@@ -142,74 +142,74 @@ def candidate_cost(row: dict, level: int, word_usage: Counter[str]) -> float:
 
 
 def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict], int]:
-    """Find a full 100-board ordering under score bands + 8-level word cooldown.
-
-    The previous purely greedy selector could paint itself into a corner even
-    when a valid sequence existed. This bounded DFS keeps the same quality
-    rules, but backtracks across local ordering choices.
-    """
+    """Build from level 100 backwards so the narrow hardest band is solved first."""
     row_words = [
         {norm(word["word"]) for word in row["words"]}
         for row in pool
     ]
-    selected_rows: list[dict] = []
-    selected_indices: list[int] = []
-    selected_set: set[int] = set()
-    recent_words: list[set[str]] = [
+    hardcore_tail = [
         {norm(answer.get("word")) for answer in puzzle.get("answers") or []}
         for puzzle in hardcore[-TARGET_COOLDOWN:]
     ]
+    selected_rev: list[dict] = []
+    selected_indices: list[int] = []
+    selected_wordsets: list[set[str]] = []
+    selected_set: set[int] = set()
     word_usage: Counter[str] = Counter()
     frames: list[dict] = []
-    level = 1
     explored = 0
-    max_nodes = 2_500_000
+    max_nodes = 750_000
+
+    def boundary_block(level_no: int) -> set[str]:
+        if level_no > TARGET_COOLDOWN:
+            return set()
+        count = TARGET_COOLDOWN - level_no + 1
+        return set().union(*hardcore_tail[-count:]) if count else set()
+
+    def blocked_now(level_no: int) -> set[str]:
+        future = selected_wordsets[-TARGET_COOLDOWN:]
+        block = set().union(*future) if future else set()
+        return block | boundary_block(level_no)
 
     def candidate_indices(level_no: int) -> list[int]:
         low, high = band_for(level_no)
-        blocked = set().union(*recent_words[-TARGET_COOLDOWN:]) if recent_words else set()
+        blocked = blocked_now(level_no)
         choices = [
             idx for idx, row in enumerate(pool)
             if idx not in selected_set
             and low <= float(row["humanDecisionScore"]) <= high
             and not (row_words[idx] & blocked)
         ]
-        if not choices:
-            return []
-
-        if level_no >= TARGET_COUNT:
+        if not choices or level_no == 1:
             return sorted(choices, key=lambda idx: candidate_cost(pool[idx], level_no, word_usage))
 
-        next_low, next_high = band_for(level_no + 1)
-        recent_tail = recent_words[-(TARGET_COOLDOWN - 1):] if TARGET_COOLDOWN > 1 else []
+        next_level = level_no - 1
+        next_low, next_high = band_for(next_level)
 
         def rank(idx: int) -> tuple[float, float]:
-            next_blocked = set().union(*(recent_tail + [row_words[idx]])) if (recent_tail or row_words[idx]) else set()
+            after = (selected_wordsets + [row_words[idx]])[-TARGET_COOLDOWN:]
+            next_block = (set().union(*after) if after else set()) | boundary_block(next_level)
             future_count = 0
             for j, row in enumerate(pool):
                 if j == idx or j in selected_set:
                     continue
                 score = float(row["humanDecisionScore"])
-                if next_low <= score <= next_high and not (row_words[j] & next_blocked):
+                if next_low <= score <= next_high and not (row_words[j] & next_block):
                     future_count += 1
-            # All choices already satisfy the same quality filters and score band.
-            # Prefer the least-constraining board so the 8-level cooldown remains
-            # satisfiable deep into the 100-level sequence.
-            score = candidate_cost(pool[idx], level_no, word_usage)
-            remaining = TARGET_COUNT - level_no
-            flex_target = min(24, max(6, remaining + 2))
-            shortage = max(0, flex_target - future_count)
-            flex_weight = 0.055 if level_no >= 61 else 0.025
-            adjusted = score + shortage * 0.45 - min(future_count, 40) * flex_weight
+            # Quality stays primary; flexibility prevents dead ends near band boundaries.
+            quality = candidate_cost(pool[idx], level_no, word_usage)
+            adjusted = quality - min(future_count, 50) * 0.07
             return adjusted, -future_count
 
         return sorted(choices, key=rank)
 
-    while 1 <= level <= TARGET_COUNT:
-        if len(frames) < level:
+    while len(selected_rev) < TARGET_COUNT:
+        depth = len(selected_rev)
+        level = TARGET_COUNT - depth
+        if len(frames) == depth:
             frames.append({"choices": candidate_indices(level), "next": 0})
 
-        frame = frames[level - 1]
+        frame = frames[depth]
         picked = False
         while frame["next"] < len(frame["choices"]):
             idx = frame["choices"][frame["next"]]
@@ -217,52 +217,45 @@ def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict],
             explored += 1
             if explored > max_nodes:
                 raise RuntimeError(
-                    f"Selector exceeded {max_nodes} search nodes at level {level}; "
-                    f"selected={len(selected_rows)}, pool={len(pool)}"
+                    f"Reverse selector exceeded {max_nodes} nodes at level {level}; "
+                    f"selected={len(selected_rev)}, pool={len(pool)}"
                 )
-
-            # Recheck against the current state; the frame can survive a backtrack.
             if idx in selected_set:
                 continue
             low, high = band_for(level)
             score = float(pool[idx]["humanDecisionScore"])
-            blocked = set().union(*recent_words[-TARGET_COOLDOWN:]) if recent_words else set()
-            if not (low <= score <= high) or (row_words[idx] & blocked):
+            if not (low <= score <= high) or (row_words[idx] & blocked_now(level)):
                 continue
 
-            selected_rows.append(pool[idx])
+            selected_rev.append(pool[idx])
             selected_indices.append(idx)
+            selected_wordsets.append(row_words[idx])
             selected_set.add(idx)
-            recent_words.append(row_words[idx])
             word_usage.update(row_words[idx])
-            level += 1
             picked = True
             break
 
         if picked:
             continue
 
-        # Exhausted this level: discard its frame and try the next alternative
-        # at the previous level.
         frames.pop()
-        if level == 1:
+        if depth == 0:
             break
-        level -= 1
         prev_idx = selected_indices.pop()
-        prev_words = row_words[prev_idx]
+        prev_words = selected_wordsets.pop()
         selected_set.remove(prev_idx)
-        selected_rows.pop()
-        recent_words.pop()
+        selected_rev.pop()
         word_usage.subtract(prev_words)
-        word_usage += Counter()  # prune zero/negative entries
+        word_usage += Counter()
 
-    if len(selected_rows) != TARGET_COUNT:
-        low, high = band_for(max(1, min(level, TARGET_COUNT)))
+    if len(selected_rev) != TARGET_COUNT:
+        level = TARGET_COUNT - len(selected_rev)
+        low, high = band_for(max(1, level))
         raise RuntimeError(
-            f"No full Mozkomor ordering found; stopped at level {level}; "
-            f"band={low:.2f}..{high:.2f}, selected={len(selected_rows)}, pool={len(pool)}, explored={explored}"
+            f"No full reverse Mozkomor ordering; stopped at level {level}; "
+            f"band={low:.2f}..{high:.2f}, selected={len(selected_rev)}, pool={len(pool)}, explored={explored}"
         )
-    return selected_rows, explored
+    return list(reversed(selected_rev)), explored
 
 
 def main() -> None:
