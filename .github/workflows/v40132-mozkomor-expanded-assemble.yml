@@ -1,0 +1,132 @@
+name: v4.01.32 Mozkomor expanded final assemble
+
+on:
+  push:
+    branches:
+      - agent/v40132-mozkomor-assemble-fix
+    paths:
+      - 'data/trigger_v40132_expanded_assemble.txt'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+
+      - name: Reuse first candidate batch
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 33217108131
+          pattern: v40132-mozkomor-candidates-*
+          path: /tmp/mozkomor-base
+          merge-multiple: true
+
+      - name: Reuse expanded candidate batch
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 33219497400
+          pattern: v40132-mozkomor-extra-*
+          path: /tmp/mozkomor-extra
+          merge-multiple: true
+
+      - name: Fetch audited historical candidate banks
+        run: |
+          git fetch origin agent/v40131-mozkomor-refresh:refs/remotes/origin/agent/v40131-mozkomor-refresh
+          git fetch origin agent/v40129-mozkomor-fastgen:refs/remotes/origin/agent/v40129-mozkomor-fastgen
+          git show origin/agent/v40131-mozkomor-refresh:data/puzzles.json > /tmp/mozkomor-refresh-source.json
+          git show origin/agent/v40131-mozkomor-refresh:data/mozkomor_refresh_playtest.json > /tmp/mozkomor-approved-playtest.json
+          git show origin/agent/v40129-mozkomor-fastgen:data/puzzles.json > /tmp/mozkomor-fastgen-source.json
+
+      - name: Combine 684 non-primary candidates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          files = sorted(Path('/tmp/mozkomor-base').glob('shard-*.json')) + sorted(Path('/tmp/mozkomor-extra').glob('shard-*.json'))
+          assert len(files) == 16, [str(p) for p in files]
+          puzzles = []
+          stats = []
+          for path in files:
+              payload = json.loads(path.read_text(encoding='utf-8'))
+              shard = int(path.stem.split('-')[-1])
+              stats.append({'shard': shard, **(payload.get('stats') or {})})
+              for local, puzzle in enumerate(payload.get('puzzles') or [], 1):
+                  puzzle['id'] = f"fresh-s{shard}-{local:03d}"
+                  puzzle.setdefault('meta', {})['candidateShard'] = shard
+                  puzzles.append(puzzle)
+          assert len(puzzles) == 584, len(puzzles)
+
+          fastgen = json.loads(Path('/tmp/mozkomor-fastgen-source.json').read_text(encoding='utf-8'))
+          fast_bank = list((fastgen.get('free') or {}).get('mozkomor') or [])
+          assert len(fast_bank) == 100, len(fast_bank)
+          for local, puzzle in enumerate(fast_bank, 1):
+              puzzle['id'] = f"historical-fastgen-{local:03d}"
+              puzzle.setdefault('meta', {})['historicalCandidateSource'] = 'v40129-fastgen'
+              puzzles.append(puzzle)
+          assert len(puzzles) == 684, len(puzzles)
+
+          Path('/tmp/mozkomor-expanded-pool.json').write_text(
+              json.dumps({'version':1,'kind':'gen4-mozkomor-expanded-candidate-pool','puzzles':puzzles,'shardStats':stats},ensure_ascii=False,indent=2)+'\n',
+              encoding='utf-8'
+          )
+          print('combined non-primary candidates', len(puzzles))
+          PY
+
+      - name: Syntax preflight
+        run: |
+          python -m py_compile             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
+
+      - name: Select final human-calibrated 100
+        run: |
+          python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-expanded-pool.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
+
+      - name: Cheap final-bank contract
+        run: python tools/test_mozkomor_final_v40132.py
+
+      - name: Full Generation 4 validation against current content
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current = json.loads(Path('data/puzzles.json').read_text(encoding='utf-8'))
+          final = json.loads(Path('data/mozkomor_final_v40132.json').read_text(encoding='utf-8'))
+          current.setdefault('free', {})['mozkomor'] = final['puzzles']
+          Path('/tmp/puzzles-with-final-mozkomor.json').write_text(
+              json.dumps(current, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+          PY
+          python tools/validate_gen4_release.py /tmp/puzzles-with-final-mozkomor.json             --rolling data/rolling_content_v1.json             --profiles data/gen4_profiles_v334.json             --exclusions data/target_generation_exclusions_v334.json             --approved-release             --report /tmp/mozkomor-final-full-validation.json
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40132-mozkomor-expanded-final-bank
+          path: |
+            data/mozkomor_final_v40132.json
+            data/audits/mozkomor_final_v40132.json
+            /tmp/mozkomor-final-full-validation.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Commit selected bank
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/mozkomor_final_v40132.json data/audits/mozkomor_final_v40132.json
+          git commit -m "Generate expanded human-calibrated Mozkomor final bank [mozkomor-generated]"
+          git push origin HEAD:agent/v40132-mozkomor-assemble-fix
