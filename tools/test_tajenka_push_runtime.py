@@ -87,8 +87,8 @@ first = route.endpoint(None, "Bearer test-secret")
 assert first["ok"] is True
 assert first["date"] == "2026-08-29"
 assert first["category"] == "tajenka"
-assert first["tajenka"] == "tajenka-week-01"
-assert first["eventKey"] == "tajenka:tajenka-week-01"
+assert first["tajenka"] == "tajenka-v2-week-01"
+assert first["eventKey"] == "tajenka:tajenka-v2-week-01"
 assert first["sent"] == 1
 assert len(sent_payloads) == 1
 payload = sent_payloads[0]
@@ -96,13 +96,13 @@ assert payload["title"] == "✨ Víkendová Tajenka je tady"
 assert "200 XP" in payload["body"]
 assert payload["url"] == "https://hrajproplet.cz/?open=tajenka&via=push-tajenka"
 assert tables["push_delivery_log"][0]["category"] == "tajenka"
-assert tables["push_delivery_log"][0]["event_key"] == "tajenka:tajenka-week-01"
+assert tables["push_delivery_log"][0]["event_key"] == "tajenka:tajenka-v2-week-01"
 assert tables["push_delivery_log"][0]["status"] == "sent"
 
 # A retry of the same cron event is idempotent at delivery level.
 second = route.endpoint(None, "Bearer test-secret")
 assert second["category"] == "tajenka"
-assert second["tajenka"] == "tajenka-week-01"
+assert second["tajenka"] == "tajenka-v2-week-01"
 assert second["sent"] == 0
 assert second["duplicate"] == 1
 assert len(sent_payloads) == 1

@@ -38,9 +38,34 @@ def longest_straight_run(path: list[int], cols: int) -> int:
     return longest
 
 
+def matching_paths(text: str, letters: list[str], mask: set[int], rows: int, cols: int) -> set[tuple[int, ...]]:
+    result: set[tuple[int, ...]] = set()
+    for start in mask:
+        if letters[start] != text[0]:
+            continue
+        path = [start]
+        used = {start}
+
+        def visit(position: int) -> None:
+            if position == len(text):
+                result.add(tuple(path))
+                return
+            for cell in mask:
+                if cell in used or letters[cell] != text[position] or not adjacent(path[-1], cell, cols):
+                    continue
+                path.append(cell)
+                used.add(cell)
+                visit(position + 1)
+                used.remove(cell)
+                path.pop()
+
+        visit(1)
+    return result
+
+
 def validate_puzzle(data: dict, expected_week: int) -> None:
     assert data["version"] == 1
-    assert data["id"] == f"tajenka-week-{expected_week:02d}"
+    assert data["id"] == f"tajenka-v2-week-{expected_week:02d}"
     assert data["week"] == expected_week
     assert data["kind"] == "weekend_bonus"
     assert data["difficulty"] == "medium"
@@ -53,14 +78,15 @@ def validate_puzzle(data: dict, expected_week: int) -> None:
     mask = set(data["mask"])
     assert len(mask) == len(data["mask"]) == data["meta"]["cells"]
     assert mask <= set(range(rows * cols))
-    assert 2 <= rows * cols - len(mask) <= 4
+    assert len(mask) == 32
+    assert rows * cols - len(mask) == 4
 
     answer_owner = {}
     measured_turns = []
     for answer_index, answer in enumerate(data["answers"]):
         path = answer["path"]
         assert len(path) == len(answer["word"])
-        assert len(answer["word"]) >= 4
+        assert 5 <= len(answer["word"]) <= 7
         assert isinstance(answer.get("clue"), str) and len(answer["clue"]) >= 12
         assert len(set(path)) == len(path)
         assert set(path) <= mask
@@ -69,16 +95,18 @@ def validate_puzzle(data: dict, expected_week: int) -> None:
         turns = turn_count(path, cols)
         measured_turns.append(turns)
         assert turns == answer["turns"]
-        assert turns >= 2
-        assert longest_straight_run(path, cols) <= 2
+        assert turns >= 3
+        assert longest_straight_run(path, cols) == 1
+        assert matching_paths(answer["word"], data["letters"], mask, rows, cols) == {tuple(path)}
         for cell in path:
             assert cell not in answer_owner
             answer_owner[cell] = answer_index
 
     decoys = mask - set(answer_owner)
-    assert len(decoys) == data["meta"]["decoyCells"] >= 3
+    assert len(decoys) == data["meta"]["decoyCells"] in (4, 5)
     assert len(answer_owner) == data["meta"]["phraseCells"]
-    assert sum(measured_turns) >= 14
+    assert len(answer_owner) in (27, 28)
+    assert sum(measured_turns) >= 17
     cross_word_edges = sum(
         1
         for cell in answer_owner
@@ -86,7 +114,42 @@ def validate_puzzle(data: dict, expected_week: int) -> None:
         if cell < neighbour and adjacent(cell, neighbour, cols)
         and answer_owner[cell] != answer_owner[neighbour]
     )
-    assert cross_word_edges == data["meta"]["crossWordEdges"] >= 4
+    cross_word_pairs = {
+        tuple(sorted((answer_owner[cell], answer_owner[neighbour])))
+        for cell in answer_owner
+        for neighbour in answer_owner
+        if cell < neighbour and adjacent(cell, neighbour, cols)
+        and answer_owner[cell] != answer_owner[neighbour]
+    }
+    non_sequential_edges = sum(
+        1
+        for cell in answer_owner
+        for neighbour in answer_owner
+        if cell < neighbour and adjacent(cell, neighbour, cols)
+        and abs(answer_owner[cell] - answer_owner[neighbour]) > 1
+    )
+    sequential_boundaries = sum(
+        int(adjacent(data["answers"][index]["path"][-1], data["answers"][index + 1]["path"][0], cols))
+        for index in range(len(data["answers"]) - 1)
+    )
+    assert cross_word_edges == data["meta"]["crossWordEdges"] >= 13
+    assert len(cross_word_pairs) == data["meta"]["crossWordPairs"] >= 7
+    assert non_sequential_edges == data["meta"]["nonSequentialEdges"] >= 8
+    assert sequential_boundaries == data["meta"]["sequentialBoundaries"] <= 1
+    assert data["meta"]["minWordContacts"] >= 2
+    assert data["meta"]["falsePrefixes2"] >= 6
+    assert data["meta"]["falsePrefixes3"] >= 2
+    assert data["meta"]["falsePrefixStartCells"] >= 4
+    assert data["meta"]["falsePrefixFamilies"] >= 3
+    assert data["meta"]["meaningfulDecoys"] == len(decoys)
+    assert data["meta"]["alternativeFullPaths"] == 0
+    assert data["meta"]["holeQuadrants"] >= 3
+    assert data["meta"]["decoyQuadrants"] >= 3
+    assert data["meta"]["decoyAdjacencyEdges"] <= 1
+    assert data["meta"]["minRowFill"] >= 4
+    assert data["meta"]["minColFill"] >= 4
+    assert data["meta"]["candidatePool"] >= 1
+    assert data["meta"]["pathStyle"] == "independent_interleaved_with_intentional_decoys"
 
     order = data["tajenka"]["answerOrder"]
     assert sorted(order) == list(range(len(data["answers"])))
@@ -101,6 +164,8 @@ def main() -> None:
     assert bank["rewardXp"] == REWARD_XP
     assert len({puzzle["id"] for puzzle in bank["puzzles"]}) == 10
     assert len({puzzle["tajenka"]["phrase"] for puzzle in bank["puzzles"]}) == 10
+    all_words = [answer["word"] for puzzle in bank["puzzles"] for answer in puzzle["answers"]]
+    assert len(all_words) == len(set(all_words)) == 50
     for week, puzzle in enumerate(bank["puzzles"], 1):
         validate_puzzle(puzzle, week)
 
@@ -147,7 +212,7 @@ def main() -> None:
     assert '"url": f"{canonical_origin}/?open=tajenka&via=push-tajenka"' in push
     assert "tajenkaReleaseEnabled:false" in runtime
     assert "tajenkaRewardXp:200" in runtime
-    assert "proplet-v4.01.28-tajenka-preview-v6-shell" in sw
+    assert "proplet-v4.01.28-tajenka-preview-v7-curated-shell" in sw
     assert "'/tajenka-test.json'" in sw
 
     assert re.search(r"\.tajenka-rule-note\{[^}]*font-size:14px", styles)
