@@ -23,19 +23,19 @@ jobs:
   generate:
     if: ${{ !contains(github.event.head_commit.message, '[mozkomor-generated]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
         include:
-          - shard: 0
-            seed: 40132029
-          - shard: 1
-            seed: 40132030
-          - shard: 2
-            seed: 40132031
-          - shard: 3
-            seed: 40132032
+          - { shard: 0, seed: 40132029 }
+          - { shard: 1, seed: 40132030 }
+          - { shard: 2, seed: 40132031 }
+          - { shard: 3, seed: 40132032 }
+          - { shard: 4, seed: 40132033 }
+          - { shard: 5, seed: 40132034 }
+          - { shard: 6, seed: 40132035 }
+          - { shard: 7, seed: 40132036 }
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -46,7 +46,7 @@ jobs:
       - name: Generate candidate shard ${{ matrix.shard }}
         run: |
           mkdir -p /tmp/mozkomor-candidates
-          python tools/generate_mozkomor_gen4.py             --count 65             --start-level 1             --seed '${{ matrix.seed }}'             --output '/tmp/mozkomor-candidates/shard-${{ matrix.shard }}.json'
+          python tools/generate_mozkomor_gen4.py             --count 33             --start-level 1             --seed '${{ matrix.seed }}'             --output '/tmp/mozkomor-candidates/shard-${{ matrix.shard }}.json'
       - uses: actions/upload-artifact@v6
         with:
           name: v40132-mozkomor-candidates-${{ matrix.shard }}
@@ -73,18 +73,21 @@ jobs:
           pattern: v40132-mozkomor-candidates-*
           path: /tmp/mozkomor-candidates
           merge-multiple: true
-      - name: Fetch audited refresh source only
+      - name: Fetch audited historical candidate banks
         run: |
           git fetch origin agent/v40131-mozkomor-refresh:refs/remotes/origin/agent/v40131-mozkomor-refresh
+          git fetch origin agent/v40129-mozkomor-fastgen:refs/remotes/origin/agent/v40129-mozkomor-fastgen
           git show origin/agent/v40131-mozkomor-refresh:data/puzzles.json > /tmp/mozkomor-refresh-source.json
           git show origin/agent/v40131-mozkomor-refresh:data/mozkomor_refresh_playtest.json > /tmp/mozkomor-approved-playtest.json
-      - name: Combine fresh candidate shards
+          git show origin/agent/v40129-mozkomor-fastgen:data/puzzles.json > /tmp/mozkomor-fastgen-source.json
+      - name: Combine fresh and already-paid candidate pools
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
+
           files = sorted(Path('/tmp/mozkomor-candidates').glob('shard-*.json'))
-          assert len(files) == 4, files
+          assert len(files) == 8, files
           puzzles = []
           stats = []
           for shard, path in enumerate(files):
@@ -94,24 +97,36 @@ jobs:
                   puzzle['id'] = f"fresh-s{shard}-{local:03d}"
                   puzzle.setdefault('meta', {})['candidateShard'] = shard
                   puzzles.append(puzzle)
-          assert len(puzzles) == 260, len(puzzles)
-          Path('/tmp/mozkomor-fresh-candidates.json').write_text(
+          assert len(puzzles) == 264, len(puzzles)
+
+          fastgen = json.loads(Path('/tmp/mozkomor-fastgen-source.json').read_text(encoding='utf-8'))
+          fast_bank = list((fastgen.get('free') or {}).get('mozkomor') or [])
+          assert len(fast_bank) == 100, len(fast_bank)
+          for local, puzzle in enumerate(fast_bank, 1):
+              puzzle['id'] = f"historical-fastgen-{local:03d}"
+              puzzle.setdefault('meta', {})['historicalCandidateSource'] = 'v40129-fastgen'
+              puzzles.append(puzzle)
+
+          assert len(puzzles) == 364, len(puzzles)
+          Path('/tmp/mozkomor-candidate-pool.json').write_text(
               json.dumps({
                   'version': 1,
                   'kind': 'gen4-mozkomor-candidate-pool',
+                  'freshCount': 264,
+                  'historicalFastgenCount': 100,
                   'puzzles': puzzles,
                   'shardStats': stats,
               }, ensure_ascii=False, indent=2) + '\n',
               encoding='utf-8'
           )
-          print(f"Combined {len(puzzles)} fresh candidates")
+          print(f"Combined {len(puzzles)} non-primary candidates")
           PY
       - name: Syntax preflight
         run: |
           python -m py_compile             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
       - name: Select final human-calibrated 100
         run: |
-          python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-fresh-candidates.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
+          python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-candidate-pool.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
       - name: Cheap final-bank contract
         run: python tools/test_mozkomor_final_v40132.py
       - name: Full Generation 4 validation against current main content
@@ -134,7 +149,7 @@ jobs:
           path: |
             data/mozkomor_final_v40132.json
             data/audits/mozkomor_final_v40132.json
-            /tmp/mozkomor-fresh-candidates.json
+            /tmp/mozkomor-candidate-pool.json
             /tmp/mozkomor-final-full-validation.json
           retention-days: 30
           if-no-files-found: error
