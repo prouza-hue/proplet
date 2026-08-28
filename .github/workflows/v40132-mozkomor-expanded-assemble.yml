@@ -1,9 +1,9 @@
-name: v4.01.32 Mozkomor expanded final assemble
+name: v4.01.32 Mozkomor reverse final assemble
 
 on:
   push:
     branches:
-      - agent/v40132-mozkomor-assemble-fix
+      - agent/v40132-mozkomor-reverse-select
     paths:
       - 'data/trigger_v40132_expanded_assemble.txt'
 
@@ -129,4 +129,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/mozkomor_final_v40132.json data/audits/mozkomor_final_v40132.json
           git commit -m "Generate expanded human-calibrated Mozkomor final bank [mozkomor-generated]"
-          git push origin HEAD:agent/v40132-mozkomor-assemble-fix
+          git push origin HEAD:agent/v40132-mozkomor-reverse-select
