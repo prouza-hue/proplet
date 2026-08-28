@@ -24,9 +24,9 @@ jobs:
 
       - name: Fetch selected final bank
         run: |
-          git fetch origin agent/v40132-mozkomor-assemble-fix:refs/remotes/origin/agent/v40132-mozkomor-assemble-fix
-          git show origin/agent/v40132-mozkomor-assemble-fix:data/mozkomor_final_v40132.json > /tmp/mozkomor-final.json
-          git show origin/agent/v40132-mozkomor-assemble-fix:data/audits/mozkomor_final_v40132.json > /tmp/mozkomor-audit.json
+          git fetch origin agent/v40132-mozkomor-reverse-select:refs/remotes/origin/agent/v40132-mozkomor-reverse-select
+          git show origin/agent/v40132-mozkomor-reverse-select:data/mozkomor_final_v40132.json > /tmp/mozkomor-final.json
+          git show origin/agent/v40132-mozkomor-reverse-select:data/audits/mozkomor_final_v40132.json > /tmp/mozkomor-audit.json
 
       - name: Bind final 100 into preview databases
         run: |
