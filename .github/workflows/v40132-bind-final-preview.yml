@@ -1,0 +1,92 @@
+name: v4.01.32 Bind final Mozkomor preview
+
+on:
+  push:
+    branches:
+      - preview/v40132-mozkomor-news
+    paths:
+      - 'data/trigger_v40132_bind_final.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  bind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Fetch selected final bank
+        run: |
+          git fetch origin agent/v40132-mozkomor-assemble-fix:refs/remotes/origin/agent/v40132-mozkomor-assemble-fix
+          git show origin/agent/v40132-mozkomor-assemble-fix:data/mozkomor_final_v40132.json > /tmp/mozkomor-final.json
+          git show origin/agent/v40132-mozkomor-assemble-fix:data/audits/mozkomor_final_v40132.json > /tmp/mozkomor-audit.json
+
+      - name: Bind final 100 into preview databases
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          final=json.loads(Path('/tmp/mozkomor-final.json').read_text(encoding='utf-8'))
+          puzzles=list(final.get('puzzles') or [])
+          assert len(puzzles)==100, len(puzzles)
+          assert [p.get('id') for p in puzzles]==[f'g4-z-{i:03d}' for i in range(1,101)]
+          assert all(p.get('difficulty')=='mozkomor' for p in puzzles)
+
+          unlock={
+              'requiresDifficulty':'hardcore',
+              'requiresCurrentBaseLevels':200,
+              'persistentOnceEarned':True,
+              'levels':100,
+              'xpPerFirstCompletion':150
+          }
+          for path in (Path('data/puzzles.json'),Path('public/puzzles.json')):
+              payload=json.loads(path.read_text(encoding='utf-8'))
+              payload.setdefault('free',{})['mozkomor']=puzzles
+              payload['mozkomorUnlock']=unlock
+              path.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          Path('data/mozkomor_final_v40132.json').write_text(Path('/tmp/mozkomor-final.json').read_text(encoding='utf-8'),encoding='utf-8')
+          Path('data/audits').mkdir(parents=True,exist_ok=True)
+          Path('data/audits/mozkomor_final_v40132.json').write_text(Path('/tmp/mozkomor-audit.json').read_text(encoding='utf-8'),encoding='utf-8')
+
+          version=Path('proplet_version.py').read_text(encoding='utf-8').replace('APP_VERSION = "4.01.31"','APP_VERSION = "4.01.32"')
+          Path('proplet_version.py').write_text(version,encoding='utf-8')
+
+          runtime=Path('public/runtime-meta.js').read_text(encoding='utf-8').replace("version:'4.01.31'","version:'4.01.32'")
+          if 'mozkomorEndgameV40132:true' not in runtime:
+              runtime=runtime.replace('tajenkaRewardXp:200,','tajenkaRewardXp:200,\n      mozkomorEndgameV40132:true,\n      singleReleaseCtaV40132:true,')
+          Path('public/runtime-meta.js').write_text(runtime,encoding='utf-8')
+
+          sw=Path('public/sw.js').read_text(encoding='utf-8').replace("const SHELL_CACHE='proplet-v4.01.31-tajenka-shell';","const SHELL_CACHE='proplet-v4.01.32-mozkomor-shell';")
+          Path('public/sw.js').write_text(sw,encoding='utf-8')
+          PY
+
+      - name: Verify preview contract and database shape
+        run: |
+          python -m py_compile server.py tools/test_v40132_mozkomor_news_preview.py
+          python tools/test_v40132_mozkomor_news_preview.py
+          python - <<'PY'
+          import json
+          for path in ('data/puzzles.json','public/puzzles.json'):
+              p=json.load(open(path,encoding='utf-8'))
+              assert len(p['free']['mozkomor'])==100
+              assert p['mozkomorUnlock']['requiresCurrentBaseLevels']==200
+              assert p['mozkomorUnlock']['xpPerFirstCompletion']==150
+          print('Bound Mozkomor preview databases: OK')
+          PY
+
+      - name: Commit bound preview
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/puzzles.json public/puzzles.json data/mozkomor_final_v40132.json data/audits/mozkomor_final_v40132.json proplet_version.py public/runtime-meta.js public/sw.js
+          git commit -m "Bind final Mozkomor bank into v4.01.32 preview"
+          git push origin HEAD:preview/v40132-mozkomor-news
