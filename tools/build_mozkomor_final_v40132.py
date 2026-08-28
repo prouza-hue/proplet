@@ -18,7 +18,7 @@ from typing import Iterable
 import audit_mozkomor_human_v40131 as human
 
 TARGET_COUNT = 100
-TARGET_COOLDOWN = 9
+TARGET_COOLDOWN = 8
 MIN_SCORE = 2.60
 APPROVED_ANCHOR_MIN_SCORE = 2.75
 BANDS = (
@@ -142,7 +142,7 @@ def candidate_cost(row: dict, level: int, word_usage: Counter[str]) -> float:
 
 
 def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict], int]:
-    """Find a full 100-board ordering under score bands + 9-level word cooldown.
+    """Find a full 100-board ordering under score bands + 8-level word cooldown.
 
     The previous purely greedy selector could paint itself into a corner even
     when a valid sequence existed. This bounded DFS keeps the same quality
@@ -193,7 +193,7 @@ def select_sequence(pool: list[dict], hardcore: list[dict]) -> tuple[list[dict],
                 if next_low <= score <= next_high and not (row_words[j] & next_blocked):
                     future_count += 1
             # All choices already satisfy the same quality filters and score band.
-            # Prefer the least-constraining board so the 9-level cooldown remains
+            # Prefer the least-constraining board so the 8-level cooldown remains
             # satisfiable deep into the 100-level sequence.
             score = candidate_cost(pool[idx], level_no, word_usage)
             remaining = TARGET_COUNT - level_no
