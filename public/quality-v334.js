@@ -102,7 +102,7 @@ function installRescue60s(){
   };
   bindRescueButtons();
   [50,200,600,1400].forEach(ms=>setTimeout(bindRescueButtons,ms));
-  setTimeout(()=>{try{refreshRescueStatus()}catch{}},250);
+  setTimeout(()=>{try{if(!puzzleDB)return;Promise.resolve(refreshRescueStatus()).catch(()=>{})}catch{}},250);
 }
 
 installRescue60s();

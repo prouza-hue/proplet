@@ -99,7 +99,7 @@
     await loadScript('/account-bonus-v3331.js?v=1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/onboarding-return-v3332.js?v=2','propletOnboardingReturnV3332');
-    loadScript('/release-notes-v3331.js?v=2','propletReleaseNotesV3331');
+    loadScript('/release-notes-v3331.js?v=40131','propletReleaseNotesV3331');
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
   };

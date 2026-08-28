@@ -56,6 +56,7 @@ ROLLING_CONTENT_PATH = ROOT / "data" / (
     "rolling_content_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "rolling_content_v1.json"
 )
 CONTENT_CATALOG_PATH = ROOT / "data" / "content_catalog_v334.json"
+TAJENKA_BANK_PATH = ROOT / "data" / "tajenka_weekend_v1.json"
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -72,6 +73,9 @@ BADGES = [
 
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100}
 STARTER_XP = 10
+TAJENKA_REWARD_XP = 200
+TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
+TAJENKA_RELEASE_ENABLED = VERCEL_ENV == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
@@ -966,6 +970,34 @@ def load_puzzles() -> dict:
 
 
 @lru_cache(maxsize=1)
+def load_tajenka_bank() -> dict:
+    if not TAJENKA_BANK_PATH.exists():
+        return {"version": 1, "kind": "weekend_bonus_bank", "weeks": 0, "rewardXp": TAJENKA_REWARD_XP, "puzzles": []}
+    return json.loads(TAJENKA_BANK_PATH.read_text(encoding="utf-8"))
+
+
+def tajenka_week_for(day: date) -> Optional[int]:
+    """Return the finite release week for a date; never cycle future content."""
+    offset = (day - TAJENKA_FIRST_SATURDAY).days
+    if offset < 0:
+        return None
+    week = offset // 7 + 1
+    prepared = int(load_tajenka_bank().get("weeks") or 0)
+    return week if 1 <= week <= prepared else None
+
+
+def tajenka_puzzle_for_week(week: int) -> Optional[dict]:
+    return next(
+        (puzzle for puzzle in load_tajenka_bank().get("puzzles", []) if int(puzzle.get("week") or 0) == week),
+        None,
+    )
+
+
+def tajenka_is_live(day: date) -> bool:
+    return TAJENKA_RELEASE_ENABLED and day.weekday() in (5, 6) and tajenka_week_for(day) is not None
+
+
+@lru_cache(maxsize=1)
 def load_rolling_content() -> dict:
     if not ROLLING_CONTENT_PATH.exists():
         return {"version": 1, "releaseEnabled": False, "batches": [], "puzzles": {d: [] for d in ("easy", "medium", "hard", "hardcore")}}
@@ -1462,6 +1494,14 @@ def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
 
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
     data = load_puzzles()
+    if mode == "tajenka":
+        current_week = tajenka_week_for(current_prague_date())
+        return TAJENKA_RELEASE_ENABLED and current_week is not None and any(
+            p.get("id") == puzzle_id and p.get("difficulty") == difficulty
+            and int((p.get("meta") or {}).get("rewardXp") or 0) == TAJENKA_REWARD_XP
+            and 1 <= int(p.get("week") or 0) <= current_week
+            for p in load_tajenka_bank().get("puzzles", [])
+        )
     if mode == "starter":
         starter = data.get("starter") or {}
         return starter.get("id") == puzzle_id and starter.get("difficulty") == difficulty
@@ -1538,6 +1578,22 @@ def puzzle_database_preview(request: Request):
         content=released_puzzle_payload(effective_content_date(request)),
         headers={"Cache-Control": "no-store"},
     )
+
+
+@app.get("/api/tajenka")
+def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=10)):
+    """Serve one released board without exposing the remaining weekend bank."""
+    today = current_prague_date()
+    if VERCEL_ENV == "preview":
+        selected_week = week or 1
+    else:
+        if not tajenka_is_live(today):
+            raise HTTPException(404, "Tajenka je dostupná o víkendu")
+        selected_week = tajenka_week_for(today)
+    puzzle = tajenka_puzzle_for_week(int(selected_week or 0))
+    if not puzzle:
+        raise HTTPException(404, "Tajenka pro tento týden není připravená")
+    return JSONResponse(content=puzzle, headers={"Cache-Control": "private, no-store"})
 
 
 @app.get("/")
@@ -1692,6 +1748,12 @@ def health():
         "foldResponsiveReflow": True,
         "starterPuzzle": bool(pdata.get("starter")),
         "starterXp": STARTER_XP,
+        "tajenkaWeeksPrepared": int(load_tajenka_bank().get("weeks") or 0),
+        "tajenkaRewardXp": TAJENKA_REWARD_XP,
+        "tajenkaReleaseEnabled": TAJENKA_RELEASE_ENABLED,
+        "tajenkaFirstSaturday": TAJENKA_FIRST_SATURDAY.isoformat(),
+        "tajenkaCurrentWeek": tajenka_week_for(current_prague_date()),
+        "tajenkaLiveNow": tajenka_is_live(current_prague_date()),
         "starterHintOptional": True,
         "starterHintOfferIdleSeconds": 10,
         "accountWithoutTeam": True,
@@ -2168,9 +2230,10 @@ def product_event(
         "push_nudge_shown", "push_nudge_accepted", "push_nudge_dismissed", "push_permission_denied",
         "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
         "push_notifications_enabled", "push_notifications_disabled", "push_notifications_auto_repaired",
-        "push_daily_opened", "push_weekly_opened", "push_content_opened", "push_return_opened",
+        "push_daily_opened", "push_weekly_opened", "push_content_opened", "push_return_opened", "push_tajenka_opened",
         "pwa_update_detected", "pwa_update_applied", "legacy_origin_update_shown", "legacy_origin_update_opened",
         "content_drop_cta_clicked",
+        "tajenka_viewed", "tajenka_started", "tajenka_word_found", "tajenka_completed", "tajenka_abandoned",
         "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
         "progress_guard_google_selected", "progress_guard_other_account_selected",
         "calm_preference_enabled", "calm_preference_disabled", "calm_run_enabled",
@@ -3779,7 +3842,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600)
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
-    if payload.mode not in ("daily", "free", "starter"):
+    if payload.mode not in ("daily", "free", "starter", "tajenka"):
         raise HTTPException(400, "Neplatný režim")
     if payload.difficulty not in ("easy", "medium", "hard", "hardcore"):
         raise HTTPException(400, "Neplatná obtížnost")
@@ -3799,7 +3862,15 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                 raise HTTPException(400, "Výsledek neodpovídá zahájenému pokusu")
 
     transferred_reward = False
-    if payload.mode == "starter":
+    if payload.mode == "tajenka":
+        if not TAJENKA_RELEASE_ENABLED:
+            raise HTTPException(404, "Tajenka zatím není vydaná")
+        if payload.challenge_key != f"tajenka:{payload.puzzle_id}":
+            raise HTTPException(400, "Neplatný klíč Tajenky")
+        if payload.daily_date:
+            raise HTTPException(400, "Tajenka nemá daily datum")
+        points = TAJENKA_REWARD_XP
+    elif payload.mode == "starter":
         if payload.challenge_key != f"starter:{payload.puzzle_id}":
             raise HTTPException(400, "Neplatný klíč první úlohy")
         if payload.daily_date:

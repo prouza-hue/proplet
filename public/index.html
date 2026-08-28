@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#6c5ce7" data-light-color="#6c5ce7" />
   <meta name="color-scheme" content="light dark" />
   <script src="/runtime-meta.js" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=3"></script>
+  <script src="/theme-init.js?v=4"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Proplet – česká slovní hra, která umí příjemně zamotat hlavu. Najdi všechna slova a propleť celou plochu." />
@@ -66,6 +66,8 @@
         <button id="shareDailyBtn" class="hero-secondary daily-challenge-cta hidden" aria-label="Vyzvat kamaráda na dnešní Proplet">⚔️ Vyzvat kamaráda</button>
         <div id="dailySyncStatus" class="daily-sync hidden"></div>
       </div>
+
+      <div id="tajenkaPreviewCard" class="card tajenka-preview-card hidden"></div>
 
       <div id="rescueCard" class="card rescue-card hidden">
         <div class="rescue-flame">🔥</div>
@@ -234,6 +236,8 @@
             <span id="cleanStatus" class="clean-status">✨ Čistě</span>
           </div>
 
+          <div id="tajenkaPhrase" class="tajenka-phrase card hidden" aria-live="polite"></div>
+
           <div id="starterCoach" class="starter-coach hidden" role="status" aria-live="polite">
             <div id="starterCoachStep" class="starter-coach-step">1 / 4</div>
             <div class="starter-coach-copy"><strong id="starterCoachTitle">Začni slovem MRAK</strong><span id="starterCoachCopy">Táhni přes sousední písmena.</span></div>
@@ -285,6 +289,7 @@
         <p id="winText" class="muted"></p>
         <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
       </div>
+      <div id="tajenkaWinPhrase" class="tajenka-win-phrase hidden" aria-live="polite"></div>
       <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
       <button id="winAccountBtn" class="win-account-btn hidden">☁️ Uložit postup a zobrazit své místo</button>
       <div id="newBadgeBox" class="new-badge-box hidden"></div>
@@ -626,6 +631,6 @@
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <script src="/app.js"></script>
-  <script src="/quality-v334.js?v=3"></script>
+  <script src="/quality-v334.js?v=4"></script>
 </body>
 </html>

@@ -1,13 +1,13 @@
 (()=>{
   'use strict';
-  if(window.__PROPLET_RELEASE_NOTES_V3331__)return;
-  window.__PROPLET_RELEASE_NOTES_V3331__=true;
+  if(window.__PROPLET_RELEASE_NOTES_V40131__)return;
+  window.__PROPLET_RELEASE_NOTES_V40131__=true;
 
-  const RELEASE_ID='3.33.1';
+  const RELEASE_ID='4.01.31';
+  const RELEASE_DATE='2026-08-29';
   const SEEN_KEY=`proplet-release-notes-seen:${RELEASE_ID}`;
   let shown=false;
 
-  const profile=()=>{try{return typeof getProfile==='function'?getProfile():null}catch{return null}};
   const track=event=>{
     try{
       if(window.PROPLET_ACCOUNT_BONUS_API?.track)window.PROPLET_ACCOUNT_BONUS_API.track(event);
@@ -16,89 +16,85 @@
   };
   const alreadySeen=()=>{try{return localStorage.getItem(SEEN_KEY)==='1'}catch{return false}};
   const markSeen=()=>{try{localStorage.setItem(SEEN_KEY,'1')}catch{}};
-  const supersededByGen4=()=>{
-    try{
-      if(window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true)return true;
-      const db=typeof puzzleDB!=='undefined'?puzzleDB:null;
-      return Number(db?.freeGeneration||db?.contentGeneration||0)>=4;
-    }catch{return false}
+  const today=()=>{try{return typeof pragueDateISO==='function'?pragueDateISO():new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague'}).format(new Date())}catch{return ''}};
+  const isPreview=()=>{try{return typeof TAJENKA_PREVIEW!=='undefined'&&TAJENKA_PREVIEW===true}catch{return false}};
+  const tajenkaReady=()=>{
+    try{return typeof TAJENKA_AVAILABLE!=='undefined'&&TAJENKA_AVAILABLE===true&&typeof tajenkaPuzzle!=='undefined'&&!!tajenkaPuzzle}catch{return false}
   };
+  const mozkomorReady=()=>window.PROPLET_RUNTIME_META?.capabilities?.mozkomorReleaseEnabled===true;
 
   function canShow(){
-    if(supersededByGen4())return false;
+    if(!isPreview()&&today()<RELEASE_DATE)return false;
+    if(!tajenkaReady())return false;
     if(shown||alreadySeen()||document.querySelector('.release-notes-v3331-backdrop'))return false;
     if(document.body.classList.contains('playing'))return false;
     if(!document.querySelector('#screen-daily.active'))return false;
     try{if(typeof openTransientModal==='function'&&openTransientModal())return false}catch{}
     if(document.querySelector('#onboardingModal:not(.hidden),#winModal:not(.hidden),#profileModal:not(.hidden)'))return false;
-    const signedIn=!!profile()?.token;
-    if(signedIn&&window.PROPLET_ACCOUNT_BONUS?.granted!==true)return false;
     return true;
   }
 
   function show(){
-    if(shown||supersededByGen4())return;
+    if(shown||!tajenkaReady())return;
     shown=true;
-    const signedIn=!!profile()?.token;
     const backdrop=document.createElement('div');
     backdrop.className='release-notes-v3331-backdrop';
     backdrop.setAttribute('role','dialog');
     backdrop.setAttribute('aria-modal','true');
-    backdrop.setAttribute('aria-labelledby','releaseNotesV3331Title');
+    backdrop.setAttribute('aria-labelledby','releaseNotesV40131Title');
+    const mozkomor=mozkomorReady()?`<div class="release-notes-v3331-feature"><span aria-hidden="true">😈</span><div><strong>Mozkomor je tady</strong><p>Nová vrcholná výzva pro hráče, kterým už běžná cesta nestačí.</p></div></div>`:'';
     backdrop.innerHTML=`<section class="release-notes-v3331-panel">
       <button type="button" class="release-notes-v3331-close" aria-label="Zavřít">×</button>
-      <div class="release-notes-v3331-kicker">✨ NOVINKY · ${RELEASE_ID}</div>
-      <h2 id="releaseNotesV3331Title">Proplet má pár velkých novinek</h2>
-      <div class="release-notes-v3331-hero ${signedIn?'is-account':'is-guest'}">
-        <div class="release-notes-v3331-gift" aria-hidden="true">🎁</div>
+      <div class="release-notes-v3331-kicker">✨ VÍKENDOVÁ NOVINKA · ${RELEASE_ID}</div>
+      <h2 id="releaseNotesV40131Title">Tajenka je tady</h2>
+      <div class="release-notes-v3331-hero">
+        <div class="release-notes-v3331-gift" aria-hidden="true">✦</div>
         <div class="release-notes-v3331-hero-copy">
-          <span>500 XP BONUS</span>
-          <h3>${signedIn?'Máš od nás +500 XP':'500 XP je tvoje'}</h3>
-          <p>${signedIn?'Za to, že máš Proplet účet. Díky, že hraješ. 💜':'<strong>Nepřijdi o svoje výsledky.</strong> Účet založíš za pár vteřin, uložíš si celý postup a dostaneš <strong>+500 XP</strong>.'}</p>
-          ${signedIn?'<div class="release-notes-v3331-earned">✓ Připsáno k tvému postupu</div>':'<button type="button" class="release-notes-v3331-account">Založit účet · +500 XP</button>'}
+          <span>VÍKENDOVÝ BONUS · +200 XP</span>
+          <h3>Pět slov. Jedna myšlenka.</h3>
+          <p>Najdi propletená slova, nech některá písmena nevyužitá a odhal společnou tajenku. Každý víkend čeká nová.</p>
+          <button type="button" class="release-notes-v3331-account">Hrát Tajenku · +200 XP</button>
         </div>
       </div>
-      <div class="release-notes-v3331-features">
-        <div class="release-notes-v3331-feature"><span aria-hidden="true">⚔️</span><div><strong>Vyzvi kamaráda</strong><p>Pošli svůj výsledek. Kamarád dostane stejný Proplet a může tě rovnou zkusit překonat.</p></div></div>
-        <div class="release-notes-v3331-feature"><span aria-hidden="true">💻</span><div><strong>Proplet na velké obrazovce</strong><p>Notebooky a monitory mají nové rozložení s větší deskou, výsledky i profilem.</p></div></div>
+      <div class="release-notes-v3331-features"${mozkomorReady()?'':' style="grid-template-columns:1fr"'}>
+        <div class="release-notes-v3331-feature"><span aria-hidden="true">✨</span><div><strong>Platné slovo má cenu</strong><p>Za každé nové platné slovo, které při skládání objevíš, získáš navíc +1 XP.</p></div></div>
+        ${mozkomor}
       </div>
-      <button type="button" class="release-notes-v3331-done">${signedIn?'Paráda, jdu hrát':'Teď ne, jdu hrát'}</button>
+      <button type="button" class="release-notes-v3331-done">Teď ne, prohlédnout Dnes</button>
     </section>`;
     document.body.appendChild(backdrop);
     document.body.classList.add('release-notes-v3331-open');
     track('release_notes_shown');
-    if(!signedIn)window.PROPLET_ACCOUNT_BONUS_API?.offerSeen?.();
 
-    const close=()=>{
-      if(backdrop.classList.contains('closing'))return;
+    const finish=()=>{
       markSeen();
       track('release_notes_dismissed');
       document.body.classList.remove('release-notes-v3331-open');
-      backdrop.classList.add('closing');
-      setTimeout(()=>backdrop.remove(),160);
       document.removeEventListener('keydown',onKey);
     };
-    const create=()=>{
-      markSeen();
-      window.PROPLET_ACCOUNT_BONUS_API?.createClicked?.();
-      document.body.classList.remove('release-notes-v3331-open');
+    const close=()=>{
+      if(backdrop.classList.contains('closing'))return;
+      finish();
+      backdrop.classList.add('closing');
+      setTimeout(()=>backdrop.remove(),160);
+    };
+    const play=()=>{
+      finish();
       backdrop.remove();
-      document.removeEventListener('keydown',onKey);
-      try{if(typeof openProfileModal==='function')openProfileModal('create')}catch{}
+      try{if(typeof startTajenka==='function')startTajenka()}catch{}
     };
     const onKey=e=>{if(e.key==='Escape')close()};
     backdrop.querySelector('.release-notes-v3331-close')?.addEventListener('click',close);
     backdrop.querySelector('.release-notes-v3331-done')?.addEventListener('click',close);
-    backdrop.querySelector('.release-notes-v3331-account')?.addEventListener('click',create);
+    backdrop.querySelector('.release-notes-v3331-account')?.addEventListener('click',play);
     backdrop.addEventListener('click',e=>{if(e.target===backdrop)close()});
     document.addEventListener('keydown',onKey);
     requestAnimationFrame(()=>backdrop.classList.add('visible'));
-    setTimeout(()=>backdrop.querySelector(signedIn?'.release-notes-v3331-done':'.release-notes-v3331-account')?.focus(),140);
+    setTimeout(()=>backdrop.querySelector('.release-notes-v3331-account')?.focus(),140);
   }
 
   let tries=0;
   const tick=()=>{
-    if(supersededByGen4()){markSeen();return}
     if(canShow()){show();return}
     if(++tries<360)setTimeout(tick,250);
   };
