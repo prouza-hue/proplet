@@ -10,6 +10,7 @@ const must=[
   "MOZKOMOR_QA_PARAM==='refresh'",
   ':mozkomor-human-refresh-v40131',
   '🧪 PLAYTEST · REFRESH 10',
+  "key==='mozkomor'&&!done&&!isRefresh?'🌑 ODEMČENO · ENDGAME':progressLabel",
   'Bez XP · kalibrační sada',
   "playtestProfile==='mozkomor-human-refresh-v40131'",
   "fetch('/mozkomor-refresh-playtest.json',{cache:'no-store'})",
