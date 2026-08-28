@@ -18,7 +18,7 @@ from typing import Iterable
 import audit_mozkomor_human_v40131 as human
 
 TARGET_COUNT = 100
-TARGET_COOLDOWN = 12
+TARGET_COOLDOWN = 9
 MIN_SCORE = 2.60
 APPROVED_ANCHOR_MIN_SCORE = 2.75
 BANDS = (
@@ -225,7 +225,7 @@ def main() -> None:
 
     selected: list[dict] = []
     # Cooldown crosses the difficulty boundary: final Mozkomor level 1 must not
-    # reuse a target from the last 12 active Mozkožrout levels.
+    # reuse a target from the last 9 active Mozkožrout levels.
     recent_words: list[set[str]] = [
         {norm(answer.get("word")) for answer in puzzle.get("answers") or []}
         for puzzle in hardcore[-TARGET_COOLDOWN:]
