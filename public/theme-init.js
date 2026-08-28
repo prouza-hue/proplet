@@ -1,4 +1,5 @@
 (()=>{
+  window.PROPLET_SINGLE_RELEASE_CTA_V40132=true;
   try{
     if(history.state?.proplet&&history.state.screen==='game')history.replaceState({...history.state,screen:'daily'},'',location.href);
   }catch{}
