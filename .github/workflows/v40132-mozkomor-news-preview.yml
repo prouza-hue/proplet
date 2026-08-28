@@ -1,0 +1,17 @@
+name: v4.01.32 Mozkomor news preview contract
+
+on:
+  push:
+    branches:
+      - preview/v40132-mozkomor-news
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python tools/test_v40132_mozkomor_news_preview.py
