@@ -1,0 +1,77 @@
+name: v4.01.31 Mozkomor human refresh
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/puzzles.json'
+      - 'public/puzzles.json'
+      - 'data/answer_tiers.json'
+      - 'data/audits/mozkomor_human_v40131.json'
+      - 'data/mozkomor_refresh_playtest.json'
+      - 'public/mozkomor-refresh-playtest.json'
+      - 'public/app.js'
+      - 'public/sw.js'
+      - 'tools/audit_mozkomor_human_v40131.py'
+      - 'tools/test_mozkomor_refresh_v40131.py'
+      - 'tools/test_mozkomor_refresh_client_v40131.js'
+      - '.github/workflows/v40131-mozkomor-refresh.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v40131-mozkomor-refresh-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime test dependencies
+        run: pip install -r requirements.txt
+
+      - name: Rebuild the human audit deterministically
+        run: |
+          python tools/audit_mozkomor_human_v40131.py
+          git diff --exit-code -- data/audits/mozkomor_human_v40131.json data/mozkomor_refresh_playtest.json public/mozkomor-refresh-playtest.json
+
+      - name: Syntax and isolated preview contracts
+        run: |
+          python -m py_compile tools/audit_mozkomor_human_v40131.py tools/test_mozkomor_refresh_v40131.py
+          node --check public/app.js
+          node --check tools/test_mozkomor_refresh_client_v40131.js
+          python tools/test_mozkomor_refresh_v40131.py
+          node tools/test_mozkomor_refresh_client_v40131.js
+
+      - name: Re-run existing Mozkomor and Generation 4 contracts
+        run: |
+          python tools/validate_mozkomor_v40129.py
+          python tools/test_mozkomor_v40129.py
+          node tools/test_mozkomor_client_v40129.js
+          python tools/validate_gen4_release.py data/puzzles.json \
+            --rolling data/rolling_content_v1.json \
+            --profiles data/gen4_profiles_v334.json \
+            --exclusions data/target_generation_exclusions_v334.json \
+            --strict-counts \
+            --approved-release \
+            --report /tmp/mozkomor-refresh-full-validation.json
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: v40131-mozkomor-human-refresh
+          path: |
+            data/audits/mozkomor_human_v40131.json
+            data/mozkomor_refresh_playtest.json
+            /tmp/mozkomor-refresh-full-validation.json
+          retention-days: 30
+          if-no-files-found: error

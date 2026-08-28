@@ -33,8 +33,8 @@ if(!home.includes("r.difficulty!=='mozkomor'"))
   throw new Error('Dnes resume card must exclude Mozkomor sessions');
 if(!theme.includes("/home-layout.js?v=12"))
   throw new Error('Dnes home renderer cache bust must be v12');
-if(!sw.includes("proplet-v4.01.29-shell-mozkomor-rc2")||!sw.includes("/home-layout.js?v=12"))
-  throw new Error('Mozkomor RC service worker must rotate and precache the fixed Dnes renderer');
+if(!sw.includes("proplet-v4.01.31-shell-mozkomor-refresh")||!sw.includes("/home-layout.js?v=12"))
+  throw new Error('Mozkomor refresh service worker must rotate and precache the fixed Dnes renderer');
 if((puzzles.free?.mozkomor||[]).length!==100)
   throw new Error('Preview public puzzle bank must contain exactly 100 Mozkomor boards');
 if(!app.includes("scopedStorageKey(MOZKOMOR_UNLOCK_KEY)"))
