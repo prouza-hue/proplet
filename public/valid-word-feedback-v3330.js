@@ -81,8 +81,8 @@
     const style=document.createElement('style');
     style.id='wordDiscoveryXpStyle';
     style.textContent=`
-      .word-discovery-xp-pop{position:fixed;z-index:1600;pointer-events:none;font-weight:900;font-size:18px;line-height:1;padding:8px 11px;border-radius:999px;background:rgba(75,181,113,.96);color:#fff;box-shadow:0 8px 24px rgba(20,80,45,.22);transform:translate(-50%,0) scale(.94);opacity:0;animation:wordDiscoveryXpPop .62s cubic-bezier(.2,.8,.2,1) forwards}
-      @keyframes wordDiscoveryXpPop{0%{opacity:0;transform:translate(-50%,8px) scale(.92)}18%{opacity:1;transform:translate(-50%,0) scale(1)}72%{opacity:1;transform:translate(-50%,-8px) scale(1)}100%{opacity:0;transform:translate(-50%,-16px) scale(.98)}}
+      .word-discovery-xp-pop{position:fixed;z-index:1600;pointer-events:none;font-weight:900;font-size:19px;line-height:1;padding:9px 12px;border-radius:999px;background:rgba(75,181,113,.98);color:#fff;box-shadow:0 8px 24px rgba(20,80,45,.24);transform:translate(-50%,0) scale(.94);opacity:0;animation:wordDiscoveryXpPop .95s cubic-bezier(.2,.8,.2,1) forwards}
+      @keyframes wordDiscoveryXpPop{0%{opacity:0;transform:translate(-50%,8px) scale(.92)}15%{opacity:1;transform:translate(-50%,0) scale(1.03)}72%{opacity:1;transform:translate(-50%,-10px) scale(1)}100%{opacity:0;transform:translate(-50%,-20px) scale(.98)}}
       @media (prefers-reduced-motion:reduce){.word-discovery-xp-pop{animation:wordDiscoveryXpFade .5s linear forwards}@keyframes wordDiscoveryXpFade{0%,100%{opacity:0}20%,75%{opacity:1}}}
     `;
     document.head.appendChild(style);
@@ -373,9 +373,13 @@
           validNonSolutionStreak++;
           track('valid_nonsolution_detected');
           // It remains a wrong attempt for this board. Clean is unchanged because Clean is
-          // defined by hints, not by exploratory traces.
-          message(`„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.`);
-          await awardDiscovery(candidate);
+          // defined by hints, not by exploratory traces. Award first so the acknowledgement can
+          // state unambiguously whether this particular discovery actually earned XP.
+          const awarded=await awardDiscovery(candidate);
+          if(currentGame!==candidate.game||candidate.game.finished)return;
+          message(awarded
+            ? `„${candidate.word}“ je slovo 👍 Jen nepatří do řešení. · +1 XP`
+            : `„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.`);
           if(validNonSolutionStreak>=TRIGGER_STREAK&&!failsafeShown())showFailsafe();
         }).catch(()=>{});
       }
