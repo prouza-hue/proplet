@@ -1,4 +1,4 @@
-name: v4.01.32 Mozkomor assemble only # schema-safe rerun
+name: v4.01.32 Mozkomor assemble only # cooldown9 diagnostic rerun
 
 on:
   push:
@@ -73,6 +73,83 @@ jobs:
       - name: Syntax preflight
         run: |
           python -m py_compile             tools/audit_mozkomor_human_v40131.py             tools/build_mozkomor_final_v40132.py             tools/test_mozkomor_final_v40132.py
+      - name: Diagnose human-filter candidate pool
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools')
+          import build_mozkomor_final_v40132 as b
+          import audit_mozkomor_human_v40131 as human
+
+          current=b.load(Path('data/puzzles.json'))
+          refresh=b.load(Path('/tmp/mozkomor-refresh-source.json'))
+          approved=b.load(Path('/tmp/mozkomor-approved-playtest.json'))
+          generated=b.load(Path('/tmp/mozkomor-candidate-pool.json'))
+          hardcore=list((current.get('free') or {}).get('hardcore') or [])
+          old=list((refresh.get('free') or {}).get('mozkomor') or [])
+          fresh=list(generated.get('puzzles') or [])
+          approved_ids={
+              str((p.get('meta') or {}).get('refreshSourceId') or '')
+              for p in approved.get('puzzles') or []
+              if float((p.get('meta') or {}).get('humanDecisionScore') or 0) >= b.APPROVED_ANCHOR_MIN_SCORE
+          }
+          tiers_payload=b.load(Path('data/answer_tiers.json'))
+          tiers=tiers_payload.get('tiers') or {}
+          tier_of={b.norm(word):tier for tier,words in tiers.items() for word in words}
+          lexical={b.norm(word):value for word,value in (tiers_payload.get('metadata') or {}).items()}
+          hrows=[human.initial_board_metrics(p,tier_of,lexical) for p in hardcore]
+          pressures=[float(w['decisionPressure']) for r in hrows for w in r['words']]
+          easy=human.percentile(pressures,0.25)
+          hrows=[human.finish_board_metrics(r,easy) for r in hrows]
+          hscores=[float(r['humanDecisionScore']) for r in hrows]
+          rows=(
+              b.annotate_rows(old,'refresh-original',tier_of,lexical,easy,hscores,approved_ids)+
+              b.annotate_rows(fresh,'fresh-generated',tier_of,lexical,easy,hscores,approved_ids)
+          )
+          active={b.board_signature(p) for p in b.all_active_puzzles(current)}
+          rows=[r for r in rows if r['_signature'] not in active]
+          checks=[
+              ('score>=2.60',lambda r: float(r['humanDecisionScore'])>=2.60),
+              ('easyAnchor<=2',lambda r: int(r['easyAnchorCount'])<=2),
+              ('longWordShare<=0.50',lambda r: float(r['longWordShare'])<=0.50),
+              ('forcedLong<=3',lambda r: int(r['forcedLongWordCount'])<=3),
+              ('averageFun>=3.20',lambda r: float(r['averageFun'])>=3.20),
+              ('lowFun==0',lambda r: int(r['lowFunCount'])==0),
+              ('verbAdjAdv<=1',lambda r: int(r['explicitVerbOrAdjectiveCount'])<=1),
+              ('tierD<=1',lambda r: b.tier_d_count(r)<=1),
+          ]
+          print('TOTAL_NONACTIVE',len(rows))
+          cur=rows
+          for name,fn in checks:
+              before=len(cur); cur=[r for r in cur if fn(r)]
+              print('SEQUENTIAL',name,before,'->',len(cur),'lost',before-len(cur))
+          print('FINAL_STRICT',len(cur))
+          for name,fn in checks:
+              fail=sum(not fn(r) for r in rows)
+              print('INDEPENDENT_FAIL',name,fail)
+          scores=sorted(float(r['humanDecisionScore']) for r in rows)
+          for cutoff in (2.50,2.55,2.60,2.65,2.70,2.72,2.75,2.78,2.80,2.90,3.00):
+              print('SCORE_COUNT',cutoff,sum(s>=cutoff for s in scores))
+          # How many become available by relaxing exactly one strict lexical gate.
+          base=[r for r in rows if
+              float(r['humanDecisionScore'])>=2.60 and
+              int(r['easyAnchorCount'])<=2 and
+              float(r['longWordShare'])<=0.50 and
+              int(r['forcedLongWordCount'])<=3 and
+              b.tier_d_count(r)<=1
+          ]
+          print('STRUCTURAL_BASE',len(base))
+          variants={
+              'current': lambda r: float(r['averageFun'])>=3.20 and int(r['lowFunCount'])==0 and int(r['explicitVerbOrAdjectiveCount'])<=1,
+              'fun>=3.10': lambda r: float(r['averageFun'])>=3.10 and int(r['lowFunCount'])==0 and int(r['explicitVerbOrAdjectiveCount'])<=1,
+              'allow1LowFun': lambda r: float(r['averageFun'])>=3.20 and int(r['lowFunCount'])<=1 and int(r['explicitVerbOrAdjectiveCount'])<=1,
+              'pos<=2': lambda r: float(r['averageFun'])>=3.20 and int(r['lowFunCount'])==0 and int(r['explicitVerbOrAdjectiveCount'])<=2,
+              'fun3.10+low1': lambda r: float(r['averageFun'])>=3.10 and int(r['lowFunCount'])<=1 and int(r['explicitVerbOrAdjectiveCount'])<=1,
+          }
+          for name,fn in variants.items():
+              print('VARIANT',name,sum(fn(r) for r in base))
+          PY
       - name: Select final human-calibrated 100
         run: |
           python tools/build_mozkomor_final_v40132.py             --current data/puzzles.json             --refresh /tmp/mozkomor-refresh-source.json             --approved /tmp/mozkomor-approved-playtest.json             --generated /tmp/mozkomor-candidate-pool.json             --output data/mozkomor_final_v40132.json             --report data/audits/mozkomor_final_v40132.json
