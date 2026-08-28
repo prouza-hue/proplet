@@ -1,4 +1,4 @@
-name: v4.01.32 Mozkomor assemble only # cooldown9 diagnostic rerun
+name: v4.01.32 Mozkomor assemble only # cooldown9 score-distribution diagnostic
 
 on:
   push:
@@ -149,6 +149,12 @@ jobs:
           }
           for name,fn in variants.items():
               print('VARIANT',name,sum(fn(r) for r in base))
+          for cutoff in (2.70,2.72,2.75,2.78,2.80,2.90,3.00):
+              hardbase=[r for r in base if float(r['humanDecisionScore'])>=cutoff]
+              print('VARIANT_AT_SCORE',cutoff,'current',sum(variants['current'](r) for r in hardbase),'relaxed',sum(variants['fun3.10+low1'](r) for r in hardbase),'structural',len(hardbase))
+          for lo,hi in ((2.72,3.00),(2.78,3.10),(2.84,3.20),(2.92,3.35),(3.00,9.99)):
+              band=[r for r in base if lo<=float(r['humanDecisionScore'])<=hi]
+              print('BAND_POOL',lo,hi,'current',sum(variants['current'](r) for r in band),'relaxed',sum(variants['fun3.10+low1'](r) for r in band),'structural',len(band))
           PY
       - name: Select final human-calibrated 100
         run: |
