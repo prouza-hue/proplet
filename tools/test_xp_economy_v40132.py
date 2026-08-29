@@ -102,7 +102,11 @@ assert "creditRunXp(candidate,1)" in feedback
 assert "creditRunXp(candidate,Math.max(1,Number(data?.awardedPoints)||1))" in feedback
 assert "wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)" in app
 assert "const bonusXp=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)" in app
-assert "setWinXpDisplay(`+${totalXp} XP`,detail)" in app
+assert "function renderRunWinXp" in app
+assert "g.winBaseXpAwarded=" in app
+assert "renderRunWinXp(g)" in app
+assert "renderRunWinXp(g)" in feedback
+assert "attemptId:candidate.game?.attemptId||null" in feedback
 assert "pg_advisory_xact_lock" in migration
 assert "v_board_xp >= 5" in migration
 assert "v_daily_xp >= 20" in migration  # historical v4.01.32 migration; v4.01.33 overrides it to 50

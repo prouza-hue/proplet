@@ -229,6 +229,7 @@
         }
         try{
           const result=await api('/api/word-discovery/claim',{method:'POST',body:JSON.stringify(claimPayload(row))});
+          if(result?.newlyGranted===true&&row?.attemptId&&currentGame?.attemptId===row.attemptId)creditRunXp({game:currentGame},Math.max(1,Number(result?.awardedPoints)||1));
           const limit=result?.limitReason;
           store.entries[key]={...row,status:limit==='board_limit'||limit==='daily_limit'?'capped':'confirmed',limitReason:limit||null};changed=true;
           store.serverTotalXp=Math.max(Number(store.serverTotalXp||0),Number(result?.totalDiscoveryXp||0));
@@ -241,7 +242,7 @@
     finally{discoverySyncInFlight=false}
   };
 
-  const creditRunXp=(candidate,points=1)=>{const g=candidate?.game;if(!g||points<=0)return;g.wordDiscoveryXpAwarded=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)+Math.max(0,Number(points)||0);try{if(currentGame===g&&!g.finished&&typeof saveGameProgress==='function')saveGameProgress()}catch{}};
+  const creditRunXp=(candidate,points=1)=>{const g=candidate?.game;if(!g||points<=0)return;g.wordDiscoveryXpAwarded=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)+Math.max(0,Number(points)||0);try{if(currentGame===g){if(!g.finished&&typeof saveGameProgress==='function')saveGameProgress();else if(g.finished&&typeof renderRunWinXp==='function')renderRunWinXp(g)}}catch{}};
   const awardDiscovery=async candidate=>{
     if(rewardDisabled())return 'disabled';
     patchEffectiveStats();
@@ -261,6 +262,7 @@
       mode:candidate.mode,
       difficulty:candidate.difficulty,
       dailyDate:candidate.dailyDate||null,
+      attemptId:candidate.game?.attemptId||null,
       word:normalize(candidate.word),
       path:[...(candidate.path||[])],
       status:profile()?.token?'pending':'local',
