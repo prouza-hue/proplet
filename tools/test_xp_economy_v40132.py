@@ -2,7 +2,11 @@
 """Focused contract checks for the v4.01.32 XP economy preview."""
 
 from pathlib import Path
+import sys
 from zoneinfo import ZoneInfo
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from word_recognition_v3330 import (
     WORD_DISCOVERY_BOARD_XP_LIMIT,
@@ -12,7 +16,6 @@ from word_recognition_v3330 import (
 import server
 
 
-ROOT = Path(__file__).resolve().parents[1]
 TZ = ZoneInfo("Europe/Prague")
 
 
@@ -58,7 +61,12 @@ reward_rows = [
 try:
     server.db_select = lambda table, **_filters: result_rows if table == "results" else reward_rows if table == "account_rewards" else []
     server.reconcile_gen4_free_rewards = lambda _player, _rows: {"repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": False}
-    server.free_slot_summary = lambda _rows: {"effective": {"easy": 1, "medium": 0, "hard": 0, "hardcore": 0}, "transferred": {"easy": 0, "medium": 0, "hard": 0, "hardcore": 0}, "current": {"easy": 1, "medium": 0, "hard": 0, "hardcore": 0}}
+    server.free_slot_summary = lambda _rows: {
+        "effective": {"easy": 1, "medium": 0, "hard": 0, "hardcore": 0, "mozkomor": 0},
+        "transferred": {"easy": 0, "medium": 0, "hard": 0, "hardcore": 0, "mozkomor": 0},
+        "current": {"easy": 1, "medium": 0, "hard": 0, "hardcore": 0, "mozkomor": 0},
+        "baseCurrent": {"easy": 1, "medium": 0, "hard": 0, "hardcore": 0, "mozkomor": 0},
+    }
     server.rescue_rows = lambda _player: []
     stats = server.player_stats("player")
     assert stats["resultXp"] == 315

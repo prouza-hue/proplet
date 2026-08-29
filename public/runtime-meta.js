@@ -64,6 +64,8 @@
       tajenkaRewardXp:200,
       xpEconomyV40132Preview:true,
       mozkomorPlannedRewardXp:150,
+      mozkomorEndgameV40132:true,
+      singleReleaseCtaV40132:true,
       wordDiscoveryBoardXpLimit:5,
       wordDiscoveryDailyXpLimit:20,
       copyDensityPolish:true,

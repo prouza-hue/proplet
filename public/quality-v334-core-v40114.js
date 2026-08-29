@@ -186,6 +186,11 @@ function renderArchiveExplainer(){
 function renderXpRewardMain(){const card=q('#qualityReleaseCard');if(!card)return;activeReleaseModal='xp';card.innerHTML='<div class="quality-release-art" aria-hidden="true"><span class="quality-release-tile">X</span><span class="quality-release-tile">P</span><span class="quality-release-tile">!</span></div><h2 id="qualityReleaseTitle">Tvoje nové desky už dávají XP!</h2><p class="quality-release-lead">Odehrané odměny jsme ti dopočítali.</p><div class="quality-release-points"><div class="quality-release-point"><span>↩️</span><strong>XP za dříve odehrané Gen4 desky jsou připsané</strong></div><div class="quality-release-point"><span>🎁</span><strong>Přidáváme ti také návratový bonus 500 XP</strong></div><div class="quality-release-point"><span>✨</span><strong>Každá další nová Gen4 deska dá plné XP</strong></div></div><button id="qualityReleasePlay" class="quality-release-primary" type="button">Paráda!</button>';q('#qualityReleasePlay').onclick=closeReleaseModal}
 function ensureReleaseModal(){if(q('#qualityReleaseModal'))return;const modal=document.createElement('div');modal.id='qualityReleaseModal';modal.className='quality-modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','qualityReleaseTitle');modal.innerHTML='<div id="qualityReleaseCard" class="quality-release-card"></div>';document.body.appendChild(modal);modal.onclick=e=>{if(e.target===modal)closeReleaseModal()}}
 function maybeShowReleaseModal(){
+  if(window.PROPLET_SINGLE_RELEASE_CTA_V40132===true){
+    q('#qualityReleaseModal')?.classList.add('hidden');
+    revealApp();
+    return;
+  }
   ensureReleaseModal();
   if(!puzzleDB)return;
   const modal=q('#qualityReleaseModal');if(!modal?.classList.contains('hidden'))return;

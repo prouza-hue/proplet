@@ -37,8 +37,8 @@ assert "Clear-Site-Data" not in server
 # The rescue enhancement must not render Daily before the puzzle bank exists
 # during a first-install service-worker handover.
 assert "if(!puzzleDB)return;Promise.resolve(refreshRescueStatus()).catch(()=>{})" in quality
-assert '/quality-v334.js?v=4' in html
-assert "'/quality-v334.js?v=4'" in service_worker
+assert '/quality-v334.js?v=40132' in html
+assert "'/quality-v334.js?v=40132'" in service_worker
 
 # One cron owns Daily and Monday content; every notification returns to the canonical app.
 assert vercel["crons"] == [{"path": "/api/cron/daily-push-v2", "schedule": "0 7 * * *"}]

@@ -108,7 +108,7 @@ function installRescue60s(){
 installRescue60s();
 
 const core=document.createElement('script');
-core.src='/quality-v334-core-v40114.js?v=3';
+core.src='/quality-v334-core-v40114.js?v=40132';
 core.async=false;
 core.onerror=()=>console.error('Proplet quality core se nepodařilo načíst.');
 document.head.appendChild(core);

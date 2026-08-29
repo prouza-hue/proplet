@@ -105,6 +105,21 @@
       "vocabularyTiers": ["A", "B", "C", "D"],
       "ambiguityRange": [0.0, 50.0],
       "ambiguityRole": "high-but-bounded"
+    },
+    "mozkomor-core": {
+      "rows": 10,
+      "cols": 10,
+      "activeCells": [72, 80],
+      "targetWords": [10, 11],
+      "targetLength": [5, 11],
+      "maxCurlPaths": 9,
+      "maxCurlRun": 5,
+      "meanTurns": [3.8, 5.3],
+      "maxBlankComponents": 8,
+      "maxIsolatedBlanks": 1,
+      "vocabularyTiers": ["A", "B", "C", "D"],
+      "ambiguityRange": [18, 60],
+      "ambiguityRole": "endgame-high-above-mozkozrout-floor-with-bounded-false-branches"
     }
   },
   "freeMediumMix": {
@@ -136,5 +151,19 @@
     "migrationRehearsalRequired": true,
     "previewApprovalRequired": true,
     "productionHealthVerificationRequired": true
+  },
+  "mozkomorPolicy": {
+    "label": "Mozkomor",
+    "role": "locked-endgame",
+    "unlock": {
+      "requiresDifficulty": "hardcore",
+      "requiresCurrentBaseLevels": 200,
+      "persistentOnceEarned": true
+    },
+    "xpPerNewLevel": 150,
+    "rollingContent": false,
+    "designIntent": "Harder than Mozkožrout through geometry and human decision pressure, not obscure vocabulary or forced long tails.",
+    "targetCooldown": 8,
+    "requiredLevels": 100
   }
 }

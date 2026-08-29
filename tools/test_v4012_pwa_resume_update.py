@@ -11,7 +11,7 @@ assert "navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'})" in a
 assert "document.addEventListener('visibilitychange',checkWhenVisible)" in app
 assert "window.addEventListener('pageshow',()=>{probeCanonicalRelease(true);checkForUpdate()})" in app
 assert "window.addEventListener('online',()=>{probeCanonicalRelease(true);checkForUpdate()})" in app
-assert "setInterval(checkForUpdate,15*60*1000)" in app
+assert "setInterval(checkForUpdate,5*60*1000)" in app
 assert "pwaResumeUpdateCheckV4012:true" in runtime
 assert '"source": "/sw.js"' in vercel
 assert '"value": "no-cache, no-store, must-revalidate"' in vercel

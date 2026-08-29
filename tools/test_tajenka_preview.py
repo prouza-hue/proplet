@@ -221,17 +221,17 @@ def main() -> None:
     assert "tajenkaReleaseEnabled:true" in runtime
     assert "tajenkaFirstSaturday:'2026-08-29'" in runtime
     assert "tajenkaRewardXp:200" in runtime
-    assert "proplet-v4.01.32-xp-economy-preview-shell" in sw
+    assert "proplet-v4.01.32-xp-mozkomor-release-shell" in sw
     assert "tajenka-test.json" not in sw
     assert not (ROOT / "public" / "tajenka-test.json").exists()
     for marker in (
-        "const RELEASE_ID='4.01.31'",
+        "const RELEASE_ID='4.01.32'",
         "const RELEASE_DATE='2026-08-29'",
-        "Tajenka je tady",
-        "Hrát Tajenku · +200 XP",
-        "Platné slovo má cenu",
-        "Mozkomor je tady",
-        "mozkomorReleaseEnabled===true",
+        "Novinky v Propletu",
+        "<strong>Tajenka</strong><span>nová každou sobotu</span>",
+        "<strong>Mozkomor</strong><span>100 nových úrovní</span>",
+        "<strong>+1 XP</strong><span>za platná slova navíc</span>",
+        ">Jdu hrát</button>",
     ):
         assert marker in release_notes, marker
 
