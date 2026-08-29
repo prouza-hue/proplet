@@ -1849,7 +1849,7 @@ def health():
         "xpEconomyVersion": 4,
         "wordDiscoveryXp": 1,
         "wordDiscoveryBoardXpLimit": 5,
-        "wordDiscoveryDailyXpLimit": 20,
+        "wordDiscoveryDailyXpLimit": 50,
         "mozkomorXp": POINTS["mozkomor"],
         "rankingsVersion": 2,
         "rollingContentVersion": int(load_rolling_content().get("version") or 0),

@@ -7,7 +7,7 @@
   const DISCOVERY_STORE_BASE='proplet-v4-word-discovery-v1';
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
   const BOARD_XP_LIMIT=5;
-  const DAILY_XP_LIMIT=20;
+  const DAILY_XP_LIMIT=50;
   const TRIGGER_STREAK=3;
   let localWords=null;
   let localWordsPromise=null;
@@ -402,7 +402,7 @@
           if(currentGame!==candidate.game||candidate.game.finished)return;
           const suffix=awardState==='awarded'?' · +1 XP'
             :awardState==='board_limit'?' · Limit 5 XP na této desce už máš.'
-            :awardState==='daily_limit'?' · Dnešní limit 20 XP už máš.'
+            :awardState==='daily_limit'?' · Dnešní limit 50 XP už máš.'
             :awardState==='pending'?' · XP ověříme po připojení.'
             :'';
           message(`„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.${suffix}`);

@@ -28,18 +28,18 @@ def reward(puzzle: str, word: str, granted_at: str) -> dict:
 
 
 rows = [reward("board-a", f"slovo{i}", "2026-08-28T10:00:00+02:00") for i in range(5)]
-rows += [reward(f"board-{i}", f"jiné{i}", "2026-08-28T12:00:00+02:00") for i in range(15)]
+rows += [reward(f"board-{i}", f"jiné{i}", "2026-08-28T12:00:00+02:00") for i in range(45)]
 rows += [reward("board-b", "slovo0", "2026-08-27T12:00:00+02:00")]
 
 summary = _discovery_summary(rows, puzzle_id="board-a", today="2026-08-28", tz=TZ)
 assert WORD_DISCOVERY_BOARD_XP_LIMIT == 5
-assert WORD_DISCOVERY_DAILY_XP_LIMIT == 20
+assert WORD_DISCOVERY_DAILY_XP_LIMIT == 50
 assert summary["boardDiscoveryXp"] == 5
-assert summary["dailyDiscoveryXp"] == 20
+assert summary["dailyDiscoveryXp"] == 50
 assert summary["boardRemainingXp"] == 0
 assert summary["dailyRemainingXp"] == 0
-assert summary["totalDiscoveryXp"] == 21
-assert summary["discoveredWords"] == 20, "same word on another board earns XP again but remains one distinct word"
+assert summary["totalDiscoveryXp"] == 51
+assert summary["discoveredWords"] == 50, "same word on another board earns XP again but remains one distinct word"
 
 # Profile XP has one server-side total: result XP + account bonus + discovery rewards.
 originals = {
@@ -100,7 +100,7 @@ assert "const missing=Math.max(0,xp-included)" in feedback
 assert "status:profile()?.token?'pending':'local'" in feedback
 assert "pg_advisory_xact_lock" in migration
 assert "v_board_xp >= 5" in migration
-assert "v_daily_xp >= 20" in migration
+assert "v_daily_xp >= 20" in migration  # historical v4.01.32 migration; v4.01.33 overrides it to 50
 assert "grant execute on function public.proplet_claim_word_discovery" in migration
 assert "on conflict on constraint account_rewards_player_reward_key_unique do nothing" in migration
 assert "on conflict (player_id, reward_key) do nothing" not in migration
@@ -108,5 +108,11 @@ assert "on conflict (player_id, reward_key) do nothing" not in migration
 hotfix = (ROOT / "SUPABASE_MIGRATION_V4_01_32_WORD_DISCOVERY_HOTFIX.sql").read_text(encoding="utf-8")
 assert "on conflict on constraint account_rewards_player_reward_key_unique do nothing" in hotfix
 assert "on conflict (player_id, reward_key) do nothing" not in hotfix
+
+daily_50 = (ROOT / "SUPABASE_MIGRATION_V4_01_33_WORD_DISCOVERY_50_XP.sql").read_text(encoding="utf-8")
+assert "v_board_xp >= 5" in daily_50
+assert "v_daily_xp >= 50" in daily_50
+assert "50 XP per Prague day" in daily_50
+assert "on conflict on constraint account_rewards_player_reward_key_unique do nothing" in daily_50
 
 print("xp-economy-v40132 regression: PASS")
