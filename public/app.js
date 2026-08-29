@@ -12,8 +12,8 @@ const WIN_PRAISE={
  easy:['A je to!','Pěkně.','Hotovo!','Hezky propleteno.','To sedlo.','Další je doma.'],
  medium:['Pěkná práce.','Je to tam!','Hotovo!','Hezky!','Další je doma.','To se povedlo.'],
  hard:['Těžká? Pro tebe ne!','Tohle se počítá.','Pěkný výkon.','Těžká je doma.','Krásná práce.','Tak tohle jo.'],
- hardcore:['Tak kdo s koho?','Fíha. Respekt.','Klobouk dolů!','Je po něm!','Tohle nebyla sranda.','Tvůj mozek odolal.'],
- mozkomor:['Hlubina zdolána.','Tohle už je jiná liga.','Mozkomor padl.','Neurony přežily.','Klobouk hodně dolů.','Endgame? Vyřízeno.']
+ hardcore:['Tak kdo s koho?','Fíha. Respekt!','Klobouk dolů!','Je po něm, nesežral tě!','Další kousek za pasem.','Tvůj mozek odolal.'],
+ mozkomor:['Tebe nic nezdolá!','Tohle už je jiná liga.','Našel jsi na Mozkomora recept.','Tvé neurony opět vítězí!','Velký klobouk, hodně dolů.','Endgame? Zjevně nesouhlasíš.']
 };
 const DIFF={
   easy:{label:'Snadná',icon:'/difficulty/easy.svg',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
