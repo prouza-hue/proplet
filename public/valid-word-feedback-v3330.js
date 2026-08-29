@@ -241,6 +241,7 @@
     finally{discoverySyncInFlight=false}
   };
 
+  const creditRunXp=(candidate,points=1)=>{const g=candidate?.game;if(!g||points<=0)return;g.wordDiscoveryXpAwarded=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)+Math.max(0,Number(points)||0);try{if(currentGame===g&&!g.finished&&typeof saveGameProgress==='function')saveGameProgress()}catch{}};
   const awardDiscovery=async candidate=>{
     if(rewardDisabled())return 'disabled';
     patchEffectiveStats();
@@ -270,6 +271,7 @@
     if(!profile()?.token){
       store.entries[key]=row;
       writeDiscoveryStore(store,s);
+      creditRunXp(candidate,1);
       showXpPop();
       refreshVisibleUi();
       return 'awarded';
@@ -296,6 +298,7 @@
       writeDiscoveryStore(store,s);
       markServerState(data,s);
       if(data?.newlyGranted===true){
+        creditRunXp(candidate,Math.max(1,Number(data?.awardedPoints)||1));
         showXpPop();
         refreshVisibleUi();
         return 'awarded';
