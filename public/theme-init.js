@@ -39,7 +39,7 @@
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/result-layout-v3330.css?v=2','propletResultLayoutCss'],
-    ['/profile-layout-v3330.css?v=1','propletProfileLayoutCss'],
+    ['/profile-layout-v3330.css?v=2','propletProfileLayoutCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
     ['/release-notes-v3331.css?v=40132','propletReleaseNotesV3331Css'],

@@ -3,6 +3,10 @@
    compact mobile presentation intact and gives laptop/monitor users proper reading typography. */
 
 @media (min-width:1000px) and (min-height:650px){
+  /* The wide shell has four grid tracks, but the two headline metrics are still a two-card row. */
+  #screen-profile:not(.settings-open) .profile-grid>.profile-stat:not(.profile-stat-wide){grid-column:span 2;min-width:0}
+  #screen-profile:not(.settings-open) .profile-rank-value strong{overflow-wrap:normal;word-break:normal;hyphens:none}
+
   /* Achievements: icon + title form one clear headline row; description gets its own readable row. */
   #screen-profile .achievement-card{padding:22px 24px}
   #screen-profile .achievement-toggle-btn{padding:9px 13px;font-size:13px}
@@ -58,9 +62,15 @@
 
   /* Ranks use the same information hierarchy as achievements instead of tiny 112px tiles. */
   #screen-profile .level-roadmap-card{padding:22px 24px}
-  #screen-profile .level-roadmap{gap:11px;padding:14px 2px 4px}
+  #screen-profile .level-roadmap{
+    --profile-roadmap-gap:11px;
+    gap:var(--profile-roadmap-gap);
+    padding:14px 2px 4px;
+    scroll-snap-type:x proximity;
+  }
   #screen-profile .level-step{
-    min-width:205px;
+    flex:0 0 calc((100% - 3 * var(--profile-roadmap-gap)) / 4);
+    min-width:0;
     min-height:96px;
     padding:15px 16px;
     border-radius:19px;
@@ -70,6 +80,7 @@
     column-gap:10px;
     row-gap:7px;
     align-items:center;
+    scroll-snap-align:start;
   }
   #screen-profile .level-step .level-step-icon{grid-column:1;grid-row:1;font-size:30px;line-height:1}
   #screen-profile .level-step strong{grid-column:2;grid-row:1;margin:0;padding-right:21px;font-size:16.5px;line-height:1.25}
@@ -112,7 +123,6 @@
   #screen-profile .achievement strong{font-size:18px}
   #screen-profile .achievement small{font-size:15px}
   #screen-profile .achievement em{font-size:13px}
-  #screen-profile .level-step{min-width:220px}
   #screen-profile .level-step strong{font-size:17px}
   #screen-profile .level-step small{font-size:14px}
   #screen-profile .profile-badge strong{font-size:17px}
