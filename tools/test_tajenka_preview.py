@@ -226,7 +226,7 @@ def main() -> None:
     assert "tajenkaReleaseEnabled:true" in runtime
     assert "tajenkaFirstSaturday:'2026-08-29'" in runtime
     assert "tajenkaRewardXp:200" in runtime
-    assert "proplet-v4.01.33-sync-quarantine-shell" in sw
+    assert "proplet-v4.01.34-first-win-return-shell" in sw
     assert "tajenka-test.json" not in sw
     assert not (ROOT / "public" / "tajenka-test.json").exists()
     for marker in (

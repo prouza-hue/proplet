@@ -63,6 +63,7 @@ Report porovnává včerejšek s předchozím dnem a s klouzavým 7denním prům
 
 - PWA: `pwa_install_nudge_shown` → `pwa_install_native_accepted` / `pwa_install_ios_hint_ack` → `pwa_installed`.
 - Push: `push_nudge_shown` → `push_nudge_accepted` → `push_delivery_log.status=sent` → `push_delivery_log.opened_at`. U doručení i otevření se reportuje kategorie `daily` / `content`; klientské `push_*_opened` slouží ke kontrole cílové navigace.
+- Od v4.01.34 se první nabídka návratu po první dokončené skutečné hře měří samostatně přes `first_win_return_nudge_shown` → `first_win_return_nudge_accepted` / `first_win_return_nudge_dismissed`. Tato větev nemá srovnatelnou historii před v4.01.34.
 - Daily share: `daily_share_clicked` → `daily_share_created` → `shared_daily_opened` → `shared_daily_started` → `shared_daily_completed`.
 - Level share: `level_share_clicked` → `level_share_created` → `shared_level_opened` → `shared_level_started` → `shared_level_completed` → volitelně `shared_level_beaten`.
 - Vždy se reportují unikátní aktéři a vedle nich absolutní počet doručení. `*_cancelled` a `*_failed` jsou diagnostické větve, ne konverze.

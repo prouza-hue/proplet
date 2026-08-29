@@ -59,7 +59,7 @@
 
   const localDay=()=>{try{return typeof pragueDateISO==='function'?pragueDateISO():new Date().toISOString().slice(0,10)}catch{return new Date().toISOString().slice(0,10)}};
   const localLimitReason=(candidate,store)=>{
-    const entries=Object.values(store.entries||{}).filter(row=>row?.status!=='capped');
+    const entries=Object.values(store.entries||{}).filter(row=>['local','pending','confirmed'].includes(row?.status));
     const board=entries.filter(row=>row?.puzzleId===candidate.puzzleId).length;
     const daily=entries.filter(row=>(row?.rewardDay||String(row?.createdAt||'').slice(0,10))===localDay()).length;
     if(board>=BOARD_XP_LIMIT)return 'board_limit';
@@ -198,6 +198,18 @@
     daily_date:row.dailyDate||null
   });
 
+  const permanentClaimError=error=>[400,404,410,422].includes(Number(error?.status));
+  const rejectClaim=(store,key,row,error)=>{
+    store.entries[key]={
+      ...row,
+      status:'rejected',
+      rejectedStatus:Number(error?.status)||null,
+      rejectedReason:String(error?.message||'Claim zamítnut').slice(0,160),
+      rejectedAt:new Date().toISOString()
+    };
+    track('word_discovery_claim_rejected');
+  };
+
   const syncDiscoveries=async()=>{
     patchEffectiveStats();
     const p=profile();
@@ -234,7 +246,9 @@
           store.entries[key]={...row,status:limit==='board_limit'||limit==='daily_limit'?'capped':'confirmed',limitReason:limit||null};changed=true;
           store.serverTotalXp=Math.max(Number(store.serverTotalXp||0),Number(result?.totalDiscoveryXp||0));
           markServerState(result,id);
-        }catch{}
+        }catch(error){
+          if(permanentClaimError(error)){rejectClaim(store,key,row,error);changed=true}
+        }
       }
       if(changed)writeDiscoveryStore(store,id);
       refreshVisibleUi();
@@ -307,7 +321,13 @@
       }
       refreshVisibleUi();
       return serverLimit||'duplicate';
-    }catch{
+    }catch(error){
+      if(permanentClaimError(error)){
+        rejectClaim(store,key,row,error);
+        writeDiscoveryStore(store,s);
+        refreshVisibleUi();
+        return 'rejected';
+      }
       // A signed-in player's XP is server-authoritative. Keep the claim queued, but do not
       // temporarily inflate the profile before the atomic server decision arrives.
       store.entries[key]=row;
@@ -409,6 +429,7 @@
             :awardState==='board_limit'?' · Limit 5 XP na této desce už máš.'
             :awardState==='daily_limit'?' · Dnešní limit 50 XP už máš.'
             :awardState==='pending'?' · XP ověříme po připojení.'
+            :awardState==='rejected'?' · Bonus XP se tentokrát nepřipsal.'
             :'';
           message(`„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.${suffix}`);
           if(validNonSolutionStreak>=TRIGGER_STREAK&&!failsafeShown())showFailsafe();

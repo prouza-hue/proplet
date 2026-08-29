@@ -252,6 +252,8 @@ let reloadOnServiceWorkerChange=false;
 let winFeedbackSent=false;
 let pendingPostWinAction=null;
 let pendingPushPostWinAction=null;
+let pendingPushFollowUp=null;
+let pushNudgeContext='standard';
 let pendingInstallPostWinAction=null;
 let installModalManual=false;
 let deferredInstallPrompt=null;
@@ -497,7 +499,8 @@ function initNavigation(){
   const modal=openTransientModal();
   if(modal){
    if(modal.id==='onboardingModal'&&onboardingMandatory){history.pushState({proplet:true,screen:currentScreen},'',location.href);return}
-   if(modal.id==='winModal'&&shouldOfferAccountNudge())maybeOfferAccountNudge('menu');
+   if(modal.id==='winModal'&&await maybeOfferFirstWinReturnNudge('menu')){}
+   else if(modal.id==='winModal'&&shouldOfferAccountNudge())maybeOfferAccountNudge('menu');
    else if(modal.id==='winModal'&&await maybeOfferPushNudge('menu')){} 
    else if(modal.id==='winModal'&&maybeOfferInstallNudge('menu','daily')){}
    else if(modal.id==='accountNudgeModal')dismissAccountNudge();
@@ -931,8 +934,8 @@ function updateWinAccountCta(){const button=$('#winAccountBtn'),show=!!button&&!
 function restoreWinAfterAccountModal(){profileModalFromWin=false;if(!currentGame?.finished)return;$('#winModal').classList.remove('hidden');updateWinAccountCta()}
 function openAccountFromWin(){if(getProfile()?.token)return;trackProductEvent('win_account_cta_create');profileModalFromWin=true;$('#winModal').classList.add('hidden');openProfileModal('create')}
 async function refreshWinLeaderboardAfterAuth(){if(!currentGame?.finished)return;updateWinAccountCta();if(currentGame.mode==='daily')await loadWinDailyGlobalLeaderboard(currentGame.dailyDate||pragueDateISO(),getState().completed[`daily:${currentGame.dailyDate||pragueDateISO()}`]||currentGame);else if(currentGame.mode==='free')await loadWinLevelLeaderboard(currentGame.puzzle,getState().completed[`free:${currentGame.puzzle.id}`]||currentGame)}
-async function closeWinAndContinue(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');return}if(maybeOfferAccountNudge('continue'))return;if(await maybeOfferPushNudge('continue'))return;if(maybeOfferInstallNudge('continue','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
-async function closeWinToMenu(){if(maybeOfferAccountNudge('menu'))return;if(await maybeOfferPushNudge('menu'))return;if(maybeOfferInstallNudge('menu','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
+async function closeWinAndContinue(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');return}if(await maybeOfferFirstWinReturnNudge('continue'))return;if(maybeOfferAccountNudge('continue'))return;if(await maybeOfferPushNudge('continue'))return;if(maybeOfferInstallNudge('continue','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
+async function closeWinToMenu(){if(await maybeOfferFirstWinReturnNudge('menu'))return;if(maybeOfferAccountNudge('menu'))return;if(await maybeOfferPushNudge('menu'))return;if(maybeOfferInstallNudge('menu','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
 function showDailyResult(date,rec){
  const p=dailyPuzzleFor(date);stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};
  const tajenkaWin=$('#tajenkaWinPhrase');if(tajenkaWin){tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''}$('#screen-game')?.classList.remove('tajenka-mode','starter-mode','rescue-mode');$('#winModal')?.classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');
@@ -1612,11 +1615,16 @@ async function shouldOfferPushNudge(){
  const g=currentGame;if(!['daily','free'].includes(g?.mode)||g?.justCompleted!==true||!pushNudgeDue())return false;if(!('Notification' in window)||!('PushManager' in window)||Notification.permission==='denied')return false;
  try{const state=await browserPushState();if(state.enabled){savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return false}return !!state.config?.available}catch{return false}
 }
-async function maybeOfferPushNudge(action){if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;trackProductEvent('push_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
-function finishPushNudgeFlow(){const action=pendingPushPostWinAction;pendingPushPostWinAction=null;$('#pushNudgeModal').classList.add('hidden');if(action)performPostWinAction(action)}
-function dismissPushNudge(){const st=getPushNudgeState(),declines=(st.declines||0)+1,today=pragueDateISO();trackProductEvent('push_nudge_dismissed');if(declines>=3)savePushNudgeState({...st,declines,done:true,lastDeclinedAt:new Date().toISOString()});else savePushNudgeState({...st,declines,nextOfferDate:addDaysISO(today,declines===1?1:7),lastDeclinedAt:new Date().toISOString()});finishPushNudgeFlow()}
+function firstRealGameJustCompleted(){return ['daily','free'].includes(currentGame?.mode)&&currentGame?.justCompleted===true&&completedGameCount()===1}
+function renderPushNudge(context='standard'){
+ const firstWin=context==='first_win';$('#pushNudgeEyebrow').textContent=firstWin?'ZÍTRA JE TU NOVÁ VÝZVA':'NOVÁ DESKA KAŽDÝ DEN';$('#pushNudgeTitle').textContent=firstWin?'První výhra je doma. Navážeš zítra?':'Vrať se pro nový Proplet';$('#pushNudgeCopy').textContent=firstWin?'Ráno ti připomeneme novou Denní výzvu. Jen jednu zprávu, dokud ji ještě nemáš vyřešenou.':'Ráno připomeneme jen nevyřešenou Denní výzvu. V pondělí dáme vědět o pěti nových úrovních.';
+}
+async function maybeOfferPushNudge(action,options={}){if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;pendingPushFollowUp=options.followUp||null;pushNudgeContext=options.context||'standard';renderPushNudge(pushNudgeContext);trackProductEvent('push_nudge_shown');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
+async function maybeOfferFirstWinReturnNudge(action){return firstRealGameJustCompleted()?maybeOfferPushNudge(action,{context:'first_win',followUp:'account'}):false}
+function finishPushNudgeFlow(){const action=pendingPushPostWinAction,followUp=pendingPushFollowUp;pendingPushPostWinAction=null;pendingPushFollowUp=null;$('#pushNudgeModal').classList.add('hidden');if(followUp==='account'&&maybeOfferAccountNudge(action))return;if(action)performPostWinAction(action)}
+function dismissPushNudge(){const st=getPushNudgeState(),declines=(st.declines||0)+1,today=pragueDateISO();trackProductEvent('push_nudge_dismissed');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_dismissed');if(declines>=3)savePushNudgeState({...st,declines,done:true,lastDeclinedAt:new Date().toISOString()});else savePushNudgeState({...st,declines,nextOfferDate:addDaysISO(today,declines===1?1:7),lastDeclinedAt:new Date().toISOString()});finishPushNudgeFlow()}
 async function enablePushReminder(){const result=await persistPushEnabled(true);savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});return result}
-async function acceptPushNudge(){if(pushUiBusy)return;pushUiBusy=true;$('#pushNudgeEnableBtn').disabled=true;try{await enablePushReminder();trackProductEvent('push_nudge_accepted');trackProductEvent('push_notifications_enabled');showToast('Upozornění zapnutá 🔔');finishPushNudgeFlow()}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;$('#pushNudgeEnableBtn').disabled=false;updatePushUI()}}
+async function acceptPushNudge(){if(pushUiBusy)return;pushUiBusy=true;$('#pushNudgeEnableBtn').disabled=true;try{await enablePushReminder();trackProductEvent('push_nudge_accepted');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_accepted');trackProductEvent('push_notifications_enabled');showToast('Upozornění zapnutá 🔔');finishPushNudgeFlow()}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;$('#pushNudgeEnableBtn').disabled=false;updatePushUI()}}
 async function updatePushUI(){
  const btn=$('#pushToggleBtn'),status=$('#pushStatusText');if(!btn||pushUiBusy)return;
  if(!('Notification' in window)||!('PushManager' in window)){btn.disabled=true;btn.textContent='🔕 Nepodporováno';status.textContent='Na tomto zařízení/prohlížeči Web Push není dostupný.';return}

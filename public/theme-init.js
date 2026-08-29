@@ -89,7 +89,7 @@
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
     loadScript('/onboarding-model-v3328.js?v=3','propletOnboardingModel');
     loadScript('/gesture-guard-v3325.js?v=2','propletGestureGuard');
-    loadScript('/valid-word-feedback-v3330.js?v=6','propletValidWordFeedback');
+    loadScript('/valid-word-feedback-v3330.js?v=7','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=2','propletAccountTeamIntegrity');
