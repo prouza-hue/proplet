@@ -1032,11 +1032,14 @@ html[data-theme="dark"] .starter-hard-prompt{color:#c9c0cc}html[data-theme="dark
 .tajenka-entry-copy{min-width:0}.tajenka-entry-copy .eyebrow{display:block;color:#6a57c8;font-size:9px;letter-spacing:.09em;font-weight:1000}.tajenka-entry-copy h2{margin:1px 0;font-size:19px;letter-spacing:-.025em}.tajenka-entry-copy p{display:inline;margin:0;color:#6d6478;font-size:12px;line-height:1.3}
 .tajenka-entry-reward{display:inline-flex;align-items:center;margin-left:6px;padding:3px 7px;border-radius:999px;background:#e7ddff;color:#5944c3;font-size:11px;font-weight:950;white-space:nowrap}
 .tajenka-preview-card>.primary-btn{white-space:nowrap;width:auto;min-width:72px;padding:9px 12px;background:linear-gradient(145deg,#684ecf,#8b65df);box-shadow:none}
-.tajenka-preview-card.completed{grid-template-columns:auto minmax(0,1fr);gap:9px;padding:10px 13px;background:linear-gradient(135deg,#f8f4ff,#eef9f4);border-color:#d8d0ec;box-shadow:0 6px 18px rgba(73,57,118,.08)}
+.tajenka-preview-card.completed{grid-template-columns:auto minmax(0,1fr) auto;gap:9px;padding:9px 12px;background:linear-gradient(135deg,#f8f4ff,#eef9f4);border-color:#d8d0ec;box-shadow:0 6px 18px rgba(73,57,118,.08);cursor:pointer;transition:transform .14s ease,box-shadow .14s ease}
 .tajenka-preview-card.completed:before{background:linear-gradient(#7e66dc,#55b994)}
-.tajenka-preview-card.completed .tajenka-entry-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(145deg,#e1f5eb,#eee8ff);color:#2f8d6c;font-size:18px;box-shadow:none}
-.tajenka-entry-answer{display:block;margin-top:1px;color:#3e3761;font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tajenka-entry-next{display:block;margin-top:2px;color:#777184;font-size:10px;font-weight:800}
+.tajenka-preview-card.completed .tajenka-entry-icon{width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#e1f5eb,#eee8ff);color:#2f8d6c;font-size:17px;box-shadow:none}
+.tajenka-preview-card.completed .tajenka-entry-copy h2{margin:0;color:#3e3761;font-size:15px;line-height:1.15;letter-spacing:-.015em}
+.tajenka-entry-next{display:block;margin-top:2px;color:#777184;font-size:10px;line-height:1.2;font-weight:800}
+.tajenka-entry-open{align-self:center;color:#7564c7;font-size:25px;line-height:1;font-weight:800}
+.tajenka-preview-card.completed:focus-visible{outline:3px solid rgba(108,92,231,.35);outline-offset:2px}
+@media(hover:hover){.tajenka-preview-card.completed:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(73,57,118,.12)}}
 
 .tajenka-phrase{padding:6px 8px;margin:0;display:grid;gap:4px;background:linear-gradient(145deg,#f5f0ff,#f1faf6);border-color:#d9d1f3;border-radius:13px;box-shadow:none}
 .tajenka-phrase.hidden{display:none}
@@ -1053,7 +1056,7 @@ html[data-theme="dark"] .starter-hard-prompt{color:#c9c0cc}html[data-theme="dark
 
 html[data-theme="dark"] .tajenka-preview-card{background:radial-gradient(circle at 94% -35%,rgba(255,255,255,.07) 0 24%,transparent 25%),linear-gradient(135deg,#42351e,#302746 53%,#1f3931);border-color:#755f35;box-shadow:0 10px 28px rgba(0,0,0,.22)}
 html[data-theme="dark"] .tajenka-entry-copy p{color:#d0c7d7}html[data-theme="dark"] .tajenka-entry-copy .eyebrow{color:#d0c6ff}html[data-theme="dark"] .tajenka-entry-reward{background:rgba(130,103,232,.2);color:#d9d0ff}html[data-theme="dark"] .tajenka-entry-icon{background:linear-gradient(145deg,#6650bd,#8969d6);color:#fff0ae}
-html[data-theme="dark"] .tajenka-preview-card.completed{background:linear-gradient(135deg,#29243b,#20352f);border-color:#4b4560}html[data-theme="dark"] .tajenka-preview-card.completed .tajenka-entry-icon{background:#29483e;color:#8ee3bf}html[data-theme="dark"] .tajenka-entry-answer{color:#eee9ff}html[data-theme="dark"] .tajenka-entry-next{color:#bdb5c6}
+html[data-theme="dark"] .tajenka-preview-card.completed{background:linear-gradient(135deg,#29243b,#20352f);border-color:#4b4560}html[data-theme="dark"] .tajenka-preview-card.completed .tajenka-entry-icon{background:#29483e;color:#8ee3bf}html[data-theme="dark"] .tajenka-preview-card.completed .tajenka-entry-copy h2{color:#eee9ff}html[data-theme="dark"] .tajenka-entry-next{color:#bdb5c6}html[data-theme="dark"] .tajenka-entry-open{color:#bcb0ff}
 html[data-theme="dark"] .tajenka-phrase,html[data-theme="dark"] .tajenka-win-phrase{background:linear-gradient(145deg,#292440,#1e342e);border-color:#4c426c}html[data-theme="dark"] .tajenka-mode .board-stage{background:radial-gradient(circle at 50% 0,rgba(255,220,112,.06),transparent 40%),linear-gradient(145deg,rgba(29,27,42,.96),rgba(24,33,34,.92))}html[data-theme="dark"] .tajenka-progress i{background:#464052}html[data-theme="dark"] .tajenka-slot.pending{background:#39334a;color:#aaa1b6}html[data-theme="dark"] .tajenka-slot.revealed{background:#25483d;color:#8ee3bf}html[data-theme="dark"] .tajenka-rule-inline{color:#bdb5c6}html[data-theme="dark"] .tajenka-win-phrase strong{color:#d0c7ff}
 
 @keyframes tajenkaReveal{0%{transform:scale(.78);opacity:.15;filter:blur(3px)}55%{transform:scale(1.08);opacity:1;filter:blur(0);box-shadow:0 0 0 4px rgba(99,190,149,.13)}100%{transform:scale(1);box-shadow:none}}
@@ -1063,7 +1066,7 @@ html[data-theme="dark"] .tajenka-phrase,html[data-theme="dark"] .tajenka-win-phr
  .tajenka-phrase-head{grid-column:1}.tajenka-slots{grid-column:2;justify-content:flex-end}.tajenka-rule-inline{grid-column:1/-1}
 }
 @media(max-width:600px){
- .tajenka-preview-card{grid-template-columns:38px minmax(0,1fr) auto;gap:8px;padding:10px 11px}.tajenka-entry-icon{width:38px;height:38px;border-radius:12px;font-size:21px}.tajenka-entry-copy h2{font-size:17px}.tajenka-entry-copy p{font-size:11px}.tajenka-entry-reward{margin-left:4px;font-size:10px;padding:2px 6px}.tajenka-preview-card>.primary-btn{min-width:62px;padding:8px 9px;font-size:12px}.tajenka-entry-answer{font-size:13px}.tajenka-entry-next{font-size:9px}
+ .tajenka-preview-card{grid-template-columns:38px minmax(0,1fr) auto;gap:8px;padding:10px 11px}.tajenka-entry-icon{width:38px;height:38px;border-radius:12px;font-size:21px}.tajenka-entry-copy h2{font-size:17px}.tajenka-entry-copy p{font-size:11px}.tajenka-entry-reward{margin-left:4px;font-size:10px;padding:2px 6px}.tajenka-preview-card>.primary-btn{min-width:62px;padding:8px 9px;font-size:12px}.tajenka-preview-card.completed{padding:8px 10px}.tajenka-preview-card.completed .tajenka-entry-icon{width:32px;height:32px}.tajenka-preview-card.completed .tajenka-entry-copy h2{font-size:14px}.tajenka-entry-next{font-size:9.5px}.tajenka-entry-open{font-size:23px}
  .tajenka-mode .game-board-column{gap:3px}.tajenka-mode .game-board-column>.game-info{padding:3px 6px}.tajenka-mode .game-board-column>.current-word{min-height:34px;padding:3px 7px}.tajenka-mode .game-board-column>.current-word strong{font-size:15px}.tajenka-phrase{padding:5px 7px;gap:3px}.tajenka-slot{font-size:10px;padding:2px 4px}.tajenka-rule-inline{font-size:8.5px}.tajenka-mode .game-board-column>.board-stage{padding:3px}
 }
 @media(max-width:350px){

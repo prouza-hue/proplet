@@ -195,8 +195,10 @@ def main() -> None:
         "tajenka-rule-inline",
         "některá písmena mohou zůstat volná.",
         "Významová stopa",
-        "Další tajenka zase v sobotu.",
-        "tajenka-entry-answer",
+        "Další přijde zase v sobotu.",
+        "showTajenkaRecap",
+        "tajenka_recap_opened",
+        "tajenka-entry-open",
         "push_tajenka_opened",
     ):
         assert marker in app, marker
@@ -241,7 +243,8 @@ def main() -> None:
     assert ".tajenka-rule-note{" not in styles
     assert ".tajenka-rule-inline{" in styles
     assert ".tajenka-preview-card.completed{" in styles
-    assert ".tajenka-entry-answer{" in styles
+    assert ".tajenka-entry-open{" in styles
+    assert ".tajenka-entry-answer{" not in styles
     assert ".tajenka-mode .game-board-column>.game-info .found-row" in styles
     assert ".tajenka-mode .game-board-column>.game-info .game-progress{display:none}" in styles
     assert ".tajenka-mode .game-board-column>.board-stage{grid-row:4;padding:4px" in styles
@@ -252,13 +255,18 @@ def main() -> None:
     assert "tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''" in app
     assert "root.classList.toggle('completed',completed)" in app
     assert "showRule=g.found.length===0" in app
+    assert "tajenkaRecapOpen=true" in app
+    assert "if(tajenkaRecapOpen){tajenkaRecapOpen=false" in app
     entry = app[app.index("function renderTajenkaEntry()"):app.index("async function loadTajenkaFixture()")]
     assert "Zahrát znovu" not in entry
     assert "Každý víkend nová" not in entry
+    assert "tajenkaPuzzle.tajenka.phrase" not in entry
+    assert "Tajenka odhalena" in entry
+    assert "Další přijde zase v sobotu." in entry
 
     hosts = re.search(r"const TAJENKA_PRODUCTION_HOSTS=new Set\(\[(.*?)\]\)", app, re.S)
     assert hosts and "hrajproplet.cz" in hosts.group(1)
-    print("PASS: 10 Tajenka boards, compact responsive UI, isolated Daily result, 200 XP and Saturday push")
+    print("PASS: compact clickable Tajenka recap card, responsive game UI, isolated Daily result, 200 XP and Saturday push")
 
 
 if __name__ == "__main__":

@@ -931,7 +931,7 @@ function updateWinAccountCta(){const button=$('#winAccountBtn'),show=!!button&&!
 function restoreWinAfterAccountModal(){profileModalFromWin=false;if(!currentGame?.finished)return;$('#winModal').classList.remove('hidden');updateWinAccountCta()}
 function openAccountFromWin(){if(getProfile()?.token)return;trackProductEvent('win_account_cta_create');profileModalFromWin=true;$('#winModal').classList.add('hidden');openProfileModal('create')}
 async function refreshWinLeaderboardAfterAuth(){if(!currentGame?.finished)return;updateWinAccountCta();if(currentGame.mode==='daily')await loadWinDailyGlobalLeaderboard(currentGame.dailyDate||pragueDateISO(),getState().completed[`daily:${currentGame.dailyDate||pragueDateISO()}`]||currentGame);else if(currentGame.mode==='free')await loadWinLevelLeaderboard(currentGame.puzzle,getState().completed[`free:${currentGame.puzzle.id}`]||currentGame)}
-async function closeWinAndContinue(){if(maybeOfferAccountNudge('continue'))return;if(await maybeOfferPushNudge('continue'))return;if(maybeOfferInstallNudge('continue','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
+async function closeWinAndContinue(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');return}if(maybeOfferAccountNudge('continue'))return;if(await maybeOfferPushNudge('continue'))return;if(maybeOfferInstallNudge('continue','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('continue')}
 async function closeWinToMenu(){if(maybeOfferAccountNudge('menu'))return;if(await maybeOfferPushNudge('menu'))return;if(maybeOfferInstallNudge('menu','daily'))return;$('#winModal').classList.add('hidden');performPostWinAction('menu')}
 function showDailyResult(date,rec){
  const p=dailyPuzzleFor(date);stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};
@@ -957,7 +957,7 @@ Zahraj si taky: ${SHARE_URL}`;
 }
 async function shareProplet(text){try{if(navigator.share){const body=text.split('\n\nZahraj si taky:')[0];await navigator.share({title:'Proplet – česká slovní hra',text:body,url:SHARE_URL})}else{await navigator.clipboard.writeText(text);showToast('Výsledek i odkaz jsou ve schránce ✓')}}catch(e){if(e?.name!=='AbortError')showToast('Sdílení se nepovedlo. Zkus to znovu.')}}
 async function shareDaily(){await shareProplet(shareText())}
-function replayDailyFromWin(){const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO(),puzzle=dailyPuzzleFor(date);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}
+function replayDailyFromWin(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');startTajenka();return}const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO(),puzzle=dailyPuzzleFor(date);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}
 
 function queueResult(rec){
  if(GEN4_CANDIDATE_PREVIEW||isMozkomorQaDifficulty(rec?.difficulty))return;
@@ -1676,6 +1676,7 @@ const TAJENKA_PREPARED_WEEKS=10;
 let activeTajenkaWeek=null;
 let TAJENKA_AVAILABLE=false;
 let tajenkaPuzzle=null;
+let tajenkaRecapOpen=false;
 
 function refreshTajenkaAvailability(iso=pragueDateISO()){
  const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null,weekend=mondayWeekdayIndex(iso)>=5;
@@ -1707,15 +1708,24 @@ function savedTajenkaProgress(puzzle){const row=tajenkaState().inProgress;const 
 function tajenkaPhraseWords(puzzle=tajenkaPuzzle){return (puzzle?.tajenka?.answerOrder||[]).map(i=>puzzle.answers[i]).filter(Boolean)}
 function trackTajenkaAbandon(g=currentGame){if(!TAJENKA_AVAILABLE||!g||g.mode!=='tajenka'||g.finished||g.tajenkaAbandonTracked)return;g.tajenkaAbandonTracked=true;trackProductEvent('tajenka_abandoned')}
 function trackTajenkaView(){if(!TAJENKA_AVAILABLE)return;try{const key=`${TAJENKA_VIEW_KEY}:${tajenkaPuzzle?.id||'unknown'}`;if(sessionStorage.getItem(key)==='1')return;sessionStorage.setItem(key,'1')}catch{}trackProductEvent('tajenka_viewed')}
+function showTajenkaRecap(completion=tajenkaCompletion()){
+ if(!TAJENKA_AVAILABLE||!tajenkaPuzzle||!completion)return;
+ tajenkaRecapOpen=true;trackProductEvent('tajenka_recap_opened');
+ $('#winModal').classList.remove('starter-win','hidden');$('#starterHardActions')?.classList.add('hidden');$('#levelLeaderboardBox')?.classList.add('hidden');$('#winAccountBtn')?.classList.add('hidden');$('#newBadgeBox')?.classList.add('hidden');$('#newBadgeBox').innerHTML='';$('#winFeedback')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');
+ $('#winBadge').textContent='✦';$('#winTitle').textContent='Tajenka odhalena';$('#winPraise').classList.add('hidden');$('#winText').textContent=`${fmtTime(Number(completion.elapsedMs)||0)} · ${countCz(Number(completion.moves)||0,'tah','tahy','tahů')}`;$('#winXp').textContent='Vyřešeno';$('#winClean').classList.add('hidden');
+ const phrase=$('#tajenkaWinPhrase');if(phrase){phrase.classList.remove('hidden');phrase.innerHTML=`<span class="stat-label">TAJENKA</span><strong>${esc(tajenkaPuzzle.tajenka.phrase)}</strong><small>Víkendová tajenka</small>`}
+ $('#winWords').innerHTML='';$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winReplayBtn').classList.remove('hidden');$('#winReplayBtn').textContent='↻ Zahrát znovu · bez XP';$('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Zavřít';
+}
 function renderTajenkaEntry(){
  const root=$('#tajenkaPreviewCard');if(!root)return;
- if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){root.classList.add('hidden');root.classList.remove('completed');root.innerHTML='';return}
+ if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){root.classList.add('hidden');root.classList.remove('completed');root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;root.innerHTML='';return}
  const state=tajenkaState(),inProgress=state.inProgress?.puzzleId===tajenkaPuzzle.id,completion=tajenkaCompletion(tajenkaPuzzle,state),completed=!!completion;
  root.classList.toggle('completed',completed);
  if(completed){
-  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><span class="eyebrow">TAJENKA ODHALENA</span><strong class="tajenka-entry-answer">${esc(tajenkaPuzzle.tajenka.phrase)}</strong><small class="tajenka-entry-next">Další tajenka zase v sobotu.</small></div>`;
-  root.classList.remove('hidden');trackTajenkaView();return;
+  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><h2>Tajenka odhalena</h2><small class="tajenka-entry-next">Další přijde zase v sobotu.</small></div><span class="tajenka-entry-open" aria-hidden="true">›</span>`;
+  root.setAttribute('role','button');root.tabIndex=0;root.setAttribute('aria-label','Tajenka odhalena. Zobrazit výsledek.');root.onclick=()=>showTajenkaRecap(completion);root.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showTajenkaRecap(completion)}};root.classList.remove('hidden');trackTajenkaView();return;
  }
+ root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
  const progress=inProgress?tajenkaFoundFromState(tajenkaPuzzle,state.inProgress).length:0,total=tajenkaPhraseWords(tajenkaPuzzle).length,reward=Number(tajenkaPuzzle.meta?.rewardXp)||TAJENKA_REWARD_XP;
  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✦</div><div class="tajenka-entry-copy"><span class="eyebrow">VÍKENDOVÝ BONUS</span><h2>Tajenka</h2><p>${inProgress?`${progress}/${total} slov · pokračuj v hledání.`:`Najdi ${total} slov a odhal frázi.`}</p><span class="tajenka-entry-reward">+${reward} XP</span></div><button id="tajenkaPreviewBtn" class="primary-btn">${inProgress?'Pokračovat':'Hrát'}</button>`;
  root.classList.remove('hidden');root.querySelector('#tajenkaPreviewBtn').onclick=startTajenka;trackTajenkaView();
