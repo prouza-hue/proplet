@@ -18,10 +18,10 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 service_worker = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.32"' in version
-assert "version:'4.01.32'" in runtime
+assert 'APP_VERSION = "4.01.33"' in version
+assert "version:'4.01.33'" in runtime
 assert "supabaseRpcAuthRetryV40124:true" in runtime
-assert "proplet-v4.01.32-xp-mozkomor-release-shell" in service_worker
+assert "proplet-v4.01.33-sync-quarantine-shell" in service_worker
 
 
 with patch.object(server, "SUPABASE_SECRET_KEY", "sb_secret_opaque"):
