@@ -1,37 +1,9 @@
--- Proplet v4.01.32 — authoritative word-discovery XP limits.
--- Additive only: existing reward rows and every historical XP value stay unchanged.
+-- Proplet v4.01.32 hotfix — disambiguate word-discovery upsert.
+-- The RETURNS TABLE output parameter `reward_key` shadows the table column name
+-- inside ON CONFLICT (player_id, reward_key). Naming the existing unique
+-- constraint keeps the claim atomic and removes that PL/pgSQL ambiguity.
 
 begin;
-
-alter table public.account_rewards
-  add column if not exists reward_type text,
-  add column if not exists puzzle_id text,
-  add column if not exists reward_word text;
-
-update public.account_rewards
-set reward_type = 'account_creation'
-where reward_key = 'account_creation_v1'
-  and reward_type is null;
-
-update public.account_rewards
-set
-  reward_type = 'word_discovery',
-  puzzle_id = split_part(substring(reward_key from length('word_discovery_v1:') + 1), ':', 1),
-  reward_word = reverse(split_part(reverse(reward_key), ':', 1))
-where reward_key like 'word_discovery_v1:%'
-  and (reward_type is null or puzzle_id is null or reward_word is null);
-
-create index if not exists account_rewards_word_board_idx
-  on public.account_rewards (player_id, puzzle_id)
-  where reward_type = 'word_discovery';
-
-create index if not exists account_rewards_word_day_idx
-  on public.account_rewards (player_id, granted_at)
-  where reward_type = 'word_discovery';
-
-create index if not exists account_rewards_word_distinct_idx
-  on public.account_rewards (player_id, reward_word)
-  where reward_type = 'word_discovery';
 
 create or replace function public.proplet_claim_word_discovery(
   p_player_id uuid,
@@ -65,8 +37,6 @@ begin
 
   v_reward_key := 'word_discovery_v1:' || trim(p_puzzle_id) || ':' || lower(trim(p_word));
 
-  -- Every player has one very short critical section. This makes the board/day counters
-  -- authoritative even when two tabs or devices submit different words simultaneously.
   perform pg_advisory_xact_lock(hashtext('proplet_word_discovery'), hashtext(p_player_id::text));
 
   if exists (

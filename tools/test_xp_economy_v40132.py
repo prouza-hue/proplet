@@ -102,6 +102,11 @@ assert "pg_advisory_xact_lock" in migration
 assert "v_board_xp >= 5" in migration
 assert "v_daily_xp >= 20" in migration
 assert "grant execute on function public.proplet_claim_word_discovery" in migration
-assert "on conflict (player_id, reward_key) do nothing" in migration
+assert "on conflict on constraint account_rewards_player_reward_key_unique do nothing" in migration
+assert "on conflict (player_id, reward_key) do nothing" not in migration
+
+hotfix = (ROOT / "SUPABASE_MIGRATION_V4_01_32_WORD_DISCOVERY_HOTFIX.sql").read_text(encoding="utf-8")
+assert "on conflict on constraint account_rewards_player_reward_key_unique do nothing" in hotfix
+assert "on conflict (player_id, reward_key) do nothing" not in hotfix
 
 print("xp-economy-v40132 regression: PASS")
