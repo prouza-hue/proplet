@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "data" / "tajenka_weekend_v1.json"
 APP = ROOT / "public" / "app.js"
 STYLES = ROOT / "public" / "styles.css"
+GAME_LAYOUT = ROOT / "public" / "game-layout-v3323.css"
 SERVER = ROOT / "server.py"
 PUSH = ROOT / "push_diagnostics_v3329.py"
 RUNTIME = ROOT / "public" / "runtime-meta.js"
@@ -172,6 +173,7 @@ def main() -> None:
 
     app = APP.read_text(encoding="utf-8")
     styles = STYLES.read_text(encoding="utf-8")
+    game_layout = GAME_LAYOUT.read_text(encoding="utf-8")
     server = SERVER.read_text(encoding="utf-8")
     push = PUSH.read_text(encoding="utf-8")
     runtime = RUNTIME.read_text(encoding="utf-8")
@@ -243,9 +245,13 @@ def main() -> None:
     assert ".tajenka-mode .game-board-column>.game-info .found-row" in styles
     assert ".tajenka-mode .game-board-column>.game-info .game-progress{display:none}" in styles
     assert ".tajenka-mode .game-board-column>.board-stage{grid-row:4;padding:4px" in styles
+    assert "body.game-tablet-landscape .game-screen.tajenka-mode .game-board-column{grid-template-rows:auto minmax(0,1fr) auto!important" in game_layout
+    assert "body.game-tablet-landscape .game-screen.tajenka-mode .game-board-column>.board-stage{grid-row:2!important" in game_layout
+    assert "body.game-tablet-landscape .game-screen.tajenka-mode .game-board-column>.tajenka-phrase{grid-row:3!important" in game_layout
     assert ".tajenka-entry-copy p{display:inline;margin:0;color:#6d6478;font-size:12px" in styles
     assert "tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''" in app
     assert "root.classList.toggle('completed',completed)" in app
+    assert "showRule=g.found.length===0" in app
     entry = app[app.index("function renderTajenkaEntry()"):app.index("async function loadTajenkaFixture()")]
     assert "Zahrát znovu" not in entry
     assert "Každý víkend nová" not in entry
