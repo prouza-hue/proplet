@@ -49,6 +49,7 @@ DB_HTTP_CLIENT = httpx.Client(
 )
 GEN4_PREVIEW_BRANCH = "agent/v3340-medium-calibration-v3"
 GEN4_CANDIDATE_PREVIEW = VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == GEN4_PREVIEW_BRANCH
+REFACTOR_PREVIEW_READ_ONLY = VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == "refactor/s03-migration-manifest"
 PUZZLES_PATH = ROOT / "data" / (
     "puzzles_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "puzzles.json"
 )
@@ -98,10 +99,11 @@ async def launch_safety_middleware(request: Request, call_next):
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
     request.state.request_id = request_id
-    if GEN4_CANDIDATE_PREVIEW and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+    if (GEN4_CANDIDATE_PREVIEW or REFACTOR_PREVIEW_READ_ONLY) and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        preview_detail = "Refactor preview je pouze pro čtení" if REFACTOR_PREVIEW_READ_ONLY else "Generation 4 preview je pouze pro čtení"
         return JSONResponse(
             status_code=409,
-            content={"detail": "Generation 4 preview je pouze pro čtení", "requestId": request_id},
+            content={"detail": preview_detail, "requestId": request_id},
             headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
         )
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
