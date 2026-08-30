@@ -19,6 +19,7 @@
       {"path": "tools/test_v40134_retention_claim_fix.py", "runner": "python"},
       {"path": "tools/test_tajenka_preview.py", "runner": "python"},
       {"path": "tools/test_tajenka_push_runtime.py", "runner": "python"},
+      {"path": "tests/current/test_tajenka_weekly_availability.py", "runner": "python"},
       {"path": "tools/test_word_discovery_xp.py", "runner": "python"},
       {"path": "tools/test_v40135_profile_wide_layout.py", "runner": "python"},
       {"path": "tests/current/test_s04_backend_foundation.py", "runner": "python"},

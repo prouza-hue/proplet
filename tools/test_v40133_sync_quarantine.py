@@ -8,9 +8,9 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.35"' in version
-assert "version:'4.01.35'" in runtime
-assert "proplet-v4.01.35-profile-wide-alignment-shell" in sw
+assert 'APP_VERSION = "4.01.36"' in version
+assert "version:'4.01.36'" in runtime
+assert "proplet-v4.01.36-tajenka-weekly-availability-shell" in sw
 assert "const REJECTED_QUEUE_KEY='proplet-v4-rejected-sync-queue'" in app
 assert "Number(error?.status)===400&&error?.message==='Neznámá úloha'" in app
 assert "obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message)" in app

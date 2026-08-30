@@ -698,7 +698,8 @@ def tajenka_puzzle_for_week(week: int) -> Optional[dict]:
 
 
 def tajenka_is_live(day: date) -> bool:
-    return TAJENKA_RELEASE_ENABLED and day.weekday() in (5, 6) and tajenka_week_for(day) is not None
+    """Return whether the puzzle released for this week is currently playable."""
+    return TAJENKA_RELEASE_ENABLED and tajenka_week_for(day) is not None
 
 
 @lru_cache(maxsize=1)
@@ -1211,7 +1212,7 @@ def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=10)):
         selected_week = week or 1
     else:
         if not tajenka_is_live(today):
-            raise HTTPException(404, "Tajenka je dostupná o víkendu")
+            raise HTTPException(404, "Tajenka zatím není vydaná")
         selected_week = tajenka_week_for(today)
     puzzle = tajenka_puzzle_for_week(int(selected_week or 0))
     if not puzzle:
