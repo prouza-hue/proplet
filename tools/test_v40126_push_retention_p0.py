@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 server = (ROOT / "server.py").read_text(encoding="utf-8")
+backend_db = (ROOT / "backend" / "db.py").read_text(encoding="utf-8")
 app = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
 runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
@@ -13,7 +14,7 @@ assert 'APP_VERSION = "4.01.35"' in (ROOT / "proplet_version.py").read_text(enco
 assert "proplet-v4.01.35-profile-wide-alignment-shell" in sw
 assert "proplet_http_5xx" in server and "response.status_code >= 500" in server
 assert 'response.headers["X-Proplet-Version"] = APP_VERSION' in server
-assert "proplet_upsert_push_subscription" in server
+assert "proplet_upsert_push_subscription" in backend_db
 assert "on conflict (endpoint) do update" in migration
 assert "grant execute on function public.proplet_upsert_push_subscription" in migration
 assert "'X-Proplet-Version':APP_VERSION" in app

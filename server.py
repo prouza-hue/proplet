@@ -12,19 +12,64 @@ import time
 import uuid
 from datetime import date, datetime, timedelta
 from functools import lru_cache
-from pathlib import Path
 from typing import Optional
-from zoneinfo import ZoneInfo
-
-from proplet_version import APP_VERSION, PHONE_LANDSCAPE_BLOCKING, TABLET_LANDSCAPE_BREAKPOINT_PX
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
-
 from content_archive import archived_puzzle_info, daily_window_id, daily_window_puzzle_id, load_catalog
+from backend import db as backend_db
+from backend.config import (
+    APP_VERSION,
+    CONTENT_CATALOG_PATH,
+    CRON_SECRET,
+    GEN4_CANDIDATE_PREVIEW,
+    GEN4_PREVIEW_BRANCH,
+    PUZZLES_PATH,
+    PHONE_LANDSCAPE_BLOCKING,
+    ROOT,
+    ROLLING_CONTENT_PATH,
+    SUPABASE_SECRET_KEY,
+    SUPABASE_URL,
+    TAJENKA_BANK_PATH,
+    TAJENKA_RELEASE_ENABLED,
+    TABLET_LANDSCAPE_BREAKPOINT_PX,
+    TZ,
+    VAPID_PRIVATE_KEY,
+    VAPID_PUBLIC_KEY,
+    VAPID_SUBJECT,
+    VERCEL_ENV,
+    VERCEL_GIT_COMMIT_REF,
+)
+from backend.contracts import (
+    AccountDeleteConfirm,
+    AdminReportUpdate,
+    AnonymousClaim,
+    AttemptCheckpoint,
+    AttemptFinishTelemetry,
+    AttemptStart,
+    AvatarSet,
+    ClientErrorCreate,
+    FamilyLeagueSettings,
+    FeedbackCreate,
+    HelperEventCreate,
+    HintEventCreate,
+    PasswordSet,
+    PlayerCreate,
+    PlayerLogin,
+    ProductEventCreate,
+    PublicRankingsSet,
+    PushSubscriptionCreate,
+    PushUnsubscribe,
+    RescueFinish,
+    ResultCreate,
+    SupportModeSet,
+    SupportReportCreate,
+    SupportReportUpdate,
+    TeamMembershipSet,
+    TeamPinSet,
+)
 
 try:
     from pywebpush import webpush, WebPushException
@@ -32,31 +77,7 @@ except Exception:  # Push remains optional until dependencies/env are configured
     webpush = None
     WebPushException = Exception
 
-ROOT = Path(__file__).resolve().parent
-TZ = ZoneInfo("Europe/Prague")
-
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
-SUPABASE_SECRET_KEY = os.environ.get("SUPABASE_SECRET_KEY", "")
-VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "").strip()
-VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
-VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "https://proplet-nine.vercel.app").strip()
-CRON_SECRET = os.environ.get("CRON_SECRET", "").strip()
-VERCEL_ENV = os.environ.get("VERCEL_ENV", "").strip().lower()
-VERCEL_GIT_COMMIT_REF = os.environ.get("VERCEL_GIT_COMMIT_REF", "").strip()
-DB_HTTP_CLIENT = httpx.Client(
-    timeout=12.0,
-    limits=httpx.Limits(max_connections=40, max_keepalive_connections=20),
-)
-GEN4_PREVIEW_BRANCH = "agent/v3340-medium-calibration-v3"
-GEN4_CANDIDATE_PREVIEW = VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == GEN4_PREVIEW_BRANCH
-PUZZLES_PATH = ROOT / "data" / (
-    "puzzles_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "puzzles.json"
-)
-ROLLING_CONTENT_PATH = ROOT / "data" / (
-    "rolling_content_gen4_candidate_v334.json" if GEN4_CANDIDATE_PREVIEW else "rolling_content_v1.json"
-)
-CONTENT_CATALOG_PATH = ROOT / "data" / "content_catalog_v334.json"
-TAJENKA_BANK_PATH = ROOT / "data" / "tajenka_weekend_v1.json"
+DB_HTTP_CLIENT = backend_db.DEFAULT_HTTP_CLIENT
 
 BADGES = [
     {"days": 1, "icon": "🥉", "name": "První zářez"},
@@ -78,7 +99,6 @@ MOZKOMOR_UNLOCK_BASE_LEVELS = 200
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
-TAJENKA_RELEASE_ENABLED = VERCEL_ENV == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
@@ -175,367 +195,69 @@ async def unexpected_error_handler(request: Request, exc: Exception):
     )
 
 
-class PlayerCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=24)
-    # v3.20: team is optional. Keeping these fields preserves older cached clients.
-    family_code: Optional[str] = Field(default=None, max_length=24)
-    password: Optional[str] = Field(default=None, min_length=8, max_length=128)
-    league_pin: Optional[str] = Field(default=None, max_length=32)
-    create_league: bool = False
-    league_name: Optional[str] = Field(default=None, max_length=40)
-
-
-class PlayerLogin(BaseModel):
-    # v3.31.8: accepts either the historical display name or a verified email.
-    name: str = Field(min_length=1, max_length=254)
-    # New accounts log in with name + password. Team remains an optional
-    # disambiguator for legacy duplicate names.
-    family_code: Optional[str] = Field(default=None, max_length=24)
-    password: str = Field(min_length=8, max_length=128)
-
-
-class PasswordSet(BaseModel):
-    password: str = Field(min_length=8, max_length=128)
-
-
-class AvatarSet(BaseModel):
-    avatar: Optional[str] = Field(default=None, min_length=1, max_length=16)
-    use_google_avatar: bool = False
-
-
-class SupportModeSet(BaseModel):
-    support_mode: str
-
-
-class HelperEventCreate(BaseModel):
-    attempt_id: str = Field(min_length=8, max_length=80)
-    puzzle_id: str
-    challenge_key: str
-    event_type: str
-    support_mode: str = Field(default="none", max_length=32)
-    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
-    idle_ms: int = Field(default=0, ge=0, le=86_400_000)
-    found_words: int = Field(default=0, ge=0, le=99)
-    total_words: int = Field(default=0, ge=0, le=99)
-
-
-class HintEventCreate(BaseModel):
-    attempt_id: str = Field(min_length=8, max_length=80)
-    puzzle_id: str
-    challenge_key: str
-    hint_level: int = Field(ge=1, le=3)
-    source: str = Field(default="manual", max_length=24)
-    support_mode: str = Field(default="none", max_length=32)
-    complimentary: bool = False
-    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
-    found_words: int = Field(default=0, ge=0, le=99)
-    total_words: int = Field(default=0, ge=0, le=99)
-
-
-class ProductEventCreate(BaseModel):
-    event_type: str = Field(min_length=2, max_length=40)
-
-
-class TeamPinSet(BaseModel):
-    pin: str = Field(min_length=4, max_length=32)
-
-
-class TeamMembershipSet(BaseModel):
-    mode: str = Field(pattern="^(join|new)$")
-    family_code: Optional[str] = Field(default=None, max_length=24)
-    league_pin: str = Field(min_length=4, max_length=32)
-    league_name: Optional[str] = Field(default=None, max_length=40)
-
-
-class ResultCreate(BaseModel):
-    puzzle_id: str
-    challenge_key: str
-    mode: str
-    difficulty: str
-    elapsed_ms: int = Field(ge=1000, le=86_400_000)
-    moves: int = Field(ge=1, le=10000)
-    daily_date: Optional[str] = None
-    hints_used: int = Field(default=0, ge=0, le=99)
-    wrong_attempts: int = Field(default=0, ge=0, le=999)
-    max_hint_level: int = Field(default=0, ge=0, le=3)
-    attempt_id: Optional[str] = Field(default=None, min_length=8, max_length=80)
-    # Conservative default keeps older cached clients from being falsely marked as Clean.
-    clean_solve: bool = False
-    # Client timestamp lets delayed/offline sync preserve the actual first completion.
-    completed_at: Optional[str] = Field(default=None, max_length=40)
-    # Klidny rezim keeps XP/progress but is excluded from competitive standings.
-    calm_mode: bool = False
-
-
-class AttemptStart(BaseModel):
-    attempt_id: str = Field(min_length=8, max_length=80)
-    puzzle_id: str
-    challenge_key: str
-    mode: str
-    difficulty: str
-    calm_mode: bool = False
-
-
-class AttemptCheckpoint(BaseModel):
-    attempt_id: str = Field(min_length=8, max_length=80)
-    event_type: str
-    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
-    found_words: int = Field(default=0, ge=0, le=99)
-    calm_mode: Optional[bool] = None
-
-
-class AttemptFinishTelemetry(BaseModel):
-    attempt_id: str = Field(min_length=8, max_length=80)
-    puzzle_id: str
-    challenge_key: str
-    mode: str
-    difficulty: str
-    elapsed_ms: int = Field(ge=1000, le=86_400_000)
-    moves: int = Field(ge=1, le=10000)
-    hints_used: int = Field(default=0, ge=0, le=99)
-    wrong_attempts: int = Field(default=0, ge=0, le=999)
-    max_hint_level: int = Field(default=0, ge=0, le=3)
-    clean_solve: bool = False
-    completed_at: Optional[str] = Field(default=None, max_length=40)
-    calm_mode: bool = False
-
-
-class AnonymousClaim(BaseModel):
-    anonymous_id: str = Field(min_length=16, max_length=100)
-
-
-class FeedbackCreate(BaseModel):
-    puzzle_id: str
-    challenge_key: str
-    kind: str
-    rating: Optional[int] = Field(default=None, ge=-1, le=1)
-    word: Optional[str] = Field(default=None, max_length=80)
-    note: Optional[str] = Field(default=None, max_length=300)
-
-
-class SupportReportCreate(BaseModel):
-    category: str = Field(pattern="^(bug|account|privacy|idea|other)$")
-    message: str = Field(min_length=3, max_length=1200)
-    reply_to: Optional[str] = Field(default=None, max_length=160)
-    page: Optional[str] = Field(default=None, max_length=120)
-
-
-class SupportReportUpdate(BaseModel):
-    status: str = Field(pattern="^(new|reviewing|resolved|dismissed)$")
-    resolution_note: Optional[str] = Field(default=None, max_length=500)
-
-
-class ClientErrorCreate(BaseModel):
-    code: str = Field(default="client_error", min_length=2, max_length=80)
-    message: Optional[str] = Field(default=None, max_length=240)
-    route: Optional[str] = Field(default=None, max_length=120)
-
-
-class AccountDeleteConfirm(BaseModel):
-    confirmation: str = Field(min_length=4, max_length=20)
-    password: Optional[str] = Field(default=None, max_length=128)
-
-
-class AdminReportUpdate(BaseModel):
-    status: str = Field(min_length=3, max_length=20)
-    resolution_note: Optional[str] = Field(default=None, max_length=500)
-
-
-class RescueFinish(BaseModel):
-    puzzle_id: str
-    completed: bool
-    elapsed_ms: int = Field(ge=0, le=120_000)
-
-
-class PushSubscriptionCreate(BaseModel):
-    endpoint: str = Field(min_length=20, max_length=2048)
-    p256dh: str = Field(min_length=20, max_length=512)
-    auth: str = Field(min_length=8, max_length=256)
-    user_agent: Optional[str] = Field(default=None, max_length=300)
-    # None means an older client: preserve the historical Daily-only semantics.
-    daily_enabled: Optional[bool] = None
-    content_enabled: Optional[bool] = None
-
-
-class PushUnsubscribe(BaseModel):
-    endpoint: str = Field(min_length=20, max_length=2048)
-
-
-class FamilyLeagueSettings(BaseModel):
-    enabled: bool
-    public_name: Optional[str] = Field(default=None, min_length=2, max_length=40)
-    league_pin: Optional[str] = Field(default=None, max_length=32)  # backward compatibility with v3.8.1 clients
-
-
-class PublicRankingsSet(BaseModel):
-    enabled: bool
-
-
 def supabase_ready() -> bool:
-    return bool(SUPABASE_URL and SUPABASE_SECRET_KEY)
+    return backend_db.supabase_ready(SUPABASE_URL, SUPABASE_SECRET_KEY)
 
 
 def _supabase_headers() -> dict[str, str]:
-    """Build server-only Supabase headers for both current and legacy keys.
-
-    Opaque ``sb_secret_*`` keys must stay in ``apikey``; they are not JWTs.  A
-    legacy service-role JWT, on the other hand, should also be sent as Bearer so
-    PostgREST consistently assumes ``service_role`` for protected RPC calls.
-    """
-    headers = {
-        "apikey": SUPABASE_SECRET_KEY,
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    if SUPABASE_SECRET_KEY.count(".") == 2 and SUPABASE_SECRET_KEY.startswith("eyJ"):
-        headers["Authorization"] = f"Bearer {SUPABASE_SECRET_KEY}"
-    return headers
+    return backend_db.supabase_headers(SUPABASE_SECRET_KEY)
 
 
 def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
-    if not supabase_ready():
-        raise HTTPException(503, "Supabase ještě není připojený")
-    headers = _supabase_headers()
-    if prefer:
-        headers["Prefer"] = prefer
-    url = f"{SUPABASE_URL}/rest/v1/{table}"
-    try:
-        r = DB_HTTP_CLIENT.request(method, url, params=params, json=body, headers=headers)
-    except httpx.HTTPError as exc:
-        raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
-    if r.status_code >= 400:
-        internal_detail = "database error"
-        try:
-            payload = r.json()
-            internal_detail = payload.get("message") or payload.get("hint") or internal_detail
-        except Exception:
-            pass
-        logger.warning("Supabase request failed method=%s table=%s status=%s detail=%s", method, table, r.status_code, str(internal_detail)[:300])
-        if r.status_code == 409:
-            raise HTTPException(409, "Konflikt při ukládání dat")
-        if r.status_code >= 500:
-            raise HTTPException(503, "Databáze je momentálně nedostupná")
-        raise HTTPException(400, "Data se nepodařilo zpracovat")
-    if not r.content:
-        return []
-    return r.json()
+    return backend_db.db_request(
+        method,
+        table,
+        params=params,
+        body=body,
+        prefer=prefer,
+        supabase_url=SUPABASE_URL,
+        supabase_secret_key=SUPABASE_SECRET_KEY,
+        http_client=DB_HTTP_CLIENT,
+    )
 
 
 def db_select(table: str, **filters):
-    params = {"select": "*"}
-    for key, value in filters.items():
-        if value is not None:
-            params[key] = f"eq.{value}"
-    return db_request("GET", table, params=params)
+    return backend_db.db_select(table, db_request, **filters)
 
 
 def db_select_all(table: str, **filters):
-    """Read complete analytics/admin datasets past PostgREST's 1,000-row page."""
-    rows: list[dict] = []
-    page_size = 1000
-    offset = 0
-    while True:
-        params = {"select": "*", "limit": str(page_size), "offset": str(offset)}
-        for key, value in filters.items():
-            if value is not None:
-                params[key] = f"eq.{value}"
-        page = db_request("GET", table, params=params)
-        rows.extend(page)
-        if len(page) < page_size:
-            return rows
-        offset += page_size
+    return backend_db.db_select_all(table, db_request, **filters)
 
 
 def db_insert(table: str, row: dict):
-    rows = db_request("POST", table, body=row, prefer="return=representation")
-    return rows[0] if rows else row
+    return backend_db.db_insert(table, row, db_request)
 
 
 def db_upsert_push_subscription(row: dict):
-    """Atomically create or refresh one browser endpoint without changing its id."""
-    result = db_rpc("proplet_upsert_push_subscription", {
-        "p_endpoint": row["endpoint"],
-        "p_player_id": row.get("player_id"),
-        "p_anonymous_id": row.get("anonymous_id"),
-        "p_p256dh": row["p256dh"],
-        "p_auth": row["auth"],
-        "p_user_agent": row.get("user_agent"),
-        "p_daily_enabled": bool(row.get("daily_enabled", True)),
-        "p_content_enabled": bool(row.get("content_enabled", True)),
-    })
-    if isinstance(result, list) and result:
-        return result[0]
-    if isinstance(result, dict):
-        return result
-    raise HTTPException(503, "Registraci upozornění se nepodařilo potvrdit")
+    return backend_db.db_upsert_push_subscription(row, db_rpc)
 
 
 def db_update(table: str, filters: dict, values: dict):
-    params = {key: f"eq.{value}" for key, value in filters.items()}
-    return db_request("PATCH", table, params=params, body=values, prefer="return=representation")
+    return backend_db.db_update(table, filters, values, db_request)
 
 
 def db_delete(table: str, **filters):
-    params = {key: f"eq.{value}" for key, value in filters.items() if value is not None}
-    return db_request("DELETE", table, params=params, prefer="return=representation")
+    return backend_db.db_delete(table, db_request, **filters)
 
 
 def xp_economy_migrated() -> bool:
-    """True when every positive Free reward uses the current XP economy.
-
-    Zero-point rows are intentional: they represent a Gen1/Gen2 slot that was already
-    rewarded elsewhere. One Gen4 result may also carry the 500 XP returning-player
-    bonus. Ordering mismatches descending distinguishes those valid values from stale
-    or invalid positive rewards with one cheap PostgREST probe per difficulty.
-    """
     targets = {key: value for key, value in POINTS.items() if key != "daily"}
-    for table in ("results", "free_slot_rewards"):
-        for difficulty, target in targets.items():
-            params = {
-                "select": "id,points",
-                "difficulty": f"eq.{difficulty}",
-                "points": (
-                    f"not.in.({target},{target + GEN4_RETURNING_BONUS_XP})"
-                    if table == "results"
-                    else f"neq.{target}"
-                ),
-                "order": "points.desc",
-                "limit": "1",
-            }
-            if table == "results":
-                params["mode"] = "eq.free"
-            rows = db_request("GET", table, params=params)
-            if rows and int(rows[0].get("points") or 0) > 0:
-                return False
-    return True
+    return backend_db.xp_economy_migrated(
+        targets,
+        GEN4_RETURNING_BONUS_XP,
+        db_request,
+    )
 
 
 def db_rpc(function: str, body: Optional[dict] = None):
-    if not supabase_ready():
-        raise HTTPException(503, "Supabase ještě není připojený")
-    headers = _supabase_headers()
-    url = f"{SUPABASE_URL}/rest/v1/rpc/{function}"
-    try:
-        r = DB_HTTP_CLIENT.post(url, json=body or {}, headers=headers)
-    except httpx.HTTPError as exc:
-        raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
-    if r.status_code == 401:
-        # Supabase can transiently reject a newly propagated/rotated secret on one
-        # gateway node. A 401 is returned before PostgREST executes the function, so
-        # one fresh-connection retry cannot duplicate the RPC side effect.
-        logger.warning("Supabase RPC auth retry function=%s status=401", function)
-        retry_headers = {**headers, "Connection": "close"}
-        try:
-            with httpx.Client(timeout=12.0) as retry_client:
-                r = retry_client.post(url, json=body or {}, headers=retry_headers)
-        except httpx.HTTPError as exc:
-            raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
-    if r.status_code >= 400:
-        logger.warning("Supabase RPC failed function=%s status=%s", function, r.status_code)
-        raise HTTPException(503 if r.status_code >= 500 else 400, "Bezpečnostní služba databáze není připravená")
-    if not r.content:
-        return None
-    return r.json()
+    return backend_db.db_rpc(
+        function,
+        body,
+        supabase_url=SUPABASE_URL,
+        supabase_secret_key=SUPABASE_SECRET_KEY,
+        http_client=DB_HTTP_CLIENT,
+        httpx_client_factory=httpx.Client,
+    )
 
 
 def _client_network_id(request: Request) -> str:

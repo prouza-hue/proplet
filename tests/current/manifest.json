@@ -21,6 +21,7 @@
       {"path": "tools/test_tajenka_push_runtime.py", "runner": "python"},
       {"path": "tools/test_word_discovery_xp.py", "runner": "python"},
       {"path": "tools/test_v40135_profile_wide_layout.py", "runner": "python"},
+      {"path": "tests/current/test_s04_backend_foundation.py", "runner": "python"},
       {"path": "tests/current/test_result_queue.js", "runner": "node"},
       {"path": "tests/current/test_sw_lifecycle.js", "runner": "node"},
       {"path": "tests/current/test_sw_update_handshake.js", "runner": "node"},
