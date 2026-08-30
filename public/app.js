@@ -244,6 +244,7 @@ let tutorialState={dragging:false,path:[],done:false};
 let onboardingTutorialTracked=false;
 let onboardingSupportTracked=false;
 let pendingSW=null;
+let serviceWorkerFirstInstallMessagePending=false;
 let canonicalUpdateTarget=null;
 let runtimeRecoveryBusy=false;
 let releaseProbeBusy=false;
@@ -273,6 +274,7 @@ let teamMembershipMode='join';
 let levelDetailContext=null;
 let pushUiBusy=false;
 let gameWakeLock=null;
+let resultQueueController=null;
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
 function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}}
@@ -292,6 +294,14 @@ function localSupportMode(){try{const mode=localStorage.getItem(SUPPORT_MODE_KEY
 function rememberSupportMode(mode){if(validSupportMode(mode))try{localStorage.setItem(SUPPORT_MODE_KEY,mode)}catch{}}
 function getQueue(){try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY))||'[]')}catch{return []}}
 function saveQueue(q){localStorage.setItem(scopedStorageKey(QUEUE_KEY),JSON.stringify(q))}
+function queuedResultPayload(r){return {puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null}}
+function resultQueue(){
+ if(resultQueueController)return resultQueueController;
+ const factory=window.PropletResultQueue;
+ if(!factory?.create)return null;
+ resultQueueController=factory.create({getQueue,saveQueue,post:r=>api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r))}),quarantine:quarantineRejectedResult});
+ return resultQueueController;
+}
 function quarantineRejectedResult(row,reason){
  try{
   const key=scopedStorageKey(REJECTED_QUEUE_KEY),parsed=JSON.parse(localStorage.getItem(key)||'[]'),old=Array.isArray(parsed)?parsed:[],id=row?.attemptId||`${row?.challengeKey||''}:${row?.completedAt||''}`;
@@ -965,6 +975,7 @@ function replayDailyFromWin(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#wi
 function queueResult(rec){
  if(GEN4_CANDIDATE_PREVIEW||isMozkomorQaDifficulty(rec?.difficulty))return;
  if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return;
+ const controller=resultQueue();if(controller){controller.enqueue(rec);renderDaily();return}
  const q=getQueue();if(rec.mode==='daily'){const i=q.findIndex(x=>x.challengeKey===rec.challengeKey);if(i<0)q.push(rec);else if(q[i].puzzleId!==rec.puzzleId)q[i]=rec}else{const id=rec.attemptId||`${rec.challengeKey}:${rec.completedAt}`;if(!q.some(x=>(x.attemptId||`${x.challengeKey}:${x.completedAt}`)===id))q.push(rec)}saveQueue(q);renderDaily();
 }
 async function api(path,opts={}){
@@ -986,6 +997,13 @@ function trackAppSession(){
 async function syncQueue({announce=false}={}){
  if(GEN4_CANDIDATE_PREVIEW){syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
+ const controller=resultQueue();if(controller&&controller.getQueue().length){
+  syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
+  const result=await controller.sync();
+  try{await refreshRemoteProfile({throwOnError:result.left===0})}catch(e){if(!result.error)result.error=e.message}
+  if(result.left){syncState={status:'error',error:result.error||'Některé výsledky zůstaly ve frontě',lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace selhala: ${syncState.error}`)}else{syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast(result.quarantined?`Synchronizace opravena · ${countCz(result.quarantined,'zastaralý záznam','zastaralé záznamy','zastaralých záznamů')} bezpečně odložen ✓`:result.sent?`Synchronizováno ${countCz(result.sent,'výsledek','výsledky','výsledků')} ✓`:'Všechno je synchronizované ✓')}
+  renderProfile();renderDaily();if(currentScreen==='leaderboard'&&!result.left)renderLeaderboard();return {...result,failedKeys:result.failedKeys||[]};
+ }
  const q=getQueue();syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
  if(!q.length){try{await refreshRemoteProfile({throwOnError:true});syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast('Všechno je synchronizované ✓');renderProfile();renderDaily();if(currentScreen==='leaderboard')renderLeaderboard();return {ok:true,left:0}}catch(e){syncState={status:'error',error:e.message,lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace: ${e.message}`);renderProfile();renderDaily();return {ok:false,left:0,error:e.message}}}
  const left=[];let firstError=null,sent=0,quarantined=0;
@@ -1389,10 +1407,15 @@ async function probeCanonicalRelease(force=false){
    try{const key=`proplet-update-detected-${canonicalVersion}`;if(sessionStorage.getItem(key)!=='1'){sessionStorage.setItem(key,'1');trackProductEvent('pwa_update_detected')}}catch{}
    if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>recoverRuntimeUpdate({automatic:true,targetVersion:canonicalVersion}),1200);
   }
- }catch{}finally{releaseProbeBusy=false}
+}catch{}finally{releaseProbeBusy=false}
+}
+function consumeServiceWorkerUpdateMessage(){
+ if(serviceWorkerFirstInstallMessagePending&&!pendingSW&&!runtimeUpdateRequired){serviceWorkerFirstInstallMessagePending=false;return false}
+ serviceWorkerFirstInstallMessagePending=false;return true;
 }
 function registerServiceWorker(){
  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
+ serviceWorkerFirstInstallMessagePending=!navigator.serviceWorker.controller;
  navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
   if(reg.waiting)showUpdateBanner(reg.waiting);
   reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)showUpdateBanner(w)})});
@@ -1403,6 +1426,7 @@ function registerServiceWorker(){
   window.addEventListener('online',()=>{probeCanonicalRelease(true);checkForUpdate()});
   setInterval(checkForUpdate,5*60*1000);
  }).catch(()=>{});
+ navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='PROPLET_SW_UPDATED'||!consumeServiceWorkerUpdateMessage())return;navigator.serviceWorker.getRegistration().then(reg=>showUpdateBanner(reg?.waiting||null)).catch(()=>showUpdateBanner(null))});
  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloadOnServiceWorkerChange||reloading)return;reloading=true;location.reload()});
 }
 

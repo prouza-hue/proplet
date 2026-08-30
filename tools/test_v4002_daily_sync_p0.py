@@ -44,7 +44,8 @@ assert PUBLIC["dailyRotationBaseDate"] == "2026-08-24"
 assert "dailyGeneration4From" in APP
 assert "failedKeys" in APP
 assert "applyPendingUpdate" in APP
-assert "client.navigate(client.url)" in SW
+assert "client.navigate(client.url)" not in SW
+assert "PROPLET_SW_UPDATED" in SW
 assert "await Promise.all(clients.map(client=>client.navigate" not in SW
 
 print("Proplet v4.00.6 Daily sync P0 contract: OK")
