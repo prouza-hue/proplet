@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "xp": [
+    {"mode": "daily", "difficulty": "easy", "expected": 100},
+    {"mode": "free", "difficulty": "easy", "puzzleId": "easy-1", "expected": 15},
+    {"mode": "free", "difficulty": "hardcore", "puzzleId": "hardcore-1", "expected": 100},
+    {"mode": "free", "difficulty": "mozkomor", "puzzleId": "mozkomor-1", "expected": 150},
+    {"mode": "starter", "difficulty": "easy", "puzzleId": "starter-1", "expected": 10},
+    {"mode": "starter", "difficulty": "easy", "puzzleId": "starter-2", "rewardXp": 12, "expected": 12},
+    {"mode": "tajenka", "difficulty": "medium", "puzzleId": "tajenka-1", "rewardXp": 200, "expected": 200}
+  ],
+  "challengeKeys": [
+    {"mode": "daily", "puzzleId": "d4-1", "dailyDate": "2026-08-30", "expected": "daily:2026-08-30"},
+    {"mode": "free", "puzzleId": "easy-1", "expected": "free:easy-1"},
+    {"mode": "starter", "puzzleId": "starter-1", "expected": "starter:starter-1"},
+    {"mode": "tajenka", "puzzleId": "tajenka-1", "expected": "tajenka:tajenka-1"}
+  ],
+  "streak": [
+    {"today": "2026-08-30", "dates": ["2026-08-30", "2026-08-29", "2026-08-27"], "current": 2, "longest": 2},
+    {"today": "2026-08-30", "dates": ["2026-08-29", "2026-08-28", "2026-08-26"], "current": 2, "longest": 2},
+    {"today": "2026-08-30", "dates": ["2026-08-28", "2026-08-27", "2026-08-25"], "current": 0, "longest": 2},
+    {"today": "2026-08-30", "dates": [], "current": 0, "longest": 0}
+  ],
+  "unlock": [
+    {"rows": [], "baseCurrentHardcore": 199, "expected": false},
+    {"rows": [], "baseCurrentHardcore": 200, "expected": true},
+    {"rows": [{"mode": "free", "difficulty": "mozkomor"}], "baseCurrentHardcore": 0, "expected": true}
+  ],
+  "rank": [
+    {"serverRow": {"clean_solve": true, "hints_used": 0, "elapsed_ms": 12000, "moves": 8}, "clientRow": {"cleanSolve": true, "hintsUsed": 0, "elapsedMs": 12000, "moves": 8}, "expected": [0, 0, 12, 8]},
+    {"serverRow": {"clean_solve": true, "hints_used": 0, "elapsed_ms": 12999, "moves": 8}, "clientRow": {"cleanSolve": true, "hintsUsed": 0, "elapsedMs": 12999, "moves": 8}, "expected": [0, 0, 12, 8]},
+    {"serverRow": {"clean_solve": false, "hints_used": 0, "elapsed_ms": 8000, "moves": 3}, "clientRow": {"cleanSolve": false, "hintsUsed": 0, "elapsedMs": 8000, "moves": 3}, "expected": [1, 0, 8, 3]},
+    {"serverRow": {"clean_solve": false, "hints_used": 1, "elapsed_ms": 8000, "moves": 3}, "clientRow": {"cleanSolve": false, "hintsUsed": 1, "elapsedMs": 8000, "moves": 3}, "expected": [1, 1, 8, 3]}
+  ],
+  "daily": [
+    {
+      "data": {
+        "dailyGeneration": 4,
+        "dailyGeneration4From": "2026-08-31",
+        "dailyRotationBaseDate": "2026-08-31",
+        "daily": [
+          {"id": "d4-1", "meta": {"contentGeneration": 4}},
+          {"id": "d4-2", "meta": {"contentGeneration": 4}},
+          {"id": "d3-2", "meta": {"contentGeneration": 3}}
+        ],
+        "archive": {"dailyWindows": [{"generation": 3, "activeFrom": "2026-01-01", "activeUntil": "2026-08-30", "rotationBaseDate": "2026-01-01", "puzzleIds": ["d3-1", "d3-2"]}]}
+      },
+      "date": "2026-08-30",
+      "expected": "d3-2"
+    },
+    {
+      "data": {
+        "dailyGeneration": 4,
+        "dailyGeneration4From": "2026-08-31",
+        "dailyRotationBaseDate": "2026-08-31",
+        "daily": [
+          {"id": "d4-1", "meta": {"contentGeneration": 4}},
+          {"id": "d4-2", "meta": {"contentGeneration": 4}},
+          {"id": "d3-2", "meta": {"contentGeneration": 3}}
+        ],
+        "archive": {"dailyWindows": []}
+      },
+      "date": "2026-09-01",
+      "expected": "d4-2"
+    },
+    {
+      "data": {"dailyGeneration": 3, "dailyGeneration3From": "2026-08-17", "dailyRotationBaseDate": "2026-08-17", "daily": [{"id": "d3-1"}, {"id": "d3-2"}]},
+      "date": "2026-08-18",
+      "expected": "d3-2"
+    }
+  ],
+  "freeSelection": {
+    "data": {
+      "freeGeneration": 4,
+      "free": {"easy": [{"id": "easy-1", "meta": {"level": 1, "contentGeneration": 4}}]},
+      "legacyFree": {"easy": [{"id": "old-1", "meta": {"level": 1, "contentGeneration": 1}}]},
+      "legacyFreeIndex": {"old-indexed": {"difficulty": "easy", "level": 7, "generation": 2, "lineageConfidence": "slot-exact"}}
+    },
+    "rolling": {"releaseEnabled": true, "puzzles": {}},
+    "cases": [
+      {"id": "easy-1", "expected": {"difficulty": "easy", "level": 1, "generation": 4, "legacy": false}},
+      {"id": "old-1", "expected": {"difficulty": "easy", "level": 1, "generation": 1, "legacy": true}},
+      {"id": "old-indexed", "expected": {"difficulty": "easy", "level": 7, "generation": 2, "legacy": true}},
+      {"id": "missing", "expected": null}
+    ]
+  },
+  "release": [
+    {"availableFrom": null, "asOf": "2026-08-30", "expected": true},
+    {"availableFrom": "2026-08-30", "asOf": "2026-08-30", "expected": true},
+    {"availableFrom": "2026-08-31", "asOf": "2026-08-30", "expected": false}
+  ],
+  "contentSources": {"serverDailyCount": 365, "publicDailyCount": 366}
+}

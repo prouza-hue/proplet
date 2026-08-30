@@ -12,6 +12,7 @@ STYLES = ROOT / "public" / "styles.css"
 GAME_LAYOUT = ROOT / "public" / "game-layout-v3323.css"
 SERVER = ROOT / "server.py"
 BACKEND_CONFIG = ROOT / "backend" / "config.py"
+BACKEND_CONTENT = ROOT / "backend" / "content.py"
 PUSH = ROOT / "push_diagnostics_v3329.py"
 RUNTIME = ROOT / "public" / "runtime-meta.js"
 SW = ROOT / "public" / "sw.js"
@@ -177,6 +178,7 @@ def main() -> None:
     game_layout = GAME_LAYOUT.read_text(encoding="utf-8")
     server = SERVER.read_text(encoding="utf-8")
     backend_config = BACKEND_CONFIG.read_text(encoding="utf-8")
+    backend_content = BACKEND_CONTENT.read_text(encoding="utf-8")
     push = PUSH.read_text(encoding="utf-8")
     runtime = RUNTIME.read_text(encoding="utf-8")
     sw = SW.read_text(encoding="utf-8")
@@ -217,7 +219,8 @@ def main() -> None:
 
     assert "TAJENKA_REWARD_XP = 200" in server
     assert 'payload.mode not in ("daily", "free", "starter", "tajenka")' in server
-    assert 'payload.challenge_key != f"tajenka:{payload.puzzle_id}"' in server
+    assert 'payload.challenge_key != domain_content.challenge_key("tajenka", payload.puzzle_id)' in server
+    assert 'return f"tajenka:{puzzle_id}"' in backend_content
     assert 'tajenka_bank_path=data_root / "tajenka_weekend_v1.json"' in backend_config
     assert '@app.get("/api/tajenka")' in server
     assert 'headers={"Cache-Control": "private, no-store"}' in server

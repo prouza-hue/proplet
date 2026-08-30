@@ -19,6 +19,7 @@ from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from content_archive import archived_puzzle_info, daily_window_id, daily_window_puzzle_id, load_catalog
+from backend import content as domain_content
 from backend import db as backend_db
 from backend.config import (
     APP_VERSION,
@@ -533,37 +534,11 @@ def current_prague_date() -> date:
 
 
 def streaks(dates: list[str]) -> tuple[int, int]:
-    vals = sorted({date.fromisoformat(str(d)) for d in dates if d}, reverse=True)
-    if not vals:
-        return 0, 0
-    s = set(vals)
-    today = current_prague_date()
-    anchor = today if today in s else (today - timedelta(days=1) if today - timedelta(days=1) in s else None)
-    current = 0
-    if anchor:
-        d = anchor
-        while d in s:
-            current += 1
-            d -= timedelta(days=1)
-    longest = 0
-    for d in vals:
-        n = 0
-        x = d
-        while x in s:
-            n += 1
-            x -= timedelta(days=1)
-        longest = max(longest, n)
-    return current, longest
+    return domain_content.streaks(dates, current_prague_date())
 
 
 def streak_ending_on(date_strings: list[str] | set[str], anchor: date) -> int:
-    vals = set(str(x)[:10] for x in date_strings if x)
-    n = 0
-    d = anchor
-    while d.isoformat() in vals:
-        n += 1
-        d -= timedelta(days=1)
-    return n
+    return domain_content.streak_ending_on(date_strings, anchor)
 
 
 def rescue_rows(player_id: str) -> list[dict]:
@@ -795,12 +770,7 @@ def rolling_content_release_enabled() -> bool:
 
 
 def _parse_content_date(value: Optional[str]) -> Optional[date]:
-    if not value:
-        return None
-    try:
-        return date.fromisoformat(str(value)[:10])
-    except ValueError:
-        return None
+    return domain_content.parse_content_date(value)
 
 
 def effective_content_date(request: Optional[Request] = None, requested: Optional[str] = None) -> date:
@@ -815,21 +785,17 @@ def effective_content_date(request: Optional[Request] = None, requested: Optiona
 
 
 def puzzle_release_date(puzzle: dict) -> Optional[date]:
-    return _parse_content_date((puzzle.get("meta") or {}).get("availableFrom"))
+    return domain_content.parse_content_date((puzzle.get("meta") or {}).get("availableFrom"))
 
 
 def is_puzzle_released(puzzle: dict, as_of: Optional[date] = None) -> bool:
-    released = puzzle_release_date(puzzle)
-    return released is None or released <= (as_of or current_prague_date())
+    return domain_content.is_puzzle_released(puzzle, as_of or current_prague_date())
 
 
 def released_free_bank(difficulty: str, as_of: Optional[date] = None) -> list[dict]:
-    base = list(load_puzzles().get("free", {}).get(difficulty, []))
-    rolling = load_rolling_content()
-    extras = [] if not rolling_content_release_enabled() else [
-        p for p in rolling.get("puzzles", {}).get(difficulty, []) if is_puzzle_released(p, as_of)
-    ]
-    return base + extras
+    return domain_content.released_free_bank(
+        load_puzzles(), load_rolling_content(), difficulty, as_of or current_prague_date(),
+    )
 
 
 def _released_batches(as_of: date) -> tuple[list[dict], Optional[str]]:
@@ -907,55 +873,9 @@ def push_open_tracking_schema_ready() -> bool:
 
 def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Optional[dict]:
     """Resolve a Free puzzle to its generation and stable difficulty/level slot."""
-    data = load_puzzles()
-    difficulties = (difficulty,) if difficulty in FREE_DIFFICULTIES else FREE_DIFFICULTIES
-    for diff in difficulties:
-        for index, puzzle in enumerate(data.get("free", {}).get(diff, []), start=1):
-            if puzzle.get("id") == puzzle_id:
-                meta = puzzle.get("meta") or {}
-                return {
-                    "puzzle": puzzle, "difficulty": diff, "mode": "free",
-                    "level": int(meta.get("level") or index),
-                    "generation": int(meta.get("contentGeneration") or data.get("freeGeneration") or 1),
-                    "legacy": False,
-                }
-    reserve = load_rolling_content()
-    for diff in difficulties:
-        for puzzle in reserve.get("puzzles", {}).get(diff, []):
-            if puzzle.get("id") == puzzle_id:
-                meta = puzzle.get("meta") or {}
-                return {
-                    "puzzle": puzzle, "difficulty": diff, "mode": "free",
-                    "level": int(meta.get("level") or 0),
-                    "generation": int(meta.get("contentGeneration") or data.get("freeGeneration") or 1),
-                    "legacy": False, "rolling": True,
-                }
-    # Newest archived bank is appended last. This is the best possible mapping for
-    # a handful of IDs that had already been reused before Gen2 introduced unique IDs.
-    for diff in difficulties:
-        bank = data.get("legacyFree", {}).get(diff, [])
-        for index in range(len(bank) - 1, -1, -1):
-            puzzle = bank[index]
-            if puzzle.get("id") == puzzle_id:
-                meta = puzzle.get("meta") or {}
-                return {
-                    "puzzle": puzzle, "difficulty": diff, "mode": "free",
-                    "level": int(meta.get("level") or index + 1),
-                    "generation": int(meta.get("contentGeneration") or 1),
-                    "legacy": True,
-                }
-    indexed = (data.get("legacyFreeIndex") or {}).get(puzzle_id)
-    if indexed and (difficulty is None or indexed.get("difficulty") == difficulty):
-        return {
-            "puzzle": None,
-            "difficulty": indexed.get("difficulty"),
-            "mode": "free",
-            "level": int(indexed.get("level") or 0),
-            "generation": int(indexed.get("generation") or 1),
-            "legacy": True,
-            "lineageConfidence": indexed.get("lineageConfidence") or "slot-exact",
-        }
-    return None
+    return domain_content.free_puzzle_info(
+        load_puzzles(), load_rolling_content(), puzzle_id, FREE_DIFFICULTIES, difficulty,
+    )
 
 
 def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
@@ -988,10 +908,10 @@ def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
 
 def mozkomor_unlocked_from_rows(rows: list[dict], slots: Optional[dict] = None) -> bool:
     """Unlock after all 200 base Gen4 Mozkožrout slots; rolling levels never count."""
-    if any(r.get("mode") == "free" and r.get("difficulty") == "mozkomor" for r in rows):
+    if any(row.get("mode") == "free" and row.get("difficulty") == "mozkomor" for row in rows):
         return True
     summary = slots or free_slot_summary(rows)
-    return int((summary.get("baseCurrent") or {}).get("hardcore") or 0) >= MOZKOMOR_UNLOCK_BASE_LEVELS
+    return domain_content.mozkomor_unlocked_from_rows(rows, summary, MOZKOMOR_UNLOCK_BASE_LEVELS)
 
 
 def enforce_mozkomor_unlock(rows: list[dict], slots: Optional[dict] = None) -> None:
@@ -1110,105 +1030,44 @@ def claim_free_slot_points(player_id: str, info: dict, points: int, puzzle_id: s
 
 
 def daily_rotation_index(daily_date: str, bank_size: int, base_date: str = "2026-01-01") -> int:
-    if bank_size <= 0:
-        raise HTTPException(503, "Daily banka je prázdná")
     try:
-        d = date.fromisoformat(daily_date)
-        base = date.fromisoformat(base_date)
-    except ValueError:
-        raise HTTPException(400, "Neplatné datum")
-    return (d - base).days % bank_size
+        return domain_content.daily_rotation_index(daily_date, bank_size, base_date)
+    except ValueError as exc:
+        status = 503 if "prázdná" in str(exc) else 400
+        raise HTTPException(status, str(exc)) from exc
 
 
 def legacy_daily_banks(data: Optional[dict] = None) -> list[dict]:
-    pdata = data or load_puzzles()
-    return [bank for bank in pdata.get("legacyDaily", []) if bank.get("puzzles")]
+    return domain_content.legacy_daily_banks(data or load_puzzles())
 
 
 def previous_daily_bank(data: Optional[dict] = None) -> Optional[dict]:
-    pdata = data or load_puzzles()
-    bank = pdata.get("previousDaily") or {}
-    return bank if bank.get("puzzles") else None
+    return domain_content.previous_daily_bank(data or load_puzzles())
 
 
 def legacy_daily_bank_by_generation(generation: int, data: Optional[dict] = None) -> Optional[dict]:
-    pdata = data or load_puzzles()
-    return next((bank for bank in legacy_daily_banks(pdata) if int(bank.get("generation") or 0) == int(generation)), None)
+    return domain_content.legacy_daily_bank_by_generation(data or load_puzzles(), generation)
 
 
 def daily_bank_puzzle_id(bank: dict, daily_date: str, fallback_base: str = "2026-01-01") -> str:
-    puzzles = bank.get("puzzles") or []
-    base = str(bank.get("rotationBaseDate") or fallback_base)
-    return puzzles[daily_rotation_index(daily_date, len(puzzles), base)]["id"]
+    try:
+        return domain_content.daily_bank_puzzle_id(bank, daily_date, fallback_base)
+    except ValueError as exc:
+        status = 503 if "prázdná" in str(exc) else 400
+        raise HTTPException(status, str(exc)) from exc
 
 
 def expected_daily_puzzle_id(daily_date: str) -> str:
-    """Return the primary Daily board for a date without rewriting history."""
+    """HTTP-compatible adapter for the pure Daily content contract."""
     data = load_puzzles()
     try:
-        d = date.fromisoformat(daily_date)
-    except ValueError:
-        raise HTTPException(400, "Neplatné datum")
-
-    if int(data.get("dailyGeneration") or 0) == 4:
-        release = data.get("release") or {}
-        switch4_raw = data.get("dailyGeneration4From") or release.get("dailyGeneration4From")
-        try:
-            switch4 = date.fromisoformat(str(switch4_raw)) if switch4_raw else None
-        except ValueError:
-            switch4 = None
-        # The branch preview intentionally exposes the paused candidate. A bound
-        # production release, however, must preserve the historical Daily window
-        # until the explicitly approved cutover date.
-        if switch4 is None and GEN4_CANDIDATE_PREVIEW:
-            bank = data.get("daily", [])
-            base = str(data.get("dailyRotationBaseDate") or "2026-01-01")
-            return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
-        if switch4 is None:
-            raise HTTPException(503, "Generation 4 Daily nemá schválené datum spuštění")
-        if d >= switch4:
-            bank = data.get("daily", [])
-            base = str(data.get("dailyRotationBaseDate") or switch4.isoformat())
-            return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
-        archived_id = daily_window_id(data, daily_date)
-        if archived_id:
-            return archived_id
-        raise HTTPException(503, "Pro datum chybí bezpečně svázané Daily okno")
-
-    switch3_raw = data.get("dailyGeneration3From")
-    try:
-        switch3 = date.fromisoformat(str(switch3_raw)) if switch3_raw else None
-    except ValueError:
-        switch3 = None
-    if switch3 and d >= switch3:
-        bank = data.get("daily", [])
-        base = str(data.get("dailyRotationBaseDate") or switch3.isoformat())
-        return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
-
-    switch2_raw = data.get("dailyGeneration2From")
-    try:
-        switch2 = date.fromisoformat(str(switch2_raw)) if switch2_raw else None
-    except ValueError:
-        switch2 = None
-    if switch2 and d >= switch2:
-        previous = previous_daily_bank(data)
-        if previous and int(previous.get("generation") or 0) == 2:
-            return daily_bank_puzzle_id(previous, daily_date)
-        legacy2 = legacy_daily_bank_by_generation(2, data)
-        if legacy2:
-            return daily_bank_puzzle_id(legacy2, daily_date)
-        if int(data.get("dailyGeneration") or 1) == 2:
-            bank = data.get("daily", [])
-            return bank[daily_rotation_index(daily_date, len(bank))]["id"]
-
-    legacy1 = legacy_daily_bank_by_generation(1, data)
-    if legacy1:
-        return daily_bank_puzzle_id(legacy1, daily_date)
-
-    # Defensive fallback for old/local data snapshots without generation metadata.
-    bank = data.get("daily", [])
-    base = str(data.get("dailyRotationBaseDate") or "2026-01-01")
-    return bank[daily_rotation_index(daily_date, len(bank), base)]["id"]
+        return domain_content.expected_daily_puzzle_id(
+            data, daily_date, candidate_preview=GEN4_CANDIDATE_PREVIEW,
+        )
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(503, str(exc)) from exc
 
 
 def valid_daily_puzzle_ids(daily_date: str) -> set[str]:
@@ -3585,26 +3444,12 @@ def displayed_elapsed_seconds(r: dict) -> int:
 
 
 def run_rank_tuple(r: dict) -> tuple:
-    return (
-        0 if r.get("clean_solve") is True else 1,
-        int(r.get("hints_used") or 0),
-        displayed_elapsed_seconds(r),
-        int(r.get("moves") or r.get("best_moves") or 10**9),
-    )
+    return domain_content.run_rank_tuple(r)
 
 
 def competition_ranks(rows: list[dict]) -> list[int]:
     """Equal player-visible results share a rank (1, 1, 3 competition ranking)."""
-    ranks: list[int] = []
-    previous = None
-    current_rank = 0
-    for position, row in enumerate(rows, 1):
-        visible_result = run_rank_tuple(row)
-        if visible_result != previous:
-            current_rank = position
-            previous = visible_result
-        ranks.append(current_rank)
-    return ranks
+    return domain_content.competition_ranks(rows)
 
 def puzzle_info(puzzle_id: str) -> Optional[dict]:
     free_info = free_puzzle_info(puzzle_id)
@@ -3671,17 +3516,19 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     if payload.mode == "tajenka":
         if not TAJENKA_RELEASE_ENABLED:
             raise HTTPException(404, "Tajenka zatím není vydaná")
-        if payload.challenge_key != f"tajenka:{payload.puzzle_id}":
+        if payload.challenge_key != domain_content.challenge_key("tajenka", payload.puzzle_id):
             raise HTTPException(400, "Neplatný klíč Tajenky")
         if payload.daily_date:
             raise HTTPException(400, "Tajenka nemá daily datum")
-        points = TAJENKA_REWARD_XP
+        points = domain_content.xp_for(
+            "tajenka", payload.difficulty, POINTS, reward_xp=TAJENKA_REWARD_XP,
+        )
     elif payload.mode == "starter":
-        if payload.challenge_key != f"starter:{payload.puzzle_id}":
+        if payload.challenge_key != domain_content.challenge_key("starter", payload.puzzle_id):
             raise HTTPException(400, "Neplatný klíč první úlohy")
         if payload.daily_date:
             raise HTTPException(400, "První úloha nemá datum")
-        points = STARTER_XP
+        points = domain_content.xp_for("starter", payload.difficulty, POINTS, starter_xp=STARTER_XP)
     elif payload.mode == "daily":
         if not payload.daily_date:
             raise HTTPException(400, "Daily výsledek musí mít datum")
@@ -3689,13 +3536,13 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             date.fromisoformat(payload.daily_date)
         except ValueError:
             raise HTTPException(400, "Neplatné datum")
-        if payload.challenge_key != f"daily:{payload.daily_date}":
+        if payload.challenge_key != domain_content.challenge_key("daily", payload.puzzle_id, payload.daily_date):
             raise HTTPException(400, "Neplatný daily klíč")
         if not daily_puzzle_matches_date(payload.puzzle_id, payload.daily_date):
             raise HTTPException(400, "Tato úloha nepatří k uvedenému dni")
-        points = POINTS["daily"]
+        points = domain_content.xp_for("daily", payload.difficulty, POINTS)
     else:
-        if payload.challenge_key != f"free:{payload.puzzle_id}":
+        if payload.challenge_key != domain_content.challenge_key("free", payload.puzzle_id):
             raise HTTPException(400, "Neplatný klíč volné úlohy")
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
         if not info or not is_puzzle_released(info.get("puzzle") or {}, effective_content_date(request)):
@@ -3704,7 +3551,9 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             unlock_rows = db_select("results", player_id=player["id"])
             enforce_mozkomor_unlock(unlock_rows)
         points, transferred_reward = claim_free_slot_points(
-            player["id"], info, POINTS[payload.difficulty], payload.puzzle_id,
+            player["id"], info,
+            domain_content.xp_for("free", payload.difficulty, POINTS),
+            payload.puzzle_id,
         )
 
     # Each actual completion is stored as one coherent run. Leaderboards never mix a fast hinted
