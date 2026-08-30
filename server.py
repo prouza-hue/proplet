@@ -4964,24 +4964,38 @@ def leaderboard(
 
 
 # v3.31.8 — additive identity bridge. Existing Proplet sessions/passwords stay canonical.
-from account_auth import install_account_auth
+from account_auth import AppServices, install_account_auth
 install_account_auth(
     app,
-    supabase_url=SUPABASE_URL,
-    supabase_key=SUPABASE_SECRET_KEY,
-    tz=TZ,
-    db_select=db_select,
-    db_insert=db_insert,
-    db_update=db_update,
-    db_delete=db_delete,
-    auth_player=auth_player,
-    new_session=new_session,
-    hash_password=hash_password,
-    verify_password=verify_password,
-    enforce_rate_limit=enforce_rate_limit,
-    player_stats=player_stats,
-    public_family_code=public_family_code,
-    league_name_for=league_name_for,
+    services=AppServices(
+        supabase_url=SUPABASE_URL,
+        supabase_key=SUPABASE_SECRET_KEY,
+        tz=TZ,
+        db_select=db_select,
+        db_insert=db_insert,
+        db_update=db_update,
+        db_delete=db_delete,
+        auth_player=auth_player,
+        new_session=new_session,
+        hash_password=hash_password,
+        verify_password=verify_password,
+        enforce_rate_limit=enforce_rate_limit,
+        player_stats=player_stats,
+        public_family_code=public_family_code,
+        league_name_for=league_name_for,
+        db_rpc=db_rpc,
+        save_quality_snapshot_if_monday=save_quality_snapshot_if_monday,
+        current_prague_date=current_prague_date,
+        released_batches=_released_batches,
+        logger=logger,
+        norm_family=norm_family,
+        resolved_puzzle=resolved_puzzle,
+        puzzle_exists=puzzle_exists,
+        daily_puzzle_matches_date=daily_puzzle_matches_date,
+        telemetry_actor=telemetry_actor,
+        app_version=APP_VERSION,
+        vercel_env=VERCEL_ENV,
+    ),
 )
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
