@@ -22,14 +22,16 @@ shell = shell_match.group(1)
 # The split quality bootstrap adds one small core script while puzzle data and
 # all genuinely heavy/lazy assets stay outside the shell.
 # v4.01.23 adds one tiny Daily result-menu asset to the intentional shell set.
-assert shell.count("'/") <= 10
+assert shell.count("'/") <= 11
+assert "/app/core/result-queue.js" in shell
 for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.png", "/privacy.html", "/terms.html"):
     assert heavy_or_lazy not in shell
 
 assert "preserveExistingPuzzleDatabase" in sw
 assert "caches.match('/puzzles.json',{ignoreSearch:true})" in sw
 assert "Number(data?.contentGeneration)===4&&Number(data?.dailyGeneration)===4" in sw
-assert "client.navigate(client.url)" in sw
+assert "client.navigate(client.url)" not in sw
+assert "PROPLET_SW_UPDATED" in sw
 assert "cacheFirst(e.request)" in sw
 assert "fetch(e.request,{cache:'no-store'}).then" not in sw
 

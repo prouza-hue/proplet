@@ -1,0 +1,41 @@
+name: Current runtime gate
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.py'
+      - 'public/**'
+      - 'vercel.json'
+      - 'requirements*.txt'
+      - 'SUPABASE*.sql'
+      - 'supabase/**'
+      - 'docs/SUPABASE_MIGRATION_MANIFEST.md'
+      - 'tests/current/**'
+      - 'tools/test_current.py'
+      - 'tools/validate_migration_manifest.py'
+      - '.github/workflows/current-runtime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  current-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install current test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Run current runtime gate
+        run: python tools/test_current.py

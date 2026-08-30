@@ -1,0 +1,4 @@
+# The current contract suite imports the application and therefore needs the
+# same pinned runtime dependencies.  No browser or pytest dependency is
+# required by the static/current gate.
+-r requirements.txt
