@@ -48,7 +48,7 @@ openapi_snapshot = json.dumps(
     server.app.openapi(), ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )
 assert hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest() == (
-    "b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674"
+    "a4c54893f22909963965e8d4b3d6a5c1186a3dd7d64370cd5d1d446963d2d5e9"
 )
 
 
@@ -282,7 +282,7 @@ with (
         separators=(",", ":"),
     )
 assert hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest() == (
-    "6867ae54f2c88f6f0f62ebc7694f09ed531c19635f495542e04a4092aa4f3f27"
+    "86646ed2bf653e079704b7c28ad393c0dd1176e39f9368e9b738c5822572b37e"
 )
 
 

@@ -1711,9 +1711,9 @@ let tajenkaPuzzle=null;
 let tajenkaRecapOpen=false;
 
 function refreshTajenkaAvailability(iso=pragueDateISO()){
- const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null,weekend=mondayWeekdayIndex(iso)>=5;
+ const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null;
  activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);
- TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&weekend&&activeTajenkaWeek);
+ TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);
  return TAJENKA_AVAILABLE;
 }
 refreshTajenkaAvailability();
