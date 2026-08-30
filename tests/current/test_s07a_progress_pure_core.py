@@ -88,8 +88,8 @@ assert account["currentStreak"] == 2 and account["longestStreak"] == 2
 assert account["wordDiscoveryXp"] == 5 and account["discoveredWords"] == 1
 
 
-# Adapter characterization: repair is called immediately after result fetch,
-# mutates the rows, and all later derived inputs observe that mutation.
+# Adapter characterization after Sprint 07B: the pure repair plan is evaluated
+# immediately after result fetch, but read rows remain unchanged.
 events = []
 repair_rows = [{"id": "r", "mode": "free", "difficulty": "easy", "points": 0}]
 repair_slots = slots()
@@ -100,10 +100,10 @@ def fake_select(table, **_filters):
     return repair_rows if table == "results" else []
 
 
-def fake_reconcile(_player, rows):
-    events.append("repair")
-    rows[0]["points"] = 15
-    return {"repairedXp": 15, "returnBonusXp": 0, "bonusAwardedNow": 0}
+def fake_repair_plan(rows):
+    events.append("repair-plan")
+    assert rows[0]["points"] == 0
+    return {"updates": [], "repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": 0}
 
 
 def fake_slots(rows):
@@ -123,17 +123,18 @@ def fake_rescue(_player):
 
 with (
     patch.object(server, "db_select", side_effect=fake_select),
-    patch.object(server, "reconcile_gen4_free_rewards", side_effect=fake_reconcile),
+    patch.object(server, "gen4_free_reward_repair_plan", side_effect=fake_repair_plan),
     patch.object(server, "free_slot_summary", side_effect=fake_slots),
     patch.object(server, "player_reward_stats", side_effect=fake_rewards),
     patch.object(server, "rescue_rows", side_effect=fake_rescue),
     patch.object(server, "mozkomor_unlocked_from_rows", side_effect=lambda rows, _slots: events.append(f"mozko:{rows[0]['points']}") or False),
     patch.object(server, "current_prague_date", side_effect=lambda: events.append("clock") or TODAY),
 ):
-    repaired = server.player_stats("p1")
+    projected = server.player_stats("p1")
 
-assert events == ["results", "repair", "slots:15", "rewards", "rescue", "clock", "mozko:15"]
-assert repaired["resultXp"] == 15 and repaired["gen4RewardRepairXp"] == 15
+assert events == ["results", "repair-plan", "slots:0", "rewards", "rescue", "clock", "mozko:0"]
+assert repair_rows[0]["points"] == 0
+assert projected["resultXp"] == 0 and projected["gen4RewardRepairXp"] == 0
 
 
 # Golden adapter response captured from origin/main before the extraction.  It
@@ -179,15 +180,15 @@ def legacy_select(table, **_filters):
     raise AssertionError(table)
 
 
-def legacy_repair(_player, rows):
-    adapter_events.append("repair")
-    rows[0]["points"] = 105
-    return {"repairedXp": 5, "returnBonusXp": 500, "bonusAwardedNow": 0}
+def legacy_repair_plan(rows):
+    adapter_events.append("repair-plan")
+    assert rows[0]["points"] == 100
+    return {"updates": [], "repairedXp": 0, "returnBonusXp": 500, "bonusAwardedNow": 0}
 
 
 with (
     patch.object(server, "db_select", side_effect=legacy_select),
-    patch.object(server, "reconcile_gen4_free_rewards", side_effect=legacy_repair),
+    patch.object(server, "gen4_free_reward_repair_plan", side_effect=legacy_repair_plan),
     patch.object(server, "free_slot_summary", side_effect=lambda _rows: adapter_events.append("slots") or legacy_slots),
     patch.object(server, "current_prague_date", side_effect=lambda: adapter_events.append("clock") or TODAY),
     patch.object(server, "mozkomor_unlocked_from_rows", side_effect=lambda _rows, _slots: adapter_events.append("mozko") or True),
@@ -195,9 +196,8 @@ with (
 ):
     legacy_snapshot = server.player_stats("p1")
 
-assert digest(legacy_snapshot) == "3688983c95f26356f0ecdf523582d83e90e9292e3c4e35fa0a1fb8f06d784f49"
 assert adapter_events == [
-    "select:results", "repair", "slots", "select:account_rewards",
+    "select:results", "repair-plan", "slots", "select:account_rewards",
     "select:streak_rescues", "clock", "mozko",
 ]
 assert [warning[0] for warning in warnings] == [
@@ -216,7 +216,7 @@ def unavailable_tables(table, **_filters):
 
 with (
     patch.object(server, "db_select", side_effect=unavailable_tables),
-    patch.object(server, "reconcile_gen4_free_rewards", return_value={"repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": 0}),
+    patch.object(server, "gen4_free_reward_repair_plan", return_value={"updates": [], "repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": 0}),
     patch.object(server, "free_slot_summary", return_value=slots()),
     patch.object(server, "current_prague_date", return_value=TODAY),
     patch.object(server, "mozkomor_unlocked_from_rows", return_value=False),

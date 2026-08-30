@@ -71,7 +71,7 @@ from backend.contracts import (
     TeamMembershipSet,
     TeamPinSet,
 )
-from backend.progress import calculate_stats, reward_stats_from_rows
+from backend.progress import calculate_stats, plan_gen4_free_reward_repairs, reward_stats_from_rows
 
 try:
     from pywebpush import webpush, WebPushException
@@ -566,9 +566,22 @@ def player_stats(player_id: str) -> dict:
     # "resultXp", "accountBonusXp", "wordDiscoveryXp", "discoveredWords".
     # Serialization aliases remain: "freeBasePlayedCurrent": free_slots["baseCurrent"].
     rows = db_select("results", player_id=player_id)
-    # This intentionally remains the first operation after result loading:
-    # reconciliation can write and mutates rows before XP is calculated.
-    gen4_rewards = reconcile_gen4_free_rewards(player_id, rows)
+    repair_plan = gen4_free_reward_repair_plan(rows)
+    if repair_plan["updates"]:
+        # Intentionally omit player/result identifiers: this is an aggregate
+        # operational signal, not a profile audit log.
+        logger.info(
+            "Gen4 reward repair pending rows=%s xp=%s",
+            len(repair_plan["updates"]),
+            repair_plan["repairedXp"],
+        )
+    # Legacy public metadata remains stable for consistent rows.  A read never
+    # claims that a pending repair was applied in this request.
+    gen4_rewards = {
+        "repairedXp": 0,
+        "returnBonusXp": repair_plan["returnBonusXp"],
+        "bonusAwardedNow": 0,
+    }
     daily_dates: list[str] = []
     daily_times: list[int] = []
     clean_daily = 0
@@ -865,19 +878,18 @@ def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> b
     return False
 
 
-def reconcile_gen4_free_rewards(player_id: str, rows: list[dict]) -> dict:
-    """Repair already-finished Gen4 boards and grant one returning-player bonus.
-
-    The bonus is stored on the player's earliest Gen4 result. A points value of
-    at least that board's base reward plus the bonus is the persistent claim
-    marker, so retries and concurrent profile reads cannot award it twice.
-    """
+def gen4_free_reward_repair_plan(rows: list[dict]) -> dict:
+    """Describe legacy Gen4 reward repairs without mutating rows or the DB."""
     puzzle_data = load_puzzles()
     active_generation = int(puzzle_data.get("freeGeneration") or 1)
-    empty = {"repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": 0}
     if active_generation < 4:
-        return empty
-
+        return plan_gen4_free_reward_repairs(
+            rows,
+            active_generation=active_generation,
+            active_ids={},
+            base_points=POINTS,
+            returning_bonus_xp=GEN4_RETURNING_BONUS_XP,
+        )
     active_ids = {
         difficulty: {
             str(puzzle.get("id") or "")
@@ -888,46 +900,64 @@ def reconcile_gen4_free_rewards(player_id: str, rows: list[dict]) -> dict:
         }
         for difficulty in FREE_DIFFICULTIES
     }
-    prior_generation_played = False
-    current_results: list[tuple[dict, int]] = []
-    for row in rows:
-        difficulty = str(row.get("difficulty") or "")
-        if row.get("mode") != "free" or difficulty not in POINTS:
-            continue
-        if str(row.get("puzzle_id") or "") in active_ids[difficulty]:
-            current_results.append((row, int(POINTS[difficulty])))
-        else:
-            prior_generation_played = True
-
-    if not current_results:
-        return empty
-
-    bonus_already_awarded = any(
-        int(row.get("points") or 0) >= base_points + GEN4_RETURNING_BONUS_XP
-        for row, base_points in current_results
+    return plan_gen4_free_reward_repairs(
+        rows,
+        active_generation=active_generation,
+        active_ids=active_ids,
+        base_points=POINTS,
+        returning_bonus_xp=GEN4_RETURNING_BONUS_XP,
     )
-    earliest_row = min(
-        current_results,
-        key=lambda item: (str(item[0].get("completed_at") or ""), str(item[0].get("id") or "")),
-    )[0]
-    repaired_xp = 0
-    bonus_awarded_now = 0
-    for row, base_points in current_results:
-        old_points = max(0, int(row.get("points") or 0))
-        target_points = max(old_points, base_points)
-        if prior_generation_played and not bonus_already_awarded and row is earliest_row:
-            target_points += GEN4_RETURNING_BONUS_XP
-            bonus_awarded_now = GEN4_RETURNING_BONUS_XP
-        if target_points == old_points:
-            continue
-        db_update("results", {"id": row["id"], "player_id": player_id}, {"points": target_points})
-        row["points"] = target_points
-        repaired_xp += target_points - old_points
 
+
+def repair_gen4_free_rewards(player_id: str, *, dry_run: bool = True) -> dict:
+    """Explicit, idempotent maintenance command for legacy Gen4 rewards.
+
+    ``dry_run`` defaults to true.  Apply mode uses the stored points value as a
+    compare-and-set guard so a concurrent result change cannot be overwritten.
+    Conflicts are reported and can be safely replanned by rerunning the command.
+    """
+    rows = db_select("results", player_id=player_id)
+    plan = gen4_free_reward_repair_plan(rows)
+    applied = 0
+    applied_xp = 0
+    conflicts = 0
+    validation_errors = []
+    if not dry_run:
+        for update in plan["updates"]:
+            expected_points = update["expectedPoints"]
+            if (
+                not isinstance(expected_points, int)
+                or isinstance(expected_points, bool)
+                or expected_points < 0
+            ):
+                conflicts += 1
+                validation_errors.append({"id": update["id"], "reason": "invalid-stored-points"})
+                continue
+            changed = db_update(
+                "results",
+                {
+                    "id": update["id"],
+                    "player_id": player_id,
+                    "points": expected_points,
+                },
+                {"points": update["targetPoints"]},
+            )
+            if changed:
+                applied += 1
+                applied_xp += update["targetPoints"] - update["oldPoints"]
+            else:
+                conflicts += 1
     return {
-        "repairedXp": repaired_xp,
-        "returnBonusXp": GEN4_RETURNING_BONUS_XP if prior_generation_played else 0,
-        "bonusAwardedNow": bonus_awarded_now,
+        "dryRun": bool(dry_run),
+        "candidateRows": len(plan["updates"]),
+        "appliedRows": applied,
+        "conflicts": conflicts,
+        "plannedXp": plan["repairedXp"],
+        "appliedXp": applied_xp,
+        "returnBonusXp": plan["returnBonusXp"],
+        "plannedBonusXp": plan["bonusAwardedNow"],
+        "validationErrors": validation_errors,
+        "updates": plan["updates"],
     }
 
 

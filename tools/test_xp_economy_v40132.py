@@ -44,7 +44,7 @@ assert summary["discoveredWords"] == 50, "same word on another board earns XP ag
 # Profile XP has one server-side total: result XP + account bonus + discovery rewards.
 originals = {
     "db_select": server.db_select,
-    "reconcile": server.reconcile_gen4_free_rewards,
+    "repair_plan": server.gen4_free_reward_repair_plan,
     "free_slots": server.free_slot_summary,
     "rescues": server.rescue_rows,
 }
@@ -60,7 +60,7 @@ reward_rows = [
 ]
 try:
     server.db_select = lambda table, **_filters: result_rows if table == "results" else reward_rows if table == "account_rewards" else []
-    server.reconcile_gen4_free_rewards = lambda _player, _rows: {"repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": False}
+    server.gen4_free_reward_repair_plan = lambda _rows: {"updates": [], "repairedXp": 0, "returnBonusXp": 0, "bonusAwardedNow": 0}
     server.free_slot_summary = lambda _rows: {
         "effective": {"easy": 1, "medium": 0, "hard": 0, "hardcore": 0, "mozkomor": 0},
         "transferred": {"easy": 0, "medium": 0, "hard": 0, "hardcore": 0, "mozkomor": 0},
@@ -78,7 +78,7 @@ try:
     assert stats["discoveredWords"] == 1
 finally:
     server.db_select = originals["db_select"]
-    server.reconcile_gen4_free_rewards = originals["reconcile"]
+    server.gen4_free_reward_repair_plan = originals["repair_plan"]
     server.free_slot_summary = originals["free_slots"]
     server.rescue_rows = originals["rescues"]
 

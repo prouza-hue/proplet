@@ -85,6 +85,86 @@ def reward_stats_from_rows(rows: Iterable[Mapping], *, account_rewards_included:
     }
 
 
+def plan_gen4_free_reward_repairs(
+    rows: Sequence[Mapping],
+    *,
+    active_generation: int,
+    active_ids: Mapping[str, Iterable[str]],
+    base_points: Mapping[str, int],
+    returning_bonus_xp: int,
+) -> dict:
+    """Build a deterministic Gen4 reward repair plan without side effects.
+
+    The plan preserves the historical compatibility rules but never mutates
+    ``rows``.  Persistence adapters can execute ``updates`` explicitly and use
+    ``oldPoints`` as a compare-and-set guard.
+    """
+    empty = {
+        "updates": [],
+        "repairedXp": 0,
+        "returnBonusXp": 0,
+        "bonusAwardedNow": 0,
+    }
+    if int(active_generation) < 4:
+        return empty
+
+    normalized_ids = {
+        str(difficulty): {str(puzzle_id) for puzzle_id in puzzle_ids}
+        for difficulty, puzzle_ids in active_ids.items()
+    }
+    prior_generation_played = False
+    current_results: list[tuple[Mapping, int]] = []
+    for row in rows:
+        difficulty = str(row.get("difficulty") or "")
+        if row.get("mode") != "free" or difficulty not in base_points:
+            continue
+        if str(row.get("puzzle_id") or "") in normalized_ids.get(difficulty, set()):
+            current_results.append((row, int(base_points[difficulty])))
+        else:
+            prior_generation_played = True
+
+    if not current_results:
+        return empty
+
+    bonus_already_awarded = any(
+        int(row.get("points") or 0) >= points + int(returning_bonus_xp)
+        for row, points in current_results
+    )
+    earliest_row = min(
+        current_results,
+        key=lambda item: (str(item[0].get("completed_at") or ""), str(item[0].get("id") or "")),
+    )[0]
+    updates = []
+    repaired_xp = 0
+    bonus_awarded_now = 0
+    for row, points in current_results:
+        stored_points = row.get("points")
+        old_points = max(0, int(stored_points or 0))
+        target_points = max(old_points, points)
+        reason = "base-reward"
+        if prior_generation_played and not bonus_already_awarded and row is earliest_row:
+            target_points += int(returning_bonus_xp)
+            bonus_awarded_now = int(returning_bonus_xp)
+            reason = "base-reward-and-returning-bonus"
+        if target_points == old_points:
+            continue
+        updates.append({
+            "id": str(row["id"]),
+            "expectedPoints": stored_points,
+            "oldPoints": old_points,
+            "targetPoints": target_points,
+            "reason": reason,
+        })
+        repaired_xp += target_points - old_points
+
+    return {
+        "updates": updates,
+        "repairedXp": repaired_xp,
+        "returnBonusXp": int(returning_bonus_xp) if prior_generation_played else 0,
+        "bonusAwardedNow": bonus_awarded_now,
+    }
+
+
 def _empty_slots(difficulties: Sequence[str]) -> dict:
     zero = {key: 0 for key in difficulties}
     return {"effective": zero.copy(), "transferred": zero.copy(), "current": zero.copy(), "baseCurrent": zero.copy()}
