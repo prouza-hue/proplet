@@ -11,6 +11,8 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, Iterable, Optional
 
+from backend.progress import streak_ending_on, streaks
+
 
 def parse_content_date(value: Optional[str]) -> Optional[date]:
     if not value:
@@ -185,27 +187,6 @@ def competition_ranks(rows: list[dict]) -> list[int]:
             rank, previous = position, value
         ranks.append(rank)
     return ranks
-
-
-def streak_ending_on(date_strings: Iterable[str], anchor: date) -> int:
-    values = {str(value)[:10] for value in date_strings if value}
-    count = 0
-    current = anchor
-    while current.isoformat() in values:
-        count += 1
-        current = date.fromordinal(current.toordinal() - 1)
-    return count
-
-
-def streaks(dates: Iterable[str], today: date) -> tuple[int, int]:
-    values = sorted({date.fromisoformat(str(value)) for value in dates if value}, reverse=True)
-    if not values:
-        return 0, 0
-    value_set = set(values)
-    anchor = today if today in value_set else (date.fromordinal(today.toordinal() - 1) if date.fromordinal(today.toordinal() - 1) in value_set else None)
-    current = streak_ending_on((item.isoformat() for item in value_set), anchor) if anchor else 0
-    longest = max(streak_ending_on((item.isoformat() for item in value_set), item) for item in values)
-    return current, longest
 
 
 def mozkomor_unlocked_from_rows(rows: list[dict], slots: dict, required: int = 200) -> bool:

@@ -23,6 +23,7 @@
       {"path": "tools/test_v40135_profile_wide_layout.py", "runner": "python"},
       {"path": "tests/current/test_s04_backend_foundation.py", "runner": "python"},
       {"path": "tests/current/test_s06_backend_dependencies.py", "runner": "python"},
+      {"path": "tests/current/test_s07a_progress_pure_core.py", "runner": "python"},
       {"path": "tests/current/test_domain_golden.py", "runner": "python"},
       {"path": "tests/current/test_result_queue.js", "runner": "node"},
       {"path": "tests/current/test_domain_golden.js", "runner": "node"},

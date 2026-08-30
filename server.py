@@ -71,6 +71,7 @@ from backend.contracts import (
     TeamMembershipSet,
     TeamPinSet,
 )
+from backend.progress import calculate_stats, reward_stats_from_rows
 
 try:
     from pywebpush import webpush, WebPushException
@@ -556,132 +557,67 @@ def player_reward_stats(player_id: str) -> dict:
         rewards = []
         included = False
 
-    account_bonus_xp = 0
-    word_discovery_xp = 0
-    other_reward_xp = 0
-    discovered_words: set[str] = set()
-    discovery_rewards = 0
-    for reward in rewards:
-        points = max(0, int(reward.get("points") or 0))
-        key = str(reward.get("reward_key") or "")
-        if key == "account_creation_v1":
-            account_bonus_xp += points
-        elif key.startswith("word_discovery_v1:"):
-            word_discovery_xp += points
-            discovery_rewards += 1
-            word = str(reward.get("reward_word") or key.rpartition(":")[2]).strip().casefold()
-            if word:
-                discovered_words.add(word)
-        else:
-            other_reward_xp += points
-    reward_xp = account_bonus_xp + word_discovery_xp + other_reward_xp
-    return {
-        "rewardXp": reward_xp,
-        "accountBonusXp": account_bonus_xp,
-        "wordDiscoveryXp": word_discovery_xp,
-        "otherRewardXp": other_reward_xp,
-        "wordDiscoveryRewards": discovery_rewards,
-        "discoveredWords": len(discovered_words),
-        "accountRewardsIncluded": included,
-    }
+    return reward_stats_from_rows(rewards, account_rewards_included=included)
 
 
 def player_stats(player_id: str) -> dict:
     """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
+    # Public stats keys remain owned by the core: "xpAuthoritative",
+    # "resultXp", "accountBonusXp", "wordDiscoveryXp", "discoveredWords".
+    # Serialization aliases remain: "freeBasePlayedCurrent": free_slots["baseCurrent"].
     rows = db_select("results", player_id=player_id)
+    # This intentionally remains the first operation after result loading:
+    # reconciliation can write and mutates rows before XP is calculated.
     gen4_rewards = reconcile_gen4_free_rewards(player_id, rows)
     daily_dates: list[str] = []
-    free_history = {k: 0 for k in FREE_DIFFICULTIES}
     daily_times: list[int] = []
-    total_points = 0
-    clean_solves = 0
     clean_daily = 0
-    tajenka_completed = 0
-    mozkomor_completed = 0
-
-    for r in rows:
-        mode = r.get("mode")
-        difficulty = r.get("difficulty")
-        total_points += int(r.get("points") or 0)
-        is_clean = r.get("clean_solve") is True
-        if is_clean and mode in ("daily", "free"):
-            clean_solves += 1
-
-        if mode == "daily" and r.get("daily_date"):
-            raw_date = str(r.get("daily_date"))[:10]
-            try:
-                date.fromisoformat(raw_date)
-                daily_dates.append(raw_date)
-                if is_clean:
-                    clean_daily += 1
-            except ValueError:
-                logger.warning("Ignoring malformed daily_date for result %s: %r", r.get("id"), r.get("daily_date"))
-            try:
-                daily_times.append(int(r.get("best_elapsed_ms")))
-            except (TypeError, ValueError):
-                logger.warning("Ignoring malformed elapsed time for result %s", r.get("id"))
-
-        if mode == "free" and difficulty in free_history:
-            free_history[difficulty] += 1
-            if difficulty == "mozkomor":
-                mozkomor_completed += 1
-        elif mode == "tajenka":
-            tajenka_completed += 1
+    # The core is deliberately logger-free.  Keep the two historical warning
+    # seams in this adapter while passing the validated values down to it.
+    for row in rows:
+        if row.get("mode") != "daily" or not row.get("daily_date"):
+            continue
+        raw_date = str(row.get("daily_date"))[:10]
+        try:
+            date.fromisoformat(raw_date)
+            daily_dates.append(raw_date)
+            if row.get("clean_solve") is True:
+                clean_daily += 1
+        except ValueError:
+            logger.warning("Ignoring malformed daily_date for result %s: %r", row.get("id"), row.get("daily_date"))
+        try:
+            daily_times.append(int(row.get("best_elapsed_ms")))
+        except (TypeError, ValueError):
+            logger.warning("Ignoring malformed elapsed time for result %s", row.get("id"))
 
     free_slots = free_slot_summary(rows)
     reward_stats = player_reward_stats(player_id)
 
-    rescued_dates: list[str] = []
+    rescue_data: list[dict] = []
     try:
         for rr in rescue_rows(player_id):
-            if rr.get("status") == "passed" and rr.get("missed_date"):
-                raw = str(rr.get("missed_date"))[:10]
-                try:
-                    date.fromisoformat(raw)
-                    rescued_dates.append(raw)
-                except ValueError:
-                    pass
+            rescue_data.append(rr)
     except HTTPException:
         # During a rolling deploy before the v3.4 migration, normal gameplay remains readable.
-        rescued_dates = []
-
-    effective_dates = list(set(daily_dates) | set(rescued_dates))
-    current, longest = streaks(effective_dates)
-    earned = [b for b in BADGES if longest >= b["days"]]
-    next_badge = next((b for b in BADGES if current < b["days"]), None)
-    return {
-        "points": total_points + reward_stats["rewardXp"],
-        "resultXp": total_points,
-        "xpAuthoritative": reward_stats["accountRewardsIncluded"],
-        **reward_stats,
-        "totalCompleted": sum(1 for r in rows if r.get("mode") in ("daily", "free")),
-        "dailyCompleted": len(set(daily_dates)),
-        # Effective progress is a union of level slots across content generations.
-        # A Gen1 level and its Gen2 replacement therefore count once, while every
-        # actual historical result remains available in the history.
-        "freeCompleted": free_slots["effective"],
-        "freeTransferred": free_slots["transferred"],
-        "freePlayedCurrent": free_slots["current"],
-        "freeBasePlayedCurrent": free_slots["baseCurrent"],
-        "mozkomorUnlocked": mozkomor_unlocked_from_rows(rows, free_slots),
-        # Compatibility alias for cached pre-Gen3 clients; semantics are now active-generation plays.
-        "freePlayedGen2": free_slots["current"],
-        "freeHistoryCompleted": free_history,
-        "currentStreak": current,
-        "longestStreak": longest,
-        "bestDailyMs": min(daily_times) if daily_times else None,
-        "cleanSolves": clean_solves,
-        "cleanDaily": clean_daily,
-        "tajenkaCompleted": tajenka_completed,
-        "mozkomorCompleted": mozkomor_completed,
-        "rescuedDays": len(set(rescued_dates)),
-        "earnedBadges": earned,
-        "nextBadge": next_badge,
-        "gen4RewardPolicy": "per-board",
-        "gen4RewardRepairXp": gen4_rewards["repairedXp"],
-        "gen4ReturnBonusXp": gen4_rewards["returnBonusXp"],
-        "gen4ReturnBonusAwardedNow": gen4_rewards["bonusAwardedNow"],
-    }
+        rescue_data = []
+    # Preserve the historical derivation order: streak date is captured before
+    # the unlock projection that used to be evaluated while serializing.
+    today = current_prague_date()
+    mozkomor_unlocked = mozkomor_unlocked_from_rows(rows, free_slots)
+    return calculate_stats(
+        rows,
+        today=today,
+        rescue_rows=rescue_data,
+        free_slots=free_slots,
+        reward_stats=reward_stats,
+        gen4_rewards=gen4_rewards,
+        mozkomor_unlocked=mozkomor_unlocked,
+        badges=BADGES,
+        free_difficulties=FREE_DIFFICULTIES,
+        daily_dates=daily_dates,
+        daily_times=daily_times,
+        clean_daily=clean_daily,
+    )
 
 
 def rescue_status_for(player_id: str) -> dict:
