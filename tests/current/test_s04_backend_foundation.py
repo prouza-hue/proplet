@@ -291,11 +291,11 @@ with (
         sort_keys=True,
         separators=(",", ":"),
     )
-# Recaptured from the unchanged production backend at main d7252e4d after
-# legitimate health/config additions since Sprint 04.
+# Recaptured for the unchanged backend contract after the v4.01.40 release
+# version bump; fixture content differs from v4.01.39 only through release metadata.
 response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
 assert response_fixture_digest == (
-    "12d98531db21a43038f0e9f5d24088ac4e65be04f78a4632a0b0430b60b3ba35"
+    "702932e4b85aa0082c150c4cde680af520ab3ac4cef2a6700773b03b87e4e64c"
 ), f"current response fixture digest: {response_fixture_digest}"
 
 
