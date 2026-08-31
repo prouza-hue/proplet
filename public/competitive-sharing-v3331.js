@@ -310,14 +310,28 @@
       if(typeof startGame!=='function'||typeof finishGame!=='function'||typeof performPostWinAction!=='function'||typeof startStarter!=='function'||typeof startDaily!=='function'||typeof shareDaily!=='function')return false;
       baseStartGame=startGame;basePerformPostWinAction=performPostWinAction;baseStartStarter=startStarter;baseStartDaily=startDaily;baseShareDaily=shareDaily;
 
-      startGame=function(puzzle,mode,dailyDate,options={}){
-        const out=baseStartGame.apply(this,arguments);
-        if(mode==='free'){
-          const ctx=contextForPuzzle(puzzle?.id);
-          if(ctx)attachGameChallengeUi(ctx);else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
-        }else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
-        return out;
+      const sharingSessionHook={
+        id:'competitive-sharing-session-v3331',
+        priority:30,
+        afterStart(event){
+          const {puzzle,mode}=event;
+          if(mode==='free'){
+            const ctx=contextForPuzzle(puzzle?.id);
+            if(ctx)attachGameChallengeUi(ctx);else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
+          }else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
+        },
       };
+      const sharingSessionHookInstalled=typeof registerGameSessionHook==='function'&&registerGameSessionHook(sharingSessionHook)!==false;
+      if(!sharingSessionHookInstalled){
+        startGame=function(puzzle,mode,dailyDate,options={}){
+          const out=baseStartGame.apply(this,arguments);
+          if(mode==='free'){
+            const ctx=contextForPuzzle(puzzle?.id);
+            if(ctx)attachGameChallengeUi(ctx);else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
+          }else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
+          return out;
+        };
+      }
 
       const sharingCompletionHook={
         id:'competitive-sharing-v3331',

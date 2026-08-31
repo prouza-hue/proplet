@@ -224,8 +224,8 @@ let puzzleDB=null;
 let GEN4_CANDIDATE_PREVIEW=false;
 let currentScreen='daily';
 let runtimeUpdateRequired=false;
-let currentGame=null;
-let timerId=null;
+let legacyGameCompatibility=null;
+let legacyTimerId=null;
 let leaderTab='daily';
 let leagueScope='family';
 let globalWeekOffset=0;
@@ -278,6 +278,7 @@ let resultQueueController=null;
 let apiClientController=null;
 let scopedStorageController=null;
 let completionPipelineController=null;
+let gameSessionController=null;
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
 function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}}
@@ -426,6 +427,7 @@ function pointsFor(mode,difficulty,puzzle=null){
  return info&&slots.actual.has(info.level)?0:DIFF[difficulty].xp;
 }
 function savedProgressFor(puzzle,mode,dailyDate){
+ const session=gameSession();if(session)return session.restore(puzzle,mode,dailyDate);
  if(mode==='tajenka')return savedTajenkaProgress(puzzle);
  if(mode==='rescue'||mode==='starter')return null;const s=getState(),key=challengeKey(mode,puzzle,dailyDate),completed=s.completed?.[key];if(completed&&!(mode==='daily'&&completed.puzzleId!==puzzle.id))return null;const r=s.inProgress?.[key];
  if(!r||r.puzzleId!==puzzle.id||r.mode!==mode)return null;
@@ -433,12 +435,17 @@ function savedProgressFor(puzzle,mode,dailyDate){
  for(const f of r.found||[]){const a=puzzle.answers?.[f.answerIndex];if(!a||seen.has(f.answerIndex)||a.word!==f.word||!samePath(a.path,f.path||[]))continue;seen.add(f.answerIndex);found.push({answerIndex:f.answerIndex,word:f.word,colorIndex:Number.isFinite(f.colorIndex)?f.colorIndex:found.length%COLORS.length,path:[...f.path]})}
  return {...r,found,moves:Math.max(0,Number(r.moves)||0),hints:Math.max(0,Number(r.hints)||0),wrongAttempts:Math.max(0,Number(r.wrongAttempts)||0),maxHintLevel:Math.max(0,Number(r.maxHintLevel)||0),elapsedMs:Math.max(0,Number(r.elapsedMs)||0)};
 }
-function gameElapsed(g=currentGame){if(!g)return 0;const end=g.pausedAt??performance.now();return Math.max(0,(g.baseElapsedMs||0)+(end-g.start))}
-function saveRescueProgress(g=currentGame){if(!g||g.mode!=='rescue'||g.finished||!g.dailyDate)return;const s=getState();s.rescues=s.rescues||{};s.rescues[g.dailyDate]={...(s.rescues[g.dailyDate]||{}),status:'started',puzzleId:g.puzzle.id,elapsedMs:Math.round(gameElapsed(g))};saveState(s);g.lastAutosaveAt=Date.now()}
+function gameElapsed(g=currentGame){const session=gameSession();if(session)return session.elapsed(g);if(!g)return 0;const end=g.pausedAt??performance.now();return Math.max(0,(g.baseElapsedMs||0)+(end-g.start))}
+function saveRescueProgress(g=currentGame){
+ const session=gameSession();if(session)return session.saveRescueProgress(g);
+ if(!g||g.mode!=='rescue'||g.finished||!g.dailyDate)return;const s=getState();s.rescues=s.rescues||{};s.rescues[g.dailyDate]={...(s.rescues[g.dailyDate]||{}),status:'started',puzzleId:g.puzzle.id,elapsedMs:Math.round(gameElapsed(g))};saveState(s);g.lastAutosaveAt=Date.now()
+}
 function pauseGameClock(reason='background'){
+ const session=gameSession();if(session)return session.pause(reason,{screen:currentScreen,onUpdateActive:updateActive});
  const g=currentGame;if(!g||g.finished||g.pausedAt!=null||currentScreen!=='game')return false;const now=performance.now(),elapsed=gameElapsed(g);g.baseElapsedMs=elapsed;g.elapsedMs=elapsed;g.start=now;g.pausedAt=now;g.pauseReason=reason;g.dragging=false;g.lastPointer=null;g.path=[];stopTimer();updateActive();if(g.mode==='rescue'){g.rescueElapsedMs=elapsed;saveRescueProgress(g)}else saveGameProgress();return true;
 }
 function resumeGameClock(){
+ const session=gameSession();if(session)return session.resume({screen:currentScreen,visibilityState:document.visibilityState,focused:typeof document.hasFocus==='function'?document.hasFocus():true,onResume:startTimer});
  const g=currentGame;if(!g||g.finished||g.pausedAt==null||currentScreen!=='game'||document.visibilityState==='hidden'||(typeof document.hasFocus==='function'&&!document.hasFocus()))return false;const now=performance.now();g.start=now;g.pausedAt=null;g.pauseReason=null;g.lastProgressAt=now;startTimer();return true;
 }
 async function acquireGameWakeLock(){
@@ -449,6 +456,7 @@ async function acquireGameWakeLock(){
 async function releaseGameWakeLock(){const lock=gameWakeLock;gameWakeLock=null;if(lock&&!lock.released)try{await lock.release()}catch{}}
 function syncGameWakeLock(){if(getSettings().wakeLock&&currentScreen==='game'&&currentGame&&!currentGame.finished&&document.visibilityState==='visible')acquireGameWakeLock();else releaseGameWakeLock()}
 function saveGameProgress(){
+ const session=gameSession();if(session)return session.saveProgress(currentGame);
  const g=currentGame;if(!g||g.finished||g.mode==='rescue'||g.mode==='starter')return;if(g.mode==='tajenka')return saveTajenkaGameProgress(g);const key=challengeKey(g.mode,g.puzzle,g.dailyDate),s=getState();s.inProgress=s.inProgress||{},elapsed=gameElapsed(g);
  s.inProgress[key]={puzzleId:g.puzzle.id,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate||null,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,cleanSolve:(g.hints||0)===0,elapsedMs:Math.round(elapsed),attemptId:g.attemptId||null,wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),helperOffered:!!g.helperOffered,helperHintUsed:!!g.helperHintUsed,postStarterWarmup:!!g.postStarterWarmup,savedAt:Date.now()};saveState(s);g.lastAutosaveAt=Date.now();
 }
@@ -692,11 +700,11 @@ function startGame(puzzle,mode,dailyDate,options={}){
  // Android/PWA tlačítko Zpět pak vrátí hra → výběr her, ne rovnou na Daily.
  if(mode==='free'&&currentScreen!=='free'&&currentScreen!=='game')history.pushState({proplet:true,screen:'free'},'',location.href);
  if(mode==='rescue'&&currentScreen!=='daily'&&currentScreen!=='game')history.pushState({proplet:true,screen:'daily'},'',location.href);
- const totalLimit=options.rescueTotalLimitMs||30000,remaining=options.limitMs||totalLimit,restored=mode==='rescue'||mode==='starter'?null:savedProgressFor(puzzle,mode,dailyDate),found=restored?.found||[],used=new Map();found.forEach(f=>f.path.forEach(i=>used.set(i,f.colorIndex)));
+ const totalLimit=options.rescueTotalLimitMs||30000,remaining=options.limitMs||totalLimit,restored=mode==='rescue'||mode==='starter'?null:savedProgressFor(puzzle,mode,dailyDate),sessionEvent={puzzle,mode,dailyDate,options,restored,data:Object.create(null)};runGameSessionHooks('beforeStart',sessionEvent);options=sessionEvent.options||options;const found=restored?.found||[],used=new Map();found.forEach(f=>f.path.forEach(i=>used.set(i,f.colorIndex)));
  let baseElapsedMs=mode==='rescue'?Math.max(0,totalLimit-remaining):(restored?.elapsedMs||0);
  currentGame={puzzle,mode,dailyDate,found,used,path:[],wrongPath:[],dragging:false,lastPointer:null,moves:restored?.moves||0,start:performance.now(),pausedAt:null,pauseReason:null,baseElapsedMs,elapsedMs:baseElapsedMs,finished:false,lastFound:[],hints:restored?.hints||0,wrongAttempts:restored?.wrongAttempts||0,maxHintLevel:restored?.maxHintLevel||0,cleanSolve:(restored?.hints||0)===0,attemptId:mode==='starter'||mode==='tajenka'?null:(restored?.attemptId||newAttemptId()),wordDiscoveryXpAwarded:Math.max(0,Number(restored?.wordDiscoveryXpAwarded)||0),rescueFinished:false,rescueTotalLimitMs:totalLimit,rescueOffsetMs:baseElapsedMs,lastAutosaveAt:Date.now(),lastProgressAt:performance.now(),helperOffered:!!restored?.helperOffered,helperHintUsed:!!restored?.helperHintUsed,nextHintSource:'manual',isReplay:mode==='tajenka'?!!tajenkaCompletion(puzzle):!!getState().completed[challengeKey(mode,puzzle,dailyDate)],contentBatchId:options.contentBatchId||null,postStarterWarmup:!!(options.postStarterWarmup||restored?.postStarterWarmup),starterHardDirect:!!options.starterHardDirect,starterHintUsed:false,starterHintOfferShown:false,starterTrackedWordCount:0,starterGuidePath:[],undoSnapshot:null};
  $('#screen-game').classList.toggle('rescue-mode',mode==='rescue');$('#screen-game').classList.toggle('starter-mode',mode==='starter');$('#screen-game').classList.toggle('tajenka-mode',mode==='tajenka');$('#gameModeLabel').textContent=mode==='daily'?'Denní výzva':mode==='rescue'?'Záchrana série':mode==='starter'?'První Proplet':mode==='tajenka'?'Víkendový bonus':'Volná hra';const levelNo=Number(puzzle.meta?.level)||null;if(mode==='rescue'||mode==='starter')$('#gameDifficulty').textContent=mode==='rescue'?'🔥 6×6 · jeden pokus':'🎓 Trénink · 5×5';else if(mode==='tajenka')$('#gameDifficulty').innerHTML='<span class="tajenka-game-label">✦ Tajenka</span>';else $('#gameDifficulty').innerHTML=`${difficultyIconMarkup(puzzle.difficulty,'game-difficulty-icon')}<span>${esc(DIFF[puzzle.difficulty].label)}${mode==='free'&&levelNo?` ${levelNo}`:''}</span>`;
- $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});
+ $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});runGameSessionHooks('afterStart',{...sessionEvent,game:currentGame});
 }
 function startStarter(){const p=puzzleDB?.starter;if(!p){nav('daily');showToast('Tréninková úroveň se nepodařila načíst.');return}startGame(p,'starter',null,{starter:true})}
 function starterGuideFor(g=currentGame){if(!g||g.mode!=='starter')return[];const n=g.found.length;if(n===0)return [...(g.puzzle.answers[0]?.path||[])];if(n===1)return (g.puzzle.answers[1]?.path||[]).slice(0,3);return[]}
@@ -726,9 +734,13 @@ function hideGameUndo(){const el=$('#gameUndoToast');if(el)el.classList.add('hid
 function showGameUndo(){const el=$('#gameUndoToast');if(!el)return;el.classList.remove('hidden');clearTimeout(showGameUndo._t);showGameUndo._t=setTimeout(hideGameUndo,4800)}
 function undoReset(){const g=currentGame,snap=g?.undoSnapshot;if(!g||!snap||g.finished)return;g.found=snap.found.map(f=>({...f,path:[...f.path]}));g.used=new Map(snap.used);g.path=[];g.wrongPath=[];g.undoSnapshot=null;$('#gameUndoToast')?.classList.add('hidden');message('Plocha vrácena. Čas, tahy i nápovědy běží dál.','good');if(g.mode==='starter')updateStarterGuidance();else{renderGameBoard();renderGameHUD();updateGameFeel()}saveGameProgress()}
 function flashWrongPath(path){const g=currentGame;if(!g||!path?.length)return;g.wrongPath=[...path];renderGameBoard();setTimeout(()=>{if(currentGame!==g)return;g.wrongPath=[];renderGameBoard();renderGameHUD();updateGameFeel()},210)}
-function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}}
+function stopTimer(){const session=gameSession();if(session){session.stopTimer();return}if(legacyTimerId){clearInterval(legacyTimerId);legacyTimerId=null}}
 function fmtCountdown(ms){const sec=Math.max(0,Math.ceil(ms/1000));return `00:${String(sec).padStart(2,'0')}`}
-function startTimer(){stopTimer();if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;timerId=setInterval(()=>{if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;const elapsed=gameElapsed(currentGame);if(currentGame.mode==='rescue'){currentGame.rescueElapsedMs=elapsed;const rem=currentGame.rescueTotalLimitMs-elapsed;$('#timer').textContent=fmtCountdown(rem);if(Date.now()-(currentGame.lastAutosaveAt||0)>1000)saveRescueProgress(currentGame);if(rem<=0){stopTimer();finishRescue(false)}}else{currentGame.elapsedMs=elapsed;$('#timer').textContent=fmtTime(elapsed);if(Date.now()-(currentGame.lastAutosaveAt||0)>5000)saveGameProgress();if(currentGame.mode==='starter')maybeOfferStarterHint();else maybeOfferHelper()}},currentGame?.mode==='rescue'?100:250)}
+function startTimer(){
+ const tick=(game,elapsed)=>{if(game.mode==='rescue'){game.rescueElapsedMs=elapsed;const rem=game.rescueTotalLimitMs-elapsed;$('#timer').textContent=fmtCountdown(rem);if(Date.now()-(game.lastAutosaveAt||0)>1000)saveRescueProgress(game);if(rem<=0){stopTimer();finishRescue(false)}}else{game.elapsedMs=elapsed;$('#timer').textContent=fmtTime(elapsed);if(Date.now()-(game.lastAutosaveAt||0)>5000)saveGameProgress();if(game.mode==='starter')maybeOfferStarterHint();else maybeOfferHelper()}};
+ const session=gameSession();if(session)return session.startTimer(tick,currentGame?.mode==='rescue'?100:250);
+ stopTimer();if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;legacyTimerId=setInterval(()=>{if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;tick(currentGame,gameElapsed(currentGame))},currentGame?.mode==='rescue'?100:250)
+}
 function renderTajenkaPhrase(g=currentGame){
  const root=$('#tajenkaPhrase');if(!root)return;
  if(g?.mode!=='tajenka'){root.classList.add('hidden');root.innerHTML='';return}
@@ -1001,6 +1013,30 @@ function completionPipeline(){
 }
 function registerGameCompletionHook(hook){const pipeline=completionPipeline();return pipeline?pipeline.register(hook):false}
 async function runGameCompletionHooks(phase,context){const pipeline=completionPipeline();if(!pipeline)return;if(phase==='before')return pipeline.runBefore(context);return pipeline.runAfter(context)}
+function gameSession(){
+ if(gameSessionController)return gameSessionController;
+ const factory=window.PropletGameState;if(!factory?.create)return null;
+ gameSessionController=factory.create({
+  performanceNow:()=>performance.now(),
+  dateNow:()=>Date.now(),
+  setIntervalFn:(fn,ms)=>setInterval(fn,ms),
+  clearIntervalFn:id=>clearInterval(id),
+  readState:getState,
+  writeState:saveState,
+  readTajenkaProgress:puzzle=>savedTajenkaProgress(puzzle),
+  writeTajenkaProgress:game=>saveTajenkaGameProgress(game),
+  challengeKey,
+  samePath,
+  colorCount:COLORS.length,
+ });
+ return gameSessionController;
+}
+function registerGameSessionHook(hook){const session=gameSession();return session?session.registerHook(hook):false}
+function runGameSessionHooks(phase,event){const session=gameSession();if(session)return session.runHooks(phase,event)}
+try{
+ Object.defineProperty(window,'currentGame',{configurable:true,get(){const session=gameSession();return session?session.get():legacyGameCompatibility},set(value){const session=gameSession();if(session)session.replace(value);else legacyGameCompatibility=value}});
+}catch{window.currentGame=legacyGameCompatibility}
+
 
 async function api(path,opts={}){
  const client=apiClient();if(client)return client(path,opts);

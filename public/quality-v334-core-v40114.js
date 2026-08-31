@@ -143,13 +143,30 @@ function applyCalmWin(g){
   const details=q('#winDetails');if(details&&!q('.calm-win-note',details))details.insertAdjacentHTML('afterbegin','<div class="calm-win-note">🫧 Hráno v klidu · XP a postup se počítají, pořadí ne.</div>');
 }
 function installGameWrappers(){
-  if(typeof startGame==='function'&&!startGame.__calmWrapped){const base=startGame,wrapped=function(puzzle,mode,dailyDate,options={}){let restored=null;try{restored=typeof savedProgressFor==='function'?savedProgressFor(puzzle,mode,dailyDate):null}catch{}const eligible=mode==='daily'||mode==='free',calm=eligible&&(restored?.calmMode===true||options?.calmMode===true||calmPreference());pendingCalmLaunch=calm;try{const out=base(puzzle,mode,dailyDate,options);try{if(currentGame&&eligible)currentGame.calmMode=calm}catch{}applyCalmRunUi();return out}finally{pendingCalmLaunch=false}};wrapped.__calmWrapped=true;startGame=wrapped}
-  if(typeof saveGameProgress==='function'&&!saveGameProgress.__calmWrapped){const base=saveGameProgress,wrapped=function(...args){const out=base(...args);saveCalmIntoProgress();return out};wrapped.__calmWrapped=true;saveGameProgress=wrapped}
+  const calmSessionHook={
+    id:'quality-calm-session-v40114',
+    priority:20,
+    beforeStart(event){
+      const eligible=event.mode==='daily'||event.mode==='free',calm=eligible&&(event.restored?.calmMode===true||event.options?.calmMode===true||calmPreference());
+      event.data.calmMode=calm;event.data.calmEligible=eligible;pendingCalmLaunch=calm;
+    },
+    afterStart(event){
+      try{if(event.game&&event.data.calmEligible)event.game.calmMode=event.data.calmMode}catch{}
+      applyCalmRunUi();pendingCalmLaunch=false;
+    },
+    afterPersist(){saveCalmIntoProgress()},
+  };
+  const calmSessionHookInstalled=typeof registerGameSessionHook==='function'&&registerGameSessionHook(calmSessionHook)!==false;
+  if(!calmSessionHookInstalled){
+    if(typeof startGame==='function'&&!startGame.__calmWrapped){const base=startGame,wrapped=function(puzzle,mode,dailyDate,options={}){let restored=null;try{restored=typeof savedProgressFor==='function'?savedProgressFor(puzzle,mode,dailyDate):null}catch{}const eligible=mode==='daily'||mode==='free',calm=eligible&&(restored?.calmMode===true||options?.calmMode===true||calmPreference());pendingCalmLaunch=calm;try{const out=base(puzzle,mode,dailyDate,options);try{if(currentGame&&eligible)currentGame.calmMode=calm}catch{}applyCalmRunUi();return out}finally{pendingCalmLaunch=false}};wrapped.__calmWrapped=true;startGame=wrapped}
+    if(typeof saveGameProgress==='function'&&!saveGameProgress.__calmWrapped){const base=saveGameProgress,wrapped=function(...args){const out=base(...args);saveCalmIntoProgress();return out};wrapped.__calmWrapped=true;saveGameProgress=wrapped}
+  }
   if(typeof queueResult==='function'&&!queueResult.__calmWrapped){const base=queueResult,wrapped=function(rec){let calm=false;try{calm=!!(currentGame&&currentGame.attemptId===rec?.attemptId&&currentGame.calmMode)}catch{}if(rec)rec.calmMode=calm;const out=base(rec);try{const s=getState(),stored=s.completed?.[rec.challengeKey];if(stored&&stored.attemptId===rec.attemptId){stored.calmMode=calm;saveState(s)}}catch{}return out};wrapped.__calmWrapped=true;queueResult=wrapped}
   if(typeof loadWinLevelLeaderboard==='function'&&!loadWinLevelLeaderboard.__calmWrapped){const base=loadWinLevelLeaderboard,wrapped=async function(puzzle,rec){if(rec?.calmMode===true||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(puzzle,rec)};wrapped.__calmWrapped=true;loadWinLevelLeaderboard=wrapped}
   if(typeof loadWinDailyGlobalLeaderboard==='function'&&!loadWinDailyGlobalLeaderboard.__calmWrapped){const base=loadWinDailyGlobalLeaderboard,wrapped=async function(date,rec){if(calmPreference()||currentGame?.calmMode===true){q('#levelLeaderboardBox')?.classList.add('hidden');return}return base(date,rec)};wrapped.__calmWrapped=true;loadWinDailyGlobalLeaderboard=wrapped}
   const calmCompletionHook={id:'quality-calm-v40114',priority:20,after(event){const g=event.game;if(g?.calmMode)applyCalmWin(g);applyCalmRunUi()}};const calmCompletionHookInstalled=typeof registerGameCompletionHook==='function'&&registerGameCompletionHook(calmCompletionHook)!==false;if(!calmCompletionHookInstalled&&typeof finishGame==='function'&&!finishGame.__calmWrapped){const base=finishGame,wrapped=async function(...args){let g=null;try{g=currentGame}catch{}const out=await base(...args);if(g?.calmMode)applyCalmWin(g);applyCalmRunUi();return out};wrapped.__calmWrapped=true;finishGame=wrapped}
   if(typeof showDailyResult==='function'&&!showDailyResult.__calmWrapped){const base=showDailyResult,wrapped=function(date,rec,...rest){const out=base(date,rec,...rest);if(rec?.calmMode===true)applyCalmWin(rec);return out};wrapped.__calmWrapped=true;showDailyResult=wrapped}
+}
 }
 
 async function enrichPlayedLevels(diff){

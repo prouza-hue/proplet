@@ -3,8 +3,8 @@
 - Sprint: 11B.1 — GameSession state, timer, persistence, pause/resume
 - Branch: `refactor/s11b-game-session`
 - Base SHA: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc` (produkční main po S10 + S11A)
-- Current HEAD: characterization pending
-- Stav: characterization
+- Current HEAD: implementation pending
+- Stav: implementation
 - Zamýšlená změna chování: žádná.
 - Změněné soubory: test/status pouze.
 - Hotové kroky:
@@ -13,13 +13,11 @@
   - nalezeny dva runtime přepisy `startGame`: Klidný režim a competitive sharing;
   - nalezen jeden runtime přepis `saveGameProgress`: Klidný režim.
 - Zbývající kroky:
-  - characterization gate;
-  - vytvořit `public/app/game/state.js`;
-  - převést state/timer/persistence/pause/resume na explicitní GameSession API;
-  - převést calm/sharing start lifecycle na hooky bez přepisu `startGame`;
-  - current gate + browser/Fold/visibility smoke + Vercel preview.
-- Testy PASS: zatím baseline z main; nový characterization test a legacy focus/pause test jsou přidány do current gate.
-- Testy FAIL / nespouštěné: characterization gate ještě neběžel.
+  - current gate nad implementací;
+  - browser/Fold/visibility smoke + Vercel preview;
+  - opravit pouze prokázané regrese a uzavřít 11B.1.
+- Testy PASS: characterization gate na nezměněném runtime = GREEN; nový characterization test i povýšený focus/pause regression prošly.
+- Testy FAIL / nespouštěné: runtime implementace ještě nebyla ověřena.
 - Nově nalezená rizika:
   - starý renderer/input přímo mutuje objekt session; B.1 proto nesmí přesouvat board/input/hints;
   - mixed PWA cache vyžaduje kompatibilní globální accessor/fallback;
