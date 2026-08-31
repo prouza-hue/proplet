@@ -3,13 +3,13 @@
 - Sprint: 11A — Gameplay completion vertical slice
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD; runtime S10 = `6467a809…`)
-- Stav: characterization
+- Stav: implementation
 - Zamýšlená změna chování: žádná.
 - Cíl: `finishGame` zůstane jediným runtime vlastníkem dokončení hry; late feature vrstvy přestanou funkci přepisovat a místo toho se připojí přes explicitní completion hooky.
 - Characterizované side-effecty: local state → result queue → finish telemetry; win XP/UI; async sync + leaderboard; shared challenge/Daily completion; Klidný režim; reset `comparison-loaded`.
 - Kompatibilita: Sprint 11A musí zachovat fallback pro klienty s nestejně starými cache assety; žádná změna produkční DB, API payloadů, XP pravidel, gameplaye ani copy.
 - Testy: nový `tests/current/test_s11a_completion_characterization.js` + existující shared Daily runtime test přidány do current gate.
-- Zbývá: characterization gate → nový completion core → přesměrování tří late wrapperů → current gate + Vercel preview/browser smoke.
+- Characterization gate před runtime změnou: PASS.\n- Implementace: nový `public/app/core/completion-pipeline.js`; `finishGame` spouští explicitní before/after fáze; competitive sharing, Klidný režim a copy-density používají prioritizované hooky a při nedostupném novém core se vrací k původnímu wrapperu.\n- Zbývá: current gate + Vercel preview/browser smoke; případné opravy pouze proti zjištěným regresím.
 - Produkce/main/Supabase: beze změny.
 - Bezpečný rollback: branch reset na `66081c664a0120cdb37b4344ce6d7beff9169c4c`.
 

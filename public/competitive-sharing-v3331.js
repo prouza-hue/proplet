@@ -308,7 +308,7 @@
     if(installed)return true;
     try{
       if(typeof startGame!=='function'||typeof finishGame!=='function'||typeof performPostWinAction!=='function'||typeof startStarter!=='function'||typeof startDaily!=='function'||typeof shareDaily!=='function')return false;
-      baseStartGame=startGame;baseFinishGame=finishGame;basePerformPostWinAction=performPostWinAction;baseStartStarter=startStarter;baseStartDaily=startDaily;baseShareDaily=shareDaily;
+      baseStartGame=startGame;basePerformPostWinAction=performPostWinAction;baseStartStarter=startStarter;baseStartDaily=startDaily;baseShareDaily=shareDaily;
 
       startGame=function(puzzle,mode,dailyDate,options={}){
         const out=baseStartGame.apply(this,arguments);
@@ -319,14 +319,34 @@
         return out;
       };
 
-      finishGame=async function(){
-        const ctx=currentGame?.mode==='free'?contextForPuzzle(currentGame?.puzzle?.id):null;
-        const dailyCtx=currentGame?.mode==='daily'?loadDailySession():null;
-        const out=await baseFinishGame.apply(this,arguments);
-        if(ctx)renderChallengeResult(ctx);
-        if(dailyCtx&&currentGame?.mode==='daily'&&currentGame?.finished&&!dailyCtx.completedTracked){dailyCtx.completedTracked=true;track('shared_daily_completed');saveDailySession(null)}
-        return out;
+      const sharingCompletionHook={
+        id:'competitive-sharing-v3331',
+        priority:30,
+        before(event){
+          const game=event.game;
+          event.data.competitiveSharing={
+            challenge:game?.mode==='free'?contextForPuzzle(game?.puzzle?.id):null,
+            daily:game?.mode==='daily'?loadDailySession():null,
+          };
+        },
+        after(event){
+          const state=event.data.competitiveSharing||{},game=event.game;
+          if(state.challenge)renderChallengeResult(state.challenge);
+          if(state.daily&&game?.mode==='daily'&&game?.finished&&!state.daily.completedTracked){state.daily.completedTracked=true;track('shared_daily_completed');saveDailySession(null)}
+        },
       };
+      const sharingCompletionHookInstalled=typeof registerGameCompletionHook==='function'&&registerGameCompletionHook(sharingCompletionHook)!==false;
+      if(!sharingCompletionHookInstalled){
+        baseFinishGame=finishGame;
+        finishGame=async function(){
+          const ctx=currentGame?.mode==='free'?contextForPuzzle(currentGame?.puzzle?.id):null;
+          const dailyCtx=currentGame?.mode==='daily'?loadDailySession():null;
+          const out=await baseFinishGame.apply(this,arguments);
+          if(ctx)renderChallengeResult(ctx);
+          if(dailyCtx&&currentGame?.mode==='daily'&&currentGame?.finished&&!dailyCtx.completedTracked){dailyCtx.completedTracked=true;track('shared_daily_completed');saveDailySession(null)}
+          return out;
+        };
+      }
 
       startDaily=function(){
         const out=baseStartDaily.apply(this,arguments),dailyCtx=loadDailySession();

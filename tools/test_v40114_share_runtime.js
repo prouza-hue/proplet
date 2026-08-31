@@ -3,6 +3,7 @@ const vm=require('vm');
 const path=require('path');
 
 const events=[];
+const completionHooks=[];
 const storage=new Map();
 const buttons={
   '#playDailyBtn':{},
@@ -26,6 +27,7 @@ const context={
   setTimeout:fn=>{fn();return 1},
   clearTimeout(){},
   api:async(_path,options)=>{events.push(JSON.parse(options.body).event_type);return {ok:true}},
+  registerGameCompletionHook(hook){if(!completionHooks.some(row=>row.id===hook.id))completionHooks.push(hook);return true},
   puzzleDB:{},
   DIFF:{easy:{label:'Snadná'}},
   SHARE_URL:'https://hrajproplet.cz/',
@@ -62,7 +64,12 @@ vm.runInContext(source,context);
 if(!events.includes('shared_daily_opened'))throw new Error('shared Daily open was not tracked');
 buttons['#playDailyBtn'].onclick();
 if(!events.includes('shared_daily_started'))throw new Error('shared Daily start was not tracked');
-context.finishGame().then(async()=>{
+(async()=>{
+  const completion={game:context.currentGame,data:{}};
+  for(const hook of completionHooks.slice().sort((a,b)=>(a.priority||100)-(b.priority||100)))if(hook.before)await hook.before(completion);
+  await context.finishGame();
+  for(const hook of completionHooks.slice().sort((a,b)=>(a.priority||100)-(b.priority||100)))if(hook.after)await hook.after(completion);
+})().then(async()=>{
   if(!events.includes('shared_daily_completed'))throw new Error('shared Daily completion was not tracked');
   context.currentGame={puzzle:{id:'g4-d-test',difficulty:'easy',answers:[]},mode:'daily',dailyDate:'2026-08-25',elapsedMs:65000,moves:9,hints:0,finished:true};
   await buttons['#shareDailyBtn'].onclick();

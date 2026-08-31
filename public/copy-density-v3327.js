@@ -160,7 +160,10 @@
       wrapped.__copyDensity3327=true;
       renderDailyGlobalLeaderboardBox=wrapped;
     }
+    const densityCompletionHook={id:'copy-density-v3327',priority:10,before(){$('#winModal')?.classList.remove('comparison-loaded')}};
+    const densityCompletionHookInstalled=typeof registerGameCompletionHook==='function'&&registerGameCompletionHook(densityCompletionHook)!==false;
     for(const name of ['finishGame','finishStarterGame','finishRescue','showDailyResult']){
+      if(name==='finishGame'&&densityCompletionHookInstalled)continue;
       const fn=window[name];
       if(typeof fn!=='function'||fn.__copyDensity3327)continue;
       const wrapped=function(...args){$('#winModal')?.classList.remove('comparison-loaded');return fn.apply(this,args)};
