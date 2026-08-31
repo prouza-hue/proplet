@@ -1,39 +1,42 @@
 # Technical debt refactor status
 
-- Sprint: 12A.1 — account session a auth ownership seam
+- Sprint: 12A.1 — account session ownership + QA account-isolation hardening
 - Branch: `refactor/s12a-account-auth-profile-team`
 - Base SHA: `6fb4eab5429fa1839beae35828b46dab349caf37` (`main`, Proplet v4.01.40 po Sprintu 11B.2)
-- Characterization commit: `64b5905`
-- Runtime commit: lokální `d1e62d0`; publikovaný GitHub commit `bf3984557ee58f93631406633bb8c89c0e04abe3`
-- Stav: **implementace uzavřena / GREEN, preview READY, čeká na user checkpoint**
-- Zamýšlená změna chování: žádná.
+- Characterization commit: lokální `64b5905`; publikovaný `030e3ccc671845af8aba102233a865c556d44ed0`
+- Account-session runtime: publikovaný `bf3984557ee58f93631406633bb8c89c0e04abe3`
+- Ranking QA fix: publikovaný `c7de0c50b5beaaa7d2fa20dcfbbee1c484db2ad3`
+- Tajenka/account-isolation fix: lokální `edcefec`; publikovaný `9077a0195d8c05ac6aa9e4e493ecee28e966acf5`
+- Produkční merge: `64f37be0b85a4d5458e7ce99b22e9f4ae12cbe7d`
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Výsledek:
-  - nový `public/app/account/session.js` vlastní načtení, uložení, patch, clear, auth headers a přijetí identity;
-  - password create/login, OAuth, recovery a email verification používají společný account-session seam;
-  - `/api/login-integrity` je explicitní call site; starý globální fetch rewrite zůstává jen jako mixed-cache fallback;
-  - recovery callback persistence je explicitní; historický globální fetch wrapper zůstává jen pro starší cache kombinace;
-  - profile/team mutace ukládají přes jedno update API, logout/delete přes jedno clear API;
-  - PWA shell přidal pouze malý dependency-free account-session modul; cache hranice account assetů byla posunuta.
-- Current gate na čistém runtime commitu:
-  - **41 PASS / 0 FAIL**;
-  - Assets: **80 PASS / 0 FAIL** (72 lokálních referencí);
-  - Syntax: **218 PASS / 0 FAIL**;
-  - `tests/current/test_s12a_account_session.js`: PASS;
-  - `tests/current/test_s12a_account_backend.py`: PASS.
-- Vercel preview:
-  - finální QA-fix deployment `dpl_J4HXaQpgC6xG6XWCS7iaxtFUkbiV`: **READY**;
+  - `public/app/account/session.js` vlastní načtení, uložení, update, clear, auth headers, přijetí identity a kontrolu stale identity snapshotu;
+  - password create/login i OAuth/e-mail/recovery callbacky používají společný session seam a první autoritativní callback adoptuje guest data právě jednou;
+  - home ranking cache a in-flight ranking response jsou vázané na konkrétní account session;
+  - nový `public/app/account/tajenka-storage.js` vlastní account-scoped Tajenka completion/progress, lossless guest adoption, legacy migraci a serverový merge;
+  - dokončená Tajenka se po loginu/reloadu obnoví z autoritativního `/api/progress`; subtilní completed karta se zobrazí bez replay a XP deduplikace se nemění;
+  - legacy globální Tajenka se před prvním async boot krokem migruje do neutrálního `guest` scope, nikdy do náhodně přihlášeného účtu;
+  - result upload, retry i quarantine jsou po celý request připnuté k zachycenému scope a tokenu; stale account switch nemůže zapsat data do jiného účtu;
+  - smazání účtu odstraní i jeho lokální Tajenka scope; logout nepropouští guest data mezi hráči;
+  - žádná změna DB schématu, contentu, pravidel XP ani gameplay.
+- Finální testy na přesném publikovaném stromu `a6f4275a259c16175e5b3aa2c25a355b1ba1923c`:
+  - Current gate: **42 PASS / 0 FAIL**;
+  - Assets: **81 PASS / 0 FAIL** (73 lokálních referencí);
+  - Syntax: **219 PASS / 0 FAIL**;
+  - nezávislé P0/P1 review po třech kolech: **no blockers**.
+- Preview:
+  - deployment `dpl_7tzcijcL9jEhXC1T1omN4aouPKHU`: **READY**;
   - stable alias: `https://proplet-git-refactor-s12a-account-dc3378-pavel-prouzas-projects.vercel.app`;
-  - HTTP smoke: `/`, `/api/health`, nový account-session asset, versioned `theme-init` a `account-auth` vracejí 200;
-  - health: Proplet 4.01.40, `ok=true`, DB true; runtime error scan po smoke je čistý.
-- User QA oprava globálního pořadí:
-  - po Google callbacku mohl první anonymní `/api/rankings/xp` doběhnout dřív než přijetí session a `home-layout` jej 60 s znovu používal i pro přihlášený profil;
-  - home ranking cache i in-flight request jsou nyní vázané na konkrétní account session; stale anonymní odpověď nemůže přepsat přihlášené UI;
-  - fix commit: lokální `feca25b`, publikovaný `c7de0c50b5beaaa7d2fa20dcfbbee1c484db2ad3`; full gate zůstal 41/0, assets 80/0, syntax 218/0.
-- Známé předchozí chování: OAuth/email/recovery callback nejprve persistuje serverový profil, takže následný accept neprovede guest adoption/anonymous claim. Sprint 12A.1 toto nemění; oprava vyžaduje samostatné behavior rozhodnutí a testy.
-- Scope checkpoint: profile/team UI ownership a další dělení `app.js` jsou odloženy do 12A.2 až po review 12A.1.
-- Produkce/main/Supabase: **beze změny**. Žádná DB/content migrace. Draft PR #92.
-- Rollback 12A.1: reset branche na `6fb4eab`; není potřeba DB rollback.
-- Další krok: user preview a checkpoint; 12A.2 ani merge nezačínat bez navazujícího pokynu.
+  - root, health, `app.js` a nový Tajenka storage asset vracejí 200; nasazené account guardy potvrzeny; runtime error scan čistý.
+- PR:
+  - draft #92 byl technicky uzavřen, protože GitHub ready-for-review konektor selhal na vlastní GraphQL response field;
+  - nedraftový náhradní PR #93 byl ze stejného head SHA standardně sloučen.
+- Produkce:
+  - deployment `dpl_KbWWBKDi35iHDEEMJHxSQsyLdr5v`: **READY**, alias error `null`;
+  - `https://hrajproplet.cz/`, `/api/health`, `app.js` a Tajenka storage asset vracejí 200;
+  - health hlásí Proplet 4.01.40 a DB true; nasazené migration/import/auth-snapshot/race guardy potvrzeny; post-deploy runtime error scan čistý.
+- Rollback: revert merge commitu `64f37be0…`; žádný DB/content rollback není potřeba.
+- Zbývající refaktor scope: profile/team UI ownership a další dělení `app.js` zůstávají samostatný další krok; nezačínat bez nového pokynu.
 
 ## Předchozí uzavřený stav
 
@@ -250,7 +253,6 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
-
 
 
 
