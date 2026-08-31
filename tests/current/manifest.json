@@ -118,6 +118,14 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s11a_completion_characterization.js",
+        "runner": "node"
+      },
+      {
+        "path": "tools/test_v40114_share_runtime.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_result_queue.js",
         "runner": "node"
       },
