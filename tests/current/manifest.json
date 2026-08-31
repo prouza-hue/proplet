@@ -5,52 +5,170 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
-      {"path": "tools/test_v4001_pwa_startup.py", "runner": "python"},
-      {"path": "tools/test_v4002_daily_sync_p0.py", "runner": "python"},
-      {"path": "tools/test_v4004_rank_order.py", "runner": "python"},
-      {"path": "tools/test_v4007_fresh_free_progression.py", "runner": "python"},
-      {"path": "tools/test_v4010_gen4_xp_rewards.py", "runner": "python"},
-      {"path": "tools/test_v4012_pwa_resume_update.py", "runner": "python"},
-      {"path": "tools/test_v40114_retention_funnel.py", "runner": "python"},
-      {"path": "tools/test_v40124_supabase_rpc_auth.py", "runner": "python"},
-      {"path": "tools/test_v40126_push_retention_p0.py", "runner": "python"},
-      {"path": "tools/test_v40132_mozkomor_news_preview.py", "runner": "python"},
-      {"path": "tools/test_v40133_sync_quarantine.py", "runner": "python"},
-      {"path": "tools/test_v40134_retention_claim_fix.py", "runner": "python"},
-      {"path": "tools/test_tajenka_preview.py", "runner": "python"},
-      {"path": "tools/test_tajenka_push_runtime.py", "runner": "python"},
-      {"path": "tests/current/test_tajenka_weekly_availability.py", "runner": "python"},
-      {"path": "tests/current/test_tajenka_result_validation.py", "runner": "python"},
-      {"path": "tools/test_word_discovery_xp.py", "runner": "python"},
-      {"path": "tools/test_v40135_profile_wide_layout.py", "runner": "python"},
-      {"path": "tests/current/test_s04_backend_foundation.py", "runner": "python"},
-      {"path": "tests/current/test_s06_backend_dependencies.py", "runner": "python"},
-      {"path": "tests/current/test_s07a_progress_pure_core.py", "runner": "python"},
-      {"path": "tests/current/test_s07b_readonly_stats.py", "runner": "python"},
-      {"path": "tests/current/test_s08a_result_contract.py", "runner": "python"},
-      {"path": "tests/current/test_s08b_result_adapter_characterization.py", "runner": "python"},
-      {"path": "tests/current/test_s08b_atomic_result_adapter.py", "runner": "python"},
-      {"path": "tests/current/test_s09_ranking_query_bounds.py", "runner": "python"},
-      {"path": "tests/current/test_domain_golden.py", "runner": "python"},
-      {"path": "tests/current/test_result_queue.js", "runner": "node"},
-      {"path": "tests/current/test_domain_golden.js", "runner": "node"},
-      {"path": "tests/current/test_sw_lifecycle.js", "runner": "node"},
-      {"path": "tests/current/test_sw_update_handshake.js", "runner": "node"},
-      {"path": "tests/current/test_migration_manifest.py", "runner": "python"},
-      {"path": "tools/validate_migration_manifest.py", "runner": "python"}
+      {
+        "path": "tools/test_v4001_pwa_startup.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v4002_daily_sync_p0.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v4004_rank_order.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v4007_fresh_free_progression.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v4010_gen4_xp_rewards.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v4012_pwa_resume_update.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40114_retention_funnel.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40124_supabase_rpc_auth.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40126_push_retention_p0.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40132_mozkomor_news_preview.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40133_sync_quarantine.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40134_retention_claim_fix.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_tajenka_preview.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_tajenka_push_runtime.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_tajenka_weekly_availability.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_tajenka_result_validation.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_word_discovery_xp.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v40135_profile_wide_layout.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s04_backend_foundation.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s06_backend_dependencies.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s07a_progress_pure_core.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s07b_readonly_stats.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s08a_result_contract.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s08b_result_adapter_characterization.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s08b_atomic_result_adapter.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s09_ranking_query_bounds.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_domain_golden.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s10_frontend_core.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_result_queue.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_domain_golden.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_sw_lifecycle.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_sw_update_handshake.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_migration_manifest.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/validate_migration_manifest.py",
+        "runner": "python"
+      }
     ]
   },
   "legacy_evidence": {
     "description": "Historical release/regression evidence. Do not run in the default gate and do not repair merely to make it green.",
-    "globs": ["tools/test_v3*.py", "tools/test_v3*.js"]
+    "globs": [
+      "tools/test_v3*.py",
+      "tools/test_v3*.js"
+    ]
   },
   "generation_manual": {
     "description": "Generation, release-lab and browser/manual checks. Run only from their dedicated workflow or by explicit request.",
-    "globs": ["tools/test_gen4*.py", "tools/test_gen4*.js", "tools/test_v334*.py", "tools/test_v334*.js", "tools/test_mozkomor*.py", "tools/test_*playtest*.py"]
+    "globs": [
+      "tools/test_gen4*.py",
+      "tools/test_gen4*.js",
+      "tools/test_v334*.py",
+      "tools/test_v334*.js",
+      "tools/test_mozkomor*.py",
+      "tools/test_*playtest*.py"
+    ]
   },
   "syntax": {
-    "python_globs": ["**/*.py"],
-    "javascript_globs": ["public/**/*.js", "tools/**/*.js"]
+    "python_globs": [
+      "**/*.py"
+    ],
+    "javascript_globs": [
+      "public/**/*.js",
+      "tools/**/*.js"
+    ]
   },
   "assets": {
     "required": [

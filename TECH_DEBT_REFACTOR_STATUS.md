@@ -1,5 +1,22 @@
 # Technical debt refactor status
 
+- Sprint: 10 — Frontend core: API client a scoped storage
+- Branch: `refactor/s10-frontend-core`
+- Base SHA: `d7252e4d3679dbf5e1ebecf154f840b7fd807000` (aktuální produkční `main`, Proplet v4.01.39)
+- Current HEAD: characterization commit se vytváří
+- Stav: characterization
+- Zamýšlená změna chování: žádná; HTTP kontrakty, localStorage klíče, guest/account scoping, load order a UI zůstávají stejné.
+- Změněné soubory: characterization test + current manifest; runtime zatím beze změny.
+- Hotové kroky: ověřen aktuální main a uzavření Sprintů 08B/09; zmapován existující `api()`, scoped state/queue storage a guest adoption.
+- Zbývající kroky: přidat `public/app/core/api-client.js` a `storage.js`; přesměrovat pouze kryté adaptéry v `app.js`; doplnit asset/load-order kontrakt; current gate + browser preview.
+- Testy PASS: čeká na characterization CI.
+- Testy FAIL / nespouštěné: žádné známé; preview/browser zatím nespouštěno.
+- Nově nalezená rizika: přímé `fetch()` cesty pro release probe, PWA/puzzle boot, push config, Tajenku a client-error mají odlišné cache/header/keepalive kontrakty a v tomto sprintu se nebudou násilně sjednocovat.
+- Bezpečný bod pokračování: tento characterization commit na Sprint 10 branchi.
+- Další povolený sprint: Sprint 11A pouze po zeleném a uzavřeném Sprintu 10; uživatel výslovně povolil navázání bloků 1→2 bez merge do main.
+
+## Předchozí uzavřený stav
+
 - Sprint: 09 — Ranking a admin query boundaries
 - Branch: `refactor/s09-ranking-query-bounds`
 - Base SHA: `e6c6204` (`origin/main`; Sprint 08B aplikace na main, atomická DB migrace/rollout zůstávají samostatně vypnuté)
