@@ -1,5 +1,25 @@
 # Technical debt refactor status
 
+- Sprint: 11B.2 — board, input a hints
+- Branch: `refactor/s11b2-game-interaction`
+- Base SHA: `7cad28b12788813f5932ca450f754d6540ed049b` (produkční main, Proplet v4.01.40)
+- Stav: characterization
+- Zamýšlená změna chování: žádná.
+- Scope podle plánu: `public/app/game/board.js`, `input.js`, `hints.js` napojené na stabilní GameSession API.
+- Characterizované kontrakty:
+  - přesný 2D board fit a grid geometrie;
+  - orthogonal neighbour policy, pointer drag/backtrack a 6px pointer sampling;
+  - touch magnifier eligibility pro Hard/Mozkožrout + touch short-side policy;
+  - hint target ordering, Starter special target, hint count/max level/clean solve/helper attribution.
+- Mimo scope: completion, account/profile, onboarding, rankings a CSS redesign.
+- Zbývá: characterization gate → moduly → current gate → browser matrix (mouse/touch/Fold/magnifier/hints) → preview.
+- Produkce/main/Supabase: beze změny od v4.01.40 release.
+- Rollback: branch reset na `7cad28b12788813f5932ca450f754d6540ed049b`.
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 11B.1 — GameSession state, timer, persistence, pause/resume
 - Branch: `refactor/s11b-game-session`
 - Base SHA: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc` (produkční main po S10 + S11A)
@@ -168,6 +188,7 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
+
 
 
 
