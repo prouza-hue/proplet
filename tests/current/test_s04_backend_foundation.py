@@ -289,9 +289,10 @@ with (
         sort_keys=True,
         separators=(",", ":"),
     )
-assert hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest() == (
+response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
+assert response_fixture_digest == (
     "73caf7437c52b8826d55f44b27761da7681183ef3ae8a6d07047f8de16ec26d0"
-)
+), f"current response fixture digest: {response_fixture_digest}"
 
 
 print("Sprint 04 characterization contracts: PASS")
