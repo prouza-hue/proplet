@@ -87,7 +87,8 @@ assert _digest(route_snapshot) == "3b2f8960d59d9b8588d29e90f1a23cffc539b5476224c
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract["info"]["version"] = "4.01.35-cloud"
-assert _digest(openapi_contract) == "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"
+openapi_digest = _digest(openapi_contract)
+assert openapi_digest == "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854", f"current OpenAPI digest: {openapi_digest}"
 
 
 # A fake-service assembly proves feature modules remain independently testable

@@ -54,9 +54,10 @@ openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )
-assert hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest() == (
+openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
+assert openapi_digest == (
     "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"
-)
+), f"current OpenAPI digest: {openapi_digest}"
 
 
 # Config parsing remains byte-for-byte compatible with the old server globals,
