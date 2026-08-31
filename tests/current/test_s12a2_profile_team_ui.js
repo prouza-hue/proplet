@@ -9,6 +9,9 @@ const root=path.resolve(__dirname,'../..');
 const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8');
 const accountPath=path.join(root,'public/app/account/account.js');
 const account=fs.existsSync(accountPath)?fs.readFileSync(accountPath,'utf8'):'';
+const styles=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
+const index=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
+const sw=fs.readFileSync(path.join(root,'public/sw.js'),'utf8');
 const runtime=`${app}\n${account}`;
 
 function has(source,pattern,label){assert(pattern.test(source),label)}
@@ -41,6 +44,8 @@ has(runtime,/googleusercontent\.com/,'Google avatar host restriction missing');
 has(runtime,/referrerpolicy="no-referrer"/,'Google avatar referrer policy missing');
 has(runtime,/syncQueue\(\{announce:true\}\)/,'manual profile sync action missing');
 has(runtime,/getQueue\(\)\.length&&!confirm\('Některé výsledky ještě čekají na synchronizaci\./,'logout pending-queue guard drifted');
+has(styles,/\.ranking-team-card small\{font-size:14px;/,'team card helper text must match result metadata readability');
+assert(index.includes('/styles.css?v=40140-s12a2r2')&&sw.includes('/styles.css?v=40140-s12a2r2'),'team card readability CSS cache boundary was not advanced');
 
 if(!account){
   has(app,/function renderProfile\(\{focusRoadmap=false\}=\{\}\)/,'legacy profile renderer missing');
