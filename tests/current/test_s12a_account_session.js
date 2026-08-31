@@ -11,6 +11,7 @@ const accountAuth=fs.readFileSync(path.join(root,'public/account-auth.js'),'utf8
 const accountTeam=fs.readFileSync(path.join(root,'public/account-team-v33210.js'),'utf8');
 const recoveryGuard=fs.readFileSync(path.join(root,'public/auth-recovery-guard-v3326.js'),'utf8');
 const themeInit=fs.readFileSync(path.join(root,'public/theme-init.js'),'utf8');
+const homeLayout=fs.readFileSync(path.join(root,'public/home-layout.js'),'utf8');
 const index=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'public/sw.js'),'utf8');
 const sessionPath=path.join(root,'public/app/account/session.js');
@@ -105,7 +106,11 @@ const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=40140-s12a1')&&sw.includes('/theme-init.js?v=40140-s12a1'),'theme-init cache boundary was not advanced');
+assert(index.includes('/theme-init.js?v=40140-s12a1r1')&&sw.includes('/theme-init.js?v=40140-s12a1r1'),'theme-init cache boundary was not advanced');
+assert(themeInit.includes("loadScript('/home-layout.js?v=40140-s12a1r1'"),'home layout cache boundary was not advanced');
+has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
+has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
+has(homeLayout,/if\(rankingSessionScope\(\)!==scope\)return/,'stale anonymous ranking response can overwrite authenticated UI');
 
 const passwordAcceptPos=app.indexOf('acceptAccountProfile({id:profile.id');
 const anonymousClaimPos=app.indexOf("api('/api/anonymous/claim'",passwordAcceptPos);

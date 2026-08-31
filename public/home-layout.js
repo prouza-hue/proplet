@@ -9,7 +9,14 @@
   };
   let rankingCache=null;
   let rankingCacheAt=0;
+  let rankingCacheScope=null;
   let rankingLoading=null;
+  let rankingLoadingScope=null;
+
+  function rankingSessionScope(){
+    const p=typeof getProfile==='function'?getProfile():null;
+    return p?.id&&p?.token?`player:${p.id}:${p.token}`:'anonymous';
+  }
 
   function tuneNoviceIcon(){
     try{if(typeof LEVELS!=='undefined'&&LEVELS[0]?.name==='Nováček')LEVELS[0].icon='🔰'}catch{}
@@ -156,17 +163,19 @@
   async function loadCompetition(){
     const card=ensureCompetitionCard();if(!card)return;
     renderCompetitionSelf();
-    const fresh=rankingCache&&Date.now()-rankingCacheAt<60000;
+    const scope=rankingSessionScope(),fresh=rankingCache&&rankingCacheScope===scope&&Date.now()-rankingCacheAt<60000;
     if(fresh){renderCompetitionRows(rankingCache);return}
-    if(rankingLoading)return;
-    rankingLoading=(async()=>{
+    if(rankingLoading&&rankingLoadingScope===scope){await rankingLoading;return}
+    const request=(async()=>{
       try{
         const data=typeof api==='function'?await api('/api/rankings/xp?period=all'):await fetch('/api/rankings/xp?period=all',{cache:'no-store'}).then(r=>r.json());
-        rankingCache=data;rankingCacheAt=Date.now();renderCompetitionRows(data);
-      }catch{const root=document.querySelector('#homeCompetitionRows');if(root)root.innerHTML='<div class="home-ranking-empty"><strong>Pořadí teď nedoběhlo.</strong><span>Zkus ho otevřít za chvíli.</span></div>'}
-      finally{rankingLoading=null}
+        if(rankingSessionScope()!==scope)return;
+        rankingCache=data;rankingCacheAt=Date.now();rankingCacheScope=scope;renderCompetitionRows(data);
+      }catch{if(rankingSessionScope()===scope){const root=document.querySelector('#homeCompetitionRows');if(root)root.innerHTML='<div class="home-ranking-empty"><strong>Pořadí teď nedoběhlo.</strong><span>Zkus ho otevřít za chvíli.</span></div>'}}
     })();
-    await rankingLoading;
+    rankingLoading=request;rankingLoadingScope=scope;
+    try{await request}finally{if(rankingLoading===request){rankingLoading=null;rankingLoadingScope=null}}
+    if(rankingSessionScope()!==scope)await loadCompetition();
   }
 
   function placeMetaProgress(){
