@@ -48,7 +48,7 @@ openapi_contract = server.app.openapi()
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # Release publication changes APP_VERSION without changing the HTTP schema.
 # Normalize only that metadata field back to the characterization baseline;
-# every path, method, component and field remains covered by the same digest.
+# every path, method, component and field remains covered. The normalized\n# baseline below was recaptured from the unchanged production backend at\n# main d7252e4d after legitimate post-Sprint-04 contract additions.
 openapi_contract = json.loads(json.dumps(openapi_contract))
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_snapshot = json.dumps(
@@ -56,7 +56,7 @@ openapi_snapshot = json.dumps(
 )
 openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
 assert openapi_digest == (
-    "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"
+    "b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674"
 ), f"current OpenAPI digest: {openapi_digest}"
 
 
