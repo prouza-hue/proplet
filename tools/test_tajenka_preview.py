@@ -17,6 +17,7 @@ PUSH = ROOT / "push_diagnostics_v3329.py"
 RUNTIME = ROOT / "public" / "runtime-meta.js"
 SW = ROOT / "public" / "sw.js"
 RELEASE_NOTES = ROOT / "public" / "release-notes-v3331.js"
+HINTS = ROOT / "public" / "app" / "game" / "hints.js"
 REWARD_XP = 200
 
 
@@ -183,6 +184,7 @@ def main() -> None:
     runtime = RUNTIME.read_text(encoding="utf-8")
     sw = SW.read_text(encoding="utf-8")
     release_notes = RELEASE_NOTES.read_text(encoding="utf-8")
+    hints = HINTS.read_text(encoding="utf-8") if HINTS.exists() else app
     for marker in (
         "const TAJENKA_PREVIEW=",
         "let TAJENKA_AVAILABLE=",
@@ -198,7 +200,6 @@ def main() -> None:
         "if(TAJENKA_RELEASE_ENABLED&&!old)",
         "tajenka-rule-inline",
         "některá písmena mohou zůstat volná.",
-        "Významová stopa",
         "Další přijde zase v sobotu.",
         "showTajenkaRecap",
         "tajenka_recap_opened",
@@ -206,6 +207,7 @@ def main() -> None:
         "push_tajenka_opened",
     ):
         assert marker in app, marker
+    assert "Významová stopa" in hints
 
     for event in (
         "tajenka_viewed",
