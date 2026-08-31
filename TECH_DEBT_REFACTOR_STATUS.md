@@ -28,3 +28,17 @@
 - Nově nalezená rizika: hard cap 5 000 ranking runs / entities, 10 000 weekly runs a 20 000 telemetry řádků selže 503, pokud dataset přeroste bezpečnou hranici; jde o měřitelný guard, ne tiché zkrácení. Další navýšení nebo nový index vyžaduje samostatná data a schválení.
 - Bezpečný bod pokračování: produkční `main` s aplikačním commitem `7e477c84`, aplikovaná migrace v4.01.39 a ověřený deployment `dpl_CAQbHEscm77yUpiuomBQLbMCPYyt`. Sprint 09 je uzavřený.
 - Další povolený sprint: žádný. Sprint 10 nezačínat bez výslovného pokynu.
+
+## Sprint 08B — uzavření produkčního rolloutu
+
+- Stav: UZAVŘENO. Aplikační kód 08B zůstal beze změny; rollout pouze doplnil aditivní databázový kontrakt a zapnul již schválenou atomickou cestu.
+- Produkční migrace: `20260831115149_v4_01_38_atomic_result` byla aplikována až po read-only preflightu. Sprint 09 (`20260831082509_v4_01_39_query_bounds`) zůstal přítomný a objekty obou migrací se nekříží.
+- Databázový verify: `proplet_submit_result_v1(uuid,text,text,text,jsonb)` je `SECURITY DEFINER` s prázdným `search_path`; `EXECUTE` má pouze `service_role`. Ledger `result_commands` má RLS, `anon` ani `authenticated` jej nemohou číst a `service_role` jej číst může. Po migraci nebyl žádný neúplný ledger záznam.
+- Produkční rollback smoke: syntetický hráč a výsledek ověřily první commit, přesný idempotentní retry i jediný zápis do ledgeru/run/result/attempt. Celá transakce následně provedla `ROLLBACK`; kontrola potvrdila, že v produkci nezůstala žádná syntetická stopa.
+- Aktivace: nesekretní flag `PROPLET_ATOMIC_RESULT_V1_ENABLED=true` je auditovatelně nastavený ve `vercel.json`. Aktivační commit `68ca43daa22618c0fb3e6980956a948f9ea85e21` byl fast-forwardem publikován na `main`.
+- Produkční deployment: `dpl_FEkj3hG2MpgZLL67jBFAMDvJcyQa` je `READY`, bez alias chyby, a obsluhuje `hrajproplet.cz`.
+- Post-deploy kontrola: `/`, `/api/health`, `/api/daily-global-leaderboard`, `/api/rankings/daily` a `/api/rankings/xp` vracejí HTTP 200; health hlásí `database=true`. Vercel runtime error scan od vydání je čistý.
+- Testy: databázový verify a transakční smoke PASS; JSON konfigurace, Python compile, migrační manifest 42/42 a čtyři současné Node kontrakty PASS. Python aplikační kontrakty nebyly v tomto rollout kroku znovu spuštěny, protože pracovní runtime neměl nainstalovaný `fastapi`; stejný aplikační strom byl již v gatech 08B/09 ověřen a aktivační změna se týká pouze `vercel.json`.
+- Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
+- Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
+- Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
