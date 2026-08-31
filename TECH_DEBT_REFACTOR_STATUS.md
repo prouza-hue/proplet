@@ -1,5 +1,36 @@
 # Technical debt refactor status
 
+- Sprint: 11B.1 — GameSession state, timer, persistence, pause/resume
+- Branch: `refactor/s11b-game-session`
+- Base SHA: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc` (produkční main po S10 + S11A)
+- Current HEAD: characterization pending
+- Stav: characterization
+- Zamýšlená změna chování: žádná.
+- Změněné soubory: test/status pouze.
+- Hotové kroky:
+  - scope ověřen proti `TECH_DEBT_REFACTOR_PLAN.md`;
+  - inventář současného `currentGame`, timeru, restore/save a pause/resume lifecycle;
+  - nalezeny dva runtime přepisy `startGame`: Klidný režim a competitive sharing;
+  - nalezen jeden runtime přepis `saveGameProgress`: Klidný režim.
+- Zbývající kroky:
+  - characterization gate;
+  - vytvořit `public/app/game/state.js`;
+  - převést state/timer/persistence/pause/resume na explicitní GameSession API;
+  - převést calm/sharing start lifecycle na hooky bez přepisu `startGame`;
+  - current gate + browser/Fold/visibility smoke + Vercel preview.
+- Testy PASS: zatím baseline z main; nový characterization test a legacy focus/pause test jsou přidány do current gate.
+- Testy FAIL / nespouštěné: characterization gate ještě neběžel.
+- Nově nalezená rizika:
+  - starý renderer/input přímo mutuje objekt session; B.1 proto nesmí přesouvat board/input/hints;
+  - mixed PWA cache vyžaduje kompatibilní globální accessor/fallback;
+  - calm payload závisí na přesném pořadí start hooku vůči attempt telemetry.
+- Bezpečný bod pokračování: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc`.
+- Další povolený sprint: pouze 11B.2 po samostatném GREEN ověření 11B.1.
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 11A — Gameplay completion vertical slice
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)

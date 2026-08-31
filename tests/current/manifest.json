@@ -122,6 +122,14 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s11b1_game_session.js",
+        "runner": "node"
+      },
+      {
+        "path": "tools/test_v319_focus_pause.js",
+        "runner": "node"
+      },
+      {
         "path": "tools/test_v40114_share_runtime.js",
         "runner": "node"
       },
