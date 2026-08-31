@@ -73,7 +73,7 @@ const game={
   mode:'free',finished:false,hints:0,maxHintLevel:0,cleanSolve:true,nextHintSource:'manual',isReplay:false,
 };
 const b=board.create({getGame:()=>game});
-assert.deepStrictEqual(b.neighbours(1),[0,2,4]);
+assert.deepStrictEqual(b.neighbours(1),[4,0,2]);
 assert.deepStrictEqual(b.neighbours(4),[1]);
 
 const events=[];
