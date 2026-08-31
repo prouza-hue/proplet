@@ -11,8 +11,8 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 server = (ROOT / "server.py").read_text(encoding="utf-8")
 theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.36"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
-assert "version:'4.01.36'" in runtime
+assert 'APP_VERSION = "4.01.37"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
+assert "version:'4.01.37'" in runtime
 assert "firstWinReturnNudgeV40134:true" in runtime
 assert "wordDiscoveryTerminalRejectV40134:true" in runtime
 

@@ -1149,6 +1149,21 @@ def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
 
 def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict]:
     data = load_puzzles()
+    if mode == "tajenka":
+        current_week = tajenka_week_for(current_prague_date())
+        if not TAJENKA_RELEASE_ENABLED or current_week is None:
+            return None
+        return next(
+            (
+                puzzle
+                for puzzle in load_tajenka_bank().get("puzzles", [])
+                if puzzle.get("id") == puzzle_id
+                and puzzle.get("difficulty") == difficulty
+                and int((puzzle.get("meta") or {}).get("rewardXp") or 0) == TAJENKA_REWARD_XP
+                and 1 <= int(puzzle.get("week") or 0) <= current_week
+            ),
+            None,
+        )
     if mode == "starter":
         p = data.get("starter") or {}
         return p if p.get("id") == puzzle_id and p.get("difficulty") == difficulty else None

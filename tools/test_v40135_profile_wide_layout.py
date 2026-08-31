@@ -11,9 +11,9 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.01.36"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
-assert "version:'4.01.36'" in runtime
-assert "proplet-v4.01.36-tajenka-weekly-availability-shell" in sw
+assert 'APP_VERSION = "4.01.37"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
+assert "version:'4.01.37'" in runtime
+assert "proplet-v4.01.37-tajenka-result-validation-shell" in sw
 assert 'theme-init.js?v=40135' in html and 'theme-init.js?v=40135' in sw
 assert "profile-layout-v3330.css?v=2" in theme
 
@@ -25,4 +25,4 @@ assert "position=current.getBoundingClientRect().left-rail.getBoundingClientRect
 assert "wide?position-current.offsetWidth-gap" in app
 assert "if(currentScreen==='profile')focusProfileRoadmap()" in app
 
-print("PASS: v4.01.36 preserves wide profile alignment")
+print("PASS: v4.01.37 preserves wide profile alignment")

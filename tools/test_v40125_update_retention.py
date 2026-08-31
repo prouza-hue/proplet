@@ -14,7 +14,7 @@ migration = (ROOT / "SUPABASE_MIGRATION_V4_01_25.sql").read_text(encoding="utf-8
 analytics = (ROOT / "ANALYTICS_V4_CZ.md").read_text(encoding="utf-8")
 vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
 
-assert "4.01.36" in runtime
+assert "4.01.37" in runtime
 assert "canonicalUpdateProbeV40125:true" in runtime
 assert "pushOpenTrackingV40125:true" in runtime
 assert "d7ReturnMessagingV40125:true" in runtime

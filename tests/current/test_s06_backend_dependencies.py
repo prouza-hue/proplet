@@ -84,7 +84,7 @@ route_snapshot = sorted(
     if route.path
 )
 assert _digest(route_snapshot) == "3b2f8960d59d9b8588d29e90f1a23cffc539b5476224c99d1fcc3cbd3e8324b0"
-assert _digest(server.app.openapi()) == "a4c54893f22909963965e8d4b3d6a5c1186a3dd7d64370cd5d1d446963d2d5e9"
+assert _digest(server.app.openapi()) == "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"
 
 
 # A fake-service assembly proves feature modules remain independently testable
