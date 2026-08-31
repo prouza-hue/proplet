@@ -138,6 +138,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s12a2_profile_team_ui.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_s12a_account_backend.py",
         "runner": "python"
       },
