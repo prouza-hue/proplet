@@ -277,6 +277,7 @@ let gameWakeLock=null;
 let resultQueueController=null;
 let apiClientController=null;
 let scopedStorageController=null;
+let accountSessionController=null;
 let completionPipelineController=null;
 let gameSessionController=null;
 let gameBoardController=null;
@@ -284,7 +285,12 @@ let gameInputController=null;
 let gameHintsController=null;
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
-function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}}
+function accountSession(){
+ if(accountSessionController)return accountSessionController;
+ const factory=window.PropletAccountSession;if(!factory?.create)return null;
+ accountSessionController=factory.create({storage:localStorage,profileKey:PROFILE_KEY,adoptGuestData});return accountSessionController;
+}
+function getProfile(){const session=accountSession();if(session)return session.get();try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}}
 function getAnonymousId(){
  let id=localStorage.getItem(ANON_ID_KEY);if(id)return id;
  try{id=crypto.randomUUID()}catch{id=`anon-${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`}
@@ -300,7 +306,13 @@ function scopedStorage(){
 function scopedStorageKey(base,scope=playerScope()){const core=scopedStorage();return core?core.scopedKey(base,scope):`${base}:${scope}`}
 function getState(){const core=scopedStorage();if(core)return core.readState(STORE_KEY);try{return {...blankState(),...JSON.parse(localStorage.getItem(scopedStorageKey(STORE_KEY))||'{}')}}catch{return blankState()}}
 function saveState(s){const core=scopedStorage();if(core)return core.writeState(STORE_KEY,s);localStorage.setItem(scopedStorageKey(STORE_KEY),JSON.stringify(s))}
-function saveProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p));updateProfileChip()}
+function saveProfile(p){const session=accountSession();if(session)session.save(p);else localStorage.setItem(PROFILE_KEY,JSON.stringify(p));updateProfileChip();return p}
+function updateAccountProfile(patch){const session=accountSession();let profile;if(session)profile=session.update(patch);else{const current=getProfile();profile=current?{...current,...(patch||{})}:null;if(profile)localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}updateProfileChip();return profile}
+function acceptAccountProfile(profile){const session=accountSession();if(session){const accepted=session.accept(profile);updateProfileChip();return accepted}const hadProfile=!!getProfile();if(!hadProfile)adoptGuestData(profile.id);return saveProfile(profile)}
+function persistAccountResponseProfile(profile){const session=accountSession();if(session){const stored=session.persistResponseProfile(profile);updateProfileChip();return stored}if(!profile?.id||!profile?.token)return null;return saveProfile({...getProfile(),...profile})}
+function clearAccountProfile(){const session=accountSession();if(session)session.clear();else localStorage.removeItem(PROFILE_KEY);updateProfileChip()}
+function accountAuthHeaders(){const session=accountSession();if(session)return session.authHeaders();const p=getProfile();return p?.token?{Authorization:`Bearer ${p.token}`}:{}}
+window.PROPLET_ACCOUNT_SESSION_ACTIVE=true;
 function validSupportMode(mode){return Object.prototype.hasOwnProperty.call(SUPPORT_MODES,mode)}
 function localSupportMode(){try{const mode=localStorage.getItem(SUPPORT_MODE_KEY);return validSupportMode(mode)?mode:null}catch{return null}}
 function rememberSupportMode(mode){if(validSupportMode(mode))try{localStorage.setItem(SUPPORT_MODE_KEY,mode)}catch{}}
@@ -1087,7 +1099,7 @@ async function refreshRemoteProfile({throwOnError=false}={}){
   mergeRemoteProgress(progress.completed||[]);
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
-  saveProfile({...p,name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',googleLinked:!!me.googleLinked,googleAvatarUrl:me.googleAvatarUrl||null,useGoogleAvatar:!!me.useGoogleAvatar,supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
+  updateAccountProfile({name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',googleLinked:!!me.googleLinked,googleAvatarUrl:me.googleAvatarUrl||null,useGoogleAvatar:!!me.useGoogleAvatar,supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
   document.dispatchEvent(new CustomEvent('proplet:profile-refreshed'));
   return me;
  }catch(e){if(throwOnError)throw e;return null}
@@ -1123,7 +1135,7 @@ async function deleteAccount(){
   await api('/api/account',{method:'DELETE',body:JSON.stringify({confirmation:'SMAZAT',password:p.hasPassword?password:null})});
   try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch{}
   try{const reg=await navigator.serviceWorker?.ready,sub=await reg?.pushManager?.getSubscription?.();if(sub)await sub.unsubscribe()}catch{}
-  localStorage.removeItem(PROFILE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(REJECTED_QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
+  clearAccountProfile();localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(REJECTED_QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
  }catch(e){$('#deleteAccountError').textContent=e.message}finally{button.disabled=false;button.textContent='Trvale smazat účet'}
 }
 let reportingClientError=false;
@@ -1154,9 +1166,9 @@ async function saveNewProfile(){
  const authAction=accountMode,offerInstallAfterCreate=authAction==='create'&&!profileModalFromNudge&&!profileModalFromWin;
  const name=$('#playerNameInput').value.trim(),password=$('#playerPasswordInput').value;$('#profileFormError').textContent='';if(!name||!password){$('#profileFormError').textContent='Vyplň jméno a heslo.';return}if(password.length<8){$('#profileFormError').textContent='Heslo musí mít alespoň 8 znaků.';return}
  try{
-  const endpoint=accountMode==='create'?'/api/player':'/api/login',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body)});
+  const endpoint=accountMode==='create'?'/api/player':'/api/login-integrity',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body)});
   try{await currentGame?.finishTelemetryPromise}catch{}
-  const hadNoProfile=!getProfile();if(hadNoProfile)adoptGuestData(profile.id);const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';saveProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
+  const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   try{await api('/api/anonymous/claim',{method:'POST',body:JSON.stringify({anonymous_id:anonId})});rotateAnonymousId()}catch{}
   trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
@@ -1167,7 +1179,7 @@ function setTeamMembershipMode(mode){teamMembershipMode=mode;const join=mode==='
 async function openTeamMembershipModal(){const p=getProfile();if(!p?.token){openProfileModal('create');return}if(p.familyCode){showToast('Už jsi v týmu.');return}$('#teamMembershipError').textContent='';$('#teamMembershipJoinPin').value='';$('#teamMembershipNewPin').value='';$('#teamMembershipName').value='';setTeamMembershipMode('join');$('#teamMembershipModal').classList.remove('hidden');try{await loadLeagues();const sel=$('#teamMembershipSelect');sel.innerHTML=['<option value="">Vyber tým…</option>',...leaguesCache.map(l=>`<option value="${esc(l.code)}">${esc(l.name)}${l.members?` · ${countCz(l.members,'hráč','hráči','hráčů')}`:''}</option>`)].join('')}catch{}}
 async function saveTeamMembership(){
  $('#teamMembershipError').textContent='';const join=teamMembershipMode==='join',family_code=join?normalizeLeagueCode($('#teamMembershipSelect').value):null,league_name=join?null:$('#teamMembershipName').value.trim(),league_pin=join?$('#teamMembershipJoinPin').value:$('#teamMembershipNewPin').value;if(join&&!family_code){$('#teamMembershipError').textContent='Vyber tým.';return}if(!join&&!league_name){$('#teamMembershipError').textContent='Pojmenuj nový tým.';return}if((league_pin||'').length<4){$('#teamMembershipError').textContent='PIN musí mít alespoň 4 znaky.';return}
- try{const r=await api('/api/team-membership',{method:'POST',body:JSON.stringify({mode:join?'join':'new',family_code,league_name,league_pin})}),p=getProfile();saveProfile({...p,familyCode:r.familyCode,leagueName:r.leagueName});$('#teamMembershipModal').classList.add('hidden');showToast(join?'Jsi v týmu ✓':'Tým založen ✓');renderProfile();renderLeaderboard();renderDaily()}catch(e){$('#teamMembershipError').textContent=e.message}
+ try{const r=await api('/api/team-membership',{method:'POST',body:JSON.stringify({mode:join?'join':'new',family_code,league_name,league_pin})});updateAccountProfile({familyCode:r.familyCode,leagueName:r.leagueName});$('#teamMembershipModal').classList.add('hidden');showToast(join?'Jsi v týmu ✓':'Tým založen ✓');renderProfile();renderLeaderboard();renderDaily()}catch(e){$('#teamMembershipError').textContent=e.message}
 }
 function openPasswordModal(){
  $('#passwordFormError').textContent='';$('#setPasswordInput').value='';$('#setPasswordConfirmInput').value='';$('#setPasswordInput').type='password';$('#setPasswordConfirmInput').type='password';$('#setPasswordToggle').textContent='👁 Zobrazit heslo';$('#passwordModal').classList.remove('hidden');
@@ -1178,7 +1190,7 @@ async function savePassword(){
  if(password!==confirm){$('#passwordFormError').textContent='Hesla se neshodují.';return}
  try{
   await api('/api/password',{method:'POST',body:JSON.stringify({password})});
-  const p=getProfile();saveProfile({...p,hasPassword:true});$('#passwordModal').classList.add('hidden');showToast('Heslo nastaveno. Teď se můžeš přihlásit i na jiném zařízení ✓');renderProfile();
+  updateAccountProfile({hasPassword:true});$('#passwordModal').classList.add('hidden');showToast('Heslo nastaveno. Teď se můžeš přihlásit i na jiném zařízení ✓');renderProfile();
  }catch(e){$('#passwordFormError').textContent=e.message}
 }
 
@@ -1218,8 +1230,8 @@ function supportOutcomeHtml(mode,compact=false){const cfg=SUPPORT_MODES[mode]||S
 function supportChoicesHtml(context='onboard'){const compact=context==='onboard';return Object.entries(SUPPORT_MODES).map(([mode,cfg])=>`<button class="support-choice" data-${context}-support="${mode}"><span>${cfg.icon}</span><div><strong>${cfg.label}${compact&&cfg.seconds?` · ${cfg.seconds} s`:''}</strong>${compact?'':`<small>${cfg.seconds?`po ${cfg.seconds} sekundách`:'sám se neozve'}</small>`}</div></button>`).join('')}
 function renderSupportChoice(rootSelector,mode,outcomeSelector,compact=false){$(`${rootSelector}`)?.querySelectorAll('.support-choice').forEach(b=>b.classList.toggle('selected',(b.dataset.supportMode||b.dataset.onboardSupport)===mode));const outcome=$(outcomeSelector);if(outcome)outcome.innerHTML=supportOutcomeHtml(mode,compact)}
 async function persistSupportMode(mode){
- if(!validSupportMode(mode))throw new Error('Neplatné nastavení Pomocníka');rememberSupportMode(mode);const p=getProfile();if(!p?.token)return mode;const previous=validSupportMode(p.supportMode)?p.supportMode:'none';saveProfile({...p,supportMode:mode});
- try{const r=await api('/api/support-mode',{method:'POST',body:JSON.stringify({support_mode:mode})});const saved=validSupportMode(r.supportMode)?r.supportMode:mode;rememberSupportMode(saved);saveProfile({...getProfile(),supportMode:saved});return saved}catch(e){rememberSupportMode(previous);saveProfile({...getProfile(),supportMode:previous});throw e}
+ if(!validSupportMode(mode))throw new Error('Neplatné nastavení Pomocníka');rememberSupportMode(mode);const p=getProfile();if(!p?.token)return mode;const previous=validSupportMode(p.supportMode)?p.supportMode:'none';updateAccountProfile({supportMode:mode});
+ try{const r=await api('/api/support-mode',{method:'POST',body:JSON.stringify({support_mode:mode})});const saved=validSupportMode(r.supportMode)?r.supportMode:mode;rememberSupportMode(saved);updateAccountProfile({supportMode:saved});return saved}catch(e){rememberSupportMode(previous);updateAccountProfile({supportMode:previous});throw e}
 }
 function selectSupportModeDraft(mode){if(!validSupportMode(mode))return;supportModeDraft=mode;renderSupportChoice('#supportModeModal',mode,'#supportModeOutcome')}
 function openSupportModeModal(){
@@ -1252,9 +1264,9 @@ function dismissHelperOffer(){
 }
 
 async function saveAvatar(avatar){
- const p=getProfile();if(!p?.token)return;try{const r=await api('/api/avatar',{method:'POST',body:JSON.stringify({avatar,use_google_avatar:false})});saveProfile({...p,avatar:r.avatar,useGoogleAvatar:false,googleAvatarUrl:r.googleAvatarUrl||p.googleAvatarUrl||null});updateProfileChip();renderProfile();if(currentScreen==='leaderboard')renderLeaderboard();showToast(`Avatar ${avatar} uložen ✓`)}catch(e){showToast(e.message)}
+ const p=getProfile();if(!p?.token)return;try{const r=await api('/api/avatar',{method:'POST',body:JSON.stringify({avatar,use_google_avatar:false})});updateAccountProfile({avatar:r.avatar,useGoogleAvatar:false,googleAvatarUrl:r.googleAvatarUrl||p.googleAvatarUrl||null});updateProfileChip();renderProfile();if(currentScreen==='leaderboard')renderLeaderboard();showToast(`Avatar ${avatar} uložen ✓`)}catch(e){showToast(e.message)}
 }
-async function saveGoogleAvatar(){const p=getProfile();if(!p?.token||!safeGoogleAvatarUrl(p.googleAvatarUrl))return;try{const r=await api('/api/avatar',{method:'POST',body:JSON.stringify({use_google_avatar:true})});saveProfile({...p,useGoogleAvatar:true,googleAvatarUrl:r.googleAvatarUrl||p.googleAvatarUrl});updateProfileChip();renderProfile();showToast('Google fotka je teď tvůj avatar ✓')}catch(e){showToast(e.message)}}
+async function saveGoogleAvatar(){const p=getProfile();if(!p?.token||!safeGoogleAvatarUrl(p.googleAvatarUrl))return;try{const r=await api('/api/avatar',{method:'POST',body:JSON.stringify({use_google_avatar:true})});updateAccountProfile({useGoogleAvatar:true,googleAvatarUrl:r.googleAvatarUrl||p.googleAvatarUrl});updateProfileChip();renderProfile();showToast('Google fotka je teď tvůj avatar ✓')}catch(e){showToast(e.message)}}
 function openTeamPinModal(){const p=getProfile();if(!p?.token){openProfileModal('login');return}$('#teamPinInput').value='';$('#teamPinInput').type='password';$('#teamPinToggle').textContent='👁 Zobrazit PIN';$('#teamPinError').textContent='';$('#teamPinModal').classList.remove('hidden')}
 async function saveTeamPin(){const pin=$('#teamPinInput').value;$('#teamPinError').textContent='';if(pin.length<4){$('#teamPinError').textContent='PIN týmu musí mít alespoň 4 znaky.';return}try{await api('/api/team-pin',{method:'POST',body:JSON.stringify({pin})});$('#teamPinModal').classList.add('hidden');showToast('PIN týmu uložen ✓');await loadLeagues()}catch(e){$('#teamPinError').textContent=e.message}}
 async function logoutPlayer(){
@@ -1263,7 +1275,7 @@ async function logoutPlayer(){
  // aby nový hráč nedostával připomínky podle cizí Denní výzvy.
  try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}}catch{}
  try{await api('/api/logout',{method:'POST'})}catch{}
- localStorage.removeItem(PROFILE_KEY);rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
+ clearAccountProfile();rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
 }
 
 function renderSettings(){const s=getSettings(),supported=typeof navigator.vibrate==='function',wakeSupported=!!navigator.wakeLock?.request;renderThemeSettings();$('#soundToggle').textContent=`${s.sound?'🔊':'🔇'} Zvuk ${s.sound?'zapnutý':'vypnutý'}`;$('#soundToggle').classList.toggle('on',s.sound);$('#hapticToggle').textContent=supported?`${s.haptics?'📳':'📴'} Vibrace ${s.haptics?'zapnuté':'vypnuté'}`:'📴 Vibrace nepodporovány';$('#hapticToggle').classList.toggle('on',s.haptics&&supported);$('#hapticToggle').disabled=!supported;const magWrap=$('#magnifierSettingWrap'),mag=$('#magnifierSettingToggle'),magSupported=touchMagnifierDeviceSupported();magWrap?.classList.toggle('hidden',!magSupported);if(mag){mag.textContent=s.magnifier?'🔍 Lupa při tahu zapnutá':'🔍 Lupa při tahu vypnutá';mag.classList.toggle('on',s.magnifier);mag.setAttribute('aria-pressed',s.magnifier?'true':'false')}const wake=$('#wakeLockToggle'),note=$('#wakeLockNote');if(wake){wake.textContent=wakeSupported?`${s.wakeLock?'☀️':'🌙'} Displej během hry ${s.wakeLock?'zůstane zapnutý':'může zhasnout'}`:'🌙 Prohlížeč neumí udržet displej';wake.classList.toggle('on',s.wakeLock&&wakeSupported);wake.disabled=!wakeSupported}if(note&&!wakeSupported)note.textContent='Tento prohlížeč funkci nepodporuje; použije se běžný limit zařízení.';const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;test.textContent=supported?'📳 Otestovat vibrace':'📴 Prohlížeč vibrace nepodporuje'}}
@@ -1272,7 +1284,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 async function ensureRankingProfileState(){
  const p=getProfile();if(!p?.token)return p;
  if(Object.prototype.hasOwnProperty.call(p,'publicRankings'))return p;
- try{const fresh=await api('/api/me');saveProfile({...p,...fresh,token:p.token});return getProfile()}catch{return p}
+ try{const fresh=await api('/api/me');updateAccountProfile({...fresh,token:p.token});return getProfile()}catch{return p}
 }
 function renderRankingPrivacyNote(){
  const box=$('#rankingPrivacyNote'),p=getProfile();if(!box)return;
@@ -1289,7 +1301,7 @@ function openRankingPrivacyModal(){
  $('#rankingPrivacyPreviewAvatar').textContent=p.avatar||'🙂';$('#rankingPrivacyPreviewName').textContent=p.name||'Hráč';$('#rankingPrivacyModal').classList.remove('hidden')
 }
 async function saveRankingVisibility(enabled){
- try{const result=await api('/api/rankings/visibility',{method:'POST',body:JSON.stringify({enabled})}),p=getProfile();saveProfile({...p,publicRankings:result.publicRankings});$('#rankingPrivacyModal').classList.add('hidden');renderRankingPrivacyNote();showToast(enabled?'Jsi ve společném pořadí 🏆':'V pořadí jsi anonymně 🎭');await renderLeaderboard()}catch(e){showToast(e.message)}
+ try{const result=await api('/api/rankings/visibility',{method:'POST',body:JSON.stringify({enabled})});updateAccountProfile({publicRankings:result.publicRankings});$('#rankingPrivacyModal').classList.add('hidden');renderRankingPrivacyNote();showToast(enabled?'Jsi ve společném pořadí 🏆':'V pořadí jsi anonymně 🎭');await renderLeaderboard()}catch(e){showToast(e.message)}
 }
 function maybeShowRankingPrivacyNotice(){const p=getProfile();if(p?.token&&p.publicRankings==null)openRankingPrivacyModal()}
 
@@ -1372,7 +1384,7 @@ async function saveFamilyLeagueSettings(enabled){
 }
 async function leaveCurrentTeam(){
  const p=getProfile();if(!p?.familyCode)return;if(!confirm(`Opravdu opustit tým ${p.leagueName||p.familyCode}? Dříve získané týmové XP zůstanou týmu.`))return;
- try{await api('/api/team-membership/leave',{method:'POST',body:'{}'});saveProfile({...p,familyCode:null,leagueName:null});$('#familyLeagueModal').classList.add('hidden');showToast('Tým jsi opustil. Historické XP zůstaly na místě.');renderProfile();await renderLeaderboard()}catch(e){$('#familyLeagueModalError').textContent=e.message}
+ try{await api('/api/team-membership/leave',{method:'POST',body:'{}'});updateAccountProfile({familyCode:null,leagueName:null});$('#familyLeagueModal').classList.add('hidden');showToast('Tým jsi opustil. Historické XP zůstaly na místě.');renderProfile();await renderLeaderboard()}catch(e){$('#familyLeagueModalError').textContent=e.message}
 }
 
 async function sendPuzzleFeedback(kind,{rating=null,word=null,note=null}={}){

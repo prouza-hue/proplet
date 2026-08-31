@@ -82,8 +82,8 @@
     if(!document.querySelector('link[data-proplet-account-auth-css]')){
       const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=5';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
     }
-    loadScript('/auth-recovery-guard-v3326.js?v=1','propletAuthRecoveryGuard');
-    loadScript('/account-auth.js?v=6','propletAccountAuth');
+    await loadScript('/account-auth.js?v=7','propletAccountAuth',{wait:true});
+    loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=3','propletGameLayout');
     loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
     loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
@@ -92,7 +92,7 @@
     loadScript('/valid-word-feedback-v3330.js?v=7','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
-    loadScript('/account-team-v33210.js?v=2','propletAccountTeamIntegrity');
+    loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=4','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');

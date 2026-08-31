@@ -2,30 +2,32 @@
   'use strict';
   const PROFILE_KEY='proplet-v2-profile';
 
-  // Account recovery rotates all old sessions. Persist the fresh server-issued profile/token
-  // before the legacy account UI gets a chance to do any optional rendering or guest-data work.
-  const originalFetch=window.fetch.bind(window);
-  window.fetch=async function(input,init){
-    const response=await originalFetch(input,init);
-    try{
-      const url=new URL(typeof input==='string'?input:input?.url||'',location.href);
-      const profileEndpoints=new Set([
-        '/api/auth/recovery/reset',
-        '/api/auth/google/complete',
-        '/api/account/email/verify'
-      ]);
-      if(response.ok&&profileEndpoints.has(url.pathname)){
-        const data=await response.clone().json();
-        const incoming=data?.profile;
-        if(incoming?.id&&incoming?.token){
-          let current={};
-          try{current=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}')||{}}catch{}
-          localStorage.setItem(PROFILE_KEY,JSON.stringify({...current,...incoming}));
+  // New runtimes persist callback profiles explicitly in account-auth.js. Keep the historical
+  // fetch wrapper only as a mixed-cache fallback for an older app/account-auth generation.
+  if(!window.PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE){
+    const originalFetch=window.fetch.bind(window);
+    window.fetch=async function(input,init){
+      const response=await originalFetch(input,init);
+      try{
+        const url=new URL(typeof input==='string'?input:input?.url||'',location.href);
+        const profileEndpoints=new Set([
+          '/api/auth/recovery/reset',
+          '/api/auth/google/complete',
+          '/api/account/email/verify'
+        ]);
+        if(response.ok&&profileEndpoints.has(url.pathname)){
+          const data=await response.clone().json();
+          const incoming=data?.profile;
+          if(incoming?.id&&incoming?.token){
+            let current={};
+            try{current=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}')||{}}catch{}
+            localStorage.setItem(PROFILE_KEY,JSON.stringify({...current,...incoming}));
+          }
         }
-      }
-    }catch{}
-    return response;
-  };
+      }catch{}
+      return response;
+    };
+  }
 
   // The same field is used for a 24-character game nickname and for email login. The base HTML
   // still carries the historical nickname limit, so switch it according to the active auth mode.

@@ -9,15 +9,21 @@ let recoveryContext=null;
 let knownAvatars=[];
 let enhanceScheduled=false;
 let securityRefreshPromise=null;
+const PROFILE_RESPONSE_ENDPOINTS=new Set(['/api/auth/recovery/reset','/api/auth/google/complete','/api/account/email/verify']);
+window.PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE=true;
 
 function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
 function profileScreenActive(){return !!$('#screen-profile')?.classList.contains('active')}
-function authHeaders(){const p=profile();return p?.token?{'Authorization':`Bearer ${p.token}`}:{}}
+function authHeaders(){try{return typeof accountAuthHeaders==='function'?accountAuthHeaders():(profile()?.token?{'Authorization':`Bearer ${profile().token}`}:{})}catch{return {}}}
 async function call(path,{method='GET',body,auth=true}={}){
  const headers={'Accept':'application/json',...(body?{'Content-Type':'application/json'}:{}),...(auth?authHeaders():{})};
  const r=await fetch(path,{method,headers,body:body?JSON.stringify(body):undefined,cache:'no-store'});
  let d={};try{d=await r.json()}catch{}
  if(!r.ok)throw new Error(d.detail||'Něco se nepodařilo. Zkus to znovu.');
+ if(PROFILE_RESPONSE_ENDPOINTS.has(path)&&d?.profile?.id&&d?.profile?.token){
+  if(typeof persistAccountResponseProfile==='function')persistAccountResponseProfile(d.profile);
+  else{let current={};try{current=JSON.parse(localStorage.getItem('proplet-v2-profile')||'{}')||{}}catch{}try{localStorage.setItem('proplet-v2-profile',JSON.stringify({...current,...d.profile}))}catch{}}
+ }
  return d;
 }
 function toast(text){try{if(typeof showToast==='function')return showToast(text)}catch{} alert(text)}
@@ -27,8 +33,8 @@ function cleanAuthUrl(){
 function acceptProfile(p){
  if(!p?.id||!p?.token)return;
  try{
-  const had=!profile();if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id);
-  if(typeof saveProfile==='function')saveProfile({id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',googleAvatarUrl:p.googleAvatarUrl||null,useGoogleAvatar:!!p.useGoogleAvatar,supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked});
+  const next={id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',googleAvatarUrl:p.googleAvatarUrl||null,useGoogleAvatar:!!p.useGoogleAvatar,supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked};
+  if(typeof acceptAccountProfile==='function')acceptAccountProfile(next);else{const had=!profile();if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id);if(typeof saveProfile==='function')saveProfile(next)}
   if(typeof updateProfileChip==='function')updateProfileChip();
   if(typeof renderProfile==='function')renderProfile();
   if(typeof renderDaily==='function')renderDaily();
@@ -155,7 +161,7 @@ function openProfileEditor(){
 }
 async function saveDisplayName(){
  const input=$('#displayNameInput'),msg=$('#displayNameMessage'),btn=$('#saveDisplayNameBtn'),name=String(input.value||'').trim().replace(/\s+/g,' ');msg.textContent='';if(!name){msg.textContent='Napiš, jak ti má Proplet říkat.';return}if(name.length>24){msg.textContent='Přezdívka může mít nejvýš 24 znaků.';return}btn.disabled=true;
- try{const d=await call('/api/account/display-name',{method:'POST',body:{name}}),p=profile();if(typeof saveProfile==='function')saveProfile({...p,name:d.name});if(typeof updateProfileChip==='function')updateProfileChip();if(typeof renderProfile==='function')renderProfile();if(typeof renderLeaderboard==='function')renderLeaderboard();closeModal('#profileEditModal');toast(`✎ Teď ti říkáme ${d.name}.`)}catch(e){msg.textContent=e.message}finally{btn.disabled=false}
+ try{const d=await call('/api/account/display-name',{method:'POST',body:{name}}),p=profile();if(typeof updateAccountProfile==='function')updateAccountProfile({name:d.name});else if(typeof saveProfile==='function')saveProfile({...p,name:d.name});if(typeof updateProfileChip==='function')updateProfileChip();if(typeof renderProfile==='function')renderProfile();if(typeof renderLeaderboard==='function')renderLeaderboard();closeModal('#profileEditModal');toast(`✎ Teď ti říkáme ${d.name}.`)}catch(e){msg.textContent=e.message}finally{btn.disabled=false}
 }
 function openRecoveryEmailModal(){ensureModals();$('#recoveryEmailAddInput').value='';$('#recoveryEmailAddMessage').textContent='';openModal('#recoveryEmailModal');setTimeout(()=>$('#recoveryEmailAddInput')?.focus(),60)}
 async function saveRecoveryEmail(){const email=$('#recoveryEmailAddInput').value.trim(),msg=$('#recoveryEmailAddMessage'),btn=$('#saveRecoveryEmailBtn');msg.textContent='';if(!validEmail(email)){msg.textContent='Zkontroluj e-mailovou adresu.';return}btn.disabled=true;try{const d=await call('/api/account/email/start',{method:'POST',body:{email}});msg.textContent=d.message||'Odkaz je na cestě.'}catch(e){msg.textContent=e.message}finally{btn.disabled=false}}
