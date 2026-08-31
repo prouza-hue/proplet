@@ -2,16 +2,37 @@
 
 - Sprint: 11A — Gameplay completion vertical slice
 - Branch: `refactor/s11a-game-completion`
-- Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD; runtime S10 = `6467a809…`)
-- Stav: implementation
+- Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
+- Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+- Stav: **implementace uzavřena / GREEN, čeká na user preview + pozdější merge approval**
 - Zamýšlená změna chování: žádná.
-- Cíl: `finishGame` zůstane jediným runtime vlastníkem dokončení hry; late feature vrstvy přestanou funkci přepisovat a místo toho se připojí přes explicitní completion hooky.
-- Characterizované side-effecty: local state → result queue → finish telemetry; win XP/UI; async sync + leaderboard; shared challenge/Daily completion; Klidný režim; reset `comparison-loaded`.
-- Kompatibilita: Sprint 11A musí zachovat fallback pro klienty s nestejně starými cache assety; žádná změna produkční DB, API payloadů, XP pravidel, gameplaye ani copy.
-- Testy: nový `tests/current/test_s11a_completion_characterization.js` + existující shared Daily runtime test přidány do current gate.
-- Characterization gate před runtime změnou: PASS.\n- Implementace: nový `public/app/core/completion-pipeline.js`; `finishGame` spouští explicitní before/after fáze; competitive sharing, Klidný režim a copy-density používají prioritizované hooky a při nedostupném novém core se vrací k původnímu wrapperu.\n- Zbývá: current gate + Vercel preview/browser smoke; případné opravy pouze proti zjištěným regresím.
-- Produkce/main/Supabase: beze změny.
-- Bezpečný rollback: branch reset na `66081c664a0120cdb37b4344ce6d7beff9169c4c`.
+- Výsledek:
+  - nový `public/app/core/completion-pipeline.js` je jediný explicitní registry/executor completion hooků;
+  - `finishGame` vlastní before/after completion fáze a dál drží původní pořadí persistence → queue → telemetry → win UI → async sync/leaderboard;
+  - `copy-density-v3327.js` registruje before hook s prioritou 10 pro reset `comparison-loaded`;
+  - `quality-v334-core-v40114.js` registruje after hook s prioritou 20 pro Klidný režim;
+  - `competitive-sharing-v3331.js` registruje after hook s prioritou 30 pro shared result UI a `shared_daily_completed`;
+  - všechny tři feature vrstvy zachovávají legacy wrapper fallback, pokud běží proti staršímu `app.js` / chybějícímu completion core v rozhozené PWA cache.
+- Characterization commit před runtime změnou: `5b63360e75e466af55f61ef1da4f3ca56b7fa0ed`.
+- Runtime commit: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`.
+- Testy PASS:
+  - Current runtime gate: **36 PASS / 0 FAIL**;
+  - Assets: **75 PASS / 0 FAIL** (67 lokálních referencí);
+  - Syntax: **212 PASS / 0 FAIL**;
+  - `tests/current/test_s11a_completion_characterization.js`: PASS;
+  - `tools/test_v40114_share_runtime.js`: PASS na nové hook cestě;
+  - completion core unit test: priorita, before/after order a idempotentní registrace PASS.
+- Vercel preview:
+  - deployment `dpl_55vLwweKeyscYBa7uYgnftxKHaJ6`: READY;
+  - branch alias: `https://proplet-git-refactor-s11a-game-co-bc2649-pavel-prouzas-projects.vercel.app`;
+  - `/api/health`: HTTP 200, Proplet 4.01.39, `ok=true`, DB true;
+  - HTTP smoke potvrzuje nový completion asset, before/after runner v `app.js` a hook cestu ve všech třech feature vrstvách.
+- PWA shell: budget se zvýšil pouze o nový malý completion core (13→14); heavy/lazy asset pravidla zůstala beze změny.
+- Známý nesouvisející check: historický `v3.34 Generation 4 contract` zůstává červený ze stejného důvodu jako před Sprintem 11A; current runtime gate je GREEN.
+- Produkce/main/Supabase: **beze změny**. Draft PR #89.
+- Rollback: reset branche na `66081c66…`; žádná DB/content migrace.
+- Bezpečný bod pokračování: runtime `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e` + tento status-only commit.
+- Další krok: user preview; po schválení lze řešit merge pořadí Sprint 10 → 11A nebo pokračovat dalším plánovaným refaktor sprintem na navazující branchi.
 
 ## Předchozí uzavřený stav
 
@@ -91,6 +112,7 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
+
 
 
 
