@@ -1,11 +1,32 @@
 # Technical debt refactor status
 
+- Sprint: 12B.1 — onboarding a engagement nudges orchestration
+- Branch: `refactor/s12b-onboarding`
+- Base SHA: `2fe6010889c1a6eb185c45d37577a0a785986782` (uzavřený produkční Sprint 12A.2)
+- Stav: **ZAHÁJENO / READ-ONLY MAPOVÁNÍ / BEZ RUNTIME ZMĚN**
+- Rozsah:
+  - pouze `engagement/onboarding.js` + `engagement/nudges.js`;
+  - starter/helper/install/account/push CTA a jejich lifecycle;
+  - Daily orchestration a rankings jsou mimo tento řez a zůstávají za STOP bránou.
+- Dosud:
+  - založena branch z přesného produkčního main;
+  - načten plán Sprintu 12B a audit Finding 3;
+  - probíhá mapování globálních vlastníků, wrapperů, listenerů, observerů a timeoutů;
+  - produkční 12A.2 rollout ověřen bez chyb.
+- Omezení pracovního běhu: lokální checkout/runner je momentálně nedostupný; před runtime změnou je nutný characterization checkpoint a zelený Current Runtime Gate přes bezpečně dostupný runner/CI.
+- Produkce/main/Supabase: **beze změny oproti uzavřenému 12A.2**. Žádná migrace.
+- Další krok: dokončit mapu a characterization test; runtime neměnit bez zeleného test-only checkpointu.
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 12A.2 — profile/team UI ownership
 - Branch: `refactor/s12a2-profile-team-ui`
 - Base SHA: `72846baa3c5de28a87051d3e7e2493380963e411` (`main`, uzavřený Sprint 12A.1)
 - Characterization: lokální `d48c772`; publikovaný `f17448e7753c602e307855c774bd6edc5071f987`
 - Runtime: lokální `8e99f8b`; publikovaný `29f376e0a339ce3cb643831062ab3b22dbc69bac`
-- Stav: **IMPLEMENTACE GREEN / PREVIEW READY / ČEKÁ NA USER QA A MERGE SOUHLAS**
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Výsledek:
   - nový `public/app/account/account.js` vlastní profilový renderer, bezpečné Google avatary, týmový seznam, join/new membership, týmový PIN, family-league nastavení a leave;
   - `app.js` ponechává pouze tenké přiřaditelné adaptéry, takže `account-bonus`, `account-conversion` a `copy-density` dál mohou obalit `renderProfile`;
@@ -24,9 +45,12 @@
   - `/`, `/api/health`, `/app.js` a `/app/account/account.js` vracejí 200;
   - health hlásí Proplet 4.01.40, `ok=true`, DB true; runtime error/fatal log scan čistý.
 - PR: draft #94 — `https://github.com/prouza-hue/proplet/pull/94`.
-- Produkce/main/Supabase: **beze změny**. Žádná migrace.
+- Merge/main: fast-forward na `2fe6010889c1a6eb185c45d37577a0a785986782`; PR #94 je automaticky označený jako merged.
+- Produkce: deployment `dpl_PZEwHmZFSiDWVVqhbafRot4Bvu5M` je **READY**; `hrajproplet.cz`, health, account modul i CSS `s12a2r2` vracejí 200; DB true; runtime error/fatal scan čistý.
+- Supabase: beze změny. Žádná migrace.
 - Rollback: zavřít PR/resetnout branch na `72846baa…`; není potřeba DB/content rollback.
-- Další krok: user preview; merge na `main` pouze po explicitním souhlasu. Sprint 12B nezačínat před uzavřením tohoto checkpointu.
+- Další povolený krok: pouze první samostatný řez Sprintu 12B — onboarding/nudges.
+
 
 ## Předchozí uzavřený stav
 
