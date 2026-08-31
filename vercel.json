@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["arn1"],
+  "env": {
+    "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true"
+  },
   "crons": [
     {
       "path": "/api/cron/daily-push-v2",
