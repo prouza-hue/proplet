@@ -30,6 +30,7 @@
       {"path": "tests/current/test_s08a_result_contract.py", "runner": "python"},
       {"path": "tests/current/test_s08b_result_adapter_characterization.py", "runner": "python"},
       {"path": "tests/current/test_s08b_atomic_result_adapter.py", "runner": "python"},
+      {"path": "tests/current/test_s09_ranking_query_bounds.py", "runner": "python"},
       {"path": "tests/current/test_domain_golden.py", "runner": "python"},
       {"path": "tests/current/test_result_queue.js", "runner": "node"},
       {"path": "tests/current/test_domain_golden.js", "runner": "node"},

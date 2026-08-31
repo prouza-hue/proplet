@@ -125,6 +125,56 @@ def db_select_all(table: str, request_fn: Optional[Callable[..., Any]] = None, /
         offset += page_size
 
 
+def db_select_bounded(
+    table: str,
+    request_fn: Optional[Callable[..., Any]] = None,
+    /,
+    *,
+    columns: str = "*",
+    filters: Optional[dict[str, str]] = None,
+    order: Optional[str] = None,
+    max_rows: int = 5000,
+):
+    """Read an explicitly scoped PostgREST result with a hard transfer cap.
+
+    ``filters`` contains complete PostgREST operators (for example ``eq.daily``
+    or ``gte.2026-08-31T00:00:00Z``).  Fetching one extra row lets callers fail
+    closed instead of silently returning a truncated ranking/admin result.
+    """
+    if not 1 <= max_rows <= 20_000:
+        raise ValueError("max_rows must be between 1 and 20000")
+    requester = request_fn or db_request
+    rows: list[dict] = []
+    offset = 0
+    while len(rows) <= max_rows:
+        remaining = max_rows + 1 - len(rows)
+        page_size = min(1000, remaining)
+        params = {
+            "select": columns,
+            "limit": str(page_size),
+            "offset": str(offset),
+        }
+        if order:
+            params["order"] = order
+        params.update(filters or {})
+        page = requester("GET", table, params=params)
+        if not isinstance(page, list):
+            raise HTTPException(503, "Databáze vrátila neplatný formát")
+        rows.extend(page)
+        if len(rows) > max_rows:
+            logger.warning(
+                "Bounded query exceeded table=%s max_rows=%s filters=%s",
+                table,
+                max_rows,
+                sorted((filters or {}).keys()),
+            )
+            raise HTTPException(503, "Datový dotaz překročil bezpečný limit")
+        if len(page) < page_size:
+            return rows
+        offset += page_size
+    raise HTTPException(503, "Datový dotaz překročil bezpečný limit")
+
+
 def db_insert(table: str, row: dict, request_fn: Optional[Callable[..., Any]] = None, /):
     requester = request_fn or db_request
     rows = requester("POST", table, body=row, prefer="return=representation")

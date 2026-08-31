@@ -1,17 +1,27 @@
 # Technical debt refactor status
 
-- Sprint: 08B — Atomic `/api/result`: implementace
-- Branch: `refactor/s08b-atomic-result`
-- Base SHA: `317dee6` (`origin/main`; produkční 4.01.37 se schválenými Sprinty 00–07B a Tajenka result hotfixem)
-- Approved contract checkpoint: schválený Sprint 08A je v historii větve beze změny runtime
-- Pre-runtime characterization checkpoint: charakterizace legacy adaptéru je v historii větve před implementací 08B
-- Stav: implementace, izolované PostgreSQL ověření i Vercel preview hotové / čeká uživatelské schválení produkční brány
-- Zamýšlená změna chování: `/api/result` má po zapnutí serverového rollout flagu ukládat command ledger, puzzle run, oficiální result, legacy reward claim a vlastněný/offline attempt v jedné idempotentní PostgreSQL transakci. Veřejný request a response kontrakt zůstává kompatibilní. Legacy cesta zůstane pouze jako časově omezený rollback fallback; default produkční chování se v této branchi nezapíná.
-- Změněné soubory: `backend/results.py`, flag v `backend/config.py`, RPC error mapping v `backend/db.py`, rollout adapter v `server.py`, verzovaná migrace + verify + bezpečný rollback, disposable DB acceptance testy, migrační manifest a současný testovací manifest.
-- Hotové kroky: Větev vytvořena z aktuálního `origin/main` po produkčním Tajenka hotfixu; kontrakt 08A přenesen jako samostatný commit. Read-only otisk živého schématu potvrdil přesné sloupce, constrainty a indexy pěti dotčených tabulek. Charakterizována legacy cesta. Implementován deterministický request/command digest, durable replay před content lookupem, service-role-only atomická RPC hranice a výchozí vypnutý rollout flag. Připravena aditivní migrace, read-only verify, audit zachovávající rollback a failure-injection sada pro všech šest transakčních fází. Protože produkční tarif nepodporuje branching, byl po samostatném schválení vytvořen bezplatný dočasný projekt bez produkčních dat. Na něm prošla migrace, verify, exact retry, digest conflict, zamítnutí anon role, šest failure-injection bodů, kontrola nulových zbytků, advisor review, bezpečný rollback, rollback verify a opětovné nasazení. Testovací projekt je po dokončení pozastavený; dostupný konektor neumí projekt smazat. GitHub větev byla publikována a její finální strom byl porovnán s lokálně otestovaným stromem (`c748a05b` shodně na obou stranách). Vercel preview přešlo do `READY`; `/api/health` vrací 200, hlavní obrazovka i Tajenka se vykreslují a aplikace nemá vlastní konzolové chyby.
-- Zbývající kroky: Uživatelsky ověřit preview a STOP. Produkční migrace, zapnutí flagu i merge na `main` vyžadují samostatné schválení.
-- Testy PASS: current gate 32/32, assety 72/72, syntax 207/207; atomic adapter, legacy characterization, kontrakt 08A a migrační manifest PASS; disposable PostgreSQL acceptance a rollback drill PASS.
-- Testy FAIL / nespouštěné: žádné. Produkční DB, produkční deployment a rollout flag nebyly změněny.
-- Nově nalezená rizika: RPC bude service-role-only `SECURITY DEFINER`; musí mít fixní `search_path`, plně kvalifikované objekty a explicitní revoke od `PUBLIC`, `anon` i `authenticated`. `puzzle_attempts.mode` musí přijmout `starter` a `tajenka`. Globální unique `puzzle_runs.attempt_id` nesmí při cizí kolizi zahodit platný result command.
-- Bezpečný bod pokračování: GitHub větev `refactor/s08b-atomic-result` a Vercel preview `https://proplet-git-refactor-s08b-atomic-result-pavel-prouzas-projects.vercel.app/`; produkční DB ani produkční deployment nebyly změněny.
-- Další povolený sprint: žádný. Sprint 09 nezačínat; 08B končí vlastní produkční bránou a STOP.
+- Sprint: 09 — Ranking a admin query boundaries
+- Branch: `refactor/s09-ranking-query-bounds`
+- Base SHA: `e6c6204` (`origin/main`; Sprint 08B aplikace na main, atomická DB migrace/rollout zůstávají samostatně vypnuté)
+- Stav: implementace a izolované PostgreSQL ověření hotové; větev ještě není publikovaná / preview ještě není vytvořené
+- Zamýšlená změna chování: žádná změna pravidel pořadí, tie-breaků, anonymizace, UX ani indexů. Mění se pouze hranice čtení: agregace a first-run redukce probíhají v databázi, metadata se načítají jen pro dotčené entity a kompatibilní PostgREST fallback je puzzle/challenge-scoped s tvrdým limitem.
+- Změněné soubory: `backend/rankings.py`, bounded query transport v `backend/db.py`, ranking/admin adaptéry v `server.py`, aditivní migrace `SUPABASE_MIGRATION_V4_01_39_QUERY_BOUNDS.sql`, read-only verify, migrační manifest a současné/golden testy.
+- Baseline před Sprintem 09:
+  - `/api/rankings/xp`: 1 aggregate RPC, poté celé tabulky `players` a `leagues`; při RPC chybě celý `results`, `account_rewards` a `streak_rescues`.
+  - `/api/rankings/daily`: všechny `players`, `leagues` a `team_memberships` plus puzzle-scoped runs.
+  - legacy `/api/leaderboard`: `player_stats()` třikrát čte data pro každého člena a poté načte celé `results`; databázové dotazy rostly jako `3N + 3`.
+  - admin overview/users: 6, respektive 5 celotabulkových přenosů do aplikace; další admin seznamy a quality agregace používaly neohraničený `db_select_all`.
+- Výsledek Sprintu 09:
+  - XP používá existující aggregate RPC a entity-scoped hráče/týmy; neexistuje full-scan fallback.
+  - Daily/Free globální pořadí používá `proplet_ranking_runs_v1`; fallback čte jen jeden puzzle/challenge a při překročení 5 000 řádků selže uzavřeně místo tichého ořezu.
+  - legacy týmový leaderboard používá 4 bulk dotazy nezávisle na počtu členů; `player_stats()` dostává přednačtené family-scoped řádky.
+  - Liga týmů čte jen veřejné týmy, jejich členy a sedm konkrétních Daily challenge keys.
+  - admin overview/users používají po jednom service-role-only RPC; users jsou filtrováni a stránkováni v PostgreSQL. Ostatní admin/quality čtení mají explicitní 7/24/30denní okna nebo tvrdé přenosové limity. V produkčním `server.py` nezůstalo žádné volání `db_select_all` mimo kompatibilní definici helperu.
+- Golden chování: první standardní dokončení zůstává autoritativní; pozdější rychlejší replay výsledek nezlepší; calm run se nezapočítá; shodné viditelné skóre používá competition ranking `1, 1, 3`; public opt-in jméno zůstává veřejné a private/NULL identita zůstává deterministický alias; Daily dokončené po půlnoci zůstává u challenge data z `challenge_key`.
+- Izolované DB ověření: bezplatný testovací projekt bez produkčních dat, po ověření znovu pozastavený; migrace PASS, tři funkce jsou `STABLE SECURITY INVOKER`, execute má jen `service_role`, `anon` a `authenticated` jsou zamítnuté. Fixture ověřil replay/calm/cross-midnight pravidla a admin payload/filter. `EXPLAIN ANALYZE` pro first-run dotaz použil existující `puzzle_runs_competitive_rank_idx`, vrátil 2 řádky za přibližně 0,65 ms; žádný index nebyl přidán ani změněn.
+- Testy PASS: current gate 33/33, assety 72/72, syntax 209/209; migration manifest 42/42; query-count kontrakt ověřuje konstantní 4 bulk dotazy pro tým o 2 i 25 členech.
+- Testy FAIL / nespouštěné: žádné. Produkční Supabase migrace ani produkční deployment nebyly provedeny.
+- Rollout pořadí: před merge/deploy aplikace aplikovat aditivní v4.01.39 migraci, spustit read-only verify, teprve potom nasadit aplikaci. Ranking endpointy mají bezpečný bounded compatibility fallback; admin overview/users záměrně vyžadují hotovou migraci a nepoužívají full-scan fallback.
+- Nově nalezená rizika: hard cap 5 000 ranking runs / entities, 10 000 weekly runs a 20 000 telemetry řádků selže 503, pokud dataset přeroste bezpečnou hranici; jde o měřitelný guard, ne tiché zkrácení. Další navýšení nebo nový index vyžaduje samostatná data a schválení.
+- Bezpečný bod pokračování: lokální čistě otestovaná větev `refactor/s09-ranking-query-bounds`; dalším krokem je commit, publikace větve a Vercel preview, potom STOP na uživatelské ověření.
+- Další povolený sprint: žádný. Sprint 10 nezačínat bez výslovného pokynu.

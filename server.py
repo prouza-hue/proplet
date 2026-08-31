@@ -21,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from content_archive import archived_puzzle_info, daily_window_id, daily_window_puzzle_id, load_catalog
 from backend import content as domain_content
 from backend import db as backend_db
+from backend import rankings as ranking_queries
 from backend import results as result_domain
 from backend.config import (
     APP_VERSION,
@@ -226,6 +227,24 @@ def db_select(table: str, **filters):
 
 def db_select_all(table: str, **filters):
     return backend_db.db_select_all(table, db_request, **filters)
+
+
+def db_select_bounded(
+    table: str,
+    *,
+    columns: str = "*",
+    filters: Optional[dict[str, str]] = None,
+    order: Optional[str] = None,
+    max_rows: int = 5000,
+):
+    return backend_db.db_select_bounded(
+        table,
+        db_request,
+        columns=columns,
+        filters=filters,
+        order=order,
+        max_rows=max_rows,
+    )
 
 
 def db_insert(table: str, row: dict):
@@ -574,12 +593,18 @@ def player_reward_stats(player_id: str) -> dict:
     return reward_stats_from_rows(rewards, account_rewards_included=included)
 
 
-def player_stats(player_id: str) -> dict:
+def player_stats(
+    player_id: str,
+    *,
+    prefetched_results: Optional[list[dict]] = None,
+    prefetched_rewards: Optional[list[dict]] = None,
+    prefetched_rescues: Optional[list[dict]] = None,
+) -> dict:
     """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
     # Public stats keys remain owned by the core: "xpAuthoritative",
     # "resultXp", "accountBonusXp", "wordDiscoveryXp", "discoveredWords".
     # Serialization aliases remain: "freeBasePlayedCurrent": free_slots["baseCurrent"].
-    rows = db_select("results", player_id=player_id)
+    rows = prefetched_results if prefetched_results is not None else db_select("results", player_id=player_id)
     repair_plan = gen4_free_reward_repair_plan(rows)
     if repair_plan["updates"]:
         # Intentionally omit player/result identifiers: this is an aggregate
@@ -618,11 +643,16 @@ def player_stats(player_id: str) -> dict:
             logger.warning("Ignoring malformed elapsed time for result %s", row.get("id"))
 
     free_slots = free_slot_summary(rows)
-    reward_stats = player_reward_stats(player_id)
+    reward_stats = (
+        reward_stats_from_rows(prefetched_rewards, account_rewards_included=True)
+        if prefetched_rewards is not None
+        else player_reward_stats(player_id)
+    )
 
     rescue_data: list[dict] = []
     try:
-        for rr in rescue_rows(player_id):
+        source_rescues = prefetched_rescues if prefetched_rescues is not None else rescue_rows(player_id)
+        for rr in source_rescues:
             rescue_data.append(rr)
     except HTTPException:
         # During a rolling deploy before the v3.4 migration, normal gameplay remains readable.
@@ -2349,12 +2379,16 @@ def build_quality_report():
     Main calibration metrics use each player's FIRST started attempt on a puzzle.
     Replays remain available as secondary telemetry, but cannot make a puzzle look easier.
     """
-    attempts = db_select_all("puzzle_attempts")
-    feedback = db_select_all("puzzle_feedback", kind="difficulty")
-    word_feedback = db_select_all("puzzle_feedback", kind="word")
-    hint_events = db_select_all("hint_events")
-    helper_events = db_select_all("helper_events")
-    product_events = db_select_all("product_events")
+    attempts = db_select_bounded("puzzle_attempts", max_rows=20_000)
+    feedback = db_select_bounded(
+        "puzzle_feedback", filters={"kind": "eq.difficulty"}, max_rows=20_000
+    )
+    word_feedback = db_select_bounded(
+        "puzzle_feedback", filters={"kind": "eq.word"}, max_rows=20_000
+    )
+    hint_events = db_select_bounded("hint_events", max_rows=20_000)
+    helper_events = db_select_bounded("helper_events", max_rows=20_000)
+    product_events = db_select_bounded("product_events", max_rows=20_000)
 
     def ts(row):
         raw = row.get("started_at") or ""
@@ -2764,15 +2798,36 @@ def admin_launch(authorization: Optional[str] = Header(default=None)):
     cutoff7 = now - timedelta(days=7)
     cutoff30 = now - timedelta(days=30)
     today = current_prague_date()
-    product = db_select_all("product_events")
-    attempts = db_select_all("puzzle_attempts")
-    players = db_select_all("players")
+    product = db_select_bounded(
+        "product_events",
+        filters={"created_at": f"gte.{cutoff30.isoformat()}"},
+        max_rows=20_000,
+    )
+    attempts = db_select_bounded(
+        "puzzle_attempts",
+        filters={"started_at": f"gte.{cutoff30.isoformat()}"},
+        max_rows=20_000,
+    )
+    players = db_select_bounded(
+        "players",
+        columns="id,created_at",
+        filters={"created_at": f"gte.{cutoff24.isoformat()}"},
+        max_rows=5000,
+    )
     try:
-        ops = db_select_all("operational_events")
+        ops = db_select_bounded(
+            "operational_events",
+            filters={"created_at": f"gte.{cutoff7.isoformat()}"},
+            max_rows=10_000,
+        )
     except HTTPException:
         ops = []
     try:
-        support = db_select_all("support_reports")
+        support = db_select_bounded(
+            "support_reports",
+            filters={"status": "in.(new,reviewing)"},
+            max_rows=5000,
+        )
     except HTTPException:
         support = []
 
@@ -3038,12 +3093,22 @@ def admin_support(
     authorization: Optional[str] = Header(default=None),
 ):
     require_admin(authorization)
-    rows = db_select_all("support_reports")
+    filters = {}
     if status == "open":
-        rows = [row for row in rows if str(row.get("status") or "new") in ("new", "reviewing")]
+        filters["status"] = "in.(new,reviewing)"
     elif status != "all":
-        rows = [row for row in rows if str(row.get("status") or "new") == status]
-    players = {row["id"]: row for row in db_select_all("players") if row.get("id")}
+        filters["status"] = f"eq.{status}"
+    rows = db_select_bounded(
+        "support_reports",
+        filters=filters,
+        order="created_at.desc,id.desc",
+        max_rows=5000,
+    )
+    player_rows, _ = ranking_queries.entity_context(
+        db_select_bounded,
+        (row.get("player_id") for row in rows),
+    )
+    players = {row["id"]: row for row in player_rows if row.get("id")}
     out = []
     for row in sorted(rows, key=lambda r: str(r.get("created_at") or ""), reverse=True)[:200]:
         player = players.get(row.get("player_id"))
@@ -3083,128 +3148,39 @@ def admin_overview(authorization: Optional[str] = Header(default=None)):
     require_admin(authorization)
     now = datetime.now(TZ)
     today = current_prague_date()
-    seven_days_ago = now - timedelta(days=7)
-    thirty_days_ago = now - timedelta(days=30)
-    players = db_select_all("players")
-    results = db_select_all("results")
-    attempts = db_select_all("puzzle_attempts")
-    reports = db_select_all("puzzle_feedback", kind="word")
-    ratings = db_select_all("puzzle_feedback", kind="difficulty")
-    leagues = db_select_all("leagues")
-    try:
-        runs = db_select_all("puzzle_runs")
-    except HTTPException:
-        runs = results
-
-    last_activity: dict[str, datetime] = {}
-    for row in attempts:
-        player_id = row.get("player_id")
-        stamp = parse_timestamp(row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
-        if player_id and stamp and (player_id not in last_activity or stamp > last_activity[player_id]):
-            last_activity[player_id] = stamp
-    for row in results:
-        player_id = row.get("player_id")
-        stamp = parse_timestamp(row.get("completed_at"))
-        if player_id and stamp and (player_id not in last_activity or stamp > last_activity[player_id]):
-            last_activity[player_id] = stamp
-
-    run_times = [(row, parse_timestamp(row.get("completed_at"))) for row in runs]
-    today_runs = [row for row, stamp in run_times if stamp and stamp.date() == today]
-    week_runs = [row for row, stamp in run_times if stamp and stamp >= seven_days_ago]
     primary_daily = expected_daily_puzzle_id(today.isoformat())
-    daily_today = {
-        row.get("player_id") for row in results
-        if row.get("mode") == "daily"
-        and str(row.get("daily_date") or "")[:10] == today.isoformat()
-        and row.get("puzzle_id") == primary_daily
-    }
-    daily_today.discard(None)
+    payload = ranking_queries.admin_overview(
+        db_rpc,
+        now=now,
+        today=today.isoformat(),
+        primary_daily_id=primary_daily,
+    )
+    payload["generatedAt"] = now.isoformat()
+    payload["today"] = today.isoformat()
+    return payload
 
-    version_counts: dict[str, int] = {}
-    for row in attempts:
-        stamp = parse_timestamp(row.get("started_at"))
-        version = str(row.get("app_version") or "neznámá")
-        if stamp and stamp >= thirty_days_ago:
-            version_counts[version] = version_counts.get(version, 0) + 1
-    versions = [
-        {"version": version, "attempts": count}
-        for version, count in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))
+
+def admin_user_summaries(query: str, limit: int) -> tuple[int, list[dict]]:
+    total, rows = ranking_queries.admin_users(db_rpc, query=query, limit=limit)
+    return total, [
+        {
+            "id": row.get("id"),
+            "name": row.get("name"),
+            "avatar": row.get("avatar") or "🙂",
+            "familyCode": row.get("family_code"),
+            "team": row.get("team") or "Bez týmu",
+            "createdAt": row.get("created_at"),
+            "lastActiveAt": row.get("last_active_at"),
+            "appVersion": row.get("app_version"),
+            "supportMode": row.get("support_mode") or "none",
+            "hasPassword": bool(row.get("has_password")),
+            "points": int(row.get("points") or 0),
+            "completed": int(row.get("completed") or 0),
+            "dailyCompleted": int(row.get("daily_completed") or 0),
+            "openWordReports": int(row.get("open_word_reports") or 0),
+        }
+        for row in rows
     ]
-    open_reports = [row for row in reports if str(row.get("status") or "new") in ("new", "reviewing")]
-    vote_counts = {str(value): sum(1 for row in ratings if row.get("rating") == value) for value in (-1, 0, 1)}
-    return {
-        "generatedAt": now.isoformat(),
-        "today": today.isoformat(),
-        "players": {
-            "total": len(players),
-            "active7": sum(1 for stamp in last_activity.values() if stamp >= seven_days_ago),
-            "active30": sum(1 for stamp in last_activity.values() if stamp >= thirty_days_ago),
-        },
-        "games": {"today": len(today_runs), "last7Days": len(week_runs)},
-        "daily": {"todayPlayers": len(daily_today), "puzzleId": primary_daily},
-        "feedback": {"openWordReports": len(open_reports), "wordReportsTotal": len(reports), "ratingsTotal": len(ratings), "votes": vote_counts},
-        "teams": len(leagues),
-        "appVersions": versions[:8],
-    }
-
-
-def admin_user_summaries() -> list[dict]:
-    players = db_select_all("players")
-    results = db_select_all("results")
-    attempts = db_select_all("puzzle_attempts")
-    reports = db_select_all("puzzle_feedback", kind="word")
-    try:
-        leagues = {str(row.get("code")): row.get("name") or row.get("code") for row in db_select_all("leagues")}
-    except HTTPException:
-        leagues = {}
-    results_by_player: dict[str, list[dict]] = {}
-    attempts_by_player: dict[str, list[dict]] = {}
-    reports_by_player: dict[str, list[dict]] = {}
-    for row in results:
-        if row.get("player_id"):
-            results_by_player.setdefault(row["player_id"], []).append(row)
-    for row in attempts:
-        if row.get("player_id"):
-            attempts_by_player.setdefault(row["player_id"], []).append(row)
-    for row in reports:
-        if row.get("player_id"):
-            reports_by_player.setdefault(row["player_id"], []).append(row)
-
-    summaries = []
-    for player in players:
-        player_results = results_by_player.get(player["id"], [])
-        player_attempts = attempts_by_player.get(player["id"], [])
-        activity_candidates = [
-            parse_timestamp(row.get("last_activity_at") or row.get("completed_at") or row.get("started_at"))
-            for row in player_attempts
-        ] + [parse_timestamp(row.get("completed_at")) for row in player_results]
-        activity = max((stamp for stamp in activity_candidates if stamp), default=None)
-        latest_attempt = max(
-            player_attempts,
-            key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ),
-            default=None,
-        )
-        raw_family = str(player.get("family_code") or "")
-        family = public_family_code(raw_family, player.get("team_joined_at"))
-        player_reports = reports_by_player.get(player["id"], [])
-        summaries.append({
-            "id": player["id"],
-            "name": player.get("name"),
-            "avatar": player.get("avatar") or "🙂",
-            "familyCode": family,
-            "team": (leagues.get(family) or family) if family else "Bez týmu",
-            "createdAt": player.get("created_at"),
-            "lastActiveAt": activity.isoformat() if activity else None,
-            "appVersion": latest_attempt.get("app_version") if latest_attempt else None,
-            "supportMode": player.get("support_mode") or "none",
-            "hasPassword": bool(player.get("password_hash")),
-            "points": sum(int(row.get("points") or 0) for row in player_results),
-            "completed": len(player_results),
-            "dailyCompleted": len({str(row.get("daily_date"))[:10] for row in player_results if row.get("mode") == "daily" and row.get("daily_date")}),
-            "openWordReports": sum(1 for row in player_reports if str(row.get("status") or "new") in ("new", "reviewing")),
-        })
-    summaries.sort(key=lambda row: row.get("lastActiveAt") or "", reverse=True)
-    return summaries
 
 
 @app.get("/api/admin/users")
@@ -3215,10 +3191,8 @@ def admin_users(
 ):
     require_admin(authorization)
     needle = " ".join(q.strip().casefold().split())
-    rows = admin_user_summaries()
-    if needle:
-        rows = [row for row in rows if needle in " ".join((str(row.get("name") or ""), str(row.get("team") or ""), str(row.get("familyCode") or ""))).casefold()]
-    return {"total": len(rows), "users": rows[:limit]}
+    total, rows = admin_user_summaries(needle, limit)
+    return {"total": total, "users": rows}
 
 
 @app.get("/api/admin/users/{player_id}")
@@ -3271,8 +3245,26 @@ def admin_reports(
     require_admin(authorization)
     if status not in ("open", "all", "new", "reviewing", "resolved", "dismissed"):
         raise HTTPException(400, "Neplatný filtr stavu")
-    reports = db_select_all("puzzle_feedback", kind="word")
-    players = {row["id"]: row for row in db_select_all("players")}
+    report_filters = {"kind": "eq.word"}
+    if status == "open":
+        report_filters["status"] = "in.(new,reviewing)"
+    elif status != "all":
+        report_filters["status"] = f"eq.{status}"
+    reports = db_select_bounded(
+        "puzzle_feedback",
+        filters=report_filters,
+        order="created_at.desc,id.desc",
+        max_rows=5000,
+    )
+    player_rows, league_rows = ranking_queries.entity_context(
+        db_select_bounded,
+        (row.get("player_id") for row in reports),
+    )
+    players = {row["id"]: row for row in player_rows if row.get("id")}
+    league_names = {
+        norm_family(str(row.get("code") or "")): row.get("name") or row.get("code")
+        for row in league_rows if row.get("code")
+    }
     needle = " ".join(q.strip().casefold().split())
     output = []
     for report in reports:
@@ -3298,7 +3290,11 @@ def admin_reports(
             "level": (info or {}).get("level") or puzzle_meta.get("level"), "legacy": bool((info or {}).get("legacy")),
             "reportedBy": {
                 "id": player.get("id"), "name": player.get("name"),
-                "team": public_team_name(player.get("family_code"), player.get("team_joined_at")),
+                "team": (
+                    league_names.get(family) or family
+                    if (family := public_family_code(player.get("family_code"), player.get("team_joined_at")))
+                    else None
+                ),
             } if player else {"id": None, "name": "Anonymní hráč", "team": None},
             "createdAt": report.get("created_at"), "resolutionNote": report.get("resolution_note"),
             "reviewedAt": report.get("reviewed_at"), "reviewedBy": report.get("reviewed_by"),
@@ -3338,8 +3334,16 @@ def admin_audit(
     authorization: Optional[str] = Header(default=None),
 ):
     require_admin(authorization)
-    rows = db_select_all("admin_audit_log")
-    players = {row["id"]: row for row in db_select_all("players")}
+    rows = db_select_bounded(
+        "admin_audit_log",
+        order="created_at.desc,id.desc",
+        max_rows=5000,
+    )
+    player_rows, _ = ranking_queries.entity_context(
+        db_select_bounded,
+        (row.get("admin_player_id") for row in rows),
+    )
+    players = {row["id"]: row for row in player_rows if row.get("id")}
     rows.sort(key=lambda row: parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
     return {"entries": [{
         "id": row.get("id"), "action": row.get("action"), "targetType": row.get("target_type"),
@@ -3868,14 +3872,41 @@ def _family_league_week(week_offset: int = 0) -> dict:
     week_end = week_start + timedelta(days=7)
     dates = [(week_start + timedelta(days=i)).isoformat() for i in range(7)]
 
-    leagues = [r for r in db_select("leagues") if r.get("public_opt_in") is True]
-    players = db_select("players")
-    player_by_id = {p["id"]: p for p in players}
+    leagues = db_select_bounded(
+        "leagues",
+        columns="code,name,public_opt_in,public_name,public_enabled_at",
+        filters={"public_opt_in": "eq.true"},
+        max_rows=1000,
+    )
+    public_codes = [norm_family(str(row.get("code") or "")) for row in leagues if row.get("code")]
+    players = [] if not public_codes else db_select_bounded(
+        "players",
+        columns="id,family_code,team_joined_at,created_at",
+        filters={"family_code": ranking_queries.in_filter(public_codes)},
+        max_rows=ranking_queries.ENTITY_TRANSFER_LIMIT,
+    )
     members_by_family: dict[str, list[dict]] = {}
     for p in players:
         members_by_family.setdefault(norm_family(str(p.get("family_code") or "")), []).append(p)
 
-    daily_results = [r for r in db_select_all("puzzle_runs", mode="daily") if competitive_row(r)]
+    daily_challenges = ",".join(f"daily:{day}" for day in dates)
+    daily_results = [
+        r for r in db_select_bounded(
+            "puzzle_runs",
+            columns=(
+                "id,player_id,puzzle_id,challenge_key,mode,elapsed_ms,moves,hints_used,wrong_attempts,"
+                "clean_solve,calm_mode,completed_at"
+            ),
+            filters={
+                "mode": "eq.daily",
+                "calm_mode": "eq.false",
+                "challenge_key": f"in.({daily_challenges})",
+            },
+            order="completed_at.asc,id.asc",
+            max_rows=10_000,
+        )
+        if competitive_row(r)
+    ]
     daily_results = [
         r for r in daily_results
         if daily_run_date(r) in dates
@@ -4079,7 +4110,13 @@ def free_global_leaderboard(
     if not info or info.get("legacy") is True:
         raise HTTPException(404, "Aktivní volná úroveň nebyla nalezena")
 
-    runs = [row for row in db_select_all("puzzle_runs", puzzle_id=puzzle_id, mode="free") if competitive_row(row)]
+    runs, _ = ranking_queries.ranking_runs(
+        db_rpc,
+        db_select_bounded,
+        mode="free",
+        puzzle_id=puzzle_id,
+    )
+    runs = [row for row in runs if competitive_row(row)]
     first_by_player: dict[str, dict] = {}
     for row in runs:
         player_id = str(row.get("player_id") or "")
@@ -4113,7 +4150,11 @@ def free_global_leaderboard(
         start = max(0, min(my_index - 1, total - 3))
         visible_indices = list(range(start, min(total, start + 3)))
 
-    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}
+    players, _ = ranking_queries.entity_context(
+        db_select_bounded,
+        (row.get("player_id") for row in ranked),
+    )
+    players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
     board = []
     for index in visible_indices:
@@ -4170,8 +4211,15 @@ def daily_global_leaderboard(
         except HTTPException:
             pass
     primary_puzzle_id = daily_leaderboard_puzzle_id(selected_date, my_player_id)
+    results, _ = ranking_queries.ranking_runs(
+        db_rpc,
+        db_select_bounded,
+        mode="daily",
+        puzzle_id=primary_puzzle_id,
+        daily_date=selected_date,
+    )
     results = [
-        row for row in db_select_all("puzzle_runs", mode="daily")
+        row for row in results
         if competitive_row(row)
         and daily_run_date(row) == selected_date
         and row.get("puzzle_id") == primary_puzzle_id
@@ -4202,7 +4250,11 @@ def daily_global_leaderboard(
         start = max(0, min(my_index - 1, total - 3))
         visible_indices = list(range(start, min(total, start + 3)))
 
-    players_by_id = {str(p.get("id")): p for p in db_select_all("players") if p.get("id")}
+    players, _ = ranking_queries.entity_context(
+        db_select_bounded,
+        (row.get("player_id") for row in ranked),
+    )
+    players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
     board = []
     for index in visible_indices:
@@ -4398,23 +4450,20 @@ def _ranking_assign_tied_ranks(rows: list[dict], score_key: str) -> None:
         row["rank"] = rank
 
 
-def _ranking_context(*, include_results: bool = True, include_rescues: bool = True):
-    players = db_select_all("players")
-    leagues = db_select_all("leagues")
-    results = db_select_all("results") if include_results else []
-    rescues = []
-    if include_rescues:
-        try:
-            rescues = db_select_all("streak_rescues")
-        except HTTPException:
-            rescues = []
+def _ranking_context(player_ids: set[str], team_codes: set[str]):
+    players, leagues = ranking_queries.entity_context(
+        db_select_bounded,
+        player_ids,
+        team_codes,
+        include_team_members=True,
+    )
     player_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     league_by_code = {norm_family(str(l.get("code") or "")): l for l in leagues if l.get("code")}
     public_team_names = {
         code: (league.get("public_name") or league.get("name") or code)
         for code, league in league_by_code.items() if league.get("public_opt_in") is True
     }
-    return players, results, rescues, player_by_id, league_by_code, public_team_names
+    return players, player_by_id, league_by_code, public_team_names
 
 
 def _ranking_xp_aggregates(period_start: datetime | None):
@@ -4509,57 +4558,16 @@ def rankings_xp(
     viewer_id = str(viewer.get("id")) if viewer else None
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
     period_start = _ranking_period_start(period)
-    try:
-        period_points, lifetime_points, badge_counts, team_points = _ranking_xp_aggregates(period_start)
-        players, _, _, player_by_id, league_by_code, public_team_names = _ranking_context(
-            include_results=False,
-            include_rescues=False,
-        )
-        account_rewards_included = True
-        aggregation_mode = "database-rpc-v1"
-    except HTTPException as exc:
-        # Rolling-deploy fallback: v4.01.10 can start safely before the additive
-        # function reaches a database, and the established calculation remains valid.
-        logger.warning("rankings_xp aggregate unavailable; using legacy path: %s", exc.detail)
-        players, results, rescues, player_by_id, league_by_code, public_team_names = _ranking_context()
-        try:
-            account_rewards = db_select_all("account_rewards")
-            account_rewards_included = True
-        except HTTPException:
-            account_rewards = []
-            account_rewards_included = False
-        period_results = [
-            row for row in results
-            if competitive_row(row)
-            and (period_start is None or ((parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ)) >= period_start))
-        ]
-        lifetime_points = {}
-        for row in results:
-            pid = str(row.get("player_id") or "")
-            if pid:
-                lifetime_points[pid] = lifetime_points.get(pid, 0) + int(row.get("points") or 0)
-        for reward in account_rewards:
-            pid = str(reward.get("player_id") or "")
-            if pid:
-                lifetime_points[pid] = lifetime_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
-        period_points = {}
-        for row in period_results:
-            pid = str(row.get("player_id") or "")
-            if pid:
-                period_points[pid] = period_points.get(pid, 0) + int(row.get("points") or 0)
-        for reward in account_rewards:
-            pid = str(reward.get("player_id") or "")
-            granted_at = parse_timestamp(reward.get("granted_at"))
-            if pid and (period_start is None or (granted_at and granted_at >= period_start)):
-                period_points[pid] = period_points.get(pid, 0) + max(0, int(reward.get("points") or 0))
-        badge_counts = _ranking_badge_counts(results, rescues)
-        team_points = {}
-        for row in period_results:
-            player = player_by_id.get(str(row.get("player_id") or ""))
-            family = _ranking_result_team(row, player)
-            if family:
-                team_points[family] = team_points.get(family, 0) + int(row.get("points") or 0)
-        aggregation_mode = "legacy-fallback"
+    period_points, lifetime_points, badge_counts, team_points = _ranking_xp_aggregates(period_start)
+    player_ids = set(period_points) | set(lifetime_points)
+    if viewer_id:
+        player_ids.add(viewer_id)
+    team_codes = set(team_points)
+    if viewer_team:
+        team_codes.add(viewer_team)
+    players, player_by_id, league_by_code, public_team_names = _ranking_context(player_ids, team_codes)
+    account_rewards_included = True
+    aggregation_mode = "database-rpc-v1"
 
     player_rows = []
     used_aliases: set[str] = set()
@@ -4636,13 +4644,16 @@ def rankings_daily(
     viewer = _ranking_viewer(authorization)
     viewer_id = str(viewer.get("id")) if viewer else None
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
-    players, _, _, player_by_id, league_by_code, public_team_names = _ranking_context(
-        include_results=False,
-        include_rescues=False,
-    )
     primary_puzzle_id = daily_leaderboard_puzzle_id(selected_date, viewer_id)
+    day_rows, _ = ranking_queries.ranking_runs(
+        db_rpc,
+        db_select_bounded,
+        mode="daily",
+        puzzle_id=primary_puzzle_id,
+        daily_date=selected_date,
+    )
     day_rows = [
-        row for row in db_select_all("puzzle_runs", mode="daily", puzzle_id=primary_puzzle_id)
+        row for row in day_rows
         if competitive_row(row) and daily_run_date(row) == selected_date
     ]
     by_player: dict[str, dict] = {}
@@ -4659,6 +4670,16 @@ def rankings_daily(
     ))
     ranks = competition_ranks(ranked_all)
     day_rows = list(by_player.values())
+    participant_ids = {str(row.get("player_id")) for row in day_rows if row.get("player_id")}
+    if viewer_id:
+        participant_ids.add(viewer_id)
+    participant_team_codes: set[str] = set()
+    if viewer_team:
+        participant_team_codes.add(viewer_team)
+    players, player_by_id, league_by_code, public_team_names = _ranking_context(
+        participant_ids,
+        participant_team_codes,
+    )
     player_rows = []
     used_aliases: set[str] = set()
     for row_index, row in enumerate(ranked_all):
@@ -4680,7 +4701,12 @@ def rankings_daily(
         })
 
     try:
-        memberships = db_select_all("team_memberships")
+        memberships = [] if not participant_ids else db_select_bounded(
+            "team_memberships",
+            columns="id,player_id,team_code,joined_at,left_at",
+            filters={"player_id": ranking_queries.in_filter(participant_ids)},
+            max_rows=ranking_queries.ENTITY_TRANSFER_LIMIT,
+        )
         memberships_by_player: dict[str, list[dict]] | None = {}
         for membership in memberships:
             if membership.get("player_id"):
@@ -4972,11 +4998,50 @@ def leaderboard(
     if is_solo_player(viewer) or viewer_family != family:
         raise HTTPException(403, "Týmové pořadí je dostupné jen členům tohoto týmu")
     daily_date = daily_date or current_prague_date().isoformat()
-    players = db_select("players", family_code=family)
+    players = db_select_bounded(
+        "players",
+        columns="*",
+        filters={"family_code": f"eq.{family}"},
+        max_rows=500,
+    )
+    player_ids = {str(player.get("id")) for player in players if player.get("id")}
+    family_results = [] if not player_ids else db_select_bounded(
+        "results",
+        columns="*",
+        filters={"player_id": ranking_queries.in_filter(player_ids)},
+        max_rows=10_000,
+    )
+    family_rewards = [] if not player_ids else db_select_bounded(
+        "account_rewards",
+        columns="id,player_id,reward_key,points,granted_at",
+        filters={"player_id": ranking_queries.in_filter(player_ids)},
+        max_rows=5000,
+    )
+    family_rescues = [] if not player_ids else db_select_bounded(
+        "streak_rescues",
+        columns="id,player_id,missed_date,puzzle_id,status,started_at,completed_at,elapsed_ms",
+        filters={"player_id": ranking_queries.in_filter(player_ids)},
+        max_rows=5000,
+    )
+    results_by_player: dict[str, list[dict]] = {}
+    rewards_by_player: dict[str, list[dict]] = {}
+    rescues_by_player: dict[str, list[dict]] = {}
+    for row in family_results:
+        results_by_player.setdefault(str(row.get("player_id")), []).append(row)
+    for row in family_rewards:
+        rewards_by_player.setdefault(str(row.get("player_id")), []).append(row)
+    for row in family_rescues:
+        rescues_by_player.setdefault(str(row.get("player_id")), []).append(row)
 
     overall = []
     for p in players:
-        stats = player_stats(p["id"])
+        player_id = str(p["id"])
+        stats = player_stats(
+            player_id,
+            prefetched_results=results_by_player.get(player_id, []),
+            prefetched_rewards=rewards_by_player.get(player_id, []),
+            prefetched_rescues=rescues_by_player.get(player_id, []),
+        )
         overall.append({"id": p["id"], "name": p["name"], "avatar": p.get("avatar") or "🙂", **stats})
     overall.sort(key=lambda x: (-x["points"], -x["currentStreak"], x["name"].casefold()))
     for i, item in enumerate(overall, 1):
@@ -4987,8 +5052,6 @@ def leaderboard(
     week_start = today - timedelta(days=today.weekday())
     week_end = week_start + timedelta(days=7)
     weekly = []
-    all_results = db_select("results")
-    family_results = [r for r in all_results if r.get("player_id") in player_map]
     for p in players:
         rows = []
         for r in family_results:
@@ -5009,7 +5072,10 @@ def leaderboard(
     for i, item in enumerate(weekly, 1):
         item["rank"] = i
 
-    daily_rows = db_select("results", mode="daily", daily_date=daily_date)
+    daily_rows = [
+        row for row in family_results
+        if row.get("mode") == "daily" and str(row.get("daily_date") or "")[:10] == daily_date
+    ]
     primary_daily_id = expected_daily_puzzle_id(daily_date)
     daily_rows = [r for r in daily_rows if r["player_id"] in player_map and r.get("puzzle_id") == primary_daily_id]
     daily_rows.sort(key=lambda r: (*run_rank_tuple(r), player_map[r["player_id"]]["name"].casefold()))

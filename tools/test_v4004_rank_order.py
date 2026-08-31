@@ -48,19 +48,12 @@ daily_runs = [
 ]
 
 
-def daily_rows(table: str, **filters):
-    if table == "puzzle_runs":
-        return daily_runs
-    if table == "players":
-        return list(PLAYERS.values())
-    return []
-
-
 with (
     patch.object(server, "enforce_rate_limit"),
     patch.object(server, "auth_player", return_value=PLAYERS["me"]),
     patch.object(server, "daily_leaderboard_puzzle_id", return_value=PUZZLE_ID),
-    patch.object(server, "db_select_all", side_effect=daily_rows),
+    patch.object(server.ranking_queries, "ranking_runs", return_value=(daily_runs, "fixture")),
+    patch.object(server.ranking_queries, "entity_context", return_value=(list(PLAYERS.values()), [])),
     patch.object(server, "_ranking_display_identity", side_effect=identity),
 ):
     daily = server.daily_global_leaderboard(object(), DATE, "Bearer test")
@@ -73,19 +66,12 @@ assert daily["myRank"] == 1, daily
 free_runs = [dict(row, mode="free", challenge_key=f"free:{PUZZLE_ID}") for row in daily_runs]
 
 
-def free_rows(table: str, **filters):
-    if table == "puzzle_runs":
-        return free_runs
-    if table == "players":
-        return list(PLAYERS.values())
-    return []
-
-
 with (
     patch.object(server, "enforce_rate_limit"),
     patch.object(server, "auth_player", return_value=PLAYERS["me"]),
     patch.object(server, "free_puzzle_info", return_value={"difficulty": "easy", "level": 1, "generation": 4, "legacy": False}),
-    patch.object(server, "db_select_all", side_effect=free_rows),
+    patch.object(server.ranking_queries, "ranking_runs", return_value=(free_runs, "fixture")),
+    patch.object(server.ranking_queries, "entity_context", return_value=(list(PLAYERS.values()), [])),
     patch.object(server, "_ranking_display_identity", side_effect=identity),
 ):
     free = server.free_global_leaderboard(object(), PUZZLE_ID, "Bearer test")
