@@ -44,8 +44,15 @@ assert _route_snapshot() == "3b2f8960d59d9b8588d29e90f1a23cffc539b5476224c99d1fc
 assert server.app.docs_url is None
 assert server.app.redoc_url is None
 assert server.app.openapi_url is None
+openapi_contract = server.app.openapi()
+assert openapi_contract["info"]["version"] == server.APP_VERSION
+# Release publication changes APP_VERSION without changing the HTTP schema.
+# Normalize only that metadata field back to the characterization baseline;
+# every path, method, component and field remains covered by the same digest.
+openapi_contract = json.loads(json.dumps(openapi_contract))
+openapi_contract["info"]["version"] = "4.01.37"
 openapi_snapshot = json.dumps(
-    server.app.openapi(), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )
 assert hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest() == (
     "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"

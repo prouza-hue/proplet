@@ -21,9 +21,8 @@ assert shell_match
 shell = shell_match.group(1)
 # The split quality bootstrap adds one small core script while puzzle data and
 # all genuinely heavy/lazy assets stay outside the shell.
-# v4.01.23 adds one tiny Daily result-menu asset to the intentional shell set.
-assert shell.count("'/") <= 11
-assert "/app/core/result-queue.js" in shell
+# v4.01.23 adds one tiny Daily result-menu asset to the intentional shell set.\n# Sprint 10 adds two small dependency-free frontend core modules; heavy/lazy\n# data remains outside the shell, so the startup budget grows only by those two.\nassert shell.count("'/") <= 13
+assert "/app/core/result-queue.js" in shell\nassert "/app/core/api-client.js" in shell\nassert "/app/core/storage.js" in shell
 for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.png", "/privacy.html", "/terms.html"):
     assert heavy_or_lazy not in shell
 

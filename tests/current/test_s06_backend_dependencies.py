@@ -84,7 +84,10 @@ route_snapshot = sorted(
     if route.path
 )
 assert _digest(route_snapshot) == "3b2f8960d59d9b8588d29e90f1a23cffc539b5476224c99d1fcc3cbd3e8324b0"
-assert _digest(server.app.openapi()) == "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"
+openapi_contract = json.loads(json.dumps(server.app.openapi()))
+assert openapi_contract["info"]["version"] == server.APP_VERSION
+openapi_contract["info"]["version"] = "4.01.37"
+assert _digest(openapi_contract) == "9887b465b1d3f53ae6c3dcadf2c4ca11fc988d486b8882138ec180bf90948854"
 
 
 # A fake-service assembly proves feature modules remain independently testable

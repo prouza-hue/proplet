@@ -4,13 +4,12 @@
 - Branch: `refactor/s10-frontend-core`
 - Base SHA: `d7252e4d3679dbf5e1ebecf154f840b7fd807000`
 - Current HEAD: implementation commit se vytváří
-- Stav: implementation
+- Stav: implementation — první CI diagnostika opravena
 - Zamýšlená změna chování: žádná; veřejné HTTP payloady/chyby, 12s timeout, auth/anonymous/preview hlavičky, scoped localStorage klíče, migrace guest dat, load order a UI zůstávají kontraktně stejné.
 - Změněné soubory: `public/app/core/api-client.js`, `public/app/core/storage.js`, kompatibilní adaptéry v `public/app.js`, bootstrap/cache seznamy v `public/index.html` + `public/sw.js`, Sprint 10 characterization test.
 - Hotové kroky: characterization commit `b3730adc884a40658a4fc2961d6fc22cf749bda1`; API a scoped state/queue storage mají nové explicitní vlastníky; legacy globální adaptéry a fallback implementace zůstávají pro kompatibilitu. Speciální přímé fetch cesty nejsou v tomto sprintu přesouvány.
 - Zbývající kroky: current gate, asset/syntax kontrola, Vercel preview + browser/API smoke; potom uzavřít Sprint 10.
-- Testy PASS: characterization starého `app.js` kontraktu PASS před runtime změnou.
-- Testy FAIL / nespouštěné: nový current gate a preview zatím nespouštěny.
+- Testy PASS: characterization starého `app.js` kontraktu PASS před runtime změnou; Vercel preview build `d9c0fdae…` READY; syntax 211/211 a assets 74/74 v prvním CI.\n- Testy FAIL / nespouštěné: první current gate našel 4 fail: shell budget 11→13 (Sprint 10), 2× stale OpenAPI digest po produkčním version bumpu 4.01.37→4.01.39 (baseline drift), 1× příliš úzký vlastní S10 source regex. Všechny tři příčiny opraveny v tomto test-maintenance commitu; rerun čeká.
 - Nově nalezená rizika: release probe, puzzle/PWA boot, push config, Tajenka a client-error používají odlišné cache/header/keepalive kontrakty; zůstávají záměrně mimo nový generický JSON API client.
 - Bezpečný bod pokračování: characterization `b3730adc…`; implementace je oddělený navazující commit.
 - Další povolený sprint: Sprint 11A pouze po zeleném a uzavřeném Sprintu 10; uživatel výslovně povolil navázání bloků 1→2 bez merge do main.
