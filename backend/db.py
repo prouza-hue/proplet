@@ -210,6 +210,7 @@ def db_rpc(
     supabase_secret_key: Optional[str] = None,
     http_client=None,
     httpx_client_factory: Callable[..., Any] = httpx.Client,
+    error_mapper: Optional[Callable[[int, dict], Optional[HTTPException]]] = None,
 ):
     url_base, secret_key = _values(supabase_url, supabase_secret_key)
     if not supabase_ready(url_base, secret_key):
@@ -233,7 +234,15 @@ def db_rpc(
         except httpx.HTTPError as exc:
             raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if response.status_code >= 400:
+        try:
+            error_payload = response.json()
+        except Exception:
+            error_payload = {}
         logger.warning("Supabase RPC failed function=%s status=%s", function, response.status_code)
+        if error_mapper:
+            mapped = error_mapper(response.status_code, error_payload if isinstance(error_payload, dict) else {})
+            if mapped is not None:
+                raise mapped
         raise HTTPException(503 if response.status_code >= 500 else 400, "Bezpečnostní služba databáze není připravená")
     if not response.content:
         return None

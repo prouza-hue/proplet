@@ -45,6 +45,7 @@ class Settings:
     content_catalog_path: Path
     tajenka_bank_path: Path
     tajenka_release_enabled: bool
+    atomic_result_v1_enabled: bool
 
 
 def load_settings() -> Settings:
@@ -82,6 +83,9 @@ def load_settings() -> Settings:
             vercel_env == "production"
             and _env("PROPLET_TAJENKA_RELEASE_ENABLED", "true").lower() in {"1", "true", "yes"}
         ),
+        atomic_result_v1_enabled=(
+            _env("PROPLET_ATOMIC_RESULT_V1_ENABLED", "false").lower() in {"1", "true", "yes"}
+        ),
     )
 
 
@@ -108,3 +112,4 @@ ROLLING_CONTENT_PATH = settings.rolling_content_path
 CONTENT_CATALOG_PATH = settings.content_catalog_path
 TAJENKA_BANK_PATH = settings.tajenka_bank_path
 TAJENKA_RELEASE_ENABLED = settings.tajenka_release_enabled
+ATOMIC_RESULT_V1_ENABLED = settings.atomic_result_v1_enabled
