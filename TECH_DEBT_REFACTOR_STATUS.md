@@ -3,7 +3,7 @@
 - Sprint: 09 — Ranking a admin query boundaries
 - Branch: `refactor/s09-ranking-query-bounds`
 - Base SHA: `e6c6204` (`origin/main`; Sprint 08B aplikace na main, atomická DB migrace/rollout zůstávají samostatně vypnuté)
-- Stav: implementace a izolované PostgreSQL ověření hotové; větev ještě není publikovaná / preview ještě není vytvořené
+- Stav: implementace, izolované PostgreSQL ověření a Vercel preview hotové; čeká uživatelské ověření a samostatné schválení produkční brány
 - Zamýšlená změna chování: žádná změna pravidel pořadí, tie-breaků, anonymizace, UX ani indexů. Mění se pouze hranice čtení: agregace a first-run redukce probíhají v databázi, metadata se načítají jen pro dotčené entity a kompatibilní PostgREST fallback je puzzle/challenge-scoped s tvrdým limitem.
 - Změněné soubory: `backend/rankings.py`, bounded query transport v `backend/db.py`, ranking/admin adaptéry v `server.py`, aditivní migrace `SUPABASE_MIGRATION_V4_01_39_QUERY_BOUNDS.sql`, read-only verify, migrační manifest a současné/golden testy.
 - Baseline před Sprintem 09:
@@ -20,8 +20,9 @@
 - Golden chování: první standardní dokončení zůstává autoritativní; pozdější rychlejší replay výsledek nezlepší; calm run se nezapočítá; shodné viditelné skóre používá competition ranking `1, 1, 3`; public opt-in jméno zůstává veřejné a private/NULL identita zůstává deterministický alias; Daily dokončené po půlnoci zůstává u challenge data z `challenge_key`.
 - Izolované DB ověření: bezplatný testovací projekt bez produkčních dat, po ověření znovu pozastavený; migrace PASS, tři funkce jsou `STABLE SECURITY INVOKER`, execute má jen `service_role`, `anon` a `authenticated` jsou zamítnuté. Fixture ověřil replay/calm/cross-midnight pravidla a admin payload/filter. `EXPLAIN ANALYZE` pro first-run dotaz použil existující `puzzle_runs_competitive_rank_idx`, vrátil 2 řádky za přibližně 0,65 ms; žádný index nebyl přidán ani změněn.
 - Testy PASS: current gate 33/33, assety 72/72, syntax 209/209; migration manifest 42/42; query-count kontrakt ověřuje konstantní 4 bulk dotazy pro tým o 2 i 25 členech.
-- Testy FAIL / nespouštěné: žádné. Produkční Supabase migrace ani produkční deployment nebyly provedeny.
+- Publikace a preview: otestovaný strom `dd146106b707c195f5540bd50a783d826688b7d4` byl publikován v GitHub commitu `7c44b86e`; Vercel deployment `dpl_2119cUD7WPYXpKwVoEJcEyB3ZRXu` přešel do `READY`. `/api/health` i hlavní HTML vracejí 200 na `https://proplet-git-refactor-s09-ranking-a1266b-pavel-prouzas-projects.vercel.app/`.
+- Testy FAIL / nespouštěné: žádné. Admin overview/users nelze na preview funkčně ověřit bez nové RPC migrace; produkční Supabase migrace ani produkční deployment nebyly provedeny.
 - Rollout pořadí: před merge/deploy aplikace aplikovat aditivní v4.01.39 migraci, spustit read-only verify, teprve potom nasadit aplikaci. Ranking endpointy mají bezpečný bounded compatibility fallback; admin overview/users záměrně vyžadují hotovou migraci a nepoužívají full-scan fallback.
 - Nově nalezená rizika: hard cap 5 000 ranking runs / entities, 10 000 weekly runs a 20 000 telemetry řádků selže 503, pokud dataset přeroste bezpečnou hranici; jde o měřitelný guard, ne tiché zkrácení. Další navýšení nebo nový index vyžaduje samostatná data a schválení.
-- Bezpečný bod pokračování: lokální čistě otestovaná větev `refactor/s09-ranking-query-bounds`; dalším krokem je commit, publikace větve a Vercel preview, potom STOP na uživatelské ověření.
+- Bezpečný bod pokračování: publikovaná větev `refactor/s09-ranking-query-bounds` a READY preview `https://proplet-git-refactor-s09-ranking-a1266b-pavel-prouzas-projects.vercel.app/`; STOP na uživatelské ověření. Případné vydání musí zachovat pořadí migrace → verify → merge/deploy.
 - Další povolený sprint: žádný. Sprint 10 nezačínat bez výslovného pokynu.
