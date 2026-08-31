@@ -1,0 +1,51 @@
+{
+  "contractVersion": 1,
+  "publicResponseKeys": [
+    "ok",
+    "firstCompletion",
+    "awardedPoints",
+    "dailyGenerationUpgrade",
+    "transferredSlot",
+    "stats",
+    "statsWarning"
+  ],
+  "atomicPhases": [
+    "command_ledger",
+    "legacy_slot_reward",
+    "puzzle_run",
+    "official_result",
+    "attempt_finalization",
+    "durable_receipt"
+  ],
+  "bestEffortOutsideTransaction": [
+    "player_stats_read",
+    "operational_logs",
+    "helper_hint_product_events",
+    "push_work",
+    "quality_snapshots",
+    "explicit_historical_repair"
+  ],
+  "requiredStates": {
+    "first_submit": {"http": 200, "write": "atomic_commit", "firstCompletion": true},
+    "exact_retry": {"http": 200, "write": "none", "receipt": "identical"},
+    "conflicting_retry": {"http": 409, "write": "none", "code": "IDEMPOTENCY_CONFLICT"},
+    "offline_delayed_submit": {"http": 200, "write": "atomic_commit", "officialRule": "earliest_same_puzzle"},
+    "guest_adoption": {"http": 200, "write": "atomic_commit", "attemptStatus": "finalized"},
+    "unowned_guest_attempt": {"http": 200, "write": "atomic_commit", "attemptStatus": "ownership_conflict"},
+    "stale_unknown_puzzle": {"http": 400, "write": "none", "code": "RESULT_COMMAND_INVALID"},
+    "duplicate_reward": {"http": 200, "write": "new_run_only", "firstCompletion": false, "awardedPoints": 0}
+  },
+  "retryInvariant": {
+    "commands": 1,
+    "runs": 1,
+    "officialResults": 1,
+    "rewardClaims": 1,
+    "receipts": 1
+  },
+  "authorization": {
+    "caller": "service_role_only",
+    "browserRpcAccess": false,
+    "playerSource": "authenticated_server_session",
+    "anonymousAttemptAutoAdoption": false
+  }
+}
