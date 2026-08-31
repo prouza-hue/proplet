@@ -45,12 +45,12 @@ assert server.app.docs_url is None
 assert server.app.redoc_url is None
 assert server.app.openapi_url is None
 openapi_contract = server.app.openapi()
-assert openapi_contract["info"]["version"] == server.APP_VERSION
+assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # Release publication changes APP_VERSION without changing the HTTP schema.
 # Normalize only that metadata field back to the characterization baseline;
 # every path, method, component and field remains covered by the same digest.
 openapi_contract = json.loads(json.dumps(openapi_contract))
-openapi_contract["info"]["version"] = "4.01.37"
+openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )

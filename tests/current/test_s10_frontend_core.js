@@ -28,7 +28,10 @@ has(/new Error\('Server se neozval včas'\)/, 'timeout message');
 has(/new Error\(navigator\.onLine\?'Spojení se serverem selhalo':'Telefon je offline'\)/, 'network/offline messages');
 has(/error\.status=r\.status/, 'HTTP status propagation');
 
-has(/function scopedStorageKey\(base,scope=playerScope\(\)\)\{return `\$\{base\}:\$\{scope\}`\}/, 'scope key format');
+has(/function scopedStorageKey\(base,scope=playerScope\(\)\)/, 'scope key adapter');
+has(/core\?core\.scopedKey\(base,scope\):`\$\{base\}:\$\{scope\}`/, 'scope key compatibility fallback');
+has(/window\.PropletApiClient/, 'API client adapter');
+has(/window\.PropletScopedStorage/, 'scoped storage adapter');
 has(/const marker='proplet-v3-9-scoped-storage'/, 'legacy migration marker');
 has(/localStorage\.removeItem\(guestStateKey\);localStorage\.removeItem\(guestQueueKey\)/, 'guest adoption cleanup');
 
