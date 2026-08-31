@@ -3,27 +3,54 @@
 - Sprint: 11B.1 — GameSession state, timer, persistence, pause/resume
 - Branch: `refactor/s11b-game-session`
 - Base SHA: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc` (produkční main po S10 + S11A)
-- Current HEAD: implementation pending
-- Stav: implementation
+- Runtime HEAD: `c39edc8c5b2ef9f083e217f618ac93cc5c50bce0`
+- Verification/cleanup HEAD: `b56ae3373ca9f3e5bc2feec4960ec3315fafcb49`
+- Stav: **implementace uzavřena / GREEN, čeká na user preview + merge approval**
 - Zamýšlená změna chování: žádná.
-- Změněné soubory: test/status pouze.
-- Hotové kroky:
-  - scope ověřen proti `TECH_DEBT_REFACTOR_PLAN.md`;
-  - inventář současného `currentGame`, timeru, restore/save a pause/resume lifecycle;
-  - nalezeny dva runtime přepisy `startGame`: Klidný režim a competitive sharing;
-  - nalezen jeden runtime přepis `saveGameProgress`: Klidný režim.
-- Zbývající kroky:
-  - current gate nad implementací;
-  - browser/Fold/visibility smoke + Vercel preview;
-  - opravit pouze prokázané regrese a uzavřít 11B.1.
-- Testy PASS: characterization gate na nezměněném runtime = GREEN; nový characterization test i povýšený focus/pause regression prošly.
-- Testy FAIL / nespouštěné: první runtime gate odhalil pouze syntax chybu v mechanicky upraveném quality wrapperu a příliš přísný source-regex v novém testu; oba body jsou v tomto commitu opraveny, další gate čeká.
-- Nově nalezená rizika:
-  - starý renderer/input přímo mutuje objekt session; B.1 proto nesmí přesouvat board/input/hints;
-  - mixed PWA cache vyžaduje kompatibilní globální `currentGame` accessor a timer/persistence fallback v `app.js`; versioned feature patche už záměrně nesmějí přepisovat `startGame`;
-  - calm payload závisí na přesném pořadí start hooku vůči attempt telemetry.
-- Bezpečný bod pokračování: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc`.
-- Další povolený sprint: pouze 11B.2 po samostatném GREEN ověření 11B.1.
+- Změněné runtime soubory:
+  - nový `public/app/game/state.js`;
+  - `public/app.js`;
+  - `public/quality-v334-core-v40114.js`;
+  - `public/competitive-sharing-v3331.js`;
+  - `public/index.html`, `public/sw.js`;
+  - current/legacy regression testy a PWA shell contract.
+- Výsledek:
+  - GameSession vlastní aktivní session referenci, elapsed clock a timer ID;
+  - restore/persistence/pause/resume/rescue autosave jsou explicitní API `PropletGameState`;
+  - starý renderer, board, pointer/touch input, magnifier a hints dál pracují přes kompatibilní `window.currentGame` accessor — nejsou součástí 11B.1;
+  - `startGame` zůstává jediný bootstrap vlastník a versioned patche jej už nepřepisují;
+  - Klidný režim používá session hooky `beforeStart/afterStart/afterPersist`;
+  - competitive sharing používá `afterStart` session hook;
+  - standardní autosave zůstává 5 s, rescue autosave 1 s; timer cadence zůstává 250/100 ms;
+  - pause při hidden/blur/menu dál vyloučí background čas, uloží postup a zruší roztaženou cestu; resume vyžaduje viditelný/fokusovaný game screen;
+  - mixed-cache fallback pro základní session/timer/persistence zůstává v `app.js`, ale feature patche už záměrně nemonkey-patchují `startGame`.
+- Characterization commit před runtime změnou: `23c1ffc946f3ecbfd192d0c157948ef35d2c562b`.
+- Runtime implementace: `df823a8f6f47a140e4367bd63b42e905aa49eec0`; stabilizační runtime commit `c39edc8c5b2ef9f083e217f618ac93cc5c50bce0`.
+- Testy PASS na čistém výsledném diffu:
+  - Current runtime gate: **38 PASS / 0 FAIL**;
+  - Assets: **76 PASS / 0 FAIL** (68 lokálních referencí);
+  - Syntax: **213 PASS / 0 FAIL**;
+  - `tests/current/test_s11b1_game_session.js`: PASS;
+  - `tools/test_v319_focus_pause.js`: PASS.
+- Browser verification:
+  - jednorázový Playwright/Chrome run `33425648311`, job `99598425734`: **PASS**;
+  - start/restore GameSession a `currentGame` accessor PASS;
+  - Klidný režim přes hook bez `startGame` wrapperu PASS;
+  - pause → frozen elapsed → persisted progress → resume PASS;
+  - restart stejné Free úrovně obnovil elapsed i Calm stav;
+  - Fold portrait 590×960 / screen API 384×832: `tablet-portrait-rail`, portrait, large-touch, overflow 0.
+  - dočasný browser workflow byl po úspěšném runu odstraněn; v branchi nezůstává.
+- Vercel preview:
+  - deployment `dpl_HgutaAdwjH3kNJUAM7AaecRoitPP`: READY;
+  - branch alias: `https://proplet-git-refactor-s11b-game-session-pavel-prouzas-projects.vercel.app`;
+  - `/api/health`: HTTP 200, Proplet 4.01.39, DB true;
+  - nasazené assety potvrzují `game/state.js`, session delegaci a absenci startGame monkey-patchů.
+- PWA shell: budget rozšířen pouze o nový malý `/app/game/state.js` asset (14→15).
+- Známý nesouvisející check: historický `v3.34 Generation 4 contract` zůstává červený kvůli starému source-level kontraktu; current runtime gate je GREEN.
+- Produkce/main/Supabase: **beze změny**. Draft PR #90.
+- Rollback: reset branche na `ff6bcc34…`; žádná DB/content migrace.
+- Bezpečný bod pokračování: runtime `c39edc8c…` + verification cleanup `b56ae3373ca9f3e5bc2feec4960ec3315fafcb49` + tento status-only commit.
+- Další povolený sprint: **11B.2 až po samostatném user review/approval 11B.1**.
 
 ## Předchozí uzavřený stav
 
@@ -141,6 +168,7 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
+
 
 
 
