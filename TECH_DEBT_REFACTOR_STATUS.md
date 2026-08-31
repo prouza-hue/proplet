@@ -1,5 +1,35 @@
 # Technical debt refactor status
 
+- Sprint: 12A.2 — profile/team UI ownership
+- Branch: `refactor/s12a2-profile-team-ui`
+- Base SHA: `72846baa3c5de28a87051d3e7e2493380963e411` (`main`, uzavřený Sprint 12A.1)
+- Characterization: lokální `d48c772`; publikovaný `f17448e7753c602e307855c774bd6edc5071f987`
+- Runtime: lokální `8e99f8b`; publikovaný `29f376e0a339ce3cb643831062ab3b22dbc69bac`
+- Stav: **IMPLEMENTACE GREEN / PREVIEW READY / ČEKÁ NA USER QA A MERGE SOUHLAS**
+- Výsledek:
+  - nový `public/app/account/account.js` vlastní profilový renderer, bezpečné Google avatary, týmový seznam, join/new membership, týmový PIN, family-league nastavení a leave;
+  - `app.js` ponechává pouze tenké přiřaditelné adaptéry, takže `account-bonus`, `account-conversion` a `copy-density` dál mohou obalit `renderProfile`;
+  - dynamické callbacky do `renderProfile` a `openProfileModal` vždy používají aktuální globální binding a neobcházejí později načtené compatibility vrstvy;
+  - login submit, anonymous claim, logout, smazání účtu, push/queue cleanup a remote profile sync zůstaly beze změny v `app.js`;
+  - žádná změna UI, textů, auth modelu, gameplay, XP, API kontraktů ani DB schématu.
+- Ověření:
+  - Current Runtime Gate: **43 PASS / 0 FAIL**;
+  - Assets: **82 PASS / 0 FAIL** (74 lokálních referencí);
+  - Syntax: **220 PASS / 0 FAIL**;
+  - executable characterization ověřuje normalizaci team kódu, Google avatar allowlist, join i leave payload/order a cancel větev;
+  - nezávislé P0/P1 review: **no blockers**.
+- Preview:
+  - deployment `dpl_DTk95Nv1og1j7WSuGcTq7APq7Wss`: **READY**, alias error `null`;
+  - stable alias: `https://proplet-git-refactor-s12a2-profil-e9d9a5-pavel-prouzas-projects.vercel.app`;
+  - `/`, `/api/health`, `/app.js` a `/app/account/account.js` vracejí 200;
+  - health hlásí Proplet 4.01.40, `ok=true`, DB true; runtime error/fatal log scan čistý.
+- PR: draft #94 — `https://github.com/prouza-hue/proplet/pull/94`.
+- Produkce/main/Supabase: **beze změny**. Žádná migrace.
+- Rollback: zavřít PR/resetnout branch na `72846baa…`; není potřeba DB/content rollback.
+- Další krok: user preview; merge na `main` pouze po explicitním souhlasu. Sprint 12B nezačínat před uzavřením tohoto checkpointu.
+
+## Předchozí uzavřený stav
+
 - Sprint: 12A.1 — account session ownership + QA account-isolation hardening
 - Branch: `refactor/s12a-account-auth-profile-team`
 - Base SHA: `6fb4eab5429fa1839beae35828b46dab349caf37` (`main`, Proplet v4.01.40 po Sprintu 11B.2)
@@ -253,6 +283,5 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
-
 
 
