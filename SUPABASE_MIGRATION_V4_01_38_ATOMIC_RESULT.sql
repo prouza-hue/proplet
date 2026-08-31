@@ -202,10 +202,10 @@ begin
     )
     on conflict (player_id, difficulty, level) do nothing
     returning true into v_reward_inserted;
-    v_transferred_slot := not pg_catalog.coalesce(v_reward_inserted, false) or v_points = 0;
+    v_transferred_slot := not coalesce(v_reward_inserted, false) or v_points = 0;
   end if;
 
-  v_run_attempt_id := pg_catalog.coalesce(v_attempt_id, 'result:' || v_command_id::text);
+  v_run_attempt_id := coalesce(v_attempt_id, 'result:' || v_command_id::text);
   perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_run_attempt_id, 8802));
   if exists (select 1 from public.puzzle_runs where attempt_id = v_run_attempt_id) then
     v_run_attempt_id := 'result:' || v_command_id::text;
@@ -247,8 +247,8 @@ begin
 
     if v_mode = 'daily'
        and v_existing_result.puzzle_id <> v_puzzle_id
-       and pg_catalog.coalesce(v_content_generation, 0) >
-           pg_catalog.coalesce(v_existing_result.content_generation, 0)
+       and coalesce(v_content_generation, 0) >
+           coalesce(v_existing_result.content_generation, 0)
     then
       update public.results set
         puzzle_id = v_puzzle_id,

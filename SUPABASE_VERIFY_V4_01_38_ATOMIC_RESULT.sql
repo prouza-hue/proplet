@@ -17,7 +17,7 @@ begin
   end if;
   if not exists (
     select 1 from pg_catalog.pg_proc
-    where oid = v_function and proconfig @> array['search_path=']::text[]
+    where oid = v_function and proconfig @> array['search_path=""']::text[]
   ) then
     raise exception 'VERIFY v4.01.38: RPC search_path is not fixed to empty';
   end if;
@@ -25,7 +25,7 @@ begin
        select 1
        from pg_catalog.pg_proc p,
             lateral pg_catalog.aclexplode(
-              pg_catalog.coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))
+              coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))
             ) acl
        where p.oid = v_function and acl.grantee = 0 and acl.privilege_type = 'EXECUTE'
      )
