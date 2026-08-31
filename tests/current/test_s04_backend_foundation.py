@@ -289,9 +289,9 @@ with (
         sort_keys=True,
         separators=(",", ":"),
     )
-response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
+# Recaptured from the unchanged production backend at main d7252e4d after\n# legitimate health/config additions since Sprint 04.\nresponse_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
 assert response_fixture_digest == (
-    "73caf7437c52b8826d55f44b27761da7681183ef3ae8a6d07047f8de16ec26d0"
+    "12d98531db21a43038f0e9f5d24088ac4e65be04f78a4632a0b0430b60b3ba35"
 ), f"current response fixture digest: {response_fixture_digest}"
 
 
