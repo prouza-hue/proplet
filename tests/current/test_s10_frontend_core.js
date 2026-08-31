@@ -154,3 +154,17 @@ function verifyStorageModule() {
   await verifyApiModule();
   verifyStorageModule();
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+const indexSource = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+const swSource = fs.readFileSync(path.join(root, 'public/sw.js'), 'utf8');
+const apiPos=indexSource.indexOf('/app/core/api-client.js');
+const storagePos=indexSource.indexOf('/app/core/storage.js');
+const queuePos=indexSource.indexOf('/app/core/result-queue.js');
+const appPos=indexSource.indexOf('/app.js');
+assert(apiPos>=0 && storagePos>apiPos && queuePos>storagePos && appPos>queuePos, 'core load order changed');
+assert(swSource.includes('/app/core/api-client.js') && swSource.includes('/app/core/storage.js'), 'new core assets are not in shell cache');
+if (fs.existsSync(apiModulePath)) {
+  const moduleSource=fs.readFileSync(apiModulePath,'utf8');
+  assert(!/window\.fetch\s*=/.test(moduleSource), 'API module monkey-patches window.fetch');
+}
+console.log('PASS: Sprint 10 core modules load before legacy app and are cached offline');

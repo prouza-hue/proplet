@@ -275,6 +275,8 @@ let levelDetailContext=null;
 let pushUiBusy=false;
 let gameWakeLock=null;
 let resultQueueController=null;
+let apiClientController=null;
+let scopedStorageController=null;
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
 function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}}
@@ -285,15 +287,20 @@ function getAnonymousId(){
 }
 function rotateAnonymousId(){localStorage.removeItem(ANON_ID_KEY);return getAnonymousId()}
 function playerScope(){return getProfile()?.id||'guest'}
-function scopedStorageKey(base,scope=playerScope()){return `${base}:${scope}`}
-function getState(){try{return {...blankState(),...JSON.parse(localStorage.getItem(scopedStorageKey(STORE_KEY))||'{}')}}catch{return blankState()}}
-function saveState(s){localStorage.setItem(scopedStorageKey(STORE_KEY),JSON.stringify(s))}
+function scopedStorage(){
+ if(scopedStorageController)return scopedStorageController;
+ const factory=window.PropletScopedStorage;if(!factory?.create)return null;
+ scopedStorageController=factory.create({storage:localStorage,getScope:playerScope,blankState,firstResult});return scopedStorageController;
+}
+function scopedStorageKey(base,scope=playerScope()){const core=scopedStorage();return core?core.scopedKey(base,scope):`${base}:${scope}`}
+function getState(){const core=scopedStorage();if(core)return core.readState(STORE_KEY);try{return {...blankState(),...JSON.parse(localStorage.getItem(scopedStorageKey(STORE_KEY))||'{}')}}catch{return blankState()}}
+function saveState(s){const core=scopedStorage();if(core)return core.writeState(STORE_KEY,s);localStorage.setItem(scopedStorageKey(STORE_KEY),JSON.stringify(s))}
 function saveProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p));updateProfileChip()}
 function validSupportMode(mode){return Object.prototype.hasOwnProperty.call(SUPPORT_MODES,mode)}
 function localSupportMode(){try{const mode=localStorage.getItem(SUPPORT_MODE_KEY);return validSupportMode(mode)?mode:null}catch{return null}}
 function rememberSupportMode(mode){if(validSupportMode(mode))try{localStorage.setItem(SUPPORT_MODE_KEY,mode)}catch{}}
-function getQueue(){try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY))||'[]')}catch{return []}}
-function saveQueue(q){localStorage.setItem(scopedStorageKey(QUEUE_KEY),JSON.stringify(q))}
+function getQueue(){const core=scopedStorage();if(core)return core.readQueue(QUEUE_KEY);try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY))||'[]')}catch{return []}}
+function saveQueue(q){const core=scopedStorage();if(core)return core.writeQueue(QUEUE_KEY,q);localStorage.setItem(scopedStorageKey(QUEUE_KEY),JSON.stringify(q))}
 function queuedResultPayload(r){return {puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null}}
 function resultQueue(){
  if(resultQueueController)return resultQueueController;
@@ -312,13 +319,15 @@ function quarantineRejectedResult(row,reason){
 }
 function obsoleteQueuedResultError(error){return Number(error?.status)===400&&error?.message==='Neznámá úloha'}
 function migrateScopedStorage(){
- const marker='proplet-v3-9-scoped-storage';if(localStorage.getItem(marker))return;const scope=playerScope();
+ const marker='proplet-v3-9-scoped-storage',core=scopedStorage();if(core)return core.migrateLegacy({marker,stateKey:STORE_KEY,queueKey:QUEUE_KEY});
+ if(localStorage.getItem(marker))return;const scope=playerScope();
  const legacyState=localStorage.getItem(STORE_KEY),legacyQueue=localStorage.getItem(QUEUE_KEY);
  if(legacyState&&!localStorage.getItem(scopedStorageKey(STORE_KEY,scope)))localStorage.setItem(scopedStorageKey(STORE_KEY,scope),legacyState);
  if(legacyQueue&&!localStorage.getItem(scopedStorageKey(QUEUE_KEY,scope)))localStorage.setItem(scopedStorageKey(QUEUE_KEY,scope),legacyQueue);
  localStorage.setItem(marker,'1');
 }
 function adoptGuestData(profileId){
+ const core=scopedStorage();if(core)return core.adoptGuest({profileId,stateKey:STORE_KEY,queueKey:QUEUE_KEY});
  const guestStateKey=scopedStorageKey(STORE_KEY,'guest'),guestQueueKey=scopedStorageKey(QUEUE_KEY,'guest'),playerStateKey=scopedStorageKey(STORE_KEY,profileId),playerQueueKey=scopedStorageKey(QUEUE_KEY,profileId);
  try{const guest={...blankState(),...JSON.parse(localStorage.getItem(guestStateKey)||'{}')},player={...blankState(),...JSON.parse(localStorage.getItem(playerStateKey)||'{}')};for(const [k,r] of Object.entries(guest.completed||{}))player.completed[k]=player.completed[k]?firstResult(player.completed[k],r):r;for(const [k,r] of Object.entries(guest.inProgress||{}))if(!player.completed[k]&&!player.inProgress[k])player.inProgress[k]=r;player.rescues={...(player.rescues||{}),...(guest.rescues||{})};localStorage.setItem(playerStateKey,JSON.stringify(player))}catch{}
  try{const gq=JSON.parse(localStorage.getItem(guestQueueKey)||'[]'),pq=JSON.parse(localStorage.getItem(playerQueueKey)||'[]');const ids=new Set(pq.map(r=>r.attemptId||`${r.challengeKey}:${r.completedAt}`));for(const r of gq){const id=r.attemptId||`${r.challengeKey}:${r.completedAt}`;if(!ids.has(id)){pq.push(r);ids.add(id)}}localStorage.setItem(playerQueueKey,JSON.stringify(pq))}catch{}
@@ -978,7 +987,13 @@ function queueResult(rec){
  const controller=resultQueue();if(controller){controller.enqueue(rec);renderDaily();return}
  const q=getQueue();if(rec.mode==='daily'){const i=q.findIndex(x=>x.challengeKey===rec.challengeKey);if(i<0)q.push(rec);else if(q[i].puzzleId!==rec.puzzleId)q[i]=rec}else{const id=rec.attemptId||`${rec.challengeKey}:${rec.completedAt}`;if(!q.some(x=>(x.attemptId||`${x.challengeKey}:${x.completedAt}`)===id))q.push(rec)}saveQueue(q);renderDaily();
 }
+function apiClient(){
+ if(apiClientController)return apiClientController;
+ const factory=window.PropletApiClient;if(!factory?.create)return null;
+ apiClientController=factory.create({fetch:(...args)=>window.fetch(...args),getProfile,getAnonymousId,getVersion:()=>APP_VERSION,getPreviewDate:()=>CONTENT_PREVIEW_DATE,isOnline:()=>navigator.onLine,timeoutMs:12000});return apiClientController;
+}
 async function api(path,opts={}){
+ const client=apiClient();if(client)return client(path,opts);
  const p=getProfile(),headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);let r;
  try{r=await fetch(path,{...opts,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}

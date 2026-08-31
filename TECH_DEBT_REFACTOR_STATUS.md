@@ -2,17 +2,17 @@
 
 - Sprint: 10 — Frontend core: API client a scoped storage
 - Branch: `refactor/s10-frontend-core`
-- Base SHA: `d7252e4d3679dbf5e1ebecf154f840b7fd807000` (aktuální produkční `main`, Proplet v4.01.39)
-- Current HEAD: characterization commit se vytváří
-- Stav: characterization
-- Zamýšlená změna chování: žádná; HTTP kontrakty, localStorage klíče, guest/account scoping, load order a UI zůstávají stejné.
-- Změněné soubory: characterization test + current manifest; runtime zatím beze změny.
-- Hotové kroky: ověřen aktuální main a uzavření Sprintů 08B/09; zmapován existující `api()`, scoped state/queue storage a guest adoption.
-- Zbývající kroky: přidat `public/app/core/api-client.js` a `storage.js`; přesměrovat pouze kryté adaptéry v `app.js`; doplnit asset/load-order kontrakt; current gate + browser preview.
-- Testy PASS: čeká na characterization CI.
-- Testy FAIL / nespouštěné: žádné známé; preview/browser zatím nespouštěno.
-- Nově nalezená rizika: přímé `fetch()` cesty pro release probe, PWA/puzzle boot, push config, Tajenku a client-error mají odlišné cache/header/keepalive kontrakty a v tomto sprintu se nebudou násilně sjednocovat.
-- Bezpečný bod pokračování: tento characterization commit na Sprint 10 branchi.
+- Base SHA: `d7252e4d3679dbf5e1ebecf154f840b7fd807000`
+- Current HEAD: implementation commit se vytváří
+- Stav: implementation
+- Zamýšlená změna chování: žádná; veřejné HTTP payloady/chyby, 12s timeout, auth/anonymous/preview hlavičky, scoped localStorage klíče, migrace guest dat, load order a UI zůstávají kontraktně stejné.
+- Změněné soubory: `public/app/core/api-client.js`, `public/app/core/storage.js`, kompatibilní adaptéry v `public/app.js`, bootstrap/cache seznamy v `public/index.html` + `public/sw.js`, Sprint 10 characterization test.
+- Hotové kroky: characterization commit `b3730adc884a40658a4fc2961d6fc22cf749bda1`; API a scoped state/queue storage mají nové explicitní vlastníky; legacy globální adaptéry a fallback implementace zůstávají pro kompatibilitu. Speciální přímé fetch cesty nejsou v tomto sprintu přesouvány.
+- Zbývající kroky: current gate, asset/syntax kontrola, Vercel preview + browser/API smoke; potom uzavřít Sprint 10.
+- Testy PASS: characterization starého `app.js` kontraktu PASS před runtime změnou.
+- Testy FAIL / nespouštěné: nový current gate a preview zatím nespouštěny.
+- Nově nalezená rizika: release probe, puzzle/PWA boot, push config, Tajenka a client-error používají odlišné cache/header/keepalive kontrakty; zůstávají záměrně mimo nový generický JSON API client.
+- Bezpečný bod pokračování: characterization `b3730adc…`; implementace je oddělený navazující commit.
 - Další povolený sprint: Sprint 11A pouze po zeleném a uzavřeném Sprintu 10; uživatel výslovně povolil navázání bloků 1→2 bez merge do main.
 
 ## Předchozí uzavřený stav
@@ -59,3 +59,4 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
+
