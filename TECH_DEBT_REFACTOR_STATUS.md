@@ -17,10 +17,10 @@
   - browser/Fold/visibility smoke + Vercel preview;
   - opravit pouze prokázané regrese a uzavřít 11B.1.
 - Testy PASS: characterization gate na nezměněném runtime = GREEN; nový characterization test i povýšený focus/pause regression prošly.
-- Testy FAIL / nespouštěné: runtime implementace ještě nebyla ověřena.
+- Testy FAIL / nespouštěné: první runtime gate odhalil pouze syntax chybu v mechanicky upraveném quality wrapperu a příliš přísný source-regex v novém testu; oba body jsou v tomto commitu opraveny, další gate čeká.
 - Nově nalezená rizika:
   - starý renderer/input přímo mutuje objekt session; B.1 proto nesmí přesouvat board/input/hints;
-  - mixed PWA cache vyžaduje kompatibilní globální accessor/fallback;
+  - mixed PWA cache vyžaduje kompatibilní globální `currentGame` accessor a timer/persistence fallback v `app.js`; versioned feature patche už záměrně nesmějí přepisovat `startGame`;
   - calm payload závisí na přesném pořadí start hooku vůči attempt telemetry.
 - Bezpečný bod pokračování: `ff6bcc3487dd7d02f15234e2d6a64629d3348adc`.
 - Další povolený sprint: pouze 11B.2 po samostatném GREEN ověření 11B.1.

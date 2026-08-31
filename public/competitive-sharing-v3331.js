@@ -321,17 +321,7 @@
           }else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
         },
       };
-      const sharingSessionHookInstalled=typeof registerGameSessionHook==='function'&&registerGameSessionHook(sharingSessionHook)!==false;
-      if(!sharingSessionHookInstalled){
-        startGame=function(puzzle,mode,dailyDate,options={}){
-          const out=baseStartGame.apply(this,arguments);
-          if(mode==='free'){
-            const ctx=contextForPuzzle(puzzle?.id);
-            if(ctx)attachGameChallengeUi(ctx);else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
-          }else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
-          return out;
-        };
-      }
+      if(typeof registerGameSessionHook==='function')registerGameSessionHook(sharingSessionHook);
 
       const sharingCompletionHook={
         id:'competitive-sharing-v3331',

@@ -39,10 +39,10 @@ assert.strictEqual(typeof state.create,'function','GameSession factory missing')
 has(app,/function gameSession\(/,'GameSession adapter missing');
 has(app,/Object\.defineProperty\(window,'currentGame'/,'currentGame compatibility accessor missing');
 has(app,/function registerGameSessionHook\(/,'session hook facade missing');
-has(app,/gameSession\(\)\.pause\(/,'pause does not delegate to GameSession');
-has(app,/gameSession\(\)\.resume\(/,'resume does not delegate to GameSession');
-has(app,/gameSession\(\)\.saveProgress\(/,'persistence does not delegate to GameSession');
-has(app,/gameSession\(\)\.startTimer\(/,'timer does not delegate to GameSession');
+has(app,/session\.pause\(reason,/,'pause does not delegate to GameSession');
+has(app,/session\.resume\(\{screen:/,'resume does not delegate to GameSession');
+has(app,/session\.saveProgress\(currentGame\)/,'persistence does not delegate to GameSession');
+has(app,/session\.startTimer\(tick,/,'timer does not delegate to GameSession');
 assert(!/let currentGame=null;/.test(app),'legacy mutable currentGame still owns session');
 assert(!/let timerId=null;/.test(app),'legacy timerId still owns timer');
 assert(!/startGame=wrapped/.test(quality),'quality still overwrites startGame');
