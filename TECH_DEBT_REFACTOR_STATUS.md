@@ -21,10 +21,14 @@
   - `tests/current/test_s12a_account_session.js`: PASS;
   - `tests/current/test_s12a_account_backend.py`: PASS.
 - Vercel preview:
-  - deployment `dpl_674xw89FU86radHaHfm4EisPgTvs`: **READY**;
+  - finální QA-fix deployment `dpl_J4HXaQpgC6xG6XWCS7iaxtFUkbiV`: **READY**;
   - stable alias: `https://proplet-git-refactor-s12a-account-dc3378-pavel-prouzas-projects.vercel.app`;
   - HTTP smoke: `/`, `/api/health`, nový account-session asset, versioned `theme-init` a `account-auth` vracejí 200;
   - health: Proplet 4.01.40, `ok=true`, DB true; runtime error scan po smoke je čistý.
+- User QA oprava globálního pořadí:
+  - po Google callbacku mohl první anonymní `/api/rankings/xp` doběhnout dřív než přijetí session a `home-layout` jej 60 s znovu používal i pro přihlášený profil;
+  - home ranking cache i in-flight request jsou nyní vázané na konkrétní account session; stale anonymní odpověď nemůže přepsat přihlášené UI;
+  - fix commit: lokální `feca25b`, publikovaný `c7de0c50b5beaaa7d2fa20dcfbbee1c484db2ad3`; full gate zůstal 41/0, assets 80/0, syntax 218/0.
 - Známé předchozí chování: OAuth/email/recovery callback nejprve persistuje serverový profil, takže následný accept neprovede guest adoption/anonymous claim. Sprint 12A.1 toto nemění; oprava vyžaduje samostatné behavior rozhodnutí a testy.
 - Scope checkpoint: profile/team UI ownership a další dělení `app.js` jsou odloženy do 12A.2 až po review 12A.1.
 - Produkce/main/Supabase: **beze změny**. Žádná DB/content migrace. Draft PR #92.
@@ -246,7 +250,6 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
-
 
 
 
