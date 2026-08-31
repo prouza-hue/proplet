@@ -15,16 +15,19 @@ const homeLayout=fs.readFileSync(path.join(root,'public/home-layout.js'),'utf8')
 const index=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'public/sw.js'),'utf8');
 const sessionPath=path.join(root,'public/app/account/session.js');
+const accountUiPath=path.join(root,'public/app/account/account.js');
+const accountUi=fs.existsSync(accountUiPath)?fs.readFileSync(accountUiPath,'utf8'):'';
+const accountRuntime=`${app}\n${accountUi}`;
 
 function has(source,pattern,label){assert(pattern.test(source),label)}
 
 // Stable product contracts shared by both the legacy and extracted runtimes.
 has(app,/Heslo musí mít alespoň 8 znaků\./,'password validation copy drifted');
 has(app,/Vyplň jméno a heslo\./,'missing account form validation drifted');
-has(app,/Vyber tým\./,'team selection validation drifted');
-has(app,/PIN musí mít alespoň 4 znaky\./,'team PIN validation drifted');
-has(app,/Tým založen ✓/,'team creation success copy drifted');
-has(app,/Historické XP zůstaly na místě|Historické XP zůstanou na místě|Historické XP zůstanou týmu|Historické XP zůstávají týmu|Historické XP zůstávají na místě|Historické XP zůstaly týmu|Historické XP zůstaly v týmu|Historické XP zůstávají v týmu|Dříve získané týmové XP zůstanou týmu/,'team leave historical-XP copy drifted');
+has(accountRuntime,/Vyber tým\./,'team selection validation drifted');
+has(accountRuntime,/PIN musí mít alespoň 4 znaky\./,'team PIN validation drifted');
+has(accountRuntime,/Tým založen ✓/,'team creation success copy drifted');
+has(accountRuntime,/Historické XP zůstaly na místě|Historické XP zůstanou na místě|Historické XP zůstanou týmu|Historické XP zůstávají týmu|Historické XP zůstávají na místě|Historické XP zůstaly týmu|Historické XP zůstaly v týmu|Historické XP zůstávají v týmu|Dříve získané týmové XP zůstanou týmu/,'team leave historical-XP copy drifted');
 has(app,/api\('\/api\/anonymous\/claim'/,'anonymous claim missing after password auth');
 has(app,/await syncQueue\(\{announce:true\}\)/,'post-auth synchronization missing');
 has(accountAuth,/\/api\/auth\/google\/complete/,'Google completion route missing');
@@ -121,16 +124,19 @@ const passwordAcceptPos=app.indexOf('acceptAccountProfile({id:profile.id');
 const anonymousClaimPos=app.indexOf("api('/api/anonymous/claim'",passwordAcceptPos);
 const passwordSyncPos=app.indexOf('await syncQueue({announce:true})',anonymousClaimPos);
 assert(passwordAcceptPos>=0&&anonymousClaimPos>passwordAcceptPos&&passwordSyncPos>anonymousClaimPos,'password auth adoption/claim/sync order changed');
-has(app,/team-membership'[\s\S]*updateAccountProfile\(\{familyCode:r\.familyCode,leagueName:r\.leagueName\}\)/,'team join does not use account-session mutation');
-has(app,/team-membership\/leave'[\s\S]*updateAccountProfile\(\{familyCode:null,leagueName:null\}\)/,'team leave does not use account-session mutation');
+has(accountRuntime,/team-membership['"`][\s\S]*updateAccountProfile\(\{familyCode:\s*(?:r|result)\.familyCode,\s*leagueName:\s*(?:r|result)\.leagueName\}\)/,'team join does not use account-session mutation');
+has(accountRuntime,/team-membership\/leave['"`][\s\S]*updateAccountProfile\(\{familyCode:\s*null,\s*leagueName:\s*null\}\)/,'team leave does not use account-session mutation');
 has(app,/async function logoutPlayer\([\s\S]*clearAccountProfile\(\)/,'logout does not clear the account session');
 has(app,/async function deleteAccount\([\s\S]*clearAccountProfile\(\)/,'account deletion does not clear the account session');
 
 const modulePos=index.indexOf('/app/account/session.js');
 const tajenkaModulePos=index.indexOf('/app/account/tajenka-storage.js');
+const accountUiModulePos=index.indexOf('/app/account/account.js');
 const appPos=index.indexOf('/app.js');
 assert(modulePos>=0&&modulePos<appPos,'account session must load before app.js');
 assert(tajenkaModulePos>modulePos&&tajenkaModulePos<appPos,'account-scoped Tajenka storage must load before app.js');
+assert(accountUiModulePos>tajenkaModulePos&&accountUiModulePos<appPos,'account UI owner must load before app.js');
 assert(sw.includes('/app/account/session.js'),'account session missing from PWA shell');
 assert(sw.includes('/app/account/tajenka-storage.js'),'account-scoped Tajenka storage missing from PWA shell');
+assert(sw.includes('/app/account/account.js'),'account UI owner missing from PWA shell');
 console.log('PASS: Sprint 12A.1 account session owns profile persistence and auth acceptance contracts');

@@ -262,7 +262,6 @@ let postWinEngagementNudgeShown=false;
 let profileModalFromNudge=false;
 let profileModalFromWin=false;
 let leagueCreateMode='join';
-let leaguesCache=[];
 let onboardingMandatory=false;
 let onboardingFocusedHelper=false;
 let onboardingSupportMode=null;
@@ -270,7 +269,6 @@ let supportModeDraft='none';
 let accountNudgeStage=0;
 let progressGuardHiddenAt=0;
 let legacyTeamLogin=false;
-let teamMembershipMode='join';
 let levelDetailContext=null;
 let pushUiBusy=false;
 let gameWakeLock=null;
@@ -454,8 +452,8 @@ function reconcileLocalGen4Rewards(){
  if(repairedXp)saveState(state);
  return {repairedXp,returnBonusXp:priorGenerationPlayed?500:0};
 }
-function normalizeLeagueCode(v){return String(v||'').trim().toLocaleUpperCase('cs-CZ').replace(/\s+/g,'').replace(/[^0-9A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ_-]/g,'').slice(0,24)}
-function selectedLeague(){return leaguesCache.find(l=>l.code===$('#leagueSelect')?.value)||null}
+function normalizeLeagueCode(v){return accountUI().normalizeLeagueCode(v)}
+function selectedLeague(){return accountUI().selectedLeague()}
 function togglePassword(inputIds,btn){const ids=Array.isArray(inputIds)?inputIds:[inputIds],show=ids.some(id=>$('#'+id)?.type==='password');ids.forEach(id=>{const el=$('#'+id);if(el)el.type=show?'text':'password'});if(btn)btn.textContent=show?'🙈 Skrýt heslo':'👁 Zobrazit heslo'}
 function formatDateCZ(iso){const [y,m,d]=iso.split('-').map(Number);return new Intl.DateTimeFormat('cs-CZ',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Prague'}).format(new Date(Date.UTC(y,m-1,d,12)))}
 function pragueDateISO(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
@@ -1190,15 +1188,28 @@ function bindClientErrorReporting(){
  window.addEventListener('error',e=>reportClientError('window_error',e?.message||'JavaScript error'));window.addEventListener('unhandledrejection',e=>{const r=e?.reason;reportClientError('unhandled_rejection',r?.message||String(r||'Promise rejection'))});
 }
 
-function safeGoogleAvatarUrl(value){try{const u=new URL(String(value||'')),host=u.hostname.toLowerCase();return u.protocol==='https:'&&(host==='googleusercontent.com'||host.endsWith('.googleusercontent.com'))?u.href:''}catch{return ''}}
-function profileAvatarMarkup(p,css=''){const url=p?.useGoogleAvatar?safeGoogleAvatarUrl(p.googleAvatarUrl):'';return url?`<img class="google-profile-avatar ${esc(css)}" src="${esc(url)}" alt="" referrerpolicy="no-referrer">`:esc(p?.avatar||'🙂')}
-function updateProfileChip(){const p=getProfile(),chip=$('#profileChip');$('#profileChipText').textContent=p?.name||'Uložit';const a=$('#profileChipAvatar');if(a)a.innerHTML=p?profileAvatarMarkup(p):'☁️';if(chip)chip.setAttribute('aria-label',p?`Profil hráče ${p.name}`:'Uložit postup do účtu')}
+let accountUIController=null;
+function accountUI(){
+ if(accountUIController)return accountUIController;
+ const factory=window.PropletAccountUI;if(!factory?.create)throw new Error('Account UI modul není dostupný.');
+ accountUIController=factory.create({
+  $,$$,api,getProfile,updateAccountProfile,esc,countCz,czPlural,fmtTime,currentLocalStats,effectiveStats,levelFor,getQueue,
+  AVATARS,LEVELS,BADGES,SUPPORT_MODES,renderInstallUI,renderAchievementSummary,renderAchievements,syncAchievementDisclosure,
+  toggleProfileAchievementsExpanded:()=>{profileAchievementsExpanded=!profileAchievementsExpanded},focusProfileRoadmap,updatePushUI,
+  renderSettings,renderPrivacyActions,getSyncState:()=>syncState,getCurrentScreen:()=>currentScreen,showToast,
+  openProfileModal:(...args)=>openProfileModal(...args),syncQueue,openPasswordModal,openSupportModeModal,
+  logoutPlayer:(...args)=>logoutPlayer(...args),refreshAdminEntry,renderProfile:(...args)=>renderProfile(...args),
+  renderDaily:(...args)=>renderDaily(...args),renderLeaderboard:(...args)=>renderLeaderboard(...args),confirm:message=>confirm(message)
+ });
+ return accountUIController;
+}
+function safeGoogleAvatarUrl(value){return accountUI().safeGoogleAvatarUrl(value)}
+function profileAvatarMarkup(p,css=''){return accountUI().profileAvatarMarkup(p,css)}
+function updateProfileChip(){return accountUI().updateProfileChip()}
 
 function setLeagueCreateMode(mode){leagueCreateMode=mode}
 function renderLeaguePinField(){if($('#leaguePinLabel'))$('#leaguePinLabel').classList.add('hidden');if($('#teamPinHelp'))$('#teamPinHelp').classList.add('hidden')}
-async function loadLeagues(){
- try{const d=await api('/api/teams');leaguesCache=d.leagues||[]}catch{leaguesCache=[]}const sel=$('#leagueSelect');if(sel){const prev=sel.value,p=getProfile();sel.innerHTML=['<option value="">Vyber tým…</option>',...leaguesCache.map(l=>`<option value="${esc(l.code)}">${esc(l.name)}${l.members?` · ${countCz(l.members,'hráč','hráči','hráčů')}`:''}</option>`)].join('');if(prev&&leaguesCache.some(l=>l.code===prev))sel.value=prev;else if(p?.familyCode&&leaguesCache.some(l=>l.code===p.familyCode))sel.value=p.familyCode}return leaguesCache;
-}
+function loadLeagues(){return accountUI().loadLeagues()}
 function setAccountMode(mode){
  accountMode=mode;const create=mode==='create';legacyTeamLogin=false;$('#profileModeLogin').classList.toggle('active',!create);$('#profileModeCreate').classList.toggle('active',create);$('#profileModalTitle').textContent=create?'Ulož si postup':'Přihlásit se';$('#profileModalDesc').textContent=create?'Jméno a heslo stačí. Postup uložíme do cloudu; tým je volitelný a můžeš ho přidat později.':'Stačí jméno a osobní heslo. Tým vybírej jen u staršího účtu, pokud máš v Propletu jmenovce.';$('#saveProfileBtn').textContent=create?'Uložit můj postup':'Přihlásit se';$('#playerPasswordInput').setAttribute('autocomplete',create?'new-password':'current-password');$('#legacyTeamLoginToggle').classList.toggle('hidden',create);$('#leagueChooser').classList.add('hidden');$('#profileFormError').textContent='';
 }
@@ -1218,12 +1229,9 @@ async function saveNewProfile(){
  }catch(e){$('#profileFormError').textContent=e.message}
 }
 function toggleLegacyTeamLogin(){legacyTeamLogin=!legacyTeamLogin;$('#leagueChooser').classList.toggle('hidden',!legacyTeamLogin);$('#legacyTeamLoginToggle').textContent=legacyTeamLogin?'Skrýt výběr týmu':'Mám starší účet v týmu';if(legacyTeamLogin)loadLeagues()}
-function setTeamMembershipMode(mode){teamMembershipMode=mode;const join=mode==='join';$('#teamMembershipJoinTab').classList.toggle('active',join);$('#teamMembershipNewTab').classList.toggle('active',!join);$('#teamMembershipJoinFields').classList.toggle('hidden',!join);$('#teamMembershipNewFields').classList.toggle('hidden',join);$('#saveTeamMembershipBtn').textContent=join?'Přidat se k týmu':'Založit tým'}
-async function openTeamMembershipModal(){const p=getProfile();if(!p?.token){openProfileModal('create');return}if(p.familyCode){showToast('Už jsi v týmu.');return}$('#teamMembershipError').textContent='';$('#teamMembershipJoinPin').value='';$('#teamMembershipNewPin').value='';$('#teamMembershipName').value='';setTeamMembershipMode('join');$('#teamMembershipModal').classList.remove('hidden');try{await loadLeagues();const sel=$('#teamMembershipSelect');sel.innerHTML=['<option value="">Vyber tým…</option>',...leaguesCache.map(l=>`<option value="${esc(l.code)}">${esc(l.name)}${l.members?` · ${countCz(l.members,'hráč','hráči','hráčů')}`:''}</option>`)].join('')}catch{}}
-async function saveTeamMembership(){
- $('#teamMembershipError').textContent='';const join=teamMembershipMode==='join',family_code=join?normalizeLeagueCode($('#teamMembershipSelect').value):null,league_name=join?null:$('#teamMembershipName').value.trim(),league_pin=join?$('#teamMembershipJoinPin').value:$('#teamMembershipNewPin').value;if(join&&!family_code){$('#teamMembershipError').textContent='Vyber tým.';return}if(!join&&!league_name){$('#teamMembershipError').textContent='Pojmenuj nový tým.';return}if((league_pin||'').length<4){$('#teamMembershipError').textContent='PIN musí mít alespoň 4 znaky.';return}
- try{const r=await api('/api/team-membership',{method:'POST',body:JSON.stringify({mode:join?'join':'new',family_code,league_name,league_pin})});updateAccountProfile({familyCode:r.familyCode,leagueName:r.leagueName});$('#teamMembershipModal').classList.add('hidden');showToast(join?'Jsi v týmu ✓':'Tým založen ✓');renderProfile();renderLeaderboard();renderDaily()}catch(e){$('#teamMembershipError').textContent=e.message}
-}
+function setTeamMembershipMode(mode){return accountUI().setTeamMembershipMode(mode)}
+function openTeamMembershipModal(){return accountUI().openTeamMembershipModal()}
+function saveTeamMembership(){return accountUI().saveTeamMembership()}
 function openPasswordModal(){
  $('#passwordFormError').textContent='';$('#setPasswordInput').value='';$('#setPasswordConfirmInput').value='';$('#setPasswordInput').type='password';$('#setPasswordConfirmInput').type='password';$('#setPasswordToggle').textContent='👁 Zobrazit heslo';$('#passwordModal').classList.remove('hidden');
 }
@@ -1250,25 +1258,7 @@ async function refreshAdminEntry(){
  const allowed=await adminEntryPromise;if(getProfile()?.id===p.id)renderAdminEntryAccess(allowed);
 }
 
-function renderProfile({focusRoadmap=false}={}){
- renderInstallUI();
- const p=getProfile(),local=currentLocalStats(),stats=effectiveStats(),level=levelFor(stats.points||0),q=getQueue();
- if(!p){
-  $('#profileCard').innerHTML=`<h2>Postup je zatím jen tady</h2><p class="muted">Na tomhle zařízení o nic nepřijdeš. Účet navíc uloží XP, výsledky a sérii do cloudu a pustí tě do pořadí.</p><div class="account-actions"><button id="profileCreateBtn" class="primary-btn">☁️ Uložit postup</button><button id="profileLoginBtn" class="secondary-btn">Už účet mám</button></div>`;
-  setTimeout(()=>{$('#profileLoginBtn')&&($('#profileLoginBtn').onclick=()=>openProfileModal('login'));$('#profileCreateBtn')&&($('#profileCreateBtn').onclick=()=>openProfileModal('create'))},0);
- }else{
-  const inTeam=!!p.familyCode,status=syncState.status==='syncing'?['Synchronizuji…','']:syncState.status==='error'?['Synchronizace čeká',syncState.error||'Neznámá chyba']:q.length?[[countCz(q.length,'výsledek','výsledky','výsledků'),'čeká'].join(' '),'Připoj internet a zkus synchronizovat']:['Vše synchronizováno',inTeam?'Cloud i týmové pořadí jsou aktuální':'Postup je bezpečně v cloudu'];
-  const cls=syncState.status==='error'?'error':(!q.length&&syncState.status!=='syncing'?'success':'');
-  const account=p.hasPassword?`<div class="account-banner account-ok"><strong>☁️ Účet je v cloudu</strong><span>Na dalším zařízení se přihlas jako <b>${esc(p.name)}</b> svým heslem. Tým k přihlášení nepotřebuješ.</span></div>`:`<div class="account-banner"><strong>💻 Zapni hraní na více zařízeních</strong><span>Nastav osobní heslo. Výsledky a XP zůstanou přesně tam, kde jsou.</span><button id="setPasswordBtn" class="secondary-btn">Nastavit heslo</button></div>`;
-  const avatars=AVATARS.map(a=>`<button class="avatar-choice ${a===(p.avatar||'🙂')?'selected':''}" data-avatar="${a}" aria-label="Avatar ${a}">${a}</button>`).join('');
-  const teamAccess=inTeam?`<div class="team-access-card"><div><strong>👥 ${esc(p.leagueName||p.familyCode)}</strong><span>Týmové pořadí je aktivní. PIN slouží jen jako pozvánka pro další hráče.</span></div><button id="teamPinBtn" class="secondary-btn">Nastavit PIN</button></div>`:`<div class="team-access-card team-empty"><div><strong>👥 Tým je volitelný</strong><span>Účet funguje i bez něj. Přidej rodinu nebo partu, až budeš chtít společné pořadí.</span></div><button id="joinTeamBtn" class="secondary-btn">Přidat tým</button></div>`;
-  $('#profileCard').innerHTML=`<div class="profile-summary"><div class="profile-identity"><div class="profile-avatar-big">${esc(p.avatar||'🙂')}</div><div><div class="profile-name">${esc(p.name)}</div><div class="profile-family">${inTeam?`Tým: ${esc(p.leagueName||p.familyCode)}`:'Bez týmu · účet je uložený'}</div></div></div><div class="streak-bubble"><span class="streak-icon">🔥</span><strong>${stats.currentStreak||0}</strong><small>${czPlural(stats.currentStreak||0,'den','dny','dní')}</small></div></div><div class="avatar-picker"><span class="stat-label">TVŮJ AVATAR</span><div class="avatar-grid">${avatars}</div></div><div class="profile-grid"><div class="profile-stat"><span class="stat-label">XP</span><strong>${stats.points??local.points}</strong></div><div class="profile-stat profile-rank-stat"><span class="stat-label">Hodnost</span><div class="profile-rank-value"><span class="profile-rank-icon">${level.current.icon}</span><strong>${level.index} · ${esc(level.current.name)}</strong></div></div><div class="profile-stat profile-stat-wide"><span class="stat-label">Hotovo</span><div class="profile-completion-grid"><span><b>${stats.freeCompleted?.easy??local.freeCompleted?.easy??0}</b><small>🌱 Snadná</small></span><span><b>${stats.freeCompleted?.medium??local.freeCompleted?.medium??0}</b><small>🧠 Střední</small></span><span><b>${stats.freeCompleted?.hard??local.freeCompleted?.hard??0}</b><small>🔥 Těžká</small></span><span><b>${stats.freeCompleted?.hardcore??local.freeCompleted?.hardcore??0}</b><small>🤯 Mozkožrout</small></span></div></div><div class="profile-stat profile-stat-wide profile-daily-highlights"><span><small>Denní výzvy</small><b>${stats.dailyCompleted??local.dailyCompleted}</b></span><span><small>Nejdelší série</small><b>${stats.longestStreak??local.longestStreak}</b></span><span><small>Nejlepší Daily</small><b>${fmtTime(stats.bestDailyMs??local.bestDailyMs)}</b></span></div></div>${account}<div class="support-mode-card"><div><span class="stat-label">POMOCNÍK</span><strong>${SUPPORT_MODES[p.supportMode||'none']?.icon||'🧠'} ${esc(SUPPORT_MODES[p.supportMode||'none']?.label||'Nenabízet')}</strong><small>${esc(SUPPORT_MODES[p.supportMode||'none']?.desc||'')}</small></div><button id="supportModeBtn" class="secondary-btn">Nastavit</button></div>${teamAccess}<a id="adminEntryBtn" class="admin-entry hidden" href="/admin"><span>🛠</span><div><strong>Proplet Admin</strong><small>Quality, hlášení a uživatelé</small></div><b>→</b></a><div class="sync-panel"><div class="sync-status ${cls}"><div><strong>${esc(status[0])}</strong><div>${esc(status[1])}</div></div><span>${syncState.status==='syncing'?'↻':q.length?'☁️':'✓'}</span></div><button id="syncBtn" class="secondary-btn" ${syncState.status==='syncing'?'disabled':''}>${syncState.status==='syncing'?'Synchronizuji…':`Synchronizovat${q.length?` (${q.length})`:''}`}</button></div><button id="logoutBtn" class="logout-btn">Odhlásit hráče z tohoto zařízení</button>`;
-  const mainAvatar=$('#profileCard .profile-avatar-big');if(mainAvatar)mainAvatar.innerHTML=profileAvatarMarkup(p);
-  setTimeout(()=>{$('#syncBtn')&&($('#syncBtn').onclick=()=>syncQueue({announce:true}));$('#setPasswordBtn')&&($('#setPasswordBtn').onclick=openPasswordModal);$('#supportModeBtn')&&($('#supportModeBtn').onclick=openSupportModeModal);$('#teamPinBtn')&&($('#teamPinBtn').onclick=openTeamPinModal);$('#joinTeamBtn')&&($('#joinTeamBtn').onclick=openTeamMembershipModal);$('#logoutBtn')&&($('#logoutBtn').onclick=logoutPlayer);$$('.avatar-choice').forEach(b=>b.onclick=()=>saveAvatar(b.dataset.avatar));refreshAdminEntry()},0);
- }
- const points=stats.points||0,longest=stats.longestStreak??local.longestStreak;$('#levelRoadmap').innerHTML=LEVELS.map((l,i)=>`<div class="level-step ${points>=l.xp?'earned':''} ${i===level.index-1?'current':''}"><span class="level-num">${i+1}</span><span class="level-step-icon">${l.icon}</span><strong>${l.name}</strong><small>${l.xp.toLocaleString('cs-CZ')} XP</small></div>`).join('');$('#profileBadges').innerHTML=BADGES.map(b=>`<div class="profile-badge ${longest>=b.days?'earned':''}"><span class="emoji">${b.icon}</span><strong>${b.name}</strong><small>${countCz(b.days,'den','dny','dní')} v řadě</small></div>`).join('');updatePushUI();const achievementSummary=$('#achievementSummary'),achievementGrid=$('#achievementGrid');if(achievementSummary)achievementSummary.innerHTML=renderAchievementSummary(stats);if(achievementGrid)achievementGrid.innerHTML=renderAchievements(stats);syncAchievementDisclosure();const achievementToggle=$('#achievementToggleBtn');if(achievementToggle)achievementToggle.onclick=()=>{profileAchievementsExpanded=!profileAchievementsExpanded;syncAchievementDisclosure()};if(focusRoadmap)focusProfileRoadmap();renderSettings();renderPrivacyActions();
-}
-
+function renderProfile(options){return accountUI().renderProfile(options)}
 function supportOutcomeHtml(mode,compact=false){const cfg=SUPPORT_MODES[mode]||SUPPORT_MODES.none;if(compact){if(!cfg.seconds)return '<strong>Pomocník nic sám nenabídne.</strong>Nápověda zůstane vždy po ruce.';return `<strong>Po ${cfg.seconds} s bez nového slova nabídne pomoc.</strong>Bez souhlasu nic neukáže.`}if(!cfg.seconds)return '<strong>Pomocník ti pomoc sám nenabídne.</strong>Tlačítko Nápověda zůstane během hry kdykoli dostupné.';return `<strong>Po ${cfg.seconds} sekundách bez nového slova nabídne malé postrčení.</strong>Když souhlasíš, ukáže startovní políčko, první písmeno a délku jednoho slova. Bez souhlasu neukáže nic.`}
 function supportChoicesHtml(context='onboard'){const compact=context==='onboard';return Object.entries(SUPPORT_MODES).map(([mode,cfg])=>`<button class="support-choice" data-${context}-support="${mode}"><span>${cfg.icon}</span><div><strong>${cfg.label}${compact&&cfg.seconds?` · ${cfg.seconds} s`:''}</strong>${compact?'':`<small>${cfg.seconds?`po ${cfg.seconds} sekundách`:'sám se neozve'}</small>`}</div></button>`).join('')}
 function renderSupportChoice(rootSelector,mode,outcomeSelector,compact=false){$(`${rootSelector}`)?.querySelectorAll('.support-choice').forEach(b=>b.classList.toggle('selected',(b.dataset.supportMode||b.dataset.onboardSupport)===mode));const outcome=$(outcomeSelector);if(outcome)outcome.innerHTML=supportOutcomeHtml(mode,compact)}
@@ -1306,12 +1296,10 @@ function dismissHelperOffer(){
  const g=currentGame;if(!g)return;$('#helperOfferModal').classList.add('hidden');sendHelperEvent('dismissed');g.lastProgressAt=performance.now(); // znovu už v tomto pokusu nenabízíme
 }
 
-async function saveAvatar(avatar){
- const p=getProfile();if(!p?.token)return;try{const r=await api('/api/avatar',{method:'POST',body:JSON.stringify({avatar,use_google_avatar:false})});updateAccountProfile({avatar:r.avatar,useGoogleAvatar:false,googleAvatarUrl:r.googleAvatarUrl||p.googleAvatarUrl||null});updateProfileChip();renderProfile();if(currentScreen==='leaderboard')renderLeaderboard();showToast(`Avatar ${avatar} uložen ✓`)}catch(e){showToast(e.message)}
-}
-async function saveGoogleAvatar(){const p=getProfile();if(!p?.token||!safeGoogleAvatarUrl(p.googleAvatarUrl))return;try{const r=await api('/api/avatar',{method:'POST',body:JSON.stringify({use_google_avatar:true})});updateAccountProfile({useGoogleAvatar:true,googleAvatarUrl:r.googleAvatarUrl||p.googleAvatarUrl});updateProfileChip();renderProfile();showToast('Google fotka je teď tvůj avatar ✓')}catch(e){showToast(e.message)}}
-function openTeamPinModal(){const p=getProfile();if(!p?.token){openProfileModal('login');return}$('#teamPinInput').value='';$('#teamPinInput').type='password';$('#teamPinToggle').textContent='👁 Zobrazit PIN';$('#teamPinError').textContent='';$('#teamPinModal').classList.remove('hidden')}
-async function saveTeamPin(){const pin=$('#teamPinInput').value;$('#teamPinError').textContent='';if(pin.length<4){$('#teamPinError').textContent='PIN týmu musí mít alespoň 4 znaky.';return}try{await api('/api/team-pin',{method:'POST',body:JSON.stringify({pin})});$('#teamPinModal').classList.add('hidden');showToast('PIN týmu uložen ✓');await loadLeagues()}catch(e){$('#teamPinError').textContent=e.message}}
+function saveAvatar(avatar){return accountUI().saveAvatar(avatar)}
+function saveGoogleAvatar(){return accountUI().saveGoogleAvatar()}
+function openTeamPinModal(){return accountUI().openTeamPinModal()}
+function saveTeamPin(){return accountUI().saveTeamPin()}
 async function logoutPlayer(){
  const p=getProfile();if(!p)return;const q=getQueue();if(q.length&&navigator.onLine)await syncQueue({announce:false});if(getQueue().length&&!confirm('Některé výsledky ještě čekají na synchronizaci. Opravdu se chceš odhlásit?'))return;
  // Web Push je subscription zařízení. Při střídání hráčů ji odpojíme od starého profilu,
@@ -1417,18 +1405,9 @@ async function renderGlobalLeague(){
   setTimeout(()=>{if($('#editFamilyWorldBtn'))$('#editFamilyWorldBtn').onclick=openFamilyLeagueModal;if($('#joinFamilyWorldBtn'))$('#joinFamilyWorldBtn').onclick=openFamilyLeagueModal;if($('#globalTeamBtn'))$('#globalTeamBtn').onclick=openTeamMembershipModal;if($('#globalLoginBtn'))$('#globalLoginBtn').onclick=()=>openProfileModal('create')},0);
  }catch(e){list.innerHTML=`<div class="gate card"><strong>Liga týmů je zrovna mimo hřiště.</strong><p class="muted">${esc(e.message)}</p></div>`}
 }
-async function openFamilyLeagueModal(){
- const p=getProfile();if(!p?.token){openProfileModal('create');return}if(!p.familyCode){openTeamMembershipModal();return}
- try{const data=await api('/api/team-settings');if(!data.hasTeam){openTeamMembershipModal();return}$('#teamSettingsTitle').textContent=data.leagueName||'Tvůj tým';$('#familyLeaguePublicName').value=data.publicName||data.leagueName||'';$('#familyLeagueModalError').textContent='';$('#enableFamilyLeagueBtn').textContent=data.publicEnabled?'Uložit veřejný název':'Zobrazit tým v pořadí';$('#disableFamilyLeagueBtn').classList.toggle('hidden',!data.publicEnabled);$('#familyLeagueModal').classList.remove('hidden')}catch(e){showToast(e.message)}
-}
-async function saveFamilyLeagueSettings(enabled){
- const name=$('#familyLeaguePublicName').value.trim();$('#familyLeagueModalError').textContent='';if(enabled&&name.length<2){$('#familyLeagueModalError').textContent='Pojmenuj veřejný tým.';return}
- try{await api('/api/family-league/settings',{method:'POST',body:JSON.stringify({enabled,public_name:name||null})});$('#familyLeagueModal').classList.add('hidden');showToast(enabled?'Tým je ve veřejném pořadí 👥':'Tým je z veřejného pořadí skrytý');await renderLeaderboard()}catch(e){$('#familyLeagueModalError').textContent=e.message}
-}
-async function leaveCurrentTeam(){
- const p=getProfile();if(!p?.familyCode)return;if(!confirm(`Opravdu opustit tým ${p.leagueName||p.familyCode}? Dříve získané týmové XP zůstanou týmu.`))return;
- try{await api('/api/team-membership/leave',{method:'POST',body:'{}'});updateAccountProfile({familyCode:null,leagueName:null});$('#familyLeagueModal').classList.add('hidden');showToast('Tým jsi opustil. Historické XP zůstaly na místě.');renderProfile();await renderLeaderboard()}catch(e){$('#familyLeagueModalError').textContent=e.message}
-}
+function openFamilyLeagueModal(){return accountUI().openFamilyLeagueModal()}
+function saveFamilyLeagueSettings(enabled){return accountUI().saveFamilyLeagueSettings(enabled)}
+function leaveCurrentTeam(){return accountUI().leaveCurrentTeam()}
 
 async function sendPuzzleFeedback(kind,{rating=null,word=null,note=null}={}){
  const g=currentGame;if(!g?.puzzle||g.mode==='rescue')throw new Error('Tuhle úlohu teď nejde hodnotit.');if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)throw new Error('V read-only preview hodnocení neodesíláme.');
