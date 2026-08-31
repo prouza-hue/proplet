@@ -1,5 +1,38 @@
 # Technical debt refactor status
 
+- Sprint: 12A.1 — account session a auth ownership seam
+- Branch: `refactor/s12a-account-auth-profile-team`
+- Base SHA: `6fb4eab5429fa1839beae35828b46dab349caf37` (`main`, Proplet v4.01.40 po Sprintu 11B.2)
+- Characterization commit: `64b5905`
+- Runtime commit: lokální `d1e62d0`; publikovaný GitHub commit `bf3984557ee58f93631406633bb8c89c0e04abe3`
+- Stav: **implementace uzavřena / GREEN, preview READY, čeká na user checkpoint**
+- Zamýšlená změna chování: žádná.
+- Výsledek:
+  - nový `public/app/account/session.js` vlastní načtení, uložení, patch, clear, auth headers a přijetí identity;
+  - password create/login, OAuth, recovery a email verification používají společný account-session seam;
+  - `/api/login-integrity` je explicitní call site; starý globální fetch rewrite zůstává jen jako mixed-cache fallback;
+  - recovery callback persistence je explicitní; historický globální fetch wrapper zůstává jen pro starší cache kombinace;
+  - profile/team mutace ukládají přes jedno update API, logout/delete přes jedno clear API;
+  - PWA shell přidal pouze malý dependency-free account-session modul; cache hranice account assetů byla posunuta.
+- Current gate na čistém runtime commitu:
+  - **41 PASS / 0 FAIL**;
+  - Assets: **80 PASS / 0 FAIL** (72 lokálních referencí);
+  - Syntax: **218 PASS / 0 FAIL**;
+  - `tests/current/test_s12a_account_session.js`: PASS;
+  - `tests/current/test_s12a_account_backend.py`: PASS.
+- Vercel preview:
+  - deployment `dpl_674xw89FU86radHaHfm4EisPgTvs`: **READY**;
+  - stable alias: `https://proplet-git-refactor-s12a-account-dc3378-pavel-prouzas-projects.vercel.app`;
+  - HTTP smoke: `/`, `/api/health`, nový account-session asset, versioned `theme-init` a `account-auth` vracejí 200;
+  - health: Proplet 4.01.40, `ok=true`, DB true; runtime error scan po smoke je čistý.
+- Známé předchozí chování: OAuth/email/recovery callback nejprve persistuje serverový profil, takže následný accept neprovede guest adoption/anonymous claim. Sprint 12A.1 toto nemění; oprava vyžaduje samostatné behavior rozhodnutí a testy.
+- Scope checkpoint: profile/team UI ownership a další dělení `app.js` jsou odloženy do 12A.2 až po review 12A.1.
+- Produkce/main/Supabase: **beze změny**. Žádná DB/content migrace. Draft PR #92.
+- Rollback 12A.1: reset branche na `6fb4eab`; není potřeba DB rollback.
+- Další krok: user preview a checkpoint; 12A.2 ani merge nezačínat bez navazujícího pokynu.
+
+## Předchozí uzavřený stav
+
 - Sprint: 11B.2 — board, input a hints
 - Branch: `refactor/s11b2-game-interaction`
 - Base release: `7cad28b12788813f5932ca450f754d6540ed049b` (Proplet v4.01.40); main navíc obsahuje test-only baseline `0013292f…`.
@@ -213,8 +246,6 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
-
-
 
 
 
