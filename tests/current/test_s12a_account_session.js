@@ -77,24 +77,29 @@ session.accept(first);
 assert.deepStrictEqual(session.get(),first);
 assert.deepStrictEqual(adopted,['p1'],'first account acceptance must adopt guest data');
 assert.deepStrictEqual(session.authHeaders(),{Authorization:'Bearer token-1'});
+assert.strictEqual(session.matches(first),true,'active account snapshot should match');
 session.update({familyCode:'TEAM',leagueName:'Tým'});
 assert.strictEqual(session.get().familyCode,'TEAM');
 assert.strictEqual(session.get().token,'token-1');
 session.clear();
 assert.strictEqual(session.get(),null);
 
-// OAuth/email/recovery currently persist their fresh token before acceptProfile.
-// Preserve this ordering in the refactor; fixing its guest-adoption consequence is
-// a separate behavior change, not a hidden part of Sprint 12A.1.
+// OAuth/email/recovery persist their fresh token before acceptProfile. The first
+// authoritative callback must adopt guest data exactly once before persistence.
 session.persistResponseProfile({id:'p2',name:'Callback',token:'token-2'});
 session.accept({id:'p2',name:'Callback',token:'token-2',avatar:'🙂'});
-assert.deepStrictEqual(adopted,['p1'],'pre-persisted callback profile must not newly adopt guest data');
+assert.deepStrictEqual(adopted,['p1','p2'],'first callback profile must adopt guest data exactly once');
+session.persistResponseProfile({id:'p3',name:'Other',token:'token-3'});
+assert.deepStrictEqual(session.get(),{id:'p3',name:'Other',token:'token-3'},'identity switch must not inherit fields from the previous account');
+assert.deepStrictEqual(adopted,['p1','p2'],'switching an existing account must not adopt guest data');
+assert.strictEqual(session.matches({id:'p2',token:'token-2'}),false,'stale account snapshot must be rejected after an identity switch');
 assert(changed.length>=4,'account change notifications missing');
 
 storage.setItem('profile','{broken');
 assert.strictEqual(session.get(),null,'corrupt profile fallback changed');
 
 has(app,/function accountSession\(/,'account session adapter missing');
+has(app,/function accountProfileMatches\(/,'account identity race guard missing');
 has(app,/function acceptAccountProfile\(/,'shared account acceptance adapter missing');
 has(app,/'\/api\/login-integrity'/,'app does not call the integrity login route explicitly');
 has(accountAuth,/acceptAccountProfile/,'OAuth/email/recovery does not share account acceptance');
@@ -106,7 +111,7 @@ const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=40140-s12a1r1')&&sw.includes('/theme-init.js?v=40140-s12a1r1'),'theme-init cache boundary was not advanced');
+assert(index.includes('/theme-init.js?v=40140-s12a2r1')&&sw.includes('/theme-init.js?v=40140-s12a2r1'),'theme-init cache boundary was not advanced');
 assert(themeInit.includes("loadScript('/home-layout.js?v=40140-s12a1r1'"),'home layout cache boundary was not advanced');
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
@@ -122,7 +127,10 @@ has(app,/async function logoutPlayer\([\s\S]*clearAccountProfile\(\)/,'logout do
 has(app,/async function deleteAccount\([\s\S]*clearAccountProfile\(\)/,'account deletion does not clear the account session');
 
 const modulePos=index.indexOf('/app/account/session.js');
+const tajenkaModulePos=index.indexOf('/app/account/tajenka-storage.js');
 const appPos=index.indexOf('/app.js');
 assert(modulePos>=0&&modulePos<appPos,'account session must load before app.js');
+assert(tajenkaModulePos>modulePos&&tajenkaModulePos<appPos,'account-scoped Tajenka storage must load before app.js');
 assert(sw.includes('/app/account/session.js'),'account session missing from PWA shell');
+assert(sw.includes('/app/account/tajenka-storage.js'),'account-scoped Tajenka storage missing from PWA shell');
 console.log('PASS: Sprint 12A.1 account session owns profile persistence and auth acceptance contracts');

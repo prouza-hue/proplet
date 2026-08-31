@@ -15,7 +15,9 @@
     const timeoutMs = Number.isFinite(Number(options.timeoutMs)) ? Number(options.timeoutMs) : 12000;
 
     return async function request(path, opts = {}) {
-      const profile = getProfile();
+      const hasAuthSnapshot = Object.prototype.hasOwnProperty.call(opts, 'authProfile');
+      const profile = hasAuthSnapshot ? opts.authProfile : getProfile();
+      const {authProfile: _authProfile, ...requestOptions} = opts;
       const headers = {
         'Content-Type': 'application/json',
         'X-Proplet-Version': getVersion(),
@@ -32,7 +34,7 @@
       let response;
       try {
         response = await fetchFn(path, {
-          ...opts,
+          ...requestOptions,
           headers,
           signal: controller.signal,
           cache: 'no-store',

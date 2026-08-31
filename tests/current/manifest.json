@@ -134,6 +134,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s12a2_tajenka_storage.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_s12a_account_backend.py",
         "runner": "python"
       },

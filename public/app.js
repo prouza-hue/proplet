@@ -275,9 +275,11 @@ let levelDetailContext=null;
 let pushUiBusy=false;
 let gameWakeLock=null;
 let resultQueueController=null;
+let resultQueueControllerIdentity=null;
 let apiClientController=null;
 let scopedStorageController=null;
 let accountSessionController=null;
+let tajenkaStorageController=null;
 let completionPipelineController=null;
 let gameSessionController=null;
 let gameBoardController=null;
@@ -304,31 +306,38 @@ function scopedStorage(){
  scopedStorageController=factory.create({storage:localStorage,getScope:playerScope,blankState,firstResult});return scopedStorageController;
 }
 function scopedStorageKey(base,scope=playerScope()){const core=scopedStorage();return core?core.scopedKey(base,scope):`${base}:${scope}`}
-function getState(){const core=scopedStorage();if(core)return core.readState(STORE_KEY);try{return {...blankState(),...JSON.parse(localStorage.getItem(scopedStorageKey(STORE_KEY))||'{}')}}catch{return blankState()}}
-function saveState(s){const core=scopedStorage();if(core)return core.writeState(STORE_KEY,s);localStorage.setItem(scopedStorageKey(STORE_KEY),JSON.stringify(s))}
+function getState(scope=playerScope()){const core=scopedStorage();if(core)return core.readState(STORE_KEY,scope);try{return {...blankState(),...JSON.parse(localStorage.getItem(scopedStorageKey(STORE_KEY,scope))||'{}')}}catch{return blankState()}}
+function saveState(s,scope=playerScope()){const core=scopedStorage();if(core)return core.writeState(STORE_KEY,s,scope);localStorage.setItem(scopedStorageKey(STORE_KEY,scope),JSON.stringify(s))}
+function tajenkaStorage(){
+ if(tajenkaStorageController)return tajenkaStorageController;
+ const factory=window.PropletTajenkaStorage;if(!factory?.create)return null;
+ tajenkaStorageController=factory.create({storage:localStorage,stateKey:TAJENKA_STATE_KEY,marker:'proplet-v4-01-40-scoped-tajenka',rewardXp:TAJENKA_REWARD_XP,getScope:playerScope,scopedKey:scopedStorageKey});return tajenkaStorageController;
+}
 function saveProfile(p){const session=accountSession();if(session)session.save(p);else localStorage.setItem(PROFILE_KEY,JSON.stringify(p));updateProfileChip();return p}
 function updateAccountProfile(patch){const session=accountSession();let profile;if(session)profile=session.update(patch);else{const current=getProfile();profile=current?{...current,...(patch||{})}:null;if(profile)localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}updateProfileChip();return profile}
 function acceptAccountProfile(profile){const session=accountSession();if(session){const accepted=session.accept(profile);updateProfileChip();return accepted}const hadProfile=!!getProfile();if(!hadProfile)adoptGuestData(profile.id);return saveProfile(profile)}
-function persistAccountResponseProfile(profile){const session=accountSession();if(session){const stored=session.persistResponseProfile(profile);updateProfileChip();return stored}if(!profile?.id||!profile?.token)return null;return saveProfile({...getProfile(),...profile})}
+function persistAccountResponseProfile(profile){const session=accountSession();if(session){const stored=session.persistResponseProfile(profile);updateProfileChip();return stored}if(!profile?.id||!profile?.token)return null;const current=getProfile();if(!current)adoptGuestData(profile.id);return saveProfile(current?.id===profile.id?{...current,...profile}:{...profile})}
 function clearAccountProfile(){const session=accountSession();if(session)session.clear();else localStorage.removeItem(PROFILE_KEY);updateProfileChip()}
 function accountAuthHeaders(){const session=accountSession();if(session)return session.authHeaders();const p=getProfile();return p?.token?{Authorization:`Bearer ${p.token}`}:{}}
+function accountProfileMatches(snapshot){const session=accountSession();if(session?.matches)return session.matches(snapshot);const current=getProfile();return !!snapshot?.id&&!!snapshot?.token&&current?.id===snapshot.id&&current?.token===snapshot.token}
 window.PROPLET_ACCOUNT_SESSION_ACTIVE=true;
 function validSupportMode(mode){return Object.prototype.hasOwnProperty.call(SUPPORT_MODES,mode)}
 function localSupportMode(){try{const mode=localStorage.getItem(SUPPORT_MODE_KEY);return validSupportMode(mode)?mode:null}catch{return null}}
 function rememberSupportMode(mode){if(validSupportMode(mode))try{localStorage.setItem(SUPPORT_MODE_KEY,mode)}catch{}}
-function getQueue(){const core=scopedStorage();if(core)return core.readQueue(QUEUE_KEY);try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY))||'[]')}catch{return []}}
-function saveQueue(q){const core=scopedStorage();if(core)return core.writeQueue(QUEUE_KEY,q);localStorage.setItem(scopedStorageKey(QUEUE_KEY),JSON.stringify(q))}
+function getQueue(scope=playerScope()){const core=scopedStorage();if(core)return core.readQueue(QUEUE_KEY,scope);try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY,scope))||'[]')}catch{return []}}
+function saveQueue(q,scope=playerScope()){const core=scopedStorage();if(core)return core.writeQueue(QUEUE_KEY,q,scope);localStorage.setItem(scopedStorageKey(QUEUE_KEY,scope),JSON.stringify(q))}
 function queuedResultPayload(r){return {puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null}}
-function resultQueue(){
- if(resultQueueController)return resultQueueController;
+function resultQueue(profile=getProfile(),scope=profile?.id||playerScope()){
+ const identity=`${scope}:${profile?.token||''}`;if(resultQueueController&&resultQueueControllerIdentity===identity)return resultQueueController;
  const factory=window.PropletResultQueue;
  if(!factory?.create)return null;
- resultQueueController=factory.create({getQueue,saveQueue,post:r=>api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r))}),quarantine:quarantineRejectedResult});
+ resultQueueControllerIdentity=identity;
+ resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),post:r=>api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
  return resultQueueController;
 }
-function quarantineRejectedResult(row,reason){
+function quarantineRejectedResult(row,reason,scope=playerScope()){
  try{
-  const key=scopedStorageKey(REJECTED_QUEUE_KEY),parsed=JSON.parse(localStorage.getItem(key)||'[]'),old=Array.isArray(parsed)?parsed:[],id=row?.attemptId||`${row?.challengeKey||''}:${row?.completedAt||''}`;
+  const key=scopedStorageKey(REJECTED_QUEUE_KEY,scope),parsed=JSON.parse(localStorage.getItem(key)||'[]'),old=Array.isArray(parsed)?parsed:[],id=row?.attemptId||`${row?.challengeKey||''}:${row?.completedAt||''}`;
   if(!old.some(item=>(item?.attemptId||`${item?.challengeKey||''}:${item?.completedAt||''}`)===id))old.push({...row,rejectedAt:new Date().toISOString(),rejectedReason:reason||'Neznámá úloha',rejectedByVersion:APP_VERSION});
   localStorage.setItem(key,JSON.stringify(old.slice(-20)));
   return true;
@@ -343,12 +352,42 @@ function migrateScopedStorage(){
  if(legacyQueue&&!localStorage.getItem(scopedStorageKey(QUEUE_KEY,scope)))localStorage.setItem(scopedStorageKey(QUEUE_KEY,scope),legacyQueue);
  localStorage.setItem(marker,'1');
 }
+function migrateTajenkaStorage(){
+ const core=tajenkaStorage();if(core)return core.migrateLegacy('guest');
+ const marker='proplet-v4-01-40-scoped-tajenka';
+ try{
+  if(localStorage.getItem(marker))return;
+  const legacy=localStorage.getItem(TAJENKA_STATE_KEY),target=tajenkaState('guest');
+  if(legacy){const incoming=JSON.parse(legacy||'{}'),completions={...(incoming.completions||{}),...(target.completions||{})};if(incoming.completed?.puzzleId&&!completions[incoming.completed.puzzleId])completions[incoming.completed.puzzleId]=incoming.completed;saveTajenkaState({...incoming,...target,completions,version:2},'guest')}
+  localStorage.removeItem(TAJENKA_STATE_KEY);localStorage.setItem(marker,'1');
+ }catch{}
+}
+function adoptGuestTajenkaData(profileId){
+ const core=tajenkaStorage();if(core)return core.adoptGuest(profileId);
+ const guestKey=tajenkaStateKey('guest'),playerKey=tajenkaStateKey(profileId);
+ try{
+  const guestRaw=localStorage.getItem(guestKey);if(!guestRaw)return;
+  const guest={...JSON.parse(guestRaw||'{}')},player={...JSON.parse(localStorage.getItem(playerKey)||'{}')};
+  const guestCompletions={...(guest.completions||{})},playerCompletions={...(player.completions||{})};
+  if(guest.completed?.puzzleId&&!guestCompletions[guest.completed.puzzleId])guestCompletions[guest.completed.puzzleId]=guest.completed;
+  if(player.completed?.puzzleId&&!playerCompletions[player.completed.puzzleId])playerCompletions[player.completed.puzzleId]=player.completed;
+  for(const [puzzleId,completion] of Object.entries(guestCompletions))if(!playerCompletions[puzzleId])playerCompletions[puzzleId]=completion;
+  player.completions=playerCompletions;
+  if(!player.completed&&guest.completed)player.completed=guest.completed;
+  if(!player.inProgress&&guest.inProgress&&!playerCompletions[guest.inProgress.puzzleId])player.inProgress=guest.inProgress;
+  localStorage.setItem(playerKey,JSON.stringify(player));localStorage.removeItem(guestKey);
+ }catch{}
+}
 function adoptGuestData(profileId){
- const core=scopedStorage();if(core)return core.adoptGuest({profileId,stateKey:STORE_KEY,queueKey:QUEUE_KEY});
- const guestStateKey=scopedStorageKey(STORE_KEY,'guest'),guestQueueKey=scopedStorageKey(QUEUE_KEY,'guest'),playerStateKey=scopedStorageKey(STORE_KEY,profileId),playerQueueKey=scopedStorageKey(QUEUE_KEY,profileId);
- try{const guest={...blankState(),...JSON.parse(localStorage.getItem(guestStateKey)||'{}')},player={...blankState(),...JSON.parse(localStorage.getItem(playerStateKey)||'{}')};for(const [k,r] of Object.entries(guest.completed||{}))player.completed[k]=player.completed[k]?firstResult(player.completed[k],r):r;for(const [k,r] of Object.entries(guest.inProgress||{}))if(!player.completed[k]&&!player.inProgress[k])player.inProgress[k]=r;player.rescues={...(player.rescues||{}),...(guest.rescues||{})};localStorage.setItem(playerStateKey,JSON.stringify(player))}catch{}
- try{const gq=JSON.parse(localStorage.getItem(guestQueueKey)||'[]'),pq=JSON.parse(localStorage.getItem(playerQueueKey)||'[]');const ids=new Set(pq.map(r=>r.attemptId||`${r.challengeKey}:${r.completedAt}`));for(const r of gq){const id=r.attemptId||`${r.challengeKey}:${r.completedAt}`;if(!ids.has(id)){pq.push(r);ids.add(id)}}localStorage.setItem(playerQueueKey,JSON.stringify(pq))}catch{}
- localStorage.removeItem(guestStateKey);localStorage.removeItem(guestQueueKey);
+ const core=scopedStorage();
+ if(core)core.adoptGuest({profileId,stateKey:STORE_KEY,queueKey:QUEUE_KEY});
+ else{
+  const guestStateKey=scopedStorageKey(STORE_KEY,'guest'),guestQueueKey=scopedStorageKey(QUEUE_KEY,'guest'),playerStateKey=scopedStorageKey(STORE_KEY,profileId),playerQueueKey=scopedStorageKey(QUEUE_KEY,profileId);
+  try{const guest={...blankState(),...JSON.parse(localStorage.getItem(guestStateKey)||'{}')},player={...blankState(),...JSON.parse(localStorage.getItem(playerStateKey)||'{}')};for(const [k,r] of Object.entries(guest.completed||{}))player.completed[k]=player.completed[k]?firstResult(player.completed[k],r):r;for(const [k,r] of Object.entries(guest.inProgress||{}))if(!player.completed[k]&&!player.inProgress[k])player.inProgress[k]=r;player.rescues={...(player.rescues||{}),...(guest.rescues||{})};localStorage.setItem(playerStateKey,JSON.stringify(player))}catch{}
+  try{const gq=JSON.parse(localStorage.getItem(guestQueueKey)||'[]'),pq=JSON.parse(localStorage.getItem(playerQueueKey)||'[]');const ids=new Set(pq.map(r=>r.attemptId||`${r.challengeKey}:${r.completedAt}`));for(const r of gq){const id=r.attemptId||`${r.challengeKey}:${r.completedAt}`;if(!ids.has(id)){pq.push(r);ids.add(id)}}localStorage.setItem(playerQueueKey,JSON.stringify(pq))}catch{}
+  localStorage.removeItem(guestStateKey);localStorage.removeItem(guestQueueKey);
+ }
+ adoptGuestTajenkaData(profileId);
 }
 const THEME_MODES=new Set(['auto','light','dark']);
 const THEME_COLORS={light:'#6c5ce7',dark:'#111019'};
@@ -1044,9 +1083,9 @@ function gameHints(){
 
 async function api(path,opts={}){
  const client=apiClient();if(client)return client(path,opts);
- const p=getProfile(),headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
+ const hasAuthSnapshot=Object.prototype.hasOwnProperty.call(opts,'authProfile'),p=hasAuthSnapshot?opts.authProfile:getProfile(),{authProfile:_authProfile,...requestOptions}=opts,headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);let r;
- try{r=await fetch(path,{...opts,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}
+ try{r=await fetch(path,{...requestOptions,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}
  clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;const error=new Error(msg);error.status=r.status;throw error}return r.json();
 }
 function trackProductEvent(eventType){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)return;api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}
@@ -1062,24 +1101,27 @@ function trackAppSession(){
 async function syncQueue({announce=false}={}){
  if(GEN4_CANDIDATE_PREVIEW){syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
- const controller=resultQueue();if(controller&&controller.getQueue().length){
+ const scope=p.id,controller=resultQueue(p,scope);if(controller&&controller.getQueue().length){
   syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
   const result=await controller.sync();
+  if(!accountProfileMatches(p)){syncState={status:'idle',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();return {...result,ok:false,stale:true}}
   try{await refreshRemoteProfile({throwOnError:result.left===0})}catch(e){if(!result.error)result.error=e.message}
   if(result.left){syncState={status:'error',error:result.error||'Některé výsledky zůstaly ve frontě',lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace selhala: ${syncState.error}`)}else{syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast(result.quarantined?`Synchronizace opravena · ${countCz(result.quarantined,'zastaralý záznam','zastaralé záznamy','zastaralých záznamů')} bezpečně odložen ✓`:result.sent?`Synchronizováno ${countCz(result.sent,'výsledek','výsledky','výsledků')} ✓`:'Všechno je synchronizované ✓')}
   renderProfile();renderDaily();if(currentScreen==='leaderboard'&&!result.left)renderLeaderboard();return {...result,failedKeys:result.failedKeys||[]};
  }
- const q=getQueue();syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
- if(!q.length){try{await refreshRemoteProfile({throwOnError:true});syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast('Všechno je synchronizované ✓');renderProfile();renderDaily();if(currentScreen==='leaderboard')renderLeaderboard();return {ok:true,left:0}}catch(e){syncState={status:'error',error:e.message,lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace: ${e.message}`);renderProfile();renderDaily();return {ok:false,left:0,error:e.message}}}
+ const q=getQueue(scope);syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
+ if(!q.length){try{await refreshRemoteProfile({throwOnError:true});if(!accountProfileMatches(p)){syncState={status:'idle',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();return {ok:false,left:0,stale:true}}syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast('Všechno je synchronizované ✓');renderProfile();renderDaily();if(currentScreen==='leaderboard')renderLeaderboard();return {ok:true,left:0}}catch(e){syncState={status:'error',error:e.message,lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace: ${e.message}`);renderProfile();renderDaily();return {ok:false,left:0,error:e.message}}}
  const left=[];let firstError=null,sent=0,quarantined=0;
- for(const r of q){try{await api('/api/result',{method:'POST',body:JSON.stringify({puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null})});sent++}catch(e){if(obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message)){quarantined++;continue}left.push(r);if(!firstError)firstError=e.message}}
- saveQueue(left);
+ for(const r of q){try{await api('/api/result',{method:'POST',body:JSON.stringify({puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null}),authProfile:p});sent++}catch(e){if(obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)){quarantined++;continue}left.push(r);if(!firstError)firstError=e.message}}
+ saveQueue(left,scope);
+ if(!accountProfileMatches(p)){syncState={status:'idle',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();return {ok:false,left:left.length,error:firstError,stale:true,failedKeys:[...new Set(left.map(r=>r.challengeKey))]}}
  try{await refreshRemoteProfile({throwOnError:left.length===0})}catch(e){if(!firstError)firstError=e.message}
  if(left.length){syncState={status:'error',error:firstError||'Některé výsledky zůstaly ve frontě',lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace selhala: ${syncState.error}`)}else{syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast(quarantined?`Synchronizace opravena · ${countCz(quarantined,'zastaralý záznam','zastaralé záznamy','zastaralých záznamů')} bezpečně odložen ✓`:sent?`Synchronizováno ${countCz(sent,'výsledek','výsledky','výsledků')} ✓`:'Všechno je synchronizované ✓')}
  renderProfile();renderDaily();if(currentScreen==='leaderboard'&&!left.length)renderLeaderboard();return {ok:!left.length,left:left.length,error:firstError,failedKeys:[...new Set(left.map(r=>r.challengeKey))]};
 }
-function mergeRemoteProgress(rows){
- const state=getState();
+function mergeRemoteProgress(rows,scope=playerScope()){
+ mergeRemoteTajenkaProgress(rows,scope);
+ const state=getState(scope);
  for(const r of rows||[]){
   if(!r?.challengeKey)continue;
   const old=state.completed[r.challengeKey];
@@ -1090,13 +1132,14 @@ function mergeRemoteProgress(rows){
   state.completed[r.challengeKey]={...old,...r};
   if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];
  }
- saveState(state);
+ saveState(state,scope);
 }
 async function refreshRemoteProfile({throwOnError=false}={}){
  const p=getProfile();if(!p?.token)return null;
  try{
   const [me,progress]=await Promise.all([api('/api/me'),api('/api/progress')]);
-  mergeRemoteProgress(progress.completed||[]);
+  if(!accountProfileMatches(p))return null;
+  mergeRemoteProgress(progress.completed||[],p.id);
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
   updateAccountProfile({name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',googleLinked:!!me.googleLinked,googleAvatarUrl:me.googleAvatarUrl||null,useGoogleAvatar:!!me.useGoogleAvatar,supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
@@ -1135,7 +1178,7 @@ async function deleteAccount(){
   await api('/api/account',{method:'DELETE',body:JSON.stringify({confirmation:'SMAZAT',password:p.hasPassword?password:null})});
   try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch{}
   try{const reg=await navigator.serviceWorker?.ready,sub=await reg?.pushManager?.getSubscription?.();if(sub)await sub.unsubscribe()}catch{}
-  clearAccountProfile();localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(REJECTED_QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
+  clearAccountProfile();localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(REJECTED_QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));tajenkaStorage()?.remove(deletedId);localStorage.removeItem(tajenkaStateKey(deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
  }catch(e){$('#deleteAccountError').textContent=e.message}finally{button.disabled=false;button.textContent='Trvale smazat účet'}
 }
 let reportingClientError=false;
@@ -1275,7 +1318,7 @@ async function logoutPlayer(){
  // aby nový hráč nedostával připomínky podle cizí Denní výzvy.
  try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}}catch{}
  try{await api('/api/logout',{method:'POST'})}catch{}
- clearAccountProfile();rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
+ clearAccountProfile();rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));tajenkaStorage()?.remove('guest');localStorage.removeItem(tajenkaStateKey('guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
 }
 
 function renderSettings(){const s=getSettings(),supported=typeof navigator.vibrate==='function',wakeSupported=!!navigator.wakeLock?.request;renderThemeSettings();$('#soundToggle').textContent=`${s.sound?'🔊':'🔇'} Zvuk ${s.sound?'zapnutý':'vypnutý'}`;$('#soundToggle').classList.toggle('on',s.sound);$('#hapticToggle').textContent=supported?`${s.haptics?'📳':'📴'} Vibrace ${s.haptics?'zapnuté':'vypnuté'}`:'📴 Vibrace nepodporovány';$('#hapticToggle').classList.toggle('on',s.haptics&&supported);$('#hapticToggle').disabled=!supported;const magWrap=$('#magnifierSettingWrap'),mag=$('#magnifierSettingToggle'),magSupported=touchMagnifierDeviceSupported();magWrap?.classList.toggle('hidden',!magSupported);if(mag){mag.textContent=s.magnifier?'🔍 Lupa při tahu zapnutá':'🔍 Lupa při tahu vypnutá';mag.classList.toggle('on',s.magnifier);mag.setAttribute('aria-pressed',s.magnifier?'true':'false')}const wake=$('#wakeLockToggle'),note=$('#wakeLockNote');if(wake){wake.textContent=wakeSupported?`${s.wakeLock?'☀️':'🌙'} Displej během hry ${s.wakeLock?'zůstane zapnutý':'může zhasnout'}`:'🌙 Prohlížeč neumí udržet displej';wake.classList.toggle('on',s.wakeLock&&wakeSupported);wake.disabled=!wakeSupported}if(note&&!wakeSupported)note.textContent='Tento prohlížeč funkci nepodporuje; použije se běžný limit zařízení.';const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;test.textContent=supported?'📳 Otestovat vibrace':'📴 Prohlížeč vibrace nepodporuje'}}
@@ -1792,8 +1835,20 @@ function tajenkaFixtureValid(data){
  const order=data.tajenka?.answerOrder;return Array.isArray(order)&&order.length===data.answers.length&&new Set(order).size===order.length&&order.every(i=>Number.isInteger(i)&&i>=0&&i<data.answers.length);
 }
 function adjacentPuzzleCells(a,b,cols){return Math.abs(a-b)===1&&Math.floor(a/cols)===Math.floor(b/cols)||Math.abs(a-b)===cols}
-function tajenkaState(){try{const raw=JSON.parse(localStorage.getItem(TAJENKA_STATE_KEY)||'{}');return raw&&typeof raw==='object'?raw:{}}catch{return {}}}
-function saveTajenkaState(state){try{localStorage.setItem(TAJENKA_STATE_KEY,JSON.stringify(state))}catch{}}
+function tajenkaStateKey(scope=playerScope()){return scopedStorageKey(TAJENKA_STATE_KEY,scope)}
+function tajenkaState(scope=playerScope()){const core=tajenkaStorage();if(core)return core.read(scope);try{const raw=JSON.parse(localStorage.getItem(tajenkaStateKey(scope))||'{}');return raw&&typeof raw==='object'?raw:{}}catch{return {}}}
+function saveTajenkaState(state,scope=playerScope()){const core=tajenkaStorage();if(core)return core.write(state,scope);try{localStorage.setItem(tajenkaStateKey(scope),JSON.stringify(state))}catch{}}
+function mergeRemoteTajenkaProgress(rows,scope=playerScope()){
+ const core=tajenkaStorage();if(core)return core.mergeRemote(rows,scope);
+ const completed=(rows||[]).filter(row=>row?.mode==='tajenka'&&row.puzzleId);if(!completed.length)return false;
+ const state=tajenkaState(scope);state.completions={...(state.completions||{})};
+ for(const row of completed){
+  const old=state.completions[row.puzzleId]||(state.completed?.puzzleId===row.puzzleId?state.completed:null);
+  state.completions[row.puzzleId]={...row,found:Array.isArray(old?.found)?old.found:[],hints:Math.max(0,Number(row.hintsUsed??old?.hints)||0),elapsedMs:Math.max(0,Number(row.elapsedMs??old?.elapsedMs)||0),moves:Math.max(0,Number(row.moves??old?.moves)||0),completedAt:row.completedAt||old?.completedAt||null,rewarded:true,rewardXp:Math.max(0,Number(row.points??old?.rewardXp)||TAJENKA_REWARD_XP),remote:true};
+  if(state.inProgress?.puzzleId===row.puzzleId)delete state.inProgress;
+ }
+ saveTajenkaState(state,scope);return true;
+}
 function tajenkaCompletion(puzzle=tajenkaPuzzle,state=tajenkaState()){if(!puzzle)return null;return state.completions?.[puzzle.id]||(state.completed?.puzzleId===puzzle.id?state.completed:null)}
 function tajenkaFoundFromState(puzzle,row){
  if(!row||row.puzzleId!==puzzle.id)return [];
@@ -1877,10 +1932,10 @@ async function refreshRollingContent(){
 }
 
 async function boot(){
- applyTheme(getSettings().theme);showPuzzleBootLoading();
+ applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  await loadTajenkaFixture();
- document.body.classList.remove('landscape-game-blocked');migrateScopedStorage();reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }

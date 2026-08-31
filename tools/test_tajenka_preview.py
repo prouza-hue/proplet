@@ -196,6 +196,11 @@ def main() -> None:
         "const puzzle=await response.json()",
         "mode==='tajenka'?`tajenka:${puzzle.id}`",
         "TAJENKA_REWARD_XP=200",
+        "function tajenkaStateKey(",
+        "function migrateTajenkaStorage(",
+        "function adoptGuestTajenkaData(",
+        "function mergeRemoteTajenkaProgress(",
+        "mergeRemoteTajenkaProgress(rows,scope)",
         "state.completions[g.puzzle.id]=completion",
         "if(TAJENKA_RELEASE_ENABLED&&!old)",
         "tajenka-rule-inline",
@@ -260,6 +265,12 @@ def main() -> None:
     assert "body.game-tablet-landscape .game-screen.tajenka-mode .game-board-column>.tajenka-phrase{grid-row:3!important" in game_layout
     assert ".tajenka-entry-copy p{display:inline;margin:0;color:#6d6478;font-size:12px" in styles
     assert "tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''" in app
+    assert "localStorage.getItem(tajenkaStateKey(scope))" in app
+    assert "localStorage.setItem(tajenkaStateKey(scope),JSON.stringify(state))" in app
+    assert "localStorage.getItem(TAJENKA_STATE_KEY)||'{}'" not in app
+    assert "PropletTajenkaStorage" in app
+    assert "if(!accountProfileMatches(p))return null" in app
+    assert "tajenkaStorage()?.remove(deletedId)" in app
     assert "root.classList.toggle('completed',completed)" in app
     assert "showRule=g.found.length===0" in app
     assert "tajenkaRecapOpen=true" in app

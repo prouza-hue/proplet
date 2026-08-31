@@ -68,7 +68,8 @@
     function persistResponseProfile(incoming) {
       if (!hasIdentity(incoming)) return null;
       const current = get();
-      return save({...current, ...incoming});
+      if (!current) adoptGuestData(incoming.id);
+      return save(current?.id === incoming.id ? {...current, ...incoming} : {...incoming});
     }
 
     function authHeaders() {
@@ -76,7 +77,14 @@
       return profile?.token ? {Authorization: `Bearer ${profile.token}`} : {};
     }
 
-    return {get, save, update, clear, accept, persistResponseProfile, authHeaders};
+    function matches(snapshot) {
+      const current = get();
+      return !!snapshot?.id && !!snapshot?.token
+        && current?.id === snapshot.id
+        && current?.token === snapshot.token;
+    }
+
+    return {get, save, update, clear, accept, persistResponseProfile, authHeaders, matches};
   }
 
   const api = {create};

@@ -22,7 +22,7 @@ async function call(path,{method='GET',body,auth=true}={}){
  if(!r.ok)throw new Error(d.detail||'Něco se nepodařilo. Zkus to znovu.');
  if(PROFILE_RESPONSE_ENDPOINTS.has(path)&&d?.profile?.id&&d?.profile?.token){
   if(typeof persistAccountResponseProfile==='function')persistAccountResponseProfile(d.profile);
-  else{let current={};try{current=JSON.parse(localStorage.getItem('proplet-v2-profile')||'{}')||{}}catch{}try{localStorage.setItem('proplet-v2-profile',JSON.stringify({...current,...d.profile}))}catch{}}
+  else{let current=null;try{current=JSON.parse(localStorage.getItem('proplet-v2-profile')||'null')}catch{}try{if(!current&&typeof adoptGuestData==='function')adoptGuestData(d.profile.id);localStorage.setItem('proplet-v2-profile',JSON.stringify(current?.id===d.profile.id?{...current,...d.profile}:{...d.profile}))}catch{}}
  }
  return d;
 }

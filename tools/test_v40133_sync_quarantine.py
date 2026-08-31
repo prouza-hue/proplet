@@ -13,7 +13,8 @@ assert "version:'4.01.40'" in runtime
 assert "proplet-v4.01.40-game-session-shell" in sw
 assert "const REJECTED_QUEUE_KEY='proplet-v4-rejected-sync-queue'" in app
 assert "Number(error?.status)===400&&error?.message==='Neznámá úloha'" in app
-assert "obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message)" in app
+assert "obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)" in app
+assert "scopedStorageKey(REJECTED_QUEUE_KEY,scope)" in app
 assert "Array.isArray(parsed)?parsed:[]" in app
 assert "catch{return false}" in app
 assert "old.slice(-20)" in app
