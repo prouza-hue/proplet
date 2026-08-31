@@ -59,6 +59,9 @@ has(sw,/\/app\/game\/hints\.js/,'hints module not in shell');
 has(app,/function gameBoard\(\)/,'board adapter missing');
 has(app,/function gameInput\(\)/,'input adapter missing');
 has(app,/function gameHints\(\)/,'hints adapter missing');
+has(app,/function renderGameBoard\(\)\{return gameBoard\(\)\?\.render\(\)\}/,'board render adapter missing');
+has(app,/function pointerDown\(e\)\{return gameInput\(\)\?\.pointerDown\(e\)\}/,'pointer adapter missing');
+has(app,/function pickHintTarget\(\)\{return gameHints\(\)\?\.pickTarget\(\)\|\|null\}/,'hint target adapter missing');
 
 const game={
   puzzle:{rows:2,cols:3,mask:[0,1,2,4],letters:['A','B','C','X','D','X'],answers:[

@@ -3,7 +3,7 @@
 - Sprint: 11B.2 — board, input a hints
 - Branch: `refactor/s11b2-game-interaction`
 - Base SHA: `7cad28b12788813f5932ca450f754d6540ed049b` (produkční main, Proplet v4.01.40)
-- Stav: characterization
+- Stav: implementation
 - Zamýšlená změna chování: žádná.
 - Scope podle plánu: `public/app/game/board.js`, `input.js`, `hints.js` napojené na stabilní GameSession API.
 - Characterizované kontrakty:
@@ -12,7 +12,7 @@
   - touch magnifier eligibility pro Hard/Mozkožrout + touch short-side policy;
   - hint target ordering, Starter special target, hint count/max level/clean solve/helper attribution.
 - Mimo scope: completion, account/profile, onboarding, rankings a CSS redesign.
-- Zbývá: characterization gate → moduly → current gate → browser matrix (mouse/touch/Fold/magnifier/hints) → preview.
+- Characterization gate: **GREEN** na nezměněném v4.01.40 runtime.\n- Implementace: nové `game/board.js`, `game/input.js`, `game/hints.js`; `app.js` zůstává orchestrace submit/result a poskytuje kompatibilní globální adaptéry.\n- Zbývá: current gate → browser matrix (mouse/touch/Fold/magnifier/hints) → preview → user review.
 - Produkce/main/Supabase: beze změny od v4.01.40 release.
 - Rollback: branch reset na `7cad28b12788813f5932ca450f754d6540ed049b`.
 

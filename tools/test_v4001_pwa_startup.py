@@ -24,11 +24,14 @@ shell = shell_match.group(1)
 # v4.01.23 adds one tiny Daily result-menu asset to the intentional shell set.
 # Sprint 10 adds two small dependency-free frontend core modules; heavy/lazy
 # data remains outside the shell, so the startup budget grows only by those two.
-assert shell.count("'/") <= 15
+assert shell.count("'/") <= 18
 assert "/app/core/result-queue.js" in shell
 assert "/app/core/api-client.js" in shell
 assert "/app/core/storage.js" in shell
 assert "/app/game/state.js" in shell
+assert "/app/game/board.js" in shell
+assert "/app/game/input.js" in shell
+assert "/app/game/hints.js" in shell
 assert "/app/core/completion-pipeline.js" in shell
 for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.png", "/privacy.html", "/terms.html"):
     assert heavy_or_lazy not in shell
