@@ -2,17 +2,33 @@
 
 - Sprint: 10 — Frontend core: API client a scoped storage
 - Branch: `refactor/s10-frontend-core`
-- Base SHA: `d7252e4d3679dbf5e1ebecf154f840b7fd807000`
-- Current HEAD: implementation commit se vytváří
-- Stav: implementation — první CI diagnostika opravena
-- Zamýšlená změna chování: žádná; veřejné HTTP payloady/chyby, 12s timeout, auth/anonymous/preview hlavičky, scoped localStorage klíče, migrace guest dat, load order a UI zůstávají kontraktně stejné.
-- Změněné soubory: `public/app/core/api-client.js`, `public/app/core/storage.js`, kompatibilní adaptéry v `public/app.js`, bootstrap/cache seznamy v `public/index.html` + `public/sw.js`, Sprint 10 characterization test.
-- Hotové kroky: characterization commit `b3730adc884a40658a4fc2961d6fc22cf749bda1`; API a scoped state/queue storage mají nové explicitní vlastníky; legacy globální adaptéry a fallback implementace zůstávají pro kompatibilitu. Speciální přímé fetch cesty nejsou v tomto sprintu přesouvány.
-- Zbývající kroky: current gate, asset/syntax kontrola, Vercel preview + browser/API smoke; potom uzavřít Sprint 10.
-- Testy PASS: characterization starého `app.js` kontraktu PASS před runtime změnou; Vercel preview build `d9c0fdae…` READY; syntax 211/211 a assets 74/74 v prvním CI.\n- Testy FAIL / nespouštěné: první current gate našel 4 fail: shell budget 11→13 (Sprint 10), 2× stale OpenAPI digest po produkčním version bumpu 4.01.37→4.01.39 (baseline drift), 1× příliš úzký vlastní S10 source regex. První test-maintenance patch měl chybné escapování; opraveno. OpenAPI baseline je nyní normalizovaný přesně na původní Sprint 04/06 metadata `4.01.35-cloud`, zatímco aktuální schema musí hlásit `${APP_VERSION}-cloud`. CI diagnostika potvrdila nový normalizovaný OpenAPI baseline `b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674` shodně v obou testech; branch backend je proti `main@d7252e4d` nezměněný. Baseline zamčen, finální OpenAPI baseline je zamčen; response fixture baseline po legitimních health/config rozšířeních je `12d98531db21a43038f0e9f5d24088ac4e65be04f78a4632a0b0430b60b3ba35`. Finální rerun čeká.
-- Nově nalezená rizika: release probe, puzzle/PWA boot, push config, Tajenka a client-error používají odlišné cache/header/keepalive kontrakty; zůstávají záměrně mimo nový generický JSON API client.
-- Bezpečný bod pokračování: characterization `b3730adc…`; implementace je oddělený navazující commit.
-- Další povolený sprint: Sprint 11A pouze po zeleném a uzavřeném Sprintu 10; uživatel výslovně povolil navázání bloků 1→2 bez merge do main.
+- Base SHA: `d7252e4d3679dbf5e1ebecf154f840b7fd807000` (produkční `main`, Proplet v4.01.39)
+- Runtime HEAD: `6467a809a7fa9ac79353960dafea00158683ef16`
+- Stav: **uzavřeno / GREEN, čeká na pozdější merge approval**
+- Zamýšlená změna chování: žádná; HTTP kontrakty, scoped localStorage, guest/account adoption, UI a produkční data beze změny.
+- Runtime změny:
+  - nový `public/app/core/api-client.js` s explicitními závislostmi a zachovanými auth/anonymous/preview hlavičkami, 12s timeoutem, JSON/error mappingem a `no-store`;
+  - nový `public/app/core/storage.js` pro scoped state/queue, legacy migraci a guest adoption;
+  - `app.js` používá kompatibilní adaptéry a ponechává legacy fallbacky;
+  - speciální přímé fetch cesty (PWA/puzzle boot, release probe, push config, Tajenka, client-error) zůstaly záměrně mimo generický klient;
+  - nové core assety se načítají před `result-queue.js` a `app.js` a jsou v PWA shell cache.
+- Characterization před runtime změnou: `b3730adc884a40658a4fc2961d6fc22cf749bda1`.
+- Testy PASS na runtime HEAD:
+  - Current runtime gate: **34 PASS / 0 FAIL**;
+  - Assets: **74 PASS / 0 FAIL** (66 lokálních referencí);
+  - Syntax: **211 PASS / 0 FAIL**;
+  - targeted Sprint 10 Node kontrakt PASS;
+  - Vercel preview deployment `dpl_ASSCcLndm4sSpUqAfQQaPyZRBdFh` READY;
+  - stabilní branch preview `/api/health`: HTTP 200, `version=4.01.39`, `ok=true`, DB true.
+- Test maintenance během Sprintu 10:
+  - PWA shell budget byl explicitně rozšířen pouze o 2 malé core skripty (11→13);
+  - staré Sprint 04/06 hash baseline driftovaly po legitimních backendových změnách; OpenAPI byl znovu zamčen na version-normalized baseline `b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674`;
+  - config/health/push fixture byl znovu zamčen na současný produkční kontrakt `12d98531db21a43038f0e9f5d24088ac4e65be04f78a4632a0b0430b60b3ba35`.
+- Známý nesouvisející check: historický workflow `v3.34 Generation 4 contract` zůstává červený kvůli zastaralému source-level očekávání modelů přímo v `server.py` po dřívějším backend refaktoru. Není součástí current runtime gate ani Sprintu 10 a runtime S10 nemění.
+- Produkce/main/Supabase: **beze změny**. PR #88 zůstává draft.
+- Rollback: reset/uzavření branch na base `d7252e4d…`; žádná DB migrace ani content rollback nejsou potřeba.
+- Bezpečný bod pokračování: runtime HEAD `6467a809…` + tento status-only commit.
+- Další povolený sprint: **11A — Gameplay completion vertical slice**, explicitně povolen uživatelem jako navazující blok 2.
 
 ## Předchozí uzavřený stav
 
@@ -58,4 +74,5 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
+
 
