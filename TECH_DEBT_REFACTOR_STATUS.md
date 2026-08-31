@@ -2,19 +2,44 @@
 
 - Sprint: 11B.2 — board, input a hints
 - Branch: `refactor/s11b2-game-interaction`
-- Base SHA: `7cad28b12788813f5932ca450f754d6540ed049b` (produkční main, Proplet v4.01.40)
-- Stav: implementation
+- Base release: `7cad28b12788813f5932ca450f754d6540ed049b` (Proplet v4.01.40); main navíc obsahuje test-only baseline `0013292f…`.
+- Runtime implementation: `43943f27c247f92aa638c00742b35f23d79b1a5e`
+- Test ownership alignment: `f0f124576a3fff0089c6943f64c0aaaf046979ec`
+- Browser-matrix cleanup HEAD: `9c642801025757f34fb9ed67caf0d20f22feebde`
+- Stav: **implementace uzavřena / GREEN, čeká na user preview + merge approval**
 - Zamýšlená změna chování: žádná.
-- Scope podle plánu: `public/app/game/board.js`, `input.js`, `hints.js` napojené na stabilní GameSession API.
-- Characterizované kontrakty:
-  - přesný 2D board fit a grid geometrie;
-  - orthogonal neighbour policy, pointer drag/backtrack a 6px pointer sampling;
-  - touch magnifier eligibility pro Hard/Mozkožrout + touch short-side policy;
-  - hint target ordering, Starter special target, hint count/max level/clean solve/helper attribution.
-- Mimo scope: completion, account/profile, onboarding, rankings a CSS redesign.
-- Characterization gate: **GREEN** na nezměněném v4.01.40 runtime.\n- Implementace: nové `game/board.js`, `game/input.js`, `game/hints.js`; `app.js` zůstává orchestrace submit/result a poskytuje kompatibilní globální adaptéry.\n- Zbývá: current gate → browser matrix (mouse/touch/Fold/magnifier/hints) → preview → user review.
-- Produkce/main/Supabase: beze změny od v4.01.40 release.
-- Rollback: branch reset na `7cad28b12788813f5932ca450f754d6540ed049b`.
+- Výsledek:
+  - nový `public/app/game/board.js` vlastní board grid, 2D fit, cesty a orthogonal neighbour policy;
+  - nový `public/app/game/input.js` vlastní pointer drag/backtrack, 6px sampling a touch magnifier;
+  - nový `public/app/game/hints.js` vlastní hint copy/policy, target selection a změny hint state;
+  - `app.js` zůstává orchestrace submit/result/completion/reset a poskytuje kompatibilní adaptéry;
+  - renderer/input/hints jsou napojené na stabilní GameSession z 11B.1;
+  - žádný CSS redesign, žádná změna gameplay/XP/API/DB/textů.
+- Characterization:
+  - commit `2ab1f3e11d06ab8ab411f63f225683c0cd8b9a19`;
+  - po v4.01.40 release byl S04 health/config hash legitimně posunut pouze release metadata; branch baseline opraven v `70faaf30211aa4225cfc73e8d77d0491282d8ca7`.
+- Current gate na čistém výsledném diffu:
+  - **39 PASS / 0 FAIL**;
+  - Assets: **79 PASS / 0 FAIL** (71 lokálních referencí);
+  - Syntax: **216 PASS / 0 FAIL**;
+  - `tests/current/test_s11b2_game_interaction.js`: PASS.
+- Browser matrix:
+  - temporary workflow run `33431006205`, job `99616059437`: **PASS**;
+  - desktop mouse drag: cílové slovo `MŮRA` nalezeno jedním reálným drag tahem;
+  - Fold portrait 590×960 / screen 384×832: `tablet-portrait-rail`, portrait, large-touch, overflow 0;
+  - Fold touch/magnifier: lupa viditelná při tahu, přesně 9 buněk, po puštění skryta; reálným tahem nalezeno `BLUDIŠTĚ`;
+  - board fit na Foldu: 390×390 uvnitř 404×832 stage;
+  - hint level 2: hints=1, maxHintLevel=2, cleanSolve=false, 3 zvýrazněné route cells, modal zavřen;
+  - žádné page errors.
+  - temporary workflow byl po PASS odstraněn; v branchi nezůstává.
+- Vercel preview:
+  - stable alias: `https://proplet-git-refactor-s11b2-game-i-776120-pavel-prouzas-projects.vercel.app`;
+  - nové board/input/hints assety jsou v PWA shellu před `app.js`;
+  - PWA shell budget 15→18 pouze kvůli třem malým game modulům.
+- Známý nesouvisející check: historický `v3.34 Generation 4 contract` zůstává červený ze stejného starého source-level důvodu; Current Runtime Gate je GREEN.
+- Produkce/main/Supabase: **11B.2 beze změny**. Produkce je v4.01.40; draft PR #91.
+- Rollback 11B.2: reset branch na release baseline; žádná DB/content migrace.
+- Další krok: user preview. Po schválení merge 11B.2; další plánovaný blok je Sprint 12A.
 
 ## Předchozí uzavřený stav
 
@@ -188,6 +213,7 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
+
 
 
 
