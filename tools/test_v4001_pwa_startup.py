@@ -24,10 +24,14 @@ shell = shell_match.group(1)
 # v4.01.23 adds one tiny Daily result-menu asset to the intentional shell set.
 # Sprint 10 adds two small dependency-free frontend core modules; heavy/lazy
 # data remains outside the shell, so the startup budget grows only by those two.
-assert shell.count("'/") <= 18
+# Sprint 12A.1 adds one small dependency-free account-session owner.
+# Sprint 12A.2 adds the small account-scoped Tajenka persistence owner.
+assert shell.count("'/") <= 20
 assert "/app/core/result-queue.js" in shell
 assert "/app/core/api-client.js" in shell
 assert "/app/core/storage.js" in shell
+assert "/app/account/session.js" in shell
+assert "/app/account/tajenka-storage.js" in shell
 assert "/app/game/state.js" in shell
 assert "/app/game/board.js" in shell
 assert "/app/game/input.js" in shell

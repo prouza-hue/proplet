@@ -4,26 +4,28 @@ if(window.__PROPLET_ACCOUNT_TEAM_V33210__)return;
 window.__PROPLET_ACCOUNT_TEAM_V33210__=true;
 
 const PROFILE_KEY='proplet-v2-profile';
-const profile=()=>{try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}};
-const authHeaders=()=>profile()?.token?{'Authorization':`Bearer ${profile().token}`}:{ };
+const profile=()=>{try{return typeof getProfile==='function'?getProfile():JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}};
+const authHeaders=()=>{try{return typeof accountAuthHeaders==='function'?accountAuthHeaders():(profile()?.token?{'Authorization':`Bearer ${profile().token}`}:{})}catch{return {}}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const setText=(node,text)=>{if(node&&node.textContent!==text)node.textContent=text};
 
 /* New clients use the dedupe-aware login endpoint. The historical /api/login stays available
    for cached clients, while the server-side create-race guard protects both generations. */
 const nativeFetch=window.fetch.bind(window);
-window.fetch=(input,init)=>{
-  try{
-    if(typeof input==='string'){
-      const url=new URL(input,location.href);
-      if(url.origin===location.origin&&url.pathname==='/api/login'){
-        url.pathname='/api/login-integrity';
-        input=url.pathname+url.search;
+if(!window.PROPLET_ACCOUNT_SESSION_ACTIVE){
+  window.fetch=(input,init)=>{
+    try{
+      if(typeof input==='string'){
+        const url=new URL(input,location.href);
+        if(url.origin===location.origin&&url.pathname==='/api/login'){
+          url.pathname='/api/login-integrity';
+          input=url.pathname+url.search;
+        }
       }
-    }
-  }catch{}
-  return nativeFetch(input,init);
-};
+    }catch{}
+    return nativeFetch(input,init);
+  };
+}
 
 function wrapAccountSubmit(){
   const btn=document.getElementById('saveProfileBtn');

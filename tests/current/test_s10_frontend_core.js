@@ -77,6 +77,10 @@ async function verifyApiModule() {
   assert.strictEqual(captured.options.cache,'no-store');
   assert(captured.options.signal);
 
+  await client('/api/snapshot',{method:'POST',authProfile:{id:'player-old',token:'token-old'}});
+  assert.strictEqual(captured.options.headers.Authorization,'Bearer token-old','explicit auth snapshot must survive an account switch');
+  assert(!('authProfile' in captured.options),'internal auth snapshot leaked into fetch options');
+
   let anonCaptured = null;
   const anonClient = create({
     fetch: async (_url, options) => { anonCaptured=options; return {ok:true,json:async()=>({})}; },

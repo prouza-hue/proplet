@@ -88,6 +88,20 @@ assert result_rows[0]["points"] == 200
 
 
 with (
+    patch.object(server, "enforce_rate_limit"),
+    patch.object(server, "auth_player", return_value={"id": "00000000-0000-0000-0000-000000000001"}),
+    patch.object(server, "db_select", return_value=[result_rows[0]]),
+):
+    synced = server.progress(Mock(), "Bearer test")["completed"]
+
+assert len(synced) == 1
+assert synced[0]["mode"] == "tajenka"
+assert synced[0]["puzzleId"] == week_one["id"]
+assert synced[0]["challengeKey"] == f"tajenka:{week_one['id']}"
+assert synced[0]["points"] == 200
+
+
+with (
     patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
     patch.object(server, "current_prague_date", return_value=date(2026, 8, 31)),
 ):
@@ -100,4 +114,4 @@ with (
         raise AssertionError("future Tajenka must remain rejected")
 
 
-print("PASS: released Tajenka result validates and awards 200 XP")
+print("PASS: released Tajenka result validates, awards 200 XP, and syncs to the account")
