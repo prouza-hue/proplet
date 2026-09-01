@@ -3,41 +3,41 @@
 - Sprint: 16 — Ověřený legacy/dead cleanup a dokumentace
 - Branch: `refactor/s16-legacy-cleanup`
 - Base SHA: `5edd2bc847153ef50a5226c080e1e79243d96000`
-- Stav: **characterization**
+- Characterization HEAD: `0a27513883d8f62a3453f1c8f07cdfb0f2af8b90`
+- Stav: **implementation candidate / verification pending**
 - Zamýšlená změna chování: žádná.
 - Tento sprint je poslední sprint v `TECH_DEBT_REFACTOR_PLAN.md`.
 
-## Evidence inventory
+## Cleanup
 
-Live — **nemazat**:
-- `public/p0-hotfix-v3336.js` + `.css` — dynamicky načítá `public/runtime-meta.js`.
-- `public/push-origin-v3325.js` — dynamicky načítá `public/runtime-meta.js`; current test jej chrání.
-- `public/quality-hotfix-v334.css` — dynamicky načítá `public/runtime-meta.js`; current CSS/quality testy jej chrání.
+Odstranit pouze:
+- `public/server.py`;
+- `tools/__pycache__/generate_puzzles.cpython-313.pyc`;
+- `tools/__pycache__/test_v317_admin.cpython-312.pyc`.
 
-Ověření kandidáti k odstranění:
-- `tools/__pycache__/generate_puzzles.cpython-313.pyc` — generovaný Python bytecode.
-- `tools/__pycache__/test_v317_admin.cpython-312.pyc` — generovaný Python bytecode.
-- `public/server.py` — historický backend publikovaný jako statický asset; současný runtime backend je root `server.py`; žádný loader/import/workflow/reference nebyl nalezen.
+Přidat:
+- minimální `.gitignore` pro Python bytecode;
+- aktuální README;
+- `docs/ARCHITECTURE.md`;
+- `docs/LEGACY_ASSETS.md`;
+- current migration hygiene poznámku.
 
-Zatím **ponechat — dead status není dostatečně prokázaný kvůli možným přímým QA URL**:
-- `public/game-layout-v3323.js`
-- `public/release-notes.js`
-- `public/release-notes.css`
-- `public/valid-word-feedback-v3328.js`
+## Evidence
 
-## Test lifecycle
+Live a proto chráněné: `p0-hotfix-v3336.{js,css}`, `push-origin-v3325.js`, `quality-hotfix-v334.css` — načítá `runtime-meta.js`.
 
-`tests/current/manifest.json` už explicitně označuje `tools/test_v3*.py/js` jako `legacy_evidence`, mimo default current gate. Sprint 16 je nebude hromadně přesouvat ani opravovat jen kvůli historickým failure.
+Unreferenced, ale kvůli možným přímým QA URL záměrně ponechané: `game-layout-v3323.js`, `release-notes.{js,css}`, `valid-word-feedback-v3328.js`.
 
-## Characterization
+Pre-change current-runtime po opravě characterization: **GREEN**.
 
-- `tests/current/test_s16_legacy_reachability.py`
-- Chrání live dynamic legacy assets a explicitní legacy test lifecycle.
-- Cleanup se provede až po GREEN current gate.
+## Zbývá
 
-## STOP
-
-Po cleanupu: current gate + asset scan + Vercel preview smoke + request-log review. Každý odstraněný soubor musí být v reportu s důkazem a Git rollback cestou. Žádný další refactor.
+1. post-change current gate + asset scan;
+2. diff review — žádný další runtime/content/DB zásah;
+3. Vercel preview health + smoke;
+4. preview request-log scan na odstraněný `/server.py`;
+5. user review/approval;
+6. STOP — žádný další refactor z tohoto plánu.
 
 ## Předchozí stav
 
@@ -534,6 +534,7 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
 

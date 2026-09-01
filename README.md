@@ -1,43 +1,64 @@
-# Proplet v3.24.0
+# Proplet
 
-Aktuální produkční release: **v3.24.0 — Daily 2/3/2 + jednotný production root**.
+Česká webová/PWA slovní hra. Aktuální produkční runtime je **v4.01.40** na `https://hrajproplet.cz`.
 
-## Produkční struktura
+## Kanonická struktura
 
-Od v3.24 je jediným zdrojem pravdy **root tohoto repozitáře**. Vercel má `Root Directory` nastavený na repository root.
+- `server.py` — FastAPI entrypoint.
+- `backend/` — backendové doménové/infrastrukturní moduly: config, contracts, DB transport, content, progress, rankings, results a analytics.
+- `public/` — web/PWA/admin runtime.
+- `public/app/` — explicitní frontendové ownery pro core, game, account, content, engagement, rankings a analytics.
+- `data/` — kanonické runtime/build-time content vstupy a historická evidence podle content manifestu.
+- `proplet_content/` — pure content model/IO/validator.
+- `tools/` — current test runner, build/generation CLI, validátory a historické release testy.
+- `supabase/migrations/manifest.json` — kanonický manifest SQL lineage.
+- `vercel.json` — deployment/security konfigurace.
 
-Hlavní runtime části:
+Detailní mapa: `docs/ARCHITECTURE.md`.
 
-- `server.py` — FastAPI backend
-- `public/` — web/PWA/admin
-- `data/` — puzzle banky, lexikon a archivované Daily generace
-- `tools/` — generátory, audity a regresní testy
-- `requirements.txt` — pinované Python dependencies
-- `vercel.json` — Vercel konfigurace a security headers
+## Vývoj a testy
 
-Adresář `proplet-v3.1-cloud/` byl historický deployment relikt a od v3.24 se nepoužívá.
+Autoritativní current gate:
 
-## v3.24
+```bash
+python tools/test_current.py
+```
 
-Denní výzva má od pondělí 17. 8. 2026 pevný týdenní rytmus:
+Dev/test dependencies:
 
-- Po–Út: Snadná
-- St–Pá: Střední
-- So–Ne: Těžká
+```bash
+python -m pip install -r requirements-dev.txt
+```
 
-Daily Generation 3 obsahuje 365 nových úloh a Generation 2 zůstává archivovaná kvůli historii a kompatibilitě starších/offline klientů.
+Historické `tools/test_v3*.py/js` jsou ve `tests/current/manifest.json` vedené jako `legacy_evidence`; default gate je nespouští, pokud konkrétní test není explicitně povýšen do current suite.
 
-Podrobnosti: `RELEASE_V3_24_CZ.md`, `DAILY_GENERATION3_AUDIT_CZ.md`.
+Content build/validace:
 
-## Nasazování
+```bash
+python tools/build_runtime_content.py --check
+python tools/validate_migration_manifest.py
+```
 
-Běžný release:
+Generation workflow se nespouští jako běžný test a vydané banky se neregenerují bez explicitního release rozhodnutí.
 
-1. změny připravit v samostatné branchi,
-2. automatické testy / QA,
-3. Pull Request do `main`,
-4. po schválení **Squash and merge**,
-5. Vercel automaticky nasadí `main` z rootu,
-6. ověřit `/api/health` a základní smoke test.
+## Release flow
 
-Pokud release vyžaduje změnu databáze, musí být v release dokumentaci výslovně uvedena příslušná `SUPABASE_MIGRATION_*.sql` a pořadí nasazení. **v3.24 žádnou novou Supabase migraci nevyžaduje.**
+1. nová branch z aktuálního produkčního `main`;
+2. characterization před runtime změnou;
+3. current gate + cílené kontrakty;
+4. review PR a Vercel preview;
+5. explicitní user approval;
+6. merge do `main`;
+7. ověřit production deployment, `/api/health`, build log a runtime errors.
+
+Produkční DB migrace, změny produkčních dat a content generation vyžadují zvláštní explicitní schválení.
+
+## Migrace
+
+`SUPABASE_SETUP.sql` je historický bootstrap, nikoli současný repair baseline. Kanonické pořadí a checksums jsou v `supabase/migrations/manifest.json`; viz `docs/SUPABASE_MIGRATION_MANIFEST.md`.
+
+## Legacy a kompatibilita
+
+Staré číslo verze v názvu **neznamená dead code**. Některé versioned assety jsou stále živé compatibility vrstvy načítané z `runtime-meta.js`.
+
+Ověřený cleanup a seznam záměrně ponechaných kandidátů: `docs/LEGACY_ASSETS.md`.

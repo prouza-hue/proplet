@@ -54,5 +54,8 @@ legacy_server = PUBLIC / "server.py"
 pycache = ROOT / "tools" / "__pycache__"
 if not legacy_server.exists():
     assert not list(pycache.glob("*.pyc")) if pycache.exists() else True
+    gitignore = read(".gitignore")
+    assert "__pycache__/" in gitignore
+    assert "*.py[cod]" in gitignore
 
 print("PASS Sprint 16 legacy reachability characterization")
