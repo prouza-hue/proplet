@@ -57,6 +57,7 @@ def install_account_auth(
     player_stats,
     public_family_code,
     league_name_for,
+    db_select_bounded=None,
 ):
     """Install the additive v3.31.8 identity bridge.
 
@@ -223,7 +224,17 @@ def install_account_auth(
         )
 
     def verified_email_owner(email: str, exclude_player: Optional[str] = None) -> Optional[dict]:
-        for candidate in db_select("players"):
+        # Account emails are normalized through norm_email before storage. Keep the
+        # Python equality check as a semantic guard while pushing the lookup into DB.
+        if callable(db_select_bounded):
+            candidates = db_select_bounded(
+                "players",
+                filters={"email": f"eq.{email}"},
+                max_rows=50,
+            )
+        else:
+            candidates = db_select("players", email=email)
+        for candidate in candidates:
             if exclude_player and candidate.get("id") == exclude_player:
                 continue
             if candidate.get("email_verified_at") and str(candidate.get("email") or "").casefold() == email:

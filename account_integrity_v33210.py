@@ -19,6 +19,7 @@ def install_account_integrity(
     *,
     tz,
     db_select,
+    db_select_bounded=None,
     auth_player,
     new_session,
     verify_password,
@@ -55,6 +56,22 @@ def install_account_integrity(
         if callable(norm_family):
             return norm_family(str(value or ""))
         return str(value or "").strip().upper()[:24]
+
+    def bounded_rows(table, *, filters=None, columns="*", max_rows=5000):
+        if callable(db_select_bounded):
+            return db_select_bounded(
+                table,
+                filters=filters or {},
+                columns=columns,
+                max_rows=max_rows,
+            )
+        # Compatibility for direct historical installers. Production always wires
+        # db_select_bounded through AppServices.
+        exact = {}
+        for key, condition in (filters or {}).items():
+            if isinstance(condition, str) and condition.startswith("eq."):
+                exact[key] = condition[3:]
+        return db_select(table, **exact)
 
     def admin_allowed(player):
         try:
@@ -114,16 +131,23 @@ def install_account_integrity(
         if "@" in identifier:
             email = identifier.casefold()
             candidates = [
-                p for p in db_select("players")
+                p for p in bounded_rows("players", filters={"email": f"eq.{email}"}, max_rows=50)
                 if p.get("email_verified_at") and str(p.get("email") or "").casefold() == email
             ]
         elif requested_family:
             candidates = [
-                p for p in db_select("players", family_code=requested_family)
+                p for p in bounded_rows(
+                    "players",
+                    filters={"family_code": f"eq.{requested_family}", "name": f"ilike.{identifier}"},
+                    max_rows=100,
+                )
                 if norm_name(p.get("name")) == norm_name(identifier)
             ]
         else:
-            candidates = [p for p in db_select("players") if norm_name(p.get("name")) == norm_name(identifier)]
+            candidates = [
+                p for p in bounded_rows("players", filters={"name": f"ilike.{identifier}"}, max_rows=100)
+                if norm_name(p.get("name")) == norm_name(identifier)
+            ]
 
         if not candidates:
             raise HTTPException(401, "Jméno nebo heslo nesedí")
@@ -167,7 +191,7 @@ def install_account_integrity(
         if not admin_allowed(viewer):
             raise HTTPException(403, "Administrátorský přístup je potřeba")
 
-        players = list(db_select("players"))
+        players = list(bounded_rows("players", max_rows=5000))
         by_name = {}
         for player in players:
             by_name.setdefault(norm_name(player.get("name")), []).append(player)
@@ -194,13 +218,13 @@ def install_account_integrity(
         result_counts = {}
         session_counts = {}
         push_counts = {}
-        for row in db_select("results"):
+        for row in bounded_rows("results", columns="player_id", max_rows=20000):
             pid = str(row.get("player_id") or "")
             result_counts[pid] = result_counts.get(pid, 0) + 1
-        for row in db_select("player_sessions"):
+        for row in bounded_rows("player_sessions", columns="player_id", max_rows=20000):
             pid = str(row.get("player_id") or "")
             session_counts[pid] = session_counts.get(pid, 0) + 1
-        for row in db_select("push_subscriptions"):
+        for row in bounded_rows("push_subscriptions", columns="player_id", max_rows=20000):
             pid = str(row.get("player_id") or "")
             push_counts[pid] = push_counts.get(pid, 0) + 1
 

@@ -26,6 +26,7 @@ def install_push_diagnostics(
     *,
     tz,
     db_select,
+    db_select_bounded=None,
     db_insert,
     db_update,
     db_delete,
@@ -54,6 +55,12 @@ def install_push_diagnostics(
 
     def now():
         return datetime.now(tz)
+
+    def diagnostic_rows(table, *, columns="*", max_rows=5000):
+        if callable(db_select_bounded):
+            return db_select_bounded(table, columns=columns, filters={}, max_rows=max_rows)
+        # Historical direct installers keep working; production wires the bounded seam.
+        return db_select(table)
 
     def today_iso():
         if callable(current_prague_date):
@@ -364,9 +371,20 @@ def install_push_diagnostics(
         player = auth_player(authorization)
         if not is_admin(player):
             raise HTTPException(403, "Administrátorský přístup je potřeba")
-        subscriptions = db_select("push_subscriptions")
-        logs = db_select("push_delivery_log")
-        players = {str(row.get("id")): row for row in db_select("players")}
+        subscriptions = diagnostic_rows(
+            "push_subscriptions",
+            columns="player_id,anonymous_id,endpoint,user_agent,daily_enabled,content_enabled,created_at,updated_at",
+            max_rows=5000,
+        )
+        logs = diagnostic_rows(
+            "push_delivery_log",
+            columns="category,event_key,status,opened_at,created_at,sent_at",
+            max_rows=20000,
+        )
+        players = {
+            str(row.get("id")): row
+            for row in diagnostic_rows("players", columns="id,name", max_rows=5000)
+        }
 
         daily_groups = {}
         for row in logs:

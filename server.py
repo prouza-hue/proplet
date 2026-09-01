@@ -1703,13 +1703,26 @@ def login(payload: PlayerLogin, request: Request):
     if "@" in identifier:
         # Recovery email becomes a login identifier only after ownership was verified.
         email = identifier.casefold()
-        candidates = [p for p in db_select("players") if p.get("email_verified_at") and str(p.get("email") or "").casefold() == email]
+        candidates = [
+            p for p in db_select_bounded("players", filters={"email": f"eq.{email}"}, max_rows=50)
+            if p.get("email_verified_at") and str(p.get("email") or "").casefold() == email
+        ]
     elif family:
-        candidates = [p for p in db_select("players", family_code=family) if p.get("name", "").casefold() == identifier.casefold()]
+        candidates = [
+            p for p in db_select_bounded(
+                "players",
+                filters={"family_code": f"eq.{family}", "name": f"ilike.{identifier}"},
+                max_rows=100,
+            )
+            if p.get("name", "").casefold() == identifier.casefold()
+        ]
     else:
         # Teamless login is intentionally simple for the player. We only use
         # team when an old duplicate name needs disambiguation.
-        candidates = [p for p in db_select("players") if p.get("name", "").casefold() == identifier.casefold()]
+        candidates = [
+            p for p in db_select_bounded("players", filters={"name": f"ilike.{identifier}"}, max_rows=100)
+            if p.get("name", "").casefold() == identifier.casefold()
+        ]
 
     if not candidates:
         raise HTTPException(401, "Jméno nebo heslo nesedí")
@@ -5075,6 +5088,7 @@ install_account_auth(
         supabase_key=SUPABASE_SECRET_KEY,
         tz=TZ,
         db_select=db_select,
+        db_select_bounded=db_select_bounded,
         db_insert=db_insert,
         db_update=db_update,
         db_delete=db_delete,

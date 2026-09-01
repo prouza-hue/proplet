@@ -38,6 +38,7 @@ class AppServices:
     player_stats: Callable
     public_family_code: Callable
     league_name_for: Callable
+    db_select_bounded: Optional[Callable] = None
     db_rpc: Optional[Callable] = None
     save_quality_snapshot_if_monday: Optional[Callable] = None
     current_prague_date: Optional[Callable] = None
@@ -80,6 +81,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         supabase_key=services.supabase_key,
         tz=services.tz,
         db_select=services.db_select,
+        db_select_bounded=services.db_select_bounded,
         db_insert=services.db_insert,
         db_update=services.db_update,
         db_delete=services.db_delete,
@@ -96,6 +98,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         app,
         tz=services.tz,
         db_select=services.db_select,
+        db_select_bounded=services.db_select_bounded,
         db_insert=services.db_insert,
         db_update=services.db_update,
         db_delete=services.db_delete,
@@ -112,6 +115,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         app,
         tz=services.tz,
         db_select=services.db_select,
+        db_select_bounded=services.db_select_bounded,
         auth_player=services.auth_player,
         new_session=services.new_session,
         verify_password=services.verify_password,
