@@ -1,5 +1,27 @@
 # Technical debt refactor status
 
+- Sprint: 15 — Analytics adapter a event registry
+- Branch: `refactor/s15-analytics-adapter`
+- Base SHA: `af088886d33d83ce2a2748a1fded6a6d7fffd7cc`
+- Stav: **characterization**
+- Zamýšlená změna chování: žádná.
+- Scope: product analytics pouze; kritická gameplay/completion telemetry, challenge/account-bonus telemetry a historické agregace jsou mimo tento sprint.
+- Baseline kontrakt:
+  - 132 povolených `/api/product-event` event names po rozbalení dynamických families;
+  - request body pouze `{event_type}`; žádné custom properties ani nová PII;
+  - jeden request na event, best-effort failure;
+  - existující navigation/session/impression dedup guards zachovat.
+- Characterization:
+  - `tests/current/s15-product-events-baseline.json`;
+  - `tests/current/test_s15_analytics_characterization.py`;
+  - test je přidaný do `tests/current/manifest.json`.
+- Batching/agregace: **NEZAPÍNAT** — samostatná změna až po měření.
+- STOP: neměnit product metrics, retention definice ani historické agregace; bez preview schválení nemergovat ani nezačínat Sprint 16.
+
+## Předchozí stav
+
+# Technical debt refactor status
+
 - Sprint: 14 — Canonical content build a generation manifest
 - Branch: `refactor/s14-content-pipeline`
 - Base SHA: `b8de402ad676b823f72a905289945eff6f6b3e6c`
@@ -419,4 +441,5 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
