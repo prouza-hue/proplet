@@ -20,7 +20,8 @@ assert "idx_push_subscriptions_anonymous_id" in migration
 assert 'x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID")' in server
 assert 'actor = telemetry_actor(authorization, x_proplet_anon_id)' in server
 assert '"pushSubscriptions": 0' in server
-for event in ("push_daily_opened", "push_weekly_opened", "push_content_opened"):\n    assert f'"{event}"' in product_registry
+for event in ("push_daily_opened", "push_weekly_opened", "push_content_opened"):
+    assert f'"{event}"' in product_registry
 assert '"anonymous_id": sub.get("anonymous_id")' in server
 
 for event in (
