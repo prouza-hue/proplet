@@ -1,0 +1,46 @@
+name: Sprint 13B CSS characterization
+on:
+  push:
+    branches: [refactor/s13b-css-app-screens]
+    paths: ['public/**','tests/current/**','tools/test_s13b_visual_matrix.py','tools/compare_s13b_visuals.py','TECH_DEBT_REFACTOR_STATUS.md','.github/workflows/s13b-css-characterization.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  current-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Enforce Sprint 13B scope
+        shell: bash
+        run: |
+          bad=0
+          while IFS= read -r f; do
+            case "$f" in
+              public/*.css|public/theme-init.js|public/index.html|public/sw.js|tests/current/*|tools/test_s13b_visual_matrix.py|tools/compare_s13b_visuals.py|TECH_DEBT_REFACTOR_STATUS.md|.github/workflows/s13b-css-characterization.yml) ;;
+              *) echo "OUT OF SCOPE: $f"; bad=1 ;;
+            esac
+          done < <(git diff --name-only 02606c4b047ce450f02a0fb8e7c1bf4d24c4e908...HEAD)
+          exit "$bad"
+      - run: python tools/test_current.py
+  visual-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0 Pillow==11.3.0
+      - run: git worktree add --detach /tmp/proplet-s13b-base 02606c4b047ce450f02a0fb8e7c1bf4d24c4e908
+      - name: Capture baseline and current
+        run: |
+          python tools/test_s13b_visual_matrix.py --public-root /tmp/proplet-s13b-base/public --output /tmp/s13b-base
+          python tools/test_s13b_visual_matrix.py --public-root public --output /tmp/s13b-current
+      - run: python tools/compare_s13b_visuals.py --baseline /tmp/s13b-base --current /tmp/s13b-current --max-changed-ratio 0.0007 --max-channel-delta 8 --max-geometry-delta 0.25
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: s13b-visual-matrix, path: /tmp/s13b-current/, retention-days: 14}

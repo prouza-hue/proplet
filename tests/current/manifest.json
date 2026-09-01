@@ -186,6 +186,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_s13b_css_characterization.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_migration_manifest.py",
         "runner": "python"
       },

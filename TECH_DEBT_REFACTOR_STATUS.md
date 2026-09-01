@@ -1,5 +1,77 @@
 # Technical debt refactor status
 
+- Sprint: 13B — CSS app screens
+- Branch: `refactor/s13b-css-app-screens`
+- Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908`
+- Pre-change characterization HEAD: `08757dd233889a8c41a29c98fa85b9f7b8d5c354`
+- Runtime consolidation HEAD: `9ace662a4911b6aeba6fac4fa601abcc9aee583f`
+- Final reviewed HEAD before preview: `dcb34e17436bd11e3bf9bfed274bc9393fefc2f6`
+- Stav: **PREVIEW READY — STOP na user review**
+- Zamýšlená změna chování: žádná.
+
+## Sprint 13B výsledek
+
+- `app-play.css` = původní `home-layout.css` + `today-brand.css`.
+- `app-onboarding.css` = původní `onboarding-fit.css` + `onboarding-model-v3328.css`.
+- `app-profile-settings.css` = původní `profile-layout-v3330.css` + `settings-ia-v40122.css` + `settings-polish-v40122.css` + `account-auth.css`.
+- 8 starých stylesheetů → 3 kanonické ownery; netto **−5 stylesheetů**.
+- Cache boundary: `theme-init.js?v=40140-s13b`.
+- JS runtime, DOM, gameplay, copy, XP, API, DB, Supabase a content jsou beze změny.
+
+## Explicitně nedotčené risk vrstvy
+
+Byte-identické proti base SHA:
+- `desktop-layout-v3330.css`
+- `onboarding-return-v3332.css`
+- `push-retention-v3329.css`
+- `ranking-polish.css`
+- `gesture-guard-v3325.css`
+- `quality-v334.css`
+- `quality-hotfix-v334.css`
+- `game.css`
+- `results.css`
+- `challenge-cta-v3333.css`
+- `competitive-sharing-v3331.css`
+- `copy-density-v3327.css`
+
+## Characterization a review
+
+- Pre-change current gate: GREEN.
+- Pre-change 19-case app-screen matrix: GREEN.
+- Fixovaný visual gate určený před runtime změnou: 0,07 % changed pixels / channel delta 8 / geometry 0,25 px.
+- Post-change Current Runtime Gate: GREEN.
+- Post-change 19-case visual matrix: GREEN.
+- Finální CI run: `33529596365` SUCCESS.
+- `app-play.css`: byte-exaktní mechanické složení původních bloků.
+- `app-onboarding.css`: byte-exaktní mechanické složení původních bloků.
+- `app-profile-settings.css`: byte-exaktní mechanické složení původních bloků; `!important` 93 = přesný součet zdrojů.
+- Odstraněné CSS assety nemají stale reference v `theme-init.js`, `index.html` ani `sw.js`.
+- P0/P1 diff review: bez nálezu.
+
+## Preview
+
+- Deployment: `dpl_81miuvjBgYWFdSG4g3M1vydmgL4P` — READY.
+- Preview URL: `https://proplet-i4w0a7gc6-pavel-prouzas-projects.vercel.app/`.
+- `/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- `/app-play.css?v=40140-s13b`: 200.
+- `/app-onboarding.css?v=40140-s13b`: 200.
+- `/app-profile-settings.css?v=40140-s13b`: 200.
+- `/theme-init.js?v=40140-s13b`: 200; načítá všechny tři nové ownery.
+- Build error scan: čistý.
+- Preview runtime `error/fatal` scan: žádné záznamy.
+- Finální docs-only CI run `33530975640`: current gate GREEN + visual matrix GREEN.
+
+## STOP
+
+Čeká se na explicitní vizuální schválení uživatele. Bez něj:
+- **nemergovat do `main`**;
+- **nezačínat Sprint 14**;
+- nedělat produkční deployment.
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 13A — CSS game/results/Fold/responsive
 - Branch: `refactor/s13a-css-game`
 - Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
@@ -344,6 +416,9 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
+
+
 
 
 
