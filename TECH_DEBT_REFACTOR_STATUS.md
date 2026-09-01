@@ -1,5 +1,37 @@
 # Technical debt refactor status
 
+- Sprint: 13A — CSS game/results/Fold/responsive
+- Branch: `refactor/s13a-css-game`
+- Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8` (aktuální produkční `main`; obsahuje runtime merge `f454768b843fa2542bb9fbb0ac8975f0381c87d0`)
+- Current HEAD: characterization checkpoint (tento commit; přesné SHA doplní následující baseline checkpoint)
+- Stav: **characterization**
+- Zamýšlená změna chování: žádná; behavior-preserving CSS konsolidace bez redesignu
+- Změněné runtime soubory: žádné
+- Hotové kroky:
+  - scope 13A ověřen proti handoveru, původnímu plánu a audit Finding 12; bez rozporu;
+  - branch založena z aktuálního `main`;
+  - zmapován produkční CSS load order v `index.html` a `theme-init.js`;
+  - zmapovány game/results/Fold vrstvy a jejich `!important` baseline;
+  - přidána statická characterization a reprezentativní screenshot matrix;
+  - přidán branch-only Playwright workflow, který běží nad přesným commitem z lokálního HTTP serveru.
+- Zbývající kroky:
+  - spustit a uložit baseline screenshot/hash/metrics matrix;
+  - teprve potom konsolidovat CSS ownership se zachováním cascade/specificity;
+  - current gate + visual parity + preview + nezávislé review;
+  - STOP před merge a před 13B.
+- Testy PASS: čeká se na GitHub Actions characterization run
+- Testy FAIL / nespouštěné: runtime CSS změny zatím žádné; preview zatím nevytvořeno
+- Nově nalezená rizika:
+  - `desktop-layout-v3330.css` míchá 13A game desktop pravidla s 13B app-screen pravidly; ve 13A se smí vyjmout pouze game část;
+  - `gesture-guard-v3325.css` míchá game touch ownership s onboarding tutorial pravidly; bez důkazu se ve 13A nerozděluje;
+  - výsledková pravidla jsou rozložená mezi base CSS, win-actions, copy-density a result-layout; cascade order je součást chování.
+- Bezpečný bod pokračování: characterization commit; žádný runtime CSS/loader asset zatím změněn
+- Další povolený sprint: žádný; dokončit 13A a STOP na preview review
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 12B.3 — rankings orchestration
 - Branch: `refactor/s12b3-rankings`
 - Base SHA: `3b29f494a2bc02bf6610c84ea0f03e16aba84cfb` (`main`, včetně Gen4 calm-mode contract hotfixu)

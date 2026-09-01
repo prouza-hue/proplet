@@ -1,0 +1,63 @@
+name: Sprint 13A CSS characterization
+
+on:
+  push:
+    branches:
+      - refactor/s13a-css-game
+    paths:
+      - 'public/**'
+      - 'tests/current/**'
+      - 'tools/test_s13a_visual_matrix.py'
+      - 'TECH_DEBT_REFACTOR_STATUS.md'
+      - '.github/workflows/s13a-css-characterization.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  current-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Enforce Sprint 13A scope
+        shell: bash
+        run: |
+          bad=0
+          while IFS= read -r f; do
+            case "$f" in
+              public/*.css|public/theme-init.js|tests/current/*|tools/test_s13a_visual_matrix.py|TECH_DEBT_REFACTOR_STATUS.md|.github/workflows/s13a-css-characterization.yml) ;;
+              *) echo "OUT OF SCOPE: $f"; bad=1 ;;
+            esac
+          done < <(git diff --name-only b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8...HEAD)
+          exit "$bad"
+      - name: Current runtime gate
+        run: python tools/test_current.py
+
+  visual-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Capture visual matrix
+        shell: bash
+        run: |
+          args=(--output /tmp/proplet-s13a-visual)
+          if [[ -f tests/current/s13a-visual-baseline.json ]]; then args+=(--baseline tests/current/s13a-visual-baseline.json); fi
+          python tools/test_s13a_visual_matrix.py "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s13a-visual-matrix
+          path: /tmp/proplet-s13a-visual/
+          if-no-files-found: error
+          retention-days: 14

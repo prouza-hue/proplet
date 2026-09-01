@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "description": "Sprint 13A representative baseline. Cases intentionally span viewport, theme, game/result state, safe-area and reduced motion without becoming a combinatorial explosion.",
+  "cases": [
+    {
+      "id": "phone-light-pre",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-pre"
+    },
+    {
+      "id": "phone-dark-progress",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-progress"
+    },
+    {
+      "id": "phone-auto-hint-safe-reduced",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "auto",
+      "system": "dark",
+      "motion": "reduce",
+      "safe_area": {
+        "top": 47,
+        "right": 0,
+        "bottom": 34,
+        "left": 0
+      },
+      "state": "game-hint"
+    },
+    {
+      "id": "fold-portrait-light-pre",
+      "viewport": [
+        590,
+        960
+      ],
+      "screen": [
+        384,
+        832
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-pre"
+    },
+    {
+      "id": "fold-portrait-dark-progress-safe",
+      "viewport": [
+        590,
+        960
+      ],
+      "screen": [
+        384,
+        832
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe_area": {
+        "top": 24,
+        "right": 0,
+        "bottom": 24,
+        "left": 0
+      },
+      "state": "game-progress"
+    },
+    {
+      "id": "fold-landscape-light-progress",
+      "viewport": [
+        728,
+        656
+      ],
+      "screen": [
+        728,
+        656
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-progress"
+    },
+    {
+      "id": "fold-landscape-dark-hint",
+      "viewport": [
+        728,
+        656
+      ],
+      "screen": [
+        728,
+        656
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-hint"
+    },
+    {
+      "id": "desktop-light-pre",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-pre"
+    },
+    {
+      "id": "desktop-dark-progress",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-progress"
+    },
+    {
+      "id": "desktop-auto-hint-reduced",
+      "viewport": [
+        1600,
+        900
+      ],
+      "screen": [
+        1600,
+        900
+      ],
+      "theme": "auto",
+      "system": "light",
+      "motion": "reduce",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "game-hint"
+    },
+    {
+      "id": "phone-light-result-safe",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 47,
+        "right": 0,
+        "bottom": 34,
+        "left": 0
+      },
+      "state": "result"
+    },
+    {
+      "id": "fold-dark-result",
+      "viewport": [
+        728,
+        656
+      ],
+      "screen": [
+        728,
+        656
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "result"
+    },
+    {
+      "id": "desktop-light-result",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "result"
+    },
+    {
+      "id": "desktop-dark-result-comparison",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe_area": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "state": "result-comparison"
+    }
+  ]
+}
