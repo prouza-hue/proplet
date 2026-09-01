@@ -3,29 +3,40 @@
 - Sprint: 13A — CSS game/results/Fold/responsive
 - Branch: `refactor/s13a-css-game`
 - Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
-- Pre-change characterization HEAD: `db4522639a558b7a359dd002a20d5179ea3dc347`
-- Current HEAD: runtime CSS consolidation candidate (exact SHA follows after commit)
-- Stav: **runtime candidate / tests pending**
-- Zamýšlená změna chování: žádná
-- Runtime scope:
-  - nový `public/game.css`: Fold/tablet + desktop game ownership;
-  - nový `public/results.css`: result actions + result density + responsive result ownership;
-  - `desktop-layout-v3330.css`: pouze app-screen desktop část (13B nedotčena);
-  - `copy-density-v3327.css`: pouze non-result část;
-  - `theme-init.js` + cache-busting query v `index.html`;
-  - odstraněny `game-layout-v3323.css`, `win-actions-v3324.css`, `result-layout-v3330.css`.
-- Cascade rozhodnutí:
-  - `desktop-layout-v3330.css` zůstává na původní pozici;
-  - `game.css` následuje bezprostředně po něm, takže desktop-game blok zůstává na původní hranici;
-  - `results.css` je na původní pozici `result-layout-v3330.css`;
-  - uvnitř `results.css` je zachováno pořadí win-actions → comparison density → result responsive;
-  - přesun časných game/result bloků přes mezilehlé stylesheety je povolen pouze proto, že characterization + selector inventory neukázaly kolizi vítězících deklarací; pixel/geometry gate je blocker.
-- Neměněno: `styles.css`, gesture/onboarding mix, DOM, JS runtime, gameplay, texty, XP, API, DB, Supabase, content.
-- Characterization před změnou: current gate GREEN; 14-case screenshot matrix GREEN; empirický renderer-noise gate <=0,05 % pixelů / delta 3 / geometrie 0,25 px.
-- První post-change run: scope enforcement PASS; current gate FAIL pouze na stale asset/cache assertions po legitimním přesunu; visual FAIL lokalizován výhradně na dynamický timer 00:01→00:02 (82 px, geometrie 0,0 px).
-- Preview: zatím nevytvořeno
-- Bezpečný rollback: `db4522639a558b7a359dd002a20d5179ea3dc347`
-- Další povolený krok: aktualizovat PWA theme-init cache URL + stale characterization odkazy, zmrazit timer a porovnat base/current ve stejném CI běhu -> nezávislé review -> preview -> user review STOP; bez merge a bez 13B
+- Pre-change characterization: `db4522639a558b7a359dd002a20d5179ea3dc347`
+- Runtime CSS HEAD: `c47d7291bbc000c5d6239b884c0dcbcb6338e427`
+- Stav: **implementation + characterization GREEN; preview pending**
+- Zamýšlená změna chování: žádná.
+
+## Sprint 13A změna
+
+- `public/game.css` je kanonický owner pro Fold/tablet + desktop game responsive pravidla.
+- `public/results.css` je kanonický owner pro result actions + comparison density + responsive result pravidla.
+- `public/desktop-layout-v3330.css` obsahuje už jen app-screen desktop pravidla; 13B scope nebyl rozšířen.
+- `public/copy-density-v3327.css` už neobsahuje result comparison pravidla.
+- Odstraněny: `game-layout-v3323.css`, `win-actions-v3324.css`, `result-layout-v3330.css`.
+- `theme-init.js`, `index.html` a PWA shell používají nový cache boundary `40140-s13a`.
+- `styles.css`, DOM, gameplay JS, copy, XP, API, DB, Supabase a content jsou beze změny.
+- Net počet patch stylesheetů: -1. Herních 92× `!important` bylo úmyslně zachováno; bez důkazu nebyl proveden specificity cleanup.
+
+## Characterization a review
+
+- Current Runtime Gate: GREEN, run `33504936588`.
+- 14-case browser matrix: GREEN proti přesnému pre-change SHA ve stejném CI runneru.
+- Visual diff: max changed-pixel ratio `0.00030544` (0,0305 %), max channel delta `2`, max geometry delta `0.0 px`; limity zůstaly `0.0005 / 3 / 0.25 px`.
+- Dynamický timer byl ve fixture zmrazen; předchozí 00:01→00:02 false positive nebyl maskován zvýšením tolerance.
+- Game consolidation ověřena byte-exaktním přeskupením původních bloků.
+- Results consolidation ověřena byte-exaktním přeskupením původních bloků.
+- Staré CSS reference nejsou v aktuálním `theme-init.js`, `index.html` ani `sw.js`.
+- P0/P1 review: bez nálezu.
+- Rollback: návrat runtime změn na `db4522639a558b7a359dd002a20d5179ea3dc347`.
+
+## Zbývá
+
+1. Vercel preview READY.
+2. Health `ok=true`, DB true, build/runtime error scan.
+3. Ruční preview review uživatelem.
+4. STOP — bez explicitního schválení žádný merge a žádný Sprint 13B.
 
 ## Předchozí uzavřený stav
 
@@ -327,3 +338,4 @@
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
