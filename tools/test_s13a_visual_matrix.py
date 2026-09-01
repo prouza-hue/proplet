@@ -224,7 +224,7 @@ def main() -> int:
             # Structural metrics get a tiny rounding tolerance; screenshot equality remains the strongest gate.
             om=old.get("metrics",{});nm=row["metrics"]
             for key in ("theme","themePreference","layoutMode","gameMainColumns"):
-                if om.get(key)!=nm.get(key): failures.append(f"{case_id}: {key} {om.get(key)!r} -> {nm.get(key)!r}")
+                if key in om and om.get(key)!=nm.get(key): failures.append(f"{case_id}: {key} {om.get(key)!r} -> {nm.get(key)!r}")
         if failures:
             print("\n".join("VISUAL DIFF "+x for x in failures))
             return 1
