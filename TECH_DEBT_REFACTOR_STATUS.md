@@ -1,12 +1,38 @@
 # Technical debt refactor status
 
+- Sprint: 12B.2 — progression + Daily orchestration
+- Branch: `refactor/s12b-daily`
+- Base SHA: `b3579b2957dc38cf83798fc05c86546a8949ddf7` (uzavřený produkční Sprint 12B.1)
+- Stav: **ZAHÁJENO / READ-ONLY MAPOVÁNÍ / BEZ RUNTIME ZMĚN**
+- Zamýšlená změna chování: žádná; pouze přesun vlastnictví při zachování výběru, fresh/replay a release CTA.
+- Rozsah:
+  - `public/app/content/progression.js` + Daily orchestrace;
+  - `renderDaily` musí mít po řezu právě jednoho vlastníka;
+  - opakovaná navigace nesmí přidat listener, observer ani timeout;
+  - rankings a `public/app/rankings/rankings.js` zůstávají za samostatnou STOP bránou.
+- Hotové kroky:
+  - 12B.1 fast-forward merged do `main` a ověřen na produkci;
+  - branch založena z přesného produkčního SHA;
+  - načten celý plán Sprintu 12B a audit Finding 3;
+  - zahájena nezávislá mapa runtime vlastníků a characterization/browser matrix.
+- Testy PASS: zatím pouze převzatý zelený stav 12B.1 — Current Runtime Gate 44/44.
+- Testy FAIL / nespouštěné: characterization 12B.2 dosud nevytvořen; runtime nezměněn.
+- Nově nalezená rizika: žádná; známý historický Gen4 failure `ResultCreate must carry calm_mode` je mimo scope.
+- Bezpečný bod pokračování: dokončit mapu, zapsat characterization test, ověřit zelený test-only checkpoint; teprve potom měnit runtime.
+- Produkce/main/Supabase: **beze změny po založení branche**. Žádná migrace.
+- Další povolený sprint: žádný před samostatným review a schválením tohoto řezu.
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 12B.1 — onboarding a engagement nudges orchestration
 - Branch: `refactor/s12b-onboarding`
 - Base SHA: `2fe6010889c1a6eb185c45d37577a0a785986782` (uzavřený produkční Sprint 12A.2)
 - Characterization: `5a2599afb83dad3b62b298e5e89cf47e5899cb53`
 - Runtime: `d6601493f2026f8848e9c023ae89256c76c06fa7`
 - QA hardening: `90d0b46b531a4cc6f92ac05f81cf64133714c010`
-- Stav: **IMPLEMENTACE GREEN / PREVIEW READY / STOP PRO USER QA**
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Rozsah:
   - pouze `public/app/engagement/onboarding.js` + `public/app/engagement/nudges.js`;
   - starter/helper/install/account/push CTA a jejich lifecycle;
@@ -28,10 +54,11 @@
   - stable alias: `https://proplet-git-refactor-s12b-onboarding-pavel-prouzas-projects.vercel.app`;
   - `/`, `/api/health` a oba engagement moduly vracejí 200;
   - health hlásí Proplet 4.01.40, `ok=true`, DB true; HTML i SW odkazují na oba nové ownery.
-- PR: draft #95 — `https://github.com/prouza-hue/proplet/pull/95`.
-- Produkce/main/Supabase: **beze změny oproti uzavřenému 12A.2**. Žádná migrace.
+- PR #95: **MERGED** — `https://github.com/prouza-hue/proplet/pull/95`; fast-forward `main` na `b3579b2957dc38cf83798fc05c86546a8949ddf7`.
+- Produkce: deployment `dpl_FMoeX9yV19TqTrMGBBAGjJRtkSBf` je **READY** na `hrajproplet.cz`; `/`, health a oba engagement moduly 200; DB true; error/fatal scan čistý.
+- Supabase: beze změny. Žádná migrace.
 - Rollback: zavřít PR/resetnout branch na `2fe6010889c1a6eb185c45d37577a0a785986782`; bez DB/content rollbacku.
-- Další krok: user preview onboarding/starter/post-win CTA; merge pouze po explicitním schválení. Teprve poté lze otevřít další samostatný řez Sprintu 12B.
+- Další povolený krok: pouze druhý samostatný řez Sprintu 12B — progression + Daily orchestrace.
 
 ## Předchozí uzavřený stav
 
