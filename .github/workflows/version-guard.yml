@@ -37,8 +37,20 @@ jobs:
             fi
           done
 
-          grep -Fq 'from proplet_version import APP_VERSION, PHONE_LANDSCAPE_BLOCKING, TABLET_LANDSCAPE_BREAKPOINT_PX' server.py || {
-            echo "::error file=server.py::Backend must use canonical runtime metadata"
+          grep -Fq 'from proplet_version import (' backend/config.py || {
+            echo "::error file=backend/config.py::Backend config must import canonical release metadata"
+            exit 1
+          }
+          grep -Fq 'APP_VERSION as RELEASE_VERSION' backend/config.py || {
+            echo "::error file=backend/config.py::Backend config must map canonical APP_VERSION"
+            exit 1
+          }
+          grep -Fq 'APP_VERSION = settings.app_version' backend/config.py || {
+            echo "::error file=backend/config.py::Backend config must expose APP_VERSION from settings"
+            exit 1
+          }
+          grep -Fq 'from backend.config import (' server.py && grep -Fq '    APP_VERSION,' server.py || {
+            echo "::error file=server.py::Backend entrypoint must use backend.config APP_VERSION"
             exit 1
           }
           grep -Fq "const APP_VERSION=window.PROPLET_RUNTIME_META?.version" public/app.js || {
