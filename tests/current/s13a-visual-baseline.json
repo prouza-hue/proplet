@@ -9,7 +9,7 @@
     "--disable-lcd-text",
     "device_scale_factor=1"
   ],
-  "policy": "Exact PNG SHA-256 equality. Any mismatch blocks Sprint 13A until explained/reviewed.",
+  "policy": "Characterized renderer-noise tolerance fixed before runtime CSS changes.",
   "results": {
     "phone-light-pre": {
       "sha256": "167ccf1a7f230acd0650872a86f396e2168837158a1d0123cacd06e356b91c85"
@@ -52,6 +52,15 @@
     },
     "desktop-dark-result-comparison": {
       "sha256": "95bd1ba7892c4e297f0eb5a0dbda1503b049e0305023592c579a44c337e9b809"
+    }
+  },
+  "tolerance": {
+    "max_changed_pixel_ratio": 0.00005,
+    "max_channel_delta": 3,
+    "max_geometry_delta_px": 0.25,
+    "measured_prechange_noise": {
+      "max_changed_pixel_ratio": 0.00002722,
+      "max_channel_delta": 2
     }
   }
 }

@@ -8,12 +8,14 @@ on:
       - 'public/**'
       - 'tests/current/**'
       - 'tools/test_s13a_visual_matrix.py'
+      - 'tools/compare_s13a_visuals.py'
       - 'TECH_DEBT_REFACTOR_STATUS.md'
       - '.github/workflows/s13a-css-characterization.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   current-gate:
@@ -31,7 +33,7 @@ jobs:
           bad=0
           while IFS= read -r f; do
             case "$f" in
-              public/*.css|public/theme-init.js|tests/current/*|tools/test_s13a_visual_matrix.py|TECH_DEBT_REFACTOR_STATUS.md|.github/workflows/s13a-css-characterization.yml) ;;
+              public/*.css|public/theme-init.js|tests/current/*|tools/test_s13a_visual_matrix.py|tools/compare_s13a_visuals.py|TECH_DEBT_REFACTOR_STATUS.md|.github/workflows/s13a-css-characterization.yml) ;;
               *) echo "OUT OF SCOPE: $f"; bad=1 ;;
             esac
           done < <(git diff --name-only b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8...HEAD)
@@ -47,13 +49,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0 Pillow==11.3.0
       - name: Capture visual matrix
+        run: python tools/test_s13a_visual_matrix.py --output /tmp/proplet-s13a-visual
+      - name: Compare against characterized baseline
+        if: hashFiles('tests/current/s13a-visual-baseline.json') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          args=(--output /tmp/proplet-s13a-visual)
-          if [[ -f tests/current/s13a-visual-baseline.json ]]; then args+=(--baseline tests/current/s13a-visual-baseline.json); fi
-          python tools/test_s13a_visual_matrix.py "${args[@]}"
+          run_id=$(python -c "import json;print(json.load(open('tests/current/s13a-visual-baseline.json'))['workflow_run_id'])")
+          mkdir -p /tmp/proplet-s13a-baseline
+          gh run download "$run_id" -n s13a-visual-matrix -D /tmp/proplet-s13a-baseline
+          python tools/compare_s13a_visuals.py \
+            --baseline /tmp/proplet-s13a-baseline \
+            --current /tmp/proplet-s13a-visual \
+            --max-changed-ratio 0.00005 \
+            --max-channel-delta 3 \
+            --max-geometry-delta 0.25
       - uses: actions/upload-artifact@v4
         if: always()
         with:
