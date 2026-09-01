@@ -1,54 +1,79 @@
 # Technical debt refactor status
 
-- Sprint: 16 — Ověřený legacy/dead cleanup a dokumentace
-- Branch: `refactor/s16-legacy-cleanup`
-- Base SHA: `5edd2bc847153ef50a5226c080e1e79243d96000`
-- Characterization HEAD: `0a27513883d8f62a3453f1c8f07cdfb0f2af8b90`
-- Stav: **PREVIEW READY — STOP na user review**
-- Zamýšlená změna chování: žádná.
-- Tento sprint je poslední sprint v `TECH_DEBT_REFACTOR_PLAN.md`.
+- Plán: **Sprint 00–16 — DOKONČEN**
+- Poslední refactor sprint: **16 — Ověřený legacy/dead cleanup a dokumentace**
+- Sprint 16 branch: `refactor/s16-legacy-cleanup`
+- Sprint 16 base: `5edd2bc847153ef50a5226c080e1e79243d96000`
+- Sprint 16 implementation: `5eeadbdecd38aa5603b4da939143c4df2a463e77`
+- Sprint 16 final branch HEAD: `227e969ef4c80cb435c979b5143619089b085c19`
+- Sprint 16 merge PR #106: `e4aefab136d6b0525bae41eab4add8befb73f57c`
+- Milestone release: **Proplet v4.02.0**
+- Release branch: `release/v4.02.0`
+- Release PR #107 merge: `fb5d04be97e62ca76693e95f2ed6282d4e7648bb`
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
+- Zamýšlená změna chování Sprintu 16 + release bumpu: žádná.
 
-## Cleanup
+## Sprint 16 výsledek
 
-Odstranit pouze:
-- `public/server.py`;
+Odstraněno pouze s reachability důkazem:
+- `public/server.py` — historická statická backendová kopie; root `server.py` zůstává jediný runtime entrypoint;
 - `tools/__pycache__/generate_puzzles.cpython-313.pyc`;
 - `tools/__pycache__/test_v317_admin.cpython-312.pyc`.
 
-Přidat:
-- minimální `.gitignore` pro Python bytecode;
-- aktuální README;
+Přidáno/aktualizováno:
+- `.gitignore` pro `__pycache__/` a `*.py[cod]`;
+- aktuální `README.md`;
 - `docs/ARCHITECTURE.md`;
 - `docs/LEGACY_ASSETS.md`;
-- current migration hygiene poznámku.
+- doplněná migration hygiene dokumentace.
 
-## Evidence
+Záměrně ponecháno:
+- `p0-hotfix-v3336.{js,css}`, `push-origin-v3325.js`, `quality-hotfix-v334.css` — stále live přes `runtime-meta.js`;
+- `game-layout-v3323.js`, `release-notes.{js,css}`, `valid-word-feedback-v3328.js` — unreferenced kandidáti bez dostatečného důkazu proti historickým direct QA URL.
 
-Live a proto chráněné: `p0-hotfix-v3336.{js,css}`, `push-origin-v3325.js`, `quality-hotfix-v334.css` — načítá `runtime-meta.js`.
+## Sprint 16 verifikace
 
-Unreferenced, ale kvůli možným přímým QA URL záměrně ponechané: `game-layout-v3323.js`, `release-notes.{js,css}`, `valid-word-feedback-v3328.js`.
-
-Pre-change current-runtime po opravě characterization: **GREEN**.
-
-## Verification
-
-- Implementation HEAD: `5eeadbdecd38aa5603b4da939143c4df2a463e77`.
-- Current tests: **53 PASS / 0 FAIL**.
-- Assets: **77 PASS / 0 FAIL** (69 local references).
+- Pre-change characterization: GREEN.
+- Post-change Current tests: **53 PASS / 0 FAIL**.
+- Assets: **77 PASS / 0 FAIL**.
 - Syntax: **241 PASS / 0 FAIL**.
-- Diff proti base: mimo testy/dokumentaci pouze odstraněný `public/server.py` + dva tracked `.pyc`; žádný současný JS/CSS/content/SQL/backend owner změněn.
-- Vercel preview: `dpl_9aeEcy8PKkGe75K44DAMfmrNVxLq` — **READY**.
-- Preview root + `/api/health`: HTTP 200; Proplet `4.01.40`, `ok=true`, DB true.
-- Build error scan: čistý.
-- Preview runtime `error/fatal`: bez záznamů.
-- Preview request log před explicitním testem: žádný request na `/server.py`.
+- Vercel preview: READY.
+- Preview `/api/health`: HTTP 200, `ok=true`, DB true.
+- Build/runtime error scan: čistý.
+- Před explicitním testem žádný preview request na `/server.py`.
 - Explicitní `GET /server.py`: **404 Not Found**.
+- User preview: **SCHVÁLENO**.
 
-## STOP
+## v4.02.0 milestone release
 
-Čeká se na explicitní user approval. Bez něj:
-- nemergovat PR #106 do `main`;
-- neprovádět další refactor — Sprint 16 je poslední sprint plánu.
+Release bump označuje dokončení celého technického refactor plánu. Neobsahuje gameplay/content/DB redesign.
+
+- `proplet_version.py`: `APP_VERSION = "4.02.0"`.
+- `public/runtime-meta.js`: `version:'4.02.0'`.
+- `public/sw.js`: `proplet-v4.02.0-game-session-shell`.
+- Release PR #107:
+  - `version-alignment`: SUCCESS;
+  - `current-runtime`: SUCCESS;
+  - `gen4-contract`: SUCCESS;
+  - Vercel preview: READY;
+  - preview health: HTTP 200 / 4.02.0 / ok=true / DB true.
+- Production deployment: `dpl_4br6ZUpgSpts8g5mUrbEmXn4hM9o` — **READY**.
+- Production health: HTTP 200 / **4.02.0** / `ok=true` / `database=true`.
+- Production `runtime-meta.js`: 4.02.0.
+- Production SW cache namespace: 4.02.0.
+- Build error scan: čistý.
+- Production runtime `error/fatal`: bez záznamů.
+
+## Refactor plan closure
+
+Plán Sprint 00–16 je dokončen. Další práce už nemá automaticky pokračovat jako „Sprint 17“.
+
+Doporučený další krok je **samostatný post-refactor audit / verification pass**:
+- porovnat původní `TECH_DEBT_AUDIT.md` finding-by-finding proti současnému repu;
+- porovnat `TECH_DEBT_REFACTOR_PLAN.md` acceptance criteria proti implementovanému stavu;
+- klasifikovat každý původní finding jako `resolved / partially resolved / intentionally retained / obsolete`;
+- zaznamenat nově vzniklý technický dluh nebo regression risk;
+- během verification passu nic automaticky nerefactorovat.
 
 ## Předchozí stav
 
@@ -545,6 +570,7 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
 
