@@ -1,0 +1,476 @@
+/* Sprint 13B — canonical profile/settings/account presentation owner. Behavior-preserving consolidation. */
+
+/* Former profile-layout-v3330.css. */
+/* v3.33.0 — Desktop profile readability.
+   The profile used to have desktop-sized cards with phone-sized labels. This layer keeps the
+   compact mobile presentation intact and gives laptop/monitor users proper reading typography. */
+
+@media (min-width:1000px) and (min-height:650px){
+  /* The wide shell has four grid tracks, but the two headline metrics are still a two-card row. */
+  #screen-profile:not(.settings-open) .profile-grid>.profile-stat:not(.profile-stat-wide){grid-column:span 2;min-width:0}
+  #screen-profile:not(.settings-open) .profile-rank-value strong{overflow-wrap:normal;word-break:normal;hyphens:none}
+
+  /* Achievements: icon + title form one clear headline row; description gets its own readable row. */
+  #screen-profile .achievement-card{padding:22px 24px}
+  #screen-profile .achievement-toggle-btn{padding:9px 13px;font-size:13px}
+  #screen-profile .achievement-toggle-btn span{font-size:15px}
+  #screen-profile .achievement-summary{margin-top:14px;padding:15px 16px;border-radius:19px}
+  #screen-profile .achievement-summary-copy{gap:16px}
+  #screen-profile .achievement-summary-copy strong{font-size:17px;line-height:1.25}
+  #screen-profile .achievement-summary-copy small{margin-top:4px;font-size:13.5px;line-height:1.4}
+  #screen-profile .achievement-summary-copy>span{font-size:15px}
+  #screen-profile .achievement-summary-progress{height:7px;margin-top:11px}
+  #screen-profile .achievement-summary-icons{gap:8px;margin-top:13px}
+  #screen-profile .achievement-peek{flex-basis:40px;width:40px;height:40px;border-radius:13px}
+  #screen-profile .achievement-peek b{font-size:22px}
+  #screen-profile .achievement-peek i{width:16px;height:16px;font-size:8px}
+
+  #screen-profile .achievement-details .achievement-groups{margin-top:18px;padding-top:17px}
+  #screen-profile .achievement-groups{gap:20px}
+  #screen-profile .achievement-group-head{margin:0 3px 10px}
+  #screen-profile .achievement-group-head strong{font-size:14px;letter-spacing:.065em}
+  #screen-profile .achievement-group-head span{font-size:12px;padding:4px 9px}
+  #screen-profile .achievement-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  #screen-profile .achievement{
+    min-height:118px;
+    padding:15px 16px;
+    border-radius:19px;
+    display:grid;
+    grid-template-columns:38px minmax(0,1fr) auto;
+    grid-template-rows:auto auto auto auto;
+    column-gap:10px;
+    row-gap:7px;
+    align-items:center;
+  }
+  #screen-profile .achievement .emoji{grid-column:1;grid-row:1;font-size:30px;line-height:1}
+  #screen-profile .achievement strong{
+    grid-column:2 / 4;
+    grid-row:1;
+    min-width:0;
+    margin:0;
+    padding-right:20px;
+    font-size:17px;
+    line-height:1.25;
+  }
+  #screen-profile .achievement small{
+    grid-column:1 / -1;
+    grid-row:2;
+    margin:0;
+    font-size:14px;
+    line-height:1.4;
+  }
+  #screen-profile .achievement-progress{grid-column:1 / -1;grid-row:3;height:7px;margin:1px 0 0}
+  #screen-profile .achievement em{grid-column:1 / -1;grid-row:4;margin:0;font-size:12.5px;line-height:1.25}
+  #screen-profile .achievement.earned:after{right:12px;top:12px;width:24px;height:24px;font-size:12px}
+
+  /* Ranks use the same information hierarchy as achievements instead of tiny 112px tiles. */
+  #screen-profile .level-roadmap-card{padding:22px 24px}
+  #screen-profile .level-roadmap{
+    --profile-roadmap-gap:11px;
+    gap:var(--profile-roadmap-gap);
+    padding:14px 2px 4px;
+    scroll-snap-type:x proximity;
+  }
+  #screen-profile .level-step{
+    flex:0 0 calc((100% - 3 * var(--profile-roadmap-gap)) / 4);
+    min-width:0;
+    min-height:96px;
+    padding:15px 16px;
+    border-radius:19px;
+    display:grid;
+    grid-template-columns:38px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    column-gap:10px;
+    row-gap:7px;
+    align-items:center;
+    scroll-snap-align:start;
+  }
+  #screen-profile .level-step .level-step-icon{grid-column:1;grid-row:1;font-size:30px;line-height:1}
+  #screen-profile .level-step strong{grid-column:2;grid-row:1;margin:0;padding-right:21px;font-size:16.5px;line-height:1.25}
+  #screen-profile .level-step small{grid-column:1 / -1;grid-row:2;margin:0;font-size:13.5px;line-height:1.35}
+  #screen-profile .level-step .level-num{right:11px;top:11px;width:26px;height:26px;font-size:11px}
+
+  /* Series badges are adjacent profile progress and should not suddenly fall back to 10px copy. */
+  #screen-profile .badge-card{padding:22px 24px}
+  #screen-profile .profile-badges{gap:11px;margin-top:14px}
+  #screen-profile .profile-badge{
+    min-height:86px;
+    padding:14px 15px;
+    border-radius:18px;
+    display:grid;
+    grid-template-columns:36px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    column-gap:10px;
+    row-gap:6px;
+    align-items:center;
+  }
+  #screen-profile .profile-badge .emoji{grid-column:1;grid-row:1;font-size:28px;line-height:1}
+  #screen-profile .profile-badge strong{grid-column:2;grid-row:1;margin:0;font-size:16px;line-height:1.25}
+  #screen-profile .profile-badge small{grid-column:1 / -1;grid-row:2;margin:0;font-size:13px;line-height:1.35}
+
+  /* Appearance had the smallest text in the whole profile: 8.5px secondary labels. */
+  #screen-profile .appearance-card{padding:22px 24px}
+  #screen-profile .appearance-copy{margin:9px 0 15px;font-size:15px;line-height:1.5}
+  #screen-profile .theme-segment{gap:9px;padding:7px;border-radius:19px}
+  #screen-profile .theme-choice{min-height:82px;padding:12px 10px 11px;border-radius:15px;gap:5px}
+  #screen-profile .theme-choice>span{font-size:26px}
+  #screen-profile .theme-choice strong{font-size:15px;line-height:1.2}
+  #screen-profile .theme-choice small{font-size:12.5px;line-height:1.25}
+  #screen-profile .theme-mode-note{margin-top:11px;font-size:13.5px;line-height:1.45}
+
+  #screen-profile .settings-row{gap:11px}
+  #screen-profile .setting-toggle{min-height:52px;padding:12px 11px;font-size:16px}
+}
+
+@media (min-width:1500px) and (min-height:800px){
+  #screen-profile .achievement strong{font-size:18px}
+  #screen-profile .achievement small{font-size:15px}
+  #screen-profile .achievement em{font-size:13px}
+  #screen-profile .level-step strong{font-size:17px}
+  #screen-profile .level-step small{font-size:14px}
+  #screen-profile .profile-badge strong{font-size:17px}
+  #screen-profile .profile-badge small{font-size:13.5px}
+  #screen-profile .theme-choice strong{font-size:16px}
+  #screen-profile .theme-choice small{font-size:13px}
+}
+
+/* Former settings-ia-v40122.css. */
+/* v4.01.22 preview — profile/settings information architecture polish. */
+
+/* The old privacy chip was useful during rollout, but is too prominent as a permanent global control. */
+#rankingPrivacyMini{display:none!important}
+.quality-header-actions{align-items:center}
+
+.settings-header-gear{
+  flex:0 0 44px;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;
+  display:grid;place-items:center;padding:0;background:color-mix(in srgb,var(--paper) 90%,transparent);
+  color:var(--muted);box-shadow:var(--soft-shadow);cursor:pointer;transition:.16s ease;
+}
+.settings-header-gear svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.settings-header-gear:hover,.settings-header-gear:focus-visible{color:var(--purple);border-color:color-mix(in srgb,var(--purple) 38%,var(--line));background:color-mix(in srgb,var(--purple) 7%,var(--paper));outline:none}
+.settings-header-gear:active{transform:scale(.96)}
+
+/* Settings remains a sub-view of Já: no duplicate inline gear/button and no fifth bottom-nav item. */
+#profileSettingsBtn{display:none!important}
+#screen-profile:not(.settings-open)>:is(.settings-card,#profileTeamSettingsCard,#settingsAdminSlot,#profileAdminSlot){display:none!important}
+#screen-profile:not(.settings-open) #profileAccountHub,
+#screen-profile:not(.settings-open) #adminEntryBtn{display:none!important}
+
+.profile-settings-header{display:none}
+#screen-profile.settings-open.active{
+  --settings-gap:18px;
+  display:flex;flex-direction:column;
+}
+#screen-profile.settings-open>.screen-title,
+#screen-profile.settings-open>.level-roadmap-card,
+#screen-profile.settings-open>.achievement-card,
+#screen-profile.settings-open>.badge-card{display:none!important}
+#screen-profile.settings-open>.profile-settings-header{display:flex;order:0;align-items:center;gap:12px;margin:3px 2px 20px}
+.profile-settings-back{
+  flex:0 0 auto;min-height:40px;padding:8px 11px;border:1px solid var(--line);border-radius:13px;background:var(--paper);
+  color:var(--muted);font:inherit;font-size:12px;font-weight:900;cursor:pointer;box-shadow:var(--soft-shadow)
+}
+.profile-settings-heading{min-width:0}
+.profile-settings-heading h1{margin:0;font-size:clamp(30px,5vw,42px);line-height:1;letter-spacing:-.045em}
+.profile-settings-heading p{margin:5px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
+
+/* Stable order + one vertical rhythm across all top-level settings blocks. */
+#screen-profile.settings-open>#calmModeCard{order:10}
+#screen-profile.settings-open>.settings-gameplay-card{order:11}
+#screen-profile.settings-open>.appearance-card{order:20}
+#screen-profile.settings-open>.push-card{order:30}
+#screen-profile.settings-open>.install-app-card{order:40}
+#screen-profile.settings-open>#profileCard{order:50}
+#screen-profile.settings-open>#settingsPrivacyCard{order:60}
+#screen-profile.settings-open>#profileTeamSettingsCard{order:70}
+#screen-profile.settings-open>.settings-data-card{order:80}
+#screen-profile.settings-open>#settingsAdminSlot{order:90}
+#screen-profile.settings-open>#profileAdminSlot{order:91}
+#screen-profile.settings-open>:is(#calmModeCard,.settings-gameplay-card,.appearance-card,.push-card,.install-app-card,#profileCard,#settingsPrivacyCard,#profileTeamSettingsCard,.settings-data-card,#settingsAdminSlot,#profileAdminSlot){margin:0 0 var(--settings-gap)!important}
+
+/* Shared top-level hierarchy: card title first, support copy second, controls third. */
+#screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard) .section-head h2{
+  margin:0;font-size:21px;line-height:1.18;letter-spacing:-.025em
+}
+#screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard) .section-head .eyebrow{
+  font-size:10px;line-height:1.2;letter-spacing:.085em
+}
+#screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard)>p.muted{
+  margin:8px 0 14px;font-size:13px;line-height:1.45
+}
+.settings-copy-pruned{display:none!important}
+
+/* Gameplay: remove redundant eyebrow/note and restore visual priority to the setting name, not its value. */
+#screen-profile.settings-open .settings-gameplay-card{padding:18px 19px}
+#screen-profile.settings-open .settings-gameplay-card .section-head{margin-bottom:14px}
+#screen-profile.settings-open .settings-gameplay-card .settings-row{gap:9px}
+#screen-profile.settings-open .settings-gameplay-card .setting-toggle{font-size:13.5px;line-height:1.25}
+#screen-profile.settings-open .settings-support-polished{
+  margin:0 0 14px!important;padding:12px 13px;border:1px solid var(--line);border-radius:15px;
+  background:color-mix(in srgb,var(--bg) 46%,var(--paper));align-items:center
+}
+#screen-profile.settings-open .settings-support-polished .support-mode-title{
+  display:block;margin:0 0 3px;color:var(--ink);font-size:15.5px!important;line-height:1.2;font-weight:900!important;
+  letter-spacing:0!important;text-transform:none!important
+}
+#screen-profile.settings-open .settings-support-polished strong{font-size:13.5px;line-height:1.25;color:var(--muted)}
+#screen-profile.settings-open .settings-support-polished small{font-size:12px;line-height:1.4;color:var(--muted)}
+#screen-profile.settings-open .settings-support-polished .secondary-btn{font-size:12px}
+
+/* Appearance: the controls are self-explanatory; no explanatory paragraph underneath. */
+#screen-profile.settings-open .appearance-card{padding:18px 19px}
+#screen-profile.settings-open .appearance-card .section-head{margin-bottom:13px}
+#screen-profile.settings-open .theme-segment{margin-top:0}
+
+/* Notifications: one sentence, in normal Czech, with transient status only when it adds information. */
+#screen-profile.settings-open .push-card{padding:18px 19px}
+#screen-profile.settings-open .push-card .section-head{margin-bottom:14px}
+#screen-profile.settings-open .notification-pref-row{padding:13px 14px}
+#screen-profile.settings-open .notification-pref-copy strong{font-size:14.5px;line-height:1.25}
+#screen-profile.settings-open .notification-pref-copy>small{margin-top:3px;font-size:12.5px;line-height:1.42;color:var(--muted)}
+#screen-profile.settings-open #pushStatusText{margin-top:5px;font-size:11.5px;line-height:1.35}
+#screen-profile.settings-open #pushStatusText.settings-status-redundant{display:none!important}
+
+/* Logged-in profile card becomes a proper account settings section; identity and gameplay stats stay on Já. */
+#screen-profile.settings-open:not(.settings-guest)>#profileCard{
+  padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible
+}
+#screen-profile.settings-open:not(.settings-guest)>#profileCard>:not(#profileAccountHub){display:none!important}
+#screen-profile.settings-open #profileAccountHub{
+  display:block!important;margin:0!important;padding:18px 19px!important;border-radius:22px!important
+}
+#screen-profile.settings-open #profileAccountHub .profile-account-head{margin-bottom:13px}
+#screen-profile.settings-open #profileAccountHub .profile-account-head strong{
+  margin:0;font-size:21px;line-height:1.18;letter-spacing:-.025em
+}
+#screen-profile.settings-open #profileAccountHub .profile-account-badge{font-size:10.5px;padding:5px 9px}
+#screen-profile.settings-open #profileAccountHub .profile-account-body{gap:9px}
+#screen-profile.settings-open #profileAccountHub .account-hub-row{
+  grid-template-columns:34px minmax(0,1fr) auto;gap:10px;padding:11px 12px;border-radius:14px
+}
+#screen-profile.settings-open #profileAccountHub .account-hub-row>span{width:34px;height:34px;border-radius:10px;font-size:17px}
+#screen-profile.settings-open #profileAccountHub .account-hub-row strong{font-size:13.5px;line-height:1.25}
+#screen-profile.settings-open #profileAccountHub .account-hub-row small{margin-top:2px;font-size:12px;line-height:1.38}
+#screen-profile.settings-open #profileAccountHub .account-hub-row .secondary-btn{font-size:11.5px}
+#screen-profile.settings-open #profileAccountHub .sync-panel{margin:10px 0 0;padding:10px 11px}
+#screen-profile.settings-open #profileAccountHub .sync-status strong{font-size:13px}
+#screen-profile.settings-open #profileAccountHub .sync-status div{font-size:11.5px;line-height:1.35}
+#screen-profile.settings-open .profile-sync-ok #syncBtn{display:none!important}
+#screen-profile.settings-open .profile-sync-ok .sync-panel{grid-template-columns:1fr}
+#screen-profile.settings-open #profileAccountHub .profile-account-actions .logout-btn{margin-top:10px;font-size:11.5px}
+
+/* Privacy uses the same top-level visual weight as neighbouring settings sections. */
+.settings-privacy-card{padding:18px 19px}
+.settings-privacy-line{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center}
+.settings-privacy-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--purple) 9%,var(--paper));font-size:22px}
+.settings-privacy-copy{min-width:0}
+.settings-privacy-copy strong,.settings-privacy-copy small{display:block}
+.settings-privacy-copy strong{font-size:19px;line-height:1.2;letter-spacing:-.02em}
+.settings-privacy-copy small{margin-top:4px;color:var(--muted);font-size:12.5px;line-height:1.4}
+.settings-privacy-action{min-height:40px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--purple);font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+
+/* Team and data/support should read at the same scale as Account, not as separate product eras. */
+#screen-profile.settings-open #profileTeamSettingsCard{padding:18px 19px}
+#screen-profile.settings-open #profileTeamSettingsCard .profile-team-body{margin-top:12px}
+#screen-profile.settings-open #profileTeamSettingsCard .team-access-card strong{font-size:13.5px;line-height:1.25}
+#screen-profile.settings-open #profileTeamSettingsCard .team-access-card span{font-size:12px;line-height:1.4}
+#screen-profile.settings-open .settings-data-card{padding:18px 19px}
+#screen-profile.settings-open .settings-data-card .section-head{margin-bottom:8px}
+#screen-profile.settings-open .settings-data-card>p.muted{font-size:13px;line-height:1.45;margin:0 0 15px}
+#screen-profile.settings-open .settings-data-card .privacy-actions{gap:9px}
+
+/* Keep admin out of the identity card and put it at the bottom of Settings. */
+#settingsAdminSlot .admin-entry,#profileAdminSlot .admin-entry{margin:0}
+
+/* Less explaining, more playing: the seven-day rhythm already communicates its own distribution. */
+#screen-daily .daily-week-rhythm-head>span{display:none!important}
+
+/* Result boards keep their rules accessible, but stop repeating two lines of explanation on every result. */
+.daily-world-summary>p>small{display:none!important}
+.ranking-compact-explain{margin-top:8px;color:var(--muted)}
+.ranking-compact-explain summary{list-style:none;width:max-content;max-width:100%;cursor:pointer;font-size:10.5px;font-weight:850;color:var(--muted);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.ranking-compact-explain summary::-webkit-details-marker{display:none}
+.ranking-compact-explain[open] summary{color:var(--purple)}
+.ranking-compact-explain p{margin:7px 0 0;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--bg) 55%,var(--paper));font-size:10.5px;line-height:1.45;color:var(--muted)}
+.level-board-head>.ranking-compact-explain{display:block;width:100%;margin-top:5px}
+
+html[data-theme="dark"] .settings-header-gear,
+html[data-theme="dark"] .profile-settings-back,
+html[data-theme="dark"] .settings-privacy-action{background:#25222d;border-color:#433d4b}
+html[data-theme="dark"] .settings-privacy-icon{background:#383152}
+html[data-theme="dark"] #screen-profile.settings-open .settings-support-polished{background:#211f2a}
+
+@media(max-width:520px){
+  #screen-profile.settings-open.active{--settings-gap:14px}
+  .settings-header-gear{flex-basis:36px;width:36px;height:36px}
+  .settings-header-gear svg{width:18px;height:18px}
+  #screen-profile.settings-open>.profile-settings-header{margin-top:1px;margin-bottom:14px}
+  .profile-settings-heading p{display:none}
+  #screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard) .section-head h2,
+  #screen-profile.settings-open #profileAccountHub .profile-account-head strong{font-size:20px}
+  #screen-profile.settings-open #profileAccountHub .account-hub-row{grid-template-columns:32px minmax(0,1fr);gap:9px}
+  #screen-profile.settings-open #profileAccountHub .account-hub-row>span{width:32px;height:32px}
+  #screen-profile.settings-open #profileAccountHub .account-hub-row .secondary-btn{grid-column:2;width:max-content}
+  .settings-privacy-line{grid-template-columns:40px minmax(0,1fr) auto;gap:10px}
+  .settings-privacy-icon{width:40px;height:40px;border-radius:13px;font-size:20px}
+  .settings-privacy-copy strong{font-size:18px}
+  .settings-privacy-copy small{font-size:11.5px}
+  .settings-privacy-action{padding-inline:10px}
+}
+
+@media(min-width:1000px) and (min-height:650px){
+  #screen-profile.settings-open.active{--settings-gap:20px;max-width:920px!important;margin-inline:auto}
+  .settings-header-gear{width:48px;height:48px;flex-basis:48px}
+  .settings-header-gear svg{width:22px;height:22px}
+  #screen-profile.settings-open>.profile-settings-header{margin:6px 3px 22px}
+  #screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard){padding:22px 24px}
+  #screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard) .section-head h2,
+  #screen-profile.settings-open #profileAccountHub .profile-account-head strong{font-size:24px}
+  #screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard)>p.muted{font-size:14px}
+  #screen-profile.settings-open .settings-gameplay-card,
+  #screen-profile.settings-open .appearance-card,
+  #screen-profile.settings-open .push-card,
+  #screen-profile.settings-open #profileTeamSettingsCard,
+  #screen-profile.settings-open .settings-data-card,
+  #screen-profile.settings-open #settingsPrivacyCard{padding:22px 24px}
+  #screen-profile.settings-open #profileAccountHub{padding:22px 24px!important}
+  #screen-profile.settings-open #profileAccountHub .account-hub-row strong{font-size:14.5px}
+  #screen-profile.settings-open #profileAccountHub .account-hub-row small{font-size:12.5px}
+  #screen-profile.settings-open #profileAccountHub .sync-status strong{font-size:14px}
+  #screen-profile.settings-open #profileAccountHub .sync-status div{font-size:12.5px}
+  .settings-privacy-copy strong{font-size:22px}
+  .settings-privacy-copy small{font-size:13px}
+  #screen-profile.settings-open #profileTeamSettingsCard .team-access-card strong{font-size:14.5px}
+  #screen-profile.settings-open #profileTeamSettingsCard .team-access-card span{font-size:13px}
+  #screen-profile.settings-open .settings-data-card>p.muted{font-size:14px}
+}
+
+/* Former settings-polish-v40122.css. */
+/* v4.01.22 preview follow-up — mobile profile + settings polish. */
+
+/* Legacy helper cards are generated inside the profile by the base renderer. They must never be
+   moved into Settings; moving them causes the renderer to recreate them and produces duplicates. */
+#screen-profile .support-mode-card{display:none!important}
+#screen-profile.settings-open .settings-helper-control{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  margin:0 0 12px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:color-mix(in srgb,var(--bg) 46%,var(--paper));
+}
+#screen-profile.settings-open .settings-helper-copy{min-width:0}
+#screen-profile.settings-open .settings-helper-copy strong,
+#screen-profile.settings-open .settings-helper-copy small{display:block}
+#screen-profile.settings-open .settings-helper-copy strong{
+  margin:0;
+  color:var(--ink);
+  font-size:15.5px;
+  line-height:1.15;
+  font-weight:950;
+}
+#screen-profile.settings-open .settings-helper-copy small{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.25;
+  font-weight:800;
+}
+#screen-profile.settings-open .settings-helper-control .secondary-btn{
+  width:auto;
+  min-width:0;
+  min-height:36px;
+  padding:7px 11px;
+  font-size:11.5px;
+  white-space:nowrap;
+}
+
+/* PWA install card: one headline + one useful sentence. */
+#screen-profile.settings-open .install-app-card .section-head{margin-bottom:9px!important}
+#screen-profile.settings-open .install-app-card>p.muted{margin:0 0 14px!important;font-size:13px!important;line-height:1.45!important}
+#screen-profile.settings-open .install-app-card .install-mini-icon{font-size:22px}
+#screen-profile.settings-open #installAppStatus.settings-install-status-redundant{display:none!important}
+
+/* Fold closed / ordinary phone: preserve desktop hierarchy but re-balance the available width. */
+@media(max-width:520px){
+  #screen-profile:not(.settings-open) .profile-summary{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:10px!important;
+    align-items:center!important;
+  }
+  #screen-profile:not(.settings-open) .profile-identity{min-width:0}
+  #screen-profile:not(.settings-open) .profile-name{font-size:25px}
+
+  #screen-profile:not(.settings-open) .streak-bubble{
+    width:72px!important;
+    height:72px!important;
+    padding:8px 10px!important;
+    border-radius:21px!important;
+    grid-template-columns:auto auto!important;
+    grid-template-rows:1fr auto!important;
+    column-gap:5px!important;
+    justify-content:center!important;
+    background:color-mix(in srgb,#f2b83f 14%,var(--paper))!important;
+    border-color:color-mix(in srgb,#f2b83f 32%,var(--line))!important;
+    box-shadow:none!important;
+  }
+  #screen-profile:not(.settings-open) .streak-bubble .streak-icon{font-size:21px!important}
+  #screen-profile:not(.settings-open) .streak-bubble strong{font-size:24px!important;line-height:1!important}
+  #screen-profile:not(.settings-open) .streak-bubble small{font-size:10px!important;line-height:1.1!important}
+
+  #screen-profile:not(.settings-open) .profile-grid{
+    grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr)!important;
+    gap:8px!important;
+  }
+  #screen-profile:not(.settings-open) .profile-stat{min-width:0!important;padding:11px 12px!important}
+  #screen-profile:not(.settings-open) .profile-stat>strong{font-size:21px!important;line-height:1.1!important}
+  #screen-profile:not(.settings-open) .profile-rank-stat{min-width:0!important}
+  #screen-profile:not(.settings-open) .profile-rank-value{
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    min-width:0!important;
+  }
+  #screen-profile:not(.settings-open) .profile-rank-icon{flex:0 0 auto!important;font-size:19px!important;line-height:1!important}
+  #screen-profile:not(.settings-open) .profile-rank-value strong{
+    min-width:0!important;
+    font-size:14.5px!important;
+    line-height:1.2!important;
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+    hyphens:none!important;
+  }
+  #screen-profile:not(.settings-open) .profile-stat-wide{grid-column:1/-1!important}
+  #screen-profile:not(.settings-open) .profile-daily-highlights small{font-size:10.5px!important;line-height:1.22!important}
+  #screen-profile:not(.settings-open) .profile-daily-highlights b{font-size:18px!important;line-height:1.1!important}
+}
+
+@media(max-width:380px){
+  #screen-profile:not(.settings-open) .profile-grid{grid-template-columns:minmax(0,.66fr) minmax(0,1.34fr)!important}
+  #screen-profile:not(.settings-open) .profile-rank-value strong{font-size:14px!important}
+  #screen-profile:not(.settings-open) .streak-bubble{width:68px!important;height:68px!important;padding-inline:9px!important}
+}
+
+html[data-theme="dark"] #screen-profile.settings-open .settings-helper-control{background:#211f2a}
+html[data-theme="dark"] #screen-profile:not(.settings-open) .streak-bubble{
+  background:color-mix(in srgb,#d89c28 18%,#2a2419)!important;
+  border-color:color-mix(in srgb,#d89c28 34%,#51452a)!important;
+}
+
+/* Former dynamically appended account-auth.css; remains last inside this owner. */
+/* Proplet v3.31.8 — account recovery, identity and profile IA */
+.account-auth-extras{display:grid;gap:9px;margin:3px 0 10px}.optional-tag{display:inline-flex;margin-left:5px;padding:2px 6px;border-radius:999px;background:#f0edf5;color:#777286;font-size:9px;font-weight:850;text-transform:none;letter-spacing:0}.account-email-create{display:grid;gap:7px;margin-bottom:2px}.account-email-warning{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid #efdfaa;border-radius:13px;background:#fff9e8}.account-email-warning>span{font-size:18px;line-height:1.15}.account-email-warning strong,.account-email-warning small{display:block}.account-email-warning strong{font-size:11px}.account-email-warning small{margin-top:2px;color:#756c55;font-size:10.5px;line-height:1.35}.account-forgot-btn{justify-self:center;border:0;background:transparent;color:#6258c7;font-size:11px;font-weight:850;padding:5px 8px;cursor:pointer}.account-forgot-btn:hover{text-decoration:underline}.account-auth-divider{display:flex;align-items:center;gap:9px;color:#9a95a8;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.account-auth-divider::before,.account-auth-divider::after{content:"";height:1px;flex:1;background:var(--line)}
+.google-auth-btn{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #747775;border-radius:14px;background:#fff;color:#1f1f1f;box-shadow:0 3px 10px rgba(46,39,72,.055);cursor:pointer}.google-auth-btn:active{transform:scale(.985)}.google-auth-btn strong{font-size:14px;line-height:20px;font-weight:600}.google-g{display:block;width:20px;height:20px;flex:0 0 20px}.google-g-small{width:17px;height:17px;flex-basis:17px}.account-recovery-modal,.profile-edit-modal-card{max-width:430px}.account-recovery-modal>p,.profile-edit-modal-card>p{font-size:12px;line-height:1.45}.account-auth-message{min-height:18px;margin-top:7px;color:#615d70;font-size:10.5px;line-height:1.35}.account-auth-message:not(:empty){padding:8px 9px;border-radius:11px;background:#f5f2fa}
+#profileCard>.account-banner,#profileCard>.avatar-picker{display:none!important}.profile-edit-inline{display:inline-flex;align-items:center;gap:5px;margin:4px 0 2px;padding:4px 7px;border:0;border-radius:999px;background:#f0ecff;color:#6255cc;font-size:10.5px;font-weight:850;cursor:pointer}.profile-edit-inline:active{transform:scale(.97)}.profile-edit-avatar-block{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}.profile-edit-avatar-grid{margin-top:8px}.profile-edit-avatar-grid .avatar-choice{cursor:pointer}
+.profile-account-hub{margin-top:13px;padding:12px;border:1px solid #dcd5f3;border-radius:17px;background:linear-gradient(145deg,#f3efff 0%,#eef9f5 115%)}.profile-account-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.profile-account-head strong{display:block;font-size:14px;margin-top:2px}.profile-account-badge{padding:5px 8px;border-radius:999px;background:#fff4d8;color:#8b6b19;font-size:9.5px;font-weight:900}.profile-account-badge.ok{background:#dff3e9;color:#2d8060}.profile-account-body{display:grid;gap:7px}.account-hub-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px 10px;border:1px solid rgba(88,75,130,.11);border-radius:13px;background:rgba(255,255,255,.72)}.account-hub-row>span{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:#fff;font-size:15px}.account-hub-row strong,.account-hub-row small{display:block}.account-hub-row strong{font-size:11.5px}.account-hub-row small{margin-top:2px;color:var(--muted);font-size:10px;line-height:1.3}.account-hub-row .secondary-btn{padding:7px 9px;font-size:9.5px}.account-hub-row.warn{border-color:#ead9a3;background:#fff9e8}.account-hub-row.ok{border-color:#cce7da;background:#f2fbf7}.profile-account-hub .sync-panel{margin:8px 0 0;padding:8px 9px;background:rgba(255,255,255,.45);border-color:rgba(88,75,130,.10)}.profile-account-hub .sync-status{margin:0}.profile-account-hub .sync-panel.profile-sync-ok .secondary-btn{display:none}.profile-account-hub .sync-panel.profile-sync-ok{padding:7px 9px}.profile-account-actions{display:flex;justify-content:flex-end}.profile-account-actions .logout-btn{margin:8px 0 0;padding:6px 3px;font-size:10px;color:var(--muted)}
+.profile-team-settings{padding:16px;margin-top:12px}.profile-section-icon{font-size:22px}.profile-team-body{margin-top:10px}.profile-team-body .team-access-card{margin:0}.profile-support-slot{margin:10px 0 4px}.profile-support-slot .support-mode-card{margin:0}.profile-admin-slot{margin-top:12px}.profile-admin-slot .admin-entry{margin:0}.account-auth-error{margin:0;color:#a04d48;font-size:11px}
+html[data-theme="dark"] .optional-tag{background:#302d3b;color:#b9b4c5}html[data-theme="dark"] .account-email-warning{background:#382f1e;border-color:#5b4a27}html[data-theme="dark"] .account-email-warning small{color:#c6b990}html[data-theme="dark"] .account-forgot-btn{color:#b6aaff}html[data-theme="dark"] .google-auth-btn{background:#fff;border-color:#747775;color:#1f1f1f}html[data-theme="dark"] .account-auth-message:not(:empty){background:#292631}html[data-theme="dark"] .profile-edit-inline{background:#302b49;color:#c7bfff}html[data-theme="dark"] .profile-account-hub{background:linear-gradient(145deg,#29253e,#1d302a);border-color:#3d4550}html[data-theme="dark"] .account-hub-row{background:#24212f;border-color:#403a49}html[data-theme="dark"] .account-hub-row.ok{background:#20342d;border-color:#345144}html[data-theme="dark"] .account-hub-row.warn{background:#382f1e;border-color:#5b4a27}html[data-theme="dark"] .account-hub-row>span{background:rgba(255,255,255,.06)}html[data-theme="dark"] .profile-account-hub .sync-panel{background:rgba(255,255,255,.035);border-color:#403a49}
+html[data-theme="dark"] .ranking-privacy-preview{background:#292631!important;border:1px solid #403a49!important;color:#f3f0f7!important}html[data-theme="dark"] .ranking-privacy-preview strong{color:#f3f0f7!important}html[data-theme="dark"] .ranking-privacy-preview small{color:#b9b4c5!important}html[data-theme="dark"] .ranking-privacy-preview>span{background:#211f2c!important;color:#f3f0f7!important}
+@media(max-width:430px){.account-hub-row{grid-template-columns:28px minmax(0,1fr)}.account-hub-row .secondary-btn{grid-column:2;width:max-content}.profile-account-head{align-items:flex-start}.profile-edit-inline span{display:none}}
+
+/* v4.01.13 — Google photo is an explicit, private profile choice. */
+.google-avatar-choice{width:100%;display:flex;align-items:center;gap:10px;margin-top:9px;padding:8px;border:1px solid var(--line);border-radius:14px;background:#faf9fd;color:inherit;text-align:left;cursor:pointer}.google-avatar-choice img{width:42px;height:42px;flex:0 0 42px;border-radius:50%;object-fit:cover}.google-avatar-choice strong,.google-avatar-choice small{display:block}.google-avatar-choice strong{font-size:12px}.google-avatar-choice small{margin-top:2px;color:var(--muted);font-size:10px}.google-avatar-choice.selected{border-color:#7b6ee2;background:#f0ecff;box-shadow:0 0 0 3px rgba(108,92,231,.10)}.google-avatar-unavailable{margin-top:9px;padding:9px 10px;border-radius:12px;background:#f5f2fa;color:var(--muted);font-size:10px;line-height:1.35}html[data-theme="dark"] .google-avatar-choice{background:#242130;border-color:#403a4d}html[data-theme="dark"] .google-avatar-choice.selected{background:#302a52;border-color:#8275df}html[data-theme="dark"] .google-avatar-unavailable{background:#292631}

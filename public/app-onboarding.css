@@ -1,3 +1,50 @@
+/* Sprint 13B — canonical onboarding presentation owner. Behavior-preserving consolidation. */
+
+/* v3.32.2 — keep onboarding CTA visible on short / wide viewports (e.g. unfolded Fold portrait). */
+.onboarding-card{
+  max-height:calc(100dvh - 24px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#onboardContent{
+  min-height:0;
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+}
+#onboardContent::-webkit-scrollbar{display:none}
+#onboardNextBtn{flex:0 0 auto}
+
+/* The interactive 3×3 tutorial should fit without pushing its CTA below the fold. */
+@media (max-height:720px){
+  .onboarding-card{padding:16px 20px}
+  .onboard-dots{margin-bottom:8px}
+  .onboard-content h2{font-size:clamp(24px,4.5vh,29px);margin:3px 0 5px}
+  .onboard-content p{margin-bottom:8px;line-height:1.32}
+  .tutorial-wrap{
+    margin:6px auto 8px;
+    width:min(100%,clamp(190px,calc(100dvh - 290px),250px));
+  }
+  .tutorial-success{min-height:18px;margin-top:5px}
+}
+
+@media (max-height:560px){
+  .onboarding-card{padding:12px 16px}
+  .onboard-dots{margin-bottom:6px}
+  .onboard-content .eyebrow{font-size:9px}
+  .onboard-content h2{font-size:23px;margin:2px 0 4px}
+  .onboard-content p{font-size:13px;margin-bottom:6px;line-height:1.28}
+  .tutorial-wrap{
+    margin:4px auto 6px;
+    width:min(100%,clamp(170px,calc(100dvh - 285px),220px));
+  }
+  .tutorial-success{min-height:16px;margin-top:3px;font-size:11px}
+  .onboarding-card .primary-btn.big{min-height:46px}
+}
+
+/* Former onboarding-model-v3328.css — original adjacent cascade order preserved. */
 .onboard-principle{max-width:540px;margin:0 auto;text-align:center}
 .onboard-principle .eyebrow{display:inline-block;margin-bottom:6px}
 .onboard-principle h2{margin:0 0 14px;font-size:clamp(1.55rem,6vw,2rem);line-height:1.12}

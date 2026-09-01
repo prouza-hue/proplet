@@ -26,11 +26,9 @@
   if(document.documentElement.hasAttribute('data-proplet-theme-only'))return;
 
   const styles=[
-    ['/home-layout.css?v=10','propletHomeLayoutCss'],
-    ['/today-brand.css?v=4','propletTodayBrandCss'],
+    ['/app-play.css?v=40140-s13b','propletAppPlayCss'],
     ['/ranking-polish.css?v=5','propletRankingPolishCss'],
-    ['/onboarding-fit.css?v=1','propletOnboardingFitCss'],
-    ['/onboarding-model-v3328.css?v=3','propletOnboardingModelCss'],
+    ['/app-onboarding.css?v=40140-s13b','propletAppOnboardingCss'],
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
     ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
@@ -38,14 +36,12 @@
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/game.css?v=40140-s13a','propletGameCss'],
     ['/results.css?v=40140-s13a2','propletResultsCss'],
-    ['/profile-layout-v3330.css?v=2','propletProfileLayoutCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
     ['/release-notes-v3331.css?v=40132','propletReleaseNotesV3331Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
-    ['/settings-ia-v40122.css?v=2','propletSettingsIaV40122Css'],
-    ['/settings-polish-v40122.css?v=2','propletSettingsPolishV40122Css']
+    ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
   ];
 
   const loadStyle=(href,key)=>{
@@ -78,9 +74,6 @@
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=40140-s12b2','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
-    if(!document.querySelector('link[data-proplet-account-auth-css]')){
-      const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=5';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
-    }
     await loadScript('/account-auth.js?v=7','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=3','propletGameLayout');

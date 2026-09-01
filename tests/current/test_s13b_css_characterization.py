@@ -6,8 +6,7 @@ read=lambda p:(ROOT/p).read_text(encoding="utf-8")
 theme=read("public/theme-init.js"); index=read("public/index.html")
 baseline_files=[
 "public/home-layout.css","public/today-brand.css","public/onboarding-fit.css","public/onboarding-model-v3328.css",
-"public/onboarding-return-v3332.css","public/profile-layout-v3330.css","public/settings-ia-v40122.css",
-"public/settings-polish-v40122.css","public/push-retention-v3329.css","public/account-auth.css","public/desktop-layout-v3330.css"
+"public/profile-layout-v3330.css","public/settings-ia-v40122.css","public/settings-polish-v40122.css","public/account-auth.css"
 ]
 new_files=["public/app-play.css","public/app-profile-settings.css","public/app-onboarding.css"]
 baseline=all((ROOT/p).is_file() for p in baseline_files)
@@ -35,9 +34,8 @@ if baseline:
     assert "#screen-profile .achievement-card" in read("public/profile-layout-v3330.css")
     assert "#screen-profile.settings-open.active" in read("public/settings-ia-v40122.css")
 else:
-    for old in ["home-layout.css","today-brand.css","onboarding-fit.css","onboarding-model-v3328.css","onboarding-return-v3332.css",
-                "profile-layout-v3330.css","settings-ia-v40122.css","settings-polish-v40122.css","push-retention-v3329.css",
-                "account-auth.css","desktop-layout-v3330.css"]:
+    for old in ["home-layout.css","today-brand.css","onboarding-fit.css","onboarding-model-v3328.css",
+                "profile-layout-v3330.css","settings-ia-v40122.css","settings-polish-v40122.css","account-auth.css"]:
         assert old not in theme, old
     for new in ["/app-play.css","/app-profile-settings.css","/app-onboarding.css"]: assert new in theme
     assert "#screen-daily.home-layout-active .daily-hero" in read("public/app-play.css")
@@ -45,4 +43,8 @@ else:
     assert "#screen-profile .achievement-card" in read("public/app-profile-settings.css")
     assert "#screen-profile.settings-open.active" in read("public/app-profile-settings.css")
     assert ".onboard-principle" in read("public/app-onboarding.css")
+    assert ".google-auth-btn" in read("public/app-profile-settings.css")
+    assert (ROOT/"public/onboarding-return-v3332.css").is_file()
+    assert (ROOT/"public/push-retention-v3329.css").is_file()
+    assert (ROOT/"public/desktop-layout-v3330.css").is_file()
 print("PASS Sprint 13B CSS characterization")

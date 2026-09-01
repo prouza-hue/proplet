@@ -10,7 +10,7 @@ import server
 
 root = Path(__file__).resolve().parents[1]
 home_js = (root / "public" / "home-layout.js").read_text(encoding="utf-8")
-home_css = (root / "public" / "home-layout.css").read_text(encoding="utf-8")
+home_css = (root / "public" / "app-play.css").read_text(encoding="utf-8")
 runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 account_bonus = (root / "public" / "account-bonus-v3331.js").read_text(encoding="utf-8")
 
