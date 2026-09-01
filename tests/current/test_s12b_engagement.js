@@ -11,17 +11,13 @@ const app = read('public/app.js');
 const theme = read('public/theme-init.js');
 const index = read('public/index.html');
 const sw = read('public/sw.js');
-const model = read('public/onboarding-model-v3328.js');
-const returning = read('public/onboarding-return-v3332.js');
-const starterCopy = read('public/starter-copy-hotfix.js');
-const difficulty = read('public/difficulty-nudge.js');
-const pushOrigin = read('public/push-origin-v3325.js');
-const pushRetention = read('public/push-retention-v3329.js');
-const accountBonus = read('public/account-bonus-v3331.js');
-const accountConversion = read('public/account-conversion-v3331.js');
+const onboardingSource = read('public/app/engagement/onboarding.js');
+const nudgesSource = read('public/app/engagement/nudges.js');
+const onboarding = require(path.join(root, 'public/app/engagement/onboarding.js'));
+const nudges = require(path.join(root, 'public/app/engagement/nudges.js'));
 
 function includes(source, needle, label) {
-  assert(source.includes(needle), 'Sprint 12B characterization missing: ' + label);
+  assert(source.includes(needle), 'Sprint 12B contract missing: ' + label);
 }
 function ordered(source, needles, label) {
   let cursor = -1;
@@ -32,87 +28,74 @@ function ordered(source, needles, label) {
   }
 }
 
-includes(app, 'const ACCOUNT_NUDGE_THRESHOLDS=[1,4,10];', 'account CTA thresholds');
-includes(app, "g.mode!=='starter'", 'starter-only hint');
-includes(app, 'g.found.length<2', 'starter hint requires two found words');
-includes(app, 'if(idle<10000)return', 'starter hint waits ten seconds');
-includes(app, "window.addEventListener('beforeinstallprompt'", 'install prompt listener');
-includes(app, "window.addEventListener('appinstalled'", 'installed listener');
+assert.strictEqual(typeof onboarding.install, 'function');
+assert.strictEqual(typeof onboarding.shouldOfferStarterHint, 'function');
+assert.strictEqual(typeof nudges.install, 'function');
+assert.strictEqual(typeof nudges.runPostWin, 'function');
 
-const continueFlow = app.slice(
-  app.indexOf('async function closeWinAndContinue'),
-  app.indexOf('function showDailyResult')
-);
-ordered(continueFlow, [
-  "maybeOfferFirstWinReturnNudge('continue')",
-  "maybeOfferAccountNudge('continue')",
-  "maybeOfferPushNudge('continue')",
-  "maybeOfferInstallNudge('continue','daily')",
-  "performPostWinAction('continue')"
-], 'continue post-win engagement');
-ordered(continueFlow, [
-  "maybeOfferFirstWinReturnNudge('menu')",
-  "maybeOfferAccountNudge('menu')",
-  "maybeOfferPushNudge('menu')",
-  "maybeOfferInstallNudge('menu','daily')",
-  "performPostWinAction('menu')"
-], 'menu post-win engagement');
+const baseGame={mode:'starter',finished:false,starterHintUsed:false,starterHintOfferShown:false,found:['A','B'],dragging:false,start:100,lastProgressAt:100};
+assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:10099}),false);
+assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:10100}),true);
+assert.strictEqual(onboarding.shouldOfferStarterHint({game:{...baseGame,found:['A']},now:20000}),false);
+assert.strictEqual(onboarding.shouldOfferStarterHint({game:{...baseGame,mode:'daily'},now:20000}),false);
+assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:20000,hidden:true}),false);
+assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:20000,transientOpen:true}),false);
 
-includes(model, 'window.__PROPLET_ONBOARDING_MODEL_V3328__', 'onboarding model install sentinel');
-includes(model, "title:'Najdi PES'", 'mandatory PES tutorial');
-includes(model, 'ONBOARD_STEPS.splice(0,ONBOARD_STEPS.length,pesStep,principleStep)', 'two-step onboarding model');
-includes(model, "trackProductEvent('onboarding_principle_completed')", 'principle completion analytics');
-includes(model, "if(launchStarter)startStarter();else nav('daily')", 'starter launch after onboarding');
-includes(model, "rememberSupportMode('younger')", 'younger helper default');
+async function verifyPostWinOrder() {
+  const calls=[];
+  const deps={
+    maybeOfferFirstWinReturnNudge:async action=>{calls.push('return:'+action);return false},
+    maybeOfferAccountNudge:action=>{calls.push('account:'+action);return false},
+    maybeOfferPushNudge:async action=>{calls.push('push:'+action);return false},
+    maybeOfferInstallNudge:(action,source)=>{calls.push('install:'+action+':'+source);return false},
+    hideWin:()=>calls.push('hide'),
+    performPostWinAction:action=>calls.push('action:'+action),
+  };
+  assert.strictEqual(await nudges.runPostWin('continue',deps),false);
+  assert.deepStrictEqual(calls,['return:continue','account:continue','push:continue','install:continue:daily','hide','action:continue']);
 
-includes(returning, 'window.__PROPLET_ONBOARDING_RETURN_V3332__', 'returning-player install sentinel');
-includes(returning, 'let observer=null;', 'single returning-player observer owner');
-includes(returning, 'let authWatch=null;', 'single auth polling owner');
-includes(returning, 'class="onboarding-return-login"', 'returning-player login path');
-includes(returning, 'class="onboarding-return-skip"', 'returning-player skip path');
-
-includes(starterCopy, "const FROM='Zkus ČOKOLÁDU';", 'legacy starter copy source');
-includes(starterCopy, "const TO='Najdi slovo ČOKOLÁDA';", 'correct starter copy target');
-includes(difficulty, 'const WINDOW_SIZE=5;', 'difficulty five-game window');
-includes(difficulty, 'const FAST_REQUIRED=4;', 'difficulty four-fast-games threshold');
-includes(difficulty, 'const MAX_DECLINES=2;', 'difficulty decline cap');
-includes(difficulty, "easy:{target:'medium',thresholdMs:45000}", 'easy threshold');
-includes(difficulty, "medium:{target:'hard',thresholdMs:75000}", 'medium threshold');
-includes(difficulty, "hard:{target:'hardcore',thresholdMs:120000}", 'hard threshold');
-includes(difficulty, "String(getProfile?.()?.id||'guest')", 'profile-scoped difficulty state');
-includes(difficulty, 'new MutationObserver(()=>setTimeout(handleWin,0))', 'difficulty win observer');
-
-includes(pushOrigin, "const baseUpdate=typeof updatePushUI==='function'?updatePushUI:null;", 'push origin wrapper');
-includes(pushRetention, 'window.__PROPLET_PUSH_RETENTION_V3329__', 'push retention sentinel');
-includes(accountBonus, 'window.__PROPLET_ACCOUNT_BONUS_V3331__', 'account bonus sentinel');
-includes(accountConversion, 'window.__PROPLET_ACCOUNT_CONVERSION_V3331__', 'account conversion sentinel');
-
-ordered(theme, [
-  "/starter-copy-hotfix.js?v=1",
-  "/difficulty-nudge.js?v=2",
-  "/onboarding-model-v3328.js?v=3"
-], 'starter and difficulty patch precedence');
-ordered(theme, [
-  "/account-bonus-v3331.js?v=2",
-  "/account-conversion-v3331.js?v=2",
-  "/onboarding-return-v3332.js?v=2"
-], 'account and returning-player wrapper precedence');
-ordered(index, ['/theme-init.js', '/app.js'], 'legacy bootstrap order');
-includes(sw, "'/app.js'", 'offline app shell');
-includes(sw, "'/theme-init.js", 'offline theme bootstrap');
-
-const onboardingModule = path.join(root, 'public/app/engagement/onboarding.js');
-const nudgesModule = path.join(root, 'public/app/engagement/nudges.js');
-assert.strictEqual(
-  fs.existsSync(onboardingModule),
-  fs.existsSync(nudgesModule),
-  'Sprint 12B engagement modules must be installed as one complete slice'
-);
-if (fs.existsSync(onboardingModule)) {
-  for (const modulePath of [onboardingModule, nudgesModule]) {
-    const api = require(modulePath);
-    assert.strictEqual(typeof api.install, 'function', path.basename(modulePath) + ' must export install()');
-  }
+  const stopped=[];
+  assert.strictEqual(await nudges.runPostWin('menu',{
+    ...deps,
+    maybeOfferFirstWinReturnNudge:async()=>{stopped.push('return');return false},
+    maybeOfferAccountNudge:()=>{stopped.push('account');return true},
+    maybeOfferPushNudge:async()=>{stopped.push('push');return false},
+    maybeOfferInstallNudge:()=>{stopped.push('install');return false},
+    hideWin:()=>stopped.push('hide'),
+    performPostWinAction:()=>stopped.push('action'),
+  }),true);
+  assert.deepStrictEqual(stopped,['return','account']);
 }
 
-console.log('PASS: Sprint 12B onboarding and engagement baseline characterized');
+includes(onboardingSource, 'window.__PROPLET_ONBOARDING_MODEL_V3328__', 'onboarding model sentinel');
+includes(onboardingSource, "title:'Najdi PES'", 'mandatory PES tutorial');
+includes(onboardingSource, 'ONBOARD_STEPS.splice(0,ONBOARD_STEPS.length,pesStep,principleStep)', 'two-step onboarding model');
+includes(onboardingSource, "rememberSupportMode('younger')", 'younger helper default');
+includes(onboardingSource, 'window.__PROPLET_ONBOARDING_RETURN_V3332__', 'returning-player sentinel');
+includes(onboardingSource, 'class="onboarding-return-login"', 'returning-player login');
+includes(onboardingSource, 'class="onboarding-return-skip"', 'returning-player skip');
+includes(onboardingSource, "const TO='Najdi slovo ČOKOLÁDA';", 'starter copy');
+
+includes(nudgesSource, 'const WINDOW_SIZE=5;', 'difficulty five-game window');
+includes(nudgesSource, 'const FAST_REQUIRED=4;', 'difficulty four-fast-games threshold');
+includes(nudgesSource, 'const MAX_DECLINES=2;', 'difficulty decline cap');
+includes(nudgesSource, "easy:{target:'medium',thresholdMs:45000}", 'easy threshold');
+includes(nudgesSource, "medium:{target:'hard',thresholdMs:75000}", 'medium threshold');
+includes(nudgesSource, "hard:{target:'hardcore',thresholdMs:120000}", 'hard threshold');
+includes(nudgesSource, "String(getProfile?.()?.id||'guest')", 'profile-scoped difficulty state');
+includes(nudgesSource, 'if(installLifecycleBound', 'single install lifecycle owner');
+ordered(nudgesSource, ['maybeOfferFirstWinReturnNudge(action)','maybeOfferAccountNudge(action)','maybeOfferPushNudge(action)',"maybeOfferInstallNudge(action,'daily')",'performPostWinAction(action)'], 'post-win engagement');
+
+includes(app, 'window.PropletEngagementOnboarding', 'onboarding adapter');
+includes(app, 'window.PropletEngagementNudges', 'nudges adapter');
+assert(!app.includes("window.addEventListener('beforeinstallprompt'"), 'app still owns install listener');
+assert(!app.includes("window.addEventListener('appinstalled'"), 'app still owns installed listener');
+for(const legacy of ['/starter-copy-hotfix.js','/difficulty-nudge.js','/onboarding-model-v3328.js','/onboarding-return-v3332.js']){
+  assert(!theme.includes("loadScript('"+legacy), 'legacy engagement patch still loads: '+legacy);
+}
+ordered(index, ['/app/engagement/onboarding.js','/app/engagement/nudges.js','/app.js'], 'engagement bootstrap');
+includes(sw, '/app/engagement/onboarding.js', 'offline onboarding owner');
+includes(sw, '/app/engagement/nudges.js', 'offline nudges owner');
+
+(async()=>{await verifyPostWinOrder();console.log('PASS: Sprint 12B engagement owners preserve onboarding and nudge behavior')})()
+  .catch(error=>{console.error(error);process.exitCode=1});

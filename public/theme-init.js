@@ -85,9 +85,6 @@
     await loadScript('/account-auth.js?v=7','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=3','propletGameLayout');
-    loadScript('/starter-copy-hotfix.js?v=1','propletStarterCopyHotfix');
-    loadScript('/difficulty-nudge.js?v=2','propletDifficultyNudge');
-    loadScript('/onboarding-model-v3328.js?v=3','propletOnboardingModel');
     loadScript('/gesture-guard-v3325.js?v=2','propletGestureGuard');
     loadScript('/valid-word-feedback-v3330.js?v=7','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
@@ -99,7 +96,6 @@
     loadScript('/daily-win-menu-v40123.js?v=1','propletDailyWinMenuV40123');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
-    loadScript('/onboarding-return-v3332.js?v=2','propletOnboardingReturnV3332');
     loadScript('/release-notes-v3331.js?v=40132','propletReleaseNotesV3331');
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
