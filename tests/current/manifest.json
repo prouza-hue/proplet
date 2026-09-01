@@ -224,6 +224,10 @@
       {
         "path": "tests/current/test_final_debt_push_diagnostics_characterization.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_final_debt_query_bounds.py",
+        "runner": "python"
       }
     ]
   },
