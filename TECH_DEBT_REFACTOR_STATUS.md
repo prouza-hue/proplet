@@ -6,7 +6,7 @@
 - Pre-change characterization HEAD: `08757dd233889a8c41a29c98fa85b9f7b8d5c354`
 - Runtime consolidation HEAD: `9ace662a4911b6aeba6fac4fa601abcc9aee583f`
 - Final reviewed HEAD before preview: `dcb34e17436bd11e3bf9bfed274bc9393fefc2f6`
-- Stav: **implementation + characterization GREEN; preview pending**
+- Stav: **PREVIEW READY — STOP na user review**
 - Zamýšlená změna chování: žádná.
 
 ## Sprint 13B výsledek
@@ -48,13 +48,25 @@ Byte-identické proti base SHA:
 - Odstraněné CSS assety nemají stale reference v `theme-init.js`, `index.html` ani `sw.js`.
 - P0/P1 diff review: bez nálezu.
 
-## Zbývá
+## Preview
 
-1. Vercel preview READY.
-2. `/api/health` ok=true, DB true.
-3. Build/runtime error scan.
-4. User preview review.
-5. STOP — bez explicitního schválení žádný merge a žádný Sprint 14.
+- Deployment: `dpl_81miuvjBgYWFdSG4g3M1vydmgL4P` — READY.
+- Preview URL: `https://proplet-i4w0a7gc6-pavel-prouzas-projects.vercel.app/`.
+- `/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- `/app-play.css?v=40140-s13b`: 200.
+- `/app-onboarding.css?v=40140-s13b`: 200.
+- `/app-profile-settings.css?v=40140-s13b`: 200.
+- `/theme-init.js?v=40140-s13b`: 200; načítá všechny tři nové ownery.
+- Build error scan: čistý.
+- Preview runtime `error/fatal` scan: žádné záznamy.
+- Finální docs-only CI run `33530975640`: current gate GREEN + visual matrix GREEN.
+
+## STOP
+
+Čeká se na explicitní vizuální schválení uživatele. Bez něj:
+- **nemergovat do `main`**;
+- **nezačínat Sprint 14**;
+- nedělat produkční deployment.
 
 ## Předchozí uzavřený stav
 
