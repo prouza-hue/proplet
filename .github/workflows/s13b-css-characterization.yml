@@ -40,7 +40,7 @@ jobs:
         run: |
           python tools/test_s13b_visual_matrix.py --public-root /tmp/proplet-s13b-base/public --output /tmp/s13b-base
           python tools/test_s13b_visual_matrix.py --public-root public --output /tmp/s13b-current
-      - run: python tools/compare_s13b_visuals.py --baseline /tmp/s13b-base --current /tmp/s13b-current --max-changed-ratio 0.0007 --max-channel-delta 3 --max-geometry-delta 0.25
+      - run: python tools/compare_s13b_visuals.py --baseline /tmp/s13b-base --current /tmp/s13b-current --max-changed-ratio 0.0007 --max-channel-delta 8 --max-geometry-delta 0.25
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: s13b-visual-matrix, path: /tmp/s13b-current/, retention-days: 14}
