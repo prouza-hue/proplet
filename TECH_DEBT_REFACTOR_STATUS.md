@@ -5,7 +5,8 @@
 - Base SHA: `b3579b2957dc38cf83798fc05c86546a8949ddf7` (uzavřený produkční Sprint 12B.1)
 - Characterization: `417dc8200159a589497186b5065f9e5aa1d89692`
 - Runtime: `86263e4aabd71119c2fb33efef2d587ea29dfd7c`
-- Stav: **GREEN / PREVIEW QA PASS / STOP PŘED MERGE A RANKINGS**
+- Merge: `95500f07b95c54b864c4df383464d0793ed5078d`
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Zamýšlená změna chování: žádná; pouze přesun vlastnictví při zachování výběru, fresh/replay a release CTA.
 - Rozsah:
   - `public/app/content/progression.js` + Daily orchestrace;
@@ -31,12 +32,13 @@
   - browser fresh-state: Daily homescreen, `Hrát Denní výzvu`, release banner `Hrát novinky`, Free → Daily → Daily stabilní;
   - opakovaná Daily navigace zachovala datum i CTA a nepřidala page console error/warning;
   - preview runtime error/fatal log scan za poslední hodinu je čistý.
-- Testy FAIL / mimo scope: Gen4 workflow dál padá výhradně na známém `ResultCreate must carry calm_mode`; žádný nový failure tohoto řezu.
-- Nově nalezená rizika: PWA shell je na vědomém limitu 24 assetů; mixed-cache cesta je krytá novým query boundary a pasivním shimem. Známý historický Gen4 failure `ResultCreate must carry calm_mode` je mimo scope.
-- PR: draft #96 — `https://github.com/prouza-hue/proplet/pull/96`.
-- Bezpečný bod pokračování: STOP. Po uživatelském review lze samostatně rozhodnout o merge; `rankings/rankings.js` nezačínat před uzavřením tohoto řezu.
-- Produkce/main/Supabase: **beze změny po založení branche**. Žádná migrace.
-- Další povolený sprint: žádný před samostatným review a schválením tohoto řezu.
+- Testy FAIL / mimo scope: Gen4 workflow dál padá na `ResultCreate must carry calm_mode`. Jde o zastaralou statickou kontrolu, která hledá model přímo v `server.py`, ačkoli model i `calm_mode` už správně vlastní `backend/contracts.py`; nejde o runtime vadu.
+- Nově nalezená rizika: PWA shell je na vědomém limitu 24 assetů; mixed-cache cesta je krytá novým query boundary a pasivním shimem. Gen4 kontrolu opravit samostatným test-only hotfixem, aby CI znovu dávalo spolehlivý signál.
+- PR #97: **MERGED** — `https://github.com/prouza-hue/proplet/pull/97`; nahrazuje draft #96, který GitHub konektor nedokázal přepnout do ready stavu.
+- Produkce: deployment `dpl_2n3uKFk1okdT8ErfJt7vxkrsiLrr` je **READY** na merge SHA; `hrajproplet.cz`, health a oba nové content moduly vracejí 200, DB true a error/fatal scan je čistý.
+- Supabase: beze změny. Žádná migrace.
+- Rollback: revert merge commitu `95500f07b95c54b864c4df383464d0793ed5078d`; bez DB/content rollbacku.
+- Další povolený krok: samostatný test-only hotfix Gen4 kontroly; poté třetí řez Sprintu 12B — `rankings/rankings.js`.
 
 ## Předchozí uzavřený stav
 
