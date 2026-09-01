@@ -10,6 +10,7 @@ push = (ROOT / "push_diagnostics_v3329.py").read_text(encoding="utf-8")
 migration = (ROOT / "SUPABASE_MIGRATION_V4_01_14.sql").read_text(encoding="utf-8")
 vercel = (ROOT / "vercel.json").read_text(encoding="utf-8")
 analytics = (ROOT / "ANALYTICS_V4_CZ.md").read_text(encoding="utf-8")
+product_registry = (ROOT / "public" / "analytics-event-registry.json").read_text(encoding="utf-8")
 
 assert "alter column player_id drop not null" in migration
 assert "push_subscriptions_actor_check" in migration
@@ -19,7 +20,7 @@ assert "idx_push_subscriptions_anonymous_id" in migration
 assert 'x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID")' in server
 assert 'actor = telemetry_actor(authorization, x_proplet_anon_id)' in server
 assert '"pushSubscriptions": 0' in server
-assert '"push_daily_opened", "push_weekly_opened", "push_content_opened"' in server
+for event in ("push_daily_opened", "push_weekly_opened", "push_content_opened"):\n    assert f'"{event}"' in product_registry
 assert '"anonymous_id": sub.get("anonymous_id")' in server
 
 for event in (

@@ -18,6 +18,7 @@ RUNTIME = ROOT / "public" / "runtime-meta.js"
 SW = ROOT / "public" / "sw.js"
 RELEASE_NOTES = ROOT / "public" / "release-notes-v3331.js"
 HINTS = ROOT / "public" / "app" / "game" / "hints.js"
+PRODUCT_REGISTRY = ROOT / "public" / "analytics-event-registry.json"
 REWARD_XP = 200
 
 
@@ -185,6 +186,7 @@ def main() -> None:
     sw = SW.read_text(encoding="utf-8")
     release_notes = RELEASE_NOTES.read_text(encoding="utf-8")
     hints = HINTS.read_text(encoding="utf-8") if HINTS.exists() else app
+    product_registry = PRODUCT_REGISTRY.read_text(encoding="utf-8")
     for marker in (
         "const TAJENKA_PREVIEW=",
         "let TAJENKA_AVAILABLE=",
@@ -222,7 +224,7 @@ def main() -> None:
         "tajenka_abandoned",
         "push_tajenka_opened",
     ):
-        assert f'"{event}"' in server, event
+        assert f'"{event}"' in product_registry, event
 
     assert "TAJENKA_REWARD_XP = 200" in server
     assert 'payload.mode not in ("daily", "free", "starter", "tajenka")' in server

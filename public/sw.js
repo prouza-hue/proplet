@@ -1,7 +1,7 @@
 const SHELL_CACHE='proplet-v4.01.40-game-session-shell';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
-const SHELL=['/','/styles.css?v=40140-s12a2r2','/app.js','/app/engagement/onboarding.js?v=40140-s12b1','/app/engagement/nudges.js?v=40140-s12b1','/app/content/progression.js?v=40140-s12b2','/app/content/daily.js?v=40140-s12b2','/app/rankings/rankings.js?v=40140-s12b3','/app/core/api-client.js','/app/analytics.js?v=40140-s15','/app/core/storage.js','/app/account/session.js','/app/account/tajenka-storage.js','/app/account/account.js','/app/game/state.js','/app/game/board.js','/app/game/input.js','/app/game/hints.js','/app/core/completion-pipeline.js','/app/core/result-queue.js','/theme-init.js?v=40140-s13b','/runtime-meta.js','/analytics-init.js','/quality-v334.css?v=4','/quality-v334.js?v=40132','/quality-v334-core-v40114.js?v=40132'];
+const SHELL=['/','/styles.css?v=40140-s12a2r2','/app.js','/app/engagement/onboarding.js?v=40140-s12b1','/app/engagement/nudges.js?v=40140-s12b1','/app/content/progression.js?v=40140-s12b2','/app/content/daily.js?v=40140-s12b2','/app/rankings/rankings.js?v=40140-s12b3','/app/core/api-client.js','/app/analytics.js?v=40140-s15','/app/core/storage.js','/app/account/session.js','/app/account/tajenka-storage.js','/app/account/account.js','/app/game/state.js','/app/game/board.js','/app/game/input.js','/app/game/hints.js','/app/core/completion-pipeline.js','/app/core/result-queue.js','/theme-init.js?v=40140-s13b','/runtime-meta.js','/quality-v334.css?v=4','/quality-v334.js?v=40132','/quality-v334-core-v40114.js?v=40132'];
 
 async function putIfOk(cacheName,request,response){
   if(!response?.ok)return response;
