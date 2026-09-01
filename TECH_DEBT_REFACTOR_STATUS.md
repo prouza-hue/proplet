@@ -3,19 +3,35 @@
 - Sprint: 12B.1 — onboarding a engagement nudges orchestration
 - Branch: `refactor/s12b-onboarding`
 - Base SHA: `2fe6010889c1a6eb185c45d37577a0a785986782` (uzavřený produkční Sprint 12A.2)
-- Stav: **ZAHÁJENO / READ-ONLY MAPOVÁNÍ / BEZ RUNTIME ZMĚN**
+- Characterization: `5a2599afb83dad3b62b298e5e89cf47e5899cb53`
+- Runtime: `d6601493f2026f8848e9c023ae89256c76c06fa7`
+- QA hardening: `90d0b46b531a4cc6f92ac05f81cf64133714c010`
+- Stav: **IMPLEMENTACE GREEN / PREVIEW READY / STOP PRO USER QA**
 - Rozsah:
-  - pouze `engagement/onboarding.js` + `engagement/nudges.js`;
+  - pouze `public/app/engagement/onboarding.js` + `public/app/engagement/nudges.js`;
   - starter/helper/install/account/push CTA a jejich lifecycle;
   - Daily orchestration a rankings jsou mimo tento řez a zůstávají za STOP bránou.
-- Dosud:
-  - založena branch z přesného produkčního main;
-  - načten plán Sprintu 12B a audit Finding 3;
-  - probíhá mapování globálních vlastníků, wrapperů, listenerů, observerů a timeoutů;
-  - produkční 12A.2 rollout ověřen bez chyb.
-- Omezení pracovního běhu: lokální checkout/runner je momentálně nedostupný; před runtime změnou je nutný characterization checkpoint a zelený Current Runtime Gate přes bezpečně dostupný runner/CI.
+- Výsledek:
+  - onboarding owner sjednocuje PES/principle model, returning-player cestu, starter copy a starter hint eligibility;
+  - nudges owner sjednocuje difficulty observer, install lifecycle a pořadí post-win nabídek return → account → push → install → akce;
+  - `app.js` ponechává kompatibilní adaptéry pro existující account/push wrappery;
+  - `theme-init.js` už nenačítá čtyři původní engagement patche; nové moduly se načítají před `app.js` a jsou v offline shellu;
+  - opakované načtení/instalace zachová jediného ownera, jeden difficulty observer a jednu dvojici install listenerů.
+- Ověření:
+  - Current Runtime Gate #37: **44 PASS / 0 FAIL**;
+  - Assets: **80 PASS / 0 FAIL** (72 lokálních referencí);
+  - Syntax: **222 PASS / 0 FAIL**;
+  - DOM fixture ověřuje dvojí evaluaci bez duplicitního observeru/listenerů;
+  - historický Gen4 workflow dál padá pouze na známém nesouvisejícím `ResultCreate must carry calm_mode`.
+- Preview:
+  - deployment `dpl_98s8wJepq6T1NXESanpugBcCKd49`: **READY**;
+  - stable alias: `https://proplet-git-refactor-s12b-onboarding-pavel-prouzas-projects.vercel.app`;
+  - `/`, `/api/health` a oba engagement moduly vracejí 200;
+  - health hlásí Proplet 4.01.40, `ok=true`, DB true; HTML i SW odkazují na oba nové ownery.
+- PR: draft #95 — `https://github.com/prouza-hue/proplet/pull/95`.
 - Produkce/main/Supabase: **beze změny oproti uzavřenému 12A.2**. Žádná migrace.
-- Další krok: dokončit mapu a characterization test; runtime neměnit bez zeleného test-only checkpointu.
+- Rollback: zavřít PR/resetnout branch na `2fe6010889c1a6eb185c45d37577a0a785986782`; bez DB/content rollbacku.
+- Další krok: user preview onboarding/starter/post-win CTA; merge pouze po explicitním schválení. Teprve poté lze otevřít další samostatný řez Sprintu 12B.
 
 ## Předchozí uzavřený stav
 
