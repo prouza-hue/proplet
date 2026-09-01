@@ -39,7 +39,7 @@ else:
         assert old not in theme, old
     for new in ["/app-play.css","/app-profile-settings.css","/app-onboarding.css"]: assert new in theme
     assert "#screen-daily.home-layout-active .daily-hero" in read("public/app-play.css")
-    assert "#screen-free .difficulty-grid" in read("public/app-play.css")
+    assert "#screen-free .difficulty-grid" in read("public/desktop-layout-v3330.css")
     assert "#screen-profile .achievement-card" in read("public/app-profile-settings.css")
     assert "#screen-profile.settings-open.active" in read("public/app-profile-settings.css")
     assert ".onboard-principle" in read("public/app-onboarding.css")
