@@ -4,51 +4,45 @@
 - Branch: `refactor/s13a-css-game`
 - Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
 - Pre-change characterization: `db4522639a558b7a359dd002a20d5179ea3dc347`
-- Runtime CSS HEAD: `c47d7291bbc000c5d6239b884c0dcbcb6338e427`
-- Stav: **preview feedback fix pending validation**
-- Zamýšlená změna chování: žádná.
+- Final branch/runtime SHA: `5d69e4dedbf17f049adb8905d4dbb2c028f454f1`
+- Merge: `69999b85df5f9841e38315683ba89dec10ce7b5d` (PR #101)
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
+- Zamýšlená změna chování: žádná; jediná user-approved preview korekce je sjednocení mobilního rozestupu výsledkových akcí na 7 px.
 
-## Sprint 13A změna
+## Sprint 13A výsledek
 
 - `public/game.css` je kanonický owner pro Fold/tablet + desktop game responsive pravidla.
 - `public/results.css` je kanonický owner pro result actions + comparison density + responsive result pravidla.
 - `public/desktop-layout-v3330.css` obsahuje už jen app-screen desktop pravidla; 13B scope nebyl rozšířen.
 - `public/copy-density-v3327.css` už neobsahuje result comparison pravidla.
 - Odstraněny: `game-layout-v3323.css`, `win-actions-v3324.css`, `result-layout-v3330.css`.
-- `theme-init.js`, `index.html` a PWA shell používají nový cache boundary `40140-s13a`.
+- Net počet patch stylesheetů: -1.
+- Herních 92× `!important` bylo úmyslně zachováno; bez důkazu nebyl proveden specificity cleanup.
 - `styles.css`, DOM, gameplay JS, copy, XP, API, DB, Supabase a content jsou beze změny.
-- Net počet patch stylesheetů: -1. Herních 92× `!important` bylo úmyslně zachováno; bez důkazu nebyl proveden specificity cleanup.
+- PWA/cache boundary: `theme-init.js?v=40140-s13a2`; results asset `results.css?v=40140-s13a2`.
 
-## Characterization a review
+## Ověření
 
 - Current Runtime Gate: GREEN.
-- Finální branch CI před preview: run `33505210606` GREEN.
-- 14-case browser matrix: GREEN proti přesnému pre-change SHA ve stejném CI runneru.
-- Visual diff: max changed-pixel ratio `0.00030544` (0,0305 %), max channel delta `2`, max geometry delta `0.0 px`; limity zůstaly `0.0005 / 3 / 0.25 px`.
-- Dynamický timer byl ve fixture zmrazen; předchozí 00:01→00:02 false positive nebyl maskován zvýšením tolerance.
+- Sprint 13A current + visual run `33524941179`: GREEN po rerunu známého Chromium raster noise.
+- 14-case browser matrix: GREEN; phone-only schválený action gap kontrakt = 7 px; Fold/desktop beze změny.
 - Game consolidation ověřena byte-exaktním přeskupením původních bloků.
-- Results consolidation ověřena byte-exaktním přeskupením původních bloků.
-- Staré CSS reference nejsou v aktuálním `theme-init.js`, `index.html` ani `sw.js`.
-- P0/P1 review: bez nálezu.
-
-## Preview
-
-- Stable alias: `https://proplet-git-refactor-s13a-css-game-pavel-prouzas-projects.vercel.app/`
-- Vercel: READY.
-- `/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- Results consolidation ověřena byte-exaktním přeskupením původních bloků + jediná preview korekce 7 px na telefonu.
+- PR #101 checks: `gen4-contract` SUCCESS, `current-runtime` SUCCESS, Vercel SUCCESS.
+- User preview: **SCHVÁLENO**.
+- Produkce: deployment `dpl_BjfVXVSJzFrCsZxjRGYZ3KjVuZYL` na merge SHA je **READY**.
+- `https://hrajproplet.cz/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
 - `/game.css?v=40140-s13a`: 200.
-- `/results.css?v=40140-s13a`: 200.
-- `/theme-init.js?v=40140-s13a`: 200; obsahuje nové game/results ownery a žádný starý CSS asset.
+- `/results.css?v=40140-s13a2`: 200.
+- `/theme-init.js?v=40140-s13a2`: 200; obsahuje nové game/results ownery a žádný odstraněný CSS asset.
 - Build error scan: čistý.
-- Runtime `error/fatal` scan pro preview deployment: žádné záznamy.
-- Rollback runtime: `db4522639a558b7a359dd002a20d5179ea3dc347`.
+- Production runtime `error/fatal` scan: žádné záznamy.
+- Supabase / DB / content: beze změny.
+- Rollback: revert merge commitu `69999b85df5f9841e38315683ba89dec10ce7b5d`; bez DB/content rollbacku.
 
-## STOP
+## Další krok
 
-Preview feedback #2: uživatel chce přesně sjednotit mobilní rozestup. Mezi modrým a červeným CTA je 7 px, proto se červené → Znovu/Menu mění z 14 px na stejných 7 px. Fold/desktop beze změny. Bez něj:
-- **nemergovat do `main`**;
-- **nezačínat Sprint 13B**;
-- nedělat produkční deployment.
+Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokynu uživatele.**
 
 ## Předchozí uzavřený stav
 
@@ -350,5 +344,6 @@ Preview feedback #2: uživatel chce přesně sjednotit mobilní rozestup. Mezi m
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
