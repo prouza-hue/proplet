@@ -7,7 +7,7 @@
 - Scope: Daily/free/profile/settings/rankings/onboarding/modals; bez redesignu.
 - Runtime změny: žádné.
 - Inventura: čisté ownery home/today/onboarding/profile/settings/push/account-auth/desktop; smíšené `ranking-polish`, `gesture-guard`, `quality-v334`, challenge/result vrstvy se nesmí plošně přesouvat.
-- Povinná brzda: current gate + 19-case same-run screenshot matrix proti přesnému base SHA.
+- Povinná brzda: current gate + 19-case same-run screenshot matrix proti přesnému base SHA. Pre-change renderer noise po vypnutí transition/animation: max channel delta 6 bez geometry/pixel-ratio driftu; fixovaný gate = 0,07 % pixelů / channel 8 / geometry 0,25 px.
 - STOP: bez preview schválení nemergovat a nezačínat Sprint 14.
 
 ## Předchozí uzavřený stav
