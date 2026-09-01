@@ -42,7 +42,7 @@ cron_pos = push.index('subscriptions = db_select("push_subscriptions")')
 admin_pos = push.index('@app.get("/api/admin/push-diagnostics")')
 assert cron_pos < admin_pos
 
-by_id = {entry["id"]: entry for entry in manifest["entries"]}
+by_id = {entry["id"]: entry for entry in manifest["files"]}
 assert by_id["v4.01.38-atomic-result"]["status"] == "current-history"
 assert by_id["v4.01.39-query-bounds"]["status"] == "current-history"
 
