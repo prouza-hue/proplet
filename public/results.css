@@ -258,5 +258,5 @@ html[data-theme="dark"] #winModal .win-details{border-top-color:#3a3544}
 
 /* Sprint 13A preview review: restore breathing room between challenge CTA and utility actions on phone only. */
 @media(max-width:480px){
-  #winModal .win-main-actions + .win-secondary-actions{margin-top:14px}
+  #winModal .win-main-actions + .win-secondary-actions{margin-top:7px}
 }

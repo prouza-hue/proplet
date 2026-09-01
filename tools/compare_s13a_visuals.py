@@ -60,8 +60,8 @@ def main():
                 failures.append(f"{case_id}: {key} geometry delta {delta:.3f}px")
         if intentional_phone_spacing:
             gap=nm.get("mainSecondaryGap")
-            if gap is None or abs(float(gap)-14.0)>args.max_geometry_delta:
-                failures.append(f"{case_id}: approved main/secondary gap expected 14px, got {gap!r}")
+            if gap is None or abs(float(gap)-7.0)>args.max_geometry_delta:
+                failures.append(f"{case_id}: approved main/secondary gap expected 7px, got {gap!r}")
             ratio,max_delta,old_size,new_size=pixel_diff(args.baseline/f"{case_id}.png",args.current/f"{case_id}.png")
         else:
             ratio,max_delta,old_size,new_size=pixel_diff(args.baseline/f"{case_id}.png",args.current/f"{case_id}.png")

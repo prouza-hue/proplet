@@ -45,7 +45,7 @@
 
 ## STOP
 
-Uživatel našel jedinou regresi: příliš malý odstup mezi challenge CTA a Znovu/Menu na telefonu; Fold je správně. Opravuje se pouze <=480 px na 14 px. Bez něj:
+Preview feedback #2: uživatel chce přesně sjednotit mobilní rozestup. Mezi modrým a červeným CTA je 7 px, proto se červené → Znovu/Menu mění z 14 px na stejných 7 px. Fold/desktop beze změny. Bez něj:
 - **nemergovat do `main`**;
 - **nezačínat Sprint 13B**;
 - nedělat produkční deployment.

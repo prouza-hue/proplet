@@ -152,6 +152,6 @@ else:
 # User-approved preview correction: phone-only breathing room; Fold/tablet must stay outside this breakpoint.
 results_css = read("public/results.css")
 assert "@media(max-width:480px)" in results_css
-assert "#winModal .win-main-actions + .win-secondary-actions{margin-top:14px}" in results_css
+assert "#winModal .win-main-actions + .win-secondary-actions{margin-top:7px}" in results_css
 
 print("PASS Sprint 13A CSS characterization")
