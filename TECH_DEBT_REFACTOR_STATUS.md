@@ -3,20 +3,44 @@
 - Sprint: 15 — Analytics adapter a event registry
 - Branch: `refactor/s15-analytics-adapter`
 - Base SHA: `af088886d33d83ce2a2748a1fded6a6d7fffd7cc`
-- Stav: **characterization**
+- Characterization HEAD: `c6811bd06820913aa9eae7de2825feefb194d070`
+- Stav: **implementation candidate / post-change gate pending**
 - Zamýšlená změna chování: žádná.
-- Scope: product analytics pouze; kritická gameplay/completion telemetry, challenge/account-bonus telemetry a historické agregace jsou mimo tento sprint.
-- Baseline kontrakt:
-  - 132 povolených `/api/product-event` event names po rozbalení dynamických families;
-  - request body pouze `{event_type}`; žádné custom properties ani nová PII;
-  - jeden request na event, best-effort failure;
-  - existující navigation/session/impression dedup guards zachovat.
-- Characterization:
-  - `tests/current/s15-product-events-baseline.json`;
-  - `tests/current/test_s15_analytics_characterization.py`;
-  - test je přidaný do `tests/current/manifest.json`.
-- Batching/agregace: **NEZAPÍNAT** — samostatná změna až po měření.
-- STOP: neměnit product metrics, retention definice ani historické agregace; bez preview schválení nemergovat ani nezačínat Sprint 16.
+
+## Baseline contract
+
+- 132 povolených `/api/product-event` event names.
+- Request body pouze `{event_type}`; žádné custom properties ani nová PII.
+- Jeden request na event; best-effort failure nesmí blokovat UI/gameplay/navigation.
+- Existující navigation/session/impression dedup guards zůstávají.
+- Kritická telemetry `attempt/start/checkpoint/finish`, hint/helper, challenge a account-bonus zůstává mimo product analytics.
+- Batching, session buffer a změny admin agregací jsou mimo Sprint 15.
+
+## Implementation candidate
+
+- `public/analytics-event-registry.json`: kanonický registry 132 eventů + transport/PII metadata.
+- `public/app/analytics.js`: jediný product-event transport adapter; 1 track = 1 POST; caller properties jsou stejně jako baseline ignorovány.
+- `backend/analytics.py`: explicitní registry validation + přesně stejný `product_events` row writer.
+- `server.py`: HTTP endpoint/signature/rate-limit/actor/error/response zachovány, interně deleguje na analytics service.
+- `trackProductEvent()`: zůstává kompatibilní wrapper; při mixed-cache absenci adapteru zachová původní direct request.
+- `index.html` + PWA shell: přidán nový adapter asset.
+- `docs/ANALYTICS_EVENT_REGISTRY.md`: explicitní PII audit, scope a change protocol.
+- `build_quality_report()`, `/api/admin/launch` a historické metriky/agregace se nemění.
+
+## Characterization
+
+- Pre-change PR #104 current-runtime: **GREEN**.
+- Golden fixture: `tests/current/s15-product-events-baseline.json`.
+- Pre-change server parity: všech 132 eventů accepted, unknown event 400, exact DB row keys.
+- Adapter test candidate ověřuje one-request/event, event_type-only payload, preview disable a non-blocking sync/async failure.
+
+## STOP
+
+Post-change current-runtime + diff review + Vercel preview musí být GREEN. Bez explicitního user schválení:
+- nemergovat do `main`;
+- neměnit event/retention semantics;
+- nezapínat batching/agregaci;
+- nezačínat Sprint 16.
 
 ## Předchozí stav
 
@@ -441,5 +465,6 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 

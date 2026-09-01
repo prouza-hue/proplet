@@ -21,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from content_archive import archived_puzzle_info, daily_window_id, daily_window_puzzle_id, load_catalog
 from backend import content as domain_content
 from backend import db as backend_db
+from backend import analytics as product_analytics
 from backend import rankings as ranking_queries
 from backend import results as result_domain
 from backend.config import (
@@ -1898,51 +1899,18 @@ def product_event(
 ):
     enforce_rate_limit(request, "product_event", limit=300, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
-    allowed = {
-        "app_open", "app_session_started",
-        "screen_daily_viewed", "screen_free_viewed", "screen_leaderboard_viewed", "screen_profile_viewed",
-        "onboarding_started", "onboarding_tutorial_completed", "onboarding_support_selected",
-        "onboarding_support_selected_none", "onboarding_support_selected_beginner",
-        "onboarding_support_selected_younger", "onboarding_support_selected_older", "onboarding_completed",
-        "helper_onboarding_started", "helper_default_applied", "onboarding_principle_shown", "onboarding_principle_completed",
-        "onboarding_login_clicked", "onboarding_login_authenticated", "onboarding_skipped_known_player",
-        "onboarding_returning_state_detected", "onboarding_skipped_returning_state",
-        "account_nudge_shown", "account_nudge_create", "account_nudge_login", "account_nudge_dismissed",
-        "account_authenticated", "account_created", "account_logged_in",
-        "starter_started", "starter_hint_offer_shown", "starter_hint_used", "starter_reset",
-        "starter_word_1_completed", "starter_word_2_completed", "starter_word_3_completed", "starter_completed",
-        "starter_hard_choice_shown", "starter_hard_direct_selected", "starter_easy_warmup_selected", "starter_easy_warmup_completed",
-        "win_account_cta_shown", "win_account_cta_create", "win_account_cta_authenticated",
-        "pwa_install_nudge_shown", "pwa_install_profile_closed", "pwa_install_nudge_dismissed",
-        "pwa_install_ios_hint_ack", "pwa_install_native_accepted", "pwa_install_native_dismissed",
-        "pwa_install_profile_opened", "pwa_installed",
-        "push_nudge_shown", "push_nudge_accepted", "push_nudge_dismissed", "push_permission_denied",
-        "first_win_return_nudge_shown", "first_win_return_nudge_accepted", "first_win_return_nudge_dismissed",
-        "push_daily_enabled", "push_daily_disabled", "push_content_enabled", "push_content_disabled",
-        "push_notifications_enabled", "push_notifications_disabled", "push_notifications_auto_repaired",
-        "push_daily_opened", "push_weekly_opened", "push_content_opened", "push_return_opened", "push_tajenka_opened",
-        "pwa_update_detected", "pwa_update_applied", "legacy_origin_update_shown", "legacy_origin_update_opened",
-        "content_drop_cta_clicked",
-        "tajenka_viewed", "tajenka_started", "tajenka_word_found", "tajenka_completed", "tajenka_abandoned",
-        "progress_guard_desktop_shown", "progress_guard_mobile_shown", "progress_guard_dismissed",
-        "progress_guard_google_selected", "progress_guard_other_account_selected",
-        "calm_preference_enabled", "calm_preference_disabled", "calm_run_enabled",
-        "difficulty_nudge_shown", "difficulty_nudge_accepted", "difficulty_nudge_declined",
-        "valid_nonsolution_failsafe_shown", "valid_nonsolution_detected",
-        "word_discovery_claim_rejected",
-        *{f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")},
-        *{f"difficulty_nudge_{action}_{source}_{target}" for action in ("shown", "accepted", "declined") for source, target in (("easy", "medium"), ("medium", "hard"), ("hard", "hardcore"))},
-        *{f"difficulty_nudge_followup_{step}" for step in (1, 2, 3)},
-        *{f"difficulty_nudge_followup_{step}_{target}" for step in (1, 2, 3) for target in ("medium", "hard", "hardcore")},
-    }
-    if payload.event_type not in allowed:
-        raise HTTPException(400, "Neplatný product event")
-    db_insert("product_events", {
-        "id": str(uuid.uuid4()), "player_id": actor.get("player_id"), "anonymous_id": actor.get("anonymous_id"),
-        "event_type": payload.event_type, "app_version": client_app_version(request), "created_at": datetime.now(TZ).isoformat(),
-    })
+    try:
+        product_analytics.record_product_event(
+            payload.event_type,
+            actor=actor,
+            app_version=client_app_version(request),
+            insert_fn=db_insert,
+            event_id=str(uuid.uuid4()),
+            created_at=datetime.now(TZ).isoformat(),
+        )
+    except product_analytics.UnknownProductEvent:
+        raise HTTPException(400, "Neplatný product event") from None
     return {"ok": True}
-
 
 @app.post("/api/team-pin")
 def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[str] = Header(default=None)):

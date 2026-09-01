@@ -11,23 +11,49 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = json.loads((ROOT / "tests/current/s15-product-events-baseline.json").read_text(encoding="utf-8"))
 APP = (ROOT / "public/app.js").read_text(encoding="utf-8")
 CONTRACTS = (ROOT / "backend/contracts.py").read_text(encoding="utf-8")
+INDEX = (ROOT / "public/index.html").read_text(encoding="utf-8")
+SW = (ROOT / "public/sw.js").read_text(encoding="utf-8")
+REGISTRY_PATH = ROOT / "public/analytics-event-registry.json"
+ADAPTER_PATH = ROOT / "public/app/analytics.js"
+SERVICE_PATH = ROOT / "backend/analytics.py"
 
 old_transport = (
     "function trackProductEvent(eventType){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)return;"
     "api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}"
 )
-assert old_transport in APP
+implemented = REGISTRY_PATH.is_file() and ADAPTER_PATH.is_file() and SERVICE_PATH.is_file()
+
 assert FIXTURE["endpoint"] == "/api/product-event"
 assert FIXTURE["method"] == "POST"
 assert FIXTURE["request_fields"] == ["event_type"]
 assert FIXTURE["pii_policy"]["custom_properties_sent"] is False
 assert "class ProductEventCreate(BaseModel):\n    event_type: str = Field(min_length=2, max_length=40)" in CONTRACTS
 
+if implemented:
+    registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    assert registry["events"] == FIXTURE["events"]
+    assert registry["request_fields"] == ["event_type"]
+    assert registry["pii_policy"]["custom_properties_sent"] is False
+    assert '/app/analytics.js?v=40140-s15' in INDEX
+    assert "'/app/analytics.js?v=40140-s15'" in SW
+    assert "let productAnalyticsController=null;" in APP
+    assert "function productAnalytics()" in APP
+    assert "controller.track(eventType,properties)" in APP
+    # Mixed-cache fallback preserves the exact old wire contract if the new adapter is unavailable.
+    assert "api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{});" in APP
+    service = SERVICE_PATH.read_text(encoding="utf-8")
+    assert 'REGISTRY_PATH = ROOT / "public" / "analytics-event-registry.json"' in service
+    assert 'insert_fn("product_events", row)' in service
+else:
+    assert old_transport in APP
+
 # Baseline quirk: callers may pass a second argument, but product analytics sends event_type only.
 assert "trackProductEvent('starter_hint_used',{level})" in APP
 
-# Event timing / duplicate guards that must remain behavior-identical.
-assert "if(screen!==prev&&screen!=='game')trackProductEvent(`screen_${screen}_viewed`);" in APP
+# Event timing / duplicate guards must remain behavior-identical.
+assert "if(screen!==prev&&screen!='game')" not in APP  # guard uses strict JS comparison
+assert "if(screen!==prev&&screen!=='game')" in APP
+assert "trackProductEvent(`screen_${screen}_viewed`)" in APP
 assert "if(sessionStorage.getItem(ANALYTICS_SESSION_KEY)==='1')return;" in APP
 assert "if(show&&!button.dataset.impression)" in APP
 assert "trackProductEvent('win_account_cta_shown')" in APP
@@ -69,4 +95,4 @@ for (table, row), expected in zip(inserted, events):
     assert row["anonymous_id"] == "anon-hash"
     assert row["app_version"] == "4.01.40"
 
-print("PASS Sprint 15 analytics characterization: 132 events, transport, dedup and PII baseline")
+print("PASS Sprint 15 analytics characterization: 132 events, transport, dedup and PII parity")

@@ -272,6 +272,7 @@ let gameWakeLock=null;
 let resultQueueController=null;
 let resultQueueControllerIdentity=null;
 let apiClientController=null;
+let productAnalyticsController=null;
 let scopedStorageController=null;
 let accountSessionController=null;
 let tajenkaStorageController=null;
@@ -1101,7 +1102,18 @@ async function api(path,opts={}){
  try{r=await fetch(path,{...requestOptions,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}
  clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;const error=new Error(msg);error.status=r.status;throw error}return r.json();
 }
-function trackProductEvent(eventType){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)return;api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{})}
+function productAnalytics(){
+ if(productAnalyticsController)return productAnalyticsController;
+ const factory=window.PropletAnalytics;if(!factory?.create)return null;
+ productAnalyticsController=factory.create({request:(path,opts)=>api(path,opts),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)});
+ return productAnalyticsController;
+}
+function trackProductEvent(eventType,properties){
+ const controller=productAnalytics();
+ if(controller){controller.track(eventType,properties);return}
+ if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)return;
+ api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{});
+}
 function trackInboundCampaign(){
  try{const u=new URL(location.href),via=u.searchParams.get('via'),event={"push-daily":"push_daily_opened","push-weekly":"push_weekly_opened","push-content":"push_content_opened","push-return":"push_return_opened","push-tajenka":"push_tajenka_opened"}[via];if(!event)return;trackProductEvent(event);u.searchParams.delete('via');history.replaceState(history.state,'',`${u.pathname}${u.search}${u.hash}`)}catch{}
 }
