@@ -5,7 +5,7 @@
 - Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
 - Pre-change characterization: `db4522639a558b7a359dd002a20d5179ea3dc347`
 - Runtime CSS HEAD: `c47d7291bbc000c5d6239b884c0dcbcb6338e427`
-- Stav: **implementation + characterization GREEN; preview pending**
+- Stav: **PREVIEW READY — STOP na user review**
 - Zamýšlená změna chování: žádná.
 
 ## Sprint 13A změna
@@ -21,7 +21,8 @@
 
 ## Characterization a review
 
-- Current Runtime Gate: GREEN, run `33504936588`.
+- Current Runtime Gate: GREEN.
+- Finální branch CI před preview: run `33505210606` GREEN.
 - 14-case browser matrix: GREEN proti přesnému pre-change SHA ve stejném CI runneru.
 - Visual diff: max changed-pixel ratio `0.00030544` (0,0305 %), max channel delta `2`, max geometry delta `0.0 px`; limity zůstaly `0.0005 / 3 / 0.25 px`.
 - Dynamický timer byl ve fixture zmrazen; předchozí 00:01→00:02 false positive nebyl maskován zvýšením tolerance.
@@ -29,14 +30,25 @@
 - Results consolidation ověřena byte-exaktním přeskupením původních bloků.
 - Staré CSS reference nejsou v aktuálním `theme-init.js`, `index.html` ani `sw.js`.
 - P0/P1 review: bez nálezu.
-- Rollback: návrat runtime změn na `db4522639a558b7a359dd002a20d5179ea3dc347`.
 
-## Zbývá
+## Preview
 
-1. Vercel preview READY.
-2. Health `ok=true`, DB true, build/runtime error scan.
-3. Ruční preview review uživatelem.
-4. STOP — bez explicitního schválení žádný merge a žádný Sprint 13B.
+- Stable alias: `https://proplet-git-refactor-s13a-css-game-pavel-prouzas-projects.vercel.app/`
+- Vercel: READY.
+- `/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- `/game.css?v=40140-s13a`: 200.
+- `/results.css?v=40140-s13a`: 200.
+- `/theme-init.js?v=40140-s13a`: 200; obsahuje nové game/results ownery a žádný starý CSS asset.
+- Build error scan: čistý.
+- Runtime `error/fatal` scan pro preview deployment: žádné záznamy.
+- Rollback runtime: `db4522639a558b7a359dd002a20d5179ea3dc347`.
+
+## STOP
+
+Čeká se na explicitní vizuální schválení uživatele. Bez něj:
+- **nemergovat do `main`**;
+- **nezačínat Sprint 13B**;
+- nedělat produkční deployment.
 
 ## Předchozí uzavřený stav
 
@@ -338,4 +350,5 @@
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
