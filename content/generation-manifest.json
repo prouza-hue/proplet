@@ -1,0 +1,172 @@
+{
+  "$schema": "./generation-manifest.schema.json",
+  "schemaVersion": 1,
+  "manifestId": "proplet-runtime-content",
+  "manifestVersion": 1,
+  "validatorVersion": "proplet-content-s14-v1",
+  "provenance": {
+    "baselineCommit": "b8de402ad676b823f72a905289945eff6f6b3e6c",
+    "baselineRuntimeMergeCommit": "f4e5ed7455b4c09c2e303c7679dc9361dcf663c4",
+    "archiveCandidateEvidenceCommit": "d8c087fce889181cca9546865c93927e65c04a30",
+    "generation4BinderCommit": "db55f73521c84aa93278beaac4f16307eded08cc",
+    "generation4ReleaseCutoverCommit": "ea475a875bb6c28ed32dd7a972ac90add95349e8",
+    "publicDailyCompatibilityCommit": "5ffa725abecef12e21e5c2d576e386c5488b907b",
+    "mozkomorRuntimeCommit": "cf1da0b74944c8505b6af968e2b913d9543ccc55",
+    "generation4CandidateManifest": "data/gen4_release_candidate_manifest_v334.json",
+    "generation4BindingTool": "tools/bind_gen4_release.py",
+    "mozkomorSource": "data/mozkomor_final_v40132.json",
+    "compatibilitySourceCommit": "a1904574324c714526a5303f6584f3174a789f8e",
+    "compatibilitySourcePublicBlob": "d95dc7e285c23abcdd5333ef9950690025b72737",
+    "note": "Released banks are frozen inputs. Sprint 14 declares and verifies their lineage; it does not regenerate them."
+  },
+  "generation": {
+    "contentGeneration": 4,
+    "freeGeneration": 4,
+    "dailyGeneration": 4,
+    "generationKey": "gen4-v334-release-candidate",
+    "dailyGeneration4From": "2026-08-24",
+    "rollingFirstRelease": "2026-08-31",
+    "mozkomorLevels": 100
+  },
+  "canonicalBuild": {
+    "source": {
+      "path": "data/puzzles.json",
+      "role": "canonical-server-puzzle-source",
+      "sha256": "51370983c0f8a831f2706eaf45b6130e44666fe4aa8e57e309868766475ee53a",
+      "sizeBytes": 2815720,
+      "gitBlob": "06af75bef8caa285548348769f54e0c0c6977fd2"
+    },
+    "compatibilitySource": {
+      "path": "data/archive/v3.33.5/puzzles.json.gz",
+      "role": "gen3-daily-compatibility-archive",
+      "sha256": "b1754c1714827654cf308c3e4042fda119396fba2ebdb3439ca68c9bc670e5d0",
+      "sizeBytes": 719689,
+      "gitBlob": "9f318f431a92f890270fa987e88955a602bc60cd",
+      "compression": "gzip",
+      "uncompressedSha256": "aabe0e92a48024cf375b11d77cbe7841bd5665f728f553b568128aeb0f76d79a",
+      "uncompressedSizeBytes": 4958992
+    },
+    "append": {
+      "sourceCollection": "daily",
+      "sourceId": "g3-d-007",
+      "targetCollection": "daily",
+      "position": "end",
+      "itemSha256": "0267eddd8fa930f64d7e6a21a16908d7b524a4701d477b0882d5eeec0071f375",
+      "reason": "One-day Generation 4 cutover compatibility for clients that opened Sunday 2026-08-23 before deployment."
+    },
+    "serialization": {
+      "encoding": "utf-8",
+      "ensureAscii": false,
+      "separators": [",", ":"],
+      "trailingNewline": true
+    },
+    "output": {
+      "path": "public/puzzles.json",
+      "role": "public-puzzle-runtime",
+      "sha256": "09b2f3a4545ac1504de0e618a6bfa657f04c0d72f324dfb2b2eadff1b73504c7",
+      "sizeBytes": 2817259,
+      "gitBlob": "9c6c61da1407846e0504754573d8ab0737db6316"
+    }
+  },
+  "identityBuilds": [
+    {
+      "source": {
+        "path": "data/words.txt",
+        "role": "canonical-validator-lexicon",
+        "sha256": "0ce6845aea800582202a618c7da95a16d8eaf3e43921afd1c2d77d718d835047",
+        "sizeBytes": 112061,
+        "gitBlob": "a2f42ea77a90f96dcecb18438ee9124cf202831d"
+      },
+      "output": {
+        "path": "public/valid-words-v3328.txt",
+        "role": "public-validator-lexicon",
+        "sha256": "0ce6845aea800582202a618c7da95a16d8eaf3e43921afd1c2d77d718d835047",
+        "sizeBytes": 112061,
+        "gitBlob": "a2f42ea77a90f96dcecb18438ee9124cf202831d"
+      }
+    }
+  ],
+  "runtimeArtifacts": [
+    {
+      "path": "data/rolling_content_v1.json",
+      "role": "server-rolling-content",
+      "sha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "sizeBytes": 374393,
+      "gitBlob": "1c33da18a66a3e09eeee5e63e62309bd46eaa804"
+    },
+    {
+      "path": "data/content_catalog_v334.json",
+      "role": "server-content-lineage-catalog",
+      "sha256": "bce617335566801cb03142618cecb6f530687b8217c7b1a61d1412bb98a5e6a3",
+      "sizeBytes": 2466583,
+      "gitBlob": "02035cb2e9990748c7aaff563308568043e82298"
+    },
+    {
+      "path": "data/tajenka_weekend_v1.json",
+      "role": "server-tajenka-runtime",
+      "sha256": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "sizeBytes": 40393,
+      "gitBlob": "08e9d1974939152794f4f2503186417469ea815e"
+    },
+    {
+      "path": "data/gen4_release_candidate_manifest_v334.json",
+      "role": "gen4-paused-candidate-evidence",
+      "sha256": "9d71afd437300528904739a868111738a0835e0d0fe8b0138d3f3af24afdfd9b",
+      "sizeBytes": 819,
+      "gitBlob": "1061c0b9b6b4f8f3c0de486add36ac905ee86882"
+    }
+  ],
+  "generationInputs": [
+    {
+      "path": "data/source_cs_50k.txt",
+      "role": "frequency-source-input",
+      "sha256": "1fb0576ef07cf5a543789d394cde1168573fc9e7adf427fd143249fd5547458d",
+      "sizeBytes": 656472
+    },
+    {
+      "path": "data/answer_tiers.json",
+      "role": "curated-answer-tier-input",
+      "sha256": "3088dbe03fb2a0ac4d441f9338595be79a0138e2b35a3d9d7101d58a0532a799",
+      "sizeBytes": 726697
+    },
+    {
+      "path": "data/lexicon_v2.json",
+      "role": "released-lexicon-v2-input",
+      "sha256": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+      "sizeBytes": 1716041
+    },
+    {
+      "path": "data/gen4_profiles_v334.json",
+      "role": "gen4-generation-profile-input",
+      "sha256": "fa00e59fca7b35d65bf2e75d43a472abeed336ac0a658db8de404910b415174d",
+      "sizeBytes": 5039
+    },
+    {
+      "path": "data/target_generation_exclusions_v334.json",
+      "role": "gen4-target-exclusion-input",
+      "sha256": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+      "sizeBytes": 1694
+    },
+    {
+      "path": "data/puzzles_gen4_candidate_v334.json",
+      "role": "gen4-paused-puzzle-candidate-input",
+      "sha256": "13d0eb0be5d7095f03fc95db0085497b04f03d4157b1b2a207e6da44a63603a5",
+      "sizeBytes": 2547265,
+      "gitBlob": "ed69db6964d042845c4385f220b2d81fff5c143c"
+    },
+    {
+      "path": "data/rolling_content_gen4_candidate_v334.json",
+      "role": "gen4-paused-rolling-candidate-input",
+      "sha256": "7b13ca502b94d16561d9d0ead202d53f9726a9e1b665838e0304657f735af894",
+      "sizeBytes": 374451,
+      "gitBlob": "0ee440bc1b96e0152cb7e6d616845fd2b508b1e6"
+    },
+    {
+      "path": "data/mozkomor_final_v40132.json",
+      "role": "mozkomor-release-source",
+      "sha256": "eeba12024f24abca2f02c203e0136e1e57a648c112c4a0027823a38a9ba9061f",
+      "sizeBytes": 680218,
+      "gitBlob": "267e7b6aad875b3afa1a1d2e50bd1c23c76cb84d"
+    }
+  ]
+}
