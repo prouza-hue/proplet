@@ -9,6 +9,8 @@ on:
       - 'tests/current/**'
       - 'tools/test_s13a_visual_matrix.py'
       - 'tools/compare_s13a_visuals.py'
+      - 'tools/test_tajenka_preview.py'
+      - 'tools/test_v40135_profile_wide_layout.py'
       - 'TECH_DEBT_REFACTOR_STATUS.md'
       - '.github/workflows/s13a-css-characterization.yml'
   workflow_dispatch:
