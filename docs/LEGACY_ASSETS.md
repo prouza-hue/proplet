@@ -44,10 +44,15 @@ Staré testy se nemažou ani „neopravují do zelena“ jen kvůli historickém
 
 ## Preview evidence
 
-Po implementačním commitu doplnit:
+Implementation HEAD: `5eeadbdecd38aa5603b4da939143c4df2a463e77`.
 
-- current gate;
-- asset scan;
-- Vercel preview health/smoke;
-- preview request-log scan na odstraněné `/server.py`;
-- build/runtime error scan.
+- Current tests: **53 PASS / 0 FAIL**.
+- Asset scan: **77 PASS / 0 FAIL** (69 local references).
+- Syntax: **241 PASS / 0 FAIL**.
+- Vercel preview deployment `dpl_9aeEcy8PKkGe75K44DAMfmrNVxLq`: **READY**.
+- Preview root: HTTP 200.
+- Preview `/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- Build error scan: clean.
+- Preview runtime `error/fatal`: no logs.
+- Before the deliberate removal check, preview request-log scan found **no request to `/server.py`**.
+- Deliberate `GET /server.py` returns **404 Not Found**, proving the historical backend source is no longer publicly served.
