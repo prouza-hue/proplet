@@ -2,31 +2,30 @@
 
 - Sprint: 13A — CSS game/results/Fold/responsive
 - Branch: `refactor/s13a-css-game`
-- Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8` (aktuální produkční `main`; obsahuje runtime merge `f454768b843fa2542bb9fbb0ac8975f0381c87d0`)
-- Current HEAD: characterization checkpoint (tento commit; přesné SHA doplní následující baseline checkpoint)
-- Stav: **characterization**
-- Zamýšlená změna chování: žádná; behavior-preserving CSS konsolidace bez redesignu
-- Změněné runtime soubory: žádné
-- Hotové kroky:
-  - scope 13A ověřen proti handoveru, původnímu plánu a audit Finding 12; bez rozporu;
-  - branch založena z aktuálního `main`;
-  - zmapován produkční CSS load order v `index.html` a `theme-init.js`;
-  - zmapovány game/results/Fold vrstvy a jejich `!important` baseline;
-  - přidána statická characterization a reprezentativní screenshot matrix;
-  - přidán branch-only Playwright workflow, který běží nad přesným commitem z lokálního HTTP serveru.
-- Zbývající kroky:
-  - spustit a uložit baseline screenshot/hash/metrics matrix;
-  - teprve potom konsolidovat CSS ownership se zachováním cascade/specificity;
-  - current gate + visual parity + preview + nezávislé review;
-  - STOP před merge a před 13B.
-- Testy PASS: čeká se na GitHub Actions characterization run
-- Testy FAIL / nespouštěné: runtime CSS změny zatím žádné; preview zatím nevytvořeno
-- Nově nalezená rizika:
-  - `desktop-layout-v3330.css` míchá 13A game desktop pravidla s 13B app-screen pravidly; ve 13A se smí vyjmout pouze game část;
-  - `gesture-guard-v3325.css` míchá game touch ownership s onboarding tutorial pravidly; bez důkazu se ve 13A nerozděluje;
-  - výsledková pravidla jsou rozložená mezi base CSS, win-actions, copy-density a result-layout; cascade order je součást chování.
-- Bezpečný bod pokračování: characterization commit; žádný runtime CSS/loader asset zatím změněn
-- Další povolený sprint: žádný; dokončit 13A a STOP na preview review
+- Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
+- Pre-change characterization HEAD: `db4522639a558b7a359dd002a20d5179ea3dc347`
+- Current HEAD: runtime CSS consolidation candidate (exact SHA follows after commit)
+- Stav: **runtime candidate / tests pending**
+- Zamýšlená změna chování: žádná
+- Runtime scope:
+  - nový `public/game.css`: Fold/tablet + desktop game ownership;
+  - nový `public/results.css`: result actions + result density + responsive result ownership;
+  - `desktop-layout-v3330.css`: pouze app-screen desktop část (13B nedotčena);
+  - `copy-density-v3327.css`: pouze non-result část;
+  - `theme-init.js` + cache-busting query v `index.html`;
+  - odstraněny `game-layout-v3323.css`, `win-actions-v3324.css`, `result-layout-v3330.css`.
+- Cascade rozhodnutí:
+  - `desktop-layout-v3330.css` zůstává na původní pozici;
+  - `game.css` následuje bezprostředně po něm, takže desktop-game blok zůstává na původní hranici;
+  - `results.css` je na původní pozici `result-layout-v3330.css`;
+  - uvnitř `results.css` je zachováno pořadí win-actions → comparison density → result responsive;
+  - přesun časných game/result bloků přes mezilehlé stylesheety je povolen pouze proto, že characterization + selector inventory neukázaly kolizi vítězících deklarací; pixel/geometry gate je blocker.
+- Neměněno: `styles.css`, gesture/onboarding mix, DOM, JS runtime, gameplay, texty, XP, API, DB, Supabase, content.
+- Characterization před změnou: current gate GREEN; 14-case screenshot matrix GREEN; empirický renderer-noise gate <=0,05 % pixelů / delta 3 / geometrie 0,25 px.
+- Testy PASS: čeká se na post-change run
+- Preview: zatím nevytvořeno
+- Bezpečný rollback: `db4522639a558b7a359dd002a20d5179ea3dc347`
+- Další povolený krok: post-change gate -> nezávislé review -> preview -> user review STOP; bez merge a bez 13B
 
 ## Předchozí uzavřený stav
 

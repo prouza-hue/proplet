@@ -33,7 +33,7 @@ jobs:
           bad=0
           while IFS= read -r f; do
             case "$f" in
-              public/*.css|public/theme-init.js|tests/current/*|tools/test_s13a_visual_matrix.py|tools/compare_s13a_visuals.py|TECH_DEBT_REFACTOR_STATUS.md|.github/workflows/s13a-css-characterization.yml) ;;
+              public/*.css|public/theme-init.js|public/index.html|tests/current/*|tools/test_s13a_visual_matrix.py|tools/compare_s13a_visuals.py|TECH_DEBT_REFACTOR_STATUS.md|.github/workflows/s13a-css-characterization.yml) ;;
               *) echo "OUT OF SCOPE: $f"; bad=1 ;;
             esac
           done < <(git diff --name-only b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8...HEAD)

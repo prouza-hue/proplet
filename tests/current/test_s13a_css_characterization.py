@@ -25,7 +25,8 @@ consolidated = all((ROOT / p).is_file() for p in consolidated_files)
 assert baseline ^ consolidated, "13A must be either baseline or fully consolidated, never a half-applied ownership state"
 
 # Bootstrap order is behavioral: theme-init runs before the static base CSS links are parsed.
-assert index.index('/theme-init.js?v=40140-s12b3') < index.index('/styles.css?v=40140-s12a2r2')
+theme_boot='/theme-init.js?v=40140-s12b3' if baseline else '/theme-init.js?v=40140-s13a'
+assert index.index(theme_boot) < index.index('/styles.css?v=40140-s12a2r2')
 assert '/quality-v334.css?v=4' in index
 
 # Gesture ownership is intentionally not refactored in 13A because this file also owns onboarding.
