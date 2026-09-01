@@ -4,14 +4,57 @@
 - Branch: `refactor/s13b-css-app-screens`
 - Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908`
 - Pre-change characterization HEAD: `08757dd233889a8c41a29c98fa85b9f7b8d5c354`
-- Stav: **runtime consolidation candidate / visual GREEN; static test fix pending**
+- Runtime consolidation HEAD: `9ace662a4911b6aeba6fac4fa601abcc9aee583f`
+- Final reviewed HEAD before preview: `dcb34e17436bd11e3bf9bfed274bc9393fefc2f6`
+- Stav: **implementation + characterization GREEN; preview pending**
 - Zamýšlená změna chování: žádná.
-- New owners: `app-play.css`, `app-onboarding.css`, `app-profile-settings.css`.
-- Removed patch assets: home-layout, today-brand, onboarding-fit, onboarding-model, profile-layout, settings-ia, settings-polish, account-auth = 8 old → 3 new, netto **−5 stylesheets**.
-- Intentionally untouched mixed-risk owners: desktop-layout, onboarding-return, push-retention, ranking-polish, gesture-guard, quality-v334, game/results/challenge layers.
-- Characterization before runtime: current GREEN; 19-case same-run matrix GREEN; fixed gate = 0.07% pixels / channel 8 / geometry 0.25px.
-- Cache boundary moves to `theme-init.js?v=40140-s13b`.
-- Post-change 19-case visual matrix: GREEN. Current gate 47/48; jediný FAIL je chybný S13B assertion očekávající záměrně nepřesunutý Free desktop selector v app-play. Opravit test a rerun.\n- STOP after post-change gate → preview → user review. No main merge / Sprint 14 without approval.
+
+## Sprint 13B výsledek
+
+- `app-play.css` = původní `home-layout.css` + `today-brand.css`.
+- `app-onboarding.css` = původní `onboarding-fit.css` + `onboarding-model-v3328.css`.
+- `app-profile-settings.css` = původní `profile-layout-v3330.css` + `settings-ia-v40122.css` + `settings-polish-v40122.css` + `account-auth.css`.
+- 8 starých stylesheetů → 3 kanonické ownery; netto **−5 stylesheetů**.
+- Cache boundary: `theme-init.js?v=40140-s13b`.
+- JS runtime, DOM, gameplay, copy, XP, API, DB, Supabase a content jsou beze změny.
+
+## Explicitně nedotčené risk vrstvy
+
+Byte-identické proti base SHA:
+- `desktop-layout-v3330.css`
+- `onboarding-return-v3332.css`
+- `push-retention-v3329.css`
+- `ranking-polish.css`
+- `gesture-guard-v3325.css`
+- `quality-v334.css`
+- `quality-hotfix-v334.css`
+- `game.css`
+- `results.css`
+- `challenge-cta-v3333.css`
+- `competitive-sharing-v3331.css`
+- `copy-density-v3327.css`
+
+## Characterization a review
+
+- Pre-change current gate: GREEN.
+- Pre-change 19-case app-screen matrix: GREEN.
+- Fixovaný visual gate určený před runtime změnou: 0,07 % changed pixels / channel delta 8 / geometry 0,25 px.
+- Post-change Current Runtime Gate: GREEN.
+- Post-change 19-case visual matrix: GREEN.
+- Finální CI run: `33529596365` SUCCESS.
+- `app-play.css`: byte-exaktní mechanické složení původních bloků.
+- `app-onboarding.css`: byte-exaktní mechanické složení původních bloků.
+- `app-profile-settings.css`: byte-exaktní mechanické složení původních bloků; `!important` 93 = přesný součet zdrojů.
+- Odstraněné CSS assety nemají stale reference v `theme-init.js`, `index.html` ani `sw.js`.
+- P0/P1 diff review: bez nálezu.
+
+## Zbývá
+
+1. Vercel preview READY.
+2. `/api/health` ok=true, DB true.
+3. Build/runtime error scan.
+4. User preview review.
+5. STOP — bez explicitního schválení žádný merge a žádný Sprint 14.
 
 ## Předchozí uzavřený stav
 
@@ -361,6 +404,7 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
 
