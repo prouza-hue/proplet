@@ -1,5 +1,19 @@
 # Technical debt refactor status
 
+- Sprint: 13B — CSS app screens
+- Branch: `refactor/s13b-css-app-screens`
+- Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908` (uzavřený produkční Sprint 13A)
+- Stav: **characterization**
+- Scope: Daily/free/profile/settings/rankings/onboarding/modals; bez redesignu.
+- Runtime změny: žádné.
+- Inventura: čisté ownery home/today/onboarding/profile/settings/push/account-auth/desktop; smíšené `ranking-polish`, `gesture-guard`, `quality-v334`, challenge/result vrstvy se nesmí plošně přesouvat.
+- Povinná brzda: current gate + 19-case same-run screenshot matrix proti přesnému base SHA.
+- STOP: bez preview schválení nemergovat a nezačínat Sprint 14.
+
+## Předchozí uzavřený stav
+
+# Technical debt refactor status
+
 - Sprint: 13A — CSS game/results/Fold/responsive
 - Branch: `refactor/s13a-css-game`
 - Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
@@ -344,6 +358,7 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
 

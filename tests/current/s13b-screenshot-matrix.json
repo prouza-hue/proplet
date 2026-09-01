@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "phone-light-daily-safe",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {
+        "top": 47,
+        "bottom": 34
+      },
+      "state": "daily"
+    },
+    {
+      "id": "phone-dark-free",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "free"
+    },
+    {
+      "id": "phone-auto-profile-safe",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "auto",
+      "system": "dark",
+      "motion": "reduce",
+      "safe": {
+        "top": 47,
+        "bottom": 34
+      },
+      "state": "profile"
+    },
+    {
+      "id": "phone-light-settings",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "settings"
+    },
+    {
+      "id": "phone-dark-rankings",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe": {},
+      "state": "rankings"
+    },
+    {
+      "id": "phone-light-onboarding",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "onboarding"
+    },
+    {
+      "id": "phone-dark-profile-modal",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "profile-modal"
+    },
+    {
+      "id": "phone-light-release-modal",
+      "viewport": [
+        390,
+        844
+      ],
+      "screen": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "reduce",
+      "safe": {},
+      "state": "release-modal"
+    },
+    {
+      "id": "fold-portrait-dark-daily",
+      "viewport": [
+        590,
+        960
+      ],
+      "screen": [
+        384,
+        832
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "daily"
+    },
+    {
+      "id": "fold-portrait-light-profile",
+      "viewport": [
+        590,
+        960
+      ],
+      "screen": [
+        384,
+        832
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "profile"
+    },
+    {
+      "id": "fold-portrait-dark-settings",
+      "viewport": [
+        590,
+        960
+      ],
+      "screen": [
+        384,
+        832
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe": {
+        "top": 24,
+        "bottom": 24
+      },
+      "state": "settings"
+    },
+    {
+      "id": "fold-landscape-light-rankings",
+      "viewport": [
+        728,
+        656
+      ],
+      "screen": [
+        728,
+        656
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "rankings"
+    },
+    {
+      "id": "fold-landscape-dark-onboarding",
+      "viewport": [
+        728,
+        656
+      ],
+      "screen": [
+        728,
+        656
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe": {},
+      "state": "onboarding"
+    },
+    {
+      "id": "desktop-light-daily",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "daily"
+    },
+    {
+      "id": "desktop-dark-free",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "free"
+    },
+    {
+      "id": "desktop-light-profile",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "profile"
+    },
+    {
+      "id": "desktop-dark-settings",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe": {},
+      "state": "settings"
+    },
+    {
+      "id": "desktop-light-rankings",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "light",
+      "system": "light",
+      "motion": "no-preference",
+      "safe": {},
+      "state": "rankings"
+    },
+    {
+      "id": "desktop-dark-release-modal",
+      "viewport": [
+        1440,
+        900
+      ],
+      "screen": [
+        1440,
+        900
+      ],
+      "theme": "dark",
+      "system": "dark",
+      "motion": "reduce",
+      "safe": {},
+      "state": "release-modal"
+    }
+  ]
+}
