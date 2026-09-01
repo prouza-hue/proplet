@@ -12,6 +12,8 @@ const app=read('public/app.js');
 const polish=read('public/ranking-polish.js');
 const bonus=read('public/account-bonus-v3331.js');
 const modulePath=path.join(root,'public/app/rankings/rankings.js');
+const hasOwner=fs.existsSync(modulePath);
+const rankingSource=hasOwner?read('public/app/rankings/rankings.js'):app;
 
 function extractFunction(source,name){
   const start=source.indexOf(`function ${name}(`);
@@ -32,11 +34,39 @@ function extractFunction(source,name){
   throw new Error(`unterminated function ${name}`);
 }
 
-function legacyRenderer(){
+function characterizedRenderer(){
   const nodes=new Map([
     ['#xpLeaderboardList',{innerHTML:''}],
     ['#dailyLeaderboardList',{innerHTML:''}],
   ]);
+  if(hasOwner){
+    const owner=require(modulePath);
+    const handlers=new Map();
+    const buttons={
+      '.ranking-scope-tab':['players','teams'].map(value=>({dataset:{rankingXpScope:value},classList:{toggle(){}},addEventListener:(type,handler)=>handlers.set(`xp:${value}`,handler)})),
+      '.ranking-period-tab':['today','week','all'].map(value=>({dataset:{rankingPeriod:value},classList:{toggle(){}},addEventListener:(type,handler)=>handlers.set(`period:${value}`,handler)})),
+      '.ranking-daily-tab':['players','teams'].map(value=>({dataset:{rankingDailyScope:value},classList:{toggle(){}},addEventListener:(type,handler)=>handlers.set(`daily:${value}`,handler)})),
+    };
+    const controller=owner.create({
+      $:selector=>nodes.get(selector)||null,
+      $$:selector=>buttons[selector]||[],
+      api:async()=>({players:[],teams:[]}),
+      pragueDateISO:()=> '2026-09-01',
+      getProfile:()=>null,
+      esc:value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])),
+      countCz:(count,one,few,many)=>`${count} ${count===1?one:(count>=2&&count<=4?few:many)}`,
+      levelFor:points=>({current:{icon:points>=1000?'🧠':'🔰',name:points>=1000?'Myslitel':'Nováček'}}),
+      fmtTime:ms=>`${Math.floor(ms/60000)}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}`,
+      adjustAccountRankingData:data=>data,
+    });
+    controller.install();
+    return {
+      xp:(data,scope='players',period='today')=>{handlers.get(`xp:${scope}`)?.();handlers.get(`period:${period}`)?.();controller.renderXpRanking(data);return nodes.get('#xpLeaderboardList').innerHTML},
+      daily:(data,scope='players')=>{handlers.get(`daily:${scope}`)?.();controller.renderDailyRanking(data);return nodes.get('#dailyLeaderboardList').innerHTML},
+      rows:controller.rankingRows,
+      badge:controller.rankingRankBadge,
+    };
+  }
   const sandbox={
     console,
     $:selector=>nodes.get(selector)||null,
@@ -64,7 +94,7 @@ function legacyRenderer(){
   return sandbox.__rankings;
 }
 
-const rankings=legacyRenderer();
+const rankings=characterizedRenderer();
 const payload={
   players:[{
     rank:1,name:'Pavel <hráč>',avatar:'🦊',isMine:true,xp:1234,lifetimePoints:1500,
@@ -118,35 +148,62 @@ assert(rankings.xp({players:[],teams:[]},'players','today').includes('Hráči za
 assert(rankings.xp({players:[],teams:[]},'teams','today').includes('Týmy zatím nemají XP v tomto období.'),'empty XP team state drifted');
 assert(rankings.daily({players:[],teams:[]},'players').includes('Dnešní startovní rošt je zatím prázdný.'),'empty Daily state drifted');
 
+if(hasOwner){
+  const allRows=Array.from({length:12},(_,index)=>({
+    ...payload.players[0],rank:index+1,name:`Hráč ${index+1}`,isMine:index===11,
+  }));
+  const allHtml=rankings.xp({players:allRows,teams:[]},'players','all');
+  assert.strictEqual((allHtml.match(/leader-row ranking-row/g)||[]).length,11,'all-time ranking no longer shows top 10 plus own row');
+  assert(allHtml.includes('ranking-own-divider')&&allHtml.includes('Hráč 12'),'own all-time position disappeared');
+  assert(allHtml.includes('A dalších <strong>1 hráč</strong>'),'hidden all-time row count drifted');
+  const todayHtml=rankings.xp({players:allRows,teams:[]},'players','today');
+  assert.strictEqual((todayHtml.match(/leader-row ranking-row/g)||[]).length,12,'today ranking was unexpectedly sliced');
+
+  const bonusSandbox={window:null,setTimeout(){},document:{querySelector(){return null}}};
+  bonusSandbox.window=bonusSandbox;
+  vm.runInNewContext(bonus,bonusSandbox);
+  const adjust=bonusSandbox.PROPLET_ACCOUNT_BONUS_API.adjustRankingData;
+  const adjusted=adjust({players:[{lifetimePoints:750}],teams:[]});
+  assert.strictEqual(adjusted.players[0].lifetimePoints,1250,'legacy +500 XP ranking adjustment drifted');
+  const included={players:[{lifetimePoints:750}],accountRewardsIncluded:true};
+  assert.strictEqual(adjust(included),included,'server-included account reward was applied twice');
+}
+
 // Both ranking reads are deliberately concurrent. Daily is always today's Prague date;
 // XP period is the selected today/week/all state, independent of player/team scope.
-assert(app.includes('const [xpResult,dailyResult]=await Promise.allSettled(['),'ranking reads are no longer concurrent');
-assert(app.includes('api(`/api/rankings/xp?period=${rankingXpPeriod}`)'),'XP period API contract drifted');
-assert(app.includes('api(`/api/rankings/daily?daily_date=${pragueDateISO()}`)'),'Daily date API contract drifted');
-assert(app.includes("$('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams')"),'Daily team-method visibility drifted');
+assert(rankingSource.includes('const [xpResult,dailyResult]=await Promise.allSettled(['),'ranking reads are no longer concurrent');
+assert(rankingSource.includes('/api/rankings/xp?period=${rankingXpPeriod}'),'XP period API contract drifted');
+assert(rankingSource.includes('/api/rankings/daily?daily_date=${d.pragueDateISO?.()'),'Daily date API contract drifted');
+assert(rankingSource.includes("$('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams')"),'Daily team-method visibility drifted');
 
 const selectorOwners=[
-  ['.ranking-scope-tab','rankingXpScope=b.dataset.rankingXpScope'],
-  ['.ranking-period-tab','rankingXpPeriod=b.dataset.rankingPeriod'],
-  ['.ranking-daily-tab','rankingDailyScope=b.dataset.rankingDailyScope'],
+  ['.ranking-scope-tab',/rankingXpScope=\w+\.dataset\.rankingXpScope/g],
+  ['.ranking-period-tab',/rankingXpPeriod=\w+\.dataset\.rankingPeriod/g],
+  ['.ranking-daily-tab',/rankingDailyScope=\w+\.dataset\.rankingDailyScope/g],
 ];
 for(const [selector,mutation] of selectorOwners){
-  assert.strictEqual((app.match(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length>=2,true,`${selector} controls missing`);
-  assert.strictEqual((app.match(new RegExp(mutation.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length,1,`${selector} has more than one state owner`);
+  assert.strictEqual((rankingSource.match(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length>=2,true,`${selector} controls missing`);
+  assert.strictEqual((rankingSource.match(mutation)||[]).length,1,`${selector} has more than one state owner`);
 }
 assert(!polish.includes("querySelectorAll('.ranking-scope-tab')"),'ranking polish owns ranking tab lifecycle');
 assert(!polish.includes("querySelectorAll('.ranking-period-tab')"),'ranking polish owns period tab lifecycle');
 assert(!polish.includes("querySelectorAll('.ranking-daily-tab')"),'ranking polish owns Daily tab lifecycle');
-assert(!/MutationObserver/.test(`${app.slice(app.indexOf('async function renderLeaderboard'),app.indexOf('async function renderGlobalLeague'))}\n${polish}`),'rankings introduced an observer lifecycle');
+assert(!/MutationObserver/.test(`${rankingSource}\n${polish}`),'rankings introduced an observer lifecycle');
 
-// Inventory guards: today the all-time slice and account reward are stacked monkey patches.
-// The extracted owner must absorb the visual slice and keep one stable adapter for the reward layer.
-assert(polish.includes('renderXpRanking=function(data)'),'all-time top-10 behavior is no longer applied');
-assert(polish.includes("if(rankingXpPeriod!=='all')return baseRenderXpRanking(data)"),'all-time patch now affects today/week');
-assert(polish.includes('const sliced=totalXpSlice(rows)'),'all-time top-10/self slice drifted');
-assert(bonus.includes('const originalRenderXpRanking=renderXpRanking'),'account reward compatibility layer disappeared');
+// The extracted owner absorbs the all-time slice. Account bonus remains an explicit,
+// behavior-preserving dependency rather than a second renderer monkey-patch.
+if(hasOwner){
+  assert(rankingSource.includes("if(rankingXpPeriod!=='all'||rows.length<=limit)"),'all-time patch now affects today/week');
+  assert(rankingSource.includes('const sliced=totalXpSlice(rows)'),'all-time top-10/self slice drifted');
+  assert(bonus.includes('function adjustRankingData(data)'),'account reward adjustment seam disappeared');
+  assert(app.includes('adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data'),'account reward dependency is not explicit');
+  assert(!bonus.includes('renderXpRanking=function'),'account reward still monkey-patches the extracted renderer');
+}else{
+  assert(polish.includes('renderXpRanking=function(data)'),'all-time top-10 behavior is no longer applied');
+  assert(bonus.includes('const originalRenderXpRanking=renderXpRanking'),'account reward compatibility layer disappeared');
+}
 
-if(fs.existsSync(modulePath)){
+if(hasOwner){
   const source=read('public/app/rankings/rankings.js');
   const owner=require(modulePath);
   assert.strictEqual(typeof owner.create,'function','rankings owner must export create(deps)');

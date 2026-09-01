@@ -230,9 +230,6 @@ let leaderTab='daily';
 let leagueScope='family';
 let globalWeekOffset=0;
 let globalLeagueData=null;
-let rankingXpScope='players';
-let rankingXpPeriod='today';
-let rankingDailyScope='players';
 let winDailyGlobalData=null;
 let audioCtx=null;
 let toastTimer=null;
@@ -285,6 +282,7 @@ let gameInputController=null;
 let gameHintsController=null;
 let progressionController=null;
 let dailyOrchestrationController=null;
+let rankingsOrchestrationController=null;
 
 function progression(){
  if(progressionController)return progressionController;
@@ -303,6 +301,16 @@ function dailyOrchestration(){
   afterRender:()=>window.PropletHomeLayout?.applyDailyLayout?.(),
  });
  return dailyOrchestrationController;
+}
+function rankingsOrchestration(){
+ if(rankingsOrchestrationController)return rankingsOrchestrationController;
+ const factory=window.PropletRankings;if(!factory?.create)throw new Error('Rankings modul není dostupný.');
+ rankingsOrchestrationController=factory.create({
+  $,$$,api,pragueDateISO,ensureRankingProfileState,getProfile,updateAccountProfile,
+  esc,countCz,levelFor,fmtTime,adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data,
+  openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
+ });
+ return rankingsOrchestrationController;
 }
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
@@ -1325,75 +1333,23 @@ async function ensureRankingProfileState(){
  try{const fresh=await api('/api/me');updateAccountProfile({...fresh,token:p.token});return getProfile()}catch{return p}
 }
 function renderRankingPrivacyNote(){
- const box=$('#rankingPrivacyNote'),p=getProfile();if(!box)return;
- if(!p?.token){box.innerHTML='<span class="ranking-privacy-icon">👀</span><div><strong>Kompletní pořadí, soukromí zůstává</strong><small>Výsledky jsou vždy vidět. Kdo nezveřejní profil, dostane místo jména hravou anonymní přezdívku.</small></div>';return}
- const state=p.publicRankings;
- const title=state===true?'Jsi ve veřejném pořadí':state===false?'V pořadí jsi anonymně':'Vyber si, jestli chceš být vidět';
- const copy=state===true?'Ostatní vidí jen avatar, herní jméno a případně veřejný tým.':state===false?'Tvoje výsledky v pořadí zůstávají, ale ostatní u nich vidí jen anonymní přezdívku.':'Dokud volbu nepotvrdíš, tvoje výsledky se ukazují anonymně.';
- const action=state===true?'Skrýt mě':state===false?'Zobrazit mě':'Nastavit';
- box.innerHTML=`<span class="ranking-privacy-icon">👀</span><div><strong>${title}</strong><small>${copy}</small></div><button id="rankingPrivacyActionBtn" class="text-btn">${action}</button>`;
- setTimeout(()=>{const b=$('#rankingPrivacyActionBtn');if(b)b.onclick=()=>state===true?saveRankingVisibility(false):state===false?saveRankingVisibility(true):openRankingPrivacyModal()},0)
+ return rankingsOrchestration().renderRankingPrivacyNote();
 }
 function openRankingPrivacyModal(){
- const p=getProfile();if(!p?.token){openProfileModal('create');return}
- $('#rankingPrivacyPreviewAvatar').textContent=p.avatar||'🙂';$('#rankingPrivacyPreviewName').textContent=p.name||'Hráč';$('#rankingPrivacyModal').classList.remove('hidden')
+ return rankingsOrchestration().openRankingPrivacyModal();
 }
 async function saveRankingVisibility(enabled){
- try{const result=await api('/api/rankings/visibility',{method:'POST',body:JSON.stringify({enabled})});updateAccountProfile({publicRankings:result.publicRankings});$('#rankingPrivacyModal').classList.add('hidden');renderRankingPrivacyNote();showToast(enabled?'Jsi ve společném pořadí 🏆':'V pořadí jsi anonymně 🎭');await renderLeaderboard()}catch(e){showToast(e.message)}
+ return rankingsOrchestration().saveRankingVisibility(enabled);
 }
-function maybeShowRankingPrivacyNotice(){const p=getProfile();if(p?.token&&p.publicRankings==null)openRankingPrivacyModal()}
+function maybeShowRankingPrivacyNotice(){return rankingsOrchestration().maybeShowRankingPrivacyNotice?.()}
 
-async function renderLeaderboard(){
- const xpList=$('#xpLeaderboardList'),dailyList=$('#dailyLeaderboardList');
- if(!xpList||!dailyList)return;
- await ensureRankingProfileState();
- renderRankingPrivacyNote();
- maybeShowRankingPrivacyNotice();
- $$('.ranking-scope-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingXpScope===rankingXpScope));
- $$('.ranking-period-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingPeriod===rankingXpPeriod));
- $$('.ranking-daily-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingDailyScope===rankingDailyScope));
- $('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams');
- renderRankingTeamCard();
- xpList.innerHTML='<div class="ranking-loading">Načítám XP pořadí…</div>';
- dailyList.innerHTML='<div class="ranking-loading">Načítám dnešní pořadí…</div>';
- const [xpResult,dailyResult]=await Promise.allSettled([
-   api(`/api/rankings/xp?period=${rankingXpPeriod}`),
-   api(`/api/rankings/daily?daily_date=${pragueDateISO()}`)
-  ]);
- if(xpResult.status==='fulfilled'){
-  renderXpRanking(xpResult.value);
-  const privacy=$('#rankingPrivacyNote');
-  if(privacy&&xpResult.value.visibilityReady===true)privacy.dataset.visibilityReady='true';
- }else xpList.innerHTML=`<div class="ranking-empty"><strong>XP pořadí se teď nepodařilo načíst.</strong><small>${esc(xpResult.reason?.message||'Zkus to prosím znovu.')}</small></div>`;
- if(dailyResult.status==='fulfilled')renderDailyRanking(dailyResult.value);
- else dailyList.innerHTML=`<div class="ranking-empty"><strong>Dnešní pořadí se teď nepodařilo načíst.</strong><small>${esc(dailyResult.reason?.message||'Zkus to prosím znovu.')}</small></div>`;
-}
-function rankingRows(data,scope){return scope==='teams'?(data?.teams||[]):(data?.players||[])}
-function rankingRankBadge(rank){return rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':`${rank}.`}
-function renderXpRanking(data){
- const list=$('#xpLeaderboardList'),rows=rankingRows(data,rankingXpScope);
- if(!rows.length){list.innerHTML=`<div class="ranking-empty"><strong>${rankingXpScope==='teams'?'Týmy':'Hráči'} zatím nemají XP v tomto období.</strong><small>První body tu udělají pořádek velmi rychle. 😄</small></div>`;return}
- list.innerHTML=rows.map(r=>{
-  if(rankingXpScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${rankingXpPeriod==='today'?'dnes':rankingXpPeriod==='week'?'tento týden':'celkem'}</small></div></div>`;
-  const level=levelFor(Number(r.lifetimePoints||0)),team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
-  return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small><span class="ranking-rank-chip">${level.current.icon} ${esc(level.current.name)}</span>${r.badgeCount?` · 🏅 ${r.badgeCount}`:''}${team}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${rankingXpPeriod==='today'?'dnes':rankingXpPeriod==='week'?'tento týden':'celkem'}</small></div></div>`
- }).join('')
-}
-function renderDailyRanking(data){
- const list=$('#dailyLeaderboardList'),rows=rankingRows(data,rankingDailyScope);
- if(!rows.length){list.innerHTML='<div class="ranking-empty"><strong>Dnešní startovní rošt je zatím prázdný.</strong><small>Stačí dokončit Denní výzvu.</small></div>';return}
- list.innerHTML=rows.map(r=>{
-  if(rankingDailyScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.players||0,'výkon','výkony','výkonů')} v dnešním skóre · ${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.score||0).toLocaleString('cs-CZ',{maximumFractionDigits:1})}</strong><small>/ 100</small></div></div>`;
-  const quality=r.cleanSolve===true?'✨ Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Bez nápovědy',team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
-  return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small>${quality} · ${countCz(r.moves||0,'tah','tahy','tahů')}${team}</small></div><div class="leader-score"><strong>${fmtTime(r.elapsedMs)}</strong><small>dnešní výzva</small></div></div>`
- }).join('')
-}
+function renderLeaderboard(){return rankingsOrchestration().renderLeaderboard()}
+function rankingRows(data,scope){return rankingsOrchestration().rankingRows(data,scope)}
+function rankingRankBadge(rank){return rankingsOrchestration().rankingRankBadge(rank)}
+function renderXpRanking(data){return rankingsOrchestration().renderXpRanking(data)}
+function renderDailyRanking(data){return rankingsOrchestration().renderDailyRanking(data)}
 function renderRankingTeamCard(){
- const box=$('#rankingTeamCard'),p=getProfile();if(!box)return;
- if(!p?.token){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Chceš soutěžit i za partu?</strong><small>Pořadí můžeš sledovat bez účtu. Pro vlastní tým si nejdřív ulož postup.</small></div><button id="rankingAccountBtn" class="secondary-btn">☁️ Uložit postup</button>';setTimeout(()=>$('#rankingAccountBtn')&&($('#rankingAccountBtn').onclick=()=>openProfileModal('create')),0);return}
- if(!p.familyCode){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Jsi zatím bez týmu</strong><small>Účet funguje samostatně. Tým můžeš přidat kdykoli, bez vlivu na předchozí XP.</small></div><button id="rankingJoinTeamBtn" class="secondary-btn">Přidat / založit tým</button>';setTimeout(()=>$('#rankingJoinTeamBtn')&&($('#rankingJoinTeamBtn').onclick=openTeamMembershipModal),0);return}
- box.innerHTML=`<div><span class="eyebrow">👥 TVŮJ TÝM</span><strong>${esc(p.leagueName||p.familyCode)}</strong><small>Do týmových XP se počítají jen XP získané během členství.</small></div><button id="rankingTeamSettingsBtn" class="secondary-btn">Nastavení týmu</button>`;
- setTimeout(()=>$('#rankingTeamSettingsBtn')&&($('#rankingTeamSettingsBtn').onclick=openFamilyLeagueModal),0)
+ return rankingsOrchestration().renderRankingTeamCard();
 }
 
 async function renderGlobalLeague(){
@@ -1581,9 +1537,10 @@ async function openPlayedLevels(diff){
  $$('[data-level-puzzle]').forEach(b=>b.onclick=()=>openLevelDetail(b.dataset.levelDiff,b.dataset.levelPuzzle));
 }
 function localLevelResult(puzzleId){return getState().completed[`free:${puzzleId}`]||null}
+function transformRankingPayload(data){return window.PropletRankings?.transformRankingPayload?window.PropletRankings.transformRankingPayload(data):data}
 async function fetchPuzzleLeaderboard(puzzleId){const p=getProfile();if(!p?.familyCode)return {rows:[],anonymous:true};return api(`/api/puzzle-leaderboard?puzzle_id=${encodeURIComponent(puzzleId)}&family_code=${encodeURIComponent(p.familyCode)}`)}
 async function fetchFreeLevelLeaderboards(puzzleId){
- const p=getProfile(),worldPromise=api(`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(puzzleId)}`),teamPromise=p?.familyCode?fetchPuzzleLeaderboard(puzzleId):Promise.resolve({rows:[],anonymous:true});
+ const p=getProfile(),worldPromise=api(`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(puzzleId)}`).then(transformRankingPayload),teamPromise=p?.familyCode?fetchPuzzleLeaderboard(puzzleId):Promise.resolve({rows:[],anonymous:true});
  const [worldResult,teamResult]=await Promise.allSettled([worldPromise,teamPromise]);
  return {world:worldResult.status==='fulfilled'?worldResult.value:null,worldError:worldResult.status==='rejected'?worldResult.reason?.message||'Globální pořadí se nepodařilo načíst.':null,team:teamResult.status==='fulfilled'?teamResult.value:null,teamError:teamResult.status==='rejected'?teamResult.reason?.message||'Týmové pořadí se nepodařilo načíst.':null};
 }
@@ -1616,7 +1573,7 @@ function renderDailyGlobalLeaderboardBox(container,data){
  const topLine=total===1?'První hráč dne. Království je zatím celé tvoje.':`Patříš mezi nejlepších ${data.topPercent} % dnešních hráčů.`;
  container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}<small>${RANK_RULES}</small></p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
 }
-async function loadWinDailyGlobalLeaderboard(date,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='daily'){return}box.classList.remove('hidden');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám globální pořadí…</div>';try{const data=await api(`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(date)}`);winDailyGlobalData=data;renderDailyGlobalLeaderboardBox(box,data)}catch(e){box.innerHTML=`<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(e.message)}. Výsledek tím není ohrožený.</small></div>`}}
+async function loadWinDailyGlobalLeaderboard(date,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='daily'){return}box.classList.remove('hidden');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám globální pořadí…</div>';try{const data=transformRankingPayload(await api(`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(date)}`));winDailyGlobalData=data;renderDailyGlobalLeaderboardBox(box,data)}catch(e){box.innerHTML=`<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(e.message)}. Výsledek tím není ohrožený.</small></div>`}}
 async function openLevelDetail(diff,puzzleId){
  const puzzle=sortedFreeBank(diff).find(p=>p.id===puzzleId);if(!puzzle)return;const rec=localLevelResult(puzzleId),transferred=!rec&&localFreeSlotState(diff).transferred.has(Number(puzzle.meta?.level)),result=$('#levelDetailResult'),actions=$('.level-detail-actions');levelDetailContext={puzzleId,difficulty:diff,level:puzzle.meta?.level,globalRank:null,teamRank:null,result:rec};$('#levelDetailEyebrow').textContent=`${DIFF[diff].label.toUpperCase()} · ÚROVEŇ ${puzzle.meta?.level||'?'}`;$('#levelDetailTitle').textContent=`${DIFF[diff].label} ${puzzle.meta?.level||''}`.trim();result.classList.toggle('new-board',transferred);result.innerHTML=rec?`<strong>${fmtTime(rec.elapsedMs)}</strong><span>${rec.cleanSolve?'✨ Čistě':`💡 ${countCz(rec.hintsUsed||0,'nápověda','nápovědy','nápověd')}`} · ${countCz(rec.moves,'tah','tahy','tahů')}</span><small>Do pořadí se počítá první dokončený pokus.</small>`:transferred?`<div class="new-board-visual" aria-hidden="true"><span>✓</span><i>→</i><span>✦</span></div><div class="new-board-copy"><strong>Nová deska čeká</strong><span>Dřívější verzi máš splněnou. Tahle je nová.</span><small>+${DIFF[diff].xp} XP za novou desku</small></div>`:'<span>Výsledek není na tomto zařízení uložený.</span>';$('#levelDetailReplayBtn').textContent=transferred?'Hrát novou desku':rec?'Zahrát znovu · trénink':'Zahrát úroveň';$('#levelDetailShareBtn').classList.toggle('hidden',!rec);actions.classList.toggle('solo',!rec);$('#levelDetailLeaderboard').innerHTML='<div class="leaderboard-empty">Načítám globální i týmové pořadí…</div>';$('#levelDetailModal').classList.remove('hidden');try{const data=await fetchFreeLevelLeaderboards(puzzleId),ranks=renderFreeLeaderboardPanel($('#levelDetailLeaderboard'),data,getProfile()?.id);levelDetailContext.globalRank=ranks.globalRank;levelDetailContext.teamRank=ranks.teamRank}catch(e){$('#levelDetailLeaderboard').innerHTML=`<div class="leaderboard-empty">${esc(e.message)}</div>`}
 }
@@ -1762,7 +1719,6 @@ function bind(){
  $('#rescueBtn').onclick=openRescueOffer;$('#confirmRescueBtn').onclick=beginRescue;$('#cancelRescueBtn').onclick=()=>$('#rescueOfferModal').classList.add('hidden');
  $('#skipOnboardingBtn').onclick=()=>closeOnboarding(false);$('#onboardNextBtn').onclick=onboardingNext;
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
- $$('.ranking-scope-tab').forEach(b=>b.onclick=()=>{rankingXpScope=b.dataset.rankingXpScope;renderLeaderboard()});$$('.ranking-period-tab').forEach(b=>b.onclick=()=>{rankingXpPeriod=b.dataset.rankingPeriod;renderLeaderboard()});$$('.ranking-daily-tab').forEach(b=>b.onclick=()=>{rankingDailyScope=b.dataset.rankingDailyScope;renderLeaderboard()});
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);$('#leaveTeamBtn').onclick=leaveCurrentTeam;$('#closeRankingPrivacyModal').onclick=()=>$('#rankingPrivacyModal').classList.add('hidden');$('#acceptRankingPrivacyBtn').onclick=()=>saveRankingVisibility(true);$('#hideRankingPrivacyBtn').onclick=()=>saveRankingVisibility(false);
  $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=applyPendingUpdate;
@@ -1928,6 +1884,6 @@ function installEngagementModules(){
   onAppInstalled:()=>{deferredInstallPrompt=null;saveInstallNudgeState({...getInstallNudgeState(),installed:true,done:true,installedAt:new Date().toISOString()});trackProductEvent('pwa_installed');renderInstallUI()}
  });
 }
-function installContentModules(){dailyOrchestration().install()}
+function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};

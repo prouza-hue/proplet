@@ -78,7 +78,7 @@
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=40140-s12b2','propletHomeLayout');
-    loadScript('/ranking-polish.js?v=2','propletRankingPolish');
+    loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     if(!document.querySelector('link[data-proplet-account-auth-css]')){
       const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=5';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
     }
