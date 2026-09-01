@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 app = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
+nudges = (ROOT / "public" / "app" / "engagement" / "nudges.js").read_text(encoding="utf-8")
 feedback = (ROOT / "public" / "valid-word-feedback-v3330.js").read_text(encoding="utf-8")
 html = (ROOT / "public" / "index.html").read_text(encoding="utf-8")
 runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
@@ -26,7 +27,7 @@ assert "valid-word-feedback-v3330.js?v=7" in theme
 
 assert "firstRealGameJustCompleted" in app
 assert "completedGameCount()===1" in app
-assert "maybeOfferFirstWinReturnNudge('continue')" in app
+assert "maybeOfferFirstWinReturnNudge(action)" in nudges
 assert "context:'first_win',followUp:'account'" in app
 for event in (
     "first_win_return_nudge_shown",
