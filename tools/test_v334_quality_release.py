@@ -6,6 +6,7 @@ import re
 
 root = Path(__file__).resolve().parents[1]
 server = (root / "server.py").read_text(encoding="utf-8")
+contracts = (root / "backend" / "contracts.py").read_text(encoding="utf-8")
 client = (
     (root / "public" / "quality-v334.js").read_text(encoding="utf-8")
     + (root / "public" / "quality-v334-core-v40114.js").read_text(encoding="utf-8")
@@ -37,19 +38,30 @@ assert [a["word"] for a in canonical_starter["answers"]] == ["MRAK", "JABLKO", "
 starter_cells = [i for answer in canonical_starter["answers"] for i in answer["path"]]
 assert len(starter_cells) == 25 and len(set(starter_cells)) == 25
 
-# API + telemetry contract.
-for model in ("ResultCreate", "AttemptStart", "AttemptFinishTelemetry"):
-    match = re.search(rf"class {model}\(BaseModel\):(.*?)(?=\n\nclass |\n\ndef )", server, re.S)
+# API + telemetry contract.  Request models live in backend/contracts.py;
+# server.py is checked separately below for the runtime wiring that consumes
+# their calm_mode fields.
+for model in ("ResultCreate", "AttemptStart", "AttemptCheckpoint", "AttemptFinishTelemetry"):
+    match = re.search(rf"class {model}\(BaseModel\):(.*?)(?=\n\nclass |\n\ndef )", contracts, re.S)
     assert match and "calm_mode" in match.group(1), f"{model} must carry calm_mode"
-checkpoint = re.search(r"class AttemptCheckpoint\(BaseModel\):(.*?)(?=\n\nclass )", server, re.S)
+checkpoint = re.search(r"class AttemptCheckpoint\(BaseModel\):(.*?)(?=\n\nclass )", contracts, re.S)
 assert checkpoint and "calm_mode: Optional[bool] = None" in checkpoint.group(1)
+# The route module must still import and use the contracts at runtime.
+assert "from backend.contracts import (" in server
+for model in ("ResultCreate", "AttemptStart", "AttemptCheckpoint", "AttemptFinishTelemetry"):
+    assert re.search(rf"^    {model},$", server, re.M), f"server must import {model}"
 assert '"calm_mode": bool(payload.calm_mode)' in server
 assert 'values["calm_mode"] = bool(row.get("calm_mode") is True or payload.calm_mode)' in server
 
 # Calm Mode stays in personal data but is cut out of every competitive source.
 assert "def competitive_row(row: dict) -> bool:" in server
-assert 'runs = [row for row in db_select_all("puzzle_runs", puzzle_id=puzzle_id, mode="free") if competitive_row(row)]' in server
-assert 'db_select_all("puzzle_runs", mode="daily")' in server
+assert re.search(
+    r"runs, _ = ranking_queries\.ranking_runs\(.*?mode=\"free\",\s*puzzle_id=puzzle_id,.*?\)\s*"
+    r"runs = \[row for row in runs if competitive_row\(row\)\]",
+    server,
+    re.S,
+), "free competitive source must filter calm_mode"
+assert re.search(r"ranking_queries\.ranking_runs\(.*?mode=\"daily\"", server, re.S), "daily competitive source must remain covered"
 assert 'if competitive_row(row)' in server
 assert 'row.get("calm_mode") is not True' in server
 assert '"calmMode": calm_mode_summary' in server
@@ -139,7 +151,7 @@ assert "min-height:50px" in challenge_css
 assert "padding:12px 16px" in challenge_css
 assert "border-radius:14px" in challenge_css
 assert "self.skipWaiting()" in sw
-assert "client.navigate(client.url)" in sw
+assert "client.navigate(target)" in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 assert "preserveExistingPuzzleDatabase" in sw
