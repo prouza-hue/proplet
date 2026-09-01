@@ -3,7 +3,7 @@
 - Sprint: 12B.2 — progression + Daily orchestration
 - Branch: `refactor/s12b-daily`
 - Base SHA: `b3579b2957dc38cf83798fc05c86546a8949ddf7` (uzavřený produkční Sprint 12B.1)
-- Stav: **ZAHÁJENO / READ-ONLY MAPOVÁNÍ / BEZ RUNTIME ZMĚN**
+- Stav: **CHARACTERIZATION CHECKPOINT / BEZ RUNTIME ZMĚN**
 - Zamýšlená změna chování: žádná; pouze přesun vlastnictví při zachování výběru, fresh/replay a release CTA.
 - Rozsah:
   - `public/app/content/progression.js` + Daily orchestrace;
@@ -14,11 +14,12 @@
   - 12B.1 fast-forward merged do `main` a ověřen na produkci;
   - branch založena z přesného produkčního SHA;
   - načten celý plán Sprintu 12B a audit Finding 3;
-  - zahájena nezávislá mapa runtime vlastníků a characterization/browser matrix.
-- Testy PASS: zatím pouze převzatý zelený stav 12B.1 — Current Runtime Gate 44/44.
-- Testy FAIL / nespouštěné: characterization 12B.2 dosud nevytvořen; runtime nezměněn.
-- Nově nalezená rizika: žádná; známý historický Gen4 failure `ResultCreate must carry calm_mode` je mimo scope.
-- Bezpečný bod pokračování: dokončit mapu, zapsat characterization test, ověřit zelený test-only checkpoint; teprve potom měnit runtime.
+  - dokončena nezávislá mapa runtime vlastníků a characterization/browser matrix;
+  - přidán test-only kontrakt pro Daily rotaci, active/legacy stav, Free fresh/replay, release CTA a budoucí idempotentní ownership guard.
+- Testy PASS: lokální Current Runtime Gate **45/45**, assets **80/80**, syntax **222/222**; vzdálený gate čeká na draft PR.
+- Testy FAIL / nespouštěné: runtime dosud nezměněn; browser matrix poběží až nad preview runtime checkpointem.
+- Nově nalezená rizika: `home-layout.js` obaluje globální `renderDaily`, `daily-win-menu-v40123.js` přidává samostatný observer a PWA shell je na vědomém limitu 23 assetů; známý historický Gen4 failure `ResultCreate must carry calm_mode` je mimo scope.
+- Bezpečný bod pokračování: publikovat test-only checkpoint a vyžádat zelený Current Runtime Gate; teprve potom měnit runtime.
 - Produkce/main/Supabase: **beze změny po založení branche**. Žádná migrace.
 - Další povolený sprint: žádný před samostatným review a schválením tohoto řezu.
 
@@ -350,5 +351,3 @@
 - Advisories: migrace nepřidala kritický nález. `result_commands` je záměrně hlášený jako RLS bez policy, protože tabulka není dostupná klientským rolím; přístup je omezený grantem na `service_role`. Ostatní security/performance nálezy jsou dříve existující a mimo rozsah rolloutu 08B.
 - Rollback: změnit pouze `PROPLET_ATOMIC_RESULT_V1_ENABLED` na `false` a znovu nasadit. Aditivní tabulku, vazbu ani již vydané receipts při běžném rollbacku nemaž; funkci odstranit až samostatným schváleným DB rollbackem po vypnutí flagu.
 - Bezpečný bod pokračování: produkční `main` s aktivovanou atomickou cestou, aplikovanými migracemi 08B i 09 a ověřeným deploymentem. Sprint 08B je uzavřený; Sprint 10 nezačínat bez výslovného pokynu.
-
-
