@@ -3,10 +3,11 @@
 - Sprint: 13B — CSS app screens
 - Branch: `refactor/s13b-css-app-screens`
 - Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908`
-- Pre-change characterization HEAD: `08757dd233889a8c41a29c98fa85b9f7b8d5c354`
-- Runtime consolidation HEAD: `9ace662a4911b6aeba6fac4fa601abcc9aee583f`
-- Final reviewed HEAD before preview: `dcb34e17436bd11e3bf9bfed274bc9393fefc2f6`
-- Stav: **PREVIEW READY — STOP na user review**
+- Pre-change characterization: `08757dd233889a8c41a29c98fa85b9f7b8d5c354`
+- Runtime consolidation: `9ace662a4911b6aeba6fac4fa601abcc9aee583f`
+- Final branch HEAD: `d784e09abfdc350b8aabfafd5e7e7284ffa994b5`
+- Merge: `f4e5ed7455b4c09c2e303c7679dc9361dcf663c4` (PR #102)
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Zamýšlená změna chování: žádná.
 
 ## Sprint 13B výsledek
@@ -16,57 +17,30 @@
 - `app-profile-settings.css` = původní `profile-layout-v3330.css` + `settings-ia-v40122.css` + `settings-polish-v40122.css` + `account-auth.css`.
 - 8 starých stylesheetů → 3 kanonické ownery; netto **−5 stylesheetů**.
 - Cache boundary: `theme-init.js?v=40140-s13b`.
-- JS runtime, DOM, gameplay, copy, XP, API, DB, Supabase a content jsou beze změny.
+- JS runtime, DOM, gameplay, copy, XP, API, DB, Supabase a content se neměnily.
 
-## Explicitně nedotčené risk vrstvy
+## Ověření
 
-Byte-identické proti base SHA:
-- `desktop-layout-v3330.css`
-- `onboarding-return-v3332.css`
-- `push-retention-v3329.css`
-- `ranking-polish.css`
-- `gesture-guard-v3325.css`
-- `quality-v334.css`
-- `quality-hotfix-v334.css`
-- `game.css`
-- `results.css`
-- `challenge-cta-v3333.css`
-- `competitive-sharing-v3331.css`
-- `copy-density-v3327.css`
-
-## Characterization a review
-
-- Pre-change current gate: GREEN.
-- Pre-change 19-case app-screen matrix: GREEN.
-- Fixovaný visual gate určený před runtime změnou: 0,07 % changed pixels / channel delta 8 / geometry 0,25 px.
+- Pre-change characterization + 19-case screenshot matrix: GREEN.
+- Fixovaný pre-change visual gate: 0,07 % changed pixels / channel delta 8 / geometry 0,25 px.
 - Post-change Current Runtime Gate: GREEN.
 - Post-change 19-case visual matrix: GREEN.
-- Finální CI run: `33529596365` SUCCESS.
-- `app-play.css`: byte-exaktní mechanické složení původních bloků.
-- `app-onboarding.css`: byte-exaktní mechanické složení původních bloků.
-- `app-profile-settings.css`: byte-exaktní mechanické složení původních bloků; `!important` 93 = přesný součet zdrojů.
-- Odstraněné CSS assety nemají stale reference v `theme-init.js`, `index.html` ani `sw.js`.
-- P0/P1 diff review: bez nálezu.
-
-## Preview
-
-- Deployment: `dpl_81miuvjBgYWFdSG4g3M1vydmgL4P` — READY.
-- Preview URL: `https://proplet-i4w0a7gc6-pavel-prouzas-projects.vercel.app/`.
-- `/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- Finální branch CI před merge: GREEN.
+- PR #102 checks: `current-runtime` SUCCESS, `gen4-contract` SUCCESS, Sprint 13B `current-gate` SUCCESS, `visual-matrix` SUCCESS, Vercel SUCCESS.
+- User preview: **SCHVÁLENO**.
+- Produkční deployment: `dpl_CSp3HZ6JZUHCBC1NKuWkbbnPgGEU` — **READY**.
+- `https://hrajproplet.cz/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
 - `/app-play.css?v=40140-s13b`: 200.
 - `/app-onboarding.css?v=40140-s13b`: 200.
 - `/app-profile-settings.css?v=40140-s13b`: 200.
-- `/theme-init.js?v=40140-s13b`: 200; načítá všechny tři nové ownery.
 - Build error scan: čistý.
-- Preview runtime `error/fatal` scan: žádné záznamy.
-- Finální docs-only CI run `33530975640`: current gate GREEN + visual matrix GREEN.
+- Production runtime `error/fatal` scan: žádné záznamy.
+- Supabase / DB / content: beze změny.
+- Rollback: revert merge commitu `f4e5ed7455b4c09c2e303c7679dc9361dcf663c4`; bez DB/content rollbacku.
 
-## STOP
+## Další krok
 
-Čeká se na explicitní vizuální schválení uživatele. Bez něj:
-- **nemergovat do `main`**;
-- **nezačínat Sprint 14**;
-- nedělat produkční deployment.
+Sprint 13B je uzavřen. Další povolený sprint je **Sprint 14 — Canonical content build a generation manifest** na nové větvi z aktuálního produkčního `main`.
 
 ## Předchozí uzavřený stav
 
