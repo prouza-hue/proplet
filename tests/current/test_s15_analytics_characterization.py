@@ -63,6 +63,7 @@ for endpoint in FIXTURE["out_of_scope_telemetry"][:5]:
     assert endpoint in APP
 
 import server
+from backend import analytics as product_analytics
 
 events = FIXTURE["events"]
 assert len(events) == 132
@@ -85,6 +86,15 @@ with (
         assert exc.detail == "Neplatný product event"
     else:
         raise AssertionError("Unknown product event must be rejected")
+
+# Vercel Python functions do not bundle public/ static files. The embedded
+# mirror must preserve the exact canonical registry when that file is absent.
+product_analytics.load_registry.cache_clear()
+product_analytics.allowed_event_names.cache_clear()
+with patch.object(product_analytics, "REGISTRY_PATH", ROOT / "public" / "__missing_s15_registry__.json"):
+    assert product_analytics.allowed_event_names() == frozenset(events)
+product_analytics.load_registry.cache_clear()
+product_analytics.allowed_event_names.cache_clear()
 
 assert len(inserted) == len(events)
 for (table, row), expected in zip(inserted, events):
