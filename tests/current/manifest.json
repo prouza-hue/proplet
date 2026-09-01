@@ -142,6 +142,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s12b_engagement.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_s12a_account_backend.py",
         "runner": "python"
       },
