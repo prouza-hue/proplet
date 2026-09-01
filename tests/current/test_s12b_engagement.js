@@ -45,7 +45,7 @@ assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:20000,tr
 function verifyDuplicateInstallGuard() {
   const listenerTypes=[];
   let observerCount=0;
-  const hiddenModal={classList:{contains:name=>name==='hidden'}};
+  const hiddenModal={dataset:{},classList:{contains:name=>name==='hidden',add:()=>{},remove:()=>{}}};
   const storage={getItem:()=>null,setItem:()=>{}};
   const context={
     console,
