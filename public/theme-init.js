@@ -37,7 +37,7 @@
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/game.css?v=40140-s13a','propletGameCss'],
-    ['/results.css?v=40140-s13a','propletResultsCss'],
+    ['/results.css?v=40140-s13a2','propletResultsCss'],
     ['/profile-layout-v3330.css?v=2','propletProfileLayoutCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],

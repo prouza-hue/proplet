@@ -5,7 +5,7 @@
 - Base SHA: `b8d98c35527e6006c0ceaeb4ba4d76e4c06665b8`
 - Pre-change characterization: `db4522639a558b7a359dd002a20d5179ea3dc347`
 - Runtime CSS HEAD: `c47d7291bbc000c5d6239b884c0dcbcb6338e427`
-- Stav: **PREVIEW READY — STOP na user review**
+- Stav: **preview feedback fix pending validation**
 - Zamýšlená změna chování: žádná.
 
 ## Sprint 13A změna
@@ -45,7 +45,7 @@
 
 ## STOP
 
-Čeká se na explicitní vizuální schválení uživatele. Bez něj:
+Uživatel našel jedinou regresi: příliš malý odstup mezi challenge CTA a Znovu/Menu na telefonu; Fold je správně. Opravuje se pouze <=480 px na 14 px. Bez něj:
 - **nemergovat do `main`**;
 - **nezačínat Sprint 13B**;
 - nedělat produkční deployment.
