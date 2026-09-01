@@ -4,14 +4,14 @@
 - Branch: `refactor/s13b-css-app-screens`
 - Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908`
 - Pre-change characterization HEAD: `08757dd233889a8c41a29c98fa85b9f7b8d5c354`
-- Stav: **runtime consolidation candidate / tests pending**
+- Stav: **runtime consolidation candidate / visual GREEN; static test fix pending**
 - Zamýšlená změna chování: žádná.
 - New owners: `app-play.css`, `app-onboarding.css`, `app-profile-settings.css`.
 - Removed patch assets: home-layout, today-brand, onboarding-fit, onboarding-model, profile-layout, settings-ia, settings-polish, account-auth = 8 old → 3 new, netto **−5 stylesheets**.
 - Intentionally untouched mixed-risk owners: desktop-layout, onboarding-return, push-retention, ranking-polish, gesture-guard, quality-v334, game/results/challenge layers.
 - Characterization before runtime: current GREEN; 19-case same-run matrix GREEN; fixed gate = 0.07% pixels / channel 8 / geometry 0.25px.
 - Cache boundary moves to `theme-init.js?v=40140-s13b`.
-- STOP after post-change gate → preview → user review. No main merge / Sprint 14 without approval.
+- Post-change 19-case visual matrix: GREEN. Current gate 47/48; jediný FAIL je chybný S13B assertion očekávající záměrně nepřesunutý Free desktop selector v app-play. Opravit test a rerun.\n- STOP after post-change gate → preview → user review. No main merge / Sprint 14 without approval.
 
 ## Předchozí uzavřený stav
 
