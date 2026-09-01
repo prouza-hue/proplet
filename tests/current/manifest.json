@@ -206,6 +206,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s16_legacy_reachability.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_migration_manifest.py",
         "runner": "python"
       },

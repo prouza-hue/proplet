@@ -54,3 +54,7 @@ entry and uses filesystem reads only. Negative fixture coverage lives in
 
 No migration is applied, repaired, pushed, or connected to a database by this
 sprint.
+
+## Sprint 16 / current release hygiene
+
+Sprint 16 legacy cleanup nemění SQL soubory, pořadí migrací ani databázi. Aktuální release proces má používat tento manifest a `python tools/validate_migration_manifest.py`; historické release dokumenty nebo `SUPABASE_SETUP.sql` nejsou náhradou za kanonický lineage manifest.
