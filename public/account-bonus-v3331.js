@@ -21,6 +21,11 @@
   const trackOfferOnce=()=>{if(offerTracked)return;offerTracked=true;bonusEvent('account_bonus_offer_seen')};
   const trackCreateOnce=()=>{if(createIntentTracked)return;createIntentTracked=true;bonusEvent('account_bonus_create_clicked')};
 
+  function adjustRankingData(data){
+    if(!data||!Array.isArray(data.players)||data.accountRewardsIncluded===true)return data;
+    return {...data,players:data.players.map(row=>({...row,lifetimePoints:Number(row.lifetimePoints||0)+BONUS_XP}))};
+  }
+
   function patchUiFunctions(){
     if(patched)return true;
     if(typeof effectiveStats!=='function'||typeof renderProfile!=='function'||typeof setAccountMode!=='function')return false;
@@ -35,16 +40,6 @@
       if(!missing)return stats;
       return {...stats,points:Number(stats.points||0)+missing,accountBonusXp:alreadyIncluded+missing};
     };
-
-    if(typeof renderXpRanking==='function'){
-      const originalRenderXpRanking=renderXpRanking;
-      renderXpRanking=function(data){
-        if(!data||!Array.isArray(data.players))return originalRenderXpRanking.apply(this,arguments);
-        if(data.accountRewardsIncluded===true)return originalRenderXpRanking.apply(this,arguments);
-        const adjusted={...data,players:data.players.map(row=>({...row,lifetimePoints:Number(row.lifetimePoints||0)+BONUS_XP}))};
-        return originalRenderXpRanking.call(this,adjusted);
-      };
-    }
 
     const originalRenderProfile=renderProfile;
     renderProfile=function(){
@@ -170,6 +165,7 @@
     sync:syncBonus,
     track:bonusEvent,
     offerSeen:trackOfferOnce,
-    createClicked:trackCreateOnce
+    createClicked:trackCreateOnce,
+    adjustRankingData
   });
 })();

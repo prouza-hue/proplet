@@ -29,7 +29,8 @@ shell = shell_match.group(1)
 # dependency-injected profile/team UI owner.
 # Sprint 12B.1 adds two small engagement owners. Sprint 12B.2 replaces the
 # Daily menu patch with two explicit content owners, for a net +1 shell asset.
-assert shell.count("'/") <= 24
+# Sprint 12B.3 adds one dependency-free owner for the main Pořadí screen.
+assert shell.count("'/") <= 25
 assert "/app/core/result-queue.js" in shell
 assert "/app/core/api-client.js" in shell
 assert "/app/core/storage.js" in shell
@@ -40,6 +41,7 @@ assert "/app/engagement/onboarding.js" in shell
 assert "/app/engagement/nudges.js" in shell
 assert "/app/content/progression.js" in shell
 assert "/app/content/daily.js" in shell
+assert "/app/rankings/rankings.js" in shell
 assert "/app/game/state.js" in shell
 assert "/app/game/board.js" in shell
 assert "/app/game/input.js" in shell
