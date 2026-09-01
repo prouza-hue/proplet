@@ -25,7 +25,7 @@ def route(app: FastAPI, path: str):
     return next(item.endpoint for item in app.routes if item.path == path)
 
 
-def player(pid, name, family, password="pw", *, email=None, verified=False, created="2026-01-01T00:00:00+00:00"):
+def player(pid, name, family, password="password", *, email=None, verified=False, created="2026-01-01T00:00:00+00:00"):
     return {
         "id": pid,
         "name": name,
@@ -40,10 +40,10 @@ def player(pid, name, family, password="pw", *, email=None, verified=False, crea
 
 
 players = [
-    player("p1", "Pavel", "PROUZA", "one", email="pavel@example.com", verified=True),
-    player("p2", "Pavel", "OTHER", "two", created="2026-02-01T00:00:00+00:00"),
-    player("p3", "Case Name", "SOLO_A", "case"),
-    player("p4", "Unverified", "SOLO_B", "hidden", email="hidden@example.com", verified=False),
+    player("p1", "Pavel", "PROUZA", "password1", email="pavel@example.com", verified=True),
+    player("p2", "Pavel", "OTHER", "password2", created="2026-02-01T00:00:00+00:00"),
+    player("p3", "Case Name", "SOLO_A", "casepass"),
+    player("p4", "Unverified", "SOLO_B", "hiddenpass", email="hidden@example.com", verified=False),
 ]
 
 
@@ -73,12 +73,12 @@ install_account_integrity(
 login = route(app, "/api/login-integrity")
 
 # Name login is case-insensitive.
-result = login(IntegrityLogin(name="case name", password="case"), request("/api/login-integrity"))
+result = login(IntegrityLogin(name="case name", password="casepass"), request("/api/login-integrity"))
 assert result["id"] == "p3"
 
 # Duplicate names without family remain ambiguous when both passwords match.
 try:
-    login(IntegrityLogin(name="PAVEL", password="one"), request("/api/login-integrity"))
+    login(IntegrityLogin(name="PAVEL", password="password1"), request("/api/login-integrity"))
 except HTTPException as exc:
     # Only p1 matches this password, so this is deliberately not ambiguous.
     assert exc.status_code != 409
@@ -86,27 +86,27 @@ else:
     pass
 
 duplicate_players = [
-    player("d1", "Dup", "A", "same", created="2026-01-01T00:00:00+00:00"),
-    player("d2", "Dup", "B", "same", created="2026-03-01T00:00:00+00:00"),
+    player("d1", "Dup", "A", "samepass", created="2026-01-01T00:00:00+00:00"),
+    player("d2", "Dup", "B", "samepass", created="2026-03-01T00:00:00+00:00"),
 ]
 old_players = list(players)
 players[:] = duplicate_players
 try:
     try:
-        login(IntegrityLogin(name="dup", password="same"), request("/api/login-integrity"))
+        login(IntegrityLogin(name="dup", password="samepass"), request("/api/login-integrity"))
         raise AssertionError("duplicate name without family must require disambiguation")
     except HTTPException as exc:
         assert exc.status_code == 409
-    result = login(IntegrityLogin(name="DUP", family_code="b", password="same"), request("/api/login-integrity"))
+    result = login(IntegrityLogin(name="DUP", family_code="b", password="samepass"), request("/api/login-integrity"))
     assert result["id"] == "d2"
 finally:
     players[:] = old_players
 
 # Verified email is a login identifier; an unverified email is not.
-result = login(IntegrityLogin(name="PAVEL@EXAMPLE.COM", password="one"), request("/api/login-integrity"))
+result = login(IntegrityLogin(name="PAVEL@EXAMPLE.COM", password="password1"), request("/api/login-integrity"))
 assert result["id"] == "p1"
 try:
-    login(IntegrityLogin(name="hidden@example.com", password="hidden"), request("/api/login-integrity"))
+    login(IntegrityLogin(name="hidden@example.com", password="hiddenpass"), request("/api/login-integrity"))
     raise AssertionError("unverified email must not be a login identifier")
 except HTTPException as exc:
     assert exc.status_code == 401
@@ -131,9 +131,9 @@ class FakeClient:
 
 
 core_players = [
-    player("self", "Self", "SOLO_SELF", "self"),
-    player("owner", "Owner", "SOLO_OWNER", "owner", email="owned@example.com", verified=True),
-    player("unverified", "Unverified", "SOLO_U", "u", email="free@example.com", verified=False),
+    player("self", "Self", "SOLO_SELF", "selfpass"),
+    player("owner", "Owner", "SOLO_OWNER", "ownerpass", email="owned@example.com", verified=True),
+    player("unverified", "Unverified", "SOLO_U", "unverifiedpass", email="free@example.com", verified=False),
 ]
 inserted = []
 
