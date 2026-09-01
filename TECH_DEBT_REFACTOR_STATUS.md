@@ -4,43 +4,69 @@
 - Branch: `refactor/s15-analytics-adapter`
 - Base SHA: `af088886d33d83ce2a2748a1fded6a6d7fffd7cc`
 - Characterization HEAD: `c6811bd06820913aa9eae7de2825feefb194d070`
-- Stav: **implementation candidate / post-change gate pending**
+- Final review HEAD: `f179750ec292325f1ea6aebfece973a390ce36f9`
+- Merge PR #104: `9e6d9dba829e8aa99a573edb5b0f12c7ba7f9e14`
+- Serverless hotfix PR #105: `2a03ad51d0b188ded640762c335c1428d896f7fd`
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Zamýšlená změna chování: žádná.
 
-## Baseline contract
+## Sprint 15 výsledek
 
-- 132 povolených `/api/product-event` event names.
-- Request body pouze `{event_type}`; žádné custom properties ani nová PII.
-- Jeden request na event; best-effort failure nesmí blokovat UI/gameplay/navigation.
-- Existující navigation/session/impression dedup guards zůstávají.
-- Kritická telemetry `attempt/start/checkpoint/finish`, hint/helper, challenge a account-bonus zůstává mimo product analytics.
-- Batching, session buffer a změny admin agregací jsou mimo Sprint 15.
+- `public/analytics-event-registry.json`: kanonický registry 132 product event names.
+- `public/app/analytics.js`: jediný product-event transport adapter.
+- `backend/analytics.py`: explicitní validation + writer service.
+- `trackProductEvent()` zůstává compatibility wrapper pro současné/versioned call sites.
+- HTTP kontrakt zůstává `POST /api/product-event` s request body pouze `{event_type}`.
+- Jeden event = jeden request; batching/session buffer nejsou zapnuté.
+- Caller properties se stejně jako před Sprintem 15 neposílají.
+- Žádné nové PII.
+- Kritická `attempt/start/checkpoint/finish`, hint/helper, challenge a account-bonus telemetry zůstává mimo product analytics.
+- `build_quality_report()`, `/api/admin/launch`, historické metriky a retention definice se neměnily.
+- PWA shell budget zůstal 25 assetů; nový analytics adapter v offline shellu nahradil nepotřebný `analytics-init.js`.
 
-## Implementation candidate
+## Characterization a review
 
-- `public/analytics-event-registry.json`: kanonický registry 132 eventů + transport/PII metadata.
-- `public/app/analytics.js`: jediný product-event transport adapter; 1 track = 1 POST; caller properties jsou stejně jako baseline ignorovány.
-- `backend/analytics.py`: explicitní registry validation + přesně stejný `product_events` row writer.
-- `server.py`: HTTP endpoint/signature/rate-limit/actor/error/response zachovány, interně deleguje na analytics service.
-- `trackProductEvent()`: zůstává kompatibilní wrapper; při mixed-cache absenci adapteru zachová původní direct request.
-- `index.html` + PWA shell: přidán nový adapter asset.
-- `docs/ANALYTICS_EVENT_REGISTRY.md`: explicitní PII audit, scope a change protocol.
-- `build_quality_report()`, `/api/admin/launch` a historické metriky/agregace se nemění.
+- Pre-change characterization PR gate: GREEN.
+- Golden registry fixture: přesně 132/132 events.
+- Unknown event zůstává HTTP 400 `Neplatný product event`.
+- DB row shape zůstává přesně `id/player_id/anonymous_id/event_type/app_version/created_at`.
+- Navigation/session/impression dedup guardy zachovány.
+- `ProductEventCreate`, attempt start/checkpoint/finish, `build_quality_report()` a `/api/admin/launch` byly proti base ověřeny jako byte-identické.
+- Final PR #104 `current-runtime`: SUCCESS.
+- Final PR #104 Gen4 contract: SUCCESS.
+- User preview: **SCHVÁLENO**.
 
-## Characterization
+## Produkční incident po merge a hotfix
 
-- Pre-change PR #104 current-runtime: **GREEN**.
-- Golden fixture: `tests/current/s15-product-events-baseline.json`.
-- Pre-change server parity: všech 132 eventů accepted, unknown event 400, exact DB row keys.
-- Adapter test candidate ověřuje one-request/event, event_type-only payload, preview disable a non-blocking sync/async failure.
+První produkční deployment PR #104 odhalil `/api/product-event` HTTP 500. Příčina nebyla v event semantics, ale v packaging rozdílu:
 
-## STOP
+- lokálně/CI byl dostupný `public/analytics-event-registry.json`;
+- Vercel Python serverless bundle `public/` statické assety neobsahuje;
+- backend proto při prvním eventu selhal na chybějícím registry souboru.
 
-Post-change current-runtime + diff review + Vercel preview musí být GREEN. Bez explicitního user schválení:
-- nemergovat do `main`;
-- neměnit event/retention semantics;
-- nezapínat batching/agregaci;
-- nezačínat Sprint 16.
+Hotfix PR #105:
+- ponechává public JSON registry beze změny;
+- přidává embedded mirror přesně stejných 132 event names jako serverless fallback;
+- current characterization explicitně simuluje chybějící `public/` soubor a vyžaduje přesnou parity.
+
+Hotfix gate:
+- PR #105 `current-runtime`: SUCCESS.
+- Preview deployment: READY.
+- Produkční deployment: `dpl_cQLv4kb2QazrwD8S8prK2mTmB9oV` — READY.
+- `https://hrajproplet.cz/api/health`: HTTP 200, Proplet `4.01.40`, `ok=true`, `database=true`.
+- Build error scan: čistý.
+- Post-hotfix production `error/fatal` scan: bez záznamů.
+- Post-hotfix `/api/product-event` 500 scan: bez záznamů v ověřovacím okně.
+- Během ověřovacího okna nebyl zaznamenán nový product-event request, takže nebyl pozorován explicitní živý 200; serverless missing-file scénář je ale nyní přímo kryt characterization testem.
+
+## Rollback
+
+- Runtime rollback: revert hotfix merge `2a03ad51d0b188ded640762c335c1428d896f7fd` a následně Sprint 15 merge `9e6d9dba829e8aa99a573edb5b0f12c7ba7f9e14`.
+- Žádná DB migrace ani data/content rollback nejsou potřeba.
+
+## Další krok
+
+Sprint 15 je uzavřen. Sprint 16 začít pouze na nové větvi z aktuálního produkčního `main` a podle `TECH_DEBT_REFACTOR_PLAN.md`.
 
 ## Předchozí stav
 
@@ -465,6 +491,7 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
 
