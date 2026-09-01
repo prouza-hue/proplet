@@ -1,5 +1,48 @@
 # Technical debt refactor status
 
+- Sprint: 16 — Ověřený legacy/dead cleanup a dokumentace
+- Branch: `refactor/s16-legacy-cleanup`
+- Base SHA: `5edd2bc847153ef50a5226c080e1e79243d96000`
+- Stav: **characterization**
+- Zamýšlená změna chování: žádná.
+- Tento sprint je poslední sprint v `TECH_DEBT_REFACTOR_PLAN.md`.
+
+## Evidence inventory
+
+Live — **nemazat**:
+- `public/p0-hotfix-v3336.js` + `.css` — dynamicky načítá `public/runtime-meta.js`.
+- `public/push-origin-v3325.js` — dynamicky načítá `public/runtime-meta.js`; current test jej chrání.
+- `public/quality-hotfix-v334.css` — dynamicky načítá `public/runtime-meta.js`; current CSS/quality testy jej chrání.
+
+Ověření kandidáti k odstranění:
+- `tools/__pycache__/generate_puzzles.cpython-313.pyc` — generovaný Python bytecode.
+- `tools/__pycache__/test_v317_admin.cpython-312.pyc` — generovaný Python bytecode.
+- `public/server.py` — historický backend publikovaný jako statický asset; současný runtime backend je root `server.py`; žádný loader/import/workflow/reference nebyl nalezen.
+
+Zatím **ponechat — dead status není dostatečně prokázaný kvůli možným přímým QA URL**:
+- `public/game-layout-v3323.js`
+- `public/release-notes.js`
+- `public/release-notes.css`
+- `public/valid-word-feedback-v3328.js`
+
+## Test lifecycle
+
+`tests/current/manifest.json` už explicitně označuje `tools/test_v3*.py/js` jako `legacy_evidence`, mimo default current gate. Sprint 16 je nebude hromadně přesouvat ani opravovat jen kvůli historickým failure.
+
+## Characterization
+
+- `tests/current/test_s16_legacy_reachability.py`
+- Chrání live dynamic legacy assets a explicitní legacy test lifecycle.
+- Cleanup se provede až po GREEN current gate.
+
+## STOP
+
+Po cleanupu: current gate + asset scan + Vercel preview smoke + request-log review. Každý odstraněný soubor musí být v reportu s důkazem a Git rollback cestou. Žádný další refactor.
+
+## Předchozí stav
+
+# Technical debt refactor status
+
 - Sprint: 15 — Analytics adapter a event registry
 - Branch: `refactor/s15-analytics-adapter`
 - Base SHA: `af088886d33d83ce2a2748a1fded6a6d7fffd7cc`
@@ -491,6 +534,7 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
+
 
 
 
