@@ -201,17 +201,13 @@
     if(typeof renderDaily!=='function'||typeof renderQuickPlay!=='function'||typeof freeProgress!=='function'||typeof getState!=='function')return false;
     window.__propletHomeLayoutInstalled=true;
     tuneNoviceIcon();
-    const baseDaily=renderDaily;
     renderQuickPlay=renderHomeQuickPlay;
-    renderDaily=function(){
-      baseDaily();
-      applyLayout();
-    };
     applyLayout();
     try{renderDaily()}catch{}
-    document.querySelectorAll('[data-nav="daily"]').forEach(el=>el.addEventListener('click',()=>setTimeout(applyLayout,40)));
     return true;
   }
+
+  window.PropletHomeLayout={applyDailyLayout:applyLayout,install};
 
   let tries=0;
   const boot=()=>{

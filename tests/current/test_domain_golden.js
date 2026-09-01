@@ -53,8 +53,6 @@ const runtimeFunctions = [
   between('resultRankTuple', 'betterResult'),
   between('freePuzzleSlot', 'localFreeSlotState'),
   between('dayOffsetISO', 'dailyBankFor'),
-  between('dailyBankFor', 'dailyPuzzleFor'),
-  between('dailyPuzzleFor', 'mondayWeekdayIndex'),
   between('challengeKey', 'pointsFor'),
   between('pointsFor', 'savedProgressFor'),
   between('isoShift', 'streakEndingOn'),
@@ -64,8 +62,14 @@ const runtimeFunctions = [
   between('localMozkomorBaseDone', 'mozkomorUnlockState'),
   between('mozkomorUnlockState', 'renderQuickPlay'),
 ].join('\n');
-vm.runInContext(`${runtimeFunctions}\nthis.runtime = {resultRankTuple, freePuzzleSlot, dailyPuzzleFor, challengeKey, pointsFor, streakEndingOn, calcStreak, calcLongest, mozkomorUnlockState};`, context);
+vm.runInContext(`${runtimeFunctions}\nthis.runtime = {resultRankTuple, freePuzzleSlot, challengeKey, pointsFor, streakEndingOn, calcStreak, calcLongest, mozkomorUnlockState};`, context);
 const runtime = context.runtime;
+const progression=require(path.join(root,'public/app/content/progression.js')).create({
+  getPuzzleDB:()=>context.puzzleDB,
+  getState:()=>({completed:{}}),
+  dayOffsetISO:(...args)=>context.dayOffsetISO(...args),
+});
+runtime.dailyPuzzleFor=iso=>progression.dailyPuzzleFor(iso);
 
 context.puzzleDB = {
   freeGeneration: 4,
@@ -129,4 +133,4 @@ const publicContent = JSON.parse(fs.readFileSync(path.join(root, 'public/puzzles
 assert.equal(serverContent.daily.length, fixture.contentSources.serverDailyCount);
 assert.equal(publicContent.daily.length, fixture.contentSources.publicDailyCount);
 
-console.log('domain golden vectors (actual public/app.js): PASS');
+console.log('domain golden vectors (actual runtime owners): PASS');

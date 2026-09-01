@@ -146,6 +146,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s12b2_daily_progression.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_s12a_account_backend.py",
         "runner": "python"
       },
