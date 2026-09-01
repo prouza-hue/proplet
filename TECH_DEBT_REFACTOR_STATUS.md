@@ -1,5 +1,34 @@
 # Technical debt refactor status
 
+- Sprint: 14 — Canonical content build a generation manifest
+- Branch: `refactor/s14-content-pipeline`
+- Base SHA: `b8de402ad676b823f72a905289945eff6f6b3e6c`
+- Characterization commit: `27f370ba2de3133092d4d3148439da473c85fe6b`
+- Implementation commit: `6e55140feb78fa75da2734ef2ee7429a4f473515`
+- Stav: **LOCAL GREEN / NEZÁVISLÉ REVIEW CLEAN / PŘED PR**
+- Zamýšlená změna chování: žádná; pouze explicitní, bezpečný a reprodukovatelný content build/tooling.
+- Změněné oblasti: `content/` manifest + schema, `proplet_content/` model/IO/validator, explicitní build CLI, bezpečné hranice historického generátoru, characterization/pipeline testy, current CI trigger a workflow dokumentace.
+- Hotové kroky:
+  - ověřen produkční `main`, Vercel deployment a health;
+  - zmapován záměrný rozdíl 365 server Daily vs. 366 public Daily;
+  - potvrzeno, že jediný public compatibility přírůstek je `g3-d-007`;
+  - potvrzen byte-identický in-memory rebuild z `data/puzzles.json` + `data/archive/v3.33.5/puzzles.json.gz`;
+  - zafixovány SHA-256, Git blob IDs, byte velikosti a přesná commitová provenance;
+  - build bez akce selže; `--check` je read-only; `--output` zapisuje pouze explicitní cestu atomicky a až po ověření vydaného public artefaktu;
+  - historický `generate_puzzles.py` nemá implicitní output ani skryté auxiliary zápisy; primary bank se zapisuje poslední;
+  - nezávislé review odhalilo fail-closed write-mode blocker; závěrečný re-review po opravách je bez P0/P1.
+- Testy PASS: Sprint 14 characterization; Sprint 14 pipeline; canonical builder `--check`; full Current Runtime Gate **50/50**, assets **76/76**, syntax **1081/1081**.
+- Testy FAIL / nespouštěné: žádné v autoritativním lokálním gate; generation workflow a generation příkazy záměrně nespouštěny.
+- Nově nalezená rizika:
+  - nekanonické legacy tooly a jeden stale workflow stále obsahují přímé fixed-path writery vydaných artefaktů; jejich převod je samostatný charakterizovaný řez;
+  - explicitní multi-output zápisy jsou jednotlivě atomické, nikoli cross-file transakční; primary bank se proto zapisuje až po auxiliaries;
+  - čtyři historické Mozkomor workflow odkazují na odstraněné generation soubory; ve Sprintu 14 se nespouštějí ani neopravují bez samostatně krytého řezu.
+- Byte důkaz: `data/puzzles.json` `51370983…`; deterministický public build a vydaný `public/puzzles.json` shodně `09b2f3a4…` / 2 817 259 bytes. Žádný manifest-bound runtime/content artefakt není v diffu.
+- Bezpečný bod pokračování: pushnout branch a spustit pouze current-runtime CI; žádný generation workflow, release bind ani merge.
+- Další povolený sprint: žádný; Sprint 14 končí review a STOP.
+
+## Předchozí uzavřený stav
+
 - Sprint: 13B — CSS app screens
 - Branch: `refactor/s13b-css-app-screens`
 - Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908`
@@ -390,9 +419,4 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
-
-
-
-
-
 

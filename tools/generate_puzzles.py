@@ -13,15 +13,19 @@ import argparse
 import json
 import random
 import re
+import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from proplet_content.io import atomic_write_text
+
 SOURCE = ROOT / "data" / "source_cs_50k.txt"
 WORDS_OUT = ROOT / "data" / "words.txt"
 ANSWER_TIERS = ROOT / "data" / "answer_tiers.json"
-PUZZLES_PUBLIC_OUT = ROOT / "public" / "puzzles.json"
 PUZZLES_SERVER_OUT = ROOT / "data" / "puzzles.json"
-LEGACY_DAILY_ARCHIVE_OUT = ROOT / "data" / "legacy_daily_gen1.json"
 
 CZ_RE = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.I)
 BAD_SUBSTRINGS = (
@@ -726,8 +730,47 @@ def create_puzzle(
     raise RuntimeError(f"Could not generate {difficulty} puzzle {puzzle_id} from seed {seed}")
 
 
+def write_outputs(
+    *,
+    output: Path,
+    puzzle_payload: str,
+    words_output: Path | None,
+    words_payload: str,
+    legacy_daily_output: Path | None,
+    legacy_daily_payload: str | None,
+) -> None:
+    """Write auxiliaries first so their failure cannot advance the main bank."""
+    if words_output is not None:
+        atomic_write_text(words_output, words_payload)
+    if legacy_daily_output is not None and legacy_daily_payload is not None:
+        atomic_write_text(legacy_daily_output, legacy_daily_payload)
+    atomic_write_text(output, puzzle_payload)
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--input",
+        type=Path,
+        default=PUZZLES_SERVER_OUT,
+        help="Existing canonical bank to read for preserve/top-up modes (read-only).",
+    )
+    ap.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Explicit path for the generated canonical puzzle bank.",
+    )
+    ap.add_argument(
+        "--words-output",
+        type=Path,
+        help="Optional explicit path for the generated validator word list.",
+    )
+    ap.add_argument(
+        "--legacy-daily-output",
+        type=Path,
+        help="Explicit archive path required with --daily-generation-2.",
+    )
     ap.add_argument("--free-per-level", type=int, default=100)
     ap.add_argument("--daily", type=int, default=365)
     ap.add_argument("--rescue", type=int, default=30)
@@ -746,6 +789,21 @@ def main():
                     help="Use the calmer reviewed D profile for appended Hardcore levels.")
     args = ap.parse_args()
 
+    if args.daily_generation_2 and args.legacy_daily_output is None:
+        ap.error("--daily-generation-2 requires --legacy-daily-output")
+    if args.legacy_daily_output is not None and not args.daily_generation_2:
+        ap.error("--legacy-daily-output is only valid with --daily-generation-2")
+    explicit_outputs = [
+        path.resolve()
+        for path in (args.output, args.words_output, args.legacy_daily_output)
+        if path is not None
+    ]
+    if len(explicit_outputs) != len(set(explicit_outputs)):
+        ap.error("output paths must be distinct")
+    for output in explicit_outputs:
+        if not output.parent.is_dir():
+            ap.error(f"output directory does not exist: {output.parent}")
+
     freq = load_frequency_words()
     tiers, tier_of = load_answer_tiers()
     missing_conservative = CONSERVATIVE_D_WORDS - set(tiers["D"])
@@ -759,10 +817,10 @@ def main():
     dictionary = [w for w, _ in freq if w not in FUNCTION_WORDS]
     # Every intended answer must be recognized by the solver even when absent from the frequency corpus.
     dictionary = list(dict.fromkeys(dictionary[:12000] + [w for w in all_answers if w not in dictionary[:12000]] + sorted(EDITORIAL_VALIDATOR_WORDS)))
-    WORDS_OUT.write_text("\n".join(dictionary) + "\n", encoding="utf-8")
+    words_payload = "\n".join(dictionary) + "\n"
 
     preserve_any = args.generation_2 or args.daily_generation_2 or args.preserve_existing or args.preserve_existing_all or args.top_up_existing
-    old = json.loads(PUZZLES_SERVER_OUT.read_text(encoding="utf-8")) if preserve_any and PUZZLES_SERVER_OUT.exists() else None
+    old = json.loads(args.input.read_text(encoding="utf-8")) if preserve_any and args.input.exists() else None
     rng = random.Random(args.seed + 33)
 
     if args.daily_generation_2 and not old:
@@ -770,6 +828,7 @@ def main():
 
     legacy_daily = list((old or {}).get("legacyDaily", []))
     archived_daily_puzzles: list[dict] = []
+    legacy_daily_archive_payload: str | None = None
 
     if old and args.daily_generation_2:
         free = {k: list(old.get("free", {}).get(k, [])) for k in ("easy", "medium", "hard", "hardcore")}
@@ -786,9 +845,8 @@ def main():
                 "rotationBaseDate": "2026-01-01",
                 "puzzles": archived_daily_puzzles,
             }
-            LEGACY_DAILY_ARCHIVE_OUT.write_text(
-                json.dumps(archive_payload, ensure_ascii=False, separators=(",", ":")),
-                encoding="utf-8",
+            legacy_daily_archive_payload = json.dumps(
+                archive_payload, ensure_ascii=False, separators=(",", ":")
             )
             legacy_daily.append({
                 "generation": 1,
@@ -970,8 +1028,14 @@ def main():
         "freeMigration": {"strategy": "transferred-slots", "xpPolicy": "once-per-difficulty-level-slot"} if args.generation_2 else (old or {}).get("freeMigration"),
     }
     payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    PUZZLES_PUBLIC_OUT.write_text(payload_json, encoding="utf-8")
-    PUZZLES_SERVER_OUT.write_text(payload_json, encoding="utf-8")
+    write_outputs(
+        output=args.output,
+        puzzle_payload=payload_json,
+        words_output=args.words_output,
+        words_payload=words_payload,
+        legacy_daily_output=args.legacy_daily_output,
+        legacy_daily_payload=legacy_daily_archive_payload,
+    )
     print(f"Generated/kept {sum(map(len, free.values()))} free + {len(daily)} daily + {len(rescue)} rescue puzzles in {time.time()-started:.1f}s")
     print(f"Dictionary: {len(dictionary)} words; tiered answers: {sum(len(v) for v in tiers.values())} "
           f"(A={len(tiers['A'])}, B={len(tiers['B'])}, C={len(tiers['C'])}, D={len(tiers['D'])})")

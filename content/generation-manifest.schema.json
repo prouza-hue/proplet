@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hrajproplet.cz/schemas/generation-manifest-v1.json",
+  "title": "Proplet generation manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "manifestId",
+    "manifestVersion",
+    "validatorVersion",
+    "provenance",
+    "generation",
+    "canonicalBuild",
+    "identityBuilds",
+    "runtimeArtifacts",
+    "generationInputs"
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitSha1": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "dependentRequired": {
+        "compression": ["uncompressedSha256", "uncompressedSizeBytes"],
+        "uncompressedSha256": ["compression", "uncompressedSizeBytes"],
+        "uncompressedSizeBytes": ["compression", "uncompressedSha256"]
+      },
+      "required": ["path", "role", "sha256", "sizeBytes"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "sizeBytes": {"type": "integer", "minimum": 0},
+        "gitBlob": {"$ref": "#/$defs/gitSha1"},
+        "compression": {"enum": ["gzip"]},
+        "uncompressedSha256": {"$ref": "#/$defs/sha256"},
+        "uncompressedSizeBytes": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "properties": {
+    "$schema": {"const": "./generation-manifest.schema.json"},
+    "schemaVersion": {"const": 1},
+    "manifestId": {"const": "proplet-runtime-content"},
+    "manifestVersion": {"type": "integer", "minimum": 1},
+    "validatorVersion": {"const": "proplet-content-s14-v1"},
+    "provenance": {"type": "object"},
+    "generation": {"type": "object"},
+    "canonicalBuild": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "compatibilitySource", "append", "serialization", "output"],
+      "properties": {
+        "source": {"$ref": "#/$defs/file"},
+        "compatibilitySource": {"$ref": "#/$defs/file"},
+        "output": {"$ref": "#/$defs/file"},
+        "append": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceCollection", "sourceId", "targetCollection", "position", "itemSha256", "reason"],
+          "properties": {
+            "sourceCollection": {"type": "string"},
+            "sourceId": {"type": "string"},
+            "targetCollection": {"type": "string"},
+            "position": {"const": "end"},
+            "itemSha256": {"$ref": "#/$defs/sha256"},
+            "reason": {"type": "string", "minLength": 1}
+          }
+        },
+        "serialization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["encoding", "ensureAscii", "separators", "trailingNewline"],
+          "properties": {
+            "encoding": {"const": "utf-8"},
+            "ensureAscii": {"const": false},
+            "separators": {"const": [",", ":"]},
+            "trailingNewline": {"const": true}
+          }
+        }
+      }
+    },
+    "identityBuilds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "output"],
+        "properties": {
+          "source": {"$ref": "#/$defs/file"},
+          "output": {"$ref": "#/$defs/file"}
+        }
+      }
+    },
+    "runtimeArtifacts": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+    "generationInputs": {"type": "array", "items": {"$ref": "#/$defs/file"}}
+  }
+}

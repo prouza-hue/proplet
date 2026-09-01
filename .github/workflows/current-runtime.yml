@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - '**/*.py'
+      - 'content/**'
+      - 'data/**'
       - 'public/**'
       - 'vercel.json'
       - 'requirements*.txt'
