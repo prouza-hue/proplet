@@ -13,7 +13,10 @@ import server
 
 
 PUBLIC = json.loads((ROOT / "public" / "puzzles.json").read_text(encoding="utf-8"))
-APP = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
+APP = "\n".join(
+    (ROOT / path).read_text(encoding="utf-8")
+    for path in ("public/app.js", "public/app/content/progression.js")
+)
 SW = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 
 

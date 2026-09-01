@@ -283,6 +283,27 @@ let gameSessionController=null;
 let gameBoardController=null;
 let gameInputController=null;
 let gameHintsController=null;
+let progressionController=null;
+let dailyOrchestrationController=null;
+
+function progression(){
+ if(progressionController)return progressionController;
+ const factory=window.PropletContentProgression;if(!factory?.create)throw new Error('Progression modul není dostupný.');
+ progressionController=factory.create({getPuzzleDB:()=>puzzleDB,getState,dayOffsetISO,sortedFreeBank,localFreeSlotState,resumableFreePuzzle,pragueDateISO,addDaysISO,getContentPreviewDate:()=>CONTENT_PREVIEW_DATE});
+ return progressionController;
+}
+function dailyOrchestration(){
+ if(dailyOrchestrationController)return dailyOrchestrationController;
+ const factory=window.PropletDaily;if(!factory?.create)throw new Error('Daily modul není dostupný.');
+ dailyOrchestrationController=factory.create({
+  $,$$,documentObj:document,MutationObserverCtor:MutationObserver,setTimeoutFn:setTimeout,DIFF,pragueDateISO,dailyResultState,effectiveStats,formatDateCZ,countCz,
+  renderDailyWeekRhythm,renderLevelCard,getProfile,getQueue,getSyncState:()=>syncState,
+  renderRescueCard:(...args)=>renderRescueCard(...args),renderQuickPlay:(...args)=>renderQuickPlay(...args),renderTajenkaEntry:(...args)=>renderTajenkaEntry(...args),
+  showDailyResult:(...args)=>showDailyResult(...args),startGame:(...args)=>startGame(...args),showToast,
+  afterRender:()=>window.PropletHomeLayout?.applyDailyLayout?.(),
+ });
+ return dailyOrchestrationController;
+}
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
 function accountSession(){
@@ -459,19 +480,11 @@ function formatDateCZ(iso){const [y,m,d]=iso.split('-').map(Number);return new I
 function pragueDateISO(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
 function addDaysISO(iso,days){const [y,m,d]=iso.split('-').map(Number),dt=new Date(Date.UTC(y,m-1,d+days,12));return dt.toISOString().slice(0,10)}
 function dayOffsetISO(iso,base){const [y,m,d]=iso.split('-').map(Number),[by,bm,bd]=base.split('-').map(Number);return Math.floor((Date.UTC(y,m-1,d)-Date.UTC(by,bm-1,bd))/86400000)}
-function dailyBankFor(iso){
- const gen4From=puzzleDB.dailyGeneration4From||puzzleDB.release?.dailyGeneration4From||null,active=puzzleDB.daily||[];
- if(gen4From){
-  if(iso>=gen4From)return {bank:active.filter(p=>Number(p.meta?.contentGeneration||4)===4),base:puzzleDB.dailyRotationBaseDate||gen4From};
-  const window=(puzzleDB.archive?.dailyWindows||[]).find(w=>(!w.activeFrom||iso>=w.activeFrom)&&(!w.activeUntil||iso<=w.activeUntil));
-  if(window?.puzzleIds?.length){const base=window.rotationBaseDate||'2026-01-01',i=((dayOffsetISO(iso,base)%window.puzzleIds.length)+window.puzzleIds.length)%window.puzzleIds.length,id=window.puzzleIds[i],puzzle=active.find(p=>p.id===id);if(puzzle)return {bank:[puzzle],base:iso}}
- }
- const switchDate=puzzleDB.dailyGeneration3From||null,previous=puzzleDB.previousDaily;if(switchDate&&iso<switchDate&&previous?.puzzles?.length)return {bank:previous.puzzles,base:previous.rotationBaseDate||'2026-01-01'};return {bank:active,base:puzzleDB.dailyRotationBaseDate||switchDate||'2026-01-01'}
-}
-function dailyPuzzleFor(iso){const source=dailyBankFor(iso),n=source.bank.length;if(!n)throw new Error('Daily banka je prázdná');const i=((dayOffsetISO(iso,source.base)%n)+n)%n;return source.bank[i]}
+function dailyBankFor(iso){return progression().dailyBankFor(iso)}
+function dailyPuzzleFor(iso){return progression().dailyPuzzleFor(iso)}
 function mondayWeekdayIndex(iso){const [y,m,d]=iso.split('-').map(Number),day=new Date(Date.UTC(y,m-1,d,12)).getUTCDay();return (day+6)%7}
 function renderDailyWeekRhythm(iso){const root=$('#dailyWeekRhythm');if(!root)return;const cadence=puzzleDB.dailyCadence||{},pattern=cadence.pattern||['easy','easy','medium','medium','medium','hard','hard'],labels=cadence.labels||['Po','Út','St','Čt','Pá','So','Ne'],activeFrom=cadence.activeFrom||puzzleDB.dailyGeneration3From||null,active=!activeFrom||iso>=activeFrom,today=active?mondayWeekdayIndex(iso):-1;root.classList.toggle('pending',!active);root.innerHTML=`<div class="daily-week-rhythm-head"><strong>${active?'Týdenní rytmus':'Od pondělí 17. 8.'}</strong><span>2 snadné · 3 střední · 2 těžké</span></div><div class="daily-week-days">${pattern.map((diff,i)=>`<span class="daily-week-day ${diff} ${i===today?'active':''}" title="${labels[i]} · ${DIFF[diff]?.label||diff}"><b>${labels[i]}</b><i>${difficultyIconMarkup(diff,'daily-week-icon')}</i></span>`).join('')}</div>`}
-function dailyResultState(iso){const puzzle=dailyPuzzleFor(iso),stored=getState().completed[`daily:${iso}`]||null;return {puzzle,stored,active:stored?.puzzleId===puzzle.id?stored:null,legacy:stored&&stored.puzzleId!==puzzle.id?stored:null}}
+function dailyResultState(iso){return progression().dailyResultState(iso)}
 function challengeKey(mode,puzzle,date){return mode==='daily'?`daily:${date}`:mode==='starter'?`starter:${puzzle.id}`:mode==='tajenka'?`tajenka:${puzzle.id}`:`free:${puzzle.id}`}
 function pointsFor(mode,difficulty,puzzle=null){
  if(mode==='tajenka')return tajenkaCompletion(puzzle)?0:Number(puzzle?.meta?.rewardXp)||TAJENKA_REWARD_XP;if(mode==='daily')return 100;if(mode==='starter')return Number(puzzle?.meta?.rewardXp)||10;if(mode!=='free')return DIFF[difficulty].xp;
@@ -610,13 +623,7 @@ function renderLevelCard(stats){
  const l=levelFor(stats.points||0),toNext=l.next?l.next.xp-(stats.points||0):0,risk=rescueStatus&&(rescueStatus.state==='available'||rescueStatus.state==='started'),shownStreak=risk?Math.max(stats.currentStreak||0,rescueStatus.priorStreak||0):stats.currentStreak,next=BADGES.find(b=>shownStreak<b.days);
  $('#levelCard').innerHTML=`<div class="daily-progress-rank"><span>${l.current.icon}</span><div><strong>${l.current.name}</strong><small>${stats.points||0} XP${l.next?` · ${toNext.toLocaleString('cs-CZ')} do ${esc(l.next.name)}`:''}</small></div></div><div class="daily-progress-track"><i><b style="width:${l.pct}%"></b></i></div><div class="daily-progress-streak ${risk?'at-risk':''}"><span>🔥</span><div><strong>${shownStreak||0}</strong><small>${risk?'zachraň sérii':next?`${countCz(next.days-shownStreak,'den','dny','dní')} do ${esc(next.name)}`:'legendární série'}</small></div></div>`;
 }
-function renderDaily(){
- const date=pragueDateISO(),daily=dailyResultState(date),p=daily.puzzle,stats=effectiveStats(),done=daily.active,upgrade=daily.legacy;
- $('#dailyDate').textContent=formatDateCZ(date);$('#dailyMeta').textContent=`${DIFF[p.difficulty].label} · ${countCz(p.meta.cells,'políčko','políčka','políček')} · ${countCz(p.answers.length,'slovo','slova','slov')}`;renderDailyWeekRhythm(date);
- $('#playDailyBtn').textContent=done?'Zobrazit dnešní výsledek':upgrade?'Zahrát novou dnešní výzvu':'Hrát dnešní výzvu';$('#shareDailyBtn').classList.toggle('hidden',!done);renderLevelCard(stats);
- const sync=$('#dailySyncStatus');if(!done&&!upgrade){sync.classList.add('hidden')}else{sync.classList.remove('hidden');const pfile=getProfile(),queued=getQueue().some(r=>r.challengeKey===`daily:${date}`);if(upgrade)sync.textContent='✨ Dnešní výzva má novou desku. Zahraj ji pro dnešní i týdenní pořadí; dalších 100 XP se nepřidá.';else if(!pfile?.token)sync.textContent='📱 Výsledek je uložený jen v tomto zařízení';else if(queued)sync.textContent=syncState.status==='error'?`⚠️ Čeká na synchronizaci: ${syncState.error||'zkus to znovu'}`:'☁️ Výsledek čeká na synchronizaci';else sync.textContent=pfile.familyCode?'✓ Výsledek je v cloudu i týmovém pořadí':'✓ Výsledek je bezpečně v cloudu';}
- renderRescueCard();renderQuickPlay();renderTajenkaEntry();
-}
+function renderDaily(){return dailyOrchestration().renderDaily()}
 
 async function refreshRescueStatus(){
  const profile=getProfile();
@@ -670,10 +677,7 @@ async function finishRescue(passed){
 }
 function failRescue(){finishRescue(false)}
 
-function freeProgress(diff){
- const list=sortedFreeBank(diff),total=list.length,slots=localFreeSlotState(diff),done=slots.actual.size,resume=resumableFreePuzzle(diff,list),nextUnsolved=list.find(p=>!slots.actual.has(Number(p.meta?.level)))||null,pct=total?Math.round(done/total*100):0;
- return {list,total,done,actual:slots.actual.size,transferred:slots.transferred.size,resume,nextUnsolved,pct,slots};
-}
+function freeProgress(diff){return progression().freeProgress(diff)}
 function localMozkomorBaseDone(){
  const slots=localFreeSlotState('hardcore');
  return [...slots.actual].filter(level=>level>=1&&level<=MOZKOMOR_UNLOCK_BASE).length;
@@ -692,14 +696,11 @@ function renderQuickPlay(){
 }
 
 
-function latestContentBatch(){return puzzleDB?.contentStatus?.latestBatch||null}
-function latestContentIsFresh(){const b=latestContentBatch(),today=CONTENT_PREVIEW_DATE||pragueDateISO();if(!b?.availableFrom)return false;return today>=b.availableFrom&&today<=addDaysISO(b.availableFrom,6)}
-function latestContentPuzzles(){
- const batch=latestContentBatch();if(!batch||!latestContentIsFresh())return[];
- return (batch.levels||[]).map(row=>sortedFreeBank(row.difficulty).find(p=>p.id===row.id)).filter(Boolean);
-}
-function latestContentUnplayed(){const s=getState();return latestContentPuzzles().filter(p=>!s.completed?.[`free:${p.id}`])}
-function newContentCount(diff){return latestContentUnplayed().filter(p=>p.difficulty===diff).length}
+function latestContentBatch(){return progression().latestContentBatch()}
+function latestContentIsFresh(){return progression().latestContentIsFresh()}
+function latestContentPuzzles(){return progression().latestContentPuzzles()}
+function latestContentUnplayed(){return progression().latestContentUnplayed()}
+function newContentCount(diff){return progression().newContentCount(diff)}
 function startLatestContent(){const batch=latestContentBatch(),list=latestContentUnplayed(),all=latestContentPuzzles(),p=list[0]||all[0];if(p)startGame(p,'free',null,{contentBatchId:batch?.id||null})}
 function continueLatestContent(){const batch=latestContentBatch(),p=latestContentUnplayed()[0];if(p&&currentGame?.contentBatchId===batch?.id)startGame(p,'free',null,{contentBatchId:batch.id});else nav('free',{replace:true})}
 function renderNewContentBanner(){
@@ -725,7 +726,7 @@ async function startFree(diff){
  const list=sortedFreeBank(diff),slots=localFreeSlotState(diff),resume=resumableFreePuzzle(diff,list),unplayed=list.filter(p=>!slots.actual.has(Number(p.meta?.level))),p=resume||(unplayed[0]||list[0]);if(p)startGame(p,'free',null);
 }
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
-function startDaily(options={}){$('#starterDailyNudge')?.classList.add('hidden');$('.daily-hero')?.classList.remove('starter-next');const date=pragueDateISO(),daily=dailyResultState(date);if(daily.active){showDailyResult(date,daily.active);return}startGame(daily.puzzle,'daily',date,options);if(options.starterHardDirect)setTimeout(()=>showToast('🔥 Dnešní výzva je Těžká. Kdyby ses zasekl, Nápověda je dole po ruce.'),180)}
+function startDaily(options={}){return dailyOrchestration().startDaily(options)}
 function startStarterWarmup(){const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has(Number(x.meta?.level)))||list[0];if(!p){nav('free',{replace:true});return}startGame(p,'free',null,{postStarterWarmup:true})}
 function startTajenka(){if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){showToast('Tajenka není na této verzi dostupná.');return}trackProductEvent('tajenka_started');startGame(tajenkaPuzzle,'tajenka',null)}
 
@@ -1927,5 +1928,6 @@ function installEngagementModules(){
   onAppInstalled:()=>{deferredInstallPrompt=null;saveInstallNudgeState({...getInstallNudgeState(),installed:true,done:true,installedAt:new Date().toISOString()});trackProductEvent('pwa_installed');renderInstallUI()}
  });
 }
-if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();boot()}
+function installContentModules(){dailyOrchestration().install()}
+if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};

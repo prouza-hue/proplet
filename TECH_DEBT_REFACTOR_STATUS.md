@@ -3,7 +3,8 @@
 - Sprint: 12B.2 — progression + Daily orchestration
 - Branch: `refactor/s12b-daily`
 - Base SHA: `b3579b2957dc38cf83798fc05c86546a8949ddf7` (uzavřený produkční Sprint 12B.1)
-- Stav: **CHARACTERIZATION CHECKPOINT / BEZ RUNTIME ZMĚN**
+- Characterization: `417dc8200159a589497186b5065f9e5aa1d89692`
+- Stav: **RUNTIME CHECKPOINT / GREEN / ČEKÁ NA PREVIEW QA**
 - Zamýšlená změna chování: žádná; pouze přesun vlastnictví při zachování výběru, fresh/replay a release CTA.
 - Rozsah:
   - `public/app/content/progression.js` + Daily orchestrace;
@@ -15,11 +16,16 @@
   - branch založena z přesného produkčního SHA;
   - načten celý plán Sprintu 12B a audit Finding 3;
   - dokončena nezávislá mapa runtime vlastníků a characterization/browser matrix;
-  - přidán test-only kontrakt pro Daily rotaci, active/legacy stav, Free fresh/replay, release CTA a budoucí idempotentní ownership guard.
-- Testy PASS: lokální Current Runtime Gate **45/45**, assets **80/80**, syntax **222/222**; vzdálený gate čeká na draft PR.
-- Testy FAIL / nespouštěné: runtime dosud nezměněn; browser matrix poběží až nad preview runtime checkpointem.
-- Nově nalezená rizika: `home-layout.js` obaluje globální `renderDaily`, `daily-win-menu-v40123.js` přidává samostatný observer a PWA shell je na vědomém limitu 23 assetů; známý historický Gen4 failure `ResultCreate must carry calm_mode` je mimo scope.
-- Bezpečný bod pokračování: publikovat test-only checkpoint a vyžádat zelený Current Runtime Gate; teprve potom měnit runtime.
+  - přidán test-only kontrakt pro Daily rotaci, active/legacy stav, Free fresh/replay, release CTA a idempotentní ownership guard;
+  - vzdálený Current Runtime Gate #38 nad characterization checkpointem je green;
+  - `public/app/content/progression.js` vlastní Daily selection, Free progression a fresh release-batch policy;
+  - `public/app/content/daily.js` vlastní `renderDaily`, `startDaily` a jediný result-menu observer;
+  - `app.js` ponechává tenké kompatibilní adaptéry; `home-layout.js` používá explicitní `afterRender` seam a nepřepisuje `renderDaily` ani nepřidává Daily nav listener;
+  - starý `daily-win-menu-v40123.js` je pasivní mixed-cache shim a už se nenačítá; cache boundaries pro `theme-init` a `home-layout` jsou posunuté.
+- Testy PASS: lokální Current Runtime Gate **45/45**, assets **81/81**, syntax **224/224**.
+- Testy FAIL / nespouštěné: vzdálený runtime gate a browser/preview matrix čekají na publikaci runtime checkpointu.
+- Nově nalezená rizika: PWA shell je na vědomém limitu 24 assetů; mixed-cache cesta je krytá novým query boundary a pasivním shimem. Známý historický Gen4 failure `ResultCreate must carry calm_mode` je mimo scope.
+- Bezpečný bod pokračování: publikovat runtime checkpoint, vyžádat zelený Current Runtime Gate a ověřit preview browser matrix; bez výsledku QA nemergovat.
 - Produkce/main/Supabase: **beze změny po založení branche**. Žádná migrace.
 - Další povolený sprint: žádný před samostatným review a schválením tohoto řezu.
 

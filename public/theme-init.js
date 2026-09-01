@@ -77,7 +77,7 @@
   const loadExtras=async()=>{
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=40140-s12a1r1','propletHomeLayout');
+    loadScript('/home-layout.js?v=40140-s12b2','propletHomeLayout');
     loadScript('/ranking-polish.js?v=2','propletRankingPolish');
     if(!document.querySelector('link[data-proplet-account-auth-css]')){
       const css=document.createElement('link');css.rel='stylesheet';css.href='/account-auth.css?v=5';css.dataset.propletAccountAuthCss='1';document.head.appendChild(css);
@@ -93,7 +93,6 @@
     loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=4','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');
-    loadScript('/daily-win-menu-v40123.js?v=1','propletDailyWinMenuV40123');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/release-notes-v3331.js?v=40132','propletReleaseNotesV3331');

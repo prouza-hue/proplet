@@ -14,6 +14,9 @@ const release=read('public/release-notes-v3331.js');
 const menu=read('public/daily-win-menu-v40123.js');
 const progressionPath=path.join(root,'public/app/content/progression.js');
 const dailyPath=path.join(root,'public/app/content/daily.js');
+const hasOwners=fs.existsSync(progressionPath)&&fs.existsSync(dailyPath);
+const progressionSource=hasOwners?read('public/app/content/progression.js'):'';
+const dailySource=hasOwners?read('public/app/content/daily.js'):'';
 
 function extractFunction(source,name){
   const start=source.indexOf(`function ${name}(`);
@@ -54,7 +57,9 @@ const puzzleDB={
   daily:[activeA,activeB,archive],
   archive:{dailyWindows:[{activeFrom:'2026-07-01',activeUntil:'2026-07-31',rotationBaseDate:'2026-07-01',puzzleIds:[archive.id]}]},
 };
-const dailyFns=legacyFunctions(['dailyBankFor','dailyPuzzleFor','dailyResultState'],{puzzleDB,dayOffsetISO:days,getState:()=>state});
+const dailyFns=hasOwners
+  ?require(progressionPath).create({getPuzzleDB:()=>puzzleDB,dayOffsetISO:days,getState:()=>state})
+  :legacyFunctions(['dailyBankFor','dailyPuzzleFor','dailyResultState'],{puzzleDB,dayOffsetISO:days,getState:()=>state});
 assert.strictEqual(dailyFns.dailyPuzzleFor('2026-07-15').id,archive.id,'archive Daily selection drifted');
 assert.strictEqual(dailyFns.dailyPuzzleFor('2026-08-01').id,activeA.id,'Gen4 Daily rotation base drifted');
 assert.strictEqual(dailyFns.dailyPuzzleFor('2026-08-02').id,activeB.id,'Gen4 Daily rotation drifted');
@@ -70,11 +75,10 @@ assert.strictEqual(dailyFns.dailyResultState('2026-08-01').legacy,null);
 
 const levels=[1,2,3].map(level=>({id:`easy-${level}`,difficulty:'easy',meta:{level}}));
 let actual=new Set(),transferred=new Set(),resume=null;
-const {freeProgress}=legacyFunctions(['freeProgress'],{
-  sortedFreeBank:()=>levels,
-  localFreeSlotState:()=>({actual,transferred}),
-  resumableFreePuzzle:()=>resume,
-});
+const freeProgress=(hasOwners
+  ?require(progressionPath).create({sortedFreeBank:()=>levels,localFreeSlotState:()=>({actual,transferred}),resumableFreePuzzle:()=>resume})
+  :legacyFunctions(['freeProgress'],{sortedFreeBank:()=>levels,localFreeSlotState:()=>({actual,transferred}),resumableFreePuzzle:()=>resume})
+).freeProgress;
 let progress=freeProgress('easy');
 assert.strictEqual(progress.nextUnsolved.id,'easy-1');
 assert.strictEqual(progress.done,0);
@@ -88,6 +92,22 @@ assert.strictEqual(freeProgress('easy').transferred,1,'prior-generation credit d
 actual=new Set([1,2,3]);resume=null;
 assert.strictEqual(freeProgress('easy').nextUnsolved,null,'completed bank must enter replay selection');
 
+if(hasOwners){
+  const batchPuzzles=[{id:'batch-1',difficulty:'easy',meta:{level:4}},{id:'batch-2',difficulty:'easy',meta:{level:5}}];
+  const contentState={completed:{'free:batch-1':{puzzleId:'batch-1'}}};
+  const contentDB={contentStatus:{latestBatch:{id:'week-1',availableFrom:'2026-08-31',levels:[{id:'batch-1',difficulty:'easy'},{id:'batch-2',difficulty:'easy'}]}}};
+  const content=require(progressionPath).create({
+    getPuzzleDB:()=>contentDB,getState:()=>contentState,sortedFreeBank:()=>batchPuzzles,
+    getContentPreviewDate:()=>null,pragueDateISO:()=> '2026-09-01',
+    addDaysISO:(iso,daysToAdd)=>new Date(Date.parse(`${iso}T12:00:00Z`)+daysToAdd*86400000).toISOString().slice(0,10),
+  });
+  assert.strictEqual(content.latestContentIsFresh(),true);
+  assert.deepStrictEqual(content.latestContentPuzzles().map(p=>p.id),['batch-1','batch-2']);
+  assert.deepStrictEqual(content.latestContentUnplayed().map(p=>p.id),['batch-2']);
+  contentDB.contentStatus.latestBatch.availableFrom='2026-08-20';
+  assert.strictEqual(content.latestContentIsFresh(),false,'stale release batch stayed fresh');
+}
+
 for(const copy of [
   'Hrát dnešní výzvu',
   'Zobrazit dnešní výsledek',
@@ -95,11 +115,11 @@ for(const copy of [
   'Pokračovat v Denní výzvě',
   'Hrát novinky',
   'Týdenní várka dohraná',
-])assert(`${app}\n${home}`.includes(copy),`Daily/progression copy drifted: ${copy}`);
-assert(app.includes("$('#shareDailyBtn').classList.toggle('hidden',!done)"),'Daily share visibility drifted');
-assert(app.includes("if(daily.active){showDailyResult(date,daily.active);return}"),'completed Daily must open its result');
-assert(app.includes("startGame(daily.puzzle,'daily',date,options)"),'fresh/legacy Daily must start the selected board');
-assert(menu.includes("new MutationObserver(normalize).observe(button"),'Daily result-menu observer missing');
+])assert(`${app}\n${home}\n${progressionSource}\n${dailySource}`.includes(copy),`Daily/progression copy drifted: ${copy}`);
+assert(`${app}\n${dailySource}`.includes("$('#shareDailyBtn').classList.toggle('hidden',!done)"),'Daily share visibility drifted');
+assert(`${app}\n${dailySource}`.includes("if(daily.active){deps.showDailyResult(date,daily.active);return}")||app.includes("if(daily.active){showDailyResult(date,daily.active);return}"),'completed Daily must open its result');
+assert(`${app}\n${dailySource}`.includes("deps.startGame(daily.puzzle,'daily',date,options)")||app.includes("startGame(daily.puzzle,'daily',date,options)"),'fresh/legacy Daily must start the selected board');
+if(!hasOwners)assert(menu.includes("new MutationObserver(normalize).observe(button"),'Daily result-menu observer missing');
 assert(release.includes("if(!document.querySelector('#screen-daily.active'))return false"),'release modal Daily-screen guard drifted');
 assert(release.includes("localStorage.setItem(SEEN_KEY,'1')"),'release modal seen marker drifted');
 
@@ -111,7 +131,9 @@ if(fs.existsSync(progressionPath)||fs.existsSync(dailyPath)){
   assert.strictEqual(typeof daily.create,'function');
   assert(!home.includes('const baseDaily=renderDaily'),'home layout still captures renderDaily');
   assert(!home.includes('renderDaily=function'),'home layout still replaces renderDaily');
+  assert(!home.includes("querySelectorAll('[data-nav=\"daily\"]')"),'home layout still adds a Daily navigation listener');
   assert(!menu.includes('new MutationObserver'),'legacy result-menu observer still owns the patch');
+  assert(!dailySource.includes('setTimeout(boot,100)'),'Daily owner introduced a retry loop');
   assert(/function renderDaily\([^)]*\)\{return dailyOrchestration\(\)\.renderDaily/.test(app),'app renderDaily is not a thin Daily-owner adapter');
   assert(/function dailyResultState\([^)]*\)\{return progression\(\)\.dailyResultState/.test(app),'app dailyResultState is not a thin progression adapter');
 
