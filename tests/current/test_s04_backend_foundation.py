@@ -281,18 +281,24 @@ with (
     patch.object(server, "VAPID_PUBLIC_KEY", ""),
     patch.object(server, "VAPID_PRIVATE_KEY", ""),
 ):
+    config_fixture = server.config()
+    health_fixture = server.health()
+    # Release publication changes APP_VERSION without changing these response
+    # contracts. Normalize only the release metadata back to the captured
+    # v4.01.40 baseline so every other response field stays hash-protected.
+    for fixture in (config_fixture, health_fixture):
+        if isinstance(fixture, dict) and "version" in fixture:
+            fixture["version"] = "4.01.40"
     response_fixtures = json.dumps(
         {
-            "config": server.config(),
-            "health": server.health(),
+            "config": config_fixture,
+            "health": health_fixture,
             "push": server.push_config(),
         },
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
     )
-# Recaptured for the unchanged backend contract after the v4.01.40 release
-# version bump; fixture content differs from v4.01.39 only through release metadata.
 response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
 assert response_fixture_digest == (
     "702932e4b85aa0082c150c4cde680af520ab3ac4cef2a6700773b03b87e4e64c"
