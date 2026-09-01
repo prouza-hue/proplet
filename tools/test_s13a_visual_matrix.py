@@ -166,13 +166,13 @@ def main() -> int:
         wait_http(base+"/")
         with sync_playwright() as pw:
             chrome=next((p for p in ("/usr/bin/google-chrome","/usr/bin/google-chrome-stable","/usr/bin/chromium","/usr/bin/chromium-browser") if os.path.exists(p)),None)
-            browser=pw.chromium.launch(headless=True,executable_path=chrome,args=["--no-sandbox","--disable-dev-shm-usage"] if chrome else [])
+            browser=pw.chromium.launch(headless=True,executable_path=chrome,args=["--no-sandbox","--disable-dev-shm-usage","--disable-font-subpixel-positioning","--font-render-hinting=none","--disable-lcd-text"] if chrome else [])
             for case in matrix["cases"]:
                 w,h=case["viewport"];sw,sh=case["screen"]
                 touch=w<900
                 ctx=browser.new_context(
                     viewport={"width":w,"height":h},screen={"width":sw,"height":sh},
-                    has_touch=touch,is_mobile=touch,service_workers="block",
+                    has_touch=touch,is_mobile=touch,service_workers="block",device_scale_factor=1,
                     color_scheme=case["system"],reduced_motion=case["motion"]
                 )
                 theme=case["theme"]
