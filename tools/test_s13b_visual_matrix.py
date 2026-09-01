@@ -81,6 +81,7 @@ def main():
     pref=case["theme"];ctx.add_init_script(script=f"""()=>{{localStorage.setItem('proplet-v3-settings',JSON.stringify({{theme:{json.dumps(pref)}}}));localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');sessionStorage.setItem('proplet-gen4-release-modal-v1','1')}}""")
     p=ctx.new_page();errs=[];p.on("pageerror",lambda e,bag=errs:bag.append(str(e)));p.goto(base,wait_until="domcontentloaded",timeout=30000);p.wait_for_timeout(900)
     p.evaluate("""()=>{document.querySelector('#qualityReleaseModal')?.classList.add('hidden');document.querySelector('.release-notes-v3331-backdrop')?.remove();document.documentElement.classList.remove('gen4-preview-booting')}""")
+    p.add_style_tag(content="*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}")
     safe=case.get("safe",{});top=safe.get("top",0);bottom=safe.get("bottom",0)
     if top or bottom:p.add_style_tag(content=f"body:not(.playing) .app-shell{{padding-top:calc({top}px + 10px)!important;padding-bottom:calc({bottom}px + 12px)!important}}")
     fixture(p,case["state"]);p.evaluate("()=>document.fonts?.ready");p.wait_for_timeout(250)
