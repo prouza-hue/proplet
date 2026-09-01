@@ -4,7 +4,7 @@
 - Branch: `refactor/s16-legacy-cleanup`
 - Base SHA: `5edd2bc847153ef50a5226c080e1e79243d96000`
 - Characterization HEAD: `0a27513883d8f62a3453f1c8f07cdfb0f2af8b90`
-- Stav: **implementation candidate / verification pending**
+- Stav: **PREVIEW READY — STOP na user review**
 - Zamýšlená změna chování: žádná.
 - Tento sprint je poslední sprint v `TECH_DEBT_REFACTOR_PLAN.md`.
 
@@ -30,14 +30,25 @@ Unreferenced, ale kvůli možným přímým QA URL záměrně ponechané: `game-
 
 Pre-change current-runtime po opravě characterization: **GREEN**.
 
-## Zbývá
+## Verification
 
-1. post-change current gate + asset scan;
-2. diff review — žádný další runtime/content/DB zásah;
-3. Vercel preview health + smoke;
-4. preview request-log scan na odstraněný `/server.py`;
-5. user review/approval;
-6. STOP — žádný další refactor z tohoto plánu.
+- Implementation HEAD: `5eeadbdecd38aa5603b4da939143c4df2a463e77`.
+- Current tests: **53 PASS / 0 FAIL**.
+- Assets: **77 PASS / 0 FAIL** (69 local references).
+- Syntax: **241 PASS / 0 FAIL**.
+- Diff proti base: mimo testy/dokumentaci pouze odstraněný `public/server.py` + dva tracked `.pyc`; žádný současný JS/CSS/content/SQL/backend owner změněn.
+- Vercel preview: `dpl_9aeEcy8PKkGe75K44DAMfmrNVxLq` — **READY**.
+- Preview root + `/api/health`: HTTP 200; Proplet `4.01.40`, `ok=true`, DB true.
+- Build error scan: čistý.
+- Preview runtime `error/fatal`: bez záznamů.
+- Preview request log před explicitním testem: žádný request na `/server.py`.
+- Explicitní `GET /server.py`: **404 Not Found**.
+
+## STOP
+
+Čeká se na explicitní user approval. Bez něj:
+- nemergovat PR #106 do `main`;
+- neprovádět další refactor — Sprint 16 je poslední sprint plánu.
 
 ## Předchozí stav
 
