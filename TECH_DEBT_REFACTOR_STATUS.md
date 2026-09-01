@@ -32,8 +32,9 @@
   - browser fresh-state: Daily homescreen, `Hrát Denní výzvu`, release banner `Hrát novinky`, Free → Daily → Daily stabilní;
   - opakovaná Daily navigace zachovala datum i CTA a nepřidala page console error/warning;
   - preview runtime error/fatal log scan za poslední hodinu je čistý.
-- Testy FAIL / mimo scope: Gen4 workflow dál padá na `ResultCreate must carry calm_mode`. Jde o zastaralou statickou kontrolu, která hledá model přímo v `server.py`, ačkoli model i `calm_mode` už správně vlastní `backend/contracts.py`; nejde o runtime vadu.
+- Historický test FAIL / mimo scope: Gen4 workflow padal na `ResultCreate must carry calm_mode`. Šlo o zastaralou statickou kontrolu, která hledala model přímo v `server.py`, ačkoli model i `calm_mode` už správně vlastní `backend/contracts.py`; nešlo o runtime vadu.
 - Nově nalezená rizika: PWA shell je na vědomém limitu 24 assetů; mixed-cache cesta je krytá novým query boundary a pasivním shimem. Gen4 kontrolu opravit samostatným test-only hotfixem, aby CI znovu dávalo spolehlivý signál.
+- Hotfix checkpoint: na větvi `hotfix/gen4-calm-contract` kontrola Gen4 staticky ověřuje `ResultCreate`, `AttemptStart`, `AttemptCheckpoint` a `AttemptFinishTelemetry` v `backend/contracts.py`; `server.py` zůstává ověřený pro runtime importy a použití `calm_mode`. Runtime, produktová data ani DB se nemění.
 - PR #97: **MERGED** — `https://github.com/prouza-hue/proplet/pull/97`; nahrazuje draft #96, který GitHub konektor nedokázal přepnout do ready stavu.
 - Produkce: deployment `dpl_2n3uKFk1okdT8ErfJt7vxkrsiLrr` je **READY** na merge SHA; `hrajproplet.cz`, health a oba nové content moduly vracejí 200, DB true a error/fatal scan je čistý.
 - Supabase: beze změny. Žádná migrace.
