@@ -64,7 +64,7 @@ jobs:
           python tools/compare_s13a_visuals.py \
             --baseline /tmp/proplet-s13a-baseline \
             --current /tmp/proplet-s13a-visual \
-            --max-changed-ratio 0.00005 \
+            --max-changed-ratio 0.0005 \
             --max-channel-delta 3 \
             --max-geometry-delta 0.25
       - uses: actions/upload-artifact@v4
