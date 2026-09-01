@@ -28,13 +28,6 @@
 .played-levels-progress small{margin-top:2px;font-size:9px;color:var(--muted);font-weight:850}
 .played-levels-meta:empty{display:none}
 
-#winModal.comparison-loaded .win-summary>p{display:none}
-#winModal.comparison-loaded .win-summary{margin:4px 0 7px;padding:8px 10px}
-#winModal.comparison-loaded .win-card{padding-top:17px}
-#winModal.comparison-loaded .win-badge{font-size:40px;line-height:1}
-#winModal.comparison-loaded .win-card h2{margin:1px 0 3px}
-#winModal.comparison-loaded .win-praise{margin:0 auto 5px}
-
 html[data-theme="dark"] .played-levels-progress{background:conic-gradient(var(--played-diff,#9b8cff) var(--progress),#302c3b 0)}
 html[data-theme="dark"] .played-levels-progress:before{background:#1b1926}
 
@@ -43,8 +36,4 @@ html[data-theme="dark"] .played-levels-progress:before{background:#1b1926}
   .played-levels-difficulty-icon{width:28px;height:28px}
   .played-levels-progress{width:56px;height:56px}
   .played-levels-head{gap:10px}
-}
-@media(min-width:520px){
-  #winModal.comparison-loaded .win-card{padding-top:14px}
-  #winModal.comparison-loaded .win-badge{font-size:36px}
 }

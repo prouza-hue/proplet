@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "source_commit": "8adbb36b3d68b32f9da33c1d94dd222a02926ef5",
+  "workflow_run_id": 33500090150,
+  "artifact_id": 9797349512,
+  "renderer": [
+    "--disable-font-subpixel-positioning",
+    "--font-render-hinting=none",
+    "--disable-lcd-text",
+    "device_scale_factor=1"
+  ],
+  "policy": "Characterized renderer-noise tolerance fixed before runtime CSS changes: <=0.05% changed pixels, channel delta <=3, geometry delta <=0.25px.",
+  "results": {
+    "phone-light-pre": {
+      "sha256": "167ccf1a7f230acd0650872a86f396e2168837158a1d0123cacd06e356b91c85"
+    },
+    "phone-dark-progress": {
+      "sha256": "86ffe8246ce9a49b58de33adfc79384661581a8523106299b9bc4988d3f4fb09"
+    },
+    "phone-auto-hint-safe-reduced": {
+      "sha256": "e8fc93482ca80d8e8aa9b3da1ca29f0966204a760b6ee95e6e0c0e6a225c1d5f"
+    },
+    "fold-portrait-light-pre": {
+      "sha256": "183be88d382775cc9011d6bc3b9aa309aa2fc6844c2632beac850edf8b1664a8"
+    },
+    "fold-portrait-dark-progress-safe": {
+      "sha256": "6fcd9560eb5e5fb6aff78db5137a0319cdddaa4e601624f674d3ea238dec6e5e"
+    },
+    "fold-landscape-light-progress": {
+      "sha256": "73a56b49dc4caf60d9d6d68bb13c6cb395ddd965a051e58b70cb823d086a0748"
+    },
+    "fold-landscape-dark-hint": {
+      "sha256": "e1a9c6d46250688fe0a1f3afa22dbf4df41d3207a65c710279bce0beda0d046c"
+    },
+    "desktop-light-pre": {
+      "sha256": "19011ff90a3e013d9ec06dd679f673c31c283c9503b60452f5635e15bd5ab71f"
+    },
+    "desktop-dark-progress": {
+      "sha256": "80651c0957ca96d450a38020d80155f79fb729e29a0e86060b83db451f83631f"
+    },
+    "desktop-auto-hint-reduced": {
+      "sha256": "c95004b265a26e6d986b3a467621091ab9e974ee1490d1703cebc5bb6133a9f1"
+    },
+    "phone-light-result-safe": {
+      "sha256": "f91fd70480e01d46f2d87a9dde4f60abfae03ef88f614a96844614d25f6fb3e9"
+    },
+    "fold-dark-result": {
+      "sha256": "0fb5b77a56273616ee645d2a3b4946a0ec264ed3ee5fc5457b5ab6cc90358e65"
+    },
+    "desktop-light-result": {
+      "sha256": "5933c24e28d1ab0b6abb7dfbe0c27720214dca1ab03b5d009f282293b22d7101"
+    },
+    "desktop-dark-result-comparison": {
+      "sha256": "95bd1ba7892c4e297f0eb5a0dbda1503b049e0305023592c579a44c337e9b809"
+    }
+  },
+  "tolerance": {
+    "max_changed_pixel_ratio": 0.0005,
+    "max_channel_delta": 3,
+    "max_geometry_delta_px": 0.25,
+    "measured_prechange_noise": {
+      "max_changed_pixel_ratio": 0.00038312,
+      "max_channel_delta": 3
+    }
+  }
+}

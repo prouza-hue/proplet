@@ -14,7 +14,7 @@ theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 assert 'APP_VERSION = "4.01.40"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 assert "version:'4.01.40'" in runtime
 assert "proplet-v4.01.40-game-session-shell" in sw
-assert 'theme-init.js?v=40140-s12b3' in html and 'theme-init.js?v=40140-s12b3' in sw
+assert 'theme-init.js?v=40140-s13a2' in html and 'theme-init.js?v=40140-s13a2' in sw
 assert "profile-layout-v3330.css?v=2" in theme
 
 assert ".profile-grid>.profile-stat:not(.profile-stat-wide){grid-column:span 2" in css

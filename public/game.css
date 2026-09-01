@@ -1,3 +1,5 @@
+/* Sprint 13A — canonical game/Fold/responsive owner. Behavior-preserving consolidation. */
+
 /* v3.32.3 — final pre-launch game layout.
    Mobile landscape is intentionally blocked; unfolded Fold/tablet landscape gets a real side rail.
    The physical-orientation/device classification is applied by game-layout-v3323.js. */
@@ -41,3 +43,74 @@ body.game-tablet-landscape .game-screen.tajenka-mode .game-control-column>.curre
 body.game-tablet-landscape .game-screen.tajenka-mode .game-control-column>.current-word strong{font-size:16px!important;margin-top:2px!important}
 body.game-tablet-landscape .game-screen.tajenka-mode .game-control-column>.current-word .clean-status{margin-top:5px!important}
 
+/* Desktop game rules consolidated from desktop-layout-v3330.css; source order preserved after tablet/Fold rules. */
+/* The game gets a true desktop rail. The board owns the left side; current word, remaining/found
+   state, feedback and controls live together on the right at a readable monitor scale. */
+@media (min-width:1000px) and (min-height:650px){
+  body.game-desktop-wide .app-shell{max-width:1280px;padding:10px 20px 13px}
+  body.game-desktop-wide .game-screen.active{gap:10px}
+  body.game-desktop-wide .game-top{min-height:48px;grid-template-columns:46px minmax(0,1fr) auto;gap:11px}
+  body.game-desktop-wide .game-top .icon-btn{width:46px;height:46px;border-radius:14px;font-size:24px}
+  body.game-desktop-wide .game-title strong{font-size:18px}
+  body.game-desktop-wide .game-title .eyebrow{font-size:10px}
+  body.game-desktop-wide .game-clock span{font-size:20px}
+  body.game-desktop-wide .game-clock small{font-size:11px}
+
+  body.game-desktop-wide .game-main{grid-template-columns:minmax(0,1fr) clamp(285px,24vw,330px);grid-template-rows:minmax(0,1fr);gap:16px}
+  body.game-desktop-wide .game-board-column{min-width:0;min-height:0;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+  body.game-desktop-wide .game-board-column>.starter-coach{flex:0 0 auto}
+  body.game-desktop-wide .game-board-column>.board-stage{flex:1 1 auto;min-height:0;padding:10px;border-radius:22px}
+  body.game-desktop-wide .board{gap:6px}
+  body.game-desktop-wide .cell{border-radius:13px;font-size:clamp(21px,2.35vw,34px)}
+  body.game-desktop-wide .board.dense-board{gap:5px}
+  body.game-desktop-wide .board.dense-board .cell{border-radius:11px;font-size:clamp(18px,2vw,30px)}
+  body.game-desktop-wide .board.ultra-board{gap:4px}
+  body.game-desktop-wide .board.ultra-board .cell{border-radius:9px;font-size:clamp(16px,1.75vw,26px)}
+
+  body.game-desktop-wide .game-control-column{height:100%;display:grid;grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:10px;align-items:stretch;padding:0}
+  body.game-desktop-wide .game-control-column>.current-word{grid-column:1;grid-row:1;width:100%;min-width:0;min-height:84px;margin:0;padding:13px 15px;display:block;text-align:left;border-radius:20px}
+  body.game-desktop-wide .game-control-column>.current-word .stat-label{font-size:13px;letter-spacing:.095em}
+  body.game-desktop-wide .game-control-column>.current-word strong{display:block;margin:5px 0 0;min-height:29px;font-size:28px;line-height:1.08;letter-spacing:.06em;white-space:normal;overflow-wrap:anywhere}
+  body.game-desktop-wide .game-control-column>.current-word .clean-status{display:inline-flex;margin:10px 0 0;font-size:10px}
+
+  body.game-desktop-wide .game-control-column>.game-info{grid-column:1;grid-row:2;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;width:100%;margin:0;padding:14px 15px;border-radius:20px}
+  body.game-desktop-wide .game-control-column>.game-info .word-status-wrap{min-width:0;display:grid;gap:11px}
+  body.game-desktop-wide .game-control-column>.game-info .word-status-row{display:block;min-width:0}
+  body.game-desktop-wide .game-control-column>.game-info .word-status-row .stat-label{display:block;margin-bottom:7px;font-size:13px;letter-spacing:.095em}
+  body.game-desktop-wide .game-control-column>.game-info .found-row{margin-top:0;padding-top:10px;border-top:1px solid #eee9f2}
+  body.game-desktop-wide .game-control-column>.game-info .lengths,
+  body.game-desktop-wide .game-control-column>.game-info .found-words{display:flex;gap:6px;min-width:0;overflow-x:auto;padding:1px 0;scrollbar-width:none}
+  body.game-desktop-wide .game-control-column>.game-info .found-word-chip,
+  body.game-desktop-wide .game-control-column>.game-info .remaining-row .length-pill{min-height:31px;height:31px;padding:3px 9px;font-size:12px;border-radius:999px}
+  body.game-desktop-wide .game-control-column>.game-info .remaining-row .length-pill{min-width:31px}
+  body.game-desktop-wide .game-control-column>.game-info .empty-found,
+  body.game-desktop-wide .game-control-column>.game-info .all-found{font-size:12px}
+  body.game-desktop-wide .game-control-column>.game-info .game-progress{align-self:start;min-width:40px;padding:1px 0 0;font-size:19px;font-weight:950;text-align:right}
+
+  body.game-desktop-wide .game-control-column>.game-message{grid-column:1;grid-row:3;min-height:0;padding:13px 9px;align-self:start;white-space:normal;font-size:14px;line-height:1.48;text-align:left}
+  body.game-desktop-wide .game-control-column>.starter-hint-nudge{grid-column:1;grid-row:4;margin:0}
+  body.game-desktop-wide .game-control-column>.game-actions{grid-column:1;grid-row:5;display:grid;grid-template-columns:1fr;gap:9px;align-self:end}
+  body.game-desktop-wide .game-control-column>.game-actions .secondary-btn{width:100%;min-height:50px;padding:10px 12px;font-size:14px;border-radius:15px}
+}
+
+@media (min-width:1500px) and (min-height:800px){
+  body.game-desktop-wide .app-shell{max-width:1420px;padding-left:28px;padding-right:28px}
+  body.game-desktop-wide .game-main{grid-template-columns:minmax(0,1fr) 340px;gap:20px}
+  body.game-desktop-wide .game-control-column>.current-word strong{font-size:31px}
+  body.game-desktop-wide .game-control-column>.game-info .found-word-chip,
+  body.game-desktop-wide .game-control-column>.game-info .remaining-row .length-pill{min-height:33px;height:33px;font-size:12.5px}
+  body.game-desktop-wide .game-control-column>.game-message{font-size:15px}
+}
+
+/* Free-play mode no longer wastes a line on the redundant "Volná hra" eyebrow. This rule is
+   global on purpose: phone, Fold, tablet and desktop all give that room to the useful title. */
+body.game-free-mode .game-title #gameDifficulty{font-size:17px;line-height:1.05;gap:8px}
+body.game-free-mode .game-title .game-difficulty-icon{width:24px;height:24px;flex:0 0 24px}
+@media (min-width:1000px) and (min-height:650px){
+  body.game-free-mode.game-desktop-wide .game-title #gameDifficulty{font-size:21px;gap:9px}
+  body.game-free-mode.game-desktop-wide .game-title .game-difficulty-icon{width:28px;height:28px;flex-basis:28px}
+}
+
+html[data-theme="dark"] body.game-desktop-wide .game-control-column>.current-word{background:linear-gradient(145deg,#262230,#211e2a);border-color:#433c50;box-shadow:0 5px 14px rgba(0,0,0,.24)}
+html[data-theme="dark"] body.game-desktop-wide .game-control-column>.current-word strong{color:#b9adff}
+html[data-theme="dark"] body.game-desktop-wide .game-control-column>.game-info .found-row{border-top-color:#3d3748}

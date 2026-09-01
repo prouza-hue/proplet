@@ -114,7 +114,7 @@ const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=40140-s12b3')&&sw.includes('/theme-init.js?v=40140-s12b3'),'theme-init cache boundary was not advanced');
+assert(index.includes('/theme-init.js?v=40140-s13a2')&&sw.includes('/theme-init.js?v=40140-s13a2'),'theme-init cache boundary was not advanced');
 assert(themeInit.includes("loadScript('/home-layout.js?v=40140-s12b2'"),'home layout cache boundary was not advanced');
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
