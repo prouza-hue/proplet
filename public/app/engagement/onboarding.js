@@ -1,5 +1,9 @@
 (function(root,factory){
   'use strict';
+  if(root?.PropletEngagementOnboarding){
+    if(typeof module!=='undefined'&&module.exports)module.exports=root.PropletEngagementOnboarding;
+    return;
+  }
   const api=factory(root);
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
   if(root)root.PropletEngagementOnboarding=api;

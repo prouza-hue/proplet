@@ -4,6 +4,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const root = path.resolve(__dirname, '../..');
 const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
@@ -40,6 +41,51 @@ assert.strictEqual(onboarding.shouldOfferStarterHint({game:{...baseGame,found:['
 assert.strictEqual(onboarding.shouldOfferStarterHint({game:{...baseGame,mode:'daily'},now:20000}),false);
 assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:20000,hidden:true}),false);
 assert.strictEqual(onboarding.shouldOfferStarterHint({game:baseGame,now:20000,transientOpen:true}),false);
+
+function verifyDuplicateInstallGuard() {
+  const listenerTypes=[];
+  let observerCount=0;
+  const hiddenModal={classList:{contains:name=>name==='hidden'}};
+  const storage={getItem:()=>null,setItem:()=>{}};
+  const context={
+    console,
+    localStorage:storage,
+    document:{readyState:'complete',querySelector:selector=>selector==='#winModal'?hiddenModal:null},
+    addEventListener:type=>listenerTypes.push(type),
+    MutationObserver:class{constructor(){observerCount++}observe(){}},
+    setTimeout:()=>0,
+  };
+  context.window=context;
+  context.globalThis=context;
+  vm.createContext(context);
+
+  vm.runInContext(nudgesSource,context);
+  const first=context.PropletEngagementNudges;
+  first.install({
+    onBeforeInstallPrompt:()=>{},
+    onAppInstalled:()=>{},
+    maybeOfferFirstWinReturnNudge:async()=>false,
+    maybeOfferAccountNudge:()=>false,
+    maybeOfferPushNudge:async()=>false,
+    maybeOfferInstallNudge:()=>false,
+    hideWin:()=>{},
+    performPostWinAction:()=>{},
+  });
+  vm.runInContext(nudgesSource,context);
+  assert.strictEqual(context.PropletEngagementNudges,first,'duplicate nudges evaluation replaced the owner');
+  context.PropletEngagementNudges.install({});
+  assert.deepStrictEqual(listenerTypes,['beforeinstallprompt','appinstalled']);
+  assert.strictEqual(observerCount,1,'duplicate nudges evaluation installed another observer');
+
+  const onboardingContext={console};
+  onboardingContext.window=onboardingContext;
+  onboardingContext.globalThis=onboardingContext;
+  vm.createContext(onboardingContext);
+  vm.runInContext(onboardingSource,onboardingContext);
+  const firstOnboarding=onboardingContext.PropletEngagementOnboarding;
+  vm.runInContext(onboardingSource,onboardingContext);
+  assert.strictEqual(onboardingContext.PropletEngagementOnboarding,firstOnboarding,'duplicate onboarding evaluation replaced the owner');
+}
 
 async function verifyPostWinOrder() {
   const calls=[];
@@ -97,5 +143,5 @@ ordered(index, ['/app/engagement/onboarding.js','/app/engagement/nudges.js','/ap
 includes(sw, '/app/engagement/onboarding.js', 'offline onboarding owner');
 includes(sw, '/app/engagement/nudges.js', 'offline nudges owner');
 
-(async()=>{await verifyPostWinOrder();console.log('PASS: Sprint 12B engagement owners preserve onboarding and nudge behavior')})()
+(async()=>{verifyDuplicateInstallGuard();await verifyPostWinOrder();console.log('PASS: Sprint 12B engagement owners preserve onboarding and nudge behavior')})()
   .catch(error=>{console.error(error);process.exitCode=1});
