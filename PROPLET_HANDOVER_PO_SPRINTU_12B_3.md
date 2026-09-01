@@ -1,7 +1,9 @@
 # PROPLET — HANDOVER PO SPRINTU 12B.3
 
-Datum uzavření: **2026-09-01**  
-Stav produktu: **Proplet v4.01.40, produkce GREEN**  
+Datum uzavření: **2026-09-01**
+
+Stav produktu: **Proplet v4.01.40, produkce GREEN**
+
 Účel dokumentu: bezpečné navázání v nové konverzaci před zahájením Sprintu 13.
 
 ## 1. Aktuální stav v jedné minutě
@@ -123,9 +125,12 @@ Bezpečný použitý workaround:
 
 ## 5. Sprint 13 — závazný plán
 
-Priorita: **P2**  
-Velikost/riziko: dvě části M–L, **vysoké vizuální riziko**  
-Závislost: dokončené JS vertical slices 11–12  
+Priorita: **P2**
+
+Velikost/riziko: dvě části M–L, **vysoké vizuální riziko**
+
+Závislost: dokončené JS vertical slices 11–12
+
 Cíl: konsolidovat CSS po obrazovkách, snížit počet patch stylesheetů a `!important`, **bez vizuálního redesignu**.
 
 ### Sprint 13A — CSS game/results/Fold/responsive
