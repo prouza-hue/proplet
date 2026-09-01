@@ -45,7 +45,6 @@ for hook in (
     'id="currentWord"',
     'id="gameMessage"',
     'id="hintBtn"',
-    'id="resetBtn"',
     'id="winModal"',
     'id="winTitle"',
     'id="winXp"',
