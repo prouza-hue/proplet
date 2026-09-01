@@ -22,10 +22,10 @@
   - přesun časných game/result bloků přes mezilehlé stylesheety je povolen pouze proto, že characterization + selector inventory neukázaly kolizi vítězících deklarací; pixel/geometry gate je blocker.
 - Neměněno: `styles.css`, gesture/onboarding mix, DOM, JS runtime, gameplay, texty, XP, API, DB, Supabase, content.
 - Characterization před změnou: current gate GREEN; 14-case screenshot matrix GREEN; empirický renderer-noise gate <=0,05 % pixelů / delta 3 / geometrie 0,25 px.
-- Testy PASS: čeká se na post-change run
+- První post-change run: scope enforcement PASS; current gate FAIL pouze na stale asset/cache assertions po legitimním přesunu; visual FAIL lokalizován výhradně na dynamický timer 00:01→00:02 (82 px, geometrie 0,0 px).
 - Preview: zatím nevytvořeno
 - Bezpečný rollback: `db4522639a558b7a359dd002a20d5179ea3dc347`
-- Další povolený krok: post-change gate -> nezávislé review -> preview -> user review STOP; bez merge a bez 13B
+- Další povolený krok: aktualizovat PWA theme-init cache URL + stale characterization odkazy, zmrazit timer a porovnat base/current ve stejném CI běhu -> nezávislé review -> preview -> user review STOP; bez merge a bez 13B
 
 ## Předchozí uzavřený stav
 

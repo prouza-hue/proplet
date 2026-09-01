@@ -101,6 +101,7 @@ def game_fixture(page, state: str) -> None:
           if(msg) msg.textContent='Nápověda ukazuje začátek cesty.';
         }""")
         page.wait_for_timeout(180)
+    page.evaluate("""(state)=>{try{if(typeof stopTimer===\'function\')stopTimer()}catch(e){}const t=document.querySelector(\'#timer\');if(t)t.textContent=state===\'game-pre\'?\'00:00\':\'00:01\'}""",state)
 
 
 def result_fixture(page, comparison: bool) -> None:
@@ -154,12 +155,14 @@ def metrics(page, case: dict) -> dict:
 def main() -> int:
     parser=argparse.ArgumentParser()
     parser.add_argument("--output",type=Path,required=True)
+    parser.add_argument("--public-root",type=Path,default=PUBLIC)
     parser.add_argument("--baseline",type=Path)
     args=parser.parse_args()
     out=args.output.resolve();out.mkdir(parents=True,exist_ok=True)
+    public_root=args.public_root.resolve()
     matrix=json.loads(MATRIX.read_text(encoding="utf-8"))
     port=free_port()
-    server=subprocess.Popen([sys.executable,"-m","http.server",str(port),"--bind","127.0.0.1","--directory",str(PUBLIC)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    server=subprocess.Popen([sys.executable,"-m","http.server",str(port),"--bind","127.0.0.1","--directory",str(public_root)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     base=f"http://127.0.0.1:{port}"
     results={}
     try:
