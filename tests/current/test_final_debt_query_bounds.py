@@ -23,7 +23,8 @@ assert 'filters={"email": f"eq.{email}"}' in owner
 
 integrity_login = re.search(r'@app\.post\("/api/login-integrity"\)(.*?)@app\.get\("/api/admin/account-integrity"\)', integrity, re.S).group(1)
 assert 'db_select("players")' not in integrity_login
-assert integrity_login.count('bounded_rows("players"') == 3
+assert integrity_login.count('bounded_rows("players"') == 2
+assert 'bounded_rows(\n                    "players",' in integrity_login
 
 admin_integrity = re.search(r'@app\.get\("/api/admin/account-integrity"\)(.*)', integrity, re.S).group(1)
 for table in ("players", "results", "player_sessions", "push_subscriptions"):
