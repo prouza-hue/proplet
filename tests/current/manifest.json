@@ -198,6 +198,14 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_s15_analytics_characterization.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_s15_analytics_adapter.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_migration_manifest.py",
         "runner": "python"
       },

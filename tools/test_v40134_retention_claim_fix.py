@@ -11,6 +11,7 @@ html = (ROOT / "public" / "index.html").read_text(encoding="utf-8")
 runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 server = (ROOT / "server.py").read_text(encoding="utf-8")
 theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
+product_registry = (ROOT / "public" / "analytics-event-registry.json").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.01.40"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 assert "version:'4.01.40'" in runtime
@@ -21,7 +22,7 @@ assert "[400,404,410,422].includes(Number(error?.status))" in feedback
 assert "status:'rejected'" in feedback
 assert "if(permanentClaimError(error)){rejectClaim(store,key,row,error);changed=true}" in feedback
 assert "return 'rejected'" in feedback
-assert "word_discovery_claim_rejected" in feedback and "word_discovery_claim_rejected" in server
+assert "word_discovery_claim_rejected" in feedback and "word_discovery_claim_rejected" in product_registry
 assert "['local','pending','confirmed'].includes(row?.status)" in feedback
 assert "valid-word-feedback-v3330.js?v=7" in theme
 
@@ -34,7 +35,7 @@ for event in (
     "first_win_return_nudge_accepted",
     "first_win_return_nudge_dismissed",
 ):
-    assert event in app and event in server
+    assert event in app and event in product_registry
 for element_id in ("pushNudgeEyebrow", "pushNudgeTitle", "pushNudgeCopy"):
     assert f'id="{element_id}"' in html
 
