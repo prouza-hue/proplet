@@ -5,7 +5,8 @@
 - Base SHA: `3b29f494a2bc02bf6610c84ea0f03e16aba84cfb` (`main`, včetně Gen4 calm-mode contract hotfixu)
 - Characterization: `1454b1d8fe49a82b285c9ef01d7afd67a364ec9a`
 - Runtime: `bda2869855238d66f53cfd4b2a719add92a9f805`
-- Stav: **GREEN / PREVIEW READY / STOP — ČEKÁ NA REVIEW**
+- Merge: `f454768b843fa2542bb9fbb0ac8975f0381c87d0`
+- Stav: **UZAVŘENO / GREEN / MERGED / PRODUKCE READY**
 - Výsledek:
   - nový `public/app/rankings/rankings.js` vlastní hlavní obrazovku Pořadí, její hráčský/týmový scope, XP období, Daily renderer, privacy a týmovou kartu;
   - `app.js` ponechává tenké kompatibilní adaptéry a jedinou instalaci lifecycle listenerů;
@@ -16,16 +17,19 @@
 - Ověření:
   - lokální Current Runtime Gate **46/46**, assets **82/82**, syntax **225/225**;
   - lokální Gen4 quality contract **PASS**;
-  - vzdálený Current Runtime Gate #41 **SUCCESS** a Gen4 contract #334 **SUCCESS**;
+  - vzdálený gate nad finálním PR headem: Current Runtime Gate #43 **SUCCESS** a Gen4 contract #336 **SUCCESS**;
   - preview deployment `dpl_73wfsn5syKgXTeHLrUBAn9XKExRx` je **READY** na přesném runtime SHA;
   - stable alias: `https://proplet-git-refactor-s12b3-rankings-pavel-prouzas-projects.vercel.app/`;
   - health 200: Proplet 4.01.40, `ok=true`, DB true; nový rankings asset vrací 200;
   - browser guest matrix: Daily hráči/týmy, XP hráči/týmy, Dnes/Týden/Celkem, top-10 slice a opakovaná navigace jsou green;
   - build error scan a preview runtime error/fatal/warning scan jsou čisté.
-- PR #99: **DRAFT / REVIEW** — `https://github.com/prouza-hue/proplet/pull/99`.
+- PR #99: zavřený draft; GitHub ready-for-review konektor znovu selhal na vlastním GraphQL poli.
+- PR #100: **MERGED** ze stejného ověřeného head SHA — `https://github.com/prouza-hue/proplet/pull/100`.
+- Produkce: deployment `dpl_6tiGJGKnsYKg3CQzyPKVwNXfaksq` je **READY** na merge SHA; `hrajproplet.cz` hlásí 4.01.40, `ok=true`, DB true, nový rankings asset se servíruje a build/runtime error/fatal/warning scan je čistý.
 - Supabase: beze změny. Žádná migrace.
-- Rollback: zavřít PR; po případném merge revert runtime commitu. Bez DB/content rollbacku.
-- Další povolený krok: uživatelské review přihlášeného preview; bez schválení nemergovat.
+- Rollback: revert merge commitu `f454768b843fa2542bb9fbb0ac8975f0381c87d0`. Bez DB/content rollbacku.
+- Handover: `PROPLET_HANDOVER_PO_SPRINTU_12B_3.md`.
+- Další povolený krok: pouze Sprint 13A — CSS tokens/base + game/results/Fold/responsive na nové větvi z aktuálního produkčního `main`; nejprve characterization + screenshot matrix, bez redesignu a s preview STOP bránou.
 
 ## Předchozí uzavřený stav
 
