@@ -216,6 +216,10 @@
       {
         "path": "tools/validate_migration_manifest.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_final_debt_account_lookup_characterization.py",
+        "runner": "python"
       }
     ]
   },
