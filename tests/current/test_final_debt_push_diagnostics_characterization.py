@@ -31,11 +31,22 @@ def db_select(table, **filters):
     return result
 
 
+bounded_calls = []
+
+
+def db_select_bounded(table, *, filters=None, columns="*", order=None, max_rows=5000):
+    bounded_calls.append((table, columns, max_rows))
+    result = list(rows.get(table, []))
+    assert len(result) <= max_rows
+    return result
+
+
 app = FastAPI()
 install_push_diagnostics(
     app,
     tz=timezone.utc,
     db_select=db_select,
+    db_select_bounded=db_select_bounded,
     db_insert=lambda *args, **kwargs: None,
     db_update=lambda *args, **kwargs: None,
     db_delete=lambda *args, **kwargs: None,
@@ -59,5 +70,8 @@ assert payload["subscriptions"]["contentEnabled"] == 1
 assert payload["subscriptions"]["rows"][1]["playerName"] == "Pavel"
 assert payload["tests"]["total"] == 1
 assert payload["tests"]["recent"][0]["status"] == "sent"
+assert ("push_subscriptions", "player_id,anonymous_id,endpoint,user_agent,daily_enabled,content_enabled,created_at,updated_at", 5000) in bounded_calls
+assert ("push_delivery_log", "category,event_key,status,opened_at,created_at,sent_at", 20000) in bounded_calls
+assert ("players", "id,name", 5000) in bounded_calls
 
 print("PASS: final-debt push diagnostics response characterized")
