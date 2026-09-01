@@ -1,6 +1,6 @@
 # Proplet
 
-Česká webová/PWA slovní hra. Aktuální produkční runtime je **v4.01.40** na `https://hrajproplet.cz`.
+Česká webová/PWA slovní hra. Aktuální produkční runtime je **v4.02.0** na `https://hrajproplet.cz`.
 
 ## Kanonická struktura
 
