@@ -1,5 +1,28 @@
 # Technical debt refactor status
 
+- Sprint: 14 — Canonical content build a generation manifest
+- Branch: `refactor/s14-content-pipeline`
+- Base SHA: `b8de402ad676b823f72a905289945eff6f6b3e6c`
+- Current HEAD: `b8de402ad676b823f72a905289945eff6f6b3e6c` + uncommitted characterization
+- Stav: **CHARACTERIZATION**
+- Zamýšlená změna chování: žádná; pouze explicitní, bezpečný a reprodukovatelný content build/tooling.
+- Změněné soubory: `tests/current/test_s14_content_characterization.py`, `tests/current/manifest.json`, tento status.
+- Hotové kroky:
+  - ověřen produkční `main`, Vercel deployment a health;
+  - zmapován záměrný rozdíl 365 server Daily vs. 366 public Daily;
+  - potvrzeno, že jediný public compatibility přírůstek je `g3-d-007`;
+  - potvrzen byte-identický in-memory rebuild z `data/puzzles.json` + `data/archive/v3.33.5/puzzles.json.gz`;
+  - zafixovány SHA-256 a velikosti runtime/source/evidence artefaktů před změnou toolingu.
+- Testy PASS: content characterization; baseline assets **76/76**; baseline syntax **231/231**.
+- Testy FAIL / nespouštěné: lokální full current gate 32 PASS / 16 FAIL pouze kvůli chybějícím `fastapi`/`httpx` v systémovém Pythonu; autoritativní běh s projektovými dependencies zbývá.
+- Nově nalezená rizika:
+  - `tools/generate_puzzles.py` implicitně zapisuje čtyři pevné cesty (`data/words.txt`, legacy Daily archive, server a public banku);
+  - čtyři historické Mozkomor workflow odkazují na odstraněné generation soubory; ve Sprintu 14 se nespouštějí ani neopravují bez samostatně krytého řezu.
+- Bezpečný bod pokračování: characterization musí být GREEN a commitnutá před změnou runtime/content toolingu.
+- Další povolený sprint: žádný; Sprint 14 končí review a STOP.
+
+## Předchozí uzavřený stav
+
 - Sprint: 13B — CSS app screens
 - Branch: `refactor/s13b-css-app-screens`
 - Base SHA: `02606c4b047ce450f02a0fb8e7c1bf4d24c4e908`
@@ -390,7 +413,6 @@ Sprint 13A je uzavřen. **Sprint 13B nezačínat bez nového explicitního pokyn
 - Branch: `refactor/s11a-game-completion`
 - Base SHA: `66081c664a0120cdb37b4344ce6d7beff9169c4c` (uzavřený Sprint 10 status HEAD)
 - Runtime HEAD: `e1b089d39e460190ebfd7d0cbfd5d4d73e8a415e`
-
 
 
 

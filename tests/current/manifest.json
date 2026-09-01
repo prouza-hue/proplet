@@ -190,6 +190,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_s14_content_characterization.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_migration_manifest.py",
         "runner": "python"
       },
