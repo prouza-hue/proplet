@@ -18,7 +18,7 @@ TZ = timezone.utc
 
 
 def request(path: str) -> Request:
-    return Request({"type": "http", "method": "POST", "path": path, "headers": [], "scheme": "https", "server": ("hrajproplet.cz", 443)})
+    return Request({"type": "http", "method": "POST", "path": path, "headers": [(b"host", b"hrajproplet.cz")], "scheme": "https", "server": ("hrajproplet.cz", 443)})
 
 
 def route(app: FastAPI, path: str):
