@@ -150,6 +150,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_s12b3_rankings_characterization.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_s12a_account_backend.py",
         "runner": "python"
       },
