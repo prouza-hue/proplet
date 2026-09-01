@@ -147,6 +147,7 @@ def metrics(page, case: dict) -> dict:
         cellFont:css(cell)?.fontSize||null,
         gameAction:r(action),
         winCard:r(win),winTitleFont:css(title)?.fontSize||null,winUtility:r(utility),
+        mainSecondaryGap:(()=>{const a=document.querySelector('#winModal .win-main-actions'),b=document.querySelector('#winModal .win-secondary-actions');if(!a||!b)return null;return +(b.getBoundingClientRect().top-a.getBoundingClientRect().bottom).toFixed(2)})(),
         loadedStyles:[...document.styleSheets].map(s=>{try{return new URL(s.href).pathname}catch{return null}}).filter(Boolean)
       };
     }""", case["id"])

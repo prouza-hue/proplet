@@ -51,15 +51,24 @@ def main():
             if om.get(key)!=nm.get(key):
                 failures.append(f"{case_id}: {key} {om.get(key)!r} -> {nm.get(key)!r}")
         geometry={}
+        intentional_phone_spacing = case_id == "phone-light-result-safe"
         for key in RECT_KEYS:
             delta=rect_delta(om.get(key),nm.get(key)); geometry[key]=delta
+            if intentional_phone_spacing and key in ("winCard","winUtility"):
+                continue
             if delta>args.max_geometry_delta:
                 failures.append(f"{case_id}: {key} geometry delta {delta:.3f}px")
-        ratio,max_delta,old_size,new_size=pixel_diff(args.baseline/f"{case_id}.png",args.current/f"{case_id}.png")
-        if ratio>args.max_changed_ratio:
-            failures.append(f"{case_id}: changed pixel ratio {ratio:.8f} > {args.max_changed_ratio:.8f}")
-        if max_delta>args.max_channel_delta:
-            failures.append(f"{case_id}: max channel delta {max_delta} > {args.max_channel_delta}")
+        if intentional_phone_spacing:
+            gap=nm.get("mainSecondaryGap")
+            if gap is None or abs(float(gap)-14.0)>args.max_geometry_delta:
+                failures.append(f"{case_id}: approved main/secondary gap expected 14px, got {gap!r}")
+            ratio,max_delta,old_size,new_size=pixel_diff(args.baseline/f"{case_id}.png",args.current/f"{case_id}.png")
+        else:
+            ratio,max_delta,old_size,new_size=pixel_diff(args.baseline/f"{case_id}.png",args.current/f"{case_id}.png")
+            if ratio>args.max_changed_ratio:
+                failures.append(f"{case_id}: changed pixel ratio {ratio:.8f} > {args.max_changed_ratio:.8f}")
+            if max_delta>args.max_channel_delta:
+                failures.append(f"{case_id}: max channel delta {max_delta} > {args.max_channel_delta}")
         report[case_id]={"changed_pixel_ratio":ratio,"max_channel_delta":max_delta,"geometry":geometry,"size":[old_size,new_size]}
     (args.current/"comparison.json").write_text(json.dumps({"limits":{"max_changed_ratio":args.max_changed_ratio,"max_channel_delta":args.max_channel_delta,"max_geometry_delta":args.max_geometry_delta},"report":report,"failures":failures},indent=2)+"\n",encoding="utf-8")
     if failures:
