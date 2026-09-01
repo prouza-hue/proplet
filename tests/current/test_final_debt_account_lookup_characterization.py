@@ -56,11 +56,28 @@ def select_rows(table, **filters):
     return rows
 
 
+def bounded_select(table, *, filters=None, columns="*", order=None, max_rows=5000):
+    assert table == "players"
+    rows = list(players)
+    for key, condition in (filters or {}).items():
+        if condition.startswith("eq."):
+            expected = condition[3:]
+            rows = [row for row in rows if str(row.get(key) or "") == expected]
+        elif condition.startswith("ilike."):
+            expected = condition[6:].casefold()
+            rows = [row for row in rows if str(row.get(key) or "").casefold() == expected]
+        else:
+            raise AssertionError(f"unexpected filter: {key}={condition}")
+    assert len(rows) <= max_rows
+    return rows
+
+
 app = FastAPI()
 install_account_integrity(
     app,
     tz=TZ,
     db_select=select_rows,
+    db_select_bounded=bounded_select,
     auth_player=lambda _auth: players[0],
     new_session=lambda pid: f"token:{pid}",
     verify_password=lambda supplied, stored: supplied == stored,
@@ -150,6 +167,17 @@ def core_select(table, **filters):
     return rows
 
 
+def core_bounded_select(table, *, filters=None, columns="*", order=None, max_rows=5000):
+    assert table == "players"
+    rows = list(core_players)
+    for key, condition in (filters or {}).items():
+        assert condition.startswith("eq.")
+        expected = condition[3:]
+        rows = [row for row in rows if str(row.get(key) or "") == expected]
+    assert len(rows) <= max_rows
+    return rows
+
+
 def core_insert(table, row):
     if table == "account_auth_challenges":
         inserted.append(dict(row))
@@ -166,6 +194,7 @@ try:
         supabase_key="secret",
         tz=TZ,
         db_select=core_select,
+        db_select_bounded=core_bounded_select,
         db_insert=core_insert,
         db_update=lambda *args, **kwargs: None,
         db_delete=lambda *args, **kwargs: None,
