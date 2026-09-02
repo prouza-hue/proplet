@@ -38,7 +38,6 @@
     ['/results.css?v=40140-s13a2','propletResultsCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
-    ['/release-notes-v3331.css?v=40132','propletReleaseNotesV3331Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
@@ -87,7 +86,6 @@
     loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
-    loadScript('/release-notes-v3331.js?v=40132','propletReleaseNotesV3331');
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
   };

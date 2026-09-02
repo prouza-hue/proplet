@@ -28,22 +28,14 @@ migration = read("SUPABASE_MIGRATION_V4_01_32_MOZKOMOR.sql")
 puzzles = json.loads(read("data/puzzles.json"))
 public_puzzles = json.loads(read("public/puzzles.json"))
 
-# Exactly one release CTA: the new card suppresses both legacy Gen4/XP modals.
+# The v4.01.32 release CTA is retired from runtime, while its historical asset
+# remains in the repository. The suppression flag stays active so retiring the
+# CTA cannot resurrect the older Gen4/XP release modal.
 assert "window.PROPLET_SINGLE_RELEASE_CTA_V40132=true" in theme
 assert "PROPLET_SINGLE_RELEASE_CTA_V40132===true" in quality
+assert "release-notes-v3331.js" not in theme
+assert "release-notes-v3331.css" not in theme
 assert "Novinky v Propletu" in notes
-for phrase in (
-    "Tajenka",
-    "nová každou sobotu",
-    "Mozkomor",
-    "100 nových úrovní",
-    "+1 XP",
-    "za platná slova navíc",
-    "Jdu hrát",
-):
-    assert phrase in notes, phrase
-assert "eyebrow" not in notes
-assert "release-notes-v3331-secondary" not in notes
 assert notes.count("Jdu hrát") == 1
 assert "release-notes-v3331-art" in notes
 assert all(token in css for token in ("tile-p", "feature-tajenka", "feature-mozkomor", "feature-xp"))
