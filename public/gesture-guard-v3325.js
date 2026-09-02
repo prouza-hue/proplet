@@ -108,13 +108,13 @@
     const intro=board.closest('.onboard-content')?.querySelector('p.muted');
     if(intro&&intro.dataset.gestureCopy!=='1'){
       intro.dataset.gestureCopy='1';
-      intro.innerHTML='Táhni nejdřív <b>P ↓ E</b> a potom <b>→ S</b>. Jen přes políčka vedle sebe.';
+      intro.innerHTML='Táhni, nebo postupně klepni: <b>P ↓ E</b> a potom <b>→ S</b>. Jen přes políčka vedle sebe.';
     }
     const success=document.querySelector('#tutorialSuccess');
     if(success&&!success.dataset.gestureCopyObserver){
       success.dataset.gestureCopyObserver='1';
       const rewrite=()=>{
-        if(success.textContent?.startsWith('Skoro.'))success.textContent='Skoro. Zkus P ↓ E a potom doprava na S.';
+        if(success.textContent?.startsWith('Skoro.'))success.textContent='Skoro. Zkus P ↓ E a potom doprava na S — tahem nebo třemi klepnutími.';
       };
       new MutationObserver(rewrite).observe(success,{childList:true,characterData:true,subtree:true});
       rewrite();

@@ -31,6 +31,12 @@ function ordered(source, needles, label) {
 
 assert.strictEqual(typeof onboarding.install, 'function');
 assert.strictEqual(typeof onboarding.shouldOfferStarterHint, 'function');
+assert.strictEqual(typeof onboarding.advancePesTapPath, 'function');
+assert.deepStrictEqual(onboarding.advancePesTapPath([],0),{path:[0],done:false,valid:true});
+assert.deepStrictEqual(onboarding.advancePesTapPath([0],1),{path:[0,1],done:false,valid:true});
+assert.deepStrictEqual(onboarding.advancePesTapPath([0,1],4),{path:[0,1,4],done:true,valid:true});
+assert.deepStrictEqual(onboarding.advancePesTapPath([0],4),{path:[],done:false,valid:false});
+assert.deepStrictEqual(onboarding.advancePesTapPath([0,1],0),{path:[0],done:false,valid:true});
 assert.strictEqual(typeof nudges.install, 'function');
 assert.strictEqual(typeof nudges.runPostWin, 'function');
 
@@ -133,6 +139,8 @@ includes(nudgesSource, 'if(installLifecycleBound', 'single install lifecycle own
 ordered(nudgesSource, ['maybeOfferFirstWinReturnNudge(action)','maybeOfferAccountNudge(action)','maybeOfferPushNudge(action)',"maybeOfferInstallNudge(action,'daily')",'performPostWinAction(action)'], 'post-win engagement');
 
 includes(app, 'window.PropletEngagementOnboarding', 'onboarding adapter');
+includes(app, 'owner?.advancePesTapPath', 'PES tap fallback adapter');
+includes(app, 'board.onpointerup=finish;board.onpointercancel=cancel;', 'pointer cancel must not count as a tap');
 includes(app, 'window.PropletEngagementNudges', 'nudges adapter');
 assert(!app.includes("window.addEventListener('beforeinstallprompt'"), 'app still owns install listener');
 assert(!app.includes("window.addEventListener('appinstalled'"), 'app still owns installed listener');

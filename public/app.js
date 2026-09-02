@@ -1504,7 +1504,7 @@ function showToast(text){const t=$('#toast');clearTimeout(toastTimer);t.textCont
 
 const ONBOARD_STEPS=[
  {title:'Co je Proplet',intro:true,cta:'Jak hrát',html:()=>`<div class="onboard-content onboard-game-intro"><h2>Spojuj písmena do slov</h2><p class="muted">Hledej cesty přes sousední políčka a poskládej slova tak, aby nakonec zaplnila celou mřížku.</p><div class="onboard-game-modes"><div class="onboard-mode-card daily"><div class="onboard-mode-mark daily-mark" aria-hidden="true">☀</div><div><span class="eyebrow">DENNÍ VÝZVA</span><strong>Každý den nový Proplet</strong><small>Jedna nová úroveň pro všechny hráče.</small></div></div><div class="onboard-mode-card free"><div class="onboard-free-icons" aria-hidden="true">${difficultyIconMarkup('easy','onboard-diff-icon')}${difficultyIconMarkup('medium','onboard-diff-icon')}${difficultyIconMarkup('hard','onboard-diff-icon')}${difficultyIconMarkup('hardcore','onboard-diff-icon')}</div><div><span class="eyebrow">VOLNÁ HRA</span><strong>Stovky dalších úrovní</strong><small>Čtyři obtížnosti. Hraj kdykoli a vlastním tempem.</small></div></div></div><p class="onboard-intro-note">Nejdřív si během chvilky ukážeme, jak na to.</p></div>`},
- {title:'Najdi PES',interactive:true,html:`<div class="onboard-content"><span class="eyebrow">ZAČNI ROVNOU HRÁT</span><h2>Najdi PES</h2><p class="muted">Táhni přes <b>P → E → S</b>. Jen přes políčka vedle sebe.</p><div class="tutorial-wrap"><div id="tutorialBoard" class="tutorial-board"><div class="tutorial-cell" data-tidx="0">P</div><div class="tutorial-cell" data-tidx="1">E</div><div class="tutorial-cell" data-tidx="2">L</div><div class="tutorial-cell" data-tidx="3">A</div><div class="tutorial-cell" data-tidx="4">S</div><div class="tutorial-cell" data-tidx="5">K</div><div class="tutorial-cell" data-tidx="6">M</div><div class="tutorial-cell" data-tidx="7">O</div><div class="tutorial-cell" data-tidx="8">C</div></div><div id="tutorialSuccess" class="tutorial-success"></div></div></div>`},
+ {title:'Najdi PES',interactive:true,html:`<div class="onboard-content"><span class="eyebrow">ZAČNI ROVNOU HRÁT</span><h2>Najdi PES</h2><p class="muted">Táhni, nebo postupně klepni na <b>P → E → S</b>. Jen přes políčka vedle sebe.</p><div class="tutorial-wrap"><div id="tutorialBoard" class="tutorial-board"><div class="tutorial-cell" data-tidx="0">P</div><div class="tutorial-cell" data-tidx="1">E</div><div class="tutorial-cell" data-tidx="2">L</div><div class="tutorial-cell" data-tidx="3">A</div><div class="tutorial-cell" data-tidx="4">S</div><div class="tutorial-cell" data-tidx="5">K</div><div class="tutorial-cell" data-tidx="6">M</div><div class="tutorial-cell" data-tidx="7">O</div><div class="tutorial-cell" data-tidx="8">C</div></div><div id="tutorialSuccess" class="tutorial-success"></div></div></div>`},
  {title:'Pomocník',support:true,html:()=>`<div class="onboard-content"><span class="eyebrow">POMOC, KDYŽ JI CHCEŠ</span><h2>Kdy ti má Pomocník nabídnout nápovědu?</h2><p class="muted">Když se chvíli nic nového nepodaří, jen nabídne malé postrčení. <b>Bez tvého souhlasu nic neodhalí.</b></p><div class="support-choice-grid onboard-support-grid" aria-label="Čas nabídky Pomocníka">${supportChoicesHtml('onboard')}</div><div id="onboardSupportOutcome" class="support-outcome" aria-live="polite">Vyber si tempo.</div></div>`}
 ];
 
@@ -1534,10 +1534,21 @@ function renderTutorialPath(){
 function bindTutorial(){
  const board=$('#tutorialBoard');if(!board)return;
  const add=i=>{const p=tutorialState.path,last=p.at(-1);if(i===last)return;if(p.length>1&&i===p.at(-2)){p.pop();renderTutorialPath();return}if(p.includes(i)||last==null||!tutorialAdj(last,i))return;p.push(i);renderTutorialPath()};
- $$('.tutorial-cell').forEach(c=>c.onpointerdown=e=>{e.preventDefault();tutorialState.dragging=true;tutorialState.path=[+c.dataset.tidx];renderTutorialPath();try{c.setPointerCapture(e.pointerId)}catch{}});
+ const complete=()=>{tutorialState.done=true;tutorialState.tapPath=[];if(onboardingMandatory&&!onboardingTutorialTracked){onboardingTutorialTracked=true;trackProductEvent('onboarding_tutorial_completed')}$('#tutorialSuccess').textContent='Jo! 🐶 Slovo může i zatáčet.';fx('correct');renderTutorialPath();$('.onboarding-card').classList.remove('waiting-interaction');$('#onboardNextBtn').textContent='Jo, chápu'};
+ const fail=()=>{$('#tutorialSuccess').textContent='Skoro. Zkus P → E a pak dolů na S.';fx('wrong');tutorialState.path=[];tutorialState.tapPath=[];renderTutorialPath()};
+ const tap=i=>{
+  const owner=window.PropletEngagementOnboarding;
+  const progress=owner?.advancePesTapPath?owner.advancePesTapPath(tutorialState.tapPath||[],i):(()=>{const target=[0,1,4],path=tutorialState.tapPath||[];if(i===target[path.length]){const next=[...path,i];return {path:next,done:next.length===target.length,valid:true}}if(i===0)return {path:[0],done:false,valid:true};return {path:[],done:false,valid:false}})();
+  tutorialState.tapPath=progress.path;tutorialState.path=[...progress.path];
+  if(progress.done){complete();return}
+  $('#tutorialSuccess').textContent=progress.valid?(progress.path.length===1?'Super. Teď E.':'Ještě S.'):'Začni písmenem P.';
+  if(!progress.valid)fx('wrong');renderTutorialPath();
+ };
+ $('.tutorial-cell').forEach(c=>c.onpointerdown=e=>{e.preventDefault();tutorialState.dragging=true;tutorialState.path=[+c.dataset.tidx];renderTutorialPath();try{c.setPointerCapture(e.pointerId)}catch{}});
  board.onpointermove=e=>{if(!tutorialState.dragging)return;const c=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('.tutorial-cell');if(c)add(+c.dataset.tidx)};
- const finish=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;const ok=tutorialState.path.join(',')==='0,1,4';if(ok){tutorialState.done=true;if(onboardingMandatory&&!onboardingTutorialTracked){onboardingTutorialTracked=true;trackProductEvent('onboarding_tutorial_completed')}$('#tutorialSuccess').textContent='Jo! 🐶 Slovo může i zatáčet.';fx('correct');renderTutorialPath();$('.onboarding-card').classList.remove('waiting-interaction');$('#onboardNextBtn').textContent='Jo, chápu'}else{$('#tutorialSuccess').textContent='Skoro. Zkus P → E a pak dolů na S.';fx('wrong');tutorialState.path=[];renderTutorialPath()}};
- board.onpointerup=finish;board.onpointercancel=finish;
+ const finish=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;if(tutorialState.path.length===1){tap(tutorialState.path[0]);return}tutorialState.tapPath=[];if(tutorialState.path.join(',')==='0,1,4')complete();else fail()};
+ const cancel=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;tutorialState.path=[...(tutorialState.tapPath||[])];renderTutorialPath()};
+ board.onpointerup=finish;board.onpointercancel=cancel;
 }
 
 
