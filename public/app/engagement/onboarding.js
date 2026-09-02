@@ -17,6 +17,17 @@
     return Number(input.now)-(game.lastProgressAt||game.start)>=10000;
   }
 
+  function advancePesTapPath(path=[],index){
+    const target=[0,1,4],current=Array.isArray(path)?path:[];
+    const prefix=current.every((value,pos)=>value===target[pos])?current:[];
+    if(index===target[prefix.length]){
+      const next=[...prefix,index];
+      return {path:next,done:next.length===target.length,valid:true};
+    }
+    if(index===target[0])return {path:[target[0]],done:false,valid:true};
+    return {path:[],done:false,valid:false};
+  }
+
   function installStarterCopy(){
     
       const FROM='Zkus ČOKOLÁDU';
@@ -47,7 +58,7 @@
       const pesStep={
         title:'Najdi PES',
         interactive:true,
-        html:`<div class="onboard-content onboard-action-first"><span class="eyebrow">ZAČNI ROVNOU HRÁT</span><h2>Najdi PES</h2><p class="muted">Spoj písmena tahem. Jen přes políčka vedle sebe.</p><div class="tutorial-wrap"><div id="tutorialBoard" class="tutorial-board"><div class="tutorial-cell" data-tidx="0">P</div><div class="tutorial-cell" data-tidx="1">E</div><div class="tutorial-cell" data-tidx="2">L</div><div class="tutorial-cell" data-tidx="3">A</div><div class="tutorial-cell" data-tidx="4">S</div><div class="tutorial-cell" data-tidx="5">K</div><div class="tutorial-cell" data-tidx="6">M</div><div class="tutorial-cell" data-tidx="7">O</div><div class="tutorial-cell" data-tidx="8">C</div></div><div id="tutorialSuccess" class="tutorial-success"></div></div></div>`
+        html:`<div class="onboard-content onboard-action-first"><span class="eyebrow">ZAČNI ROVNOU HRÁT</span><h2>Najdi PES</h2><p class="muted">Táhni, nebo postupně klepni na P, E a S. Jen přes políčka vedle sebe.</p><div class="tutorial-wrap"><div id="tutorialBoard" class="tutorial-board"><div class="tutorial-cell" data-tidx="0">P</div><div class="tutorial-cell" data-tidx="1">E</div><div class="tutorial-cell" data-tidx="2">L</div><div class="tutorial-cell" data-tidx="3">A</div><div class="tutorial-cell" data-tidx="4">S</div><div class="tutorial-cell" data-tidx="5">K</div><div class="tutorial-cell" data-tidx="6">M</div><div class="tutorial-cell" data-tidx="7">O</div><div class="tutorial-cell" data-tidx="8">C</div></div><div id="tutorialSuccess" class="tutorial-success"></div></div></div>`
       };
     
       const principleStep={
@@ -354,6 +365,6 @@
     return api;
   }
 
-  const api={install,shouldOfferStarterHint};
+  const api={install,shouldOfferStarterHint,advancePesTapPath};
   return api;
 });
