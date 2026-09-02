@@ -70,10 +70,29 @@ def db_request(
         headers["Prefer"] = prefer
     url = f"{url_base}/rest/v1/{table}"
     client = http_client or DEFAULT_HTTP_CLIENT
+    method = str(method).upper()
+
+    def send():
+        return client.request(method, url, params=params, json=body, headers=headers)
+
     try:
-        response = client.request(method, url, params=params, json=body, headers=headers)
+        response = send()
     except httpx.HTTPError as exc:
-        raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+        if method != "GET":
+            raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+        # Reads are idempotent. One immediate retry covers a dropped pooled
+        # connection without risking a duplicated write or RPC side effect.
+        logger.warning("Supabase read transport retry table=%s", table)
+        try:
+            response = send()
+        except httpx.HTTPError as retry_exc:
+            raise HTTPException(503, "Databáze je momentálně nedostupná") from retry_exc
+    if method == "GET" and response.status_code >= 500:
+        logger.warning("Supabase read status retry table=%s status=%s", table, response.status_code)
+        try:
+            response = send()
+        except httpx.HTTPError as exc:
+            raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if response.status_code >= 400:
         internal_detail = "database error"
         try:

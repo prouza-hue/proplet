@@ -63,7 +63,35 @@
     };
   }
 
-  const api = {create};
+  function createCachedLoader({load, ttlMs = 300000, now = () => Date.now()} = {}) {
+    if (typeof load !== 'function') throw new TypeError('load is required');
+    let cached = null;
+    let inFlight = null;
+
+    async function get({force = false} = {}) {
+      const currentTime = Number(now());
+      if (!force && cached && currentTime - cached.at < ttlMs) return cached.value;
+      if (!force && inFlight) return inFlight;
+
+      const request = Promise.resolve().then(load);
+      if (!force) inFlight = request;
+      try {
+        const value = await request;
+        cached = {at: Number(now()), value};
+        return value;
+      } finally {
+        if (inFlight === request) inFlight = null;
+      }
+    }
+
+    function invalidate() {
+      cached = null;
+    }
+
+    return {get, invalidate};
+  }
+
+  const api = {create, createCachedLoader};
   if (global) global.PropletApiClient = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : globalThis);

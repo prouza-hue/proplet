@@ -18,10 +18,10 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 service_worker = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.02.0"' in version
-assert "version:'4.02.0'" in runtime
+assert 'APP_VERSION = "4.02.1"' in version
+assert "version:'4.02.1'" in runtime
 assert "supabaseRpcAuthRetryV40124:true" in runtime
-assert "proplet-v4.02.0-game-session-shell" in service_worker
+assert "proplet-v4.02.1-game-session-shell" in service_worker
 
 
 with patch.object(server, "SUPABASE_SECRET_KEY", "sb_secret_opaque"):

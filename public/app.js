@@ -1656,6 +1656,8 @@ function openInstallFromProfile(){
 function getPushNudgeState(){try{return JSON.parse(localStorage.getItem(PUSH_NUDGE_KEY)||'{}')}catch{return {}}}
 function savePushNudgeState(v){localStorage.setItem(PUSH_NUDGE_KEY,JSON.stringify(v))}
 let pushConfigPromise=null;
+const PUSH_STATE_TTL_MS=5*60*1000;
+const pushPreferenceCache=window.PropletApiClient?.createCachedLoader({load:loadBrowserPushState,ttlMs:PUSH_STATE_TTL_MS});
 async function loadPushConfig(){
  if(pushConfigPromise)return pushConfigPromise;
  pushConfigPromise=(async()=>{
@@ -1669,7 +1671,7 @@ function pushNudgeDue(){
  const st=getPushNudgeState();if(st.accepted||st.done||st.disabledByUser||st.systemDenied)return false;
  if(!st.nextOfferDate)return true;return pragueDateISO()>=st.nextOfferDate;
 }
-async function browserPushState(){
+async function loadBrowserPushState(){
  const p=getProfile();
  if(!('Notification' in window)||!('PushManager' in window))return {account:true,unsupported:true,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:false};
  const cfg=await loadPushConfig();if(!cfg.available)return {account:true,unavailable:true,config:cfg,sub:null,dailyEnabled:false,contentEnabled:false,migrationReady:!!cfg.preferencesReady};
@@ -1685,12 +1687,14 @@ async function browserPushState(){
   return {account:true,config:cfg,sub,enabled,dailyEnabled:!!pref.dailyEnabled,contentEnabled:!!pref.contentEnabled,migrationReady:!!pref.migrationReady}
  }catch{return {account:true,config:cfg,sub,enabled:true,dailyEnabled:true,contentEnabled:true,migrationReady:false}}
 }
+async function browserPushState(options={}){return pushPreferenceCache?pushPreferenceCache.get(options):loadBrowserPushState()}
+function invalidatePushState(){pushPreferenceCache?.invalidate()}
 async function persistPushEnabled(enabled){
  const cfg=await loadPushConfig();if(!cfg.available)throw new Error('Push ještě není nakonfigurovaný na serveru.');if(!cfg.preferencesReady)throw new Error('Nové nastavení upozornění čeká na databázovou migraci.');
  const reg=await getPushRegistration();let sub=await reg.pushManager.getSubscription();
- if(!enabled){if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}return {enabled:false,dailyEnabled:false,contentEnabled:false}}
+ if(!enabled){if(sub){try{await api('/api/push/unsubscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint})})}catch{}await sub.unsubscribe()}invalidatePushState();return {enabled:false,dailyEnabled:false,contentEnabled:false}}
  if(!sub){const permission=await Notification.requestPermission();if(permission!=='granted'){savePushNudgeState({...getPushNudgeState(),done:true,systemDenied:true,deniedAt:new Date().toISOString()});throw new Error('Oznámení nejsou povolená. Později je můžeš zapnout v nastavení webu/prohlížeče.')}sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(cfg.publicKey)})}
- const j=sub.toJSON();await api('/api/push/subscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint,p256dh:j.keys?.p256dh,auth:j.keys?.auth,user_agent:navigator.userAgent.slice(0,240),daily_enabled:true,content_enabled:true})});return {enabled:true,dailyEnabled:true,contentEnabled:true}
+ const j=sub.toJSON();await api('/api/push/subscribe',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint,p256dh:j.keys?.p256dh,auth:j.keys?.auth,user_agent:navigator.userAgent.slice(0,240),daily_enabled:true,content_enabled:true})});invalidatePushState();return {enabled:true,dailyEnabled:true,contentEnabled:true}
 }
 async function shouldOfferPushNudge(){
  const g=currentGame;if(!['daily','free'].includes(g?.mode)||g?.justCompleted!==true||!pushNudgeDue())return false;if(!('Notification' in window)||!('PushManager' in window)||Notification.permission==='denied')return false;
@@ -1715,7 +1719,7 @@ async function updatePushUI(){
 }
 async function togglePushReminder(){
  if(pushUiBusy)return;pushUiBusy=true;const btn=$('#pushToggleBtn');btn.disabled=true;
- try{const state=await browserPushState();if(!state.migrationReady)throw new Error('Nastavení upozornění čeká na databázovou migraci.');const enabled=!state.enabled;await persistPushEnabled(enabled);trackProductEvent(`push_notifications_${enabled?'enabled':'disabled'}`);if(enabled)savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});else savePushNudgeState({...getPushNudgeState(),accepted:false,done:true,disabledByUser:true,disabledAt:new Date().toISOString()});showToast(enabled?'Upozornění zapnutá 🔔':'Upozornění vypnutá.')}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}
+ try{const state=await browserPushState({force:true});if(!state.migrationReady)throw new Error('Nastavení upozornění čeká na databázovou migraci.');const enabled=!state.enabled;await persistPushEnabled(enabled);trackProductEvent(`push_notifications_${enabled?'enabled':'disabled'}`);if(enabled)savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});else savePushNudgeState({...getPushNudgeState(),accepted:false,done:true,disabledByUser:true,disabledAt:new Date().toISOString()});showToast(enabled?'Upozornění zapnutá 🔔':'Upozornění vypnutá.')}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}
 }
 
 

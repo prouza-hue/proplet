@@ -10,10 +10,10 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (root / "proplet_version.py").read_text(encoding="utf-8")
 vercel = json.loads((root / "vercel.json").read_text(encoding="utf-8"))
 
-assert 'APP_VERSION = "4.02.0"' in version
-assert "version:'4.02.0'" in runtime
+assert 'APP_VERSION = "4.02.1"' in version
+assert "version:'4.02.1'" in runtime
 assert "pwaStartupHotfixV4001:true" in runtime
-assert "const SHELL_CACHE='proplet-v4.02.0-game-session-shell'" in sw
+assert "const SHELL_CACHE='proplet-v4.02.1-game-session-shell'" in sw
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)

@@ -228,6 +228,14 @@
       {
         "path": "tests/current/test_final_debt_query_bounds.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_runtime_resilience.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_push_preference_cache.js",
+        "runner": "node"
       }
     ]
   },
