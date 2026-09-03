@@ -27,35 +27,74 @@ function create(deps={}){
   function magnifierEnabled(game=getGame()){return magnifierAvailable(game)&&getSettings().magnifier!==false}
 
   const MAGNIFIER_SCALE=1.8;
+  const MAGNIFIER_THUMB_OFFSET=96;
+  let magnifierState=null;
 
-  function ensureMagnifier(){return query('#boardWrap')||null}
-  function renderMagnifier(){return magnifierEnabled()}
+  function ensureMagnifier(){
+    let root=query('#touchBoardZoom');
+    if(root||!documentObj)return root;
+    const stage=query('#boardStage');if(!stage)return null;
+    root=documentObj.createElement('div');
+    root.id='touchBoardZoom';root.className='touch-board-zoom-overlay hidden';root.setAttribute('aria-hidden','true');
+    const camera=documentObj.createElement('div');camera.className='touch-board-zoom-camera';root.appendChild(camera);stage.appendChild(root);
+    return root;
+  }
+  function cloneBoardVisual(){
+    const wrap=query('#boardWrap');if(!wrap?.cloneNode)return null;
+    const clone=wrap.cloneNode(true);clone.removeAttribute?.('id');clone.classList?.add('touch-board-zoom-clone');
+    clone.querySelectorAll?.('[id]').forEach(el=>el.removeAttribute('id'));
+    return clone;
+  }
+  function syncMagnifierVisual(){
+    const root=ensureMagnifier(),camera=root?.querySelector?.('.touch-board-zoom-camera'),clone=cloneBoardVisual();
+    if(!camera||!clone)return false;
+    camera.replaceChildren(clone);return true;
+  }
+  function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
+  function cameraAxis(stageSize,baseStart,boardSize,focus,target,scale){
+    const scaledStart=scale*baseStart,scaledEnd=scale*(baseStart+boardSize),scaledSize=scale*boardSize,
+      desired=target-scale*(baseStart+focus);
+    if(scaledSize<=stageSize)return (stageSize-scaledSize)/2-scaledStart;
+    return clamp(desired,stageSize-scaledEnd,-scaledStart);
+  }
+  function positionMagnifier(centerIndex,pointerX,pointerY){
+    const root=ensureMagnifier(),camera=root?.querySelector?.('.touch-board-zoom-camera'),
+      stage=query('#boardStage'),wrap=query('#boardWrap'),cell=query(`.cell[data-index="${centerIndex}"]`);
+    if(!root||!camera||!stage||!wrap)return false;
+    const sr=stage.getBoundingClientRect?.(),wr=wrap.getBoundingClientRect?.(),cr=cell?.getBoundingClientRect?.();
+    if(!sr?.width||!sr?.height||!wr?.width||!wr?.height)return false;
+    const baseLeft=wr.left-sr.left,baseTop=wr.top-sr.top,
+      fallbackX=cr?cr.left-wr.left+cr.width/2:wr.width/2,
+      fallbackY=cr?cr.top-wr.top+cr.height/2:wr.height/2,
+      focusX=clamp(Number.isFinite(pointerX)?pointerX-wr.left:fallbackX,0,wr.width),
+      focusY=clamp(Number.isFinite(pointerY)?pointerY-wr.top:fallbackY,0,wr.height),
+      pointerStageX=Number.isFinite(pointerX)?pointerX-sr.left:baseLeft+focusX,
+      pointerStageY=Number.isFinite(pointerY)?pointerY-sr.top:baseTop+focusY,
+      sideBias=pointerStageX>sr.width*.62?-28:pointerStageX<sr.width*.38?28:0,
+      targetX=clamp(pointerStageX+sideBias,34,sr.width-34),
+      targetY=clamp(pointerStageY-MAGNIFIER_THUMB_OFFSET,42,sr.height-42),
+      tx=cameraAxis(sr.width,baseLeft,wr.width,focusX,targetX,MAGNIFIER_SCALE),
+      ty=cameraAxis(sr.height,baseTop,wr.height,focusY,targetY,MAGNIFIER_SCALE);
+    camera.style.setProperty('--touch-camera-x',`${tx}px`);
+    camera.style.setProperty('--touch-camera-y',`${ty}px`);
+    camera.style.setProperty('--touch-camera-scale',String(MAGNIFIER_SCALE));
+    return true;
+  }
+  function renderMagnifier(){
+    if(!magnifierState)return false;
+    return syncMagnifierVisual();
+  }
   function hideMagnifier(){
-    const wrap=query('#boardWrap'),stage=query('#boardStage');
-    wrap?.classList.remove('touch-board-zoom');
-    stage?.classList.remove('touch-board-zoom-active');
-    wrap?.style?.removeProperty('--touch-zoom-x');
-    wrap?.style?.removeProperty('--touch-zoom-y');
-    wrap?.style?.removeProperty('--touch-zoom-scale');
+    magnifierState=null;
+    query('#touchBoardZoom')?.classList.add('hidden');
+    query('#boardStage')?.classList.remove('touch-board-zoom-active');
   }
   function showMagnifier(centerIndex,pointerX,pointerY){
     if(!magnifierEnabled()){hideMagnifier();return false}
-    const wrap=ensureMagnifier(),stage=query('#boardStage'),cell=query(`.cell[data-index="${centerIndex}"]`);
-    if(!wrap||!stage)return false;
-    const wr=wrap.getBoundingClientRect?.(),cr=cell?.getBoundingClientRect?.();
-    if(!wr?.width||!wr?.height)return false;
-    const fallbackX=cr?cr.left-wr.left+cr.width/2:wr.width/2,
-      fallbackY=cr?cr.top-wr.top+cr.height/2:wr.height/2,
-      rawX=Number.isFinite(pointerX)?pointerX-wr.left:fallbackX,
-      rawY=Number.isFinite(pointerY)?pointerY-wr.top:fallbackY,
-      anchorX=Math.max(0,Math.min(wr.width,rawX)),
-      anchorY=Math.max(0,Math.min(wr.height,rawY));
-    wrap.style.setProperty('--touch-zoom-x',`${anchorX}px`);
-    wrap.style.setProperty('--touch-zoom-y',`${anchorY}px`);
-    wrap.style.setProperty('--touch-zoom-scale',String(MAGNIFIER_SCALE));
-    stage.classList.add('touch-board-zoom-active');
-    wrap.classList.add('touch-board-zoom');
-    return true;
+    const root=ensureMagnifier(),stage=query('#boardStage');if(!root||!stage)return false;
+    magnifierState={centerIndex,pointerX,pointerY};
+    if(!syncMagnifierVisual()||!positionMagnifier(centerIndex,pointerX,pointerY)){magnifierState=null;return false}
+    stage.classList.add('touch-board-zoom-active');root.classList.remove('hidden');return true;
   }
 
   function currentWord(){const game=getGame();return game?.path?.map(i=>game.puzzle.letters[i]).join('')||''}
