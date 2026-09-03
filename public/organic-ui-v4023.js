@@ -130,10 +130,13 @@ function iconizeCloseButtons(){
    if(btn.querySelector('.ui-icon'))return;btn.replaceChildren(svgIcon('close'));btn.classList.add('ui-icon-only');
  });
 }
-const pictographic=/\p{Extended_Pictographic}/u;
+const pictographic=/\p{Extended_Pictographic}/gu;
+const NON_UI_PICTOGRAPHS=new Set(['©','®','™']);
 function keyAt(text){
  for(const [key,name] of MAP){const i=text.indexOf(key);if(i>=0)return {key,name,i};}
- const m=text.match(pictographic);return m?{key:m[0],name:'circle',i:m.index}:null;
+ pictographic.lastIndex=0;
+ let m;while((m=pictographic.exec(text))){if(!NON_UI_PICTOGRAPHS.has(m[0]))return {key:m[0],name:'circle',i:m.index}}
+ return null;
 }
 function replaceEmojiTextNode(node){
  let text=node.nodeValue||'';const hit=keyAt(text);if(!hit)return false;
@@ -156,8 +159,8 @@ function replaceVisibleEmoji(root=document.body){
 }
 function updateFooter(){
  const footer=document.querySelector('.app-footer');if(!footer)return;
- const line=footer.querySelector('span');if(line)line.textContent='© 2026 Proplet · Česká slovní hra';
- const author=footer.querySelector('strong');if(author)author.hidden=true;
+ const line=footer.querySelector('span');if(line&&line.textContent!=='© 2026 Proplet · Česká slovní hra')line.textContent='© 2026 Proplet · Česká slovní hra';
+ const author=footer.querySelector('strong');if(author&&!author.hidden)author.hidden=true;
 }
 function updateThemeMeta(){
  const meta=document.querySelector('meta[name="theme-color"]');if(!meta)return;
