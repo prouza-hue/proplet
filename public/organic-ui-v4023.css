@@ -211,12 +211,85 @@ button.ui-icon-only .ui-icon{margin-right:0}
 .support-choice>span:first-child,.hint-choice>span:first-child{font-size:0!important;color:#A95031!important}
 .support-choice>span:first-child .ui-icon,.hint-choice>span:first-child .ui-icon{width:24px;height:24px}
 
-/* Emoji avatar picker is retired; identity is initials-first. */
-.avatar-picker,.profile-edit-avatar-block{display:none!important}
-.profile-avatar-big,.avatar-dot,.home-ranking-avatar,.leader-avatar,.ranking-avatar,.ranking-privacy-preview>span:first-child{
-  font-size:12px!important;
-  line-height:1!important;
+/* Graphical avatar system — approved warm-paper / Verne character medallions. */
+.organic-avatar-host{
+  position:relative!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:50%!important;
+  background:#F6EFE2!important;
+  color:transparent!important;
+  font-size:0!important;
+  isolation:isolate;
 }
+.organic-avatar{
+  display:block;
+  width:100%;height:100%;
+  min-width:100%;min-height:100%;
+  border-radius:50%;
+  background-repeat:no-repeat;
+  background-size:400% 100%;
+  background-position-y:center;
+  box-shadow:inset 0 0 0 1px rgba(86,65,42,.16),0 1px 3px rgba(64,47,31,.08);
+}
+.oa-row-1{background-image:url('/organic/avatars-row-1.svg?v=1')}
+.oa-row-2{background-image:url('/organic/avatars-row-2.svg?v=1')}
+.oa-row-3{background-image:url('/organic/avatars-row-3.svg?v=1')}
+.oa-row-4{background-image:url('/organic/avatars-row-4.svg?v=1')}
+.oa-col-0{background-position-x:0%}.oa-col-1{background-position-x:33.3333%}.oa-col-2{background-position-x:66.6667%}.oa-col-3{background-position-x:100%}
+#profileChipAvatar.avatar-dot{width:36px!important;height:36px!important;flex:0 0 36px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #DED4C6,0 3px 9px rgba(61,44,30,.10)!important}
+.profile-avatar-big.organic-avatar-host{width:78px!important;height:78px!important;flex:0 0 78px!important;border:3px solid #FFFDF8!important;box-shadow:0 0 0 1px #D9CDBD,0 8px 18px rgba(61,44,30,.10)!important}
+.home-ranking-avatar.organic-avatar-host,.leader-avatar.organic-avatar-host,.leaderboard-avatar.organic-avatar-host,.ranking-avatar.organic-avatar-host{width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #DED4C6!important}
+.ranking-privacy-preview>span:first-child.organic-avatar-host{width:58px!important;height:58px!important;flex:0 0 58px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #D8CCBC,0 5px 12px rgba(61,44,30,.10)!important}
+.leader-name>strong.organic-leader-name,.leader-name>strong:has(.organic-avatar){display:flex!important;align-items:center!important;gap:8px!important}
+.leader-name>strong .ranking-avatar{display:inline-flex!important}
+#profileCard>.avatar-picker,.profile-edit-avatar-block{display:block!important}
+#profileCard>.avatar-picker{margin:15px 0 12px;padding:14px;border:1.5px solid #E5E0D8;border-radius:18px;background:#FFFDF9;box-shadow:0 3px 12px rgba(62,48,32,.04)}
+.avatar-grid,.profile-edit-avatar-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:9px!important;margin-top:9px!important}
+.avatar-choice{
+  width:100%!important;aspect-ratio:1!important;height:auto!important;min-height:0!important;
+  padding:3px!important;border-radius:50%!important;
+  background:#F6EFE3!important;border:2px solid #E1D7C8!important;
+  box-shadow:0 2px 5px rgba(62,48,32,.06)!important;
+  overflow:hidden;cursor:pointer;
+}
+.avatar-choice:hover{transform:translateY(-1px)!important;border-color:#CDAA55!important;box-shadow:0 5px 12px rgba(80,55,28,.10)!important}
+.avatar-choice.selected{border-color:#D69D16!important;box-shadow:0 0 0 3px rgba(234,179,8,.18),0 5px 12px rgba(80,55,28,.10)!important;background:#FFF6D8!important}
+.avatar-choice .organic-avatar{pointer-events:none}
+.avatar-choice.organic-avatar-duplicate{display:none!important}
+.settings-privacy-icon.organic-private-avatar{width:42px!important;height:42px!important;border-radius:50%!important;padding:2px!important;background:#EFE8DC!important}
+
+/* Tactile achievement / rank medallions. */
+.organic-emblem{
+  --emblem-bg:#F2E8D7;--emblem-ink:#5D5144;--emblem-edge:#D8CBB8;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  width:30px;height:30px;min-width:30px;
+  border-radius:50%;background:var(--emblem-bg)!important;color:var(--emblem-ink)!important;
+  border:1.5px solid var(--emblem-edge);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.46),0 2px 5px rgba(62,48,32,.08);
+  vertical-align:middle;
+}
+.organic-emblem .ui-icon{width:16px!important;height:16px!important;margin:0!important;vertical-align:0!important}
+.organic-emblem.tone-amber{--emblem-bg:#F5D77D;--emblem-ink:#6D4A09;--emblem-edge:#D9A62B}
+.organic-emblem.tone-coral{--emblem-bg:#F2A07D;--emblem-ink:#6E2F1E;--emblem-edge:#D56F4B}
+.organic-emblem.tone-sage{--emblem-bg:#A9C7A5;--emblem-ink:#284D35;--emblem-edge:#739B72}
+.organic-emblem.tone-blue{--emblem-bg:#A9C1D0;--emblem-ink:#294A60;--emblem-edge:#718FA4}
+.organic-emblem.tone-clay{--emblem-bg:#D8A37F;--emblem-ink:#633E29;--emblem-edge:#B87955}
+.organic-emblem.tone-mauve{--emblem-bg:#C9B2C5;--emblem-ink:#554052;--emblem-edge:#9B7F98}
+.organic-emblem.tone-ivory{--emblem-bg:#F5EFE4;--emblem-ink:#61574B;--emblem-edge:#D8CDBD}
+.profile-badge .organic-emblem{width:42px;height:42px;min-width:42px}.profile-badge .organic-emblem .ui-icon{width:22px!important;height:22px!important}
+.level-step-icon .organic-emblem,.profile-rank-icon .organic-emblem{width:32px;height:32px;min-width:32px}
+.achievement-summary-icons .organic-emblem,.achievement-peek .organic-emblem{width:27px;height:27px;min-width:27px}
+.home-ranking-medal .organic-emblem{width:28px;height:28px;min-width:28px}
+.streak-bubble .organic-emblem{width:34px;height:34px;min-width:34px}
+
+/* Larger utility illustrations get a warm paper tile instead of a floating pictogram. */
+.notification-pref-icon,.install-mini-icon,.ranking-privacy-icon,.rescue-flame,.helper-big-icon,.push-nudge-icon,.install-nudge-icon,.account-nudge-icon,.starter-choice-icon,.calm-confirm-icon{
+  display:grid!important;place-items:center!important;
+  border:1.5px solid #E2D7C7!important;border-radius:14px!important;
+  background:#FFF8EA!important;box-shadow:0 3px 9px rgba(62,48,32,.06)!important;
+}
+.notification-pref-icon .ui-icon,.install-mini-icon .ui-icon,.ranking-privacy-icon .ui-icon,.rescue-flame .ui-icon,.helper-big-icon .ui-icon,.push-nudge-icon .ui-icon,.install-nudge-icon .ui-icon,.account-nudge-icon .ui-icon,.starter-choice-icon .ui-icon,.calm-confirm-icon .ui-icon{width:55%!important;height:55%!important;margin:0!important}
 
 /* Footer */
 .app-footer{color:#756E66!important}
