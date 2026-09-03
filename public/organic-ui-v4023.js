@@ -31,6 +31,19 @@ const ICONS={
   check:'<path d="m5 12 4 4L19 6"/>',
   eyeOff:'<path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A11 11 0 0 1 12 5c6.5 0 10 7 10 7a16 16 0 0 1-3 3.8M6.6 6.6C3.6 8.4 2 12 2 12s3.5 7 10 7c1.2 0 2.3-.2 3.3-.6"/>',
   tool:'<path d="M14.7 6.3a4 4 0 0 0-5-5l2.4 2.4-3.4 3.4-2.4-2.4a4 4 0 0 0 5 5L18 16.4a2 2 0 1 0 2.8-2.8l-6.1-7.3Z"/>',
+  star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>',
+  bolt:'<path d="m13 2-8 12h6l-1 8 9-13h-6V2Z"/>',
+  crown:'<path d="m4 8 4 4 4-7 4 7 4-4-2 11H6L4 8Z"/><path d="M7 22h10"/>',
+  gem:'<path d="m7 4-4 6 9 11 9-11-4-6H7Z"/><path d="M3 10h18M8 4l4 6 4-6M8 10l4 11 4-11"/>',
+  medal:'<circle cx="12" cy="14" r="5"/><path d="m9 9-3-7h5l1 4 1-4h5l-3 7"/>',
+  calendar:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/><path d="m9 15 2 2 4-4"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/>',
+  book:'<path d="M4 5c3-1 5 0 8 2v14c-3-2-5-3-8-2V5ZM20 5c-3-1-5 0-8 2v14c3-2 5-3 8-2V5Z"/>',
+  key:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M17 12v3M20 12v2"/>',
+  mountain:'<path d="m3 20 7-12 3 5 2-3 6 10H3Z"/><path d="m8 12 2 2 2-2"/>',
+  snow:'<path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 4l3 3 3-3M9 20l3-3 3 3"/>',
+  music:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+  rocket:'<path d="M14 4c3-2 5-2 6-2 0 1 0 3-2 6l-6 6-4-4 6-6Z"/><path d="m8 10-4 1-2 4 6-1M12 14l-1 6-4 2 1-8"/><circle cx="15.5" cy="6.5" r="1.5"/>',
   circle:'<circle cx="12" cy="12" r="7"/>'
 };
 const MAP=new Map([
@@ -45,25 +58,73 @@ function svgIcon(name){
  const span=document.createElement('span');span.className='ui-icon';span.setAttribute('aria-hidden','true');
  span.innerHTML='<svg viewBox="0 0 24 24" focusable="false">'+(ICONS[name]||ICONS.circle)+'</svg>';return span;
 }
-function initials(name){
- const clean=(name||'').trim().replace(/\s+/g,' ');if(!clean)return 'HR';
- const parts=clean.split(' ').filter(Boolean);
- const out=parts.length>1?parts[0][0]+parts[parts.length-1][0]:parts[0].slice(0,2);
- return out.toLocaleUpperCase('cs-CZ');
+const LEGACY_AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
+const AVATAR_NAMES=['Vynálezce','Botanička','Badatel','Řemeslnice','Kapitán','Snílka','Strážce','Posel','Mechanik','Bard','Učenka','Hraničářka','Polárník','Gentleman','Čarodějka'];
+const AVATAR_COUNT=15;
+function legacyAvatarIndex(value){return LEGACY_AVATARS.indexOf(String(value||'').trim())}
+function visualAvatarIndex(value){
+ const i=legacyAvatarIndex(value);return i<0?-1:i%AVATAR_COUNT;
 }
-function setInitials(el,name){
- if(!el)return;const val=initials(name);if(el.textContent!==val)el.textContent=val;el.dataset.initialsAvatar='1';el.setAttribute('aria-label',name?('Avatar '+name):'Avatar hráče');
+function avatarNode(index,label='Herní avatar'){
+ const n=document.createElement('span'),safe=Math.max(0,Math.min(15,Number(index)||0)),row=Math.floor(safe/4)+1,col=safe%4;
+ n.className=`organic-avatar oa-row-${row} oa-col-${col}`;n.dataset.avatarIndex=String(safe);n.setAttribute('role','img');n.setAttribute('aria-label',label);return n;
 }
-function applyInitials(){
- const chip=document.getElementById('profileChipAvatar'),chipName=document.getElementById('profileChipText')?.textContent;
- setInitials(chip,chipName||'Hráč');
- document.querySelectorAll('.profile-avatar-big').forEach(el=>setInitials(el,el.closest('.profile-card,.profile-summary')?.querySelector('.profile-name')?.textContent||chipName||'Hráč'));
- const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview)setInitials(preview,document.getElementById('rankingPrivacyPreviewName')?.textContent||chipName||'Hráč');
- document.querySelectorAll('.home-ranking-row,.leader-row,.leaderboard-row,.ranking-row').forEach(row=>{
-   const av=row.querySelector('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar,[class*="ranking-avatar"]');
-   const name=row.querySelector('strong,.leader-name,.ranking-name')?.textContent;if(av&&name)setInitials(av,name.replace(/\bTy\b/g,'').trim());
+function profileState(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
+function decorateAvatarElement(el,key,label){
+ if(!el||el.querySelector('img.google-profile-avatar'))return false;
+ const raw=String(key??el.dataset.organicAvatarKey??el.textContent??'').trim();
+ const idx=visualAvatarIndex(raw);if(idx<0)return false;
+ if(el.dataset.organicAvatarKey===raw&&el.querySelector('.organic-avatar'))return true;
+ el.dataset.organicAvatarKey=raw;el.classList.add('organic-avatar-host');el.replaceChildren(avatarNode(idx,label||AVATAR_NAMES[idx]||'Herní avatar'));return true;
+}
+function decorateAvatarPickers(){
+ const p=profileState(),current=visualAvatarIndex(p?.avatar||'🙂');
+ document.querySelectorAll('.avatar-choice').forEach(btn=>{
+   const raw=String(btn.dataset.avatar||'').trim(),legacy=legacyAvatarIndex(raw);
+   if(legacy<0)return;
+   const idx=legacy%AVATAR_COUNT,duplicate=legacy>=AVATAR_COUNT;
+   btn.classList.toggle('organic-avatar-duplicate',duplicate);
+   if(duplicate){btn.tabIndex=-1;btn.setAttribute('aria-hidden','true');return}
+   btn.removeAttribute('aria-hidden');btn.tabIndex=0;btn.dataset.organicAvatarKey=raw;
+   btn.classList.toggle('selected',idx===current);
+   btn.setAttribute('aria-label',`Avatar: ${AVATAR_NAMES[idx]}`);btn.title=AVATAR_NAMES[idx];
+   if(!btn.querySelector('.organic-avatar'))btn.replaceChildren(avatarNode(idx,AVATAR_NAMES[idx]));
  });
 }
+function decorateInlineLeaderboardAvatars(){
+ document.querySelectorAll('.leader-name>strong').forEach(strong=>{
+   if(strong.querySelector('.organic-avatar'))return;
+   const first=strong.firstChild;if(!first||first.nodeType!==Node.TEXT_NODE)return;
+   const text=first.nodeValue||'';
+   const key=LEGACY_AVATARS.find(k=>text.trimStart().startsWith(k));if(!key)return;
+   first.nodeValue=text.replace(key,'').replace(/^\\s+/,'');
+   const host=document.createElement('span');host.className='ranking-avatar organic-avatar-host';host.dataset.organicAvatarKey=key;host.appendChild(avatarNode(visualAvatarIndex(key),'Herní avatar'));
+   strong.prepend(host);
+ });
+}
+function applyAvatars(){
+ const p=profileState();
+ if(p&&!p.useGoogleAvatar)decorateAvatarElement(document.getElementById('profileChipAvatar'),p.avatar||'🙂',`Avatar hráče ${p.name||''}`);
+ if(p&&!p.useGoogleAvatar)document.querySelectorAll('.profile-avatar-big').forEach(el=>decorateAvatarElement(el,p.avatar||'🙂',`Avatar hráče ${p.name||''}`));
+ const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview&&p&&!p.useGoogleAvatar)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
+ document.querySelectorAll('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar').forEach(el=>decorateAvatarElement(el,null,'Herní avatar'));
+ decorateInlineLeaderboardAvatars();decorateAvatarPickers();
+ const privateIcon=document.querySelector('.settings-privacy-icon');if(privateIcon&&profileState()?.publicRankings===false){privateIcon.replaceChildren(avatarNode(15,'Anonymní hráč'));privateIcon.classList.add('organic-private-avatar')}
+}
+function emblemSpec(key){
+ const specs={
+ '🥇':['trophy','amber'],'🥈':['medal','blue'],'🥉':['medal','clay'],'🏆':['trophy','amber'],'👑':['crown','amber'],'⭐':['star','amber'],'🌟':['star','amber'],'🏅':['medal','amber'],
+ '🔥':['flame','coral'],'⚡':['bolt','coral'],'❤️':['heart','clay'],'❤':['heart','clay'],'💎':['gem','blue'],'🚀':['rocket','blue'],'🦉':['book','blue'],
+ '🧠':['brain','blue'],'🤯':['brain','coral'],'🌱':['leaf','sage'],'🍀':['leaf','sage'],'🧭':['compass','blue'],'🔍':['search','blue'],'📚':['book','blue'],'📖':['book','blue'],
+ '📅':['calendar','sage'],'🗓️':['calendar','sage'],'🔑':['key','amber'],'⛰️':['mountain','clay'],'🏔️':['mountain','blue'],'❄️':['snow','blue'],'🎵':['music','mauve'],'🎶':['music','mauve'],
+ '✨':['star','mauve'],'💡':['bulb','amber'],'🛟':['lifebuoy','coral'],'👥':['users','sage'],'🛡️':['shield','sage'],'🎯':['target','coral'],'🧩':['puzzle','blue']
+ };
+ return specs[key]||null;
+}
+function emblemForEmoji(key){
+ const spec=emblemSpec(key)||[MAP.get(key)||'star','ivory'];const span=document.createElement('span');span.className=`organic-emblem tone-${spec[1]}`;span.dataset.sourceEmoji=key;span.appendChild(svgIcon(spec[0]));return span;
+}
+function isEmblemContext(parent){return !!parent?.closest('.profile-badge,.level-step-icon,.profile-rank-icon,.achievement-summary-icons,.achievement-peek,.achievement-card,.achievement,.home-ranking-medal,.ranking-rank-chip,.streak-bubble,.profile-completion-grid')}
 function iconizeCloseButtons(){
  document.querySelectorAll('.modal-close,.release-notes-v3331-close').forEach(btn=>{
    if(btn.querySelector('.ui-icon'))return;btn.replaceChildren(svgIcon('close'));btn.classList.add('ui-icon-only');
@@ -81,7 +142,7 @@ function replaceEmojiTextNode(node){
    const segment=text.slice(cursor);const h=keyAt(segment);
    if(!h){if(segment)frag.append(document.createTextNode(segment));break}
    if(h.i)frag.append(document.createTextNode(segment.slice(0,h.i)));
-   frag.append(svgIcon(h.name));cursor+=h.i+h.key.length;
+   frag.append(isEmblemContext(node.parentElement)?emblemForEmoji(h.key):svgIcon(h.name));cursor+=h.i+h.key.length;
  }
  node.parentNode?.replaceChild(frag,node);return true;
 }
@@ -104,7 +165,7 @@ function updateThemeMeta(){
 }
 let queued=false;
 function apply(){
- queued=false;applyInitials();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
+ queued=false;applyAvatars();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
 }
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(apply)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
