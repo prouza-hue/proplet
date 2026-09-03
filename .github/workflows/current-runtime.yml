@@ -1,6 +1,23 @@
 name: Current runtime gate
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.py'
+      - 'content/**'
+      - 'data/**'
+      - 'public/**'
+      - 'vercel.json'
+      - 'requirements*.txt'
+      - 'SUPABASE*.sql'
+      - 'supabase/**'
+      - 'docs/SUPABASE_MIGRATION_MANIFEST.md'
+      - 'tests/current/**'
+      - 'tools/test_current.py'
+      - 'tools/validate_migration_manifest.py'
+      - '.github/workflows/current-runtime.yml'
   pull_request:
     branches:
       - main
