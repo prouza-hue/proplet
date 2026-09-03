@@ -43,6 +43,7 @@ const ICONS={
   mountain:'<path d="m3 20 7-12 3 5 2-3 6 10H3Z"/><path d="m8 12 2 2 2-2"/>',
   snow:'<path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 4l3 3 3-3M9 20l3-3 3 3"/>',
   music:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+  home:'<path d="m3 11 9-7 9 7"/><path d="M5 10v10h14V10M9 20v-6h6v6"/>',
   rocket:'<path d="M14 4c3-2 5-2 6-2 0 1 0 3-2 6l-6 6-4-4 6-6Z"/><path d="m8 10-4 1-2 4 6-1M12 14l-1 6-4 2 1-8"/><circle cx="15.5" cy="6.5" r="1.5"/>',
   circle:'<circle cx="12" cy="12" r="7"/>'
 };
@@ -52,7 +53,15 @@ const MAP=new Map([
  ['☁️','cloud'],['☁','cloud'],['⚑','flag'],['👁️','eye'],['👁','eye'],['🔥','flame'],['🌱','leaf'],['🎒','backpack'],['🧠','brain'],
  ['🧩','puzzle'],['🎯','target'],['🛡️','shield'],['🛡','shield'],['🫧','calm'],['⚔️','sword'],['⚔','sword'],['☀️','sun'],['☀','sun'],
  ['👥','users'],['✓','check'],['🛠️','tool'],['🛠','tool'],['💻','tool'],['🏁','flag'],['🔦','bulb'],['🧭','target'],['🎓','user'],
- ['🐣','leaf'],['🧒','user'],['🤯','brain'],['✨','circle'],['✦','circle'],['🙂','user'],['🥇','trophy'],['🥈','trophy'],['🥉','trophy']
+ ['🐣','leaf'],['🧒','user'],['🤯','brain'],['✨','star'],['✦','star'],['🙂','user'],['🥇','trophy'],['🥈','medal'],['🥉','medal'],
+ ['⭐','star'],['🌟','star'],['🏅','medal'],['👑','crown'],['💎','gem'],['⚡','bolt'],['🚀','rocket'],['🦉','book'],
+ ['🔎','search'],['🧵','puzzle'],['🪢','puzzle'],['↪️','refresh'],['♟️','target'],['🧶','puzzle'],['🛤️','compass'],['🐉','shield'],
+ ['🌀','refresh'],['🧱','shield'],['🥷','shield'],['⚗️','tool'],['🐌','calm'],['🔮','star'],['🌌','star'],['🏰','shield'],['🎓','book'],
+ ['🪄','star'],['🗿','shield'],['♾️','refresh'],['🌠','star'],['🛰️','rocket'],['🗝️','key'],['🕸️','puzzle'],
+ ['🖐️','users'],['🔟','target'],['💯','target'],['🚂','rocket'],['🏃','bolt'],['🌿','leaf'],['🌳','leaf'],['🏡','home'],
+ ['🌲','leaf'],['🤔','brain'],['🧐','search'],['🧬','brain'],['🧨','bolt'],['💥','bolt'],['🦾','shield'],['⛏️','tool'],['⚒️','tool'],
+ ['🍽️','circle'],['🌤️','sun'],['🌞','sun'],['🌻','sun'],['🌍','compass'],['💭','brain'],['📜','book'],['🕳️','circle'],
+ ['👍','check'],['🏺','gem'],['🧼','calm'],['🦅','compass'],['🪞','eye']
 ]);
 function svgIcon(name){
  const span=document.createElement('span');span.className='ui-icon';span.setAttribute('aria-hidden','true');
