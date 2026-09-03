@@ -16,7 +16,7 @@
       root.dataset.themePreference=pref;
       root.style.colorScheme=resolved;
       const meta=document.querySelector('meta[name="theme-color"]');
-      if(meta){const light=meta.dataset.lightColor||meta.getAttribute('content')||'#6c5ce7';meta.setAttribute('content',dark?'#111019':light)}
+      if(meta){const light=meta.dataset.lightColor||meta.getAttribute('content')||'#FDFBF7';meta.setAttribute('content',dark?'#1C1C21':light)}
     }catch{}
   };
   apply();
