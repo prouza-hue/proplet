@@ -52,10 +52,11 @@ function create(deps={}){
   }
   function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
   function cameraAxis(stageSize,baseStart,boardSize,focus,target,scale){
-    const scaledStart=scale*baseStart,scaledEnd=scale*(baseStart+boardSize),scaledSize=scale*boardSize,
-      desired=target-scale*(baseStart+focus);
-    if(scaledSize<=stageSize)return (stageSize-scaledSize)/2-scaledStart;
-    return clamp(desired,stageSize-scaledEnd,-scaledStart);
+    const edgeMargin=20,scaledStart=scale*baseStart,scaledEnd=scale*(baseStart+boardSize),
+      desired=target-scale*(baseStart+focus),ratio=boardSize?focus/boardSize:.5;
+    if(ratio<=.28)return Math.max(desired,edgeMargin-scaledStart);
+    if(ratio>=.72)return Math.min(desired,stageSize-edgeMargin-scaledEnd);
+    return desired;
   }
   function positionMagnifier(centerIndex,pointerX,pointerY){
     const root=ensureMagnifier(),camera=root?.querySelector?.('.touch-board-zoom-camera'),
