@@ -1,182 +1,121 @@
-name: v3.34 Fold portrait + privacy icon smoke
-
+name: Organic UI browser smoke
 on:
   pull_request:
     branches: [main]
     paths: ['.github/workflows/v334-fold-portrait-smoke.yml']
-
-permissions:
-  contents: read
-
+permissions: {contents: read}
 jobs:
-  fold-and-icon:
+  organic-ui:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
-      PREVIEW_URL: https://proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app
+      PREVIEW_URL: https://proplet-git-ux-warm-paper-refactor-pavel-prouzas-projects.vercel.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+        with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check playwright==1.57.0
-      - name: Verify real-Fold portrait rail, centered mask, superseded modal and privacy icon
+      - name: Verify warm-paper UI in real Chromium
         shell: bash
         run: |
-          cat > /tmp/fold_smoke.py <<'PY'
+          cat > /tmp/organic_smoke.py <<'PY'
           import json, os, time, urllib.request
           from playwright.sync_api import sync_playwright
 
           URL=os.environ['PREVIEW_URL'].rstrip('/')
           CHROME=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
-          OUT='/tmp/proplet-fold-smoke';os.makedirs(OUT,exist_ok=True)
-          result={}
+          OUT='/tmp/proplet-organic-smoke';os.makedirs(OUT,exist_ok=True)
 
-          # Stable branch aliases can lag GitHub by a few seconds. Do not test the previous deployment.
-          deadline=time.time()+75
+          deadline=time.time()+90
           while True:
               try:
-                  with urllib.request.urlopen(URL+'/game-layout-v3330.js?qa='+str(time.time()),timeout=8) as r: layout_src=r.read().decode('utf-8','replace')
-                  with urllib.request.urlopen(URL+'/quality-v334.js?qa='+str(time.time()),timeout=8) as r: quality_src=r.read().decode('utf-8','replace')
-                  with urllib.request.urlopen(URL+'/release-notes-v3331.js?qa='+str(time.time()),timeout=8) as r: release_src=r.read().decode('utf-8','replace')
-                  if "TABLET_PORTRAIT_CLASS='game-tablet-portrait'" in layout_src and "icon.className='ranking-privacy-mini-icon'" in quality_src and 'supersededByGen4' in release_src:break
-              except Exception:pass
-              if time.time()>deadline:raise AssertionError('preview alias did not reach current Fold/modal/icon fix')
+                  with urllib.request.urlopen(URL+'/organic-ui-v4023.css?qa='+str(time.time()),timeout=8) as r: css=r.read().decode('utf-8','replace')
+                  with urllib.request.urlopen(URL+'/organic-ui-v4023.js?qa='+str(time.time()),timeout=8) as r: js=r.read().decode('utf-8','replace')
+                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js: break
+              except Exception: pass
+              if time.time()>deadline: raise AssertionError('preview alias did not reach organic UI head')
               time.sleep(2)
 
-          def wait(page,expr,timeout=12000):
-              end=time.time()+timeout/1000;last=None
-              while time.time()<end:
-                  try:
-                      last=page.evaluate(expr)
-                      if last:return last
-                  except Exception as e:last=repr(e)
-                  time.sleep(.1)
-              raise AssertionError(f'timeout: {expr}; last={last!r}')
-
-          def dismiss_overlays(page):
+          def dismiss(page):
               page.evaluate("""()=>{
-                try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');sessionStorage.setItem('proplet-gen4-release-modal-v1','1')}catch(e){}
-                document.querySelector('#qualityReleaseModal')?.classList.add('hidden');
-                document.querySelector('#onboardingModal')?.classList.add('hidden');
+                try{
+                  localStorage.setItem('proplet-onboarding-v1','done');
+                  localStorage.setItem('proplet-helper-onboarding-v1','done');
+                  sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
+                }catch(e){}
+                document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
                 document.documentElement.classList.remove('gen4-preview-booting');
               }""")
 
-          def boot_game(browser,w,h,sw,sh,touch,label,bank='medium',pick='first'):
-              ctx=browser.new_context(viewport={'width':w,'height':h},screen={'width':sw,'height':sh},has_touch=touch,is_mobile=touch,service_workers='block')
-              page=ctx.new_page();errs=[]
-              page.on('pageerror',lambda e:errs.append(str(e)))
-              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-              wait(page,f"typeof startGame==='function' && !!puzzleDB?.free?.{bank}?.[0]")
-              dismiss_overlays(page)
-              if pick=='biased':
-                  info=page.evaluate("""()=>{
-                    const all=Object.values(puzzleDB.free||{}).flat();
-                    const score=p=>{const rows=(p.mask||[]).map(i=>Math.floor(Number(i)/p.cols));if(!rows.length)return 0;const lo=Math.min(...rows),hi=Math.max(...rows);return Math.abs((lo+hi)/2-(p.rows-1)/2)};
-                    const p=[...all].sort((a,b)=>score(b)-score(a))[0];startGame(p,'free');return {id:p.id,score:score(p)};
-                  }""")
-              else:
-                  info=page.evaluate(f"()=>{{const p=puzzleDB.free.{bank}[0];startGame(p,'free');return {{id:p.id}}}}")
-              wait(page,"document.body.classList.contains('playing')")
-              page.wait_for_timeout(900)
-              state=page.evaluate("""()=>({
-                mode:document.documentElement.dataset.gameLayoutMode,
-                orient:document.documentElement.dataset.gameLayoutOrientation,
-                device:document.documentElement.dataset.gameLayoutDevice,
-                metrics:document.documentElement.dataset.gameLayoutMetrics,
-                cols:getComputedStyle(document.querySelector('.game-main')).gridTemplateColumns,
-                currentParent:document.querySelector('.current-word')?.parentElement?.className||'',
-                infoParent:document.querySelector('.game-info')?.parentElement?.className||'',
-                rail:document.querySelector('.game-control-column')?.getBoundingClientRect().width||0,
-                boardStage:document.querySelector('.board-stage')?.getBoundingClientRect(),
-                cellFont:parseFloat(getComputedStyle(document.querySelector('#board .cell')).fontSize)||0,
-                overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth
-              })""")
-              state['puzzle']=info
-              page.screenshot(path=f'{OUT}/{label}.png',full_page=True)
-              assert not errs,(label,errs)
-              return ctx,page,state
-
+          result={}
           with sync_playwright() as p:
-              b=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
+              browser=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
+              for label,viewport in [('mobile',{'width':390,'height':844}),('desktop',{'width':1440,'height':900})]:
+                  ctx=browser.new_context(viewport=viewport,service_workers='block')
+                  page=ctx.new_page(); errors=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+                  page.wait_for_function("()=>!!document.querySelector('link[href*="organic-ui-v4023.css"]') && !!document.querySelector('script[src*="organic-ui-v4023.js"]')",timeout=12000)
+                  page.wait_for_timeout(1200); dismiss(page); page.wait_for_timeout(200)
+                  base=page.evaluate("""()=>({
+                    bg:getComputedStyle(document.body).backgroundColor,
+                    hero:getComputedStyle(document.querySelector('.daily-hero')).backgroundColor,
+                    footer:document.querySelector('.app-footer span')?.textContent?.trim(),
+                    avatar:document.querySelector('#profileChipAvatar')?.textContent?.trim(),
+                    overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                    emoji:new RegExp('\\\\p{Extended_Pictographic}','u').test(document.body.innerText),
+                    closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg'))
+                  })""")
+                  assert base['bg']=='rgb(253, 251, 247)',base
+                  assert base['hero']=='rgb(185, 92, 54)',base
+                  assert base['footer']=='© 2026 Proplet · Česká slovní hra',base
+                  assert len(base['avatar'])==2 and not base['emoji'],base
+                  assert base['overflow']<=1 and base['closeSvg'],base
 
-              # Reproduce the real Android Fold failure mode: usable unfolded viewport, but screen API
-              # still reports phone-like dimensions. Old classifier treated this as a phone and lost the rail.
-              ctx,page,s=boot_game(b,590,960,384,832,True,'fold-portrait-real-browser')
-              assert s['mode']=='tablet-portrait-rail',s
-              assert s['orient']=='portrait' and s['device']=='large-touch',s
-              assert len(s['cols'].split())==2,s
-              assert 'game-control-column' in s['currentParent'],s
-              assert 'game-board-column' in s['infoParent'],s
-              assert 145<=s['rail']<=180,s
-              assert s['boardStage']['width']>340,s
-              assert s['cellFont']<=22.5,s
-              assert s['overflowX']<=1,s
-              result['foldPortraitRealBrowser']=s;ctx.close()
+                  page.evaluate("""()=>{const m=document.querySelector('#profileModal');m.classList.remove('hidden')}""")
+                  page.wait_for_timeout(150)
+                  modal=page.evaluate("""()=>{const m=document.querySelector('#profileModal'),c=m.querySelector('.modal-card'),mr=getComputedStyle(m),cr=getComputedStyle(c),r=c.getBoundingClientRect();return {align:mr.alignItems,bottom:Math.abs(innerHeight-r.bottom),width:r.width,br:cr.borderBottomLeftRadius}}""")
+                  if label=='mobile':
+                      assert modal['align']=='flex-end' and modal['bottom']<=1 and modal['width']>=389 and modal['br']=='0px',modal
+                  else:
+                      assert modal['width']<700 and modal['br']!='0px',modal
+                  page.evaluate("document.querySelector('#profileModal').classList.add('hidden')")
 
-              # Existing Fold landscape contract remains intact.
-              ctx,page,s=boot_game(b,728,656,728,656,True,'fold-landscape')
-              assert s['mode']=='tablet-landscape',s
-              assert len(s['cols'].split())==2 and 'game-control-column' in s['currentParent'],s
-              assert s['overflowX']<=1,s
-              result['foldLandscape']=s;ctx.close()
+                  page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]",timeout=12000)
+                  page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
+                  page.wait_for_function("()=>document.body.classList.contains('playing')",timeout=8000)
+                  page.wait_for_timeout(500)
+                  board=page.evaluate("""()=>{
+                    const cell=document.querySelector('#board .cell'),cs=getComputedStyle(cell);
+                    const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+                    line.classList.add('path-active');line.setAttribute('points','0,0 20,20');document.querySelector('#pathLayer').appendChild(line);
+                    const ls=getComputedStyle(line);
+                    return {bg:cs.backgroundColor,color:cs.color,border:cs.borderTopWidth,weight:cs.fontWeight,transform:cs.textTransform,duration:cs.transitionDuration,stroke:ls.stroke,strokeWidth:ls.strokeWidth};
+                  }""")
+                  assert board['bg']=='rgb(255, 255, 255)' and int(board['weight'])>=900,board
+                  assert board['transform']=='uppercase' and '0.15s' in board['duration'],board
+                  assert board['stroke']=='rgb(234, 179, 8)' and board['strokeWidth']=='10px',board
+                  page.screenshot(path=f"{OUT}/{label}.png",full_page=True)
+                  result[label]={'base':base,'modal':modal,'board':board}
+                  assert not errors,(label,errors)
+                  ctx.close()
 
-              # Ordinary phone portrait must not inherit the Fold rail.
-              ctx,page,s=boot_game(b,390,844,390,844,True,'phone-portrait')
-              assert s['mode']=='standard',s
-              assert len(s['cols'].split())==1,s
-              assert 'game-board-column' in s['currentParent'],s
-              result['phonePortrait']=s;ctx.close()
+              ctx=browser.new_context(viewport={'width':390,'height':844},service_workers='block')
+              page=ctx.new_page();page.goto(URL,wait_until='domcontentloaded',timeout=30000);page.wait_for_timeout(800);dismiss(page)
+              dark=page.evaluate("""()=>{document.documentElement.dataset.theme='dark';return getComputedStyle(document.body).backgroundColor}""")
+              assert dark=='rgb(28, 28, 33)',dark
+              result['dark']=dark;page.screenshot(path=f"{OUT}/dark.png",full_page=True);ctx.close();browser.close()
 
-              # Fresh Gen4 session: close the current Gen4 modal, then prove the obsolete 3.33.1 / 500 XP
-              # modal never appears underneath it. Use the same page to verify the compact mask icon.
-              ctx=b.new_context(viewport={'width':390,'height':844},screen={'width':390,'height':844},has_touch=True,is_mobile=True,service_workers='block')
-              page=ctx.new_page()
-              page.add_init_script("""()=>{try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');localStorage.removeItem('proplet-release-notes-seen:3.33.1');sessionStorage.removeItem('proplet-gen4-release-modal-v1')}catch(e){}}""")
-              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-              page.locator('#qualityReleaseModal:not(.hidden)').wait_for(state='visible',timeout=10000)
-              page.locator('#qualityReleasePlay').click()
-              wait(page,"!document.documentElement.classList.contains('gen4-preview-booting')")
-              page.wait_for_timeout(1600)
-              old_count=page.locator('.release-notes-v3331-backdrop').count()
-              assert old_count==0,{'oldReleaseModalCount':old_count}
-              wait(page,"!!document.querySelector('#rankingPrivacyMini')")
-              icon=page.evaluate("""()=>{
-                const b=document.querySelector('#rankingPrivacyMini'),i=b?.querySelector('.ranking-privacy-mini-icon'),cs=getComputedStyle(b),ics=getComputedStyle(i),r=b.getBoundingClientRect(),ir=i.getBoundingClientRect();
-                return {display:cs.display,width:r.width,height:r.height,placeItems:cs.placeItems,text:i.textContent,iconSize:ics.fontSize,iconWidth:ir.width,iconHeight:ir.height,transform:ics.transform};
-              }""")
-              assert icon['display']=='grid' and 35<=icon['width']<=37 and 35<=icon['height']<=37,icon
-              assert 'center' in icon['placeItems'] and '🎭' in icon['text'],icon
-              assert float(icon['iconSize'].replace('px',''))>=17 and icon['transform']=='none',icon
-              page.screenshot(path=f'{OUT}/privacy-mask-mobile.png',full_page=True)
-              result['privacyMask']=icon;result['oldReleaseModalSuppressed']=True;ctx.close()
-
-              # Desktop: choose the most vertically asymmetric available mask. The centre of VISIBLE
-              # cells, rather than the empty rectangular grid, must sit on the board-stage centre.
-              ctx,page,s=boot_game(b,1600,900,1600,900,False,'desktop-centered-mask',pick='biased')
-              assert s['mode']=='desktop-wide',s
-              assert len(s['cols'].split())==2 and 'game-control-column' in s['currentParent'] and 'game-control-column' in s['infoParent'],s
-              centers=page.evaluate("""()=>{
-                const stage=document.querySelector('#boardStage').getBoundingClientRect(),cells=[...document.querySelectorAll('#board .cell')].map(e=>e.getBoundingClientRect());
-                const top=Math.min(...cells.map(r=>r.top)),bottom=Math.max(...cells.map(r=>r.bottom));
-                return {stage:(stage.top+stage.bottom)/2,mask:(top+bottom)/2,delta:Math.abs((stage.top+stage.bottom)/2-(top+bottom)/2),offset:getComputedStyle(document.querySelector('#boardWrap')).getPropertyValue('--mask-center-y')};
-              }""")
-              assert centers['delta']<=3.0,(s,centers)
-              assert s['rail']>=285 and s['overflowX']<=1,s
-              result['desktop']=s;result['desktopMaskCenter']=centers
-              page.screenshot(path=f'{OUT}/desktop-centered-mask.png',full_page=True)
-              ctx.close();b.close()
-
-          with open(f'{OUT}/summary.json','w',encoding='utf-8') as f:json.dump(result,f,ensure_ascii=False,indent=2)
+          with open(f'{OUT}/summary.json','w',encoding='utf-8') as f: json.dump(result,f,ensure_ascii=False,indent=2)
           print(json.dumps(result,ensure_ascii=False,indent=2))
           PY
-          python /tmp/fold_smoke.py
+          python /tmp/organic_smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v334-fold-portrait-smoke
-          path: /tmp/proplet-fold-smoke/
+          name: organic-ui-browser-smoke
+          path: /tmp/proplet-organic-smoke/
           if-no-files-found: warn
           retention-days: 7
