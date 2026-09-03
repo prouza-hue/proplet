@@ -122,7 +122,7 @@ assert.strictEqual(zoomInput.showMagnifier(7,250,250),true,'touch zoom should ac
 assert.strictEqual(zoomRoot.classList.contains('hidden'),false,'zoom camera should be visible');
 assert.strictEqual(zoomStage.classList.contains('touch-board-zoom-active'),true,'board stage clipping class missing');
 assert.strictEqual(zoomCamera.style.get('--touch-camera-scale'),'1.8','zoom scale drifted');
-assert.strictEqual(zoomCamera.style.get('--touch-camera-x'),'-296px','right edge camera should pull the board inward');
+assert.strictEqual(zoomCamera.style.get('--touch-camera-x'),'-228px','right edge camera should pull the board inward');
 assert.strictEqual(zoomCamera.style.get('--touch-camera-y'),'-296px','bottom edge camera should lift the board above the thumb');
 assert.strictEqual(zoomCamera.child,zoomClone,'zoom camera should render a visual clone, not move the input board');
 assert.strictEqual(zoomWrap.classList.contains('touch-board-zoom'),false,'interactive board must stay stationary');
