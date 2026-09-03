@@ -106,10 +106,10 @@ function applyAvatars(){
  const p=profileState();
  if(p&&!p.useGoogleAvatar)decorateAvatarElement(document.getElementById('profileChipAvatar'),p.avatar||'🙂',`Avatar hráče ${p.name||''}`);
  if(p&&!p.useGoogleAvatar)document.querySelectorAll('.profile-avatar-big').forEach(el=>decorateAvatarElement(el,p.avatar||'🙂',`Avatar hráče ${p.name||''}`));
- const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview&&p&&!p.useGoogleAvatar)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
+ const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview&&p)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
  document.querySelectorAll('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar').forEach(el=>decorateAvatarElement(el,null,'Herní avatar'));
  decorateInlineLeaderboardAvatars();decorateAvatarPickers();
- const privateIcon=document.querySelector('.settings-privacy-icon');if(privateIcon&&profileState()?.publicRankings===false){privateIcon.replaceChildren(avatarNode(15,'Anonymní hráč'));privateIcon.classList.add('organic-private-avatar')}
+ const privateIcon=document.querySelector('.settings-privacy-icon');if(privateIcon&&profileState()?.publicRankings===false&&!privateIcon.querySelector('.organic-avatar')){privateIcon.replaceChildren(avatarNode(15,'Anonymní hráč'));privateIcon.classList.add('organic-private-avatar')}
 }
 function emblemSpec(key){
  const specs={
