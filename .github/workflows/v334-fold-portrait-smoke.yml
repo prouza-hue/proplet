@@ -59,19 +59,31 @@ jobs:
                   page.goto(URL,wait_until='domcontentloaded',timeout=30000)
                   page.wait_for_function("""()=>!!document.querySelector('link[href*="organic-ui-v4023.css"]') && !!document.querySelector('script[src*="organic-ui-v4023.js"]')""",timeout=12000)
                   page.wait_for_timeout(1200); dismiss(page); page.wait_for_timeout(200)
+                  page.evaluate("""()=>{
+                    const probe=document.createElement('div');probe.id='organicUiProbe';probe.style.cssText='position:absolute;left:-9999px;top:0;width:320px';
+                    const keys=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
+                    probe.innerHTML='<span class="home-ranking-avatar">🐲</span><div class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-avatar="'+k+'">'+k+'</button>').join('')+'</div><div class="profile-badge"><span class="emoji">🔥</span><strong>Test</strong></div>';
+                    document.body.appendChild(probe);
+                  }""")
+                  page.wait_for_timeout(300)
                   base=page.evaluate("""()=>({
                     bg:getComputedStyle(document.body).backgroundColor,
                     hero:getComputedStyle(document.querySelector('.daily-hero')).backgroundColor,
                     footer:document.querySelector('.app-footer span')?.textContent?.trim(),
-                    avatar:document.querySelector('#profileChipAvatar')?.textContent?.trim(),
                     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
-                    emoji:new RegExp('\\\\p{Extended_Pictographic}','u').test(document.body.innerText),\n                    emojiChars:[...new Set(Array.from(document.body.innerText).filter(ch=>new RegExp('\\\\p{Extended_Pictographic}','u').test(ch)))].slice(0,30),
+                    emojiChars:[...new Set(Array.from(document.body.innerText).filter(ch=>new RegExp('\\\\p{Extended_Pictographic}','u').test(ch)&&!['©','®'].includes(ch)))].slice(0,30),
+                    avatarCount:document.querySelectorAll('#organicUiProbe .avatar-choice:not(.organic-avatar-duplicate)').length,
+                    avatarRendered:!!document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar'),
+                    avatarBg:getComputedStyle(document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar')).backgroundImage,
+                    badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
                     closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg'))
                   })""")
                   assert base['bg']=='rgb(253, 251, 247)',base
                   assert base['hero']=='rgb(185, 92, 54)',base
                   assert base['footer']=='© 2026 Proplet · Česká slovní hra',base
-                  assert len(base['avatar'])==2 and not base['emoji'],base
+                  assert not base['emojiChars'],base
+                  assert base['avatarCount']==15 and base['avatarRendered'] and 'avatars-row-' in base['avatarBg'],base
+                  assert base['badgeRendered'],base
                   assert base['overflow']<=1 and base['closeSvg'],base
 
                   page.evaluate("""()=>{const m=document.querySelector('#profileModal');m.classList.remove('hidden')}""")
