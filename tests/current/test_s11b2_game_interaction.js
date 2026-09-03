@@ -93,6 +93,43 @@ assert.strictEqual(inp.extendPath(4),true);
 assert.deepStrictEqual(game.path,[0,1,4]);
 assert.strictEqual(inp.extendPath(2),false);
 
+function fakeClassList(initial=[]){
+  const values=new Set(initial);
+  return {add:(...names)=>names.forEach(name=>values.add(name)),remove:(...names)=>names.forEach(name=>values.delete(name)),contains:name=>values.has(name)};
+}
+function fakeStyle(){
+  const values=new Map();
+  return {setProperty:(name,value)=>values.set(name,value),removeProperty:name=>values.delete(name),get:name=>values.get(name)};
+}
+const zoomClone={classList:fakeClassList(),removeAttribute:()=>{},querySelectorAll:()=>[]};
+const zoomWrap={
+  classList:fakeClassList(),style:fakeStyle(),getBoundingClientRect:()=>({left:30,top:30,width:240,height:240}),
+  cloneNode:()=>zoomClone,
+};
+const zoomCamera={style:fakeStyle(),replaceChildren:child=>{zoomCamera.child=child}};
+const zoomRoot={classList:fakeClassList(['hidden']),querySelector:selector=>selector==='.touch-board-zoom-camera'?zoomCamera:null};
+const zoomStage={classList:fakeClassList(),getBoundingClientRect:()=>({left:0,top:0,width:300,height:300})};
+const zoomCell={getBoundingClientRect:()=>({left:238,top:238,width:24,height:24})};
+const zoomGame={puzzle:{difficulty:'hard'},finished:false};
+const zoomInput=input.create({
+  getGame:()=>zoomGame,
+  query:selector=>selector==='#touchBoardZoom'?zoomRoot:selector==='#boardWrap'?zoomWrap:selector==='#boardStage'?zoomStage:selector==='.cell[data-index="7"]'?zoomCell:null,
+  windowObj:{matchMedia:()=>({matches:true}),visualViewport:{width:390,height:844},innerWidth:390,innerHeight:844},
+  navigatorObj:{maxTouchPoints:5},
+  getSettings:()=>({magnifier:true}),
+});
+assert.strictEqual(zoomInput.showMagnifier(7,250,250),true,'touch zoom should activate on supported hard board');
+assert.strictEqual(zoomRoot.classList.contains('hidden'),false,'zoom camera should be visible');
+assert.strictEqual(zoomStage.classList.contains('touch-board-zoom-active'),true,'board stage clipping class missing');
+assert.strictEqual(zoomCamera.style.get('--touch-camera-scale'),'1.8','zoom scale drifted');
+assert.strictEqual(zoomCamera.style.get('--touch-camera-x'),'-228px','right edge camera should pull the board inward');
+assert.strictEqual(zoomCamera.style.get('--touch-camera-y'),'-296px','bottom edge camera should lift the board above the thumb');
+assert.strictEqual(zoomCamera.child,zoomClone,'zoom camera should render a visual clone, not move the input board');
+assert.strictEqual(zoomWrap.classList.contains('touch-board-zoom'),false,'interactive board must stay stationary');
+zoomInput.hideMagnifier();
+assert.strictEqual(zoomRoot.classList.contains('hidden'),true,'zoom camera should hide on release');
+assert.strictEqual(zoomStage.classList.contains('touch-board-zoom-active'),false,'board stage clipping state should reset on release');
+
 const h=hints.create({getGame:()=>game,supportMode:()=> 'standard'});
 let target=h.pickTarget();
 assert.strictEqual(target.i,1,'hint should prefer fewer turns then shorter word');
