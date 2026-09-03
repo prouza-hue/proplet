@@ -1,0 +1,243 @@
+/* Proplet warm-paper UI refactor — visual-only layer. Core gameplay/audio/haptics untouched. */
+:root{
+  --bg:#FDFBF7;
+  --paper:#FFFFFF;
+  --ink:#1C1917;
+  --muted:#6F6A63;
+  --line:#E5E0D8;
+  --purple:#C65F36;
+  --purple2:#EAB308;
+  --mint:#6FA486;
+  --coral:#F97316;
+  --yellow:#EAB308;
+  --blue:#58728A;
+  --surface:#FFFFFF;
+  --surface-2:#F7F3EC;
+  --accent:#EAB308;
+  --accent-strong:#C65F36;
+  --success:#3F8B68;
+  --success-soft:#E6F2EB;
+  --shadow:0 16px 38px rgba(62,48,32,.09);
+  --soft-shadow:0 4px 14px rgba(62,48,32,.07);
+}
+html,body{
+  background:#FDFBF7!important;
+  color:var(--ink);
+  font-family:"Avenir Next","Avenir Next Rounded","Nunito Sans","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif!important;
+}
+body{background-image:radial-gradient(circle at 12% 3%,rgba(234,179,8,.055),transparent 27%),radial-gradient(circle at 88% 92%,rgba(63,139,104,.04),transparent 24%)!important}
+.ambient{display:none!important}
+.card,.ranking-section,.settings-card,.profile-card,.game-info,.current-word,.board-stage{
+  background:#fff!important;
+  border:1.5px solid #E5E0D8!important;
+  box-shadow:var(--soft-shadow)!important;
+}
+.card{border-radius:20px}
+.eyebrow,.stat-label{color:#766F66!important;letter-spacing:.12em}
+.muted{color:#6F6A63!important}
+.brand-mark,
+body:has(#screen-daily.active.home-layout-active) .home-brand .brand-mark{
+  background:#EAB308!important;
+  color:#1C1917!important;
+  box-shadow:0 7px 18px rgba(160,116,6,.17)!important;
+  transform:rotate(-2deg)!important;
+}
+.brand-mark:after,
+body:has(#screen-daily.active.home-layout-active) .home-brand .brand-mark:after{
+  background:#F97316!important;
+  border-color:#FDFBF7!important;
+}
+.profile-chip{
+  background:#fff!important;
+  border:1.5px solid #E5E0D8!important;
+  box-shadow:0 3px 10px rgba(62,48,32,.06)!important;
+}
+.avatar-dot,.profile-avatar-big,.home-ranking-avatar,.ranking-privacy-preview>span:first-child{
+  background:linear-gradient(145deg,#F2D78A,#E8B88C)!important;
+  color:#3E2B1C!important;
+  font-weight:900!important;
+  letter-spacing:.02em!important;
+  text-transform:uppercase!important;
+}
+.daily-hero,
+#screen-daily.home-layout-active .daily-hero{
+  background:#B95C36!important;
+  border:1.5px solid #A95131!important;
+  color:#FFFDF8!important;
+  box-shadow:0 15px 34px rgba(129,66,38,.17)!important;
+}
+.daily-hero:before{background:rgba(255,255,255,.055)!important}
+.hero-decor span{background:#FFFDF8!important;color:#7B3A24!important}
+.light-pill,.hero-streak{background:rgba(255,255,255,.11)!important;border-color:rgba(255,255,255,.20)!important}
+.primary-btn,.hero-btn,.quality-release-primary,.release-notes-v3331-account{
+  background:#1C1917!important;
+  color:#FFFDF8!important;
+  border:1px solid #1C1917!important;
+  box-shadow:0 5px 12px rgba(28,25,23,.13)!important;
+}
+.primary-btn:hover,.hero-btn:hover{background:#292522!important}
+.secondary-btn,.hero-secondary,.text-btn,.quick-all-btn,.win-utility-btn{
+  color:#4D463F!important;
+}
+.secondary-btn{
+  background:#fff!important;
+  border:1.5px solid #DDD6CC!important;
+  box-shadow:none!important;
+}
+button{transition:transform .15s ease,box-shadow .15s ease,background-color .15s ease,border-color .15s ease,color .15s ease}
+button:active{transform:translateY(1px) scale(.985)}
+.home-diff-tile,.home-resume-card{
+  background:#fff!important;
+  border:1.5px solid #E5E0D8!important;
+  box-shadow:0 3px 10px rgba(62,48,32,.045)!important;
+}
+.home-diff-tile{border-radius:16px!important}
+.home-diff-tile[data-diff="easy"],.home-resume-card[data-diff="easy"]{--q:#3F8B68;--qs:#E6F2EB;--qb:#C8E1D3}
+.home-diff-tile[data-diff="medium"],.home-resume-card[data-diff="medium"]{--q:#58728A;--qs:#EAF0F3;--qb:#D3DFE5}
+.home-diff-tile[data-diff="hard"],.home-resume-card[data-diff="hard"]{--q:#C65F36;--qs:#FAEDE7;--qb:#EECBBB}
+.home-diff-tile[data-diff="hardcore"],.home-resume-card[data-diff="hardcore"]{--q:#8D4E42;--qs:#F4E9E5;--qb:#DFC8C0}
+.home-competition-card,.profile-account-hub{
+  background:#FFFDF9!important;
+  border:1.5px solid #E5E0D8!important;
+  box-shadow:none!important;
+}
+.home-progress-level{background:#FFF8DD!important;border-color:#EBD99C!important}
+.home-progress-level-icon{background:#F7E8A8!important}
+.home-progress-level-track{background:#EFE3BF!important}
+.home-progress-level-track b{background:#C98C16!important}
+.home-progress-total>strong,.home-ranking-row>b,.home-ranking-selfline,.home-competition-head button,.home-ranking-login,.account-forgot-btn,.profile-edit-inline{color:#A95031!important}
+.home-ranking-row.mine,.home-ranking-selfline,.profile-edit-inline{background:#FAEDE7!important}
+.home-ranking-you{background:#F4D8CA!important;color:#823E27!important}
+
+/* Board: tactile ivory tiles, strong letters, warm active path, muted emerald completion. */
+.board .cell{
+  background:#FFFFFF!important;
+  color:#1C1917!important;
+  border:1.5px solid #E5E0D8!important;
+  box-shadow:0 2px 0 rgba(72,54,37,.08),0 4px 10px rgba(72,54,37,.035)!important;
+  border-radius:22%!important;
+  font-weight:950!important;
+  text-transform:uppercase!important;
+  display:grid;
+  place-items:center;
+  transition:transform .15s ease,background-color .15s ease,border-color .15s ease,box-shadow .15s ease!important;
+}
+.board .cell:active{transform:scale(.95)!important}
+.board .cell.used{
+  background:color-mix(in srgb,var(--word-color,#6FA486) 24%,#FFFFFF)!important;
+  border-color:color-mix(in srgb,var(--word-color,#6FA486) 54%,#D9E6DE)!important;
+  color:#173529!important;
+}
+.board .cell.just-found{box-shadow:0 0 0 3px rgba(63,139,104,.14),0 2px 0 rgba(72,54,37,.08)!important}
+.board .cell.starter-guide{border-color:#EAB308!important;background:#FFF9D9!important}
+.board .cell.wrong-flash{border-color:#CF6C5B!important;background:#FCEDEA!important}
+#pathLayer .path-active{stroke:#EAB308!important;opacity:.72!important;stroke-width:10!important}
+#pathLayer .path-found{stroke:#3F8B68!important;opacity:.42!important}
+#pathLayer .path-guide{stroke:#D49A12!important;opacity:.30!important}
+#pathLayer .path-wrong{stroke:#C95D4D!important;opacity:.72!important}
+.clean-status{color:#3F8B68!important}
+.current-word strong{letter-spacing:.04em}
+
+/* Segmented controls + inputs */
+.ranking-segment,.theme-segment,.account-tabs,.league-create-tabs,.team-membership-tabs{
+  background:#F3EFE9!important;
+  border:1px solid #E5E0D8!important;
+}
+.ranking-segment button.active,.theme-choice[aria-checked="true"],.account-tab.active,.league-create-tab.active{
+  background:#fff!important;
+  color:#1C1917!important;
+  box-shadow:0 2px 8px rgba(62,48,32,.06)!important;
+}
+input,select,textarea{
+  background:#fff!important;
+  color:#1C1917!important;
+  border:1.5px solid #DCD4CA!important;
+  box-shadow:none!important;
+}
+input:focus,select:focus,textarea:focus{border-color:#D59B18!important;outline:3px solid rgba(234,179,8,.14)!important}
+
+/* Modal system: paper cards on desktop, bottom sheets for account/settings/stats on mobile. */
+.modal{background:rgba(31,27,23,.36)!important;backdrop-filter:blur(3px)}
+.modal-card,.quality-release-card,.release-notes-v3331-panel{
+  background:#FFFDF9!important;
+  border:1.5px solid #E5E0D8!important;
+  border-radius:22px!important;
+  box-shadow:0 24px 60px rgba(48,38,28,.20)!important;
+}
+.modal-close,.release-notes-v3331-close{
+  width:36px!important;height:36px!important;border-radius:999px!important;
+  display:grid!important;place-items:center!important;
+  background:#F3EFE9!important;color:#3C3732!important;border:1px solid #E0D8CE!important;
+  font-size:0!important;
+}
+.modal-close svg,.release-notes-v3331-close svg{width:18px;height:18px}
+@media(max-width:767px){
+  #profileModal,#passwordModal,#teamPinModal,#teamMembershipModal,#supportModeModal,#wordReportModal,#playedLevelsModal,#levelDetailModal,#familyLeagueModal,#rankingPrivacyModal,#supportReportModal,#deleteAccountModal,#progressGuardModal{
+    align-items:flex-end!important;
+    padding:0!important;
+  }
+  #profileModal .modal-card,#passwordModal .modal-card,#teamPinModal .modal-card,#teamMembershipModal .modal-card,#supportModeModal .modal-card,#wordReportModal .modal-card,#playedLevelsModal .modal-card,#levelDetailModal .modal-card,#familyLeagueModal .modal-card,#rankingPrivacyModal .modal-card,#supportReportModal .modal-card,#deleteAccountModal .modal-card,#progressGuardModal .modal-card{
+    width:100%!important;max-width:none!important;max-height:88dvh!important;overflow:auto!important;
+    margin:0!important;border-radius:24px 24px 0 0!important;border-bottom:0!important;
+    padding:24px 20px calc(22px + env(safe-area-inset-bottom))!important;
+    animation:organicSheetIn .24s cubic-bezier(.2,.75,.25,1);
+  }
+  @keyframes organicSheetIn{from{transform:translateY(26px);opacity:.55}to{transform:none;opacity:1}}
+}
+
+/* Existing purple gradients removed from prominent product surfaces. */
+.profile-account-hub,.home-competition-card,.home-ranking-row.mine,.ranking-privacy-note,.account-nudge-card,.progress-guard-card,.push-nudge-card,.install-nudge-card,.helper-offer-card,.calm-confirm-card{
+  background-image:none!important;
+}
+.quality-release-tile,.release-notes-v3331-tile{
+  background:#C65F36!important;
+  color:#FFFDF8!important;
+  box-shadow:0 7px 18px rgba(116,59,34,.12)!important;
+}
+.quality-release-tile:nth-child(2),.release-notes-v3331-tile.tile-l{background:#6FA486!important}
+.quality-release-tile:nth-child(3),.release-notes-v3331-tile.tile-t{background:#EAB308!important;color:#362A0B!important}
+
+/* Vector icon adapter */
+.ui-icon{display:inline-flex;align-items:center;justify-content:center;width:1.15em;height:1.15em;flex:0 0 auto;vertical-align:-.16em}
+.ui-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ui-icon-only{font-size:0!important}
+.ui-icon-only .ui-icon{width:20px;height:20px}
+button .ui-icon{margin-right:.42em}
+button.ui-icon-only .ui-icon{margin-right:0}
+.notification-pref-icon,.install-mini-icon,.ranking-privacy-icon,.rescue-flame,.helper-big-icon,.push-nudge-icon,.install-nudge-icon,.account-nudge-icon,.starter-choice-icon,.calm-confirm-icon{
+  color:#A95031!important;
+}
+.support-choice>span:first-child,.hint-choice>span:first-child{font-size:0!important;color:#A95031!important}
+.support-choice>span:first-child .ui-icon,.hint-choice>span:first-child .ui-icon{width:24px;height:24px}
+
+/* Emoji avatar picker is retired; identity is initials-first. */
+.avatar-picker,.profile-edit-avatar-block{display:none!important}
+.profile-avatar-big,.avatar-dot,.home-ranking-avatar,.leader-avatar,.ranking-avatar,.ranking-privacy-preview>span:first-child{
+  font-size:12px!important;
+  line-height:1!important;
+}
+
+/* Footer */
+.app-footer{color:#756E66!important}
+.app-footer strong{display:none!important}
+.app-footer span{font-weight:750!important}
+.app-footer a{color:#6B625A!important}
+
+/* Matte slate dark mode */
+html[data-theme="dark"]{
+  --bg:#1C1C21;--paper:#242428;--surface:#242428;--surface-2:#2B2A2E;--ink:#F2EFE8;--muted:#AAA49C;--line:#3A383D;
+  --shadow:0 16px 38px rgba(0,0,0,.22);--soft-shadow:0 4px 14px rgba(0,0,0,.16);
+}
+html[data-theme="dark"],html[data-theme="dark"] body{background:#1C1C21!important;color:#F2EFE8!important;background-image:none!important}
+html[data-theme="dark"] .card,html[data-theme="dark"] .ranking-section,html[data-theme="dark"] .settings-card,html[data-theme="dark"] .profile-card,html[data-theme="dark"] .game-info,html[data-theme="dark"] .current-word,html[data-theme="dark"] .board-stage{
+  background:#242428!important;border-color:#3A383D!important;
+}
+html[data-theme="dark"] .profile-chip,html[data-theme="dark"] .secondary-btn,html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#29292E!important;color:#F2EFE8!important;border-color:#403E43!important}
+html[data-theme="dark"] .board .cell{background:#29292E!important;color:#F2EFE8!important;border-color:#403E43!important;box-shadow:0 2px 0 rgba(0,0,0,.24)!important}
+html[data-theme="dark"] .board .cell.used{background:color-mix(in srgb,var(--word-color,#6FA486) 34%,#29292E)!important;color:#F7F4ED!important}
+html[data-theme="dark"] .modal-card,html[data-theme="dark"] .quality-release-card,html[data-theme="dark"] .release-notes-v3331-panel{background:#242428!important;border-color:#403E43!important}
+html[data-theme="dark"] .modal-close,html[data-theme="dark"] .release-notes-v3331-close{background:#2D2C31!important;color:#F2EFE8!important;border-color:#444147!important}
+html[data-theme="dark"] .home-diff-tile,html[data-theme="dark"] .home-resume-card,html[data-theme="dark"] .home-competition-card,html[data-theme="dark"] .profile-account-hub{background:#242428!important;border-color:#3A383D!important;color:#F2EFE8!important}
+html[data-theme="dark"] .home-ranking-row.mine,html[data-theme="dark"] .home-ranking-selfline,html[data-theme="dark"] .profile-edit-inline{background:#332720!important}
+html[data-theme="dark"] .ranking-segment,html[data-theme="dark"] .theme-segment,html[data-theme="dark"] .account-tabs,html[data-theme="dark"] .league-create-tabs{background:#2B2A2E!important;border-color:#403E43!important}
+html[data-theme="dark"] .ranking-segment button.active,html[data-theme="dark"] .theme-choice[aria-checked="true"],html[data-theme="dark"] .account-tab.active,html[data-theme="dark"] .league-create-tab.active{background:#38373C!important;color:#F2EFE8!important}
