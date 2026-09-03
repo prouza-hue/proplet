@@ -113,7 +113,9 @@ function decorateInlineLeaderboardAvatars(){
 }
 function applyAvatars(){
  const p=profileState();
- if(p&&!p.useGoogleAvatar)decorateAvatarElement(document.getElementById('profileChipAvatar'),p.avatar||'🙂',`Avatar hráče ${p.name||''}`);
+ const chip=document.getElementById('profileChipAvatar');
+ if(p&&!p.useGoogleAvatar)decorateAvatarElement(chip,p.avatar||'🙂',`Avatar hráče ${p.name||''}`);
+ else if(!p&&chip&&!chip.querySelector('.organic-avatar')){chip.classList.add('organic-avatar-host');chip.replaceChildren(avatarNode(15,'Profil zatím není uložen'))}
  if(p&&!p.useGoogleAvatar)document.querySelectorAll('.profile-avatar-big').forEach(el=>decorateAvatarElement(el,p.avatar||'🙂',`Avatar hráče ${p.name||''}`));
  const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview&&p)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
  document.querySelectorAll('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar').forEach(el=>decorateAvatarElement(el,null,'Herní avatar'));
