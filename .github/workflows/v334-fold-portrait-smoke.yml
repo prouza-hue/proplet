@@ -57,7 +57,7 @@ jobs:
                   page=ctx.new_page(); errors=[]
                   page.on('pageerror',lambda e:errors.append(str(e)))
                   page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-                  page.wait_for_function("()=>!!document.querySelector('link[href*="organic-ui-v4023.css"]') && !!document.querySelector('script[src*="organic-ui-v4023.js"]')",timeout=12000)
+                  page.wait_for_function("""()=>!!document.querySelector('link[href*="organic-ui-v4023.css"]') && !!document.querySelector('script[src*="organic-ui-v4023.js"]')""",timeout=12000)
                   page.wait_for_timeout(1200); dismiss(page); page.wait_for_timeout(200)
                   base=page.evaluate("""()=>({
                     bg:getComputedStyle(document.body).backgroundColor,
