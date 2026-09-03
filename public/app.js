@@ -1544,7 +1544,7 @@ function bindTutorial(){
   $('#tutorialSuccess').textContent=progress.valid?(progress.path.length===1?'Super. Teď E.':'Ještě S.'):'Začni písmenem P.';
   if(!progress.valid)fx('wrong');renderTutorialPath();
  };
- $('.tutorial-cell').forEach(c=>c.onpointerdown=e=>{e.preventDefault();tutorialState.dragging=true;tutorialState.path=[+c.dataset.tidx];renderTutorialPath();try{c.setPointerCapture(e.pointerId)}catch{}});
+ board.querySelectorAll('.tutorial-cell').forEach(c=>c.onpointerdown=e=>{e.preventDefault();tutorialState.dragging=true;tutorialState.path=[+c.dataset.tidx];renderTutorialPath();try{c.setPointerCapture(e.pointerId)}catch{}});
  board.onpointermove=e=>{if(!tutorialState.dragging)return;const c=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('.tutorial-cell');if(c)add(+c.dataset.tidx)};
  const finish=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;if(tutorialState.path.length===1){tap(tutorialState.path[0]);return}tutorialState.tapPath=[];if(tutorialState.path.join(',')==='0,1,4')complete();else fail()};
  const cancel=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;tutorialState.path=[...(tutorialState.tapPath||[])];renderTutorialPath()};

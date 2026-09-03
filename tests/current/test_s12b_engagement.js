@@ -93,6 +93,55 @@ function verifyDuplicateInstallGuard() {
   assert.strictEqual(onboardingContext.PropletEngagementOnboarding,firstOnboarding,'duplicate onboarding evaluation replaced the owner');
 }
 
+function verifyPesInputBinding() {
+  // Exercise the actual app adapter, not just the pure tap helper. A single
+  // element selected with $ must never masquerade as the $$ collection.
+  const source = app.slice(app.indexOf('function tutorialAdj('), app.indexOf('async function openPlayedLevels('));
+  function setup(withOwner = true) {
+    const classList = {toggle(){}, remove(){}, add(){}};
+    const cells = Array.from({length:9}, (_,i) => ({dataset:{tidx:String(i)}, classList, setPointerCapture(){}, closest(){return this}}));
+    const board = {querySelectorAll:selector=>selector==='.tutorial-cell'?cells:[]};
+    const success = {textContent:''}, next = {textContent:''}, events = [];
+    const single = selector => ({'#tutorialBoard':board, '#tutorialSuccess':success, '#onboardNextBtn':next, '.onboarding-card':{classList}, '.tutorial-cell':cells[0]})[selector];
+    const context = {
+      $:single, $$:selector=>selector==='.tutorial-cell'?cells:[],
+      document:{elementFromPoint:x=>cells[x]}, window:withOwner?{PropletEngagementOnboarding:onboarding}:{},
+      tutorialState:{dragging:false,path:[],done:false}, onboardingMandatory:true, onboardingTutorialTracked:false,
+      trackProductEvent:name=>events.push(name), fx(){},
+    };
+    vm.createContext(context);
+    vm.runInContext(source,context);
+    context.bindTutorial();
+    assert(cells.every(c=>typeof c.onpointerdown==='function'),'all nine PES cells must receive input handlers');
+    assert.strictEqual(typeof board.onpointerup,'function');
+    const down=i=>cells[i].onpointerdown({preventDefault(){},pointerId:1});
+    const tap=i=>{down(i);board.onpointerup()};
+    return {context,board,down,tap,success,next,events};
+  }
+  for(const withOwner of [true,false]){
+    const h=setup(withOwner);
+    h.tap(0); assert.strictEqual(h.success.textContent,'Super. Teď E.');
+    h.tap(1); assert.strictEqual(h.success.textContent,'Ještě S.');
+    h.tap(4); assert.strictEqual(h.context.tutorialState.done,true);
+    assert.strictEqual(h.next.textContent,'Jo, chápu');
+    assert.deepStrictEqual(h.events,['onboarding_tutorial_completed']);
+  }
+  const drag=setup();
+  drag.down(0);
+  drag.board.onpointermove({clientX:1,clientY:0});
+  drag.board.onpointermove({clientX:4,clientY:0});
+  drag.board.onpointerup();
+  assert.strictEqual(drag.context.tutorialState.done,true,'P→E→S drag must complete');
+  const cancel=setup();
+  cancel.down(0);cancel.board.onpointercancel();
+  assert.strictEqual(cancel.context.tutorialState.path.length,0,'cancel is not a tap');
+  assert.deepStrictEqual(cancel.events,[]);
+  cancel.tap(0);cancel.tap(4);
+  assert.strictEqual(cancel.context.tutorialState.done,false,'diagonal shortcut cannot complete');
+  cancel.tap(0);cancel.tap(1);cancel.tap(4);
+  assert.strictEqual(cancel.context.tutorialState.done,true,'retry after invalid input works');
+}
+
 async function verifyPostWinOrder() {
   const calls=[];
   const deps={
@@ -151,5 +200,5 @@ ordered(index, ['/app/engagement/onboarding.js','/app/engagement/nudges.js','/ap
 includes(sw, '/app/engagement/onboarding.js', 'offline onboarding owner');
 includes(sw, '/app/engagement/nudges.js', 'offline nudges owner');
 
-(async()=>{verifyDuplicateInstallGuard();await verifyPostWinOrder();console.log('PASS: Sprint 12B engagement owners preserve onboarding and nudge behavior')})()
+(async()=>{verifyDuplicateInstallGuard();verifyPesInputBinding();await verifyPostWinOrder();console.log('PASS: Sprint 12B engagement owners preserve onboarding and nudge behavior')})()
   .catch(error=>{console.error(error);process.exitCode=1});

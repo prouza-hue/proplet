@@ -13,8 +13,8 @@ server = (ROOT / "server.py").read_text(encoding="utf-8")
 theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 product_registry = (ROOT / "public" / "analytics-event-registry.json").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.02.1"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
-assert "version:'4.02.1'" in runtime
+assert 'APP_VERSION = "4.02.2"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
+assert "version:'4.02.2'" in runtime
 assert "firstWinReturnNudgeV40134:true" in runtime
 assert "wordDiscoveryTerminalRejectV40134:true" in runtime
 
