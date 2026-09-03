@@ -65,7 +65,7 @@ jobs:
                     footer:document.querySelector('.app-footer span')?.textContent?.trim(),
                     avatar:document.querySelector('#profileChipAvatar')?.textContent?.trim(),
                     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
-                    emoji:new RegExp('\\\\p{Extended_Pictographic}','u').test(document.body.innerText),
+                    emoji:new RegExp('\\\\p{Extended_Pictographic}','u').test(document.body.innerText),\n                    emojiChars:[...new Set(Array.from(document.body.innerText).filter(ch=>new RegExp('\\\\p{Extended_Pictographic}','u').test(ch)))].slice(0,30),
                     closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg'))
                   })""")
                   assert base['bg']=='rgb(253, 251, 247)',base
