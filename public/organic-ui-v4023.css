@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
 /* Proplet warm-paper UI refactor — visual-only layer. Core gameplay/audio/haptics untouched. */
 :root{
   --bg:#FDFBF7;
@@ -23,7 +24,7 @@
 html,body{
   background:#FDFBF7!important;
   color:var(--ink);
-  font-family:"Avenir Next","Avenir Next Rounded","Nunito Sans","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif!important;
+  font-family:"Outfit","Avenir Next","Avenir Next Rounded","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif!important;
 }
 body{background-image:radial-gradient(circle at 12% 3%,rgba(234,179,8,.055),transparent 27%),radial-gradient(circle at 88% 92%,rgba(63,139,104,.04),transparent 24%)!important}
 .ambient{display:none!important}
