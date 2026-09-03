@@ -315,3 +315,16 @@ html[data-theme="dark"] .home-diff-tile,html[data-theme="dark"] .home-resume-car
 html[data-theme="dark"] .home-ranking-row.mine,html[data-theme="dark"] .home-ranking-selfline,html[data-theme="dark"] .profile-edit-inline{background:#332720!important}
 html[data-theme="dark"] .ranking-segment,html[data-theme="dark"] .theme-segment,html[data-theme="dark"] .account-tabs,html[data-theme="dark"] .league-create-tabs{background:#2B2A2E!important;border-color:#403E43!important}
 html[data-theme="dark"] .ranking-segment button.active,html[data-theme="dark"] .theme-choice[aria-checked="true"],html[data-theme="dark"] .account-tab.active,html[data-theme="dark"] .league-create-tab.active{background:#38373C!important;color:#F2EFE8!important}
+
+/* Profile composition polish for the new graphic system. */
+#screen-profile .achievement>.organic-emblem{grid-column:1;grid-row:1;width:34px;height:34px;min-width:34px}
+#screen-profile .profile-badge>.organic-emblem{grid-column:1;grid-row:1;width:34px;height:34px;min-width:34px}
+#screen-profile .achievement>.organic-emblem .ui-icon,#screen-profile .profile-badge>.organic-emblem .ui-icon{width:18px!important;height:18px!important}
+#screen-profile .level-step-icon{display:grid;place-items:center}
+#screen-profile .level-step-icon>.organic-emblem{margin:auto}
+.google-avatar-choice{background:#FFFDF9!important;border:1.5px solid #E0D7CA!important;box-shadow:none!important}
+.google-avatar-choice.selected{background:#FFF6D8!important;border-color:#D69D16!important;box-shadow:0 0 0 3px rgba(234,179,8,.14)!important}
+.google-avatar-unavailable{background:#F5F0E8!important}
+html[data-theme="dark"] .google-avatar-choice{background:#29292E!important;border-color:#403E43!important}
+html[data-theme="dark"] .google-avatar-choice.selected{background:#3A3321!important;border-color:#9A7621!important}
+html[data-theme="dark"] .google-avatar-unavailable{background:#2B2A2E!important}
