@@ -26,34 +26,36 @@ function create(deps={}){
   function magnifierAvailable(game=getGame()){return !!game&&!game.finished&&['hard','hardcore','mozkomor'].includes(game.puzzle?.difficulty)&&magnifierDeviceSupported()}
   function magnifierEnabled(game=getGame()){return magnifierAvailable(game)&&getSettings().magnifier!==false}
 
-  function ensureMagnifier(){
-    let el=query('#touchMagnifier');if(el)return el;
-    if(!documentObj)return null;
-    el=documentObj.createElement('div');el.id='touchMagnifier';el.className='touch-magnifier hidden';
-    el.setAttribute('aria-hidden','true');el.innerHTML='<div class="touch-magnifier-grid"></div>';documentObj.body.appendChild(el);return el;
+  const MAGNIFIER_SCALE=1.8;
+
+  function ensureMagnifier(){return query('#boardWrap')||null}
+  function renderMagnifier(){return magnifierEnabled()}
+  function hideMagnifier(){
+    const wrap=query('#boardWrap'),stage=query('#boardStage');
+    wrap?.classList.remove('touch-board-zoom');
+    stage?.classList.remove('touch-board-zoom-active');
+    wrap?.style?.removeProperty('--touch-zoom-x');
+    wrap?.style?.removeProperty('--touch-zoom-y');
+    wrap?.style?.removeProperty('--touch-zoom-scale');
   }
-  function renderMagnifier(centerIndex){
-    const game=getGame();if(!game||centerIndex==null)return false;
-    const p=game.puzzle,mask=new Set(p.mask),row=Math.floor(centerIndex/p.cols),col=centerIndex%p.cols,
-      root=ensureMagnifier(),grid=root?.querySelector('.touch-magnifier-grid'),cells=[],backIndex=game.path.length>1?game.path.at(-2):null;
-    if(!grid)return false;
-    for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
-      if(Math.abs(dr)+Math.abs(dc)>1){cells.push('<span class="touch-mag-cell void"></span>');continue}
-      const rr=row+dr,cc=col+dc,j=rr*p.cols+cc;
-      if(rr<0||rr>=p.rows||cc<0||cc>=p.cols||!mask.has(j)){cells.push('<span class="touch-mag-cell void"></span>');continue}
-      const cls=['touch-mag-cell'],isCenter=j===centerIndex,isBack=j===backIndex,isBlocked=!isCenter&&!isBack&&(game.used.has(j)||game.path.includes(j));
-      if(isCenter)cls.push('focus','active');else if(isBack)cls.push('backtrack');else if(isBlocked)cls.push('blocked');else cls.push('candidate');
-      const color=game.used.get(j),style=color!=null?` style="--word-color:${colors[color%colors.length]}"`:'';
-      cells.push(`<span class="${cls.join(' ')}"${style}>${escapeHtml(p.letters[j])}</span>`);
-    }
-    grid.innerHTML=cells.join('');return true;
-  }
-  function hideMagnifier(){const el=query('#touchMagnifier');el?.classList.add('hidden')}
-  function showMagnifier(centerIndex){
+  function showMagnifier(centerIndex,pointerX,pointerY){
     if(!magnifierEnabled()){hideMagnifier();return false}
-    const el=ensureMagnifier(),board=query('#board');if(!el)return false;
-    const boardTop=board?.getBoundingClientRect?.().top??220,magHeight=144,gap=12,top=Math.max(8,Math.floor(boardTop-magHeight-gap));
-    el.style.setProperty('--magnifier-top',`${top}px`);renderMagnifier(centerIndex);el.classList.remove('hidden');return true;
+    const wrap=ensureMagnifier(),stage=query('#boardStage'),cell=query(`.cell[data-index="${centerIndex}"]`);
+    if(!wrap||!stage)return false;
+    const wr=wrap.getBoundingClientRect?.(),cr=cell?.getBoundingClientRect?.();
+    if(!wr?.width||!wr?.height)return false;
+    const fallbackX=cr?cr.left-wr.left+cr.width/2:wr.width/2,
+      fallbackY=cr?cr.top-wr.top+cr.height/2:wr.height/2,
+      rawX=Number.isFinite(pointerX)?pointerX-wr.left:fallbackX,
+      rawY=Number.isFinite(pointerY)?pointerY-wr.top:fallbackY,
+      anchorX=Math.max(0,Math.min(wr.width,rawX)),
+      anchorY=Math.max(0,Math.min(wr.height,rawY));
+    wrap.style.setProperty('--touch-zoom-x',`${anchorX}px`);
+    wrap.style.setProperty('--touch-zoom-y',`${anchorY}px`);
+    wrap.style.setProperty('--touch-zoom-scale',String(MAGNIFIER_SCALE));
+    stage.classList.add('touch-board-zoom-active');
+    wrap.classList.add('touch-board-zoom');
+    return true;
   }
 
   function currentWord(){const game=getGame();return game?.path?.map(i=>game.puzzle.letters[i]).join('')||''}
@@ -78,8 +80,9 @@ function create(deps={}){
     const game=getGame(),index=+event.currentTarget.dataset.index;
     if(!game||game.finished||game.used.has(index)||game.wrongPath?.length)return false;
     if(game.undoSnapshot)hideUndo();
-    game.dragging=true;game.path=[index];game.lastPointer={x:event.clientX,y:event.clientY};fx('tap');updateActive();showMagnifier(index);
+    game.dragging=true;game.path=[index];game.lastPointer={x:event.clientX,y:event.clientY};fx('tap');updateActive();
     try{event.currentTarget.setPointerCapture(event.pointerId)}catch{}
+    showMagnifier(index,event.clientX,event.clientY);
     return true;
   }
   function pointerEnter(event){const game=getGame();return game?.dragging?extendPath(+event.currentTarget.dataset.index):false}
