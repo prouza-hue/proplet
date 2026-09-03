@@ -1094,18 +1094,20 @@ html[data-theme="dark"] .tajenka-phrase,html[data-theme="dark"] .tajenka-win-phr
 /* v4.01.13 — screen wake lock and optional private Google profile photo */
 .google-profile-avatar{display:block;width:100%;height:100%;border-radius:inherit;object-fit:cover}.setting-toggle-wide{width:100%;margin-top:9px}.settings-card #wakeLockNote{display:block;margin:6px 2px 10px;line-height:1.35}
 
-/* mobile touch magnifier — zoom the real board layer inside its existing frame */
-.board-stage.touch-board-zoom-active{overflow:hidden}
-.board-wrap{
- transform-origin:var(--touch-zoom-x,50%) var(--touch-zoom-y,50%);
- transition:transform .11s cubic-bezier(.2,.72,.25,1);
+/* mobile touch magnifier — camera layer over the real, stationary input board */
+.board-stage.touch-board-zoom-active{position:relative;overflow:hidden}
+.touch-board-zoom-overlay{
+ position:absolute;inset:0;z-index:12;overflow:hidden;border-radius:inherit;pointer-events:none;
+ background:color-mix(in srgb,var(--paper) 92%,transparent)
 }
-.board-wrap.touch-board-zoom{
- z-index:3;
- transform:scale(var(--touch-zoom-scale,1.8));
- will-change:transform;
+.touch-board-zoom-camera{
+ position:absolute;inset:0;transform-origin:0 0;
+ transform:translate(var(--touch-camera-x,0),var(--touch-camera-y,0)) scale(var(--touch-camera-scale,1.8));
+ transition:transform .11s cubic-bezier(.2,.72,.25,1);will-change:transform
 }
-@media (prefers-reduced-motion:reduce){.board-wrap{transition:none}}
+.touch-board-zoom-clone{margin:0;pointer-events:none}
+.touch-board-zoom-clone .cell{pointer-events:none}
+@media (prefers-reduced-motion:reduce){.touch-board-zoom-camera{transition:none}}
 
 /* v4.01.28 preview — optional mobile magnifier */
 .magnifier-setting-wrap{margin-top:9px}
