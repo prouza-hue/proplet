@@ -106,7 +106,8 @@ const AVATAR_ART=[
 ];
 const PRIVATE_AVATAR_ART=avatarSvg('#E7DDCC','<circle cx="32" cy="27" r="11" fill="#8F877B"/><path d="M13 54q2-18 19-18t19 18" fill="#8F877B"/><path d="M20 24q12-11 24 0" stroke="#F6F0DE" stroke-width="3" fill="none"/><path d="M22 44q10 7 20 0" stroke="#C66B42" stroke-width="3" fill="none" stroke-linecap="round"/>');
 function legacyAvatarIndex(value){return LEGACY_AVATARS.indexOf(String(value||'').trim())}
-function visualAvatarIndex(value){return legacyAvatarIndex(value)}
+function avatarHash(value){let h=2166136261;for(const ch of String(value||'')){h^=ch.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function visualAvatarIndex(value){const raw=String(value||'').trim(),legacy=legacyAvatarIndex(raw);return legacy>=0?legacy:(raw?avatarHash(raw)%15:-1)}
 function avatarNode(index,label='Herní avatar'){
  const n=document.createElement('span'),safe=Number(index);
  n.className='organic-avatar';n.dataset.avatarIndex=String(safe);n.setAttribute('role','img');n.setAttribute('aria-label',label);
@@ -137,9 +138,9 @@ function decorateInlineLeaderboardAvatars(){
  document.querySelectorAll('.leader-name>strong').forEach(strong=>{
    if(strong.querySelector('.organic-avatar'))return;
    const first=strong.firstChild;if(!first||first.nodeType!==Node.TEXT_NODE)return;
-   const text=first.nodeValue||'';
-   const key=LEGACY_AVATARS.find(k=>text.trimStart().startsWith(k));if(!key)return;
-   first.nodeValue=text.replace(key,'').replace(/^\\s+/,'');
+   const text=first.nodeValue||'',trimmed=text.trimStart();
+   const key=LEGACY_AVATARS.find(k=>trimmed.startsWith(k))||(trimmed.match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)/u)?.[1]||'');if(!key)return;
+   first.nodeValue=trimmed.slice(key.length).replace(/^\s+/,'');
    const host=document.createElement('span');host.className='ranking-avatar organic-avatar-host';host.dataset.organicAvatarKey=key;host.appendChild(avatarNode(visualAvatarIndex(key),'Herní avatar'));
    strong.prepend(host);
  });
