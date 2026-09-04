@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Tkalcovský stav">
+<title>Tkalcovský stav</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<rect x="12" y="10" width="40" height="44" rx="2" fill="none" stroke="#D67A4F" stroke-width="5"/>
+<path d="M18 15v34m5-34v34m5-34v34m5-34v34m5-34v34m5-34v34m5-34v34" fill="none" stroke="#F7F0DE" stroke-width="1.7"/>
+<path fill="#F7F0DE" d="M16 28h32v7H16Z"/><path fill="#779169" d="M16 34c7-4 14 4 21 0 4-2 7-2 11 0v8H16Z"/><path fill="#5D7892" d="M16 40c7-4 14 4 21 0 4-2 7-2 11 0v9H16Z"/>
+<path d="M10 16h44m-44 32h44" fill="none" stroke="#D67A4F" stroke-width="4"/></g>
+</svg>
