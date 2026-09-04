@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Myška">
+<title>Myška</title>
+<circle cx="32" cy="32" r="30" fill="#D67A4F" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#AEB3B0" d="M18 27c2-7 8-11 15-10 8 1 14 8 14 18v10c0 7-5 11-13 11H22c-7 0-11-5-10-12 0-8 2-13 6-17Z"/>
+<circle cx="37" cy="18" r="9" fill="#AEB3B0"/><circle cx="37" cy="18" r="5" fill="#D7A28F"/>
+<circle cx="24" cy="29" r="1.8" fill="#30383A" stroke="none"/><circle cx="14" cy="34" r="2.2" fill="#30383A" stroke="none"/>
+<path fill="#F7F0DE" d="M23 39c5 0 10 3 12 8-4 3-8 4-12 2Z"/>
+<path d="M45 37c9 3 11 12 4 17-6 4-11 0-8-5 2-3 6-1 6 2" fill="none" stroke="#D7A28F" stroke-width="3"/></g>
+</svg>
