@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cívka">
+<title>Cívka</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#D67A4F" d="M17 13h30l-3 7H20Z"/><path fill="#D67A4F" d="M20 44h24l3 7H17Z"/>
+<path fill="#E6B53E" d="M20 20h24v24H20Z"/>
+<path d="M21 24h22m-22 4h22m-22 4h22m-22 4h22m-22 4h22" fill="none" stroke="#B98922" stroke-width="2"/>
+<ellipse cx="32" cy="16.5" rx="15" ry="5" fill="#D67A4F"/><ellipse cx="32" cy="47.5" rx="15" ry="5" fill="#D67A4F"/>
+<ellipse cx="32" cy="16.5" rx="4" ry="1.7" fill="#9E4B2C" stroke="none"/>
+<path d="M44 37c7 1 9 6 7 11" fill="none" stroke="#E6B53E" stroke-width="3"/></g>
+</svg>
