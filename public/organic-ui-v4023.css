@@ -247,6 +247,12 @@ button.ui-icon-only .ui-icon{margin-right:0}
   box-shadow:inset 0 0 0 1px rgba(86,65,42,.16),0 1px 3px rgba(64,47,31,.08);
 }
 .organic-avatar>svg,.organic-avatar>img{display:block;width:100%;height:100%;object-fit:contain}
+.organic-avatar[data-avatar-file]{background-size:100% 100%;background-position:center;background-repeat:no-repeat}
+.organic-avatar[data-avatar-file]>.organic-avatar-focus{
+  transform:scale(var(--avatar-focus-scale,1));
+  transform-origin:50% 50%;
+  clip-path:circle(35% at 50% 50%);
+}
 #profileChipAvatar.avatar-dot{width:36px!important;height:36px!important;flex:0 0 36px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #DED4C6,0 3px 9px rgba(61,44,30,.10)!important}
 .profile-avatar-big.organic-avatar-host{width:78px!important;height:78px!important;flex:0 0 78px!important;border:3px solid #FFFDF8!important;box-shadow:0 0 0 1px #D9CDBD,0 8px 18px rgba(61,44,30,.10)!important}
 .home-ranking-avatar.organic-avatar-host,.leader-avatar.organic-avatar-host,.leaderboard-avatar.organic-avatar-host,.ranking-avatar.organic-avatar-host{width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #DED4C6!important}
