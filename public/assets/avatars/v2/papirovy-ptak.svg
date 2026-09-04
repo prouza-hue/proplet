@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Papírový pták">
+<title>Papírový pták</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#C9693A" d="M13 33 30 19l7 9 14-4-9 13 8 9-17-5-10 10 2-15Z"/>
+<path fill="#A9C59C" d="m30 19-5 17 17 1Z"/><path fill="#D67A4F" d="m25 36-12-3 10 18Z"/>
+<path fill="#C9693A" d="m42 37 9-13 2 8Z"/>
+<path d="M41 44c7 1 10 5 8 10-2 4-7 4-9 1" fill="none" stroke="#30383A" stroke-width="2.5"/></g>
+</svg>
