@@ -81,7 +81,11 @@ jobs:
                     bespokeEasyCount:document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art').length,
                     bespokeEasyUnique:new Set([...document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art')].map(x=>x.dataset.achArt)).size,
                     bespokeRankCount:document.querySelectorAll('#organicUiProbe .level-step .proplet-rank-art').length,
-                    closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg'))
+                    closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg')),
+                    shareColor:(()=>{const b=document.querySelector('#shareDailyBtn');b?.classList.remove('hidden');return b?getComputedStyle(b).color:null})(),
+                    freeSectionBorder:(()=>{const c=document.querySelector('#quickPlayCard');c?.classList.add('home-free-section');return c?getComputedStyle(c).borderTopWidth:null})(),
+                    footerMarginBottom:getComputedStyle(document.querySelector('.app-footer')).marginBottom,
+                    navActiveColor:getComputedStyle(document.querySelector('.bottom-nav button.active')).color
                   })""")
                   assert base['bg']=='rgb(253, 251, 247)',base
                   assert base['hero']=='rgb(185, 92, 54)',base
@@ -93,6 +97,10 @@ jobs:
                   assert base['bespokeEasyCount']==6 and base['bespokeEasyUnique']==6,base
                   assert base['bespokeRankCount']==3,base
                   assert base['overflow']<=1 and base['closeSvg'],base
+                  assert base['shareColor']=='rgb(255, 253, 248)',base
+                  assert base['freeSectionBorder']=='0px',base
+                  assert base['navActiveColor']=='rgb(169, 80, 49)',base
+                  if label=='mobile': assert float(base['footerMarginBottom'].replace('px',''))>=140,base
 
                   page.evaluate("""()=>{const m=document.querySelector('#profileModal');m.classList.remove('hidden')}""")
                   page.wait_for_timeout(150)
