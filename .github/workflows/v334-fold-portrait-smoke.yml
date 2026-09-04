@@ -122,7 +122,7 @@ jobs:
                   board=page.evaluate("""()=>{
                     const cell=document.querySelector('#board .cell'),cs=getComputedStyle(cell);
                     const baseBg=cs.backgroundColor;
-                    cell.classList.add('active');const active=getComputedStyle(cell);
+                    cell.style.transition='none';cell.classList.add('active');const active=getComputedStyle(cell);
                     const activeBg=active.backgroundColor,activeBorder=active.borderTopColor,activeColor=active.color;
                     const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
                     line.classList.add('path-active');line.setAttribute('points','0,0 20,20');document.querySelector('#pathLayer').appendChild(line);
