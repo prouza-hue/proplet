@@ -73,6 +73,10 @@ const AVATAR_MANIFEST=[{"id":1,"name":"Liška","file":"01-liska.svg","category":
 const AVATAR_BASE_PATH='/assets/avatars/v2/';
 const AVATAR_COUNT=AVATAR_MANIFEST.length;
 const AVATAR_NAMES=AVATAR_MANIFEST.map(a=>a.name);
+// Per-avatar optical calibration. The SVG masters stay faithful; only the motif inside each medallion
+// is enlarged where needed so all 30 avatars carry comparable visual weight in the picker and rankings.
+const AVATAR_FOCUS_SCALES=[1.00,1.16,1.16,1.00,1.00,1.08,1.00,1.02,1.00,1.00,1.00,1.00,1.06,1.03,1.06,1.03,1.27,1.26,1.34,1.00,1.12,1.12,1.03,1.03,1.04,1.05,1.10,1.10,1.10,1.05];
+function avatarFocusScale(index){const n=Number(AVATAR_FOCUS_SCALES[index]||1);return Number.isFinite(n)?Math.max(1,Math.min(1.4,n)):1}
 function avatarSvg(bg,body){return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="'+bg+'"/>'+body+'</svg>'}
 const PRIVATE_AVATAR_ART=avatarSvg('#E7DDCC','<circle cx="32" cy="27" r="11" fill="#8F877B"/><path d="M13 54q2-18 19-18t19 18" fill="#8F877B"/><path d="M20 24q12-11 24 0" stroke="#F6F0DE" stroke-width="3" fill="none"/><path d="M22 44q10 7 20 0" stroke="#C66B42" stroke-width="3" fill="none" stroke-linecap="round"/>');
 function legacyAvatarIndex(value){return LEGACY_AVATARS.indexOf(String(value||'').trim())}
@@ -82,9 +86,13 @@ function avatarNode(index,label='Herní avatar'){
  const n=document.createElement('span'),safe=Number(index);
  n.className='organic-avatar';n.dataset.avatarIndex=String(safe);n.setAttribute('role','img');n.setAttribute('aria-label',label);
  if(safe>=0&&safe<AVATAR_COUNT){
-   const meta=AVATAR_MANIFEST[safe],img=document.createElement('img');
-   n.dataset.avatarFile=meta.file;n.dataset.avatarCategory=meta.category;
-   img.src=AVATAR_BASE_PATH+meta.file;img.alt='';img.width=64;img.height=64;img.decoding='async';img.draggable=false;
+   const meta=AVATAR_MANIFEST[safe],img=document.createElement('img'),url=AVATAR_BASE_PATH+meta.file,scale=avatarFocusScale(safe);
+   n.dataset.avatarFile=meta.file;n.dataset.avatarCategory=meta.category;n.dataset.avatarFocusScale=String(scale);
+   n.style.setProperty('--avatar-focus-scale',String(scale));
+   // Keep the faithful full medallion as the base layer. A clipped duplicate zooms only the inner motif,
+   // so the cream rings stay identical while small subjects (owl, hedgehog, glasses, etc.) gain weight.
+   n.style.backgroundImage=`url("${url}")`;
+   img.src=url;img.alt='';img.width=64;img.height=64;img.decoding='async';img.draggable=false;img.className='organic-avatar-focus';
    n.appendChild(img);
  }else n.innerHTML=PRIVATE_AVATAR_ART;
  return n;
