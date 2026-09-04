@@ -241,6 +241,8 @@ button.ui-icon-only .ui-icon{margin-right:0}
 #profileCard>.avatar-picker,.profile-edit-avatar-block{display:block!important}
 #profileCard>.avatar-picker{margin:15px 0 12px;padding:14px;border:1.5px solid #E5E0D8;border-radius:18px;background:#FFFDF9;box-shadow:0 3px 12px rgba(62,48,32,.04)}
 .avatar-grid,.profile-edit-avatar-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:9px!important;margin-top:9px!important}
+.avatar-group-label{grid-column:1/-1;display:block;margin:5px 2px -1px;color:#887B6B;font-size:9px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+.avatar-group-label:first-child{margin-top:0}
 .avatar-choice{
   width:100%!important;aspect-ratio:1!important;height:auto!important;min-height:0!important;
   padding:3px!important;border-radius:50%!important;
