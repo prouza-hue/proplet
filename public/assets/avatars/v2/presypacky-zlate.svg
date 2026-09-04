@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Přesýpačky zlaté">
+<title>Přesýpačky zlaté</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<rect x="17" y="10" width="30" height="5" rx="2.5" fill="#B47C21"/><rect x="17" y="49" width="30" height="5" rx="2.5" fill="#B47C21"/>
+<path fill="#F7F0DE" d="M21 15h22c0 8-3 13-8 17 5 4 8 9 8 17H21c0-8 3-13 8-17-5-4-8-9-8-17Z"/>
+<path fill="#E6B53E" d="M25 23h14c-2 4-4 6-7 8-3-2-5-4-7-8Zm-1 22h16c-1-6-3-9-8-11-5 2-7 5-8 11Z" stroke="none"/>
+<path d="M32 31v7" fill="none" stroke="#E6B53E" stroke-width="2.5"/>
+<path d="M21 15v34m22-34v34" fill="none" stroke="#B47C21" stroke-width="2.8"/></g>
+</svg>
