@@ -62,7 +62,7 @@ jobs:
                   page.evaluate("""()=>{
                     const probe=document.createElement('div');probe.id='organicUiProbe';probe.style.cssText='position:absolute;left:-9999px;top:0;width:320px';
                     const keys=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
-                    probe.innerHTML='<span class="home-ranking-avatar">🐲</span><div id="probeMainPicker" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-avatar="'+k+'">'+k+'</button>').join('')+'</div><div id="profileEditAvatarGrid" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-edit-avatar="'+k+'">'+k+'</button>').join('')+'</div><div class="profile-badge"><span class="emoji">🔥</span><strong>Test</strong></div>';
+                    probe.innerHTML='<span class="home-ranking-avatar">🐲</span><div id="probeMainPicker" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-avatar="'+k+'">'+k+'</button>').join('')+'</div><div id="profileEditAvatarGrid" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-edit-avatar="'+k+'">'+k+'</button>').join('')+'</div><div class="profile-badge"><span class="emoji">🔥</span><strong>Test</strong></div><section class="achievement-group"><div class="achievement-group-head"><strong>Snadná</strong></div><div class="achievement-grid">'+['První klíček','Rozcvička','Lehká váha','Půlka zahrady','Zelený velmistr','Vládce zelené banky'].map((n,i)=>'<div class="achievement"><span class="emoji">🌱</span><strong>'+n+'</strong></div>').join('')+'</div></section><div id="levelRoadmap"><div class="level-step"><span class="level-step-icon">🌱</span><strong>Nováček</strong></div><div class="level-step"><span class="level-step-icon">🧵</span><strong>Hledač nití</strong></div><div class="level-step"><span class="level-step-icon">🗿</span><strong>Propletový titán</strong></div></div>';
                     document.body.appendChild(probe);
                   }""")
                   page.wait_for_timeout(300)
@@ -78,6 +78,9 @@ jobs:
                     editPickerSvgs:document.querySelectorAll('#profileEditAvatarGrid .avatar-choice .organic-avatar>svg').length,
                     uniqueAvatarIndexes:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarIndex)).size,
                     badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
+                    bespokeEasyCount:document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art').length,
+                    bespokeEasyUnique:new Set([...document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art')].map(x=>x.dataset.achArt)).size,
+                    bespokeRankCount:document.querySelectorAll('#organicUiProbe .level-step .proplet-rank-art').length,
                     closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg'))
                   })""")
                   assert base['bg']=='rgb(253, 251, 247)',base
@@ -87,6 +90,8 @@ jobs:
                   assert base['avatarCount']==30 and base['avatarRendered'],base
                   assert base['mainPickerSvgs']==30 and base['editPickerSvgs']==30 and base['uniqueAvatarIndexes']==30,base
                   assert base['badgeRendered'],base
+                  assert base['bespokeEasyCount']==6 and base['bespokeEasyUnique']==6,base
+                  assert base['bespokeRankCount']==3,base
                   assert base['overflow']<=1 and base['closeSvg'],base
 
                   page.evaluate("""()=>{const m=document.querySelector('#profileModal');m.classList.remove('hidden')}""")
