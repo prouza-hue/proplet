@@ -88,7 +88,7 @@
     polishGameplayCard();polishAppearanceCard();polishPushCard();polishDataCard();polishAccountHub();ensureAdminPlacement();
   }
 
-  function privacyState(){const p=profile();return p?.publicRankings===true?{icon:'👀',title:'Veřejný profil',copy:'V pořadí se ukáže tvoje herní jméno a emoji avatar.'}:{icon:'🎭',title:'Anonymní profil',copy:'Výsledky zůstávají v pořadí pod anonymní přezdívkou.'}}
+  function privacyState(){const p=profile();return p?.publicRankings===true?{icon:'👀',title:'Veřejný profil',copy:'V pořadí se ukáže tvoje herní jméno a zvolený herní avatar.'}:{icon:'🎭',title:'Anonymní profil',copy:'Výsledky zůstávají v pořadí pod anonymní přezdívkou.'}}
   function ensurePrivacyCard(){
     const screen=profileScreen();if(!screen)return;
     let card=q('#settingsPrivacyCard',screen);

@@ -209,7 +209,7 @@
         updateProfileChip();
         d.renderProfile();
         if (d.getCurrentScreen() === 'leaderboard') d.renderLeaderboard();
-        d.showToast(`Avatar ${avatar} uložen ✓`);
+        d.showToast('Avatar uložen ✓');
       } catch (error) {
         d.showToast(error.message);
       }
