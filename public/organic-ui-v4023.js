@@ -134,6 +134,18 @@ function decorateAvatarPickers(){
    if(!existing||Number(existing.dataset.avatarIndex)!==idx)btn.replaceChildren(avatarNode(idx,AVATAR_NAMES[idx]));
  });
 }
+function polishAvatarEditor(){
+ const grid=document.getElementById('profileEditAvatarGrid');
+ if(grid){
+   const buttons=[...grid.querySelectorAll('.avatar-choice')];
+   if(buttons.length>=30&&!grid.querySelector('.avatar-group-label')){
+     const a=document.createElement('span');a.className='avatar-group-label';a.textContent='LESNÍ ZVÍŘÁTKA';grid.insertBefore(a,buttons[0]);
+     const b=document.createElement('span');b.className='avatar-group-label';b.textContent='PLETENÍ A ŘEMESLO';grid.insertBefore(b,buttons[15]);
+   }
+ }
+ const note=document.querySelector('#profileEditModal .profile-edit-avatar-block .field-note');
+ if(note&&note.textContent.includes('emoji'))note.textContent='Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.';
+}
 function decorateInlineLeaderboardAvatars(){
  document.querySelectorAll('.leader-name>strong').forEach(strong=>{
    if(strong.querySelector('.organic-avatar'))return;
@@ -153,7 +165,7 @@ function applyAvatars(){
  if(p&&!p.useGoogleAvatar)document.querySelectorAll('.profile-avatar-big').forEach(el=>decorateAvatarElement(el,p.avatar||'🙂',`Avatar hráče ${p.name||''}`));
  const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview&&p)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
  document.querySelectorAll('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar').forEach(el=>decorateAvatarElement(el,null,'Herní avatar'));
- decorateInlineLeaderboardAvatars();decorateAvatarPickers();
+ decorateInlineLeaderboardAvatars();decorateAvatarPickers();polishAvatarEditor();
  const privateIcon=document.querySelector('.settings-privacy-icon');if(privateIcon&&profileState()?.publicRankings===false&&!privateIcon.querySelector('.organic-avatar')){privateIcon.replaceChildren(avatarNode(-1,'Anonymní hráč'));privateIcon.classList.add('organic-private-avatar')}
 }
 function emblemSpec(key){
