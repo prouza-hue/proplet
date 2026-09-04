@@ -75,7 +75,7 @@ const AVATAR_COUNT=AVATAR_MANIFEST.length;
 const AVATAR_NAMES=AVATAR_MANIFEST.map(a=>a.name);
 // Per-avatar optical calibration. The SVG masters stay faithful; only the motif inside each medallion
 // is enlarged where needed so all 30 avatars carry comparable visual weight in the picker and rankings.
-const AVATAR_FOCUS_SCALES=[1.00,1.16,1.16,1.00,1.00,1.08,1.00,1.02,1.00,1.00,1.00,1.00,1.06,1.03,1.06,1.03,1.27,1.26,1.34,1.00,1.12,1.12,1.03,1.03,1.04,1.05,1.10,1.10,1.10,1.05];
+const AVATAR_FOCUS_SCALES=[1.00,1.16,1.32,1.00,1.00,1.08,1.00,1.02,1.00,1.00,1.00,1.00,1.06,1.03,1.06,1.03,1.27,1.26,1.34,1.00,1.12,1.12,1.03,1.03,1.04,1.05,1.10,1.10,1.10,1.05];
 function avatarFocusScale(index){const n=Number(AVATAR_FOCUS_SCALES[index]||1);return Number.isFinite(n)?Math.max(1,Math.min(1.4,n)):1}
 function avatarSvg(bg,body){return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="'+bg+'"/>'+body+'</svg>'}
 const PRIVATE_AVATAR_ART=avatarSvg('#E7DDCC','<circle cx="32" cy="27" r="11" fill="#8F877B"/><path d="M13 54q2-18 19-18t19 18" fill="#8F877B"/><path d="M20 24q12-11 24 0" stroke="#F6F0DE" stroke-width="3" fill="none"/><path d="M22 44q10 7 20 0" stroke="#C66B42" stroke-width="3" fill="none" stroke-linecap="round"/>');
