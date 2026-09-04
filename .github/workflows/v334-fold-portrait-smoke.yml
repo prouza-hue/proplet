@@ -85,7 +85,9 @@ jobs:
                     shareColor:(()=>{const b=document.querySelector('#shareDailyBtn');b?.classList.remove('hidden');return b?getComputedStyle(b).color:null})(),
                     freeSectionBorder:(()=>{const c=document.querySelector('#quickPlayCard');c?.classList.add('home-free-section');return c?getComputedStyle(c).borderTopWidth:null})(),
                     footerMarginBottom:getComputedStyle(document.querySelector('.app-footer')).marginBottom,
-                    navActiveColor:getComputedStyle(document.querySelector('.bottom-nav button.active')).color
+                    navActiveColor:getComputedStyle(document.querySelector('.bottom-nav button.active')).color,
+                    primaryBg:(()=>{const b=document.createElement('button');b.className='primary-btn';document.body.appendChild(b);const v=getComputedStyle(b).backgroundColor;b.remove();return v})(),
+                    heroBtnBg:(()=>{const b=document.createElement('button');b.className='hero-btn';document.body.appendChild(b);const v=getComputedStyle(b).backgroundColor;b.remove();return v})()
                   })""")
                   assert base['bg']=='rgb(253, 251, 247)',base
                   assert base['hero']=='rgb(185, 92, 54)',base
@@ -100,6 +102,8 @@ jobs:
                   assert base['shareColor']=='rgb(255, 253, 248)',base
                   assert base['freeSectionBorder']=='0px',base
                   assert base['navActiveColor']=='rgb(169, 80, 49)',base
+                  assert base['primaryBg']=='rgb(169, 80, 49)',base
+                  assert base['heroBtnBg']=='rgb(255, 244, 223)',base
                   if label=='mobile': assert float(base['footerMarginBottom'].replace('px',''))>=140,base
 
                   page.evaluate("""()=>{const m=document.querySelector('#profileModal');m.classList.remove('hidden')}""")
@@ -117,14 +121,19 @@ jobs:
                   page.wait_for_timeout(500)
                   board=page.evaluate("""()=>{
                     const cell=document.querySelector('#board .cell'),cs=getComputedStyle(cell);
+                    const baseBg=cs.backgroundColor;
+                    cell.classList.add('active');const active=getComputedStyle(cell);
+                    const activeBg=active.backgroundColor,activeBorder=active.borderTopColor,activeColor=active.color;
                     const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
                     line.classList.add('path-active');line.setAttribute('points','0,0 20,20');document.querySelector('#pathLayer').appendChild(line);
                     const ls=getComputedStyle(line);
-                    return {bg:cs.backgroundColor,color:cs.color,border:cs.borderTopWidth,weight:cs.fontWeight,transform:cs.textTransform,duration:cs.transitionDuration,stroke:ls.stroke,strokeWidth:ls.strokeWidth};
+                    return {bg:baseBg,color:cs.color,border:cs.borderTopWidth,weight:cs.fontWeight,transform:cs.textTransform,duration:cs.transitionDuration,activeBg,activeBorder,activeColor,lineDisplay:ls.display,lineOpacity:ls.opacity};
                   }""")
                   assert board['bg']=='rgb(255, 255, 255)' and int(board['weight'])>=900,board
                   assert board['transform']=='uppercase' and '0.15s' in board['duration'],board
-                  assert board['stroke']=='rgb(234, 179, 8)' and board['strokeWidth']=='10px',board
+                  assert board['activeBg']=='rgb(245, 213, 111)' and board['activeBorder']=='rgb(200, 145, 23)',board
+                  assert board['activeColor']=='rgb(51, 38, 11)',board
+                  assert board['lineDisplay']=='none' and board['lineOpacity']=='0',board
                   page.screenshot(path=f"{OUT}/{label}.png",full_page=True)
                   result[label]={'base':base,'modal':modal,'board':board}
                   assert not errors,(label,errors)
