@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Jezevec">
+<title>Jezevec</title>
+<circle cx="32" cy="32" r="30" fill="#E6B53E" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#F7F0DE" d="M14 28c0-10 8-16 18-16s18 6 18 16v14c0 9-7 14-18 14S14 51 14 42Z"/>
+<path fill="#394346" d="M19 19c5 4 7 10 8 22l-8-5-5-8Zm26 0c-5 4-7 10-8 22l8-5 5-8Z"/>
+<path fill="#394346" d="M18 16c2-3 6-5 9-4l-2 7Zm28 0c-2-3-6-5-9-4l2 7Z"/>
+<circle cx="24.5" cy="31" r="1.7" fill="#30383A" stroke="none"/><circle cx="39.5" cy="31" r="1.7" fill="#30383A" stroke="none"/>
+<path fill="#30383A" d="m28 40 4-3 4 3-4 4Z" stroke="none"/><path d="M27 45c3 2 7 2 10 0" fill="none"/>
+<path fill="#394346" d="M18 46c5 5 23 5 28 0v10H18Z"/></g>
+</svg>

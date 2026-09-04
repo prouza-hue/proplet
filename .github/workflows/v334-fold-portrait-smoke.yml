@@ -73,10 +73,11 @@ jobs:
                     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
                     emojiChars:[...new Set(Array.from(document.body.innerText).filter(ch=>new RegExp('\\\\p{Extended_Pictographic}','u').test(ch)&&!['©','®'].includes(ch)))].slice(0,30),
                     avatarCount:document.querySelectorAll('#probeMainPicker .avatar-choice').length,
-                    avatarRendered:!!document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar>svg'),
-                    mainPickerSvgs:document.querySelectorAll('#probeMainPicker .avatar-choice .organic-avatar>svg').length,
-                    editPickerSvgs:document.querySelectorAll('#profileEditAvatarGrid .avatar-choice .organic-avatar>svg').length,
+                    avatarRendered:!!document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar>img'),
+                    mainPickerImgs:document.querySelectorAll('#probeMainPicker .avatar-choice .organic-avatar>img').length,
+                    editPickerImgs:document.querySelectorAll('#profileEditAvatarGrid .avatar-choice .organic-avatar>img').length,
                     uniqueAvatarIndexes:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarIndex)).size,
+                    uniqueAvatarFiles:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarFile)).size,
                     badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
                     bespokeEasyCount:document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art').length,
                     bespokeEasyUnique:new Set([...document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art')].map(x=>x.dataset.achArt)).size,
@@ -94,7 +95,25 @@ jobs:
                   assert base['footer']=='© 2026 Proplet · Česká slovní hra',base
                   assert not base['emojiChars'],base
                   assert base['avatarCount']==30 and base['avatarRendered'],base
-                  assert base['mainPickerSvgs']==30 and base['editPickerSvgs']==30 and base['uniqueAvatarIndexes']==30,base
+                  assert base['mainPickerImgs']==30 and base['editPickerImgs']==30 and base['uniqueAvatarIndexes']==30 and base['uniqueAvatarFiles']==30,base
+                  page.wait_for_function("""()=>[...document.querySelectorAll('#probeMainPicker .organic-avatar>img')].every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0)""",timeout=12000)
+                  avatar_assets=page.evaluate("""async()=>{
+                    const manifest=await fetch('/assets/avatars/v2/manifest.json',{cache:'no-store'}).then(r=>r.json());
+                    const imgs=[...document.querySelectorAll('#probeMainPicker .organic-avatar')];
+                    const files=imgs.map(x=>x.dataset.avatarFile);
+                    const expected=manifest.avatars.map(x=>x.file);
+                    const sizes=[24,32,40],rendered=[];
+                    for(let i=0;i<sizes.length;i++){
+                      const host=document.createElement('span');host.className='organic-avatar';host.style.cssText='position:absolute;left:-9999px;top:0;width:'+sizes[i]+'px;height:'+sizes[i]+'px;min-width:'+sizes[i]+'px;min-height:'+sizes[i]+'px';
+                      const img=document.createElement('img');img.src='/assets/avatars/v2/'+expected[i];img.width=64;img.height=64;host.appendChild(img);document.body.appendChild(host);
+                      if(!img.complete)await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject});
+                      const r=img.getBoundingClientRect();rendered.push({size:sizes[i],w:r.width,h:r.height,nw:img.naturalWidth,nh:img.naturalHeight});host.remove();
+                    }
+                    return {manifestCount:manifest.avatars.length,viewBox:manifest.viewBox,targetSizes:manifest.targetSizesPx,filesMatch:files.join('|')===expected.join('|'),rendered};
+                  }""")
+                  assert avatar_assets['manifestCount']==30 and avatar_assets['viewBox']=='0 0 64 64',avatar_assets
+                  assert avatar_assets['targetSizes']==[24,32,40] and avatar_assets['filesMatch'],avatar_assets
+                  assert all(abs(x['w']-x['size'])<0.2 and abs(x['h']-x['size'])<0.2 and x['nw']>0 and x['nh']>0 for x in avatar_assets['rendered']),avatar_assets
                   assert base['badgeRendered'],base
                   assert base['bespokeEasyCount']==6 and base['bespokeEasyUnique']==6,base
                   assert base['bespokeRankCount']==3,base

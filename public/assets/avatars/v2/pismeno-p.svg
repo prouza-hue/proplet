@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Písmeno P">
+<title>Písmeno P</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<rect x="15" y="15" width="34" height="34" rx="7" fill="#D8B57F"/>
+<path fill="#30383A" fill-rule="evenodd" d="M22 45V19h11c8 0 13 4 13 10s-5 10-13 10h-4v6Zm7-20v8h4c4 0 6-1 6-4s-2-4-6-4Z" stroke="none"/>
+<path d="M45 38c7 1 9 7 5 11-4 4-11 2-13 7" fill="none" stroke="#E6B53E" stroke-width="3"/></g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Brk a inkoust">
+<title>Brk a inkoust</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#394346" d="M15 43c4-14 10-25 26-33 4-2 8-1 9 1-2 9-9 21-25 31Z"/>
+<path d="M20 39 44 14" fill="none" stroke="#79946F" stroke-width="2"/>
+<path d="m24 33-6-2m12-4-7-3m14-3-7-3m12-2-6-2" fill="none"/>
+<path fill="#394346" d="m15 43 6-1-2 7-5 4-1-4Z"/>
+<path fill="#F7F0DE" d="M33 40h17l3 5v11H30V45Z"/>
+<path fill="#30383A" d="M34 39h15v5H34Z"/>
+<path d="M24 38c-1 4 1 7 5 8" fill="none" stroke="#79946F" stroke-width="4"/></g>
+</svg>

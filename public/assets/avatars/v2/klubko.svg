@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Klubko">
+<title>Klubko</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="31" cy="34" r="16" fill="#C9693A"/>
+<path d="M19 27c8 4 16 4 24 0M17 34c9 5 19 5 28 0M19 41c8 4 16 4 24 0M24 20c-4 8-4 18 0 28m8-29c-4 10-4 20 0 30m8-27c-4 8-4 16-1 23" fill="none" stroke="#9E4B2C" stroke-width="2"/>
+<path d="M21 47c-3 3-5 5-6 8m26-7c4 1 7 3 9 6" fill="none" stroke="#C9693A" stroke-width="3"/>
+<path d="M27 24 23 9m12 18 6-15" fill="none" stroke="#394346" stroke-width="3"/><circle cx="22" cy="8" r="2.3" fill="#394346"/><circle cx="42" cy="11" r="2.3" fill="#394346"/></g>
+</svg>

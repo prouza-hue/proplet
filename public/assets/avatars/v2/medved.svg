@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Medvěd">
+<title>Medvěd</title>
+<circle cx="32" cy="32" r="30" fill="#E6B53E" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="20" cy="19" r="7" fill="#C9693A"/><circle cx="44" cy="19" r="7" fill="#C9693A"/>
+<circle cx="20" cy="19" r="3" fill="#D8B57F"/><circle cx="44" cy="19" r="3" fill="#D8B57F"/>
+<path fill="#C9693A" d="M15 30c0-10 7-16 17-16s17 6 17 16v12c0 9-7 14-17 14S15 51 15 42Z"/>
+<ellipse cx="32" cy="39" rx="10" ry="9" fill="#D8B57F"/>
+<circle cx="25" cy="31" r="1.8" fill="#30383A" stroke="none"/><circle cx="39" cy="31" r="1.8" fill="#30383A" stroke="none"/>
+<path fill="#30383A" d="m28 37 4-3 4 3-4 4Z" stroke="none"/><path d="M27 43c3 3 7 3 10 0" fill="none"/>
+<path fill="#D8B57F" d="M23 53h18l-3 5H26Z"/></g>
+</svg>

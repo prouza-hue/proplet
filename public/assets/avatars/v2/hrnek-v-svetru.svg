@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Hrnek v svetru">
+<title>Hrnek v svetru</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#E6B53E" d="M16 21h29v27c0 5-4 8-9 8H25c-5 0-9-3-9-8Z"/>
+<path d="M45 27h5c5 0 8 4 8 9s-3 9-8 9h-5" fill="none" stroke="#E6B53E" stroke-width="5"/>
+<path fill="#7898B3" d="M15 31h31v18c0 4-3 7-7 7H22c-4 0-7-3-7-7Z"/>
+<path d="m18 35 5 5 5-5 5 5 5-5 5 5m-24 4 5 5 5-5 5 5 5-5 5 5" fill="none" stroke="#5B758C" stroke-width="2"/>
+<path d="M23 18c-3-4 2-6 0-10m9 10c-3-4 2-6 0-10m9 10c-3-4 2-6 0-10" fill="none" stroke="#F7F0DE" stroke-width="2.5"/>
+<ellipse cx="30.5" cy="22" rx="14.5" ry="4" fill="#8E5B35"/></g>
+</svg>

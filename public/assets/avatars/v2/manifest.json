@@ -1,0 +1,193 @@
+{
+  "version": "2.0.0",
+  "sourceBranch": "assets/avatar-redesign-v1",
+  "basePath": "/assets/avatars/v2/",
+  "viewBox": "0 0 64 64",
+  "targetSizesPx": [
+    24,
+    32,
+    40
+  ],
+  "avatars": [
+    {
+      "id": 0,
+      "name": "Liška",
+      "file": "liska.svg",
+      "category": "forest"
+    },
+    {
+      "id": 1,
+      "name": "Sova",
+      "file": "sova.svg",
+      "category": "forest"
+    },
+    {
+      "id": 2,
+      "name": "Ježek",
+      "file": "jezek.svg",
+      "category": "forest"
+    },
+    {
+      "id": 3,
+      "name": "Medvěd",
+      "file": "medved.svg",
+      "category": "forest"
+    },
+    {
+      "id": 4,
+      "name": "Jelen",
+      "file": "jelen.svg",
+      "category": "forest"
+    },
+    {
+      "id": 5,
+      "name": "Srna",
+      "file": "srna.svg",
+      "category": "forest"
+    },
+    {
+      "id": 6,
+      "name": "Jezevec",
+      "file": "jezevec.svg",
+      "category": "forest"
+    },
+    {
+      "id": 7,
+      "name": "Veverka",
+      "file": "veverka.svg",
+      "category": "forest"
+    },
+    {
+      "id": 8,
+      "name": "Mýval",
+      "file": "myval.svg",
+      "category": "forest"
+    },
+    {
+      "id": 9,
+      "name": "Kočka",
+      "file": "kocka.svg",
+      "category": "forest"
+    },
+    {
+      "id": 10,
+      "name": "Vlk",
+      "file": "vlk.svg",
+      "category": "forest"
+    },
+    {
+      "id": 11,
+      "name": "Mourek",
+      "file": "mourek.svg",
+      "category": "forest"
+    },
+    {
+      "id": 12,
+      "name": "Zajíc",
+      "file": "zajic.svg",
+      "category": "forest"
+    },
+    {
+      "id": 13,
+      "name": "Králík",
+      "file": "kralik.svg",
+      "category": "forest"
+    },
+    {
+      "id": 14,
+      "name": "Myška",
+      "file": "myska.svg",
+      "category": "forest"
+    },
+    {
+      "id": 15,
+      "name": "Klubko",
+      "file": "klubko.svg",
+      "category": "craft"
+    },
+    {
+      "id": 16,
+      "name": "Háček",
+      "file": "hacek.svg",
+      "category": "craft"
+    },
+    {
+      "id": 17,
+      "name": "Písmeno P",
+      "file": "pismeno-p.svg",
+      "category": "craft"
+    },
+    {
+      "id": 18,
+      "name": "Pletené brýle",
+      "file": "pletene-bryle.svg",
+      "category": "craft"
+    },
+    {
+      "id": 19,
+      "name": "Kniha s copem",
+      "file": "kniha-s-copem.svg",
+      "category": "craft"
+    },
+    {
+      "id": 20,
+      "name": "Kniha se stehem",
+      "file": "kniha-se-stehem.svg",
+      "category": "craft"
+    },
+    {
+      "id": 21,
+      "name": "Hrnek v svetru",
+      "file": "hrnek-v-svetru.svg",
+      "category": "craft"
+    },
+    {
+      "id": 22,
+      "name": "Brk a inkoust",
+      "file": "brk-a-inkoust.svg",
+      "category": "craft"
+    },
+    {
+      "id": 23,
+      "name": "Cívka",
+      "file": "civka.svg",
+      "category": "craft"
+    },
+    {
+      "id": 24,
+      "name": "Papírový pták",
+      "file": "papirovy-ptak.svg",
+      "category": "craft"
+    },
+    {
+      "id": 25,
+      "name": "Papírová vlaštovka",
+      "file": "papirova-vlastovka.svg",
+      "category": "craft"
+    },
+    {
+      "id": 26,
+      "name": "Přesýpačky modré",
+      "file": "presypacky-modre.svg",
+      "category": "craft"
+    },
+    {
+      "id": 27,
+      "name": "Přesýpačky zlaté",
+      "file": "presypacky-zlate.svg",
+      "category": "craft"
+    },
+    {
+      "id": 28,
+      "name": "Člunek",
+      "file": "clunek.svg",
+      "category": "craft"
+    },
+    {
+      "id": 29,
+      "name": "Tkalcovský stav",
+      "file": "tkalcovsky-stav.svg",
+      "category": "craft"
+    }
+  ]
+}

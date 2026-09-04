@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Kočka">
+<title>Kočka</title>
+<circle cx="32" cy="32" r="30" fill="#D67A4F" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#E6B53E" d="M16 24 13 11l11 8c5-2 11-2 16 0l11-8-3 13c2 4 3 8 2 13-2 11-9 18-18 18s-16-7-18-18c-1-5 0-9 2-13Z"/>
+<path fill="#D8B57F" d="M22 37c4-3 16-3 20 0l-2 10c-5 4-11 4-16 0Z"/>
+<circle cx="25" cy="31" r="1.8" fill="#30383A" stroke="none"/><circle cx="39" cy="31" r="1.8" fill="#30383A" stroke="none"/>
+<path fill="#C9693A" d="m29 38 3-2 3 2-3 3Z" stroke="none"/><path d="M27 43c3 3 7 3 10 0" fill="none"/>
+<path d="M21 40h-7m7 4-8 2m30-6h7m-7 4 8 2" fill="none"/></g>
+</svg>
