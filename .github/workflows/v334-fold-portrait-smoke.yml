@@ -62,7 +62,7 @@ jobs:
                   page.evaluate("""()=>{
                     const probe=document.createElement('div');probe.id='organicUiProbe';probe.style.cssText='position:absolute;left:-9999px;top:0;width:320px';
                     const keys=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
-                    probe.innerHTML='<span class="home-ranking-avatar">🐲</span><div class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-avatar="'+k+'">'+k+'</button>').join('')+'</div><div class="profile-badge"><span class="emoji">🔥</span><strong>Test</strong></div>';
+                    probe.innerHTML='<span class="home-ranking-avatar">🐲</span><div id="probeMainPicker" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-avatar="'+k+'">'+k+'</button>').join('')+'</div><div id="profileEditAvatarGrid" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-edit-avatar="'+k+'">'+k+'</button>').join('')+'</div><div class="profile-badge"><span class="emoji">🔥</span><strong>Test</strong></div>';
                     document.body.appendChild(probe);
                   }""")
                   page.wait_for_timeout(300)
@@ -72,9 +72,11 @@ jobs:
                     footer:document.querySelector('.app-footer span')?.textContent?.trim(),
                     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
                     emojiChars:[...new Set(Array.from(document.body.innerText).filter(ch=>new RegExp('\\\\p{Extended_Pictographic}','u').test(ch)&&!['©','®'].includes(ch)))].slice(0,30),
-                    avatarCount:document.querySelectorAll('#organicUiProbe .avatar-choice:not(.organic-avatar-duplicate)').length,
-                    avatarRendered:!!document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar'),
-                    avatarBg:getComputedStyle(document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar')).backgroundImage,
+                    avatarCount:document.querySelectorAll('#probeMainPicker .avatar-choice').length,
+                    avatarRendered:!!document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar>svg'),
+                    mainPickerSvgs:document.querySelectorAll('#probeMainPicker .avatar-choice .organic-avatar>svg').length,
+                    editPickerSvgs:document.querySelectorAll('#profileEditAvatarGrid .avatar-choice .organic-avatar>svg').length,
+                    uniqueAvatarIndexes:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarIndex)).size,
                     badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
                     closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg'))
                   })""")
@@ -82,7 +84,8 @@ jobs:
                   assert base['hero']=='rgb(185, 92, 54)',base
                   assert base['footer']=='© 2026 Proplet · Česká slovní hra',base
                   assert not base['emojiChars'],base
-                  assert base['avatarCount']==15 and base['avatarRendered'] and 'avatars-row-' in base['avatarBg'],base
+                  assert base['avatarCount']==30 and base['avatarRendered'],base
+                  assert base['mainPickerSvgs']==30 and base['editPickerSvgs']==30 and base['uniqueAvatarIndexes']==30,base
                   assert base['badgeRendered'],base
                   assert base['overflow']<=1 and base['closeSvg'],base
 
