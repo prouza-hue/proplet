@@ -31,7 +31,7 @@ jobs:
               try:
                   with urllib.request.urlopen(URL+'/organic-ui-v4023.css?qa='+str(time.time()),timeout=8) as r: css=r.read().decode('utf-8','replace')
                   with urllib.request.urlopen(URL+'/organic-ui-v4023.js?qa='+str(time.time()),timeout=8) as r: js=r.read().decode('utf-8','replace')
-                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js and '01-liska.svg' in js and '30-tkalcovsky-stav.svg' in js and 'AVATAR_FOCUS_SCALES=[1.00,1.16,1.32' in js: break
+                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js and '01-liska.svg' in js and '30-tkalcovsky-stav.svg' in js and 'AVATAR_FOCUS_SCALES=[1.00,1.16,1.32' in js and 'avatarFocusClip' in js and '--avatar-focus-clip' in css: break
               except Exception: pass
               if time.time()>deadline: raise AssertionError('preview alias did not reach organic UI head')
               time.sleep(2)
@@ -79,6 +79,7 @@ jobs:
                     uniqueAvatarIndexes:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarIndex)).size,
                     uniqueAvatarFiles:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarFile)).size,
                     avatarFocusScales:[...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>Number(x.dataset.avatarFocusScale||1)),
+                    avatarFocusClips:[...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>Number(x.dataset.avatarFocusClip||35)),
                     badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
                     bespokeEasyCount:document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art').length,
                     bespokeEasyUnique:new Set([...document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art')].map(x=>x.dataset.achArt)).size,
@@ -97,9 +98,10 @@ jobs:
                   assert not base['emojiChars'],base
                   assert base['avatarCount']==30 and base['avatarRendered'],base
                   assert base['mainPickerImgs']==30 and base['editPickerImgs']==30 and base['uniqueAvatarIndexes']==30 and base['uniqueAvatarFiles']==30,base
-                  scales=base['avatarFocusScales']
-                  assert len(scales)==30 and all(1.0<=x<=1.4 for x in scales),base
+                  scales=base['avatarFocusScales'];clips=base['avatarFocusClips']
+                  assert len(scales)==30 and len(clips)==30 and all(1.0<=x<=1.4 for x in scales),base
                   assert scales[1]>=1.15 and scales[2]>=1.30 and scales[18]>=1.30,base
+                  assert clips[1]>=37.5 and clips[2]>=40.5 and clips[18]>=40.5,base
                   page.wait_for_function("""()=>[...document.querySelectorAll('#probeMainPicker .organic-avatar>img')].every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0)""",timeout=12000)
                   avatar_assets=page.evaluate("""async()=>{
                     const manifest=await fetch('/assets/avatars/v2/manifest.json',{cache:'no-store'}).then(r=>r.json());
