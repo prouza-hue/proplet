@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Králík">
+<title>Králík</title>
+<circle cx="32" cy="32" r="30" fill="#A9C59C" stroke="#30383A" stroke-width="2.5"/>
+<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path fill="#E6B53E" d="M20 22c-3-8-1-16 3-18 4 2 5 10 4 17 3-1 7-1 10 0 0-8 2-15 6-17 4 3 5 11 1 20 5 4 8 10 8 17 0 10-8 15-20 15S12 51 12 41c0-8 3-14 8-19Z"/>
+<path fill="#F7F0DE" d="M22 31c4-3 16-3 20 0l-2 13c-5 5-11 5-16 0Z"/>
+<path fill="#D7A28F" d="M22 9c2 3 2 7 2 11l-3-1c-1-4-1-7 1-10Zm20 0c-2 3-2 7-2 11l3-1c1-4 1-7-1-10Z" stroke="none"/>
+<circle cx="25" cy="31" r="1.8" fill="#30383A" stroke="none"/><circle cx="39" cy="31" r="1.8" fill="#30383A" stroke="none"/>
+<path fill="#30383A" d="m29 38 3-2 3 2-3 3Z" stroke="none"/><path d="M27 43c3 3 7 3 10 0" fill="none"/>
+<circle cx="48" cy="47" r="4" fill="#F7F0DE"/></g>
+</svg>
