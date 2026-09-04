@@ -137,6 +137,7 @@ button:active{transform:translateY(1px) scale(.985)}
   color:#33260B!important;
   transform:scale(.94)!important;
   box-shadow:0 0 0 3px rgba(214,157,22,.17),0 2px 0 rgba(92,66,15,.12)!important;
+  transition-duration:.05s,.05s,.05s,.05s!important;
 }
 .board .cell.used{
   background:color-mix(in srgb,var(--word-color,#6FA486) 24%,#FFFFFF)!important;
