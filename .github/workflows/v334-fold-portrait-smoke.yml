@@ -31,7 +31,7 @@ jobs:
               try:
                   with urllib.request.urlopen(URL+'/organic-ui-v4023.css?qa='+str(time.time()),timeout=8) as r: css=r.read().decode('utf-8','replace')
                   with urllib.request.urlopen(URL+'/organic-ui-v4023.js?qa='+str(time.time()),timeout=8) as r: js=r.read().decode('utf-8','replace')
-                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js and 'const AVATAR_MANIFEST=' in js and 'dataset.avatarFile' in js: break
+                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js and '01-liska.svg' in js and '30-tkalcovsky-stav.svg' in js: break
               except Exception: pass
               if time.time()>deadline: raise AssertionError('preview alias did not reach organic UI head')
               time.sleep(2)
@@ -103,17 +103,19 @@ jobs:
                     const files=imgs.map(x=>x.dataset.avatarFile);
                     const expected=manifest.avatars.map(x=>x.file);
                     const sizes=[24,32,40],rendered=[];
-                    for(let i=0;i<sizes.length;i++){
-                      const host=document.createElement('span');host.className='organic-avatar';host.style.cssText='position:absolute;left:-9999px;top:0;width:'+sizes[i]+'px;height:'+sizes[i]+'px;min-width:'+sizes[i]+'px;min-height:'+sizes[i]+'px';
-                      const img=document.createElement('img');img.src='/assets/avatars/v2/'+expected[i];img.width=64;img.height=64;host.appendChild(img);document.body.appendChild(host);
-                      if(!img.complete)await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject});
-                      const r=img.getBoundingClientRect();rendered.push({size:sizes[i],w:r.width,h:r.height,nw:img.naturalWidth,nh:img.naturalHeight});host.remove();
+                    for(const size of sizes){
+                      for(const file of expected){
+                        const host=document.createElement('span');host.className='organic-avatar';host.style.cssText='position:absolute;left:-9999px;top:0;width:'+size+'px;height:'+size+'px;min-width:'+size+'px;min-height:'+size+'px';
+                        const img=document.createElement('img');img.src='/assets/avatars/v2/'+file;img.width=512;img.height=512;host.appendChild(img);document.body.appendChild(host);
+                        if(!img.complete)await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject});
+                        const r=img.getBoundingClientRect();rendered.push({file,size,w:r.width,h:r.height,nw:img.naturalWidth,nh:img.naturalHeight});host.remove();
+                      }
                     }
-                    return {manifestCount:manifest.avatars.length,viewBox:manifest.viewBox,targetSizes:manifest.targetSizesPx,filesMatch:files.join('|')===expected.join('|'),rendered};
+                    return {manifestCount:manifest.avatars.length,viewBox:manifest.viewBox,packageName:manifest.package,filesMatch:files.join('|')===expected.join('|'),rendered};
                   }""")
-                  assert avatar_assets['manifestCount']==30 and avatar_assets['viewBox']=='0 0 64 64',avatar_assets
-                  assert avatar_assets['targetSizes']==[24,32,40] and avatar_assets['filesMatch'],avatar_assets
-                  assert all(abs(x['w']-x['size'])<0.2 and abs(x['h']-x['size'])<0.2 and x['nw']>0 and x['nh']>0 for x in avatar_assets['rendered']),avatar_assets
+                  assert avatar_assets['manifestCount']==30 and avatar_assets['viewBox']=='0 0 512 512',avatar_assets
+                  assert avatar_assets['packageName']=='proplet-faithful-svg-all-30' and avatar_assets['filesMatch'],avatar_assets
+                  assert len(avatar_assets['rendered'])==90 and all(abs(x['w']-x['size'])<0.2 and abs(x['h']-x['size'])<0.2 and x['nw']>0 and x['nh']>0 for x in avatar_assets['rendered']),avatar_assets
                   assert base['badgeRendered'],base
                   assert base['bespokeEasyCount']==6 and base['bespokeEasyUnique']==6,base
                   assert base['bespokeRankCount']==3,base

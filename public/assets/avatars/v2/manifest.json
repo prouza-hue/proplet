@@ -1,193 +1,249 @@
 {
-  "version": "2.0.0",
-  "sourceBranch": "assets/avatar-redesign-v1",
-  "basePath": "/assets/avatars/v2/",
-  "viewBox": "0 0 64 64",
-  "targetSizesPx": [
-    24,
-    32,
-    40
-  ],
+  "package": "proplet-faithful-svg-all-30",
+  "type": "true-vector-trace",
+  "embedded_raster": false,
+  "count": 30,
+  "viewBox": "0 0 512 512",
   "avatars": [
     {
-      "id": 0,
-      "name": "Liška",
-      "file": "liska.svg",
-      "category": "forest"
-    },
-    {
       "id": 1,
-      "name": "Sova",
-      "file": "sova.svg",
-      "category": "forest"
+      "name": "Liška",
+      "slug": "01-liska",
+      "file": "01-liska.svg",
+      "category": "forest",
+      "source_file": "01-liska.svg"
     },
     {
       "id": 2,
-      "name": "Ježek",
-      "file": "jezek.svg",
-      "category": "forest"
+      "name": "Sova",
+      "slug": "02-sova",
+      "file": "02-sova.svg",
+      "category": "forest",
+      "source_file": "02-sova.svg"
     },
     {
       "id": 3,
-      "name": "Medvěd",
-      "file": "medved.svg",
-      "category": "forest"
+      "name": "Ježek",
+      "slug": "03-jezek",
+      "file": "03-jezek.svg",
+      "category": "forest",
+      "source_file": "03-jezek.svg"
     },
     {
       "id": 4,
-      "name": "Jelen",
-      "file": "jelen.svg",
-      "category": "forest"
+      "name": "Medvěd",
+      "slug": "04-medved",
+      "file": "04-medved.svg",
+      "category": "forest",
+      "source_file": "04-medved.svg"
     },
     {
       "id": 5,
-      "name": "Srna",
-      "file": "srna.svg",
-      "category": "forest"
+      "name": "Jelen",
+      "slug": "05-jelen",
+      "file": "05-jelen.svg",
+      "category": "forest",
+      "source_file": "05-jelen.svg"
     },
     {
       "id": 6,
-      "name": "Jezevec",
-      "file": "jezevec.svg",
-      "category": "forest"
+      "name": "Srna",
+      "slug": "06-srna",
+      "file": "06-srna.svg",
+      "category": "forest",
+      "source_file": "06-srna.svg"
     },
     {
       "id": 7,
-      "name": "Veverka",
-      "file": "veverka.svg",
-      "category": "forest"
+      "name": "Jezevec",
+      "slug": "07-jezevec",
+      "file": "07-jezevec.svg",
+      "category": "forest",
+      "source_file": "07-jezevec.svg"
     },
     {
       "id": 8,
-      "name": "Mýval",
-      "file": "myval.svg",
-      "category": "forest"
+      "name": "Veverka",
+      "slug": "08-veverka",
+      "file": "08-veverka.svg",
+      "category": "forest",
+      "source_file": "08-veverka.svg"
     },
     {
       "id": 9,
-      "name": "Kočka",
-      "file": "kocka.svg",
-      "category": "forest"
+      "name": "Mýval",
+      "slug": "09-myval",
+      "file": "09-myval.svg",
+      "category": "forest",
+      "source_file": "09-myval.svg"
     },
     {
       "id": 10,
-      "name": "Vlk",
-      "file": "vlk.svg",
-      "category": "forest"
+      "name": "Kočka",
+      "slug": "10-kocka",
+      "file": "10-kocka.svg",
+      "category": "forest",
+      "source_file": "10-kocka.svg"
     },
     {
       "id": 11,
-      "name": "Mourek",
-      "file": "mourek.svg",
-      "category": "forest"
+      "name": "Vlk",
+      "slug": "11-vlk",
+      "file": "11-vlk.svg",
+      "category": "forest",
+      "source_file": "01-vlk.svg"
     },
     {
       "id": 12,
-      "name": "Zajíc",
-      "file": "zajic.svg",
-      "category": "forest"
+      "name": "Mourek",
+      "slug": "12-mourek",
+      "file": "12-mourek.svg",
+      "category": "forest",
+      "source_file": "02-mourek.svg"
     },
     {
       "id": 13,
-      "name": "Králík",
-      "file": "kralik.svg",
-      "category": "forest"
+      "name": "Zajíc",
+      "slug": "13-zajic",
+      "file": "13-zajic.svg",
+      "category": "forest",
+      "source_file": "03-zajic.svg"
     },
     {
       "id": 14,
-      "name": "Myška",
-      "file": "myska.svg",
-      "category": "forest"
+      "name": "Králík",
+      "slug": "14-kralik",
+      "file": "14-kralik.svg",
+      "category": "forest",
+      "source_file": "04-kralik.svg"
     },
     {
       "id": 15,
-      "name": "Klubko",
-      "file": "klubko.svg",
-      "category": "craft"
+      "name": "Myška",
+      "slug": "15-myska",
+      "file": "15-myska.svg",
+      "category": "forest",
+      "source_file": "05-myska.svg"
     },
     {
       "id": 16,
-      "name": "Háček",
-      "file": "hacek.svg",
-      "category": "craft"
+      "name": "Klubko",
+      "slug": "16-klubko",
+      "file": "16-klubko.svg",
+      "category": "craft",
+      "source_file": "11-klubko.svg"
     },
     {
       "id": 17,
-      "name": "Písmeno P",
-      "file": "pismeno-p.svg",
-      "category": "craft"
+      "name": "Háček",
+      "slug": "17-hacek",
+      "file": "17-hacek.svg",
+      "category": "craft",
+      "source_file": "12-hacek.svg"
     },
     {
       "id": 18,
-      "name": "Pletené brýle",
-      "file": "pletene-bryle.svg",
-      "category": "craft"
+      "name": "Písmeno P",
+      "slug": "18-pismeno-p",
+      "file": "18-pismeno-p.svg",
+      "category": "craft",
+      "source_file": "13-pismeno-p.svg"
     },
     {
       "id": 19,
-      "name": "Kniha s copem",
-      "file": "kniha-s-copem.svg",
-      "category": "craft"
+      "name": "Pletené brýle",
+      "slug": "19-pletene-bryle",
+      "file": "19-pletene-bryle.svg",
+      "category": "craft",
+      "source_file": "14-pletene-bryle.svg"
     },
     {
       "id": 20,
-      "name": "Kniha se stehem",
-      "file": "kniha-se-stehem.svg",
-      "category": "craft"
+      "name": "Kniha s copem",
+      "slug": "20-kniha-s-copem",
+      "file": "20-kniha-s-copem.svg",
+      "category": "craft",
+      "source_file": "15-kniha-s-copem.svg"
     },
     {
       "id": 21,
-      "name": "Hrnek v svetru",
-      "file": "hrnek-v-svetru.svg",
-      "category": "craft"
+      "name": "Kniha se stehem",
+      "slug": "21-kniha-se-stehem",
+      "file": "21-kniha-se-stehem.svg",
+      "category": "craft",
+      "source_file": "16-kniha-se-stehem.svg"
     },
     {
       "id": 22,
-      "name": "Brk a inkoust",
-      "file": "brk-a-inkoust.svg",
-      "category": "craft"
+      "name": "Hrnek v svetru",
+      "slug": "22-hrnek-v-svetru",
+      "file": "22-hrnek-v-svetru.svg",
+      "category": "craft",
+      "source_file": "17-hrnek-v-svetru.svg"
     },
     {
       "id": 23,
-      "name": "Cívka",
-      "file": "civka.svg",
-      "category": "craft"
+      "name": "Brk a inkoust",
+      "slug": "23-brk-a-inkoust",
+      "file": "23-brk-a-inkoust.svg",
+      "category": "craft",
+      "source_file": "18-brk-a-inkoust.svg"
     },
     {
       "id": 24,
-      "name": "Papírový pták",
-      "file": "papirovy-ptak.svg",
-      "category": "craft"
+      "name": "Cívka",
+      "slug": "24-civka",
+      "file": "24-civka.svg",
+      "category": "craft",
+      "source_file": "19-civka.svg"
     },
     {
       "id": 25,
-      "name": "Papírová vlaštovka",
-      "file": "papirova-vlastovka.svg",
-      "category": "craft"
+      "name": "Papírový pták",
+      "slug": "25-papirovy-ptak",
+      "file": "25-papirovy-ptak.svg",
+      "category": "craft",
+      "source_file": "20-papirovy-ptak.svg"
     },
     {
       "id": 26,
-      "name": "Přesýpačky modré",
-      "file": "presypacky-modre.svg",
-      "category": "craft"
+      "name": "Papírová vlaštovka",
+      "slug": "26-papirova-vlastovka",
+      "file": "26-papirova-vlastovka.svg",
+      "category": "craft",
+      "source_file": "06-papirova-vlastovka.svg"
     },
     {
       "id": 27,
-      "name": "Přesýpačky zlaté",
-      "file": "presypacky-zlate.svg",
-      "category": "craft"
+      "name": "Přesýpačky modré",
+      "slug": "27-presypacky-modre",
+      "file": "27-presypacky-modre.svg",
+      "category": "craft",
+      "source_file": "07-presypacky-modre.svg"
     },
     {
       "id": 28,
-      "name": "Člunek",
-      "file": "clunek.svg",
-      "category": "craft"
+      "name": "Přesýpačky zlaté",
+      "slug": "28-presypacky-zlate",
+      "file": "28-presypacky-zlate.svg",
+      "category": "craft",
+      "source_file": "08-presypacky-zlate.svg"
     },
     {
       "id": 29,
+      "name": "Člunek",
+      "slug": "29-clunek",
+      "file": "29-clunek.svg",
+      "category": "craft",
+      "source_file": "09-clunek.svg"
+    },
+    {
+      "id": 30,
       "name": "Tkalcovský stav",
-      "file": "tkalcovsky-stav.svg",
-      "category": "craft"
+      "slug": "30-tkalcovsky-stav",
+      "file": "30-tkalcovsky-stav.svg",
+      "category": "craft",
+      "source_file": "10-tkalcovsky-stav.svg"
     }
   ]
 }

@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vlk">
-<title>Vlk</title>
-<circle cx="32" cy="32" r="30" fill="#D67A4F" stroke="#30383A" stroke-width="2.5"/>
-<g stroke="#30383A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-<path fill="#394346" d="M15 43c0-12 7-18 14-21l3-10 5 8 9-3-4 8c5 5 8 11 7 20-1 8-7 12-15 12-11 0-19-5-19-14Z"/>
-<path fill="#F7F0DE" d="M14 25c3-7 9-12 14-15 5 2 8 6 8 11-3 4-6 6-10 9 5 2 8 6 7 12-1 6-5 10-10 10-7 0-11-5-11-12 0-6 1-11 2-15Z"/>
-<path fill="#F7F0DE" d="m35 22 10-3-5 8Z"/>
-<path fill="#30383A" d="m13 22 5-2 2 3-5 3Z" stroke="none"/><path d="M24 19c3 1 5 2 7 5" fill="none"/></g>
-</svg>
