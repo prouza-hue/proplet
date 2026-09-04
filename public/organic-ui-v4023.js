@@ -124,7 +124,7 @@ function decorateAvatarElement(el,key,label){
 function decorateAvatarPickers(){
  const p=profileState(),current=visualAvatarIndex(p?.avatar||'🙂');
  document.querySelectorAll('.avatar-choice').forEach(btn=>{
-   const raw=String(btn.dataset.avatar||'').trim(),idx=legacyAvatarIndex(raw);
+   const raw=String(btn.dataset.avatar||btn.dataset.editAvatar||'').trim(),idx=legacyAvatarIndex(raw);
    if(idx<0)return;
    btn.classList.remove('organic-avatar-duplicate');btn.removeAttribute('aria-hidden');btn.tabIndex=0;btn.dataset.organicAvatarKey=raw;
    btn.classList.toggle('selected',idx===current);
