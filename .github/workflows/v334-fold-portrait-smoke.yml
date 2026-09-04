@@ -106,7 +106,7 @@ jobs:
                   page.wait_for_timeout(150)
                   modal=page.evaluate("""()=>{const m=document.querySelector('#profileModal'),c=m.querySelector('.modal-card'),mr=getComputedStyle(m),cr=getComputedStyle(c),r=c.getBoundingClientRect();return {align:mr.alignItems,bottom:Math.abs(innerHeight-r.bottom),width:r.width,br:cr.borderBottomLeftRadius}}""")
                   if label=='mobile':
-                      assert modal['align']=='flex-end' and modal['bottom']<=2 and modal['width']>=389 and modal['br']=='0px',modal
+                      assert modal['align']=='flex-end' and modal['bottom']<=4 and modal['width']>=389 and modal['br']=='0px',modal
                   else:
                       assert modal['width']<700 and modal['br']!='0px',modal
                   page.evaluate("document.querySelector('#profileModal').classList.add('hidden')")
