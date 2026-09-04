@@ -249,7 +249,7 @@ button.ui-icon-only .ui-icon{margin-right:0}
 .organic-avatar>svg,.organic-avatar>img{display:block;width:100%;height:100%;object-fit:contain}
 .organic-avatar[data-avatar-file]{background-size:100% 100%;background-position:center;background-repeat:no-repeat}
 .organic-avatar[data-avatar-file]>.organic-avatar-focus{
-  transform:scale(var(--avatar-focus-scale,1));
+  transform:translate(var(--avatar-focus-x,0),var(--avatar-focus-y,0)) scale(var(--avatar-focus-scale,1));
   transform-origin:50% 50%;
   clip-path:circle(var(--avatar-focus-clip,35%) at 50% 50%);
 }

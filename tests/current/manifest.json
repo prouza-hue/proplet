@@ -190,6 +190,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_avatar_optical_sizing.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_s14_content_characterization.py",
         "runner": "python"
       },
