@@ -70,7 +70,7 @@ function ensureModals(){
    <p class="muted">Přezdívka je jen tvoje jméno ve hře. Nemusí odpovídat jménu na Google účtu a můžeš ji kdykoli změnit.</p>
    <label>Přezdívka<input id="displayNameInput" maxlength="24" autocomplete="nickname" placeholder="např. Pavel nebo Slovožrout"></label>
    <div id="displayNameMessage" class="account-auth-message"></div><button id="saveDisplayNameBtn" class="primary-btn big">Uložit přezdívku</button>
-   <div class="profile-edit-avatar-block"><span class="stat-label">AVATAR</span><div id="profileEditGoogleAvatar"></div><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div><small class="field-note">Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolené emoji.</small></div>
+   <div class="profile-edit-avatar-block"><span class="stat-label">AVATAR</span><div id="profileEditGoogleAvatar"></div><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div><small class="field-note">Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.</small></div>
   </div></div>
   <div id="recoveryEmailModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
    <button id="closeRecoveryEmail" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Přidat e-mail</h2>
