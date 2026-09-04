@@ -121,13 +121,13 @@ jobs:
                   page.wait_for_timeout(500)
                   board=page.evaluate("""()=>{
                     const cell=document.querySelector('#board .cell'),cs=getComputedStyle(cell);
-                    const baseBg=cs.backgroundColor;
+                    const baseBg=cs.backgroundColor,duration=cs.transitionDuration;
                     cell.style.setProperty('transition','none','important');cell.classList.add('active');const active=getComputedStyle(cell);
                     const activeBg=active.backgroundColor,activeBorder=active.borderTopColor,activeColor=active.color;
                     const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
                     line.classList.add('path-active');line.setAttribute('points','0,0 20,20');document.querySelector('#pathLayer').appendChild(line);
                     const ls=getComputedStyle(line);
-                    return {bg:baseBg,color:cs.color,border:cs.borderTopWidth,weight:cs.fontWeight,transform:cs.textTransform,duration:cs.transitionDuration,activeBg,activeBorder,activeColor,lineDisplay:ls.display,lineOpacity:ls.opacity};
+                    return {bg:baseBg,color:cs.color,border:cs.borderTopWidth,weight:cs.fontWeight,transform:cs.textTransform,duration,activeBg,activeBorder,activeColor,lineDisplay:ls.display,lineOpacity:ls.opacity};
                   }""")
                   assert board['bg']=='rgb(255, 255, 255)' and int(board['weight'])>=900,board
                   assert board['transform']=='uppercase' and '0.15s' in board['duration'],board
