@@ -99,7 +99,7 @@ jobs:
                   assert base['mainPickerImgs']==30 and base['editPickerImgs']==30 and base['uniqueAvatarIndexes']==30 and base['uniqueAvatarFiles']==30,base
                   scales=base['avatarFocusScales']
                   assert len(scales)==30 and all(1.0<=x<=1.4 for x in scales),base
-                  assert scales[1]>=1.15 and scales[2]>=1.15 and scales[18]>=1.30,base
+                  assert scales[1]>=1.15 and scales[2]>=1.30 and scales[18]>=1.30,base
                   page.wait_for_function("""()=>[...document.querySelectorAll('#probeMainPicker .organic-avatar>img')].every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0)""",timeout=12000)
                   avatar_assets=page.evaluate("""async()=>{
                     const manifest=await fetch('/assets/avatars/v2/manifest.json',{cache:'no-store'}).then(r=>r.json());
