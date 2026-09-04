@@ -211,7 +211,7 @@ button.ui-icon-only .ui-icon{margin-right:0}
 .support-choice>span:first-child,.hint-choice>span:first-child{font-size:0!important;color:#A95031!important}
 .support-choice>span:first-child .ui-icon,.hint-choice>span:first-child .ui-icon{width:24px;height:24px}
 
-/* Graphical avatar system — approved warm-paper / Verne character medallions. */
+/* Graphical avatar system — 30 bespoke Proplet medallions: forest + craft. */
 .organic-avatar-host{
   position:relative!important;
   padding:0!important;
@@ -227,16 +227,11 @@ button.ui-icon-only .ui-icon{margin-right:0}
   width:100%;height:100%;
   min-width:100%;min-height:100%;
   border-radius:50%;
-  background-repeat:no-repeat;
-  background-size:400% 100%;
-  background-position-y:center;
+  overflow:hidden;
+  background:#F6EFE2;
   box-shadow:inset 0 0 0 1px rgba(86,65,42,.16),0 1px 3px rgba(64,47,31,.08);
 }
-.oa-row-1{background-image:url('/organic/avatars-row-1.svg?v=1')}
-.oa-row-2{background-image:url('/organic/avatars-row-2.svg?v=1')}
-.oa-row-3{background-image:url('/organic/avatars-row-3.svg?v=1')}
-.oa-row-4{background-image:url('/organic/avatars-row-4.svg?v=1')}
-.oa-col-0{background-position-x:0%}.oa-col-1{background-position-x:33.3333%}.oa-col-2{background-position-x:66.6667%}.oa-col-3{background-position-x:100%}
+.organic-avatar>svg{display:block;width:100%;height:100%}
 #profileChipAvatar.avatar-dot{width:36px!important;height:36px!important;flex:0 0 36px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #DED4C6,0 3px 9px rgba(61,44,30,.10)!important}
 .profile-avatar-big.organic-avatar-host{width:78px!important;height:78px!important;flex:0 0 78px!important;border:3px solid #FFFDF8!important;box-shadow:0 0 0 1px #D9CDBD,0 8px 18px rgba(61,44,30,.10)!important}
 .home-ranking-avatar.organic-avatar-host,.leader-avatar.organic-avatar-host,.leaderboard-avatar.organic-avatar-host,.ranking-avatar.organic-avatar-host{width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;border:2px solid #FFFDF8!important;box-shadow:0 0 0 1px #DED4C6!important}
@@ -256,7 +251,10 @@ button.ui-icon-only .ui-icon{margin-right:0}
 .avatar-choice:hover{transform:translateY(-1px)!important;border-color:#CDAA55!important;box-shadow:0 5px 12px rgba(80,55,28,.10)!important}
 .avatar-choice.selected{border-color:#D69D16!important;box-shadow:0 0 0 3px rgba(234,179,8,.18),0 5px 12px rgba(80,55,28,.10)!important;background:#FFF6D8!important}
 .avatar-choice .organic-avatar{pointer-events:none}
-.avatar-choice.organic-avatar-duplicate{display:none!important}
+.avatar-choice:nth-child(-n+15){background:#F2F5E9!important}
+.avatar-choice:nth-child(n+16){background:#F7EFE4!important}
+.avatar-choice.selected .organic-avatar{box-shadow:inset 0 0 0 1px rgba(86,65,42,.12)}
+
 .settings-privacy-icon.organic-private-avatar{width:42px!important;height:42px!important;border-radius:50%!important;padding:2px!important;background:#EFE8DC!important}
 
 /* Tactile achievement / rank medallions. */
