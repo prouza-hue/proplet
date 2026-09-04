@@ -382,3 +382,40 @@ html[data-theme="dark"] .google-avatar-unavailable{background:#2B2A2E!important}
 }
 #screen-profile .profile-rank-stat{background:linear-gradient(135deg,#FFF7D5 0%,#F8EEDB 100%)!important}
 #screen-profile .profile-rank-value{align-items:center!important;gap:10px!important}
+
+/* Phase 2C — light-theme cleanup from Pavel's mobile review. Dark mode intentionally deferred. */
+html:not([data-theme="dark"]) #shareDailyBtn.daily-challenge-cta,
+html:not([data-theme="dark"]) #winModal .challenge-share-cta,
+html:not([data-theme="dark"]) #levelDetailShareBtn.challenge-share-detail-cta{
+  color:#FFFDF8!important;
+}
+html:not([data-theme="dark"]) #shareDailyBtn.daily-challenge-cta .ui-icon,
+html:not([data-theme="dark"]) #winModal .challenge-share-cta .ui-icon,
+html:not([data-theme="dark"]) #levelDetailShareBtn.challenge-share-detail-cta .ui-icon{color:inherit!important}
+
+/* Volná hra should sit in the page, not inside a second framed card. Individual difficulty choices stay tactile. */
+html:not([data-theme="dark"]) #quickPlayCard.home-free-section{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html:not([data-theme="dark"]) #quickPlayCard.home-free-section .quick-play-head{padding-left:2px;padding-right:2px}
+html:not([data-theme="dark"]) #quickPlayCard.home-free-section .home-diff-grid{padding:0!important}
+
+/* The fixed nav must never cover the footer at the bottom of a long profile/ranking page. */
+@media(max-width:767px){
+  html:not([data-theme="dark"]) .app-footer{margin-bottom:142px!important}
+}
+
+/* Remove the last purple note from the primary navigation; keep the game colorful with warm organic accents. */
+html:not([data-theme="dark"]) .bottom-nav{
+  background:rgba(255,252,244,.94)!important;
+  border-color:#DED4C6!important;
+  box-shadow:0 12px 30px rgba(73,55,36,.13)!important;
+}
+html:not([data-theme="dark"]) .bottom-nav button{color:#756B61!important}
+html:not([data-theme="dark"]) .bottom-nav button.active{
+  background:linear-gradient(145deg,#FAE9DD 0%,#E7F0E2 100%)!important;
+  color:#A95031!important;
+}
+html:not([data-theme="dark"]) .bottom-nav button.active svg{stroke:currentColor!important}
