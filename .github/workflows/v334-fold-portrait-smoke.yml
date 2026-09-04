@@ -78,6 +78,7 @@ jobs:
                     editPickerImgs:document.querySelectorAll('#profileEditAvatarGrid .avatar-choice .organic-avatar>img').length,
                     uniqueAvatarIndexes:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarIndex)).size,
                     uniqueAvatarFiles:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarFile)).size,
+                    avatarFocusScales:[...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>Number(x.dataset.avatarFocusScale||1)),
                     badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
                     bespokeEasyCount:document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art').length,
                     bespokeEasyUnique:new Set([...document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art')].map(x=>x.dataset.achArt)).size,
@@ -96,6 +97,9 @@ jobs:
                   assert not base['emojiChars'],base
                   assert base['avatarCount']==30 and base['avatarRendered'],base
                   assert base['mainPickerImgs']==30 and base['editPickerImgs']==30 and base['uniqueAvatarIndexes']==30 and base['uniqueAvatarFiles']==30,base
+                  scales=base['avatarFocusScales']
+                  assert len(scales)==30 and all(1.0<=x<=1.4 for x in scales),base
+                  assert scales[1]>=1.15 and scales[2]>=1.15 and scales[18]>=1.30,base
                   page.wait_for_function("""()=>[...document.querySelectorAll('#probeMainPicker .organic-avatar>img')].every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0)""",timeout=12000)
                   avatar_assets=page.evaluate("""async()=>{
                     const manifest=await fetch('/assets/avatars/v2/manifest.json',{cache:'no-store'}).then(r=>r.json());
