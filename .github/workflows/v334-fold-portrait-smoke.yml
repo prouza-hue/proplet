@@ -31,7 +31,7 @@ jobs:
               try:
                   with urllib.request.urlopen(URL+'/organic-ui-v4023.css?qa='+str(time.time()),timeout=8) as r: css=r.read().decode('utf-8','replace')
                   with urllib.request.urlopen(URL+'/organic-ui-v4023.js?qa='+str(time.time()),timeout=8) as r: js=r.read().decode('utf-8','replace')
-                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js: break
+                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js and 'const AVATAR_MANIFEST=' in js and 'dataset.avatarFile' in js: break
               except Exception: pass
               if time.time()>deadline: raise AssertionError('preview alias did not reach organic UI head')
               time.sleep(2)
