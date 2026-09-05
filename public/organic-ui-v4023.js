@@ -310,7 +310,8 @@ const GROUP_TONE={general:'mauve',easy:'sage',medium:'blue',hard:'coral',hardcor
 function bespokeSvg(body,label=''){
  return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'+body+'</svg>';
 }
-function bespokeArt(group,index,label=''){
+function bespokeArt(group,index,label='',locked=false){
+ const ribbon=window.PropletRibbonArt?.art(label,{locked,size:34});if(ribbon)return ribbon;
  const list=ACHIEVEMENT_SERIES[group]||[];const body=list[index]||list[list.length-1]||ACHIEVEMENT_SERIES.general[0];
  const span=document.createElement('span');span.className='proplet-ach-art tone-'+(GROUP_TONE[group]||'ivory');span.dataset.achArt=group+'-'+index;span.setAttribute('role','img');span.setAttribute('aria-label',label);span.innerHTML=bespokeSvg(body,label);return span;
 }
@@ -330,7 +331,8 @@ const LOYALTY_ART=[
  '<path d="m32 12 5 9 10 2-7 7 3 11-11-6-11 6 3-11-7-7 10-2z"/><path class="fill" d="M25 30q7-9 14 0-7 9-14 0Z"/>',
  '<circle cx="32" cy="32" r="19"/><path d="M17 40c9-12 21-17 31-20M16 26c12 2 20 9 32 18"/><circle class="fill" cx="22" cy="22" r="3"/><circle class="fill" cx="44" cy="42" r="3"/>'
 ];
-function loyaltyArt(index,label){
+function loyaltyArt(index,label,locked=false){
+ const ribbon=window.PropletRibbonArt?.art(label,{locked,size:34});if(ribbon)return ribbon;
  const span=document.createElement('span');span.className='proplet-ach-art proplet-loyalty-art tone-'+(['clay','clay','amber','amber','sage','clay','blue','sage','amber','mauve'][index]||'clay');span.dataset.loyaltyArt=String(index);span.setAttribute('role','img');span.setAttribute('aria-label',label);span.innerHTML=bespokeSvg(LOYALTY_ART[index]||LOYALTY_ART[0]);return span;
 }
 const RANK_BODY={
@@ -369,7 +371,8 @@ const RANK_BODY={
  '🗝️':'<circle cx="22" cy="27" r="10"/><path d="M32 27h23m-7 0v9m-8-9v6"/><path class="fill" d="M18 23h8v8h-8z"/>',
  '🕸️':'<circle cx="32" cy="32" r="20"/><path d="M32 12v40M12 32h40M18 18l28 28M46 18 18 46"/><circle cx="32" cy="32" r="8"/><circle cx="32" cy="32" r="14"/>'
 };
-function rankArt(key,index,label){
+function rankArt(key,index,label,locked=false){
+ const ribbon=window.PropletRibbonArt?.art(label,{locked,size:42});if(ribbon)return ribbon;
  const body=RANK_BODY[key]||ACHIEVEMENT_SERIES.general[index%ACHIEVEMENT_SERIES.general.length];
  const tone=['sage','sage','blue','clay','clay','mauve','blue','blue','mauve','clay','amber','sage','coral','mauve','clay','blue','charcoal','mauve','sage','mauve','blue','coral','clay','blue','mauve','clay','mauve','amber','blue','coral','sage','amber','clay','mauve','blue'][index]||'ivory';
  const span=document.createElement('span');span.className='proplet-rank-art tone-'+tone;span.dataset.rankArt=String(index);span.setAttribute('role','img');span.setAttribute('aria-label',label);span.innerHTML=bespokeSvg(body);return span;
@@ -378,22 +381,35 @@ function applyBespokeProgressArt(){
  document.querySelectorAll('.achievement-group').forEach(section=>{
    const label=section.querySelector('.achievement-group-head>strong')?.textContent?.trim()||'',group=GROUP_ID_BY_LABEL[label];if(!group)return;
    [...section.querySelectorAll('.achievement')].forEach((card,index)=>{
-     const slot=card.querySelector(':scope>.emoji');if(!slot)return;
-     const name=card.querySelector(':scope>strong')?.textContent?.trim()||'';slot.replaceChildren(bespokeArt(group,index,name));slot.classList.add('bespoke-ready');
+     const slot=card.querySelector(':scope>.emoji');if(!slot||slot.classList.contains('bespoke-ready'))return;
+     const name=card.querySelector(':scope>strong')?.textContent?.trim()||'';slot.replaceChildren(bespokeArt(group,index,name,!card.classList.contains('earned')));slot.classList.add('bespoke-ready');
    });
  });
  document.querySelectorAll('.achievement-peek').forEach(peek=>{
    const name=peek.getAttribute('title')||peek.getAttribute('aria-label')?.replace(/, splněno$/,'')||'',id=achievementIdentityByName(name),slot=peek.querySelector('b');
-   if(id&&slot&&!slot.querySelector('.proplet-ach-art'))slot.replaceChildren(bespokeArt(id.group,id.index,name));
+   if(id&&slot&&!slot.querySelector('.proplet-ach-art,.ribbon-art'))slot.replaceChildren(bespokeArt(id.group,id.index,name,!peek.classList.contains('earned')));
  });
  [...document.querySelectorAll('#profileBadges .profile-badge')].forEach((card,index)=>{
-   const slot=card.querySelector(':scope>.emoji');if(!slot)return;const name=card.querySelector('strong')?.textContent||'';slot.replaceChildren(loyaltyArt(index,name));slot.classList.add('bespoke-ready');
+   const slot=card.querySelector(':scope>.emoji');if(!slot||slot.classList.contains('bespoke-ready'))return;const name=card.querySelector('strong')?.textContent||'';slot.replaceChildren(loyaltyArt(index,name,!card.classList.contains('earned')));slot.classList.add('bespoke-ready');
  });
  [...document.querySelectorAll('#levelRoadmap .level-step')].forEach((step,index)=>{
-   const slot=step.querySelector('.level-step-icon');if(!slot||slot.querySelector('.proplet-rank-art'))return;const key=slot.textContent.trim(),name=step.querySelector('strong')?.textContent||'';slot.replaceChildren(rankArt(key,index,name));
+   const slot=step.querySelector('.level-step-icon');if(!slot||slot.querySelector('.proplet-rank-art,.ribbon-art'))return;const key=slot.textContent.trim(),name=step.querySelector('strong')?.textContent||'';slot.replaceChildren(rankArt(key,index,name,!step.classList.contains('earned')&&!step.classList.contains('current')));
  });
  document.querySelectorAll('.profile-rank-icon').forEach(slot=>{
-   if(slot.querySelector('.proplet-rank-art'))return;const key=slot.textContent.trim(),name=slot.parentElement?.querySelector('strong')?.textContent||'',match=name.match(/^(\d+)/),index=Math.max(0,Number(match?.[1]||1)-1);slot.replaceChildren(rankArt(key,index,name));
+   if(slot.querySelector('.proplet-rank-art,.ribbon-art'))return;const key=slot.textContent.trim(),name=slot.parentElement?.querySelector('strong')?.textContent||'',match=name.match(/^(\d+)/),index=Math.max(0,Number(match?.[1]||1)-1);slot.replaceChildren(rankArt(key,index,name));
+ });
+}
+
+function applyRibbonContexts(){
+ document.querySelectorAll('.unlock-row').forEach(row=>{
+  const slot=row.querySelector('.emoji');if(!slot||slot.querySelector('.ribbon-art'))return;
+  const name=row.querySelector('strong')?.textContent?.trim()||'';
+  const ribbon=window.PropletRibbonArt?.art(name);if(ribbon){slot.replaceChildren(ribbon);slot.classList.add('ribbon-slot')}
+ });
+ document.querySelectorAll('.result-medal-1,.home-progress-level-icon').forEach(slot=>{
+  if(slot.querySelector('.ribbon-art'))return;
+  const name=slot.classList.contains('result-medal-1')?'Zlatá medaile':slot.parentElement?.textContent?.match(/Nováček|Slovní alchymista|Legenda beze konce/)?.[0];
+  const ribbon=window.PropletRibbonArt?.art(name,{size:32});if(ribbon){slot.replaceChildren(ribbon);slot.classList.add('ribbon-slot')}
  });
 }
 
@@ -440,7 +456,7 @@ function updateThemeMeta(){
 }
 let queued=false;
 function apply(){
- queued=false;applyAvatars();applyBespokeProgressArt();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
+ queued=false;applyAvatars();applyBespokeProgressArt();applyRibbonContexts();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
 }
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(apply)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();

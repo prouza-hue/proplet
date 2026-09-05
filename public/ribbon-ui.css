@@ -1,0 +1,100 @@
+/* Proplet ribbon presentation. Theme roles, not changes to game state. */
+html.ribbon-ui{
+ --r-accent:#197970;--r-accent-soft:#EAF3ED;--r-paper:#FFFDF7;--r-surface:#FFFFFF;
+ --r-ink:#243431;--r-muted:#626D64;--r-edge:#DDDCCF;--r-track:#E4EAE2;
+ --r-active:#F1C962;--r-active-edge:#A87812;--r-active-ink:#302A18;
+ --r-error:#BA4D43;--r-error-soft:#FBE6E0;
+ --purple:var(--r-accent);--purple2:#3A9B86;--muted:var(--r-muted);
+}
+html.ribbon-ui[data-theme="dark"]{
+ --r-accent:#78CABA;--r-accent-soft:#263D39;--r-paper:#20282A;--r-surface:#293234;
+ --r-ink:#F4EEDD;--r-muted:#B9C3B9;--r-edge:#485552;--r-track:#394743;
+ --r-active:#D7AA45;--r-active-edge:#F2CD70;--r-active-ink:#292718;
+ --r-error:#F38C7B;--r-error-soft:#513632;
+ --bg:var(--r-paper);--paper:var(--r-surface);--ink:var(--r-ink);--line:var(--r-edge);
+}
+html.ribbon-ui .ribbon-art{display:inline-grid!important;place-items:center;position:relative;width:40px;height:40px;min-width:0;vertical-align:middle;flex-shrink:0;line-height:0}
+html.ribbon-ui .ribbon-art img{display:block;width:100%;height:100%;object-fit:contain;padding:0;border:0;background:none;box-shadow:none}
+html.ribbon-ui .ribbon-art .ribbon-dark{display:none}
+html.ribbon-ui[data-theme="dark"] .ribbon-art .ribbon-light{display:none}
+html.ribbon-ui[data-theme="dark"] .ribbon-art .ribbon-dark{display:block}
+html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"]){filter:grayscale(.85);opacity:.8}
+html.ribbon-ui .ribbon-slot{display:inline-grid!important;place-items:center;background:transparent!important;border:0!important;box-shadow:none!important}
+html.ribbon-ui #screen-profile .level-step:has(.ribbon-art){opacity:1}
+html.ribbon-ui #screen-profile .level-step .ribbon-art{width:42px;height:42px}
+html.ribbon-ui #screen-profile .achievement .ribbon-art,html.ribbon-ui #screen-profile .profile-badge .ribbon-art{width:34px;height:34px}
+html.ribbon-ui #screen-profile .achievement-peek .ribbon-art{width:30px;height:30px}
+html.ribbon-ui #screen-profile .achievement-peek b:has(.ribbon-art){display:grid!important;place-items:center;font-size:0;background:none!important;box-shadow:none!important;border:0!important}
+html.ribbon-ui #screen-profile .achievement:has(.ribbon-art),html.ribbon-ui #screen-profile .profile-badge:has(.ribbon-art){opacity:1}
+html.ribbon-ui .home-progress-level-icon:has(.ribbon-art){background:none!important}
+html.ribbon-ui .home-progress-level-icon .ribbon-art{width:32px;height:32px}
+html.ribbon-ui .result-medal .ribbon-art{width:40px;height:40px}
+/* One functional accent. Difficulty and found-word palettes keep their meaning. */
+html.ribbon-ui .level-step.current,
+html.ribbon-ui .achievement-summary,
+html.ribbon-ui .ranking-segment,
+html.ribbon-ui .theme-segment,
+html.ribbon-ui .account-tabs,
+html.ribbon-ui .win-result-hero{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important;background-image:none!important}
+html.ribbon-ui .level-step.current{border-color:var(--r-accent)!important;box-shadow:0 0 0 1px var(--r-accent)!important}
+html.ribbon-ui .level-step.current .level-step-num,
+html.ribbon-ui .achievement-progress>span,
+html.ribbon-ui .achievement-summary-progress>span{background:var(--r-accent)!important;background-image:none!important}
+html.ribbon-ui .achievement-progress,html.ribbon-ui .achievement-summary-progress{background:var(--r-track)!important}
+html.ribbon-ui .achievement-summary-copy>span,
+html.ribbon-ui .achievement-summary-toggle,
+html.ribbon-ui .ranking-segment button.active,
+html.ribbon-ui .current-word strong{color:var(--r-accent)!important}
+html.ribbon-ui .achievement-summary-toggle{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .bottom-nav button.active{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
+html.ribbon-ui .bottom-nav{background:var(--r-paper)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .achievement-summary small{color:var(--r-muted)!important}
+/* Dark mode has its own ink and surfaces. */
+html.ribbon-ui[data-theme="dark"],html.ribbon-ui[data-theme="dark"] body{background:var(--r-paper)!important;color:var(--r-ink)!important}
+html.ribbon-ui[data-theme="dark"] .card,
+html.ribbon-ui[data-theme="dark"] .settings-card,
+html.ribbon-ui[data-theme="dark"] .profile-card,
+html.ribbon-ui[data-theme="dark"] .profile-account-hub,
+html.ribbon-ui[data-theme="dark"] .home-competition-card,
+html.ribbon-ui[data-theme="dark"] .ranking-section,
+html.ribbon-ui[data-theme="dark"] .home-diff-tile,
+html.ribbon-ui[data-theme="dark"] .home-resume-card,
+html.ribbon-ui[data-theme="dark"] .game-info,
+html.ribbon-ui[data-theme="dark"] .current-word,
+html.ribbon-ui[data-theme="dark"] .board-stage,
+html.ribbon-ui[data-theme="dark"] .modal-card{background:var(--r-surface)!important;border-color:var(--r-edge)!important;color:var(--r-ink)!important;box-shadow:0 3px 12px #11191B44!important}
+html.ribbon-ui[data-theme="dark"] .muted,
+html.ribbon-ui[data-theme="dark"] .eyebrow,
+html.ribbon-ui[data-theme="dark"] .stat-label,
+html.ribbon-ui[data-theme="dark"] .profile-account-hub p,
+html.ribbon-ui[data-theme="dark"] .free-level-desc,
+html.ribbon-ui[data-theme="dark"] .difficulty-card p,
+html.ribbon-ui[data-theme="dark"] .home-diff-tile small,
+html.ribbon-ui[data-theme="dark"] .home-resume-card small{color:var(--r-muted)!important}
+html.ribbon-ui[data-theme="dark"] .home-progress-level,
+html.ribbon-ui[data-theme="dark"] #screen-profile .profile-rank-stat{background:#3B3526!important;border-color:#7B6942!important;color:#F7E6BA!important}
+html.ribbon-ui[data-theme="dark"] .home-progress-level-track{background:#574B2D!important}
+html.ribbon-ui[data-theme="dark"] .home-progress-level-track b{background:#DBB75D!important}
+html.ribbon-ui[data-theme="dark"] #quickPlayCard.home-free-section{background:transparent!important;border:0!important;box-shadow:none!important}
+html.ribbon-ui[data-theme="dark"] .secondary-btn,
+html.ribbon-ui[data-theme="dark"] input,
+html.ribbon-ui[data-theme="dark"] select,
+html.ribbon-ui[data-theme="dark"] textarea{background:#313D3E!important;color:var(--r-ink)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui[data-theme="dark"] .text-btn,html.ribbon-ui[data-theme="dark"] .quick-all-btn{color:var(--r-accent)!important}
+/* State specificity is deliberate: dark available must never override active/wrong. */
+html.ribbon-ui .board .cell{background:var(--r-surface)!important;color:var(--r-ink)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui[data-theme="dark"] .board .cell{background:#344042!important;color:var(--r-ink)!important;border-color:#63716B!important;box-shadow:0 2px 0 #142022!important}
+html.ribbon-ui .board .cell.active,html.ribbon-ui[data-theme="dark"] .board .cell.active{background:var(--r-active)!important;border-color:var(--r-active-edge)!important;color:var(--r-active-ink)!important;transform:scale(.97)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--r-active) 40%,transparent)!important;transition-duration:60ms!important}
+html.ribbon-ui .board .cell.used{background:color-mix(in srgb,var(--word-color) 35%,#FFFEF9)!important;border-color:color-mix(in srgb,var(--word-color) 65%,#9DABA2)!important;color:#253C33!important}
+html.ribbon-ui[data-theme="dark"] .board .cell.used{background:color-mix(in srgb,var(--word-color) 33%,#243235)!important;border-color:color-mix(in srgb,var(--word-color) 72%,#53695E)!important;color:#FFF1DC!important}
+html.ribbon-ui .board .cell.wrong-flash,html.ribbon-ui[data-theme="dark"] .board .cell.wrong-flash{background:var(--r-error-soft)!important;border-color:var(--r-error)!important;color:var(--r-ink)!important;animation:wrongCellNudge 180ms ease;box-shadow:0 0 0 2px var(--r-error)!important}
+html.ribbon-ui .board .cell.just-found{animation:ribbonWordSeat 420ms cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--found-delay,0ms);box-shadow:0 0 0 2px color-mix(in srgb,var(--word-color) 60%,transparent)!important}
+html.ribbon-ui #pathLayer .path-active{display:block!important;stroke:var(--r-active-edge)!important;opacity:1!important}
+html.ribbon-ui #pathLayer .path-found{stroke:var(--path-color)!important;opacity:.8!important}
+html.ribbon-ui #pathLayer .path-wrong{stroke:var(--r-error)!important;opacity:1!important}
+html.ribbon-ui .game-message{font-size:14px!important;line-height:1.4!important}
+html.ribbon-ui .game-message.good{color:var(--r-accent)!important}
+html.ribbon-ui .game-message.bad{color:var(--r-error)!important}
+@keyframes ribbonWordSeat{0%{transform:scale(.98)}32%{transform:scale(1.055)}100%{transform:scale(1)}}
+@media(max-width:600px){html.ribbon-ui .game-message{font-size:15px!important}html.ribbon-ui .app-footer{margin-bottom:142px!important}}
+@media(prefers-reduced-motion:reduce){html.ribbon-ui .board .cell{animation:none!important;transition:none!important}html.ribbon-ui .board .cell.active{transform:none!important}}

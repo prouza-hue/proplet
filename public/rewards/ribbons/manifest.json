@@ -1,0 +1,97 @@
+{
+  "status": "Designový pilot, není nasazeno",
+  "revision": 4,
+  "sizes": {
+    "small": [
+      24,
+      32
+    ],
+    "regular": [
+      40,
+      64
+    ]
+  },
+  "items": [
+    {
+      "key": "novacek",
+      "name": "Nováček",
+      "files": [
+        "light/novacek-regular.svg",
+        "light/novacek-small.svg",
+        "dark/novacek-regular.svg",
+        "dark/novacek-small.svg"
+      ]
+    },
+    {
+      "key": "alchymista",
+      "name": "Slovní alchymista",
+      "files": [
+        "light/alchymista-regular.svg",
+        "light/alchymista-small.svg",
+        "dark/alchymista-regular.svg",
+        "dark/alchymista-small.svg"
+      ]
+    },
+    {
+      "key": "legenda",
+      "name": "Legenda beze konce",
+      "files": [
+        "light/legenda-regular.svg",
+        "light/legenda-small.svg",
+        "dark/legenda-regular.svg",
+        "dark/legenda-small.svg"
+      ]
+    },
+    {
+      "key": "prvni-proplet",
+      "name": "První Proplet",
+      "files": [
+        "light/prvni-proplet-regular.svg",
+        "light/prvni-proplet-small.svg",
+        "dark/prvni-proplet-regular.svg",
+        "dark/prvni-proplet-small.svg"
+      ]
+    },
+    {
+      "key": "nemesis",
+      "name": "Mozkomorova Nemesis",
+      "files": [
+        "light/nemesis-regular.svg",
+        "light/nemesis-small.svg",
+        "dark/nemesis-regular.svg",
+        "dark/nemesis-small.svg"
+      ]
+    },
+    {
+      "key": "tyden",
+      "name": "Týden v plamenech",
+      "files": [
+        "light/tyden-regular.svg",
+        "light/tyden-small.svg",
+        "dark/tyden-regular.svg",
+        "dark/tyden-small.svg"
+      ]
+    },
+    {
+      "key": "medaile",
+      "name": "Zlatá medaile",
+      "files": [
+        "light/medaile-regular.svg",
+        "light/medaile-small.svg",
+        "dark/medaile-regular.svg",
+        "dark/medaile-small.svg"
+      ]
+    },
+    {
+      "key": "zamceno",
+      "name": "Zamčený První Proplet",
+      "files": [
+        "light/zamceno-regular.svg",
+        "light/zamceno-small.svg",
+        "dark/zamceno-regular.svg",
+        "dark/zamceno-small.svg"
+      ]
+    }
+  ],
+  "changes": "Pouze vlastní číslice 1 a 7"
+}
