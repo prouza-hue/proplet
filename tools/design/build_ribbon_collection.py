@@ -155,6 +155,7 @@ for a in achievements:
  add('achievement-'+a['id'],a['name'],'achievement',SERIES[g][i],i,g)
 for i,b in enumerate(badges):add(f'streak-{i+1:02}',b['name'],'streak',STREAK[i],min(6,i))
 for n,name in enumerate(['Zlatá medaile','Stříbrná medaile','Bronzová medaile'],1):add(f'medal-{n}',name,'medal','cup')
+for key,name,motif in [('complete','Dokončeno','knot'),('daily','Denní výzva','sun'),('streak','Herní série','flame'),('secret','Odhalená tajenka','eye')]:add('symbol-'+key,name,'symbol',motif)
 manifest={'revision':5,'status':'Complete collection candidate; pilot geometry preserved','sizes':{'small':[24,32],'regular':[40,64]},'items':items}
 (OUT/'collection.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 # Explicit category+name avoids the two unrelated rewards named Blesk.

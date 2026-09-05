@@ -8,5 +8,4 @@ function render(){grid.replaceChildren();for(const name of Object.keys(window.Pr
  card.append(sizes);grid.append(card);
 }}
 family.onchange=render;locked.onchange=render;document.querySelector('#theme').onclick=e=>{const dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';document.body.classList.toggle('dark',dark);e.target.textContent=dark?'Světlý režim':'Tmavý režim'};
-const frame=document.querySelector('iframe');document.querySelector('details').addEventListener('toggle',e=>{if(e.target.open&&!frame.getAttribute('src'))frame.src=frame.dataset.src});
-for(const button of document.querySelectorAll('[data-width]'))button.onclick=()=>{frame.width=button.dataset.width;for(const b of document.querySelectorAll('[data-width]'))b.setAttribute('aria-pressed',String(b===button))};render();
+render();

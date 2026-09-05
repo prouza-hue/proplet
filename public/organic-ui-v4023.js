@@ -412,6 +412,14 @@ function applyRibbonContexts(){
   const name=row.querySelector('strong')?.textContent?.trim()||'';
   mount(row.querySelector('.emoji'),name,name.startsWith('Nový odznak')?'streak':'achievement',40);
  });
+ document.querySelectorAll('.streak-icon,.home-progress-streak i').forEach(slot=>mount(slot,'Herní série','symbol',24));
+ const win=document.querySelector('#winBadge');
+ if(win&&!win.querySelector('.ribbon-art')){
+  const fresh=document.querySelector('#newBadgeBox .unlock-row strong')?.textContent||'';
+  const title=document.querySelector('#winTitle')?.textContent||'';
+  if(fresh.startsWith('Nový odznak'))mount(win,fresh,'streak',64);
+  else mount(win,/Tajenka/.test(title)?'Odhalená tajenka':win.textContent.includes('☀')?'Denní výzva':'Dokončeno','symbol',64);
+ }
  const medals=['Zlatá medaile','Stříbrná medaile','Bronzová medaile'];
  document.querySelectorAll('.result-medal').forEach(slot=>{
   const n=[1,2,3].find(n=>slot.classList.contains('result-medal-'+n));if(n)mount(slot,medals[n-1],'medal',40);

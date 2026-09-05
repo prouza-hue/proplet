@@ -1391,6 +1391,46 @@
       "stage": 0,
       "key": "medal-3",
       "pilot": false
+    },
+    {
+      "id": "symbol-complete",
+      "name": "Dokončeno",
+      "category": "symbol",
+      "group": null,
+      "motif": "knot",
+      "stage": 0,
+      "key": "symbol-complete",
+      "pilot": false
+    },
+    {
+      "id": "symbol-daily",
+      "name": "Denní výzva",
+      "category": "symbol",
+      "group": null,
+      "motif": "sun",
+      "stage": 0,
+      "key": "symbol-daily",
+      "pilot": false
+    },
+    {
+      "id": "symbol-streak",
+      "name": "Herní série",
+      "category": "symbol",
+      "group": null,
+      "motif": "flame",
+      "stage": 0,
+      "key": "symbol-streak",
+      "pilot": false
+    },
+    {
+      "id": "symbol-secret",
+      "name": "Odhalená tajenka",
+      "category": "symbol",
+      "group": null,
+      "motif": "eye",
+      "stage": 0,
+      "key": "symbol-secret",
+      "pilot": false
     }
   ]
 }

@@ -137,3 +137,10 @@ html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"])::after{content
 html.ribbon-ui .achievement:not(.earned)>strong,html.ribbon-ui .profile-badge:not(.earned)>strong{color:var(--r-muted)!important}
 html.ribbon-ui .level-step.current .level-num{color:var(--r-paper)!important}
 html.ribbon-ui .achievement-peek.earned:has(.ribbon-art){background:var(--r-accent-soft)!important}
+html.ribbon-ui .win-badge.ribbon-slot{background:none!important;box-shadow:none!important;animation:none!important}
+html.ribbon-ui .win-badge .ribbon-art{width:64px;height:64px}
+html.ribbon-ui .streak-icon .ribbon-art,html.ribbon-ui .home-progress-streak i .ribbon-art{width:24px;height:24px}
+/* Locked rewards sit on neutral paper; colour is earned by the object. */
+html.ribbon-ui #screen-profile .level-step:not(.current):not(.earned),html.ribbon-ui #screen-profile .achievement:not(.earned),html.ribbon-ui #screen-profile .profile-badge:not(.earned){background:var(--r-paper)!important;border-color:var(--r-edge)!important;box-shadow:none!important}
+html.ribbon-ui .achievement-peek:not(.earned):has(.ribbon-art){background:transparent!important;border-color:var(--r-edge)!important}
+html.ribbon-ui[data-theme="dark"] .ribbon-art.is-locked:not([data-ribbon="zamceno"]){filter:grayscale(1) brightness(1.7);opacity:.85}
