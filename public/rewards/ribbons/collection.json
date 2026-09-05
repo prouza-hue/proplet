@@ -1,0 +1,1396 @@
+{
+  "revision": 5,
+  "status": "Complete collection candidate; pilot geometry preserved",
+  "sizes": {
+    "small": [
+      24,
+      32
+    ],
+    "regular": [
+      40,
+      64
+    ]
+  },
+  "items": [
+    {
+      "id": "rank-01",
+      "name": "Nováček",
+      "category": "rank",
+      "group": null,
+      "motif": "leaf",
+      "stage": 0,
+      "key": "novacek",
+      "pilot": true
+    },
+    {
+      "id": "rank-02",
+      "name": "Písmenkář",
+      "category": "rank",
+      "group": null,
+      "motif": "letter",
+      "stage": 0,
+      "key": "rank-02",
+      "pilot": false
+    },
+    {
+      "id": "rank-03",
+      "name": "Slovolovec",
+      "category": "rank",
+      "group": null,
+      "motif": "search",
+      "stage": 0,
+      "key": "rank-03",
+      "pilot": false
+    },
+    {
+      "id": "rank-04",
+      "name": "Hledač nití",
+      "category": "rank",
+      "group": null,
+      "motif": "spool",
+      "stage": 0,
+      "key": "rank-04",
+      "pilot": false
+    },
+    {
+      "id": "rank-05",
+      "name": "Propletač",
+      "category": "rank",
+      "group": null,
+      "motif": "knot",
+      "stage": 0,
+      "key": "rank-05",
+      "pilot": false
+    },
+    {
+      "id": "rank-06",
+      "name": "Kličkař",
+      "category": "rank",
+      "group": null,
+      "motif": "loop",
+      "stage": 1,
+      "key": "rank-06",
+      "pilot": false
+    },
+    {
+      "id": "rank-07",
+      "name": "Mistr cest",
+      "category": "rank",
+      "group": null,
+      "motif": "compass",
+      "stage": 1,
+      "key": "rank-07",
+      "pilot": false
+    },
+    {
+      "id": "rank-08",
+      "name": "Slovní taktik",
+      "category": "rank",
+      "group": null,
+      "motif": "rook",
+      "stage": 1,
+      "key": "rank-08",
+      "pilot": false
+    },
+    {
+      "id": "rank-09",
+      "name": "Slovní mág",
+      "category": "rank",
+      "group": null,
+      "motif": "spark",
+      "stage": 1,
+      "key": "rank-09",
+      "pilot": false
+    },
+    {
+      "id": "rank-10",
+      "name": "Uzlovač",
+      "category": "rank",
+      "group": null,
+      "motif": "knot",
+      "stage": 1,
+      "key": "rank-10",
+      "pilot": false
+    },
+    {
+      "id": "rank-11",
+      "name": "Legenda Propletu",
+      "category": "rank",
+      "group": null,
+      "motif": "crown",
+      "stage": 2,
+      "key": "rank-11",
+      "pilot": false
+    },
+    {
+      "id": "rank-12",
+      "name": "Cestář",
+      "category": "rank",
+      "group": null,
+      "motif": "route",
+      "stage": 2,
+      "key": "rank-12",
+      "pilot": false
+    },
+    {
+      "id": "rank-13",
+      "name": "Krotitel",
+      "category": "rank",
+      "group": null,
+      "motif": "dragon",
+      "stage": 2,
+      "key": "rank-13",
+      "pilot": false
+    },
+    {
+      "id": "rank-14",
+      "name": "Mistr zákrut",
+      "category": "rank",
+      "group": null,
+      "motif": "spiral",
+      "stage": 2,
+      "key": "rank-14",
+      "pilot": false
+    },
+    {
+      "id": "rank-15",
+      "name": "Labyrintník",
+      "category": "rank",
+      "group": null,
+      "motif": "maze",
+      "stage": 2,
+      "key": "rank-15",
+      "pilot": false
+    },
+    {
+      "id": "rank-16",
+      "name": "Velmistr Propletu",
+      "category": "rank",
+      "group": null,
+      "motif": "gem",
+      "stage": 3,
+      "key": "rank-16",
+      "pilot": false
+    },
+    {
+      "id": "rank-17",
+      "name": "Propletový ninja",
+      "category": "rank",
+      "group": null,
+      "motif": "ninja",
+      "stage": 3,
+      "key": "rank-17",
+      "pilot": false
+    },
+    {
+      "id": "rank-18",
+      "name": "Slovní alchymista",
+      "category": "rank",
+      "group": null,
+      "motif": "vase",
+      "stage": 3,
+      "key": "alchymista",
+      "pilot": true
+    },
+    {
+      "id": "rank-19",
+      "name": "Mistr šneků",
+      "category": "rank",
+      "group": null,
+      "motif": "snail",
+      "stage": 3,
+      "key": "rank-19",
+      "pilot": false
+    },
+    {
+      "id": "rank-20",
+      "name": "Mřížkový mág",
+      "category": "rank",
+      "group": null,
+      "motif": "orb",
+      "stage": 3,
+      "key": "rank-20",
+      "pilot": false
+    },
+    {
+      "id": "rank-21",
+      "name": "Nadslovník",
+      "category": "rank",
+      "group": null,
+      "motif": "galaxy",
+      "stage": 4,
+      "key": "rank-21",
+      "pilot": false
+    },
+    {
+      "id": "rank-22",
+      "name": "Krotitel Mozkožroutů",
+      "category": "rank",
+      "group": null,
+      "motif": "brain",
+      "stage": 4,
+      "key": "rank-22",
+      "pilot": false
+    },
+    {
+      "id": "rank-23",
+      "name": "Král mřížky",
+      "category": "rank",
+      "group": null,
+      "motif": "gate",
+      "stage": 4,
+      "key": "rank-23",
+      "pilot": false
+    },
+    {
+      "id": "rank-24",
+      "name": "Arcimistr Propletu",
+      "category": "rank",
+      "group": null,
+      "motif": "graduate",
+      "stage": 4,
+      "key": "rank-24",
+      "pilot": false
+    },
+    {
+      "id": "rank-25",
+      "name": "Slovočaroděj",
+      "category": "rank",
+      "group": null,
+      "motif": "wand",
+      "stage": 4,
+      "key": "rank-25",
+      "pilot": false
+    },
+    {
+      "id": "rank-26",
+      "name": "Propletový titán",
+      "category": "rank",
+      "group": null,
+      "motif": "arch",
+      "stage": 5,
+      "key": "rank-26",
+      "pilot": false
+    },
+    {
+      "id": "rank-27",
+      "name": "Mistr nekonečna",
+      "category": "rank",
+      "group": null,
+      "motif": "infinity",
+      "stage": 5,
+      "key": "rank-27",
+      "pilot": false
+    },
+    {
+      "id": "rank-28",
+      "name": "Hvězdný propletač",
+      "category": "rank",
+      "group": null,
+      "motif": "comet",
+      "stage": 5,
+      "key": "rank-28",
+      "pilot": false
+    },
+    {
+      "id": "rank-29",
+      "name": "Orbitální luštitel",
+      "category": "rank",
+      "group": null,
+      "motif": "orbit",
+      "stage": 5,
+      "key": "rank-29",
+      "pilot": false
+    },
+    {
+      "id": "rank-30",
+      "name": "Galaktický slovolovec",
+      "category": "rank",
+      "group": null,
+      "motif": "rocket",
+      "stage": 5,
+      "key": "rank-30",
+      "pilot": false
+    },
+    {
+      "id": "rank-31",
+      "name": "Strážce všech cest",
+      "category": "rank",
+      "group": null,
+      "motif": "shield",
+      "stage": 6,
+      "key": "rank-31",
+      "pilot": false
+    },
+    {
+      "id": "rank-32",
+      "name": "Absolutní Propletač",
+      "category": "rank",
+      "group": null,
+      "motif": "cup",
+      "stage": 6,
+      "key": "rank-32",
+      "pilot": false
+    },
+    {
+      "id": "rank-33",
+      "name": "Strážce tajných cest",
+      "category": "rank",
+      "group": null,
+      "motif": "key",
+      "stage": 6,
+      "key": "rank-33",
+      "pilot": false
+    },
+    {
+      "id": "rank-34",
+      "name": "Architekt labyrintu",
+      "category": "rank",
+      "group": null,
+      "motif": "web",
+      "stage": 6,
+      "key": "rank-34",
+      "pilot": false
+    },
+    {
+      "id": "rank-35",
+      "name": "Legenda beze konce",
+      "category": "rank",
+      "group": null,
+      "motif": "infinity",
+      "stage": 6,
+      "key": "legenda",
+      "pilot": true
+    },
+    {
+      "id": "achievement-all-1",
+      "name": "První Proplet",
+      "category": "achievement",
+      "group": "general",
+      "motif": "grid",
+      "stage": 0,
+      "key": "prvni-proplet",
+      "pilot": true
+    },
+    {
+      "id": "achievement-all-5",
+      "name": "Pětka v kapse",
+      "category": "achievement",
+      "group": "general",
+      "motif": "knot",
+      "stage": 1,
+      "key": "achievement-all-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-10",
+      "name": "Rozjezd",
+      "category": "achievement",
+      "group": "general",
+      "motif": "route",
+      "stage": 2,
+      "key": "achievement-all-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-25",
+      "name": "Čtvrtsto",
+      "category": "achievement",
+      "group": "general",
+      "motif": "compass",
+      "stage": 3,
+      "key": "achievement-all-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-50",
+      "name": "Půl stovky",
+      "category": "achievement",
+      "group": "general",
+      "motif": "bridge",
+      "stage": 4,
+      "key": "achievement-all-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-100",
+      "name": "Stovka úloh",
+      "category": "achievement",
+      "group": "general",
+      "motif": "gate",
+      "stage": 5,
+      "key": "achievement-all-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-250",
+      "name": "Nezastavitelný",
+      "category": "achievement",
+      "group": "general",
+      "motif": "rocket",
+      "stage": 6,
+      "key": "achievement-all-250",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-400",
+      "name": "Propletový maratonec",
+      "category": "achievement",
+      "group": "general",
+      "motif": "flag",
+      "stage": 7,
+      "key": "achievement-all-400",
+      "pilot": false
+    },
+    {
+      "id": "achievement-all-800",
+      "name": "Nekonečný propletač",
+      "category": "achievement",
+      "group": "general",
+      "motif": "infinity",
+      "stage": 8,
+      "key": "achievement-all-800",
+      "pilot": false
+    },
+    {
+      "id": "achievement-easy-1",
+      "name": "První klíček",
+      "category": "achievement",
+      "group": "easy",
+      "motif": "leaf",
+      "stage": 0,
+      "key": "achievement-easy-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-easy-10",
+      "name": "Rozcvička",
+      "category": "achievement",
+      "group": "easy",
+      "motif": "tree",
+      "stage": 1,
+      "key": "achievement-easy-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-easy-25",
+      "name": "Lehká váha",
+      "category": "achievement",
+      "group": "easy",
+      "motif": "flower",
+      "stage": 2,
+      "key": "achievement-easy-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-easy-50",
+      "name": "Půlka zahrady",
+      "category": "achievement",
+      "group": "easy",
+      "motif": "tree",
+      "stage": 3,
+      "key": "achievement-easy-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-easy-100",
+      "name": "Zelený velmistr",
+      "category": "achievement",
+      "group": "easy",
+      "motif": "gate",
+      "stage": 4,
+      "key": "achievement-easy-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-easy-200",
+      "name": "Vládce zelené banky",
+      "category": "achievement",
+      "group": "easy",
+      "motif": "tree",
+      "stage": 5,
+      "key": "achievement-easy-200",
+      "pilot": false
+    },
+    {
+      "id": "achievement-medium-1",
+      "name": "Hlavička",
+      "category": "achievement",
+      "group": "medium",
+      "motif": "brain",
+      "stage": 0,
+      "key": "achievement-medium-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-medium-10",
+      "name": "Mozkovna",
+      "category": "achievement",
+      "group": "medium",
+      "motif": "brain",
+      "stage": 1,
+      "key": "achievement-medium-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-medium-25",
+      "name": "Přemýšlivec",
+      "category": "achievement",
+      "group": "medium",
+      "motif": "search",
+      "stage": 2,
+      "key": "achievement-medium-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-medium-50",
+      "name": "Šedá kůra",
+      "category": "achievement",
+      "group": "medium",
+      "motif": "helix",
+      "stage": 3,
+      "key": "achievement-medium-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-medium-100",
+      "name": "Mistr středu",
+      "category": "achievement",
+      "group": "medium",
+      "motif": "graduate",
+      "stage": 4,
+      "key": "achievement-medium-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-medium-200",
+      "name": "Dvojitá mozkovna",
+      "category": "achievement",
+      "group": "medium",
+      "motif": "helix",
+      "stage": 5,
+      "key": "achievement-medium-200",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-1",
+      "name": "Odvážlivec",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "bolt",
+      "stage": 0,
+      "key": "achievement-hard-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-5",
+      "name": "Rozbuška",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "flame",
+      "stage": 1,
+      "key": "achievement-hard-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-10",
+      "name": "Nebojácný",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "shield",
+      "stage": 2,
+      "key": "achievement-hard-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-25",
+      "name": "Těžká práce",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "peak",
+      "stage": 3,
+      "key": "achievement-hard-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-50",
+      "name": "Ocelová hlava",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "arch",
+      "stage": 4,
+      "key": "achievement-hard-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-100",
+      "name": "Demoliční četa",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "cup",
+      "stage": 5,
+      "key": "achievement-hard-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hard-200",
+      "name": "Nezničitelná hlava",
+      "category": "achievement",
+      "group": "hard",
+      "motif": "peak",
+      "stage": 6,
+      "key": "achievement-hard-200",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-1",
+      "name": "Mozkožrout",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "brain",
+      "stage": 0,
+      "key": "achievement-hc-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-5",
+      "name": "Nakrmil Mozkožrouta",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "dragon",
+      "stage": 1,
+      "key": "achievement-hc-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-10",
+      "name": "Neurony v plamenech",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "flame",
+      "stage": 2,
+      "key": "achievement-hc-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-25",
+      "name": "Požírač šneků",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "snail",
+      "stage": 3,
+      "key": "achievement-hc-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-50",
+      "name": "Mozkový kulturista",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "brain",
+      "stage": 4,
+      "key": "achievement-hc-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-100",
+      "name": "Mozkožroutí král",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "crown",
+      "stage": 5,
+      "key": "achievement-hc-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-hc-200",
+      "name": "Mozkožroutí nesmrtelný",
+      "category": "achievement",
+      "group": "hardcore",
+      "motif": "infinity",
+      "stage": 6,
+      "key": "achievement-hc-200",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-1",
+      "name": "Dnešní dávka",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "sun",
+      "stage": 0,
+      "key": "achievement-daily-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-3",
+      "name": "Tři slunce",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "sun",
+      "stage": 1,
+      "key": "achievement-daily-3",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-7",
+      "name": "Týdenní hráč",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "calendar",
+      "stage": 2,
+      "key": "achievement-daily-7",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-14",
+      "name": "Dva týdny",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "calendar",
+      "stage": 3,
+      "key": "achievement-daily-14",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-30",
+      "name": "Měsíčník",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "orbit",
+      "stage": 4,
+      "key": "achievement-daily-30",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-50",
+      "name": "Sluneční sběratel",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "flower",
+      "stage": 5,
+      "key": "achievement-daily-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-100",
+      "name": "Stovka rán",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "sun",
+      "stage": 6,
+      "key": "achievement-daily-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-200",
+      "name": "Kalendářní démon",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "compass",
+      "stage": 7,
+      "key": "achievement-daily-200",
+      "pilot": false
+    },
+    {
+      "id": "achievement-daily-365",
+      "name": "Celý rok",
+      "category": "achievement",
+      "group": "daily",
+      "motif": "orbit",
+      "stage": 8,
+      "key": "achievement-daily-365",
+      "pilot": false
+    },
+    {
+      "id": "achievement-tajenka-1",
+      "name": "První tajemství",
+      "category": "achievement",
+      "group": "tajenka",
+      "motif": "eye",
+      "stage": 0,
+      "key": "achievement-tajenka-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-tajenka-3",
+      "name": "Čtenář mezi řádky",
+      "category": "achievement",
+      "group": "tajenka",
+      "motif": "key",
+      "stage": 1,
+      "key": "achievement-tajenka-3",
+      "pilot": false
+    },
+    {
+      "id": "achievement-tajenka-5",
+      "name": "Sběratel myšlenek",
+      "category": "achievement",
+      "group": "tajenka",
+      "motif": "orb",
+      "stage": 2,
+      "key": "achievement-tajenka-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-tajenka-10",
+      "name": "Mistr skrytých vět",
+      "category": "achievement",
+      "group": "tajenka",
+      "motif": "scroll",
+      "stage": 3,
+      "key": "achievement-tajenka-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-mozkomor-1",
+      "name": "Vstup do Hlubiny",
+      "category": "achievement",
+      "group": "mozkomor",
+      "motif": "portal",
+      "stage": 0,
+      "key": "achievement-mozkomor-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-mozkomor-5",
+      "name": "Pětkrát bez milosti",
+      "category": "achievement",
+      "group": "mozkomor",
+      "motif": "brain",
+      "stage": 1,
+      "key": "achievement-mozkomor-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-mozkomor-10",
+      "name": "Krotitel chaosu",
+      "category": "achievement",
+      "group": "mozkomor",
+      "motif": "spiral",
+      "stage": 2,
+      "key": "achievement-mozkomor-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-mozkomor-25",
+      "name": "Pán zákrut",
+      "category": "achievement",
+      "group": "mozkomor",
+      "motif": "web",
+      "stage": 3,
+      "key": "achievement-mozkomor-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-mozkomor-50",
+      "name": "Neuron z ocele",
+      "category": "achievement",
+      "group": "mozkomor",
+      "motif": "helix",
+      "stage": 4,
+      "key": "achievement-mozkomor-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-mozkomor-100",
+      "name": "Mozkomorova Nemesis",
+      "category": "achievement",
+      "group": "mozkomor",
+      "motif": "eye",
+      "stage": 5,
+      "key": "nemesis",
+      "pilot": true
+    },
+    {
+      "id": "achievement-discovery-1",
+      "name": "Slovo navíc",
+      "category": "achievement",
+      "group": "discovery",
+      "motif": "branch",
+      "stage": 0,
+      "key": "achievement-discovery-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-discovery-10",
+      "name": "Boční stezka",
+      "category": "achievement",
+      "group": "discovery",
+      "motif": "route",
+      "stage": 1,
+      "key": "achievement-discovery-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-discovery-50",
+      "name": "Lovec skrytých slov",
+      "category": "achievement",
+      "group": "discovery",
+      "motif": "lamp",
+      "stage": 2,
+      "key": "achievement-discovery-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-discovery-100",
+      "name": "Slovní archeolog",
+      "category": "achievement",
+      "group": "discovery",
+      "motif": "vase",
+      "stage": 3,
+      "key": "achievement-discovery-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-1",
+      "name": "Bez berliček",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "check",
+      "stage": 0,
+      "key": "achievement-clean-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-5",
+      "name": "Čistá pětka",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "flower",
+      "stage": 1,
+      "key": "achievement-clean-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-10",
+      "name": "Čistá desítka",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "check",
+      "stage": 2,
+      "key": "achievement-clean-10",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-25",
+      "name": "Bez nápovědy",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "gem",
+      "stage": 3,
+      "key": "achievement-clean-25",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-50",
+      "name": "Samostatný mozek",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "wing",
+      "stage": 4,
+      "key": "achievement-clean-50",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-100",
+      "name": "Čistokrevný propletač",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "mirror",
+      "stage": 5,
+      "key": "achievement-clean-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-clean-250",
+      "name": "Nápovědy jsou pro ostatní",
+      "category": "achievement",
+      "group": "clean",
+      "motif": "wand",
+      "stage": 6,
+      "key": "achievement-clean-250",
+      "pilot": false
+    },
+    {
+      "id": "achievement-cd-1",
+      "name": "Čisté slunce",
+      "category": "achievement",
+      "group": "cleanDaily",
+      "motif": "sun",
+      "stage": 0,
+      "key": "achievement-cd-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-cd-7",
+      "name": "Sedm čistých rán",
+      "category": "achievement",
+      "group": "cleanDaily",
+      "motif": "wing",
+      "stage": 1,
+      "key": "achievement-cd-7",
+      "pilot": false
+    },
+    {
+      "id": "achievement-cd-30",
+      "name": "Čistý měsíc",
+      "category": "achievement",
+      "group": "cleanDaily",
+      "motif": "orbit",
+      "stage": 2,
+      "key": "achievement-cd-30",
+      "pilot": false
+    },
+    {
+      "id": "achievement-cd-100",
+      "name": "Sluneční purista",
+      "category": "achievement",
+      "group": "cleanDaily",
+      "motif": "spark",
+      "stage": 3,
+      "key": "achievement-cd-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-100",
+      "name": "První stovka XP",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "coin",
+      "stage": 0,
+      "key": "achievement-xp-100",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-500",
+      "name": "Sběrač XP",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "coin",
+      "stage": 1,
+      "key": "achievement-xp-500",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-1000",
+      "name": "Tisícovka",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "chest",
+      "stage": 2,
+      "key": "achievement-xp-1000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-2500",
+      "name": "Pokladnice",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "chest",
+      "stage": 3,
+      "key": "achievement-xp-2500",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-5000",
+      "name": "Pět tisíc",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "gate",
+      "stage": 4,
+      "key": "achievement-xp-5000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-10000",
+      "name": "Pěticiferný",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "grid",
+      "stage": 5,
+      "key": "achievement-xp-10000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-25000",
+      "name": "XP magnát",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "cup",
+      "stage": 6,
+      "key": "achievement-xp-25000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-40000",
+      "name": "Čtyřicet tisíc cest",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "shield",
+      "stage": 7,
+      "key": "achievement-xp-40000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-50000",
+      "name": "Padesátitisícový let",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "rocket",
+      "stage": 8,
+      "key": "achievement-xp-50000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-61000",
+      "name": "Absolutní sběratel",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "cup",
+      "stage": 9,
+      "key": "achievement-xp-61000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-75000",
+      "name": "Klíč ke všem cestám",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "key",
+      "stage": 10,
+      "key": "achievement-xp-75000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-95000",
+      "name": "Architekt XP",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "web",
+      "stage": 11,
+      "key": "achievement-xp-95000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-xp-120000",
+      "name": "Za hranicí mřížky",
+      "category": "achievement",
+      "group": "xp",
+      "motif": "galaxy",
+      "stage": 12,
+      "key": "achievement-xp-120000",
+      "pilot": false
+    },
+    {
+      "id": "achievement-speed-300",
+      "name": "Pohodový sprint",
+      "category": "achievement",
+      "group": "speed",
+      "motif": "clock",
+      "stage": 0,
+      "key": "achievement-speed-300",
+      "pilot": false
+    },
+    {
+      "id": "achievement-speed-180",
+      "name": "Svižník",
+      "category": "achievement",
+      "group": "speed",
+      "motif": "wing",
+      "stage": 1,
+      "key": "achievement-speed-180",
+      "pilot": false
+    },
+    {
+      "id": "achievement-speed-120",
+      "name": "Rychlík",
+      "category": "achievement",
+      "group": "speed",
+      "motif": "bolt",
+      "stage": 2,
+      "key": "achievement-speed-120",
+      "pilot": false
+    },
+    {
+      "id": "achievement-speed-60",
+      "name": "Blesk",
+      "category": "achievement",
+      "group": "speed",
+      "motif": "rocket",
+      "stage": 3,
+      "key": "achievement-speed-60",
+      "pilot": false
+    },
+    {
+      "id": "achievement-rescue-1",
+      "name": "Ne dnes, série!",
+      "category": "achievement",
+      "group": "rescue",
+      "motif": "life",
+      "stage": 0,
+      "key": "achievement-rescue-1",
+      "pilot": false
+    },
+    {
+      "id": "achievement-rescue-3",
+      "name": "Záchranář",
+      "category": "achievement",
+      "group": "rescue",
+      "motif": "bridge",
+      "stage": 1,
+      "key": "achievement-rescue-3",
+      "pilot": false
+    },
+    {
+      "id": "achievement-rescue-5",
+      "name": "Devět životů",
+      "category": "achievement",
+      "group": "rescue",
+      "motif": "heart",
+      "stage": 2,
+      "key": "achievement-rescue-5",
+      "pilot": false
+    },
+    {
+      "id": "achievement-rescue-10",
+      "name": "Hasící přístroj",
+      "category": "achievement",
+      "group": "rescue",
+      "motif": "life",
+      "stage": 3,
+      "key": "achievement-rescue-10",
+      "pilot": false
+    },
+    {
+      "id": "streak-01",
+      "name": "První zářez",
+      "category": "streak",
+      "group": null,
+      "motif": "flag",
+      "stage": 0,
+      "key": "streak-01",
+      "pilot": false
+    },
+    {
+      "id": "streak-02",
+      "name": "Srdcař",
+      "category": "streak",
+      "group": null,
+      "motif": "heart",
+      "stage": 1,
+      "key": "streak-02",
+      "pilot": false
+    },
+    {
+      "id": "streak-03",
+      "name": "Pětka",
+      "category": "streak",
+      "group": null,
+      "motif": "flower",
+      "stage": 2,
+      "key": "streak-03",
+      "pilot": false
+    },
+    {
+      "id": "streak-04",
+      "name": "Týden v plamenech",
+      "category": "streak",
+      "group": null,
+      "motif": "flame",
+      "stage": 3,
+      "key": "tyden",
+      "pilot": true
+    },
+    {
+      "id": "streak-05",
+      "name": "Desítka",
+      "category": "streak",
+      "group": null,
+      "motif": "cup",
+      "stage": 4,
+      "key": "streak-05",
+      "pilot": false
+    },
+    {
+      "id": "streak-06",
+      "name": "Blesk",
+      "category": "streak",
+      "group": null,
+      "motif": "bolt",
+      "stage": 5,
+      "key": "streak-06",
+      "pilot": false
+    },
+    {
+      "id": "streak-07",
+      "name": "Mistr slov",
+      "category": "streak",
+      "group": null,
+      "motif": "book",
+      "stage": 6,
+      "key": "streak-07",
+      "pilot": false
+    },
+    {
+      "id": "streak-08",
+      "name": "Koruna",
+      "category": "streak",
+      "group": null,
+      "motif": "crown",
+      "stage": 6,
+      "key": "streak-08",
+      "pilot": false
+    },
+    {
+      "id": "streak-09",
+      "name": "Diamant",
+      "category": "streak",
+      "group": null,
+      "motif": "gem",
+      "stage": 6,
+      "key": "streak-09",
+      "pilot": false
+    },
+    {
+      "id": "streak-10",
+      "name": "Legenda",
+      "category": "streak",
+      "group": null,
+      "motif": "rocket",
+      "stage": 6,
+      "key": "streak-10",
+      "pilot": false
+    },
+    {
+      "id": "medal-1",
+      "name": "Zlatá medaile",
+      "category": "medal",
+      "group": null,
+      "motif": "cup",
+      "stage": 0,
+      "key": "medaile",
+      "pilot": true
+    },
+    {
+      "id": "medal-2",
+      "name": "Stříbrná medaile",
+      "category": "medal",
+      "group": null,
+      "motif": "cup",
+      "stage": 0,
+      "key": "medal-2",
+      "pilot": false
+    },
+    {
+      "id": "medal-3",
+      "name": "Bronzová medaile",
+      "category": "medal",
+      "group": null,
+      "motif": "cup",
+      "stage": 0,
+      "key": "medal-3",
+      "pilot": false
+    }
+  ]
+}

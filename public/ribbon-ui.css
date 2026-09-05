@@ -124,3 +124,16 @@ html.ribbon-ui .unlock-title{color:var(--r-accent)!important}
 html.ribbon-ui .new-badge-box{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important}
 html.ribbon-ui .mini-leader-row small,html.ribbon-ui .unlock-row small{color:var(--r-muted)!important;font-size:14px!important;line-height:1.4!important}
 @media(max-width:600px){html.ribbon-ui .mini-leader-row small,html.ribbon-ui .unlock-row small{font-size:15px!important}}
+/* Complete collection: one drawing per reward, no legacy medal plate around it. */
+html.ribbon-ui .result-medal.ribbon-slot,html.ribbon-ui .home-ranking-medal.ribbon-slot{padding:0!important;filter:none!important;transform:none!important;border-radius:0!important}
+html.ribbon-ui .result-medal.ribbon-slot::before{content:none!important}
+html.ribbon-ui .home-ranking-medal.ribbon-slot{display:inline-grid!important;width:32px!important;height:32px!important}
+html.ribbon-ui .home-ranking-medal .ribbon-art,html.ribbon-ui .leader-rank .ribbon-art{width:32px;height:32px}
+html.ribbon-ui .ribbon-rank-chip{display:inline-flex;align-items:center;gap:4px;background:transparent!important;color:var(--r-muted)!important}
+html.ribbon-ui .ribbon-rank-chip .ribbon-art{width:24px;height:24px}
+html.ribbon-ui #screen-profile .level-step,html.ribbon-ui #screen-profile .achievement,html.ribbon-ui #screen-profile .profile-badge{opacity:1!important}
+html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"]){filter:grayscale(1);opacity:.72}
+html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"])::after{content:"";position:absolute;right:-1px;bottom:0;width:12px;height:14px;background:var(--r-ink);clip-path:path('M 3 5 L 3 3 A 3 3 0 0 1 9 3 L 9 5 L 11 5 L 11 14 L 1 14 L 1 5 Z M 5 5 L 7 5 L 7 3 A 1 1 0 0 0 5 3 Z');border:1px solid var(--r-paper)}
+html.ribbon-ui .achievement:not(.earned)>strong,html.ribbon-ui .profile-badge:not(.earned)>strong{color:var(--r-muted)!important}
+html.ribbon-ui .level-step.current .level-num{color:var(--r-paper)!important}
+html.ribbon-ui .achievement-peek.earned:has(.ribbon-art){background:var(--r-accent-soft)!important}
