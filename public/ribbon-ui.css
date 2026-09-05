@@ -100,3 +100,27 @@ html.ribbon-ui .game-message.bad{color:var(--r-error)!important}
 @media(prefers-reduced-motion:reduce){html.ribbon-ui .board .cell{animation:none!important;transition:none!important}html.ribbon-ui .board .cell.active{transform:none!important}}
 
 html.ribbon-ui .achievement-summary-toggle,html.ribbon-ui #achievementToggle{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
+/* Existing control classes shared by the five main screens. */
+html.ribbon-ui .achievement-toggle-btn,
+html.ribbon-ui .ranking-daily-tab.active,
+html.ribbon-ui .ranking-scope-tab.active,
+html.ribbon-ui .ranking-period-tab.active,
+html.ribbon-ui .setting-toggle.on,
+html.ribbon-ui .theme-choice.active{background:var(--r-accent-soft)!important;color:var(--r-accent)!important;border-color:var(--r-accent)!important;box-shadow:none!important}
+html.ribbon-ui .length-pill{background:var(--r-track)!important;color:var(--r-ink)!important}
+html.ribbon-ui .icon-btn{background:var(--r-surface)!important;color:var(--r-ink)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .calm-quick-row{background:var(--r-surface)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .played-levels-btn:disabled{color:var(--r-muted)!important;opacity:.75!important}
+html.ribbon-ui #calmQuickBtn[aria-checked="true"],html.ribbon-ui .calm-setting-toggle[aria-checked="true"]{background:var(--r-accent)!important}
+html.ribbon-ui[data-theme="dark"] .game-actions .secondary-btn{background:var(--r-surface)!important;color:var(--r-ink)!important}
+/* Results reuse the same stage and ink; reward gold stays local to the reward. */
+html.ribbon-ui .win-summary,html.ribbon-ui .level-leaderboard-box,
+html.ribbon-ui .free-board-tabs,html.ribbon-ui .leaderboard-empty,
+html.ribbon-ui .mini-leader-row,html.ribbon-ui .unlock-row{background:var(--r-surface)!important;border-color:var(--r-edge)!important;color:var(--r-ink)!important;box-shadow:none!important}
+html.ribbon-ui .free-board-tab{background:transparent!important;color:var(--r-muted)!important}
+html.ribbon-ui .free-board-tab.active,html.ribbon-ui .win-account-btn{background:var(--r-accent-soft)!important;color:var(--r-accent)!important;border-color:var(--r-accent)!important;box-shadow:none!important}
+html.ribbon-ui .daily-world-head>span{background:var(--r-track)!important;color:var(--r-ink)!important}
+html.ribbon-ui .unlock-title{color:var(--r-accent)!important}
+html.ribbon-ui .new-badge-box{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .mini-leader-row small,html.ribbon-ui .unlock-row small{color:var(--r-muted)!important;font-size:14px!important;line-height:1.4!important}
+@media(max-width:600px){html.ribbon-ui .mini-leader-row small,html.ribbon-ui .unlock-row small{font-size:15px!important}}
