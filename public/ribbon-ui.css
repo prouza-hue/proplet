@@ -36,8 +36,8 @@ html.ribbon-ui .ranking-segment,
 html.ribbon-ui .theme-segment,
 html.ribbon-ui .account-tabs,
 html.ribbon-ui .win-result-hero{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important;background-image:none!important}
-html.ribbon-ui .level-step.current{border-color:var(--r-accent)!important;box-shadow:0 0 0 1px var(--r-accent)!important}
-html.ribbon-ui .level-step.current .level-step-num,
+html.ribbon-ui .level-step.current{border-color:var(--r-accent)!important;outline-color:var(--r-accent)!important;box-shadow:0 0 0 1px var(--r-accent)!important}
+html.ribbon-ui .level-step.current .level-num,
 html.ribbon-ui .achievement-progress>span,
 html.ribbon-ui .achievement-summary-progress>span{background:var(--r-accent)!important;background-image:none!important}
 html.ribbon-ui .achievement-progress,html.ribbon-ui .achievement-summary-progress{background:var(--r-track)!important}
@@ -98,3 +98,5 @@ html.ribbon-ui .game-message.bad{color:var(--r-error)!important}
 @keyframes ribbonWordSeat{0%{transform:scale(.98)}32%{transform:scale(1.055)}100%{transform:scale(1)}}
 @media(max-width:600px){html.ribbon-ui .game-message{font-size:15px!important}html.ribbon-ui .app-footer{margin-bottom:142px!important}}
 @media(prefers-reduced-motion:reduce){html.ribbon-ui .board .cell{animation:none!important;transition:none!important}html.ribbon-ui .board .cell.active{transform:none!important}}
+
+html.ribbon-ui .achievement-summary-toggle,html.ribbon-ui #achievementToggle{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
