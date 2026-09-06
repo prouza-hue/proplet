@@ -73,7 +73,7 @@
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=40140-s12b2','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
-    await loadScript('/account-auth.js?v=7','propletAccountAuth',{wait:true});
+    await loadScript('/account-auth.js?v=8','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=3','propletGameLayout');
     loadScript('/gesture-guard-v3325.js?v=3','propletGestureGuard');

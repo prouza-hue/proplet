@@ -110,7 +110,7 @@ has(accountTeam,/if\(!window\.PROPLET_ACCOUNT_SESSION_ACTIVE\)\{\s*window\.fetch
 has(recoveryGuard,/if\(!window\.PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE\)\{[\s\S]*window\.fetch=/,'recovery mixed-cache fallback is not gated by explicit callback persistence');
 has(accountAuth,/PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE=true/,'account callback ownership marker missing');
 has(accountAuth,/PROFILE_RESPONSE_ENDPOINTS\.has\(path\)[\s\S]*persistAccountResponseProfile\(d\.profile\)/,'callback response persistence is not explicit');
-const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?v=7'");
+const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?v=8'");
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
