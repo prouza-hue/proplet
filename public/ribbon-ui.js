@@ -15,7 +15,7 @@ function art(label,{locked=false,size=40,category}={}){
  const wrap=document.createElement('span');wrap.className='ribbon-art'+(locked?' is-locked':'');wrap.dataset.ribbon=key;if(printed)wrap.classList.add('printshop-art');wrap.setAttribute('role','img');wrap.setAttribute('aria-label',name+(locked?', zamčeno':''));
  for(const theme of ['print']){
   const img=document.createElement('img');img.className='ribbon-'+theme;img.alt='';img.setAttribute('aria-hidden','true');img.width=size;img.height=size;img.draggable=false;img.loading='lazy';img.decoding='async';
-  img.src='/rewards/printshop/'+printKey+'.svg?v=2';wrap.appendChild(img);
+  img.src='/rewards/printshop/'+printKey+'.svg?v=3';wrap.appendChild(img);
  }
  return wrap;
 }

@@ -53,6 +53,9 @@ for filename,cols,rows,group in specs:
   manifest[key]=entry;log.append(dict(key=key,**entry))
   if __import__("os").environ.get("ONLY_KEYS") and key not in __import__("os").environ["ONLY_KEYS"].split(","):continue
   if out.exists() and not __import__("os").environ.get("RETRACE"):continue
-  selected=assigned[j];mask=np.isin(labels,selected);rgba=im.convert('RGBA');rgba.putalpha(Image.fromarray(np.uint8(mask)*255));rgba=rgba.crop(rgba.getbbox());rgba.thumbnail((300,300),Image.Resampling.LANCZOS);canvas=Image.new('RGBA',(336,336));canvas.alpha_composite(rgba,((336-rgba.width)//2,(336-rgba.height)//2));canvas.save(WORK/'masters'/(key+'.png'));trace(canvas,out);print(key,flush=True)
+  selected=assigned[j];mask=np.isin(labels,selected);rgba=im.convert('RGBA');rgba.putalpha(Image.fromarray(np.uint8(mask)*255));rgba=rgba.crop(rgba.getbbox());rgba.thumbnail((300,300),Image.Resampling.LANCZOS);canvas=Image.new('RGBA',(336,336));canvas.alpha_composite(rgba,((336-rgba.width)//2,(336-rgba.height)//2));
+  if key in ['rank-03','rank-04','rank-27','achievement-rescue-1']:
+   data=np.asarray(canvas).copy();rgb=data[:,:,:3].astype(float);white=(rgb.min(2)>237)&((rgb.max(2)-rgb.min(2))<14)&(data[:,:,3]>0);labs,n=ndi.label(white);sz=np.bincount(labs.ravel());sz[0]=0;data[sz[labs]>45,3]=0;canvas=Image.fromarray(data)
+  canvas.save(WORK/'masters'/(key+'.png'));trace(canvas,out);print(key,flush=True)
  (OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 (ROOT/'design/printshop-expansion/provenance.json').write_text(json.dumps(log,ensure_ascii=False,indent=2)+'\n')
