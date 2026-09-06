@@ -1,8 +1,8 @@
 {
-  "package": "proplet-printshop-30",
+  "package": "proplet-printshop-40",
   "type": "true-vector-trace",
   "embedded_raster": false,
-  "count": 30,
+  "count": 40,
   "viewBox": "0 0 512 512",
   "avatars": [
     {
@@ -244,6 +244,86 @@
       "file": "30-tkalcovsky-stav.svg",
       "category": "craft",
       "source_file": "10-tkalcovsky-stav.svg"
+    },
+    {
+      "id": 31,
+      "name": "Jednorožec",
+      "slug": "31-jednorozec",
+      "file": "31-jednorozec.svg",
+      "category": "playful",
+      "token": "🦄✨"
+    },
+    {
+      "id": 32,
+      "name": "Lebka a hnáty",
+      "slug": "32-lebka",
+      "file": "32-lebka.svg",
+      "category": "playful",
+      "token": "☠️"
+    },
+    {
+      "id": 33,
+      "name": "Radioaktivita",
+      "slug": "33-radioaktivita",
+      "file": "33-radioaktivita.svg",
+      "category": "playful",
+      "token": "☢️"
+    },
+    {
+      "id": 34,
+      "name": "Kytička",
+      "slug": "34-kyticka",
+      "file": "34-kyticka.svg",
+      "category": "playful",
+      "token": "🌺"
+    },
+    {
+      "id": 35,
+      "name": "UFO",
+      "slug": "35-ufo",
+      "file": "35-ufo.svg",
+      "category": "playful",
+      "token": "🛸"
+    },
+    {
+      "id": 36,
+      "name": "Mimozemšťan",
+      "slug": "36-mimozemstan",
+      "file": "36-mimozemstan.svg",
+      "category": "playful",
+      "token": "👽"
+    },
+    {
+      "id": 37,
+      "name": "Bomba",
+      "slug": "37-bomba",
+      "file": "37-bomba.svg",
+      "category": "playful",
+      "token": "💣"
+    },
+    {
+      "id": 38,
+      "name": "Ďáblík",
+      "slug": "38-dablik",
+      "file": "38-dablik.svg",
+      "category": "playful",
+      "token": "😈"
+    },
+    {
+      "id": 39,
+      "name": "Robot",
+      "slug": "39-robot",
+      "file": "39-robot.svg",
+      "category": "playful",
+      "token": "🤖"
+    },
+    {
+      "id": 40,
+      "name": "Blesk",
+      "slug": "40-blesk",
+      "file": "40-blesk.svg",
+      "category": "playful",
+      "token": "🌩️"
     }
   ]
 }

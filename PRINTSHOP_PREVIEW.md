@@ -20,3 +20,13 @@ Review gallery: /design/tiskarska-dilna.html
 Verification: stable avatar ID map and normalized medallion bounds; existing ribbon
 catalog and 572 old assets unchanged; existing interaction and daily progression tests;
 all 42 master path geometries/colors/transforms preserved by structural optimization.
+
+## Complete collection update
+
+- All 142 catalog entries now resolve to faithful printshop SVG: 35 ranks, 90 achievements, 10 loyalty badges, 3 medals, 4 context symbols.
+- The old public ribbon asset directory is removed; the previous reward gallery redirects to the current collection.
+- Ten playful avatars append IDs 31–40. First 30 IDs, files and persisted tokens remain unchanged. The unicorn uses a distinct token so it cannot remap the older legacy unicorn token.
+- Gameplay CSS, board/input/hints modules and printshop surrounding UI CSS are byte-identical to baseline 2ed41e5.
+- Raster masters were generated in eight sheets total (one avatars, seven rewards). Native-resolution VTracer tracing preserves source illustration rather than redrawing simplified vector stand-ins. No embedded raster in SVG.
+- Assets load lazily as external images. Gallery filters defer assigning image URLs for unopened families. Artwork is intentionally not service-worker precached.
+- Preview only. No production merge, database migration, economy or reward predicate changes.

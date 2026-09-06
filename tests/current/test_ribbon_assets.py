@@ -1,24 +1,14 @@
-"""Validate complete reward coverage, immutable pilot inputs and strict SVG references."""
+"""Full runtime coverage, true SVG, old identities and protected gameplay baseline."""
 from pathlib import Path
-import re,json,subprocess,xml.etree.ElementTree as ET
-root=Path(__file__).resolve().parents[2];assets=root/'public/rewards/ribbons'
-data=json.loads((assets/'collection.json').read_text())['items']
-assert len(data)==142
-assert {c:sum(x['category']==c for x in data) for c in ['rank','achievement','streak','medal']}=={'rank':35,'achievement':90,'streak':10,'medal':3}
-assert len({x['id'] for x in data})==142
-files=list(assets.rglob('*.svg'));assert len(files)==572
-for path in files:
- text=path.read_text();svg=ET.fromstring(text)
- assert svg.tag.endswith('svg') and svg.attrib['viewBox']=='0 0 128 128',path
- assert not re.search(r'<(?:image|script|foreignObject|text)\b',text),path
- ids={el.attrib['id'] for el in svg.iter() if 'id' in el.attrib}
- assert set(re.findall(r'url\(#([^)]+)\)',text))<=ids,path
- assert not re.search(r'(?:href|src)="https?://',text),path
-for item in data:
- for theme in ['light','dark']:
-  for size in ['small','regular']:
-   p=assets/theme/(item['key']+'-'+size+'.svg');assert p.is_file(),p
-   if item['pilot']:
-    old=subprocess.check_output(['git','show','aff3cefe3e767d8df0e274e30be0b480ca57027e:'+str(p.relative_to(root))],cwd=root)
-    assert p.read_bytes()==old,p
-print('PASS: 138 rewards + 4 game symbols, 572 strict SVGs; approved pilot byte-identical')
+import json,re,subprocess,xml.etree.ElementTree as ET
+R=Path(__file__).resolve().parents[2];P=R/'public';base='2ed41e5dc845cf8e1c144be1e2aae54459176cd3'
+c=json.loads((P/'rewards/printshop/collection.json').read_text())['items'];m=json.loads((P/'rewards/printshop/manifest.json').read_text());assert len(c)==len(m)==142;assert {x['key'] for x in c}==set(m)
+for key,x in m.items():
+ root=ET.parse(P/'rewards/printshop'/x['file']).getroot();assert root.get('viewBox');assert root.findall('.//{http://www.w3.org/2000/svg}path');assert not root.findall('.//{http://www.w3.org/2000/svg}image')
+old=json.loads(subprocess.check_output(['git','show',base+':public/rewards/printshop/manifest.json'],cwd=R))
+for x in old.values():
+ f='public/rewards/printshop/'+x['file'];assert (R/f).read_bytes()==subprocess.check_output(['git','show',base+':'+f],cwd=R)
+for f in ['public/ribbon-ui.css','public/printshop-ui.css','public/app/game/board.js','public/app/game/input.js','public/app/game/hints.js']:
+ assert (R/f).read_bytes()==subprocess.check_output(['git','show',base+':'+f],cwd=R),f
+assert '/rewards/ribbons/' not in (P/'ribbon-ui.js').read_text()
+print('PASS: 142 genuine SVG, complete coverage; original 12 illustrations and gameplay files unchanged')

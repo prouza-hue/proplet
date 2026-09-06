@@ -1,0 +1,1172 @@
+[
+  {
+    "key": "rank-02",
+    "name": "Písmenkář",
+    "file": "rank-02.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 0,
+    "category": "rank"
+  },
+  {
+    "key": "rank-03",
+    "name": "Slovolovec",
+    "file": "rank-03.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 1,
+    "category": "rank"
+  },
+  {
+    "key": "rank-04",
+    "name": "Hledač nití",
+    "file": "rank-04.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 2,
+    "category": "rank"
+  },
+  {
+    "key": "rank-05",
+    "name": "Propletač",
+    "file": "rank-05.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 3,
+    "category": "rank"
+  },
+  {
+    "key": "rank-06",
+    "name": "Kličkař",
+    "file": "rank-06.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 4,
+    "category": "rank"
+  },
+  {
+    "key": "rank-07",
+    "name": "Mistr cest",
+    "file": "rank-07.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 5,
+    "category": "rank"
+  },
+  {
+    "key": "rank-08",
+    "name": "Slovní taktik",
+    "file": "rank-08.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 6,
+    "category": "rank"
+  },
+  {
+    "key": "rank-09",
+    "name": "Slovní mág",
+    "file": "rank-09.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 7,
+    "category": "rank"
+  },
+  {
+    "key": "rank-10",
+    "name": "Uzlovač",
+    "file": "rank-10.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 8,
+    "category": "rank"
+  },
+  {
+    "key": "rank-11",
+    "name": "Legenda Propletu",
+    "file": "rank-11.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 9,
+    "category": "rank"
+  },
+  {
+    "key": "rank-12",
+    "name": "Cestář",
+    "file": "rank-12.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 10,
+    "category": "rank"
+  },
+  {
+    "key": "rank-13",
+    "name": "Krotitel",
+    "file": "rank-13.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 11,
+    "category": "rank"
+  },
+  {
+    "key": "rank-14",
+    "name": "Mistr zákrut",
+    "file": "rank-14.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 12,
+    "category": "rank"
+  },
+  {
+    "key": "rank-15",
+    "name": "Labyrintník",
+    "file": "rank-15.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 13,
+    "category": "rank"
+  },
+  {
+    "key": "rank-16",
+    "name": "Velmistr Propletu",
+    "file": "rank-16.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 14,
+    "category": "rank"
+  },
+  {
+    "key": "rank-17",
+    "name": "Propletový ninja",
+    "file": "rank-17.svg",
+    "source_sheet": "exec-b31af56e-4b8d-4c4c-a81a-fdac8b9f7592.png",
+    "source_sha256": "d7aaed90d3b593685a9d21dc6414b508928f3c3441627dd4d15cdbba0e9eb14a",
+    "cell": 15,
+    "category": "rank"
+  },
+  {
+    "key": "rank-19",
+    "name": "Mistr šneků",
+    "file": "rank-19.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 0,
+    "category": "rank"
+  },
+  {
+    "key": "rank-20",
+    "name": "Mřížkový mág",
+    "file": "rank-20.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 1,
+    "category": "rank"
+  },
+  {
+    "key": "rank-21",
+    "name": "Nadslovník",
+    "file": "rank-21.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 2,
+    "category": "rank"
+  },
+  {
+    "key": "rank-22",
+    "name": "Krotitel Mozkožroutů",
+    "file": "rank-22.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 3,
+    "category": "rank"
+  },
+  {
+    "key": "rank-23",
+    "name": "Král mřížky",
+    "file": "rank-23.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 4,
+    "category": "rank"
+  },
+  {
+    "key": "rank-24",
+    "name": "Arcimistr Propletu",
+    "file": "rank-24.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 5,
+    "category": "rank"
+  },
+  {
+    "key": "rank-25",
+    "name": "Slovočaroděj",
+    "file": "rank-25.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 6,
+    "category": "rank"
+  },
+  {
+    "key": "rank-26",
+    "name": "Propletový titán",
+    "file": "rank-26.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 7,
+    "category": "rank"
+  },
+  {
+    "key": "rank-27",
+    "name": "Mistr nekonečna",
+    "file": "rank-27.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 8,
+    "category": "rank"
+  },
+  {
+    "key": "rank-28",
+    "name": "Hvězdný propletač",
+    "file": "rank-28.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 9,
+    "category": "rank"
+  },
+  {
+    "key": "rank-29",
+    "name": "Orbitální luštitel",
+    "file": "rank-29.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 10,
+    "category": "rank"
+  },
+  {
+    "key": "rank-30",
+    "name": "Galaktický slovolovec",
+    "file": "rank-30.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 11,
+    "category": "rank"
+  },
+  {
+    "key": "rank-31",
+    "name": "Strážce všech cest",
+    "file": "rank-31.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 12,
+    "category": "rank"
+  },
+  {
+    "key": "rank-32",
+    "name": "Absolutní Propletač",
+    "file": "rank-32.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 13,
+    "category": "rank"
+  },
+  {
+    "key": "rank-33",
+    "name": "Strážce tajných cest",
+    "file": "rank-33.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 14,
+    "category": "rank"
+  },
+  {
+    "key": "rank-34",
+    "name": "Architekt labyrintu",
+    "file": "rank-34.svg",
+    "source_sheet": "exec-c8798532-645f-4993-8453-b2dcc6e76cd7.png",
+    "source_sha256": "b0875004a5961d6355ddb22cfa4945ece5424c1de22d87285ee56f387e7898f7",
+    "cell": 15,
+    "category": "rank"
+  },
+  {
+    "key": "achievement-all-5",
+    "name": "Pětka v kapse",
+    "file": "achievement-all-5.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 0,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-10",
+    "name": "Rozjezd",
+    "file": "achievement-all-10.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 1,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-25",
+    "name": "Čtvrtsto",
+    "file": "achievement-all-25.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 2,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-50",
+    "name": "Půl stovky",
+    "file": "achievement-all-50.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 3,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-100",
+    "name": "Stovka úloh",
+    "file": "achievement-all-100.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 4,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-250",
+    "name": "Nezastavitelný",
+    "file": "achievement-all-250.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 5,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-400",
+    "name": "Propletový maratonec",
+    "file": "achievement-all-400.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 6,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-all-800",
+    "name": "Nekonečný propletač",
+    "file": "achievement-all-800.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 7,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-easy-1",
+    "name": "První klíček",
+    "file": "achievement-easy-1.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 8,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-easy-10",
+    "name": "Rozcvička",
+    "file": "achievement-easy-10.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 9,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-easy-25",
+    "name": "Lehká váha",
+    "file": "achievement-easy-25.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 10,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-easy-50",
+    "name": "Půlka zahrady",
+    "file": "achievement-easy-50.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 11,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-easy-100",
+    "name": "Zelený velmistr",
+    "file": "achievement-easy-100.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 12,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-easy-200",
+    "name": "Vládce zelené banky",
+    "file": "achievement-easy-200.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 13,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-medium-1",
+    "name": "Hlavička",
+    "file": "achievement-medium-1.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 14,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-medium-10",
+    "name": "Mozkovna",
+    "file": "achievement-medium-10.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 15,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-medium-25",
+    "name": "Přemýšlivec",
+    "file": "achievement-medium-25.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 16,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-medium-50",
+    "name": "Šedá kůra",
+    "file": "achievement-medium-50.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 17,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-medium-100",
+    "name": "Mistr středu",
+    "file": "achievement-medium-100.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 18,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-medium-200",
+    "name": "Dvojitá mozkovna",
+    "file": "achievement-medium-200.svg",
+    "source_sheet": "exec-5de10bc7-1c4f-416a-9175-ac4380555a93.png",
+    "source_sha256": "7534cb9348ff2cc4504cd772ebabbbf517cfe9701f25c40b8b57264731ca55ba",
+    "cell": 19,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-1",
+    "name": "Odvážlivec",
+    "file": "achievement-hard-1.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 0,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-5",
+    "name": "Rozbuška",
+    "file": "achievement-hard-5.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 1,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-10",
+    "name": "Nebojácný",
+    "file": "achievement-hard-10.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 2,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-25",
+    "name": "Těžká práce",
+    "file": "achievement-hard-25.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 3,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-50",
+    "name": "Ocelová hlava",
+    "file": "achievement-hard-50.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 4,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-100",
+    "name": "Demoliční četa",
+    "file": "achievement-hard-100.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 5,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hard-200",
+    "name": "Nezničitelná hlava",
+    "file": "achievement-hard-200.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 6,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-1",
+    "name": "Mozkožrout",
+    "file": "achievement-hc-1.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 7,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-5",
+    "name": "Nakrmil Mozkožrouta",
+    "file": "achievement-hc-5.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 8,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-10",
+    "name": "Neurony v plamenech",
+    "file": "achievement-hc-10.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 9,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-25",
+    "name": "Požírač šneků",
+    "file": "achievement-hc-25.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 10,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-50",
+    "name": "Mozkový kulturista",
+    "file": "achievement-hc-50.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 11,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-100",
+    "name": "Mozkožroutí král",
+    "file": "achievement-hc-100.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 12,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-hc-200",
+    "name": "Mozkožroutí nesmrtelný",
+    "file": "achievement-hc-200.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 13,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-1",
+    "name": "Dnešní dávka",
+    "file": "achievement-daily-1.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 14,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-50",
+    "name": "Sluneční sběratel",
+    "file": "achievement-daily-50.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 15,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-3",
+    "name": "Tři slunce",
+    "file": "achievement-daily-3.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 16,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-7",
+    "name": "Týdenní hráč",
+    "file": "achievement-daily-7.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 17,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-14",
+    "name": "Dva týdny",
+    "file": "achievement-daily-14.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 18,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-30",
+    "name": "Měsíčník",
+    "file": "achievement-daily-30.svg",
+    "source_sheet": "exec-68907daf-73af-475f-a48f-21cecb7e6d9d.png",
+    "source_sha256": "0ef29f3dae27bfe82f611982422af90e01426006aac83a0e6178a52f0c0945f7",
+    "cell": 19,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-100",
+    "name": "Stovka rán",
+    "file": "achievement-daily-100.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 0,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-200",
+    "name": "Kalendářní démon",
+    "file": "achievement-daily-200.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 1,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-daily-365",
+    "name": "Celý rok",
+    "file": "achievement-daily-365.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 2,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-tajenka-1",
+    "name": "První tajemství",
+    "file": "achievement-tajenka-1.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 3,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-tajenka-3",
+    "name": "Čtenář mezi řádky",
+    "file": "achievement-tajenka-3.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 4,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-tajenka-5",
+    "name": "Sběratel myšlenek",
+    "file": "achievement-tajenka-5.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 5,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-mozkomor-1",
+    "name": "Vstup do Hlubiny",
+    "file": "achievement-mozkomor-1.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 6,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-mozkomor-5",
+    "name": "Pětkrát bez milosti",
+    "file": "achievement-mozkomor-5.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 7,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-mozkomor-10",
+    "name": "Krotitel chaosu",
+    "file": "achievement-mozkomor-10.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 8,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-mozkomor-25",
+    "name": "Pán zákrut",
+    "file": "achievement-mozkomor-25.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 9,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-mozkomor-50",
+    "name": "Neuron z ocele",
+    "file": "achievement-mozkomor-50.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 10,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-discovery-1",
+    "name": "Slovo navíc",
+    "file": "achievement-discovery-1.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 11,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-discovery-10",
+    "name": "Boční stezka",
+    "file": "achievement-discovery-10.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 12,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-discovery-50",
+    "name": "Lovec skrytých slov",
+    "file": "achievement-discovery-50.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 13,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-discovery-100",
+    "name": "Slovní archeolog",
+    "file": "achievement-discovery-100.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 14,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-1",
+    "name": "Bez berliček",
+    "file": "achievement-clean-1.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 15,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-5",
+    "name": "Čistá pětka",
+    "file": "achievement-clean-5.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 16,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-10",
+    "name": "Čistá desítka",
+    "file": "achievement-clean-10.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 17,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-25",
+    "name": "Bez nápovědy",
+    "file": "achievement-clean-25.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 18,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-50",
+    "name": "Samostatný mozek",
+    "file": "achievement-clean-50.svg",
+    "source_sheet": "exec-8205f5bd-4162-429b-b155-1d89d540e277.png",
+    "source_sha256": "63ac32bd3aa839dc2c44d2b2a5d394cdd5af37dd07bdd030161b1a0fdfea8ca2",
+    "cell": 19,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-100",
+    "name": "Čistokrevný propletač",
+    "file": "achievement-clean-100.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 0,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-clean-250",
+    "name": "Nápovědy jsou pro ostatní",
+    "file": "achievement-clean-250.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 1,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-cd-1",
+    "name": "Čisté slunce",
+    "file": "achievement-cd-1.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 2,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-cd-7",
+    "name": "Sedm čistých rán",
+    "file": "achievement-cd-7.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 3,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-cd-30",
+    "name": "Čistý měsíc",
+    "file": "achievement-cd-30.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 4,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-cd-100",
+    "name": "Sluneční purista",
+    "file": "achievement-cd-100.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 5,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-100",
+    "name": "První stovka XP",
+    "file": "achievement-xp-100.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 6,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-500",
+    "name": "Sběrač XP",
+    "file": "achievement-xp-500.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 7,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-1000",
+    "name": "Tisícovka",
+    "file": "achievement-xp-1000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 8,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-2500",
+    "name": "Pokladnice",
+    "file": "achievement-xp-2500.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 9,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-5000",
+    "name": "Pět tisíc",
+    "file": "achievement-xp-5000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 10,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-10000",
+    "name": "Pěticiferný",
+    "file": "achievement-xp-10000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 11,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-25000",
+    "name": "XP magnát",
+    "file": "achievement-xp-25000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 12,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-40000",
+    "name": "Čtyřicet tisíc cest",
+    "file": "achievement-xp-40000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 13,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-50000",
+    "name": "Padesátitisícový let",
+    "file": "achievement-xp-50000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 14,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-61000",
+    "name": "Absolutní sběratel",
+    "file": "achievement-xp-61000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 15,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-75000",
+    "name": "Klíč ke všem cestám",
+    "file": "achievement-xp-75000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 16,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-95000",
+    "name": "Architekt XP",
+    "file": "achievement-xp-95000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 17,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-xp-120000",
+    "name": "Za hranicí mřížky",
+    "file": "achievement-xp-120000.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 18,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-speed-300",
+    "name": "Pohodový sprint",
+    "file": "achievement-speed-300.svg",
+    "source_sheet": "exec-f02457d2-866c-40be-8392-71a7f777cbbc.png",
+    "source_sha256": "0f00f8226c8d0a6f45eec1a645c4a77e340f29f0332cdd927e69201ad6a2fba9",
+    "cell": 19,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-speed-180",
+    "name": "Svižník",
+    "file": "achievement-speed-180.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 0,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-speed-120",
+    "name": "Rychlík",
+    "file": "achievement-speed-120.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 1,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-speed-60",
+    "name": "Blesk",
+    "file": "achievement-speed-60.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 2,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-rescue-1",
+    "name": "Ne dnes, série!",
+    "file": "achievement-rescue-1.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 3,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-rescue-3",
+    "name": "Záchranář",
+    "file": "achievement-rescue-3.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 4,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-rescue-5",
+    "name": "Devět životů",
+    "file": "achievement-rescue-5.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 5,
+    "category": "achievement"
+  },
+  {
+    "key": "achievement-rescue-10",
+    "name": "Hasící přístroj",
+    "file": "achievement-rescue-10.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 6,
+    "category": "achievement"
+  },
+  {
+    "key": "streak-01",
+    "name": "První zářez",
+    "file": "streak-01.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 7,
+    "category": "streak"
+  },
+  {
+    "key": "streak-03",
+    "name": "Pětka",
+    "file": "streak-03.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 8,
+    "category": "streak"
+  },
+  {
+    "key": "streak-05",
+    "name": "Desítka",
+    "file": "streak-05.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 9,
+    "category": "streak"
+  },
+  {
+    "key": "streak-06",
+    "name": "Blesk",
+    "file": "streak-06.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 10,
+    "category": "streak"
+  },
+  {
+    "key": "streak-07",
+    "name": "Mistr slov",
+    "file": "streak-07.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 11,
+    "category": "streak"
+  },
+  {
+    "key": "streak-08",
+    "name": "Koruna",
+    "file": "streak-08.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 12,
+    "category": "streak"
+  },
+  {
+    "key": "streak-09",
+    "name": "Diamant",
+    "file": "streak-09.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 13,
+    "category": "streak"
+  },
+  {
+    "key": "symbol-complete",
+    "name": "Dokončeno",
+    "file": "symbol-complete.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 14,
+    "category": "symbol"
+  },
+  {
+    "key": "symbol-daily",
+    "name": "Denní výzva",
+    "file": "symbol-daily.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 15,
+    "category": "symbol"
+  },
+  {
+    "key": "symbol-streak",
+    "name": "Herní série",
+    "file": "symbol-streak.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 16,
+    "category": "symbol"
+  },
+  {
+    "key": "symbol-secret",
+    "name": "Odhalená tajenka",
+    "file": "symbol-secret.svg",
+    "source_sheet": "exec-a3d8ee27-bbe2-44db-99c7-cf999c418b02.png",
+    "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
+    "cell": 17,
+    "category": "symbol"
+  }
+]
