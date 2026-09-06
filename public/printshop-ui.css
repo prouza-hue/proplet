@@ -1,0 +1,51 @@
+/* Tiskařská dílna. Presentation outside #screen-game only.
+   The r-* gameplay tokens, board geometry, letters and motion remain authoritative. */
+html.tiskarna-ui{--td-paper:#FFFCF5;--td-line:#D8D2C7;--td-ink:#202B39;--td-blue:#204FAB;--td-tint:#E8EEF8;--td-mint:#E6F3EB;--td-muted:#586576}
+html.tiskarna-ui[data-theme=dark]{--td-paper:#29313D;--td-line:#4B5464;--td-ink:#F5F0E4;--td-blue:#A9C6FF;--td-tint:#273C5B;--td-mint:#244A41;--td-muted:#BDC9D5}
+html.tiskarna-ui,html.tiskarna-ui body{background:#F7F2E8!important;background-image:none!important}
+html.tiskarna-ui[data-theme=dark],html.tiskarna-ui[data-theme=dark] body{background:#1D2530!important}
+html.tiskarna-ui .app-header{border-bottom:2px solid var(--td-line);padding-bottom:16px;margin-bottom:20px}
+html.tiskarna-ui :is(.screen:not(#screen-game),#winModal,.account-modal,.settings-modal){color:var(--td-ink)}
+html.tiskarna-ui .screen:not(#screen-game) :is(h1,h2,h3){color:var(--td-ink)}
+html.tiskarna-ui .screen:not(#screen-game) h1{letter-spacing:-.035em}
+html.tiskarna-ui .screen:not(#screen-game) h2{letter-spacing:-.025em}
+html.tiskarna-ui .screen:not(#screen-game) :is(.card,.profile-card,.home-competition-card,.ranking-section,.home-diff-tile,.settings-card,.profile-account-hub){background:var(--td-paper)!important;border:1px solid var(--td-line)!important;border-radius:14px!important;box-shadow:none!important;color:var(--td-ink)!important}
+html.tiskarna-ui .screen:not(#screen-game) :is(.muted,.field-note,.eyebrow,.stat-label){color:var(--td-muted)!important}
+html.tiskarna-ui #screen-daily .daily-hero{background:#214FAE!important;background-image:none!important;border-radius:14px!important;border:0!important;box-shadow:0 5px 0 #173D8B!important;color:#FFF8E9!important}
+html.tiskarna-ui #screen-daily .daily-hero :is(h1,h2,p,.eyebrow){color:#FFF8E9!important}
+html.tiskarna-ui #screen-daily .home-diff-tile{border-top:4px solid #009D93!important;border-radius:9px!important}
+html.tiskarna-ui #screen-daily .home-diff-tile:nth-child(2){border-top-color:#235BCC!important}
+html.tiskarna-ui #screen-daily .home-diff-tile:nth-child(3){border-top-color:#EF492D!important}
+html.tiskarna-ui #screen-daily .home-diff-tile:nth-child(4){border-top-color:#854B90!important}
+html.tiskarna-ui #screen-daily .home-progress-level{background:var(--td-mint)!important;border-color:var(--td-line)!important;color:var(--td-ink)!important}
+html.tiskarna-ui #screen-daily .home-progress-level-icon{background:none!important;padding:0!important}
+html.tiskarna-ui #screen-daily :is(.home-ranking-list,.home-ranking-row,.home-progress-metrics){background:transparent!important;border-color:var(--td-line)!important;box-shadow:none!important}
+html.tiskarna-ui #screen-daily .home-ranking-row{border-radius:0!important}
+html.tiskarna-ui #screen-daily .home-ranking-row:first-child{background:color-mix(in srgb,#F8C742 15%,var(--td-paper))!important}
+html.tiskarna-ui #screen-profile :is(.level-roadmap-card,.achievements-card){background:transparent!important;border:0!important;border-top:2px solid var(--td-line)!important;border-radius:0!important;padding-inline:0!important}
+html.tiskarna-ui #screen-profile .level-step{border-radius:8px!important;border-color:var(--td-line)!important;background:var(--td-paper)!important;box-shadow:none!important}
+html.tiskarna-ui #screen-profile .level-step.current{border:2px solid var(--td-blue)!important;background:var(--td-tint)!important;outline:0!important}
+html.tiskarna-ui #screen-profile :is(.level-step.current .level-num,.achievement-progress>span,.achievement-summary-progress>span){background:var(--td-blue)!important;color:var(--td-paper)!important}
+html.tiskarna-ui #screen-profile .achievement-summary{background:var(--td-mint)!important;border-color:var(--td-line)!important;border-radius:8px!important}
+html.tiskarna-ui #screen-profile .achievement-peek{background:none!important;border:0!important;border-radius:0!important}
+html.tiskarna-ui #screen-profile .profile-badge{border-radius:8px!important;background:var(--td-paper)!important;border-color:var(--td-line)!important}
+html.tiskarna-ui :is(.screen:not(#screen-game),#winModal) .primary-btn{background:#235BCC!important;color:#FFF8E9!important;box-shadow:0 3px 0 #193F8B!important;border-radius:9px!important;border:0!important}
+html.tiskarna-ui :is(.screen:not(#screen-game),#winModal) .secondary-btn{box-shadow:none!important;border-radius:9px!important;border-color:var(--td-line)!important}
+html.tiskarna-ui .bottom-nav{background:var(--td-paper)!important;border:1px solid var(--td-line)!important;box-shadow:none!important;border-radius:12px!important}
+html.tiskarna-ui .bottom-nav button.active{background:var(--td-tint)!important;color:var(--td-blue)!important;border-radius:7px!important}
+html.tiskarna-ui #winModal .win-card{background:var(--td-paper)!important;color:var(--td-ink)!important;border-color:var(--td-line)!important;border-top:6px solid #F8C742!important}
+html.tiskarna-ui #winModal :is(.win-xp,#winXp){background:#F8C742!important;color:#29313D!important}
+html.tiskarna-ui #winModal :is(.win-clean,.win-result-hero){background:var(--td-mint)!important;color:var(--td-ink)!important}
+html.tiskarna-ui #winModal :is(.win-summary,.level-leaderboard-box,.win-achievements){background:transparent!important;border:0!important;border-top:1px solid var(--td-line)!important;border-radius:0!important;box-shadow:none!important}
+html.tiskarna-ui #winModal .frb-row{background:var(--td-paper)!important;border-color:var(--td-line)!important;border-radius:6px!important}
+html.tiskarna-ui #winModal .frb-row:first-child{background:color-mix(in srgb,#F8C742 14%,var(--td-paper))!important}
+html.tiskarna-ui .printshop-art{background:none!important}
+html.tiskarna-ui .printshop-art.is-locked{filter:grayscale(1)!important;opacity:.75!important}
+html.tiskarna-ui .printshop-art:after{display:none!important}
+html.tiskarna-ui .organic-avatar[data-avatar-file]{background:transparent;box-shadow:none}
+html.tiskarna-ui .organic-avatar-print{display:block;width:100%;height:100%;object-fit:contain}
+@media(max-width:600px){
+ html.tiskarna-ui .screen:not(#screen-game) :is(p,.muted,.field-note){font-size:15px!important;line-height:1.4!important}
+ html.tiskarna-ui #screen-daily .home-diff-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.tiskarna-ui #screen-profile .level-step{min-width:150px!important}
+}

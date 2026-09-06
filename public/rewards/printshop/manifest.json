@@ -1,0 +1,62 @@
+{
+  "novacek": {
+    "name": "Nováček",
+    "file": "novacek.svg",
+    "source_sha256": "ac0065758111ad3955049ea5b454fcd132a8cffd72295b9edfcbd5c62285d192"
+  },
+  "alchymista": {
+    "name": "Slovní alchymista",
+    "file": "alchymista.svg",
+    "source_sha256": "0b16362e6584f30f8a1a1eabd77b8c958716d47cb5bb516217495206b0f089a4"
+  },
+  "legenda": {
+    "name": "Legenda beze konce",
+    "file": "legenda.svg",
+    "source_sha256": "cd3359ac1b1912aae9bfc19cb47553da7c98367a724cbd5b7780483e65e52d95"
+  },
+  "prvni-proplet": {
+    "name": "První Proplet",
+    "file": "prvni-proplet.svg",
+    "source_sha256": "d9fe4609902daf32305e97f3822001f8ee77323af61ee55f986f5e4c9325b2d5"
+  },
+  "achievement-tajenka-10": {
+    "name": "Mistr skrytých vět",
+    "file": "achievement-tajenka-10.svg",
+    "source_sha256": "79785c879906d40092725f9542af903eaa866ec116d7d8bb88c3bb119b9c092f"
+  },
+  "nemesis": {
+    "name": "Mozkomorova Nemesis",
+    "file": "nemesis.svg",
+    "source_sha256": "26d44d65788e68909a1bd2f807dce1d1876f6c99c65479742e4af262a72eb359"
+  },
+  "streak-02": {
+    "name": "Srdcař",
+    "file": "streak-02.svg",
+    "source_sha256": "a3a7ec8ec8b00f87d9abc67cc747dc98772b33ef19ebf4bca41931e02ea1e8a1"
+  },
+  "tyden": {
+    "name": "Týden v plamenech",
+    "file": "tyden.svg",
+    "source_sha256": "fde0c70ae6954bf6c95a07dfb81885c8c6bc0b0e50ad0e05e9d3e20b3afec923"
+  },
+  "streak-10": {
+    "name": "Legenda",
+    "file": "streak-10.svg",
+    "source_sha256": "18b9e60af5367528d0d0b7762ac9def0d193f94fcb2a1855b5dcd22548e926c6"
+  },
+  "medaile": {
+    "name": "Zlatá medaile",
+    "file": "medaile.svg",
+    "source_sha256": "b02876d4e3e4b31bb03e2bf9fd83d18a3f438f87e9e25218a163ea1d9c1221f3"
+  },
+  "medal-2": {
+    "name": "Stříbrná medaile",
+    "file": "medal-2.svg",
+    "source_sha256": "c78dc6d52f1ef1a8ecc189b36f0e9751d08723043196df9015cb7662b68341ce"
+  },
+  "medal-3": {
+    "name": "Bronzová medaile",
+    "file": "medal-3.svg",
+    "source_sha256": "4d3d35702570eceff3d71506d0a7b8319f858764e5bd2a927601c8d4429da254"
+  }
+}

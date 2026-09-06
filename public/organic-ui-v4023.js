@@ -70,15 +70,10 @@ function svgIcon(name){
 const LEGACY_AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
 // Avatar v2 runtime map. Generated verbatim from /assets/avatars/v2/manifest.json; smoke keeps it in lockstep.
 const AVATAR_MANIFEST=[{"id":1,"name":"Liška","file":"01-liska.svg","category":"forest"},{"id":2,"name":"Sova","file":"02-sova.svg","category":"forest"},{"id":3,"name":"Ježek","file":"03-jezek.svg","category":"forest"},{"id":4,"name":"Medvěd","file":"04-medved.svg","category":"forest"},{"id":5,"name":"Jelen","file":"05-jelen.svg","category":"forest"},{"id":6,"name":"Srna","file":"06-srna.svg","category":"forest"},{"id":7,"name":"Jezevec","file":"07-jezevec.svg","category":"forest"},{"id":8,"name":"Veverka","file":"08-veverka.svg","category":"forest"},{"id":9,"name":"Mýval","file":"09-myval.svg","category":"forest"},{"id":10,"name":"Kočka","file":"10-kocka.svg","category":"forest"},{"id":11,"name":"Vlk","file":"11-vlk.svg","category":"forest"},{"id":12,"name":"Mourek","file":"12-mourek.svg","category":"forest"},{"id":13,"name":"Zajíc","file":"13-zajic.svg","category":"forest"},{"id":14,"name":"Králík","file":"14-kralik.svg","category":"forest"},{"id":15,"name":"Myška","file":"15-myska.svg","category":"forest"},{"id":16,"name":"Klubko","file":"16-klubko.svg","category":"craft"},{"id":17,"name":"Háček","file":"17-hacek.svg","category":"craft"},{"id":18,"name":"Písmeno P","file":"18-pismeno-p.svg","category":"craft"},{"id":19,"name":"Pletené brýle","file":"19-pletene-bryle.svg","category":"craft"},{"id":20,"name":"Kniha s copem","file":"20-kniha-s-copem.svg","category":"craft"},{"id":21,"name":"Kniha se stehem","file":"21-kniha-se-stehem.svg","category":"craft"},{"id":22,"name":"Hrnek v svetru","file":"22-hrnek-v-svetru.svg","category":"craft"},{"id":23,"name":"Brk a inkoust","file":"23-brk-a-inkoust.svg","category":"craft"},{"id":24,"name":"Cívka","file":"24-civka.svg","category":"craft"},{"id":25,"name":"Papírový pták","file":"25-papirovy-ptak.svg","category":"craft"},{"id":26,"name":"Papírová vlaštovka","file":"26-papirova-vlastovka.svg","category":"craft"},{"id":27,"name":"Přesýpačky modré","file":"27-presypacky-modre.svg","category":"craft"},{"id":28,"name":"Přesýpačky zlaté","file":"28-presypacky-zlate.svg","category":"craft"},{"id":29,"name":"Člunek","file":"29-clunek.svg","category":"craft"},{"id":30,"name":"Tkalcovský stav","file":"30-tkalcovsky-stav.svg","category":"craft"}];
-const AVATAR_BASE_PATH='/assets/avatars/v2/';
+const AVATAR_BASE_PATH='/assets/avatars/v3/';
 const AVATAR_COUNT=AVATAR_MANIFEST.length;
 const AVATAR_NAMES=AVATAR_MANIFEST.map(a=>a.name);
-// Optical frames are calibrated from the actual motif bounds in the faithful 512px masters.
-// Each tuple is [scale, x%, y%]. Translation matters: scaling an off-centre motif around the SVG
-// canvas centre (notably the hedgehog) makes the visual imbalance worse as the scale increases.
-const AVATAR_FOCUS_FRAMES=[[1.00,0,0],[1.16,0,0],[1.52,-1.2,5.3],[1.00,0,0],[1.00,0,0],[1.08,0,0],[1.00,0,0],[1.02,0,0],[1.00,0,0],[1.00,0,0],[1.00,0,0],[1.00,0,0],[1.06,0,0],[1.03,0,0],[1.06,0,0],[1.03,0,0],[1.27,0,0],[1.26,0,0],[1.34,0,0],[1.00,0,0],[1.12,0,0],[1.12,0,0],[1.03,0,0],[1.03,0,0],[1.04,0,0],[1.05,0,0],[1.10,0,0],[1.10,0,0],[1.10,0,0],[1.05,0,0]];
-function avatarFocusFrame(index){const raw=AVATAR_FOCUS_FRAMES[index]||[1,0,0],finite=(value,fallback)=>Number.isFinite(Number(value))?Number(value):fallback;return{scale:Math.max(1,Math.min(1.6,finite(raw[0],1))),x:Math.max(-12,Math.min(12,finite(raw[1],0))),y:Math.max(-12,Math.min(12,finite(raw[2],0)))}}
-function avatarFocusClip(frame){const n=Number(frame?.scale||1);return Math.max(35,Math.min(42,35+Math.max(0,n-1)*18))}
+// Printshop masters already fill the same circular viewBox; no per-character zoom layer.
 function avatarSvg(bg,body){return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="'+bg+'"/>'+body+'</svg>'}
 const PRIVATE_AVATAR_ART=avatarSvg('#E7DDCC','<circle cx="32" cy="27" r="11" fill="#8F877B"/><path d="M13 54q2-18 19-18t19 18" fill="#8F877B"/><path d="M20 24q12-11 24 0" stroke="#F6F0DE" stroke-width="3" fill="none"/><path d="M22 44q10 7 20 0" stroke="#C66B42" stroke-width="3" fill="none" stroke-linecap="round"/>');
 function legacyAvatarIndex(value){return LEGACY_AVATARS.indexOf(String(value||'').trim())}
@@ -88,14 +83,9 @@ function avatarNode(index,label='Herní avatar'){
  const n=document.createElement('span'),safe=Number(index);
  n.className='organic-avatar';n.dataset.avatarIndex=String(safe);n.setAttribute('role','img');n.setAttribute('aria-label',label);
  if(safe>=0&&safe<AVATAR_COUNT){
-   const meta=AVATAR_MANIFEST[safe],img=document.createElement('img'),url=AVATAR_BASE_PATH+meta.file,frame=avatarFocusFrame(safe),clip=avatarFocusClip(frame);
-   n.dataset.avatarFile=meta.file;n.dataset.avatarCategory=meta.category;n.dataset.avatarFocusScale=String(frame.scale);n.dataset.avatarFocusX=String(frame.x);n.dataset.avatarFocusY=String(frame.y);n.dataset.avatarFocusClip=String(clip);
-   n.style.setProperty('--avatar-focus-scale',String(frame.scale));n.style.setProperty('--avatar-focus-x',frame.x+'%');n.style.setProperty('--avatar-focus-y',frame.y+'%');n.style.setProperty('--avatar-focus-clip',clip+'%');
-   // Keep the faithful full medallion as the base layer. The duplicate is clipped to a scale-aware
-   // inner aperture: larger avatars get a wider aperture so their *whole silhouette* grows, not only
-   // the central pixels. The outer cream rings remain from the untouched base layer.
-   n.style.backgroundImage=`url("${url}")`;
-   img.src=url;img.alt='';img.width=64;img.height=64;img.decoding='async';img.draggable=false;img.className='organic-avatar-focus';
+   const meta=AVATAR_MANIFEST[safe],img=document.createElement('img'),url=AVATAR_BASE_PATH+meta.file;
+   n.dataset.avatarFile=meta.file;n.dataset.avatarCategory=meta.category;
+   img.src=url;img.alt='';img.width=64;img.height=64;img.decoding='async';img.loading='lazy';img.draggable=false;img.className='organic-avatar-print';
    n.appendChild(img);
  }else n.innerHTML=PRIVATE_AVATAR_ART;
  return n;
