@@ -71,7 +71,7 @@
   const loadExtras=async()=>{
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=40140-s12b2','propletHomeLayout');
+    loadScript('/home-layout.js?v=brand1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=8','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');

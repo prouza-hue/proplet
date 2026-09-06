@@ -50,3 +50,24 @@ html.tiskarna-ui .organic-avatar-print{display:block;width:100%;height:100%;obje
  html.tiskarna-ui #screen-profile .level-step{min-width:150px!important}
 }
 html.tiskarna-ui #screen-daily #quickPlayCard.home-free-section{background:transparent!important;border:0!important;box-shadow:none!important}
+
+/* Letterpress brand mark: use the authoritative artwork in every header state. */
+.brand-mark,
+body:has(#screen-daily.active.home-layout-active) .home-brand .brand-mark{
+  width:40px!important;
+  height:40px!important;
+  padding:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+  display:block!important;
+  overflow:visible!important;
+}
+.brand-mark:after,
+body:has(#screen-daily.active.home-layout-active) .home-brand .brand-mark:after{display:none!important;content:none!important}
+.brand-mark img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important}
+
+/* Outlined wordmark keeps the same letterpress typography on every device. */
+html.tiskarna-ui .brand-copy strong{font-size:0!important;line-height:1!important}
+html.tiskarna-ui .brand-copy strong::before{content:"";display:block;width:111px;height:31px;background:currentColor;-webkit-mask:url('/brand/wordmark.svg?v=brand1') center/contain no-repeat;mask:url('/brand/wordmark.svg?v=brand1') center/contain no-repeat}

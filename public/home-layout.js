@@ -26,10 +26,11 @@
     const brand=document.querySelector('.brand'),mark=brand?.querySelector('.brand-mark');
     if(!brand||!mark)return;
     brand.classList.add('home-brand');
-    if(mark.dataset.homeMark){
-      mark.innerHTML='<span>P</span>';
-      delete mark.dataset.homeMark;
+    // Keep the authoritative letterpress mark in the home header as an image.
+    if(!mark.querySelector('img')){
+      mark.innerHTML='<img src="/brand/mark.svg?v=brand1" alt="" aria-hidden="true">';
     }
+    delete mark.dataset.homeMark;
   }
 
   function compactDailyHero(){
