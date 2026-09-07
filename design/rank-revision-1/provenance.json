@@ -1,0 +1,42 @@
+[
+  {
+    "key": "rank-14",
+    "source_png": "exec-299def4e-0343-4d34-8f95-d5f9cc60c470.png",
+    "source_sha256": "92d5b183a55333f65e65fd6d4d15bcc0dc6c7df2a301b6c5681e40f8afa3e9f8",
+    "source_mode": "RGB",
+    "master_png": "design/rank-revision-1/masters/rank-14.png",
+    "svg": "public/rewards/printshop/rank-14.svg"
+  },
+  {
+    "key": "rank-16",
+    "source_png": "exec-8bf8175a-5444-4490-9b60-ea67732d0080.png",
+    "source_sha256": "f0d527abc014923c2e147ad01a8dd5466c3b8224866c1fa1a575a2b083883861",
+    "source_mode": "RGBA",
+    "master_png": "design/rank-revision-1/masters/rank-16.png",
+    "svg": "public/rewards/printshop/rank-16.svg"
+  },
+  {
+    "key": "rank-24",
+    "source_png": "exec-30fe8b90-a138-47a1-b0bc-f8e61829c9f1.png",
+    "source_sha256": "3f33b61fa7582fc9ffd9f6ecd942467e8ba10cda96d8909126c5035361dce570",
+    "source_mode": "RGB",
+    "master_png": "design/rank-revision-1/masters/rank-24.png",
+    "svg": "public/rewards/printshop/rank-24.svg"
+  },
+  {
+    "key": "rank-31",
+    "source_png": "exec-0c7b9106-dfab-4cd8-941c-b39b0c8473f0.png",
+    "source_sha256": "ba9ce7ee5684ce41e49d7a1180f6ced4f8dd3ee676235c35c6494f869b0bffd2",
+    "source_mode": "RGBA",
+    "master_png": "design/rank-revision-1/masters/rank-31.png",
+    "svg": "public/rewards/printshop/rank-31.svg"
+  },
+  {
+    "key": "rank-32",
+    "source_png": "exec-9406efd3-c6a5-48c3-a296-0a81b9c6bb92.png",
+    "source_sha256": "2ab374c5ce345f8adf45184027db2eac1ef2b13203fa72d5c996e330073fce80",
+    "source_mode": "RGB",
+    "master_png": "design/rank-revision-1/masters/rank-32.png",
+    "svg": "public/rewards/printshop/rank-32.svg"
+  }
+]
