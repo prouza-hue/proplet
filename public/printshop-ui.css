@@ -150,3 +150,81 @@ html.tiskarna-ui[data-theme="dark"] #winModal .win-utility-btn:hover{background:
  html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji .ribbon-art,
  html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji .ribbon-art img{width:62px!important;height:62px!important}
 }
+
+
+/* September 8: stable mobile controls and collision-free progress. */
+html.tiskarna-ui #screen-profile .profile-completion-grid .organic-emblem{display:none!important}
+html.tiskarna-ui .difficulty-progress>span{font-size:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important}
+html.tiskarna-ui .difficulty-progress>span::after{content:'';width:6px;height:6px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:translateX(-1px) rotate(45deg)}
+html.tiskarna-ui .settings-header-gear{margin-left:12px!important;flex-shrink:0!important}
+@media(min-width:600px) and (max-width:1100px){
+ html.tiskarna-ui #screen-daily .home-competition-self{grid-template-columns:minmax(0,1fr)!important}
+ html.tiskarna-ui #screen-daily .home-progress-metrics{grid-template-columns:1.35fr 1fr 1fr!important}
+ html.tiskarna-ui #screen-daily .home-progress-total{grid-column:auto!important}
+ html.tiskarna-ui #screen-daily .home-progress-metric{padding:12px 8px!important}
+ html.tiskarna-ui #screen-daily .home-progress-metric>strong{font-size:20px!important;white-space:normal!important;overflow-wrap:anywhere}
+}
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game .game-actions{display:flex!important;gap:6px!important}
+ html.tiskarna-ui #screen-game .game-actions .secondary-btn{font-size:0!important;min-width:42px!important;width:42px!important;height:42px!important;padding:8px!important;display:grid!important;place-items:center!important}
+ html.tiskarna-ui #screen-game .game-actions .ui-icon{width:21px!important;height:21px!important;font-size:21px!important;margin:0!important}
+ html.tiskarna-ui #screen-game .game-message{min-width:0!important;text-align:left!important}
+ html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:112px!important;padding-right:112px!important;display:block!important;text-align:left!important}
+ html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word .clean-status{position:static!important}
+ html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important;border-radius:16px!important}
+ html.tiskarna-ui .touch-mag-cell{font-size:19px!important;border-radius:7px!important}
+ html.tiskarna-ui .touch-magnifier-grid{gap:3px!important}
+}
+
+/* Results screen corrections from the September 8 review. */
+
+/* The leaderboard rows remain useful without repeating the total beneath them. */
+html.tiskarna-ui #winModal .daily-world-count{display:none!important}
+
+/* The rank and percentile block duplicates the leaderboard information and crowds the result. */
+html.tiskarna-ui #winModal .daily-world-summary{display:none!important}
+
+/* Keep the XP result chip visually centered with equal breathing room above and below. */
+html.tiskarna-ui #winModal .win-summary-chips{padding-block:6px}
+html.tiskarna-ui #winModal .win-xp{margin-block:0!important}
+
+@media(max-width:480px){
+  html.tiskarna-ui #winModal .win-summary-chips{padding-block:7px}
+}
+
+html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block:6px!important}
+
+@media(pointer:coarse) and (min-width:601px){
+ html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:112px!important;padding-right:112px!important;display:block!important}
+ html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important}
+}
+/* Keep the interactive onboarding step usable on short phones and unfolded devices. */
+.onboarding-card:has(#tutorialBoard){
+  max-height:calc(100dvh - 20px);
+  padding-block:clamp(12px,2.4dvh,24px);
+}
+
+.onboarding-card:has(#tutorialBoard) #onboardContent{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+}
+
+.onboarding-card:has(#tutorialBoard) #onboardNextBtn{
+  position:relative;
+  z-index:1;
+  flex:0 0 auto;
+}
+
+@media (max-height:740px){
+  .onboarding-card:has(#tutorialBoard) .onboard-dots{margin-bottom:6px}
+  .onboarding-card:has(#tutorialBoard) .onboard-content h2{font-size:clamp(22px,4.2dvh,28px);margin-block:2px 4px}
+  .onboarding-card:has(#tutorialBoard) .onboard-content p{margin-bottom:6px;line-height:1.25}
+  .onboarding-card:has(#tutorialBoard) .tutorial-wrap{
+    width:min(100%,clamp(168px,calc(100dvh - 330px),238px));
+    margin:4px auto 6px;
+  }
+  .onboarding-card:has(#tutorialBoard) .tutorial-board{gap:5px}
+  .onboarding-card:has(#tutorialBoard) .tutorial-success{min-height:15px;margin-top:3px}
+  .onboarding-card:has(#tutorialBoard) #onboardNextBtn{min-height:44px;margin-top:4px}
+}

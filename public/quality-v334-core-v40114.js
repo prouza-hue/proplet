@@ -87,7 +87,7 @@ function ensureCalmSettings(){
 }
 function ensureCalmRunButton(){
   const actions=q('.game-actions');if(!actions||q('#calmRunBtn',actions))return;
-  const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.textContent='🫧 Klidný režim';btn.onclick=()=>openCalmConfirmation('run');actions.appendChild(btn);
+  const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.textContent='🫧 Klidný režim';btn.setAttribute('aria-label','Klidný režim');btn.title='Klidný režim';btn.onclick=()=>openCalmConfirmation('run');actions.appendChild(btn);
 }
 function ensureCalmConfirmation(){
   if(q('#calmConfirmModal'))return;

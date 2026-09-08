@@ -52,7 +52,8 @@ function create(deps={}){
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
     const el=ensureMagnifier(),board=query('#board');if(!el)return false;
-    const boardTop=board?.getBoundingClientRect?.().top??220,currentWordBottom=query('.current-word')?.getBoundingClientRect?.().bottom??0,magHeight=144,gap=12,top=Math.max(8,Math.ceil(currentWordBottom+8),Math.floor(boardTop-magHeight-gap));
+    const wordRect=query('.current-word')?.getBoundingClientRect?.(),boardTop=board?.getBoundingClientRect?.().top??220,top=wordRect?Math.ceil(wordRect.top+6):Math.max(8,boardTop-112);
+    el.style.setProperty('--magnifier-left',`${Math.max(8,Math.floor((wordRect?.right||(windowObj.innerWidth||360))-106))}px`);
     el.style.setProperty('--magnifier-top',`${top}px`);renderMagnifier(centerIndex);el.classList.remove('hidden');return true;
   }
 
@@ -101,3 +102,4 @@ const api={create};
 if(global)global.PropletGameInput=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:typeof self!=='undefined'?self:globalThis);
+

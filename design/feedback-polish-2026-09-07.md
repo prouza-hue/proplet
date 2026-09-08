@@ -25,3 +25,7 @@ Deferred visual assets — do not fake with emoji:
 2. New printshop challenge/crossed-swords icon for Vyzvat kamaráda.
 
 No gameplay rules, XP thresholds, rank thresholds, puzzle content or production main branch changed.
+
+
+September 8 follow-up: user reports above checklist was not fully achieved.
+Pending artwork (after bug fixes): Půlměsíc, Vyzvat kamaráda, Klidný režim.
