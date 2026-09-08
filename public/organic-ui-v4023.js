@@ -420,6 +420,18 @@ function applyRibbonContexts(){
  });
 }
 
+// Painted action marks are mounted after dynamic challenge/calm controls render.
+// Keep the surrounding text and accessible labels intact while replacing legacy emoji.
+function applyActionIcons(){
+ const src=(key,size)=>{const img=document.createElement('img');img.className='painted-action-icon';img.src=`/rewards/printshop/${key}.svg?v=icons1`;img.alt='';img.setAttribute('aria-hidden','true');img.width=size;img.height=size;img.decoding='async';img.loading='lazy';img.draggable=false;return img};
+ const stripLeading=(node,emoji)=>{[...node.childNodes].forEach(child=>{if(child.nodeType===Node.TEXT_NODE){const next=child.nodeValue.replace(new RegExp(`^(\\s*)${emoji}\\uFE0F?\\s*`,'u'),'$1');if(next!==child.nodeValue)child.nodeValue=next}})};
+ const button=(el,key,emoji,size=24)=>{if(!el)return;el.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());stripLeading(el,emoji);if(!el.querySelector(':scope>.painted-action-icon'))el.prepend(src(key,size));el.classList.add('painted-action-control')};
+ button(document.querySelector('#shareDailyBtn'),'challenge','⚔',24);
+ button(document.querySelector('#calmRunBtn'),'calm','🫧',24);
+ document.querySelectorAll('.calm-settings-icon,.calm-confirm-icon').forEach(slot=>{slot.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());if(!slot.querySelector(':scope>.painted-action-icon'))slot.replaceChildren(src('calm',22));slot.classList.add('painted-action-slot')});
+ document.querySelectorAll('.calm-quick>strong').forEach(label=>{label.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());stripLeading(label,'🫧');if(!label.querySelector(':scope>.painted-action-icon'))label.prepend(src('calm',22));label.classList.add('painted-action-label')});
+}
+
 function iconizeCloseButtons(){
  document.querySelectorAll('.modal-close,.release-notes-v3331-close').forEach(btn=>{
    if(btn.querySelector('.ui-icon'))return;btn.replaceChildren(svgIcon('close'));btn.classList.add('ui-icon-only');
@@ -463,7 +475,7 @@ function updateThemeMeta(){
 }
 let queued=false;
 function apply(){
- queued=false;applyAvatars();applyBespokeProgressArt();applyRibbonContexts();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
+ queued=false;applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
 }
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(apply)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();

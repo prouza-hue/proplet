@@ -230,3 +230,24 @@ html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block
 }
 /* Preserve game-mode/device visibility when sizing icon buttons. */
 html.tiskarna-ui #screen-game .game-actions .secondary-btn.hidden{display:none!important}
+
+/* Compact painted icons for challenge and calm action controls. */
+html.tiskarna-ui .painted-action-icon{
+  display:inline-block!important;
+  width:24px!important;
+  height:24px!important;
+  flex:0 0 24px!important;
+  object-fit:contain!important;
+  margin:0 .35em 0 0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  vertical-align:middle!important;
+}
+html.tiskarna-ui .painted-action-control{display:inline-flex!important;align-items:center!important;gap:0!important}
+html.tiskarna-ui :is(.calm-settings-icon,.calm-confirm-icon) .painted-action-icon,
+html.tiskarna-ui .calm-quick>strong .painted-action-icon{width:22px!important;height:22px!important;flex-basis:22px!important;margin-right:.3em!important}
+html.tiskarna-ui :is(.calm-settings-icon,.calm-confirm-icon){display:inline-flex!important;align-items:center!important}
+html.tiskarna-ui .calm-quick>strong{display:inline-flex!important;align-items:center!important}

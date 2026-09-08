@@ -15,7 +15,7 @@ function art(label,{locked=false,size=40,category}={}){
  const wrap=document.createElement('span');wrap.className='ribbon-art'+(locked?' is-locked':'');wrap.dataset.ribbon=key;if(printed)wrap.classList.add('printshop-art');wrap.setAttribute('role','img');wrap.setAttribute('aria-label',name+(locked?', zamčeno':''));
  for(const theme of ['print']){
   const img=document.createElement('img');img.className='ribbon-'+theme;img.alt='';img.setAttribute('aria-hidden','true');img.width=size;img.height=size;img.draggable=false;img.loading='lazy';img.decoding='async';
-  const revision=['rank-14','rank-16','rank-24','rank-31','rank-32'].includes(printKey)?'rankrev1':'3';
+  const revision=printKey==='pulmesic'?'icons1':['rank-14','rank-16','rank-24','rank-31','rank-32'].includes(printKey)?'rankrev1':'3';
   img.src='/rewards/printshop/'+printKey+'.svg?v='+revision;wrap.appendChild(img);
  }
  return wrap;

@@ -1103,5 +1103,26 @@
     "source_sha256": "d466f9da65707e38cf2479f7b40ed61fc808763fb4e1c0464a1d50e5e6a882fb",
     "cell": 17,
     "category": "symbol"
+  },
+  "pulmesic": {
+    "name": "Půlměsíc",
+    "file": "pulmesic.svg",
+    "source_sha256": "22f0330c7c10a2f9e8c9489c4b593c17d3faa0ab3cbc14626c72f28ea54268ac",
+    "source": "design/action-icons-2026-09-08",
+    "revision": "icons1"
+  },
+  "challenge": {
+    "name": "Vyzvat kamaráda",
+    "file": "challenge.svg",
+    "source_sha256": "5601f4f4092636ce4a37339d76f01fba790b89c4ce418fe18ca7ad81d62a3a12",
+    "source": "design/action-icons-2026-09-08",
+    "revision": "icons1"
+  },
+  "calm": {
+    "name": "Klidný režim",
+    "file": "calm.svg",
+    "source_sha256": "62b6bca1129669451115419878815d5f04792894f1bddeccc2b320db2b5dead8",
+    "source": "design/action-icons-2026-09-08",
+    "revision": "icons1"
   }
 }
