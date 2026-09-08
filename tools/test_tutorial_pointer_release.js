@@ -52,4 +52,20 @@ assert(cells.every(c=>!c.classList.contains('active')),'document-level release m
 tap(0);tap(1);tap(4);
 assert(cells[0].classList.contains('done')&&cells[1].classList.contains('done')&&cells[4].classList.contains('done'),'PES must remain retryable after a wrong path');
 assert.strictEqual(next.textContent,'Jo, chápu');
+
+// Exercise the real gesture-guard rewrite against MutationObserver-like delivery.
+// Assigning textContent, even to the same string, queues another mutation in browsers.
+const guard=fs.readFileSync('public/gesture-guard-v3325.js','utf8');
+const rewriteBody=guard.slice(guard.indexOf("const copy='Skoro."),guard.indexOf('\n      };',guard.indexOf("const copy='Skoro.")));
+let queued=0,writes=0,rewrite;
+const observedSuccess={_text:'Skoro. Zkus to znovu.'};
+Object.defineProperty(observedSuccess,'textContent',{
+  get(){return this._text},
+  set(value){this._text=value;writes++;queued++}
+});
+rewrite=new Function('success',rewriteBody).bind(null,observedSuccess);
+rewrite();
+for(let deliveries=0;queued&&deliveries<10;deliveries++){queued--;rewrite()}
+assert.strictEqual(queued,0,'wrong-copy observer must settle instead of starving the main thread');
+assert.strictEqual(writes,1,'wrong-copy observer should rewrite only once');
 console.log('tutorial pointer recovery: ok');

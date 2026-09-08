@@ -114,7 +114,8 @@
     if(success&&!success.dataset.gestureCopyObserver){
       success.dataset.gestureCopyObserver='1';
       const rewrite=()=>{
-        if(success.textContent?.startsWith('Skoro.'))success.textContent='Skoro. Zkus P ↓ E a potom doprava na S — tahem nebo třemi klepnutími.';
+        const copy='Skoro. Zkus P ↓ E a potom doprava na S — tahem nebo třemi klepnutími.';
+        if(success.textContent?.startsWith('Skoro.')&&success.textContent!==copy)success.textContent=copy;
       };
       new MutationObserver(rewrite).observe(success,{childList:true,characterData:true,subtree:true});
       rewrite();

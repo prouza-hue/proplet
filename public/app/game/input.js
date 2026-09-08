@@ -52,7 +52,7 @@ function create(deps={}){
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
     const el=ensureMagnifier(),board=query('#board');if(!el)return false;
-    const wordRect=query('.current-word')?.getBoundingClientRect?.(),boardTop=board?.getBoundingClientRect?.().top??220,top=wordRect?Math.ceil(wordRect.top+6):Math.max(8,boardTop-112);
+    const wordRect=query('.current-word')?.getBoundingClientRect?.(),boardTop=board?.getBoundingClientRect?.().top??220,top=wordRect?Math.ceil(wordRect.width<230?wordRect.bottom-106:wordRect.top+6):Math.max(8,boardTop-112);
     el.style.setProperty('--magnifier-left',`${Math.max(8,Math.floor((wordRect?.right||(windowObj.innerWidth||360))-106))}px`);
     el.style.setProperty('--magnifier-top',`${top}px`);renderMagnifier(centerIndex);el.classList.remove('hidden');return true;
   }

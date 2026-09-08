@@ -195,7 +195,7 @@ html.tiskarna-ui #winModal .win-xp{margin-block:0!important}
 html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block:6px!important}
 
 @media(pointer:coarse) and (min-width:601px){
- html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:112px!important;padding-right:112px!important;display:block!important}
+ html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:188px!important;padding-right:10px!important;padding-bottom:112px!important;display:block!important}
  html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important}
 }
 /* Keep the interactive onboarding step usable on short phones and unfolded devices. */
