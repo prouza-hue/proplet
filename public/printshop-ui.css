@@ -228,3 +228,5 @@ html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block
   .onboarding-card:has(#tutorialBoard) .tutorial-success{min-height:15px;margin-top:3px}
   .onboarding-card:has(#tutorialBoard) #onboardNextBtn{min-height:44px;margin-top:4px}
 }
+/* Preserve game-mode/device visibility when sizing icon buttons. */
+html.tiskarna-ui #screen-game .game-actions .secondary-btn.hidden{display:none!important}
