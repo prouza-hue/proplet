@@ -1269,7 +1269,7 @@ def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=10)):
     """Serve one released board without exposing the remaining weekend bank."""
     today = current_prague_date()
     if VERCEL_ENV == "preview":
-        selected_week = week or 1
+        selected_week = week or tajenka_week_for(today) or 1
     else:
         if not tajenka_is_live(today):
             raise HTTPException(404, "Tajenka zatím není vydaná")
@@ -4080,6 +4080,7 @@ def free_global_leaderboard(
     request: Request,
     puzzle_id: str = Query(min_length=2, max_length=80),
     authorization: Optional[str] = Header(default=None),
+    offset: Optional[int] = Query(default=None, ge=0),
 ):
     enforce_rate_limit(request, "free_global_read", limit=300, window_seconds=3600)
     """Worldwide standings for one active Free puzzle.
@@ -4125,7 +4126,10 @@ def free_global_leaderboard(
         None,
     )
     total = len(ranked)
-    if my_index is None:
+    page_offset = offset if isinstance(offset, int) else None
+    if page_offset is not None:
+        visible_indices = list(range(page_offset, min(total, page_offset + 50)))
+    elif my_index is None:
         visible_indices = list(range(min(3, total)))
     else:
         start = max(0, min(my_index - 1, total - 3))
@@ -4138,10 +4142,12 @@ def free_global_leaderboard(
     players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
     board = []
-    for index in visible_indices:
-        row = ranked[index]
+    visible_set = set(visible_indices)
+    for index, row in enumerate(ranked):
         pid = str(row.get("player_id") or "")
         identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"free:{puzzle_id}", used_aliases)
+        if index not in visible_set:
+            continue
         board.append({
             "rank": ranks[index],
             "isMine": index == my_index,
@@ -4166,6 +4172,7 @@ def free_global_leaderboard(
         "topPercent": top_percent,
         "percentileMinimum": 10,
         "rows": board,
+        "nextOffset": page_offset + 50 if page_offset is not None and page_offset + 50 < total else None,
         "privacy": "opt-in-identity-otherwise-alias",
         "attemptPolicy": "first-completed-only",
     }
@@ -4176,6 +4183,7 @@ def daily_global_leaderboard(
     request: Request,
     daily_date: Optional[str] = Query(default=None),
     authorization: Optional[str] = Header(default=None),
+    offset: Optional[int] = Query(default=None, ge=0),
 ):
     """Global Daily standings: opted-in identity, otherwise a privacy-safe playful alias."""
     enforce_rate_limit(request, "daily_global_read", limit=300, window_seconds=3600)
@@ -4225,7 +4233,10 @@ def daily_global_leaderboard(
 
     my_index = next((index for index, row in enumerate(ranked) if str(row.get("player_id")) == my_player_id), None)
     total = len(ranked)
-    if my_index is None:
+    page_offset = offset if isinstance(offset, int) else None
+    if page_offset is not None:
+        visible_indices = list(range(page_offset, min(total, page_offset + 50)))
+    elif my_index is None:
         visible_indices = list(range(min(3, total)))
     else:
         start = max(0, min(my_index - 1, total - 3))
@@ -4238,10 +4249,12 @@ def daily_global_leaderboard(
     players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
     board = []
-    for index in visible_indices:
-        row = ranked[index]
+    visible_set = set(visible_indices)
+    for index, row in enumerate(ranked):
         pid = str(row.get("player_id") or "")
         identity = _ranking_display_identity(players_by_id.get(pid), my_player_id, f"day:{selected_date}", used_aliases)
+        if index not in visible_set:
+            continue
         board.append({
             "rank": ranks[index],
             "isMine": index == my_index,
@@ -4264,6 +4277,7 @@ def daily_global_leaderboard(
         "myRank": my_rank,
         "topPercent": top_percent,
         "rows": board,
+        "nextOffset": page_offset + 50 if page_offset is not None and page_offset + 50 < total else None,
         "privacy": "opt-in-identity-otherwise-alias",
     }
 

@@ -1582,12 +1582,36 @@ function rankBadge(rank){
  const value=Number(rank)||0,medals={1:['🥇','Zlatá medaile'],2:['🥈','Stříbrná medaile'],3:['🥉','Bronzová medaile']},medal=medals[value];
  return medal?`<span class="result-medal result-medal-${value}" role="img" aria-label="${medal[1]}">${medal[0]}</span>`:`<span class="result-rank-number">${value}.</span>`;
 }
+function rankingExpandMarkup(data){
+ const total=Number(data?.total||0);if(total<=1)return '';
+ const rank=Number(data?.myRank||0);
+ return `<details class="ranking-expand"><summary>Zobrazit pořadí · ${countCz(total,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${rank?`Tvoje pozice: ${rank}. z ${total}.`:'Celkové pořadí hráčů.'}</p><div class="ranking-expanded-rows"></div><button type="button" class="secondary-btn ranking-more">Načíst pořadí</button></details>`;
+}
+function rankingExpandedRows(rows){
+ return rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('');
+}
+function bindRankingExpansion(container,data){
+ const details=container.querySelector('.ranking-expand');if(!details)return;
+ const rows=details.querySelector('.ranking-expanded-rows'),button=details.querySelector('.ranking-more');
+ const endpoint=data?.date?`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(data.date)}`:data?.puzzleId?`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(data.puzzleId)}`:null;
+ let offset=0,loading=false,loaded=false;
+ const load=async()=>{
+  if(loading||offset===null||!endpoint)return;loading=true;button.disabled=true;button.textContent='Načítám…';
+  try{
+   const page=transformRankingPayload(await api(`${endpoint}&offset=${offset}`));
+   if(!details.isConnected)return;
+   rows.insertAdjacentHTML('beforeend',rankingExpandedRows(page.rows||[]));
+   offset=page.nextOffset??null;loaded=true;button.classList.toggle('hidden',offset===null);button.textContent='Další hráči';
+  }catch{button.textContent='Zkusit načíst znovu'}finally{loading=false;button.disabled=false}
+ };
+ details.addEventListener('toggle',()=>{if(details.open&&!loaded)load()});button.onclick=load;
+}
 function renderFreeWorldBoard(data,error){
  if(error)return `<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(error)} Výsledek tím není ohrožený.</small></div>`;
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[],minimum=Number(data?.percentileMinimum||10);
- if(!rank){return `<div class="daily-world-head"><strong>🌍 Globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už tuhle úroveň proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${getProfile()?.token?'Tvůj první výsledek zatím není v globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.'}</small></div>${rows.length?`<div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>`:''}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`}
+ if(!rank){return `<div class="daily-world-head"><strong>🌍 Globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už tuhle úroveň proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${getProfile()?.token?'Tvůj první výsledek zatím není v globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.'}</small></div>${rows.length?`<div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>`:''}${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`}
  const topLine=total===1?'První hráč téhle úrovně. Trůn je zatím celý tvůj.':total>=minimum?`Patříš mezi nejlepších ${data.topPercent} % hráčů této úrovně.`:`Jsi ${rank}. z ${total}. Procenta ukážeme od ${minimum} hráčů.`;
- return `<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class="daily-world-count">${countCz(total,'hráč','hráči','hráčů')} celkem</small><small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku · počítá se první dokončený pokus.</small>`;
+ return `<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku · počítá se první dokončený pokus.</small>`;
 }
 function renderFreeTeamBoard(data,error,myId){
  if(error)return `<div class="leaderboard-empty"><strong>Týmová tribuna se nenačetla.</strong><small>${esc(error)}</small></div>`;
@@ -1597,15 +1621,16 @@ function renderFreeTeamBoard(data,error,myId){
 }
 function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
  const globalRank=Number(data?.world?.myRank||0)||null,teamRank=(data?.team?.rows||[]).find(r=>r.id===myId)?.rank||null;
- const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
+ const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;if(active==='world')bindRankingExpansion(container,data?.world);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
  render(initialTab);return {globalRank,teamRank};
 }
 async function loadWinLevelLeaderboard(puzzle,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='free'||isMozkomorQaDifficulty(puzzle?.difficulty)){box?.classList.add('hidden');return}box.classList.remove('hidden');box.innerHTML='<div class="leaderboard-empty">Načítám globální i týmové pořadí…</div>';try{const data=await fetchFreeLevelLeaderboards(puzzle.id),ranks=renderFreeLeaderboardPanel(box,data,getProfile()?.id);levelDetailContext={puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:puzzle.meta?.level,globalRank:ranks.globalRank,teamRank:ranks.teamRank,result:rec}}catch(e){box.innerHTML=`<div class="leaderboard-empty">Pořadí se teď nepodařilo načíst. <small>${esc(e.message)}</small></div>`}}
 function renderDailyGlobalLeaderboardBox(container,data){
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[];container.classList.remove('free-level-board');container.classList.add('daily-global-board');container.classList.remove('hidden');
- if(!rank){const message=getProfile()?.token?'Tvůj výsledek zatím není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>`;return}
+ if(!rank){const message=getProfile()?.token?'Tvůj výsledek zatím není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>${rankingExpandMarkup(data)}`;bindRankingExpansion(container,data);return}
  const topLine=total===1?'První hráč dne. Království je zatím celé tvoje.':`Patříš mezi nejlepších ${data.topPercent} % dnešních hráčů.`;
- container.innerHTML=`<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class="daily-world-count">${countCz(total,'hráč','hráči','hráčů')} dnes</small><small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
+ container.innerHTML=`<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
+ bindRankingExpansion(container,data);
 }
 async function loadWinDailyGlobalLeaderboard(date,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='daily'){return}box.classList.remove('hidden');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám globální pořadí…</div>';try{const data=transformRankingPayload(await api(`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(date)}`));winDailyGlobalData=data;renderDailyGlobalLeaderboardBox(box,data)}catch(e){box.innerHTML=`<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(e.message)}. Výsledek tím není ohrožený.</small></div>`}}
 async function openLevelDetail(diff,puzzleId){
@@ -1847,12 +1872,15 @@ function renderTajenkaEntry(){
  if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){root.classList.add('hidden');root.classList.remove('completed');root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;root.innerHTML='';return}
  const state=tajenkaState(),inProgress=state.inProgress?.puzzleId===tajenkaPuzzle.id,completion=tajenkaCompletion(tajenkaPuzzle,state),completed=!!completion;
  const quick=$('#quickPlayCard'),hero=document.querySelector('#screen-daily .daily-hero');
- if(completed&&quick?.parentNode===root.parentNode)quick.insertAdjacentElement('afterend',root);
- else if(!completed&&hero?.parentNode===root.parentNode)hero.insertAdjacentElement('afterend',root);
+ $('#screen-daily')?.appendChild(root);
  root.classList.toggle('completed',completed);
  if(completed){
-  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><h2>Tajenka odhalena</h2><small class="tajenka-entry-next">Další přijde zase v sobotu.</small></div><span class="tajenka-entry-open" aria-hidden="true">›</span>`;
-  root.setAttribute('role','button');root.tabIndex=0;root.setAttribute('aria-label','Tajenka odhalena. Zobrazit výsledek.');root.onclick=()=>showTajenkaRecap(completion);root.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showTajenkaRecap(completion)}};root.classList.remove('hidden');trackTajenkaView();return;
+  root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
+  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><h2>Tajenka odhalena</h2><strong class="tajenka-revealed-phrase">${esc(tajenkaPuzzle.tajenka.phrase)}</strong><small class="tajenka-entry-next">Další přijde zase v sobotu.</small></div><div class="tajenka-home-actions"><button type="button" class="secondary-btn" data-tajenka-recap>Zobrazit výsledek</button><button type="button" class="secondary-btn" data-tajenka-share>Sdílet Tajenku</button></div>`;
+  root.querySelector('[data-tajenka-recap]').onclick=()=>showTajenkaRecap(completion);
+  const phrase=tajenkaPuzzle.tajenka.phrase;
+  root.querySelector('[data-tajenka-share]').onclick=()=>shareProplet(`Proplet · Tajenka odhalena\n${phrase}\n\nZahraj si taky: ${SHARE_URL}`);
+  root.classList.remove('hidden');trackTajenkaView();return;
  }
  root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
  const progress=inProgress?tajenkaFoundFromState(tajenkaPuzzle,state.inProgress).length:0,total=tajenkaPhraseWords(tajenkaPuzzle).length,reward=Number(tajenkaPuzzle.meta?.rewardXp)||TAJENKA_REWARD_XP;

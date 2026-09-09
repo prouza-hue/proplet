@@ -100,7 +100,6 @@ html.tiskarna-ui #screen-profile .profile-completion-grid>span small{display:blo
  html.tiskarna-ui #screen-game .current-word>div{min-width:0!important;max-width:100%!important}
  html.tiskarna-ui #screen-game .current-word strong{max-width:100%!important;font-size:clamp(16px,5.4vw,22px)!important;letter-spacing:.07em!important;line-height:1.15!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important}
  html.tiskarna-ui #screen-game .current-word strong::-webkit-scrollbar{display:none!important}
- html.tiskarna-ui #screen-game .game-message{min-height:30px!important;max-height:36px!important;margin:0!important;font-size:11.5px!important;line-height:1.25!important;overflow:hidden!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important}
  html.tiskarna-ui .touch-magnifier{width:132px!important;height:132px!important;padding:7px!important}
 }
 
@@ -171,8 +170,6 @@ html.tiskarna-ui .settings-header-gear{margin-left:12px!important;flex-shrink:0!
  html.tiskarna-ui #screen-game #calmRunBtn::after{content:"Klid";font-size:10px;line-height:1;font-weight:850;letter-spacing:0}
  html.tiskarna-ui #screen-game #magnifierQuickBtn{min-width:44px!important;width:44px!important;padding-inline:7px!important}
  html.tiskarna-ui #screen-game .game-message{min-width:0!important;text-align:left!important}
- html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:112px!important;padding-right:112px!important;display:block!important;text-align:left!important}
- html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word .clean-status{position:static!important}
  html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important;border-radius:16px!important}
  html.tiskarna-ui .touch-mag-cell{font-size:19px!important;border-radius:7px!important}
  html.tiskarna-ui .touch-magnifier-grid{gap:3px!important}
@@ -197,7 +194,6 @@ html.tiskarna-ui #winModal .win-xp{margin-block:0!important}
 html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block:6px!important}
 
 @media(pointer:coarse) and (min-width:601px){
- html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:188px!important;padding-right:10px!important;padding-bottom:112px!important;display:block!important}
  html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important}
 }
 /* Keep the interactive onboarding step usable on short phones and unfolded devices. */
@@ -253,3 +249,67 @@ html.tiskarna-ui :is(.calm-settings-icon,.calm-confirm-icon) .painted-action-ico
 html.tiskarna-ui .calm-quick>strong .painted-action-icon{width:22px!important;height:22px!important;flex-basis:22px!important;margin-right:.3em!important}
 html.tiskarna-ui :is(.calm-settings-icon,.calm-confirm-icon){display:inline-flex!important;align-items:center!important}
 html.tiskarna-ui .calm-quick>strong{display:inline-flex!important;align-items:center!important}
+
+/* September 9 feedback: compact HUD; feedback has a stable home above the board. */
+html.tiskarna-ui #screen-game :is(.game-info,.current-word,#hintBtn){
+ background:color-mix(in srgb,var(--r-board-mat) 58%,var(--r-paper))!important;
+ background-image:none!important;box-shadow:none!important;border-color:var(--r-edge)!important;
+}
+html.tiskarna-ui #screen-game .current-word{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+ grid-template-rows:auto auto!important;gap:2px 8px!important;
+ min-height:0!important;height:auto!important;padding:6px 10px!important;align-items:center!important;
+}
+html.tiskarna-ui #screen-game .current-word>div:first-child{grid-column:1;grid-row:1}
+html.tiskarna-ui #screen-game .current-word .clean-status{grid-column:2;grid-row:1;position:static!important;margin:0!important;white-space:nowrap}
+html.tiskarna-ui #screen-game .current-word strong{margin:0!important;min-height:22px!important;line-height:1.15!important}
+html.tiskarna-ui #screen-game .current-word #gameMessage{
+ grid-column:1/-1!important;grid-row:2!important;display:block!important;
+ height:42px!important;min-height:42px!important;max-height:42px!important;
+ margin:0!important;padding:0!important;align-self:start!important;
+ font-size:15px!important;line-height:1.4!important;white-space:normal!important;
+ overflow-y:auto!important;overflow-x:hidden!important;text-overflow:clip!important;
+ -webkit-line-clamp:unset!important;text-align:left!important;
+}
+html.tiskarna-ui #screen-game .word-status-row .lengths{
+ display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;
+ overflow-y:hidden!important;width:auto!important;scrollbar-width:none;
+}
+html.tiskarna-ui #screen-game .word-status-row .length-pill{flex:0 0 auto!important;width:auto!important;min-width:24px!important}
+html.tiskarna-ui #screen-game .game-control-column{grid-template-columns:1fr!important}
+html.tiskarna-ui #screen-game .game-actions{grid-column:1!important;width:100%}
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game .game-info{padding:4px 8px!important}
+ html.tiskarna-ui #screen-game .word-status-row{grid-template-columns:76px minmax(0,1fr)!important;gap:5px!important}
+ html.tiskarna-ui #screen-game .current-word .stat-label{font-size:11px!important}
+ html.tiskarna-ui #screen-game .current-word .clean-status{font-size:12px!important}
+ html.tiskarna-ui #screen-game .game-actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:6px!important}
+ html.tiskarna-ui #screen-game .game-actions .secondary-btn{min-width:0!important;min-height:48px!important;height:48px!important;padding:6px!important}
+ html.tiskarna-ui #screen-game :is(#hintBtn,#calmRunBtn)::after{font-size:15px!important;line-height:1.35!important}
+ html.tiskarna-ui #screen-game #magnifierQuickBtn{width:48px!important;min-width:48px!important;order:3}
+}
+/* The magnifier overlays the upper HUD only during a drag; it never reserves board space. */
+html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;top:var(--magnifier-top)!important;transform:none!important;pointer-events:none!important}
+html.tiskarna-ui #winModal #winBadge{display:none!important}
+html.tiskarna-ui #winModal :is(#winPrimaryBtn,#winShareBtn.challenge-share-cta){
+ display:flex;align-items:center;justify-content:center;gap:8px;
+ width:100%!important;max-width:none!important;min-height:52px!important;
+ padding:12px 16px!important;margin:8px 0!important;border:0!important;
+ border-radius:12px!important;box-shadow:none!important;filter:none!important;
+ font-size:17px!important;font-weight:850!important;line-height:1.35!important;transform:none!important;
+}
+html.tiskarna-ui #winModal .win-secondary-actions:has(.challenge-share-cta:not(.hidden)){display:flex!important;flex-wrap:wrap!important;gap:6px!important}
+html.tiskarna-ui #winModal #winShareBtn.challenge-share-cta{flex:0 0 100%;background:#BA4557!important;color:#FFF8E9!important;text-shadow:none!important}
+html.tiskarna-ui #winModal #winShareBtn.challenge-share-cta::before,
+html.tiskarna-ui #winModal #winShareBtn.challenge-share-cta::after{display:none!important}
+html.tiskarna-ui #winModal .ranking-expand{margin:8px 0}
+html.tiskarna-ui .ranking-expand summary{cursor:pointer;list-style:none;padding:11px 8px;text-align:center;border:1px solid var(--td-line);border-radius:10px;font-size:15px;line-height:1.35;font-weight:750;color:var(--td-ink)}
+html.tiskarna-ui .ranking-expand summary::after{content:'⌄';margin-left:8px}
+html.tiskarna-ui .ranking-expand[open] summary::after{content:'⌃'}
+html.tiskarna-ui .ranking-expanded-position{font-size:15px;line-height:1.4;margin:10px 0}
+html.tiskarna-ui .ranking-expand .ranking-more{width:100%;min-height:44px;margin-top:8px}
+html.tiskarna-ui #screen-daily #tajenkaPreviewCard{grid-area:auto!important;grid-column:1/-1!important;order:99;background:var(--td-paper)!important;border:1px solid var(--td-line)!important;box-shadow:none!important}
+html.tiskarna-ui #screen-daily #tajenkaPreviewCard.completed{display:grid;grid-template-columns:40px minmax(0,1fr)!important;gap:10px!important;padding:16px!important}
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-revealed-phrase{display:block;font-size:20px;line-height:1.3;margin:8px 0;color:var(--td-ink)}
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions button{flex:1;min-height:44px;font-size:15px}

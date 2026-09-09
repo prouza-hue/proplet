@@ -53,8 +53,11 @@ function create(deps={}){
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
     const el=ensureMagnifier(),board=query('#board');if(!el)return false;
-    const wordRect=query('.current-word')?.getBoundingClientRect?.(),boardTop=board?.getBoundingClientRect?.().top??220,top=wordRect?Math.ceil(wordRect.width<230?wordRect.bottom-106:wordRect.top+6):Math.max(8,boardTop-112);
-    el.style.setProperty('--magnifier-left',`${Math.max(8,Math.floor((wordRect?.right||(windowObj.innerWidth||360))-106))}px`);
+    const wordRect=query('.current-word')?.getBoundingClientRect?.(),boardTop=query('#boardStage')?.getBoundingClientRect?.().top??board?.getBoundingClientRect?.().top??220;
+    const viewWidth=windowObj.visualViewport?.width||windowObj.innerWidth||360;
+    const top=Math.max(8,Math.floor(boardTop-106));
+    const left=Math.max(8,Math.min(viewWidth-108,Math.floor((wordRect?.right||viewWidth)-106)));
+    el.style.setProperty('--magnifier-left',`${left}px`);
     el.style.setProperty('--magnifier-top',`${top}px`);renderMagnifier(centerIndex);el.classList.remove('hidden');return true;
   }
 

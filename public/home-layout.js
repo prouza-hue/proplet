@@ -157,7 +157,7 @@
     renderCompetitionSelf(self);
     if(!top.length){root.innerHTML='<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-empty"><strong>Pořadí se právě rozjíždí.</strong><span>Nasbírej XP a zabydli se nahoře.</span></div>';return}
     const medals=['🥇','🥈','🥉'];
-    root.innerHTML=`<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-list">${top.map((r,i)=>`<div class="home-ranking-row ${r.isMine?'mine':''}"><span class="home-ranking-medal">${medals[i]}</span><span class="home-ranking-avatar">${htmlEsc(r.avatar||'🙂')}</span><strong>${htmlEsc(r.name||'Hráč')}${r.isMine?' <span class="home-ranking-you">TY</span>':''}</strong><b>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</b></div>`).join('')}</div>`+((self&&self.rank>3)?`<div class="home-ranking-selfline"><span>Tvoje místo</span><strong>${self.rank}. místo · ${Number(self.xp||0).toLocaleString('cs-CZ')} XP</strong></div>`:(!getProfile?.()?.token?'<button type="button" class="home-ranking-login" data-home-profile>Přihlas se a ukaž svoje místo v pořadí →</button>':''));
+    root.innerHTML=`<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-list">${top.map((r,i)=>`<div class="home-ranking-row ${r.isMine?'mine':''}"><span class="home-ranking-medal">${medals[i]}</span><span class="home-ranking-avatar">${htmlEsc(r.avatar||'🙂')}</span><strong>${htmlEsc(r.name||'Hráč')}${r.isMine?' <span class="home-ranking-you">TY</span>':''}</strong><b>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</b></div>`).join('')}</div>`+(!getProfile?.()?.token?'<button type="button" class="home-ranking-login" data-home-profile>Přihlas se a ukaž svoje místo v pořadí →</button>':'');
     root.querySelector('[data-home-profile]')?.addEventListener('click',()=>nav('profile'));
   }
 
@@ -194,6 +194,8 @@
     renderResumeCard();
     ensureCompetitionCard();
     placeMetaProgress();
+    const tajenka=document.querySelector('#tajenkaPreviewCard');
+    if(tajenka)document.querySelector('#screen-daily')?.appendChild(tajenka);
     loadCompetition();
   }
 

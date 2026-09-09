@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#FDFBF7" data-light-color="#FDFBF7" />
   <meta name="color-scheme" content="light dark" />
   <script src="/runtime-meta.js" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=fixsep8c"></script>
+  <script src="/theme-init.js?v=feedback9"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="/quality-v334.css?v=4" />
   <link rel="stylesheet" href="/organic-ui-v4023.css?v=11" />
   <link rel="stylesheet" href="/ribbon-ui.css?v=board1" />
-  <link rel="stylesheet" href="/printshop-ui.css?v=board1" />
+  <link rel="stylesheet" href="/printshop-ui.css?v=feedback9" />
 </head>
 <body>
   <div class="ambient ambient-one"></div>
@@ -238,6 +238,7 @@
           <div class="current-word card">
             <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
             <span id="cleanStatus" class="clean-status">✨ Čistě</span>
+            <div id="gameMessage" class="game-message" aria-live="polite"></div>
           </div>
 
           <div id="tajenkaPhrase" class="tajenka-phrase card hidden" aria-live="polite"></div>
@@ -256,7 +257,6 @@
         </div>
 
         <aside class="game-control-column">
-          <div id="gameMessage" class="game-message" aria-live="polite"></div>
           <div class="game-actions">
             <button id="hintBtn" class="secondary-btn" aria-label="Nápověda" title="Nápověda">💡 Nápověda</button>
             <button id="magnifierQuickBtn" class="secondary-btn magnifier-quick-btn hidden" type="button" aria-label="Vypnout lupu při tahu" aria-pressed="true" title="Lupa při tahu">🔍</button>
@@ -293,6 +293,7 @@
         <p id="winText" class="muted"></p>
         <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
       </div>
+      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
       <div id="tajenkaWinPhrase" class="tajenka-win-phrase hidden" aria-live="polite"></div>
       <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
       <button id="winAccountBtn" class="win-account-btn hidden">☁️ Uložit postup a zobrazit své místo</button>
@@ -302,7 +303,6 @@
         <button id="starterWarmupBtn" class="starter-choice-btn starter-choice-warmup"><span class="starter-choice-icon" aria-hidden="true">🌱</span><span><strong>Snadná</strong><small>Na rozjezd</small></span></button>
         <button id="starterHardDailyBtn" class="starter-choice-btn starter-choice-hard"><span class="starter-choice-icon" aria-hidden="true">🔥</span><span><strong>Dnešní Těžká</strong><small>Jdu rovnou</small></span></button>
       </div>
-      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
       <div class="win-secondary-actions" aria-label="Další akce">
         <button id="winShareBtn" class="win-utility-btn hidden">↗ Sdílet</button>
         <button id="winReplayBtn" class="win-utility-btn hidden">↻ Znovu</button>
@@ -642,7 +642,7 @@
   <script src="/app/account/account.js"></script>
   <script src="/app/game/state.js"></script>
   <script src="/app/game/board.js"></script>
-  <script src="/app/game/input.js?v=board1"></script>
+  <script src="/app/game/input.js?v=feedback9"></script>
   <script src="/app/game/hints.js"></script>
   <script src="/app/core/completion-pipeline.js"></script>
   <script src="/app/core/result-queue.js"></script>
@@ -653,7 +653,7 @@
   <script src="/app/rankings/rankings.js?v=fixsep8c"></script>
   <script src="/ribbon-catalog.js?v=icons1"></script>
   <script src="/ribbon-ui.js?v=icons1"></script>
-  <script src="/app.js?v=4022-board1"></script>
+  <script src="/app.js?v=4022-feedback9"></script>
   <script src="/quality-v334.js?v=fixsep8b"></script>
   <script src="/organic-ui-v4023.js?v=icons2"></script>
 </body>
