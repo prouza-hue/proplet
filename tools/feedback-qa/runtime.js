@@ -4,6 +4,8 @@ for(const key of ['localStorage','sessionStorage']){const map=new Map();Object.d
 const params=new URLSearchParams(parent.location.search),view=params.get('view')||'hardcore';
 if(Number(params.get('width')||390)<1000){const base=window.matchMedia.bind(window);window.matchMedia=q=>{const m=base(q);if(!/pointer/.test(q))return m;return new Proxy(m,{get:(o,k)=>k==='matches'?q.includes('coarse'):typeof o[k]==='function'?o[k].bind(o):o[k]})};Object.defineProperty(navigator,'maxTouchPoints',{value:1})}
 const rows=Array.from({length:7},(_,i)=>({rank:i+1,isMine:i===4,name:i===4?'Ty':`Hráč ${i+1}`,avatar:'🐱',elapsedMs:50000+i*5000,moves:7+i,hintsUsed:0,cleanSolve:true}));
+Object.defineProperty(screen,'width',{get:()=>innerWidth});Object.defineProperty(screen,'height',{get:()=>innerHeight});
+Object.defineProperty(screen.orientation,'type',{get:()=>innerWidth>innerHeight?'landscape-primary':'portrait-primary'});
 const baseFetch=window.fetch.bind(window);window.fetch=(url,opts={})=>{
  const u=new URL(typeof url==='string'?url:url.url,parent.location.origin);
  if(u.pathname.startsWith('/api/')&&u.pathname!=='/api/tajenka'){

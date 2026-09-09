@@ -1616,8 +1616,12 @@ function renderFreeWorldBoard(data,error){
 function renderFreeTeamBoard(data,error,myId){
  if(error)return `<div class="leaderboard-empty"><strong>Týmová tribuna se nenačetla.</strong><small>${esc(error)}</small></div>`;
  if(data?.anonymous)return '<div class="leaderboard-empty"><strong>Ulož si postup a pak se můžeš přidat k týmu.</strong><small>Týmový žebříček srovnává přesně tuhle úroveň.</small></div>';
- const rows=data?.rows||[];if(!rows.length)return '<div class="leaderboard-empty">Zatím jsi tady první. To je docela slušný začátek. 👑</div>';
- return rows.map(r=>`<div class="mini-leader-row ${r.id===myId?'me':''}"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.name)}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('');
+ const rows=(data?.rows||[]).map(r=>({...r,isMine:r.id===myId}));if(!rows.length)return '<div class="leaderboard-empty">Zatím jsi tady první.</div>';
+ const mine=rows.findIndex(r=>r.isMine),start=mine<0?0:Math.max(0,Math.min(mine-1,rows.length-3));
+ const compact=rankingExpandedRows(rows.slice(start,start+3));
+ if(rows.length<=1)return compact;
+ return `${compact}<details class="ranking-expand"><summary>Zobrazit týmové pořadí · ${countCz(rows.length,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${mine>=0?`Tvoje pozice: ${rows[mine].rank}. z ${rows.length}.`:'Celkové pořadí týmu.'}</p>${rankingExpandedRows(rows)}</details>`;
+
 }
 function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
  const globalRank=Number(data?.world?.myRank||0)||null,teamRank=(data?.team?.rows||[]).find(r=>r.id===myId)?.rank||null;
