@@ -260,7 +260,7 @@ html.tiskarna-ui #screen-game .current-word{
  grid-template-rows:auto auto!important;gap:2px 8px!important;
  min-height:0!important;height:auto!important;padding:6px 10px!important;align-items:center!important;
 }
-html.tiskarna-ui #screen-game .current-word>div:first-child{grid-column:1;grid-row:1}
+html.tiskarna-ui #screen-game .current-word>div:first-child{grid-column:1;grid-row:1;display:flex!important;align-items:center;gap:8px}
 html.tiskarna-ui #screen-game .current-word .clean-status{grid-column:2;grid-row:1;position:static!important;margin:0!important;white-space:nowrap}
 html.tiskarna-ui #screen-game .current-word strong{margin:0!important;min-height:22px!important;line-height:1.15!important}
 html.tiskarna-ui #screen-game .current-word #gameMessage{

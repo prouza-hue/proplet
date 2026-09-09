@@ -5,7 +5,7 @@ const params=new URLSearchParams(parent.location.search),view=params.get('view')
 if(Number(params.get('width')||390)<1000){const base=window.matchMedia.bind(window);window.matchMedia=q=>{const m=base(q);if(!/pointer/.test(q))return m;return new Proxy(m,{get:(o,k)=>k==='matches'?q.includes('coarse'):typeof o[k]==='function'?o[k].bind(o):o[k]})};Object.defineProperty(navigator,'maxTouchPoints',{value:1})}
 const rows=Array.from({length:7},(_,i)=>({rank:i+1,isMine:i===4,name:i===4?'Ty':`Hráč ${i+1}`,avatar:'🐱',elapsedMs:50000+i*5000,moves:7+i,hintsUsed:0,cleanSolve:true}));
 const baseFetch=window.fetch.bind(window);window.fetch=(url,opts={})=>{
- const u=new URL(typeof url==='string'?url:url.url,location.origin);
+ const u=new URL(typeof url==='string'?url:url.url,parent.location.origin);
  if(u.pathname.startsWith('/api/')&&u.pathname!=='/api/tajenka'){
   let data={};
   if(u.pathname.includes('global-leaderboard'))data={total:7,myRank:5,topPercent:72,puzzleId:'g4-x-001',...(view==='daily'?{date:'2026-09-09'}:{}),rows:u.searchParams.has('offset')?rows:rows.slice(3,6),nextOffset:null};
@@ -32,7 +32,7 @@ window.addEventListener('load',()=>{
     else renderDailyGlobalLeaderboardBox(document.querySelector('#levelLeaderboardBox'),data);
    }else message('„ČERNÍ“ je platné slovo navíc. +1 XP','good');
   }
-  setTimeout(()=>{document.querySelector('#onboardModal')?.classList.add('hidden');document.querySelectorAll('.onboarding-modal').forEach(el=>el.classList.add('hidden'));fitGameBoard();drawPaths()},300);
+  setTimeout(()=>{document.querySelector('#onboardingModal')?.classList.add('hidden');document.querySelectorAll('.onboarding-modal').forEach(el=>el.classList.add('hidden'));fitGameBoard();drawPaths()},300);
  };setTimeout(ready,1000);
 },{once:true});
 })();
