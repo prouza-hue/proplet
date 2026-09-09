@@ -31,5 +31,5 @@ function waitForGame(attempt=0){
  document.documentElement.classList.add('board-qa-mode');
  requestAnimationFrame(()=>requestAnimationFrame(()=>{fitGameBoard();drawPaths();document.documentElement.dataset.boardQaReady='1'}));
 }
-waitForGame();
+window.addEventListener('load',()=>setTimeout(waitForGame,900),{once:true});
 })();
