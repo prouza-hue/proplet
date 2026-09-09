@@ -8,6 +8,7 @@ function create(deps={}){
   const ensureAudio=deps.ensureAudio||(()=>{});
   const fx=deps.fx||(()=>{});
   const hideUndo=deps.hideUndo||(()=>{});
+  const clearHints=deps.clearHints||(()=>{});
   const submit=deps.submit||(()=>{});
   const query=deps.query||(()=>null);
   const documentObj=deps.documentObj||(typeof document!=='undefined'?document:null);
@@ -78,6 +79,7 @@ function create(deps={}){
     event.preventDefault();ensureAudio();
     const game=getGame(),index=+event.currentTarget.dataset.index;
     if(!game||game.finished||game.used.has(index)||game.wrongPath?.length)return false;
+    clearHints();
     if(game.undoSnapshot)hideUndo();
     game.dragging=true;game.path=[index];game.lastPointer={x:event.clientX,y:event.clientY};fx('tap');updateActive();showMagnifier(index);
     try{event.currentTarget.setPointerCapture(event.pointerId)}catch{}
@@ -102,4 +104,3 @@ const api={create};
 if(global)global.PropletGameInput=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:typeof self!=='undefined'?self:globalThis);
-

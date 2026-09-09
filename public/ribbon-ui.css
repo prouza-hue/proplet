@@ -8,7 +8,8 @@ html.ribbon-ui{
  --r-board-edge:#657970;--r-board-foot:#172522;
  --r-board-active:#82411D;--r-board-active-edge:#F3BE55;
  --r-board-error:#762F2D;--r-board-error-edge:#F28D7D;
- --r-board-hint:#5E4A13;--r-board-hint-edge:#FFD86A;
+ --r-board-hint:#5E4A13;--r-board-hint-edge:#FFD86A;--r-board-hint-full:#175449;
+ --r-board-path-active:#493208;--r-board-path-error:#6B2827;
  --purple:var(--r-accent);--purple2:#3A9B86;--muted:var(--r-muted);
 }
 html.ribbon-ui[data-theme="dark"]{
@@ -16,8 +17,9 @@ html.ribbon-ui[data-theme="dark"]{
  --r-ink:#F4EEDD;--r-muted:#B9C3B9;--r-edge:#485552;--r-track:#394743;
  --r-active:#D7AA45;--r-active-edge:#F2CD70;--r-active-ink:#292718;
  --r-error:#F38C7B;--r-error-soft:#513632;
- --r-board-mat:#171D1B;--r-board-tile:#314946;--r-board-letter:#FFF7E4;
- --r-board-edge:#71867D;--r-board-foot:#0C1312;
+ --r-board-mat:#0F1514;--r-board-tile:#36514D;--r-board-letter:#FFF7E4;
+ --r-board-edge:#7C9187;--r-board-foot:#080D0C;
+ --r-board-path-active:#F3BE55;--r-board-path-error:#F28D7D;
  --bg:var(--r-paper);--paper:var(--r-surface);--ink:var(--r-ink);--line:var(--r-edge);
 }
 html.ribbon-ui .ribbon-art{display:inline-grid!important;place-items:center;position:relative;width:40px;height:40px;min-width:0;vertical-align:middle;flex-shrink:0;line-height:0}
@@ -164,14 +166,17 @@ html.ribbon-ui .board .cell.hint-route::after{
  font:900 clamp(7px,calc(var(--cell-size) * .12),10px)/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 html.ribbon-ui .board .cell.hint-full{
- background:#175449!important;border-color:#81D5BC!important;color:var(--r-board-letter)!important;
+ background:var(--r-board-hint-full)!important;border-color:#81D5BC!important;color:var(--r-board-letter)!important;
  box-shadow:inset 0 0 0 2px rgba(255,247,228,.18),0 0 0 2px rgba(129,213,188,.42)!important;
 }
-html.ribbon-ui #pathLayer .path-active{display:block!important;stroke:var(--r-board-active-edge)!important;stroke-width:10px!important;opacity:.98!important}
-html.ribbon-ui #pathLayer .path-found{stroke:color-mix(in srgb,var(--path-color) 62%,var(--r-board-letter))!important;stroke-width:8px!important;opacity:.94!important}
-html.ribbon-ui #pathLayer .path-wrong{stroke:var(--r-board-error-edge)!important;stroke-width:10px!important;opacity:1!important}
+html.ribbon-ui #pathLayer .path-active{display:block!important;stroke:var(--r-board-path-active)!important;stroke-width:10px!important;opacity:1!important}
+html.ribbon-ui #pathLayer .path-found{stroke:var(--path-color)!important;stroke-width:8px!important;opacity:1!important}
+html.ribbon-ui #pathLayer .path-wrong{stroke:var(--r-board-path-error)!important;stroke-width:10px!important;opacity:1!important}
+html.ribbon-ui[data-theme="dark"] #pathLayer .path-found{stroke:color-mix(in srgb,var(--path-color) 55%,var(--r-board-letter))!important}
 html.ribbon-ui #screen-game .length-pill{background:color-mix(in srgb,var(--r-track) 72%,transparent)!important;color:var(--r-muted)!important}
 html.ribbon-ui #screen-game .length-pill.found{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
+html.ribbon-ui #screen-game .found-word-chip{background:color-mix(in srgb,var(--word-color) 28%,var(--r-paper))!important;color:var(--r-ink)!important;border-color:color-mix(in srgb,var(--word-color) 48%,var(--r-edge))!important}
+html.ribbon-ui #winModal .win-word{background:var(--word-color)!important;color:var(--r-board-letter)!important;border:1px solid color-mix(in srgb,var(--word-color) 58%,var(--r-board-letter))!important;text-shadow:0 1px 0 rgba(0,0,0,.45)!important}
 html.ribbon-ui #screen-game:has(.ultra-board) .word-status-row .lengths{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:visible!important;width:100%}
 html.ribbon-ui #screen-game:has(.ultra-board) .word-status-row .length-pill{min-width:0;width:100%;padding-inline:3px}
 html.ribbon-ui #screen-game .board-stage.board-complete{animation:ribbonBoardLock 640ms cubic-bezier(.2,.82,.2,1)!important}
@@ -180,8 +185,17 @@ html.ribbon-ui .game-message.good{color:var(--r-accent)!important}
 html.ribbon-ui .game-message.bad{color:var(--r-error)!important}
 @keyframes ribbonWordSeat{0%{transform:translateY(2px) scale(.95)}36%{transform:translateY(0) scale(1.045)}100%{transform:none}}
 @keyframes ribbonBoardLock{0%{transform:scale(.992);filter:saturate(.9)}42%{transform:scale(1.008);filter:saturate(1.12)}100%{transform:none;filter:none}}
-@media(max-width:600px){html.ribbon-ui .game-message{font-size:15px!important}html.ribbon-ui .app-footer{margin-bottom:142px!important}}
-@media(prefers-reduced-motion:reduce){html.ribbon-ui .board .cell{animation:none!important;transition:none!important}html.ribbon-ui .board .cell.active{transform:none!important}}
+@media(max-width:600px){
+ html.ribbon-ui .game-message{font-size:15px!important}html.ribbon-ui .app-footer{margin-bottom:142px!important}
+ html.ribbon-ui .board.ultra-board .cell.active::after,html.ribbon-ui .board.ultra-board .cell.hint-route::after{right:1px;bottom:1px;width:10px;height:10px;font-size:7px;border-width:1px;box-shadow:none}
+ html.ribbon-ui .board.ultra-board .cell.route-start::after{outline-width:1px;outline-offset:0}
+ html.ribbon-ui .board.ultra-board .cell.route-end::after{box-shadow:0 0 0 1px var(--r-board-letter)}
+}
+@media(prefers-reduced-motion:reduce){
+ html.ribbon-ui .board .cell,html.ribbon-ui .board .cell.wrong-flash,html.ribbon-ui .board .cell.just-found{animation:none!important;transition:none!important}
+ html.ribbon-ui .board .cell.active{transform:none!important}
+ html.ribbon-ui #screen-game .board-stage.board-complete{animation:none!important}
+}
 
 html.ribbon-ui .achievement-summary-toggle,html.ribbon-ui #achievementToggle{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
 /* Existing control classes shared by the five main screens. */

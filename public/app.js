@@ -1,6 +1,6 @@
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
-const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#235744'];
+const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
 const AVATARS=["🙂","😎","🤓","🥳","🦊","🐱","🐶","🐼","🐯","🦁","🐸","🐵","🦄","🐲","🦖","🐙","🦉","🐝","🦋","🐧","🚀","⚡","🔥","🌈","🍕","⚽","🎮","🧩","🤯","👑","🦄✨","☠️","☢️","🌺","🛸","👽","💣","😈","🤖","🌩️"];
 const SUPPORT_MODES={
  beginner:{icon:'🐣',label:'Brzy',desc:'Nabídne pomoc po 45 s bez nového slova.',idleMs:45000,seconds:45},
@@ -1088,7 +1088,7 @@ function gameInput(){
  if(gameInputController)return gameInputController;
  const factory=window.PropletGameInput;if(!factory?.create)return null;
  gameInputController=factory.create({
-  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,submit:submitPath,
+  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,clearHints:clearHintTrace,submit:submitPath,
   query:$,documentObj:document,windowObj:window,navigatorObj:navigator,colors:COLORS,escapeHtml:esc,getSettings,
  });return gameInputController;
 }

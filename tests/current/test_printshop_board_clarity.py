@@ -46,6 +46,7 @@ def contrast_ratio(first: str, second: str) -> float:
 ribbon = read("public/ribbon-ui.css")
 printshop = read("public/printshop-ui.css")
 app = read("public/app.js")
+puzzles = read("public/puzzles.json")
 
 # Letters are a single paper ink across all decisive board states. Requiring named,
 # direct hex tokens keeps this check deterministic instead of trying to evaluate
@@ -55,6 +56,8 @@ state_tokens = {
     "available": css_hex_variable(ribbon, "--r-board-tile"),
     "active": css_hex_variable(ribbon, "--r-board-active"),
     "error": css_hex_variable(ribbon, "--r-board-error"),
+    "hint": css_hex_variable(ribbon, "--r-board-hint"),
+    "full hint": css_hex_variable(ribbon, "--r-board-hint-full"),
 }
 for state, surface in state_tokens.items():
     ratio = contrast_ratio(letter, surface)
@@ -62,6 +65,40 @@ for state, surface in state_tokens.items():
         f"Board letter contrast in {state} state is {ratio:.2f}:1; expected >= 7:1 "
         f"({letter} on {surface})"
     )
+
+# Figure/ground separation is intrinsic to the fills, not dependent on the tile
+# shadow. Light mode is intentionally very strong; dark mode still doubles the
+# old preview's 1.22:1 tile/mat separation.
+light_mat = css_hex_variable(ribbon, "--r-board-mat")
+assert contrast_ratio(light_mat, state_tokens["available"]) >= 7.0
+dark_block_match = re.search(r'html\.ribbon-ui\[data-theme="dark"\]\{([^}]*)\}', ribbon)
+assert dark_block_match, "Missing dark board tokens"
+dark_block = dark_block_match.group(1)
+dark_letter = css_hex_variable(dark_block, "--r-board-letter")
+dark_tile = css_hex_variable(dark_block, "--r-board-tile")
+dark_mat = css_hex_variable(dark_block, "--r-board-mat")
+assert contrast_ratio(dark_letter, dark_tile) >= 7.0
+assert contrast_ratio(dark_mat, dark_tile) >= 2.0
+
+# Every completion ink still keeps the paper letter at 7:1 or better. This also
+# prevents a future palette edit from making one solved word unreadable.
+palette_match = re.search(r"const COLORS=\[([^]]+)\]", app)
+assert palette_match, "Missing found-word palette"
+palette = re.findall(r"#[0-9a-fA-F]{6}", palette_match.group(1))
+assert len(palette) == 12, f"Expected 12 completion inks, found {len(palette)}"
+for ink in palette:
+    ratio = contrast_ratio(letter, ink)
+    assert ratio >= 7.0, f"Completion ink {ink} has only {ratio:.2f}:1 letter contrast"
+    assert contrast_ratio(light_mat, ink) >= 4.5, (
+        f"Found path ink {ink} has insufficient light-mat contrast"
+    )
+
+# The shipped puzzle bank exercises every Czech uppercase glyph called out in
+# the visual brief. The board deliberately uses the platform UI stack rather
+# than decorative display type.
+for glyph in "ÁÉĚÍŇŘŠŤÚŮÝŽ":
+    assert glyph in puzzles, f"Puzzle bank does not exercise Czech glyph {glyph}"
+assert 'font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important' in ribbon
 
 # The tested tokens must own the actual surfaces, not merely exist as unused values.
 for needle in (
@@ -87,6 +124,9 @@ assert re.search(
 ), "Active route order must be visible through data-route-order badges"
 assert ".route-start" in ribbon and ".route-end" in ribbon, (
     "Route start and end need separate visual treatments"
+)
+assert "clearHints:clearHintTrace" in app, (
+    "Starting a drag must clear an older hint so the two states cannot collide"
 )
 
 # Level-two and level-three hints number the first three cells, and the number is
@@ -118,5 +158,22 @@ assert len(settle_delays) >= 3, "Expected settle delays for starter, tajenka, an
 assert max(settle_delays) <= 1000, (
     f"Completion settle delay exceeds 1000 ms: {settle_delays}"
 )
+
+# In light mode the SVG lives almost entirely in narrow tile gutters, so each
+# path stroke needs its own dark ink. Dark mode swaps to bright path tokens.
+for token in ("--r-board-path-active", "--r-board-path-error"):
+    light_path = css_hex_variable(ribbon, token)
+    dark_path = css_hex_variable(dark_block, token)
+    assert contrast_ratio(light_mat, light_path) >= 4.5
+    assert contrast_ratio(dark_mat, dark_path) >= 4.5
+assert "html.ribbon-ui[data-theme=\"dark\"] #pathLayer .path-found" in ribbon
+
+# Reduced-motion owns every state animation with selectors at least as specific
+# as the normal state rules, including the whole-board lock.
+reduce_match = re.search(r"@media\(prefers-reduced-motion:reduce\)\{([^@]+)\}", ribbon)
+assert reduce_match, "Missing reduced-motion board treatment"
+reduce_css = reduce_match.group(1)
+for state in ("wrong-flash", "just-found", "board-stage.board-complete"):
+    assert state in reduce_css, f"Reduced motion does not cover {state}"
 
 print("PASS Tiskařská dílna board clarity contract")
