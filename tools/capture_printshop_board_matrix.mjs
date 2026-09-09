@@ -147,7 +147,7 @@ async function chromiumExecutable(explicitPath) {
   return null;
 }
 
-const SCENARIOS = [
+const REQUIRED_SCENARIOS = [
   { file: '01-easy-default-desktop.png', difficulty: 'easy', state: 'default', viewport: { width: 1440, height: 960 } },
   { file: '02-easy-active-desktop.png', difficulty: 'easy', state: 'active', viewport: { width: 1440, height: 960 } },
   { file: '03-easy-wrong-desktop.png', difficulty: 'easy', state: 'wrong', viewport: { width: 1440, height: 960 } },
@@ -159,6 +159,27 @@ const SCENARIOS = [
   { file: '09-easy-default-mobile-390x844.png', difficulty: 'easy', state: 'default', viewport: { width: 390, height: 844 }, mobile: true },
   { file: '10-mozkozrout-default-mobile-390x844.png', difficulty: 'hardcore', state: 'default', viewport: { width: 390, height: 844 }, mobile: true },
 ];
+
+const SUPPLEMENTARY_SCENARIOS = [
+  {
+    file: '11-mozkozrout-progress-desktop-grayscale.png',
+    difficulty: 'hardcore',
+    state: 'progress',
+    viewport: { width: 1440, height: 960 },
+    visualFilter: 'grayscale(1)',
+    purpose: 'grayscale',
+  },
+  {
+    file: '12-mozkozrout-progress-desktop-low-brightness.png',
+    difficulty: 'hardcore',
+    state: 'progress',
+    viewport: { width: 1440, height: 960 },
+    visualFilter: 'brightness(.55) contrast(.88) saturate(.72)',
+    purpose: 'low-brightness-and-poor-display',
+  },
+];
+
+const SCENARIOS = [...REQUIRED_SCENARIOS, ...SUPPLEMENTARY_SCENARIOS];
 
 const APP_READY = () => (
   typeof puzzleDB !== 'undefined'
@@ -313,7 +334,7 @@ async function newScenarioPage(browser, baseUrl, scenario) {
   if (scenario.state === 'hint') {
     await page.evaluate(() => applySmartHint(3));
   }
-  await page.evaluate(() => {
+  await page.evaluate((visualFilter) => {
     document.querySelectorAll('.modal:not(.hidden)').forEach((modal) => modal.classList.add('hidden'));
     const timer = document.querySelector('#timer');
     if (timer) timer.textContent = '00:00';
@@ -329,10 +350,14 @@ async function newScenarioPage(browser, baseUrl, scenario) {
       }
     `;
     document.head.appendChild(style);
+    if (visualFilter) {
+      document.documentElement.style.filter = visualFilter;
+      document.documentElement.style.background = '#000';
+    }
     window.scrollTo(0, 0);
     fitGameBoard();
     drawPaths();
-  });
+  }, scenario.visualFilter || null);
   await page.evaluate(() => document.fonts?.ready);
   await page.waitForTimeout(120);
   return { context, page, metadata, consoleErrors };
@@ -388,7 +413,7 @@ async function main() {
       }
     }
     await writeFile(resolve(output, 'matrix-report.json'), `${JSON.stringify(report, null, 2)}\n`);
-    process.stdout.write(`\n10 screenshotů a report: ${output}\n`);
+    process.stdout.write(`\n12 screenshotů (10 povinných + 2 zátěžové) a report: ${output}\n`);
   } finally {
     if (browser) await browser.close();
     if (staticServer) await new Promise((resolveClose) => staticServer.server.close(resolveClose));
