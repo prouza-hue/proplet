@@ -1,6 +1,7 @@
 (function installBoardQaRuntime(){
 'use strict';
-const params=new URLSearchParams(location.search),state=params.get('boardQaState');
+const parentSearch=parent!==window?parent.location.search:'';
+const params=new URLSearchParams(location.search||parentSearch),state=params.get('boardQaState');
 if(!state)return;
 const difficulty=params.get('boardQaDifficulty')==='hardcore'?'hardcore':'easy';
 
