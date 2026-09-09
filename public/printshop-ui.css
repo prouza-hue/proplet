@@ -1,5 +1,4 @@
-/* Tiskařská dílna. Presentation outside #screen-game only.
-   The r-* gameplay tokens, board geometry, letters and motion remain authoritative. */
+/* Tiskařská dílna. Surrounding chrome stays quiet; gameplay states remain in ribbon-ui.css. */
 html.tiskarna-ui{--td-paper:#FFFCF5;--td-line:#D8D2C7;--td-ink:#202B39;--td-blue:#204FAB;--td-tint:#E8EEF8;--td-mint:#E6F3EB;--td-muted:#586576}
 html.tiskarna-ui[data-theme=dark]{--td-paper:#29313D;--td-line:#4B5464;--td-ink:#F5F0E4;--td-blue:#A9C6FF;--td-tint:#273C5B;--td-mint:#244A41;--td-muted:#BDC9D5}
 html.tiskarna-ui,html.tiskarna-ui body{background:#F7F2E8!important;background-image:none!important}
@@ -166,8 +165,11 @@ html.tiskarna-ui .settings-header-gear{margin-left:12px!important;flex-shrink:0!
 }
 @media(max-width:600px){
  html.tiskarna-ui #screen-game .game-actions{display:flex!important;gap:6px!important}
- html.tiskarna-ui #screen-game .game-actions .secondary-btn{font-size:0!important;min-width:42px!important;width:42px!important;height:42px!important;padding:8px!important;display:grid!important;place-items:center!important}
+ html.tiskarna-ui #screen-game .game-actions .secondary-btn{font-size:0!important;min-width:64px!important;width:auto!important;height:44px!important;padding:6px 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
  html.tiskarna-ui #screen-game .game-actions .ui-icon{width:21px!important;height:21px!important;font-size:21px!important;margin:0!important}
+ html.tiskarna-ui #screen-game #hintBtn::after{content:"Nápověda";font-size:10px;line-height:1;font-weight:850;letter-spacing:0}
+ html.tiskarna-ui #screen-game #calmRunBtn::after{content:"Klid";font-size:10px;line-height:1;font-weight:850;letter-spacing:0}
+ html.tiskarna-ui #screen-game #magnifierQuickBtn{min-width:44px!important;width:44px!important;padding-inline:7px!important}
  html.tiskarna-ui #screen-game .game-message{min-width:0!important;text-align:left!important}
  html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word{min-height:112px!important;padding-right:112px!important;display:block!important;text-align:left!important}
  html.tiskarna-ui #screen-game:has(.magnifier-control-visible) .current-word .clean-status{position:static!important}
