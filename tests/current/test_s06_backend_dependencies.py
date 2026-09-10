@@ -88,7 +88,9 @@ openapi_contract = json.loads(json.dumps(server.app.openapi()))
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_digest = _digest(openapi_contract)
-assert openapi_digest == "b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674", f"current OpenAPI digest: {openapi_digest}"
+# Ranking expansion intentionally adds optional offset query parameters to the
+# existing Daily/Free leaderboard routes; route inventory itself is unchanged.
+assert openapi_digest == "8a7b8a6182368d09a5376062038cbe871514a7383fd9936034f8dad9ba193d83", f"current OpenAPI digest: {openapi_digest}"
 
 
 # A fake-service assembly proves feature modules remain independently testable
