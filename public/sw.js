@@ -1,7 +1,7 @@
-const SHELL_CACHE='proplet-v4.02.2-printshop-preview-fix23';
+const SHELL_CACHE='proplet-v4.02.2-printshop-preview-fix20';
 const DATA_CACHE='proplet-data-v11';
 const CACHE_PREFIX='proplet-';
-const SHELL=['/rewards/printshop/pulmesic.svg?v=icons1','/rewards/printshop/challenge.svg?v=icons1','/rewards/printshop/calm.svg?v=icons1','/gesture-guard-v3325.js?v=fixsep8c','/brand/wordmark.svg?v=brand1','/brand/mark-16.png?v=brand1','/manifest.webmanifest?v=brand1','/favicon.svg?v=brand1','/favicon-32.png?v=brand1','/apple-touch-icon.png?v=brand1','/icon.svg?v=brand1','/icon-192.png?v=brand1','/icon-512.png?v=brand1','/icon-maskable-192.png?v=brand1','/icon-maskable-512.png?v=brand1','/brand/mark.svg?v=brand1','/home-layout.js?v=fix20','/','/printshop-ui.css?v=fix20','/ribbon-ui.css?v=fix20','/ribbon-catalog.js?v=icons1','/ribbon-ui.js?v=icons1','/organic-ui-v4023.css?v=11','/organic-ui-v4023.js?v=fix20','/styles.css?v=40140-s12a2r2','/app.js?v=4022-fix20','/app/engagement/onboarding.js?v=4021-pes1','/app/engagement/nudges.js?v=40140-s12b1','/app/content/progression.js?v=40140-s12b2','/app/content/daily.js?v=40140-s12b2','/app/rankings/rankings.js?v=fixsep8c','/app/core/api-client.js','/app/analytics.js?v=40140-s15','/app/core/storage.js','/app/account/session.js','/app/account/tajenka-storage.js','/app/account/account.js','/app/game/state.js','/app/game/board.js','/app/game/input.js?v=fix20','/app/game/hints.js','/app/core/completion-pipeline.js','/app/core/result-queue.js','/theme-init.js?v=fix20','/runtime-meta.js','/quality-v334.css?v=4','/quality-v334.js?v=fixsep8b','/quality-v334-core-v40114.js?v=fixsep8b','/challenge-cta-v3333.css?v=5','/challenge-cta-v3333.js?v=fix22','/typography-readability-v1.css?v=3'];
+const SHELL=['/rewards/printshop/pulmesic.svg?v=icons1','/rewards/printshop/challenge.svg?v=icons1','/rewards/printshop/calm.svg?v=icons1','/gesture-guard-v3325.js?v=fixsep8c','/brand/wordmark.svg?v=brand1','/brand/mark-16.png?v=brand1','/manifest.webmanifest?v=brand1','/favicon.svg?v=brand1','/favicon-32.png?v=brand1','/apple-touch-icon.png?v=brand1','/icon.svg?v=brand1','/icon-192.png?v=brand1','/icon-512.png?v=brand1','/icon-maskable-192.png?v=brand1','/icon-maskable-512.png?v=brand1','/brand/mark.svg?v=brand1','/home-layout.js?v=fix20','/','/printshop-ui.css?v=fix20','/ribbon-ui.css?v=fix20','/ribbon-catalog.js?v=icons1','/ribbon-ui.js?v=icons1','/organic-ui-v4023.css?v=11','/organic-ui-v4023.js?v=fix20','/styles.css?v=40140-s12a2r2','/app.js?v=4022-fix20','/app/engagement/onboarding.js?v=4021-pes1','/app/engagement/nudges.js?v=40140-s12b1','/app/content/progression.js?v=40140-s12b2','/app/content/daily.js?v=40140-s12b2','/app/rankings/rankings.js?v=fixsep8c','/app/core/api-client.js','/app/analytics.js?v=40140-s15','/app/core/storage.js','/app/account/session.js','/app/account/tajenka-storage.js','/app/account/account.js','/app/game/state.js','/app/game/board.js','/app/game/input.js?v=fix20','/app/game/hints.js','/app/core/completion-pipeline.js','/app/core/result-queue.js','/theme-init.js?v=fix20','/runtime-meta.js','/quality-v334.css?v=4','/quality-v334.js?v=fixsep8b','/quality-v334-core-v40114.js?v=fixsep8b'];
 
 async function putIfOk(cacheName,request,response){
   if(!response?.ok)return response;
@@ -36,6 +36,9 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   await caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&!keep.has(k)).map(k=>caches.delete(k))));
   await self.clients.claim();
   const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  // Activation must not reboot a game or discard its in-memory/local state.
+  // The page can apply the update later through the existing explicit
+  // SKIP_WAITING handshake and controllerchange reload path.
   clients.forEach(client=>client.postMessage({type:'PROPLET_SW_UPDATED',shell:SHELL_CACHE}));
 })()));
 
