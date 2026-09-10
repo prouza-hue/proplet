@@ -41,6 +41,7 @@
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
+    ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
   ];
 
   const loadStyle=(href,key)=>{
