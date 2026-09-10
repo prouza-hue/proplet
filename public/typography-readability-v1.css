@@ -110,3 +110,43 @@ html.tiskarna-ui body #screen-game #calmRunBtn::after{
 
 /* Do not touch the outlined brand wordmark or board glyphs. */
 html.tiskarna-ui body .brand-copy strong{letter-spacing:normal!important}
+
+/* Readability pass 2 — keep Outfit, but give its geometric shapes more air on small displays. */
+html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(p,.muted,.field-note),
+html.tiskarna-ui body :is(.modal-card p,.leader-name small,.leader-score small,.result-player-copy small,.home-progress-level-copy span){
+  font-weight:500!important;
+  letter-spacing:.006em!important;
+  line-height:1.45!important;
+}
+html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(h1,h2,h3),
+html.tiskarna-ui body #winModal :is(h1,h2,h3),
+html.tiskarna-ui body .modal-card :is(h1,h2,h3){
+  letter-spacing:0!important;
+}
+html.tiskarna-ui body #screen-daily .daily-hero h1,
+html.tiskarna-ui body #screen-daily.home-layout-active .daily-hero .hero-main h1{
+  letter-spacing:.004em!important;
+  line-height:1.1!important;
+}
+
+/* Daily hero is already blue: the primary action must be the contrasting paper surface, not blue-on-blue. */
+html.tiskarna-ui body #screen-daily #playDailyBtn.primary-btn.hero-btn{
+  background:#FFF8E9!important;
+  color:#204FAB!important;
+  border:1px solid rgba(255,255,255,.76)!important;
+  box-shadow:0 3px 0 #C8C0B1,0 7px 16px rgba(20,47,105,.18)!important;
+}
+html.tiskarna-ui body #screen-daily #playDailyBtn.primary-btn.hero-btn:hover{
+  background:#FFFFFF!important;
+  color:#173D8B!important;
+}
+
+@media(max-width:600px){
+  html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(p,.muted,.field-note){
+    font-size:16px!important;
+    line-height:1.45!important;
+  }
+  html.tiskarna-ui body :is(.leader-name small,.leader-score small,.result-player-copy small,.home-progress-level-copy span){
+    font-size:max(12px,1em)!important;
+  }
+}
