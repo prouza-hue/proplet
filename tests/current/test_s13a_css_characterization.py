@@ -24,8 +24,10 @@ baseline = all((ROOT / p).is_file() for p in baseline_files)
 consolidated = all((ROOT / p).is_file() for p in consolidated_files)
 assert baseline ^ consolidated, "13A must be either baseline or fully consolidated, never a half-applied ownership state"
 
-# Bootstrap order is behavioral: theme-init runs before the static base CSS links are parsed.
-theme_boot='/theme-init.js?v=40140-s12b3' if baseline else ('/theme-init.js?v=40140-s13b-pes1' if '/theme-init.js?v=40140-s13b-pes1' in index else ('/theme-init.js?v=40140-s13b' if '/theme-init.js?v=40140-s13b' in index else '/theme-init.js?v=40140-s13a2'))
+# Bootstrap order is behavioral; the cache-busting suffix is a release detail.
+theme_boot_match = re.search(r'<script src="(/theme-init\.js\?v=[^"]+)"', index)
+assert theme_boot_match, "theme-init bootstrap missing"
+theme_boot = theme_boot_match.group(1)
 assert index.index(theme_boot) < index.index('/styles.css?v=40140-s12a2r2')
 assert '/quality-v334.css?v=4' in index
 
