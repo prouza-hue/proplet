@@ -197,6 +197,10 @@
       restoreGameBoardNodes();
     }
 
+    const dock=document.querySelector('#magnifierDock');
+    const dockParent=largeTouchRail||desktopWide?document.querySelector('.game-control-column'):currentWord;
+    if(dock&&dockParent&&dock.parentNode!==dockParent)dockParent.appendChild(dock);
+
     const largeTouchMode=landscape?'tablet-landscape':'tablet-portrait-rail';
     setDebugMode(
       desktopWide?'desktop-wide':largeTouchRail?largeTouchMode:playing?'standard':'inactive',

@@ -123,7 +123,7 @@ html.ribbon-ui .board .cell.active{
  z-index:3;
 }
 html.ribbon-ui .board .cell.active::after{
- content:attr(data-route-order);
+ content:none;
  position:absolute;right:3px;bottom:3px;top:auto;
  width:clamp(11px,18%,18px);height:clamp(11px,18%,18px);
  display:grid;place-items:center;border-radius:50%;

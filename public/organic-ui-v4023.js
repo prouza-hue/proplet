@@ -115,6 +115,7 @@ function polishAvatarEditor(){
  if(note&&note.textContent.includes('emoji'))note.textContent='Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.';
 }
 function decorateInlineLeaderboardAvatars(){
+ document.querySelectorAll("[data-player-avatar]").forEach(el=>decorateAvatarElement(el,el.dataset.playerAvatar,"Herní avatar"));
  document.querySelectorAll('.leader-name>strong').forEach(strong=>{
    if(strong.querySelector('.organic-avatar'))return;
    const first=strong.firstChild;if(!first||first.nodeType!==Node.TEXT_NODE)return;
