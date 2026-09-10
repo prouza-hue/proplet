@@ -50,8 +50,11 @@
     if(!done)done=(banner.querySelector('h2')?.textContent||'').trim()==='Týdenní várka dohraná';
     if(done){
       if(cards.nextElementSibling!==banner)cards.insertAdjacentElement('afterend',banner);
-    }else if(banner.nextElementSibling!==cards){
-      cards.parentElement.insertBefore(banner,cards);
+      const gridStyle=getComputedStyle(cards);
+      banner.style.marginTop=gridStyle.rowGap&&gridStyle.rowGap!=='normal'?gridStyle.rowGap:(gridStyle.gap&&gridStyle.gap!=='normal'?gridStyle.gap:'16px');
+    }else{
+      banner.style.marginTop='';
+      if(banner.nextElementSibling!==cards)cards.parentElement.insertBefore(banner,cards);
     }
   }
 
