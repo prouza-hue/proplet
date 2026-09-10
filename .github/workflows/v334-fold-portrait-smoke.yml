@@ -1,39 +1,52 @@
-name: Organic UI browser smoke
+name: Printshop browser smoke
+
 on:
   pull_request:
     branches: [main]
-    paths: ['.github/workflows/v334-fold-portrait-smoke.yml']
+    paths:
+      - 'public/**'
+      - 'backend/**'
+      - 'server.py'
+      - 'data/**'
+      - 'content/**'
+      - '.github/workflows/v334-fold-portrait-smoke.yml'
+  workflow_dispatch:
+
 permissions: {contents: read}
+
 jobs:
-  organic-ui:
+  printshop-ui:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
-      PREVIEW_URL: https://proplet-git-ux-warm-paper-refactor-pavel-prouzas-projects.vercel.app
+      PREVIEW_URL: https://proplet-git-ux-tiskarska-dilna-pavel-prouzas-projects.vercel.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check playwright==1.57.0
-      - name: Verify warm-paper UI in real Chromium
+      - name: Verify Tiskařská dílna in real Chromium
         shell: bash
         run: |
-          cat > /tmp/organic_smoke.py <<'PY'
+          cat > /tmp/printshop_smoke.py <<'PY'
           import json, os, time, urllib.request
           from playwright.sync_api import sync_playwright
 
           URL=os.environ['PREVIEW_URL'].rstrip('/')
           CHROME=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
-          OUT='/tmp/proplet-organic-smoke';os.makedirs(OUT,exist_ok=True)
+          OUT='/tmp/proplet-printshop-smoke';os.makedirs(OUT,exist_ok=True)
 
-          deadline=time.time()+90
+          deadline=time.time()+120
           while True:
               try:
-                  with urllib.request.urlopen(URL+'/organic-ui-v4023.css?qa='+str(time.time()),timeout=8) as r: css=r.read().decode('utf-8','replace')
-                  with urllib.request.urlopen(URL+'/organic-ui-v4023.js?qa='+str(time.time()),timeout=8) as r: js=r.read().decode('utf-8','replace')
-                  if '--bg:#FDFBF7' in css and 'organicPropletUI' in js and '01-liska.svg' in js and '30-tkalcovsky-stav.svg' in js and 'AVATAR_FOCUS_SCALES=[1.00,1.16,1.32' in js and 'avatarFocusClip' in js and '--avatar-focus-clip' in css: break
-              except Exception: pass
-              if time.time()>deadline: raise AssertionError('preview alias did not reach organic UI head')
+                  with urllib.request.urlopen(URL+'/api/health?qa='+str(time.time()),timeout=8) as r:
+                      health=json.loads(r.read().decode('utf-8'))
+                  if health.get('ok') is True and health.get('database') is True:
+                      break
+              except Exception:
+                  pass
+              if time.time()>deadline:
+                  raise AssertionError('preview alias did not become healthy')
               time.sleep(2)
 
           def dismiss(page):
@@ -49,137 +62,68 @@ jobs:
                 document.documentElement.classList.remove('gen4-preview-booting');
               }""")
 
-          result={}
+          result={'health':health}
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
               for label,viewport in [('mobile',{'width':390,'height':844}),('desktop',{'width':1440,'height':900})]:
-                  ctx=browser.new_context(viewport=viewport,service_workers='block')
+                  ctx=browser.new_context(viewport=viewport)
                   page=ctx.new_page(); errors=[]
                   page.on('pageerror',lambda e:errors.append(str(e)))
                   page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-                  page.wait_for_function("""()=>!!document.querySelector('link[href*="organic-ui-v4023.css"]') && !!document.querySelector('script[src*="organic-ui-v4023.js"]')""",timeout=12000)
-                  page.wait_for_timeout(1200); dismiss(page); page.wait_for_timeout(200)
-                  page.evaluate("""()=>{
-                    const probe=document.createElement('div');probe.id='organicUiProbe';probe.style.cssText='position:absolute;left:-9999px;top:0;width:320px';
-                    const keys=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
-                    probe.innerHTML='<span class="home-ranking-avatar">🐲</span><div id="probeMainPicker" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-avatar="'+k+'">'+k+'</button>').join('')+'</div><div id="profileEditAvatarGrid" class="avatar-grid">'+keys.map(k=>'<button class="avatar-choice" data-edit-avatar="'+k+'">'+k+'</button>').join('')+'</div><div class="profile-badge"><span class="emoji">🔥</span><strong>Test</strong></div><section class="achievement-group"><div class="achievement-group-head"><strong>Snadná</strong></div><div class="achievement-grid">'+['První klíček','Rozcvička','Lehká váha','Půlka zahrady','Zelený velmistr','Vládce zelené banky'].map((n,i)=>'<div class="achievement"><span class="emoji">🌱</span><strong>'+n+'</strong></div>').join('')+'</div></section><div id="levelRoadmap"><div class="level-step"><span class="level-step-icon">🌱</span><strong>Nováček</strong></div><div class="level-step"><span class="level-step-icon">🧵</span><strong>Hledač nití</strong></div><div class="level-step"><span class="level-step-icon">🗿</span><strong>Propletový titán</strong></div></div>';
-                    document.body.appendChild(probe);
-                  }""")
-                  page.wait_for_timeout(300)
-                  base=page.evaluate("""()=>({
-                    bg:getComputedStyle(document.body).backgroundColor,
-                    hero:getComputedStyle(document.querySelector('.daily-hero')).backgroundColor,
-                    footer:document.querySelector('.app-footer span')?.textContent?.trim(),
-                    overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
-                    emojiChars:[...new Set(Array.from(document.body.innerText).filter(ch=>new RegExp('\\\\p{Extended_Pictographic}','u').test(ch)&&!['©','®'].includes(ch)))].slice(0,30),
-                    avatarCount:document.querySelectorAll('#probeMainPicker .avatar-choice').length,
-                    avatarRendered:!!document.querySelector('#organicUiProbe .home-ranking-avatar .organic-avatar>img'),
-                    mainPickerImgs:document.querySelectorAll('#probeMainPicker .avatar-choice .organic-avatar>img').length,
-                    editPickerImgs:document.querySelectorAll('#profileEditAvatarGrid .avatar-choice .organic-avatar>img').length,
-                    uniqueAvatarIndexes:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarIndex)).size,
-                    uniqueAvatarFiles:new Set([...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>x.dataset.avatarFile)).size,
-                    avatarFocusScales:[...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>Number(x.dataset.avatarFocusScale||1)),
-                    avatarFocusClips:[...document.querySelectorAll('#probeMainPicker .organic-avatar')].map(x=>Number(x.dataset.avatarFocusClip||35)),
-                    badgeRendered:!!document.querySelector('#organicUiProbe .profile-badge .organic-emblem'),
-                    bespokeEasyCount:document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art').length,
-                    bespokeEasyUnique:new Set([...document.querySelectorAll('#organicUiProbe .achievement .proplet-ach-art')].map(x=>x.dataset.achArt)).size,
-                    bespokeRankCount:document.querySelectorAll('#organicUiProbe .level-step .proplet-rank-art').length,
-                    closeSvg:[...document.querySelectorAll('.modal-close')].every(b=>!!b.querySelector('svg')),
-                    shareColor:(()=>{const b=document.querySelector('#shareDailyBtn');b?.classList.remove('hidden');return b?getComputedStyle(b).color:null})(),
-                    freeSectionBorder:(()=>{const c=document.querySelector('#quickPlayCard');c?.classList.add('home-free-section');return c?getComputedStyle(c).borderTopWidth:null})(),
-                    footerMarginBottom:getComputedStyle(document.querySelector('.app-footer')).marginBottom,
-                    navActiveColor:getComputedStyle(document.querySelector('.bottom-nav button.active')).color,
-                    primaryBg:(()=>{const b=document.createElement('button');b.className='primary-btn';document.body.appendChild(b);const v=getComputedStyle(b).backgroundColor;b.remove();return v})(),
-                    heroBtnBg:(()=>{const b=document.createElement('button');b.className='hero-btn';document.body.appendChild(b);const v=getComputedStyle(b).backgroundColor;b.remove();return v})()
-                  })""")
-                  assert base['bg']=='rgb(253, 251, 247)',base
-                  assert base['hero']=='rgb(185, 92, 54)',base
-                  assert base['footer']=='© 2026 Proplet · Česká slovní hra',base
-                  assert not base['emojiChars'],base
-                  assert base['avatarCount']==30 and base['avatarRendered'],base
-                  assert base['mainPickerImgs']==30 and base['editPickerImgs']==30 and base['uniqueAvatarIndexes']==30 and base['uniqueAvatarFiles']==30,base
-                  scales=base['avatarFocusScales'];clips=base['avatarFocusClips']
-                  assert len(scales)==30 and len(clips)==30 and all(1.0<=x<=1.4 for x in scales),base
-                  assert scales[1]>=1.15 and scales[2]>=1.30 and scales[18]>=1.30,base
-                  assert clips[1]>=37.5 and clips[2]>=40.5 and clips[18]>=40.5,base
-                  page.wait_for_function("""()=>[...document.querySelectorAll('#probeMainPicker .organic-avatar>img')].every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0)""",timeout=12000)
-                  avatar_assets=page.evaluate("""async()=>{
-                    const manifest=await fetch('/assets/avatars/v2/manifest.json',{cache:'no-store'}).then(r=>r.json());
-                    const imgs=[...document.querySelectorAll('#probeMainPicker .organic-avatar')];
-                    const files=imgs.map(x=>x.dataset.avatarFile);
-                    const expected=manifest.avatars.map(x=>x.file);
-                    const sizes=[24,32,40],rendered=[];
-                    for(const size of sizes){
-                      for(const file of expected){
-                        const host=document.createElement('span');host.className='organic-avatar';host.style.cssText='position:absolute;left:-9999px;top:0;width:'+size+'px;height:'+size+'px;min-width:'+size+'px;min-height:'+size+'px';
-                        const img=document.createElement('img');img.src='/assets/avatars/v2/'+file;img.width=512;img.height=512;host.appendChild(img);document.body.appendChild(host);
-                        if(!img.complete)await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject});
-                        const r=img.getBoundingClientRect();rendered.push({file,size,w:r.width,h:r.height,nw:img.naturalWidth,nh:img.naturalHeight});host.remove();
-                      }
-                    }
-                    return {manifestCount:manifest.avatars.length,viewBox:manifest.viewBox,packageName:manifest.package,filesMatch:files.join('|')===expected.join('|'),rendered};
-                  }""")
-                  assert avatar_assets['manifestCount']==30 and avatar_assets['viewBox']=='0 0 512 512',avatar_assets
-                  assert avatar_assets['packageName']=='proplet-faithful-svg-all-30' and avatar_assets['filesMatch'],avatar_assets
-                  assert len(avatar_assets['rendered'])==90 and all(abs(x['w']-x['size'])<0.2 and abs(x['h']-x['size'])<0.2 and x['nw']>0 and x['nh']>0 for x in avatar_assets['rendered']),avatar_assets
-                  assert base['badgeRendered'],base
-                  assert base['bespokeEasyCount']==6 and base['bespokeEasyUnique']==6,base
-                  assert base['bespokeRankCount']==3,base
-                  assert base['overflow']<=1 and base['closeSvg'],base
-                  assert base['shareColor']=='rgb(255, 253, 248)',base
-                  assert base['freeSectionBorder']=='0px',base
-                  assert base['navActiveColor']=='rgb(169, 80, 49)',base
-                  assert base['primaryBg']=='rgb(169, 80, 49)',base
-                  assert base['heroBtnBg']=='rgb(255, 244, 223)',base
-                  if label=='mobile': assert float(base['footerMarginBottom'].replace('px',''))>=140,base
+                  page.wait_for_function("()=>document.documentElement.classList.contains('tiskarna-ui')",timeout=15000)
+                  page.wait_for_timeout(1000); dismiss(page); page.wait_for_timeout(250)
 
-                  page.evaluate("""()=>{const m=document.querySelector('#profileModal');m.classList.remove('hidden')}""")
-                  page.wait_for_timeout(150)
-                  modal=page.evaluate("""()=>{const m=document.querySelector('#profileModal'),c=m.querySelector('.modal-card'),mr=getComputedStyle(m),cr=getComputedStyle(c),r=c.getBoundingClientRect();return {align:mr.alignItems,bottom:Math.abs(innerHeight-r.bottom),width:r.width,br:cr.borderBottomLeftRadius}}""")
-                  if label=='mobile':
-                      assert modal['align']=='flex-end' and modal['bottom']<=8 and modal['width']>=389 and modal['br']=='0px',modal
-                  else:
-                      assert modal['width']<700 and modal['br']!='0px',modal
-                  page.evaluate("document.querySelector('#profileModal').classList.add('hidden')")
+                  base=page.evaluate("""()=>({
+                    overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                    dailyActive:document.querySelector('#screen-daily')?.classList.contains('active'),
+                    dailyVisible:!!document.querySelector('#playDailyBtn')&&getComputedStyle(document.querySelector('#playDailyBtn')).display!=='none',
+                    shareHidden:document.querySelector('#shareDailyBtn')?.classList.contains('hidden')===true,
+                    updateHidden:document.querySelector('#updateBanner')?.classList.contains('hidden')===true,
+                    printshopCss:[...document.styleSheets].some(s=>(s.href||'').includes('printshop-ui.css')),
+                    typographyCss:[...document.styleSheets].some(s=>(s.href||'').includes('typography-readability-v1.css')),
+                  })""")
+                  assert base['overflow']<=1,base
+                  assert base['dailyActive'] and base['dailyVisible'],base
+                  assert base['shareHidden'],base
+                  assert base['updateHidden'],base
+                  assert base['printshopCss'] and base['typographyCss'],base
+
+                  page.evaluate("window.__propletSmokeSentinel='alive'")
+                  for target in ('free','leaderboard','profile','daily'):
+                      page.locator(f'.bottom-nav [data-nav="{target}"]').click()
+                      page.wait_for_timeout(250)
+                      state=page.evaluate("""target=>({
+                        active:document.querySelector('#screen-'+target)?.classList.contains('active')===true,
+                        sentinel:window.__propletSmokeSentinel,
+                        updateHidden:document.querySelector('#updateBanner')?.classList.contains('hidden')===true,
+                      })""",target)
+                      assert state['active'] and state['sentinel']=='alive' and state['updateHidden'],(target,state)
+
+                  page.locator('.bottom-nav [data-nav="free"]').click();page.wait_for_timeout(250)
+                  free=page.evaluate("""()=>({
+                    calmQuick:!!document.querySelector('#freeCalmQuick'),
+                    cards:document.querySelectorAll('#difficultyCards .difficulty-card').length,
+                    mozkomorCopy:document.querySelector('#difficultyCards')?.innerText.includes('kteří porazili Mozkožrouta')||false,
+                  })""")
+                  assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'],free
 
                   page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]",timeout=12000)
                   page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
-                  page.wait_for_function("()=>document.body.classList.contains('playing')",timeout=8000)
-                  page.wait_for_timeout(500)
-                  board=page.evaluate("""()=>{
-                    const cell=document.querySelector('#board .cell'),cs=getComputedStyle(cell);
-                    const baseBg=cs.backgroundColor,duration=cs.transitionDuration;
-                    cell.style.setProperty('transition','none','important');cell.classList.add('active');const active=getComputedStyle(cell);
-                    const activeBg=active.backgroundColor,activeBorder=active.borderTopColor,activeColor=active.color;
-                    const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
-                    line.classList.add('path-active');line.setAttribute('points','0,0 20,20');document.querySelector('#pathLayer').appendChild(line);
-                    const ls=getComputedStyle(line);
-                    return {bg:baseBg,color:cs.color,border:cs.borderTopWidth,weight:cs.fontWeight,transform:cs.textTransform,duration,activeBg,activeBorder,activeColor,lineDisplay:ls.display,lineOpacity:ls.opacity};
-                  }""")
-                  assert board['bg']=='rgb(255, 255, 255)' and int(board['weight'])>=900,board
-                  assert board['transform']=='uppercase' and '0.15s' in board['duration'],board
-                  assert board['activeBg']=='rgb(245, 213, 111)' and board['activeBorder']=='rgb(200, 145, 23)',board
-                  assert board['activeColor']=='rgb(51, 38, 11)',board
-                  assert board['lineDisplay']=='none' and board['lineOpacity']=='0',board
-                  page.screenshot(path=f"{OUT}/{label}.png",full_page=True)
-                  result[label]={'base':base,'modal':modal,'board':board}
+                  page.wait_for_function("()=>document.body.classList.contains('playing') && document.querySelectorAll('#board .cell').length>0",timeout=8000)
+                  page.screenshot(path=f'{OUT}/{label}.png',full_page=True)
+                  result[label]={'base':base,'free':free,'errors':errors}
                   assert not errors,(label,errors)
                   ctx.close()
-
-              ctx=browser.new_context(viewport={'width':390,'height':844},service_workers='block')
-              page=ctx.new_page();page.goto(URL,wait_until='domcontentloaded',timeout=30000);page.wait_for_timeout(800);dismiss(page)
-              dark=page.evaluate("""()=>{document.documentElement.dataset.theme='dark';return getComputedStyle(document.body).backgroundColor}""")
-              assert dark=='rgb(28, 28, 33)',dark
-              result['dark']=dark;page.screenshot(path=f"{OUT}/dark.png",full_page=True);ctx.close();browser.close()
+              browser.close()
 
           with open(f'{OUT}/summary.json','w',encoding='utf-8') as f: json.dump(result,f,ensure_ascii=False,indent=2)
           print(json.dumps(result,ensure_ascii=False,indent=2))
           PY
-          python /tmp/organic_smoke.py
+          python /tmp/printshop_smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: organic-ui-browser-smoke
-          path: /tmp/proplet-organic-smoke/
+          name: printshop-browser-smoke
+          path: /tmp/proplet-printshop-smoke/
           if-no-files-found: warn
           retention-days: 7
