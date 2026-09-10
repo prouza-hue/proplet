@@ -264,7 +264,7 @@ html.tiskarna-ui #screen-game .current-word #gameMessage{
  grid-column:1/-1!important;grid-row:2!important;display:block!important;
  height:auto!important;min-height:42px!important;max-height:none!important;
  margin:0!important;padding:0!important;align-self:start!important;
- font-size:15px!important;line-height:1.4!important;white-space:normal!important;
+ font-size:15px!important;font-weight:400!important;line-height:1.4!important;white-space:normal!important;
  overflow:visible!important;text-overflow:clip!important;
  -webkit-line-clamp:unset!important;text-align:left!important;
 }
@@ -311,6 +311,9 @@ html.tiskarna-ui #tajenkaPreviewCard .tajenka-revealed-phrase{display:block;font
 html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
 html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions button{flex:1;min-height:44px;font-size:15px}
 
+/* Keep the board stationary when a phone word grows from one to two lines. */
+html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game .current-word>div:first-child{display:grid!important;gap:2px;grid-template-rows:auto minmax(2.3em,auto);align-content:center}
+html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game #currentWord{min-height:2.3em!important}
 /* Layout composition, shared by every width classified as a side rail. */
 html.tiskarna-ui #magnifierDock{display:none;min-width:0;pointer-events:none}
 html.tiskarna-ui body:has(#magnifierQuickBtn:not(.hidden)) #magnifierDock{display:block;height:84px;grid-column:1/-1;grid-row:2}
@@ -325,6 +328,7 @@ html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game
 html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game #gameMessage{grid-row:3!important;font-size:14px!important;min-height:4.2em!important}
 html.tiskarna-ui body.game-tablet-landscape #magnifierDock{align-self:center;justify-self:center;width:84px;grid-column:1;grid-row:2}
 html.tiskarna-ui .touch-magnifier .touch-mag-cell{font-size:17px!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game #magnifierQuickBtn{width:100%!important}
 /* Give the XP value its own row; its available width follows the card, not the viewport. */
 html.tiskarna-ui #screen-daily .home-progress-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 html.tiskarna-ui #screen-daily .home-progress-total{grid-column:1/-1!important;border:0!important;border-bottom:1px solid var(--td-line)!important}
