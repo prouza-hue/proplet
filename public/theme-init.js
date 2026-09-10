@@ -41,6 +41,7 @@
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
+    ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
   ];
 
   const loadStyle=(href,key)=>{
@@ -82,14 +83,12 @@
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=fix22','propletChallengeCtaV3333');
+    loadScript('/challenge-cta-v3333.js?v=fix20','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
-    // Must remain the last UI stylesheet: printshop-ui contains legacy 500-weight overrides.
-    loadStyle('/typography-readability-v1.css?v=3','propletTypographyReadabilityV1Css');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
