@@ -1595,18 +1595,29 @@ function bindRankingExpansion(container,data){
  const details=container.querySelector('.ranking-expand');if(!details)return;
  const rows=details.querySelector('.ranking-expanded-rows'),button=details.querySelector('.ranking-more');
  const endpoint=data?.date?`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(data.date)}`:data?.puzzleId?`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(data.puzzleId)}`:null;
- let offset=0,loading=false,loaded=false;
- const load=async()=>{
-  if(loading||offset===null||!endpoint)return;loading=true;button.disabled=true;button.textContent='Načítám…';
+ let firstOffset=Math.max(0,(Number(data?.myRank)||1)-26),offset=firstOffset,loading=false,loaded=!!rows?.children.length;
+ const before=document.createElement('button');before.type='button';before.className='secondary-btn ranking-before hidden';before.textContent='Předchozí hráči';rows?.before(before);
+ const focusMine=()=>requestAnimationFrame(()=>{if(details.open)(rows?.querySelector('.me')||rows?.firstElementChild)?.scrollIntoView({block:'center',behavior:'instant'})});
+ const load=async(previous=false)=>{
+  if(loading||(!previous&&offset===null)||!endpoint)return;
+  const initial=!loaded,anchor=previous?rows.firstElementChild:null,top=anchor?.getBoundingClientRect().top;
+  const pageOffset=previous?Math.max(0,firstOffset-50):offset;
+  loading=true;button.disabled=true;before.disabled=true;button.textContent='Načítám…';
   try{
-   const page=transformRankingPayload(await api(`${endpoint}&offset=${offset}`));
+   const page=transformRankingPayload(await api(`${endpoint}&offset=${pageOffset}`));
    if(!details.isConnected)return;
-   rows.insertAdjacentHTML('beforeend',rankingExpandedRows(page.rows||[]));
-   offset=page.nextOffset??null;loaded=true;button.classList.toggle('hidden',offset===null);button.textContent='Další hráči';
-  }catch{button.textContent='Zkusit načíst znovu'}finally{loading=false;button.disabled=false}
+   const incoming=previous?(page.rows||[]).filter(r=>Number(r.rank)<=firstOffset):(page.rows||[]);
+   rows.insertAdjacentHTML(previous?'afterbegin':'beforeend',rankingExpandedRows(incoming));
+   if(previous)firstOffset=pageOffset;else offset=page.nextOffset??null;
+   loaded=true;before.classList.toggle('hidden',firstOffset===0);button.classList.toggle('hidden',offset===null);button.textContent='Další hráči';
+   if(initial)focusMine();
+   else if(anchor){const scroll=details.closest('.modal-card');if(scroll)scroll.scrollTop+=anchor.getBoundingClientRect().top-top}
+  }catch{button.textContent='Zkusit načíst znovu'}finally{loading=false;button.disabled=false;before.disabled=false}
  };
- details.addEventListener('toggle',()=>{if(details.open&&!loaded)load()});button.onclick=load;
+ details.addEventListener('toggle',()=>{if(!details.open)return;if(!loaded)load();else focusMine()});
+ if(button)button.onclick=()=>load();before.onclick=()=>load(true);
 }
+
 function renderFreeWorldBoard(data,error){
  if(error)return `<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(error)} Výsledek tím není ohrožený.</small></div>`;
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[],minimum=Number(data?.percentileMinimum||10);
@@ -1621,12 +1632,12 @@ function renderFreeTeamBoard(data,error,myId){
  const mine=rows.findIndex(r=>r.isMine),start=mine<0?0:Math.max(0,Math.min(mine-1,rows.length-3));
  const compact=rankingExpandedRows(rows.slice(start,start+3));
  if(rows.length<=1)return compact;
- return `${compact}<details class="ranking-expand"><summary>Zobrazit týmové pořadí · ${countCz(rows.length,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${mine>=0?`Tvoje pozice: ${rows[mine].rank}. z ${rows.length}.`:'Celkové pořadí týmu.'}</p>${rankingExpandedRows(rows)}</details>`;
+ return `<div class="ranking-compact">${compact}</div><details class="ranking-expand"><summary>Zobrazit týmové pořadí · ${countCz(rows.length,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${mine>=0?`Tvoje pozice: ${rows[mine].rank}. z ${rows.length}.`:'Celkové pořadí týmu.'}</p><div class="ranking-expanded-rows">${rankingExpandedRows(rows)}</div></details>`;
 
 }
 function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
  const globalRank=Number(data?.world?.myRank||0)||null,teamRank=(data?.team?.rows||[]).find(r=>r.id===myId)?.rank||null;
- const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;if(active==='world')bindRankingExpansion(container,data?.world);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
+ const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;bindRankingExpansion(container,active==='world'?data?.world:null);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
  render(initialTab);return {globalRank,teamRank};
 }
 async function loadWinLevelLeaderboard(puzzle,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='free'||isMozkomorQaDifficulty(puzzle?.difficulty)){box?.classList.add('hidden');return}box.classList.remove('hidden');box.innerHTML='<div class="leaderboard-empty">Načítám globální i týmové pořadí…</div>';try{const data=await fetchFreeLevelLeaderboards(puzzle.id),ranks=renderFreeLeaderboardPanel(box,data,getProfile()?.id);levelDetailContext={puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:puzzle.meta?.level,globalRank:ranks.globalRank,teamRank:ranks.teamRank,result:rec}}catch(e){box.innerHTML=`<div class="leaderboard-empty">Pořadí se teď nepodařilo načíst. <small>${esc(e.message)}</small></div>`}}

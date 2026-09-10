@@ -1,21 +1,16 @@
 'use strict';
 const assert=require('node:assert/strict');
 const input=require('../../public/app/game/input.js');
-const styles=new Map(),hidden=new Set(['hidden']);
-let dock={left:20,top:180,width:350,height:84};
-const el={style:{setProperty:(k,v)=>styles.set(k,v)},classList:{add:k=>hidden.add(k),remove:k=>hidden.delete(k)},querySelector:()=>({innerHTML:''})};
-const game={puzzle:{difficulty:'hardcore',rows:1,cols:3,mask:[0,1,2],letters:['A','B','C']},path:[0],used:new Map()};
-const controller=input.create({getGame:()=>game,neighbours:()=>[0,1,2],windowObj:{innerWidth:390,innerHeight:844,matchMedia:()=>({matches:true})},navigatorObj:{maxTouchPoints:1},query:s=>s==='#touchMagnifier'?el:s==='#magnifierDock'?{getBoundingClientRect:()=>dock}:null});
-assert(controller.showMagnifier(0));
-assert(!hidden.has('hidden'));
-const oldTop=parseFloat(styles.get('--magnifier-top'));
-// A word wraps during an ongoing gesture. Re-rendering must follow its new safe slot.
-dock={...dock,top:240};controller.extendPath(1);
-assert(parseFloat(styles.get('--magnifier-top'))>=240);
-assert.notEqual(parseFloat(styles.get('--magnifier-top')),oldTop);
-// Reposition into the Fold rail without keeping a phone offset.
-dock={left:540,top:300,width:84,height:100};controller.renderMagnifier(1);
-assert(parseFloat(styles.get('--magnifier-left'))>=540);
-assert(parseFloat(styles.get('--magnifier-top'))+84<=400);
-controller.pointerUp();assert(hidden.has('hidden'));
-console.log('PASS magnifier follows the safe dock across wrapping and layout changes');
+for(const width of [390,560,760,1024]){
+ const hidden=new Set(['hidden']),dock={appendChild(el){el.parentNode=this}};
+ const el={classList:{add:k=>hidden.add(k),remove:k=>hidden.delete(k)},querySelector:()=>({innerHTML:''})};
+ const game={puzzle:{difficulty:'hardcore',rows:1,cols:3,mask:[0,1,2],letters:['A','B','C']},path:[],used:new Map()};
+ let enabled=true,submitted=0;
+ const controller=input.create({getGame:()=>game,neighbours:()=>[0,1,2],getSettings:()=>({magnifier:enabled}),submit:()=>submitted++,windowObj:{innerWidth:width,innerHeight:900,matchMedia:()=>({matches:false})},navigatorObj:{maxTouchPoints:5},query:s=>s==='#touchMagnifier'?el:s==='#magnifierDock'?dock:null});
+ const down=()=>controller.pointerDown({preventDefault(){},currentTarget:{dataset:{index:'0'}},clientX:10,clientY:10});
+ assert(down());assert(!hidden.has('hidden'),`pointerDown must show magnifier at ${width}`);assert.equal(el.parentNode,dock);
+ controller.extendPath(1);assert.deepEqual(game.path,[0,1]);assert(!hidden.has('hidden'));
+ controller.pointerUp();assert(hidden.has('hidden'));assert.equal(submitted,1);
+ enabled=false;down();assert(hidden.has('hidden'),'respect the off preference');
+}
+console.log('PASS magnifier pointer lifecycle on phone, Fold and touch tablet');

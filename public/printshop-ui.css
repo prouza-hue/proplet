@@ -286,7 +286,8 @@ html.tiskarna-ui #screen-game .game-actions{grid-column:1!important;width:100%}
  html.tiskarna-ui #screen-game #magnifierQuickBtn{width:48px!important;min-width:48px!important;order:3}
 }
 /* The magnifier overlays the upper HUD only during a drag; it never reserves board space. */
-html.tiskarna-ui .touch-magnifier{width:84px!important;height:84px!important;padding:4px!important;left:var(--magnifier-left)!important;top:var(--magnifier-top)!important;transform:none!important;pointer-events:none!important}
+html.tiskarna-ui #magnifierDock>.touch-magnifier{position:absolute!important;display:block!important;width:84px!important;height:84px!important;padding:4px!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;pointer-events:none!important}
+html.tiskarna-ui #magnifierDock>.touch-magnifier.hidden{display:none!important}
 html.tiskarna-ui #winModal #winBadge{display:none!important}
 html.tiskarna-ui #winModal :is(#winPrimaryBtn,#winShareBtn.challenge-share-cta){
  display:flex;align-items:center;justify-content:center;gap:8px;
@@ -315,7 +316,7 @@ html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions button{flex:1;min-hei
 html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game .current-word>div:first-child{display:grid!important;gap:2px;grid-template-rows:auto minmax(2.3em,auto);align-content:center}
 html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game #currentWord{min-height:2.3em!important}
 /* Layout composition, shared by every width classified as a side rail. */
-html.tiskarna-ui #magnifierDock{display:none;min-width:0;pointer-events:none}
+html.tiskarna-ui #magnifierDock{position:relative;display:none;min-width:0;pointer-events:none}
 html.tiskarna-ui body:has(#magnifierQuickBtn:not(.hidden)) #magnifierDock{display:block;height:84px;grid-column:1/-1;grid-row:2}
 html.tiskarna-ui #screen-game .current-word>div:first-child{min-width:0;flex-wrap:wrap}
 html.tiskarna-ui #screen-game #currentWord{max-width:100%;white-space:normal!important;overflow-wrap:anywhere;overflow:visible!important;letter-spacing:.025em!important}
@@ -337,7 +338,7 @@ html.tiskarna-ui #screen-daily .home-progress-metric{min-width:0!important;borde
 html.tiskarna-ui #screen-daily .home-progress-metric>strong{white-space:normal!important;overflow-wrap:anywhere;line-height:1.25!important}
 html.tiskarna-ui :is(.primary-btn,.secondary-btn,.free-board-tab),html.tiskarna-ui #screen-daily .daily-hero :is(h1,h2){font-weight:500!important}
 
-html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row{display:grid!important;grid-template-columns:28px 40px minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;min-height:68px!important;padding:10px!important;border:1px solid var(--td-line)!important;border-radius:12px!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row{display:grid!important;grid-template-columns:40px 40px minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;min-height:68px!important;padding:10px!important;border:1px solid var(--td-line)!important;border-radius:12px!important}
 html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row.me{background:color-mix(in srgb,var(--td-mint) 75%,var(--td-paper))!important;border:2px solid var(--td-ink)!important}
 html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row>*{min-width:0;align-self:center!important;margin:0!important;transform:none!important}
 html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-avatar,html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-avatar .organic-avatar{width:40px!important;height:40px!important;display:block!important}
@@ -350,3 +351,8 @@ html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row .result-pla
 html.tiskarna-ui .ranking-expanded-rows{display:grid;gap:6px}
 
 html.tiskarna-ui #winModal button{font-weight:500!important}
+
+/* Expanding replaces the compact neighbourhood instead of duplicating it. */
+html.tiskarna-ui :is(.free-board-content,.daily-global-board):has(.ranking-expand[open])>.daily-world-neighbours,
+html.tiskarna-ui .free-board-content:has(.ranking-expand[open])>.ranking-compact{display:none!important}
+html.tiskarna-ui .ranking-before{width:100%;min-height:44px;margin-bottom:8px}

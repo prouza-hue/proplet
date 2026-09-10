@@ -19,20 +19,26 @@ function create(deps={}){
   const getSettings=deps.getSettings||(()=>({magnifier:true}));
 
   function magnifierDeviceSupported(){
-    const coarse=windowObj.matchMedia?.('(pointer: coarse)')?.matches===true,
-      touchCapable=(navigatorObj.maxTouchPoints||0)>0,
-      shortSide=Math.min(windowObj.visualViewport?.width||windowObj.innerWidth||9999,windowObj.visualViewport?.height||windowObj.innerHeight||9999);
-    return coarse&&touchCapable&&shortSide<=600;
+    const touchCapable=(navigatorObj.maxTouchPoints||0)>0||windowObj.matchMedia?.('(any-pointer: coarse)')?.matches===true;
+    const width=windowObj.visualViewport?.width||windowObj.innerWidth||9999;
+    return touchCapable&&width<=1280;
   }
+
   function magnifierAvailable(game=getGame()){return !!game&&!game.finished&&['hard','hardcore','mozkomor'].includes(game.puzzle?.difficulty)&&magnifierDeviceSupported()}
   function magnifierEnabled(game=getGame()){return magnifierAvailable(game)&&getSettings().magnifier!==false}
 
   function ensureMagnifier(){
-    let el=query('#touchMagnifier');if(el)return el;
-    if(!documentObj)return null;
+    let dock=query('#magnifierDock');
+    if(!dock&&documentObj){
+      const parent=query('.current-word');if(!parent)return null;
+      dock=documentObj.createElement('div');dock.id='magnifierDock';dock.setAttribute('aria-hidden','true');parent.appendChild(dock);
+    }
+    let el=query('#touchMagnifier');if(el){if(dock&&el.parentNode!==dock)dock.appendChild(el);return el}
+    if(!documentObj||!dock)return null;
     el=documentObj.createElement('div');el.id='touchMagnifier';el.className='touch-magnifier hidden';
-    el.setAttribute('aria-hidden','true');el.innerHTML='<div class="touch-magnifier-grid"></div>';documentObj.body.appendChild(el);return el;
+    el.setAttribute('aria-hidden','true');el.innerHTML='<div class="touch-magnifier-grid"></div>';dock.appendChild(el);return el;
   }
+
   function renderMagnifier(centerIndex){
     const game=getGame();if(!game||centerIndex==null)return false;
     const p=game.puzzle,mask=new Set(p.mask),row=Math.floor(centerIndex/p.cols),col=centerIndex%p.cols,
@@ -47,26 +53,15 @@ function create(deps={}){
       const color=game.used.get(j),style=color!=null?` style="--word-color:${colors[color%colors.length]}"`:'';
       cells.push(`<span class="${cls.join(' ')}"${style}>${escapeHtml(p.letters[j])}</span>`);
     }
-    grid.innerHTML=cells.join('');positionMagnifier(root);return true;
+    grid.innerHTML=cells.join('');return true;
   }
   function hideMagnifier(){const el=query('#touchMagnifier');el?.classList.add('hidden')}
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
     const el=ensureMagnifier();if(!el)return false;
     renderMagnifier(centerIndex);
-    if(!positionMagnifier(el)){hideMagnifier();return false}
     el.classList.remove('hidden');return true;
   }
-  function positionMagnifier(el){
-    // Re-measure after every word update: wrapping and viewport changes can move
-    // the dock. Its layout slot always stays clear of the word and the board.
-    const dock=query('#magnifierDock')?.getBoundingClientRect?.();
-    if(!dock||dock.width<84||dock.height<84)return false;
-    el.style.setProperty('--magnifier-left',`${Math.round(dock.left+(dock.width-84)/2)}px`);
-    el.style.setProperty('--magnifier-top',`${Math.round(dock.top+(dock.height-84)/2)}px`);
-    return true;
-  }
-
   function currentWord(){const game=getGame();return game?.path?.map(i=>game.puzzle.letters[i]).join('')||''}
   function extendPath(index){
     const game=getGame();if(!game)return false;
