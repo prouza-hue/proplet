@@ -402,6 +402,11 @@ def decoy_count_for(target_letters: int) -> int:
     return max(3, min(8, 32 - target_letters))
 
 
+def isolated_mask_cells(mask: set[int]) -> list[int]:
+    """Return active cells that cannot connect to any orthogonal neighbour."""
+    return sorted(cell for cell in mask if not any(other in mask for other in neighbours(cell)))
+
+
 def decorate_with_decoys(words: list[str], paths: list[list[int]], seed: int, prefixes: dict[int, set[str]]) -> tuple[list[int], list[str], dict]:
     owners = {cell: owner for owner, path in enumerate(paths) for cell in path}
     base_letters = [""] * (ROWS * COLS)
@@ -423,6 +428,9 @@ def decorate_with_decoys(words: list[str], paths: list[list[int]], seed: int, pr
         decoys = set(subset)
         mask = set(owners) | decoys
         holes = set(range(ROWS * COLS)) - mask
+        # Isolated decoys are visibly impossible and therefore not legitimate decoys.
+        if isolated_mask_cells(mask):
+            continue
         if not 2 <= len(holes) <= 5:
             continue
         row_fill = [sum(cell in mask for cell in range(row * COLS, (row + 1) * COLS)) for row in range(ROWS)]
@@ -649,6 +657,8 @@ def validate_board_candidate(candidate: dict) -> None:
     assert candidate["meta"]["minRowFill"] >= 4
     assert candidate["meta"]["minColFill"] >= 4
     mask = set(candidate["mask"])
+    isolated = isolated_mask_cells(mask)
+    assert not isolated, f"isolated active cells: {isolated}"
     used: set[int] = set()
     for answer in answers:
         path = answer["path"]
