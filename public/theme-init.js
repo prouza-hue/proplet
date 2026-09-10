@@ -82,15 +82,14 @@
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=fix21','propletChallengeCtaV3333');
+    loadScript('/challenge-cta-v3333.js?v=fix22','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
-    // Typography must be appended only after the parser has installed the static theme sheets.
-    // Loading it in the early styles array put it before printshop-ui.css in cascade order on desktop.
-    loadStyle('/typography-readability-v1.css?v=2','propletTypographyReadabilityV1Css');
+    // Must remain the last UI stylesheet: printshop-ui contains legacy 500-weight overrides.
+    loadStyle('/typography-readability-v1.css?v=3','propletTypographyReadabilityV1Css');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
