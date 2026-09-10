@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-preview-fix18';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-preview-fix19';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -17,11 +17,11 @@ const WIN_PRAISE={
  mozkomor:['Tebe nic nezdolá!','Tohle už je jiná liga.','Našel jsi na Mozkomora recept.','Tvé neurony opět vítězí!','Velký klobouk, hodně dolů.','Endgame? Zjevně nesouhlasíš.']
 };
 const DIFF={
-  easy:{label:'Snadná',icon:'/difficulty/easy.svg',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
-  medium:{label:'Střední',icon:'/difficulty/medium.svg',desc:'Postupně větší plocha · od přehledných cest k prvním zákrutám.',xp:25},
-  hard:{label:'Těžká',icon:'/difficulty/hard.svg',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},
-  hardcore:{label:'Mozkožrout',icon:'/difficulty/hardcore.svg',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100},
-  mozkomor:{label:'Mozkomor',icon:'/difficulty/mozkomor.svg',desc:'10×10 · endgame pro hráče, kteří dokončili všechny Mozkožrouty.',xp:150}
+  easy:{label:'Snadná',icon:'/difficulty/printshop/easy.webp',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
+  medium:{label:'Střední',icon:'/difficulty/printshop/medium.webp',desc:'Postupně větší plocha · od přehledných cest k prvním zákrutám.',xp:25},
+  hard:{label:'Těžká',icon:'/difficulty/printshop/hard.webp',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},
+  hardcore:{label:'Mozkožrout',icon:'/difficulty/printshop/hardcore.webp',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100},
+  mozkomor:{label:'Mozkomor',icon:'/difficulty/printshop/mozkomor.webp',desc:'10×10 · endgame pro hráče, kteří dokončili všechny Mozkožrouty.',xp:150}
 };
 const MOZKOMOR_UNLOCK_KEY='proplet-v4-01-32-mozkomor-unlocked';
 const MOZKOMOR_UNLOCK_BASE=200;

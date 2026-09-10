@@ -71,18 +71,18 @@
   const loadExtras=async()=>{
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=fix18','propletHomeLayout');
+    loadScript('/home-layout.js?v=fix19','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=8','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
-    loadScript('/game-layout-v3330.js?v=fix18','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=fix19','propletGameLayout');
     loadScript('/gesture-guard-v3325.js?v=fixsep8c','propletGestureGuard');
     loadScript('/valid-word-feedback-v3330.js?v=9','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=fix18','propletChallengeCtaV3333');
+    loadScript('/challenge-cta-v3333.js?v=fix19','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
