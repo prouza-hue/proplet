@@ -1088,7 +1088,7 @@ function gameInput(){
  if(gameInputController)return gameInputController;
  const factory=window.PropletGameInput;if(!factory?.create)return null;
  gameInputController=factory.create({
-  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,clearHints:clearHintTrace,submit:submitPath,
+  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,clearHints:clearHintTrace,submit:()=>submitPath(),
   query:$,documentObj:document,windowObj:window,navigatorObj:navigator,colors:COLORS,escapeHtml:esc,getSettings,
  });return gameInputController;
 }

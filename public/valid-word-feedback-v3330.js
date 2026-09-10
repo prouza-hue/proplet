@@ -132,7 +132,7 @@
   const loadLocalWords=()=>{
     if(localWords)return Promise.resolve(localWords);
     if(localWordsPromise)return localWordsPromise;
-    localWordsPromise=fetch('/valid-words-v3328.txt',{cache:'force-cache'})
+    localWordsPromise=fetch('/valid-words-v3328.txt?v=recognition6',{cache:'force-cache'})
       .then(r=>r.ok?r.text():null)
       .then(text=>{
         if(!text)return null;
