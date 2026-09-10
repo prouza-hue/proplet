@@ -47,20 +47,24 @@ function create(deps={}){
       const color=game.used.get(j),style=color!=null?` style="--word-color:${colors[color%colors.length]}"`:'';
       cells.push(`<span class="${cls.join(' ')}"${style}>${escapeHtml(p.letters[j])}</span>`);
     }
-    grid.innerHTML=cells.join('');return true;
+    grid.innerHTML=cells.join('');positionMagnifier(root);return true;
   }
   function hideMagnifier(){const el=query('#touchMagnifier');el?.classList.add('hidden')}
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
     const el=ensureMagnifier();if(!el)return false;
-    // The layout owns the dock: it is below the word on phones and in the rail
-    // on unfolded screens. Measuring that slot avoids device-specific offsets.
+    renderMagnifier(centerIndex);
+    if(!positionMagnifier(el)){hideMagnifier();return false}
+    el.classList.remove('hidden');return true;
+  }
+  function positionMagnifier(el){
+    // Re-measure after every word update: wrapping and viewport changes can move
+    // the dock. Its layout slot always stays clear of the word and the board.
     const dock=query('#magnifierDock')?.getBoundingClientRect?.();
-    if(!dock||dock.width<84||dock.height<84){hideMagnifier();return false}
-    const top=Math.round(dock.top+(dock.height-84)/2);
-    const left=Math.round(dock.left+(dock.width-84)/2);
-    el.style.setProperty('--magnifier-left',`${left}px`);
-    el.style.setProperty('--magnifier-top',`${top}px`);renderMagnifier(centerIndex);el.classList.remove('hidden');return true;
+    if(!dock||dock.width<84||dock.height<84)return false;
+    el.style.setProperty('--magnifier-left',`${Math.round(dock.left+(dock.width-84)/2)}px`);
+    el.style.setProperty('--magnifier-top',`${Math.round(dock.top+(dock.height-84)/2)}px`);
+    return true;
   }
 
   function currentWord(){const game=getGame();return game?.path?.map(i=>game.puzzle.letters[i]).join('')||''}

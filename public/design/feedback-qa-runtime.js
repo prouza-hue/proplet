@@ -37,6 +37,7 @@ window.addEventListener('load',()=>{
     setTimeout(()=>{
      const answer=[...puzzle.answers].sort((a,b)=>b.path.length-a.path.length)[0];
      currentGame.path=answer.path.slice(0,params.get('short')?3:answer.path.length);updateActive();
+     if(params.has('long'))document.querySelector('#currentWord').textContent='NEJNEOBHOSPODAŘOVÁVATELNĚJŠÍ';
      message('Tohle slovo do Propletu nepatří. Zkus poskládat jiné slovo.','bad');
      showTouchMagnifier(currentGame.path.at(-1));
     },700);
