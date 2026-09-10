@@ -21,22 +21,10 @@
     }
   }
 
-  function currentDailyHasResult(){
-    try{
-      if(typeof dailyResultState!=='function'||typeof pragueDateISO!=='function')return null;
-      return !!dailyResultState(pragueDateISO())?.active;
-    }catch{return null}
-  }
-
-  function setDailyVisibility(el,visible){
-    setClass(el,'hidden',!visible);
-    if(el.hidden===visible)el.hidden=!visible;
-    el.setAttribute('aria-hidden',visible?'false':'true');
-  }
-
   function syncWinLayout(win){
     const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
     if(!primary||!summary||!secondary)return;
+    // The next game is always the first action, before the standings.
     if(summary.nextElementSibling!==primary)summary.after(primary);
     if(win.parentElement!==secondary)secondary.prepend(win);
     modal.querySelector('.win-main-actions')?.remove();
@@ -58,7 +46,7 @@
     let row=hero?.querySelector('.daily-main-actions');
     if(!hero||!play||!daily)return;
 
-    const pair=!daily.hidden&&!daily.classList.contains('hidden');
+    const pair=!daily.classList.contains('hidden');
     if(pair){
       if(!row){
         row=document.createElement('div');
@@ -98,8 +86,6 @@
     }
 
     if(daily){
-      const hasResult=currentDailyHasResult();
-      if(hasResult!==null)setDailyVisibility(daily,hasResult);
       setChallengeContent(daily);
       setClass(daily,'daily-challenge-cta',true);
       setAriaLabel(daily,'Vyzvat kamaráda na dnešní Proplet');
@@ -122,7 +108,7 @@
     const daily=$('#shareDailyBtn');
     if(winModal)observer.observe(winModal,{attributes:true,attributeFilter:['class']});
     if(detailModal)observer.observe(detailModal,{attributes:true,attributeFilter:['class']});
-    if(daily)observer.observe(daily,{attributes:true,attributeFilter:['class','hidden']});
+    if(daily)observer.observe(daily,{attributes:true,attributeFilter:['class']});
     window.addEventListener('pageshow',syncShareCtas);
   }
 
