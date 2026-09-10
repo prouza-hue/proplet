@@ -19,3 +19,5 @@ Subject prompts:
 - mozkomor: near-circular purple disc, thick lavender inward spiral, ivory center and slanted upper marks; no shell, horns or galaxy.
 
 Only asset paths and cache-release stamps changed in the application. Temporary frame pages are used for responsive browser inspection of the real application and removed afterward; tools/difficulty-qa retains the local harness.
+
+Verification: deployed real UI inspected in Cloud Chrome on desktop and in 390×844 and 760×844 srcdoc viewports. All five loaded at the existing 40×40 card size; checked top and lower mobile cards, locked Mozkomor, and smaller Dnes shortcuts/weekday icons. Source diff changes no layout CSS or gameplay. Transparent export also inspected against dark paper. Temporary public QA files removed after review. Viewport simulation is not a physical Samsung device test.
