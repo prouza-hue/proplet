@@ -73,16 +73,16 @@
       "source": {
         "path": "data/words.txt",
         "role": "canonical-validator-lexicon",
-        "sha256": "0ce6845aea800582202a618c7da95a16d8eaf3e43921afd1c2d77d718d835047",
-        "sizeBytes": 112061,
-        "gitBlob": "a2f42ea77a90f96dcecb18438ee9124cf202831d"
+        "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+        "sizeBytes": 112068,
+        "gitBlob": "4df37d2cd946127e8971a3dd013657fc86abec96"
       },
       "output": {
         "path": "public/valid-words-v3328.txt",
         "role": "public-validator-lexicon",
-        "sha256": "0ce6845aea800582202a618c7da95a16d8eaf3e43921afd1c2d77d718d835047",
-        "sizeBytes": 112061,
-        "gitBlob": "a2f42ea77a90f96dcecb18438ee9124cf202831d"
+        "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+        "sizeBytes": 112068,
+        "gitBlob": "4df37d2cd946127e8971a3dd013657fc86abec96"
       }
     }
   ],
