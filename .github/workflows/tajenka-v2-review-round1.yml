@@ -1,0 +1,248 @@
+name: Tajenka v2 editorial review round 1
+
+on:
+  push:
+    branches:
+      - playtest/tajenka-v2-review1
+    paths:
+      - '.github/workflows/tajenka-v2-review-round1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: playtest/tajenka-v2-review1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Apply editorial decisions and no-isolated-cell gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          def load(path):
+              return json.loads(Path(path).read_text(encoding='utf-8'))
+
+          def save(path, payload):
+              Path(path).write_text(
+                  json.dumps(payload, ensure_ascii=False, separators=(',', ':')) + '\n',
+                  encoding='utf-8',
+              )
+
+          obs_path = Path('content/tajenka-v2/editorial-observation.json')
+          obs = load(obs_path)
+          obs['candidates'] = [
+              c for c in obs['candidates']
+              if c['id'] not in {'tajenka-v2-c05', 'tajenka-v2-c07', 'tajenka-v2-c42'}
+          ]
+          by_id = {c['id']: c for c in obs['candidates']}
+
+          c = by_id['tajenka-v2-c04']
+          c['displayText'] = 'Fronta se pohne hned, když odejdeš vedle.'
+          anchors = {a['surface']: a for a in c['anchors']}
+          c['anchors'] = [anchors[w] for w in ('FRONTA', 'POHNE', 'HNED', 'ODEJDEŠ', 'VEDLE')]
+          c['companions'] = [
+              {'text': 'se', 'revealWith': 'POHNE', 'significant': False},
+              {'text': 'když', 'revealWith': 'ODEJDEŠ', 'significant': False},
+          ]
+
+          c = by_id['tajenka-v2-c10']
+          c['displayText'] = 'Myčka na nádobí tajně jí lžičky k snídani.'
+          c['companions'] = [
+              {'text': 'na', 'revealWith': 'NÁDOBÍ', 'significant': False},
+              {'text': 'jí', 'revealWith': 'LŽIČKY', 'significant': False},
+              {'text': 'k', 'revealWith': 'SNÍDANI', 'significant': False},
+          ]
+
+          c = by_id['tajenka-v2-c11']
+          c['displayText'] = 'Když má deštník největší cenu, zůstane doma.'
+          c['companions'] = [
+              {'text': 'Když', 'revealWith': 'DEŠTNÍK', 'significant': False},
+              {'text': 'má', 'revealWith': 'NEJVĚTŠÍ', 'significant': False},
+          ]
+          save(obs_path, obs)
+
+          proverb_path = Path('content/tajenka-v2/editorial-proverb.json')
+          proverb = load(proverb_path)
+          proverb['candidates'] = [c for c in proverb['candidates'] if c['id'] != 'tajenka-v2-c55']
+          save(proverb_path, proverb)
+
+          builder_path = Path('tools/build_tajenka_v2_candidates.py')
+          text = builder_path.read_text(encoding='utf-8')
+
+          old = '''def decoy_count_for(target_letters: int) -> int:\n    return max(3, min(8, 32 - target_letters))\n\n\ndef decorate_with_decoys'''
+          new = '''def decoy_count_for(target_letters: int) -> int:\n    return max(3, min(8, 32 - target_letters))\n\n\ndef isolated_mask_cells(mask: set[int]) -> list[int]:\n    \"\"\"Return active cells that cannot be connected to any orthogonal neighbour.\"\"\"\n    return sorted(\n        cell for cell in mask\n        if not any(other in mask for other in neighbours(cell))\n    )\n\n\ndef decorate_with_decoys'''
+          if old not in text:
+              raise SystemExit('Could not locate decoy_count_for insertion point')
+          text = text.replace(old, new, 1)
+
+          old = '''        mask = set(owners) | decoys\n        holes = set(range(ROWS * COLS)) - mask\n        if not 2 <= len(holes) <= 5:\n            continue'''
+          new = '''        mask = set(owners) | decoys\n        holes = set(range(ROWS * COLS)) - mask\n        # A lone decoy is visually self-disqualifying: the player can see that it\n        # can never participate in a word. Reject that silhouette outright.\n        if isolated_mask_cells(mask):\n            continue\n        if not 2 <= len(holes) <= 5:\n            continue'''
+          if old not in text:
+              raise SystemExit('Could not locate mask connectivity insertion point')
+          text = text.replace(old, new, 1)
+
+          old = '''    mask = set(candidate[\"mask\"])\n    used: set[int] = set()'''
+          new = '''    mask = set(candidate[\"mask\"])\n    isolated = isolated_mask_cells(mask)\n    assert not isolated, f\"isolated active cells: {isolated}\"\n    used: set[int] = set()'''
+          if old not in text:
+              raise SystemExit('Could not locate board validation insertion point')
+          text = text.replace(old, new, 1)
+          builder_path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate editorial contract
+        run: |
+          python -m py_compile tools/build_tajenka_v2_candidates.py
+          python tools/validate_tajenka_content_v2.py
+
+      - name: Build reviewed bank while preserving good layouts
+        run: |
+          python - <<'PY'
+          import copy
+          import importlib.util
+          import json
+          from pathlib import Path
+
+          spec = importlib.util.spec_from_file_location('tv2', 'tools/build_tajenka_v2_candidates.py')
+          tv2 = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(tv2)
+
+          source_candidates = {
+              c['id']: c for c in tv2.load_candidates()
+              if c.get('expectedValidation') == 'pass'
+          }
+          base = json.loads(Path('data/tajenka_v2_board_candidates.json').read_text(encoding='utf-8'))
+          excluded = {'tajenka-v2-c05', 'tajenka-v2-c07', 'tajenka-v2-c42', 'tajenka-v2-c55'}
+          prefixes = tv2.load_prefixes()
+          reviewed = []
+          isolated_before = []
+          repaired = []
+          regenerated = []
+
+          def score(paths, branching):
+              return (
+                  tv2.topology_score(paths)
+                  + min(branching['falsePrefixes3'], 45) * 0.6
+                  + min(branching['falsePrefixStartCells'], 24) * 0.8
+                  + branching['holeQuadrants'] * 3.0
+                  + branching['decoyQuadrants'] * 3.0
+                  - branching['decoyAdjacencyEdges'] * 4.0
+              )
+
+          def redecorate(board):
+              words = [a['word'] for a in board['answers']]
+              paths = [a['path'] for a in board['answers']]
+              no = int(board['candidateNo'])
+              for attempt in range(1, 21):
+                  try:
+                      mask, letters, branching = tv2.decorate_with_decoys(
+                          words, paths,
+                          seed=910_000 + no * 101 + attempt * 10_007,
+                          prefixes=prefixes,
+                      )
+                  except RuntimeError:
+                      continue
+                  topology = tv2.topology_stats(paths)
+                  result = copy.deepcopy(board)
+                  result['mask'] = mask
+                  result['letters'] = letters
+                  result['meta'] = {
+                      'targetLetters': sum(len(w) for w in words),
+                      'cells': len(mask),
+                      'decoyCells': len(mask) - sum(len(w) for w in words),
+                      'holes': 36 - len(mask),
+                      **topology,
+                      **branching,
+                      'qualityScore': round(score(paths, branching), 2),
+                      'pathStyle': 'v2-independent-interleaved-adaptive-density',
+                      'previewOnly': True,
+                      'runtimeEnabled': False,
+                      'isolatedActiveCells': 0,
+                  }
+                  tv2.validate_board_candidate(result)
+                  return result
+              return None
+
+          for original in base['boards']:
+              cid = original['id']
+              if cid in excluded:
+                  continue
+              source = source_candidates[cid]
+              board = copy.deepcopy(original)
+              board['displayText'] = source['displayText']
+              board['companions'] = source.get('companions', [])
+              board['source'] = source.get('source')
+
+              iso = tv2.isolated_mask_cells(set(board['mask']))
+              if iso:
+                  isolated_before.append({'id': cid, 'candidateNo': board['candidateNo'], 'cells': iso})
+
+              # c04 changes anchor order to match the rewritten sentence, so rebuild it cleanly.
+              if cid == 'tajenka-v2-c04':
+                  board = tv2.make_candidate(source, attempt_count=20, prefixes=prefixes)
+                  regenerated.append(cid)
+              elif iso:
+                  fixed = redecorate(board)
+                  if fixed is None:
+                      board = tv2.make_candidate(source, attempt_count=20, prefixes=prefixes)
+                      regenerated.append(cid)
+                  else:
+                      board = fixed
+                      repaired.append(cid)
+              else:
+                  board.setdefault('meta', {})['isolatedActiveCells'] = 0
+
+              tv2.validate_board_candidate(board)
+              assert not tv2.isolated_mask_cells(set(board['mask']))
+              reviewed.append(board)
+
+          assert len(reviewed) == 37, len(reviewed)
+          assert {b['id'] for b in reviewed} == set(source_candidates), (
+              {b['id'] for b in reviewed} ^ set(source_candidates)
+          )
+          payload = {
+              'schemaVersion': 2,
+              'kind': 'tajenka-v2-board-candidate-bank-review1',
+              'runtimeEnabled': False,
+              'source': 'playtest/tajenka-v2-review1',
+              'editorialRemoved': sorted(excluded),
+              'isolatedBeforeRepair': isolated_before,
+              'redecorated': repaired,
+              'regenerated': regenerated,
+              'boards': reviewed,
+              'failures': [],
+          }
+          out = Path('data/tajenka_v2_board_candidates_review1.json')
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('REVIEW1 PASS', f'boards={len(reviewed)}')
+          print('ISOLATED BEFORE:', json.dumps(isolated_before, ensure_ascii=False))
+          print('REDECORATED:', ', '.join(repaired) or 'none')
+          print('REGENERATED:', ', '.join(regenerated) or 'none')
+          PY
+
+      - name: Commit reviewed sources and bank
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add content/tajenka-v2/editorial-observation.json \
+                  content/tajenka-v2/editorial-proverb.json \
+                  tools/build_tajenka_v2_candidates.py \
+                  data/tajenka_v2_board_candidates_review1.json
+          git commit -m 'Apply Tajenka v2 playtest editorial fixes and connectivity gate'
+          git push origin HEAD:playtest/tajenka-v2-review1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tajenka-v2-review1-bank
+          path: data/tajenka_v2_board_candidates_review1.json
+          if-no-files-found: error
