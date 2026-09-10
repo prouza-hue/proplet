@@ -1,0 +1,91 @@
+name: Tajenka v2 sharded board calibration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - '.github/workflows/tajenka-v2-sharded-calibration.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tajenka-v2-sharded-calibration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calibration:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: a
+            ids: 'tajenka-v2-c01 tajenka-v2-c03 tajenka-v2-c04 tajenka-v2-c05 tajenka-v2-c06 tajenka-v2-c07 tajenka-v2-c10'
+            expected: 7
+          - shard: b
+            ids: 'tajenka-v2-c11 tajenka-v2-c12 tajenka-v2-c15 tajenka-v2-c16 tajenka-v2-c17 tajenka-v2-c18 tajenka-v2-c19'
+            expected: 7
+          - shard: c
+            ids: 'tajenka-v2-c20 tajenka-v2-c21 tajenka-v2-c22 tajenka-v2-c23 tajenka-v2-c24 tajenka-v2-c26 tajenka-v2-c27'
+            expected: 7
+          - shard: d
+            ids: 'tajenka-v2-c28 tajenka-v2-c29 tajenka-v2-c31 tajenka-v2-c32 tajenka-v2-c34 tajenka-v2-c35 tajenka-v2-c36'
+            expected: 7
+          - shard: e
+            ids: 'tajenka-v2-c37 tajenka-v2-c38 tajenka-v2-c39 tajenka-v2-c42 tajenka-v2-c48 tajenka-v2-c49 tajenka-v2-c50'
+            expected: 7
+          - shard: f
+            ids: 'tajenka-v2-c51 tajenka-v2-c52 tajenka-v2-c54 tajenka-v2-c55 tajenka-v2-c56 tajenka-v2-c57'
+            expected: 6
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validate editorial contract
+        run: |
+          python tools/validate_tajenka_content_v2.py
+          python tools/test_tajenka_content_v2.py
+
+      - name: Generate shard against production lexicon
+        run: |
+          python tools/build_tajenka_v2_candidates.py \
+            --attempts 6 \
+            --ids ${{ matrix.ids }} \
+            --output /tmp/tajenka-v2-${{ matrix.shard }}.json
+
+      - name: Verify shard accounting
+        env:
+          EXPECTED: ${{ matrix.expected }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path(f"/tmp/tajenka-v2-{os.environ['SHARD']}.json")
+          payload = json.loads(p.read_text(encoding='utf-8'))
+          boards = payload.get('boards', [])
+          failures = payload.get('failures', [])
+          expected = int(os.environ['EXPECTED'])
+          assert len(boards) + len(failures) == expected, (len(boards), len(failures), expected)
+          for board in boards:
+              assert board['runtimeEnabled'] is False
+              assert board['meta']['alternativeFullPaths'] == 0
+          print(f"SHARD {os.environ['SHARD']}: boards={len(boards)}/{expected}, failures={len(failures)}")
+          if failures:
+              for item in failures:
+                  print('FAIL', item['id'], item['error'])
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tajenka-v2-calibration-${{ matrix.shard }}
+          path: /tmp/tajenka-v2-${{ matrix.shard }}.json
+          if-no-files-found: warn
