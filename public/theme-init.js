@@ -89,6 +89,7 @@
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
+    loadScript('/printshop-release-polish.js?v=1','propletPrintshopReleasePolish');
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
