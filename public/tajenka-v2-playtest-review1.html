@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Proplet · Tajenka v2 · playtest 37</title>
+<link rel="stylesheet" href="/tajenka-v2-playtest.css?v=1">
+</head>
+<body>
+<main class="shell">
+  <header class="head">
+    <div>
+      <span class="eyebrow">PROPLET · TAJENKA V2 · NOVÝ PLAYTEST</span>
+      <h1>37 revidovaných desek</h1>
+      <p>Čistý druhý průchod po editorial revizi a opravě izolovaných decoy písmen. Nic se neposílá do účtu, XP, leaderboardu ani produkčních analytics. Výsledky a poznámky zůstávají jen v tomto prohlížeči.</p>
+    </div>
+    <span class="pill">● runtime vypnutý</span>
+  </header>
+
+  <section class="toolbar">
+    <div class="progress"><small>Ohodnoceno</small><strong id="overall">0 / 37</strong></div>
+    <label class="picker"><small>Deska</small><select id="boardSelect"></select></label>
+    <button class="ghost" id="nextUnrated">Další neohodnocená →</button>
+  </section>
+
+  <section class="game">
+    <div class="game-meta">
+      <div class="board-id"><small>Deska</small><strong id="boardLabel">#—</strong></div>
+      <div class="category"><small>Kategorie</small><strong id="categoryLabel">—</strong></div>
+      <div class="metric"><small>Čas</small><strong id="timer">0:00.0</strong></div>
+      <div class="metric"><small>Nalezeno</small><strong id="foundLabel">0 / 0</strong></div>
+    </div>
+
+    <div id="phrase" class="phrase" aria-label="Postupně odhalovaná tajenka"></div>
+
+    <div class="board-wrap">
+      <div id="board" class="board" aria-label="Tajenka playtest"></div>
+      <button id="startOverlay" class="start-overlay"><span>▶</span><strong>Spustit desku</strong><small>Deska se odkryje až se stopkami.</small></button>
+    </div>
+
+    <div id="currentWord" class="current">Připraven?</div>
+    <div id="message" class="message">Táhni pouze nahoru, dolů, vlevo nebo vpravo.</div>
+    <div class="actions">
+      <button class="ghost" id="restart">↻ Stejná znovu</button>
+      <button class="ghost" id="skip">Přeskočit →</button>
+      <button class="ghost" id="reveal">Ukázat řešení</button>
+    </div>
+
+    <details class="debug"><summary>Technické údaje desky</summary><div id="debugGrid" class="debug-grid"></div></details>
+  </section>
+
+  <section id="review" class="review hidden" aria-live="polite">
+    <div class="review-head">
+      <div><span class="eyebrow">PO DOHRÁNÍ</span><h2 id="finalPhrase">—</h2><p id="finishStats">—</p></div>
+      <div id="source" class="source"></div>
+    </div>
+    <div class="rate-grid" aria-label="Hodnocení desky">
+      <button class="rate" data-rating="ok">Sedí</button>
+      <button class="rate" data-rating="easy">Moc lehká</button>
+      <button class="rate" data-rating="hard">Moc těžká</button>
+      <button class="rate" data-rating="bad">Špatná deska</button>
+    </div>
+    <label class="note">Poznámka<textarea id="note" placeholder="Co ti vadilo / co bylo dobré? Volitelné."></textarea></label>
+    <div class="review-actions"><span id="savedState" class="source">Hodnocení se ukládá automaticky.</span><button id="saveNext" class="primary">Uložit a další →</button></div>
+  </section>
+
+  <section class="session">
+    <div class="session-head"><div><span class="eyebrow">LOKÁLNÍ PLAYTEST</span><h2>Výsledky</h2></div><span class="pill" id="completionPill">0 dokončeno</span></div>
+    <div id="summaryChips" class="summary-chips"></div>
+    <div id="results" class="results"><span style="color:var(--muted);font-size:12px">Zatím nic.</span></div>
+    <div class="session-actions"><button id="copy" class="ghost">Kopírovat report</button><button id="clear" class="textbtn">Smazat lokální playtest</button></div>
+  </section>
+  <footer>Samostatný playtest · 37 revidovaných Tajenek · NOT FOR PRODUCTION</footer>
+</main>
+<script src="/tajenka-v2-playtest-review1.js?v=1"></script>
+</body>
+</html>
