@@ -1,3 +1,4 @@
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-preview-fix18';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1457,7 +1458,19 @@ async function probeCanonicalRelease(force=false){
  const now=Date.now();if(releaseProbeBusy||(!force&&now-lastReleaseProbeAt<60000))return;releaseProbeBusy=true;lastReleaseProbeAt=now;
  try{
   const local=await fetch(`/api/config?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.json():null);
-  if(!local||local.environment==='preview')return;
+  if(!local)return;
+  if(local.environment==='preview'){
+   const source=await fetch(`/sw.js?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.text():'');
+   const release=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
+   if(release&&release!==APP_PREVIEW_RELEASE){
+    runtimeUpdateRequired=true;
+    showUpdateBanner(pendingSW);
+    if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>{
+     if(currentScreen!=='game'&&document.visibilityState==='visible')recoverRuntimeUpdate({automatic:true,targetVersion:release});
+    },1200);
+   }
+   return;
+  }
   const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
   const source=await fetch(`${canonicalOrigin}/runtime-meta.js?release_probe=${now}`,{cache:'no-store',mode:'cors'}).then(r=>r.ok?r.text():'');
   const canonicalVersion=source.match(/version:\s*['\"]([^'\"]+)['\"]/)?.[1];if(!canonicalVersion)return;
