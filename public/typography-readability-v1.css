@@ -22,7 +22,9 @@ html.tiskarna-ui body .modal-card h3{
   letter-spacing:-.005em!important;
   line-height:1.14!important;
 }
-html.tiskarna-ui body #screen-daily .daily-hero h1{
+/* Explicit home selector also wins against desktop/printshop legacy 500-weight rules. */
+html.tiskarna-ui body #screen-daily .daily-hero h1,
+html.tiskarna-ui body #screen-daily.home-layout-active .daily-hero .hero-main h1{
   font-weight:700!important;
   letter-spacing:-.005em!important;
   line-height:1.08!important;
@@ -64,6 +66,12 @@ html.tiskarna-ui body .challenge-share-cta{
   font-weight:600!important;
   letter-spacing:.018em!important;
   line-height:1.2!important;
+}
+
+/* A hidden action must stay hidden even after painted-action-control adds display:inline-flex!important. */
+html.tiskarna-ui body #screen-daily #shareDailyBtn.hidden,
+html.tiskarna-ui body .painted-action-control.hidden{
+  display:none!important;
 }
 
 /* Small navigational labels: firm enough to scan, without the old 850–950 heaviness. */
