@@ -1,0 +1,20 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('public/app.js','utf8');
+const code=source.slice(source.indexOf('function bindRankingExpansion'),source.indexOf('\nfunction renderFreeWorldBoard'));
+const players=Array.from({length:120},(_,i)=>({rank:i+1,isMine:i===74}));
+const requests=[],shown=[];let focused=null,before;
+const button=()=>({classList:{toggle(){}},disabled:false});
+const more=button(),rows={children:shown,before:b=>before=b,querySelector:()=>{const p=shown.find(p=>p.isMine);return p&&{scrollIntoView:()=>focused=p.rank}},insertAdjacentHTML:(where,json)=>{const p=JSON.parse(json);where==='afterbegin'?shown.unshift(...p):shown.push(...p)},get firstElementChild(){return {getBoundingClientRect:()=>({top:0}),scrollIntoView(){}}}};
+const details={open:true,isConnected:true,querySelector:s=>s==='.ranking-expanded-rows'?rows:more,addEventListener:(e,fn)=>details[e]=fn,closest:()=>({scrollTop:0})};
+const context={document:{createElement:button},requestAnimationFrame:fn=>fn(),rankingExpandedRows:JSON.stringify,transformRankingPayload:x=>x,api:async url=>{const offset=Number(url.split('offset=')[1]);requests.push(offset);return {rows:players.slice(offset,offset+50),nextOffset:offset+50<120?offset+50:null}}};
+vm.createContext(context);vm.runInContext(code,context);
+(async()=>{
+ context.bindRankingExpansion({querySelector:()=>details},{puzzleId:'test',myRank:75});details.toggle();await new Promise(setImmediate);
+ assert.deepEqual(requests,[49]);assert.equal(focused,75);assert.equal(shown.length,50);
+ await before.onclick();assert.equal(shown.length,99);assert.equal(shown[0].rank,1);assert.equal(new Set(shown.map(p=>p.rank)).size,99);
+ await more.onclick();assert.equal(shown.length,120);assert.equal(new Set(shown.map(p=>p.rank)).size,120);
+ details.open=false;details.toggle();details.open=true;details.toggle();assert.equal(requests.length,3);assert.equal(focused,75);
+ context.bindRankingExpansion({querySelector:()=>details},null);details.toggle();assert.equal(requests.length,3);assert.equal(focused,75);
+ console.log('PASS ranking opens around own row and paginates both ways without duplicates');
+})().catch(e=>{console.error(e);process.exitCode=1});
