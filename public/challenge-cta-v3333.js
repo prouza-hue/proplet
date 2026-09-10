@@ -21,6 +21,13 @@
     }
   }
 
+  function currentDailyHasResult(){
+    try{
+      if(typeof dailyResultState!=='function'||typeof pragueDateISO!=='function')return null;
+      return !!dailyResultState(pragueDateISO())?.active;
+    }catch{return null}
+  }
+
   function syncWinLayout(win){
     const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
     if(!primary||!summary||!secondary)return;
@@ -86,6 +93,11 @@
     }
 
     if(daily){
+      // The Daily challenge only makes sense after a completed Daily. Reconcile visibility
+      // from authoritative current state as well as renderDaily, so late account/local merges
+      // cannot leave behind a stale, non-functional CTA.
+      const hasResult=currentDailyHasResult();
+      if(hasResult!==null)setClass(daily,'hidden',!hasResult);
       setChallengeContent(daily);
       setClass(daily,'daily-challenge-cta',true);
       setAriaLabel(daily,'Vyzvat kamaráda na dnešní Proplet');
