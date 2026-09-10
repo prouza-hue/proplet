@@ -109,8 +109,7 @@ for needle in (
 ):
     assert needle in ribbon, f"Board state does not consume clarity token: {needle}"
 
-# An active route is redundantly encoded by sequence badges and explicit endpoints,
-# so it remains understandable in grayscale and on a poor display.
+# Active route keeps its semantic endpoints but no longer prints noisy order numbers.
 for needle in (
     "dataset.routeOrder",
     "route-start",
@@ -118,10 +117,10 @@ for needle in (
 ):
     assert needle in app, f"Missing active-route semantic hook: {needle}"
 assert re.search(
-    r"\.cell\.active::after\s*\{[^}]*content\s*:\s*attr\(data-route-order\)",
+    r"\.cell\.active::after\s*\{[^}]*content\s*:\s*none",
     ribbon,
     re.DOTALL,
-), "Active route order must be visible through data-route-order badges"
+), "Active tiles must not print sequence badges"
 assert ".route-start" in ribbon and ".route-end" in ribbon, (
     "Route start and end need separate visual treatments"
 )

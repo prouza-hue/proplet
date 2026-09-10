@@ -22,6 +22,7 @@ window.addEventListener('load',()=>{
   if(typeof puzzleDB==='undefined'||!puzzleDB?.free?.hardcore){setTimeout(ready,100);return}
   document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
   if(view==='home'){
+   const priorStats=effectiveStats;effectiveStats=()=>({...priorStats(),points:123456789,currentStreak:1234});
    const state=tajenkaState();state.completions=state.completions||{};state.completions[tajenkaPuzzle.id]={puzzleId:tajenkaPuzzle.id,moves:7,elapsedMs:64000,found:[],rewarded:true};saveTajenkaState(state);renderDaily();renderTajenkaEntry();nav('daily');
   }else{
    const puzzle=puzzleDB.free.hardcore[0];startGame(puzzle,view==='daily'?'daily':'free',view==='daily'?'2026-09-09':null);stopTimer();currentGame.pausedAt=performance.now();

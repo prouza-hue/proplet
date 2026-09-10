@@ -100,7 +100,6 @@ html.tiskarna-ui #screen-profile .profile-completion-grid>span small{display:blo
  html.tiskarna-ui #screen-game .current-word>div{min-width:0!important;max-width:100%!important}
  html.tiskarna-ui #screen-game .current-word strong{max-width:100%!important;font-size:clamp(16px,5.4vw,22px)!important;letter-spacing:.07em!important;line-height:1.15!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important}
  html.tiskarna-ui #screen-game .current-word strong::-webkit-scrollbar{display:none!important}
- html.tiskarna-ui .touch-magnifier{width:132px!important;height:132px!important;padding:7px!important}
 }
 
 html.tiskarna-ui .quick-game-arrow{display:grid!important;place-items:center!important;align-self:stretch!important;line-height:1!important}
@@ -170,7 +169,6 @@ html.tiskarna-ui .settings-header-gear{margin-left:12px!important;flex-shrink:0!
  html.tiskarna-ui #screen-game #calmRunBtn::after{content:"Klid";font-size:10px;line-height:1;font-weight:500;letter-spacing:0}
  html.tiskarna-ui #screen-game #magnifierQuickBtn{min-width:44px!important;width:44px!important;padding-inline:7px!important}
  html.tiskarna-ui #screen-game .game-message{min-width:0!important;text-align:left!important}
- html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important;border-radius:16px!important}
  html.tiskarna-ui .touch-mag-cell{font-size:19px!important;border-radius:7px!important}
  html.tiskarna-ui .touch-magnifier-grid{gap:3px!important}
 }
@@ -194,7 +192,6 @@ html.tiskarna-ui #winModal .win-xp{margin-block:0!important}
 html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block:6px!important}
 
 @media(pointer:coarse) and (min-width:601px){
- html.tiskarna-ui .touch-magnifier{width:100px!important;height:100px!important;padding:5px!important;left:var(--magnifier-left)!important;transform:none!important}
 }
 /* Keep the interactive onboarding step usable on short phones and unfolded devices. */
 .onboarding-card:has(#tutorialBoard){

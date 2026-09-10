@@ -52,7 +52,7 @@ function create(deps={}){
   function hideMagnifier(){const el=query('#touchMagnifier');el?.classList.add('hidden')}
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
-    const el=ensureMagnifier(),board=query('#board');if(!el)return false;
+    const el=ensureMagnifier();if(!el)return false;
     // The layout owns the dock: it is below the word on phones and in the rail
     // on unfolded screens. Measuring that slot avoids device-specific offsets.
     const dock=query('#magnifierDock')?.getBoundingClientRect?.();
