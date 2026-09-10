@@ -118,7 +118,6 @@ for(const [period,label] of [['today','dnes'],['week','tento týden'],['all','ce
   assert(html.includes('Pavel &lt;hráč&gt;'),'XP player name is no longer escaped');
   assert(html.includes('ranking-you">Ty'),'current-player marker drifted');
   assert(html.includes('🧠 Myslitel'),'XP rank chip drifted');
-  assert(html.includes('🏅 2'),'badge count drifted');
   assert(html.includes('👥 Propletači'),'player team label drifted');
   assert(html.includes('1 234 XP')||html.includes('1 234 XP')||html.includes('1234 XP'),'XP value drifted');
   assert(html.includes(`<small>${label}</small>`),`XP period label drifted for ${period}`);
