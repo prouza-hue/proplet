@@ -1,9 +1,18 @@
 /* Tajenka runtime UI — authoritative last-mile overrides.
    Loaded after the generic Fold/desktop game polish so these state rules win. */
 
-/* Once a run is calm, the action is gone on every viewport. The generic wide
-   rail explicitly resurrects #calmRunBtn with display:flex!important, so this
-   selector intentionally carries both game IDs and the calm state. */
+/* Hidden is an invariant. Generic tablet/desktop polish must never resurrect a
+   control that game state has already hidden. This directly counters the wide
+   #calmRunBtn display:flex!important rule with higher specificity. */
+html.tiskarna-ui #screen-game #calmRunBtn.hidden,
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait,.game-desktop-wide) #screen-game #calmRunBtn.hidden{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+/* Calm run state is a second guard for the brief frame before/after the button's
+   .hidden class is synchronised. */
 html.tiskarna-ui body.calm-run-v334 #screen-game #calmRunBtn,
 html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portrait,.game-desktop-wide) #screen-game #calmRunBtn{
   display:none!important;
