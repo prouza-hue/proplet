@@ -13,6 +13,10 @@
     return window.matchMedia?.('(max-width:600px)')?.matches===true;
   }
 
+  function isTabletRail(){
+    return document.body.classList.contains('game-tablet-landscape')||document.body.classList.contains('game-tablet-portrait');
+  }
+
   function semanticHintText(value){
     const raw=String(value||'').trim();
     if(!raw)return '';
@@ -120,6 +124,35 @@
     }catch{}
   }
 
+  /* One Tajenka progress card, one owner. On Fold/tablet it belongs directly
+     below “Skládáš” in the side rail. On phone and desktop it returns to the
+     board column before the board. Moving the live node preserves its progress
+     state and avoids duplicate render trees during Fold posture changes. */
+  function syncTajenkaPhrasePlacement(){
+    const game=q('#screen-game');
+    const phrase=q('#tajenkaPhrase');
+    const boardColumn=q('.game-board-column',game);
+    const rail=q('.game-control-column',game);
+    const currentWord=q('.current-word',game);
+    const boardStage=q('#boardStage',game);
+    const starterCoach=q('#starterCoach',game);
+    if(!phrase||!boardColumn||!rail)return;
+
+    const tajenka=game?.classList.contains('tajenka-mode');
+    if(tajenka&&isTabletRail()&&currentWord?.parentNode===rail){
+      if(phrase.parentNode!==rail||phrase.previousElementSibling!==currentWord)currentWord.after(phrase);
+      phrase.classList.add('tajenka-phrase-in-rail');
+      return;
+    }
+
+    phrase.classList.remove('tajenka-phrase-in-rail');
+    if(phrase.parentNode!==boardColumn){
+      const anchor=starterCoach?.parentNode===boardColumn?starterCoach:boardStage;
+      if(anchor)boardColumn.insertBefore(phrase,anchor);
+      else boardColumn.appendChild(phrase);
+    }
+  }
+
   function calmRunActive(){
     try{if(typeof currentGame!=='undefined'&&currentGame?.calmMode===true)return true}catch{}
     return document.body.classList.contains('calm-run-v334');
@@ -136,6 +169,7 @@
   function run(){
     queued=false;
     ensureTajenkaPhraseShell();
+    syncTajenkaPhrasePlacement();
     syncSemanticHint();
     syncCalmAction();
   }
