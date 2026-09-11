@@ -1,0 +1,58 @@
+name: Refresh Tajenka cadence contract
+
+on:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - .github/workflows/tajenka-contract-refresh.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ux/tiskarska-dilna
+          fetch-depth: 0
+
+      - name: Align release-safety characterization
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/test_tajenka_preview.py')
+          text=p.read_text(encoding='utf-8')
+          replacements={
+            '        "const TAJENKA_FIRST_SATURDAY=",\n': '        "const TAJENKA_FIRST_SATURDAY=",\n        "const TAJENKA_TWICE_WEEKLY_START=",\n',
+            '    assert \'"title": "✨ Víkendová Tajenka je tady"\' in push\n': '    assert \'"title": "✨ Nová Tajenka je tady"\' in push\n',
+            '    assert "tajenkaFirstSaturday:\'2026-08-29\'" in runtime\n': '    assert "tajenkaFirstSaturday:\'2026-08-29\'" in runtime\n    assert "tajenkaTwiceWeeklyStart:\'2026-09-12\'" in runtime\n',
+            '    assert "tajenkaPuzzle.tajenka.phrase" not in entry\n': '    completed_entry = entry[entry.index("if(completed){"):entry.index("const progress=")]\n    playable_entry = entry[entry.index("const progress="):]\n    assert "tajenkaPuzzle.tajenka.phrase" in completed_entry\n    assert "tajenkaPuzzle.tajenka.phrase" not in playable_entry\n',
+            '    print("PASS: compact clickable Tajenka recap card, responsive game UI, isolated Daily result, 200 XP and Saturday push")\n': '    print("PASS: Tajenka recap, responsive UI, 200 XP, privacy-safe reveal and Saturday/Wednesday cadence")\n',
+          }
+          for old,new in replacements.items():
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'Expected one match, got {count}: {old!r}')
+              text=text.replace(old,new,1)
+          p.write_text(text,encoding='utf-8')
+          PY
+
+      - name: Verify Tajenka contracts
+        run: |
+          python tools/test_tajenka_preview.py
+          python tools/test_tajenka_push_runtime.py
+          python tests/current/test_tajenka_weekly_availability.py
+
+      - name: Commit and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/test_tajenka_preview.py
+          git rm .github/workflows/tajenka-contract-refresh.yml
+          git diff --cached --check
+          git commit -m "Align Tajenka contracts with twice-weekly release"
+          git push origin HEAD:ux/tiskarska-dilna
