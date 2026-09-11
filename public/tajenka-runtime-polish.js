@@ -13,32 +13,61 @@
     return raw.replace(/^[💭💡]\s*/u,'').trim();
   }
 
+  function semanticHintIcon(){
+    const icon=document.createElement('span');
+    icon.className='tajenka-semantic-hint-icon';
+    icon.setAttribute('aria-hidden','true');
+    icon.innerHTML='<svg viewBox="0 0 24 24" focusable="false"><path d="M9 18h6M10 22h4"/><path d="M8.2 14.5A6 6 0 1 1 15.8 14.5c-.9.8-1.3 1.6-1.3 2.5h-5c0-.9-.4-1.7-1.3-2.5Z"/></svg>';
+    return icon;
+  }
+
+  function renderSemanticHint(el,clue){
+    if(!el||!clue)return;
+    el.classList.add('tajenka-semantic-hint');
+    if(el.dataset.tajenkaSemanticClue===clue&&q('.tajenka-semantic-hint-icon',el)&&q('.tajenka-semantic-hint-text',el))return;
+    const text=document.createElement('span');
+    text.className='tajenka-semantic-hint-text';
+    text.textContent=clue;
+    el.replaceChildren(semanticHintIcon(),text);
+    el.dataset.tajenkaSemanticClue=clue;
+  }
+
+  function clearSemanticHint(el){
+    if(!el)return;
+    el.classList.remove('tajenka-semantic-hint');
+    delete el.dataset.tajenkaSemanticClue;
+  }
+
   function syncSemanticHint(){
     const game=q('#screen-game');
     const message=q('#gameMessage');
     const banner=q('#tajenkaHintBanner');
     if(!game?.classList.contains('tajenka-mode')){
-      message?.classList.remove('tajenka-semantic-hint');
-      banner?.classList.remove('tajenka-semantic-hint');
+      clearSemanticHint(message);
+      clearSemanticHint(banner);
       return;
     }
 
-    const bannerRaw=String(banner?.textContent||'').trim();
-    const messageRaw=String(message?.textContent||'').trim();
-    const bannerLooksSemantic=!!bannerRaw;
-    const messageLooksSemantic=/^[💭💡]/u.test(messageRaw);
-    const clue=semanticHintText(bannerLooksSemantic?bannerRaw:(messageLooksSemantic?messageRaw:''));
-    if(!clue)return;
+    /* The dedicated banner is the stable source of truth for level-1 Tajenka
+       clues. It may already have had its emoji converted by organic-ui, so never
+       use an emoji as the semantic marker here. */
+    const clue=semanticHintText(banner?.dataset.tajenkaSemanticClue||banner?.textContent||'');
+    if(!clue){
+      clearSemanticHint(message);
+      clearSemanticHint(banner);
+      return;
+    }
 
-    const text=`💡 ${clue}`;
-    if(banner){
-      banner.classList.add('tajenka-semantic-hint');
-      if(String(banner.textContent||'').trim()!==text)banner.textContent=text;
-    }
-    if(message&&messageLooksSemantic){
-      message.classList.add('tajenka-semantic-hint');
-      if(String(message.textContent||'').trim()!==text)message.textContent=text;
-    }
+    renderSemanticHint(banner,clue);
+
+    /* On Fold/tablet/desktop the visible clue surface is #gameMessage inside
+       “Skládáš”. Organic UI may have replaced the original pictograph before
+       this observer runs, so match by clue text instead of emoji. Do not steal
+       later level-2/3 feedback: only own the message while it still contains
+       this exact semantic clue. */
+    const messageText=semanticHintText(message?.dataset.tajenkaSemanticClue||message?.textContent||'');
+    if(message&&messageText===clue)renderSemanticHint(message,clue);
+    else if(message)clearSemanticHint(message);
   }
 
   function calmRunActive(){
