@@ -24,7 +24,7 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
 
 
 def regex_once(text: str, pattern: str, repl: str, label: str) -> str:
-    new, count = re.subn(pattern, repl, text, count=1, flags=re.S)
+    new, count = re.subn(pattern, lambda _match: repl, text, count=1, flags=re.S)
     if count != 1:
         raise RuntimeError(f"{label}: expected exactly one regex match, found {count}")
     return new
