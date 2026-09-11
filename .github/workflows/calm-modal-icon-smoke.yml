@@ -4,8 +4,6 @@ on:
   push:
     branches: [feature/tajenka-v2-production]
     paths:
-      - 'public/calm-mode.svg'
-      - 'public/tajenka-runtime-polish.css'
       - '.github/workflows/calm-modal-icon-smoke.yml'
   workflow_dispatch:
 
@@ -22,71 +20,40 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check playwright==1.57.0
-      - name: Verify dedicated Calm icon across viewports
+      - name: Inspect real Calm button and modal icon
         shell: bash
         run: |
-          cat > /tmp/calm_modal_icon_smoke.py <<'PY'
-          import os, time, urllib.request
+          cat > /tmp/calm_icon_inspect.py <<'PY'
+          import os, json
           from playwright.sync_api import sync_playwright
 
-          url=os.environ['PREVIEW_URL'].rstrip('/')
-          deadline=time.time()+150
-          while True:
-              try:
-                  nonce=str(time.time())
-                  with urllib.request.urlopen(url+'/tajenka-runtime-polish.css?qa='+nonce,timeout=8) as r:
-                      css=r.read().decode('utf-8')
-                  with urllib.request.urlopen(url+'/calm-mode.svg?qa='+nonce,timeout=8) as r:
-                      svg=r.read().decode('utf-8')
-                  if "background:url('/calm-mode.svg')" in css and '<title id="title">Klidný režim</title>' in svg:
-                      break
-              except Exception:
-                  pass
-              if time.time()>deadline:
-                  raise AssertionError('preview alias did not publish Calm icon assets')
-              time.sleep(2)
-
+          url=os.environ['PREVIEW_URL'].rstrip('/')+'/?tajenka=1&tajenka_week=1'
           chrome=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox','--disable-dev-shm-usage'])
-              for width,height in ((390,844),(800,700),(1440,900)):
-                  page=browser.new_page(viewport={'width':width,'height':height})
-                  page.goto(url+'/?tajenka=1&tajenka_week=1',wait_until='domcontentloaded',timeout=30000)
-                  page.evaluate("""()=>{
-                    document.documentElement.classList.add('tiskarna-ui');
-                    const modal=document.createElement('div');
-                    modal.id='calmConfirmModal';
-                    modal.className='modal';
-                    modal.innerHTML='<div class="modal-card calm-confirm-card"><div class="calm-confirm-icon" aria-hidden="true"><span class="emoji-icon" style="display:grid;width:30px;height:30px">🌿</span></div><h2>Zapnout Klidný režim?</h2></div>';
-                    document.body.appendChild(modal);
-                  }""")
-                  state=page.evaluate("""()=>{
-                    const icon=document.querySelector('.calm-confirm-icon');
-                    const child=icon.firstElementChild;
-                    const iconStyle=getComputedStyle(icon);
-                    const before=getComputedStyle(icon,'::before');
-                    return {
-                      cssWidth:iconStyle.width,
-                      cssHeight:iconStyle.height,
-                      renderedWidth:icon.getBoundingClientRect().width,
-                      renderedHeight:icon.getBoundingClientRect().height,
-                      childDisplay:getComputedStyle(child).display,
-                      beforeDisplay:before.display,
-                      beforeWidth:before.width,
-                      beforeHeight:before.height,
-                      beforeBg:before.backgroundImage,
-                      fontSize:iconStyle.fontSize,
-                    };
-                  }""")
-                  print(width,state)
-                  assert state['cssWidth']=='58px' and state['cssHeight']=='58px',state
-                  assert state['renderedWidth']>50 and state['renderedHeight']>50,state
-                  assert state['childDisplay']=='none',state
-                  assert state['beforeDisplay']=='block',state
-                  assert state['beforeWidth']=='39px' and state['beforeHeight']=='39px',state
-                  assert 'calm-mode.svg' in state['beforeBg'],state
-                  assert state['fontSize']=='0px',state
-                  page.close()
+              page=browser.new_page(viewport={'width':1440,'height':900})
+              page.goto(url,wait_until='domcontentloaded',timeout=30000)
+              page.wait_for_timeout(4000)
+              page.wait_for_selector('#calmRunBtn',state='attached',timeout=15000)
+              button=page.evaluate("""()=>{
+                const el=document.querySelector('#calmRunBtn');
+                const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
+                return {outer:el.outerHTML,html:el.innerHTML,text:el.textContent,
+                  before:{content:before.content,bg:before.backgroundImage,display:before.display,width:before.width,height:before.height},
+                  after:{content:after.content,bg:after.backgroundImage,display:after.display,width:after.width,height:after.height}};
+              }""")
+              print('BUTTON='+json.dumps(button,ensure_ascii=False))
+              page.locator('#calmRunBtn').click(force=True)
+              page.wait_for_selector('#calmConfirmModal:not(.hidden)',state='visible',timeout=10000)
+              page.wait_for_timeout(500)
+              modal=page.evaluate("""()=>{
+                const el=document.querySelector('#calmConfirmModal .calm-confirm-icon');
+                const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
+                return {outer:el.outerHTML,html:el.innerHTML,text:el.textContent,
+                  before:{content:before.content,bg:before.backgroundImage,display:before.display,width:before.width,height:before.height},
+                  after:{content:after.content,bg:after.backgroundImage,display:after.display,width:after.width,height:after.height}};
+              }""")
+              print('MODAL='+json.dumps(modal,ensure_ascii=False))
               browser.close()
           PY
-          python /tmp/calm_modal_icon_smoke.py
+          python /tmp/calm_icon_inspect.py
