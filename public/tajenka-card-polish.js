@@ -61,6 +61,17 @@
     q('#newContentBanner .eyebrow')?.remove();
   }
 
+  function polishHintBanner(){
+    const banner=q('#tajenkaHintBanner');
+    if(!banner)return;
+    banner.classList.add('tajenka-hint-banner-polished');
+    const raw=String(banner.textContent||'').trim();
+    if(!raw)return;
+    const cleaned=raw.replace(/^[💭💡]\s*/u,'').trim();
+    const desired=`💡 ${cleaned}`;
+    if(banner.textContent!==desired)banner.textContent=desired;
+  }
+
   /*
    * Tajenka mobile/Fold stability guard.
    *
@@ -83,6 +94,12 @@
     const style=document.createElement('style');
     style.id='tajenkaMobileLayoutGuardStyle';
     style.textContent=`
+      /* Calm is a run state, not a persistent action button. Tablet/wide-layout
+         rules must never resurrect the action after the run has become calm. */
+      body.calm-run-v334 #calmRunBtn{
+        display:none!important;
+      }
+
       @media(max-width:600px){
         html.tiskarna-ui #screen-game.tajenka-mode .game-board-column,
         html.tiskarna-ui .tajenka-mode .game-board-column{
@@ -102,6 +119,16 @@
           padding:7px 9px!important;
           white-space:normal!important;
           overflow:visible!important;
+        }
+        html.tiskarna-ui .tajenka-mode .tajenka-hint-banner-polished:not(.hidden){
+          color:#397f69!important;
+          font-size:15px!important;
+          line-height:1.35!important;
+          font-weight:850!important;
+          letter-spacing:0!important;
+          background:color-mix(in srgb,#55cfa7 10%,var(--paper))!important;
+          border:1px solid color-mix(in srgb,#55cfa7 38%,var(--line))!important;
+          border-radius:9px!important;
         }
         html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.board-stage,
         html.tiskarna-ui .tajenka-mode .game-board-column>.board-stage{
@@ -148,6 +175,7 @@
     polishCard(q('#tajenkaPreviewCard'));
     polishCard(q('#tajenkaPlayCard'));
     polishResult();
+    polishHintBanner();
   }
 
   function queue(){
@@ -162,10 +190,12 @@
     const daily=q('#screen-daily');
     const free=q('#screen-free');
     const modal=q('#winModal');
+    const game=q('#screen-game');
     const observer=new MutationObserver(queue);
     if(daily)observer.observe(daily,{childList:true,subtree:true});
     if(free)observer.observe(free,{childList:true,subtree:true});
     if(modal)observer.observe(modal,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+    if(game)observer.observe(game,{childList:true,subtree:true,characterData:true});
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
