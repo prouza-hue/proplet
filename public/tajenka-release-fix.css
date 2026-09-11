@@ -34,6 +34,59 @@ html.tiskarna-ui #screen-free #tajenkaPlayCard .tajenka-home-actions button{
   font-size:15px;
 }
 
+/* Final completed-card treatment shared by Dnes and Hrát. */
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed .tajenka-entry-copy h2{
+  display:none!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed .tajenka-revealed-phrase{
+  text-transform:lowercase!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed .tajenka-revealed-phrase::first-letter{
+  text-transform:uppercase!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed .tajenka-revealed-phrase::before{content:'„'}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed .tajenka-revealed-phrase::after{content:'“'}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]{
+  border:1px solid #d05677!important;
+  background:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%)!important;
+  color:#fff!important;
+  box-shadow:0 7px 22px rgba(139,36,70,.25),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  font-size:0!important;
+  font-weight:900!important;
+  letter-spacing:.01em!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]::before{
+  content:'';
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  background:url('/rewards/printshop/challenge.svg?v=icons1') center/contain no-repeat;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]::after{
+  content:'Pošli tajenku';
+  font-size:15px;
+  line-height:1.1;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]:hover,
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]:focus-visible{
+  border-color:#c34266!important;
+  background:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%)!important;
+  color:#fff!important;
+  box-shadow:0 8px 23px rgba(139,36,70,.32),inset 0 1px 0 rgba(255,255,255,.2)!important;
+  outline:none!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]:active{transform:scale(.985)}
+html.tiskarna-ui[data-theme="dark"] :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]{
+  border-color:#df6a8b!important;
+  background:linear-gradient(135deg,#a93262,#ca4968)!important;
+  color:#fff!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.25),0 0 0 1px rgba(177,158,255,.08) inset!important;
+}
+
 html.tiskarna-ui #winModal.tajenka-daily-result #winTitle{
   text-transform:none!important;
 }
@@ -59,6 +112,9 @@ html.tiskarna-ui #winModal .result-player-copy>strong.ranking-name-very-long{
     margin:6px 0;
   }
   html.tiskarna-ui #screen-free #tajenkaPlayCard .tajenka-home-actions button{
+    font-size:14px;
+  }
+  html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard).completed [data-tajenka-share]::after{
     font-size:14px;
   }
 }
