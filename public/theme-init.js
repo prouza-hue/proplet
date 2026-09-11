@@ -62,6 +62,7 @@
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
     ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
+    ['/tajenka-card-polish.css?v=1','propletTajenkaCardPolishCss'],
     ['/game-release-polish.css?v=2','propletGameReleasePolishCss'],
   ];
 
@@ -113,6 +114,7 @@
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=2','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
+    loadScript('/tajenka-card-polish.js?v=1','propletTajenkaCardPolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep
     // the document valid, so delegate only its active play CTA back to the
