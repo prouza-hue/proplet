@@ -62,6 +62,9 @@
   }
 
   function polishHintBanner(){
+    /* Tajenka runtime polish owns the semantic-hint DOM once loaded. The old
+       text-only normalizer must not flatten its SVG bulb + text structure. */
+    if(window.__PROPLET_TAJENKA_RUNTIME_POLISH__)return;
     const banner=q('#tajenkaHintBanner');
     if(!banner)return;
     banner.classList.add('tajenka-hint-banner-polished');
