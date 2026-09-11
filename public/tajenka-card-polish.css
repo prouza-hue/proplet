@@ -1,4 +1,8 @@
 /* Completed Tajenka card: lighter hierarchy and Daily-style challenge action. */
+html.tiskarna-ui #newContentBanner .eyebrow{
+  display:none!important;
+}
+
 html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-entry-copy,
 html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-entry-copy{
   align-self:center;
