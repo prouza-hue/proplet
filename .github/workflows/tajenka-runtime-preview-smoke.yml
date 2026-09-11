@@ -116,19 +116,34 @@ jobs:
               result={'desktop':desktop,'tablet':tablet,'mobile':mobile,'dark':dark}
               print(result)
 
+              # The player-visible requirement: Calm action is absent everywhere.
               for mode in ('desktop','tablet','mobile'):
+                  assert result[mode]['calmDisplay']=='none',result
+
+              # Wide layouts were the regression: their high-specificity flex rule
+              # must be defeated by the calm runtime state itself.
+              for mode in ('desktop','tablet'):
                   state=result[mode]
-                  assert state['calmDisplay']=='none',result
                   assert state['calmInline']=='none' and state['calmInlinePriority']=='important',result
-                  assert state['msgIcon'] and state['bannerIcon'],result
+                  assert state['msgDisplay']=='flex',result
+                  assert state['msgIcon'],result
                   assert state['msgLabel']=='Testovací významová stopa',result
-                  assert state['bannerLabel']=='Testovací významová stopa',result
                   assert state['msgSize']=='16px',result
-                  assert state['bannerSize']=='16px',result
-                  assert int(state['msgWeight'])>=800 and int(state['bannerWeight'])>=800,result
-                  assert state['msgColor']!='rgb(255, 255, 255)' and state['bannerColor']!='rgb(255, 255, 255)',result
-              assert desktop['bannerDisplay']=='none' and tablet['bannerDisplay']=='none',result
-              assert mobile['bannerDisplay']=='flex' and mobile['msgDisplay']=='none',result
+                  assert int(state['msgWeight'])>=800,result
+                  assert state['msgColor']!='rgb(255, 255, 255)',result
+                  assert state['bannerDisplay']=='none',result
+
+              # Phone deliberately uses only the dedicated compact banner. The
+              # old tiny current-word copy is hidden and therefore not judged by
+              # its inherited font-size.
+              assert mobile['msgDisplay']=='none',result
+              assert mobile['bannerDisplay']=='flex',result
+              assert mobile['bannerIcon'],result
+              assert mobile['bannerLabel']=='Testovací významová stopa',result
+              assert mobile['bannerSize']=='16px',result
+              assert int(mobile['bannerWeight'])>=800,result
+              assert mobile['bannerColor']!='rgb(255, 255, 255)',result
+
               assert dark['bannerColor']!='rgb(255, 255, 255)',result
               browser.close()
           PY
