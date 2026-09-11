@@ -3,7 +3,8 @@
 
 This tool is intentionally NOT a generator. It treats the approved candidate geometry
 (mask, letters and answer paths) as immutable master assets and only wraps it in the
-runtime schema used by Proplet.
+runtime schema used by Proplet. Editorial semantic clues are supplied by a separate,
+explicitly curated overlay and never inferred from geometry.
 """
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "data" / "tajenka_v2_approved.json"
+DEFAULT_CLUES = ROOT / "data" / "tajenka_v2_clues.json"
 DEFAULT_OUTPUT = ROOT / "data" / "tajenka_weekend_v2.json"
 DEFAULT_MANIFEST = ROOT / "data" / "tajenka_v2_freeze_manifest.json"
 REWARD_XP = 200
@@ -47,17 +49,37 @@ def production_source(board: dict) -> dict | None:
     return out
 
 
-def promote_board(board: dict, week: int) -> dict:
+def load_clues(path: Path, boards: list[dict]) -> dict[str, str]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("version") != 1 or not isinstance(payload.get("clues"), dict):
+        raise SystemExit(f"Invalid Tajenka clue overlay: {path}")
+    clues = {
+        str(word): str(clue).strip()
+        for word, clue in payload["clues"].items()
+        if str(word).strip() and str(clue).strip()
+    }
+    required = {answer["word"] for board in boards for answer in board["answers"]}
+    missing = sorted(required - clues.keys())
+    extra = sorted(clues.keys() - required)
+    if missing:
+        raise SystemExit(f"Missing Tajenka semantic clues: {missing}")
+    if extra:
+        raise SystemExit(f"Unexpected Tajenka semantic clues: {extra}")
+    return clues
+
+
+def promote_board(board: dict, week: int, clues: dict[str, str]) -> dict:
     answers = []
     for answer in board["answers"]:
-        # Preserve the exact tested geometry. Clues are deliberately not invented here;
-        # the runtime already has a safe length-based fallback when no editorial clue exists.
+        # Preserve tested geometry byte-for-byte at the logical level; clue is editorial
+        # metadata only and therefore deliberately excluded from the geometry hash.
         answers.append(
             {
                 "word": answer["word"],
                 "path": answer["path"],
                 "turns": answer.get("turns"),
                 "curlRun": answer.get("curlRun", 1),
+                "clue": clues[answer["word"]],
             }
         )
 
@@ -108,6 +130,7 @@ def promote_board(board: dict, week: int) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
+    parser.add_argument("--clues", type=Path, default=DEFAULT_CLUES)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     args = parser.parse_args()
@@ -119,8 +142,9 @@ def main() -> None:
         raise SystemExit(f"Approved bank unexpectedly contains failures: {failures}")
     if len(boards) != 37:
         raise SystemExit(f"Expected exactly 37 approved boards, found {len(boards)}")
+    clues = load_clues(args.clues, boards)
 
-    puzzles = [promote_board(board, week) for week, board in enumerate(boards, 1)]
+    puzzles = [promote_board(board, week, clues) for week, board in enumerate(boards, 1)]
     bank = {
         "version": 2,
         "kind": "weekend_bonus_bank",
@@ -147,7 +171,7 @@ def main() -> None:
 
     args.output.write_text(json.dumps(bank, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     args.manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Promoted {len(puzzles)} frozen Tajenka boards -> {args.output}")
+    print(f"Promoted {len(puzzles)} frozen Tajenka boards with semantic clues -> {args.output}")
 
 
 if __name__ == "__main__":
