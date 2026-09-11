@@ -6,6 +6,12 @@
   const q=(selector,root=document)=>root?.querySelector?.(selector)||null;
   const qa=(selector,root=document)=>[...(root?.querySelectorAll?.(selector)||[])];
   let queued=false;
+  let lastMobileHintToast='';
+  let toastResetTimer=0;
+
+  function isPhoneLayout(){
+    return window.matchMedia?.('(max-width:600px)')?.matches===true;
+  }
 
   function semanticHintText(value){
     const raw=String(value||'').trim();
@@ -38,6 +44,20 @@
     delete el.dataset.tajenkaSemanticClue;
   }
 
+  function showMobileHintToast(clue){
+    if(!clue||clue===lastMobileHintToast)return;
+    lastMobileHintToast=clue;
+    try{
+      if(typeof showToast==='function')showToast(`💡 ${clue}`);
+      const toast=q('#toast');
+      if(toast){
+        toast.classList.add('tajenka-hint-toast');
+        clearTimeout(toastResetTimer);
+        toastResetTimer=setTimeout(()=>toast.classList.remove('tajenka-hint-toast'),3400);
+      }
+    }catch{}
+  }
+
   function syncSemanticHint(){
     const game=q('#screen-game');
     const message=q('#gameMessage');
@@ -45,55 +65,77 @@
     if(!game?.classList.contains('tajenka-mode')){
       clearSemanticHint(message);
       clearSemanticHint(banner);
+      lastMobileHintToast='';
       return;
     }
 
-    /* The dedicated banner is the stable source of truth for level-1 Tajenka
-       clues. It may already have had its emoji converted by organic-ui, so never
-       use an emoji as the semantic marker here. */
-    const clue=semanticHintText(banner?.dataset.tajenkaSemanticClue||banner?.textContent||'');
-    if(!clue){
-      clearSemanticHint(message);
+    const bannerClue=semanticHintText(banner?.dataset.tajenkaSemanticClue||banner?.textContent||'');
+    if(!bannerClue){
+      if(!message?.classList.contains('tajenka-semantic-hint'))clearSemanticHint(message);
+      return;
+    }
+
+    const messageRaw=message?.classList.contains('tajenka-semantic-hint')
+      ? semanticHintText(message.dataset.tajenkaSemanticClue||'')
+      : semanticHintText(message?.textContent||'');
+
+    /* Level 2/3 hints replace #gameMessage. Once that happens, the old level-1
+       clue must stop owning the surface. */
+    if(messageRaw&&messageRaw!==bannerClue){
+      banner?.classList.add('hidden');
       clearSemanticHint(banner);
+      clearSemanticHint(message);
+      lastMobileHintToast='';
       return;
     }
 
-    renderSemanticHint(banner,clue);
+    if(banner){
+      banner.dataset.tajenkaSemanticClue=bannerClue;
+      banner.classList.add('hidden');
+    }
+    renderSemanticHint(message,bannerClue);
+    if(isPhoneLayout())showMobileHintToast(bannerClue);
+  }
 
-    /* On Fold/tablet/desktop the visible clue surface is #gameMessage inside
-       “Skládáš”. Organic UI may have replaced the original pictograph before
-       this observer runs, so match by clue text instead of emoji. Do not steal
-       later level-2/3 feedback: only own the message while it still contains
-       this exact semantic clue. */
-    const messageText=semanticHintText(message?.dataset.tajenkaSemanticClue||message?.textContent||'');
-    if(message&&messageText===clue)renderSemanticHint(message,clue);
-    else if(message)clearSemanticHint(message);
+  function ensureTajenkaPhraseShell(){
+    const box=q('#tajenkaPhrase');
+    if(!box)return;
+    const game=q('#screen-game');
+    if(!game?.classList.contains('tajenka-mode')){
+      box.classList.add('hidden');
+      return;
+    }
+
+    let progress=q('#tajenkaProgress',box);
+    let slots=q('#tajenkaSlots',box);
+    if(!progress||!slots){
+      box.innerHTML='<div class="tajenka-phrase-head"><span class="stat-label">TAJENKA</span><div id="tajenkaProgress" class="tajenka-progress" aria-live="polite"></div></div><div id="tajenkaSlots" class="tajenka-slots"></div>';
+      progress=q('#tajenkaProgress',box);
+      slots=q('#tajenkaSlots',box);
+    }
+
+    if(!progress||!slots)return;
+    try{
+      if(typeof currentGame!=='undefined'&&currentGame?.mode==='tajenka'&&typeof renderTajenkaPhrase==='function')renderTajenkaPhrase(currentGame);
+    }catch{}
   }
 
   function calmRunActive(){
-    if(document.body.classList.contains('calm-run-v334'))return true;
-    try{return !!window.currentGame?.calmMode}catch{return false}
+    try{if(typeof currentGame!=='undefined'&&currentGame?.calmMode===true)return true}catch{}
+    return document.body.classList.contains('calm-run-v334');
   }
 
   function syncCalmAction(){
-    const active=calmRunActive();
-    qa('#calmRunBtn').forEach(btn=>{
-      if(active){
-        btn.dataset.tajenkaCalmForcedHidden='1';
-        btn.style.setProperty('display','none','important');
-        btn.style.setProperty('visibility','hidden','important');
-        btn.setAttribute('aria-hidden','true');
-      }else if(btn.dataset.tajenkaCalmForcedHidden==='1'){
-        delete btn.dataset.tajenkaCalmForcedHidden;
-        btn.style.removeProperty('display');
-        btn.style.removeProperty('visibility');
-        btn.removeAttribute('aria-hidden');
-      }
-    });
+    if(!calmRunActive())return;
+    /* Do not merely hide the action. Remove it from the DOM so Fold/desktop
+       layout CSS cannot resurrect it. If the legacy polish recreates it later,
+       this observer removes it again on the next frame. */
+    qa('#calmRunBtn').forEach(btn=>btn.remove());
   }
 
   function run(){
     queued=false;
+    ensureTajenkaPhraseShell();
     syncSemanticHint();
     syncCalmAction();
   }
@@ -114,7 +156,7 @@
     window.visualViewport?.addEventListener?.('resize',queue,{passive:true});
     screen.orientation?.addEventListener?.('change',queue);
     navigator.devicePosture?.addEventListener?.('change',queue);
-    [0,80,220,500].forEach(ms=>setTimeout(queue,ms));
+    [0,80,220,500,1200].forEach(ms=>setTimeout(queue,ms));
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
