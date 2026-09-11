@@ -1,12 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap');
 
 /* Proplet header wordmark — approved Fraunces direction. */
-html.tiskarna-ui .brand-copy{
-  transform:translateY(1px);
+html.tiskarna-ui body:not(.playing) .app-header .brand.home-brand .brand-copy,
+html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-width:0!important;
+  height:auto!important;
+  overflow:visible!important;
+  visibility:visible!important;
+  opacity:1!important;
+  color:var(--td-ink,#202B39)!important;
+  transform:translateY(1px)!important;
 }
 
-html.tiskarna-ui .brand-copy strong{
+html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong{
   display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  color:var(--td-ink,#202B39)!important;
   font-family:'Fraunces',Georgia,'Times New Roman',serif!important;
   font-size:30px!important;
   font-style:normal!important;
@@ -15,21 +30,22 @@ html.tiskarna-ui .brand-copy strong{
   line-height:.92!important;
   letter-spacing:-.03em!important;
   text-rendering:optimizeLegibility;
+  white-space:nowrap!important;
 }
 
-html.tiskarna-ui .brand-copy strong::before{
+html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong::before{
   content:none!important;
   display:none!important;
 }
 
-html.tiskarna-ui .brand-copy small{
+html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy small{
   margin-top:3px!important;
 }
 
 @media(max-width:420px){
-  html.tiskarna-ui .brand-copy strong{font-size:29px!important}
+  html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong{font-size:29px!important}
 }
 
 @media(min-width:1000px){
-  html.tiskarna-ui .brand-copy strong{font-size:31px!important}
+  html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong{font-size:31px!important}
 }
