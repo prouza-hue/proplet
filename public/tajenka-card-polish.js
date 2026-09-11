@@ -62,34 +62,16 @@
   }
 
   function polishHintBanner(){
-    /* Tajenka runtime polish owns the semantic-hint DOM once loaded. The old
-       text-only normalizer must not flatten its SVG bulb + text structure. */
+    /* Runtime polish owns level-1 hint presentation. Never flatten its SVG
+       markup and never reserve permanent board space for a hint. */
     if(window.__PROPLET_TAJENKA_RUNTIME_POLISH__)return;
     const banner=q('#tajenkaHintBanner');
-    if(!banner)return;
-    banner.classList.add('tajenka-hint-banner-polished');
-    const raw=String(banner.textContent||'').trim();
-    if(!raw)return;
-    const cleaned=raw.replace(/^[💭💡]\s*/u,'').trim();
-    const desired=`💡 ${cleaned}`;
-    if(banner.textContent!==desired)banner.textContent=desired;
+    if(banner)banner.classList.add('hidden');
   }
 
-  /*
-   * Tajenka mobile/Fold stability guard.
-   *
-   * The first semantic-hint implementation added a fifth CSS-grid row with an
-   * `auto` track. CSS Grid stretches auto tracks by default, so on a narrow Fold
-   * that row could consume most of the available board height and look like a
-   * giant empty panel. Keep the hint as a dedicated row, but make the row
-   * max-content so it can never reserve more space than the clue itself.
-   *
-   * Samsung Fold can also report a transient viewport while moving from the
-   * unfolded tablet state back to the cover display. The canonical game-layout
-   * listener gets the immediate resize; the settled passes below deliberately
-   * re-run that listener after the viewport has stabilised and then refit the
-   * board on the following frames. No game state or board geometry is changed.
-   */
+  /* Fold stability guard only. Tajenka's canonical board column stays four rows:
+     remaining words, current word, progressive Tajenka, board. Semantic hints do
+     not get a fifth permanent row; phone uses a transient toast instead. */
   function installMobileLayoutGuard(){
     if(window.__PROPLET_TAJENKA_MOBILE_LAYOUT_GUARD__)return;
     window.__PROPLET_TAJENKA_MOBILE_LAYOUT_GUARD__=true;
@@ -97,46 +79,22 @@
     const style=document.createElement('style');
     style.id='tajenkaMobileLayoutGuardStyle';
     style.textContent=`
-      /* Calm is a run state, not a persistent action button. Tablet/wide-layout
-         rules must never resurrect the action after the run has become calm. */
-      body.calm-run-v334 #calmRunBtn{
-        display:none!important;
-      }
-
       @media(max-width:600px){
         html.tiskarna-ui #screen-game.tajenka-mode .game-board-column,
         html.tiskarna-ui .tajenka-mode .game-board-column{
-          grid-template-rows:auto auto auto max-content minmax(0,1fr)!important;
+          grid-template-rows:auto auto auto minmax(0,1fr)!important;
         }
-        html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden),
-        html.tiskarna-ui .tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden){
-          grid-row:4!important;
-          display:block!important;
-          align-self:start!important;
-          justify-self:stretch!important;
-          min-width:0!important;
-          min-height:0!important;
-          height:auto!important;
-          max-height:none!important;
-          margin:0!important;
-          padding:7px 9px!important;
-          white-space:normal!important;
-          overflow:visible!important;
-        }
-        html.tiskarna-ui .tajenka-mode .tajenka-hint-banner-polished:not(.hidden){
-          color:#397f69!important;
-          font-size:15px!important;
-          line-height:1.35!important;
-          font-weight:850!important;
-          letter-spacing:0!important;
-          background:color-mix(in srgb,#55cfa7 10%,var(--paper))!important;
-          border:1px solid color-mix(in srgb,#55cfa7 38%,var(--line))!important;
-          border-radius:9px!important;
+        html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.tajenka-phrase,
+        html.tiskarna-ui .tajenka-mode .game-board-column>.tajenka-phrase{
+          grid-row:3!important;
         }
         html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.board-stage,
         html.tiskarna-ui .tajenka-mode .game-board-column>.board-stage{
-          grid-row:5!important;
+          grid-row:4!important;
           min-height:0!important;
+        }
+        html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner{
+          display:none!important;
         }
       }
     `;
