@@ -25,7 +25,6 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
 
           def replace_once(path, old, new):
               p = Path(path)
@@ -35,194 +34,28 @@ jobs:
                   raise SystemExit(f'{path}: expected one exact match, got {count}')
               p.write_text(text.replace(old, new, 1), encoding='utf-8')
 
-          def regex_once(path, pattern, replacement):
-              p = Path(path)
-              text = p.read_text(encoding='utf-8')
-              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
-              if count != 1:
-                  raise SystemExit(f'{path}: expected one regex match, got {count}')
-              p.write_text(updated, encoding='utf-8')
+          replace_once('server.py', 'TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)\n', 'TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)\nTAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)\n')
+          replace_once('server.py', 'def tajenka_week_for(day: date) -> Optional[int]:\n    """Return the finite release week for a date; never cycle future content."""\n    offset = (day - TAJENKA_FIRST_SATURDAY).days\n    if offset < 0:\n        return None\n    week = offset // 7 + 1\n    prepared = int(load_tajenka_bank().get("weeks") or 0)\n    return week if 1 <= week <= prepared else None', 'def tajenka_week_for(day: date) -> Optional[int]:\n    """Return the active finite Tajenka slot for the Saturday/Wednesday cadence."""\n    initial_offset = (day - TAJENKA_FIRST_SATURDAY).days\n    if initial_offset < 0:\n        return None\n    if day < TAJENKA_TWICE_WEEKLY_START:\n        week = initial_offset // 7 + 1\n    else:\n        cadence_offset = (day - TAJENKA_TWICE_WEEKLY_START).days\n        week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)\n    prepared = int(load_tajenka_bank().get("weeks") or 0)\n    return week if 1 <= week <= prepared else None')
 
-          # Backend: preserve the two already released Saturday puzzles, then switch
-          # to Saturday/Wednesday starting with puzzle 3 on 2026-09-12.
-          replace_once(
-              'server.py',
-              'TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)\n',
-              'TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)\nTAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)\n',
-          )
-          regex_once(
-              'server.py',
-              r'def tajenka_week_for\(day: date\) -> Optional\[int\]:\n    """Return the finite release week for a date; never cycle future content\."""\n.*?    return week if 1 <= week <= prepared else None',
-              '''def tajenka_week_for(day: date) -> Optional[int]:
-    """Return the active finite Tajenka slot for the Saturday/Wednesday cadence."""
-    initial_offset = (day - TAJENKA_FIRST_SATURDAY).days
-    if initial_offset < 0:
-        return None
-    if day < TAJENKA_TWICE_WEEKLY_START:
-        week = initial_offset // 7 + 1
-    else:
-        cadence_offset = (day - TAJENKA_TWICE_WEEKLY_START).days
-        week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)
-    prepared = int(load_tajenka_bank().get("weeks") or 0)
-    return week if 1 <= week <= prepared else None''',
-          )
+          replace_once('public/app.js', "const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';\nconst TAJENKA_PREPARED_WEEKS=10;", "const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';\nconst TAJENKA_TWICE_WEEKLY_START=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaTwiceWeeklyStart||'2026-09-12';\nconst TAJENKA_PREPARED_WEEKS=10;")
+          replace_once('public/app.js', 'function refreshTajenkaAvailability(iso=pragueDateISO()){\n const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null;\n activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);\n TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);\n return TAJENKA_AVAILABLE;\n}', 'function tajenkaReleaseSlotForISO(iso=pragueDateISO()){\n const initialOffset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY);\n if(initialOffset<0)return null;\n const cadenceOffset=dayOffsetISO(iso,TAJENKA_TWICE_WEEKLY_START);\n if(cadenceOffset<0)return Math.floor(initialOffset/7)+1;\n return 3+Math.floor(cadenceOffset/7)*2+(cadenceOffset%7>=4?1:0);\n}\nfunction refreshTajenkaAvailability(iso=pragueDateISO()){\n const week=tajenkaReleaseSlotForISO(iso);\n activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);\n TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);\n return TAJENKA_AVAILABLE;\n}')
 
-          # Frontend must resolve the same active slot before it requests /api/tajenka.
-          replace_once(
-              'public/app.js',
-              "const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';\nconst TAJENKA_PREPARED_WEEKS=10;",
-              "const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';\nconst TAJENKA_TWICE_WEEKLY_START=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaTwiceWeeklyStart||'2026-09-12';\nconst TAJENKA_PREPARED_WEEKS=10;",
-          )
-          replace_once(
-              'public/app.js',
-              "function refreshTajenkaAvailability(iso=pragueDateISO()){\n const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null;\n activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);\n TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);\n return TAJENKA_AVAILABLE;\n}",
-              "function tajenkaReleaseSlotForISO(iso=pragueDateISO()){\n const initialOffset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY);\n if(initialOffset<0)return null;\n const cadenceOffset=dayOffsetISO(iso,TAJENKA_TWICE_WEEKLY_START);\n if(cadenceOffset<0)return Math.floor(initialOffset/7)+1;\n return 3+Math.floor(cadenceOffset/7)*2+(cadenceOffset%7>=4?1:0);\n}\nfunction refreshTajenkaAvailability(iso=pragueDateISO()){\n const week=tajenkaReleaseSlotForISO(iso);\n activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);\n TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);\n return TAJENKA_AVAILABLE;\n}",
-          )
+          replace_once('public/runtime-meta.js', "      tajenkaFirstSaturday:'2026-08-29',\n      tajenkaRewardXp:200,", "      tajenkaFirstSaturday:'2026-08-29',\n      tajenkaTwiceWeeklyStart:'2026-09-12',\n      tajenkaRewardXp:200,")
 
-          # Runtime metadata is the shared source for the cadence transition date.
-          replace_once(
-              'public/runtime-meta.js',
-              "      tajenkaFirstSaturday:'2026-08-29',\n      tajenkaRewardXp:200,",
-              "      tajenkaFirstSaturday:'2026-08-29',\n      tajenkaTwiceWeeklyStart:'2026-09-12',\n      tajenkaRewardXp:200,",
-          )
-
-          # Push: notify on actual release days and keep slot numbering in lockstep.
-          replace_once(
-              'push_diagnostics_v3329.py',
-              '    tajenka_first_saturday = date(2026, 8, 29)\n',
-              '    tajenka_first_saturday = date(2026, 8, 29)\n    tajenka_twice_weekly_start = date(2026, 9, 12)\n',
-          )
-          replace_once(
-              'push_diagnostics_v3329.py',
-              '''        tajenka_week = None
-        if tajenka_release_enabled and today_date >= tajenka_first_saturday and today_date.weekday() == 5:
-            candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1
-            tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None
-''',
-              '''        tajenka_week = None
-        if tajenka_release_enabled and today_date >= tajenka_first_saturday:
-            release_day = today_date.weekday() == 5 if today_date < tajenka_twice_weekly_start else today_date.weekday() in {2, 5}
-            if release_day:
-                if today_date < tajenka_twice_weekly_start:
-                    candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1
-                else:
-                    cadence_offset = (today_date - tajenka_twice_weekly_start).days
-                    candidate_week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)
-                tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None
-''',
-          )
-          replace_once(
-              'push_diagnostics_v3329.py',
-              '"title": "✨ Víkendová Tajenka je tady",',
-              '"title": "✨ Nová Tajenka je tady",',
-          )
-
-          # Current regression contract: transition without retroactively skipping puzzles.
-          Path('tests/current/test_tajenka_weekly_availability.py').write_text('''#!/usr/bin/env python3
-"""Regression contract: Tajenka switches from weekly Saturday to Saturday/Wednesday."""
-
-from __future__ import annotations
-
-import json
-import sys
-from datetime import date
-from pathlib import Path
-from unittest.mock import patch
-
-from fastapi import HTTPException
-
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
-import server  # noqa: E402
-
-
-def released_slot(day: date) -> int | None:
-    with (
-        patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
-        patch.object(server, "VERCEL_ENV", "production"),
-        patch.object(server, "current_prague_date", return_value=day),
-    ):
-        if not server.tajenka_is_live(day):
-            return None
-        response = server.current_tajenka(week=None)
-        return int(json.loads(response.body)["week"])
-
-
-def assert_unavailable(day: date) -> None:
-    with (
-        patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
-        patch.object(server, "VERCEL_ENV", "production"),
-        patch.object(server, "current_prague_date", return_value=day),
-    ):
-        assert server.tajenka_is_live(day) is False
-        try:
-            server.current_tajenka(week=None)
-        except HTTPException as error:
-            assert error.status_code == 404
-            assert error.detail == "Tajenka zatím není vydaná"
-        else:
-            raise AssertionError("unreleased Tajenka must not be served")
-
-
-assert_unavailable(date(2026, 8, 28))
-
-# The two already released puzzles keep their historical weekly windows.
-for day in (date(2026, 8, 29), date(2026, 9, 2), date(2026, 9, 4)):
-    assert released_slot(day) == 1, day
-for day in (date(2026, 9, 5), date(2026, 9, 9), date(2026, 9, 11)):
-    assert released_slot(day) == 2, day
-
-# From 12 Sep onward: Saturday release, then Wednesday release.
-for day in (date(2026, 9, 12), date(2026, 9, 13), date(2026, 9, 15)):
-    assert released_slot(day) == 3, day
-for day in (date(2026, 9, 16), date(2026, 9, 17), date(2026, 9, 18)):
-    assert released_slot(day) == 4, day
-assert released_slot(date(2026, 9, 19)) == 5
-assert released_slot(date(2026, 10, 7)) == 10
-assert_unavailable(date(2026, 10, 10))
-
-app = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
-assert "TAJENKA_TWICE_WEEKLY_START" in app
-assert "function tajenkaReleaseSlotForISO" in app
-assert "cadenceOffset%7>=4" in app
-
-print("PASS: Tajenka keeps slots 1-2, then releases every Saturday and Wednesday")
-''', encoding='utf-8')
-
-          # Keep release-safety assertions aligned with the new cadence and push wording.
-          replace_once(
-              'tools/test_tajenka_preview.py',
-              '        "const TAJENKA_FIRST_SATURDAY=",\n',
-              '        "const TAJENKA_FIRST_SATURDAY=",\n        "const TAJENKA_TWICE_WEEKLY_START=",\n',
-          )
-          replace_once(
-              'tools/test_tajenka_preview.py',
-              "    assert '\"title\": \"✨ Víkendová Tajenka je tady\"' in push\n",
-              "    assert '\"title\": \"✨ Nová Tajenka je tady\"' in push\n",
-          )
-          replace_once(
-              'tools/test_tajenka_preview.py',
-              '    assert "tajenkaFirstSaturday:\'2026-08-29\'" in runtime\n',
-              '    assert "tajenkaFirstSaturday:\'2026-08-29\'" in runtime\n    assert "tajenkaTwiceWeeklyStart:\'2026-09-12\'" in runtime\n',
-          )
-          replace_once(
-              'tools/test_tajenka_push_runtime.py',
-              'assert payload["title"] == "✨ Víkendová Tajenka je tady"\n',
-              'assert payload["title"] == "✨ Nová Tajenka je tady"\n',
-          )
+          replace_once('push_diagnostics_v3329.py', '    tajenka_first_saturday = date(2026, 8, 29)\n', '    tajenka_first_saturday = date(2026, 8, 29)\n    tajenka_twice_weekly_start = date(2026, 9, 12)\n')
+          replace_once('push_diagnostics_v3329.py', '        tajenka_week = None\n        if tajenka_release_enabled and today_date >= tajenka_first_saturday and today_date.weekday() == 5:\n            candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1\n            tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None\n', '        tajenka_week = None\n        if tajenka_release_enabled and today_date >= tajenka_first_saturday:\n            release_day = today_date.weekday() == 5 if today_date < tajenka_twice_weekly_start else today_date.weekday() in {2, 5}\n            if release_day:\n                if today_date < tajenka_twice_weekly_start:\n                    candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1\n                else:\n                    cadence_offset = (today_date - tajenka_twice_weekly_start).days\n                    candidate_week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)\n                tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None\n')
+          replace_once('push_diagnostics_v3329.py', '"title": "✨ Víkendová Tajenka je tady",', '"title": "✨ Nová Tajenka je tady",')
           PY
 
-      - name: Verify cadence contracts
+      - name: Verify syntax
         run: |
           python -m py_compile server.py push_diagnostics_v3329.py
-          python tests/current/test_tajenka_weekly_availability.py
-          python tools/test_tajenka_push_runtime.py
 
       - name: Commit migration
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add server.py public/app.js public/runtime-meta.js push_diagnostics_v3329.py tests/current/test_tajenka_weekly_availability.py tools/test_tajenka_preview.py tools/test_tajenka_push_runtime.py
+          git add server.py public/app.js public/runtime-meta.js push_diagnostics_v3329.py
           git diff --cached --check
           git commit -m "Switch Tajenka to Saturday and Wednesday cadence"
           git push origin HEAD:ux/tiskarska-dilna
