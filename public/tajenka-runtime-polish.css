@@ -87,6 +87,110 @@ html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner{
   }
 }
 
+/* Fold/tablet: the live Tajenka progress card belongs immediately below
+   “Skládáš” in the side rail. This is a real layout slot, not an overlay. */
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-board-column{
+  grid-template-rows:auto minmax(0,1fr)!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-board-column>.game-info{
+  grid-row:1!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-board-column>.board-stage{
+  grid-row:2!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column{
+  grid-template-rows:auto auto minmax(0,1fr) auto auto!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>.current-word{
+  grid-row:1!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>#tajenkaPhrase.tajenka-phrase-in-rail{
+  grid-column:1!important;
+  grid-row:2!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 9px!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:5px!important;
+  border-radius:15px!important;
+  align-self:start!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>#tajenkaPhrase .tajenka-phrase-head{
+  grid-column:1!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>#tajenkaPhrase .tajenka-slots{
+  grid-column:1!important;
+  justify-content:flex-start!important;
+  gap:3px!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>#tajenkaPhrase .tajenka-slot{
+  font-size:11px!important;
+  padding:3px 5px!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>.game-message{
+  grid-row:3!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>.starter-hint-nudge{
+  grid-row:4!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait) #screen-game.tajenka-mode .game-control-column>.game-actions{
+  grid-row:5!important;
+}
+
+/* Desktop: the progress row already sits above the board, but the old compact
+   mobile-sized treatment wastes the available resolution. Give it a deliberate
+   two-row composition and readable reveal chips. */
+@media(min-width:1000px) and (min-height:650px){
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode .game-board-column>#tajenkaPhrase{
+    flex:0 0 auto!important;
+    min-height:82px!important;
+    padding:13px 16px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    align-items:start!important;
+    row-gap:9px!important;
+    border-radius:18px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-phrase-head{
+    grid-column:1!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-phrase-head>.stat-label{
+    font-size:11px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-progress{
+    gap:5px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-progress i{
+    width:10px!important;
+    height:10px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-progress strong{
+    font-size:14px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-slots{
+    grid-column:1!important;
+    justify-content:flex-start!important;
+    gap:6px 5px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-slot{
+    padding:5px 8px!important;
+    border-radius:9px!important;
+    font-size:16px!important;
+    line-height:1.15!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-literal,
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-space{
+    font-size:15px!important;
+  }
+  html.tiskarna-ui body.game-desktop-wide #screen-game.tajenka-mode #tajenkaPhrase .tajenka-rule-inline{
+    grid-column:1!important;
+    font-size:11px!important;
+    text-align:left!important;
+  }
+}
+
 /* Fold/tablet/desktop: keep the semantic clue in the established Skládáš rail. */
 @media(min-width:601px){
   html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
