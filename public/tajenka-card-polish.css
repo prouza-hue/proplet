@@ -10,6 +10,27 @@ html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-revealed-phrase{
   letter-spacing:-.02em;
 }
 
+/* Match the Tajenka artwork slot to the weekly-news artwork rhythm. */
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard){
+  column-gap:13px!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-entry-icon{
+  width:48px!important;
+  height:48px!important;
+  flex:0 0 48px!important;
+  border-radius:16px!important;
+  display:grid!important;
+  place-items:center!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-entry-icon img[data-tajenka-icon]{
+  width:42px!important;
+  height:42px!important;
+  object-fit:contain!important;
+}
+html.tiskarna-ui #screen-free #tajenkaPlayCard.completed{
+  grid-template-columns:48px minmax(0,1fr)!important;
+}
+
 html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta,
 html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta{
   display:flex;
