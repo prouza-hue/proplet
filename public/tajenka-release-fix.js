@@ -23,6 +23,22 @@
   function currentPhrase(){
     try{return String(tajenkaPuzzle?.tajenka?.phrase||'').trim()}catch{return ''}
   }
+  function currentSourceMarkup(){
+    let puzzle=null;try{puzzle=tajenkaPuzzle}catch{}
+    const source=puzzle?.source;if(!source?.url||!/^https:\/\//i.test(String(source.url)))return '';
+    const href=esc(String(source.url)),label=esc(source.label||'zdroj');
+    if(source.author){
+      const byline=[source.author,source.work].filter(Boolean).map(esc).join(' · ');
+      return `<span>${byline}</span><a href="${href}" target="_blank" rel="noopener noreferrer">Zdroj ↗</a>`;
+    }
+    return `<span>Zdroj:</span><a href="${href}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`;
+  }
+  function syncTajenkaSourceLine(modal){
+    let line=q('.tajenka-result-source',modal),markup=currentSourceMarkup();
+    if(!markup){line?.remove();return}
+    if(!line){line=document.createElement('div');line.className='tajenka-result-source';const text=q('#winText',modal);text?.insertAdjacentElement('afterend',line)}
+    line.innerHTML=markup;
+  }
   function sentenceCasePhrase(value){
     const text=String(value??'').trim();
     const letters=text.replace(/[^\p{L}]/gu,'');
@@ -191,7 +207,7 @@
     const title=q('#winTitle',modal);if(title){title.textContent=phrase;title.classList.remove('hidden')}
     q('#winPraise',modal)?.classList.add('hidden');
     q('#tajenkaWinPhrase',modal)?.classList.add('hidden');
-    const text=q('#winText',modal);if(text)text.textContent=resultLine(result);
+    const text=q('#winText',modal);if(text)text.textContent=resultLine(result);syncTajenkaSourceLine(modal);
     const chips=q('.win-summary-chips',modal);chips?.classList.remove('hidden');
     const xp=q('#winXp',modal);if(xp){xp.textContent='+200 XP';xp.classList.remove('hidden')}
     const clean=q('#winClean',modal);if(clean){clean.textContent=cleanLabel(result);clean.classList.remove('hidden');clean.classList.toggle('hinted',Math.max(0,Number(result?.hints??result?.hintsUsed)||0)>0)}
@@ -212,7 +228,7 @@
   }
   function resetTajenkaDailyResult(){
     const modal=q('#winModal');
-    modal?.classList.remove('tajenka-daily-result');
+    modal?.classList.remove('tajenka-daily-result');q('.tajenka-result-source',modal)?.remove();
   }
 
   function wrapAsync(name,after){

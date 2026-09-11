@@ -62,3 +62,16 @@ html.tiskarna-ui #winModal .result-player-copy>strong.ranking-name-very-long{
     font-size:14px;
   }
 }
+
+/* Tajenka v2 — source/author is a quiet post-solve editorial footnote. */
+html.tiskarna-ui #winModal.tajenka-daily-result .tajenka-result-source{
+  display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;
+  margin:-2px 0 8px;color:var(--td-muted,#706a62);font-size:11px;line-height:1.35;text-align:center;
+}
+html.tiskarna-ui #winModal.tajenka-daily-result .tajenka-result-source a{
+  color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;font-weight:750;
+}
+html.tiskarna-ui #winModal.tajenka-daily-result .tajenka-result-source a:hover{color:var(--td-ink,#2c2925)}
+.tajenka-literal{white-space:pre;font-size:11px;font-weight:850;color:#706987}
+@media(max-width:600px){.tajenka-literal{font-size:10px}}
+

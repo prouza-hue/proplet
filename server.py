@@ -1270,7 +1270,7 @@ def puzzle_database_preview(request: Request):
 
 
 @app.get("/api/tajenka")
-def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=10)):
+def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
     """Serve one released board without exposing the remaining weekend bank."""
     today = current_prague_date()
     if VERCEL_ENV == "preview":

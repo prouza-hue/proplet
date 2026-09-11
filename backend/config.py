@@ -78,7 +78,7 @@ def load_settings() -> Settings:
             "rolling_content_gen4_candidate_v334.json" if gen4_candidate_preview else "rolling_content_v1.json"
         ),
         content_catalog_path=data_root / "content_catalog_v334.json",
-        tajenka_bank_path=data_root / "tajenka_weekend_v1.json",
+        tajenka_bank_path=data_root / "tajenka_weekend_v2.json",
         tajenka_release_enabled=(
             vercel_env == "production"
             and _env("PROPLET_TAJENKA_RELEASE_ENABLED", "true").lower() in {"1", "true", "yes"}
