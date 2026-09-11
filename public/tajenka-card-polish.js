@@ -57,8 +57,13 @@
     }
   }
 
+  function polishWeeklyBanner(){
+    q('#newContentBanner .eyebrow')?.remove();
+  }
+
   function run(){
     queued=false;
+    polishWeeklyBanner();
     polishCard(q('#tajenkaPreviewCard'));
     polishCard(q('#tajenkaPlayCard'));
     polishResult();
