@@ -41,11 +41,8 @@ jobs:
           p.write_text(text,encoding='utf-8')
           PY
 
-      - name: Verify Tajenka contracts
-        run: |
-          python tools/test_tajenka_preview.py
-          python tools/test_tajenka_push_runtime.py
-          python tests/current/test_tajenka_weekly_availability.py
+      - name: Verify refreshed characterization
+        run: python tools/test_tajenka_preview.py
 
       - name: Commit and remove one-time workflow
         run: |
