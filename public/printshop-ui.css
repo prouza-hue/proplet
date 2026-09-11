@@ -356,3 +356,21 @@ html.tiskarna-ui #winModal button{font-weight:500!important}
 html.tiskarna-ui :is(.free-board-content,.daily-global-board):has(.ranking-expand[open])>.daily-world-neighbours,
 html.tiskarna-ui .free-board-content:has(.ranking-expand[open])>.ranking-compact{display:none!important}
 html.tiskarna-ui .ranking-before{width:100%;min-height:44px;margin-bottom:8px}
+
+/* Tajenka mobile semantic hint — dedicated visible row, never clipped inside Skládáš. */
+html.tiskarna-ui #screen-game .tajenka-hint-banner{display:none}
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game.tajenka-mode .game-board-column,
+ html.tiskarna-ui .tajenka-mode .game-board-column{grid-template-rows:auto auto auto auto minmax(0,1fr)!important}
+ html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden),
+ html.tiskarna-ui .tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden){
+  grid-row:4!important;display:flex!important;align-items:flex-start!important;min-width:0!important;
+  padding:7px 9px!important;border:1px solid color-mix(in srgb,#235BCC 28%,var(--td-line))!important;
+  border-radius:9px!important;background:color-mix(in srgb,#235BCC 7%,var(--td-paper))!important;
+  color:var(--td-ink)!important;font-size:12px!important;font-weight:750!important;line-height:1.3!important;
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+ }
+ html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.board-stage,
+ html.tiskarna-ui .tajenka-mode .game-board-column>.board-stage{grid-row:5!important}
+}
+
