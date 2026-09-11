@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check playwright==1.57.0
-      - name: Verify Tajenka progress, Calm and semantic clue in Chromium
+      - name: Verify Tajenka responsive structure in Chromium
         shell: bash
         run: |
           cat > /tmp/tajenka_runtime_smoke.py <<'PY'
@@ -42,10 +42,10 @@ jobs:
                   runtime=get('/tajenka-runtime-polish.js?v=1')
                   card=get('/tajenka-card-polish.js?v=2')
                   css=get('/tajenka-runtime-polish.css?v=1')
-                  if ('ensureTajenkaPhraseShell' in runtime
+                  if ('syncTajenkaPhrasePlacement' in runtime
                       and 'Remove it from the DOM' in runtime
                       and 'four rows' in card
-                      and 'progressive phrase is a permanent' in css):
+                      and 'two-row composition' in css):
                       break
               except Exception:
                   pass
@@ -56,51 +56,56 @@ jobs:
           chrome=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox','--disable-dev-shm-usage'])
-              page=browser.new_page(viewport={'width':1440,'height':900})
-              page.goto(url+'/?tajenka=1&tajenka_week=1',wait_until='domcontentloaded',timeout=30000)
-              page.wait_for_function("()=>window.__PROPLET_TAJENKA_RUNTIME_POLISH__===true",timeout=15000)
 
-              page.evaluate("""async()=>{
-                const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-                document.documentElement.classList.add('tiskarna-ui','ribbon-ui');
-                const game=document.querySelector('#screen-game');
-                game.classList.add('active','tajenka-mode');
-                document.body.classList.add('playing','game-desktop-wide','calm-run-v334');
+              def prime(page, calm=True, clue='Testovací významová stopa'):
+                  page.goto(url+'/?tajenka=1&tajenka_week=1',wait_until='domcontentloaded',timeout=30000)
+                  page.wait_for_function("()=>window.__PROPLET_TAJENKA_RUNTIME_POLISH__===true",timeout=15000)
+                  page.evaluate("""async({calm,clue})=>{
+                    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+                    document.documentElement.classList.add('tiskarna-ui','ribbon-ui');
+                    const game=document.querySelector('#screen-game');
+                    game.classList.add('active','tajenka-mode');
+                    document.body.classList.add('playing');
+                    currentGame={
+                      mode:'tajenka',calmMode:calm,finished:false,
+                      puzzle:{
+                        answers:[{word:'NOVÉ',path:[]},{word:'TRIČKO',path:[]}],
+                        tajenka:{displayText:'Nové tričko',phrase:'NOVÉ TRIČKO',answerOrder:[0,1]}
+                      },
+                      found:[{answerIndex:0,word:'NOVÉ',colorIndex:0,path:[]}],
+                      tajenkaRevealed:[],hints:0,moves:0
+                    };
+                    const actions=document.querySelector('.game-actions');
+                    let calmBtn=document.querySelector('#calmRunBtn');
+                    if(!calmBtn){calmBtn=document.createElement('button');calmBtn.id='calmRunBtn';calmBtn.className='secondary-btn';calmBtn.textContent='Klidný režim';actions.appendChild(calmBtn)}
+                    const msg=document.querySelector('#gameMessage');
+                    msg.textContent='💭 '+clue;
+                    msg.className='game-message good';
+                    let banner=document.querySelector('#tajenkaHintBanner');
+                    if(!banner){banner=document.createElement('div');banner.id='tajenkaHintBanner';document.querySelector('#boardStage').before(banner)}
+                    banner.className='tajenka-hint-banner';
+                    banner.textContent='💭 '+clue;
+                    await sleep(900);
+                  }""",{'calm':calm,'clue':clue})
 
-                currentGame={
-                  mode:'tajenka',calmMode:true,finished:false,
-                  puzzle:{
-                    answers:[{word:'NOVÉ',path:[]},{word:'TRIČKO',path:[]}],
-                    tajenka:{displayText:'Nové tričko',phrase:'NOVÉ TRIČKO',answerOrder:[0,1]}
-                  },
-                  found:[{answerIndex:0,word:'NOVÉ',colorIndex:0,path:[]}],
-                  tajenkaRevealed:[],hints:0,moves:0
-                };
-
-                const actions=document.querySelector('.game-actions');
-                let calm=document.querySelector('#calmRunBtn');
-                if(!calm){calm=document.createElement('button');calm.id='calmRunBtn';calm.className='secondary-btn';calm.textContent='Klidný režim';actions.appendChild(calm)}
-
-                const msg=document.querySelector('#gameMessage');
-                msg.textContent='💭 Testovací významová stopa';
-                msg.className='game-message good';
-                let banner=document.querySelector('#tajenkaHintBanner');
-                if(!banner){banner=document.createElement('div');banner.id='tajenkaHintBanner';document.querySelector('#boardStage').before(banner)}
-                banner.className='tajenka-hint-banner';
-                banner.textContent='💭 Testovací významová stopa';
-                await sleep(350);
-              }""")
-
-              def snapshot():
+              def snapshot(page):
                   return page.evaluate("""()=>{
                     const calm=document.querySelector('#calmRunBtn');
                     const msg=document.querySelector('#gameMessage');
                     const banner=document.querySelector('#tajenkaHintBanner');
                     const phrase=document.querySelector('#tajenkaPhrase');
                     const toast=document.querySelector('#toast');
+                    const parent=phrase?.parentElement;
                     return {
+                      bodyClasses:document.body.className,
                       calmExists:!!calm,
                       phraseDisplay:getComputedStyle(phrase).display,
+                      phraseHeight:phrase.getBoundingClientRect().height,
+                      phraseParent:parent?.className||'',
+                      phraseInRail:parent?.classList.contains('game-control-column')||false,
+                      phraseInBoard:parent?.classList.contains('game-board-column')||false,
+                      phraseAfterCurrent:phrase?.previousElementSibling?.classList.contains('current-word')||false,
+                      phraseRailClass:phrase?.classList.contains('tajenka-phrase-in-rail')||false,
                       phraseProgress:phrase.querySelector('#tajenkaProgress')?.textContent||'',
                       phraseSlots:phrase.querySelectorAll('#tajenkaSlots .tajenka-slot').length,
                       revealedSlots:phrase.querySelectorAll('#tajenkaSlots .tajenka-slot.revealed').length,
@@ -119,9 +124,17 @@ jobs:
                     };
                   }""")
 
-              desktop=snapshot()
+              # Desktop: Tajenka stays with the board but must be intentionally
+              # large enough to use the available resolution.
+              desktop_ctx=browser.new_context(viewport={'width':1440,'height':900},screen={'width':1440,'height':900})
+              desktop_page=desktop_ctx.new_page()
+              prime(desktop_page)
+              desktop= snapshot(desktop_page)
+              print('desktop',desktop)
+              assert 'game-desktop-wide' in desktop['bodyClasses'],desktop
               assert not desktop['calmExists'],desktop
-              assert desktop['phraseDisplay']=='grid',desktop
+              assert desktop['phraseDisplay']=='grid' and desktop['phraseInBoard'],desktop
+              assert desktop['phraseHeight']>=78,desktop
               assert '1/2' in desktop['phraseProgress'].replace(' ',''),desktop
               assert desktop['phraseSlots']==2 and desktop['revealedSlots']==1 and desktop['pendingSlots']==1,desktop
               assert desktop['msgDisplay']=='flex',desktop
@@ -129,42 +142,54 @@ jobs:
               assert desktop['msgSize']=='16px' and int(desktop['msgWeight'])>=800,desktop
               assert desktop['msgColor']!='rgb(255, 255, 255)',desktop
               assert desktop['bannerDisplay']=='none',desktop
+              desktop_ctx.close()
 
-              # Legacy/wide layout tries to recreate the Calm action. Runtime must
-              # physically remove it again, not merely depend on CSS display.
-              page.evaluate("""async()=>{
+              # Real touch Fold/tablet classification: the same live progress
+              # node must move directly below “Skládáš” in the control rail.
+              tablet_ctx=browser.new_context(
+                  viewport={'width':800,'height':700},
+                  screen={'width':800,'height':700},
+                  has_touch=True,
+                  is_mobile=True,
+              )
+              tablet_page=tablet_ctx.new_page()
+              prime(tablet_page)
+              tablet=snapshot(tablet_page)
+              print('tablet',tablet)
+              assert 'game-tablet-landscape' in tablet['bodyClasses'],tablet
+              assert not tablet['calmExists'],tablet
+              assert tablet['phraseDisplay']=='grid',tablet
+              assert tablet['phraseInRail'] and tablet['phraseRailClass'],tablet
+              assert tablet['phraseAfterCurrent'],tablet
+              assert tablet['msgDisplay']=='flex' and tablet['msgIcon'],tablet
+              assert tablet['bannerDisplay']=='none',tablet
+
+              # Recreate Calm after activation: runtime must remove it again,
+              # including in the wide touch rail.
+              tablet_page.evaluate("""async()=>{
                 const actions=document.querySelector('.game-actions');
                 const calm=document.createElement('button');
                 calm.id='calmRunBtn';calm.className='secondary-btn';calm.textContent='Klidný režim';
                 actions.appendChild(calm);
-                document.body.classList.remove('game-desktop-wide');
-                document.body.classList.add('game-tablet-landscape');
-                window.dispatchEvent(new Event('resize'));
-                await new Promise(r=>setTimeout(r,350));
+                await new Promise(r=>setTimeout(r,300));
               }""")
-              tablet=snapshot()
-              assert not tablet['calmExists'],tablet
-              assert tablet['phraseDisplay']=='grid',tablet
-              assert tablet['msgDisplay']=='flex' and tablet['msgIcon'],tablet
-              assert tablet['bannerDisplay']=='none',tablet
+              assert not snapshot(tablet_page)['calmExists'],snapshot(tablet_page)
+              tablet_ctx.close()
 
-              # Fold/phone: keep progressive Tajenka visible. Level-1 clue becomes
-              # a transient toast; it must not reserve a fifth board row.
-              page.set_viewport_size({'width':390,'height':844})
-              page.evaluate("""async()=>{
-                document.body.classList.remove('game-desktop-wide','game-tablet-landscape','game-tablet-portrait');
-                const msg=document.querySelector('#gameMessage');
-                msg.textContent='💭 Mobilní významová stopa';
-                msg.className='game-message good';
-                const banner=document.querySelector('#tajenkaHintBanner');
-                banner.className='tajenka-hint-banner';
-                banner.textContent='💭 Mobilní významová stopa';
-                window.dispatchEvent(new Event('resize'));
-                await new Promise(r=>setTimeout(r,700));
-              }""")
-              mobile=snapshot()
+              # Phone: the progress node returns to the board column. Level-1
+              # clue is a transient toast and never steals a permanent row.
+              phone_ctx=browser.new_context(
+                  viewport={'width':390,'height':844},
+                  screen={'width':390,'height':844},
+                  has_touch=True,
+                  is_mobile=True,
+              )
+              phone_page=phone_ctx.new_page()
+              prime(phone_page,clue='Mobilní významová stopa')
+              mobile=snapshot(phone_page)
+              print('mobile',mobile)
               assert not mobile['calmExists'],mobile
-              assert mobile['phraseDisplay']=='grid',mobile
+              assert mobile['phraseDisplay']=='grid' and mobile['phraseInBoard'],mobile
               assert '1/2' in mobile['phraseProgress'].replace(' ',''),mobile
               assert mobile['msgDisplay']=='none',mobile
               assert mobile['bannerDisplay']=='none',mobile
@@ -172,6 +197,7 @@ jobs:
               assert mobile['toastDisplay']!='none',mobile
               assert mobile['toastSize']=='16px',mobile
               assert mobile['toastColor']!='rgb(255, 255, 255)',mobile
+              phone_ctx.close()
 
               browser.close()
           PY
