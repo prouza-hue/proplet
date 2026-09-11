@@ -61,6 +61,7 @@
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
+    ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
   ];
 
   const loadStyle=(href,key)=>{
@@ -109,7 +110,7 @@
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=1','propletTajenkaReleaseFix',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=2','propletTajenkaReleaseFix',{wait:true});
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
