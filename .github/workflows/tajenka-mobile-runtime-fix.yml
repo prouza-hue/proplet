@@ -1,0 +1,45 @@
+name: Tajenka mobile runtime fix
+
+on:
+  push:
+    branches:
+      - feature/tajenka-v2-production
+    paths:
+      - 'tools/apply_tajenka_mobile_runtime_fix.py'
+      - 'tools/test_tajenka_mobile_runtime_fix.py'
+      - '.github/workflows/tajenka-mobile-runtime-fix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Apply mobile hint and calm-mode fix
+        run: python tools/apply_tajenka_mobile_runtime_fix.py
+      - name: Run focused regression checks
+        run: python tools/test_tajenka_mobile_runtime_fix.py
+      - name: Keep frozen Tajenka production bank green
+        run: python tools/test_tajenka_v2_production.py
+      - name: Syntax checks
+        run: |
+          python -m py_compile tools/apply_tajenka_mobile_runtime_fix.py tools/test_tajenka_mobile_runtime_fix.py
+          node --check public/app.js
+          node --check public/quality-v334-core-v40114.js
+      - name: Commit runtime fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/app.js public/quality-v334-core-v40114.js public/printshop-ui.css
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix Tajenka mobile hints and calm mode'
+          git push origin HEAD:feature/tajenka-v2-production
