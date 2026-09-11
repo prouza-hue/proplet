@@ -125,7 +125,7 @@ def main() -> None:
     assert 'Math.min(37,' in app
     assert 'function tajenkaPhraseTokens(' in app
     assert 'puzzle?.tajenka?.companions' in app
-    assert 'g.puzzle.answers?.[answerIndex]?.clue' in app
+    assert "tajenka&&level===1" in app and "pick.a.clue" in app, "Tajenka level-1 hint must read semantic clue metadata"
     assert 'currentSourceMarkup' in result_fix and 'tajenka-result-source' in result_fix
     assert "Pět slov, jedna společná myšlenka." not in app
     print("Tajenka v2 production validation: 37/37 frozen boards + 184/184 semantic clues PASS")
