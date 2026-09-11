@@ -74,6 +74,27 @@
     spark.dataset.weeklyIconReady='1';
   }
 
+  function installTajenkaIcon(){
+    const slot=q('#tajenkaPreviewCard .tajenka-entry-icon');
+    if(!slot)return;
+    let img=slot.querySelector('img[data-tajenka-icon]');
+    if(!img){
+      slot.textContent='';
+      img=document.createElement('img');
+      img.src='/tajenka.svg';
+      img.alt='';
+      img.setAttribute('aria-hidden','true');
+      img.dataset.tajenkaIcon='1';
+      img.style.display='block';
+      img.style.width='100%';
+      img.style.height='100%';
+      img.style.objectFit='contain';
+      slot.appendChild(img);
+    }
+    slot.style.background='transparent';
+    slot.style.boxShadow='none';
+  }
+
   function polishFreeScreen(){
     q('#freeCalmQuick')?.remove();
     const note=q('#screen-free .mozkomor-lock-note');
@@ -103,6 +124,7 @@
     installMozkomorUnlockPatch();
     tuneMozkomorCopy();
     polishFreeScreen();
+    installTajenkaIcon();
     polishProfileCopy();
   }
 
@@ -124,6 +146,7 @@
     installMozkomorUnlockPatch();
     tuneMozkomorCopy();
     wrapRender('renderFree',()=>queuePolish());
+    wrapRender('renderTajenkaEntry',()=>queuePolish());
     wrapRender('renderProfile',()=>queuePolish());
     wrapRender('setAccountMode',()=>queuePolish());
     wrapRender('updateWinAccountCta',()=>queuePolish());
