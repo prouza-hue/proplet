@@ -17,6 +17,31 @@ html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portr
   pointer-events:none!important;
 }
 
+/* Calm confirmation is global, but this file is the authoritative last-loaded
+   release-polish layer on the current preview. Do not let emoji replacement
+   create a tiny nested tile inside the modal badge. The badge owns one dedicated
+   Calm icon asset at a stable optical size on every viewport. */
+html.tiskarna-ui #calmConfirmModal .calm-confirm-icon{
+  width:58px!important;
+  height:58px!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  font-size:0!important;
+  line-height:0!important;
+  background:linear-gradient(145deg,#EEE8D9,#F4EDDD)!important;
+}
+html.tiskarna-ui #calmConfirmModal .calm-confirm-icon>*{
+  display:none!important;
+}
+html.tiskarna-ui #calmConfirmModal .calm-confirm-icon::before{
+  content:""!important;
+  display:block!important;
+  width:39px!important;
+  height:39px!important;
+  background:url('/calm-mode.svg') center/contain no-repeat!important;
+}
+
 /* The progressive phrase is a permanent part of Tajenka gameplay. */
 html.tiskarna-ui #screen-game.tajenka-mode #tajenkaPhrase:not(.hidden){
   display:grid!important;
