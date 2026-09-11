@@ -36,11 +36,15 @@ jobs:
           while True:
               try:
                   nonce=str(time.time())
-                  with urllib.request.urlopen(url+'/tajenka-runtime-polish.js?v=1&qa='+nonce,timeout=8) as r:
-                      runtime=r.read().decode('utf-8')
-                  with urllib.request.urlopen(url+'/tajenka-card-polish.js?v=2&qa='+nonce,timeout=8) as r:
-                      card=r.read().decode('utf-8')
-                  if 'semanticHintIcon' in runtime and 'text-only normalizer must not flatten' in card:
+                  def get(path):
+                      with urllib.request.urlopen(url+path+('&' if '?' in path else '?')+'qa='+nonce,timeout=8) as r:
+                          return r.read().decode('utf-8')
+                  runtime=get('/tajenka-runtime-polish.js?v=1')
+                  card=get('/tajenka-card-polish.js?v=2')
+                  css=get('/tajenka-runtime-polish.css?v=1')
+                  if ('semanticHintIcon' in runtime
+                      and 'text-only normalizer must not flatten' in card
+                      and 'Hidden is an invariant' in css):
                       break
               except Exception:
                   pass
@@ -64,6 +68,8 @@ jobs:
                 const actions=document.querySelector('.game-actions');
                 let calm=document.querySelector('#calmRunBtn');
                 if(!calm){calm=document.createElement('button');calm.id='calmRunBtn';calm.className='secondary-btn';calm.textContent='Klidný režim';actions.appendChild(calm)}
+                /* This is the canonical state written by applyCalmRunUi(). */
+                calm.classList.add('hidden');
                 const msg=document.querySelector('#gameMessage');
                 msg.textContent='💭 Testovací významová stopa';
                 msg.className='game-message good';
@@ -81,16 +87,13 @@ jobs:
                     const banner=document.querySelector('#tajenkaHintBanner');
                     return {
                       calmDisplay:getComputedStyle(calm).display,
-                      calmInline:calm.style.getPropertyValue('display'),
-                      calmInlinePriority:calm.style.getPropertyPriority('display'),
-                      msgClass:msg.className,
+                      calmHiddenClass:calm.classList.contains('hidden'),
                       msgColor:getComputedStyle(msg).color,
                       msgSize:getComputedStyle(msg).fontSize,
                       msgWeight:getComputedStyle(msg).fontWeight,
                       msgDisplay:getComputedStyle(msg).display,
                       msgIcon:!!msg.querySelector('.tajenka-semantic-hint-icon svg'),
                       msgLabel:msg.querySelector('.tajenka-semantic-hint-text')?.textContent||'',
-                      bannerClass:banner.className,
                       bannerColor:getComputedStyle(banner).color,
                       bannerSize:getComputedStyle(banner).fontSize,
                       bannerWeight:getComputedStyle(banner).fontWeight,
@@ -102,7 +105,7 @@ jobs:
 
               desktop=snapshot()
               page.evaluate("""()=>{document.body.classList.remove('game-desktop-wide');document.body.classList.add('game-tablet-landscape');window.dispatchEvent(new Event('resize'))}""")
-              page.wait_for_timeout(220)
+              page.wait_for_timeout(300)
               tablet=snapshot()
 
               page.set_viewport_size({'width':390,'height':844})
@@ -116,15 +119,16 @@ jobs:
               result={'desktop':desktop,'tablet':tablet,'mobile':mobile,'dark':dark}
               print(result)
 
-              # The player-visible requirement: Calm action is absent everywhere.
+              # Calm is hidden by canonical .hidden state on every viewport,
+              # including wide layouts that formerly forced it back to flex.
               for mode in ('desktop','tablet','mobile'):
-                  assert result[mode]['calmDisplay']=='none',result
+                  state=result[mode]
+                  assert state['calmHiddenClass'],result
+                  assert state['calmDisplay']=='none',result
 
-              # Wide layouts were the regression: their high-specificity flex rule
-              # must be defeated by the calm runtime state itself.
+              # Fold/tablet/desktop use the clue in the “Skládáš” rail.
               for mode in ('desktop','tablet'):
                   state=result[mode]
-                  assert state['calmInline']=='none' and state['calmInlinePriority']=='important',result
                   assert state['msgDisplay']=='flex',result
                   assert state['msgIcon'],result
                   assert state['msgLabel']=='Testovací významová stopa',result
@@ -133,9 +137,7 @@ jobs:
                   assert state['msgColor']!='rgb(255, 255, 255)',result
                   assert state['bannerDisplay']=='none',result
 
-              # Phone deliberately uses only the dedicated compact banner. The
-              # old tiny current-word copy is hidden and therefore not judged by
-              # its inherited font-size.
+              # Phone uses only the dedicated compact clue banner.
               assert mobile['msgDisplay']=='none',result
               assert mobile['bannerDisplay']=='flex',result
               assert mobile['bannerIcon'],result
@@ -143,7 +145,6 @@ jobs:
               assert mobile['bannerSize']=='16px',result
               assert int(mobile['bannerWeight'])>=800,result
               assert mobile['bannerColor']!='rgb(255, 255, 255)',result
-
               assert dark['bannerColor']!='rgb(255, 255, 255)',result
               browser.close()
           PY
