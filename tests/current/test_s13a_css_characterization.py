@@ -55,8 +55,8 @@ for hook in (
 ):
     assert hook in index, hook
 
-# Base stylesheet debt is frozen, not silently "cleaned up" during the screen-owner move.
-assert len(re.findall(r"!important", styles)) == 93
+# Base stylesheet debt is frozen; retiring the detached lens intentionally removes one legacy !important.
+assert len(re.findall(r"!important", styles)) == 92
 
 if baseline:
     game = read("public/game-layout-v3323.css")
