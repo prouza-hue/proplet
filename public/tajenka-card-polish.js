@@ -21,7 +21,8 @@
   }
 
   function polishShareButton(button){
-    if(!button)return;
+    if(!button||button.dataset.tajenkaCardPolished==='1')return;
+    button.dataset.tajenkaCardPolished='1';
     button.classList.add('tajenka-share-cta','painted-action-control');
     button.setAttribute('aria-label','Pošli tajenku');
     const icon=document.createElement('img');
@@ -66,7 +67,7 @@
   function queue(){
     if(queued)return;
     queued=true;
-    queueMicrotask(run);
+    requestAnimationFrame(run);
   }
 
   function install(){
@@ -75,9 +76,9 @@
     const free=q('#screen-free');
     const modal=q('#winModal');
     const observer=new MutationObserver(queue);
-    if(daily)observer.observe(daily,{childList:true,subtree:true,characterData:true});
-    if(free)observer.observe(free,{childList:true,subtree:true,characterData:true});
-    if(modal)observer.observe(modal,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
+    if(daily)observer.observe(daily,{childList:true,subtree:true});
+    if(free)observer.observe(free,{childList:true,subtree:true});
+    if(modal)observer.observe(modal,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
