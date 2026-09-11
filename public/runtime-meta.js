@@ -63,6 +63,7 @@
       tajenkaWeekendPreview:true,
       tajenkaReleaseEnabled:true,
       tajenkaFirstSaturday:'2026-08-29',
+      tajenkaTwiceWeeklyStart:'2026-09-12',
       tajenkaRewardXp:200,
       xpEconomyV40132Preview:true,
       mozkomorPlannedRewardXp:150,

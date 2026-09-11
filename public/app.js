@@ -1840,14 +1840,22 @@ const TAJENKA_PREVIEW=new URLSearchParams(location.search).get('tajenka')==='1'&
 const TAJENKA_RELEASE_ENABLED=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaReleaseEnabled===true;
 const requestedTajenkaWeek=Math.min(10,Math.max(1,Number.parseInt(new URLSearchParams(location.search).get('tajenka_week')||'1',10)||1));
 const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';
+const TAJENKA_TWICE_WEEKLY_START=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaTwiceWeeklyStart||'2026-09-12';
 const TAJENKA_PREPARED_WEEKS=10;
 let activeTajenkaWeek=null;
 let TAJENKA_AVAILABLE=false;
 let tajenkaPuzzle=null;
 let tajenkaRecapOpen=false;
 
+function tajenkaReleaseSlotForISO(iso=pragueDateISO()){
+ const initialOffset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY);
+ if(initialOffset<0)return null;
+ const cadenceOffset=dayOffsetISO(iso,TAJENKA_TWICE_WEEKLY_START);
+ if(cadenceOffset<0)return Math.floor(initialOffset/7)+1;
+ return 3+Math.floor(cadenceOffset/7)*2+(cadenceOffset%7>=4?1:0);
+}
 function refreshTajenkaAvailability(iso=pragueDateISO()){
- const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null;
+ const week=tajenkaReleaseSlotForISO(iso);
  activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);
  TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);
  return TAJENKA_AVAILABLE;

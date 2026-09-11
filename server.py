@@ -105,6 +105,7 @@ MOZKOMOR_UNLOCK_BASE_LEVELS = 200
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
+TAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
@@ -726,11 +727,15 @@ def load_tajenka_bank() -> dict:
 
 
 def tajenka_week_for(day: date) -> Optional[int]:
-    """Return the finite release week for a date; never cycle future content."""
-    offset = (day - TAJENKA_FIRST_SATURDAY).days
-    if offset < 0:
+    """Return the active finite Tajenka slot for the Saturday/Wednesday cadence."""
+    initial_offset = (day - TAJENKA_FIRST_SATURDAY).days
+    if initial_offset < 0:
         return None
-    week = offset // 7 + 1
+    if day < TAJENKA_TWICE_WEEKLY_START:
+        week = initial_offset // 7 + 1
+    else:
+        cadence_offset = (day - TAJENKA_TWICE_WEEKLY_START).days
+        week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)
     prepared = int(load_tajenka_bank().get("weeks") or 0)
     return week if 1 <= week <= prepared else None
 
