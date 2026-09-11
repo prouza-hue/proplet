@@ -112,6 +112,22 @@
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=2','propletTajenkaReleaseFix',{wait:true});
+
+    // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep
+    // the document valid, so delegate only its active play CTA back to the
+    // canonical Tajenka button on Dnes.
+    if(!window.__PROPLET_TAJENKA_PLAY_DELEGATE__){
+      window.__PROPLET_TAJENKA_PLAY_DELEGATE__=true;
+      document.addEventListener('click',event=>{
+        const button=event.target?.closest?.('#tajenkaPlayCard:not(.completed) button.primary-btn');
+        if(!button)return;
+        const source=document.querySelector('#tajenkaPreviewCard #tajenkaPreviewBtn');
+        if(!source)return;
+        event.preventDefault();
+        event.stopPropagation();
+        source.click();
+      },true);
+    }
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
