@@ -61,6 +61,87 @@
     q('#newContentBanner .eyebrow')?.remove();
   }
 
+  /*
+   * Tajenka mobile/Fold stability guard.
+   *
+   * The first semantic-hint implementation added a fifth CSS-grid row with an
+   * `auto` track. CSS Grid stretches auto tracks by default, so on a narrow Fold
+   * that row could consume most of the available board height and look like a
+   * giant empty panel. Keep the hint as a dedicated row, but make the row
+   * max-content so it can never reserve more space than the clue itself.
+   *
+   * Samsung Fold can also report a transient viewport while moving from the
+   * unfolded tablet state back to the cover display. The canonical game-layout
+   * listener gets the immediate resize; the settled passes below deliberately
+   * re-run that listener after the viewport has stabilised and then refit the
+   * board on the following frames. No game state or board geometry is changed.
+   */
+  function installMobileLayoutGuard(){
+    if(window.__PROPLET_TAJENKA_MOBILE_LAYOUT_GUARD__)return;
+    window.__PROPLET_TAJENKA_MOBILE_LAYOUT_GUARD__=true;
+
+    const style=document.createElement('style');
+    style.id='tajenkaMobileLayoutGuardStyle';
+    style.textContent=`
+      @media(max-width:600px){
+        html.tiskarna-ui #screen-game.tajenka-mode .game-board-column,
+        html.tiskarna-ui .tajenka-mode .game-board-column{
+          grid-template-rows:auto auto auto max-content minmax(0,1fr)!important;
+        }
+        html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden),
+        html.tiskarna-ui .tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden){
+          grid-row:4!important;
+          display:block!important;
+          align-self:start!important;
+          justify-self:stretch!important;
+          min-width:0!important;
+          min-height:0!important;
+          height:auto!important;
+          max-height:none!important;
+          margin:0!important;
+          padding:7px 9px!important;
+          white-space:normal!important;
+          overflow:visible!important;
+        }
+        html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.board-stage,
+        html.tiskarna-ui .tajenka-mode .game-board-column>.board-stage{
+          grid-row:5!important;
+          min-height:0!important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    let syntheticResize=false;
+    let settleTimers=[];
+
+    const refit=()=>{
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        try{if(typeof fitGameBoard==='function')fitGameBoard()}catch{}
+        try{if(typeof drawPaths==='function')drawPaths()}catch{}
+      }));
+    };
+
+    const settledPass=()=>{
+      if(!document.body.classList.contains('playing'))return;
+      syntheticResize=true;
+      try{window.dispatchEvent(new Event('resize'))}finally{syntheticResize=false}
+      refit();
+    };
+
+    const scheduleSettledPasses=()=>{
+      if(syntheticResize)return;
+      settleTimers.forEach(clearTimeout);
+      settleTimers=[120,480].map(ms=>setTimeout(settledPass,ms));
+    };
+
+    window.addEventListener('resize',scheduleSettledPasses,{passive:true});
+    window.addEventListener('orientationchange',scheduleSettledPasses,{passive:true});
+    window.visualViewport?.addEventListener?.('resize',scheduleSettledPasses,{passive:true});
+    screen.orientation?.addEventListener?.('change',scheduleSettledPasses);
+    navigator.devicePosture?.addEventListener?.('change',scheduleSettledPasses);
+  }
+
   function run(){
     queued=false;
     polishWeeklyBanner();
@@ -76,6 +157,7 @@
   }
 
   function install(){
+    installMobileLayoutGuard();
     run();
     const daily=q('#screen-daily');
     const free=q('#screen-free');
