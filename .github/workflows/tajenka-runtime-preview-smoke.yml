@@ -6,6 +6,7 @@ on:
     paths:
       - 'public/tajenka-runtime-polish.css'
       - 'public/tajenka-runtime-polish.js'
+      - 'public/tajenka-card-polish.js'
       - 'public/theme-init.js'
       - '.github/workflows/tajenka-runtime-preview-smoke.yml'
   workflow_dispatch:
@@ -31,18 +32,20 @@ jobs:
           from playwright.sync_api import sync_playwright
 
           url=os.environ['PREVIEW_URL'].rstrip('/')
-          marker='semanticHintIcon'
           deadline=time.time()+150
           while True:
               try:
-                  with urllib.request.urlopen(url+'/tajenka-runtime-polish.js?v=1&qa='+str(time.time()),timeout=8) as r:
-                      text=r.read().decode('utf-8')
-                  if marker in text:
+                  nonce=str(time.time())
+                  with urllib.request.urlopen(url+'/tajenka-runtime-polish.js?v=1&qa='+nonce,timeout=8) as r:
+                      runtime=r.read().decode('utf-8')
+                  with urllib.request.urlopen(url+'/tajenka-card-polish.js?v=2&qa='+nonce,timeout=8) as r:
+                      card=r.read().decode('utf-8')
+                  if 'semanticHintIcon' in runtime and 'text-only normalizer must not flatten' in card:
                       break
               except Exception:
                   pass
               if time.time()>deadline:
-                  raise AssertionError('preview alias did not publish current Tajenka runtime polish')
+                  raise AssertionError('preview alias did not publish current Tajenka polish assets')
               time.sleep(2)
 
           chrome=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
@@ -52,7 +55,7 @@ jobs:
               page.goto(url+'/?tajenka=1&tajenka_week=1',wait_until='domcontentloaded',timeout=30000)
               page.wait_for_function("()=>window.__PROPLET_TAJENKA_RUNTIME_POLISH__===true",timeout=15000)
 
-              result=page.evaluate("""async()=>{
+              page.evaluate("""async()=>{
                 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
                 document.documentElement.classList.add('tiskarna-ui','ribbon-ui');
                 const game=document.querySelector('#screen-game');
@@ -61,7 +64,6 @@ jobs:
                 const actions=document.querySelector('.game-actions');
                 let calm=document.querySelector('#calmRunBtn');
                 if(!calm){calm=document.createElement('button');calm.id='calmRunBtn';calm.className='secondary-btn';calm.textContent='Klidný režim';actions.appendChild(calm)}
-
                 const msg=document.querySelector('#gameMessage');
                 msg.textContent='💭 Testovací významová stopa';
                 msg.className='game-message good';
@@ -69,54 +71,65 @@ jobs:
                 if(!banner){banner=document.createElement('div');banner.id='tajenkaHintBanner';document.querySelector('#boardStage').before(banner)}
                 banner.className='tajenka-hint-banner';
                 banner.textContent='💭 Testovací významová stopa';
-                await sleep(180);
-
-                const snapshot=()=>({
-                  calmDisplay:getComputedStyle(calm).display,
-                  calmInline:calm.style.getPropertyValue('display'),
-                  calmInlinePriority:calm.style.getPropertyPriority('display'),
-                  msgClass:msg.className,
-                  msgText:msg.textContent.trim(),
-                  msgColor:getComputedStyle(msg).color,
-                  msgSize:getComputedStyle(msg).fontSize,
-                  msgWeight:getComputedStyle(msg).fontWeight,
-                  msgIcon:!!msg.querySelector('.tajenka-semantic-hint-icon svg'),
-                  msgLabel:msg.querySelector('.tajenka-semantic-hint-text')?.textContent||'',
-                  bannerClass:banner.className,
-                  bannerText:banner.textContent.trim(),
-                  bannerColor:getComputedStyle(banner).color,
-                  bannerSize:getComputedStyle(banner).fontSize,
-                  bannerIcon:!!banner.querySelector('.tajenka-semantic-hint-icon svg'),
-                  bannerLabel:banner.querySelector('.tajenka-semantic-hint-text')?.textContent||'',
-                  bannerDisplay:getComputedStyle(banner).display,
-                });
-
-                const desktop=snapshot();
-                document.body.classList.remove('game-desktop-wide');
-                document.body.classList.add('game-tablet-landscape');
-                window.dispatchEvent(new Event('resize'));
-                await sleep(180);
-                const tablet=snapshot();
-                document.documentElement.dataset.theme='dark';
-                await sleep(80);
-                const dark={msgColor:getComputedStyle(msg).color,bannerColor:getComputedStyle(banner).color};
-                return {desktop,tablet,dark};
+                await sleep(220);
               }""")
 
+              def snapshot():
+                  return page.evaluate("""()=>{
+                    const calm=document.querySelector('#calmRunBtn');
+                    const msg=document.querySelector('#gameMessage');
+                    const banner=document.querySelector('#tajenkaHintBanner');
+                    return {
+                      calmDisplay:getComputedStyle(calm).display,
+                      calmInline:calm.style.getPropertyValue('display'),
+                      calmInlinePriority:calm.style.getPropertyPriority('display'),
+                      msgClass:msg.className,
+                      msgColor:getComputedStyle(msg).color,
+                      msgSize:getComputedStyle(msg).fontSize,
+                      msgWeight:getComputedStyle(msg).fontWeight,
+                      msgDisplay:getComputedStyle(msg).display,
+                      msgIcon:!!msg.querySelector('.tajenka-semantic-hint-icon svg'),
+                      msgLabel:msg.querySelector('.tajenka-semantic-hint-text')?.textContent||'',
+                      bannerClass:banner.className,
+                      bannerColor:getComputedStyle(banner).color,
+                      bannerSize:getComputedStyle(banner).fontSize,
+                      bannerWeight:getComputedStyle(banner).fontWeight,
+                      bannerDisplay:getComputedStyle(banner).display,
+                      bannerIcon:!!banner.querySelector('.tajenka-semantic-hint-icon svg'),
+                      bannerLabel:banner.querySelector('.tajenka-semantic-hint-text')?.textContent||'',
+                    };
+                  }""")
+
+              desktop=snapshot()
+              page.evaluate("""()=>{document.body.classList.remove('game-desktop-wide');document.body.classList.add('game-tablet-landscape');window.dispatchEvent(new Event('resize'))}""")
+              page.wait_for_timeout(220)
+              tablet=snapshot()
+
+              page.set_viewport_size({'width':390,'height':844})
+              page.evaluate("""()=>{document.body.classList.remove('game-desktop-wide','game-tablet-landscape','game-tablet-portrait');window.dispatchEvent(new Event('resize'))}""")
+              page.wait_for_timeout(700)
+              mobile=snapshot()
+
+              page.evaluate("document.documentElement.dataset.theme='dark'")
+              page.wait_for_timeout(100)
+              dark=snapshot()
+              result={'desktop':desktop,'tablet':tablet,'mobile':mobile,'dark':dark}
               print(result)
-              for mode in ('desktop','tablet'):
+
+              for mode in ('desktop','tablet','mobile'):
                   state=result[mode]
                   assert state['calmDisplay']=='none',result
                   assert state['calmInline']=='none' and state['calmInlinePriority']=='important',result
-                  assert 'tajenka-semantic-hint' in state['msgClass'],result
                   assert state['msgIcon'] and state['bannerIcon'],result
                   assert state['msgLabel']=='Testovací významová stopa',result
                   assert state['bannerLabel']=='Testovací významová stopa',result
                   assert state['msgSize']=='16px',result
-                  assert int(state['msgWeight'])>=800,result
-                  assert state['msgColor']!='rgb(255, 255, 255)',result
-              assert result['desktop']['bannerDisplay']=='none',result
-              assert result['dark']['msgColor']!='rgb(255, 255, 255)',result
+                  assert state['bannerSize']=='16px',result
+                  assert int(state['msgWeight'])>=800 and int(state['bannerWeight'])>=800,result
+                  assert state['msgColor']!='rgb(255, 255, 255)' and state['bannerColor']!='rgb(255, 255, 255)',result
+              assert desktop['bannerDisplay']=='none' and tablet['bannerDisplay']=='none',result
+              assert mobile['bannerDisplay']=='flex' and mobile['msgDisplay']=='none',result
+              assert dark['bannerColor']!='rgb(255, 255, 255)',result
               browser.close()
           PY
           python /tmp/tajenka_runtime_smoke.py
