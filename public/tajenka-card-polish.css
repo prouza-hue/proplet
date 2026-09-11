@@ -35,6 +35,16 @@ html.tiskarna-ui #screen-free #tajenkaPlayCard.completed{
   grid-template-columns:48px minmax(0,1fr)!important;
 }
 
+/* The completed Hrát card has the desired visual breathing room. Match the
+   other Tajenka states to it without moving the already-correct reference. */
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-entry-copy,
+html.tiskarna-ui #tajenkaPlayCard:not(.completed) .tajenka-entry-copy{
+  padding-inline-start:8px!important;
+}
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-entry-copy{
+  padding-inline-start:0!important;
+}
+
 html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta,
 html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta{
   display:flex;
