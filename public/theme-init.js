@@ -62,6 +62,7 @@
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
     ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
+    ['/game-release-polish.css?v=1','propletGameReleasePolishCss'],
   ];
 
   const loadStyle=(href,key)=>{
