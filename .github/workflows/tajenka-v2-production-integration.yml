@@ -5,6 +5,7 @@ on:
     branches:
       - feature/tajenka-v2-production
     paths:
+      - 'data/tajenka_v2_clues.json'
       - 'tools/promote_tajenka_v2.py'
       - 'tools/apply_tajenka_v2_integration.py'
       - 'tools/test_tajenka_v2_production.py'
@@ -35,8 +36,16 @@ jobs:
       - name: Promote frozen boards without regeneration
         run: python tools/promote_tajenka_v2.py
 
-      - name: Apply runtime integration
-        run: python tools/apply_tajenka_v2_integration.py
+      - name: Apply runtime integration if needed
+        run: |
+          if grep -q 'const TAJENKA_PREPARED_WEEKS=37;' public/app.js \
+             && grep -q 'tajenka_weekend_v2.json' backend/config.py \
+             && grep -q 'Query(default=None, ge=1, le=37)' server.py \
+             && grep -q 'function tajenkaPhraseTokens(' public/app.js; then
+            echo 'Tajenka v2 runtime integration already present; keeping it unchanged.'
+          else
+            python tools/apply_tajenka_v2_integration.py
+          fi
 
       - name: Validate frozen production bank
         run: python tools/test_tajenka_v2_production.py
@@ -51,7 +60,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/tajenka_v2_approved.json data/tajenka_weekend_v2.json data/tajenka_v2_freeze_manifest.json backend/config.py server.py public/app.js public/tajenka-release-fix.js public/tajenka-release-fix.css
+          git add data/tajenka_v2_approved.json data/tajenka_v2_clues.json data/tajenka_weekend_v2.json data/tajenka_v2_freeze_manifest.json backend/config.py server.py public/app.js public/tajenka-release-fix.js public/tajenka-release-fix.css
           git diff --cached --quiet && exit 0
           git commit -m 'Integrate approved Tajenka v2 frozen production bank'
           git push origin HEAD:feature/tajenka-v2-production
