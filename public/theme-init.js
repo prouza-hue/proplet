@@ -1,5 +1,24 @@
 (()=>{
   window.PROPLET_SINGLE_RELEASE_CTA_V40132=true;
+
+  const themeOnly=document.documentElement.hasAttribute('data-proplet-theme-only');
+  if(!themeOnly){
+    const root=document.documentElement;
+    root.classList.add('proplet-current-ui-booting');
+    const bootStyle=document.createElement('style');
+    bootStyle.id='propletCurrentUiBootStyle';
+    bootStyle.textContent='html.proplet-current-ui-booting .app-shell,html.proplet-current-ui-booting .bottom-nav{visibility:hidden!important}html.proplet-current-ui-booting body{background:#F7F2E8!important}html[data-theme="dark"].proplet-current-ui-booting body{background:#1D2530!important}';
+    document.head.appendChild(bootStyle);
+    let revealed=false;
+    window.__PROPLET_REVEAL_CURRENT_UI=()=>{
+      if(revealed)return;
+      revealed=true;
+      root.classList.remove('proplet-current-ui-booting');
+      bootStyle.remove();
+    };
+    setTimeout(()=>window.__PROPLET_REVEAL_CURRENT_UI?.(),5000);
+  }
+
   try{
     if(history.state?.proplet&&history.state.screen==='game')history.replaceState({...history.state,screen:'daily'},'',location.href);
   }catch{}
@@ -23,7 +42,7 @@
   media?.addEventListener?.('change',apply);
   window.addEventListener?.('storage',e=>{if(e.key==='proplet-v3-settings')apply()});
 
-  if(document.documentElement.hasAttribute('data-proplet-theme-only'))return;
+  if(themeOnly)return;
 
   const styles=[
     ['/app-play.css?v=40140-s13b','propletAppPlayCss'],
@@ -89,7 +108,8 @@
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
-    loadScript('/printshop-release-polish.js?v=1','propletPrintshopReleasePolish');
+    await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=1','propletTajenkaReleaseFix',{wait:true});
   };
 
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
