@@ -43,7 +43,7 @@ jobs:
                   card=get('/tajenka-card-polish.js?v=2')
                   css=get('/tajenka-runtime-polish.css?v=1')
                   if ('ensureTajenkaPhraseShell' in runtime
-                      and 'remove it from the DOM' in runtime
+                      and 'Remove it from the DOM' in runtime
                       and 'four rows' in card
                       and 'progressive phrase is a permanent' in css):
                       break
