@@ -58,11 +58,28 @@
     }
   }
 
+  function installWeeklyBannerIcon(){
+    const spark=q('#newContentBanner .new-content-spark');
+    if(!spark||spark.dataset.weeklyIconReady==='1')return;
+    spark.textContent='';
+    const img=document.createElement('img');
+    img.src='/weekly-banner-icon-optimized.svg';
+    img.alt='';
+    img.setAttribute('aria-hidden','true');
+    img.style.width='42px';
+    img.style.height='42px';
+    img.style.display='block';
+    img.style.objectFit='contain';
+    spark.appendChild(img);
+    spark.dataset.weeklyIconReady='1';
+  }
+
   function polishFreeScreen(){
     q('#freeCalmQuick')?.remove();
     const note=q('#screen-free .mozkomor-lock-note');
     if(note&&note.textContent!=='🔒 Odemkne se po dokončení 200 Mozkožroutů')note.textContent='🔒 Odemkne se po dokončení 200 Mozkožroutů';
     positionWeeklyBanner();
+    installWeeklyBannerIcon();
   }
 
   function polishProfileCopy(){
