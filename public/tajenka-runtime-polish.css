@@ -11,17 +11,43 @@ html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portr
   pointer-events:none!important;
 }
 
-/* Semantic clue: same success/mint language as the solved-word feedback.
-   Both surfaces are styled because phone uses the dedicated banner while
-   Fold/tablet/desktop can surface the canonical #gameMessage. */
-html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint,
-html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+/* Semantic clue: one visual language everywhere. The icon is the same bulb
+   geometry used by organic-ui's Hint control, rendered as SVG rather than an
+   emoji so the generic pictograph replacer cannot turn it into a brain. */
+html.tiskarna-ui #screen-game.tajenka-mode :is(#gameMessage,#tajenkaHintBanner).tajenka-semantic-hint{
   color:var(--r-accent,#197970)!important;
   font-size:16px!important;
   line-height:1.35!important;
   font-weight:900!important;
   letter-spacing:0!important;
   text-shadow:none!important;
+  align-items:center!important;
+  gap:7px!important;
+}
+
+html.tiskarna-ui #screen-game.tajenka-mode .tajenka-semantic-hint-icon{
+  width:21px!important;
+  height:21px!important;
+  flex:0 0 21px!important;
+  display:inline-grid!important;
+  place-items:center!important;
+  color:currentColor!important;
+  line-height:0!important;
+}
+html.tiskarna-ui #screen-game.tajenka-mode .tajenka-semantic-hint-icon svg{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+html.tiskarna-ui #screen-game.tajenka-mode .tajenka-semantic-hint-text{
+  min-width:0!important;
+  color:inherit!important;
+  font:inherit!important;
 }
 
 html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint:not(.hidden){
@@ -31,15 +57,35 @@ html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-h
   padding:8px 10px!important;
 }
 
-html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint,
-html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode :is(#gameMessage,#tajenkaHintBanner).tajenka-semantic-hint{
   color:var(--r-accent,#78CABA)!important;
 }
 
+/* Phone: dedicated clue banner. Suppress the duplicate copy inside “Skládáš”. */
 @media(max-width:600px){
-  html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint,
-  html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+  html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint:not(.hidden){
+    display:flex!important;
     font-size:16px!important;
     line-height:1.35!important;
+  }
+  html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
+    display:none!important;
+  }
+}
+
+/* Fold/tablet/desktop: keep the clue in the established “Skládáš” rail and
+   remove the extra board-column banner so there is only one visible hint. */
+@media(min-width:601px){
+  html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+    display:none!important;
+  }
+  html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
+    display:flex!important;
+    font-size:16px!important;
+    line-height:1.35!important;
+    font-weight:900!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
   }
 }
