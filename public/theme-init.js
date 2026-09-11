@@ -63,8 +63,9 @@
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
     ['/brand-wordmark-fraunces.css?v=2','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
-    ['/tajenka-card-polish.css?v=1','propletTajenkaCardPolishCss'],
-    ['/game-release-polish.css?v=2','propletGameReleasePolishCss'],
+    ['/tajenka-card-polish.css?v=2','propletTajenkaCardPolishCss'],
+    ['/game-release-polish.css?v=3','propletGameReleasePolishCss'],
+    ['/tajenka-runtime-polish.css?v=1','propletTajenkaRuntimePolishCss'],
   ];
 
   const loadStyle=(href,key)=>{
@@ -115,7 +116,8 @@
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=2','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
-    loadScript('/tajenka-card-polish.js?v=1','propletTajenkaCardPolish');
+    loadScript('/tajenka-card-polish.js?v=2','propletTajenkaCardPolish');
+    loadScript('/tajenka-runtime-polish.js?v=1','propletTajenkaRuntimePolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep
     // the document valid, so delegate only its active play CTA back to the
