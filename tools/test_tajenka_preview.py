@@ -193,6 +193,7 @@ def main() -> None:
         "const requestedTajenkaWeek=",
         "!TAJENKA_PRODUCTION_HOSTS.has(location.hostname)",
         "const TAJENKA_FIRST_SATURDAY=",
+        "const TAJENKA_TWICE_WEEKLY_START=",
         "function refreshTajenkaAvailability(",
         "`/api/tajenka?week=${activeTajenkaWeek}`",
         "const puzzle=await response.json()",
@@ -234,11 +235,12 @@ def main() -> None:
     assert '@app.get("/api/tajenka")' in server
     assert 'headers={"Cache-Control": "private, no-store"}' in server
     assert "week if 1 <= week <= prepared else None" in server
-    assert '"title": "✨ Víkendová Tajenka je tady"' in push
+    assert '"title": "✨ Nová Tajenka je tady"' in push
     assert '"body": "Pět slov, jedna myšlenka a 200 XP. Odhalíš ji?"' in push
     assert '"url": f"{canonical_origin}/?open=tajenka&via=push-tajenka"' in push
     assert "tajenkaReleaseEnabled:true" in runtime
     assert "tajenkaFirstSaturday:'2026-08-29'" in runtime
+    assert "tajenkaTwiceWeeklyStart:'2026-09-12'" in runtime
     assert "tajenkaRewardXp:200" in runtime
     assert "proplet-v4.02.2-printshop-preview-fix20" in sw
     assert "tajenka-test.json" not in sw
@@ -280,13 +282,16 @@ def main() -> None:
     entry = app[app.index("function renderTajenkaEntry()"):app.index("async function loadTajenkaFixture()")]
     assert "Zahrát znovu" not in entry
     assert "Každý víkend nová" not in entry
-    assert "tajenkaPuzzle.tajenka.phrase" not in entry
+    completed_entry = entry[entry.index("if(completed){"):entry.index("const progress=")]
+    playable_entry = entry[entry.index("const progress="):]
+    assert "tajenkaPuzzle.tajenka.phrase" in completed_entry
+    assert "tajenkaPuzzle.tajenka.phrase" not in playable_entry
     assert "Tajenka odhalena" in entry
     assert "Další přijde zase v sobotu." in entry
 
     hosts = re.search(r"const TAJENKA_PRODUCTION_HOSTS=new Set\(\[(.*?)\]\)", app, re.S)
     assert hosts and "hrajproplet.cz" in hosts.group(1)
-    print("PASS: compact clickable Tajenka recap card, responsive game UI, isolated Daily result, 200 XP and Saturday push")
+    print("PASS: Tajenka recap, responsive UI, 200 XP, privacy-safe reveal and Saturday/Wednesday cadence")
 
 
 if __name__ == "__main__":
