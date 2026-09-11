@@ -1,0 +1,111 @@
+name: Tajenka runtime preview smoke
+
+on:
+  push:
+    branches: [feature/tajenka-v2-production]
+    paths:
+      - 'public/tajenka-runtime-polish.css'
+      - 'public/tajenka-runtime-polish.js'
+      - 'public/theme-init.js'
+      - '.github/workflows/tajenka-runtime-preview-smoke.yml'
+  workflow_dispatch:
+
+permissions: {contents: read}
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PREVIEW_URL: https://proplet-git-feature-tajenka-v2-pr-7166ab-pavel-prouzas-projects.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Verify calm button and semantic clue in Chromium
+        shell: bash
+        run: |
+          cat > /tmp/tajenka_runtime_smoke.py <<'PY'
+          import os, time, urllib.request
+          from playwright.sync_api import sync_playwright
+
+          url=os.environ['PREVIEW_URL'].rstrip('/')
+          marker='PROPLET_TAJENKA_RUNTIME_POLISH'
+          deadline=time.time()+150
+          while True:
+              try:
+                  with urllib.request.urlopen(url+'/tajenka-runtime-polish.js?v=1&qa='+str(time.time()),timeout=8) as r:
+                      text=r.read().decode('utf-8')
+                  if marker in text:
+                      break
+              except Exception:
+                  pass
+              if time.time()>deadline:
+                  raise AssertionError('preview alias did not publish Tajenka runtime polish')
+              time.sleep(2)
+
+          chrome=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox','--disable-dev-shm-usage'])
+              page=browser.new_page(viewport={'width':1440,'height':900})
+              page.goto(url+'/?tajenka=1&tajenka_week=1',wait_until='domcontentloaded',timeout=30000)
+              page.wait_for_function("()=>window.__PROPLET_TAJENKA_RUNTIME_POLISH__===true",timeout=15000)
+
+              # Put the real game DOM into the same wide states that previously overrode .hidden.
+              result=page.evaluate("""async()=>{
+                const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+                document.documentElement.classList.add('tiskarna-ui','ribbon-ui');
+                const game=document.querySelector('#screen-game');
+                game.classList.add('active','tajenka-mode');
+                document.body.classList.add('playing','game-desktop-wide','calm-run-v334');
+                let actions=document.querySelector('.game-actions');
+                let calm=document.querySelector('#calmRunBtn');
+                if(!calm){calm=document.createElement('button');calm.id='calmRunBtn';calm.className='secondary-btn';calm.textContent='Klidný režim';actions.appendChild(calm)}
+
+                const msg=document.querySelector('#gameMessage');
+                msg.textContent='💭 Testovací významová stopa';
+                msg.className='game-message good';
+                let banner=document.querySelector('#tajenkaHintBanner');
+                if(!banner){banner=document.createElement('div');banner.id='tajenkaHintBanner';document.querySelector('#boardStage').before(banner)}
+                banner.className='tajenka-hint-banner';
+                banner.textContent='💭 Testovací významová stopa';
+                await sleep(120);
+
+                const desktop={
+                  calmDisplay:getComputedStyle(calm).display,
+                  calmInline:calm.style.getPropertyValue('display'),
+                  calmInlinePriority:calm.style.getPropertyPriority('display'),
+                  msgText:msg.textContent,
+                  msgColor:getComputedStyle(msg).color,
+                  msgSize:getComputedStyle(msg).fontSize,
+                  msgWeight:getComputedStyle(msg).fontWeight,
+                  bannerText:banner.textContent,
+                  bannerColor:getComputedStyle(banner).color,
+                  bannerSize:getComputedStyle(banner).fontSize,
+                };
+
+                document.body.classList.remove('game-desktop-wide');
+                document.body.classList.add('game-tablet-landscape');
+                window.dispatchEvent(new Event('resize'));
+                await sleep(120);
+                const tablet={calmDisplay:getComputedStyle(calm).display};
+
+                document.documentElement.dataset.theme='dark';
+                await sleep(60);
+                const dark={msgColor:getComputedStyle(msg).color,bannerColor:getComputedStyle(banner).color};
+                return {desktop,tablet,dark};
+              }""")
+
+              print(result)
+              d=result['desktop']
+              assert d['calmDisplay']=='none',result
+              assert result['tablet']['calmDisplay']=='none',result
+              assert d['calmInline']=='none' and d['calmInlinePriority']=='important',result
+              assert d['msgText'].startswith('💡 ') and d['bannerText'].startswith('💡 '),result
+              assert d['msgSize']=='16px' and d['bannerSize']=='16px',result
+              assert d['msgColor']!='rgb(255, 255, 255)' and d['bannerColor']!='rgb(255, 255, 255)',result
+              assert result['dark']['msgColor']!='rgb(255, 255, 255)' and result['dark']['bannerColor']!='rgb(255, 255, 255)',result
+              browser.close()
+          PY
+          python /tmp/tajenka_runtime_smoke.py
