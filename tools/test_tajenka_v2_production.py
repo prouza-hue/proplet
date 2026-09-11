@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 APPROVED = ROOT / "data" / "tajenka_v2_approved.json"
+CLUES = ROOT / "data" / "tajenka_v2_clues.json"
 PROD = ROOT / "data" / "tajenka_weekend_v2.json"
 MANIFEST = ROOT / "data" / "tajenka_v2_freeze_manifest.json"
 
@@ -66,14 +67,21 @@ def assert_phrase_coverage(puzzle: dict) -> None:
 
 def main() -> None:
     approved = json.loads(APPROVED.read_text(encoding="utf-8"))
+    clue_payload = json.loads(CLUES.read_text(encoding="utf-8"))
     prod = json.loads(PROD.read_text(encoding="utf-8"))
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     source_boards = approved["boards"]
     puzzles = prod["puzzles"]
+    clues = clue_payload.get("clues") or {}
+    assert clue_payload.get("version") == 1 and isinstance(clues, dict)
     assert approved.get("failures") == []
     assert len(source_boards) == len(puzzles) == len(manifest["boards"]) == 37
     assert prod["version"] == 2 and prod["weeks"] == 37 and prod["rewardXp"] == 200
 
+    required_words = {answer["word"] for board in source_boards for answer in board["answers"]}
+    assert set(clues) == required_words, f"clue coverage mismatch missing={sorted(required_words-set(clues))} extra={sorted(set(clues)-required_words)}"
+
+    answer_count = 0
     for week, (source, puzzle, frozen) in enumerate(zip(source_boards, puzzles, manifest["boards"]), 1):
         assert puzzle["week"] == week
         assert puzzle["id"] == f"tajenka-v2-week-{week:02d}"
@@ -87,11 +95,16 @@ def main() -> None:
         rows, cols = puzzle["rows"], puzzle["cols"]
         assert all(any(n in mask for n in neighbours(cell, cols, rows)) for cell in mask), f"{puzzle['id']}: isolated active cell"
         for answer in puzzle["answers"]:
+            answer_count += 1
             assert len(answer["path"]) == len(answer["word"])
             assert answer["path"] == list(dict.fromkeys(answer["path"]))
             assert all(cell in mask for cell in answer["path"])
             assert all(b in set(neighbours(a, cols, rows)) for a, b in zip(answer["path"], answer["path"][1:]))
             assert "".join(puzzle["letters"][cell] for cell in answer["path"]) == answer["word"]
+            clue = str(answer.get("clue") or "").strip()
+            assert clue == str(clues[answer["word"]]).strip(), f"{puzzle['id']} {answer['word']}: clue mismatch"
+            assert 3 <= len(clue) <= 90, f"{puzzle['id']} {answer['word']}: invalid clue length"
+            assert not clue.startswith("Hledej slovo dlouhé"), f"{puzzle['id']} {answer['word']}: semantic clue fell back to length"
         assert puzzle["meta"].get("alternativeFullPaths") == 0
         assert puzzle["tajenka"]["phrase"] == puzzle["tajenka"]["displayText"] == source["displayText"]
         assert_phrase_coverage(puzzle)
@@ -101,6 +114,7 @@ def main() -> None:
         if puzzle.get("category") == "quote":
             assert puzzle["source"].get("author") and puzzle["source"].get("work"), puzzle["id"]
 
+    assert answer_count == 184, f"expected 184 playable anchors, got {answer_count}"
     config = (ROOT / "backend/config.py").read_text(encoding="utf-8")
     server = (ROOT / "server.py").read_text(encoding="utf-8")
     app = (ROOT / "public/app.js").read_text(encoding="utf-8")
@@ -111,9 +125,10 @@ def main() -> None:
     assert 'Math.min(37,' in app
     assert 'function tajenkaPhraseTokens(' in app
     assert 'puzzle?.tajenka?.companions' in app
+    assert 'g.puzzle.answers?.[answerIndex]?.clue' in app
     assert 'currentSourceMarkup' in result_fix and 'tajenka-result-source' in result_fix
     assert "Pět slov, jedna společná myšlenka." not in app
-    print("Tajenka v2 production validation: 37/37 frozen boards PASS")
+    print("Tajenka v2 production validation: 37/37 frozen boards + 184/184 semantic clues PASS")
 
 
 if __name__ == "__main__":
