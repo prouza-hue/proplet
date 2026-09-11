@@ -90,7 +90,12 @@ function answerIndexForTajenka'''
         new_render,
         "phrase renderer",
     )
-    text = text.replace("winPraise.textContent='Pět slov, jedna společná myšlenka.';winPraise.classList.remove('hidden');", "winPraise.classList.add('hidden');")
+    text = replace_once(
+        text,
+        "$('#winPraise').textContent='Pět slov, jedna společná myšlenka.';$('#winPraise').classList.remove('hidden');",
+        "$('#winPraise').classList.add('hidden');",
+        "obsolete five-word praise",
+    )
     write(path, text)
 
 
