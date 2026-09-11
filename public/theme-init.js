@@ -61,6 +61,7 @@
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
+    ['/brand-wordmark-fraunces.css?v=1','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
     ['/tajenka-card-polish.css?v=1','propletTajenkaCardPolishCss'],
     ['/game-release-polish.css?v=2','propletGameReleasePolishCss'],
