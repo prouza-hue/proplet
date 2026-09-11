@@ -17,10 +17,8 @@ html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portr
   pointer-events:none!important;
 }
 
-/* Calm confirmation is global, but this file is the authoritative last-loaded
-   release-polish layer on the current preview. Do not let emoji replacement
-   create a tiny nested tile inside the modal badge. The badge owns one dedicated
-   Calm icon asset at a stable optical size on every viewport. */
+/* Calm confirmation is global. Reuse the exact same painted Calm asset as the
+   in-game Klidný režim button; only scale it up for the modal badge. */
 html.tiskarna-ui #calmConfirmModal .calm-confirm-icon{
   width:58px!important;
   height:58px!important;
@@ -37,9 +35,9 @@ html.tiskarna-ui #calmConfirmModal .calm-confirm-icon>*{
 html.tiskarna-ui #calmConfirmModal .calm-confirm-icon::before{
   content:""!important;
   display:block!important;
-  width:39px!important;
-  height:39px!important;
-  background:url('/calm-mode.svg') center/contain no-repeat!important;
+  width:46px!important;
+  height:46px!important;
+  background:url('/rewards/printshop/calm.svg?v=icons1') center/contain no-repeat!important;
 }
 
 /* The progressive phrase is a permanent part of Tajenka gameplay. */
