@@ -1,0 +1,45 @@
+/* Tajenka runtime UI — authoritative last-mile overrides.
+   Loaded after the generic Fold/desktop game polish so these state rules win. */
+
+/* Once a run is calm, the action is gone on every viewport. The generic wide
+   rail explicitly resurrects #calmRunBtn with display:flex!important, so this
+   selector intentionally carries both game IDs and the calm state. */
+html.tiskarna-ui body.calm-run-v334 #screen-game #calmRunBtn,
+html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portrait,.game-desktop-wide) #screen-game #calmRunBtn{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+/* Semantic clue: same success/mint language as the solved-word feedback.
+   Both surfaces are styled because phone uses the dedicated banner while
+   Fold/tablet/desktop can surface the canonical #gameMessage. */
+html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint,
+html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+  color:var(--r-accent,#197970)!important;
+  font-size:16px!important;
+  line-height:1.35!important;
+  font-weight:900!important;
+  letter-spacing:0!important;
+  text-shadow:none!important;
+}
+
+html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint:not(.hidden){
+  background:color-mix(in srgb,var(--r-accent,#197970) 9%,var(--r-surface,#fff))!important;
+  border:1px solid color-mix(in srgb,var(--r-accent,#197970) 34%,var(--r-edge,#ddd))!important;
+  border-radius:9px!important;
+  padding:8px 10px!important;
+}
+
+html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint,
+html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+  color:var(--r-accent,#78CABA)!important;
+}
+
+@media(max-width:600px){
+  html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint,
+  html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
+    font-size:16px!important;
+    line-height:1.35!important;
+  }
+}
