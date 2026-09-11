@@ -2,8 +2,7 @@
    Loaded after the generic Fold/desktop game polish so these state rules win. */
 
 /* Hidden is an invariant. Generic tablet/desktop polish must never resurrect a
-   control that game state has already hidden. This directly counters the wide
-   #calmRunBtn display:flex!important rule with higher specificity. */
+   control that game state has already hidden. */
 html.tiskarna-ui #screen-game #calmRunBtn.hidden,
 html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait,.game-desktop-wide) #screen-game #calmRunBtn.hidden{
   display:none!important;
@@ -11,8 +10,6 @@ html.tiskarna-ui body:is(.game-tablet-landscape,.game-tablet-portrait,.game-desk
   pointer-events:none!important;
 }
 
-/* Calm run state is a second guard for the brief frame before/after the button's
-   .hidden class is synchronised. */
 html.tiskarna-ui body.calm-run-v334 #screen-game #calmRunBtn,
 html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portrait,.game-desktop-wide) #screen-game #calmRunBtn{
   display:none!important;
@@ -20,10 +17,13 @@ html.tiskarna-ui body.calm-run-v334:is(.game-tablet-landscape,.game-tablet-portr
   pointer-events:none!important;
 }
 
-/* Semantic clue: one visual language everywhere. The icon is the same bulb
-   geometry used by organic-ui's Hint control, rendered as SVG rather than an
-   emoji so the generic pictograph replacer cannot turn it into a brain. */
-html.tiskarna-ui #screen-game.tajenka-mode :is(#gameMessage,#tajenkaHintBanner).tajenka-semantic-hint{
+/* The progressive phrase is a permanent part of Tajenka gameplay. */
+html.tiskarna-ui #screen-game.tajenka-mode #tajenkaPhrase:not(.hidden){
+  display:grid!important;
+}
+
+/* Semantic clue in the established "Skládáš" area on Fold/tablet/desktop. */
+html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
   color:var(--r-accent,#197970)!important;
   font-size:16px!important;
   line-height:1.35!important;
@@ -59,40 +59,38 @@ html.tiskarna-ui #screen-game.tajenka-mode .tajenka-semantic-hint-text{
   font:inherit!important;
 }
 
-html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint:not(.hidden){
-  background:color-mix(in srgb,var(--r-accent,#197970) 9%,var(--r-surface,#fff))!important;
-  border:1px solid color-mix(in srgb,var(--r-accent,#197970) 34%,var(--r-edge,#ddd))!important;
-  border-radius:9px!important;
-  padding:8px 10px!important;
-}
-
-html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode :is(#gameMessage,#tajenkaHintBanner).tajenka-semantic-hint{
+html.tiskarna-ui[data-theme="dark"] #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
   color:var(--r-accent,#78CABA)!important;
 }
 
-/* Phone: dedicated clue banner. Suppress the duplicate copy inside “Skládáš”. */
+/* The old dedicated banner is now only a data hand-off surface. It never takes
+   layout space. Phone receives the clue as a transient toast instead. */
+html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner{
+  display:none!important;
+}
+
+/* Phone: preserve the progressive Tajenka row and board height. */
 @media(max-width:600px){
-  html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint:not(.hidden){
-    display:flex!important;
-    font-size:16px!important;
-    line-height:1.35!important;
-  }
   html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
     display:none!important;
+  }
+  html.tiskarna-ui #toast.tajenka-hint-toast{
+    color:var(--r-accent,#197970)!important;
+    background:color-mix(in srgb,var(--r-accent,#197970) 11%,var(--r-surface,#fff))!important;
+    border-color:color-mix(in srgb,var(--r-accent,#197970) 36%,var(--r-edge,#ddd))!important;
+    font-size:16px!important;
+    font-weight:850!important;
+    line-height:1.35!important;
+  }
+  html.tiskarna-ui[data-theme="dark"] #toast.tajenka-hint-toast{
+    color:var(--r-accent,#78CABA)!important;
   }
 }
 
-/* Fold/tablet/desktop: keep the clue in the established “Skládáš” rail and
-   remove the extra board-column banner so there is only one visible hint. */
+/* Fold/tablet/desktop: keep the semantic clue in the established Skládáš rail. */
 @media(min-width:601px){
-  html.tiskarna-ui #screen-game.tajenka-mode #tajenkaHintBanner.tajenka-semantic-hint{
-    display:none!important;
-  }
   html.tiskarna-ui #screen-game.tajenka-mode #gameMessage.tajenka-semantic-hint{
     display:flex!important;
-    font-size:16px!important;
-    line-height:1.35!important;
-    font-weight:900!important;
     white-space:normal!important;
     overflow:visible!important;
     text-overflow:clip!important;
