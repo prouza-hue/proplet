@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap');
+
+/* Proplet header wordmark — approved Fraunces direction. */
+html.tiskarna-ui .brand-copy{
+  transform:translateY(1px);
+}
+
+html.tiskarna-ui .brand-copy strong{
+  display:block!important;
+  font-family:'Fraunces',Georgia,'Times New Roman',serif!important;
+  font-size:30px!important;
+  font-style:normal!important;
+  font-weight:800!important;
+  font-optical-sizing:auto;
+  line-height:.92!important;
+  letter-spacing:-.03em!important;
+  text-rendering:optimizeLegibility;
+}
+
+html.tiskarna-ui .brand-copy strong::before{
+  content:none!important;
+  display:none!important;
+}
+
+html.tiskarna-ui .brand-copy small{
+  margin-top:3px!important;
+}
+
+@media(max-width:420px){
+  html.tiskarna-ui .brand-copy strong{font-size:29px!important}
+}
+
+@media(min-width:1000px){
+  html.tiskarna-ui .brand-copy strong{font-size:31px!important}
+}
