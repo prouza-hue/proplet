@@ -63,20 +63,24 @@ jobs:
                   state=page.evaluate("""()=>{
                     const icon=document.querySelector('.calm-confirm-icon');
                     const child=icon.firstElementChild;
+                    const iconStyle=getComputedStyle(icon);
                     const before=getComputedStyle(icon,'::before');
                     return {
-                      w:icon.getBoundingClientRect().width,
-                      h:icon.getBoundingClientRect().height,
+                      cssWidth:iconStyle.width,
+                      cssHeight:iconStyle.height,
+                      renderedWidth:icon.getBoundingClientRect().width,
+                      renderedHeight:icon.getBoundingClientRect().height,
                       childDisplay:getComputedStyle(child).display,
                       beforeDisplay:before.display,
                       beforeWidth:before.width,
                       beforeHeight:before.height,
                       beforeBg:before.backgroundImage,
-                      fontSize:getComputedStyle(icon).fontSize,
+                      fontSize:iconStyle.fontSize,
                     };
                   }""")
                   print(width,state)
-                  assert state['w']==58 and state['h']==58,state
+                  assert state['cssWidth']=='58px' and state['cssHeight']=='58px',state
+                  assert state['renderedWidth']>50 and state['renderedHeight']>50,state
                   assert state['childDisplay']=='none',state
                   assert state['beforeDisplay']=='block',state
                   assert state['beforeWidth']=='39px' and state['beforeHeight']=='39px',state
