@@ -1,0 +1,49 @@
+name: Refresh puzzle bootstrap
+
+on:
+  push:
+    branches:
+      - main
+      - perf/bootstrap-dataset
+    paths:
+      - public/puzzles.json
+      - tools/generate_puzzles_bootstrap.py
+      - .github/workflows/puzzles-bootstrap.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: puzzle-bootstrap-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate bootstrap dataset
+        run: python tools/generate_puzzles_bootstrap.py
+
+      - name: Commit generated bootstrap when changed
+        shell: bash
+        run: |
+          if git diff --quiet -- public/puzzles-bootstrap.json; then
+            echo "Bootstrap is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/puzzles-bootstrap.json
+          git commit -m "Refresh puzzle bootstrap dataset"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
