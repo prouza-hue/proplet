@@ -11,14 +11,29 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "public" / "puzzles.json"
 DEFAULT_OUTPUT = ROOT / "public" / "puzzles-bootstrap.json"
 HEAVY_KEYS = {"free", "daily", "rescue", "legacyFree", "previousDaily"}
-DESCRIPTOR_KEYS = ("id", "difficulty", "meta")
+DESCRIPTOR_META_KEYS = (
+    "level",
+    "contentGeneration",
+    "difficultyScore",
+    "availableFrom",
+    "releaseBatch",
+    "releaseIndex",
+    "rollingContent",
+)
 PUZZLE_PAYLOAD_KEYS = ("answers", "letters", "mask", "rows", "cols")
 BOOTSTRAP_DAYS_BEHIND = 1
 BOOTSTRAP_DAYS_AHEAD = 8
 
 
 def descriptor(puzzle: dict) -> dict:
-    return {key: puzzle[key] for key in DESCRIPTOR_KEYS if key in puzzle}
+    meta = puzzle.get("meta") or {}
+    slim_meta = {key: meta[key] for key in DESCRIPTOR_META_KEYS if key in meta}
+    result = {
+        "id": puzzle.get("id"),
+        "difficulty": puzzle.get("difficulty"),
+        "meta": slim_meta,
+    }
+    return {key: value for key, value in result.items() if value is not None}
 
 
 def is_playable_puzzle(puzzle: object) -> bool:
@@ -97,9 +112,9 @@ def build_bootstrap(source: dict, source_bytes: bytes, today: date | None = None
         "dailyGeneration4From": source.get("dailyGeneration4From"),
     }
 
-    # Preserve Daily ordering and metadata so the canonical rotation math is
-    # unchanged. Only puzzles reachable during the bootstrap validity window keep
-    # their full board payload; all other Daily entries become light descriptors.
+    # Preserve Daily ordering and the tiny metadata subset required by rotation.
+    # Only puzzles reachable during the bootstrap validity window keep their full
+    # board payload; all other Daily entries become light descriptors.
     bootstrap["daily"] = [
         puzzle if puzzle.get("id") in full_daily_ids else descriptor(puzzle)
         for puzzle in (source.get("daily") or [])
@@ -150,6 +165,8 @@ def validate(source: dict, bootstrap: dict, full_size: int, bootstrap_size: int)
         for puzzle in slim_bank:
             if not puzzle.get("id") or any(key in puzzle for key in PUZZLE_PAYLOAD_KEYS):
                 raise ValueError(f"Invalid free descriptor in {difficulty}")
+            if not isinstance(puzzle.get("meta"), dict) or "level" not in puzzle["meta"]:
+                raise ValueError(f"Free descriptor lacks level in {difficulty}: {puzzle.get('id')}")
 
     if len(bootstrap.get("rescue", [])) != len(source.get("rescue") or []):
         raise ValueError("Rescue bank count mismatch")
