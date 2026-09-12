@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /admin.html
 Disallow: /api/
 
-Sitemap: https://proplet-nine.vercel.app/sitemap.xml
+Sitemap: https://hrajproplet.cz/sitemap.xml
