@@ -1,0 +1,1 @@
+Use binary blob commit; this marker will be removed.
