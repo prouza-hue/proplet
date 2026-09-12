@@ -109,7 +109,8 @@
         if(!response?.ok)return null;
         try{
           const data=await response.clone().json();
-          const valid=data?.bootstrapSchema===1&&[9,10,11].includes(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4&&Array.isArray(data?.daily)&&data.daily.length>0;
+          const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+          const valid=data?.bootstrapSchema===1&&[9,10,11].includes(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4&&Array.isArray(data?.daily)&&data.daily.length>0&&typeof data?.bootstrapSource?.sha256==='string'&&data.bootstrapSource.sha256.length===64&&typeof data?.bootstrapValidFrom==='string'&&typeof data?.bootstrapValidThrough==='string'&&today>=data.bootstrapValidFrom&&today<=data.bootstrapValidThrough;
           return valid?response:null;
         }catch{return null}
       }).catch(()=>null);
