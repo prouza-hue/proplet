@@ -7,16 +7,64 @@
     root.classList.add('proplet-current-ui-booting');
     const bootStyle=document.createElement('style');
     bootStyle.id='propletCurrentUiBootStyle';
-    bootStyle.textContent='html.proplet-current-ui-booting .app-shell,html.proplet-current-ui-booting .bottom-nav{visibility:hidden!important}html.proplet-current-ui-booting body{background:#F7F2E8!important}html[data-theme="dark"].proplet-current-ui-booting body{background:#1D2530!important}';
+    bootStyle.textContent=`
+      html.proplet-current-ui-booting .app-shell,
+      html.proplet-current-ui-booting .bottom-nav{visibility:hidden!important}
+      html.proplet-current-ui-booting body{background:#F7F2E8!important}
+      html[data-theme="dark"].proplet-current-ui-booting body{background:#1D2530!important}
+      #propletBootScreen{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:28px;background:#F7F2E8;color:#332D28;opacity:1;transition:opacity .24s ease;pointer-events:auto}
+      html[data-theme="dark"] #propletBootScreen{background:#1D2530;color:#F5EFE5}
+      .proplet-boot-inner{display:flex;flex-direction:column;align-items:center;text-align:center;transform:translateY(-3vh)}
+      .proplet-boot-brand{display:flex;align-items:center;gap:13px;margin-bottom:21px}
+      .proplet-boot-mark{width:56px;height:56px;display:block;filter:drop-shadow(0 5px 10px rgba(64,43,27,.12))}
+      .proplet-boot-wordmark{font:700 31px/1.02 Georgia,'Times New Roman',serif;letter-spacing:-.9px}
+      .proplet-boot-copy{font:650 14px/1.3 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:.02em;opacity:.72}
+      .proplet-boot-dots{display:flex;gap:7px;margin-top:15px;height:9px;align-items:center}
+      .proplet-boot-dots i{width:7px;height:7px;border-radius:2px;background:#A64C3E;box-shadow:inset 0 0 0 1px rgba(73,40,30,.14);animation:propletBootStamp 1.08s ease-in-out infinite}
+      .proplet-boot-dots i:nth-child(2){animation-delay:.13s}.proplet-boot-dots i:nth-child(3){animation-delay:.26s}
+      @keyframes propletBootStamp{0%,60%,100%{transform:translateY(0) rotate(0);opacity:.35}30%{transform:translateY(-5px) rotate(-2deg);opacity:1}}
+      html.proplet-current-ui-ready #propletBootScreen{opacity:0;pointer-events:none}
+      @media (prefers-reduced-motion:reduce){#propletBootScreen{transition:none}.proplet-boot-dots i{animation:none;opacity:.65}}
+    `;
     document.head.appendChild(bootStyle);
+
     let revealed=false;
+    const mountBootScreen=()=>{
+      if(revealed||document.getElementById('propletBootScreen'))return;
+      if(!document.body){setTimeout(mountBootScreen,0);return}
+      const screen=document.createElement('div');
+      screen.id='propletBootScreen';
+      screen.setAttribute('role','status');
+      screen.setAttribute('aria-live','polite');
+      screen.innerHTML='<div class="proplet-boot-inner"><div class="proplet-boot-brand"><img class="proplet-boot-mark" src="/brand/mark.svg?v=brand1" alt=""><strong class="proplet-boot-wordmark">Proplet</strong></div><div class="proplet-boot-copy">Rozplétám…</div><div class="proplet-boot-dots" aria-hidden="true"><i></i><i></i><i></i></div></div>';
+      document.body.prepend(screen);
+    };
+    mountBootScreen();
+
     window.__PROPLET_REVEAL_CURRENT_UI=()=>{
       if(revealed)return;
       revealed=true;
+      const loader=document.getElementById('propletBootScreen');
+      root.classList.add('proplet-current-ui-ready');
       root.classList.remove('proplet-current-ui-booting');
-      bootStyle.remove();
+      setTimeout(()=>{
+        loader?.remove();
+        bootStyle.remove();
+        root.classList.remove('proplet-current-ui-ready');
+      },280);
     };
-    setTimeout(()=>window.__PROPLET_REVEAL_CURRENT_UI?.(),5000);
+
+    let readyChecks=0;
+    const revealWhenCanonicalHomeReady=()=>{
+      if(revealed)return;
+      const daily=document.querySelector('#screen-daily');
+      const play=document.querySelector('#playDailyBtn');
+      const ready=window.__propletHomeLayoutInstalled&&daily?.classList.contains('home-layout-active')&&typeof play?.onclick==='function';
+      if(ready){requestAnimationFrame(()=>requestAnimationFrame(()=>window.__PROPLET_REVEAL_CURRENT_UI?.()));return}
+      if(++readyChecks<180)setTimeout(revealWhenCanonicalHomeReady,50);
+    };
+    setTimeout(revealWhenCanonicalHomeReady,25);
+    setTimeout(()=>window.__PROPLET_REVEAL_CURRENT_UI?.(),6500);
   }
 
   try{
