@@ -80,7 +80,10 @@ jobs:
                   page.on('pageerror',lambda e:errors.append(str(e)))
                   page.goto(URL,wait_until='domcontentloaded',timeout=30000)
                   page.wait_for_function("()=>document.documentElement.classList.contains('tiskarna-ui')",timeout=15000)
-                  page.wait_for_timeout(1000); dismiss(page); page.wait_for_timeout(250)
+                  # Boot-ready invariant: renderFree() runs only after bind(), so a
+                  # populated difficulty grid means bottom-nav listeners are attached.
+                  page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0] && document.querySelectorAll('#difficultyCards .difficulty-card').length>=4",timeout=15000)
+                  page.wait_for_timeout(250); dismiss(page); page.wait_for_timeout(250)
 
                   base=page.evaluate("""()=>({
                     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
@@ -116,7 +119,6 @@ jobs:
                   })""")
                   assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'],free
 
-                  page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0]",timeout=12000)
                   page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
                   page.wait_for_function("()=>document.body.classList.contains('playing') && document.querySelectorAll('#board .cell').length>0",timeout=8000)
                   page.screenshot(path=f'{OUT}/{label}.png',full_page=True)
