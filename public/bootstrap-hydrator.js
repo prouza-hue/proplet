@@ -5,6 +5,11 @@
   let startGameWrapped=false;
   let hydrationPromise=null;
 
+  const playablePuzzle=puzzle=>{
+    const rows=Number(puzzle?.rows),cols=Number(puzzle?.cols);
+    return !!(puzzle?.id&&Array.isArray(puzzle?.answers)&&puzzle.answers.length&&Array.isArray(puzzle?.letters)&&Array.isArray(puzzle?.mask)&&rows>0&&cols>0&&puzzle.letters.length===rows*cols&&puzzle.mask.length);
+  };
+
   const cacheCanonicalResponse=response=>{
     if(!response?.ok||!('caches' in window))return;
     try{caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',response.clone())).catch(()=>{})}catch{}
@@ -46,7 +51,7 @@
     const content=bootstrap.contentStatus;
     const rollingExtras={};
     for(const difficulty of Object.keys(bootstrap.free||{})){
-      rollingExtras[difficulty]=(bootstrap.free[difficulty]||[]).filter(puzzle=>puzzle?.meta?.rollingContent&&puzzle?.answers&&puzzle?.grid);
+      rollingExtras[difficulty]=(bootstrap.free[difficulty]||[]).filter(puzzle=>puzzle?.meta?.rollingContent&&playablePuzzle(puzzle));
     }
 
     puzzleDB=full;
@@ -92,7 +97,7 @@
         if(!needsFull)return canonicalStartGame(puzzle,mode,dailyDate,options);
         ensureFullDatabase().then(full=>{
           const resolved=canonicalPuzzle(full,puzzle,mode);
-          if(!resolved?.answers||!resolved?.grid)throw new Error('canonical-puzzle-missing');
+          if(!playablePuzzle(resolved))throw new Error('canonical-puzzle-missing');
           canonicalStartGame(resolved,mode,dailyDate,options);
         }).catch(error=>{
           console.warn('bootstrap hydration failed before game start',error);
