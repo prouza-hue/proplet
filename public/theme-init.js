@@ -171,7 +171,7 @@
     ['/tajenka-card-polish.css?v=2','propletTajenkaCardPolishCss'],
     ['/game-release-polish.css?v=3','propletGameReleasePolishCss'],
     ['/tajenka-runtime-polish.css?v=1','propletTajenkaRuntimePolishCss'],
-    ['/training-layout.css?v=1','propletTrainingLayoutCss'],
+    ['/training-layout.css?v=2','propletTrainingLayoutCss'],
   ];
 
   const loadStyle=(href,key)=>{

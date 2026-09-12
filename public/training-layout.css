@@ -20,11 +20,15 @@ html.tiskarna-ui body #screen-game.starter-mode .starter-returning-actions{paddi
 html.tiskarna-ui body #screen-game.starter-mode .starter-returning-actions button{min-height:38px;background:var(--td-paper)!important;color:var(--td-ink)!important;border:1px solid var(--td-line)!important;box-shadow:none!important;font-size:12px!important}
 html.tiskarna-ui body #screen-game.starter-mode .starter-returning-actions .onboarding-return-login{background:var(--td-mint)!important;border-color:var(--td-ink)!important}
 html.tiskarna-ui body #screen-game.starter-mode .game-actions{grid-column:1!important;grid-row:5!important;display:flex!important;margin:0!important;align-self:start!important}
-html.tiskarna-ui body #screen-game.starter-mode #hintBtn{min-height:40px!important;background:var(--td-paper)!important;color:var(--td-ink)!important;border:1px solid var(--td-line)!important;box-shadow:none!important}
+html.tiskarna-ui body #screen-game.starter-mode #hintBtn{flex:1 1 auto!important;width:100%!important;min-height:40px!important;background:var(--td-paper)!important;color:var(--td-ink)!important;border:1px solid var(--td-line)!important;box-shadow:none!important}
+html.tiskarna-ui body #screen-game.starter-mode .game-info .found-row{display:flex!important;align-items:center!important;gap:10px!important}
+html.tiskarna-ui body #screen-game.starter-mode .game-info .found-row>.stat-label{flex:0 0 auto!important;width:auto!important;margin:0!important}
+html.tiskarna-ui body #screen-game.starter-mode .game-info .found-row .found-words{flex:1 1 0!important;min-width:0!important;margin:0!important}
 html.tiskarna-ui body #screen-game.starter-mode #starterHintNudge{grid-column:1!important;grid-row:6!important;margin:0!important}
 html.tiskarna-ui #winModal.starter-win :is(#winPraise,#winText){display:none!important}
 html.tiskarna-ui #winModal.starter-win .win-card{border-top:2px solid var(--td-ink)!important;background:var(--td-paper)!important;box-shadow:none!important}
-html.tiskarna-ui #winModal.starter-win .win-summary{border:0!important;padding-top:8px!important}
+html.tiskarna-ui #winModal.starter-win .win-summary{display:block!important;border:0!important;padding-top:8px!important}
+html.tiskarna-ui #winModal.starter-win .win-summary-chips{display:flex!important;justify-content:center!important;width:100%!important;margin-inline:auto!important}
 html.tiskarna-ui #winModal.starter-win :is(#winXp,#winClean){background:var(--td-mint)!important;color:var(--td-ink)!important;border:1px solid var(--td-line)!important;box-shadow:none!important;border-radius:10px!important;padding:9px 12px!important;font-size:14px!important}
 html.tiskarna-ui #screen-leaderboard .leader-row.me{background:color-mix(in srgb,var(--td-mint) 75%,var(--td-paper))!important;border:2px solid var(--td-ink)!important;box-shadow:none!important}
 @media(min-width:1000px) and (min-height:650px){
