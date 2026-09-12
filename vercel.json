@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python tools/inspect_puzzle_sections.py && python tools/generate_puzzles_bootstrap.py",
+  "buildCommand": "python tools/generate_puzzles_bootstrap.py",
   "regions": ["arn1"],
   "env": {
     "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true"
