@@ -13,7 +13,7 @@ theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.02.2"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 assert "version:'4.02.2'" in runtime
-assert "proplet-v4.02.2-printshop-preview-fix20" in sw
+assert "proplet-v4.02.2-printshop-live-boot1-share20260912" in sw
 assert 'theme-init.js?v=fix20' in html and 'theme-init.js?v=fix20' in sw
 assert "app-profile-settings.css?v=40140-s13b" in theme
 
