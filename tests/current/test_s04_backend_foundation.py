@@ -48,9 +48,8 @@ openapi_contract = server.app.openapi()
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # Release publication changes APP_VERSION without changing the HTTP schema.
 # Normalize only that metadata field back to the characterization baseline;
-# every path, method, component and field remains covered. Ranking expansion
-# intentionally added optional offset query parameters to existing leaderboard
-# routes, so the schema digest was recaptured without changing route inventory.
+# every path, method, component and field remains covered. Tajenka v2
+# intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_snapshot = json.dumps(
@@ -58,7 +57,7 @@ openapi_snapshot = json.dumps(
 )
 openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
 assert openapi_digest == (
-    "8a7b8a6182368d09a5376062038cbe871514a7383fd9936034f8dad9ba193d83"
+    "048d390c79a6b1615e0b0f10b1673b5326116738b87a6b2f07f0096b918c3a2d"
 ), f"current OpenAPI digest: {openapi_digest}"
 
 
