@@ -395,6 +395,18 @@
       incomingRaw=parseIncoming();
       parseIncomingDaily();
       activeChallenge=loadSession();
+      // Completing the mini tutorial calls startStarter; "Skip intro" and
+      // returning-player sign-in close the modal without calling that facade.
+      const intro=document.querySelector('#onboardingModal');
+      if(intro&&typeof MutationObserver!=='undefined'){
+        new MutationObserver(()=>{
+          if(!pendingResolved||!intro.classList.contains('hidden'))return;
+          let known=false;try{known=!!localStorage.getItem(ONBOARD_KEY)}catch{}
+          if(!known)return;
+          const {puzzle,ctx}=pendingResolved;pendingResolved=null;
+          startSharedChallenge(puzzle,ctx);
+        }).observe(intro,{attributes:true,attributeFilter:['class']});
+      }
       const waitForBoot=()=>{
         if(typeof puzzleDB!=='undefined'&&puzzleDB){bindShareHandlers();if(incomingRaw&&!pendingResolvePromise)pendingResolvePromise=resolveIncoming().finally(()=>{pendingResolvePromise=null});return}
         setTimeout(waitForBoot,60);
