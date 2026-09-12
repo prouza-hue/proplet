@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-invitations1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-autoupdate1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -247,7 +247,8 @@ let canonicalUpdateTarget=null;
 let runtimeRecoveryBusy=false;
 let releaseProbeBusy=false;
 let lastReleaseProbeAt=0;
-let reloadOnServiceWorkerChange=false;
+let automaticUpdateTimer=null;
+let automaticUpdateTarget='';
 let winFeedbackSent=false;
 let pendingPostWinAction=null;
 let pendingPushPostWinAction=null;
@@ -591,7 +592,6 @@ function applyScreen(screen){
 }
 function nav(screen,{replace=false,fromPop=false}={}){
  screen=ROUTE_SCREENS.has(screen)?screen:'daily';
- if(runtimeUpdateRequired&&screen!=='game'){recoverRuntimeUpdate();return}
  if(!fromPop&&screen!==currentScreen){const state={proplet:true,screen};if(replace)history.replaceState(state,'',location.href);else history.pushState(state,'',location.href)}
  applyScreen(screen);
 }
@@ -758,7 +758,6 @@ async function sendAttemptCheckpoint(eventType){
 function startGame(puzzle,mode,dailyDate,options={}){
  $('#tajenkaHintBanner')?.remove();
  hideTouchMagnifier();
- if(runtimeUpdateRequired){showToast('Nejdřív dokončím aktualizaci Propletu…');recoverRuntimeUpdate();return}
  stopTimer();hideGameUndo();
  // Když hráč otevře Free hru z rychlé nabídky na Daily, vytvoř v historii mezikrok Free menu.
  // Android/PWA tlačítko Zpět pak vrátí hra → výběr her, ne rovnou na Daily.
@@ -1440,27 +1439,66 @@ async function maybeOpenQaDashboard(){
  }catch(e){root.querySelector('.qa-loading').innerHTML=`<strong>QA dashboard se nenačetl.</strong><p class="muted">${esc(e.message)}</p>`}
 }
 
+function canAutomaticallyUpdate(){
+ return currentScreen!=='game'&&document.visibilityState==='visible'&&navigator.onLine!==false&&!openTransientModal()&&!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
+}
+function scheduleAutomaticUpdate(targetVersion='',delay=1500){
+ runtimeUpdateRequired=true;
+ if(targetVersion)automaticUpdateTarget=targetVersion;
+ $('#updateBanner')?.classList.add('hidden');
+ if(automaticUpdateTimer!==null||runtimeRecoveryBusy)return;
+ automaticUpdateTimer=setTimeout(()=>{
+  automaticUpdateTimer=null;
+  if(!canAutomaticallyUpdate()){scheduleAutomaticUpdate();return}
+  recoverRuntimeUpdate({automatic:true,targetVersion:automaticUpdateTarget});
+ },delay);
+}
 function showUpdateBanner(worker,message='✨ Je připravená nová verze Propletu.',action='Aktualizovat'){
  if(worker)pendingSW=worker;
+ if(!canonicalUpdateTarget){scheduleAutomaticUpdate();return}
  const banner=$('#updateBanner'),label=banner?.querySelector('span'),button=$('#applyUpdateBtn');
  if(label)label.textContent=message;if(button){button.disabled=false;button.textContent=action}banner?.classList.remove('hidden');
 }
 async function recoverRuntimeUpdate({automatic=false,targetVersion=''}={}){
+ if(automatic&&!canAutomaticallyUpdate()){scheduleAutomaticUpdate(targetVersion);return}
  if(runtimeRecoveryBusy)return;runtimeRecoveryBusy=true;
+ if(automatic){
+  try{
+   const response=await fetch(`/sw.js?auto_update=${Date.now()}`,{cache:'no-store'});
+   if(!response.ok)throw new Error('Update unavailable');
+   const source=await response.text();
+   targetVersion=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1]||targetVersion;
+  }catch{runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,15000);return}
+ }
  const button=$('#applyUpdateBtn');if(button){button.disabled=true;button.textContent='Aktualizuji…'}
  const automaticKey=targetVersion?`proplet-auto-update-${targetVersion}`:'';
- if(automatic&&automaticKey){try{if(sessionStorage.getItem(automaticKey)==='1'){runtimeRecoveryBusy=false;if(button){button.disabled=false;button.textContent='Aktualizovat'}return}sessionStorage.setItem(automaticKey,'1')}catch{}}
+ if(automatic&&automaticKey){try{if(sessionStorage.getItem(automaticKey)==='1'){runtimeRecoveryBusy=false;return}}catch{}}
+ const reloadSafely=()=>{
+  if(automatic&&!canAutomaticallyUpdate()){runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion);return}
+  if(automatic&&automaticKey){try{sessionStorage.setItem(automaticKey,'1')}catch{}}
+  location.reload();
+ };
  trackProductEvent('pwa_update_applied');
- try{
+ if(!automatic)try{
   const keys=await caches.keys();
   await Promise.all(keys.filter(key=>key.startsWith('proplet-')&&!key.startsWith('proplet-data-')).map(key=>caches.delete(key)));
  }catch{}
  try{
   const reg=await navigator.serviceWorker?.getRegistration?.();
   await reg?.update?.();
-  if(reg?.waiting){pendingSW=reg.waiting;reloadOnServiceWorkerChange=true;reg.waiting.postMessage({type:'SKIP_WAITING'});setTimeout(()=>location.reload(),1800);return}
- }catch{}
- location.reload();
+  if(automatic&&(reg?.installing||reg?.waiting||reg?.active?.state==='activating')){
+   const worker=reg.installing||reg.waiting||reg.active;
+   const activated=await new Promise(resolve=>{
+    const timeout=setTimeout(()=>finish(false),15000);
+    const finish=ok=>{clearTimeout(timeout);worker.removeEventListener('statechange',check);resolve(ok)};
+    const check=()=>{if(worker.state==='activated')finish(true);else if(worker.state==='redundant')finish(false);else if(worker.state==='installed')worker.postMessage({type:'SKIP_WAITING'})};
+    worker.addEventListener('statechange',check);check();
+   });
+   if(!activated){runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,15000);return}
+  }
+  if(!automatic&&reg?.waiting){pendingSW=reg.waiting;reg.waiting.postMessage({type:'SKIP_WAITING'});setTimeout(reloadSafely,1800);return}
+ }catch{if(automatic){runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,15000);return}}
+ reloadSafely();
 }
 function applyPendingUpdate(){
  if(canonicalUpdateTarget){trackProductEvent('legacy_origin_update_opened');location.assign(canonicalUpdateTarget);return}
@@ -1471,19 +1509,16 @@ async function probeCanonicalRelease(force=false){
  try{
   const local=await fetch(`/api/config?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.json():null);
   if(!local)return;
-  if(local.environment==='preview'){
+  const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
+  if(local.environment==='preview'||location.origin===canonicalOrigin){
    const source=await fetch(`/sw.js?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.text():'');
    const release=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
    if(release&&release!==APP_PREVIEW_RELEASE){
     runtimeUpdateRequired=true;
-    showUpdateBanner(pendingSW);
-    if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>{
-     if(currentScreen!=='game'&&document.visibilityState==='visible')recoverRuntimeUpdate({automatic:true,targetVersion:release});
-    },1200);
+    scheduleAutomaticUpdate(release);
    }
    return;
   }
-  const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
   const source=await fetch(`${canonicalOrigin}/runtime-meta.js?release_probe=${now}`,{cache:'no-store',mode:'cors'}).then(r=>r.ok?r.text():'');
   const canonicalVersion=source.match(/version:\s*['\"]([^'\"]+)['\"]/)?.[1];if(!canonicalVersion)return;
   if(location.origin!==canonicalOrigin){
@@ -1494,9 +1529,8 @@ async function probeCanonicalRelease(force=false){
   }
   if(canonicalVersion!==APP_VERSION){
    runtimeUpdateRequired=true;
-   showUpdateBanner(pendingSW);
+   scheduleAutomaticUpdate(canonicalVersion);
    try{const key=`proplet-update-detected-${canonicalVersion}`;if(sessionStorage.getItem(key)!=='1'){sessionStorage.setItem(key,'1');trackProductEvent('pwa_update_detected')}}catch{}
-   if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>recoverRuntimeUpdate({automatic:true,targetVersion:canonicalVersion}),1200);
   }
 }catch{}finally{releaseProbeBusy=false}
 }
@@ -1517,8 +1551,7 @@ function registerServiceWorker(){
   window.addEventListener('online',()=>{probeCanonicalRelease(true);checkForUpdate()});
   setInterval(checkForUpdate,5*60*1000);
  }).catch(()=>{});
- navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='PROPLET_SW_UPDATED'||!consumeServiceWorkerUpdateMessage())return;navigator.serviceWorker.getRegistration().then(reg=>showUpdateBanner(reg?.waiting||null)).catch(()=>showUpdateBanner(null))});
- let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloadOnServiceWorkerChange||reloading)return;reloading=true;location.reload()});
+ navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='PROPLET_SW_UPDATED'||!consumeServiceWorkerUpdateMessage())return;scheduleAutomaticUpdate(event.data.shell||'')});
 }
 
 function ensureAudio(){if(!getSettings().sound)return;try{if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch{}}

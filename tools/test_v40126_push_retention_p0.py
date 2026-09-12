@@ -11,7 +11,7 @@ push = (ROOT / "push_diagnostics_v3329.py").read_text(encoding="utf-8")
 migration = (ROOT / "SUPABASE_MIGRATION_V4_01_26.sql").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.02.2"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
-assert "proplet-v4.02.2-printshop-invitations1" in sw
+assert "proplet-v4.02.2-printshop-autoupdate1" in sw
 assert "proplet_http_5xx" in server and "response.status_code >= 500" in server
 assert 'response.headers["X-Proplet-Version"] = APP_VERSION' in server
 assert "proplet_upsert_push_subscription" in backend_db
@@ -19,9 +19,9 @@ assert "on conflict (endpoint) do update" in migration
 assert "grant execute on function public.proplet_upsert_push_subscription" in migration
 assert "'X-Proplet-Version':APP_VERSION" in app
 assert 'return "legacy-unknown"' in server
-assert "runtimeUpdateRequired&&screen!=='game'" in app
+assert "function canAutomaticallyUpdate()" in app
 assert "proplet-auto-update-${targetVersion}" in app
-assert "recoverRuntimeUpdate({automatic:true,targetVersion:canonicalVersion})" in app
+assert "scheduleAutomaticUpdate(canonicalVersion)" in app
 assert "setInterval(checkForUpdate,5*60*1000)" in app
 assert "proplet_push_return_cohort" in migration and "proplet_push_return_cohort" in push
 assert "push-return" in push and '"push-return":"push_return_opened"' in app

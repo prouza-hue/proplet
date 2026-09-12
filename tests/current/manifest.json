@@ -182,6 +182,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_automatic_updates.js",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_s13a_css_characterization.py",
         "runner": "python"
       },
