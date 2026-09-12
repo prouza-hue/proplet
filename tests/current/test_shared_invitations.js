@@ -4,15 +4,15 @@ const vm=require('node:vm');
 const path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../../public/competitive-sharing-v3331.js'),'utf8');
 function setup(url='https://hrajproplet.cz/',onboarded=true){
-  const nodes=new Map(),store=new Map(),sent=[],events=[],hooks=[],timers=[];
+  const nodes=new Map(),store=new Map(),sent=[],events=[],hooks=[],timers=[],observers=[];
   function node(id){if(nodes.has(id))return nodes.get(id);const classes=new Set();const n={id,textContent:'',innerHTML:'',className:'',classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x)},appendChild(c){nodes.set('#'+c.id,c)},parentNode:{insertBefore(c){nodes.set('#'+c.id,c)}},remove(){nodes.delete(id)}};nodes.set(id,n);return n}
-  ['#winShareBtn','#levelDetailShareBtn','#shareDailyBtn','#playDailyBtn','#gameModeLabel','.game-title','#levelLeaderboardBox','#winPrimaryBtn','#winMenuBtn'].forEach(node);
+  ['#winShareBtn','#levelDetailShareBtn','#shareDailyBtn','#playDailyBtn','#gameModeLabel','.game-title','#levelLeaderboardBox','#winPrimaryBtn','#winMenuBtn','#onboardingModal'].forEach(node);
   const daily={id:'daily-1',difficulty:'easy',answers:[]},free={id:'free-12',difficulty:'easy',meta:{level:12}},tajenka={id:'tajenka-1',difficulty:'easy',week:1,tajenka:{phrase:'SECRET ANSWER'}};
   const c={URL,URLSearchParams,console,window:null,location:new URL(url),history:{state:null,replaceState(a,b,u){c.location=new URL(u,c.location)}},
     document:{body:{classList:node('body').classList},querySelector:s=>nodes.get(s)||null,createElement:()=>node('temporary-'+nodes.size)},
     navigator:{share:async value=>sent.push(value),clipboard:{writeText:async value=>sent.push(value)}},
     localStorage:{getItem:()=>onboarded?'1':null},sessionStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)},
-    setTimeout:fn=>{timers.push(fn);return timers.length},clearTimeout(){},
+    setTimeout:fn=>{timers.push(fn);return timers.length},clearTimeout(){},MutationObserver:class{constructor(fn){observers.push(fn)}observe(){}},
     api:async(url,options)=>{if(options){events.push(JSON.parse(options.body).event_type);return {ok:true}}const q=new URL(url,'https://hrajproplet.cz').searchParams;if(q.get('puzzle_id')==='missing')throw Error('404');return {puzzle:q.get('kind')==='daily'?daily:tajenka}},
     registerGameCompletionHook:hook=>{hooks.push(hook);return true},registerGameSessionHook:()=>true,
     puzzleDB:{},DIFF:{easy:{label:'Snadná'}},SHARE_URL:'https://hrajproplet.cz/',currentGame:null,levelDetailContext:null,winDailyGlobalData:null,
@@ -23,7 +23,7 @@ function setup(url='https://hrajproplet.cz/',onboarded=true){
     formatDateCZ:s=>s,countCz:(n,a,b,d)=>`${n} ${n===1?a:n>=2&&n<=4?b:d}`,showToast:t=>{c.toast=t},
     sortedFreeBank:()=>[free],archivedFreePuzzle:async()=>null,getState:()=>({completed:{}}),localLevelResult:()=>({elapsedMs:65000,moves:9,hintsUsed:2}),startFree(){},nav:s=>{c.screen=s},ONBOARD_KEY:'onboarded',$:node};
   c.window=c;vm.createContext(c);vm.runInContext(source,c);
-  return {c,nodes,sent,events,hooks,daily,free,tajenka,timers};
+  return {c,nodes,sent,events,hooks,daily,free,tajenka,timers,observers};
 }
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{
@@ -57,6 +57,8 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
     assert.match(b.nodes.get('#sharedChallengeResult').innerHTML,/Plichta/);
   }
   const t=setup(tajenkaShare.url);await tick();assert.equal(t.c.currentGame.mode,'tajenka');assert.equal(t.c.currentGame.puzzle.id,'tajenka-1');
+  const skipped=setup(incoming,false);await tick();skipped.c.localStorage.getItem=()=> '1';skipped.nodes.get('#onboardingModal').classList.add('hidden');skipped.observers.forEach(fn=>fn());
+  assert.equal(skipped.c.currentGame.dailyDate,'2026-09-10');assert.equal(skipped.c.currentGame.puzzle.id,'daily-1');
   const invalid=setup(incoming.replace('play=daily-1','play=missing'),false);await tick();assert.equal(invalid.c.currentGame,null);assert.match(invalid.c.toast,/není dostupná/);
   console.log('PASS: invitation text, hint fidelity, spoiler safety, clipboard, cancellation, exact Daily/Tajenka routing, onboarding and visible-time comparison');
 })().catch(e=>{console.error(e);process.exitCode=1});
