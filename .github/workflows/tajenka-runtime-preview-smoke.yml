@@ -1,0 +1,148 @@
+name: Tajenka runtime preview smoke
+
+on:
+  push:
+    branches: [feature/tajenka-v2-production]
+    paths:
+      - 'public/tajenka-runtime-polish.css'
+      - 'public/tajenka-runtime-polish.js'
+      - 'public/tajenka-card-polish.js'
+      - 'public/theme-init.js'
+      - '.github/workflows/tajenka-runtime-preview-smoke.yml'
+  workflow_dispatch:
+
+permissions: {contents: read}
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PREVIEW_URL: https://proplet-git-feature-tajenka-v2-pr-7166ab-pavel-prouzas-projects.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Verify Tajenka responsive structure in Chromium
+        shell: bash
+        run: |
+          cat > /tmp/tajenka_runtime_smoke.py <<'PY'
+          import os, time, urllib.request
+          from playwright.sync_api import sync_playwright
+
+          url=os.environ['PREVIEW_URL'].rstrip('/')
+          deadline=time.time()+150
+          while True:
+              try:
+                  nonce=str(time.time())
+                  def get(path):
+                      with urllib.request.urlopen(url+path+('&' if '?' in path else '?')+'qa='+nonce,timeout=8) as r:
+                          return r.read().decode('utf-8')
+                  runtime=get('/tajenka-runtime-polish.js?v=1')
+                  css=get('/tajenka-runtime-polish.css?v=1')
+                  if 'syncTajenkaPhrasePlacement' in runtime and 'two-row composition' in css:
+                      break
+              except Exception:
+                  pass
+              if time.time()>deadline:
+                  raise AssertionError('preview alias did not publish current Tajenka assets')
+              time.sleep(2)
+
+          chrome=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
+
+          def prime(page, clue='Testovací významová stopa'):
+              page.goto(url+'/?tajenka=1&tajenka_week=1',wait_until='domcontentloaded',timeout=30000)
+              page.wait_for_function("()=>window.__PROPLET_TAJENKA_RUNTIME_POLISH__===true",timeout=15000)
+              page.wait_for_timeout(1400)
+              page.evaluate("""async(clue)=>{
+                document.documentElement.classList.add('tiskarna-ui','ribbon-ui');
+                currentGame={
+                  mode:'tajenka',calmMode:true,finished:false,
+                  puzzle:{
+                    answers:[{word:'NOVÉ',path:[]},{word:'TRIČKO',path:[]}],
+                    tajenka:{displayText:'Nové tričko',phrase:'NOVÉ TRIČKO',answerOrder:[0,1]}
+                  },
+                  found:[{answerIndex:0,word:'NOVÉ',colorIndex:0,path:[]}],
+                  tajenkaRevealed:[],hints:0,moves:0
+                };
+                if(typeof nav==='function')nav('game',{replace:true});
+                const game=document.querySelector('#screen-game');
+                game.classList.add('active','tajenka-mode');
+                document.body.classList.add('playing');
+                const actions=document.querySelector('.game-actions');
+                if(!document.querySelector('#calmRunBtn')){
+                  const b=document.createElement('button');b.id='calmRunBtn';b.className='secondary-btn';b.textContent='Klidný režim';actions.appendChild(b);
+                }
+                const msg=document.querySelector('#gameMessage');
+                msg.textContent='💭 '+clue;msg.className='game-message good';
+                let banner=document.querySelector('#tajenkaHintBanner');
+                if(!banner){banner=document.createElement('div');banner.id='tajenkaHintBanner';document.querySelector('#boardStage').before(banner)}
+                banner.className='tajenka-hint-banner';banner.textContent='💭 '+clue;
+                window.dispatchEvent(new Event('resize'));
+                await new Promise(r=>setTimeout(r,900));
+              }""", clue)
+
+          def snap(page):
+              return page.evaluate("""()=>{
+                const phrase=document.querySelector('#tajenkaPhrase'),parent=phrase?.parentElement;
+                const msg=document.querySelector('#gameMessage'),toast=document.querySelector('#toast');
+                return {
+                  body:document.body.className,
+                  calm:!!document.querySelector('#calmRunBtn'),
+                  phraseDisplay:getComputedStyle(phrase).display,
+                  phraseHeight:phrase.getBoundingClientRect().height,
+                  inRail:parent?.classList.contains('game-control-column')||false,
+                  inBoard:parent?.classList.contains('game-board-column')||false,
+                  afterCurrent:phrase?.previousElementSibling?.classList.contains('current-word')||false,
+                  railClass:phrase?.classList.contains('tajenka-phrase-in-rail')||false,
+                  progress:phrase.querySelector('#tajenkaProgress')?.textContent||'',
+                  slots:phrase.querySelectorAll('#tajenkaSlots .tajenka-slot').length,
+                  msgDisplay:getComputedStyle(msg).display,
+                  msgSize:getComputedStyle(msg).fontSize,
+                  msgIcon:!!msg.querySelector('.tajenka-semantic-hint-icon svg'),
+                  toastText:toast?.textContent||'',
+                  toastDisplay:toast?getComputedStyle(toast).display:'missing',
+                };
+              }""")
+
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox','--disable-dev-shm-usage'])
+
+              # Desktop — phrase stays over board and is genuinely enlarged.
+              ctx=browser.new_context(viewport={'width':1440,'height':900},screen={'width':1440,'height':900})
+              page=ctx.new_page(); prime(page); d=snap(page); print('desktop',d)
+              assert 'game-desktop-wide' in d['body'],d
+              assert not d['calm'],d
+              assert d['phraseDisplay']=='grid' and d['inBoard'],d
+              assert d['phraseHeight']>=78,d
+              assert '1/2' in d['progress'].replace(' ','') and d['slots']==2,d
+              assert d['msgDisplay']=='flex' and d['msgSize']=='16px' and d['msgIcon'],d
+              ctx.close()
+
+              # Real coarse-pointer Fold/tablet — same live node goes directly
+              # below Skládáš in the control rail.
+              ctx=browser.new_context(viewport={'width':800,'height':700},screen={'width':800,'height':700},has_touch=True,is_mobile=False)
+              page=ctx.new_page(); prime(page); t=snap(page); print('tablet',t)
+              assert 'game-tablet-landscape' in t['body'],t
+              assert not t['calm'],t
+              assert t['phraseDisplay']=='grid' and t['inRail'] and t['railClass'],t
+              assert t['afterCurrent'],t
+              assert t['msgDisplay']=='flex' and t['msgIcon'],t
+              page.evaluate("""async()=>{const a=document.querySelector('.game-actions'),b=document.createElement('button');b.id='calmRunBtn';b.className='secondary-btn';b.textContent='Klidný režim';a.appendChild(b);await new Promise(r=>setTimeout(r,300));}""")
+              assert not snap(page)['calm'],snap(page)
+              ctx.close()
+
+              # Phone — phrase returns to board column; level-1 clue is toast.
+              ctx=browser.new_context(viewport={'width':390,'height':844},screen={'width':390,'height':844},has_touch=True,is_mobile=False)
+              page=ctx.new_page(); prime(page,'Mobilní významová stopa'); m=snap(page); print('mobile',m)
+              assert not m['calm'],m
+              assert m['phraseDisplay']=='grid' and m['inBoard'],m
+              assert '1/2' in m['progress'].replace(' ',''),m
+              assert m['msgDisplay']=='none',m
+              assert 'Mobilní významová stopa' in m['toastText'] and m['toastDisplay']!='none',m
+              ctx.close()
+
+              browser.close()
+          PY
+          python /tmp/tajenka_runtime_smoke.py

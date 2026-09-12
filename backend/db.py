@@ -123,6 +123,22 @@ def db_select(table: str, request_fn: Optional[Callable[..., Any]] = None, /, **
     for key, value in filters.items():
         if value is not None:
             params[key] = f"eq.{value}"
+    # Account history must be complete: PostgREST otherwise silently caps reads.
+    # Keep point lookups and public/bounded ranking queries unchanged.
+    if table in {"results", "account_rewards", "streak_rescues"} and set(params) == {"select", "player_id"}:
+        params.update({"order": "id.asc", "limit": "1000"})
+        rows = []
+        while True:
+            page = requester("GET", table, params=dict(params))
+            if not page:
+                return rows
+            cursor = str(page[-1]["id"])
+            if params.get("id") == f"gt.{cursor}":
+                raise HTTPException(502, "Account history pagination did not advance")
+            rows.extend(page)
+            # Continue even after a short page (the configured server cap may
+            # be lower than 1000). Stable primary-key cursors avoid offset drift.
+            params["id"] = f"gt.{cursor}"
     return requester("GET", table, params=params)
 
 

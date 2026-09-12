@@ -1,0 +1,124 @@
+name: Bind Tajenka v2 bank from verified calibration
+
+on:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - '.github/workflows/tajenka-v2-bind-from-calibration.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: tajenka-v2-bind-bank
+  cancel-in-progress: true
+
+jobs:
+  bind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FULL_ARTIFACT: '10161912899'
+      RECOVERY_C01: '10162009546'
+      RECOVERY_C11: '10162004267'
+      RECOVERY_C22: '10162011894'
+      RECOVERY_C35: '10162016380'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ux/tiskarska-dilna
+
+      - name: Download verified calibration artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tajenka-artifacts
+          for pair in \
+            "full:${FULL_ARTIFACT}" \
+            "c01:${RECOVERY_C01}" \
+            "c11:${RECOVERY_C11}" \
+            "c22:${RECOVERY_C22}" \
+            "c35:${RECOVERY_C35}"; do
+            name="${pair%%:*}"
+            id="${pair##*:}"
+            curl -fsSL \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" \
+              -o "/tmp/tajenka-artifacts/${name}.zip"
+            mkdir -p "/tmp/tajenka-artifacts/${name}"
+            unzip -q "/tmp/tajenka-artifacts/${name}.zip" -d "/tmp/tajenka-artifacts/${name}"
+          done
+          find /tmp/tajenka-artifacts -type f -name '*.json' -print
+
+      - name: Assemble canonical 41-board candidate bank
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('/tmp/tajenka-artifacts')
+          full_path = next((root / 'full').rglob('*.json'))
+          full = json.loads(full_path.read_text(encoding='utf-8'))
+          boards = {b['id']: b for b in full.get('boards', [])}
+
+          recovered = []
+          for key in ('c01','c11','c22','c35'):
+              path = next((root / key).rglob('*.json'))
+              payload = json.loads(path.read_text(encoding='utf-8'))
+              assert len(payload.get('boards') or []) == 1, (key, payload)
+              board = payload['boards'][0]
+              boards[board['id']] = board
+              recovered.append(board['id'])
+
+          ordered = sorted(boards.values(), key=lambda b: int(b['candidateNo']))
+          assert len(ordered) == 41, len(ordered)
+          assert len({b['id'] for b in ordered}) == 41
+          assert all(b.get('runtimeEnabled') is False for b in ordered)
+          assert all((b.get('meta') or {}).get('alternativeFullPaths') == 0 for b in ordered)
+          assert any(len(b.get('answers') or []) == 4 for b in ordered)
+          assert any(any(len(str(a.get('word') or '')) == 3 for a in b.get('answers') or []) for b in ordered)
+
+          output = {
+              'schemaVersion': 2,
+              'kind': 'tajenka-v2-board-candidate-bank',
+              'runtimeEnabled': False,
+              'status': 'authoring-candidates-not-runtime',
+              'provenance': {
+                  'baseCalibrationCommit': 'c5d2d86365079fbaa27a79b109b8ab7e1c16aae8',
+                  'baseCalibrationRunId': 34500649405,
+                  'baseAttemptBudget': 6,
+                  'recoveryCommit': '0803e83c9a61a8cef81d14b1d10f78c2f69096be',
+                  'recoveryRunId': 34501423506,
+                  'recoveryAttemptBudget': 20,
+                  'recoveredIds': recovered,
+              },
+              'summary': {'contentPass': 41, 'boardPass': 41, 'boardFail': 0},
+              'boards': ordered,
+              'failures': [],
+          }
+          out = Path('data/tajenka_v2_board_candidates.json')
+          out.write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(f'Canonical Tajenka v2 bank assembled: {len(ordered)}/41')
+          PY
+
+      - name: Re-run structural content validation
+        run: |
+          python tools/validate_tajenka_content_v2.py
+          python tools/test_tajenka_content_v2.py
+
+      - name: Commit canonical bank
+        run: |
+          git config user.name "proplet-authoring-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/tajenka_v2_board_candidates.json
+          if git diff --cached --quiet; then
+            echo "Candidate bank is already current."
+            exit 0
+          fi
+          git commit -m "[tajenka-v2] Bind verified 41-board candidate bank"
+          git push origin HEAD:ux/tiskarska-dilna

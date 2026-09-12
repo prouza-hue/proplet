@@ -88,7 +88,8 @@ openapi_contract = json.loads(json.dumps(server.app.openapi()))
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_digest = _digest(openapi_contract)
-assert openapi_digest == "b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674", f"current OpenAPI digest: {openapi_digest}"
+# Tajenka v2 intentionally extends the API schema while preserving the route inventory.
+assert openapi_digest == "048d390c79a6b1615e0b0f10b1673b5326116738b87a6b2f07f0096b918c3a2d", f"current OpenAPI digest: {openapi_digest}"
 
 
 # A fake-service assembly proves feature modules remain independently testable

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression contract: Saturday releases stay playable for the whole week."""
+"""Regression contract: Tajenka switches from weekly Saturday to Saturday/Wednesday."""
 
 from __future__ import annotations
 
@@ -11,14 +11,12 @@ from unittest.mock import patch
 
 from fastapi import HTTPException
 
-
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-
 import server  # noqa: E402
 
 
-def released_week(day: date) -> int | None:
+def released_slot(day: date) -> int | None:
     with (
         patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
         patch.object(server, "VERCEL_ENV", "production"),
@@ -46,29 +44,33 @@ def assert_unavailable(day: date) -> None:
             raise AssertionError("unreleased Tajenka must not be served")
 
 
-# Nothing leaks before the first scheduled Saturday.
 assert_unavailable(date(2026, 8, 28))
 
-# A Saturday release remains the active puzzle through Friday.
-for day in (
-    date(2026, 8, 29),
-    date(2026, 8, 30),
-    date(2026, 8, 31),
-    date(2026, 9, 1),
-    date(2026, 9, 4),
-):
-    assert released_week(day) == 1, day
+# Keep the two already released Saturday puzzles exactly where players saw them.
+for day in (date(2026, 8, 29), date(2026, 9, 2), date(2026, 9, 4)):
+    assert released_slot(day) == 1, day
+for day in (date(2026, 9, 5), date(2026, 9, 9), date(2026, 9, 11)):
+    assert released_slot(day) == 2, day
 
-# The following Saturday advances to the next prepared puzzle.
-assert released_week(date(2026, 9, 5)) == 2
+# Starting 12 Sep, a new puzzle arrives Saturday and Wednesday.
+for day in (date(2026, 9, 12), date(2026, 9, 13), date(2026, 9, 15)):
+    assert released_slot(day) == 3, day
+for day in (date(2026, 9, 16), date(2026, 9, 17), date(2026, 9, 18)):
+    assert released_slot(day) == 4, day
+assert released_slot(date(2026, 9, 19)) == 5
 
-# The finite bank still fails closed after its last prepared release.
-assert_unavailable(date(2026, 11, 7))
+# The frozen 37-board bank remains available through slot 37, then stops.
+assert released_slot(date(2026, 10, 7)) == 10
+assert released_slot(date(2026, 10, 10)) == 11
+assert released_slot(date(2027, 1, 9)) == 37
+assert released_slot(date(2027, 1, 12)) == 37
+assert_unavailable(date(2027, 1, 13))
 
-# The frontend must use the released week, not a weekend-only weekday gate.
+# Frontend and backend must use the same transition marker and split-week calculation.
 app = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
-availability = app.split("function refreshTajenkaAvailability", 1)[1].split("refreshTajenkaAvailability();", 1)[0]
-assert "weekend" not in availability
-assert "TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek" in availability
+assert "TAJENKA_TWICE_WEEKLY_START" in app
+assert "function tajenkaReleaseSlotForISO" in app
+assert "cadenceOffset%7>=4" in app
+assert "TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek" in app
 
-print("PASS: Tajenka Saturday release remains available through Friday")
+print("PASS: Tajenka keeps slots 1-2, then releases every Saturday and Wednesday across the frozen 37-board bank")

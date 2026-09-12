@@ -1,0 +1,152 @@
+/* Tiskařská dílna — readability pass. Keeps Outfit; changes only hierarchy, weight, tracking and line-height. */
+html.tiskarna-ui body{
+  font-kerning:normal;
+  text-rendering:optimizeLegibility;
+}
+
+/* Headings: keep character, remove the over-tight letter collisions. */
+html.tiskarna-ui body .screen:where(:not(#screen-game)) h1,
+html.tiskarna-ui body #winModal h1,
+html.tiskarna-ui body .modal-card h1{
+  font-weight:700!important;
+  letter-spacing:-.01em!important;
+  line-height:1.08!important;
+}
+html.tiskarna-ui body .screen:where(:not(#screen-game)) h2,
+html.tiskarna-ui body .screen:where(:not(#screen-game)) h3,
+html.tiskarna-ui body #winModal h2,
+html.tiskarna-ui body #winModal h3,
+html.tiskarna-ui body .modal-card h2,
+html.tiskarna-ui body .modal-card h3{
+  font-weight:700!important;
+  letter-spacing:-.005em!important;
+  line-height:1.14!important;
+}
+/* Explicit home selector also wins against desktop/printshop legacy 500-weight rules. */
+html.tiskarna-ui body #screen-daily .daily-hero h1,
+html.tiskarna-ui body #screen-daily.home-layout-active .daily-hero .hero-main h1{
+  font-weight:700!important;
+  letter-spacing:-.005em!important;
+  line-height:1.08!important;
+}
+
+/* Functional UI: medium-semibold is clearer in Outfit than either regular or extra-bold. */
+html.tiskarna-ui body button,
+html.tiskarna-ui body .primary-btn,
+html.tiskarna-ui body .secondary-btn,
+html.tiskarna-ui body .text-btn,
+html.tiskarna-ui body .hero-secondary,
+html.tiskarna-ui body .quick-all-btn,
+html.tiskarna-ui body .win-utility-btn,
+html.tiskarna-ui body .setting-toggle,
+html.tiskarna-ui body .ranking-segment button,
+html.tiskarna-ui body .achievement-toggle-btn,
+html.tiskarna-ui body .achievement-summary-toggle{
+  font-weight:600!important;
+  letter-spacing:.012em!important;
+  line-height:1.2!important;
+}
+html.tiskarna-ui body button :is(strong,b){font-weight:600!important}
+
+/* Primary play actions deserve one extra pixel, not extra weight. */
+html.tiskarna-ui body #playDailyBtn,
+html.tiskarna-ui body .primary-btn.big,
+html.tiskarna-ui body .difficulty-card .secondary-btn,
+html.tiskarna-ui body #winModal .primary-btn{
+  font-size:16px!important;
+  font-weight:600!important;
+  letter-spacing:.012em!important;
+  line-height:1.2!important;
+}
+
+/* Challenge CTA: explicitly open the word-shapes that previously merged in bold. */
+html.tiskarna-ui body #shareDailyBtn,
+html.tiskarna-ui body .daily-challenge-cta,
+html.tiskarna-ui body .challenge-share-cta{
+  font-weight:600!important;
+  letter-spacing:.018em!important;
+  line-height:1.2!important;
+}
+
+/* A hidden action must stay hidden even after painted-action-control adds display:inline-flex!important. */
+html.tiskarna-ui body #screen-daily #shareDailyBtn.hidden,
+html.tiskarna-ui body .painted-action-control.hidden{
+  display:none!important;
+}
+
+/* Small navigational labels: firm enough to scan, without the old 850–950 heaviness. */
+html.tiskarna-ui body :is(.eyebrow,.stat-label){
+  font-weight:700!important;
+  letter-spacing:.10em!important;
+  line-height:1.25!important;
+}
+html.tiskarna-ui body :is(.date-pill,.daily-sync,.xp-chip,.home-ranking-you){
+  font-weight:600!important;
+  letter-spacing:.015em!important;
+  line-height:1.2!important;
+}
+
+/* Lists, rankings and progress: consistent readable emphasis. */
+html.tiskarna-ui body :is(.leader-name strong,.leader-score strong,.home-ranking-row>strong,.home-ranking-row>b,.result-player-copy strong,.result-player-time,.profile-name,.level-top strong,.home-progress-level-copy strong,.home-progress-metric>strong){
+  font-weight:600!important;
+}
+html.tiskarna-ui body :is(.leader-name small,.leader-score small,.result-player-copy small,.home-progress-level-copy span,.field-note,.muted){
+  line-height:1.4!important;
+}
+
+/* Gameplay chrome only. Board letters and the assembled word keep their dedicated high-contrast treatment. */
+html.tiskarna-ui body #screen-game .game-title strong,
+html.tiskarna-ui body #screen-game .game-clock span,
+html.tiskarna-ui body #screen-game .game-actions .secondary-btn{
+  font-weight:600!important;
+  letter-spacing:.01em!important;
+  line-height:1.2!important;
+}
+html.tiskarna-ui body #screen-game #hintBtn::after,
+html.tiskarna-ui body #screen-game #calmRunBtn::after{
+  font-weight:600!important;
+  letter-spacing:.01em!important;
+}
+
+/* Do not touch the outlined brand wordmark or board glyphs. */
+html.tiskarna-ui body .brand-copy strong{letter-spacing:normal!important}
+
+/* Readability pass 2 — keep Outfit, but give its geometric shapes more air on small displays. */
+html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(p,.muted,.field-note),
+html.tiskarna-ui body :is(.modal-card p,.leader-name small,.leader-score small,.result-player-copy small,.home-progress-level-copy span){
+  font-weight:500!important;
+  letter-spacing:.006em!important;
+  line-height:1.45!important;
+}
+html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(h1,h2,h3),
+html.tiskarna-ui body #winModal :is(h1,h2,h3),
+html.tiskarna-ui body .modal-card :is(h1,h2,h3){
+  letter-spacing:0!important;
+}
+html.tiskarna-ui body #screen-daily .daily-hero h1,
+html.tiskarna-ui body #screen-daily.home-layout-active .daily-hero .hero-main h1{
+  letter-spacing:.004em!important;
+  line-height:1.1!important;
+}
+
+/* Daily hero is already blue: the primary action must be the contrasting paper surface, not blue-on-blue. */
+html.tiskarna-ui body #screen-daily #playDailyBtn.primary-btn.hero-btn{
+  background:#FFF8E9!important;
+  color:#204FAB!important;
+  border:1px solid rgba(255,255,255,.76)!important;
+  box-shadow:0 3px 0 #C8C0B1,0 7px 16px rgba(20,47,105,.18)!important;
+}
+html.tiskarna-ui body #screen-daily #playDailyBtn.primary-btn.hero-btn:hover{
+  background:#FFFFFF!important;
+  color:#173D8B!important;
+}
+
+@media(max-width:600px){
+  html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(p,.muted,.field-note){
+    font-size:16px!important;
+    line-height:1.45!important;
+  }
+  html.tiskarna-ui body :is(.leader-name small,.leader-score small,.result-player-copy small,.home-progress-level-copy span){
+    font-size:max(12px,1em)!important;
+  }
+}

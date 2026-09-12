@@ -9,6 +9,7 @@
   const BOARD_XP_LIMIT=5;
   const DAILY_XP_LIMIT=50;
   const TRIGGER_STREAK=3;
+  const BLOCKED_DISCOVERY_WORDS=new Set(['NEGR']);
   let localWords=null;
   let localWordsPromise=null;
   let trackedGame=null;
@@ -131,7 +132,7 @@
   const loadLocalWords=()=>{
     if(localWords)return Promise.resolve(localWords);
     if(localWordsPromise)return localWordsPromise;
-    localWordsPromise=fetch('/valid-words-v3328.txt',{cache:'force-cache'})
+    localWordsPromise=fetch('/valid-words-v3328.txt?v=recognition6',{cache:'force-cache'})
       .then(r=>r.ok?r.text():null)
       .then(text=>{
         if(!text)return null;
@@ -144,6 +145,7 @@
 
   const recognizeWord=async word=>{
     const normalized=normalize(word);
+    if(BLOCKED_DISCOVERY_WORDS.has(normalized)){const miss={recognized:false,source:'editorial_block'};recognitionCache.set(normalized,miss);return miss;}
     if(recognitionCache.has(normalized))return recognitionCache.get(normalized);
     const local=await loadLocalWords();
     if(local?.has(normalized)){
@@ -431,7 +433,7 @@
             :awardState==='pending'?' · XP ověříme po připojení.'
             :awardState==='rejected'?' · Bonus XP se tentokrát nepřipsal.'
             :'';
-          message(`„${candidate.word}“ je slovo 👍 Jen nepatří do řešení.${suffix}`);
+          message(`„${candidate.word}“ je platné, mimo řešení${suffix}`);
           if(validNonSolutionStreak>=TRIGGER_STREAK&&!failsafeShown())showFailsafe();
         }).catch(()=>{});
       }

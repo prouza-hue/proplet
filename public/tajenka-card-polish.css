@@ -1,0 +1,92 @@
+/* Completed Tajenka card: lighter hierarchy and Daily-style challenge action. */
+html.tiskarna-ui #newContentBanner .eyebrow{
+  display:none!important;
+}
+
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-entry-copy,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-entry-copy{
+  align-self:center;
+}
+
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-revealed-phrase,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-revealed-phrase{
+  text-transform:none!important;
+  letter-spacing:-.02em;
+}
+
+/* Match the Tajenka artwork slot to the weekly-news artwork rhythm. */
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard){
+  column-gap:13px!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-entry-icon{
+  width:48px!important;
+  height:48px!important;
+  flex:0 0 48px!important;
+  border-radius:16px!important;
+  display:grid!important;
+  place-items:center!important;
+}
+html.tiskarna-ui :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-entry-icon img[data-tajenka-icon]{
+  width:42px!important;
+  height:42px!important;
+  object-fit:contain!important;
+}
+html.tiskarna-ui #screen-free #tajenkaPlayCard.completed{
+  grid-template-columns:48px minmax(0,1fr)!important;
+}
+
+/* The completed Hrát card has the desired visual breathing room. Match the
+   other Tajenka states to it without moving the already-correct reference. */
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-entry-copy,
+html.tiskarna-ui #tajenkaPlayCard:not(.completed) .tajenka-entry-copy{
+  padding-inline-start:8px!important;
+}
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-entry-copy{
+  padding-inline-start:0!important;
+}
+
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:1px solid #d05677!important;
+  background:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%)!important;
+  color:#fff!important;
+  box-shadow:0 7px 22px rgba(139,36,70,.25),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  font-weight:900!important;
+  letter-spacing:.01em;
+}
+
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta:hover,
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta:focus-visible,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta:hover,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta:focus-visible{
+  border-color:#c34266!important;
+  background:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%)!important;
+  color:#fff!important;
+  box-shadow:0 8px 23px rgba(139,36,70,.32),inset 0 1px 0 rgba(255,255,255,.2)!important;
+  outline:none;
+}
+
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta:active,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta:active{
+  transform:scale(.985);
+}
+
+html.tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions .painted-action-icon,
+html.tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions .painted-action-icon{
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  object-fit:contain;
+}
+
+html[data-theme="dark"].tiskarna-ui #tajenkaPreviewCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta,
+html[data-theme="dark"].tiskarna-ui #tajenkaPlayCard.completed .tajenka-home-actions [data-tajenka-share].tajenka-share-cta{
+  border-color:#df6a8b!important;
+  background:linear-gradient(135deg,#a93262,#ca4968)!important;
+  color:#fff!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.25),0 0 0 1px rgba(177,158,255,.08) inset!important;
+}

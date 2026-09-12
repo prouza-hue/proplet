@@ -41,7 +41,7 @@ function create(deps={}){
       }).filter(Boolean).join(' ');
       if(!pts)return;
       const line=documentObj.createElementNS('http://www.w3.org/2000/svg','polyline');
-      line.setAttribute('points',pts);line.setAttribute('fill','none');line.setAttribute('stroke',color);
+      line.style.setProperty('--path-color',color);line.setAttribute('points',pts);line.setAttribute('fill','none');line.setAttribute('stroke',color);
       line.setAttribute('stroke-width',kind==='guide'?'7':'9');line.setAttribute('stroke-linecap','round');
       line.setAttribute('stroke-linejoin','round');line.setAttribute('opacity',kind==='guide'?'.28':kind==='wrong'?'.78':'.52');
       line.classList.add(`path-${kind}`);svg.appendChild(line);
@@ -73,7 +73,7 @@ function create(deps={}){
       const cell=documentObj.createElement('div');cell.className='cell';cell.dataset.index=i;cell.textContent=p.letters[i];
       const color=game.used.get(i);if(color!=null){cell.classList.add('used');cell.style.setProperty('--word-color',colors[color%colors.length])}
       if(game.mode==='tajenka'&&game.finished&&!game.used.has(i))cell.classList.add('tajenka-unused');
-      if(game.lastFound?.includes(i))cell.classList.add('just-found');
+      if(game.lastFound?.includes(i)){cell.classList.add('just-found');cell.style.setProperty('--found-delay',`${Math.min(game.lastFound.indexOf(i)*24,72)}ms`)}
       if(game.wrongPath?.includes(i))cell.classList.add('wrong-flash');
       if(game.mode==='starter'&&game.starterGuidePath?.includes(i)&&!game.used.has(i)){
         cell.classList.add('starter-guide');cell.style.setProperty('--guide-order',String(game.starterGuidePath.indexOf(i)));
@@ -81,7 +81,7 @@ function create(deps={}){
       cell.addEventListener('pointerdown',onPointerDown);cell.addEventListener('pointerenter',onPointerEnter);board.appendChild(cell);
     }
     requestAnimationFrameFn(()=>{fit();drawPaths()});
-    if(game.lastFound?.length)setTimeoutFn(()=>{game.lastFound=[];queryAll('.just-found').forEach(cell=>cell.classList.remove('just-found'))},460);
+    if(game.lastFound?.length)setTimeoutFn(()=>{game.lastFound=[];queryAll('.just-found').forEach(cell=>cell.classList.remove('just-found'))},520);
     return true;
   }
 

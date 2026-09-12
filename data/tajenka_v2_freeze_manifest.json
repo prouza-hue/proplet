@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "kind": "tajenka-v2-freeze-manifest",
+  "source": "data/tajenka_v2_approved.json",
+  "boards": [
+    {
+      "week": 1,
+      "runtimeId": "tajenka-v2-week-01",
+      "sourceId": "tajenka-v2-c01",
+      "geometrySha256": "410fbde17d93d668488c8ff7726cbb320c575f84c59bd69253a3b650e8f9c987",
+      "displayText": "Nové bílé tričko přitahuje omáčku."
+    },
+    {
+      "week": 2,
+      "runtimeId": "tajenka-v2-week-02",
+      "sourceId": "tajenka-v2-c03",
+      "geometrySha256": "79dfd25c03ea88dda04288c03ccff846202170c020f6cf5b43ec3cdc823ef0ec",
+      "displayText": "Ticho v bytě s dětmi bývá podezřelé."
+    },
+    {
+      "week": 3,
+      "runtimeId": "tajenka-v2-week-03",
+      "sourceId": "tajenka-v2-c04",
+      "geometrySha256": "c3bd02441a84eca0430ce20e68427a2a75a912daea48aada97f009b37a642e80",
+      "displayText": "Fronta se pohne hned, když odejdeš vedle."
+    },
+    {
+      "week": 4,
+      "runtimeId": "tajenka-v2-week-04",
+      "sourceId": "tajenka-v2-c06",
+      "geometrySha256": "7d8cd7ae4f0b1f7812aa267073608941a8f424380406a701cabfa8addf5fa300",
+      "displayText": "Prázdná krabice od bot vydrží doma roky."
+    },
+    {
+      "week": 5,
+      "runtimeId": "tajenka-v2-week-05",
+      "sourceId": "tajenka-v2-c10",
+      "geometrySha256": "7a7bba5358a8f4d7957eecb21b7384b3ec1c508942d21ba0188631a70cccf0f6",
+      "displayText": "Myčka na nádobí tajně jí lžičky k snídani."
+    },
+    {
+      "week": 6,
+      "runtimeId": "tajenka-v2-week-06",
+      "sourceId": "tajenka-v2-c11",
+      "geometrySha256": "16b27054f9cb89597dace18ce3219def9296aa5aeaa2f3d9b781e028bc858a9b",
+      "displayText": "Když má deštník největší cenu, zůstane doma."
+    },
+    {
+      "week": 7,
+      "runtimeId": "tajenka-v2-week-07",
+      "sourceId": "tajenka-v2-c12",
+      "geometrySha256": "782e50507ec7d9928aa00ac8d28c331350c5e7a22dae48142dfbdfd08a6d178e",
+      "displayText": "Zavřené dveře jsou pro kočku osobní útok."
+    },
+    {
+      "week": 8,
+      "runtimeId": "tajenka-v2-week-08",
+      "sourceId": "tajenka-v2-c15",
+      "geometrySha256": "ac650409914668444fd21a276ba7cf9094e19a9adf6438ea2a55392b644e64c4",
+      "displayText": "Chobotnice mají tři srdce a modrou krev."
+    },
+    {
+      "week": 9,
+      "runtimeId": "tajenka-v2-week-09",
+      "sourceId": "tajenka-v2-c16",
+      "geometrySha256": "67f7a45f794afaca3b23b323dfaa02ecb228a56704373d4c9077472c64836ec4",
+      "displayText": "Vombat opravdu kadí malé kostky."
+    },
+    {
+      "week": 10,
+      "runtimeId": "tajenka-v2-week-10",
+      "sourceId": "tajenka-v2-c17",
+      "geometrySha256": "85f33c98a352eaf40f64bc61555ebcaf379257075260129162ae7bf301fa1663",
+      "displayText": "Žraloci jsou starší než první stromy."
+    },
+    {
+      "week": 11,
+      "runtimeId": "tajenka-v2-week-11",
+      "sourceId": "tajenka-v2-c18",
+      "geometrySha256": "7d0ca8aa882c90ba396c50eba51b18f49937ded3e54df5b2872f04cb3cfc116b",
+      "displayText": "Vrány si pamatují lidské tváře celé roky."
+    },
+    {
+      "week": 12,
+      "runtimeId": "tajenka-v2-week-12",
+      "sourceId": "tajenka-v2-c19",
+      "geometrySha256": "4a0ca7bddd583dd9b402cebee4c989503b664c71c008eb49244dfb68fa998adb",
+      "displayText": "Banán je bobule. Jahoda botanicky není."
+    },
+    {
+      "week": 13,
+      "runtimeId": "tajenka-v2-week-13",
+      "sourceId": "tajenka-v2-c20",
+      "geometrySha256": "e9c46419f22c8e3078447d6fa551be71bc0554851070b32d79fa5323a40765a3",
+      "displayText": "Kočky sladkou chuť prostě necítí."
+    },
+    {
+      "week": 14,
+      "runtimeId": "tajenka-v2-week-14",
+      "sourceId": "tajenka-v2-c21",
+      "geometrySha256": "50d27e4f3ebd3eb207cc772b03a5f70800d5917b18f661aceca7dcf78e78a1bb",
+      "displayText": "Saturn má průměrnou hustotu menší než voda."
+    },
+    {
+      "week": 15,
+      "runtimeId": "tajenka-v2-week-15",
+      "sourceId": "tajenka-v2-c22",
+      "geometrySha256": "da070ccce732fa309603770a96f6c8127dab35dc4dfae8d6e44206b8f4d289c6",
+      "displayText": "Včely tancem ukazují směr k potravě."
+    },
+    {
+      "week": 16,
+      "runtimeId": "tajenka-v2-week-16",
+      "sourceId": "tajenka-v2-c23",
+      "geometrySha256": "6472f2e3caf3f9502541b3e02828f4724fe00c27c4aa06658035e302553e1143",
+      "displayText": "U mořských koníků rodí mláďata samci."
+    },
+    {
+      "week": 17,
+      "runtimeId": "tajenka-v2-week-17",
+      "sourceId": "tajenka-v2-c24",
+      "geometrySha256": "3969c5febd6482b66c94fc5067c910540b0daa32e216c5f9179338cd87864857",
+      "displayText": "Hlemýžď má v tlamě tisíce drobných zubů."
+    },
+    {
+      "week": 18,
+      "runtimeId": "tajenka-v2-week-18",
+      "sourceId": "tajenka-v2-c26",
+      "geometrySha256": "2a57624a041b19da173f3fee68a9414937b0f26ed8f9770183027e2d3a372018",
+      "displayText": "Dolar má přes tolar české kořeny v Jáchymově."
+    },
+    {
+      "week": 19,
+      "runtimeId": "tajenka-v2-week-19",
+      "sourceId": "tajenka-v2-c27",
+      "geometrySha256": "a8a1fc377f5b9884df34c4bed14cf359f6e19ca219ea7dec510969c4cc9ff883",
+      "displayText": "Kostka cukru vznikla v Dačicích roku 1841."
+    },
+    {
+      "week": 20,
+      "runtimeId": "tajenka-v2-week-20",
+      "sourceId": "tajenka-v2-c28",
+      "geometrySha256": "e76ae63b4ffa02d56a4b55ace1a2a3a43870313329a16ba1d9820f585720f57d",
+      "displayText": "Pražský orloj existuje přes šest století."
+    },
+    {
+      "week": 21,
+      "runtimeId": "tajenka-v2-week-21",
+      "sourceId": "tajenka-v2-c29",
+      "geometrySha256": "44aaa9ff7eed94d258c6c3b959f360b49c3d906947aeb51df98a7d709a1946da",
+      "displayText": "Lepší vrabec v hrsti než holub na střeše."
+    },
+    {
+      "week": 22,
+      "runtimeId": "tajenka-v2-week-22",
+      "sourceId": "tajenka-v2-c31",
+      "geometrySha256": "44bb272d862e12c19d1d43c90317da5f505284fc945df23ce9af23c18bed3b19",
+      "displayText": "Návod oceníš teprve po druhé chybě."
+    },
+    {
+      "week": 23,
+      "runtimeId": "tajenka-v2-week-23",
+      "sourceId": "tajenka-v2-c32",
+      "geometrySha256": "28e58850965569f076800b5d1cabaeb222b81f8fffd7a9844f364078d25c1fd4",
+      "displayText": "Staré heslo si vybavíš hned po resetu."
+    },
+    {
+      "week": 24,
+      "runtimeId": "tajenka-v2-week-24",
+      "sourceId": "tajenka-v2-c34",
+      "geometrySha256": "e9840a55314f5683b559214d9297dda7b99552571d0cb07666225ac08ff9a5d6",
+      "displayText": "Lednice v noci nabízí lepší argumenty."
+    },
+    {
+      "week": 25,
+      "runtimeId": "tajenka-v2-week-25",
+      "sourceId": "tajenka-v2-c35",
+      "geometrySha256": "c5b4fbe3c3dbaca0495e4a25195d54ccc0e1f3bdac9899be9d8b8f51efcf527d",
+      "displayText": "Výtah přijede přesně, když vezmeš schody."
+    },
+    {
+      "week": 26,
+      "runtimeId": "tajenka-v2-week-26",
+      "sourceId": "tajenka-v2-c36",
+      "geometrySha256": "22be26dbd68d5ccf88a3b77c773e8fd7892d5fc5b766f2e7d8c1bc992351c3ee",
+      "displayText": "Káva vystydne vždycky během hovoru."
+    },
+    {
+      "week": 27,
+      "runtimeId": "tajenka-v2-week-27",
+      "sourceId": "tajenka-v2-c37",
+      "geometrySha256": "338402b1c60ba126a82bc14ff13aaa2c7bdd76eba301c8682827245f9452da53",
+      "displayText": "Čisté prádlo se skládá nejlépe zítra."
+    },
+    {
+      "week": 28,
+      "runtimeId": "tajenka-v2-week-28",
+      "sourceId": "tajenka-v2-c38",
+      "geometrySha256": "d7649056a7a2d337d873bf46952c8f3d9713db42733937e7e437b852a1f54d66",
+      "displayText": "Vysavač najde drobný šroubek dřív než ty."
+    },
+    {
+      "week": 29,
+      "runtimeId": "tajenka-v2-week-29",
+      "sourceId": "tajenka-v2-c39",
+      "geometrySha256": "9bbadc817d02fa18ff7b9eccc22916742fe54305606ff458b40db5fec02e54b4",
+      "displayText": "Čerstvě umyté okno přivolá déšť."
+    },
+    {
+      "week": 30,
+      "runtimeId": "tajenka-v2-week-30",
+      "sourceId": "tajenka-v2-c48",
+      "geometrySha256": "6c2d743be2d4649f11821871e4fada0780b2583485bc1bed36066c5a2c371453",
+      "displayText": "Rajče v lednici čeká na lepší časy."
+    },
+    {
+      "week": 31,
+      "runtimeId": "tajenka-v2-week-31",
+      "sourceId": "tajenka-v2-c49",
+      "geometrySha256": "21c20d303d9c03f61e1efebcccee899c1d6c795de7161056afd2723f392f1657",
+      "displayText": "Banán dozraje ve chvíli, kdy odejdeš z domu."
+    },
+    {
+      "week": 32,
+      "runtimeId": "tajenka-v2-week-32",
+      "sourceId": "tajenka-v2-c50",
+      "geometrySha256": "8d67d1a57cd6053a0f242fcc0bf80c8c260633a17ea4deac838de1a0a2196646",
+      "displayText": "Motýl poznává chutě pomocí nohou."
+    },
+    {
+      "week": 33,
+      "runtimeId": "tajenka-v2-week-33",
+      "sourceId": "tajenka-v2-c51",
+      "geometrySha256": "0115212ef8f561264734f497cfc72465129bbc8bbb980c3a71508a24a726360e",
+      "displayText": "Sovy nehýbou očima, proto otáčejí hlavou."
+    },
+    {
+      "week": 34,
+      "runtimeId": "tajenka-v2-week-34",
+      "sourceId": "tajenka-v2-c52",
+      "geometrySha256": "f3930f98c0d1b1c326ba4ddf7c2c77126bacab1d50ec760e3fbf5370c68e1da6",
+      "displayText": "Kolibříci umějí létat také pozpátku."
+    },
+    {
+      "week": 35,
+      "runtimeId": "tajenka-v2-week-35",
+      "sourceId": "tajenka-v2-c54",
+      "geometrySha256": "b345f7c95fc4e809b72efdd25c8cab885411790c494a867f1aad5721be11b619",
+      "displayText": "Co můžeš udělat dnes, neodkládej na zítřek."
+    },
+    {
+      "week": 36,
+      "runtimeId": "tajenka-v2-week-36",
+      "sourceId": "tajenka-v2-c56",
+      "geometrySha256": "ecc4234aae9d61536007e7b81d6daefe21f5e6cb3f59371373d9101b81c14642",
+      "displayText": "„Kdo chvíli stál, již stojí opodál.“"
+    },
+    {
+      "week": 37,
+      "runtimeId": "tajenka-v2-week-37",
+      "sourceId": "tajenka-v2-c57",
+      "geometrySha256": "d16ed734bfdbfb1049a5a447d0e5a2e263c03fce04369b89055c6be04a8729f5",
+      "displayText": "Jablko nepadá daleko od stromu."
+    }
+  ]
+}

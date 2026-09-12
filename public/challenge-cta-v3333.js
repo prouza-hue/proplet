@@ -21,27 +21,23 @@
     }
   }
 
-  function syncWinLayout(win,challengeMode){
-    const modal=$('#winModal');
-    const primary=$('#winPrimaryBtn');
-    const secondary=modal?.querySelector('.win-secondary-actions');
-    let row=modal?.querySelector('.win-main-actions');
-    if(!modal||!primary||!secondary)return;
+  function syncWinLayout(win){
+    const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
+    if(!primary||!summary||!secondary)return;
+    // The next game is always the first action, before the standings.
+    if(summary.nextElementSibling!==primary)summary.after(primary);
+    if(win.parentElement!==secondary)secondary.prepend(win);
+    modal.querySelector('.win-main-actions')?.remove();
+  }
 
-    const pair=challengeMode&&!modal.classList.contains('hidden')&&!win.classList.contains('hidden');
-    if(pair){
-      if(!row){
-        row=document.createElement('div');
-        row.className='win-main-actions';
-        primary.before(row);
-      }
-      if(primary.parentElement!==row)row.appendChild(primary);
-      if(win.parentElement!==row)row.appendChild(win);
-    }else if(row){
-      row.before(primary);
-      secondary.insertBefore(win,secondary.firstChild);
-      row.remove();
-    }
+  function setChallengeContent(el){
+    if(el.querySelector(':scope > .painted-action-icon')&&el.textContent.trim()==='Vyzvat kamaráda')return;
+    const icon=document.createElement('img');
+    icon.src='/rewards/printshop/challenge.svg?v=icons1';
+    icon.className='painted-action-icon';icon.alt='';icon.width=24;icon.height=24;
+    icon.setAttribute('aria-hidden','true');
+    el.replaceChildren(icon,document.createTextNode(' Vyzvat kamaráda'));
+    el.classList.add('painted-action-control');
   }
 
   function syncDailyLayout(daily){
@@ -78,7 +74,7 @@
 
     if(win){
       if(challengeMode){
-        setText(win,'⚔️ Vyzvat kamaráda');
+        setChallengeContent(win);
         setClass(win,'challenge-share-cta',true);
         setAriaLabel(win,dailyGame?'Vyzvat kamaráda na dnešní Proplet':'Vyzvat kamaráda na stejný Proplet');
       }else{
@@ -90,14 +86,14 @@
     }
 
     if(daily){
-      setText(daily,'⚔️ Vyzvat kamaráda');
+      setChallengeContent(daily);
       setClass(daily,'daily-challenge-cta',true);
       setAriaLabel(daily,'Vyzvat kamaráda na dnešní Proplet');
       syncDailyLayout(daily);
     }
 
     if(detail){
-      setText(detail,'⚔️ Vyzvat kamaráda');
+      setChallengeContent(detail);
       setClass(detail,'challenge-share-cta',true);
       setClass(detail,'challenge-share-detail-cta',true);
       setAriaLabel(detail,'Vyzvat kamaráda na tuto úroveň');

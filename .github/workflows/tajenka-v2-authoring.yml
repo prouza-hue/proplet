@@ -1,0 +1,87 @@
+name: Tajenka v2 authoring smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - 'content/tajenka-v2/**'
+      - 'tools/build_tajenka_v2_candidates.py'
+      - 'tools/validate_tajenka_content_v2.py'
+      - 'tools/test_tajenka_content_v2.py'
+      - '.github/workflows/tajenka-v2-authoring.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tajenka-v2-authoring-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  authoring-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Syntax checks
+        run: |
+          python -m py_compile \
+            tools/validate_tajenka_content_v2.py \
+            tools/test_tajenka_content_v2.py \
+            tools/build_tajenka_v2_candidates.py
+
+      - name: Validate editorial contract
+        run: |
+          python tools/validate_tajenka_content_v2.py
+          python tools/test_tajenka_content_v2.py
+
+      - name: Generate representative boards against production lexicon
+        run: |
+          python tools/build_tajenka_v2_candidates.py \
+            --attempts 6 \
+            --ids \
+              tajenka-v2-c03 \
+              tajenka-v2-c16 \
+              tajenka-v2-c18 \
+              tajenka-v2-c28 \
+              tajenka-v2-c29 \
+              tajenka-v2-c55 \
+              tajenka-v2-c56 \
+            --output /tmp/tajenka-v2-board-candidates.json
+
+      - name: Verify representative output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/tajenka-v2-board-candidates.json').read_text(encoding='utf-8'))
+          assert payload.get('runtimeEnabled') is False
+          boards = {board['id']: board for board in payload.get('boards', [])}
+          failures = payload.get('failures', [])
+          required = {'tajenka-v2-c55', 'tajenka-v2-c56'}
+          missing_required = required - set(boards)
+          assert not missing_required, f'Edge-case boards did not generate: {sorted(missing_required)}; failures={failures}'
+          assert len(boards) >= 5, f'Expected at least 5/7 representative boards, got {len(boards)}; failures={failures}'
+          for board in boards.values():
+              assert board['runtimeEnabled'] is False
+              assert board['meta']['alternativeFullPaths'] == 0
+              assert 24 <= board['meta']['targetLetters'] <= 31
+              assert 3 <= board['meta']['decoyCells'] <= 8
+              assert 2 <= board['meta']['holes'] <= 5
+          print(f"Representative Tajenka v2 boards: PASS {len(boards)}/7; failures={len(failures)}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tajenka-v2-board-candidates
+          path: /tmp/tajenka-v2-board-candidates.json
+          if-no-files-found: warn

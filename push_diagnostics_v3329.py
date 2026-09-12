@@ -51,6 +51,7 @@ def install_push_diagnostics(
     vercel_env = os.environ.get("VERCEL_ENV", "").strip().lower()
     tajenka_release_enabled = vercel_env == "production" and os.environ.get("PROPLET_TAJENKA_RELEASE_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
     tajenka_first_saturday = date(2026, 8, 29)
+    tajenka_twice_weekly_start = date(2026, 9, 12)
     canonical_origin = str(_kwargs.get("canonical_origin") or "https://hrajproplet.cz").rstrip("/")
 
     def now():
@@ -204,9 +205,15 @@ def install_push_diagnostics(
         today = today_iso()
         today_date = date.fromisoformat(today)
         tajenka_week = None
-        if tajenka_release_enabled and today_date >= tajenka_first_saturday and today_date.weekday() == 5:
-            candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1
-            tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None
+        if tajenka_release_enabled and today_date >= tajenka_first_saturday:
+            release_day = today_date.weekday() == 5 if today_date < tajenka_twice_weekly_start else today_date.weekday() in {2, 5}
+            if release_day:
+                if today_date < tajenka_twice_weekly_start:
+                    candidate_week = (today_date - tajenka_first_saturday).days // 7 + 1
+                else:
+                    cadence_offset = (today_date - tajenka_twice_weekly_start).days
+                    candidate_week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)
+                tajenka_week = candidate_week if 1 <= candidate_week <= 10 else None
         tajenka_id = f"tajenka-v2-week-{tajenka_week:02d}" if tajenka_week else None
         batch = None
         if callable(released_batches):
@@ -249,7 +256,7 @@ def install_push_diagnostics(
             category = "content"
         elif tajenka_id:
             payload = {
-                "title": "✨ Víkendová Tajenka je tady",
+                "title": "✨ Nová Tajenka je tady",
                 "body": "Pět slov, jedna myšlenka a 200 XP. Odhalíš ji?",
                 "url": f"{canonical_origin}/?open=tajenka&via=push-tajenka",
                 "tag": f"proplet-{tajenka_id}",

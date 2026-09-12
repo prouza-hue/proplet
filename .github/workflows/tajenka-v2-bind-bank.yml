@@ -1,0 +1,73 @@
+name: Bind Tajenka v2 candidate bank
+
+on:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - '.github/workflows/tajenka-v2-bind-bank.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tajenka-v2-bind-bank
+  cancel-in-progress: true
+
+jobs:
+  bind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ux/tiskarska-dilna
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validate editorial contract
+        run: |
+          python tools/validate_tajenka_content_v2.py
+          python tools/test_tajenka_content_v2.py
+
+      - name: Build canonical non-runtime candidate bank
+        run: |
+          python tools/build_tajenka_v2_candidates.py \
+            --attempts 20 \
+            --output data/tajenka_v2_board_candidates.json
+
+      - name: Verify complete bank
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('data/tajenka_v2_board_candidates.json')
+          payload = json.loads(path.read_text(encoding='utf-8'))
+          boards = payload.get('boards') or []
+          failures = payload.get('failures') or []
+          assert payload.get('runtimeEnabled') is False
+          assert len(boards) == 41, f'Expected 41 boards, got {len(boards)}; failures={failures}'
+          assert not failures, failures
+          assert len({b['id'] for b in boards}) == 41
+          assert all(b.get('runtimeEnabled') is False for b in boards)
+          assert all((b.get('meta') or {}).get('alternativeFullPaths') == 0 for b in boards)
+          assert any(len(b.get('answers') or []) == 4 for b in boards)
+          assert any(any(len(str(a.get('word') or '')) == 3 for a in b.get('answers') or []) for b in boards)
+          print('Tajenka v2 candidate bank: 41/41 PASS, runtime disabled')
+          PY
+
+      - name: Commit canonical bank
+        run: |
+          git config user.name "proplet-authoring-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/tajenka_v2_board_candidates.json
+          if git diff --cached --quiet; then
+            echo "Candidate bank is already current."
+            exit 0
+          fi
+          git commit -m "[tajenka-v2] Bind 41-board candidate bank"
+          git push origin HEAD:ux/tiskarska-dilna

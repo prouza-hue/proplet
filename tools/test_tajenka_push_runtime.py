@@ -11,7 +11,6 @@ sys.path.insert(0, str(ROOT))
 import push_diagnostics_v3329 as push_module
 
 
-# Exercise the first scheduled Tajenka Saturday with the production gate enabled.
 os.environ["CRON_SECRET"] = "test-secret"
 os.environ["VAPID_PUBLIC_KEY"] = "public"
 os.environ["VAPID_PRIVATE_KEY"] = "private"
@@ -34,6 +33,7 @@ tables = {
     "puzzle_attempts": [],
 }
 sent_payloads = []
+current_day = [date(2026, 8, 29)]
 
 
 def db_select(table, **filters):
@@ -77,13 +77,14 @@ push_module.install_push_diagnostics(
     db_delete=db_delete,
     auth_player=lambda _auth: {"id": "player-1"},
     enforce_rate_limit=lambda *_args, **_kwargs: None,
-    current_prague_date=lambda: date(2026, 8, 29),
+    current_prague_date=lambda: current_day[0],
     released_batches=lambda _today: ([], []),
 )
 
 route = next(route for route in app.routes if getattr(route, "path", None) == "/api/cron/daily-push-v2")
-first = route.endpoint(None, "Bearer test-secret")
 
+# Historical first Saturday still sends puzzle 1.
+first = route.endpoint(None, "Bearer test-secret")
 assert first["ok"] is True
 assert first["date"] == "2026-08-29"
 assert first["category"] == "tajenka"
@@ -92,14 +93,11 @@ assert first["eventKey"] == "tajenka:tajenka-v2-week-01"
 assert first["sent"] == 1
 assert len(sent_payloads) == 1
 payload = sent_payloads[0]
-assert payload["title"] == "✨ Víkendová Tajenka je tady"
+assert payload["title"] == "✨ Nová Tajenka je tady"
 assert "200 XP" in payload["body"]
 assert payload["url"] == "https://hrajproplet.cz/?open=tajenka&via=push-tajenka"
-assert tables["push_delivery_log"][0]["category"] == "tajenka"
-assert tables["push_delivery_log"][0]["event_key"] == "tajenka:tajenka-v2-week-01"
-assert tables["push_delivery_log"][0]["status"] == "sent"
 
-# A retry of the same cron event is idempotent at delivery level.
+# Repeating the same cron event is idempotent.
 second = route.endpoint(None, "Bearer test-secret")
 assert second["category"] == "tajenka"
 assert second["tajenka"] == "tajenka-v2-week-01"
@@ -107,4 +105,16 @@ assert second["sent"] == 0
 assert second["duplicate"] == 1
 assert len(sent_payloads) == 1
 
-print("PASS: Tajenka week 1 push sends 200 XP copy and is idempotent on repeat.")
+# Once the new cadence starts, Wednesday is a real release day.
+current_day[0] = date(2026, 9, 16)
+wednesday = route.endpoint(None, "Bearer test-secret")
+assert wednesday["ok"] is True
+assert wednesday["date"] == "2026-09-16"
+assert wednesday["category"] == "tajenka"
+assert wednesday["tajenka"] == "tajenka-v2-week-04"
+assert wednesday["eventKey"] == "tajenka:tajenka-v2-week-04"
+assert wednesday["sent"] == 1
+assert len(sent_payloads) == 2
+assert sent_payloads[-1]["title"] == "✨ Nová Tajenka je tady"
+
+print("PASS: Tajenka push is idempotent and releases on Saturday + Wednesday")

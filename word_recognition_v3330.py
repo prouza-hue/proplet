@@ -36,7 +36,8 @@ WORD_DISCOVERY_REWARD_PREFIX = "word_discovery_v1:"
 WORD_DISCOVERY_XP = 1
 WORD_DISCOVERY_BOARD_XP_LIMIT = 5
 WORD_DISCOVERY_DAILY_XP_LIMIT = 50
-RECOGNITION_VERSION = 4
+RECOGNITION_VERSION = 5
+RECOGNITION_BLOCKLIST = frozenset({"negr"})
 
 _CZECH_WORD = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.IGNORECASE)
 _CZECH_DIACRITICS = frozenset("áčďéěíňóřšťúůýž")
@@ -56,7 +57,7 @@ def _normalize(value: str) -> str:
 
 
 def _acceptable(value: str) -> bool:
-    return 4 <= len(value) <= 24 and bool(_CZECH_WORD.fullmatch(value))
+    return 4 <= len(value) <= 24 and value not in RECOGNITION_BLOCKLIST and bool(_CZECH_WORD.fullmatch(value))
 
 
 def _discovery_reward_key(puzzle_id: str, word: str) -> str:

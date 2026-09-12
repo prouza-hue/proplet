@@ -3,36 +3,40 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6c5ce7" data-light-color="#6c5ce7" />
+  <meta name="theme-color" content="#FDFBF7" data-light-color="#FDFBF7" />
   <meta name="color-scheme" content="light dark" />
   <script src="/runtime-meta.js" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=40140-s13b-pes1"></script>
+  <script src="/theme-init.js?v=fix20"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="description" content="Proplet – česká slovní hra, která umí příjemně zamotat hlavu. Najdi všechna slova a propleť celou plochu." />
+  <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content="Proplet" />
-  <meta property="og:title" content="Proplet – česká slovní hra" />
-  <meta property="og:description" content="Najdi všechna slova, propleť celou plochu a dej si každý den novou výzvu." />
-  <meta property="og:url" content="https://hrajproplet.cz/" />
-  <meta property="og:image" content="https://hrajproplet.cz/share-card.png" />
+  <meta property="og:title" content="Proplet – rozpleť si hlavu." />
+  <meta property="og:description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
+  <meta property="og:url" content="https://proplet-git-ux-tiskarska-dilna-pavel-prouzas-projects.vercel.app/" />
+  <meta property="og:image" content="https://proplet-git-ux-tiskarska-dilna-pavel-prouzas-projects.vercel.app/share-card.png?v=brand1" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:alt" content="Proplet – česká slovní hra s barevnou mřížkou písmen" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Proplet – česká slovní hra" />
-  <meta name="twitter:description" content="Najdi všechna slova a propleť celou plochu." />
-  <meta name="twitter:image" content="https://hrajproplet.cz/share-card.png" />
+  <meta name="twitter:title" content="Proplet – rozpleť si hlavu." />
+  <meta name="twitter:description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
+  <meta name="twitter:image" content="https://proplet-git-ux-tiskarska-dilna-pavel-prouzas-projects.vercel.app/share-card.png?v=brand1" />
   <link rel="canonical" href="https://hrajproplet.cz/" />
-  <title>Proplet – česká slovní hra</title>
-  <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <title>Proplet – rozpleť si hlavu.</title>
+  <link rel="manifest" href="/manifest.webmanifest?v=brand1" />
+  <link rel="icon" href="/favicon.svg?v=brand1" type="image/svg+xml" />
+  <link rel="icon" href="/brand/mark-16.png?v=brand1" sizes="16x16" type="image/png" />
+  <link rel="icon" href="/favicon-32.png?v=brand1" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=brand1" sizes="180x180" />
   <link rel="stylesheet" href="/styles.css?v=40140-s12a2r2" />
   <link rel="stylesheet" href="/quality-v334.css?v=4" />
+  <link rel="stylesheet" href="/organic-ui-v4023.css?v=11" />
+  <link rel="stylesheet" href="/ribbon-ui.css?v=fix20" />
+  <link rel="stylesheet" href="/printshop-ui.css?v=fix20" />
 </head>
 <body>
   <div class="ambient ambient-one"></div>
@@ -41,10 +45,10 @@
   <main class="app-shell">
     <header class="app-header">
       <button class="brand" data-nav="daily" aria-label="Proplet – domů">
-        <span class="brand-mark"><span>P</span></span>
+        <span class="brand-mark"><img src="/brand/mark.svg?v=brand1" alt="" aria-hidden="true" /></span>
         <span class="brand-copy"><strong>Proplet</strong><small>česká slovní hra</small></span>
       </button>
-      <button id="profileChip" class="profile-chip" data-nav="profile"><span id="profileChipAvatar" class="avatar-dot">🙂</span><span id="profileChipText">Hráč</span></button>
+      <button id="profileChip" class="profile-chip" data-nav="profile"><span id="profileChipAvatar" class="avatar-dot">HR</span><span id="profileChipText">Hráč</span></button>
     </header>
 
     <section id="screen-daily" class="screen active">
@@ -234,6 +238,8 @@
           <div class="current-word card">
             <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
             <span id="cleanStatus" class="clean-status">✨ Čistě</span>
+            <div id="gameMessage" class="game-message" aria-live="polite"></div>
+            <div id="magnifierDock" aria-hidden="true"></div>
           </div>
 
           <div id="tajenkaPhrase" class="tajenka-phrase card hidden" aria-live="polite"></div>
@@ -252,9 +258,8 @@
         </div>
 
         <aside class="game-control-column">
-          <div id="gameMessage" class="game-message" aria-live="polite"></div>
           <div class="game-actions">
-            <button id="hintBtn" class="secondary-btn">💡 Nápověda</button>
+            <button id="hintBtn" class="secondary-btn" aria-label="Nápověda" title="Nápověda">💡 Nápověda</button>
             <button id="magnifierQuickBtn" class="secondary-btn magnifier-quick-btn hidden" type="button" aria-label="Vypnout lupu při tahu" aria-pressed="true" title="Lupa při tahu">🔍</button>
           </div>
           <div id="starterHintNudge" class="starter-hint-nudge hidden" role="status" aria-live="polite">
@@ -289,6 +294,7 @@
         <p id="winText" class="muted"></p>
         <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
       </div>
+      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
       <div id="tajenkaWinPhrase" class="tajenka-win-phrase hidden" aria-live="polite"></div>
       <div id="levelLeaderboardBox" class="level-leaderboard-box hidden"></div>
       <button id="winAccountBtn" class="win-account-btn hidden">☁️ Uložit postup a zobrazit své místo</button>
@@ -298,7 +304,6 @@
         <button id="starterWarmupBtn" class="starter-choice-btn starter-choice-warmup"><span class="starter-choice-icon" aria-hidden="true">🌱</span><span><strong>Snadná</strong><small>Na rozjezd</small></span></button>
         <button id="starterHardDailyBtn" class="starter-choice-btn starter-choice-hard"><span class="starter-choice-icon" aria-hidden="true">🔥</span><span><strong>Dnešní Těžká</strong><small>Jdu rovnou</small></span></button>
       </div>
-      <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
       <div class="win-secondary-actions" aria-label="Další akce">
         <button id="winShareBtn" class="win-utility-btn hidden">↗ Sdílet</button>
         <button id="winReplayBtn" class="win-utility-btn hidden">↻ Znovu</button>
@@ -577,7 +582,7 @@
       <button id="closeRankingPrivacyModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">🏆 NOVÉ POŘADÍ</span>
       <h2>Pořadí je teď společné</h2>
-      <p class="muted">Když se zapojíš, ostatní uvidí jen tvůj emoji avatar, herní jméno a případně veřejný název týmu. Když ne, tvoje výsledky v pořadí zůstanou pod anonymní přezdívkou.</p>
+      <p class="muted">Když se zapojíš, ostatní uvidí jen tvůj zvolený herní avatar, herní jméno a případně veřejný název týmu. Když ne, tvoje výsledky v pořadí zůstanou pod anonymní přezdívkou.</p>
       <div class="ranking-privacy-preview"><span id="rankingPrivacyPreviewAvatar">🙂</span><div><strong id="rankingPrivacyPreviewName">Hráč</strong><small>Takto bude vypadat tvůj veřejný profil.</small></div></div>
       <button id="acceptRankingPrivacyBtn" class="primary-btn big">Rozumím · zapojit mě</button>
       <button id="hideRankingPrivacyBtn" class="secondary-btn bigish">Zůstat anonymně</button>
@@ -638,7 +643,7 @@
   <script src="/app/account/account.js"></script>
   <script src="/app/game/state.js"></script>
   <script src="/app/game/board.js"></script>
-  <script src="/app/game/input.js"></script>
+  <script src="/app/game/input.js?v=fix20"></script>
   <script src="/app/game/hints.js"></script>
   <script src="/app/core/completion-pipeline.js"></script>
   <script src="/app/core/result-queue.js"></script>
@@ -646,8 +651,11 @@
   <script src="/app/engagement/nudges.js?v=40140-s12b1"></script>
   <script src="/app/content/progression.js?v=40140-s12b2"></script>
   <script src="/app/content/daily.js?v=40140-s12b2"></script>
-  <script src="/app/rankings/rankings.js?v=40140-s12b3"></script>
-  <script src="/app.js?v=4022-pes2"></script>
-  <script src="/quality-v334.js?v=40132"></script>
+  <script src="/app/rankings/rankings.js?v=fixsep8c"></script>
+  <script src="/ribbon-catalog.js?v=icons1"></script>
+  <script src="/ribbon-ui.js?v=icons1"></script>
+  <script src="/app.js?v=4022-fix20"></script>
+  <script src="/quality-v334.js?v=fixsep8b"></script>
+  <script src="/organic-ui-v4023.js?v=fix20"></script>
 </body>
 </html>

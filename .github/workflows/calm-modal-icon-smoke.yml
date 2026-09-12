@@ -1,0 +1,59 @@
+name: Calm modal icon smoke
+
+on:
+  push:
+    branches: [feature/tajenka-v2-production]
+    paths:
+      - '.github/workflows/calm-modal-icon-smoke.yml'
+  workflow_dispatch:
+
+permissions: {contents: read}
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PREVIEW_URL: https://proplet-git-feature-tajenka-v2-pr-7166ab-pavel-prouzas-projects.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check playwright==1.57.0
+      - name: Inspect real Calm button and modal icon
+        shell: bash
+        run: |
+          cat > /tmp/calm_icon_inspect.py <<'PY'
+          import os, json
+          from playwright.sync_api import sync_playwright
+
+          url=os.environ['PREVIEW_URL'].rstrip('/')+'/?tajenka=1&tajenka_week=1'
+          chrome=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox','--disable-dev-shm-usage'])
+              page=browser.new_page(viewport={'width':1440,'height':900})
+              page.goto(url,wait_until='domcontentloaded',timeout=30000)
+              page.wait_for_timeout(4000)
+              page.wait_for_selector('#calmRunBtn',state='attached',timeout=15000)
+              button=page.evaluate("""()=>{
+                const el=document.querySelector('#calmRunBtn');
+                const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
+                return {outer:el.outerHTML,html:el.innerHTML,text:el.textContent,
+                  before:{content:before.content,bg:before.backgroundImage,display:before.display,width:before.width,height:before.height},
+                  after:{content:after.content,bg:after.backgroundImage,display:after.display,width:after.width,height:after.height}};
+              }""")
+              print('BUTTON='+json.dumps(button,ensure_ascii=False))
+              page.locator('#calmRunBtn').click(force=True)
+              page.wait_for_selector('#calmConfirmModal:not(.hidden)',state='visible',timeout=10000)
+              page.wait_for_timeout(500)
+              modal=page.evaluate("""()=>{
+                const el=document.querySelector('#calmConfirmModal .calm-confirm-icon');
+                const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
+                return {outer:el.outerHTML,html:el.innerHTML,text:el.textContent,
+                  before:{content:before.content,bg:before.backgroundImage,display:before.display,width:before.width,height:before.height},
+                  after:{content:after.content,bg:after.backgroundImage,display:after.display,width:after.width,height:after.height}};
+              }""")
+              print('MODAL='+json.dumps(modal,ensure_ascii=False))
+              browser.close()
+          PY
+          python /tmp/calm_icon_inspect.py

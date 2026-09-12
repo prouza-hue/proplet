@@ -48,9 +48,8 @@ openapi_contract = server.app.openapi()
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # Release publication changes APP_VERSION without changing the HTTP schema.
 # Normalize only that metadata field back to the characterization baseline;
-# every path, method, component and field remains covered. The normalized
-# baseline below was recaptured from the unchanged production backend at
-# main d7252e4d after legitimate post-Sprint-04 contract additions.
+# every path, method, component and field remains covered. Tajenka v2
+# intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_snapshot = json.dumps(
@@ -58,7 +57,7 @@ openapi_snapshot = json.dumps(
 )
 openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
 assert openapi_digest == (
-    "b3b70b2206d36b196201f10846da107d3ab43b92373c097984f658cbed351674"
+    "048d390c79a6b1615e0b0f10b1673b5326116738b87a6b2f07f0096b918c3a2d"
 ), f"current OpenAPI digest: {openapi_digest}"
 
 
@@ -301,7 +300,7 @@ with (
     )
 response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
 assert response_fixture_digest == (
-    "702932e4b85aa0082c150c4cde680af520ab3ac4cef2a6700773b03b87e4e64c"
+    "5d3be33f8357f8d0a69e49752c955af23df4a6cd8185677850334e454fce226c"
 ), f"current response fixture digest: {response_fixture_digest}"
 
 

@@ -1,0 +1,71 @@
+name: Tajenka v2 full board calibration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - '.github/workflows/tajenka-v2-full-calibration.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tajenka-v2-full-calibration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validate editorial contract
+        run: |
+          python tools/validate_tajenka_content_v2.py
+          python tools/test_tajenka_content_v2.py
+
+      - name: Generate all structurally approved Tajenka v2 boards
+        run: |
+          python tools/build_tajenka_v2_candidates.py \
+            --attempts 6 \
+            --output /tmp/tajenka-v2-full-calibration.json
+
+      - name: Verify calibration output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/tajenka-v2-full-calibration.json').read_text(encoding='utf-8'))
+          assert payload.get('runtimeEnabled') is False
+          boards = payload.get('boards', [])
+          failures = payload.get('failures', [])
+          assert len(boards) + len(failures) == 41, (len(boards), len(failures))
+          assert len(boards) >= 30, f'Board yield below calibration floor: {len(boards)}/41; failures={failures}'
+          ids = {board['id'] for board in boards}
+          assert 'tajenka-v2-c55' in ids, '4-anchor immutable smoke case failed'
+          assert 'tajenka-v2-c56' in ids, '3-letter meaningful anchor smoke case failed'
+          for board in boards:
+              assert board['runtimeEnabled'] is False
+              assert board['meta']['alternativeFullPaths'] == 0
+              assert 24 <= board['meta']['targetLetters'] <= 31
+              assert 3 <= board['meta']['decoyCells'] <= 8
+              assert 2 <= board['meta']['holes'] <= 5
+          print(f"FULL CALIBRATION: PASS boards={len(boards)}/41 failures={len(failures)}")
+          if failures:
+              print('FAILURE IDS:', ', '.join(item['id'] for item in failures))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tajenka-v2-full-calibration
+          path: /tmp/tajenka-v2-full-calibration.json
+          if-no-files-found: warn

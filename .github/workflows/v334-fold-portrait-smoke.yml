@@ -1,182 +1,153 @@
-name: v3.34 Fold portrait + privacy icon smoke
+name: Printshop browser smoke
 
 on:
   pull_request:
     branches: [main]
-    paths: ['.github/workflows/v334-fold-portrait-smoke.yml']
+    paths:
+      - 'public/**'
+      - 'backend/**'
+      - 'server.py'
+      - 'data/**'
+      - 'content/**'
+      - '.github/workflows/v334-fold-portrait-smoke.yml'
+  workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {contents: read}
 
 jobs:
-  fold-and-icon:
+  printshop-ui:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
-      PREVIEW_URL: https://proplet-git-agent-v3340-medium-ca-024677-pavel-prouzas-projects.vercel.app
+      PREVIEW_URL: https://proplet-git-ux-tiskarska-dilna-pavel-prouzas-projects.vercel.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+        with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check playwright==1.57.0
-      - name: Verify real-Fold portrait rail, centered mask, superseded modal and privacy icon
+      - name: Verify Tiskařská dílna in real Chromium
         shell: bash
         run: |
-          cat > /tmp/fold_smoke.py <<'PY'
+          cat > /tmp/printshop_smoke.py <<'PY'
           import json, os, time, urllib.request
           from playwright.sync_api import sync_playwright
 
           URL=os.environ['PREVIEW_URL'].rstrip('/')
           CHROME=next(p for p in ('/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser') if os.path.exists(p))
-          OUT='/tmp/proplet-fold-smoke';os.makedirs(OUT,exist_ok=True)
-          result={}
+          OUT='/tmp/proplet-printshop-smoke';os.makedirs(OUT,exist_ok=True)
 
-          # Stable branch aliases can lag GitHub by a few seconds. Do not test the previous deployment.
-          deadline=time.time()+75
+          deadline=time.time()+120
           while True:
               try:
-                  with urllib.request.urlopen(URL+'/game-layout-v3330.js?qa='+str(time.time()),timeout=8) as r: layout_src=r.read().decode('utf-8','replace')
-                  with urllib.request.urlopen(URL+'/quality-v334.js?qa='+str(time.time()),timeout=8) as r: quality_src=r.read().decode('utf-8','replace')
-                  with urllib.request.urlopen(URL+'/release-notes-v3331.js?qa='+str(time.time()),timeout=8) as r: release_src=r.read().decode('utf-8','replace')
-                  if "TABLET_PORTRAIT_CLASS='game-tablet-portrait'" in layout_src and "icon.className='ranking-privacy-mini-icon'" in quality_src and 'supersededByGen4' in release_src:break
-              except Exception:pass
-              if time.time()>deadline:raise AssertionError('preview alias did not reach current Fold/modal/icon fix')
+                  with urllib.request.urlopen(URL+'/api/health?qa='+str(time.time()),timeout=8) as r:
+                      health=json.loads(r.read().decode('utf-8'))
+                  if health.get('ok') is True and health.get('database') is True:
+                      break
+              except Exception:
+                  pass
+              if time.time()>deadline:
+                  raise AssertionError('preview alias did not become healthy')
               time.sleep(2)
 
-          def wait(page,expr,timeout=12000):
-              end=time.time()+timeout/1000;last=None
-              while time.time()<end:
-                  try:
-                      last=page.evaluate(expr)
-                      if last:return last
-                  except Exception as e:last=repr(e)
-                  time.sleep(.1)
-              raise AssertionError(f'timeout: {expr}; last={last!r}')
-
-          def dismiss_overlays(page):
+          def settle_returning_player(page):
+              # The smoke tests the returning-player application, not onboarding.
+              # Wait until the real onboarding patches have finished installing,
+              # then close through the canonical production function so no later
+              # async installer can reopen the modal and invalidate navigation.
+              page.wait_for_function("()=>window.__PROPLET_ONBOARDING_MODEL_V3328__===true && window.__PROPLET_ONBOARDING_RETURN_V3332__===true",timeout=8000)
               page.evaluate("""()=>{
-                try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');sessionStorage.setItem('proplet-gen4-release-modal-v1','1')}catch(e){}
-                document.querySelector('#qualityReleaseModal')?.classList.add('hidden');
-                document.querySelector('#onboardingModal')?.classList.add('hidden');
+                try{
+                  localStorage.setItem('proplet-v3-7-required-onboarding','done');
+                  localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
+                  localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
+                  sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
+                }catch(e){}
+                try{if(typeof closeOnboarding==='function')closeOnboarding(true)}catch(e){}
+                document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
                 document.documentElement.classList.remove('gen4-preview-booting');
               }""")
+              page.wait_for_function("()=>document.querySelector('#onboardingModal')?.classList.contains('hidden')!==false",timeout=5000)
 
-          def boot_game(browser,w,h,sw,sh,touch,label,bank='medium',pick='first'):
-              ctx=browser.new_context(viewport={'width':w,'height':h},screen={'width':sw,'height':sh},has_touch=touch,is_mobile=touch,service_workers='block')
-              page=ctx.new_page();errs=[]
-              page.on('pageerror',lambda e:errs.append(str(e)))
-              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-              wait(page,f"typeof startGame==='function' && !!puzzleDB?.free?.{bank}?.[0]")
-              dismiss_overlays(page)
-              if pick=='biased':
-                  info=page.evaluate("""()=>{
-                    const all=Object.values(puzzleDB.free||{}).flat();
-                    const score=p=>{const rows=(p.mask||[]).map(i=>Math.floor(Number(i)/p.cols));if(!rows.length)return 0;const lo=Math.min(...rows),hi=Math.max(...rows);return Math.abs((lo+hi)/2-(p.rows-1)/2)};
-                    const p=[...all].sort((a,b)=>score(b)-score(a))[0];startGame(p,'free');return {id:p.id,score:score(p)};
-                  }""")
-              else:
-                  info=page.evaluate(f"()=>{{const p=puzzleDB.free.{bank}[0];startGame(p,'free');return {{id:p.id}}}}")
-              wait(page,"document.body.classList.contains('playing')")
-              page.wait_for_timeout(900)
-              state=page.evaluate("""()=>({
-                mode:document.documentElement.dataset.gameLayoutMode,
-                orient:document.documentElement.dataset.gameLayoutOrientation,
-                device:document.documentElement.dataset.gameLayoutDevice,
-                metrics:document.documentElement.dataset.gameLayoutMetrics,
-                cols:getComputedStyle(document.querySelector('.game-main')).gridTemplateColumns,
-                currentParent:document.querySelector('.current-word')?.parentElement?.className||'',
-                infoParent:document.querySelector('.game-info')?.parentElement?.className||'',
-                rail:document.querySelector('.game-control-column')?.getBoundingClientRect().width||0,
-                boardStage:document.querySelector('.board-stage')?.getBoundingClientRect(),
-                cellFont:parseFloat(getComputedStyle(document.querySelector('#board .cell')).fontSize)||0,
-                overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth
-              })""")
-              state['puzzle']=info
-              page.screenshot(path=f'{OUT}/{label}.png',full_page=True)
-              assert not errs,(label,errs)
-              return ctx,page,state
-
+          result={'health':health}
           with sync_playwright() as p:
-              b=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
+              browser=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
+              for label,viewport in [
+                  ('mobile',{'width':390,'height':844}),
+                  ('fold',{'width':768,'height':1000}),
+                  ('desktop',{'width':1440,'height':900}),
+              ]:
+                  ctx=browser.new_context(viewport=viewport)
+                  # Seed canonical returning-player keys before any app script runs.
+                  ctx.add_init_script("""()=>{
+                    try{
+                      localStorage.setItem('proplet-v3-7-required-onboarding','done');
+                      localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
+                      localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
+                      sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
+                    }catch(e){}
+                  }""")
+                  page=ctx.new_page(); errors=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+                  page.wait_for_function("()=>document.documentElement.classList.contains('tiskarna-ui')",timeout=15000)
+                  # Boot-ready invariant: renderFree() runs only after bind(), so a
+                  # populated difficulty grid means bottom-nav listeners are attached.
+                  page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0] && document.querySelectorAll('#difficultyCards .difficulty-card').length>=4",timeout=15000)
+                  settle_returning_player(page)
+                  page.wait_for_timeout(250)
 
-              # Reproduce the real Android Fold failure mode: usable unfolded viewport, but screen API
-              # still reports phone-like dimensions. Old classifier treated this as a phone and lost the rail.
-              ctx,page,s=boot_game(b,590,960,384,832,True,'fold-portrait-real-browser')
-              assert s['mode']=='tablet-portrait-rail',s
-              assert s['orient']=='portrait' and s['device']=='large-touch',s
-              assert len(s['cols'].split())==2,s
-              assert 'game-control-column' in s['currentParent'],s
-              assert 'game-board-column' in s['infoParent'],s
-              assert 145<=s['rail']<=180,s
-              assert s['boardStage']['width']>340,s
-              assert s['cellFont']<=22.5,s
-              assert s['overflowX']<=1,s
-              result['foldPortraitRealBrowser']=s;ctx.close()
+                  base=page.evaluate("""()=>({
+                    overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                    dailyActive:document.querySelector('#screen-daily')?.classList.contains('active'),
+                    dailyVisible:!!document.querySelector('#playDailyBtn')&&getComputedStyle(document.querySelector('#playDailyBtn')).display!=='none',
+                    shareHidden:document.querySelector('#shareDailyBtn')?.classList.contains('hidden')===true,
+                    updateHidden:document.querySelector('#updateBanner')?.classList.contains('hidden')===true,
+                    printshopCss:[...document.styleSheets].some(s=>(s.href||'').includes('printshop-ui.css')),
+                    typographyCss:[...document.styleSheets].some(s=>(s.href||'').includes('typography-readability-v1.css')),
+                  })""")
+                  assert base['overflow']<=1,base
+                  assert base['dailyActive'] and base['dailyVisible'],base
+                  assert base['shareHidden'],base
+                  assert base['updateHidden'],base
+                  assert base['printshopCss'] and base['typographyCss'],base
 
-              # Existing Fold landscape contract remains intact.
-              ctx,page,s=boot_game(b,728,656,728,656,True,'fold-landscape')
-              assert s['mode']=='tablet-landscape',s
-              assert len(s['cols'].split())==2 and 'game-control-column' in s['currentParent'],s
-              assert s['overflowX']<=1,s
-              result['foldLandscape']=s;ctx.close()
+                  page.evaluate("window.__propletSmokeSentinel='alive'")
+                  for target in ('free','leaderboard','profile','daily'):
+                      page.locator(f'.bottom-nav [data-nav="{target}"]').click()
+                      page.wait_for_timeout(250)
+                      state=page.evaluate("""target=>({
+                        active:document.querySelector('#screen-'+target)?.classList.contains('active')===true,
+                        sentinel:window.__propletSmokeSentinel,
+                        updateHidden:document.querySelector('#updateBanner')?.classList.contains('hidden')===true,
+                      })""",target)
+                      assert state['active'] and state['sentinel']=='alive' and state['updateHidden'],(target,state)
 
-              # Ordinary phone portrait must not inherit the Fold rail.
-              ctx,page,s=boot_game(b,390,844,390,844,True,'phone-portrait')
-              assert s['mode']=='standard',s
-              assert len(s['cols'].split())==1,s
-              assert 'game-board-column' in s['currentParent'],s
-              result['phonePortrait']=s;ctx.close()
+                  page.locator('.bottom-nav [data-nav="free"]').click();page.wait_for_timeout(250)
+                  free=page.evaluate("""()=>({
+                    calmQuick:!!document.querySelector('#freeCalmQuick'),
+                    cards:document.querySelectorAll('#difficultyCards .difficulty-card').length,
+                    mozkomorCopy:document.querySelector('#difficultyCards')?.innerText.includes('kteří porazili Mozkožrouta')||false,
+                  })""")
+                  assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'],free
 
-              # Fresh Gen4 session: close the current Gen4 modal, then prove the obsolete 3.33.1 / 500 XP
-              # modal never appears underneath it. Use the same page to verify the compact mask icon.
-              ctx=b.new_context(viewport={'width':390,'height':844},screen={'width':390,'height':844},has_touch=True,is_mobile=True,service_workers='block')
-              page=ctx.new_page()
-              page.add_init_script("""()=>{try{localStorage.setItem('proplet-onboarding-v1','done');localStorage.setItem('proplet-helper-onboarding-v1','done');localStorage.removeItem('proplet-release-notes-seen:3.33.1');sessionStorage.removeItem('proplet-gen4-release-modal-v1')}catch(e){}}""")
-              page.goto(URL,wait_until='domcontentloaded',timeout=30000)
-              page.locator('#qualityReleaseModal:not(.hidden)').wait_for(state='visible',timeout=10000)
-              page.locator('#qualityReleasePlay').click()
-              wait(page,"!document.documentElement.classList.contains('gen4-preview-booting')")
-              page.wait_for_timeout(1600)
-              old_count=page.locator('.release-notes-v3331-backdrop').count()
-              assert old_count==0,{'oldReleaseModalCount':old_count}
-              wait(page,"!!document.querySelector('#rankingPrivacyMini')")
-              icon=page.evaluate("""()=>{
-                const b=document.querySelector('#rankingPrivacyMini'),i=b?.querySelector('.ranking-privacy-mini-icon'),cs=getComputedStyle(b),ics=getComputedStyle(i),r=b.getBoundingClientRect(),ir=i.getBoundingClientRect();
-                return {display:cs.display,width:r.width,height:r.height,placeItems:cs.placeItems,text:i.textContent,iconSize:ics.fontSize,iconWidth:ir.width,iconHeight:ir.height,transform:ics.transform};
-              }""")
-              assert icon['display']=='grid' and 35<=icon['width']<=37 and 35<=icon['height']<=37,icon
-              assert 'center' in icon['placeItems'] and '🎭' in icon['text'],icon
-              assert float(icon['iconSize'].replace('px',''))>=17 and icon['transform']=='none',icon
-              page.screenshot(path=f'{OUT}/privacy-mask-mobile.png',full_page=True)
-              result['privacyMask']=icon;result['oldReleaseModalSuppressed']=True;ctx.close()
+                  page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
+                  page.wait_for_function("()=>document.body.classList.contains('playing') && document.querySelectorAll('#board .cell').length>0",timeout=8000)
+                  page.screenshot(path=f'{OUT}/{label}.png',full_page=True)
+                  result[label]={'base':base,'free':free,'errors':errors}
+                  assert not errors,(label,errors)
+                  ctx.close()
+              browser.close()
 
-              # Desktop: choose the most vertically asymmetric available mask. The centre of VISIBLE
-              # cells, rather than the empty rectangular grid, must sit on the board-stage centre.
-              ctx,page,s=boot_game(b,1600,900,1600,900,False,'desktop-centered-mask',pick='biased')
-              assert s['mode']=='desktop-wide',s
-              assert len(s['cols'].split())==2 and 'game-control-column' in s['currentParent'] and 'game-control-column' in s['infoParent'],s
-              centers=page.evaluate("""()=>{
-                const stage=document.querySelector('#boardStage').getBoundingClientRect(),cells=[...document.querySelectorAll('#board .cell')].map(e=>e.getBoundingClientRect());
-                const top=Math.min(...cells.map(r=>r.top)),bottom=Math.max(...cells.map(r=>r.bottom));
-                return {stage:(stage.top+stage.bottom)/2,mask:(top+bottom)/2,delta:Math.abs((stage.top+stage.bottom)/2-(top+bottom)/2),offset:getComputedStyle(document.querySelector('#boardWrap')).getPropertyValue('--mask-center-y')};
-              }""")
-              assert centers['delta']<=3.0,(s,centers)
-              assert s['rail']>=285 and s['overflowX']<=1,s
-              result['desktop']=s;result['desktopMaskCenter']=centers
-              page.screenshot(path=f'{OUT}/desktop-centered-mask.png',full_page=True)
-              ctx.close();b.close()
-
-          with open(f'{OUT}/summary.json','w',encoding='utf-8') as f:json.dump(result,f,ensure_ascii=False,indent=2)
+          with open(f'{OUT}/summary.json','w',encoding='utf-8') as f: json.dump(result,f,ensure_ascii=False,indent=2)
           print(json.dumps(result,ensure_ascii=False,indent=2))
           PY
-          python /tmp/fold_smoke.py
+          python /tmp/printshop_smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v334-fold-portrait-smoke
-          path: /tmp/proplet-fold-smoke/
+          name: printshop-browser-smoke
+          path: /tmp/proplet-printshop-smoke/
           if-no-files-found: warn
           retention-days: 7

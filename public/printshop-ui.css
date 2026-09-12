@@ -1,0 +1,376 @@
+/* Tiskařská dílna. Surrounding chrome stays quiet; gameplay states remain in ribbon-ui.css. */
+html.tiskarna-ui{--td-paper:#FFFCF5;--td-line:#D8D2C7;--td-ink:#202B39;--td-blue:#204FAB;--td-tint:#E8EEF8;--td-mint:#E6F3EB;--td-muted:#586576}
+html.tiskarna-ui[data-theme=dark]{--td-paper:#29313D;--td-line:#4B5464;--td-ink:#F5F0E4;--td-blue:#A9C6FF;--td-tint:#273C5B;--td-mint:#244A41;--td-muted:#BDC9D5}
+html.tiskarna-ui,html.tiskarna-ui body{background:#F7F2E8!important;background-image:none!important}
+html.tiskarna-ui[data-theme=dark],html.tiskarna-ui[data-theme=dark] body{background:#1D2530!important}
+html.tiskarna-ui .app-header{border-bottom:2px solid var(--td-line);padding-bottom:16px;margin-bottom:20px}
+html.tiskarna-ui :is(.screen:where(:not(#screen-game)),#winModal,.account-modal,.settings-modal){color:var(--td-ink)}
+html.tiskarna-ui .screen:where(:not(#screen-game)) :is(h1,h2,h3){color:var(--td-ink)}
+html.tiskarna-ui .screen:where(:not(#screen-game)) h1{letter-spacing:-.035em}
+html.tiskarna-ui .screen:where(:not(#screen-game)) h2{letter-spacing:-.025em}
+html.tiskarna-ui .screen:where(:not(#screen-game)) :is(.card,.profile-card,.home-competition-card,.ranking-section,.home-diff-tile,.settings-card,.profile-account-hub){background:var(--td-paper)!important;border:1px solid var(--td-line)!important;border-radius:14px!important;box-shadow:none!important;color:var(--td-ink)!important}
+html.tiskarna-ui .screen:where(:not(#screen-game)) :is(.muted,.field-note,.eyebrow,.stat-label){color:var(--td-muted)!important}
+html.tiskarna-ui #screen-daily .daily-hero{background:#214FAE!important;background-image:none!important;border-radius:14px!important;border:0!important;box-shadow:0 5px 0 #173D8B!important;color:#FFF8E9!important}
+html.tiskarna-ui #screen-daily .daily-hero :is(h1,h2,p,.eyebrow){color:#FFF8E9!important}
+html.tiskarna-ui #screen-daily .home-diff-tile{border-top:4px solid #009D93!important;border-radius:9px!important}
+html.tiskarna-ui #screen-daily .home-diff-tile:nth-child(2){border-top-color:#235BCC!important}
+html.tiskarna-ui #screen-daily .home-diff-tile:nth-child(3){border-top-color:#EF492D!important}
+html.tiskarna-ui #screen-daily .home-diff-tile:nth-child(4){border-top-color:#854B90!important}
+html.tiskarna-ui #screen-daily .home-progress-level{background:var(--td-mint)!important;border-color:var(--td-line)!important;color:var(--td-ink)!important}
+html.tiskarna-ui #screen-daily .home-progress-level-icon{background:none!important;padding:0!important}
+html.tiskarna-ui #screen-daily :is(.home-ranking-list,.home-ranking-row,.home-progress-metrics){background:transparent!important;border-color:var(--td-line)!important;box-shadow:none!important}
+html.tiskarna-ui #screen-daily .home-ranking-row{border-radius:0!important}
+html.tiskarna-ui #screen-daily .home-ranking-row:first-child{background:color-mix(in srgb,#F8C742 15%,var(--td-paper))!important}
+html.tiskarna-ui #screen-profile :is(.level-roadmap-card,.achievements-card){background:transparent!important;border:0!important;border-top:2px solid var(--td-line)!important;border-radius:0!important;padding-inline:0!important}
+html.tiskarna-ui #screen-profile .level-step{border-radius:8px!important;border-color:var(--td-line)!important;background:var(--td-paper)!important;box-shadow:none!important}
+html.tiskarna-ui #screen-profile .level-step.current{border:2px solid var(--td-blue)!important;background:var(--td-tint)!important;outline:0!important}
+html.tiskarna-ui #screen-profile :is(.level-step.current .level-num,.achievement-progress>span,.achievement-summary-progress>span){background:var(--td-blue)!important;color:var(--td-paper)!important}
+html.tiskarna-ui #screen-profile .achievement-summary{background:var(--td-mint)!important;border-color:var(--td-line)!important;border-radius:8px!important}
+html.tiskarna-ui #screen-profile .achievement-peek{background:none!important;border:0!important;border-radius:0!important}
+html.tiskarna-ui #screen-profile .profile-badge{border-radius:8px!important;background:var(--td-paper)!important;border-color:var(--td-line)!important}
+html.tiskarna-ui :is(.screen:where(:not(#screen-game)),#winModal) .primary-btn{background:#235BCC!important;color:#FFF8E9!important;box-shadow:0 3px 0 #193F8B!important;border-radius:9px!important;border:0!important}
+html.tiskarna-ui :is(.screen:where(:not(#screen-game)),#winModal) .secondary-btn{box-shadow:none!important;border-radius:9px!important;border-color:var(--td-line)!important}
+html.tiskarna-ui .bottom-nav{background:var(--td-paper)!important;border:1px solid var(--td-line)!important;box-shadow:none!important;border-radius:12px!important}
+html.tiskarna-ui .bottom-nav button.active{background:var(--td-tint)!important;color:var(--td-blue)!important;border-radius:7px!important}
+html.tiskarna-ui #winModal .win-card{background:var(--td-paper)!important;color:var(--td-ink)!important;border-color:var(--td-line)!important;border-top:6px solid #F8C742!important}
+html.tiskarna-ui #winModal :is(.win-xp,#winXp){background:#F8C742!important;color:#29313D!important}
+html.tiskarna-ui #winModal :is(.win-clean,.win-result-hero){background:var(--td-mint)!important;color:var(--td-ink)!important}
+html.tiskarna-ui #winModal :is(.win-summary,.level-leaderboard-box,.win-achievements){background:transparent!important;border:0!important;border-top:1px solid var(--td-line)!important;border-radius:0!important;box-shadow:none!important}
+html.tiskarna-ui #winModal .frb-row{background:var(--td-paper)!important;border-color:var(--td-line)!important;border-radius:6px!important}
+html.tiskarna-ui #winModal .frb-row:first-child{background:color-mix(in srgb,#F8C742 14%,var(--td-paper))!important}
+html.tiskarna-ui .printshop-art{background:none!important}
+html.tiskarna-ui .printshop-art.is-locked{filter:grayscale(1)!important;opacity:.75!important}
+html.tiskarna-ui .printshop-art:after{display:none!important}
+html.tiskarna-ui .organic-avatar[data-avatar-file]{background:transparent;box-shadow:none}
+html.tiskarna-ui .organic-avatar-print{display:block;width:100%;height:100%;object-fit:contain}
+@media(max-width:600px){
+ html.tiskarna-ui .screen:where(:not(#screen-game)) :is(p,.muted,.field-note){font-size:15px!important;line-height:1.4!important}
+ html.tiskarna-ui #screen-daily .home-diff-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.tiskarna-ui #screen-profile .level-step{min-width:150px!important}
+}
+html.tiskarna-ui #screen-daily #quickPlayCard.home-free-section{background:transparent!important;border:0!important;box-shadow:none!important}
+
+/* Letterpress brand mark: use the authoritative artwork in every header state. */
+.brand-mark,
+body:has(#screen-daily.active.home-layout-active) .home-brand .brand-mark{
+  width:40px!important;
+  height:40px!important;
+  padding:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+  display:block!important;
+  overflow:visible!important;
+}
+.brand-mark:after,
+body:has(#screen-daily.active.home-layout-active) .home-brand .brand-mark:after{display:none!important;content:none!important}
+.brand-mark img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important}
+
+/* Outlined wordmark keeps the same letterpress typography on every device. */
+html.tiskarna-ui .brand-copy strong{font-size:0!important;line-height:1!important}
+html.tiskarna-ui .brand-copy strong::before{content:"";display:block;width:111px;height:31px;background:currentColor;-webkit-mask:url('/brand/wordmark.svg?v=brand1') center/contain no-repeat;mask:url('/brand/wordmark.svg?v=brand1') center/contain no-repeat}
+
+
+/* feedback-polish-2026-09-07 — screenshot-driven layout cleanup */
+html.tiskarna-ui #screen-profile .achievement.earned>em{display:none!important}
+html.tiskarna-ui #screen-profile .achievement-peek i{display:none!important}
+
+html.tiskarna-ui #screen-profile .profile-completion-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span{min-width:0!important;padding:8px 5px!important;border:1px solid var(--td-line)!important;border-radius:8px!important;text-align:center!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span:nth-child(1){background:color-mix(in srgb,#009D93 12%,var(--td-paper))!important;border-color:color-mix(in srgb,#009D93 35%,var(--td-line))!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span:nth-child(2){background:color-mix(in srgb,#235BCC 10%,var(--td-paper))!important;border-color:color-mix(in srgb,#235BCC 30%,var(--td-line))!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span:nth-child(3){background:color-mix(in srgb,#EF492D 10%,var(--td-paper))!important;border-color:color-mix(in srgb,#EF492D 30%,var(--td-line))!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span:nth-child(4){background:color-mix(in srgb,#854B90 11%,var(--td-paper))!important;border-color:color-mix(in srgb,#854B90 32%,var(--td-line))!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span b{display:block!important;font-size:17px!important;line-height:1!important}
+html.tiskarna-ui #screen-profile .profile-completion-grid>span small{display:block!important;margin-top:4px!important;font-size:9px!important;line-height:1.15!important;white-space:normal!important}
+
+@media(min-width:700px){
+ html.tiskarna-ui #screen-daily .home-progress-total{min-width:0!important;padding-inline:10px!important}
+ html.tiskarna-ui #screen-daily .home-progress-total>strong{max-width:100%!important;font-size:clamp(20px,2.4vw,27px)!important;line-height:1!important;white-space:nowrap!important}
+ html.tiskarna-ui #screen-daily .home-progress-metric>strong{min-width:0!important}
+}
+
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game .word-status-row{grid-template-columns:78px minmax(0,1fr)!important;gap:7px!important}
+ html.tiskarna-ui #screen-game .word-status-row .stat-label{white-space:nowrap!important}
+ html.tiskarna-ui #screen-game .word-status-row .lengths,
+ html.tiskarna-ui #screen-game .found-words{overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important}
+ html.tiskarna-ui #screen-game .current-word{min-width:0!important;min-height:48px!important;padding:7px 10px!important}
+ html.tiskarna-ui #screen-game .current-word>div{min-width:0!important;max-width:100%!important}
+ html.tiskarna-ui #screen-game .current-word strong{max-width:100%!important;font-size:clamp(16px,5.4vw,22px)!important;letter-spacing:.07em!important;line-height:1.15!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important}
+ html.tiskarna-ui #screen-game .current-word strong::-webkit-scrollbar{display:none!important}
+}
+
+html.tiskarna-ui .quick-game-arrow{display:grid!important;place-items:center!important;align-self:stretch!important;line-height:1!important}
+
+html.tiskarna-ui #winModal .win-card{padding:14px!important}
+html.tiskarna-ui #winModal .win-card h2{margin:1px 0 2px!important}
+html.tiskarna-ui #winModal .win-praise{margin:0 auto 5px!important;font-size:11.5px!important;line-height:1.3!important}
+html.tiskarna-ui #winModal .win-summary{margin:4px 0 7px!important;padding:7px 8px!important}
+html.tiskarna-ui #winModal .win-summary>p{margin:0 0 5px!important;font-size:10.5px!important;line-height:1.25!important}
+html.tiskarna-ui #winModal .win-summary-chips{gap:5px!important}
+html.tiskarna-ui #winModal :is(#winXp,#winClean){padding:5px 8px!important;font-size:10px!important;line-height:1.1!important}
+html.tiskarna-ui #winModal .level-leaderboard-box{margin:6px 0!important;padding:7px 0 0!important}
+html.tiskarna-ui #winModal .daily-world-summary{margin:0 0 5px!important;padding:7px 8px!important}
+html.tiskarna-ui #winModal .daily-world-summary>div>strong{font-size:24px!important}
+html.tiskarna-ui #winModal .daily-world-summary p{font-size:11px!important;line-height:1.25!important}
+html.tiskarna-ui #winModal .daily-world-neighbours{margin-top:4px!important}
+html.tiskarna-ui #winModal .mini-leader-row{min-height:42px!important;padding:5px 6px!important;gap:6px!important}
+html.tiskarna-ui #winModal .mini-leader-row>span>strong{font-size:14px!important;line-height:1.15!important}
+html.tiskarna-ui #winModal .mini-leader-row small{font-size:10.5px!important;line-height:1.2!important}
+html.tiskarna-ui #winModal .mini-leader-row em{font-size:10.5px!important}
+html.tiskarna-ui #winModal .daily-world-count{display:block!important;margin:5px 2px 1px!important;text-align:center!important;color:var(--td-muted)!important;font-size:9px!important;font-weight:800!important}
+html.tiskarna-ui #winModal .daily-world-privacy{display:block!important;margin-top:3px!important;font-size:8px!important;line-height:1.2!important}
+
+html.tiskarna-ui #winModal .new-badge-box{margin:7px 0!important;padding:8px!important}
+html.tiskarna-ui #winModal .new-badge-box .unlock-title{margin:0 0 4px!important;font-size:9px!important}
+html.tiskarna-ui #winModal .new-badge-box .unlock-row{grid-template-columns:58px minmax(0,1fr)!important;gap:10px!important;padding:8px!important}
+html.tiskarna-ui #winModal .new-badge-box .achievement-unlock{grid-template-columns:72px minmax(0,1fr)!important}
+html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji{width:72px!important;height:72px!important;display:grid!important;place-items:center!important}
+html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji .ribbon-art,
+html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji .ribbon-art img{width:72px!important;height:72px!important}
+html.tiskarna-ui #winModal .new-badge-box .unlock-row strong{font-size:15px!important;line-height:1.15!important}
+html.tiskarna-ui #winModal .new-badge-box .unlock-row small{margin-top:3px!important;font-size:10px!important;line-height:1.25!important}
+
+html.tiskarna-ui #xpLeaderboardList .ranking-row{min-height:64px!important;padding-block:7px!important}
+
+html.tiskarna-ui #shareDailyBtn{box-shadow:none!important}
+html.tiskarna-ui[data-theme="dark"] #shareDailyBtn{color:#FFF8E9!important;border-color:rgba(255,248,233,.5)!important}
+html.tiskarna-ui[data-theme="dark"] #winModal .win-utility-btn{color:#FFF8E9!important}
+html.tiskarna-ui[data-theme="dark"] #winModal .win-utility-btn:hover{background:rgba(255,248,233,.1)!important;color:#FFF8E9!important}
+
+@media(max-width:390px){
+ html.tiskarna-ui #screen-profile .profile-completion-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.tiskarna-ui #winModal .new-badge-box .achievement-unlock{grid-template-columns:62px minmax(0,1fr)!important}
+ html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji,
+ html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji .ribbon-art,
+ html.tiskarna-ui #winModal .new-badge-box .achievement-unlock>.emoji .ribbon-art img{width:62px!important;height:62px!important}
+}
+
+
+/* September 8: stable mobile controls and collision-free progress. */
+html.tiskarna-ui #screen-profile .profile-completion-grid .organic-emblem{display:none!important}
+html.tiskarna-ui .difficulty-progress>span{font-size:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important}
+html.tiskarna-ui .difficulty-progress>span::after{content:'';width:6px;height:6px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:translateX(-1px) rotate(45deg)}
+html.tiskarna-ui .settings-header-gear{margin-left:12px!important;flex-shrink:0!important}
+@media(min-width:600px) and (max-width:1100px){
+ html.tiskarna-ui #screen-daily .home-competition-self{grid-template-columns:minmax(0,1fr)!important}
+ html.tiskarna-ui #screen-daily .home-progress-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.tiskarna-ui #screen-daily .home-progress-total{grid-column:1/-1!important}
+ html.tiskarna-ui #screen-daily .home-progress-metric{padding:12px 8px!important}
+ html.tiskarna-ui #screen-daily .home-progress-metric>strong{font-size:20px!important;white-space:normal!important;overflow-wrap:anywhere}
+}
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game .game-actions{display:flex!important;gap:6px!important}
+ html.tiskarna-ui #screen-game .game-actions .secondary-btn{font-size:0!important;min-width:64px!important;width:auto!important;height:44px!important;padding:6px 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
+ html.tiskarna-ui #screen-game .game-actions .ui-icon{width:21px!important;height:21px!important;font-size:21px!important;margin:0!important}
+ html.tiskarna-ui #screen-game #hintBtn::after{content:"Nápověda";font-size:10px;line-height:1;font-weight:500;letter-spacing:0}
+ html.tiskarna-ui #screen-game #calmRunBtn::after{content:"Klid";font-size:10px;line-height:1;font-weight:500;letter-spacing:0}
+ html.tiskarna-ui #screen-game #magnifierQuickBtn{min-width:44px!important;width:44px!important;padding-inline:7px!important}
+ html.tiskarna-ui #screen-game .game-message{min-width:0!important;text-align:left!important}
+ html.tiskarna-ui .touch-mag-cell{font-size:19px!important;border-radius:7px!important}
+ html.tiskarna-ui .touch-magnifier-grid{gap:3px!important}
+}
+
+/* Results screen corrections from the September 8 review. */
+
+/* The leaderboard rows remain useful without repeating the total beneath them. */
+html.tiskarna-ui #winModal .daily-world-count{display:none!important}
+
+/* The rank and percentile block duplicates the leaderboard information and crowds the result. */
+html.tiskarna-ui #winModal .daily-world-summary{display:none!important}
+
+/* Keep the XP result chip visually centered with equal breathing room above and below. */
+html.tiskarna-ui #winModal .win-summary-chips{padding-block:6px}
+html.tiskarna-ui #winModal .win-xp{margin-block:0!important}
+
+@media(max-width:480px){
+  html.tiskarna-ui #winModal .win-summary-chips{padding-block:7px}
+}
+
+html.tiskarna-ui #winModal .win-summary{margin-block:6px!important;padding-block:6px!important}
+
+@media(pointer:coarse) and (min-width:601px){
+}
+/* Keep the interactive onboarding step usable on short phones and unfolded devices. */
+.onboarding-card:has(#tutorialBoard){
+  max-height:calc(100dvh - 20px);
+  padding-block:clamp(12px,2.4dvh,24px);
+}
+
+.onboarding-card:has(#tutorialBoard) #onboardContent{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+}
+
+.onboarding-card:has(#tutorialBoard) #onboardNextBtn{
+  position:relative;
+  z-index:1;
+  flex:0 0 auto;
+}
+
+@media (max-height:740px){
+  .onboarding-card:has(#tutorialBoard) .onboard-dots{margin-bottom:6px}
+  .onboarding-card:has(#tutorialBoard) .onboard-content h2{font-size:clamp(22px,4.2dvh,28px);margin-block:2px 4px}
+  .onboarding-card:has(#tutorialBoard) .onboard-content p{margin-bottom:6px;line-height:1.25}
+  .onboarding-card:has(#tutorialBoard) .tutorial-wrap{
+    width:min(100%,clamp(168px,calc(100dvh - 330px),238px));
+    margin:4px auto 6px;
+  }
+  .onboarding-card:has(#tutorialBoard) .tutorial-board{gap:5px}
+  .onboarding-card:has(#tutorialBoard) .tutorial-success{min-height:15px;margin-top:3px}
+  .onboarding-card:has(#tutorialBoard) #onboardNextBtn{min-height:44px;margin-top:4px}
+}
+/* Preserve game-mode/device visibility when sizing icon buttons. */
+html.tiskarna-ui #screen-game .game-actions .secondary-btn.hidden{display:none!important}
+
+/* Compact painted icons for challenge and calm action controls. */
+html.tiskarna-ui .painted-action-icon{
+  display:inline-block!important;
+  width:24px!important;
+  height:24px!important;
+  flex:0 0 24px!important;
+  object-fit:contain!important;
+  margin:0 .35em 0 0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  vertical-align:middle!important;
+}
+html.tiskarna-ui .painted-action-control{display:inline-flex!important;align-items:center!important;gap:0!important}
+html.tiskarna-ui :is(.calm-settings-icon,.calm-confirm-icon) .painted-action-icon,
+html.tiskarna-ui .calm-quick>strong .painted-action-icon{width:22px!important;height:22px!important;flex-basis:22px!important;margin-right:.3em!important}
+html.tiskarna-ui :is(.calm-settings-icon,.calm-confirm-icon){display:inline-flex!important;align-items:center!important}
+html.tiskarna-ui .calm-quick>strong{display:inline-flex!important;align-items:center!important}
+
+/* September 9 feedback: compact HUD; feedback has a stable home above the board. */
+html.tiskarna-ui #screen-game :is(.game-info,.current-word,#hintBtn){
+ background:color-mix(in srgb,var(--r-board-mat) 58%,var(--r-paper))!important;
+ background-image:none!important;box-shadow:none!important;border-color:var(--r-edge)!important;
+}
+html.tiskarna-ui #screen-game .current-word{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+ grid-template-rows:auto auto!important;gap:2px 8px!important;
+ min-height:0!important;height:auto!important;padding:6px 10px!important;align-items:center!important;
+}
+html.tiskarna-ui #screen-game .current-word>div:first-child{grid-column:1;grid-row:1;display:flex!important;align-items:center;gap:8px}
+html.tiskarna-ui #screen-game .current-word .clean-status{grid-column:2;grid-row:1;position:static!important;margin:0!important;white-space:nowrap}
+html.tiskarna-ui #screen-game .current-word strong{margin:0!important;min-height:22px!important;line-height:1.15!important}
+html.tiskarna-ui #screen-game .current-word #gameMessage{
+ grid-column:1/-1!important;grid-row:2!important;display:block!important;
+ height:auto!important;min-height:42px!important;max-height:none!important;
+ margin:0!important;padding:0!important;align-self:start!important;
+ font-size:15px!important;font-weight:400!important;line-height:1.4!important;white-space:normal!important;
+ overflow:visible!important;text-overflow:clip!important;
+ -webkit-line-clamp:unset!important;text-align:left!important;
+}
+html.tiskarna-ui #screen-game .word-status-row .lengths{
+ display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;
+ overflow-y:hidden!important;width:auto!important;scrollbar-width:none;
+}
+html.tiskarna-ui #screen-game .word-status-row .length-pill{flex:0 0 auto!important;width:auto!important;min-width:24px!important}
+html.tiskarna-ui #screen-game .game-control-column{grid-template-columns:1fr!important}
+html.tiskarna-ui #screen-game .game-actions{grid-column:1!important;width:100%}
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game .game-info{padding:4px 8px!important}
+ html.tiskarna-ui #screen-game .word-status-row{grid-template-columns:76px minmax(0,1fr)!important;gap:5px!important}
+ html.tiskarna-ui #screen-game .current-word .stat-label{font-size:11px!important}
+ html.tiskarna-ui #screen-game .current-word .clean-status{font-size:12px!important}
+ html.tiskarna-ui #screen-game .game-actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:6px!important}
+ html.tiskarna-ui #screen-game .game-actions .secondary-btn{min-width:0!important;min-height:48px!important;height:48px!important;padding:6px!important}
+ html.tiskarna-ui #screen-game :is(#hintBtn,#calmRunBtn)::after{font-size:15px!important;line-height:1.35!important}
+ html.tiskarna-ui #screen-game #magnifierQuickBtn{width:48px!important;min-width:48px!important;order:3}
+}
+/* The magnifier overlays the upper HUD only during a drag; it never reserves board space. */
+html.tiskarna-ui #magnifierDock>.touch-magnifier{position:absolute!important;display:block!important;width:84px!important;height:84px!important;padding:4px!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;pointer-events:none!important}
+html.tiskarna-ui #magnifierDock>.touch-magnifier.hidden{display:none!important}
+html.tiskarna-ui #winModal #winBadge{display:none!important}
+html.tiskarna-ui #winModal :is(#winPrimaryBtn,#winShareBtn.challenge-share-cta){
+ display:flex;align-items:center;justify-content:center;gap:8px;
+ width:100%!important;max-width:none!important;min-height:52px!important;
+ padding:12px 16px!important;margin:8px 0!important;border:0!important;
+ border-radius:12px!important;box-shadow:none!important;filter:none!important;
+ font-size:17px!important;font-weight:500!important;line-height:1.35!important;transform:none!important;
+}
+html.tiskarna-ui #winModal .win-secondary-actions:has(.challenge-share-cta:not(.hidden)){display:flex!important;flex-wrap:wrap!important;gap:6px!important}
+html.tiskarna-ui #winModal #winShareBtn.challenge-share-cta{flex:0 0 100%;background:#BA4557!important;color:#FFF8E9!important;text-shadow:none!important}
+html.tiskarna-ui #winModal #winShareBtn.challenge-share-cta::before,
+html.tiskarna-ui #winModal #winShareBtn.challenge-share-cta::after{display:none!important}
+html.tiskarna-ui #winModal .ranking-expand{margin:8px 0}
+html.tiskarna-ui .ranking-expand summary{cursor:pointer;list-style:none;padding:11px 8px;text-align:center;border:1px solid var(--td-line);border-radius:10px;font-size:15px;line-height:1.35;font-weight:750;color:var(--td-ink)}
+html.tiskarna-ui .ranking-expand summary::after{content:'⌄';margin-left:8px}
+html.tiskarna-ui .ranking-expand[open] summary::after{content:'⌃'}
+html.tiskarna-ui .ranking-expanded-position{font-size:15px;line-height:1.4;margin:10px 0}
+html.tiskarna-ui .ranking-expand .ranking-more{width:100%;min-height:44px;margin-top:8px}
+html.tiskarna-ui #screen-daily #tajenkaPreviewCard{grid-area:auto!important;grid-column:1/-1!important;order:99;background:var(--td-paper)!important;border:1px solid var(--td-line)!important;box-shadow:none!important}
+html.tiskarna-ui #screen-daily #tajenkaPreviewCard.completed{display:grid;grid-template-columns:40px minmax(0,1fr)!important;gap:10px!important;padding:16px!important}
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-revealed-phrase{display:block;font-size:20px;line-height:1.3;margin:8px 0;color:var(--td-ink)}
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+html.tiskarna-ui #tajenkaPreviewCard .tajenka-home-actions button{flex:1;min-height:44px;font-size:15px}
+
+/* Keep the board stationary when a phone word grows from one to two lines. */
+html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game .current-word>div:first-child{display:grid!important;gap:2px;grid-template-rows:auto minmax(2.3em,auto);align-content:center}
+html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game #currentWord{min-height:2.3em!important}
+/* Layout composition, shared by every width classified as a side rail. */
+html.tiskarna-ui #magnifierDock{position:relative;display:none;min-width:0;pointer-events:none}
+html.tiskarna-ui body:has(#magnifierQuickBtn:not(.hidden)) #magnifierDock{display:block;height:84px;grid-column:1/-1;grid-row:2}
+html.tiskarna-ui #screen-game .current-word>div:first-child{min-width:0;flex-wrap:wrap}
+html.tiskarna-ui #screen-game #currentWord{max-width:100%;white-space:normal!important;overflow-wrap:anywhere;overflow:visible!important;letter-spacing:.025em!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game .game-actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game .game-actions .secondary-btn{width:100%!important;min-width:0!important;height:auto!important;min-height:48px!important;font-size:15px!important;white-space:normal!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game :is(#hintBtn,#calmRunBtn)::after{content:none!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game .current-word{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto auto!important;gap:8px!important;padding:10px!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game .current-word>div:first-child{display:grid!important;gap:4px}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game .clean-status{grid-column:1!important;grid-row:2!important;justify-self:start}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game #gameMessage{grid-row:3!important;font-size:14px!important;min-height:4.2em!important}
+html.tiskarna-ui body.game-tablet-landscape #magnifierDock{align-self:center;justify-self:center;width:84px;grid-column:1;grid-row:2}
+html.tiskarna-ui .touch-magnifier .touch-mag-cell{font-size:17px!important}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game #magnifierQuickBtn{width:100%!important}
+/* Give the XP value its own row; its available width follows the card, not the viewport. */
+html.tiskarna-ui #screen-daily .home-progress-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html.tiskarna-ui #screen-daily .home-progress-total{grid-column:1/-1!important;border:0!important;border-bottom:1px solid var(--td-line)!important}
+html.tiskarna-ui #screen-daily .home-progress-total+.home-progress-metric{border-left:0!important}
+html.tiskarna-ui #screen-daily .home-progress-metric{min-width:0!important;border-top:0!important}
+html.tiskarna-ui #screen-daily .home-progress-metric>strong{white-space:normal!important;overflow-wrap:anywhere;line-height:1.25!important}
+html.tiskarna-ui :is(.primary-btn,.secondary-btn,.free-board-tab),html.tiskarna-ui #screen-daily .daily-hero :is(h1,h2){font-weight:500!important}
+
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row{display:grid!important;grid-template-columns:40px 40px minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;min-height:68px!important;padding:10px!important;border:1px solid var(--td-line)!important;border-radius:12px!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row.me{background:color-mix(in srgb,var(--td-mint) 75%,var(--td-paper))!important;border:2px solid var(--td-ink)!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row>*{min-width:0;align-self:center!important;margin:0!important;transform:none!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-avatar,html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-avatar .organic-avatar{width:40px!important;height:40px!important;display:block!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-copy{display:flex!important;flex-direction:column;gap:4px;text-align:left!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row .result-player-copy strong{display:block!important;font-size:16px!important;font-weight:500!important;line-height:1.25!important;white-space:normal!important;overflow-wrap:anywhere}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row .result-player-copy small{font-size:12px!important;line-height:1.3!important;font-weight:400!important;white-space:normal!important}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row .result-player-time{font-size:15px!important;font-weight:500!important;font-style:normal;white-space:nowrap;font-variant-numeric:tabular-nums}
+html.tiskarna-ui :is(#winModal,#levelDetailModal) .result-player-row .result-player-rank{font-size:16px!important;background:none!important;padding:0!important;width:auto!important;height:auto!important}
+
+html.tiskarna-ui .ranking-expanded-rows{display:grid;gap:6px}
+
+html.tiskarna-ui #winModal button{font-weight:500!important}
+
+/* Expanding replaces the compact neighbourhood instead of duplicating it. */
+html.tiskarna-ui :is(.free-board-content,.daily-global-board):has(.ranking-expand[open])>.daily-world-neighbours,
+html.tiskarna-ui .free-board-content:has(.ranking-expand[open])>.ranking-compact{display:none!important}
+html.tiskarna-ui .ranking-before{width:100%;min-height:44px;margin-bottom:8px}
+
+/* Tajenka mobile semantic hint — dedicated visible row, never clipped inside Skládáš. */
+html.tiskarna-ui #screen-game .tajenka-hint-banner{display:none}
+@media(max-width:600px){
+ html.tiskarna-ui #screen-game.tajenka-mode .game-board-column,
+ html.tiskarna-ui .tajenka-mode .game-board-column{grid-template-rows:auto auto auto auto minmax(0,1fr)!important}
+ html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden),
+ html.tiskarna-ui .tajenka-mode .game-board-column>.tajenka-hint-banner:not(.hidden){
+  grid-row:4!important;display:flex!important;align-items:flex-start!important;min-width:0!important;
+  padding:7px 9px!important;border:1px solid color-mix(in srgb,#235BCC 28%,var(--td-line))!important;
+  border-radius:9px!important;background:color-mix(in srgb,#235BCC 7%,var(--td-paper))!important;
+  color:var(--td-ink)!important;font-size:12px!important;font-weight:750!important;line-height:1.3!important;
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+ }
+ html.tiskarna-ui #screen-game.tajenka-mode .game-board-column>.board-stage,
+ html.tiskarna-ui .tajenka-mode .game-board-column>.board-stage{grid-row:5!important}
+}
+

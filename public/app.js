@@ -1,7 +1,8 @@
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-preview-fix20';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
-const COLORS=['#ff9585','#68cfaa','#7ca8ff','#ffd064','#b295ff','#f391c3','#62cbd8','#ffad63','#a6d86d','#76c3ee','#da87e4','#66bea0'];
-const AVATARS=['🙂','😎','🤓','🥳','🦊','🐱','🐶','🐼','🐯','🦁','🐸','🐵','🦄','🐲','🦖','🐙','🦉','🐝','🦋','🐧','🚀','⚡','🔥','🌈','🍕','⚽','🎮','🧩','🤯','👑'];
+const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
+const AVATARS=["🙂","😎","🤓","🥳","🦊","🐱","🐶","🐼","🐯","🦁","🐸","🐵","🦄","🐲","🦖","🐙","🦉","🐝","🦋","🐧","🚀","⚡","🔥","🌈","🍕","⚽","🎮","🧩","🤯","👑","🦄✨","☠️","☢️","🌺","🛸","👽","💣","😈","🤖","🌩️"];
 const SUPPORT_MODES={
  beginner:{icon:'🐣',label:'Brzy',desc:'Nabídne pomoc po 45 s bez nového slova.',idleMs:45000,seconds:45},
  younger:{icon:'🧒',label:'Vyváženě',desc:'Nabídne pomoc po 70 s bez nového slova.',idleMs:70000,seconds:70},
@@ -16,11 +17,11 @@ const WIN_PRAISE={
  mozkomor:['Tebe nic nezdolá!','Tohle už je jiná liga.','Našel jsi na Mozkomora recept.','Tvé neurony opět vítězí!','Velký klobouk, hodně dolů.','Endgame? Zjevně nesouhlasíš.']
 };
 const DIFF={
-  easy:{label:'Snadná',icon:'/difficulty/easy.svg',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
-  medium:{label:'Střední',icon:'/difficulty/medium.svg',desc:'Postupně větší plocha · od přehledných cest k prvním zákrutám.',xp:25},
-  hard:{label:'Těžká',icon:'/difficulty/hard.svg',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},
-  hardcore:{label:'Mozkožrout',icon:'/difficulty/hardcore.svg',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100},
-  mozkomor:{label:'Mozkomor',icon:'/difficulty/mozkomor.svg',desc:'10×10 · endgame pro hráče, kteří dokončili všechny Mozkožrouty.',xp:150}
+  easy:{label:'Snadná',icon:'/difficulty/printshop/easy.webp',desc:'6×6 · menší plocha a přehlednější cesty.',xp:15},
+  medium:{label:'Střední',icon:'/difficulty/printshop/medium.webp',desc:'Postupně větší plocha · od přehledných cest k prvním zákrutám.',xp:25},
+  hard:{label:'Těžká',icon:'/difficulty/printshop/hard.webp',desc:'8×8 až 9×9 · delší slova a ostré zákruty.',xp:50},
+  hardcore:{label:'Mozkožrout',icon:'/difficulty/printshop/hardcore.webp',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100},
+  mozkomor:{label:'Mozkomor',icon:'/difficulty/printshop/mozkomor.webp',desc:'10×10 · endgame pro hráče, kteří dokončili všechny Mozkožrouty.',xp:150}
 };
 const MOZKOMOR_UNLOCK_KEY='proplet-v4-01-32-mozkomor-unlocked';
 const MOZKOMOR_UNLOCK_BASE=200;
@@ -34,7 +35,7 @@ function difficultyIconMarkup(diff,className='difficulty-icon-img'){
 }
 const BADGES=[
  {days:1,icon:'🥉',name:'První zářez'},{days:3,icon:'❤️',name:'Srdcař'},{days:5,icon:'⭐',name:'Pětka'},
- {days:7,icon:'🔥',name:'Týden v plamenech'},{days:10,icon:'🏆',name:'Desítka'},{days:14,icon:'⚡',name:'Blesk'},
+ {days:7,icon:'🔥',name:'Týden v plamenech'},{days:10,icon:'🏆',name:'Desítka'},{days:14,icon:'⚡',name:'Půlměsíc'},
  {days:21,icon:'🦉',name:'Mistr slov'},{days:30,icon:'👑',name:'Koruna'},{days:50,icon:'💎',name:'Diamant'},{days:100,icon:'🚀',name:'Legenda'}
 ];
 const LEVELS=[
@@ -536,7 +537,7 @@ function saveGameProgress(){
 }
 function saveTajenkaGameProgress(g=currentGame){
  if(!g||g.mode!=='tajenka'||g.finished)return;
- const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
+ const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
 }
 function clearGameProgress(mode,puzzle,dailyDate){const s=getState(),key=challengeKey(mode,puzzle,dailyDate);if(s.inProgress?.[key]){delete s.inProgress[key];saveState(s)}}
 function resumableFreePuzzle(diff,list){
@@ -755,6 +756,7 @@ async function sendAttemptCheckpoint(eventType){
  try{await api('/api/attempt/checkpoint',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,event_type:eventType,elapsed_ms:Math.max(0,Math.round(gameElapsed(g))),found_words:foundWords})})}catch{}
 }
 function startGame(puzzle,mode,dailyDate,options={}){
+ $('#tajenkaHintBanner')?.remove();
  hideTouchMagnifier();
  if(runtimeUpdateRequired){showToast('Nejdřív dokončím aktualizaci Propletu…');recoverRuntimeUpdate();return}
  stopTimer();hideGameUndo();
@@ -805,10 +807,16 @@ function startTimer(){
  stopTimer();if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;legacyTimerId=setInterval(()=>{if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;tick(currentGame,gameElapsed(currentGame))},currentGame?.mode==='rescue'?100:250)
 }
 function renderTajenkaPhrase(g=currentGame){
- const root=$('#tajenkaPhrase');if(!root)return;
- if(g?.mode!=='tajenka'){root.classList.add('hidden');root.innerHTML='';return}
- const words=tajenkaPhraseWords(g.puzzle),found=new Set(g.found.map(f=>f.answerIndex)),showRule=g.found.length===0;
- root.classList.remove('hidden');root.innerHTML=`<div class="tajenka-phrase-head"><span class="stat-label">TAJENKA</span><div class="tajenka-progress" aria-label="${g.found.length} z ${words.length} slov">${words.map((_,i)=>`<i class="${found.has(answerIndexForTajenka(g.puzzle,i))?'done':''}"></i>`).join('')}<strong>${g.found.length}/${words.length}</strong></div></div><div class="tajenka-slots">${words.map((answer,i)=>{const answerIndex=answerIndexForTajenka(g.puzzle,i),revealed=found.has(answerIndex),fresh=revealed&&g.lastTajenkaReveal===answerIndex;return `<span class="tajenka-slot ${revealed?'revealed':'pending'} ${fresh?'newly-revealed':''}" ${revealed?'':'aria-label="Skryté slovo"'}>${revealed?esc(answer.word):'·'.repeat(answer.word.length)}</span>`}).join('<b class="tajenka-space" aria-hidden="true">·</b>')}${showRule?`<small class="tajenka-rule-inline">Najdi ${words.length} slov · některá písmena mohou zůstat volná.</small>`:''}`;
+ if(!g||g.mode!=='tajenka')return;const box=$('#tajenkaPhrase'),slots=$('#tajenkaSlots'),progress=$('#tajenkaProgress');if(!box||!slots||!progress)return;
+ const words=tajenkaPhraseWords(g.puzzle),tokens=tajenkaPhraseTokens(g.puzzle),solved=new Set((g.found||[]).map(f=>f.answerIndex)),previous=new Set((g.tajenkaRevealed||[]));
+ slots.innerHTML=tokens.map(token=>{
+  if(!token.isWord)return `<span class="tajenka-literal">${esc(token.text)}</span>`;
+  const answerIndex=token.answerIndex,revealed=Number.isInteger(answerIndex)&&solved.has(answerIndex),fresh=revealed&&!previous.has(answerIndex);
+  const text=revealed?esc(token.text):'·'.repeat(Math.max(1,[...token.text].length));
+  return `<span class="tajenka-slot ${revealed?'revealed':'pending'} ${fresh?'newly-revealed':''}">${text}</span>`;
+ }).join('');
+ progress.innerHTML=words.map((_,i)=>`<i class="${solved.has(i)?'done':''}"></i>`).join('')+`<strong>${solved.size}/${words.length}</strong>`;
+ box.classList.remove('hidden');g.tajenkaRevealed=[...solved];
 }
 function answerIndexForTajenka(puzzle,phraseIndex){return Number(puzzle?.tajenka?.answerOrder?.[phraseIndex]??phraseIndex)}
 function renderGameHUD(){
@@ -845,7 +853,11 @@ function pointerMove(e){return gameInput()?.pointerMove(e)}
 function extendPath(i){return gameInput()?.extendPath(i)}
 function pointerUp(){return gameInput()?.pointerUp()}
 function currentWord(){return gameInput()?.currentWord()||''}
-function updateActive(){$$('.cell').forEach(c=>c.classList.toggle('active',currentGame.path.includes(+c.dataset.index)));$('#currentWord').textContent=currentGame.path.length?currentWord():'—';drawPaths()}
+function updateActive(){
+ const path=currentGame?.path||[],order=new Map(path.map((index,step)=>[index,step]));
+ $$('.cell').forEach(c=>{const step=order.get(+c.dataset.index),active=step!==undefined;c.classList.toggle('active',active);c.classList.toggle('route-start',active&&step===0);c.classList.toggle('route-end',active&&step===path.length-1);if(active)c.dataset.routeOrder=String(step+1);else delete c.dataset.routeOrder});
+ $('#currentWord').textContent=path.length?currentWord():'—';drawPaths()
+}
 function samePath(a,b){return a.length===b.length&&a.every((v,i)=>v===b[i])}
 function submitPath(){
  const g=currentGame,word=currentWord(),path=[...g.path];if(!word){g.path=[];return updateActive()}if(word.length<4){g.path=[];message('Slova mají aspoň 4 písmena.');renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
@@ -866,7 +878,12 @@ function openHintModal(fromHelper=false){if(!currentGame||currentGame.mode==='re
 }
 function pickHintTarget(){return gameHints()?.pickTarget()||null}
 function clearHintTrace(){$$('.cell.hint,.cell.hint-route,.cell.hint-full').forEach(c=>{c.classList.remove('hint','hint-route','hint-full');delete c.dataset.hintOrder})}
-function applySmartHint(level){const g=currentGame,pick=pickHintTarget();$('#hintModal').classList.add('hidden');if(!pick)return;const plan=gameHints()?.applyState(level,pick,{onStarter:({level})=>{hideStarterHintNudge();trackProductEvent('starter_hint_used',{level})},onScored:({level,source,complimentary})=>{sendHintEvent(level,source,complimentary);sendAttemptCheckpoint('hint')}});if(!plan)return;const {starter,tajenka}=plan,path=pick.a.path;level=plan.level;if(tajenka&&level===1){message(`💭 ${pick.a.clue||`Hledáš slovo o ${pick.a.word.length} písmenech.`}`,'good')}else if(tajenka&&level===2){const c=$(`.cell[data-index="${path[0]}"]`);c?.classList.add('hint');message(`Začni na ${pick.a.word[0]}. Hledáš slovo o ${countCz(pick.a.word.length,'písmenu','písmenech','písmenech')}.`)}else if(level===1){const c=$(`.cell[data-index="${path[0]}"]`);c?.classList.add('hint');message(starter?`Tady začíná ${pick.a.word}. Teď už ho propleť sám.`:`Začni na ${pick.a.word[0]}. Hledáš slovo o ${countCz(pick.a.word.length,'písmenu','písmenech','písmenech')}.`)}else if(level===2){path.slice(0,Math.min(3,path.length)).forEach((i,n)=>{const c=$(`.cell[data-index="${i}"]`);if(c){c.classList.add('hint-route');c.dataset.hintOrder=String(n+1)}});message(starter?`První tři kroky slova ${pick.a.word} svítí. Zbytek je na tobě.`:`První tři kroky svítí. Slovo má ${countCz(pick.a.word.length,'písmeno','písmena','písmen')}.`)}else{path.forEach((i,n)=>{const c=$(`.cell[data-index="${i}"]`);if(c){c.classList.add('hint-full');if(n<3){c.classList.add('hint-route');c.dataset.hintOrder=String(n+1)}}});message(starter?`Takhle vypadá celá cesta slova ${pick.a.word}. V běžné hře by tím skončilo ✨ Čistě.`:`Je to „${pick.a.word}“. Cesta na chvíli svítí.`)}renderGameHUD();if(!starter)saveGameProgress();fx('hint');setTimeout(clearHintTrace,level===3?3600:2600)
+function setTajenkaHintBanner(text=''){
+ const stage=$('#boardStage');if(!stage)return;let banner=$('#tajenkaHintBanner');
+ if(!banner){banner=document.createElement('div');banner.id='tajenkaHintBanner';banner.className='tajenka-hint-banner hidden';banner.setAttribute('role','status');banner.setAttribute('aria-live','polite');stage.before(banner)}
+ const value=String(text||'').trim();banner.textContent=value;banner.classList.toggle('hidden',!value);
+}
+function applySmartHint(level){const g=currentGame,pick=pickHintTarget();$('#hintModal').classList.add('hidden');if(!pick)return;const plan=gameHints()?.applyState(level,pick,{onStarter:({level})=>{hideStarterHintNudge();trackProductEvent('starter_hint_used',{level})},onScored:({level,source,complimentary})=>{sendHintEvent(level,source,complimentary);sendAttemptCheckpoint('hint')}});if(!plan)return;const {starter,tajenka}=plan,path=pick.a.path;level=plan.level;if(tajenka&&level===1){const hintText=`💭 ${pick.a.clue||`Hledáš slovo o ${pick.a.word.length} písmenech.`}`;message(hintText,'good');setTajenkaHintBanner(hintText)}else if(tajenka&&level===2){const c=$(`.cell[data-index="${path[0]}"]`);c?.classList.add('hint');message(`Začni na ${pick.a.word[0]}. Hledáš slovo o ${countCz(pick.a.word.length,'písmenu','písmenech','písmenech')}.`)}else if(level===1){const c=$(`.cell[data-index="${path[0]}"]`);c?.classList.add('hint');message(starter?`Tady začíná ${pick.a.word}. Teď už ho propleť sám.`:`Začni na ${pick.a.word[0]}. Hledáš slovo o ${countCz(pick.a.word.length,'písmenu','písmenech','písmenech')}.`)}else if(level===2){path.slice(0,Math.min(3,path.length)).forEach((i,n)=>{const c=$(`.cell[data-index="${i}"]`);if(c){c.classList.add('hint-route');c.dataset.hintOrder=String(n+1)}});message(starter?`První tři kroky slova ${pick.a.word} svítí. Zbytek je na tobě.`:`První tři kroky svítí. Slovo má ${countCz(pick.a.word.length,'písmeno','písmena','písmen')}.`)}else{path.forEach((i,n)=>{const c=$(`.cell[data-index="${i}"]`);if(c){c.classList.add('hint-full');if(n<3){c.classList.add('hint-route');c.dataset.hintOrder=String(n+1)}}});message(starter?`Takhle vypadá celá cesta slova ${pick.a.word}. V běžné hře by tím skončilo ✨ Čistě.`:`Je to „${pick.a.word}“. Cesta na chvíli svítí.`)}renderGameHUD();if(!starter)saveGameProgress();fx('hint');setTimeout(clearHintTrace,level===3?3600:2600)
 }
 function message(t,kind=''){$('#gameMessage').textContent=t;$('#gameMessage').className=`game-message ${kind}`} function setWinXpDisplay(text,detail=''){const el=$('#winXp');if(!el)return;el.classList.toggle('win-xp-total',!!detail);el.replaceChildren();if(!detail){el.textContent=text;return}const strong=document.createElement('strong'),small=document.createElement('small');strong.textContent=text;small.textContent=detail;el.append(strong,small)} function renderRunWinXp(g=currentGame){if(!g)return;const baseXp=Math.max(0,Number(g.winBaseXpAwarded)||0),bonusXp=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0);if(bonusXp>0){const totalXp=baseXp+bonusXp,detail=baseXp>0?`${baseXp} základ · +${bonusXp} bonus`:`+${bonusXp} bonusová slova`;setWinXpDisplay(`+${totalXp} XP`,detail)}else setWinXpDisplay(g.winXpFallbackText||`+${baseXp} XP`)}
 function drawPaths(){return gameBoard()?.drawPaths()}
@@ -878,7 +895,7 @@ async function finishAttemptTelemetry(rec){
 async function finishStarterGame(g){
  $('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];hideStarterHintNudge();renderGameBoard();renderGameHUD();updateGameFeel();
  const starterDaily=dailyPuzzleFor(pragueDateISO()),hardNext=starterDaily?.difficulty==='hard';g.starterNextHard=hardNext;if(hardNext)trackProductEvent('starter_hard_choice_shown');
- await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:520);
+ await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
  const key=challengeKey('starter',g.puzzle,null),state=getState(),old=state.completed[key],rec={puzzleId:g.puzzle.id,challengeKey:key,mode:'starter',difficulty:'easy',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:old?0:pointsFor('starter','easy',g.puzzle),hintsUsed:0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:0,attemptId:null,cleanSolve:true,completedAt:new Date().toISOString()};
  if(!old)state.completed[key]=rec;saveState(state);if(!old)queueResult(rec);trackProductEvent('starter_completed');
  const winBoard=$('#levelLeaderboardBox');winBoard?.classList.add('hidden');$('#winBadge').textContent='🎓';$('#winTitle').textContent='První Proplet je doma!';$('#winPraise').textContent=g.starterHintUsed?'Rovná cesta, zatáčka, nápověda i šnek. Teď už znáš všechno důležité.':'Rovná cesta, zatáčka i šnek. Nápověda zůstala po ruce — a nebyla potřeba.';$('#winPraise').classList.remove('hidden');$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · první výhra`;setWinXpDisplay(old?'🎓 Trénink dokončen':'+10 XP · první odměna');const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent='🎓 Zaškoleno';$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');$('#newBadgeBox').classList.add('hidden');$('#newBadgeBox').innerHTML='';const hardActions=$('#starterHardActions');hardActions?.classList.toggle('hidden',!hardNext);
@@ -891,11 +908,11 @@ async function finishTajenkaGame(g){
  const state=tajenkaState(),old=tajenkaCompletion(g.puzzle,state),rewardXp=old?0:Number(g.puzzle.meta?.rewardXp)||TAJENKA_REWARD_XP,completion={puzzleId:g.puzzle.id,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,elapsedMs:Math.round(g.elapsedMs),completedAt:new Date().toISOString(),rewarded:true,rewardXp};state.version=2;state.completions=state.completions||{};state.completions[g.puzzle.id]=completion;state.completed=completion;delete state.inProgress;saveTajenkaState(state);
  if(TAJENKA_RELEASE_ENABLED&&!old){const rec={puzzleId:g.puzzle.id,challengeKey:challengeKey('tajenka',g.puzzle,null),mode:'tajenka',difficulty:g.puzzle.difficulty||'medium',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:rewardXp,hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:null,cleanSolve:(g.hints||0)===0,completedAt:completion.completedAt};queueResult(rec);if(getProfile()?.token)syncQueue({announce:false}).catch(()=>{})}
  trackProductEvent('tajenka_completed');
- await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:520);
- $('#screen-game').classList.add('tajenka-mode');$('#winModal').classList.remove('starter-win','hidden');$('#levelLeaderboardBox')?.classList.add('hidden');$('#winAccountBtn')?.classList.add('hidden');$('#newBadgeBox')?.classList.add('hidden');$('#newBadgeBox').innerHTML='';$('#winFeedback')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');$('#winBadge').textContent='✦';$('#winTitle').textContent='Tajenka odhalena!';$('#winPraise').textContent='Pět slov, jedna společná myšlenka.';$('#winPraise').classList.remove('hidden');$('#winText').textContent=`${fmtTime(g.elapsedMs)} · ${countCz(g.moves,'tah','tahy','tahů')} · víkendový bonus`;setWinXpDisplay(rewardXp?`+${rewardXp} XP · jednou za tuto Tajenku`:'Znovu · bez dalších XP');$('#winClean').classList.remove('hidden','hinted');$('#winClean').textContent='Bonus bez žebříčku';const phrase=$('#tajenkaWinPhrase'),words=tajenkaPhraseWords(g.puzzle);if(phrase){phrase.classList.remove('hidden');phrase.innerHTML=`<span class="stat-label">TAJENKA</span><strong>${esc(g.puzzle.tajenka.phrase)}</strong><small>${countCz(words.length,'nalezené slovo','nalezená slova','nalezených slov')}</small>`}$('#winWords').innerHTML='';$('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Zpět na Dnes';confetti();fx('win');renderTajenkaEntry();
+ await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
+ $('#screen-game').classList.add('tajenka-mode');$('#winModal').classList.remove('starter-win','hidden');$('#levelLeaderboardBox')?.classList.add('hidden');$('#winAccountBtn')?.classList.add('hidden');$('#newBadgeBox')?.classList.add('hidden');$('#newBadgeBox').innerHTML='';$('#winFeedback')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');$('#winBadge').textContent='✦';$('#winTitle').textContent='Tajenka odhalena!';$('#winPraise').classList.add('hidden');$('#winText').textContent=`${fmtTime(g.elapsedMs)} · ${countCz(g.moves,'tah','tahy','tahů')} · víkendový bonus`;setWinXpDisplay(rewardXp?`+${rewardXp} XP · jednou za tuto Tajenku`:'Znovu · bez dalších XP');$('#winClean').classList.remove('hidden','hinted');$('#winClean').textContent='Bonus bez žebříčku';const phrase=$('#tajenkaWinPhrase'),words=tajenkaPhraseWords(g.puzzle);if(phrase){phrase.classList.remove('hidden');phrase.innerHTML=`<span class="stat-label">TAJENKA</span><strong>${esc(g.puzzle.tajenka.phrase)}</strong><small>${countCz(words.length,'nalezené slovo','nalezená slova','nalezených slov')}</small>`}$('#winWords').innerHTML='';$('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Zpět na Dnes';confetti();fx('win');renderTajenkaEntry();
 }
 async function finishGame(){
- const g=currentGame,completion={game:g,data:Object.create(null)};await runGameCompletionHooks('before',completion);if(g?.mode==='starter'){const out=await finishStarterGame(g);await runGameCompletionHooks('after',completion);return out}if(g?.mode==='tajenka'){const out=await finishTajenkaGame(g);await runGameCompletionHooks('after',completion);return out}postWinEngagementNudgeShown=false;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];$('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:520);const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
+ const g=currentGame,completion={game:g,data:Object.create(null)};await runGameCompletionHooks('before',completion);if(g?.mode==='starter'){const out=await finishStarterGame(g);await runGameCompletionHooks('after',completion);return out}if(g?.mode==='tajenka'){const out=await finishTajenkaGame(g);await runGameCompletionHooks('after',completion);return out}postWinEngagementNudgeShown=false;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];$('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
  const dailyGenerationUpgrade=g.mode==='daily'&&!!old&&old.puzzleId!==g.puzzle.id;
  const dailyReplay=g.mode==='daily'&&!!old&&!dailyGenerationUpgrade;
  const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,level:g.mode==='free'?Number(g.puzzle.meta?.level)||null:null,contentGeneration:g.mode==='free'?Number(g.puzzle.meta?.contentGeneration)||Number(puzzleDB.freeGeneration)||2:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty,g.puzzle),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString()};
@@ -1084,7 +1101,7 @@ function gameInput(){
  if(gameInputController)return gameInputController;
  const factory=window.PropletGameInput;if(!factory?.create)return null;
  gameInputController=factory.create({
-  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,submit:submitPath,
+  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,clearHints:clearHintTrace,submit:()=>submitPath(),
   query:$,documentObj:document,windowObj:window,navigatorObj:navigator,colors:COLORS,escapeHtml:esc,getSettings,
  });return gameInputController;
 }
@@ -1453,7 +1470,19 @@ async function probeCanonicalRelease(force=false){
  const now=Date.now();if(releaseProbeBusy||(!force&&now-lastReleaseProbeAt<60000))return;releaseProbeBusy=true;lastReleaseProbeAt=now;
  try{
   const local=await fetch(`/api/config?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.json():null);
-  if(!local||local.environment==='preview')return;
+  if(!local)return;
+  if(local.environment==='preview'){
+   const source=await fetch(`/sw.js?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.text():'');
+   const release=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
+   if(release&&release!==APP_PREVIEW_RELEASE){
+    runtimeUpdateRequired=true;
+    showUpdateBanner(pendingSW);
+    if(currentScreen!=='game'&&document.visibilityState==='visible')setTimeout(()=>{
+     if(currentScreen!=='game'&&document.visibilityState==='visible')recoverRuntimeUpdate({automatic:true,targetVersion:release});
+    },1200);
+   }
+   return;
+  }
   const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
   const source=await fetch(`${canonicalOrigin}/runtime-meta.js?release_probe=${now}`,{cache:'no-store',mode:'cors'}).then(r=>r.ok?r.text():'');
   const canonicalVersion=source.match(/version:\s*['\"]([^'\"]+)['\"]/)?.[1];if(!canonicalVersion)return;
@@ -1514,6 +1543,7 @@ function openOnboarding(force=false){
 function closeOnboarding(forceClose=false){if(onboardingMandatory&&!forceClose)return;try{localStorage.setItem(ONBOARD_KEY,'done');localStorage.setItem(HELPER_ONBOARD_KEY,'done')}catch{}$('#onboardingModal').classList.add('hidden');tutorialState={dragging:false,path:[],done:false};onboardingMandatory=false;onboardingFocusedHelper=false}
 function renderOnboarding(){
  const step=ONBOARD_STEPS[onboardingStep],modal=$('.onboarding-card');
+ if(!step.interactive){document._propletTutorialPointerController?.abort();document._propletTutorialPointerController=null}
  $('#onboardDots').innerHTML=onboardingFocusedHelper?'<i class="active"></i>':ONBOARD_STEPS.map((_,i)=>`<i class="${i===onboardingStep?'active':''}"></i>`).join('');
  $('#onboardContent').innerHTML=typeof step.html==='function'?step.html():step.html;const waitingTutorial=!!step.interactive&&!tutorialState.done,waitingSupport=!!step.support&&!onboardingSupportMode;modal.classList.toggle('waiting-interaction',waitingTutorial||waitingSupport);modal.classList.toggle('support-step',!!step.support);
  $('#onboardNextBtn').textContent=step.support?(onboardingSupportMode?(onboardingFocusedHelper?'Uložit a pokračovat':'Jdu na první Proplet 🧩'):'Nejdřív vyber možnost'):(waitingTutorial?'Nejdřív najdi PES':(step.cta||'Pokračovat'));
@@ -1533,9 +1563,13 @@ function renderTutorialPath(){
 }
 function bindTutorial(){
  const board=$('#tutorialBoard');if(!board)return;
+ document._propletTutorialPointerController?.abort?.();
+ const controller=typeof AbortController==='function'?new AbortController():null,events=controller?{signal:controller.signal}:undefined;
+ document._propletTutorialPointerController=controller;
+ let pointerId=null;
  const add=i=>{const p=tutorialState.path,last=p.at(-1);if(i===last)return;if(p.length>1&&i===p.at(-2)){p.pop();renderTutorialPath();return}if(p.includes(i)||last==null||!tutorialAdj(last,i))return;p.push(i);renderTutorialPath()};
  const complete=()=>{tutorialState.done=true;tutorialState.tapPath=[];if(onboardingMandatory&&!onboardingTutorialTracked){onboardingTutorialTracked=true;trackProductEvent('onboarding_tutorial_completed')}$('#tutorialSuccess').textContent='Jo! 🐶 Slovo může i zatáčet.';fx('correct');renderTutorialPath();$('.onboarding-card').classList.remove('waiting-interaction');$('#onboardNextBtn').textContent='Jo, chápu'};
- const fail=()=>{$('#tutorialSuccess').textContent='Skoro. Zkus P → E a pak dolů na S.';fx('wrong');tutorialState.path=[];tutorialState.tapPath=[];renderTutorialPath()};
+ const fail=()=>{$('#tutorialSuccess').textContent='Skoro. Zkus P ↓ E a pak doprava na S.';fx('wrong');tutorialState.path=[];tutorialState.tapPath=[];renderTutorialPath()};
  const tap=i=>{
   const owner=window.PropletEngagementOnboarding;
   const progress=owner?.advancePesTapPath?owner.advancePesTapPath(tutorialState.tapPath||[],i):(()=>{const target=[0,1,4],path=tutorialState.tapPath||[];if(i===target[path.length]){const next=[...path,i];return {path:next,done:next.length===target.length,valid:true}}if(i===0)return {path:[0],done:false,valid:true};return {path:[],done:false,valid:false}})();
@@ -1544,11 +1578,13 @@ function bindTutorial(){
   $('#tutorialSuccess').textContent=progress.valid?(progress.path.length===1?'Super. Teď E.':'Ještě S.'):'Začni písmenem P.';
   if(!progress.valid)fx('wrong');renderTutorialPath();
  };
- board.querySelectorAll('.tutorial-cell').forEach(c=>c.onpointerdown=e=>{e.preventDefault();tutorialState.dragging=true;tutorialState.path=[+c.dataset.tidx];renderTutorialPath();try{c.setPointerCapture(e.pointerId)}catch{}});
- board.onpointermove=e=>{if(!tutorialState.dragging)return;const c=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('.tutorial-cell');if(c)add(+c.dataset.tidx)};
- const finish=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;if(tutorialState.path.length===1){tap(tutorialState.path[0]);return}tutorialState.tapPath=[];if(tutorialState.path.join(',')==='0,1,4')complete();else fail()};
- const cancel=()=>{if(!tutorialState.dragging)return;tutorialState.dragging=false;tutorialState.path=[...(tutorialState.tapPath||[])];renderTutorialPath()};
+ board.querySelectorAll('.tutorial-cell').forEach(c=>c.onpointerdown=e=>{if(e.isPrimary===false||tutorialState.done)return;e.preventDefault();pointerId=e.pointerId;tutorialState.dragging=true;tutorialState.path=[+c.dataset.tidx];renderTutorialPath()});
+ board.onpointermove=e=>{if(!tutorialState.dragging||e.pointerId!=null&&e.pointerId!==pointerId)return;e.preventDefault?.();const c=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('.tutorial-cell');if(c&&(!board.contains||board.contains(c)))add(+c.dataset.tidx)};
+ const finish=e=>{if(!tutorialState.dragging||e?.pointerId!=null&&e.pointerId!==pointerId)return;tutorialState.dragging=false;pointerId=null;if(tutorialState.path.length===1){tap(tutorialState.path[0]);return}tutorialState.tapPath=[];if(tutorialState.path.join(',')==='0,1,4')complete();else fail()};
+ const cancel=e=>{if(!tutorialState.dragging||e?.pointerId!=null&&e.pointerId!==pointerId)return;tutorialState.dragging=false;pointerId=null;tutorialState.path=[...(tutorialState.tapPath||[])];renderTutorialPath()};
  board.onpointerup=finish;board.onpointercancel=cancel;
+ document.addEventListener?.('pointerup',finish,{capture:true,...events});
+ document.addEventListener?.('pointercancel',cancel,{capture:true,...events});
 }
 
 
@@ -1571,30 +1607,71 @@ function rankBadge(rank){
  const value=Number(rank)||0,medals={1:['🥇','Zlatá medaile'],2:['🥈','Stříbrná medaile'],3:['🥉','Bronzová medaile']},medal=medals[value];
  return medal?`<span class="result-medal result-medal-${value}" role="img" aria-label="${medal[1]}">${medal[0]}</span>`:`<span class="result-rank-number">${value}.</span>`;
 }
+function rankingExpandMarkup(data){
+ const total=Number(data?.total||0);if(total<=1)return '';
+ const rank=Number(data?.myRank||0);
+ return `<details class="ranking-expand"><summary>Zobrazit pořadí · ${countCz(total,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${rank?`Tvoje pozice: ${rank}. z ${total}.`:'Celkové pořadí hráčů.'}</p><div class="ranking-expanded-rows"></div><button type="button" class="secondary-btn ranking-more">Načíst pořadí</button></details>`;
+}
+function rankingExpandedRows(rows){
+ return rows.map(r=>`<div class="mini-leader-row result-player-row ${r.isMine?'me':''}" ${r.isMine?'aria-label="Tvůj výsledek"':''}><b class="result-player-rank">${rankBadge(r.rank)}</b><span class="result-player-avatar" data-player-avatar="${esc(r.avatar||'🎭')}">${esc(r.avatar||'🎭')}</span><span class="result-player-copy"><strong>${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'Čistě':`Nápověda ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTime(r.elapsedMs)}</em></div>`).join('');
+}
+
+function bindRankingExpansion(container,data){
+ const details=container.querySelector('.ranking-expand');if(!details)return;
+ const rows=details.querySelector('.ranking-expanded-rows'),button=details.querySelector('.ranking-more');
+ const endpoint=data?.date?`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(data.date)}`:data?.puzzleId?`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(data.puzzleId)}`:null;
+ let firstOffset=Math.max(0,(Number(data?.myRank)||1)-26),offset=firstOffset,loading=false,loaded=!!rows?.children.length;
+ const before=document.createElement('button');before.type='button';before.className='secondary-btn ranking-before hidden';before.textContent='Předchozí hráči';rows?.before(before);
+ const focusMine=()=>requestAnimationFrame(()=>{if(details.open)(rows?.querySelector('.me')||rows?.firstElementChild)?.scrollIntoView({block:'center',behavior:'instant'})});
+ const load=async(previous=false)=>{
+  if(loading||(!previous&&offset===null)||!endpoint)return;
+  const initial=!loaded,anchor=previous?rows.firstElementChild:null,top=anchor?.getBoundingClientRect().top;
+  const pageOffset=previous?Math.max(0,firstOffset-50):offset;
+  loading=true;button.disabled=true;before.disabled=true;button.textContent='Načítám…';
+  try{
+   const page=transformRankingPayload(await api(`${endpoint}&offset=${pageOffset}`));
+   if(!details.isConnected)return;
+   const incoming=previous?(page.rows||[]).filter(r=>Number(r.rank)<=firstOffset):(page.rows||[]);
+   rows.insertAdjacentHTML(previous?'afterbegin':'beforeend',rankingExpandedRows(incoming));
+   if(previous)firstOffset=pageOffset;else offset=page.nextOffset??null;
+   loaded=true;before.classList.toggle('hidden',firstOffset===0);button.classList.toggle('hidden',offset===null);button.textContent='Další hráči';
+   if(initial)focusMine();
+   else if(anchor){const scroll=details.closest('.modal-card');if(scroll)scroll.scrollTop+=anchor.getBoundingClientRect().top-top}
+  }catch{button.textContent='Zkusit načíst znovu'}finally{loading=false;button.disabled=false;before.disabled=false}
+ };
+ details.addEventListener('toggle',()=>{if(!details.open)return;if(!loaded)load();else focusMine()});
+ if(button)button.onclick=()=>load();before.onclick=()=>load(true);
+}
+
 function renderFreeWorldBoard(data,error){
  if(error)return `<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(error)} Výsledek tím není ohrožený.</small></div>`;
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[],minimum=Number(data?.percentileMinimum||10);
- if(!rank){return `<div class="daily-world-head"><strong>🌍 Globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už tuhle úroveň proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${getProfile()?.token?'Tvůj první výsledek zatím není v globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.'}</small></div>${rows.length?`<div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.avatar||'🎭')} ${esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>`:''}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`}
+ if(!rank){return `<div class="daily-world-head"><strong>🌍 Globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už tuhle úroveň proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${getProfile()?.token?'Tvůj první výsledek zatím není v globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.'}</small></div>${rows.length?`<div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>`:''}${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`}
  const topLine=total===1?'První hráč téhle úrovně. Trůn je zatím celý tvůj.':total>=minimum?`Patříš mezi nejlepších ${data.topPercent} % hráčů této úrovně.`:`Jsi ${rank}. z ${total}. Procenta ukážeme od ${minimum} hráčů.`;
- return `<div class="daily-world-head"><strong>🌍 Globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}<small>${RANK_RULES}</small></p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku · počítá se první dokončený pokus.</small>`;
+ return `<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rankingExpandedRows(rows)}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku · počítá se první dokončený pokus.</small>`;
 }
 function renderFreeTeamBoard(data,error,myId){
  if(error)return `<div class="leaderboard-empty"><strong>Týmová tribuna se nenačetla.</strong><small>${esc(error)}</small></div>`;
  if(data?.anonymous)return '<div class="leaderboard-empty"><strong>Ulož si postup a pak se můžeš přidat k týmu.</strong><small>Týmový žebříček srovnává přesně tuhle úroveň.</small></div>';
- const rows=data?.rows||[],my=rows.find(r=>r.id===myId);if(!rows.length)return '<div class="leaderboard-empty">Zatím jsi tady první. To je docela slušný začátek. 👑</div>';
- return `<div class="level-board-head"><strong>👥 Pořadí v týmu</strong>${my?`<span>Ty: ${my.rank}. místo</span>`:''}<small>${RANK_RULES} · počítá se první dokončený pokus.</small></div>`+rows.slice(0,5).map(r=>`<div class="mini-leader-row ${r.id===myId?'me':''}"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.name)}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('');
+ const rows=(data?.rows||[]).map(r=>({...r,isMine:r.id===myId}));if(!rows.length)return '<div class="leaderboard-empty">Zatím jsi tady první.</div>';
+ const mine=rows.findIndex(r=>r.isMine),start=mine<0?0:Math.max(0,Math.min(mine-1,rows.length-3));
+ const compact=rankingExpandedRows(rows.slice(start,start+3));
+ if(rows.length<=1)return compact;
+ return `<div class="ranking-compact">${compact}</div><details class="ranking-expand"><summary>Zobrazit týmové pořadí · ${countCz(rows.length,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${mine>=0?`Tvoje pozice: ${rows[mine].rank}. z ${rows.length}.`:'Celkové pořadí týmu.'}</p><div class="ranking-expanded-rows">${rankingExpandedRows(rows)}</div></details>`;
+
 }
 function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
  const globalRank=Number(data?.world?.myRank||0)||null,teamRank=(data?.team?.rows||[]).find(r=>r.id===myId)?.rank||null;
- const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
+ const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;bindRankingExpansion(container,active==='world'?data?.world:null);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
  render(initialTab);return {globalRank,teamRank};
 }
 async function loadWinLevelLeaderboard(puzzle,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='free'||isMozkomorQaDifficulty(puzzle?.difficulty)){box?.classList.add('hidden');return}box.classList.remove('hidden');box.innerHTML='<div class="leaderboard-empty">Načítám globální i týmové pořadí…</div>';try{const data=await fetchFreeLevelLeaderboards(puzzle.id),ranks=renderFreeLeaderboardPanel(box,data,getProfile()?.id);levelDetailContext={puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:puzzle.meta?.level,globalRank:ranks.globalRank,teamRank:ranks.teamRank,result:rec}}catch(e){box.innerHTML=`<div class="leaderboard-empty">Pořadí se teď nepodařilo načíst. <small>${esc(e.message)}</small></div>`}}
 function renderDailyGlobalLeaderboardBox(container,data){
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[];container.classList.remove('free-level-board');container.classList.add('daily-global-board');container.classList.remove('hidden');
- if(!rank){const message=getProfile()?.token?'Tvůj výsledek zatím není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>`;return}
+ if(!rank){const message=getProfile()?.token?'Tvůj výsledek zatím není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>${rankingExpandMarkup(data)}`;bindRankingExpansion(container,data);return}
  const topLine=total===1?'První hráč dne. Království je zatím celé tvoje.':`Patříš mezi nejlepších ${data.topPercent} % dnešních hráčů.`;
- container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}<small>${RANK_RULES}</small></p></div><div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row ${r.isMine?'me':''}"><b>${rankBadge(r.rank)}</b><span><strong>${esc(r.avatar||'🎭')} ${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div><small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
+ container.innerHTML=`<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rankingExpandedRows(rows)}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
+ bindRankingExpansion(container,data);
 }
 async function loadWinDailyGlobalLeaderboard(date,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='daily'){return}box.classList.remove('hidden');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám globální pořadí…</div>';try{const data=transformRankingPayload(await api(`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(date)}`));winDailyGlobalData=data;renderDailyGlobalLeaderboardBox(box,data)}catch(e){box.innerHTML=`<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(e.message)}. Výsledek tím není ohrožený.</small></div>`}}
 async function openLevelDetail(diff,puzzleId){
@@ -1773,16 +1850,24 @@ const TAJENKA_PRODUCTION_HOSTS=new Set(['hrajproplet.cz','www.hrajproplet.cz','p
 const TAJENKA_PREVIEW_ORIGIN=location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname.endsWith('.vercel.app');
 const TAJENKA_PREVIEW=new URLSearchParams(location.search).get('tajenka')==='1'&&TAJENKA_PREVIEW_ORIGIN&&!TAJENKA_PRODUCTION_HOSTS.has(location.hostname);
 const TAJENKA_RELEASE_ENABLED=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaReleaseEnabled===true;
-const requestedTajenkaWeek=Math.min(10,Math.max(1,Number.parseInt(new URLSearchParams(location.search).get('tajenka_week')||'1',10)||1));
+const requestedTajenkaWeek=Math.min(37,Math.max(1,Number.parseInt(new URLSearchParams(location.search).get('tajenka_week')||'1',10)||1));
 const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';
-const TAJENKA_PREPARED_WEEKS=10;
+const TAJENKA_TWICE_WEEKLY_START=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaTwiceWeeklyStart||'2026-09-12';
+const TAJENKA_PREPARED_WEEKS=37;
 let activeTajenkaWeek=null;
 let TAJENKA_AVAILABLE=false;
 let tajenkaPuzzle=null;
 let tajenkaRecapOpen=false;
 
+function tajenkaReleaseSlotForISO(iso=pragueDateISO()){
+ const initialOffset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY);
+ if(initialOffset<0)return null;
+ const cadenceOffset=dayOffsetISO(iso,TAJENKA_TWICE_WEEKLY_START);
+ if(cadenceOffset<0)return Math.floor(initialOffset/7)+1;
+ return 3+Math.floor(cadenceOffset/7)*2+(cadenceOffset%7>=4?1:0);
+}
 function refreshTajenkaAvailability(iso=pragueDateISO()){
- const offset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY),week=offset>=0?Math.floor(offset/7)+1:null;
+ const week=tajenkaReleaseSlotForISO(iso);
  activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);
  TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);
  return TAJENKA_AVAILABLE;
@@ -1790,7 +1875,7 @@ function refreshTajenkaAvailability(iso=pragueDateISO()){
 refreshTajenkaAvailability();
 
 function tajenkaFixtureValid(data){
- if(!data||data.version!==1||!/^tajenka-v2-week-\d{2}$/.test(data.id)||data.kind!=='weekend_bonus'||data.meta?.previewOnly!==true||Number(data.meta?.rewardXp)!==TAJENKA_REWARD_XP)return false;
+ if(!data||data.version!==2||!/^tajenka-v2-week-\d{2}$/.test(data.id)||data.kind!=='weekend_bonus'||data.meta?.previewOnly!==true||Number(data.meta?.rewardXp)!==TAJENKA_REWARD_XP)return false;
  if(!Number.isInteger(data.rows)||!Number.isInteger(data.cols)||!Array.isArray(data.mask)||!Array.isArray(data.letters)||!Array.isArray(data.answers))return false;
  if(data.letters.length!==data.rows*data.cols||data.mask.length!==Number(data.meta?.cells)||data.answers.length<1)return false;
  const mask=new Set(data.mask);if(mask.size!==data.mask.length||data.mask.some(i=>!Number.isInteger(i)||i<0||i>=data.letters.length))return false;
@@ -1821,6 +1906,26 @@ function tajenkaFoundFromState(puzzle,row){
 }
 function savedTajenkaProgress(puzzle){const row=tajenkaState().inProgress;const found=tajenkaFoundFromState(puzzle,row);if(!row||row.puzzleId!==puzzle.id)return null;return {...row,found,moves:Math.max(0,Number(row.moves)||0),hints:Math.max(0,Number(row.hints)||0),wrongAttempts:Math.max(0,Number(row.wrongAttempts)||0),maxHintLevel:Math.max(0,Number(row.maxHintLevel)||0),elapsedMs:Math.max(0,Number(row.elapsedMs)||0)} }
 function tajenkaPhraseWords(puzzle=tajenkaPuzzle){return (puzzle?.tajenka?.answerOrder||[]).map(i=>puzzle.answers[i]).filter(Boolean)}
+function tajenkaPhraseTokens(puzzle=tajenkaPuzzle){
+ const display=String(puzzle?.tajenka?.displayText||puzzle?.tajenka?.phrase||'');
+ const parts=display.match(/[\p{L}\p{N}]+|[^\p{L}\p{N}]+/gu)||[display];
+ const tokens=parts.map((text,index)=>({text,index,isWord:/^[\p{L}\p{N}]+$/u.test(text),answerIndex:null}));
+ const words=tokens.filter(token=>token.isWord);const used=new Set();
+ const norm=value=>String(value||'').toLocaleUpperCase('cs-CZ');
+ for(let answerIndex=0;answerIndex<(puzzle?.answers||[]).length;answerIndex++){
+  const answer=puzzle.answers[answerIndex];const token=words.find(word=>!used.has(word.index)&&norm(word.text)===norm(answer.word));
+  if(token){token.answerIndex=answerIndex;used.add(token.index)}
+ }
+ for(const companion of (puzzle?.tajenka?.companions||[])){
+  const wanted=(String(companion?.text||'').match(/[\p{L}\p{N}]+/gu)||[]).map(norm);if(!wanted.length)continue;
+  const revealIndex=(puzzle?.answers||[]).findIndex(answer=>norm(answer.word)===norm(companion?.revealWith));if(revealIndex<0)continue;
+  for(let i=0;i<=words.length-wanted.length;i++){
+   const slice=words.slice(i,i+wanted.length);if(slice.some(word=>used.has(word.index)))continue;
+   if(slice.every((word,j)=>norm(word.text)===wanted[j])){slice.forEach(word=>{word.answerIndex=revealIndex;used.add(word.index)});break}
+  }
+ }
+ return tokens;
+}
 function trackTajenkaAbandon(g=currentGame){if(!TAJENKA_AVAILABLE||!g||g.mode!=='tajenka'||g.finished||g.tajenkaAbandonTracked)return;g.tajenkaAbandonTracked=true;trackProductEvent('tajenka_abandoned')}
 function trackTajenkaView(){if(!TAJENKA_AVAILABLE)return;try{const key=`${TAJENKA_VIEW_KEY}:${tajenkaPuzzle?.id||'unknown'}`;if(sessionStorage.getItem(key)==='1')return;sessionStorage.setItem(key,'1')}catch{}trackProductEvent('tajenka_viewed')}
 function showTajenkaRecap(completion=tajenkaCompletion()){
@@ -1835,10 +1940,16 @@ function renderTajenkaEntry(){
  const root=$('#tajenkaPreviewCard');if(!root)return;
  if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){root.classList.add('hidden');root.classList.remove('completed');root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;root.innerHTML='';return}
  const state=tajenkaState(),inProgress=state.inProgress?.puzzleId===tajenkaPuzzle.id,completion=tajenkaCompletion(tajenkaPuzzle,state),completed=!!completion;
+ const quick=$('#quickPlayCard'),hero=document.querySelector('#screen-daily .daily-hero');
+ $('#screen-daily')?.appendChild(root);
  root.classList.toggle('completed',completed);
  if(completed){
-  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><h2>Tajenka odhalena</h2><small class="tajenka-entry-next">Další přijde zase v sobotu.</small></div><span class="tajenka-entry-open" aria-hidden="true">›</span>`;
-  root.setAttribute('role','button');root.tabIndex=0;root.setAttribute('aria-label','Tajenka odhalena. Zobrazit výsledek.');root.onclick=()=>showTajenkaRecap(completion);root.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showTajenkaRecap(completion)}};root.classList.remove('hidden');trackTajenkaView();return;
+  root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
+  root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><h2>Tajenka odhalena</h2><strong class="tajenka-revealed-phrase">${esc(tajenkaPuzzle.tajenka.phrase)}</strong><small class="tajenka-entry-next">Další přijde zase v sobotu.</small></div><div class="tajenka-home-actions"><button type="button" class="secondary-btn" data-tajenka-recap>Zobrazit výsledek</button><button type="button" class="secondary-btn" data-tajenka-share>Sdílet Tajenku</button></div>`;
+  root.querySelector('[data-tajenka-recap]').onclick=()=>showTajenkaRecap(completion);
+  const phrase=tajenkaPuzzle.tajenka.phrase;
+  root.querySelector('[data-tajenka-share]').onclick=()=>shareProplet(`Proplet · Tajenka odhalena\n${phrase}\n\nZahraj si taky: ${SHARE_URL}`);
+  root.classList.remove('hidden');trackTajenkaView();return;
  }
  root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
  const progress=inProgress?tajenkaFoundFromState(tajenkaPuzzle,state.inProgress).length:0,total=tajenkaPhraseWords(tajenkaPuzzle).length,reward=Number(tajenkaPuzzle.meta?.rewardXp)||TAJENKA_REWARD_XP;

@@ -1,0 +1,244 @@
+/* Proplet ribbon presentation. Theme roles, not changes to game state. */
+html.ribbon-ui{
+ --r-accent:#197970;--r-accent-soft:#EAF3ED;--r-paper:#FFFDF7;--r-surface:#FFFFFF;
+ --r-ink:#243431;--r-muted:#626D64;--r-edge:#DDDCCF;--r-track:#E4EAE2;
+ --r-active:#F1C962;--r-active-edge:#A87812;--r-active-ink:#302A18;
+ --r-error:#BA4D43;--r-error-soft:#FBE6E0;
+ --r-board-mat:#D7CDB8;--r-board-tile:#263A38;--r-board-letter:#FFF7E4;
+ --r-board-edge:#657970;--r-board-foot:#172522;
+ --r-board-active:#82411D;--r-board-active-edge:#F3BE55;
+ --r-board-error:#762F2D;--r-board-error-edge:#F28D7D;
+ --r-board-hint:#5E4A13;--r-board-hint-edge:#FFD86A;--r-board-hint-full:#175449;
+ --r-board-path-active:#493208;--r-board-path-error:#6B2827;
+ --purple:var(--r-accent);--purple2:#3A9B86;--muted:var(--r-muted);
+}
+html.ribbon-ui[data-theme="dark"]{
+ --r-accent:#78CABA;--r-accent-soft:#263D39;--r-paper:#20282A;--r-surface:#293234;
+ --r-ink:#F4EEDD;--r-muted:#B9C3B9;--r-edge:#485552;--r-track:#394743;
+ --r-active:#D7AA45;--r-active-edge:#F2CD70;--r-active-ink:#292718;
+ --r-error:#F38C7B;--r-error-soft:#513632;
+ --r-board-mat:#0F1514;--r-board-tile:#36514D;--r-board-letter:#FFF7E4;
+ --r-board-edge:#7C9187;--r-board-foot:#080D0C;
+ --r-board-path-active:#F3BE55;--r-board-path-error:#F28D7D;
+ --bg:var(--r-paper);--paper:var(--r-surface);--ink:var(--r-ink);--line:var(--r-edge);
+}
+html.ribbon-ui .ribbon-art{display:inline-grid!important;place-items:center;position:relative;width:40px;height:40px;min-width:0;vertical-align:middle;flex-shrink:0;line-height:0}
+html.ribbon-ui .ribbon-art img{display:block;width:100%;height:100%;object-fit:contain;padding:0;border:0;background:none;box-shadow:none}
+html.ribbon-ui .ribbon-art .ribbon-dark{display:none}
+html.ribbon-ui[data-theme="dark"] .ribbon-art .ribbon-light{display:none}
+html.ribbon-ui[data-theme="dark"] .ribbon-art .ribbon-dark{display:block}
+html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"]){filter:grayscale(.85);opacity:.8}
+html.ribbon-ui .ribbon-slot{display:inline-grid!important;place-items:center;background:transparent!important;border:0!important;box-shadow:none!important}
+html.ribbon-ui #screen-profile .level-step:has(.ribbon-art){opacity:1}
+html.ribbon-ui #screen-profile .level-step .ribbon-art{width:42px;height:42px}
+html.ribbon-ui #screen-profile .achievement .ribbon-art,html.ribbon-ui #screen-profile .profile-badge .ribbon-art{width:34px;height:34px}
+html.ribbon-ui #screen-profile .achievement-peek .ribbon-art{width:30px;height:30px}
+html.ribbon-ui #screen-profile .achievement-peek b:has(.ribbon-art){display:grid!important;place-items:center;font-size:0;background:none!important;box-shadow:none!important;border:0!important}
+html.ribbon-ui #screen-profile .achievement:has(.ribbon-art),html.ribbon-ui #screen-profile .profile-badge:has(.ribbon-art){opacity:1}
+html.ribbon-ui .home-progress-level-icon:has(.ribbon-art){background:none!important}
+html.ribbon-ui .home-progress-level-icon .ribbon-art{width:32px;height:32px}
+html.ribbon-ui .result-medal .ribbon-art{width:40px;height:40px}
+/* One functional accent. Difficulty and found-word palettes keep their meaning. */
+html.ribbon-ui .level-step.current,
+html.ribbon-ui .achievement-summary,
+html.ribbon-ui .ranking-segment,
+html.ribbon-ui .theme-segment,
+html.ribbon-ui .account-tabs,
+html.ribbon-ui .win-result-hero{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important;background-image:none!important}
+html.ribbon-ui .level-step.current{border-color:var(--r-accent)!important;outline-color:var(--r-accent)!important;box-shadow:0 0 0 1px var(--r-accent)!important}
+html.ribbon-ui .level-step.current .level-num,
+html.ribbon-ui .achievement-progress>span,
+html.ribbon-ui .achievement-summary-progress>span{background:var(--r-accent)!important;background-image:none!important}
+html.ribbon-ui .achievement-progress,html.ribbon-ui .achievement-summary-progress{background:var(--r-track)!important}
+html.ribbon-ui .achievement-summary-copy>span,
+html.ribbon-ui .achievement-summary-toggle,
+html.ribbon-ui .ranking-segment button.active,
+html.ribbon-ui .current-word strong{color:var(--r-accent)!important}
+html.ribbon-ui .achievement-summary-toggle{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .bottom-nav button.active{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
+html.ribbon-ui .bottom-nav{background:var(--r-paper)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .achievement-summary small{color:var(--r-muted)!important}
+/* Dark mode has its own ink and surfaces. */
+html.ribbon-ui[data-theme="dark"],html.ribbon-ui[data-theme="dark"] body{background:var(--r-paper)!important;color:var(--r-ink)!important}
+html.ribbon-ui[data-theme="dark"] .card,
+html.ribbon-ui[data-theme="dark"] .settings-card,
+html.ribbon-ui[data-theme="dark"] .profile-card,
+html.ribbon-ui[data-theme="dark"] .profile-account-hub,
+html.ribbon-ui[data-theme="dark"] .home-competition-card,
+html.ribbon-ui[data-theme="dark"] .ranking-section,
+html.ribbon-ui[data-theme="dark"] .home-diff-tile,
+html.ribbon-ui[data-theme="dark"] .home-resume-card,
+html.ribbon-ui[data-theme="dark"] .game-info,
+html.ribbon-ui[data-theme="dark"] .current-word,
+html.ribbon-ui[data-theme="dark"] .board-stage,
+html.ribbon-ui[data-theme="dark"] .modal-card{background:var(--r-surface)!important;border-color:var(--r-edge)!important;color:var(--r-ink)!important;box-shadow:0 3px 12px #11191B44!important}
+html.ribbon-ui[data-theme="dark"] .muted,
+html.ribbon-ui[data-theme="dark"] .eyebrow,
+html.ribbon-ui[data-theme="dark"] .stat-label,
+html.ribbon-ui[data-theme="dark"] .profile-account-hub p,
+html.ribbon-ui[data-theme="dark"] .free-level-desc,
+html.ribbon-ui[data-theme="dark"] .difficulty-card p,
+html.ribbon-ui[data-theme="dark"] .home-diff-tile small,
+html.ribbon-ui[data-theme="dark"] .home-resume-card small{color:var(--r-muted)!important}
+html.ribbon-ui[data-theme="dark"] .home-progress-level,
+html.ribbon-ui[data-theme="dark"] #screen-profile .profile-rank-stat{background:#3B3526!important;border-color:#7B6942!important;color:#F7E6BA!important}
+html.ribbon-ui[data-theme="dark"] .home-progress-level-track{background:#574B2D!important}
+html.ribbon-ui[data-theme="dark"] .home-progress-level-track b{background:#DBB75D!important}
+html.ribbon-ui[data-theme="dark"] #quickPlayCard.home-free-section{background:transparent!important;border:0!important;box-shadow:none!important}
+html.ribbon-ui[data-theme="dark"] .secondary-btn,
+html.ribbon-ui[data-theme="dark"] input,
+html.ribbon-ui[data-theme="dark"] select,
+html.ribbon-ui[data-theme="dark"] textarea{background:#313D3E!important;color:var(--r-ink)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui[data-theme="dark"] .text-btn,html.ribbon-ui[data-theme="dark"] .quick-all-btn{color:var(--r-accent)!important}
+/* The board is a precise composing bed, not another paper card. Letter contrast wins. */
+html.ribbon-ui #screen-game .board-stage{
+ background:var(--r-board-mat)!important;
+ background-image:none!important;
+ border:1px solid color-mix(in srgb,var(--r-board-edge) 65%,var(--r-board-mat))!important;
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--r-board-letter) 10%,transparent),0 7px 18px rgba(28,35,31,.1)!important;
+}
+html.ribbon-ui #screen-game .board{isolation:isolate}
+html.ribbon-ui .board .cell{
+ position:relative;
+ background:var(--r-board-tile)!important;
+ color:var(--r-board-letter)!important;
+ border-color:var(--r-board-edge)!important;
+ border-radius:clamp(6px,calc(var(--cell-size) * .11),14px)!important;
+ font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+ font-size:clamp(15px,calc(var(--cell-size) * .43),38px)!important;
+ font-weight:900!important;
+ line-height:1!important;
+ text-shadow:0 1px 0 rgba(0,0,0,.72)!important;
+ box-shadow:0 2px 0 var(--r-board-foot),0 4px 9px rgba(16,27,24,.16)!important;
+ transition:transform 70ms ease,background 100ms ease,border-color 100ms ease,box-shadow 100ms ease!important;
+}
+html.ribbon-ui .board.dense-board .cell{border-radius:clamp(5px,calc(var(--cell-size) * .1),9px)!important}
+html.ribbon-ui .board.ultra-board .cell{border-radius:clamp(4px,calc(var(--cell-size) * .09),7px)!important}
+html.ribbon-ui .board .cell.active{
+ background:var(--r-board-active)!important;
+ border-color:var(--r-board-active-edge)!important;
+ color:var(--r-board-letter)!important;
+ transform:translateY(2px) scale(.96)!important;
+ box-shadow:inset 0 0 0 2px rgba(255,247,228,.22),0 0 0 2px color-mix(in srgb,var(--r-board-active-edge) 72%,transparent)!important;
+ z-index:3;
+}
+html.ribbon-ui .board .cell.active::after{
+ content:none;
+ position:absolute;right:3px;bottom:3px;top:auto;
+ width:clamp(11px,18%,18px);height:clamp(11px,18%,18px);
+ display:grid;place-items:center;border-radius:50%;
+ background:var(--r-board-letter);color:#392817;border:1px solid #392817;
+ font:900 clamp(7px,calc(var(--cell-size) * .12),10px)/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ text-shadow:none;box-shadow:0 1px 0 rgba(0,0,0,.25);
+}
+html.ribbon-ui .board .cell.route-start::after{outline:2px solid var(--r-board-letter);outline-offset:1px}
+html.ribbon-ui .board .cell.route-end::after{background:var(--r-board-active-edge);box-shadow:0 0 0 2px var(--r-board-letter)}
+html.ribbon-ui .board .cell.used{
+ background:var(--word-color)!important;
+ border-color:color-mix(in srgb,var(--word-color) 55%,var(--r-board-letter))!important;
+ color:var(--r-board-letter)!important;
+ transform:none!important;
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--word-color) 70%,#090D0C),0 1px 0 var(--r-board-foot)!important;
+}
+html.ribbon-ui .board .cell.wrong-flash{
+ background:var(--r-board-error)!important;
+ border-color:var(--r-board-error-edge)!important;
+ color:var(--r-board-letter)!important;
+ animation:wrongCellNudge 190ms ease!important;
+ box-shadow:inset 0 0 0 2px rgba(255,247,228,.22),0 0 0 2px var(--r-board-error-edge)!important;
+}
+html.ribbon-ui .board .cell.just-found{
+ animation:ribbonWordSeat 320ms cubic-bezier(.2,.8,.2,1) both!important;
+ animation-delay:var(--found-delay,0ms)!important;
+ box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--word-color) 45%,var(--r-board-letter)),0 1px 0 var(--r-board-foot)!important;
+}
+html.ribbon-ui .board .cell.hint,
+html.ribbon-ui .board .cell.hint-route{
+ background:var(--r-board-hint)!important;
+ border-color:var(--r-board-hint-edge)!important;
+ color:var(--r-board-letter)!important;
+ box-shadow:inset 0 0 0 2px rgba(255,247,228,.18),0 0 0 2px color-mix(in srgb,var(--r-board-hint-edge) 72%,transparent)!important;
+}
+html.ribbon-ui .board .cell.hint-route::after{
+ content:attr(data-hint-order);
+ right:3px;bottom:3px;top:auto;width:clamp(12px,20%,18px);height:clamp(12px,20%,18px);
+ background:var(--r-board-hint-edge);border:1px solid #42320C;color:#2B230F;
+ font:900 clamp(7px,calc(var(--cell-size) * .12),10px)/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+html.ribbon-ui .board .cell.hint-full{
+ background:var(--r-board-hint-full)!important;border-color:#81D5BC!important;color:var(--r-board-letter)!important;
+ box-shadow:inset 0 0 0 2px rgba(255,247,228,.18),0 0 0 2px rgba(129,213,188,.42)!important;
+}
+html.ribbon-ui #pathLayer .path-active{display:block!important;stroke:var(--r-board-path-active)!important;stroke-width:10px!important;opacity:1!important}
+html.ribbon-ui #pathLayer .path-found{stroke:var(--path-color)!important;stroke-width:8px!important;opacity:1!important}
+html.ribbon-ui #pathLayer .path-wrong{stroke:var(--r-board-path-error)!important;stroke-width:10px!important;opacity:1!important}
+html.ribbon-ui[data-theme="dark"] #pathLayer .path-found{stroke:color-mix(in srgb,var(--path-color) 55%,var(--r-board-letter))!important}
+html.ribbon-ui #screen-game .length-pill{background:color-mix(in srgb,var(--r-track) 72%,transparent)!important;color:var(--r-muted)!important}
+html.ribbon-ui #screen-game .length-pill.found{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
+html.ribbon-ui #screen-game .found-word-chip{background:color-mix(in srgb,var(--word-color) 28%,var(--r-paper))!important;color:var(--r-ink)!important;border-color:color-mix(in srgb,var(--word-color) 48%,var(--r-edge))!important}
+html.ribbon-ui #winModal .win-word{background:var(--word-color)!important;color:var(--r-board-letter)!important;border:1px solid color-mix(in srgb,var(--word-color) 58%,var(--r-board-letter))!important;text-shadow:0 1px 0 rgba(0,0,0,.45)!important}
+html.ribbon-ui #screen-game:has(.ultra-board) .word-status-row .lengths{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:visible!important;width:100%}
+html.ribbon-ui #screen-game:has(.ultra-board) .word-status-row .length-pill{min-width:0;width:100%;padding-inline:3px}
+html.ribbon-ui #screen-game .board-stage.board-complete{animation:ribbonBoardLock 640ms cubic-bezier(.2,.82,.2,1)!important}
+html.ribbon-ui .game-message{font-size:14px!important;line-height:1.4!important}
+html.ribbon-ui .game-message.good{color:var(--r-accent)!important}
+html.ribbon-ui .game-message.bad{color:var(--r-error)!important}
+@keyframes ribbonWordSeat{0%{transform:translateY(2px) scale(.95)}36%{transform:translateY(0) scale(1.045)}100%{transform:none}}
+@keyframes ribbonBoardLock{0%{transform:scale(.992);filter:saturate(.9)}42%{transform:scale(1.008);filter:saturate(1.12)}100%{transform:none;filter:none}}
+@media(max-width:600px){
+ html.ribbon-ui .game-message{font-size:15px!important}html.ribbon-ui .app-footer{margin-bottom:142px!important}
+ html.ribbon-ui .board.ultra-board .cell.active::after,html.ribbon-ui .board.ultra-board .cell.hint-route::after{right:1px;bottom:1px;width:10px;height:10px;font-size:7px;border-width:1px;box-shadow:none}
+ html.ribbon-ui .board.ultra-board .cell.route-start::after{outline-width:1px;outline-offset:0}
+ html.ribbon-ui .board.ultra-board .cell.route-end::after{box-shadow:0 0 0 1px var(--r-board-letter)}
+}
+@media(prefers-reduced-motion:reduce){
+ html.ribbon-ui .board .cell,html.ribbon-ui .board .cell.wrong-flash,html.ribbon-ui .board .cell.just-found{animation:none!important;transition:none!important}
+ html.ribbon-ui .board .cell.active{transform:none!important}
+ html.ribbon-ui #screen-game .board-stage.board-complete{animation:none!important}
+}
+
+html.ribbon-ui .achievement-summary-toggle,html.ribbon-ui #achievementToggle{background:var(--r-accent-soft)!important;color:var(--r-accent)!important}
+/* Existing control classes shared by the five main screens. */
+html.ribbon-ui .achievement-toggle-btn,
+html.ribbon-ui .ranking-daily-tab.active,
+html.ribbon-ui .ranking-scope-tab.active,
+html.ribbon-ui .ranking-period-tab.active,
+html.ribbon-ui .setting-toggle.on,
+html.ribbon-ui .theme-choice.active{background:var(--r-accent-soft)!important;color:var(--r-accent)!important;border-color:var(--r-accent)!important;box-shadow:none!important}
+html.ribbon-ui .length-pill{background:var(--r-track)!important;color:var(--r-ink)!important}
+html.ribbon-ui .icon-btn{background:var(--r-surface)!important;color:var(--r-ink)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .calm-quick-row{background:var(--r-surface)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .played-levels-btn:disabled{color:var(--r-muted)!important;opacity:.75!important}
+html.ribbon-ui #calmQuickBtn[aria-checked="true"],html.ribbon-ui .calm-setting-toggle[aria-checked="true"]{background:var(--r-accent)!important}
+html.ribbon-ui[data-theme="dark"] .game-actions .secondary-btn{background:var(--r-surface)!important;color:var(--r-ink)!important}
+/* Results reuse the same stage and ink; reward gold stays local to the reward. */
+html.ribbon-ui .win-summary,html.ribbon-ui .level-leaderboard-box,
+html.ribbon-ui .free-board-tabs,html.ribbon-ui .leaderboard-empty,
+html.ribbon-ui .mini-leader-row,html.ribbon-ui .unlock-row{background:var(--r-surface)!important;border-color:var(--r-edge)!important;color:var(--r-ink)!important;box-shadow:none!important}
+html.ribbon-ui .free-board-tab{background:transparent!important;color:var(--r-muted)!important}
+html.ribbon-ui .free-board-tab.active,html.ribbon-ui .win-account-btn{background:var(--r-accent-soft)!important;color:var(--r-accent)!important;border-color:var(--r-accent)!important;box-shadow:none!important}
+html.ribbon-ui .daily-world-head>span{background:var(--r-track)!important;color:var(--r-ink)!important}
+html.ribbon-ui .unlock-title{color:var(--r-accent)!important}
+html.ribbon-ui .new-badge-box{background:var(--r-accent-soft)!important;border-color:var(--r-edge)!important}
+html.ribbon-ui .mini-leader-row small,html.ribbon-ui .unlock-row small{color:var(--r-muted)!important;font-size:14px!important;line-height:1.4!important}
+@media(max-width:600px){html.ribbon-ui .mini-leader-row small,html.ribbon-ui .unlock-row small{font-size:15px!important}}
+/* Complete collection: one drawing per reward, no legacy medal plate around it. */
+html.ribbon-ui .result-medal.ribbon-slot,html.ribbon-ui .home-ranking-medal.ribbon-slot{padding:0!important;filter:none!important;transform:none!important;border-radius:0!important}
+html.ribbon-ui .result-medal.ribbon-slot::before{content:none!important}
+html.ribbon-ui .home-ranking-medal.ribbon-slot{display:inline-grid!important;width:32px!important;height:32px!important}
+html.ribbon-ui .home-ranking-medal .ribbon-art,html.ribbon-ui .leader-rank .ribbon-art{width:32px;height:32px}
+html.ribbon-ui .ribbon-rank-chip{display:inline-flex;align-items:center;gap:4px;background:transparent!important;color:var(--r-muted)!important}
+html.ribbon-ui .ribbon-rank-chip .ribbon-art{width:24px;height:24px}
+html.ribbon-ui #screen-profile .level-step,html.ribbon-ui #screen-profile .achievement,html.ribbon-ui #screen-profile .profile-badge{opacity:1!important}
+html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"]){filter:grayscale(1);opacity:.72}
+html.ribbon-ui .ribbon-art.is-locked:not([data-ribbon="zamceno"])::after{content:"";position:absolute;right:-1px;bottom:0;width:12px;height:14px;background:var(--r-ink);clip-path:path('M 3 5 L 3 3 A 3 3 0 0 1 9 3 L 9 5 L 11 5 L 11 14 L 1 14 L 1 5 Z M 5 5 L 7 5 L 7 3 A 1 1 0 0 0 5 3 Z');border:1px solid var(--r-paper)}
+html.ribbon-ui .achievement:not(.earned)>strong,html.ribbon-ui .profile-badge:not(.earned)>strong{color:var(--r-muted)!important}
+html.ribbon-ui .level-step.current .level-num{color:var(--r-paper)!important}
+html.ribbon-ui .achievement-peek.earned:has(.ribbon-art){background:var(--r-accent-soft)!important}
+html.ribbon-ui .win-badge.ribbon-slot{background:none!important;box-shadow:none!important;animation:none!important}
+html.ribbon-ui .win-badge .ribbon-art{width:64px;height:64px}
+html.ribbon-ui .streak-icon .ribbon-art,html.ribbon-ui .home-progress-streak i .ribbon-art{width:24px;height:24px}
+/* Locked rewards sit on neutral paper; colour is earned by the object. */
+html.ribbon-ui #screen-profile .level-step:not(.current):not(.earned),html.ribbon-ui #screen-profile .achievement:not(.earned),html.ribbon-ui #screen-profile .profile-badge:not(.earned){background:var(--r-paper)!important;border-color:var(--r-edge)!important;box-shadow:none!important}
+html.ribbon-ui .achievement-peek:not(.earned):has(.ribbon-art){background:transparent!important;border-color:var(--r-edge)!important}
+html.ribbon-ui[data-theme="dark"] .ribbon-art.is-locked:not([data-ribbon="zamceno"]){filter:grayscale(1) brightness(1.7);opacity:.85}

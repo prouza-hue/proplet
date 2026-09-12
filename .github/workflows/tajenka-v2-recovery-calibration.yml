@@ -1,0 +1,61 @@
+name: Tajenka v2 hard-board recovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ux/tiskarska-dilna
+    paths:
+      - '.github/workflows/tajenka-v2-recovery-calibration.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    strategy:
+      fail-fast: false
+      matrix:
+        id:
+          - tajenka-v2-c01
+          - tajenka-v2-c11
+          - tajenka-v2-c22
+          - tajenka-v2-c35
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Probe additional deterministic attempts
+        run: |
+          python tools/build_tajenka_v2_candidates.py \
+            --attempts 20 \
+            --ids ${{ matrix.id }} \
+            --output /tmp/${{ matrix.id }}.json
+      - name: Report result without weakening quality gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import os
+          cid = '${{ matrix.id }}'
+          payload = json.loads(Path(f'/tmp/{cid}.json').read_text(encoding='utf-8'))
+          boards = payload.get('boards', [])
+          failures = payload.get('failures', [])
+          assert len(boards) + len(failures) == 1
+          if boards:
+              b = boards[0]
+              assert b['runtimeEnabled'] is False
+              assert b['meta']['alternativeFullPaths'] == 0
+              print(f"RECOVERED {cid} score={b['meta']['qualityScore']}")
+          else:
+              print(f"STILL_REJECTED {cid}: {failures[0]['error']}")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recovery-${{ matrix.id }}
+          path: /tmp/${{ matrix.id }}.json
+          if-no-files-found: warn
