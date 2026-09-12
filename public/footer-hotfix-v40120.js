@@ -7,7 +7,7 @@
     const line=document.createElement('span');
     line.textContent='© 2026 Proplet · Česká slovní hra';
 
-    const author=document.createElement('div');
+    const author=document.createElement('span');
     author.className='footer-author';
     author.textContent='Pavel Prouza';
 
@@ -20,11 +20,10 @@
     links.innerHTML='<a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a>';
 
     footer.replaceChildren(line,author,version,links);
-    footer.style.setProperty('display','flex','important');
-    footer.style.setProperty('flex-direction','column','important');
-    footer.style.setProperty('align-items','center','important');
-    footer.style.setProperty('gap','4px','important');
-    footer.style.setProperty('text-align','center','important');
+
+    // Footer visibility belongs to the app/game layout. Never override display
+    // or visibility here: body.playing must remain able to hide the footer.
+    [line,author,version,links].forEach(node=>node.style.setProperty('display','block','important'));
     author.style.setProperty('font-weight','650','important');
     version.style.setProperty('opacity','.72','important');
     links.style.setProperty('margin-top','2px','important');
