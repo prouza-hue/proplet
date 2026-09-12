@@ -49,13 +49,26 @@ jobs:
                   raise AssertionError('preview alias did not become healthy')
               time.sleep(2)
 
-          def dismiss(page):
+          def settle_returning_player(page):
+              # The smoke tests the returning-player application, not onboarding.
+              # Wait until the real onboarding patches have finished installing,
+              # then close through the canonical production function so no later
+              # async installer can reopen the modal and invalidate navigation.
+              page.wait_for_function("()=>window.__PROPLET_ONBOARDING_MODEL_V3328__===true && window.__PROPLET_ONBOARDING_RETURN_V3332__===true",timeout=8000)
               page.evaluate("""()=>{
+                try{
+                  localStorage.setItem('proplet-v3-7-required-onboarding','done');
+                  localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
+                  localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
+                  sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
+                }catch(e){}
+                try{if(typeof closeOnboarding==='function')closeOnboarding(true)}catch(e){}
                 document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
                 document.documentElement.classList.remove('gen4-preview-booting');
               }""")
+              page.wait_for_function("()=>document.querySelector('#onboardingModal')?.classList.contains('hidden')!==false",timeout=5000)
 
           result={'health':health}
           with sync_playwright() as p:
@@ -66,8 +79,7 @@ jobs:
                   ('desktop',{'width':1440,'height':900}),
               ]:
                   ctx=browser.new_context(viewport=viewport)
-                  # Returning-player state is a precondition of this smoke. Seed the
-                  # canonical production keys before application scripts run.
+                  # Seed canonical returning-player keys before any app script runs.
                   ctx.add_init_script("""()=>{
                     try{
                       localStorage.setItem('proplet-v3-7-required-onboarding','done');
@@ -83,7 +95,8 @@ jobs:
                   # Boot-ready invariant: renderFree() runs only after bind(), so a
                   # populated difficulty grid means bottom-nav listeners are attached.
                   page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0] && document.querySelectorAll('#difficultyCards .difficulty-card').length>=4",timeout=15000)
-                  page.wait_for_timeout(250); dismiss(page); page.wait_for_timeout(250)
+                  settle_returning_player(page)
+                  page.wait_for_timeout(250)
 
                   base=page.evaluate("""()=>({
                     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
