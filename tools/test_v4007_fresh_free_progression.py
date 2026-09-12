@@ -12,7 +12,8 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 assert "done=slots.actual.size" in runtime_source
 assert "nextUnsolved=list.find(p=>!slots.actual.has" in runtime_source
 assert "unplayed=list.filter(p=>!slots.actual.has" in runtime_source
-assert "startStarterWarmup(){const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has" in app
+warmup = app.split("function startStarterWarmup(){", 1)[1].split("function ", 1)[0]
+assert "const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has" in warmup
 assert "return info&&slots.actual.has(info.level)?0" in app
 
 # An abandoned board from an older content generation must not hijack the new
