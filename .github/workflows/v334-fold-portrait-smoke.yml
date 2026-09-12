@@ -66,13 +66,13 @@ jobs:
                   ('desktop',{'width':1440,'height':900}),
               ]:
                   ctx=browser.new_context(viewport=viewport)
-                  # Onboarding state is a precondition of this returning-player smoke.
-                  # Seed it before any application script runs so async onboarding
-                  # cannot reopen a modal after the test has dismissed the DOM.
+                  # Returning-player state is a precondition of this smoke. Seed the
+                  # canonical production keys before application scripts run.
                   ctx.add_init_script("""()=>{
                     try{
-                      localStorage.setItem('proplet-onboarding-v1','done');
-                      localStorage.setItem('proplet-helper-onboarding-v1','done');
+                      localStorage.setItem('proplet-v3-7-required-onboarding','done');
+                      localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
+                      localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
                       sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
                     }catch(e){}
                   }""")
