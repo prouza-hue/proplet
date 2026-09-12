@@ -440,3 +440,11 @@ html:not([data-theme="dark"]) .bottom-nav button.active{
   color:#A95031!important;
 }
 html:not([data-theme="dark"]) .bottom-nav button.active svg{stroke:currentColor!important}
+
+/* Keep mobile ranking avatars inside their column with room before the name. */
+@media(max-width:559px){
+  #screen-daily .home-ranking-row{grid-template-columns:30px max-content minmax(0,1fr) auto;column-gap:8px}
+}
+@media(max-width:370px){
+  #screen-daily .home-ranking-row{grid-template-columns:28px max-content minmax(0,1fr) auto}
+}
