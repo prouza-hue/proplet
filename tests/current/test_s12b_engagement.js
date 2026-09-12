@@ -169,13 +169,13 @@ async function verifyPostWinOrder() {
 }
 
 includes(onboardingSource, 'window.__PROPLET_ONBOARDING_MODEL_V3328__', 'onboarding model sentinel');
-includes(onboardingSource, "title:'Najdi PES'", 'mandatory PES tutorial');
-includes(onboardingSource, 'ONBOARD_STEPS.splice(0,ONBOARD_STEPS.length,pesStep,principleStep)', 'two-step onboarding model');
+includes(onboardingSource, "startGame(puzzleDB.starter,'starter'", 'direct training board');
+assert(!onboardingSource.includes('ONBOARD_STEPS.splice'), 'training replaces the separate intro');
 includes(onboardingSource, "rememberSupportMode('younger')", 'younger helper default');
 includes(onboardingSource, 'window.__PROPLET_ONBOARDING_RETURN_V3332__', 'returning-player sentinel');
-includes(onboardingSource, 'class="onboarding-return-login"', 'returning-player login');
-includes(onboardingSource, 'class="onboarding-return-skip"', 'returning-player skip');
-includes(onboardingSource, "const TO='Najdi slovo ČOKOLÁDA';", 'starter copy');
+includes(index, 'class="onboarding-return-login"', 'returning-player login');
+includes(index, 'class="onboarding-return-skip"', 'returning-player skip');
+includes(app, "'Najdi slovo ČOKOLÁDA'", 'starter copy');
 
 includes(nudgesSource, 'const WINDOW_SIZE=5;', 'difficulty five-game window');
 includes(nudgesSource, 'const FAST_REQUIRED=4;', 'difficulty four-fast-games threshold');

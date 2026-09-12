@@ -448,3 +448,11 @@ html:not([data-theme="dark"]) .bottom-nav button.active svg{stroke:currentColor!
 @media(max-width:370px){
   #screen-daily .home-ranking-row{grid-template-columns:28px max-content minmax(0,1fr) auto}
 }
+
+/* Returning players can leave the training directly from the instruction card. */
+.starter-returning-actions{grid-column:1/-1;display:flex;gap:8px;padding-bottom:8px;border-bottom:1px solid currentColor}
+.starter-returning-actions button{flex:1;min-height:42px;padding:8px 10px;border:1.5px solid #9b8df2;border-radius:10px;background:#fff;color:#43366c;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+.starter-returning-actions .onboarding-return-login{background:#6650ac;color:#fff;border-color:#6650ac}
+.starter-returning-actions button:focus-visible{outline:3px solid #d78c26;outline-offset:2px}
+html[data-theme="dark"] .starter-returning-actions button{background:#30294d;color:#f5edff;border-color:#a99acb}
+html[data-theme="dark"] .starter-returning-actions .onboarding-return-login{background:#c7b1f1;color:#281b3f}

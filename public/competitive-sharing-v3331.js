@@ -279,7 +279,12 @@
     const u=new URL(SHARE_URL);u.searchParams.set('play',puzzle.id);u.searchParams.set('kind','tajenka');u.searchParams.set('open','tajenka');
     await sendShare('Proplet · Tajenka',`✦ Proplet · Tajenku mám odhalenou!\n${performanceLine(rec)}\nOdhalíš ji taky?`,u.href,'tajenka');
   };
-  window.PropletSharing={shareTajenka};
+  function resumeInvitation(){
+    if(pendingResolved){const {puzzle,ctx}=pendingResolved;pendingResolved=null;startSharedChallenge(puzzle,ctx);return true}
+    if(pendingResolvePromise){pendingResolvePromise.then(()=>resumeInvitation());return true}
+    return false;
+  }
+  window.PropletSharing={shareTajenka,resumeInvitation};
 
   const shareCurrent=async()=>{
     const g=currentGame;

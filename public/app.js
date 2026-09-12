@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-autoupdate1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-boardintro1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -784,10 +784,10 @@ function renderStarterCoach(step,title,copy,hintFocus=false){
 }
 function updateStarterGuidance(){
  const g=currentGame;if(!g||g.mode!=='starter')return;g.starterGuidePath=starterGuideFor(g);
- if(g.found.length===0)renderStarterCoach(1,'Začni slovem MRAK','Táhni přes sousední písmena. Fialová stopa ti ukáže první cestu.');
- else if(g.found.length===1)renderStarterCoach(2,'Teď najdi JABLKO','Čísla nahoře ukazují délky zbývajících slov. JABLKO má 6 a zahne za roh.');
- else if(g.found.length===2)renderStarterCoach(3,'Zkus ČOKOLÁDU','Zasekl ses? Tlačítko Nápověda dole ti dá malé postrčení.',true);
- else if(g.found.length===3){hideStarterHintNudge();renderStarterCoach(4,'Dokonči celou mřížku','Poslední je AUTOBUS. Hotovo je až bez jediného volného políčka.');}
+ if(g.found.length===0)renderStarterCoach(1,'Najdi MRAK','Spoj sousední písmena tahem nebo postupným klepáním. Sleduj zvýrazněnou cestu.');
+ else if(g.found.length===1)renderStarterCoach(2,'Paráda! Teď najdi JABLKO','Hledáš vybraná slova, která společně zaplní celou desku. Jiná slova se nepočítají. JABLKO má 6 písmen a zahne za roh.');
+ else if(g.found.length===2)renderStarterCoach(3,'Najdi slovo ČOKOLÁDA','Čísla nahoře ukazují délky zbývajících slov. Zkus další cestu najít sám.');
+ else if(g.found.length===3){hideStarterHintNudge();renderStarterCoach(4,'Poslední slovo už zkus sám','Spoj zbývající písmena. Hotovo bude, až zaplníš celou desku.');}
  renderGameBoard();renderGameHUD();updateGameFeel();
 }
 function updateGameFeel(){
@@ -867,7 +867,7 @@ function submitPath(){
  if(ai>=0){const colorIndex=g.found.length%COLORS.length;g.found.push({answerIndex:ai,word,colorIndex,path});path.forEach(i=>g.used.set(i,colorIndex));g.lastFound=path;g.lastProgressAt=performance.now();if(g.mode==='tajenka'){g.lastTajenkaReveal=ai;trackProductEvent('tajenka_word_found');setTimeout(()=>{if(currentGame===g&&g.lastTajenkaReveal===ai){g.lastTajenkaReveal=null;renderTajenkaPhrase(g)}},1100)}else sendAttemptCheckpoint('correct');message(`✓ ${word}`,'good');fx('correct')}
  else if(wordIndex>=0){g.wrongAttempts=(g.wrongAttempts||0)+1;message(`„${word}“ je správné slovo, ale tahle cesta se do plochy nevejde.`,'bad');wrong=true;fx('wrong')}
  else if(alreadyFound){g.wrongAttempts=(g.wrongAttempts||0)+1;message(`„${word}“ už máš. Hledej dál.`,'bad');wrong=true;fx('wrong')}
- else{g.wrongAttempts=(g.wrongAttempts||0)+1;message(`„${word}“ do tohohle Propletu nezapadá.`,'bad');wrong=true;fx('wrong')}
+ else{g.wrongAttempts=(g.wrongAttempts||0)+1;message(g.mode==='starter'?`„${word}“ do řešení této desky nepatří. Hledáš vybraná slova, která zaplní celou plochu.`:`„${word}“ do tohohle Propletu nezapadá.`,'bad');wrong=true;fx('wrong')}
  g.path=[];if(wrong)g.wrongPath=path;renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';if(wrong){setTimeout(()=>{if(currentGame!==g)return;g.wrongPath=[];renderGameBoard();renderGameHUD();updateGameFeel()},210)}if(g.mode==='starter'&&ai>=0){const n=g.found.length;if(n<=3&&n>g.starterTrackedWordCount){g.starterTrackedWordCount=n;trackProductEvent(`starter_word_${n}_completed`)}updateStarterGuidance()}if(g.mode!=='rescue'&&g.mode!=='starter')saveGameProgress();if(g.found.length===g.puzzle.answers.length){if(g.mode==='rescue')finishRescue(true);else finishGame();}
 }
 function resetGame(){const g=currentGame;if(!g||g.mode==='rescue'||g.finished)return;if(!g.found.length){message('Plocha je už prázdná.');return}if(g.mode==='starter')trackProductEvent('starter_reset');const usedHints=g.hints||0,elapsed=gameElapsed(g),now=performance.now();g.undoSnapshot={found:g.found.map(f=>({...f,path:[...f.path]})),used:[...g.used.entries()]};g.found=[];g.used=new Map();g.path=[];g.wrongPath=[];g.baseElapsedMs=elapsed;g.start=now;if(g.pausedAt!=null)g.pausedAt=now;g.elapsedMs=elapsed;g.lastFound=[];sendAttemptCheckpoint('reset');g.hints=usedHints;g.cleanSolve=usedHints===0;message('Plocha vyčištěna. Čas, tahy i nápovědy běží dál.');if(g.mode==='starter')updateStarterGuidance();else{renderGameBoard();renderGameHUD();updateGameFeel()}saveGameProgress();showGameUndo()
@@ -892,6 +892,7 @@ async function finishAttemptTelemetry(rec){
 }
 
 async function finishStarterGame(g){
+ window.PropletEngagementOnboarding?.completeTutorial();
  $('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];hideStarterHintNudge();renderGameBoard();renderGameHUD();updateGameFeel();
  const starterDaily=dailyPuzzleFor(pragueDateISO()),hardNext=starterDaily?.difficulty==='hard';g.starterNextHard=hardNext;if(hardNext)trackProductEvent('starter_hard_choice_shown');
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
@@ -952,6 +953,7 @@ function performPostWinAction(action){
  const mode=currentGame?.mode,diff=currentGame?.puzzle?.difficulty;
  if(mode==='tajenka'){nav('daily',{replace:true});return}
  if(mode==='starter'){
+  if(window.PropletSharing?.resumeInvitation?.())return;
   if(currentGame?.starterNextHard){if(action==='menu'){trackProductEvent('starter_hard_direct_selected');startDaily({starterHardDirect:true});return}trackProductEvent('starter_easy_warmup_selected');startStarterWarmup();return}
   if(action==='menu'){nav('free',{replace:true});return}startDaily();return
  }
@@ -2041,7 +2043,7 @@ async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  await loadTajenkaFixture();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1'),80));
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }
