@@ -6,9 +6,9 @@ html.tiskarna-ui body #screen-game.starter-mode .game-info{grid-column:1!importa
 html.tiskarna-ui body #screen-game.starter-mode .current-word{grid-column:1!important;grid-row:2!important;display:flex!important;align-items:center!important;flex-wrap:wrap;gap:4px 10px!important;min-height:0!important;height:auto!important;padding:5px 10px!important;margin:0!important}
 html.tiskarna-ui body #screen-game.starter-mode .current-word>div:has(#currentWord){display:flex!important;align-items:center;gap:8px;grid-template-rows:none!important;min-height:0!important}
 html.tiskarna-ui body #screen-game.starter-mode .current-word .stat-label{font-size:10px!important;margin:0!important}
-html.tiskarna-ui body #screen-game.starter-mode .current-word #currentWord{min-height:0!important;font-size:18px!important;line-height:1.2!important;margin:0!important}
+html.tiskarna-ui body #screen-game.starter-mode .current-word.card #currentWord{min-height:0!important;font-size:18px!important;line-height:1.2!important;margin:0!important}
 html.tiskarna-ui body #screen-game.starter-mode :is(.clean-status,#magnifierDock){display:none!important}
-html.tiskarna-ui body #screen-game.starter-mode .current-word #gameMessage{font-size:12px!important;line-height:1.3!important;min-height:0!important;margin:0!important;padding:0!important;flex:1 1 120px}
+html.tiskarna-ui body #screen-game.starter-mode .current-word.card #gameMessage{font-size:12px!important;line-height:1.3!important;min-height:0!important;margin:0!important;padding:0!important;flex:1 1 120px}
 html.tiskarna-ui body #screen-game.starter-mode .current-word #gameMessage:empty{display:none!important}
 html.tiskarna-ui body #screen-game.starter-mode .board-stage{grid-column:1!important;grid-row:3!important;min-height:150px!important;height:100%!important;padding:6px!important;margin:0!important;border-radius:16px!important}
 html.tiskarna-ui body #screen-game.starter-mode #starterCoach{grid-column:1!important;grid-row:4!important;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;padding:12px!important;margin:0!important;border:1.5px solid var(--td-line)!important;background:var(--td-paper)!important;color:var(--td-ink)!important;box-shadow:none!important;border-radius:16px!important}
