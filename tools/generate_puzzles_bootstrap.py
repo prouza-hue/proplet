@@ -10,10 +10,28 @@ DEFAULT_SOURCE = ROOT / "public" / "puzzles.json"
 DEFAULT_OUTPUT = ROOT / "public" / "puzzles-bootstrap.json"
 HEAVY_KEYS = {"free", "daily", "rescue", "legacyFree", "previousDaily"}
 DESCRIPTOR_KEYS = ("id", "difficulty", "meta")
+PUZZLE_PAYLOAD_KEYS = ("answers", "letters", "mask", "rows", "cols")
 
 
 def descriptor(puzzle: dict) -> dict:
     return {key: puzzle[key] for key in DESCRIPTOR_KEYS if key in puzzle}
+
+
+def is_playable_puzzle(puzzle: object) -> bool:
+    if not isinstance(puzzle, dict) or not puzzle.get("id"):
+        return False
+    answers = puzzle.get("answers")
+    letters = puzzle.get("letters")
+    mask = puzzle.get("mask")
+    rows = puzzle.get("rows")
+    cols = puzzle.get("cols")
+    if not isinstance(answers, list) or not answers:
+        return False
+    if not isinstance(letters, list) or not isinstance(mask, list):
+        return False
+    if not isinstance(rows, int) or not isinstance(cols, int) or rows <= 0 or cols <= 0:
+        return False
+    return len(letters) == rows * cols and bool(mask)
 
 
 def build_bootstrap(source: dict, source_bytes: bytes) -> dict:
@@ -55,11 +73,11 @@ def validate(source: dict, bootstrap: dict, full_size: int, bootstrap_size: int)
     if not bootstrap.get("daily"):
         raise ValueError("Bootstrap daily bank is empty")
     for puzzle in bootstrap["daily"]:
-        if not puzzle.get("id") or not puzzle.get("answers") or not puzzle.get("grid"):
-            raise ValueError(f"Incomplete daily puzzle in bootstrap: {puzzle.get('id')}")
+        if not is_playable_puzzle(puzzle):
+            raise ValueError(f"Incomplete daily puzzle in bootstrap: {puzzle.get('id') if isinstance(puzzle, dict) else None}")
 
     starter = bootstrap.get("starter")
-    if source.get("starter") is not None and (not starter or not starter.get("answers") or not starter.get("grid")):
+    if source.get("starter") is not None and not is_playable_puzzle(starter):
         raise ValueError("Starter puzzle was not preserved in full")
 
     for difficulty, full_bank in (source.get("free") or {}).items():
@@ -67,11 +85,14 @@ def validate(source: dict, bootstrap: dict, full_size: int, bootstrap_size: int)
         if len(slim_bank) != len(full_bank):
             raise ValueError(f"Free bank count mismatch for {difficulty}")
         for puzzle in slim_bank:
-            if not puzzle.get("id") or "answers" in puzzle or "grid" in puzzle:
+            if not puzzle.get("id") or any(key in puzzle for key in PUZZLE_PAYLOAD_KEYS):
                 raise ValueError(f"Invalid free descriptor in {difficulty}")
 
     if len(bootstrap.get("rescue", [])) != len(source.get("rescue") or []):
         raise ValueError("Rescue bank count mismatch")
+    for puzzle in bootstrap.get("rescue", []):
+        if not puzzle.get("id") or any(key in puzzle for key in PUZZLE_PAYLOAD_KEYS):
+            raise ValueError("Invalid rescue descriptor")
 
     # Fail the build instead of silently carrying a bootstrap that no longer buys
     # meaningful startup time.
