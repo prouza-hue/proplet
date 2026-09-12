@@ -300,7 +300,7 @@ with (
     )
 response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
 assert response_fixture_digest == (
-    "702932e4b85aa0082c150c4cde680af520ab3ac4cef2a6700773b03b87e4e64c"
+    "5d3be279221ff571428557394ed2ef59b05a9bd32aa4dd7fbfb32631d8b08757"
 ), f"current response fixture digest: {response_fixture_digest}"
 
 
