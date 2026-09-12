@@ -23,8 +23,8 @@
   function currentPhrase(){
     try{return String(tajenkaPuzzle?.tajenka?.phrase||'').trim()}catch{return ''}
   }
-  function currentSourceMarkup(){
-    let puzzle=null;try{puzzle=tajenkaPuzzle}catch{}
+  function currentSourceMarkup(puzzleId){
+    let puzzle=null;try{puzzle=currentGame?.mode==='tajenka'&&currentGame.puzzle?.id===puzzleId?currentGame.puzzle:tajenkaPuzzle}catch{}
     const source=puzzle?.source;if(!source?.url||!/^https:\/\//i.test(String(source.url)))return '';
     const href=esc(String(source.url)),label=esc(source.label||'zdroj');
     if(source.author){
@@ -33,8 +33,8 @@
     }
     return `<span>Zdroj:</span><a href="${href}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`;
   }
-  function syncTajenkaSourceLine(modal){
-    let line=q('.tajenka-result-source',modal),markup=currentSourceMarkup();
+  function syncTajenkaSourceLine(modal,puzzleId){
+    let line=q('.tajenka-result-source',modal),markup=currentSourceMarkup(puzzleId);
     if(!markup){line?.remove();return}
     if(!line){line=document.createElement('div');line.className='tajenka-result-source';const text=q('#winText',modal);text?.insertAdjacentElement('afterend',line)}
     line.innerHTML=markup;
@@ -207,7 +207,7 @@
     const title=q('#winTitle',modal);if(title){title.textContent=phrase;title.classList.remove('hidden')}
     q('#winPraise',modal)?.classList.add('hidden');
     q('#tajenkaWinPhrase',modal)?.classList.add('hidden');
-    const text=q('#winText',modal);if(text)text.textContent=resultLine(result);syncTajenkaSourceLine(modal);
+    const text=q('#winText',modal);if(text)text.textContent=resultLine(result);syncTajenkaSourceLine(modal,puzzleId);
     const chips=q('.win-summary-chips',modal);chips?.classList.remove('hidden');
     const xp=q('#winXp',modal);if(xp){xp.textContent='+200 XP';xp.classList.remove('hidden')}
     const clean=q('#winClean',modal);if(clean){clean.textContent=cleanLabel(result);clean.classList.remove('hidden');clean.classList.toggle('hinted',Math.max(0,Number(result?.hints??result?.hintsUsed)||0)>0)}

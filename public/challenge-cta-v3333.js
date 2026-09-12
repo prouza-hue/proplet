@@ -76,7 +76,7 @@
       if(challengeMode){
         setChallengeContent(win);
         setClass(win,'challenge-share-cta',true);
-        setAriaLabel(win,dailyGame?'Vyzvat kamaráda na dnešní Proplet':'Vyzvat kamaráda na stejný Proplet');
+        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Vyzvat kamaráda na tuto Tajenku':dailyGame?'Vyzvat kamaráda na tuto Denní výzvu':'Vyzvat kamaráda na stejný Proplet');
       }else{
         if(win.classList.contains('challenge-share-cta'))setText(win,'↗ Sdílet');
         setClass(win,'challenge-share-cta',false);
