@@ -51,11 +51,6 @@ jobs:
 
           def dismiss(page):
               page.evaluate("""()=>{
-                try{
-                  localStorage.setItem('proplet-onboarding-v1','done');
-                  localStorage.setItem('proplet-helper-onboarding-v1','done');
-                  sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
-                }catch(e){}
                 document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
                 document.querySelector('.release-notes-v3331-backdrop')?.remove();
                 document.body.classList.remove('release-notes-v3331-open');
@@ -65,8 +60,22 @@ jobs:
           result={'health':health}
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True,executable_path=CHROME,args=['--no-sandbox','--disable-dev-shm-usage'])
-              for label,viewport in [('mobile',{'width':390,'height':844}),('desktop',{'width':1440,'height':900})]:
+              for label,viewport in [
+                  ('mobile',{'width':390,'height':844}),
+                  ('fold',{'width':768,'height':1000}),
+                  ('desktop',{'width':1440,'height':900}),
+              ]:
                   ctx=browser.new_context(viewport=viewport)
+                  # Onboarding state is a precondition of this returning-player smoke.
+                  # Seed it before any application script runs so async onboarding
+                  # cannot reopen a modal after the test has dismissed the DOM.
+                  ctx.add_init_script("""()=>{
+                    try{
+                      localStorage.setItem('proplet-onboarding-v1','done');
+                      localStorage.setItem('proplet-helper-onboarding-v1','done');
+                      sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
+                    }catch(e){}
+                  }""")
                   page=ctx.new_page(); errors=[]
                   page.on('pageerror',lambda e:errors.append(str(e)))
                   page.goto(URL,wait_until='domcontentloaded',timeout=30000)
