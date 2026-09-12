@@ -171,6 +171,7 @@
     ['/tajenka-card-polish.css?v=2','propletTajenkaCardPolishCss'],
     ['/game-release-polish.css?v=3','propletGameReleasePolishCss'],
     ['/tajenka-runtime-polish.css?v=1','propletTajenkaRuntimePolishCss'],
+    ['/training-layout.css?v=1','propletTrainingLayoutCss'],
   ];
 
   const loadStyle=(href,key)=>{
@@ -211,7 +212,7 @@
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
-    loadScript('/competitive-sharing-v3331.js?v=boardintro1','propletCompetitiveSharing');
+    loadScript('/competitive-sharing-v3331.js?v=boardintro2','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=invitations1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=3','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});

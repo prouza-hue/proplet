@@ -19,7 +19,10 @@ function create(deps={}){
   function choices(mode){return (mode==='tajenka'?TAJENKA_CHOICES:DEFAULT_CHOICES).map(row=>[...row])}
   function pickTarget(){
     const game=getGame();if(!game?.puzzle)return null;
-    if(game.mode==='starter'&&!game.found.some(f=>f.answerIndex===2))return {a:game.puzzle.answers[2],i:2};
+    if(game.mode==='starter'){
+      const i=game.puzzle.answers.findIndex((a,index)=>!game.found.some(f=>f.answerIndex===index));
+      return i<0?null:{a:game.puzzle.answers[i],i};
+    }
     return game.puzzle.answers.map((a,i)=>({a,i}))
       .filter(x=>!game.found.some(f=>f.answerIndex===x.i))
       .sort((x,y)=>(x.a.turns||0)-(y.a.turns||0)||x.a.word.length-y.a.word.length)[0]||null;

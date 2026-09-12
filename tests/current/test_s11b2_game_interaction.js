@@ -108,9 +108,18 @@ assert.strictEqual(plan.source,'helper');
 
 game.mode='starter';game.found=[];game.hints=0;game.maxHintLevel=0;game.cleanSolve=true;
 target=h.pickTarget();
-assert.strictEqual(target.i,2,'starter third answer target contract');
+assert.strictEqual(target.i,0,'starter hints begin with the first training word');
 plan=h.applyState(1);
 assert.strictEqual(game.hints,0,'starter hint does not increment scored hints');
 assert.strictEqual(game.starterHintUsed,true);
+for(let i=0;i<game.puzzle.answers.length;i++){
+  game.found=game.puzzle.answers.slice(0,i).map((a,answerIndex)=>({answerIndex}));
+  assert.strictEqual(h.pickTarget().i,i,'hint follows each unfinished training step');
+  for(const level of [1,2,3])assert.strictEqual(h.applyState(level).pick.i,i);
+}
+game.found=game.puzzle.answers.map((a,answerIndex)=>({answerIndex}));
+assert.strictEqual(h.pickTarget(),null,'completed training has no hint target');
+game.found=[{answerIndex:1}];
+assert.strictEqual(h.pickTarget().i,0,'out-of-order solving keeps the first unfinished target');
 
 console.log('PASS: Sprint 11B.2 board/input/hints modules preserve interaction policies');

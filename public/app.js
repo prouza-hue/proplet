@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-boardintro1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-boardintro2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -770,7 +770,7 @@ function startGame(puzzle,mode,dailyDate,options={}){
  $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});runGameSessionHooks('afterStart',{...sessionEvent,game:currentGame});
 }
 function startStarter(){const p=puzzleDB?.starter;if(!p){nav('daily');showToast('Tréninková úroveň se nepodařila načíst.');return}startGame(p,'starter',null,{starter:true})}
-function starterGuideFor(g=currentGame){if(!g||g.mode!=='starter')return[];const n=g.found.length;if(n===0)return [...(g.puzzle.answers[0]?.path||[])];if(n===1)return (g.puzzle.answers[1]?.path||[]).slice(0,3);return[]}
+function starterGuideFor(g=currentGame){if(!g||g.mode!=='starter')return[];const n=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i));if(n===0)return [...(g.puzzle.answers[0]?.path||[])];if(n===1)return (g.puzzle.answers[1]?.path||[]).slice(0,3);return[]}
 function hideStarterHintNudge(){const n=$('#starterHintNudge');n?.classList.add('hidden');$('#hintBtn')?.classList.remove('starter-attention')}
 function acceptStarterHintNudge(){hideStarterHintNudge();openHintModal()}
 function dismissStarterHintNudge(){hideStarterHintNudge()}
@@ -783,11 +783,11 @@ function renderStarterCoach(step,title,copy,hintFocus=false){
  const coach=$('#starterCoach');if(!coach)return;coach.classList.remove('hidden');coach.classList.toggle('hint-focus',hintFocus);$('#starterCoachStep').textContent=`${step} / 4`;$('#starterCoachTitle').textContent=title;$('#starterCoachCopy').textContent=copy;$('#hintBtn')?.classList.toggle('starter-attention',hintFocus);
 }
 function updateStarterGuidance(){
- const g=currentGame;if(!g||g.mode!=='starter')return;g.starterGuidePath=starterGuideFor(g);
- if(g.found.length===0)renderStarterCoach(1,'Najdi MRAK','Spoj sousední písmena tahem nebo postupným klepáním. Sleduj zvýrazněnou cestu.');
- else if(g.found.length===1)renderStarterCoach(2,'Paráda! Teď najdi JABLKO','Hledáš vybraná slova, která společně zaplní celou desku. Jiná slova se nepočítají. JABLKO má 6 písmen a zahne za roh.');
- else if(g.found.length===2)renderStarterCoach(3,'Najdi slovo ČOKOLÁDA','Čísla nahoře ukazují délky zbývajících slov. Zkus další cestu najít sám.');
- else if(g.found.length===3){hideStarterHintNudge();renderStarterCoach(4,'Poslední slovo už zkus sám','Spoj zbývající písmena. Hotovo bude, až zaplníš celou desku.');}
+ const g=currentGame;if(!g||g.mode!=='starter')return;g.starterGuidePath=starterGuideFor(g);const next=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i));
+ if(next===0)renderStarterCoach(1,'Najdi MRAK','Spoj sousední písmena tahem nebo postupným klepáním. Sleduj zvýrazněnou cestu.');
+ else if(next===1)renderStarterCoach(2,'Paráda! Teď najdi JABLKO','Hledáš vybraná slova, která společně zaplní celou desku. Jiná slova se nepočítají. JABLKO má 6 písmen a zahne za roh.');
+ else if(next===2)renderStarterCoach(3,'Najdi slovo ČOKOLÁDA','Čísla nahoře ukazují délky zbývajících slov. Zkus další cestu najít sám.');
+ else if(next===3){hideStarterHintNudge();renderStarterCoach(4,'Poslední slovo už zkus sám','Spoj zbývající písmena. Hotovo bude, až zaplníš celou desku.');}
  renderGameBoard();renderGameHUD();updateGameFeel();
 }
 function updateGameFeel(){
@@ -821,7 +821,7 @@ function answerIndexForTajenka(puzzle,phraseIndex){return Number(puzzle?.tajenka
 function renderGameHUD(){
  const g=currentGame,p=g.puzzle;$('#moves').textContent=countCz(g.moves,'tah','tahy','tahů');$('#gameProgress').textContent=`${g.found.length}/${p.answers.length}`;
  const remaining=p.answers.map((a,i)=>({len:a.word.length,i})).filter(x=>!g.found.some(f=>f.answerIndex===x.i)).sort((a,b)=>a.len-b.len||a.i-b.i);
- $('#lengths').innerHTML=remaining.length?remaining.map(x=>`<span class="length-pill ${g.mode==='starter'&&((g.found.length===0&&x.i===0)||(g.found.length===1&&x.i===1)||(g.found.length===2&&x.i===2)||(g.found.length===3&&x.i===3))?'starter-target':''}" title="${countCz(x.len,'písmeno','písmena','písmen')}">${x.len}</span>`).join(''):'<span class="all-found">✓ nic</span>';
+ $('#lengths').innerHTML=remaining.length?remaining.map(x=>`<span class="length-pill ${g.mode==='starter'&&x.i===p.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i))?'starter-target':''}" title="${countCz(x.len,'písmeno','písmena','písmen')}">${x.len}</span>`).join(''):'<span class="all-found">✓ nic</span>';
  $('#foundWords').innerHTML=g.found.length?g.found.map(f=>`<span class="found-word-chip" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,var(--word-color) 58%,white)">${esc(f.word)}</span>`).join(''):'<span class="empty-found">zatím nic</span>';
  const clean=$('#cleanStatus');clean.textContent=g.mode==='rescue'?'':g.mode==='starter'?'🎓 Trénink':g.mode==='tajenka'?(g.isReplay?'↻ Bez dalších XP':'🎁 +200 XP'):(g.hints?'💡 S nápovědou':'✨ Čistě');clean.classList.toggle('lost',g.mode!=='starter'&&g.mode!=='tajenka'&&!!g.hints);$('#hintBtn').textContent=g.mode==='starter'?'💡 Nápověda':g.hints?`💡 ${g.hints}×`:'💡 Nápověda';renderTajenkaPhrase(g);renderMagnifierControls();updateGameFeel();
 }
@@ -898,7 +898,7 @@ async function finishStarterGame(g){
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
  const key=challengeKey('starter',g.puzzle,null),state=getState(),old=state.completed[key],rec={puzzleId:g.puzzle.id,challengeKey:key,mode:'starter',difficulty:'easy',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:old?0:pointsFor('starter','easy',g.puzzle),hintsUsed:0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:0,attemptId:null,cleanSolve:true,completedAt:new Date().toISOString()};
  if(!old)state.completed[key]=rec;saveState(state);if(!old)queueResult(rec);trackProductEvent('starter_completed');
- const winBoard=$('#levelLeaderboardBox');winBoard?.classList.add('hidden');$('#winBadge').textContent='🎓';$('#winTitle').textContent='První Proplet je doma!';$('#winPraise').textContent=g.starterHintUsed?'Rovná cesta, zatáčka, nápověda i šnek. Teď už znáš všechno důležité.':'Rovná cesta, zatáčka i šnek. Nápověda zůstala po ruce — a nebyla potřeba.';$('#winPraise').classList.remove('hidden');$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · první výhra`;setWinXpDisplay(old?'🎓 Trénink dokončen':'+10 XP · první odměna');const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent='🎓 Zaškoleno';$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');$('#newBadgeBox').classList.add('hidden');$('#newBadgeBox').innerHTML='';const hardActions=$('#starterHardActions');hardActions?.classList.toggle('hidden',!hardNext);
+ const winBoard=$('#levelLeaderboardBox');winBoard?.classList.add('hidden');$('#winBadge').textContent='🎓';$('#winTitle').textContent='První Proplet je doma!';$('#winPraise').textContent='';$('#winPraise').classList.add('hidden');$('#winText').textContent='';setWinXpDisplay('Trénink dokončen');const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent='🎓 Zaškoleno';$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');$('#newBadgeBox').classList.add('hidden');$('#newBadgeBox').innerHTML='';const hardActions=$('#starterHardActions');hardActions?.classList.toggle('hidden',!hardNext);
  $('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.toggle('hidden',hardNext);if(!hardNext)$('#winMenuBtn').textContent='Vybrat volnou hru';$('#winAccountBtn')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');$('#winFeedback')?.classList.add('hidden');$('#winPrimaryBtn').classList.toggle('hidden',hardNext);if(!hardNext)$('#winPrimaryBtn').textContent='Hrát dnešní výzvu ☀️';$('#winModal').classList.add('starter-win');$('#winModal').classList.remove('hidden');confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(getProfile()?.token&&!old)syncQueue({announce:false}).catch(()=>{});
 }

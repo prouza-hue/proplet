@@ -22,7 +22,7 @@ assert shell_release.group(1) == app_release.group(1), (
     "Service-worker shell and app release marker must stay identical; a mismatch "
     "causes the runtime-update reload loop."
 )
-assert shell_release.group(1) == "proplet-v4.02.2-printshop-boardintro1"
+assert shell_release.group(1) == "proplet-v4.02.2-printshop-boardintro2"
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)
@@ -44,7 +44,7 @@ assert "/app/rankings/rankings.js" in shell
 assert "/app/game/state.js" in shell
 assert "/app/game/board.js" in shell
 assert "/app/game/input.js" in shell
-assert "/app/game/hints.js" in shell
+assert "/app/game/hints.js?v=boardintro2" in shell
 assert "/app/core/completion-pipeline.js" in shell
 for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.png", "/privacy.html", "/terms.html"):
     assert heavy_or_lazy not in shell
