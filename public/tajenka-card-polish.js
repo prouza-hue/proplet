@@ -24,7 +24,7 @@
     if(!button||button.dataset.tajenkaCardPolished==='1')return;
     button.dataset.tajenkaCardPolished='1';
     button.classList.add('tajenka-share-cta','painted-action-control');
-    button.setAttribute('aria-label','Pošli tajenku');
+    button.setAttribute('aria-label','Vyzvat kamaráda');
     const icon=document.createElement('img');
     icon.src='/rewards/printshop/challenge.svg?v=icons1';
     icon.className='painted-action-icon';
@@ -32,7 +32,7 @@
     icon.width=24;
     icon.height=24;
     icon.setAttribute('aria-hidden','true');
-    button.replaceChildren(icon,document.createTextNode(' Pošli tajenku'));
+    button.replaceChildren(icon,document.createTextNode(' Vyzvat kamaráda'));
   }
 
   function polishCard(card){

@@ -9,6 +9,12 @@ from pydantic import BaseModel, Field
 
 
 ALLOWED_CHALLENGE_EVENTS = {
+    "tajenka_share_clicked",
+    "tajenka_share_created",
+    "tajenka_share_native_completed",
+    "tajenka_share_clipboard_completed",
+    "tajenka_share_cancelled",
+    "tajenka_share_failed",
     "daily_share_clicked",
     "daily_share_created",
     "daily_share_native_completed",
@@ -24,6 +30,10 @@ ALLOWED_CHALLENGE_EVENTS = {
     "shared_daily_opened",
     "shared_daily_started",
     "shared_daily_completed",
+    "shared_daily_beaten",
+    "shared_tajenka_opened",
+    "shared_tajenka_started",
+    "shared_tajenka_completed",
     "shared_level_opened",
     "shared_level_started",
     "shared_level_completed",

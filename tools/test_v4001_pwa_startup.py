@@ -22,7 +22,7 @@ assert shell_release.group(1) == app_release.group(1), (
     "Service-worker shell and app release marker must stay identical; a mismatch "
     "causes the runtime-update reload loop."
 )
-assert shell_release.group(1) == "proplet-v4.02.2-printshop-live-boot1-share20260912"
+assert shell_release.group(1) == "proplet-v4.02.2-printshop-invitations1"
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)

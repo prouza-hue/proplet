@@ -240,6 +240,14 @@
       {
         "path": "tests/current/test_push_preference_cache.js",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_shared_invitations.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_shared_puzzle.py",
+        "runner": "python"
       }
     ]
   },

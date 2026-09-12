@@ -40,7 +40,7 @@ def _route_snapshot() -> str:
 
 # The route inventory, including versioned compatibility routes, is part of the
 # deployment contract.  This is the baseline captured before extraction.
-assert _route_snapshot() == "3b2f8960d59d9b8588d29e90f1a23cffc539b5476224c99d1fcc3cbd3e8324b0"
+assert _route_snapshot() == "f57b2cb7fee7e4cbcd81be61e6156c81716ece6e19e69033506b3b3318053bc6"
 assert server.app.docs_url is None
 assert server.app.redoc_url is None
 assert server.app.openapi_url is None
@@ -57,7 +57,7 @@ openapi_snapshot = json.dumps(
 )
 openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
 assert openapi_digest == (
-    "048d390c79a6b1615e0b0f10b1673b5326116738b87a6b2f07f0096b918c3a2d"
+    "70d48981962251f732335d11fa63a07c4a7368391f803e687fbbd8fcf6db275d"
 ), f"current OpenAPI digest: {openapi_digest}"
 
 
@@ -282,6 +282,8 @@ with (
 ):
     config_fixture = server.config()
     health_fixture = server.health()
+    # Keep the Linux production fixture portable to Windows development.
+    health_fixture["puzzleSource"] = health_fixture["puzzleSource"].replace("\\", "/")
     # Release publication changes APP_VERSION without changing these response
     # contracts. Normalize only the release metadata back to the captured
     # v4.01.40 baseline so every other response field stays hash-protected.

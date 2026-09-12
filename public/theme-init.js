@@ -211,17 +211,17 @@
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
-    loadScript('/competitive-sharing-v3331.js?v=4','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=fix20','propletChallengeCtaV3333');
+    loadScript('/competitive-sharing-v3331.js?v=invitations1','propletCompetitiveSharing');
+    loadScript('/challenge-cta-v3333.js?v=invitations1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=3','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=2','propletTajenkaReleaseFix',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
-    loadScript('/tajenka-card-polish.js?v=2','propletTajenkaCardPolish');
+    loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=1','propletTajenkaRuntimePolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep

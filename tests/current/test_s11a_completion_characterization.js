@@ -42,8 +42,8 @@ has(density,/name==='finishGame'&&densityCompletionHookInstalled/,'copy-density 
 has(density,/classList\.remove\('comparison-loaded'\)/,'comparison-loaded reset missing');
 
 has(theme,/loadScript\('\/copy-density-v3327\.js\?v=2'/,'copy-density loader missing');
-has(theme,/loadScript\('\/competitive-sharing-v3331\.js\?v=4'/,'competitive-sharing loader missing');
-assert(theme.indexOf('/copy-density-v3327.js?v=2')<theme.indexOf('/competitive-sharing-v3331.js?v=4'));
+has(theme,/loadScript\('\/competitive-sharing-v3331\.js\?v=invitations1'/,'competitive-sharing loader missing');
+assert(theme.indexOf('/copy-density-v3327.js?v=2')<theme.indexOf('/competitive-sharing-v3331.js?v=invitations1'));
 
 const pipelinePath=path.join(root,'public/app/core/completion-pipeline.js');
 assert(fs.existsSync(pipelinePath),'completion pipeline module missing');

@@ -70,7 +70,7 @@
     try{mode=typeof currentGame!=='undefined'?currentGame?.mode:null}catch{}
     const free=mode==='free';
     const dailyGame=mode==='daily';
-    const challengeMode=free||dailyGame;
+    const challengeMode=free||dailyGame||mode==='tajenka'||$('#winModal')?.classList.contains('tajenka-daily-result');
 
     if(win){
       if(challengeMode){

@@ -211,6 +211,11 @@
     const chips=q('.win-summary-chips',modal);chips?.classList.remove('hidden');
     const xp=q('#winXp',modal);if(xp){xp.textContent='+200 XP';xp.classList.remove('hidden')}
     const clean=q('#winClean',modal);if(clean){clean.textContent=cleanLabel(result);clean.classList.remove('hidden');clean.classList.toggle('hinted',Math.max(0,Number(result?.hints??result?.hintsUsed)||0)>0)}
+    const share=q('#winShareBtn',modal);
+    if(share){
+      share.classList.remove('hidden');share.textContent='Vyzvat kamaráda';
+      share.onclick=()=>{let puzzle=null;try{puzzle=currentGame?.mode==='tajenka'&&currentGame.puzzle.id===puzzleId?currentGame.puzzle:tajenkaPuzzle}catch{}window.PropletSharing?.shareTajenka(puzzle,result)};
+    }
     const primary=q('#winPrimaryBtn',modal);if(primary){primary.textContent='Zpět';primary.classList.remove('hidden')}
     const details=q('#winDetails',modal),words=q('#winWords',modal),items=foundWords(result);
     if(words){

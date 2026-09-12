@@ -1269,6 +1269,38 @@ def puzzle_database_preview(request: Request):
     )
 
 
+@app.get("/api/shared-puzzle")
+def shared_puzzle(
+    request: Request,
+    kind: str = Query(pattern="^(daily|tajenka)$"),
+    puzzle_id: str = Query(min_length=2, max_length=100),
+    daily_date: Optional[str] = Query(default=None),
+):
+    """Resolve an exact released challenge; never substitute today's board."""
+    enforce_rate_limit(request, "shared_puzzle_read", limit=120, window_seconds=3600)
+    today = current_prague_date()
+    puzzle = None
+    if kind == "daily":
+        try:
+            selected = date.fromisoformat(daily_date or "")
+        except ValueError:
+            raise HTTPException(400, "Neplatné datum výzvy")
+        if selected > today or puzzle_id not in valid_daily_puzzle_ids(selected.isoformat()):
+            raise HTTPException(404, "Tato Denní výzva není dostupná")
+        data = load_puzzles()
+        banks = [data.get("daily", []), (data.get("previousDaily") or {}).get("puzzles", [])]
+        banks.extend(bank.get("puzzles", []) for bank in domain_content.legacy_daily_banks(data))
+        puzzle = next((p for bank in banks for p in bank if p.get("id") == puzzle_id), None)
+    elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or VERCEL_ENV == "preview"):
+        slot = tajenka_week_for(today)
+        latest = slot or 0
+        puzzle = next((p for p in load_tajenka_bank().get("puzzles", [])
+                       if p.get("id") == puzzle_id and 1 <= int(p.get("week") or 0) <= latest), None)
+    if not puzzle or (puzzle.get("meta") or {}).get("archiveSummaryOnly"):
+        raise HTTPException(404, "Tahle sdílená úloha už není dostupná")
+    return JSONResponse(content={"puzzle": puzzle}, headers={"Cache-Control": "private, no-store"})
+
+
 @app.get("/api/tajenka")
 def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
     """Serve one released board without exposing the remaining weekend bank."""

@@ -11,7 +11,7 @@ push = (ROOT / "push_diagnostics_v3329.py").read_text(encoding="utf-8")
 migration = (ROOT / "SUPABASE_MIGRATION_V4_01_26.sql").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.02.2"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
-assert "proplet-v4.02.2-printshop-live-boot1-share20260912" in sw
+assert "proplet-v4.02.2-printshop-invitations1" in sw
 assert "proplet_http_5xx" in server and "response.status_code >= 500" in server
 assert 'response.headers["X-Proplet-Version"] = APP_VERSION' in server
 assert "proplet_upsert_push_subscription" in backend_db

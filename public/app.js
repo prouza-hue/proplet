@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-live-boot1-share20260912';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-invitations1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -196,7 +196,7 @@ function renderAchievementSummary(stats){
 }
 function syncAchievementDisclosure(){const button=$('#achievementToggleBtn'),details=$('#achievementDetails');if(!button||!details)return;details.hidden=!profileAchievementsExpanded;button.setAttribute('aria-expanded',String(profileAchievementsExpanded));button.innerHTML=profileAchievementsExpanded?'Sbalit <span>⌃</span>':'Zobrazit vše <span>⌄</span>'}
 function focusProfileRoadmap(){requestAnimationFrame(()=>{const rail=$('#levelRoadmap'),current=rail?.querySelector('.current');if(!rail||!current)return;const max=Math.max(0,rail.scrollWidth-rail.clientWidth),wide=window.matchMedia?.('(min-width:1000px) and (min-height:650px)')?.matches,gap=parseFloat(getComputedStyle(rail).columnGap)||0,position=current.getBoundingClientRect().left-rail.getBoundingClientRect().left+rail.scrollLeft,target=wide?position-current.offsetWidth-gap:position-(rail.clientWidth-current.offsetWidth)/2;rail.scrollLeft=Math.max(0,Math.min(max,target))})}
-const SHARE_URL=typeof location!=='undefined'?`${location.origin}/`:'https://proplet-nine.vercel.app/';
+const SHARE_URL='https://hrajproplet.cz/';
 const STORE_KEY='proplet-v2-state';
 const PROFILE_KEY='proplet-v2-profile';
 const QUEUE_KEY='proplet-v2-sync-queue';
@@ -1022,7 +1022,7 @@ async function runPostWinEngagement(action){
 async function closeWinAndContinue(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');return}await runPostWinEngagement('continue')}
 async function closeWinToMenu(){await runPostWinEngagement('menu')}
 function showDailyResult(date,rec){
- const p=dailyPuzzleFor(date);stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};
+ const p=dailyPuzzleFor(date);stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,hints:rec.hintsUsed||0,finished:true};
  const tajenkaWin=$('#tajenkaWinPhrase');if(tajenkaWin){tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''}$('#screen-game')?.classList.remove('tajenka-mode','starter-mode','rescue-mode');$('#winModal')?.classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');
  $('#winBadge').textContent='☀️';renderCompletionPraise(p.difficulty,rec);$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[p.difficulty].label}`;setWinXpDisplay('+100 XP');const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Čistě · bez nápovědy':(hints?`💡 ${countCz(hints,'nápověda','nápovědy','nápověd')}`:'Výsledek z předchozího postupu');if(!knownClean)wc.classList.add('hinted');
  $('#winWords').innerHTML=p.answers.map((a,i)=>`<span class="win-word" style="--word-color:${COLORS[i%COLORS.length]};background:color-mix(in srgb,${COLORS[i%COLORS.length]} 55%,white)">${a.word}</span>`).join('');
@@ -1947,8 +1947,7 @@ function renderTajenkaEntry(){
   root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
   root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✓</div><div class="tajenka-entry-copy"><h2>Tajenka odhalena</h2><strong class="tajenka-revealed-phrase">${esc(tajenkaPuzzle.tajenka.phrase)}</strong><small class="tajenka-entry-next">Další přijde zase v sobotu.</small></div><div class="tajenka-home-actions"><button type="button" class="secondary-btn" data-tajenka-recap>Zobrazit výsledek</button><button type="button" class="secondary-btn" data-tajenka-share>Sdílet Tajenku</button></div>`;
   root.querySelector('[data-tajenka-recap]').onclick=()=>showTajenkaRecap(completion);
-  const phrase=tajenkaPuzzle.tajenka.phrase;
-  root.querySelector('[data-tajenka-share]').onclick=()=>shareProplet(`Proplet · Tajenka odhalena\n${phrase}\n\nZahraj si taky: ${SHARE_URL}`);
+  root.querySelector('[data-tajenka-share]').onclick=()=>window.PropletSharing?.shareTajenka(tajenkaPuzzle,completion);
   root.classList.remove('hidden');trackTajenkaView();return;
  }
  root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
@@ -2009,7 +2008,7 @@ async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  await loadTajenkaFixture();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(false),80));
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
 }

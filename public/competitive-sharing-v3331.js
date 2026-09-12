@@ -4,7 +4,7 @@
 
   const SESSION_KEY='proplet-v3-33-1-shared-challenge';
   const DAILY_SESSION_KEY='proplet-v4-01-14-shared-daily';
-  const PARAMS=['play','t','h','m'];
+  const PARAMS=['play','t','h','m','kind','date','open','via'];
   let installed=false;
   let activeChallenge=null;
   let incomingRaw=null;
@@ -18,16 +18,20 @@
   let baseShareDaily=null;
 
   const intParam=(value,min,max)=>{
-    const n=Number.parseInt(String(value??''),10);
-    return Number.isFinite(n)?Math.max(min,Math.min(max,n)):null;
+    if(value===null||value===undefined||!/^\d+$/.test(String(value)))return null;
+    const n=Number(value);
+    return Number.isSafeInteger(n)&&n>=min&&n<=max?n:null;
   };
 
   const parseIncoming=()=>{
     try{
       const q=new URLSearchParams(location.search),puzzleId=String(q.get('play')||'').trim();
       if(!puzzleId)return null;
+      if(q.has('kind')&&!['daily','tajenka','free'].includes(q.get('kind')))return null;
       return {
         puzzleId:puzzleId.slice(0,100),
+        kind:['daily','tajenka'].includes(q.get('kind'))?q.get('kind'):'free',
+        dailyDate:q.get('date')||null,
         elapsedMs:intParam(q.get('t'),1000,24*60*60*1000),
         hintsUsed:intParam(q.get('h'),0,99),
         moves:intParam(q.get('m'),1,9999),
@@ -49,6 +53,7 @@
   const parseIncomingDaily=()=>{
     try{
       const q=new URLSearchParams(location.search);
+      if(q.has('play'))return null;
       if(q.get('via')!=='share-daily')return loadDailySession();
       const value={openedTracked:true,startedTracked:false,completedTracked:false,openedAt:new Date().toISOString()};
       saveDailySession(value);
@@ -89,10 +94,16 @@
   const track=event=>{
     try{api('/api/challenge-event',{method:'POST',body:JSON.stringify({event_type:event})}).catch(()=>{})}catch{}
   };
+  const challengeEvents={
+    daily:{opened:'shared_daily_opened',started:'shared_daily_started',completed:'shared_daily_completed',beaten:'shared_daily_beaten'},
+    tajenka:{opened:'shared_tajenka_opened',started:'shared_tajenka_started',completed:'shared_tajenka_completed'},
+    free:{opened:'shared_level_opened',started:'shared_level_started',completed:'shared_level_completed',beaten:'shared_level_beaten'},
+  };
+  const challengeEvent=(ctx,suffix)=>challengeEvents[ctx?.kind||'free'][suffix];
   const diffLabel=diff=>DIFF?.[diff]?.label||diff||'Proplet';
   const cleanLabel=hints=>{
     const n=Number(hints||0);
-    return n===0?'✨ čistě':`💡 ${countCz(n,'nápověda','nápovědy','nápověd')}`;
+    return n===0?'✨ bez nápovědy':`💡 ${countCz(n,'nápověda','nápovědy','nápověd')}`;
   };
   const formatDelta=ms=>{
     const total=Math.max(1,Math.round(Number(ms||0)/1000));
@@ -111,7 +122,16 @@
     return null;
   };
 
-  const resolvePuzzle=async id=>{
+  const resolvePuzzle=async (id,ctx={})=>{
+    if(ctx.kind==='daily'||ctx.kind==='tajenka'){
+      try{
+        const q=new URLSearchParams({kind:ctx.kind,puzzle_id:id});
+        if(ctx.dailyDate)q.set('daily_date',ctx.dailyDate);
+        const result=await api('/api/shared-puzzle?'+q);
+        return result?.puzzle?.id===id?result.puzzle:null;
+      }catch{return null}
+    }
+    try{if(window.__PROPLET_ENSURE_FULL_PUZZLE_DB)await window.__PROPLET_ENSURE_FULL_PUZZLE_DB()}catch{return null}
     const active=activePuzzleById(id);
     if(active)return active;
     try{
@@ -124,22 +144,22 @@
   const hasBenchmark=ctx=>Number.isFinite(ctx?.elapsedMs)&&Number.isFinite(ctx?.hintsUsed)&&Number.isFinite(ctx?.moves);
   const benchmarkShort=ctx=>{
     if(!hasBenchmark(ctx))return '🎯 Sdílená výzva';
-    return `🎯 Překonej ${fmtTime(ctx.elapsedMs)} · ${Number(ctx.hintsUsed||0)===0?'čistě':`${ctx.hintsUsed}× nápověda`}`;
+    return `🎯 Překonej ${fmtTime(ctx.elapsedMs)} · ${Number(ctx.hintsUsed||0)===0?'bez nápovědy':countCz(ctx.hintsUsed,'nápověda','nápovědy','nápověd')}`;
   };
 
   const attachGameChallengeUi=ctx=>{
-    if(!ctx||currentGame?.mode!=='free')return;
+    if(!ctx||!['free','daily','tajenka'].includes(currentGame?.mode))return;
     document.body.classList.add('game-shared-challenge');
     currentGame.sharedChallenge=ctx;
     const label=document.querySelector('#gameModeLabel');
-    if(label){label.textContent='Výzva od kamaráda';label.classList.remove('hidden')}
+    if(label){label.textContent=ctx.kind==='daily'?`Výzva od kamaráda · ${formatDateCZ(ctx.dailyDate)}`:ctx.kind==='tajenka'?'Tajenka od kamaráda':'Výzva od kamaráda';label.classList.remove('hidden')}
     const title=document.querySelector('.game-title');
     if(title){
       let target=document.querySelector('#sharedChallengeTarget');
       if(!target){target=document.createElement('span');target.id='sharedChallengeTarget';target.className='shared-challenge-target';title.appendChild(target)}
-      target.textContent=benchmarkShort(ctx);
+      target.textContent=ctx.kind==='tajenka'?'Odhalíš ji taky?':benchmarkShort(ctx);
     }
-    if(!ctx.startedTracked){ctx.startedTracked=true;saveSession(ctx);track('shared_level_started')}
+    if(!ctx.startedTracked){ctx.startedTracked=true;saveSession(ctx);track(challengeEvent(ctx,'started'))}
   };
 
   const contextForPuzzle=id=>{
@@ -151,10 +171,10 @@
 
   const startSharedChallenge=(puzzle,ctx)=>{
     if(!puzzle||!ctx)return;
-    activeChallenge={...ctx,puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:Number(puzzle.meta?.level)||null};
+    activeChallenge={...ctx,kind:ctx.kind||'free',puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:Number(puzzle.meta?.level)||null};
     saveSession(activeChallenge);
     stripChallengeQuery();
-    baseStartGame(puzzle,'free',null,{sharedChallenge:true});
+    baseStartGame(puzzle,activeChallenge.kind,ctx.dailyDate||null,{sharedChallenge:true});
     attachGameChallengeUi(activeChallenge);
   };
 
@@ -167,7 +187,9 @@
     if(aHints!==bHints)return aHints<bHints
       ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:`Použil jsi o ${bHints-aHints} ${bHints-aHints===1?'nápovědu':'nápovědy'} méně.`}
       :{outcome:'loss',title:'Těsně vedle.',copy:`Soupeř použil o ${aHints-bHints} ${aHints-bHints===1?'nápovědu':'nápovědy'} méně.`};
-    const dt=Math.round(Number(attempt.elapsedMs||0)-Number(bench.elapsedMs||0));
+    // Compare the whole seconds shown to both players; invisible milliseconds
+    // must not decide a result that looks like a tie.
+    const dt=(Math.floor(Number(attempt.elapsedMs||0)/1000)-Math.floor(Number(bench.elapsedMs||0)/1000))*1000;
     if(dt!==0){
       const delta=Math.abs(dt);
       return dt<0
@@ -194,7 +216,7 @@
   };
 
   const renderChallengeResult=ctx=>{
-    const g=currentGame;if(!ctx||!g?.finished||g.mode!=='free')return;
+    const g=currentGame;if(!ctx||!g?.finished||!['free','daily'].includes(g.mode))return;
     const attempt={elapsedMs:Math.max(1000,Math.round(g.elapsedMs||0)),hintsUsed:Number(g.hints||0),moves:Number(g.moves||0)};
     const verdict=challengeResult(attempt,ctx),card=ensureResultCard();
     if(card){
@@ -202,9 +224,8 @@
       card.className=`shared-challenge-result ${verdict.outcome}`;
       card.innerHTML=`<div class="shared-challenge-result-icon">${verdict.outcome==='win'?'🏆':verdict.outcome==='tie'?'🤝':'🎯'}</div><div><strong>${verdict.title}</strong><p>${verdict.copy}</p><small>${benchmark}</small></div>`;
     }
-    $('#winPrimaryBtn').textContent='Pokračovat v mém postupu';
-    $('#winMenuBtn').textContent='← Volná hra';
-    if(!ctx.completedTracked){ctx.completedTracked=true;saveSession(ctx);track('shared_level_completed');if(verdict.outcome==='win')track('shared_level_beaten')}
+    if(g.mode==='free'){$('#winPrimaryBtn').textContent='Pokračovat v mém postupu';$('#winMenuBtn').textContent='← Volná hra'}
+    if(!ctx.completedTracked){ctx.completedTracked=true;saveSession(ctx);track(challengeEvent(ctx,'completed'));if(verdict.outcome==='win')track(challengeEvent(ctx,'beaten'))}
   };
 
   const buildChallengeUrl=(puzzle,rec)=>{
@@ -216,88 +237,81 @@
     return u.href;
   };
 
-  const buildDailyUrl=()=>{
-    const u=new URL(SHARE_URL||`${location.origin}/`);
-    PARAMS.forEach(k=>u.searchParams.delete(k));
-    u.searchParams.set('open','daily');
-    u.searchParams.set('via','share-daily');
+  const buildDailyUrl=(puzzle,rec,date)=>{
+    const u=new URL(buildChallengeUrl(puzzle,rec));
+    u.searchParams.set('kind','daily');u.searchParams.set('date',date);
+    u.searchParams.set('open','daily');u.searchParams.set('via','share-daily');
     return u.href;
   };
-
-  const shareDailyChallenge=async()=>{
-    const g=currentGame?.mode==='daily'?currentGame:null;
+  const performanceLine=rec=>`⏱ ${fmtTime(rec.elapsedMs)} · ${cleanLabel(rec.hintsUsed??rec.hints)}`;
+  const shareEvents={
+    daily:['daily_share_clicked','daily_share_native_completed','daily_share_clipboard_completed','daily_share_created','daily_share_cancelled','daily_share_failed'],
+    level:['level_share_clicked','level_share_native_completed','level_share_clipboard_completed','level_share_created','level_share_cancelled','level_share_failed'],
+    tajenka:['tajenka_share_clicked','tajenka_share_native_completed','tajenka_share_clipboard_completed','tajenka_share_created','tajenka_share_cancelled','tajenka_share_failed'],
+  };
+  const sendShare=async(title,text,url,event)=>{
+    const [clicked,native,clipboard,created,cancelled,failed]=shareEvents[event];
+    track(clicked);
+    try{
+      if(navigator.share){await navigator.share({title,text,url});track(native)}
+      else{await navigator.clipboard.writeText(text+'\n'+url);track(clipboard);showToast('Výzva i odkaz jsou ve schránce ✓')}
+      track(created);
+    }catch(e){if(e?.name==='AbortError')track(cancelled);else{track(failed);showToast('Sdílení se nepovedlo. Zkus to znovu.')}}
+  };
+  const shareDailyChallenge=async(fromResult=false)=>{
+    const g=fromResult&&currentGame?.mode==='daily'?currentGame:null;
     const date=g?.dailyDate||pragueDateISO();
-    let daily=null;
-    try{daily=dailyResultState(date)}catch{}
-    const puzzle=g?.puzzle||daily?.puzzle;
-    const stored=daily?.active||null;
-    const rec=g?.finished?{
-      elapsedMs:g.elapsedMs,
-      moves:g.moves,
-      hintsUsed:g.hints||0,
-      cleanSolve:(g.hints||0)===0
-    }:stored;
-    if(!puzzle||!rec)return baseShareDaily?.();
-
-    const stats=effectiveStats();
-    const rank=winDailyGlobalData?.date===date&&winDailyGlobalData?.myRank
-      ?` · 🌍 ${winDailyGlobalData.myRank}. z ${winDailyGlobalData.total}`
-      :'';
-    const clean=Number(rec.hintsUsed||0)===0?'✨ čistě':`💡 ${countCz(Number(rec.hintsUsed||0),'nápověda','nápovědy','nápověd')}`;
-    const url=buildDailyUrl();
-    const title='Proplet · dnešní výzva';
-    const text=`☀️ Dnešní Proplet mám za ${fmtTime(rec.elapsedMs)}. Překonáš mě?\n📅 ${formatDateCZ(date)} · ${diffLabel(puzzle.difficulty)} · 🔥 ${countCz(stats.currentStreak,'den','dny','dní')}${rank}\n${clean} · ${countCz(rec.moves,'tah','tahy','tahů')}`;
-    track('daily_share_clicked');
-    try{
-      if(navigator.share){await navigator.share({title,text,url});track('daily_share_native_completed')}
-      else{await navigator.clipboard.writeText(`${text}\n${url}`);track('daily_share_clipboard_completed');showToast('Výzva i odkaz jsou ve schránce ✓')}
-      track('daily_share_created');
-    }catch(e){if(e?.name==='AbortError')track('daily_share_cancelled');else{track('daily_share_failed');showToast('Sdílení se nepovedlo. Zkus to znovu.')}}
+    let daily=null;try{daily=dailyResultState(date)}catch{}
+    const puzzle=g?.puzzle||daily?.puzzle,stored=daily?.active||null;
+    const rec=g?.finished?{elapsedMs:g.elapsedMs,moves:g.moves,hintsUsed:g.hints??stored?.hintsUsed??0}:stored;
+    if(!puzzle||!rec){showToast('Nejdřív dokonči Denní výzvu.');return}
+    const title='Proplet · Denní výzva';
+    const text=`☀️ Proplet · ${formatDateCZ(date)}\n${performanceLine(rec)}\nPřekonáš mě?`;
+    await sendShare(title,text,buildDailyUrl(puzzle,rec,date),'daily');
   };
-
-  const shareCompetitive=async(puzzle,rec,rankText='')=>{
+  const shareCompetitive=async(puzzle,rec)=>{
     if(!puzzle||!rec)return;
-    const level=Number(puzzle.meta?.level)||'?',diff=diffLabel(puzzle.difficulty),url=buildChallengeUrl(puzzle,rec),clean=Number(rec.hintsUsed||0)===0?'✨ čistě':`💡 ${rec.hintsUsed||0}×`,title=`Proplet výzva · ${diff} #${level}`,text=`🧩 ${title}${rankText?` · ${rankText}`:''}\n⏱ ${fmtTime(rec.elapsedMs)} · ${clean} · ${countCz(rec.moves,'tah','tahy','tahů')}\nDokážeš mě porazit? 👀`;
-    track('level_share_clicked');
-    try{
-      if(navigator.share){await navigator.share({title,text,url});track('level_share_native_completed')}
-      else{await navigator.clipboard.writeText(`${text}\n${url}`);track('level_share_clipboard_completed');showToast('Výzva i odkaz jsou ve schránce ✓')}
-      track('level_share_created');
-    }catch(e){if(e?.name==='AbortError')track('level_share_cancelled');else{track('level_share_failed');showToast('Sdílení se nepovedlo. Zkus to znovu.')}}
+    const title=`Proplet · ${diffLabel(puzzle.difficulty)} · úroveň ${Number(puzzle.meta?.level)||'?'}`;
+    await sendShare(title,`🧩 ${title}\n${performanceLine(rec)}\nPřekonáš mě?`,buildChallengeUrl(puzzle,rec),'level');
   };
+  const shareTajenka=async(puzzle,rec)=>{
+    if(!puzzle||!rec)return;
+    const u=new URL(SHARE_URL);u.searchParams.set('play',puzzle.id);u.searchParams.set('kind','tajenka');u.searchParams.set('open','tajenka');
+    await sendShare('Proplet · Tajenka',`✦ Proplet · Tajenku mám odhalenou!\n${performanceLine(rec)}\nOdhalíš ji taky?`,u.href,'tajenka');
+  };
+  window.PropletSharing={shareTajenka};
 
   const shareCurrent=async()=>{
     const g=currentGame;
-    if(g?.mode==='daily')return shareDailyChallenge();
+    if(g?.mode==='daily')return shareDailyChallenge(true);
+    if(g?.mode==='tajenka')return shareTajenka(g.puzzle,g);
     if(g?.mode!=='free'||!g?.puzzle){return baseShareDaily?.()}
     const stored=getState().completed?.[`free:${g.puzzle.id}`];
     const rec=g.finished?{elapsedMs:g.elapsedMs,moves:g.moves,hintsUsed:g.hints||0,cleanSolve:(g.hints||0)===0}:(stored||g);
-    const rank=levelDetailContext?.puzzleId===g.puzzle.id&&levelDetailContext?.globalRank?`🌍 ${levelDetailContext.globalRank}. globálně`:levelDetailContext?.puzzleId===g.puzzle.id&&levelDetailContext?.teamRank?`${levelDetailContext.teamRank}. v týmu`:'';
-    await shareCompetitive(g.puzzle,rec,rank);
+    await shareCompetitive(g.puzzle,rec);
   };
 
   const shareDetail=async()=>{
     const c=levelDetailContext;if(!c)return;
     const puzzle=activePuzzleById(c.puzzleId);const rec=localLevelResult(c.puzzleId)||c.result;
     if(!puzzle||!rec)return;
-    const rank=c.globalRank?`🌍 ${c.globalRank}. globálně`:c.teamRank?`${c.teamRank}. v týmu`:'';
-    await shareCompetitive(puzzle,rec,rank);
+    await shareCompetitive(puzzle,rec);
   };
 
   const bindShareHandlers=()=>{
     const win=document.querySelector('#winShareBtn'),detail=document.querySelector('#levelDetailShareBtn'),daily=document.querySelector('#shareDailyBtn'),playDaily=document.querySelector('#playDailyBtn');
     if(win)win.onclick=shareCurrent;
     if(detail)detail.onclick=shareDetail;
-    if(daily)daily.onclick=shareDailyChallenge;
+    if(daily)daily.onclick=()=>shareDailyChallenge(false);
     if(playDaily)playDaily.onclick=startDaily;
   };
 
   const resolveIncoming=async()=>{
     if(!incomingRaw)return null;
-    const puzzle=await resolvePuzzle(incomingRaw.puzzleId);
-    if(!puzzle){track('shared_level_invalid');stripChallengeQuery();showToast('Tahle sdílená úroveň už není dostupná. Otevírám Volnou hru.');nav('free',{replace:true});incomingRaw=null;return null}
+    const puzzle=await resolvePuzzle(incomingRaw.puzzleId,incomingRaw);
+    if(!puzzle){track('shared_level_invalid');stripChallengeQuery();showToast('Tahle sdílená úloha už není dostupná. Vyber si jinou výzvu.');nav(incomingRaw.kind==='free'?'free':'daily',{replace:true});incomingRaw=null;return null}
     const ctx={...incomingRaw,puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:Number(puzzle.meta?.level)||null};
-    track('shared_level_opened');
+    track(challengeEvent(ctx,'opened'));
     pendingResolved={puzzle,ctx};
     let onboarded=false;try{onboarded=!!localStorage.getItem(ONBOARD_KEY)}catch{}
     if(onboarded){pendingResolved=null;startSharedChallenge(puzzle,ctx)}
@@ -315,7 +329,8 @@
         priority:30,
         afterStart(event){
           const {puzzle,mode}=event;
-          if(mode==='free'){
+          document.querySelector('#sharedChallengeResult')?.classList.add('hidden');
+          if(['free','daily','tajenka'].includes(mode)){
             const ctx=contextForPuzzle(puzzle?.id);
             if(ctx)attachGameChallengeUi(ctx);else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
           }else{document.body.classList.remove('game-shared-challenge');document.querySelector('#sharedChallengeTarget')?.remove()}
@@ -329,13 +344,13 @@
         before(event){
           const game=event.game;
           event.data.competitiveSharing={
-            challenge:game?.mode==='free'?contextForPuzzle(game?.puzzle?.id):null,
+            challenge:['free','daily','tajenka'].includes(game?.mode)?contextForPuzzle(game?.puzzle?.id):null,
             daily:game?.mode==='daily'?loadDailySession():null,
           };
         },
         after(event){
           const state=event.data.competitiveSharing||{},game=event.game;
-          if(state.challenge)renderChallengeResult(state.challenge);
+          if(state.challenge){renderChallengeResult(state.challenge);if(game?.mode==='tajenka'){track(challengeEvent(state.challenge,'completed'));clearSession()}}
           if(state.daily&&game?.mode==='daily'&&game?.finished&&!state.daily.completedTracked){state.daily.completedTracked=true;track('shared_daily_completed');saveDailySession(null)}
         },
       };
@@ -343,7 +358,7 @@
       if(!sharingCompletionHookInstalled){
         baseFinishGame=finishGame;
         finishGame=async function(){
-          const ctx=currentGame?.mode==='free'?contextForPuzzle(currentGame?.puzzle?.id):null;
+          const ctx=['free','daily','tajenka'].includes(currentGame?.mode)?contextForPuzzle(currentGame?.puzzle?.id):null;
           const dailyCtx=currentGame?.mode==='daily'?loadDailySession():null;
           const out=await baseFinishGame.apply(this,arguments);
           if(ctx)renderChallengeResult(ctx);
@@ -360,6 +375,7 @@
 
       performPostWinAction=function(action){
         const ctx=currentGame?.sharedChallenge||contextForPuzzle(currentGame?.puzzle?.id);
+        if(ctx&&currentGame?.finished&&currentGame?.mode!=='free')clearSession();
         if(ctx&&currentGame?.finished&&currentGame?.mode==='free'){
           const diff=currentGame.puzzle.difficulty;
           document.querySelector('#sharedChallengeResult')?.classList.add('hidden');
