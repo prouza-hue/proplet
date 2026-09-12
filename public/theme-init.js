@@ -92,6 +92,33 @@
 
   if(themeOnly)return;
 
+  // On the very first visit there is no controlling service worker yet. Start the
+  // large puzzle database request while the document is still parsing, then let
+  // the normal boot consume the same response when it eventually asks for it.
+  // This changes timing only: validation and parsing stay owned by app.js.
+  if(!window.PROPLET_RUNTIME_META?.gen4CandidatePreview&&!navigator.serviceWorker?.controller&&typeof window.fetch==='function'){
+    const baseFetch=window.fetch.bind(window);
+    let coldPuzzleConsumed=false;
+    const coldPuzzleFetch=baseFetch('/puzzles.json',{cache:'no-store'}).then(response=>{
+      if(response?.ok&&'caches' in window){
+        try{caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',response.clone())).catch(()=>{})}catch{}
+      }
+      return response;
+    }).catch(()=>null);
+    window.__PROPLET_COLD_PUZZLE_PREFETCH=coldPuzzleFetch;
+    window.fetch=(input,init)=>{
+      try{
+        const raw=typeof input==='string'?input:input?.url;
+        const url=new URL(raw,location.href);
+        if(!coldPuzzleConsumed&&url.origin===location.origin&&url.pathname==='/puzzles.json'){
+          coldPuzzleConsumed=true;
+          return coldPuzzleFetch.then(response=>response?.ok?response.clone():baseFetch(input,init));
+        }
+      }catch{}
+      return baseFetch(input,init);
+    };
+  }
+
   const styles=[
     ['/app-play.css?v=40140-s13b','propletAppPlayCss'],
     ['/ranking-polish.css?v=5','propletRankingPolishCss'],
