@@ -58,8 +58,13 @@ for day in (date(2026, 9, 12), date(2026, 9, 13), date(2026, 9, 15)):
 for day in (date(2026, 9, 16), date(2026, 9, 17), date(2026, 9, 18)):
     assert released_slot(day) == 4, day
 assert released_slot(date(2026, 9, 19)) == 5
+
+# The frozen 37-board bank remains available through slot 37, then stops.
 assert released_slot(date(2026, 10, 7)) == 10
-assert_unavailable(date(2026, 10, 10))
+assert released_slot(date(2026, 10, 10)) == 11
+assert released_slot(date(2027, 1, 9)) == 37
+assert released_slot(date(2027, 1, 12)) == 37
+assert_unavailable(date(2027, 1, 13))
 
 # Frontend and backend must use the same transition marker and split-week calculation.
 app = (ROOT / "public" / "app.js").read_text(encoding="utf-8")
@@ -68,4 +73,4 @@ assert "function tajenkaReleaseSlotForISO" in app
 assert "cadenceOffset%7>=4" in app
 assert "TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek" in app
 
-print("PASS: Tajenka keeps slots 1-2, then releases every Saturday and Wednesday")
+print("PASS: Tajenka keeps slots 1-2, then releases every Saturday and Wednesday across the frozen 37-board bank")
