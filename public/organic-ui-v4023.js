@@ -475,10 +475,27 @@ function updateThemeMeta(){
  meta.dataset.lightColor='#FDFBF7';if(document.documentElement.dataset.theme!=='dark')meta.setAttribute('content','#FDFBF7');
 }
 let queued=false;
+const observer=new MutationObserver(records=>{
+ // Plain timer/counter text and changes inside generated SVGs need no decoration.
+ const relevant=records.some(record=>{
+   const parent=record.target.nodeType===Node.TEXT_NODE?record.target.parentElement:record.target;
+   if(parent?.closest?.('script,style,svg,textarea,option'))return false;
+   if(record.type==='characterData')return !!keyAt(record.target.nodeValue||'');
+   return Array.from(record.addedNodes||[]).some(node=>
+     node.nodeType===Node.ELEMENT_NODE||
+     (node.nodeType===Node.TEXT_NODE&&!!keyAt(node.nodeValue||'')));
+ });
+ if(relevant)schedule();
+});
+function observe(){observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true})}
 function apply(){
- queued=false;applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta();
+ queued=false;
+ // Decoration must not schedule another frame through its own DOM writes.
+ observer.disconnect();
+ try{applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta()}
+ finally{observe()}
 }
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(apply)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-new MutationObserver(schedule).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+observe();
 })();
