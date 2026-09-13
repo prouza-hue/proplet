@@ -228,7 +228,7 @@
     loadScript('/challenge-cta-v3333.js?v=invitations1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=3','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
-    await loadScript('/account-conversion-v3331.js?v=2','propletAccountConversionV3331',{wait:true});
+    await loadScript('/account-conversion-v3331.js?v=auth-freeze1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});

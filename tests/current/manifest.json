@@ -5,6 +5,7 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
+      {"path": "tests/current/test_auth_title_convergence.js", "runner": "node"},
       {
         "path": "tools/test_v4001_pwa_startup.py",
         "runner": "python"

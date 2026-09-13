@@ -45,7 +45,7 @@
     const divider=$('#googleManualDivider span'),head=$('#googlePrimaryBlock .google-primary-head span'),note=$('#googlePrimaryBlock .google-primary-note');
 
     if(create){
-      setText(title,'Nepřijdi o své výsledky');
+      setText(title,'Nepřijď o své výsledky');
       setText(desc,'Založ si účet, trvá to pár vteřin. Uložíme XP, výsledky i sérii — a přidáme ti +500 XP.');
       setText(save,'Založit jménem a heslem · +500 XP');
       setText(divider,'nebo přezdívkou a heslem');
@@ -83,7 +83,7 @@
             const h=card.querySelector('h2');
             const p=card.querySelector('p.muted');
             const b=card.querySelector('#profileCreateBtn');
-            if(h)h.textContent='Nepřijdi o své výsledky';
+            if(h)h.textContent='Nepřijď o své výsledky';
             if(p)p.textContent='Účet založíš za pár vteřin. Nejrychleji přes Google — uložíme XP, výsledky i sérii a přidáme +500 XP.';
             if(b)b.textContent='🔒 Uložit výsledky · +500 XP';
           }
@@ -99,11 +99,11 @@
       const benefits=$('.account-nudge-benefits'),icon=$('.account-nudge-icon');
       if(icon)icon.textContent='🔒';
       if(stage===1){
-        if(eyebrow)eyebrow.textContent='NEPŘIJDI O VÝSLEDEK';
+        if(eyebrow)eyebrow.textContent='NEPŘIJĎ O VÝSLEDEK';
         if(title)title.textContent='Ulož si, co už máš';
         if(copy)copy.textContent='Založ si účet, trvá to pár vteřin. Výsledky, XP a série pak nezůstanou jen v tomhle zařízení — a dostaneš +500 XP.';
       }else if(stage===2){
-        if(eyebrow)eyebrow.textContent='NEPŘIJDI O SVŮJ POSTUP';
+        if(eyebrow)eyebrow.textContent='NEPŘIJĎ O SVŮJ POSTUP';
         if(title)title.textContent='Tenhle postup už stojí za uložení';
         if(copy)copy.textContent='Stačí pár vteřin. Nejrychleji přes Google. Uložíme tvoje výsledky do cloudu a přidáme +500 XP.';
       }else{

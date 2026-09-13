@@ -1,0 +1,14 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const a=fs.readFileSync('public/account-conversion-v3331.js','utf8');
+const b=fs.readFileSync('public/printshop-release-polish.js','utf8');
+const first=a.slice(a.indexOf('  function polishAuthModal(){'),a.indexOf('  function patchFunctions(){'));
+const second=b.slice(b.indexOf('  function polishProfileCopy(){'),b.indexOf('  function resetTajenkaResultMode(){'));
+let value='',writes=0,create=true;const title={get textContent(){return value},set textContent(v){value=v;writes++}};
+const q=s=>s==='#profileModalTitle'?title:null;
+const ctx={q,$:q,getProfile:()=>null,positionGoogleFirst:()=>true,isCreateMode:()=>create,setText:(el,v)=>{if(el&&el.textContent!==v)el.textContent=v}};
+vm.createContext(ctx);vm.runInContext(first+second,ctx);
+for(let i=0;i<100;i++)vm.runInContext('polishAuthModal();polishProfileCopy();',ctx);
+assert.equal(value,'Nepřijď o své výsledky');assert.equal(writes,1);
+create=false;for(let i=0;i<100;i++)vm.runInContext('polishAuthModal();polishProfileCopy();',ctx);
+assert.equal(value,'Přihlásit se');assert.equal(writes,2);
+console.log('PASS: registration and login titles converge without repeated mutations.');
