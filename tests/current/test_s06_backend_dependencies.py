@@ -72,7 +72,7 @@ EXPECTED_INSTALLER_ROUTES = (
 route_keys = [
     (method, route.path)
     for route in server.app.routes
-    if route.path and route.path != "/api/admin/quality-snapshot"
+    if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome"}
     for method in (route.methods or ())
 ]
 for expected in EXPECTED_INSTALLER_ROUTES:
@@ -81,12 +81,14 @@ for expected in EXPECTED_INSTALLER_ROUTES:
 route_snapshot = sorted(
     (route.path, tuple(sorted(route.methods or ())), route.name)
     for route in server.app.routes
-    if route.path and route.path != "/api/admin/quality-snapshot"
+    if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome"}
 )
 assert _digest(route_snapshot) == "f57b2cb7fee7e4cbcd81be61e6156c81716ece6e19e69033506b3b3318053bc6"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
+assert "/api/account/welcome" in openapi_contract["paths"]
+openapi_contract["paths"].pop("/api/account/welcome")
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_digest = _digest(openapi_contract)

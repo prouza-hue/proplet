@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path != "/api/admin/quality-snapshot"
+        if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -55,6 +55,8 @@ openapi_contract["info"]["version"] = "4.01.35-cloud"
 # Additive authenticated repair endpoint is covered by test_analytics_v2.
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
+assert "/api/account/welcome" in openapi_contract["paths"]
+openapi_contract["paths"].pop("/api/account/welcome")
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )

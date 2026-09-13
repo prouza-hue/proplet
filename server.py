@@ -10,7 +10,7 @@ import re
 import secrets
 import time
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from typing import Optional
 
@@ -1863,6 +1863,20 @@ def set_avatar(payload: AvatarSet, request: Request, authorization: Optional[str
         raise HTTPException(400, "Vyber avatar")
     db_update("players", {"id": player["id"]}, {"avatar": avatar, "use_google_avatar": False})
     return {"ok": True, "avatar": avatar, "useGoogleAvatar": False, "googleAvatarUrl": player.get("google_avatar_url")}
+
+
+@app.post("/api/account/welcome")
+def claim_printshop_welcome(request: Request, authorization: Optional[str] = Header(default=None)):
+    player = auth_player(authorization)
+    if VERCEL_ENV == "preview":
+        return {"show": False}
+    enforce_rate_limit(request, "welcome_claim", limit=30, window_seconds=3600)
+    rows = db_request("PATCH", "players", params={
+        "id": "eq." + str(player["id"]),
+        "printshop_welcome_seen_at": "is.null", "select": "id",
+    }, body={"printshop_welcome_seen_at": datetime.now(timezone.utc).isoformat()},
+        prefer="return=representation")
+    return {"show": bool(rows)}
 
 
 @app.post("/api/support-mode")
