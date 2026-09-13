@@ -1,5 +1,5 @@
 {
-  "revision": "printshop-complete-1",
+  "revision": "rank-progression-1",
   "status": "preview",
   "sizes": {
     "small": [
@@ -13,283 +13,411 @@
   },
   "items": [
     {
-      "id": "rank-01",
+      "id": "rank-progress-01",
       "name": "Nováček",
       "category": "rank",
-      "group": null,
+      "group": "První kroky",
       "stage": 0,
       "key": "novacek"
     },
     {
-      "id": "rank-02",
+      "id": "rank-progress-02",
       "name": "Písmenkář",
       "category": "rank",
-      "group": null,
-      "stage": 0,
+      "group": "První kroky",
+      "stage": 1,
       "key": "rank-02"
     },
     {
-      "id": "rank-03",
-      "name": "Slovolovec",
-      "category": "rank",
-      "group": null,
-      "stage": 0,
-      "key": "rank-03"
-    },
-    {
-      "id": "rank-04",
+      "id": "rank-progress-03",
       "name": "Hledač nití",
       "category": "rank",
-      "group": null,
-      "stage": 0,
+      "group": "První kroky",
+      "stage": 2,
       "key": "rank-04"
     },
     {
-      "id": "rank-05",
+      "id": "rank-progress-04",
+      "name": "Slovolovec",
+      "category": "rank",
+      "group": "První kroky",
+      "stage": 3,
+      "key": "rank-03"
+    },
+    {
+      "id": "rank-progress-05",
       "name": "Propletač",
       "category": "rank",
-      "group": null,
-      "stage": 0,
+      "group": "První kroky",
+      "stage": 4,
       "key": "rank-05"
     },
     {
-      "id": "rank-06",
+      "id": "rank-progress-06",
       "name": "Kličkař",
       "category": "rank",
-      "group": null,
-      "stage": 1,
+      "group": "První kroky",
+      "stage": 5,
       "key": "rank-06"
     },
     {
-      "id": "rank-07",
-      "name": "Mistr cest",
-      "category": "rank",
-      "group": null,
-      "stage": 1,
-      "key": "rank-07"
-    },
-    {
-      "id": "rank-08",
-      "name": "Slovní taktik",
-      "category": "rank",
-      "group": null,
-      "stage": 1,
-      "key": "rank-08"
-    },
-    {
-      "id": "rank-09",
-      "name": "Slovní mág",
-      "category": "rank",
-      "group": null,
-      "stage": 1,
-      "key": "rank-09"
-    },
-    {
-      "id": "rank-10",
+      "id": "rank-progress-07",
       "name": "Uzlovač",
       "category": "rank",
-      "group": null,
-      "stage": 1,
+      "group": "První kroky",
+      "stage": 6,
       "key": "rank-10"
     },
     {
-      "id": "rank-11",
-      "name": "Legenda Propletu",
-      "category": "rank",
-      "group": null,
-      "stage": 2,
-      "key": "rank-11"
-    },
-    {
-      "id": "rank-12",
+      "id": "rank-progress-08",
       "name": "Cestář",
       "category": "rank",
-      "group": null,
-      "stage": 2,
+      "group": "První kroky",
+      "stage": 7,
       "key": "rank-12"
     },
     {
-      "id": "rank-13",
-      "name": "Krotitel",
+      "id": "rank-progress-09",
+      "name": "Stopař slov",
       "category": "rank",
-      "group": null,
-      "stage": 2,
-      "key": "rank-13"
+      "group": "První kroky",
+      "stage": 8,
+      "key": "achievement-discovery-10"
     },
     {
-      "id": "rank-14",
-      "name": "Mistr zákrut",
+      "id": "rank-progress-10",
+      "name": "Průzkumník mřížky",
       "category": "rank",
-      "group": null,
-      "stage": 2,
-      "key": "rank-14"
+      "group": "První kroky",
+      "stage": 9,
+      "key": "achievement-discovery-50"
     },
     {
-      "id": "rank-15",
+      "id": "rank-progress-11",
       "name": "Labyrintník",
       "category": "rank",
-      "group": null,
-      "stage": 2,
+      "group": "První kroky",
+      "stage": 10,
       "key": "rank-15"
     },
     {
-      "id": "rank-16",
-      "name": "Velmistr Propletu",
+      "id": "rank-progress-12",
+      "name": "Slovní taktik",
       "category": "rank",
-      "group": null,
-      "stage": 3,
-      "key": "rank-16"
+      "group": "První kroky",
+      "stage": 11,
+      "key": "rank-08"
     },
     {
-      "id": "rank-17",
-      "name": "Propletový ninja",
+      "id": "rank-progress-13",
+      "name": "Krotitel zákrut",
       "category": "rank",
-      "group": null,
-      "stage": 3,
-      "key": "rank-17"
+      "group": "První kroky",
+      "stage": 12,
+      "key": "rank-13"
     },
     {
-      "id": "rank-18",
-      "name": "Slovní alchymista",
+      "id": "rank-progress-14",
+      "name": "Mistr cest",
       "category": "rank",
-      "group": null,
-      "stage": 3,
-      "key": "alchymista"
+      "group": "Mistrovství",
+      "stage": 13,
+      "key": "rank-07"
     },
     {
-      "id": "rank-19",
+      "id": "rank-progress-15",
+      "name": "Mistr zákrut",
+      "category": "rank",
+      "group": "Mistrovství",
+      "stage": 14,
+      "key": "rank-14"
+    },
+    {
+      "id": "rank-progress-16",
       "name": "Mistr šneků",
       "category": "rank",
-      "group": null,
-      "stage": 3,
+      "group": "Mistrovství",
+      "stage": 15,
       "key": "rank-19"
     },
     {
-      "id": "rank-20",
+      "id": "rank-progress-17",
+      "name": "Propletový ninja",
+      "category": "rank",
+      "group": "Mistrovství",
+      "stage": 16,
+      "key": "rank-17"
+    },
+    {
+      "id": "rank-progress-18",
+      "name": "Slovní alchymista",
+      "category": "rank",
+      "group": "Mistrovství",
+      "stage": 17,
+      "key": "alchymista"
+    },
+    {
+      "id": "rank-progress-19",
+      "name": "Slovní mág",
+      "category": "rank",
+      "group": "Mistrovství",
+      "stage": 18,
+      "key": "rank-09"
+    },
+    {
+      "id": "rank-progress-20",
       "name": "Mřížkový mág",
       "category": "rank",
-      "group": null,
-      "stage": 3,
+      "group": "Mistrovství",
+      "stage": 19,
       "key": "rank-20"
     },
     {
-      "id": "rank-21",
-      "name": "Nadslovník",
-      "category": "rank",
-      "group": null,
-      "stage": 4,
-      "key": "rank-21"
-    },
-    {
-      "id": "rank-22",
-      "name": "Krotitel Mozkožroutů",
-      "category": "rank",
-      "group": null,
-      "stage": 4,
-      "key": "rank-22"
-    },
-    {
-      "id": "rank-23",
-      "name": "Král mřížky",
-      "category": "rank",
-      "group": null,
-      "stage": 4,
-      "key": "rank-23"
-    },
-    {
-      "id": "rank-24",
-      "name": "Arcimistr Propletu",
-      "category": "rank",
-      "group": null,
-      "stage": 4,
-      "key": "rank-24"
-    },
-    {
-      "id": "rank-25",
+      "id": "rank-progress-21",
       "name": "Slovočaroděj",
       "category": "rank",
-      "group": null,
-      "stage": 4,
+      "group": "Mistrovství",
+      "stage": 20,
       "key": "rank-25"
     },
     {
-      "id": "rank-26",
-      "name": "Propletový titán",
+      "id": "rank-progress-22",
+      "name": "Krotitel Mozkožroutů",
       "category": "rank",
-      "group": null,
-      "stage": 5,
-      "key": "rank-26"
+      "group": "Mistrovství",
+      "stage": 21,
+      "key": "rank-22"
     },
     {
-      "id": "rank-27",
-      "name": "Mistr nekonečna",
+      "id": "rank-progress-23",
+      "name": "Strážce mřížky",
       "category": "rank",
-      "group": null,
-      "stage": 5,
-      "key": "rank-27"
+      "group": "Mistrovství",
+      "stage": 22,
+      "key": "achievement-hard-50"
     },
     {
-      "id": "rank-28",
-      "name": "Hvězdný propletač",
-      "category": "rank",
-      "group": null,
-      "stage": 5,
-      "key": "rank-28"
-    },
-    {
-      "id": "rank-29",
-      "name": "Orbitální luštitel",
-      "category": "rank",
-      "group": null,
-      "stage": 5,
-      "key": "rank-29"
-    },
-    {
-      "id": "rank-30",
-      "name": "Galaktický slovolovec",
-      "category": "rank",
-      "group": null,
-      "stage": 5,
-      "key": "rank-30"
-    },
-    {
-      "id": "rank-31",
-      "name": "Strážce všech cest",
-      "category": "rank",
-      "group": null,
-      "stage": 6,
-      "key": "rank-31"
-    },
-    {
-      "id": "rank-32",
-      "name": "Absolutní Propletač",
-      "category": "rank",
-      "group": null,
-      "stage": 6,
-      "key": "rank-32"
-    },
-    {
-      "id": "rank-33",
-      "name": "Strážce tajných cest",
-      "category": "rank",
-      "group": null,
-      "stage": 6,
-      "key": "rank-33"
-    },
-    {
-      "id": "rank-34",
+      "id": "rank-progress-24",
       "name": "Architekt labyrintu",
       "category": "rank",
-      "group": null,
-      "stage": 6,
+      "group": "Velmistři a strážci",
+      "stage": 23,
       "key": "rank-34"
     },
     {
-      "id": "rank-35",
+      "id": "rank-progress-25",
+      "name": "Mistr skrytých cest",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 24,
+      "key": "achievement-tajenka-10"
+    },
+    {
+      "id": "rank-progress-26",
+      "name": "Mistr nekonečna",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 25,
+      "key": "rank-27"
+    },
+    {
+      "id": "rank-progress-27",
+      "name": "Velmistr Propletu",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 26,
+      "key": "rank-16"
+    },
+    {
+      "id": "rank-progress-28",
+      "name": "Arcimistr Propletu",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 27,
+      "key": "rank-24"
+    },
+    {
+      "id": "rank-progress-29",
+      "name": "Strážce tajných cest",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 28,
+      "key": "rank-33"
+    },
+    {
+      "id": "rank-progress-30",
+      "name": "Strážce všech cest",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 29,
+      "key": "rank-31"
+    },
+    {
+      "id": "rank-progress-31",
+      "name": "Král mřížky",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 30,
+      "key": "rank-23"
+    },
+    {
+      "id": "rank-progress-32",
+      "name": "Propletový titán",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 31,
+      "key": "rank-26"
+    },
+    {
+      "id": "rank-progress-33",
+      "name": "Nadslovník",
+      "category": "rank",
+      "group": "Velmistři a strážci",
+      "stage": 32,
+      "key": "rank-21"
+    },
+    {
+      "id": "rank-progress-34",
+      "name": "Hvězdný propletač",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 33,
+      "key": "rank-28"
+    },
+    {
+      "id": "rank-progress-35",
+      "name": "Orbitální luštitel",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 34,
+      "key": "rank-29"
+    },
+    {
+      "id": "rank-progress-36",
+      "name": "Galaktický slovolovec",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 35,
+      "key": "rank-30"
+    },
+    {
+      "id": "rank-progress-37",
+      "name": "Hvězdný navigátor",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 36,
+      "key": "achievement-daily-200"
+    },
+    {
+      "id": "rank-progress-38",
+      "name": "Čtenář souhvězdí",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 37,
+      "key": "achievement-medium-100"
+    },
+    {
+      "id": "rank-progress-39",
+      "name": "Strážce souhvězdí",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 38,
+      "key": "achievement-xp-61000"
+    },
+    {
+      "id": "rank-progress-40",
+      "name": "Mistr hvězdných cest",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 39,
+      "key": "achievement-xp-75000"
+    },
+    {
+      "id": "rank-progress-41",
+      "name": "Architekt souhvězdí",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 40,
+      "key": "achievement-xp-95000"
+    },
+    {
+      "id": "rank-progress-42",
+      "name": "Strážce slovního vesmíru",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 41,
+      "key": "achievement-cd-100"
+    },
+    {
+      "id": "rank-progress-43",
+      "name": "Mistr slovního vesmíru",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 42,
+      "key": "achievement-daily-365"
+    },
+    {
+      "id": "rank-progress-44",
+      "name": "Architekt slovního vesmíru",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 43,
+      "key": "achievement-all-800"
+    },
+    {
+      "id": "rank-progress-45",
+      "name": "Vládce slovního vesmíru",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 44,
+      "key": "achievement-hc-100"
+    },
+    {
+      "id": "rank-progress-46",
+      "name": "Strážce nekonečna",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 45,
+      "key": "achievement-clean-250"
+    },
+    {
+      "id": "rank-progress-47",
+      "name": "Velmistr nekonečna",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 46,
+      "key": "achievement-xp-50000"
+    },
+    {
+      "id": "rank-progress-48",
+      "name": "Arcimistr nekonečna",
+      "category": "rank",
+      "group": "Za hranice mřížky",
+      "stage": 47,
+      "key": "achievement-xp-120000"
+    },
+    {
+      "id": "rank-progress-49",
+      "name": "Legenda Propletu",
+      "category": "rank",
+      "group": "Legendy",
+      "stage": 48,
+      "key": "rank-11"
+    },
+    {
+      "id": "rank-progress-50",
+      "name": "Absolutní Propletač",
+      "category": "rank",
+      "group": "Legendy",
+      "stage": 49,
+      "key": "rank-32"
+    },
+    {
+      "id": "rank-progress-51",
       "name": "Legenda bez konce",
       "category": "rank",
-      "group": null,
-      "stage": 6,
+      "group": "Legendy",
+      "stage": 50,
       "key": "legenda"
     },
     {
