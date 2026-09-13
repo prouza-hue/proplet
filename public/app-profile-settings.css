@@ -175,12 +175,12 @@
 .profile-settings-heading p{margin:5px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
 
 /* Stable order + one vertical rhythm across all top-level settings blocks. */
-#screen-profile.settings-open>#calmModeCard{order:10}
-#screen-profile.settings-open>.settings-gameplay-card{order:11}
-#screen-profile.settings-open>.appearance-card{order:20}
+#screen-profile.settings-open>#calmModeCard{order:21}
+#screen-profile.settings-open>.settings-gameplay-card{order:20}
+#screen-profile.settings-open>.appearance-card{order:10}
 #screen-profile.settings-open>.push-card{order:30}
 #screen-profile.settings-open>.install-app-card{order:40}
-#screen-profile.settings-open>#profileCard{order:50}
+#screen-profile.settings-open>#profileCard{order:1}
 #screen-profile.settings-open>#settingsPrivacyCard{order:60}
 #screen-profile.settings-open>#profileTeamSettingsCard{order:70}
 #screen-profile.settings-open>.settings-data-card{order:80}

@@ -164,7 +164,7 @@
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
-    ['/app-profile-settings.css?v=40140-s13b','propletAppProfileSettingsCss'],
+    ['/app-profile-settings.css?v=settingsorder1','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
     ['/brand-wordmark-fraunces.css?v=2','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
