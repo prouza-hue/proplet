@@ -5,7 +5,7 @@ if(location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.searc
 }
 
 const auditEnabled=location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).has('uiAudit');
-const auditStats={passes:0,full:0,ms:0,textNodes:0};
+const auditStats={passes:0,full:0,ms:0,textNodes:0,roots:{}};
 function auditPublish(){
  if(!auditEnabled)return;
  let output=document.getElementById('uiAudit');
@@ -419,8 +419,8 @@ function applyRibbonContexts(){
  decorationAll('.streak-icon,.home-progress-streak i').forEach(slot=>mount(slot,'Herní série','symbol',24));
  const win=decorationOne('#winBadge');
  if(win&&!win.querySelector('.ribbon-art')){
-  const fresh=decorationOne('#newBadgeBox .unlock-row strong')?.textContent||'';
-  const title=decorationOne('#winTitle')?.textContent||'';
+  const fresh=document.querySelector('#newBadgeBox .unlock-row strong')?.textContent||'';
+  const title=document.querySelector('#winTitle')?.textContent||'';
   if(fresh.startsWith('Nový odznak'))mount(win,fresh,'streak',64);
   else mount(win,/Tajenka/.test(title)?'Odhalená tajenka':win.textContent.includes('☀')?'Denní výzva':'Dokončeno','symbol',64);
  }
@@ -492,7 +492,7 @@ function updateFooter(){
  const author=footer.querySelector('strong');if(author&&!author.hidden)author.hidden=true;
 }
 function updateThemeMeta(){
- const meta=decorationOne('meta[name="theme-color"]');if(!meta)return;
+ const meta=document.querySelector('meta[name="theme-color"]');if(!meta)return;
  meta.dataset.lightColor='#FDFBF7';if(document.documentElement.dataset.theme!=='dark')meta.setAttribute('content','#FDFBF7');
 }
 let queued=false;
@@ -521,7 +521,7 @@ const observer=new MutationObserver(records=>{
 function observe(){observer.observe(document.body,{subtree:true,childList:true,characterData:true})}
 function decorate(root){
  decorationRoot=root;const started=performance.now();
- if(auditEnabled){auditStats.passes++;if(root===document.body)auditStats.full++}
+ if(auditEnabled){auditStats.passes++;const label=root.id||root.className||root.tagName;auditStats.roots[label]=(auditStats.roots[label]||0)+1;if(root===document.body)auditStats.full++}
  try{applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();if(root===document.body)updateThemeMeta()}
  finally{decorationRoot=document;if(auditEnabled)auditStats.ms+=performance.now()-started}
 }
