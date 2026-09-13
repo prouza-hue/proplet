@@ -172,6 +172,11 @@ def install_push_diagnostics(
                 snapshot = save_quality_snapshot_if_monday()
             except Exception as exc:
                 log.warning("Push diagnostics snapshot hook failed: %s", exc)
+                snapshot = {"saved": False, "reason": "failed"}
+                try:
+                    db_insert("operational_events", {"id": str(uuid.uuid4()), "event_type": "analytics_snapshot_failed", "severity": "warning", "code": "snapshot_build", "created_at": now().isoformat()})
+                except Exception:
+                    log.warning("Could not record snapshot failure")
         if callable(db_rpc):
             try:
                 housekeeping = db_rpc("proplet_launch_housekeeping")

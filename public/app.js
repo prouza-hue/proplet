@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-boardintro2';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-analytics2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -362,7 +362,7 @@ function resultQueue(profile=getProfile(),scope=profile?.id||playerScope()){
  const factory=window.PropletResultQueue;
  if(!factory?.create)return null;
  resultQueueControllerIdentity=identity;
- resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),post:r=>api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
+ resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
  return resultQueueController;
 }
 function quarantineRejectedResult(row,reason,scope=playerScope()){
@@ -738,7 +738,7 @@ async function startFree(diff){
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
 function startDaily(options={}){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;return dailyOrchestration().startDaily(options)}
 function startStarterWarmup(){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has(Number(x.meta?.level)))||list[0];if(!p){nav('free',{replace:true});return}startGame(p,'free',null,{postStarterWarmup:true})}
-function startTajenka(){if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){showToast('Tajenka není na této verzi dostupná.');return}trackProductEvent('tajenka_started');startGame(tajenkaPuzzle,'tajenka',null)}
+function startTajenka(){if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){showToast('Tajenka není na této verzi dostupná.');return}startGame(tajenkaPuzzle,'tajenka',null);trackProductEvent('tajenka_started',{puzzleId:tajenkaPuzzle.id})}
 
 function newAttemptId(){try{return crypto.randomUUID()}catch{return `a-${Date.now()}-${Math.random().toString(36).slice(2,10)}`}}
 async function startAttemptTelemetry(g){if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||isMozkomorQaDifficulty(g?.puzzle?.difficulty)||!g||g.mode==='rescue'||g.mode==='starter'||g.mode==='tajenka')return;try{await api('/api/attempt/start',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,puzzle_id:g.puzzle.id,challenge_key:challengeKey(g.mode,g.puzzle,g.dailyDate),mode:g.mode,difficulty:g.puzzle.difficulty})})}catch{}}
@@ -1057,7 +1057,7 @@ function queueResult(rec){
 function apiClient(){
  if(apiClientController)return apiClientController;
  const factory=window.PropletApiClient;if(!factory?.create)return null;
- apiClientController=factory.create({fetch:(...args)=>window.fetch(...args),getProfile,getAnonymousId,getVersion:()=>APP_VERSION,getPreviewDate:()=>CONTENT_PREVIEW_DATE,isOnline:()=>navigator.onLine,timeoutMs:12000});return apiClientController;
+ apiClientController=factory.create({fetch:(...args)=>window.fetch(...args),getProfile,getAnonymousId,getVersion:()=>APP_VERSION,getPreviewDate:()=>CONTENT_PREVIEW_DATE,getAnalyticsHeaders:analyticsHeaders,isOnline:()=>navigator.onLine,timeoutMs:12000});return apiClientController;
 }
 function completionPipeline(){
  if(completionPipelineController)return completionPipelineController;
@@ -1115,15 +1115,29 @@ function gameHints(){
 
 async function api(path,opts={}){
  const client=apiClient();if(client)return client(path,opts);
- const hasAuthSnapshot=Object.prototype.hasOwnProperty.call(opts,'authProfile'),p=hasAuthSnapshot?opts.authProfile:getProfile(),{authProfile:_authProfile,...requestOptions}=opts,headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
+ const hasAuthSnapshot=Object.prototype.hasOwnProperty.call(opts,'authProfile'),p=hasAuthSnapshot?opts.authProfile:getProfile(),{authProfile:_authProfile,...requestOptions}=opts,headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...analyticsHeaders(),...(opts.headers||{})};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();if(CONTENT_PREVIEW_DATE)headers['X-Proplet-Preview-As-Of']=CONTENT_PREVIEW_DATE;
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);let r;
  try{r=await fetch(path,{...requestOptions,headers,signal:controller.signal,cache:'no-store'})}catch(e){clearTimeout(timeout);if(e.name==='AbortError')throw new Error('Server se neozval včas');throw new Error(navigator.onLine?'Spojení se serverem selhalo':'Telefon je offline')}
- clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;const error=new Error(msg);error.status=r.status;throw error}return r.json();
+ clearTimeout(timeout);if(!r.ok){let msg=`Server vrátil chybu ${r.status}`,requestId='';try{const body=await r.json();msg=body.detail||body.message||msg;requestId=String(body.requestId||'').replace(/[^A-Za-z0-9_.:-]/g,'').slice(0,24)}catch{}if(requestId)msg+=` · kód ${requestId}`;const error=new Error(msg);error.status=r.status;error.retryAfterMs=Number(r.headers.get("Retry-After")||0)*1000;throw error}return r.json();
+}
+async function claimTelemetryAfterAuth(anonymousId){
+ const profile=getProfile();if(!profile?.id)return;
+ const key=`proplet-pending-telemetry-claim:${profile.id}`;
+ let anon=anonymousId;try{anon=anon||localStorage.getItem(key);if(anon)localStorage.setItem(key,anon)}catch{}
+ if(!anon)return;
+ await productAnalytics()?.flush();
+ productAnalytics()?.adoptGuest(anon,profile.id);
+ try{await api('/api/anonymous/claim',{method:'POST',body:JSON.stringify({anonymous_id:anon}),authProfile:profile});localStorage.removeItem(key);if(getAnonymousId()===anon)rotateAnonymousId();productAnalytics()?.flush()}catch{}
+}
+function analyticsHeaders(eventType,properties){
+ const g=currentGame,puzzleId=properties?.puzzleId||g?.puzzle?.id;
+ const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
+ return {...gameHeaders,...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':'board-v2',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
  const factory=window.PropletAnalytics;if(!factory?.create)return null;
- productAnalyticsController=factory.create({request:(path,opts)=>api(path,opts),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW)});
+ productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,request:(path,opts)=>api(path,opts),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview')});
  return productAnalyticsController;
 }
 function trackProductEvent(eventType,properties){
@@ -1136,13 +1150,13 @@ function trackInboundCampaign(){
  try{const u=new URL(location.href),via=u.searchParams.get('via'),event={"push-daily":"push_daily_opened","push-weekly":"push_weekly_opened","push-content":"push_content_opened","push-return":"push_return_opened","push-tajenka":"push_tajenka_opened"}[via];if(!event)return;trackProductEvent(event);u.searchParams.delete('via');history.replaceState(history.state,'',`${u.pathname}${u.search}${u.hash}`)}catch{}
 }
 function trackAppSession(){
- try{if(sessionStorage.getItem(ANALYTICS_SESSION_KEY)==='1')return;sessionStorage.setItem(ANALYTICS_SESSION_KEY,'1')}catch{}
+ try{const now=Date.now(),day=pragueDateISO(),last=JSON.parse(sessionStorage.getItem(ANALYTICS_SESSION_KEY)||'null');if(last?.day===day&&now-last.at<1800000)return;sessionStorage.setItem(ANALYTICS_SESSION_KEY,JSON.stringify({at:now,day}))}catch{}
  trackProductEvent('app_session_started');
  if(currentScreen!=='game')trackProductEvent(`screen_${currentScreen}_viewed`);
 }
 
 async function syncQueue({announce=false}={}){
- if(GEN4_CANDIDATE_PREVIEW){syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
+ if(GEN4_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview'||new URLSearchParams(location.search).get('tutorial')==='1'){syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
  const scope=p.id,controller=resultQueue(p,scope);if(controller&&controller.getQueue().length){
   syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
@@ -1269,7 +1283,7 @@ async function saveNewProfile(){
   try{await currentGame?.finishTelemetryPromise}catch{}
   const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
-  try{await api('/api/anonymous/claim',{method:'POST',body:JSON.stringify({anonymous_id:anonId})});rotateAnonymousId()}catch{}
+  await claimTelemetryAfterAuth(anonId);
   trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
  }catch(e){$('#profileFormError').textContent=e.message}
 }
@@ -1512,7 +1526,8 @@ async function probeCanonicalRelease(force=false){
   const local=await fetch(`/api/config?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.json():null);
   if(!local)return;
   const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
-  if(local.environment==='preview'||location.origin===canonicalOrigin){
+  window.PROPLET_RUNTIME_ENV=local.environment;
+ if(local.environment==='preview'||location.origin===canonicalOrigin){
    const source=await fetch(`/sw.js?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.text():'');
    const release=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
    if(release&&release!==APP_PREVIEW_RELEASE){
@@ -1873,7 +1888,7 @@ function bind(){
  window.addEventListener('storage',e=>{if(e.key===SETTINGS_KEY){applyTheme(getSettings().theme);renderSettings();renderMagnifierControls();if(getSettings().magnifier===false)hideTouchMagnifier()}});
  if(typeof ResizeObserver!=='undefined'){const stage=$('#boardStage');if(stage){const ro=new ResizeObserver(()=>{if(currentScreen==='game')requestAnimationFrame(()=>{fitGameBoard();drawPaths()})});ro.observe(stage);window.__propletBoardResizeObserver=ro}}
  window.addEventListener('online',()=>{syncQueue({announce:false});refreshRollingContent().catch(()=>{})});
- document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){releaseGameWakeLock();pauseGameClock('hidden');sendAttemptCheckpoint('leave')}else{resumeGameClock();syncGameWakeLock();if(getQueue().length)syncQueue({announce:false})}});window.addEventListener('blur',()=>{releaseGameWakeLock();pauseGameClock('blur')});window.addEventListener('focus',()=>{resumeGameClock();syncGameWakeLock()});window.addEventListener('pagehide',()=>{releaseGameWakeLock();pauseGameClock('pagehide');trackTajenkaAbandon();sendAttemptCheckpoint('leave')});
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){releaseGameWakeLock();pauseGameClock('hidden');sendAttemptCheckpoint('leave')}else{trackAppSession();productAnalytics()?.flush();resumeGameClock();syncGameWakeLock();if(getQueue().length)syncQueue({announce:false})}});window.addEventListener('blur',()=>{releaseGameWakeLock();pauseGameClock('blur')});window.addEventListener('focus',()=>{resumeGameClock();syncGameWakeLock()});window.addEventListener('pagehide',()=>{releaseGameWakeLock();pauseGameClock('pagehide');trackTajenkaAbandon();sendAttemptCheckpoint('leave')});
 }
 
 const EXPECTED_PUZZLE_DB_VERSION=11;
@@ -2043,9 +2058,9 @@ async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  await loadTajenkaFixture();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1'),80));
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1'),80));
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
- let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(getQueue().length&&navigator.onLine)syncQueue({announce:false})},60000);
+ let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(navigator.onLine){productAnalytics()?.flush();if(getQueue().length)syncQueue({announce:false})}},60000);
 }
 function installEngagementModules(){
  window.PropletEngagementOnboarding?.install();

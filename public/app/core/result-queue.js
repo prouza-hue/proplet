@@ -21,6 +21,10 @@
     const post = typeof options.post === 'function' ? options.post : async () => {};
     const quarantine = typeof options.quarantine === 'function' ? options.quarantine : () => false;
     let syncPromise = null;
+    const now = options.now || (() => Date.now());
+    const readRetry = options.getRetry || (() => null);
+    const writeRetry = options.saveRetry || (() => {});
+    let retry = readRetry() || {};
 
     function normalize() {
       let queue;
@@ -60,6 +64,8 @@
 
     function sync() {
       if (syncPromise) return syncPromise;
+      retry = readRetry() || retry;
+      if (Number(retry.until) > now()) return Promise.resolve({ok:false,left:current().length,sent:0,deferred:true,retryAt:retry.until,error:'Synchronizace chvíli počká a zkusí to automaticky znovu.'});
       const run = (async () => {
         const snapshot = current();
         const confirmed = new Set();
@@ -73,6 +79,7 @@
             await post(item);
             confirmed.add(itemId);
             sent++;
+            retry = {}; writeRetry(retry);
           } catch (error) {
             if (Number(error?.status) === 400 && error?.message === 'Neznámá úloha' && quarantine(item, error.message)) {
               confirmed.add(itemId);
@@ -80,6 +87,12 @@
             } else {
               failed.push(item);
               if (!firstError) firstError = error?.message || 'Synchronizace selhala';
+              if (!error?.status || Number(error.status) === 429 || Number(error.status) >= 500 || Number(error.status) === 401) {
+                const failures = Math.min(7, (Number(retry.failures) || 0) + 1);
+                const delay = Math.max(Number(error.retryAfterMs) || 0, Math.min(3600000, 60000 * 2 ** (failures - 1)));
+                retry = {failures, until:now() + delay}; writeRetry(retry);
+                break;
+              }
             }
           }
         }

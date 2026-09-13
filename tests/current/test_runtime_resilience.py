@@ -90,7 +90,7 @@ def test_product_event_smoke_works_without_public_registry_bundle():
         patch.object(server, "client_app_version", return_value="4.02.1"),
         patch.object(server, "db_insert", side_effect=lambda table, row: inserted.append((table, row)) or row),
     ):
-        assert server.product_event(server.ProductEventCreate(event_type="app_open"), object()) == {"ok": True}
+        assert server.product_event(server.ProductEventCreate(event_type="app_open"), __import__("types").SimpleNamespace(headers={})) == {"ok": True}
     product_analytics.load_registry.cache_clear()
     product_analytics.allowed_event_names.cache_clear()
     assert inserted[0][0] == "product_events"
@@ -114,7 +114,7 @@ def test_progress_endpoint_smoke_returns_completed_rows():
         patch.object(server, "db_select", return_value=[result]),
         patch.object(server, "free_puzzle_info", return_value={"level": 1, "generation": 4, "legacy": False}),
     ):
-        payload = server.progress(object(), authorization="Bearer test")
+        payload = server.progress(__import__("types").SimpleNamespace(headers={}), authorization="Bearer test")
     assert payload["completed"][0]["challengeKey"] == "free:g4-e-001"
     assert payload["completed"][0]["level"] == 1
 

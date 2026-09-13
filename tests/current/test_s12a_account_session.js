@@ -110,18 +110,18 @@ has(accountTeam,/if\(!window\.PROPLET_ACCOUNT_SESSION_ACTIVE\)\{\s*window\.fetch
 has(recoveryGuard,/if\(!window\.PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE\)\{[\s\S]*window\.fetch=/,'recovery mixed-cache fallback is not gated by explicit callback persistence');
 has(accountAuth,/PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE=true/,'account callback ownership marker missing');
 has(accountAuth,/PROFILE_RESPONSE_ENDPOINTS\.has\(path\)[\s\S]*persistAccountResponseProfile\(d\.profile\)/,'callback response persistence is not explicit');
-const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?v=8'");
+const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?v=analytics2'");
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=boardintro2')&&sw.includes('/theme-init.js?v=boardintro2'),'theme-init cache boundary drifted');
+assert(index.includes('/theme-init.js?v=analytics2')&&sw.includes('/theme-init.js?v=analytics2'),'theme-init cache boundary drifted');
 assert(themeInit.includes("loadScript('/home-layout.js?v=fix20'"),'home layout cache boundary drifted');
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
 has(homeLayout,/if\(rankingSessionScope\(\)!==scope\)return/,'stale anonymous ranking response can overwrite authenticated UI');
 
 const passwordAcceptPos=app.indexOf('acceptAccountProfile({id:profile.id');
-const anonymousClaimPos=app.indexOf("api('/api/anonymous/claim'",passwordAcceptPos);
+const anonymousClaimPos=app.indexOf("claimTelemetryAfterAuth(anonId)",passwordAcceptPos);
 const passwordSyncPos=app.indexOf('await syncQueue({announce:true})',anonymousClaimPos);
 assert(passwordAcceptPos>=0&&anonymousClaimPos>passwordAcceptPos&&passwordSyncPos>anonymousClaimPos,'password auth adoption/claim/sync order changed');
 has(accountRuntime,/team-membership['"`][\s\S]*updateAccountProfile\(\{familyCode:\s*(?:r|result)\.familyCode,\s*leagueName:\s*(?:r|result)\.leagueName\}\)/,'team join does not use account-session mutation');

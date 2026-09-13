@@ -85,7 +85,9 @@ async function main() {
   const sent = [];
   let retryQueue = [{...first, queueId: 'first'}, {...duringSync, queueId: 'second'}];
   let failOnce = true;
+  let retryTime = 1000;
   const retry = create({
+    now: () => retryTime,
     getQueue: () => retryQueue,
     saveQueue: next => { retryQueue = next; },
     post: async item => {
@@ -95,6 +97,7 @@ async function main() {
   });
   const firstResult = await retry.sync();
   if (firstResult.ok || retryQueue.map(item => item.queueId).join() !== 'second') throw new Error('failed item was not retained');
+  retryTime += 60001;
   await retry.sync();
   if (retryQueue.length || sent.join() !== 'first,second,second') throw new Error('retry/FIFO contract failed');
   console.log('PASS: FIFO and retry retain only failed items');

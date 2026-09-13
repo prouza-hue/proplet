@@ -10,6 +10,7 @@
     const getAnonymousId = typeof options.getAnonymousId === 'function' ? options.getAnonymousId : () => '';
     const getVersion = typeof options.getVersion === 'function' ? options.getVersion : () => '';
     const getPreviewDate = typeof options.getPreviewDate === 'function' ? options.getPreviewDate : () => '';
+    const getAnalyticsHeaders = options.getAnalyticsHeaders || (() => ({}));
     const isOnline = typeof options.isOnline === 'function' ? options.isOnline : () => global.navigator?.onLine !== false;
     const AbortControllerImpl = options.AbortController || global.AbortController;
     const timeoutMs = Number.isFinite(Number(options.timeoutMs)) ? Number(options.timeoutMs) : 12000;
@@ -21,6 +22,7 @@
       const headers = {
         'Content-Type': 'application/json',
         'X-Proplet-Version': getVersion(),
+        ...getAnalyticsHeaders(),
         ...(opts.headers || {}),
       };
       if (profile?.token) headers.Authorization = `Bearer ${profile.token}`;
@@ -57,6 +59,8 @@
         if (requestId) message += ` · kód ${requestId}`;
         const error = new Error(message);
         error.status = response.status;
+        const retryAfter = response.headers?.get?.('Retry-After');
+        error.retryAfterMs = retryAfter ? (/^\d+$/.test(retryAfter) ? Number(retryAfter)*1000 : Math.max(0,Date.parse(retryAfter)-Date.now())) : 0;
         throw error;
       }
       return response.json();

@@ -22,6 +22,8 @@ from content_archive import archived_puzzle_info, daily_window_id, daily_window_
 from backend import content as domain_content
 from backend import db as backend_db
 from backend import analytics as product_analytics
+from backend import measurement
+from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
 from backend import results as result_domain
 from backend.config import (
@@ -122,6 +124,10 @@ logger = logging.getLogger("proplet")
 
 @app.middleware("http")
 async def launch_safety_middleware(request: Request, call_next):
+    if VERCEL_ENV == "preview" and request.method == "POST" and request.url.path in {"/api/product-event","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+        return JSONResponse({"ok":True,"ignored":True,"preview":True})
+    if (VERCEL_ENV == "preview" or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and request.url.path == "/api/result":
+        return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
     request.state.request_id = request_id
@@ -150,7 +156,11 @@ async def launch_safety_middleware(request: Request, call_next):
                 content={"detail": "Požadavek je příliš velký", "requestId": request_id},
                 headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
             )
-    response = await call_next(request)
+    measurement_token = measurement.context.set(measurement.request_context(request, VERCEL_ENV))
+    try:
+        response = await call_next(request)
+    finally:
+        measurement.context.reset(measurement_token)
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Proplet-Version"] = APP_VERSION
     if response.status_code >= 500:
@@ -250,7 +260,11 @@ def db_select_bounded(
 
 
 def db_insert(table: str, row: dict):
-    return backend_db.db_insert(table, row, db_request)
+    if table == 'product_events' and (measurement.context.get() or {}).get('_event_id'):
+        row = measurement.enrich(table, row)
+        rows = db_request('POST', table, body=row, prefer='resolution=ignore-duplicates,return=representation')
+        return rows[0] if rows else row
+    return backend_db.db_insert(table, measurement.enrich(table, row), db_request)
 
 
 def db_upsert_push_subscription(row: dict):
@@ -376,10 +390,10 @@ def enforce_rate_limit(
     if not bool(row.get("allowed")):
         request_id = getattr(request.state, "request_id", None)
         try:
-            record_operational_event("rate_limit", request_id=request_id, route=request.url.path, actor_kind="network", code=scope)
+            record_operational_event("rate_limit", request_id=request_id, route=request.url.path, actor_kind="network", code=scope, metadata={"rate_scope_actor":actor_hash})
         except Exception:
             pass
-        raise HTTPException(429, "Příliš mnoho pokusů. Chvíli počkej a zkus to znovu.")
+        raise HTTPException(429, "Příliš mnoho pokusů. Chvíli počkej a zkus to znovu.", headers={"Retry-After": str(max(60, window_seconds))})
 
 
 def norm_family(code: str) -> str:
@@ -1949,14 +1963,30 @@ def product_event(
 ):
     enforce_rate_limit(request, "product_event", limit=300, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
+    event_id = str(uuid.uuid4())
+    supplied_id = request.headers.get("x-proplet-event-id")
+    created_at = datetime.now(TZ)
+    if supplied_id:
+        try:
+            event_id = str(uuid.UUID(supplied_id))
+            event_time = parse_timestamp(request.headers.get("x-proplet-event-time"))
+            if event_time and created_at-timedelta(days=7) <= event_time <= created_at+timedelta(minutes=5):
+                created_at = min(event_time, created_at)
+        except ValueError:
+            raise HTTPException(400,"Neplatné ID události") from None
+    def insert_event(table, row):
+        if not supplied_id:
+            return db_insert(table, row)
+        rows = db_request("POST",table,body=measurement.enrich(table,row),prefer="resolution=ignore-duplicates,return=representation")
+        return rows[0] if rows else row
     try:
         product_analytics.record_product_event(
             payload.event_type,
             actor=actor,
             app_version=client_app_version(request),
-            insert_fn=db_insert,
-            event_id=str(uuid.uuid4()),
-            created_at=datetime.now(TZ).isoformat(),
+            insert_fn=insert_event,
+            event_id=event_id,
+            created_at=created_at.isoformat(),
         )
     except product_analytics.UnknownProductEvent:
         raise HTTPException(400, "Neplatný product event") from None
@@ -2391,22 +2421,27 @@ def _median(vals: list[int]) -> Optional[int]:
     return vals[n // 2] if n % 2 else round((vals[n // 2 - 1] + vals[n // 2]) / 2)
 
 
-def build_quality_report():
+def build_quality_report(until=None):
     """Quality Analytics v2.
 
     Main calibration metrics use each player's FIRST started attempt on a puzzle.
     Replays remain available as secondary telemetry, but cannot make a puzzle look easier.
     """
-    attempts = db_select_bounded("puzzle_attempts", max_rows=20_000)
-    feedback = db_select_bounded(
-        "puzzle_feedback", filters={"kind": "eq.difficulty"}, max_rows=20_000
-    )
-    word_feedback = db_select_bounded(
-        "puzzle_feedback", filters={"kind": "eq.word"}, max_rows=20_000
-    )
-    hint_events = db_select_bounded("hint_events", max_rows=20_000)
-    helper_events = db_select_bounded("helper_events", max_rows=20_000)
-    product_events = db_select_bounded("product_events", max_rows=20_000)
+    until = until or datetime.now(TZ)
+    cutoff = until - timedelta(days=90)
+    base = {"environment": "in.(production,legacy)", "is_test": "eq.false"}
+    def read(table, time_column="created_at", extra=None):
+        filters = {**base, "and": f"({time_column}.gte.{cutoff.isoformat()},{time_column}.lte.{until.isoformat()})", **(extra or {})}
+        return measurement.pages(db_request, table, filters=filters)
+    attempts = read("analytics_first_attempts", "started_at")
+    for attempt in attempts:
+        if (parse_timestamp(attempt.get("completed_at")) or until) > until:
+            attempt["completed_at"] = None
+    feedback = read("puzzle_feedback", extra={"kind":"eq.difficulty"})
+    word_feedback = read("puzzle_feedback", extra={"kind":"eq.word"})
+    hint_events = read("hint_events")
+    helper_events = read("helper_events")
+    event_counts = db_rpc("proplet_quality_event_counts", {"p_from":cutoff.isoformat(),"p_until":until.isoformat()})
 
     def ts(row):
         raw = row.get("started_at") or ""
@@ -2427,7 +2462,7 @@ def build_quality_report():
         identity = telemetry_identity(a)
         if not identity:
             continue
-        key = (identity, str(a.get("puzzle_id")))
+        key = (identity, str(a.get("puzzle_id")), bool(a.get("calm_mode")))
         first_by_actor_puzzle.setdefault(key, a)
 
     first_attempts = list(first_by_actor_puzzle.values())
@@ -2719,9 +2754,7 @@ def build_quality_report():
         *[f"account_nudge_{stage}_{action}" for stage in (1, 2, 3) for action in ("shown", "create", "login", "dismissed", "authenticated")],
     )
     for event_type in quality_funnel_events:
-        identities = {event_identity(e) for e in product_events if e.get("event_type") == event_type}
-        identities.discard(None)
-        funnel[event_type] = len(identities)
+        funnel[event_type] = int(event_counts.get(event_type, 0))
 
     hint_summary = {
         "events": len(hint_events),
@@ -2735,7 +2768,8 @@ def build_quality_report():
         "firstAttemptHintRate": round(len(hinted_first_ids) / len(first_attempts), 3) if first_attempts else None,
     }
     return {
-        "analyticsVersion": 2,
+        "analyticsVersion": 3,
+        "window": {"from":cutoff.isoformat(),"until":until.isoformat(),"days":90,"firstLifetimeAttempts":True,"historicalDataLimited":True},
         "attemptsRaw": len(attempts),
         "firstAttempts": len(first_attempts),
         "registeredFirstAttempts": sum(1 for a in first_attempts if a.get("player_id")),
@@ -2812,297 +2846,8 @@ def _app_version_at_least(value: object, minimum: str) -> bool:
 def admin_launch(authorization: Optional[str] = Header(default=None)):
     require_admin(authorization)
     now = datetime.now(TZ)
-    cutoff24 = now - timedelta(hours=24)
-    cutoff7 = now - timedelta(days=7)
-    cutoff30 = now - timedelta(days=30)
-    today = current_prague_date()
-    product = db_select_bounded(
-        "product_events",
-        filters={"created_at": f"gte.{cutoff30.isoformat()}"},
-        max_rows=20_000,
-    )
-    attempts = db_select_bounded(
-        "puzzle_attempts",
-        filters={"started_at": f"gte.{cutoff30.isoformat()}"},
-        max_rows=20_000,
-    )
-    players = db_select_bounded(
-        "players",
-        columns="id,created_at",
-        filters={"created_at": f"gte.{cutoff24.isoformat()}"},
-        max_rows=5000,
-    )
-    try:
-        ops = db_select_bounded(
-            "operational_events",
-            filters={"created_at": f"gte.{cutoff7.isoformat()}"},
-            max_rows=10_000,
-        )
-    except HTTPException:
-        ops = []
-    try:
-        support = db_select_bounded(
-            "support_reports",
-            filters={"status": "in.(new,reviewing)"},
-            max_rows=5000,
-        )
-    except HTTPException:
-        support = []
-
-    def recent(rows, cutoff):
-        return [row for row in rows if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= cutoff]
-
-    def actors(rows):
-        return {key for row in rows if (key := _telemetry_actor_key(row))}
-
-    def event_actors(rows, event):
-        return actors([row for row in rows if row.get("event_type") == event])
-
-    def attempt_actors(rows, mode=None, completed=False):
-        filtered = rows
-        if mode:
-            filtered = [row for row in filtered if row.get("mode") == mode]
-        if completed:
-            filtered = [row for row in filtered if row.get("completed_at")]
-        return actors(filtered)
-
-    product_sorted = sorted(product, key=lambda row: _event_stamp(row) or datetime.max.replace(tzinfo=TZ))
-    attempts_sorted = sorted(attempts, key=lambda row: parse_timestamp(row.get("started_at")) or datetime.max.replace(tzinfo=TZ))
-    events_by_actor: dict[str, list[dict]] = {}
-    attempts_by_actor: dict[str, list[dict]] = {}
-    for row in product_sorted:
-        key = _telemetry_actor_key(row)
-        if key:
-            events_by_actor.setdefault(key, []).append(row)
-    for row in attempts_sorted:
-        key = _telemetry_actor_key(row)
-        if key:
-            attempts_by_actor.setdefault(key, []).append(row)
-
-    first_onboarding: dict[str, dict] = {}
-    for row in product_sorted:
-        if row.get("event_type") != "onboarding_started":
-            continue
-        key = _telemetry_actor_key(row)
-        if key and key not in first_onboarding:
-            first_onboarding[key] = row
-
-    def event_time(actor_key: str, event_type: str, started_at: datetime):
-        floor = started_at - timedelta(seconds=5)
-        for row in events_by_actor.get(actor_key, []):
-            stamp = _event_stamp(row)
-            if row.get("event_type") == event_type and stamp and stamp >= floor:
-                return stamp
-        return None
-
-    def actor_event_types(actor_key: str, started_at: datetime) -> set[str]:
-        floor = started_at - timedelta(seconds=5)
-        return {
-            str(row.get("event_type")) for row in events_by_actor.get(actor_key, [])
-            if (_event_stamp(row) or datetime.min.replace(tzinfo=TZ)) >= floor
-        }
-
-    activity_dates: dict[str, set[date]] = {}
-    for row in product + attempts:
-        key = _telemetry_actor_key(row)
-        stamp = _event_stamp(row)
-        if key and stamp:
-            activity_dates.setdefault(key, set()).add(stamp.astimezone(TZ).date())
-
-    p24, p7, p30 = recent(product, cutoff24), recent(product, cutoff7), recent(product, cutoff30)
-    a24, a7, a30 = recent(attempts, cutoff24), recent(attempts, cutoff7), recent(attempts, cutoff30)
-    op24, op7 = recent(ops, cutoff24), recent(ops, cutoff7)
-    active24 = actors(p24) | actors(a24)
-    active7 = actors(p7) | actors(a7)
-
-    def legacy_funnel(rows_p, rows_a):
-        app_open = event_actors(rows_p, "app_open")
-        onboard = event_actors(rows_p, "onboarding_completed")
-        starter = event_actors(rows_p, "starter_completed")
-        daily_start = attempt_actors(rows_a, "daily", False)
-        daily_done = attempt_actors(rows_a, "daily", True)
-        free_done = attempt_actors(rows_a, "free", True)
-        auth = event_actors(rows_p, "account_authenticated")
-        return {
-            "appOpen": len(app_open), "onboardingCompleted": len(onboard), "starterCompleted": len(starter),
-            "dailyStarted": len(daily_start), "dailyCompleted": len(daily_done), "freeCompleted": len(free_done),
-            "accountAuthenticated": len(auth),
-        }
-
-    def newcomer_window(cutoff, rows_p, rows_a):
-        cohort: dict[str, datetime] = {}
-        for key, row in first_onboarding.items():
-            stamp = _event_stamp(row)
-            if stamp and stamp >= cutoff and _app_version_at_least(row.get("app_version"), "3.31.5"):
-                cohort[key] = stamp
-
-        event_types = {key: actor_event_types(key, start) for key, start in cohort.items()}
-        current = set(cohort)
-        funnel_rows = []
-
-        def add_step(key, label, matched):
-            nonlocal current
-            previous = len(current)
-            current &= matched
-            count = len(current)
-            funnel_rows.append({
-                "key": key, "label": label, "count": count, "previousCount": previous if funnel_rows else None,
-                "conversionFromPrevious": round(count / previous, 3) if funnel_rows and previous else (None if not funnel_rows else 0.0),
-                "dropOffCount": previous - count if funnel_rows else None,
-                "dropOff": round((previous - count) / previous, 3) if funnel_rows and previous else (None if not funnel_rows else 0.0),
-            })
-
-        add_step("onboardingStarted", "Začalo onboarding", set(cohort))
-        for event_type, key, label in (
-            ("onboarding_tutorial_completed", "tutorialCompleted", "Našlo PES"),
-            ("onboarding_support_selected", "supportSelected", "Vybralo Pomocníka"),
-            ("onboarding_completed", "onboardingCompleted", "Dokončilo onboarding"),
-            ("starter_started", "starterStarted", "Spustilo první Proplet"),
-            ("starter_word_1_completed", "starterWord1", "Našlo MRAK"),
-            ("starter_word_2_completed", "starterWord2", "Našlo JABLKO"),
-            ("starter_word_3_completed", "starterWord3", "Našlo ČOKOLÁDU"),
-            ("starter_completed", "starterCompleted", "Dokončilo první Proplet"),
-        ):
-            add_step(key, label, {actor for actor in cohort if event_type in event_types[actor]})
-
-        real_started = set()
-        real_completed = set()
-        for actor in current:
-            start = cohort[actor]
-            eligible_attempts = [
-                row for row in attempts_by_actor.get(actor, [])
-                if row.get("mode") in ("daily", "free")
-                and (parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ)) >= start - timedelta(seconds=5)
-            ]
-            if eligible_attempts:
-                real_started.add(actor)
-            if any(row.get("completed_at") for row in eligible_attempts):
-                real_completed.add(actor)
-        add_step("firstRealGameStarted", "Spustilo první skutečnou hru", real_started)
-        add_step("firstRealGameCompleted", "Dokončilo první skutečnou hru", real_completed)
-        add_step("accountAuthenticated", "Přihlásilo / vytvořilo účet", {actor for actor in cohort if "account_authenticated" in event_types[actor]})
-
-        choice = {actor for actor in cohort if "starter_hard_choice_shown" in event_types[actor]}
-        easy = choice & {actor for actor in cohort if "starter_easy_warmup_selected" in event_types[actor]}
-        direct = choice & {actor for actor in cohort if "starter_hard_direct_selected" in event_types[actor]}
-        warmup_done = easy & {actor for actor in cohort if "starter_easy_warmup_completed" in event_types[actor]}
-        warmup_to_daily = set()
-        hard_started = set()
-        hard_completed = set()
-        for actor in choice:
-            start = cohort[actor]
-            daily_attempts = [
-                row for row in attempts_by_actor.get(actor, [])
-                if row.get("mode") == "daily" and row.get("difficulty") == "hard"
-                and (parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ)) >= start - timedelta(seconds=5)
-            ]
-            if daily_attempts:
-                hard_started.add(actor)
-                if actor in warmup_done:
-                    warmup_to_daily.add(actor)
-            if any(row.get("completed_at") for row in daily_attempts):
-                hard_completed.add(actor)
-
-        starter_started = {actor for actor in cohort if "starter_started" in event_types[actor]}
-        starter_done = starter_started & {actor for actor in cohort if "starter_completed" in event_types[actor]}
-        hint_offer = starter_started & {actor for actor in cohort if "starter_hint_offer_shown" in event_types[actor]}
-        hint_used = starter_started & {actor for actor in cohort if "starter_hint_used" in event_types[actor]}
-        reset = starter_started & {actor for actor in cohort if "starter_reset" in event_types[actor]}
-        abandon_cutoff = now - timedelta(minutes=30)
-        abandoned = {
-            actor for actor in starter_started - starter_done
-            if (event_time(actor, "starter_started", cohort[actor]) or now) <= abandon_cutoff
-        }
-        starter_times = []
-        for actor in starter_done:
-            start_time = event_time(actor, "starter_started", cohort[actor])
-            done_time = event_time(actor, "starter_completed", cohort[actor])
-            if start_time and done_time and done_time >= start_time:
-                elapsed = int((done_time - start_time).total_seconds() * 1000)
-                if elapsed <= 3_600_000:
-                    starter_times.append(elapsed)
-        support_distribution = {}
-        for mode in ("none", "beginner", "younger", "older"):
-            mode_set = {actor for actor in cohort if f"onboarding_support_selected_{mode}" in event_types[actor]}
-            support_distribution[mode] = {"count": len(mode_set), "share": round(len(mode_set) / len(cohort), 3) if cohort else None}
-
-        eligible = retained = 0
-        for actor, start in cohort.items():
-            first_day = start.astimezone(TZ).date()
-            if first_day <= today - timedelta(days=1):
-                eligible += 1
-                if first_day + timedelta(days=1) in activity_dates.get(actor, set()):
-                    retained += 1
-
-        visitor_actors = event_actors(rows_p, "app_open")
-        first_real_completed = next((row["count"] for row in funnel_rows if row["key"] == "firstRealGameCompleted"), 0)
-        return {
-            "visitors": len(visitor_actors), "newcomers": len(cohort),
-            "returningVisitors": max(0, len(visitor_actors) - len(cohort)),
-            "firstRealGameCompleted": first_real_completed, "funnel": funnel_rows,
-            "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
-            "starter": {
-                "started": len(starter_started), "completed": len(starter_done),
-                "completionRate": round(len(starter_done) / len(starter_started), 3) if starter_started else None,
-                "medianCompletionMs": _median(starter_times), "hintOfferShown": len(hint_offer), "hintUsed": len(hint_used),
-                "hintUseRate": round(len(hint_used) / len(starter_started), 3) if starter_started else None,
-                "resetActors": len(reset), "abandoned": len(abandoned), "supportDistribution": support_distribution,
-            },
-            "hardDaily": {
-                "choiceShown": len(choice), "easySelected": len(easy), "directSelected": len(direct),
-                "easySelectionRate": round(len(easy) / len(choice), 3) if choice else None,
-                "directSelectionRate": round(len(direct) / len(choice), 3) if choice else None,
-                "warmupCompleted": len(warmup_done),
-                "warmupCompletionRate": round(len(warmup_done) / len(easy), 3) if easy else None,
-                "warmupToDailyStarted": len(warmup_to_daily),
-                "warmupToDailyRate": round(len(warmup_to_daily) / len(warmup_done), 3) if warmup_done else None,
-                "hardDailyStarted": len(hard_started), "hardDailyCompleted": len(hard_completed),
-                "hardDailyCompletionRate": round(len(hard_completed) / len(hard_started), 3) if hard_started else None,
-            },
-        }
-
-    windows = {
-        "24h": newcomer_window(cutoff24, p24, a24),
-        "7d": newcomer_window(cutoff7, p7, a7),
-        "30d": newcomer_window(cutoff30, p30, a30),
-    }
-
-    starter7 = event_actors(p7, "starter_completed")
-    auth7 = event_actors(p7, "account_authenticated")
-    starter_to_account = len(starter7 & auth7)
-
-    eligible = retained = 0
-    cohort_floor = today - timedelta(days=14)
-    for dates in activity_dates.values():
-        first = min(dates)
-        if cohort_floor <= first <= today - timedelta(days=1):
-            eligible += 1
-            if first + timedelta(days=1) in dates:
-                retained += 1
-
-    version_counts = {}
-    for row in a7:
-        version = str(row.get("app_version") or "neznámá")
-        version_counts[version] = version_counts.get(version, 0) + 1
-    versions = [{"version": v, "attempts": c} for v, c in sorted(version_counts.items(), key=lambda item: (-item[1], item[0]))][:8]
-
-    open_support = [row for row in support if str(row.get("status") or "new") in ("new", "reviewing")]
-    errors24 = [row for row in op24 if row.get("event_type") in ("server_error", "client_error")]
-    rate24 = [row for row in op24 if row.get("event_type") == "rate_limit"]
-    return {
-        "generatedAt": now.isoformat(), "analyticsVersion": 3, "newcomerInstrumentationFrom": "3.31.5",
-        "active": {"last24h": len(active24), "last7d": len(active7)},
-        "newAccounts24h": sum(1 for row in players if (parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ)) >= cutoff24),
-        "funnel24h": legacy_funnel(p24, a24), "funnel7d": legacy_funnel(p7, a7), "windows": windows,
-        "starterToAccount7d": {"converted": starter_to_account, "starterCompleted": len(starter7), "rate": round(starter_to_account / len(starter7), 3) if starter7 else None},
-        "retentionD1": {"eligible": eligible, "retained": retained, "rate": round(retained / eligible, 3) if eligible else None},
-        "reliability": {
-            "errors24h": len(errors24),
-            "errors7d": sum(1 for row in op7 if row.get("event_type") in ("server_error", "client_error")),
-            "rateLimits24h": len(rate24), "openSupportReports": len(open_support),
-        },
-        "appVersions7d": versions,
-    }
+    data = db_rpc("proplet_launch_dataset", {"p_until": now.isoformat()})
+    return build_launch_report(data, now)
 
 
 @app.get("/api/admin/support")
@@ -3385,15 +3130,24 @@ def quality_history(authorization: Optional[str] = Header(default=None)):
     return {"snapshots": rows}
 
 
+@app.post("/api/admin/quality-snapshot")
+def repair_quality_snapshot(authorization: Optional[str] = Header(default=None)):
+    require_admin(authorization)
+    if VERCEL_ENV == 'preview':
+        raise HTTPException(409, 'Souhrny lze doplnit pouze v produkci')
+    return save_quality_snapshot_if_monday()
+
+
 def save_quality_snapshot_if_monday() -> dict:
     today = current_prague_date()
-    if today.weekday() != 0:
-        return {"saved": False, "reason": "not_monday"}
-    week_start = today.isoformat()
+    monday = today - timedelta(days=today.weekday())
+    week_start = monday.isoformat()
     if db_select("quality_snapshots", week_start=week_start):
         return {"saved": False, "reason": "exists"}
-    report = build_quality_report()
+    report = build_quality_report(until=datetime.combine(monday, datetime.min.time(), TZ))
     compact = {
+        "window": report.get("window"),
+        "backfilled": today != monday,
         "analyticsVersion": report.get("analyticsVersion"),
         "firstAttempts": report.get("firstAttempts"),
         "puzzlesMeasured": report.get("puzzlesMeasured"),
@@ -3403,7 +3157,7 @@ def save_quality_snapshot_if_monday() -> dict:
         "priorities": report.get("priorities", [])[:30],
     }
     db_insert("quality_snapshots", {
-        "id": str(uuid.uuid4()), "week_start": week_start, "analytics_version": 2,
+        "id": str(uuid.uuid4()), "week_start": week_start, "analytics_version": 3,
         "payload": compact, "created_at": datetime.now(TZ).isoformat(),
     })
     return {"saved": True, "weekStart": week_start}
@@ -3520,7 +3274,7 @@ def atomic_result_public_response(player_id: str, receipt: dict) -> dict:
 
 @app.post("/api/result")
 def result(payload: ResultCreate, request: Request, authorization: Optional[str] = Header(default=None)):
-    enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600)
+    enforce_rate_limit(request, "result_network", limit=1200, window_seconds=3600)
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
     if payload.mode not in ("daily", "free", "starter", "tajenka"):
@@ -3539,6 +3293,9 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         if replay_receipt is not None:
             logger.info("atomic_result_v1 status=replay")
             return atomic_result_public_response(player["id"], replay_receipt)
+    # Replaying an already committed result does not consume the player's write budget.
+    # Players sharing a school/home network no longer share this smaller limit.
+    enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600, discriminator=player["id"])
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
     validate_result_sanity(payload)

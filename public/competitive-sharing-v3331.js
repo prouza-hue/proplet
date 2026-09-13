@@ -92,7 +92,8 @@
   };
 
   const track=event=>{
-    try{api('/api/challenge-event',{method:'POST',body:JSON.stringify({event_type:event})}).catch(()=>{})}catch{}
+    if(typeof productAnalytics==='function'&&productAnalytics()?.trackChallenge){productAnalytics().trackChallenge(event,{puzzleId:activeChallenge?.puzzleId||incomingRaw?.puzzleId});return;}
+    try{api('/api/challenge-event',{method:'POST',headers:{'X-Proplet-Puzzle':activeChallenge?.puzzleId||incomingRaw?.puzzleId||''},body:JSON.stringify({event_type:event})}).catch(()=>{})}catch{}
   };
   const challengeEvents={
     daily:{opened:'shared_daily_opened',started:'shared_daily_started',completed:'shared_daily_completed',beaten:'shared_daily_beaten'},

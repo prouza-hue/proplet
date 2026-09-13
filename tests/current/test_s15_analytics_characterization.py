@@ -34,8 +34,8 @@ if implemented:
     assert registry["events"] == FIXTURE["events"]
     assert registry["request_fields"] == ["event_type"]
     assert registry["pii_policy"]["custom_properties_sent"] is False
-    assert '/app/analytics.js?v=40140-s15' in INDEX
-    assert "'/app/analytics.js?v=40140-s15'" in SW
+    assert '/app/analytics.js?v=analytics2' in INDEX
+    assert "'/app/analytics.js?v=analytics2'" in SW
     assert "let productAnalyticsController=null;" in APP
     assert "function productAnalytics()" in APP
     assert "controller.track(eventType,properties)" in APP
@@ -54,7 +54,7 @@ assert "trackProductEvent('starter_hint_used',{level})" in APP
 assert "if(screen!==prev&&screen!='game')" not in APP  # guard uses strict JS comparison
 assert "if(screen!==prev&&screen!=='game')" in APP
 assert "trackProductEvent(`screen_${screen}_viewed`)" in APP
-assert "if(sessionStorage.getItem(ANALYTICS_SESSION_KEY)==='1')return;" in APP
+assert "if(last?.day===day&&now-last.at<1800000)return;" in APP
 assert "if(show&&!button.dataset.impression)" in APP
 assert "trackProductEvent('win_account_cta_shown')" in APP
 
@@ -77,10 +77,10 @@ with (
     patch.object(server, "db_insert", side_effect=lambda table, row: inserted.append((table, row)) or row),
 ):
     for name in events:
-        out = server.product_event(server.ProductEventCreate(event_type=name), object(), x_proplet_anon_id="anon")
+        out = server.product_event(server.ProductEventCreate(event_type=name), __import__("types").SimpleNamespace(headers={}), x_proplet_anon_id="anon")
         assert out == {"ok": True}
     try:
-        server.product_event(server.ProductEventCreate(event_type="s15_unknown_event"), object(), x_proplet_anon_id="anon")
+        server.product_event(server.ProductEventCreate(event_type="s15_unknown_event"), __import__("types").SimpleNamespace(headers={}), x_proplet_anon_id="anon")
     except HTTPException as exc:
         assert exc.status_code == 400
         assert exc.detail == "Neplatný product event"

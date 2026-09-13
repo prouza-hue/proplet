@@ -256,6 +256,14 @@
       {
         "path": "tests/current/test_shared_puzzle.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_analytics_v2.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_sync_backoff.js",
+        "runner": "node"
       }
     ]
   },
