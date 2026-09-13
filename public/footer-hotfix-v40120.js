@@ -17,8 +17,9 @@
 
     const links=document.createElement('small');
     links.className='footer-links';
-    links.innerHTML='<a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a>';
+    links.innerHTML='<a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a> · <button type="button" class="footer-report-link">Nahlásit chybu</button>';
 
+    links.querySelector('.footer-report-link').onclick=()=>openSupportReport();
     footer.replaceChildren(line,author,version,links);
 
     // Footer visibility belongs to the app/game layout. Never override display

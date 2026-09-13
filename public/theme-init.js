@@ -226,7 +226,7 @@
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=invitations1','propletChallengeCtaV3333');
-    loadScript('/footer-hotfix-v40120.js?v=3','propletFooterHotfixV40120');
+    loadScript('/footer-hotfix-v40120.js?v=welcome1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=auth-freeze1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
