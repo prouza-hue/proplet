@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-avatars47';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-ranktitle1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -73,7 +73,7 @@ const LEVELS=[
  {xp:61000,icon:'🏆',name:'Absolutní Propletač'},
  {xp:75000,icon:'🗝️',name:'Strážce tajných cest'},
  {xp:95000,icon:'🕸️',name:'Architekt labyrintu'},
- {xp:120000,icon:'🌌',name:'Legenda beze konce'}
+ {xp:120000,icon:'🌌',name:'Legenda bez konce'}
 ];
 const ACHIEVEMENT_GROUPS=[
  ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],

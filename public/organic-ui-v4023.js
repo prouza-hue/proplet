@@ -430,7 +430,8 @@ function applyRibbonContexts(){
  decorationAll('.ranking-rank-chip').forEach(slot=>{
   if(slot.querySelector('.ribbon-art'))return;
   const text=slot.textContent.trim();
-  const name=Object.keys(window.PropletRibbonCatalog?.rank||{}).find(n=>text.endsWith(n));
+  // Match the full title before a shared suffix (Absolutní Propletač / Propletač).
+  const name=Object.keys(window.PropletRibbonCatalog?.rank||{}).sort((a,b)=>b.length-a.length).find(n=>text.endsWith(n));
   if(!name)return;const ribbon=art(name,{category:'rank',size:24});
   if(ribbon){ribbon.setAttribute('aria-hidden','true');slot.replaceChildren(ribbon,document.createTextNode(' '+name));slot.classList.add('ribbon-rank-chip')}
  });
