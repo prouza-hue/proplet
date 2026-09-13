@@ -37,7 +37,9 @@
       q('#settingsHelperBtn',row).onclick=()=>{try{openSupportModeModal()}catch{}};
     }
     const mode=currentHelperMode();
-    setText(q('#settingsHelperValue',row),`${mode.icon||'🧠'} ${mode.label||'Nenabízet'}`);
+    const value=q('#settingsHelperValue',row),copy=`${mode.icon||'🧠'} ${mode.label||'Nenabízet'}`;
+    // The icon decorator replaces emoji with artwork. Compare the semantic value, not decorated text.
+    if(value&&value.dataset.helperCopy!==copy){setText(value,copy);value.dataset.helperCopy=copy}
   }
 
   function polishProfileCopy(){
