@@ -78,13 +78,6 @@ function ensureQuickCalmControls(){
   const grid=q('#difficultyCards');if(grid&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick'));bindCalmSwitch(q('#freeCalmQuick'))}
   q('#dailyCalmQuick')?.remove();
 }
-function ensureCalmSettings(){
-  if(q('#calmModeCard'))return;
-  const sound=q('#soundToggle')?.closest('.settings-card');if(!sound)return;
-  const card=document.createElement('div');card.id='calmModeCard';card.className='card settings-card calm-settings-card';
-  card.innerHTML='<div class="quality-setting-line"><span class="calm-settings-icon">🫧</span><div class="calm-settings-copy"><strong>Klidný režim</strong><small>Hraj bez časomíry a žebříčku. XP i postup zůstávají.</small></div><button id="calmModeToggle" class="calm-setting-toggle" type="button" role="switch" aria-label="Klidný režim" aria-checked="false"></button></div>';
-  sound.before(card);q('#calmModeToggle',card).onclick=toggleCalmPreference;
-}
 function ensureCalmRunButton(){
   const actions=q('.game-actions');if(!actions||q('#calmRunBtn',actions))return;
   const btn=document.createElement('button');btn.id='calmRunBtn';btn.type='button';btn.className='secondary-btn';btn.textContent='🫧 Klidný režim';btn.setAttribute('aria-label','Klidný režim');btn.title='Klidný režim';btn.onclick=()=>openCalmConfirmation('run');actions.appendChild(btn);
@@ -105,7 +98,7 @@ function confirmCalmMode(){const kind=calmConfirmKind;closeCalmConfirmation();if
 function toggleCalmPreference(){if(calmPreference())setCalmPreference(false);else openCalmConfirmation('preference')}
 function syncCalmControls(){
   const on=calmPreference();document.documentElement.classList.toggle('calm-preference-v334',on);
-  ['#freeCalmQuick .calm-quick-toggle','#calmModeToggle'].forEach(sel=>setAttr(q(sel),'aria-checked',on?'true':'false'));
+  setAttr(q('#freeCalmQuick .calm-quick-toggle'),'aria-checked',on?'true':'false');
   setDisplay(q('[data-nav="leaderboard"]'),on?'none':'');ensurePrivacyMini();applyCalmRunUi();
 }
 function setCalmPreference(enabled,{announce=true}={}){
@@ -211,7 +204,7 @@ function maybeShowReleaseModal(){
   revealApp();
 }
 
-function polish(){polishQueued=false;polishHierarchy();ensurePrivacyMini();ensureQuickCalmControls();ensureCalmSettings();ensureCalmRunButton();syncCalmControls()}
+function polish(){polishQueued=false;polishHierarchy();ensurePrivacyMini();ensureQuickCalmControls();ensureCalmRunButton();syncCalmControls()}
 function schedulePolish(delay=0){if(polishQueued&&delay===0)return;polishQueued=true;setTimeout(polish,delay)}
 function bootQuality(){
   installNetworkCalmFlag();installGameWrappers();installHistoryWrapper();polish();
