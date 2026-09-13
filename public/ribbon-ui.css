@@ -17,8 +17,8 @@ html.ribbon-ui[data-theme="dark"]{
  --r-ink:#F4EEDD;--r-muted:#B9C3B9;--r-edge:#485552;--r-track:#394743;
  --r-active:#D7AA45;--r-active-edge:#F2CD70;--r-active-ink:#292718;
  --r-error:#F38C7B;--r-error-soft:#513632;
- --r-board-mat:#0F1514;--r-board-tile:#36514D;--r-board-letter:#FFF7E4;
- --r-board-edge:#7C9187;--r-board-foot:#080D0C;
+ --r-board-mat:#0F1514;--r-board-tile:#303B3D;--r-board-letter:#FFF7E4;
+ --r-board-edge:#61716D;--r-board-foot:#080D0C;
  --r-board-path-active:#F3BE55;--r-board-path-error:#F28D7D;
  --bg:var(--r-paper);--paper:var(--r-surface);--ink:var(--r-ink);--line:var(--r-edge);
 }
@@ -135,10 +135,10 @@ html.ribbon-ui .board .cell.route-start::after{outline:2px solid var(--r-board-l
 html.ribbon-ui .board .cell.route-end::after{background:var(--r-board-active-edge);box-shadow:0 0 0 2px var(--r-board-letter)}
 html.ribbon-ui .board .cell.used{
  background:var(--word-color)!important;
- border-color:color-mix(in srgb,var(--word-color) 55%,var(--r-board-letter))!important;
+ border-color:color-mix(in srgb,var(--word-color) 30%,var(--r-board-letter))!important;
  color:var(--r-board-letter)!important;
  transform:none!important;
- box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--word-color) 70%,#090D0C),0 1px 0 var(--r-board-foot)!important;
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--word-color) 30%,var(--r-board-letter)),0 1px 0 var(--r-board-foot)!important;
 }
 html.ribbon-ui .board .cell.wrong-flash{
  background:var(--r-board-error)!important;
