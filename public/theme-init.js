@@ -231,7 +231,7 @@
     await loadScript('/account-conversion-v3331.js?v=auth-freeze1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=cpu2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=cpu3','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');

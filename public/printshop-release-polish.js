@@ -217,7 +217,9 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   function polishFreeScreen(){
     q('#freeCalmQuick')?.remove();
     const note=q('#screen-free .mozkomor-lock-note');
-    if(note&&note.textContent!=='🔒 Odemkne se po dokončení 200 Mozkožroutů')note.textContent='🔒 Odemkne se po dokončení 200 Mozkožroutů';
+    // The icon decorator consumes the emoji. Compare copy independently of its artwork.
+    const lockCopy='Odemkne se po dokončení 200 Mozkožroutů';
+    if(note&&note.textContent.replace(/^🔒\s*/u,'').trim()!==lockCopy)note.textContent='🔒 '+lockCopy;
     positionWeeklyBanner();
     installWeeklyBannerIcon();
     syncTajenkaPlayCard();
