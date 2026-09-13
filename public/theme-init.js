@@ -177,7 +177,19 @@
   const loadStyle=(href,key)=>{
     if(document.querySelector(`link[data-${key.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())}]`))return;
     const css=document.createElement('link');
-    css.rel='stylesheet';css.href=href;css.dataset[key]='1';document.head.appendChild(css);
+    css.rel='stylesheet';css.href=href;css.dataset[key]='1';
+    let retries=0;
+    css.addEventListener('error',()=>{
+      if(retries>=2)return;
+      const attempt=++retries;
+      setTimeout(()=>{
+        const retryUrl=new URL(href,location.href);
+        retryUrl.searchParams.set('styleRetry',String(attempt));
+        // Preserve cascade order by reusing the original link.
+        css.href=retryUrl.href;
+      },attempt*1000);
+    });
+    document.head.appendChild(css);
   };
   styles.forEach(([href,key])=>loadStyle(href,key));
 
@@ -206,7 +218,7 @@
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=analytics2','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
-    loadScript('/game-layout-v3330.js?v=fix20','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=style-recovery1','propletGameLayout');
     loadScript('/gesture-guard-v3325.js?v=fixsep8c','propletGestureGuard');
     loadScript('/valid-word-feedback-v3330.js?v=9','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');

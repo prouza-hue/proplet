@@ -69,6 +69,8 @@
     if(!document.querySelector('.phone-landscape-guard')){
       const guard=document.createElement('div');
       guard.className='phone-landscape-guard';
+      // Stay out of document flow even when the stylesheet fails.
+      guard.style.cssText='display:none;position:fixed;inset:0;z-index:180';
       guard.setAttribute('role','status');
       guard.setAttribute('aria-live','polite');
       guard.innerHTML='<div class="phone-landscape-guard-card"><div class="phone-landscape-guard-icon" aria-hidden="true">📱↻</div><strong>Otoč telefon na výšku</strong><p>Proplet potřebuje na mobilu víc výšky pro mřížku. Otoč telefon a hned pokračujeme.</p></div>';
@@ -162,6 +164,7 @@
     const blocked=playing&&landscape&&phone;
 
     document.body.classList.toggle(PHONE_CLASS,blocked);
+    document.querySelector('.phone-landscape-guard').style.display=blocked?'grid':'none';
     if(blocked){
       setDebugMode('phone-landscape-blocked',d,landscape,'phone');
       document.body.classList.remove(TABLET_CLASS,TABLET_PORTRAIT_CLASS,DESKTOP_CLASS);
