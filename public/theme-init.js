@@ -229,7 +229,7 @@
     loadScript('/footer-hotfix-v40120.js?v=welcome1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=auth-freeze1','propletAccountConversionV3331',{wait:true});
-    loadScript('/settings-ia-v40122.js?v=2','propletSettingsIaV40122');
+    loadScript('/settings-ia-v40122.js?v=cpu2','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=2','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
