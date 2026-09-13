@@ -1,5 +1,26 @@
 (function organicPropletUI(){
 'use strict';
+if(location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).get('uiAudit')==='baseline'){
+ const script=document.createElement('script');script.src='/ui-audit-baseline.js';document.head.appendChild(script);return;
+}
+
+const auditEnabled=location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).has('uiAudit');
+const auditStats={passes:0,full:0,ms:0,textNodes:0};
+function auditPublish(){
+ if(!auditEnabled)return;
+ let output=document.getElementById('uiAudit');
+ if(!output){output=document.createElement('output');output.id='uiAudit';output.style.cssText='position:fixed;bottom:0;left:0;z-index:99999;background:#111;color:#fff;padding:5px;font:11px monospace;pointer-events:none';document.body.appendChild(output)}
+ output.textContent=JSON.stringify({...auditStats,ms:Math.round(auditStats.ms)});
+}
+if(auditEnabled)setInterval(auditPublish,1000);
+
+let decorationRoot=document;
+function decorationAll(selector){
+ const found=Array.from(decorationRoot.querySelectorAll(selector));
+ if(decorationRoot.nodeType===1&&decorationRoot.matches(selector))found.unshift(decorationRoot);
+ return found;
+}
+function decorationOne(selector){return decorationAll(selector)[0]||null}
 const ICONS={
   close:'<path d="M6 6l12 12M18 6L6 18"/>',
   trophy:'<path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M8 6H5v1a4 4 0 0 0 4 4M16 6h3v1a4 4 0 0 1-4 4M12 12v4M8 20h8M9 16h6"/>',
@@ -100,7 +121,7 @@ function decorateAvatarElement(el,key,label){
 }
 function decorateAvatarPickers(){
  const p=profileState(),current=visualAvatarIndex(p?.avatar||'🙂');
- document.querySelectorAll('.avatar-choice').forEach(btn=>{
+ decorationAll('.avatar-choice').forEach(btn=>{
    const raw=String(btn.dataset.avatar||btn.dataset.editAvatar||'').trim(),idx=legacyAvatarIndex(raw);
    if(idx<0)return;
    btn.classList.remove('organic-avatar-duplicate');btn.removeAttribute('aria-hidden');btn.tabIndex=0;btn.dataset.organicAvatarKey=raw;btn.dataset.avatarCategory=AVATAR_MANIFEST[idx].category;
@@ -111,12 +132,12 @@ function decorateAvatarPickers(){
  });
 }
 function polishAvatarEditor(){
- const note=document.querySelector('#profileEditModal .profile-edit-avatar-block .field-note');
+ const note=decorationOne('#profileEditModal .profile-edit-avatar-block .field-note');
  if(note&&note.textContent.includes('emoji'))note.textContent='Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.';
 }
 function decorateInlineLeaderboardAvatars(){
- document.querySelectorAll("[data-player-avatar]").forEach(el=>decorateAvatarElement(el,el.dataset.playerAvatar,"Herní avatar"));
- document.querySelectorAll('.leader-name>strong').forEach(strong=>{
+ decorationAll("[data-player-avatar]").forEach(el=>decorateAvatarElement(el,el.dataset.playerAvatar,"Herní avatar"));
+ decorationAll('.leader-name>strong').forEach(strong=>{
    if(strong.querySelector('.organic-avatar'))return;
    const first=strong.firstChild;if(!first||first.nodeType!==Node.TEXT_NODE)return;
    const text=first.nodeValue||'',trimmed=text.trimStart();
@@ -128,14 +149,14 @@ function decorateInlineLeaderboardAvatars(){
 }
 function applyAvatars(){
  const p=profileState();
- const chip=document.getElementById('profileChipAvatar');
+ const chip=decorationOne('#profileChipAvatar');
  if(p&&!p.useGoogleAvatar)decorateAvatarElement(chip,p.avatar||'🙂',`Avatar hráče ${p.name||''}`);
  else if(!p&&chip&&!chip.querySelector('.organic-avatar')){chip.classList.add('organic-avatar-host');chip.replaceChildren(avatarNode(-1,'Profil zatím není uložen'))}
- if(p&&!p.useGoogleAvatar)document.querySelectorAll('.profile-avatar-big').forEach(el=>decorateAvatarElement(el,p.avatar||'🙂',`Avatar hráče ${p.name||''}`));
- const preview=document.getElementById('rankingPrivacyPreviewAvatar');if(preview&&p)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
- document.querySelectorAll('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar').forEach(el=>decorateAvatarElement(el,null,'Herní avatar'));
+ if(p&&!p.useGoogleAvatar)decorationAll('.profile-avatar-big').forEach(el=>decorateAvatarElement(el,p.avatar||'🙂',`Avatar hráče ${p.name||''}`));
+ const preview=decorationOne('#rankingPrivacyPreviewAvatar');if(preview&&p)decorateAvatarElement(preview,p.avatar||'🙂','Tvůj veřejný herní avatar');
+ decorationAll('.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar').forEach(el=>decorateAvatarElement(el,null,'Herní avatar'));
  decorateInlineLeaderboardAvatars();decorateAvatarPickers();polishAvatarEditor();
- const privateIcon=document.querySelector('.settings-privacy-icon');if(privateIcon&&profileState()?.publicRankings===false&&!privateIcon.querySelector('.organic-avatar')){privateIcon.replaceChildren(avatarNode(-1,'Anonymní hráč'));privateIcon.classList.add('organic-private-avatar')}
+ const privateIcon=decorationOne('.settings-privacy-icon');if(privateIcon&&profileState()?.publicRankings===false&&!privateIcon.querySelector('.organic-avatar')){privateIcon.replaceChildren(avatarNode(-1,'Anonymní hráč'));privateIcon.classList.add('organic-private-avatar')}
 }
 function emblemSpec(key){
  const specs={
@@ -361,24 +382,24 @@ function rankArt(key,index,label,locked=false){
  const span=document.createElement('span');span.className='proplet-rank-art tone-'+tone;span.dataset.rankArt=String(index);span.setAttribute('role','img');span.setAttribute('aria-label',label);span.innerHTML=bespokeSvg(body);return span;
 }
 function applyBespokeProgressArt(){
- document.querySelectorAll('.achievement-group').forEach(section=>{
+ decorationAll('.achievement-group').forEach(section=>{
    const label=section.querySelector('.achievement-group-head>strong')?.textContent?.trim()||'',group=GROUP_ID_BY_LABEL[label];if(!group)return;
    [...section.querySelectorAll('.achievement')].forEach((card,index)=>{
      const slot=card.querySelector(':scope>.emoji');if(!slot||slot.classList.contains('bespoke-ready'))return;
      const name=card.querySelector(':scope>strong')?.textContent?.trim()||'';slot.replaceChildren(bespokeArt(group,index,name,!card.classList.contains('earned')));slot.classList.add('bespoke-ready');
    });
  });
- document.querySelectorAll('.achievement-peek').forEach(peek=>{
+ decorationAll('.achievement-peek').forEach(peek=>{
    const name=peek.getAttribute('title')||peek.getAttribute('aria-label')?.replace(/, splněno$/,'')||'',id=achievementIdentityByName(name),slot=peek.querySelector('b');
    if(id&&slot&&!slot.querySelector('.proplet-ach-art,.ribbon-art'))slot.replaceChildren(bespokeArt(id.group,id.index,name,!peek.classList.contains('earned'),30));
  });
- [...document.querySelectorAll('#profileBadges .profile-badge')].forEach((card,index)=>{
-   const slot=card.querySelector(':scope>.emoji');if(!slot||slot.classList.contains('bespoke-ready'))return;const name=card.querySelector('strong')?.textContent||'';slot.replaceChildren(loyaltyArt(index,name,!card.classList.contains('earned')));slot.classList.add('bespoke-ready');
+ [...decorationAll('#profileBadges .profile-badge')].forEach((card,index)=>{
+   const slot=card.querySelector(':scope>.emoji');if(!slot||slot.classList.contains('bespoke-ready'))return;const name=card.querySelector('strong')?.textContent||'';slot.replaceChildren(loyaltyArt(Array.from(card.parentElement.querySelectorAll('.profile-badge')).indexOf(card),name,!card.classList.contains('earned')));slot.classList.add('bespoke-ready');
  });
- [...document.querySelectorAll('#levelRoadmap .level-step')].forEach((step,index)=>{
-   const slot=step.querySelector('.level-step-icon');if(!slot||slot.querySelector('.proplet-rank-art,.ribbon-art'))return;const key=slot.textContent.trim(),name=step.querySelector('strong')?.textContent||'';slot.replaceChildren(rankArt(key,index,name,!step.classList.contains('earned')&&!step.classList.contains('current')));
+ [...decorationAll('#levelRoadmap .level-step')].forEach((step,index)=>{
+   const slot=step.querySelector('.level-step-icon');if(!slot||slot.querySelector('.proplet-rank-art,.ribbon-art'))return;const key=slot.textContent.trim(),name=step.querySelector('strong')?.textContent||'';slot.replaceChildren(rankArt(key,Array.from(step.parentElement.querySelectorAll('.level-step')).indexOf(step),name,!step.classList.contains('earned')&&!step.classList.contains('current')));
  });
- document.querySelectorAll('.profile-rank-icon').forEach(slot=>{
+ decorationAll('.profile-rank-icon').forEach(slot=>{
    if(slot.querySelector('.proplet-rank-art,.ribbon-art'))return;const key=slot.textContent.trim(),name=slot.parentElement?.querySelector('strong')?.textContent||'',match=name.match(/^(\d+)/),index=Math.max(0,Number(match?.[1]||1)-1);slot.replaceChildren(rankArt(key,index,name));
  });
 }
@@ -391,28 +412,28 @@ function applyRibbonContexts(){
   if(slot.getAttribute('role')==='img')ribbon.setAttribute('aria-hidden','true');
   slot.replaceChildren(ribbon);slot.classList.add('ribbon-slot');
  }
- document.querySelectorAll('.unlock-row').forEach(row=>{
+ decorationAll('.unlock-row').forEach(row=>{
   const name=row.querySelector('strong')?.textContent?.trim()||'';
   mount(row.querySelector('.emoji'),name,name.startsWith('Nový odznak')?'streak':'achievement',40);
  });
- document.querySelectorAll('.streak-icon,.home-progress-streak i').forEach(slot=>mount(slot,'Herní série','symbol',24));
- const win=document.querySelector('#winBadge');
+ decorationAll('.streak-icon,.home-progress-streak i').forEach(slot=>mount(slot,'Herní série','symbol',24));
+ const win=decorationOne('#winBadge');
  if(win&&!win.querySelector('.ribbon-art')){
-  const fresh=document.querySelector('#newBadgeBox .unlock-row strong')?.textContent||'';
-  const title=document.querySelector('#winTitle')?.textContent||'';
+  const fresh=decorationOne('#newBadgeBox .unlock-row strong')?.textContent||'';
+  const title=decorationOne('#winTitle')?.textContent||'';
   if(fresh.startsWith('Nový odznak'))mount(win,fresh,'streak',64);
   else mount(win,/Tajenka/.test(title)?'Odhalená tajenka':win.textContent.includes('☀')?'Denní výzva':'Dokončeno','symbol',64);
  }
  const medals=['Zlatá medaile','Stříbrná medaile','Bronzová medaile'];
- document.querySelectorAll('.result-medal').forEach(slot=>{
+ decorationAll('.result-medal').forEach(slot=>{
   const n=[1,2,3].find(n=>slot.classList.contains('result-medal-'+n));if(n)mount(slot,medals[n-1],'medal',40);
  });
- document.querySelectorAll('.home-ranking-medal,.leader-rank').forEach(slot=>{
+ decorationAll('.home-ranking-medal,.leader-rank').forEach(slot=>{
   const text=slot.textContent.trim(),n=['🥇','🥈','🥉'].indexOf(text);
   if(n>=0)mount(slot,medals[n],'medal',32);
  });
- document.querySelectorAll('.home-progress-level-icon').forEach(slot=>mount(slot,slot.parentElement?.querySelector('strong')?.textContent,'rank',32));
- document.querySelectorAll('.ranking-rank-chip').forEach(slot=>{
+ decorationAll('.home-progress-level-icon').forEach(slot=>mount(slot,slot.parentElement?.querySelector('strong')?.textContent,'rank',32));
+ decorationAll('.ranking-rank-chip').forEach(slot=>{
   if(slot.querySelector('.ribbon-art'))return;
   const text=slot.textContent.trim();
   const name=Object.keys(window.PropletRibbonCatalog?.rank||{}).find(n=>text.endsWith(n));
@@ -426,15 +447,15 @@ function applyRibbonContexts(){
 function applyActionIcons(){
  const src=(key,size)=>{const img=document.createElement('img');img.className='painted-action-icon';img.src=`/rewards/printshop/${key}.svg?v=icons1`;img.alt='';img.setAttribute('aria-hidden','true');img.width=size;img.height=size;img.decoding='async';img.loading='lazy';img.draggable=false;return img};
  const stripLeading=(node,emoji)=>{[...node.childNodes].forEach(child=>{if(child.nodeType===Node.TEXT_NODE){const next=child.nodeValue.replace(new RegExp(`^(\\s*)${emoji}\\uFE0F?\\s*`,'u'),'$1');if(next!==child.nodeValue)child.nodeValue=next}})};
- const button=(el,key,emoji,size=24)=>{if(!el)return;el.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());stripLeading(el,emoji);if(!el.querySelector(':scope>.painted-action-icon'))el.prepend(src(key,size));el.classList.add('painted-action-control')};
- document.querySelectorAll('#shareDailyBtn,.challenge-share-cta').forEach(el=>button(el,'challenge','⚔',24));
- button(document.querySelector('#calmRunBtn'),'calm','🫧',24);
- document.querySelectorAll('.calm-settings-icon,.calm-confirm-icon').forEach(slot=>{slot.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());if(!slot.querySelector(':scope>.painted-action-icon'))slot.replaceChildren(src('calm',22));slot.classList.add('painted-action-slot')});
- document.querySelectorAll('.calm-quick>strong').forEach(label=>{label.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());stripLeading(label,'🫧');if(!label.querySelector(':scope>.painted-action-icon'))label.prepend(src('calm',22));label.classList.add('painted-action-label')});
+ const button=(el,key,emoji,size=24)=>{if(!el)return;el.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());stripLeading(el,emoji);if(!el.querySelector(':scope>.painted-action-icon'))el.prepend(src(key,size));if(!el.classList.contains('painted-action-control'))el.classList.add('painted-action-control')};
+ decorationAll('#shareDailyBtn,.challenge-share-cta').forEach(el=>button(el,'challenge','⚔',24));
+ button(decorationOne('#calmRunBtn'),'calm','🫧',24);
+ decorationAll('.calm-settings-icon,.calm-confirm-icon').forEach(slot=>{slot.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());if(!slot.querySelector(':scope>.painted-action-icon'))slot.replaceChildren(src('calm',22));slot.classList.add('painted-action-slot')});
+ decorationAll('.calm-quick>strong').forEach(label=>{label.querySelectorAll('.ui-icon').forEach(icon=>icon.remove());stripLeading(label,'🫧');if(!label.querySelector(':scope>.painted-action-icon'))label.prepend(src('calm',22));label.classList.add('painted-action-label')});
 }
 
 function iconizeCloseButtons(){
- document.querySelectorAll('.modal-close,.release-notes-v3331-close').forEach(btn=>{
+ decorationAll('.modal-close,.release-notes-v3331-close').forEach(btn=>{
    if(btn.querySelector('.ui-icon'))return;btn.replaceChildren(svgIcon('close'));btn.classList.add('ui-icon-only');
  });
 }
@@ -457,45 +478,58 @@ function replaceEmojiTextNode(node){
  }
  node.parentNode?.replaceChild(frag,node);return true;
 }
-function replaceVisibleEmoji(root=document.body){
+function replaceVisibleEmoji(root=decorationRoot){
  if(!root)return;
  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(node){
-   const p=node.parentElement;if(!p||p.closest('script,style,svg,textarea,option'))return NodeFilter.FILTER_REJECT;
+   if(auditEnabled)auditStats.textNodes++;const p=node.parentElement;if(!p||p.closest('script,style,svg,textarea,option,.ui-icon,.organic-avatar,#uiAudit'))return NodeFilter.FILTER_REJECT;
    return keyAt(node.nodeValue||'')?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
  }});
  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(replaceEmojiTextNode);
 }
 function updateFooter(){
- const footer=document.querySelector('.app-footer');if(!footer)return;
+ const footer=decorationOne('.app-footer');if(!footer)return;
  const line=footer.querySelector('span');if(line&&line.textContent!=='© 2026 Proplet · Česká slovní hra')line.textContent='© 2026 Proplet · Česká slovní hra';
  const author=footer.querySelector('strong');if(author&&!author.hidden)author.hidden=true;
 }
 function updateThemeMeta(){
- const meta=document.querySelector('meta[name="theme-color"]');if(!meta)return;
+ const meta=decorationOne('meta[name="theme-color"]');if(!meta)return;
  meta.dataset.lightColor='#FDFBF7';if(document.documentElement.dataset.theme!=='dark')meta.setAttribute('content','#FDFBF7');
 }
 let queued=false;
-const observer=new MutationObserver(records=>{
- // Plain timer/counter text and changes inside generated SVGs need no decoration.
- const relevant=records.some(record=>{
-   const parent=record.target.nodeType===Node.TEXT_NODE?record.target.parentElement:record.target;
-   if(parent?.closest?.('script,style,svg,textarea,option'))return false;
-   if(record.type==='characterData')return !!keyAt(record.target.nodeValue||'');
-   return Array.from(record.addedNodes||[]).some(node=>
-     node.nodeType===Node.ELEMENT_NODE||
-     (node.nodeType===Node.TEXT_NODE&&!!keyAt(node.nodeValue||'')));
- });
- if(relevant)schedule();
-});
-function observe(){observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true})}
-function apply(){
- queued=false;
- // Decoration must not schedule another frame through its own DOM writes.
- observer.disconnect();
- try{applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();updateThemeMeta()}
- finally{observe()}
+const pendingRoots=new Set();
+const ignored='script,style,svg,textarea,option,.ui-icon,.organic-avatar,.path-layer,.board,#timer,#currentWord,#uiAudit';
+const contexts='.achievement-group,.achievement-peek,#profileBadges,#levelRoadmap,.profile-rank-icon,.unlock-row,.leader-name,.avatar-choice,[data-player-avatar],.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar,.settings-privacy-icon,.result-medal,.home-ranking-medal,.leader-rank,.home-progress-level-icon,.ranking-rank-chip,.streak-icon,.home-progress-streak,#shareDailyBtn,.challenge-share-cta,#calmRunBtn,.calm-settings-icon,.calm-confirm-icon,.calm-quick,.modal-close,.release-notes-v3331-close,.app-footer,#winBadge,#profileChipAvatar,#rankingPrivacyPreviewAvatar,.profile-avatar-big';
+function queueRoot(node){
+ const element=node.nodeType===3?node.parentElement:node;
+ if(!element||element.nodeType!==1||!element.isConnected||element.closest(ignored))return;
+ const root=element.closest(contexts)||element;
+ // Never expand a routine update into a whole-document scan.
+ if(root===document.body||root===document.documentElement)return;
+ for(const existing of pendingRoots){if(existing.contains(root))return;if(root.contains(existing))pendingRoots.delete(existing)}
+ pendingRoots.add(root);
+ if(!queued){queued=true;requestAnimationFrame(flush)}
 }
-function schedule(){if(queued)return;queued=true;requestAnimationFrame(apply)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-observe();
+const observer=new MutationObserver(records=>{
+ for(const record of records){
+  if(record.type==='characterData'){
+   if(keyAt(record.target.nodeValue||''))queueRoot(record.target);
+  }else for(const node of record.addedNodes){
+   if(node.nodeType===1||(node.nodeType===3&&keyAt(node.nodeValue||'')))queueRoot(node);
+  }
+ }
+});
+function observe(){observer.observe(document.body,{subtree:true,childList:true,characterData:true})}
+function decorate(root){
+ decorationRoot=root;const started=performance.now();
+ if(auditEnabled){auditStats.passes++;if(root===document.body)auditStats.full++}
+ try{applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();if(root===document.body)updateThemeMeta()}
+ finally{decorationRoot=document;if(auditEnabled)auditStats.ms+=performance.now()-started}
+}
+function flush(){
+ queued=false;const roots=Array.from(pendingRoots);pendingRoots.clear();
+ observer.disconnect();
+ try{for(const root of roots)if(root.isConnected)decorate(root)}finally{observe()}
+}
+function start(){observer.disconnect();try{decorate(document.body)}finally{observe()}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();

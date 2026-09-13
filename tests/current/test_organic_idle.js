@@ -1,14 +1,14 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const source=fs.readFileSync('public/organic-ui-v4023.js','utf8');
 const code=source.slice(source.indexOf('let queued=false;'),source.lastIndexOf('})();'));
-let listener,connected=false,passes=0;const frames=[];
-const parent={closest:()=>null},text=value=>({nodeType:3,nodeValue:value,parentElement:parent});
-const ctx={Node:{TEXT_NODE:3,ELEMENT_NODE:1},document:{readyState:'complete',documentElement:{}},MutationObserver:class{constructor(fn){listener=fn}observe(){connected=true}disconnect(){connected=false}},requestAnimationFrame:fn=>frames.push(fn),keyAt:value=>value.includes('🔥')?{}:null};
-for(const name of ['applyAvatars','applyBespokeProgressArt','applyRibbonContexts','applyActionIcons','iconizeCloseButtons','replaceVisibleEmoji','updateFooter','updateThemeMeta'])ctx[name]=()=>{};
-ctx.replaceVisibleEmoji=()=>{passes++;assert.equal(connected,false,'own mutations must not schedule another pass')};
-vm.runInNewContext(code,ctx);assert.equal(passes,1);assert.equal(connected,true);
-for(let i=0;i<1000;i++)listener([{type:'characterData',target:text('00:'+i)}]);
-listener([{type:'childList',target:parent,addedNodes:[text('00:10')]}]);assert.equal(frames.length,0);
-listener([{type:'characterData',target:text('🔥')}]);listener([{type:'childList',target:parent,addedNodes:[{nodeType:1}]}]);assert.equal(frames.length,1);
-frames.shift()();assert.equal(passes,2);assert.equal(frames.length,0);assert.equal(connected,true);
-console.log('PASS: 1000 timer updates cause no scans; new UI/emoji is batched; own writes cannot recur.');
+let listener,connected=false;const frames=[],scanned=[];
+function element(name,parent=null){return {name,nodeType:1,isConnected:true,parentElement:parent,closest(selector){return null},contains(other){return other===this||other.parentElement===this}}}
+const body=element('body'),panel=element('panel',body),child=element('child',panel);
+const ctx={document:{readyState:'complete',body,documentElement:element('html')},performance:{now:()=>0},auditEnabled:false,decorationRoot:null,MutationObserver:class{constructor(fn){listener=fn}observe(){connected=true}disconnect(){connected=false}},requestAnimationFrame:fn=>frames.push(fn),keyAt:s=>s.includes('🔥')?{}:null};
+for(const name of ['applyAvatars','applyBespokeProgressArt','applyRibbonContexts','applyActionIcons','iconizeCloseButtons','updateFooter','updateThemeMeta'])ctx[name]=()=>{};
+ctx.replaceVisibleEmoji=()=>{assert.equal(connected,false);scanned.push(ctx.decorationRoot)};
+vm.createContext(ctx);vm.runInContext(code,ctx);assert.deepEqual(scanned,[body]);
+for(let i=0;i<1000;i++)listener([{type:'characterData',target:{nodeType:3,nodeValue:'00:10',parentElement:panel}}]);assert.equal(frames.length,0);
+listener([{type:'childList',addedNodes:[child,panel],target:body}]);assert.equal(frames.length,1);frames.shift()();assert.deepEqual(scanned,[body,panel]);assert.equal(frames.length,0);
+listener([{type:'childList',addedNodes:[{nodeType:3,nodeValue:'🔥',parentElement:child}],target:child}]);frames.shift()();assert.deepEqual(scanned,[body,panel,child]);assert.equal(connected,true);
+console.log('PASS: one initial scan, updates scoped to changed roots, nested roots deduplicated, numeric text ignored.');
