@@ -1,19 +1,5 @@
 (function organicPropletUI(){
 'use strict';
-if(location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).get('uiAudit')==='baseline'){
- const script=document.createElement('script');script.src='/ui-audit-baseline.js';document.head.appendChild(script);return;
-}
-
-const auditEnabled=location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).has('uiAudit');
-const auditStats={passes:0,full:0,ms:0,textNodes:0,roots:{}};
-function auditPublish(){
- if(!auditEnabled)return;
- let output=document.getElementById('uiAudit');
- if(!output){output=document.createElement('output');output.id='uiAudit';output.style.cssText='position:fixed;bottom:0;left:0;z-index:99999;background:#111;color:#fff;padding:5px;font:11px monospace;pointer-events:none';document.body.appendChild(output)}
- output.textContent=JSON.stringify({...auditStats,ms:Math.round(auditStats.ms)});
-}
-if(auditEnabled)setInterval(auditPublish,1000);
-
 let decorationRoot=document;
 function decorationAll(selector){
  const found=Array.from(decorationRoot.querySelectorAll(selector));
@@ -481,7 +467,7 @@ function replaceEmojiTextNode(node){
 function replaceVisibleEmoji(root=decorationRoot){
  if(!root)return;
  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(node){
-   if(auditEnabled)auditStats.textNodes++;const p=node.parentElement;if(!p||p.closest('script,style,svg,textarea,option,.ui-icon,.organic-avatar,#uiAudit'))return NodeFilter.FILTER_REJECT;
+   const p=node.parentElement;if(!p||p.closest('script,style,svg,textarea,option,.ui-icon,.organic-avatar'))return NodeFilter.FILTER_REJECT;
    return keyAt(node.nodeValue||'')?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
  }});
  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(replaceEmojiTextNode);
@@ -497,7 +483,7 @@ function updateThemeMeta(){
 }
 let queued=false;
 const pendingRoots=new Set();
-const ignored='script,style,svg,textarea,option,.ui-icon,.organic-avatar,.path-layer,.board,#timer,#currentWord,#uiAudit';
+const ignored='script,style,svg,textarea,option,.ui-icon,.organic-avatar,.path-layer,.board,#timer,#currentWord';
 const contexts='.achievement-group,.achievement-peek,#profileBadges,#levelRoadmap,.profile-rank-icon,.unlock-row,.leader-name,.avatar-choice,[data-player-avatar],.home-ranking-avatar,.leader-avatar,.leaderboard-avatar,.ranking-avatar,.settings-privacy-icon,.result-medal,.home-ranking-medal,.leader-rank,.home-progress-level-icon,.ranking-rank-chip,.streak-icon,.home-progress-streak,#shareDailyBtn,.challenge-share-cta,#calmRunBtn,.calm-settings-icon,.calm-confirm-icon,.calm-quick,.modal-close,.release-notes-v3331-close,.app-footer,#winBadge,#profileChipAvatar,#rankingPrivacyPreviewAvatar,.profile-avatar-big';
 function queueRoot(node){
  const element=node.nodeType===3?node.parentElement:node;
@@ -520,10 +506,9 @@ const observer=new MutationObserver(records=>{
 });
 function observe(){observer.observe(document.body,{subtree:true,childList:true,characterData:true})}
 function decorate(root){
- decorationRoot=root;const started=performance.now();
- if(auditEnabled){auditStats.passes++;const label=root.id||root.className||root.tagName;auditStats.roots[label]=(auditStats.roots[label]||0)+1;if(root===document.body)auditStats.full++}
+ decorationRoot=root;
  try{applyAvatars();applyBespokeProgressArt();applyRibbonContexts();applyActionIcons();iconizeCloseButtons();replaceVisibleEmoji();updateFooter();if(root===document.body)updateThemeMeta()}
- finally{decorationRoot=document;if(auditEnabled)auditStats.ms+=performance.now()-started}
+ finally{decorationRoot=document}
 }
 function flush(){
  queued=false;const roots=Array.from(pendingRoots);pendingRoots.clear();

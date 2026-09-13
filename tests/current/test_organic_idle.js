@@ -12,3 +12,16 @@ for(let i=0;i<1000;i++)listener([{type:'characterData',target:{nodeType:3,nodeVa
 listener([{type:'childList',addedNodes:[child,panel],target:body}]);assert.equal(frames.length,1);frames.shift()();assert.deepEqual(scanned,[body,panel]);assert.equal(frames.length,0);
 listener([{type:'childList',addedNodes:[{nodeType:3,nodeValue:'🔥',parentElement:child}],target:child}]);frames.shift()();assert.deepEqual(scanned,[body,panel,child]);assert.equal(connected,true);
 console.log('PASS: one initial scan, updates scoped to changed roots, nested roots deduplicated, numeric text ignored.');
+
+// Settings must retain the semantic mode when its emoji is replaced by artwork.
+const settings=fs.readFileSync('public/settings-polish-v40122.js','utf8');
+const helperCode=settings.slice(settings.indexOf('  function ensureSingleHelperSetting(){'),settings.indexOf('  function polishProfileCopy(){'));
+let helperText='',helperWrites=0,mode={icon:'🧠',label:'Nenabízet'};
+const helperValue={dataset:{},get textContent(){return helperText},set textContent(v){helperText=v;helperWrites++}};
+const helperContext={q:s=>s==='#soundToggle'?{closest:()=>({})}:s==='#settingsHelperControl'?{}:s==='#settingsHelperValue'?helperValue:null,qa:()=>[],currentHelperMode:()=>mode,setText:(el,text)=>{if(el.textContent!==text)el.textContent=text}};
+vm.createContext(helperContext);vm.runInContext(helperCode,helperContext);
+helperContext.ensureSingleHelperSetting();helperText=' Nenabízet';
+for(let i=0;i<1000;i++)helperContext.ensureSingleHelperSetting();
+assert.equal(helperWrites,1,'decorated helper must not be reset to emoji');
+mode={icon:'💡',label:'Nabízet'};helperContext.ensureSingleHelperSetting();assert.equal(helperWrites,2,'changing helper mode still updates its label');
+console.log('PASS: helper decoration converges and mode changes remain visible.');
