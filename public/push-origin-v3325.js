@@ -31,7 +31,8 @@
     if(!d||!dt)return;
     const profile=typeof getProfile==='function'?getProfile():null;
     if(!profile?.token){
-      dt.textContent='Zapnutí platí pro konkrétní zařízení a prohlížeč. Nejdřív si ulož postup.';
+      d.disabled=false;d.textContent='Přihlásit se';
+      dt.textContent='Upozornění zapneš po přihlášení na tomto zařízení.';
       return;
     }
     const sub=await localSubscription();

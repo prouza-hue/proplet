@@ -64,10 +64,10 @@
   }
 
   function polishDataCard(){
-    const card=q('#reportIssueBtn')?.closest('.settings-card');if(!card)return;
+    const card=q('.trust-card');if(!card)return;
     card.classList.add('settings-data-card');removeEyebrow(card);
     setText(q('.section-head h2',card),'Data pod kontrolou');
-    setText(q(':scope>p.muted',card),'Stáhni svá data, nahlas problém nebo účet trvale smaž.');
+    setText(q(':scope>p.muted',card),profile()?.token?'Stáhni svá data nebo trvale smaž účet.':'Informace o soukromí a podmínkách hraní.');
   }
 
   function polishAccountHub(){

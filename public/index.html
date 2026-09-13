@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#FDFBF7" data-light-color="#FDFBF7" />
   <meta name="color-scheme" content="light dark" />
-  <script src="/runtime-meta.js" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=settingsorder1"></script>
+  <script src="/runtime-meta.js?v=settingssimple1" data-proplet-runtime-meta="1" data-loaded="1"></script>
+  <script src="/theme-init.js?v=settingssimple1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -182,8 +182,6 @@
         </div>
         <button id="wakeLockToggle" class="setting-toggle setting-toggle-wide"></button>
         <small id="wakeLockNote" class="field-note">Platí jen během rozehrané partie. Po jejím dokončení se displej zase řídí nastavením zařízení.</small>
-        <button id="hapticTestBtn" class="secondary-btn intro-replay-btn">📳 Otestovat vibrace</button>
-        <button id="replayIntroBtn" class="secondary-btn intro-replay-btn">▶ Ukázat úvod znovu</button>
       </div>
 
       <div class="card settings-card push-card">
@@ -205,11 +203,25 @@
         <div id="installAppStatus" class="install-app-status muted"></div>
       </div>
 
+      <div id="settingsHelpCard" class="card settings-card settings-help-card">
+        <div class="section-head"><h2>Pomoc</h2></div>
+        <div class="settings-help-actions">
+          <button id="reportIssueBtn" class="secondary-btn" type="button">Nahlásit chybu</button>
+          <button id="replayIntroBtn" class="secondary-btn" type="button">Zopakovat tutoriál</button>
+        </div>
+        <details id="settingsDiagnostics" class="settings-disclosure">
+          <summary>Řešení problémů</summary>
+          <div class="settings-diagnostics-body">
+            <button id="hapticTestBtn" class="secondary-btn" type="button">Otestovat vibrace</button>
+          </div>
+        </details>
+      </div>
+
       <div class="card settings-card trust-card">
         <div class="section-head"><div><span class="eyebrow">ÚČET A SOUKROMÍ</span><h2>Data pod kontrolou</h2></div></div>
         <p class="muted">Proplet můžeš hrát bez účtu. Když účet máš, můžeš si jeho serverová data stáhnout nebo ho trvale smazat.</p>
         <div class="trust-actions">
-          <button id="reportIssueBtn" class="secondary-btn">🛟 Nahlásit problém</button>
+
           <button id="exportDataBtn" class="secondary-btn hidden">⬇ Export mých dat</button>
           <button id="deleteAccountBtn" class="danger-btn hidden">Smazat účet</button>
         </div>
@@ -657,7 +669,7 @@
   <script src="/app/rankings/rankings.js?v=fixsep8c"></script>
   <script src="/ribbon-catalog.js?v=icons1"></script>
   <script src="/ribbon-ui.js?v=icons1"></script>
-  <script src="/app.js?v=magnifiersettings1"></script>
+  <script src="/app.js?v=settingssimple1"></script>
   <script src="/quality-v334.js?v=calmsettings1"></script>
   <script src="/organic-ui-v4023.js?v=scoped1"></script>
   <script src="/welcome-feedback.js?v=2"></script>

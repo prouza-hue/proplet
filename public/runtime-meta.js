@@ -174,7 +174,7 @@
     if(legacyOriginSession)return;
     if(document.querySelector('script[data-proplet-push-origin]'))return;
     const script=document.createElement('script');
-    script.src='/push-origin-v3325.js?v=2';
+    script.src='/push-origin-v3325.js?v=settingssimple1';
     script.async=false;
     script.dataset.propletPushOrigin='1';
     document.body.appendChild(script);

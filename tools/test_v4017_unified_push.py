@@ -16,7 +16,7 @@ assert "proplet-v4.01.26-shell" in sw
 assert "unifiedPushV4017:true" in runtime
 assert "pushAutoRepairV4017:true" in runtime
 assert "weeklyContentBannerV4017:true" in runtime
-assert "/push-origin-v3325.js?v=2" in runtime
+assert "/push-origin-v3325.js?v=settingssimple1" in runtime
 
 # One player-facing preference controls both delivery schedules.
 assert html.count('id="pushToggleBtn"') == 1

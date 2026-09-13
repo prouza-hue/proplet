@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-calmsettings1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-settingssimple1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1368,7 +1368,21 @@ async function logoutPlayer(){
  clearAccountProfile();rotateAnonymousId();localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);localStorage.removeItem(scopedStorageKey(STORE_KEY,'guest'));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,'guest'));tajenkaStorage()?.remove('guest');localStorage.removeItem(tajenkaStateKey('guest'));syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();updateProfileChip();renderProfile();renderDaily();renderFree();showToast(`${p.name} je odhlášený. Teď může hrát někdo další.`);nav('daily',{replace:true});
 }
 
-function renderSettings(){const s=getSettings(),supported=typeof navigator.vibrate==='function',wakeSupported=!!navigator.wakeLock?.request;renderThemeSettings();$('#soundToggle').textContent=`${s.sound?'🔊':'🔇'} Zvuk ${s.sound?'zapnutý':'vypnutý'}`;$('#soundToggle').classList.toggle('on',s.sound);$('#hapticToggle').textContent=supported?`${s.haptics?'📳':'📴'} Vibrace ${s.haptics?'zapnuté':'vypnuté'}`:'📴 Vibrace nepodporovány';$('#hapticToggle').classList.toggle('on',s.haptics&&supported);$('#hapticToggle').disabled=!supported;const wake=$('#wakeLockToggle'),note=$('#wakeLockNote');if(wake){wake.textContent=wakeSupported?`${s.wakeLock?'☀️':'🌙'} Displej během hry ${s.wakeLock?'zůstane zapnutý':'může zhasnout'}`:'🌙 Prohlížeč neumí udržet displej';wake.classList.toggle('on',s.wakeLock&&wakeSupported);wake.disabled=!wakeSupported}if(note&&!wakeSupported)note.textContent='Tento prohlížeč funkci nepodporuje; použije se běžný limit zařízení.';const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;test.textContent=supported?'📳 Otestovat vibrace':'📴 Prohlížeč vibrace nepodporuje'}}
+function renderSettings(){
+ const s=getSettings(),supported=typeof navigator.vibrate==='function',wakeSupported=!!navigator.wakeLock?.request;
+ renderThemeSettings();
+ const toggle=(id,label,on,available=true)=>{
+  const el=$(id);if(!el)return;
+  if(el.textContent!==label)el.textContent=label;
+  el.classList.add('settings-switch');el.classList.toggle('on',!!on&&available);
+  el.setAttribute('role','switch');el.setAttribute('aria-checked',String(!!on&&available));el.disabled=!available;
+  el.title=available?'':'Toto zařízení funkci nepodporuje.';
+ };
+ toggle('#soundToggle','Zvuk',s.sound);
+ toggle('#hapticToggle',supported?'Vibrace':'Vibrace — nepodporovány',s.haptics,supported);
+ toggle('#wakeLockToggle',wakeSupported?'Nezhasínat displej při hraní':'Nezhasínat displej — nepodporováno',s.wakeLock,wakeSupported);
+ const test=$('#hapticTestBtn');if(test){test.disabled=!supported||!s.haptics;const label=supported?'Otestovat vibrace':'Vibrace nejsou podporovány';if(test.textContent!==label)test.textContent=label}
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 async function ensureRankingProfileState(){
@@ -1850,12 +1864,14 @@ async function enablePushReminder(){const result=await persistPushEnabled(true);
 async function acceptPushNudge(){if(pushUiBusy)return;pushUiBusy=true;$('#pushNudgeEnableBtn').disabled=true;try{await enablePushReminder();trackProductEvent('push_nudge_accepted');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_accepted');trackProductEvent('push_notifications_enabled');showToast('Upozornění zapnutá 🔔');finishPushNudgeFlow()}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;$('#pushNudgeEnableBtn').disabled=false;updatePushUI()}}
 async function updatePushUI(){
  const btn=$('#pushToggleBtn'),status=$('#pushStatusText');if(!btn||pushUiBusy)return;
+ if(!getProfile()?.token){btn.disabled=false;btn.textContent='Přihlásit se';status.textContent='Upozornění zapneš po přihlášení na tomto zařízení.';return}
  if(!('Notification' in window)||!('PushManager' in window)){btn.disabled=true;btn.textContent='🔕 Nepodporováno';status.textContent='Na tomto zařízení/prohlížeči Web Push není dostupný.';return}
  try{const state=await browserPushState();if(state.unavailable){btn.disabled=true;btn.textContent='🔔 Push čeká na server';status.textContent='Hraní funguje normálně. Push není nakonfigurovaný.';return}
   btn.disabled=false;btn.textContent=state.enabled?'Vypnout':'Zapnout';status.textContent=state.enabled?'Zapnuto · Daily i pondělní novinky.':Notification.permission==='denied'?'Oznámení jsou v prohlížeči zablokovaná.':'Vypnuto.';
  }catch(e){btn.disabled=true;status.textContent=e.message}
 }
 async function togglePushReminder(){
+ if(!getProfile()?.token){openProfileModal('login');return}
  if(pushUiBusy)return;pushUiBusy=true;const btn=$('#pushToggleBtn');btn.disabled=true;
  try{const state=await browserPushState({force:true});if(!state.migrationReady)throw new Error('Nastavení upozornění čeká na databázovou migraci.');const enabled=!state.enabled;await persistPushEnabled(enabled);trackProductEvent(`push_notifications_${enabled?'enabled':'disabled'}`);if(enabled)savePushNudgeState({accepted:true,acceptedAt:new Date().toISOString()});else savePushNudgeState({...getPushNudgeState(),accepted:false,done:true,disabledByUser:true,disabledAt:new Date().toISOString()});showToast(enabled?'Upozornění zapnutá 🔔':'Upozornění vypnutá.')}catch(e){if(typeof Notification!=='undefined'&&Notification.permission==='denied')trackProductEvent('push_permission_denied');showToast(e.message)}finally{pushUiBusy=false;updatePushUI()}
 }

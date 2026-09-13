@@ -31,15 +31,14 @@
       row=document.createElement('div');
       row.id='settingsHelperControl';
       row.className='settings-helper-control';
-      row.innerHTML='<div class="settings-helper-copy"><strong>Pomocník</strong><small id="settingsHelperValue"></small></div><button id="settingsHelperBtn" class="secondary-btn" type="button">Nastavit</button>';
+      row.innerHTML='<div class="settings-helper-copy"><strong>Automatická nabídka nápovědy</strong><small id="settingsHelperValue"></small></div><button id="settingsHelperBtn" class="secondary-btn" type="button">Nastavit</button>';
       const head=q('.section-head',gameplay);
       if(head)head.insertAdjacentElement('afterend',row);else gameplay.prepend(row);
-      q('#settingsHelperBtn',row).onclick=()=>{try{openSupportModeModal()}catch{}};
+      q('#settingsHelperBtn',row).onclick=()=>{try{if(typeof getProfile==='function'&&getProfile()?.token)openSupportModeModal();else openProfileModal('login')}catch{}};
     }
-    const mode=currentHelperMode();
-    const value=q('#settingsHelperValue',row),copy=`${mode.icon||'🧠'} ${mode.label||'Nenabízet'}`;
-    // The icon decorator replaces emoji with artwork. Compare the semantic value, not decorated text.
-    if(value&&value.dataset.helperCopy!==copy){setText(value,copy);value.dataset.helperCopy=copy}
+    const signedIn=typeof getProfile==='function'&&!!getProfile()?.token,mode=currentHelperMode();
+    const value=q('#settingsHelperValue',row),copy=signedIn?(mode.label==='Nenabízet'?'Vypnutá':`${mode.label} · nabídne pomoc, když se zasekneš.`):'Dostupná po přihlášení. Ruční nápovědu můžeš používat i bez účtu.';
+    setText(value,copy);setText(q('#settingsHelperBtn',row),signedIn?'Nastavit':'Přihlásit se');
   }
 
   function polishProfileCopy(){

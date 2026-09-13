@@ -33,8 +33,8 @@
     const pushCard=document.querySelector('.push-card');if(!pushCard)return false;
     if(!document.getElementById('pushSelfTestRow')){
       const row=document.createElement('div');row.id='pushSelfTestRow';row.className='push-self-test';
-      row.innerHTML='<div class="push-self-test-copy"><strong>Otestovat toto zařízení</strong><small>Pošli si skutečné systémové upozornění a ověř, že cesta funguje až do telefonu.</small></div><button id="pushSelfTestBtn" class="secondary-btn" type="button">🔔 Otestovat</button>';
-      pushCard.appendChild(row);row.querySelector('button').onclick=e=>sendSelfTest(e.currentTarget);
+      row.innerHTML='<div class="push-self-test-copy"><strong>Test upozornění</strong><small>Pošle zkušební upozornění, pokud jsou na tomto zařízení zapnutá.</small></div><button id="pushSelfTestBtn" class="secondary-btn" type="button">🔔 Otestovat</button>';
+      (document.querySelector('#settingsDiagnostics .settings-diagnostics-body')||pushCard).appendChild(row);row.querySelector('button').onclick=e=>sendSelfTest(e.currentTarget);
     }
     if(ios()&&!standalone()&&!document.getElementById('iosPwaPushCallout')){
       const callout=document.createElement('div');callout.id='iosPwaPushCallout';callout.className='ios-pwa-push-callout';

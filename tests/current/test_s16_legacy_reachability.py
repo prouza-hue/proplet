@@ -18,7 +18,7 @@ manifest = json.loads(read("tests/current/manifest.json"))
 for asset in (
     "/p0-hotfix-v3336.css",
     "/p0-hotfix-v3336.js",
-    "/push-origin-v3325.js?v=2",
+    "/push-origin-v3325.js?v=settingssimple1",
     "/quality-hotfix-v334.css",
 ):
     assert asset in runtime, asset
