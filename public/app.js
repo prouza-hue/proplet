@@ -1,8 +1,8 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-avatarselection1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-avatars47';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
-const AVATARS=["🙂","😎","🤓","🥳","🦊","🐱","🐶","🐼","🐯","🦁","🐸","🐵","🦄","🐲","🦖","🐙","🦉","🐝","🦋","🐧","🚀","⚡","🔥","🌈","🍕","⚽","🎮","🧩","🤯","👑","🦄✨","☠️","☢️","🌺","🛸","👽","💣","😈","🤖","🌩️"];
+const AVATARS=["🙂","😎","🤓","🥳","🦊","🐱","🐶","🐼","🐯","🦁","🐸","🐵","🦄","🐲","🦖","🐙","🦉","🐝","🦋","🐧","🚀","⚡","🔥","🌈","🍕","⚽","🎮","🧩","🤯","👑","🦄✨","☠️","☢️","🌺","🛸","👽","💣","😈","🤖","🌩️","🐕","🐕‍🦺","👻","🐉","🍄","🎲","🪐"];
 const SUPPORT_MODES={
  beginner:{icon:'🐣',label:'Brzy',desc:'Nabídne pomoc po 45 s bez nového slova.',idleMs:45000,seconds:45},
  younger:{icon:'🧒',label:'Vyváženě',desc:'Nabídne pomoc po 70 s bez nového slova.',idleMs:70000,seconds:70},

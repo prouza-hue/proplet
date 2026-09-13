@@ -1,8 +1,8 @@
 {
-  "package": "proplet-printshop-40",
-  "type": "true-vector-trace",
+  "package": "proplet-printshop-47",
+  "type": "vector-and-approved-raster",
   "embedded_raster": false,
-  "count": 40,
+  "count": 47,
   "viewBox": "0 0 512 512",
   "avatars": [
     {
@@ -324,6 +324,83 @@
       "file": "40-blesk.svg",
       "category": "playful",
       "token": "🌩️"
+    },
+    {
+      "id": 41,
+      "name": "Retrívr",
+      "file": "approved-expansion.png",
+      "category": "forest",
+      "frame": [
+        335,
+        146,
+        396
+      ]
+    },
+    {
+      "id": 42,
+      "name": "Jezevčík",
+      "file": "approved-expansion.png",
+      "category": "forest",
+      "frame": [
+        790,
+        146,
+        396
+      ]
+    },
+    {
+      "id": 43,
+      "name": "Duch",
+      "file": "approved-expansion.png",
+      "category": "playful",
+      "frame": [
+        26,
+        604,
+        280
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Dráček",
+      "file": "approved-expansion.png",
+      "category": "playful",
+      "frame": [
+        327,
+        604,
+        280
+      ]
+    },
+    {
+      "id": 45,
+      "name": "Muchomůrka",
+      "file": "approved-expansion.png",
+      "category": "playful",
+      "frame": [
+        628,
+        604,
+        280
+      ]
+    },
+    {
+      "id": 46,
+      "name": "Kostka",
+      "file": "approved-expansion.png",
+      "category": "playful",
+      "frame": [
+        929,
+        604,
+        280
+      ]
+    },
+    {
+      "id": 47,
+      "name": "Planeta",
+      "file": "approved-expansion.png",
+      "category": "playful",
+      "frame": [
+        1228,
+        604,
+        280
+      ]
     }
   ]
 }
