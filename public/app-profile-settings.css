@@ -512,3 +512,15 @@ html[data-theme="dark"] .ranking-privacy-preview{background:#292631!important;bo
 #screen-profile.settings-open #profileAccountHub #accountSecurityDetails .profile-account-body{margin-top:0}
 @media(max-width:420px){.settings-help-actions{grid-template-columns:1fr}#screen-profile.settings-open .settings-helper-control{flex-wrap:wrap;gap:10px}}
 @media(prefers-reduced-motion:reduce){#screen-profile.settings-open .settings-switch::after{transition:none}}
+
+/* Keep nickname editing above the mobile keyboard instead of centering it behind it. */
+@media(max-width:700px){
+ #profileEditModal{align-items:flex-start;padding: max(12px,env(safe-area-inset-top)) 12px 12px;overflow-y:auto}
+ #profileEditModal .profile-edit-modal-card{margin:0 auto;padding:20px;max-height:calc(100dvh - 24px)}
+ #profileEditModal h2{font-size:24px;line-height:1.15;margin:0 42px 12px 0}
+ #profileEditModal .profile-edit-modal-card>p{font-size:12px;line-height:1.4;margin:0 0 12px}
+ #profileEditModal label{margin:0;font-size:13px}
+ #profileEditModal input{font-size:16px;min-height:44px;margin-top:6px}
+ #profileEditModal #displayNameMessage:empty{display:none}
+ #profileEditModal #saveDisplayNameBtn{min-height:44px;margin-top:12px;padding:10px 16px;font-size:15px}
+}

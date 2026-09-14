@@ -142,7 +142,7 @@ function enhanceProfileArchitecture(){
  card.querySelectorAll('.account-banner,.avatar-picker').forEach(n=>n.remove());
  const family=card.querySelector('.profile-family');if(family&&!p.familyCode)family.textContent='Bez týmu';
  const avatar=card.querySelector('#editAvatarBtn');if(avatar)avatar.onclick=openAvatarEditor;
- const name=card.querySelector('.profile-name');if(name&&!card.querySelector('#editProfileInlineBtn')){const b=document.createElement('button');b.id='editProfileInlineBtn';b.className='secondary-btn profile-edit-name';b.type='button';b.textContent='Změnit přezdívku';b.onclick=openProfileEditor;name.insertAdjacentElement('afterend',b)}
+ const name=card.querySelector('.profile-name');if(name&&!card.querySelector('#editProfileInlineBtn')){const b=document.createElement('button');b.id='editProfileInlineBtn';b.className='secondary-btn profile-edit-name';b.type='button';b.textContent='Změnit přezdívku';b.onclick=openProfileEditor;(family||name).insertAdjacentElement('afterend',b)}
  const team=card.querySelector('.team-access-card');if(team)ensureTeamSection(team);
  const support=card.querySelector('.support-mode-card');if(support)moveSupportSetting(support);
  const admin=card.querySelector('#adminEntryBtn');if(admin)moveAdminEntry(admin);
