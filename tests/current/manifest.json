@@ -5,6 +5,7 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
+      {"path": "tests/current/test_tajenka_rules.js", "runner": "node"},
       {"path": "tests/current/test_avatar_editor.js", "runner": "node"},
       {"path": "tests/current/test_rank_titles.js", "runner": "node"},
       {"path": "tests/current/test_lock_copy_convergence.js", "runner": "node"},

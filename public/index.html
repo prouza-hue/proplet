@@ -40,6 +40,7 @@
   <link rel="stylesheet" href="/ribbon-ui.css?v=boardcontrast1" />
   <link rel="stylesheet" href="/printshop-ui.css?v=fix20" />
   <link rel="stylesheet" href="/welcome-feedback.css?v=1">
+  <link rel="stylesheet" href="/tajenka-rules.css?v=1">
 </head>
 <body>
   <div class="ambient ambient-one"></div>
@@ -275,6 +276,7 @@
         <aside class="game-control-column">
           <div class="game-actions">
             <button id="hintBtn" class="secondary-btn" aria-label="Nápověda" title="Nápověda">💡 Nápověda</button>
+            <button id="tajenkaRulesBtn" class="secondary-btn hidden" type="button" aria-label="Pravidla Tajenky" title="Pravidla Tajenky"><span aria-hidden="true">ⓘ</span></button>
             <button id="magnifierQuickBtn" class="secondary-btn magnifier-quick-btn hidden" type="button" aria-label="Vypnout lupu při tahu" aria-pressed="true" title="Lupa při tahu">🔍</button>
           </div>
           <div id="starterHintNudge" class="starter-hint-nudge hidden" role="status" aria-live="polite">
@@ -516,6 +518,26 @@
     </div>
   </div>
 
+
+  <div id="tajenkaRulesModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tajenkaRulesTitle">
+    <div class="modal-card tajenka-rules-card">
+      <h2 id="tajenkaRulesTitle" tabindex="-1">Jak na Tajenku</h2>
+      <div class="tajenka-rule">
+        <div class="rule-tiles" aria-hidden="true"><span>M</span><span>R</span><span>A</span><span>K</span></div>
+        <p>Hledej slova se <strong>4 a více písmeny.</strong></p>
+      </div>
+      <div class="tajenka-rule">
+        <div class="rule-phrase" aria-hidden="true"><span>ŽIVOT</span><span class="rule-auto">JE</span><span class="rule-auto">HRA</span></div>
+        <p>Slova o <strong>1–3 písmenech</strong> doplníme za tebe.</p>
+      </div>
+      <div class="tajenka-rule">
+        <div class="rule-tiles rule-leftovers" aria-hidden="true"><span>M</span><span>R</span><span>A</span><span>K</span><span class="unused">B</span><span class="unused">E</span><span class="unused">S</span><span class="unused">T</span></div>
+        <p><strong>Některá písmena zůstanou nevyužitá.</strong> To je v pořádku.</p>
+      </div>
+      <button id="tajenkaRulesDone" class="primary-btn" type="button">Jdu luštit</button>
+    </div>
+  </div>
+
   <div id="hintModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card left hint-card">
       <button id="closeHintModal" class="modal-close" aria-label="Zavřít">×</button>
@@ -669,7 +691,7 @@
   <script src="/app/rankings/rankings.js?v=fixsep8c"></script>
   <script src="/ribbon-catalog.js?v=rankprogress1"></script>
   <script src="/ribbon-ui.js?v=icons1"></script>
-  <script src="/app.js?v=rankprogress1"></script>
+  <script src="/app.js?v=tajenkaguide1"></script>
   <script src="/quality-v334.js?v=calmsettings1"></script>
   <script src="/organic-ui-v4023.js?v=avatareditor1"></script>
   <script src="/welcome-feedback.js?v=2"></script>

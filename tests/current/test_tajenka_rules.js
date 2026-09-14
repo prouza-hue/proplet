@@ -1,0 +1,16 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const app=fs.readFileSync('public/app.js','utf8');
+const code=app.slice(app.indexOf('function tajenkaRulesKey(){'),app.indexOf('function startStarter(){'));
+let hidden=true,paused=0,resumed=0,scope='guest';const storage=new Map();
+const modal={classList:{contains:()=>hidden,add:()=>hidden=true,remove:()=>hidden=false}};
+const ctx={currentGame:{mode:'tajenka'},playerScope:()=>scope,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:s=>s==='#tajenkaRulesModal'?modal:{focus(){}},pauseGameClock:()=>paused++,resumeGameClock:()=>resumed++};
+vm.createContext(ctx);vm.runInContext(code,ctx);
+assert.equal(ctx.tajenkaRulesSeen(),false);ctx.openTajenkaRules();assert.equal(hidden,false);assert.equal(paused,1);assert.equal(ctx.tajenkaRulesSeen(),false);
+ctx.closeTajenkaRules();assert.equal(hidden,true);assert.equal(resumed,1);assert.equal(ctx.tajenkaRulesSeen(),true);
+ctx.closeTajenkaRules();assert.equal(resumed,1);ctx.openTajenkaRules();assert.equal(hidden,false);assert.equal(paused,2);ctx.closeTajenkaRules();
+scope='another-player';assert.equal(ctx.tajenkaRulesSeen(),false);ctx.currentGame.mode='free';ctx.openTajenkaRules();assert.equal(hidden,true);
+const resume=app.slice(app.indexOf('function resumeGameClock(){'),app.indexOf('async function acquireGameWakeLock(){'));
+hidden=false;
+const guard={...ctx,$:()=>modal,gameSession:()=>{throw Error('must not resume while rules are open')}};vm.createContext(guard);vm.runInContext(resume,guard);assert.equal(guard.resumeGameClock(),false);
+assert(app.includes("else if(modal.id==='tajenkaRulesModal')closeTajenkaRules()"));
+console.log('PASS: Tajenka rules persist per player, reopen, pause and block background resume.');
