@@ -164,7 +164,7 @@
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
-    ['/app-profile-settings.css?v=nickname-layout1','propletAppProfileSettingsCss'],
+    ['/app-profile-settings.css?v=guestcta1','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=1','propletTypographyReadabilityV1Css'],
     ['/brand-wordmark-fraunces.css?v=2','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=1','propletTajenkaReleaseFixCss'],
@@ -227,11 +227,11 @@
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=invitations1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=welcome1','propletFooterHotfixV40120');
-    await loadScript('/account-bonus-v3331.js?v=2','propletAccountBonusV3331',{wait:true});
-    await loadScript('/account-conversion-v3331.js?v=auth-freeze1','propletAccountConversionV3331',{wait:true});
+    await loadScript('/account-bonus-v3331.js?v=guestcta1','propletAccountBonusV3331',{wait:true});
+    await loadScript('/account-conversion-v3331.js?v=guestcta1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=settingssimple1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=cpu3','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=guestcta1','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');

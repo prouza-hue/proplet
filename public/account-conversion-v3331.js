@@ -73,25 +73,6 @@
       return result;
     };
 
-    const originalRenderProfile=renderProfile;
-    renderProfile=function(){
-      const result=originalRenderProfile.apply(this,arguments);
-      try{
-        if(!getProfile?.()?.token){
-          const card=$('#profileCard');
-          if(card){
-            const h=card.querySelector('h2');
-            const p=card.querySelector('p.muted');
-            const b=card.querySelector('#profileCreateBtn');
-            if(h)h.textContent='Nepřijď o své výsledky';
-            if(p)p.textContent='Účet založíš za pár vteřin. Nejrychleji přes Google — uložíme XP, výsledky i sérii a přidáme +500 XP.';
-            if(b)b.textContent='🔒 Uložit výsledky · +500 XP';
-          }
-        }
-      }catch{}
-      return result;
-    };
-
     const originalRenderAccountNudge=renderAccountNudge;
     renderAccountNudge=function(stage){
       originalRenderAccountNudge.apply(this,arguments);

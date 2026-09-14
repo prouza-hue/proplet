@@ -143,7 +143,7 @@
       const level = d.levelFor(stats.points || 0);
       const queue = d.getQueue();
       if (!profile) {
-        d.$('#profileCard').innerHTML = '<h2>Postup je zatím jen tady</h2><p class="muted">Na tomhle zařízení o nic nepřijdeš. Účet navíc uloží XP, výsledky a sérii do cloudu a pustí tě do pořadí.</p><div class="account-actions"><button id="profileCreateBtn" class="primary-btn">☁️ Uložit postup</button><button id="profileLoginBtn" class="secondary-btn">Už účet mám</button></div>';
+        d.$('#profileCard').innerHTML = '<h2>Založ si účet a ulož výsledky + bonus 500 XP</h2><div class="account-actions"><button id="profileCreateBtn" class="primary-btn">Registrace</button><button id="profileLoginBtn" class="secondary-btn">Přihlášení</button></div>';
         setTimeout(() => {
           if (d.$('#profileLoginBtn')) d.$('#profileLoginBtn').onclick = () => d.openProfileModal('login');
           if (d.$('#profileCreateBtn')) d.$('#profileCreateBtn').onclick = () => d.openProfileModal('create');

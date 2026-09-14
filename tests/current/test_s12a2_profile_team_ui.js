@@ -18,7 +18,7 @@ function has(source,pattern,label){assert(pattern.test(source),label)}
 
 // Characterize the user-visible profile/team contract before ownership moves.
 [
-  'Postup je zatím jen tady',
+  'Založ si účet a ulož výsledky + bonus 500 XP',
   'Účet je v cloudu',
   'Tým je volitelný',
   'Vše synchronizováno',

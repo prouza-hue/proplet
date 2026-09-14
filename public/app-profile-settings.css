@@ -524,3 +524,10 @@ html[data-theme="dark"] .ranking-privacy-preview{background:#292631!important;bo
  #profileEditModal #displayNameMessage:empty{display:none}
  #profileEditModal #saveDisplayNameBtn{min-height:44px;margin-top:12px;padding:10px 16px;font-size:15px}
 }
+
+/* A distinct, readable sign-in action beside blue registration. */
+#profileCard #profileLoginBtn{background:#7047ad!important;color:#fff!important;border:1px solid #7047ad!important;box-shadow:0 3px 0 #4e307e!important;font-weight:800}
+#profileCard #profileLoginBtn:hover{background:#603b98!important;border-color:#603b98!important}
+#profileCard #profileLoginBtn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+html[data-theme=dark] #profileCard #profileLoginBtn{background:#bda0ec!important;color:#25183c!important;border-color:#cdb6f1!important;box-shadow:0 3px 0 #755699!important}
+html[data-theme=dark] #profileCard #profileLoginBtn:hover{background:#cdb6f1!important}

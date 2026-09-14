@@ -232,7 +232,7 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
       const heading=card.querySelector('h2');
       const button=card.querySelector('#profileCreateBtn');
       if(heading?.textContent?.trim()==='Nepřijdi o své výsledky')heading.textContent='Nepřijď o své výsledky';
-      if(button&&button.textContent!=='Uložit výsledky · +500 XP')button.textContent='Uložit výsledky · +500 XP';
+      if(button&&button.textContent!=='Registrace')button.textContent='Registrace';
     }
     const modalTitle=q('#profileModalTitle');
     if(modalTitle?.textContent?.trim()==='Nepřijdi o své výsledky')modalTitle.textContent='Nepřijď o své výsledky';

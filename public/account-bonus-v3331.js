@@ -41,20 +41,6 @@
       return {...stats,points:Number(stats.points||0)+missing,accountBonusXp:alreadyIncluded+missing};
     };
 
-    const originalRenderProfile=renderProfile;
-    renderProfile=function(){
-      const result=originalRenderProfile.apply(this,arguments);
-      if(!hasAccount()){
-        const card=document.querySelector('#profileCard');
-        if(card){
-          const h=card.querySelector('h2');if(h)h.textContent='Ulož si postup a získej 500 XP';
-          const p=card.querySelector('p.muted');if(p)p.textContent='Účet uloží XP, výsledky i sérii do cloudu. A teď za jeho vytvoření dostaneš +500 XP.';
-          const b=card.querySelector('#profileCreateBtn');if(b)b.textContent='🎁 Uložit postup · +500 XP';
-        }
-      }
-      return result;
-    };
-
     const originalSetAccountMode=setAccountMode;
     setAccountMode=function(mode){
       const result=originalSetAccountMode.apply(this,arguments);
