@@ -179,5 +179,6 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         auth_player=services.auth_player,
         enforce_rate_limit=services.enforce_rate_limit,
         canonical_origin=services.canonical_origin,
+        strict_owner_lock=services.vercel_env in {"preview", "production"},
     )
     _install_preview_auth_v334(app)
