@@ -85,6 +85,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_admin_legacy_recovery.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_s04_backend_foundation.py",
         "runner": "python"
       },
