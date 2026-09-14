@@ -168,17 +168,18 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         player_stats=services.player_stats,
         tz=services.tz,
     )
-    _install_admin_recovery(
-        app,
-        supabase_url=services.supabase_url,
-        supabase_key=services.supabase_key,
-        tz=services.tz,
-        db_select=services.db_select,
-        db_insert=services.db_insert,
-        db_update=services.db_update,
-        auth_player=services.auth_player,
-        enforce_rate_limit=services.enforce_rate_limit,
-        canonical_origin=services.canonical_origin,
-        strict_owner_lock=services.vercel_env in {"preview", "production"},
-    )
+    if services.vercel_env in {"preview", "production"}:
+        _install_admin_recovery(
+            app,
+            supabase_url=services.supabase_url,
+            supabase_key=services.supabase_key,
+            tz=services.tz,
+            db_select=services.db_select,
+            db_insert=services.db_insert,
+            db_update=services.db_update,
+            auth_player=services.auth_player,
+            enforce_rate_limit=services.enforce_rate_limit,
+            canonical_origin=services.canonical_origin,
+            strict_owner_lock=True,
+        )
     _install_preview_auth_v334(app)
