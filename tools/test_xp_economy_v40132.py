@@ -32,11 +32,11 @@ rows += [reward(f"board-{i}", f"jiné{i}", "2026-08-28T12:00:00+02:00") for i in
 rows += [reward("board-b", "slovo0", "2026-08-27T12:00:00+02:00")]
 
 summary = _discovery_summary(rows, puzzle_id="board-a", today="2026-08-28", tz=TZ)
-assert WORD_DISCOVERY_BOARD_XP_LIMIT == 5
+assert WORD_DISCOVERY_BOARD_XP_LIMIT is None
 assert WORD_DISCOVERY_DAILY_XP_LIMIT == 50
 assert summary["boardDiscoveryXp"] == 5
 assert summary["dailyDiscoveryXp"] == 50
-assert summary["boardRemainingXp"] == 0
+assert summary["boardRemainingXp"] is None
 assert summary["dailyRemainingXp"] == 0
 assert summary["totalDiscoveryXp"] == 51
 assert summary["discoveredWords"] == 50, "same word on another board earns XP again but remains one distinct word"

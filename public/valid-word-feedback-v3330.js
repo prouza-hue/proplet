@@ -6,7 +6,6 @@
   const FAILSAFE_SHOWN_KEY='proplet-v3-32-8-valid-nonsolution-failsafe-shown';
   const DISCOVERY_STORE_BASE='proplet-v4-word-discovery-v1';
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
-  const BOARD_XP_LIMIT=5;
   const DAILY_XP_LIMIT=50;
   const TRIGGER_STREAK=3;
   const BLOCKED_DISCOVERY_WORDS=new Set(['NEGR']);
@@ -61,9 +60,7 @@
   const localDay=()=>{try{return typeof pragueDateISO==='function'?pragueDateISO():new Date().toISOString().slice(0,10)}catch{return new Date().toISOString().slice(0,10)}};
   const localLimitReason=(candidate,store)=>{
     const entries=Object.values(store.entries||{}).filter(row=>['local','pending','confirmed'].includes(row?.status));
-    const board=entries.filter(row=>row?.puzzleId===candidate.puzzleId).length;
     const daily=entries.filter(row=>(row?.rewardDay||String(row?.createdAt||'').slice(0,10))===localDay()).length;
-    if(board>=BOARD_XP_LIMIT)return 'board_limit';
     if(daily>=DAILY_XP_LIMIT)return 'daily_limit';
     return null;
   };
@@ -139,14 +136,21 @@
         localWords=new Set(text.split(/\r?\n/).map(normalize).filter(w=>w.length>=4));
         return localWords;
       })
-      .catch(()=>null);
+      .catch(()=>null)
+      .finally(()=>{if(!localWords)localWordsPromise=null});
     return localWordsPromise;
   };
 
+  // Recognition only; mirrored in the server editorial overlay and regression-tested.
+  const editorialRecognitionWords=new Set(['setr','bígl','labrador','jilm']);
   const recognizeWord=async word=>{
     const normalized=normalize(word);
     if(BLOCKED_DISCOVERY_WORDS.has(normalized)){const miss={recognized:false,source:'editorial_block'};recognitionCache.set(normalized,miss);return miss;}
     if(recognitionCache.has(normalized))return recognitionCache.get(normalized);
+    if(editorialRecognitionWords.has(normalized)){
+      const hit={recognized:true,source:'editorial_overlay'};
+      recognitionCache.set(normalized,hit);return hit;
+    }
     const local=await loadLocalWords();
     if(local?.has(normalized)){
       const hit={recognized:true,source:'offline_seed'};
@@ -161,9 +165,8 @@
       recognitionCache.set(normalized,result);
       return result;
     }catch{
-      const miss={recognized:false,source:null};
-      recognitionCache.set(normalized,miss);
-      return miss;
+      // A transport failure is unknown, not a dictionary rejection. Retry next time.
+      return {recognized:false,source:null,unavailable:true};
     }
   };
 
@@ -428,7 +431,6 @@
           const awardState=await awardDiscovery(candidate);
           if(currentGame!==candidate.game||candidate.game.finished)return;
           const suffix=awardState==='awarded'?' · +1 XP'
-            :awardState==='board_limit'?' · Limit 5 XP na této desce už máš.'
             :awardState==='daily_limit'?' · Dnešní limit 50 XP už máš.'
             :awardState==='pending'?' · XP ověříme po připojení.'
             :awardState==='rejected'?' · Bonus XP se tentokrát nepřipsal.'

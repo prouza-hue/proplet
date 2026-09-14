@@ -16,7 +16,11 @@ DATA = ROOT / "data"
 
 # Player-reported, editorially verified forms that are useful for recognition even when they are
 # not desirable generation targets. Keep this overlay intentionally small and reviewable.
+# Verified in Lingea Slovník současné češtiny (2026-09-15):
+# https://www.nechybujte.cz/slovnik-soucasne-cestiny/PSI
+# https://www.nechybujte.cz/slovnik-soucasne-cestiny/jilm
 RECOGNITION_OVERLAY = {
+    "setr", "bígl", "labrador", "jilm",
     "bruska",
     "pnutí",
     "padnutí",
@@ -34,9 +38,9 @@ WORDFREQ_ZIPF_THRESHOLD_PLAIN = 2.85
 
 WORD_DISCOVERY_REWARD_PREFIX = "word_discovery_v1:"
 WORD_DISCOVERY_XP = 1
-WORD_DISCOVERY_BOARD_XP_LIMIT = 5
+WORD_DISCOVERY_BOARD_XP_LIMIT = None  # No per-board cap; daily cap and deduplication still apply.
 WORD_DISCOVERY_DAILY_XP_LIMIT = 50
-RECOGNITION_VERSION = 5
+RECOGNITION_VERSION = 6
 RECOGNITION_BLOCKLIST = frozenset({"negr"})
 
 _CZECH_WORD = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.IGNORECASE)
@@ -117,7 +121,7 @@ def _discovery_summary(rows: list[dict], *, puzzle_id: str = "", today: str = ""
         "discoveredWords": len(words),
         "boardDiscoveryXp": board_xp,
         "dailyDiscoveryXp": daily_xp,
-        "boardRemainingXp": max(0, WORD_DISCOVERY_BOARD_XP_LIMIT - board_xp),
+        "boardRemainingXp": None,
         "dailyRemainingXp": max(0, WORD_DISCOVERY_DAILY_XP_LIMIT - daily_xp),
     }
 
@@ -412,9 +416,7 @@ def install_word_recognition(
             tz=tz,
         )
         limit_reason = None
-        if usage["boardDiscoveryXp"] >= WORD_DISCOVERY_BOARD_XP_LIMIT:
-            limit_reason = "board_limit"
-        elif usage["dailyDiscoveryXp"] >= WORD_DISCOVERY_DAILY_XP_LIMIT:
+        if usage["dailyDiscoveryXp"] >= WORD_DISCOVERY_DAILY_XP_LIMIT:
             limit_reason = "daily_limit"
         if limit_reason:
             return {
