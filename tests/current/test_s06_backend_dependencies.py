@@ -40,6 +40,9 @@ import server  # noqa: E402
 import account_auth  # noqa: E402
 
 
+RECOVERY_ROUTES = {
+    "/api/admin/users/{player_id}/recovery-email",
+}
 EXPECTED_INSTALLER_ROUTES = (
     ("GET", "/api/account/auth-status"),
     ("POST", "/api/account/display-name"),
@@ -67,6 +70,8 @@ EXPECTED_INSTALLER_ROUTES = (
     ("GET", "/api/rescue-status"),
     ("POST", "/api/rescue/start"),
     ("POST", "/api/rescue/finish"),
+    ("GET", "/api/admin/users/{player_id}/recovery-email"),
+    ("POST", "/api/admin/users/{player_id}/recovery-email"),
 )
 
 route_keys = [
@@ -78,10 +83,14 @@ route_keys = [
 for expected in EXPECTED_INSTALLER_ROUTES:
     assert route_keys.count(expected) == 1, f"expected exactly one installed route: {expected}"
 
+# The historical digest deliberately excludes later additive endpoints; each of
+# those is characterized explicitly above instead of rewriting the old baseline.
 route_snapshot = sorted(
     (route.path, tuple(sorted(route.methods or ())), route.name)
     for route in server.app.routes
-    if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome"}
+    if route.path
+    and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome"}
+    and route.path not in RECOVERY_ROUTES
 )
 assert _digest(route_snapshot) == "f57b2cb7fee7e4cbcd81be61e6156c81716ece6e19e69033506b3b3318053bc6"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
@@ -89,6 +98,9 @@ assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
 assert "/api/account/welcome" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/account/welcome")
+for path in RECOVERY_ROUTES:
+    assert path in openapi_contract["paths"]
+    openapi_contract["paths"].pop(path)
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_digest = _digest(openapi_contract)
@@ -124,6 +136,7 @@ installer_names = (
     "_install_competitive_sharing",
     "_install_account_bonus",
     "_install_rescue_limit_v40115",
+    "_install_admin_recovery",
     "_install_preview_auth_v334",
 )
 with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names}) as installers:
@@ -134,5 +147,6 @@ with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names})
     assert tuple(calls) == installer_names
     assert installers["_install_push_diagnostics"].call_args.kwargs["db_rpc"] is None
     assert installers["_install_word_recognition"].call_args.kwargs["resolved_puzzle"] is None
+    assert installers["_install_admin_recovery"].call_args.kwargs["strict_owner_lock"] is False
 
 print("PASS: Sprint 06 explicit dependency and route/OpenAPI characterization")
