@@ -66,11 +66,16 @@ function ensureModals(){
    <div id="resetPasswordMessage" class="account-auth-message"></div><button id="completeRecoveryBtn" class="primary-btn big">Nastavit nové heslo</button>
   </div></div>
   <div id="profileEditModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left profile-edit-modal-card">
-   <button id="closeProfileEdit" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">TVŮJ PROFIL</span><h2>Jak ti má Proplet říkat?</h2>
+   <button id="closeProfileEdit" class="modal-close" aria-label="Zavřít">×</button><h2>Jak ti má Proplet říkat?</h2>
    <p class="muted">Přezdívka je jen tvoje jméno ve hře. Nemusí odpovídat jménu na Google účtu a můžeš ji kdykoli změnit.</p>
    <label>Přezdívka<input id="displayNameInput" maxlength="24" autocomplete="nickname" placeholder="např. Pavel nebo Slovožrout"></label>
    <div id="displayNameMessage" class="account-auth-message"></div><button id="saveDisplayNameBtn" class="primary-btn big">Uložit přezdívku</button>
-   <div class="profile-edit-avatar-block"><span class="stat-label">AVATAR</span><div id="profileEditGoogleAvatar"></div><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div><small class="field-note">Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.</small></div>
+  </div></div>
+  <div id="avatarEditModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="avatarEditTitle"><div class="modal-card left profile-edit-modal-card avatar-edit-modal-card">
+   <button id="closeAvatarEdit" class="modal-close" aria-label="Zavřít výběr avatara">×</button><h2 id="avatarEditTitle" tabindex="-1">Vyber si avatara</h2>
+   <p class="muted">Klepni na obrázek. Výběr se rovnou uloží.</p>
+   <div id="avatarEditMessage" class="account-auth-message" role="status" aria-live="polite"></div>
+   <div class="profile-edit-avatar-block"><div id="profileEditGoogleAvatar"></div><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div><small class="field-note">Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.</small></div>
   </div></div>
   <div id="recoveryEmailModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
    <button id="closeRecoveryEmail" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Přidat e-mail</h2>
@@ -80,12 +85,15 @@ function ensureModals(){
   </div></div>`);
  $('#closeForgotPassword').onclick=()=>closeModal('#forgotPasswordModal');
  $('#closeProfileEdit').onclick=()=>closeModal('#profileEditModal');
+ $('#closeAvatarEdit').onclick=closeAvatarEditor;
  $('#closeRecoveryEmail').onclick=()=>closeModal('#recoveryEmailModal');
  $('#sendRecoveryBtn').onclick=sendRecovery;
  $('#completeRecoveryBtn').onclick=completeRecovery;
  $('#saveDisplayNameBtn').onclick=saveDisplayName;
  $('#saveRecoveryEmailBtn').onclick=saveRecoveryEmail;
  ['#forgotPasswordModal','#profileEditModal','#recoveryEmailModal'].forEach(sel=>{$(sel).onclick=e=>{if(e.target===$(sel))closeModal(sel)}});
+ $('#avatarEditModal').onclick=e=>{if(e.target===$('#avatarEditModal'))closeAvatarEditor()};
+ $('#avatarEditModal').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeAvatarEditor()}});
 }
 
 function ensureLoginEnhancements(){
@@ -133,7 +141,8 @@ function enhanceProfileArchitecture(){
  const card=$('#profileCard'),p=profile();if(!card||!p)return;captureAvatars(card);
  card.querySelectorAll('.account-banner,.avatar-picker').forEach(n=>n.remove());
  const family=card.querySelector('.profile-family');if(family&&!p.familyCode)family.textContent='Bez týmu';
- const name=card.querySelector('.profile-name');if(name&&!card.querySelector('#editProfileInlineBtn')){const b=document.createElement('button');b.id='editProfileInlineBtn';b.className='profile-edit-inline';b.type='button';b.innerHTML='✎ <span>Upravit profil</span>';b.onclick=openProfileEditor;name.insertAdjacentElement('afterend',b)}
+ const avatar=card.querySelector('#editAvatarBtn');if(avatar)avatar.onclick=openAvatarEditor;
+ const name=card.querySelector('.profile-name');if(name&&!card.querySelector('#editProfileInlineBtn')){const b=document.createElement('button');b.id='editProfileInlineBtn';b.className='secondary-btn profile-edit-name';b.type='button';b.textContent='Změnit přezdívku';b.onclick=openProfileEditor;name.insertAdjacentElement('afterend',b)}
  const team=card.querySelector('.team-access-card');if(team)ensureTeamSection(team);
  const support=card.querySelector('.support-mode-card');if(support)moveSupportSetting(support);
  const admin=card.querySelector('#adminEntryBtn');if(admin)moveAdminEntry(admin);
@@ -157,7 +166,31 @@ async function refreshSecurityCard(){
 }
 
 function openProfileEditor(){
- const p=profile();if(!p)return;ensureModals();$('#displayNameInput').value=p.name||'';$('#displayNameMessage').textContent='';const avatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];const google=$('#profileEditGoogleAvatar'),safeUrl=typeof safeGoogleAvatarUrl==='function'?safeGoogleAvatarUrl(p.googleAvatarUrl):'';google.innerHTML=safeUrl?`<button type="button" id="useGoogleAvatarBtn" class="google-avatar-choice ${p.useGoogleAvatar?'selected':''}"><img src="${esc(safeUrl)}" alt="" referrerpolicy="no-referrer"><span><strong>Fotka z Googlu</strong><small>${p.useGoogleAvatar?'Používáš v Propletu':'Použít jako avatar'}</small></span></button>`:(p.googleLinked?'<div class="google-avatar-unavailable"><strong>Fotku z Googlu načteme při příštím přihlášení přes Google.</strong></div>':'');$('#useGoogleAvatarBtn')?.addEventListener('click',async()=>{if(typeof saveGoogleAvatar==='function'){await saveGoogleAvatar();openProfileEditor()}});const grid=$('#profileEditAvatarGrid');const buttonFor=a=>`<button type="button" class="avatar-choice ${!p.useGoogleAvatar&&a===(p.avatar||'🙂')?'selected':''}" data-edit-avatar="${esc(a)}">${esc(a)}</button>`;grid.innerHTML=avatars.map(buttonFor).join('');grid.querySelectorAll('[data-edit-avatar]').forEach(b=>b.onclick=async()=>{if(typeof saveAvatar==='function'){await saveAvatar(b.dataset.editAvatar);openProfileEditor()}});openModal('#profileEditModal');setTimeout(()=>$('#displayNameInput')?.focus(),60);
+ const p=profile();if(!p)return;ensureModals();$('#displayNameInput').value=p.name||'';$('#displayNameMessage').textContent='';openModal('#profileEditModal');$('#displayNameInput').focus({preventScroll:true});
+}
+let avatarSaveBusy=false;
+function closeAvatarEditor(){closeModal('#avatarEditModal');$('#editAvatarBtn')?.focus({preventScroll:true})}
+async function selectProfileAvatar(value,useGoogle=false){
+ if(avatarSaveBusy)return;avatarSaveBusy=true;
+ const modal=$('#avatarEditModal'),msg=$('#avatarEditMessage'),buttons=[...modal.querySelectorAll('.avatar-choice,.google-avatar-choice')];
+ buttons.forEach(b=>b.disabled=true);modal.setAttribute('aria-busy','true');msg.textContent='Ukládám avatara…';
+ try{
+  const saved=useGoogle?await saveGoogleAvatar():await saveAvatar(value);
+  if(saved){closeAvatarEditor()}else{msg.textContent='Avatara se nepodařilo uložit. Zkus to prosím znovu.'}
+ }catch(e){msg.textContent=e.message||'Avatara se nepodařilo uložit.'}
+ finally{avatarSaveBusy=false;buttons.forEach(b=>b.disabled=false);modal.removeAttribute('aria-busy')}
+}
+function openAvatarEditor(){
+ const p=profile();if(!p||avatarSaveBusy)return;ensureModals();
+ $('#avatarEditMessage').textContent='';
+ const avatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];
+ const google=$('#profileEditGoogleAvatar'),safeUrl=typeof safeGoogleAvatarUrl==='function'?safeGoogleAvatarUrl(p.googleAvatarUrl):'';
+ google.innerHTML=safeUrl?`<button type="button" id="useGoogleAvatarBtn" class="google-avatar-choice ${p.useGoogleAvatar?'selected':''}"><img src="${esc(safeUrl)}" alt="" referrerpolicy="no-referrer"><span><strong>Fotka z Googlu</strong><small>${p.useGoogleAvatar?'Používáš v Propletu':'Použít jako avatar'}</small></span></button>`:(p.googleLinked?'<div class="google-avatar-unavailable"><strong>Fotku z Googlu načteme při příštím přihlášení přes Google.</strong></div>':'');
+ $('#useGoogleAvatarBtn')?.addEventListener('click',()=>selectProfileAvatar(null,true));
+ const grid=$('#profileEditAvatarGrid');
+ grid.innerHTML=avatars.map(a=>`<button type="button" class="avatar-choice ${!p.useGoogleAvatar&&a===(p.avatar||'🙂')?'selected':''}" data-edit-avatar="${esc(a)}">${esc(a)}</button>`).join('');
+ grid.querySelectorAll('[data-edit-avatar]').forEach(b=>b.onclick=()=>selectProfileAvatar(b.dataset.editAvatar));
+ openModal('#avatarEditModal');$('#avatarEditTitle').focus({preventScroll:true});
 }
 async function saveDisplayName(){
  const input=$('#displayNameInput'),msg=$('#displayNameMessage'),btn=$('#saveDisplayNameBtn'),name=String(input.value||'').trim().replace(/\s+/g,' ');msg.textContent='';if(!name){msg.textContent='Napiš, jak ti má Proplet říkat.';return}if(name.length>24){msg.textContent='Přezdívka může mít nejvýš 24 znaků.';return}btn.disabled=true;

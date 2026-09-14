@@ -166,7 +166,7 @@
         const teamAccess = inTeam
           ? `<div class="team-access-card"><div><strong>👥 ${d.esc(profile.leagueName || profile.familyCode)}</strong><span>Týmové pořadí je aktivní. PIN slouží jen jako pozvánka pro další hráče.</span></div><button id="teamPinBtn" class="secondary-btn">Nastavit PIN</button></div>`
           : '<div class="team-access-card team-empty"><div><strong>👥 Tým je volitelný</strong><span>Účet funguje i bez něj. Přidej rodinu nebo partu, až budeš chtít společné pořadí.</span></div><button id="joinTeamBtn" class="secondary-btn">Přidat tým</button></div>';
-        d.$('#profileCard').innerHTML = `<div class="profile-summary"><div class="profile-identity"><div class="profile-avatar-big">${d.esc(profile.avatar || '🙂')}</div><div><div class="profile-name">${d.esc(profile.name)}</div><div class="profile-family">${inTeam ? `Tým: ${d.esc(profile.leagueName || profile.familyCode)}` : 'Bez týmu · účet je uložený'}</div></div></div><div class="streak-bubble"><span class="streak-icon">🔥</span><strong>${stats.currentStreak || 0}</strong><small>${d.czPlural(stats.currentStreak || 0, 'den', 'dny', 'dní')}</small></div></div><div class="avatar-picker"><span class="stat-label">TVŮJ AVATAR</span><div class="avatar-grid">${avatars}</div></div><div class="profile-grid"><div class="profile-stat"><span class="stat-label">XP</span><strong>${stats.points ?? local.points}</strong></div><div class="profile-stat profile-rank-stat"><span class="stat-label">Hodnost</span><div class="profile-rank-value"><span class="profile-rank-icon">${level.current.icon}</span><strong>${level.index} · ${d.esc(level.current.name)}</strong></div></div><div class="profile-stat profile-stat-wide"><span class="stat-label">Hotovo</span><div class="profile-completion-grid"><span><b>${stats.freeCompleted?.easy ?? local.freeCompleted?.easy ?? 0}</b><small>🌱 Snadná</small></span><span><b>${stats.freeCompleted?.medium ?? local.freeCompleted?.medium ?? 0}</b><small>🧠 Střední</small></span><span><b>${stats.freeCompleted?.hard ?? local.freeCompleted?.hard ?? 0}</b><small>🔥 Těžká</small></span><span><b>${stats.freeCompleted?.hardcore ?? local.freeCompleted?.hardcore ?? 0}</b><small>🤯 Mozkožrout</small></span></div></div><div class="profile-stat profile-stat-wide profile-daily-highlights"><span><small>Denní výzvy</small><b>${stats.dailyCompleted ?? local.dailyCompleted}</b></span><span><small>Nejdelší série</small><b>${stats.longestStreak ?? local.longestStreak}</b></span><span><small>Nejlepší Daily</small><b>${d.fmtTime(stats.bestDailyMs ?? local.bestDailyMs)}</b></span></div></div>${account}<div class="support-mode-card"><div><span class="stat-label">POMOCNÍK</span><strong>${d.SUPPORT_MODES[profile.supportMode || 'none']?.icon || '🧠'} ${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.label || 'Nenabízet')}</strong><small>${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.desc || '')}</small></div><button id="supportModeBtn" class="secondary-btn">Nastavit</button></div>${teamAccess}<a id="adminEntryBtn" class="admin-entry hidden" href="/admin"><span>🛠</span><div><strong>Proplet Admin</strong><small>Quality, hlášení a uživatelé</small></div><b>→</b></a><div class="sync-panel"><div class="sync-status ${statusClass}"><div><strong>${d.esc(status[0])}</strong><div>${d.esc(status[1])}</div></div><span>${syncState.status === 'syncing' ? '↻' : queue.length ? '☁️' : '✓'}</span></div><button id="syncBtn" class="secondary-btn" ${syncState.status === 'syncing' ? 'disabled' : ''}>${syncState.status === 'syncing' ? 'Synchronizuji…' : `Synchronizovat${queue.length ? ` (${queue.length})` : ''}`}</button></div><button id="logoutBtn" class="logout-btn">Odhlásit hráče z tohoto zařízení</button>`;
+        d.$('#profileCard').innerHTML = `<div class="profile-summary"><div class="profile-identity"><div class="profile-avatar-control"><button type="button" id="editAvatarBtn" class="profile-avatar-big" aria-label="Změnit avatara">${d.esc(profile.avatar || '🙂')}</button><span aria-hidden="true">Změnit avatar</span></div><div><div class="profile-name">${d.esc(profile.name)}</div><div class="profile-family">${inTeam ? `Tým: ${d.esc(profile.leagueName || profile.familyCode)}` : 'Bez týmu · účet je uložený'}</div></div></div><div class="streak-bubble"><span class="streak-icon">🔥</span><strong>${stats.currentStreak || 0}</strong><small>${d.czPlural(stats.currentStreak || 0, 'den', 'dny', 'dní')}</small></div></div><div class="avatar-picker"><span class="stat-label">TVŮJ AVATAR</span><div class="avatar-grid">${avatars}</div></div><div class="profile-grid"><div class="profile-stat"><span class="stat-label">XP</span><strong>${stats.points ?? local.points}</strong></div><div class="profile-stat profile-rank-stat"><span class="stat-label">Hodnost</span><div class="profile-rank-value"><span class="profile-rank-icon">${level.current.icon}</span><strong>${level.index} · ${d.esc(level.current.name)}</strong></div></div><div class="profile-stat profile-stat-wide"><span class="stat-label">Hotovo</span><div class="profile-completion-grid"><span><b>${stats.freeCompleted?.easy ?? local.freeCompleted?.easy ?? 0}</b><small>🌱 Snadná</small></span><span><b>${stats.freeCompleted?.medium ?? local.freeCompleted?.medium ?? 0}</b><small>🧠 Střední</small></span><span><b>${stats.freeCompleted?.hard ?? local.freeCompleted?.hard ?? 0}</b><small>🔥 Těžká</small></span><span><b>${stats.freeCompleted?.hardcore ?? local.freeCompleted?.hardcore ?? 0}</b><small>🤯 Mozkožrout</small></span></div></div><div class="profile-stat profile-stat-wide profile-daily-highlights"><span><small>Denní výzvy</small><b>${stats.dailyCompleted ?? local.dailyCompleted}</b></span><span><small>Nejdelší série</small><b>${stats.longestStreak ?? local.longestStreak}</b></span><span><small>Nejlepší Daily</small><b>${d.fmtTime(stats.bestDailyMs ?? local.bestDailyMs)}</b></span></div></div>${account}<div class="support-mode-card"><div><span class="stat-label">POMOCNÍK</span><strong>${d.SUPPORT_MODES[profile.supportMode || 'none']?.icon || '🧠'} ${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.label || 'Nenabízet')}</strong><small>${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.desc || '')}</small></div><button id="supportModeBtn" class="secondary-btn">Nastavit</button></div>${teamAccess}<a id="adminEntryBtn" class="admin-entry hidden" href="/admin"><span>🛠</span><div><strong>Proplet Admin</strong><small>Quality, hlášení a uživatelé</small></div><b>→</b></a><div class="sync-panel"><div class="sync-status ${statusClass}"><div><strong>${d.esc(status[0])}</strong><div>${d.esc(status[1])}</div></div><span>${syncState.status === 'syncing' ? '↻' : queue.length ? '☁️' : '✓'}</span></div><button id="syncBtn" class="secondary-btn" ${syncState.status === 'syncing' ? 'disabled' : ''}>${syncState.status === 'syncing' ? 'Synchronizuji…' : `Synchronizovat${queue.length ? ` (${queue.length})` : ''}`}</button></div><button id="logoutBtn" class="logout-btn">Odhlásit hráče z tohoto zařízení</button>`;
         const mainAvatar = d.$('#profileCard .profile-avatar-big');
         if (mainAvatar) mainAvatar.innerHTML = profileAvatarMarkup(profile);
         setTimeout(() => {
@@ -202,7 +202,7 @@
 
     async function saveAvatar(avatar) {
       const profile = d.getProfile();
-      if (!profile?.token) return;
+      if (!profile?.token) return false;
       try {
         const result = await d.api('/api/avatar', {method: 'POST', body: JSON.stringify({avatar, use_google_avatar: false})});
         d.updateAccountProfile({avatar: result.avatar, useGoogleAvatar: false, googleAvatarUrl: result.googleAvatarUrl || profile.googleAvatarUrl || null});
@@ -210,22 +210,26 @@
         d.renderProfile();
         if (d.getCurrentScreen() === 'leaderboard') d.renderLeaderboard();
         d.showToast('Avatar uložen ✓');
+        return true;
       } catch (error) {
         d.showToast(error.message);
+        return false;
       }
     }
 
     async function saveGoogleAvatar() {
       const profile = d.getProfile();
-      if (!profile?.token || !safeGoogleAvatarUrl(profile.googleAvatarUrl)) return;
+      if (!profile?.token || !safeGoogleAvatarUrl(profile.googleAvatarUrl)) return false;
       try {
         const result = await d.api('/api/avatar', {method: 'POST', body: JSON.stringify({use_google_avatar: true})});
         d.updateAccountProfile({useGoogleAvatar: true, googleAvatarUrl: result.googleAvatarUrl || profile.googleAvatarUrl});
         updateProfileChip();
         d.renderProfile();
         d.showToast('Google fotka je teď tvůj avatar ✓');
+        return true;
       } catch (error) {
         d.showToast(error.message);
+        return false;
       }
     }
 

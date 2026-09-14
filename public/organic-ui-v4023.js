@@ -126,7 +126,7 @@ function decorateAvatarPickers(){
  });
 }
 function polishAvatarEditor(){
- const note=decorationOne('#profileEditModal .profile-edit-avatar-block .field-note');
+ const note=decorationOne('#avatarEditModal .profile-edit-avatar-block .field-note');
  if(note&&note.textContent.includes('emoji'))note.textContent='Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.';
 }
 function decorateInlineLeaderboardAvatars(){

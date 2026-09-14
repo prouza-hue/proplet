@@ -1,0 +1,28 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+(async()=>{
+const source=fs.readFileSync('public/account-auth.js','utf8');
+const code=source.slice(source.indexOf('function openProfileEditor(){'),source.indexOf('async function saveDisplayName(){'));
+let focused='',closed=0,calls=0,release;
+const buttons=[{disabled:false},{disabled:false}];
+const nodes=new Map();
+for(const id of ['#avatarEditModal','#avatarEditMessage','#editAvatarBtn','#avatarEditTitle','#displayNameInput','#displayNameMessage','#profileEditGoogleAvatar','#profileEditAvatarGrid'])nodes.set(id,{textContent:'',value:'',innerHTML:'',focus(){focused=id},setAttribute(){},removeAttribute(){},querySelectorAll(){return buttons}});
+const ctx={$:id=>nodes.get(id),profile:()=>({name:'Test',avatar:'🙂'}),ensureModals(){},openModal(){},closeModal(){closed++},knownAvatars:['🙂'],esc:String,saveAvatar:async()=>{calls++;return new Promise(r=>release=r)},saveGoogleAvatar:async()=>false};
+vm.createContext(ctx);vm.runInContext(code,ctx);
+ctx.openAvatarEditor();assert.equal(focused,'#avatarEditTitle','opening avatars must not focus a text input');
+const pending=ctx.selectProfileAvatar('🐕');
+assert(buttons.every(b=>b.disabled));
+await ctx.selectProfileAvatar('👻');assert.equal(calls,1,'ignore duplicate taps while saving');
+release(true);await pending;assert.equal(closed,1);assert.equal(focused,'#editAvatarBtn');assert(buttons.every(b=>!b.disabled));
+ctx.saveAvatar=async()=>false;await ctx.selectProfileAvatar('👻');assert.equal(closed,1,'failure must keep the selector open');assert(nodes.get('#avatarEditMessage').textContent.includes('nepodařilo'));
+ctx.saveAvatar=async()=>{throw Error('Offline')};await ctx.selectProfileAvatar('👻');assert.equal(closed,1);assert.equal(nodes.get('#avatarEditMessage').textContent,'Offline');assert(buttons.every(b=>!b.disabled));
+ctx.saveGoogleAvatar=async()=>true;await ctx.selectProfileAvatar(null,true);assert.equal(closed,2);
+ctx.openProfileEditor();assert.equal(focused,'#displayNameInput','nickname focus only after explicitly opening nickname editor');
+const modal=source.slice(source.indexOf('<div id="avatarEditModal"'),source.indexOf('<div id="recoveryEmailModal"'));
+assert(!modal.includes('<input')&&!modal.includes('Uložit přezdívku'));
+const account=fs.readFileSync('public/app/account/account.js','utf8');
+const saveCode=account.slice(account.indexOf('    async function saveAvatar('),account.indexOf('    function openTeamPinModal('));
+ctx.d={getProfile:()=>({token:'test'}),api:async()=>({avatar:'🐕'}),updateAccountProfile(){},renderProfile(){},getCurrentScreen:()=>'',showToast(){}};ctx.updateProfileChip=()=>{};
+vm.runInContext(saveCode,ctx);assert.equal(await ctx.saveAvatar('🐕'),true);
+ctx.d.api=async()=>{throw Error('Offline')};assert.equal(await ctx.saveAvatar('🐕'),false);
+console.log('PASS: avatar-only focus, single save, success closes, failure stays open and nickname is separate');
+})().catch(e=>{console.error(e);process.exit(1)});

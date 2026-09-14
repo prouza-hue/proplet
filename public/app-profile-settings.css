@@ -461,6 +461,19 @@ html[data-theme="dark"] #screen-profile:not(.settings-open) .streak-bubble{
   border-color:color-mix(in srgb,#d89c28 34%,#51452a)!important;
 }
 
+/* Avatar selection and nickname editing have separate, explicit entry points. */
+.profile-avatar-control{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto}
+.profile-avatar-control>span{font-size:10px;line-height:1.2;color:var(--muted);white-space:nowrap}
+button.profile-avatar-big{padding:0;cursor:pointer;appearance:none;font-family:inherit}
+button.profile-avatar-big:focus-visible{outline:3px solid var(--purple);outline-offset:4px}
+#editProfileInlineBtn.profile-edit-name{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 10px;margin-top:8px;font-size:12px;line-height:1.3;white-space:normal}
+#avatarEditModal .avatar-edit-modal-card{display:flex;flex-direction:column;max-height:86vh;max-height:86dvh;overflow:hidden}
+#avatarEditModal h2{padding-right:25px;margin-bottom:8px;flex-shrink:0}
+#avatarEditModal .profile-edit-avatar-block{overflow-y:auto;overscroll-behavior:contain;min-height:0;margin-top:0;padding-top:0;border-top:0;padding-bottom:8px}
+#avatarEditModal #avatarEditMessage:empty{display:none}
+#avatarEditModal .field-note{display:block;margin-top:14px}
+#avatarEditModal [aria-busy="true"]{cursor:progress}
+
 /* Former dynamically appended account-auth.css; remains last inside this owner. */
 /* Proplet v3.31.8 — account recovery, identity and profile IA */
 .account-auth-extras{display:grid;gap:9px;margin:3px 0 10px}.optional-tag{display:inline-flex;margin-left:5px;padding:2px 6px;border-radius:999px;background:#f0edf5;color:#777286;font-size:9px;font-weight:850;text-transform:none;letter-spacing:0}.account-email-create{display:grid;gap:7px;margin-bottom:2px}.account-email-warning{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid #efdfaa;border-radius:13px;background:#fff9e8}.account-email-warning>span{font-size:18px;line-height:1.15}.account-email-warning strong,.account-email-warning small{display:block}.account-email-warning strong{font-size:11px}.account-email-warning small{margin-top:2px;color:#756c55;font-size:10.5px;line-height:1.35}.account-forgot-btn{justify-self:center;border:0;background:transparent;color:#6258c7;font-size:11px;font-weight:850;padding:5px 8px;cursor:pointer}.account-forgot-btn:hover{text-decoration:underline}.account-auth-divider{display:flex;align-items:center;gap:9px;color:#9a95a8;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.account-auth-divider::before,.account-auth-divider::after{content:"";height:1px;flex:1;background:var(--line)}
