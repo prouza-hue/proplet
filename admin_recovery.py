@@ -14,8 +14,8 @@ from starlette.responses import JSONResponse
 
 
 # Proplet administration is intentionally personal, not delegable by adding a
-# row to admin_accounts. Changing the owner therefore requires a reviewed code
-# change as well as a database grant.
+# row to admin_accounts. Changing the deployed owner therefore requires a
+# reviewed code change as well as a database grant.
 ADMIN_OWNER_PLAYER_ID = "e1740794-d196-48da-a59a-2741eadb8e44"
 _EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 
@@ -35,10 +35,7 @@ def _mask_email(raw: Optional[str]) -> Optional[str]:
     if not raw or "@" not in str(raw):
         return None
     local, domain = str(raw).split("@", 1)
-    if len(local) <= 2:
-        visible = local[:1]
-    else:
-        visible = local[:2]
+    visible = local[:1] if len(local) <= 2 else local[:2]
     return f"{visible}***@{domain}"
 
 
@@ -54,6 +51,7 @@ def install_admin_recovery(
     auth_player: Callable,
     enforce_rate_limit: Callable,
     canonical_origin: str = "https://hrajproplet.cz",
+    strict_owner_lock: bool = True,
     httpx_client_factory: Callable = httpx.Client,
 ) -> None:
     """Install a non-delegable admin gate and support-assisted email recovery.
@@ -61,41 +59,50 @@ def install_admin_recovery(
     The admin never marks an email as verified. It can only issue a link_email
     challenge for a stable player_id. The existing public account callback then
     verifies control of the mailbox through Supabase Auth before linking it.
+
+    ``strict_owner_lock`` is enabled for Vercel preview/production. Local test
+    harnesses may disable it so their synthetic admin IDs keep working.
     """
 
     origin = str(canonical_origin or "https://hrajproplet.cz").rstrip("/")
 
-    def require_owner(authorization: Optional[str]) -> dict:
-        player = auth_player(authorization)
-        if str(player.get("id") or "") != ADMIN_OWNER_PLAYER_ID:
-            raise HTTPException(403, "Administrace je dostupná pouze vlastníkovi Propletu")
-        grants = db_select("admin_accounts", player_id=ADMIN_OWNER_PLAYER_ID)
-        owner_grant = next(
-            (
-                row
-                for row in grants
-                if row.get("active") is True and str(row.get("role") or "") == "owner"
-            ),
+    def active_grant(player_id: str) -> Optional[dict]:
+        return next(
+            (row for row in db_select("admin_accounts", player_id=player_id) if row.get("active") is True),
             None,
         )
-        if not owner_grant:
+
+    def require_admin_actor(authorization: Optional[str], *, owner_only: bool = False) -> dict:
+        player = auth_player(authorization)
+        player_id = str(player.get("id") or "")
+        if strict_owner_lock and player_id != ADMIN_OWNER_PLAYER_ID:
+            raise HTTPException(403, "Administrace je dostupná pouze vlastníkovi Propletu")
+        grant = active_grant(player_id)
+        if not grant:
+            raise HTTPException(403, "Tento hráč nemá přístup do administrace")
+        role = str(grant.get("role") or "viewer")
+        if strict_owner_lock and role != "owner":
             raise HTTPException(403, "Vlastnické oprávnění administrace není aktivní")
-        return {"player": player, "account": owner_grant, "role": "owner"}
+        if owner_only and role != "owner":
+            raise HTTPException(403, "Obnovu účtu může provést pouze vlastník Propletu")
+        return {"player": player, "account": grant, "role": role}
 
     @app.middleware("http")
     async def proplet_owner_only_admin(request: Request, call_next):
-        # Keep the static /admin shell loadable; every API read/write behind it
-        # is owner-gated. OPTIONS is harmless and may be needed by tooling.
-        if request.url.path.startswith("/api/admin/") and request.method != "OPTIONS":
+        # Keep the static /admin shell loadable; every deployed admin API read or
+        # write is additionally pinned to the single immutable owner player_id.
+        if strict_owner_lock and request.url.path.startswith("/api/admin/") and request.method != "OPTIONS":
             try:
-                request.state.proplet_admin_owner = require_owner(request.headers.get("authorization"))
+                request.state.proplet_admin_owner = require_admin_actor(request.headers.get("authorization"))
             except HTTPException as exc:
                 return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
         return await call_next(request)
 
     def request_owner(request: Request, authorization: Optional[str]) -> dict:
         cached = getattr(request.state, "proplet_admin_owner", None)
-        return cached or require_owner(authorization)
+        if cached and cached.get("role") == "owner":
+            return cached
+        return require_admin_actor(authorization, owner_only=True)
 
     def target_player(player_id: str) -> dict:
         rows = db_select("players", id=player_id)
@@ -147,7 +154,7 @@ def install_admin_recovery(
         raw = secrets.token_urlsafe(32)
         now = datetime.now(tz)
         # A new support action supersedes every unfinished link-email attempt for
-        # this account. This also prevents an older address from winning a race.
+        # this account. This prevents an older address from winning a race.
         for old in db_select("account_auth_challenges", player_id=player_id):
             if old.get("purpose") == "link_email" and not old.get("used_at"):
                 try:
