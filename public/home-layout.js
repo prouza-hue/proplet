@@ -92,9 +92,8 @@
 
   function difficultyTiles(){
     return Object.entries(DIFF).filter(([key])=>key!=='mozkomor').map(([key,info])=>{
-      const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0,next=Number((q.resume||q.nextUnsolved)?.meta?.level)||1;
-      const state=q.resume?'Rozehráno':q.done>=q.total&&q.total?'Dokončeno':`Další: ${next}`;
-      return `<button class="home-diff-tile" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${htmlEsc(info.label)}, ${q.done} z ${q.total} hotovo"><span class="home-diff-top"><span class="home-diff-icon-wrap">${difficultyIconMarkup(key,'home-diff-icon')}</span><strong>${htmlEsc(info.label)}</strong><b class="home-diff-xp">+${info.xp} XP</b></span><span class="home-diff-meta"><b>${htmlEsc(state)}</b><span>${q.done} / ${q.total}</span></span><i class="home-diff-progress"><b style="width:${pct}%"></b></i></button>`;
+      const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0,action=q.resume?'Pokračovat':q.done>=q.total&&q.total?'Zahrát znovu':'Hrát';
+      return `<button class="today-card ${key}" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${action}: ${htmlEsc(info.label)}, ${q.done} z ${q.total} dokončeno, +${info.xp} XP za novou úroveň">${difficultyIconMarkup(key,'today-art')}<span class="today-title"><strong>${htmlEsc(info.label)}</strong><span class="today-xp">+${info.xp} XP</span></span><span class="today-progress"><span class="today-count"><b>${q.done}</b> / ${q.total}</span><span class="today-track" aria-hidden="true"><span style="width:${pct}%"></span></span></span><span class="today-action">${action} <span class="today-arrow" aria-hidden="true">→</span></span></button>`;
     }).join('');
   }
 
@@ -105,7 +104,7 @@
     card.classList.add('home-free-section');
     if(title)title.textContent='Volná hra';
     if(all)all.innerHTML='Všechny hry <span>→</span>';
-    root.innerHTML=`<div class="home-diff-grid">${difficultyTiles()}</div>`;
+    root.innerHTML=`<div class="today-grid">${difficultyTiles()}</div>`;
     root.querySelectorAll('[data-home-free]').forEach(btn=>btn.addEventListener('click',()=>startFree(btn.dataset.homeFree)));
   }
 
