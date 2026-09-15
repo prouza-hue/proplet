@@ -60,9 +60,9 @@ for payload in (puzzles, public_puzzles):
 assert "mozkomor:{label:'Mozkomor'" in app
 assert "xp:150" in app
 assert "const MOZKOMOR_UNLOCK_BASE=200" in app
-assert "Odemkne se po dokončení všech 200 Mozkožroutů" in app
-assert "<small>/200</small>" in app
-assert "+150 XP za novou úroveň" in app
+assert "a vypusť Mozkomora" in app
+assert "${unlock.done} / ${unlock.required} dokončeno" in app
+assert "mozkomor-lock-meter" in app
 assert "ÚROVEŇ ${nextLevel||1} Z ${total}" not in app
 
 # Dnes never exposes Mozkomor, including quick play, resume, or local recent history.

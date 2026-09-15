@@ -92,11 +92,11 @@
 
   if(themeOnly)return;
 
-  // Cold-start bootstrap: only a page without a controlling service worker and
-  // without an already cached canonical database is eligible. Any bootstrap
+  // Bootstrap is also usable on an offline return before the first free game.
+  // An already cached canonical database takes precedence. Any bootstrap
   // validation failure falls straight through to the existing /puzzles.json path.
   const bootstrapParams=new URLSearchParams(location.search);
-  const bootstrapEligible=!navigator.serviceWorker?.controller&&typeof window.fetch==='function'&&!bootstrapParams.has('content_preview')&&!bootstrapParams.has('tajenka');
+  const bootstrapEligible=typeof window.fetch==='function'&&!bootstrapParams.has('content_preview')&&!bootstrapParams.has('tajenka');
   if(bootstrapEligible){
     const baseFetch=window.fetch.bind(window);
     let coldPuzzleConsumed=false;
@@ -111,6 +111,9 @@
           const data=await response.clone().json();
           const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
           const valid=data?.bootstrapSchema===1&&[9,10,11].includes(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4&&Array.isArray(data?.daily)&&data.daily.length>0&&typeof data?.bootstrapSource?.sha256==='string'&&data.bootstrapSource.sha256.length===64&&typeof data?.bootstrapValidFrom==='string'&&typeof data?.bootstrapValidThrough==='string'&&today>=data.bootstrapValidFrom&&today<=data.bootstrapValidThrough;
+          if(valid&&'caches' in window){
+            try{await (await caches.open('proplet-data-v11')).put('/puzzles-bootstrap.json',response.clone())}catch{}
+          }
           return valid?response:null;
         }catch{return null}
       }).catch(()=>null);
@@ -118,7 +121,7 @@
     window.__PROPLET_COLD_BOOTSTRAP_PREFETCH=coldBootstrapFetch;
 
     const hydrator=document.createElement('script');
-    hydrator.src='/bootstrap-hydrator.js?v=1';
+    hydrator.src='/bootstrap-hydrator.js?v=auditphase2-2';
     hydrator.async=false;
     hydrator.dataset.propletBootstrapHydrator='1';
     document.head.appendChild(hydrator);
@@ -132,15 +135,20 @@
           return coldBootstrapFetch.then(response=>{
             if(!response?.ok)return baseFetch(input,init);
             window.__PROPLET_BOOTSTRAP_DELIVERED__=true;
-            if(!window.__PROPLET_FULL_PUZZLE_DATA_PROMISE){
+            // Keep the complete bank demand-driven: the bootstrap already
+            // contains Daily and every free-level descriptor used by the home.
+            window.__PROPLET_FETCH_FULL_PUZZLE_DATA=()=>{
+             if(!window.__PROPLET_FULL_PUZZLE_DATA_PROMISE){
               window.__PROPLET_FULL_PUZZLE_DATA_PROMISE=baseFetch('/puzzles.json',{cache:'no-store'}).then(fullResponse=>{
                 if(!fullResponse?.ok)throw new Error(`canonical-puzzle-db-${fullResponse?.status||'fetch'}`);
                 if('caches' in window){
-                  try{caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',fullResponse.clone())).catch(()=>{})}catch{}
+                  try{const cachedResponse=fullResponse.clone();caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
                 }
                 return fullResponse.json();
-              });
-            }
+              }).catch(error=>{window.__PROPLET_FULL_PUZZLE_DATA_PROMISE=null;throw error});
+             }
+             return window.__PROPLET_FULL_PUZZLE_DATA_PROMISE;
+            };
             return response.clone();
           });
         }
@@ -231,11 +239,11 @@
     await loadScript('/account-conversion-v3331.js?v=reminders1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=settingssimple1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=guestcta1','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=auditphase2-2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');
-    loadScript('/tajenka-runtime-polish.js?v=1','propletTajenkaRuntimePolish');
+    loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep
     // the document valid, so delegate only its active play CTA back to the

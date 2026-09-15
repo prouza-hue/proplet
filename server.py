@@ -125,9 +125,11 @@ logger = logging.getLogger("proplet")
 
 @app.middleware("http")
 async def launch_safety_middleware(request: Request, call_next):
-    if VERCEL_ENV == "preview" and request.method == "POST" and request.url.path in {"/api/product-event","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    # Use the ASGI routing path, independent of the untrusted Host header.
+    path = request.scope["path"]
+    if VERCEL_ENV == "preview" and request.method == "POST" and path in {"/api/product-event","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
-    if (VERCEL_ENV == "preview" or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and request.url.path == "/api/result":
+    if (VERCEL_ENV == "preview" or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
@@ -171,21 +173,21 @@ async def launch_safety_middleware(request: Request, call_next):
             "proplet_http_5xx status=%s method=%s route=%s request_id=%s version=%s",
             response.status_code,
             request.method,
-            request.url.path,
+            path,
             request_id,
             APP_VERSION,
         )
         # Do not synchronously write this alarm back to Supabase: Supabase may be
         # the failed dependency, and a second DB attempt would delay the response.
-    if request.url.path == "/api/rolling-content" and not GEN4_CANDIDATE_PREVIEW:
+    if path == "/api/rolling-content" and not GEN4_CANDIDATE_PREVIEW:
         response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=86400"
-    elif request.url.path == "/api/push/config":
+    elif path == "/api/push/config":
         # This endpoint contains only public capability flags and the public VAPID key.
         # Let browsers reuse it briefly and let Vercel's CDN absorb repeat app opens.
         response.headers["Cache-Control"] = (
             "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
         )
-    elif request.url.path.startswith("/api/"):
+    elif path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
     return response
 
@@ -2373,6 +2375,7 @@ def attempt_finish(
         completed_at = datetime.fromisoformat(str(completed_at).replace("Z", "+00:00")).isoformat()
     except Exception:
         completed_at = datetime.now(TZ).isoformat()
+    payload = result_domain.preserve_recorded_attempt_flags(payload, row or {})
     db_update("puzzle_attempts", {"id": payload.attempt_id}, {
         "completed_at": completed_at, "elapsed_ms": payload.elapsed_ms, "moves": payload.moves,
         "wrong_attempts": payload.wrong_attempts, "hints_used": payload.hints_used,
@@ -3326,6 +3329,8 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                 bound.get("difficulty") != payload.difficulty,
             )):
                 raise HTTPException(400, "Výsledek neodpovídá zahájenému pokusu")
+            payload = result_domain.preserve_recorded_attempt_flags(payload, bound)
+            effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
 
     transferred_reward = False
     content_generation = None

@@ -58,3 +58,30 @@ jobs:
 
       - name: Run current runtime gate
         run: python tools/test_current.py
+
+  isolated-result-database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_USER: proplet_test_admin
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: postgres
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U proplet_test_admin -d postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test dependencies
+        run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5'
+      - name: Test real SQL with synthetic players only
+        run: |
+          python -c "from pathlib import Path; Path('/tmp/proplet-test-password').write_text('local-test-only')"
+          python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-isolated-results.json
