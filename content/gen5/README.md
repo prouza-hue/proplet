@@ -1,6 +1,7 @@
 # Gen5 lab
 
 Offline výrobní generátor. Návrh a limity: [DESIGN.md](DESIGN.md).
+Dokončená série 450 desek a další krok: [RELEASE-CANDIDATE-01.md](RELEASE-CANDIDATE-01.md).
 Spouštět z kořene repozitáře s Pythonem 3.11+; bez nových závislostí.
 
 ```sh
@@ -37,5 +38,5 @@ Výstupy:
 
 Otevřete HTML přímo v prohlížeči. Galerie slouží ke kalibraci desek; nenahrazuje
 testování skutečného herního rozhraní. Výstupy v `lab-output/` jsou ignorované
-Gitem a nejsou součástí produkčního webu. Před budoucím nasazením nového generátoru
-je třeba rozhodnout, které review artefakty a schválené desky verzovat.
+Gitem a nejsou součástí produkčního webu. Přesné výrobní výstupy dokončené
+série a redakční evidence jsou verzované v `evidence/release-candidate-01/`.

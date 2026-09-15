@@ -1,0 +1,22 @@
+{
+  "series.json": {
+    "sha256": "b4d4a4cfcd2a05cc1fd2011a33f7a8ccd846a3e1b670d3faeb24ec6a5a217e79",
+    "bytes": 2574884,
+    "gzipBytes": 193951
+  },
+  "candidate.json": {
+    "sha256": "c039d08c7a40b9298c847553858da5baaa74eb3f4c24d2b98c45f1787e0d568c",
+    "bytes": 3672262,
+    "gzipBytes": 236141
+  },
+  "report.json": {
+    "sha256": "acde73073fd4d4c0814978bfaf7f44511552300146b870e79140b612fc3dfff1",
+    "bytes": 144210,
+    "gzipBytes": 10877
+  },
+  "editorial.json": {
+    "sha256": "c38296ec58b08fe0e0a6b030abcceae3aa26ac7a6c4ece36ec47dc62859d5ea4",
+    "bytes": 1525692,
+    "gzipBytes": 63835
+  }
+}
