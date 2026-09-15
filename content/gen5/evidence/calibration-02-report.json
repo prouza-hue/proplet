@@ -1,0 +1,492 @@
+{
+  "status": "experimental-not-for-release",
+  "difficultyClaims": "hypotheses-pending-human-playtest",
+  "profiles": {
+    "easy": {
+      "baseline": {
+        "boards": 200,
+        "occurrences": 1389,
+        "uniqueWords": 243,
+        "fourLetterShare": 0.8747,
+        "maxWordUses": 42,
+        "topWords": [
+          [
+            "bobr",
+            42
+          ],
+          [
+            "upír",
+            41
+          ],
+          [
+            "štít",
+            41
+          ],
+          [
+            "drak",
+            35
+          ],
+          [
+            "deka",
+            14
+          ],
+          [
+            "moře",
+            13
+          ],
+          [
+            "ucho",
+            12
+          ],
+          [
+            "kluk",
+            12
+          ],
+          [
+            "dech",
+            12
+          ],
+          [
+            "hrát",
+            12
+          ]
+        ],
+        "quartetBoards": 151,
+        "wordsNeverUsedInSameDifficulty": 0,
+        "medianTurns": 1.1428571428571428,
+        "medianAmbiguity": 10.482
+      },
+      "pilot": {
+        "boards": 3,
+        "occurrences": 12,
+        "uniqueWords": 12,
+        "fourLetterShare": 0.0,
+        "maxWordUses": 1,
+        "topWords": [
+          [
+            "školní",
+            1
+          ],
+          [
+            "pizza",
+            1
+          ],
+          [
+            "tvrdý",
+            1
+          ],
+          [
+            "teplý",
+            1
+          ],
+          [
+            "máslo",
+            1
+          ],
+          [
+            "nehet",
+            1
+          ],
+          [
+            "měsíc",
+            1
+          ],
+          [
+            "kopec",
+            1
+          ],
+          [
+            "želva",
+            1
+          ],
+          [
+            "chléb",
+            1
+          ]
+        ],
+        "quartetBoards": 0,
+        "wordsNeverUsedInSameDifficulty": 8,
+        "medianTurns": 0.75,
+        "medianAmbiguity": 7.812
+      }
+    },
+    "medium": {
+      "baseline": {
+        "boards": 200,
+        "occurrences": 1531,
+        "uniqueWords": 638,
+        "fourLetterShare": 0.5892,
+        "maxWordUses": 16,
+        "topWords": [
+          [
+            "úhoř",
+            16
+          ],
+          [
+            "můra",
+            15
+          ],
+          [
+            "jojo",
+            13
+          ],
+          [
+            "humr",
+            11
+          ],
+          [
+            "zelí",
+            11
+          ],
+          [
+            "upír",
+            10
+          ],
+          [
+            "mrož",
+            10
+          ],
+          [
+            "kešu",
+            10
+          ],
+          [
+            "štír",
+            10
+          ],
+          [
+            "ovád",
+            10
+          ]
+        ],
+        "quartetBoards": 28,
+        "wordsNeverUsedInSameDifficulty": 0,
+        "medianTurns": 1.875,
+        "medianAmbiguity": 11.438
+      },
+      "pilot": {
+        "boards": 3,
+        "occurrences": 18,
+        "uniqueWords": 18,
+        "fourLetterShare": 0.3889,
+        "maxWordUses": 1,
+        "topWords": [
+          [
+            "míchat",
+            1
+          ],
+          [
+            "polštář",
+            1
+          ],
+          [
+            "ovád",
+            1
+          ],
+          [
+            "svět",
+            1
+          ],
+          [
+            "kamzík",
+            1
+          ],
+          [
+            "láska",
+            1
+          ],
+          [
+            "duna",
+            1
+          ],
+          [
+            "odnést",
+            1
+          ],
+          [
+            "zkusit",
+            1
+          ],
+          [
+            "řeka",
+            1
+          ]
+        ],
+        "quartetBoards": 0,
+        "wordsNeverUsedInSameDifficulty": 10,
+        "medianTurns": 1.3333333333333333,
+        "medianAmbiguity": 8.25
+      }
+    },
+    "hard": {
+      "baseline": {
+        "boards": 200,
+        "occurrences": 1790,
+        "uniqueWords": 1098,
+        "fourLetterShare": 0.1966,
+        "maxWordUses": 9,
+        "topWords": [
+          [
+            "ovád",
+            9
+          ],
+          [
+            "fénix",
+            7
+          ],
+          [
+            "fenek",
+            7
+          ],
+          [
+            "umění",
+            7
+          ],
+          [
+            "cikáda",
+            6
+          ],
+          [
+            "mrož",
+            6
+          ],
+          [
+            "šachy",
+            6
+          ],
+          [
+            "zatmění",
+            6
+          ],
+          [
+            "surf",
+            6
+          ],
+          [
+            "mládí",
+            6
+          ]
+        ],
+        "quartetBoards": 10,
+        "wordsNeverUsedInSameDifficulty": 0,
+        "medianTurns": 3.111111111111111,
+        "medianAmbiguity": 15.0695
+      },
+      "pilot": {
+        "boards": 0,
+        "occurrences": 0,
+        "uniqueWords": 0,
+        "fourLetterShare": 0.0,
+        "maxWordUses": 0,
+        "topWords": [],
+        "quartetBoards": 0,
+        "wordsNeverUsedInSameDifficulty": 0
+      }
+    },
+    "hardcore": {
+      "baseline": {
+        "boards": 200,
+        "occurrences": 2028,
+        "uniqueWords": 1181,
+        "fourLetterShare": 0.2973,
+        "maxWordUses": 12,
+        "topWords": [
+          [
+            "úhoř",
+            12
+          ],
+          [
+            "bagr",
+            11
+          ],
+          [
+            "jednorožec",
+            11
+          ],
+          [
+            "mikroskop",
+            9
+          ],
+          [
+            "lokomotiva",
+            9
+          ],
+          [
+            "stavebnice",
+            9
+          ],
+          [
+            "surf",
+            9
+          ],
+          [
+            "kešu",
+            9
+          ],
+          [
+            "ovád",
+            8
+          ],
+          [
+            "dáma",
+            8
+          ]
+        ],
+        "quartetBoards": 8,
+        "wordsNeverUsedInSameDifficulty": 0,
+        "medianTurns": 4.0,
+        "medianAmbiguity": 21.6625
+      },
+      "pilot": {
+        "boards": 0,
+        "occurrences": 0,
+        "uniqueWords": 0,
+        "fourLetterShare": 0.0,
+        "maxWordUses": 0,
+        "topWords": [],
+        "quartetBoards": 0,
+        "wordsNeverUsedInSameDifficulty": 0
+      }
+    },
+    "mozkomor": {
+      "baseline": {
+        "boards": 100,
+        "occurrences": 1040,
+        "uniqueWords": 787,
+        "fourLetterShare": 0.0,
+        "maxWordUses": 6,
+        "topWords": [
+          [
+            "marmeláda",
+            6
+          ],
+          [
+            "stoicismus",
+            5
+          ],
+          [
+            "vzducholoď",
+            4
+          ],
+          [
+            "kuželky",
+            4
+          ],
+          [
+            "solidarita",
+            4
+          ],
+          [
+            "sonar",
+            4
+          ],
+          [
+            "bumerang",
+            4
+          ],
+          [
+            "kosmonaut",
+            4
+          ],
+          [
+            "plejtvák",
+            4
+          ],
+          [
+            "stavebnice",
+            4
+          ]
+        ],
+        "quartetBoards": 0,
+        "wordsNeverUsedInSameDifficulty": 0,
+        "medianTurns": 4.8,
+        "medianAmbiguity": 27.0375
+      },
+      "pilot": {
+        "boards": 0,
+        "occurrences": 0,
+        "uniqueWords": 0,
+        "fourLetterShare": 0.0,
+        "maxWordUses": 0,
+        "topWords": [],
+        "quartetBoards": 0,
+        "wordsNeverUsedInSameDifficulty": 0
+      }
+    }
+  },
+  "diagnostics": [
+    {
+      "id": "g5-pilot-easy-001",
+      "rejections": {
+        "packing": 32,
+        "geometry": 1,
+        "mean_turns": 8,
+        "isolated_cutouts": 4,
+        "cutouts": 1,
+        "ambiguity_band": 2
+      },
+      "shortlist": 1,
+      "seconds": 0.234
+    },
+    {
+      "id": "g5-pilot-medium-001",
+      "rejections": {
+        "curl_count": 9,
+        "cutouts": 7,
+        "isolated_cutouts": 11,
+        "ambiguity_band": 4,
+        "mean_turns": 6
+      },
+      "shortlist": 1,
+      "seconds": 0.25
+    },
+    {
+      "id": "g5-pilot-easy-002",
+      "rejections": {
+        "packing": 5,
+        "target_path_or_budget": 1,
+        "mean_turns": 1
+      },
+      "shortlist": 1,
+      "seconds": 0.218
+    },
+    {
+      "id": "g5-pilot-medium-002",
+      "rejections": {
+        "isolated_cutouts": 18,
+        "ambiguity_band": 8,
+        "mean_turns": 8,
+        "curl_count": 10,
+        "cutouts": 8,
+        "solver_multiple": 1
+      },
+      "shortlist": 1,
+      "seconds": 0.25
+    },
+    {
+      "id": "g5-pilot-easy-003",
+      "rejections": {
+        "mean_turns": 22,
+        "packing": 65,
+        "ambiguity_band": 4,
+        "isolated_cutouts": 6,
+        "geometry": 3,
+        "cutouts": 2
+      },
+      "shortlist": 1,
+      "seconds": 0.25
+    },
+    {
+      "id": "g5-pilot-medium-003",
+      "rejections": {
+        "mean_turns": 8,
+        "curl_count": 7,
+        "cutouts": 5,
+        "isolated_cutouts": 11,
+        "ambiguity_band": 2
+      },
+      "shortlist": 1,
+      "seconds": 0.234
+    }
+  ]
+}

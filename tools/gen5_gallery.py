@@ -20,7 +20,7 @@ HTML = r'''<!doctype html>
 <p class="notice"><strong>Soukromý experiment.</strong> Obtížnost ještě ladíme. Výsledky ani XP se neukládají a nic se neposílá na server.</p>
 <div class="selectors"><label>Obtížnost<select id="difficulty"></select></label><label>Deska<select id="board-choice"></select></label></div>
 <div class="layout"><section class="board-panel" aria-label="Hrací deska"><div id="grid" class="grid"></div></section>
-<aside class="side"><section class="card"><h2>Zbývá <span class="progress" id="progress"></span></h2><div class="chips" id="remaining"></div><h2 style="margin-top:18px">Nalezeno</h2><div class="chips" id="found"></div></section>
+<aside class="side"><section class="card"><h2>Čas hraní <span class="progress" id="timer">00:00</span></h2><p class="help" id="timer-note">Od prvního písmene. Při skrytí stránky se čas pozastaví.</p></section><section class="card"><h2>Zbývá <span class="progress" id="progress"></span></h2><div class="chips" id="remaining"></div><h2 style="margin-top:18px">Nalezeno</h2><div class="chips" id="found"></div></section>
 <section class="card"><h2>Skládáš</h2><div id="selection" class="selected-word">—</div><p id="status" class="status" role="status" aria-live="polite">Spoj sousední písmena tahem nebo postupným klepáním.</p><div class="actions"><button class="action" id="clear">Zrušit výběr</button><button class="action primary" id="reset">Znovu</button></div></section>
 <section class="card"><label class="toggle"><input type="checkbox" id="reveal">Ukázat řešení</label><p class="help">Hledají se připravená slova uvedených délek. Každé políčko patří právě jednomu slovu. Pohyb vede vodorovně a svisle.</p><p class="help">Zpětným tahem se vrátíš o písmeno. Klávesnicí lze políčka vybrat přes Tab a Enter.</p><div id="details" class="details"></div></section></aside></div></main>
 <script id="pilot-data" type="application/json">__PILOT__</script>
@@ -31,6 +31,12 @@ const $=id=>document.getElementById(id);
 const names={easy:'Snadná',medium:'Střední',hard:'Těžká',hardcore:'Mozkožrout',mozkomor:'Mozkomor'};
 const colors=['#a84f38','#28796c','#325fa9','#896529','#835194','#436a31','#a54064','#346d83','#766040','#5954a1','#52684b'];
 let board,selected=[],found=new Set(),activePointer=null,dragMoved=false,pointerStart=null;
+let elapsed=0,clockStart=null,clockEnabled=false,solutionSeen=false;
+function clockPause(){if(clockStart!==null){elapsed+=performance.now()-clockStart;clockStart=null;}}
+function clockResume(){if(clockEnabled&&!document.hidden&&clockStart===null)clockStart=performance.now();}
+function clockPaint(){const seconds=Math.floor((elapsed+(clockStart===null?0:performance.now()-clockStart))/1000);$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');}
+setInterval(clockPaint,1000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clockPause();else clockResume();clockPaint();});
 const normalize=w=>w.normalize('NFC').toLocaleUpperCase('cs');
 const adjacent=(a,b)=>Math.abs(Math.floor(a/board.cols)-Math.floor(b/board.cols))+Math.abs(a%board.cols-b%board.cols)===1;
 const owner=i=>board.answers.findIndex(a=>a.path.includes(i));
@@ -42,6 +48,7 @@ function loadDifficulty(){
   loadBoard();
 }
 function loadBoard(){
+  elapsed=0;clockStart=null;clockEnabled=false;solutionSeen=false;clockPaint();$('timer-note').textContent='Od prvního písmene. Při skrytí stránky se čas pozastaví.';
   board=puzzles[Number($('board-choice').value)];selected=[];found=new Set();activePointer=null;$('reveal').checked=false;
   const grid=$('grid');grid.replaceChildren();grid.style.gridTemplateColumns=`repeat(${board.cols},minmax(0,1fr))`;
   board.letters.forEach((letter,i)=>{const b=document.createElement('button');b.type='button';b.className='cell';b.dataset.cell=i;b.textContent=letter;b.setAttribute('aria-label',`${letter}, řádek ${Math.floor(i/board.cols)+1}, sloupec ${i%board.cols+1}`);if(!board.mask.includes(i)){b.classList.add('blank');b.disabled=true;b.setAttribute('aria-hidden','true');}grid.append(b);});
@@ -63,6 +70,7 @@ function paint(){
 }
 function addCell(i){
   if(!board.mask.includes(i)||found.has(owner(i))||$('reveal').checked)return;
+  clockEnabled=true;clockResume();
   if(selected.length>1&&selected[selected.length-2]===i){selected.pop();paint();return;}
   if(selected.includes(i))return;
   if(selected.length&&!adjacent(selected[selected.length-1],i))return;
@@ -71,7 +79,7 @@ function addCell(i){
 function submit(clearInvalid){
   const word=normalize(selected.map(i=>board.letters[i]).join(''));
   const target=board.answers.findIndex(a=>normalize(a.word)===word&&a.path.length===selected.length&&a.path.every((cell,i)=>cell===selected[i]));
-  if(target>=0&&!found.has(target)){found.add(target);selected=[];status(found.size===board.answers.length?'Hotovo! Jak na tebe tahle deska působila?':`Nalezeno: ${word}.`);paint();}
+  if(target>=0&&!found.has(target)){found.add(target);selected=[];if(found.size===board.answers.length){clockPause();clockEnabled=false;clockPaint();}status(found.size===board.answers.length?'Hotovo! Jak na tebe tahle deska působila?':`Nalezeno: ${word}.`);paint();}
   else if(clearInvalid&&selected.length>1){status('Tato cesta nepatří do řešení. Zkus jinou.');selected=[];paint();}
 }
 const cellFromPoint=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.closest('#grid .cell:not(.blank)');};
@@ -83,7 +91,7 @@ $('grid').addEventListener('click',e=>{if(e.detail!==0)return;const cell=e.targe
 $('difficulty').addEventListener('change',loadDifficulty);$('board-choice').addEventListener('change',loadBoard);
 $('clear').addEventListener('click',()=>{selected=[];paint();status('Výběr zrušen.');});
 $('reset').addEventListener('click',loadBoard);
-$('reveal').addEventListener('change',()=>{selected=[];status($('reveal').checked?'Prohlížíš řešení. Vypnutím se můžeš vrátit ke hraní.':'Pokračuj ve hledání.');paint();});
+$('reveal').addEventListener('change',()=>{selected=[];if($('reveal').checked){solutionSeen=true;clockPause();clockEnabled=false;$('timer-note').textContent='Řešení bylo odhaleno — čas není srovnatelný se samostatným hraním.';}status($('reveal').checked?'Prohlížíš řešení. Vypnutím se můžeš vrátit ke hraní.':'Pokračuj ve hledání.');clockPaint();paint();});
 loadDifficulty();
 </script></html>'''
 

@@ -1,0 +1,1284 @@
+{
+  "kind": "gen5-pilot",
+  "status": "pilot-complete",
+  "contentGeneration": 5,
+  "settings": {
+    "seed": 20260915,
+    "count": 3,
+    "difficulties": [
+      "easy",
+      "medium"
+    ],
+    "secondsPerBoard": 45.0
+  },
+  "inputs": {
+    "content/gen5/profiles.json": "b6a868c7304f903cf7a2f9bf58e246c52389feef695aa86de1fa534a297944b4",
+    "content/generation-manifest.json": "142f7483f4afe3398170697ec914f75c1920dc5d0d7495f10579d6b8624ef389",
+    "data/answer_tiers.json": "3088dbe03fb2a0ac4d441f9338595be79a0138e2b35a3d9d7101d58a0532a799",
+    "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+    "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+    "data/puzzles.json": "51370983c0f8a831f2706eaf45b6130e44666fe4aa8e57e309868766475ee53a",
+    "data/rolling_content_v1.json": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+    "data/target_generation_exclusions_v334.json": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+    "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "public/puzzles.json": "09b2f3a4545ac1504de0e618a6bfa657f04c0d72f324dfb2b2eadff1b73504c7",
+    "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "tools/gen5/__init__.py": "1e88b45d825b3427e88b43806ae730008b1bb2df972085b36960c83ffd5d7269",
+    "tools/gen5/catalog.py": "20f7df65104d7e2c0dd19c0e25f8682fae9337822d459070462e0c2404d56d76",
+    "tools/gen5/geometry.py": "a117ce469d0dc5d455e473616f8e3d47884ac534fe2eb71ad381897fdf8b5a63",
+    "tools/gen5/runner.py": "69cc614b67478dd059e5d1f80ec6e002297bef94d36c894ca63952ed75a00f63",
+    "tools/gen5/validation.py": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd",
+    "tools/gen5_lab.py": "637ca9ae91df409ea0b5ab67f5b376646b9a8666d41d9eb40073f6a75927981a",
+    "tools/generate_gen4_candidates.py": "71ba5f9788cb7703a87f2d8ff4341fb6766914c1d1e96bb391f0cf4f08a910df",
+    "tools/generate_puzzles.py": "98c43616c9b5a595a7e211c2d65d917691f971f85bc9f675ac762f48b104d416",
+    "tools/generate_v334_calibration.py": "ad4425f748a5e0f4ed92163aa3c466920bfbf2f7e4472d706e90d92bc502843e",
+    "tools/generate_v334_calibration_v3.py": "9ea62d0f37ebf17d24322b4cd1ef602bd51c264e6879651f0795c18bbd086192",
+    "tools/measure_gen4_ambiguity.py": "fc09c4fd65fde73f13c8afb219e6d9673300613c01c4e95e58b7b4092e1126b0",
+    "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15"
+  },
+  "validationLexicon": {
+    "size": 26093,
+    "sha256": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7"
+  },
+  "puzzles": [
+    {
+      "difficulty": "easy",
+      "rows": 5,
+      "cols": 5,
+      "mask": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        14,
+        16,
+        17,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "letters": [
+        "L",
+        "O",
+        "K",
+        "Š",
+        "T",
+        "N",
+        "P",
+        "T",
+        "",
+        "E",
+        "Í",
+        "I",
+        "V",
+        "",
+        "P",
+        "",
+        "Z",
+        "R",
+        "",
+        "L",
+        "A",
+        "Z",
+        "D",
+        "Ý",
+        "Ý"
+      ],
+      "answers": [
+        {
+          "word": "TVRDÝ",
+          "path": [
+            7,
+            12,
+            17,
+            22,
+            23
+          ]
+        },
+        {
+          "word": "ŠKOLNÍ",
+          "path": [
+            3,
+            2,
+            1,
+            0,
+            5,
+            10
+          ]
+        },
+        {
+          "word": "TEPLÝ",
+          "path": [
+            4,
+            9,
+            14,
+            19,
+            24
+          ]
+        },
+        {
+          "word": "PIZZA",
+          "path": [
+            6,
+            11,
+            16,
+            21,
+            20
+          ]
+        }
+      ],
+      "lengths": [
+        5,
+        6,
+        5,
+        5
+      ],
+      "id": "g5-pilot-easy-001",
+      "meta": {
+        "level": 218,
+        "contentGeneration": 5,
+        "calibrationOnly": true,
+        "generationKey": "gen5-lab-v1",
+        "geometryProfile": "gen5-easy-pilot-v2",
+        "gen5": {
+          "seed": 1554495551767199487,
+          "attempt": 4,
+          "geometry": {
+            "rows": 5,
+            "cols": 5,
+            "cells": 21,
+            "wordCount": 4,
+            "fourWords": 0,
+            "minLength": 5,
+            "maxLength": 6,
+            "minPathTurns": 0,
+            "maxPathTurns": 1,
+            "maxPathStraightShare": 1.0,
+            "meanTurns": 0.75,
+            "meanStraightShare": 0.775,
+            "curvyShare": 0.0,
+            "maxCurlRun": 1,
+            "curlPathCount": 0,
+            "endpointStartPairs": 0,
+            "blankComponents": 2,
+            "isolatedBlanks": 1,
+            "bboxRows": 5,
+            "bboxCols": 5
+          },
+          "ambiguity": {
+            "id": "g5-pilot-easy-001",
+            "difficulty": "easy",
+            "level": 218,
+            "profile": "gen5-easy-pilot-v2",
+            "targetCount": 4,
+            "falsePrefixes": {
+              "2": 28,
+              "3": 16,
+              "4": 2
+            },
+            "falseStartCells": 15,
+            "targetAlternativeBranches": 4,
+            "startLetterCollisions": 1,
+            "matchingShortPaths": 58,
+            "localAmbiguityScore": 7.625
+          },
+          "verification": {
+            "status": "unique",
+            "solutionsLowerBound": 1,
+            "targetPathsUnique": true,
+            "candidateCount": 5,
+            "searchNodes": 5,
+            "enumerationAndSearchNodes": 196,
+            "forcedNodeShare": 0.8,
+            "dictionaryHash": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7",
+            "dictionarySize": 26093
+          },
+          "lexicalReviewRequired": []
+        }
+      }
+    },
+    {
+      "difficulty": "medium",
+      "rows": 7,
+      "cols": 7,
+      "mask": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        21,
+        24,
+        25,
+        26,
+        27,
+        32,
+        33,
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        45,
+        46,
+        47,
+        48
+      ],
+      "letters": [
+        "",
+        "",
+        "T",
+        "A",
+        "K",
+        "Í",
+        "Z",
+        "",
+        "",
+        "",
+        "H",
+        "",
+        "Ř",
+        "M",
+        "Ě",
+        "V",
+        "S",
+        "C",
+        "",
+        "Á",
+        "A",
+        "T",
+        "",
+        "",
+        "Í",
+        "M",
+        "T",
+        "K",
+        "",
+        "",
+        "",
+        "",
+        "L",
+        "Š",
+        "L",
+        "",
+        "D",
+        "Á",
+        "V",
+        "Á",
+        "A",
+        "O",
+        "",
+        "",
+        "",
+        "O",
+        "S",
+        "K",
+        "P"
+      ],
+      "answers": [
+        {
+          "word": "LÁSKA",
+          "path": [
+            32,
+            39,
+            46,
+            47,
+            40
+          ]
+        },
+        {
+          "word": "MÍCHAT",
+          "path": [
+            25,
+            24,
+            17,
+            10,
+            3,
+            2
+          ]
+        },
+        {
+          "word": "OVÁD",
+          "path": [
+            45,
+            38,
+            37,
+            36
+          ]
+        },
+        {
+          "word": "POLŠTÁŘ",
+          "path": [
+            48,
+            41,
+            34,
+            33,
+            26,
+            19,
+            12
+          ]
+        },
+        {
+          "word": "KAMZÍK",
+          "path": [
+            27,
+            20,
+            13,
+            6,
+            5,
+            4
+          ]
+        },
+        {
+          "word": "SVĚT",
+          "path": [
+            16,
+            15,
+            14,
+            21
+          ]
+        }
+      ],
+      "lengths": [
+        5,
+        6,
+        4,
+        7,
+        6,
+        4
+      ],
+      "id": "g5-pilot-medium-001",
+      "meta": {
+        "level": 217,
+        "contentGeneration": 5,
+        "calibrationOnly": true,
+        "generationKey": "gen5-lab-v1",
+        "geometryProfile": "gen5-medium-pilot-v2",
+        "gen5": {
+          "seed": 3057769265563367748,
+          "attempt": 5,
+          "geometry": {
+            "rows": 7,
+            "cols": 7,
+            "cells": 32,
+            "wordCount": 6,
+            "fourWords": 2,
+            "minLength": 4,
+            "maxLength": 7,
+            "minPathTurns": 1,
+            "maxPathTurns": 2,
+            "maxPathStraightShare": 0.6666666666666666,
+            "meanTurns": 1.5,
+            "meanStraightShare": 0.5888888888888889,
+            "curvyShare": 0.5,
+            "maxCurlRun": 2,
+            "curlPathCount": 1,
+            "endpointStartPairs": 0,
+            "blankComponents": 3,
+            "isolatedBlanks": 0,
+            "bboxRows": 7,
+            "bboxCols": 7
+          },
+          "ambiguity": {
+            "id": "g5-pilot-medium-001",
+            "difficulty": "medium",
+            "level": 217,
+            "profile": "gen5-medium-pilot-v2",
+            "targetCount": 6,
+            "falsePrefixes": {
+              "2": 44,
+              "3": 29,
+              "4": 7
+            },
+            "falseStartCells": 26,
+            "targetAlternativeBranches": 5,
+            "startLetterCollisions": 0,
+            "matchingShortPaths": 98,
+            "localAmbiguityScore": 8.875
+          },
+          "verification": {
+            "status": "unique",
+            "solutionsLowerBound": 1,
+            "targetPathsUnique": true,
+            "candidateCount": 11,
+            "searchNodes": 7,
+            "enumerationAndSearchNodes": 323,
+            "forcedNodeShare": 0.8571428571428571,
+            "dictionaryHash": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7",
+            "dictionarySize": 26093
+          },
+          "lexicalReviewRequired": []
+        }
+      }
+    },
+    {
+      "difficulty": "easy",
+      "rows": 5,
+      "cols": 5,
+      "mask": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        22,
+        23,
+        24
+      ],
+      "letters": [
+        "C",
+        "E",
+        "P",
+        "O",
+        "K",
+        "C",
+        "Í",
+        "S",
+        "Ě",
+        "M",
+        "T",
+        "",
+        "",
+        "",
+        "M",
+        "E",
+        "H",
+        "E",
+        "N",
+        "Á",
+        "",
+        "",
+        "O",
+        "L",
+        "S"
+      ],
+      "answers": [
+        {
+          "word": "MÁSLO",
+          "path": [
+            14,
+            19,
+            24,
+            23,
+            22
+          ]
+        },
+        {
+          "word": "KOPEC",
+          "path": [
+            4,
+            3,
+            2,
+            1,
+            0
+          ]
+        },
+        {
+          "word": "NEHET",
+          "path": [
+            18,
+            17,
+            16,
+            15,
+            10
+          ]
+        },
+        {
+          "word": "MĚSÍC",
+          "path": [
+            9,
+            8,
+            7,
+            6,
+            5
+          ]
+        }
+      ],
+      "lengths": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "id": "g5-pilot-easy-002",
+      "meta": {
+        "level": 219,
+        "contentGeneration": 5,
+        "calibrationOnly": true,
+        "generationKey": "gen5-lab-v1",
+        "geometryProfile": "gen5-easy-pilot-v2",
+        "gen5": {
+          "seed": 18205078779631187936,
+          "attempt": 2,
+          "geometry": {
+            "rows": 5,
+            "cols": 5,
+            "cells": 20,
+            "wordCount": 4,
+            "fourWords": 0,
+            "minLength": 5,
+            "maxLength": 5,
+            "minPathTurns": 0,
+            "maxPathTurns": 1,
+            "maxPathStraightShare": 1.0,
+            "meanTurns": 0.5,
+            "meanStraightShare": 0.8125,
+            "curvyShare": 0.0,
+            "maxCurlRun": 1,
+            "curlPathCount": 0,
+            "endpointStartPairs": 0,
+            "blankComponents": 2,
+            "isolatedBlanks": 0,
+            "bboxRows": 5,
+            "bboxCols": 5
+          },
+          "ambiguity": {
+            "id": "g5-pilot-easy-002",
+            "difficulty": "easy",
+            "level": 219,
+            "profile": "gen5-easy-pilot-v2",
+            "targetCount": 4,
+            "falsePrefixes": {
+              "2": 28,
+              "3": 15,
+              "4": 3
+            },
+            "falseStartCells": 17,
+            "targetAlternativeBranches": 4,
+            "startLetterCollisions": 1,
+            "matchingShortPaths": 58,
+            "localAmbiguityScore": 7.812
+          },
+          "verification": {
+            "status": "unique",
+            "solutionsLowerBound": 1,
+            "targetPathsUnique": true,
+            "candidateCount": 4,
+            "searchNodes": 5,
+            "enumerationAndSearchNodes": 164,
+            "forcedNodeShare": 0.8,
+            "dictionaryHash": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7",
+            "dictionarySize": 26093
+          },
+          "lexicalReviewRequired": []
+        }
+      }
+    },
+    {
+      "difficulty": "medium",
+      "rows": 7,
+      "cols": 7,
+      "mask": [
+        1,
+        2,
+        9,
+        10,
+        16,
+        17,
+        18,
+        19,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        41,
+        42,
+        45,
+        46,
+        47,
+        48
+      ],
+      "letters": [
+        "",
+        "A",
+        "M",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "U",
+        "A",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "P",
+        "N",
+        "U",
+        "D",
+        "",
+        "",
+        "",
+        "V",
+        "O",
+        "R",
+        "V",
+        "",
+        "T",
+        "I",
+        "S",
+        "U",
+        "Ň",
+        "A",
+        "O",
+        "K",
+        "E",
+        "Ř",
+        "K",
+        "T",
+        "",
+        "D",
+        "A",
+        "",
+        "",
+        "Z",
+        "S",
+        "É",
+        "N"
+      ],
+      "answers": [
+        {
+          "word": "DUNA",
+          "path": [
+            19,
+            18,
+            17,
+            10
+          ]
+        },
+        {
+          "word": "PUMA",
+          "path": [
+            16,
+            9,
+            2,
+            1
+          ]
+        },
+        {
+          "word": "VORVAŇ",
+          "path": [
+            23,
+            24,
+            25,
+            26,
+            33,
+            32
+          ]
+        },
+        {
+          "word": "ZKUSIT",
+          "path": [
+            45,
+            38,
+            31,
+            30,
+            29,
+            28
+          ]
+        },
+        {
+          "word": "ŘEKA",
+          "path": [
+            37,
+            36,
+            35,
+            42
+          ]
+        },
+        {
+          "word": "ODNÉST",
+          "path": [
+            34,
+            41,
+            48,
+            47,
+            46,
+            39
+          ]
+        }
+      ],
+      "lengths": [
+        4,
+        4,
+        6,
+        6,
+        4,
+        6
+      ],
+      "id": "g5-pilot-medium-002",
+      "meta": {
+        "level": 218,
+        "contentGeneration": 5,
+        "calibrationOnly": true,
+        "generationKey": "gen5-lab-v1",
+        "geometryProfile": "gen5-medium-pilot-v2",
+        "gen5": {
+          "seed": 6174956600410503767,
+          "attempt": 10,
+          "geometry": {
+            "rows": 7,
+            "cols": 7,
+            "cells": 30,
+            "wordCount": 6,
+            "fourWords": 3,
+            "minLength": 4,
+            "maxLength": 6,
+            "minPathTurns": 1,
+            "maxPathTurns": 2,
+            "maxPathStraightShare": 0.6666666666666666,
+            "meanTurns": 1.3333333333333333,
+            "meanStraightShare": 0.6,
+            "curvyShare": 0.3333333333333333,
+            "maxCurlRun": 2,
+            "curlPathCount": 2,
+            "endpointStartPairs": 0,
+            "blankComponents": 4,
+            "isolatedBlanks": 1,
+            "bboxRows": 7,
+            "bboxCols": 7
+          },
+          "ambiguity": {
+            "id": "g5-pilot-medium-002",
+            "difficulty": "medium",
+            "level": 218,
+            "profile": "gen5-medium-pilot-v2",
+            "targetCount": 6,
+            "falsePrefixes": {
+              "2": 51,
+              "3": 29,
+              "4": 6
+            },
+            "falseStartCells": 24,
+            "targetAlternativeBranches": 3,
+            "startLetterCollisions": 0,
+            "matchingShortPaths": 104,
+            "localAmbiguityScore": 8.25
+          },
+          "verification": {
+            "status": "unique",
+            "solutionsLowerBound": 1,
+            "targetPathsUnique": true,
+            "candidateCount": 11,
+            "searchNodes": 7,
+            "enumerationAndSearchNodes": 386,
+            "forcedNodeShare": 0.8571428571428571,
+            "dictionaryHash": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7",
+            "dictionarySize": 26093
+          },
+          "lexicalReviewRequired": []
+        }
+      }
+    },
+    {
+      "difficulty": "easy",
+      "rows": 5,
+      "cols": 5,
+      "mask": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        10,
+        12,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "letters": [
+        "A",
+        "A",
+        "K",
+        "C",
+        "H",
+        "V",
+        "",
+        "L",
+        "",
+        "L",
+        "L",
+        "",
+        "O",
+        "",
+        "É",
+        "E",
+        "V",
+        "H",
+        "",
+        "B",
+        "Ž",
+        "Č",
+        "E",
+        "L",
+        "A"
+      ],
+      "answers": [
+        {
+          "word": "VČELA",
+          "path": [
+            16,
+            21,
+            22,
+            23,
+            24
+          ]
+        },
+        {
+          "word": "HOLKA",
+          "path": [
+            17,
+            12,
+            7,
+            2,
+            1
+          ]
+        },
+        {
+          "word": "ŽELVA",
+          "path": [
+            20,
+            15,
+            10,
+            5,
+            0
+          ]
+        },
+        {
+          "word": "CHLÉB",
+          "path": [
+            3,
+            4,
+            9,
+            14,
+            19
+          ]
+        }
+      ],
+      "lengths": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "id": "g5-pilot-easy-003",
+      "meta": {
+        "level": 220,
+        "contentGeneration": 5,
+        "calibrationOnly": true,
+        "generationKey": "gen5-lab-v1",
+        "geometryProfile": "gen5-easy-pilot-v2",
+        "gen5": {
+          "seed": 15093529579763171630,
+          "attempt": 8,
+          "geometry": {
+            "rows": 5,
+            "cols": 5,
+            "cells": 20,
+            "wordCount": 4,
+            "fourWords": 0,
+            "minLength": 5,
+            "maxLength": 5,
+            "minPathTurns": 0,
+            "maxPathTurns": 1,
+            "maxPathStraightShare": 1.0,
+            "meanTurns": 0.75,
+            "meanStraightShare": 0.8125,
+            "curvyShare": 0.0,
+            "maxCurlRun": 1,
+            "curlPathCount": 0,
+            "endpointStartPairs": 0,
+            "blankComponents": 2,
+            "isolatedBlanks": 0,
+            "bboxRows": 5,
+            "bboxCols": 5
+          },
+          "ambiguity": {
+            "id": "g5-pilot-easy-003",
+            "difficulty": "easy",
+            "level": 220,
+            "profile": "gen5-easy-pilot-v2",
+            "targetCount": 4,
+            "falsePrefixes": {
+              "2": 30,
+              "3": 16,
+              "4": 3
+            },
+            "falseStartCells": 17,
+            "targetAlternativeBranches": 4,
+            "startLetterCollisions": 0,
+            "matchingShortPaths": 61,
+            "localAmbiguityScore": 8.0
+          },
+          "verification": {
+            "status": "unique",
+            "solutionsLowerBound": 1,
+            "targetPathsUnique": true,
+            "candidateCount": 4,
+            "searchNodes": 5,
+            "enumerationAndSearchNodes": 155,
+            "forcedNodeShare": 0.8,
+            "dictionaryHash": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7",
+            "dictionarySize": 26093
+          },
+          "lexicalReviewRequired": []
+        }
+      }
+    },
+    {
+      "difficulty": "medium",
+      "rows": 7,
+      "cols": 7,
+      "mask": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        18,
+        20,
+        21,
+        22,
+        25,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        36,
+        37,
+        40,
+        41,
+        43,
+        44,
+        47,
+        48
+      ],
+      "letters": [
+        "",
+        "",
+        "",
+        "",
+        "U",
+        "Š",
+        "T",
+        "H",
+        "C",
+        "Y",
+        "R",
+        "P",
+        "",
+        "Í",
+        "L",
+        "T",
+        "",
+        "",
+        "O",
+        "",
+        "K",
+        "Ý",
+        "I",
+        "",
+        "",
+        "V",
+        "",
+        "",
+        "",
+        "C",
+        "Á",
+        "L",
+        "O",
+        "C",
+        "E",
+        "",
+        "H",
+        "V",
+        "",
+        "",
+        "L",
+        "O",
+        "",
+        "Ý",
+        "A",
+        "",
+        "",
+        "É",
+        "T"
+      ],
+      "answers": [
+        {
+          "word": "TICHÝ",
+          "path": [
+            15,
+            22,
+            29,
+            36,
+            43
+          ]
+        },
+        {
+          "word": "OVOCE",
+          "path": [
+            18,
+            25,
+            32,
+            33,
+            34
+          ]
+        },
+        {
+          "word": "LÁVA",
+          "path": [
+            31,
+            30,
+            37,
+            44
+          ]
+        },
+        {
+          "word": "RYCHLÝ",
+          "path": [
+            10,
+            9,
+            8,
+            7,
+            14,
+            21
+          ]
+        },
+        {
+          "word": "PUŠTÍK",
+          "path": [
+            11,
+            4,
+            5,
+            6,
+            13,
+            20
+          ]
+        },
+        {
+          "word": "LÉTO",
+          "path": [
+            40,
+            47,
+            48,
+            41
+          ]
+        }
+      ],
+      "lengths": [
+        5,
+        5,
+        4,
+        6,
+        6,
+        4
+      ],
+      "id": "g5-pilot-medium-003",
+      "meta": {
+        "level": 219,
+        "contentGeneration": 5,
+        "calibrationOnly": true,
+        "generationKey": "gen5-lab-v1",
+        "geometryProfile": "gen5-medium-pilot-v2",
+        "gen5": {
+          "seed": 6765579584593970351,
+          "attempt": 3,
+          "geometry": {
+            "rows": 7,
+            "cols": 7,
+            "cells": 30,
+            "wordCount": 6,
+            "fourWords": 2,
+            "minLength": 4,
+            "maxLength": 6,
+            "minPathTurns": 0,
+            "maxPathTurns": 2,
+            "maxPathStraightShare": 1.0,
+            "meanTurns": 1.1666666666666667,
+            "meanStraightShare": 0.5833333333333334,
+            "curvyShare": 0.3333333333333333,
+            "maxCurlRun": 2,
+            "curlPathCount": 2,
+            "endpointStartPairs": 0,
+            "blankComponents": 5,
+            "isolatedBlanks": 0,
+            "bboxRows": 7,
+            "bboxCols": 7
+          },
+          "ambiguity": {
+            "id": "g5-pilot-medium-003",
+            "difficulty": "medium",
+            "level": 219,
+            "profile": "gen5-medium-pilot-v2",
+            "targetCount": 6,
+            "falsePrefixes": {
+              "2": 39,
+              "3": 22,
+              "4": 4
+            },
+            "falseStartCells": 22,
+            "targetAlternativeBranches": 7,
+            "startLetterCollisions": 1,
+            "matchingShortPaths": 83,
+            "localAmbiguityScore": 7.792
+          },
+          "verification": {
+            "status": "unique",
+            "solutionsLowerBound": 1,
+            "targetPathsUnique": true,
+            "candidateCount": 7,
+            "searchNodes": 7,
+            "enumerationAndSearchNodes": 249,
+            "forcedNodeShare": 0.8571428571428571,
+            "dictionaryHash": "9d6a58f50e188ea150028b0b501cc38aedd8a426251b2e369d16646aba1e64c7",
+            "dictionarySize": 26093
+          },
+          "lexicalReviewRequired": []
+        }
+      }
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "g5-pilot-easy-001",
+      "rejections": {
+        "packing": 32,
+        "geometry": 1,
+        "mean_turns": 8,
+        "isolated_cutouts": 4,
+        "cutouts": 1,
+        "ambiguity_band": 2
+      },
+      "shortlist": 1,
+      "seconds": 0.234
+    },
+    {
+      "id": "g5-pilot-medium-001",
+      "rejections": {
+        "curl_count": 9,
+        "cutouts": 7,
+        "isolated_cutouts": 11,
+        "ambiguity_band": 4,
+        "mean_turns": 6
+      },
+      "shortlist": 1,
+      "seconds": 0.25
+    },
+    {
+      "id": "g5-pilot-easy-002",
+      "rejections": {
+        "packing": 5,
+        "target_path_or_budget": 1,
+        "mean_turns": 1
+      },
+      "shortlist": 1,
+      "seconds": 0.218
+    },
+    {
+      "id": "g5-pilot-medium-002",
+      "rejections": {
+        "isolated_cutouts": 18,
+        "ambiguity_band": 8,
+        "mean_turns": 8,
+        "curl_count": 10,
+        "cutouts": 8,
+        "solver_multiple": 1
+      },
+      "shortlist": 1,
+      "seconds": 0.25
+    },
+    {
+      "id": "g5-pilot-easy-003",
+      "rejections": {
+        "mean_turns": 22,
+        "packing": 65,
+        "ambiguity_band": 4,
+        "isolated_cutouts": 6,
+        "geometry": 3,
+        "cutouts": 2
+      },
+      "shortlist": 1,
+      "seconds": 0.25
+    },
+    {
+      "id": "g5-pilot-medium-003",
+      "rejections": {
+        "mean_turns": 8,
+        "curl_count": 7,
+        "cutouts": 5,
+        "isolated_cutouts": 11,
+        "ambiguity_band": 2
+      },
+      "shortlist": 1,
+      "seconds": 0.234
+    }
+  ]
+}

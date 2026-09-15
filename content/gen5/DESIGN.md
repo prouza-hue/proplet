@@ -29,8 +29,8 @@ slovník o všechny výrazy, které uznává širší slovník bonusových slov.
    přesná dostupná kombinace tříd A–D; až potom jednotlivá slova. Nepoužívá se
    povinná kotva s vysokým `fun` ani její násobná váha. Stávající minimum
    přijatelnosti `fun >= 3` a explicitní výluky zůstávají.
-4. **Pestrost má pevné hranice.** Nejvýše 2 čtyřpísmenná slova na snadné, těžké
-   a hardcore desce, 3 na střední, žádné na Mozkomoru. Snadná zůstává 6×6,
+4. **Pestrost má pevné hranice.** Nejvýše 3 čtyřpísmenná slova na snadné a střední desce, 2 na těžké
+   a hardcore desce, žádné na Mozkomoru. Snadná je po kalibraci 5×5,
    s běžnými slovy třídy A a jednoduchými cestami. Hodnoty jsou hypotéza pro
    kalibraci, nikoli nový slib obtížnosti hráčům.
 5. **Samostatná geometrie.** Omezené prohledávání skládá sousední cesty bez

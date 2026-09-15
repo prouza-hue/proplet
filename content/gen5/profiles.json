@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "experimental-not-approved",
   "seed": 20260915,
   "notes": [
@@ -9,24 +9,24 @@
   ],
   "profiles": {
     "easy": {
-      "rows": 6,
-      "cols": 6,
+      "rows": 5,
+      "cols": 5,
       "cells": [
-        29,
-        34
+        20,
+        24
       ],
       "words": [
-        5,
-        6
+        4,
+        5
       ],
       "min_len": 4,
-      "max_len": 7,
-      "turn_bias": -0.45,
-      "min_bbox_rows": 6,
-      "min_bbox_cols": 6,
+      "max_len": 6,
+      "turn_bias": -0.8,
+      "min_bbox_rows": 5,
+      "min_bbox_cols": 5,
       "min_curvy_share": 0.0,
-      "max_mean_straight_share": 0.9,
-      "geometry_profile": "gen5-easy-pilot-v1",
+      "max_mean_straight_share": 1,
+      "geometry_profile": "gen5-easy-pilot-v2",
       "policy": {
         "allowed": [
           "A"
@@ -42,75 +42,75 @@
       "max_curl_paths": 1,
       "max_curl_run": 1,
       "min_mean_turns": 0.1,
-      "max_mean_turns": 1.35,
+      "max_mean_turns": 0.85,
       "max_blank_components": 3,
       "max_isolated_blanks": 1,
       "ambiguity": [
-        0.0,
-        20.0
+        0,
+        9
       ],
-      "max_four_words": 2,
+      "max_four_words": 3,
       "cooldown": 8,
       "new_word_cap": 5,
       "geometry_restarts": 20,
       "path_node_limit": 4200,
       "min_path_turns": 0,
-      "max_path_turns": 2,
+      "max_path_turns": 1,
       "max_path_straight_share": 1.0
     },
     "medium": {
-      "rows": 8,
-      "cols": 8,
+      "rows": 7,
+      "cols": 7,
       "cells": [
-        38,
-        43
+        30,
+        35
       ],
       "words": [
-        7,
-        8
+        6,
+        7
       ],
       "min_len": 4,
-      "max_len": 8,
-      "turn_bias": 0.24,
-      "min_bbox_rows": 7,
-      "min_bbox_cols": 7,
-      "min_curvy_share": 0.14,
-      "max_mean_straight_share": 0.68,
-      "geometry_profile": "gen5-medium-pilot-v1",
+      "max_len": 7,
+      "turn_bias": -0.25,
+      "min_bbox_rows": 6,
+      "min_bbox_cols": 6,
+      "min_curvy_share": 0,
+      "max_mean_straight_share": 0.85,
+      "geometry_profile": "gen5-medium-pilot-v2",
       "policy": {
         "allowed": [
           "A",
           "B"
         ],
         "weights": {
-          "A": 2,
-          "B": 3
+          "A": 3,
+          "B": 2
         },
         "min_fraction": {
-          "B": 0.45
+          "B": 0.25
         },
         "max_fraction": {
-          "B": 0.75
+          "B": 0.5
         }
       },
       "max_curl_paths": 2,
       "max_curl_run": 2,
-      "min_mean_turns": 0.7,
-      "max_mean_turns": 2.35,
+      "min_mean_turns": 0.5,
+      "max_mean_turns": 1.5,
       "max_blank_components": 5,
       "max_isolated_blanks": 1,
       "ambiguity": [
-        0.0,
-        14.0
+        0,
+        10
       ],
       "max_four_words": 3,
       "cooldown": 10,
       "new_word_cap": 4,
       "geometry_restarts": 20,
       "path_node_limit": 4200,
-      "min_path_turns": 1,
-      "max_path_turns": 8,
-      "max_path_straight_share": 0.84
+      "min_path_turns": 0,
+      "max_path_turns": 2,
+      "max_path_straight_share": 1
     },
     "hard": {
       "rows": 9,
