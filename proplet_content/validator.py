@@ -348,7 +348,10 @@ def validate_manifest(
             try:
                 mozkomor = json.loads(read_record_bytes(root, mozkomor_record))
                 runtime_puzzles = (source.get("free") or {}).get("mozkomor") or []
-                if mozkomor.get("puzzles") != runtime_puzzles:
+                # The original 100-board release remains an immutable prefix;
+                # later approved additions are covered by the canonical file hash.
+                original_puzzles = mozkomor.get("puzzles") or []
+                if original_puzzles != runtime_puzzles[:len(original_puzzles)]:
                     issues.append(
                         ValidationIssue(
                             "mozkomor-embed",

@@ -901,6 +901,7 @@ def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
     puzzle_data = load_puzzles(); reserve = load_rolling_content()
     active_generation = int(puzzle_data.get("freeGeneration") or 1)
     base_levels = {key: len(puzzle_data.get("free", {}).get(key, [])) for key in difficulties}
+    base_slot_limits = (puzzle_data.get("release") or {}).get("baselineLevelCounts") or base_levels
     maximum_levels = {key: base_levels[key] + len(reserve.get("puzzles", {}).get(key, [])) for key in difficulties}
     prior_slots = {key: set() for key in difficulties}
     current_slots = {key: set() for key in difficulties}
@@ -914,7 +915,7 @@ def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
         is_current = int(info["generation"]) == active_generation and info.get("legacy") is not True
         target = current_slots if is_current else prior_slots
         target[info["difficulty"]].add(int(info["level"]))
-        if is_current and info.get("rolling") is not True and int(info["level"]) <= base_levels.get(info["difficulty"], 0):
+        if is_current and info.get("rolling") is not True and int(info["level"]) <= base_slot_limits.get(info["difficulty"], 0):
             base_current_slots[info["difficulty"]].add(int(info["level"]))
     effective = {key: len(prior_slots[key] | current_slots[key]) for key in difficulties}
     transferred = {key: len(prior_slots[key] - current_slots[key]) for key in difficulties}

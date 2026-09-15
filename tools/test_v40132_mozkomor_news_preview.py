@@ -42,8 +42,8 @@ assert all(token in css for token in ("tile-p", "feature-tajenka", "feature-mozk
 
 # Final bank is bound unchanged and exposes the approved 200/200 unlock contract.
 for payload in (puzzles, public_puzzles):
-    bank = payload["free"]["mozkomor"]
-    assert len(bank) == 100
+    assert len(payload["free"]["mozkomor"]) == 150
+    bank = payload["free"]["mozkomor"][:100]
     assert [p["id"] for p in bank] == [f"g4-z-{i:03d}" for i in range(1, 101)]
     assert [int(p["meta"]["level"]) for p in bank] == list(range(1, 101))
     assert all(p["difficulty"] == "mozkomor" for p in bank)
@@ -52,7 +52,7 @@ for payload in (puzzles, public_puzzles):
         "requiresDifficulty": "hardcore",
         "requiresCurrentBaseLevels": 200,
         "persistentOnceEarned": True,
-        "levels": 100,
+        "levels": 150,
         "xpPerFirstCompletion": 150,
     }
 

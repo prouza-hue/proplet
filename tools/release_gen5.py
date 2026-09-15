@@ -21,7 +21,8 @@ def release():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == manifest['frozenInputs'][name], name
     preview = json.loads((ROOT / 'data/gen5_preview_puzzles.json').read_bytes())
     release_meta = deepcopy(preview['release'])
-    release_meta.update(status='released', previewOnly=False, productionApproved=True)
+    release_meta.update(status='released', previewOnly=False, productionApproved=True,
+                        baselineLevelCounts={d:len([p for p in preview['free'][d] if not p['id'].startswith('g5-r1-') and not p.get('meta',{}).get('rollingContent')]) for d in package['puzzles']})
     outputs = {}
     for name in ('data/puzzles.json', 'public/puzzles.json'):
         source = json.loads((ROOT / name).read_bytes())
@@ -34,6 +35,7 @@ def release():
         source['release'] = release_meta
         source['freeLevelCounts'] = {d:len(bank) for d,bank in source['free'].items()}
         source['freeLevelsPerDifficulty'] = 300
+        source['mozkomorUnlock']['levels'] = len(source['free']['mozkomor'])
         outputs[name] = (json.dumps(source, ensure_ascii=False, separators=(',', ':'))+'\n').encode()
     for name,payload in outputs.items():
         (ROOT / name).write_bytes(payload)

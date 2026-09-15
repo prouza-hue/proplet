@@ -308,10 +308,10 @@ with (
         separators=(",", ":"),
     )
 response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
-# Health adds gen5CandidatePreview:false on the normal runtime; omitting this
-# sole additive field reproduces the previous 5d3be33f response digest.
+# Approved Gen5 publication updates free-bank totals and Mozkomor count to 150;
+# the unlock requirement remains the original 200 base Mozkozrout levels.
 assert response_fixture_digest == (
-    "ae6e813520b4d9e6ce15b7b6dd8644958325cd8c9967a0cf40e6726a5693b3cf"
+    "47a07d50adc60b7d45adf528b6b4ba153fea5f3ba3178eea136cd04bdb6b6c21"
 ), f"current response fixture digest: {response_fixture_digest}"
 
 

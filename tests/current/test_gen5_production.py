@@ -12,6 +12,7 @@ os.environ['VERCEL_GIT_COMMIT_REF']='main'
 from backend.config import load_settings
 from backend.content import released_free_bank, free_puzzle_info
 from tools.build_gen5_preview import DIFFICULTIES, digest
+import server
 
 def read(name):
     return json.loads((ROOT/name).read_bytes())
@@ -24,6 +25,14 @@ assert hashlib.sha256((ROOT/'data/rolling_content_v1.json').read_bytes()).hexdig
 assert data['freeGeneration']==data['contentGeneration']==4
 assert data['release']['productionApproved'] and not data['release']['previewOnly']
 assert data['release']['totalNewLevels']==450
+assert data['mozkomorUnlock']['requiresCurrentBaseLevels']==200
+assert data['mozkomorUnlock']['levels']==150
+new_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'] if p['id'].startswith('g5-r1-')]
+assert server.free_slot_summary(new_hardcore)['current']['hardcore']==100
+assert server.free_slot_summary(new_hardcore)['baseCurrent']['hardcore']==0
+assert not server.mozkomor_unlocked_from_rows(new_hardcore)
+old_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'][:200]]
+assert server.mozkomor_unlocked_from_rows(old_hardcore)
 for d in DIFFICULTIES:
     old=[p for p in data['free'][d] if not p['id'].startswith('g5-r1-')]
     additions=[p for p in data['free'][d] if p['id'].startswith('g5-r1-')]

@@ -2,6 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),pat
 const root=path.resolve(__dirname,'../../public');
 (async()=>{
  const shellSource=fs.readFileSync(path.join(root,'sw.js'),'utf8').split('];',1)[0];
+ const currentShell=shellSource.match(/SHELL_CACHE='([^']+)'/)[1];
  for(const file of ['index.html','theme-init.js']){
   const source=fs.readFileSync(path.join(root,file),'utf8');
   for(const match of source.matchAll(/["'](\/[^"'\s]+\.(?:js|css)(?:\?[^"'\s]*)?)["']/g)){
@@ -35,7 +36,7 @@ const root=path.resolve(__dirname,'../../public');
   });
   handlers.install({waitUntil:p=>installation=p});
   if(failure)await assert.rejects(installation);else await installation;
-  assert.equal(skipped,failure?0:1);assert.deepEqual(deleted,failure?['proplet-v4.02.2-audit-phase2-2']:[]);
+  assert.equal(skipped,failure?0:1);assert.deepEqual(deleted,failure?[currentShell]:[]);
  }
  // A slow sibling fetch must finish writing before candidate cache cleanup.
  {
