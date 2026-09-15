@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-progresscache1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-resultdock1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1788,7 +1788,7 @@ function bindRankingExpansion(container,data){
    if(previous)firstOffset=pageOffset;else offset=page.nextOffset??null;
    loaded=true;before.classList.toggle('hidden',firstOffset===0);button.classList.toggle('hidden',offset===null);button.textContent='Další hráči';
    if(initial)focusMine();
-   else if(anchor){const scroll=details.closest('.modal-card');if(scroll)scroll.scrollTop+=anchor.getBoundingClientRect().top-top}
+   else if(anchor){const scroll=details.closest('.win-result-scroll,.modal-card');if(scroll)scroll.scrollTop+=anchor.getBoundingClientRect().top-top}
   }catch{button.textContent='Zkusit načíst znovu'}finally{loading=false;button.disabled=false;before.disabled=false}
  };
  details.addEventListener('toggle',()=>{if(!details.open)return;if(!loaded)load();else focusMine()});

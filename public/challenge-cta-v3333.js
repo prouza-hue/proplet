@@ -21,11 +21,25 @@
     }
   }
 
-  function syncWinLayout(win){
+  function syncWinLayout(win,canDock=true){
     const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
     if(!primary||!summary||!secondary)return;
-    // The next game is always the first action, before the standings.
-    if(summary.nextElementSibling!==primary)summary.after(primary);
+    const card=modal.querySelector('.win-card');
+    const docked=canDock&&window.matchMedia('(max-width:999px)').matches&&!modal.classList.contains('starter-win')&&!primary.classList.contains('hidden');
+    let scroll=card.querySelector(':scope > .win-result-scroll'),footer=card.querySelector(':scope > .win-result-footer');
+    if(docked){
+      if(!scroll){
+        scroll=document.createElement('div');scroll.className='win-result-scroll';
+        footer=document.createElement('div');footer.className='win-result-footer';
+        for(const child of [...card.children])if(child!==primary&&child.id!=='confettiLayer')scroll.appendChild(child);
+        footer.appendChild(primary);card.append(scroll,footer);
+      }else if(primary.parentElement!==footer)footer.appendChild(primary);
+    }else{
+      if(scroll){for(const child of [...scroll.children])card.insertBefore(child,scroll);scroll.remove()}
+      if(summary.nextElementSibling!==primary)summary.after(primary);
+      if(footer)footer.remove();
+    }
+    setClass(modal,'result-action-docked',docked);
     if(win.parentElement!==secondary)secondary.prepend(win);
     modal.querySelector('.win-main-actions')?.remove();
   }
@@ -82,7 +96,7 @@
         setClass(win,'challenge-share-cta',false);
         setAriaLabel(win,'');
       }
-      syncWinLayout(win,challengeMode);
+      syncWinLayout(win,free||dailyGame);
     }
 
     if(daily){
@@ -110,6 +124,7 @@
     if(detailModal)observer.observe(detailModal,{attributes:true,attributeFilter:['class']});
     if(daily)observer.observe(daily,{attributes:true,attributeFilter:['class']});
     window.addEventListener('pageshow',syncShareCtas);
+    window.matchMedia('(max-width:999px)').addEventListener('change',syncShareCtas);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});

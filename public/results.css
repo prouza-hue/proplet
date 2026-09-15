@@ -260,3 +260,12 @@ html[data-theme="dark"] #winModal .win-details{border-top-color:#3a3544}
 @media(max-width:480px){
   #winModal .win-main-actions + .win-secondary-actions{margin-top:7px}
 }
+
+/* One persistent primary action; rankings and the friend challenge scroll above it. */
+@media(max-width:999px){
+ html.tiskarna-ui #winModal.result-action-docked .win-card{display:flex!important;flex-direction:column!important;gap:0!important;padding:0!important;overflow:hidden!important;max-height:calc(100dvh - 32px)!important}
+ #winModal.result-action-docked .win-result-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 16px;scroll-padding-bottom:20px}
+ #winModal.result-action-docked .win-result-footer{flex:0 0 auto;order:100;padding:12px 16px max(12px,env(safe-area-inset-bottom));background:var(--td-paper);border-top:1px solid var(--td-line);box-shadow:0 -8px 18px #00000008}
+ html.tiskarna-ui #winModal.result-action-docked .win-result-footer #winPrimaryBtn{margin:0!important;width:100%!important;min-height:54px!important;font-weight:700!important}
+ #winModal.result-action-docked .win-result-scroll>.win-secondary-actions{margin-top:18px}
+}

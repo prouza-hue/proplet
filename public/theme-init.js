@@ -167,7 +167,7 @@
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/game.css?v=40140-s13a','propletGameCss'],
-    ['/results.css?v=40140-s13a2','propletResultsCss'],
+    ['/results.css?v=resultdock1','propletResultsCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
     ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
@@ -233,7 +233,7 @@
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=invitations1','propletChallengeCtaV3333');
+    loadScript('/challenge-cta-v3333.js?v=resultdock1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=welcome1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=reminders1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=reminders1','propletAccountConversionV3331',{wait:true});
