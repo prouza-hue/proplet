@@ -134,7 +134,8 @@
     
       const clearCard=()=>{
         document.querySelector('#difficultyNudgeCard')?.remove();
-        document.querySelector('#winModal')?.classList.remove('difficulty-nudge-active');
+        const modal=document.querySelector('#winModal');
+        if(modal?.classList.contains('difficulty-nudge-active'))modal.classList.remove('difficulty-nudge-active');
         lastRenderedSignature='';
       };
     
@@ -214,7 +215,12 @@
       const boot=()=>{
         const modal=document.querySelector('#winModal');
         if(!modal)return;
-        new MutationObserver(()=>setTimeout(handleWin,0)).observe(modal,{attributes:true,attributeFilter:['class']});
+        let pending=false;
+        new MutationObserver(()=>{
+          if(pending)return;
+          pending=true;
+          setTimeout(()=>{pending=false;handleWin()},0);
+        }).observe(modal,{attributes:true,attributeFilter:['class']});
         handleWin();
       };
       if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});

@@ -118,7 +118,7 @@
     window.__PROPLET_COLD_BOOTSTRAP_PREFETCH=coldBootstrapFetch;
 
     const hydrator=document.createElement('script');
-    hydrator.src='/bootstrap-hydrator.js?v=1';
+    hydrator.src='/bootstrap-hydrator.js?v=idleoffline1';
     hydrator.async=false;
     hydrator.dataset.propletBootstrapHydrator='1';
     document.head.appendChild(hydrator);
@@ -136,7 +136,7 @@
               window.__PROPLET_FULL_PUZZLE_DATA_PROMISE=baseFetch('/puzzles.json',{cache:'no-store'}).then(fullResponse=>{
                 if(!fullResponse?.ok)throw new Error(`canonical-puzzle-db-${fullResponse?.status||'fetch'}`);
                 if('caches' in window){
-                  try{caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',fullResponse.clone())).catch(()=>{})}catch{}
+                  try{const cachedResponse=fullResponse.clone();caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
                 }
                 return fullResponse.json();
               });
@@ -235,7 +235,7 @@
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');
-    loadScript('/tajenka-runtime-polish.js?v=1','propletTajenkaRuntimePolish');
+    loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep
     // the document valid, so delegate only its active play CTA back to the
