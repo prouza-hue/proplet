@@ -2,3 +2,6 @@
 # same pinned runtime dependencies.  No browser or pytest dependency is
 # required by the static/current gate.
 -r requirements.txt
+
+# Windows does not ship an IANA timezone database.
+tzdata==2026.4; sys_platform == "win32"

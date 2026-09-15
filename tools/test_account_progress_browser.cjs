@@ -1,0 +1,62 @@
+// Synthetic account and delayed responses only; never runs against a deployment.
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs');
+(async()=>{
+ const url=process.env.TEST_URL;
+ assert(url&&['127.0.0.1','localhost'].includes(new URL(url).hostname));
+ const health=await fetch(url+'/api/health').then(r=>r.json());
+ assert(health.isolatedFixture&&health.database===false);
+ const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
+ const report={sha:health.sha,started:new Date().toISOString(),browser:browser.version(),synthetic:true,checks:[]};
+ try{
+  const context=await browser.newContext({serviceWorkers:'block',viewport:{width:1104,height:884}});
+  const page=await context.newPage();let release,fail=false,requests=0,completed=[];
+  await page.route('**/api/me',r=>r.fulfill({json:{name:'Synthetic player',stats:{points:34018},avatar:'🙂'}}));
+  await page.route('**/api/progress',async r=>{requests++;await new Promise(resolve=>release=resolve);await r.fulfill({status:fail?503:200,json:fail?{detail:'synthetic outage'}:{completed}})});
+  await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&typeof document.querySelector('#playDailyBtn')?.onclick==='function');
+  completed=await page.evaluate(()=>{
+   closeTransientModals();stopTimer();currentGame=null;nav('daily');
+   const batch=puzzleDB.free.hardcore.slice(0,3);
+   puzzleDB.contentStatus={latestBatch:{id:'synthetic-week',availableFrom:pragueDateISO(),count:3,levels:batch.map(p=>({id:p.id,difficulty:'hardcore'}))}};
+   return [...batch.map(p=>({puzzleId:p.id,challengeKey:challengeKey('free',p,null),mode:'free',difficulty:'hardcore',level:p.meta.level,contentGeneration:4,elapsedMs:42000,moves:12,points:100,completedAt:'2026-09-15T09:00:00Z'})),{puzzleId:tajenkaPuzzle.id,challengeKey:'tajenka:'+tajenkaPuzzle.id,mode:'tajenka',elapsedMs:42000,moves:5,points:200}];
+  });
+  await page.evaluate(()=>{window.PROPLET_RUNTIME_ENV='preview';acceptAccountProfile({id:'synthetic-a',token:'synthetic-token',name:'Synthetic player'});syncQueue();renderDaily();renderFree()});
+  await page.waitForFunction(()=>document.body.classList.contains('account-progress-pending'));
+  await page.waitForTimeout(1000);assert.equal(requests,1,'login and sync share one progress read');
+  assert.equal(await page.locator('#quickPlayCard').getAttribute('aria-busy'),'true');
+  assert.equal(await page.locator('#quickPlayGrid').evaluate(e=>getComputedStyle(e).visibility),'hidden','unknown counts are hidden');
+  await page.evaluate(()=>{startFree('hardcore');startTajenka();startGame(puzzleDB.free.hardcore[0],'free',null)});
+  assert.equal(await page.evaluate(()=>!!currentGame),false,'all entry paths reject unknown progress');
+  await page.screenshot({path:(process.env.RESULT_PATH||'account-progress.json')+'.pending.png'});
+  report.checks.push('delayed preview login hides unknown counts, deduplicates reads, blocks game entry');
+  release();await page.waitForFunction(()=>accountProgressAvailable());
+  assert.equal(await page.evaluate(()=>freeProgress('hardcore').done),3);
+  assert.equal(await page.evaluate(()=>latestContentUnplayed().length),0);
+  assert(await page.locator('#newContentBanner').textContent().then(t=>t.includes('Týdenní várka dohraná')));
+  assert(await page.locator('#tajenkaPreviewCard.completed [data-tajenka-recap]').count());
+  assert.equal(await page.locator('#quickPlayCard').getAttribute('aria-busy'),'false');
+  await page.evaluate(()=>startFree('hardcore'));await page.waitForFunction(()=>currentGame?.puzzle.meta.level===4);
+  report.checks.push('history, completed Tajenka and weekly batch rerender without reload; next game is level 4');
+  await page.evaluate(()=>{nav('daily');currentGame=null;stopTimer();acceptAccountProfile({id:'synthetic-b',token:'synthetic-b-token',name:'Other synthetic player'})});
+  await page.waitForTimeout(300);fail=true;release();await page.waitForFunction(()=>accountProgressError);
+  assert.equal(await page.evaluate(()=>accountProgressAvailable()),false,'failed new account cannot use other account history');
+  await page.locator('#screen-daily .account-progress-status button').click();
+  await page.waitForTimeout(300);fail=false;completed=[];release();await page.waitForFunction(()=>accountProgressAvailable());
+  assert.equal(await page.evaluate(()=>freeProgress('hardcore').done),0,'confirmed empty history is valid');
+  report.checks.push('failed read remains blocked; explicit retry accepts genuinely empty history');
+  await page.evaluate(()=>acceptAccountProfile({id:'synthetic-c',token:'synthetic-c-token',name:'Delayed account'}));
+  await page.waitForTimeout(200);const staleRelease=release;
+  await page.evaluate(()=>acceptAccountProfile({id:'synthetic-d',token:'synthetic-d-token',name:'Current account'}));
+  await page.waitForTimeout(200);release();await page.waitForFunction(()=>accountProgressAvailable());
+  staleRelease();await page.waitForTimeout(200);
+  assert.equal(await page.evaluate(()=>accountProgressReady.id),'synthetic-d');
+  assert.equal(await page.evaluate(()=>getState('synthetic-c').remoteProgressLoadedAt),undefined);
+  report.checks.push('late previous-account response cannot mark progress ready or write its history');
+  await page.reload();await page.waitForFunction(()=>typeof accountProgressAvailable==='function'&&!accountProgressAvailable());
+  await page.waitForTimeout(500);assert(await page.locator('body.account-progress-pending').count());release();await page.waitForFunction(()=>accountProgressAvailable());
+  await context.setOffline(true);await page.evaluate(()=>accountProgressReady=null);assert.equal(await page.evaluate(()=>accountProgressAvailable()),true,'persisted verified history remains available offline');
+  report.checks.push('reload waits for refresh; verified account cache remains playable offline');
+  report.finished=new Date().toISOString();fs.writeFileSync(process.env.RESULT_PATH||'account-progress.json',JSON.stringify(report,null,2));
+  console.log(JSON.stringify(report));
+ }finally{await browser.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});

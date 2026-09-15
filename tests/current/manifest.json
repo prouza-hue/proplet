@@ -5,6 +5,8 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
+      {"path": "tests/current/test_account_identity_boundary.py", "runner": "python"},
+      {"path": "tests/current/test_preview_path_boundary.py", "runner": "python"},
       {"path":"tests/current/test_browser_fixture.cjs","runner":"node"},
       {"path":"tests/current/test_idle_offline.js","runner":"node"},
       {"path":"tests/current/test_recognition_retry.js","runner":"node"},

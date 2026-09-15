@@ -1181,6 +1181,12 @@ html[data-theme="dark"] .difficulty-card[data-diff="mozkomor"]{
 html[data-theme="dark"] .difficulty-card[data-diff="mozkomor"]:before{background:#3b3264;color:#dcd4ff}
 html[data-theme="dark"] .difficulty-card[data-diff="mozkomor"] .difficulty-left-icon{background:linear-gradient(145deg,#302a52,#24203d)}
 html[data-theme="dark"] .difficulty-card.mozkomor-locked{background:linear-gradient(145deg,#1c1a23,#211e2c);border-color:#423c50}
+.account-progress-status{padding:20px;margin-bottom:16px;font-weight:700}
+.account-progress-status[hidden]{display:none}
+.account-progress-status button{margin:12px}
+.account-progress-pending :is(#quickPlayCard,#difficultyCards,#tajenkaPreviewCard,#tajenkaPlayCard,#newContentBanner,#screen-daily .daily-hero){position:relative;pointer-events:none}
+.account-progress-pending :is(#quickPlayCard,#difficultyCards,#tajenkaPreviewCard,#tajenkaPlayCard,#newContentBanner,#screen-daily .daily-hero)>*{visibility:hidden}
+.account-progress-pending :is(#quickPlayCard,#difficultyCards,#tajenkaPreviewCard,#tajenkaPlayCard,#newContentBanner,#screen-daily .daily-hero)::after{content:'Čekáme na tvůj postup';position:absolute;inset:0;display:grid;place-items:center;font-weight:700;color:inherit}
 @media(max-width:390px){
   .difficulty-card[data-diff="mozkomor"]:before{right:80px;top:14px}
   .mozkomor-lock-note{font-size:14px}

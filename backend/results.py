@@ -25,6 +25,22 @@ RECEIPT_PUBLIC_FIELDS = (
 )
 
 
+def preserve_recorded_attempt_flags(payload: Any, recorded: Mapping[str, Any]) -> Any:
+    """Never let delayed client data erase recorded assistance/calm mode.
+
+    This is corroboration of an existing attempt, not proof of human play.
+    Keep the original payload intact: its digest identifies old queued retries.
+    """
+    hints = max(payload.hints_used, int(recorded.get("hints_used") or 0))
+    level = max(payload.max_hint_level, int(recorded.get("max_hint_level") or 0))
+    return payload.model_copy(update={
+        "calm_mode": bool(payload.calm_mode or recorded.get("calm_mode") is True),
+        "hints_used": hints,
+        "max_hint_level": level,
+        "clean_solve": bool(payload.clean_solve and hints == 0 and level == 0),
+    })
+
+
 @dataclass(frozen=True, slots=True)
 class ResultIdentity:
     player_id: str

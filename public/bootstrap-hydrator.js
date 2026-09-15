@@ -4,6 +4,7 @@
 
   let startGameWrapped=false;
   let hydrationPromise=null;
+  let pendingStart=0;
 
   const playablePuzzle=puzzle=>{
     const rows=Number(puzzle?.rows),cols=Number(puzzle?.cols);
@@ -22,6 +23,7 @@
   });
 
   const fullData=()=>{
+    if(window.__PROPLET_FETCH_FULL_PUZZLE_DATA)return window.__PROPLET_FETCH_FULL_PUZZLE_DATA();
     const prefetched=window.__PROPLET_FULL_PUZZLE_DATA_PROMISE;
     if(prefetched)return Promise.resolve(prefetched).catch(()=>fetchCanonical());
     return fetchCanonical();
@@ -93,34 +95,32 @@
       startGameWrapped=true;
       const canonicalStartGame=startGame;
       startGame=function(puzzle,mode,dailyDate,options={}){
+        if(mode!=='starter'&&typeof allowAccountGameStart==='function'&&!allowAccountGameStart())return;
+        const request=++pendingStart;
+        const requestedProfile=typeof getProfile==='function'?getProfile():null;
+        const requestedScreen=typeof currentScreen==='undefined'?null:currentScreen;
         const needsFull=(mode==='free'||mode==='rescue')&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1;
         if(!needsFull)return canonicalStartGame(puzzle,mode,dailyDate,options);
         ensureFullDatabase().then(full=>{
+          if(request!==pendingStart)return;
+          if(requestedScreen!==null&&currentScreen!==requestedScreen)return;
+          if(typeof getProfile==='function'){
+            const active=getProfile();
+            if(active?.id!==requestedProfile?.id||active?.token!==requestedProfile?.token)return;
+          }
           const resolved=canonicalPuzzle(full,puzzle,mode);
           if(!playablePuzzle(resolved))throw new Error('canonical-puzzle-missing');
           canonicalStartGame(resolved,mode,dailyDate,options);
         }).catch(error=>{
+          if(request!==pendingStart)return;
           console.warn('bootstrap hydration failed before game start',error);
           try{typeof showToast==='function'&&showToast('Herní banka se ještě načítá. Zkus to prosím znovu.')}catch{}
         });
       };
       window.__PROPLET_ENSURE_FULL_PUZZLE_DB=ensureFullDatabase;
 
-      // Hydrate as soon as both sides are ready. The startGame gate above remains
-      // as a race-condition guard for unusually slow connections.
-      const hydrateWhenReady=()=>{
-        try{
-          // A failed/rejected bootstrap falls back to the full database. That
-          // successful startup needs no hydration or further readiness polling.
-          if(typeof puzzleDB!=='undefined'&&puzzleDB&&!puzzleDB.bootstrapSchema)return;
-          if(window.__PROPLET_BOOTSTRAP_DELIVERED__&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1){
-            ensureFullDatabase().catch(error=>console.warn('background bootstrap hydration failed',error));
-            return;
-          }
-          if(!window.__PROPLET_BOOTSTRAP_HYDRATED__)setTimeout(hydrateWhenReady,25);
-        }catch{setTimeout(hydrateWhenReady,25)}
-      };
-      hydrateWhenReady();
+      // Free/rescue entry above is the demand boundary. Daily/home need only
+      // the bootstrap; no full-bank parsing or readiness polling in idle.
     }catch{setTimeout(installStartGate,0)}
   };
 

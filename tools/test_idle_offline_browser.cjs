@@ -23,9 +23,34 @@ const {execFileSync}=require('node:child_process');
  const out={sha:expectedSha,assets,started:new Date().toISOString(),browser:b.version(),viewport:{width:1440,height:1000},cpuThrottle:1,guest:true,measurements:[],errors:[]};
  const requests=[];p.on('request',r=>requests.push({method:r.method(),path:new URL(r.url()).pathname}));
  p.on('pageerror',e=>out.errors.push(e.message));
- await p.goto(url);await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&!puzzleDB.bootstrapSchema);await p.waitForTimeout(5000);
+ console.log('Loading isolated frontend');await p.goto(url);await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);await p.waitForTimeout(5000);
  const skip=p.locator('.onboarding-return-skip');if(await skip.isVisible())await skip.click();
- out.cached=await p.evaluate(async()=>!!await caches.match('/puzzles.json'));assert(out.cached,'first visit caches canonical bank');
+ out.demandLoading=await p.evaluate(()=>({bootstrap:puzzleDB.bootstrapSchema===1,fullRequests:performance.getEntriesByType('resource').filter(r=>new URL(r.name).pathname==='/puzzles.json').length}));
+ if(out.demandLoading.bootstrap)assert.equal(out.demandLoading.fullRequests,0,'home must not fetch the full bank');
+ const savedProgress=await p.evaluate(()=>{
+  const state=getState();
+  for(const difficulty of ['easy','hardcore'])for(const puzzle of puzzleDB.free[difficulty].slice(0,2)){
+   const key=challengeKey('free',puzzle,null);
+   state.completed[key]={puzzleId:puzzle.id,challengeKey:key,mode:'free',difficulty,level:puzzle.meta.level,contentGeneration:4,elapsedMs:42000,moves:12,points:pointsFor('free',difficulty,puzzle),completedAt:'2026-09-15T09:00:00Z'};
+  }
+  saveState(state);return JSON.stringify(state.completed);
+ });
+ if(out.demandLoading.bootstrap){
+  console.log('Checking offline bootstrap reload');
+  await p.evaluate(()=>navigator.serviceWorker.ready);await p.waitForTimeout(1000);
+  await c.setOffline(true);await p.reload();
+  await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1);
+  await p.waitForFunction(()=>typeof document.querySelector('#playDailyBtn')?.onclick==='function');
+  out.offlineBeforeFree=true;
+  await c.setOffline(false);
+  await p.waitForFunction(()=>typeof tajenkaPuzzle!=='undefined'&&tajenkaPuzzle);
+ }
+ console.log('Starting free game');await p.evaluate(()=>{closeTransientModals();startGame(puzzleDB.free.easy[0],'free',null,{})});
+ await p.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='free'&&currentGame.puzzle.answers?.length>0);
+ await p.waitForTimeout(500);
+ assert.equal(await p.evaluate(()=>JSON.stringify(getState().completed)),savedProgress,'offline reload/full hydration preserves existing completion records');
+ out.preservedSyntheticCompletions=4;
+ out.cached=await p.evaluate(async()=>!!await caches.match('/puzzles.json'));assert(out.cached,'first free-game entry caches canonical bank');
  await p.evaluate(()=>{closeTransientModals();startTajenka();closeTajenkaRules()});await p.waitForTimeout(3000);
  // Prepare the normal 'helper already declined' state before timed windows.
  // Only the helper's idle timestamp is advanced; the game clock is unchanged.
