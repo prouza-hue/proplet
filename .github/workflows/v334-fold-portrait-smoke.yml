@@ -24,7 +24,6 @@ jobs:
     env:
       EXPECTED_SHA: ${{ github.sha }}
       TEST_URL: http://127.0.0.1:8765
-      PLAYWRIGHT_MODULE: ${{ runner.temp }}/proplet-browser/node_modules/playwright
       RESULT_PATH: artifacts/idle-browser.json
       SMOKE_OUT: artifacts/printshop-smoke
       PYTHONUTF8: '1'
@@ -40,6 +39,7 @@ jobs:
           python -m pip install --disable-pip-version-check playwright==1.57.0
           npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/proplet-browser" playwright@1.57.0
           python -m playwright install --with-deps chromium
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/proplet-browser/node_modules/playwright" >> "$GITHUB_ENV"
       - name: Build the checked-out frontend
         run: |
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
