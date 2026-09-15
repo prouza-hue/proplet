@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-rankspotlight1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-progresscache1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -335,12 +335,20 @@ function rankingsOrchestration(){
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
 let accountProgressRequest=null,accountProgressReady=null,accountProgressError=false;
+function hasCachedAccountProgress(profile=getProfile()){
+ if(!profile?.id||!profile?.token)return false;
+ // Only a completed server read can set this marker, and storage is keyed by player ID.
+ const state=getState(profile.id),loadedAt=Date.parse(state.remoteProgressLoadedAt||'');
+ return Number.isFinite(loadedAt)&&!!state.completed&&typeof state.completed==='object'&&!Array.isArray(state.completed);
+}
 function accountProgressAvailable(){
  const p=getProfile();
- return !p?.token||accountProfileMatches(accountProgressReady)||(!navigator.onLine&&!!getState(p.id).remoteProgressLoadedAt);
+ return !p?.token||accountProfileMatches(accountProgressReady)||hasCachedAccountProgress(p);
 }
 function renderAccountProgressStatus(){
- const blocked=!accountProgressAvailable();
+ const blocked=!accountProgressAvailable(),p=getProfile();
+ const refreshing=!!p?.token&&!accountProfileMatches(accountProgressReady);
+ const showNotice=blocked||((refreshing||accountProgressError)&&hasCachedAccountProgress(p));
  if(document.body.classList.contains('account-progress-pending')!==blocked)document.body.classList.toggle('account-progress-pending',blocked);
  for(const selector of ['#quickPlayCard','#difficultyCards','#tajenkaPreviewCard','#tajenkaPlayCard','#newContentBanner','#screen-daily .daily-hero']){
   const element=$(selector);if(element){if(element.inert!==blocked)element.inert=blocked;if(element.getAttribute('aria-busy')!==String(blocked))element.setAttribute('aria-busy',String(blocked))}
@@ -349,8 +357,9 @@ function renderAccountProgressStatus(){
   const root=$(`#screen-${screen}`);if(!root)continue;
   let notice=root.querySelector('.account-progress-status');
   if(!notice){notice=document.createElement('div');notice.className='account-progress-status card';notice.setAttribute('role','status');root.prepend(notice)}
-  if(notice.hidden===blocked)notice.hidden=!blocked;
-  const message=accountProgressError?'Postup se nepodařilo načíst. Připoj se k internetu a zkus to znovu.':'Načítáme tvůj postup…';
+  if(notice.hidden===showNotice)notice.hidden=!showNotice;
+  notice.classList.toggle('is-background',!blocked);
+  const message=blocked?(accountProgressError?'Postup se nepodařilo načíst. Zkus to znovu.':'Načítám tvůj uložený postup…'):(accountProgressError?'Zobrazuji uložený postup. Obnovení se zatím nepodařilo.':'Aktualizuji postup…');
   const text=message+(accountProgressError?' Zkusit znovu':'');
   if(notice.textContent!==text){notice.textContent=message;if(accountProgressError){const retry=document.createElement('button');retry.className='secondary-btn';retry.textContent=' Zkusit znovu';retry.onclick=()=>refreshRemoteProfile();notice.appendChild(retry)}}
  }
