@@ -69,30 +69,6 @@
       renderAccountNudge=function(stage){
         originalRenderAccountNudge.apply(this,arguments);
         trackOfferOnce();
-        const count=typeof completedGameCount==='function'?completedGameCount():0;
-        const countText=typeof countCz==='function'?countCz(count,'Proplet','Proplety','Propletů'):`${count} Propletů`;
-        const eyebrow=document.querySelector('#accountNudgeEyebrow');
-        const title=document.querySelector('#accountNudgeTitle');
-        const copy=document.querySelector('#accountNudgeCopy');
-        const icon=document.querySelector('.account-nudge-icon');
-        const benefits=document.querySelector('.account-nudge-benefits');
-        const button=document.querySelector('#nudgeCreateBtn');
-        if(icon)icon.textContent='🎁';
-        if(stage===1){
-          if(eyebrow)eyebrow.textContent='500 XP ZA ÚČET';
-          if(title)title.textContent='První Proplet je doma. Vezmi si bonus.';
-          if(copy)copy.textContent='Vytvoř si účet, ulož postup do cloudu a dostaneš +500 XP hned.';
-        }else if(stage===2){
-          if(eyebrow)eyebrow.textContent='500 XP POŘÁD ČEKÁ';
-          if(title)title.textContent='Tenhle postup už stojí za účet';
-          if(copy)copy.textContent=`Máš hotové už ${countText}. Ulož si je a přidej k nim +500 XP.`;
-        }else{
-          if(eyebrow)eyebrow.textContent='POSLEDNÍ PŘIPOMENUTÍ';
-          if(title)title.textContent='Nechceš si vzít 500 XP?';
-          if(copy)copy.textContent='Tohle je poslední automatická nabídka. Účet uloží postup a bonus +500 XP ti zůstane natrvalo.';
-        }
-        if(benefits)benefits.innerHTML='<span>🎁 +500 XP okamžitě</span><span>☁️ pokračuj na mobilu i počítači</span><span>🔥 neztrať XP, sérii ani úspěchy</span>';
-        if(button)button.textContent='Vytvořit účet · +500 XP';
       };
     }
 

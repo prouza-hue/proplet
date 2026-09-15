@@ -65,6 +65,7 @@ function create(deps={}){
   function render(){
     const game=getGame(),p=game?.puzzle,board=query('#board');if(!game||!p||!board)return false;
     const mask=new Set(p.mask);
+    board.classList.toggle('starter-first-word',game.mode==='starter'&&!game.found.some(f=>f.answerIndex===0));
     board.style.gridTemplateColumns=`repeat(${p.cols},minmax(0,1fr))`;
     board.style.gridTemplateRows=`repeat(${p.rows},minmax(0,1fr))`;
     board.classList.toggle('dense-board',p.cols>=9);board.classList.toggle('ultra-board',p.cols>=10);board.innerHTML='';
@@ -76,7 +77,7 @@ function create(deps={}){
       if(game.lastFound?.includes(i)){cell.classList.add('just-found');cell.style.setProperty('--found-delay',`${Math.min(game.lastFound.indexOf(i)*24,72)}ms`)}
       if(game.wrongPath?.includes(i))cell.classList.add('wrong-flash');
       if(game.mode==='starter'&&game.starterGuidePath?.includes(i)&&!game.used.has(i)){
-        cell.classList.add('starter-guide');cell.style.setProperty('--guide-order',String(game.starterGuidePath.indexOf(i)));
+        cell.classList.add('starter-guide');cell.dataset.guideStep=String(game.starterGuidePath.indexOf(i)+1);cell.style.setProperty('--guide-order',String(game.starterGuidePath.indexOf(i)));
       }
       cell.addEventListener('pointerdown',onPointerDown);cell.addEventListener('pointerenter',onPointerEnter);board.appendChild(cell);
     }

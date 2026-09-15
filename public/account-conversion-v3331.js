@@ -73,29 +73,6 @@
       return result;
     };
 
-    const originalRenderAccountNudge=renderAccountNudge;
-    renderAccountNudge=function(stage){
-      originalRenderAccountNudge.apply(this,arguments);
-      const eyebrow=$('#accountNudgeEyebrow'),title=$('#accountNudgeTitle'),copy=$('#accountNudgeCopy'),button=$('#nudgeCreateBtn');
-      const benefits=$('.account-nudge-benefits'),icon=$('.account-nudge-icon');
-      if(icon)icon.textContent='🔒';
-      if(stage===1){
-        if(eyebrow)eyebrow.textContent='NEPŘIJĎ O VÝSLEDEK';
-        if(title)title.textContent='Ulož si, co už máš';
-        if(copy)copy.textContent='Založ si účet, trvá to pár vteřin. Výsledky, XP a série pak nezůstanou jen v tomhle zařízení — a dostaneš +500 XP.';
-      }else if(stage===2){
-        if(eyebrow)eyebrow.textContent='NEPŘIJĎ O SVŮJ POSTUP';
-        if(title)title.textContent='Tenhle postup už stojí za uložení';
-        if(copy)copy.textContent='Stačí pár vteřin. Nejrychleji přes Google. Uložíme tvoje výsledky do cloudu a přidáme +500 XP.';
-      }else{
-        if(eyebrow)eyebrow.textContent='POSLEDNÍ PŘIPOMENUTÍ';
-        if(title)title.textContent='Nenechávej svůj postup jen tady';
-        if(copy)copy.textContent='Když zařízení nebo data zmizí, lokální postup s nimi může zmizet taky. Účet založíš za pár vteřin a dostaneš +500 XP.';
-      }
-      if(benefits)benefits.innerHTML='<span>🔒 výsledky bezpečně v účtu</span><span>⚡ Google = nejrychlejší cesta</span><span>🎁 +500 XP za založení</span>';
-      if(button)button.textContent='Založit účet · +500 XP';
-    };
-
     if(typeof updateWinAccountCta==='function'){
       const originalUpdateWinAccountCta=updateWinAccountCta;
       updateWinAccountCta=function(){

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-gen5preview5';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-printshop-reminders2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -819,7 +819,7 @@ function renderStarterCoach(step,title,copy,hintFocus=false){
 }
 function updateStarterGuidance(){
  const g=currentGame;if(!g||g.mode!=='starter')return;g.starterGuidePath=starterGuideFor(g);const next=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i));
- if(next===0)renderStarterCoach(1,'Najdi MRAK','Spoj sousední písmena tahem nebo postupným klepáním. Sleduj zvýrazněnou cestu.');
+ if(next===0)renderStarterCoach(1,'Najdi MRAK','Začni na M. Táhni přes fialová písmena až ke K, nebo na ně postupně klepni.');
  else if(next===1)renderStarterCoach(2,'Paráda! Teď najdi JABLKO','Hledáš vybraná slova, která společně zaplní celou desku. Jiná slova se nepočítají. JABLKO má 6 písmen a zahne za roh.');
  else if(next===2)renderStarterCoach(3,'Najdi slovo ČOKOLÁDA','Čísla nahoře ukazují délky zbývajících slov. Zkus další cestu najít sám.');
  else if(next===3){hideStarterHintNudge();renderStarterCoach(4,'Poslední slovo už zkus sám','Spoj zbývající písmena. Hotovo bude, až zaplníš celou desku.');}
@@ -982,9 +982,11 @@ function shouldOfferAccountNudge(){
  return dueAccountNudgeStage();
 }
 function renderAccountNudge(stage){
- const count=completedGameCount(),copy=stage===1?['PRVNÍ PROPLET JE DOMA','Uložit postup?','Bez účtu zůstává postup jen na tomhle zařízení. Účet zabere pár sekund a tým můžeš řešit až někdy potom.']:stage===2?['UŽ SE TO PLETE','Uložit si tenhle postup?',`Máš hotové už ${countCz(count,'Proplet','Proplety','Propletů')}. S účtem o ně nepřijdeš a můžeš pokračovat na jiném zařízení.`]:['POSLEDNÍ PŘIPOMENUTÍ','Tenhle postup už stojí za účet',`Tohle je poslední automatická nabídka. Ulož si ${countCz(count,'dokončenou hru','dokončené hry','dokončených her')} do cloudu a zapoj se do pořadí.`];
- $('#accountNudgeEyebrow').textContent=copy[0];$('#accountNudgeTitle').textContent=copy[1].trim();$('#accountNudgeCopy').textContent=copy[2];
+ const count=completedGameCount();
+ $('#accountNudgeTitle').textContent='Nepřijď o své výsledky';
+ $('#accountNudgeCopy').textContent=stage===1?'První výhra je doma. Ulož si ji do účtu.':stage===2?`Už máš ${countCz(count,'hotový Proplet','hotové Proplety','hotových Propletů')}. Ulož si je do účtu.`:'Ulož si výsledky, XP i sérii a pokračuj na kterémkoli zařízení.';
 }
+
 function performPostWinAction(action){
  const mode=currentGame?.mode,diff=currentGame?.puzzle?.difficulty;
  if(mode==='tajenka'){nav('daily',{replace:true});return}
@@ -1023,8 +1025,7 @@ function canOfferProgressGuard(source){
 }
 function renderProgressGuard(source){
  const stats=currentLocalStats(),count=stats.totalCompleted||completedGameCount();
- $('#progressGuardEyebrow').textContent=source==='mobile'?'VÍTEJ ZPÁTKY':'NEŽ ODEJDEŠ';
- $('#progressGuardCopy').textContent=source==='mobile'?'Postup zůstává jen v tomto zařízení. Ulož si ho, než se zase vydáš hrát.':'Bez účtu zůstává postup jen v tomto zařízení. Ulož si ho dřív, než zavřeš Proplet.';
+ $('#progressGuardCopy').textContent='Ulož si výsledky a pokračuj i na dalším zařízení.';
  $('#progressGuardGames').textContent=String(count);
  $('#progressGuardGames').nextElementSibling.textContent=czPlural(count,'hotová hra','hotové hry','hotových her');
  $('#progressGuardXp').textContent=`${Number(stats.points||0).toLocaleString('cs-CZ')} XP`;
@@ -1797,14 +1798,15 @@ function renderInstallUI(){
  status.textContent=ios?'Otevře se pak jako samostatná aplikace. Kdyby se po prvním spuštění zeptal, přihlas se stejným účtem.':'Otevře se jako běžná aplikace bez adresního řádku a zůstane po ruce na ploše.';
 }
 function renderInstallModal(source='daily'){
- const ios=isIosDevice(),title=$('#installNudgeTitle'),copy=$('#installNudgeCopy'),steps=$('#installIosSteps'),note=$('#installNudgeNote'),primary=$('#installNudgePrimary');
- if(ios){
-  title.textContent='Přidej si Proplet na plochu';copy.textContent='Bude pak po ruce stejně jako ostatní aplikace.';steps.classList.remove('hidden');note.classList.remove('hidden');note.textContent='Kdyby se Proplet po prvním otevření z plochy zeptal, přihlas se stejným jménem a heslem.';primary.textContent='Rozumím';
- }else{
-  title.textContent=source==='account'?'Účet uložen. A Proplet do kapsy?':'Měj Proplet vždy po ruce';copy.textContent='Přidej si ho na plochu. Otevírá se pak jako běžná aplikace a k Denní výzvě se dostaneš jedním klepnutím.';steps.classList.add('hidden');note.classList.add('hidden');note.textContent='';primary.textContent='Nainstalovat Proplet';
- }
- primary.disabled=false;
+ const ios=isIosDevice();
+ $('#installNudgeTitle').textContent='Proplet na jedno klepnutí';
+ $('#installNudgeCopy').textContent='Přidej si ho na plochu a hraj rovnou.';
+ $('#installIosSteps').classList.toggle('hidden',!ios);
+ $('#installNudgeNote').classList.add('hidden');
+ $('#installNudgeNote').textContent='';
+ const primary=$('#installNudgePrimary');primary.textContent=ios?'Rozumím':'Přidat na plochu';primary.disabled=false;
 }
+
 function shouldOfferInstallNudge(source='daily'){
  if(!installOfferAvailable()||!installNudgeDue())return false;
  if(source==='daily'){
@@ -1890,7 +1892,8 @@ async function shouldOfferPushNudge(){
 }
 function firstRealGameJustCompleted(){return ['daily','free'].includes(currentGame?.mode)&&currentGame?.justCompleted===true&&completedGameCount()===1}
 function renderPushNudge(context='standard'){
- const firstWin=context==='first_win';$('#pushNudgeEyebrow').textContent=firstWin?'ZÍTRA JE TU NOVÁ VÝZVA':'NOVÁ DESKA KAŽDÝ DEN';$('#pushNudgeTitle').textContent=firstWin?'První výhra je doma. Navážeš zítra?':'Vrať se pro nový Proplet';$('#pushNudgeCopy').textContent=firstWin?'Ráno ti připomeneme novou Denní výzvu. Jen jednu zprávu, dokud ji ještě nemáš vyřešenou.':'Ráno připomeneme jen nevyřešenou Denní výzvu. V pondělí dáme vědět o pěti nových úrovních.';
+ $('#pushNudgeTitle').textContent=context==='first_win'?'Zítra další Proplet?':'Nová výzva neuteče';
+ $('#pushNudgeCopy').textContent='Připomeneme ti nevyřešenou denní výzvu a pondělní novinky.';
 }
 async function maybeOfferPushNudge(action,options={}){if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;pendingPushFollowUp=options.followUp||null;pushNudgeContext=options.context||'standard';renderPushNudge(pushNudgeContext);trackProductEvent('push_nudge_shown');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
 async function maybeOfferFirstWinReturnNudge(action){return firstRealGameJustCompleted()?maybeOfferPushNudge(action,{context:'first_win',followUp:'account'}):false}

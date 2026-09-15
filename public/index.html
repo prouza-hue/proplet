@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#FDFBF7" data-light-color="#FDFBF7" />
   <meta name="color-scheme" content="light dark" />
   <script src="/runtime-meta.js?v=gen5preview5" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=recognition7"></script>
+  <script src="/theme-init.js?v=reminders1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -42,6 +42,7 @@
   <link rel="stylesheet" href="/welcome-feedback.css?v=1">
   <link rel="stylesheet" href="/tajenka-rules.css?v=2">
   <link rel="stylesheet" href="/content-release.css?v=gen5preview5">
+  <link rel="stylesheet" href="/engagement-polish.css?v=4">
 </head>
 <body>
   <div class="ambient ambient-one"></div>
@@ -343,56 +344,48 @@
     </div>
   </div>
 
-  <div id="accountNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card account-nudge-card">
-      <div class="account-nudge-icon">☁️</div>
-      <span id="accountNudgeEyebrow" class="eyebrow">PROGRES BEZ ZTRÁT</span>
-      <h2 id="accountNudgeTitle">Ulož si postup</h2>
+  <div id="accountNudgeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="accountNudgeTitle" aria-describedby="accountNudgeCopy">
+    <div class="modal-card account-nudge-card reminder-card">
+      <div class="reminder-art" aria-hidden="true"><img src="/assets/avatars/v3/20-kniha-s-copem.svg" width="80" height="80" alt=""></div>
+      <h2 id="accountNudgeTitle">Nepřijď o své výsledky</h2>
       <p id="accountNudgeCopy" class="muted"></p>
-      <div class="account-nudge-benefits">
-        <span>☁️ pokračuj na mobilu i počítači</span>
-        <span>🏁 zapoj se do pořadí</span>
-        <span>🔥 neztrať XP, série ani úspěchy</span>
-      </div>
-      <button id="nudgeCreateBtn" class="primary-btn big">Uložit postup</button>
-      <button id="nudgeLoginBtn" class="secondary-btn">Už účet mám</button>
+      <div class="reminder-bonus"><strong>+500 XP</strong> za založení účtu</div>
+      <button id="nudgeCreateBtn" class="primary-btn big">Registrace</button>
+      <button id="nudgeLoginBtn" class="secondary-btn">Přihlášení</button>
       <button id="nudgeSkipBtn" class="text-btn">Pokračovat bez účtu</button>
     </div>
   </div>
 
   <div id="progressGuardModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="progressGuardTitle">
-    <div class="modal-card progress-guard-card">
+    <div class="modal-card progress-guard-card reminder-card">
       <button id="closeProgressGuardModal" class="modal-close" aria-label="Zavřít">×</button>
-      <div class="progress-guard-icon" aria-hidden="true"><span>☁️</span><b>✓</b></div>
-      <span id="progressGuardEyebrow" class="eyebrow">NEŽ ODEJDEŠ</span>
-      <h2 id="progressGuardTitle">Ať o svůj postup nepřijdeš</h2>
+      <div class="reminder-art" aria-hidden="true"><img src="/assets/avatars/v3/20-kniha-s-copem.svg" width="80" height="80" alt=""></div>
+      <h2 id="progressGuardTitle">Nepřijď o své výsledky</h2>
       <p id="progressGuardCopy" class="muted">Bez účtu zůstává postup jen na tomto zařízení.</p>
       <div class="progress-guard-summary" aria-label="Neuložený postup">
         <span><b id="progressGuardGames">0</b><small>hotových her</small></span>
         <span><b id="progressGuardXp">0 XP</b><small>čeká na uložení</small></span>
       </div>
       <button id="progressGuardGoogleBtn" type="button" class="google-auth-btn progress-guard-google"><img class="google-g" src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button>
-      <small class="progress-guard-bonus">Pár vteřin · bez nového hesla · +500 XP</small>
-      <button id="progressGuardCreateBtn" class="secondary-btn" type="button">Založit účet jinak</button>
+      <small class="progress-guard-bonus">+500 XP za nový účet</small>
+      <button id="progressGuardCreateBtn" class="secondary-btn" type="button">Další možnosti</button>
       <button id="progressGuardDismissBtn" class="text-btn" type="button">Teď ne</button>
     </div>
   </div>
 
-  <div id="pushNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card push-nudge-card">
-      <div class="push-nudge-icon">🔔</div>
-      <span id="pushNudgeEyebrow" class="eyebrow">NOVÁ DESKA KAŽDÝ DEN</span>
+  <div id="pushNudgeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pushNudgeTitle" aria-describedby="pushNudgeCopy">
+    <div class="modal-card push-nudge-card reminder-card">
+      <div class="reminder-art" aria-hidden="true"><img src="/rewards/printshop/challenge.svg?v=icons1" width="80" height="80" alt=""></div>
       <h2 id="pushNudgeTitle">Vrať se pro nový Proplet</h2>
       <p id="pushNudgeCopy" class="muted">Ráno připomeneme jen nevyřešenou Denní výzvu. V pondělí dáme vědět o pěti nových úrovních.</p>
-      <button id="pushNudgeEnableBtn" class="primary-btn big">Zapnout upozornění 🔔</button>
+      <button id="pushNudgeEnableBtn" class="primary-btn big">Zapnout upozornění</button>
       <button id="pushNudgeLaterBtn" class="text-btn">Teď ne</button>
     </div>
   </div>
 
-  <div id="installNudgeModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card install-nudge-card">
-      <div class="install-nudge-icon">📲</div>
-      <span class="eyebrow">PROPLET V KAPSE</span>
+  <div id="installNudgeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="installNudgeTitle" aria-describedby="installNudgeCopy">
+    <div class="modal-card install-nudge-card reminder-card">
+      <div class="reminder-art" aria-hidden="true"><img src="/brand/mark.svg?v=brand1" width="80" height="80" alt=""></div>
       <h2 id="installNudgeTitle">Měj Proplet vždy po ruce</h2>
       <p id="installNudgeCopy" class="muted">Přidej si ho na plochu a k Denní výzvě se dostaneš jedním klepnutím.</p>
       <div id="installIosSteps" class="install-steps hidden">
@@ -685,7 +678,7 @@
   <script src="/app/account/tajenka-storage.js"></script>
   <script src="/app/account/account.js?v=guestcta1"></script>
   <script src="/app/game/state.js"></script>
-  <script src="/app/game/board.js"></script>
+  <script src="/app/game/board.js?v=starterguide3"></script>
   <script src="/app/game/input.js?v=fix20"></script>
   <script src="/app/game/hints.js?v=boardintro2"></script>
   <script src="/app/core/completion-pipeline.js"></script>
@@ -697,10 +690,10 @@
   <script src="/app/rankings/rankings.js?v=fixsep8c"></script>
   <script src="/ribbon-catalog.js?v=rankprogress1"></script>
   <script src="/ribbon-ui.js?v=icons1"></script>
-  <script src="/app.js?v=gen5preview5"></script>
+  <script src="/app.js?v=reminders2"></script>
   <script src="/quality-v334.js?v=calmsettings1"></script>
   <script src="/organic-ui-v4023.js?v=avatareditor1"></script>
   <script src="/welcome-feedback.js?v=2"></script>
-  <script src="/content-release.js?v=gen5preview5"></script>
+  <script src="/content-release.js?v=reminders1"></script>
 </body>
 </html>

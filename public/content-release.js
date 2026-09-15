@@ -24,6 +24,19 @@
     difficulty.addEventListener('change',populate);populate();
     form.addEventListener('submit',event=>{event.preventDefault();const id=`g5-r1-${difficulty.value}-${board.value.padStart(3,'0')}`,puzzle=puzzleDB.free[difficulty.value].find(p=>p.id===id);if(puzzle)startGame(puzzle,'free',null)});
     section.querySelector('.gen5-preview-reopen').addEventListener('click',()=>{if(openTransientModal())return;mount();document.documentElement.classList.add('content-release-open');dialog.showModal()});
+    const reminders=document.createElement('div');reminders.className='reminder-preview-controls';
+    reminders.innerHTML='<label>Kontrola připomínek<select aria-label="Ukázka připomínky"><option value="account-1">Účet – první výhra</option><option value="account-2">Účet – další postup</option><option value="account-3">Účet – poslední připomenutí</option><option value="guard">Uložení před odchodem / po návratu</option><option value="push-first">Oznámení – první výhra</option><option value="push">Oznámení – další hry</option><option value="install">Přidání na plochu</option></select></label><button type="button" class="preview-reminder-show">Ukázat připomínku</button><button type="button" class="preview-training">Vyzkoušet začátek tréninku</button>';
+    section.append(reminders);
+    reminders.querySelector('.preview-reminder-show').addEventListener('click',()=>{
+      if(openTransientModal())return;
+      const value=reminders.querySelector('select').value;let id;
+      if(value.startsWith('account-')){renderAccountNudge(Number(value.slice(-1)));id='accountNudgeModal'}
+      else if(value==='guard'){renderProgressGuard('desktop');id='progressGuardModal'}
+      else if(value.startsWith('push')){renderPushNudge(value==='push-first'?'first_win':'standard');id='pushNudgeModal'}
+      else{renderInstallModal('profile');id='installNudgeModal'}
+      document.getElementById(id).classList.remove('hidden');
+    });
+    reminders.querySelector('.preview-training').addEventListener('click',()=>{if(!openTransientModal())startStarter()});
   }
   function mount(){
     if(dialog)return;

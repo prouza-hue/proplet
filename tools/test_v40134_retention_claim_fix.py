@@ -36,7 +36,7 @@ for event in (
     "first_win_return_nudge_dismissed",
 ):
     assert event in app and event in product_registry
-for element_id in ("pushNudgeEyebrow", "pushNudgeTitle", "pushNudgeCopy"):
+for element_id in ("pushNudgeTitle", "pushNudgeCopy"):
     assert f'id="{element_id}"' in html
 
 print("PASS: v4.01.34 terminal claims and first-win return nudge")

@@ -122,4 +122,24 @@ assert.strictEqual(h.pickTarget(),null,'completed training has no hint target');
 game.found=[{answerIndex:1}];
 assert.strictEqual(h.pickTarget().i,0,'out-of-order solving keeps the first unfinished target');
 
+// The welcome emphasis follows the first answer, never later words or normal games.
+function fakeNode(){
+ const classes=new Set();return {children:[],dataset:{},style:{setProperty(){}},
+ classList:{add:c=>classes.add(c),contains:c=>classes.has(c),toggle(c,on){on?classes.add(c):classes.delete(c)}},
+ set innerHTML(value){this.children=[]},appendChild(child){this.children.push(child)},addEventListener(){}};
+}
+const boardNode=fakeNode();
+const renderer=board.create({getGame:()=>game,query:s=>s==='#board'?boardNode:null,
+ documentObj:{createElement:fakeNode},requestAnimationFrameFn:()=>{},colors:['#123']});
+game.mode='starter';game.found=[];game.used=new Map();game.starterGuidePath=[0,1,2,4];
+renderer.render();
+assert(boardNode.classList.contains('starter-first-word'));
+assert.deepStrictEqual(boardNode.children.filter(n=>n.classList.contains('starter-guide')).map(n=>n.dataset.guideStep),['1','2','3','4']);
+game.found=[{answerIndex:2}];renderer.render();assert(boardNode.classList.contains('starter-first-word'));
+game.found=[{answerIndex:0}];game.used=new Map([[0,0]]);game.starterGuidePath=[1,2];renderer.render();
+assert(!boardNode.classList.contains('starter-first-word'));
+assert(!boardNode.children[0].classList.contains('starter-guide'));
+game.mode='free';game.found=[];renderer.render();
+assert(!boardNode.classList.contains('starter-first-word'));
+assert(!boardNode.children.some(n=>n.classList.contains('starter-guide')));
 console.log('PASS: Sprint 11B.2 board/input/hints modules preserve interaction policies');
