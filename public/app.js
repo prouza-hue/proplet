@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-audit-phase2-1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-audit-phase2-2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -317,7 +317,7 @@ function dailyOrchestration(){
   renderDailyWeekRhythm,renderLevelCard,getProfile,getQueue,getSyncState:()=>syncState,
   renderRescueCard:(...args)=>renderRescueCard(...args),renderQuickPlay:(...args)=>renderQuickPlay(...args),renderTajenkaEntry:(...args)=>renderTajenkaEntry(...args),
   showDailyResult:(...args)=>showDailyResult(...args),startGame:(...args)=>startGame(...args),showToast,
-  afterRender:()=>window.PropletHomeLayout?.applyDailyLayout?.(),
+  afterRender:()=>{window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus()},
  });
  return dailyOrchestrationController;
 }
@@ -333,10 +333,39 @@ function rankingsOrchestration(){
 }
 
 function blankState(){return {completed:{},rescues:{},inProgress:{},dailyDates:[],statsVersion:5};}
+let accountProgressRequest=null,accountProgressReady=null,accountProgressError=false;
+function accountProgressAvailable(){
+ const p=getProfile();
+ return !p?.token||accountProfileMatches(accountProgressReady)||(!navigator.onLine&&!!getState(p.id).remoteProgressLoadedAt);
+}
+function renderAccountProgressStatus(){
+ const blocked=!accountProgressAvailable();
+ if(document.body.classList.contains('account-progress-pending')!==blocked)document.body.classList.toggle('account-progress-pending',blocked);
+ for(const selector of ['#quickPlayCard','#difficultyCards','#tajenkaPreviewCard','#tajenkaPlayCard','#newContentBanner','#screen-daily .daily-hero']){
+  const element=$(selector);if(element){if(element.inert!==blocked)element.inert=blocked;if(element.getAttribute('aria-busy')!==String(blocked))element.setAttribute('aria-busy',String(blocked))}
+ }
+ for(const screen of ['daily','free']){
+  const root=$(`#screen-${screen}`);if(!root)continue;
+  let notice=root.querySelector('.account-progress-status');
+  if(!notice){notice=document.createElement('div');notice.className='account-progress-status card';notice.setAttribute('role','status');root.prepend(notice)}
+  if(notice.hidden===blocked)notice.hidden=!blocked;
+  const message=accountProgressError?'Postup se nepodařilo načíst. Připoj se k internetu a zkus to znovu.':'Načítáme tvůj postup…';
+  const text=message+(accountProgressError?' Zkusit znovu':'');
+  if(notice.textContent!==text){notice.textContent=message;if(accountProgressError){const retry=document.createElement('button');retry.className='secondary-btn';retry.textContent=' Zkusit znovu';retry.onclick=()=>refreshRemoteProfile();notice.appendChild(retry)}}
+ }
+}
+function allowAccountGameStart(){
+ if(accountProgressAvailable())return true;
+ renderAccountProgressStatus();showToast(accountProgressError?'Nejdřív načti svůj postup tlačítkem Zkusit znovu.':'Ještě načítáme tvůj postup. Za chvilku můžeš hrát.');return false;
+}
 function accountSession(){
  if(accountSessionController)return accountSessionController;
  const factory=window.PropletAccountSession;if(!factory?.create)return null;
- accountSessionController=factory.create({storage:localStorage,profileKey:PROFILE_KEY,adoptGuestData});return accountSessionController;
+ accountSessionController=factory.create({storage:localStorage,profileKey:PROFILE_KEY,adoptGuestData,onChange:(next,previous)=>{
+  if(next?.id===previous?.id&&next?.token===previous?.token)return;
+  accountProgressReady=null;accountProgressError=false;
+  if(typeof puzzleDB!=='undefined'&&puzzleDB){renderAccountProgressStatus();if(next?.token)queueMicrotask(()=>refreshRemoteProfile());else{renderDaily();renderFree()}}
+ }});return accountSessionController;
 }
 function getProfile(){const session=accountSession();if(session)return session.get();try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{return null}}
 function getAnonymousId(){
@@ -740,6 +769,7 @@ function renderNewContentBanner(){
 }
 
 function renderFree(){
+ renderAccountProgressStatus();
  renderNewContentBanner();const unlock=mozkomorUnlockState();
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
   if(key==='mozkomor'&&!unlock.unlocked){const pct=Math.min(100,Math.round(unlock.done/unlock.required*100));const links=[1,-1].map(direction=>Array.from({length:23},(_,i)=>{const x=i*28-8,y=direction===1?x*280/600:280-x*280/600;return `<rect x="-17" y="-6" width="34" height="12" rx="6" transform="translate(${x} ${y}) rotate(${direction*25})"/>`}).join('')).join('');return `<article class="difficulty-card card mozkomor-locked" data-diff="mozkomor" aria-label="Mozkomor zamčený"><div class="difficulty-copy"><div class="difficulty-title"><span class="difficulty-left-icon">${difficultyIconMarkup('mozkomor','difficulty-icon-img')}</span><div class="difficulty-heading-line"><h2>Mozkomor</h2></div></div></div><svg class="mozkomor-chains" viewBox="0 0 600 280" preserveAspectRatio="none" aria-hidden="true" focusable="false"><g fill="none" stroke="#555c60" stroke-width="6">${links}</g><g fill="none" stroke="#c4c8c8" stroke-width="2">${links}</g></svg><div class="mozkomor-lock-plate"><svg class="mozkomor-padlock" viewBox="0 0 48 56" aria-hidden="true" focusable="false"><path d="M12 23V15a12 12 0 0 1 24 0v8" fill="none" stroke="currentColor" stroke-width="6"/><rect x="5" y="21" width="38" height="31" rx="6" fill="currentColor"/><path d="M24 31v11" stroke="var(--lock-paper)" stroke-width="5" stroke-linecap="round"/></svg><strong>Dohraj ${unlock.required} Mozkožroutů<br>a vypusť Mozkomora</strong><span class="mozkomor-lock-count">${unlock.done} / ${unlock.required} dokončeno</span><div class="mozkomor-lock-meter" role="progressbar" aria-label="Dokončení Mozkožrouti" aria-valuemin="0" aria-valuemax="${unlock.required}" aria-valuenow="${unlock.done}"><span style="width:${pct}%"></span></div></div></article>`}
@@ -750,6 +780,7 @@ function renderFree(){
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
 }
 async function startFree(diff){
+ if(!allowAccountGameStart())return;
  if(diff==='mozkomor'&&!mozkomorUnlockState().unlocked){showToast('🔒 Mozkomor se odemkne po dokončení všech 200 Mozkožroutů.');return}
  const list=sortedFreeBank(diff),slots=localFreeSlotState(diff),resume=resumableFreePuzzle(diff,list),unplayed=list.filter(p=>!slots.actual.has(Number(p.meta?.level))),p=resume||(unplayed[0]||list[0]);if(p)startGame(p,'free',null);
 }
@@ -774,6 +805,7 @@ async function sendAttemptCheckpoint(eventType){
  try{await api('/api/attempt/checkpoint',{method:'POST',body:JSON.stringify({attempt_id:g.attemptId,event_type:eventType,elapsed_ms:Math.max(0,Math.round(gameElapsed(g))),found_words:foundWords})})}catch{}
 }
 function startGame(puzzle,mode,dailyDate,options={}){
+ if(mode!=='starter'&&!allowAccountGameStart())return;
  $('#tajenkaHintBanner')?.remove();
  hideTouchMagnifier();
  stopTimer();hideGameUndo();
@@ -1189,7 +1221,7 @@ function trackAppSession(){
 }
 
 async function syncQueue({announce=false}={}){
- if(GEN4_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview'||new URLSearchParams(location.search).get('tutorial')==='1'){syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
+ if(GEN4_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview'||new URLSearchParams(location.search).get('tutorial')==='1'){if(getProfile()?.token)await refreshRemoteProfile();syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
  const scope=p.id,controller=resultQueue(p,scope);if(controller&&controller.getQueue().length){
   syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
@@ -1226,16 +1258,26 @@ function mergeRemoteProgress(rows,scope=playerScope()){
 }
 async function refreshRemoteProfile({throwOnError=false}={}){
  const p=getProfile();if(!p?.token)return null;
- try{
-  const [me,progress]=await Promise.all([api('/api/me'),api('/api/progress')]);
+ if(accountProgressRequest&&accountProgressRequest.profile.id===p.id&&accountProgressRequest.profile.token===p.token){try{return await accountProgressRequest.promise}catch(e){if(throwOnError)throw e;return null}}
+ accountProgressError=false;renderAccountProgressStatus();
+ const request={profile:p,promise:null};
+ request.promise=(async()=>{try{
+  const [me,progress]=await Promise.all([api('/api/me',{authProfile:p}),api('/api/progress',{authProfile:p})]);
   if(!accountProfileMatches(p))return null;
+  if(!Array.isArray(progress.completed))throw new Error('Neúplná odpověď postupu');
   mergeRemoteProgress(progress.completed||[],p.id);
+  const loadedState=getState(p.id);loadedState.remoteProgressLoadedAt=new Date().toISOString();saveState(loadedState,p.id);
+  accountProgressReady=p;
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
   updateAccountProfile({name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',googleLinked:!!me.googleLinked,googleAvatarUrl:me.googleAvatarUrl||null,useGoogleAvatar:!!me.useGoogleAvatar,supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
   document.dispatchEvent(new CustomEvent('proplet:profile-refreshed'));
+  renderDaily();renderFree();renderProfile();
   return me;
- }catch(e){if(throwOnError)throw e;return null}
+ }catch(e){if(accountProfileMatches(p)){accountProgressError=true;renderAccountProgressStatus()}throw e}
+ finally{if(accountProgressRequest===request)accountProgressRequest=null}
+ })();accountProgressRequest=request;
+ try{return await request.promise}catch(e){if(throwOnError)throw e;return null}
 }
 
 

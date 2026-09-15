@@ -23,7 +23,7 @@ const {execFileSync}=require('node:child_process');
  const out={sha:expectedSha,assets,started:new Date().toISOString(),browser:b.version(),viewport:{width:1440,height:1000},cpuThrottle:1,guest:true,measurements:[],errors:[]};
  const requests=[];p.on('request',r=>requests.push({method:r.method(),path:new URL(r.url()).pathname}));
  p.on('pageerror',e=>out.errors.push(e.message));
- await p.goto(url);await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);await p.waitForTimeout(5000);
+ console.log('Loading isolated frontend');await p.goto(url);await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);await p.waitForTimeout(5000);
  const skip=p.locator('.onboarding-return-skip');if(await skip.isVisible())await skip.click();
  out.demandLoading=await p.evaluate(()=>({bootstrap:puzzleDB.bootstrapSchema===1,fullRequests:performance.getEntriesByType('resource').filter(r=>new URL(r.name).pathname==='/puzzles.json').length}));
  if(out.demandLoading.bootstrap)assert.equal(out.demandLoading.fullRequests,0,'home must not fetch the full bank');
@@ -36,6 +36,7 @@ const {execFileSync}=require('node:child_process');
   saveState(state);return JSON.stringify(state.completed);
  });
  if(out.demandLoading.bootstrap){
+  console.log('Checking offline bootstrap reload');
   await p.evaluate(()=>navigator.serviceWorker.ready);await p.waitForTimeout(1000);
   await c.setOffline(true);await p.reload();
   await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1);
@@ -44,7 +45,7 @@ const {execFileSync}=require('node:child_process');
   await c.setOffline(false);
   await p.waitForFunction(()=>typeof tajenkaPuzzle!=='undefined'&&tajenkaPuzzle);
  }
- await p.evaluate(()=>{closeTransientModals();startGame(puzzleDB.free.easy[0],'free',null,{})});
+ console.log('Starting free game');await p.evaluate(()=>{closeTransientModals();startGame(puzzleDB.free.easy[0],'free',null,{})});
  await p.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='free'&&currentGame.puzzle.answers?.length>0);
  await p.waitForTimeout(500);
  assert.equal(await p.evaluate(()=>JSON.stringify(getState().completed)),savedProgress,'offline reload/full hydration preserves existing completion records');

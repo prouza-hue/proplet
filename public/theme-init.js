@@ -121,7 +121,7 @@
     window.__PROPLET_COLD_BOOTSTRAP_PREFETCH=coldBootstrapFetch;
 
     const hydrator=document.createElement('script');
-    hydrator.src='/bootstrap-hydrator.js?v=auditphase2-1';
+    hydrator.src='/bootstrap-hydrator.js?v=auditphase2-2';
     hydrator.async=false;
     hydrator.dataset.propletBootstrapHydrator='1';
     document.head.appendChild(hydrator);
@@ -239,7 +239,7 @@
     await loadScript('/account-conversion-v3331.js?v=guestcta1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=settingssimple1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=auditphase2-1','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=auditphase2-2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');

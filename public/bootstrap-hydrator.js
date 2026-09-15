@@ -95,13 +95,19 @@
       startGameWrapped=true;
       const canonicalStartGame=startGame;
       startGame=function(puzzle,mode,dailyDate,options={}){
+        if(mode!=='starter'&&typeof allowAccountGameStart==='function'&&!allowAccountGameStart())return;
         const request=++pendingStart;
+        const requestedProfile=typeof getProfile==='function'?getProfile():null;
         const requestedScreen=typeof currentScreen==='undefined'?null:currentScreen;
         const needsFull=(mode==='free'||mode==='rescue')&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1;
         if(!needsFull)return canonicalStartGame(puzzle,mode,dailyDate,options);
         ensureFullDatabase().then(full=>{
           if(request!==pendingStart)return;
           if(requestedScreen!==null&&currentScreen!==requestedScreen)return;
+          if(typeof getProfile==='function'){
+            const active=getProfile();
+            if(active?.id!==requestedProfile?.id||active?.token!==requestedProfile?.token)return;
+          }
           const resolved=canonicalPuzzle(full,puzzle,mode);
           if(!playablePuzzle(resolved))throw new Error('canonical-puzzle-missing');
           canonicalStartGame(resolved,mode,dailyDate,options);

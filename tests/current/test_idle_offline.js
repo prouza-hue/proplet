@@ -35,7 +35,7 @@ const root=path.resolve(__dirname,'../../public');
   });
   handlers.install({waitUntil:p=>installation=p});
   if(failure)await assert.rejects(installation);else await installation;
-  assert.equal(skipped,failure?0:1);assert.deepEqual(deleted,failure?['proplet-v4.02.2-audit-phase2-1']:[]);
+  assert.equal(skipped,failure?0:1);assert.deepEqual(deleted,failure?['proplet-v4.02.2-audit-phase2-2']:[]);
  }
  // A slow sibling fetch must finish writing before candidate cache cleanup.
  {

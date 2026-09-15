@@ -52,6 +52,7 @@ jobs:
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" || true' EXIT
           python tools/test_printshop_browser.py
+          RESULT_PATH=artifacts/account-progress.json node tools/test_account_progress_browser.cjs
           node tools/test_idle_offline_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
