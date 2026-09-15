@@ -127,6 +127,31 @@ function, rpc_body = rpc_calls[0]
 assert function == "proplet_submit_result_v1"
 command = rpc_body["p_command"]
 assert rpc_body["p_player_id"] == player["id"] == command["playerId"]
+
+# A stale or modified finish must not erase assistance already recorded for
+# this player's same attempt. Identity stays tied to the original queued bytes.
+recorded = {
+    "puzzle_id": payload.puzzle_id, "challenge_key": payload.challenge_key,
+    "mode": payload.mode, "difficulty": payload.difficulty,
+    "calm_mode": True, "hints_used": 2, "max_hint_level": 2,
+}
+stale = payload.model_copy(update={"clean_solve": True, "calm_mode": False})
+stale_digest = result_domain.result_identity(player["id"], stale).request_digest
+def select_recorded(table, **filters):
+    if table == "puzzle_attempts":
+        assert filters == {"id": stale.attempt_id, "player_id": player["id"]}
+        return [recorded]
+    return []
+with ExitStack() as stack:
+    for active_patch in common_patches(stale, select_recorded, fake_rpc):
+        stack.enter_context(active_patch)
+    server.result(stale, request_for(stale), "Bearer test")
+safe_command = rpc_calls[-1][1]["p_command"]
+assert safe_command["calmMode"] is True
+assert safe_command["hintsUsed"] == 2 and safe_command["maxHintLevel"] == 2
+assert safe_command["cleanSolve"] is False
+assert safe_command["requestDigest"] == stale_digest
+assert stale.calm_mode is False and stale.hints_used == 0
 assert rpc_body["p_idempotency_key"] == f"attempt:{payload.attempt_id}"
 assert rpc_body["p_request_digest"] == command["requestDigest"]
 assert rpc_body["p_command_digest"] == command["commandDigest"]

@@ -132,7 +132,9 @@ def install_account_auth(
         user = auth_request("GET", "/auth/v1/user", access_token=access_token)
         uid = str(user.get("id") or "")
         email = str(user.get("email") or "").strip().casefold()
-        if not uid or not email:
+        # A valid access token alone does not prove ownership of its email.
+        # Read the provider's confirmation field, never editable user_metadata.
+        if not uid or not email or not user.get("email_confirmed_at"):
             raise HTTPException(401, "Ověření identity vypršelo. Zkus odkaz znovu.")
         return user
 
@@ -385,6 +387,16 @@ def install_account_auth(
         enforce_rate_limit(request, "google_auth_complete", limit=20, window_seconds=3600)
         user = auth_user(payload.accessToken)
         uid = str(user.get("id"))
+        # Identities come from the authenticated Auth API response. A password
+        # token or a user_metadata claim must not impersonate a Google identity.
+        if not any(
+            isinstance(identity, dict)
+            and identity.get("provider") == "google"
+            and isinstance(identity.get("identity_data"), dict)
+            and identity["identity_data"].get("email_verified") is True
+            for identity in (user.get("identities") or [])
+        ):
+            raise HTTPException(401, "Přihlas se znovu přes Google.")
         email = norm_email(str(user.get("email") or ""))
         meta = user.get("user_metadata") or {}
         google_avatar_url = trusted_google_avatar(user)

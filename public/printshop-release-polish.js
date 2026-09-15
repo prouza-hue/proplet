@@ -133,6 +133,9 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
     if(!spark||spark.dataset.weeklyIconReady==='1')return;
     spark.textContent='';
     const img=document.createElement('img');
+    img.loading='lazy';
+    img.decoding='async';
+    img.width=42;img.height=42;
     img.src='/weekly-banner-icon-optimized.svg';
     img.alt='';
     img.setAttribute('aria-hidden','true');
@@ -151,6 +154,9 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
     if(!img){
       slot.textContent='';
       img=document.createElement('img');
+      img.loading='lazy';
+      img.decoding='async';
+      img.width=64;img.height=64;
       img.src='/tajenka.svg';
       img.alt='';
       img.setAttribute('aria-hidden','true');
