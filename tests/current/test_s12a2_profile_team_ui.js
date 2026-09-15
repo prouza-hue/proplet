@@ -45,7 +45,7 @@ has(runtime,/referrerpolicy="no-referrer"/,'Google avatar referrer policy missin
 has(runtime,/syncQueue\(\{announce:true\}\)/,'manual profile sync action missing');
 has(runtime,/getQueue\(\)\.length&&!confirm\('Některé výsledky ještě čekají na synchronizaci\./,'logout pending-queue guard drifted');
 has(styles,/\.ranking-team-card small\{font-size:14px;/,'team card helper text must match result metadata readability');
-assert(index.includes('/styles.css?v=safearea1')&&sw.includes('/styles.css?v=safearea1'),'team card readability CSS cache boundary was not advanced');
+assert(index.includes('/styles.css?v=mozkomorlock1')&&sw.includes('/styles.css?v=mozkomorlock1'),'team card readability CSS cache boundary was not advanced');
 
 if(!account){
   has(app,/function renderProfile\(\{focusRoadmap=false\}=\{\}\)/,'legacy profile renderer missing');
