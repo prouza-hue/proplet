@@ -12,7 +12,7 @@
 
   const cacheCanonicalResponse=response=>{
     if(!response?.ok||!('caches' in window))return;
-    try{caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',response.clone())).catch(()=>{})}catch{}
+    try{const cachedResponse=response.clone();caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
   };
 
   const fetchCanonical=()=>fetch('/puzzles.json',{cache:'no-store'}).then(response=>{
@@ -110,6 +110,9 @@
       // as a race-condition guard for unusually slow connections.
       const hydrateWhenReady=()=>{
         try{
+          // A failed/rejected bootstrap falls back to the full database. That
+          // successful startup needs no hydration or further readiness polling.
+          if(typeof puzzleDB!=='undefined'&&puzzleDB&&!puzzleDB.bootstrapSchema)return;
           if(window.__PROPLET_BOOTSTRAP_DELIVERED__&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1){
             ensureFullDatabase().catch(error=>console.warn('background bootstrap hydration failed',error));
             return;

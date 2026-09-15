@@ -5,6 +5,8 @@
 
   const q=(selector,root=document)=>root?.querySelector?.(selector)||null;
   const qa=(selector,root=document)=>[...(root?.querySelectorAll?.(selector)||[])];
+  // DOMTokenList writes can emit mutations even when the token is unchanged.
+  const setClass=(el,name,on)=>{if(el&&el.classList.contains(name)!==on)el.classList.toggle(name,on)};
   let queued=false;
   let lastMobileHintToast='';
   let toastResetTimer=0;
@@ -33,7 +35,7 @@
 
   function renderSemanticHint(el,clue){
     if(!el||!clue)return;
-    el.classList.add('tajenka-semantic-hint');
+    setClass(el,'tajenka-semantic-hint',true);
     if(el.dataset.tajenkaSemanticClue===clue&&q('.tajenka-semantic-hint-icon',el)&&q('.tajenka-semantic-hint-text',el))return;
     const text=document.createElement('span');
     text.className='tajenka-semantic-hint-text';
@@ -44,7 +46,7 @@
 
   function clearSemanticHint(el){
     if(!el)return;
-    el.classList.remove('tajenka-semantic-hint');
+    setClass(el,'tajenka-semantic-hint',false);
     delete el.dataset.tajenkaSemanticClue;
   }
 
@@ -86,7 +88,7 @@
     /* Level 2/3 hints replace #gameMessage. Once that happens, the old level-1
        clue must stop owning the surface. */
     if(messageRaw&&messageRaw!==bannerClue){
-      banner?.classList.add('hidden');
+      setClass(banner,'hidden',true);
       clearSemanticHint(banner);
       clearSemanticHint(message);
       lastMobileHintToast='';
@@ -95,7 +97,7 @@
 
     if(banner){
       banner.dataset.tajenkaSemanticClue=bannerClue;
-      banner.classList.add('hidden');
+      setClass(banner,'hidden',true);
     }
     renderSemanticHint(message,bannerClue);
     if(isPhoneLayout())showMobileHintToast(bannerClue);
@@ -106,19 +108,22 @@
     if(!box)return;
     const game=q('#screen-game');
     if(!game?.classList.contains('tajenka-mode')){
-      box.classList.add('hidden');
+      setClass(box,'hidden',true);
       return;
     }
 
     let progress=q('#tajenkaProgress',box);
     let slots=q('#tajenkaSlots',box);
+    const rebuilt=!progress||!slots;
     if(!progress||!slots){
       box.innerHTML='<div class="tajenka-phrase-head"><span class="stat-label">TAJENKA</span><div id="tajenkaProgress" class="tajenka-progress" aria-live="polite"></div></div><div id="tajenkaSlots" class="tajenka-slots"></div>';
       progress=q('#tajenkaProgress',box);
       slots=q('#tajenkaSlots',box);
     }
 
-    if(!progress||!slots)return;
+    // The game owns rendering on start, progress and reveal expiry. Only repair
+    // a replaced shell here; observing that render must not trigger another one.
+    if(!rebuilt||!progress||!slots)return;
     try{
       if(typeof currentGame!=='undefined'&&currentGame?.mode==='tajenka'&&typeof renderTajenkaPhrase==='function')renderTajenkaPhrase(currentGame);
     }catch{}
@@ -141,11 +146,11 @@
     const tajenka=game?.classList.contains('tajenka-mode');
     if(tajenka&&isTabletRail()&&currentWord?.parentNode===rail){
       if(phrase.parentNode!==rail||phrase.previousElementSibling!==currentWord)currentWord.after(phrase);
-      phrase.classList.add('tajenka-phrase-in-rail');
+      setClass(phrase,'tajenka-phrase-in-rail',true);
       return;
     }
 
-    phrase.classList.remove('tajenka-phrase-in-rail');
+    setClass(phrase,'tajenka-phrase-in-rail',false);
     if(phrase.parentNode!==boardColumn){
       const anchor=starterCoach?.parentNode===boardColumn?starterCoach:boardStage;
       if(anchor)boardColumn.insertBefore(phrase,anchor);
