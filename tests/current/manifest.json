@@ -7,6 +7,7 @@
     "tests": [
       {"path":"tests/current/test_gen5_release_cta.js","runner":"node"},
       {"path":"tests/current/test_gen5_preview.py","runner":"python"},
+      {"path":"tests/current/test_gen5_production.py","runner":"python"},
       {"path": "tests/current/test_account_identity_boundary.py", "runner": "python"},
       {"path": "tests/current/test_preview_path_boundary.py", "runner": "python"},
       {"path":"tests/current/test_browser_fixture.cjs","runner":"node"},

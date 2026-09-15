@@ -34,15 +34,13 @@ class Gen5PreviewTests(unittest.TestCase):
                 self.assertEqual(config.puzzles_path.name,'gen5_preview_puzzles.json' if active else 'puzzles.json')
 
     def test_existing_files_and_all_reserve_payloads_stay_unchanged(self):
-        expected={'data/puzzles.json':'51370983c0f8a831f2706eaf45b6130e44666fe4aa8e57e309868766475ee53a',
-                  'public/puzzles.json':'09b2f3a4545ac1504de0e618a6bfa657f04c0d72f324dfb2b2eadff1b73504c7',
-                  'data/rolling_content_v1.json':'6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c'}
+        expected={'data/rolling_content_v1.json':'6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c'}
         for name,value in expected.items():
             self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(),value,name)
         source=read('data/puzzles.json'); rolling=read('data/rolling_content_v1.json')
         preview=server.load_puzzles()
         for d in DIFFICULTIES:
-            history=source['free'][d]+rolling['puzzles'].get(d,[])
+            history=[p for p in source['free'][d] if not p['id'].startswith('g5-r1-')]+rolling['puzzles'].get(d,[])
             self.assertEqual(preview['free'][d][:len(history)],history,d)
         for key in source.keys()-{'free','freeLevelsPerDifficulty','freeLevelCounts','release'}:
             self.assertEqual(preview[key],source[key],key)
