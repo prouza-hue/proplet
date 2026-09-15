@@ -1,0 +1,840 @@
+{
+  "kind": "vocabulary-only-capacity-rehearsal",
+  "inputs": {
+    "content/gen5/profiles.json": "51f38220f0b3516f816277fe4a76160d9e898d022f1a390020b58f70399e3387",
+    "content/generation-manifest.json": "142f7483f4afe3398170697ec914f75c1920dc5d0d7495f10579d6b8624ef389",
+    "data/answer_tiers.json": "3088dbe03fb2a0ac4d441f9338595be79a0138e2b35a3d9d7101d58a0532a799",
+    "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+    "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+    "data/puzzles.json": "51370983c0f8a831f2706eaf45b6130e44666fe4aa8e57e309868766475ee53a",
+    "data/rolling_content_v1.json": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+    "data/target_generation_exclusions_v334.json": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+    "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "public/puzzles.json": "09b2f3a4545ac1504de0e618a6bfa657f04c0d72f324dfb2b2eadff1b73504c7",
+    "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "tools/gen5/__init__.py": "1e88b45d825b3427e88b43806ae730008b1bb2df972085b36960c83ffd5d7269",
+    "tools/gen5/catalog.py": "20f7df65104d7e2c0dd19c0e25f8682fae9337822d459070462e0c2404d56d76",
+    "tools/gen5/geometry.py": "a117ce469d0dc5d455e473616f8e3d47884ac534fe2eb71ad381897fdf8b5a63",
+    "tools/gen5/runner.py": "69cc614b67478dd059e5d1f80ec6e002297bef94d36c894ca63952ed75a00f63",
+    "tools/gen5/validation.py": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd",
+    "tools/gen5_lab.py": "637ca9ae91df409ea0b5ab67f5b376646b9a8666d41d9eb40073f6a75927981a",
+    "tools/generate_gen4_candidates.py": "71ba5f9788cb7703a87f2d8ff4341fb6766914c1d1e96bb391f0cf4f08a910df",
+    "tools/generate_puzzles.py": "98c43616c9b5a595a7e211c2d65d917691f971f85bc9f675ac762f48b104d416",
+    "tools/generate_v334_calibration.py": "ad4425f748a5e0f4ed92163aa3c466920bfbf2f7e4472d706e90d92bc502843e",
+    "tools/generate_v334_calibration_v3.py": "9ea62d0f37ebf17d24322b4cd1ef602bd51c264e6879651f0795c18bbd086192",
+    "tools/measure_gen4_ambiguity.py": "fc09c4fd65fde73f13c8afb219e6d9673300613c01c4e95e58b7b4092e1126b0",
+    "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15"
+  },
+  "limitations": "Does not test packing, ambiguity rejection bias, lexical quality or human difficulty. Not 450 generated levels.",
+  "eligible": {
+    "easy": {
+      "A": 498
+    },
+    "medium": {
+      "A": 506,
+      "B": 696
+    },
+    "hard": {
+      "A": 509,
+      "B": 726,
+      "C": 1405
+    },
+    "hardcore": {
+      "A": 510,
+      "B": 741,
+      "C": 1475,
+      "D": 258
+    },
+    "mozkomor": {
+      "A": 376,
+      "B": 648,
+      "C": 1318,
+      "D": 252
+    }
+  },
+  "runs": [
+    {
+      "seed": 20260915,
+      "failures": [],
+      "profiles": {
+        "easy": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 360,
+          "occurrences": 564,
+          "maxUses": 5,
+          "fourLetterShare": 0.15425531914893617,
+          "quartetUses": 1,
+          "topWords": [
+            [
+              "čtvrtek",
+              5
+            ],
+            [
+              "pondělí",
+              5
+            ],
+            [
+              "krabice",
+              5
+            ],
+            [
+              "babička",
+              4
+            ],
+            [
+              "skok",
+              4
+            ],
+            [
+              "plavání",
+              4
+            ],
+            [
+              "pohádka",
+              4
+            ],
+            [
+              "autobus",
+              4
+            ],
+            [
+              "snídaně",
+              4
+            ],
+            [
+              "kamarád",
+              4
+            ]
+          ]
+        },
+        "medium": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 560,
+          "occurrences": 730,
+          "maxUses": 4,
+          "fourLetterShare": 0.2136986301369863,
+          "quartetUses": 1,
+          "topWords": [
+            [
+              "komiks",
+              4
+            ],
+            [
+              "čokoláda",
+              4
+            ],
+            [
+              "strž",
+              4
+            ],
+            [
+              "pastelka",
+              4
+            ],
+            [
+              "zmrzlina",
+              4
+            ],
+            [
+              "pomeranč",
+              4
+            ],
+            [
+              "limonáda",
+              4
+            ],
+            [
+              "knihovna",
+              4
+            ],
+            [
+              "velbloud",
+              4
+            ],
+            [
+              "atol",
+              3
+            ]
+          ]
+        },
+        "hard": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 678,
+          "occurrences": 840,
+          "maxUses": 3,
+          "fourLetterShare": 0.10119047619047619,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "koloběžka",
+              3
+            ],
+            [
+              "tarantule",
+              3
+            ],
+            [
+              "marioneta",
+              3
+            ],
+            [
+              "prázdniny",
+              3
+            ],
+            [
+              "gorila",
+              3
+            ],
+            [
+              "nemocnice",
+              3
+            ],
+            [
+              "nabíječka",
+              3
+            ],
+            [
+              "aligátor",
+              3
+            ],
+            [
+              "světluška",
+              3
+            ],
+            [
+              "strýc",
+              3
+            ]
+          ]
+        },
+        "hardcore": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 794,
+          "occurrences": 991,
+          "maxUses": 3,
+          "fourLetterShare": 0.07870837537840565,
+          "quartetUses": 2,
+          "topWords": [
+            [
+              "bažant",
+              3
+            ],
+            [
+              "narozeniny",
+              3
+            ],
+            [
+              "limonáda",
+              3
+            ],
+            [
+              "croissant",
+              3
+            ],
+            [
+              "strakapoud",
+              3
+            ],
+            [
+              "záležitost",
+              3
+            ],
+            [
+              "vstupenka",
+              3
+            ],
+            [
+              "chameleon",
+              3
+            ],
+            [
+              "plastelína",
+              3
+            ],
+            [
+              "puštík",
+              3
+            ]
+          ]
+        },
+        "mozkomor": {
+          "planned": 50,
+          "allocated": 50,
+          "unique": 485,
+          "occurrences": 516,
+          "maxUses": 3,
+          "fourLetterShare": 0.0,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "strakapoud",
+              3
+            ],
+            [
+              "koloběžka",
+              3
+            ],
+            [
+              "narozeniny",
+              3
+            ],
+            [
+              "punčocháče",
+              2
+            ],
+            [
+              "studánka",
+              2
+            ],
+            [
+              "díkůvzdání",
+              2
+            ],
+            [
+              "biologie",
+              2
+            ],
+            [
+              "prohlášení",
+              2
+            ],
+            [
+              "pochybnost",
+              2
+            ],
+            [
+              "vědec",
+              2
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "seed": 20260916,
+      "failures": [],
+      "profiles": {
+        "easy": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 349,
+          "occurrences": 561,
+          "maxUses": 5,
+          "fourLetterShare": 0.14795008912655971,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "baterka",
+              5
+            ],
+            [
+              "počítač",
+              5
+            ],
+            [
+              "kuchyně",
+              5
+            ],
+            [
+              "popcorn",
+              5
+            ],
+            [
+              "snídaně",
+              5
+            ],
+            [
+              "hladový",
+              4
+            ],
+            [
+              "kajak",
+              4
+            ],
+            [
+              "skok",
+              4
+            ],
+            [
+              "studený",
+              4
+            ],
+            [
+              "odpověď",
+              4
+            ]
+          ]
+        },
+        "medium": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 567,
+          "occurrences": 734,
+          "maxUses": 4,
+          "fourLetterShare": 0.21662125340599456,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "velbloud",
+              4
+            ],
+            [
+              "zmrzlina",
+              4
+            ],
+            [
+              "pastelka",
+              4
+            ],
+            [
+              "čokoláda",
+              4
+            ],
+            [
+              "limonáda",
+              4
+            ],
+            [
+              "sklenice",
+              4
+            ],
+            [
+              "pomeranč",
+              4
+            ],
+            [
+              "knihovna",
+              4
+            ],
+            [
+              "laser",
+              3
+            ],
+            [
+              "otevřít",
+              3
+            ]
+          ]
+        },
+        "hard": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 665,
+          "occurrences": 834,
+          "maxUses": 3,
+          "fourLetterShare": 0.08872901678657075,
+          "quartetUses": 2,
+          "topWords": [
+            [
+              "nemocnice",
+              3
+            ],
+            [
+              "postavení",
+              3
+            ],
+            [
+              "koloběžka",
+              3
+            ],
+            [
+              "liška",
+              3
+            ],
+            [
+              "krypta",
+              3
+            ],
+            [
+              "marmeláda",
+              3
+            ],
+            [
+              "oblečení",
+              3
+            ],
+            [
+              "housenka",
+              3
+            ],
+            [
+              "anakonda",
+              3
+            ],
+            [
+              "pravítko",
+              3
+            ]
+          ]
+        },
+        "hardcore": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 789,
+          "occurrences": 999,
+          "maxUses": 3,
+          "fourLetterShare": 0.09309309309309309,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "tarantule",
+              3
+            ],
+            [
+              "čokoláda",
+              3
+            ],
+            [
+              "ohňostroj",
+              3
+            ],
+            [
+              "orangutan",
+              3
+            ],
+            [
+              "nabíječka",
+              3
+            ],
+            [
+              "kouzelník",
+              3
+            ],
+            [
+              "koloběžka",
+              3
+            ],
+            [
+              "katedrála",
+              3
+            ],
+            [
+              "chameleon",
+              3
+            ],
+            [
+              "skluzavka",
+              3
+            ]
+          ]
+        },
+        "mozkomor": {
+          "planned": 50,
+          "allocated": 50,
+          "unique": 460,
+          "occurrences": 518,
+          "maxUses": 3,
+          "fourLetterShare": 0.0,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "marioneta",
+              3
+            ],
+            [
+              "jednorožec",
+              3
+            ],
+            [
+              "strakapoud",
+              3
+            ],
+            [
+              "plastelína",
+              3
+            ],
+            [
+              "nabíječka",
+              3
+            ],
+            [
+              "vzducholoď",
+              3
+            ],
+            [
+              "vstupenka",
+              3
+            ],
+            [
+              "dinosaurus",
+              3
+            ],
+            [
+              "poloostrov",
+              3
+            ],
+            [
+              "trampolína",
+              3
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "seed": 20260917,
+      "failures": [],
+      "profiles": {
+        "easy": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 342,
+          "occurrences": 562,
+          "maxUses": 5,
+          "fourLetterShare": 0.1619217081850534,
+          "quartetUses": 2,
+          "topWords": [
+            [
+              "popcorn",
+              5
+            ],
+            [
+              "prázdný",
+              5
+            ],
+            [
+              "divadlo",
+              5
+            ],
+            [
+              "švestka",
+              5
+            ],
+            [
+              "studený",
+              5
+            ],
+            [
+              "ponožka",
+              5
+            ],
+            [
+              "krabice",
+              4
+            ],
+            [
+              "skok",
+              4
+            ],
+            [
+              "snídaně",
+              4
+            ],
+            [
+              "baterka",
+              4
+            ]
+          ]
+        },
+        "medium": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 580,
+          "occurrences": 729,
+          "maxUses": 4,
+          "fourLetterShare": 0.20027434842249658,
+          "quartetUses": 2,
+          "topWords": [
+            [
+              "čokoláda",
+              4
+            ],
+            [
+              "pastelka",
+              4
+            ],
+            [
+              "atol",
+              4
+            ],
+            [
+              "zmrzlina",
+              4
+            ],
+            [
+              "strž",
+              3
+            ],
+            [
+              "zlato",
+              3
+            ],
+            [
+              "kuchyně",
+              3
+            ],
+            [
+              "útes",
+              3
+            ],
+            [
+              "brambor",
+              3
+            ],
+            [
+              "osoba",
+              3
+            ]
+          ]
+        },
+        "hard": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 668,
+          "occurrences": 833,
+          "maxUses": 3,
+          "fourLetterShare": 0.11284513805522209,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "vstupenka",
+              3
+            ],
+            [
+              "marmeláda",
+              3
+            ],
+            [
+              "pastelka",
+              3
+            ],
+            [
+              "rašelina",
+              3
+            ],
+            [
+              "propast",
+              3
+            ],
+            [
+              "nabíječka",
+              3
+            ],
+            [
+              "chameleon",
+              3
+            ],
+            [
+              "obličej",
+              3
+            ],
+            [
+              "ohňostroj",
+              3
+            ],
+            [
+              "krabice",
+              3
+            ]
+          ]
+        },
+        "hardcore": {
+          "planned": 100,
+          "allocated": 100,
+          "unique": 807,
+          "occurrences": 999,
+          "maxUses": 3,
+          "fourLetterShare": 0.08708708708708708,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "pomeranč",
+              3
+            ],
+            [
+              "záležitost",
+              3
+            ],
+            [
+              "nabíječka",
+              3
+            ],
+            [
+              "marioneta",
+              3
+            ],
+            [
+              "jinovatka",
+              3
+            ],
+            [
+              "vrchol",
+              3
+            ],
+            [
+              "plastelína",
+              3
+            ],
+            [
+              "jednorožec",
+              3
+            ],
+            [
+              "výprava",
+              3
+            ],
+            [
+              "zmrzlina",
+              3
+            ]
+          ]
+        },
+        "mozkomor": {
+          "planned": 50,
+          "allocated": 50,
+          "unique": 478,
+          "occurrences": 525,
+          "maxUses": 3,
+          "fourLetterShare": 0.0,
+          "quartetUses": 0,
+          "topWords": [
+            [
+              "prázdniny",
+              3
+            ],
+            [
+              "strakapoud",
+              3
+            ],
+            [
+              "poloostrov",
+              3
+            ],
+            [
+              "těstoviny",
+              3
+            ],
+            [
+              "ninja",
+              3
+            ],
+            [
+              "koloběžka",
+              3
+            ],
+            [
+              "banda",
+              2
+            ],
+            [
+              "protein",
+              2
+            ],
+            [
+              "prohlížeč",
+              2
+            ],
+            [
+              "limonáda",
+              2
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}
