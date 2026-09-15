@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from copy import deepcopy
 from functools import lru_cache
 import hashlib
 import json
@@ -40,12 +41,24 @@ def fingerprint(paths):
 
 def input_fingerprint():
     paths = [ROOT / p for p in FROZEN]
-    paths += [ROOT / 'content/gen5/profiles.json', ROOT / 'tools/gen5_lab.py']
+    paths += list((ROOT / 'content/gen5').glob('*.json'))
+    paths += list((ROOT / 'tools').glob('gen5_*.py'))
     paths += list((ROOT / 'tools/gen5').glob('*.py'))
     paths += [ROOT / 'tools/generate_v334_calibration.py', ROOT / 'tools/generate_v334_calibration_v3.py',
               ROOT / 'tools/generate_gen4_candidates.py', ROOT / 'tools/generate_puzzles.py',
               ROOT / 'tools/measure_gen4_ambiguity.py']
     return fingerprint(paths)
+
+
+def profile_for(catalog, difficulty, ordinal):
+    """Variants are scheduled by ordinal, never selected for easier acceptance."""
+    if type(ordinal) is not int or ordinal<1:
+        raise ValueError('Positive ordinal required')
+    profile=deepcopy(catalog.profiles[difficulty])
+    for variant in profile.pop('variants',[]):
+        if ordinal%variant['every']==variant['remainder']:
+            profile.update(variant['overrides'])
+    return profile
 
 
 class Catalog:
@@ -56,6 +69,7 @@ class Catalog:
         self.exclusions |= {'červodíra', 'blockchain', 'pulsar', 'tensor'}  # Existing MUST_REVIEW.
         self.profiles = read_json(ROOT / 'content/gen5/profiles.json')['profiles']
         bank = read_json(ROOT / 'public/puzzles.json')
+        self.free_generation=bank['freeGeneration']
         rolling = read_json(ROOT / 'data/rolling_content_v1.json')['puzzles']
         # All reserved rolling boards precede Gen5 conservatively; release ordering must
         # be finalized separately. Never infer chronology from puzzle IDs alone.
@@ -78,7 +92,8 @@ class Catalog:
                 self.global_counts.update(self.words(b))
                 seen[b['id']] = digest(b)
         self.historical_ids = set(seen)
-        self.historical_words_hashes = {digest(sorted(self.words(b))) for bs in self.history.values() for b in bs}
+        historical_boards=[b for bs in self.history.values() for b in bs]+bank['daily']+bank['rescue']+[bank['starter']]
+        self.historical_words_hashes = {digest(sorted(self.words(b))) for b in historical_boards}
 
     @staticmethod
     def words(board):

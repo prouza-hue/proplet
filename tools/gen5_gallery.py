@@ -99,11 +99,11 @@ loadDifficulty();
 def render(path):
     path = Path(path).resolve()
     root = LAB.resolve()
-    if not path.is_relative_to(root) or path.parent == root or path.name != 'pilot.json':
-        raise ValueError('Input must be pilot.json inside a run directory under lab-output/gen5.')
+    if not path.is_relative_to(root) or path.parent == root or path.name not in ('pilot.json','series.json'):
+        raise ValueError('Input must be pilot.json or series.json inside a run directory under lab-output/gen5.')
     state = json.loads(path.read_text(encoding='utf-8'))
     boards = state.get('puzzles', [])
-    if state.get('kind') != 'gen5-pilot' or not boards:
+    if state.get('kind') not in ('gen5-pilot','gen5-series') or not boards:
         raise ValueError('A nonempty Gen5 pilot checkpoint is required.')
     # Embedding JSON is data, never HTML or executable script, even with hostile input.
     data = json.dumps(boards, ensure_ascii=False).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')

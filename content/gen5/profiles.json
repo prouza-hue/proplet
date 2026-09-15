@@ -1,11 +1,11 @@
 {
-  "version": 2,
-  "status": "experimental-not-approved",
+  "version": 3,
+  "status": "user-calibrated-generation-candidate",
   "seed": 20260915,
   "notes": [
-    "Geometry thresholds are pilot hypotheses, not proof of player-perceived difficulty.",
-    "No changes to existing levels or production runtime.",
-    "Future release 100 easy, 100 medium, 100 hard, 100 hardcore, 50 mozkomor requires lexical and human approval."
+    "Easy/medium calibrated by user; hard/hardcore/mozkomor accepted unchanged.",
+    "Easy uses 75% 5x5 and 25% 6x6 with the same word/cell/turn limits.",
+    "Existing released levels are frozen; generated candidates require a separate publication step."
   ],
   "profiles": {
     "easy": {
@@ -56,7 +56,20 @@
       "path_node_limit": 4200,
       "min_path_turns": 0,
       "max_path_turns": 1,
-      "max_path_straight_share": 1.0
+      "max_path_straight_share": 1.0,
+      "variants": [
+        {
+          "every": 4,
+          "remainder": 0,
+          "overrides": {
+            "rows": 6,
+            "cols": 6,
+            "min_bbox_rows": 6,
+            "min_bbox_cols": 6,
+            "geometry_profile": "gen5-easy-6x6-v3"
+          }
+        }
+      ]
     },
     "medium": {
       "rows": 7,

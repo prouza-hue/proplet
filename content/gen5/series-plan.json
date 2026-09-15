@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "seriesId": "g5-r1",
+  "seed": 20260916,
+  "counts": {"easy": 100, "medium": 100, "hard": 100, "hardcore": 100, "mozkomor": 50},
+  "secondsPerBoard": 45,
+  "attemptsPerInvocation": 3,
+  "workers": 3,
+  "status": "unpublished-candidate",
+  "calibration": "Easy/medium approved after calibration-02; higher profiles approved from pilot-04. Every fourth easy board is 6x6 with unchanged workload."
+}

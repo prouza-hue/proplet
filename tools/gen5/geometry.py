@@ -1,13 +1,21 @@
 """Bounded independent path packing with explicit per-profile geometry policies."""
 from __future__ import annotations
 import time
+from functools import lru_cache
+import math
 from .validation import BudgetExceeded, adjacent, neighbours, path_metrics, geometry_errors, structural
+
+
+@lru_cache(maxsize=16)
+def grid_adjacency(rows,cols):
+    grid=set(range(rows*cols))
+    return {i:neighbours(i,rows,cols,grid) for i in grid}
 
 
 def find_path(length, profile, occupied, starts, ends, rng, deadline):
     rows,cols=profile['rows'],profile['cols']
     grid=set(range(rows*cols))
-    adjacency={i:neighbours(i,rows,cols,grid) for i in grid}
+    adjacency=grid_adjacency(rows,cols)
     unused=sorted(grid-occupied)
     if occupied:
         candidates=[i for i in unused if any(n in occupied for n in adjacency[i])
@@ -59,13 +67,20 @@ def build(words, difficulty, profile, rng, deadline, diagnostics=None):
     ordered = sorted(words,key=lambda w:(-len(w),rng.random()))
     for _ in range(profile['geometry_restarts']):
         placed,occupied,starts,ends = {},set(),set(),set()
+        used_turns=0;used_curls=0
         for word in ordered:
             if time.monotonic()>deadline:
                 raise BudgetExceeded('geometry_deadline')
-            path = find_path(len(word),profile,occupied,starts,ends,rng,deadline)
+            remaining=len(words)-len(placed)-1
+            local=dict(profile)
+            local['max_path_turns']=min(profile['max_path_turns'],math.floor(profile['max_mean_turns']*len(words)+1e-9-used_turns-remaining*profile['min_path_turns']))
+            if used_curls>=profile['max_curl_paths']:
+                local['max_curl_run']=min(local['max_curl_run'],1)
+            path = find_path(len(word),local,occupied,starts,ends,rng,deadline)
             if path is None:
                 break
             placed[word]=path
+            turns,_,curl=path_metrics(path,profile['cols']);used_turns+=turns;used_curls+=curl>=2
             occupied.update(path)
             starts.add(path[0]);ends.add(path[-1])
         if len(placed)!=len(words):

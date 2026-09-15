@@ -1,9 +1,10 @@
 # Gen5: pestřejší desky, ověřitelné výsledky
 
-Stav: neveřejný prototyp, nikoli schválené vydání. Dosavadní úrovně, jejich ID,
-řešení, uložený postup ani produkční generátor se nemění. První etapa připravuje
-malý pilot a nástroje pro následnou kalibraci. Plánovaný obsah je 100 nových desek
-pro každou ze čtyř běžných obtížností a 50 pro Mozkomora.
+Stav: neveřejný výrobní generátor se schválenými profily obtížností. Uživatel
+potvrdil upravenou snadnou a střední a původní těžkou, Mozkožrouta i Mozkomora.
+Snadná střídá 75 % desek 5×5 a 25 % desek 6×6 při stejné zátěži. Dosavadní úrovně,
+jejich ID, řešení a uložený postup se nemění. Výrobní plán obsahuje 100 nových
+úrovní pro každou ze čtyř běžných obtížností a 50 pro Mozkomora.
 
 ## Problém, který řešíme
 
@@ -16,7 +17,7 @@ hodnocené slovo. Mezi krátkými snadnými slovy tuto podmínku splňuje práv�
 Gen5 proto mění výběr slov a kontrolu celé série. Nerozšiřuje automaticky cílový
 slovník o všechny výrazy, které uznává širší slovník bonusových slov.
 
-## Rozhodnutí prototypu
+## Rozhodnutí generátoru
 
 1. **Zmražené vstupy.** Každý běh ukládá otisky slovníků, konfigurace, zdrojového
    kódu a vydaných bank. Při obnovení odmítne změněné vstupy. Výstup je povolen
@@ -31,8 +32,8 @@ slovník o všechny výrazy, které uznává širší slovník bonusových slov.
    přijatelnosti `fun >= 3` a explicitní výluky zůstávají.
 4. **Pestrost má pevné hranice.** Nejvýše 3 čtyřpísmenná slova na snadné a střední desce, 2 na těžké
    a hardcore desce, žádné na Mozkomoru. Snadná je po kalibraci 5×5,
-   s běžnými slovy třídy A a jednoduchými cestami. Hodnoty jsou hypotéza pro
-   kalibraci, nikoli nový slib obtížnosti hráčům.
+   s běžnými slovy třídy A a jednoduchými cestami. Hodnoty odpovídají uživatelem
+   schválené kalibraci.
 5. **Samostatná geometrie.** Omezené prohledávání skládá sousední cesty bez
    překryvů. Parametry jednoduchých cest jsou explicitní: stará skrytá výjimka
    v pomocném generátoru už nevnucuje zatáčky snadným slovům. Hlídají se také
@@ -81,11 +82,10 @@ alternativ. Zachovává rozumnou velikost desky, omezuje třídu D na 10 % a nep
 krátká slova. Výsledek se porovnává se současným Mozkomorem pomocí stejného
 slovníku a stejné výpočetní metody.
 
-Počet zatáček ani počet slovníkových odboček nejsou spolehlivou náhradou lidské
-obtížnosti. Tři desky na obtížnost neprokazují „dramaticky těžší a stále zábavný“
-Mozkomor. Ten musí projít slepým srovnáním se současnými deskami: dokončení,
-nápovědy, čas, pocit férovosti a rozpoznatelnost slov. Obdobně je třeba ověřit,
-že delší běžná slova nepřetížila snadnou obtížnost.
+Počet zatáček ani skóre odboček nejsou samy měřítkem lidské obtížnosti.
+Uživatel pilot zahrál a jeho zpětná vazba byla zapracována; další opakované
+schvalování stejných obtížností není podmínkou výroby. Mozkomor zůstává v
+odsouhlasené podobě. Netvrdíme neprokázané násobné zvýšení jeho obtížnosti.
 
 ## Co už testujeme a co ještě ne
 
@@ -99,13 +99,27 @@ nápovědy, čas, pocit férovosti a rozpoznatelnost slov. Obdobně je třeba ov
   dostupnou množinu kandidátů; bitovou reprodukovatelnost přes takový limit
   netvrdíme. Uložené přijaté desky se při obnovení znovu negenerují.
 
-## Postup k vydání
+## Výroba a vydání
 
-1. Projít pilotní slova a zahrát nové i referenční desky bez znalosti řešení.
-2. Doladit pouze profily Gen5 podle zjištění. Staré desky zůstanou identické.
-3. Zvětšit neveřejný pilot; posoudit skutečnou distribuci po odmítání kandidátů,
-   délku výroby, obtížnost a pestrost v sousedních oknech i celé sérii.
-4. Až poté vytvořit plánovaný obsah a provést kontrolu všech 450 desek, všech
-   hranic s rezervovaným obsahem, opakování a redakční kvality slov.
-5. Připravit samostatný append-only release manifest a preview. Produkční
-   nasazení je další krok; tento nástroj k němu nemá příkaz.
+`gen5_series.py` vyrábí naplánovanou sérii souběžně, nejvýše jednu desku každé
+obtížnosti v jednom kole. Všechny úlohy kola vidí stejnou historii dokončených
+kol. Tvrdé odstupy a maxima použití zůstávají přesné uvnitř obtížnosti; měkké
+váhy globálního použití se aktualizují mezi koly. Jediný zapisovatel přijímá
+výsledky v pevném pořadí a znovu kontroluje shodu úlohy, slova, strukturu a variantu.
+Neúspěch nikdy nepřeskočí pozici. Každý pokus má uložené číslo a odvozený seed.
+
+Checkpoint tvoří kanonický začátek plánu, nese hash obsahu, otisky zdrojů a
+počty pokusů. OS zámek brání dvěma zapisovatelům; po pádu procesu se uvolní.
+Po obnovení se kontroluje celý přijatý obsah. Na konci se znovu provede plné
+nezávislé ověření každé desky. Při nedokončené výrobě příkaz hlásí neúspěch,
+pokud nešlo o výslovné plánované pozastavení přes `--max-rounds`.
+
+Výroba je oddělená od publikace. Výstupní soukromý balíček zachová současnou
+runtime generaci postupu (`contentGeneration=4`) a označí algoritmus zvlášť
+jako `generatorGeneration=5`. Změna globální `freeGeneration` na 5 se neprovádí.
+Manifest uchovává otisky a pořadí všech původních i rezervovaných úrovní.
+
+Před nasazením zbývá uzavřít kontrolu unikátních slov celé série a napojit její
+append-only balíček za dosavadní banku včetně rolling rezervy. Publikace musí
+zachovat všechny staré ID, pořadí i payloady a potvrdit započítání staré i nové
+výhry a odemykání Mozkomora ve skutečné hře. Výrobní nástroj nic nenasazuje.

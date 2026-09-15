@@ -10,7 +10,7 @@ import random
 import time
 import traceback
 
-from .catalog import Catalog, DIFFICULTIES, Exposure, ROOT, choose_words, digest, input_fingerprint, read_json, tier_mix_ok
+from .catalog import Catalog, DIFFICULTIES, Exposure, ROOT, choose_words, digest, input_fingerprint, read_json, tier_mix_ok, profile_for
 from .validation import Solver, BudgetExceeded, structural, geometry_errors, validation_words
 
 try:
@@ -24,7 +24,7 @@ def difficulty_prefixes(catalog):
     return Solver(words | set(catalog.entries)).prefixes
 
 
-def worker(connection, difficulty, ordinal, seed, accepted, seconds):
+def worker(connection, difficulty, ordinal, seed, accepted, seconds, series_id=None):
     """A hard parent timeout covers the legacy constructor, imports and solver."""
     started = time.monotonic()
     deadline = started + seconds
@@ -38,7 +38,8 @@ def worker(connection, difficulty, ordinal, seed, accepted, seconds):
         # Correctness is checked against the larger, frozen recognition union.
         prefixes = difficulty_prefixes(catalog)
         rng = random.Random(seed)
-        profile = catalog.profiles[difficulty]
+        profile = profile_for(catalog,difficulty,ordinal)
+        catalog.profiles[difficulty]=profile
         shortlist = []
         for attempt in range(1, 1001):
             if time.monotonic()>deadline-1:
@@ -55,6 +56,9 @@ def worker(connection, difficulty, ordinal, seed, accepted, seconds):
             board['id']=f'g5-pilot-{difficulty}-{ordinal:03d}'
             board['meta']={'level':len(catalog.history[difficulty])+ordinal,'contentGeneration':5,
                            'calibrationOnly':True,'generationKey':'gen5-lab-v1','geometryProfile':profile['geometry_profile']}
+            if series_id:
+                board['id']=f'{series_id}-{difficulty}-{ordinal:03d}'
+                board['meta'].update(generationKey=series_id,releaseCandidate=True)
             metrics = structural(board)
             amb = ambiguity.board_metrics(board,prefixes,4)
             if not profile['ambiguity'][0] <= amb['localAmbiguityScore'] <= profile['ambiguity'][1]:
@@ -101,50 +105,58 @@ def atomic_write(path, payload):
     temporary.replace(path)
 
 
-def validate_bank(catalog, boards, solver, full=True):
-    exposure=Exposure(catalog)
-    ids=set(catalog.historical_ids)
-    wordsets=set(catalog.historical_words_hashes)
-    ordinals=Counter()
-    prefixes=difficulty_prefixes(catalog) if full else None
-    for board in boards:
-        d=board['difficulty']
-        p=catalog.profiles[d]
-        if board['id'] in ids or not board['id'].startswith('g5-pilot-'+d+'-'):
-            raise ValueError('Duplicate or non-pilot ID')
-        ids.add(board['id'])
-        ordinals[d]+=1
-        if board['id']!=f'g5-pilot-{d}-{ordinals[d]:03d}' or board['meta']['level']!=len(catalog.history[d])+ordinals[d]:
+class BankValidator:
+    """Incremental acceptance with no ledger mutation on a rejected candidate."""
+    def __init__(self,catalog,solver,series_id=None):
+        self.catalog=catalog;self.solver=solver;self.prefix=series_id or 'g5-pilot'
+        self.exposure=Exposure(catalog)
+        self.ids=set(catalog.historical_ids)
+        self.wordsets=set(catalog.historical_words_hashes)
+        self.ordinals=Counter()
+        self.prefixes=None
+        self.eligible={d:set(catalog.eligible(d)) for d in DIFFICULTIES}
+
+    def add(self,board,full=True):
+        catalog=self.catalog;d=board['difficulty'];ordinal=self.ordinals[d]+1
+        if board['id'] in self.ids or board['id']!=f'{self.prefix}-{d}-{ordinal:03d}' or board['meta']['level']!=len(catalog.history[d])+ordinal:
             raise ValueError('Pilot order or level gap: '+board['id'])
-        metrics=structural(board)
-        errors=geometry_errors(metrics,p)
+        p=profile_for(catalog,d,ordinal)
+        errors=geometry_errors(structural(board),p)
         if errors:
             raise ValueError(board['id']+': '+','.join(errors))
         words=catalog.words(board)
-        if not words <= set(catalog.eligible(d)) or words & exposure.forbidden(d):
+        if not words<=self.eligible[d] or words & self.exposure.forbidden(d):
             raise ValueError('Vocabulary, cooldown or repetition cap: '+board['id'])
         if not tier_mix_ok(list(words),catalog.entries,p['policy']):
             raise ValueError('Tier mix: '+board['id'])
         signature=digest(sorted(words))
-        if signature in wordsets:
+        if signature in self.wordsets:
             raise ValueError('Repeated word set: '+board['id'])
-        wordsets.add(signature)
         if full:
-            score=ambiguity.board_metrics(board,prefixes,4)['localAmbiguityScore']
+            if self.prefixes is None:
+                self.prefixes=difficulty_prefixes(catalog)
+            score=ambiguity.board_metrics(board,self.prefixes,4)['localAmbiguityScore']
             if not p['ambiguity'][0]<=score<=p['ambiguity'][1]:
                 raise ValueError('Independent ambiguity rejection: '+board['id'])
-            verified=solver.verify(board)
+            verified=self.solver.verify(board)
             if verified['status']!='unique' or not verified['targetPathsUnique']:
                 raise ValueError('Independent solver rejection: '+board['id']+' '+verified['status'])
-        exposure.add(board)
-    return exposure
+        self.ids.add(board['id']);self.wordsets.add(signature);self.ordinals[d]=ordinal
+        self.exposure.add(board)
+
+
+def validate_bank(catalog,boards,solver,full=True,series_id=None):
+    validator=BankValidator(catalog,solver,series_id)
+    for board in boards:
+        validator.add(board,full)
+    return validator.exposure
 
 
 def report(catalog, boards, diagnostics):
     from statistics import median
     prefixes=difficulty_prefixes(catalog)
     def stats(bs):
-        counts=Counter(w for b in bs for w in catalog.words(b))
+        counts=Counter(w for b in bs for w in sorted(catalog.words(b)))
         fours=Counter({w:n for w,n in counts.items() if len(w)==4})
         quartet={'bobr','drak','upír','štít'}
         return {'boards':len(bs),'occurrences':sum(counts.values()),'uniqueWords':len(counts),
