@@ -32,6 +32,7 @@ from backend.config import (
     CONTENT_CATALOG_PATH,
     CRON_SECRET,
     GEN4_CANDIDATE_PREVIEW,
+    GEN5_CANDIDATE_PREVIEW,
     GEN4_PREVIEW_BRANCH,
     PUZZLES_PATH,
     PHONE_LANDSCAPE_BLOCKING,
@@ -1274,8 +1275,8 @@ def validate_result_sanity(payload: ResultCreate) -> None:
 
 @app.get("/api/puzzle-database")
 def puzzle_database_preview(request: Request):
-    """Serve the candidate pack only on the read-only Gen4 branch preview."""
-    if not GEN4_CANDIDATE_PREVIEW:
+    """Serve candidate packs only on their explicit read-only preview branches."""
+    if not (GEN4_CANDIDATE_PREVIEW or GEN5_CANDIDATE_PREVIEW):
         raise HTTPException(404, "Preview databáze není v tomto prostředí dostupná")
     return JSONResponse(
         content=released_puzzle_payload(effective_content_date(request)),
@@ -1442,6 +1443,7 @@ def health():
         "puzzleFile": puzzle_file,
         "puzzleSource": str(PUZZLES_PATH.relative_to(ROOT)),
         "gen4CandidatePreview": GEN4_CANDIDATE_PREVIEW,
+        "gen5CandidatePreview": GEN5_CANDIDATE_PREVIEW,
         "gen4CandidateReadOnly": GEN4_CANDIDATE_PREVIEW,
         "gen4ReleaseStatus": (pdata.get("release") or {}).get("status"),
         "version": APP_VERSION,
@@ -4936,6 +4938,18 @@ install_account_auth(
         vercel_env=VERCEL_ENV,
     ),
 )
+
+# Install last so account bridge middleware cannot perform a write before the guard.
+if GEN5_CANDIDATE_PREVIEW:
+    @app.middleware("http")
+    async def gen5_preview_readonly(request: Request, call_next):
+        if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+            return JSONResponse(
+                status_code=409,
+                content={"detail": "V tomto náhledu zůstávají změny pouze na zařízení."},
+                headers={"Cache-Control": "no-store"},
+            )
+        return await call_next(request)
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
 if not os.environ.get("VERCEL"):

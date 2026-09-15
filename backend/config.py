@@ -40,6 +40,7 @@ class Settings:
     vercel_git_commit_ref: str
     gen4_preview_branch: str
     gen4_candidate_preview: bool
+    gen5_candidate_preview: bool
     puzzles_path: Path
     rolling_content_path: Path
     content_catalog_path: Path
@@ -54,6 +55,7 @@ def load_settings() -> Settings:
     vercel_git_commit_ref = _env("VERCEL_GIT_COMMIT_REF")
     gen4_preview_branch = "agent/v3340-medium-calibration-v3"
     gen4_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == gen4_preview_branch
+    gen5_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/gen5-lab"
     data_root = root / "data"
     return Settings(
         root=root,
@@ -73,9 +75,10 @@ def load_settings() -> Settings:
         vercel_git_commit_ref=vercel_git_commit_ref,
         gen4_preview_branch=gen4_preview_branch,
         gen4_candidate_preview=gen4_candidate_preview,
-        puzzles_path=data_root / ("puzzles_gen4_candidate_v334.json" if gen4_candidate_preview else "puzzles.json"),
+        gen5_candidate_preview=gen5_candidate_preview,
+        puzzles_path=data_root / ("gen5_preview_puzzles.json" if gen5_candidate_preview else "puzzles_gen4_candidate_v334.json" if gen4_candidate_preview else "puzzles.json"),
         rolling_content_path=data_root / (
-            "rolling_content_gen4_candidate_v334.json" if gen4_candidate_preview else "rolling_content_v1.json"
+            "gen5_preview_rolling.json" if gen5_candidate_preview else "rolling_content_gen4_candidate_v334.json" if gen4_candidate_preview else "rolling_content_v1.json"
         ),
         content_catalog_path=data_root / "content_catalog_v334.json",
         tajenka_bank_path=data_root / "tajenka_weekend_v2.json",
@@ -107,6 +110,7 @@ VERCEL_ENV = settings.vercel_env
 VERCEL_GIT_COMMIT_REF = settings.vercel_git_commit_ref
 GEN4_PREVIEW_BRANCH = settings.gen4_preview_branch
 GEN4_CANDIDATE_PREVIEW = settings.gen4_candidate_preview
+GEN5_CANDIDATE_PREVIEW = settings.gen5_candidate_preview
 PUZZLES_PATH = settings.puzzles_path
 ROLLING_CONTENT_PATH = settings.rolling_content_path
 CONTENT_CATALOG_PATH = settings.content_catalog_path

@@ -61,8 +61,10 @@ openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )
 openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
+# Gen5 adds a preview branch: only /api/puzzle-database's description changed.
+# Restoring its old Gen4-only description reproduces the prior 70d48981 digest.
 assert openapi_digest == (
-    "70d48981962251f732335d11fa63a07c4a7368391f803e687fbbd8fcf6db275d"
+    "c0d9ee3b471425d86c10a58b3c99d1e5ac5e68c40e99b1c278abd1c92dcbe2f2"
 ), f"current OpenAPI digest: {openapi_digest}"
 
 
@@ -306,8 +308,10 @@ with (
         separators=(",", ":"),
     )
 response_fixture_digest = hashlib.sha256(response_fixtures.encode("utf-8")).hexdigest()
+# Health adds gen5CandidatePreview:false on the normal runtime; omitting this
+# sole additive field reproduces the previous 5d3be33f response digest.
 assert response_fixture_digest == (
-    "5d3be33f8357f8d0a69e49752c955af23df4a6cd8185677850334e454fce226c"
+    "ae6e813520b4d9e6ce15b7b6dd8644958325cd8c9967a0cf40e6726a5693b3cf"
 ), f"current response fixture digest: {response_fixture_digest}"
 
 

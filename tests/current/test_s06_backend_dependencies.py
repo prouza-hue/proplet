@@ -93,7 +93,9 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 openapi_digest = _digest(openapi_contract)
 # Tajenka v2 intentionally extends the API schema while preserving the route inventory.
-assert openapi_digest == "70d48981962251f732335d11fa63a07c4a7368391f803e687fbbd8fcf6db275d", f"current OpenAPI digest: {openapi_digest}"
+# Only the candidate database description now covers Gen4 and Gen5 preview branches;
+# restoring the Gen4-only description reproduces the former 70d48981 digest.
+assert openapi_digest == "c0d9ee3b471425d86c10a58b3c99d1e5ac5e68c40e99b1c278abd1c92dcbe2f2", f"current OpenAPI digest: {openapi_digest}"
 
 
 # A fake-service assembly proves feature modules remain independently testable
