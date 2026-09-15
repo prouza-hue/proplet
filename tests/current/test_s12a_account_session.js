@@ -115,7 +115,7 @@ const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
 assert(index.includes('/theme-init.js?v=compactplay1')&&sw.includes('/theme-init.js?v=compactplay1'),'theme-init cache boundary drifted');
-assert(themeInit.includes("loadScript('/home-layout.js?v=rankspotlight1'"),'home layout cache boundary drifted');
+assert(themeInit.includes("loadScript('/home-layout.js?v=compactplay1'"),'home layout cache boundary drifted');
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
 has(homeLayout,/if\(rankingSessionScope\(\)!==scope\)return/,'stale anonymous ranking response can overwrite authenticated UI');
