@@ -62,7 +62,8 @@ assert "xp:150" in app
 assert "const MOZKOMOR_UNLOCK_BASE=200" in app
 assert "a vypusť Mozkomora" in app
 assert "${unlock.done} / ${unlock.required} dokončeno" in app
-assert "mozkomor-lock-meter" in app
+assert 'class="cp-lock-message"' in app
+assert 'aria-label="Dokončení základních Mozkožroutů"' in app
 assert "ÚROVEŇ ${nextLevel||1} Z ${total}" not in app
 
 # Dnes never exposes Mozkomor, including quick play, resume, or local recent history.
