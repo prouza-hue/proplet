@@ -1,0 +1,8 @@
+(() => {
+const stage=document.querySelector('#previewStage'),scroll=document.querySelector('.result-scroll'),button=document.querySelector('#winPrimaryBtn'),footer=document.querySelector('.result-footer');
+document.querySelectorAll('[data-width]').forEach(b=>b.onclick=()=>{stage.style.width=b.dataset.width+'px';const desktop=b.dataset.width==='1000';stage.classList.toggle('desktop',desktop);(desktop?document.querySelector('#desktopAction'):footer).appendChild(button);document.querySelectorAll('[data-width]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));scroll.scrollTop=0});
+document.querySelector('#themeSwitch').onclick=e=>{const light=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=light?'light':'dark';e.target.textContent=light?'Tmavý vzhled':'Světlý vzhled'};
+button.onclick=()=>document.querySelector('#previewStatus').textContent='V ostré hře se tady otevře další úroveň. Toto je pouze náhled.';
+document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=()=>document.querySelector('#previewStatus').textContent='Ukázka vzhledu — žádné výsledky ani hodnocení se neukládají.');
+document.querySelectorAll('.free-board-tab').forEach((b,i)=>b.onclick=()=>{document.querySelectorAll('.free-board-tab').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});document.querySelector('.free-board-content h3').textContent=i?'2. místo v týmu':'4. místo ze 128';document.querySelector('.free-board-content>p').textContent=i?'Ukázkové týmové pořadí':'Lepší než 97 % hráčů';document.querySelectorAll('.sample-rows>div').forEach((r,n)=>r.hidden=i&&n>3)});
+})();
