@@ -99,9 +99,11 @@ with sync_playwright() as p:
         free=page.evaluate("""()=>({
           calmQuick:!!document.querySelector('#freeCalmQuick'),
           cards:document.querySelectorAll('#difficultyCards .difficulty-card').length,
-          mozkomorCopy:document.querySelector('#difficultyCards')?.innerText.includes('kteří porazili Mozkožrouta')||false,
+          mozkomorCopy:document.querySelector('.mozkomor-lock-plate')?.innerText.includes('a vypusť Mozkomora')||false,
+          mozkomorCounter:!!document.querySelector('.mozkomor-lock-meter[role="progressbar"][aria-valuemax="200"]'),
+          oldLockNote:!!document.querySelector('.mozkomor-lock-note'),
         })""")
-        assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'],free
+        assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'] and free['mozkomorCounter'] and not free['oldLockNote'],free
 
         page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
         page.wait_for_function("()=>document.body.classList.contains('playing') && document.querySelectorAll('#board .cell').length>0",timeout=8000)
