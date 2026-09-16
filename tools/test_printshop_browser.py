@@ -57,6 +57,7 @@ with sync_playwright() as p:
             localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
             localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
             sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
+            localStorage.setItem('proplet:content-release:g5-r1','1');
           }catch(e){}
         })()""")
         page=ctx.new_page(); errors=[]
@@ -65,7 +66,7 @@ with sync_playwright() as p:
         page.wait_for_function("()=>document.documentElement.classList.contains('tiskarna-ui')",timeout=15000)
         # Boot-ready invariant: renderFree() runs only after bind(), so a
         # populated difficulty grid means bottom-nav listeners are attached.
-        page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0] && document.querySelectorAll('#difficultyCards .difficulty-card').length>=4",timeout=15000)
+        page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0] && document.querySelectorAll('#difficultyCards [data-play-free]').length>=4",timeout=15000)
         settle_returning_player(page)
         page.wait_for_timeout(250)
 
@@ -98,9 +99,9 @@ with sync_playwright() as p:
         page.locator('.bottom-nav [data-nav="free"]').click();page.wait_for_timeout(250)
         free=page.evaluate("""()=>({
           calmQuick:!!document.querySelector('#freeCalmQuick'),
-          cards:document.querySelectorAll('#difficultyCards .difficulty-card').length,
-          mozkomorCopy:document.querySelector('.mozkomor-lock-plate')?.innerText.includes('a vypusť Mozkomora')||false,
-          mozkomorCounter:!!document.querySelector('.mozkomor-lock-meter[role="progressbar"][aria-valuemax="200"]'),
+          cards:document.querySelectorAll('#difficultyCards [data-play-free]').length,
+          mozkomorCopy:document.querySelector('[data-diff="mozkomor"]')?.innerText.includes('a vypusť Mozkomora')||false,
+          mozkomorCounter:!!document.querySelector('[data-diff="mozkomor"] [role="progressbar"][aria-valuemax="200"]'),
           oldLockNote:!!document.querySelector('.mozkomor-lock-note'),
         })""")
         assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'] and free['mozkomorCounter'] and not free['oldLockNote'],free
