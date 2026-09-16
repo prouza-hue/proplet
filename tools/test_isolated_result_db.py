@@ -62,9 +62,14 @@ def main():
                  if f['type'] != 'verify']
         files += sorted((ROOT/'supabase/migrations').glob('*.sql'))
         for path in files:
+            if path.name.endswith('_account_created_authoritative.sql'):
+                c.execute("insert into players(id,name,family_code,token_hash) values ('20000000-0000-4000-8000-000000000001','Historical fixture','SOLO_HISTORY','historical-fixture')")
+                c.execute("insert into product_events(id,anonymous_id,event_type,app_version) values ('20000000-0000-4000-8000-000000000002','historical-guest','account_created','legacy')")
             c.execute(path.read_text(encoding='utf8'))
             report['schemaFiles'].append({'path': path.relative_to(ROOT).as_posix(),
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        c.execute((ROOT/'supabase/tests/account_created.sql').read_text(encoding='utf8'))
+        report['checks'].append('account-created: atomic insert, retry, privacy, legacy event suppression, rollback')
         c.execute((ROOT/'supabase/tests/s08b_atomic_result_acceptance.sql').read_text(encoding='utf8'))
         report['checks'].append('existing SQL acceptance: rollback, retry, conflict, grants')
         players = ['00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000002']

@@ -66,6 +66,11 @@ def db_request(
     if not supabase_ready(url_base, secret_key):
         raise HTTPException(503, "Supabase ještě není připojený")
     headers = supabase_headers(secret_key)
+    if str(method).upper() == "POST" and table == "players":
+        # Server-owned provenance for the atomic account-created DB trigger.
+        # Never forward arbitrary browser headers or OAuth/user profile data.
+        headers["X-Proplet-Signup-Environment"] = settings.vercel_env or "local"
+        headers["X-Proplet-Signup-Version"] = settings.app_version
     if prefer:
         headers["Prefer"] = prefer
     url = f"{url_base}/rest/v1/{table}"
