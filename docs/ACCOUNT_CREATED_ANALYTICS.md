@@ -71,6 +71,6 @@ CI runs both. These are not real Google end-to-end tests.
 
 For a local browser preview, start the second script with `--serve 8877`, then
 run `tools/test_account_created_browser.cjs` with `TEST_URL=http://127.0.0.1:8877`.
-The browser invokes profile/win entry helpers and submits their real visible
+The browser invokes profile, win CTA, post-game nudge, progress guard and onboarding entry helpers and submits their real visible
 forms; it verifies the player/event count deltas. External traffic is blocked.
 Cloud preview requires separate verification; the fixture is not its substitute.
