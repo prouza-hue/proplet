@@ -74,3 +74,31 @@ run `tools/test_account_created_browser.cjs` with `TEST_URL=http://127.0.0.1:887
 The browser invokes profile, win CTA, post-game nudge, progress guard and onboarding entry helpers and submits their real visible
 forms; it verifies the player/event count deltas. External traffic is blocked.
 Cloud preview requires separate verification; the fixture is not its substitute.
+
+## Cloud preview verification — 2026-09-16
+
+The restored `proplet-s08b-atomic-result-test` project is separate from production.
+Only branch `fix/account-created-analytics` has database URL/key overrides in
+Vercel. Deployment `dpl_JBZ76a6HY4CCuCJbg1DrNbgRamD7` runs commit
+`69b4dda249b281fd0987bfdb9ba4af5b6d3417a8` with those overrides.
+
+Chrome UI registrations through onboarding and profile increased `players` from
+3 to 5 and `account_created` from 0 to 2. Both events have `environment=preview`,
+`is_test=true`, server version `4.02.2`, and only `origin=players_insert` context.
+The existing three players were not backfilled. Existing-account login and
+cancelled/invalid signup left the counts unchanged. A service-role transaction
+verified same-ID INSERT retry and legacy client-event suppression, then rolled
+back. No duplicate or missing events were found; neither synthetic account
+exists in production. No real Google consent flow was exercised: Google route
+creation/retry remains covered by the isolated HTTP/SQL provider fixture.
+
+The restored database needed existing auth, avatar, welcome, analytics and XP
+ranking migrations before serving the current backend. These were applied only
+to the test project. Its security advisor reported INFO-only RLS-without-policy
+notices, expected for tables accessed through the server's service role.
+
+Browser CI also contained stale assumptions from before compact cards and Gen5:
+old CSS selectors, an unseen content announcement, and a slot-3 Tajenka fixture
+tested against the current date. The smoke now uses action/progress attributes,
+marks the announcement as already seen, and fixes the fixture's calendar date
+without changing running timers. This changes test setup only.

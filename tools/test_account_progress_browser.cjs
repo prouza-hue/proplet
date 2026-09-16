@@ -11,9 +11,12 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
  try{
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width:1104,height:884}});
   const page=await context.newPage();let release,fail=false,requests=0,completed=[];
+  // The committed Tajenka fixture is release slot 3; keep the test on that date.
+  await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
+  await context.addInitScript(()=>localStorage.setItem('proplet:content-release:g5-r1','1'));
   await page.route('**/api/me',r=>r.fulfill({json:{name:'Synthetic player',stats:{points:34018},avatar:'🙂'}}));
   await page.route('**/api/progress',async r=>{requests++;await new Promise(resolve=>release=resolve);await r.fulfill({status:fail?503:200,json:fail?{detail:'synthetic outage'}:{completed}})});
-  await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&typeof document.querySelector('#playDailyBtn')?.onclick==='function');
+  await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&typeof tajenkaPuzzle!=='undefined'&&tajenkaPuzzle?.id&&typeof document.querySelector('#playDailyBtn')?.onclick==='function');
   completed=await page.evaluate(()=>{
    closeTransientModals();stopTimer();currentGame=null;nav('daily');
    const batch=puzzleDB.free.hardcore.slice(0,3);
