@@ -111,6 +111,36 @@ html.tiskarna-ui body #screen-game #calmRunBtn::after{
 /* Do not touch the outlined brand wordmark or board glyphs. */
 html.tiskarna-ui body .brand-copy strong{letter-spacing:normal!important}
 
+/* Rules and consequences are meaningful copy, even when marked up as small. */
+html.tiskarna-ui body :is(.account-email-warning strong,.account-email-warning small,.hint-choice strong,.hint-choice small,.ranking-compact-explain summary,.ranking-compact-explain p){
+  font-size:14px!important;
+  line-height:1.45!important;
+}
+@media(max-width:600px){
+  html.tiskarna-ui body :is(.account-email-warning strong,.account-email-warning small,.hint-choice strong,.hint-choice small,.ranking-compact-explain summary,.ranking-compact-explain p){
+    font-size:15px!important;
+  }
+}
+
+/* Footer navigation and the report action share one quiet text-link role. */
+html.tiskarna-ui body .footer-links :is(a,button){
+  appearance:none;
+  border:0;
+  border-radius:2px;
+  margin:0;
+  padding:0;
+  background:none;
+  color:var(--td-muted,var(--muted))!important;
+  font:inherit!important;
+  letter-spacing:inherit!important;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  cursor:pointer;
+  transform:none;
+}
+html.tiskarna-ui body .footer-links :is(a,button):is(:hover,:active){color:var(--td-ink,var(--ink))!important}
+html.tiskarna-ui body .footer-links :is(a,button):focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
 /* Readability pass 2 — keep Outfit, but give its geometric shapes more air on small displays. */
 html.tiskarna-ui body .screen:where(:not(#screen-game)) :is(p,.muted,.field-note),
 html.tiskarna-ui body :is(.modal-card p,.leader-name small,.leader-score small,.result-player-copy small,.home-progress-level-copy span){

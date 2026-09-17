@@ -17,11 +17,12 @@ html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy{
   transform:translateY(1px)!important;
 }
 
-html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong{
+html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong,
+.legal-brand .legal-wordmark{
   display:block!important;
   visibility:visible!important;
   opacity:1!important;
-  color:var(--td-ink,#202B39)!important;
+  color:var(--td-ink,var(--ink,#202B39))!important;
   font-family:'Fraunces',Georgia,'Times New Roman',serif!important;
   font-size:30px!important;
   font-style:normal!important;
@@ -43,9 +44,11 @@ html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy small{
 }
 
 @media(max-width:420px){
-  html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong{font-size:29px!important}
+  html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong,
+  .legal-brand .legal-wordmark{font-size:29px!important}
 }
 
 @media(min-width:1000px){
-  html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong{font-size:31px!important}
+  html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong,
+  .legal-brand .legal-wordmark{font-size:31px!important}
 }

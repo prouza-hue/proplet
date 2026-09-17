@@ -406,9 +406,12 @@ html[data-theme="dark"] .google-avatar-unavailable{background:#2B2A2E!important}
 
 /* Phase 2C — light-theme cleanup from Pavel's mobile review. Dark mode intentionally deferred. */
 html:not([data-theme="dark"]) #shareDailyBtn.daily-challenge-cta,
-html:not([data-theme="dark"]) #winModal .challenge-share-cta,
-html:not([data-theme="dark"]) #levelDetailShareBtn.challenge-share-detail-cta{
+html:not([data-theme="dark"]) #winModal .challenge-share-cta{
   color:#FFFDF8!important;
+}
+/* The detail action uses the secondary white surface, unlike result sharing. */
+html:not([data-theme="dark"]) #levelDetailShareBtn.challenge-share-detail-cta{
+  color:#4D463F!important;
 }
 html:not([data-theme="dark"]) #shareDailyBtn.daily-challenge-cta .ui-icon,
 html:not([data-theme="dark"]) #winModal .challenge-share-cta .ui-icon,
