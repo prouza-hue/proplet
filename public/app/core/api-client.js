@@ -18,7 +18,7 @@
     return async function request(path, opts = {}) {
       const hasAuthSnapshot = Object.prototype.hasOwnProperty.call(opts, 'authProfile');
       const profile = hasAuthSnapshot ? opts.authProfile : getProfile();
-      const {authProfile: _authProfile, ...requestOptions} = opts;
+      const {authProfile: _authProfile, timeoutMs: requestTimeoutMs, ...requestOptions} = opts;
       const headers = {
         'Content-Type': 'application/json',
         'X-Proplet-Version': getVersion(),
@@ -32,7 +32,7 @@
       if (previewDate) headers['X-Proplet-Preview-As-Of'] = previewDate;
 
       const controller = new AbortControllerImpl();
-      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      const timeout = setTimeout(() => controller.abort(), Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0 ? requestTimeoutMs : timeoutMs);
       let response;
       try {
         response = await fetchFn(path, {

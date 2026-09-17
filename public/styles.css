@@ -1192,3 +1192,8 @@ html[data-theme="dark"] .difficulty-card.mozkomor-locked{background:linear-gradi
   .difficulty-card[data-diff="mozkomor"]:before{right:80px;top:14px}
   .mozkomor-lock-note{font-size:14px}
 }
+/* Hide the puzzle completely while its clock is paused; keep layout stable. */
+#boardStage.game-paused { position: relative; }
+#boardStage.game-paused #boardWrap { visibility: hidden; pointer-events: none; }
+.game-pause-cover:not([hidden]) { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .75rem; padding: 1.5rem; text-align: center; }
+.game-pause-cover strong { font-size: 1.35rem; }

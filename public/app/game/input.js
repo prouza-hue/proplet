@@ -82,7 +82,7 @@ function create(deps={}){
   function pointerDown(event){
     event.preventDefault();ensureAudio();
     const game=getGame(),index=+event.currentTarget.dataset.index;
-    if(!game||game.finished||game.used.has(index)||game.wrongPath?.length)return false;
+    if(!game||game.finished||game.pausedAt!=null||game.used.has(index)||game.wrongPath?.length)return false;
     clearHints();
     if(game.undoSnapshot)hideUndo();
     game.dragging=true;game.path=[index];game.lastPointer={x:event.clientX,y:event.clientY};fx('tap');updateActive();showMagnifier(index);
