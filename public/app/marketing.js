@@ -3,8 +3,8 @@
   const CONSENT_KEY = 'proplet-marketing-consent-v1';
   const EVENTS_KEY = 'proplet-marketing-events-v1';
   const MAX_AGE = 180 * 86400000;
-  // Public identifier, filled after the dedicated Proplet dataset is created.
-  const PIXEL_ID = '';
+  // Dedicated Proplet dataset; never reuse the historical client pixel.
+  const PIXEL_ID = '1379409957596561';
 
   function create({storage, now = Date.now, enabled = () => false, load, send, revoke}) {
     let loaded = false, pageViewed = false;
@@ -84,28 +84,24 @@
       global.fbq('consent', 'grant');
       global.fbq(standard ? 'trackSingle' : 'trackSingleCustom', PIXEL_ID, name, data);
     }});
-  let dialog, previousFocus;
+  let banner, showTimer;
   function show() {
-    if (!dialog) {
-      dialog = doc.createElement('dialog'); dialog.className = 'marketing-consent';
-      dialog.setAttribute('aria-labelledby', 'marketing-consent-title');
-      dialog.setAttribute('aria-describedby', 'marketing-consent-copy');
-      dialog.innerHTML = '<h2 id="marketing-consent-title">Pomůžeš nám vyhodnotit reklamu?</h2><p id="marketing-consent-copy">S tvým souhlasem použijeme Meta Pixel a reklamní cookies. Meta získá údaje o návštěvě a hraní, technické údaje a identifikátory pro propojení s reklamou. Hra funguje stejně i bez souhlasu.</p><p>Volbu můžeš kdykoli změnit v nastavení soukromí. <a href="/privacy.html#marketing">Podrobnosti o měření</a></p><div class="marketing-consent-actions"><button type="button" data-choice="denied">Pokračovat bez měření</button><button type="button" data-choice="granted">Povolit měření</button></div>';
-      doc.body.appendChild(dialog);
-      dialog.addEventListener('click', event => {
+    if (showTimer) global.clearTimeout(showTimer);
+    if (!banner) {
+      banner = doc.createElement('section'); banner.className = 'marketing-consent';
+      banner.setAttribute('role', 'region');
+      banner.setAttribute('aria-label', 'Reklamní cookies');
+      banner.innerHTML = '<p>Můžeme použít cookies od Mety k měření reklamy? <a href="/privacy.html#marketing">Podrobnosti</a></p><div class="marketing-consent-actions"><button type="button" data-choice="denied">Ne, díky</button><button type="button" data-choice="granted">Povolit</button></div>';
+      doc.body.appendChild(banner);
+      banner.addEventListener('click', event => {
         const choice = event.target.closest('[data-choice]')?.dataset.choice;
-        if (choice) {
-          controller.choose(choice);
-          // The starter may already be displayed while the player makes a choice.
-          // Begin measuring the active game now, never replay earlier events.
-          if (choice === 'granted' && global.currentGame && !global.currentGame.finished) controller.event('GameStarted', global.currentGame);
-          dialog.close(); previousFocus?.focus();
-        }
+        if (!choice) return;
+        controller.choose(choice);
+        if (choice === 'granted' && global.currentGame && !global.currentGame.finished) controller.event('GameStarted', global.currentGame);
+        banner.hidden = true;
       });
-      dialog.addEventListener('cancel', () => {controller.choose('denied');});
     }
-    previousFocus = doc.activeElement;
-    if (!dialog.open) dialog.showModal();
+    banner.hidden = false;
   }
   doc.querySelectorAll('[data-marketing-settings]').forEach(button => button.addEventListener('click', show));
   // Hooks cover normal games, the starter and Tajenka without exporting account data.
@@ -116,10 +112,10 @@
     if (global.currentGame && !global.currentGame.finished) controller.event('GameStarted', global.currentGame);
   }
   else if (['/', '/index.html'].includes(global.location.pathname)) {
-    // DOM readiness also covers cached/offline startup where game readiness can
-    // happen before this script is evaluated.
-    if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', show, {once: true});
-    else show();
+    // Let the player see the game first. This notice never locks play or moves focus.
+    const schedule = () => {showTimer = global.setTimeout(show, 6000);};
+    if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', schedule, {once: true});
+    else schedule();
   }
   global.addEventListener('storage', event => {
     if (event.key === CONSENT_KEY) global.location.reload();

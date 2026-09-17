@@ -1,9 +1,10 @@
 # Meta measurement for the Proplet campaign
 
-Status: implementation prepared; **not production-ready** until the dedicated
-Proplet dataset has been created and `PIXEL_ID` in `public/app/marketing.js`
-has been populated. The empty identifier intentionally disables all Meta calls.
-Do not reuse Klokočka's historical client pixel.
+Status: dedicated dataset **Proplet – hrajproplet.cz**, ID **1379409957596561**,
+created after owner approval of Meta Business Tools Terms and connected to ad
+account **Klokočka (370983596435354)**. The real ID is installed in the code.
+Automatic Advanced Matching was left off in the setup wizard.
+Production deployment and Meta Test Events verification remain outstanding.
 
 ## Event definitions
 
@@ -23,6 +24,7 @@ They are client-reported events, not server-validated leaderboard results.
 ## Consent and isolation
 
 - No Meta script or request before explicit opt-in; reject and accept have equal prominence.
+- A compact, non-modal bottom banner appears after six seconds without moving focus.
 - Consent expires after 180 days and can be changed in settings or on the privacy page.
 - Revocation signals Meta consent withdrawal and clears local marketing records and `_fbp`/`_fbc` cookies.
 - Historical gameplay before consent is not replayed. The existing first-party analytics is independent.
@@ -38,17 +40,15 @@ They are client-reported events, not server-validated leaderboard results.
 - Focused consent tests also exercise the actual browser adapter with a fake SDK:
   production/preview URL boundaries, hook registration, no events before consent,
   deduplication, completed-versus-unfinished games, expiry, withdrawal and blocked scripts.
-- Browser inspection: initial dialog, persisted rejection, settings on privacy page,
+- Browser inspection: initial banner, persisted rejection, settings on privacy page,
   desktop layout and actual 390 px iframe viewport.
 
 ## Before launch
 
-1. User accepts Meta Business Tools Terms at dataset creation.
-2. Create Proplet dataset, record its ID, connect advertising account 370983596435354.
-3. Set PIXEL_ID and verify dataset automatic advanced matching/automatic events are off.
-4. Review preview and obtain release approval following README release flow.
-5. Deploy, then verify PageView, GameStarted, GameCompleted and CompleteTutorial in Meta Test Events,
+1. Verify dataset automatic events are off.
+2. Review the compact-banner preview and obtain release approval following README release flow.
+3. Deploy, then verify PageView, GameStarted, GameCompleted and CompleteTutorial in Meta Test Events,
    plus no Meta request when consent is denied and no CSP violations.
-6. Connect the dataset to the campaign and add per-creative UTM parameters before publishing.
+4. Connect the dataset to the campaign and add per-creative UTM parameters before publishing.
 
 Reference for SDK commands: https://github.com/facebook/GoogleTagManager-WebTemplate-For-FacebookPixel/blob/main/template.tpl
