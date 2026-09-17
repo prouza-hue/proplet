@@ -19,7 +19,7 @@ has(app,/async function finishGame\(\)/,'finishGame entry missing');
 has(app,/saveState\(state\);queueResult\(rec\);g\.finishTelemetryPromise=finishAttemptTelemetry\(rec\)/,'completion persistence order drifted');
 has(app,/renderRunWinXp\(g\)/,'win XP render missing');
 has(app,/renderWinFeedback\(\);confetti\(\);fx\('win'\);renderDaily\(\);renderFree\(\);renderProfile\(\)/,'win render sequence drifted');
-has(app,/syncQueue\(\{announce:false\}\)\.then/,'post-win sync scheduling missing');
+has(app,/syncQueue\(\{announce:false,waitForProfile:false\}\)\.then/,'post-win sync scheduling missing');
 
 // Sprint 11A runtime: finishGame owns the pipeline; late layers use explicit hooks.
 has(app,/function registerGameCompletionHook\(hook\)/,'completion hook registration facade missing');

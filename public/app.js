@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-fairplay3';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-mozkosync1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -763,10 +763,10 @@ function failRescue(){finishRescue(false)}
 function freeProgress(diff){return progression().freeProgress(diff)}
 function localMozkomorBaseDone(){
  const slots=localFreeSlotState('hardcore');
- return [...slots.actual].filter(level=>level>=1&&level<=MOZKOMOR_UNLOCK_BASE).length;
+ return slots.actual.size;
 }
 function mozkomorUnlockState(){
- const required=MOZKOMOR_UNLOCK_BASE,remote=getProfile()?.stats||{},localDone=localMozkomorBaseDone(),remoteDone=Number(remote.freeBasePlayedCurrent?.hardcore||0),done=Math.min(required,Math.max(localDone,remoteDone));
+ const required=MOZKOMOR_UNLOCK_BASE,remote=getProfile()?.stats||{},localDone=localMozkomorBaseDone(),remoteDone=Number(remote.freePlayedCurrent?.hardcore||0),done=Math.min(required,Math.max(localDone,remoteDone));
  const key=scopedStorageKey(MOZKOMOR_UNLOCK_KEY),remembered=(()=>{try{return localStorage.getItem(key)==='1'}catch{return false}})();
  const unlocked=MOZKOMOR_QA_PREVIEW||remembered||remote.mozkomorUnlocked===true||done>=required;
  if(unlocked&&!MOZKOMOR_QA_PREVIEW)try{localStorage.setItem(key,'1')}catch{}
@@ -798,7 +798,7 @@ function renderFree(){
  renderAccountProgressStatus();
  renderNewContentBanner();const unlock=mozkomorUnlockState();
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
-  if(key==='mozkomor'&&!unlock.unlocked){const pct=Math.min(100,Math.round(unlock.done/unlock.required*100));return `<article class="cp-locked" data-diff="mozkomor" aria-label="Mozkomor zamčený"><div class="cp-underlay" aria-hidden="true">${difficultyIconMarkup('mozkomor','cp-locked-art')}<span>Mozkomor</span></div><div class="cp-lock-message"><svg viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="12" width="18" height="13" rx="3"/><path d="M7 12V8a5 5 0 0 1 10 0v4M12 17v3"/></svg><strong>Dohraj ${unlock.required} Mozkožroutů<br>a vypusť Mozkomora</strong><p>${unlock.done} / ${unlock.required} dokončeno</p><div class="cp-track" role="progressbar" aria-label="Dokončení základních Mozkožroutů" aria-valuemin="0" aria-valuemax="${unlock.required}" aria-valuenow="${unlock.done}"><span style="width:${pct}%"></span></div></div></article>`}
+  if(key==='mozkomor'&&!unlock.unlocked){const pct=Math.min(100,Math.round(unlock.done/unlock.required*100));return `<article class="cp-locked" data-diff="mozkomor" aria-label="Mozkomor zamčený"><div class="cp-underlay" aria-hidden="true">${difficultyIconMarkup('mozkomor','cp-locked-art')}<span>Mozkomor</span></div><div class="cp-lock-message"><svg viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="12" width="18" height="13" rx="3"/><path d="M7 12V8a5 5 0 0 1 10 0v4M12 17v3"/></svg><strong>Dohraj ${unlock.required} Mozkožroutů<br>a vypusť Mozkomora</strong><p>${unlock.done} / ${unlock.required} dokončeno</p><div class="cp-track" role="progressbar" aria-label="Dokončení Mozkožroutů" aria-valuemin="0" aria-valuemax="${unlock.required}" aria-valuenow="${unlock.done}"><span style="width:${pct}%"></span></div></div></article>`}
   const {total,done,pct,resume}=freeProgress(key),action=resume?'Pokračovat':done===total&&total?'Zahrát znovu':'Hrát';
   return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="${esc(d.label)}: ${done} z ${total} hotovo, otevřít přehled úrovní"><strong>${done}</strong> / ${total}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
  }).join('');
@@ -807,7 +807,7 @@ function renderFree(){
 }
 async function startFree(diff){
  if(!allowAccountGameStart())return;
- if(diff==='mozkomor'&&!mozkomorUnlockState().unlocked){showToast('🔒 Mozkomor se odemkne po dokončení všech 200 Mozkožroutů.');return}
+ if(diff==='mozkomor'&&!mozkomorUnlockState().unlocked){showToast('🔒 Mozkomor se odemkne po dokončení 200 různých Mozkožroutů.');return}
  const list=sortedFreeBank(diff),slots=localFreeSlotState(diff),resume=resumableFreePuzzle(diff,list),unplayed=list.filter(p=>!slots.actual.has(Number(p.meta?.level))),p=resume||(unplayed[0]||list[0]);if(p)startGame(p,'free',null);
 }
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
@@ -1032,10 +1032,10 @@ async function finishGame(){
  const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}$('#newBadgeBox').classList.toggle('hidden',!celebrations.length);$('#newBadgeBox').innerHTML=celebrations.join('');
  configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':g.mode==='daily'?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hrát další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.mode==='free'&&!g.postStarterWarmup){
- if(getProfile()?.token){syncQueue({announce:false}).then(r=>{if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
+ if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
   else loadWinLevelLeaderboard(g.puzzle,rec);
  }else if(g.mode==='daily'){
-  if(getProfile()?.token){syncQueue({announce:false}).then(r=>{if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinDailyGlobalLeaderboard(g.dailyDate,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Globální místo ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
+  if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinDailyGlobalLeaderboard(g.dailyDate,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Globální místo ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
   else loadWinDailyGlobalLeaderboard(g.dailyDate,rec);
  }else $('#levelLeaderboardBox').classList.add('hidden')
  await runGameCompletionHooks('after',completion)
@@ -1284,7 +1284,7 @@ function trackAppSession(){
  if(currentScreen!=='game')trackProductEvent(`screen_${currentScreen}_viewed`);
 }
 
-async function syncQueue({announce=false}={}){
+async function syncQueue({announce=false,waitForProfile=true}={}){
  if(await claimTelemetryAfterAuth()===false)return {ok:false,left:getQueue().length,error:"Převod postupu čeká na spojení se serverem."};
  if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||(window.PROPLET_RUNTIME_ENV==='preview'&&!window.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW)||new URLSearchParams(location.search).get('tutorial')==='1'){if(getProfile()?.token)await refreshRemoteProfile();syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
@@ -1292,7 +1292,8 @@ async function syncQueue({announce=false}={}){
   syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
   const result=await controller.sync();
   if(!accountProfileMatches(p)){syncState={status:'idle',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();return {...result,ok:false,stale:true}}
-  try{await refreshRemoteProfile({throwOnError:result.left===0})}catch(e){if(!result.error)result.error=e.message}
+  const refresh=refreshRemoteProfile({throwOnError:result.left===0});
+  if(waitForProfile){try{await refresh}catch(e){if(!result.error)result.error=e.message}}else refresh.catch(()=>{});
   if(result.left){syncState={status:'error',error:result.error||'Některé výsledky zůstaly ve frontě',lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace selhala: ${syncState.error}`)}else{syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast(result.quarantined?`Synchronizace opravena · ${countCz(result.quarantined,'zastaralý záznam','zastaralé záznamy','zastaralých záznamů')} bezpečně odložen ✓`:result.sent?`Synchronizováno ${countCz(result.sent,'výsledek','výsledky','výsledků')} ✓`:'Všechno je synchronizované ✓')}
   renderProfile();renderDaily();if(currentScreen==='leaderboard'&&!result.left)renderLeaderboard();return {...result,failedKeys:result.failedKeys||[]};
  }
@@ -1796,11 +1797,19 @@ function bindTutorial(){
 }
 
 
+function mergePendingPlayedLevels(levels,queued,diff){
+ const merged=[...levels],seen=new Set(levels.map(r=>r.puzzleId));
+ for(const r of queued||[]){if(r?.mode!=='free'||r.difficulty!==diff||seen.has(r.puzzleId))continue;seen.add(r.puzzleId);merged.push({...r,attempts:1,transferred:false,pendingSync:true})}
+ return merged.sort((a,b)=>Number(a.level)-Number(b.level));
+}
 async function openPlayedLevels(diff){
  const d=DIFF[diff],modal=$('#playedLevelsModal');$('#playedLevelsTitle').textContent=`${d.label} · tvoje úrovně`;$('#playedLevelsMeta').textContent='Načítám tvůj postup…';$('#playedLevelsList').innerHTML='';modal.classList.remove('hidden');const p=getProfile();let levels=[],legacyLevels=[],summary=null;
  try{if(p?.token){const data=await api(`/api/played-levels?difficulty=${encodeURIComponent(diff)}`);levels=data.levels||[];legacyLevels=data.legacyLevels||[];summary=data}else{const state=getState(),slots=localFreeSlotState(diff),rows=Object.values(state.completed||{}),total=sortedFreeBank(diff).length;levels=sortedFreeBank(diff).map(x=>{const level=Number(x.meta?.level),r=state.completed[`free:${x.id}`];return r?{puzzleId:x.id,level,elapsedMs:r.elapsedMs,moves:r.moves,hintsUsed:r.hintsUsed||0,cleanSolve:r.cleanSolve===true,attempts:1,transferred:false}:slots.transferred.has(level)?{puzzleId:x.id,level,transferred:true,attempts:0}:null}).filter(Boolean);legacyLevels=rows.map(r=>{if(r?.mode!=='free'||r.difficulty!==diff)return null;const info=(Number(r.level)&&Number(r.contentGeneration))?{level:Number(r.level),generation:Number(r.contentGeneration)}:freePuzzleSlot(r.puzzleId,diff);return info&&info.generation<2?{...r,level:info.level,contentGeneration:info.generation}:null}).filter(Boolean).sort((a,b)=>a.level-b.level);summary={actual:slots.actual.size,transferred:slots.transferred.size,total}}}catch(e){$('#playedLevelsMeta').textContent=e.message;return}
+ if(p?.token){if(!accountProfileMatches(p))return;levels=mergePendingPlayedLevels(levels,getQueue(p.id),diff)}
+ const pendingCount=levels.filter(r=>r.pendingSync).length;
  const actual=summary?.actual??levels.filter(r=>!r.transferred).length,transferred=summary?.transferred??levels.filter(r=>r.transferred).length,total=summary?.total??sortedFreeBank(diff).length;$('#playedLevelsMeta').textContent=actual?`Nový postup ${actual}/${total}`:transferred?'Nový postup začíná od jedničky.':'Zatím tu nic není. Nejdřív něco propleť.';
- const currentHtml=levels.length?levels.map(r=>`<button class="played-level-row ${r.transferred?'transferred':''}" data-level-puzzle="${esc(r.puzzleId)}" data-level-diff="${diff}"><span class="level-index">${r.transferred?'✦':`${r.level}.`}</span><span class="level-history-main">${r.transferred?`<strong>Nová deska · úroveň ${r.level}</strong><small>Dřívější verzi máš splněnou.</small>`:`<strong>${fmtTime(r.elapsedMs)}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}${r.attempts>1?` · hráno ${r.attempts}×`:''}</small>`}</span><span class="played-arrow">›</span></button>`).join(''):'<div class="empty-history">Tady zatím fouká vítr. 🌬️</div>';$('#playedLevelsList').innerHTML=currentHtml;
+ if(pendingCount)$('#playedLevelsMeta').textContent=`${actual} potvrzeno · ${pendingCount} čeká na synchronizaci`;
+ const currentHtml=levels.length?levels.map(r=>`<button class="played-level-row ${r.transferred?'transferred':''}" data-level-puzzle="${esc(r.puzzleId)}" data-level-diff="${diff}"><span class="level-index">${r.transferred?'✦':`${r.level}.`}</span><span class="level-history-main">${r.transferred?`<strong>Nová deska · úroveň ${r.level}</strong><small>Dřívější verzi máš splněnou.</small>`:`<strong>${fmtTime(r.elapsedMs)}</strong><small>${r.pendingSync?'Čeká na synchronizaci · ':''}${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}${r.attempts>1?` · hráno ${r.attempts}×`:''}</small>`}</span><span class="played-arrow">›</span></button>`).join(''):'<div class="empty-history">Tady zatím fouká vítr. 🌬️</div>';$('#playedLevelsList').innerHTML=currentHtml;
  $$('[data-level-puzzle]').forEach(b=>b.onclick=()=>openLevelDetail(b.dataset.levelDiff,b.dataset.levelPuzzle));
 }
 function localLevelResult(puzzleId){return getState().completed[`free:${puzzleId}`]||null}

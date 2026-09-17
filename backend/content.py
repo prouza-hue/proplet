@@ -192,7 +192,7 @@ def competition_ranks(rows: list[dict]) -> list[int]:
 def mozkomor_unlocked_from_rows(rows: list[dict], slots: dict, required: int = 200) -> bool:
     if any(row.get("mode") == "free" and row.get("difficulty") == "mozkomor" for row in rows):
         return True
-    return int((slots.get("baseCurrent") or {}).get("hardcore") or 0) >= required
+    return int((slots.get("current") or {}).get("hardcore") or 0) >= required
 
 
 def challenge_key(mode: str, puzzle_id: str, daily_date: Optional[str] = None) -> str:

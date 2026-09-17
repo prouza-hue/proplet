@@ -99,7 +99,7 @@ for (const vector of fixture.streak) {
 for (const vector of fixture.unlock) {
   storage.clear();
   context.testRemote = {
-    freeBasePlayedCurrent: {hardcore: vector.baseCurrentHardcore},
+    freePlayedCurrent: {hardcore: vector.currentHardcore},
     mozkomorUnlocked: vector.rows.some(row => row.mode === 'free' && row.difficulty === 'mozkomor'),
   };
   context.testSlots = {actual: new Set()};

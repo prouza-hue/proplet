@@ -63,7 +63,7 @@ assert "const MOZKOMOR_UNLOCK_BASE=200" in app
 assert "a vypusť Mozkomora" in app
 assert "${unlock.done} / ${unlock.required} dokončeno" in app
 assert 'class="cp-lock-message"' in app
-assert 'aria-label="Dokončení základních Mozkožroutů"' in app
+assert 'aria-label="Dokončení Mozkožroutů"' in app
 assert "ÚROVEŇ ${nextLevel||1} Z ${total}" not in app
 
 # Dnes never exposes Mozkomor, including quick play, resume, or local recent history.
@@ -89,14 +89,14 @@ assert server.FREE_DIFFICULTIES == ("easy", "medium", "hard", "hardcore", "mozko
 assert server.POINTS["mozkomor"] == 150
 assert server.MOZKOMOR_UNLOCK_BASE_LEVELS == 200
 empty = {key: 0 for key in server.FREE_DIFFICULTIES}
-summary = {"baseCurrent": {**empty, "hardcore": 199}}
+summary = {"current": {**empty, "hardcore": 199}}
 assert server.mozkomor_unlocked_from_rows([], summary) is False
 try:
     server.enforce_mozkomor_unlock([], summary)
     raise AssertionError("locked Mozkomor must return HTTP 403")
 except HTTPException as exc:
     assert exc.status_code == 403
-summary["baseCurrent"]["hardcore"] = 200
+summary["current"]["hardcore"] = 200
 assert server.mozkomor_unlocked_from_rows([], summary) is True
 server.enforce_mozkomor_unlock([], summary)
 assert server.mozkomor_unlocked_from_rows([{"mode": "free", "difficulty": "mozkomor"}], {"baseCurrent": empty}) is True
