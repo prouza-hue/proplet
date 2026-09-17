@@ -94,12 +94,10 @@
     let card=q('#settingsPrivacyCard',screen);
     if(!card){
       card=document.createElement('div');card.id='settingsPrivacyCard';card.className='card settings-card settings-privacy-card';
-      card.innerHTML='<div class="settings-privacy-line"><span class="settings-privacy-icon"></span><div class="settings-privacy-copy"><strong></strong><small></small></div><button class="settings-privacy-action" type="button">Změnit</button></div>';
+      card.innerHTML='<div class="settings-privacy-line"><div class="settings-privacy-copy"><strong></strong><small></small></div><button class="settings-privacy-action" type="button">Změnit</button></div>';
       screen.appendChild(card);q('.settings-privacy-action',card).onclick=()=>{const p=profile();if(!p?.token){try{openProfileModal('create')}catch{};return}try{openRankingPrivacyModal()}catch{}};
     }
-    const state=privacyState(),p=profile(),icon=q('.settings-privacy-icon',card);
-    // The visual layer replaces emoji with artwork. Track semantic state instead of text.
-    if(icon&&icon.dataset.privacyStateIcon!==state.icon){icon.dataset.privacyStateIcon=state.icon;setText(icon,state.icon)}
+    const state=privacyState(),p=profile();
     setText(q('.settings-privacy-copy strong',card),'Soukromí a pořadí');
     setText(q('.settings-privacy-copy small',card),p?.token?`${state.title} · ${state.copy}`:'Po uložení účtu si zvolíš, jestli se v pořadí ukáže tvoje herní jméno.');
     setText(q('.settings-privacy-action',card),p?.token?'Změnit':'Uložit postup');

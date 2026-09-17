@@ -329,6 +329,7 @@ function rankingsOrchestration(){
   $,$$,api,pragueDateISO,ensureRankingProfileState,getProfile,updateAccountProfile,
   esc,countCz,levelFor,fmtTime,adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data,
   openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
+  canShowRankingPrivacyNotice:()=>{const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&!document.querySelector('.modal:not(.hidden)')},
  });
  return rankingsOrchestrationController;
 }

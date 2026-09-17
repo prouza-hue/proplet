@@ -116,7 +116,8 @@
     async function saveRankingVisibility(enabled){
       try{const result=await d.api('/api/rankings/visibility',{method:'POST',body:JSON.stringify({enabled})});d.updateAccountProfile?.({publicRankings:result.publicRankings});$('#rankingPrivacyModal')?.classList.add('hidden');renderRankingPrivacyNote();d.showToast?.(enabled?'Jsi ve společném pořadí 🏆':'V pořadí jsi anonymně 🎭');await renderLeaderboard()}catch(error){d.showToast?.(error.message)}
     }
-    function maybeShowRankingPrivacyNotice(){const p=getProfile();if(p?.token&&p.publicRankings==null)openRankingPrivacyModal()}
+    let privacyNoticeShown=false;
+    function maybeShowRankingPrivacyNotice(){const p=getProfile();if(!privacyNoticeShown&&p?.token&&p.publicRankings==null&&d.canShowRankingPrivacyNotice?.()){privacyNoticeShown=true;openRankingPrivacyModal()}}
     function renderRankingTeamCard(){
       const box=$('#rankingTeamCard'),p=getProfile();if(!box)return;
       if(!p?.token){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Chceš soutěžit i za partu?</strong><small>Pořadí můžeš sledovat bez účtu. Pro vlastní tým si nejdřív ulož postup.</small></div><button id="rankingAccountBtn" class="secondary-btn">☁️ Uložit postup</button>';const button=$('#rankingAccountBtn');if(button)button.onclick=()=>d.openProfileModal?.('create');return}
@@ -140,6 +141,7 @@
     function install(){
       if(installed)return false;
       installed=true;
+      globalThis.document?.addEventListener('proplet:screen-changed',maybeShowRankingPrivacyNotice);
       $$('.ranking-scope-tab').forEach(button=>button.addEventListener('click',()=>{rankingXpScope=button.dataset.rankingXpScope;renderLeaderboard()}));
       $$('.ranking-period-tab').forEach(button=>button.addEventListener('click',()=>{rankingXpPeriod=button.dataset.rankingPeriod;renderLeaderboard()}));
       $$('.ranking-daily-tab').forEach(button=>button.addEventListener('click',()=>{rankingDailyScope=button.dataset.rankingDailyScope;renderLeaderboard()}));
