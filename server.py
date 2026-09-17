@@ -26,6 +26,7 @@ from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
 from backend import results as result_domain
+from backend import play_sessions
 from backend.config import (
     APP_VERSION,
     ATOMIC_RESULT_V1_ENABLED,
@@ -123,13 +124,20 @@ app = FastAPI(
 logger = logging.getLogger("proplet")
 
 
+def isolated_fair_play_preview():
+    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == "fix/fair-play-progress"
+            and SUPABASE_URL.rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co")
+
+
 @app.middleware("http")
 async def launch_safety_middleware(request: Request, call_next):
     # Use the ASGI routing path, independent of the untrusted Host header.
     path = request.scope["path"]
-    if VERCEL_ENV == "preview" and request.method == "POST" and path in {"/api/product-event","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    if VERCEL_ENV == "preview" and not isolated_fair_play_preview() and request.method == "POST" and path == "/api/play-session":
+        return JSONResponse({"detail":"Preview nemá oddělené herní úložiště."},status_code=409)
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and path == "/api/anonymous/claim") and request.method == "POST" and path in {"/api/product-event","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
-    if (VERCEL_ENV == "preview" or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
+    if ((VERCEL_ENV == "preview" and not isolated_fair_play_preview()) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
@@ -1814,6 +1822,8 @@ def claim_anonymous(payload: AnonymousClaim, request: Request, authorization: Op
     anon = anonymous_hash(payload.anonymous_id)
     if not anon:
         raise HTTPException(400, "Chybí anonymní ID")
+    if play_session_config().get("enabled"):
+        db_rpc("proplet_claim_play_sessions_v1", {"p_anon": "a:" + anon, "p_player": player["id"]})
     claimed = {"attempts": 0, "helperEvents": 0, "hintEvents": 0, "productEvents": 0, "feedback": 0, "pushSubscriptions": 0}
     for table, key in (("puzzle_attempts", "attempts"), ("helper_events", "helperEvents"), ("hint_events", "hintEvents"), ("product_events", "productEvents")):
         rows = db_select(table, anonymous_id=anon)
@@ -2133,6 +2143,7 @@ def progress(request: Request, authorization: Optional[str] = Header(default=Non
             "level": info.get("level") if info else None,
             "contentGeneration": info.get("generation") if info else None,
             "legacy": info.get("legacy") if info else False,
+            **({"timingVerified": r["timing_verified"]} if r.get("timing_verified") is not None else {}),
         }
     return {
         "completed": [completion_payload(r) for r in rows]
@@ -2254,6 +2265,51 @@ def merged_hint_count(old_value, new_value: int) -> int:
     except (TypeError, ValueError):
         old = int(new_value)
     return min(old, int(new_value))
+
+
+@app.get("/api/play-session/config")
+def play_session_config():
+    if VERCEL_ENV == "preview" and not isolated_fair_play_preview():
+        return {"enabled": False}
+    try:
+        rows = db_select("fair_play_policy", singleton=True)
+    except HTTPException:
+        return {"enabled": False}
+    policy = rows[0] if rows else {}
+    return {"enabled": policy.get("enabled") is True, "dailyFrom": policy.get("daily_from"),
+            "isolatedPreview": isolated_fair_play_preview(),
+            "heartbeatMs": 15000, "leaseMs": 45000}
+
+
+@app.post("/api/play-session")
+def play_session_command(payload: play_sessions.SessionCommand, request: Request,
+                         authorization: Optional[str] = Header(default=None),
+                         x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID")):
+    enforce_rate_limit(request, "play_session", limit=900, window_seconds=3600)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
+    if not play_session_config().get("enabled"):
+        raise HTTPException(503, "Pokračování mezi zařízeními zatím není dostupné")
+    puzzle = resolved_puzzle(payload.puzzle_id, payload.mode, payload.difficulty)
+    if not puzzle:
+        raise HTTPException(400, "Neznámá úloha")
+    if payload.mode == "daily":
+        try:
+            date.fromisoformat(payload.challenge_key[6:])
+        except ValueError:
+            raise HTTPException(400, "Neplatné Daily datum")
+        if not payload.challenge_key.startswith("daily:") or not daily_puzzle_matches_date(payload.puzzle_id, payload.challenge_key[6:]):
+            raise HTTPException(400, "Tato úloha nepatří k Daily datu")
+    elif payload.challenge_key != domain_content.challenge_key(payload.mode, payload.puzzle_id):
+        raise HTTPException(400, "Neplatný klíč úlohy")
+    if payload.mode == "free":
+        info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
+        if not info or not is_puzzle_released(info.get("puzzle") or {}, effective_content_date(request)):
+            raise HTTPException(400, "Úloha ještě není vydaná")
+        if payload.difficulty == "mozkomor":
+            if not actor.get("player_id"):
+                raise HTTPException(403, "Mozkomora nejprve odemkni ve svém účtu")
+            enforce_mozkomor_unlock(db_select("results", player_id=actor["player_id"]))
+    return play_sessions.execute(payload, actor, puzzle, db_rpc)
 
 
 @app.post("/api/attempt/start")
@@ -3213,7 +3269,7 @@ def first_run_key(r: dict) -> tuple:
 
 def competitive_row(row: dict) -> bool:
     """Klidny rezim counts for personal progression, never for competitive standings."""
-    return row.get("calm_mode") is not True
+    return row.get("calm_mode") is not True and row.get("timing_verified") is not False
 
 def daily_run_date(row: dict) -> Optional[str]:
     key = str(row.get("challenge_key") or "")
@@ -3692,7 +3748,7 @@ def _family_league_week(week_offset: int = 0) -> dict:
             "puzzle_runs",
             columns=(
                 "id,player_id,puzzle_id,challenge_key,mode,elapsed_ms,moves,hints_used,wrong_attempts,"
-                "clean_solve,calm_mode,completed_at"
+                "clean_solve,calm_mode,timing_verified,completed_at"
             ),
             filters={
                 "mode": "eq.daily",

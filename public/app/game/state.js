@@ -101,6 +101,8 @@ function create(deps={}){
       cleanSolve:(game.hints||0)===0,
       elapsedMs:Math.round(elapsed(game)),
       attemptId:game.attemptId||null,
+      timingUnverified:!!game.timingUnverified,
+      mergedAttempts:!!game.mergedAttempts,
       wordDiscoveryXpAwarded:Math.max(0,Number(game.wordDiscoveryXpAwarded)||0),
       helperOffered:!!game.helperOffered,
       helperHintUsed:!!game.helperHintUsed,

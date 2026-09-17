@@ -1,6 +1,33 @@
 (function installScopedStorage(global) {
   'use strict';
 
+  // Preserve progress at an identity boundary; never add overlapping clocks.
+  function mergeProgress(current, incoming) {
+    if (!current) return incoming;
+    if (!incoming) return current;
+    if (current.puzzleId !== incoming.puzzleId || current.mode !== incoming.mode) return current;
+    const number = value => Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;
+    const preferred = number(incoming.elapsedMs) > number(current.elapsedMs) ? incoming : current;
+    const other = preferred === current ? incoming : current;
+    const found = [], seen = new Set();
+    for (const row of [...(preferred.found || []), ...(other.found || [])]) {
+      if (!Number.isInteger(row?.answerIndex) || seen.has(row.answerIndex)) continue;
+      seen.add(row.answerIndex); found.push({...row, colorIndex:found.length});
+    }
+    const merged = {...other, ...preferred, found};
+    for (const field of ['elapsedMs','moves','hints','wrongAttempts','maxHintLevel','wordDiscoveryXpAwarded','savedAt']) {
+      merged[field] = Math.max(number(current[field]), number(incoming[field]));
+    }
+    merged.moves = Math.max(merged.moves, found.length + merged.wrongAttempts);
+    merged.calmMode = !!(current.calmMode || incoming.calmMode);
+    merged.timingUnverified = !!(current.timingUnverified || incoming.timingUnverified);
+    merged.cleanSolve = merged.hints === 0 && merged.maxHintLevel === 0;
+    // Distinct attempts cannot be proven to represent one uninterrupted run.
+    merged.mergedAttempts = !!(current.mergedAttempts || incoming.mergedAttempts ||
+      (current.attemptId && incoming.attemptId && current.attemptId !== incoming.attemptId));
+    return merged;
+  }
+
   function create(options = {}) {
     const storage = options.storage || global.localStorage;
     const getScope = typeof options.getScope === 'function' ? options.getScope : () => 'guest';
@@ -63,11 +90,11 @@
           player.completed[key] = player.completed[key] ? firstResult(player.completed[key], result) : result;
         }
         for (const [key, progress] of Object.entries(guest.inProgress || {})) {
-          if (!player.completed[key] && !player.inProgress[key]) player.inProgress[key] = progress;
+          if (!player.completed[key]) player.inProgress[key] = mergeProgress(player.inProgress[key], progress);
         }
         player.rescues = {...(player.rescues || {}), ...(guest.rescues || {})};
         storage.setItem(playerStateKey, JSON.stringify(player));
-      } catch (_) {}
+      } catch (_) { return false; }
 
       try {
         const guestQueue = JSON.parse(storage.getItem(guestQueueKey) || '[]');
@@ -81,16 +108,17 @@
           }
         }
         storage.setItem(playerQueueKey, JSON.stringify(playerQueue));
-      } catch (_) {}
+      } catch (_) { return false; }
 
       storage.removeItem(guestStateKey);
       storage.removeItem(guestQueueKey);
+      return true;
     }
 
     return {scopedKey, readState, writeState, readQueue, writeQueue, migrateLegacy, adoptGuest};
   }
 
-  const api = {create};
+  const api = {create, mergeProgress};
   if (global) global.PropletScopedStorage = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : globalThis);

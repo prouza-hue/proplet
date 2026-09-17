@@ -270,6 +270,7 @@
           </div>
 
           <div id="boardStage" class="board-stage card">
+            <div id="gamePauseCover" class="game-pause-cover" role="status" hidden><strong>Hra je pozastavená</strong><span>Čas neběží. Vrať se do hry a pokračuj.</span></div>
             <div id="boardWrap" class="board-wrap">
               <svg id="pathLayer" class="path-layer" aria-hidden="true"></svg>
               <div id="board" class="board" role="grid"></div>
@@ -278,6 +279,7 @@
         </div>
 
         <aside class="game-control-column">
+          <p id="gameTimingNotice" class="muted" role="status" hidden>Čas se nepodařilo ověřit. Postup a XP zůstávají, čas bude mimo žebříček.</p>
           <div class="game-actions">
             <button id="hintBtn" class="secondary-btn" aria-label="Nápověda" title="Nápověda">💡 Nápověda</button>
             <button id="tajenkaRulesBtn" class="secondary-btn hidden" type="button" aria-label="Pravidla Tajenky" title="Pravidla Tajenky"><span aria-hidden="true">ⓘ</span></button>
@@ -313,6 +315,7 @@
       <p id="winPraise" class="win-praise"></p>
       <div class="win-summary">
         <p id="winText" class="muted"></p>
+        <p id="winTimingNotice" class="muted" hidden>Neověřený čas · mimo časový žebříček. Postup a XP zůstávají.</p>
         <div class="win-summary-chips"><div id="winXp" class="win-xp"></div><div id="winClean" class="win-clean hidden"></div></div>
       </div>
       <button id="winPrimaryBtn" class="primary-btn big">Pokračovat</button>
@@ -680,6 +683,7 @@
   <script src="/app/account/tajenka-storage.js"></script>
   <script src="/app/account/account.js?v=guestcta1"></script>
   <script src="/app/game/state.js"></script>
+  <script src="/app/game/fair-play.js?v=1"></script>
   <script src="/app/game/board.js?v=starterguide3"></script>
   <script src="/app/game/input.js?v=fix20"></script>
   <script src="/app/game/hints.js?v=boardintro2"></script>

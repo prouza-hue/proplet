@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome"}
+        if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -57,6 +57,13 @@ assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
 assert "/api/account/welcome" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/account/welcome")
+# Additive session endpoints have separate real HTTP/SQL acceptance tests.
+for path in ("/api/play-session", "/api/play-session/config"):
+    assert path in openapi_contract["paths"]
+    openapi_contract["paths"].pop(path)
+for model in ("SessionCommand", "Progress", "FoundWord"):
+    openapi_contract["components"]["schemas"].pop(model)
+
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )

@@ -115,7 +115,7 @@ def ranking_runs(
             "puzzle_runs",
             columns=(
                 "id,player_id,puzzle_id,challenge_key,mode,elapsed_ms,moves,hints_used,wrong_attempts,"
-                "clean_solve,calm_mode,completed_at"
+                "clean_solve,calm_mode,timing_verified,completed_at"
             ),
             filters=filters,
             order="completed_at.asc,id.asc",
@@ -124,7 +124,7 @@ def ranking_runs(
         first: dict[str, dict] = {}
         for row in raw:
             player_id = str(row.get("player_id") or "")
-            if player_id and player_id not in first:
+            if player_id and player_id not in first and row.get("timing_verified") is not False:
                 first[player_id] = row
         return list(first.values()), "bounded-compatibility-v1"
 

@@ -86,3 +86,5 @@ jobs:
           python -c "from pathlib import Path; Path('/tmp/proplet-test-password').write_text('local-test-only')"
           python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-isolated-results.json
           python tools/test_account_created_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-account-created.json
+          python tools/test_fair_play_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
+          python tools/test_fair_play_http.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
