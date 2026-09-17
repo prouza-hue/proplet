@@ -1417,6 +1417,11 @@ function setAccountMode(mode){
 async function openProfileModal(mode='login'){
  setAccountMode(mode);$('#profileModal').classList.remove('hidden');const p=getProfile();if(p)$('#playerNameInput').value=p.name||'';$('#playerPasswordInput').value='';$('#playerPasswordInput').type='password';$('#profilePasswordToggle').textContent='👁 Zobrazit heslo';if(mode==='login')loadLeagues();
 }
+function showDailyAfterRegistration(){
+ profileModalFromWin=false;profileModalFromNudge=false;pendingPostWinAction=null;accountNudgeStage=0;
+ ['#profileModal','#winModal','#accountNudgeModal'].forEach(id=>$(id)?.classList.add('hidden'));
+ nav('daily',{replace:true});
+}
 async function saveNewProfile(){
  const authAction=accountMode,offerInstallAfterCreate=authAction==='create'&&!profileModalFromNudge&&!profileModalFromWin;
  const name=$('#playerNameInput').value.trim(),password=$('#playerPasswordInput').value;$('#profileFormError').textContent='';if(!name||!password){$('#profileFormError').textContent='Vyplň jméno a heslo.';return}if(password.length<8){$('#profileFormError').textContent='Heslo musí mít alespoň 8 znaků.';return}
@@ -1428,7 +1433,7 @@ async function saveNewProfile(){
   const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   await claimTelemetryAfterAuth(anonId);
-  trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
+  trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(authAction==='create'){showDailyAfterRegistration();if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320)}else if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
  }catch(e){$('#profileFormError').textContent=e.message}
 }
 function toggleLegacyTeamLogin(){legacyTeamLogin=!legacyTeamLogin;$('#leagueChooser').classList.toggle('hidden',!legacyTeamLogin);$('#legacyTeamLoginToggle').textContent=legacyTeamLogin?'Skrýt výběr týmu':'Mám starší účet v týmu';if(legacyTeamLogin)loadLeagues()}
