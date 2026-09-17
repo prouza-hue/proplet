@@ -43,7 +43,18 @@ jobs:
       - name: Build the checked-out frontend
         run: |
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
-          python tools/generate_puzzles_bootstrap.py
+          # Match the fixed browser date and Tajenka fixture; wall-clock builds age out.
+          python - <<'PY'
+          import json
+          from datetime import date
+          from tools.generate_puzzles_bootstrap import DEFAULT_SOURCE, DEFAULT_OUTPUT, build_bootstrap, validate
+          raw = DEFAULT_SOURCE.read_bytes()
+          source = json.loads(raw)
+          data = build_bootstrap(source, raw, today=date(2026, 9, 15))
+          encoded = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+          validate(source, data, len(raw), len(encoded))
+          DEFAULT_OUTPUT.write_bytes(encoded)
+          PY
           mkdir -p artifacts
       - name: Verify layout and idle lifecycle against isolated checkout
         shell: bash

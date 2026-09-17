@@ -29,6 +29,7 @@ const {execFileSync}=require('node:child_process');
  console.log('Loading isolated frontend');await p.goto(url);await p.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);await p.waitForTimeout(5000);
  const skip=p.locator('.onboarding-return-skip');if(await skip.isVisible())await skip.click();
  out.demandLoading=await p.evaluate(()=>({bootstrap:puzzleDB.bootstrapSchema===1,fullRequests:performance.getEntriesByType('resource').filter(r=>new URL(r.name).pathname==='/puzzles.json').length}));
+ assert(out.demandLoading.bootstrap,'fixture bootstrap must cover the fixed browser date 2026-09-15');
  if(out.demandLoading.bootstrap)assert.equal(out.demandLoading.fullRequests,0,'home must not fetch the full bank');
  const savedProgress=await p.evaluate(()=>{
   const state=getState();
