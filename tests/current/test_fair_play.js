@@ -46,3 +46,14 @@ const host={setInterval(fn,ms){assert.equal(this,host);assert.equal(ms,15000);re
 const adapter=require('node:vm').runInNewContext('({'+timerAdapter+'})',{window:host});
 adapter.clearInterval(adapter.setInterval(()=>{},15000));
 console.log('PASS browser timer adapter preserves the Window receiver');
+
+// A paused device may resume after another device has completed the board.
+const restoredAdapter=appSource.match(/restored:(g=>.*?),completed:/)[1];
+const restoredGame={found:[{}],puzzle:{answers:[{}]},finished:false,isReplay:false};
+const pending=[];let finishes=0;
+const scope={currentGame:restoredGame,renderGameBoard(){},renderGameHUD(){},saveGameProgress(){},queueMicrotask:fn=>pending.push(fn),finishGame:()=>finishes++};
+const onRestored=require('node:vm').runInNewContext('('+restoredAdapter+')',scope);
+onRestored(restoredGame);assert.equal(pending.length,1);pending.shift()();assert.equal(finishes,1);
+onRestored(restoredGame);scope.currentGame={};pending.shift()();assert.equal(finishes,1);
+scope.currentGame=restoredGame;restoredGame.isReplay=true;onRestored(restoredGame);assert.equal(pending.length,0);
+console.log('PASS remote completion recovery and stale-screen/replay guards');

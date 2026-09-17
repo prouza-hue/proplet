@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-fairplay2';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-fairplay3';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1185,7 +1185,7 @@ let fairPlayController=null;
 function fairPlay(){
  if(fairPlayController)return fairPlayController;
  if(!window.PropletFairPlay)return {prepare:async(p,m,d,restored)=>({restored}),pause(){},resume:async()=>null,start(){},finish:async()=>null};
- fairPlayController=window.PropletFairPlay.create({api,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress()}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,
+ fairPlayController=window.PropletFairPlay.create({api,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,
  conflict:(g,text)=>{if(g!==currentGame)return;g.fairPlayConflict=true;g.fairPlay=false;pauseGameClock('other-device');showToast(text)}});
  return fairPlayController;
 }
