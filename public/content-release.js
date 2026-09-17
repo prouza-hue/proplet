@@ -11,6 +11,9 @@
       (puzzleDB.free?.[d]||[]).filter(p=>p.id?.startsWith(`g5-r1-${d}-`)).length===(d==='mozkomor'?50:100));
     }catch{return false}
   }
+  function eligible(){
+    try{const profile=getProfile();return !!(profile?.id&&profile?.token)&&localStorage.getItem(ONBOARD_KEY)==='done'&&!(typeof onboardingMandatory!=='undefined'&&onboardingMandatory)&&!(typeof currentGame!=='undefined'&&currentGame?.mode==='starter'&&!currentGame.finished)}catch{return false}
+  }
   function seen(){try{return storage().getItem(key)==='1'}catch{return false}}
   function dismiss(){if(dialog?.open)dialog.close()}
   function mountPreviewPicker(){
@@ -61,14 +64,14 @@
       <button type="button" class="content-release-play">Jdu hrát <span aria-hidden="true">→</span></button>`;
     document.body.append(dialog);
     dialog.querySelector('.content-release-close').addEventListener('click',dismiss);
-    dialog.querySelector('.content-release-play').addEventListener('click',()=>{dismiss();nav('free')});
+    dialog.querySelector('.content-release-play').addEventListener('click',()=>{const allowed=eligible();dismiss();if(allowed)nav('free')});
     dialog.addEventListener('close',()=>{
       document.documentElement.classList.remove('content-release-open');
       try{storage().setItem(key,'1')}catch{}
     });
   }
   function maybeShow(){
-    if(!ready||shown||document.hidden||!available()||(!forced()&&seen()))return;
+    if(!ready||!eligible()||shown||document.hidden||!available()||(!forced()&&seen()))return;
     if(!['daily','free'].includes(currentScreen)||openTransientModal()||document.querySelector('dialog[open],.modal:not(.hidden),.quality-modal:not(.hidden)'))return;
     mount();shown=true;document.documentElement.classList.add('content-release-open');dialog.showModal();
   }

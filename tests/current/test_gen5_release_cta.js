@@ -5,8 +5,9 @@ const app=fs.readFileSync('public/app.js','utf8');
 const key='proplet:content-release:g5-r1';
 const diffs=['easy','medium','hard','hardcore','mozkomor'];
 
-function setup({preview=false,query='',stored=false,screen='daily',blocked=false,storageFails=false}={}){
+function setup({preview=false,query='',stored=false,screen='daily',blocked=false,storageFails=false,authenticated=true,onboarded=true}={}){
  const nodes=new Map(),timers=[],events=new Map(),windowEvents=new Map(),local=new Map(),session=new Map(),games=[],navigations=[];
+ if(onboarded)local.set('onboard','done');
  if(stored)(preview?session:local).set(key,'1');
  const storage=map=>({getItem:k=>{if(storageFails)throw Error('denied');return map.get(k)},setItem:(k,v)=>{if(storageFails)throw Error('denied');map.set(k,v)}});
  function node(tag='div'){
@@ -27,6 +28,7 @@ function setup({preview=false,query='',stored=false,screen='daily',blocked=false
   blocked,addEventListener(name,fn){events.set(name,fn)}};
  const context={window:{PROPLET_RUNTIME_META:{gen5CandidatePreview:preview},addEventListener:(name,fn)=>windowEvents.set(name,fn)},
   document,location:{search:query,href:'https://example.test/'},localStorage:storage(local),sessionStorage:storage(session),URLSearchParams,
+  ONBOARD_KEY:'onboard',getProfile:()=>authenticated?{id:'test-player',token:'test-token'}:null,
   currentScreen:screen,puzzleDB:{free:Object.fromEntries(diffs.map(d=>[d,Array.from({length:d==='mozkomor'?50:100},(_,i)=>({id:`g5-r1-${d}-${String(i+1).padStart(3,'0')}`}))]))},
   setTimeout(fn){timers.push(fn)},setInterval(){throw Error('CTA must not poll')},requestAnimationFrame(){throw Error('CTA must not animate-loop')},
   startGame:(...args)=>games.push(args),nav:s=>navigations.push(s)};
@@ -39,6 +41,13 @@ function setup({preview=false,query='',stored=false,screen='daily',blocked=false
 }
 
 (async()=>{
+ // Fresh guests, signed-in newcomers and storage failures must fail closed.
+ for(const options of [{authenticated:false,onboarded:false},{authenticated:false},{onboarded:false},{authenticated:false,onboarded:false,preview:true,query:'?releasePreview=1'}]){
+  const fresh=setup(options);fresh.emit('proplet:ready');fresh.emit('proplet:screen-changed');fresh.flush();fresh.emit('visibilitychange');assert.equal(fresh.modal(),undefined);assert.deepEqual(fresh.navigations,[]);assert.equal(fresh.local.get(key),undefined);
+ }
+ const tutorial=setup();tutorial.context.currentGame={mode:'starter',finished:false};tutorial.emit('proplet:ready');assert.equal(tutorial.modal(),undefined);
+ const pending=setup();pending.context.onboardingMandatory=true;pending.emit('proplet:ready');assert.equal(pending.modal(),undefined);
+ const logout=setup();logout.emit('proplet:ready');logout.context.getProfile=()=>null;logout.modal().querySelector('.content-release-play').emit('click');assert.deepEqual(logout.navigations,[]);
  // Actual new content, not shell metadata, controls eligibility.
  const missing=setup();missing.context.puzzleDB.free.mozkomor.pop();missing.emit('proplet:ready');assert.equal(missing.modal(),undefined);
  missing.context.puzzleDB.free.mozkomor.push({id:'g5-r1-mozkomor-050'});missing.emit('proplet:screen-changed');missing.flush();assert(missing.modal().open);
@@ -59,7 +68,7 @@ function setup({preview=false,query='',stored=false,screen='daily',blocked=false
  for(let i=0;i<10;i++){once.emit('proplet:screen-changed');once.emit('visibilitychange')}
  once.flush();assert.equal(once.modal().showCalls,1);assert.equal(once.timers.length,0);
  const alreadySeen=setup({stored:true});alreadySeen.emit('proplet:ready');assert.equal(alreadySeen.modal(),undefined);
- const noStorage=setup({storageFails:true});noStorage.emit('proplet:ready');noStorage.context.window.PropletContentRelease.close();noStorage.emit('visibilitychange');assert.equal(noStorage.modal().showCalls,1);
+ const noStorage=setup({storageFails:true});noStorage.emit('proplet:ready');assert.equal(noStorage.modal(),undefined);
 
  // CTA closes through the shared controller before changing screen.
  const play=setup();play.emit('proplet:ready');play.modal().querySelector('.content-release-play').emit('click');
@@ -68,7 +77,7 @@ function setup({preview=false,query='',stored=false,screen='daily',blocked=false
  // Preview force is restricted to preview and does not consume production storage.
  const prodForce=setup({query:'?releasePreview=1',stored:true});prodForce.emit('proplet:ready');assert.equal(prodForce.modal(),undefined);assert.equal(prodForce.nodes.has('gen5PreviewPicker'),false);
  const demo=setup({preview:true,query:'?releasePreview=1',stored:true});demo.emit('proplet:ready');assert(demo.modal().open);
- demo.context.window.PropletContentRelease.close();assert.equal(demo.local.size,0);assert.equal(demo.session.get(key),'1');
+ demo.context.window.PropletContentRelease.close();assert.equal(demo.local.get(key),undefined);assert.equal(demo.session.get(key),'1');
  const picker=demo.nodes.get('gen5PreviewPicker'),form=picker.querySelector('form');assert.equal(form.elements.board.children.length,100);
  form.elements.difficulty.value='mozkomor';form.elements.difficulty.emit('change');assert.equal(form.elements.board.children.length,50);
  form.elements.board.value='50';let prevented=false;form.emit('submit',{preventDefault(){prevented=true}});
