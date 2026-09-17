@@ -111,7 +111,10 @@
   // Hooks cover normal games, the starter and Tajenka without exporting account data.
   if (typeof global.registerGameSessionHook === 'function') global.registerGameSessionHook({id: 'meta-marketing', afterStart: ({game}) => controller.event('GameStarted', game)});
   if (typeof global.registerGameCompletionHook === 'function') global.registerGameCompletionHook({id: 'meta-marketing', after: ({game}) => controller.event('GameCompleted', game)});
-  if (controller.status()) controller.start();
+  if (controller.status()) {
+    controller.start();
+    if (global.currentGame && !global.currentGame.finished) controller.event('GameStarted', global.currentGame);
+  }
   else if (['/', '/index.html'].includes(global.location.pathname)) {
     // DOM readiness also covers cached/offline startup where game readiness can
     // happen before this script is evaluated.

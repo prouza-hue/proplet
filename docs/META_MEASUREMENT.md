@@ -34,7 +34,7 @@ They are client-reported events, not server-validated leaderboard results.
 
 ## Validation completed
 
-- Current runtime gate: 90 tests, 116 asset checks, 335 syntax checks pass.
+- Current runtime gate: 91 tests, 116 asset checks, 335 syntax checks pass.
 - Focused consent tests also exercise the actual browser adapter with a fake SDK:
   production/preview URL boundaries, hook registration, no events before consent,
   deduplication, completed-versus-unfinished games, expiry, withdrawal and blocked scripts.
