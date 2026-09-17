@@ -1488,7 +1488,7 @@ function maybeOfferHelper(){
  if(!g||g.finished||g.mode==='rescue'||g.mode==='starter'||!threshold||g.helperOffered||g.dragging||document.hidden||openTransientModal())return;
  const idle=performance.now()-(g.lastProgressAt||g.start);
  if(idle<threshold)return;
- g.helperOffered=true;saveGameProgress();sendHelperEvent('offered');$('#helperOfferText').textContent=`Už ${Math.max(1,Math.round(idle/1000))} sekund se nic nového nezamklo. Můžu ukázat začátek jednoho slova. Počítá se to jako nápověda, takže ✨ čisté řešení tím končí.`;$('#helperOfferModal').classList.remove('hidden');
+ g.helperOffered=true;saveGameProgress();sendHelperEvent('offered');$('#helperOfferText').textContent=g.mode==='tajenka'?'Ukážu ti vodítko k jednomu slovu.':'Ukážu ti začátek jednoho slova.';$('#helperOfferModal').classList.remove('hidden');
 }
 function acceptHelperOffer(){
  const g=currentGame;if(!g)return;$('#helperOfferModal').classList.add('hidden');g.nextHintSource='helper';sendHelperEvent('accepted');applySmartHint(1);

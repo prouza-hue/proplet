@@ -54,3 +54,15 @@ html.tiskarna-ui body #screen-game.starter-mode #pathLayer .path-guide{stroke:#a
 .reminder-preview-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap;border-top:1px solid var(--td-line);margin-top:18px;padding-top:18px}
 .reminder-preview-controls label{display:grid;gap:6px;flex:1 1 220px;font-size:14px}
 .reminder-preview-controls select{width:100%;min-height:44px;background:var(--td-paper);color:var(--td-ink);border:1px solid var(--td-line);border-radius:10px;padding:8px}
+
+/* A brief, optional offer of help, without judgement or a large icon tile. */
+html.tiskarna-ui #helperOfferModal .helper-offer-card{width:min(100%,420px);padding:28px 24px!important;max-height:calc(100dvh - 32px);overflow:auto;background:var(--td-paper)!important;color:var(--td-ink)!important;border:1px solid var(--td-line)!important;border-radius:24px!important;text-align:center}
+#helperOfferModal .helper-offer-art{display:block;width:52px;height:52px;margin:0 auto 18px;color:var(--td-blue,#2458cd)}
+#helperOfferModal h2{margin:0 0 12px;font-size:28px;line-height:1.15;letter-spacing:-.025em}
+#helperOfferModal #helperOfferText{margin:0;font-size:17px;line-height:1.45;color:var(--td-ink)}
+#helperOfferModal .helper-offer-note{margin:8px 0 22px;font-size:13px;line-height:1.4;color:var(--td-muted)}
+html.tiskarna-ui #helperOfferModal #helperAcceptBtn,html.tiskarna-ui #helperOfferModal #helperDismissBtn{display:block;width:100%;min-height:48px;margin:10px 0 0;font:inherit;font-size:17px;font-weight:600;border-radius:12px;box-shadow:none}
+html.tiskarna-ui #helperOfferModal #helperAcceptBtn{background:#2458cd!important;color:#fff!important;border:1px solid #2458cd!important}
+html.tiskarna-ui #helperOfferModal #helperAcceptBtn:hover{background:#1c46a5!important}
+html.tiskarna-ui #helperOfferModal #helperDismissBtn{background:transparent!important;color:var(--td-ink)!important;border:1px solid var(--td-line)!important}
+#helperOfferModal button:focus-visible{outline:3px solid #88acff;outline-offset:3px}
