@@ -40,7 +40,7 @@ def test_streak_vectors() -> None:
 
 def test_unlock_vectors() -> None:
     for vector in FIXTURE["unlock"]:
-        slots = {"baseCurrent": {"hardcore": vector["baseCurrentHardcore"]}}
+        slots = {"current": {"hardcore": vector["currentHardcore"]}}
         assert content.mozkomor_unlocked_from_rows(vector["rows"], slots) is vector["expected"]
 
 

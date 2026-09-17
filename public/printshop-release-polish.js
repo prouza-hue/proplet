@@ -80,32 +80,6 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
     document.head.appendChild(style);
   }
 
-  function hardcoreDoneForUnlock(){
-    try{
-      const progress=typeof freeProgress==='function'?freeProgress('hardcore'):null;
-      return Math.max(0,Number(progress?.done)||0);
-    }catch{return 0}
-  }
-
-  function installMozkomorUnlockPatch(){
-    if(typeof mozkomorUnlockState!=='function'||mozkomorUnlockState.__printshopAllHardcoreDone)return;
-    const base=mozkomorUnlockState;
-    const wrapped=function(){
-      const state=base.apply(this,arguments)||{};
-      const required=Math.max(1,Number(state.required)||200);
-      const done=Math.min(required,Math.max(Number(state.done)||0,hardcoreDoneForUnlock()));
-      const unlocked=state.unlocked===true||done>=required;
-      if(unlocked&&state.unlocked!==true){
-        try{
-          if(typeof scopedStorageKey==='function'&&typeof MOZKOMOR_UNLOCK_KEY!=='undefined')localStorage.setItem(scopedStorageKey(MOZKOMOR_UNLOCK_KEY),'1');
-        }catch{}
-      }
-      return {...state,done,required,unlocked};
-    };
-    wrapped.__printshopAllHardcoreDone=true;
-    mozkomorUnlockState=wrapped;
-  }
-
   function tuneMozkomorCopy(){
     try{
       if(typeof DIFF!=='undefined'&&DIFF?.mozkomor)DIFF.mozkomor.desc='10×10 · endgame pro hráče, kteří porazili Mozkožrouta.';
@@ -316,7 +290,6 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
 
   function polish(){
     ensureTajenkaStyles();
-    installMozkomorUnlockPatch();
     tuneMozkomorCopy();
     syncTajenkaDailyPlacement();
     polishFreeScreen();
@@ -356,7 +329,6 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
 
   function install(){
     ensureTajenkaStyles();
-    installMozkomorUnlockPatch();
     tuneMozkomorCopy();
     wrapRender('renderFree',()=>queuePolish());
     wrapRender('renderTajenkaEntry',()=>queuePolish());

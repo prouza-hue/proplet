@@ -22,9 +22,9 @@
     {"today": "2026-08-30", "dates": [], "current": 0, "longest": 0}
   ],
   "unlock": [
-    {"rows": [], "baseCurrentHardcore": 199, "expected": false},
-    {"rows": [], "baseCurrentHardcore": 200, "expected": true},
-    {"rows": [{"mode": "free", "difficulty": "mozkomor"}], "baseCurrentHardcore": 0, "expected": true}
+    {"rows": [], "currentHardcore": 199, "expected": false},
+    {"rows": [], "currentHardcore": 200, "expected": true},
+    {"rows": [{"mode": "free", "difficulty": "mozkomor"}], "currentHardcore": 0, "expected": true}
   ],
   "rank": [
     {"serverRow": {"clean_solve": true, "hints_used": 0, "elapsed_ms": 12000, "moves": 8}, "clientRow": {"cleanSolve": true, "hintsUsed": 0, "elapsedMs": 12000, "moves": 8}, "expected": [0, 0, 12, 8]},

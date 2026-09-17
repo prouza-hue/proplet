@@ -933,7 +933,7 @@ def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
 
 
 def mozkomor_unlocked_from_rows(rows: list[dict], slots: Optional[dict] = None) -> bool:
-    """Unlock after all 200 base Gen4 Mozkožrout slots; rolling levels never count."""
+    """Unlock after 200 distinct current Mozkožrout slots, including weekly releases."""
     if any(row.get("mode") == "free" and row.get("difficulty") == "mozkomor" for row in rows):
         return True
     summary = slots or free_slot_summary(rows)
@@ -942,7 +942,7 @@ def mozkomor_unlocked_from_rows(rows: list[dict], slots: Optional[dict] = None) 
 
 def enforce_mozkomor_unlock(rows: list[dict], slots: Optional[dict] = None) -> None:
     if not mozkomor_unlocked_from_rows(rows, slots):
-        raise HTTPException(403, "Mozkomor se odemkne po dokončení všech 200 Mozkožroutů")
+        raise HTTPException(403, "Mozkomor se odemkne po dokončení 200 různých Mozkožroutů")
 
 
 def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> bool:
