@@ -5,6 +5,7 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
+      {"path":"tests/current/test_marketing_consent.js","runner":"node"},
       {"path":"tests/current/test_result_confirmation_latency.js","runner":"node"},
       {"path":"tests/current/test_mozkomor_any_200.py","runner":"python"},
       {"path":"tests/current/test_fair_play.js","runner":"node"},
