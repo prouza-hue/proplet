@@ -38,3 +38,11 @@ console.log('PASS guest merge, monotonic clock, retry and quota retention, inten
  completed=true;assert.equal((await controller.prepare({id:'p'},'daily',null,null)).replay,true);
  console.log('PASS session restore, single heartbeat, pause cleanup, transient retry, offline finish and receipt recovery');
 })().catch(error=>{console.error(error);process.exitCode=1});
+
+// Exercise the actual app adapter with receiver-sensitive browser timers.
+const appSource=require('node:fs').readFileSync(require('node:path').join(__dirname,'../../public/app.js'),'utf8');
+const timerAdapter=appSource.match(/now:\(\)=>performance.now\(\),(setInterval:.*?),status:renderTimingStatus/)[1];
+const host={setInterval(fn,ms){assert.equal(this,host);assert.equal(ms,15000);return 7},clearInterval(id){assert.equal(this,host);assert.equal(id,7)}};
+const adapter=require('node:vm').runInNewContext('({'+timerAdapter+'})',{window:host});
+adapter.clearInterval(adapter.setInterval(()=>{},15000));
+console.log('PASS browser timer adapter preserves the Window receiver');

@@ -53,8 +53,12 @@ const {execFileSync}=require('node:child_process');
  await p.waitForTimeout(500);
  assert.equal(await p.evaluate(()=>JSON.stringify(getState().completed)),savedProgress,'offline reload/full hydration preserves existing completion records');
  out.preservedSyntheticCompletions=4;
+ // CacheStorage writes are asynchronous; wait for completion, not a fixed 500 ms.
+ await p.waitForFunction(async()=>!!await caches.match('/puzzles.json'),null,{timeout:15000});
  out.cached=await p.evaluate(async()=>!!await caches.match('/puzzles.json'));assert(out.cached,'first free-game entry caches canonical bank');
- await p.evaluate(()=>{closeTransientModals();startTajenka();closeTajenkaRules()});await p.waitForTimeout(3000);
+ await p.evaluate(()=>{closeTransientModals();startTajenka()});
+ await p.waitForFunction(()=>currentGame?.mode==='tajenka',null,{timeout:15000});
+ await p.evaluate(()=>closeTajenkaRules());await p.waitForTimeout(3000);
  // Prepare the normal 'helper already declined' state before timed windows.
  // Only the helper's idle timestamp is advanced; the game clock is unchanged.
  await p.evaluate(()=>{currentGame.lastProgressAt=performance.now()-Math.max(600000,helperThreshold()+1);maybeOfferHelper()});

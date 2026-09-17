@@ -14,8 +14,8 @@ if(!expectedVersion)throw new Error('Canonical APP_VERSION missing');
 function load(hostname){
   const window={addEventListener:()=>{}};
   const document={readyState:'loading',querySelector:()=>null,body:{appendChild:()=>{}},createElement:()=>({dataset:{}})};
-  const location={hostname,origin:`https://${hostname}`,href:`https://${hostname}/`};
-  vm.runInNewContext(source,{window,document,location,localStorage:{getItem:()=>null}});
+  const location={hostname,search:'',origin:`https://${hostname}`,href:`https://${hostname}/`};
+  vm.runInNewContext(source,{window,document,location,URLSearchParams,localStorage:{getItem:()=>null}});
   return window.PROPLET_RUNTIME_META;
 }
 
