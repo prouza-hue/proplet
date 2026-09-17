@@ -25,6 +25,7 @@
       {"path": "tests/current/test_rank_titles.js", "runner": "node"},
       {"path": "tests/current/test_lock_copy_convergence.js", "runner": "node"},
       {"path": "tests/current/test_privacy_icon_convergence.js", "runner": "node"},
+      {"path": "tests/current/test_registration_destination.js", "runner": "node"},
       {"path": "tests/current/test_welcome_claim.py", "runner": "python"},
       {"path": "tests/current/test_organic_idle.js", "runner": "node"},
       {"path": "tests/current/test_settings_controls.js", "runner": "node"},
