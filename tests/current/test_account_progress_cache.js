@@ -59,5 +59,18 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
  reads=[];const empty=context.refreshRemoteProfile();reads[0].resolve({stats:{points:0}});reads[1].resolve({completed:[]});await empty;
  assert(context.accountProgressAvailable(),'verified empty history is valid');
  set('accountProgressReady=null');assert(context.accountProgressAvailable(),'empty verified history survives reload too');
+ // Expired sessions must offer sign-in, never endless retries or data deletion.
+ let loginMode='';context.openProfileModal=mode=>{loginMode=mode};
+ profile={id:'expired',token:'old'};set('accountProgressReady=null');reads=[];
+ const unauthorized=context.refreshRemoteProfile();
+ reads[0].reject(Object.assign(new Error('Unauthorized'),{status:401}));reads[1].reject(Object.assign(new Error('Unauthorized'),{status:401}));await unauthorized;
+ assert(!context.accountProgressAvailable());
+ const notice=elements.get('#screen-free').notice;
+ assert(notice.textContent.includes('přihlas znovu'));
+ notice.children.at(-1).onclick();assert.equal(loginMode,'login');
+ assert.equal(profile.token,'old','do not clear identity or migrate its local data to guest');
+ reads=[];profile={id:'expired',token:'new'};
+ const recovered=context.refreshRemoteProfile();reads[0].resolve({stats:{}});reads[1].resolve({completed:[{challengeKey:'restored'}]});await recovered;
+ assert(context.accountProgressAvailable());assert(states.expired.completed.restored);assert(notice.hidden);
  console.log('PASS account progress: cached startup, background refresh, failure, deduplication, empty history and account isolation');
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -7,6 +7,7 @@
   let bonusXp=0;
   let activeProfileId=null;
   let syncInFlight=false;
+  let failedToken=null,retryAt=0;
   let patched=false;
   let offerTracked=false;
   let createIntentTracked=false;
@@ -95,9 +96,9 @@
   async function syncBonus(){
     patchUiFunctions();
     const p=profile();
-    if(!p?.token){activeProfileId=null;bonusXp=0;return}
+    if(!p?.token){activeProfileId=null;bonusXp=0;failedToken=null;retryAt=0;return}
     const id=String(p.id||p.playerId||p.name||'account');
-    if(syncInFlight||activeProfileId===id)return;
+    if(syncInFlight||activeProfileId===id||(failedToken===p.token&&Date.now()<retryAt))return;
     syncInFlight=true;
     try{
       if(typeof api!=='function')return;
@@ -110,7 +111,7 @@
         try{if(typeof showToast==='function')showToast('🎁 +500 XP za účet!')}catch{}
       }
       refreshVisibleUi();
-    }catch{}
+    }catch(error){failedToken=p.token;retryAt=error?.status===401?Infinity:Date.now()+Math.max(30000,Number(error?.retryAfterMs)||0)}
     finally{syncInFlight=false}
   }
 

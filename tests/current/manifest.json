@@ -12,6 +12,7 @@
       {"path":"tests/current/test_account_created_authority.py","runner":"python"},
       {"path":"tests/current/test_result_action_dock.js","runner":"node"},
       {"path":"tests/current/test_account_progress_cache.js","runner":"node"},
+      {"path":"tests/current/test_bonus_retry.js","runner":"node"},
       {"path":"tests/current/test_gen5_release_cta.js","runner":"node"},
       {"path":"tests/current/test_gen5_preview.py","runner":"python"},
       {"path":"tests/current/test_gen5_production.py","runner":"python"},
