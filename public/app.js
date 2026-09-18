@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-marketing2';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-sparseslots1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -520,7 +520,8 @@ function freePuzzleSlot(puzzleId,diffHint=null){
 }
 function localFreeSlotState(diff){
  const actual=new Set(),prior=new Set(),rows=Object.values(getState().completed||{}),activeGeneration=Number(puzzleDB?.freeGeneration)||1;
- const maxLevel=sortedFreeBank(diff).length;for(const r of rows){if(r?.mode!=='free'||r.difficulty!==diff)continue;const resolved=freePuzzleSlot(r.puzzleId,diff),info=(Number(r.level)&&Number(r.contentGeneration))?{level:Number(r.level),generation:Number(r.contentGeneration),legacy:resolved?.legacy===true}:resolved;if(!info||info.level<1||info.level>maxLevel)continue;(info.generation===activeGeneration&&!info.legacy?actual:prior).add(info.level)}
+ // Released slots can have gaps: scheduled boards retain their numbers before Gen5.
+ const availableLevels=new Set(sortedFreeBank(diff).map(p=>Number(p.meta?.level)));for(const r of rows){if(r?.mode!=='free'||r.difficulty!==diff)continue;const resolved=freePuzzleSlot(r.puzzleId,diff),info=(Number(r.level)&&Number(r.contentGeneration))?{level:Number(r.level),generation:Number(r.contentGeneration),legacy:resolved?.legacy===true}:resolved;if(!info||!availableLevels.has(info.level))continue;(info.generation===activeGeneration&&!info.legacy?actual:prior).add(info.level)}
  const effective=new Set([...prior,...actual]),transferred=new Set([...prior].filter(level=>!actual.has(level)));
  return {actual,legacy:prior,prior,effective,transferred};
 }
