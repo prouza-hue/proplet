@@ -6,9 +6,7 @@
   ],
   "env": {
     "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true",
-    "SUPABASE_URL": "https://eanzztstmwlamwfdskbf.supabase.co",
-    "PROPLET_FREE_ORDER_ENABLED": "true",
-    "PROPLET_ORDER_TEST_ONLY": "true"
+    "PROPLET_FREE_ORDER_ENABLED": "false"
   },
   "crons": [
     {
@@ -31,7 +29,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://eanzztstmwlamwfdskbf.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://hrajproplet.cz https://iopyhluayfszskyqqpuc.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
         },
         {
           "key": "X-Content-Type-Options",

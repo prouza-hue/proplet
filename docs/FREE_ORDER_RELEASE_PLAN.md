@@ -1,6 +1,6 @@
 # Pestré pořadí — implementace a provozní plán
 
-Stav 2026-09-19: pouze preview, žádné schválení produkčního nasazení.
+Stav 2026-09-19: uživatel výslovně schválil produkční nasazení po ověření preview všech čtyř obtížností.
 
 ## Výchozí stav a prostředí
 
@@ -34,7 +34,7 @@ Offline se uchová poslední ověřené zapnutí i volba. Nedokončený zápis s
 - Browser kontrola: host, oba přepínače, Snadná 218 se zachovanou deskou, přepnutí na číselné během rozehrání, reload a obnovení. Široký světlý layout vizuálně ověřen. Fyzický Samsung Fold a instalované mobilní PWA zůstávají součástí předprodukčního smoke testu.
 - Obsahová data a soubory definující XP nebyly změněny. Testovací zápisy byly ověřeny přímo v oddělené DB.
 
-## Bezpečné nasazení — zatím neprovádět
+## Bezpečné nasazení — schválený postup
 
 1. Vyžádat výslovné schválení konkrétního release commitu a produkční migrace. Znovu ověřit aktuální main/produkční SHA a případné souběžné změny. Nikdy neslučovat referenční `preview/pestre-poradi`.
 2. Připravit samostatný release commit z této implementace: odstranit test-only `SUPABASE_URL` a `PROPLET_ORDER_TEST_ONLY` z `vercel.json`, obnovit produkční CSP z aktuálního main a nastavit `PROPLET_FREE_ORDER_ENABLED=false`. Testovací secret nikdy nepřenášet do produkce. Preview větev ponechat beze změny pro porovnání. Tento krok je nutný: současná větev záměrně obsahuje fail-closed testovací konfiguraci a není určena k přímému Promote to Production.
@@ -52,3 +52,7 @@ Offline se uchová poslední ověřené zapnutí i volba. Nedokončený zápis s
 ## Rozhodnutí uživatele: redakční sekvence
 
 Ruční redakční práce na sekvenci není požadavek ani blokátor vydání. Používáme deterministický algoritmus se stabilním uloženým plánem; budoucí ruční dramaturgii nyní nepřipravujeme.
+
+## Produkční release
+
+Větev `release/pestre-poradi` zachovává testovací preview na samostatné větvi. Produkční CSP a prostředí jsou převzaty z ověřeného main. První release má `PROPLET_FREE_ORDER_ENABLED=false`; zapnutí následuje samostatným commitem po kontrole produkce. Automatické CI včetně Printshop browser smoke prošlo na schválené implementaci `db5387620e1eeeaa4377cd46c9a80c2684e87457`.
