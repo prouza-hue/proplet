@@ -1,0 +1,39 @@
+name: Isolated order preview QA
+on:
+  push:
+    branches: ['preview/pestre-poradi']
+    paths: ['tools/order-preview/**', '.github/workflows/order-preview-qa.yml', 'vercel.json', '.vercelignore']
+permissions:
+  contents: read
+concurrency:
+  group: order-preview-qa
+  cancel-in-progress: true
+jobs:
+  isolated-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build isolated real application
+        run: node tools/order-preview/build.cjs
+      - name: Install pinned browser test dependency
+        run: |
+          mkdir -p /tmp/order-preview-playwright
+          npm install --prefix /tmp/order-preview-playwright --no-save --package-lock=false playwright@1.55.0
+          /tmp/order-preview-playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Browser regression and isolation verification
+        env:
+          NODE_PATH: /tmp/order-preview-playwright/node_modules
+        run: node tools/order-preview/browser-test.cjs
+      - name: Save verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-preview-evidence
+          path: |
+            order-preview-evidence/
+            .vercel/output/static/order-manifest.json
+          retention-days: 7

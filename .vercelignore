@@ -1,0 +1,14 @@
+# This preview has no server runtime, API routes or database clients.
+.git
+.github
+node_modules
+.env*
+**/.env*
+**/*.py
+requirements*.txt
+pyproject.toml
+uv.lock
+api
+supabase
+proplet_server
+server
