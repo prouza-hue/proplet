@@ -33,6 +33,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    await page.locator('[data-diff="medium"] .order-optin').click();
    const snapshot=()=>page.evaluate(()=>window.PROPLET_ORDER_PREVIEW.snapshot());let s=await snapshot();assert.equal(s.medium.next[0].gen5,true);const id=s.medium.next[0].id;
    await page.locator('[data-play-free="medium"]').click();await page.waitForFunction(wanted=>window.PROPLET_ORDER_PREVIEW.snapshot().current?.id===wanted,id);
+   // Confirmation is intentionally visible briefly; don't attempt to drag through it.
+   await page.locator('#toast').waitFor({state:'hidden'});
    await page.waitForTimeout(500);await page.locator('#board').scrollIntoViewIfNeeded();await page.waitForTimeout(200);
    const answerPath=await page.evaluate(()=>currentGame.puzzle.answers[0].path);
    const points=[];for(const cell of answerPath){const rect=await page.locator('.cell[data-index="'+cell+'"]').boundingBox();assert(rect);points.push({x:rect.x+rect.width/2,y:rect.y+rect.height/2})}
