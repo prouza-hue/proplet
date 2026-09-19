@@ -13,8 +13,14 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   await sleep(5000);
  }
  if(!ready){result.status='NOT_VERIFIED';result.reason='Hosted asset unavailable, protected, or not yet matching this commit; HTTP '+lastStatus;save();throw new Error(result.reason)}
- for(const name of ['index.html','app.js','order-engine.js','order-prelude.js','order-preview.css']){const r=await fetch(origin+'/'+name);assert(r.ok);assert.equal(hash(Buffer.from(await r.arrayBuffer())),hash(fs.readFileSync(path.join(root,name))),name+' deployed content mismatch')}
- checks.push('PASS deployed HTML, application, engine, network guard and CSS exactly match local tested build');
+ for(const name of ['index.html','app.js','order-engine.js','order-prelude.js','order-preview.css']){
+  const r=await fetch(origin+'/'+name);assert(r.ok);let remote=Buffer.from(await r.arrayBuffer());
+  // Vercel appends this exact opt-in toolbar script after </html>. It is blocked
+  // by this preview's CSP. Strip only that verified platform addition, not app code.
+  if(name==='index.html')remote=Buffer.from(remote.toString('utf8').replace(/<script async data-explicit-opt-in="true" data-deployment-id="dpl_[A-Za-z0-9]+" src="https:\/\/vercel\.live\/_next-live\/feedback\/feedback\.js"><\/script>$/,''));
+  assert.equal(hash(remote),hash(fs.readFileSync(path.join(root,name))),name+' deployed content mismatch');
+ }
+ checks.push('PASS deployed HTML (excluding verified Vercel toolbar injection), app, engine, network guard and CSS match local build');
  const blocked=await fetch(origin+'/api/config');assert.equal(blocked.status,403);assert.match(blocked.headers.get('content-security-policy')||'',/connect-src 'self'/);assert.match(await blocked.text(),/No API or database/);
  checks.push('PASS hosted API returns 403 and CSP forbids database/cross-origin connections');
  const browser=await chromium.launch({headless:true});let page;
