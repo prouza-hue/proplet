@@ -1,0 +1,13 @@
+{
+  "url": "https://proplet-numn8vbba-pavel-prouzas-projects.vercel.app",
+  "at": "2026-09-19T13:11:28.277928+00:00",
+  "databaseRef": "eanzztstmwlamwfdskbf",
+  "syntheticPlayer": "b2e4dcaf-27d9-4387-ac26-3d888f4f8cf3",
+  "syntheticName": "QA order 0eb8c39f",
+  "checks": [
+    "easy: import, retry, independent sessions, concurrent CAS, immutable prefix, validation",
+    "medium: import, retry, independent sessions, concurrent CAS, immutable prefix, validation",
+    "partial game preserved across devices; real completion and idempotent XP receipt; mode switch preserves stats"
+  ],
+  "awardedPoints": 15
+}

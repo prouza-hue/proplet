@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const source=fs.readFileSync('public/app.js','utf8');
 function element(){return {hidden:false,inert:false,textContent:'',children:[],attrs:{},classList:{values:new Set(),contains(x){return this.values.has(x)},toggle(x,on){on?this.values.add(x):this.values.delete(x)}},getAttribute(k){return this.attrs[k]},setAttribute(k,v){this.attrs[k]=v},appendChild(e){this.children.push(e)},querySelector(){return this.notice||null},prepend(e){this.notice=e}}}
 const elements=new Map(),states={};let profile=null,reads=[],merges=[];
-const context={console,Date,Number,Array,Promise,queueMicrotask,navigator:{onLine:true},
+const context={freeOrder:()=>({sync:async()=>{}}),console,Date,Number,Array,Promise,queueMicrotask,navigator:{onLine:true},
  getProfile:()=>profile,getState:id=>states[id]||{completed:{}},saveState:(s,id)=>states[id]=s,
  accountProfileMatches:p=>!!p?.id&&p.id===profile?.id&&p.token===profile?.token,
  $:selector=>{if(!elements.has(selector))elements.set(selector,element());return elements.get(selector)},

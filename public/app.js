@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-sparseslots1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-freeorder3';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -402,7 +402,7 @@ function tajenkaStorage(){
 }
 function saveProfile(p){const session=accountSession();if(session)session.save(p);else localStorage.setItem(PROFILE_KEY,JSON.stringify(p));updateProfileChip();return p}
 function updateAccountProfile(patch){const session=accountSession();let profile;if(session)profile=session.update(patch);else{const current=getProfile();profile=current?{...current,...(patch||{})}:null;if(profile)localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}updateProfileChip();return profile}
-function acceptAccountProfile(profile){if(profile?.id&&!getProfile())try{localStorage.setItem(`proplet-pending-telemetry-claim:${profile.id}`,getAnonymousId())}catch{}const session=accountSession();if(session){const accepted=session.accept(profile);updateProfileChip();return accepted}const hadProfile=!!getProfile();if(!hadProfile)adoptGuestData(profile.id);return saveProfile(profile)}
+function acceptAccountProfile(profile){if(profile?.id&&!getProfile())try{localStorage.setItem(`proplet-pending-telemetry-claim:${profile.id}`,getAnonymousId())}catch{}const session=accountSession();if(session){const accepted=session.accept(profile);freeOrder().newAccount(accepted).catch(()=>{});updateProfileChip();return accepted}const hadProfile=!!getProfile();if(!hadProfile)adoptGuestData(profile.id);return saveProfile(profile)}
 function persistAccountResponseProfile(profile){const session=accountSession();if(session){const stored=session.persistResponseProfile(profile);updateProfileChip();return stored}if(!profile?.id||!profile?.token)return null;const current=getProfile();if(!current)adoptGuestData(profile.id);return saveProfile(current?.id===profile.id?{...current,...profile}:{...profile})}
 function clearAccountProfile(){const session=accountSession();if(session)session.clear();else localStorage.removeItem(PROFILE_KEY);updateProfileChip()}
 function accountAuthHeaders(){const session=accountSession();if(session)return session.authHeaders();const p=getProfile();return p?.token?{Authorization:`Bearer ${p.token}`}:{}}
@@ -466,6 +466,7 @@ function adoptGuestTajenkaData(profileId){
  }catch{}
 }
 function adoptGuestData(profileId){
+ freeOrder().adopt(profileId);
  const core=scopedStorage();
  if(core){if(core.adoptGuest({profileId,stateKey:STORE_KEY,queueKey:QUEUE_KEY})===false)throw new Error('Postup se nepodařilo bezpečně uložit. Uvolni místo v prohlížeči a zkus přihlášení znovu.')}
  else{
@@ -763,7 +764,24 @@ async function finishRescue(passed){
 }
 function failRescue(){finishRescue(false)}
 
-function freeProgress(diff){return progression().freeProgress(diff)}
+let freeOrderController=null;
+function freeOrder(){
+ if(freeOrderController)return freeOrderController;
+ freeOrderController=window.PropletFreeOrderStore.create({engine:window.PropletFreeOrder,storage:localStorage,
+  profile:getProfile,api,uuid:newAttemptId,bank:sortedFreeBank,
+  prepare:async()=>{await window.__PROPLET_ENSURE_FULL_PUZZLE_DB?.();await refreshRollingContent()},
+  completed:diff=>{const slots=localFreeSlotState(diff);return sortedFreeBank(diff).filter(p=>slots.actual.has(Number(p.meta?.level))).map(p=>p.id)},
+  hasHistory:scope=>{const state=getState(scope);return Object.values(state.completed||{}).some(r=>r.mode!=='starter')||Object.values(state.inProgress||{}).some(r=>r.mode!=='starter')||getQueue(scope).length>0},
+  isolated:()=>{window.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=true},
+  notice:showToast,changed:()=>{if(puzzleDB){renderFree();renderQuickPlay()}}
+ });return freeOrderController;
+}
+function freeProgress(diff){const q=progression().freeProgress(diff);q.nextUnsolved=freeOrder().next(diff,q.nextUnsolved);return q}
+async function changeFreeOrder(diff,mode){
+ saveGameProgress();try{await freeOrder().change(diff,mode)}catch(e){showToast('Volbu se nepodařilo synchronizovat: '+e.message)}
+}
+async function refreshFreeOrder(){try{await freeOrder().configure();await freeOrder().sync()}catch{}}
+
 function localMozkomorBaseDone(){
  const slots=localFreeSlotState('hardcore');
  return slots.actual.size;
@@ -807,15 +825,17 @@ function renderFree(){
  }).join('');
  $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
+ window.PropletFreeOrderUI?.mount({store:freeOrder(),progress:freeProgress,labels:DIFF,change:changeFreeOrder});
 }
 async function startFree(diff){
  if(!allowAccountGameStart())return;
  if(diff==='mozkomor'&&!mozkomorUnlockState().unlocked){showToast('🔒 Mozkomor se odemkne po dokončení 200 různých Mozkožroutů.');return}
- const list=sortedFreeBank(diff),slots=localFreeSlotState(diff),resume=resumableFreePuzzle(diff,list),unplayed=list.filter(p=>!slots.actual.has(Number(p.meta?.level))),p=resume||(unplayed[0]||list[0]);if(p)startGame(p,'free',null);
+ if(freeOrder().enabled()&&getProfile()?.token&&navigator.onLine){try{await freeOrder().sync()}catch{if(!freeOrder().ready()){showToast('Nejdřív načti uložené pořadí. Zkus to znovu.');return}}}
+ const q=freeProgress(diff),p=q.resume||q.nextUnsolved||q.list[0];if(p)startGame(p,'free',null);
 }
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
 function startDaily(options={}){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;return dailyOrchestration().startDaily(options)}
-function startStarterWarmup(){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has(Number(x.meta?.level)))||list[0];if(!p){nav('free',{replace:true});return}startGame(p,'free',null,{postStarterWarmup:true})}
+function startStarterWarmup(){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;const q=freeProgress('easy'),p=q.resume||q.nextUnsolved||q.list[0];if(!p){nav('free',{replace:true});return}startGame(p,'free',null,{postStarterWarmup:true})}
 function startTajenka(){if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){showToast('Tajenka není na této verzi dostupná.');return}startGame(tajenkaPuzzle,'tajenka',null);trackProductEvent('tajenka_started',{puzzleId:tajenkaPuzzle.id})}
 
 function newAttemptId(){try{return crypto.randomUUID()}catch{return `a-${Date.now()}-${Math.random().toString(36).slice(2,10)}`}}
@@ -1340,6 +1360,7 @@ async function refreshRemoteProfile({throwOnError=false}={}){
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
   updateAccountProfile({name:me.name,familyCode:me.familyCode,leagueName:me.leagueName,avatar:me.avatar||p.avatar||'🙂',googleLinked:!!me.googleLinked,googleAvatarUrl:me.googleAvatarUrl||null,useGoogleAvatar:!!me.useGoogleAvatar,supportMode:remoteMode,hasPassword:!!me.hasPassword,stats:me.stats});
+  freeOrder().sync().catch(()=>{});
   document.dispatchEvent(new CustomEvent('proplet:profile-refreshed'));
   renderDaily();renderFree();renderProfile();
   return me;
@@ -1432,7 +1453,7 @@ async function saveNewProfile(){
   try{await currentGame?.finishTelemetryPromise}catch{}
   pauseGameClock('login');
   if(currentGame?.fairPlay)await fairPlay().pause(currentGame);
-  const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
+  const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,freeOrderNewAccount:profile.freeOrderNewAccount===true,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   await claimTelemetryAfterAuth(anonId);
   trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(authAction==='create'){showDailyAfterRegistration();if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320)}else if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
@@ -2238,7 +2259,9 @@ async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  await loadTajenkaFixture();
+ await freeOrder().configure();
  document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>{if(!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'))},80));
+ window.addEventListener('online',refreshFreeOrder);window.addEventListener('focus',refreshFreeOrder);window.addEventListener('storage',()=>{renderFree();renderQuickPlay()});setInterval(()=>{if(document.visibilityState==='visible'&&navigator.onLine)refreshFreeOrder()},30000);
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(navigator.onLine){productAnalytics()?.flush();if(getQueue().length)syncQueue({announce:false})}},60000);
 }

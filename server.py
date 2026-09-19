@@ -26,7 +26,7 @@ from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
 from backend import results as result_domain
-from backend import play_sessions
+from backend import play_sessions, free_order
 from backend.config import (
     APP_VERSION,
     ATOMIC_RESULT_V1_ENABLED,
@@ -125,7 +125,7 @@ logger = logging.getLogger("proplet")
 
 
 def isolated_fair_play_preview():
-    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == "fix/fair-play-progress"
+    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH}
             and SUPABASE_URL.rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co")
 
 
@@ -1640,6 +1640,53 @@ def health():
         return {**base, "ok": False, "database": False, "accountMigration": False, "featuresMigration": False, "qualityMigration": False, "playtestMigration": False, "globalLeagueMigration": False, "uxMigration": False, "profilesMigration": False, "analyticsV2Migration": False, "anonymousAnalyticsMigration": False, "anonymousAnalytics": False, "freeGeneration2Migration": False, "freeProgressionMigration": False, "stableFreeLevelSlots": True, "starterMigration": False, "adminMigration": False, "securityMigration": False, "xpMigration": False, "pushConfigured": push_ready(), "pushOpenTrackingMigration": False, "message": "Databázový health check selhal"}
 
 
+def free_order_enabled():
+    return os.environ.get("PROPLET_FREE_ORDER_ENABLED", "false").lower() == "true"
+
+
+@app.get("/api/free-order/config")
+def free_order_config():
+    return {"enabled": free_order_enabled(), "version": free_order.VERSION,
+            "isolatedPreview": isolated_fair_play_preview(),
+            "databaseRef": "eanzztstmwlamwfdskbf" if isolated_fair_play_preview() else None}
+
+
+@app.get("/api/free-order")
+def get_free_order(request: Request, authorization: Optional[str] = Header(default=None)):
+    if not free_order_enabled():
+        return {"enabled": False, "records": {}}
+    enforce_rate_limit(request, "free_order_read", limit=300, window_seconds=3600)
+    player = auth_player(authorization)
+    rows = db_select("player_free_order", player_id=player["id"])
+    resumes = {}
+    sessions = db_select("play_sessions", player_id=player["id"], mode="free", finished=False)
+    for session in sorted(sessions, key=lambda r: str(r.get("last_seen") or "")):
+        info = free_puzzle_info(session["puzzle_id"])
+        if info and info["difficulty"] in ("easy", "medium", "hard", "hardcore"):
+            resumes[info["difficulty"]] = session["puzzle_id"]
+    return {"enabled": True, "records": {r["difficulty"]: free_order.public_record(r) for r in rows}, "resumeIds": resumes}
+
+
+@app.post("/api/free-order")
+def save_free_order(payload: free_order.OrderCommand, request: Request,
+                    authorization: Optional[str] = Header(default=None)):
+    if not free_order_enabled():
+        raise HTTPException(503, "Pestré pořadí je dočasně vypnuté")
+    enforce_rate_limit(request, "free_order_write", limit=180, window_seconds=3600)
+    player = auth_player(authorization)
+    rows = db_select("player_free_order", player_id=player["id"], difficulty=payload.difficulty)
+    existing = rows[0]["ids"] if rows else []
+    ids = [] if payload.mode == "numeric" and not payload.ids and not existing else free_order.validate_ids(payload.ids,
+          released_free_bank(payload.difficulty, current_prague_date()), existing)
+    result = db_rpc("proplet_free_order_v1", {
+        "p_player": player["id"], "p_difficulty": payload.difficulty,
+        "p_expected": payload.expected_revision, "p_mode": payload.mode,
+        "p_ids": ids, "p_request": payload.request_id,
+        "p_import": payload.import_guest, "p_newcomer": payload.newcomer})
+    return {"conflict": result.get("conflict", False),
+            "record": free_order.public_record(result["record"])}
+
+
 @app.get("/api/config")
 def config():
     p = load_puzzles()
@@ -1753,6 +1800,7 @@ def create_player(payload: PlayerCreate, request: Request):
     return {
         "id": player_id, "name": name, "familyCode": public_family,
         "leagueName": league_name_for(family) if public_family else None, "token": token,
+        "freeOrderNewAccount": free_order_enabled(),
         "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "googleLinked": False, "googleAvatarUrl": None, "useGoogleAvatar": False,
         "supportMode": row.get("support_mode") or "none", "publicRankings": row.get("public_rankings"), "stats": stats,
     }

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import re
 import secrets
 import uuid
@@ -401,6 +402,7 @@ def install_account_auth(
         meta = user.get("user_metadata") or {}
         google_avatar_url = trusted_google_avatar(user)
 
+        created_for_order = False
         current = None
         if authorization:
             try:
@@ -452,6 +454,7 @@ def install_account_auth(
                     "auth_user_id": uid,
                 })
                 player = db_select("players", id=player_id)[0]
+                created_for_order = True
 
         # Refresh the optional Google photo candidate on every Google login/link,
         # but never switch the player's chosen avatar automatically.
@@ -460,6 +463,6 @@ def install_account_auth(
             player = db_select("players", id=player["id"])[0]
 
         token = new_session(player["id"])
-        return {"ok": True, "profile": player_payload(player, token), "linked": bool(current), "provider": "google"}
+        return {"ok": True, "profile": {**player_payload(player, token), "freeOrderNewAccount": created_for_order and os.environ.get("PROPLET_FREE_ORDER_ENABLED", "false").lower() == "true"}, "linked": bool(current), "provider": "google"}
 
     return app

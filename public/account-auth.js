@@ -33,7 +33,7 @@ function cleanAuthUrl(){
 function acceptProfile(p){
  if(!p?.id||!p?.token)return;
  try{
-  const next={id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',googleAvatarUrl:p.googleAvatarUrl||null,useGoogleAvatar:!!p.useGoogleAvatar,supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked};
+  const next={id:p.id,name:p.name,familyCode:p.familyCode||null,leagueName:p.leagueName||null,avatar:p.avatar||'🙂',googleAvatarUrl:p.googleAvatarUrl||null,useGoogleAvatar:!!p.useGoogleAvatar,supportMode:p.supportMode||'none',token:p.token,hasPassword:!!p.hasPassword,publicRankings:p.publicRankings,stats:p.stats,email:p.email||null,emailVerified:!!p.emailVerified,googleLinked:!!p.googleLinked,freeOrderNewAccount:p.freeOrderNewAccount===true};
   if(typeof acceptAccountProfile==='function')acceptAccountProfile(next);else{const had=!profile();if(had&&typeof adoptGuestData==='function')adoptGuestData(p.id);if(typeof saveProfile==='function')saveProfile(next)}
   if(typeof updateProfileChip==='function')updateProfileChip();
   if(typeof renderProfile==='function')renderProfile();
