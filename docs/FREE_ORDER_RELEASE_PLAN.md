@@ -10,7 +10,7 @@ Stav 2026-09-19: uživatel výslovně schválil produkční nasazení po ověře
 - Původní izolované preview zůstává na `https://proplet-8ck70bq92-pavel-prouzas-projects.vercel.app/`.
 - Nové backendové preview: `https://proplet-git-feat-pestre-poradi-pr-c66440-pavel-prouzas-projects.vercel.app/`.
 - Znovu použita databáze `eanzztstmwlamwfdskbf`, `proplet-s08b-atomic-result-test`. Žádný nový Supabase projekt.
-- Produkční DB `iopyhluayfszskyqqpuc`: bez migrace a bez změn dat.
+- Produkční DB `iopyhluayfszskyqqpuc`: při přípravě beze změn; schválené aditivní migrace provedeny 2026-09-19, viz produkční záznam níže.
 - Nový testovací secret ve Vercelu je scoped pouze na novou preview větev. Existující nastavení `fix/fair-play-progress` zůstalo zachované.
 - Backend se při nesprávném URL DB nebo při pokusu nasadit tuto testovací konfiguraci do Production odmítne spustit před inicializací databázového klienta.
 
@@ -30,8 +30,8 @@ Offline se uchová poslední ověřené zapnutí i volba. Nedokončený zápis s
 
 - `python tools/test_current.py`: aktuální runtime, syntaxe a assety; zahrnuje engine, klientský store, API validaci/identity, novou Google registraci vs. existující účet.
 - `tools/test_free_order_db.py`: navazuje na existující izolovaný Postgres job; žádná druhá testovací infrastruktura. Testuje skutečné RPC a granty.
-- `tools/test_free_order_preview.py`: guard na přesný testovací DB ref před jakýmkoli zápisem, syntetický účet a dvě nezávislé přihlašovací relace. Pokrývá obě obtížnosti, guest import, souběžný CAS, retry, stabilní prefix, odmítnutí neplatných ID, obnovu rozehrané desky a skutečné dokončení/XP. Výstup `docs/qa/free-order-hosted.json`; neobsahuje hesla ani tokeny.
-- Browser kontrola: host, oba přepínače, Snadná 218 se zachovanou deskou, přepnutí na číselné během rozehrání, reload a obnovení. Široký světlý layout vizuálně ověřen. Fyzický Samsung Fold a instalované mobilní PWA zůstávají součástí předprodukčního smoke testu.
+- `tools/test_free_order_preview.py`: guard na přesný testovací DB ref před jakýmkoli zápisem, syntetický účet a dvě nezávislé přihlašovací relace. Pokrývá všechny čtyři obtížnosti, guest import, souběžný CAS, retry, stabilní prefix, odmítnutí neplatných ID, obnovu rozehrané desky a skutečné dokončení/XP. Výstup `docs/qa/free-order-hosted.json`; neobsahuje hesla ani tokeny.
+- Browser kontrola: host, oba přepínače, Snadná 218 se zachovanou deskou, přepnutí na číselné během rozehrání, reload a obnovení. Široký světlý layout vizuálně ověřen. CI prohlížeč ověřil šířky 390, 768 a 1440 px. Fyzický Samsung Fold a instalované PWA nebyly v automatizaci ověřeny; uživatel schválil preview na svém mobilu.
 - Obsahová data a soubory definující XP nebyly změněny. Testovací zápisy byly ověřeny přímo v oddělené DB.
 
 ## Bezpečné nasazení — schválený postup
@@ -56,3 +56,12 @@ Ruční redakční práce na sekvenci není požadavek ani blokátor vydání. P
 ## Produkční release
 
 Větev `release/pestre-poradi` zachovává testovací preview na samostatné větvi. Produkční CSP a prostředí jsou převzaty z ověřeného main. První release má `PROPLET_FREE_ORDER_ENABLED=false`; zapnutí následuje samostatným commitem po kontrole produkce. Automatické CI včetně Printshop browser smoke prošlo na schválené implementaci `db5387620e1eeeaa4377cd46c9a80c2684e87457`.
+
+### Záznam schváleného nasazení 2026-09-19
+
+- PR #128 sloučen jako `c5a6630c208a3650ef8e7c1f66969290561af19e`, všechny relevantní CI kontroly úspěšné.
+- Produkční migrace `free_order_v1` a `free_order_all_difficulties` úspěšné. Nová tabulka byla prázdná; RLS zapnuto, přístup a RPC pouze pro service_role, všechny čtyři obtížnosti povolené. Existující hráčské výsledky ani XP migrace nemění.
+- Úplnou zálohu Supabase nebylo možné bez dalšího přihlášení ověřit; tato výjimka byla uživateli sdělena. Ověřen byl výchozí stav dotčeného schématu a aditivní charakter změny.
+- Deployment s vypnutou funkcí `dpl_GnruEWuqBUJhj6D6szoCfP3EBqKE` READY na hrajproplet.cz; /api/health ok=true, database=true; /api/free-order/config enabled=false, isolatedPreview=false. Živý prohlížeč zobrazil čtyři obtížnosti bez přepínačů.
+- Následující config commit zapíná funkci; pro rychlé vypnutí vrátit pouze flag na false a redeploy, nebo rollback na výše uvedený deployment. Původní aplikace: `dpl_9wAe4BnnJRrbcrcPWzDdioYk7zbF`.
+- Testovací větev db538762 a původní reference 4cee6c7 zachované. Úplný autentizovaný regresní scénář a XP ověřeny na izolovaném testovacím backendu; produkční kontrola používá hosta bez dokončování úrovní.

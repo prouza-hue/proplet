@@ -6,7 +6,7 @@
   ],
   "env": {
     "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true",
-    "PROPLET_FREE_ORDER_ENABLED": "false"
+    "PROPLET_FREE_ORDER_ENABLED": "true"
   },
   "crons": [
     {
