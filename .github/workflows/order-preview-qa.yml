@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '22'
       - name: Build isolated real application
-        run: node tools/order-preview/build.cjs
+        run: node tools/order-preview/build.cjs && node tools/order-preview/privacy.cjs
       - name: Install pinned browser test dependency
         run: |
           mkdir -p /tmp/order-preview-playwright

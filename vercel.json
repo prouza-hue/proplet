@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "echo Isolated-static-preview-no-dependencies",
-  "buildCommand": "node tools/order-preview/build.cjs",
+  "buildCommand": "node tools/order-preview/build.cjs && node tools/order-preview/privacy.cjs",
   "ignoreCommand": "exit 1"
 }
