@@ -17,7 +17,7 @@ assert.deepEqual(E.reconcilePlan(newcomer,{bank:bank.slice(1),difficulty:'easy'}
 assert.equal(JSON.stringify(bank),original);
 for(const diff of ['medium','hard','hardcore','mozkomor']){
  const b=bank.map(p=>({...p,difficulty:diff})),p=E.buildPlan({bank:b,difficulty:diff});
- if(diff!=='medium')assert.equal(p.kind,'numeric');
+ if(diff==='mozkomor')assert.equal(p.kind,'numeric');else{assert.equal(p.kind,'varied');if(diff!=='medium'){const fresh=E.buildPlan({bank:b,difficulty:diff,newcomer:true});assert.deepEqual(fresh.ids.slice(0,3),['g5-r1-0','old-0','old-1'],'higher difficulties have no beginner intro')}}
  assert.equal(new Set(p.ids).size,b.length);
 }
 function fixture(){

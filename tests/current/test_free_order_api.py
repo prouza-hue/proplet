@@ -32,5 +32,5 @@ with patch.object(server.DB_HTTP_CLIENT,'request',side_effect=AssertionError('ex
    result=client.post('/api/free-order',json=body);assert result.status_code==200,result.text
    assert rpc.call_args.args[1]['p_player']=='owner','actor must come from authentication'
    body['ids']=['future'];assert client.post('/api/free-order',json=body).status_code==400
-   body['difficulty']='hard';assert client.post('/api/free-order',json=body).status_code==422
+   body['difficulty']='mozkomor';assert client.post('/api/free-order',json=body).status_code==422
 print('PASS order API: identity, published IDs, tombstones, unsupported difficulty, feature off, preview database gates')

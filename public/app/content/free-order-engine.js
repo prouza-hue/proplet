@@ -1,7 +1,7 @@
 /* Immutable-board ordering policy. Storage, rewards and network are not owned here. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.PropletFreeOrder=api})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION='pestre-v1',SUPPORTED=['easy','medium'];
+const VERSION='pestre-v1',SUPPORTED=['easy','medium','hard','hardcore'];
 // Gen5 manufacturing did not migrate player history to a new contentGeneration.
 const isGen5=p=>String(p?.id||'').startsWith('g5-r1-')||Number(p?.meta?.contentGeneration)===5;
 function canonicalBank(bank,difficulty){
@@ -12,6 +12,7 @@ function canonicalBank(bank,difficulty){
 const defaultWords=p=>(p?.answers||p?.words||[]).map(w=>typeof w==='string'?w:w.word).filter(Boolean);
 function overlap(p,recent,getWords){const words=new Set(getWords(p).map(w=>String(w).normalize('NFC').toLocaleUpperCase('cs-CZ')));return recent.reduce((n,q,i)=>n+getWords(q).filter(w=>words.has(String(w).normalize('NFC').toLocaleUpperCase('cs-CZ'))).length*(i+1),0)}
 function buildPlan({bank,difficulty,completedIds=[],newcomer=false,recentIds=[],introIds=[],getWords=defaultWords}){
+ newcomer=newcomer&&['easy','medium'].includes(difficulty);
  const list=canonicalBank(bank,difficulty),completed=new Set(completedIds),pending=list.filter(p=>!completed.has(p.id));
  if(!SUPPORTED.includes(difficulty))return {version:VERSION,difficulty,kind:'numeric',ids:pending.map(p=>p.id)};
  const old=pending.filter(p=>!isGen5(p)),modern=pending.filter(isGen5),byId=new Map(list.map(p=>[p.id,p])),recent=recentIds.slice(-2).map(id=>byId.get(id)).filter(Boolean),intro=new Map(introIds.map((id,i)=>[id,i])),ids=[];

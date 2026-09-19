@@ -20,6 +20,9 @@ with psycopg.connect(host='127.0.0.1',port=55432,user='proplet_test_admin',dbnam
   assert second['record']['ids']==['old-1','g5-1','batch-2']
   assert call(1,'varied',[],'synthetic-stale')['conflict']
   assert call(0,'varied',['guest'],'synthetic-guest',True)['record']==second['record']
+  for difficulty in ('hard','hardcore'):
+   record=c.execute('select proplet_free_order_v1(%s,%s,0,%s,%s,%s,false,false) as r',(player,difficulty,'varied',Jsonb(['new','old-1','old-2']),str(uuid.uuid4()))).fetchone()['r']['record']
+   assert record['difficulty']==difficulty and record['ids']==['new','old-1','old-2']
   assert c.execute('select count(*) as n from results where player_id=%s',(player,)).fetchone()['n']==0
   for role in ('anon','authenticated'):
    assert not c.execute("select has_table_privilege(%s,'public.player_free_order','SELECT') as allowed",(role,)).fetchone()['allowed']

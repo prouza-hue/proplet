@@ -91,7 +91,7 @@ function create(d){
   const all=read(p.id);
   // Only a server-confirmed registration with no guest history qualifies.
   if(d.hasHistory(p.id)||Object.keys(all).length)return;
-  for(const diff of E.SUPPORTED)queue(diff,{...empty(),mode:'varied',newcomer:true},{importGuest:true});
+  for(const diff of E.SUPPORTED)queue(diff,{...empty(),mode:'varied',newcomer:['easy','medium'].includes(diff)},{importGuest:true});
  }
  return {configure,sync,change,next,record,adopt,newAccount,enabled:()=>enabled,
   ready:()=>!d.profile()?.token||loadedIdentity===identity(d.profile())};

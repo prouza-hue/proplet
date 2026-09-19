@@ -32,7 +32,7 @@ def main():
   b=request('/api/login',{'name':name,'password':password});assert a['id']==b['id'] and a['token']!=b['token']
   ta,tb=a['token'],b['token'];before=request('/api/me',auth=ta)['stats']
   day=datetime.now(ZoneInfo('Europe/Prague')).date()
-  banks={d:server.released_free_bank(d,day) for d in ('easy','medium')}
+  banks={d:server.released_free_bank(d,day) for d in ('easy','medium','hard','hardcore')}
   checks=[]
   for diff,bank in banks.items():
    ids=[p['id'] for p in bank];order=[ids[-1],*ids[:-1]]

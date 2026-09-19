@@ -1662,7 +1662,7 @@ def get_free_order(request: Request, authorization: Optional[str] = Header(defau
     sessions = db_select("play_sessions", player_id=player["id"], mode="free", finished=False)
     for session in sorted(sessions, key=lambda r: str(r.get("last_seen") or "")):
         info = free_puzzle_info(session["puzzle_id"])
-        if info and info["difficulty"] in ("easy", "medium"):
+        if info and info["difficulty"] in ("easy", "medium", "hard", "hardcore"):
             resumes[info["difficulty"]] = session["puzzle_id"]
     return {"enabled": True, "records": {r["difficulty"]: free_order.public_record(r) for r in rows}, "resumeIds": resumes}
 

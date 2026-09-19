@@ -16,7 +16,7 @@ Stav 2026-09-19: pouze preview, žádné schválení produkčního nasazení.
 
 ## Chování
 
-Řazení vlastní jen preferenci a seznam původních puzzle ID. Nemění čísla, desky, odpovědi, výsledky, XP ani identitu účtu. Výběr rozehrané hry má přednost; dokončené desky se přeskočí podle existujícího postupu. Přepínače jsou jen pro Snadnou a Střední.
+Řazení vlastní jen preferenci a seznam původních puzzle ID. Nemění čísla, desky, odpovědi, výsledky, XP ani identitu účtu. Výběr rozehrané hry má přednost; dokončené desky se přeskočí podle existujícího postupu. Přepínače jsou pro Snadnou, Střední, Těžkou a Mozkožrouta. Těžká a Mozkožrout vždy používají běžnou sekvenci nová → starší → starší, bez desetideskového úvodu; Mozkomor zůstává beze změny. Nabídka má rovnou jednotný přepínač a krátké vysvětlení, bez nadpisu a dalších potvrzovacích tlačítek.
 
 Neznámá instalace není důkaz nového hráče: zůstává číselné pořadí s výslovným opt-in. Automatický úvodní pestrý plán vzniká pouze po serverem potvrzeném založení účtu, pokud není historie hosta ani dřívější volba. Přihlášení existujícího účtu, obnovení hesla a dočasně prázdná cache nejsou založení účtu. Google větev označuje pouze skutečně nově vloženého hráče, nikoli připojení identity k existujícímu hráči.
 
@@ -38,7 +38,7 @@ Offline se uchová poslední ověřené zapnutí i volba. Nedokončený zápis s
 
 1. Vyžádat výslovné schválení konkrétního release commitu a produkční migrace. Znovu ověřit aktuální main/produkční SHA a případné souběžné změny. Nikdy neslučovat referenční `preview/pestre-poradi`.
 2. Připravit samostatný release commit z této implementace: odstranit test-only `SUPABASE_URL` a `PROPLET_ORDER_TEST_ONLY` z `vercel.json`, obnovit produkční CSP z aktuálního main a nastavit `PROPLET_FREE_ORDER_ENABLED=false`. Testovací secret nikdy nepřenášet do produkce. Preview větev ponechat beze změny pro porovnání. Tento krok je nutný: současná větev záměrně obsahuje fail-closed testovací konfiguraci a není určena k přímému Promote to Production.
-3. Ověřit snapshot/zálohu produkční DB a spustit pouze novou aditivní migraci `20260919103255_free_order_v1.sql`, nikoli historické setupy ani plný replay migrací. Migrace přidává tabulku a RPC; nepřepisuje žádného hráče ani výsledek. Zkontrolovat RLS a granty.
+3. Ověřit snapshot/zálohu produkční DB a spustit pouze nové migrace `20260919103255_free_order_v1.sql` a následně `20260919133525_free_order_all_difficulties.sql`, nikoli historické setupy ani plný replay migrací. Migrace přidává tabulku a RPC; nepřepisuje žádného hráče ani výsledek. Zkontrolovat RLS a granty.
 4. Nasadit schválený release se stále vypnutou funkcí; ověřit přihlášení, dokončení, XP, synchronizaci a PWA update na mobilu/Foldu. Ověřit, že build skutečně obsahuje vypnutý flag.
 5. Zapnout funkci samostatným malým config commitem a preview/produkčním postupem schváleným uživatelem. Stávající hráči mají opt-in, nikoli nucené přerovnání. Sledovat chyby order API, konflikty, úspěšnost synchronizace a rozdíly XP/completion; žádné plošné zpětné doplňování plánů.
 
@@ -48,3 +48,7 @@ Offline se uchová poslední ověřené zapnutí i volba. Nedokončený zápis s
 - Online klient načte config při startu, návratu do okna, obnovení připojení a každých 30 s v aktivním okně. Přepínače zmizí, výběr se vrátí k původnímu číselnému resolveru; rozehraná hra, výsledky a XP zůstanou. Přijetí vypnutí se uloží i pro další offline start.
 - Nevypouštět tabulku, nesmazat plány ani lokální preference. Opětovné zapnutí obnoví stejný stabilní prefix.
 - Při širší regresi vrátit předchozí ověřený aplikační deployment. Aditivní tabulka/RPC mohou zůstat, starší aplikace je nepoužívá. Žádný rollback hráčských výsledků ani XP.
+
+## Rozhodnutí uživatele: redakční sekvence
+
+Ruční redakční práce na sekvenci není požadavek ani blokátor vydání. Používáme deterministický algoritmus se stabilním uloženým plánem; budoucí ruční dramaturgii nyní nepřipravujeme.

@@ -9,7 +9,7 @@ BRANCH = 'feat/pestre-poradi-production'
 
 
 class OrderCommand(BaseModel):
-    difficulty: Literal['easy', 'medium']
+    difficulty: Literal['easy', 'medium', 'hard', 'hardcore']
     mode: Literal['numeric', 'varied']
     expected_revision: int = Field(ge=0)
     request_id: str = Field(min_length=16, max_length=80, pattern=r'^[A-Za-z0-9-]+$')
