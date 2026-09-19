@@ -210,3 +210,19 @@ for material, expected in (
     assert result_domain.map_atomic_rpc_error(400, material).status_code == expected
 
 print("PASS: Sprint 08B atomic result adapter")
+
+# Receipt-only clients get the same durable award without reading full history.
+# Older clients retain their stats response, and replay cannot award twice.
+for select in (select_new, select_replay):
+    with ExitStack() as stack:
+        for active_patch in common_patches(payload, select, fake_rpc):
+            stack.enter_context(active_patch)
+        stats = stack.enter_context(patch.object(server, 'player_stats', side_effect=AssertionError('history on receipt path')))
+        request = request_for(payload)
+        request.headers['X-Proplet-Result-Receipt'] = '1'
+        count = len(rpc_calls)
+        compact = server.result(payload, request, 'Bearer test')
+        assert compact == {**response, 'stats': None}
+        assert len(rpc_calls) == count + (select is select_new)
+        stats.assert_not_called()
+print('PASS compact commit/replay receipt skips full history; legacy response preserved')

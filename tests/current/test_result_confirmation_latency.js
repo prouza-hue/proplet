@@ -27,3 +27,21 @@ merged=ctx.mergePendingPlayedLevels([{...queued,elapsedMs:132000}], [queued], 'm
 assert.equal(merged.length,1);assert.equal(merged[0].pendingSync,undefined);assert.equal(merged[0].elapsedMs,132000);
 assert.equal(ctx.mergePendingPlayedLevels([], [queued], 'easy').length,0);
 console.log('PASS pending history preserves time, deduplicates and prefers server confirmation');
+
+// One slow/erroring team request cannot hold back the visible world result.
+const fetchCode=source.slice(source.indexOf('async function fetchFreeLevelLeaderboards('),source.indexOf('function rankBadge('));
+(async()=>{
+ for(const teamFails of [false,true]){
+  let worldResolve,teamResolve,teamReject;
+  const updates=[];
+  const world=new Promise(r=>worldResolve=r),team=new Promise((r,j)=>{teamResolve=r;teamReject=j});
+  const c={getProfile:()=>({familyCode:'TEST'}),api:()=>world,fetchPuzzleLeaderboard:()=>team,transformRankingPayload:x=>x};
+  vm.createContext(c);vm.runInContext(fetchCode,c);
+  let settled=false;const work=c.fetchFreeLevelLeaderboards('synthetic',(data,kind)=>updates.push({kind,pending:data.teamPending,rank:data.world?.myRank})).then(x=>{settled=true;return x});
+  worldResolve({myRank:2});await new Promise(r=>setImmediate(r));
+  assert.equal(updates.length,1);assert.equal(updates[0].kind,'world');assert.equal(updates[0].rank,2);assert.equal(updates[0].pending,true);assert.equal(settled,false);
+  if(teamFails)teamReject(Error('synthetic offline'));else teamResolve({rows:[]});
+  const result=await work;assert.equal(result.world.myRank,2);assert.equal(result.teamPending,false);assert.equal(!!result.teamError,teamFails);
+ }
+ console.log('PASS world ranking paints before slow team; team failure preserves world');
+})().catch(e=>{console.error(e);process.exitCode=1});

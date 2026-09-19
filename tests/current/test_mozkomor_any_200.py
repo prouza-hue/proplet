@@ -32,7 +32,7 @@ request=Request({'type':'http','method':'POST','path':'/api/result','headers':[]
 player={'id':'00000000-0000-4000-8000-000000000123'}
 payload=ResultCreate(puzzle_id='g4-z-001',challenge_key='free:g4-z-001',mode='free',difficulty='mozkomor',elapsed_ms=131000,moves=17,attempt_id='synthetic-preserved-attempt')
 with ExitStack() as stack:
-    for name,value in {'enforce_rate_limit':lambda *a,**k:None,'auth_player':lambda *a:player,'db_select':lambda table,**k:rows if table=='results' else [],'rankings_v2_schema_ready':lambda:False,'atomic_result_public_response':lambda p,r:r}.items():
+    for name,value in {'enforce_rate_limit':lambda *a,**k:None,'auth_player':lambda *a:player,'db_select':lambda table,**k:rows if table=='results' else [],'rankings_v2_schema_ready':lambda:False,'atomic_result_public_response':lambda p,r,**kwargs:r}.items():
         stack.enter_context(patch.object(server,name,value))
     stack.enter_context(patch.object(server,'ATOMIC_RESULT_V1_ENABLED',True))
     submit=stack.enter_context(patch.object(server.result_domain,'submit_atomic',return_value={'firstCompletion':True,'awardedPoints':150}))

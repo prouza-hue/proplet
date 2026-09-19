@@ -3384,8 +3384,10 @@ def record_puzzle_run(player_id: str, payload: ResultCreate, effective_clean: bo
     })
 
 
-def atomic_result_public_response(player_id: str, receipt: dict) -> dict:
-    """Refresh read-only stats after the atomic commit or durable replay."""
+def atomic_result_public_response(player_id: str, receipt: dict, *, include_stats: bool = True) -> dict:
+    """A durable receipt need not wait for the separately refreshed profile."""
+    if not include_stats:
+        return result_domain.public_response(receipt, None, None)
     try:
         stats = player_stats(player_id)
         stats_warning = None
@@ -3416,7 +3418,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             raise HTTPException(503, "Atomické ukládání výsledku není připravené") from exc
         if replay_receipt is not None:
             logger.info("atomic_result_v1 status=replay")
-            return atomic_result_public_response(player["id"], replay_receipt)
+            return atomic_result_public_response(player["id"], replay_receipt, include_stats=request.headers.get("X-Proplet-Result-Receipt") != "1")
     # Replaying an already committed result does not consume the player's write budget.
     # Players sharing a school/home network no longer share this smaller limit.
     enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600, discriminator=player["id"])
@@ -3528,7 +3530,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             bool(receipt.get("firstCompletion")),
             str(receipt.get("attemptStatus") or "unknown"),
         )
-        return atomic_result_public_response(player["id"], receipt)
+        return atomic_result_public_response(player["id"], receipt, include_stats=request.headers.get("X-Proplet-Result-Receipt") != "1")
 
     # Each actual completion is stored as one coherent run. Leaderboards never mix a fast hinted
     # attempt with a slower clean attempt into an impossible synthetic record.
