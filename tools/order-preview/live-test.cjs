@@ -46,7 +46,9 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    await page.screenshot({path:path.join(dir,'hosted-game-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
    await page.evaluate(()=>window.PROPLET_ORDER_PREVIEW.solve(false));await page.waitForSelector('#winModal:not(.hidden)');assert.equal((await snapshot()).medium.done,13);
    await page.screenshot({path:path.join(dir,'hosted-win-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
-   await page.locator('#winPrimaryBtn').click();await page.waitForFunction(()=>{const c=window.PROPLET_ORDER_PREVIEW.snapshot().current;return c&&!c.gen5&&!c.finished});
+   // Fast synthetic history may show the app's existing difficulty recommendation.
+   // Continue the same difficulty using whichever real visible action is offered.
+   await page.locator('#winPrimaryBtn:visible, #difficultyNudgeCard .difficulty-nudge-decline:visible').first().click();await page.waitForFunction(()=>{const c=window.PROPLET_ORDER_PREVIEW.snapshot().current;return c&&!c.gen5&&!c.finished});
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Horizontal overflow');assert.equal(await page.locator('.marketing-consent').count(),0);
    checks.push('PASS hosted '+spec.width+'x'+spec.height+' '+spec.theme+': real pointer word submission, medium Gen5 opt-in, win, local progress and next original board');
    await context.close();page=null;
