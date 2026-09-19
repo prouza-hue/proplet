@@ -224,7 +224,7 @@
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=compactplay1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
-    await loadScript('/account-auth.js?v=registrationhome1','propletAccountAuth',{wait:true});
+    await loadScript('/account-auth.js?v=freeorder2','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=style-recovery1','propletGameLayout');
     loadScript('/gesture-guard-v3325.js?v=fixsep8c','propletGestureGuard');

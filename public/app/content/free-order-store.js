@@ -4,6 +4,7 @@
 function create(d){
  const E=d.engine, prefix='proplet-free-order-v1:', busy=new Map();
  let enabled=false, loadedIdentity=null, resumeIds={};
+ try{const c=JSON.parse(d.storage.getItem(prefix+'capability')||'null');enabled=c?.version===E.VERSION&&c.enabled===true}catch{}
  const scope=()=>d.profile()?.id||'guest';
  const identity=p=>p?.id&&p?.token?p.id+':'+p.token:'guest';
  const read=s=>{try{return JSON.parse(d.storage.getItem(prefix+s)||'{}')}catch{return {}}};
@@ -25,8 +26,9 @@ function create(d){
   return save(diff,r);
  }
  async function configure(){
-  try{const c=await d.api('/api/free-order/config');enabled=c.enabled===true;if(c.isolatedPreview)d.isolated?.();}
+  try{const c=await d.api('/api/free-order/config');enabled=c.enabled===true;d.storage.setItem(prefix+'capability',JSON.stringify({version:E.VERSION,enabled}));if(c.isolatedPreview)d.isolated?.();}
   catch{} // Keep a previously verified capability during a transient disconnect.
+  if(enabled)try{await newAccount(d.profile())}catch{}
   changed();return enabled;
  }
  async function sync(){
@@ -35,7 +37,7 @@ function create(d){
   const job=(async()=>{
    const remote=await d.api('/api/free-order',{authProfile:p});
    if(identity(d.profile())!==id)return;
-   if(!remote.enabled){enabled=false;changed();return}
+   if(!remote.enabled){enabled=false;d.storage.setItem(prefix+'capability',JSON.stringify({version:E.VERSION,enabled:false}));changed();return}
    resumeIds=remote.resumeIds||{};
    const local=read(p.id);
    for(const diff of E.SUPPORTED){
@@ -71,7 +73,9 @@ function create(d){
   if(!enabled||!E.SUPPORTED.includes(diff))return fallback;
   const r=record(diff);const remote=loadedIdentity===identity(d.profile())&&d.bank(diff).find(p=>p.id===resumeIds[diff]&&!d.completed(diff).includes(p.id));if(remote)return remote;
   if(r.mode!=='varied'||!r.plan)return fallback;
-  return E.next({bank:d.bank(diff),difficulty:diff,completedIds:d.completed(diff),mode:r.mode,plan:r.plan}).puzzle;
+  const stable=plan(diff,r);
+  if(scope()==='guest'&&JSON.stringify(stable.ids)!==JSON.stringify(r.plan.ids))queue(diff,{...r,plan:stable});
+  return E.next({bank:d.bank(diff),difficulty:diff,completedIds:d.completed(diff),mode:r.mode,plan:stable}).puzzle;
  }
  function adopt(profileId){
   const guest=read('guest'),target=read(profileId);

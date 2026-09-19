@@ -24,7 +24,7 @@ function buildPlan({bank,difficulty,completedIds=[],newcomer=false,recentIds=[],
 }
 function reconcilePlan(plan,{bank,difficulty}){
  if(!plan||plan.version!==VERSION||plan.difficulty!==difficulty||!Array.isArray(plan.ids))throw new Error('Incompatible saved plan');
- const list=canonicalBank(bank,difficulty),allowed=new Set(list.map(p=>p.id)),seen=new Set(),ids=[];
+ const list=canonicalBank(bank,difficulty),seen=new Set(),ids=[];
  for(const id of plan.ids)if(typeof id==='string'&&!seen.has(id)){ids.push(id);seen.add(id)}
  for(const p of list)if(!seen.has(p.id)){ids.push(p.id);seen.add(p.id)}
  return {...plan,ids};

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-freeorder1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-freeorder2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -771,7 +771,7 @@ function freeOrder(){
   profile:getProfile,api,uuid:newAttemptId,bank:sortedFreeBank,
   prepare:async()=>{await window.__PROPLET_ENSURE_FULL_PUZZLE_DB?.();await refreshRollingContent()},
   completed:diff=>{const slots=localFreeSlotState(diff);return sortedFreeBank(diff).filter(p=>slots.actual.has(Number(p.meta?.level))).map(p=>p.id)},
-  hasHistory:scope=>{const state=getState(scope);return Object.keys(state.completed||{}).length>0||Object.keys(state.inProgress||{}).length>0||getQueue(scope).length>0},
+  hasHistory:scope=>{const state=getState(scope);return Object.values(state.completed||{}).some(r=>r.mode!=='starter')||Object.values(state.inProgress||{}).some(r=>r.mode!=='starter')||getQueue(scope).length>0},
   isolated:()=>{window.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=true},
   notice:showToast,changed:()=>{if(puzzleDB){renderFree();renderQuickPlay()}}
  });return freeOrderController;
@@ -1453,7 +1453,7 @@ async function saveNewProfile(){
   try{await currentGame?.finishTelemetryPromise}catch{}
   pauseGameClock('login');
   if(currentGame?.fairPlay)await fairPlay().pause(currentGame);
-  const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,stats:profile.stats});rememberSupportMode(serverMode);
+  const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,freeOrderNewAccount:profile.freeOrderNewAccount===true,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   await claimTelemetryAfterAuth(anonId);
   trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(authAction==='create'){showDailyAfterRegistration();if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320)}else if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);

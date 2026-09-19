@@ -39,6 +39,7 @@ function fixture(){
 (async()=>{
  const f=fixture(),s=f.make();await s.configure();assert.equal(s.record('easy').mode,'numeric','empty installation is unknown, not newcomer');
  await s.change('easy','varied');const ids=s.record('easy').plan.ids;assert.equal(ids[0],'g5-r1-0');
+ f.setFail(true);const offlineReload=f.make();await offlineReload.configure();assert.equal(offlineReload.enabled(),true);assert.equal(offlineReload.next('easy',old[0]).id,ids[0],'cold offline reload retains verified varied ordering');f.setFail(false);
  const reload=f.make();await reload.configure();assert.deepEqual(reload.record('easy').plan.ids,ids);
  await reload.change('easy','numeric');await reload.change('easy','varied');assert.deepEqual(reload.record('easy').plan.ids,ids);
  s.adopt('account-a');f.setProfile({id:'account-a',token:'a'});await s.sync();assert.deepEqual(f.remote.easy.plan.ids,ids,'guest plan imported');
@@ -47,8 +48,9 @@ function fixture(){
  f.setFail(false);f.remote.easy={...f.remote.easy,revision:f.remote.easy.revision+1,mode:'varied'};await device.sync();assert.equal(device.record('easy').mode,'varied');assert.equal(f.notices.length,1,'concurrent server revision wins visibly');
  f.setBank([...bank,release]);await device.sync();await device.sync();assert.deepEqual(f.remote.easy.plan.ids,[...ids,'batch-new']);
  f.setProfile({id:'account-b',token:'b'});assert.equal(device.record('easy').mode,'numeric','account switch never leaks choice');
- f.setEnabled(false);await device.configure();assert.equal(device.next('easy',old[2]),old[2],'kill switch keeps canonical fallback');
+ f.setEnabled(false);await device.configure();assert.equal(device.next('easy',old[2]),old[2],'kill switch keeps canonical fallback');f.setFail(true);assert.equal(f.make().enabled(),false,'received kill switch persists through offline reload');
  const n=fixture(),ns=n.make();await ns.configure();n.setProfile({id:'new',token:'n',freeOrderNewAccount:true});await ns.newAccount({id:'new',token:'n',freeOrderNewAccount:true});assert.equal(ns.record('easy').mode,'varied');assert.equal(ns.record('easy').plan.ids[0],'old-0');
+ const g=fixture(),gs=g.make();await gs.configure();await gs.change('easy','varied');g.setBank([...bank,release]);gs.next('easy',old[0]);assert.equal(gs.record('easy').plan.ids.at(-1),'batch-new','guest persists appended batch before account adoption');
  // Lost/stale authentication response may not write another account's state.
  const before=JSON.stringify([...f.memory]);await device.sync();assert.equal(JSON.stringify([...f.memory]),before);
  console.log('PASS free ordering: identity, cadence, resume, persistence, guest import, cross-device CAS, batches, unknown install, account switch, kill switch');

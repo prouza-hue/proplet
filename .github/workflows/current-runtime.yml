@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat/pestre-poradi-production
     paths:
       - '**/*.py'
       - 'content/**'
@@ -88,3 +89,4 @@ jobs:
           python tools/test_account_created_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-account-created.json
           python tools/test_fair_play_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_http.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
+          python tools/test_free_order_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password

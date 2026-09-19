@@ -99,6 +99,18 @@ class IdentityBoundaryTests(unittest.TestCase):
         self.assertEqual(self.owner["auth_user_id"], "auth-owner")
         self.assertEqual(self.sessions, ["owner"])
 
+    def test_only_created_google_account_gets_newcomer_marker(self):
+        with patch.dict(auth.os.environ, {"PROPLET_FREE_ORDER_ENABLED": "true"}):
+            existing = self.complete().json()["profile"]
+            self.assertFalse(existing["freeOrderNewAccount"])
+            self.user["id"] = "brand-new-google-user"
+            self.user["email"] = "new@example.invalid"
+            created = self.complete().json()["profile"]
+            self.assertTrue(created["freeOrderNewAccount"])
+            returning = self.complete().json()["profile"]
+            self.assertFalse(returning["freeOrderNewAccount"])
+            self.assertEqual(returning["id"], created["id"])
+
     def test_stable_identity_mapping_survives_changed_email(self):
         self.owner["auth_user_id"] = "auth-owner"
         self.user["email"] = "changed@example.invalid"
