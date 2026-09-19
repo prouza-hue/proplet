@@ -11,9 +11,9 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 # Gen4 has its own visible progression and its own per-board XP economy.
 assert "done=slots.actual.size" in runtime_source
 assert "nextUnsolved=list.find(p=>!slots.actual.has" in runtime_source
-assert "unplayed=list.filter(p=>!slots.actual.has" in runtime_source
+assert "const q=freeProgress(diff),p=q.resume||q.nextUnsolved||q.list[0]" in app
 warmup = app.split("function startStarterWarmup(){", 1)[1].split("function ", 1)[0]
-assert "const list=sortedFreeBank('easy'),slots=localFreeSlotState('easy'),p=list.find(x=>!slots.actual.has" in warmup
+assert "const q=freeProgress('easy'),p=q.resume||q.nextUnsolved||q.list[0]" in warmup
 assert "return info&&slots.actual.has(info.level)?0" in app
 
 # An abandoned board from an older content generation must not hijack the new

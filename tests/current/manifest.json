@@ -5,34 +5,122 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
-      {"path":"tests/current/test_sparse_free_slots.js","runner":"node"},
-      {"path":"tests/current/test_marketing_consent.js","runner":"node"},
-      {"path":"tests/current/test_result_confirmation_latency.js","runner":"node"},
-      {"path":"tests/current/test_mozkomor_any_200.py","runner":"python"},
-      {"path":"tests/current/test_fair_play.js","runner":"node"},
-      {"path":"tests/current/test_account_created_authority.py","runner":"python"},
-      {"path":"tests/current/test_result_action_dock.js","runner":"node"},
-      {"path":"tests/current/test_account_progress_cache.js","runner":"node"},
-      {"path":"tests/current/test_bonus_retry.js","runner":"node"},
-      {"path":"tests/current/test_gen5_release_cta.js","runner":"node"},
-      {"path":"tests/current/test_gen5_preview.py","runner":"python"},
-      {"path":"tests/current/test_gen5_production.py","runner":"python"},
-      {"path": "tests/current/test_account_identity_boundary.py", "runner": "python"},
-      {"path": "tests/current/test_preview_path_boundary.py", "runner": "python"},
-      {"path":"tests/current/test_browser_fixture.cjs","runner":"node"},
-      {"path":"tests/current/test_idle_offline.js","runner":"node"},
-      {"path":"tests/current/test_recognition_retry.js","runner":"node"},
-      {"path":"tests/current/test_recognition_overlay.py","runner":"python"},
-      {"path": "tests/current/test_tajenka_rules.js", "runner": "node"},
-      {"path": "tests/current/test_avatar_editor.js", "runner": "node"},
-      {"path": "tests/current/test_rank_titles.js", "runner": "node"},
-      {"path": "tests/current/test_lock_copy_convergence.js", "runner": "node"},
-      {"path": "tests/current/test_privacy_icon_convergence.js", "runner": "node"},
-      {"path": "tests/current/test_registration_destination.js", "runner": "node"},
-      {"path": "tests/current/test_welcome_claim.py", "runner": "python"},
-      {"path": "tests/current/test_organic_idle.js", "runner": "node"},
-      {"path": "tests/current/test_settings_controls.js", "runner": "node"},
-      {"path": "tests/current/test_auth_title_convergence.js", "runner": "node"},
+      {
+        "path": "tests/current/test_free_order.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_sparse_free_slots.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_marketing_consent.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_result_confirmation_latency.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_mozkomor_any_200.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_fair_play.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_account_created_authority.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_result_action_dock.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_account_progress_cache.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_bonus_retry.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_gen5_release_cta.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_gen5_preview.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_gen5_production.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_account_identity_boundary.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_preview_path_boundary.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_browser_fixture.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_idle_offline.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_recognition_retry.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_recognition_overlay.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_tajenka_rules.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_avatar_editor.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_rank_titles.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_lock_copy_convergence.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_privacy_icon_convergence.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_registration_destination.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_welcome_claim.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_organic_idle.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_settings_controls.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_auth_title_convergence.js",
+        "runner": "node"
+      },
       {
         "path": "tools/test_v4001_pwa_startup.py",
         "runner": "python"
