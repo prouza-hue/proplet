@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-freeorder3';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-postwin1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -419,7 +419,7 @@ function resultQueue(profile=getProfile(),scope=profile?.id||playerScope()){
  const factory=window.PropletResultQueue;
  if(!factory?.create)return null;
  resultQueueControllerIdentity=identity;
- resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
+ resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
  return resultQueueController;
 }
 function quarantineRejectedResult(row,reason,scope=playerScope()){
@@ -1055,10 +1055,10 @@ async function finishGame(){
  const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}$('#newBadgeBox').classList.toggle('hidden',!celebrations.length);$('#newBadgeBox').innerHTML=celebrations.join('');
  configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':g.mode==='daily'?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hrát další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.mode==='free'&&!g.postStarterWarmup){
- if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
+ if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(currentGame!==g)return;if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
   else loadWinLevelLeaderboard(g.puzzle,rec);
  }else if(g.mode==='daily'){
-  if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinDailyGlobalLeaderboard(g.dailyDate,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Globální místo ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
+  if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(currentGame!==g)return;if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinDailyGlobalLeaderboard(g.dailyDate,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Globální místo ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
   else loadWinDailyGlobalLeaderboard(g.dailyDate,rec);
  }else $('#levelLeaderboardBox').classList.add('hidden')
  await runGameCompletionHooks('after',completion)
@@ -1844,10 +1844,14 @@ async function openPlayedLevels(diff){
 function localLevelResult(puzzleId){return getState().completed[`free:${puzzleId}`]||null}
 function transformRankingPayload(data){return window.PropletRankings?.transformRankingPayload?window.PropletRankings.transformRankingPayload(data):data}
 async function fetchPuzzleLeaderboard(puzzleId){const p=getProfile();if(!p?.familyCode)return {rows:[],anonymous:true};return api(`/api/puzzle-leaderboard?puzzle_id=${encodeURIComponent(puzzleId)}&family_code=${encodeURIComponent(p.familyCode)}`)}
-async function fetchFreeLevelLeaderboards(puzzleId){
- const p=getProfile(),worldPromise=api(`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(puzzleId)}`).then(transformRankingPayload),teamPromise=p?.familyCode?fetchPuzzleLeaderboard(puzzleId):Promise.resolve({rows:[],anonymous:true});
- const [worldResult,teamResult]=await Promise.allSettled([worldPromise,teamPromise]);
- return {world:worldResult.status==='fulfilled'?worldResult.value:null,worldError:worldResult.status==='rejected'?worldResult.reason?.message||'Globální pořadí se nepodařilo načíst.':null,team:teamResult.status==='fulfilled'?teamResult.value:null,teamError:teamResult.status==='rejected'?teamResult.reason?.message||'Týmové pořadí se nepodařilo načíst.':null};
+async function fetchFreeLevelLeaderboards(puzzleId,onUpdate){
+ const p=getProfile(),data={world:null,worldPending:true,team:null,teamPending:true,worldError:null,teamError:null};
+ const load=async(kind,work)=>{
+  try{data[kind]=await work}catch(error){data[kind+'Error']=error?.message||'Pořadí se nepodařilo načíst.'}
+  data[kind+'Pending']=false;onUpdate?.(data,kind);
+ };
+ await Promise.all([load('world',api(`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(puzzleId)}`).then(transformRankingPayload)),load('team',p?.familyCode?fetchPuzzleLeaderboard(puzzleId):Promise.resolve({rows:[],anonymous:true}))]);
+ return data;
 }
 function rankBadge(rank){
  const value=Number(rank)||0,medals={1:['🥇','Zlatá medaile'],2:['🥈','Stříbrná medaile'],3:['🥉','Bronzová medaile']},medal=medals[value];
@@ -1908,10 +1912,22 @@ function renderFreeTeamBoard(data,error,myId){
 }
 function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
  const globalRank=Number(data?.world?.myRank||0)||null,teamRank=(data?.team?.rows||[]).find(r=>r.id===myId)?.rank||null;
- const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;bindRankingExpansion(container,active==='world'?data?.world:null);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
+ const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${data?.[active+'Pending']?'<div class="leaderboard-empty">Načítám pořadí…</div>':active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;bindRankingExpansion(container,active==='world'?data?.world:null);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
  render(initialTab);return {globalRank,teamRank};
 }
-async function loadWinLevelLeaderboard(puzzle,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='free'||isMozkomorQaDifficulty(puzzle?.difficulty)){box?.classList.add('hidden');return}box.classList.remove('hidden');box.innerHTML='<div class="leaderboard-empty">Načítám globální i týmové pořadí…</div>';try{const data=await fetchFreeLevelLeaderboards(puzzle.id),ranks=renderFreeLeaderboardPanel(box,data,getProfile()?.id);levelDetailContext={puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:puzzle.meta?.level,globalRank:ranks.globalRank,teamRank:ranks.teamRank,result:rec}}catch(e){box.innerHTML=`<div class="leaderboard-empty">Pořadí se teď nepodařilo načíst. <small>${esc(e.message)}</small></div>`}}
+async function loadWinLevelLeaderboard(puzzle,rec){
+ const box=$('#levelLeaderboardBox'),game=currentGame,profile=getProfile();
+ if(!box||game?.mode!=='free'||isMozkomorQaDifficulty(puzzle?.difficulty)){box?.classList.add('hidden');return}
+ const request={};box.postWinRequest=request;box.postWinData=null;
+ const valid=()=>box.postWinRequest===request&&currentGame===game&&getProfile()?.id===profile?.id&&getProfile()?.token===profile?.token;
+ renderFreeLeaderboardPanel(box,{worldPending:true,teamPending:true},profile?.id);
+ await fetchFreeLevelLeaderboards(puzzle.id,(data,kind)=>{
+  if(!valid())return;
+  const tab=box.querySelector('[aria-selected="true"]')?.dataset.freeBoardTab||'world';
+  if(tab===kind||!box.postWinData){renderFreeLeaderboardPanel(box,data,profile?.id,tab);box.postWinData=data}
+  levelDetailContext={puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:puzzle.meta?.level,globalRank:Number(data.world?.myRank)||null,teamRank:data.team?.rows?.find(r=>r.id===profile?.id)?.rank||null,result:rec};
+ });
+}
 function renderDailyGlobalLeaderboardBox(container,data){
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[];container.classList.remove('free-level-board');container.classList.add('daily-global-board');container.classList.remove('hidden');
  if(!rank){const message=getProfile()?.token?'Tvůj výsledek zatím není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 Dnešní globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>${rankingExpandMarkup(data)}`;bindRankingExpansion(container,data);return}
