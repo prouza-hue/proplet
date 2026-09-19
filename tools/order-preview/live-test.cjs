@@ -31,10 +31,10 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    fonts.push(await page.evaluate(()=>({wordmark:getComputedStyle(document.querySelector('.brand-copy strong')).fontFamily,loaded:[...document.fonts].map(f=>({family:f.family,status:f.status})),theme:document.documentElement.dataset.theme||document.body.dataset.theme||null})));
    await page.screenshot({path:path.join(dir,'hosted-existing-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
    await page.locator('[data-diff="medium"] .order-optin').click();
+   await page.locator('#toast').waitFor({state:'hidden'});
+   await page.screenshot({path:path.join(dir,'hosted-toggle-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
    const snapshot=()=>page.evaluate(()=>window.PROPLET_ORDER_PREVIEW.snapshot());let s=await snapshot();assert.equal(s.medium.next[0].gen5,true);const id=s.medium.next[0].id;
    await page.locator('[data-play-free="medium"]').click();await page.waitForFunction(wanted=>window.PROPLET_ORDER_PREVIEW.snapshot().current?.id===wanted,id);
-   // Confirmation is intentionally visible briefly; don't attempt to drag through it.
-   await page.locator('#toast').waitFor({state:'hidden'});
    await page.waitForTimeout(500);await page.locator('#board').scrollIntoViewIfNeeded();await page.waitForTimeout(200);
    const answerPath=await page.evaluate(()=>currentGame.puzzle.answers[0].path);
    const points=[];for(const cell of answerPath){const rect=await page.locator('.cell[data-index="'+cell+'"]').boundingBox();assert(rect);points.push({x:rect.x+rect.width/2,y:rect.y+rect.height/2})}
@@ -46,11 +46,13 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    await page.screenshot({path:path.join(dir,'hosted-game-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
    await page.evaluate(()=>window.PROPLET_ORDER_PREVIEW.solve(false));await page.waitForSelector('#winModal:not(.hidden)');assert.equal((await snapshot()).medium.done,13);
    await page.screenshot({path:path.join(dir,'hosted-win-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
-   // Fast synthetic history may show the app's existing difficulty recommendation.
-   // Continue the same difficulty using whichever real visible action is offered.
+   // The existing fast-solve recommendation can replace the usual primary CTA.
    await page.locator('#winPrimaryBtn:visible, #difficultyNudgeCard .difficulty-nudge-decline:visible').first().click();await page.waitForFunction(()=>{const c=window.PROPLET_ORDER_PREVIEW.snapshot().current;return c&&!c.gen5&&!c.finished});
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Horizontal overflow');assert.equal(await page.locator('.marketing-consent').count(),0);
-   checks.push('PASS hosted '+spec.width+'x'+spec.height+' '+spec.theme+': real pointer word submission, medium Gen5 opt-in, win, local progress and next original board');
+   await page.goto(origin+'/?open=free&scenario=newcomer');await page.waitForFunction(()=>window.PROPLET_ORDER_PREVIEW?.ready);await page.evaluate(()=>document.fonts.ready);
+   assert.equal((await snapshot()).easy.mode,'varied');assert.equal((await snapshot()).easy.next[1].gen5,true);
+   await page.screenshot({path:path.join(dir,'hosted-newcomer-'+spec.width+'-'+spec.theme+'.png'),fullPage:true});
+   checks.push('PASS hosted '+spec.width+'x'+spec.height+' '+spec.theme+': real pointer word submission, medium Gen5 opt-in, win, local progress, next original board and newcomer varied default; toggle screenshots saved');
    await context.close();page=null;
   }
   assert.equal(errors.length,0,errors.join('; '));assert.equal(apiRequests.length,0);assert.equal(writes.length,0);result.status='PASS';save();console.log(JSON.stringify(result,null,2));
