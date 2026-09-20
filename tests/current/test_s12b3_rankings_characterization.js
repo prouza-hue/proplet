@@ -130,11 +130,11 @@ assert(xpTeam.includes('4 členové'),'XP team member count drifted');
 assert(xpTeam.includes('<small>tento týden</small>'),'XP team period drifted');
 
 const dailyPlayer=rankings.daily(payload,'players');
-assert(dailyPlayer.includes('✨ Čistě · 7 tahů'),'Daily player quality/moves drifted');
+assert(dailyPlayer.includes('Čistě · 7 tahů'),'Daily player quality/moves drifted');
 assert(dailyPlayer.includes('1:23'),'Daily player time drifted');
 assert(dailyPlayer.includes('<small>dnešní výzva</small>'),'Daily player score label drifted');
 const hintedDaily={players:[{...payload.players[0],cleanSolve:false,hintsUsed:2,moves:1}],teams:[]};
-assert(rankings.daily(hintedDaily,'players').includes('💡 2× · 1 tah'),'Daily hint quality drifted');
+assert(rankings.daily(hintedDaily,'players').includes('2 nápovědy · 1 tah'),'Daily hint quality drifted');
 const noHintDaily={players:[{...payload.players[0],cleanSolve:false,hintsUsed:0,moves:3}],teams:[]};
 assert(rankings.daily(noHintDaily,'players').includes('Bez nápovědy · 3 tahy'),'Daily no-hint quality drifted');
 
