@@ -74,9 +74,13 @@
     }catch{}
   }
 
+  function todayDifficultyVisible(key){
+    return !!DIFF[key]&&(key!=='mozkomor'||mozkomorUnlockState().unlocked);
+  }
+
   function freeHistory(){
     const state=getState?.()||{};
-    const visibleOnToday=r=>r?.mode==='free'&&r.difficulty!=='mozkomor'&&DIFF[r.difficulty];
+    const visibleOnToday=r=>r?.mode==='free'&&todayDifficultyVisible(r.difficulty);
     const progress=Object.values(state.inProgress||{}).filter(visibleOnToday);
     const completed=Object.values(state.completed||{}).filter(visibleOnToday);
     return {progress,completed,hasAny:progress.length>0||completed.length>0};
@@ -84,14 +88,15 @@
 
   function latestFreeResume(){
     const progress=[...freeHistory().progress].sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
-    if(!progress.length)return null;
-    const difficulty=progress[0].difficulty;
-    const q=freeProgress(difficulty);
-    return q.resume?{difficulty,q}:null;
+    for(const item of progress){
+      const difficulty=item.difficulty,q=freeProgress(difficulty);
+      if(q.resume)return {difficulty,q};
+    }
+    return null;
   }
 
   function difficultyTiles(){
-    return Object.entries(DIFF).filter(([key])=>key!=='mozkomor').map(([key,info])=>{
+    return ['easy','medium','hard','hardcore','mozkomor'].filter(todayDifficultyVisible).map(key=>[key,DIFF[key]]).map(([key,info])=>{
       const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0,action=q.resume?'Pokračovat':q.done>=q.total&&q.total?'Zahrát znovu':'Hrát';
       return `<button class="today-card ${key}" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${action}: ${htmlEsc(info.label)}, ${q.done} z ${q.total} dokončeno, +${info.xp} XP za novou úroveň">${difficultyIconMarkup(key,'today-art')}<span class="today-title"><strong>${htmlEsc(info.label)}</strong><span class="today-xp">+${info.xp} XP</span></span><span class="today-progress"><span class="today-count"><b>${q.done}</b> / ${q.total}</span><span class="today-track" aria-hidden="true"><span style="width:${pct}%"></span></span></span><span class="today-action">${action} <span class="today-arrow" aria-hidden="true">→</span></span></button>`;
     }).join('');
