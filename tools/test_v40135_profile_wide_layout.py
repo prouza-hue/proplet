@@ -13,8 +13,8 @@ theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.02.2"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 assert "version:'4.02.2'" in runtime
-assert "proplet-v4.02.2-postwin1" in sw
-assert 'theme-init.js?v=freeorder3' in html and 'theme-init.js?v=freeorder3' in sw
+assert "proplet-v4.02.2-todaymoz1" in sw
+assert 'theme-init.js?v=todaymoz1' in html and 'theme-init.js?v=todaymoz1' in sw
 assert "app-profile-settings.css?v=privacyflow1" in theme
 
 assert ".profile-grid>.profile-stat:not(.profile-stat-wide){grid-column:span 2" in css
