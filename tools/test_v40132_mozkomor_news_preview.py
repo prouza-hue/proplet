@@ -67,9 +67,9 @@ assert 'aria-label="Dokončení Mozkožroutů"' in app
 assert "ÚROVEŇ ${nextLevel||1} Z ${total}" not in app
 
 # Dnes never exposes Mozkomor, including quick play, resume, or local recent history.
-assert "Object.entries(DIFF).filter(([key])=>key!=='mozkomor')" in app
-assert "Object.entries(DIFF).filter(([key])=>key!=='mozkomor')" in home
-assert "r.difficulty!=='mozkomor'" in home
+assert "key!=='mozkomor'||mozkomorUnlockState().unlocked" in app
+assert "['easy','medium','hard','hardcore','mozkomor'].filter(todayDifficultyVisible)" in home
+assert "r?.mode==='free'&&todayDifficultyVisible(r.difficulty)" in home
 
 # QA bypass is preview-only, excludes known production aliases, and never syncs test runs.
 assert "location.hostname.endsWith('.vercel.app')" in app
