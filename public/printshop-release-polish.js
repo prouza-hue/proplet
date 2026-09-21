@@ -103,8 +103,8 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   function installWeeklyBannerIcon(){
-    for(const spark of document.querySelectorAll('.new-content-banner .new-content-spark')){
-    if(spark.dataset.weeklyIconReady==='1')continue;
+    const spark=q('#newContentBanner .new-content-spark');
+    if(!spark||spark.dataset.weeklyIconReady==='1')return;
     spark.textContent='';
     const img=document.createElement('img');
     img.loading='lazy';
@@ -119,7 +119,6 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
     img.style.objectFit='contain';
     spark.appendChild(img);
     spark.dataset.weeklyIconReady='1';
-    }
   }
 
   function installTajenkaIcon(root=q('#tajenkaPreviewCard')){
@@ -147,14 +146,14 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   function syncTajenkaDailyPlacement(){
-    const card=q('#tajenkaPreviewCard'),screen=q('#screen-daily'),anchor=q('#todayNewContentBanner')||q('#screen-daily .daily-hero');
+    const card=q('#tajenkaPreviewCard'),screen=q('#screen-daily'),hero=q('#screen-daily .daily-hero');
     if(!card||!screen)return;
     card.querySelector('.tajenka-entry-copy>.eyebrow')?.remove();
     if(card.classList.contains('hidden'))return;
     if(card.classList.contains('completed')){
       if(screen.lastElementChild!==card)screen.appendChild(card);
-    }else if(anchor&&anchor.nextElementSibling!==card){
-      anchor.insertAdjacentElement('afterend',card);
+    }else if(hero&&hero.nextElementSibling!==card){
+      hero.insertAdjacentElement('afterend',card);
     }
     installTajenkaIcon(card);
   }

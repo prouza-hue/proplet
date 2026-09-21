@@ -85,21 +85,6 @@ with sync_playwright() as p:
         assert base['updateHidden'],base
         assert base['printshopCss'] and base['typographyCss'],base
 
-        news=page.evaluate("""()=>{
-          const today=document.querySelector('#todayNewContentBanner'),free=document.querySelector('#newContentBanner');
-          return {
-            directlyBelowDaily:document.querySelector('.daily-hero').nextElementSibling===today,
-            separated:today.classList.contains('hidden') || today.getBoundingClientRect().top-document.querySelector('.daily-hero').getBoundingClientRect().bottom>=12,
-            sameVisibility:today.classList.contains('hidden')===free.classList.contains('hidden'),
-            sameContent:today.textContent===free.textContent,
-            sameArtwork:today.querySelector('img')?.getAttribute('src')===free.querySelector('img')?.getAttribute('src'),
-            noHeading:!document.querySelector('#quickPlayCard .quick-play-head'),
-            noEyebrow:!today.querySelector('.eyebrow'),
-            uniqueActions:document.querySelectorAll('#playNewContentBtn').length<=1 && document.querySelectorAll('#playTodayNewContentBtn').length<=1
-          };
-        }""")
-        assert all(news.values()),news
-
         page.evaluate("window.__propletSmokeSentinel='alive'")
         for target in ('free','leaderboard','profile','daily'):
             page.locator(f'.bottom-nav [data-nav="{target}"]').click()

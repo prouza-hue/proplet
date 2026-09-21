@@ -176,7 +176,7 @@
     ['/typography-readability-v1.css?v=uipolish1','propletTypographyReadabilityV1Css'],
     ['/brand-wordmark-fraunces.css?v=uipolish1','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=uipolish1','propletTajenkaReleaseFixCss'],
-    ['/tajenka-card-polish.css?v=todaynews1','propletTajenkaCardPolishCss'],
+    ['/tajenka-card-polish.css?v=2','propletTajenkaCardPolishCss'],
     ['/game-release-polish.css?v=3','propletGameReleasePolishCss'],
     ['/tajenka-runtime-polish.css?v=1','propletTajenkaRuntimePolishCss'],
     ['/training-layout.css?v=2','propletTrainingLayoutCss'],
@@ -222,7 +222,7 @@
   const loadExtras=async()=>{
     await loadScript('/runtime-meta.js?v=1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=todaynews1','propletHomeLayout');
+    loadScript('/home-layout.js?v=todaymoz1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=freeorder3','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
@@ -239,10 +239,10 @@
     await loadScript('/account-conversion-v3331.js?v=reminders1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=privacyflow1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=todaynews1','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=auditphase2-2','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
-    loadScript('/tajenka-card-polish.js?v=todaynews1','propletTajenkaCardPolish');
+    loadScript('/tajenka-card-polish.js?v=invitations1','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep

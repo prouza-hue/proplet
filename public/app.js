@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-todaynews1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-todaymoz1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -318,7 +318,7 @@ function dailyOrchestration(){
   renderDailyWeekRhythm,renderLevelCard,getProfile,getQueue,getSyncState:()=>syncState,
   renderRescueCard:(...args)=>renderRescueCard(...args),renderQuickPlay:(...args)=>renderQuickPlay(...args),renderTajenkaEntry:(...args)=>renderTajenkaEntry(...args),
   showDailyResult:(...args)=>showDailyResult(...args),startGame:(...args)=>startGame(...args),showToast,
-  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus()},
+  afterRender:()=>{window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus()},
  });
  return dailyOrchestrationController;
 }
@@ -351,7 +351,7 @@ function renderAccountProgressStatus(){
  // A verified local history stays playable while it refreshes silently.
  const showNotice=blocked||accountProgressAuthRequired||(accountProgressError&&hasCachedAccountProgress(p));
  if(document.body.classList.contains('account-progress-pending')!==blocked)document.body.classList.toggle('account-progress-pending',blocked);
- for(const selector of ['#quickPlayCard','#difficultyCards','#tajenkaPreviewCard','#tajenkaPlayCard','#newContentBanner','#todayNewContentBanner','#screen-daily .daily-hero']){
+ for(const selector of ['#quickPlayCard','#difficultyCards','#tajenkaPreviewCard','#tajenkaPlayCard','#newContentBanner','#screen-daily .daily-hero']){
   const element=$(selector);if(element){if(element.inert!==blocked)element.inert=blocked;if(element.getAttribute('aria-busy')!==String(blocked))element.setAttribute('aria-busy',String(blocked))}
  }
  for(const screen of ['daily','free']){
@@ -807,12 +807,12 @@ function latestContentUnplayed(){return progression().latestContentUnplayed()}
 function newContentCount(diff){return progression().newContentCount(diff)}
 function startLatestContent(){const batch=latestContentBatch(),list=latestContentUnplayed(),all=latestContentPuzzles(),p=list[0]||all[0];if(p)startGame(p,'free',null,{contentBatchId:batch?.id||null})}
 function continueLatestContent(){const batch=latestContentBatch(),p=latestContentUnplayed()[0];if(p&&currentGame?.contentBatchId===batch?.id)startGame(p,'free',null,{contentBatchId:batch.id});else nav('free',{replace:true})}
-function renderNewContentBanner(selector='#newContentBanner'){
- const root=$(selector);if(!root)return;root.classList.add('hidden');root.innerHTML='';
+function renderNewContentBanner(){
+ const root=$('#newContentBanner');if(!root)return;root.classList.add('hidden');root.innerHTML='';
  const batch=latestContentBatch();if(!batch||!latestContentIsFresh())return;
  const all=latestContentPuzzles(),left=latestContentUnplayed(),done=Math.max(0,all.length-left.length),count=Number(batch.count)||all.length||5;
- root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>${left.length?`${count} nových Propletů je tady`:'Týdenní várka dohraná'}</h2><p>${left.length?`${done?`${done} hotovo · `:''}${left.length} ještě čeká.`:`Všech ${count} nových úrovní máš hotových.`}</p></div></div><div class="new-content-actions"><button id="${root.id==='newContentBanner'?'playNewContentBtn':'playTodayNewContentBtn'}" class="primary-btn">${left.length?'Hrát novinky':'Zahrát znovu'}</button></div>`;
- root.classList.remove('hidden');root.querySelector('.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
+ root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>${left.length?`${count} nových Propletů je tady`:'Týdenní várka dohraná'}</h2><p>${left.length?`${done?`${done} hotovo · `:''}${left.length} ještě čeká.`:`Všech ${count} nových úrovní máš hotových.`}</p></div></div><div class="new-content-actions"><button id="playNewContentBtn" class="primary-btn">${left.length?'Hrát novinky':'Zahrát znovu'}</button></div>`;
+ root.classList.remove('hidden');$('#playNewContentBtn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
 }
 
 function renderFree(){
@@ -2090,7 +2090,7 @@ function bind(){
  $('#skipOnboardingBtn').onclick=()=>closeOnboarding(false);$('#onboardNextBtn').onclick=onboardingNext;
  $$('.leader-tab').forEach(b=>b.onclick=()=>{leaderTab=b.dataset.leaderTab;$$('.leader-tab').forEach(x=>x.classList.toggle('active',x===b));renderLeaderboard()});
  $$('.league-scope-tab').forEach(b=>b.onclick=()=>{leagueScope=b.dataset.leagueScope;renderLeaderboard()});$$('.global-week-tab').forEach(b=>b.onclick=()=>{globalWeekOffset=Number(b.dataset.weekOffset||0);$$('.global-week-tab').forEach(x=>x.classList.toggle('active',x===b));renderGlobalLeague()});$('#familyLeagueSettingsBtn').onclick=openFamilyLeagueModal;$('#closeFamilyLeagueModal').onclick=()=>$('#familyLeagueModal').classList.add('hidden');$('#enableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(true);$('#disableFamilyLeagueBtn').onclick=()=>saveFamilyLeagueSettings(false);$('#leaveTeamBtn').onclick=leaveCurrentTeam;$('#closeRankingPrivacyModal').onclick=()=>$('#rankingPrivacyModal').classList.add('hidden');$('#acceptRankingPrivacyBtn').onclick=()=>saveRankingVisibility(true);$('#hideRankingPrivacyBtn').onclick=()=>saveRankingVisibility(false);
- $('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
+ $('#openAllGamesBtn').onclick=()=>nav('free');$('#pushToggleBtn').onclick=togglePushReminder;$('#pushNudgeEnableBtn').onclick=acceptPushNudge;$('#pushNudgeLaterBtn').onclick=dismissPushNudge;$('#installAppBtn').onclick=openInstallFromProfile;$('#installNudgePrimary').onclick=acceptInstallNudge;$('#installNudgeLater').onclick=dismissInstallNudge;$('#closePlayedLevelsModal').onclick=()=>$('#playedLevelsModal').classList.add('hidden');$('#closeLevelDetailModal').onclick=()=>$('#levelDetailModal').classList.add('hidden');$('#levelDetailReplayBtn').onclick=()=>{const c=levelDetailContext;if(!c)return;const p=sortedFreeBank(c.difficulty).find(x=>x.id===c.puzzleId);if(!p)return;$('#levelDetailModal').classList.add('hidden');$('#playedLevelsModal').classList.add('hidden');startGame(p,'free')};$('#levelDetailShareBtn').onclick=shareLevelDetail;
  $$('[data-difficulty-rating]').forEach(b=>b.onclick=()=>rateDifficulty(+b.dataset.difficultyRating,b));$('#reportWordBtn').onclick=openWordReport;$('#closeWordReportModal').onclick=()=>$('#wordReportModal').classList.add('hidden');$('#saveWordReportBtn').onclick=saveWordReport;$('#applyUpdateBtn').onclick=applyPendingUpdate;
  $('#reportIssueBtn').onclick=openSupportReport;$('#closeSupportReportModal').onclick=()=>$('#supportReportModal').classList.add('hidden');$('#saveSupportReportBtn').onclick=saveSupportReport;$('#supportReportModal').onclick=e=>{if(e.target===$('#supportReportModal'))$('#supportReportModal').classList.add('hidden')};$('#exportDataBtn').onclick=exportAccountData;$('#deleteAccountBtn').onclick=openDeleteAccount;$('#closeDeleteAccountModal').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#cancelDeleteAccountBtn').onclick=()=>$('#deleteAccountModal').classList.add('hidden');$('#confirmDeleteAccountBtn').onclick=deleteAccount;$('#deleteAccountModal').onclick=e=>{if(e.target===$('#deleteAccountModal'))$('#deleteAccountModal').classList.add('hidden')};
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('#tajenkaRulesModal').classList.contains('hidden')){closeTajenkaRules();return}const guard=$('#progressGuardModal'),support=$('#supportReportModal'),deletion=$('#deleteAccountModal');if(guard&&!guard.classList.contains('hidden')){dismissProgressGuard();return}if(support&&!support.classList.contains('hidden')){support.classList.add('hidden');return}if(deletion&&!deletion.classList.contains('hidden'))deletion.classList.add('hidden')});

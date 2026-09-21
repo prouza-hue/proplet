@@ -1,5 +1,5 @@
 /* Completed Tajenka card: lighter hierarchy and Daily-style challenge action. */
-html.tiskarna-ui .new-content-banner .eyebrow{
+html.tiskarna-ui #newContentBanner .eyebrow{
   display:none!important;
 }
 

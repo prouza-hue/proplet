@@ -58,7 +58,7 @@
   }
 
   function polishWeeklyBanner(){
-    document.querySelectorAll('.new-content-banner .eyebrow').forEach(el=>el.remove());
+    q('#newContentBanner .eyebrow')?.remove();
   }
 
   function polishHintBanner(){
