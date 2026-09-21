@@ -28,7 +28,7 @@ assert baseline ^ consolidated, "13A must be either baseline or fully consolidat
 theme_boot_match = re.search(r'<script src="(/theme-init\.js\?v=[^"]+)"', index)
 assert theme_boot_match, "theme-init bootstrap missing"
 theme_boot = theme_boot_match.group(1)
-assert index.index(theme_boot) < index.index('/styles.css?v=uipolish1')
+assert index.index(theme_boot) < index.index('/styles.css?v=todaynews2')
 assert '/quality-v334.css?v=4' in index
 
 # Gesture ownership is intentionally not refactored in 13A because this file also owns onboarding.
