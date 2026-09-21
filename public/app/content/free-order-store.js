@@ -3,7 +3,7 @@
 'use strict';
 function create(d){
  const E=d.engine, prefix='proplet-free-order-v1:', busy=new Map();
- let enabled=false, loadedIdentity=null, resumeIds={};
+ let enabled=false, loadedIdentity=null, resumeIds={},configured=false,configureJob=null;
  try{const c=JSON.parse(d.storage.getItem(prefix+'capability')||'null');enabled=c?.version===E.VERSION&&c.enabled===true}catch{}
  const scope=()=>d.profile()?.id||'guest';
  const identity=p=>p?.id&&p?.token?p.id+':'+p.token:'guest';
@@ -25,11 +25,16 @@ function create(d){
     ids:r.plan?.ids||[],import_guest:importGuest,newcomer:!!r.newcomer};
   return save(diff,r);
  }
- async function configure(){
-  try{const c=await d.api('/api/free-order/config');enabled=c.enabled===true;d.storage.setItem(prefix+'capability',JSON.stringify({version:E.VERSION,enabled}));if(c.isolatedPreview)d.isolated?.();}
-  catch{} // Keep a previously verified capability during a transient disconnect.
-  if(enabled)try{await newAccount(d.profile())}catch{}
-  changed();return enabled;
+ async function configure({force=false}={}){
+  if(configured&&!force)return enabled;
+  if(configureJob)return configureJob;
+  const job=(async()=>{
+   try{const c=await d.api('/api/free-order/config');enabled=c.enabled===true;d.storage.setItem(prefix+'capability',JSON.stringify({version:E.VERSION,enabled}));if(c.isolatedPreview)d.isolated?.();configured=true;}
+   catch{} // Keep a previously verified capability during a transient disconnect.
+   if(enabled)try{await newAccount(d.profile())}catch{}
+   changed();return enabled;
+  })().finally(()=>{if(configureJob===job)configureJob=null});
+  configureJob=job;return job;
  }
  async function sync(){
   const p=d.profile(),id=identity(p);if(!enabled||!p?.token)return;

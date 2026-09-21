@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-todaymoz1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-pollfix1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -661,7 +661,7 @@ function applyScreen(screen){
  if(prev==='game'&&screen!=='game'){releaseGameWakeLock();pauseGameClock('menu');if(currentGame?.mode!=='rescue'){saveGameProgress();sendAttemptCheckpoint('leave')}trackTajenkaAbandon();stopTimer()}
  currentScreen=screen;$$('.screen').forEach(x=>x.classList.remove('active'));$(`#screen-${screen}`).classList.add('active');
  document.body.classList.toggle('playing',screen==='game');$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));$('.bottom-nav').classList.toggle('hidden',screen==='game');
- if(screen==='daily'){renderDaily();refreshRescueStatus()}if(screen==='free')renderFree();if(screen==='leaderboard')renderLeaderboard();if(screen==='profile')renderProfile({focusRoadmap:prev!=='profile'});if(screen==='game')requestAnimationFrame(fitGameBoard);else window.scrollTo({top:0,behavior:'instant'});
+ if(screen==='daily'){renderDaily();refreshRescueStatus()}if(screen==='free'){renderFree();if(prev!==screen)refreshFreeOrder()}if(screen==='leaderboard')renderLeaderboard();if(screen==='profile')renderProfile({focusRoadmap:prev!=='profile'});if(screen==='game')requestAnimationFrame(fitGameBoard);else window.scrollTo({top:0,behavior:'instant'});
  if(screen!==prev&&screen!=='game')trackProductEvent(`screen_${screen}_viewed`);
  document.dispatchEvent(new CustomEvent('proplet:screen-changed',{detail:{screen}}));
 }
@@ -780,7 +780,21 @@ function freeProgress(diff){const q=progression().freeProgress(diff);q.nextUnsol
 async function changeFreeOrder(diff,mode){
  saveGameProgress();try{await freeOrder().change(diff,mode)}catch(e){showToast('Volbu se nepodařilo synchronizovat: '+e.message)}
 }
-async function refreshFreeOrder(){try{await freeOrder().configure();await freeOrder().sync()}catch{}}
+const FREE_ORDER_RESUME_REFRESH_MS=5*60*1000;
+let freeOrderRefreshRequest=null,freeOrderLastRefreshAt=0;
+async function refreshFreeOrder({forceConfig=false,minAgeMs=FREE_ORDER_RESUME_REFRESH_MS}={}){
+ if(!navigator.onLine||currentScreen==='game')return false;
+ const now=Date.now();
+ if(minAgeMs>0&&freeOrderLastRefreshAt&&now-freeOrderLastRefreshAt<minAgeMs)return false;
+ if(freeOrderRefreshRequest)return freeOrderRefreshRequest;
+ const job=(async()=>{try{
+  await freeOrder().configure({force:forceConfig});
+  await freeOrder().sync();
+  freeOrderLastRefreshAt=Date.now();
+  return true;
+ }catch{return false}})().finally(()=>{if(freeOrderRefreshRequest===job)freeOrderRefreshRequest=null});
+ freeOrderRefreshRequest=job;return job;
+}
 
 function localMozkomorBaseDone(){
  const slots=localFreeSlotState('hardcore');
@@ -2275,9 +2289,14 @@ async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  try{puzzleDB=await loadPuzzleDatabase()}catch{$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
  await loadTajenkaFixture();
- await freeOrder().configure();
+ await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
  document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);const initialRollingContent=refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();initialRollingContent.finally(()=>setTimeout(()=>{if(!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'))},80));
- window.addEventListener('online',refreshFreeOrder);window.addEventListener('focus',refreshFreeOrder);window.addEventListener('storage',()=>{renderFree();renderQuickPlay()});setInterval(()=>{if(document.visibilityState==='visible'&&navigator.onLine)refreshFreeOrder()},30000);
+ const refreshFreeOrderAfterResume=()=>refreshFreeOrder({forceConfig:true});
+ window.addEventListener('online',()=>refreshFreeOrder({forceConfig:true,minAgeMs:0}));
+ window.addEventListener('focus',refreshFreeOrderAfterResume);
+ window.addEventListener('pageshow',refreshFreeOrderAfterResume);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshFreeOrderAfterResume()});
+ window.addEventListener('storage',()=>{renderFree();renderQuickPlay()});
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(navigator.onLine){productAnalytics()?.flush();if(getQueue().length)syncQueue({announce:false})}},60000);
 }
