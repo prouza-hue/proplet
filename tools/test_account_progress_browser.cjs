@@ -37,6 +37,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   assert.equal(await page.evaluate(()=>freeProgress('hardcore').done),3);
   assert.equal(await page.evaluate(()=>latestContentUnplayed().length),0);
   assert(await page.locator('#newContentBanner').textContent().then(t=>t.includes('Týdenní várka dohraná')));
+  assert(await page.locator('#todayNewContentBanner').evaluate(e=>e.classList.contains('hidden')),'Today must hide a fully completed weekly batch');
+  assert.equal(await page.locator('#todayNewContentBanner').textContent(),'');
   assert(await page.locator('#tajenkaPreviewCard.completed [data-tajenka-recap]').count());
   assert.equal(await page.locator('#quickPlayCard').getAttribute('aria-busy'),'false');
   await page.evaluate(()=>startFree('hardcore'));await page.waitForFunction(()=>currentGame?.puzzle.meta.level===4);
