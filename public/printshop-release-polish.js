@@ -104,6 +104,7 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
 
   function installWeeklyBannerIcon(){
     for(const spark of document.querySelectorAll('.new-content-banner .new-content-spark')){
+      spark.closest('.new-content-banner')?.querySelector('.eyebrow')?.remove();
       if(spark.dataset.weeklyIconReady==='1')continue;
       spark.textContent='';
       const img=document.createElement('img');
