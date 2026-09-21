@@ -147,14 +147,14 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   function syncTajenkaDailyPlacement(){
-    const card=q('#tajenkaPreviewCard'),screen=q('#screen-daily'),hero=q('#screen-daily .daily-hero');
+    const card=q('#tajenkaPreviewCard'),screen=q('#screen-daily'),anchor=q('#todayNewContentBanner')||q('#screen-daily .daily-hero');
     if(!card||!screen)return;
     card.querySelector('.tajenka-entry-copy>.eyebrow')?.remove();
     if(card.classList.contains('hidden'))return;
     if(card.classList.contains('completed')){
       if(screen.lastElementChild!==card)screen.appendChild(card);
-    }else if(hero&&hero.nextElementSibling!==card){
-      hero.insertAdjacentElement('afterend',card);
+    }else if(anchor&&anchor.nextElementSibling!==card){
+      anchor.insertAdjacentElement('afterend',card);
     }
     installTajenkaIcon(card);
   }
