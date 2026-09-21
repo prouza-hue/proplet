@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-todaynews2';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-todaynews3';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -825,6 +825,7 @@ function renderNewContentBanner(selector='#newContentBanner'){
  const root=$(selector);if(!root)return;root.classList.add('hidden');root.innerHTML='';
  const batch=latestContentBatch();if(!batch||!latestContentIsFresh())return;
  const all=latestContentPuzzles(),left=latestContentUnplayed(),done=Math.max(0,all.length-left.length),count=Number(batch.count)||all.length||5;
+ if(root.id==='todayNewContentBanner'&&!left.length)return;
  root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>${left.length?`${count} nových Propletů je tady`:'Týdenní várka dohraná'}</h2><p>${left.length?`${done?`${done} hotovo · `:''}${left.length} ještě čeká.`:`Všech ${count} nových úrovní máš hotových.`}</p></div></div><div class="new-content-actions"><button id="${root.id==='newContentBanner'?'playNewContentBtn':'playTodayNewContentBtn'}" class="primary-btn">${left.length?'Hrát novinky':'Zahrát znovu'}</button></div>`;
  root.classList.remove('hidden');root.querySelector('.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
 }
