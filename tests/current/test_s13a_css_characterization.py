@@ -58,7 +58,7 @@ for hook in (
     assert hook in index, hook
 
 # Base stylesheet debt is frozen, not silently "cleaned up" during the screen-owner move.
-assert len(re.findall(r"!important", styles)) == 98 # Three scoped overrides keep the background sync notice unobtrusive.
+assert len(re.findall(r"!important", styles)) == 99 # One scoped Today-news eyebrow override plus the existing background-sync overrides.
 
 if baseline:
     game = read("public/game-layout-v3323.css")
