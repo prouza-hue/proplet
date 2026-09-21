@@ -105,10 +105,7 @@
   function renderHomeQuickPlay(){
     const root=document.querySelector('#quickPlayGrid'),card=document.querySelector('#quickPlayCard');
     if(!root||!card||typeof puzzleDB==='undefined'||!puzzleDB)return;
-    const head=card.querySelector('.quick-play-head'),title=head?.querySelector('h2'),all=head?.querySelector('#openAllGamesBtn');
     card.classList.add('home-free-section');
-    if(title)title.textContent='Volná hra';
-    if(all)all.innerHTML='Všechny hry <span>→</span>';
     root.innerHTML=`<div class="today-grid">${difficultyTiles()}</div>`;
     root.querySelectorAll('[data-home-free]').forEach(btn=>btn.addEventListener('click',()=>startFree(btn.dataset.homeFree)));
   }

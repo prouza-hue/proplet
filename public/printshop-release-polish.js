@@ -103,8 +103,8 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   function installWeeklyBannerIcon(){
-    const spark=q('#newContentBanner .new-content-spark');
-    if(!spark||spark.dataset.weeklyIconReady==='1')return;
+    for(const spark of document.querySelectorAll('.new-content-banner .new-content-spark')){
+    if(spark.dataset.weeklyIconReady==='1')continue;
     spark.textContent='';
     const img=document.createElement('img');
     img.loading='lazy';
@@ -119,6 +119,7 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
     img.style.objectFit='contain';
     spark.appendChild(img);
     spark.dataset.weeklyIconReady='1';
+    }
   }
 
   function installTajenkaIcon(root=q('#tajenkaPreviewCard')){
