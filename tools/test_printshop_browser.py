@@ -89,6 +89,7 @@ with sync_playwright() as p:
           const today=document.querySelector('#todayNewContentBanner'),free=document.querySelector('#newContentBanner');
           return {
             directlyBelowDaily:document.querySelector('.daily-hero').nextElementSibling===today,
+            separated:today.classList.contains('hidden') || today.getBoundingClientRect().top-document.querySelector('.daily-hero').getBoundingClientRect().bottom>=12,
             sameVisibility:today.classList.contains('hidden')===free.classList.contains('hidden'),
             sameContent:today.textContent===free.textContent,
             sameArtwork:today.querySelector('img')?.getAttribute('src')===free.querySelector('img')?.getAttribute('src'),
