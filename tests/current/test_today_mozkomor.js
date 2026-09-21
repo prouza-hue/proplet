@@ -23,11 +23,18 @@ const bannerCtx={$:selector=>roots[selector.slice(1)],latestContentBatch:()=>({c
 vm.createContext(bannerCtx);vm.runInContext(app.slice(app.indexOf('function renderNewContentBanner('),app.indexOf('\nfunction renderFree(')),bannerCtx);
 for(const count of [5,2,0]){
  remaining=count;bannerCtx.renderNewContentBanner();bannerCtx.renderNewContentBanner('#todayNewContentBanner');
- assert.equal(roots.newContentBanner.innerHTML.replace('playNewContentBtn','playTodayNewContentBtn'),roots.todayNewContentBanner.innerHTML);
- assert.equal(roots.todayNewContentBanner.hidden,false);
- assert(roots.todayNewContentBanner.innerHTML.includes(count?'Hrát novinky':'Týdenní várka dohraná'));
+ if(count){
+  assert.equal(roots.newContentBanner.innerHTML.replace('playNewContentBtn','playTodayNewContentBtn'),roots.todayNewContentBanner.innerHTML);
+  assert.equal(roots.todayNewContentBanner.hidden,false);
+  assert(roots.todayNewContentBanner.innerHTML.includes('Hrát novinky'));
+ }else{
+  assert.equal(roots.newContentBanner.hidden,false);
+  assert(roots.newContentBanner.innerHTML.includes('Týdenní várka dohraná'));
+  assert.equal(roots.todayNewContentBanner.hidden,true);
+  assert.equal(roots.todayNewContentBanner.innerHTML,'');
+ }
 }
-roots.newContentBanner.button.onclick();roots.todayNewContentBanner.button.onclick();assert.equal(started,2);assert.equal(tracked,2);
+remaining=2;bannerCtx.renderNewContentBanner();bannerCtx.renderNewContentBanner('#todayNewContentBanner');roots.newContentBanner.button.onclick();roots.todayNewContentBanner.button.onclick();assert.equal(started,2);assert.equal(tracked,2);
 fresh=false;bannerCtx.renderNewContentBanner();bannerCtx.renderNewContentBanner('#todayNewContentBanner');
 for(const root of Object.values(roots)){assert.equal(root.hidden,true);assert.equal(root.innerHTML,'')}
 assert(index.indexOf('id="todayNewContentBanner"')>index.indexOf('id="dailySyncStatus"'));
