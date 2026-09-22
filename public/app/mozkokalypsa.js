@@ -139,10 +139,13 @@ async function resolveConflict(id){
 }
 async function launch(id){
  if(!status?.eligible||launching)return;
+ const owner=scope(),qa=!!status.qa;
  launching=true;
  try{
   await flush();
-  const response=await request(status.qa?`/board/${id}?qa=true`:`/open/${id}`,status.qa?{}:{method:'POST'});
+  if(owner!==scope()||!status?.eligible)return;
+  const response=await request(qa?`/board/${id}?qa=true`:`/open/${id}`,qa?{}:{method:'POST'});
+  if(owner!==scope()||statusScope!==owner)return;
   let row=stored(id),remote=response.attempt;
   if(!status.qa&&row?.pending?.length){
    if(row.conflict)throw new Error('Tato deska byla změněna na jiném zařízení. Místní postup je zachovaný; otevři ji na původním zařízení.');

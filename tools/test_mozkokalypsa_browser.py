@@ -15,6 +15,9 @@ with sync_playwright() as pw:
   page.goto(origin+'/?mozkokalypsa=preview',wait_until='domcontentloaded')
   page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for();page.wait_for_function('!!puzzleDB && document.documentElement.classList.contains("proplet-current-ui-ready")');page.wait_for_timeout(500)
   page.screenshot(path=str(args.output/'01-invite-mobile.png'),full_page=True)
+  page.evaluate("document.documentElement.dataset.theme='dark'")
+  page.screenshot(path=str(args.output/'01b-invite-dark-mobile.png'),full_page=True)
+  page.evaluate("document.documentElement.dataset.theme='light'")
   assert page.locator('#onboardingModal').get_attribute('class').find('hidden')>=0
   baseline=page.evaluate('JSON.stringify({completed:getState().completed,inProgress:getState().inProgress,queue:getQueue()})')
   page.locator('#mkInviteButton').click();page.locator('#mkBoardList button').first.click()

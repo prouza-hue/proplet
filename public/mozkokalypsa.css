@@ -22,3 +22,8 @@
 html[data-theme=dark] .mk-invite{--mk-wash:#342C3A;--mk-ink:#D49BAB}
 html[data-theme=dark] .mk-invite .primary-btn,html[data-theme=dark] .mk-pilot-modal .primary-btn{background:#BF8198;border-color:#BF8198;color:#231E2D}
 @media(max-width:600px){.mk-invite{grid-template-columns:52px minmax(0,1fr);padding:16px;gap:12px}.mk-invite-art{width:52px;height:52px}.mk-invite button,.mk-invite small{grid-column:1/-1}.mk-invite button{width:100%}.mk-invite h2{font-size:20px}.mk-pilot-modal h2{font-size:24px}}
+
+/* Scoped overrides of the legacy printshop card/button rules. */
+html.tiskarna-ui #screen-daily #mozkokalypsaInvite{background:var(--mk-wash)!important;border-left:4px solid var(--mk-ink)!important}
+html.tiskarna-ui #screen-daily #mozkokalypsaInvite .primary-btn{background:#733F57!important;color:#FFF8EF!important;box-shadow:0 3px 0 #4B293C!important}
+html.tiskarna-ui[data-theme=dark] #screen-daily #mozkokalypsaInvite .primary-btn{background:#BF8198!important;color:#231E2D!important;box-shadow:0 3px 0 #674152!important}
