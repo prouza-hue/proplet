@@ -91,6 +91,9 @@ function ensureCalmConfirmation(){
 function openCalmConfirmation(kind){
   ensureCalmConfirmation();calmConfirmKind=kind;
   setText(q('#calmConfirmCopy'),kind==='run'?'Časomíru schováme a tento pokus se nebude počítat do žebříčku. XP a postup zůstávají.':'Nové hry poběží bez časomíry a nebudou se počítat do žebříčku. XP a postup zůstávají.');
+  const pilot=kind==='run'&&typeof currentGame!=='undefined'&&currentGame?.mode==='playtest';
+  if(pilot)setText(q('#calmConfirmCopy'),'Časomíru schováme. Čas a použité nápovědy se dál ukládají pro vyhodnocení playtestu.');
+  setText(q('#cancelCalmBtn'),pilot?'Nechat časomíru':'Zůstat soutěžně');
   q('#calmConfirmModal')?.classList.remove('hidden');setTimeout(()=>q('#confirmCalmBtn')?.focus(),0);
 }
 function closeCalmConfirmation(){q('#calmConfirmModal')?.classList.add('hidden');calmConfirmKind=null}
@@ -116,6 +119,7 @@ function applyCalmRunUi(){
   let g=null;try{g=currentGame}catch{}
   const eligible=!!g&&['daily','free','tajenka','playtest'].includes(g.mode)&&!g.finished,calm=eligible&&g.calmMode===true;
   document.body.classList.toggle('calm-run-v334',calm);
+  if(eligible&&!calm&&g.mode==='playtest')ensureCalmRunButton();
   const btn=q('#calmRunBtn');if(btn){btn.classList.toggle('hidden',!eligible||calm);btn.disabled=false}
 }
 function calmForPayload(body,path){
