@@ -1,0 +1,28 @@
+name: Mozkokalypsa isolated lab
+on:
+  push:
+    branches: [feat/mozkokalypsa-playtest]
+    paths: [.github/workflows/mozkokalypsa-lab.yml]
+permissions:
+  contents: read
+concurrency:
+  group: mozkokalypsa-lab
+  cancel-in-progress: true
+jobs:
+  source-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Archive tracked source for isolated offline authoring
+        run: |
+          mkdir -p /tmp/proplet-snapshot
+          git archive --format=tar HEAD | gzip > /tmp/proplet-snapshot/source.tar.gz
+          git rev-parse HEAD > /tmp/proplet-snapshot/SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mozkokalypsa-source
+          path: /tmp/proplet-snapshot/
+          retention-days: 3
