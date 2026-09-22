@@ -25,41 +25,31 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Apply checked stabilization patch only to authoring branch
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Final narrow repairs on authoring branch
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = 'feat/mozkokalypsa-playtest'
-          test "$(git rev-parse HEAD^)" = '7caf5a15da5b8ed46fe618f5e2c57e5bf1958049'
+          test "$(git rev-parse HEAD^)" = '50353bfb72ea1f378c76055b344373b2121ddb7b'
           python - <<'PY'
-          import base64, hashlib, json, lzma, os, pathlib, urllib.request
-          chunks = ['dc4157be3a94fee6f7afc14264178a581a3c7f24','4a91f9b220def1cbc6d3d1d7c9f3cce952554764']
-          encoded = b''
-          for sha in chunks:
-              req=urllib.request.Request('https://api.github.com/repos/prouza-hue/proplet/git/blobs/'+sha,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
-              with urllib.request.urlopen(req,timeout=30) as response: item=json.load(response)
-              encoded += base64.b64decode(item['content'])
-          patch=lzma.decompress(base64.b64decode(encoded))
-          assert hashlib.sha256(patch).hexdigest()=='42ebf81625e0785257cc5855ba84ff0f99594494863f524b4a5f4f647d39e1da'
-          pathlib.Path('/tmp/mozkokalypsa-fix.patch').write_bytes(patch)
+          from pathlib import Path
+          p=Path('tools/test_v40135_profile_wide_layout.py');s=p.read_text();assert 'theme-init.js?v=todaymoz1' in s;p.write_text(s.replace('theme-init.js?v=todaymoz1','theme-init.js?v=mkpilot3'))
+          p=Path('public/app/mozkokalypsa.js');s=p.read_text();s=s.replace(' launching=true;',' const owner=scope(),qa=!!status.qa;\n launching=true;',1)
+          old="  const response=await request(status.qa?`/board/${id}?qa=true`:`/open/${id}`,status.qa?{}:{method:'POST'});"
+          new="  if(owner!==scope()||!status?.eligible)return;\n  const response=await request(qa?`/board/${id}?qa=true`:`/open/${id}`,qa?{}:{method:'POST'});\n  if(owner!==scope()||statusScope!==owner)return;"
+          assert old in s;s=s.replace(old,new);p.write_text(s)
+          p=Path('public/mozkokalypsa.css');s=p.read_text();s+='\n/* Scoped overrides of the legacy printshop card/button rules. */\nhtml.tiskarna-ui #screen-daily #mozkokalypsaInvite{background:var(--mk-wash)!important;border-left:4px solid var(--mk-ink)!important}\nhtml.tiskarna-ui #screen-daily #mozkokalypsaInvite .primary-btn{background:#733F57!important;color:#FFF8EF!important;box-shadow:0 3px 0 #4B293C!important}\nhtml.tiskarna-ui[data-theme=dark] #screen-daily #mozkokalypsaInvite .primary-btn{background:#BF8198!important;color:#231E2D!important;box-shadow:0 3px 0 #674152!important}\n';p.write_text(s)
+          p=Path('tools/test_mozkokalypsa_browser.py');s=p.read_text();old="  page.screenshot(path=str(args.output/'01-invite-mobile.png'),full_page=True)";new=old+"\n  page.evaluate(\"document.documentElement.dataset.theme='dark'\")\n  page.screenshot(path=str(args.output/'01b-invite-dark-mobile.png'),full_page=True)\n  page.evaluate(\"document.documentElement.dataset.theme='light'\")";assert old in s;s=s.replace(old,new);p.write_text(s)
           PY
-          git apply --check --unidiff-zero /tmp/mozkokalypsa-fix.patch
-          git apply --unidiff-zero /tmp/mozkokalypsa-fix.patch
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5' 'playwright==1.55.0' 'Pillow==11.3.0' 'numpy==2.2.6'
-      - name: Build icon and freeze verified source
-        run: |
-          set -euo pipefail
-          python tools/generate_mozkokalypsa_icon.py
           git diff --check
           git add . ':!.github/workflows'
-          git -c user.name='prouza-hue' -c user.email='prouza@gmail.com' commit -m 'fix: stabilize Mozkokalypsa invite, sync and printshop identity'
+          git -c user.name='prouza-hue' -c user.email='prouza@gmail.com' commit -m 'fix: finalize pilot cache assertion, account boundary and scoped colors'
           git push origin HEAD:feat/mozkokalypsa-playtest
           mkdir -p /tmp/mk-evidence
           git rev-parse HEAD > /tmp/mk-evidence/SOURCE_SHA.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5' 'playwright==1.55.0'
       - name: Current runtime regression
         run: |
           set -euo pipefail
@@ -69,8 +59,11 @@ jobs:
         run: |
           set -euo pipefail
           python tools/test_mozkokalypsa_db.py | tee /tmp/mk-evidence/database.txt
-      - run: python -m playwright install --with-deps chromium
+      - name: Install browser
+        if: ${{ !cancelled() }}
+        run: python -m playwright install --with-deps chromium
       - name: Native browser walkthrough without production credentials
+        if: ${{ !cancelled() }}
         env:
           PROPLET_PLAYTEST_LOCAL_QA: 'true'
           SUPABASE_URL: ''
