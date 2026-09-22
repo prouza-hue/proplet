@@ -25,21 +25,50 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Scope board assertions and disable unprovisioned production pilot
+      - name: Keep help available across pilot boards
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = 'feat/mozkokalypsa-playtest'
-          test "$(git rev-parse HEAD^)" = 'ffabeb9669b58a99d98ab8e6bd191ea35a63ff85'
+          test "$(git rev-parse HEAD^)" = '19ff7205a9c5b7c3994ed223c21da93a1704c126'
           python - <<'PY'
           from pathlib import Path
-          import json
-          p=Path('tools/test_mozkokalypsa_browser.py');s=p.read_text();assert "page.locator('.cell').count()" in s;s=s.replace("page.locator('.cell').count()","page.locator('#board > .cell').count()").replace("f'.cell[data-index=","f'#board > .cell[data-index=");p.write_text(s)
-          p=Path('vercel.json');data=json.loads(p.read_text());data['env']['PROPLET_MOZKOKALYPSA_ENABLED']='false';p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
-          p=Path('docs/playtests/MOZKOKALYPSA-20260922.md');s=p.read_text();s+='\n## Produkční blokace — 22. 9. 2026, 21:20 UTC\nSupabase apply_migration byl odmítnut bezpečnostní kontrolou konektoru OpenAI. Následná read-only kontrola potvrdila, že všechny tři nové tabulky stále neexistují. Migrace nebyla provedena jiným kanálem, žádné pozvánky nebyly vloženy. Produkční přepínač je proto výslovně false; nenahradit tento stav tvrzením, že hráčský playtest běží. Preview QA zůstává read-only a dostupné.\n';p.write_text(s)
+          p=Path('public/quality-v334-core-v40114.js');s=p.read_text()
+          old="  document.body.classList.toggle('calm-run-v334',calm);\n  const btn=q('#calmRunBtn');"
+          new="  document.body.classList.toggle('calm-run-v334',calm);\n  if(eligible&&!calm&&g.mode==='playtest')ensureCalmRunButton();\n  const btn=q('#calmRunBtn');"
+          assert old in s;s=s.replace(old,new)
+          old="  q('#calmConfirmModal')?.classList.remove('hidden');setTimeout(()=>q('#confirmCalmBtn')?.focus(),0);"
+          new="  const pilot=kind==='run'&&typeof currentGame!=='undefined'&&currentGame?.mode==='playtest';\n  if(pilot)setText(q('#calmConfirmCopy'),'Časomíru schováme. Čas a použité nápovědy se dál ukládají pro vyhodnocení playtestu.');\n  setText(q('#cancelCalmBtn'),pilot?'Nechat časomíru':'Zůstat soutěžně');\n"+old
+          assert old in s;s=s.replace(old,new);p.write_text(s)
+          p=Path('tools/test_mozkokalypsa_browser.py');s=p.read_text()
+          old="    page.screenshot(path=str(args.output/'02-full-board-mobile.png'),full_page=True)"
+          new="    page.locator('#calmRunBtn:not(.hidden)').wait_for()\n    page.wait_for_timeout(200)\n    report['checks'].append('calm-button-restored-on-next-board')\n"+old
+          assert old in s;s=s.replace(old,new)
+          old="    page.set_viewport_size({'width':768,'height':1024});page.wait_for_timeout(100)\n    page.screenshot(path=str(args.output/'03-full-board-fold-emulation.png'),full_page=True)"
+          new="""    touch=browser.new_context(viewport={'width':768,'height':1024},has_touch=True,is_mobile=True,storage_state=context.storage_state())
+              tp=touch.new_page();tp.set_default_timeout(15000)
+              tp.on('pageerror',lambda e:report['errors'].append(str(e)))
+              tp.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
+              tp.goto(origin+'/?mozkokalypsa=preview',wait_until='domcontentloaded')
+              tp.wait_for_function('!!puzzleDB && document.documentElement.classList.contains("proplet-current-ui-ready")')
+              tp.locator('#mkInviteButton').click();tp.locator('#mkBoardList button').nth(1).click()
+              tp.wait_for_function("currentGame?.mode==='playtest' && document.body.classList.contains('game-tablet-portrait')")
+              tp.wait_for_timeout(250)
+              assert tp.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+              tp.screenshot(path=str(args.output/'03-full-board-fold-emulation.png'),full_page=True)
+              report['checks'].append('touch-fold-portrait-rail')
+              touch.close();page.bring_to_front()
+              page.wait_for_function('currentGame.pausedAt===null')"""
+          new='\n'.join('    '+line[14:] if line.startswith('              ') else line for line in new.splitlines())
+          assert old in s;s=s.replace(old,new);p.write_text(s)
+          for root in ('public','tests/current','tools'):
+              for p in Path(root).rglob('*'):
+                  if p.is_file() and p.suffix in ('.js','.py','.html'):
+                      s=p.read_text();updated=s.replace('mkpilot3','mkpilot4')
+                      if updated!=s:p.write_text(updated)
           PY
           git diff --check
           git add . ':!.github/workflows'
-          git -c user.name='prouza-hue' -c user.email='prouza@gmail.com' commit -m 'test: complete native pilot checks; keep production activation safely off'
+          git -c user.name='prouza-hue' -c user.email='prouza@gmail.com' commit -m 'fix: preserve pilot calm controls between boards and verify touch rail'
           git push origin HEAD:feat/mozkokalypsa-playtest
           mkdir -p /tmp/mk-evidence
           git rev-parse HEAD > /tmp/mk-evidence/SOURCE_SHA.txt
