@@ -37,3 +37,15 @@ Pouze přesná Vercel preview větev má read-only QA vstup `?mozkokalypsa=previ
 5. Vyhodnocovat izolované tabulky podle experimentu, hráče, skryté skupiny a pořadí. Nedokončení není nula času. Čas posuzovat spolu s počtem slov, nápovědami a subjektivním hodnocením; tři hráči nejsou statistická studie.
 
 Nouzové vypnutí: flag false (s odpovídajícím deployem), případně active=false na pozvánkách. Zachovat výsledky i místní data. Dosavadní produkční banky a pokrok se nevracejí ani nemažou.
+
+## Dotažení před vydáním (22. 9. 2026)
+- Opravena ztráta query parametrů v lokálním přesměrování / → /index.html.
+  To vysvětluje chybějící QA pozvánku v prvním browserovém testu.
+- Čtyři API routy jsou přímo na app, stejně jako ostatní moduly; původní route-inventory kontroly zůstávají.
+- Zápis leave/resume po finish se ignoruje: nezablokuje odeslání zpětné vazby CAS konfliktem.
+- Stejná serverová revize nepřepisuje novější lokálně naspořený čas.
+- Divergentní průběh z jiného zařízení lze výslovně obnovit z cloudu; místní kopie se zálohuje.
+- Vercel flag je verzovaný v vercel.json, stejně jako další stávající přepínače. Preview stále odmítá zápisy a odpojuje produkční DB.
+- Pozvánky v DB jsou poslední aktivační brána. Do jejich vložení nikdo na produkci přístup nemá.
+- Identita: docs/design/MOZKOKALYPSA_PRINTSHOP.md.
+- Nasazení a aktivace jsou v tomto okamžiku ještě neověřené; výsledek se zapíše do samostatného release reportu.

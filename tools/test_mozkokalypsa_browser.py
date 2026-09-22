@@ -12,8 +12,8 @@ with sync_playwright() as pw:
  page.on('pageerror',lambda e:report['errors'].append(str(e)))
  requests=[];page.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
  try:
-  page.goto(origin+'/?mozkokalypsa=preview',wait_until='networkidle')
-  page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for();page.wait_for_timeout(500)
+  page.goto(origin+'/?mozkokalypsa=preview',wait_until='domcontentloaded')
+  page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for();page.wait_for_function('!!puzzleDB && document.documentElement.classList.contains("proplet-current-ui-ready")');page.wait_for_timeout(500)
   page.screenshot(path=str(args.output/'01-invite-mobile.png'),full_page=True)
   assert page.locator('#onboardingModal').get_attribute('class').find('hidden')>=0
   baseline=page.evaluate('JSON.stringify({completed:getState().completed,inProgress:getState().inProgress,queue:getQueue()})')
@@ -31,11 +31,12 @@ with sync_playwright() as pw:
   report['checks'].append('real-pointer-submission')
   page.locator('#hintBtn').click();page.locator('.hint-choice').first.click()
   assert page.evaluate('currentGame.hints')==1
-  if page.locator('#calmRunBtn').is_visible():page.locator('#calmRunBtn').click()
+  page.locator('#calmRunBtn').click()
+  if page.locator('#confirmCalmBtn').is_visible():page.locator('#confirmCalmBtn').click()
   assert page.evaluate('currentGame.calmMode') is True
   page.evaluate("nav('daily')")
   first_id=page.evaluate('currentGame.puzzle.id')
-  page.reload(wait_until='networkidle');page.locator('#mkInviteButton').click();page.locator('#mkBoardList button').first.click()
+  page.reload(wait_until='domcontentloaded');page.wait_for_function('!!puzzleDB');page.locator('#mkInviteButton').click();page.locator('#mkBoardList button').first.click()
   page.wait_for_function("currentGame?.mode==='playtest'")
   assert page.evaluate('currentGame.found.length')==1
   assert page.evaluate('currentGame.hints')==1
@@ -83,6 +84,7 @@ with sync_playwright() as pw:
   try:
    page.screenshot(path=str(args.output/'failure.png'),full_page=True)
    report['body']=page.locator('body').inner_text()
+   report['runtime']=page.evaluate('({url:location.href,pilot:typeof PropletPlaytest,api:typeof window.api,bank:!!puzzleDB,game:currentGame,screen:currentScreen})')
   except Exception:pass
  finally:
   report['requests']=requests

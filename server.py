@@ -1344,8 +1344,10 @@ def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
 
 
 @app.get("/")
-def home():
-    return RedirectResponse(url="/index.html", status_code=307)
+def home(request: Request):
+    # Keep invitation/preview/deep-link parameters on the local FastAPI entry.
+    query = ("?" + request.url.query) if request.url.query else ""
+    return RedirectResponse(url="/index.html" + query, status_code=307)
 
 
 @app.get("/admin")

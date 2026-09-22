@@ -67,3 +67,13 @@ with TestClient(app) as c:
   assert c.post('/api/mozkokalypsa/event',json=dict(event,feedback={'fun':8}),headers=headers).status_code==422
 assert all(name.startswith(('mozkokalypsa_','proplet_mozkokalypsa_')) for name,_ in calls)
 print('PASS 10 unique boards, 133 words, frozen evidence, server-auth cohort, preview/production isolation, forged paths and payloads rejected')
+
+# FastAPI root redirects must retain a preview/invitation query string.
+import server
+with TestClient(server.app) as client:
+ response=client.get('/?mozkokalypsa=preview&open=free',follow_redirects=False)
+ assert response.headers['location']=='/index.html?mozkokalypsa=preview&open=free'
+
+full=bank['boards'][2]
+progress=m.validate_progress({'moves':len(full['answers']),'found':[{'answerIndex':i,**a} for i,a in enumerate(full['answers'])]},full,'finish')
+assert all(0<=a['colorIndex']<12 for a in progress['found'])

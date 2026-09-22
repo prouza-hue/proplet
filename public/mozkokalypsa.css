@@ -1,17 +1,24 @@
-/* Scoped pilot surfaces reuse the existing printshop palette and controls. */
-.mk-invite{padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:8px 18px;align-items:center;margin:14px 0}
+/* Mozkokalypsa: plum ink + copper on Proplet's existing printshop paper. */
+.mk-invite{--mk-ink:#733F57;--mk-wash:#F4E9E2;position:relative;padding:18px 20px;display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px 16px;align-items:center;margin:14px 0;border:1px solid var(--td-line,#D6C8B9);border-left:4px solid var(--mk-ink);background:var(--mk-wash);color:var(--td-ink,#352B26);box-shadow:2px 3px 0 rgba(55,36,34,.09)}
+.mk-invite-art{width:64px;height:64px;display:block;object-fit:contain}
 .mk-invite h2{font-size:21px;line-height:1.2;margin:0 0 7px}
 .mk-invite p{margin:0;line-height:1.45;font-size:15px}
-.mk-invite small{grid-column:1/-1;font-size:12px;opacity:.78;line-height:1.4}
+.mk-invite small{grid-column:2/-1;font-size:14px;color:var(--td-muted,#675D55);line-height:1.4}
 .mk-invite button{white-space:nowrap}
-.mk-pilot-modal .modal-card{width:min(520px,calc(100vw - 28px));max-height:85dvh;overflow:auto;text-align:left}
-.mk-pilot-modal h2{margin:8px 0 12px}
+.mk-invite .primary-btn,.mk-pilot-modal .primary-btn{background:#733F57;color:#FFF8EF;border-color:#733F57}
+.mk-pilot-modal .modal-card{width:min(540px,calc(100vw - 28px));max-height:85dvh;overflow:auto;text-align:left}
+.mk-heading{display:flex;gap:12px;align-items:center;margin:4px 28px 12px 0}
+.mk-heading img{width:48px;height:48px;flex:0 0 48px}
+.mk-pilot-modal h2{margin:0;font-size:26px;line-height:1.2}
 .mk-pilot-modal p{line-height:1.5}
+.mk-pilot-modal small{font-size:14px;line-height:1.45;color:var(--td-muted,#675D55)}
 .mk-board-list{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0}
-.mk-board-link{min-height:48px;font-size:14px}
-.mk-pilot-modal label{display:block;margin:12px 0;font-weight:700;font-size:14px}
-.mk-pilot-modal select,.mk-pilot-modal textarea{display:block;width:100%;margin-top:6px;padding:10px;font:inherit;color:inherit;background:var(--surface,var(--paper,#fff));border:1px solid var(--border,#c9bfae);border-radius:10px}
+.mk-board-link{min-height:48px;font-size:15px}
+.mk-pilot-modal label{display:block;margin:12px 0;font-weight:700;font-size:15px}
+.mk-pilot-modal select,.mk-pilot-modal textarea{display:block;box-sizing:border-box;width:100%;margin-top:6px;padding:10px;font:inherit;color:inherit;background:var(--td-paper,#FFF9EE);border:1px solid var(--td-line,#D6C8B9);border-radius:10px}
 .mk-pilot-modal .mk-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
 .mk-pilot-modal .mk-actions button{flex:1;min-height:46px}
-#mkResultSync{font-size:13px;margin-top:14px}
-@media(max-width:520px){.mk-invite{grid-template-columns:1fr;padding:16px}.mk-invite button{width:100%}.mk-invite h2{font-size:20px}}
+#mkResultSync{font-size:14px;line-height:1.4;margin-top:14px}
+html[data-theme=dark] .mk-invite{--mk-wash:#342C3A;--mk-ink:#D49BAB}
+html[data-theme=dark] .mk-invite .primary-btn,html[data-theme=dark] .mk-pilot-modal .primary-btn{background:#BF8198;border-color:#BF8198;color:#231E2D}
+@media(max-width:600px){.mk-invite{grid-template-columns:52px minmax(0,1fr);padding:16px;gap:12px}.mk-invite-art{width:52px;height:52px}.mk-invite button,.mk-invite small{grid-column:1/-1}.mk-invite button{width:100%}.mk-invite h2{font-size:20px}.mk-pilot-modal h2{font-size:24px}}

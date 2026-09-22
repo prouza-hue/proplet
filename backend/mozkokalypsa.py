@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Header, HTTPException, Request
+from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
 EXPERIMENT = 'mozkokalypsa-20260922-v1'
@@ -74,7 +74,7 @@ def validate_progress(raw,board,kind):
         if item.get('word')!=a['word'] or item.get('path')!=a['path']:
             raise HTTPException(422,'Nález neodpovídá desce.')
         seen.add(i)
-        out['found'].append({'answerIndex':i,'word':a['word'],'path':a['path'],'colorIndex':len(seen)-1})
+        out['found'].append({'answerIndex':i,'word':a['word'],'path':a['path'],'colorIndex':(len(seen)-1)%12})
     for key in ('firstCorrectMs','firstHintMs','lastCorrectMs'):
         val=raw.get(key)
         if val is not None and (type(val) is not int or not 0<=val<=out['elapsedMs']):
@@ -102,7 +102,6 @@ def validate_feedback(raw):
 
 
 def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
-    router=APIRouter(prefix='/api/mozkokalypsa')
 
     def invite(authorization):
         if not enabled():raise HTTPException(404,'Playtest zatím není otevřený.')
@@ -111,7 +110,7 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         if not rows:raise HTTPException(403,'Tento playtest je pouze pro pozvané hráče.')
         return player,rows[0]
 
-    @router.get('/status')
+    @app.get('/api/mozkokalypsa/status')
     def status(request:Request,qa:bool=False,authorization:str|None=Header(default=None)):
         if qa:
             if not preview_allowed():raise HTTPException(403,'Testovací náhled není na produkci dostupný.')
@@ -128,13 +127,13 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         return {'eligible':True,'qa':False,'experimentId':EXPERIMENT,
                 'order':bank()['orders'][cohort['slot']],'attempts':attempts,'name':'Mozkokalypsa'}
 
-    @router.get('/board/{board_id}')
+    @app.get('/api/mozkokalypsa/board/{board_id}')
     def preview_board(board_id:str,qa:bool=False):
         # Read-only, explicit preview route; actual participant start is POST /open.
         if not qa or not preview_allowed():raise HTTPException(403,'Desku lze otevřít pouze přes pozvánku.')
         return {'puzzle':puzzle(board_id),'qa':True}
 
-    @router.post('/open/{board_id}')
+    @app.post('/api/mozkokalypsa/open/{board_id}')
     def open_board(board_id:str,request:Request,authorization:str|None=Header(default=None)):
         player,_=invite(authorization)
         board=puzzle(board_id)
@@ -142,7 +141,7 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         result=db_rpc('proplet_mozkokalypsa_open',{'p_experiment':EXPERIMENT,'p_player':player['id'],'p_board':board_id})
         return {'puzzle':board,'attempt':result}
 
-    @router.post('/event')
+    @app.post('/api/mozkokalypsa/event')
     def record(payload:Event,request:Request,authorization:str|None=Header(default=None)):
         player,_=invite(authorization)
         board=puzzle(payload.board_id)
@@ -155,5 +154,3 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
             'p_feedback':validate_feedback(payload.feedback)})
         if result.get('conflict'):raise HTTPException(409,'Playtest se změnil na jiném zařízení. Otevři desku znovu; místní tahy zůstaly uložené.')
         return result
-
-    app.include_router(router)
