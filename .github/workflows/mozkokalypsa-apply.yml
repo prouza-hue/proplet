@@ -25,48 +25,58 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Apply checked patch only to the isolated authoring branch
+      - name: Apply checked stabilization patch only to authoring branch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           test "$GITHUB_REF_NAME" = 'feat/mozkokalypsa-playtest'
-          test "$(git rev-parse HEAD^)" = '562e879fb8625bdac740f7231812b7e651ebd91d'
+          test "$(git rev-parse HEAD^)" = '7caf5a15da5b8ed46fe618f5e2c57e5bf1958049'
           python - <<'PY'
           import base64, hashlib, json, lzma, os, pathlib, urllib.request
-          chunks = ['4e4359be061f3cce5b2e7ce20ae6a353d8f3e5bc','06014a7fc01002a43b39d50e9720f3825509e2fc','a45aa8b1c58263f06e0dede02a04dfeb13955248','35e89540052a8a2413a8427a86bbb0a0b7989327','bf66e9e4ca6d51b3136e3175843ee5bfd24c3b2d','b93efaefabd51a3c7aeec715940b67aef1a45666','3505ff8c59ae8a8086976f1c05ebb68b1ed0860b']
+          chunks = ['dc4157be3a94fee6f7afc14264178a581a3c7f24','4a91f9b220def1cbc6d3d1d7c9f3cce952554764']
           encoded = b''
           for sha in chunks:
-              req = urllib.request.Request('https://api.github.com/repos/prouza-hue/proplet/git/blobs/'+sha, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
-              with urllib.request.urlopen(req, timeout=30) as response:
-                  item=json.load(response)
+              req=urllib.request.Request('https://api.github.com/repos/prouza-hue/proplet/git/blobs/'+sha,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as response: item=json.load(response)
               encoded += base64.b64decode(item['content'])
           patch=lzma.decompress(base64.b64decode(encoded))
-          assert hashlib.sha256(patch).hexdigest() == '22c725b51bc0fbe48ef91916a777da45d76bc63573c4859f50d18e764708ceb0'
-          pathlib.Path('/tmp/mozkokalypsa.patch').write_bytes(patch)
+          assert hashlib.sha256(patch).hexdigest()=='42ebf81625e0785257cc5855ba84ff0f99594494863f524b4a5f4f647d39e1da'
+          pathlib.Path('/tmp/mozkokalypsa-fix.patch').write_bytes(patch)
           PY
-          git apply --check --unidiff-zero /tmp/mozkokalypsa.patch
-          git apply --unidiff-zero /tmp/mozkokalypsa.patch
-          git diff --check
-          git add . ':!.github/workflows'
-          git -c user.name='prouza-hue' -c user.email='prouza@gmail.com' commit -m 'feat: Mozkokalypsa ten-board native playtest, isolated metrics, default off'
-          git push origin HEAD:feat/mozkokalypsa-playtest
-          mkdir -p /tmp/mk-evidence
-          git rev-parse HEAD > /tmp/mk-evidence/SOURCE_SHA.txt
+          git apply --check --unidiff-zero /tmp/mozkokalypsa-fix.patch
+          git apply --unidiff-zero /tmp/mozkokalypsa-fix.patch
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5' playwright
-      - run: python -m playwright install --with-deps chromium
-      - name: Existing runtime and isolated SQL regression
+      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5' 'playwright==1.55.0' 'Pillow==11.3.0' 'numpy==2.2.6'
+      - name: Build icon and freeze verified source
         run: |
+          set -euo pipefail
+          python tools/generate_mozkokalypsa_icon.py
+          git diff --check
+          git add . ':!.github/workflows'
+          git -c user.name='prouza-hue' -c user.email='prouza@gmail.com' commit -m 'fix: stabilize Mozkokalypsa invite, sync and printshop identity'
+          git push origin HEAD:feat/mozkokalypsa-playtest
+          mkdir -p /tmp/mk-evidence
+          git rev-parse HEAD > /tmp/mk-evidence/SOURCE_SHA.txt
+      - name: Current runtime regression
+        run: |
+          set -euo pipefail
           python tools/test_current.py | tee /tmp/mk-evidence/runtime.txt
+      - name: Isolated database permissions and concurrency
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
           python tools/test_mozkokalypsa_db.py | tee /tmp/mk-evidence/database.txt
+      - run: python -m playwright install --with-deps chromium
       - name: Native browser walkthrough without production credentials
         env:
           PROPLET_PLAYTEST_LOCAL_QA: 'true'
           SUPABASE_URL: ''
           SUPABASE_SECRET_KEY: ''
         run: |
+          set -euo pipefail
           python -m uvicorn server:app --host 127.0.0.1 --port 8765 > /tmp/mk-evidence/server.txt 2>&1 &
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:8765/api/health >/dev/null && break; sleep 1; done
           python tools/test_mozkokalypsa_browser.py --output /tmp/mk-evidence
