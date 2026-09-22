@@ -228,7 +228,7 @@
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=style-recovery1','propletGameLayout');
     loadScript('/gesture-guard-v3325.js?v=fixsep8c','propletGestureGuard');
-    loadScript('/valid-word-feedback-v3330.js?v=10','propletValidWordFeedback');
+    loadScript('/valid-word-feedback-v3330.js?v=mkpilot1','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');

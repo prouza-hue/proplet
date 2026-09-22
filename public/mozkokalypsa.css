@@ -1,0 +1,17 @@
+/* Scoped pilot surfaces reuse the existing printshop palette and controls. */
+.mk-invite{padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:8px 18px;align-items:center;margin:14px 0}
+.mk-invite h2{font-size:21px;line-height:1.2;margin:0 0 7px}
+.mk-invite p{margin:0;line-height:1.45;font-size:15px}
+.mk-invite small{grid-column:1/-1;font-size:12px;opacity:.78;line-height:1.4}
+.mk-invite button{white-space:nowrap}
+.mk-pilot-modal .modal-card{width:min(520px,calc(100vw - 28px));max-height:85dvh;overflow:auto;text-align:left}
+.mk-pilot-modal h2{margin:8px 0 12px}
+.mk-pilot-modal p{line-height:1.5}
+.mk-board-list{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0}
+.mk-board-link{min-height:48px;font-size:14px}
+.mk-pilot-modal label{display:block;margin:12px 0;font-weight:700;font-size:14px}
+.mk-pilot-modal select,.mk-pilot-modal textarea{display:block;width:100%;margin-top:6px;padding:10px;font:inherit;color:inherit;background:var(--surface,var(--paper,#fff));border:1px solid var(--border,#c9bfae);border-radius:10px}
+.mk-pilot-modal .mk-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.mk-pilot-modal .mk-actions button{flex:1;min-height:46px}
+#mkResultSync{font-size:13px;margin-top:14px}
+@media(max-width:520px){.mk-invite{grid-template-columns:1fr;padding:16px}.mk-invite button{width:100%}.mk-invite h2{font-size:20px}}

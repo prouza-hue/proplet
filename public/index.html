@@ -78,6 +78,12 @@
         <div id="dailySyncStatus" class="daily-sync hidden"></div>
       </div>
 
+      <aside id="mozkokalypsaInvite" class="card mk-invite hidden" aria-label="Pozvánka k playtestu Mozkokalypsa">
+        <div><h2 id="mkInviteTitle"></h2><p id="mkInviteCopy"></p></div>
+        <button id="mkInviteButton" class="primary-btn" type="button">Troufám si</button>
+        <small id="mkInviteNote"></small>
+      </aside>
+
       <div id="todayNewContentBanner" class="new-content-banner hidden"></div>
 
       <div id="tajenkaPreviewCard" class="card tajenka-preview-card hidden"></div>
@@ -669,6 +675,25 @@
     <button id="applyUpdateBtn">Aktualizovat</button>
   </div>
 
+
+  <div id="mkHubModal" class="modal mk-pilot-modal hidden" role="dialog" aria-modal="true" aria-labelledby="mkHubTitle">
+    <div class="modal-card"><button id="mkHubClose" class="modal-close" aria-label="Zavřít" type="button">×</button>
+      <h2 id="mkHubTitle">Mozkokalypsa</h2><p id="mkHubNote" class="muted"></p>
+      <div id="mkBoardList" class="mk-board-list"></div>
+      <small>Desky se liší. Zkoušíme, kde začíná ta pravá výzva. Nápověda je v pořádku.</small>
+    </div>
+  </div>
+  <div id="mkResultModal" class="modal mk-pilot-modal hidden" role="dialog" aria-modal="true" aria-labelledby="mkResultTitle">
+    <div class="modal-card"><h2 id="mkResultTitle">Další deska je doma.</h2><p id="mkResultStats"></p>
+      <p class="muted">Jaká byla? Hodnocení je dobrovolné.</p>
+      <label>Náročnost<select id="mkRatingDifficulty"><option value="">Vyber hodnocení</option><option value="1">1 · Lehká</option><option value="2">2 · Spíš lehká</option><option value="3">3 · Tak akorát</option><option value="4">4 · Těžká</option><option value="5">5 · Pořádná výzva</option></select></label>
+      <label>Zábavnost<select id="mkRatingFun"><option value="">Vyber hodnocení</option><option value="1">1 · Nebavila</option><option value="2">2 · Spíš nebavila</option><option value="3">3 · Ušla</option><option value="4">4 · Bavila</option><option value="5">5 · Chci další</option></select></label>
+      <label>Poznámka<textarea id="mkRatingNote" rows="2" maxlength="500" placeholder="Například neznámé slovo, záludné místo…"></textarea></label>
+      <div id="mkResultSync" role="status" aria-live="polite"></div><button id="mkRetrySync" class="text-btn hidden" type="button">Zkusit odeslat znovu</button>
+      <div class="mk-actions"><button id="mkResultMenu" class="secondary-btn" type="button">Pro dnešek stačí</button><button id="mkResultNext" class="primary-btn" type="button">Další deska</button></div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   <link rel="stylesheet" href="/marketing-consent.css?v=2"/>
   <script src="/analytics-init.js"></script>
@@ -680,7 +705,7 @@
   <script src="/app/account/session.js"></script>
   <script src="/app/account/tajenka-storage.js"></script>
   <script src="/app/account/account.js?v=guestcta1"></script>
-  <script src="/app/game/state.js"></script>
+  <script src="/app/game/state.js?v=mkpilot1"></script>
   <script src="/app/game/fair-play.js?v=1"></script>
   <script src="/app/game/board.js?v=starterguide3"></script>
   <script src="/app/game/input.js?v=fix20"></script>
@@ -698,7 +723,9 @@
   <script src="/app/rankings/rankings.js?v=todaymoz1"></script>
   <script src="/ribbon-catalog.js?v=rankprogress1"></script>
   <script src="/ribbon-ui.js?v=icons1"></script>
-  <script src="/app.js?v=todaynews3"></script>
+  <script src="/app.js?v=mkpilot1"></script>
+  <link rel="stylesheet" href="/mozkokalypsa.css?v=1">
+  <script src="/app/mozkokalypsa.js?v=1"></script>
   <script src="/app/marketing.js?v=2"></script>
   <script src="/quality-v334.js?v=calmsettings1"></script>
   <script src="/organic-ui-v4023.js?v=avatareditor1"></script>

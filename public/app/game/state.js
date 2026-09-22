@@ -45,6 +45,7 @@ function create(deps={}){
   }
 
   function restore(puzzle,mode,dailyDate){
+    if(mode==='playtest')return deps.readPlaytestProgress?.(puzzle)||null;
     if(mode==='tajenka')return readTajenkaProgress(puzzle);
     if(mode==='rescue'||mode==='starter')return null;
     const state=readState(),key=challengeKey(mode,puzzle,dailyDate),completed=state.completed?.[key];
@@ -79,6 +80,10 @@ function create(deps={}){
     if(!game||game.finished||game.mode==='rescue'||game.mode==='starter'){
       runHooks('afterPersist',event);
       return false;
+    }
+    if(game.mode==='playtest'){
+      event.kind='playtest';event.saved=deps.writePlaytestProgress?.(game)!==false;
+      runHooks('afterPersist',event);return event.saved;
     }
     if(game.mode==='tajenka'){
       event.kind='tajenka';

@@ -60,6 +60,7 @@ def load_settings() -> Settings:
     if vercel_git_commit_ref == "feat/pestre-poradi-production" or _env("PROPLET_ORDER_TEST_ONLY") == "true":
         if vercel_env != "preview" or _env("SUPABASE_URL").rstrip("/") != "https://eanzztstmwlamwfdskbf.supabase.co":
             raise RuntimeError("Order preview requires the existing isolated test database")
+    playtest_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/mozkokalypsa-playtest"
     data_root = root / "data"
     return Settings(
         root=root,
@@ -69,8 +70,8 @@ def load_settings() -> Settings:
         tablet_landscape_breakpoint_px=RELEASE_TABLET_LANDSCAPE_BREAKPOINT_PX,
         # Preserve the historical parsing exactly: URL only lost trailing
         # slashes and the secret was not whitespace-normalized.
-        supabase_url=os.environ.get("SUPABASE_URL", "").rstrip("/"),
-        supabase_secret_key=os.environ.get("SUPABASE_SECRET_KEY", ""),
+        supabase_url="" if playtest_preview else os.environ.get("SUPABASE_URL", "").rstrip("/"),
+        supabase_secret_key="" if playtest_preview else os.environ.get("SUPABASE_SECRET_KEY", ""),
         vapid_public_key=_env("VAPID_PUBLIC_KEY"),
         vapid_private_key=_env("VAPID_PRIVATE_KEY"),
         vapid_subject=_env("VAPID_SUBJECT", "https://proplet-nine.vercel.app"),

@@ -263,6 +263,7 @@
 
   const creditRunXp=(candidate,points=1)=>{const g=candidate?.game;if(!g||points<=0)return;g.wordDiscoveryXpAwarded=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)+Math.max(0,Number(points)||0);try{if(currentGame===g){if(!g.finished&&typeof saveGameProgress==='function')saveGameProgress();else if(g.finished&&typeof renderRunWinXp==='function')renderRunWinXp(g)}}catch{}};
   const awardDiscovery=async candidate=>{
+    if(candidate?.mode==='playtest')return 'disabled';
     if(rewardDisabled())return 'disabled';
     patchEffectiveStats();
     const key=discoveryRewardKey(candidate.puzzleId,candidate.word);
