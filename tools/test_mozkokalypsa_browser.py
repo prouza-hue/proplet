@@ -26,7 +26,7 @@ with sync_playwright() as pw:
   path=page.evaluate('currentGame.puzzle.answers[0].path')
   points=[]
   for cell in path:
-   box=page.locator(f'.cell[data-index="{cell}"]').bounding_box();points.append((box['x']+box['width']/2,box['y']+box['height']/2))
+   box=page.locator(f'#board > .cell[data-index="{cell}"]').bounding_box();points.append((box['x']+box['width']/2,box['y']+box['height']/2))
   page.mouse.move(*points[0]);page.mouse.down()
   for point in points[1:]:page.mouse.move(*point,steps=2)
   page.mouse.up();page.wait_for_timeout(250)
@@ -48,7 +48,7 @@ with sync_playwright() as pw:
   for n in range(10):
    page.wait_for_function("currentGame?.mode==='playtest' && !currentGame.finished")
    if n==1:
-    assert page.locator('.cell').count()==100
+    assert page.locator('#board > .cell').count()==100
     page.screenshot(path=str(args.output/'02-full-board-mobile.png'),full_page=True)
     page.set_viewport_size({'width':768,'height':1024});page.wait_for_timeout(100)
     page.screenshot(path=str(args.output/'03-full-board-fold-emulation.png'),full_page=True)

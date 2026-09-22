@@ -49,3 +49,6 @@ Nouzové vypnutí: flag false (s odpovídajícím deployem), případně active=
 - Pozvánky v DB jsou poslední aktivační brána. Do jejich vložení nikdo na produkci přístup nemá.
 - Identita: docs/design/MOZKOKALYPSA_PRINTSHOP.md.
 - Nasazení a aktivace jsou v tomto okamžiku ještě neověřené; výsledek se zapíše do samostatného release reportu.
+
+## Produkční blokace — 22. 9. 2026, 21:20 UTC
+Supabase apply_migration byl odmítnut bezpečnostní kontrolou konektoru OpenAI. Následná read-only kontrola potvrdila, že všechny tři nové tabulky stále neexistují. Migrace nebyla provedena jiným kanálem, žádné pozvánky nebyly vloženy. Produkční přepínač je proto výslovně false; nenahradit tento stav tvrzením, že hráčský playtest běží. Preview QA zůstává read-only a dostupné.
