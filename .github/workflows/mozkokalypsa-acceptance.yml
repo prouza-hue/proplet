@@ -1,0 +1,65 @@
+name: Mozkokalypsa acceptance
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'backend/mozkokalypsa.py'
+      - 'data/playtests/**'
+      - 'public/app/mozkokalypsa.js'
+      - 'public/mozkokalypsa.css'
+      - 'public/difficulty/printshop/mozkokalypsa.svg'
+      - 'tests/current/test_mozkokalypsa*'
+      - 'tools/test_mozkokalypsa*'
+      - 'SUPABASE_MOZKOKALYPSA_PLAYTEST.sql'
+      - '.github/workflows/mozkokalypsa-acceptance.yml'
+permissions:
+  contents: read
+concurrency:
+  group: mozkokalypsa-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_USER: proplet_test_admin
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: postgres
+        ports: ['55432:5432']
+        options: --health-cmd "pg_isready -U proplet_test_admin -d postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5' 'playwright==1.55.0'
+      - run: python -m playwright install --with-deps chromium
+      - name: Isolated content, runtime and database checks
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mk-evidence
+          git rev-parse HEAD > /tmp/mk-evidence/SOURCE_SHA.txt
+          node tests/current/test_mozkokalypsa.js
+          python tests/current/test_mozkokalypsa.py
+          python tools/test_mozkokalypsa_db.py | tee /tmp/mk-evidence/database.txt
+      - name: Native browser flow without production credentials
+        env:
+          PROPLET_PLAYTEST_LOCAL_QA: 'true'
+          VERCEL_ENV: preview
+          VERCEL_GIT_COMMIT_REF: feat/mozkokalypsa-playtest
+          SUPABASE_URL: ''
+          SUPABASE_SECRET_KEY: ''
+        run: |
+          set -euo pipefail
+          python -m uvicorn server:app --host 127.0.0.1 --port 8765 > /tmp/mk-evidence/server.txt 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8765/api/health >/dev/null && break; sleep 1; done
+          python tools/test_mozkokalypsa_browser.py --output /tmp/mk-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mozkokalypsa-acceptance
+          path: /tmp/mk-evidence
+          retention-days: 7
