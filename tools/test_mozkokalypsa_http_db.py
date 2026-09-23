@@ -43,20 +43,21 @@ def rpc(name,body):
  return query(sql.SQL('select {}({})').format(sql.Identifier(name),
   sql.SQL(',').join(sql.SQL('{} => %s').format(sql.Identifier(k)) for k in body)),
   [Jsonb(v) if isinstance(v,dict) else v for v in body.values()])[0][0]
-players=[str(uuid.uuid4()) for _ in range(3)]
+players=[str(uuid.uuid4()) for _ in range(4)]
 for i,pid in enumerate(players):
  insert('players',dict(id=pid,name='Synthetic Mozkokalypsa '+str(i),
   family_code='SOLO_'+pid[:8].upper(),token_hash=hashlib.sha256(secrets.token_bytes(32)).hexdigest()))
 # Run the full write flow as an observer sharing a frozen order with a primary tester.
 insert('mozkokalypsa_invites',dict(experiment_id=m.EXPERIMENT,player_id=players[2],slot=0))
 insert('mozkokalypsa_invites',dict(experiment_id=m.EXPERIMENT,player_id=players[0],slot=0,participant_role='observer'))
-for role in ('tester','observer'):
+insert('mozkokalypsa_invites',dict(experiment_id=m.EXPERIMENT,player_id=players[3],slot=0))
+for role in ('observer',):
  try:
   insert('mozkokalypsa_invites',dict(experiment_id=m.EXPERIMENT,player_id=players[1],slot=0,participant_role=role))
  except psycopg.errors.UniqueViolation:
   pass
  else:
-  raise AssertionError('Duplicate cohort slot or second observer allowed')
+  raise AssertionError('Second observer allowed')
 normal_tables=('results','puzzle_runs','puzzle_attempts','account_rewards','streak_rescues','free_slot_rewards')
 def normal_snapshot():
  return {t:[select(t,player_id=pid) for pid in players] for t in normal_tables}
@@ -110,7 +111,7 @@ with ExitStack() as stack:
   assert c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[1]).status_code==403
   assert c.get('/api/mozkokalypsa/status?qa=true',headers=headers[0]).status_code==403
   assert c.get('/api/mozkokalypsa/board/mk26-03?qa=true',headers=headers[0]).status_code==403
-  for idx in (0,2):
+  for idx in (0,2,3):
    status=c.get('/api/mozkokalypsa/status',headers=headers[idx]).json()
    assert status['eligible'] and status['order']==m.bank()['orders'][0]
   opened=c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[0])
