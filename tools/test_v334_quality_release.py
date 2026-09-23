@@ -113,7 +113,7 @@ assert "body.calm-run-v334 #levelLeaderboardBox" in css
 assert 'content:"🫧 Klidný režim"' in css
 assert "!eligible||calm" in client
 assert "/api/attempt/checkpoint" in client
-assert "sendAttemptCheckpoint('resume')" in client
+assert "sendAttemptCheckpoint(currentGame?.mode==='playtest'?'calm':'resume')" in client
 assert "calmModeLeaderboardExcluded:true" in runtime
 
 # Final v4 interaction polish: no obsolete reset, calm-mode confirmation, stable privacy icon.

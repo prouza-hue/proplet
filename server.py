@@ -1344,8 +1344,10 @@ def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
 
 
 @app.get("/")
-def home():
-    return RedirectResponse(url="/index.html", status_code=307)
+def home(request: Request):
+    # Keep invitation/preview/deep-link parameters on the local FastAPI entry.
+    query = ("?" + request.url.query) if request.url.query else ""
+    return RedirectResponse(url="/index.html" + query, status_code=307)
 
 
 @app.get("/admin")
@@ -5062,6 +5064,11 @@ if GEN5_CANDIDATE_PREVIEW:
                 headers={"Cache-Control": "no-store"},
             )
         return await call_next(request)
+
+# Invite-only experiment is isolated from normal result/progress handlers.
+from backend import mozkokalypsa
+mozkokalypsa.install(app,auth_player=auth_player,db_select=db_select,
+                    db_request=db_request,db_rpc=db_rpc,enforce_rate_limit=enforce_rate_limit)
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
 if not os.environ.get("VERCEL"):

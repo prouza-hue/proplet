@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
+        if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -56,6 +56,10 @@ openapi_contract["info"]["version"] = "4.01.35-cloud"
 for order_path in ("/api/free-order", "/api/free-order/config"):
     openapi_contract["paths"].pop(order_path, None)
 openapi_contract.get("components", {}).get("schemas", {}).pop("OrderCommand", None)
+# Invite-only pilot has its own HTTP and frozen-content boundary tests.
+for pilot_path in ('/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event'):
+    openapi_contract["paths"].pop(pilot_path, None)
+openapi_contract.get("components", {}).get("schemas", {}).pop("Event", None)
 
 # Additive authenticated repair endpoint is covered by test_analytics_v2.
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]

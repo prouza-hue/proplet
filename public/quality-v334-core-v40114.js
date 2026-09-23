@@ -91,6 +91,9 @@ function ensureCalmConfirmation(){
 function openCalmConfirmation(kind){
   ensureCalmConfirmation();calmConfirmKind=kind;
   setText(q('#calmConfirmCopy'),kind==='run'?'Časomíru schováme a tento pokus se nebude počítat do žebříčku. XP a postup zůstávají.':'Nové hry poběží bez časomíry a nebudou se počítat do žebříčku. XP a postup zůstávají.');
+  const pilot=kind==='run'&&typeof currentGame!=='undefined'&&currentGame?.mode==='playtest';
+  if(pilot)setText(q('#calmConfirmCopy'),'Časomíru schováme. Čas a použité nápovědy se dál ukládají pro vyhodnocení playtestu.');
+  setText(q('#cancelCalmBtn'),pilot?'Nechat časomíru':'Zůstat soutěžně');
   q('#calmConfirmModal')?.classList.remove('hidden');setTimeout(()=>q('#confirmCalmBtn')?.focus(),0);
 }
 function closeCalmConfirmation(){q('#calmConfirmModal')?.classList.add('hidden');calmConfirmKind=null}
@@ -108,14 +111,15 @@ function setCalmPreference(enabled,{announce=true}={}){
   try{if(typeof trackProductEvent==='function')trackProductEvent(enabled?'calm_preference_enabled':'calm_preference_disabled')}catch{}
   if(announce&&typeof showToast==='function')showToast(enabled?'Klidný režim zapnutý 🫧':'Soutěžní režim je zpátky 🏆');
 }
-function saveCalmIntoProgress(){try{const g=currentGame;if(!g||!['daily','free','tajenka'].includes(g.mode))return;if(g.mode==='tajenka'){if(typeof saveTajenkaGameProgress==='function')saveTajenkaGameProgress(g);return}const key=challengeKey(g.mode,g.puzzle,g.dailyDate),s=getState();if(s.inProgress?.[key]){s.inProgress[key].calmMode=!!g.calmMode;saveState(s)}}catch{}}
+function saveCalmIntoProgress(){try{const g=currentGame;if(!g||!['daily','free','tajenka','playtest'].includes(g.mode))return;if(g.mode==='playtest'){window.PropletPlaytest?.persist(g);return}if(g.mode==='tajenka'){if(typeof saveTajenkaGameProgress==='function')saveTajenkaGameProgress(g);return}const key=challengeKey(g.mode,g.puzzle,g.dailyDate),s=getState();if(s.inProgress?.[key]){s.inProgress[key].calmMode=!!g.calmMode;saveState(s)}}catch{}}
 function enableCalmForCurrentRun(){
-  try{if(!currentGame||currentGame.finished||!['daily','free','tajenka'].includes(currentGame.mode))return;currentGame.calmMode=true;try{if(typeof trackProductEvent==='function')trackProductEvent('calm_run_enabled')}catch{};saveCalmIntoProgress();try{if(typeof sendAttemptCheckpoint==='function')sendAttemptCheckpoint('resume')}catch{};applyCalmRunUi();if(typeof showToast==='function')showToast('Klidný režim zapnutý. Tenhle pokus už není soutěžní 🫧')}catch{}
+  try{if(!currentGame||currentGame.finished||!['daily','free','tajenka','playtest'].includes(currentGame.mode))return;currentGame.calmMode=true;try{if(typeof trackProductEvent==='function')trackProductEvent('calm_run_enabled')}catch{};saveCalmIntoProgress();try{if(typeof sendAttemptCheckpoint==='function')sendAttemptCheckpoint(currentGame?.mode==='playtest'?'calm':'resume')}catch{};applyCalmRunUi();if(typeof showToast==='function')showToast('Klidný režim zapnutý. Tenhle pokus už není soutěžní 🫧')}catch{}
 }
 function applyCalmRunUi(){
   let g=null;try{g=currentGame}catch{}
-  const eligible=!!g&&['daily','free','tajenka'].includes(g.mode)&&!g.finished,calm=eligible&&g.calmMode===true;
+  const eligible=!!g&&['daily','free','tajenka','playtest'].includes(g.mode)&&!g.finished,calm=eligible&&g.calmMode===true;
   document.body.classList.toggle('calm-run-v334',calm);
+  if(eligible&&!calm&&g.mode==='playtest')ensureCalmRunButton();
   const btn=q('#calmRunBtn');if(btn){btn.classList.toggle('hidden',!eligible||calm);btn.disabled=false}
 }
 function calmForPayload(body,path){
@@ -140,7 +144,7 @@ function installGameWrappers(){
     id:'quality-calm-session-v40114',
     priority:20,
     beforeStart(event){
-      const eligible=event.mode==='daily'||event.mode==='free'||event.mode==='tajenka',calm=eligible&&(event.restored?.calmMode===true||event.options?.calmMode===true||calmPreference());
+      const eligible=event.mode==='daily'||event.mode==='free'||event.mode==='tajenka'||event.mode==='playtest',calm=eligible&&(event.restored?.calmMode===true||event.options?.calmMode===true||calmPreference());
       event.data.calmMode=calm;event.data.calmEligible=eligible;pendingCalmLaunch=calm;
     },
     afterStart(event){

@@ -72,7 +72,7 @@ EXPECTED_INSTALLER_ROUTES = (
 route_keys = [
     (method, route.path)
     for route in server.app.routes
-    if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
+    if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
     for method in (route.methods or ())
 ]
 for expected in EXPECTED_INSTALLER_ROUTES:
@@ -81,7 +81,7 @@ for expected in EXPECTED_INSTALLER_ROUTES:
 route_snapshot = sorted(
     (route.path, tuple(sorted(route.methods or ())), route.name)
     for route in server.app.routes
-    if route.path and route.path not in {"/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
+    if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
 )
 assert _digest(route_snapshot) == "f57b2cb7fee7e4cbcd81be61e6156c81716ece6e19e69033506b3b3318053bc6"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
@@ -102,6 +102,10 @@ openapi_contract["info"]["version"] = "4.01.35-cloud"
 for order_path in ("/api/free-order", "/api/free-order/config"):
     openapi_contract["paths"].pop(order_path, None)
 openapi_contract.get("components", {}).get("schemas", {}).pop("OrderCommand", None)
+# Invite-only pilot has its own HTTP and frozen-content boundary tests.
+for pilot_path in ('/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event'):
+    openapi_contract["paths"].pop(pilot_path, None)
+openapi_contract.get("components", {}).get("schemas", {}).pop("Event", None)
 
 openapi_digest = _digest(openapi_contract)
 # Tajenka v2 intentionally extends the API schema while preserving the route inventory.
