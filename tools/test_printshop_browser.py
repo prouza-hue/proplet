@@ -88,7 +88,7 @@ with sync_playwright() as p:
         news=page.evaluate("""()=>{
           const today=document.querySelector('#todayNewContentBanner'),free=document.querySelector('#newContentBanner');
           return {
-            directlyBelowDaily:[...document.querySelector('#screen-daily').children].filter(el=>el.getClientRects().length).indexOf(today)===[...document.querySelector('#screen-daily').children].filter(el=>el.getClientRects().length).indexOf(document.querySelector('.daily-hero'))+1,
+            directlyBelowDaily:document.querySelector('.daily-hero').nextElementSibling===document.querySelector('#mozkokalypsaInvite') && document.querySelector('#mozkokalypsaInvite').nextElementSibling===today,
             pilotHidden:document.querySelector('#mozkokalypsaInvite').classList.contains('hidden'),
             separated:today.classList.contains('hidden') || today.getBoundingClientRect().top-document.querySelector('.daily-hero').getBoundingClientRect().bottom>=12,
             sameVisibility:today.classList.contains('hidden')===free.classList.contains('hidden'),
