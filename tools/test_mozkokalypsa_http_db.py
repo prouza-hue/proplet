@@ -1,8 +1,10 @@
 """Authenticated HTTP -> real PostgreSQL release test, synthetic loopback DB only.
-The PostgREST wire transport is replaced by a SQL adapter; session validation,
-pilot HTTP handlers, validation, RPC, RLS and persistence are real.
+Session validation, pilot HTTP handlers, PostgREST HTTP transport, JWT role,
+RPC, RLS and persistence are real. Only Supabase gateway routing is local.
 """
-import argparse, hashlib, json, os, secrets, sys, uuid
+import argparse, base64, hashlib, hmac, json, os, secrets, sys, uuid, subprocess, time, threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import httpx
 from contextlib import ExitStack
 from pathlib import Path
 from unittest.mock import patch
@@ -50,16 +52,47 @@ normal_tables=('results','puzzle_runs','puzzle_attempts','account_rewards','stre
 def normal_snapshot():
  return {t:[select(t,player_id=pid) for pid in players] for t in normal_tables}
 before=normal_snapshot()
+# Dedicated loopback PostgREST with a disposable JWT key and schema.
+jwt_secret=secrets.token_urlsafe(40)
+def b64(value):return base64.urlsafe_b64encode(value).rstrip(b'=').decode()
+unsigned=b64(b'{"alg":"HS256","typ":"JWT"}')+'.'+b64(json.dumps({'role':'service_role','exp':int(time.time())+1800}).encode())
+jwt=unsigned+'.'+b64(hmac.new(jwt_secret.encode(),unsigned.encode(),hashlib.sha256).digest())
+container='mk-rest-'+secrets.token_hex(4)
+subprocess.run(['docker','run','--rm','-d','--name',container,'--network','host',
+ '-e','PGRST_DB_URI=postgres://proplet_test_admin:local-test-only@127.0.0.1:55432/'+report['database'],
+ '-e','PGRST_DB_SCHEMAS=public','-e','PGRST_DB_ANON_ROLE=anon',
+ '-e','PGRST_SERVER_HOST=127.0.0.1','-e','PGRST_SERVER_PORT=55433',
+ '-e','PGRST_JWT_SECRET='+jwt_secret,'postgrest/postgrest:v12.2.3'],check=True,stdout=subprocess.DEVNULL)
+class Gateway(BaseHTTPRequestHandler):
+ def log_message(self,*args):pass
+ def relay(self):
+  assert self.path.startswith('/rest/v1/')
+  body=self.rfile.read(int(self.headers.get('Content-Length','0')))
+  r=httpx.request(self.command,'http://127.0.0.1:55433/'+self.path[len('/rest/v1/'):],
+   content=body,headers={k:v for k,v in self.headers.items() if k.lower() not in ('host','content-length')},timeout=15)
+  self.send_response(r.status_code)
+  self.send_header('Content-Type',r.headers.get('Content-Type','application/json'))
+  self.send_header('Content-Length',str(len(r.content)));self.end_headers();self.wfile.write(r.content)
+ do_GET=do_POST=do_PATCH=do_DELETE=relay
+gateway=ThreadingHTTPServer(('127.0.0.1',55434),Gateway)
+threading.Thread(target=gateway.serve_forever,daemon=True).start()
 with ExitStack() as stack:
+ stack.callback(lambda:subprocess.run(['docker','stop',container],stdout=subprocess.DEVNULL))
+ stack.callback(gateway.shutdown)
+ for _ in range(30):
+  try:
+   if httpx.get('http://127.0.0.1:55433/',headers={'Authorization':'Bearer '+jwt}).status_code==200:break
+  except httpx.HTTPError:pass
+  time.sleep(1)
+ else:raise AssertionError('Local PostgREST did not start')
  stack.enter_context(patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}))
- for name,value in {'db_select':select,'db_insert':insert}.items():
-  stack.enter_context(patch.object(server,name,value))
- stack.enter_context(patch.object(server.DB_HTTP_CLIENT,'request',side_effect=AssertionError('External I/O forbidden')))
+ stack.enter_context(patch.object(server,'SUPABASE_URL','http://127.0.0.1:55434'))
+ stack.enter_context(patch.object(server,'SUPABASE_SECRET_KEY',jwt))
  tokens=[server.new_session(pid) for pid in players]
  headers=[{'Authorization':'Bearer '+t} for t in tokens]
  app=FastAPI()
- m.install(app,auth_player=server.auth_player,db_select=select,db_request=None,
-  db_rpc=rpc,enforce_rate_limit=lambda *a,**kw:None)
+ m.install(app,auth_player=server.auth_player,db_select=server.db_select,db_request=server.db_request,
+  db_rpc=server.db_rpc,enforce_rate_limit=server.enforce_rate_limit)
  with TestClient(app) as c:
   assert c.get('/api/mozkokalypsa/status').json()=={'eligible':False}
   assert c.post('/api/mozkokalypsa/open/mk26-03').status_code==401
@@ -115,5 +148,5 @@ with ExitStack() as stack:
   query('update mozkokalypsa_invites set active=false where player_id=%s returning player_id',(players[0],))
   assert c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[0]).status_code==403
   assert normal_snapshot()==before
-print('PASS authenticated HTTP + PostgreSQL: real custom sessions, invite/anonymous/QA denial, durable metrics, retry, revision conflict, reload recovery, 14-word finish, feedback, revoke; normal XP/results unchanged')
-print('LIMIT: loopback schema and SQL transport adapter; hosted PostgREST and production browser session are not covered by this test')
+print('PASS authenticated HTTP + real PostgREST + PostgreSQL: real custom sessions, invite/anonymous/QA denial, durable metrics, retry, revision conflict, reload recovery, 14-word finish, feedback, revoke; normal XP/results unchanged')
+print('LIMIT: synthetic loopback schema, local gateway routing; hosted production browser session is not covered')
