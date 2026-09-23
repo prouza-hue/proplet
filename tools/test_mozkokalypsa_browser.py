@@ -13,7 +13,7 @@ with sync_playwright() as pw:
  requests=[];page.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
  try:
   page.goto(origin+'/?mozkokalypsa=preview',wait_until='domcontentloaded')
-  page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for();page.wait_for_function('!!puzzleDB && document.documentElement.classList.contains("proplet-current-ui-ready")');page.wait_for_timeout(500)
+  page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for();page.wait_for_function('!!puzzleDB && !document.documentElement.classList.contains("proplet-current-ui-booting") && !document.getElementById("propletBootScreen") && typeof document.querySelector("#mkInviteButton")?.onclick==="function"');page.wait_for_timeout(500)
   page.screenshot(path=str(args.output/'01-invite-mobile.png'),full_page=True)
   page.evaluate("document.documentElement.dataset.theme='dark'")
   page.screenshot(path=str(args.output/'01b-invite-dark-mobile.png'),full_page=True)
@@ -58,7 +58,7 @@ with sync_playwright() as pw:
     tp.on('pageerror',lambda e:report['errors'].append(str(e)))
     tp.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
     tp.goto(origin+'/?mozkokalypsa=preview',wait_until='domcontentloaded')
-    tp.wait_for_function('!!puzzleDB && document.documentElement.classList.contains("proplet-current-ui-ready")')
+    tp.wait_for_function('!!puzzleDB && !document.documentElement.classList.contains("proplet-current-ui-booting") && !document.getElementById("propletBootScreen") && typeof document.querySelector("#mkInviteButton")?.onclick==="function"')
     tp.locator('#mkInviteButton').click();tp.locator('#mkBoardList button').nth(1).click()
     tp.wait_for_function("currentGame?.mode==='playtest' && document.body.classList.contains('game-tablet-portrait')")
     tp.wait_for_timeout(250)
