@@ -90,3 +90,4 @@ jobs:
           python tools/test_fair_play_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_http.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_free_order_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
+          python tools/test_mozkokalypsa_http_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
