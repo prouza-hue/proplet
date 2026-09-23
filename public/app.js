@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-mkpilot4';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-accountretry1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1372,9 +1372,20 @@ async function refreshRemoteProfile({throwOnError=false}={}){
  const p=getProfile();if(!p?.token)return null;
  if(accountProgressRequest&&accountProgressRequest.profile.id===p.id&&accountProgressRequest.profile.token===p.token){try{return await accountProgressRequest.promise}catch(e){if(throwOnError)throw e;return null}}
  accountProgressError=false;renderAccountProgressStatus();
+ async function loadSnapshot(){
+  for(let attempt=0;attempt<2;attempt++){
+   try{return await Promise.all([api('/api/me',{authProfile:p}),api('/api/progress',{authProfile:p})])}
+   catch(e){
+    const status=Number(e?.status||0),retryable=!status||status===408||status===425||status===429||status>=500;
+    if(attempt||navigator.onLine===false||!retryable||!accountProfileMatches(p))throw e;
+    const delay=Math.min(5000,Math.max(1000,Number(e?.retryAfterMs)||0));
+    await new Promise(resolve=>setTimeout(resolve,delay));
+   }
+  }
+ }
  const request={profile:p,promise:null};
  request.promise=(async()=>{try{
-  const [me,progress]=await Promise.all([api('/api/me',{authProfile:p}),api('/api/progress',{authProfile:p})]);
+  const [me,progress]=await loadSnapshot();
   if(!accountProfileMatches(p))return null;
   if(!Array.isArray(progress.completed))throw new Error('Neúplná odpověď postupu');
   mergeRemoteProgress(progress.completed||[],p.id);
