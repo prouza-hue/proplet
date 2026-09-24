@@ -8,11 +8,13 @@
 
   function create({storage, now = Date.now, enabled = () => false, load, send, revoke}) {
     let loaded = false, pageViewed = false;
+    const sentRegistrations = new Set();
     const read = key => {try {return JSON.parse(storage.getItem(key));} catch {return null;}};
     const write = (key, value) => {try {storage.setItem(key, JSON.stringify(value));} catch {}};
     let consent = read(CONSENT_KEY);
     if (!consent || !Number.isFinite(consent.at) || !['granted', 'denied'].includes(consent.value) || now() - consent.at >= MAX_AGE || consent.at > now()) consent = null;
-    function allowed() {return consent?.value === 'granted' && now() - consent.at < MAX_AGE && enabled();}
+    function consented() {return consent?.value === 'granted' && now() - consent.at < MAX_AGE;}
+    function allowed() {return consented() && enabled();}
     function start() {
       if (!allowed()) return;
       try {
@@ -43,7 +45,23 @@
         write(EVENTS_KEY, [...rows, [key, now()]].slice(-1000));
       } catch {}
     }
-    return {start, choose, event, status: () => consent?.value || null};
+    function registration(result) {
+      // The server flag denotes a newly inserted player, not a login/link.
+      if (!allowed() || result?.accountCreated !== true || !/^[a-zA-Z0-9-]{1,64}$/.test(result.id || '')) return;
+      start();
+      if (!loaded) return;
+      const key = `CompleteRegistration:${result.id}`;
+      const saved = read(EVENTS_KEY);
+      const rows = (Array.isArray(saved) ? saved : []).filter(row => Array.isArray(row) && now() - row[1] < MAX_AGE);
+      if (sentRegistrations.has(key) || rows.some(row => row[0] === key)) return;
+      try {
+        // No account ID, name, email, token or submitted form data goes to Meta.
+        send('CompleteRegistration', {}, true);
+        sentRegistrations.add(key);
+        write(EVENTS_KEY, [...rows, [key, now()]].slice(-1000));
+      } catch {}
+    }
+    return {start, choose, event, registration, allowed, consented, status: () => consent?.value || null};
   }
 
   if (typeof module !== 'undefined' && module.exports) module.exports = {create, CONSENT_KEY, EVENTS_KEY};
@@ -84,6 +102,7 @@
       global.fbq('consent', 'grant');
       global.fbq(standard ? 'trackSingle' : 'trackSingleCustom', PIXEL_ID, name, data);
     }});
+  global.PropletMarketing = controller;
   let banner, showTimer;
   function show() {
     if (showTimer) global.clearTimeout(showTimer);

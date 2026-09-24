@@ -18,6 +18,11 @@ def request_context(request, environment):
         if value.tzinfo and now-timedelta(days=7)<=value<=now+timedelta(minutes=5):event_time=min(now,value).isoformat()
     except (ValueError,TypeError):pass
     details = {}
+    # Opt-in campaign metadata is an analytic declaration, never authorization.
+    source = request.headers.get('x-proplet-acquisition-source', '')
+    ids = {key: request.headers.get(f'x-proplet-acquisition-{key}', '') for key in ('campaign', 'ad', 'adset')}
+    if source in {'facebook', 'instagram', 'fb', 'ig'} and all(re.fullmatch(r'\d{5,30}', value) for value in ids.values()):
+        details['acquisition'] = {'source': source, **ids}
     for header, key in [('x-proplet-puzzle','puzzle_id'),('x-proplet-run','run_id')]:
         value=request.headers.get(header,'')
         if re.fullmatch(r'[A-Za-z0-9:._-]{1,120}',value): details[key]=value
@@ -80,4 +85,3 @@ def pages(request, table, *, filters, columns='*'):
         if next_cursor == cursor:
             raise ValueError('Analytics cursor did not advance')
         cursor = next_cursor
-

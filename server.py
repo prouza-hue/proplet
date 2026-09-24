@@ -1802,7 +1802,7 @@ def create_player(payload: PlayerCreate, request: Request):
     return {
         "id": player_id, "name": name, "familyCode": public_family,
         "leagueName": league_name_for(family) if public_family else None, "token": token,
-        "freeOrderNewAccount": free_order_enabled(),
+        "freeOrderNewAccount": free_order_enabled(), "accountCreated": True,
         "hasPassword": bool(payload.password), "avatar": row.get("avatar") or "🙂", "googleLinked": False, "googleAvatarUrl": None, "useGoogleAvatar": False,
         "supportMode": row.get("support_mode") or "none", "publicRankings": row.get("public_rankings"), "stats": stats,
     }
