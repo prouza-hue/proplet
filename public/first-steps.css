@@ -1,0 +1,37 @@
+/* New-player flow only. Preserve the Printshop palette and Fraunces typography. */
+#screen-game.first-steps-training #board{max-width:360px!important;max-height:360px!important;margin:auto!important}
+#screen-game.first-steps-training #starterCoach{border-top:3px solid var(--primary,#2450aa)}
+#screen-game.first-steps-training #starterCoachCopy{max-width:38ch}
+#screen-game.first-steps-training .game-info{opacity:.8}
+#winModal.first-steps-win .win-card{max-width:460px;text-align:center;padding:28px 26px}
+#winModal.first-steps-win #winTitle{font-family:Fraunces,Georgia,serif;font-size:clamp(26px,5vw,34px);line-height:1.15;margin:12px 0}
+#winModal.first-steps-win .win-summary{margin-bottom:18px}
+#firstStepsTrainingReward{display:none}
+html.tiskarna-ui #winModal.first-steps-win.starter-win .win-card{padding:28px 26px!important}
+html.tiskarna-ui #winModal.first-steps-win.starter-win #winTitle{font-family:Fraunces,Georgia,serif!important;font-size:clamp(27px,5vw,34px)!important;line-height:1.15!important;max-width:16ch;margin:0 auto 16px!important;text-wrap:balance}
+html.tiskarna-ui #winModal.first-steps-win.starter-win .win-summary{display:none!important}
+html.tiskarna-ui #winModal.first-steps-win.starter-win #firstStepsTrainingReward{display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 0 24px}
+#firstStepsTrainingReward>img{display:block;width:168px;height:168px;max-width:100%;object-fit:contain}
+#firstStepsTrainingReward figcaption strong{display:block;font-family:Fraunces,Georgia,serif;font-size:24px;line-height:1.25;color:var(--td-ink)}
+#firstStepsTrainingReward figcaption p{max-width:28ch;margin:8px auto 0;font-size:16px;line-height:1.45;color:var(--muted,#68645e)}
+html.tiskarna-ui #winModal.first-steps-win.starter-win #winPrimaryBtn{min-height:58px!important;font-size:19px!important;font-weight:650!important;margin:0!important}
+.first-steps-account{display:flex;flex-direction:column;align-items:stretch;gap:10px;text-align:center}
+.first-steps-account>p:first-child{font-size:17px;line-height:1.45;max-width:32ch;margin:0 auto 9px}
+.first-steps-google{display:flex!important;align-items:center;justify-content:center;gap:12px;width:100%;min-height:58px!important;background:#fff!important;color:#202124!important;border:1px solid #747775!important;border-radius:12px;font-size:17px!important;box-shadow:0 3px 0 #dfd9ca;padding:14px!important}
+.first-steps-google img{width:22px;height:22px;flex:none}
+.first-steps-google.hidden{display:none!important}
+.first-steps-manual{font-size:14px;min-height:44px;text-decoration:underline;text-underline-offset:3px}
+.first-steps-continue{min-height:48px;font-size:16px;margin-top:5px}
+.first-steps-note{font-size:13px!important;line-height:1.45;color:var(--muted,#68645e);margin:0}
+#firstStepsBrowserNote{padding:10px;border-radius:9px;background:var(--surface,#f2eadc)}
+#firstStepsSyncStatus:empty{display:none}
+#winModal.first-steps-win .win-secondary-actions{display:none}
+#winModal.first-steps-win #levelLeaderboardBox,#winModal.first-steps-win #winAccountBtn,#winModal.first-steps-win #winFeedback,#winModal.first-steps-win #newBadgeBox{display:none!important}
+#profileModal.first-steps-auth #googlePrimaryBlock,#profileModal.first-steps-auth #googleManualDivider{display:none!important}
+#profileModal.first-steps-auth .account-tabs{margin-top:12px}
+@media(max-width:540px){
+ #winModal.first-steps-win .win-card{padding:24px 20px}
+ #screen-game.first-steps-training #board{max-width:300px!important;max-height:300px!important}
+ #screen-game.first-steps-training #starterCoachTitle{font-size:23px}
+ #screen-game.first-steps-training #starterCoachCopy{font-size:15px;line-height:1.4}
+}

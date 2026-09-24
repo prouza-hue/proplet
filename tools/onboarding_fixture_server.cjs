@@ -12,7 +12,7 @@ if(baseline)execFileSync('git',['cat-file','-e',baseline+'^{commit}'],{cwd:repo}
 const fixtureDir=path.join(repo,'tests/fixtures/browser');
 const config={...JSON.parse(fs.readFileSync(path.join(fixtureDir,'config.json'))),environment:'production',pushAvailable:false};
 const syntheticProfile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'🙂',supportMode:'younger',publicRankings:false,hasPassword:true,stats:{points:125,completed:1}};
-let controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,progress:[]};
+let controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,progress:[],firstSteps:false,auth:'ok',result:'ok'};
 let events=[],requests=[],heldRolling=[];
 const historical=new Map();
 const types={'.js':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
@@ -34,8 +34,8 @@ const server=http.createServer(async(req,res)=>{
   if(p==='/api/health')return json(res,200,{isolatedFixture:true,database:false,sha,baseline,release:controls.release});
   if(p==='/__fixture/events'&&req.method==='GET')return json(res,200,{events,requests});
   if(p==='/__fixture/control'&&req.method==='POST'){
-   const value=await body(req);if(value.reset){events=[];requests=[];controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,progress:[]}}
-   for(const key of ['release','rolling','eventDelayMs','failDatabase','progress'])if(Object.hasOwn(value,key))controls[key]=value[key];
+   const value=await body(req);if(value.reset){events=[];requests=[];controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,progress:[],firstSteps:false,auth:'ok',result:'ok'}}
+   for(const key of ['release','rolling','eventDelayMs','failDatabase','progress','firstSteps','auth','result'])if(Object.hasOwn(value,key))controls[key]=value[key];
    if(!['current','baseline'].includes(controls.release)||!['ok','hold','fail'].includes(controls.rolling))return json(res,400,{detail:'invalid control'});
    if(controls.rolling!=='hold'){for(const pending of heldRolling)rolling(pending);heldRolling=[]}
    return json(res,200,{ok:true,controls});
@@ -52,10 +52,14 @@ const server=http.createServer(async(req,res)=>{
    if(p==='/api/rolling-content'){if(controls.rolling==='hold'){heldRolling.push(res);return}return rolling(res)}
    if(p==='/api/free-order/config'||p==='/api/play-session/config')return json(res,200,{enabled:false});
    if(p==='/api/login-integrity'&&req.method==='POST')return data.name===syntheticProfile.name&&data.password==='fixture-password'?json(res,200,syntheticProfile):json(res,401,{detail:'synthetic login rejected'});
+   if(p==='/api/auth/google/start'){res.writeHead(302,{location:controls.auth==='cancel'?'/?auth=google#error=access_denied':'/?auth=google#access_token=synthetic-google-token'});return res.end()}
+   if(p==='/api/auth/google/complete')return controls.auth==='fail'?json(res,503,{detail:'synthetic auth outage'}):json(res,200,{profile:syntheticProfile,linked:false});
+   if(p==='/api/player')return json(res,200,syntheticProfile);
+   if(p==='/api/result'){if(controls.result==='fail')return json(res,503,{detail:'synthetic save outage'});controls.progress.push({...data,puzzleId:data.puzzle_id,challengeKey:data.challenge_key,contentGeneration:data.content_generation,completedAt:data.completed_at});return json(res,200,{ok:true,synthetic:true})}
    if(p==='/api/me')return json(res,200,syntheticProfile);
    if(p==='/api/progress')return json(res,200,{completed:controls.progress});
    if(p==='/api/support-mode')return json(res,200,{supportMode:data?.support_mode||'younger'});
-   if(['/api/anonymous/claim','/api/result','/api/attempt/start','/api/attempt/checkpoint'].includes(p))return json(res,200,{ok:true,synthetic:true});
+   if(['/api/anonymous/claim','/api/result','/api/attempt/start','/api/attempt/checkpoint','/api/attempt/finish'].includes(p))return json(res,200,{ok:true,synthetic:true});
    if(p.includes('leaderboard'))return json(res,200,{rows:[],total:0,myRank:null});
    if(p==='/api/push/account-state')return json(res,200,{enabled:false});
    return json(res,503,{detail:'isolated fixture: endpoint disabled'});
@@ -64,7 +68,7 @@ const server=http.createServer(async(req,res)=>{
   if(controls.failDatabase&&['/puzzles.json','/puzzles-bootstrap.json'].includes(p))return json(res,503,{detail:'synthetic database asset outage'});
   const name=p==='/'?'index.html':decodeURIComponent(p).slice(1);
   if(name.split('/').includes('..'))return json(res,400,{detail:'invalid path'});
-  const bytes=asset(name);if(!bytes)return json(res,404,{detail:'not found'});
+  let bytes=asset(name);if(name==='runtime-meta.js'&&bytes)bytes=Buffer.concat([Buffer.from('window.PROPLET_FIRST_STEPS_ENABLED='+JSON.stringify(controls.firstSteps)+';\n'),bytes]);if(!bytes)return json(res,404,{detail:'not found'});
   res.writeHead(200,{'content-type':types[path.extname(name)]||'application/octet-stream','cache-control':'no-store','service-worker-allowed':'/'});res.end(req.method==='HEAD'?undefined:bytes);
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });

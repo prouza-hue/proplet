@@ -71,6 +71,7 @@
     });
   }
   function maybeShow(){
+    if(window.PropletFirstSteps?.quiet())return;
     if(!ready||!eligible()||shown||document.hidden||!available()||(!forced()&&seen()))return;
     if(!['daily','free'].includes(currentScreen)||openTransientModal()||document.querySelector('dialog[open],.modal:not(.hidden),.quality-modal:not(.hidden)'))return;
     mount();shown=true;document.documentElement.classList.add('content-release-open');dialog.showModal();

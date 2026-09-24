@@ -20,7 +20,7 @@ console.log('PASS: privacy timing, saved choices, manual settings and retired de
 const vm=require('vm'),app=fs.readFileSync('public/app.js','utf8');
 const eligibility=app.match(/canShowRankingPrivacyNotice:\(\)=>\{([^\n]+)\},/)[1];
 let stats={totalCompleted:0,tajenkaCompleted:0},blocked=false;
-const ctx={effectiveStats:()=>stats,currentScreen:'daily',document:{querySelector:()=>blocked}};
+const ctx={window:{},effectiveStats:()=>stats,currentScreen:'daily',document:{querySelector:()=>blocked}};
 vm.createContext(ctx);
 const allowed=()=>vm.runInContext('(()=>{'+eligibility+'})()',ctx);
 assert.equal(allowed(),false);
@@ -29,3 +29,6 @@ ctx.currentScreen='game';assert.equal(allowed(),false);
 ctx.currentScreen='daily';blocked=true;assert.equal(allowed(),false);
 blocked=false;stats={tajenkaCompleted:1};assert.equal(allowed(),true);
 console.log('PASS: real eligibility requires completed play and an unobstructed menu.');
+
+ctx.window.PropletFirstSteps={quiet:()=>true};assert.equal(allowed(),false,'new-player session defers automatic privacy prompt');
+
