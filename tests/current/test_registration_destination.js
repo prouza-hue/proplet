@@ -4,7 +4,7 @@ const app=fs.readFileSync('public/app.js','utf8'),auth=fs.readFileSync('public/a
 const helper=app.slice(app.indexOf('function showDailyAfterRegistration(){'),app.indexOf('async function saveNewProfile(){'));
 let destination='',hidden=[];
 const game={saved:true};
-const ctx={profileModalFromWin:true,profileModalFromNudge:true,pendingPostWinAction:'continue',accountNudgeStage:2,currentGame:game,$:id=>({classList:{add:()=>hidden.push(id)}}),nav:(screen)=>destination=screen};
+const ctx={window:{},profileModalFromWin:true,profileModalFromNudge:true,pendingPostWinAction:'continue',accountNudgeStage:2,currentGame:game,$:id=>({classList:{add:()=>hidden.push(id)}}),nav:(screen)=>destination=screen};
 vm.createContext(ctx);vm.runInContext(helper,ctx);ctx.showDailyAfterRegistration();
 assert.equal(destination,'daily');assert.equal(ctx.pendingPostWinAction,null);assert.equal(ctx.currentGame,game);assert(hidden.includes('#winModal'));
 assert(app.includes("if(authAction==='create'){showDailyAfterRegistration();"));
@@ -17,3 +17,4 @@ linked=true;destination='';await ctx.handleAuthReturn();assert.equal(destination
 linked=false;fail=true;await ctx.handleAuthReturn();assert.equal(destination,'','failed authentication does not navigate');
 console.log('PASS: registration and Google return lead to Today, linking and failures stay put, game preserved.');
 })().catch(e=>{console.error(e);process.exit(1)});
+

@@ -1025,7 +1025,7 @@ function updateActive(){
 function samePath(a,b){return a.length===b.length&&a.every((v,i)=>v===b[i])}
 function submitPath(){
  if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;
- const g=currentGame,word=currentWord(),path=[...g.path];if(!word){g.path=[];return updateActive()}if(word.length<4){g.path=[];message('Slova mají aspoň 4 písmena.');renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
+ const g=currentGame,word=currentWord(),path=[...g.path];if(!word){g.path=[];return updateActive()}const minLength=g.mode==='starter'&&g.puzzle.meta?.starterVersion===3?3:4;if(word.length<minLength){g.path=[];message(`Slova mají aspoň ${minLength} písmena.`);renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
  g.moves++;
  const ai=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word&&samePath(a.path,g.path));
  const wordIndex=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word),alreadyFound=g.found.some(f=>f.word===word);

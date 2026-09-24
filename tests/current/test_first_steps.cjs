@@ -18,3 +18,15 @@ assert.equal(p.meta.rewardXp,10,'existing one-time training reward');assert.equa
 p.letters[0]='X';assert.equal(api.trainingPuzzle({}).letters[0],'P','mutable game cannot corrupt future training');
 ctx.window.PROPLET_FIRST_STEPS_ENABLED=false;const old={id:'old'};assert.equal(api.trainingPuzzle(old),old);assert.equal(api.analyticsVersion(),null);
 console.log('PASS three short words, valid paths, full coverage, stable reward, fresh copies and legacy fallback');
+// Exercise the actual submission guard: the normal four-letter rule must not
+// reject the short tutorial, nor be relaxed for other puzzle modes.
+const app=fs.readFileSync('public/app.js','utf8');
+const submit=app.slice(app.indexOf('function submitPath(){'),app.indexOf('function resetGame(){'));
+const accepted=Error('accepted by minimum-length guard');
+for(const [mode,version,word,allow] of [['starter',3,'PES',true],['starter',3,'PE',false],['starter',2,'PES',false],['free',3,'PES',false],['free',3,'STŮL',true]]){
+ const game={mode,puzzle:{meta:{starterVersion:version},answers:{findIndex(){throw accepted}}},path:[0,1,2],moves:0};
+ const test={currentGame:game,currentWord:()=>word,updateActive(){},message(){},renderGameBoard(){},renderGameHUD(){},$:()=>({})};
+ vm.createContext(test);vm.runInContext(submit,test);
+ if(allow)assert.throws(()=>test.submitPath(),error=>error===accepted);else assert.doesNotThrow(()=>test.submitPath());
+}
+console.log('PASS real submission accepts short tutorial and preserves normal minimum length');
