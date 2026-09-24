@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-metaacquisition1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-metaacquisition2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -329,7 +329,7 @@ function rankingsOrchestration(){
   $,$$,api,pragueDateISO,ensureRankingProfileState,getProfile,updateAccountProfile,
   esc,countCz,levelFor,fmtTime,adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data,
   openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
-  canShowRankingPrivacyNotice:()=>{const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&!document.querySelector('.modal:not(.hidden)')},
+  canShowRankingPrivacyNotice:()=>{if(window.PropletFirstSteps?.quiet())return false;const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&!document.querySelector('.modal:not(.hidden)')},
  });
  return rankingsOrchestrationController;
 }
@@ -883,6 +883,7 @@ function freshStarterVisit(){
 }
 let gameLaunchSequence=0;
 async function startGame(puzzle,mode,dailyDate,options={}){
+ if(mode==='starter')puzzle=window.PropletFirstSteps?.trainingPuzzle(puzzle)||puzzle;
  if(mode!=='starter'&&!allowAccountGameStart())return;
  const starterTrace=mode==='starter'?(starterBootTrace&&!starterBootTrace.seen.has('ready')&&!starterBootTrace.seen.has('failed')?starterBootTrace:createStarterTrace()):null;
  trackStarterPhase(starterTrace,'requested');
@@ -906,7 +907,7 @@ async function startGame(puzzle,mode,dailyDate,options={}){
  if(mode==='playtest')window.PropletPlaytest.attach(currentGame);
  Object.assign(currentGame,{fairPlay:!!prepared.fairPlay,timingUnverified:!!restored?.timingUnverified,mergedAttempts:!!restored?.mergedAttempts});
  $('#screen-game').classList.toggle('rescue-mode',mode==='rescue');$('#screen-game').classList.toggle('starter-mode',mode==='starter');$('#screen-game').classList.toggle('tajenka-mode',mode==='tajenka');$('#gameModeLabel').textContent=mode==='daily'?'Denní výzva':mode==='rescue'?'Záchrana série':mode==='starter'?'První Proplet':mode==='tajenka'?'Víkendový bonus':mode==='playtest'?'Mozkokalypsa':'Volná hra';const levelNo=Number(puzzle.meta?.level)||null;if(mode==='rescue'||mode==='starter')$('#gameDifficulty').textContent=mode==='rescue'?'🔥 6×6 · jeden pokus':'🎓 Trénink · 5×5';else if(mode==='tajenka')$('#gameDifficulty').innerHTML='<span class="tajenka-game-label">✦ Tajenka</span>';else if(mode==='playtest')$('#gameDifficulty').innerHTML=window.PropletPlaytest.labelMarkup();else $('#gameDifficulty').innerHTML=`${difficultyIconMarkup(puzzle.difficulty,'game-difficulty-icon')}<span>${esc(DIFF[puzzle.difficulty].label)}${mode==='free'&&levelNo?` ${levelNo}`:''}</span>`;
- $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);if(mode==='tajenka'&&!tajenkaRulesSeen())openTajenkaRules();else startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});runGameSessionHooks('afterStart',{...sessionEvent,game:currentGame});if(!currentGame.isReplay&&currentGame.found.length===puzzle.answers.length)queueMicrotask(()=>{if(currentGame?.puzzle===puzzle)finishGame()});
+ $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);if(mode==='tajenka'&&!tajenkaRulesSeen())openTajenkaRules();else startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});runGameSessionHooks('afterStart',{...sessionEvent,game:currentGame});window.PropletFirstSteps?.afterStart(currentGame);if(!currentGame.isReplay&&currentGame.found.length===puzzle.answers.length)queueMicrotask(()=>{if(currentGame?.puzzle===puzzle)finishGame()});
  trackStarterPhase(starterTrace,'ready');
  return true;
  }catch(error){
@@ -935,6 +936,7 @@ function hideStarterHintNudge(){const n=$('#starterHintNudge');n?.classList.add(
 function acceptStarterHintNudge(){hideStarterHintNudge();openHintModal()}
 function dismissStarterHintNudge(){hideStarterHintNudge()}
 function maybeOfferStarterHint(){
+ if(window.PropletFirstSteps?.assist(currentGame))return;
  const g=currentGame,owner=window.PropletEngagementOnboarding;
  const eligible=owner?owner.shouldOfferStarterHint({game:g,now:performance.now(),hidden:document.hidden,transientOpen:openTransientModal()}):!!(g&&g.mode==='starter'&&!g.finished&&!g.starterHintUsed&&!g.starterHintOfferShown&&g.found.length>=2&&!g.dragging&&!document.hidden&&!openTransientModal()&&performance.now()-(g.lastProgressAt||g.start)>=10000);
  if(!eligible)return;g.starterHintOfferShown=true;trackProductEvent('starter_hint_offer_shown');$('#starterHintNudge')?.classList.remove('hidden');$('#hintBtn')?.classList.add('starter-attention');
@@ -943,6 +945,7 @@ function renderStarterCoach(step,title,copy,hintFocus=false){
  const coach=$('#starterCoach');if(!coach)return;coach.classList.remove('hidden');coach.classList.toggle('hint-focus',hintFocus);$('#starterCoachStep').textContent=`${step} / 4`;$('#starterCoachTitle').textContent=title;$('#starterCoachCopy').textContent=copy;$('#hintBtn')?.classList.toggle('starter-attention',hintFocus);
 }
 function updateStarterGuidance(){
+ if(window.PropletFirstSteps?.guidance(currentGame))return;
  const g=currentGame;if(!g||g.mode!=='starter')return;g.starterGuidePath=starterGuideFor(g);const next=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i));
  if(next===0)renderStarterCoach(1,'Najdi MRAK','Začni na M. Táhni přes fialová písmena až ke K, nebo na ně postupně klepni.');
  else if(next===1)renderStarterCoach(2,'Paráda! Teď najdi JABLKO','Hledáš vybraná slova, která společně zaplní celou desku. Jiná slova se nepočítají. JABLKO má 6 písmen a zahne za roh.');
@@ -1022,7 +1025,7 @@ function updateActive(){
 function samePath(a,b){return a.length===b.length&&a.every((v,i)=>v===b[i])}
 function submitPath(){
  if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;
- const g=currentGame,word=currentWord(),path=[...g.path];if(!word){g.path=[];return updateActive()}if(word.length<4){g.path=[];message('Slova mají aspoň 4 písmena.');renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
+ const g=currentGame,word=currentWord(),path=[...g.path];if(!word){g.path=[];return updateActive()}const minLength=g.mode==='starter'&&g.puzzle.meta?.starterVersion===3?3:4;if(word.length<minLength){g.path=[];message(`Slova mají aspoň ${minLength} písmena.`);renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
  g.moves++;
  const ai=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word&&samePath(a.path,g.path));
  const wordIndex=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word),alreadyFound=g.found.some(f=>f.word===word);
@@ -1037,7 +1040,7 @@ function submitPath(){
 function resetGame(){const g=currentGame;if(!g||g.mode==='rescue'||g.finished)return;if(!g.found.length){message('Plocha je už prázdná.');return}if(g.mode==='starter')trackProductEvent('starter_reset');const usedHints=g.hints||0,elapsed=gameElapsed(g),now=performance.now();g.undoSnapshot={found:g.found.map(f=>({...f,path:[...f.path]})),used:[...g.used.entries()]};g.found=[];g.used=new Map();g.path=[];g.wrongPath=[];g.baseElapsedMs=elapsed;g.start=now;if(g.pausedAt!=null)g.pausedAt=now;g.elapsedMs=elapsed;g.lastFound=[];sendAttemptCheckpoint('reset');g.hints=usedHints;g.cleanSolve=usedHints===0;message('Plocha vyčištěna. Čas, tahy i nápovědy běží dál.');if(g.mode==='starter')updateStarterGuidance();else{renderGameBoard();renderGameHUD();updateGameFeel()}saveGameProgress();showGameUndo()
 }
 function renderHintChoices(mode){const copy=gameHints()?.choices(mode)||[];$$('.hint-choice').forEach((button,i)=>{const row=copy[i];if(!row)return;button.querySelector('strong').textContent=row[0];button.querySelector('small').textContent=row[1]})}
-function openHintModal(fromHelper=false){if(!currentGame||currentGame.mode==='rescue'||currentGame.finished)return;const g=currentGame;if(g.undoSnapshot)hideGameUndo();if(g.mode==='starter')hideStarterHintNudge();if(!fromHelper)g.nextHintSource='manual';const starter=g.mode==='starter',tajenka=g.mode==='tajenka';renderHintChoices(tajenka?'tajenka':'default');$('#hintModal').classList.toggle('starter-hint',starter);$('#hintEyebrow').textContent=starter?'TRÉNINKOVÁ NÁPOVĚDA':tajenka?'TAJENKA · NÁPOVĚDA':'CHYTRÁ NÁPOVĚDA';$('#hintTitle').textContent=starter?'Zkus malé postrčení':tajenka?'Jak moc napovědět?':'Kolik pomoci chceš?';$('#hintCopy').textContent=starter?'V běžné hře nápověda zruší ✨ Čistě. Tady si ji můžeš bezpečně vyzkoušet.':g.mode==='playtest'?'Pomoc je v pořádku. Její použití nám pomůže vyladit obtížnost.':tajenka?'Začni významovou stopou. Silnější pomoc ukáže i cestu; odměnu 200 XP ani žebříček tím neztratíš.':'Jakákoli nápověda zruší ✨ čisté řešení této úrovně. Nápovědy zatím nejsou omezené.';$('#hintModal').classList.remove('hidden')
+function openHintModal(fromHelper=false){if(window.PropletFirstSteps?.assist(currentGame,true))return;if(!currentGame||currentGame.mode==='rescue'||currentGame.finished)return;const g=currentGame;if(g.undoSnapshot)hideGameUndo();if(g.mode==='starter')hideStarterHintNudge();if(!fromHelper)g.nextHintSource='manual';const starter=g.mode==='starter',tajenka=g.mode==='tajenka';renderHintChoices(tajenka?'tajenka':'default');$('#hintModal').classList.toggle('starter-hint',starter);$('#hintEyebrow').textContent=starter?'TRÉNINKOVÁ NÁPOVĚDA':tajenka?'TAJENKA · NÁPOVĚDA':'CHYTRÁ NÁPOVĚDA';$('#hintTitle').textContent=starter?'Zkus malé postrčení':tajenka?'Jak moc napovědět?':'Kolik pomoci chceš?';$('#hintCopy').textContent=starter?'V běžné hře nápověda zruší ✨ Čistě. Tady si ji můžeš bezpečně vyzkoušet.':g.mode==='playtest'?'Pomoc je v pořádku. Její použití nám pomůže vyladit obtížnost.':tajenka?'Začni významovou stopou. Silnější pomoc ukáže i cestu; odměnu 200 XP ani žebříček tím neztratíš.':'Jakákoli nápověda zruší ✨ čisté řešení této úrovně. Nápovědy zatím nejsou omezené.';$('#hintModal').classList.remove('hidden')
 }
 function pickHintTarget(){return gameHints()?.pickTarget()||null}
 function clearHintTrace(){$$('.cell.hint,.cell.hint-route,.cell.hint-full').forEach(c=>{c.classList.remove('hint','hint-route','hint-full');delete c.dataset.hintOrder})}
@@ -1114,6 +1117,7 @@ function dueAccountNudgeStage(){
  const count=completedGameCount(),shown=new Set(accountNudgeState().shown||[]);return ACCOUNT_NUDGE_THRESHOLDS.findIndex((threshold,i)=>count>=threshold&&!shown.has(i+1))+1||0;
 }
 function shouldOfferAccountNudge(){
+ if(window.PropletFirstSteps?.quiet())return 0;
  if(getProfile()?.token||currentGame?.mode==='rescue'||currentGame?.mode==='starter'||currentGame?.postStarterWarmup||currentGame?.justCompleted!==true)return 0;
  const guardShownAt=Date.parse(progressGuardState().lastShownAt||'');if(Number.isFinite(guardShownAt)&&Date.now()-guardShownAt<PROGRESS_GUARD_COOLDOWN_MS)return 0;
  return dueAccountNudgeStage();
@@ -1155,6 +1159,7 @@ function progressGuardLastPromptAt(){
  const times=[progressGuardState().lastShownAt,accountNudgeState().lastShownAt].map(value=>Date.parse(value||'')).filter(Number.isFinite);return times.length?Math.max(...times):0;
 }
 function canOfferProgressGuard(source){
+ if(window.PropletFirstSteps?.quiet())return false;
  if(getProfile()?.token||completedGameCount()<1||currentScreen==='game'||openTransientModal())return false;
  if(source==='desktop'&&progressGuardHasCoarsePointer())return false;
  if(source==='mobile'&&!progressGuardHasCoarsePointer())return false;
@@ -1185,7 +1190,7 @@ function bindProgressGuard(){
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){rememberProgressGuardDeparture();return}const away=consumeProgressGuardAwayTime();if(away>=PROGRESS_GUARD_MOBILE_AWAY_MS)setTimeout(()=>maybeOfferProgressGuard('mobile'),500)});
  if(document.visibilityState==='visible'&&progressGuardHasCoarsePointer()){const away=consumeProgressGuardAwayTime();if(away>=PROGRESS_GUARD_MOBILE_AWAY_MS)setTimeout(()=>maybeOfferProgressGuard('mobile'),900)}
 }
-function updateWinAccountCta(){const button=$('#winAccountBtn'),show=!!button&&!getProfile()?.token&&!!currentGame?.finished&&currentGame.mode!=='rescue'&&currentGame.mode!=='starter'&&!currentGame?.postStarterWarmup;button?.classList.toggle('hidden',!show);if(show&&!button.dataset.impression){button.dataset.impression='1';trackProductEvent('win_account_cta_shown')}else if(!show&&button)delete button.dataset.impression}
+function updateWinAccountCta(){if(window.PropletFirstSteps?.isFirstGame(currentGame)){ $('#winAccountBtn')?.classList.add('hidden');return; }const button=$('#winAccountBtn'),show=!!button&&!getProfile()?.token&&!!currentGame?.finished&&currentGame.mode!=='rescue'&&currentGame.mode!=='starter'&&!currentGame?.postStarterWarmup;button?.classList.toggle('hidden',!show);if(show&&!button.dataset.impression){button.dataset.impression='1';trackProductEvent('win_account_cta_shown')}else if(!show&&button)delete button.dataset.impression}
 function restoreWinAfterAccountModal(){profileModalFromWin=false;if(!currentGame?.finished)return;$('#winModal').classList.remove('hidden');updateWinAccountCta()}
 function openAccountFromWin(){if(getProfile()?.token)return;trackProductEvent('win_account_cta_create');profileModalFromWin=true;$('#winModal').classList.add('hidden');openProfileModal('create')}
 async function refreshWinLeaderboardAfterAuth(){if(!currentGame?.finished)return;updateWinAccountCta();if(currentGame.mode==='daily')await loadWinDailyGlobalLeaderboard(currentGame.dailyDate||pragueDateISO(),getState().completed[`daily:${currentGame.dailyDate||pragueDateISO()}`]||currentGame);else if(currentGame.mode==='free')await loadWinLevelLeaderboard(currentGame.puzzle,getState().completed[`free:${currentGame.puzzle.id}`]||currentGame)}
@@ -1331,7 +1336,7 @@ function analyticsHeaders(eventType,properties){
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
  if(properties?.starterReason)starterHeaders['X-Proplet-Starter-Reason']=properties.starterReason;
  const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
- return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':'board-v2',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
@@ -1500,6 +1505,7 @@ async function openProfileModal(mode='login'){
  setAccountMode(mode);$('#profileModal').classList.remove('hidden');const p=getProfile();if(p)$('#playerNameInput').value=p.name||'';$('#playerPasswordInput').value='';$('#playerPasswordInput').type='password';$('#profilePasswordToggle').textContent='👁 Zobrazit heslo';if(mode==='login')loadLeagues();
 }
 function showDailyAfterRegistration(){
+ if(window.PropletFirstSteps?.resumeAfterAuth())return;
  profileModalFromWin=false;profileModalFromNudge=false;pendingPostWinAction=null;accountNudgeStage=0;
  ['#profileModal','#winModal','#accountNudgeModal'].forEach(id=>$(id)?.classList.add('hidden'));
  nav('daily',{replace:true});
@@ -1516,7 +1522,7 @@ async function saveNewProfile(){
   const serverMode=validSupportMode(profile.supportMode)?profile.supportMode:'none';acceptAccountProfile({id:profile.id,name:profile.name,familyCode:profile.familyCode||null,leagueName:profile.leagueName||null,avatar:profile.avatar||'🙂',googleLinked:!!profile.googleLinked,googleAvatarUrl:profile.googleAvatarUrl||null,useGoogleAvatar:!!profile.useGoogleAvatar,supportMode:serverMode,token:profile.token,hasPassword:!!profile.hasPassword,freeOrderNewAccount:profile.freeOrderNewAccount===true,stats:profile.stats});rememberSupportMode(serverMode);
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   await claimTelemetryAfterAuth(anonId);
-  trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(authAction==='create'){showDailyAfterRegistration();if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320)}else if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
+  trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(window.PropletFirstSteps?.resumeAfterAuth())return;if(authAction==='create'){showDailyAfterRegistration();if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320)}else if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
  }catch(e){$('#profileFormError').textContent=e.message}
 }
 function toggleLegacyTeamLogin(){legacyTeamLogin=!legacyTeamLogin;$('#leagueChooser').classList.toggle('hidden',!legacyTeamLogin);$('#legacyTeamLoginToggle').textContent=legacyTeamLogin?'Skrýt výběr týmu':'Mám starší účet v týmu';if(legacyTeamLogin)loadLeagues()}
@@ -2039,6 +2045,7 @@ function shouldOfferInstallNudge(source='daily'){
  return true;
 }
 function maybeOfferInstallNudge(action=null,source='daily'){
+ if(window.PropletFirstSteps?.quiet())return false;
  if(!shouldOfferInstallNudge(source))return false;installModalManual=false;pendingInstallPostWinAction=action;const st=getInstallNudgeState();saveInstallNudgeState({...st,shown:(st.shown||0)+1,lastShownAt:new Date().toISOString(),lastSource:source});trackProductEvent('pwa_install_nudge_shown');renderInstallModal(source);$('#winModal')?.classList.add('hidden');$('#installNudgeModal').classList.remove('hidden');return true;
 }
 function finishInstallNudgeFlow(){
@@ -2118,7 +2125,7 @@ function renderPushNudge(context='standard'){
  $('#pushNudgeTitle').textContent=context==='first_win'?'Zítra další Proplet?':'Ať nová výzva neuteče';
  $('#pushNudgeCopy').textContent='Připomeneme ti nevyřešenou denní výzvu a pondělní novinky.';
 }
-async function maybeOfferPushNudge(action,options={}){if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;pendingPushFollowUp=options.followUp||null;pushNudgeContext=options.context||'standard';renderPushNudge(pushNudgeContext);trackProductEvent('push_nudge_shown');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
+async function maybeOfferPushNudge(action,options={}){if(window.PropletFirstSteps?.quiet())return false;if(!(await shouldOfferPushNudge()))return false;postWinEngagementNudgeShown=true;pendingPushPostWinAction=action;pendingPushFollowUp=options.followUp||null;pushNudgeContext=options.context||'standard';renderPushNudge(pushNudgeContext);trackProductEvent('push_nudge_shown');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_shown');$('#winModal').classList.add('hidden');$('#pushNudgeModal').classList.remove('hidden');return true}
 async function maybeOfferFirstWinReturnNudge(action){return firstRealGameJustCompleted()?maybeOfferPushNudge(action,{context:'first_win',followUp:'account'}):false}
 function finishPushNudgeFlow(){const action=pendingPushPostWinAction,followUp=pendingPushFollowUp;pendingPushPostWinAction=null;pendingPushFollowUp=null;$('#pushNudgeModal').classList.add('hidden');if(followUp==='account'&&maybeOfferAccountNudge(action))return;if(action)performPostWinAction(action)}
 function dismissPushNudge(){const st=getPushNudgeState(),declines=(st.declines||0)+1,today=pragueDateISO();trackProductEvent('push_nudge_dismissed');if(pushNudgeContext==='first_win')trackProductEvent('first_win_return_nudge_dismissed');if(declines>=3)savePushNudgeState({...st,declines,done:true,lastDeclinedAt:new Date().toISOString()});else savePushNudgeState({...st,declines,nextOfferDate:addDaysISO(today,declines===1?1:7),lastDeclinedAt:new Date().toISOString()});finishPushNudgeFlow()}

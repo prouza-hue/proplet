@@ -6,6 +6,7 @@ on:
     paths:
       - 'public/**'
       - 'tools/test_onboarding_activation_browser.cjs'
+      - 'tools/test_first_steps_browser.cjs'
       - 'tools/onboarding_fixture_server.cjs'
       - '.github/workflows/onboarding-activation-browser.yml'
   workflow_dispatch:
@@ -20,7 +21,7 @@ concurrency:
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     env:
       TEST_URL: http://127.0.0.1:8765
       TEST_BASELINE_SHA: 4c1f72ed95d9d4b969b0f46bd194126c5e554670
@@ -52,6 +53,10 @@ jobs:
         env:
           RESULT_PATH: browser-results/current.json
         run: node tools/test_onboarding_activation_browser.cjs
+      - name: Verify new first steps and account return
+        env:
+          RESULT_PATH: browser-results/first-steps.json
+        run: node tools/test_first_steps_browser.cjs
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4

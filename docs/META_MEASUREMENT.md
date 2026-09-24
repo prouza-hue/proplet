@@ -85,7 +85,6 @@ not zero conversions. Do not divide all website accounts by a single campaign's 
 The same person can encounter multiple campaigns: assign the earliest consented paid
 campaign touch for this test once per new account; report Meta attribution separately.
 
-This branch deliberately leaves the parallel preview/first-steps onboarding design
-separate. Integrate the final approved version and resolve shared app/SW release markers
-before production. Real Facebook/Instagram in-app OAuth and production Meta Test Events
+This branch integrates main 66e5816 including the new first-steps onboarding.
+Shared app/SW cache markers are updated together (metaacquisition2). Real Facebook/Instagram in-app OAuth and production Meta Test Events
 remain a release check. Preview must not send synthetic registrations to the live Pixel.

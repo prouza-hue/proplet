@@ -44,6 +44,11 @@
     const title=$('#profileModalTitle'),desc=$('#profileModalDesc'),save=$('#saveProfileBtn');
     const divider=$('#googleManualDivider span'),head=$('#googlePrimaryBlock .google-primary-head span'),note=$('#googlePrimaryBlock .google-primary-note');
 
+    if(create&&$('#profileModal')?.classList.contains('first-steps-auth')){
+      setText(title,'Ulož si postup');
+      setText(desc,'Zvol si přezdívku a heslo. E-mail pro obnovu účtu můžeš přidat níže.');
+      setText(save,'Vytvořit účet');return;
+    }
     if(create){
       setText(title,'Nepřijď o své výsledky');
       setText(desc,'Založ si účet, trvá to pár vteřin. Uložíme XP, výsledky i sérii — a přidáme ti +500 XP.');
