@@ -36,7 +36,7 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
   console.log('SCENARIO '+name);
   try{await fn(page,context);assert.deepEqual(errors,[]);await page.screenshot({path:output+'.'+name+'.png',fullPage:true});report.checks.push({name,ok:true,events:await events()});}
-  catch(error){report.checks.push({name,ok:false,error:error.stack,errors});await page.screenshot({path:output+'.'+name+'.failed.png',fullPage:true}).catch(()=>{});throw error;}
+  catch(error){report.checks.push({name,ok:false,error:error.stack,errors});await page.screenshot({path:output+'.'+name+'.failed.png',fullPage:true}).catch(()=>{});console.error(name+': '+error.message);}
   finally{fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close();}
  }
  try{
@@ -90,6 +90,6 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
   await scenario('existing-player-keeps-progress',async(page,context)=>{
    await context.addInitScript(()=>localStorage.setItem('proplet-v3-7-required-onboarding','done'));await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);assert.equal(await page.evaluate(()=>currentGame?.mode==='starter'),false);assert.equal(await page.locator('#winModal').isVisible(),false);
   });
-  report.finished=new Date().toISOString();fs.writeFileSync(output,JSON.stringify(report,null,2));console.log(JSON.stringify({sha:report.sha,passed:report.checks.map(c=>c.name)}));
+  assert(report.checks.every(c=>c.ok),'All first-step browser scenarios must pass; see report');report.finished=new Date().toISOString();fs.writeFileSync(output,JSON.stringify(report,null,2));console.log(JSON.stringify({sha:report.sha,passed:report.checks.map(c=>c.name)}));
  }finally{await browser.close();}
 })().catch(error=>{fs.writeFileSync(output,JSON.stringify(report,null,2));console.error(error);process.exitCode=1});
