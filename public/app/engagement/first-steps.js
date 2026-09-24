@@ -10,7 +10,7 @@
   const write=(storage,key,value)=>{try{storage.setItem(key,JSON.stringify(value));return true}catch{return false}};
   const stateKey=()=>KEY+':'+(typeof getAnonymousId==='function'?getAnonymousId():'guest');
   const state=()=>{
-    const stored=read(localStorage,stateKey());if(stored)return stored;
+    const stored=read(localStorage,stateKey());if(stored)return !stored.owner||stored.owner===profile()?.id?stored:{};
     // Claiming guest telemetry rotates the anonymous ID. The short-lived
     // return intent carries only flow metadata across that identity boundary.
     const r=read(sessionStorage,RETURN),p=profile();
@@ -130,10 +130,11 @@
       const owner=profile()?.id;let result;
       try{result=await syncQueue({announce:false})}catch(e){result={ok:false,error:e.message}}
       if(profile()?.id!==owner)return;
+      update({owner});
       const preview=!!result?.preview;
       const saved=!!result?.ok&&!preview&&!result?.left&&!getQueue().length;
       $('#firstStepsSaveCopy').textContent=preview?'Přihlášeno. V náhledu zůstává hraní na tomto zařízení.':saved?'Postup je uložený v účtu. Můžeš hrát dál.':'Účet je připravený. Výsledek ještě čeká na uložení.';
-      $('#firstStepsSyncStatus').textContent=preview?'Výsledky z preview se do ostré hry neposílají.':saved?'✓ Uloženo':navigator.onLine?'Zkus to znovu. Místní výsledek zůstává zachovaný.':'Jsi offline. Místní výsledek zůstává zachovaný.';
+      $('#firstStepsSyncStatus').textContent=preview?'Výsledky z preview se do ostré hry neposílají.':saved?'✓ Uloženo':result?.deferred?'Další pokus bude možný za chvíli. Místní výsledek zůstává zachovaný.':navigator.onLine?'Zkus to znovu. Místní výsledek zůstává zachovaný.':'Jsi offline. Místní výsledek zůstává zachovaný.';
       $('#firstStepsRetry').classList.toggle('hidden',preview||saved);
       if(saved)event('first_steps_v1_saved');
       if(saved||preview)sessionStorage.removeItem(RETURN);

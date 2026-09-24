@@ -59,7 +59,7 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
    await firstWin(page);await page.locator('#firstStepsManual').click();await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
-   await page.getByRole('button',{name:'Hrát další Proplet',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished);
+   await page.getByRole('button',{name:'Hrát další Proplet',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished);await eventOnce('first_steps_v1_continue');assert.equal((await events()).find(e=>e.event==='first_steps_v1_continue').headers['x-proplet-onboarding'],'board-v3-short');
   });
   await scenario('google-direct-round-trip',async page=>{
    await firstWin(page);await page.locator('#firstStepsGoogle').click();
@@ -77,7 +77,7 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
    await firstWin(page);await control({result:'fail'});await page.locator('#firstStepsManual').click();await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Účet je připravený. Výsledek ještě čeká na uložení.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert(await page.evaluate(()=>getQueue().length>0));assert.equal((await events()).some(e=>e.event==='first_steps_v1_saved'),false);
-   await control({result:'ok'});await page.locator('#firstStepsRetry').click();await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
+   await control({result:'ok'});await page.clock.setFixedTime(new Date('2026-09-15T10:01:01Z'));await page.locator('#firstStepsRetry').click();await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
   });
   await scenario('manual-cancel-and-embedded-alternative',async page=>{
    await firstWin(page);await page.locator('#firstStepsBrowserNote').waitFor({state:'visible'});
