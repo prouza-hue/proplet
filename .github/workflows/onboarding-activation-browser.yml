@@ -1,0 +1,61 @@
+name: Onboarding activation browser regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - 'tools/test_onboarding_activation_browser.cjs'
+      - 'tools/onboarding_fixture_server.cjs'
+      - '.github/workflows/onboarding-activation-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: onboarding-browser-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      TEST_URL: http://127.0.0.1:8765
+      TEST_BASELINE_SHA: 4c1f72ed95d9d4b969b0f46bd194126c5e554670
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver and build generated shell assets
+        run: |
+          npm install --prefix "$RUNNER_TEMP/proplet-browser" --no-save --no-package-lock playwright@1.57.0
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/proplet-browser/node_modules/playwright" >> "$GITHUB_ENV"
+          echo "CHROME_PATH=$(command -v google-chrome || command -v google-chrome-stable)" >> "$GITHUB_ENV"
+          echo "EXPECTED_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          python tools/generate_puzzles_bootstrap.py
+      - name: Start isolated fixture
+        run: |
+          mkdir -p browser-results
+          node tools/onboarding_fixture_server.cjs > browser-results/fixture.log 2>&1 &
+          node -e 'const end=Date.now()+10000; (async()=>{while(Date.now()<end){try{if((await fetch(process.env.TEST_URL+"/api/health")).ok)return}catch{}await new Promise(r=>setTimeout(r,100))}throw Error("fixture failed to start")})().catch(e=>{console.error(e);process.exitCode=1})'
+      - name: Reproduce baseline delayed telemetry with playable intro
+        env:
+          TEST_EXPECT_BASELINE: '1'
+          RESULT_PATH: browser-results/baseline.json
+        run: node tools/test_onboarding_activation_browser.cjs
+      - name: Verify first visit, input, auth, invitation, outages, and SW upgrade
+        env:
+          RESULT_PATH: browser-results/current.json
+        run: node tools/test_onboarding_activation_browser.cjs
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: onboarding-browser-${{ github.sha }}
+          path: browser-results/
+          retention-days: 14
