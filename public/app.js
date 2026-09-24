@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-startermeasure1';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-metaacquisition1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1331,12 +1331,12 @@ function analyticsHeaders(eventType,properties){
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
  if(properties?.starterReason)starterHeaders['X-Proplet-Starter-Reason']=properties.starterReason;
  const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
- return {...gameHeaders,...starterHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':'board-v2',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':'board-v2',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
  const factory=window.PropletAnalytics;if(!factory?.create)return null;
- productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,request:(path,opts)=>api(path,opts),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview')});
+ productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,request:(path,opts)=>api(path,{...opts,headers:window.PropletAcquisition?.filterHeaders(opts.headers)||opts.headers}),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview')});
  return productAnalyticsController;
 }
 function trackProductEvent(eventType,properties){
@@ -1509,6 +1509,7 @@ async function saveNewProfile(){
  const name=$('#playerNameInput').value.trim(),password=$('#playerPasswordInput').value;$('#profileFormError').textContent='';if(!name||!password){$('#profileFormError').textContent='Vyplň jméno a heslo.';return}if(password.length<8){$('#profileFormError').textContent='Heslo musí mít alespoň 8 znaků.';return}
  try{
   const endpoint=accountMode==='create'?'/api/player':'/api/login-integrity',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body)});
+  window.PropletMarketing?.registration({id:profile.id,accountCreated:authAction==='create'&&profile.accountCreated===true});
   try{await currentGame?.finishTelemetryPromise}catch{}
   pauseGameClock('login');
   if(currentGame?.fairPlay)await fairPlay().pause(currentGame);

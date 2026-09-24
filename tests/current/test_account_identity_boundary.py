@@ -111,7 +111,18 @@ class IdentityBoundaryTests(unittest.TestCase):
             self.assertFalse(returning["freeOrderNewAccount"])
             self.assertEqual(returning["id"], created["id"])
 
-    def test_stable_identity_mapping_survives_changed_email(self):
+    def test_registration_marker_independent_of_free_order(self):
+        # Registration reporting must not depend on the new-order feature flag.
+        with patch.dict(auth.os.environ, {"PROPLET_FREE_ORDER_ENABLED": "false"}):
+            self.assertFalse(self.complete().json()["accountCreated"])
+            self.user["id"] = "new-marketing-user"
+            self.user["email"] = "new-marketing@example.invalid"
+            created = self.complete().json()
+            self.assertTrue(created["accountCreated"])
+            self.assertFalse(created["profile"]["freeOrderNewAccount"])
+            self.assertFalse(self.complete().json()["accountCreated"])
+
+    def test_existing_identity_mapping_survives_changed_email(self):
         self.owner["auth_user_id"] = "auth-owner"
         self.user["email"] = "changed@example.invalid"
         response = self.complete()

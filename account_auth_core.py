@@ -463,6 +463,6 @@ def install_account_auth(
             player = db_select("players", id=player["id"])[0]
 
         token = new_session(player["id"])
-        return {"ok": True, "profile": {**player_payload(player, token), "freeOrderNewAccount": created_for_order and os.environ.get("PROPLET_FREE_ORDER_ENABLED", "false").lower() == "true"}, "linked": bool(current), "provider": "google"}
+        return {"ok": True, "accountCreated": created_for_order, "profile": {**player_payload(player, token), "freeOrderNewAccount": created_for_order and os.environ.get("PROPLET_FREE_ORDER_ENABLED", "false").lower() == "true"}, "linked": bool(current), "provider": "google"}
 
     return app
