@@ -34,8 +34,8 @@ if implemented:
     assert registry["events"] == FIXTURE["events"]
     assert registry["request_fields"] == ["event_type"]
     assert registry["pii_policy"]["custom_properties_sent"] is False
-    assert '/app/analytics.js?v=analytics2' in INDEX
-    assert "'/app/analytics.js?v=analytics2'" in SW
+    assert '/app/analytics.js?v=startermeasure1' in INDEX
+    assert "'/app/analytics.js?v=startermeasure1'" in SW
     assert "let productAnalyticsController=null;" in APP
     assert "function productAnalytics()" in APP
     assert "controller.track(eventType,properties)" in APP
@@ -66,7 +66,7 @@ import server
 from backend import analytics as product_analytics
 
 events = FIXTURE["events"]
-assert len(events) == 132
+assert len(events) == 142
 assert len(events) == len(set(events))
 inserted = []
 
@@ -105,4 +105,4 @@ for (table, row), expected in zip(inserted, events):
     assert row["anonymous_id"] == "anon-hash"
     assert row["app_version"] == "4.01.40"
 
-print("PASS Sprint 15 analytics characterization: 132 events, transport, dedup and PII parity")
+print("PASS Sprint 15 analytics characterization: 142 events, transport, dedup and PII parity")

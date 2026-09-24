@@ -24,6 +24,17 @@ def request_context(request, environment):
     for header,key,maximum in [('x-proplet-hint-level','hint_level',3),('x-proplet-hints','hints',100),('x-proplet-elapsed-ms','elapsed_ms',86400000)]:
         value=request.headers.get(header,'')
         if value.isdigit() and 0<=int(value)<=maximum: details[key]=int(value)
+    # Capture time context is immutable even when a guest queue is later claimed.
+    auth_at_event=request.headers.get('x-proplet-auth-at-event','')
+    if auth_at_event in {'anonymous','account'}:details['auth_at_event']=auth_at_event
+    starter_run=request.headers.get('x-proplet-starter-run','')
+    try:
+        if starter_run:details['starter_run_id']=str(uuid.UUID(starter_run))
+    except (ValueError,TypeError):pass
+    starter_ms=request.headers.get('x-proplet-starter-ms','')
+    if starter_ms.isdigit() and 0<=int(starter_ms)<=86400000:details['starter_ms']=int(starter_ms)
+    reason=request.headers.get('x-proplet-starter-reason','')
+    if reason in {'data','prepare','render','superseded','navigation','visibility'}:details['starter_reason']=reason
     return {
         '_event_context':details,
         '_event_id':event_id,
@@ -69,3 +80,4 @@ def pages(request, table, *, filters, columns='*'):
         if next_cursor == cursor:
             raise ValueError('Analytics cursor did not advance')
         cursor = next_cursor
+

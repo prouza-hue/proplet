@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const app=fs.readFileSync('public/app.js','utf8');
+let profile=null,clock=1100;
+const ctx={currentGame:{puzzle:{id:'starter-v1'},starterTrace:{id:'run-a',started:1000},hints:0,elapsedMs:0},getProfile:()=>profile,performance:{now:()=>clock},APP_PREVIEW_RELEASE:'candidate',URLSearchParams,location:{search:''}};
+vm.createContext(ctx);vm.runInContext(app.slice(app.indexOf('function analyticsHeaders('),app.indexOf('function productAnalytics()')),ctx);
+const captured=ctx.analyticsHeaders('starter_v1_ready');
+assert.equal(captured['X-Proplet-Auth-At-Event'],'anonymous');assert.equal(captured['X-Proplet-Starter-Run'],'run-a');assert.equal(captured['X-Proplet-Starter-Ms'],'100');
+profile={token:'synthetic-account'};ctx.currentGame.starterTrace={id:'run-b',started:1000};clock=2000;
+const transport=ctx.analyticsHeaders();
+assert.equal(transport['X-Proplet-Auth-At-Event'],undefined,'old queued event must remain unknown');
+assert.equal(transport['X-Proplet-Starter-Run'],undefined,'transport must not infer a newer run');
+assert.equal(captured['X-Proplet-Auth-At-Event'],'anonymous');assert.equal(captured['X-Proplet-Starter-Run'],'run-a');
+const explicit=ctx.analyticsHeaders('starter_v1_failed',{starterRunId:'boot-run',starterElapsedMs:25,starterReason:'data'});
+assert.equal(explicit['X-Proplet-Starter-Run'],'boot-run');assert.equal(explicit['X-Proplet-Starter-Ms'],'25');
+console.log('PASS capture-time auth and starter run remain immutable across queue delay/login');

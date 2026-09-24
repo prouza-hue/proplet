@@ -2,6 +2,7 @@
   'use strict';
 
   const DEFAULT_ENDPOINT = '/api/product-event';
+  const MAX_EVENTS_PER_FLUSH = 100;
 
   function create(options = {}) {
     const request = typeof options.request === 'function' ? options.request : null;
@@ -25,7 +26,13 @@
       if(pendingFlush)return pendingFlush;
       const scope=getScope(),authProfile=options.getProfile?.() || null;
       pendingFlush=(async()=>{
-        for(const row of read(scope)){
+        // Re-read after each request: track() can append while this flush is in flight.
+        // Bound the drain and remember IDs so failed storage writes cannot cause a loop.
+        const attempted=new Set();
+        while(attempted.size<MAX_EVENTS_PER_FLUSH){
+          const row=read(scope).find(e=>!attempted.has(e.id));
+          if(!row)break;
+          attempted.add(row.id);
           try{
             await request(row.endpoint||endpoint,{method:'POST',body:JSON.stringify({event_type:row.event}),authProfile,
               headers:{...row.headers,'X-Proplet-Event-ID':row.id,'X-Proplet-Event-Time':new Date(row.at).toISOString()}});
