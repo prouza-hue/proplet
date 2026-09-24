@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const app=fs.readFileSync('public/app.js','utf8');
 let profile=null,clock=1100;
-const ctx={currentGame:{puzzle:{id:'starter-v1'},starterTrace:{id:'run-a',started:1000},hints:0,elapsedMs:0},getProfile:()=>profile,performance:{now:()=>clock},APP_PREVIEW_RELEASE:'candidate',URLSearchParams,location:{search:''}};
+const ctx={window:{},currentGame:{puzzle:{id:'starter-v1'},starterTrace:{id:'run-a',started:1000},hints:0,elapsedMs:0},getProfile:()=>profile,performance:{now:()=>clock},APP_PREVIEW_RELEASE:'candidate',URLSearchParams,location:{search:''}};
 vm.createContext(ctx);vm.runInContext(app.slice(app.indexOf('function analyticsHeaders('),app.indexOf('function productAnalytics()')),ctx);
 const captured=ctx.analyticsHeaders('starter_v1_ready');
 assert.equal(captured['X-Proplet-Auth-At-Event'],'anonymous');assert.equal(captured['X-Proplet-Starter-Run'],'run-a');assert.equal(captured['X-Proplet-Starter-Ms'],'100');
