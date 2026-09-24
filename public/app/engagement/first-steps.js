@@ -136,7 +136,7 @@
       $('#firstStepsSaveCopy').textContent=preview?'Přihlášeno. V náhledu zůstává hraní na tomto zařízení.':saved?'Postup je uložený v účtu. Můžeš hrát dál.':'Účet je připravený. Výsledek ještě čeká na uložení.';
       $('#firstStepsSyncStatus').textContent=preview?'Výsledky z preview se do ostré hry neposílají.':saved?'✓ Uloženo':result?.deferred?'Další pokus bude možný za chvíli. Místní výsledek zůstává zachovaný.':navigator.onLine?'Zkus to znovu. Místní výsledek zůstává zachovaný.':'Jsi offline. Místní výsledek zůstává zachovaný.';
       $('#firstStepsRetry').classList.toggle('hidden',preview||saved);
-      if(saved)event('first_steps_v1_saved');
+      if(saved&&!state().savedRecorded){update({savedRecorded:true});event('first_steps_v1_saved');}
       if(saved||preview)sessionStorage.removeItem(RETURN);
     })().finally(()=>{authBusy=false});
     return true;
@@ -180,7 +180,7 @@
         if(profile()?.token)resumeAfterAuth();else{authBusy=false;accountWin();}
       }
     },{once:true});
-    global.addEventListener('pageshow',()=>{authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;});
+    global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;});
   }
   const api={enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
     quiet:()=>enabled()&&read(sessionStorage,QUIET)===true,
