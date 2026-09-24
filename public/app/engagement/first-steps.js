@@ -141,6 +141,9 @@
   }
   function isFirstGame(g){return enabled()&&state().enrolled&&!state().finished&&g?.mode==='free'&&g.puzzle?.id===state().firstBoardId&&!g.isReplay}
   function afterStart(g){
+    // Legacy presentation wrappers may not return startGame's promise. Close
+    // the training result only when the requested board actually starts.
+    if(isFirstGame(g))$('#winModal').classList.add('hidden');
     $('#screen-game').classList.toggle('first-steps-training',short(g));
     $('#winModal').classList.remove('first-steps-win');$('#firstStepsAccount')?.classList.add('hidden');
     $('#winPrimaryBtn').onclick=closeWinAndContinue;
