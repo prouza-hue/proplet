@@ -58,14 +58,14 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
   await scenario('manual-account-and-sync',async page=>{
    await firstWin(page);await page.locator('#firstStepsManual').click();await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
-   assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await eventOnce('first_steps_v1_saved');
+   assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
    await page.getByRole('button',{name:'Hrát další Proplet',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished);
   });
   await scenario('google-direct-round-trip',async page=>{
    await firstWin(page);await page.locator('#firstStepsGoogle').click();
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);
-   assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await eventOnce('first_steps_v1_saved');
+   assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
    assert.equal(await page.locator('#installNudgeModal').isVisible(),false);
   });
   await scenario('google-cancel-return',async page=>{

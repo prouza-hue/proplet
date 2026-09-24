@@ -30,3 +30,11 @@ for(const [mode,version,word,allow] of [['starter',3,'PES',true],['starter',3,'P
  if(allow)assert.throws(()=>test.submitPath(),error=>error===accepted);else assert.doesNotThrow(()=>test.submitPath());
 }
 console.log('PASS real submission accepts short tutorial and preserves normal minimum length');
+ctx.window.PROPLET_FIRST_STEPS_ENABLED=true;
+ctx.sessionStorage.setItem('proplet-first-steps-auth-v1',JSON.stringify({at:Date.now(),boardId:'g4-e-001',owner:'new-account',flow:{enrolled:true,firstBoardId:'g4-e-001'}}));
+ctx.getAnonymousId=()=> 'rotated-guest';ctx.getProfile=()=>({id:'new-account',token:'synthetic'});
+assert.equal(api.analyticsVersion(),'board-v3-short','auth return survives successful anonymous claim rotation');
+ctx.getProfile=()=>({id:'other-account',token:'synthetic'});
+assert.equal(api.analyticsVersion(),null,'return metadata cannot leak into another account');
+ctx.getProfile=()=>null;assert.equal(api.analyticsVersion(),null,'logged-out guest does not inherit account return');
+console.log('PASS auth flow survives guest rotation and remains account isolated');

@@ -9,7 +9,13 @@
   const read=(storage,key)=>{try{return JSON.parse(storage.getItem(key)||'null')}catch{return null}};
   const write=(storage,key,value)=>{try{storage.setItem(key,JSON.stringify(value));return true}catch{return false}};
   const stateKey=()=>KEY+':'+(typeof getAnonymousId==='function'?getAnonymousId():'guest');
-  const state=()=>read(localStorage,stateKey())||{};
+  const state=()=>{
+    const stored=read(localStorage,stateKey());if(stored)return stored;
+    // Claiming guest telemetry rotates the anonymous ID. The short-lived
+    // return intent carries only flow metadata across that identity boundary.
+    const r=read(sessionStorage,RETURN),p=profile();
+    return r?.at>Date.now()-30*60*1000&&p?.token&&(!r.owner||r.owner===p.id)?r.flow||{}:{};
+  };
   const update=patch=>write(localStorage,stateKey(),{...state(),...patch});
   const event=name=>{try{trackProductEvent(name)}catch{}};
   const short=g=>enabled()&&g?.mode==='starter'&&g.puzzle?.meta?.starterVersion===3;
@@ -95,10 +101,10 @@
     $('#firstStepsRetry').classList.add('hidden');$('#firstStepsSyncStatus').textContent='';
     $('#firstStepsSaveCopy').textContent=signed?'Účet je připravený. Kontroluji uložení výsledku…':'Vytvoř si účet a pokračuj se svým postupem i na jiném zařízení.';
   }
-  function returnIntent(){const r=read(sessionStorage,RETURN);return r?.at>Date.now()-30*60*1000&&r?.boardId===state().firstBoardId?r:null}
+  function returnIntent(){const r=read(sessionStorage,RETURN);return r?.at>Date.now()-30*60*1000&&(!r.owner||r.owner===profile()?.id)&&r?.boardId===state().firstBoardId?r:null}
   async function beginAuth(method){
     if(authBusy)return;
-    const intent={at:Date.now(),boardId:state().firstBoardId};
+    const intent={at:Date.now(),boardId:state().firstBoardId,flow:state()};
     if(!write(sessionStorage,RETURN,intent)){showToast('Pro návrat k výsledku potřebujeme úložiště prohlížeče. Zkus jiný způsob přihlášení.');return;}
     event(method==='google'?'first_steps_v1_google':'first_steps_v1_manual');
     if(method==='google'){
@@ -116,6 +122,7 @@
   function resumeAfterAuth(){
     if(!enabled()||!returnIntent()||!profile()?.token)return false;
     if(authBusy)return true;
+    write(sessionStorage,RETURN,{...returnIntent(),owner:profile().id});
     authBusy=true;
     (async()=>{
       if(!appReady)await ready;
