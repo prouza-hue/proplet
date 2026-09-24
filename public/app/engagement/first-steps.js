@@ -66,14 +66,19 @@
       update({firstBoardId:p.id});
       await startGame(p,'free',null,{firstSteps:true});
       if(game()?.mode==='free'&&game()?.puzzle.id===p.id)$('#winModal').classList.add('hidden');
-    }catch(e){showToast(e.message)}finally{firstLaunch=false;button.disabled=false;button.textContent='Hrát první hru';}
+    }catch(e){showToast(e.message)}finally{firstLaunch=false;button.disabled=false;button.textContent='Hrát dál';}
   }
   function trainingWin(g){
     if(!short(g))return;
     cleanSummary();$('#firstStepsAccount')?.classList.add('hidden');
-    $('#winTitle').textContent='Princip máš v ruce.';$('#winBadge').textContent='✓';
-    $('#winText').textContent='Teď zkus jeden snadný Proplet.';
-    $('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Hrát první hru';
+    $('#winTitle').textContent='Trénink v kapse, odznak čeká!';$('#winBadge').textContent='✓';
+    if(!$('#firstStepsTrainingReward')){
+      const reward=document.createElement('figure');reward.id='firstStepsTrainingReward';
+      reward.innerHTML='<img src="/rewards/printshop/prvni-proplet.svg?v=3" width="168" height="168" alt="" aria-hidden="true"><figcaption><strong>První Proplet</strong><p>Vyřeš první Proplet a odznak je tvůj.</p></figcaption>';
+      $('#winTitle').insertAdjacentElement('afterend',reward);
+    }
+    $('#winText').textContent='';
+    $('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Hrát dál';
     $('#winPrimaryBtn').onclick=startFirst;
   }
   function embeddedBrowser(){return /FBAN|FBAV|Instagram|\bwv\b/i.test(navigator.userAgent)}
