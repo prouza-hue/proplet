@@ -10,7 +10,7 @@ on:
       - 'public/difficulty/printshop/mozkokalypsa.svg'
       - 'tests/current/test_mozkokalypsa*'
       - 'tools/test_mozkokalypsa*'
-      - 'SUPABASE_MOZKOKALYPSA_PLAYTEST.sql'
+      - 'SUPABASE_MOZKOKALYPSA*.sql'
       - '.github/workflows/mozkokalypsa-acceptance.yml'
 permissions:
   contents: read
@@ -49,7 +49,7 @@ jobs:
         env:
           PROPLET_PLAYTEST_LOCAL_QA: 'true'
           VERCEL_ENV: preview
-          VERCEL_GIT_COMMIT_REF: feat/mozkokalypsa-playtest
+          VERCEL_GIT_COMMIT_REF: feat/mozkokalypsa-round2-release
           SUPABASE_URL: ''
           SUPABASE_SECRET_KEY: ''
         run: |
@@ -63,3 +63,4 @@ jobs:
           name: mozkokalypsa-acceptance
           path: /tmp/mk-evidence
           retention-days: 7
+

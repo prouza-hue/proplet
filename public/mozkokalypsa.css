@@ -27,3 +27,6 @@ html[data-theme=dark] .mk-invite .primary-btn,html[data-theme=dark] .mk-pilot-mo
 html.tiskarna-ui #screen-daily #mozkokalypsaInvite{background:var(--mk-wash)!important;border-left:4px solid var(--mk-ink)!important}
 html.tiskarna-ui #screen-daily #mozkokalypsaInvite .primary-btn{background:#733F57!important;color:#FFF8EF!important;box-shadow:0 3px 0 #4B293C!important}
 html.tiskarna-ui[data-theme=dark] #screen-daily #mozkokalypsaInvite .primary-btn{background:#BF8198!important;color:#231E2D!important;box-shadow:0 3px 0 #674152!important}
+
+
+.mk-invite .mk-deadline{font-weight:750;color:var(--text);grid-column:1/-1}

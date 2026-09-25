@@ -45,10 +45,10 @@ with sync_playwright() as pw:
   assert page.evaluate('currentGame.hints')==1
   assert page.evaluate('currentGame.calmMode') is True
   report['checks'].append('reload-resume-with-hint-and-calm')
-  for n in range(10):
+  for n in range(12):
    page.wait_for_function("currentGame?.mode==='playtest' && !currentGame.finished")
    if n==1:
-    assert page.locator('#board > .cell').count()==100
+    assert page.locator('#board > .cell').count()==120
     page.locator('#calmRunBtn:not(.hidden)').wait_for()
     page.wait_for_timeout(200)
     report['checks'].append('calm-button-restored-on-next-board')
@@ -81,18 +81,18 @@ with sync_playwright() as pw:
    if n==1:page.screenshot(path=str(args.output/'05-result-mobile.png'),full_page=True)
    page.locator('#mkResultNext').click()
   page.locator('#mkHubModal:not(.hidden)').wait_for()
-  assert page.locator('#mkBoardList button:disabled').count()==10
+  assert page.locator('#mkBoardList button').count()==12
   after=page.evaluate('JSON.stringify({completed:getState().completed,inProgress:getState().inProgress,queue:getQueue()})')
   assert baseline==after,'Playtest polluted normal progression or result queue'
-  state=page.evaluate("JSON.parse(localStorage.getItem('proplet-playtest:mozkokalypsa-20260922-v1:qa'))")
-  assert len(state['attempts'])==10 and all(a['completed'] for a in state['attempts'].values())
+  state=page.evaluate("JSON.parse(localStorage.getItem('proplet-playtest:mozkokalypsa-round2-20260925:qa'))")
+  assert len(state['attempts'])==12 and all(a['completed'] for a in state['attempts'].values())
   assert all(a.get('feedback',{}).get('fun')==5 for a in state['attempts'].values())
   assert all(a['progress']['firstCorrectMs'] is not None for a in state['attempts'].values())
   for event in [e for a in state['attempts'].values() for e in a['events']]:
    assert event['progress']['elapsedMs']>=0
   assert not [r for r in requests if '/api/mozkokalypsa' in r['url'] and r['method']=='POST'],'QA sent server metrics'
   assert not [r for r in requests if any(x in r['url'] for x in ['/api/result','/api/attempt/','/api/word-discovery/claim']) and r['method']=='POST']
-  report['checks']+=['all-10-native-completions','100-full-cells','feedback-local','first-word-timestamps','no-normal-XP-or-progress','no-QA-server-writes']
+  report['checks']+=['all-12-native-completions','100-full-cells','feedback-local','first-word-timestamps','no-normal-XP-or-progress','no-QA-server-writes']
   report['previewState']=state
   page.screenshot(path=str(args.output/'06-complete.png'),full_page=True)
   if report['errors']:raise AssertionError(report['errors'])
@@ -110,3 +110,4 @@ with sync_playwright() as pw:
   browser.close()
 print(json.dumps({k:v for k,v in report.items() if k not in ('requests','previewState')},ensure_ascii=False))
 assert report['status']=='PASS'
+

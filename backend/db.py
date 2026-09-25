@@ -329,6 +329,10 @@ def db_rpc(
         except Exception:
             error_payload = {}
         logger.warning("Supabase RPC failed function=%s status=%s", function, response.status_code)
+        if function in {'proplet_mozkokalypsa2_open','proplet_mozkokalypsa2_event'}:
+            code=error_payload.get('code') if isinstance(error_payload,dict) else None
+            if code=='PT410':raise HTTPException(410,'Playtest skončil nebo není otevřený.')
+            if code=='PT422':raise HTTPException(422,'Nejdřív dokonči desku a vyplň obě hodnocení.')
         if error_mapper:
             mapped = error_mapper(response.status_code, error_payload if isinstance(error_payload, dict) else {})
             if mapped is not None:
