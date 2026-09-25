@@ -23,9 +23,37 @@ async function draw(page,indices,touch=false){
  }
 }
 
+async function tapCell(page,index,touch=false){
+ const target=page.locator('#board .cell[data-index="'+index+'"]');
+ if(!touch){await target.click();return;}
+ const box=await target.boundingBox(),cdp=await page.context().newCDPSession(page);
+ try{await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2,id:1,radiusX:3,radiusY:3,force:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}finally{await cdp.detach();}
+}
+async function starter(page,touch=false,style='drag'){
+ const paths=[[0,1,2],[3,6,7],[4,5,8]];
+ for(let n=0;n<paths.length;n++){
+  if(style==='tap'||(style==='mixed'&&n!==1)){
+   for(let k=0;k<paths[n].length;k++){
+    await tapCell(page,paths[n][k],touch);
+    if(k<paths[n].length-1){assert.equal(await page.evaluate(()=>currentGame.found.length),n);assert.deepEqual(await page.evaluate(()=>currentGame.path),paths[n].slice(0,k+1));assert.equal(await page.locator('#board .cell.active').count(),k+1);}
+   }
+  }else await draw(page,paths[n],touch);
+  await page.waitForFunction(count=>currentGame.found.length===count,n+1);
+  assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+ }
+ await page.locator('#winModal').waitFor({state:'visible'});
+ assert.equal((await events()).some(e=>e.event==='first_steps_v1_offer'),false,'starter is not first real win');
+ for(const name of ['starter_v1_interaction','starter_v1_first_correct','starter_v1_completed','starter_completed','onboarding_completed'])await eventOnce(name);
+ const ev=await events(),phases=['starter_v1_requested','starter_v1_data_ready','starter_v1_ready','starter_v1_interaction','starter_v1_first_correct','starter_v1_completed'];
+ const records=phases.map(name=>ev.find(e=>e.event===name));assert(records.every(Boolean));
+ const positions=records.map(e=>ev.indexOf(e));assert.deepEqual(positions,[...positions].sort((a,b)=>a-b));
+ assert.equal(new Set(records.map(e=>e.headers['x-proplet-starter-run'])).size,1);
+ assert(records.every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'&&e.headers['x-proplet-auth-at-event']==='anonymous'));
+ const elapsed=records.map(e=>Number(e.headers['x-proplet-starter-ms']));assert.deepEqual(elapsed,[...elapsed].sort((a,b)=>a-b));
+}
 async function ready(page){await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter'&&currentGame.puzzle.meta.starterVersion===3&&document.querySelectorAll('#board .cell').length===9,null,{timeout:15000});await page.locator('#starterCoach').waitFor({state:'visible'});}
 async function solve(page,touch=false){const paths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));for(let i=0;i<paths.length;i++){await draw(page,paths[i],touch);await page.waitForFunction(n=>currentGame.found.length===n,i+1);}await page.locator('#winModal').waitFor({state:'visible'});}
-async function firstWin(page,touch=false){await page.goto(url);await ready(page);await solve(page,touch);await page.screenshot({path:output+'.training-'+(touch?'mobile':'desktop')+'.png',fullPage:true});await page.getByRole('button',{name:'Hrát dál',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-001'&&!currentGame.finished);await page.locator('#winModal').waitFor({state:'hidden'});await solve(page,touch);await page.locator('#firstStepsGoogle').waitFor({state:'visible'});}
+async function firstWin(page,touch=false,style='drag'){await page.goto(url);await ready(page);await starter(page,touch,style);await page.screenshot({path:output+'.training-'+(touch?'mobile':'desktop')+'.png',fullPage:true});await page.getByRole('button',{name:'Hrát dál',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-001'&&!currentGame.finished);await page.locator('#winModal').waitFor({state:'hidden'});await solve(page,touch);await page.locator('#firstStepsGoogle').waitFor({state:'visible'});}
 (async()=>{
  const health=await fetch(url+'/api/health').then(r=>r.json());assert(health.isolatedFixture&&!health.database);if(process.env.EXPECTED_SHA)assert.equal(health.sha,process.env.EXPECTED_SHA);report.sha=health.sha;
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
@@ -33,15 +61,15 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
   await control({reset:true,firstSteps:true});
   const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:'block',...(options.userAgent?{userAgent:options.userAgent}:{})});
   await context.route('**/*',route=>['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname)?route.continue():route.abort());
-  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
+  const page=await context.newPage(),errors=[],warnings=[],network=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))warnings.push({type:m.type(),text:m.text()})});page.on('requestfailed',r=>network.push({url:r.url(),error:r.failure()?.errorText}));page.on('response',r=>{if(r.status()>=500)network.push({url:r.url(),status:r.status()})});await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
   console.log('SCENARIO '+name);
-  try{await fn(page,context);assert.deepEqual(errors,[]);await page.screenshot({path:output+'.'+name+'.png',fullPage:true});report.checks.push({name,ok:true,events:await events()});}
+  try{await fn(page,context);assert.deepEqual(errors,[]);await page.screenshot({path:output+'.'+name+'.png',fullPage:true});const localFailures=network.filter(r=>['127.0.0.1','localhost'].includes(new URL(r.url).hostname)&&r.error!=='net::ERR_ABORTED');if(name.startsWith('short-'))assert.deepEqual(localFailures,[],'no failed local request or 5xx');report.checks.push({name,ok:true,events:await events(),warnings,network});}
   catch(error){report.checks.push({name,ok:false,error:error.stack,errors});await page.screenshot({path:output+'.'+name+'.failed.png',fullPage:true}).catch(()=>{});console.error(name+': '+error.message);}
   finally{fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close();}
  }
  try{
-  for(const mobile of [false,true])await scenario(mobile?'short-touch-first-win':'short-mouse-first-win',async page=>{
-   await firstWin(page,mobile);
+  for(const [mobile,style] of [[false,'drag'],[true,'drag'],[false,'tap'],[true,'tap'],[false,'mixed']])await scenario('short-'+(mobile?'touch':'mouse')+'-'+style+'-first-win',async page=>{
+   await firstWin(page,mobile,style);
    await eventOnce('starter_completed');await eventOnce('onboarding_completed');await eventOnce('first_steps_v1_offer');
    const received=await events();assert(received.filter(e=>e.event.startsWith('starter_')).every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'));
    assert.equal(await page.locator('#accountNudgeModal').isVisible(),false);assert.equal(await page.locator('#profileModal').isVisible(),false);
@@ -50,19 +78,30 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
    await page.getByRole('button',{name:'Hrát dál bez účtu',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished&&currentGame.puzzle.id!=='g4-e-001');
    for(const id of ['accountNudgeModal','pushNudgeModal','installNudgeModal'])assert.equal(await page.locator('#'+id).isVisible(),false);
   },{mobile});
+  await scenario('tap-cancel-reset-navigation',async page=>{
+   await page.goto(url);await ready(page);await tapCell(page,0);await tapCell(page,4);assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+   await tapCell(page,0);await tapCell(page,1);await tapCell(page,1);assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+   await tapCell(page,0);await page.evaluate(()=>document.querySelector('#board').dispatchEvent(new PointerEvent('pointercancel',{bubbles:true,pointerId:1})));assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+   await tapCell(page,0);await page.evaluate(()=>resetGame());assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+   await tapCell(page,0);await page.locator('.onboarding-return-login').click();assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);await page.locator('#closeProfileModal').click();
+   await tapCell(page,0);await page.evaluate(()=>nav('daily'));assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+   await page.evaluate(()=>startGame(currentGame.puzzle,'starter'));await ready(page);assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
+   await tapCell(page,0);await tapCell(page,1);await tapCell(page,2);await page.evaluate(()=>window.dispatchEvent(new PointerEvent('pointerup',{pointerId:1})));
+   assert.equal(await page.evaluate(()=>currentGame.found.length),1);assert.equal(await page.evaluate(()=>currentGame.moves),1);
+  });
   await scenario('progressive-help',async page=>{
    await page.goto(url);await ready(page);await draw(page,[0,1,2]);await page.waitForFunction(()=>currentGame.found.length===1);
    await page.locator('#hintBtn').click();assert.equal(await page.locator('#hintModal').isVisible(),false);
    assert.equal(await page.locator('#board .starter-guide').count(),3);assert.equal(await page.evaluate(()=>currentGame.found.length),1,'help does not award the word');await eventOnce('first_steps_v1_assisted');
   });
   await scenario('manual-account-and-sync',async page=>{
-   await firstWin(page);await page.locator('#firstStepsManual').click();await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
+   await firstWin(page);await page.locator('#firstStepsManual').click();await eventOnce('first_steps_v1_manual');await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
    await page.getByRole('button',{name:'Hrát další Proplet',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished);await eventOnce('first_steps_v1_continue');assert.equal((await events()).find(e=>e.event==='first_steps_v1_continue').headers['x-proplet-onboarding'],'board-v3-short');
   });
   await scenario('google-direct-round-trip',async page=>{
-   await firstWin(page);await page.locator('#firstStepsGoogle').click();
+   await firstWin(page);await page.locator('#firstStepsGoogle').click();await eventOnce('first_steps_v1_google');
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);
    assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
@@ -93,3 +132,4 @@ async function firstWin(page,touch=false){await page.goto(url);await ready(page)
   assert(report.checks.every(c=>c.ok),'All first-step browser scenarios must pass; see report');report.finished=new Date().toISOString();fs.writeFileSync(output,JSON.stringify(report,null,2));console.log(JSON.stringify({sha:report.sha,passed:report.checks.map(c=>c.name)}));
  }finally{await browser.close();}
 })().catch(error=>{fs.writeFileSync(output,JSON.stringify(report,null,2));console.error(error);process.exitCode=1});
+

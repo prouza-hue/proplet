@@ -13,7 +13,7 @@ theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.02.2"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 assert "version:'4.02.2'" in runtime
-assert "proplet-v4.02.2-metaacquisition2" in sw
+assert "proplet-v4.02.2-starterinput1" in sw
 assert 'theme-init.js?v=metaacquisition2' in html and 'theme-init.js?v=metaacquisition2' in sw
 assert "app-profile-settings.css?v=privacyflow1" in theme
 
@@ -26,4 +26,5 @@ assert "wide?position-current.offsetWidth-gap" in app
 assert "if(currentScreen==='profile')focusProfileRoadmap()" in app
 
 print("PASS: v4.02.2 preserves wide profile alignment")
+
 

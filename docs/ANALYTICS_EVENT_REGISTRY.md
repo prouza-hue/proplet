@@ -81,3 +81,39 @@ Adding or removing a product event requires:
 2. updating the golden fixture and current tests;
 3. preserving the event payload/PII policy unless explicitly approved;
 4. product review if the change alters metric or retention meaning.
+
+
+## board-v3-short provenance and boundaries (2026-09-25)
+
+`X-Proplet-Onboarding` is an exact, case-sensitive allowlist: `board-v2` and
+`board-v3-short` are retained unchanged. Missing, empty, malformed, overlong or
+unknown values map to `legacy`; arbitrary values are never stored. This category
+means **unrecognized/unspecified**, not proof that a player saw an old tutorial.
+The rule applies to all measurement-enriched tables. Environment, is_test,
+measurement_version, client_release and capture-time auth remain independent.
+Anonymous claim updates actor ownership only; it must not rewrite provenance.
+Server-owned `account_created` is authoritative; do not infer its absent client
+release or onboarding version from the actor's other events.
+
+Ordered diagnostic phases per `starter_run_id`:
+`requested → data_ready → ready → interaction → first_correct → completed`.
+`ready` means the board rendered, not that input was proven functional.
+`interaction` is the first real board pointer interaction (tap or drag), at most
+once per run. `first_correct` follows actual word acceptance, `completed` follows
+all three accepted words; both are at most once per run. `hidden` is visibility,
+not definitive abandonment. Reason remains an allowlist; no URLs, PII or raw errors.
+
+`starter_started` is a compatibility event just before ready.
+`onboarding_completed`, `starter_completed`, `starter_v1_completed` are **one
+logical starter-completion boundary**, never three successive funnel steps.
+`g4-e-001` completion is a separate real-game boundary. Only then can
+`first_steps_v1_offer` fire; Google/manual/continue follow the offer. `saved`
+requires confirmed sync after auth/claim, and is not emitted for preview storage.
+
+Evaluate new runs by environment=production, is_test=false, exact onboarding
+version and client release, retaining run IDs, captured elapsed times and
+capture-time auth. Report stage reach by distinct runs and distinct actors
+separately. Compare only closed, comparable acquisition/time windows; today's
+rolling totals are diagnostics, not a causal uplift claim. Historical rows from
+known faulty releases require explicit correction; do not silently reinterpret
+all legacy rows, nor mix corrected and uncorrected populations.
