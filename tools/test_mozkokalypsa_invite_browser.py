@@ -16,7 +16,7 @@ with sync_playwright() as pw:
   page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for()
   page.wait_for_function('!!puzzleDB && !document.documentElement.classList.contains("proplet-current-ui-booting") && !document.getElementById("propletBootScreen")')
   page.wait_for_timeout(400)
-  assert page.locator('.mk-round-stamp').inner_text()=='Druhé kolo'
+  assert page.locator('.mk-round-stamp').text_content().strip()=='Druhé kolo'
   assert page.locator('#mkInviteTitle').inner_text()=='Mozkokalypsa se vrací.'
   assert 'Psst' not in page.locator('#mozkokalypsaInvite').inner_text()
   assert 'mozkokalypsa-v2.svg' in page.locator('.mk-invite-art').get_attribute('src')
