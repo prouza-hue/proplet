@@ -37,3 +37,42 @@ Doplnit finální SHA, deployment, aktivní kohortu a výsledky gates po nasazen
 Migrace `mozkokalypsa_round2_timed_rewards` úspěšně aplikována standardní cestou 25. 9. 2026 ve 22:18 UTC. Ověřeno 12 zaregistrovaných desek, experiment zatím neaktivní, 0 pozvánek. Role anon/authenticated nemají SELECT k nové bance ani EXECUTE k novým RPC; service_role má potřebná práva. RLS bez klientských policies je zde záměrný serverový přístup. Advisor nehlásí nový bezpečnostní problém playtestu; obecné upozornění na vypnutou kontrolu uniklých hesel Supabase Auth není změnou této migrace ([podrobnosti](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)).
 
 Jednorázové vyhodnocení naplánováno na úterý 29. 9. ráno kolem 08:00 Europe/Prague. Uzavření hry není na běhu této úlohy závislé.
+
+## Skutečný produkční stav — 26. 9. 2026, 00:27 Europe/Prague
+
+- PR #144 sloučeno. Produkční SHA `3b2c40a290bd10f3dd3de1df694d3db360858900`.
+- Deployment `dpl_5EkMEymSPwUVz47fgzAcFXsEiYbE`, target `production`, stav `READY`, alias https://hrajproplet.cz. Nový build z main, žádné povýšení preview.
+- Strom `e56a6a7b7be79d8b1b89f7d9a2a74b256ae37a3f` je identický se stromem otestované větve na SHA `486892188af1edb0bcc2eb8ef3889a9db1c0ae37`.
+- `/api/health`: HTTP 200, `ok=true`, `database=true`. Produkční adapter JS, service worker a SVG nové ikony přesně odpovídají nasazeným souborům.
+- Anonymní status: `eligible=false`. Produkční QA status: HTTP 403. Náhled větve má `database=false`.
+- Aktivace jednou v `2026-09-25 22:26:45.83577 UTC`; dostupnost true, 12 aktivních testerů. Zatím 0 pokusů a 0 odměn nového kola. Původní pilot stále 50/50 dokončeno a 45 hodnocení.
+- Kontrola error/fatal logů tohoto deploymentu 22:25–22:27 UTC: žádný odpovídající záznam. Jde o krátkou kontrolu po nasazení, nikoli dlouhodobou provozní záruku.
+
+### Zmrazená kohorta
+
+| Hráč | Výběr | Celkové XP při výběru | Pořadí desek |
+|---|---|---:|---:|
+| PiettraWal | TOP 1 | 96 447 | 1 |
+| Michael | TOP 2 | 92 356 | 2 |
+| Ave | TOP 3 | 78 210 | 3 |
+| Frau Klein | TOP 4 | 61 369 | 1 |
+| Kvasmeister | TOP 5 | 59 469 | 2 |
+| BoltKey | TOP 6 | 58 457 | 3 |
+| Diss | TOP 7 | 58 372 | 1 |
+| Umpalump | TOP 8 | 57 085 | 2 |
+| Janak | TOP 9 | 56 522 | 3 |
+| MP | TOP 10 | 52 224 | 1 |
+| Pavel | explicitně, celkově 12. | 45 213 | 2 |
+| Petra | explicitně, celkově 23. | 13 917 | 3 |
+
+Všichni mají roli tester. Žádní pozorovatelé. Pozdější změny žebříčku tuto skupinu nepřepočítávají.
+
+### Doložené testy a omezení
+
+- Aktuální runtime: **107 PASS / 0 FAIL**, asset kontroly 126 PASS, syntax 358 PASS; job `108273123732`.
+- Izolovaný přihlášený HTTP → PostgREST → PostgreSQL tok: PASS, job `108273123452`. Skutečné vlastní sessions, odmítnutí nepřihlášeného/nepozvaného hráče, trvalý zápis a obnovení metrik, idempotence, konflikt revizí, neúplné/podvržené dokončení odmítnuto, samotné dokončení 0 XP, chybějící známka odmítnuta, dvě známky 200 XP jednou, opakování i nové hodnocení bez další odměny, databázová uzávěrka. Běžné výsledky, série a postup beze změn.
+- Native acceptance: PASS, job `108273123189`, všech 12 dohrání přes nativní herní tok, skutečný pointer vstup, nápověda a Klid, obnovení po reloadu, návrat k neohodnocené desce a odeslání obou známek. Žádné chyby JS, zápisy běžného postupu ani QA zápisy na server.
+- Vizuálně prohlédnut mobil 390px ve světlém i tmavém režimu, výsledek s hodnocením a nová ikona; testována též emulace Fold 768px. Nejde o fyzické zařízení.
+- Printshop/UI regresní test prošel na `5e2034152b81da4fd74bbc5596fdb3f934a67b75`; následující commity měnily pouze testy a dokumentaci. Onboarding browser gate prošel na finálním kandidátovi.
+- Syntetické zápisy proběhly výhradně v izolované CI databázi. Přihlášené hraní skutečného účtu na hostované produkci nebylo předstíráno ani provedeno za hráče. První skutečný produkční zápis bude pocházet od některého z pozvaných hráčů.
+- Převod dokončení do finální série je podmíněný vyhodnocením a schválením; nyní je zachována potřebná identita obsahu a evidence, nikoli vytvořena finální série.
