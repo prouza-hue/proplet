@@ -1,0 +1,2077 @@
+{
+  "kind": "lexical-allocation-only-not-generated-boards",
+  "seed": 2026092700,
+  "boardsPlanned": 100,
+  "occurrences": 1400,
+  "uniqueWords": 761,
+  "maxUses": 4,
+  "minOrdinalGap": 5,
+  "gapsUnder20": 99,
+  "topRepeated": [
+    [
+      "cukrárna",
+      4
+    ],
+    [
+      "simulace",
+      4
+    ],
+    [
+      "spolužák",
+      4
+    ],
+    [
+      "generace",
+      4
+    ],
+    [
+      "učebnice",
+      4
+    ],
+    [
+      "software",
+      4
+    ],
+    [
+      "rukavice",
+      4
+    ],
+    [
+      "papoušek",
+      4
+    ],
+    [
+      "festival",
+      4
+    ],
+    [
+      "pomeranč",
+      4
+    ],
+    [
+      "bankovka",
+      4
+    ],
+    [
+      "pastelka",
+      4
+    ],
+    [
+      "houpačka",
+      4
+    ],
+    [
+      "rychlost",
+      4
+    ],
+    [
+      "bumerang",
+      4
+    ]
+  ],
+  "hardCooldown": false,
+  "hardUseCap": false,
+  "qualityPoolUnchanged": true,
+  "allocation": [
+    {
+      "ordinal": 1,
+      "words": [
+        "cukrárna",
+        "simulace",
+        "charakter",
+        "vysočina",
+        "prázdný",
+        "květen",
+        "legenda",
+        "autobus",
+        "přehled",
+        "obvod",
+        "cvrček",
+        "spolužák",
+        "generace",
+        "rozdíl"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 2,
+      "words": [
+        "gladiátor",
+        "houska",
+        "beruška",
+        "učebnice",
+        "energie",
+        "soutěž",
+        "software",
+        "bezpečí",
+        "rukavice",
+        "papoušek",
+        "festival",
+        "březen",
+        "bizon",
+        "snídaně"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 3,
+      "words": [
+        "pomeranč",
+        "galerie",
+        "zenit",
+        "koncert",
+        "bankovka",
+        "klokan",
+        "pastelka",
+        "letadlo",
+        "soubor",
+        "parazit",
+        "croissant",
+        "houpačka",
+        "význam",
+        "rychlost"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 4,
+      "words": [
+        "polévka",
+        "nízký",
+        "odejít",
+        "problém",
+        "bumerang",
+        "asteroid",
+        "ještěrka",
+        "žaludek",
+        "kontinent",
+        "bažina",
+        "talisman",
+        "pohoří",
+        "klávesa",
+        "zákazník"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 5,
+      "words": [
+        "prostředí",
+        "hrdlička",
+        "složka",
+        "sklenice",
+        "hranolky",
+        "hodnota",
+        "hyena",
+        "koupelna",
+        "chodba",
+        "produkt",
+        "hlasitý",
+        "zmrzlina",
+        "program",
+        "senzor"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 6,
+      "words": [
+        "nádraží",
+        "ložnice",
+        "čokoláda",
+        "daleký",
+        "velbloud",
+        "důsledek",
+        "veverka",
+        "poslední",
+        "krokodýl",
+        "podnebí",
+        "plocha",
+        "architekt",
+        "vakuum",
+        "šifra"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 7,
+      "words": [
+        "ledovec",
+        "prohlížeč",
+        "bludiště",
+        "trilobit",
+        "rekord",
+        "bonbon",
+        "planina",
+        "knihovna",
+        "satelit",
+        "rozpočet",
+        "pijavice",
+        "zeměpis",
+        "obava",
+        "výzkum"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 8,
+      "words": [
+        "katedrála",
+        "domácí",
+        "lepidlo",
+        "příčina",
+        "grafika",
+        "způsob",
+        "fotbal",
+        "doprava",
+        "procento",
+        "mlhovina",
+        "odstavec",
+        "vidlička",
+        "dovolená",
+        "rytíř"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 9,
+      "words": [
+        "erotoman",
+        "kráter",
+        "průzkum",
+        "koloběžka",
+        "minulost",
+        "pravopis",
+        "materiál",
+        "událost",
+        "limonáda",
+        "sleva",
+        "kolotoč",
+        "prostor",
+        "pavouk",
+        "průliv"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 10,
+      "words": [
+        "aligátor",
+        "památka",
+        "kopat",
+        "bouřka",
+        "jogurt",
+        "internet",
+        "hlavolam",
+        "parodie",
+        "ropucha",
+        "firewall",
+        "bavlna",
+        "krupobití",
+        "historie",
+        "galaxie"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 11,
+      "words": [
+        "myšlenka",
+        "snadný",
+        "mokrý",
+        "mikrofon",
+        "nabídka",
+        "baterka",
+        "paprika",
+        "nížina",
+        "postoj",
+        "královna",
+        "elektřina",
+        "velryba",
+        "pravítko",
+        "sněhulák"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 12,
+      "words": [
+        "zařízení",
+        "periskop",
+        "nabíječka",
+        "chodidlo",
+        "otevřít",
+        "refrén",
+        "nářečí",
+        "hořčice",
+        "algebra",
+        "znalost",
+        "heslo",
+        "stříbrná",
+        "návštěva",
+        "kompas"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 13,
+      "words": [
+        "housenka",
+        "prosinec",
+        "protein",
+        "lesní",
+        "gejzír",
+        "střecha",
+        "prodavač",
+        "teleskop",
+        "postup",
+        "nevýhoda",
+        "evoluce",
+        "stereotyp",
+        "kamarád",
+        "břicho"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 14,
+      "words": [
+        "nostalgie",
+        "škeble",
+        "labyrint",
+        "dialekt",
+        "špinavý",
+        "anakonda",
+        "symfonie",
+        "široký",
+        "teploměr",
+        "projekt",
+        "baterie",
+        "křivý",
+        "poptávka",
+        "podoba"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 15,
+      "words": [
+        "metafora",
+        "goblin",
+        "slepice",
+        "procesor",
+        "sokol",
+        "blízko",
+        "jestřáb",
+        "tortilla",
+        "albatros",
+        "tragédie",
+        "souhvězdí",
+        "průměr",
+        "kukačka",
+        "babočka"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 16,
+      "words": [
+        "plavání",
+        "supernova",
+        "rašelina",
+        "relikvie",
+        "koukat",
+        "alegorie",
+        "turnaj",
+        "kudlanka",
+        "technika",
+        "kabel",
+        "kulatý",
+        "reaktor",
+        "deštník",
+        "lucerna"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 17,
+      "words": [
+        "plíce",
+        "mravenec",
+        "křeslo",
+        "výjimka",
+        "orchestr",
+        "skafandr",
+        "virtuální",
+        "planeta",
+        "lavice",
+        "termoska",
+        "poslat",
+        "výprava",
+        "čtverec",
+        "listopad"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 18,
+      "words": [
+        "kroupy",
+        "mikroskop",
+        "vlkodlak",
+        "kobliha",
+        "pergamen",
+        "fantazie",
+        "hurikán",
+        "horní",
+        "špaček",
+        "míchat",
+        "monolog",
+        "popcorn",
+        "biologie",
+        "revoluce"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 19,
+      "words": [
+        "poznatek",
+        "spacák",
+        "buldozer",
+        "vrstva",
+        "databáze",
+        "jezevec",
+        "námraza",
+        "lednice",
+        "hypotéza",
+        "čekat",
+        "pomalý",
+        "sardinka",
+        "fascinace",
+        "vakcína"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 20,
+      "words": [
+        "přinést",
+        "plejtvák",
+        "ekologie",
+        "datel",
+        "nejistota",
+        "lezení",
+        "východ",
+        "panter",
+        "genetika",
+        "rovnice",
+        "studánka",
+        "konfeta",
+        "konzole",
+        "barakuda"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 21,
+      "words": [
+        "hardware",
+        "bakterie",
+        "radar",
+        "prohrát",
+        "vypravěč",
+        "otázka",
+        "kontrola",
+        "úroveň",
+        "konvice",
+        "omeleta",
+        "cibule",
+        "předsudek",
+        "náhorní",
+        "meteorit"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 22,
+      "words": [
+        "šimpanz",
+        "duben",
+        "nosorožec",
+        "dokument",
+        "symbióza",
+        "joystick",
+        "odpověď",
+        "dialog",
+        "večeře",
+        "hacker",
+        "vodopád",
+        "tradice",
+        "zelenina",
+        "vrtulník"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 23,
+      "words": [
+        "ubrousek",
+        "výsledek",
+        "kentaur",
+        "pokladna",
+        "skřítek",
+        "leguán",
+        "chromozom",
+        "leopard",
+        "freska",
+        "tisíc",
+        "lachtan",
+        "přijít",
+        "horizont",
+        "legionář"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 24,
+      "words": [
+        "řešení",
+        "plameňák",
+        "elektron",
+        "kotva",
+        "hodina",
+        "koberec",
+        "kapitola",
+        "hologram",
+        "jeseter",
+        "jeskyně",
+        "pointa",
+        "jinovatka",
+        "tramvaj",
+        "langusta"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 25,
+      "words": [
+        "proton",
+        "vesnice",
+        "křepelka",
+        "náměstí",
+        "pistácie",
+        "švestka",
+        "vichřice",
+        "kapybara",
+        "strategie",
+        "karavan",
+        "zájem",
+        "období",
+        "alchymie",
+        "satira"
+      ],
+      "relaxedUsePreference": 1
+    },
+    {
+      "ordinal": 26,
+      "words": [
+        "učebnice",
+        "knihovna",
+        "dovolená",
+        "studený",
+        "batole",
+        "medaile",
+        "zápletka",
+        "slogan",
+        "pojem",
+        "podlaha",
+        "příklad",
+        "hranolky",
+        "plazma",
+        "geometrie"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 27,
+      "words": [
+        "periskop",
+        "obsah",
+        "minotaur",
+        "hladový",
+        "pomeranč",
+        "prodavač",
+        "architekt",
+        "večerní",
+        "tablet",
+        "nástroj",
+        "svítit",
+        "rukavice",
+        "památka",
+        "dohoda"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 28,
+      "words": [
+        "sklenice",
+        "počítat",
+        "hádanka",
+        "kapsle",
+        "pořadí",
+        "kategorie",
+        "tábor",
+        "rovník",
+        "pravítko",
+        "robotika",
+        "simulace",
+        "netopýr",
+        "pravopis",
+        "skořice"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 29,
+      "words": [
+        "chodidlo",
+        "larva",
+        "chvíle",
+        "čokoláda",
+        "traktor",
+        "spolužák",
+        "příčina",
+        "řemeslo",
+        "zařízení",
+        "lanovka",
+        "korzár",
+        "pravidlo",
+        "filozofie",
+        "delfín"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 30,
+      "words": [
+        "displej",
+        "pastelka",
+        "zákazník",
+        "výhoda",
+        "oslava",
+        "pijavice",
+        "kroužek",
+        "ještěrka",
+        "služba",
+        "monitor",
+        "kapitán",
+        "vstupenka",
+        "tragédie",
+        "tmavý"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 31,
+      "words": [
+        "klávesa",
+        "respekt",
+        "alegorie",
+        "gramatika",
+        "lišaj",
+        "riziko",
+        "vzduch",
+        "poslední",
+        "povaha",
+        "poznání",
+        "vysočina",
+        "housenka",
+        "zmrzlina",
+        "svačina"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 32,
+      "words": [
+        "technika",
+        "příroda",
+        "kostel",
+        "euforie",
+        "sněhulák",
+        "formule",
+        "cukrárna",
+        "kakadu",
+        "prosinec",
+        "pixel",
+        "snowboard",
+        "turbína",
+        "důvěra",
+        "listopad"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 33,
+      "words": [
+        "včera",
+        "rodina",
+        "tulipán",
+        "hrdlička",
+        "talisman",
+        "poklad",
+        "postava",
+        "profese",
+        "firewall",
+        "laguna",
+        "důsledek",
+        "skluzavka",
+        "lektvar",
+        "metafora"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 34,
+      "words": [
+        "bonviván",
+        "odnést",
+        "poptávka",
+        "divadlo",
+        "sněhová",
+        "peřej",
+        "bludiště",
+        "vynález",
+        "palačinka",
+        "kultura",
+        "kosmos",
+        "mramor",
+        "materiál",
+        "software"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 35,
+      "words": [
+        "babička",
+        "samuraj",
+        "vysoký",
+        "procento",
+        "papoušek",
+        "družice",
+        "labyrint",
+        "užovka",
+        "vidlička",
+        "kvazar",
+        "tarantule",
+        "symfonie",
+        "koráb",
+        "přízrak"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 36,
+      "words": [
+        "festival",
+        "poznatek",
+        "myšlenka",
+        "květina",
+        "odvaha",
+        "prázdniny",
+        "skupina",
+        "kavárna",
+        "pocit",
+        "albatros",
+        "džungle",
+        "tundra",
+        "vrchol",
+        "anakonda"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 37,
+      "words": [
+        "bankovka",
+        "limonáda",
+        "polárka",
+        "čepice",
+        "povídka",
+        "rybák",
+        "proroctví",
+        "generace",
+        "rašelina",
+        "portrét",
+        "kostra",
+        "nálada",
+        "minulost",
+        "fialová"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 38,
+      "words": [
+        "táhnout",
+        "stránka",
+        "kontinent",
+        "zelená",
+        "velbloud",
+        "knedlík",
+        "návštěva",
+        "odměna",
+        "svoboda",
+        "amulet",
+        "barakuda",
+        "návyk",
+        "aligátor",
+        "mravenec"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 39,
+      "words": [
+        "štětec",
+        "kobliha",
+        "postup",
+        "houpačka",
+        "taťka",
+        "smlouva",
+        "kreslit",
+        "trilobit",
+        "poloha",
+        "nabíječka",
+        "studánka",
+        "rozpočet",
+        "relikvie",
+        "imunita"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 40,
+      "words": [
+        "laboratoř",
+        "koupelna",
+        "lasice",
+        "tortilla",
+        "hlavolam",
+        "chytrý",
+        "brambor",
+        "volavka",
+        "letiště",
+        "rychlost",
+        "bakterie",
+        "námět",
+        "plocha",
+        "neutron"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 41,
+      "words": [
+        "zelenina",
+        "piráti",
+        "termoska",
+        "teploměr",
+        "pondělí",
+        "program",
+        "náhoda",
+        "skafandr",
+        "historie",
+        "koloběžka",
+        "abeceda",
+        "cedule",
+        "velryba",
+        "balet"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 42,
+      "words": [
+        "výroba",
+        "deštník",
+        "alpaka",
+        "kudlanka",
+        "průzkum",
+        "diamant",
+        "kapsa",
+        "kapybara",
+        "semafor",
+        "internet",
+        "symbióza",
+        "inspirace",
+        "citron",
+        "hypotéza"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 43,
+      "words": [
+        "taška",
+        "alchymie",
+        "teleskop",
+        "kategorie",
+        "hardware",
+        "puzzle",
+        "písmeno",
+        "buldozer",
+        "neuron",
+        "pistácie",
+        "pobřeží",
+        "avokádo",
+        "přístav",
+        "treska"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 44,
+      "words": [
+        "česnek",
+        "odstavec",
+        "vrtulník",
+        "zdraví",
+        "genetika",
+        "chiméra",
+        "mořský",
+        "krokodýl",
+        "výstava",
+        "policista",
+        "malovat",
+        "centrum",
+        "joystick",
+        "opera"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 45,
+      "words": [
+        "vztah",
+        "vichřice",
+        "sardinka",
+        "sušenka",
+        "královna",
+        "smaragd",
+        "počítač",
+        "pergamen",
+        "příliv",
+        "biologie",
+        "zpěvák",
+        "refrén",
+        "přestávka",
+        "znalost"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 46,
+      "words": [
+        "prázdniny",
+        "provaz",
+        "stříbrná",
+        "hodnota",
+        "kořen",
+        "parodie",
+        "orchestr",
+        "vlkodlak",
+        "asteroid",
+        "chemie",
+        "kapitán",
+        "žralok",
+        "ubrousek",
+        "barevný"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 47,
+      "words": [
+        "ekologie",
+        "meteorit",
+        "vypravěč",
+        "nástroj",
+        "pokladna",
+        "legenda",
+        "minerál",
+        "fascinace",
+        "koupit",
+        "polštář",
+        "krypta",
+        "ninja",
+        "databáze",
+        "rytmus"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 48,
+      "words": [
+        "hologram",
+        "procesor",
+        "zavřít",
+        "reaktor",
+        "dobrý",
+        "plameňák",
+        "křepelka",
+        "vynález",
+        "design",
+        "blízký",
+        "zvědavost",
+        "slabika",
+        "langusta",
+        "silnice"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 49,
+      "words": [
+        "fantazie",
+        "králík",
+        "parazit",
+        "plejtvák",
+        "robotika",
+        "výzva",
+        "vrátit",
+        "bezpečí",
+        "oblázky",
+        "mikrofon",
+        "pelikán",
+        "bumerang",
+        "foukat",
+        "princezna"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 50,
+      "words": [
+        "akvarel",
+        "nevýhoda",
+        "nostalgie",
+        "začátek",
+        "horizont",
+        "kobra",
+        "dokument",
+        "zatmění",
+        "pramen",
+        "výsledek",
+        "lopata",
+        "kapitola",
+        "krajina",
+        "volant"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 51,
+      "words": [
+        "barva",
+        "kontrola",
+        "mlhovina",
+        "melodie",
+        "orangutan",
+        "plakat",
+        "revoluce",
+        "fantom",
+        "elektron",
+        "planina",
+        "zatáčka",
+        "budova",
+        "mozaika",
+        "pravidlo"
+      ],
+      "relaxedUsePreference": 2
+    },
+    {
+      "ordinal": 52,
+      "words": [
+        "seriál",
+        "tornádo",
+        "talent",
+        "android",
+        "čtvrtek",
+        "prodavač",
+        "minotaur",
+        "nabíječka",
+        "zápletka",
+        "tragédie",
+        "aligátor",
+        "trofej",
+        "fenek",
+        "hlemýžď"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 53,
+      "words": [
+        "cyklus",
+        "kuchař",
+        "katakomby",
+        "firewall",
+        "pohádka",
+        "rašelina",
+        "vývoj",
+        "červená",
+        "komedie",
+        "pravopis",
+        "ještěrka",
+        "zlomek",
+        "zákazník",
+        "přízrak"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 54,
+      "words": [
+        "čokoláda",
+        "pastelka",
+        "dialekt",
+        "talisman",
+        "papoušek",
+        "pevnost",
+        "muflon",
+        "průběh",
+        "objem",
+        "euforie",
+        "barakuda",
+        "skluzavka",
+        "kamzík",
+        "večerní"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 55,
+      "words": [
+        "limonáda",
+        "fialová",
+        "formule",
+        "provoz",
+        "marioneta",
+        "tučňák",
+        "jantar",
+        "vafle",
+        "poznatek",
+        "smlouva",
+        "planeta",
+        "zmrzlina",
+        "housenka",
+        "joystick"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 56,
+      "words": [
+        "pomeranč",
+        "albatros",
+        "kronika",
+        "tlačit",
+        "dovolená",
+        "galeona",
+        "těstoviny",
+        "optika",
+        "teplota",
+        "profese",
+        "cukrárna",
+        "materiál",
+        "balvan",
+        "rovný"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 57,
+      "words": [
+        "genetika",
+        "tvaroh",
+        "krabice",
+        "čaroděj",
+        "prázdný",
+        "poslední",
+        "koupelna",
+        "mýtus",
+        "skafandr",
+        "nabídka",
+        "poezie",
+        "tarantule",
+        "minotaur",
+        "fyzika"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 58,
+      "words": [
+        "telefon",
+        "svitek",
+        "festival",
+        "problém",
+        "knihovna",
+        "holub",
+        "listopad",
+        "hardware",
+        "nejistota",
+        "hormon",
+        "školka",
+        "spolužák",
+        "rosomák",
+        "náhorní"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 59,
+      "words": [
+        "šprýmař",
+        "rekord",
+        "rukavice",
+        "symfonie",
+        "houpačka",
+        "rozpočet",
+        "kombajn",
+        "zvlášť",
+        "sklenice",
+        "kavárna",
+        "gepard",
+        "palačinka",
+        "etapa",
+        "žaludek"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 60,
+      "words": [
+        "skládačka",
+        "polévka",
+        "kentaur",
+        "veselý",
+        "široký",
+        "tortilla",
+        "prosinec",
+        "hydra",
+        "lavina",
+        "výjimka",
+        "alegorie",
+        "šampion",
+        "orchestr",
+        "teploměr"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 61,
+      "words": [
+        "velbloud",
+        "karavan",
+        "zelenina",
+        "kamera",
+        "legionář",
+        "chameleon",
+        "šunka",
+        "návštěva",
+        "reakce",
+        "kosatka",
+        "zeměpis",
+        "generace",
+        "adresa",
+        "neutron"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 62,
+      "words": [
+        "srdce",
+        "snowboard",
+        "pergamen",
+        "rovnice",
+        "kolotoč",
+        "teleskop",
+        "bakterie",
+        "zahrada",
+        "zařízení",
+        "pijavice",
+        "kyborg",
+        "karton",
+        "horský",
+        "čtverec"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 63,
+      "words": [
+        "anakonda",
+        "ekosystém",
+        "poptávka",
+        "minuta",
+        "titán",
+        "historie",
+        "ústřice",
+        "matice",
+        "kobylka",
+        "pštros",
+        "buldozer",
+        "myšlenka",
+        "baterie",
+        "tornádo"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 64,
+      "words": [
+        "chroust",
+        "sestra",
+        "revoluce",
+        "pistácie",
+        "bankovka",
+        "příběh",
+        "energie",
+        "studánka",
+        "sépie",
+        "chiméra",
+        "elektron",
+        "družice",
+        "metoda",
+        "kouzelník"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 65,
+      "words": [
+        "meteorit",
+        "učebnice",
+        "denní",
+        "soutěž",
+        "proroctví",
+        "odpověď",
+        "ponorka",
+        "biologie",
+        "postava",
+        "doprava",
+        "šampon",
+        "královna",
+        "prodat",
+        "nevýhoda"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 66,
+      "words": [
+        "doktor",
+        "pokladna",
+        "hamburger",
+        "asteroid",
+        "blues",
+        "evoluce",
+        "hrdlička",
+        "chodidlo",
+        "krajina",
+        "profil",
+        "podoba",
+        "protein",
+        "malovat",
+        "fantazie"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 67,
+      "words": [
+        "trilobit",
+        "jablko",
+        "slunovrat",
+        "algebra",
+        "plameňák",
+        "báseň",
+        "rozměr",
+        "hodnota",
+        "kudlanka",
+        "labyrint",
+        "náhoda",
+        "monolog",
+        "ponožka",
+        "vlkodlak"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 68,
+      "words": [
+        "příroda",
+        "policista",
+        "svoboda",
+        "krajta",
+        "sushi",
+        "procento",
+        "technika",
+        "loutka",
+        "ubrousek",
+        "horizont",
+        "turbína",
+        "procesor",
+        "muzeum",
+        "veverka"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 69,
+      "words": [
+        "kontrola",
+        "důsledek",
+        "císař",
+        "software",
+        "kuchyně",
+        "svitek",
+        "novela",
+        "lístek",
+        "fosilie",
+        "ohňostroj",
+        "langusta",
+        "vysočina",
+        "paprika",
+        "sasanka"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 70,
+      "words": [
+        "zkusit",
+        "mravenec",
+        "kuchař",
+        "hlasitý",
+        "ložnice",
+        "mikroskop",
+        "vypravěč",
+        "borůvka",
+        "držet",
+        "ekologie",
+        "způsob",
+        "dokument",
+        "událost",
+        "hypotéza"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 71,
+      "words": [
+        "kráva",
+        "kapybara",
+        "marmeláda",
+        "vrtulník",
+        "plavání",
+        "alchymie",
+        "vanilka",
+        "povrch",
+        "kostra",
+        "tradice",
+        "vichřice",
+        "hrozny",
+        "minulost",
+        "příklad"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 72,
+      "words": [
+        "kamarád",
+        "metafora",
+        "mikrofon",
+        "pravítko",
+        "vstát",
+        "klokan",
+        "hlavolam",
+        "výstava",
+        "planina",
+        "propast",
+        "hologram",
+        "turnaj",
+        "senzor",
+        "světluška"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 73,
+      "words": [
+        "volat",
+        "poznání",
+        "kapsle",
+        "telefon",
+        "prostředí",
+        "odstavec",
+        "výsledek",
+        "centrum",
+        "kreveta",
+        "stříbrná",
+        "mutace",
+        "křepelka",
+        "obloha",
+        "periskop"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 74,
+      "words": [
+        "pobřeží",
+        "kapitola",
+        "zápletka",
+        "počítač",
+        "pravidlo",
+        "potok",
+        "skupina",
+        "monzun",
+        "straka",
+        "křeček",
+        "přehled",
+        "vidlička",
+        "nosorožec",
+        "termoska"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 75,
+      "words": [
+        "prázdniny",
+        "akvarel",
+        "smutek",
+        "hranolky",
+        "grafika",
+        "legionář",
+        "sněhulák",
+        "karamel",
+        "úvaha",
+        "bludiště",
+        "relikvie",
+        "pavián",
+        "výjimka",
+        "mikrob"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 76,
+      "words": [
+        "kalhoty",
+        "mlhovina",
+        "charakter",
+        "bumerang",
+        "simulace",
+        "ropucha",
+        "rychlost",
+        "avatar",
+        "semafor",
+        "pohoří",
+        "hokej",
+        "bažant",
+        "kreslit",
+        "plejtvák"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 77,
+      "words": [
+        "divadlo",
+        "internet",
+        "diamant",
+        "police",
+        "gorila",
+        "krokodýl",
+        "postoj",
+        "princezna",
+        "origami",
+        "průzkum",
+        "databáze",
+        "robotika",
+        "symbióza",
+        "mladý"
+      ],
+      "relaxedUsePreference": 3
+    },
+    {
+      "ordinal": 78,
+      "words": [
+        "symfonie",
+        "střecha",
+        "minotaur",
+        "teplota",
+        "makrela",
+        "rozpočet",
+        "papoušek",
+        "ještěrka",
+        "trouba",
+        "server",
+        "housle",
+        "slepice",
+        "odliv",
+        "katedrála"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 79,
+      "words": [
+        "revoluce",
+        "pohádka",
+        "velbloud",
+        "pokladna",
+        "trilobit",
+        "zatáčka",
+        "oblázky",
+        "polárka",
+        "dialog",
+        "nadpis",
+        "medúza",
+        "barakuda",
+        "paměť",
+        "strategie"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 80,
+      "words": [
+        "těstoviny",
+        "bezpečí",
+        "koncert",
+        "cukrárna",
+        "pastelka",
+        "koberec",
+        "kuželky",
+        "software",
+        "studánka",
+        "rejnok",
+        "dohoda",
+        "soubor",
+        "ekologie",
+        "výkon"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 81,
+      "words": [
+        "otevřít",
+        "poznatek",
+        "traktor",
+        "vyhrát",
+        "důsledek",
+        "anakonda",
+        "genetika",
+        "tajga",
+        "katakomby",
+        "růžová",
+        "nabídka",
+        "generace",
+        "jeskyně",
+        "plazma"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 82,
+      "words": [
+        "pomeranč",
+        "polévka",
+        "sardinka",
+        "rovník",
+        "hurikán",
+        "historie",
+        "náměstí",
+        "konfeta",
+        "teploměr",
+        "zlomek",
+        "údolí",
+        "joystick",
+        "gladiátor",
+        "design"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 83,
+      "words": [
+        "námraza",
+        "čokoláda",
+        "nádraží",
+        "geometrie",
+        "albatros",
+        "kyselý",
+        "amonit",
+        "omeleta",
+        "tragédie",
+        "sladký",
+        "oceán",
+        "talisman",
+        "vakcína",
+        "biologie"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 84,
+      "words": [
+        "furiant",
+        "langusta",
+        "poptávka",
+        "souhvězdí",
+        "asteroid",
+        "sporák",
+        "myšlenka",
+        "sklenice",
+        "počítat",
+        "vločka",
+        "evoluce",
+        "medaile",
+        "hroch",
+        "příliv"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 85,
+      "words": [
+        "houpačka",
+        "řešení",
+        "hrdlička",
+        "náhorní",
+        "materiál",
+        "housenka",
+        "zmrzlina",
+        "práce",
+        "respekt",
+        "galaxie",
+        "sýkora",
+        "baterka",
+        "laboratoř",
+        "vrstva"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 86,
+      "words": [
+        "končit",
+        "hřiště",
+        "vichřice",
+        "firewall",
+        "prohlížeč",
+        "těsto",
+        "kudlanka",
+        "červen",
+        "dovolená",
+        "parazit",
+        "pistácie",
+        "formule",
+        "poznání",
+        "podnebí"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 87,
+      "words": [
+        "chodidlo",
+        "babička",
+        "pergamen",
+        "přinést",
+        "alchymie",
+        "bankovka",
+        "lanovka",
+        "tarantule",
+        "složka",
+        "sasanka",
+        "sysel",
+        "zákazník",
+        "kvazar",
+        "výzkum"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 88,
+      "words": [
+        "leopard",
+        "odstavec",
+        "průměr",
+        "nabíječka",
+        "plavání",
+        "pravopis",
+        "jeseter",
+        "puštík",
+        "poslední",
+        "bakterie",
+        "emoce",
+        "výroba",
+        "fialová",
+        "hypotéza"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 89,
+      "words": [
+        "jestřáb",
+        "kronika",
+        "nevýhoda",
+        "festival",
+        "knihovna",
+        "sport",
+        "balkon",
+        "abeceda",
+        "amulet",
+        "algebra",
+        "kocour",
+        "výsledek",
+        "kouzelník",
+        "návštěva"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 90,
+      "words": [
+        "slyšet",
+        "orangutan",
+        "lepidlo",
+        "nutrie",
+        "džungle",
+        "změna",
+        "relikvie",
+        "skafandr",
+        "teleskop",
+        "královna",
+        "odvaha",
+        "výstava",
+        "portrét",
+        "učebnice"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 91,
+      "words": [
+        "vidlička",
+        "ubrousek",
+        "beruška",
+        "portál",
+        "panda",
+        "spolužák",
+        "dokument",
+        "kontinent",
+        "meteorit",
+        "přehled",
+        "výhoda",
+        "chápat",
+        "prostor",
+        "řemeslo"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 92,
+      "words": [
+        "hardware",
+        "cedník",
+        "mravenec",
+        "hladový",
+        "limonáda",
+        "pijavice",
+        "energie",
+        "koupelna",
+        "výdaj",
+        "tabule",
+        "ohňostroj",
+        "galerie",
+        "družice",
+        "význam"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 93,
+      "words": [
+        "šampion",
+        "prosinec",
+        "polštář",
+        "labyrint",
+        "plejtvák",
+        "listopad",
+        "gramatika",
+        "reaktor",
+        "vesnice",
+        "stříbrná",
+        "příbor",
+        "nářečí",
+        "zákaz",
+        "cyklus"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 94,
+      "words": [
+        "muréna",
+        "metafora",
+        "foton",
+        "hlavolam",
+        "vstupenka",
+        "jahoda",
+        "novela",
+        "pelikán",
+        "bumerang",
+        "propast",
+        "snídaně",
+        "smlouva",
+        "zařízení",
+        "kapitola"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 95,
+      "words": [
+        "profese",
+        "jaguár",
+        "technika",
+        "fantazie",
+        "ostrov",
+        "koloběžka",
+        "netopýr",
+        "zápletka",
+        "tortilla",
+        "prohra",
+        "rukavice",
+        "pobřeží",
+        "volba",
+        "oblázky"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 96,
+      "words": [
+        "námraza",
+        "procento",
+        "origami",
+        "horizont",
+        "moucha",
+        "popcorn",
+        "pořadí",
+        "křepelka",
+        "prázdniny",
+        "pravidlo",
+        "buldozer",
+        "šaman",
+        "mutace",
+        "zatmění"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 97,
+      "words": [
+        "prodavač",
+        "malina",
+        "elektron",
+        "plavky",
+        "vývoj",
+        "volavka",
+        "procesor",
+        "jinovatka",
+        "hranolky",
+        "křemen",
+        "euforie",
+        "planeta",
+        "kreveta",
+        "minulost"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 98,
+      "words": [
+        "projekt",
+        "internet",
+        "vypravěč",
+        "soused",
+        "paprika",
+        "povaha",
+        "rychlost",
+        "malovat",
+        "předsudek",
+        "termoska",
+        "krokodýl",
+        "čaroděj",
+        "fixka",
+        "čmelák"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 99,
+      "words": [
+        "mlhovina",
+        "supernova",
+        "databáze",
+        "zelenina",
+        "alegorie",
+        "hologram",
+        "přízrak",
+        "brambor",
+        "chytat",
+        "veverka",
+        "rokle",
+        "lavina",
+        "tučňák",
+        "kobylka"
+      ],
+      "relaxedUsePreference": 4
+    },
+    {
+      "ordinal": 100,
+      "words": [
+        "vlkodlak",
+        "kontrola",
+        "hacker",
+        "simulace",
+        "kentaur",
+        "bolest",
+        "hrášek",
+        "bludiště",
+        "produkt",
+        "vrtulník",
+        "úloha",
+        "chroust",
+        "katedrála",
+        "rosomák"
+      ],
+      "relaxedUsePreference": 4
+    }
+  ]
+}

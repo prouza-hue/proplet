@@ -1,0 +1,113 @@
+{
+  "beforeOverlay": {
+    "eligibleTotal": 1165,
+    "lengths": {
+      "6": 349,
+      "7": 221,
+      "5": 412,
+      "8": 128,
+      "9": 55
+    },
+    "tiers": {
+      "A": 375,
+      "B": 481,
+      "C": 309
+    },
+    "lengthTier": {
+      "A": {
+        "6": 131,
+        "7": 43,
+        "5": 190,
+        "8": 8,
+        "9": 3
+      },
+      "B": {
+        "5": 151,
+        "7": 107,
+        "8": 60,
+        "6": 137,
+        "9": 26
+      },
+      "C": {
+        "7": 71,
+        "6": 81,
+        "8": 60,
+        "9": 26,
+        "5": 71
+      }
+    },
+    "demand100": {
+      "5": 100,
+      "6": 300,
+      "7": 400,
+      "8": 500,
+      "9": 100
+    },
+    "distinctUpperBoundFixedShape": 804,
+    "minimumMaxUsesByLength": {
+      "5": 1,
+      "6": 1,
+      "7": 2,
+      "8": 4,
+      "9": 2
+    },
+    "warning": "Length-only necessary bounds, not a proof of geometry or per-board lexical feasibility."
+  },
+  "afterOverlay": {
+    "eligibleTotal": 1169,
+    "lengths": {
+      "6": 349,
+      "7": 223,
+      "5": 412,
+      "8": 130,
+      "9": 55
+    },
+    "tiers": {
+      "A": 375,
+      "B": 481,
+      "C": 313
+    },
+    "lengthTier": {
+      "A": {
+        "6": 131,
+        "7": 43,
+        "5": 190,
+        "8": 8,
+        "9": 3
+      },
+      "B": {
+        "5": 151,
+        "7": 107,
+        "8": 60,
+        "6": 137,
+        "9": 26
+      },
+      "C": {
+        "7": 73,
+        "6": 81,
+        "8": 62,
+        "9": 26,
+        "5": 71
+      }
+    },
+    "demand100": {
+      "5": 100,
+      "6": 300,
+      "7": 400,
+      "8": 500,
+      "9": 100
+    },
+    "distinctUpperBoundFixedShape": 808,
+    "minimumMaxUsesByLength": {
+      "5": 1,
+      "6": 1,
+      "7": 2,
+      "8": 4,
+      "9": 2
+    },
+    "warning": "Length-only necessary bounds, not a proof of geometry or per-board lexical feasibility."
+  },
+  "softCooldown": true,
+  "hard20LevelRule": false,
+  "newWordCapIsHard": false
+}

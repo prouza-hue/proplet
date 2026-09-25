@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "status": "editorially-reviewed-lab-only",
+  "policy": "Occasional lexical spice, not a standard theme. No production dictionary change.",
+  "entries": [
+    {
+      "word": "bonviván",
+      "tier": "C",
+      "fun": 4,
+      "origin": "mozkokalypsa_editorial_20260925",
+      "source": "https://ssjc.ujc.cas.cz/search.php?heslo=bonviv%C3%A1n&hsubstr=no",
+      "note": "Occasional literary but recognizable playful word."
+    },
+    {
+      "word": "šprýmař",
+      "tier": "C",
+      "fun": 4,
+      "origin": "mozkokalypsa_editorial_20260925",
+      "source": "https://ssjc.ujc.cas.cz/search.php?heslo=%C5%A1pr%C3%BDma%C5%99&hsubstr=no",
+      "note": "Playful word; SSJC, mildly bookish."
+    },
+    {
+      "word": "erotoman",
+      "tier": "C",
+      "fun": 4,
+      "origin": "mozkokalypsa_editorial_20260925",
+      "source": "https://m.prirucka.ujc.cas.cz/?id=followerka",
+      "note": "Explicit user example; occasional, once in this lab; no repeated sexual theme."
+    },
+    {
+      "word": "furiant",
+      "tier": "C",
+      "fun": 4,
+      "origin": "mozkokalypsa_editorial_20260925",
+      "source": "https://ssjc.ujc.cas.cz/search.php?heslo=furiant&hsubstr=no",
+      "note": "Expressive personality / Czech dance; occasional lexical variation."
+    }
+  ]
+}
