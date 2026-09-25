@@ -1,0 +1,23 @@
+name: Mozkokalypsa invitation workbench
+on:
+  push:
+    branches: ['feat/mozkokalypsa-round2-invite']
+    paths: ['.github/workflows/mk-invite-workbench.yml']
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capture exact review sources
+        run: |
+          mkdir -p /tmp/mk-source
+          git archive --format=zip HEAD -o /tmp/mk-source/source.zip
+          git rev-parse HEAD > /tmp/mk-source/SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mk-invite-source
+          path: /tmp/mk-source
+          retention-days: 1
