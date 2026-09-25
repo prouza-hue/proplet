@@ -9,6 +9,7 @@ alter table public.mozkokalypsa_attempts add column rewarded_at timestamptz;
 create table public.mozkokalypsa_experiments (
  id text primary key, active boolean not null default false,
  closes_at timestamptz not null, cohort_selected_at timestamptz,
+ cohort_snapshot jsonb not null default '[]'::jsonb,
  reward_xp integer not null check(reward_xp=200)
 );
 create table public.mozkokalypsa_boards (
