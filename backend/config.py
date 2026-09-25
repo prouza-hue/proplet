@@ -60,7 +60,7 @@ def load_settings() -> Settings:
     if vercel_git_commit_ref == "feat/pestre-poradi-production" or _env("PROPLET_ORDER_TEST_ONLY") == "true":
         if vercel_env != "preview" or _env("SUPABASE_URL").rstrip("/") != "https://eanzztstmwlamwfdskbf.supabase.co":
             raise RuntimeError("Order preview requires the existing isolated test database")
-    playtest_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/mozkokalypsa-playtest"
+    playtest_preview = vercel_env == "preview" and vercel_git_commit_ref in {"feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release"}
     data_root = root / "data"
     return Settings(
         root=root,
