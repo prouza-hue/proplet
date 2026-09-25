@@ -76,6 +76,16 @@ with sync_playwright() as pw:
     g.path=[...g.puzzle.answers[i].path];submitPath();
    }}""")
    page.locator('#mkResultModal:not(.hidden)').wait_for()
+   if n==0:
+    # Finish alone is reviewable later; empty rating cannot advance for a reward.
+    page.locator('#mkResultNext').click()
+    assert page.locator('#mkResultModal').is_visible()
+    page.locator('#mkResultMenu').click()
+    page.locator('#mkInviteButton').click()
+    assert 'doplnit hodnocení' in page.locator('#mkBoardList button').first.inner_text()
+    page.locator('#mkBoardList button').first.click()
+    page.locator('#mkResultModal:not(.hidden)').wait_for()
+    report['checks'].append('missing-ratings-block-reward-and-completed-board-reopens-for-review')
    page.locator('#mkRatingDifficulty').select_option('4');page.locator('#mkRatingFun').select_option('5')
    page.locator('#mkRatingNote').fill('Syntetický ověřovací běh. Nejde o hodnocení člověka.')
    if n==1:page.screenshot(path=str(args.output/'05-result-mobile.png'),full_page=True)

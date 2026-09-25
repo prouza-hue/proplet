@@ -33,3 +33,7 @@ Databáze uchovává stabilní ID a SHA-256 obsahu každé desky, dokončené po
 ## Ověření a nasazení
 
 Doplnit finální SHA, deployment, aktivní kohortu a výsledky gates po nasazení. Syntetické zápisy jsou pouze v izolované loopback databázi CI, nikdy pod skutečnými hráči. Vercel QA větev má odpojenou produkční databázi; produkce se znovu sestaví z main.
+
+Migrace `mozkokalypsa_round2_timed_rewards` úspěšně aplikována standardní cestou 25. 9. 2026 ve 22:18 UTC. Ověřeno 12 zaregistrovaných desek, experiment zatím neaktivní, 0 pozvánek. Role anon/authenticated nemají SELECT k nové bance ani EXECUTE k novým RPC; service_role má potřebná práva. RLS bez klientských policies je zde záměrný serverový přístup. Advisor nehlásí nový bezpečnostní problém playtestu; obecné upozornění na vypnutou kontrolu uniklých hesel Supabase Auth není změnou této migrace ([podrobnosti](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)).
+
+Jednorázové vyhodnocení naplánováno na úterý 29. 9. ráno kolem 08:00 Europe/Prague. Uzavření hry není na běhu této úlohy závislé.
