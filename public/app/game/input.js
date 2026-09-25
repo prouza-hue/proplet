@@ -17,6 +17,18 @@ function create(deps={}){
   const colors=deps.colors||[];
   const escapeHtml=deps.escapeHtml||(value=>String(value??''));
   const getSettings=deps.getSettings||(()=>({magnifier:true}));
+  const feedback=deps.feedback||(()=>{});
+  const shortStarter=game=>game?.mode==='starter'&&game.puzzle?.meta?.starterVersion===3;
+  const activeAnswer=game=>game.puzzle.answers.find((_,i)=>!game.found.some(f=>f.answerIndex===i));
+  function resetStarter(){
+    const game=getGame();if(!shortStarter(game))return false;
+    game.starterPointer=null;game.dragging=false;game.lastPointer=null;game.path=[];
+    hideMagnifier();updateActive();return true;
+  }
+  function beginDrag(game){
+    const pointer=game.starterPointer;if(!pointer||pointer.drag)return;
+    pointer.drag=true;game.path=[pointer.index];updateActive();
+  }
 
   function magnifierDeviceSupported(){
     const touchCapable=(navigatorObj.maxTouchPoints||0)>0||windowObj.matchMedia?.('(any-pointer: coarse)')?.matches===true;
@@ -82,26 +94,55 @@ function create(deps={}){
   function pointerDown(event){
     event.preventDefault();ensureAudio();
     const game=getGame(),index=+event.currentTarget.dataset.index;
-    if(!game||game.finished||game.pausedAt!=null||game.used.has(index)||game.wrongPath?.length)return false;
+    if(!game||game.finished||game.pausedAt!=null||game.wrongPath?.length)return false;
+    if(shortStarter(game)){
+      if(game.starterPointer||event.isPrimary===false||(event.button!=null&&event.button!==0))return false;
+      if(game.used.has(index)){resetStarter();feedback('Začni znovu prvním písmenem hledaného slova.');return false;}
+      const answer=activeAnswer(game),previous=[...game.path];
+      const next=index===answer?.path[0]?[index]:[...previous,index];
+      const valid=!!answer&&next.every((cell,i)=>cell===answer.path[i])&&(!previous.length||index===answer.path[0]||neighbours(previous.at(-1)).includes(index));
+      game.starterPointer={id:event.pointerId,index,x:event.clientX,y:event.clientY,drag:false,valid};
+      game.path=valid?next:[index];
+    }else{if(game.used.has(index))return false;game.path=[index];}
     clearHints();
     if(game.undoSnapshot)hideUndo();
-    game.dragging=true;game.path=[index];game.lastPointer={x:event.clientX,y:event.clientY};fx('tap');updateActive();showMagnifier(index);
+    game.dragging=true;game.lastPointer={x:event.clientX,y:event.clientY};fx('tap');updateActive();showMagnifier(index);
     try{event.currentTarget.setPointerCapture(event.pointerId)}catch{}
     return true;
   }
-  function pointerEnter(event){const game=getGame();return game?.dragging?extendPath(+event.currentTarget.dataset.index):false}
+  function pointerEnter(event){
+    const game=getGame(),index=+event.currentTarget.dataset.index;
+    if(!game?.dragging)return false;
+    if(game.starterPointer){if(event.pointerId!=null&&event.pointerId!==game.starterPointer.id)return false;if(index!==game.starterPointer.index)beginDrag(game);}
+    return extendPath(index);
+  }
   function pointerMove(event){
-    if(!getGame()?.dragging)return false;
+    const game=getGame();if(!game?.dragging)return false;
+    const pointer=game.starterPointer;
+    if(pointer){
+      if(event.pointerId!=null&&event.pointerId!==pointer.id)return false;
+      if(!pointer.drag&&Math.hypot(event.clientX-pointer.x,event.clientY-pointer.y)<8)return true;
+      beginDrag(game);
+    }
     const events=typeof event.getCoalescedEvents==='function'?event.getCoalescedEvents():[event];
     for(const item of events)samplePointer(item.clientX,item.clientY);
     return true;
   }
-  function pointerUp(){
+  function pointerUp(event){
     hideMagnifier();const game=getGame();if(!game?.dragging)return false;
-    game.dragging=false;game.lastPointer=null;submit();return true;
+    const pointer=game.starterPointer;
+    if(pointer&&event?.pointerId!=null&&event.pointerId!==pointer.id)return false;
+    game.dragging=false;game.lastPointer=null;game.starterPointer=null;
+    if(shortStarter(game)&&pointer&&!pointer.drag){
+      if(!pointer.valid){resetStarter();feedback('Začni znovu prvním písmenem hledaného slova.');return true;}
+      const answer=activeAnswer(game);
+      if(!answer||game.path.length!==answer.path.length)return true;
+    }
+    submit();return true;
   }
+  function pointerCancel(event){const game=getGame();if(!shortStarter(game)){hideMagnifier();return false;}if(game.starterPointer&&event?.pointerId!=null&&event.pointerId!==game.starterPointer.id)return false;return resetStarter();}
 
-  return {magnifierDeviceSupported,magnifierAvailable,magnifierEnabled,ensureMagnifier,renderMagnifier,showMagnifier,hideMagnifier,currentWord,extendPath,samplePointer,pointerDown,pointerEnter,pointerMove,pointerUp};
+  return {magnifierDeviceSupported,magnifierAvailable,magnifierEnabled,ensureMagnifier,renderMagnifier,showMagnifier,hideMagnifier,currentWord,extendPath,samplePointer,pointerDown,pointerEnter,pointerMove,pointerUp,pointerCancel,resetStarter};
 }
 
 const api={create};

@@ -7,6 +7,12 @@ import re
 
 context = ContextVar('measurement', default=None)
 TABLES = {'product_events', 'puzzle_attempts', 'hint_events', 'helper_events', 'operational_events', 'puzzle_feedback'}
+ONBOARDING_VERSIONS = frozenset({'board-v2', 'board-v3-short'})
+
+
+def onboarding_version(value):
+    """Exact bounded allowlist; missing/unknown/untrusted versions remain legacy."""
+    return value if value in ONBOARDING_VERSIONS else 'legacy'
 
 
 def request_context(request, environment):
@@ -48,7 +54,7 @@ def request_context(request, environment):
         'release': os.environ.get('VERCEL_GIT_COMMIT_SHA', 'analytics-v2')[:64],
         'client_release': request.headers.get('x-proplet-client-release','legacy')[:80],
         'measurement_version': 2 if request.headers.get('x-proplet-analytics') == '2' else 1,
-        'onboarding_version': 'board-v2' if request.headers.get('x-proplet-onboarding') == 'board-v2' else 'legacy',
+        'onboarding_version': onboarding_version(request.headers.get('x-proplet-onboarding')),
         'is_test': request.headers.get('x-proplet-test') == '1' or bool(request.headers.get('x-proplet-preview-as-of')),
     }
 
