@@ -48,7 +48,7 @@ with sync_playwright() as pw:
   for n in range(12):
    page.wait_for_function("currentGame?.mode==='playtest' && !currentGame.finished")
    if n==1:
-    assert page.locator('#board > .cell').count()==120
+    assert page.locator('#board > .cell').count()==100
     page.locator('#calmRunBtn:not(.hidden)').wait_for()
     page.wait_for_timeout(200)
     report['checks'].append('calm-button-restored-on-next-board')
