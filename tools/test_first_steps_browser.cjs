@@ -75,7 +75,7 @@ async function firstWin(page,touch=false,style='drag'){await page.goto(url);awai
    assert.equal(await page.locator('#accountNudgeModal').isVisible(),false);assert.equal(await page.locator('#profileModal').isVisible(),false);
    const completed=await page.evaluate(()=>Object.keys(getState().completed).length);assert.equal(completed,2);
    await page.screenshot({path:output+'.'+(mobile?'mobile-offer':'desktop-offer')+'.png',fullPage:true});
-   await page.getByRole('button',{name:'Hrát dál bez účtu',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished&&currentGame.puzzle.id!=='g4-e-001');
+   await page.getByRole('button',{name:'Hrát dál bez účtu',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished&&currentGame.puzzle.id!=='g4-e-001');await eventOnce('first_steps_v1_continue');await eventOnce('first_steps_v1_offer');
    for(const id of ['accountNudgeModal','pushNudgeModal','installNudgeModal'])assert.equal(await page.locator('#'+id).isVisible(),false);
   },{mobile});
   await scenario('tap-cancel-reset-navigation',async page=>{

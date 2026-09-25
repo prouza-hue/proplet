@@ -26,7 +26,7 @@ def update(table, filters, values):
         if r.get('anonymous_id')==filters['anonymous_id']:r.update(values)
     return rows
 headers={'X-Proplet-Onboarding':'board-v3-short','X-Proplet-Analytics':'2','X-Proplet-Client-Release':'contract-fixture','X-Proplet-Test':'1','X-Proplet-Auth-At-Event':'anonymous','X-Proplet-Starter-Run':str(uuid4()),'X-Proplet-Starter-Ms':'15','X-Proplet-Starter-Reason':'visibility','X-Proplet-Event-ID':str(uuid4()),'X-Proplet-Event-Time':datetime.now(timezone.utc).isoformat()}
-with patch.object(server,'VERCEL_ENV','production'), patch.object(server,'enforce_rate_limit'), patch.object(server,'telemetry_actor',return_value={'anonymous_id':'synthetic-guest'}), patch.object(server,'db_request',side_effect=database), patch.object(server,'db_select',side_effect=select), patch.object(server,'db_update',side_effect=update), patch.object(server,'auth_player',return_value={'id':'synthetic-account'}), patch.object(server,'anonymous_hash',return_value='synthetic-guest'), patch.object(server,'play_session_config',return_value={'enabled':False}):
+with patch.object(server,'VERCEL_ENV','production'), patch.object(server,'enforce_rate_limit'), patch.object(server,'telemetry_actor',return_value={'anonymous_id':'synthetic-guest-identity'}), patch.object(server,'db_request',side_effect=database), patch.object(server,'db_select',side_effect=select), patch.object(server,'db_update',side_effect=update), patch.object(server,'auth_player',return_value={'id':'synthetic-account'}), patch.object(server,'anonymous_hash',return_value='synthetic-guest-identity'), patch.object(server,'play_session_config',return_value={'enabled':False}):
     client=TestClient(server.app)
     response=client.post('/api/product-event',headers=headers,json={'event_type':'starter_v1_interaction'})
     assert response.status_code==200,response.text
@@ -37,7 +37,7 @@ with patch.object(server,'VERCEL_ENV','production'), patch.object(server,'enforc
     assert row['measurement_version']==2 and row['client_release']=='contract-fixture'
     assert row['context']=={'auth_at_event':'anonymous','starter_run_id':headers['X-Proplet-Starter-Run'],'starter_ms':15,'starter_reason':'visibility'}
     before=deepcopy(row)
-    response=client.post('/api/anonymous/claim',headers={'X-Proplet-Onboarding':'board-v2','X-Proplet-Test':'1'},json={'anonymous_id':'synthetic-guest'})
+    response=client.post('/api/anonymous/claim',headers={'X-Proplet-Onboarding':'board-v2','X-Proplet-Test':'1'},json={'anonymous_id':'synthetic-guest-identity'})
     assert response.status_code==200,response.text
     assert response.json()['claimed']['productEvents']==1
     assert row=={**before,'player_id':'synthetic-account','anonymous_id':None}, 'capture provenance survives actual claim handler'

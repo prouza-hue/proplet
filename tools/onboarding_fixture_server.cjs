@@ -60,6 +60,7 @@ const server=http.createServer(async(req,res)=>{
    if(p==='/api/progress')return json(res,200,{completed:controls.progress});
    if(p==='/api/support-mode')return json(res,200,{supportMode:data?.support_mode||'younger'});
    if(['/api/anonymous/claim','/api/result','/api/attempt/start','/api/attempt/checkpoint','/api/attempt/finish'].includes(p))return json(res,200,{ok:true,synthetic:true});
+   if(p==='/api/rankings/xp')return json(res,200,{players:[],rows:[],total:0,myRank:null});
    if(p.includes('leaderboard'))return json(res,200,{rows:[],total:0,myRank:null});
    if(p==='/api/push/account-state')return json(res,200,{enabled:false});
    return json(res,503,{detail:'isolated fixture: endpoint disabled'});
@@ -73,3 +74,4 @@ const server=http.createServer(async(req,res)=>{
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });
 server.listen(Number(process.env.PORT||8765),'127.0.0.1',()=>console.log(`Synthetic onboarding fixture ${sha} on ${server.address().port}`));
+

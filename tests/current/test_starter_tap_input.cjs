@@ -34,5 +34,6 @@ for(const kinds of [['tap','tap','tap'],['drag','drag','drag'],['tap','drag','ta
  const h=harness();h.tap(0);h.drag(paths[0]);assert.deepEqual(h.submissions,[paths[0]],'drag from pending tap starts a fresh route');
  const j=harness();j.api.pointerDown(j.event(0));j.api.pointerEnter(j.event(1));j.api.pointerEnter(j.event(2));j.api.pointerUp(j.event(2));assert.deepEqual(j.submissions,[paths[0]]);
 }
+{const h=harness();h.api.pointerDown(h.event(0));h.api.pointerMove(h.event(1));h.api.pointerCancel(h.event(1));h.api.pointerUp(h.event(1));assert.deepEqual(h.submissions,[]);assert.deepEqual(h.game().path,[]);}
 for(const [mode,version] of [['free',3],['daily',3],['starter',2]]){const h=harness(mode,version);h.tap(0);assert.deepEqual(h.submissions,[[0]],'legacy/non-starter input unchanged');}
 console.log('PASS real input adapter: all words tap/drag/mixed, invalid/repeat/restart/cancel, pointer ownership, jitter, scope and exactly-once submission');
