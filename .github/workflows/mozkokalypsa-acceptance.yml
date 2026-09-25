@@ -43,6 +43,7 @@ jobs:
           mkdir -p /tmp/mk-evidence
           git rev-parse HEAD > /tmp/mk-evidence/SOURCE_SHA.txt
           node tests/current/test_mozkokalypsa.js
+          node tests/current/test_mozkokalypsa_countdown.js
           python tests/current/test_mozkokalypsa.py
           python tools/test_mozkokalypsa_db.py | tee /tmp/mk-evidence/database.txt
       - name: Native browser flow without production credentials
@@ -57,10 +58,10 @@ jobs:
           python -m uvicorn server:app --host 127.0.0.1 --port 8765 > /tmp/mk-evidence/server.txt 2>&1 &
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:8765/api/health >/dev/null && break; sleep 1; done
           python tools/test_mozkokalypsa_browser.py --output /tmp/mk-evidence
+          python tools/test_mozkokalypsa_invite_browser.py --output /tmp/mk-evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mozkokalypsa-acceptance
           path: /tmp/mk-evidence
           retention-days: 7
-
