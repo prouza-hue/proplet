@@ -49,6 +49,7 @@
     {"id":"20260922-mozkokalypsa-pilot","order":430,"version":"2026.09.22","path":"SUPABASE_MOZKOKALYPSA_PLAYTEST.sql","type":"migration","status":"prepared-not-applied-playtest-only","sha256":"a9e9ffeb11827f60bafa22ed9fb0ffdd8eb107ad2758c88051ec657bf063ca1f","supersedes":[],"replaced_rpc_definitions":[]},
     {"id":"20260923-mozkokalypsa-observer","order":440,"version":"2026.09.23","path":"SUPABASE_MOZKOKALYPSA_OBSERVER.sql","type":"migration","status":"current-history","sha256":"5c78f7658512d5450a4b1652ba4da61da71605751927818214f5a6b242fcff66","supersedes":[],"replaced_rpc_definitions":[]},
     {"id":"20260923-mozkokalypsa-evaluators","order":450,"version":"2026.09.23","path":"SUPABASE_MOZKOKALYPSA_EVALUATORS.sql","type":"migration","status":"current-history","sha256":"f9a8ff5b61b2ea12af7710f1e3d25aafe848fbf9e8c3b479038b7d63c3bc4599","supersedes":[],"replaced_rpc_definitions":[]},
+    {"id":"20260925-mozkokalypsa-round2","order":460,"version":"2026.09.25","path":"SUPABASE_MOZKOKALYPSA_ROUND2.sql","type":"migration","status":"current-history","sha256":"d9c0a67ebc1ed8a90e1773f7d80bdf951a12c0ca9812991d29c442fa82a41a22","supersedes":[],"replaced_rpc_definitions":[]},
     {"id":"verify-v3.23","order":900,"version":"3.23","path":"SUPABASE_VERIFY_V3_23.sql","type":"verify","status":"read-only-checks","sha256":"ebd656cb7fd31cda963234dcc5d558f701061aa99298f32c03bca462e251f0e8","supersedes":[],"replaced_rpc_definitions":[]},
     {"id":"verify-v3.25","order":910,"version":"3.25","path":"SUPABASE_VERIFY_V3_25.sql","type":"verify","status":"read-only-checks","sha256":"7c4598bf68ca520d57819d22cd28922fda4974137a028bfdf6524e3d696e53f4","supersedes":[],"replaced_rpc_definitions":[]},
     {"id":"verify-v3.30","order":920,"version":"3.30","path":"SUPABASE_VERIFY_V3_30.sql","type":"verify","status":"read-only-checks","sha256":"b1bc8f10332bd3122b8043dc385092ea6f92e9dfba993669bf7d4f228904c402","supersedes":[],"replaced_rpc_definitions":[]},
@@ -57,3 +58,4 @@
     {"id":"verify-v4.01.39-query-bounds","order":950,"version":"4.01.39","path":"SUPABASE_VERIFY_V4_01_39_QUERY_BOUNDS.sql","type":"verify","status":"read-only-checks","sha256":"32d2977bd337ebc5d48f91da1af970d386bbc19e983cb45a18dc5fc5565d29ac","supersedes":[],"replaced_rpc_definitions":[]}
   ]
 }
+

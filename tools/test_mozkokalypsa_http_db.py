@@ -39,10 +39,11 @@ def insert(table,row):
   sql.Identifier(table),sql.SQL(',').join(map(sql.Identifier,keys)),
   sql.SQL(',').join(sql.Placeholder() for _ in keys),sql.Identifier(table)),list(row.values()))[0][0]
 def rpc(name,body):
- assert name in ('proplet_mozkokalypsa_open','proplet_mozkokalypsa_event')
+ assert name in ('proplet_mozkokalypsa2_open','proplet_mozkokalypsa2_event')
  return query(sql.SQL('select {}({})').format(sql.Identifier(name),
   sql.SQL(',').join(sql.SQL('{} => %s').format(sql.Identifier(k)) for k in body)),
   [Jsonb(v) if isinstance(v,dict) else v for v in body.values()])[0][0]
+query("update mozkokalypsa_experiments set active=true,closes_at=clock_timestamp()+interval '1 hour' where id=%s returning id",(m.EXPERIMENT,))
 players=[str(uuid.uuid4()) for _ in range(4)]
 for i,pid in enumerate(players):
  insert('players',dict(id=pid,name='Synthetic Mozkokalypsa '+str(i),
@@ -95,6 +96,7 @@ with ExitStack() as stack:
   except httpx.HTTPError:pass
   time.sleep(1)
  else:raise AssertionError('Local PostgREST did not start')
+ stack.enter_context(patch.object(m,'is_closed',return_value=False))
  stack.enter_context(patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}))
  stack.enter_context(patch.object(server,'SUPABASE_URL','http://127.0.0.1:55434'))
  stack.enter_context(patch.object(server,'SUPABASE_SECRET_KEY',jwt))
@@ -105,19 +107,19 @@ with ExitStack() as stack:
   db_rpc=server.db_rpc,enforce_rate_limit=server.enforce_rate_limit)
  with TestClient(app) as c:
   assert c.get('/api/mozkokalypsa/status').json()=={'eligible':False}
-  assert c.post('/api/mozkokalypsa/open/mk26-03').status_code==401
-  assert c.post('/api/mozkokalypsa/open/mk26-03',headers={'Authorization':'Bearer invalid'}).status_code==401
+  assert c.post('/api/mozkokalypsa/open/mk2-03').status_code==401
+  assert c.post('/api/mozkokalypsa/open/mk2-03',headers={'Authorization':'Bearer invalid'}).status_code==401
   assert c.get('/api/mozkokalypsa/status',headers=headers[1]).json()=={'eligible':False}
-  assert c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[1]).status_code==403
+  assert c.post('/api/mozkokalypsa/open/mk2-03',headers=headers[1]).status_code==403
   assert c.get('/api/mozkokalypsa/status?qa=true',headers=headers[0]).status_code==403
-  assert c.get('/api/mozkokalypsa/board/mk26-03?qa=true',headers=headers[0]).status_code==403
+  assert c.get('/api/mozkokalypsa/board/mk2-03?qa=true',headers=headers[0]).status_code==403
   for idx in (0,2,3):
    status=c.get('/api/mozkokalypsa/status',headers=headers[idx]).json()
    assert status['eligible'] and status['order']==m.bank()['orders'][0]
-  opened=c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[0])
+  opened=c.post('/api/mozkokalypsa/open/mk2-03',headers=headers[0])
   assert opened.status_code==200,opened.text
   board=opened.json()['puzzle']; attempt=opened.json()['attempt']
-  assert c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[0]).json()['attempt']['id']==attempt['id']
+  assert c.post('/api/mozkokalypsa/open/mk2-03',headers=headers[0]).json()['attempt']['id']==attempt['id']
   rev=0
   progress={'elapsedMs':1000,'moves':1,'found':[{'answerIndex':0,**board['answers'][0]}],
    'firstCorrectMs':1000,'lastCorrectMs':1000}
@@ -129,6 +131,7 @@ with ExitStack() as stack:
    r=c.post('/api/mozkokalypsa/event',json=body,headers=headers[0])
    assert r.status_code==status,r.text
    return r.json()
+  post(event('feedback',feedback={'difficulty':5,'fun':4}),422)
   first=event('correct');assert post(first)['revision']==1;rev=1
   assert post(first)['duplicate'] is True
   assert len(select('mozkokalypsa_events',attempt_id=attempt['id']))==1
@@ -152,14 +155,35 @@ with ExitStack() as stack:
    found=[{'answerIndex':i,**a} for i,a in enumerate(board['answers'])])
   assert post(event('finish'))['revision']==rev+1;rev+=1
   post(event('correct'),409)
-  assert post(event('feedback',feedback={'difficulty':5,'fun':4,'note':'Synthetic isolated QA'}))['revision']==rev+1;rev+=1
+  assert select('account_rewards',player_id=players[0])==[],'finish alone paid XP'
+  post(event('feedback',feedback={'fun':4}),422)
+  rating=event('feedback',feedback={'difficulty':5,'fun':4,'note':'Synthetic isolated QA'})
+  paid=post(rating);assert paid['revision']==rev+1 and paid['rewardGranted'];rev+=1
+  assert post(rating)['duplicate']
+  assert len(select('account_rewards',player_id=players[0]))==1
+  paid_again=post(event('feedback',feedback=rating['feedback']));assert not paid_again['rewardGranted'];rev+=1
+  reward=select('account_rewards',player_id=players[0]);assert len(reward)==1 and reward[0]['points']==200
+
   persisted=select('mozkokalypsa_attempts',id=attempt['id'])[0]
   assert persisted['completed'] and persisted['completed_at'] and persisted['revision']==rev
   assert persisted['progress']['foundWords']==14 and persisted['progress']['hints']==1
   assert persisted['feedback']=={'difficulty':5,'fun':4,'note':'Synthetic isolated QA'}
   assert len(select('mozkokalypsa_events',attempt_id=attempt['id']))==rev
   query('update mozkokalypsa_invites set active=false where player_id=%s returning player_id',(players[0],))
-  assert c.post('/api/mozkokalypsa/open/mk26-03',headers=headers[0]).status_code==403
-  assert normal_snapshot()==before
-print('PASS authenticated HTTP + real PostgREST + PostgreSQL: real custom sessions, invite/anonymous/QA denial, durable metrics, retry, revision conflict, reload recovery, 14-word finish, feedback, revoke; normal XP/results unchanged')
+  assert c.post('/api/mozkokalypsa/open/mk2-03',headers=headers[0]).status_code==403
+  after=normal_snapshot()
+  assert all(after[t]==before[t] for t in normal_tables if t!='account_rewards')
+  assert all(after['account_rewards'][i]==before['account_rewards'][i] for i in (1,2,3))
+  # Deadline is enforced by the database even with backend wall-clock bypassed.
+  query("update mozkokalypsa_experiments set closes_at=clock_timestamp()-interval '1 second' returning id")
+  assert c.post('/api/mozkokalypsa/open/mk2-03',headers=headers[2]).status_code==410
+  try:
+   rpc('proplet_mozkokalypsa2_event',dict(p_experiment=m.EXPERIMENT,p_player=players[0],p_board=board['id'],
+    p_attempt=attempt['id'],p_event=str(uuid.uuid4()),p_revision=rev,p_kind='feedback',p_progress=progress,p_feedback=rating['feedback']))
+  except psycopg.Error as error:assert error.sqlstate=='PT410'
+  else:raise AssertionError('late database write accepted')
+  assert select('account_rewards',player_id=players[0])==reward
+
+print('PASS authenticated HTTP + real PostgREST + PostgreSQL: real custom sessions, invite/anonymous/QA denial, durable metrics, retry, revision conflict, reload recovery, 14-word finish, feedback, revoke; completion + two ratings pays exactly 200 XP once; all ordinary results/progress/streaks unchanged; DB deadline enforced')
 print('LIMIT: synthetic loopback schema, local gateway routing; hosted production browser session is not covered')
+

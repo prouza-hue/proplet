@@ -10,7 +10,7 @@ from backend import mozkokalypsa as m
 from tools.gen5.catalog import Catalog,digest
 from tools.gen5.validation import Solver,validation_words,structural
 
-bank=m.bank();assert len(bank['boards'])==10
+bank=json.loads((m.ROOT/'data/playtests/mozkokalypsa-v1.json').read_text());assert len(bank['boards'])==10
 solver=Solver(validation_words(Catalog()));allwords=[]
 for i,b in enumerate(bank['boards']):
  stats=structural(b);v=solver.verify(b)
@@ -24,6 +24,16 @@ report=json.loads((m.ROOT/'docs/playtests/mozkokalypsa-verification.json').read_
 assert report['bankHash']==digest(bank)
 assert report['dictionary']['sha256']==solver.hash
 
+# Preserve the pilot evidence and independently validate the exact new bank.
+old=bank;bank=m.bank();assert len(bank['boards'])==12
+words=set(validation_words(Catalog()))|{'bonviván','šprýmař','erotoman','furiant'}
+solver=Solver(words)
+for b in bank['boards']:
+ assert structural(b)['cells']==100
+ v=solver.verify(b);assert v['status']=='unique' and v['targetPathsUnique'],(b['id'],v)
+assert len({a['word'] for b in bank['boards'] for a in b['answers']})==168
+for order in bank['orders']:assert len(order)==12 and set(order)=={b['id'] for b in bank['boards']}
+assert bank['closesAt']==m.CLOSES_AT
 calls=[];who={'id':'00000000-0000-4000-8000-000000000001'}
 def auth(token):
  if token!='Bearer invited':raise HTTPException(401,'login required')
@@ -31,30 +41,31 @@ def auth(token):
 
 def select(table,**filters):
  calls.append((table,filters))
+ if table=='mozkokalypsa_experiments':return [{'active':True}]
  if table=='mozkokalypsa_invites':return [{'slot':1}] if filters['player_id']==who['id'] else []
  if table=='mozkokalypsa_attempts':return []
  raise AssertionError(table)
 def rpc(name,body):
  calls.append((name,body));return {'ok':True,'revision':body.get('p_revision',0)+1}
 app=FastAPI();m.install(app,auth_player=auth,db_select=select,db_request=lambda *a,**kw:None,db_rpc=rpc,enforce_rate_limit=lambda *a,**kw:None)
-with TestClient(app) as c:
+with patch.object(m,'is_closed',return_value=False),TestClient(app) as c:
  with patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_PLAYTEST_LOCAL_QA':'true'},clear=True):
   assert c.get('/api/mozkokalypsa/status').json()=={'eligible':False}
   assert c.get('/api/mozkokalypsa/status?qa=true').status_code==403
-  assert c.get('/api/mozkokalypsa/board/mk26-03?qa=true').status_code==403
-  assert c.post('/api/mozkokalypsa/open/mk26-01').status_code==404
+  assert c.get('/api/mozkokalypsa/board/mk2-03?qa=true').status_code==403
+  assert c.post('/api/mozkokalypsa/open/mk2-01').status_code==404
   assert not calls
  with patch.dict(os.environ,{'VERCEL_ENV':'preview','VERCEL_GIT_COMMIT_REF':m.BRANCH},clear=True):
   assert c.get('/api/mozkokalypsa/status?qa=true').json()['qa']
-  assert len(c.get('/api/mozkokalypsa/board/mk26-03?qa=true').json()['puzzle']['mask'])==100
-  assert c.post('/api/mozkokalypsa/open/mk26-03').status_code==404
+  assert len(c.get('/api/mozkokalypsa/board/mk2-03?qa=true').json()['puzzle']['mask'])==100
+  assert c.post('/api/mozkokalypsa/open/mk2-03').status_code==404
   assert not calls
  with patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'},clear=True):
   headers={'Authorization':'Bearer invited'}
   result=c.get('/api/mozkokalypsa/status',headers=headers).json()
   assert result['eligible'] and result['order']==bank['orders'][1]
-  assert c.post('/api/mozkokalypsa/open/mk26-01').status_code==401
-  assert c.get('/api/mozkokalypsa/board/mk26-01?qa=true',headers=headers).status_code==403
+  assert c.post('/api/mozkokalypsa/open/mk2-01').status_code==401
+  assert c.get('/api/mozkokalypsa/board/mk2-01?qa=true',headers=headers).status_code==403
   assert c.post('/api/mozkokalypsa/open/nope',headers=headers).status_code==404
   b=bank['boards'][0]
   progress={'elapsedMs':20000,'moves':len(b['answers']),'found':[{'answerIndex':i,**a} for i,a in enumerate(b['answers'])]}
@@ -65,8 +76,8 @@ with TestClient(app) as c:
    assert c.post('/api/mozkokalypsa/event',json=dict(event,progress=bad),headers=headers).status_code==422
   assert c.post('/api/mozkokalypsa/event',json=dict(event,player_id='forged'),headers=headers).status_code==422
   assert c.post('/api/mozkokalypsa/event',json=dict(event,feedback={'fun':8}),headers=headers).status_code==422
-assert all(name.startswith(('mozkokalypsa_','proplet_mozkokalypsa_')) for name,_ in calls)
-print('PASS 10 unique boards, 133 words, frozen evidence, server-auth cohort, preview/production isolation, forged paths and payloads rejected')
+assert all(name.startswith(('mozkokalypsa_','proplet_mozkokalypsa')) for name,_ in calls)
+print('PASS original 10 + 12 new unique boards, 168 new words, frozen evidence, server-auth cohort, preview/production isolation, forged paths and payloads rejected')
 
 # FastAPI root redirects must retain a preview/invitation query string.
 import server
@@ -77,3 +88,10 @@ with TestClient(server.app) as client:
 full=bank['boards'][2]
 progress=m.validate_progress({'moves':len(full['answers']),'found':[{'answerIndex':i,**a} for i,a in enumerate(full['answers'])]},full,'finish')
 assert all(0<=a['colorIndex']<12 for a in progress['found'])
+
+
+with patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}),patch.object(m,'is_closed',return_value=True),TestClient(app) as c:
+ assert c.get('/api/mozkokalypsa/status',headers=headers).json()=={'eligible':False}
+ assert c.post('/api/mozkokalypsa/open/mk2-01',headers=headers).status_code==410
+ assert c.post('/api/mozkokalypsa/event',json=event,headers=headers).status_code==410
+print('PASS deadline blocks status, open and event')

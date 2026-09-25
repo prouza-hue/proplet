@@ -1,10 +1,11 @@
-"""Invite-only Mozkokalypsa pilot; no normal progress, ranking or XP writes.
+"""Invite-only Mozkokalypsa pilot; isolated metrics and atomic completion + rating rewards.
 
 Preview runs are explicitly local-only. Production authorization uses a fixed
 server-side invite by immutable player ID, never a client rank/name/flag.
 """
 from __future__ import annotations
 from copy import deepcopy
+from datetime import datetime, timezone
 from functools import lru_cache
 import json
 import os
@@ -15,14 +16,19 @@ from uuid import UUID
 from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-EXPERIMENT = 'mozkokalypsa-20260922-v1'
-BRANCH = 'feat/mozkokalypsa-playtest'
+EXPERIMENT = 'mozkokalypsa-round2-20260925'
+CLOSES_AT = '2026-09-28T22:00:00Z'
+CLOSES = datetime.fromisoformat(CLOSES_AT.replace('Z','+00:00'))
+
+def is_closed():
+    return datetime.now(timezone.utc) >= CLOSES
+BRANCH = 'feat/mozkokalypsa-round2-release'
 ROOT = Path(__file__).resolve().parents[1]
 
 @lru_cache(maxsize=1)
 def bank():
-    data=json.loads((ROOT/'data/playtests/mozkokalypsa-v1.json').read_text(encoding='utf-8'))
-    if data['experimentId']!=EXPERIMENT or len(data['boards'])!=10:
+    data=json.loads((ROOT/'data/playtests/mozkokalypsa-v2.json').read_text(encoding='utf-8'))
+    if data['experimentId']!=EXPERIMENT or len(data['boards'])!=12:
         raise RuntimeError('Invalid frozen playtest bank')
     return data
 
@@ -44,7 +50,7 @@ class Event(BaseModel):
     model_config=ConfigDict(extra='forbid')
     event_id: UUID
     attempt_id: UUID
-    board_id: str=Field(pattern=r'^mk26-(0[1-9]|10)$')
+    board_id: str=Field(pattern=r'^mk2-(0[1-9]|1[0-2])$')
     revision: int=Field(ge=0,le=100000)
     event_type: Literal['correct','wrong','hint','reset','resume','leave','finish','feedback','calm']
     progress: dict=Field(default_factory=dict)
@@ -106,6 +112,9 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
     def invite(authorization):
         if not enabled():raise HTTPException(404,'Playtest zatím není otevřený.')
         player=auth_player(authorization)
+        if is_closed():raise HTTPException(410,'Playtest skončil v pondělí 28. září o půlnoci.')
+        config=db_select('mozkokalypsa_experiments',id=EXPERIMENT,active=True)
+        if not config:raise HTTPException(404,'Playtest zatím není otevřený.')
         rows=db_select('mozkokalypsa_invites',experiment_id=EXPERIMENT,player_id=player['id'],active=True)
         if not rows:raise HTTPException(403,'Tento playtest je pouze pro pozvané hráče.')
         return player,rows[0]
@@ -115,17 +124,18 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         if qa:
             if not preview_allowed():raise HTTPException(403,'Testovací náhled není na produkci dostupný.')
             return {'eligible':True,'qa':True,'experimentId':EXPERIMENT,'order':bank()['orders'][0],
-                    'attempts':[],'name':'Mozkokalypsa'}
-        if not enabled() or not authorization:return {'eligible':False}
+                    'attempts':[],'name':'Mozkokalypsa','closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat()}
+        if not enabled() or not authorization or is_closed():return {'eligible':False}
         enforce_rate_limit(request,'mozkokalypsa_status',limit=120,window_seconds=3600)
         try:
             player,cohort=invite(authorization)
         except HTTPException as exc:
-            if exc.status_code in (403,404):return {'eligible':False}
+            if exc.status_code in (403,404,410):return {'eligible':False}
             raise
         attempts=db_select('mozkokalypsa_attempts',experiment_id=EXPERIMENT,player_id=player['id'])
         return {'eligible':True,'qa':False,'experimentId':EXPERIMENT,
-                'order':bank()['orders'][cohort['slot']],'attempts':attempts,'name':'Mozkokalypsa'}
+                'order':bank()['orders'][cohort['slot']],'attempts':attempts,'name':'Mozkokalypsa',
+                'closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat()}
 
     @app.get('/api/mozkokalypsa/board/{board_id}')
     def preview_board(board_id:str,qa:bool=False):
@@ -138,7 +148,7 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         player,_=invite(authorization)
         board=puzzle(board_id)
         enforce_rate_limit(request,'mozkokalypsa_open',limit=120,window_seconds=3600)
-        result=db_rpc('proplet_mozkokalypsa_open',{'p_experiment':EXPERIMENT,'p_player':player['id'],'p_board':board_id})
+        result=db_rpc('proplet_mozkokalypsa2_open',{'p_experiment':EXPERIMENT,'p_player':player['id'],'p_board':board_id})
         return {'puzzle':board,'attempt':result}
 
     @app.post('/api/mozkokalypsa/event')
@@ -146,7 +156,9 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         player,_=invite(authorization)
         board=puzzle(payload.board_id)
         enforce_rate_limit(request,'mozkokalypsa_event',limit=1200,window_seconds=3600)
-        result=db_rpc('proplet_mozkokalypsa_event',{
+        if payload.event_type=='feedback' and not all(payload.feedback.get(k) is not None for k in ('difficulty','fun')):
+            raise HTTPException(422,'Vyplň obtížnost i zábavnost, ať můžeme desku vyhodnotit a připsat 200 XP.')
+        result=db_rpc('proplet_mozkokalypsa2_event',{
             'p_experiment':EXPERIMENT,'p_player':player['id'],'p_board':payload.board_id,
             'p_attempt':str(payload.attempt_id),'p_event':str(payload.event_id),
             'p_revision':payload.revision,'p_kind':payload.event_type,
@@ -154,3 +166,4 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
             'p_feedback':validate_feedback(payload.feedback)})
         if result.get('conflict'):raise HTTPException(409,'Playtest se změnil na jiném zařízení. Otevři desku znovu; místní tahy zůstaly uložené.')
         return result
+
