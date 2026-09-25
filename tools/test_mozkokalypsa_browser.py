@@ -82,6 +82,7 @@ with sync_playwright() as pw:
     assert page.locator('#mkResultModal').is_visible()
     page.locator('#mkResultMenu').click()
     page.locator('#mkInviteButton').click()
+    page.locator('#mkHubModal:not(.hidden)').wait_for()
     assert 'doplnit hodnocení' in page.locator('#mkBoardList button').first.inner_text()
     page.locator('#mkBoardList button').first.click()
     page.locator('#mkResultModal:not(.hidden)').wait_for()
