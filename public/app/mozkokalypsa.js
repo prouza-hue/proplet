@@ -3,7 +3,7 @@
 'use strict';
 const ID='mozkokalypsa-round2-20260925', query=new URLSearchParams(location.search);
 const wantQa=query.get('mozkokalypsa')==='preview';
-let status=null,statusScope='',flight=null,active=null,flushing=null,modalReturn=null,launching=false,feedbackBoard=null,expiryTimer=null,serverOffset=0;
+let status=null,statusScope='',flight=null,active=null,flushing=null,modalReturn=null,launching=false,feedbackBoard=null,expiryTimer=null,countdownTimer=null,serverOffset=0;
 const $=s=>document.querySelector(s),scope=()=>wantQa?'qa':(global.getProfile?.()?.id||'guest');
 const key=()=>`proplet-playtest:${ID}:${scope()}`;
 const read=()=>{try{return JSON.parse(localStorage.getItem(key())||'{}')}catch{return {}}};
@@ -14,7 +14,7 @@ const completeCount=()=>Object.values(read().attempts||{}).filter(a=>a.completed
 function pendingCount(){return Object.values(read().attempts||{}).reduce((n,a)=>n+(a.pending?.length||0),0)}
 const request=(path,opts={})=>global.api('/api/mozkokalypsa'+path,opts);
 const ICON='/difficulty/printshop/mozkokalypsa-v2.svg?v=1';
-const TOTAL=12,DEADLINE='Do pondělí 28. 9. do půlnoci';
+const TOTAL=12;
 const rated=row=>Number(row?.reward_points)===200||(status?.qa&&!!row?.feedback?.difficulty&&!!row?.feedback?.fun);
 const closed=()=>!status?.qa&&!!status?.closesAt&&Date.now()+serverOffset>=Date.parse(status.closesAt);
 function expire(){
@@ -120,20 +120,66 @@ async function refresh(){
  })().finally(()=>{flight=null});
  return flight;
 }
-function render(){
- const card=$('#mozkokalypsaInvite');if(!card)return;
- const count=completeCount();
- card.classList.toggle('hidden',!status?.eligible||statusScope!==scope());
- if(!status?.eligible)return;
- $('#mkInviteTitle').textContent=count===TOTAL?'Mozkokalypsa má první přeživší.':'Psst… Mozkomor ti nestačí?';
- $('#mkInviteCopy').textContent=count===TOTAL?'Díky za všech dvanáct desek. Tvoje hraní nám pomůže doladit novou obtížnost.':
-  'Tobě hlavu jen tak něco nezaplete. Zkus 12 nových exkluzivních desek a pomoz nám vyladit Mozkokalypsu.';
- $('#mkInviteButton').textContent=count===TOTAL?'Zobrazit playtest':Object.keys(read().attempts||{}).length?`Pokračovat v testu · ${count}/${TOTAL}`:'Troufám si';
- $('#mkInviteDeadline').textContent=DEADLINE;
- $('#mkInviteNote').textContent=status.qa?'Náhled: výsledky zůstávají jen v tomto zařízení.':pendingCount()?'Výsledky čekají na odeslání.':'200 XP za každou dohranou a ohodnocenou desku';
+function deadlineLabel(){
+ const end=Date.parse(status?.closesAt);if(!Number.isFinite(end))return 'Čas uzávěrky není dostupný.';
+ const options={timeZone:'Europe/Prague',hour:'2-digit',minute:'2-digit',hourCycle:'h23'};
+ const time=new Intl.DateTimeFormat('cs-CZ',options).format(end);
+ const midnight=time==='00:00';
+ const day=new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',weekday:'short',day:'numeric',month:'numeric'}).format(end-(midnight?1:0));
+ return `Konec: ${day} ve ${midnight?'24:00':time} · český čas`;
 }
-function showModal(id){modalReturn=document.activeElement;$(id).classList.remove('hidden');$(id).querySelector('button')?.focus()}
-function closeModal(id){$(id).classList.add('hidden');modalReturn?.focus?.()}
+function stopCountdown(){clearTimeout(countdownTimer);countdownTimer=null}
+function updateCountdown(){
+ stopCountdown();
+ if(document.hidden||!status?.eligible||statusScope!==scope())return;
+ const end=Date.parse(status.closesAt);if(!Number.isFinite(end))return;
+ // One lightweight local timer, only while a clock is actually on screen.
+ // Recompute from absolute server-adjusted time; never decrement a counter.
+ const clocks=['#mkInviteCountdown','#mkHubCountdown'].map($).filter(el=>el?.getClientRects?.().length);
+ if(!clocks.length)return;
+ const remaining=Math.max(0,Math.ceil((end-Date.now()-serverOffset)/1000));
+ const parts={days:Math.floor(remaining/86400),hours:Math.floor(remaining/3600)%24,minutes:Math.floor(remaining/60)%60,seconds:remaining%60};
+ for(const el of clocks){
+  el.classList.toggle('mk-clock-urgent',remaining>0&&remaining<3600);
+  for(const [unit,value] of Object.entries(parts)){
+   const node=el.querySelector(`[data-mk-time="${unit}"]`),text=String(value).padStart(2,'0');
+   if(node&&node.textContent!==text)node.textContent=text;
+  }
+ }
+ if(!remaining){if(!status.qa)expire();return}
+ countdownTimer=setTimeout(updateCountdown,1000);
+}
+function render(){
+ stopCountdown();
+ const card=$('#mozkokalypsaInvite');if(!card)return;
+ const visible=!!status?.eligible&&statusScope===scope();
+ card.classList.toggle('hidden',!visible);if(!visible)return;
+ if(closed()){expire();return}
+ const rows=Object.values(read().attempts||{}),count=rows.filter(a=>a.completed).length;
+ const reviewed=rows.filter(a=>a.completed&&rated(a)).length,missing=count-reviewed;
+ const done=count===TOTAL,allReviewed=done&&!missing;
+ $('#mkInviteTitle').textContent=allReviewed?'Druhé kolo pokořeno.':done?'Dvanáct desek za tebou.':'Mozkokalypsa se vrací.';
+ $('#mkInviteCopy').textContent=allReviewed?'Všech dvanáct dohráno i ohodnoceno. Díky! Teď je řada na nás: projdeme výsledky a vybereme, co půjde dál.':done?
+  'Ještě tvoje hodnocení a máme hotovo. V přehledu najdeš desky, kterým chybí poslední tečka.':
+  'Dvanáct nových desek. Zahraj si je před ostatními a řekni nám, kde je výzva a kde už trápení.';
+ $('#mkInviteButton').textContent=allReviewed?'Prohlédnout druhé kolo':done?'Doplnit hodnocení':rows.length?'Pokračovat ve druhém kole':'Jdu do druhého kola';
+ const deadline=deadlineLabel();$('#mkInviteDeadline').textContent=deadline;
+ const hubDeadline=$('#mkHubDeadline');if(hubDeadline)hubDeadline.textContent=deadline;
+ const progress=$('#mkInviteProgressText');if(progress)progress.textContent=`${count}/${TOTAL} dohráno · ${reviewed} ohodnoceno`;
+ const marks=$('#mkInviteProgress')?.children||[];
+ for(let i=0;i<marks.length;i++){
+  const row=stored(status.order?.[i]);
+  marks[i].classList.toggle('is-done',!!row?.completed&&rated(row));
+  marks[i].classList.toggle('is-review',!!row?.completed&&!rated(row));
+ }
+ $('#mkInviteNote').textContent=status.qa?'Náhled: postup jen v tomto zařízení, bez skutečných XP.':pendingCount()?
+  'Něco ještě čeká na odeslání. Připoj se před uzávěrkou, ať se hraní i hodnocení započítá.':missing?
+  `Dohráno, ale ještě ne všechno ohodnoceno. Odměnu získáš až po odeslání obou hodnocení.`:
+  allReviewed?'Díky za čas i upřímné hodnocení.':'Po každé desce ohodnoť náročnost a zábavnost. Pak je 200 XP tvých.';
+ updateCountdown();
+}
+function showModal(id){modalReturn=document.activeElement;$(id).classList.remove('hidden');$(id).querySelector('button')?.focus();updateCountdown()}
+function closeModal(id){$(id).classList.add('hidden');modalReturn?.focus?.();updateCountdown()}
 async function hub(){
  await flush();await refresh();
  if(!status?.eligible){global.showToast('Playtest není dostupný pro tento účet.');return}
@@ -145,7 +191,7 @@ async function hub(){
   if(row?.conflict)button.textContent=`${i+1}. deska · obnovit postup`;
   root.appendChild(button);
  });
- $('#mkHubNote').textContent=status.qa?'Náhled bez zápisů na server. Skutečné hráče zatím nezveme.':`${DEADLINE}. Za dohrání a obě hodnocení získáš 200 XP za desku (celkem až 2 400 XP). Odešli je před uzávěrkou. Série zůstává beze změny.`;
+ $('#mkHubNote').textContent=status.qa?'Náhled druhého kola. Hraní a hodnocení zůstávají jen v tomto zařízení; žádné skutečné XP se nepřipisují.':'Vyber si desku. Za dohrání a odeslané hodnocení náročnosti i zábavnosti dostaneš 200 XP. Všechno stihni před uzávěrkou. Denní série se nemění.';
  showModal('#mkHubModal');
 }
 async function resolveConflict(id){
@@ -254,7 +300,9 @@ function install(){
   if(!$('#mkResultModal').classList.contains('hidden')){e.preventDefault();leaveResult()}
   else if(!$('#mkHubModal').classList.contains('hidden')){e.preventDefault();closeModal('#mkHubModal')}
  });
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)expire()});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCountdown();else{expire();updateCountdown()}});
+ global.addEventListener('pagehide',stopCountdown);
+ global.addEventListener('pageshow',()=>{expire();updateCountdown()});
  document.addEventListener('proplet:ready',()=>refresh());
  document.addEventListener('proplet:profile-refreshed',()=>{if(statusScope!==scope()){status=null;active=null;feedbackBoard=null;for(const id of ['#mkResultModal','#mkHubModal'])$(id).classList.add('hidden')}refresh()});
  document.addEventListener('proplet:screen-changed',()=>{if(statusScope!==scope()){status=null;active=null;refresh()}render()});

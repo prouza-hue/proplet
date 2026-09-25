@@ -78,10 +78,28 @@
         <div id="dailySyncStatus" class="daily-sync hidden"></div>
       </div>
 
-      <aside id="mozkokalypsaInvite" class="card mk-invite hidden" aria-label="Pozvánka k playtestu Mozkokalypsa">
-        <img class="mk-invite-art" src="/difficulty/printshop/mozkokalypsa-v2.svg?v=1" width="64" height="64" alt="" aria-hidden="true"><div class="mk-invite-copy"><h2 id="mkInviteTitle"></h2><p id="mkInviteCopy"></p></div>
-        <button id="mkInviteButton" class="primary-btn" type="button">Troufám si</button>
-        <small id="mkInviteDeadline" class="mk-deadline"></small><small id="mkInviteNote"></small>
+      <aside id="mozkokalypsaInvite" class="card mk-invite hidden" aria-labelledby="mkInviteTitle" aria-describedby="mkInviteCopy">
+        <div class="mk-invite-main">
+          <div class="mk-invite-kicker"><span class="mk-round-stamp">Druhé kolo</span><span class="mk-private">Jen pro pozvané</span></div>
+          <div class="mk-invite-story">
+            <div class="mk-invite-copy"><h2 id="mkInviteTitle">Mozkokalypsa se vrací.</h2><p id="mkInviteCopy"></p></div>
+            <img class="mk-invite-art" src="/difficulty/printshop/mozkokalypsa-v2.svg?v=1" width="128" height="128" alt="" aria-hidden="true">
+          </div>
+          <div class="mk-invite-facts"><span><b>12</b> nových desek</span><span><b>200 XP</b> za dohrání a hodnocení</span></div>
+        </div>
+        <div class="mk-invite-bottom">
+          <div class="mk-invite-time"><span class="mk-clock-label">Do konce druhého kola</span><div id="mkInviteCountdown" class="mk-clock" role="timer" aria-label="Zbývá do konce playtestu" aria-live="off" aria-atomic="true">
+              <span class="mk-clock-unit"><b data-mk-time="days">–</b><small>dny</small></span>
+              <span class="mk-clock-unit"><b data-mk-time="hours">–</b><small>hodiny</small></span>
+              <span class="mk-clock-unit"><b data-mk-time="minutes">–</b><small>minuty</small></span>
+              <span class="mk-clock-unit"><b data-mk-time="seconds">–</b><small>sekundy</small></span>
+            </div><small id="mkInviteDeadline" class="mk-deadline"></small></div>
+          <div class="mk-invite-action"><button id="mkInviteButton" class="primary-btn" type="button">Jdu do druhého kola</button><span class="mk-reward-cap">Ve hře je až <b>2 400 XP</b></span></div>
+        </div>
+        <div class="mk-invite-footer"><div class="mk-progress-heading"><span>Tvůj postup ve druhém kole</span><strong id="mkInviteProgressText"></strong></div>
+          <div id="mkInviteProgress" class="mk-progress-track" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <small id="mkInviteNote"></small>
+        </div>
       </aside>
 
       <div id="todayNewContentBanner" class="new-content-banner hidden"></div>
@@ -678,9 +696,14 @@
 
   <div id="mkHubModal" class="modal mk-pilot-modal hidden" role="dialog" aria-modal="true" aria-labelledby="mkHubTitle">
     <div class="modal-card"><button id="mkHubClose" class="modal-close" aria-label="Zavřít" type="button">×</button>
-      <div class="mk-heading"><img src="/difficulty/printshop/mozkokalypsa-v2.svg?v=1" width="48" height="48" alt="" aria-hidden="true"><h2 id="mkHubTitle">Mozkokalypsa</h2></div><p id="mkHubNote" class="muted"></p>
+      <div class="mk-heading"><img src="/difficulty/printshop/mozkokalypsa-v2.svg?v=1" width="48" height="48" alt="" aria-hidden="true"><div><span class="mk-hub-kicker">Druhé kolo · 12 nových desek</span><h2 id="mkHubTitle">Mozkokalypsa</h2></div></div><div class="mk-hub-time"><span class="mk-clock-label">Do konce playtestu</span><div id="mkHubCountdown" class="mk-clock" role="timer" aria-label="Zbývá do konce playtestu" aria-live="off" aria-atomic="true">
+              <span class="mk-clock-unit"><b data-mk-time="days">–</b><small>dny</small></span>
+              <span class="mk-clock-unit"><b data-mk-time="hours">–</b><small>hodiny</small></span>
+              <span class="mk-clock-unit"><b data-mk-time="minutes">–</b><small>minuty</small></span>
+              <span class="mk-clock-unit"><b data-mk-time="seconds">–</b><small>sekundy</small></span>
+            </div><small id="mkHubDeadline" class="mk-deadline"></small></div><p id="mkHubNote" class="muted"></p>
       <div id="mkBoardList" class="mk-board-list"></div>
-      <small>Desky se liší. Zkoušíme, kde začíná ta pravá výzva. Nápověda je v pořádku.</small>
+      <small>Nápověda není ostuda. Zajímá nás, které desky tě baví — ne kdo je zvládne bez pomoci.</small>
     </div>
   </div>
   <div id="mkResultModal" class="modal mk-pilot-modal hidden" role="dialog" aria-modal="true" aria-labelledby="mkResultTitle">
@@ -726,9 +749,9 @@
   <link rel="stylesheet" href="/first-steps.css?v=2">
   <script src="/app/engagement/first-steps.js?v=5"></script>
   <script src="/app/acquisition.js?v=1"></script>
-  <script src="/app.js?v=mkround2"></script>
-  <link rel="stylesheet" href="/mozkokalypsa.css?v=4">
-  <script src="/app/mozkokalypsa.js?v=4"></script>
+  <script src="/app.js?v=mkinvite2"></script>
+  <link rel="stylesheet" href="/mozkokalypsa.css?v=5">
+  <script src="/app/mozkokalypsa.js?v=5"></script>
   <script src="/app/marketing.js?v=3"></script>
   <script src="/quality-v334.js?v=mkpilot4"></script>
   <script src="/organic-ui-v4023.js?v=avatareditor1"></script>

@@ -33,7 +33,7 @@ def bank():
     return data
 
 def preview_allowed():
-    return (os.getenv('VERCEL_ENV')=='preview' and os.getenv('VERCEL_GIT_COMMIT_REF')==BRANCH) or (
+    return (os.getenv('VERCEL_ENV')=='preview' and os.getenv('VERCEL_GIT_COMMIT_REF') in {BRANCH,'feat/mozkokalypsa-round2-invite'}) or (
         not os.getenv('VERCEL') and os.getenv('VERCEL_ENV')!='production'
         and os.getenv('PROPLET_PLAYTEST_LOCAL_QA')=='true')
 
