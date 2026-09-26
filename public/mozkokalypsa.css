@@ -35,7 +35,9 @@ html.tiskarna-ui #screen-daily #mozkokalypsaInvite .primary-btn:hover{background
 .mk-progress-track i{height:5px;background:#dfcbb9;border-radius:2px}
 .mk-progress-track i.is-done{background:#7b465f}
 .mk-progress-track i.is-review{background:#c77d42}
-#mkInviteNote{display:block;font-size:11px;line-height:1.4;margin-top:4px}
+/* Remove the two redundant note blocks from layout and accessibility tree.
+   Keep their adapter targets intact; gameplay, rewards and result sync stay unchanged. */
+#mozkokalypsaInvite #mkInviteNote,#mkHubModal #mkHubNote{display:none!important}
 .mk-pilot-modal .modal-card{width:min(540px,calc(100vw - 28px));max-height:85dvh;overflow:auto;text-align:left}
 .mk-heading{display:flex;gap:12px;align-items:center;margin:4px 28px 16px 0}
 .mk-heading img{width:60px;height:60px;flex:0 0 60px}
