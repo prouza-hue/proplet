@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-09-26T20:00:27Z",
+  "repository": "prouza-hue/proplet",
+  "pull_request": {
+    "number": 148,
+    "url": "https://github.com/prouza-hue/proplet/pull/148",
+    "draft": true,
+    "head_sha": "f5d9eeb00ea98f237f34d5bf3d26b0d9433da0d7",
+    "head_tree_sha": "0d0e536c9019582913b1fece5efb249190c0b7d3",
+    "base_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71"
+  },
+  "checks": [
+    {
+      "name": "Vercel Preview Comments",
+      "status": "completed",
+      "conclusion": "success",
+      "job_id": 108475481484,
+      "url": "https://github.com/prouza-hue/proplet/runs/108475481484",
+      "started_at": "2026-09-26T19:55:32Z",
+      "completed_at": "2026-09-26T19:55:32Z"
+    },
+    {
+      "name": "printshop-ui",
+      "status": "completed",
+      "conclusion": "success",
+      "job_id": 108475475570,
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/36267719810/job/108475475570",
+      "started_at": "2026-09-26T19:55:32Z",
+      "completed_at": "2026-09-26T20:00:19Z"
+    },
+    {
+      "name": "version-alignment",
+      "status": "completed",
+      "conclusion": "skipped",
+      "job_id": 108475475515,
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/36267719638/job/108475475515",
+      "started_at": "2026-09-26T19:55:29Z",
+      "completed_at": "2026-09-26T19:55:29Z"
+    },
+    {
+      "name": "isolated-result-database",
+      "status": "completed",
+      "conclusion": "success",
+      "job_id": 108475475216,
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/36267719700/job/108475475216",
+      "started_at": "2026-09-26T19:55:32Z",
+      "completed_at": "2026-09-26T19:56:27Z"
+    },
+    {
+      "name": "current-runtime",
+      "status": "completed",
+      "conclusion": "failure",
+      "job_id": 108475475143,
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/36267719700/job/108475475143",
+      "started_at": "2026-09-26T19:55:32Z",
+      "completed_at": "2026-09-26T19:56:45Z"
+    }
+  ],
+  "commit_statuses": [
+    {
+      "context": "Vercel",
+      "state": "success",
+      "description": "Deployment has completed",
+      "url": "https://vercel.com/pavel-prouzas-projects/proplet/BkydiE1spPbeAL1Nik7WnqKfaPBK"
+    }
+  ],
+  "current_runtime": {
+    "status": "failure",
+    "run_id": 36267719700,
+    "run_url": "https://github.com/prouza-hue/proplet/actions/runs/36267719700",
+    "job_id": 108475475143,
+    "job_url": "https://github.com/prouza-hue/proplet/actions/runs/36267719700/job/108475475143",
+    "failing_step": "Run current runtime gate",
+    "results": {
+      "current_tests": {
+        "pass": 105,
+        "fail": 3
+      },
+      "assets": {
+        "pass": 126,
+        "fail": 0,
+        "local_references_checked": 118
+      },
+      "syntax": {
+        "pass": 366,
+        "fail": 0
+      }
+    },
+    "failures": [
+      {
+        "test": "tools/test_v4001_pwa_startup.py",
+        "line": 60,
+        "error": "KeyError: 'headers'",
+        "assertion": "vercel[\"headers\"] while selecting /sw.js",
+        "reason": "The isolated static preview vercel.json intentionally has no production service-worker header configuration."
+      },
+      {
+        "test": "tools/test_v4012_pwa_resume_update.py",
+        "line": 16,
+        "error": "AssertionError",
+        "assertion": "'\"source\": \"/sw.js\"' in vercel",
+        "reason": "Production service-worker routing is intentionally absent from the isolated static preview."
+      },
+      {
+        "test": "tools/test_v40114_retention_funnel.py",
+        "line": 48,
+        "error": "AssertionError",
+        "assertion": "'\"path\": \"/api/cron/daily-push-v2\"' in vercel",
+        "reason": "Production push cron is intentionally absent; the static preview contains no API functions or account/push services."
+      }
+    ],
+    "interpretation": "Preview/production gate incompatibility, not a green production gate. No application assertion failure beyond the three production deployment-configuration expectations was observed in this job.",
+    "evidence": "Decoded full job log fetched through the authorized GitHub connector and inspected, not inferred from status."
+  },
+  "production_observation": {
+    "main_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "deployment_id": "dpl_6hStet3DsXxQzKQVYEs7jyZwKjaw",
+    "deployment_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "deployment_state": "READY",
+    "target": "production",
+    "alias": "hrajproplet.cz",
+    "deployment_url": "https://proplet-ntvtgrl3z-pavel-prouzas-projects.vercel.app",
+    "source": "GitHub main branch endpoint and Vercel deployment metadata read during this review"
+  },
+  "decision": {
+    "restore_production_service_worker_or_cron": false,
+    "alter_or_bypass_existing_gate": false,
+    "merge_authorized": false,
+    "production_deployment_authorized": false,
+    "pr_remains_draft": true,
+    "note": "Keep this isolated preview outside production. Production integration must restore the normal deployment configuration and pass its unchanged gate; this report does not waive the failed check."
+  },
+  "local_repository": {
+    "head_sha": "f5d9eeb00ea98f237f34d5bf3d26b0d9433da0d7",
+    "tree_sha": "0d0e536c9019582913b1fece5efb249190c0b7d3",
+    "exact_remote_commit_adopted": true,
+    "working_tree_clean_before_this_report": true,
+    "index_content_preserved": true,
+    "connectivity_check": "pass"
+  }
+}

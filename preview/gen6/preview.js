@@ -37,6 +37,7 @@ const previewInput=window.PropletGameInput.create({getGame:()=>currentGame,neigh
 const previewHints=window.PropletGameHints.create({getGame:()=>currentGame});
 function fitGameBoard(){return previewBoard.fit()}
 function drawPaths(){return previewBoard.drawPaths()}
+function previewCount(n,one,few,many){return `${n} ${n===1?one:n>=2&&n<=4?few:many}`}
 function previewTime(ms){const s=Math.floor(ms/1000);return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function previewMessage(text,kind=''){const el=previewQuery('#gameMessage');el.textContent=text;el.className=`game-message ${kind}`}
 function previewUpdateActive(){
@@ -50,7 +51,7 @@ function previewHud(){
   previewQuery('#lengths').innerHTML=remaining.map(n=>`<span class="length-pill">${n}</span>`).join('')||'<span class="all-found">✓ nic</span>';
   previewQuery('#foundWords').innerHTML=g.found.map(f=>`<span class="found-word-chip" style="--word-color:${previewColors[f.colorIndex]};background:color-mix(in srgb,var(--word-color) 58%,white)">${previewEscape(f.word)}</span>`).join('')||'<span class="empty-found">zatím nic</span>';
   previewQuery('#gameProgress').textContent=`${g.found.length}/${g.puzzle.answers.length}`;
-  previewQuery('#moves').textContent=`${g.moves} tahů`;
+  previewQuery('#moves').textContent=previewCount(g.moves,'tah','tahy','tahů');
   previewQuery('#cleanStatus').textContent=g.hints?'S nápovědou':'Čistě';
   previewQuery('#hintBtn').textContent=g.hints?`💡 ${g.hints}×`:'💡 Nápověda';
   previewQuery('#timer').textContent=previewTime(previewSession.elapsed(g));
@@ -78,7 +79,7 @@ function previewSubmit(){
 function previewFinish(){
   const g=currentGame;if(!g)return;
   const elapsed=previewSession.elapsed(g);g.baseElapsedMs=elapsed;g.start=performance.now();g.pausedAt=g.start;g.finished=true;previewSession.stopTimer();previewPersist();previewHud();
-  previewQuery('#finishSummary').textContent=`${previewTime(elapsed)} · ${g.moves} tahů · ${g.hints} nápověd`;
+  previewQuery('#finishSummary').textContent=`${previewTime(elapsed)} · ${previewCount(g.moves,'tah','tahy','tahů')} · ${previewCount(g.hints,'nápověda','nápovědy','nápověd')}`;
   previewQuery('#nextBoard').textContent=previewBank.boards.indexOf(g.puzzle)<previewBank.boards.length-1?'Další deska':'Přehled desek';
   previewQuery('#finishModal').classList.remove('hidden');previewQuery('#nextBoard').focus();
 }
@@ -113,7 +114,7 @@ function resumeGameClock(){
 previewQuery('#backFromGame').addEventListener('click',previewMenu);
 previewQuery('#finishMenu').addEventListener('click',previewMenu);
 previewQuery('#nextBoard').addEventListener('click',()=>{const next=previewBank.boards[previewBank.boards.indexOf(currentGame.puzzle)+1];previewQuery('#finishModal').classList.add('hidden');next?previewStart(next):previewMenu()});
-previewQuery('#calmBtn').addEventListener('click',()=>{const on=document.body.classList.toggle('preview-calm');previewQuery('#calmBtn').setAttribute('aria-pressed',String(on))});
+previewQuery('#calmRunBtn').addEventListener('click',()=>{const on=document.body.classList.toggle('preview-calm');previewQuery('#calmRunBtn').setAttribute('aria-pressed',String(on))});
 previewQuery('#magnifierQuickBtn').addEventListener('click',()=>{previewSettings.magnifier=!previewSettings.magnifier;if(!previewSettings.magnifier)previewInput.hideMagnifier();previewHud()});
 previewQuery('#hintBtn').addEventListener('click',()=>{if(currentGame&&!currentGame.finished){previewQuery('#hintModal').classList.remove('hidden');previewQuery('#hintChoices button').focus()}});
 previewHints.choices('default').forEach((row,index)=>{const button=document.createElement('button');button.innerHTML=`<strong>${previewEscape(row[0])}</strong><small>${previewEscape(row[1])}</small>`;button.addEventListener('click',()=>{

@@ -24,7 +24,7 @@ STYLES = (
     'game-release-polish.css',
 )
 RUNTIME = tuple('app/game/' + name + '.js' for name in ('board', 'input', 'state', 'hints')) + ('game-layout-v3330.js',)
-ART = ('difficulty/printshop/mozkokalypsa-v2.svg', 'favicon.svg')
+ART = ('difficulty/printshop/mozkokalypsa-v2.svg', 'rewards/printshop/calm.svg', 'favicon.svg')
 CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'none'"
 
 
