@@ -1,0 +1,28 @@
+name: Gen6 takeover workbench
+on:
+  push:
+    branches: ['chore/gen6-takeover-workbench-20260927']
+    paths: ['.github/workflows/gen6-takeover-workbench.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 84d2e75076d8422db03c8f229db19523da039acf
+          persist-credentials: false
+      - name: Export pinned source and file identities
+        run: |
+          mkdir -p /tmp/gen6-source
+          git archive --format=zip HEAD -o /tmp/gen6-source/source.zip
+          git rev-parse HEAD > /tmp/gen6-source/SOURCE_SHA.txt
+          git ls-tree -r HEAD > /tmp/gen6-source/TREE.txt
+          sha256sum /tmp/gen6-source/source.zip > /tmp/gen6-source/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gen6-takeover-source
+          path: /tmp/gen6-source
+          retention-days: 3
