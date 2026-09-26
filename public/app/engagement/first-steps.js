@@ -143,7 +143,7 @@
     $('#profileModal').classList.add('first-steps-auth');
   }
   function dismissAuth(){
-    if(!enabled()||!returnIntent()||profile()?.token)return;
+    if(!enabled()||returnIntent()?.method!=='manual'||profile()?.token)return;
     authOutcome('cancelled','dismissed');$('#profileModal').classList.remove('first-steps-auth');sessionStorage.removeItem(RETURN);authBusy=false;accountWin();
   }
   function resumeAfterAuth(){
@@ -195,7 +195,7 @@
   }
   function cancelledAuthReturn(outcome='cancelled'){
     if(!enabled()||!returnIntent()||profile()?.token)return false;
-    authOutcome(outcome,outcome==='cancelled'?'provider_cancel':'request');authBusy=false;
+    authOutcome(outcome,outcome==='cancelled'?'provider_cancel':'request');const flow=state();write(localStorage,stateKey(),flow);sessionStorage.removeItem(RETURN);authBusy=false;
     (async()=>{if(!appReady)await ready;accountWin();$('#firstStepsSyncStatus').textContent='Přihlášení se nedokončilo. Zkus to znovu nebo hraj dál.';})();
     return true;
   }
@@ -211,13 +211,13 @@
         if(profile()?.token)resumeAfterAuth();else{authBusy=false;accountWin();}
       }
     },{once:true});
-    global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;});
+    global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;if(returnIntent()?.method==='google'&&!profile()?.token)cancelledAuthReturn();});
   }
-  const api={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
+  const facade={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
     quiet:()=>enabled()&&read(sessionStorage,QUIET)===true,
     analyticsVersion:()=>enabled()&&(state().enrolled||(typeof freshStarterVisit==='function'&&freshStarterVisit()))?VERSION:null,
     };
-  global.PropletFirstSteps=api;
+  global.PropletFirstSteps=facade;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })(window);
 

@@ -72,7 +72,9 @@ def request_context(request, environment):
 def enrich(table, row):
     provenance = context.get()
     if table not in TABLES or not provenance:return row
-    details=provenance.get('_event_context',{})
+    details={**provenance.get('_event_context',{})}
+    if table=='product_events' and row.get('event_type') in {'starter_v1_left','starter_v1_hidden','starter_v1_cancelled','starter_v1_failed'}:
+        details.setdefault('reason','unknown')
     result={**row, **{k:v for k,v in provenance.items() if not k.startswith('_')}, **({'context':details} if table=='product_events' else {})}
     if table=='product_events' and provenance.get('_event_id'):
         result['id']=provenance['_event_id']

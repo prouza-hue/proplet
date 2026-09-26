@@ -85,10 +85,11 @@ class Gateway(BaseHTTPRequestHandler):
   self.send_header('Content-Type',r.headers.get('Content-Type','application/json'))
   self.send_header('Content-Length',str(len(r.content)));self.end_headers();self.wfile.write(r.content)
  do_GET=do_POST=do_PATCH=do_DELETE=relay
-gateway=ThreadingHTTPServer(('127.0.0.1',55434),Gateway)
+gateway=ThreadingHTTPServer(('127.0.0.1',0),Gateway)
 threading.Thread(target=gateway.serve_forever,daemon=True).start()
 with ExitStack() as stack:
  stack.callback(lambda:subprocess.run(['docker','stop',container],stdout=subprocess.DEVNULL))
+ stack.callback(gateway.server_close)
  stack.callback(gateway.shutdown)
  for _ in range(30):
   try:
@@ -98,7 +99,7 @@ with ExitStack() as stack:
  else:raise AssertionError('Local PostgREST did not start')
  stack.enter_context(patch.object(m,'is_closed',return_value=False))
  stack.enter_context(patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}))
- stack.enter_context(patch.object(server,'SUPABASE_URL','http://127.0.0.1:55434'))
+ stack.enter_context(patch.object(server,'SUPABASE_URL',f'http://127.0.0.1:{gateway.server_port}'))
  stack.enter_context(patch.object(server,'SUPABASE_SECRET_KEY',jwt))
  tokens=[server.new_session(pid) for pid in players]
  headers=[{'Authorization':'Bearer '+t} for t in tokens]
@@ -186,4 +187,5 @@ with ExitStack() as stack:
 
 print('PASS authenticated HTTP + real PostgREST + PostgreSQL: real custom sessions, invite/anonymous/QA denial, durable metrics, retry, revision conflict, reload recovery, 14-word finish, feedback, revoke; completion + two ratings pays exactly 200 XP once; all ordinary results/progress/streaks unchanged; DB deadline enforced')
 print('LIMIT: synthetic loopback schema, local gateway routing; hosted production browser session is not covered')
+
 
