@@ -1,0 +1,154 @@
+{
+  "source_main_sha": "6e076bccf2a89d99e003667aa2eed0f6f4e24d51",
+  "archive_sha": "e1b7ba273fb84e1a0160369cffb6cbc7dff60994",
+  "comparison": "GitHub compare verified all listed inputs unchanged vs main; not a full current working checkout",
+  "as_of": "2026-09-26",
+  "target_count": 3147,
+  "target_origins": {
+    "v2_authored_candidate": 474,
+    "v1_curated": 1108,
+    "wikidata_frequency_candidate": 1401,
+    "manual_fun_d": 164
+  },
+  "target_tiers": {
+    "A": 510,
+    "B": 750,
+    "C": 1567,
+    "D": 320
+  },
+  "static_recognition_count": 26093,
+  "static_text_rows": 13940,
+  "static_text_mirrors_identical": true,
+  "frequency_source_git_blob": "ef626682b7e1144e0f6e87f7af899daf5327d256",
+  "frequency_upstream_matched_git_blob": "ef626682b7e1144e0f6e87f7af899daf5327d256",
+  "frequency_upstream": "https://github.com/hermitdave/FrequencyWords/blob/master/content/2018/cs/cs_50k.txt",
+  "lemma_snapshot_metadata": {
+    "version": 1,
+    "language": "cs",
+    "source": "Wikidata Lexemes",
+    "source_url": "https://www.wikidata.org/wiki/Wikidata:Lexicographical_data",
+    "license": "CC0-1.0",
+    "retrieved_at": "2026-08-13T00:15:56+00:00",
+    "categories": {
+      "Q1084": "noun",
+      "Q34698": "adjective",
+      "Q380057": "adverb",
+      "Q24905": "verb"
+    },
+    "count": 16012
+  },
+  "inputs_sha256": {
+    "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+    "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+    "data/source_cs_50k.txt": "1fb0576ef07cf5a543789d394cde1168573fc9e7adf427fd143249fd5547458d",
+    "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "data/target_generation_exclusions_v334.json": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+    "data/puzzles.json": "72471265bfb9c1047710172cb1377a31eb6aa9e1c08c4969ee0b556551e014c0",
+    "data/playtests/mozkokalypsa-v2.json": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+    "tools/build_lexicon_v2.py": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+    "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+    "tools/gen5/catalog.py": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74",
+    "tools/gen5/package.py": "f0bddf830ff10e7a2f73a62e4f8e20d7486e75b42b271bc074c8851290f4ada3",
+    "public/app/content/free-order-engine.js": "6cb8092fffd3e01cd3c93bcaf769007f8956bb41c4ce2413c882f427b0da51b1",
+    "public/app/content/free-order-store.js": "9ac1a335f37837041ddb16c6696a4d58142984cbf1f331475a3fe2d36d99cb27",
+    "content/gen5/profiles.json": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5"
+  },
+  "input_mutations": 0,
+  "candidate_duplicates": 0,
+  "candidate_existing_target_collisions": 0,
+  "candidate_blocklist_collisions": 0,
+  "candidate_words_outside_4_10": 0,
+  "waves": {
+    "1": {
+      "count": 267,
+      "with_snapshot_lemma_evidence": 67,
+      "with_frequency_exact_form": 41,
+      "with_either_snapshot_signal": 108,
+      "neither_snapshot_signal": 159,
+      "in_static_recognition": 73,
+      "by_length": {
+        "4": 15,
+        "5": 57,
+        "6": 56,
+        "7": 66,
+        "8": 52,
+        "9": 13,
+        "10": 8
+      },
+      "by_pos": {
+        "noun": 267
+      },
+      "by_theme": {
+        "kuchyně_a_stolování": 33,
+        "jídlo_a_zahrada": 30,
+        "dům_a_dílna": 45,
+        "oblečení_a_drobnosti": 29,
+        "příroda_a_zvířata": 48,
+        "cesty_a_pohyb": 50,
+        "škola_a_tvoření": 32
+      },
+      "barriers": {
+        "absent_from_stored_lemma_snapshot": 200,
+        "absent_exact_headword_from_top50k_forms": 226
+      },
+      "runtime_approved": 0
+    },
+    "2": {
+      "count": 876,
+      "with_snapshot_lemma_evidence": 229,
+      "with_frequency_exact_form": 212,
+      "with_either_snapshot_signal": 419,
+      "neither_snapshot_signal": 457,
+      "in_static_recognition": 270,
+      "by_length": {
+        "4": 71,
+        "5": 163,
+        "6": 232,
+        "7": 218,
+        "8": 131,
+        "9": 46,
+        "10": 15
+      },
+      "by_pos": {
+        "noun": 727,
+        "verb": 105,
+        "adjective": 44
+      },
+      "by_theme": {
+        "Domácnost a bydlení": 45,
+        "Kuchyně a pečení": 56,
+        "Zahrada a sad": 61,
+        "Les a krajina": 66,
+        "Zvířata a jejich svět": 74,
+        "Počasí a světlo": 35,
+        "Řemesla a materiály": 65,
+        "Oblečení a výbava": 50,
+        "Hry a pohádky": 46,
+        "Hudba a zvuky": 49,
+        "Pohyb a činnosti": 105,
+        "Lidé a nálady": 47,
+        "Vlastnosti a vjemy": 44,
+        "Město a cestování": 62,
+        "Škola, papír a tvoření": 71
+      },
+      "barriers": {
+        "absent_exact_headword_from_top50k_forms": 664,
+        "absent_from_stored_lemma_snapshot": 647,
+        "no_exact_lowercase_noun_in_snapshot": 46
+      },
+      "runtime_approved": 0
+    }
+  },
+  "total_candidates": 1143,
+  "runtime_approved_candidates": 0,
+  "new_candidates_externally_headword_checked": 2,
+  "limits": [
+    "NFC casefold counts spellings, not independent meanings.",
+    "No actual player exposure inferred.",
+    "Source presence is evidence, not automatic editorial approval.",
+    "Absence is absence from frozen finite snapshots, not from Czech language.",
+    "No live wordfreq package query or per-word corpus study was performed.",
+    "Priority, themes, word classes and family relations are editorial proposals."
+  ]
+}
