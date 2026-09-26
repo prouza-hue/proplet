@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  snapshot:
+  recognition:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -14,15 +14,42 @@ jobs:
         with:
           ref: 84d2e75076d8422db03c8f229db19523da039acf
           persist-credentials: false
-      - name: Export pinned source and file identities
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'wordfreq==3.1.1'
+      - name: Freeze runtime fallback entries without game writes
         run: |
-          mkdir -p /tmp/gen6-source
-          git archive --format=zip HEAD -o /tmp/gen6-source/source.zip
-          git rev-parse HEAD > /tmp/gen6-source/SOURCE_SHA.txt
-          git ls-tree -r HEAD > /tmp/gen6-source/TREE.txt
-          sha256sum /tmp/gen6-source/source.zip > /tmp/gen6-source/SHA256.txt
+          mkdir -p /tmp/gen6-recognition
+          python - <<'PY'
+          import ast,hashlib,json,re,unicodedata
+          from pathlib import Path
+          from importlib.metadata import version
+          from wordfreq import get_frequency_dict,zipf_frequency,tokenize
+          src=Path('word_recognition_v3330.py').read_text()
+          constants={}
+          for n in ast.parse(src).body:
+            if isinstance(n,ast.Assign):
+              for t in n.targets:
+                if isinstance(t,ast.Name) and t.id.startswith('WORDFREQ_ZIPF_THRESHOLD_'):
+                  constants[t.id]=ast.literal_eval(n.value)
+          pattern=re.compile(r'^[a-záčďéěíňóřšťúůýž]{4,24}$'); accented=set('áčďéěíňóřšťúůýž')
+          data=get_frequency_dict('cs'); accepted=[]; multitokens=[]
+          for raw in data:
+            w=unicodedata.normalize('NFC',raw).strip().casefold()
+            if not pattern.fullmatch(w) or w=='negr':continue
+            tokens=tokenize(w,'cs')
+            if tokens!=[w]:multitokens.append([w,tokens])
+            threshold=constants['WORDFREQ_ZIPF_THRESHOLD_DIACRITIC' if accented.intersection(w) else 'WORDFREQ_ZIPF_THRESHOLD_PLAIN']
+            if zipf_frequency(w,'cs')>=threshold:accepted.append(w)
+          accepted=sorted(set(accepted)); out=Path('/tmp/gen6-recognition')
+          b=('\n'.join(accepted)+'\n').encode();(out/'wordfreq-cs-runtime.txt').write_bytes(b)
+          manifest={'package':'wordfreq','version':version('wordfreq'),'sourceRuntimeSha256':hashlib.sha256(src.encode()).hexdigest(),'thresholds':constants,'tableEntries':len(data),'acceptedEntries':len(accepted),'nonSingleTokenAlphabeticEntries':multitokens,'sha256':hashlib.sha256(b).hexdigest(),'scope':'All acceptable entries in the pinned cs frequency table, tested by actual runtime zipf thresholds. Not a change to runtime recognition.'}
+          (out/'wordfreq-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(manifest,ensure_ascii=False))
+          PY
       - uses: actions/upload-artifact@v4
         with:
-          name: gen6-takeover-source
-          path: /tmp/gen6-source
+          name: gen6-wordfreq-snapshot
+          path: /tmp/gen6-recognition
           retention-days: 3
