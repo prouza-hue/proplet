@@ -25,6 +25,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 import server
 import account_auth_core as auth
+from backend import measurement
 
 
 def main():
@@ -39,11 +40,17 @@ def main():
     assert source['database'].startswith('proplet_test_')
     options=dict(host='127.0.0.1',port=55432,user='proplet_test_admin',
                  password=args.password_file.read_text().strip(),dbname=source['database'])
+    def signup_headers():
+        ctx=measurement.context.get() or {};d=ctx.get('_event_context',{})
+        return {'x-proplet-signup-environment':ctx.get('environment','preview'),'x-proplet-signup-version':'4.2.2',
+                'x-proplet-signup-test':'1' if ctx.get('is_test') else '0','x-proplet-signup-onboarding':ctx.get('onboarding_version','legacy'),
+                'x-proplet-signup-release':ctx.get('client_release','legacy'),'x-proplet-signup-source':d.get('creation_source','other'),
+                'x-proplet-signup-run':d.get('first_steps_run_id','')}
     def query(statement,values=()):
         with psycopg.connect(**options) as c:
             c.execute('set local role service_role')
             c.execute("select set_config('request.headers',%s,true)",
-                      (json.dumps({'x-proplet-signup-environment':'preview','x-proplet-signup-version':'4.2.2'}),))
+                      (json.dumps(signup_headers()),))
             cur=c.execute(statement,values)
             return [r[0] for r in cur.fetchall()] if cur.description else []
     def where(filters):
@@ -66,6 +73,11 @@ def main():
     def counts():
         return query("select jsonb_build_object('players',(select count(*) from players),'events',(select count(*) from product_events where event_type='account_created'),'duplicates',(select count(*) from (select player_id from product_events where event_type='account_created' group by player_id having count(*)>1) d))")[0]
     app=FastAPI()
+    @app.middleware('http')
+    async def provenance(request,call_next):
+        token=measurement.context.set(measurement.request_context(request,'production'))
+        try:return await call_next(request)
+        finally:measurement.context.reset(token)
     app.add_api_route('/api/player',server.create_player,methods=['POST'])
     app.add_api_route('/api/login',server.login,methods=['POST'])
     app.add_api_route('/api/product-event',server.product_event,methods=['POST'])
@@ -99,7 +111,8 @@ def main():
             uvicorn.run(app,host='127.0.0.1',port=args.serve,access_log=False)
             return
         client=TestClient(app);before=counts();tag=uuid.uuid4().hex[:8]
-        r=client.post('/api/player',json={'name':'Synthetic '+tag,'password':'synthetic-password'})
+        flow=str(uuid.uuid4());headers={'X-Proplet-First-Steps-Run':flow,'X-Proplet-Creation-Source':'first_steps_v1','X-Proplet-Onboarding':'board-v3-short','X-Proplet-Client-Release':'flow-contract','X-Proplet-Test':'1'}
+        r=client.post('/api/player',headers=headers,json={'name':'Synthetic '+tag,'password':'synthetic-password'})
         assert r.status_code==200,r.text
         player=r.json();after_password=counts()
         assert after_password['players']==before['players']+1 and after_password['events']==before['events']+1
@@ -116,7 +129,7 @@ def main():
         provider.request.return_value=httpx.Response(200,json=user)
         with patch.object(auth.httpx,'Client',return_value=provider):
             for _ in range(3):
-                r=client.post('/api/auth/google/complete',json={'accessToken':'x'*50})
+                r=client.post('/api/auth/google/complete',headers=headers,json={'accessToken':'x'*50})
                 assert r.status_code==200,r.text
             after_google=counts()
             assert after_google['players']==before['players']+2 and after_google['events']==before['events']+2
@@ -131,17 +144,23 @@ def main():
         assert counts()['players']==before['players']+3 and counts()['events']==before['events']+3
         concurrent_id=str(uuid.uuid4())
         def retry_insert(_):
-            query("insert into players(id,name,family_code,token_hash) values (%s,'Concurrent fixture',%s,'synthetic') on conflict(id) do nothing",
+            query("insert into players(id,name,family_code,token_hash) values (%s,'Concurrent fixture',%s,'synthetic') on conflict do nothing",
                   (concurrent_id,'SOLO_'+tag))
         with ThreadPoolExecutor(max_workers=10) as pool:list(pool.map(retry_insert,range(10)))
         assert counts()['players']==before['players']+4 and counts()['events']==before['events']+4
         events=query("select to_jsonb(e) from product_events e where event_type='account_created' and context->>'origin'='players_insert'")
         for e in events:
-            assert e['context']=={'origin':'players_insert'}
+            assert e['context']['origin']=='players_insert'
+            if e['context'].get('creation_source')=='first_steps_v1':
+                assert e['context']['first_steps_run_id']==flow and e['onboarding_version']=='board-v3-short'
+                assert e['client_release']=='flow-contract' and e['is_test'] is True
+            else:assert e['context'].get('creation_source')=='other'
             assert not any(x in json.dumps(e) for x in ('@','Private Google','synthetic-password'))
+        assert sum(e['context'].get('first_steps_run_id')==flow for e in events)==2
         result={'syntheticOnly':True,'database':source['database'],'before':before,'after':counts(),
                 'checks':['password signup','team signup','Google signup','Google retry/login x3','password login x3',
                           'cached client event ignored','10 concurrent same-account inserts','failed registration','no PII','no duplicate events']}
         args.output.write_text(json.dumps(result,indent=2),encoding='utf-8');print(json.dumps(result))
 
 if __name__=='__main__':main()
+

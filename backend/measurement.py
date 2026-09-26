@@ -45,7 +45,17 @@ def request_context(request, environment):
     starter_ms=request.headers.get('x-proplet-starter-ms','')
     if starter_ms.isdigit() and 0<=int(starter_ms)<=86400000:details['starter_ms']=int(starter_ms)
     reason=request.headers.get('x-proplet-starter-reason','')
-    if reason in {'data','prepare','render','superseded','navigation','visibility'}:details['starter_reason']=reason
+    if reason in {'data','prepare','render','superseded','navigation','visibility'}:details['starter_reason']=reason; details['reason']=reason
+    first_steps_run=request.headers.get('x-proplet-first-steps-run','')
+    try:
+        if first_steps_run:details['first_steps_run_id']=str(uuid.UUID(first_steps_run))
+    except (ValueError,TypeError):pass
+    if 'first_steps_run_id' in details:
+        if request.headers.get('x-proplet-creation-source')=='first_steps_v1':details['creation_source']='first_steps_v1'
+        outcome=request.headers.get('x-proplet-first-steps-outcome','')
+        reason=request.headers.get('x-proplet-first-steps-reason','')
+        if outcome in {'failed','cancelled'}:details['outcome']=outcome
+        if reason in {'dismissed','provider_cancel','request','offline','sync','quarantined'}:details['reason']=reason
     return {
         '_event_context':details,
         '_event_id':event_id,
@@ -62,7 +72,9 @@ def request_context(request, environment):
 def enrich(table, row):
     provenance = context.get()
     if table not in TABLES or not provenance:return row
-    details=provenance.get('_event_context',{})
+    details={**provenance.get('_event_context',{})}
+    if table=='product_events' and row.get('event_type') in {'starter_v1_left','starter_v1_hidden','starter_v1_cancelled','starter_v1_failed'}:
+        details.setdefault('reason','unknown')
     result={**row, **{k:v for k,v in provenance.items() if not k.startswith('_')}, **({'context':details} if table=='product_events' else {})}
     if table=='product_events' and provenance.get('_event_id'):
         result['id']=provenance['_event_id']
@@ -91,3 +103,4 @@ def pages(request, table, *, filters, columns='*'):
         if next_cursor == cursor:
             raise ValueError('Analytics cursor did not advance')
         cursor = next_cursor
+

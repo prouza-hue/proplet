@@ -42,9 +42,9 @@ const server=http.createServer(async(req,res)=>{
   }
   if(p.startsWith('/api/')){
    const data=['GET','HEAD'].includes(req.method)?null:await body(req);
-   requests.push({method:req.method,path:p,at:Date.now()});
+   requests.push({method:req.method,path:p,headers:req.headers,at:Date.now()});
    if(['/api/product-event','/api/challenge-event'].includes(p)&&req.method==='POST'){
-    events.push({endpoint:p,event:data.event_type,headers:req.headers,at:Date.now()});
+    if(data.event_type!=='account_created')events.push({endpoint:p,event:data.event_type,headers:req.headers,at:Date.now()});
     return setTimeout(()=>json(res,200,{ok:true,synthetic:true}),controls.eventDelayMs);
    }
    if(p==='/api/config')return json(res,200,config);
@@ -53,8 +53,11 @@ const server=http.createServer(async(req,res)=>{
    if(p==='/api/free-order/config'||p==='/api/play-session/config')return json(res,200,{enabled:false});
    if(p==='/api/login-integrity'&&req.method==='POST')return data.name===syntheticProfile.name&&data.password==='fixture-password'?json(res,200,syntheticProfile):json(res,401,{detail:'synthetic login rejected'});
    if(p==='/api/auth/google/start'){res.writeHead(302,{location:controls.auth==='cancel'?'/?auth=google#error=access_denied':'/?auth=google#access_token=synthetic-google-token'});return res.end()}
-   if(p==='/api/auth/google/complete')return controls.auth==='fail'?json(res,503,{detail:'synthetic auth outage'}):json(res,200,{profile:syntheticProfile,linked:false});
-   if(p==='/api/player')return json(res,200,syntheticProfile);
+   if(p==='/api/auth/google/complete'||p==='/api/player'){
+    if(controls.auth==='fail')return json(res,503,{detail:'synthetic auth outage'});
+    events.push({endpoint:p,event:'account_created',headers:req.headers,authoritative:true,at:Date.now()});
+    return json(res,200,p==='/api/player'?{...syntheticProfile,accountCreated:true}:{profile:syntheticProfile,linked:false,accountCreated:true});
+   }
    if(p==='/api/result'){if(controls.result==='fail')return json(res,503,{detail:'synthetic save outage'});controls.progress.push({...data,puzzleId:data.puzzle_id,challengeKey:data.challenge_key,contentGeneration:data.content_generation,completedAt:data.completed_at});return json(res,200,{ok:true,synthetic:true})}
    if(p==='/api/me')return json(res,200,syntheticProfile);
    if(p==='/api/progress')return json(res,200,{completed:controls.progress});
@@ -74,4 +77,5 @@ const server=http.createServer(async(req,res)=>{
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });
 server.listen(Number(process.env.PORT||8765),'127.0.0.1',()=>console.log(`Synthetic onboarding fixture ${sha} on ${server.address().port}`));
+
 

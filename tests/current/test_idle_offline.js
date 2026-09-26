@@ -95,3 +95,4 @@ const root=path.resolve(__dirname,'../../public');
  assert.equal(started.length,1);assert.equal(started[0].answers[0].word,'TEST');
  console.log('PASS offline response ownership, atomic SW installation, full-bank readiness');
 })().catch(e=>{console.error(e);process.exitCode=1});
+

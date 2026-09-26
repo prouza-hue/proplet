@@ -117,3 +117,14 @@ separately. Compare only closed, comparable acquisition/time windows; today's
 rolling totals are diagnostics, not a causal uplift claim. Historical rows from
 known faulty releases require explicit correction; do not silently reinterpret
 all legacy rows, nor mix corrected and uncorrected populations.
+
+
+
+## Immutable funnel context — 2026-09-26
+Starter trace freezes onboarding_version/client_release at requested and sends that snapshot on every phase, including completed after onboarding state changes. Legitimate board-v2 remains board-v2. Run IDs are UUIDs; phase capture remains once per run. Capture-time auth and elapsed remain unchanged. starter_reason is preserved for compatibility and duplicated into canonical context.reason: data/prepare/render/superseded/navigation/visibility (unknown only as server fallback for missing/invalid legacy headers). Hidden is visibility only, not final abandonment. Three completion signals (onboarding_completed, starter_completed, starter_v1_completed) are ONE logical boundary.
+
+Account flow creates first_steps_run_id at first real g4-e-001 offer. It persists across OAuth return and guest claim; event context contains first_steps_run_id, signup trigger context additionally creation_source=first_steps_v1 (otherwise other). These analytic declarations are never authorization. All values are bounded/UUID validated; no emails, URLs or free-form errors are copied. Non-test production reports MUST filter environment=production AND is_test=false.
+
+New diagnostic events: first_steps_v1_auth_cancelled, first_steps_v1_auth_failed, first_steps_v1_save_failed; at most once each per flow. context.outcome: cancelled|failed; reason: dismissed|provider_cancel|request|offline|sync|quarantined. Multiple retries do not create duplicate branch phases. The authoritative account_created remains transactionally emitted only by the players INSERT trigger. HTTP rejection/provider cancellation cannot create it. saved requires successful claim/sync, no remaining/quarantined queue and server-confirmed starter:starter-v1 plus free:g4-e-001. An existing-account login can save without a new account_created. UI and game contents are unchanged.
+
+Use docs/audits/FUNNEL-PRODUCTION-VERIFY.sql for organic acceptance. Until at least 30 fresh non-test v3 runs and all invariants pass, status is “nasazeno, čeká na produkční ověření”. Do not fabricate production traffic to fill the cohort.

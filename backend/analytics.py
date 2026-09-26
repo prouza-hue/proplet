@@ -71,6 +71,9 @@ EMBEDDED_EVENT_NAMES = (
     "difficulty_nudge_shown_hard_hardcore",
     "difficulty_nudge_shown_medium_hard",
     "first_steps_v1_assisted",
+    "first_steps_v1_auth_cancelled",
+    "first_steps_v1_auth_failed",
+    "first_steps_v1_save_failed",
     "first_steps_v1_continue",
     "first_steps_v1_google",
     "first_steps_v1_manual",
@@ -218,4 +221,5 @@ def record_product_event(
     }
     insert_fn("product_events", row)
     return row
+
 

@@ -14,6 +14,7 @@ import httpx
 from fastapi import HTTPException
 
 from .config import settings
+from . import measurement
 
 
 logger = logging.getLogger("proplet")
@@ -71,6 +72,14 @@ def db_request(
         # Never forward arbitrary browser headers or OAuth/user profile data.
         headers["X-Proplet-Signup-Environment"] = settings.vercel_env or "local"
         headers["X-Proplet-Signup-Version"] = settings.app_version
+        provenance=measurement.context.get() or {}
+        details=provenance.get('_event_context',{})
+        headers['X-Proplet-Signup-Test']='1' if provenance.get('is_test') else '0'
+        headers['X-Proplet-Signup-Release']=provenance.get('client_release','legacy')
+        headers['X-Proplet-Signup-Onboarding']=provenance.get('onboarding_version','legacy')
+        if details.get('creation_source')=='first_steps_v1' and details.get('first_steps_run_id'):
+            headers['X-Proplet-Signup-Source']='first_steps_v1'
+            headers['X-Proplet-Signup-Run']=details['first_steps_run_id']
     if prefer:
         headers["Prefer"] = prefer
     url = f"{url_base}/rest/v1/{table}"
@@ -341,3 +350,4 @@ def db_rpc(
     if not response.content:
         return None
     return response.json()
+
