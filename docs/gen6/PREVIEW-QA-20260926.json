@@ -1,6 +1,6 @@
 {
   "date": "2026-09-26",
-  "status": "passed-with-two-adapter-fixes-awaiting-followup-smoke",
+  "status": "passed-with-followup-fixes-verified",
   "testedPreviewUrl": "https://proplet-dut0khk0v-pavel-prouzas-projects.vercel.app/",
   "testedCommit": "f5d9eeb00ea98f237f34d5bf3d26b0d9433da0d7",
   "testedDeployment": "dpl_BkydiE1spPbeAL1Nik7WnqKfaPBK",
@@ -119,14 +119,15 @@
     "390/768 checks are real iframe document widths with desktop pointer, not touch emulation or a physical Samsung Fold. Touch-only magnifier/rail classification not validated.",
     "Installed primary Playwright package had no browser executable; official chromium-headless-shell download failed as invalid/truncated ZIP. No retry workaround.",
     "Cloud browser forbids file:// navigation; actual browser QA used the isolated HTTPS Vercel preview.",
-    "Broad recognition in this static preview is the frozen 26190-word validation union, not dynamic production wordfreq fallback.",
-    "Followup deployment smoke still needed for calm label/icon and Czech plural fixes."
+    "Broad recognition in this static preview is the frozen 26190-word validation union, not dynamic production wordfreq fallback."
   ],
   "screenshots": {
     "menu": "qa/menu-f5d9.jpg",
     "desktop": "qa/desktop-f5d9.jpg",
     "finish": "qa/finish-f5d9.jpg",
     "mobileBeforeFix": "qa/mobile390-before-fix-f5d9.jpg",
-    "foldWidth": "qa/fold768-f5d9.jpg"
-  }
+    "foldWidth": "qa/fold768-f5d9.jpg",
+    "mobileFixed": "qa/mobile390-fixed-59f2.jpg"
+  },
+  "followupSmokeReport": "PREVIEW-FINAL-SMOKE-20260926.json"
 }
