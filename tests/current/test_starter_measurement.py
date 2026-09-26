@@ -8,7 +8,7 @@ def capture(headers):
 
 safe={'x-proplet-starter-run':'b7c67e99-f7d9-458e-955b-d02b57d2215d','x-proplet-starter-ms':'1245','x-proplet-starter-reason':'data','x-proplet-auth-at-event':'anonymous'}
 p=capture(safe)
-assert p['_event_context']=={'starter_run_id':safe['x-proplet-starter-run'],'starter_ms':1245,'starter_reason':'data','auth_at_event':'anonymous'}
+assert p['_event_context']=={'starter_run_id':safe['x-proplet-starter-run'],'starter_ms':1245,'starter_reason':'data','reason':'data','auth_at_event':'anonymous'}
 token=context.set(p)
 try:
     # A claimed account's server identity must not rewrite the capture context.
@@ -23,3 +23,4 @@ for bad in ['person@example.com','https://example.com/private','a'*10000,'-1','8
 assert set(load_registry()['events'])==set(EMBEDDED_EVENT_NAMES)
 assert len(EMBEDDED_EVENT_NAMES)==len(set(EMBEDDED_EVENT_NAMES))
 print('PASS starter phase context: bounded values, unknown legacy auth, claim preservation, registry parity')
+

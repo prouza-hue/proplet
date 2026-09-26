@@ -9,15 +9,36 @@
   const read=(storage,key)=>{try{return JSON.parse(storage.getItem(key)||'null')}catch{return null}};
   const write=(storage,key,value)=>{try{storage.setItem(key,JSON.stringify(value));return true}catch{return false}};
   const stateKey=()=>KEY+':'+(typeof getAnonymousId==='function'?getAnonymousId():'guest');
+  const intent=()=>{const r=read(sessionStorage,RETURN);return r?.at>Date.now()-30*60*1000&&(!r.owner||r.owner===profile()?.id)?r:null};
   const state=()=>{
-    const stored=read(localStorage,stateKey());if(stored)return !stored.owner||stored.owner===profile()?.id?stored:{};
-    // Claiming guest telemetry rotates the anonymous ID. The short-lived
-    // return intent carries only flow metadata across that identity boundary.
-    const r=read(sessionStorage,RETURN),p=profile();
-    return r?.at>Date.now()-30*60*1000&&p?.token&&(!r.owner||r.owner===p.id)?r.flow||{}:{};
+    const r=intent();if(r?.flow)return r.flow;
+    const stored=read(localStorage,stateKey());return stored&&(!stored.owner||stored.owner===profile()?.id)?stored:{};
   };
-  const update=patch=>write(localStorage,stateKey(),{...state(),...patch});
-  const event=name=>{try{trackProductEvent(name)}catch{}};
+  const update=patch=>{
+    const next={...state(),...patch},r=intent();
+    if(r)write(sessionStorage,RETURN,{...r,flow:next});
+    return write(localStorage,stateKey(),next);
+  };
+  const event=(name,properties={})=>{try{trackProductEvent(name,properties)}catch{}};
+  function once(name,properties={}){
+    if(state().events?.includes(name))return;
+    update({events:[...(state().events||[]),name]});event(name,properties);
+  }
+  function ensureFlow(){
+    if(state().firstStepsRunId)return;
+    update({firstStepsRunId:typeof newAttemptId==='function'?newAttemptId():global.crypto.randomUUID(),clientRelease:typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:'legacy',onboardingVersion:VERSION,isTest:new URLSearchParams(location.search).get('tutorial')==='1'});
+  }
+  function eventHeaders(properties={}){
+    const s=state();if(!s.firstStepsRunId)return {};
+    return {'X-Proplet-First-Steps-Run':s.firstStepsRunId,'X-Proplet-Onboarding':s.onboardingVersion,'X-Proplet-Client-Release':s.clientRelease,...(s.isTest?{'X-Proplet-Test':'1'}:{}),...(properties.reason?{'X-Proplet-First-Steps-Reason':properties.reason}:{}),...(properties.outcome?{'X-Proplet-First-Steps-Outcome':properties.outcome}:{})};
+  }
+  function authHeaders(){return intent()?{...eventHeaders(),'X-Proplet-Creation-Source':'first_steps_v1'}:{}}
+  function captureAccount(owner){
+    const r=intent();if(!r)return;
+    // Pin the complete flow before profile adoption rotates the guest identity.
+    write(sessionStorage,RETURN,{...r,owner,flow:{...r.flow,owner}});
+  }
+  function authOutcome(outcome,reason){if(intent())once('first_steps_v1_auth_'+outcome,{outcome,reason});}
   const short=g=>enabled()&&g?.mode==='starter'&&g.puzzle?.meta?.starterVersion===3;
   let appReady=false,resolveReady,authBusy=false,firstLaunch=false;
   const ready=new Promise(resolve=>{resolveReady=resolve});
@@ -106,15 +127,16 @@
     $('#firstStepsRetry').classList.add('hidden');$('#firstStepsSyncStatus').textContent='';
     $('#firstStepsSaveCopy').textContent=signed?'Účet je připravený. Kontroluji uložení výsledku…':'Vytvoř si účet a pokračuj se svým postupem i na jiném zařízení.';
   }
-  function returnIntent(){const r=read(sessionStorage,RETURN);return r?.at>Date.now()-30*60*1000&&(!r.owner||r.owner===profile()?.id)&&r?.boardId===state().firstBoardId?r:null}
+  function returnIntent(){const r=intent();return r?.boardId===r?.flow?.firstBoardId?r:null}
   async function beginAuth(method){
     if(authBusy)return;
-    const intent={at:Date.now(),boardId:state().firstBoardId,flow:state()};
+    ensureFlow();const intent={at:Date.now(),boardId:state().firstBoardId,method,flow:state()};
     if(!write(sessionStorage,RETURN,intent)){showToast('Pro návrat k výsledku potřebujeme úložiště prohlížeče. Zkus jiný způsob přihlášení.');return;}
-    event(method==='google'?'first_steps_v1_google':'first_steps_v1_manual');
+    once(method==='google'?'first_steps_v1_google':'first_steps_v1_manual');
     if(method==='google'){
       authBusy=true;$('#firstStepsGoogle').disabled=true;
       // Use the existing same-origin OAuth route. Never transfer tokens or progress through the URL.
+      if(typeof productAnalytics==='function')await productAnalytics()?.flush();
       location.assign('/api/auth/google/start');return;
     }
     $('#winModal').classList.add('hidden');openProfileModal('create');
@@ -122,7 +144,7 @@
   }
   function dismissAuth(){
     if(!enabled()||!returnIntent()||profile()?.token)return;
-    $('#profileModal').classList.remove('first-steps-auth');sessionStorage.removeItem(RETURN);authBusy=false;accountWin();
+    authOutcome('cancelled','dismissed');$('#profileModal').classList.remove('first-steps-auth');sessionStorage.removeItem(RETURN);authBusy=false;accountWin();
   }
   function resumeAfterAuth(){
     if(!enabled()||!returnIntent()||!profile()?.token)return false;
@@ -137,17 +159,21 @@
       if(profile()?.id!==owner)return;
       update({owner});
       const preview=!!result?.preview;
-      const saved=!!result?.ok&&!preview&&!result?.left&&!getQueue().length;
+      let confirmed=false;
+      if(result?.ok&&!preview){try{const remote=await api('/api/progress');const keys=new Set((remote.completed||[]).map(r=>r.challengeKey));confirmed=keys.has('starter:starter-v1')&&keys.has('free:g4-e-001')}catch{}}
+      if(profile()?.id!==owner)return;
+      const saved=confirmed&&!!result?.ok&&!preview&&!result?.left&&!result?.quarantined&&!getQueue().length;
+      if(!saved&&!preview)once('first_steps_v1_save_failed',{outcome:'failed',reason:!navigator.onLine?'offline':result?.quarantined?'quarantined':'sync'});
       $('#firstStepsSaveCopy').textContent=preview?'Přihlášeno. V náhledu zůstává hraní na tomto zařízení.':saved?'Postup je uložený v účtu. Můžeš hrát dál.':'Účet je připravený. Výsledek ještě čeká na uložení.';
       $('#firstStepsSyncStatus').textContent=preview?'Výsledky z preview se do ostré hry neposílají.':saved?'✓ Uloženo':result?.deferred?'Další pokus bude možný za chvíli. Místní výsledek zůstává zachovaný.':navigator.onLine?'Zkus to znovu. Místní výsledek zůstává zachovaný.':'Jsi offline. Místní výsledek zůstává zachovaný.';
       $('#firstStepsRetry').classList.toggle('hidden',preview||saved);
-      if(saved&&!state().savedRecorded){update({savedRecorded:true});event('first_steps_v1_saved');}
-      if(saved||preview)sessionStorage.removeItem(RETURN);
+      if(saved&&!state().savedRecorded){update({savedRecorded:true});once('first_steps_v1_saved');}
+      if(saved||preview){const flow=state();write(localStorage,stateKey(),flow);sessionStorage.removeItem(RETURN);}
     })().finally(()=>{authBusy=false});
     return true;
   }
   function continuePlaying(){
-    event('first_steps_v1_continue');
+    once('first_steps_v1_continue');
     update({finished:true});sessionStorage.removeItem(RETURN);$('#winModal').classList.add('hidden');
     $('#winModal').classList.remove('first-steps-win');$('#firstStepsAccount')?.classList.add('hidden');
     startFree('easy');
@@ -165,11 +191,11 @@
   function finish(g){
     if(short(g)){trainingWin(g);return;}
     if(!isFirstGame(g))return;
-    update({summary:{words:g.found.length,xp:g.winBaseXpAwarded||0}});accountWin();event('first_steps_v1_offer');
+    ensureFlow();update({summary:{words:g.found.length,xp:g.winBaseXpAwarded||0}});accountWin();once('first_steps_v1_offer');
   }
-  function cancelledAuthReturn(){
+  function cancelledAuthReturn(outcome='cancelled'){
     if(!enabled()||!returnIntent()||profile()?.token)return false;
-    authBusy=false;
+    authOutcome(outcome,outcome==='cancelled'?'provider_cancel':'request');authBusy=false;
     (async()=>{if(!appReady)await ready;accountWin();$('#firstStepsSyncStatus').textContent='Přihlášení se nedokončilo. Zkus to znovu nebo hraj dál.';})();
     return true;
   }
@@ -187,10 +213,11 @@
     },{once:true});
     global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;});
   }
-  const api={enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
+  const api={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
     quiet:()=>enabled()&&read(sessionStorage,QUIET)===true,
     analyticsVersion:()=>enabled()&&(state().enrolled||(typeof freshStarterVisit==='function'&&freshStarterVisit()))?VERSION:null,
     };
   global.PropletFirstSteps=api;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })(window);
+

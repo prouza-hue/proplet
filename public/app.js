@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-mkinvite2';
+const APP_PREVIEW_RELEASE='proplet-v4.02.2-flowcontext1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -873,11 +873,11 @@ async function sendAttemptCheckpoint(eventType){
 }
 // Diagnostic phases are additive; legacy funnel events keep their meaning.
 let starterBootTrace=null;
-function createStarterTrace(){return {id:newAttemptId(),started:performance.now(),seen:new Set()}}
+function createStarterTrace(){return {id:newAttemptId(),started:performance.now(),seen:new Set(),provenance:Object.freeze({onboardingVersion:window.PropletFirstSteps?.analyticsVersion()||'board-v2',clientRelease:APP_PREVIEW_RELEASE})}}
 function trackStarterPhase(trace,phase,reason){
  if(!trace||trace.seen.has(phase))return;
  trace.seen.add(phase);
- try{trackProductEvent('starter_v1_'+phase,{starterRunId:trace.id,starterElapsedMs:Math.round(performance.now()-trace.started),starterReason:reason})}catch{}
+ try{trackProductEvent('starter_v1_'+phase,{starterRunId:trace.id,starterElapsedMs:Math.round(performance.now()-trace.started),starterReason:reason,starterProvenance:trace.provenance})}catch{}
 }
 function freshStarterVisit(){
  try{if(window.PROPLET_RUNTIME_META?.gen4CandidatePreview||window.PROPLET_RUNTIME_META?.gen5CandidatePreview)return false;const state=getState();return !getProfile()?.token&&!localStorage.getItem(ONBOARD_KEY)&&!Object.keys(state.completed||{}).length&&!Object.keys(state.inProgress||{}).length}catch{return false}
@@ -1335,10 +1335,11 @@ async function claimTelemetryAfterAuth(anonymousId){
 function analyticsHeaders(eventType,properties){
  const g=currentGame,puzzleId=properties?.puzzleId||g?.puzzle?.id;
  const starterTrace=g?.starterTrace,starterRun=properties?.starterRunId||starterTrace?.id;
+ const provenance=properties?.starterProvenance||(eventType&&starterRun===starterTrace?.id?starterTrace?.provenance:null);
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
  if(properties?.starterReason)starterHeaders['X-Proplet-Starter-Reason']=properties.starterReason;
  const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
- return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
@@ -1516,7 +1517,8 @@ async function saveNewProfile(){
  const authAction=accountMode,offerInstallAfterCreate=authAction==='create'&&!profileModalFromNudge&&!profileModalFromWin;
  const name=$('#playerNameInput').value.trim(),password=$('#playerPasswordInput').value;$('#profileFormError').textContent='';if(!name||!password){$('#profileFormError').textContent='Vyplň jméno a heslo.';return}if(password.length<8){$('#profileFormError').textContent='Heslo musí mít alespoň 8 znaků.';return}
  try{
-  const endpoint=accountMode==='create'?'/api/player':'/api/login-integrity',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body)});
+  const endpoint=accountMode==='create'?'/api/player':'/api/login-integrity',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body),headers:authAction==='create'?window.PropletFirstSteps?.authHeaders():{}});
+  window.PropletFirstSteps?.captureAccount(profile.id);
   window.PropletMarketing?.registration({id:profile.id,accountCreated:authAction==='create'&&profile.accountCreated===true});
   try{await currentGame?.finishTelemetryPromise}catch{}
   pauseGameClock('login');
@@ -1525,7 +1527,7 @@ async function saveNewProfile(){
   if(accountMode==='create'&&selectedBeforeAuth)try{await persistSupportMode(selectedBeforeAuth)}catch{}
   await claimTelemetryAfterAuth(anonId);
   trackProductEvent('account_authenticated');trackProductEvent(authAction==='create'?'account_created':'account_logged_in');if(profileModalFromNudge&&accountNudgeStage)trackProductEvent(`account_nudge_${accountNudgeStage}_authenticated`);if(profileModalFromWin)trackProductEvent('win_account_cta_authenticated');$('#profileModal').classList.add('hidden');await syncQueue({announce:true});updateProfileChip();renderProfile();renderDaily();renderFree();renderLeaderboard();if(window.PropletFirstSteps?.resumeAfterAuth())return;if(authAction==='create'){showDailyAfterRegistration();if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320)}else if(profileModalFromWin){profileModalFromWin=false;$('#winModal').classList.remove('hidden');await refreshWinLeaderboardAfterAuth()}else if(profileModalFromNudge)resumeAfterAccountNudge();else if(offerInstallAfterCreate)setTimeout(()=>maybeOfferInstallNudge(null,'account'),320);
- }catch(e){$('#profileFormError').textContent=e.message}
+ }catch(e){window.PropletFirstSteps?.authOutcome('failed',navigator.onLine?'request':'offline');$('#profileFormError').textContent=e.message}
 }
 function toggleLegacyTeamLogin(){legacyTeamLogin=!legacyTeamLogin;$('#leagueChooser').classList.toggle('hidden',!legacyTeamLogin);$('#legacyTeamLoginToggle').textContent=legacyTeamLogin?'Skrýt výběr týmu':'Mám starší účet v týmu';if(legacyTeamLogin)loadLeagues()}
 function setTeamMembershipMode(mode){return accountUI().setTeamMembershipMode(mode)}
@@ -2373,4 +2375,5 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+
 

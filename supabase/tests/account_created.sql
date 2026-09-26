@@ -25,7 +25,7 @@ begin
   assert (select count(*) from public.product_events where player_id='10000000-0000-4000-8000-000000000001' and event_type='account_created')=1;
   select * into strict e from public.product_events where player_id='10000000-0000-4000-8000-000000000001' and event_type='account_created';
   assert e.environment='preview' and e.is_test=true;
-  assert e.context='{"origin":"players_insert"}'::jsonb;
+  assert e.context='{"origin":"players_insert","creation_source":"other"}'::jsonb;
   assert e.anonymous_id is null and e.app_version='4.2.2';
   assert to_jsonb(e)::text not like '%Private synthetic%' and to_jsonb(e)::text not like '%@%';
   assert not exists (select 1 from public.product_events where anonymous_id='synthetic-guest' and event_type='account_created');
@@ -39,3 +39,4 @@ begin
   assert not exists(select 1 from public.product_events where player_id='10000000-0000-4000-8000-000000000002');
 end $$;
 rollback;
+

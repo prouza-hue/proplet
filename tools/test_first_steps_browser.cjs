@@ -47,9 +47,22 @@ async function starter(page,touch=false,style='drag'){
  const ev=await events(),phases=['starter_v1_requested','starter_v1_data_ready','starter_v1_ready','starter_v1_interaction','starter_v1_first_correct','starter_v1_completed'];
  const records=phases.map(name=>ev.find(e=>e.event===name));assert(records.every(Boolean));
  const positions=records.map(e=>ev.indexOf(e));assert.deepEqual(positions,[...positions].sort((a,b)=>a-b));
- assert.equal(new Set(records.map(e=>e.headers['x-proplet-starter-run'])).size,1);
+ assert(records.every(e=>e.headers['x-proplet-starter-run']));assert.equal(new Set(records.map(e=>e.headers['x-proplet-starter-run'])).size,1);assert.equal(new Set(records.map(e=>e.headers['x-proplet-client-release'])).size,1);
  assert(records.every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'&&e.headers['x-proplet-auth-at-event']==='anonymous'));
  const elapsed=records.map(e=>Number(e.headers['x-proplet-starter-ms']));assert.deepEqual(elapsed,[...elapsed].sort((a,b)=>a-b));
+}
+async function assertAccountFlow(method){
+ await eventOnce('first_steps_v1_saved');await eventOnce('account_created');
+ const ev=await events(),names=['first_steps_v1_offer','first_steps_v1_'+method,'account_created','first_steps_v1_saved'];
+ const rows=names.map(n=>ev.find(e=>e.event===n));
+ const ids=rows.map(e=>e.headers['x-proplet-first-steps-run']);assert(ids.every(Boolean));assert.equal(new Set(ids).size,1);
+ assert.equal(rows[2].headers['x-proplet-creation-source'],'first_steps_v1');assert(rows[2].authoritative);
+ assert(rows.every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'));
+ const times=rows.map(e=>Date.parse(e.headers['x-proplet-event-time'])||e.at);
+ // Fixture clock is fixed; arrival ordering verifies branch before signup,
+ // while capture timestamps are exercised by HTTP/database tests.
+ assert(ev.indexOf(rows[0])<ev.indexOf(rows[1])&&ev.indexOf(rows[1])<ev.indexOf(rows[2])&&ev.indexOf(rows[2])<ev.indexOf(rows[3]));
+ assert((await recording()).requests.some(r=>r.path==='/api/anonymous/claim'));
 }
 async function ready(page){await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter'&&currentGame.puzzle.meta.starterVersion===3&&document.querySelectorAll('#board .cell').length===9,null,{timeout:15000});await page.locator('#starterCoach').waitFor({state:'visible'});}
 async function solve(page,touch=false){const paths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));for(let i=0;i<paths.length;i++){await draw(page,paths[i],touch);await page.waitForFunction(n=>currentGame.found.length===n,i+1);}await page.locator('#winModal').waitFor({state:'visible'});}
@@ -97,32 +110,43 @@ async function firstWin(page,touch=false,style='drag'){await page.goto(url);awai
   await scenario('manual-account-and-sync',async page=>{
    await firstWin(page);await page.locator('#firstStepsManual').click();await eventOnce('first_steps_v1_manual');await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
-   assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
+   assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await assertAccountFlow('manual');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
    await page.getByRole('button',{name:'Hrát další Proplet',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished);await eventOnce('first_steps_v1_continue');assert.equal((await events()).find(e=>e.event==='first_steps_v1_continue').headers['x-proplet-onboarding'],'board-v3-short');
   });
   await scenario('google-direct-round-trip',async page=>{
    await firstWin(page);await page.locator('#firstStepsGoogle').click();await eventOnce('first_steps_v1_google');
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);
-   assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await eventOnce('first_steps_v1_saved');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
+   assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await assertAccountFlow('google');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
    assert.equal(await page.locator('#installNudgeModal').isVisible(),false);
   });
   await scenario('google-cancel-return',async page=>{
    await firstWin(page);await control({auth:'cancel'});await page.locator('#firstStepsGoogle').click();await page.locator('#firstStepsGoogle').waitFor({state:'visible'});
    await page.getByText('Přihlášení se nedokončilo. Zkus to znovu nebo hraj dál.',{exact:true}).waitFor({state:'visible'});
-   assert.equal(await page.evaluate(()=>Object.keys(getState().completed).length),2);assert.equal(await page.evaluate(()=>!!getProfile()?.token),false);
+   assert.equal(await page.evaluate(()=>Object.keys(getState().completed).length),2);assert.equal(await page.evaluate(()=>!!getProfile()?.token),false);await eventOnce('first_steps_v1_auth_cancelled');assert(!(await events()).some(e=>['account_created','first_steps_v1_saved'].includes(e.event)));
   });
   await scenario('save-failure-is-not-success',async page=>{
    await firstWin(page);await control({result:'fail'});await page.locator('#firstStepsManual').click();await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Účet je připravený. Výsledek ještě čeká na uložení.',{exact:true}).waitFor({state:'visible',timeout:20000});
-   assert(await page.evaluate(()=>getQueue().length>0));assert.equal((await events()).some(e=>e.event==='first_steps_v1_saved'),false);
+   await eventOnce('first_steps_v1_save_failed');assert(await page.evaluate(()=>getQueue().length>0));assert.equal((await events()).some(e=>e.event==='first_steps_v1_saved'),false);
    await control({result:'ok'});await page.clock.setFixedTime(new Date('2026-09-15T10:01:01Z'));await page.locator('#firstStepsRetry').click();await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
   });
   await scenario('manual-cancel-and-embedded-alternative',async page=>{
    await firstWin(page);await page.locator('#firstStepsBrowserNote').waitFor({state:'visible'});
-   await page.locator('#firstStepsManual').click();await page.locator('#closeProfileModal').click();await page.locator('#firstStepsGoogle').waitFor({state:'visible'});
+   await page.locator('#firstStepsManual').click();await page.locator('#closeProfileModal').click();await page.locator('#firstStepsGoogle').waitFor({state:'visible'});await eventOnce('first_steps_v1_auth_cancelled');assert(!(await events()).some(e=>['account_created','first_steps_v1_saved'].includes(e.event)));
    assert.equal(await page.evaluate(()=>Object.keys(getState().completed).length),2);
   },{mobile:true,userAgent:'Mozilla/5.0 (Linux; Android 15; wv) AppleWebKit/537.36 Chrome/133.0 Mobile Safari/537.36 [FBAN/FB4A;FBAV/500]'});
+  for(const method of ['manual','google'])await scenario(method+'-auth-failed',async page=>{
+   await firstWin(page);await control({auth:'fail'});
+   await page.locator(method==='manual'?'#firstStepsManual':'#firstStepsGoogle').click();
+   if(method==='manual'){await page.locator('#playerNameInput').fill('Synthetic failure');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();}
+   await eventOnce('first_steps_v1_auth_failed');assert(!(await events()).some(e=>['account_created','first_steps_v1_saved'].includes(e.event)));
+   const e=(await events()).find(e=>e.event==='first_steps_v1_auth_failed');assert.equal(e.headers['x-proplet-first-steps-reason'],'request');
+  });
+  await scenario('test-run-remains-test',async page=>{
+   await page.goto(url+'/?tutorial=1');await ready(page);await starter(page,false,'tap');
+   assert((await events()).filter(e=>e.event.startsWith('starter_v1_')).every(e=>e.headers['x-proplet-test']==='1'));
+  });
   await scenario('invitation-priority',async page=>{
    await page.goto(url+'/?play=g4-e-002&kind=free&t=45000&h=0&m=8');await ready(page);await solve(page);await page.locator('#winPrimaryBtn').click();await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-002');
   });
@@ -132,4 +156,5 @@ async function firstWin(page,touch=false,style='drag'){await page.goto(url);awai
   assert(report.checks.every(c=>c.ok),'All first-step browser scenarios must pass; see report');report.finished=new Date().toISOString();fs.writeFileSync(output,JSON.stringify(report,null,2));console.log(JSON.stringify({sha:report.sha,passed:report.checks.map(c=>c.name)}));
  }finally{await browser.close();}
 })().catch(error=>{fs.writeFileSync(output,JSON.stringify(report,null,2));console.error(error);process.exitCode=1});
+
 
