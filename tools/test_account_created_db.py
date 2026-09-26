@@ -144,7 +144,7 @@ def main():
         assert counts()['players']==before['players']+3 and counts()['events']==before['events']+3
         concurrent_id=str(uuid.uuid4())
         def retry_insert(_):
-            query("insert into players(id,name,family_code,token_hash) values (%s,'Concurrent fixture',%s,'synthetic') on conflict(id) do nothing",
+            query("insert into players(id,name,family_code,token_hash) values (%s,'Concurrent fixture',%s,'synthetic') on conflict do nothing",
                   (concurrent_id,'SOLO_'+tag))
         with ThreadPoolExecutor(max_workers=10) as pool:list(pool.map(retry_insert,range(10)))
         assert counts()['players']==before['players']+4 and counts()['events']==before['events']+4
