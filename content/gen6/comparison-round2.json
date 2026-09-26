@@ -1,0 +1,71 @@
+{
+  "sourceSha": "6e076bccf2a89d99e003667aa2eed0f6f4e24d51",
+  "dictionaryHash": "d003ac2addd6d072298e4d556bd69eaba4862b9b1df903da374d2ac4700af7d6",
+  "old": {
+    "boards": 12,
+    "targetOccurrences": 168,
+    "uniqueWords": 168,
+    "lengthDistribution": {
+      "5": 12,
+      "6": 36,
+      "7": 48,
+      "8": 60,
+      "9": 12
+    },
+    "tierDistribution": {
+      "B": 72,
+      "A": 24,
+      "C": 68,
+      "outside-v2-catalog": 4
+    },
+    "outsideV2Catalog": [
+      "bonviván",
+      "erotoman",
+      "furiant",
+      "šprýmař"
+    ],
+    "newLexiconWords": 0,
+    "geometryMedian": {
+      "meanTurns": 4.642857142857143,
+      "meanStraightShare": 0.2482568027210884,
+      "curvyShare": 1.0
+    },
+    "pressureMedian": {
+      "initial": 42.973,
+      "after3Median": 36.704499999999996,
+      "halfMedian": 27.661,
+      "selectionScore": 34.301550000000006
+    }
+  },
+  "new": {
+    "boards": 12,
+    "targetOccurrences": 168,
+    "uniqueWords": 168,
+    "lengthDistribution": {
+      "5": 10,
+      "6": 39,
+      "7": 50,
+      "8": 55,
+      "9": 14
+    },
+    "tierDistribution": {
+      "B": 81,
+      "A": 50,
+      "C": 37
+    },
+    "outsideV2Catalog": [],
+    "newLexiconWords": 81,
+    "geometryMedian": {
+      "meanTurns": 4.642857142857143,
+      "meanStraightShare": 0.24987244897959182,
+      "curvyShare": 1.0
+    },
+    "pressureMedian": {
+      "initial": 47.0355,
+      "after3Median": 41.25,
+      "halfMedian": 32.089,
+      "selectionScore": 39.54575
+    }
+  },
+  "interpretation": "Same dictionary and same 10x10 / 14-word / 100-cell contract. Geometry/ambiguity are selection proxies, not human measured difficulty; round3 has no control arm. Old round2 out-of-catalog tiers are not invented."
+}

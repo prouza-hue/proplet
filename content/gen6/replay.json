@@ -1,0 +1,14 @@
+{
+  "boardId": "mk3-01",
+  "seed": 8190918187265313617,
+  "dictionaryHash": "d003ac2addd6d072298e4d556bd69eaba4862b9b1df903da374d2ac4700af7d6",
+  "expectedContentHash": "c29c6a5584092dbf6f5fce8af1b9d227bd0aa20abe48732c7fbaea0b0f99add5",
+  "replayedContentHash": "c29c6a5584092dbf6f5fce8af1b9d227bd0aa20abe48732c7fbaea0b0f99add5",
+  "matched": true,
+  "sameWords": true,
+  "poolSize": 24,
+  "seconds": 1.821,
+  "scope": "One representative complete fixed-pool replay, not a claim to be invariant to solver timeouts on slower hardware.",
+  "acceptedProofBudgetCompleted": true,
+  "replayCompletedFixedPool": true
+}
