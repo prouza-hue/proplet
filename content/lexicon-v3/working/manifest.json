@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "version": "lexicon-v3-working-20260926-full",
+  "provenance": {
+    "as_of": "2026-09-26",
+    "source_main_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "binding_decision": "https://github.com/prouza-hue/proplet/pull/148#issuecomment-5849652613",
+    "input_sha256": {
+      "content/gen5/profiles.json": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5",
+      "content/gen6/recognition-words.txt": "f46893e253df5cf155980e172160aa5f906eebb059f89ddcf0faa1b26d33661b",
+      "content/lexicon-v3/candidate-seeds.json": "0575ded2372981d0b7c34235259984e12b20b0be990d06187ff583a7d4170f38",
+      "content/lexicon-v3/editorial-batch-001.json": "d1113708c39c416ad5a694874f7746e2e3850d0ba0b2e36b6274ba224fffcd74",
+      "content/lexicon-v3/working/editorial-reviews.json": "997a1d64632ac278b2b37e17ac3c660726a477cc0cc80e2107cf77c90c688a0e",
+      "content/lexicon-v3/working/source-manifest.json": "464dda20cab1b672a51ba338637bc1238f2d63d8ed4fe69bb2505a0b5ce02cc9",
+      "content/lexicon-v3/working/topic-map.json": "6c5e05e036317512f42f20d2322960a04e14d516a91b90b8e7887318494b2704",
+      "content/lexicon-v3/working/variant-groups.json": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a",
+      "data/legacy_daily_gen1.json": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+      "data/legacy_daily_gen2.json": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+      "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+      "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+      "data/playtests/mozkokalypsa-v1.json": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+      "data/playtests/mozkokalypsa-v2.json": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "data/puzzles.json": "72471265bfb9c1047710172cb1377a31eb6aa9e1c08c4969ee0b556551e014c0",
+      "data/rolling_content_v1.json": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "data/tajenka_weekend_v1.json": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "data/tajenka_weekend_v2.json": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+      "data/target_generation_exclusions_v334.json": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+      "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "public/puzzles.json": "57a5ea6e3e69e01f2093e0225f763a75e47734a6815f097fcdc7da47d63e8173",
+      "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "tools/build_lexicon_v2.py": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+      "tools/build_lexicon_v3_working.py": "bceb009a271935077f64df3a14c956c9a749e8344e0c6f89fae64469c2894607",
+      "tools/gen5/catalog.py": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74",
+      "tools/gen5/validation.py": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd",
+      "tools/gen6/catalog.py": "b9819dc9f91381ae585b8555f47c34f2628d17393e4289245078fb2e8a4f10e2",
+      "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15"
+    }
+  },
+  "outputs_sha256": {
+    "lexicon.json": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "inventory.json": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+    "capacity.json": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+    "recognition-words.txt": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+    "source-limitations.json": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+    "README.md": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32"
+  },
+  "runtime_approved": false,
+  "new_boards_generated": 0
+}

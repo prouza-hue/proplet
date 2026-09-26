@@ -1,5 +1,7 @@
 # Gen6 – izolovaná kandidátní výroba
 
+**Výroba pozastavena rozhodnutím [PR #148](https://github.com/prouza-hue/proplet/pull/148#issuecomment-5849652613).** Níže uvedený příkaz dokumentuje historický prototyp z první dávky a nyní se nespouští. Dokončený společný základ je v [content/lexicon-v3/working](../../content/lexicon-v3/working/README.md). Stávajících 12 desek není finální sada Mozkokalypsy III. Nejprve se nad plným základem stanoví náročný profil; původní důkaz se nepřenáší na rozšířené uznávání a délkový profil se automaticky nezměkčuje.
+
 Stav 26. 9. 2026: tato nadstavba používá existující Gen5 katalog, exaktní
 přidělování tierů, strukturální validátor a solver. Geometrie je původní
 Hamiltonovská výroba `tools/mozkokalypsa_lab.py`. Produkční soubory ani DB

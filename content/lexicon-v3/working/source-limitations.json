@@ -1,0 +1,2342 @@
+{
+  "scope": "Individual source limitations, not lexical rejections or unreviewed inventory.",
+  "records": [
+    {
+      "candidate_id": "L3-W1-0029",
+      "word": "NÁKYP",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník / Kaikki–Wiktextract — kontextový doklad",
+          "url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "entry_url": "https://cs.wiktionary.org/wiki/Auflauf",
+          "headword": "Auflauf",
+          "observed_form": "nákyp",
+          "observation": "V místním českém Wikislovníku je u německého hesla Auflauf doložen přesný český gastronomický ekvivalent nákyp. Další český výskyt je ve vysvětlení hesla macelokš. Netvrdíme existenci samostatného hesla nákyp v dumpu.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Místní AI kontrola konkrétního synonymního nebo překladového odkazu ve veřejném dumpu; samostatná redakční kontrola českého základního tvaru.",
+          "response_sha256": "f601ac37db35cf6b81439a2ce645276e1c9af0fbcae8982d553f133c13429821",
+          "dataset_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "license": "CC BY-SA 4.0 / GFDL; pouze konzultace, vlastní česká glosa"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Platné základní heslo v konkrétním uvedeném významu; pravopis zachován. Tier vyjadřuje redakční odhad známosti, nikoli délku slova ani obtížnost herní desky."
+    },
+    {
+      "candidate_id": "L3-W1-0079",
+      "word": "ZÁPADKA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/catch",
+          "headword": "catch",
+          "candidate_mention": "západka",
+          "observation": "Český výklad mechanického významu anglického substantiva výslovně uvádí západka.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "4ad12462a50ec5ebe1d22fd9b37a67a8982183ff64cdeb25a05b183baadd0bcb",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/zapadat",
+          "headword": "zapadat",
+          "candidate_mention": "západka",
+          "observation": "Český slovesný záznam obsahuje západku v odvozené slovní rodině. Přijata jako samostatné pojmenování mechanismu, nikoli pád slovesa.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "803da947744eaab1ca6f1fd59a3654d1e22618601ed8c588977859d2fcde065d",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W1-0100",
+      "word": "PŘEHOZ",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/mantila",
+          "headword": "mantila",
+          "candidate_mention": "přehoz",
+          "observation": "Český výklad a příklad používají přehoz jako označení přehozené textilie. Samostatné nábytkové užití tu doloženo není; vlastní glosa je proto ponechána obecná pro krycí textilii.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "67adc96be48c308881da9f83ef1211036254cffae2b76e9bb53fdfc1a500ca1f",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W1-0103",
+      "word": "PODNOŽKA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary, Czech entries; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/podno%C5%BEn%C3%ADk",
+          "headword": "podnožník",
+          "candidate_mention": "podnožka",
+          "observation": "Druhý význam českého substantiva v anglickém Wiktionary označuje pomůcku pod nohy a výslovně uvádí synonymum podnožka. První astronomický význam záznamu se pro kandidáta nepoužívá.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": "42ce257b2d0cd49769da2faf783ef5167f115995e67ededfbf28a2a631697159",
+          "source_archive_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W1-0105",
+      "word": "OPĚRKA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary, Czech entries; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/op%C4%9Bra",
+          "headword": "opěra",
+          "candidate_mention": "opěrka",
+          "observation": "Česká hlavička výslovně uvádí opěrka jako zdrobnělinu opěra, přičemž výklad odkazuje k opěradlu. Doložené pojmenování nábytkové části, nikoli náhodný odvozený řetězec.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": "5e148e939f20d01254e380c49aa2cfe09b6b13ff79a662b427997fb821d60985",
+          "source_archive_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/Lehne",
+          "headword": "Lehne",
+          "candidate_mention": "opěrka",
+          "observation": "Český výklad německého substantiva samostatně uvádí opěrka v témže nábytkovém významu.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "d2ac2fa68e8c3d5da94989f8950a695bc18d3e327a03858c008a5c13a8749ed4",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W1-0111",
+      "word": "PŘEZKA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikislovník (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/buckle",
+          "headword": "buckle",
+          "observation": "Anglické podstatné jméno buckle má české překladové ekvivalenty PŘEZKA a SPONA. Doklad pravopisu a významu překladového hesla; český rod je redakční gramatické posouzení.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": [
+            "8d45092190e87595ef7a761bc211071c1129dd10c2632204d7b4b46e13ba2c59"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        },
+        {
+          "publisher": "Wikislovník (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/p%C5%99ezk%C3%A1%C4%8D",
+          "headword": "přezkáč",
+          "observation": "České heslo přezkáč výslovně uvádí PŘEZKA jako slovotvorný základ; další doklad lemmatu, nikoli jeho úplné vlastní heslo.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": [
+            "9398068d72456708a4cf77a3eacf14cefdfc91b4faf2b1011f0c029df153e727"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W1-0117",
+      "word": "JEHELNÍK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/jehla",
+          "headword": "jehla",
+          "observation": "V hesle jehla je JEHELNÍK explicitně uveden mezi příbuznými výrazy se značkou noun. Dokládá lemma a slovní druh, nikoli samostatnou definici.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "833bed1049400f911bceceb60917e66a3375e4102b65f518486b97fd6ae0abb7"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        },
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/jeheln%C3%AD%C4%8Dek",
+          "headword": "jehelníček",
+          "observation": "Heslo jehelníček uvádí etymologický základ JEHELNÍK a význam pomůcky na jehly. Význam základového slova posouzen redakčně z této souvislosti; nesmí se vydávat za přečtené heslo jehelník.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "beee906bfe28084394df406f3aa5029fdc5a3f6452881f7e24d49302b58bbae8"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W1-0127",
+      "word": "OBRUBA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikislovník (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/lem",
+          "headword": "lem",
+          "observation": "České podstatné jméno lem uvádí OBRUBA v synonymické položce pro okraj textilu. Doklad lemmatu a významového okruhu, nikoli vlastní skloňovací tabulka obruba.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": [
+            "c277a2f7eb2f82aec6cbbb4698172139db7b8b2818b577b40221442fdd56247f"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        },
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/obrubn%C3%ADk",
+          "headword": "obrubník",
+          "observation": "Etymologie hesla obrubník výslovně pojmenovává český základ OBRUBA s významem okraje. Potvrzení základního pojmenování.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "7bd37499aaad361a1fb7e6f21c2fa9d54f150ba4fa245a0a141f4ab8efdcee7f"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W1-0129",
+      "word": "CHRASTÍTKO",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikislovník (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/hochet",
+          "headword": "hochet",
+          "observation": "Francouzské podstatné jméno hochet má český překlad CHRASTÍTKO. Doklad slovníkové podoby a významu hračky; český slovní druh a rod posouzeny redakčně.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": [
+            "31a1f0f8db0f461e7db6c32bbf08eddf19c87b785416f23a2091fb8945352852"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        },
+        {
+          "publisher": "Wikislovník (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B3%D1%80%D0%B5%D0%BC%D1%83%D1%88%D0%BA%D0%B0",
+          "headword": "погремушка",
+          "observation": "Ruské podstatné jméno má český překlad CHRASTÍTKO a český větný příklad se shodou ve středním rodě. Překladový doklad a kontext, nikoli vlastní české heslo.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": [
+            "9823d1e0f120a242bc736da743b4072c07d24a41f5e7c2506e2a53e43a040b4d"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W1-0192",
+      "word": "LEZEČKA",
+      "evidence_depth": "related_plural_form_plus_explicit_editorial_meaning",
+      "evidence": [
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/l%C3%A9zt",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "lézt; související výraz lezečky",
+          "observation": "V místně přečteném českém hesle lézt je výslovně uveden související plurál lezečky. Tento doklad potvrzuje podobu příbuzného označení; neobsahuje definici boty ani výslovně singulár lezečka. Význam boty a běžný singulár jsou zde vlastní redakční jazykové posouzení, nikoli vydávaný výklad zdroje.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline related-word consultation + AI linguistic inspection; not a live target-headword visit",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "7eb1102917534ac3e620a016d232a4c0954206ffed3653eb0936d8ea5e9f0d84",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "related plural form only; intended meaning and singular explicitly AI editorial judgment"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Přijato jako zavedené sportovní pojmenování lezecké boty. Doložen příbuzný plurál lezečky; význam boty a standardní singulární podoba jsou vlastní explicitní jazykové posouzení. Nepřítomnost samostatného hesla není důvod k zamítnutí. Neslučovat s označením osoby lezec."
+    },
+    {
+      "candidate_id": "L3-W1-0211",
+      "word": "ZÁKRUT",
+      "evidence_depth": "primary_morphology_language_correction",
+      "evidence": [
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "zákrut",
+          "observation": "V úplném místním veřejném tvarotvorném seznamu MU je na řádku 804559 lemma zákrut, shodný tvar a značka k1gInSc1; další řádky 804558–804571 dokládají paradigma včetně genitivu zákrutu. To je pozitivní doklad zvoleného českého základního tvaru a mužského neživotného rodu.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline primary morphology consultation + AI inspection",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 804559,
+          "morphology_tag": "k1gInSc1",
+          "scope": "positive Czech lemma/basic-form evidence; no inference of absolute absence of alternatives"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/z%C3%A1kruta",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "zákruta (slovenské heslo)",
+          "observation": "V místním úplném snapshotu je přečtené heslo zákruta výslovně jazykově zařazeno jako sk, podstatné jméno ženského rodu ve významu zatáčky. Jde o pozitivní slovenský doklad původní podoby, nikoli důkaz absolutní neexistence archaické české varianty.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline language-tag and entry inspection; no live target-headword visit",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "72ba25216aa3e0c0ca049aa09d677394ed9fb35ed832f25a4a8bbffc25957d4d",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "language disambiguation of original form"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline language-tag and entry inspection; no live target-headword visit",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "headword": "oklika",
+          "url": "https://cs.wiktionary.org/wiki/oklika",
+          "source_record_sha256": "f2a429b7ff3d0aed6187c83eeacb4d98b64383d94da6c15c6d2e1b81758e8f5f",
+          "scope": "contextual corroboration and explicit weaker contrary evidence",
+          "observation": "Místně přečtené české heslo oklika uvádí zákrut jako synonymum v prostorovém významu; zákruta je v témže záznamu označena jako slovenský překlad. Kontext tak podporuje zachování původního významu při opravě."
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline language-tag and entry inspection; no live target-headword visit",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "headword": "kroutit",
+          "url": "https://cs.wiktionary.org/wiki/kroutit",
+          "source_record_sha256": "5e33afd4e4f296693e578477256c79db34130e3513c79678f4def6729ad54a14",
+          "scope": "contextual corroboration and explicit weaker contrary evidence",
+          "observation": "Místně přečtené české heslo kroutit obsahuje zákruta v seznamu souvisejících slov, bez vlastního výkladu a paradigmatu. Tento slabší český odkaz je zachován jako protievidence vůči absolutnímu tvrzení, že původní podoba v češtině neexistuje; rozhodnutí upřednostňuje pozitivně doložený český základ zákrut."
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Doložený český základ je zákrut. Posuzovaný ženský tvar je v dostupném místním výkladovém záznamu doložen jako slovenské heslo. Netvrdíme absolutní neexistenci historické české varianty; pro kandidátní český lexikon zvolena jednoznačně doložená podoba. Význam zůstává stejný."
+    },
+    {
+      "candidate_id": "L3-W1-0229",
+      "word": "BÓJKA",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "bójka",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis bójka na řádku 16704. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 16704,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/b%C3%B3je",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "bóje (doklad kandidáta bójka v kontextu)",
+          "observation": "České heslo bóje uvádí bójka mezi synonymy pro plovoucí značení. Vybráno české plavební užití, nikoli stejně psaný polský výraz pro rvačku; CC0 seznam značkou po:noun potvrzuje podstatné jméno.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "5a9c9cdff750e9a7935ca42c6578560ab44ba7a270a87bdce668b77c667e8b3a",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "bójka",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 518584 uvedeno lemma bójka, shodný základní tvar a morfologická značka k1gFnSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 518584,
+          "morphology_tag": "k1gFnSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0055",
+      "word": "ŠLEHAČ",
+      "evidence_depth": "spelling-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Český CC0 pravopisný slovník (MU/Wikidata; czech-cc0-dictionaries, veřejná distribuce)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "šlehač",
+          "observation": "Přesná lokální shoda šlehač v obecném CC0 pravopisném seznamu. Doklad potvrzuje český zápis a přítomnost formy; neobsahuje definici a sám nedokazuje známost. Základní substantivní tvar, rod a kuchyňský význam byly posouzeny samostatnou AI redakcí.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "Lokální kontrola formy v obecně staženém veřejném slovníku; žádné kandidátní slovo nebylo odesláno zdroji. Samostatná vlastní významová glosa.",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "source_line": 395024,
+          "license": "CC0-1.0"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Platné základní heslo v konkrétním uvedeném významu; pravopis zachován. Tier vyjadřuje redakční odhad známosti, nikoli délku slova ani obtížnost herní desky."
+    },
+    {
+      "candidate_id": "L3-W2-0065",
+      "word": "MAZANEC",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník / Kaikki–Wiktextract — kontextový doklad",
+          "url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "entry_url": "https://cs.wiktionary.org/wiki/velikono%C4%8Dka",
+          "headword": "velikonočka",
+          "observed_form": "mazanec",
+          "observation": "V místním českém hesle velikonočka je mazanec uveden jako přesné synonymum v kontextu velikonočního pečiva. Dokládá pojmenování a význam; netvrdíme, že dump obsahuje samostatné heslo mazanec.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Místní AI kontrola konkrétního synonymního nebo překladového odkazu ve veřejném dumpu; samostatná redakční kontrola českého základního tvaru.",
+          "response_sha256": "74234ea557e4a524f549b6ce8acc3bbff5a9d21c8607da87a2a7372f11d8cb03",
+          "dataset_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "license": "CC BY-SA 4.0 / GFDL; pouze konzultace, vlastní česká glosa"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Platné základní heslo v konkrétním uvedeném významu; pravopis zachován. Tier vyjadřuje redakční odhad známosti, nikoli délku slova ani obtížnost herní desky."
+    },
+    {
+      "candidate_id": "L3-W2-0113",
+      "word": "MULČ",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Český CC0 pravopisný slovník — strepon/czech-cc0-dictionaries, kopie titoBouzout/Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "mulčovat; mulčování; mulčovací (rodina mulč)",
+          "observation": "Přesný tvar mulč v seznamu nalezen nebyl. Skutečně přítomné příbuzné tvary: mulčovací/P po:adjective, mulčování/M po:noun, mulčovat/N po:verb. Jde pouze o doklad příslušné slovní rodiny, nikoli přímý doklad hesla, rodu nebo definice mulč.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "Místní přesné porovnání již obecně staženého veřejného souboru Czech.dic; význam nezjišťován z pravopisného seznamu.",
+          "snapshot_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Dosavadní odpověď Lingea zobrazila hesla mula/mul a nebyla uznána za doklad slova mulč. Přesné heslo chybí také v lokálních Wiktionary a CC0 seznamu; CC0 obsahuje příbuzné mulčovat, mulčování a mulčovací. Vlastní jazykové posouzení přijímá běžný zahradnický termín pro krycí materiál na půdě, mužský neživotný rod; podpůrný doklad rodiny není vydáván za nalezené heslo ani definici.",
+      "decision_reason": "Dosavadní odpověď Lingea zobrazila hesla mula/mul a nebyla uznána za doklad slova mulč. Přesné heslo chybí také v lokálních Wiktionary a CC0 seznamu; CC0 obsahuje příbuzné mulčovat, mulčování a mulčovací. Vlastní jazykové posouzení přijímá běžný zahradnický termín pro krycí materiál na půdě, mužský neživotný rod; podpůrný doklad rodiny není vydáván za nalezené heslo ani definici. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0131",
+      "word": "PLETÍ",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes — původní lokální CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L1179279",
+          "headword": "pletí",
+          "observation": "Ve zmrazeném původním snapshotu je přesná shoda základního hesla a slovního druhu. Záznam sám nedokládá významovou definici ani současnou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "Lokální porovnání již dostupného CC0 snapshotu; bez síťové návštěvy hesla.",
+          "license": "CC0-1.0",
+          "raw_lexeme": {
+            "lexeme_id": "L1179279",
+            "lemma": "pletí",
+            "category_id": "Q1084",
+            "part_of_speech": "noun"
+          }
+        },
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/plen%C3%AD#čeština",
+          "headword": "plení (doklad pletí)",
+          "observation": "Pletí je přímo užito k výkladu podstatného jména plení ve významu odstraňování plevele; nejde o stejně psaný pád slova pleť.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "3d73a717951da26f9ed36e4f3362c6df25f1cff780031678cf74c3f8b91c155e",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Slovesné podstatné jméno od plít, samostatně užitelné pojmenování činnosti; nejde o přídavné jméno ani tvar slovesa.",
+      "decision_reason": "Slovesné podstatné jméno od plít, samostatně užitelné pojmenování činnosti; nejde o přídavné jméno ani tvar slovesa. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0132",
+      "word": "ZÁLIVKA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/zal%C3%A9vat#čeština",
+          "headword": "zalévat (doklad zálivka)",
+          "observation": "Heslo zalévat obsahuje zahradnický význam dodávání vody rostlinám a uvádí zálivka mezi příbuznými slovy. Je to nepřímý slovotvorný doklad; přesný zahradnický význam zálivka samostatně posoudil AI redaktor.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "d6dfd3ed0225a46fa6d0985b6871723cb268aa95ecabdd934b9f3991279d9335",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        },
+        {
+          "publisher": "Český CC0 pravopisný slovník — strepon/czech-cc0-dictionaries, kopie titoBouzout/Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "zálivka",
+          "observation": "Přesný záznam v místním CC0 seznamu: zálivka/Z po:noun. Pravopisná a slovnědruhová evidence; seznam neposkytuje významovou definici ani stupeň obeznámenosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "Místní přesné porovnání již obecně staženého veřejného souboru Czech.dic; význam nezjišťován z pravopisného seznamu.",
+          "snapshot_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Zvolen zahradnický děj zalévání. Anglický Wiktionary uvádí dressing/dump; tyto jiné významy samy nepotvrzují zvolený zahradnický význam.",
+      "decision_reason": "Zvolen zahradnický děj zalévání. Anglický Wiktionary uvádí dressing/dump; tyto jiné významy samy nepotvrzují zvolený zahradnický význam. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0226",
+      "word": "PROUTÍ",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "proutí",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis proutí na řádku 295277. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 295277,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/opar",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "opar (doklad kandidáta proutí v kontextu)",
+          "observation": "V příkladu u hesla opar je doloženo holé proutí jako větve. Další místně přečtená hesla proutěný/kukaň dokládají použití proutí při pletení. Jde o kontextový doklad, nikoli samostatně navštívené heslo proutí.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "9e5c20310c0528678b3f14689ce10618f3ae3a2d75595cb1d05ff4b760124250",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "proutí",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 591464 uvedeno lemma proutí, shodný základní tvar a morfologická značka k1gNnSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 591464,
+          "morphology_tag": "k1gNnSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0246",
+      "word": "OTAKÁREK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/vidlochvost_feniklov%C3%BD",
+          "headword": "vidlochvost feniklový",
+          "candidate_mention": "otakárek",
+          "observation": "Český překlad slovenského motýlího názvu explicitně používá obecné jméno otakárek ve spojení otakárek fenyklový. Není využito stejnojmenné osobní jméno Otakárek.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "0f8c385209c933f810c0418347c0c7d144bfc7c529988b33284cdff249efe9a9",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0247",
+      "word": "STŘEVLÍK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/zlatit%C3%BD",
+          "headword": "zlatitý",
+          "candidate_mention": "střevlík",
+          "observation": "Samostatně přečtena česká lexikální vazba střevlík zlatitý; dokládá náležité zoologické jméno v základním tvaru. Samostatná rodová a pádová tabulka střevlíka zde není.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "158e2145ae0f6531f1e12ee845adbc12327ab3ec36073a3b465aa302a9bb3a5b",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0249",
+      "word": "PLOŠTICE",
+      "evidence_depth": "lemma-and-pos-only",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes; uložený CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L641411",
+          "headword": "ploštice",
+          "observation": "Místní snapshot obsahuje přesné lemma ploštice a slovní druh noun; neobsahuje zde použitý výklad ani rodovou tabulku. Nejde o novou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "offline AI inspection of existing snapshot",
+          "response_sha256": null,
+          "scope": "lemma and POS only",
+          "license": "CC0-1.0"
+        }
+      ],
+      "evidence_limit": "Ve stažených Wiktionary podkladech nenalezen vlastní záznam ani kontext. Ověřeno je přesné podstatné jméno z Wikidata; zoologický význam, rod a tvary jsou vlastní redakční posouzení, nikoli předstíraný slovníkový výklad.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0289",
+      "word": "PODBĚRÁK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes; uložený CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L1371912",
+          "headword": "podběrák",
+          "observation": "Místní snapshot obsahuje přesné lemma podběrák a slovní druh noun; neobsahuje zde použitý výklad ani rodovou tabulku. Nejde o novou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "offline AI inspection of existing snapshot",
+          "response_sha256": null,
+          "scope": "lemma and POS only",
+          "license": "CC0-1.0"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/kuil",
+          "headword": "kuil",
+          "candidate_mention": "podběrák",
+          "observation": "Český výklad druhého významu nizozemského substantiva uvádí podběrák jako rybářskou síť. Základní lemma a POS navíc potvrzuje místní Wikidata záznam.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "394dd142e9a74808bb568b47b0097f8f3ccdd7d67861ef55144764ddd34a6b3c",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0292",
+      "word": "NAPÁJEČKA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/drinker",
+          "headword": "drinker",
+          "candidate_mention": "napáječka",
+          "observation": "Druhý český výklad anglického substantiva označuje napáječku pro zvířata; potvrzuje zamýšlený význam, nikoli kompletní české skloňování.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "0010c7d78bf5a12ea1a07846319f3e652bac34c7bb23e6285b778e4f2b7f9a61",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0299",
+      "word": "OHLÁVKA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/kant%C3%A1r",
+          "headword": "kantár",
+          "candidate_mention": "ohlávka",
+          "observation": "Výklad českého hesla kantár používá ohlávku jako základní pojmenování postroje na hlavu zvířete; konkrétně ho rozšiřuje přítomností udidel.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "6a8824a45952c6f67a73fa9629dca856bd8a07f5a78ffefedbf7d52ae4780b62",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0300",
+      "word": "HŘEBELEC",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes; uložený CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L10410",
+          "headword": "hřebelec",
+          "observation": "Místní snapshot obsahuje přesné lemma hřebelec a slovní druh noun; neobsahuje zde použitý výklad ani rodovou tabulku. Nejde o novou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "offline AI inspection of existing snapshot",
+          "response_sha256": null,
+          "scope": "lemma and POS only",
+          "license": "CC0-1.0"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/h%C5%99eben",
+          "headword": "hřeben",
+          "candidate_mention": "hřebelec",
+          "observation": "V přečteném českém hesle hřeben je hřebelec uveden v seznamu synonym. Výklad zahrnuje úpravu srsti; samostatnou pádovou tabulku tato zmínka nenahrazuje. Lemma a noun POS navíc potvrzuje CC0 snapshot.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "eb13ba508b4ff31834293dca4981b27c171cda0424bc02ec6c53b2a1f496330f",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0309",
+      "word": "ŠEROSVIT",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "šerosvit",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis šerosvit na řádku 392736. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 392736,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/%C5%A1erosvitov%C3%BD",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "šerosvitový (doklad kandidáta šerosvit v kontextu)",
+          "observation": "Samostatně nalezeno přídavné jméno šerosvitový s vazbou k podstatnému jménu šerosvit; CC0 seznam potvrzuje přesný zápis. Výtvarný význam a rod jsou vlastní redakční posouzení, nikoli převzatá definice.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "753dee29f7d9a8785e45132eec0a247aeb8beb574fbb5fbdbb93e71382d10e36",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "šerosvit",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 1167687 uvedeno lemma šerosvit, shodný základní tvar a morfologická značka k1gInSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 1167687,
+          "morphology_tag": "k1gInSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0313",
+      "word": "PRŮTRŽ",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "průtrž",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis průtrž na řádku 297790. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 297790,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/tromba",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "tromba (doklad kandidáta průtrž v kontextu)",
+          "observation": "Český výklad španělského tromba obsahuje průtrž mračen. Jde o doklad meteorologického užití českého slova; pravopisný CC0 seznam navíc potvrzuje základní zápis průtrž.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "cfbcb065b9b8d00585dd7c4e32c332efa9bf53601c887c711ffc1834f7ba7422",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "průtrž",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 514438 uvedeno lemma průtrž, shodný základní tvar a morfologická značka k1gFnSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 514438,
+          "morphology_tag": "k1gFnSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatné heslo je platné; meteorologický význam je běžný ve spojení průtrž mračen, nejde o nutnost víceslovného tokenu. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0321",
+      "word": "CHUMELENÍ",
+      "evidence_depth": "contextual_or_spelling_reference_plus_editorial_review",
+      "evidence": [
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/chumelenice",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "chumelenice (doklad kandidáta chumelení v kontextu)",
+          "observation": "Heslo chumelenice obsahuje citaci, v níž je chumelení použito jako podstatné jméno středního rodu ve významu hustého sněžení; heslo sněžení je též uvádí jako synonymum. Žádné libovolné slovesné tvary nebyly přidávány.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "f353fd6fde8823c0178261909a46f2e29989d30d93bec815174c1b4302d3a23f",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Nominativ slovesného podstatného jména; vlastní význam zachován. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0322",
+      "word": "POPRAŠEK",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "poprašek",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis poprašek na řádku 267998. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 267998,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/zat%C5%99pytit%20se",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "zatřpytit se (doklad kandidáta poprašek v kontextu)",
+          "observation": "V citaci u zatřpytit se se objevuje poprašek jíní s mužskou shodou přídavného jména. Kontext potvrzuje tenkou vrstvu; pravopisný CC0 seznam navíc potvrzuje přesný základní zápis.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "f5725c2e556c38dd98cbc5ee56f39adcfac6dcee05eb1ee8d67d98735a8195f2",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "poprašek",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 599023 uvedeno lemma poprašek, shodný základní tvar a morfologická značka k1gInSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 599023,
+          "morphology_tag": "k1gInSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0366",
+      "word": "LAZURA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "lazura",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam lazura. Dokládá zápis; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_only"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatné řemeslné jméno průsvitného nátěru; nezaměňuje se s obecnou barvou. CC0 dokládá zápis, vlastní význam a ženské skloňování posoudil AI editor. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0375",
+      "word": "BEDNĚNÍ",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes — retained CC0 handover snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L315858",
+          "headword": "bednění",
+          "observation": "Místní původní CC0 záznam dokládá lemma a slovní druh podstatné jméno; sám nedokládá vybraný význam ani jeho morfologii.",
+          "retrieved_at": "2026-09-26",
+          "verified": true,
+          "method": "local inspection of retained CC0 lexical evidence; not a new web visit",
+          "evidence_scope": "lemma_and_pos_only"
+        },
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "bednění",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam bednění/M po:noun. Dokládá zápis a příznak podstatného jména; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_and_pos"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejný snapshot Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/skru%C5%BE",
+          "headword": "skruž",
+          "observation": "Místní české heslo skruž označuje jeden stavební význam jako obloukové bednění. Kontext potvrzuje stavební oblast; konkrétní obecná glosa bednění je vlastní redakční posouzení.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local consultation of generically downloaded public snapshot + AI inspection; target page not fetched",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_line_sha256": "2967de72dc7518f2fc0abf889a541cf77d7f799856496063b20a55b4a530505f",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "evidence_scope": "published_context_support"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatné slovesné substantivum; zde se vybírá konkrétní stavební forma, nikoli děj. CC0 noun/M a český stavební kontext podporují jméno; sémantické vymezení je vlastní. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0416",
+      "word": "ZÁŠEVEK",
+      "evidence_depth": "editorial-judgment-no-independent-reference",
+      "evidence": [],
+      "evidence_limit": null,
+      "reference_limitation": "Přesné heslo ani nezávislý významový doklad nebyly v dostupných místních zdrojích nalezeny. Přijetí je výslovný vlastní jazykový posudek AI k uživatelsky schválené zásobě; ověření zdroje se nepředstírá.",
+      "source_notes": null,
+      "decision_reason": "Krejčovské podstatné jméno označuje sešitý záhyb pro vytvarování oděvu; základ záševek, genitiv záševku, mužský neživotný. Tento jazykový závěr je vlastní AI posouzení; v dostupných nezávislých podkladech nebylo nalezeno přesné heslo, a proto se neuvádí falešně ověřený slovníkový zdroj. Nepřítomnost v neúplném podkladu není důvod k zamítnutí schváleného slova. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0418",
+      "word": "VOLÁN",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "volán",
+          "observation": "Přesný záznam volán/N po:verb potvrzuje pouze příčestí, ne oděvní podstatné jméno. Odděleně obsahuje samostatné záznamy volánek a volánku. Žádný z těchto řádků není vydáván za definici volánu.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "homograph_and_related_form_only"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": "Nezávislý přesný doklad zvoleného lemmatu a jeho významu chybí; uvedené související doklady mají explicitně omezený rozsah. Vlastní jazykový posudek uzavírá přijetí.",
+      "source_notes": null,
+      "decision_reason": "Zvoleno oděvní podstatné jméno s genitivem volánu; není totožné s příčestím slovesa volat. CC0 i EN potvrzují pouze psané homografum příčestí, což nedokládá zvolený slovní druh. CC0 navíc obsahuje podoby volánek a volánku; věcný význam a základní noun lemma zde uzavírá vlastní jazykový posudek. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0420",
+      "word": "NÁŠIVKA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "nášivka",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam nášivka/Z po:noun. Dokládá zápis a příznak podstatného jména; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_and_pos"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejný snapshot Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/domovenka",
+          "headword": "domovenka",
+          "observation": "Místní české heslo domovenka používá slovo nášivka pro označení na rukávu; to dokládá skutečné české užití v oděvním významu.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local consultation of generically downloaded public snapshot + AI inspection; target page not fetched",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_line_sha256": "16b6bae9116d3c7f3fd9826db733298da09c6866a7e7e244fca8bd0311e54bed",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "evidence_scope": "published_context_support"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Podstatné jméno ženského rodu pro přišitý oděvní doplněk; zápis a noun příznak obsahuje CC0, konkrétní užití potvrzuje česká definice domovenky. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0424",
+      "word": "STÉLKA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "stélka",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam stélka/Z po:noun. Dokládá zápis a příznak podstatného jména; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_and_pos"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Vybrán obuvnický význam vnitřního podkladu chodidla, nikoli botanické tělo bez pravých orgánů. CC0 potvrzuje zápis a noun příznak; přesné obuvnické vymezení je vlastní jazykový posudek. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0436",
+      "word": "VLÁSENKA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "vlásenka",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam vlásenka/Z po:noun. Dokládá zápis a příznak podstatného jména; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_and_pos"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejný snapshot Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/pin",
+          "headword": "pin",
+          "observation": "V českém překladu anglického podstatného jména pin je výslovně užito označení vlásenka vedle dalších předmětů k připínání. Konkrétní účesový význam je vlastní redakční posouzení.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local consultation of generically downloaded public snapshot + AI inspection; target page not fetched",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_line_sha256": "89b7287e4f332602cdaab6f324c881dbd5b29f75728c8e1e18ac0bff59f4adfa",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "evidence_scope": "published_context_support"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Vybrána pomůcka pro upevnění vlasů; ne jiný, starší význam paruky. CC0 noun příznak a překlad u pin podporují formu a oblast, konkrétní glosa je vlastní. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0446",
+      "word": "EŠUS",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "ešus",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam ešus. Dokládá zápis; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_only"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Běžné hovorové jméno jídelní nádoby pro táboření či vojenské užití; CC0 potvrzuje samostatný zápis, mužské skloňování a význam posoudil AI editor. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0461",
+      "word": "PŘESÝPAČKY",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejný snapshot Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/p%C5%99es%C3%BDpac%C3%AD%20hodiny",
+          "headword": "přesýpací hodiny",
+          "observation": "Místně přečteno samostatné heslo přesýpací hodiny s významem hodin fungujících pomocí písku. Dokládá zamýšlený předmět; samo nepotvrzuje zkrácené hovorové lemma přesýpačky.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local consultation of generically downloaded public snapshot + AI inspection; target page not fetched",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_line_sha256": "ff25a71004a8dec41239b3dd9ec6f7a3e612dd72523ef182f26b6dec2bc59810",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "evidence_scope": "concept_only_not_exact_lemma"
+        },
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "přesýpací",
+          "observation": "Lokální záznam přesýpací/P po:adjective potvrzuje odvozovací základ a jeho pravopis; nedokládá přesné hovorové lemma přesýpačky.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of public CC0 spelling file",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "related_form_only"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": "Nezávislý přesný doklad zvoleného lemmatu a jeho významu chybí; uvedené související doklady mají explicitně omezený rozsah. Vlastní jazykový posudek uzavírá přijetí.",
+      "source_notes": null,
+      "decision_reason": "Samostatné hovorové pomnožné označení přesýpacích hodin, genitiv přesýpaček. Neodvozuje se umělé jednotné číslo. Přesný hovorový zápis není v dostupném veřejném výřezu, ale základ přesýpací i zamýšlený předmět mají lokální doklad; přijetí zkrácené podoby je vlastní AI jazykový posudek. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0474",
+      "word": "FÁBOREK",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "fáborek",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam fáborek. Dokládá zápis; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_only"
+        },
+        {
+          "publisher": "English Wiktionary — české heslo; veřejný snapshot Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/f%C3%A1bor",
+          "headword": "fábor",
+          "observation": "Místní české heslo fábor je vyloženo jako ozdobná stuha. Dokládá význam slovního základu; zdrobnělý fáborek je samostatně potvrzen v pravopisném souboru a vyložen vlastním AI posudkem.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local consultation of public snapshot + AI inspection; target page not fetched",
+          "snapshot_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "snapshot_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "evidence_scope": "related_lemma_meaning_only"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Průhledná zdrobnělina fáboru se samostatným běžným užitím pro ozdobný proužek. Přesný zápis potvrzuje CC0; význam základního fáboru je doložen v EN snapshotu, glosa zdrobněliny je vlastní. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0486",
+      "word": "NEBOJSA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "nebojsa",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam nebojsa. Dokládá zápis; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_only"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejný snapshot Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/dreadnought",
+          "headword": "dreadnought",
+          "observation": "Český Wikislovník používá nebojsa jako významový protějšek osobního anglického jména dreadnought. Podporuje význam odvážného člověka; česká morfologie je posouzena redakčně.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local consultation of generically downloaded public snapshot + AI inspection; target page not fetched",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_line_sha256": "d9f7d36dc7614e4b7a0406e64df1ccba07189a360536bd728ae0a5284b90feca",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "evidence_scope": "published_context_support"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatné expresivní pojmenování odvážného člověka, v základním lexikálním popisu mužské životné, vzor předseda. CC0 dokládá malé počáteční písmeno a český překlad osobního dreadnought podporuje význam; nejde o vlastní jméno Nebojsa. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0495",
+      "word": "PERMONÍK",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 spelling dictionary (Český tvarotvorný slovník + Wikidata; public distribution)",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "permoník",
+          "observation": "V celém veřejném CC0 pravopisném souboru je přesný záznam permoník. Dokládá zápis; soubor neobsahuje významový výklad ani hodnocení známosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "local inspection of generically downloaded public CC0 spelling file; no candidate transmitted",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0",
+          "evidence_scope": "spelling_only"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatné běžné folklorní jméno důlního skřítka. CC0 potvrzuje zápis, ale ne definici; mytologický význam a životné skloňování zde uzavírá vlastní jazykový posudek. Tier je redakční odhad známosti, nikoli obtížnost desky či měření hráčů."
+    },
+    {
+      "candidate_id": "L3-W2-0525",
+      "word": "NÁPĚV",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "nápěv",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis nápěv na řádku 154208. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 154208,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/melodie",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "melodie (doklad kandidáta nápěv v kontextu)",
+          "observation": "V záznamu melodie je nápěv uveden mezi synonymy; přesná psaná podoba je zároveň v místním CC0 pravopisném seznamu. Slovnědruhové a rodové hodnocení je vlastní redakční analýza.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "160167e585defb49338dd4e329ea84552a3f180da3e67bd1a7702f2b9a21719f",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "nápěv",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 623275 uvedeno lemma nápěv, shodný základní tvar a morfologická značka k1gInSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 623275,
+          "morphology_tag": "k1gInSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0528",
+      "word": "SBORMISTR",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "sbormistr",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis sbormistr na řádku 354019. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 354019,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/regenschori",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "regenschori (doklad kandidáta sbormistr v kontextu)",
+          "observation": "U hesla regenschori je sbormistr výslovně uveden jako synonymum. Doklad podpírá význam osoby vedoucí sbor; vlastní rod mužský životný a nominativ byly redakčně posouzeny.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "62e5c054c75a9ae4bbf7d7af25cee23da0aa664d8426d69317d3847c4e8329bf",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "sbormistr",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 288973 uvedeno lemma sbormistr, shodný základní tvar a morfologická značka k1gMnSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 288973,
+          "morphology_tag": "k1gMnSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0537",
+      "word": "CINKOT",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "cinkot",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis cinkot na řádku 23669. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 23669,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/cinkat",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "cinkat (doklad kandidáta cinkot v kontextu)",
+          "observation": "Pod slovesem cinkat je cinkot mezi příbuznými slovy, v místně přečtené citaci u pláče se vyskytuje skloňovaný tvar cinkotu ve zvukovém kontextu. CC0 seznam navíc potvrzuje základní zápis.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "ab08054782a4c75a1f2dc9853b43e8d2915ca95cc639edc4bd491c4bab0bd092",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "cinkot",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 934796 uvedeno lemma cinkot, shodný základní tvar a morfologická značka k1gInSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 934796,
+          "morphology_tag": "k1gInSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0540",
+      "word": "ŠUSTOT",
+      "evidence_depth": "contextual_or_spelling_reference_plus_editorial_review",
+      "evidence": [
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/padouch",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "padouch (doklad kandidáta šustot v kontextu)",
+          "observation": "V literárním příkladu Edvarda Jelínka u hesla padouch je substantivní šustot ve spojení s ukazovacím zájmenem ten a slovesem pošel. To dokládá mužský rod a zvukový význam; není to samostatné slovníkové heslo.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "2a4b66489c39482ff7eca772f80e2373dff2e465374797a4173a6a2005ac8537",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0542",
+      "word": "KLAPOT",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "klapot",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis klapot na řádku 99051. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 99051,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "klapot",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 802477 uvedeno lemma klapot, shodný základní tvar a morfologická značka k1gInSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 802477,
+          "morphology_tag": "k1gInSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0543",
+      "word": "DUPOT",
+      "evidence_depth": "primary_morphology_plus_editorial_semantics",
+      "evidence": [
+        {
+          "publisher": "Czech CC0 dictionaries — Masarykova univerzita / Wikidata, mirror titoBouzout Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "dupot",
+          "observation": "V místně staženém CC0 pravopisném slovníku nalezen přesný zápis dupot na řádku 52720. Doklad potvrzuje pravopisnou existenci; sám nedokládá význam, register ani hráčskou známost.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "offline exact spelling-list match + AI inspection",
+          "response_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)",
+          "source_line": 52720,
+          "scope": "exact spelling token; not standalone dictionary meaning"
+        },
+        {
+          "publisher": "Wikislovník contributors; Kaikki/Wiktextract veřejný snapshot",
+          "url": "https://cs.wiktionary.org/wiki/tramp",
+          "dataset_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "headword": "tramp (doklad kandidáta dupot v kontextu)",
+          "observation": "Český výklad anglického tramp uvádí dupot v kontextu zvuku kroků; literární doklady v témže místním snapshotu jej rovněž používají jako substantivum. Pravopisný seznam obsahuje přesný základní zápis.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "offline contextual record consultation + AI inspection; not a live visit or standalone target headword",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "4073e9e9fc1002489389b34c0e9807d502a39ab5413fac74e693474e94e9902b",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "contextual corroboration with explicit limits; own gloss retained"
+        },
+        {
+          "publisher": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+          "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+          "headword": "dupot",
+          "observation": "V místně přečteném primárním tvarotvorném seznamu MU je na řádku 934872 uvedeno lemma dupot, shodný základní tvar a morfologická značka k1gInSc1. Doklad lemma/POS/morfologie; význam zůstává vlastní redakční glosa s uvedenými kontextovými doklady.",
+          "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+          "verified": true,
+          "method": "offline lemma and basic-form match + AI inspection; no candidate query sent",
+          "response_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+          "license": "Public Domain",
+          "source_line": 934872,
+          "morphology_tag": "k1gInSc1",
+          "scope": "lemma and nominal basic form; not semantic definition or familiarity score"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Pravopis a základní tvar odpovídají zamýšlenému významu. Přijato redakčně jako živé pojmenování ve schválené zásobě; tier je vlastní odhad známosti, nikoli obtížnost desky ani hráčské měření. U tohoto hesla je zdrojový rozsah výslovně omezen: pravopisný/kontextový doklad doplňuje vlastní jazykové posouzení, není vydáván za plné samostatné slovníkové heslo."
+    },
+    {
+      "candidate_id": "L3-W2-0628",
+      "word": "NAVLÉKAT",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/navl%C3%A9ct",
+          "headword": "navléct",
+          "observation": "Heslo navléct má v hlavičce i tabulce explicitně nedokonavý protějšek NAVLÉKAT. Je to přímý gramatický doklad základního slovesa, ne časovaný tvar; významy zahrnují protažení niti a nasazování předmětu.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "9849ca347d437d7664ed954e9bbfe4b10166afc2b31854a8497b5ede3a33bee4"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        },
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/navl%C3%A9knout",
+          "headword": "navléknout",
+          "observation": "Druhý dokonavý protějšek má výslovně imperfective NAVLÉKAT; potvrzuje tutéž vazbu a význam.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "b88da2d9b060cba541c76ed950534e6cc4043a908943da8e1f2da3636e79e22a"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W2-0631",
+      "word": "SPLÉTAT",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikislovník (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/v%C3%ADt",
+          "headword": "vít",
+          "observation": "České slovesné heslo vít uvádí SPLÉTAT jako synonymum svého významu tvoření proplétáním. Doklad je v synonymické položce, nikoli ve vlastním hesle splétat; základní infinitiv a význam jsou rozpoznatelné.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": [
+            "8ed88321857930f870556f7adfceabd208abfbe3f81e472099b367d69fa6228f"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W2-0632",
+      "word": "UZLOVAT",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/uzel",
+          "headword": "uzel",
+          "observation": "Seznam derivátů hesla uzel výslovně obsahuje UZLOVAT se slovnědruhovou značkou verb. Doklad základního slovesa; samostatný význam kandidáta zde rozepsán není.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "265c74b89c4481ac9f81506a3d1ee3e5c1be5222d23089567237ff6d6f65d7c6"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        },
+        {
+          "publisher": "English Wiktionary (Wikimedia), veřejný snapshot přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/zauzlovat",
+          "headword": "zauzlovat",
+          "observation": "Příbuzné dokonavé sloveso dokládá význam vytváření uzlů. Výklad nedokonavého uzlovat je vlastní redakční posouzení ve spojení s explicitním derivátem u uzel, ne citace neexistujícího vlastního hesla.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "local public snapshot consultation + AI inspection of explicit translation/derivation/synonym relation; candidate own entry URL not requested",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": [
+            "5a4ef519d30026b818e74086b1a962db9d6b503ed14bacfc717609b743d0e898"
+          ],
+          "source_download_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC-BY-SA-4.0; GFDL alternative",
+          "scope": "indirect_dictionary_evidence_as_specified"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Kandidát nemá v konzultovaných snímcích vlastní heslo; skutečné explicitní nepřímé doklady a jejich meze jsou popsány jednotlivě. Nikde se netvrdí návštěva samostatného hesla. Gramatické detaily, známost a vlastní glosa jsou redakční AI posouzení.",
+      "decision_reason": "Přijato po redakční kontrole z uživatelem schválené zásoby. Explicitní slovníkové vztahy, překlady či deriváty podporují základní tvar a význam; absence vlastního hesla není důvod k odmítnutí. Přesný rozsah dokladu je uveden v evidence. Tier je odhad známosti, nikoli změřená obtížnost."
+    },
+    {
+      "candidate_id": "L3-W2-0658",
+      "word": "ZÁLESÁK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes; uložený CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L31168",
+          "headword": "zálesák",
+          "observation": "Místní snapshot obsahuje přesné lemma zálesák a slovní druh noun; neobsahuje zde použitý výklad ani rodovou tabulku. Nejde o novou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "offline AI inspection of existing snapshot",
+          "response_sha256": null,
+          "scope": "lemma and POS only",
+          "license": "CC0-1.0"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/les",
+          "headword": "les",
+          "candidate_mention": "zálesák",
+          "observation": "V českém hesle les je zálesák explicitně uveden mezi odvozenými či příbuznými pojmenováními. Samostatné lemma a noun POS navíc obsahuje CC0 snapshot; podrobný vlastní význam zpracoval AI redaktor.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "c222c87e132ba834d8be53d505a3ad9fa61099b72676a3674cc89cce7f3f23ad",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0671",
+      "word": "ROŠŤÁK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/uli%C4%8Dn%C3%ADk",
+          "headword": "uličník",
+          "candidate_mention": "rošťák",
+          "observation": "U českého substantiva uličník se rošťák objevuje jako synonymum a významový štítek překladů. Kontext odpovídá nezbednému chlapci; nejde o vlastní jméno.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "fdec6595414006c83d09b9344c34eb4d844a7024383e195b4ba49158e3a30fa0",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0673",
+      "word": "NEPOSEDA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/Hummel",
+          "headword": "Hummel",
+          "candidate_mention": "neposeda",
+          "observation": "Druhý český výklad používá neposeda pro neposedné dítě, zejména dívku.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "20d5cfc36e2deca2454c5399a2b61fd90a551b7eed645f1ffb4dc6b7ef783bca",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/Sitzfleisch",
+          "headword": "Sitzfleisch",
+          "candidate_mention": "neposeda",
+          "observation": "Český příklad používá neposeda u mužské postavy Karla. Společně s ženským užitím v Hummel dokládá použitelnost pro oba rody; genitiv je vlastní morfologické posouzení.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "2bd438ac51ea97e33ba7407896db5db7755f004eec891ebd3987d86c10e2728e",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0675",
+      "word": "ZMATKAŘ",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary, Czech entries; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/zmatek",
+          "headword": "zmatek",
+          "candidate_mention": "zmatkař",
+          "observation": "V českém hesle zmatek je zmatkař explicitně zařazen mezi odvozená slova.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": "ade1cd50f599aaaee66301bc2a93cebbfcbfafba8b90a4155a840c06fef95bc0",
+          "source_archive_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/bluda%C5%99",
+          "headword": "bludař",
+          "candidate_mention": "zmatkař",
+          "observation": "Zmínka zmatkař v synonymním seznamu potvrzuje pojmenování člověka. Konkrétní neutrální glosu člověka působícího zmatky formuloval AI redaktor; neslučuje se bez rozlišení se všemi významy bludaře.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "90a2eee329d8b7f9161eb28a1fc899cdb81e3a67c5507a46b68f425ebd49d12a",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0677",
+      "word": "LOUDAL",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/slep%C3%BD%C5%A1",
+          "headword": "slepýš",
+          "candidate_mention": "loudal",
+          "observation": "Česká etymologická poznámka používá spojení oslnivý loudal jako překlad německého označení pomalého tvora. Jde o skutečný substantivní výskyt, nikoli minulý čas slovesa loudat. Samostatné současné heslo ani registr tento doklad neposkytuje.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "c93943f2fe7831dd43ef6097b7ae14069f08731d920c6a4f53556339cbc7c9bf",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0679",
+      "word": "ÚŠKLEBEK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/grimasa",
+          "headword": "grimasa",
+          "candidate_mention": "úšklebek",
+          "observation": "České heslo grimasa uvádí úšklebek jako synonymum. Potvrzuje pojmenování výrazu tváře; podrobné skloňování posoudil redaktor.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "c83705b9ff38122dc13c3a8d0c8be3a05a1bfdac4ba67560cc155fce3fa67b0e",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0696",
+      "word": "ZVÍDAVOST",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes; uložený CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L1414140",
+          "headword": "zvídavost",
+          "observation": "Místní snapshot obsahuje přesné lemma zvídavost a slovní druh noun; neobsahuje zde použitý výklad ani rodovou tabulku. Nejde o novou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "offline AI inspection of existing snapshot",
+          "response_sha256": null,
+          "scope": "lemma and POS only",
+          "license": "CC0-1.0"
+        },
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/curiosity",
+          "headword": "curiosity",
+          "candidate_mention": "zvídavost",
+          "observation": "Český výklad používá zvídavost jako překlad anglického substantiva. Přesné lemma a noun POS navíc obsahuje původní CC0 snapshot.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "7424a0f73792cc3a67eb74ee0a4edcbc687e5fa95d8604123a88514d2416718e",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0698",
+      "word": "DŘÍMOTA",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/slumber",
+          "headword": "slumber",
+          "candidate_mention": "dřímota",
+          "observation": "Český výklad anglického substantiva uvádí dřímotu v okruhu lehkého spánku.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "source_record_sha256": "68cd6436c3a1ed147e1295555047ca6fb593128bbddf1e8ea91d24a20f0ef1bb",
+          "source_archive_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        },
+        {
+          "publisher": "English Wiktionary, Czech entries; veřejná extrakce Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/d%C5%99%C3%ADmat",
+          "headword": "dřímat",
+          "candidate_mention": "dřímota",
+          "observation": "České slovesné heslo výslovně uvádí dřímota mezi odvozenými slovy.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "automated public dump retrieval + offline AI inspection of lexical context",
+          "response_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "source_record_sha256": "69c9f03d62e83702e0b7e9899f50c380d6286498a7e1a71f2fd206a3091ab8fd",
+          "source_archive_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "scope": "explicit lexical mention, derivation, translation or usage; not a standalone candidate paradigm"
+        }
+      ],
+      "evidence_limit": "Kandidát byl doložen v konkrétním lexikálním kontextu; vlastní samostatné heslo a úplná česká pádová tabulka nejsou tvrzeny. Neobsažené gramatické a registrační údaje jsou vlastní redakční posouzení.",
+      "reference_limitation": null,
+      "source_notes": null,
+      "decision_reason": "Samostatná jazyková revize neshledala pravopisnou, významovou ani tvaroslovnou vadu. Zásobu schválil uživatel; absence samostatného hesla se nezaměňuje za neplatnost slova. Přesný rozsah dostupného dokladu je uveden v evidence_grade/evidence_limit. Tier je AI odhad lexikální známosti."
+    },
+    {
+      "candidate_id": "L3-W2-0701",
+      "word": "ZVÍDAVÝ",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes — původní lokální CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L230311",
+          "headword": "zvídavý",
+          "observation": "Ve zmrazeném původním snapshotu je přesná shoda základního hesla a slovního druhu. Záznam sám nedokládá významovou definici ani současnou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "Lokální porovnání již dostupného CC0 snapshotu; bez síťové návštěvy hesla.",
+          "license": "CC0-1.0",
+          "raw_lexeme": {
+            "lexeme_id": "L230311",
+            "lemma": "zvídavý",
+            "category_id": "Q34698",
+            "part_of_speech": "adjective"
+          }
+        },
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/zv%C4%9Bdav%C3%BD#čeština",
+          "headword": "zvědavý (doklad zvídavý)",
+          "observation": "Zvídavý je uveden mezi příbuznými slovy u zvědavý. Doklad potvrzuje rodinu; vlastní glosa záměrně volí zájem o poznání, nikoli vtíravou zvědavost. Přesné lemma a adjektivní slovní druh potvrzuje původní CC0 Wikidata.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "986b3c6406b1a707c5f2ce50309be483c136e5a5fa99702200e3ae513cebd196",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná.",
+      "decision_reason": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0711",
+      "word": "SVIŽNÝ",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Wikidata Lexemes — původní lokální CC0 snapshot",
+          "url": "https://www.wikidata.org/wiki/Lexeme:L289812",
+          "headword": "svižný",
+          "observation": "Ve zmrazeném původním snapshotu je přesná shoda základního hesla a slovního druhu. Záznam sám nedokládá významovou definici ani současnou návštěvu stránky.",
+          "retrieved_at": "2026-08-13T00:15:56+00:00",
+          "verified": true,
+          "method": "Lokální porovnání již dostupného CC0 snapshotu; bez síťové návštěvy hesla.",
+          "license": "CC0-1.0",
+          "raw_lexeme": {
+            "lexeme_id": "L289812",
+            "lemma": "svižný",
+            "category_id": "Q34698",
+            "part_of_speech": "adjective"
+          }
+        },
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/bystr%C3%BD#čeština",
+          "headword": "bystrý (doklad svižný)",
+          "observation": "Svižný je výslovné synonymum druhého významu hesla bystrý, vztahujícího se k rychlosti pohybu či proudění.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "260821636f763d15c2cd70a3e62dc73d5b4b431ceb987659711853decb126fff",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná.",
+      "decision_reason": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0741",
+      "word": "SKVRNITÝ",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary — česká sekce přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/strakat%C3%BD#Czech",
+          "headword": "strakatý (doklad skvrnitý)",
+          "observation": "Skvrnitý je výslovné synonymum významu barevně nestejnorodého či skvrnitého povrchu u adjektiva strakatý. Doklad potvrzuje adjektivní význam; nečiní ze slov pravopisné varianty.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "snapshot_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "consulted_record_sha256": "baa78aefe465d7245b4a2c9d4fd981feaddaa757ee8e60b4f1c4d5649ecd8517",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná.",
+      "decision_reason": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0742",
+      "word": "PUNTÍKATÝ",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Český CC0 pravopisný slovník — strepon/czech-cc0-dictionaries, kopie titoBouzout/Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "puntíkatý",
+          "observation": "Přesný záznam v místním CC0 seznamu: puntíkatý/P po:adjective. Pravopisná a slovnědruhová evidence; seznam neposkytuje významovou definici ani stupeň obeznámenosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "Místní přesné porovnání již obecně staženého veřejného souboru Czech.dic; význam nezjišťován z pravopisného seznamu.",
+          "snapshot_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Přesný tvar a přídavné jméno jsou v CC0 pravopisném seznamu. Význam vzoru z puntíků je vlastní explicitní redakční posouzení, nikoli přepsaná slovníková definice.",
+      "decision_reason": "Přesný tvar a přídavné jméno jsou v CC0 pravopisném seznamu. Význam vzoru z puntíků je vlastní explicitní redakční posouzení, nikoli přepsaná slovníková definice. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0814",
+      "word": "NÁSADKA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "English Wiktionary — česká sekce přes Kaikki/Wiktextract",
+          "url": "https://en.wiktionary.org/wiki/n%C3%A1sada#Czech",
+          "headword": "násada (doklad násadka)",
+          "observation": "V hesle násada je násadka výslovně uvedena jako zdrobnělina; základní význam je držadlo/násada. Podpůrný doklad existence a slovotvorby, nikoli samostatná definice držátka psacího pera.",
+          "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+          "snapshot_sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+          "consulted_record_sha256": "5cd584373a67975de352eb1f99870b436a51c96a4eef07e33cb590d176e6f1e0",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        },
+        {
+          "publisher": "Český CC0 pravopisný slovník — strepon/czech-cc0-dictionaries, kopie titoBouzout/Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "násadka",
+          "observation": "Přesný záznam v místním CC0 seznamu: násadka/Z po:noun. Pravopisná a slovnědruhová evidence; seznam neposkytuje významovou definici ani stupeň obeznámenosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "Místní přesné porovnání již obecně staženého veřejného souboru Czech.dic; význam nezjišťován z pravopisného seznamu.",
+          "snapshot_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Vybráno držátko psacího pera; nejde o překlep slova násada.",
+      "decision_reason": "Vybráno držátko psacího pera; nejde o překlep slova násada. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0816",
+      "word": "STROUHÁTKO",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/o%C5%99ez%C3%A1v%C3%A1tko#čeština",
+          "headword": "ořezávátko (doklad strouhátko)",
+          "observation": "V hesle ořezávátko je strouhátko uvedeno jako synonymum prvního významu, pomůcky k zašpičatění tužky, a označeno jako nářeční. Tento stylový příznak je zachován v redakci.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "ed6bc165e2a60aa54a59971baa211e2196203b5f8dd55792864c78ad68cbe5e0",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Zachováno regionálně užívané pojmenování ořezávátka; cs Wikislovník je v tomto významu označuje jako nářeční. Je to synonymum, nikoli pravopisná varianta ořezávátka. Absence samostatného hesla není důvod k vyřazení.",
+      "decision_reason": "Zachováno regionálně užívané pojmenování ořezávátka; cs Wikislovník je v tomto významu označuje jako nářeční. Je to synonymum, nikoli pravopisná varianta ořezávátka. Absence samostatného hesla není důvod k vyřazení. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0818",
+      "word": "PŘEBAL",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/obal#čeština",
+          "headword": "obal (doklad přebal)",
+          "observation": "Přebal je výslovné synonymum druhého, knižního významu hesla obal. Doklad potvrzuje knižní kontext; vlastní glosa doplňuje praktické rozlišení snímatelného přebalu.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "45e304bb15b7b1e8319d6c52e740181f7d2c53afc9e7de619230d21429ee48e3",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná.",
+      "decision_reason": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0829",
+      "word": "RUDKA",
+      "evidence_depth": "limited-reference-plus-editorial-meaning",
+      "evidence": [
+        {
+          "publisher": "Český CC0 pravopisný slovník — strepon/czech-cc0-dictionaries, kopie titoBouzout/Dictionaries",
+          "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+          "headword": "rudka",
+          "observation": "Přesný záznam v místním CC0 seznamu: rudka/Z po:noun. Pravopisná a slovnědruhová evidence; seznam neposkytuje významovou definici ani stupeň obeznámenosti.",
+          "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+          "verified": true,
+          "method": "Místní přesné porovnání již obecně staženého veřejného souboru Czech.dic; význam nezjišťován z pravopisného seznamu.",
+          "snapshot_sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+          "license": "CC0-1.0 (Czech.txt)"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Přesný tvar a slovní druh jsou v CC0 pravopisném seznamu. Význam červenohnědého kreslicího materiálu a látkové užití byly samostatně jazykově posouzeny AI; seznam sám výklad významu neposkytuje.",
+      "decision_reason": "Přesný tvar a slovní druh jsou v CC0 pravopisném seznamu. Význam červenohnědého kreslicího materiálu a látkové užití byly samostatně jazykově posouzeny AI; seznam sám výklad významu neposkytuje. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    },
+    {
+      "candidate_id": "L3-W2-0853",
+      "word": "DOVĚTEK",
+      "evidence_depth": "lexical-context",
+      "evidence": [
+        {
+          "publisher": "Český Wikislovník přes Kaikki/Wiktextract",
+          "url": "https://cs.wiktionary.org/wiki/dou%C5%A1ka#čeština",
+          "headword": "douška (doklad dovětek)",
+          "observation": "Dovětek je výslovné synonymum významu závěrečného dodatečného sdělení u hesla douška; nejde jen o výskyt v seznamu dotazů.",
+          "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+          "verified": true,
+          "method": "Lokální čtení konkrétního souvisejícího hesla ve veřejném snapshotu; bez návštěvy heslové URL. Nepřímý doklad má výslovně omezený rozsah.",
+          "snapshot_url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+          "snapshot_sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+          "consulted_record_sha256": "d9d5ecd2b8b2965351ffc53feb09ea2b1d8a793c432201db78d41a1a4a55652f",
+          "consulted_record_hash_method": "SHA256 of sorted compact UTF-8 JSON record, not original source line bytes",
+          "license": "CC-BY-SA-4.0; GFDL alternative"
+        }
+      ],
+      "evidence_limit": null,
+      "reference_limitation": null,
+      "source_notes": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná.",
+      "decision_reason": "Základní tvar, uvedený význam a zařazení byly individuálně redakčně posouzeny; žádná oprava pravopisu není nutná. Tier vyjadřuje redakční odhad obeznámenosti, nikoli měřenou obtížnost desky."
+    }
+  ]
+}

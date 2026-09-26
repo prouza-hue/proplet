@@ -1,0 +1,144 @@
+{
+  "scope": "Explicit orthographic alternatives only; no automatic stemming or semantic-family collapse.",
+  "groups": [
+    {
+      "members": [
+        "prkénko",
+        "prkýnko"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W1-0011"
+    },
+    {
+      "members": [
+        "kolna",
+        "kůlna"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W1-0065"
+    },
+    {
+      "members": [
+        "přilba",
+        "přílba"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W1-0186"
+    },
+    {
+      "members": [
+        "střihat",
+        "stříhat"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W2-0604"
+    },
+    {
+      "members": [
+        "oblázek",
+        "oblásek"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W2-0182"
+    },
+    {
+      "members": [
+        "sekera",
+        "sekyra"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W2-0338"
+    },
+    {
+      "members": [
+        "plst",
+        "plsť"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W2-0358"
+    },
+    {
+      "members": [
+        "lampion",
+        "lampión"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W2-0473"
+    },
+    {
+      "members": [
+        "hrozinka",
+        "rozinka"
+      ],
+      "kind": "orthographic",
+      "reviewed_member": "L3-W2-0095"
+    }
+  ],
+  "soft_morphological_relations": [
+    {
+      "members": [
+        "šustit",
+        "šustět"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W2-0578"
+    },
+    {
+      "members": [
+        "rozmarýn",
+        "rozmarýna"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W1-0036"
+    },
+    {
+      "members": [
+        "kedluben",
+        "kedlubna"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W1-0044"
+    },
+    {
+      "members": [
+        "tůně",
+        "tůň"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W2-0178"
+    },
+    {
+      "members": [
+        "louže",
+        "louž"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W2-0179"
+    },
+    {
+      "members": [
+        "strniště",
+        "strnisko"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W2-0198"
+    },
+    {
+      "members": [
+        "pantofel",
+        "pantofle"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W2-0426"
+    },
+    {
+      "members": [
+        "dužina",
+        "dužnina"
+      ],
+      "kind": "morphological-or-suffix-alternative",
+      "reviewed_member": "L3-W2-0125"
+    }
+  ],
+  "note": "Variant spellings are not inserted as new target proposals. Counts use only canonical entries actually present in the full lexicon."
+}
