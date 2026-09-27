@@ -1,0 +1,196 @@
+--- a/preview/gen6/index.html
++++ b/preview/gen6/index.html
+@@ -90,7 +90,7 @@
+             <button id="calmRunBtn" class="secondary-btn painted-action-control" type="button" aria-pressed="false"><img class="painted-action-icon" src="./rewards/printshop/calm.svg" alt="" width="24" height="24">Klidný režim</button>
+             <button id="hintBtn" class="secondary-btn" aria-label="Nápověda" title="Nápověda">💡 Nápověda</button>
+             <button id="tajenkaRulesBtn" class="secondary-btn hidden" type="button" aria-label="Pravidla Tajenky" title="Pravidla Tajenky"><span aria-hidden="true">ⓘ</span></button>
+-            <button id="magnifierQuickBtn" class="secondary-btn magnifier-quick-btn hidden" type="button" aria-label="Vypnout lupu při tahu" aria-pressed="true" title="Lupa při tahu">🔍</button>
++            <button id="magnifierQuickBtn" class="secondary-btn magnifier-quick-btn hidden" type="button" aria-label="Vypnout lupu při tahu" aria-pressed="true" title="Lupa při tahu"><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span></button>
+           </div>
+           <div id="starterHintNudge" class="starter-hint-nudge hidden" role="status" aria-live="polite">
+             <div><strong>💡 Chceš malé postrčení?</strong><small>Je jen na tobě — můžeš dál normálně hrát.</small></div>
+--- a/preview/gen6/preview.js
++++ b/preview/gen6/preview.js
+@@ -81,8 +81,13 @@
+   // Do not replace a touched label node on every clock tick.
+   if(hintButton.textContent!==hintLabel)hintButton.textContent=hintLabel;
+   previewQuery('#timer').textContent=previewTime(previewSession.elapsed(g));
+-  previewQuery('#magnifierQuickBtn').classList.toggle('hidden',!previewInput.magnifierAvailable());
+-  previewQuery('#magnifierQuickBtn').setAttribute('aria-pressed',String(previewSettings.magnifier));
++  const magnifierButton=previewQuery('#magnifierQuickBtn'),magnifierAvailable=previewInput.magnifierAvailable();
++  magnifierButton.classList.toggle('hidden',!magnifierAvailable);
++  magnifierButton.classList.toggle('on',previewSettings.magnifier);
++  magnifierButton.setAttribute('aria-pressed',String(previewSettings.magnifier));
++  magnifierButton.setAttribute('aria-label',previewSettings.magnifier?'Vypnout lupu při tahu':'Zapnout lupu při tahu');
++  magnifierButton.title=previewSettings.magnifier?'Lupa při tahu zapnutá':'Lupa při tahu vypnutá';
++  magnifierButton.closest('.game-actions')?.classList.toggle('magnifier-control-visible',magnifierAvailable);
+   const stage=previewQuery('#boardStage');stage.classList.toggle('board-complete',g.finished);stage.style.setProperty('--solve-progress',g.found.length/g.puzzle.answers.length);
+ }
+ function previewClearHints(){clearTimeout(previewHintTimer);previewQueryAll('.cell.hint,.cell.hint-route,.cell.hint-full').forEach(c=>{c.classList.remove('hint','hint-route','hint-full');delete c.dataset.hintOrder})}
+--- a/tools/test_gen6_eight_browser.py
++++ b/tools/test_gen6_eight_browser.py
+@@ -19,6 +19,7 @@
+     ap=argparse.ArgumentParser()
+     ap.add_argument('--output',type=Path,required=True)
+     ap.add_argument('--chromium',default=None)
++    ap.add_argument('--touch-only',action='store_true',help='Target the phone/Fold controls; prior all-eight mouse evidence stays separate.')
+     args=ap.parse_args();args.output.mkdir(parents=True,exist_ok=True)
+     static=ROOT/'.vercel/output/static'
+     class Quiet(SimpleHTTPRequestHandler):
+@@ -27,6 +28,7 @@
+     thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+     origin=f'http://127.0.0.1:{server.server_port}'
+     report={'environment':'loopback-only-static','physicalDeviceTested':False,'checks':[],'errors':[],'screenshots':[]}
++    report['scope']='touch-controls-only' if args.touch_only else 'all-eight-and-touch'
+     requests=[];mp=None
+     with sync_playwright() as pw:
+         browser=pw.chromium.launch(headless=True,executable_path=args.chromium)
+@@ -46,44 +48,45 @@
+             for x,y in positions[1:]:page.mouse.move(x,y,steps=2)
+             page.mouse.up()
+         try:
+-            open_menu(page)
+-            page.screenshot(path=str(args.output/'menu-desktop.png'))
+-            page.locator('#previewBoards button').first.click()
+-            page.wait_for_function('currentGame && document.querySelectorAll("#board .cell").length===100')
+-            answers=page.evaluate('currentGame.puzzle.answers')
+-            draw_mouse(answers[0]['path']);page.wait_for_function('currentGame.found.length===1')
+-            assert '1 tah'==page.locator('#moves').inner_text()
+-            page.reload(wait_until='domcontentloaded');page.locator('#previewBoards button').first.click()
+-            assert page.evaluate('currentGame.found.length')==1
+-            report['checks'].append('real-mouse-word-and-reload-progress')
+-            for width,height,name in [(320,820,'narrow'),(390,844,'mobile'),(768,1024,'fold'),(1440,1080,'desktop')]:
+-                page.set_viewport_size({'width':width,'height':height})
+-                for theme in ('light','dark'):
+-                    page.evaluate('(t)=>document.documentElement.dataset.theme=t',theme);page.wait_for_timeout(150)
+-                    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),(name,theme,'overflow')
+-                    assert page.locator('#hintBtn').is_visible()
+-                    filename=f'board-{name}-{theme}.png';page.screenshot(path=str(args.output/filename),full_page=True)
+-                    report['screenshots'].append(filename)
+-            page.set_viewport_size({'width':1440,'height':1080})
+-            page.evaluate("document.documentElement.dataset.theme='light'")
+-            # Complete every board through actual pointer gestures, not by
+-            # setting found/finished or invoking the completion callback.
+-            finished=[]
+-            for ordinal in range(8):
+-                answers=page.evaluate('currentGame.puzzle.answers.filter(a=>!currentGame.found.some(f=>f.word===a.word))')
+-                for answer in answers:
+-                    before=page.evaluate('currentGame.found.length')
+-                    draw_mouse(answer['path'])
+-                    page.wait_for_function('(n)=>currentGame.found.length===n+1',arg=before)
+-                page.locator('#finishModal:not(.hidden)').wait_for()
+-                assert page.evaluate('currentGame.found.length')==14
+-                finished.append(page.evaluate('currentGame.puzzle.id'))
+-                if ordinal==0:page.screenshot(path=str(args.output/'first-complete.png'),full_page=True)
+-                page.locator('#nextBoard').click()
+-            assert page.locator('#screen-preview').evaluate('el=>el.classList.contains("active")')
+-            assert page.locator('#previewBoards .done').count()==8
+-            report['completedThroughPointer']=finished
+-            report['checks']+=['all-eight-real-pointer-completions','all-eight-menu-done','320-390-768-1440-light-dark-no-overflow']
++            if not args.touch_only:
++                open_menu(page)
++                page.screenshot(path=str(args.output/'menu-desktop.png'))
++                page.locator('#previewBoards button').first.click()
++                page.wait_for_function('currentGame && document.querySelectorAll("#board .cell").length===100')
++                answers=page.evaluate('currentGame.puzzle.answers')
++                draw_mouse(answers[0]['path']);page.wait_for_function('currentGame.found.length===1')
++                assert '1 tah'==page.locator('#moves').inner_text()
++                page.reload(wait_until='domcontentloaded');page.locator('#previewBoards button').first.click()
++                assert page.evaluate('currentGame.found.length')==1
++                report['checks'].append('real-mouse-word-and-reload-progress')
++                for width,height,name in [(320,820,'narrow'),(390,844,'mobile'),(768,1024,'fold'),(1440,1080,'desktop')]:
++                    page.set_viewport_size({'width':width,'height':height})
++                    for theme in ('light','dark'):
++                        page.evaluate('(t)=>document.documentElement.dataset.theme=t',theme);page.wait_for_timeout(150)
++                        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),(name,theme,'overflow')
++                        assert page.locator('#hintBtn').is_visible()
++                        filename=f'board-{name}-{theme}.png';page.screenshot(path=str(args.output/filename),full_page=True)
++                        report['screenshots'].append(filename)
++                page.set_viewport_size({'width':1440,'height':1080})
++                page.evaluate("document.documentElement.dataset.theme='light'")
++                # Complete every board through actual pointer gestures, not by
++                # setting found/finished or invoking the completion callback.
++                finished=[]
++                for ordinal in range(8):
++                    answers=page.evaluate('currentGame.puzzle.answers.filter(a=>!currentGame.found.some(f=>f.word===a.word))')
++                    for answer in answers:
++                        before=page.evaluate('currentGame.found.length')
++                        draw_mouse(answer['path'])
++                        page.wait_for_function('(n)=>currentGame.found.length===n+1',arg=before)
++                    page.locator('#finishModal:not(.hidden)').wait_for()
++                    assert page.evaluate('currentGame.found.length')==14
++                    finished.append(page.evaluate('currentGame.puzzle.id'))
++                    if ordinal==0:page.screenshot(path=str(args.output/'first-complete.png'),full_page=True)
++                    page.locator('#nextBoard').click()
++                assert page.locator('#screen-preview').evaluate('el=>el.classList.contains("active")')
++                assert page.locator('#previewBoards .done').count()==8
++                report['completedThroughPointer']=finished
++                report['checks']+=['all-eight-real-pointer-completions','all-eight-menu-done','320-390-768-1440-light-dark-no-overflow']
+             # Real CDP touch events in an independent mobile context.
+             mobile=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
+             mp=mobile.new_page();mp.set_default_timeout(12000)
+@@ -101,6 +104,18 @@
+             for point in points[1:]:cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[point]})
+             cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+             mp.wait_for_function('currentGame.found.length===1')
++            # The loupe must visibly represent the actual setting, including on
++            # coarse-pointer layouts whose icon buttons have zero text font-size.
++            for _ in range(2):
++                assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
++                assert mp.locator('#magnifierQuickBtn').evaluate('el=>el.classList.contains("on")')
++                assert mp.locator('#magnifierQuickBtn svg').bounding_box()['width']>=16
++                mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
++                assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='false'
++                assert not mp.locator('#magnifierQuickBtn').evaluate('el=>el.classList.contains("on")')
++                mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
++                assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
++            report['checks'].append('phone-loupe-visible-and-single-touch-toggle')
+             mp.locator('#hintBtn').tap()
+             report['afterHintTap']=mp.evaluate('({events:window.__touchEvents,modal:document.querySelector("#hintModal").className,found:currentGame.found.length,dragging:currentGame.dragging,hints:currentGame.hints})')
+             mp.locator('#hintModal:not(.hidden)').wait_for()
+@@ -113,6 +128,7 @@
+             mp.reload(wait_until='domcontentloaded');mp.locator('#previewBoards button').first.tap()
+             assert mp.evaluate('currentGame.found.length')==1
+             assert mp.evaluate('currentGame.hints')==1
++            mp.wait_for_timeout(650)
+             mp.screenshot(path=str(args.output/'touch-mobile-restored.png'),full_page=True)
+             report['checks']+=['emulated-touch-drag','hint','calm-hide-and-show','mobile-reload-progress-and-hint']
+             # The actual coarse-pointer Fold layout differs from a resized desktop.
+@@ -127,6 +143,13 @@
+             for point in points[1:]:cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[point]})
+             cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+             mp.wait_for_function('currentGame.found.length===2')
++            assert mp.locator('#magnifierQuickBtn svg').bounding_box()['width']>=16
++            assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
++            mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
++            assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='false'
++            mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
++            assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
++            report['checks'].append('fold-loupe-visible-and-single-touch-toggle')
+             mp.locator('#hintBtn').tap();mp.locator('#hintModal:not(.hidden)').wait_for()
+             mp.locator('#hintModal [data-close]').tap();mp.wait_for_timeout(400)
+             assert not mp.locator('#hintModal').is_visible()
+--- a/content/gen6/round3-eight/README.md
++++ b/content/gen6/round3-eight/README.md
+@@ -24,7 +24,11 @@
+ 
+ První deska byla znovu vyrobena ze stejného seedu a plného fondu 24 umístění: shodný obsahový hash (`replay.json`). Lokálně prošlo osm převzatých testů základu a jedenáct testů Gen6 včetně pěti nových kontrol úplné osmičky, širšího slovníku, špatné provenience a odmítnutí timeoutu.
+ 
+-Lokální Chromium se spustí, ale navigace na loopback byla administrativně blokována. Žádný snímek nebyl nahrazen maketou. Skutečný browser test je připraven jako `tools/test_gen6_eight_browser.py` pro povolené izolované CI; jeho výsledek a skutečné snímky budou doloženy samostatným reportem. Nejde o test fyzického Samsungu Fold.
++Nezávislá výroba celé osmičky v CI opakovaně reprodukovala hash `c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223`; [reprodukční běh](https://github.com/prouza-hue/proplet/actions/runs/36282086177). Pozdější změny ovládání stejné desky negenerovaly znovu.
++
++[Kompletní browser acceptance](https://github.com/prouza-hue/proplet/actions/runs/36282583649) prošla: skutečnými tahy dohráno všech osm desek, nápověda, obnova, Klid, klávesnice, 320/390/768/1440 px a obě témata bez přetékání. V samostatném dotykovém kontextu prošly skutečné CDP tahy a tlačítka na telefonu i rozloženém Foldu. Odhaleno a opraveno potlačené kliknutí tlačítka po dotykovém tahu v preview adaptéru, s kontrolou duplicitní aktivace. Report: `docs/gen6/EIGHT-BROWSER-QA-20260927.json`.
++
++Při vizuální kontrole snímků byla dále doplněna chybějící standardní ikona lupy a třída jejího zapnutého stavu; používá přesně stejnou ikonu a stavové třídy jako ostrá hra. Následná cílená kontrola je samostatná a nesmí být zaměněna za opakované dohrání osmičky. Nativní produkční input se neměnil. Jde o emulaci dotyku a viewportů, ne fyzický Samsung Fold. Lokálně blokovaná browser navigace nebyla obcházena; skutečná ověření proběhla v povoleném izolovaném CI a žádný snímek není maketa.
+ 
+ ## Reprodukce
+ 
+@@ -42,7 +46,7 @@
+ 
+ ## Další kroky
+ 
+-1. Po skutečném browser ověření ukázat obsah Pavlovi. Osmičku nepovažovat za změřeně těžkou jen proto, že projde solverem.
++1. Ukázat ověřené preview Pavlovi. Osmičku nepovažovat za změřeně těžkou jen proto, že projde solverem.
+ 2. Zapojit schválenou sadu do stávajícího playtestového toku Propletu: samostatná identita kola, zachované výsledky II, osm desek, hodnocení a odměny, serverová uzávěrka a lokální odpočet bez pollingu. Termín konce III a případné změny účastníků/odměn potvrdit před aktivací. Kolo II končí 28. 9. ve 24:00 českého času; žádný automatický launch jen dosažením data.
+ 3. Po vyhodnocení zábavnosti, náročnosti a novosti použít dokončený Lexikon v3 pro ostatní obtížnosti. Společný verzovaný manifest ID bude zachovávat `rozehráno → první nedokončená deska trasy`, původní katalog, XP i žebříčky podle identity desky. Nové desky mají přijít brzy, ne až na konec staré banky. Tato fáze se nyní nezapíná.
+ 
