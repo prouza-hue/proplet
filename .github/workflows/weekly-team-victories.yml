@@ -1,0 +1,63 @@
+name: Weekly team victories database gate
+
+on:
+  push:
+    branches: [main, feature/weekly-team-victories-20260927]
+    paths:
+      - 'supabase/migrations/*weekly_team_victories*.sql'
+      - 'tools/test_weekly_team_victories_db.py'
+      - 'tools/weekly_team_victories_db_cases.sql'
+      - 'backend/team_victories.py'
+      - 'tests/weekly/**'
+      - 'public/team-victories.js'
+      - 'tools/test_weekly_team_victories_frontend.cjs'
+      - '.github/workflows/weekly-team-victories.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/*weekly_team_victories*.sql'
+      - 'tools/test_weekly_team_victories_db.py'
+      - 'tools/weekly_team_victories_db_cases.sql'
+      - 'backend/team_victories.py'
+      - 'tests/weekly/**'
+      - 'public/team-victories.js'
+      - 'tools/test_weekly_team_victories_frontend.cjs'
+      - '.github/workflows/weekly-team-victories.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-weekly-victories:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_USER: proplet_test_admin
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: proplet_weekly_test
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U proplet_test_admin -d proplet_weekly_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install PostgreSQL driver
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt 'psycopg[binary]==3.3.5'
+      - name: Check authenticated HTTP boundary
+        run: python -m unittest discover -s tests/weekly -p 'test_team_victories.py' -v
+      - name: Check frontend reward lifecycle
+        run: node --test tools/test_weekly_team_victories_frontend.cjs
+      - name: Exercise real migration using synthetic teams
+        run: >-
+          python tools/test_weekly_team_victories_db.py
+          --database-url postgresql://proplet_test_admin:local-test-only@127.0.0.1:55432/proplet_weekly_test

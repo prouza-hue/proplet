@@ -18,6 +18,7 @@ on:
       - 'tests/current/**'
       - 'tools/test_current.py'
       - 'tools/validate_migration_manifest.py'
+      - 'tools/test_weekly_team_victories_scheduler.py'
       - '.github/workflows/current-runtime.yml'
   pull_request:
     branches:
@@ -35,6 +36,7 @@ on:
       - 'tests/current/**'
       - 'tools/test_current.py'
       - 'tools/validate_migration_manifest.py'
+      - 'tools/test_weekly_team_victories_scheduler.py'
       - '.github/workflows/current-runtime.yml'
   workflow_dispatch:
 
@@ -82,14 +84,45 @@ jobs:
           python-version: '3.12'
       - name: Install isolated test dependencies
         run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5'
+      - name: Enable real pg_cron in disposable PostgreSQL
+        env:
+          PG_TEST_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker exec --user root "$PG_TEST_CONTAINER" apt-get update
+          docker exec --user root "$PG_TEST_CONTAINER" apt-get install -y --no-install-recommends postgresql-17-cron
+          docker exec -i "$PG_TEST_CONTAINER" sh -c 'cat >> "$PGDATA/postgresql.conf"' <<'CONF'
+          shared_preload_libraries = 'pg_cron'
+          cron.database_name = 'proplet_test_ci_cron'
+          cron.use_background_workers = on
+          CONF
+          docker restart "$PG_TEST_CONTAINER"
+          for attempt in {1..30}; do
+            if docker exec "$PG_TEST_CONTAINER" pg_isready -U proplet_test_admin -d postgres; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
       - name: Test real SQL with synthetic players only
         run: |
           python -c "from pathlib import Path; Path('/tmp/proplet-test-password').write_text('local-test-only')"
-          python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-isolated-results.json
+          python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-isolated-results.json --database-name proplet_test_ci_cron
           python tools/test_account_created_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-account-created.json
           python tools/test_funnel_sql.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_http.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_free_order_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_mozkokalypsa_http_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
+      - name: Verify actual scheduler and background execution
+        env:
+          PG_TEST_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker restart "$PG_TEST_CONTAINER"
+          for attempt in {1..30}; do
+            if docker exec "$PG_TEST_CONTAINER" pg_isready -U proplet_test_admin -d proplet_test_ci_cron; then
+              break
+            fi
+            sleep 1
+          done
+          python tools/test_weekly_team_victories_scheduler.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
 

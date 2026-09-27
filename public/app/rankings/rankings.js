@@ -122,7 +122,7 @@
       const box=$('#rankingTeamCard'),p=getProfile();if(!box)return;
       if(!p?.token){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Chceš soutěžit i za partu?</strong><small>Pořadí můžeš sledovat bez účtu. Pro vlastní tým si nejdřív ulož postup.</small></div><button id="rankingAccountBtn" class="secondary-btn">☁️ Uložit postup</button>';const button=$('#rankingAccountBtn');if(button)button.onclick=()=>d.openProfileModal?.('create');return}
       if(!p.familyCode){box.innerHTML='<div><span class="eyebrow">👥 TÝMY</span><strong>Jsi zatím bez týmu</strong><small>Účet funguje samostatně. Tým můžeš přidat kdykoli, bez vlivu na předchozí XP.</small></div><button id="rankingJoinTeamBtn" class="secondary-btn">Přidat / založit tým</button>';const button=$('#rankingJoinTeamBtn');if(button)button.onclick=()=>d.openTeamMembershipModal?.();return}
-      box.innerHTML=`<div><span class="eyebrow">👥 TVŮJ TÝM</span><strong>${esc(p.leagueName||p.familyCode)}</strong><small>Do týmových XP se počítají jen XP získané během členství.</small></div><button id="rankingTeamSettingsBtn" class="secondary-btn">Nastavení týmu</button>`;const button=$('#rankingTeamSettingsBtn');if(button)button.onclick=()=>d.openFamilyLeagueModal?.();
+      box.innerHTML=`<div><span class="eyebrow">👥 TVŮJ TÝM</span><strong>${esc(p.leagueName||p.familyCode)}</strong><small>Do týmových XP se počítají jen XP získané během členství.</small></div><div class="tv-team-actions"><button id="rankingTeamVictoriesBtn" class="secondary-btn">Týdenní zlato · vitrína</button><button id="rankingTeamSettingsBtn" class="text-btn">Nastavení týmu</button></div>`;const button=$('#rankingTeamSettingsBtn');if(button)button.onclick=()=>d.openFamilyLeagueModal?.();const victories=$('#rankingTeamVictoriesBtn');if(victories)victories.onclick=()=>globalThis.PropletTeamVictories?.openCabinet();
     }
 
     async function renderLeaderboard(){
@@ -147,8 +147,10 @@
       $$('.ranking-daily-tab').forEach(button=>button.addEventListener('click',()=>{rankingDailyScope=button.dataset.rankingDailyScope;renderLeaderboard()}));
       return true;
     }
-    return {install,renderLeaderboard,renderXpRanking,renderDailyRanking,renderRankingPrivacyNote,renderRankingTeamCard,openRankingPrivacyModal,saveRankingVisibility,maybeShowRankingPrivacyNotice,rankingRows,rankingRankBadge,transformRankingPayload,getState:()=>({rankingXpScope,rankingXpPeriod,rankingDailyScope})};
+    function openWeeklyTeams({render=true}={}){rankingXpScope='teams';rankingXpPeriod='week';if(render)return renderLeaderboard()}
+    return {install,openWeeklyTeams,renderLeaderboard,renderXpRanking,renderDailyRanking,renderRankingPrivacyNote,renderRankingTeamCard,openRankingPrivacyModal,saveRankingVisibility,maybeShowRankingPrivacyNotice,rankingRows,rankingRankBadge,transformRankingPayload,getState:()=>({rankingXpScope,rankingXpPeriod,rankingDailyScope})};
   }
 
   return {create,transformRankingPayload};
 });
+

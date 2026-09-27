@@ -5070,6 +5070,12 @@ from backend import mozkokalypsa
 mozkokalypsa.install(app,auth_player=auth_player,db_select=db_select,
                     db_request=db_request,db_rpc=db_rpc,enforce_rate_limit=enforce_rate_limit)
 
+# Weekly team trophies are isolated from gameplay rewards and finalized by DB cron.
+from backend import team_victories
+team_victories.install(app, auth_player=auth_player, db_rpc=db_rpc,
+                       enforce_rate_limit=enforce_rate_limit)
+
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
+

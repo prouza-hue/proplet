@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.02.2-flowcontext1';
+const APP_PREVIEW_RELEASE='proplet-v4.03.0-weekly1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -374,6 +374,7 @@ function accountSession(){
  if(accountSessionController)return accountSessionController;
  const factory=window.PropletAccountSession;if(!factory?.create)return null;
  accountSessionController=factory.create({storage:localStorage,profileKey:PROFILE_KEY,adoptGuestData,onChange:(next,previous)=>{
+  if(next?.id!==previous?.id||next?.token!==previous?.token||next?.familyCode!==previous?.familyCode)document.dispatchEvent(new CustomEvent('proplet:account-changed'));
   if(next?.id===previous?.id&&next?.token===previous?.token)return;
   accountProgressReady=null;accountProgressError=false;accountProgressAuthRequired=false;
   if(typeof puzzleDB!=='undefined'&&puzzleDB){renderAccountProgressStatus();if(next?.token)queueMicrotask(()=>refreshRemoteProfile());else{renderDaily();renderFree()}}
@@ -419,7 +420,7 @@ function resultQueue(profile=getProfile(),scope=profile?.id||playerScope()){
  const factory=window.PropletResultQueue;
  if(!factory?.create)return null;
  resultQueueControllerIdentity=identity;
- resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
+ resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}).then(receipt=>{try{window.PropletTeamVictories?.resultConfirmed(r,receipt,profile)}catch{}return receipt}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
  return resultQueueController;
 }
 function quarantineRejectedResult(row,reason,scope=playerScope()){
@@ -2375,5 +2376,6 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+
 
 
