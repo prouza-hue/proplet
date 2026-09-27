@@ -24,7 +24,11 @@ Všech osm desek znovu prošlo nezávislým solverem: platné ortogonální cest
 
 První deska byla znovu vyrobena ze stejného seedu a plného fondu 24 umístění: shodný obsahový hash (`replay.json`). Lokálně prošlo osm převzatých testů základu a jedenáct testů Gen6 včetně pěti nových kontrol úplné osmičky, širšího slovníku, špatné provenience a odmítnutí timeoutu.
 
-Lokální Chromium se spustí, ale navigace na loopback byla administrativně blokována. Žádný snímek nebyl nahrazen maketou. Skutečný browser test je připraven jako `tools/test_gen6_eight_browser.py` pro povolené izolované CI; jeho výsledek a skutečné snímky budou doloženy samostatným reportem. Nejde o test fyzického Samsungu Fold.
+Nezávislá výroba celé osmičky v CI opakovaně reprodukovala hash `c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223`; [reprodukční běh](https://github.com/prouza-hue/proplet/actions/runs/36282086177). Pozdější změny ovládání stejné desky negenerovaly znovu.
+
+[Kompletní browser acceptance](https://github.com/prouza-hue/proplet/actions/runs/36282583649) prošla: skutečnými tahy dohráno všech osm desek, nápověda, obnova, Klid, klávesnice, 320/390/768/1440 px a obě témata bez přetékání. V samostatném dotykovém kontextu prošly skutečné CDP tahy a tlačítka na telefonu i rozloženém Foldu. Odhaleno a opraveno potlačené kliknutí tlačítka po dotykovém tahu v preview adaptéru, s kontrolou duplicitní aktivace. Report: `docs/gen6/EIGHT-BROWSER-QA-20260927.json`.
+
+Při vizuální kontrole snímků byla dále doplněna chybějící standardní ikona lupy a třída jejího zapnutého stavu; používá přesně stejnou ikonu a stavové třídy jako ostrá hra. Následná cílená kontrola je samostatná a nesmí být zaměněna za opakované dohrání osmičky. Nativní produkční input se neměnil. Jde o emulaci dotyku a viewportů, ne fyzický Samsung Fold. Lokálně blokovaná browser navigace nebyla obcházena; skutečná ověření proběhla v povoleném izolovaném CI a žádný snímek není maketa.
 
 ## Reprodukce
 
@@ -42,7 +46,7 @@ Frekvenční cache v textu není nutná ani součástí tohoto PR: stejná data 
 
 ## Další kroky
 
-1. Po skutečném browser ověření ukázat obsah Pavlovi. Osmičku nepovažovat za změřeně těžkou jen proto, že projde solverem.
+1. Ukázat ověřené preview Pavlovi. Osmičku nepovažovat za změřeně těžkou jen proto, že projde solverem.
 2. Zapojit schválenou sadu do stávajícího playtestového toku Propletu: samostatná identita kola, zachované výsledky II, osm desek, hodnocení a odměny, serverová uzávěrka a lokální odpočet bez pollingu. Termín konce III a případné změny účastníků/odměn potvrdit před aktivací. Kolo II končí 28. 9. ve 24:00 českého času; žádný automatický launch jen dosažením data.
 3. Po vyhodnocení zábavnosti, náročnosti a novosti použít dokončený Lexikon v3 pro ostatní obtížnosti. Společný verzovaný manifest ID bude zachovávat `rozehráno → první nedokončená deska trasy`, původní katalog, XP i žebříčky podle identity desky. Nové desky mají přijít brzy, ne až na konec staré banky. Tato fáze se nyní nezapíná.
 

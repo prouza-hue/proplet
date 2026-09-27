@@ -19,6 +19,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument('--output',type=Path,required=True)
     ap.add_argument('--chromium',default=None)
+    ap.add_argument('--touch-only',action='store_true',help='Target the phone/Fold controls; prior all-eight mouse evidence stays separate.')
     args=ap.parse_args();args.output.mkdir(parents=True,exist_ok=True)
     static=ROOT/'.vercel/output/static'
     class Quiet(SimpleHTTPRequestHandler):
@@ -27,6 +28,7 @@ def main():
     thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
     origin=f'http://127.0.0.1:{server.server_port}'
     report={'environment':'loopback-only-static','physicalDeviceTested':False,'checks':[],'errors':[],'screenshots':[]}
+    report['scope']='touch-controls-only' if args.touch_only else 'all-eight-and-touch'
     requests=[];mp=None
     with sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True,executable_path=args.chromium)
@@ -46,44 +48,45 @@ def main():
             for x,y in positions[1:]:page.mouse.move(x,y,steps=2)
             page.mouse.up()
         try:
-            open_menu(page)
-            page.screenshot(path=str(args.output/'menu-desktop.png'))
-            page.locator('#previewBoards button').first.click()
-            page.wait_for_function('currentGame && document.querySelectorAll("#board .cell").length===100')
-            answers=page.evaluate('currentGame.puzzle.answers')
-            draw_mouse(answers[0]['path']);page.wait_for_function('currentGame.found.length===1')
-            assert '1 tah'==page.locator('#moves').inner_text()
-            page.reload(wait_until='domcontentloaded');page.locator('#previewBoards button').first.click()
-            assert page.evaluate('currentGame.found.length')==1
-            report['checks'].append('real-mouse-word-and-reload-progress')
-            for width,height,name in [(320,820,'narrow'),(390,844,'mobile'),(768,1024,'fold'),(1440,1080,'desktop')]:
-                page.set_viewport_size({'width':width,'height':height})
-                for theme in ('light','dark'):
-                    page.evaluate('(t)=>document.documentElement.dataset.theme=t',theme);page.wait_for_timeout(150)
-                    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),(name,theme,'overflow')
-                    assert page.locator('#hintBtn').is_visible()
-                    filename=f'board-{name}-{theme}.png';page.screenshot(path=str(args.output/filename),full_page=True)
-                    report['screenshots'].append(filename)
-            page.set_viewport_size({'width':1440,'height':1080})
-            page.evaluate("document.documentElement.dataset.theme='light'")
-            # Complete every board through actual pointer gestures, not by
-            # setting found/finished or invoking the completion callback.
-            finished=[]
-            for ordinal in range(8):
-                answers=page.evaluate('currentGame.puzzle.answers.filter(a=>!currentGame.found.some(f=>f.word===a.word))')
-                for answer in answers:
-                    before=page.evaluate('currentGame.found.length')
-                    draw_mouse(answer['path'])
-                    page.wait_for_function('(n)=>currentGame.found.length===n+1',arg=before)
-                page.locator('#finishModal:not(.hidden)').wait_for()
-                assert page.evaluate('currentGame.found.length')==14
-                finished.append(page.evaluate('currentGame.puzzle.id'))
-                if ordinal==0:page.screenshot(path=str(args.output/'first-complete.png'),full_page=True)
-                page.locator('#nextBoard').click()
-            assert page.locator('#screen-preview').evaluate('el=>el.classList.contains("active")')
-            assert page.locator('#previewBoards .done').count()==8
-            report['completedThroughPointer']=finished
-            report['checks']+=['all-eight-real-pointer-completions','all-eight-menu-done','320-390-768-1440-light-dark-no-overflow']
+            if not args.touch_only:
+                open_menu(page)
+                page.screenshot(path=str(args.output/'menu-desktop.png'))
+                page.locator('#previewBoards button').first.click()
+                page.wait_for_function('currentGame && document.querySelectorAll("#board .cell").length===100')
+                answers=page.evaluate('currentGame.puzzle.answers')
+                draw_mouse(answers[0]['path']);page.wait_for_function('currentGame.found.length===1')
+                assert '1 tah'==page.locator('#moves').inner_text()
+                page.reload(wait_until='domcontentloaded');page.locator('#previewBoards button').first.click()
+                assert page.evaluate('currentGame.found.length')==1
+                report['checks'].append('real-mouse-word-and-reload-progress')
+                for width,height,name in [(320,820,'narrow'),(390,844,'mobile'),(768,1024,'fold'),(1440,1080,'desktop')]:
+                    page.set_viewport_size({'width':width,'height':height})
+                    for theme in ('light','dark'):
+                        page.evaluate('(t)=>document.documentElement.dataset.theme=t',theme);page.wait_for_timeout(150)
+                        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),(name,theme,'overflow')
+                        assert page.locator('#hintBtn').is_visible()
+                        filename=f'board-{name}-{theme}.png';page.screenshot(path=str(args.output/filename),full_page=True)
+                        report['screenshots'].append(filename)
+                page.set_viewport_size({'width':1440,'height':1080})
+                page.evaluate("document.documentElement.dataset.theme='light'")
+                # Complete every board through actual pointer gestures, not by
+                # setting found/finished or invoking the completion callback.
+                finished=[]
+                for ordinal in range(8):
+                    answers=page.evaluate('currentGame.puzzle.answers.filter(a=>!currentGame.found.some(f=>f.word===a.word))')
+                    for answer in answers:
+                        before=page.evaluate('currentGame.found.length')
+                        draw_mouse(answer['path'])
+                        page.wait_for_function('(n)=>currentGame.found.length===n+1',arg=before)
+                    page.locator('#finishModal:not(.hidden)').wait_for()
+                    assert page.evaluate('currentGame.found.length')==14
+                    finished.append(page.evaluate('currentGame.puzzle.id'))
+                    if ordinal==0:page.screenshot(path=str(args.output/'first-complete.png'),full_page=True)
+                    page.locator('#nextBoard').click()
+                assert page.locator('#screen-preview').evaluate('el=>el.classList.contains("active")')
+                assert page.locator('#previewBoards .done').count()==8
+                report['completedThroughPointer']=finished
+                report['checks']+=['all-eight-real-pointer-completions','all-eight-menu-done','320-390-768-1440-light-dark-no-overflow']
             # Real CDP touch events in an independent mobile context.
             mobile=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
             mp=mobile.new_page();mp.set_default_timeout(12000)
@@ -101,6 +104,18 @@ def main():
             for point in points[1:]:cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[point]})
             cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
             mp.wait_for_function('currentGame.found.length===1')
+            # The loupe must visibly represent the actual setting, including on
+            # coarse-pointer layouts whose icon buttons have zero text font-size.
+            for _ in range(2):
+                assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
+                assert mp.locator('#magnifierQuickBtn').evaluate('el=>el.classList.contains("on")')
+                assert mp.locator('#magnifierQuickBtn svg').bounding_box()['width']>=16
+                mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
+                assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='false'
+                assert not mp.locator('#magnifierQuickBtn').evaluate('el=>el.classList.contains("on")')
+                mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
+                assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
+            report['checks'].append('phone-loupe-visible-and-single-touch-toggle')
             mp.locator('#hintBtn').tap()
             report['afterHintTap']=mp.evaluate('({events:window.__touchEvents,modal:document.querySelector("#hintModal").className,found:currentGame.found.length,dragging:currentGame.dragging,hints:currentGame.hints})')
             mp.locator('#hintModal:not(.hidden)').wait_for()
@@ -113,6 +128,7 @@ def main():
             mp.reload(wait_until='domcontentloaded');mp.locator('#previewBoards button').first.tap()
             assert mp.evaluate('currentGame.found.length')==1
             assert mp.evaluate('currentGame.hints')==1
+            mp.wait_for_timeout(650)
             mp.screenshot(path=str(args.output/'touch-mobile-restored.png'),full_page=True)
             report['checks']+=['emulated-touch-drag','hint','calm-hide-and-show','mobile-reload-progress-and-hint']
             # The actual coarse-pointer Fold layout differs from a resized desktop.
@@ -127,6 +143,13 @@ def main():
             for point in points[1:]:cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[point]})
             cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
             mp.wait_for_function('currentGame.found.length===2')
+            assert mp.locator('#magnifierQuickBtn svg').bounding_box()['width']>=16
+            assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
+            mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
+            assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='false'
+            mp.locator('#magnifierQuickBtn').tap();mp.wait_for_timeout(400)
+            assert mp.locator('#magnifierQuickBtn').get_attribute('aria-pressed')=='true'
+            report['checks'].append('fold-loupe-visible-and-single-touch-toggle')
             mp.locator('#hintBtn').tap();mp.locator('#hintModal:not(.hidden)').wait_for()
             mp.locator('#hintModal [data-close]').tap();mp.wait_for_timeout(400)
             assert not mp.locator('#hintModal').is_visible()

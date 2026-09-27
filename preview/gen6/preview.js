@@ -81,8 +81,13 @@ function previewHud(){
   // Do not replace a touched label node on every clock tick.
   if(hintButton.textContent!==hintLabel)hintButton.textContent=hintLabel;
   previewQuery('#timer').textContent=previewTime(previewSession.elapsed(g));
-  previewQuery('#magnifierQuickBtn').classList.toggle('hidden',!previewInput.magnifierAvailable());
-  previewQuery('#magnifierQuickBtn').setAttribute('aria-pressed',String(previewSettings.magnifier));
+  const magnifierButton=previewQuery('#magnifierQuickBtn'),magnifierAvailable=previewInput.magnifierAvailable();
+  magnifierButton.classList.toggle('hidden',!magnifierAvailable);
+  magnifierButton.classList.toggle('on',previewSettings.magnifier);
+  magnifierButton.setAttribute('aria-pressed',String(previewSettings.magnifier));
+  magnifierButton.setAttribute('aria-label',previewSettings.magnifier?'Vypnout lupu při tahu':'Zapnout lupu při tahu');
+  magnifierButton.title=previewSettings.magnifier?'Lupa při tahu zapnutá':'Lupa při tahu vypnutá';
+  magnifierButton.closest('.game-actions')?.classList.toggle('magnifier-control-visible',magnifierAvailable);
   const stage=previewQuery('#boardStage');stage.classList.toggle('board-complete',g.finished);stage.style.setProperty('--solve-progress',g.found.length/g.puzzle.answers.length);
 }
 function previewClearHints(){clearTimeout(previewHintTimer);previewQueryAll('.cell.hint,.cell.hint-route,.cell.hint-full').forEach(c=>{c.classList.remove('hint','hint-route','hint-full');delete c.dataset.hintOrder})}
