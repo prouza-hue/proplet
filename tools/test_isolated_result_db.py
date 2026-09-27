@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import secrets
 import sys
 import threading
@@ -32,13 +33,18 @@ def main():
     parser.add_argument('--port', type=int, default=55432)
     parser.add_argument('--user', default='proplet_test_admin')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--database-name', help='Optional fresh proplet_test_* database for extensions configured at server startup')
     args = parser.parse_args()
     options = dict(host='127.0.0.1', port=args.port, user=args.user,
                    password=args.password_file.read_text().strip(), autocommit=True)
-    name = 'proplet_test_' + secrets.token_hex(5)
+    name = args.database_name or 'proplet_test_' + secrets.token_hex(5)
+    if not re.fullmatch(r'proplet_test_[a-z0-9_]{1,40}', name):
+        parser.error('Database name must be a fresh proplet_test_* name using lowercase letters, digits and underscores')
     report = {'startedAt': datetime.now(timezone.utc).isoformat(), 'database': name,
               'host': '127.0.0.1', 'syntheticOnly': True, 'checks': [], 'schemaFiles': []}
     with psycopg.connect(dbname='postgres', **options) as c:
+        if c.execute('select 1 from pg_database where datname=%s', (name,)).fetchone():
+            parser.error('Database already exists; refusing to reuse it')
         for role in ('anon', 'authenticated', 'service_role'):
             if not c.execute('select 1 from pg_roles where rolname=%s', (role,)).fetchone():
                 c.execute(sql.SQL('create role {} {}').format(sql.Identifier(role),
