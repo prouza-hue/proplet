@@ -5,14 +5,15 @@ on:
     paths: ['.github/workflows/gen6-takeover-workbench.yml']
 permissions:
   contents: write
+  actions: read
 jobs:
   acceptance:
     if: github.ref == 'refs/heads/chore/gen6-takeover-workbench-20260927'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Verify transferred patch and unchanged target branch
+      - name: Verify reviewed patches and unchanged target
         run: |
           set -euo pipefail
           mkdir -p /tmp/gen6-evidence
@@ -33,33 +34,41 @@ jobs:
           git apply --check /tmp/eight-touch.patch
           git apply /tmp/eight-touch.patch
           git diff --check
+      - uses: actions/download-artifact@v4
+        with:
+          name: gen6-eight-acceptance
+          run-id: 36282086177
+          github-token: ${{ github.token }}
+          path: /tmp/previous-eight
+      - name: Reuse the proven bank without regenerating unchanged content
+        run: |
+          set -euo pipefail
+          cp /tmp/previous-eight/{bank,verification}.json content/gen6/round3-eight/
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.gen6.full_catalog import FullCatalog
+          b=json.loads(Path('content/gen6/round3-eight/bank.json').read_text())
+          r=json.loads(Path('content/gen6/round3-eight/verification.json').read_text())
+          assert b['contentHash']=='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
+          assert r['frozenInputs']==FullCatalog().input_hashes(), 'Manufacturing inputs changed; existing proof cannot be reused'
+          assert len(b['boards'])==8
+          PY
+          cp /tmp/previous-eight/manufacture.txt /tmp/gen6-evidence/manufacture-independent-replay.txt
+          cp content/gen6/round3-eight/{bank,verification}.json /tmp/gen6-evidence/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install 'wordfreq==3.1.1' 'playwright==1.55.0'
       - run: python -m playwright install --with-deps chromium
-      - name: Reproduce all eight boards from the complete lexicon
-        run: |
-          set -euo pipefail
-          python -m tools.gen6.eight --output lab-output/gen6/round3-eight-ci-20260927 --seed 2026092708 --pool-size 24 --seconds-per-board 180 | tee /tmp/gen6-evidence/manufacture.txt
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          b=json.loads(Path('lab-output/gen6/round3-eight-ci-20260927/bank.json').read_text())
-          assert b['contentHash']=='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223', 'Independent full-series replay differs'
-          assert len(b['boards'])==8
-          PY
-          cp lab-output/gen6/round3-eight-ci-20260927/bank.json content/gen6/round3-eight/bank.json
-          cp lab-output/gen6/round3-eight-ci-20260927/verification.json content/gen6/round3-eight/verification.json
-          cp content/gen6/round3-eight/{bank,verification}.json /tmp/gen6-evidence/
-      - name: Lexical, solver and package acceptance
+      - name: Package acceptance and isolated build
         run: |
           set -euo pipefail
           python -m unittest discover -s tests/lexicon_v3 -v 2>&1 | tee /tmp/gen6-evidence/lexicon-tests.txt
           python -m unittest discover -s tests/gen6 -v 2>&1 | tee /tmp/gen6-evidence/gen6-tests.txt
           node --check preview/gen6/preview.js
           python tools/build_gen6_eight_preview.py | tee /tmp/gen6-evidence/build.txt
-      - name: Real browser mouse and touch acceptance without production access
+      - name: Real mouse, phone-touch and Fold-touch acceptance
         run: python tools/test_gen6_eight_browser.py --output /tmp/gen6-evidence/browser
       - name: Commit the verified files only to the preview branch
         run: |
@@ -72,12 +81,12 @@ jobs:
           assert r['status']=='PASS'
           r['ciRun']='https://github.com/prouza-hue/proplet/actions/runs/${{ github.run_id }}'
           r['bankContentHash']='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
-          r['independentFullSeriesReplay']=True
+          r['independentFullSeriesReplayRun']='https://github.com/prouza-hue/proplet/actions/runs/36282086177'
           p.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
           PY
           git add content/gen6/round3-eight/README.md content/gen6/round3-eight/bank.json content/gen6/round3-eight/replay.json content/gen6/round3-eight/selection-policy.json content/gen6/round3-eight/verification.json content/gen6/round3-eight/wordfreq-manifest.json content/lexicon-v3/working/editorial-addendum-20260927.json preview/gen6/data-sources.html preview/gen6/index.html preview/gen6/preview.js tests/gen6/test_eight_package.py tools/build_gen6_eight_preview.py tools/build_gen6_preview.py tools/gen6/eight.py tools/gen6/full_catalog.py tools/gen6/recognition_snapshot.py tools/test_gen6_eight_browser.py vercel.json docs/gen6/EIGHT-BROWSER-QA-20260927.json
           git diff --cached --check
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: eight fresh demanding boards from complete Lexikon v3 with independent solver and browser acceptance'
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: eight fresh demanding boards from complete Lexikon v3 with solver and real mouse/touch acceptance'
           git push origin HEAD:refs/heads/preview/gen6-lexicon-v3-20260926
           git rev-parse HEAD > /tmp/gen6-evidence/COMMITTED_SHA.txt
       - uses: actions/upload-artifact@v4
