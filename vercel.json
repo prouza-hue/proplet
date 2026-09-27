@@ -1,58 +1,39 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python tools/generate_puzzles_bootstrap.py",
-  "regions": [
-    "arn1"
-  ],
-  "env": {
-    "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true",
-    "PROPLET_FREE_ORDER_ENABLED": "true",
-    "PROPLET_MOZKOKALYPSA_ENABLED": "true"
-  },
-  "crons": [
+  "version": 2,
+  "builds": [
     {
-      "path": "/api/cron/daily-push-v2",
-      "schedule": "0 7 * * *"
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
+      "src": "/(.*)",
+      "headers": {
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; worker-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'none'",
+        "X-Robots-Tag": "noindex, nofollow",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer"
+      },
+      "continue": true
     },
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://hrajproplet.cz https://iopyhluayfszskyqqpuc.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), payment=()"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000"
-        }
-      ]
+      "src": "/api(?:/.*)?",
+      "status": 404,
+      "dest": "/public/preview/team-victory/blocked.json"
+    },
+    {
+      "src": "/(?:index.html)?",
+      "dest": "/public/preview/team-victory/app.html"
+    },
+    {
+      "src": "/sw.js",
+      "status": 404,
+      "dest": "/public/preview/team-victory/blocked.json"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
     }
   ]
 }

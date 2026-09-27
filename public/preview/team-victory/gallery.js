@@ -1,0 +1,1 @@
+document.getElementById('themeToggle').onclick=()=>{const dark=document.body.classList.toggle('dark');document.getElementById('themeToggle').textContent=dark?'Světlé pozadí':'Tmavé pozadí';};
