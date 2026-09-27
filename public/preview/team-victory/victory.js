@@ -8,7 +8,7 @@
   const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
   function close(){clearTimeout(countTimer);dialog.close();document.body.classList.remove('tv-modal-open');returnFocus?.focus();}
   function open(kind){
-    clearTimeout(countTimer);returnFocus=document.activeElement;
+    clearTimeout(countTimer);if(!dialog.open)returnFocus=document.activeElement;
     if(dialog.open)dialog.close();
     document.querySelectorAll('.modal:not(.hidden)').forEach(el=>el.classList.add('hidden'));
     if(typeof nav==='function')nav('daily');

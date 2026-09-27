@@ -35,3 +35,4 @@ html.tv-reduced *,html.tv-reduced *::after,html.tv-reduced *::before{animation:n
 
 .tv-dialog .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .tv-reminder[hidden]{display:none!important}
+html[data-theme="dark"] .tv-earned{color:#91D4B6!important}
