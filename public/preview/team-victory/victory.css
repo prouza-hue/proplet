@@ -1,6 +1,6 @@
 /* Only the new reward surface; all surrounding UI comes from current Proplet. */
 .tv-dialog{padding:0;border:1px solid var(--td-line,#D8D2C7);border-top:5px solid #F8C742;border-radius:20px;background:var(--td-paper,#FFFCF5);color:var(--td-ink,#202B39);width:min(480px,calc(100vw - 28px));max-height:calc(100dvh - 28px);overflow:auto;box-shadow:0 24px 90px #101c3c40;overscroll-behavior:contain}
-.tv-dialog::backdrop{background:#14213b77;backdrop-filter:blur(3px)}
+.tv-dialog::backdrop{background:#14213b55;backdrop-filter:blur(1px)}
 .tv-dialog button{font:inherit;cursor:pointer}.tv-dialog :focus-visible,.tv-reminder:focus-visible,.tv-preview-bar button:focus-visible{outline:3px solid var(--td-blue,#204FAB);outline-offset:4px}
 .tv-close{position:absolute;right:12px;top:12px;z-index:2;width:40px;height:40px;border-radius:50%;border:1px solid var(--td-line);background:var(--td-paper);color:var(--td-muted);font-size:27px!important;line-height:1}
 .tv-celebration{text-align:center;padding:30px 32px 25px;position:relative}
@@ -32,3 +32,6 @@
 @media(max-height:690px){.tv-stage{height:125px}.tv-badge-hero{width:126px;height:126px}.tv-celebration{padding-top:21px}.tv-celebration h1{font-size:25px;margin-top:11px}.tv-score{margin:12px 0}.tv-goal{margin-bottom:13px}.tv-simulation{margin-top:12px}}
 @media(prefers-reduced-motion:reduce){.tv-dialog *,.tv-dialog *::after{animation:none!important;transition:none!important}}
 html.tv-reduced *,html.tv-reduced *::after,html.tv-reduced *::before{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+
+.tv-dialog .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tv-reminder[hidden]{display:none!important}
