@@ -4,52 +4,81 @@ on:
     branches: ['chore/gen6-takeover-workbench-20260927']
     paths: ['.github/workflows/gen6-takeover-workbench.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
-  recognition:
+  acceptance:
+    if: github.ref == 'refs/heads/chore/gen6-takeover-workbench-20260927'
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: 84d2e75076d8422db03c8f229db19523da039acf
-          persist-credentials: false
+      - name: Verify transferred patch and unchanged target branch
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gen6-evidence
+          python - <<'PY'
+          import base64,hashlib,lzma
+          from pathlib import Path
+          patch=lzma.decompress(base64.b64decode(Path('tools/eight-code.patch.xz.b64').read_text()))
+          assert hashlib.sha256(patch).hexdigest()=='e33f4bc82802b3d5b4a3a3bd6f9001341e0ea23d9a9517bac05d99e2e229c9a3'
+          Path('/tmp/eight-code.patch').write_bytes(patch)
+          PY
+          git fetch origin preview/gen6-lexicon-v3-20260926
+          test "$(git rev-parse FETCH_HEAD)" = '84d2e75076d8422db03c8f229db19523da039acf'
+          git checkout -B preview/gen6-lexicon-v3-20260926 FETCH_HEAD
+          git rev-parse HEAD > /tmp/gen6-evidence/BASE_SHA.txt
+          git apply --check /tmp/eight-code.patch
+          git apply /tmp/eight-code.patch
+          git diff --check
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'wordfreq==3.1.1'
-      - name: Freeze runtime fallback entries without game writes
+      - run: python -m pip install 'wordfreq==3.1.1' 'playwright==1.55.0'
+      - run: python -m playwright install --with-deps chromium
+      - name: Reproduce all eight boards from the complete lexicon
         run: |
-          mkdir -p /tmp/gen6-recognition
+          set -euo pipefail
+          python -m tools.gen6.eight --output lab-output/gen6/round3-eight-ci-20260927 --seed 2026092708 --pool-size 24 --seconds-per-board 180 | tee /tmp/gen6-evidence/manufacture.txt
           python - <<'PY'
-          import ast,hashlib,json,re,unicodedata
+          import json
           from pathlib import Path
-          from importlib.metadata import version
-          from wordfreq import get_frequency_dict,zipf_frequency,tokenize
-          src=Path('word_recognition_v3330.py').read_text()
-          constants={}
-          for n in ast.parse(src).body:
-            if isinstance(n,ast.Assign):
-              for t in n.targets:
-                if isinstance(t,ast.Name) and t.id.startswith('WORDFREQ_ZIPF_THRESHOLD_'):
-                  constants[t.id]=ast.literal_eval(n.value)
-          pattern=re.compile(r'^[a-záčďéěíňóřšťúůýž]{4,24}$'); accented=set('áčďéěíňóřšťúůýž')
-          data=get_frequency_dict('cs'); accepted=[]; multitokens=[]
-          for raw in data:
-            w=unicodedata.normalize('NFC',raw).strip().casefold()
-            if not pattern.fullmatch(w) or w=='negr':continue
-            tokens=tokenize(w,'cs')
-            if tokens!=[w]:multitokens.append([w,tokens])
-            threshold=constants['WORDFREQ_ZIPF_THRESHOLD_DIACRITIC' if accented.intersection(w) else 'WORDFREQ_ZIPF_THRESHOLD_PLAIN']
-            if zipf_frequency(w,'cs')>=threshold:accepted.append(w)
-          accepted=sorted(set(accepted)); out=Path('/tmp/gen6-recognition')
-          b=('\n'.join(accepted)+'\n').encode();(out/'wordfreq-cs-runtime.txt').write_bytes(b)
-          manifest={'package':'wordfreq','version':version('wordfreq'),'sourceRuntimeSha256':hashlib.sha256(src.encode()).hexdigest(),'thresholds':constants,'tableEntries':len(data),'acceptedEntries':len(accepted),'nonSingleTokenAlphabeticEntries':multitokens,'sha256':hashlib.sha256(b).hexdigest(),'scope':'All acceptable entries in the pinned cs frequency table, tested by actual runtime zipf thresholds. Not a change to runtime recognition.'}
-          (out/'wordfreq-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
-          print(json.dumps(manifest,ensure_ascii=False))
+          b=json.loads(Path('lab-output/gen6/round3-eight-ci-20260927/bank.json').read_text())
+          assert b['contentHash']=='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223', 'Independent full-series replay differs'
+          assert len(b['boards'])==8
           PY
+          cp lab-output/gen6/round3-eight-ci-20260927/bank.json content/gen6/round3-eight/bank.json
+          cp lab-output/gen6/round3-eight-ci-20260927/verification.json content/gen6/round3-eight/verification.json
+      - name: Lexical, solver and package acceptance
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests/lexicon_v3 -v 2>&1 | tee /tmp/gen6-evidence/lexicon-tests.txt
+          python -m unittest discover -s tests/gen6 -v 2>&1 | tee /tmp/gen6-evidence/gen6-tests.txt
+          node --check preview/gen6/preview.js
+          python tools/build_gen6_eight_preview.py | tee /tmp/gen6-evidence/build.txt
+      - name: Real browser mouse and touch acceptance without production access
+        run: python tools/test_gen6_eight_browser.py --output /tmp/gen6-evidence/browser
+      - name: Commit the verified files only to the preview branch
+        run: |
+          set -euo pipefail
+          cp /tmp/gen6-evidence/browser/report.json docs/gen6/EIGHT-BROWSER-QA-20260927.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('docs/gen6/EIGHT-BROWSER-QA-20260927.json'); r=json.loads(p.read_text())
+          assert r['status']=='PASS'
+          r['ciRun']='https://github.com/prouza-hue/proplet/actions/runs/${{ github.run_id }}'
+          r['bankContentHash']='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
+          r['independentFullSeriesReplay']=True
+          p.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add content/gen6/round3-eight/README.md content/gen6/round3-eight/bank.json content/gen6/round3-eight/replay.json content/gen6/round3-eight/selection-policy.json content/gen6/round3-eight/verification.json content/gen6/round3-eight/wordfreq-manifest.json content/lexicon-v3/working/editorial-addendum-20260927.json preview/gen6/data-sources.html preview/gen6/index.html preview/gen6/preview.js tests/gen6/test_eight_package.py tools/build_gen6_eight_preview.py tools/build_gen6_preview.py tools/gen6/eight.py tools/gen6/full_catalog.py tools/gen6/recognition_snapshot.py tools/test_gen6_eight_browser.py vercel.json docs/gen6/EIGHT-BROWSER-QA-20260927.json
+          git diff --cached --check
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: eight fresh demanding boards from complete Lexikon v3 with independent solver and browser acceptance'
+          git push origin HEAD:refs/heads/preview/gen6-lexicon-v3-20260926
+          git rev-parse HEAD > /tmp/gen6-evidence/COMMITTED_SHA.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: gen6-wordfreq-snapshot
-          path: /tmp/gen6-recognition
-          retention-days: 3
+          name: gen6-eight-acceptance
+          path: /tmp/gen6-evidence
+          retention-days: 7
