@@ -289,7 +289,7 @@ html.tiskarna-ui #screen-game .game-actions{grid-column:1!important;width:100%}
 html.tiskarna-ui #magnifierDock>.touch-magnifier{position:absolute!important;display:block!important;width:84px!important;height:84px!important;padding:4px!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;pointer-events:none!important}
 html.tiskarna-ui #magnifierDock>.touch-magnifier.hidden{display:none!important}
 html.tiskarna-ui #winModal #winBadge{display:none!important}
-html.tiskarna-ui #winModal :is(#winPrimaryBtn,#winShareBtn.challenge-share-cta){
+html.tiskarna-ui #winModal :is(#winPrimaryBtn,#winShareBtn.challenge-share-cta,.tv-intro-footer .primary-btn){
  display:flex;align-items:center;justify-content:center;gap:8px;
  width:100%!important;max-width:none!important;min-height:52px!important;
  padding:12px 16px!important;margin:8px 0!important;border:0!important;
