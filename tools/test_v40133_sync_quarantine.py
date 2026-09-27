@@ -10,7 +10,7 @@ version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.03.0"' in version
 assert "version:'4.03.0'" in runtime
-assert "proplet-v4.03.0-weekly1" in sw
+assert "proplet-v4.03.0-weekly2" in sw
 assert "const REJECTED_QUEUE_KEY='proplet-v4-rejected-sync-queue'" in app
 assert "Number(error?.status)===400&&error?.message==='Neznámá úloha'" in app
 assert "obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)" in app
