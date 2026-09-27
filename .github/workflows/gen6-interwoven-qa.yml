@@ -1,0 +1,27 @@
+name: Gen6 interwoven private preview
+on:
+  push:
+    branches: ['preview/gen6-interwoven-20260927']
+    paths: ['.github/workflows/gen6-interwoven-qa.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a91a4bd0a63476f711c50ce863df22a72b034cff
+          persist-credentials: false
+      - name: Export pinned input without runtime access
+        run: |
+          mkdir -p /tmp/gen6-interwoven-source
+          git archive --format=zip HEAD -o /tmp/gen6-interwoven-source/source.zip
+          git ls-tree -r HEAD > /tmp/gen6-interwoven-source/TREE.txt
+          git rev-parse HEAD > /tmp/gen6-interwoven-source/SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gen6-interwoven-source
+          path: /tmp/gen6-interwoven-source
+          retention-days: 3
