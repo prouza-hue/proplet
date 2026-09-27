@@ -5,65 +5,76 @@ on:
     paths: ['.github/workflows/gen6-takeover-workbench.yml']
 permissions:
   contents: write
+  actions: read
 jobs:
-  controls:
+  package:
     if: github.ref == 'refs/heads/chore/gen6-takeover-workbench-20260927'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
-      - name: Apply only the reviewed control patch on the verified head
+        with:
+          ref: preview/gen6-lexicon-v3-20260926
+      - name: Check the previously tested source head
+        run: test "$(git rev-parse HEAD)" = 'fb1c6e7e41cd485809d281576538e7ffb20067a3'
+      - uses: actions/download-artifact@v4
+        with:
+          name: gen6-wordfreq-snapshot
+          run-id: 36280617599
+          github-token: ${{ github.token }}
+          path: /tmp/gen6-wordfreq
+      - name: Package the identical recognition data and remove the install dependency
         run: |
           set -euo pipefail
-          mkdir -p /tmp/gen6-controls
-          cp tools/eight-loupe.patch /tmp/eight-loupe.patch
-          echo 'a3d094044a45836fafbfc0e1a131e30ea125adfee9d8ca4194ec32f819d8eb1d  /tmp/eight-loupe.patch' | sha256sum -c -
-          git fetch origin preview/gen6-lexicon-v3-20260926
-          test "$(git rev-parse FETCH_HEAD)" = '12e49780f4c2944b2574254b64d98a9dc0acf580'
-          git checkout -B preview/gen6-lexicon-v3-20260926 FETCH_HEAD
-          git rev-parse HEAD > /tmp/gen6-controls/BASE_SHA.txt
-          git apply --check /tmp/eight-loupe.patch
-          git apply /tmp/eight-loupe.patch
-          git diff --check
+          mkdir -p /tmp/gen6-package
           python - <<'PY'
-          import json
+          import hashlib,json
+          from pathlib import Path
+          directory=Path('content/gen6/round3-eight')
+          data=Path('/tmp/gen6-wordfreq/wordfreq-cs-runtime.txt').read_bytes()
+          manifest=json.loads((directory/'wordfreq-manifest.json').read_text())
+          assert hashlib.sha256(data).hexdigest()==manifest['sha256']=='bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610'
+          assert len(data.decode().splitlines())==94208
+          (directory/'wordfreq-cs-runtime.txt').write_bytes(data)
+          config=json.loads(Path('vercel.json').read_text())
+          config['installCommand']='python -c "print(\'Using verified offline recognition data\')"'
+          Path('vercel.json').write_text(json.dumps(config,ensure_ascii=False,indent=2)+'\n')
+          p=directory/'README.md';s=p.read_text()
+          old='Frekvenční cache v textu není nutná ani součástí tohoto PR: stejná data se reprodukují ze stejné knihovny a kontrolují přesným hashem.'
+          new='Přesná frekvenční cache je nyní přibalena v `wordfreq-cs-runtime.txt` s kontrolou SHA-256; jde o totožných 94 208 zápisů, nikoli změnu slovníku. Vercel při nasazení 12e49780 odmítl krok instalace knihovny (exit 1), proto statické sestavení používá již ověřená offline data a nepotřebuje instalovat další Python balíčky. Bez cache lze stejná data znovu odvodit z wordfreq 3.1.1. Licence a atribuce tohoto datového souboru: `DATA-LICENSE.md` a veřejná stránka `data-sources.html`.'
+          assert old in s;p.write_text(s.replace(old,new))
+          (directory/'DATA-LICENSE.md').write_text('# Frozen recognition data\n\n`wordfreq-cs-runtime.txt` is a normalized Czech alphabetic subset of wordfreq 3.1.1 data by Robyn Speer, selected using the existing Proplet runtime frequency thresholds. It is recognition-only data, not a list of approved puzzle answers. No frequencies or dictionary definitions are included.\n\nData license: Creative Commons Attribution-ShareAlike 4.0, https://creativecommons.org/licenses/by-sa/4.0/ . This license applies to this data file, not to the whole application.\n\nSource: https://github.com/rspeer/wordfreq . Source attribution and bibliography: https://github.com/rspeer/wordfreq/blob/master/NOTICE.md . Underlying sources credited by wordfreq include Google Books Ngrams, University of Leeds Centre for Translation Studies, Wikipedia contributors, ParaCrawl, OPUS/OpenSubtitles 2018 and OpenSubtitles, and freely available SUBTLEX data by Marc Brysbaert and collaborators.\n\nThe wordfreq code is Apache-2.0; no code from the package is embedded in this data file. See wordfreq-manifest.json for exact version, thresholds, cardinality, and SHA-256. Public preview attribution is also in preview/gen6/data-sources.html.\n')
+          PY
+      - name: Build using only the Python standard library and retain all prior proofs
+        run: |
+          set -euo pipefail
+          python -S tools/build_gen6_eight_preview.py | tee /tmp/gen6-package/build.json
+          python -S - <<'PY'
+          import json,hashlib
           from pathlib import Path
           from tools.gen6.full_catalog import FullCatalog
-          report=json.loads(Path('content/gen6/round3-eight/verification.json').read_text())
-          assert report['frozenInputs']==FullCatalog().input_hashes(), 'Manufacturing inputs changed'
+          r=json.loads(Path('content/gen6/round3-eight/verification.json').read_text())
+          assert r['frozenInputs']==FullCatalog().input_hashes(), 'Actual manufacturing inputs must remain identical'
+          built=json.loads(Path('/tmp/gen6-package/build.json').read_text())
+          assert built['boards']==8 and built['recognitionWords']==103836
+          assert built['bankContentHash']=='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
+          expected={'bank.js':'29ad3f763b509d11e5fd743de82007b825818cff0c8af41251a6b05fff961976','recognition.js':'12a63a1b041b3bf54a8548cdaf41a3064e8ca52d2cf7fbb70dab0bb520037442','preview.js':'5d75c6eb0127ea1bfbf836b330335ba3b17167eac2a1e4e80c3cbc593ab152a0','index.html':'858ce42a7a4d15c262034c5cc24a55ae1f883e2d48ed65e15b8df47a11f80314'}
+          actual={p:hashlib.sha256((Path('.vercel/output/static')/p).read_bytes()).hexdigest() for p in expected}
+          assert expected==actual, 'Packaging changed browser output'
+          built.update(status='PASS',stdlibOnly=True,priorBrowserHead='fb1c6e7e41cd485809d281576538e7ffb20067a3',staticSha256=actual,ciRun='https://github.com/prouza-hue/proplet/actions/runs/${{ github.run_id }}')
+          Path('docs/gen6/EIGHT-PACKAGE-QA-20260927.json').write_text(json.dumps(built,ensure_ascii=False,indent=2)+'\n')
           PY
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install 'wordfreq==3.1.1' 'playwright==1.55.0'
-      - run: python -m playwright install --with-deps chromium
-      - name: Rebuild without generating or changing any board
-        run: |
-          node --check preview/gen6/preview.js
-          python tools/build_gen6_eight_preview.py > /tmp/gen6-controls/build.txt
-      - name: Phone and Fold touch controls including visible loupe state
-        run: python tools/test_gen6_eight_browser.py --touch-only --output /tmp/gen6-controls/browser
-      - name: Save the verified preview controls and evidence
+      - name: Commit only the verified packaging change
         run: |
           set -euo pipefail
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          r=json.loads(Path('/tmp/gen6-controls/browser/report.json').read_text())
-          assert r['status']=='PASS' and r['scope']=='touch-controls-only'
-          r['ciRun']='https://github.com/prouza-hue/proplet/actions/runs/${{ github.run_id }}'
-          r['previousFullAcceptance']='https://github.com/prouza-hue/proplet/actions/runs/36282583649'
-          r['bankContentHash']='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
-          Path('docs/gen6/EIGHT-CONTROLS-QA-20260927.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
-          PY
-          git add preview/gen6/index.html preview/gen6/preview.js tools/test_gen6_eight_browser.py content/gen6/round3-eight/README.md docs/gen6/EIGHT-CONTROLS-QA-20260927.json
+          git add vercel.json content/gen6/round3-eight/wordfreq-cs-runtime.txt content/gen6/round3-eight/DATA-LICENSE.md content/gen6/round3-eight/README.md docs/gen6/EIGHT-PACKAGE-QA-20260927.json
           git diff --cached --check
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'fix: mirror native magnifier icon and state in verified phone and Fold preview'
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: make verified eight-board preview independent of Vercel pip installation'
           git push origin HEAD:refs/heads/preview/gen6-lexicon-v3-20260926
-          git rev-parse HEAD > /tmp/gen6-controls/COMMITTED_SHA.txt
+          git rev-parse HEAD > /tmp/gen6-package/COMMITTED_SHA.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: gen6-eight-controls
-          path: /tmp/gen6-controls
+          name: gen6-eight-package
+          path: /tmp/gen6-package
           retention-days: 7
