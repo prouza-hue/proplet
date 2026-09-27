@@ -33,9 +33,7 @@
 .tv-dialog .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .tv-reminder[hidden]{display:none!important}
 html[data-theme="dark"] .tv-earned{color:#91D4B6!important}/* The launch note sits beneath the existing result action: no overlay, no focus theft. */
-.tv-intro{position:relative;isolation:isolate;margin:30px 3px 22px;padding:24px 23px 0;text-align:left;border:1px solid #c6a754;border-radius:9px 18px 7px 15px;background:#fff1c9;color:#30291d;box-shadow:3px 5px 0 #a8894730;overflow:visible}
-.tv-intro::before{content:'';position:absolute;inset:5px -4px -5px 2px;background:#efd999;border:1px solid #c6a754;border-radius:14px 7px 13px 8px;transform:rotate(-1.7deg);z-index:-2}
-.tv-intro::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,#fff8e6,#ffedb6);border-radius:inherit;z-index:-1}
+.tv-intro{position:relative;isolation:isolate;margin:30px 3px 22px;padding:24px 23px 0;text-align:left;border:1px solid #c6a754;border-radius:14px;background:linear-gradient(120deg,#fff8e6,#ffedb6);color:#30291d;box-shadow:0 4px 12px #60461212;overflow:visible}
 .tv-intro-heading{display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center;padding-right:28px;margin-bottom:14px}
 .tv-intro-art{display:block;width:72px;height:72px;object-fit:contain;pointer-events:none}
 .tv-intro h3{font-family:inherit!important;font-size:29px!important;font-weight:900!important;line-height:1.08!important;letter-spacing:-.04em;margin:0!important;color:#30291d!important}
@@ -43,11 +41,11 @@ html[data-theme="dark"] .tv-earned{color:#91D4B6!important}/* The launch note si
 .tv-intro-close{position:absolute;right:8px;top:8px;z-index:2;width:36px;height:36px;display:grid;place-items:center;border:1px solid #c6a754;border-radius:50%;background:#fff8e9;color:#66542b;font-family:inherit;font-size:25px;line-height:1;cursor:pointer}
 .tv-intro-footer{border-top:1px dashed #b89a55;margin:0 -23px;padding:12px 17px 15px;display:grid;gap:9px}
 .tv-intro-footer>span{font-size:14px;line-height:1.4;font-weight:650;color:#746137}
-.tv-intro-footer button{border:0;background:#294f9f;color:#fff9ed;border-radius:7px 11px 8px 6px;min-height:44px;padding:11px 14px;font-family:inherit;font-weight:800;font-size:15px;line-height:1.35;cursor:pointer;text-align:left;box-shadow:0 3px 0 #183971}
+.tv-intro-footer button{font-family:inherit;text-align:center}
 .tv-intro button:focus-visible{outline:3px solid #245cd0;outline-offset:4px}
 .tv-week{font-size:14px;line-height:1.4;color:var(--td-muted);margin:10px 0 0}.tv-celebration h1 span{font-size:.78em;letter-spacing:-.02em}
 .tv-rules{font-size:14px;line-height:1.5;color:var(--td-muted);margin:16px 0}.tv-history{margin-top:20px;font-size:14px;line-height:1.4}.tv-history summary{cursor:pointer;font-weight:750;padding:6px 0}.tv-history ol{list-style:none;margin:8px 0;padding:0;max-height:220px;overflow:auto}.tv-history li{display:grid;gap:4px;padding:10px 0;border-top:1px solid var(--td-line)}.tv-history li span{color:var(--td-muted)}
 .tv-team-actions{display:grid;gap:8px;flex-shrink:0}.tv-dialog .tv-progress>span{transform-origin:left center}.tv-dialog .tv-primary{font-family:inherit}
-html[data-theme="dark"] .tv-intro{background:#403720;color:#fff1c7;border-color:#8d763e}html[data-theme="dark"] .tv-intro::before{background:#57472a;border-color:#8d763e}html[data-theme="dark"] .tv-intro::after{background:linear-gradient(120deg,#433b28,#302b22)}html[data-theme="dark"] .tv-intro h3{color:#fff0c7!important}html[data-theme="dark"] .tv-intro p{color:#e7d5ab!important}html[data-theme="dark"] .tv-intro-footer>span{color:#e0c892}html[data-theme="dark"] .tv-intro-close{background:#423823;color:#fff0c7;border-color:#8d763e}
+html[data-theme="dark"] .tv-intro{background:linear-gradient(120deg,#433b28,#302b22);color:#fff1c7;border-color:#8d763e}html[data-theme="dark"] .tv-intro h3{color:#fff0c7!important}html[data-theme="dark"] .tv-intro p{color:#e7d5ab!important}html[data-theme="dark"] .tv-intro-footer>span{color:#e0c892}html[data-theme="dark"] .tv-intro-close{background:#423823;color:#fff0c7;border-color:#8d763e}
 @media(max-width:600px){.tv-rules,.tv-history,.tv-week,.tv-kicker,.tv-milestone small,.tv-milestone>span,.tv-cabinet-total small,.tv-reminder,.tv-intro-footer>span{font-size:15px}.tv-intro{padding:21px 18px 0;margin-top:28px}.tv-intro-footer{margin:0 -18px;padding:12px 15px 15px}.tv-intro-heading{grid-template-columns:64px minmax(0,1fr);gap:10px;padding-right:32px}.tv-intro-art{width:64px;height:64px}.tv-intro h3{font-size:25px!important}.tv-team-actions{width:100%}.tv-milestone{grid-template-columns:49px 1fr auto;gap:8px}.tv-milestone img{width:49px;height:49px}}
 @media(prefers-reduced-motion:reduce){.tv-intro *,.tv-intro::before,.tv-intro::after{animation:none!important;transition:none!important}}
