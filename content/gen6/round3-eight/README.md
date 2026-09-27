@@ -42,7 +42,7 @@ python -m unittest discover -s tests/gen6 -v
 python tools/build_gen6_eight_preview.py
 ```
 
-Frekvenční cache v textu není nutná ani součástí tohoto PR: stejná data se reprodukují ze stejné knihovny a kontrolují přesným hashem. Statické preview má rozpoznávací data oddělená od banky a uvádí jejich zdroje/licenci. Kód nepoužívá produkční API/DB, neposílá analytiku a nepřipisuje XP. Produkční sestavení preview builder odmítne.
+Přesná frekvenční cache je nyní přibalena v `wordfreq-cs-runtime.txt` s kontrolou SHA-256; jde o totožných 94 208 zápisů, nikoli změnu slovníku. Vercel při nasazení 12e49780 odmítl krok instalace knihovny (exit 1), proto statické sestavení používá již ověřená offline data a nepotřebuje instalovat další Python balíčky. Bez cache lze stejná data znovu odvodit z wordfreq 3.1.1. Licence a atribuce tohoto datového souboru: `DATA-LICENSE.md` a veřejná stránka `data-sources.html`. Statické preview má rozpoznávací data oddělená od banky a uvádí jejich zdroje/licenci. Kód nepoužívá produkční API/DB, neposílá analytiku a nepřipisuje XP. Produkční sestavení preview builder odmítne.
 
 ## Další kroky
 

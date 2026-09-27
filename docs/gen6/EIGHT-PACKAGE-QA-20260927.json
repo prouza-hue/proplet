@@ -1,0 +1,23 @@
+{
+  "kind": "gen6-static-preview-build",
+  "sourceSha": "84d2e75076d8422db03c8f229db19523da039acf",
+  "bankContentHash": "c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223",
+  "recognitionWords": 103836,
+  "recognitionFileSha256": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+  "boards": 8,
+  "serverFunctions": 0,
+  "accounts": false,
+  "productionWrites": false,
+  "gameplayNetworkConnections": false,
+  "externalFonts": "Google Fonts: original Fraunces / Outfit styles",
+  "status": "PASS",
+  "stdlibOnly": true,
+  "priorBrowserHead": "fb1c6e7e41cd485809d281576538e7ffb20067a3",
+  "staticSha256": {
+    "bank.js": "29ad3f763b509d11e5fd743de82007b825818cff0c8af41251a6b05fff961976",
+    "recognition.js": "12a63a1b041b3bf54a8548cdaf41a3064e8ca52d2cf7fbb70dab0bb520037442",
+    "preview.js": "5d75c6eb0127ea1bfbf836b330335ba3b17167eac2a1e4e80c3cbc593ab152a0",
+    "index.html": "858ce42a7a4d15c262034c5cc24a55ae1f883e2d48ed65e15b8df47a11f80314"
+  },
+  "ciRun": "https://github.com/prouza-hue/proplet/actions/runs/36283171048"
+}
