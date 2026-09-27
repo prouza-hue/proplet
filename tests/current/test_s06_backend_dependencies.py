@@ -83,7 +83,9 @@ route_snapshot = sorted(
     for route in server.app.routes
     if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
 )
-assert _digest(route_snapshot) == "f57b2cb7fee7e4cbcd81be61e6156c81716ece6e19e69033506b3b3318053bc6"
+# v4.03.0 adds only GET /api/team-victories and POST /api/team-victories/seen.
+# Removing those two routes reproduces the prior f57b2cb7 route digest.
+assert _digest(route_snapshot) == "7da3e64c4fa3e2d2c36c903fe1196088891296bb1ae14c898e1bf6bfb116ac6e"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
@@ -108,10 +110,12 @@ for pilot_path in ('/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_i
 openapi_contract.get("components", {}).get("schemas", {}).pop("Event", None)
 
 openapi_digest = _digest(openapi_contract)
+# Weekly trophies add those two paths and the Seen request schema.
+# Removing only these additions reproduces prior OpenAPI digest c0d9ee3b.
 # Tajenka v2 intentionally extends the API schema while preserving the route inventory.
 # Only the candidate database description now covers Gen4 and Gen5 preview branches;
 # restoring the Gen4-only description reproduces the former 70d48981 digest.
-assert openapi_digest == "c0d9ee3b471425d86c10a58b3c99d1e5ac5e68c40e99b1c278abd1c92dcbe2f2", f"current OpenAPI digest: {openapi_digest}"
+assert openapi_digest == "1f690ed5cfb2d83c8ac173726dc77cb52f11ccb977877243cc5db8a1cc401a4c", f"current OpenAPI digest: {openapi_digest}"
 
 
 # A fake-service assembly proves feature modules remain independently testable
@@ -154,3 +158,4 @@ with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names})
     assert installers["_install_word_recognition"].call_args.kwargs["resolved_puzzle"] is None
 
 print("PASS: Sprint 06 explicit dependency and route/OpenAPI characterization")
+

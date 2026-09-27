@@ -40,7 +40,9 @@ def _route_snapshot() -> str:
 
 # The route inventory, including versioned compatibility routes, is part of the
 # deployment contract.  This is the baseline captured before extraction.
-assert _route_snapshot() == "f57b2cb7fee7e4cbcd81be61e6156c81716ece6e19e69033506b3b3318053bc6"
+# v4.03.0 adds only GET /api/team-victories and POST /api/team-victories/seen.
+# Removing those two routes reproduces the prior f57b2cb7 route digest.
+assert _route_snapshot() == "7da3e64c4fa3e2d2c36c903fe1196088891296bb1ae14c898e1bf6bfb116ac6e"
 assert server.app.docs_url is None
 assert server.app.redoc_url is None
 assert server.app.openapi_url is None
@@ -77,10 +79,12 @@ openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )
 openapi_digest = hashlib.sha256(openapi_snapshot.encode("utf-8")).hexdigest()
+# Weekly trophies add those two paths and the Seen request schema.
+# Removing only these additions reproduces prior OpenAPI digest c0d9ee3b.
 # Gen5 adds a preview branch: only /api/puzzle-database's description changed.
 # Restoring its old Gen4-only description reproduces the prior 70d48981 digest.
 assert openapi_digest == (
-    "c0d9ee3b471425d86c10a58b3c99d1e5ac5e68c40e99b1c278abd1c92dcbe2f2"
+    "1f690ed5cfb2d83c8ac173726dc77cb52f11ccb977877243cc5db8a1cc401a4c"
 ), f"current OpenAPI digest: {openapi_digest}"
 
 
@@ -332,3 +336,4 @@ assert response_fixture_digest == (
 
 
 print("Sprint 04 characterization contracts: PASS")
+
