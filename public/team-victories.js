@@ -101,7 +101,7 @@
   function makeIntro(host){
     if($('#tvIntro'))return;
     const card=document.createElement('aside');card.id='tvIntro';card.className='tv-intro';card.setAttribute('aria-labelledby','tvIntroTitle');
-    card.innerHTML=`<button class="tv-intro-close" aria-label="Skrýt novinku o týmové soutěži">×</button><img class="tv-intro-art" src="${badge('first-print')}" alt="" width="108" height="108"><span class="tv-intro-label">Nově · společná výhra</span><h3 id="tvIntroTitle">Týmy hrají<br>o zlato.</h3><p>Vaše XP už pomáhají týmu. Vyhrajte týden a první zlato ve vitríně je vaše.</p><div class="tv-intro-footer"><span>Po–Ne · každý bod pomáhá</span><button>Mrknout na soutěž <span aria-hidden="true">↗</span></button></div>`;
+    card.innerHTML=`<button class="tv-intro-close" aria-label="Skrýt novinku o týmové soutěži">×</button><div class="tv-intro-heading"><img class="tv-intro-art" src="${badge('first-print')}" alt="" width="72" height="72"><h3 id="tvIntroTitle">Týmy hrají<br>o zlato.</h3></div><p>Vaše XP už pomáhají týmu. Vyhrajte týden a první zlato ve vitríně je vaše.</p><div class="tv-intro-footer"><span>Po–Ne · každý bod pomáhá</span><button>Mrknout na soutěž</button></div>`;
     card.querySelector('.tv-intro-close').onclick=()=>card.remove();card.querySelector('.tv-intro-footer button').onclick=openCompetition;
     host.insertAdjacentElement('afterend',card);
   }
