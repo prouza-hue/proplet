@@ -1,0 +1,57 @@
+--- a/preview/gen6/preview.js
++++ b/preview/gen6/preview.js
+@@ -53,7 +53,9 @@
+   previewQuery('#gameProgress').textContent=`${g.found.length}/${g.puzzle.answers.length}`;
+   previewQuery('#moves').textContent=previewCount(g.moves,'tah','tahy','tahů');
+   previewQuery('#cleanStatus').textContent=g.hints?'S nápovědou':'Čistě';
+-  previewQuery('#hintBtn').textContent=g.hints?`💡 ${g.hints}×`:'💡 Nápověda';
++  const hintLabel=g.hints?`💡 ${g.hints}×`:'💡 Nápověda',hintButton=previewQuery('#hintBtn');
++  // Do not replace a touched label node on every clock tick.
++  if(hintButton.textContent!==hintLabel)hintButton.textContent=hintLabel;
+   previewQuery('#timer').textContent=previewTime(previewSession.elapsed(g));
+   previewQuery('#magnifierQuickBtn').classList.toggle('hidden',!previewInput.magnifierAvailable());
+   previewQuery('#magnifierQuickBtn').setAttribute('aria-pressed',String(previewSettings.magnifier));
+--- a/tools/test_gen6_eight_browser.py
++++ b/tools/test_gen6_eight_browser.py
+@@ -27,7 +27,7 @@
+     thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+     origin=f'http://127.0.0.1:{server.server_port}'
+     report={'environment':'loopback-only-static','physicalDeviceTested':False,'checks':[],'errors':[],'screenshots':[]}
+-    requests=[]
++    requests=[];mp=None
+     with sync_playwright() as pw:
+         browser=pw.chromium.launch(headless=True,executable_path=args.chromium)
+         context=browser.new_context(viewport={'width':1440,'height':1080})
+@@ -86,7 +86,9 @@
+             report['checks']+=['all-eight-real-pointer-completions','all-eight-menu-done','320-390-768-1440-light-dark-no-overflow']
+             # Real CDP touch events in an independent mobile context.
+             mobile=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
+-            mp=mobile.new_page();mp.on('pageerror',lambda e:report['errors'].append(str(e)))
++            mp=mobile.new_page();mp.set_default_timeout(12000)
++            mp.add_init_script('window.__touchEvents=[]; for(const type of ["pointerdown","pointerup","click"]) document.addEventListener(type,e=>{if(e.target.closest?.("button"))window.__touchEvents.push({type,id:e.target.closest("button").id,text:e.target.textContent?.slice(0,50)});},true)')
++            mp.on('pageerror',lambda e:report['errors'].append(str(e)))
+             mp.on('request',lambda r:requests.append((r.method,r.url,r.resource_type)))
+             open_menu(mp);mp.locator('#previewBoards button').first.tap();mp.wait_for_timeout(250)
+             cdp=mobile.new_cdp_session(mp)
+@@ -99,7 +101,10 @@
+             for point in points[1:]:cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[point]})
+             cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+             mp.wait_for_function('currentGame.found.length===1')
+-            mp.locator('#hintBtn').tap();mp.locator('#hintChoices button').first.tap()
++            mp.locator('#hintBtn').tap()
++            report['afterHintTap']=mp.evaluate('({events:window.__touchEvents,modal:document.querySelector("#hintModal").className,found:currentGame.found.length,dragging:currentGame.dragging,hints:currentGame.hints})')
++            mp.locator('#hintModal:not(.hidden)').wait_for()
++            mp.locator('#hintChoices button').first.tap()
+             assert mp.evaluate('currentGame.hints')==1
+             mp.locator('#calmRunBtn').tap()
+             assert mp.locator('.game-clock').evaluate('el=>getComputedStyle(el).visibility')=='hidden'
+@@ -118,6 +123,9 @@
+         except Exception:
+             report['status']='FAIL';report['failure']=traceback.format_exc()
+             page.screenshot(path=str(args.output/'failure.png'),full_page=True)
++            if mp and not mp.is_closed():
++                mp.screenshot(path=str(args.output/'mobile-failure.png'),full_page=True)
++                report['mobileFailureState']=mp.evaluate('({events:window.__touchEvents,modal:document.querySelector("#hintModal")?.className,found:currentGame?.found.length,dragging:currentGame?.dragging,hints:currentGame?.hints,body:document.body.className})')
+         finally:
+             browser.close();server.shutdown()
+     (args.output/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
