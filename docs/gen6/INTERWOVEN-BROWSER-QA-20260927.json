@@ -1,0 +1,140 @@
+{
+  "environment": "loopback-only-static",
+  "physicalDeviceTested": false,
+  "checks": [
+    "real-mouse-word-and-reload-progress",
+    "all-eight-real-pointer-completions",
+    "all-eight-menu-done",
+    "320-390-768-1440-light-dark-no-overflow",
+    "phone-loupe-visible-and-single-touch-toggle",
+    "emulated-touch-drag",
+    "hint",
+    "calm-hide-and-show",
+    "mobile-reload-progress-and-hint",
+    "fold-loupe-visible-and-single-touch-toggle",
+    "coarse-fold-layout-and-touch-drag",
+    "touch-hint-close",
+    "keyboard-activation",
+    "no-delayed-double-hint-or-toggle",
+    "zero-gameplay-network-or-result-writes"
+  ],
+  "errors": [],
+  "screenshots": [
+    "board-narrow-light.png",
+    "board-narrow-dark.png",
+    "board-mobile-light.png",
+    "board-mobile-dark.png",
+    "board-fold-light.png",
+    "board-fold-dark.png",
+    "board-desktop-light.png",
+    "board-desktop-dark.png"
+  ],
+  "scope": "all-eight-and-touch",
+  "completedThroughPointer": [
+    "mk3w2-01",
+    "mk3w2-02",
+    "mk3w2-03",
+    "mk3w2-04",
+    "mk3w2-05",
+    "mk3w2-06",
+    "mk3w2-07",
+    "mk3w2-08"
+  ],
+  "afterHintTap": {
+    "events": [
+      {
+        "type": "pointerdown",
+        "id": "",
+        "text": "01"
+      },
+      {
+        "type": "pointerup",
+        "id": "",
+        "text": "01"
+      },
+      {
+        "type": "click",
+        "id": "",
+        "text": "01"
+      },
+      {
+        "type": "pointerdown",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerup",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "click",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerdown",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerup",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "click",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerdown",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerup",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "click",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerdown",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerup",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "click",
+        "id": "magnifierQuickBtn",
+        "text": ""
+      },
+      {
+        "type": "pointerdown",
+        "id": "hintBtn",
+        "text": "💡 Nápověda"
+      },
+      {
+        "type": "pointerup",
+        "id": "hintBtn",
+        "text": "💡 Nápověda"
+      }
+    ],
+    "modal": "modal",
+    "found": 1,
+    "dragging": false,
+    "hints": 0
+  },
+  "status": "PASS",
+  "sourceBaseline": "a91a4bd0a63476f711c50ce863df22a72b034cff",
+  "bankContentHash": "b6bfe8034861ad3cad0d3d9057658b046ea85ef172579229da60ab5dd7cdc42f",
+  "runUrl": "https://github.com/prouza-hue/proplet/actions/runs/36339549061"
+}

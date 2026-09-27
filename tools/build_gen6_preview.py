@@ -40,11 +40,13 @@ def verify_bank(bank):
     if not re.fullmatch(r'[0-9a-f]{40}', bank.get('sourceSha', '')):
         raise ValueError('Missing exact source revision')
     boards = bank.get('boards', [])
-    eight = bank.get('edition') == 'lexicon-v3-eight-v1'
-    count, prefix = (8, 'mk3v3-') if eight else (12, 'mk3-')
+    interwoven = bank.get('edition') == 'lexicon-v3-eight-interwoven-v2'
+    eight = bank.get('edition') in {'lexicon-v3-eight-v1', 'lexicon-v3-eight-interwoven-v2'}
+    count, prefix = (8, 'mk3w2-' if interwoven else 'mk3v3-') if eight else (12, 'mk3-')
     if len(boards) != count or [b.get('id') for b in boards] != [f'{prefix}{i:02d}' for i in range(1, count + 1)]:
         raise ValueError('Preview requires the complete stable board IDs for this edition')
-    if eight and (bank.get('experimentId') != 'mozkokalypsa-round3-lexicon-v3-8'
+    expected_experiment = 'mozkokalypsa-round3-interwoven-v2' if interwoven else 'mozkokalypsa-round3-lexicon-v3-8'
+    if eight and (bank.get('experimentId') != expected_experiment
                   or not re.fullmatch(r'[0-9a-f]{64}', bank.get('lexiconHash', ''))):
         raise ValueError('Missing full-Lexikon-v3 edition provenance')
     if bank.get('contentHash') != digest(boards):
