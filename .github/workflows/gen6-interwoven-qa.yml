@@ -9,121 +9,75 @@ concurrency:
   group: gen6-interwoven-private
   cancel-in-progress: false
 jobs:
-  acceptance:
+  package:
     if: github.ref == 'refs/heads/preview/gen6-interwoven-20260927'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 4
     permissions:
       contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
           ref: preview/gen6-interwoven-20260927
           fetch-depth: 30
-      - name: Verify exact private baseline and reviewed source patch
+      - uses: actions/download-artifact@v4
+        with:
+          name: gen6-interwoven-acceptance
+          run-id: 36339549061
+          github-token: ${{ github.token }}
+          path: /tmp/proven-interwoven
+      - name: Restore the exact reviewed source and proven output
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          mkdir -p /tmp/interwoven-evidence
-          git rev-parse HEAD > /tmp/interwoven-evidence/INPUT_HEAD.txt
           python - <<'PY'
-          import base64, hashlib, lzma, subprocess
+          import base64,hashlib,json,lzma,subprocess,shutil
           from pathlib import Path
-          baseline='a91a4bd0a63476f711c50ce863df22a72b034cff'
           allowed={'.github/workflows/gen6-interwoven-qa.yml','tools/interwoven-reviewed.patch.xz.b64'}
-          changed=set(subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines())
-          assert changed <= allowed, f'Unexpected concurrent changes: {changed-allowed}'
+          changed=set(subprocess.check_output(['git','diff','--name-only','a91a4bd0a63476f711c50ce863df22a72b034cff','HEAD'],text=True).splitlines())
+          assert changed<=allowed, changed-allowed
           patch=lzma.decompress(base64.b64decode(Path('tools/interwoven-reviewed.patch.xz.b64').read_text()))
           assert hashlib.sha256(patch).hexdigest()=='f1ff11f3d7a2de231c9e4a1ac36f9cf9e11f8f1f58dd962fbe10af0f3b0117f5'
           Path('/tmp/interwoven.patch').write_bytes(patch)
+          subprocess.run(['git','apply','--check','/tmp/interwoven.patch'],check=True)
+          subprocess.run(['git','apply','/tmp/interwoven.patch'],check=True)
+          evidence=Path('/tmp/proven-interwoven')
+          report=json.loads((evidence/'browser/report.json').read_text())
+          assert report['status']=='PASS' and not report['errors']
+          assert report['completedThroughPointer']==[f'mk3w2-{i:02d}' for i in range(1,9)]
+          bank=json.loads((evidence/'bank.json').read_text())
+          assert bank['contentHash']=='b6bfe8034861ad3cad0d3d9057658b046ea85ef172579229da60ab5dd7cdc42f'
+          for n in ['bank.json','verification.json','lexical-review.json']:
+              shutil.copy2(evidence/n,Path('content/gen6/round3-interwoven')/n)
+          report.update(sourceBaseline='a91a4bd0a63476f711c50ce863df22a72b034cff',bankContentHash=bank['contentHash'],runUrl='https://github.com/prouza-hue/proplet/actions/runs/36339549061')
+          Path('docs/gen6/INTERWOVEN-BROWSER-QA-20260927.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          p=Path('content/gen6/round3-interwoven/README.md')
+          p.write_text(p.read_text()+'\n## Dokončené CI ověření\n\n'+report['runUrl']+' — geometrie i všech osm desek nezávisle reprodukováno, 11 převzatých a 6 nových testů PASS, všech osm nových desek skutečně dohráno pointer tahy. Prošla emulace mobilu/Foldu, nápověda, lupa, Klid, obnova, klávesnice a obě témata na 320/390/768/1440 px. Žádné herní síťové zápisy. Report: `docs/gen6/INTERWOVEN-BROWSER-QA-20260927.json`. Závěrečný push tohoto běhu selhal pouze kvůli chybějícímu oprávnění CI měnit workflow; následné balení přebírá stejný prověřený obsah, nemění workflow a neopakuje hotové browser testy. Emulace není fyzický test telefonu.\n')
           PY
-          git apply --check /tmp/interwoven.patch
-          git apply /tmp/interwoven.patch
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Reproduce bounded geometry pool and complete eight-board bank
-        run: |
-          set -euo pipefail
           g++ -O3 -std=c++17 tools/gen6/interwoven_geometry.cpp -o /tmp/proplet-weave
           /tmp/proplet-weave 92720262 30000000 32 > content/gen6/round3-interwoven/geometry-pool.jsonl
           echo '4dea0c78bbb325ae3855f42965416e88cb50ebf55f91e4dac8d6d9f54fba0e5a  content/gen6/round3-interwoven/geometry-pool.jsonl' | sha256sum -c -
-          python -m tools.gen6.interwoven --output lab-output/gen6/interwoven-ci | tee /tmp/interwoven-evidence/manufacture.txt
           python - <<'PY'
-          import json, shutil
+          import json,hashlib
           from pathlib import Path
-          out=Path('lab-output/gen6/interwoven-ci')
-          b=json.loads((out/'bank.json').read_text())
-          assert b['contentHash']=='b6bfe8034861ad3cad0d3d9057658b046ea85ef172579229da60ab5dd7cdc42f', 'Independent manufacture mismatch'
-          for n in ['bank.json','verification.json','lexical-review.json']:
-              shutil.copy2(out/n,Path('content/gen6/round3-interwoven')/n)
-              shutil.copy2(out/n,Path('/tmp/interwoven-evidence')/n)
+          report=json.loads(Path('content/gen6/round3-interwoven/verification.json').read_text())
+          for p,h in report['frozenInputs'].items():
+              assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
           PY
-      - name: Independent lexical and full-solver acceptance
-        run: |
-          set -euo pipefail
-          python -m unittest discover -s tests/gen6 -v 2>&1 | tee /tmp/interwoven-evidence/legacy-gen6.txt
-          python -m unittest discover -s tests/interwoven -v 2>&1 | tee /tmp/interwoven-evidence/interwoven-tests.txt
-          node --check preview/gen6/preview.js
-          python tools/build_gen6_interwoven_preview.py > /tmp/interwoven-evidence/build.json
-      - run: python -m pip install 'playwright==1.55.0'
-      - run: python -m playwright install --with-deps chromium
-      - name: Real pointer completions and phone/Fold touch, no production access
-        run: python tools/test_gen6_eight_browser.py --output /tmp/interwoven-evidence/browser
-      - name: Preserve proof and publish only this private branch
+          python tools/build_gen6_interwoven_preview.py > /tmp/new-build.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          assert json.loads(Path('/tmp/new-build.json').read_text())==json.loads(Path('/tmp/proven-interwoven/build.json').read_text())
+          PY
+      - name: Commit content only; leave workflow unchanged
         run: |
           set -euo pipefail
           test "$(git ls-remote origin refs/heads/preview/gen6-interwoven-20260927 | cut -f1)" = "$GITHUB_SHA"
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          report=json.loads(Path('/tmp/interwoven-evidence/browser/report.json').read_text())
-          assert report['status']=='PASS'
-          assert report['completedThroughPointer']==[f'mk3w2-{i:02d}' for i in range(1,9)]
-          report.update(sourceBaseline='a91a4bd0a63476f711c50ce863df22a72b034cff',bankContentHash='b6bfe8034861ad3cad0d3d9057658b046ea85ef172579229da60ab5dd7cdc42f',runUrl=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}")
-          Path('docs/gen6/INTERWOVEN-BROWSER-QA-20260927.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-          p=Path('content/gen6/round3-interwoven/README.md')
-          p.write_text(p.read_text()+'\n## Dokončené CI ověření\n\n'+report['runUrl']+' — nezávisle reprodukováno všech 32 geometrií i obsahový hash osmičky; 11 převzatých a 6 nových testů PASS. Skutečné pointer tahy dohrály všech osm nových identit. Prošla emulace mobilu/Foldu, nápověda, lupa, Klid, obnova, klávesnice a obě témata na 320/390/768/1440 px. Žádné herní síťové zápisy. Report: `docs/gen6/INTERWOVEN-BROWSER-QA-20260927.json`. Emulace není fyzický test telefonu.\n')
-          Path('tools/interwoven-reviewed.patch.xz.b64').unlink()
-          Path('.github/workflows/gen6-interwoven-qa.yml').write_text('''name: Gen6 interwoven private preview
-          on:
-            push:
-              branches: ['preview/gen6-interwoven-20260927']
-              paths: ['tools/gen6/**', 'tools/build_gen6*', 'tests/interwoven/**', 'content/gen6/round3-interwoven/**', 'preview/gen6/**']
-          permissions:
-            contents: read
-          jobs:
-            acceptance:
-              runs-on: ubuntu-latest
-              timeout-minutes: 8
-              steps:
-                - uses: actions/checkout@v4
-                  with:
-                    persist-credentials: false
-                - uses: actions/setup-python@v5
-                  with:
-                    python-version: '3.13'
-                - run: python -m unittest discover -s tests/interwoven -v
-                - run: python tools/build_gen6_interwoven_preview.py
-                - run: python -m pip install 'playwright==1.55.0'
-                - run: python -m playwright install --with-deps chromium
-                - run: python tools/test_gen6_eight_browser.py --output /tmp/interwoven-browser
-                - uses: actions/upload-artifact@v4
-                  if: always()
-                  with:
-                    name: interwoven-browser
-                    path: /tmp/interwoven-browser
-                    retention-days: 7
-          ''')
-          PY
-          git add content/gen6/round3-interwoven preview/gen6/index.html preview/gen6/preview.js tests/interwoven/test_interwoven.py tools/build_gen6_interwoven_preview.py tools/build_gen6_preview.py tools/gen6/interwoven.py tools/gen6/interwoven_geometry.cpp vercel.json docs/gen6/INTERWOVEN-BROWSER-QA-20260927.json .github/workflows/gen6-interwoven-qa.yml tools/interwoven-reviewed.patch.xz.b64
+          git rm tools/interwoven-reviewed.patch.xz.b64
+          git add content/gen6/round3-interwoven preview/gen6/index.html preview/gen6/preview.js tests/interwoven/test_interwoven.py tools/build_gen6_interwoven_preview.py tools/build_gen6_preview.py tools/gen6/interwoven.py tools/gen6/interwoven_geometry.cpp vercel.json docs/gen6/INTERWOVEN-BROWSER-QA-20260927.json
           git diff --cached --check
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: private interwoven Mozkokalypsa revision with natural vocabulary and complete browser proof'
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: private interwoven eight-board refresh with verified vocabulary, geometry and mouse/touch flow'
           git push origin HEAD:refs/heads/preview/gen6-interwoven-20260927
-          git rev-parse HEAD > /tmp/interwoven-evidence/VERIFIED_HEAD.txt
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: gen6-interwoven-acceptance
-          path: /tmp/interwoven-evidence
-          retention-days: 7
