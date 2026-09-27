@@ -119,8 +119,18 @@ self.addEventListener('notificationclick',event=>{
   const openTarget=(async()=>{
     const clientsList=await self.clients.matchAll({type:'window',includeUncontrolled:true});
     for(const client of clientsList){
-      if('navigate' in client){try{await client.navigate(target)}catch{}}
-      if('focus' in client)return client.focus();
+      try{
+        let targetClient=client;
+        if('navigate' in client){
+          const navigatedClient=await client.navigate(target);
+          if(!navigatedClient)continue;
+          targetClient=navigatedClient;
+        }
+        if('focus' in targetClient){
+          const focusedClient=await targetClient.focus();
+          if(focusedClient)return focusedClient;
+        }
+      }catch{}
     }
     return self.clients.openWindow(target);
   })();
