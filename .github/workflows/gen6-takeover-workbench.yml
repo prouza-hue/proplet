@@ -5,93 +5,65 @@ on:
     paths: ['.github/workflows/gen6-takeover-workbench.yml']
 permissions:
   contents: write
-  actions: read
 jobs:
-  acceptance:
+  controls:
     if: github.ref == 'refs/heads/chore/gen6-takeover-workbench-20260927'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Verify reviewed patches and unchanged target
+      - name: Apply only the reviewed control patch on the verified head
         run: |
           set -euo pipefail
-          mkdir -p /tmp/gen6-evidence
-          cp tools/eight-touch.patch /tmp/eight-touch.patch
-          python - <<'PY'
-          import base64,hashlib,lzma
-          from pathlib import Path
-          patch=lzma.decompress(base64.b64decode(Path('tools/eight-code.patch.xz.b64').read_text()))
-          assert hashlib.sha256(patch).hexdigest()=='e33f4bc82802b3d5b4a3a3bd6f9001341e0ea23d9a9517bac05d99e2e229c9a3'
-          Path('/tmp/eight-code.patch').write_bytes(patch)
-          PY
+          mkdir -p /tmp/gen6-controls
+          cp tools/eight-loupe.patch /tmp/eight-loupe.patch
+          echo 'a3d094044a45836fafbfc0e1a131e30ea125adfee9d8ca4194ec32f819d8eb1d  /tmp/eight-loupe.patch' | sha256sum -c -
           git fetch origin preview/gen6-lexicon-v3-20260926
-          test "$(git rev-parse FETCH_HEAD)" = '84d2e75076d8422db03c8f229db19523da039acf'
+          test "$(git rev-parse FETCH_HEAD)" = '12e49780f4c2944b2574254b64d98a9dc0acf580'
           git checkout -B preview/gen6-lexicon-v3-20260926 FETCH_HEAD
-          git rev-parse HEAD > /tmp/gen6-evidence/BASE_SHA.txt
-          git apply --check /tmp/eight-code.patch
-          git apply /tmp/eight-code.patch
-          git apply --check /tmp/eight-touch.patch
-          git apply /tmp/eight-touch.patch
+          git rev-parse HEAD > /tmp/gen6-controls/BASE_SHA.txt
+          git apply --check /tmp/eight-loupe.patch
+          git apply /tmp/eight-loupe.patch
           git diff --check
-      - uses: actions/download-artifact@v4
-        with:
-          name: gen6-eight-acceptance
-          run-id: 36282086177
-          github-token: ${{ github.token }}
-          path: /tmp/previous-eight
-      - name: Reuse the proven bank without regenerating unchanged content
-        run: |
-          set -euo pipefail
-          cp /tmp/previous-eight/{bank,verification}.json content/gen6/round3-eight/
           python - <<'PY'
           import json
           from pathlib import Path
           from tools.gen6.full_catalog import FullCatalog
-          b=json.loads(Path('content/gen6/round3-eight/bank.json').read_text())
-          r=json.loads(Path('content/gen6/round3-eight/verification.json').read_text())
-          assert b['contentHash']=='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
-          assert r['frozenInputs']==FullCatalog().input_hashes(), 'Manufacturing inputs changed; existing proof cannot be reused'
-          assert len(b['boards'])==8
+          report=json.loads(Path('content/gen6/round3-eight/verification.json').read_text())
+          assert report['frozenInputs']==FullCatalog().input_hashes(), 'Manufacturing inputs changed'
           PY
-          cp /tmp/previous-eight/manufacture.txt /tmp/gen6-evidence/manufacture-independent-replay.txt
-          cp content/gen6/round3-eight/{bank,verification}.json /tmp/gen6-evidence/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install 'wordfreq==3.1.1' 'playwright==1.55.0'
       - run: python -m playwright install --with-deps chromium
-      - name: Package acceptance and isolated build
+      - name: Rebuild without generating or changing any board
         run: |
-          set -euo pipefail
-          python -m unittest discover -s tests/lexicon_v3 -v 2>&1 | tee /tmp/gen6-evidence/lexicon-tests.txt
-          python -m unittest discover -s tests/gen6 -v 2>&1 | tee /tmp/gen6-evidence/gen6-tests.txt
           node --check preview/gen6/preview.js
-          python tools/build_gen6_eight_preview.py | tee /tmp/gen6-evidence/build.txt
-      - name: Real mouse, phone-touch and Fold-touch acceptance
-        run: python tools/test_gen6_eight_browser.py --output /tmp/gen6-evidence/browser
-      - name: Commit the verified files only to the preview branch
+          python tools/build_gen6_eight_preview.py > /tmp/gen6-controls/build.txt
+      - name: Phone and Fold touch controls including visible loupe state
+        run: python tools/test_gen6_eight_browser.py --touch-only --output /tmp/gen6-controls/browser
+      - name: Save the verified preview controls and evidence
         run: |
           set -euo pipefail
-          cp /tmp/gen6-evidence/browser/report.json docs/gen6/EIGHT-BROWSER-QA-20260927.json
           python - <<'PY'
           import json
           from pathlib import Path
-          p=Path('docs/gen6/EIGHT-BROWSER-QA-20260927.json'); r=json.loads(p.read_text())
-          assert r['status']=='PASS'
+          r=json.loads(Path('/tmp/gen6-controls/browser/report.json').read_text())
+          assert r['status']=='PASS' and r['scope']=='touch-controls-only'
           r['ciRun']='https://github.com/prouza-hue/proplet/actions/runs/${{ github.run_id }}'
+          r['previousFullAcceptance']='https://github.com/prouza-hue/proplet/actions/runs/36282583649'
           r['bankContentHash']='c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223'
-          r['independentFullSeriesReplayRun']='https://github.com/prouza-hue/proplet/actions/runs/36282086177'
-          p.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
+          Path('docs/gen6/EIGHT-CONTROLS-QA-20260927.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
           PY
-          git add content/gen6/round3-eight/README.md content/gen6/round3-eight/bank.json content/gen6/round3-eight/replay.json content/gen6/round3-eight/selection-policy.json content/gen6/round3-eight/verification.json content/gen6/round3-eight/wordfreq-manifest.json content/lexicon-v3/working/editorial-addendum-20260927.json preview/gen6/data-sources.html preview/gen6/index.html preview/gen6/preview.js tests/gen6/test_eight_package.py tools/build_gen6_eight_preview.py tools/build_gen6_preview.py tools/gen6/eight.py tools/gen6/full_catalog.py tools/gen6/recognition_snapshot.py tools/test_gen6_eight_browser.py vercel.json docs/gen6/EIGHT-BROWSER-QA-20260927.json
+          git add preview/gen6/index.html preview/gen6/preview.js tools/test_gen6_eight_browser.py content/gen6/round3-eight/README.md docs/gen6/EIGHT-CONTROLS-QA-20260927.json
           git diff --cached --check
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: eight fresh demanding boards from complete Lexikon v3 with solver and real mouse/touch acceptance'
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'fix: mirror native magnifier icon and state in verified phone and Fold preview'
           git push origin HEAD:refs/heads/preview/gen6-lexicon-v3-20260926
-          git rev-parse HEAD > /tmp/gen6-evidence/COMMITTED_SHA.txt
+          git rev-parse HEAD > /tmp/gen6-controls/COMMITTED_SHA.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: gen6-eight-acceptance
-          path: /tmp/gen6-evidence
+          name: gen6-eight-controls
+          path: /tmp/gen6-controls
           retention-days: 7
