@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "true",
-  "buildCommand": "python tools/build_gen6_preview.py --bank content/gen6/mozkokalypsa-v3-preview.json --recognition content/gen6/recognition-words.txt",
+  "installCommand": "python -m pip install --disable-pip-version-check wordfreq==3.1.1",
+  "buildCommand": "python tools/build_gen6_eight_preview.py",
   "outputDirectory": null,
   "crons": []
 }

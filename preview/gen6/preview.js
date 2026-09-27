@@ -37,6 +37,30 @@ const previewInput=window.PropletGameInput.create({getGame:()=>currentGame,neigh
 const previewHints=window.PropletGameHints.create({getGame:()=>currentGame});
 function fitGameBoard(){return previewBoard.fit()}
 function drawPaths(){return previewBoard.drawPaths()}
+// Touch browsers can suppress a compatibility click after a board drag.
+// Activate a stationary touch release, and consume only its duplicate click.
+// Keyboard (detail=0) and ordinary mouse activation still use the click path.
+function previewBindAction(button,action){
+  let pressed=null,lastTouch=-Infinity;
+  button.addEventListener('pointerdown',e=>{
+    pressed=e.pointerType==='touch'&&e.isPrimary!==false?{id:e.pointerId,x:e.clientX,y:e.clientY}:null;
+  });
+  button.addEventListener('pointermove',e=>{
+    if(pressed&&e.pointerId===pressed.id&&Math.hypot(e.clientX-pressed.x,e.clientY-pressed.y)>12)pressed=null;
+  });
+  button.addEventListener('pointercancel',()=>{pressed=null});
+  button.addEventListener('pointerup',e=>{
+    const down=pressed;pressed=null;
+    if(!down||e.pointerId!==down.id||button.disabled)return;
+    const r=button.getBoundingClientRect();
+    if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>12||e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
+    lastTouch=performance.now();action(e);
+  });
+  button.addEventListener('click',e=>{
+    if(e.detail!==0&&performance.now()-lastTouch<700){e.preventDefault();return}
+    action(e);
+  });
+}
 function previewCount(n,one,few,many){return `${n} ${n===1?one:n>=2&&n<=4?few:many}`}
 function previewTime(ms){const s=Math.floor(ms/1000);return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function previewMessage(text,kind=''){const el=previewQuery('#gameMessage');el.textContent=text;el.className=`game-message ${kind}`}
@@ -53,7 +77,9 @@ function previewHud(){
   previewQuery('#gameProgress').textContent=`${g.found.length}/${g.puzzle.answers.length}`;
   previewQuery('#moves').textContent=previewCount(g.moves,'tah','tahy','tahů');
   previewQuery('#cleanStatus').textContent=g.hints?'S nápovědou':'Čistě';
-  previewQuery('#hintBtn').textContent=g.hints?`💡 ${g.hints}×`:'💡 Nápověda';
+  const hintLabel=g.hints?`💡 ${g.hints}×`:'💡 Nápověda',hintButton=previewQuery('#hintBtn');
+  // Do not replace a touched label node on every clock tick.
+  if(hintButton.textContent!==hintLabel)hintButton.textContent=hintLabel;
   previewQuery('#timer').textContent=previewTime(previewSession.elapsed(g));
   previewQuery('#magnifierQuickBtn').classList.toggle('hidden',!previewInput.magnifierAvailable());
   previewQuery('#magnifierQuickBtn').setAttribute('aria-pressed',String(previewSettings.magnifier));
@@ -111,23 +137,24 @@ function resumeGameClock(){
   const ok=previewSession.resume({screen:previewScreen,visibilityState:document.visibilityState,focused:document.hasFocus(),onResume:()=>previewSession.startTimer(()=>previewHud(),250)});
   if(ok)previewQuery('#gamePauseCover').hidden=true;return ok;
 }
-previewQuery('#backFromGame').addEventListener('click',previewMenu);
-previewQuery('#finishMenu').addEventListener('click',previewMenu);
-previewQuery('#nextBoard').addEventListener('click',()=>{const next=previewBank.boards[previewBank.boards.indexOf(currentGame.puzzle)+1];previewQuery('#finishModal').classList.add('hidden');next?previewStart(next):previewMenu()});
-previewQuery('#calmRunBtn').addEventListener('click',()=>{const on=document.body.classList.toggle('preview-calm');previewQuery('#calmRunBtn').setAttribute('aria-pressed',String(on))});
-previewQuery('#magnifierQuickBtn').addEventListener('click',()=>{previewSettings.magnifier=!previewSettings.magnifier;if(!previewSettings.magnifier)previewInput.hideMagnifier();previewHud()});
-previewQuery('#hintBtn').addEventListener('click',()=>{if(currentGame&&!currentGame.finished){previewQuery('#hintModal').classList.remove('hidden');previewQuery('#hintChoices button').focus()}});
-previewHints.choices('default').forEach((row,index)=>{const button=document.createElement('button');button.innerHTML=`<strong>${previewEscape(row[0])}</strong><small>${previewEscape(row[1])}</small>`;button.addEventListener('click',()=>{
+previewBindAction(previewQuery('#backFromGame'),previewMenu);
+previewBindAction(previewQuery('#finishMenu'),previewMenu);
+previewBindAction(previewQuery('#nextBoard'),()=>{const next=previewBank.boards[previewBank.boards.indexOf(currentGame.puzzle)+1];previewQuery('#finishModal').classList.add('hidden');next?previewStart(next):previewMenu()});
+previewBindAction(previewQuery('#calmRunBtn'),()=>{const on=document.body.classList.toggle('preview-calm');previewQuery('#calmRunBtn').setAttribute('aria-pressed',String(on))});
+previewBindAction(previewQuery('#magnifierQuickBtn'),()=>{previewSettings.magnifier=!previewSettings.magnifier;if(!previewSettings.magnifier)previewInput.hideMagnifier();previewHud()});
+previewBindAction(previewQuery('#hintBtn'),()=>{if(currentGame&&!currentGame.finished){previewQuery('#hintModal').classList.remove('hidden');previewQuery('#hintChoices button').focus()}});
+previewHints.choices('default').forEach((row,index)=>{const button=document.createElement('button');button.innerHTML=`<strong>${previewEscape(row[0])}</strong><small>${previewEscape(row[1])}</small>`;previewBindAction(button,()=>{
   previewQuery('#hintModal').classList.add('hidden');previewClearHints();const plan=previewHints.applyState(index+1);if(!plan)return;
   const {path,pick,level}=plan;(level===1?path.slice(0,1):level===2?path.slice(0,3):path).forEach((i,n)=>{const c=previewQuery(`.cell[data-index="${i}"]`);c.classList.add(level===1?'hint':level===2?'hint-route':'hint-full');if(level>1&&n<3){c.classList.add('hint-route');c.dataset.hintOrder=String(n+1)}});
   previewMessage(level===3?`Je to „${pick.a.word}“. Cesta na chvíli svítí.`:level===2?`První tři kroky svítí. Slovo má ${pick.a.word.length} písmen.`:`Začni na ${pick.a.word[0]}. Hledáš slovo o ${pick.a.word.length} písmenech.`);previewHud();previewPersist();previewHintTimer=setTimeout(previewClearHints,level===3?3600:2600);previewQuery('#hintBtn').focus();
 });previewQuery('#hintChoices').appendChild(button)});
-previewQueryAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{previewQuery('#'+b.dataset.close).classList.add('hidden');previewQuery('#hintBtn').focus()}));
+previewQueryAll('[data-close]').forEach(b=>previewBindAction(b,()=>{previewQuery('#'+b.dataset.close).classList.add('hidden');previewQuery('#hintBtn').focus()}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){previewQuery('#hintModal').classList.add('hidden');previewQuery('#hintBtn').focus()}});
 document.addEventListener('pointermove',previewInput.pointerMove,{passive:true});document.addEventListener('pointerup',previewInput.pointerUp);
 document.addEventListener('pointercancel',()=>{if(!currentGame)return;currentGame.dragging=false;currentGame.path=[];previewInput.hideMagnifier();previewUpdateActive()});
 document.addEventListener('visibilitychange',()=>document.hidden?pauseGameClock():resumeGameClock());window.addEventListener('blur',()=>pauseGameClock());window.addEventListener('focus',resumeGameClock);window.addEventListener('pagehide',()=>previewPersist());
 new ResizeObserver(()=>{if(previewScreen==='game'){fitGameBoard();drawPaths();previewHud()}}).observe(previewQuery('#boardStage'));
-if(previewBank?.kind!=='gen6-unpublished-preview'||previewBank?.status!=='verified-unpublished'||previewBank.boards?.length!==12)throw new Error('Preview requires the verified 12-board Gen6 package.');
-previewQuery('#previewEvidence').textContent='12 nových desek. Každá má 100 políček a 14 slov.';
+const expectedCount=previewBank?.edition==='lexicon-v3-eight-v1'?8:12;
+if(previewBank?.kind!=='gen6-unpublished-preview'||previewBank?.status!=='verified-unpublished'||previewBank.boards?.length!==expectedCount)throw new Error('Preview requires the complete verified Gen6 package.');
+previewQuery('#previewEvidence').textContent=`${expectedCount} nových desek. Každá má 100 políček a 14 slov.`;
 previewRenderMenu();

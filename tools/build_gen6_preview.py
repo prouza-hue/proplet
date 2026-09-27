@@ -40,8 +40,13 @@ def verify_bank(bank):
     if not re.fullmatch(r'[0-9a-f]{40}', bank.get('sourceSha', '')):
         raise ValueError('Missing exact source revision')
     boards = bank.get('boards', [])
-    if len(boards) != 12 or [b.get('id') for b in boards] != [f'mk3-{i:02d}' for i in range(1, 13)]:
-        raise ValueError('Preview requires all 12 stable round-three board IDs')
+    eight = bank.get('edition') == 'lexicon-v3-eight-v1'
+    count, prefix = (8, 'mk3v3-') if eight else (12, 'mk3-')
+    if len(boards) != count or [b.get('id') for b in boards] != [f'{prefix}{i:02d}' for i in range(1, count + 1)]:
+        raise ValueError('Preview requires the complete stable board IDs for this edition')
+    if eight and (bank.get('experimentId') != 'mozkokalypsa-round3-lexicon-v3-8'
+                  or not re.fullmatch(r'[0-9a-f]{64}', bank.get('lexiconHash', ''))):
+        raise ValueError('Missing full-Lexikon-v3 edition provenance')
     if bank.get('contentHash') != digest(boards):
         raise ValueError('Bank content hash mismatch')
     hashes = set()
@@ -113,13 +118,14 @@ def build(bank_path, recognition_path=None, output=None):
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, target)
         fingerprints['public/' + name] = hashlib.sha256(src.read_bytes()).hexdigest()
-    for name in ('index.html', 'preview.css', 'preview.js', 'layout-check.html', 'layout-check.js'):
+    for name in ('index.html', 'preview.css', 'preview.js', 'layout-check.html', 'layout-check.js', 'data-sources.html'):
         shutil.copyfile(ROOT/'preview/gen6'/name, static/name)
     # Data as same-origin script allows connect-src 'none': no fetch, XHR, beacon,
     # WebSocket or service-worker path can send gameplay data anywhere.
     payload = json.dumps(bank, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
     recognition = json.dumps(words, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
-    (static/'bank.js').write_text('window.PROPLET_GEN6_PREVIEW=' + payload + ';\nwindow.PROPLET_GEN6_RECOGNITION=' + recognition + ';\n', encoding='utf-8')
+    (static/'bank.js').write_text('window.PROPLET_GEN6_PREVIEW=' + payload + ';\n', encoding='utf-8')
+    (static/'recognition.js').write_text('/* Recognition data: see data-sources.html. */\nwindow.PROPLET_GEN6_RECOGNITION=' + recognition + ';\n', encoding='utf-8')
     (static/'404.html').write_text('<!doctype html><html lang="cs"><meta charset="utf-8"><title>Proplet preview</title><p>Tato adresa není součástí izolovaného náhledu.</p></html>', encoding='utf-8')
     config = {'version': 3, 'routes': [
         {'src': '/api(?:/.*)?', 'status': 404},
@@ -128,7 +134,7 @@ def build(bank_path, recognition_path=None, output=None):
         {'src': '/(.*)', 'dest': '/404.html', 'status': 404},
     ]}
     (output/'config.json').write_text(json.dumps(config, indent=2) + '\n', encoding='utf-8')
-    report = {'kind': 'gen6-static-preview-build', 'sourceSha': bank['sourceSha'], 'bankContentHash': bank['contentHash'], 'recognitionWords': len(words), 'recognitionFileSha256': hashlib.sha256(raw).hexdigest(), 'boards': 12, 'serverFunctions': 0, 'accounts': False, 'productionWrites': False, 'gameplayNetworkConnections': False, 'externalFonts': 'Google Fonts: original Fraunces / Outfit styles', 'runtimeAssets': fingerprints}
+    report = {'kind': 'gen6-static-preview-build', 'sourceSha': bank['sourceSha'], 'bankContentHash': bank['contentHash'], 'recognitionWords': len(words), 'recognitionFileSha256': hashlib.sha256(raw).hexdigest(), 'boards': len(bank['boards']), 'serverFunctions': 0, 'accounts': False, 'productionWrites': False, 'gameplayNetworkConnections': False, 'externalFonts': 'Google Fonts: original Fraunces / Outfit styles', 'runtimeAssets': fingerprints}
     (output/'preview-build.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return report
 
