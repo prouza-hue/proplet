@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "python -c \"print('Using verified offline recognition data')\"",
-  "buildCommand": "python tools/build_gen6_eight_preview.py",
+  "buildCommand": "python tools/build_gen6_interwoven_preview.py",
   "outputDirectory": null,
   "crons": []
 }

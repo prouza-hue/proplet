@@ -159,7 +159,7 @@ document.addEventListener('pointermove',previewInput.pointerMove,{passive:true})
 document.addEventListener('pointercancel',()=>{if(!currentGame)return;currentGame.dragging=false;currentGame.path=[];previewInput.hideMagnifier();previewUpdateActive()});
 document.addEventListener('visibilitychange',()=>document.hidden?pauseGameClock():resumeGameClock());window.addEventListener('blur',()=>pauseGameClock());window.addEventListener('focus',resumeGameClock);window.addEventListener('pagehide',()=>previewPersist());
 new ResizeObserver(()=>{if(previewScreen==='game'){fitGameBoard();drawPaths();previewHud()}}).observe(previewQuery('#boardStage'));
-const expectedCount=previewBank?.edition==='lexicon-v3-eight-v1'?8:12;
+const expectedCount=['lexicon-v3-eight-v1','lexicon-v3-eight-interwoven-v2'].includes(previewBank?.edition)?8:12;
 if(previewBank?.kind!=='gen6-unpublished-preview'||previewBank?.status!=='verified-unpublished'||previewBank.boards?.length!==expectedCount)throw new Error('Preview requires the complete verified Gen6 package.');
 previewQuery('#previewEvidence').textContent=`${expectedCount} nových desek. Každá má 100 políček a 14 slov.`;
 previewRenderMenu();

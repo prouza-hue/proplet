@@ -1,0 +1,32 @@
+name: Gen6 interwoven private preview
+on:
+  push:
+    branches: ['preview/gen6-interwoven-20260927']
+    paths: ['tools/gen6/**', 'tools/build_gen6*', 'tests/interwoven/**', 'content/gen6/round3-interwoven/**', 'preview/gen6/**']
+permissions:
+  contents: read
+concurrency:
+  group: gen6-interwoven-private
+  cancel-in-progress: true
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m unittest discover -s tests/interwoven -v
+      - run: python tools/build_gen6_interwoven_preview.py
+      - run: python -m pip install 'playwright==1.55.0'
+      - run: python -m playwright install --with-deps chromium
+      - run: python tools/test_gen6_eight_browser.py --output /tmp/interwoven-browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: interwoven-browser
+          path: /tmp/interwoven-browser
+          retention-days: 7
