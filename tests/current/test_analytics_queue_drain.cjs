@@ -50,8 +50,11 @@ test('transient rejection retains events and obeys server retry backoff', async 
   env.advance(60000); await env.controller.flush();
   assert.equal(env.calls.length, 1);
   env.advance(60000); await env.controller.flush();
-  assert.equal(env.calls.length, 3);
-  assert.equal(env.calls[1].headers['X-Proplet-Event-ID'], eventId, 'retry preserves idempotency key');
+  assert.equal(env.calls.length, 2);
+  assert.equal(env.calls[1].path, '/api/product-events');
+  const retried=JSON.parse(env.calls[1].body).events;
+  assert.equal(retried.length, 2);
+  assert(retried.some(event=>event.id===eventId), 'batch retry preserves idempotency key');
   assert.deepEqual(env.rows(), []);
 });
 

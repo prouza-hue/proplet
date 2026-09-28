@@ -43,8 +43,9 @@ const server=http.createServer(async(req,res)=>{
   if(p.startsWith('/api/')){
    const data=['GET','HEAD'].includes(req.method)?null:await body(req);
    requests.push({method:req.method,path:p,headers:req.headers,at:Date.now()});
-   if(['/api/product-event','/api/challenge-event'].includes(p)&&req.method==='POST'){
-    if(data.event_type!=='account_created')events.push({endpoint:p,event:data.event_type,headers:req.headers,at:Date.now()});
+   if(['/api/product-event','/api/product-events','/api/challenge-event'].includes(p)&&req.method==='POST'){
+    const batch=p==='/api/product-events'?(Array.isArray(data.events)?data.events:[]):[data];
+    for(const item of batch)if(item.event_type!=='account_created')events.push({endpoint:p,event:item.event_type,headers:req.headers,at:Date.now()});
     return setTimeout(()=>json(res,200,{ok:true,synthetic:true}),controls.eventDelayMs);
    }
    if(p==='/api/config')return json(res,200,config);

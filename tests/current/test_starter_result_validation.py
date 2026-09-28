@@ -15,7 +15,7 @@ TOKEN = 'starter-result-synthetic-token'
 PLAYER = '00000000-0000-4000-8000-000000000099'
 rows = {'players': [{'id': PLAYER, 'name': 'Synthetic starter', 'family_code': 'SOLO_TEST',
                     'token_hash': hashlib.sha256(TOKEN.encode()).hexdigest()}]}
-def select(table, **filters):
+def select(table, columns="*", **filters):
     return [dict(row) for row in rows.get(table, []) if all(row.get(k) == v for k, v in filters.items())]
 def insert(table, values):
     rows.setdefault(table, []).append(dict(values))

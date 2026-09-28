@@ -448,6 +448,14 @@
       {
         "path": "tests/current/test_usage_p0_client.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_usage_p1.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_usage_p1_client.cjs",
+        "runner": "node"
       }
     ]
   },

@@ -51,7 +51,9 @@ assert "from backend.contracts import (" in server
 for model in ("ResultCreate", "AttemptStart", "AttemptCheckpoint", "AttemptFinishTelemetry"):
     assert re.search(rf"^    {model},$", server, re.M), f"server must import {model}"
 assert '"calm_mode": bool(payload.calm_mode)' in server
-assert 'values["calm_mode"] = bool(row.get("calm_mode") is True or payload.calm_mode)' in server
+assert '"p_calm_mode": payload.calm_mode' in server
+assert '"p_event_type": payload.event_type' in server
+assert 'db_rpc("proplet_attempt_checkpoint_v1"' in server
 
 # Calm Mode stays in personal data but is cut out of every competitive source.
 assert "def competitive_row(row: dict) -> bool:" in server

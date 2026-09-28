@@ -79,5 +79,5 @@ with patch.object(server, "VERCEL_ENV", "production"), \
 assert first == second
 assert first["heartbeatMs"] == 25_000 and first["leaseMs"] == 45_000
 assert len(policy_reads) == 1
-assert policy_reads == [("fair_play_policy", {"singleton": True})]
+assert policy_reads == [("fair_play_policy", {"columns": "enabled,daily_from", "singleton": True})]
 print("PASS compact account snapshot contract and minute-bucket fair-play policy cache")

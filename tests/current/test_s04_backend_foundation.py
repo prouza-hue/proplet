@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot"}
+        if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -88,6 +88,10 @@ assert "/api/account/welcome" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/account/welcome")
 assert "/api/account/snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/account/snapshot")
+assert "/api/product-events" in openapi_contract["paths"]
+openapi_contract["paths"].pop("/api/product-events")
+for model in ("ProductEventBatch", "ProductEventBatchItem"):
+    openapi_contract["components"]["schemas"].pop(model)
 # Additive session endpoints have separate real HTTP/SQL acceptance tests.
 for path in ("/api/play-session", "/api/play-session/config"):
     assert path in openapi_contract["paths"]

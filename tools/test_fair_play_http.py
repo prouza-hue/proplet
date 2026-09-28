@@ -24,7 +24,7 @@ def query(statement,values=()):
   c.execute('set local role service_role');return c.execute(statement,values).fetchall()
 player=str(uuid.uuid4());query("insert into players(id,name,family_code,token_hash) values(%s,'Synthetic session',%s,%s) returning id",(player,'SOLO_'+player[:8].upper(),player))
 query("update fair_play_policy set enabled=true,daily_from='2026-09-15' returning singleton")
-def select(table,**filters):
+def select(table,columns="*",**filters):
  clauses=sql.SQL(' and ').join(sql.SQL('{}=%s').format(sql.Identifier(k)) for k in filters) or sql.SQL('true')
  return [r[0] for r in query(sql.SQL('select to_jsonb(t) from {} t where {}').format(sql.Identifier(table),clauses),list(filters.values()))]
 def rpc(name,body):

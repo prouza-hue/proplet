@@ -34,8 +34,8 @@ if implemented:
     assert registry["events"] == FIXTURE["events"]
     assert registry["request_fields"] == ["event_type"]
     assert registry["pii_policy"]["custom_properties_sent"] is False
-    assert '/app/analytics.js?v=startermeasure1' in INDEX
-    assert "'/app/analytics.js?v=startermeasure1'" in SW
+    assert '/app/analytics.js?v=usagep1' in INDEX
+    assert "'/app/analytics.js?v=usagep1'" in SW
     assert "let productAnalyticsController=null;" in APP
     assert "function productAnalytics()" in APP
     assert "controller.track(eventType,properties)" in APP

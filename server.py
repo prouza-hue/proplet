@@ -68,6 +68,7 @@ from backend.contracts import (
     PlayerCreate,
     PlayerLogin,
     ProductEventCreate,
+    ProductEventBatch,
     PublicRankingsSet,
     PushSubscriptionCreate,
     PushUnsubscribe,
@@ -110,6 +111,11 @@ STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
 FAIR_PLAY_HEARTBEAT_MS = 25_000
 FAIR_PLAY_LEASE_MS = 45_000
+PLAYER_COLUMNS = "id,name,family_code,token_hash,created_at,password_hash,avatar,support_mode,team_joined_at,public_rankings,email,email_verified_at,auth_user_id,google_avatar_url,use_google_avatar,printshop_welcome_seen_at"
+SESSION_AUTH_COLUMNS = "id,player_id,expires_at,last_used_at"
+RESULT_PROGRESS_COLUMNS = "id,puzzle_id,challenge_key,mode,difficulty,daily_date,best_elapsed_ms,best_moves,points,completed_at,hints_used,clean_solve,wrong_attempts,max_hint_level,content_generation,content_level,calm_mode,timing_verified"
+REWARD_STATS_COLUMNS = "id,points,reward_key,reward_word"
+RESCUE_COLUMNS = "id,missed_date,puzzle_id,status,started_at,completed_at,elapsed_ms"
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
 TAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)
 GEN4_RETURNING_BONUS_XP = 500
@@ -137,7 +143,7 @@ async def launch_safety_middleware(request: Request, call_next):
     path = request.scope["path"]
     if VERCEL_ENV == "preview" and not isolated_fair_play_preview() and request.method == "POST" and path == "/api/play-session":
         return JSONResponse({"detail":"Preview nemá oddělené herní úložiště."},status_code=409)
-    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and path == "/api/anonymous/claim") and request.method == "POST" and path in {"/api/product-event","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and path == "/api/anonymous/claim") and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
     if ((VERCEL_ENV == "preview" and not isolated_fair_play_preview()) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
@@ -246,8 +252,8 @@ def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
     )
 
 
-def db_select(table: str, **filters):
-    return backend_db.db_select(table, db_request, **filters)
+def db_select(table: str, *, columns: str = "*", **filters):
+    return backend_db.db_select(table, db_request, columns=columns, **filters)
 
 
 def db_select_all(table: str, **filters):
@@ -501,13 +507,13 @@ def auth_player(authorization: Optional[str]) -> dict:
     token_hash = hashlib.sha256(token.encode()).hexdigest()
 
     # Legacy/main-device token stays valid forever, so the v3.3 migration does not log anyone out.
-    rows = db_select("players", token_hash=token_hash)
+    rows = db_select("players", columns=PLAYER_COLUMNS, token_hash=token_hash)
     if rows:
         return rows[0]
 
     # Additional devices get independent session tokens. A database outage must not
     # masquerade as a bad password/session and accidentally log the user out.
-    sessions = db_select("player_sessions", token_hash=token_hash)
+    sessions = db_select("player_sessions", columns=SESSION_AUTH_COLUMNS, token_hash=token_hash)
     if sessions:
         session = sessions[0]
         now = datetime.now(TZ)
@@ -524,7 +530,7 @@ def auth_player(authorization: Optional[str]) -> dict:
                 db_update("player_sessions", {"id": session["id"]}, {"last_used_at": now.isoformat()})
             except HTTPException:
                 pass
-        players = db_select("players", id=session["player_id"])
+        players = db_select("players", columns=PLAYER_COLUMNS, id=session["player_id"])
         if players:
             return players[0]
     raise HTTPException(401, "Neplatné přihlášení hráče")
@@ -605,13 +611,13 @@ def streak_ending_on(date_strings: list[str] | set[str], anchor: date) -> int:
 
 
 def rescue_rows(player_id: str) -> list[dict]:
-    return db_select("streak_rescues", player_id=player_id)
+    return db_select("streak_rescues", columns=RESCUE_COLUMNS, player_id=player_id)
 
 
 def player_reward_stats(player_id: str) -> dict:
     """One server-owned breakdown for every non-result XP source."""
     try:
-        rewards = db_select("account_rewards", player_id=player_id)
+        rewards = db_select("account_rewards", columns=REWARD_STATS_COLUMNS, player_id=player_id)
         included = True
     except HTTPException:
         # Rolling-deploy compatibility only. Clients may temporarily retain their legacy
@@ -633,7 +639,7 @@ def player_stats(
     # Public stats keys remain owned by the core: "xpAuthoritative",
     # "resultXp", "accountBonusXp", "wordDiscoveryXp", "discoveredWords".
     # Serialization aliases remain: "freeBasePlayedCurrent": free_slots["baseCurrent"].
-    rows = prefetched_results if prefetched_results is not None else db_select("results", player_id=player_id)
+    rows = prefetched_results if prefetched_results is not None else db_select("results", columns=RESULT_PROGRESS_COLUMNS, player_id=player_id)
     repair_plan = gen4_free_reward_repair_plan(rows)
     if repair_plan["updates"]:
         # Intentionally omit player/result identifiers: this is an aggregate
@@ -2081,6 +2087,57 @@ def product_event(
         raise HTTPException(400, "Neplatný product event") from None
     return {"ok": True}
 
+
+@app.post("/api/product-events")
+def product_events(
+    payload: ProductEventBatch,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID"),
+):
+    """Persist a small offline analytics drain in one PostgREST write."""
+    enforce_rate_limit(request, "product_events", limit=120, window_seconds=3600)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
+    now = datetime.now(TZ)
+    rows: list[dict] = []
+    seen_ids: set[str] = set()
+
+    def collect_event(table: str, row: dict):
+        enriched = measurement.enrich(table, row)
+        # Batch item identity/time is authoritative; a shared request header must
+        # never overwrite every row with the same event id.
+        enriched["id"] = row["id"]
+        enriched["created_at"] = row["created_at"]
+        rows.append(enriched)
+        return row
+
+    try:
+        for item in payload.events:
+            event_id = str(uuid.UUID(item.id))
+            event_time = parse_timestamp(item.created_at)
+            if event_id in seen_ids or event_time is None or not (now-timedelta(days=7) <= event_time <= now+timedelta(minutes=5)):
+                raise ValueError
+            seen_ids.add(event_id)
+            product_analytics.record_product_event(
+                item.event_type,
+                actor=actor,
+                app_version=client_app_version(request),
+                insert_fn=collect_event,
+                event_id=event_id,
+                created_at=min(event_time, now).isoformat(),
+            )
+    except (ValueError, product_analytics.UnknownProductEvent):
+        raise HTTPException(400, "Neplatná dávka product eventů") from None
+
+    db_request(
+        "POST",
+        "product_events",
+        body=rows,
+        prefer="resolution=ignore-duplicates,return=minimal",
+    )
+    return {"ok": True, "accepted": len(rows)}
+
+
 @app.post("/api/team-pin")
 def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_pin_set", limit=12, window_seconds=3600)
@@ -2152,13 +2209,13 @@ def logout(request: Request, authorization: Optional[str] = Header(default=None)
         return {"ok": True}
     token = authorization.split(" ", 1)[1].strip()
     token_hash = hashlib.sha256(token.encode()).hexdigest()
-    sessions = db_select("player_sessions", token_hash=token_hash)
+    sessions = db_select("player_sessions", columns=SESSION_AUTH_COLUMNS, token_hash=token_hash)
     if sessions:
         db_delete("player_sessions", id=sessions[0]["id"])
         return {"ok": True}
     # The original device token lives on players. Rotate it so this particular token stops working;
     # independent sessions on other devices remain valid.
-    players = db_select("players", token_hash=token_hash)
+    players = db_select("players", columns=PLAYER_COLUMNS, token_hash=token_hash)
     if players:
         db_update("players", {"id": players[0]["id"]}, {"token_hash": hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest()})
     return {"ok": True}
@@ -2183,7 +2240,7 @@ def me(request: Request, authorization: Optional[str] = Header(default=None)):
 def progress(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "progress_read", limit=240, window_seconds=3600)
     player = auth_player(authorization)
-    rows = db_select("results", player_id=player["id"])
+    rows = db_select("results", columns=RESULT_PROGRESS_COLUMNS, player_id=player["id"])
     def completion_payload(r: dict) -> dict:
         info = free_puzzle_info(str(r.get("puzzle_id") or ""), str(r.get("difficulty") or "")) if r.get("mode") == "free" else None
         return {
@@ -2375,7 +2432,7 @@ def merged_hint_count(old_value, new_value: int) -> int:
 
 @lru_cache(maxsize=2)
 def _fair_play_policy_for_bucket(_bucket: int) -> dict:
-    rows = db_select("fair_play_policy", singleton=True)
+    rows = db_select("fair_play_policy", columns="enabled,daily_from", singleton=True)
     return dict(rows[0]) if rows else {}
 
 
@@ -2453,7 +2510,7 @@ def attempt_start(
         if not daily_puzzle_matches_date(payload.puzzle_id, daily_date):
             raise HTTPException(400, "Tato úloha nepatří k Daily datu")
     filters = {"id": payload.attempt_id, **actor_filters(actor)}
-    existing = db_select("puzzle_attempts", **filters)
+    existing = db_select("puzzle_attempts", columns="id,puzzle_id,challenge_key,mode,difficulty", **filters)
     if existing:
         row = existing[0]
         if any((
@@ -2486,26 +2543,17 @@ def attempt_checkpoint(
     allowed = {"correct", "hint", "reset", "resume", "leave"}
     if payload.event_type not in allowed:
         raise HTTPException(400, "Neplatný checkpoint")
-    rows = db_select("puzzle_attempts", id=payload.attempt_id, **actor_filters(actor))
-    if not rows:
+    updated = db_rpc("proplet_attempt_checkpoint_v1", {
+        "p_attempt_id": payload.attempt_id,
+        "p_player": actor.get("player_id"),
+        "p_anonymous_id": actor.get("anonymous_id"),
+        "p_event_type": payload.event_type,
+        "p_elapsed_ms": int(payload.elapsed_ms),
+        "p_found_words": int(payload.found_words),
+        "p_calm_mode": payload.calm_mode,
+    })
+    if updated is not True:
         return {"ok": True, "ignored": True}
-    row = rows[0]
-    values = {
-        "last_found_words": max(int(row.get("last_found_words") or 0), int(payload.found_words)),
-        "last_activity_at": datetime.now(TZ).isoformat(),
-    }
-    if payload.calm_mode is not None:
-        # A run may switch into calm mode mid-game; it never switches back within that run.
-        values["calm_mode"] = bool(row.get("calm_mode") is True or payload.calm_mode)
-    if payload.event_type == "correct" and row.get("first_correct_ms") is None:
-        values["first_correct_ms"] = int(payload.elapsed_ms)
-    elif payload.event_type == "hint" and row.get("first_hint_ms") is None:
-        values["first_hint_ms"] = int(payload.elapsed_ms)
-    elif payload.event_type == "reset":
-        values["reset_count"] = int(row.get("reset_count") or 0) + 1
-    elif payload.event_type == "resume":
-        values["resume_count"] = int(row.get("resume_count") or 0) + 1
-    db_update("puzzle_attempts", {"id": payload.attempt_id}, values)
     return {"ok": True}
 
 
@@ -4450,12 +4498,19 @@ def _ranking_context(player_ids: set[str], team_codes: set[str]):
     return players, player_by_id, league_by_code, public_team_names
 
 
-def _ranking_xp_aggregates(period_start: datetime | None):
+@lru_cache(maxsize=32)
+def _ranking_xp_aggregate_rows(period_key: str, _bucket: int) -> tuple[dict, ...]:
     rows = db_rpc("proplet_rankings_xp_aggregate", {
-        "p_period_start": period_start.isoformat() if period_start else None,
+        "p_period_start": period_key or None,
     })
     if not isinstance(rows, list):
         raise HTTPException(503, "Databázový souhrn pořadí není dostupný")
+    return tuple(dict(row) for row in rows)
+
+
+def _ranking_xp_aggregates(period_start: datetime | None):
+    period_key = period_start.isoformat() if period_start else ""
+    rows = _ranking_xp_aggregate_rows(period_key, int(time.time() // 30))
     period_points: dict[str, int] = {}
     lifetime_points: dict[str, int] = {}
     badge_counts: dict[str, int] = {}
