@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: preview/mozkokalypsa3-in-game-20260928
-          fetch-depth: 10
+          fetch-depth: 15
       - name: Apply only the exact reviewed native patch and immutable approved bank
         run: |
           set -euo pipefail
@@ -29,15 +29,18 @@ jobs:
           import base64,hashlib,lzma,subprocess
           from pathlib import Path
           baseline='46bcd5f03ad456b0e188e54d44b710ad03fbc6ec'
-          allowed={'.github/workflows/mk3-native-preview.yml','tools/mk3-native-reviewed.patch.xz.b64'}
+          allowed={'.github/workflows/mk3-native-preview.yml','tools/mk3-native-reviewed.patch.xz.b64','tools/mk3-native-qa-overlay.patch'}
           changed=set(subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines())
           assert changed<=allowed,changed-allowed
           patch=lzma.decompress(base64.b64decode(Path('tools/mk3-native-reviewed.patch.xz.b64').read_text()))
           assert hashlib.sha256(patch).hexdigest()=='0101bb7359f7ac3c619003be59b68cf0df5a5f63756644fcebdcd432b5d926cd'
+          assert hashlib.sha256(Path('tools/mk3-native-qa-overlay.patch').read_bytes()).hexdigest()=='e51c5e6fd677426e9d5afb733e94a1d6ca16e0c00d2dc460bfb2223f97a45baf'
           Path('/tmp/native.patch').write_bytes(patch)
           PY
           git apply --unidiff-zero --check /tmp/native.patch
           git apply --unidiff-zero /tmp/native.patch
+          git apply --check tools/mk3-native-qa-overlay.patch
+          git apply tools/mk3-native-qa-overlay.patch
           git fetch --depth=1 --no-tags origin 553fb3578c958004b831068dfd268dbcb2a423ab
           git show 553fb3578c958004b831068dfd268dbcb2a423ab:content/gen6/round3-interwoven/bank.json > data/playtests/mozkokalypsa-v3-preview.json
           echo 'c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410  data/playtests/mozkokalypsa-v3-preview.json' | sha256sum -c -
@@ -80,7 +83,7 @@ jobs:
               original=subprocess.check_output(['git','show','0e06a56ff0beb64dda6c3ee172324b8f105c1f19:'+path])
               assert Path(path).read_bytes()==original,path
           PY
-          git rm tools/mk3-native-reviewed.patch.xz.b64
+          git rm tools/mk3-native-reviewed.patch.xz.b64 tools/mk3-native-qa-overlay.patch
           git add backend/mozkokalypsa.py backend/mozkokalypsa_preview.py server.py public/app/mozkokalypsa.js public/mozkokalypsa.css public/index.html vercel.json tools/test_mk3_native_preview.py tools/test_mk3_native_browser.py data/playtests/mozkokalypsa-v3-preview.json docs/playtests/MOZKOKALYPSA3-NATIVE-QA-20260928.json
           git diff --cached --check
           test -z "$(git diff --cached --name-only -- .github/workflows)"
