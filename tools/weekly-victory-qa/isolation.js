@@ -12,7 +12,7 @@
   localStorage.setItem('proplet-v3-settings',JSON.stringify({theme:params.get('theme')||'light',sound:false,haptics:false,wakeLock:false}));
   localStorage.setItem('proplet-v3-16-2-helper-mode','none');
   localStorage.setItem('proplet:content-release:g5-r1','1');
-  localStorage.setItem('proplet-release-notes-seen:4.01.32','1');localStorage.setItem('proplet-release-notes-seen:4.03.1:preview-kupkovi','1');
+  localStorage.setItem('proplet-release-notes-seen:4.01.32','1');localStorage.setItem('proplet-release-notes-seen:4.03.0:preview-kupkovi','1');
   localStorage.setItem('proplet-release-notes-seen:3.32.3:preview-kupkovi','1');
   const demoProfile = {id:'preview-kupkovi',name:'Hráč',avatar:'🦊',token:'DEMONSTRATION-NOT-A-CREDENTIAL',familyCode:'PREVIEW',familyName:'Kupkovi',leagueName:'Kupkovi',publicRankings:true,stats:{points:600,totalCompleted:20,currentStreak:0,longestStreak:0,freeCompleted:{easy:0,medium:0,hard:0,hardcore:0}}};
   localStorage.setItem('proplet-v2-profile',JSON.stringify(demoProfile));
@@ -63,7 +63,7 @@
     if(url.pathname==='/api/rolling-content')return json({version:1,free:{},releases:[]});
     if(url.pathname==='/api/tajenka')return json(window.PROPLET_VICTORY_TAJENKA);
     if(url.pathname.includes('push'))return json({enabled:false,available:false,subscribed:false});
-    if(url.pathname.includes('config'))return json({environment:'production',version:'4.03.1',pushAvailable:false});
+    if(url.pathname.includes('config'))return json({environment:'production',version:'4.03.0',pushAvailable:false});
     if(url.pathname==='/sw.js')return Promise.resolve(new Response(''));
     return json({preview:true,rows:[],members:[],enabled:false});
   };
