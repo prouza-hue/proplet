@@ -1,0 +1,9 @@
+--- a/public/mozkokalypsa.css
++++ b/public/mozkokalypsa.css
+@@ -94,3 +94,6 @@
+ .mk-round3-preview #mkReturnRating{min-height:44px;white-space:normal}
+ .mk-round3-preview #mkResultModal .mk-actions{flex-direction:column-reverse}
+ .mk-round3-preview .mk-board-link{display:flex;align-items:center;justify-content:center;min-height:54px;line-height:1.35;white-space:normal;text-align:center}
++
++/* This explicit QA environment cannot load advertising or collect consent. */
++.mk-round3-preview .marketing-consent{display:none!important}
