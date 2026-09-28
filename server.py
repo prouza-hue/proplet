@@ -2375,9 +2375,7 @@ def merged_hint_count(old_value, new_value: int) -> int:
 
 @lru_cache(maxsize=2)
 def _fair_play_policy_for_bucket(_bucket: int) -> dict:
-    rows = db_request("GET", "fair_play_policy", params={
-        "select": "enabled,daily_from", "singleton": "eq.true", "limit": "1",
-    })
+    rows = db_select("fair_play_policy", singleton=True)
     return dict(rows[0]) if rows else {}
 
 
