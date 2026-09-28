@@ -2,62 +2,28 @@ name: Mozkokalypsa III native preview
 on:
   push:
     branches: ['preview/mozkokalypsa3-in-game-20260928']
-    paths: ['.github/workflows/mk3-native-preview.yml']
+    paths: ['backend/mozkokalypsa*.py', 'backend/config.py', 'server.py', 'public/app/mozkokalypsa.js', 'public/mozkokalypsa.css', 'public/index.html', 'data/playtests/mozkokalypsa-v3-preview.json', 'tools/test_mk3_native*', 'vercel.json']
 permissions:
   contents: read
 concurrency:
   group: mk3-native-private
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   acceptance:
-    if: github.ref == 'refs/heads/preview/mozkokalypsa3-in-game-20260928'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: preview/mozkokalypsa3-in-game-20260928
-          fetch-depth: 15
-      - name: Apply only the exact reviewed native patch and immutable approved bank
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          mkdir -p /tmp/mk3-native-qa
-          python - <<'PY'
-          import base64,hashlib,lzma,subprocess
-          from pathlib import Path
-          baseline='46bcd5f03ad456b0e188e54d44b710ad03fbc6ec'
-          allowed={'.github/workflows/mk3-native-preview.yml','tools/mk3-native-reviewed.patch.xz.b64','tools/mk3-native-qa-overlay.patch'}
-          changed=set(subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines())
-          assert changed<=allowed,changed-allowed
-          patch=lzma.decompress(base64.b64decode(Path('tools/mk3-native-reviewed.patch.xz.b64').read_text()))
-          assert hashlib.sha256(patch).hexdigest()=='0101bb7359f7ac3c619003be59b68cf0df5a5f63756644fcebdcd432b5d926cd'
-          assert hashlib.sha256(Path('tools/mk3-native-qa-overlay.patch').read_bytes()).hexdigest()=='e51c5e6fd677426e9d5afb733e94a1d6ca16e0c00d2dc460bfb2223f97a45baf'
-          Path('/tmp/native.patch').write_bytes(patch)
-          PY
-          git apply --unidiff-zero --check /tmp/native.patch
-          git apply --unidiff-zero /tmp/native.patch
-          git apply --check tools/mk3-native-qa-overlay.patch
-          git apply tools/mk3-native-qa-overlay.patch
-          git fetch --depth=1 --no-tags origin 553fb3578c958004b831068dfd268dbcb2a423ab
-          git show 553fb3578c958004b831068dfd268dbcb2a423ab:content/gen6/round3-interwoven/bank.json > data/playtests/mozkokalypsa-v3-preview.json
-          echo 'c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410  data/playtests/mozkokalypsa-v3-preview.json' | sha256sum -c -
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements-dev.txt 'playwright==1.55.0'
       - run: python -m playwright install --with-deps chromium
-      - name: Native adapter, original countdown and preview data boundaries
-        run: |
-          set -euo pipefail
-          node --check public/app/mozkokalypsa.js
-          node tests/current/test_mozkokalypsa_adapter.js | tee /tmp/mk3-native-qa/adapter.txt
-          node tests/current/test_mozkokalypsa_countdown.js | tee /tmp/mk3-native-qa/countdown.txt
-          python tests/current/test_mozkokalypsa.py | tee /tmp/mk3-native-qa/round2.txt
-          python tools/test_mk3_native_preview.py | tee /tmp/mk3-native-qa/isolation.txt
-      - name: Real native UI, rating, completed-board inspection and mobile touch
+      - run: python tools/test_mk3_native_preview.py
+      - run: node tests/current/test_mozkokalypsa_adapter.js && node tests/current/test_mozkokalypsa_countdown.js
+      - name: Native browser flow with local-only data
         env:
           VERCEL_ENV: preview
           VERCEL_GIT_COMMIT_REF: preview/mozkokalypsa3-in-game-20260928
@@ -65,34 +31,12 @@ jobs:
           SUPABASE_SECRET_KEY: ''
         run: |
           set -euo pipefail
-          python -m uvicorn server:app --host 127.0.0.1 --port 8765 > /tmp/mk3-native-qa/server.txt 2>&1 &
+          python -m uvicorn server:app --host 127.0.0.1 --port 8765 >/tmp/mk3-server.txt 2>&1 &
           for i in $(seq 1 30); do curl -sf 'http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true' >/dev/null && break; sleep 1; done
-          python tools/test_mk3_native_browser.py --output /tmp/mk3-native-qa/browser
-      - name: Save verified native preview only; production and workflow stay unchanged
-        run: |
-          set -euo pipefail
-          test "$(git ls-remote origin refs/heads/preview/mozkokalypsa3-in-game-20260928 | cut -f1)" = "$GITHUB_SHA"
-          python - <<'PY'
-          import hashlib,json,os,subprocess
-          from pathlib import Path
-          report=json.loads(Path('/tmp/mk3-native-qa/browser/report.json').read_text())
-          assert report['status']=='PASS' and not report['errors']
-          report.update(mainBaseline='0e06a56ff0beb64dda6c3ee172324b8f105c1f19',approvedContentCommit='553fb3578c958004b831068dfd268dbcb2a423ab',bankSha256='c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410',runUrl=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}")
-          Path('docs/playtests/MOZKOKALYPSA3-NATIVE-QA-20260928.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-          for path in ['data/playtests/mozkokalypsa-v2.json','data/puzzles.json','public/puzzles.json','data/lexicon_v2.json','public/app.js','public/sw.js']:
-              original=subprocess.check_output(['git','show','0e06a56ff0beb64dda6c3ee172324b8f105c1f19:'+path])
-              assert Path(path).read_bytes()==original,path
-          PY
-          git rm tools/mk3-native-reviewed.patch.xz.b64 tools/mk3-native-qa-overlay.patch
-          git add backend/mozkokalypsa.py backend/mozkokalypsa_preview.py server.py public/app/mozkokalypsa.js public/mozkokalypsa.css public/index.html vercel.json tools/test_mk3_native_preview.py tools/test_mk3_native_browser.py data/playtests/mozkokalypsa-v3-preview.json docs/playtests/MOZKOKALYPSA3-NATIVE-QA-20260928.json
-          git diff --cached --check
-          test -z "$(git diff --cached --name-only -- .github/workflows)"
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: private round-three module inside native Proplet with safe local ratings and board inspection'
-          git push origin HEAD:refs/heads/preview/mozkokalypsa3-in-game-20260928
-          git rev-parse HEAD > /tmp/mk3-native-qa/VERIFIED_HEAD.txt
+          python tools/test_mk3_native_browser.py --output /tmp/mk3-native-browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mk3-native-acceptance
-          path: /tmp/mk3-native-qa
+          name: mk3-native-browser
+          path: /tmp/mk3-native-browser
           retention-days: 7
