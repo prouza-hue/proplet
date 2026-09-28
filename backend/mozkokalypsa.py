@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 from typing import Literal
 from uuid import UUID
+from backend import mozkokalypsa_preview as round3_preview
 
 from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -33,7 +34,7 @@ def bank():
     return data
 
 def preview_allowed():
-    return (os.getenv('VERCEL_ENV')=='preview' and os.getenv('VERCEL_GIT_COMMIT_REF') in {BRANCH,'feat/mozkokalypsa-round2-invite'}) or (
+    return round3_preview.enabled() or (os.getenv('VERCEL_ENV')=='preview' and os.getenv('VERCEL_GIT_COMMIT_REF') in {BRANCH,'feat/mozkokalypsa-round2-invite'}) or (
         not os.getenv('VERCEL') and os.getenv('VERCEL_ENV')!='production'
         and os.getenv('PROPLET_PLAYTEST_LOCAL_QA')=='true')
 
@@ -123,6 +124,8 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
     def status(request:Request,qa:bool=False,authorization:str|None=Header(default=None)):
         if qa:
             if not preview_allowed():raise HTTPException(403,'Testovací náhled není na produkci dostupný.')
+            if round3_preview.enabled():
+                return round3_preview.status()
             return {'eligible':True,'qa':True,'experimentId':EXPERIMENT,'order':bank()['orders'][0],
                     'attempts':[],'name':'Mozkokalypsa','closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat()}
         if not enabled() or not authorization or is_closed():return {'eligible':False}
@@ -141,7 +144,7 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
     def preview_board(board_id:str,qa:bool=False):
         # Read-only, explicit preview route; actual participant start is POST /open.
         if not qa or not preview_allowed():raise HTTPException(403,'Desku lze otevřít pouze přes pozvánku.')
-        return {'puzzle':puzzle(board_id),'qa':True}
+        return {'puzzle':round3_preview.puzzle(board_id) if round3_preview.enabled() else puzzle(board_id),'qa':True}
 
     @app.post('/api/mozkokalypsa/open/{board_id}')
     def open_board(board_id:str,request:Request,authorization:str|None=Header(default=None)):

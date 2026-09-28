@@ -5075,6 +5075,19 @@ from backend import team_victories
 team_victories.install(app, auth_player=auth_player, db_rpc=db_rpc,
                        enforce_rate_limit=enforce_rate_limit)
 
+# This UI preview has no account, analytics, reward or production database path.
+if mozkokalypsa.round3_preview.enabled():
+    @app.middleware("http")
+    async def mk3_native_readonly(request: Request, call_next):
+        if request.method not in {"GET", "HEAD", "OPTIONS"}:
+            return JSONResponse({"detail": "Soukromý náhled: změny zůstávají pouze v tomto prohlížeči."},
+                                status_code=403, headers={"Cache-Control": "no-store"})
+        if request.url.path.startswith(("/api/cron/", "/api/auth/", "/api/admin/")):
+            return JSONResponse({"detail": "V náhledu není dostupné."}, status_code=403)
+        response = await call_next(request)
+        response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+        return response
+
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")

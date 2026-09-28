@@ -1,7 +1,8 @@
 /* Native-game pilot adapter. No polling; metrics stay isolated, rewards are server-owned. */
 (function(global){
 'use strict';
-const ID='mozkokalypsa-round2-20260925', query=new URLSearchParams(location.search);
+let ID='mozkokalypsa-round2-20260925';
+const query=new URLSearchParams(location.search);
 const wantQa=query.get('mozkokalypsa')==='preview';
 let status=null,statusScope='',flight=null,active=null,flushing=null,modalReturn=null,launching=false,feedbackBoard=null,expiryTimer=null,countdownTimer=null,serverOffset=0;
 const $=s=>document.querySelector(s),scope=()=>wantQa?'qa':(global.getProfile?.()?.id||'guest');
@@ -14,7 +15,9 @@ const completeCount=()=>Object.values(read().attempts||{}).filter(a=>a.completed
 function pendingCount(){return Object.values(read().attempts||{}).reduce((n,a)=>n+(a.pending?.length||0),0)}
 const request=(path,opts={})=>global.api('/api/mozkokalypsa'+path,opts);
 const ICON='/difficulty/printshop/mozkokalypsa-v2.svg?v=1';
-const TOTAL=12;
+let TOTAL=12;
+const round3=()=>status?.previewRound===3;
+let inspecting=false;
 const rated=row=>Number(row?.reward_points)===200||(status?.qa&&!!row?.feedback?.difficulty&&!!row?.feedback?.fun);
 const closed=()=>!status?.qa&&!!status?.closesAt&&Date.now()+serverOffset>=Date.parse(status.closesAt);
 function expire(){
@@ -45,11 +48,13 @@ function snapshot(g){
   calmMode:!!g.calmMode};
 }
 function persist(g){
+ if(inspecting)return false;
  if(!isGame(g)||!active||active.board_id!==g.puzzle.id||active.scope!==scope())return false;
  const row=stored(g.puzzle.id);if(!row)return false;
  row.progress=snapshot(g);if(!put(row))return false;g.lastAutosaveAt=Date.now();return true;
 }
 function record(kind,g=global.currentGame,feedback={}){
+ if(inspecting)return Promise.resolve();
  if(closed()){expire();return Promise.resolve()}
  if(!isGame(g)||!active||active.scope!==scope()||(g.finished&&!['finish','feedback'].includes(kind)))return Promise.resolve();
  const now=Math.max(0,Math.round(global.gameElapsed(g)));
@@ -105,6 +110,9 @@ async function refresh(){
    const result=await request('/status'+(wantQa?'?qa=true':''));
    if(owner!==scope())return;
    status=result;
+   if(result.qa&&result.previewRound===3&&result.experimentId==='mozkokalypsa-round3-interwoven-v2'){
+    ID=result.experimentId;TOTAL=result.order.length;setupRound3();
+   }
    serverOffset=result.serverNow?Date.parse(result.serverNow)-Date.now():0;armExpiry();
    if(result.qa)global.closeOnboarding?.(true);
    if(result.eligible&&!result.qa){
@@ -120,13 +128,44 @@ async function refresh(){
  })().finally(()=>{flight=null});
  return flight;
 }
+function setupRound3(){
+ if(document.documentElement.classList.contains('mk-round3-preview'))return;
+ document.documentElement.classList.add('mk-round3-preview');
+ const notice=document.createElement('p');notice.id='mkPreviewNotice';notice.className='mk-preview-notice';
+ notice.textContent='Soukromý náhled · Postup a hodnocení jen v tomto prohlížeči. Termín a odměny jsou ukázkové.';
+ $('#screen-daily').prepend(notice);
+ $('#mozkokalypsaInvite .mk-invite-facts>span:first-child').innerHTML='<b>8</b> nových desek';
+ $('#mozkokalypsaInvite .mk-clock-label').textContent='Do konce třetího kola';
+ $('#mozkokalypsaInvite .mk-reward-cap').innerHTML='Za celou osmičku až <b>1 600 XP</b>';
+ $('#mozkokalypsaInvite .mk-progress-heading>span').textContent='Tvoje třetí kolo';
+ $('#mkInviteProgress').replaceChildren(...Array.from({length:TOTAL},()=>document.createElement('i')));
+ $('#mkHubTitle').textContent='Mozkokalypsa III';
+ $('#mkRatingNote').placeholder='Slova, propletení, záludné místo…';
+ const inspect=document.createElement('button');inspect.type='button';inspect.id='mkInspectBoard';inspect.className='text-btn';inspect.textContent='Prohlédnout dohranou desku';
+ $('#mkResultStats').after(inspect);inspect.onclick=inspectBoard;
+ const returnButton=document.createElement('button');returnButton.type='button';returnButton.id='mkReturnRating';returnButton.className='primary-btn hidden';returnButton.textContent='Zpět k hodnocení';
+ $('#screen-game .game-actions').appendChild(returnButton);
+ returnButton.onclick=()=>{inspecting=false;returnButton.classList.add('hidden');showModal('#mkResultModal')};
+}
+async function inspectBoard(){
+ const row=stored(feedbackBoard);if(!row?.completed)return;
+ try{
+  const response=await request(`/board/${row.board_id}?qa=true`);
+  active={...row,scope:scope(),puzzle:response.puzzle};inspecting=true;
+  closeModal('#mkResultModal');
+  await global.startGame(response.puzzle,'playtest',null);
+  const g=global.currentGame;g.finished=true;global.stopTimer();global.releaseGameWakeLock();
+  global.renderGameBoard();global.renderGameHUD();
+  inspecting=true;$('#mkReturnRating').classList.remove('hidden');
+ }catch(error){inspecting=false;global.showToast(error.message);showModal('#mkResultModal')}
+}
 function deadlineLabel(){
  const end=Date.parse(status?.closesAt);if(!Number.isFinite(end))return 'Čas uzávěrky není dostupný.';
  const options={timeZone:'Europe/Prague',hour:'2-digit',minute:'2-digit',hourCycle:'h23'};
  const time=new Intl.DateTimeFormat('cs-CZ',options).format(end);
  const midnight=time==='00:00';
  const day=new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',weekday:'short',day:'numeric',month:'numeric'}).format(end-(midnight?1:0));
- return `Konec: ${day} ve ${midnight?'24:00':time} · český čas`;
+ return `${status?.deadlineIsExample?'Ukázkový konec':'Konec'}: ${day} ve ${midnight?'24:00':time} · český čas`;
 }
 function stopCountdown(){clearTimeout(countdownTimer);countdownTimer=null}
 function updateCountdown(){
@@ -163,6 +202,13 @@ function render(){
   'Ještě tvoje hodnocení a máme hotovo. V přehledu najdeš desky, kterým chybí poslední tečka.':
   'Dvanáct nových desek. Zahraj si je před ostatními a řekni nám, kde je výzva a kde už trápení.';
  $('#mkInviteButton').textContent=allReviewed?'Prohlédnout druhé kolo':done?'Doplnit hodnocení':rows.length?'Pokračovat ve druhém kole':'Jdu do druhého kola';
+ if(round3()){
+  $('#mkInviteTitle').textContent=allReviewed?'Třetí kolo rozpletené.':done?'Osmička je za tebou.':'Mozkokalypsa potřetí.';
+  $('#mkInviteCopy').textContent=allReviewed?'Všech osm dohráno i ohodnoceno. Díky! Tvoje postřehy nám pomůžou vyladit další Proplety.':done?
+   'Ještě pár hodnocení a máme hotovo. V přehledu najdeš desky, kterým chybí tvoje poslední slovo.':
+   'Pestřejší česká slova. Víc propletené cesty. Osm nových desek, které prověří i zkušené hlavy. Zkus, kam jsme se posunuli.';
+  $('#mkInviteButton').textContent=allReviewed?'Prohlédnout třetí kolo':done?'Doplnit hodnocení':rows.length?'Pokračovat ve třetím kole':'Jdu do třetího kola';
+ }
  const deadline=deadlineLabel();$('#mkInviteDeadline').textContent=deadline;
  const hubDeadline=$('#mkHubDeadline');if(hubDeadline)hubDeadline.textContent=deadline;
  const progress=$('#mkInviteProgressText');if(progress)progress.textContent=`${count}/${TOTAL} dohráno · ${reviewed} ohodnoceno`;
@@ -187,7 +233,8 @@ async function hub(){
  status.order.forEach((id,i)=>{
   const row=stored(id),button=document.createElement('button');button.type='button';button.className='secondary-btn mk-board-link';
   button.textContent=`${i+1}. deska${row?.completed?(rated(row)?' · hotovo · +200 XP':' · doplnit hodnocení'):row?.progress?.elapsedMs?' · pokračovat':''}`;
-  button.disabled=!!row?.completed&&rated(row);button.onclick=()=>row?.conflict?resolveConflict(id):launch(id);
+  if(round3()&&row?.completed&&rated(row))button.textContent=`${i+1}. deska · ohodnoceno` ;
+  button.disabled=!round3()&&!!row?.completed&&rated(row);button.onclick=()=>row?.conflict?resolveConflict(id):launch(id);
   if(row?.conflict)button.textContent=`${i+1}. deska · obnovit postup`;
   root.appendChild(button);
  });
@@ -223,8 +270,8 @@ async function launch(id){
   }
   if(status.qa){row=row||{id:uid(),board_id:id,revision:0,progress:{},completed:false,pending:[],events:[]}}
   else if(!row||remote.revision>row.revision)row={...remote,pending:[],events:row?.events||[]};
-  if(row.completed){if(!put(row))return;closeModal('#mkHubModal');showResult(row);return}
-  if(!put(row))return;active={...row,scope:scope(),puzzle:response.puzzle};
+  if(row.completed){if(!put(row))return;active={...row,scope:scope(),puzzle:response.puzzle};closeModal('#mkHubModal');showResult(row);return}
+  if(!put(row))return;inspecting=false;$('#mkReturnRating')?.classList.add('hidden');active={...row,scope:scope(),puzzle:response.puzzle};
   closeModal('#mkHubModal');closeModal('#mkResultModal');
   await global.startGame(response.puzzle,'playtest',null);
  }catch(error){global.showToast(error.message)}finally{launching=false}
@@ -244,13 +291,15 @@ function renderSync(){
  const el=$('#mkResultSync');if(!el||!status)return;
  const row=stored(feedbackBoard);
  el.textContent=status.qa?'Náhled: tento výsledek je uložen jen na zařízení.':pendingCount()?'Uloženo na zařízení. Odeslání čeká na připojení; můžeš ho zkusit znovu.':rated(row)?'Hodnocení odesláno. 200 XP máš připsáno.':'Dohráno. Vyplň obtížnost i zábavnost a získej 200 XP.';
+ if(round3())el.textContent=rated(row)?'Hodnocení je uložené v tomto náhledu. Skutečné XP se nepřipisují.':'Hodnocení se uloží jen v tomto náhledu. Skutečné XP se nepřipisují.';
  $('#mkRetrySync')?.classList.toggle('hidden',!!status.qa||!pendingCount());
 }
 function showResult(row){
- feedbackBoard=row.board_id;
+ feedbackBoard=row.board_id;inspecting=false;$('#mkReturnRating')?.classList.add('hidden');
  const p=row.progress||{};
  $('#mkResultStats').textContent=`${global.fmtTime(p.elapsedMs||0)} · ${p.moves||0} tahů · ${p.hints||0} nápověd`;
  $('#mkResultTitle').textContent=completeCount()===TOTAL?'Všech dvanáct. Respekt.':'Další deska je doma.';
+ if(round3()){$('#mkResultTitle').textContent=completeCount()===TOTAL?'Celá osmička rozpletená.':'Další deska je doma.';$('#mkResultNext').textContent=completeCount()===TOTAL?'Uložit hodnocení':'Uložit a další deska'}
  $('#mkRatingDifficulty').value=row.feedback?.difficulty||'';$('#mkRatingFun').value=row.feedback?.fun||'';$('#mkRatingNote').value=row.feedback?.note||'';
  renderSync();showModal('#mkResultModal');
 }
@@ -258,12 +307,13 @@ async function finish(g){
  g.elapsedMs=global.gameElapsed(g);g.baseElapsedMs=g.elapsedMs;g.start=performance.now();g.pausedAt=g.start;
  g.finished=true;g.finishing=false;global.stopTimer();global.releaseGameWakeLock();
  global.renderGameBoard();global.renderGameHUD();
+ if(inspecting)return;
  record('finish',g);showResult(stored(g.puzzle.id));global.fx?.('win');
 }
 function feedback(){
  if(closed()){expire();return false}
  const difficulty=Number($('#mkRatingDifficulty').value)||null,fun=Number($('#mkRatingFun').value)||null,note=$('#mkRatingNote').value.trim();
- if(!difficulty||!fun){global.showToast?.('Vyber obtížnost i zábavnost. Pak ti připíšeme 200 XP.');return false}
+ if(!difficulty||!fun){global.showToast?.(round3()?'Vyber náročnost i zábavnost, ať je hodnocení úplné.':'Vyber obtížnost i zábavnost. Pak ti připíšeme 200 XP.');return false}
  const row=stored(feedbackBoard);if(!row?.completed)return false;
  const value={difficulty,fun,note};
  if(JSON.stringify(row.feedback)===JSON.stringify(value)&&(rated(row)||row.pending?.some(e=>e.event_type==='feedback')))return true;
@@ -296,6 +346,7 @@ function install(){
    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}
    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}
   }
+  if(e.key==='Escape'&&inspecting){e.preventDefault();inspecting=false;$('#mkReturnRating').classList.add('hidden');showModal('#mkResultModal');return}
   if(e.key!=='Escape')return;
   if(!$('#mkResultModal').classList.contains('hidden')){e.preventDefault();leaveResult()}
   else if(!$('#mkHubModal').classList.contains('hidden')){e.preventDefault();closeModal('#mkHubModal')}

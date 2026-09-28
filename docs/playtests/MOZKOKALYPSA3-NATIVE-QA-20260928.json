@@ -1,0 +1,2441 @@
+{
+  "nativeApplication": true,
+  "syntheticOnly": true,
+  "physicalDevice": false,
+  "checks": [
+    "native-today-invitation",
+    "8-unchanged-approved-boards",
+    "quiet-live-countdown-no-polling",
+    "no-eyebrow-or-removed-notes",
+    "320-390-768-1440-light-dark",
+    "native-pointer-hint-calm-resume",
+    "rating-board-inspection-preserves-draft-no-duplicate-finish",
+    "all-8-native-completions-local-ratings",
+    "no-normal-XP-progression-or-server-results",
+    "real-phone-and-fold-emulated-touch"
+  ],
+  "errors": [],
+  "status": "PASS",
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/index.html?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/runtime-meta.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/theme-init.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/styles.css?v=todaynews2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.css?v=4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.css?v=boardcontrast1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-ui.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-rules.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.css?v=gen5preview5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/engagement-polish.css?v=6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rank-spotlight.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/compact-difficulties.css?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand/mark.svg?v=brand1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/assets/avatars/v3/20-kniha-s-copem.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/google-g.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/challenge.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/marketing-consent.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/analytics-init.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/speed-insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/api-client.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/analytics.js?v=startermeasure1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/session.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/tajenka-storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/account.js?v=guestcta1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/state.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/fair-play.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/board.js?v=starterguide3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/input.js?v=starterinput1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/hints.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/completion-pipeline.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/result-queue.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/onboarding.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/nudges.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/free-order.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-engine.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-store.js?v=pollfix1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-ui.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/progression.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/daily.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/rankings/rankings.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-catalog.js?v=rankprogress1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.js?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/first-steps.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/first-steps.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/acquisition.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/mozkokalypsa.css?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/mozkokalypsa.js?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/marketing.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.js?v=avatareditor1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.js?v=firststeps2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/bootstrap-hydrator.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-play.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-onboarding.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty-nudge.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/desktop-layout-v3330.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game.css?v=40140-s13a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/results.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/onboarding-return-v3332.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-profile-settings.css?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/typography-readability-v1.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand-wordmark-fraunces.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-release-polish.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/training-layout.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles-bootstrap.json"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtq.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8765/api/product-event"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc7qv8.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334-core-v40114.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles.json"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-hotfix-v334.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-origin-v3325.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/version.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/home-layout.js?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-auth.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc1qv86Rg.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/tajenka"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/auth-recovery-guard-v3326.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-layout-v3330.js?v=style-recovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.js?v=fixsep8c"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-word-feedback-v3330.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-team-v33210.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.js?v=resultdock1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/footer-hotfix-v40120.js?v=welcome1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-bonus-v3331.js?v=sessionrecovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/free-order/config"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/easy.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/medium.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hard.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hardcore.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkomor.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/symbol-streak.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/novacek.svg?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.js?v=firststeps1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581723770"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rolling-content?week=2026-09-28"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-ia-v40122.js?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-polish-v40122.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-release-polish.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581723770"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/weekly-banner-icon-optimized.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-cadence-copy.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581724177"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-words-v3328.txt?v=recognition6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581724177"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-01?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/calm.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/easy.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/medium.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hard.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hardcore.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/symbol-streak.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/novacek.svg?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/weekly-banner-icon-optimized.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/index.html?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/runtime-meta.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/theme-init.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/styles.css?v=todaynews2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.css?v=4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.css?v=boardcontrast1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-ui.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-rules.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.css?v=gen5preview5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/engagement-polish.css?v=6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rank-spotlight.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/compact-difficulties.css?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand/mark.svg?v=brand1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/assets/avatars/v3/20-kniha-s-copem.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/google-g.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/challenge.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/marketing-consent.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/analytics-init.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/speed-insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/api-client.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/analytics.js?v=startermeasure1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/session.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/tajenka-storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/account.js?v=guestcta1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/state.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/fair-play.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/board.js?v=starterguide3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/input.js?v=starterinput1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/hints.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/completion-pipeline.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/result-queue.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/onboarding.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/nudges.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/free-order.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-engine.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-store.js?v=pollfix1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-ui.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/progression.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/daily.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/rankings/rankings.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-catalog.js?v=rankprogress1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.js?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/first-steps.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/first-steps.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/acquisition.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/mozkokalypsa.css?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/mozkokalypsa.js?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/marketing.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.js?v=avatareditor1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.js?v=firststeps2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/bootstrap-hydrator.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-play.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-onboarding.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty-nudge.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/desktop-layout-v3330.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game.css?v=40140-s13a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/results.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/onboarding-return-v3332.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-profile-settings.css?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/typography-readability-v1.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand-wordmark-fraunces.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-release-polish.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/training-layout.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtq.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles-bootstrap.json"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334-core-v40114.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc7qv8.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-hotfix-v334.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-origin-v3325.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/version.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/home-layout.js?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-auth.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/calm.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc1qv86Rg.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles.json"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/auth-recovery-guard-v3326.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-layout-v3330.js?v=style-recovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.js?v=fixsep8c"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-word-feedback-v3330.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-team-v33210.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.js?v=resultdock1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/footer-hotfix-v40120.js?v=welcome1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-bonus-v3331.js?v=sessionrecovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.js?v=firststeps1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-ia-v40122.js?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-polish-v40122.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-release-polish.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/easy.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/medium.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hard.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hardcore.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkomor.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-cadence-copy.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/tajenka"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/symbol-streak.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/novacek.svg?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/free-order/config"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8765/api/product-event"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581733293"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rolling-content?week=2026-09-28"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581733293"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/weekly-banner-icon-optimized.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-words-v3328.txt?v=recognition6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-01?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-01?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-02?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-03?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-04?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-05?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-06?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-07?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-08?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/index.html?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/runtime-meta.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/theme-init.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/styles.css?v=todaynews2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.css?v=4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.css?v=boardcontrast1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-ui.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-rules.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.css?v=gen5preview5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/engagement-polish.css?v=6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rank-spotlight.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/compact-difficulties.css?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand/mark.svg?v=brand1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/assets/avatars/v3/20-kniha-s-copem.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/google-g.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/challenge.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/marketing-consent.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/analytics-init.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/speed-insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/api-client.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/analytics.js?v=startermeasure1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/session.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/tajenka-storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/account.js?v=guestcta1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/state.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/fair-play.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/board.js?v=starterguide3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/input.js?v=starterinput1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/hints.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/completion-pipeline.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/result-queue.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/onboarding.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/nudges.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/free-order.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-engine.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-store.js?v=pollfix1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-ui.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/progression.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/daily.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/rankings/rankings.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-catalog.js?v=rankprogress1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.js?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/first-steps.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/first-steps.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/acquisition.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/mozkokalypsa.css?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/mozkokalypsa.js?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/marketing.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.js?v=avatareditor1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.js?v=firststeps2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/bootstrap-hydrator.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-play.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-onboarding.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty-nudge.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/desktop-layout-v3330.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game.css?v=40140-s13a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/results.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/onboarding-return-v3332.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-profile-settings.css?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/typography-readability-v1.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand-wordmark-fraunces.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-release-polish.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/training-layout.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles-bootstrap.json"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtq.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc7qv8.woff2"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8765/api/product-event"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334-core-v40114.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles.json"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-hotfix-v334.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-origin-v3325.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/version.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/home-layout.js?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-auth.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc1qv86Rg.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/tajenka"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/auth-recovery-guard-v3326.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-layout-v3330.js?v=style-recovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.js?v=fixsep8c"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-word-feedback-v3330.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-team-v33210.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.js?v=resultdock1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/footer-hotfix-v40120.js?v=welcome1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-bonus-v3331.js?v=sessionrecovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/free-order/config"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.js?v=firststeps1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/easy.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/medium.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hard.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hardcore.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkomor.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/symbol-streak.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/novacek.svg?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581744728"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-ia-v40122.js?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-polish-v40122.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-release-polish.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rolling-content?week=2026-09-28"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581744728"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/weekly-banner-icon-optimized.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-cadence-copy.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581745186"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-words-v3328.txt?v=recognition6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581745186"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-01?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/calm.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/index.html?mozkokalypsa=preview"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/runtime-meta.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/theme-init.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/styles.css?v=todaynews2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.css?v=4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.css?v=boardcontrast1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-ui.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-rules.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.css?v=gen5preview5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/engagement-polish.css?v=6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rank-spotlight.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/compact-difficulties.css?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand/mark.svg?v=brand1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/assets/avatars/v3/20-kniha-s-copem.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/google-g.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/challenge.svg?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/marketing-consent.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/analytics-init.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/_vercel/speed-insights/script.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/api-client.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/analytics.js?v=startermeasure1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/session.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/tajenka-storage.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/account/account.js?v=guestcta1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/state.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/fair-play.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/board.js?v=starterguide3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/input.js?v=starterinput1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/game/hints.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/completion-pipeline.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/core/result-queue.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/onboarding.js?v=boardintro2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/nudges.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/free-order.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-engine.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-store.js?v=pollfix1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/free-order-ui.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/progression.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/content/daily.js?v=40140-s12b2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/rankings/rankings.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-catalog.js?v=rankprogress1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ribbon-ui.js?v=icons1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/first-steps.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/engagement/first-steps.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/acquisition.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/team-victories.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app.js?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/mozkokalypsa.css?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/mozkokalypsa.js?v=mk3native1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app/marketing.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/organic-ui-v4023.js?v=avatareditor1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/content-release.js?v=firststeps2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/bootstrap-hydrator.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-play.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-onboarding.css?v=40140-s13b"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty-nudge.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/desktop-layout-v3330.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game.css?v=40140-s13a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/results.css?v=weekly3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.css?v=5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/onboarding-return-v3332.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/app-profile-settings.css?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/typography-readability-v1.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/brand-wordmark-fraunces.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.css?v=uipolish1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-release-polish.css?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.css?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/training-layout.css?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles-bootstrap.json"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtq.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8765/api/product-event"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc7qv8.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/puzzles.json"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-v334-core-v40114.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/p0-hotfix-v3336.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/quality-hotfix-v334.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-origin-v3325.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/version.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/home-layout.js?v=todaymoz1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/ranking-polish.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-auth.js?v=flowcontext1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/tajenka"
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc1qv86Rg.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/auth-recovery-guard-v3326.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/game-layout-v3330.js?v=style-recovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/gesture-guard-v3325.js?v=fixsep8c"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-word-feedback-v3330.js?v=mkpilot4"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/copy-density-v3327.js?v=2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/push-retention-v3329.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-team-v33210.js?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/competitive-sharing-v3331.js?v=analytics2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/challenge-cta-v3333.js?v=resultdock1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/footer-hotfix-v40120.js?v=welcome1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-bonus-v3331.js?v=sessionrecovery1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/free-order/config"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/easy.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/medium.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hard.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hardcore.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/symbol-streak.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/novacek.svg?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkomor.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581749108"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/account-conversion-v3331.js?v=firststeps1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rolling-content?week=2026-09-28"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581749108"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-ia-v40122.js?v=privacyflow1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/settings-polish-v40122.js?v=settingssimple1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/printshop-release-polish.js?v=auditphase2-2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-release-fix.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/weekly-banner-icon-optimized.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/valid-words-v3328.txt?v=recognition6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-cadence-copy.js?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-card-polish.js?v=invitations1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka-runtime-polish.js?v=idleoffline1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/rankings/xp?period=all"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/symbol-streak.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/easy.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/medium.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hard.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/hardcore.webp"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/config?release_probe=1790581749826"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/novacek.svg?v=3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/tajenka.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/weekly-banner-icon-optimized.svg"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/sw.js?release_probe=1790581749826"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/api/mozkokalypsa/board/mk3w2-01?qa=true"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/difficulty/printshop/mozkokalypsa-v2.svg?v=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8765/rewards/printshop/calm.svg?v=icons1"
+    }
+  ],
+  "mainBaseline": "0e06a56ff0beb64dda6c3ee172324b8f105c1f19",
+  "approvedContentCommit": "553fb3578c958004b831068dfd268dbcb2a423ab",
+  "bankSha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+  "runUrl": "https://github.com/prouza-hue/proplet/actions/runs/36393595284"
+}
