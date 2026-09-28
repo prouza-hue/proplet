@@ -5,26 +5,160 @@ on:
     paths: ['.github/workflows/mk3-release-workbench.yml']
 permissions:
   contents: read
+concurrency:
+  group: mk3-release-workbench
+  cancel-in-progress: false
 jobs:
-  snapshot:
+  weekly-preservation:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 7
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_USER: proplet_test_admin
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: proplet_weekly_test
+        ports: ['55432:5432']
+        options: --health-cmd "pg_isready -U proplet_test_admin -d proplet_weekly_test" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
-      - name: Export exact current main and approved native preview inputs
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5'
+      - run: python -m unittest discover -s tests/weekly -v
+      - run: node --test tools/test_weekly_team_victories_frontend.cjs
+      - run: python tools/test_weekly_team_victories_db.py --database-url postgresql://proplet_test_admin:local-test-only@127.0.0.1:55432/proplet_weekly_test
+  release-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_USER: proplet_test_admin
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: postgres
+        ports: ['55432:5432']
+        options: --health-cmd "pg_isready -U proplet_test_admin -d postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/mozkokalypsa-round3-release
+          fetch-depth: 15
+      - name: Apply reviewed integration only to unchanged latest-main branch
         run: |
           set -euo pipefail
-          mkdir -p /tmp/mk3-release-source
-          git archive --format=zip 1fdc7642dbd44412311a9d0362741a6080cd3521 -o /tmp/mk3-release-source/main.zip
-          git rev-parse HEAD > /tmp/mk3-release-source/BRANCH_SHA.txt
-          git ls-tree -r 1fdc7642dbd44412311a9d0362741a6080cd3521 > /tmp/mk3-release-source/MAIN_TREE.txt
+          mkdir -p /tmp/mk3-release-proof
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python - <<'PY'
+          import base64,hashlib,lzma,subprocess
+          from pathlib import Path
+          files=sorted(Path('tools').glob('mk3-release-patch-*.xz.b64'))
+          assert len(files)==3
+          changed=set(subprocess.check_output(['git','diff','--name-only','a3b475a7b29073935e0f29beca1714278afaf5ec','HEAD'],text=True).splitlines())
+          allowed={str(p) for p in files}|{'.github/workflows/mk3-release-workbench.yml'}
+          assert changed<=allowed,changed-allowed
+          patch=lzma.decompress(base64.b64decode(''.join(p.read_text().strip() for p in files)))
+          assert hashlib.sha256(patch).hexdigest()=='fd48843588b5851e401dc0edfad177a3bc228ce45233eaef1dc266b5bba0f00e'
+          Path('/tmp/mk3-release.patch').write_bytes(patch)
+          PY
+          git apply --check /tmp/mk3-release.patch
+          git apply /tmp/mk3-release.patch
           git fetch --depth=1 --no-tags origin dc639f04ae62beb718851d3de8b1151cee5c2e82
-          git archive --format=zip dc639f04ae62beb718851d3de8b1151cee5c2e82 backend/mozkokalypsa.py backend/mozkokalypsa_preview.py public/app/mozkokalypsa.js public/mozkokalypsa.css public/index.html data/playtests/mozkokalypsa-v3-preview.json tools/test_mk3_native_preview.py tools/test_mk3_native_browser.py docs/playtests/MOZKOKALYPSA3-NATIVE-PREVIEW-20260928.md -o /tmp/mk3-release-source/preview.zip
-          git diff 1fdc7642dbd44412311a9d0362741a6080cd3521 HEAD -- backend/config.py > /tmp/mk3-release-source/isolation.patch
-      - uses: actions/upload-artifact@v4
+          git show dc639f04ae62beb718851d3de8b1151cee5c2e82:data/playtests/mozkokalypsa-v3-preview.json > data/playtests/mozkokalypsa-v3.json
+          echo 'c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410  data/playtests/mozkokalypsa-v3.json' | sha256sum -c -
+      - uses: actions/setup-python@v5
         with:
-          name: mk3-release-source
-          path: /tmp/mk3-release-source
-          retention-days: 3
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5' 'playwright==1.55.0'
+      - run: python -m playwright install --with-deps chromium
+      - name: Original playtest contract and exact midnight switch
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests/round3 -v 2>&1 | tee /tmp/mk3-release-proof/boundaries.txt
+          node tests/round3/test_transition.cjs | tee /tmp/mk3-release-proof/transition.txt
+          node tests/current/test_mozkokalypsa_adapter.js
+          node tests/current/test_mozkokalypsa_countdown.js
+          python tests/current/test_mozkokalypsa.py
+          python tools/test_v4001_pwa_startup.py
+      - name: Enable real pg_cron only in disposable local PostgreSQL
+        env:
+          PG_TEST_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          docker exec --user root "$PG_TEST_CONTAINER" apt-get update
+          docker exec --user root "$PG_TEST_CONTAINER" apt-get install -y --no-install-recommends postgresql-17-cron
+          docker exec -i "$PG_TEST_CONTAINER" sh -c 'cat >> "$PGDATA/postgresql.conf"' <<'CONF'
+          shared_preload_libraries = 'pg_cron'
+          cron.database_name = 'proplet_test_ci_cron'
+          cron.use_background_workers = on
+          CONF
+          docker restart "$PG_TEST_CONTAINER"
+          for i in $(seq 1 30); do docker exec "$PG_TEST_CONTAINER" pg_isready -U proplet_test_admin -d postgres && break; sleep 1; done
+      - name: Full migration chain, same cohort, 48h, concurrent once-only XP and authenticated HTTP
+        run: |
+          set -euo pipefail
+          printf 'local-test-only' > /tmp/proplet-test-password
+          python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/mk3-release-proof/database.json --database-name proplet_test_ci_cron
+          python tools/test_mk3_release_db.py --database-report /tmp/mk3-release-proof/database.json --password-file /tmp/proplet-test-password | tee /tmp/mk3-release-proof/round3-db.txt
+          python tools/test_mk3_release_http_db.py --database-report /tmp/mk3-release-proof/database.json --password-file /tmp/proplet-test-password | tee /tmp/mk3-release-proof/round3-http.txt
+          python tools/test_mozkokalypsa_http_db.py --database-report /tmp/mk3-release-proof/database.json --password-file /tmp/proplet-test-password | tee /tmp/mk3-release-proof/round2-http.txt
+          python tools/test_account_created_db.py --database-report /tmp/mk3-release-proof/database.json --password-file /tmp/proplet-test-password --output /tmp/mk3-release-proof/account-created.json
+          python tools/test_funnel_sql.py --database-report /tmp/mk3-release-proof/database.json --password-file /tmp/proplet-test-password | tee /tmp/mk3-release-proof/funnel.txt
+      - name: Native UI, rating, inspection, resume and phone/Fold touch without production data
+        env:
+          VERCEL_ENV: preview
+          VERCEL_GIT_COMMIT_REF: feat/mozkokalypsa-round3-release
+          SUPABASE_URL: ''
+          SUPABASE_SECRET_KEY: ''
+        run: |
+          set -euo pipefail
+          python -m uvicorn server:app --host 127.0.0.1 --port 8765 > /tmp/mk3-release-proof/server.txt 2>&1 &
+          for i in $(seq 1 30); do curl -sf 'http://127.0.0.1:8765/api/mozkokalypsa/status?qa=true' >/dev/null && break; sleep 1; done
+          python tools/test_mk3_release_browser.py --output /tmp/mk3-release-proof/browser
+      - name: Preserve protected functionality and save verified integration branch only
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/feat/mozkokalypsa-round3-release | cut -f1)" = "$GITHUB_SHA"
+          python - <<'PY'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          baseline='1fdc7642dbd44412311a9d0362741a6080cd3521'
+          protected=['server.py','account_auth.py','backend/results.py','backend/measurement.py','backend/team_victories.py','public/team-victories.js','public/app/engagement/first-steps.js','public/app/analytics.js','public/app/game/input.js','data/playtests/mozkokalypsa-v2.json','data/puzzles.json','public/puzzles.json','data/lexicon_v2.json','vercel.json']
+          checked={}
+          for p in protected:
+              before=subprocess.check_output(['git','show',baseline+':'+p]); after=Path(p).read_bytes()
+              assert before==after,p
+              checked[p]=hashlib.sha256(after).hexdigest()
+          for p in ['public/app.js','public/sw.js']:
+              after=Path(p).read_text().replace('proplet-v4.03.0-mk3release1','proplet-v4.03.0-startersave1').replace('/app.js?v=mk3release1','/app.js?v=startersave1').replace('/app/mozkokalypsa.js?v=mk3release1','/app/mozkokalypsa.js?v=mkinvite3').replace('/mozkokalypsa.css?v=mk3release1','/mozkokalypsa.css?v=mkinvite3')
+              before=subprocess.check_output(['git','show',baseline+':'+p],text=True)
+              # Assert the only changes are release/cache identities, not implementation.
+              if p.endswith('app.js'):assert before==after,p
+              else:
+                  import re
+                  clean=lambda s:re.sub(r'\?v=[^\x27\x22\s]+','?v=ASSET',s)
+                  assert clean(before)==clean(after),p
+          report=json.loads(Path('/tmp/mk3-release-proof/browser/report.json').read_text());assert report['status']=='PASS' and not report['errors']
+          report.update(mainBaseline=baseline,protectedSha256=checked,opensAt='2026-09-28T22:00:00Z',closesAt='2026-09-30T22:00:00Z',runUrl=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}")
+          Path('docs/playtests/MOZKOKALYPSA3-RELEASE-QA-20260928.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git rm tools/mk3-release-patch-*.xz.b64
+          git add backend/mozkokalypsa.py backend/mozkokalypsa_round3.py public/app.js public/app/mozkokalypsa.js public/index.html public/mozkokalypsa.css public/sw.js data/playtests/mozkokalypsa-v3.json docs/playtests/MOZKOKALYPSA3-* supabase/migrations/20260928084000_mozkokalypsa_round3.sql tests/round3 tests/current/test_mozkokalypsa.py tools/test_mk3_release* tools/test_mozkokalypsa_http_db.py tools/test_v4001_pwa_startup.py tools/test_v40124_supabase_rpc_auth.py tools/test_v40126_push_retention_p0.py tools/test_v40133_sync_quarantine.py tools/test_v40135_profile_wide_layout.py
+          git diff --cached --check
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: scheduled 48-hour third playtest with isolated rewards and preserved weekly/onboarding features'
+          git push origin HEAD:refs/heads/feat/mozkokalypsa-round3-release
+          git rev-parse HEAD > /tmp/mk3-release-proof/VERIFIED_HEAD.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mk3-release-acceptance
+          path: /tmp/mk3-release-proof
+          retention-days: 7
