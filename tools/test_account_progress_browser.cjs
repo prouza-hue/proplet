@@ -16,8 +16,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
   await context.addInitScript(()=>localStorage.setItem('proplet:content-release:g5-r1','1'));
   // Existing test accounts have already chosen anonymous leaderboard visibility.
-  await page.route('**/api/me',r=>r.fulfill({json:{name:'Synthetic player',publicRankings:false,stats:{points:34018},avatar:'🙂'}}));
-  await page.route('**/api/progress',async r=>{requests++;await new Promise(resolve=>release=resolve);await r.fulfill({status:fail?503:200,json:fail?{detail:'synthetic outage'}:{completed}})});
+  await page.route('**/api/account/snapshot*',async r=>{requests++;await new Promise(resolve=>release=resolve);await r.fulfill({status:fail?503:200,json:fail?{detail:'synthetic outage'}:{name:'Synthetic player',publicRankings:false,stats:{points:34018},avatar:'🙂',completed,cursor:new Date().toISOString()}})});
   await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&typeof tajenkaPuzzle!=='undefined'&&tajenkaPuzzle?.id&&typeof document.querySelector('#playDailyBtn')?.onclick==='function');
   completed=await page.evaluate(()=>{
    closeTransientModals();stopTimer();currentGame=null;nav('daily');
@@ -27,7 +26,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   });
   await page.evaluate(()=>{window.PROPLET_RUNTIME_ENV='preview';acceptAccountProfile({publicRankings:false,id:'synthetic-a',token:'synthetic-token',name:'Synthetic player'});syncQueue();renderDaily();renderFree()});
   await page.waitForFunction(()=>document.body.classList.contains('account-progress-pending'));
-  await page.waitForTimeout(1000);assert.equal(requests,1,'login and sync share one progress read');
+  await page.waitForTimeout(1000);assert.equal(requests,1,'login and sync share one snapshot read');
   assert.equal(await page.locator('#quickPlayCard').getAttribute('aria-busy'),'true');
   assert.equal(await page.locator('#quickPlayGrid').evaluate(e=>getComputedStyle(e).visibility),'hidden','unknown counts are hidden');
   await page.evaluate(()=>{startFree('hardcore');startTajenka();startGame(puzzleDB.free.hardcore[0],'free',null)});
