@@ -187,7 +187,7 @@ def main():
             c.execute('update players set token_hash=%s where id=%s',
                       (hashlib.sha256(token.encode()).hexdigest(), player))
 
-    def select(table, **filters):
+    def select(table, columns="*", **filters):
         with psycopg.connect(**options, row_factory=dict_row) as c:
             c.execute('set role service_role')
             where = sql.SQL(' and ').join(sql.SQL('{}=%s').format(sql.Identifier(k)) for k in filters)

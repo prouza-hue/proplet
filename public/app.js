@@ -864,7 +864,7 @@ async function sendAttemptCheckpoint(eventType){
  const foundWords=g.found.length;
  // The server still sees the first correct word immediately. Later correct-word
  // checkpoints are sampled; leave/hint/reset/resume and the final result stay exact.
- if(eventType==='correct'&&foundWords!==1&&(foundWords-1)%3!==0)return;
+ if(eventType==='correct'&&foundWords!==1&&(foundWords-1)%5!==0)return;
  if(eventType==='leave'){
   const now=Date.now(),key=`leave:${foundWords}`;
   if(g.lastCheckpointKey===key&&now-(g.lastCheckpointAt||0)<1500)return;

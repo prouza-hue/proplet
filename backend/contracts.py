@@ -68,6 +68,15 @@ class ProductEventCreate(BaseModel):
     event_type: str = Field(min_length=2, max_length=40)
 
 
+class ProductEventBatchItem(ProductEventCreate):
+    id: str = Field(min_length=36, max_length=36)
+    created_at: str = Field(min_length=20, max_length=40)
+
+
+class ProductEventBatch(BaseModel):
+    events: list[ProductEventBatchItem] = Field(min_length=1, max_length=20)
+
+
 class TeamPinSet(BaseModel):
     pin: str = Field(min_length=4, max_length=32)
 

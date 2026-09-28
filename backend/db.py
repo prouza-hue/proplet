@@ -131,9 +131,16 @@ def db_request(
     return response.json()
 
 
-def db_select(table: str, request_fn: Optional[Callable[..., Any]] = None, /, **filters):
+def db_select(
+    table: str,
+    request_fn: Optional[Callable[..., Any]] = None,
+    /,
+    *,
+    columns: str = "*",
+    **filters,
+):
     requester = request_fn or db_request
-    params = {"select": "*"}
+    params = {"select": columns}
     for key, value in filters.items():
         if value is not None:
             params[key] = f"eq.{value}"
