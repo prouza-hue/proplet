@@ -83,9 +83,9 @@ route_snapshot = sorted(
     for route in server.app.routes
     if route.path and route.path not in {'/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config"}
 )
-# v4.03.0 adds only GET /api/team-victories and POST /api/team-victories/seen.
-# Removing those two routes reproduces the prior f57b2cb7 route digest.
-assert _digest(route_snapshot) == "7da3e64c4fa3e2d2c36c903fe1196088891296bb1ae14c898e1bf6bfb116ac6e"
+# Round III adds exactly four /api/mozkokalypsa3 routes. Removing those
+# additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
+assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cdedfdeb020cd32f25c6e4b"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
@@ -104,6 +104,24 @@ openapi_contract["info"]["version"] = "4.01.35-cloud"
 for order_path in ("/api/free-order", "/api/free-order/config"):
     openapi_contract["paths"].pop(order_path, None)
 openapi_contract.get("components", {}).get("schemas", {}).pop("OrderCommand", None)
+# Round III is additive and covered by real HTTP/SQL acceptance. Preserve
+# the complete older OpenAPI contract, including team and onboarding schemas.
+round3_paths = (
+    '/api/mozkokalypsa3/status', '/api/mozkokalypsa3/board/{board_id}',
+    '/api/mozkokalypsa3/open/{board_id}', '/api/mozkokalypsa3/event',
+)
+assert {p for p in openapi_contract['paths'] if p.startswith('/api/mozkokalypsa3/')} == set(round3_paths)
+round3_schema = openapi_contract['paths']['/api/mozkokalypsa3/event']['post']['requestBody']['content']['application/json']['schema']['$ref'].rsplit('/', 1)[-1]
+round2_schema = openapi_contract['paths']['/api/mozkokalypsa/event']['post']['requestBody']['content']['application/json']['schema']['$ref'].rsplit('/', 1)[-1]
+assert round3_schema != round2_schema
+for round3_path in round3_paths:
+    openapi_contract['paths'].pop(round3_path)
+# Resolve names from exact request refs: Pydantic may qualify both Event models.
+schemas = openapi_contract['components']['schemas']
+schemas.pop(round3_schema)
+if round2_schema != 'Event':
+    schemas['Event'] = schemas.pop(round2_schema)
+
 # Invite-only pilot has its own HTTP and frozen-content boundary tests.
 for pilot_path in ('/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event'):
     openapi_contract["paths"].pop(pilot_path, None)
@@ -158,4 +176,3 @@ with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names})
     assert installers["_install_word_recognition"].call_args.kwargs["resolved_puzzle"] is None
 
 print("PASS: Sprint 06 explicit dependency and route/OpenAPI characterization")
-
