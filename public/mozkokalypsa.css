@@ -84,3 +84,16 @@ html.tiskarna-ui[data-theme=dark] #screen-daily #mozkokalypsaInvite .primary-btn
 .mk-invite-facts>span:last-child{flex:0 0 auto;position:relative;margin:2px 3px 4px 0;padding:9px 11px 8px;max-width:100%;border:2px solid #ffdfa9;border-radius:4px;background:#f4bd82;color:#593746;box-shadow:3px 4px 0 #281b28;transform:rotate(3deg);font-size:10px;line-height:1.3;text-align:center}
 .mk-invite-facts>span:last-child b{display:flex;align-items:baseline;justify-content:center;gap:7px;margin-bottom:4px;color:#352032;font-size:26px;font-weight:900;line-height:1;white-space:nowrap}
 .mk-invite-facts>span:last-child b::after{content:'za desku';font-size:11px;font-weight:750;letter-spacing:0}
+
+/* In-game round-three preview, following the approved invitation. */
+.mk-round3 .mk-invite-kicker,.mk-round3 .mk-hub-kicker{display:none}
+.mk-round3 .mk-progress-track{grid-template-columns:repeat(8,minmax(0,1fr))}
+.mk-preview-notice{margin:4px 0 14px;padding:10px 13px;border:1px dashed var(--td-line,#c6b6a6);border-radius:8px;font-size:12px;line-height:1.4;color:var(--td-muted,#675d55);grid-column:1/-1}
+.mk-round3 .mk-invite-story{padding-top:2px}
+.mk-round3 #mkInspectBoard{display:block;margin:2px 0 14px;min-height:36px;text-decoration:underline;text-underline-offset:3px;color:var(--td-ink,#493441)}
+.mk-round3 #mkReturnRating{min-height:44px;white-space:normal}
+.mk-round3 #mkResultModal .mk-actions{flex-direction:column-reverse}
+.mk-round3 .mk-board-link{display:flex;align-items:center;justify-content:center;min-height:54px;line-height:1.35;white-space:normal;text-align:center}
+
+/* This explicit QA environment cannot load advertising or collect consent. */
+.mk-round3-preview .marketing-consent{display:none!important}

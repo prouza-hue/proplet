@@ -48,7 +48,7 @@ def select(table,**filters):
 def rpc(name,body):
  calls.append((name,body));return {'ok':True,'revision':body.get('p_revision',0)+1}
 app=FastAPI();m.install(app,auth_player=auth,db_select=select,db_request=lambda *a,**kw:None,db_rpc=rpc,enforce_rate_limit=lambda *a,**kw:None)
-with patch.object(m,'is_closed',return_value=False),TestClient(app) as c:
+with patch.object(m.round3,'has_started',return_value=False),patch.object(m,'is_closed',return_value=False),TestClient(app) as c:
  with patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_PLAYTEST_LOCAL_QA':'true'},clear=True):
   assert c.get('/api/mozkokalypsa/status').json()=={'eligible':False}
   assert c.get('/api/mozkokalypsa/status?qa=true').status_code==403
@@ -90,7 +90,7 @@ progress=m.validate_progress({'moves':len(full['answers']),'found':[{'answerInde
 assert all(0<=a['colorIndex']<12 for a in progress['found'])
 
 
-with patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}),patch.object(m,'is_closed',return_value=True),TestClient(app) as c:
+with patch.object(m.round3,'has_started',return_value=False),patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}),patch.object(m,'is_closed',return_value=True),TestClient(app) as c:
  assert c.get('/api/mozkokalypsa/status',headers=headers).json()=={'eligible':False}
  assert c.post('/api/mozkokalypsa/open/mk2-01',headers=headers).status_code==410
  assert c.post('/api/mozkokalypsa/event',json=event,headers=headers).status_code==410

@@ -1,7 +1,8 @@
 /* Native-game pilot adapter. No polling; metrics stay isolated, rewards are server-owned. */
 (function(global){
 'use strict';
-const ID='mozkokalypsa-round2-20260925', query=new URLSearchParams(location.search);
+let ID='mozkokalypsa-round2-20260925';
+const query=new URLSearchParams(location.search);
 const wantQa=query.get('mozkokalypsa')==='preview';
 let status=null,statusScope='',flight=null,active=null,flushing=null,modalReturn=null,launching=false,feedbackBoard=null,expiryTimer=null,countdownTimer=null,serverOffset=0;
 const $=s=>document.querySelector(s),scope=()=>wantQa?'qa':(global.getProfile?.()?.id||'guest');
@@ -12,9 +13,21 @@ const uid=()=>crypto.randomUUID();
 const isGame=g=>g?.mode==='playtest';
 const completeCount=()=>Object.values(read().attempts||{}).filter(a=>a.completed).length;
 function pendingCount(){return Object.values(read().attempts||{}).reduce((n,a)=>n+(a.pending?.length||0),0)}
-const request=(path,opts={})=>global.api('/api/mozkokalypsa'+path,opts);
+const request=(path,opts={})=>global.api((path.startsWith('/status')?'/api/mozkokalypsa':ID==='mozkokalypsa-round3-interwoven-v2'?'/api/mozkokalypsa3':'/api/mozkokalypsa')+path,opts);
 const ICON='/difficulty/printshop/mozkokalypsa-v2.svg?v=1';
-const TOTAL=12;
+let TOTAL=12;
+const round3=()=>status?.round===3||status?.previewRound===3;
+let transitionTimer=null;
+function armTransition(){
+ clearTimeout(transitionTimer);transitionTimer=null;
+ const at=Date.parse(status?.nextTransitionAt);
+ if(!status?.qa&&Number.isFinite(at)&&at>Date.now()+serverOffset)transitionTimer=setTimeout(()=>refresh(),Math.min(2147483647,at-Date.now()-serverOffset+60));
+}
+function checkTransition(){
+ const at=Date.parse(status?.nextTransitionAt);
+ if(!status?.qa&&Number.isFinite(at)&&Date.now()+serverOffset>=at)refresh();
+}
+let inspecting=false;
 const rated=row=>Number(row?.reward_points)===200||(status?.qa&&!!row?.feedback?.difficulty&&!!row?.feedback?.fun);
 const closed=()=>!status?.qa&&!!status?.closesAt&&Date.now()+serverOffset>=Date.parse(status.closesAt);
 function expire(){
@@ -45,11 +58,13 @@ function snapshot(g){
   calmMode:!!g.calmMode};
 }
 function persist(g){
+ if(inspecting)return false;
  if(!isGame(g)||!active||active.board_id!==g.puzzle.id||active.scope!==scope())return false;
  const row=stored(g.puzzle.id);if(!row)return false;
  row.progress=snapshot(g);if(!put(row))return false;g.lastAutosaveAt=Date.now();return true;
 }
 function record(kind,g=global.currentGame,feedback={}){
+ if(inspecting)return Promise.resolve();
  if(closed()){expire();return Promise.resolve()}
  if(!isGame(g)||!active||active.scope!==scope()||(g.finished&&!['finish','feedback'].includes(kind)))return Promise.resolve();
  const now=Math.max(0,Math.round(global.gameElapsed(g)));
@@ -72,20 +87,20 @@ async function flush(){
  if(closed()){expire();return}
  if(status?.qa||!status?.eligible||!navigator.onLine)return;
  if(flushing)return flushing;
- const owner=scope(),profile=global.getProfile?.();
+ const owner=scope(),experiment=ID,profile=global.getProfile?.();
  flushing=(async()=>{
   for(const cached of Object.values(read().attempts||{})){
-   while(owner===scope()){
+   while(owner===scope()&&experiment===ID){
     const row=stored(cached.board_id),event=row?.pending?.[0];if(!event)break;
     if(row.conflict)break;
     try{
      const reply=await request('/event',{method:'POST',body:JSON.stringify(event),authProfile:profile});
-     if(owner!==scope())return;
+     if(owner!==scope()||experiment!==ID)return;
      const fresh=stored(cached.board_id);if(fresh?.pending?.[0]?.event_id!==event.event_id)return;
      fresh.pending.shift();fresh.revision=reply.revision;fresh.syncError='';fresh.reward_points=reply.rewardPoints||fresh.reward_points||0;put(fresh);
      if(reply.rewardGranted){global.showToast?.('+200 XP za dohrání a hodnocení. Díky!');global.refreshRemoteProfile?.()}
     }catch(error){
-     if(owner!==scope())return;
+     if(owner!==scope()||experiment!==ID)return;
      const fresh=stored(cached.board_id);fresh.syncError=error.message;
      if(error.status===409)fresh.conflict=true;
      if(error.status===410){status.eligible=false;global.showToast?.('Playtest skončil. Nové výsledky ani hodnocení už nelze odeslat.')} 
@@ -100,12 +115,20 @@ async function refresh(){
  const owner=scope();if(flight&&statusScope===owner)return flight;
  statusScope=owner;
  flight=(async()=>{
-  if(!wantQa&&owner==='guest'){status=null;render();return}
+  if(!wantQa&&owner==='guest'){status=null;clearTimeout(expiryTimer);armTransition();render();return}
   try{
    const result=await request('/status'+(wantQa?'?qa=true':''));
    if(owner!==scope())return;
    status=result;
-   serverOffset=result.serverNow?Date.parse(result.serverNow)-Date.now():0;armExpiry();
+   if(result.experimentId==='mozkokalypsa-round3-interwoven-v2'&&(result.round===3||result.previewRound===3)){
+    if(ID!==result.experimentId){
+     active=null;feedbackBoard=null;inspecting=false;
+     for(const id of ['#mkHubModal','#mkResultModal'])$(id)?.classList.add('hidden');
+     if(isGame(global.currentGame)){global.stopTimer();global.releaseGameWakeLock();global.nav('daily',{replace:true})}
+    }
+    ID=result.experimentId;TOTAL=result.order.length;setupRound3();
+   }
+   serverOffset=result.serverNow?Date.parse(result.serverNow)-Date.now():0;armExpiry();armTransition();
    if(result.qa)global.closeOnboarding?.(true);
    if(result.eligible&&!result.qa){
     const state=read();state.attempts=state.attempts||{};
@@ -120,13 +143,47 @@ async function refresh(){
  })().finally(()=>{flight=null});
  return flight;
 }
+function setupRound3(){
+ if(document.documentElement.classList.contains('mk-round3'))return;
+ document.documentElement.classList.add('mk-round3');
+ if(status.qa)document.documentElement.classList.add('mk-round3-preview');
+ const notice=document.createElement('p');notice.id='mkPreviewNotice';notice.className='mk-preview-notice';
+ notice.textContent='Soukromý náhled · Postup a hodnocení jen v tomto prohlížeči, bez skutečných XP.';
+ if(status.qa)$('#screen-daily').prepend(notice);
+ $('#mozkokalypsaInvite .mk-invite-facts>span:first-child').innerHTML='<b>8</b> nových desek';
+ $('#mozkokalypsaInvite .mk-clock-label').textContent='Do konce třetího kola';
+ $('#mozkokalypsaInvite .mk-reward-cap').innerHTML='Za celou osmičku až <b>1 600 XP</b>';
+ $('#mozkokalypsaInvite .mk-progress-heading>span').textContent='Tvoje třetí kolo';
+ $('#mkInviteProgress').replaceChildren(...Array.from({length:TOTAL},()=>document.createElement('i')));
+ $('#mkHubTitle').textContent='Mozkokalypsa III';
+ $('#mkRatingNote').placeholder='Slova, propletení, záludné místo…';
+ const inspect=document.createElement('button');inspect.type='button';inspect.id='mkInspectBoard';inspect.className='text-btn';inspect.textContent='Prohlédnout dohranou desku';
+ $('#mkResultStats').after(inspect);inspect.onclick=inspectBoard;
+ const returnButton=document.createElement('button');returnButton.type='button';returnButton.id='mkReturnRating';returnButton.className='primary-btn hidden';returnButton.textContent='Zpět k hodnocení';
+ $('#screen-game .game-actions').appendChild(returnButton);
+ returnButton.onclick=()=>{inspecting=false;returnButton.classList.add('hidden');showModal('#mkResultModal')};
+}
+async function inspectBoard(){
+ const row=stored(feedbackBoard);if(!row?.completed)return;
+ const owner=scope(),experiment=ID;
+ try{
+  const response=active?.board_id===row.board_id&&active?.puzzle?{puzzle:active.puzzle}:await request(status.qa?`/board/${row.board_id}?qa=true`:`/open/${row.board_id}`,status.qa?{}:{method:'POST'});
+  if(owner!==scope()||experiment!==ID||closed())return;
+  active={...row,scope:scope(),puzzle:response.puzzle};inspecting=true;
+  closeModal('#mkResultModal');
+  await global.startGame(response.puzzle,'playtest',null);
+  const g=global.currentGame;g.finished=true;global.stopTimer();global.releaseGameWakeLock();
+  global.renderGameBoard();global.renderGameHUD();
+  inspecting=true;$('#mkReturnRating').classList.remove('hidden');
+ }catch(error){inspecting=false;global.showToast(error.message);showModal('#mkResultModal')}
+}
 function deadlineLabel(){
  const end=Date.parse(status?.closesAt);if(!Number.isFinite(end))return 'Čas uzávěrky není dostupný.';
  const options={timeZone:'Europe/Prague',hour:'2-digit',minute:'2-digit',hourCycle:'h23'};
  const time=new Intl.DateTimeFormat('cs-CZ',options).format(end);
  const midnight=time==='00:00';
  const day=new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',weekday:'short',day:'numeric',month:'numeric'}).format(end-(midnight?1:0));
- return `Konec: ${day} ve ${midnight?'24:00':time} · český čas`;
+ return `${status?.deadlineIsExample?'Ukázkový konec':'Konec'}: ${day} ve ${midnight?'24:00':time} · český čas`;
 }
 function stopCountdown(){clearTimeout(countdownTimer);countdownTimer=null}
 function updateCountdown(){
@@ -163,6 +220,13 @@ function render(){
   'Ještě tvoje hodnocení a máme hotovo. V přehledu najdeš desky, kterým chybí poslední tečka.':
   'Dvanáct nových desek. Zahraj si je před ostatními a řekni nám, kde je výzva a kde už trápení.';
  $('#mkInviteButton').textContent=allReviewed?'Prohlédnout druhé kolo':done?'Doplnit hodnocení':rows.length?'Pokračovat ve druhém kole':'Jdu do druhého kola';
+ if(round3()){
+  $('#mkInviteTitle').textContent=allReviewed?'Třetí kolo rozpletené.':done?'Osmička je za tebou.':'Mozkokalypsa potřetí.';
+  $('#mkInviteCopy').textContent=allReviewed?'Všech osm dohráno i ohodnoceno. Díky! Tvoje postřehy nám pomůžou vyladit další Proplety.':done?
+   'Ještě pár hodnocení a máme hotovo. V přehledu najdeš desky, kterým chybí tvoje poslední slovo.':
+   'Pestřejší česká slova. Víc propletené cesty. Osm nových desek, které prověří i zkušené hlavy. Zkus, kam jsme se posunuli.';
+  $('#mkInviteButton').textContent=allReviewed?'Prohlédnout třetí kolo':done?'Doplnit hodnocení':rows.length?'Pokračovat ve třetím kole':'Jdu do třetího kola';
+ }
  const deadline=deadlineLabel();$('#mkInviteDeadline').textContent=deadline;
  const hubDeadline=$('#mkHubDeadline');if(hubDeadline)hubDeadline.textContent=deadline;
  const progress=$('#mkInviteProgressText');if(progress)progress.textContent=`${count}/${TOTAL} dohráno · ${reviewed} ohodnoceno`;
@@ -187,7 +251,8 @@ async function hub(){
  status.order.forEach((id,i)=>{
   const row=stored(id),button=document.createElement('button');button.type='button';button.className='secondary-btn mk-board-link';
   button.textContent=`${i+1}. deska${row?.completed?(rated(row)?' · hotovo · +200 XP':' · doplnit hodnocení'):row?.progress?.elapsedMs?' · pokračovat':''}`;
-  button.disabled=!!row?.completed&&rated(row);button.onclick=()=>row?.conflict?resolveConflict(id):launch(id);
+  if(round3()&&row?.completed&&rated(row))button.textContent=`${i+1}. deska · ohodnoceno` ;
+  button.disabled=!round3()&&!!row?.completed&&rated(row);button.onclick=()=>row?.conflict?resolveConflict(id):launch(id);
   if(row?.conflict)button.textContent=`${i+1}. deska · obnovit postup`;
   root.appendChild(button);
  });
@@ -197,8 +262,8 @@ async function hub(){
 async function resolveConflict(id){
  if(!global.confirm('Tahle deska se mezitím změnila na jiném zařízení. Načíst její poslední uložený postup? Místní kopii ponecháme v záloze.'))return;
  try{
-  const owner=scope(),response=await request(`/open/${id}`,{method:'POST'});
-  if(owner!==scope())return;
+  const owner=scope(),experiment=ID,response=await request(`/open/${id}`,{method:'POST'});
+  if(owner!==scope()||experiment!==ID)return;
   const state=read();state.conflictBackups=state.conflictBackups||[];
   state.conflictBackups.push({...state.attempts[id],backedUpAt:Date.now()});
   state.attempts[id]={...response.attempt,pending:[],events:[]};
@@ -209,13 +274,13 @@ async function resolveConflict(id){
 async function launch(id){
  if(closed()){expire();return}
  if(!status?.eligible||launching)return;
- const owner=scope(),qa=!!status.qa;
+ const owner=scope(),experiment=ID,qa=!!status.qa;
  launching=true;
  try{
   await flush();
-  if(owner!==scope()||!status?.eligible)return;
+  if(owner!==scope()||experiment!==ID||!status?.eligible)return;
   const response=await request(qa?`/board/${id}?qa=true`:`/open/${id}`,qa?{}:{method:'POST'});
-  if(owner!==scope()||statusScope!==owner)return;
+  if(owner!==scope()||experiment!==ID||statusScope!==owner)return;
   let row=stored(id),remote=response.attempt;
   if(!status.qa&&row?.pending?.length){
    if(row.conflict)throw new Error('Tato deska byla změněna na jiném zařízení. Místní postup je zachovaný; otevři ji na původním zařízení.');
@@ -223,8 +288,8 @@ async function launch(id){
   }
   if(status.qa){row=row||{id:uid(),board_id:id,revision:0,progress:{},completed:false,pending:[],events:[]}}
   else if(!row||remote.revision>row.revision)row={...remote,pending:[],events:row?.events||[]};
-  if(row.completed){if(!put(row))return;closeModal('#mkHubModal');showResult(row);return}
-  if(!put(row))return;active={...row,scope:scope(),puzzle:response.puzzle};
+  if(row.completed){if(!put(row))return;active={...row,scope:scope(),puzzle:response.puzzle};closeModal('#mkHubModal');showResult(row);return}
+  if(!put(row))return;inspecting=false;$('#mkReturnRating')?.classList.add('hidden');active={...row,scope:scope(),puzzle:response.puzzle};
   closeModal('#mkHubModal');closeModal('#mkResultModal');
   await global.startGame(response.puzzle,'playtest',null);
  }catch(error){global.showToast(error.message)}finally{launching=false}
@@ -244,13 +309,15 @@ function renderSync(){
  const el=$('#mkResultSync');if(!el||!status)return;
  const row=stored(feedbackBoard);
  el.textContent=status.qa?'Náhled: tento výsledek je uložen jen na zařízení.':pendingCount()?'Uloženo na zařízení. Odeslání čeká na připojení; můžeš ho zkusit znovu.':rated(row)?'Hodnocení odesláno. 200 XP máš připsáno.':'Dohráno. Vyplň obtížnost i zábavnost a získej 200 XP.';
+ if(round3()&&status.qa)el.textContent=rated(row)?'Hodnocení je uložené v tomto náhledu. Skutečné XP se nepřipisují.':'Hodnocení se uloží jen v tomto náhledu. Skutečné XP se nepřipisují.';
  $('#mkRetrySync')?.classList.toggle('hidden',!!status.qa||!pendingCount());
 }
 function showResult(row){
- feedbackBoard=row.board_id;
+ feedbackBoard=row.board_id;inspecting=false;$('#mkReturnRating')?.classList.add('hidden');
  const p=row.progress||{};
  $('#mkResultStats').textContent=`${global.fmtTime(p.elapsedMs||0)} · ${p.moves||0} tahů · ${p.hints||0} nápověd`;
  $('#mkResultTitle').textContent=completeCount()===TOTAL?'Všech dvanáct. Respekt.':'Další deska je doma.';
+ if(round3()){$('#mkResultTitle').textContent=completeCount()===TOTAL?'Celá osmička rozpletená.':'Další deska je doma.';$('#mkResultNext').textContent=completeCount()===TOTAL?'Uložit hodnocení':'Uložit a další deska'}
  $('#mkRatingDifficulty').value=row.feedback?.difficulty||'';$('#mkRatingFun').value=row.feedback?.fun||'';$('#mkRatingNote').value=row.feedback?.note||'';
  renderSync();showModal('#mkResultModal');
 }
@@ -258,12 +325,13 @@ async function finish(g){
  g.elapsedMs=global.gameElapsed(g);g.baseElapsedMs=g.elapsedMs;g.start=performance.now();g.pausedAt=g.start;
  g.finished=true;g.finishing=false;global.stopTimer();global.releaseGameWakeLock();
  global.renderGameBoard();global.renderGameHUD();
+ if(inspecting)return;
  record('finish',g);showResult(stored(g.puzzle.id));global.fx?.('win');
 }
 function feedback(){
  if(closed()){expire();return false}
  const difficulty=Number($('#mkRatingDifficulty').value)||null,fun=Number($('#mkRatingFun').value)||null,note=$('#mkRatingNote').value.trim();
- if(!difficulty||!fun){global.showToast?.('Vyber obtížnost i zábavnost. Pak ti připíšeme 200 XP.');return false}
+ if(!difficulty||!fun){global.showToast?.(round3()?'Vyber náročnost i zábavnost, ať je hodnocení úplné.':'Vyber obtížnost i zábavnost. Pak ti připíšeme 200 XP.');return false}
  const row=stored(feedbackBoard);if(!row?.completed)return false;
  const value={difficulty,fun,note};
  if(JSON.stringify(row.feedback)===JSON.stringify(value)&&(rated(row)||row.pending?.some(e=>e.event_type==='feedback')))return true;
@@ -296,17 +364,18 @@ function install(){
    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}
    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}
   }
+  if(e.key==='Escape'&&inspecting){e.preventDefault();inspecting=false;$('#mkReturnRating').classList.add('hidden');showModal('#mkResultModal');return}
   if(e.key!=='Escape')return;
   if(!$('#mkResultModal').classList.contains('hidden')){e.preventDefault();leaveResult()}
   else if(!$('#mkHubModal').classList.contains('hidden')){e.preventDefault();closeModal('#mkHubModal')}
  });
- document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCountdown();else{expire();updateCountdown()}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCountdown();else{expire();checkTransition();updateCountdown()}});
  global.addEventListener('pagehide',stopCountdown);
- global.addEventListener('pageshow',()=>{expire();updateCountdown()});
+ global.addEventListener('pageshow',()=>{expire();checkTransition();updateCountdown()});
  document.addEventListener('proplet:ready',()=>refresh());
  document.addEventListener('proplet:profile-refreshed',()=>{if(statusScope!==scope()){status=null;active=null;feedbackBoard=null;for(const id of ['#mkResultModal','#mkHubModal'])$(id).classList.add('hidden')}refresh()});
  document.addEventListener('proplet:screen-changed',()=>{if(statusScope!==scope()){status=null;active=null;refresh()}render()});
- global.addEventListener('online',()=>flush());
+ global.addEventListener('online',()=>refresh().then(()=>flush()));
  // Catch a readiness event fired before this additive script was installed.
  // The API/profile functions are installed by app.js; no dependency on a lexical window.puzzleDB.
  refresh();
