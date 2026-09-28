@@ -56,11 +56,15 @@ def load_settings() -> Settings:
     gen4_preview_branch = "agent/v3340-medium-calibration-v3"
     gen4_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == gen4_preview_branch
     gen5_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/gen5-lab"
+    # The in-game round-three preview cannot inherit production data or push access.
+    round3_preview = vercel_git_commit_ref == "preview/mozkokalypsa3-in-game-20260928"
+    if round3_preview and vercel_env != "preview":
+        raise RuntimeError("Round-three in-game preview cannot run as production")
     # A preview must fail closed before any database client can be constructed.
     if vercel_git_commit_ref == "feat/pestre-poradi-production" or _env("PROPLET_ORDER_TEST_ONLY") == "true":
         if vercel_env != "preview" or _env("SUPABASE_URL").rstrip("/") != "https://eanzztstmwlamwfdskbf.supabase.co":
             raise RuntimeError("Order preview requires the existing isolated test database")
-    playtest_preview = vercel_env == "preview" and vercel_git_commit_ref in {"feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release", "feat/mozkokalypsa-round2-invite"}
+    playtest_preview = round3_preview or (vercel_env == "preview" and vercel_git_commit_ref in {"feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release", "feat/mozkokalypsa-round2-invite"})
     data_root = root / "data"
     return Settings(
         root=root,
@@ -72,10 +76,10 @@ def load_settings() -> Settings:
         # slashes and the secret was not whitespace-normalized.
         supabase_url="" if playtest_preview else os.environ.get("SUPABASE_URL", "").rstrip("/"),
         supabase_secret_key="" if playtest_preview else os.environ.get("SUPABASE_SECRET_KEY", ""),
-        vapid_public_key=_env("VAPID_PUBLIC_KEY"),
-        vapid_private_key=_env("VAPID_PRIVATE_KEY"),
+        vapid_public_key="" if round3_preview else _env("VAPID_PUBLIC_KEY"),
+        vapid_private_key="" if round3_preview else _env("VAPID_PRIVATE_KEY"),
         vapid_subject=_env("VAPID_SUBJECT", "https://proplet-nine.vercel.app"),
-        cron_secret=_env("CRON_SECRET"),
+        cron_secret="" if round3_preview else _env("CRON_SECRET"),
         vercel_env=vercel_env,
         vercel_git_commit_ref=vercel_git_commit_ref,
         gen4_preview_branch=gen4_preview_branch,

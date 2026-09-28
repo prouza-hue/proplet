@@ -1,0 +1,30 @@
+name: Mozkokalypsa III native preview
+on:
+  push:
+    branches: ['preview/mozkokalypsa3-in-game-20260928']
+    paths: ['.github/workflows/mk3-native-preview.yml']
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Capture exact native application and approved content
+        run: |
+          mkdir -p /tmp/mk3-native-source
+          git archive --format=zip HEAD -o /tmp/mk3-native-source/source.zip
+          git ls-tree -r HEAD > /tmp/mk3-native-source/TREE.txt
+          git rev-parse HEAD > /tmp/mk3-native-source/SOURCE_SHA.txt
+          git fetch --no-tags origin 553fb3578c958004b831068dfd268dbcb2a423ab
+          git show 553fb3578c958004b831068dfd268dbcb2a423ab:content/gen6/round3-interwoven/bank.json > /tmp/mk3-native-source/approved-bank.json
+          sha256sum /tmp/mk3-native-source/* > /tmp/mk3-native-source/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mk3-native-source
+          path: /tmp/mk3-native-source
+          retention-days: 3
