@@ -65,13 +65,13 @@ server._fair_play_policy_for_bucket.cache_clear()
 policy_reads = []
 
 
-def policy_db(method, table, **kwargs):
-    policy_reads.append((method, table, kwargs))
+def policy_select(table, **filters):
+    policy_reads.append((table, filters))
     return [{"enabled": True, "daily_from": "2026-09-01"}]
 
 
 with patch.object(server, "VERCEL_ENV", "production"), \
-     patch.object(server, "db_request", side_effect=policy_db), \
+     patch.object(server, "db_select", side_effect=policy_select), \
      patch.object(server.time, "time", return_value=120.0):
     first = server.play_session_config()
     second = server.play_session_config()
@@ -79,5 +79,5 @@ with patch.object(server, "VERCEL_ENV", "production"), \
 assert first == second
 assert first["heartbeatMs"] == 25_000 and first["leaseMs"] == 45_000
 assert len(policy_reads) == 1
-assert policy_reads[0][2]["params"]["select"] == "enabled,daily_from"
+assert policy_reads == [("fair_play_policy", {"singleton": True})]
 print("PASS compact account snapshot contract and minute-bucket fair-play policy cache")
