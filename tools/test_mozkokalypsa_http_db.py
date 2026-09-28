@@ -98,6 +98,7 @@ with ExitStack() as stack:
   time.sleep(1)
  else:raise AssertionError('Local PostgREST did not start')
  stack.enter_context(patch.object(m,'is_closed',return_value=False))
+ stack.enter_context(patch.object(m.round3,'has_started',return_value=False))
  stack.enter_context(patch.dict(os.environ,{'VERCEL_ENV':'production','PROPLET_MOZKOKALYPSA_ENABLED':'true'}))
  stack.enter_context(patch.object(server,'SUPABASE_URL',f'http://127.0.0.1:{gateway.server_port}'))
  stack.enter_context(patch.object(server,'SUPABASE_SECRET_KEY',jwt))
@@ -176,7 +177,7 @@ with ExitStack() as stack:
   assert all(after[t]==before[t] for t in normal_tables if t!='account_rewards')
   assert all(after['account_rewards'][i]==before['account_rewards'][i] for i in (1,2,3))
   # Deadline is enforced by the database even with backend wall-clock bypassed.
-  query("update mozkokalypsa_experiments set closes_at=clock_timestamp()-interval '1 second' returning id")
+  query("update mozkokalypsa_experiments set closes_at=clock_timestamp()-interval '1 second' where id=%s returning id",(m.EXPERIMENT,))
   assert c.post('/api/mozkokalypsa/open/mk2-03',headers=headers[2]).status_code==410
   try:
    rpc('proplet_mozkokalypsa2_event',dict(p_experiment=m.EXPERIMENT,p_player=players[0],p_board=board['id'],

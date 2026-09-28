@@ -338,7 +338,8 @@ def db_rpc(
         except Exception:
             error_payload = {}
         logger.warning("Supabase RPC failed function=%s status=%s", function, response.status_code)
-        if function in {'proplet_mozkokalypsa2_open','proplet_mozkokalypsa2_event'}:
+        if function in {'proplet_mozkokalypsa2_open','proplet_mozkokalypsa2_event',
+                        'proplet_mozkokalypsa3_open','proplet_mozkokalypsa3_event'}:
             code=error_payload.get('code') if isinstance(error_payload,dict) else None
             if code=='PT410':raise HTTPException(410,'Playtest skončil nebo není otevřený.')
             if code=='PT422':raise HTTPException(422,'Nejdřív dokonči desku a vyplň obě hodnocení.')

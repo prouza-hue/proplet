@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 from typing import Literal
 from uuid import UUID
+from . import mozkokalypsa_round3 as round3
 
 from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -109,6 +110,9 @@ def validate_feedback(raw):
 
 def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
 
+    round3_status=round3.install(app,auth_player=auth_player,db_select=db_select,db_rpc=db_rpc,
+        enforce_rate_limit=enforce_rate_limit,validate_progress=validate_progress,validate_feedback=validate_feedback)
+
     def invite(authorization):
         if not enabled():raise HTTPException(404,'Playtest zatím není otevřený.')
         player=auth_player(authorization)
@@ -121,10 +125,13 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
 
     @app.get('/api/mozkokalypsa/status')
     def status(request:Request,qa:bool=False,authorization:str|None=Header(default=None)):
+        if (qa and round3.preview_allowed()) or (not qa and round3.has_started()):
+            return round3_status(request,qa,authorization)
         if qa:
             if not preview_allowed():raise HTTPException(403,'Testovací náhled není na produkci dostupný.')
             return {'eligible':True,'qa':True,'experimentId':EXPERIMENT,'order':bank()['orders'][0],
-                    'attempts':[],'name':'Mozkokalypsa','closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat()}
+                    'attempts':[],'name':'Mozkokalypsa','closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat(),
+                'nextTransitionAt':round3.OPENS_AT}
         if not enabled() or not authorization or is_closed():return {'eligible':False}
         enforce_rate_limit(request,'mozkokalypsa_status',limit=120,window_seconds=3600)
         try:
@@ -135,7 +142,8 @@ def install(app,*,auth_player,db_select,db_request,db_rpc,enforce_rate_limit):
         attempts=db_select('mozkokalypsa_attempts',experiment_id=EXPERIMENT,player_id=player['id'])
         return {'eligible':True,'qa':False,'experimentId':EXPERIMENT,
                 'order':bank()['orders'][cohort['slot']],'attempts':attempts,'name':'Mozkokalypsa',
-                'closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat()}
+                'closesAt':CLOSES_AT,'rewardXp':200,'serverNow':datetime.now(timezone.utc).isoformat(),
+                'nextTransitionAt':round3.OPENS_AT}
 
     @app.get('/api/mozkokalypsa/board/{board_id}')
     def preview_board(board_id:str,qa:bool=False):
