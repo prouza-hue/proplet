@@ -6,6 +6,10 @@
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
       {
+        "path": "tests/current/test_starter_result_validation.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_funnel_context.cjs",
         "runner": "node"
       },
