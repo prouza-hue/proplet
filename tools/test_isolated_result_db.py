@@ -227,6 +227,31 @@ def main():
         response_b = client.post('/api/result', json=body, headers={'Authorization':'Bearer '+tokens[1]})
         assert response_b.status_code == 200, response_b.text
         assert response_b.json()['stats']['playerId'] == players[1]
+        # Replay an actual pending three-word starter, then a legacy four-word
+        # completion under the same reward identity. No fabricated moves/XP.
+        starter = dict(puzzle_id='starter-v1', challenge_key='starter:starter-v1',
+                       mode='starter', difficulty='easy', elapsed_ms=12000, moves=3,
+                       completed_at=datetime.now(timezone.utc).isoformat())
+        auth = {'Authorization': 'Bearer '+tokens[0]}
+        for changes in ({'moves': 2}, {'wrong_attempts': 1}, {'elapsed_ms': 2499}):
+            rejected = client.post('/api/result', json={**starter, **changes}, headers=auth)
+            assert rejected.status_code == 400, rejected.text
+        accepted = client.post('/api/result', json=starter, headers=auth)
+        assert accepted.status_code == 200, accepted.text
+        assert accepted.json()['awardedPoints'] == server.STARTER_XP
+        replay = client.post('/api/result', json=starter, headers=auth)
+        assert replay.status_code == 200 and replay.json() == accepted.json()
+        legacy = client.post('/api/result', json={**starter, 'moves': 4,
+            'completed_at': datetime.now(timezone.utc).isoformat()}, headers=auth)
+        assert legacy.status_code == 200 and legacy.json()['awardedPoints'] == 0, legacy.text
+        progress = client.get('/api/progress', headers=auth)
+        assert progress.status_code == 200, progress.text
+        saved = [r for r in progress.json()['completed'] if r['challengeKey'] == 'starter:starter-v1']
+        assert len(saved) == 1 and saved[0]['moves'] == 3 and saved[0]['points'] == server.STARTER_XP
+        with connect() as c:
+            count, xp = c.execute("select count(*), sum(points) from results where player_id=%s and challenge_key='starter:starter-v1'", (players[0],)).fetchone()
+            assert count == 1 and xp == server.STARTER_XP
+        report['checks'].append('HTTP starter: 3 words persisted, durable replay, legacy 4 words shares reward, progress confirmed')
     with connect() as c:
         assert c.execute('select player_id::text from puzzle_attempts where id=%s', (body['attempt_id'],)).fetchone()[0] == players[0]
         assert c.execute('select count(*) from results where puzzle_id=%s', (board['id'],)).fetchone()[0] == 2

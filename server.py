@@ -1272,6 +1272,14 @@ def validate_result_sanity(payload: ResultCreate) -> None:
     answers = puzzle.get("answers") or []
     answer_count = len(answers)
     active_cells = len(puzzle.get("mask") or [])
+    if payload.mode == "starter" and payload.puzzle_id == "starter-v1" and payload.difficulty == "easy":
+        # Released board-v2 (4 answers/25 cells) and board-v3-short (3/9)
+        # intentionally share the once-per-player reward key. Shipped result
+        # payloads, including pending offline queues, have no variant field.
+        # Accept the minimum of these two known variants; do not infer content
+        # from mutable onboarding headers after signup. Other modes stay strict.
+        answer_count = 3
+        active_cells = 9
     # Every counted move is either one newly found answer or one wrong attempt.
     # Older cached clients may count harmless short taps too, hence >= rather than equality.
     if payload.moves < answer_count + payload.wrong_attempts:
