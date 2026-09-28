@@ -19,16 +19,16 @@ console.log('PASS guest merge, monotonic clock, retry and quota retention, inten
 
 (async()=>{
  const {create:fairPlay}=require('../../public/app/game/fair-play.js');
- let fail=false,finished=false,completed=false,timers=0,claimed=0;
+ let fail=false,finished=false,completed=false,timers=0,claimed=0,heartbeatMs=0;
  const controller=fairPlay({owner:'synthetic-owner',profile:()=>null,elapsed:g=>g.baseElapsedMs||0,key:(m,p)=>m+':'+p.id,now:()=>100,
-  completed:()=>completed,claim:async()=>claimed++,setInterval:()=>++timers,clearInterval:()=>timers--,
-  api:async(path,opts)=>{if(path.endsWith('/config'))return {enabled:true};if(fail)throw Error('network');return {attempt_id:'server-attempt',verified:true,finished,elapsed_ms:20000,progress:{elapsedMs:20000,found:[{answerIndex:0,path:[0]}],moves:1}};}});
+  completed:()=>completed,claim:async()=>claimed++,setInterval:(_fn,ms)=>{heartbeatMs=ms;return ++timers},clearInterval:()=>timers--,
+  api:async(path,opts)=>{if(path.endsWith('/config'))return {enabled:true,heartbeatMs:25000,leaseMs:45000};if(fail)throw Error('network');return {attempt_id:'server-attempt',verified:true,finished,elapsed_ms:20000,progress:{elapsedMs:20000,found:[{answerIndex:0,path:[0]}],moves:1}};}});
  for(const mode of ['daily','free','tajenka']){
   const prepared=await controller.prepare({id:'p'},mode,null,null);
   assert.equal(prepared.restored.elapsedMs,20000);assert.equal(prepared.restored.found.length,1);
  }
  const g={puzzle:{id:'p'},mode:'daily',attemptId:'server-attempt',fairPlay:true,found:[],baseElapsedMs:0,pausedAt:null};
- controller.start(g);controller.start(g);assert.equal(timers,1);
+ controller.start(g);controller.start(g);assert.equal(timers,1);assert.equal(heartbeatMs,25000);
  await controller.pause(g);assert.equal(timers,0);
  await controller.resume(g);assert.equal(claimed,1);assert.equal(g.baseElapsedMs,20000);assert.equal(g.found.length,1);
  fail=true;await controller.send(g,'pulse');assert.equal(!!g.timingUnverified,false);

@@ -2,8 +2,9 @@
 'use strict';
 function create(deps){
  const owner=deps.owner||global.crypto.randomUUID();
- let sequence=0,configPromise=null,active=null,chain=Promise.resolve(),timer=null;
- const config=()=>configPromise||(configPromise=deps.api('/api/play-session/config',{timeoutMs:2000}).then(value=>{global.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=value.isolatedPreview===true;try{global.localStorage?.setItem('proplet:fair-play-config',JSON.stringify(value))}catch{}return value}).catch(()=>{configPromise=null;try{return JSON.parse(global.localStorage?.getItem('proplet:fair-play-config')||'{}')}catch{return {enabled:false}}}));
+ let sequence=0,configPromise=null,active=null,chain=Promise.resolve(),timer=null,heartbeatMs=25000;
+ const rememberConfig=value=>{const configured=Number(value?.heartbeatMs);if(configured>=10000&&configured<=30000)heartbeatMs=configured;return value};
+ const config=()=>configPromise||(configPromise=deps.api('/api/play-session/config',{timeoutMs:2000}).then(value=>{global.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=value.isolatedPreview===true;try{global.localStorage?.setItem('proplet:fair-play-config',JSON.stringify(value))}catch{}return rememberConfig(value)}).catch(()=>{configPromise=null;try{return rememberConfig(JSON.parse(global.localStorage?.getItem('proplet:fair-play-config')||'{}'))}catch{return {enabled:false}}}));
  function snapshot(g){return {found:g.found||[],elapsedMs:Math.round(deps.elapsed(g)),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,calmMode:!!g.calmMode,unverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts}}
  function command(g,action,progress){return {action,puzzle_id:g.puzzle.id,challenge_key:deps.key(g.mode,g.puzzle,g.dailyDate),mode:g.mode,difficulty:g.puzzle.difficulty,attempt_id:g.attemptId,owner_id:owner,sequence:++sequence,progress}}
  function stop(){if(timer!=null){deps.clearInterval(timer);timer=null}}
@@ -35,7 +36,7 @@ function create(deps){
      return {restored:{...restored,timingUnverified:true,attemptId:g.attemptId},fairPlay:true};
    }
  }
- function start(g){stop();active=g;if(!g?.fairPlay||g.finished||g.pausedAt!=null)return;timer=deps.setInterval(()=>{if(active===g&&!g.finished&&g.pausedAt==null)send(g,'pulse');else stop()},15000)}
+ function start(g){stop();active=g;if(!g?.fairPlay||g.finished||g.pausedAt!=null)return;timer=deps.setInterval(()=>{if(active===g&&!g.finished&&g.pausedAt==null)send(g,'pulse');else stop()},heartbeatMs)}
  function pause(g){stop();return send(g,'pause')}
  async function resume(g){
    await deps.claim?.();

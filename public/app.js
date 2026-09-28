@@ -1408,7 +1408,11 @@ async function refreshRemoteProfile({throwOnError=false}={}){
  accountProgressError=false;renderAccountProgressStatus();
  async function loadSnapshot(){
   for(let attempt=0;attempt<2;attempt++){
-   try{return await Promise.all([api('/api/me',{authProfile:p}),api('/api/progress',{authProfile:p})])}
+   try{
+    const cachedAt=getState(p.id)?.remoteProgressLoadedAt,validCursor=typeof cachedAt==='string'&&Number.isFinite(Date.parse(cachedAt));
+    const suffix=validCursor?`?since=${encodeURIComponent(cachedAt)}`:'';
+    return await api('/api/account/snapshot'+suffix,{authProfile:p});
+   }
    catch(e){
     const status=Number(e?.status||0),retryable=!status||status===408||status===425||status===429||status>=500;
     if(attempt||navigator.onLine===false||!retryable||!accountProfileMatches(p))throw e;
@@ -1419,11 +1423,11 @@ async function refreshRemoteProfile({throwOnError=false}={}){
  }
  const request={profile:p,promise:null};
  request.promise=(async()=>{try{
-  const [me,progress]=await loadSnapshot();
+  const me=await loadSnapshot();
   if(!accountProfileMatches(p))return null;
-  if(!Array.isArray(progress.completed))throw new Error('Neúplná odpověď postupu');
-  mergeRemoteProgress(progress.completed||[],p.id);
-  const loadedState=getState(p.id);loadedState.remoteProgressLoadedAt=new Date().toISOString();saveState(loadedState,p.id);
+  if(!Array.isArray(me.completed))throw new Error('Neúplná odpověď postupu');
+  mergeRemoteProgress(me.completed||[],p.id);
+  const loadedState=getState(p.id),cursor=typeof me.cursor==='string'&&Number.isFinite(Date.parse(me.cursor))?me.cursor:new Date().toISOString();loadedState.remoteProgressLoadedAt=cursor;saveState(loadedState,p.id);
   accountProgressReady=p;accountProgressAuthRequired=false;
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}

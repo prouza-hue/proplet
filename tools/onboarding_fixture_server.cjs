@@ -61,6 +61,7 @@ const server=http.createServer(async(req,res)=>{
    if(p==='/api/result'){if(controls.result==='fail')return json(res,503,{detail:'synthetic save outage'});controls.progress.push({...data,puzzleId:data.puzzle_id,challengeKey:data.challenge_key,contentGeneration:data.content_generation,completedAt:data.completed_at});return json(res,200,{ok:true,synthetic:true})}
    if(p==='/api/me')return json(res,200,syntheticProfile);
    if(p==='/api/progress')return json(res,200,{completed:controls.progress});
+   if(p==='/api/account/snapshot')return json(res,200,{...syntheticProfile,completed:controls.progress,cursor:new Date().toISOString()});
    if(p==='/api/support-mode')return json(res,200,{supportMode:data?.support_mode||'younger'});
    if(['/api/anonymous/claim','/api/result','/api/attempt/start','/api/attempt/checkpoint','/api/attempt/finish'].includes(p))return json(res,200,{ok:true,synthetic:true});
    if(p==='/api/rankings/xp')return json(res,200,{players:[],rows:[],total:0,myRank:null});
