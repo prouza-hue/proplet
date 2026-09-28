@@ -440,6 +440,14 @@
       {
         "path": "tests/current/test_first_steps.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_usage_p0.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_usage_p0_client.cjs",
+        "runner": "node"
       }
     ]
   },
