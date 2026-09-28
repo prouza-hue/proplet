@@ -1,0 +1,30 @@
+name: Mozkokalypsa III release workbench
+on:
+  push:
+    branches: ['feat/mozkokalypsa-round3-release']
+    paths: ['.github/workflows/mk3-release-workbench.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Export exact current main and approved native preview inputs
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mk3-release-source
+          git archive --format=zip 1fdc7642dbd44412311a9d0362741a6080cd3521 -o /tmp/mk3-release-source/main.zip
+          git rev-parse HEAD > /tmp/mk3-release-source/BRANCH_SHA.txt
+          git ls-tree -r 1fdc7642dbd44412311a9d0362741a6080cd3521 > /tmp/mk3-release-source/MAIN_TREE.txt
+          git fetch --depth=1 --no-tags origin dc639f04ae62beb718851d3de8b1151cee5c2e82
+          git archive --format=zip dc639f04ae62beb718851d3de8b1151cee5c2e82 backend/mozkokalypsa.py backend/mozkokalypsa_preview.py public/app/mozkokalypsa.js public/mozkokalypsa.css public/index.html data/playtests/mozkokalypsa-v3-preview.json tools/test_mk3_native_preview.py tools/test_mk3_native_browser.py docs/playtests/MOZKOKALYPSA3-NATIVE-PREVIEW-20260928.md -o /tmp/mk3-release-source/preview.zip
+          git diff 1fdc7642dbd44412311a9d0362741a6080cd3521 HEAD -- backend/config.py > /tmp/mk3-release-source/isolation.patch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mk3-release-source
+          path: /tmp/mk3-release-source
+          retention-days: 3
