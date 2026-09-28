@@ -16,6 +16,7 @@ on:
       - 'supabase/**'
       - 'docs/SUPABASE_MIGRATION_MANIFEST.md'
       - 'tests/current/**'
+      - 'tests/round3/**'
       - 'tools/test_current.py'
       - 'tools/validate_migration_manifest.py'
       - 'tools/test_weekly_team_victories_scheduler.py'
@@ -34,6 +35,7 @@ on:
       - 'supabase/**'
       - 'docs/SUPABASE_MIGRATION_MANIFEST.md'
       - 'tests/current/**'
+      - 'tests/round3/**'
       - 'tools/test_current.py'
       - 'tools/validate_migration_manifest.py'
       - 'tools/test_weekly_team_victories_scheduler.py'
@@ -61,6 +63,11 @@ jobs:
 
       - name: Run current runtime gate
         run: python tools/test_current.py
+      - name: Scheduled playtest boundary and client transition
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests/round3 -v
+          node tests/round3/test_transition.cjs
 
   isolated-result-database:
     runs-on: ubuntu-latest
@@ -105,8 +112,11 @@ jobs:
           exit 1
       - name: Test real SQL with synthetic players only
         run: |
+          set -euo pipefail
           python -c "from pathlib import Path; Path('/tmp/proplet-test-password').write_text('local-test-only')"
           python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-isolated-results.json --database-name proplet_test_ci_cron
+          python tools/test_mk3_release_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
+          python tools/test_mk3_release_http_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_account_created_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-account-created.json
           python tools/test_funnel_sql.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
@@ -125,4 +135,3 @@ jobs:
             sleep 1
           done
           python tools/test_weekly_team_victories_scheduler.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
-
