@@ -108,6 +108,8 @@ POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100, "
 MOZKOMOR_UNLOCK_BASE_LEVELS = 200
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
+FAIR_PLAY_HEARTBEAT_MS = 25_000
+FAIR_PLAY_LEASE_MS = 45_000
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
 TAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)
 GEN4_RETURNING_BONUS_XP = 500
@@ -2208,6 +2210,52 @@ def progress(request: Request, authorization: Optional[str] = Header(default=Non
     }
 
 
+@app.get("/api/account/snapshot")
+def account_snapshot(
+    request: Request,
+    since: Optional[str] = Query(default=None, max_length=40),
+    authorization: Optional[str] = Header(default=None),
+):
+    """Return profile, authoritative stats and only newly completed boards."""
+    enforce_rate_limit(request, "account_snapshot", limit=600, window_seconds=3600)
+    player = auth_player(authorization)
+    since_at = parse_timestamp(since) if since else None
+    if since and since_at is None:
+        raise HTTPException(400, "Neplatný kurzor postupu")
+    puzzle_data = load_puzzles()
+    base_levels = {
+        difficulty: int(value)
+        for difficulty, value in (
+            (puzzle_data.get("release") or {}).get("baselineLevelCounts") or {}
+        ).items()
+        if difficulty in FREE_DIFFICULTIES
+    }
+    snapshot = db_rpc("proplet_account_snapshot_v1", {
+        "p_player": player["id"],
+        "p_since": since_at.isoformat() if since_at else None,
+        "p_active_generation": int(puzzle_data.get("freeGeneration") or 1),
+        "p_base_levels": base_levels,
+        "p_mozkomor_unlock_base": MOZKOMOR_UNLOCK_BASE_LEVELS,
+    })
+    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("completed"), list) or not isinstance(snapshot.get("stats"), dict):
+        raise HTTPException(503, "Souhrn účtu není momentálně dostupný")
+    stats = dict(snapshot["stats"])
+    current_streak = int(stats.get("currentStreak") or 0)
+    longest_streak = int(stats.get("longestStreak") or 0)
+    stats["earnedBadges"] = [badge for badge in BADGES if longest_streak >= badge["days"]]
+    stats["nextBadge"] = next((badge for badge in BADGES if current_streak < badge["days"]), None)
+    public_family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
+    return {
+        "id": player["id"], "name": player["name"], "familyCode": public_family,
+        "leagueName": snapshot.get("leagueName") if public_family else None,
+        "hasPassword": bool(player.get("password_hash")), "avatar": player.get("avatar") or "🙂",
+        "googleLinked": bool(player.get("auth_user_id")), "googleAvatarUrl": player.get("google_avatar_url"),
+        "useGoogleAvatar": bool(player.get("use_google_avatar")),
+        "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"),
+        "stats": stats, "completed": snapshot["completed"], "cursor": snapshot.get("cursor"),
+    }
+
+
 @app.get("/api/account/export")
 def account_export(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "account_export", limit=12, window_seconds=3600)
@@ -2325,18 +2373,29 @@ def merged_hint_count(old_value, new_value: int) -> int:
     return min(old, int(new_value))
 
 
+@lru_cache(maxsize=2)
+def _fair_play_policy_for_bucket(_bucket: int) -> dict:
+    rows = db_request("GET", "fair_play_policy", params={
+        "select": "enabled,daily_from", "singleton": "eq.true", "limit": "1",
+    })
+    return dict(rows[0]) if rows else {}
+
+
+def _fair_play_policy() -> dict:
+    return _fair_play_policy_for_bucket(int(time.time() // 60))
+
+
 @app.get("/api/play-session/config")
 def play_session_config():
     if VERCEL_ENV == "preview" and not isolated_fair_play_preview():
         return {"enabled": False}
     try:
-        rows = db_select("fair_play_policy", singleton=True)
+        policy = _fair_play_policy()
     except HTTPException:
         return {"enabled": False}
-    policy = rows[0] if rows else {}
     return {"enabled": policy.get("enabled") is True, "dailyFrom": policy.get("daily_from"),
             "isolatedPreview": isolated_fair_play_preview(),
-            "heartbeatMs": 15000, "leaseMs": 45000}
+            "heartbeatMs": FAIR_PLAY_HEARTBEAT_MS, "leaseMs": FAIR_PLAY_LEASE_MS}
 
 
 @app.post("/api/play-session")
