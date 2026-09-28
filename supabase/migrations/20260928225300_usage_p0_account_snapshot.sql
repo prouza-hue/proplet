@@ -148,10 +148,11 @@ streak_runs as (
 ),
 streak_stats as (
   select
-    coalesce(max(days) filter (where last_day in (stamp.today, stamp.today - 1)), 0)::integer as current_streak,
+    coalesce(max(days) filter (where last_day in (
+      (select today from stamp), (select today - 1 from stamp)
+    )), 0)::integer as current_streak,
     coalesce(max(days), 0)::integer as longest_streak
   from streak_runs
-  cross join stamp
 ),
 rescue_stats as (
   select count(distinct missed_date)::integer as rescued_days
