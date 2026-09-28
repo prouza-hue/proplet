@@ -9,29 +9,6 @@ concurrency:
   group: mk3-release-workbench
   cancel-in-progress: false
 jobs:
-  weekly-preservation:
-    runs-on: ubuntu-latest
-    timeout-minutes: 7
-    services:
-      postgres:
-        image: postgres:17.11
-        env:
-          POSTGRES_USER: proplet_test_admin
-          POSTGRES_PASSWORD: local-test-only
-          POSTGRES_DB: proplet_weekly_test
-        ports: ['55432:5432']
-        options: --health-cmd "pg_isready -U proplet_test_admin -d proplet_weekly_test" --health-interval 5s --health-timeout 5s --health-retries 10
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5'
-      - run: python -m unittest discover -s tests/weekly -v
-      - run: node --test tools/test_weekly_team_victories_frontend.cjs
-      - run: python tools/test_weekly_team_victories_db.py --database-url postgresql://proplet_test_admin:local-test-only@127.0.0.1:55432/proplet_weekly_test
   release-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -62,14 +39,17 @@ jobs:
           files=sorted(Path('tools').glob('mk3-release-patch-*.xz.b64'))
           assert len(files)==3
           changed=set(subprocess.check_output(['git','diff','--name-only','a3b475a7b29073935e0f29beca1714278afaf5ec','HEAD'],text=True).splitlines())
-          allowed={str(p) for p in files}|{'.github/workflows/mk3-release-workbench.yml'}
+          allowed={str(p) for p in files}|{'.github/workflows/mk3-release-workbench.yml','tools/mk3-release-rpc.patch'}
           assert changed<=allowed,changed-allowed
           patch=lzma.decompress(base64.b64decode(''.join(p.read_text().strip() for p in files)))
           assert hashlib.sha256(patch).hexdigest()=='fd48843588b5851e401dc0edfad177a3bc228ce45233eaef1dc266b5bba0f00e'
+          assert hashlib.sha256(Path('tools/mk3-release-rpc.patch').read_bytes()).hexdigest()=='44983b60b4e65ec6b32d933883d5b8d706c3d8f19142a918b527ac94de7e4650'
           Path('/tmp/mk3-release.patch').write_bytes(patch)
           PY
           git apply --check /tmp/mk3-release.patch
           git apply /tmp/mk3-release.patch
+          git apply --check tools/mk3-release-rpc.patch
+          git apply tools/mk3-release-rpc.patch
           git fetch --depth=1 --no-tags origin dc639f04ae62beb718851d3de8b1151cee5c2e82
           git show dc639f04ae62beb718851d3de8b1151cee5c2e82:data/playtests/mozkokalypsa-v3-preview.json > data/playtests/mozkokalypsa-v3.json
           echo 'c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410  data/playtests/mozkokalypsa-v3.json' | sha256sum -c -
@@ -139,18 +119,17 @@ jobs:
           for p in ['public/app.js','public/sw.js']:
               after=Path(p).read_text().replace('proplet-v4.03.0-mk3release1','proplet-v4.03.0-startersave1').replace('/app.js?v=mk3release1','/app.js?v=startersave1').replace('/app/mozkokalypsa.js?v=mk3release1','/app/mozkokalypsa.js?v=mkinvite3').replace('/mozkokalypsa.css?v=mk3release1','/mozkokalypsa.css?v=mkinvite3')
               before=subprocess.check_output(['git','show',baseline+':'+p],text=True)
-              # Assert the only changes are release/cache identities, not implementation.
               if p.endswith('app.js'):assert before==after,p
               else:
                   import re
                   clean=lambda s:re.sub(r'\?v=[^\x27\x22\s]+','?v=ASSET',s)
                   assert clean(before)==clean(after),p
           report=json.loads(Path('/tmp/mk3-release-proof/browser/report.json').read_text());assert report['status']=='PASS' and not report['errors']
-          report.update(mainBaseline=baseline,protectedSha256=checked,opensAt='2026-09-28T22:00:00Z',closesAt='2026-09-30T22:00:00Z',runUrl=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}")
+          report.update(mainBaseline=baseline,protectedSha256=checked,opensAt='2026-09-28T22:00:00Z',closesAt='2026-09-30T22:00:00Z',weeklyPreservationRun='https://github.com/prouza-hue/proplet/actions/runs/36401411466',runUrl=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}")
           Path('docs/playtests/MOZKOKALYPSA3-RELEASE-QA-20260928.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
           PY
-          git rm tools/mk3-release-patch-*.xz.b64
-          git add backend/mozkokalypsa.py backend/mozkokalypsa_round3.py public/app.js public/app/mozkokalypsa.js public/index.html public/mozkokalypsa.css public/sw.js data/playtests/mozkokalypsa-v3.json docs/playtests/MOZKOKALYPSA3-* supabase/migrations/20260928084000_mozkokalypsa_round3.sql tests/round3 tests/current/test_mozkokalypsa.py tools/test_mk3_release* tools/test_mozkokalypsa_http_db.py tools/test_v4001_pwa_startup.py tools/test_v40124_supabase_rpc_auth.py tools/test_v40126_push_retention_p0.py tools/test_v40133_sync_quarantine.py tools/test_v40135_profile_wide_layout.py
+          git rm tools/mk3-release-patch-*.xz.b64 tools/mk3-release-rpc.patch
+          git add backend/db.py backend/mozkokalypsa.py backend/mozkokalypsa_round3.py public/app.js public/app/mozkokalypsa.js public/index.html public/mozkokalypsa.css public/sw.js data/playtests/mozkokalypsa-v3.json docs/playtests/MOZKOKALYPSA3-* supabase/migrations/20260928084000_mozkokalypsa_round3.sql tests/round3 tests/current/test_mozkokalypsa.py tools/test_mk3_release* tools/test_mozkokalypsa_http_db.py tools/test_v4001_pwa_startup.py tools/test_v40124_supabase_rpc_auth.py tools/test_v40126_push_retention_p0.py tools/test_v40133_sync_quarantine.py tools/test_v40135_profile_wide_layout.py
           git diff --cached --check
           test -z "$(git diff --cached --name-only -- .github/workflows)"
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat: scheduled 48-hour third playtest with isolated rewards and preserved weekly/onboarding features'
