@@ -107,3 +107,21 @@ Upřesnění proti `ONBOARDING-ACTIVATION-20260924.md`,
   invarianty.
 
 Kanonický read-only dotaz: `docs/audits/FIRST-BOARD-V1-READOUT.sql`.
+
+## Oprava 24h okna — 29. 9. 2026
+
+Readout nyní pro `mature_24h` započítává všechny fáze funnelu pouze v intervalu
+`[assigned_at, assigned_at + 24 hours)`. Událost přesně na konci okna ani později
+se nezapočte. Assignment přesně 24 hodin před cutoffem již patří do zralé
+kohorty; stejná hranice platí pro funnel, SRM a výběr zralých běhů v diagnostice.
+
+`live_diagnostic` nadále ukazuje všechny doručené fáze do cutoffu. Kontroly
+integrity záměrně neomezují čas událostí na outcome okno: předčasné události,
+pozdní duplicity a nesoulad provenance nesmějí filtrem zmizet.
+
+Ověření: skutečný opravený funnel spuštěn nad šesti syntetickými běhy přes
+read-only CTE (bez zápisu do tabulek). Pokryto dokončení těsně před 24h,
+přesně ve 24h, po 24h, assignment bez výsledků, přesně zralý a nezralý běh.
+Live: 6 assignmentů / 5 výsledků; mature: 5 assignmentů / 2 výsledky,
+shodně pro start, dokončení, registraci i obě větve saved. Produkční read-only
+smoke prošel; žádná změna hráčských dat.
