@@ -38,3 +38,8 @@ ctx.getProfile=()=>({id:'other-account',token:'synthetic'});
 assert.equal(api.analyticsVersion(),null,'return metadata cannot leak into another account');
 ctx.getProfile=()=>null;assert.equal(api.analyticsVersion(),null,'logged-out guest does not inherit account return');
 console.log('PASS auth flow survives guest rotation and remains account isolated');
+ctx.getProfile=()=>null;ctx.getAnonymousId=()=> 'synthetic-experiment';
+ctx.localStorage.setItem('proplet-first-steps-v1:synthetic-experiment',JSON.stringify({enrolled:true,firstStepsRunId:'0ce2fd87-ef20-4d9f-b4dd-bebac4e36db4',onboardingVersion:'board-v3-short',clientRelease:'candidate',firstBoardId:'g4-e-009',firstBoardExperiment:{key:'first-board-v1',variant:'challenger_e009',bucket:58,boardId:'g4-e-009'}}));
+const headers=api.eventHeaders();
+assert.equal(headers['X-Proplet-Experiment'],'first-board-v1');assert.equal(headers['X-Proplet-Experiment-Variant'],'challenger_e009');assert.equal(headers['X-Proplet-Experiment-Bucket'],'58');
+console.log('PASS first-board experiment provenance survives the complete first-steps flow');

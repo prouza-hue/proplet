@@ -12,4 +12,7 @@ assert.equal(transport['X-Proplet-Starter-Run'],undefined,'transport must not in
 assert.equal(captured['X-Proplet-Auth-At-Event'],'anonymous');assert.equal(captured['X-Proplet-Starter-Run'],'run-a');
 const explicit=ctx.analyticsHeaders('starter_v1_failed',{starterRunId:'boot-run',starterElapsedMs:25,starterReason:'data'});
 assert.equal(explicit['X-Proplet-Starter-Run'],'boot-run');assert.equal(explicit['X-Proplet-Starter-Ms'],'25');
+ctx.window.PropletFirstSteps={analyticsVersion:()=> 'board-v3-short',eventHeaders:()=>({'X-Proplet-First-Steps-Run':'flow-run'})};
+const experiment=ctx.analyticsHeaders('first_board_experiment_assigned',{puzzleId:'g4-e-009',experimentKey:'first-board-v1',experimentVariant:'challenger_e009',experimentBucket:58});
+assert.equal(experiment['X-Proplet-First-Steps-Run'],'flow-run');assert.equal(experiment['X-Proplet-Experiment'],'first-board-v1');assert.equal(experiment['X-Proplet-Experiment-Variant'],'challenger_e009');assert.equal(experiment['X-Proplet-Experiment-Bucket'],'58');assert.equal(experiment['X-Proplet-Puzzle'],'g4-e-009');
 console.log('PASS capture-time auth and starter run remain immutable across queue delay/login');

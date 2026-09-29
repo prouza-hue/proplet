@@ -1,6 +1,7 @@
 (function(global){
   'use strict';
   const VERSION='board-v3-short',KEY='proplet-first-steps-v1',RETURN='proplet-first-steps-auth-v1',QUIET='proplet-first-steps-quiet-v1';
+  const FIRST_BOARD_EXPERIMENT={key:'first-board-v1',variants:{control_e001:'g4-e-001',challenger_e009:'g4-e-009'}};
   const TRAINING={id:'starter-v1',difficulty:'easy',rows:3,cols:3,mask:[0,1,2,3,4,5,6,7,8],letters:['P','E','S','L','Č','A','E','S','J'],lengths:[3,3,3],answers:[{word:'PES',path:[0,1,2],turns:0},{word:'LES',path:[3,6,7],turns:1},{word:'ČAJ',path:[4,5,8],turns:1}],meta:{cells:9,starterVersion:3,pathStyle:'curated-starter',rewardXp:10,contentGeneration:1}};
   // The starter reward keeps its existing once-per-player identity. Free puzzle IDs/content never change.
   const enabled=()=>global.PROPLET_FIRST_STEPS_ENABLED!==false&&!global.PROPLET_RUNTIME_META?.gen4CandidatePreview&&!global.PROPLET_RUNTIME_META?.gen5CandidatePreview;
@@ -28,9 +29,25 @@
     if(state().firstStepsRunId)return;
     update({firstStepsRunId:typeof newAttemptId==='function'?newAttemptId():global.crypto.randomUUID(),clientRelease:typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:'legacy',onboardingVersion:VERSION,isTest:new URLSearchParams(location.search).get('tutorial')==='1'});
   }
+  function experimentBucket(identity){
+    let hash=2166136261;
+    for(const char of `${FIRST_BOARD_EXPERIMENT.key}:${identity}`){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619)}
+    return (hash>>>0)%100;
+  }
+  function validAssignment(value){return value?.key===FIRST_BOARD_EXPERIMENT.key&&Object.hasOwn(FIRST_BOARD_EXPERIMENT.variants,value.variant)&&FIRST_BOARD_EXPERIMENT.variants[value.variant]===value.boardId&&Number.isInteger(value.bucket)&&value.bucket>=0&&value.bucket<100}
+  function firstBoardAssignment(){
+    const existing=state().firstBoardExperiment;if(validAssignment(existing))return existing;
+    // Existing accounts and already-started historical first games stay outside this experiment.
+    if(profile()?.token||state().firstBoardId)return null;
+    const identity=typeof getAnonymousId==='function'?getAnonymousId():'guest',bucket=experimentBucket(identity),variant=bucket<50?'control_e001':'challenger_e009';
+    const assignment={key:FIRST_BOARD_EXPERIMENT.key,variant,bucket,boardId:FIRST_BOARD_EXPERIMENT.variants[variant],assignedAt:new Date().toISOString()};
+    update({firstBoardExperiment:assignment,firstBoardId:assignment.boardId});return assignment;
+  }
+  function experimentProperties(assignment=state().firstBoardExperiment){return validAssignment(assignment)?{experimentKey:assignment.key,experimentVariant:assignment.variant,experimentBucket:assignment.bucket,puzzleId:assignment.boardId}:{} }
   function eventHeaders(properties={}){
     const s=state();if(!s.firstStepsRunId)return {};
-    return {'X-Proplet-First-Steps-Run':s.firstStepsRunId,'X-Proplet-Onboarding':s.onboardingVersion,'X-Proplet-Client-Release':s.clientRelease,...(s.isTest?{'X-Proplet-Test':'1'}:{}),...(properties.reason?{'X-Proplet-First-Steps-Reason':properties.reason}:{}),...(properties.outcome?{'X-Proplet-First-Steps-Outcome':properties.outcome}:{})};
+    const experiment=experimentProperties(s.firstBoardExperiment);
+    return {'X-Proplet-First-Steps-Run':s.firstStepsRunId,'X-Proplet-Onboarding':s.onboardingVersion,'X-Proplet-Client-Release':s.clientRelease,...(s.isTest?{'X-Proplet-Test':'1'}:{}),...(experiment.experimentKey?{'X-Proplet-Experiment':experiment.experimentKey,'X-Proplet-Experiment-Variant':experiment.experimentVariant,'X-Proplet-Experiment-Bucket':String(experiment.experimentBucket)}:{}),...(properties.reason?{'X-Proplet-First-Steps-Reason':properties.reason}:{}),...(properties.outcome?{'X-Proplet-First-Steps-Outcome':properties.outcome}:{})};
   }
   function authHeaders(){return intent()?{...eventHeaders(),'X-Proplet-Creation-Source':'first_steps_v1'}:{}}
   function captureAccount(owner){
@@ -82,9 +99,12 @@
     const button=$('#winPrimaryBtn');button.disabled=true;button.textContent='Načítám první hru…';
     try{
       if(global.PropletSharing?.resumeInvitation?.())return;
-      const p=puzzleDB?.free?.easy?.find(p=>p.id==='g4-e-001');
+      ensureFlow();const assignment=firstBoardAssignment();
+      const boardId=assignment?.boardId||state().firstBoardId||'g4-e-001';
+      const p=puzzleDB?.free?.easy?.find(p=>p.id===boardId);
       if(!p)throw Error('První hru se nepodařilo načíst. Zkus to znovu.');
       update({firstBoardId:p.id});
+      if(assignment)once('first_board_experiment_assigned',experimentProperties(assignment));
       await startGame(p,'free',null,{firstSteps:true});
       if(game()?.mode==='free'&&game()?.puzzle.id===p.id)$('#winModal').classList.add('hidden');
     }catch(e){showToast(e.message)}finally{firstLaunch=false;button.disabled=false;button.textContent='Hrát dál';}
@@ -160,7 +180,7 @@
       update({owner});
       const preview=!!result?.preview;
       let confirmed=false;
-      if(result?.ok&&!preview){try{const remote=await api('/api/progress');const keys=new Set((remote.completed||[]).map(r=>r.challengeKey));confirmed=keys.has('starter:starter-v1')&&keys.has('free:g4-e-001')}catch{}}
+      if(result?.ok&&!preview){try{const remote=await api('/api/progress');const keys=new Set((remote.completed||[]).map(r=>r.challengeKey));confirmed=keys.has('starter:starter-v1')&&keys.has(`free:${state().firstBoardId}`)}catch{}}
       if(profile()?.id!==owner)return;
       const saved=confirmed&&!!result?.ok&&!preview&&!result?.left&&!result?.quarantined&&!getQueue().length;
       if(!saved&&!preview)once('first_steps_v1_save_failed',{outcome:'failed',reason:!navigator.onLine?'offline':result?.quarantined?'quarantined':'sync'});
@@ -182,7 +202,7 @@
   function afterStart(g){
     // Legacy presentation wrappers may not return startGame's promise. Close
     // the training result only when the requested board actually starts.
-    if(isFirstGame(g))$('#winModal').classList.add('hidden');
+    if(isFirstGame(g)){$('#winModal').classList.add('hidden');once('first_board_experiment_started',experimentProperties())}
     $('#screen-game').classList.toggle('first-steps-training',short(g));
     $('#winModal').classList.remove('first-steps-win');$('#firstStepsAccount')?.classList.add('hidden');
     $('#winPrimaryBtn').onclick=closeWinAndContinue;
@@ -191,7 +211,7 @@
   function finish(g){
     if(short(g)){trainingWin(g);return;}
     if(!isFirstGame(g))return;
-    ensureFlow();update({summary:{words:g.found.length,xp:g.winBaseXpAwarded||0}});accountWin();once('first_steps_v1_offer');
+    ensureFlow();update({summary:{words:g.found.length,xp:g.winBaseXpAwarded||0}});once('first_board_experiment_completed',experimentProperties());accountWin();once('first_steps_v1_offer');
   }
   function cancelledAuthReturn(outcome='cancelled'){
     if(!enabled()||!returnIntent()||profile()?.token)return false;
@@ -214,6 +234,7 @@
     global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;if(returnIntent()?.method==='google'&&!profile()?.token)cancelledAuthReturn();});
   }
   const facade={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
+    firstBoardExperiment:()=>state().firstBoardExperiment||null,
     quiet:()=>enabled()&&read(sessionStorage,QUIET)===true,
     analyticsVersion:()=>enabled()&&(state().enrolled||(typeof freshStarterVisit==='function'&&freshStarterVisit()))?VERSION:null,
     };

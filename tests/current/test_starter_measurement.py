@@ -18,9 +18,16 @@ try:
     assert row['environment']=='preview'
 finally:context.reset(token)
 assert capture({})['_event_context']=={}, 'old queued events must remain unknown'
+experiment=capture({'x-proplet-experiment':'first-board-v1','x-proplet-experiment-variant':'challenger_e009','x-proplet-experiment-bucket':'58'})['_event_context']
+assert experiment=={'experiment_key':'first-board-v1','experiment_variant':'challenger_e009','experiment_bucket':58}
+for bad in [
+    {'x-proplet-experiment':'other','x-proplet-experiment-variant':'challenger_e009','x-proplet-experiment-bucket':'58'},
+    {'x-proplet-experiment':'first-board-v1','x-proplet-experiment-variant':'unknown','x-proplet-experiment-bucket':'58'},
+    {'x-proplet-experiment':'first-board-v1','x-proplet-experiment-variant':'control_e001','x-proplet-experiment-bucket':'100'},
+]: assert capture(bad)['_event_context']=={}
 for bad in ['person@example.com','https://example.com/private','a'*10000,'-1','86400001']:
     assert capture({key:bad for key in safe})['_event_context']=={}
 assert set(load_registry()['events'])==set(EMBEDDED_EVENT_NAMES)
 assert len(EMBEDDED_EVENT_NAMES)==len(set(EMBEDDED_EVENT_NAMES))
-print('PASS starter phase context: bounded values, unknown legacy auth, claim preservation, registry parity')
+print('PASS starter and experiment context: bounded values, unknown legacy auth, claim preservation, registry parity')
 
