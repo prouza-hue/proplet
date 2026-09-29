@@ -128,3 +128,21 @@ Account flow creates first_steps_run_id at the assigned first real-board offer. 
 New diagnostic events: first_steps_v1_auth_cancelled, first_steps_v1_auth_failed, first_steps_v1_save_failed; at most once each per flow. context.outcome: cancelled|failed; reason: dismissed|provider_cancel|request|offline|sync|quarantined. Multiple retries do not create duplicate branch phases. The authoritative account_created remains transactionally emitted only by the players INSERT trigger. HTTP rejection/provider cancellation cannot create it. saved requires successful claim/sync, no remaining/quarantined queue and server-confirmed starter:starter-v1 plus the dynamically assigned first real board. An existing-account login can save without a new account_created. Puzzle IDs and contents remain immutable.
 
 Use docs/audits/FUNNEL-PRODUCTION-VERIFY.sql for organic acceptance. Until at least 30 fresh non-test v3 runs and all invariants pass, status is “nasazeno, čeká na produkční ověření”. Do not fabricate production traffic to fill the cohort.
+
+## `first-board-v1` experiment readout — 2026-09-29
+
+The earlier `docs/audits/FUNNEL-PRODUCTION-VERIFY.sql` remains the acceptance
+check for its pinned pre-experiment release. Its 30-run gate validates measurement
+integrity; it is not an efficacy sample size and must not choose an A/B winner.
+
+For the 50/50 `control_e001` / `challenger_e009` experiment use:
+
+- `docs/audits/FIRST-BOARD-V1-READOUT.sql` for the read-only production report;
+- `docs/audits/FIRST-BOARD-V1-EVALUATION.md` for cohort, metric and decision rules.
+
+The experiment report separates live diagnostics from assignments with a closed
+24-hour outcome window, runs an SRM check, and blocks interpretation on failed
+invariants. `account_created` is joined only by `first_steps_run_id`.
+`saved_any_account` is reported separately because an existing-account login
+can save without creating a new account. Rolling totals are never a causal uplift
+claim.
