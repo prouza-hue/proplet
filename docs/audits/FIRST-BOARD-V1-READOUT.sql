@@ -15,6 +15,10 @@
 --
 -- live_diagnostic is useful for instrumentation checks only. mature_24h includes
 -- assignments whose complete 24-hour outcome window closed before analysis_as_of.
+-- mature_24h outcomes use [assigned_at, assigned_at + 24 hours).
+-- An assignment exactly 24 hours old is mature. live_diagnostic remains uncapped.
+-- Integrity checks intentionally retain all observed events: clipping them would
+-- conceal events before assignment or late duplicate/provenance violations.
 -- Never call a rolling/live difference an uplift or a product decision.
 --
 -- For a locked report, replace every analysis_as_of expression below with the
@@ -123,6 +127,7 @@ valid_assignments AS (
 ),
 flow_rollup AS (
   SELECT
+    c.cohort,
     a.flow,
     a.current_owner,
     a.variant,
@@ -147,8 +152,16 @@ flow_rollup AS (
       WHERE e.event_type = 'first_steps_v1_saved'
     ) AS saved_at
   FROM valid_assignments a
-  LEFT JOIN events e ON e.flow = a.flow
+  CROSS JOIN cohorts c
+  CROSS JOIN params p
+  LEFT JOIN events e
+    ON e.flow = a.flow
+   AND (NOT c.mature_only OR (
+     e.created_at >= a.assigned_at
+     AND e.created_at < a.assigned_at + p.outcome_window
+   ))
   GROUP BY
+    c.cohort,
     a.flow,
     a.current_owner,
     a.variant,
@@ -199,8 +212,9 @@ funnel AS (
   CROSS JOIN variants v
   LEFT JOIN stages s
     ON s.variant = v.variant
+   AND s.cohort = c.cohort
    AND s.assigned_at < p.analysis_as_of
-   AND (c.mature_only = false OR s.assigned_at < p.analysis_as_of - p.outcome_window)
+   AND (c.mature_only = false OR s.assigned_at <= p.analysis_as_of - p.outcome_window)
   GROUP BY c.cohort, c.mature_only, p.analysis_as_of, v.variant, v.board_id
 )
 SELECT
@@ -321,7 +335,7 @@ counts AS (
   CROSS JOIN cohorts c
   LEFT JOIN valid_assignments a
     ON a.assigned_at < p.analysis_as_of
-   AND (c.mature_only = false OR a.assigned_at < p.analysis_as_of - p.outcome_window)
+   AND (c.mature_only = false OR a.assigned_at <= p.analysis_as_of - p.outcome_window)
   GROUP BY c.cohort
 ),
 stats AS (
@@ -451,7 +465,7 @@ mature_assignments AS (
   SELECT a.*
   FROM valid_assignments a
   CROSS JOIN params p
-  WHERE a.assigned_at < p.analysis_as_of - p.outcome_window
+  WHERE a.assigned_at <= p.analysis_as_of - p.outcome_window
 ),
 mature_rollup AS (
   SELECT
