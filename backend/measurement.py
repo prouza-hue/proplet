@@ -56,6 +56,13 @@ def request_context(request, environment):
         reason=request.headers.get('x-proplet-first-steps-reason','')
         if outcome in {'failed','cancelled'}:details['outcome']=outcome
         if reason in {'dismissed','provider_cancel','request','offline','sync','quarantined'}:details['reason']=reason
+    experiment=request.headers.get('x-proplet-experiment','')
+    variant=request.headers.get('x-proplet-experiment-variant','')
+    bucket=request.headers.get('x-proplet-experiment-bucket','')
+    if experiment=='first-board-v1' and variant in {'control_e001','challenger_e009'} and bucket.isdigit() and 0<=int(bucket)<100:
+        details['experiment_key']=experiment
+        details['experiment_variant']=variant
+        details['experiment_bucket']=int(bucket)
     return {
         '_event_context':details,
         '_event_id':event_id,

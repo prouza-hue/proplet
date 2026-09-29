@@ -58,6 +58,7 @@ async function assertAccountFlow(method){
  const ids=rows.map(e=>e.headers['x-proplet-first-steps-run']);assert(ids.every(Boolean));assert.equal(new Set(ids).size,1);
  assert.equal(rows[2].headers['x-proplet-creation-source'],'first_steps_v1');assert(rows[2].authoritative);
  assert(rows.every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'));
+ const measured=[rows[0],rows[1],rows[3]];assert.equal(new Set(measured.map(e=>e.headers['x-proplet-experiment'])).size,1);assert.equal(new Set(measured.map(e=>e.headers['x-proplet-experiment-variant'])).size,1);
  const times=rows.map(e=>Date.parse(e.headers['x-proplet-event-time'])||e.at);
  // Fixture clock is fixed; arrival ordering verifies branch before signup,
  // while capture timestamps are exercised by HTTP/database tests.
@@ -66,13 +67,14 @@ async function assertAccountFlow(method){
 }
 async function ready(page){await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter'&&currentGame.puzzle.meta.starterVersion===3&&document.querySelectorAll('#board .cell').length===9,null,{timeout:15000});await page.locator('#starterCoach').waitFor({state:'visible'});}
 async function solve(page,touch=false){const paths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));for(let i=0;i<paths.length;i++){await draw(page,paths[i],touch);await page.waitForFunction(n=>currentGame.found.length===n,i+1);}await page.locator('#winModal').waitFor({state:'visible'});}
-async function firstWin(page,touch=false,style='drag'){await page.goto(url);await ready(page);await starter(page,touch,style);await page.screenshot({path:output+'.training-'+(touch?'mobile':'desktop')+'.png',fullPage:true});await page.getByRole('button',{name:'Hrát dál',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-001'&&!currentGame.finished);await page.locator('#winModal').waitFor({state:'hidden'});await solve(page,touch);await page.locator('#firstStepsGoogle').waitFor({state:'visible'});}
+async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await page.goto(url);await ready(page);await starter(page,touch,style);await page.screenshot({path:output+'.training-'+(touch?'mobile':'desktop')+'.png',fullPage:true});await page.getByRole('button',{name:'Hrát dál',exact:true}).click();await page.waitForFunction(expected=>currentGame?.mode==='free'&&currentGame.puzzle.id===expected&&!currentGame.finished,boardId);await page.locator('#winModal').waitFor({state:'hidden'});assert.match(await page.locator('#gameDifficulty').innerText(),/první hra/);await eventOnce('first_board_experiment_assigned');await eventOnce('first_board_experiment_started');await solve(page,touch);await eventOnce('first_board_experiment_completed');await page.locator('#firstStepsGoogle').waitFor({state:'visible'});}
 (async()=>{
  const health=await fetch(url+'/api/health').then(r=>r.json());assert(health.isolatedFixture&&!health.database);if(process.env.EXPECTED_SHA)assert.equal(health.sha,process.env.EXPECTED_SHA);report.sha=health.sha;
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
  async function scenario(name,fn,options={}){
   await control({reset:true,firstSteps:true});
   const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:'block',...(options.userAgent?{userAgent:options.userAgent}:{})});
+  await context.addInitScript(identity=>localStorage.setItem('proplet-v3-15-anonymous-id',identity),options.experimentIdentity||'synthetic-2');
   await context.route('**/*',route=>['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname)?route.continue():route.abort());
   const page=await context.newPage(),errors=[],warnings=[],network=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))warnings.push({type:m.type(),text:m.text()})});page.on('requestfailed',r=>network.push({url:r.url(),error:r.failure()?.errorText}));page.on('response',r=>{if(r.status()>=500)network.push({url:r.url(),status:r.status()})});await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
   console.log('SCENARIO '+name);
@@ -91,6 +93,13 @@ async function firstWin(page,touch=false,style='drag'){await page.goto(url);awai
    await page.getByRole('button',{name:'Hrát dál bez účtu',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished&&currentGame.puzzle.id!=='g4-e-001');await eventOnce('first_steps_v1_continue');await eventOnce('first_steps_v1_offer');
    for(const id of ['accountNudgeModal','pushNudgeModal','installNudgeModal'])assert.equal(await page.locator('#'+id).isVisible(),false);
   },{mobile});
+  await scenario('challenger-e009-first-win',async page=>{
+   await firstWin(page,false,'tap','g4-e-009');
+   const experiment=(await events()).filter(e=>e.event.startsWith('first_board_experiment_'));
+   assert.equal(experiment.length,3);assert(experiment.every(e=>e.headers['x-proplet-experiment']==='first-board-v1'&&e.headers['x-proplet-experiment-variant']==='challenger_e009'&&e.headers['x-proplet-puzzle']==='g4-e-009'&&e.headers['x-proplet-first-steps-run']));
+   await page.locator('#firstStepsManual').click();await page.locator('#playerNameInput').fill('Challenger Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
+   await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});await assertAccountFlow('manual');
+  },{experimentIdentity:'synthetic-0'});
   await scenario('tap-cancel-reset-navigation',async page=>{
    await page.goto(url);await ready(page);await tapCell(page,0);await tapCell(page,4);assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
    await tapCell(page,0);await tapCell(page,1);await tapCell(page,1);assert.deepEqual(await page.evaluate(()=>currentGame.path),[]);
