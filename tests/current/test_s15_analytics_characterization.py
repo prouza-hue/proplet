@@ -66,7 +66,7 @@ import server
 from backend import analytics as product_analytics
 
 events = FIXTURE["events"]
-assert len(events) == 151
+assert len(events) == 154
 assert len(events) == len(set(events))
 inserted = []
 
@@ -105,5 +105,5 @@ for (table, row), expected in zip(inserted, events):
     assert row["anonymous_id"] == "anon-hash"
     assert row["app_version"] == "4.01.40"
 
-print("PASS Sprint 15 analytics characterization: 148 events, transport, dedup and PII parity")
+print("PASS Sprint 15 analytics characterization: 154 events, transport, dedup and PII parity")
 
