@@ -88,6 +88,6 @@ assert(appSource.includes('authProfile:profile'), 'result queue upload does not 
 assert(appSource.includes('getQueue:()=>getQueue(scope)'), 'result queue storage is not pinned to the captured account scope');
 assert(appSource.includes('quarantineRejectedResult(row,reason,scope)'), 'rejected results are not pinned to the captured account scope');
 const boot = appSource.slice(appSource.indexOf('async function boot()'));
-assert(boot.indexOf('migrateTajenkaStorage()') < boot.indexOf('await loadPuzzleDatabase()'), 'legacy Tajenka migration can race the auth callback');
+assert(boot.indexOf('migrateTajenkaStorage()') < boot.indexOf('await loadPuzzleDatabaseWithRecovery()'), 'legacy Tajenka migration can race the auth callback');
 
 console.log('PASS: Sprint 12A.2 scopes, migrates, adopts, syncs, and deletes Tajenka state by account');

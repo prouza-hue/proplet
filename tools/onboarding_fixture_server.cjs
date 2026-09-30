@@ -12,7 +12,7 @@ if(baseline)execFileSync('git',['cat-file','-e',baseline+'^{commit}'],{cwd:repo}
 const fixtureDir=path.join(repo,'tests/fixtures/browser');
 const config={...JSON.parse(fs.readFileSync(path.join(fixtureDir,'config.json'))),environment:'production',pushAvailable:false};
 const syntheticProfile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'🙂',supportMode:'younger',publicRankings:false,hasPassword:true,stats:{points:125,completed:1}};
-let controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,progress:[],firstSteps:false,auth:'ok',result:'ok'};
+let controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,failDatabaseRequests:0,progress:[],firstSteps:false,auth:'ok',result:'ok'};
 let events=[],requests=[],heldRolling=[];
 const historical=new Map();
 const types={'.js':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
@@ -34,8 +34,8 @@ const server=http.createServer(async(req,res)=>{
   if(p==='/api/health')return json(res,200,{isolatedFixture:true,database:false,sha,baseline,release:controls.release});
   if(p==='/__fixture/events'&&req.method==='GET')return json(res,200,{events,requests});
   if(p==='/__fixture/control'&&req.method==='POST'){
-   const value=await body(req);if(value.reset){events=[];requests=[];controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,progress:[],firstSteps:false,auth:'ok',result:'ok'}}
-   for(const key of ['release','rolling','eventDelayMs','failDatabase','progress','firstSteps','auth','result'])if(Object.hasOwn(value,key))controls[key]=value[key];
+   const value=await body(req);if(value.reset){events=[];requests=[];controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,failDatabaseRequests:0,progress:[],firstSteps:false,auth:'ok',result:'ok'}}
+   for(const key of ['release','rolling','eventDelayMs','failDatabase','failDatabaseRequests','progress','firstSteps','auth','result'])if(Object.hasOwn(value,key))controls[key]=value[key];
    if(!['current','baseline'].includes(controls.release)||!['ok','hold','fail'].includes(controls.rolling))return json(res,400,{detail:'invalid control'});
    if(controls.rolling!=='hold'){for(const pending of heldRolling)rolling(pending);heldRolling=[]}
    return json(res,200,{ok:true,controls});
@@ -71,7 +71,7 @@ const server=http.createServer(async(req,res)=>{
    return json(res,503,{detail:'isolated fixture: endpoint disabled'});
   }
   if(!['GET','HEAD'].includes(req.method))return json(res,405,{detail:'method disabled'});
-  if(controls.failDatabase&&['/puzzles.json','/puzzles-bootstrap.json'].includes(p))return json(res,503,{detail:'synthetic database asset outage'});
+  if(['/puzzles.json','/puzzles-bootstrap.json'].includes(p)&&(controls.failDatabase||controls.failDatabaseRequests>0)){if(controls.failDatabaseRequests>0)controls.failDatabaseRequests--;return json(res,503,{detail:'synthetic database asset outage'})}
   const name=p==='/'?'index.html':decodeURIComponent(p).slice(1);
   if(name.split('/').includes('..'))return json(res,400,{detail:'invalid path'});
   let bytes=asset(name);if(name==='runtime-meta.js'&&bytes)bytes=Buffer.concat([Buffer.from('window.PROPLET_FIRST_STEPS_ENABLED='+JSON.stringify(controls.firstSteps)+';\n'),bytes]);if(!bytes)return json(res,404,{detail:'not found'});
