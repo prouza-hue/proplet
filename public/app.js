@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.03.0-firstboardab1';
+const APP_PREVIEW_RELEASE='proplet-v4.03.0-bootrecovery1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -2325,7 +2325,33 @@ async function loadPuzzleDatabase(){
  if('caches' in window){
   try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
  }
- const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('puzzle-db');const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
+ const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(`puzzle-db-http-${r.status}`);const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
+}
+async function loadPuzzleDatabaseWithRecovery(){
+ // A failed cold request must not strand a visitor arriving from an ad.
+ // Two bounded attempts only; no page reload loop or discarded consent state.
+ for(let attempt=0;attempt<2;attempt++){
+  let timer;
+  try{
+   return await Promise.race([loadPuzzleDatabase(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('puzzle-db-timeout')),15000)})]);
+  }catch(error){
+   if(attempt===1)throw error;
+   // Only fixed diagnostic labels, never URLs, ad identifiers or response bodies.
+   const reason=/^puzzle-db-(http-\d{3}|version|timeout)$/.test(error?.message||'')?error.message:error?.name==='SyntaxError'?'puzzle-db-json':'puzzle-db-network';
+   try{reportClientError('puzzle_boot_retry',reason)}catch{}
+   await new Promise(resolve=>setTimeout(resolve,500));
+  }finally{clearTimeout(timer)}
+ }
+}
+function showPuzzleBootError(){
+ // Preserve the shell and consent DOM. Replacing body also removed its CSS.
+ window.__PROPLET_REVEAL_CURRENT_UI?.();
+ document.querySelectorAll('.app-shell,.bottom-nav').forEach(element=>{element.inert=true;element.setAttribute('aria-hidden','true')});
+ const panel=document.createElement('main');panel.id='puzzleBootError';
+ panel.style.cssText='position:fixed;inset:0;z-index:350;overflow:auto;background:var(--bg,#f7f2e8);color:var(--ink,#332d28);padding: max(48px,env(safe-area-inset-top)) 24px 200px;font:16px/1.5 system-ui;text-align:center';
+ panel.innerHTML='<div style="max-width:420px;margin:8vh auto 0"><h1 style="font-size:32px">Proplet</h1><p role="alert">Hru se zatím nepodařilo načíst.</p><p>Zkus to prosím znovu. Tvůj uložený postup zůstává zachovaný.</p><button type="button" style="min-height:48px;padding:12px 24px;border:0;border-radius:12px;background:#365447;color:white;font:700 17px system-ui;cursor:pointer">Zkusit znovu</button></div>';
+ panel.querySelector('button').addEventListener('click',()=>location.reload());
+ document.body.appendChild(panel);panel.querySelector('button').focus();
 }
 function mergeRollingContent(delta){
  if(!puzzleDB||![1,2].includes(Number(delta?.version||0)))return false;
@@ -2357,7 +2383,7 @@ async function refreshRollingContent(){
 async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  if(freshStarterVisit()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
- try{puzzleDB=await loadPuzzleDatabase();trackStarterPhase(starterBootTrace,'data_ready')}catch{trackStarterPhase(starterBootTrace,'failed','data');$('body').innerHTML='<main style="padding:30px;font-family:system-ui"><h1>Proplet</h1><p>Nepodařilo se načíst databázi úloh. Zkontroluj připojení a zkus stránku obnovit.</p></main>';return}
+ try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
  await loadTajenkaFixture();
  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
  document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{if(!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'))},80);
@@ -2382,5 +2408,3 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
-
-
