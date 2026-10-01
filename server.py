@@ -506,33 +506,23 @@ def auth_player(authorization: Optional[str]) -> dict:
     token = authorization[7:].strip()
     token_hash = hashlib.sha256(token.encode()).hexdigest()
 
-    # Legacy/main-device token stays valid forever, so the v3.3 migration does not log anyone out.
-    rows = db_select("players", columns=PLAYER_COLUMNS, token_hash=token_hash)
-    if rows:
-        return rows[0]
-
-    # Additional devices get independent session tokens. A database outage must not
-    # masquerade as a bad password/session and accidentally log the user out.
-    sessions = db_select("player_sessions", columns=SESSION_AUTH_COLUMNS, token_hash=token_hash)
-    if sessions:
-        session = sessions[0]
-        now = datetime.now(TZ)
-        expiry = parse_timestamp(session.get("expires_at"))
-        if expiry and expiry <= now:
-            try:
-                db_delete("player_sessions", id=session["id"])
-            except HTTPException:
-                pass
-            raise HTTPException(401, "Přihlášení vypršelo. Přihlas se znovu.")
-        last_used = parse_timestamp(session.get("last_used_at"))
-        if not last_used or last_used < now - timedelta(hours=24):
-            try:
-                db_update("player_sessions", {"id": session["id"]}, {"last_used_at": now.isoformat()})
-            except HTTPException:
-                pass
-        players = db_select("players", columns=PLAYER_COLUMNS, id=session["player_id"])
-        if players:
-            return players[0]
+    # Resolve legacy and independent-device tokens in one server-only database
+    # call. The RPC checks expiry/revocation on every request; no auth is cached.
+    try:
+        result = db_rpc("proplet_auth_player_v1", {"p_token_hash": token_hash})
+    except HTTPException as exc:
+        # Missing/unavailable RPC is infrastructure failure, never a reason for
+        # the client to discard a valid login token.
+        raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+    if not isinstance(result, dict) or type(result.get("expired")) is not bool or "player" not in result:
+        raise HTTPException(503, "Databáze je momentálně nedostupná")
+    if result["expired"] is True:
+        raise HTTPException(401, "Přihlášení vypršelo. Přihlas se znovu.")
+    player = result["player"]
+    if isinstance(player, dict) and player.get("id"):
+        return player
+    if player is not None:
+        raise HTTPException(503, "Databáze je momentálně nedostupná")
     raise HTTPException(401, "Neplatné přihlášení hráče")
 
 
@@ -5198,4 +5188,3 @@ team_victories.install(app, auth_player=auth_player, db_rpc=db_rpc,
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
-
