@@ -23,6 +23,11 @@ const DIFF={
   hardcore:{label:'Mozkožrout',icon:'/difficulty/printshop/hardcore.webp',desc:'10×10 · dlouhá slova, šneci a minimum krátkých slov.',xp:100},
   mozkomor:{label:'Mozkomor',icon:'/difficulty/printshop/mozkomor.webp',desc:'10×10 · endgame pro hráče, kteří dokončili všechny Mozkožrouty.',xp:150}
 };
+// The unpublished series is enabled only by the isolated full-app preview.
+if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true){
+ DIFF.mozkokalypsa={label:'Mozkokalypsa',icon:'/difficulty/printshop/mozkokalypsa-series-ochre.svg',desc:'10×10 · stovka nových desek, čtrnáct slov a plná mřížka.',xp:200};
+ WIN_PRAISE.mozkokalypsa=['Mozkokalypsa rozpletena!','Tohle byla pořádná výzva.','Každé políčko má své místo.','Klobouk dolů!'];
+}
 const MOZKOMOR_UNLOCK_KEY='proplet-v4-01-32-mozkomor-unlocked';
 const MOZKOMOR_UNLOCK_BASE=200;
 const MOZKOMOR_QA_PRODUCTION_HOSTS=new Set(['proplet-nine.vercel.app','proplet-pavel-prouzas-projects.vercel.app','proplet-git-main-pavel-prouzas-projects.vercel.app']);
@@ -628,14 +633,14 @@ function currentLocalStats(){
  const s=getState(),rows=Object.values(s.completed),dailyDates=[...new Set(rows.filter(r=>r.mode==='daily').map(r=>r.dailyDate).filter(Boolean))];
  const rescueDates=Object.entries(s.rescues||{}).filter(([,r])=>r?.status==='passed').map(([d])=>d),effectiveDates=[...new Set([...dailyDates,...rescueDates])];
  const streak=calcStreak(effectiveDates),longest=calcLongest(effectiveDates),dailyTimes=rows.filter(r=>r.mode==='daily').map(r=>r.elapsedMs);
- const free={easy:0,medium:0,hard:0,hardcore:0,mozkomor:0},freeTransferred={...free},freePlayedGen2={...free};for(const diff of Object.keys(free)){const slots=localFreeSlotState(diff);free[diff]=slots.effective.size;freeTransferred[diff]=slots.transferred.size;freePlayedGen2[diff]=slots.actual.size}
+ const free=Object.fromEntries(Object.keys(DIFF).map(d=>[d,0])),freeTransferred={...free},freePlayedGen2={...free};for(const diff of Object.keys(free)){const slots=localFreeSlotState(diff);free[diff]=slots.effective.size;freeTransferred[diff]=slots.transferred.size;freePlayedGen2[diff]=slots.actual.size}
  const gameRows=rows.filter(r=>r.mode==='daily'||r.mode==='free'),cleanRows=gameRows.filter(r=>r.cleanSolve===true);
  const tajenkaCompleted=Object.keys(tajenkaState()?.completions||{}).length;
  return {points:rows.reduce((a,r)=>a+(r.points||0),0),totalCompleted:gameRows.length,dailyCompleted:dailyDates.length,freeCompleted:free,freeTransferred,freePlayedGen2,currentStreak:streak,longestStreak:longest,bestDailyMs:dailyTimes.length?Math.min(...dailyTimes):null,cleanSolves:cleanRows.length,cleanDaily:cleanRows.filter(r=>r.mode==='daily').length,rescuedDays:rescueDates.length,tajenkaCompleted,mozkomorCompleted:free.mozkomor,discoveredWords:0};
 }
 function effectiveStats(){
  const local=currentLocalStats(),remote=getProfile()?.stats;if(!remote)return local;
- const free={easy:0,medium:0,hard:0,hardcore:0,mozkomor:0},freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
+ const free=Object.fromEntries(Object.keys(DIFF).map(d=>[d,0])),freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
  return {...remote,
   points:Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
   dailyCompleted:Math.max(local.dailyCompleted||0,remote.dailyCompleted||0),freeCompleted:free,freeTransferred,freePlayedGen2,
@@ -1232,6 +1237,7 @@ async function shareDaily(){await shareProplet(shareText())}
 function replayDailyFromWin(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');startTajenka();return}const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO(),puzzle=dailyPuzzleFor(date);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}
 
 function queueResult(rec){
+ if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true)return;
  if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||isMozkomorQaDifficulty(rec?.difficulty))return;
  if(CONTENT_PREVIEW_DATE&&rec?.mode==='free'&&Number(rec?.level||0)>200)return;
  const controller=resultQueue();if(controller){controller.enqueue(rec);renderDaily();return}
@@ -1823,6 +1829,7 @@ function consumeServiceWorkerUpdateMessage(){
  serviceWorkerFirstInstallMessagePending=false;return true;
 }
 function registerServiceWorker(){
+ if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true)return;
  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
  serviceWorkerFirstInstallMessagePending=!navigator.serviceWorker.controller;
  navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{

@@ -9,3 +9,4 @@ artifacts/
 # Local recovery runtimes, compiler, browser evidence and static build output.
 work/
 dist-mk100/
+dist-mk100-integrated/

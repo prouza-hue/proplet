@@ -1,0 +1,714 @@
+{
+  "status": "PASS",
+  "origin": "http://127.0.0.1:8866",
+  "preferredBrowserUnavailable": true,
+  "isolatedHeadlessFallback": true,
+  "physicalDeviceTested": false,
+  "checks": [
+    {
+      "name": "phone",
+      "theme": "light",
+      "screen": "daily",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#14745a",
+          "actionFont": "13px",
+          "actionColor": "rgb(20, 116, 90)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#315da8",
+          "actionFont": "13px",
+          "actionColor": "rgb(49, 93, 168)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#ad461b",
+          "actionFont": "13px",
+          "actionColor": "rgb(173, 70, 27)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#a93655",
+          "actionFont": "13px",
+          "actionColor": "rgb(169, 54, 85)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 178,
+          "height": 171.078125,
+          "accent": "#6b4897",
+          "actionFont": "13px",
+          "actionColor": "rgb(107, 72, 151)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 178,
+          "height": 171.078125,
+          "accent": "#806018",
+          "actionFont": "15px",
+          "actionColor": "rgb(128, 96, 24)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "phone",
+      "theme": "light",
+      "screen": "free",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#257966",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(37, 121, 102)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#315da8",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(49, 93, 168)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#ac4828",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(172, 72, 40)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#a93655",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(169, 54, 85)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#7050a4",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(112, 80, 164)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#806018",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 249, 236)",
+          "actionBackground": "rgb(128, 96, 24)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "phone",
+      "theme": "dark",
+      "screen": "daily",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#72d7b2",
+          "actionFont": "13px",
+          "actionColor": "rgb(114, 215, 178)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#98bcff",
+          "actionFont": "13px",
+          "actionColor": "rgb(152, 188, 255)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#ffad6c",
+          "actionFont": "13px",
+          "actionColor": "rgb(255, 173, 108)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 178,
+          "height": 121.390625,
+          "accent": "#ff90a4",
+          "actionFont": "13px",
+          "actionColor": "rgb(255, 144, 164)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 178,
+          "height": 171.078125,
+          "accent": "#c4a5ed",
+          "actionFont": "13px",
+          "actionColor": "rgb(196, 165, 237)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 178,
+          "height": 171.078125,
+          "accent": "#e0bd63",
+          "actionFont": "15px",
+          "actionColor": "rgb(224, 189, 99)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "phone",
+      "theme": "dark",
+      "screen": "free",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#257966",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(37, 121, 102)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#315da8",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(49, 93, 168)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#ac4828",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(172, 72, 40)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#a93655",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(169, 54, 85)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#7050a4",
+          "actionFont": "17px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(112, 80, 164)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 368,
+          "height": 138.9375,
+          "accent": "#e0bd63",
+          "actionFont": "15px",
+          "actionColor": "rgb(41, 35, 19)",
+          "actionBackground": "rgb(224, 189, 99)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "phone",
+      "theme": "light",
+      "dialog": true,
+      "headline": "Mozkokalypsa je tady.",
+      "body": "Sto nových desek. Plná mřížka. Každé políčko patří do řešení.",
+      "primaryText": "Jdu do Mozkokalypsy →",
+      "primaryBackground": "rgb(35, 91, 204)",
+      "primaryColor": "rgb(255, 248, 233)",
+      "bodyFont": "16px",
+      "dialogFits": true,
+      "mainInert": true,
+      "focusInside": true,
+      "noPlaytestVisible": true
+    },
+    {
+      "name": "phone",
+      "theme": "dark",
+      "dialog": true,
+      "headline": "Mozkokalypsa je tady.",
+      "body": "Sto nových desek. Plná mřížka. Každé políčko patří do řešení.",
+      "primaryText": "Jdu do Mozkokalypsy →",
+      "primaryBackground": "rgb(35, 91, 204)",
+      "primaryColor": "rgb(255, 248, 233)",
+      "bodyFont": "16px",
+      "dialogFits": true,
+      "mainInert": true,
+      "focusInside": true,
+      "noPlaytestVisible": true
+    },
+    {
+      "name": "phone",
+      "launchPrimaryActualNativeGame": true,
+      "boardId": "mk100-v2-001",
+      "mode": "free",
+      "answers": 14,
+      "cells": 100,
+      "dialogClosed": true
+    },
+    {
+      "name": "desktop",
+      "theme": "light",
+      "screen": "daily",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#14745a",
+          "actionFont": "11px",
+          "actionColor": "rgb(20, 116, 90)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#315da8",
+          "actionFont": "11px",
+          "actionColor": "rgb(49, 93, 168)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#ad461b",
+          "actionFont": "11px",
+          "actionColor": "rgb(173, 70, 27)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#a93655",
+          "actionFont": "11px",
+          "actionColor": "rgb(169, 54, 85)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 405,
+          "height": 108.671875,
+          "accent": "#6b4897",
+          "actionFont": "11px",
+          "actionColor": "rgb(107, 72, 151)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 405,
+          "height": 108.671875,
+          "accent": "#806018",
+          "actionFont": "14px",
+          "actionColor": "rgb(128, 96, 24)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "desktop",
+      "theme": "light",
+      "screen": "free",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#257966",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(37, 121, 102)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#315da8",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(49, 93, 168)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#ac4828",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(172, 72, 40)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#a93655",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(169, 54, 85)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#7050a4",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(112, 80, 164)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#806018",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 249, 236)",
+          "actionBackground": "rgb(128, 96, 24)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "desktop",
+      "theme": "dark",
+      "screen": "daily",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#72d7b2",
+          "actionFont": "11px",
+          "actionColor": "rgb(114, 215, 178)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#98bcff",
+          "actionFont": "11px",
+          "actionColor": "rgb(152, 188, 255)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#ffad6c",
+          "actionFont": "11px",
+          "actionColor": "rgb(255, 173, 108)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 405,
+          "height": 103.078125,
+          "accent": "#ff90a4",
+          "actionFont": "11px",
+          "actionColor": "rgb(255, 144, 164)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 405,
+          "height": 108.671875,
+          "accent": "#c4a5ed",
+          "actionFont": "11px",
+          "actionColor": "rgb(196, 165, 237)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 405,
+          "height": 108.671875,
+          "accent": "#e0bd63",
+          "actionFont": "14px",
+          "actionColor": "rgb(224, 189, 99)",
+          "actionBackground": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "desktop",
+      "theme": "dark",
+      "screen": "free",
+      "cardInfo": [
+        {
+          "key": "easy",
+          "title": "Snadná",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#257966",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(37, 121, 102)"
+        },
+        {
+          "key": "medium",
+          "title": "Střední",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#315da8",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(49, 93, 168)"
+        },
+        {
+          "key": "hard",
+          "title": "Těžká",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#ac4828",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(172, 72, 40)"
+        },
+        {
+          "key": "hardcore",
+          "title": "Mozkožrout",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#a93655",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(169, 54, 85)"
+        },
+        {
+          "key": "mozkomor",
+          "title": "Mozkomor",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#7050a4",
+          "actionFont": "15px",
+          "actionColor": "rgb(255, 255, 255)",
+          "actionBackground": "rgb(112, 80, 164)"
+        },
+        {
+          "key": "mozkokalypsa",
+          "title": "Mozkokalypsa",
+          "titleFits": true,
+          "width": 405,
+          "height": 174,
+          "accent": "#e0bd63",
+          "actionFont": "15px",
+          "actionColor": "rgb(41, 35, 19)",
+          "actionBackground": "rgb(224, 189, 99)"
+        }
+      ],
+      "documentOverflow": false,
+      "iconsLoaded": true
+    },
+    {
+      "name": "desktop",
+      "theme": "light",
+      "dialog": true,
+      "headline": "Mozkokalypsa je tady.",
+      "body": "Sto nových desek. Plná mřížka. Každé políčko patří do řešení.",
+      "primaryText": "Jdu do Mozkokalypsy →",
+      "primaryBackground": "rgb(35, 91, 204)",
+      "primaryColor": "rgb(255, 248, 233)",
+      "bodyFont": "17px",
+      "dialogFits": true,
+      "mainInert": true,
+      "focusInside": true,
+      "noPlaytestVisible": true
+    },
+    {
+      "name": "desktop",
+      "theme": "dark",
+      "dialog": true,
+      "headline": "Mozkokalypsa je tady.",
+      "body": "Sto nových desek. Plná mřížka. Každé políčko patří do řešení.",
+      "primaryText": "Jdu do Mozkokalypsy →",
+      "primaryBackground": "rgb(35, 91, 204)",
+      "primaryColor": "rgb(255, 248, 233)",
+      "bodyFont": "17px",
+      "dialogFits": true,
+      "mainInert": true,
+      "focusInside": true,
+      "noPlaytestVisible": true
+    },
+    {
+      "name": "desktop",
+      "launchPrimaryActualNativeGame": true,
+      "boardId": "mk100-v2-001",
+      "mode": "free",
+      "answers": 14,
+      "cells": 100,
+      "dialogClosed": true
+    }
+  ],
+  "screenshots": [
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-dnes-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-dnes-cards-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-hrat-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-hrat-cards-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-dnes-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-dnes-cards-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-hrat-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-hrat-cards-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-launch-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\phone-launch-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-dnes-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-dnes-cards-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-hrat-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-hrat-cards-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-dnes-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-dnes-cards-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-hrat-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-hrat-cards-dark.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-launch-light.png",
+    "C:\\Users\\prouz\\Documents\\Codex\\2026-10-01\\nav\\work\\proplet\\work\\mk100\\design\\fullapp\\desktop-launch-dark.png"
+  ],
+  "blockedRequests": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "requestErrors": [],
+  "browserVersion": "154.0.8037.58"
+}

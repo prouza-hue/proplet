@@ -1,5 +1,10 @@
 # Dokončení po druhém přerušení — 1. 10. 2026
 
+**Nejnovější rozhodnutí:** další playtest nebude; po stručném projití dvanáctky
+a schválení vzhledu bude následovat vydání. Zatím vzniká pouze integrovaný
+náhled v celém Propletu, s nezměněnými dosavadními branami. Aktuální návaznost
+je [INTEGRATED_PREVIEW_20261001.md](INTEGRATED_PREVIEW_20261001.md).
+
 **Finální aktualizace:** kandidátní stovka v2 je dokončená na větvi `work/mk100-completion-20261001`. Hash `84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab`, nezávislý solver PASS100/100, individuální modelová redakce100/100, hratelné izolované preview a finální browserový průchod. Přesný aktuální stav je v `WORK_STATUS.md`, katalog a návod v `content/gen6/mozkokalypsa-100/`. Produkce i hráčská data zůstaly beze změny, další playtest nebyl aktivován. Následující text je zachovaný historický checkpoint před dokončením.
 
 Převzato ze skutečného chatu „Dokončení stovky Mozkokalypsy“. Původní zadání i předání byly načteny přes GitHub. Následná živá kontrola našla novější rozpracovaný commit `dc1fd060db70f38f7419f48dc498686faf5e5707` na `work/mozkokalypsa-100-resume-20261001`; právě tento úplný checkpoint je základem nové izolované větve `work/mk100-completion-20261001`.

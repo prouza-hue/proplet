@@ -1,0 +1,79 @@
+/* Mozkokalypsa: an ochre sixth difficulty within the native paper palette.
+   Load after compact-difficulties.css. This file does not enable the edition. */
+:root {
+  --mk-series-accent: #806018;
+  --mk-series-soft: #f3e8ca;
+  --mk-series-on-accent: #fff9ec;
+}
+
+html[data-theme="dark"] {
+  --mk-series-accent: #e0bd63;
+  --mk-series-soft: #433a26;
+  --mk-series-on-accent: #292313;
+}
+
+.cp-card[data-diff="mozkokalypsa"],
+.today-card.mozkokalypsa,
+html[data-theme="light"] .today-card.mozkokalypsa {
+  --accent: var(--mk-series-accent);
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-play {
+  background: var(--mk-series-accent);
+  color: var(--mk-series-on-accent);
+  line-height: 1.35;
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-xp,
+html[data-theme="dark"] .cp-card[data-diff="mozkokalypsa"] .cp-xp {
+  color: var(--mk-series-accent);
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-history,
+.today-card.mozkokalypsa .today-count {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.today-card.mozkokalypsa .today-action {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-top h2,
+.today-card.mozkokalypsa .today-title strong {
+  line-height: 1.2;
+}
+
+/* Support the older native quick-card surface without changing other levels. */
+.quick-game[data-diff="mozkokalypsa"],
+.difficulty-card[data-diff="mozkokalypsa"] {
+  --diff: var(--mk-series-accent);
+  --diff-soft: var(--mk-series-soft);
+}
+
+/* The name stays readable in a two-column Today grid on narrow phones. */
+@container (max-width: 450px) {
+  .today-card.mozkokalypsa {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+
+  .today-card.mozkokalypsa .today-art,
+  .today-card.mozkokalypsa .today-title {
+    grid-column: 1;
+  }
+
+  .today-card.mozkokalypsa .today-art {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cp-card[data-diff="mozkokalypsa"] .cp-history,
+  .today-card.mozkokalypsa .today-count,
+  .today-card.mozkokalypsa .today-action {
+    font-size: 15px;
+  }
+}

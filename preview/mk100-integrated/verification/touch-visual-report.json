@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "viewportOnly": true,
+  "physicalDeviceTested": false,
+  "checks": [
+    {
+      "screen": "daily",
+      "theme": "light",
+      "touchPoints": 1,
+      "coarse": true,
+      "playFont": "17px"
+    },
+    {
+      "screen": "free",
+      "theme": "light",
+      "touchPoints": 1,
+      "coarse": true,
+      "playFont": "17px"
+    },
+    {
+      "screen": "daily",
+      "theme": "dark",
+      "touchPoints": 1,
+      "coarse": true,
+      "playFont": "17px"
+    },
+    {
+      "screen": "free",
+      "theme": "dark",
+      "touchPoints": 1,
+      "coarse": true,
+      "playFont": "17px"
+    },
+    {
+      "theme": "light",
+      "launch": true,
+      "touchPoints": 1,
+      "coarse": true,
+      "vortexLoaded": true
+    },
+    {
+      "theme": "dark",
+      "launch": true,
+      "touchPoints": 1,
+      "coarse": true,
+      "vortexLoaded": true
+    },
+    {
+      "launchNativeTouchTapStartsGame": true
+    },
+    {
+      "desktopPlayFont": "15px"
+    }
+  ]
+}

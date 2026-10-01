@@ -1,5 +1,10 @@
 # Mozkokalypsa 100 — dokončené kandidátní vydání v2
 
+**Navazující požadavek Pavla:** další playtest nebude. Aktuální práce je
+náhled v běžném celém Propletu na větvi `work/mk100-proplet-preview-20261001`;
+dosavadní brány se zachovávají a produkce se zatím nenasazuje. Podrobnosti
+a pozdější podmínky vydání jsou v [INTEGRATED_PREVIEW_20261001.md](INTEGRATED_PREVIEW_20261001.md).
+
 Finální stav po převzetí nereagujícího chatu „Dokončení stovky Mozkokalypsy“, 1. 10. 2026. Samostatná větev `work/mk100-completion-20261001` navazuje na úplný checkpoint `dc1fd060db70f38f7419f48dc498686faf5e5707`.
 
 - Přesně 100 nových desek `mk100-v2-001` až `mk100-v2-100`, hash banky `84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab`.
