@@ -1,0 +1,2136 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-01",
+  "reviewer": "Codex editorial_a (AI)",
+  "range": [
+    1,
+    50
+  ],
+  "status": "complete-individual-lexical-review",
+  "method": "Every concrete14-word set was read and judged individually. Familiarity and combination quality are editorial model assessments, not player telemetry or new normative dictionary certification. All approved working-v3 bytes remain untouched. Conscious narrow/polarizing terms are reviewed separately from legacy tiers and corpus screening flags; moderate domain-knowledge risks remain explicit.",
+  "wordsetHashMethod": "tools.gen5.catalog.digest(sorted(normalizedWords))",
+  "evidenceBasis": [
+    "Unchanged content/lexicon-v3/working/lexicon.json and per-word review_ref/source_cohort",
+    "content/lexicon-v3/working/editorial-reviews.json; original evidence-depth limitations preserved",
+    "docs/mk100-recovery/ZADANI_100_DESEK.md",
+    "docs/mk100-recovery/evaluations/MOZKOKALYPSA-ROUND3-EVALUATION-20261001.md",
+    "Actual provisional lexical-plan.json sets1–50"
+  ],
+  "geometryApproval": false,
+  "productionApproval": false,
+  "playerDifficultyMeasured": false,
+  "records": [
+    {
+      "ordinal": 1,
+      "id": "mk100-v2-001",
+      "wordsetHash": "74eeea2778da14e7a4d999c61cbbf83313cf4dc0e824f8c06207c3c456a20587",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Vyprávění, zvony a krajina",
+      "whyIncluded": "Úvod opírá dlouhá slova o konkrétní obrazy LOUŽE, ZVONICE a PROHLUBEŇ; RUSALKA a PŘADLENA přidávají pohádkový tón.",
+      "risks": [
+        "OTAKÁREK a INICIÁLA mohou být méně samozřejmé pro hráče mimo přírodopis a psaní; úleva je relativní k Mozkokalypse."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "otakárek": "Platné konkrétní jméno motýla ze schválené zásoby; nízká četnost sama není důvodem k zákazu. Zde ho nevolíme jako umělou raritu.",
+        "iniciála": "Kulturní a školní výraz, který rozšiřuje domácí a přírodní obrazy.",
+        "cimbál": "Známý hudební a folklorní předmět, nikoli obdoba velmi úzce známé CITERY.",
+        "přadlena": "Ustálená pohádková a řemeslná postava; ne nahodilý odvozený tvar."
+      },
+      "reviewedWords": [
+        "cimbál",
+        "církev",
+        "dobrota",
+        "iniciála",
+        "konopí",
+        "louže",
+        "otakárek",
+        "prohlubeň",
+        "přadlena",
+        "rusalka",
+        "spojení",
+        "vyprávět",
+        "vyslanec",
+        "zvonice"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "c555fbabbee4d9d27f2929bd8fba08cf4d7dfa9c20656239e4a1e4bec7317abf",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "Prohlédnutá mřížka má krátké směrové vratky a konkrétní dlouhé kotvy PROHLUBEŇ/INICIÁLA; úleva vychází také z nižšího prefixového tlaku mezi reprezentanty. Samotný tvar cest je stále stejně výrazně lomený jako hlavní profil.",
+          "crossContacts": 77,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 36.623,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-001",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 2,
+      "id": "mk100-v2-002",
+      "wordsetHash": "112f97824728cf68cdf8306ddba2441b58492d29b2c41644762101c3b1012c16",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Nábřeží, mechanismy a vzpomínky",
+      "whyIncluded": "CHAPADLO, KOTVIŠTĚ a ZÁBRADLÍ střídají světy; KLEŠTĚ a SVORKA mají snadno představitelný význam, NOSTALGIE přidává abstrakci.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "kleště": "Ustálené pomnožné pojmenování, žádný problém se základním tvarem.",
+        "kyvadlo": "Běžný školní mechanismus; nevydávat technické téma za raritu.",
+        "záhlaví": "Přirozený dokumentový a typografický pojem.",
+        "doubrava": "Krajinné pojmenování s jasnou slovotvorbou; méně městským hráčům může pomoci zkušenost s názvy míst."
+      },
+      "reviewedWords": [
+        "chapadlo",
+        "doubrava",
+        "grafika",
+        "hůlka",
+        "kleště",
+        "kotviště",
+        "kyvadlo",
+        "nostalgie",
+        "poslanec",
+        "průtrž",
+        "svorka",
+        "vysávat",
+        "zábradlí",
+        "záhlaví"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "abac9854e90a2851ef16de3eb82aaae6fc0ac55e47aced1fe050d2d10ac14d61",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "CHAPADLO a NOSTALGIE mají prostorové zalomení mezi okolními cíli; konkrétní technické předměty pomáhají střídat typ hledání. Tiling je odlišný od01, přesto používá stejný krátce meandrující charakter.",
+          "crossContacts": 79,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 42.3189,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-002",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 3,
+      "id": "mk100-v2-003",
+      "wordsetHash": "ad9e14f7e186df81464c5d573afe7d3ffb82b4335e68c069bcd2779f01be74dd",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Domácí rozjezd s malým dobrodružstvím",
+      "whyIncluded": "BÁBOVKA, NÁPRSTEK a SPÍNAČ vytvářejí známé kotvy; DOBRODRUH a NEPOSEDA dodávají lehkost bez raritní kvóty.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "neposeda": "Živé expresivní označení člověka; hravý cíl.",
+        "konzole": "Samostatné běžné slovo s více významy; není potřeba vynucovat jediný herní význam.",
+        "ledňáček": "Známé pojmenování ptáka s výrazným obrazem; širokou znalost pouze odhadujeme.",
+        "podíl": "Ustálené podstatné jméno, nikoli slovesný rozkaz."
+      },
+      "reviewedWords": [
+        "blízkost",
+        "bábovka",
+        "dobrodruh",
+        "konzole",
+        "ledňáček",
+        "listina",
+        "myslet",
+        "naviják",
+        "neposeda",
+        "náprstek",
+        "podíl",
+        "spínač",
+        "vinice",
+        "vyhlídka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "80b8a6719f612bf633ff2cf8aa4082a0833f159a3ca0e44375a1f01927fb1338",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "NÁPRSTEK/DOBRODRUH a SPÍNAČ mění počáteční obrazy i délku; prohlédnutá mřížka drží stejná pravidla bez sdílení polí. Úleva je relativní, cesty mají nejméně tři změny směru.",
+          "crossContacts": 77,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 37.4676,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-003",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 4,
+      "id": "mk100-v2-004",
+      "wordsetHash": "c946e4f2d47f209aa764dfd9ecbfbdad20fdc643b93c5af2ad982b22c43db397",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Výlet, domácnost a trochu myšlení",
+      "whyIncluded": "TÁBORNÍK, VYSOČINA a BROSKVOŇ sousedí s obyčejnými činnostmi POČÍTAT a ZAMETAT; stereotyp a parodie obměňují typ hledání.",
+      "risks": [
+        "KUŇKA je konkrétní zoologické jméno, které může menší část hráčů neznat."
+      ],
+      "polarizingWords": [
+        "kuňka"
+      ],
+      "individualNotes": {
+        "kuňka": "Jeden vědomě méně samozřejmý přírodopisný cíl; ostatní slova netvoří další úzce odborný blok.",
+        "domácí": "Zděděné POS noun není úplný popis užití: řetězec má i běžný adjektivní význam. V novém katalogu neinterpretovat metadata jako zákaz přídavného jména.",
+        "kaučuk": "Běžně rozpoznatelný materiál; školní znalost není specializace.",
+        "holčička": "Ustálená zdrobnělina bez přepisu nebo neobvyklé varianty."
+      },
+      "reviewedWords": [
+        "broskvoň",
+        "domácí",
+        "holčička",
+        "imunita",
+        "kaučuk",
+        "kilometr",
+        "krajka",
+        "kuňka",
+        "parodie",
+        "počítat",
+        "stereotyp",
+        "táborník",
+        "vysočina",
+        "zametat"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "9a49457b09800a7b91402c4e631ad47e8d6296f42f5885606a132c599e5c3375",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "Mřížka spojuje velmi běžné slovesné cíle s KUŇKOU; POČÍTAT a ZAMETAT nejsou jen přímé řetízky. Vysoký prefixový tlak je pracovní podpůrný signál hlavního profilu, nikoli lidská obtížnost.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 54.2175,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-004",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 5,
+      "id": "mk100-v2-005",
+      "wordsetHash": "2bbb2c85ce74ea6bd46c97e327fd223d5fe04ff11788351939f737c4fd0cdc77",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Pobřeží, řeč a předpověď počasí",
+      "whyIncluded": "PŘÍBOJ, STĚŽEŇ a PŘEHÁŇKA vytvářejí atmosféru, zatímco TANČIT, VERANDA a STAŘENKA poskytují civilní kotvy.",
+      "risks": [
+        "POTÁPKA má užší přírodopisný význam; STĚŽEŇ je školně a příběhově známý, přesto méně každodenní."
+      ],
+      "polarizingWords": [
+        "potápka"
+      ],
+      "individualNotes": {
+        "potápka": "Ponecháno jako jediné vědomě užší zoologické pojmenování.",
+        "stěžeň": "Námořnický předmět s běžným školním a dobrodružným kontextem; nenavyšujeme raritu jen za téma.",
+        "středník": "Přirozený název interpunkčního znaménka.",
+        "proroctví": "Známý příběhový a kulturní výraz; nezaměňovat za doklad těžšího závěru."
+      },
+      "reviewedWords": [
+        "loutkář",
+        "odhad",
+        "poloměr",
+        "poptávka",
+        "potápka",
+        "proroctví",
+        "průvodce",
+        "přeháňka",
+        "příboj",
+        "stařenka",
+        "stěžeň",
+        "středník",
+        "tančit",
+        "veranda"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "a63e26f454a5cd15f929968d1355f419ffefd7c83ece4f0200d31f5005e4f6a4",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "POTÁPKA a STĚŽEŇ dávají odlišné slovní obrazy. Kontrola koncových scénářů zde nestojí pouze na neznalosti POTÁPKY: modelové trojice zahrnují také PROROCTVÍ/POPTÁVKA/STAŘENKA. Rychlý konec u dalších pořadí není vyloučen.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 43.7249,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "endgameReview": {
+            "plausibleOrders": 3,
+            "sensitivityOrders": 6,
+            "distinctPlausibleTails": 2,
+            "plausibleIsolatedChainWordsMean": 0,
+            "allThreeSimpleChains": 0,
+            "interpretation": "Model residual evidence only; no new player telemetry, no guarantee that every possible ordering retains difficulty."
+          },
+          "id": "mk100-v1-005",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 6,
+      "id": "mk100-v2-006",
+      "wordsetHash": "0d0a754060a848bdfa7f06ae7f119905debdd15434dd950b8ba0674850aa9f42",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Výzva s civilním slovníkem",
+      "whyIncluded": "KOČÁREK a KOPRETINA jsou blízké obrazy; REVOLUCE, TURBÍNA a VIADUKT dávají delším cílům rozdílný charakter. Výzva může stát na cestách.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "plátek": "Samostatné běžné mnohoznačné podstatné jméno.",
+        "panička": "Živé zdrobnělé označení; může mít různý tón, ale není jazykovou vadou.",
+        "kružnice": "Standardní školní geometrie.",
+        "viadukt": "Známá dopravní stavba, nikoli vymyšlená výplň."
+      },
+      "reviewedWords": [
+        "balet",
+        "doslov",
+        "kopretina",
+        "kočárek",
+        "kružnice",
+        "motocykl",
+        "návrší",
+        "panička",
+        "plátek",
+        "revoluce",
+        "rozbřesk",
+        "turbína",
+        "viadukt",
+        "zlodějka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "fbdf67b9de51791b0cfb1449ad69545801076bb60150543096f753ac82aa7879",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "KOPRETINA, TURBÍNA a MOTOCYKL mají různorodé začátky i délky; slovní výzva není založena na raritách. Ve třech modelových koncích nezůstávají tři samostatné prosté řetízky; lidský zásek se tím neprokazuje.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 43.8684,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "endgameReview": {
+            "plausibleOrders": 3,
+            "sensitivityOrders": 6,
+            "distinctPlausibleTails": 3,
+            "plausibleIsolatedChainWordsMean": 0,
+            "allThreeSimpleChains": 0,
+            "interpretation": "Model residual evidence only; no new player telemetry, no guarantee that every possible ordering retains difficulty."
+          },
+          "id": "mk100-v1-006",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 7,
+      "id": "mk100-v2-007",
+      "wordsetHash": "0d5e811c6673f47c5fe567d8c4818e1dcc1a770cc4f024a341dcb06d6b152478",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Pohádka, matematika a město",
+      "whyIncluded": "VLKODLAK a KŘESADLO přidávají dobrodružství; ŠLEHAČKA, PAŘEZ a TĚSNĚNÍ přinášejí rychlé konkrétní obrazy, ODMOCNINA mění významový registr.",
+      "risks": [
+        "ODMOCNINA a PRŮČELÍ mohou více záviset na školní zkušenosti; nevytváří to samo dvě cílené rarity."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pískovna": "Obyčejný krajinný a těžební název; nízkofrekvenční screening je zde přísnější než redakční úsudek.",
+        "odmocnina": "Přesné školní pojmenování se správným základním tvarem.",
+        "křesadlo": "Historický předmět se silnou pohádkovou oporou.",
+        "průčelí": "Přirozený architektonický termín, který se běžně objevuje v popisech města."
+      },
+      "reviewedWords": [
+        "křesadlo",
+        "melodie",
+        "odmocnina",
+        "pařez",
+        "petrklíč",
+        "průčelí",
+        "pískovna",
+        "přepis",
+        "příběh",
+        "recenze",
+        "server",
+        "těsnění",
+        "vlkodlak",
+        "šlehačka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "2385e08e4e3131bb757b442b5c5b9a886894b0c788bb1a8a83e6ffb71e28ec5a",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "KŘESADLO/ŠLEHAČKA a ODMOCNINA vytvářejí významově různorodé kotvy. Krátké zalomené cesty připomínají ostatní reprezentanty; nový slovník a odlišné tilingové rozložení jsou konkrétní rozdíly, ne nový typ pravidel.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 45.0113,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-007",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 8,
+      "id": "mk100-v2-008",
+      "wordsetHash": "392260512423ccd566ca9756c0512168e47e86af26ff4b997a00ba3462f7d79a",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Zahrada, koncert a kuchyňské drobnosti",
+      "whyIncluded": "KNOFLÍK, OTVÍRÁK, PODLOŽKA a ZELENINA kotví relativní úlevu; SBORMISTR a POINTA přinášejí kulturní obměnu.",
+      "risks": [
+        "DOŽIVOTÍ je významově těžší než ostatní slova, i když jazykově běžné; nevyvozovat z profilu úleva výhradně veselý obsah."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "jitrocel": "Známé pojmenování rostliny, nikoli zvolená botanická rarita.",
+        "sbormistr": "Srozumitelný název povolání s průhlednou stavbou.",
+        "pointa": "Ustálené přejaté slovo, vhodný odlišný rytmus písmen.",
+        "brousek": "Běžný dílenský předmět; žádná potřeba umělého odborného cíle."
+      },
+      "reviewedWords": [
+        "brousek",
+        "doživotí",
+        "jitrocel",
+        "knoflík",
+        "mezera",
+        "otvírák",
+        "podložka",
+        "pointa",
+        "potlesk",
+        "sazenice",
+        "sbormistr",
+        "srpek",
+        "zelenina",
+        "zátoka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "f4452d73f7f1db3850fafdc1560fbf34c4881ee90c280389289207fd1b21ebea",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "OTVÍRÁK/PODLOŽKA a KNOFLÍK dávají všední předměty i v plné mřížce. Cesty jsou stejně lomené jako u hlavního profilu a samotná slovní úleva proto není důkaz nižšího celkového času.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 43.3461,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-008",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 9,
+      "id": "mk100-v2-009",
+      "wordsetHash": "caf490ffd6dd5f0eff2acbf72d4a2fdabeeb1ed58b41a993d9bfe1ad04a1a434",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Od kuchyně k fyzice",
+      "whyIncluded": "ANGREŠT, CHŘEST a NÁTĚLNÍK střídají LETOKRUH a ELEKTRON; PRASKAT a ŠLAPADLO přidávají pohyb a zvuk.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "chřest": "Standardní pojmenování zeleniny; nikoli náhodný shluk souhlásek.",
+        "elektron": "Základní školní a populárně vědecký pojem.",
+        "těžiště": "Známý výraz fyzikální i přenesený.",
+        "novela": "Plnohodnotné slovo s literárním i právním významem."
+      },
+      "reviewedWords": [
+        "angrešt",
+        "bruska",
+        "chřest",
+        "elektron",
+        "kalendář",
+        "letokruh",
+        "novela",
+        "nátělník",
+        "popelnice",
+        "poutník",
+        "praskat",
+        "skica",
+        "těžiště",
+        "šlapadlo"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "0293a360ea09dfe0458869d96f2ea44668d49ab63418a50b0e83bc8f9c1dd718",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "Prohlédnuté řešení střídá kuchyni a školní fyziku. Modelové konce ELEKTRON/KALENDÁŘ/POPELNICE a CHŘEST/NOVELA/ELEKTRON zůstávají konstruované z běžných slov; výsledný tlak je pozitivní pracovní proxy, bez nového hráčského měření.",
+          "crossContacts": 76,
+          "meanTurns": 4.785714285714286,
+          "prefixPressureScore": 49.5063,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "endgameReview": {
+            "plausibleOrders": 3,
+            "sensitivityOrders": 6,
+            "distinctPlausibleTails": 3,
+            "plausibleIsolatedChainWordsMean": 0,
+            "allThreeSimpleChains": 0,
+            "interpretation": "Model residual evidence only; no new player telemetry, no guarantee that every possible ordering retains difficulty."
+          },
+          "id": "mk100-v1-009",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 10,
+      "id": "mk100-v2-010",
+      "wordsetHash": "fb7bdc70e2637cfd580b93cac40b30f613f35d19a61fad1d6ec1582743474f4e",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Technika, barvy a hudba",
+      "whyIncluded": "ANDROID a PROCESOR dávají současný tón, FRESKA a KONTRABAS kulturní protějšek; HEŘMÁNEK, MINUTA a ŠPENDLÍK drží běžné kotvy.",
+      "risks": [
+        "FRESKA a KONTRABAS vyžadují kulturní zkušenost; dvojice ANDROID/PROCESOR není návod vydávat tuto sadu za oborově neutrální."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "android": "Zavedené obecné pojmenování, též známé ze současné techniky; proper-name četnost sama nedokazuje obecnou znalost.",
+        "freska": "Běžný kulturní termín; ponechán bez nároků na univerzální hráčskou známost.",
+        "kontrabas": "Standardní nástroj známý z běžného koncertního prostředí.",
+        "pestrý": "Správný základní mužský tvar přídavného jména."
+      },
+      "reviewedWords": [
+        "android",
+        "epidemie",
+        "freska",
+        "heřmánek",
+        "hyena",
+        "karabina",
+        "kontrabas",
+        "minuta",
+        "odlitek",
+        "pestrý",
+        "popěvek",
+        "postroj",
+        "procesor",
+        "špendlík"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "b455b12edb6bae6a3fa8738212dd086f99b5c69328c83a5299931de3209f80a6",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "ANDROID/PROCESOR a FRESKA/KONTRABAS leží na rozdílných konkrétních cestách; kulturní a technická znalost zůstává samostatnou složkou nároku. Prefixový tlak je zde vyšší než u summit20, takže pořadové profily nejsou prokázaná lidská gradace.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 56.7724,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "id": "mk100-v1-010",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 11,
+      "id": "mk100-v2-011",
+      "wordsetHash": "fa8352c6ce6342a37e94ac3c2af8e6b72d2f5550429e50227a27cc15a5d012ca",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Příroda, vesmír a sportovní výzva",
+      "whyIncluded": "PLOŠTICE, ORNICE a NOVOLUNÍ mění měřítko obrazů; LYŽOVAT, TROFEJ a SKŘÍTEK chrání desku před monotónním vědeckým tónem.",
+      "risks": [
+        "NÁHORNÍ je vztahové adjektivum, které si část hráčů vybaví především ve spojení náhorní plošina."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "náhorní": "Ustálené základní adjektivum, nepřebíráme neurčité legacy POS editorial_lemma jako přesný slovní druh.",
+        "novoluní": "Známé pojmenování měsíční fáze; může mít menší každodenní známost.",
+        "podběrák": "Konkrétní rybářská pomůcka s průhledným tvarem; další slova nejsou úzce rybářská.",
+        "geometrie": "Základní obor školní výuky, nikoli specialistická rarita."
+      },
+      "reviewedWords": [
+        "bakterie",
+        "barvivo",
+        "geometrie",
+        "lyžovat",
+        "novoluní",
+        "náhorní",
+        "ornice",
+        "ploštice",
+        "podběrák",
+        "skřítek",
+        "trofej",
+        "vládkyně",
+        "zbroj",
+        "závada"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "de79e55039da54831e61030cf6947740a6f6fec37f9bb296a802887fa23e6311",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "PLOŠTICE/ORNICE a NOVOLUNÍ poskytují přírodní kotvy; největší nárok není podložen dalšími raritami. Ve modelových koncích se mění trojice, včetně BAKTERIE/PLOŠTICE/GEOMETRIE a ZÁVADA/GEOMETRIE/VLÁDKYNĚ. Je to konstrukční hypotéza.",
+          "crossContacts": 76,
+          "meanTurns": 4.785714285714286,
+          "prefixPressureScore": 36.5509,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "endgameReview": {
+            "plausibleOrders": 3,
+            "sensitivityOrders": 6,
+            "distinctPlausibleTails": 3,
+            "plausibleIsolatedChainWordsMean": 0,
+            "allThreeSimpleChains": 0,
+            "interpretation": "Model residual evidence only; no new player telemetry, no guarantee that every possible ordering retains difficulty."
+          },
+          "id": "mk100-v1-011",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 12,
+      "id": "mk100-v2-012",
+      "wordsetHash": "b53d980c497041b3e77ba9050781ee5e5d6198326a13c1008f327f3f9039b116",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Řemesla, pohádka a obchod",
+      "whyIncluded": "HEJKAL a STŘAPATÝ dodávají hravost; KERAMIKA, NÁUŠNICE a ZÁKAZNÍK přinášejí hmatatelný všední svět.",
+      "risks": [
+        "BEDNĚNÍ a STRNIŠTĚ jsou pro čistě městského hráče méně samozřejmé; oba mají obecné konkrétní významy."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "koženka": "Běžně rozpoznatelný materiál; screenovací raritní flag je falešně přísný.",
+        "bednění": "Ustálené pojmenování ze stavebnictví, v běžném veřejném prostředí dostupné.",
+        "střapatý": "Správné samostatné adjektivní lemma.",
+        "hejkal": "Ustálená pohádková bytost se silnou českou kulturní oporou."
+      },
+      "reviewedWords": [
+        "bednění",
+        "hejkal",
+        "hříva",
+        "keramika",
+        "koženka",
+        "monolog",
+        "náušnice",
+        "prodat",
+        "protein",
+        "předmluva",
+        "strniště",
+        "střapatý",
+        "zákazník",
+        "úvazek"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 13,
+      "id": "mk100-v2-013",
+      "wordsetHash": "1f4eb75d78330bc5981c0d4d62aeebd55ba3e695be8ded372e2609a9ae502b16",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Činnosti, tvary a malé pocity",
+      "whyIncluded": "DRHNOUT, NAVLÉKAT a STROUHAT vyvažují SOUČIN a ÚSEČKU; KEJKLÍŘ, PODKOVA a JÁDŘINEC dávají různé obrazy.",
+      "risks": [
+        "OCHRNUTÍ je zdravotně těžší význam, nikoli technická nebo raritní výplň."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "chladivý": "Přirozené běžné přídavné jméno; nízká četnost je zde slabá proxy.",
+        "součin": "Standardní samostatné matematické podstatné jméno.",
+        "kejklíř": "Živé kulturní a historické pojmenování; zábavnost je redakční odhad.",
+        "ledovka": "Ustálené meteorologické slovo, ne špatná varianta náledí."
+      },
+      "reviewedWords": [
+        "chladivý",
+        "drhnout",
+        "fyzika",
+        "jádřinec",
+        "kaple",
+        "kejklíř",
+        "ledovka",
+        "navlékat",
+        "ochrnutí",
+        "podkova",
+        "prázdnota",
+        "součin",
+        "strouhat",
+        "úsečka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 14,
+      "id": "mk100-v2-014",
+      "wordsetHash": "be7b98457a59f77c11788c1f0212ef7b1eb78d5ea40b29ec2e70f31920ddb51e",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Sladká úleva s rukodělným tónem",
+      "whyIncluded": "KREMROLE, KLUBKO a ŠŤAVNATÝ dávají lehké kotvy; HÁČKOVAT a ŘEZBÁŘ rozšiřují typ činnosti, STRAŠÁK drží hravost.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "meduňka": "Běžná zahradní a čajová bylina.",
+        "červenka": "Zavedené přírodopisné jméno ptáka; nepřidáváme raritu jen kvůli zoologickému tématu.",
+        "sazba": "Samostatné mnohoznačné slovo, které se hodí i k tiskařské identitě Propletu.",
+        "převis": "Běžný terénní a stavební výraz."
+      },
+      "reviewedWords": [
+        "háčkovat",
+        "klubko",
+        "kremrole",
+        "meduňka",
+        "modlitba",
+        "podezření",
+        "průjezd",
+        "převis",
+        "sazba",
+        "strašák",
+        "vstupné",
+        "červenka",
+        "řezbář",
+        "šťavnatý"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 15,
+      "id": "mk100-v2-015",
+      "wordsetHash": "401ec5741a1363fa74f73ff71aae19eaa7cdbc86497187051faf8e6b19bfadd0",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Večer u lesa a v dílně",
+      "whyIncluded": "SVÍTÁNÍ a ŠELEST tvoří atmosféru, TETŘEV a STOLIČKA přírodní a domácí oporu; TESLICE poskytuje jeden vědomý řemeslný objev.",
+      "risks": [
+        "TESLICE může být pro část hráčů nový nástroj; nesmí sama představovat údajný konstrukčně obtížný konec."
+      ],
+      "polarizingWords": [
+        "teslice"
+      ],
+      "individualNotes": {
+        "teslice": "Přijato jako jediné vědomě úzce řemeslné pojmenování.",
+        "supernova": "Známý populárně astronomický pojem, druhý záměrně raritní cíl z něj neděláme.",
+        "tetřev": "Známé školní a přírodní pojmenování.",
+        "dovětek": "Standardní název dodatku textu; samostatné lemma."
+      },
+      "reviewedWords": [
+        "databáze",
+        "dovětek",
+        "děvčátko",
+        "kvasnice",
+        "pevnost",
+        "prosinec",
+        "stolička",
+        "supernova",
+        "svítání",
+        "teslice",
+        "tetřev",
+        "večer",
+        "vrchol",
+        "šelest"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 16,
+      "id": "mk100-v2-016",
+      "wordsetHash": "5fae3a74371230b779ae2ca9f2ce2dff3fa0376a406dc6c3fc96e0eea417cb45",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Sport, dílna a přesné významy",
+      "whyIncluded": "BASEBALL a HACKER působí současně, BLATOUCH a DŽUNGLE přírodně; ZÁVLAČKA přidává jeden konkrétní odborný předmět.",
+      "risks": [
+        "ZÁVLAČKA má užší mechanický význam; MATICE si hráč může nejprve vybavit v jiném významu než výrobní metadata."
+      ],
+      "polarizingWords": [
+        "závlačka"
+      ],
+      "individualNotes": {
+        "závlačka": "Vědomě méně známá mechanická pomůcka, odůvodněná profilem výzva.",
+        "matice": "Běžné samostatné slovo s matematickým a mechanickým významem; corpus výskyt nerozliší významy.",
+        "křupavý": "Správné běžné adjektivní lemma, nikoli rarita.",
+        "blatouch": "Zavedená luční rostlina s běžnou školní oporou."
+      },
+      "reviewedWords": [
+        "baseball",
+        "blatouch",
+        "chudinka",
+        "džungle",
+        "hacker",
+        "křupavý",
+        "matice",
+        "předsudek",
+        "přehoz",
+        "radar",
+        "stupačka",
+        "zápraží",
+        "závlačka",
+        "zážitek"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 17,
+      "id": "mk100-v2-017",
+      "wordsetHash": "4552e4207d700e221c44cbdd73ba0441ff8936c6d4b9cad361108246094aacf8",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Výlet, dílna a příběh",
+      "whyIncluded": "PROHLÍŽEČ a PROPISKA střídají KOPŘIVU, LEOPARDA a POZOUN; LEŠTIT a SVĚRÁK vracejí desku ke konkrétním činnostem.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "legionář": "Zavedený historický název člověka; bez tvrzení o jednotné hráčské znalosti historického kontextu.",
+        "pozoun": "Standardní hudební nástroj, přijatelná kulturní obměna.",
+        "svodidlo": "Běžný dopravní předmět; delší slovo není raritnější jen kvůli délce.",
+        "dovolení": "Samostatné podstatné jméno se správným zápisem; nejde o variantu dovolená."
+      },
+      "reviewedWords": [
+        "dovolení",
+        "kopřiva",
+        "krupice",
+        "legionář",
+        "leopard",
+        "leštit",
+        "pozoun",
+        "pozvání",
+        "prohlížeč",
+        "propiska",
+        "román",
+        "slovíčko",
+        "svodidlo",
+        "svěrák"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 18,
+      "id": "mk100-v2-018",
+      "wordsetHash": "bb757203cabe068690119dd04cc631ac4e848f2f06f0774f092b1ad19805a713",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Městská procházka se stopami přírody",
+      "whyIncluded": "LÉKAŘKA, FIGURÍNA a VYPÍNAČ drží civilní tón; RYTINA, PŘÍVĚSEK a ROZPLÉST rozšiřují obrazový i činnostní typ hledání.",
+      "risks": [
+        "ŘEBŘÍČEK, STRNAD a LIŠEJNÍK dávají větší přírodopisný nárok; nejde o široce naměřenou znalost. STRNAD v korpusu může být i příjmení."
+      ],
+      "polarizingWords": [
+        "řebříček"
+      ],
+      "individualNotes": {
+        "řebříček": "Ponechán jako jeden vědomě méně samozřejmý botanický cíl.",
+        "strnad": "Správné obecné pojmenování ptáka; frekvence homonymního příjmení není důkaz obecné známosti ptáka.",
+        "lišejník": "Základní školní přírodopisný název.",
+        "rozplést": "Správný infinitiv; přesně odlišit od ROZMOTAT a SPLÉTAT."
+      },
+      "reviewedWords": [
+        "figurína",
+        "hbitý",
+        "lišejník",
+        "lékařka",
+        "pěšina",
+        "přívěsek",
+        "respekt",
+        "rozplést",
+        "rytina",
+        "strnad",
+        "svědectví",
+        "vidlice",
+        "vypínač",
+        "řebříček"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "peerReview": "Independent editorial_b also accepted this exact combination with specific nature-knowledge risks; did not equate school vocabulary with a specialist list."
+    },
+    {
+      "ordinal": 19,
+      "id": "mk100-v2-019",
+      "wordsetHash": "a1db869365b1bfb19ec15b3916abeff1f48d50f6c0f6bf5a45eb78645acb5910",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Písmena, počasí a fantazie",
+      "whyIncluded": "PÍŠŤALKA, NÁSTĚNKA a DROBENKA jsou blízké kotvy; DRUID a TORNÁDO dávají živý protějšek rovnicím.",
+      "risks": [
+        "DRUID má užší fantasy a historický kulturní kontext; STEHLÍK může čerpat část korpusové četnosti z příjmení. VRAŽDA mění tón na temnější."
+      ],
+      "polarizingWords": [
+        "druid"
+      ],
+      "individualNotes": {
+        "proutěný": "Běžné materiálové adjektivum; screening podle nízké četnosti z něj nesmí udělat raritu.",
+        "druid": "Záměrný kulturní objev; na této hlavní desce jediný takto počítaný.",
+        "stehlík": "Ustálené jméno ptáka; homonymní jména nebereme jako měřenou znalost.",
+        "stopka": "Plnohodnotné samostatné podstatné jméno s více významy."
+      },
+      "reviewedWords": [
+        "drobenka",
+        "druid",
+        "ekosystém",
+        "nástěnka",
+        "proutěný",
+        "píšťalka",
+        "reakce",
+        "rovnice",
+        "stehlík",
+        "stopka",
+        "tornádo",
+        "vlásenka",
+        "vražda",
+        "štětina"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 20,
+      "id": "mk100-v2-020",
+      "wordsetHash": "326101569e31b29d15f4deab1098cfa10af9aeff519c19256767f8cced80c711",
+      "profile": "summit",
+      "verdict": "accepted",
+      "character": "Vrchol přes světlo, zvuk a dílnu",
+      "whyIncluded": "MIKROFON, MRHOLENÍ a KOMEDIE vytvářejí různorodé dlouhé cíle; HOBLICE je konkrétní oborový předmět. Obtížnost vrcholu nesmí být náhradou počtu rarit.",
+      "risks": [
+        "HOBLICE není univerzálně známá; lexikon tohoto vrcholu je jinak spíše civilní, profil proto potřebuje oporu v konstrukci."
+      ],
+      "polarizingWords": [
+        "hoblice"
+      ],
+      "individualNotes": {
+        "hoblice": "Vědomě užší řemeslné pojmenování pracovního stolu; konkrétní význam je schválený.",
+        "splétat": "Živé běžné sloveso; corpus screening je zde falešně přísný.",
+        "žebřiňák": "Zavedený český historický předmět s příběhovou oporou.",
+        "mutace": "Základní vědecký i přenesený výraz, ne nově zavedená odborná výplň."
+      },
+      "reviewedWords": [
+        "císař",
+        "hoblice",
+        "hodinka",
+        "komedie",
+        "mikrofon",
+        "mrholení",
+        "mutace",
+        "naleziště",
+        "optika",
+        "ponížení",
+        "rozmarýn",
+        "splétat",
+        "svícen",
+        "žebřiňák"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "historicalRepresentativeConstructionReviews": [
+        {
+          "contentHash": "2b542c4197503e5156fd498eae82f64ec8f74218a54e7d8154350ff4b01cbbbd",
+          "reviewedActualGridAndAnswerPaths": true,
+          "view": "Exact local12-panel solution-path mosaic, not a physical-device playtest.",
+          "assessment": "HOBLICE je slovní objev, ale modelový konec za geometrického pořadí tvoří ŽEBŘIŇÁK/PONÍŽENÍ/NALEZIŠTĚ. Ve scénáři podle předpokládané známosti je naopak HODINKA/NALEZIŠTĚ/HOBLICE. Vrchol je kandidátní dramaturgická role, nikoli potvrzené maximum obtížnosti.",
+          "crossContacts": 76,
+          "meanTurns": 4.714285714285714,
+          "prefixPressureScore": 39.6224,
+          "technicalConsistencyIndependentlyChecked": [
+            "all14spellings-from-letters",
+            "orthogonal-adjacency",
+            "unique100cell-cover"
+          ],
+          "solverEvidence": "representative-verification.json finalProof; exact solver not rerun by editorial reviewer.",
+          "endgameReview": {
+            "plausibleOrders": 3,
+            "sensitivityOrders": 6,
+            "distinctPlausibleTails": 3,
+            "plausibleIsolatedChainWordsMean": 0,
+            "allThreeSimpleChains": 0,
+            "interpretation": "Model residual evidence only; no new player telemetry, no guarantee that every possible ordering retains difficulty."
+          },
+          "id": "mk100-v1-020",
+          "edition": "mozkokalypsa-100-candidate-v1",
+          "role": "Historical internal representative audit before expanded profile geometry; not finalv2content."
+        }
+      ]
+    },
+    {
+      "ordinal": 21,
+      "id": "mk100-v2-021",
+      "wordsetHash": "54e68c9f55cf45c7252f5fbf51d6759a066e3b5700b0a91c83165efc2ab5b2bd",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Řemeslné náčiní a lehké putování",
+      "whyIncluded": "KOMINÍK, KROPÍTKO a KOŽICH dávají snadné obrazy; KLOUZAT a SOUTĚSKA obměňují činnost i krajinu po vrcholu.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "baňka": "Samostatné mnohoznačné slovo; laboratorní význam není jediný.",
+        "hřebíček": "Dva běžné významy drobného hřebu a koření jsou legitimní, ne odlišné pravopisné varianty.",
+        "tvárnice": "Běžný stavební prvek; neděláme z každého řemeslného předmětu raritu.",
+        "osnova": "Ustálené podstatné jméno s textilním i textovým významem."
+      },
+      "reviewedWords": [
+        "baňka",
+        "etiketa",
+        "hřebíček",
+        "ilustrace",
+        "klouzat",
+        "kominík",
+        "kožich",
+        "kropítko",
+        "omluva",
+        "osnova",
+        "petrolej",
+        "pružina",
+        "soutěska",
+        "tvárnice"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 22,
+      "id": "mk100-v2-022",
+      "wordsetHash": "cdcf08e9abd5b549bf7ffbb9b144df8fb47a5324342230da8d13468096199814",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Město, tvary a zimní barvy",
+      "whyIncluded": "SÍDLIŠTĚ, BLATNÍK a RAMPOUCH vytvářejí rychlé obrazy; PŘESMYČKA přidává jazykový motiv přímo blízký hráčům slovní hry.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "přesmyčka": "Pro publikum slovní hry přirozený cíl; nízkofrekvenční flag není sám důkaz polarity.",
+        "ložisko": "Ustálené mnohoznačné podstatné jméno.",
+        "červánky": "Pomnožné pojmenování je správné v uvedeném tvaru.",
+        "hladký": "Přirozené základní adjektivum."
+      },
+      "reviewedWords": [
+        "blatník",
+        "chrám",
+        "grafika",
+        "hladký",
+        "kotlina",
+        "ložisko",
+        "opevnění",
+        "postup",
+        "přesmyčka",
+        "rampouch",
+        "sídliště",
+        "uvolnění",
+        "červánky",
+        "šalvěj"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 23,
+      "id": "mk100-v2-023",
+      "wordsetHash": "38b453aea88cf6f69151594c01017b5acb6be5cb5f2d67019f73f0ecce515f33",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Pohádková kuchyně a venkov",
+      "whyIncluded": "ŽEMLOVKA, BRAMBORA a NÁBYTEK drží úlevu; STRAŠIDLO a KOLÉBKA dodávají důvěrně známé obrazy.",
+      "risks": [
+        "CANDÁT, DANĚK, JALOVEC a PELYNĚK vyžadují více přírodní zkušenosti, ale netvoří dávku úzce technických termínů."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "candát": "Známá ryba i potravina, ne raritní název druhu.",
+        "ciferník": "Běžný konkrétní předmět; vhodný dlouhý cíl bez specialistické bariéry.",
+        "pelyněk": "Tradiční běžné pojmenování byliny; produktová známost je stále odhad.",
+        "svižný": "Správné samostatné adjektivní lemma."
+      },
+      "reviewedWords": [
+        "bezvětří",
+        "brambora",
+        "candát",
+        "ciferník",
+        "daněk",
+        "jalovec",
+        "kolébka",
+        "kotviště",
+        "nábytek",
+        "pelyněk",
+        "prádlo",
+        "strašidlo",
+        "svižný",
+        "žemlovka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 24,
+      "id": "mk100-v2-024",
+      "wordsetHash": "1cf8efa0afab40b03b50af240f778ace3dc494d6576bc71d532e87a58d157bfc",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Pohyb a několik hmatatelných detailů",
+      "whyIncluded": "RAMÍNKO, NÁPRSTEK a ZÁVIT dávají předmětné kotvy; VYMÝŠLET a ŠPLHAT mění činnost, PASTINÁK nabízí kulinářský objev.",
+      "risks": [
+        "PASTINÁK není pro všechny běžná zelenina; PLAZMA má více vědeckých a běžných mediálních významů."
+      ],
+      "polarizingWords": [
+        "pastinák"
+      ],
+      "individualNotes": {
+        "pastinák": "Ponecháno jako jeden vědomě méně obvyklý kulinářský cíl.",
+        "plazma": "Samostatné běžně doložené slovo; četnost neodlišuje fyzikální, krevní a přenesené užití.",
+        "robota": "Správné samostatné podstatné jméno; neplést s anglickým nebo skloňovaným tvarem robot.",
+        "skvrnitý": "Přirozené základní adjektivum, bez variantní pasti."
+      },
+      "reviewedWords": [
+        "hustota",
+        "narození",
+        "náprstek",
+        "pastinák",
+        "plazma",
+        "prohlubeň",
+        "ramínko",
+        "robota",
+        "rozvodí",
+        "skvrnitý",
+        "vymýšlet",
+        "záchvat",
+        "závit",
+        "šplhat"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 25,
+      "id": "mk100-v2-025",
+      "wordsetHash": "da96faea1463f09aa5499a6e069bc5868697714dc2a3b1ea1d4e9de88583a5be",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Stavby, zahrada a jeden botanický detail",
+      "whyIncluded": "KATEDRÁLA, BRAŠNA a CHLEBNÍK vytvářejí civilní obrazy; CHŘESTÝŠ a VODNÍK přidávají dobrodružství, PESTÍK jeden užší detail.",
+      "risks": [
+        "PESTÍK stojí na školní botanice; STROUHA a PODNOŽKA mohou být méně samozřejmé, nejde však o další cílené rarity."
+      ],
+      "polarizingWords": [
+        "pestík"
+      ],
+      "individualNotes": {
+        "pestík": "Jeden vědomě užší botanický cíl, vyvážený civilními předměty.",
+        "chřestýš": "Široce kulturně rozpoznatelný živočich; ne technická specializace.",
+        "hologram": "Populárně známý technický výraz, nikoli nově vytvořená rarita.",
+        "podnožka": "Ustálené samostatné pojmenování opěrky pro nohy."
+      },
+      "reviewedWords": [
+        "brašna",
+        "chlebník",
+        "chřestýš",
+        "hologram",
+        "katedrála",
+        "kolečko",
+        "olovo",
+        "pestík",
+        "pletivo",
+        "podnožka",
+        "strouha",
+        "vodník",
+        "vyhlídka",
+        "štěnice"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 26,
+      "id": "mk100-v2-026",
+      "wordsetHash": "d8d0fa26ae134e5587b03d28c2a4bd6a1e5e0680f4344ff3efed9182c0cc19ee",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Rozpočty, pohyb a jemný humor",
+      "whyIncluded": "SMETANA, VAJÍČKO a SVĚTLUŠKA drží konkrétní svět; REVOLUCE, ROZPOČET a PARODIE rozšiřují významový kontrast.",
+      "risks": [
+        "ŠPRÝM je živé, ale méně každodenní expresivní slovo; nevyžaduje druhou raritu v MOTOUZU."
+      ],
+      "polarizingWords": [
+        "šprým"
+      ],
+      "individualNotes": {
+        "motouz": "Ustálené běžné pojmenování provázku, nepřebíráme automaticky raritní screening.",
+        "šprým": "Vědomé expresivní obohacení pro výraznou výzvu.",
+        "kružnice": "Standardní školní pojem, nikoli odborná výplň.",
+        "profil": "Samostatné současné i technické slovo s více významy."
+      },
+      "reviewedWords": [
+        "kružnice",
+        "motouz",
+        "parodie",
+        "pobíhat",
+        "profil",
+        "revoluce",
+        "rozpočet",
+        "smetana",
+        "světluška",
+        "vajíčko",
+        "vysočina",
+        "zasedání",
+        "šachta",
+        "šprým"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 27,
+      "id": "mk100-v2-027",
+      "wordsetHash": "824215e7822fa1665adc727157ccbd518d98991d6159948736de7a0cf446d0c0",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Zvěst o cestě, hudbě a přírodě",
+      "whyIncluded": "VLAŠTOVKA, BALVAN a PALIČKA poskytují rychlé obrazy; REFRÉN a VIOLA mění kulturní téma, HRBOLATÝ a ODEJÍT typ slova.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "hrbolatý": "Běžné přídavné jméno; nízká psaná četnost neznamená neznámý cíl.",
+        "viola": "Standardní hudební nástroj; je konkrétnější než KYTARA, ale není zvolen jako rarita.",
+        "jednička": "Samostatné ustálené podstatné jméno s řadou běžných významů.",
+        "ohnisko": "Běžný konkrétní i přenesený název; nedělat z homonymního užití více slov."
+      },
+      "reviewedWords": [
+        "balvan",
+        "hrbolatý",
+        "jednička",
+        "kilometr",
+        "křesadlo",
+        "odejít",
+        "ohnisko",
+        "palička",
+        "refrén",
+        "středník",
+        "viola",
+        "vlaštovka",
+        "zkratka",
+        "zápěstí"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 28,
+      "id": "mk100-v2-028",
+      "wordsetHash": "50e9226b104dc7c8279c9b5987abccae13c71b1ef83f6a07f0cd6d30d7119e91",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Městský výlet s malou pohádkou",
+      "whyIncluded": "RADNICE, POUZDRO a PAVOUK jsou známé kotvy; LABYRINT a ROSNIČKA vytvářejí dobrodružný tón pro oddech.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "doubrava": "Zavedené krajinné pojmenování; obecná čitelnost je redakční odhad.",
+        "nákyp": "Správný cíl NÁKYP, samostatné běžné jídlo.",
+        "sbormistr": "Průhledný název povolání, nikoli specialistická slovotvorná rarita.",
+        "šikovný": "Správný základní mužský tvar adjektiva."
+      },
+      "reviewedWords": [
+        "akademie",
+        "brousek",
+        "doubrava",
+        "labyrint",
+        "nákyp",
+        "pavouk",
+        "pouzdro",
+        "pověst",
+        "radnice",
+        "rosnička",
+        "sbormistr",
+        "tekutina",
+        "včelař",
+        "šikovný"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 29,
+      "id": "mk100-v2-029",
+      "wordsetHash": "29dda0cdd1206ca9f606085c18a69766e68126ce6867c2e4e0ea5ced3e6a7d0e",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Zahrada, cesta a příprava",
+      "whyIncluded": "ANGREŠT, HADICE a PĚSTITEL dělají zahradní kotvy; KŘIŠŤÁL a NOSTALGIE odlišují obrazové a abstraktní hledání.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pádlovat": "Běžný správný infinitiv; rarity screening korigován.",
+        "bledule": "Tradiční školní a zahradní název rostliny.",
+        "průrva": "Plnohodnotné krajinné pojmenování, nikoli chybějící základní tvar.",
+        "spínač": "Běžný mechanismus, odlišný cíl od VYPÍNAČE."
+      },
+      "reviewedWords": [
+        "angrešt",
+        "bledule",
+        "hadice",
+        "kapitola",
+        "křišťál",
+        "nostalgie",
+        "průrva",
+        "průčelí",
+        "pádlovat",
+        "pěstitel",
+        "předseda",
+        "příprava",
+        "spínač",
+        "srpek"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 30,
+      "id": "mk100-v2-030",
+      "wordsetHash": "408f89184252ce7dbfb8176927e842720ac1a2acbe3becae49aa6a774fac5903",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Kouzlo, dílna a malé detaily",
+      "whyIncluded": "HASTRMAN, DIAMANT a ZVĚDAVOST dávají hravější charakter; LAZURA je zvolená řemeslná obměna, ZKUMAVKA a CIHLA pevné předmětné kotvy.",
+      "risks": [
+        "LAZURA má užší řemeslný význam a KRAHUJEC méně všeobecnou přírodopisnou znalost; tato kombinace vyžaduje pozornost v budoucím hráčském testu."
+      ],
+      "polarizingWords": [
+        "lazura"
+      ],
+      "individualNotes": {
+        "lazura": "Vědomě užší materiálový a výtvarný cíl; na hlavní desce jediný takto počítaný.",
+        "krahujec": "Zavedené jméno dravce se školní oporou; nelze z ní odvodit znalost všech hráčů.",
+        "hastrman": "Ustálené folklorní označení vodníka; živé obohacení, ne pravopisná varianta.",
+        "zkumavka": "Základní známá laboratorní pomůcka."
+      },
+      "reviewedWords": [
+        "bublina",
+        "cihla",
+        "diamant",
+        "doplnění",
+        "hastrman",
+        "hostitel",
+        "krahujec",
+        "lazura",
+        "poutník",
+        "valník",
+        "zkumavka",
+        "známka",
+        "zvědavost",
+        "čekanka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "peerReview": "Independent editorial_b also accepted this exact combination with specific nature-knowledge risks; did not equate school vocabulary with a specialist list."
+    },
+    {
+      "ordinal": 31,
+      "id": "mk100-v2-031",
+      "wordsetHash": "94506cc9137b5576ec397644ae22b361f09040b34dc93ecd784ffc6041d3da5c",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Text, měření a jeden starý materiál",
+      "whyIncluded": "SOUVĚTÍ, CITÁT a INICIÁLA přinášejí jazyk, PROCESOR a SENZOR techniku; KOUDEL má jasně vymezenou roli vědomého řemeslného objevu.",
+      "risks": [
+        "KOUDEL může být pro část hráčů nová; KLARINET a KOZOROH jsou kulturně a přírodně konkrétnější, ale známá běžná pojmenování."
+      ],
+      "polarizingWords": [
+        "koudel"
+      ],
+      "individualNotes": {
+        "koudel": "Vědomě méně známé textilní pojmenování, přijato pro výzvu.",
+        "hřejivý": "Přirozené základní adjektivum.",
+        "souvětí": "Standardní školní jazykový termín.",
+        "vyprávět": "Správný infinitiv; nepřidáváme či neubíráme diakritiku."
+      },
+      "reviewedWords": [
+        "citát",
+        "fantom",
+        "hřejivý",
+        "iniciála",
+        "klarinet",
+        "koudel",
+        "kozoroh",
+        "měřidlo",
+        "opatření",
+        "potvrzení",
+        "procesor",
+        "senzor",
+        "souvětí",
+        "vyprávět"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 32,
+      "id": "mk100-v2-032",
+      "wordsetHash": "fce8bbcf3e8b2d36f2909ec76459ab2fb929abf31da464689cabf568a83f333f",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Kultura a cesta s čutorou",
+      "whyIncluded": "KVĚTINÁČ, PODPATEK a LEDŇÁČEK kotví běžné obrazy; PŘEDMLUVA, PROZŘENÍ a VIKING přinášejí příběhový tón.",
+      "risks": [
+        "ČUTORA má užší turistické a historické užití; hráčská znalost není doložená četností."
+      ],
+      "polarizingWords": [
+        "čutora"
+      ],
+      "individualNotes": {
+        "čutora": "Jeden vědomě méně každodenní turistický předmět, doložený ve schválené zásobě.",
+        "angličan": "Zděděný obecný název příslušníka národa má při běžném psaní počáteční velké A; herní kapitalizace řetězce to nesmí vydávat za odlišné slovo.",
+        "turbína": "Známý mechanismus z běžného školního a veřejného kontextu.",
+        "tymián": "Běžná kuchyňská bylina, nikoli vzácný botanický název."
+      },
+      "reviewedWords": [
+        "angličan",
+        "koníček",
+        "květináč",
+        "ledňáček",
+        "nádvoří",
+        "podpatek",
+        "prozření",
+        "píšťala",
+        "předmluva",
+        "tesař",
+        "turbína",
+        "tymián",
+        "viking",
+        "čutora"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 33,
+      "id": "mk100-v2-033",
+      "wordsetHash": "ed9666b1412dba7dbdf6c65959c4edcb61410c422b3ba4e5b0a60efad71288dd",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Zvuk, cestování a drobné předměty",
+      "whyIncluded": "KUKÁTKO, TRYCHTÝŘ a NÁUŠNICE jsou konkrétní; HOBOJ dodává kulturní detail a TROLEJBUS městský rytmus.",
+      "risks": [
+        "HOBOJ není univerzálně známý; POŠTOLKA je další přírodopisné pojmenování, u kterého čtenost nezaručuje znalost druhu."
+      ],
+      "polarizingWords": [
+        "hoboj"
+      ],
+      "individualNotes": {
+        "hoboj": "Jeden vědomě konkrétnější hudební cíl, ostatní slova netvoří úzce hudební sérii.",
+        "poštolka": "Zavedené městské a školní jméno dravce; bez tvrzení o naměřené známosti.",
+        "podšívka": "Běžná součást oděvu, nikoli cílené krejčovské odbornictví.",
+        "amulet": "Široce známý kulturní předmět."
+      },
+      "reviewedWords": [
+        "amulet",
+        "bakterie",
+        "důvtip",
+        "hoboj",
+        "kouření",
+        "kukátko",
+        "náušnice",
+        "podšívka",
+        "pozdrav",
+        "poštolka",
+        "příval",
+        "trolejbus",
+        "trychtýř",
+        "zálesák"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 34,
+      "id": "mk100-v2-034",
+      "wordsetHash": "9770eea6dcc651e4384321f8789a3220371470084b39be0dd5be3e42c7ca8d34",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Civilní oddech se zpěvem a krajinou",
+      "whyIncluded": "PUNČOCHA, PARTNER a SEKANÁ poskytují lehké kotvy; CIMBÁL a PŘADLENA vracejí český kulturní motiv, BYSTRÝ mění druh hledaného slova.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "chrastí": "Ustálené podstatné jméno pro drobné větve a porost; nezaměňovat se slovesným tvarem chrastí.",
+        "cimbál": "Zavedený hudební předmět; oborová přesnost není sama rarita.",
+        "sekaná": "Samostatné ustálené podstatné jméno pro pokrm, tedy není stejný problém jako izolované SNĚHOVÁ.",
+        "bystrý": "Správné základní adjektivum."
+      },
+      "reviewedWords": [
+        "bystrý",
+        "chrastí",
+        "cimbál",
+        "keramika",
+        "partner",
+        "punčocha",
+        "přadlena",
+        "přerušení",
+        "sdružení",
+        "sekaná",
+        "sklízet",
+        "sloupec",
+        "úbočí",
+        "červenka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 35,
+      "id": "mk100-v2-035",
+      "wordsetHash": "558db0bf3d904a51c662dabd5a098824b72c24937e55ab331dc3064f1314e765",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Dům, zahrada a drobná zoologie",
+      "whyIncluded": "PODKROVÍ, PANTOFEL a PRŮVODCE jsou civilní kotvy; TESAŘÍK přidává konkrétní přírodopisný objev, FRESKA kulturní obraz.",
+      "risks": [
+        "TESAŘÍK může být znám především jako příjmení nebo odvozenina od tesaře; obecný název brouka má užší známost."
+      ],
+      "polarizingWords": [
+        "tesařík"
+      ],
+      "individualNotes": {
+        "tesařík": "Vědomě konkrétnější jméno brouka; frekvence jmen neslouží jako důkaz jeho znalosti.",
+        "poprašek": "Živé běžné pojmenování malé vrstvy nebo množství; raritní screening korigován.",
+        "pařeniště": "Známý zahradní předmět.",
+        "muška": "Ustálené samostatné mnohoznačné podstatné jméno."
+      },
+      "reviewedWords": [
+        "bednění",
+        "chlapec",
+        "databáze",
+        "dunění",
+        "freska",
+        "muška",
+        "nadšení",
+        "pantofel",
+        "pařeniště",
+        "podkroví",
+        "poprašek",
+        "průvodce",
+        "součin",
+        "tesařík"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 36,
+      "id": "mk100-v2-036",
+      "wordsetHash": "c36004192432c51885fa105d844f67536e70f35944d5ae43a662f33934f2e6b6",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Pohádková výzva s měkkým slovníkem",
+      "whyIncluded": "KOŤÁTKO, VLKODLAK a INSPIRACE dodávají různý emoční tón; KRUŽÍTKO a STĚŽEŇ udržují konkrétní předměty.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pomlka": "Běžné interpunkční i hudební slovo; nízkofrekvenční rarity flag není redakčně oprávněný.",
+        "puklina": "Běžné samostatné pojmenování trhliny; žádná potřebná odborná výplň.",
+        "ledvinka": "Běžný pojmenovaný předmět i zdrobnělina; více významů je přijatelné.",
+        "broskvoň": "Standardní samostatné pojmenování stromu."
+      },
+      "reviewedWords": [
+        "bonus",
+        "broskvoň",
+        "hledání",
+        "inspirace",
+        "jitrocel",
+        "koťátko",
+        "kružítko",
+        "ledvinka",
+        "pobočka",
+        "poezie",
+        "pomlka",
+        "puklina",
+        "stěžeň",
+        "vlkodlak"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 37,
+      "id": "mk100-v2-037",
+      "wordsetHash": "a7eed92fe73f19b859f35ad251671ba6a6450225e2703db814edd28d5c47c922",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Hudba, dílna a pohyb ve městě",
+      "whyIncluded": "MUZIKANT, REPORTÁŽ a TŘÍKOLKA dávají živé konkrétní obrazy; LAHODNÝ je přirozené adjektivní lemma, ZÁVITNÍK poskytuje jeden vědomý řemeslný cíl.",
+      "risks": [
+        "ZÁVITNÍK má úzký řemeslný význam. LAHODNÝ se vrací z mk3w2-06; jde o vědomě přiznané historické opakování bez stejné mřížky."
+      ],
+      "polarizingWords": [
+        "závitník"
+      ],
+      "individualNotes": {
+        "závitník": "Vědomě úzký řemeslný předmět, jeden v hlavní sadě.",
+        "fenykl": "Běžná kulinářská a pěstitelská rostlina; nepoužívat téma jako synonymum rarity.",
+        "sazba": "Plnohodnotné mnohoznačné slovo, tiskařsky přirozené.",
+        "lahodný": "Schválené B7 adjektivum s konkrétním chutovým významem; nahradilo slabý osamocený ženský tvar SNĚHOVÁ. Rodina lahoda se na této desce nekříží s jiným cílem."
+      },
+      "reviewedWords": [
+        "drobek",
+        "fenykl",
+        "hydrant",
+        "kombinéza",
+        "lahodný",
+        "muzikant",
+        "přehled",
+        "reportáž",
+        "sazba",
+        "slavík",
+        "střapatý",
+        "tříkolka",
+        "závitník",
+        "číslice"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate.",
+      "revisionHistory": [
+        {
+          "rejectedTarget": "sněhová",
+          "acceptedTarget": "lahodný",
+          "reason": "Standalone feminine inflection had no independent nominal meaning in inherited record; natural approved lemma used without editing lexicon.",
+          "priorPlaytestOverlap": "mk3w2-06",
+          "lexiconMutated": false
+        }
+      ]
+    },
+    {
+      "ordinal": 38,
+      "id": "mk100-v2-038",
+      "wordsetHash": "e511963eb44e20e0312c5dd6feb49b7663b526478ad15c6df8465ee3afbda157",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Současný všední svět a malé příběhy",
+      "whyIncluded": "AVATAR a KLÍČENKA přinášejí současné a předmětné kotvy; KAPSÁŘ, OBLEŽENÍ a LEGRACE dělají různé dějové obrazy.",
+      "risks": [
+        "ENZYM je školní a populárně zdravotní termín; jeho znalost zůstává odhad, nikoli měření."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "avatar": "Samostatné zavedené slovo ze současné kultury.",
+        "enzym": "Základní vědecké pojmenování, ne účelová nová rarita.",
+        "laskavost": "Přirozené abstraktní podstatné jméno.",
+        "ploštice": "Běžné české pojmenování hmyzu, správný cíl ze schválené zásoby."
+      },
+      "reviewedWords": [
+        "avatar",
+        "enzym",
+        "kapsář",
+        "klíčenka",
+        "laskavost",
+        "legrace",
+        "nevýhoda",
+        "náramek",
+        "návrší",
+        "obležení",
+        "ploštice",
+        "stupačka",
+        "svolení",
+        "záhlaví"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 39,
+      "id": "mk100-v2-039",
+      "wordsetHash": "f76fe3bfbdf7f26d7bbd6ed182223a4b92df1e3a2f39ad7c2e2905c913b69977",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Hravý domov a zvídavost",
+      "whyIncluded": "PANENKA, PLÁŠTĚNKA a SPONA jsou blízké obrazy; CHAPADLO, HYBRID a RYTINA přinášejí různé směry myšlení.",
+      "risks": [],
+      "polarizingWords": [],
+      "individualNotes": {
+        "kropit": "Běžný infinitiv; nízkofrekvenční flag korigován.",
+        "zvídavý": "Správné samostatné adjektivum; není pravopisná varianta zvědavý. Významová blízkost patří do globální rodinné kontroly.",
+        "jádřinec": "Ustálené pojmenování části ovoce, srozumitelné v běžné kuchyni.",
+        "rozmotat": "Správný infinitiv, jiný cíl než ROZPLÉST/SPLÉTAT."
+      },
+      "reviewedWords": [
+        "bazalka",
+        "chapadlo",
+        "hybrid",
+        "jádřinec",
+        "konzole",
+        "kropit",
+        "panenka",
+        "pláštěnka",
+        "rozmotat",
+        "rychlost",
+        "rytina",
+        "spona",
+        "uklízení",
+        "zvídavý"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 40,
+      "id": "mk100-v2-040",
+      "wordsetHash": "7bb72f8357a8f794a90fff40413742c8b5b325cf87455cf2dbef0621ccbc77f3",
+      "profile": "summit",
+      "verdict": "accepted",
+      "character": "Vrchol s nočním světlem a vodou",
+      "whyIncluded": "NOVOLUNÍ a ŠUSTOT tvoří atmosféru; LODĚNICE, PRAMICE a VÝHYBKA přidávají předmětné a dopravní obrazy, dvě užší přírodní volby jsou vědomé.",
+      "risks": [
+        "MANGOLD a ČEJKA mohou být pro hráče nové zároveň; dvojice je výjimkou dovolenou vrcholovému profilu, nikoli náhradou konstrukční kvality."
+      ],
+      "polarizingWords": [
+        "mangold",
+        "čejka"
+      ],
+      "individualNotes": {
+        "mangold": "Vědomě méně každodenní zelenina; přijatá pro vrchol.",
+        "čejka": "Vědomě konkrétnější jméno ptáka; není odvozena známost pouze z četnosti.",
+        "šustot": "Přirozené živé zvukové podstatné jméno, ne rarita.",
+        "sáňkovat": "Běžný infinitiv se správnou diakritikou."
+      },
+      "reviewedWords": [
+        "android",
+        "armáda",
+        "loděnice",
+        "mangold",
+        "mikrofon",
+        "mutace",
+        "novoluní",
+        "označení",
+        "pramice",
+        "stereotyp",
+        "sáňkovat",
+        "výhybka",
+        "čejka",
+        "šustot"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 41,
+      "id": "mk100-v2-041",
+      "wordsetHash": "c7203c102b3130f08205a82d83207a454b356dd32eb0823e9f2e746295d57bd8",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Zima, rytmus a venkovský výlet",
+      "whyIncluded": "ROLNIČKA, ŠVIHADLO a ŠPENDLÍK dávají jasné předměty; VANDR a BUČINA přidávají přirozený český venkovský tón po vrcholu.",
+      "risks": [
+        "ODMOCNINA je známý školní termín, přesto devítipísmenný cíl; úleva se musí doložit celou konstrukcí, nikoli tématem."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "vandr": "Živé hovorové a expresivní samostatné slovo, již individuálně přijaté.",
+        "bučina": "Ustálený název bukového porostu; není změnou slova buk.",
+        "trumpeta": "Běžný název nástroje, nikoli úzká hudební specializace.",
+        "plátek": "Správné samostatné podstatné jméno s běžnými významy."
+      },
+      "reviewedWords": [
+        "bučina",
+        "listina",
+        "odmocnina",
+        "plátek",
+        "rolnička",
+        "rozvrh",
+        "stonožka",
+        "stříbro",
+        "tornádo",
+        "trumpeta",
+        "vandr",
+        "zálivka",
+        "špendlík",
+        "švihadlo"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 42,
+      "id": "mk100-v2-042",
+      "wordsetHash": "d56d5363f5a7dd60be7557b74b6dd16e025547f70ffe6f0558fb2f992045fcb8",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Vodní dobrodružství a jeden dílenský detail",
+      "whyIncluded": "PONORKA, PRŮLIV a ROZHLEDNA vytvářejí cestovní obraz; ELIXÍR a PETRKLÍČ přidávají kulturní a jarní motiv.",
+      "risks": [
+        "ZÁVLAČKA je jeden cíleně užší mechanický předmět; RAKYTNÍK je méně univerzální zahradní název, který má smysl sledovat v testu."
+      ],
+      "polarizingWords": [
+        "závlačka"
+      ],
+      "individualNotes": {
+        "závlačka": "Vědomě specialističtější předmět, hlavní profil zůstává u jednoho takového cíle.",
+        "rakytník": "Zavedené zahradní a potravinové pojmenování, ne raritní botanická kvóta.",
+        "stonek": "Běžný školní a zahradní výraz.",
+        "monolog": "Zavedené kulturní slovo, nikoli uměle obtížný přejatý termín."
+      },
+      "reviewedWords": [
+        "elixír",
+        "monolog",
+        "petrklíč",
+        "ponorka",
+        "průliv",
+        "průzkum",
+        "přijetí",
+        "přívěsek",
+        "rakytník",
+        "rozhledna",
+        "stonek",
+        "tvárnice",
+        "vedro",
+        "závlačka"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 43,
+      "id": "mk100-v2-043",
+      "wordsetHash": "80d7605d324ffee1c90ab9a6d161df2b1186cc1bd19b014be4b43ee625d6e860",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Sport, škola a městský svět",
+      "whyIncluded": "VESLOVAT, KLOPÝTAT a SVIŽNÝ mění činnost a vjem; KAPELA, SLABIKÁŘ a MATRACE drží civilní kotvy.",
+      "risks": [
+        "KOMUNISTA a VĚZENÍ mají vážnější významový tón; jsou jazykově běžné a jejich použití samo není politické stanovisko."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "komunista": "Přijaté obecné pojmenování člověka; neutralitu lexikálního cíle neplést s politickou podporou.",
+        "řeřicha": "Běžná kuchyňská a zahradní rostlina.",
+        "viadukt": "Známá dopravní stavba.",
+        "svižný": "Správné základní adjektivum, nepřepisovat na jiný tvar."
+      },
+      "reviewedWords": [
+        "hrábě",
+        "kapela",
+        "klopýtat",
+        "komunista",
+        "matrace",
+        "rozbřesk",
+        "skřivan",
+        "slabikář",
+        "svižný",
+        "tiskárna",
+        "veslovat",
+        "viadukt",
+        "vězení",
+        "řeřicha"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 44,
+      "id": "mk100-v2-044",
+      "wordsetHash": "47c718d87a64038f8dbc5a1ed203488d8ca983a24e522b576e30852acb7239cd",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Les, střecha a cestování",
+      "whyIncluded": "MEDVĚD, MOTÝLEK a TÁBORNÍK dávají živé předmětné obrazy; SKLEPENÍ a ŠINDEL obměňují stavební svět.",
+      "risks": [
+        "ŘEBŘÍČEK je konkrétnější botanický cíl; ŠINDEL má historický a venkovský stavební kontext."
+      ],
+      "polarizingWords": [
+        "řebříček"
+      ],
+      "individualNotes": {
+        "plachtit": "Běžný správný infinitiv; nízkofrekvenční rarity screening korigován.",
+        "řebříček": "Jeden vědomě konkrétnější botanický cíl, stejný produktový limit jako na18.",
+        "šindel": "Zavedený střešní prvek, méně každodenní, ale kulturně průhledný.",
+        "doslov": "Samostatný literární pojem, ne slovní spojení ani předložkový fragment."
+      },
+      "reviewedWords": [
+        "doslov",
+        "elektron",
+        "jalovec",
+        "medvěd",
+        "motýlek",
+        "plachtit",
+        "provedení",
+        "rákos",
+        "sklepení",
+        "skládat",
+        "sněžení",
+        "táborník",
+        "řebříček",
+        "šindel"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 45,
+      "id": "mk100-v2-045",
+      "wordsetHash": "59178b7d3bc624057537d1fdb2bef4a3544fe171c3385612c03f3b3e8077c14e",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Kouzla, kuchyně a dílna",
+      "whyIncluded": "BLUDIČKA, MAMINKA a BACULATÝ dodávají lehkost; HOBLICE a KONTRABAS přinášejí různorodé konkrétní objekty.",
+      "risks": [
+        "HOBLICE má užší řemeslný význam; KONTRABAS a TĚŽIŠTĚ přidávají školní znalost, ale další rarity nevynucujeme."
+      ],
+      "polarizingWords": [
+        "hoblice"
+      ],
+      "individualNotes": {
+        "hoblice": "Vědomý jeden úzce řemeslný cíl, jiný záměr než vzít všechny nástroje jako běžnou domácnost.",
+        "kynout": "Správný mnohoznačný infinitiv, pohyb rukou i zvětšování těsta.",
+        "baculatý": "Živé expresivní základní adjektivum.",
+        "tažení": "Ustálené podstatné jméno, nikoli nahodilý pádový tvar."
+      },
+      "reviewedWords": [
+        "baculatý",
+        "blatník",
+        "bludička",
+        "deník",
+        "gepard",
+        "hoblice",
+        "hologram",
+        "hudebník",
+        "kontrabas",
+        "kynout",
+        "maminka",
+        "rozmarýn",
+        "tažení",
+        "těžiště"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 46,
+      "id": "mk100-v2-046",
+      "wordsetHash": "cb63996356e240ae76c75b94f2568774d3aad536c6c66f6cbc2f00d34b78a498",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Laboratoř, oděv a pohyb",
+      "whyIncluded": "NÁLEPKA, TELEVIZE a PŘÍLIV dávají všední kotvy; KAMAŠE jsou vědomě méně každodenní oděvní položka, KÁDINKA přidává známý školní laboratorní kontext.",
+      "risks": [
+        "KAMAŠE mohou být pro část hráčů nové. KÁDINKA závisí na školní a laboratorní zkušenosti; širší znalost pouze odhadujeme, stejně jako u ZKUMAVKY."
+      ],
+      "polarizingWords": [
+        "kamaše"
+      ],
+      "individualNotes": {
+        "kamaše": "Ustálené pomnožné pojmenování oděvu, vědomě méně každodenní.",
+        "kádinka": "Zavedená školní laboratorní pomůcka; explicitní znalostní riziko, ale po společném úsudku není počítána jako úmyslně raritní cíl.",
+        "protein": "Zavedené běžné vědecké a výživové slovo, nesčítáme ho automaticky jako třetí raritu.",
+        "dobývání": "Přirozené samostatné dějové podstatné jméno se správným zápisem."
+      },
+      "reviewedWords": [
+        "dobývání",
+        "drama",
+        "dužina",
+        "kamaše",
+        "kádinka",
+        "legionář",
+        "nálepka",
+        "prohlížeč",
+        "protein",
+        "příliv",
+        "soutěska",
+        "svodidlo",
+        "televize",
+        "těsnění"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 47,
+      "id": "mk100-v2-047",
+      "wordsetHash": "9d31cff24d282dad8ddc17ce0f105c5c571a434e27a03ba09f0c21d670a5d6f4",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Výlet, zvířata a malé předměty",
+      "whyIncluded": "ZAVAZADLO, PODNOŽKA a PILNÍK jsou pevné kotvy; KUDRNATÝ a PŘÍBOJ obměňují vjem, OTAKÁREK dává konkrétnější přírodní obraz.",
+      "risks": [
+        "OTAKÁREK je méně obecné jméno motýla; znalost části hráčů může být omezená i při správném slovníkovém postavení."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "brusinka": "Běžně rozpoznatelné pojmenování plodu a rostliny; screening podle psané četnosti zde nadhodnocuje raritu.",
+        "otakárek": "Stejný odhad jako na01: školní a živé přírodopisné jméno s explicitním rizikem znalosti, bez úmyslné raritní kvóty.",
+        "kudrnatý": "Správné základní adjektivum.",
+        "vidlice": "Běžné samostatné slovo s různými předmětnými významy."
+      },
+      "reviewedWords": [
+        "brusinka",
+        "dobytek",
+        "družstvo",
+        "imunita",
+        "kudrnatý",
+        "náledí",
+        "otakárek",
+        "pilník",
+        "plech",
+        "podnožka",
+        "příboj",
+        "vidlice",
+        "vstupné",
+        "zavazadlo"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 48,
+      "id": "mk100-v2-048",
+      "wordsetHash": "c5b742f434288c7cee05368666a923571f41934c9f8355e5aa341f668297addc",
+      "profile": "relief",
+      "verdict": "accepted",
+      "character": "Pohádková úleva a běžné činnosti",
+      "whyIncluded": "LEKTVAR, HOUSENKA a LENOCH dávají hravé kotvy; CHRASTIT a ZÁŘIVÝ přidávají zvuk a vjem, RAZÍTKO a VODÍTKO konkrétní domácí svět.",
+      "risks": [
+        "SYROVÁTKA je běžný potravinový termín, ale ne každému známý; tento odhad nepřebíjí budoucí hráčský test."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "syrovátka": "Samostatné přirozené potravinové podstatné jméno; ne technická zkratka.",
+        "chrastit": "Správný infinitiv s odlišným významem a tvarem od CHRASTÍ.",
+        "pamětník": "Ustálené obecné pojmenování člověka.",
+        "zářivý": "Správné základní adjektivum."
+      },
+      "reviewedWords": [
+        "chrastit",
+        "housenka",
+        "javor",
+        "jednotka",
+        "lektvar",
+        "lenoch",
+        "pamětník",
+        "profil",
+        "razítko",
+        "rozvodí",
+        "syrovátka",
+        "vlásenka",
+        "vodítko",
+        "zářivý"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 49,
+      "id": "mk100-v2-049",
+      "wordsetHash": "ec677b51ffc463bc1711bf6a8522cbd3cdbf5371ac1d06f7361d25c5f50261a8",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Zahrada, hudba a drobné dobrodružství",
+      "whyIncluded": "MALINÍK, MODŘÍN a CHLEBNÍK dávají jasné obrazy; KEJKLÍŘ, GEJZÍR a PIANISTA přinášejí kulturní a přírodní obměnu.",
+      "risks": [
+        "KEJKLÍŘ je kulturně specifičtější, avšak zavedený příběhový výraz; nejde o cílené hromadění odborných slov."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "maliník": "Standardní samostatný název rostliny, odlišný od plodu MALINA.",
+        "čenichat": "Živé expresivní sloveso, správný infinitiv.",
+        "server": "Zavedené současné slovo; významová šíře je přijatelná.",
+        "ekosystém": "Základní populárně přírodovědné pojmenování, nikoli umělá rarita."
+      },
+      "reviewedWords": [
+        "chlebník",
+        "ekosystém",
+        "etiketa",
+        "gejzír",
+        "kejklíř",
+        "maliník",
+        "modřín",
+        "pianista",
+        "podívaná",
+        "prkno",
+        "server",
+        "slabost",
+        "čenichat",
+        "šťavnatý"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    },
+    {
+      "ordinal": 50,
+      "id": "mk100-v2-050",
+      "wordsetHash": "fa3b55b87e7a149db496d23e2842367a32f792be65e3c053370416a2c4bcb7db",
+      "profile": "main",
+      "verdict": "accepted",
+      "character": "Na dvoře, v lese a po cestě",
+      "whyIncluded": "HRNČÍŘ, CHOVATEL a ŠELMA vytvářejí přirozené obrazy; SKOTAČIT a MRHOLENÍ mění činnost, PATNÍK a ZÁPRAŽÍ cestu a domov.",
+      "risks": [
+        "PODBĚRÁK může být méně známý hráčům bez rybářské zkušenosti; ve směsi běžných cílů netvoří další technický blok."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "patník": "Běžný konkrétní předmět; corpus screenovací flag je nadhodnocený.",
+        "hrnčíř": "Zavedený název řemesla s běžnou kulturní oporou.",
+        "podběrák": "Plnohodnotné pojmenování rybářské pomůcky, ponecháno s explicitním rizikem.",
+        "skotačit": "Živý správný infinitiv; přidává hravý charakter."
+      },
+      "reviewedWords": [
+        "chovatel",
+        "hrnčíř",
+        "kousnutí",
+        "mrholení",
+        "osnova",
+        "patník",
+        "podběrák",
+        "povídka",
+        "premiér",
+        "propast",
+        "předsudek",
+        "skotačit",
+        "zápraží",
+        "šelma"
+      ],
+      "reviewScope": "Individual editorial model assessment of target set; geometry and exact-cover proof are separate."
+    }
+  ],
+  "geometryReviewScope": "Representative grids independently read and consistency checked; final full-bank geometry requires matching hashes and technicalproofs. No measured profile ordering claimed.",
+  "historicalFirst12InternalVerdict": "Accepted as representative candidates for scale after lexical assessment and concrete grid review; limited structural dispersion recorded openly. All twelve exact proofs already passed independently.",
+  "historicalSharedStructuralRisk": "Representative paths have similar meandering style:11/12 meanTurns4.714286, contacts76–79, minPathTurns3. They are distinct tilings, but profiles are not proven human-difficulty classes and completion of100 must retain global tilingdiversity evidence.",
+  "historicalRepresentativeGeometryReviewedCount": 12,
+  "finalBankReviewStatus": "awaiting-profile-geometry-v2; all50finallexicalsetsstable",
+  "candidateEdition": "mozkokalypsa-100-candidate-v2"
+}

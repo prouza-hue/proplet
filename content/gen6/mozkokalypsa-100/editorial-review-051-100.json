@@ -1,0 +1,1745 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-01T13:59:12.142084+00:00",
+  "scope": "Individual Czech editorial review ordinals51–100; approved working Lexikon v3 unchanged",
+  "status": "complete-individual-wordset-review-51-100",
+  "method": "Each concrete target set read individually; spelling, natural Czech usage, actual subject/word families and cumulative familiarity barriers judged independently of inherited tier/corpus flags. This is editorial judgment, not measured player familiarity or a new dictionary certification.",
+  "boards": [
+    {
+      "ordinal": 51,
+      "wordsetHash": "86a2d0f9bcdfecb6e219d59a88db722a7c3572214d46113d2e51d458219ca9dc",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "bublifuk",
+        "hacker",
+        "hmoždinka",
+        "hrouzek",
+        "infekce",
+        "interiér",
+        "kotlina",
+        "lišejník",
+        "mlynář",
+        "palička",
+        "strniště",
+        "zavedení",
+        "šachta",
+        "šaman"
+      ],
+      "character": "Dílna, příroda a současný svět",
+      "whyIncluded": "BUBLIFUK a PALIČKA otevírají konkrétní hledání; HACKER, ŠAMAN a INTERIÉR přenášejí pozornost do odlišných významových polí. Výzvu má tvořit zejména konstrukce, s jedním vědomým rybářským výrazem.",
+      "risks": [
+        "HROUZEK je ryba, jejíž jméno nemusí znát ani jinak jazykově zdatný hráč. LIŠEJNÍK a STRNIŠTĚ jsou běžná školní a krajinná slova, nedělají z kombinace taxonomický kvíz."
+      ],
+      "polarizingWords": [
+        "hrouzek"
+      ],
+      "individualNotes": {
+        "hrouzek": "Platný cílový název ryby; vědomě méně známé slovo v profilu výzva.",
+        "hacker": "Přijatý současný výraz; rozpoznání nemá záviset na vlastní značce či zkratce.",
+        "zavedení": "Běžné slovesné substantivum; význam širší, tvar přirozený.",
+        "hmoždinka": "Běžný předmět, její nízká korpusová četnost sama není vzácnost."
+      }
+    },
+    {
+      "ordinal": 52,
+      "wordsetHash": "e75a0eca7be336c1b11031a0726c46f87c082b9551365acbc79cd7ac181a1c59",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "hormon",
+        "kakadu",
+        "katedrála",
+        "moruše",
+        "nemotora",
+        "originál",
+        "plemeno",
+        "pozítří",
+        "přeháňka",
+        "rosnička",
+        "tkadlec",
+        "topinka",
+        "vazba",
+        "žebřiňák"
+      ],
+      "character": "Domov a pohyb mezi každodenností a přírodou",
+      "whyIncluded": "TOPINKA, PŘEHÁŇKA a NEMOTORA dávají přirozené vstupy, ŽEBŘIŇÁK a TKADLEC přidávají řemeslný odstín bez úzce odborného závěru.",
+      "risks": [
+        "MORUŠE a ŽEBŘIŇÁK mohou být méně aktivní slovní zásobou mladších hráčů; oba jsou konkrétní, srozumitelné české výrazy, nikoli vynucené rarity."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pozítří": "Přirozené jednoslovné příslovce, zachovaná diakritika.",
+        "tkadlec": "Tradiční povolání, nikoli lexikální chyba.",
+        "kakadu": "Běžně známý pták; nepočítat každý zoologický název jako odborný výraz.",
+        "žebřiňák": "Konkrétní vozík a živé kulturní slovo; hráčská znalost není předpokládána univerzálně."
+      }
+    },
+    {
+      "ordinal": 53,
+      "wordsetHash": "367e479bfd8ff8da8335404d140e8613a96dd65217bba943d22ae858571fd186",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "brázda",
+        "chřestýš",
+        "expedice",
+        "geometrie",
+        "kapusta",
+        "komorník",
+        "nástupce",
+        "sfinga",
+        "soumrak",
+        "tymián",
+        "třpytivý",
+        "řídítka",
+        "štětina",
+        "šídlo"
+      ],
+      "character": "Výprava, škola a řemeslné detaily",
+      "whyIncluded": "EXPEDICE, SFINGA a KOMORNÍK vytvářejí lehký dobrodružný odstín; KAPUSTA, ŘÍDÍTKA a SOUMRAK vracejí desku k běžné zkušenosti.",
+      "risks": [
+        "ŠÍDLO má více běžných významů; hra potřebuje rozpoznání tvaru, ne taxonomické znalosti. Nezaznamenána kumulace vědomých úzce oborových hesel."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "sfinga": "Zavedené české slovo; není vlastní jméno ani vzácná transkripce.",
+        "chřestýš": "Výrazný, obecně kulturně známý zvířecí název.",
+        "geometrie": "Školní pojem není automaticky polarizující odborná terminologie.",
+        "šídlo": "Pomůcka i živočich; víceznačnost je přínos pro přirozenou češtinu."
+      }
+    },
+    {
+      "ordinal": 54,
+      "wordsetHash": "ea0d170d5f079da5717bcba8322d0610f1a48275d123517f34b7df7a7bd2e6c5",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "bruslit",
+        "drátěnka",
+        "hotovost",
+        "ledovka",
+        "loutkář",
+        "měřidlo",
+        "panter",
+        "peklo",
+        "příval",
+        "slunečník",
+        "troubení",
+        "trychtýř",
+        "vymýšlet",
+        "zvonek"
+      ],
+      "character": "Přístupnější směs pohybu a konkrétních předmětů",
+      "whyIncluded": "BRUSLIT, DRÁTĚNKA, ZVONEK a TRYCHTÝŘ tvoří srozumitelné vstupy. LOUTKÁŘ, PANTER a PEKLO rozšiřují tón bez nutnosti slovníkové nápovědy.",
+      "risks": [
+        "MĚŘIDLO je obecný název, nikoli úzce technická součástka. Žádný vědomě polarizující cíl pro úlevu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "ledovka": "Běžný meteorologický výraz, ne záměna s náledím.",
+        "troubení": "Přirozené slovesné substantivum.",
+        "loutkář": "Známé povolání a kultura, ne konstrukčně vynucená rarita.",
+        "příval": "Samostatně přirozené podstatné jméno."
+      }
+    },
+    {
+      "ordinal": 55,
+      "wordsetHash": "f4d6c8159eee63743b09b99eb16383519a7932cc79b6df87134e70ad689dcab2",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "blatouch",
+        "džungle",
+        "kapitola",
+        "labyrint",
+        "odlitek",
+        "pointa",
+        "pádlovat",
+        "pěstitel",
+        "sekaná",
+        "suchý",
+        "zatykač",
+        "zedník",
+        "zvědavost",
+        "zálesák"
+      ],
+      "character": "Výlet, příběh a trocha policejního napětí",
+      "whyIncluded": "LABYRINT, DŽUNGLE a ZATYKAČ dávají desce osobnost; SEKANÁ, ZEDNÍK a PĚSTITEL drží směs konkrétní a živou.",
+      "risks": [
+        "BLATOUCH je běžně uváděná jarní rostlina; může být méně známý, ale vedle něj nestojí botanický seznam. ZATYKAČ může mít vyšší jazykovou salienci než konstrukční obtížnost."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pointa": "Běžný přejatý tvar se správným pravopisem.",
+        "suchý": "Platné základní přídavné jméno; netřeba k němu doplňovat podstatné jméno.",
+        "blatouch": "Přírodovědný odstín, nikoli úzká terminologie pěstitele.",
+        "odlitek": "Obecně srozumitelný předmět, není automaticky technická rarita."
+      }
+    },
+    {
+      "ordinal": 56,
+      "wordsetHash": "c1ea28e76870b9176329978a94dab85d372da554c25652b5ae96e69f0a0ee016",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "akademie",
+        "bledule",
+        "bystrý",
+        "cepín",
+        "dalamánek",
+        "fyzika",
+        "genetika",
+        "kedluben",
+        "komedie",
+        "kropítko",
+        "matice",
+        "medvídek",
+        "ohnisko",
+        "souzvuk"
+      ],
+      "character": "Školní poznávání a útulná příroda",
+      "whyIncluded": "FYZIKA, GENETIKA, AKADEMIE a MATICE dávají výzvě myšlenkový tón; MEDVÍDEK, KOMEDIE a KEDLUBEN zabraňují suchému učebnicovému dojmu.",
+      "risks": [
+        "CEPÍN může být méně známý mimo turistiku a sport; zbytek nepřidává další vědomě úzkou terminologii. FYZIKA/GENETIKA/MATICE jsou trojice školních pojmů, ne tři rarity."
+      ],
+      "polarizingWords": [
+        "cepín"
+      ],
+      "individualNotes": {
+        "dalamánek": "Přirozený pekařský název, ne odstranit jen pro nízkou psanou četnost.",
+        "bledule": "Známá jarní rostlina; jednotlivé jméno zde netvoří botanickou zkoušku.",
+        "cepín": "Konkrétní nástroj; v této výzvě přijatelné jediné úzce sportovní slovo.",
+        "souzvuk": "Běžné hudební i přenesené slovo; nepřekládat jeho tiery do tvrzení o hráčské vzácnosti."
+      }
+    },
+    {
+      "ordinal": 57,
+      "wordsetHash": "69c1d3ede636ca35fee1e1f4d94bd519a2e1e8eb625b007615c5bf49e95a186c",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "kanystr",
+        "karabina",
+        "krahujec",
+        "kutálet",
+        "letokruh",
+        "lyžovat",
+        "medailon",
+        "náhorní",
+        "povlak",
+        "svědectví",
+        "vodič",
+        "zábradlí",
+        "úsečka",
+        "účetní"
+      ],
+      "character": "Výprava a hmatatelné technické předměty",
+      "whyIncluded": "KANYSTR, KARABINA, LYŽOVAT a KUTÁLET přinášejí aktivní pohyb. LETOKRUH a KRAHUJEC prokládají technické předměty přírodou.",
+      "risks": [
+        "KRAHUJEC není univerzálně aktivní slovní zásoba; mírné konkrétní riziko přírodovědné znalosti, nikoli záměrně specialistické heslo. KARABINA, VODIČ a ÚSEČKA jsou běžné sportovní/školní výrazy."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "náhorní": "Přirozené základní přídavné jméno, známé zejména ze spojení náhorní plošina.",
+        "účetní": "Běžné substantivizované přídavné jméno i adjektivum, obě použití legitimní.",
+        "krahujec": "Název dravce; hráčské znalosti nepovažujeme za jisté.",
+        "karabina": "Známá spojovací pomůcka; zde ji nepovažuji za úzce odbornou součástku."
+      }
+    },
+    {
+      "ordinal": 58,
+      "wordsetHash": "3b7161fcc399a8b1e8fe74422c750faf04bd04b1bb555c8ffbc4930518bf4404",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "chladivý",
+        "císař",
+        "generál",
+        "hydrant",
+        "kandidát",
+        "kobylka",
+        "kráter",
+        "nektar",
+        "opěradlo",
+        "pastvina",
+        "pavlač",
+        "povidla",
+        "supernova",
+        "uvozovka"
+      ],
+      "character": "Velké měřítko vesmíru a malé měřítko domova",
+      "whyIncluded": "CÍSAŘ, GENERÁL a SUPERNOVA zvyšují výraznost; POVIDLA, OPĚRADLO a PASTVINA desku uzemňují v běžných představách.",
+      "risks": [
+        "SUPERNOVA je odborného původu, ale v obecné kultuře běžně rozpoznatelná. Současně jen KRÁTER ze stejné oblasti; nejde o kumulaci úzkých astronomických hesel."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "nektar": "Zavedené české slovo bez povinného dlouhého vokálu.",
+        "supernova": "Výrazný obecně známý vědecký název; nevyvozovat znalost astrofyziky.",
+        "pavlač": "Konkrétní architektonický prvek i živé kulturní slovo.",
+        "kobylka": "Běžné víceznačné slovo; ve slovní hře nemusí být významová oblast jediná."
+      }
+    },
+    {
+      "ordinal": 59,
+      "wordsetHash": "ef85c8c85811f775f8719db3deabeff137aa4356c27bb20807dd2e2296bacf3f",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "bazalka",
+        "brousit",
+        "bárka",
+        "dřímota",
+        "fosilie",
+        "kožich",
+        "ořešák",
+        "pozvánka",
+        "proroctví",
+        "předseda",
+        "rozplést",
+        "strnad",
+        "tříkolka",
+        "vyvolání"
+      ],
+      "character": "Příroda, drobná řemesla a příběhové sliby",
+      "whyIncluded": "BAZALKA, KOŽICH a TŘÍKOLKA nabízejí každodenní vstupy; PROROCTVÍ a FOSILIE rozšiřují představivost, ROZPLÉST jemně souzní s hrou.",
+      "risks": [
+        "STRNAD má mírné riziko menší aktivní znalosti, kulturní český název ptáka ale neoznačujeme automaticky za záměrnou raritu. DŘÍMOTA a BÁRKA jsou méně aktivní, srozumitelná kulturní slova."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "dřímota": "Přirozené spisovné slovo, lehce knižní tón je přijatelný.",
+        "bárka": "Běžně známé kulturní označení lodi; tvar samostatně legitimní.",
+        "strnad": "Jméno ptáka; jednotková přírodovědná bariéra, nesmí se skrýt za metadata.",
+        "vyvolání": "Přirozené slovesné substantivum s několika obvyklými významy."
+      }
+    },
+    {
+      "ordinal": 60,
+      "wordsetHash": "b6bdc0438e40a527dc531d877347fe93d979bd7d534a05d27c8f016214091a43",
+      "verdict": "accept",
+      "profile": "summit",
+      "words": [
+        "dodávka",
+        "hmoždíř",
+        "hráčka",
+        "kohoutek",
+        "lednička",
+        "panenka",
+        "parlament",
+        "pohoda",
+        "popěvek",
+        "povídání",
+        "proutěný",
+        "trnka",
+        "zástěrka",
+        "řezání"
+      ],
+      "character": "Domácí předměty, řeč a veřejný svět",
+      "whyIncluded": "Vrchol používá konkrétní, přirozenou češtinu místo nahromaděné obskurity. LEDNIČKA, PANENKA a POHODA zpřístupňují hledání; PARLAMENT a POVÍDÁNÍ mění významové pole.",
+      "risks": [
+        "Označení summit musí doložit konstrukční výběr; samo těchto čtrnáct slov není mimořádně vzácné. HMOŽDÍŘ a POPĚVEK mají menší aktivní četnost, ale jsou konkrétní a běžně srozumitelné."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "hmoždíř": "Kuchyňská pomůcka i historická zbraň; není chybný tvar ani povinná odborná definice.",
+        "popěvek": "Platné kulturní slovo, zde bez dalšího raritního hudebního cíle.",
+        "proutěný": "Přirozené základní přídavné jméno.",
+        "kohoutek": "Běžné víceznačné slovo, například pták i vodovodní součást."
+      }
+    },
+    {
+      "ordinal": 61,
+      "wordsetHash": "1f23bc51cdef1b119d2f2645636a413d440de6df5d3ba5922a058140f0b42b6c",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "baseball",
+        "bitcoin",
+        "kefír",
+        "kombinéza",
+        "kozoroh",
+        "letiště",
+        "ostroh",
+        "pavučina",
+        "průrva",
+        "přezůvka",
+        "rolnička",
+        "sazenice",
+        "skřítek",
+        "řezbář"
+      ],
+      "character": "Volný čas, cesty a obrazná příroda",
+      "whyIncluded": "KOMBINÉZA, PŘEZŮVKA a ROLNIČKA dávají přístupné konkrétní cíle, SKŘÍTEK a PAVUČINA lehký příběhový tón. BITCOIN a BASEBALL přidávají dnešní širokou češtinu.",
+      "risks": [
+        "BITCOIN i BASEBALL jsou přejaté výrazy, ale obecně známé názvy; nenesou požadavek finanční nebo sportovní odbornosti. OSTROH a PRŮRVA jsou méně aktivní, srozumitelné krajinné výrazy."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "bitcoin": "Běžně užívaný obecný název; nespoléhá na konkrétní značku či zkratku.",
+        "baseball": "Ustálená podoba sportu v češtině, bez nutnosti počešťovat na fonetický zápis.",
+        "kozoroh": "Zvíře i znamení, obecně kulturně známé.",
+        "řezbář": "Přirozený název povolání."
+      }
+    },
+    {
+      "ordinal": 62,
+      "wordsetHash": "6ea12a2b7965f37161e35df1035c057f945a02e60405380d473fc99c4eb25504",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "delta",
+        "drobenka",
+        "kalendář",
+        "kapalina",
+        "klekánice",
+        "kroužit",
+        "povstání",
+        "rachot",
+        "stehlík",
+        "sídliště",
+        "zkouška",
+        "záhada",
+        "čekanka",
+        "šampon"
+      ],
+      "character": "Drobné zvuky, rostliny a veřejné dění",
+      "whyIncluded": "DROBENKA, ŠAMPON a ZKOUŠKA jsou běžné záchytné cíle; KLEKÁNICE, POVSTÁNÍ a DELTA rozšiřují charakter desky.",
+      "risks": [
+        "STEHLÍK má mírné riziko menší aktivní znalosti, nejde však automaticky o záměrně specialistické heslo. ČEKANKA a KLEKÁNICE jsou kulturně známé cíle; přírodní dvojice musí být přiznaná, není důvod mechanicky ji odmítnout."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "delta": "Přirozené převzaté substantivum, známé jako písmeno i ústí řeky.",
+        "klekánice": "Platná pohádková postava, nikoli vlastní jméno.",
+        "stehlík": "Název ptáka; menší znalostní bariéra musí být čitelně přiznaná.",
+        "kapalina": "Obecný školní pojem, ne úzké chemické heslo."
+      }
+    },
+    {
+      "ordinal": 63,
+      "wordsetHash": "42b77540c5104d8c131fac7efe2d41207838d3c29259ca0a8580b9171fa75050",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "glóbus",
+        "jezírko",
+        "ledvinka",
+        "mistryně",
+        "naviják",
+        "průchod",
+        "průtrž",
+        "rakytník",
+        "století",
+        "tácek",
+        "veslovat",
+        "vyřezávat",
+        "zástrčka",
+        "ředkev"
+      ],
+      "character": "Výlet s nástroji a klidnou krajinou",
+      "whyIncluded": "JEZÍRKO, TÁCEK, ZÁSTRČKA a VESLOVAT tvoří přístupné hledání; GLÓBUS a MISTRYNĚ dávají slovnímu mixu odlišnou délku i tón.",
+      "risks": [
+        "NAVIJÁK je obecný konkrétní nástroj. PRŮCHOD a PRŮTRŽ sdílejí prefix, ale významově nejsou odvozená rodina téhož cíle; podobnost může pomoci rozjezdu. Žádný vědomě raritní výraz pro úlevu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "glóbus": "Správně dlouhé ó, platný český zápis.",
+        "rakytník": "Běžně známá zahradní a potravinová rostlina, nikoli latinský taxon.",
+        "ledvinka": "Běžný předmět i anatomické zdrobnění.",
+        "ředkev": "Platné samostatné lemma, nezaměňovat automaticky za ředkvičku."
+      }
+    },
+    {
+      "ordinal": 64,
+      "wordsetHash": "f4ad200f121f9267fc4683645c6b50ffdb6fa541d3a55594b60078377875aa92",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "impérium",
+        "koroptev",
+        "kremrole",
+        "legrace",
+        "osika",
+        "prskavka",
+        "samuraj",
+        "schránka",
+        "strašidlo",
+        "svorka",
+        "trávení",
+        "valník",
+        "valčík",
+        "zvídavý"
+      ],
+      "character": "Příběh, legrace a řemeslné detaily",
+      "whyIncluded": "SAMURAJ, IMPÉRIUM a STRAŠIDLO tvoří výrazný imaginativní tón, KREMROLE a PRSKAVKA udržují hravost a konkrétnost.",
+      "risks": [
+        "KOROPTEV a OSIKA jsou běžná česká přírodní slova; mohou být méně aktivní, ale v této směsi nevytvářejí řadu úzce odborných názvů."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "samuraj": "Ustálený český přejatý tvar; není nutné cizojazyčné nebo vlastní jméno.",
+        "valčík": "Známý tanec, nikoli úzká hudební terminologie.",
+        "koroptev": "Kulturně i běžnou krajinou známý pták.",
+        "svorka": "Obecný konkrétní předmět s více běžnými použitími."
+      }
+    },
+    {
+      "ordinal": 65,
+      "wordsetHash": "fbf46ea50e9f36bc3b1b20b8daf2ec65206669f873d1b6951119d19fac214507",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "bariéra",
+        "daněk",
+        "dolina",
+        "háčkovat",
+        "maraton",
+        "melodie",
+        "nástěnka",
+        "pelyněk",
+        "podmínka",
+        "příborník",
+        "seznam",
+        "svítilna",
+        "zkumavka",
+        "žebřík"
+      ],
+      "character": "Domov, světlo a nenápadná výprava",
+      "whyIncluded": "NÁSTĚNKA, ŽEBŘÍK a SVÍTILNA dávají hmatatelné vstupy. MARATON, MELODIE a DOLINA zabraňují tematickému sevření.",
+      "risks": [
+        "PELYNĚK může být méně aktivní slovní zásoba; zůstává běžně kulturně známým názvem a nestojí vedle dalšího úzkého botanického cíle. DOLINA má regionální odstín, ale přirozené spisovné použití."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pelyněk": "Známá rostlina a obraz hořkosti; není požadována bylinkářská znalost.",
+        "zkumavka": "Obecně známá školní pomůcka, ne specializovaný přístroj.",
+        "háčkovat": "Přirozený infinitiv, živá činnost.",
+        "seznam": "Běžné substantivum, zde nikoli webová značka."
+      }
+    },
+    {
+      "ordinal": 66,
+      "wordsetHash": "caf1f4e0960273b8ebad246ca23ffc949384c6f10d050a4c8655152147f1dc86",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "deprese",
+        "hastrman",
+        "jahodník",
+        "kalous",
+        "kbelík",
+        "kladivo",
+        "kormorán",
+        "ložisko",
+        "meduňka",
+        "případ",
+        "rozsudek",
+        "vydavatel",
+        "výzva",
+        "červenec"
+      ],
+      "character": "Příroda a vážnější lidský svět",
+      "whyIncluded": "KLADIVO, KBELÍK a HASTRMAN zpřístupňují desku; ROZSUDEK, VYDAVATEL a DEPRESE přinášejí odlišnou asociativní vrstvu.",
+      "risks": [
+        "KALOUS je vědomě méně aktivní název sovy. KORMORÁN je školně a veřejně známý pták s přiznaným mírným znalostním rizikem; dvě jména nevydáváme za dva automaticky specialistické výrazy. JAHODNÍK a MEDUŇKA jsou běžné rostliny; konkrétní přírodní shluk je přijatelný v profilu výzva."
+      ],
+      "polarizingWords": [
+        "kalous"
+      ],
+      "individualNotes": {
+        "kalous": "Méně aktivní jméno sovy; první vědomě užší výraz.",
+        "kormorán": "Školně a veřejně známý pták; mírné znalostní riziko, nikoli automatická rarita.",
+        "jahodník": "Přirozený název rostliny odvozený od známého plodu.",
+        "deprese": "Běžný výraz i zdravotní téma; nevyžaduje medicínské třídění diagnóz."
+      }
+    },
+    {
+      "ordinal": 67,
+      "wordsetHash": "9d560eee704ef34acf5d73d8c4169f5d8a8ba057bf879f355012141391a968ba",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "bruska",
+        "cedule",
+        "dunění",
+        "instituce",
+        "kulička",
+        "kyselina",
+        "pažitka",
+        "plést",
+        "podložka",
+        "pískovna",
+        "rozcestí",
+        "tesařík",
+        "volejbal",
+        "řeřicha"
+      ],
+      "character": "Řemeslo, kuchyňské bylinky a pohyb",
+      "whyIncluded": "BRUSKA, KULIČKA a PODLOŽKA jsou konkrétní vstupy, VOLEJBAL a ROZCESTÍ mění rytmus. TESAŘÍK je jediný vědomě užší přírodní cíl.",
+      "risks": [
+        "TESAŘÍK může být chápán jako zdrobnělé povolání, ale cílový tvar je současně platný známý název brouka. PAŽITKA a ŘEŘICHA jsou běžné kuchyňské rostliny, ne další taxonomické rarity."
+      ],
+      "polarizingWords": [
+        "tesařík"
+      ],
+      "individualNotes": {
+        "tesařík": "Platný název brouka; jedna vědomá přírodovědná bariéra.",
+        "řeřicha": "Správná diakritika, běžná kuchyňská rostlina.",
+        "plést": "Přirozený infinitiv s řemeslným i přeneseným významem.",
+        "kyselina": "Obecný školní pojem, nikoli odborné konkrétní chemické jméno."
+      }
+    },
+    {
+      "ordinal": 68,
+      "wordsetHash": "2a368a5249f7002b2261aad1f15845495bc22b97bd798c1e9ee97f7b7cf80853",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "blázinec",
+        "chrastí",
+        "dovětek",
+        "harmonika",
+        "kružítko",
+        "místo",
+        "ponorka",
+        "převis",
+        "přívěs",
+        "radnice",
+        "růžová",
+        "sluníčko",
+        "stonožka",
+        "žemlovka"
+      ],
+      "character": "Úleva s pohádkovým a domácím tónem",
+      "whyIncluded": "SLUNÍČKO, ŽEMLOVKA, MÍSTO a KRUŽÍTKO otvírají známé obrazové cíle; PONORKA, HARMONIKA a STONOŽKA udržují pestrost.",
+      "risks": [
+        "RŮŽOVÁ je běžné samostatné barevné označení; ženský tvar zde funguje jako substantivizované adjektivum, nikoli jako nejasná půlka spojení. CHRASTÍ a DOVĚTEK jsou méně aktivní, stále běžně srozumitelné."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "růžová": "Autonomní název barvy (například nosit růžovou); legitimní ženský adjektivní tvar v této funkci.",
+        "chrastí": "Platné hromadné substantivum, není překlep chrastit.",
+        "dovětek": "Přirozené jazykové slovo, nepotřebuje úzce odbornou definici.",
+        "blázinec": "Živý expresivní výraz; zde se nepoužívá jako nálepka člověka."
+      }
+    },
+    {
+      "ordinal": 69,
+      "wordsetHash": "db23d69a38dcacda8995f63d52b8114726b313dd2f8d0e14161861be173d5e62",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "důvtip",
+        "hoboj",
+        "hřejivý",
+        "nárazník",
+        "pečivo",
+        "plachtit",
+        "poloměr",
+        "prstýnek",
+        "přezdívka",
+        "příručka",
+        "stopař",
+        "strouha",
+        "stříhat",
+        "trumpeta"
+      ],
+      "character": "Hudba a cesta mezi konkrétními věcmi",
+      "whyIncluded": "TRUMPETA, PEČIVO a PRSTÝNEK zpřístupňují výběr; DŮVTIP, PŘEZDÍVKA a HŘEJIVÝ obměňují slovní druhy a charakter hledání.",
+      "risks": [
+        "HOBOJ může být méně známý nástroj; vědomě jedna oborová bariéra. TRUMPETA je obecně známá, takže dvě hudební hesla nejsou automaticky dvojice rarit."
+      ],
+      "polarizingWords": [
+        "hoboj"
+      ],
+      "individualNotes": {
+        "hoboj": "Ustálené české jméno dechového nástroje; individuálně označené jako užší.",
+        "strouha": "Přirozený konkrétní krajinný výraz.",
+        "plachtit": "Běžný infinitiv, živá činnost.",
+        "poloměr": "Školní pojem; nepočítat geometrické slovo automaticky mezi rarity."
+      }
+    },
+    {
+      "ordinal": 70,
+      "wordsetHash": "3ef11e95adf92512c53a2511f9236ef368af9f942fd128fb18e44114e9412988",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "lesklý",
+        "maliník",
+        "plavidlo",
+        "počítání",
+        "poštolka",
+        "píšťala",
+        "předložka",
+        "skákání",
+        "sloveso",
+        "světlý",
+        "zmije",
+        "šindel",
+        "šlapadlo",
+        "švihadlo"
+      ],
+      "character": "Škola, pohyb a přirozené zvuky",
+      "whyIncluded": "POČÍTÁNÍ, SLOVESO a PŘEDLOŽKA dávají mírný školní tón, ŠLAPADLO a ŠVIHADLO přidávají pohyb, PÍŠŤALA zvukovou vrstvu.",
+      "risks": [
+        "POŠTOLKA má mírné riziko menší aktivní znalosti, jde o školně/kulturně známý název. ZMIJE je kulturně široce známá, MALINÍK průhledný název rostliny. Dvě základní gramatická slova nevytvářejí odborný seznam."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "poštolka": "Jméno ptáka; znalost nepředstíráme jako univerzální.",
+        "šindel": "Známý stavební materiál, zde ne úzce specializovaná součástka.",
+        "světlý": "Přirozené základní adjektivum.",
+        "píšťala": "Známý nástroj i součást; samostatné lemma v pořádku."
+      }
+    },
+    {
+      "ordinal": 71,
+      "wordsetHash": "11b4aad14887840cfa40527965283f39d1c1fe66df926733c2aa4e84477c6707",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "faraon",
+        "gymnastka",
+        "kádinka",
+        "opasek",
+        "pastinák",
+        "politik",
+        "postroj",
+        "pramice",
+        "premiéra",
+        "sekáč",
+        "skotačit",
+        "smutno",
+        "stolička",
+        "zásobník"
+      ],
+      "character": "Veřejná scéna, pohyb a praktické předměty",
+      "whyIncluded": "FARAON, POLITIK a PREMIÉRA dávají scéně osobnost, SKOTAČIT a SMUTNO obměňují slovní druhy. STOLIČKA a OPASEK jsou známé konkrétní cíle.",
+      "risks": [
+        "PASTINÁK je vědomě méně aktivní zeleninový název. KÁDINKA je základní školní laboratorní pomůcka s mírným znalostním rizikem, její odborný původ není automatická rarita. Zbytek se opírá o běžné kulturní a praktické výrazy."
+      ],
+      "polarizingWords": [
+        "pastinák"
+      ],
+      "individualNotes": {
+        "pastinák": "Méně známá kořenová zelenina; první vědomě užší výraz.",
+        "kádinka": "Běžná školní laboratorní pomůcka; odborný původ sám neznamená záměrnou raritu.",
+        "sekáč": "Platné obecné víceznačné slovo; nesmí být zaměněno za vlastní název.",
+        "premiéra": "Ustálené dlouhé é, přirozené kulturní substantivum."
+      }
+    },
+    {
+      "ordinal": 72,
+      "wordsetHash": "2ef5277ab0c5ffa2797e3ab02d9dd5aa28941dc369d1896e089ec854c44de927",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "brusinka",
+        "hodinky",
+        "hukot",
+        "kontinent",
+        "nátělník",
+        "ocásek",
+        "pozemek",
+        "píšťalka",
+        "skřivan",
+        "slabikář",
+        "svěrák",
+        "tučňák",
+        "vytírat",
+        "zaměření"
+      ],
+      "character": "Školní papír, domov a krajina",
+      "whyIncluded": "HODINKY, NÁTĚLNÍK a PÍŠŤALKA dávají běžné konkrétní cíle. KONTINENT, SKŘIVAN a ZAMĚŘENÍ mění měřítko i slovní druhy.",
+      "risks": [
+        "SKŘIVAN může být méně aktivní než TUČŇÁK, ale kulturně známé české jméno; spolu netvoří úzce taxonomickou kumulaci. BRUSINKA je běžně známé ovoce, nikoli povinná rarita z korpusového flagu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "hodinky": "Ustálené pomnožné podstatné jméno, není neodůvodněný plural kvůli délce.",
+        "slabikář": "Běžný školní předmět, správná diakritika.",
+        "svěrák": "Obecně známý nástroj, nikoli úzká odborná součástka.",
+        "zaměření": "Přirozené slovesné substantivum s běžnými významy."
+      }
+    },
+    {
+      "ordinal": 73,
+      "wordsetHash": "92cce23c4c4966e1b3ffe23e13b968406812c31ee28c3ac1a616502b9e0ad003",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "apartmán",
+        "bažant",
+        "bubeník",
+        "kapradí",
+        "klopýtat",
+        "mocnina",
+        "naplnění",
+        "odpoledne",
+        "piráti",
+        "provázek",
+        "tečka",
+        "truhlář",
+        "zástupce",
+        "úvazek"
+      ],
+      "character": "Škola, práce a drobná dobrodružství",
+      "whyIncluded": "KAPRADÍ, PROVÁZEK a TESAŘSKÉ řemeslo přes TRUHLÁŘE dávají konkrétní cíle; PIRÁTI a BUBENÍK odlehčují veřejná slova jako ZÁSTUPCE a ÚVAZEK.",
+      "risks": [
+        "MOCNINA je základní školní pojem, ne automatická technická rarita. PIRÁTI jsou přirozené množné číslo; lexikon tento tvar schválil a hra obecně nevyžaduje všechna substantiva v singuláru."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "piráti": "Běžný samostatný plural, nevynucený pád či chybějící syntaktický kontext.",
+        "klopýtat": "Přirozený infinitiv, hravá konkrétní činnost.",
+        "naplnění": "Běžné slovesné substantivum.",
+        "odpoledne": "Autonomní časové označení, v pořádku jako cíl."
+      }
+    },
+    {
+      "ordinal": 74,
+      "wordsetHash": "606c0851fec87c588c2aa0041d3f94154d8ea80192301c6eab3ea9ae4024272b",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "diamant",
+        "dovolená",
+        "housátko",
+        "jehličí",
+        "kartáč",
+        "matematik",
+        "poklad",
+        "polovina",
+        "povolení",
+        "slimák",
+        "solit",
+        "sáňkovat",
+        "trubice",
+        "žasnout"
+      ],
+      "character": "Přístupná cesta z běžného dne do dobrodružství",
+      "whyIncluded": "POKLAD, DIAMANT a DOVOLENÁ vytvářejí přitažlivé cíle; SOLIT, KARTÁČ a HOUSÁTKO udržují výběr konkrétní a přístupný.",
+      "risks": [
+        "MATEMATIK je delší, ale běžné povolání. TRUBICE je obecný tvar/předmět; neoznačuji ji za raritní technický díl. Žádný vědomě polarizující výraz pro úlevu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "housátko": "Přirozené zdrobnění známého zvířete.",
+        "sáňkovat": "Běžný sportovní infinitiv se zachovanou diakritikou.",
+        "polovina": "Běžné substantivum, žádná matematická specializace.",
+        "žasnout": "Živý přirozený infinitiv."
+      }
+    },
+    {
+      "ordinal": 75,
+      "wordsetHash": "fee0b01e60e213dde362d5e781c776e5b713c93e5390e50e1bd08819eed14627",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "autor",
+        "bublifuk",
+        "ciferník",
+        "holubník",
+        "kultura",
+        "medvěd",
+        "mravenec",
+        "obracečka",
+        "propast",
+        "saxofon",
+        "starosta",
+        "zátoka",
+        "šalvěj",
+        "žárovka"
+      ],
+      "character": "Domov a jídlo s hudebním odstínem",
+      "whyIncluded": "BUBLIFUK, MEDVĚD a ŽÁROVKA jsou přirozené záchytné cíle; SAXOFON, KULTURA a STAROSTA dodávají různé světy a slovní délky.",
+      "risks": [
+        "OBRACEČKA je běžná kuchyňská pomůcka, nikoli odborný název z nízkofrekvenčního flagu. HOLUBNÍK a ŠALVĚJ jsou méně aktivní slova, ale zde nevytvářejí specialistickou kumulaci."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "ciferník": "Známá konkrétní část hodin.",
+        "obracečka": "Běžný předmět, správný český tvar.",
+        "saxofon": "Široce známý hudební nástroj.",
+        "autor": "Obecné substantivum, nikoli vlastní jméno."
+      }
+    },
+    {
+      "ordinal": 76,
+      "wordsetHash": "fc74c45e5e63813b75f5fa115ce4875cf2a502b6c72220a3f389d0c99ebfc968",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "bezvětří",
+        "jeviště",
+        "kladka",
+        "náměstí",
+        "opevnění",
+        "orgasmus",
+        "páreček",
+        "předehra",
+        "straka",
+        "svěží",
+        "umyvadlo",
+        "vlečka",
+        "výherce",
+        "škraboška"
+      ],
+      "character": "Jeviště, domácnost a výraznější lidský tón",
+      "whyIncluded": "JEVIŠTĚ, PŘEDEHRA a ŠKRABOŠKA dávají scénickou vrstvu; UMYVADLO, KLADKA a VLEČKA ji prokládají konkrétními běžnými věcmi.",
+      "risks": [
+        "ORGASMUS je přirozené schválené slovo, nikoli odborná rarita. Se slovem PŘEDEHRA vzniká nápadný dospělý dvojsmysl; je to konkrétní tón této desky, ne náhrada konstrukční náročnosti ani tvrzení o rodinné vhodnosti. ŠKRABOŠKA je běžné kulturní slovo."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "orgasmus": "Základní český přejatý název; případné riziko je tonalita a věk publika, ne lexikální neplatnost.",
+        "předehra": "Běžné hudební i obecné slovo, zde má současně jasný dvojsmysl.",
+        "páreček": "Přirozené zdrobnění; žádný vynucený tvar.",
+        "bezvětří": "Přirozené počasové substantivum."
+      }
+    },
+    {
+      "ordinal": 77,
+      "wordsetHash": "b427fd2a2f24eb3a4e46d34c4672af81c7d8e408ea8c93883e46b373298e9d32",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "bažina",
+        "heřmánek",
+        "kluziště",
+        "konipas",
+        "kovář",
+        "nemotora",
+        "partnerka",
+        "pohanka",
+        "porcelán",
+        "siréna",
+        "smoking",
+        "sněhulák",
+        "tulipán",
+        "včelín"
+      ],
+      "character": "Zahrada, počasí a příběh",
+      "whyIncluded": "HEŘMÁNEK, TULIPÁN a POHANKA dávají známé přírodní cíle, SNĚHULÁK a NEMOTORA odlehčují. PORCELÁN a SMOKING mění styl.",
+      "risks": [
+        "KONIPAS je vědomě užší název ptáka; jediná skutečně cílená přírodovědná bariéra. Trojice rostlin je běžná a nepřidává další úzce odborné názvy; tematický shluk je přiznaný."
+      ],
+      "polarizingWords": [
+        "konipas"
+      ],
+      "individualNotes": {
+        "konipas": "Konkrétní pták s méně jistou aktivní znalostí.",
+        "siréna": "Známé víceznačné slovo, například zvuková výstraha i mytická bytost.",
+        "smoking": "Ustálený přejatý název oděvu.",
+        "partnerka": "Přirozené ženské substantivum."
+      }
+    },
+    {
+      "ordinal": 78,
+      "wordsetHash": "abc0bb9f68844212901f20e24fc7ec192a577ea7ecfc0e2edd934ee943bcad2e",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "cívka",
+        "holubice",
+        "horečka",
+        "ilustrace",
+        "košíkář",
+        "křemen",
+        "loupat",
+        "pevnost",
+        "podšívka",
+        "rozmotat",
+        "samička",
+        "stávka",
+        "televize",
+        "učebnice"
+      ],
+      "character": "Domácí práce, škola a širší svět",
+      "whyIncluded": "LOUPAT, ROZMOTAT a PODŠÍVKA dávají konkrétní činnost i věc; TELEVIZE, UČEBNICE a ILUSTRACE tvoří přístupné kulturní cíle.",
+      "risks": [
+        "KOŠÍKÁŘ je starší povolání, ale sémanticky průhledné. KŘEMEN je základní školní minerál; není potřeba jeho odborná definice. Není záměrná kumulace specialistiky."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "košíkář": "Přirozený průhledný název řemesla, ne historická nejasná součástka.",
+        "samička": "Běžné zoologické označení, přirozený ženský tvar.",
+        "stávka": "Běžné substantivum; nezaměňovat za sázku.",
+        "křemen": "Známý minerál, ne úzce odborný mineralogický taxon."
+      }
+    },
+    {
+      "ordinal": 79,
+      "wordsetHash": "5820c33fd12b497019378be153d158067b7de78136157bf378d24fe8a2bae613",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "amulet",
+        "dláto",
+        "doušek",
+        "fáborek",
+        "karavan",
+        "nemocnice",
+        "opěradlo",
+        "origami",
+        "potlesk",
+        "region",
+        "rostlina",
+        "sobectví",
+        "voskovka",
+        "červánky"
+      ],
+      "character": "Ráno, cesta a kulturní drobnosti",
+      "whyIncluded": "ČERVÁNKY, FÁBOREK a VOSKOVKA vytvářejí barevný tón; AMULET a ORIGAMI kulturní motiv, NEMOCNICE a SOBECTVÍ mění oblast.",
+      "risks": [
+        "FÁBOREK má nízkou psanou četnost, ale běžné konkrétní použití v dekoracích a dětských slavnostech. ORIGAMI je zavedené kulturní slovo; nepočítat každé přejaté slovo jako raritu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "fáborek": "Platná schválená podoba; konkrétní ozdoba, nikoli překlep.",
+        "origami": "Zavedený nesklonný přejatý výraz, autonomní cíl.",
+        "doušek": "Běžné samostatné substantivum.",
+        "dláto": "Známý konkrétní nástroj."
+      }
+    },
+    {
+      "ordinal": 80,
+      "wordsetHash": "2f97399e3ee84e54b2a3179e0d47341bcd07f70d4e07c3734ccfb1f9770e63d2",
+      "verdict": "accept",
+      "profile": "summit",
+      "words": [
+        "brázda",
+        "chalupa",
+        "jemný",
+        "kandidát",
+        "krabička",
+        "lastura",
+        "nálevka",
+        "pozoun",
+        "příbytek",
+        "trenýrky",
+        "utkání",
+        "záchvat",
+        "zákazník",
+        "životopis"
+      ],
+      "character": "Vrchol s domácností, veřejným světem a jedním nástrojem",
+      "whyIncluded": "CHALUPA, KRABIČKA a TRENÝRKY dávají známé vstupy; POZOUN, ŽIVOTOPIS a ZÁKAZNÍK vytvářejí odlišné směry hledání.",
+      "risks": [
+        "POZOUN je vědomě jeden méně aktivní hudební nástroj. NÁLEVKA a LASTURA jsou obecné školní/přírodní výrazy. Profil vrchol musí obstát konstrukcí a zbytkovou evidencí; běžné cíle samy neprokazují vysokou obtížnost."
+      ],
+      "polarizingWords": [
+        "pozoun"
+      ],
+      "individualNotes": {
+        "pozoun": "Platný hudební název; méně jistá hráčská znalost přiznána.",
+        "nálevka": "Běžná pomůcka, ne úzký odborný díl.",
+        "trenýrky": "Ustálené pomnožné substantivum.",
+        "příbytek": "Přirozené samostatné substantivum, lehce knižní tón."
+      }
+    },
+    {
+      "ordinal": 81,
+      "wordsetHash": "0fa7a82ae9b3d6b7b96036ae3b3943ea887eeacc724ca0e1d707c8b5620bde59",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "herectví",
+        "klakson",
+        "kůrka",
+        "lanovka",
+        "mramor",
+        "pamětník",
+        "pantofel",
+        "postavení",
+        "pružina",
+        "pstruh",
+        "sněžení",
+        "trenérka",
+        "velikost",
+        "viking"
+      ],
+      "character": "Odpočinek mezi dopravou a příběhem",
+      "whyIncluded": "LANOVKA, KLAKSON a PANTOFEL jsou známé konkrétní cíle; VIKING a HERECTVÍ přinášejí kulturní rozptyl.",
+      "risks": [
+        "PAMĚTNÍK a POSTAVENÍ jsou delší, ale běžná česká slova. PSTRUH je známý i mimo rybářství; PRUŽINA běžný předmět, nikoli záměrná technická rarita."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "viking": "Obecné české substantivum, nikoli vlastní jméno.",
+        "kůrka": "Běžné potravinové slovo.",
+        "pamětník": "Přirozený základní název osoby.",
+        "mramor": "Obecně známý materiál."
+      }
+    },
+    {
+      "ordinal": 82,
+      "wordsetHash": "ac295cea38bd336edd9aa21bc57621601a7a0839419d2e1560c6765377d2f085",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "divize",
+        "dobromysl",
+        "fosilie",
+        "halenka",
+        "lesbička",
+        "narození",
+        "obora",
+        "pavučina",
+        "pobavení",
+        "povídka",
+        "průliv",
+        "stavění",
+        "třídit",
+        "šlehačka"
+      ],
+      "character": "Příběh, příroda a všední lidský svět",
+      "whyIncluded": "POVÍDKA, POBAVENÍ a ŠLEHAČKA dávají přirozené záchytné cíle; PRŮLIV, DIVIZE a DOBROMYSL mění měřítko i tón.",
+      "risks": [
+        "DOBROMYSL jako název rostliny je jediný vědomě méně známý botanický výraz. LESBIČKA je schválené hovorové/zdrobnělé označení, jehož tón může některým hráčům znít patronizujícím způsobem; tvar není označen za neplatný ani za nadávku. Kandidátní katalog toto konkrétní riziko přiznává."
+      ],
+      "polarizingWords": [
+        "dobromysl"
+      ],
+      "individualNotes": {
+        "dobromysl": "Platný název rostliny, méně aktivní znalostní bariéra.",
+        "lesbička": "Schválený zděděný cíl; tonalita diminutiva je skutečné redakční riziko, nikoli slovníková chyba.",
+        "stavění": "Přirozené slovesné substantivum.",
+        "divize": "Běžně přejaté víceznačné substantivum, ne vlastní jméno."
+      }
+    },
+    {
+      "ordinal": 83,
+      "wordsetHash": "2867502bc0a24079266291b851f8e5a202e222aeb73ef27e3232a70002485a0e",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "housenka",
+        "lektvar",
+        "leopard",
+        "městečko",
+        "nájezd",
+        "oblečení",
+        "pomazánka",
+        "punčocha",
+        "skvrnitý",
+        "tulák",
+        "vločka",
+        "zalévat",
+        "ústřice",
+        "šermíř"
+      ],
+      "character": "Pohádkový oddech a konkrétní domácnost",
+      "whyIncluded": "LEKTVAR, LEOPARD a TULÁK přidávají dobrodružství, POMAZÁNKA, OBLEČENÍ a PUNČOCHA běžný domácí svět.",
+      "risks": [
+        "ÚSTŘICE je méně každodenní jídlo, ale obecně známý živočich; nepovažuji ji za úzce odborný název. ŠERMÍŘ je průhledné a kulturně známé povolání/sportovec. Žádná vědomá rarita pro úlevu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "skvrnitý": "Přirozené základní adjektivum.",
+        "městečko": "Běžné zdrobnělé substantivum.",
+        "ústřice": "Obecně známý název živočicha/jídla.",
+        "nájezd": "Samostatně přirozené substantivum."
+      }
+    },
+    {
+      "ordinal": 84,
+      "wordsetHash": "27361858ff2da120e64794c1c8212f976c887ead698b6b2cadb1360d8e5e3472",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "kobylka",
+        "koroptev",
+        "kouzlo",
+        "levandule",
+        "metla",
+        "plazma",
+        "potrava",
+        "potěšení",
+        "prskavka",
+        "spolužák",
+        "stránka",
+        "veletrh",
+        "vrchol",
+        "zástrčka"
+      ],
+      "character": "Příroda, spolužáci a drobná magie",
+      "whyIncluded": "KOUZLO, PRSKAVKA a LEVANDULE dávají lehký tón; SPOLUŽÁK a VELETRH přenášejí desku do společnosti.",
+      "risks": [
+        "PLAZMA je vědecké slovo, ale má široké školní i zdravotní použití; nejde o úzký odborný pojem vedle dalších podobných rarit. KOROPTEV je méně aktivní, kulturně známý název."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "plazma": "Zavedené české substantivum s více známými významy.",
+        "kobylka": "Běžný víceznačný konkrétní cíl.",
+        "potěšení": "Přirozené slovesné substantivum.",
+        "veletrh": "Běžně srozumitelné složené substantivum."
+      }
+    },
+    {
+      "ordinal": 85,
+      "wordsetHash": "7c3bf74ab9b79016a124174f3a8ef4e7efac386f00aec4330d8c8c8cd7bec4ea",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "balvan",
+        "dolina",
+        "dovádět",
+        "emoce",
+        "kuchařka",
+        "kudrnatý",
+        "kuželky",
+        "medailon",
+        "melasa",
+        "neštěstí",
+        "pastvina",
+        "představa",
+        "samuraj",
+        "vysavač"
+      ],
+      "character": "Hravý pohyb, jídlo a lidské pocity",
+      "whyIncluded": "DOVÁDĚT, KUŽELKY a KUDRNATÝ dávají lehký charakter, SAMURAJ, PŘEDSTAVA a NEŠTĚSTÍ rozšiřují záběr.",
+      "risks": [
+        "MELASA je konkrétní méně známý potravinářský výraz; jediná vědomá oborová bariéra. DOLINA má regionální odstín, ale není vynucenou raritou."
+      ],
+      "polarizingWords": [
+        "melasa"
+      ],
+      "individualNotes": {
+        "melasa": "Platný produkt zpracování cukru, ne široce předpokládaná kuchyňská znalost.",
+        "kuželky": "Ustálený plural konkrétní hry/nářadí.",
+        "emoce": "Běžné samostatné substantivum; nepovažovat za odbornou psychologii.",
+        "medailon": "Správný český přejatý tvar, také běžné víceznačné slovo."
+      }
+    },
+    {
+      "ordinal": 86,
+      "wordsetHash": "aee0ece5acefedbf90542bfce4d3f0e081bf2473e62ed9d2622a756701d21cc1",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "divadlo",
+        "jahodník",
+        "kormorán",
+        "ledovec",
+        "meruňka",
+        "obžaloba",
+        "pavlač",
+        "povoz",
+        "stíhačka",
+        "tiskárna",
+        "trubka",
+        "včerejšek",
+        "šelest",
+        "žaludek"
+      ],
+      "character": "Výprava, kulturní svět a příroda",
+      "whyIncluded": "DIVADLO a TISKÁRNA dávají známé záchytné cíle; STÍHAČKA, LEDOVEC a OBŽALOBA mají silnější obrazový odstín.",
+      "risks": [
+        "KORMORÁN je méně aktivní, široce školně a veřejně známý pták; zároveň JAHODNÍK a MERUŇKA jsou běžné rostliny, ne taxonomický seznam. VČEREJŠEK a POVOZ mají kulturně běžný tvar."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "včerejšek": "Autonomní časové substantivum; správný tvar.",
+        "pavlač": "Přirozené konkrétní architektonické slovo.",
+        "obžaloba": "Běžný veřejný/právní termín, nikoli úzce procesní terminologie.",
+        "šelest": "Běžné zvukové substantivum."
+      }
+    },
+    {
+      "ordinal": 87,
+      "wordsetHash": "b9d6b607344340a7681adce71773fa3712dccd834d992014f45de924a9f96c3b",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "cukrárna",
+        "hejkal",
+        "jistota",
+        "ledvina",
+        "moucha",
+        "neposeda",
+        "oddělení",
+        "pařeniště",
+        "pianista",
+        "pletivo",
+        "průvan",
+        "pásek",
+        "sněženka",
+        "většina"
+      ],
+      "character": "Domov, zahrada a pohádkový návštěvník",
+      "whyIncluded": "CUKRÁRNA, NEPOSEDA a HEJKAL dávají přátelský tón; PIANISTA a LEDVINA přidávají různé oblasti.",
+      "risks": [
+        "PAŘENIŠTĚ je konkrétní běžný zahradnický výraz; může být méně aktivní, ale vedle SNĚŽENKY nepřidává úzkou taxonomii. HEJKAL je kulturně známá pohádková bytost."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "pařeniště": "Známý zahradní prostor, zde přiznané mírné znalostní riziko.",
+        "oddělení": "Přirozené slovesné substantivum i název organizační části.",
+        "pásek": "Běžný konkrétní předmět.",
+        "většina": "Běžné autonomní substantivum."
+      }
+    },
+    {
+      "ordinal": 88,
+      "wordsetHash": "683075cca23180ddb78313e361ba1cee9d061a477006aab465775b663f8b7bf9",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "asteroid",
+        "chrastit",
+        "dopoledne",
+        "formička",
+        "pihovatý",
+        "radar",
+        "silnice",
+        "slavík",
+        "strouhat",
+        "terapie",
+        "traktor",
+        "truhla",
+        "závorka",
+        "špaček"
+      ],
+      "character": "Úleva s vesmírem, zvuky a běžnými věcmi",
+      "whyIncluded": "FORMIČKA, TRAKTOR a TRUHLA dávají konkrétní cíle; ASTEROID, RADAR a SLAVÍK obměňují charakter hledání.",
+      "risks": [
+        "ASTEROID a RADAR mají vědecký původ, ale běžné kulturní použití; nevyžadují fyzikální znalost. SLAVÍK a ŠPAČEK jsou známí ptáci, nikoli raritní dvojice. Žádná vědomá specialistika pro úlevu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "chrastit": "Přirozený infinitiv, nezaměňovat s hromadným substantivem chrastí.",
+        "terapie": "Běžný obecný výraz, ne konkrétní klinická metoda.",
+        "pihovatý": "Přirozené adjektivum.",
+        "závorka": "Běžný školní/jazykový znak."
+      }
+    },
+    {
+      "ordinal": 89,
+      "wordsetHash": "a4e417681dac43c373cc608ae2f36f99cd28bdb344b76110ca7a6a95f43ef3b1",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "borovice",
+        "kalous",
+        "kaučuk",
+        "krokodýl",
+        "královna",
+        "lékárna",
+        "nahrávání",
+        "plátno",
+        "ponížení",
+        "pravítko",
+        "preclík",
+        "uzlovat",
+        "vědět",
+        "zákoutí"
+      ],
+      "character": "Les, škola a řemeslné činnosti",
+      "whyIncluded": "BOROVICE, KROKODÝL a KRÁLOVNA vytvářejí výrazné obrazy; PRECLÍK, PLÁTNO a PRAVÍTKO známé konkrétní vstupy.",
+      "risks": [
+        "KALOUS je vědomě jeden méně aktivní název sovy. KAUČUK je obecně známý materiál a KROKODÝL široce známé zvíře; nevzniká kumulace dvou úzkých odborných názvů. UZLOVAT je schválený přirozený infinitiv, nízká psaná četnost není sama redakční výhrada."
+      ],
+      "polarizingWords": [
+        "kalous"
+      ],
+      "individualNotes": {
+        "kalous": "Méně jistě známá sova; vědomé jednotkové riziko.",
+        "uzlovat": "Přirozený konkrétní infinitiv činnosti, nikoli vynucený neologismus.",
+        "ponížení": "Běžné slovesné substantivum.",
+        "vědět": "Základní přirozený infinitiv."
+      }
+    },
+    {
+      "ordinal": 90,
+      "wordsetHash": "99c3c0bbab3a78486133145d22becb5506196eb295eb1d9784397410a1e92146",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "hadry",
+        "hranolky",
+        "kariéra",
+        "klíčenka",
+        "krabice",
+        "kráter",
+        "kyselina",
+        "masíčko",
+        "pilník",
+        "propiska",
+        "příborník",
+        "sedadlo",
+        "vidlička",
+        "ředkev"
+      ],
+      "character": "Přístupné jídlo a každodenní předměty",
+      "whyIncluded": "HRANOLKY, VIDLIČKA a MASÍČKO vytvářejí hravé konkrétní cíle; KLÍČENKA, PROPISKA a SEDADLO posilují běžný den.",
+      "risks": [
+        "HADRY a MASÍČKO mají hovorový/zdrobnělý tón, který je v hravé české směsi záměrný. KYSELINA a KRÁTER jsou základní školní pojmy, nikoli další raritní odborná vrstva."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "hadry": "Živé hovorové pomnožné slovo, stylisticky přiznané.",
+        "masíčko": "Běžné zdrobnění, nikoli neplatná výplň délky.",
+        "kariéra": "Přirozené přejaté substantivum se správnou diakritikou.",
+        "příborník": "Známý konkrétní domácí předmět."
+      }
+    },
+    {
+      "ordinal": 91,
+      "wordsetHash": "2659449ed0a12dc91ba02269bcc56f1ba8c07f102137f50579d20d3bfad2c31f",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "bezinka",
+        "hostinec",
+        "hypotéka",
+        "maňásek",
+        "nahrávka",
+        "navlékat",
+        "ostroh",
+        "pestrý",
+        "podlaha",
+        "povlečení",
+        "povětří",
+        "tuřín",
+        "zadržení",
+        "žížala"
+      ],
+      "character": "Domácnost, divadlo a venkov",
+      "whyIncluded": "MAŇÁSEK, POVLEČENÍ a ŽÍŽALA tvoří konkrétní vstupy; HYPOTÉKA a ZADRŽENÍ dodávají veřejný svět.",
+      "risks": [
+        "TUŘÍN je vědomě jeden méně aktivní zeleninový název. BEZINKA je běžně kulturně a potravinově známá rostlina; nepovažuji dvojici automaticky za botanickou zkoušku. HYPOTÉKA je běžná současná čeština, ne finanční specializace."
+      ],
+      "polarizingWords": [
+        "tuřín"
+      ],
+      "individualNotes": {
+        "tuřín": "Platná kořenová zelenina; znalost nepředpokládáme jako univerzální.",
+        "bezinka": "Běžné konkrétní pojmenování bezového plodu/rostliny.",
+        "povětří": "Přirozené samostatné substantivum, lehce literární tón.",
+        "navlékat": "Běžný infinitiv konkrétní činnosti."
+      }
+    },
+    {
+      "ordinal": 92,
+      "wordsetHash": "29781e7e1ba0f913896962218b4f855e1d9573beb2a3265342e141f0b7eedd19",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "baculatý",
+        "kedluben",
+        "komise",
+        "loterie",
+        "námořník",
+        "povidla",
+        "recenze",
+        "sfinga",
+        "syrovátka",
+        "volejbal",
+        "záševek",
+        "čenichat",
+        "červen",
+        "štěrk"
+      ],
+      "character": "Kuchyně, cesty a jedno oděvní řemeslo",
+      "whyIncluded": "KEDLUBEN, POVIDLA a SFINGA dávají hmatatelné i dobrodružné cíle; RECENZE, KOMISE a LOTERIE střídají významová pole.",
+      "risks": [
+        "ZÁŠEVEK je vědomě jedno úzké krejčovské heslo, přijatelná hlavní deska s jednotlivým aha momentem. SYROVÁTKA je běžně známá potravinová/supplementová surovina; její znalost také nemusí být univerzální, ale nejde o další vynucený odborný cíl."
+      ],
+      "polarizingWords": [
+        "záševek"
+      ],
+      "individualNotes": {
+        "záševek": "Platná konkrétní krejčovská úprava; skutečné záměrně odbornější slovo.",
+        "syrovátka": "Živé současné potravinové slovo, mírné znalostní riziko přiznané.",
+        "čenichat": "Běžný hravý infinitiv.",
+        "baculatý": "Přirozené adjektivum s běžným expresivním odstínem."
+      }
+    },
+    {
+      "ordinal": 93,
+      "wordsetHash": "74df7daff84e1e80120961eeefeb84a785d574b95fa24820f0479d342a7a289c",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "bažant",
+        "bruslit",
+        "candát",
+        "holčička",
+        "květináč",
+        "objížďka",
+        "opatření",
+        "piráti",
+        "sluha",
+        "střídka",
+        "ultrazvuk",
+        "zlodějka",
+        "zážitek",
+        "žaluzie"
+      ],
+      "character": "Dobrodružství, denní předměty a trochu medicíny",
+      "whyIncluded": "PIRÁTI, ZLODĚJKA a HOLČIČKA dávají příběhový tón, KVĚTINÁČ a ŽALUZIE známé domácí cíle.",
+      "risks": [
+        "STŘÍDKA je vědomě menší potravinová bariéra. CANDÁT je kulturně a gastronomicky známá ryba, ULTRAZVUK běžný diagnostický výraz; neřadím je mechanicky k úzkým raritám. PIRÁTI opakuje73 přesně po20 deskách."
+      ],
+      "polarizingWords": [
+        "střídka"
+      ],
+      "individualNotes": {
+        "střídka": "Platná vnitřní část chleba/pečiva; aktivní znalost může být nižší.",
+        "piráti": "Přirozený plural, záměrně přiznané opakování v sérii.",
+        "holčička": "Běžné zdrobnělé ženské substantivum.",
+        "ultrazvuk": "Obecně známé veřejné a medicínské slovo, ne název úzké metody."
+      }
+    },
+    {
+      "ordinal": 94,
+      "wordsetHash": "160c50ea4c20397af4e6c039e8d529f0ffcd6eb8df091d9c361374888dff92bc",
+      "verdict": "accept",
+      "profile": "relief",
+      "words": [
+        "bučina",
+        "dobrodruh",
+        "jaguár",
+        "kancelář",
+        "kroužit",
+        "lepidlo",
+        "podpatek",
+        "poklop",
+        "prosinec",
+        "reportáž",
+        "sokol",
+        "svítání",
+        "zápěstí",
+        "zástupce"
+      ],
+      "character": "Lehká výprava, les a běžný pracovní den",
+      "whyIncluded": "DOBRODRUH, JAGUÁR a SOKOL tvoří obrazné cíle; KANCELÁŘ, LEPIDLO a ZÁPĚSTÍ známou každodennost.",
+      "risks": [
+        "BUČINA je přirozené české lesní slovo, významově průhledné vůči buku; mírné znalostní riziko nevydávám za specialistickou raritu. Délka REPORTÁŽ a ZÁSTUPCE nesmí nahrazovat konstrukční obtížnost."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "bučina": "Platné běžné krajinné substantivum, nikoli pouze vlastní jméno.",
+        "jaguár": "Obecné označení zvířete se správným dlouhým á.",
+        "prosinec": "Autonomní název měsíce.",
+        "svítání": "Přirozené slovesné substantivum."
+      }
+    },
+    {
+      "ordinal": 95,
+      "wordsetHash": "8a7a8528bd1cc83995870c6b22e12c9b7d9915582146d50b2f95566ef97a3e35",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "interiér",
+        "jednotka",
+        "kreslení",
+        "křoví",
+        "nadhled",
+        "ostruha",
+        "poklad",
+        "polovina",
+        "razítko",
+        "skladba",
+        "spánek",
+        "tetřev",
+        "trolejbus",
+        "zelenina"
+      ],
+      "character": "Domov, doprava a krajina",
+      "whyIncluded": "RAZÍTKO, TROLEJBUS a ZELENINA dávají známé konkrétní cíle; NADHLED a SPÁNEK mění tón a slovní charakter.",
+      "risks": [
+        "TETŘEV a OSTRUHA mohou být méně aktivní; jde o školní/kulturně známé výrazy, nikoli záměrné nahromadění taxonomických a technických rarit."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "tetřev": "Známý kulturní a přírodní název, mírné znalostní riziko.",
+        "ostruha": "Běžná součást jezdectví i kulturního obrazu, ne vynucená specialistika.",
+        "kreslení": "Přirozené slovesné substantivum.",
+        "nadhled": "Běžné konkrétní i přenesené substantivum."
+      }
+    },
+    {
+      "ordinal": 96,
+      "wordsetHash": "2e266977149a096b9391bbc7beeacc0b47462fadfc86a4970376dee1926d8207",
+      "verdict": "accept",
+      "profile": "challenge",
+      "words": [
+        "apartmán",
+        "faraon",
+        "fenykl",
+        "fóliovník",
+        "kapsář",
+        "mazanec",
+        "nádvoří",
+        "pianino",
+        "porod",
+        "povolení",
+        "rybička",
+        "schránka",
+        "sluníčko",
+        "švagrová"
+      ],
+      "character": "Zahrada, domov a kulturní výprava",
+      "whyIncluded": "MAZANEC, RYBIČKA a SLUNÍČKO dávají známé vstupy; FARAON a APARTMÁN obměňují charakter.",
+      "risks": [
+        "FÓLIOVNÍK je vědomě jeden konkrétní zahradnický termín. FENYKL je běžně potravinově/bylinkářsky známý, PIANINO kulturně známý nástroj; jejich souběh není skrytá trojice úzkých rarit."
+      ],
+      "polarizingWords": [
+        "fóliovník"
+      ],
+      "individualNotes": {
+        "fóliovník": "Platný konkrétní zahradnický prostor; znalost mimo pěstování není jistá.",
+        "švagrová": "Plně substantivizované běžné příbuzenské označení, ženský tvar legitimní.",
+        "porod": "Běžné samostatné substantivum, nikoli odborný porodnický termín.",
+        "pianino": "Zavedený český název nástroje."
+      }
+    },
+    {
+      "ordinal": 97,
+      "wordsetHash": "b7ba77ad666cff4a4d9cf8ef7df8c2bd4e9167150a272787d3bebec4126f277c",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "herečka",
+        "libeček",
+        "nalezení",
+        "ořešák",
+        "patník",
+        "pláštěnka",
+        "sněhulák",
+        "socha",
+        "starosta",
+        "stezka",
+        "teplota",
+        "tkanička",
+        "umyvadlo",
+        "čtvrtek"
+      ],
+      "character": "Počasí, cesta a běžná domácnost",
+      "whyIncluded": "PLÁŠTĚNKA, SNĚHULÁK a TKANIČKA tvoří známé konkrétní cíle; STAROSTA a HEREČKA rozšiřují hledání na osoby.",
+      "risks": [
+        "LIBEČEK je méně aktivní, ale běžná kuchyňská bylina. OŘEŠÁK je transparentní název stromu; dvojice nemá působit jako specializovaný herbář."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "libeček": "Živá kuchyňská bylina, přiznané mírné znalostní riziko.",
+        "nalezení": "Přirozené slovesné substantivum.",
+        "čtvrtek": "Autonomní název dne.",
+        "patník": "Známý konkrétní prvek cesty."
+      }
+    },
+    {
+      "ordinal": 98,
+      "wordsetHash": "33c8be580ff150444bf4c100844ef4c04f55a705d6704645ecdc6c477cd906ce",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "chovatel",
+        "dovolená",
+        "dužina",
+        "gejzír",
+        "kominík",
+        "kontrola",
+        "kropit",
+        "mravenec",
+        "peněženka",
+        "podkroví",
+        "skřípat",
+        "střelec",
+        "vztah",
+        "zálivka"
+      ],
+      "character": "Zahrada, příroda a domácí činnost",
+      "whyIncluded": "PENĚŽENKA, KOMINÍK a MRAVENEC zpřístupňují desku; GEJZÍR a DUŽINA přinášejí základní přírodní pojmy.",
+      "risks": [
+        "GEJZÍR a DUŽINA jsou školní a každodenní přírodní výrazy, nikoli specialistické taxony. KROPIT a SKŘÍPAT mají méně psané četnosti, ale živou přirozenou činnost."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "gejzír": "Správný český přejatý zápis s dlouhým í.",
+        "dužina": "Běžný pojem části plodu, bez potřeby botanické definice.",
+        "střelec": "Obecné víceznačné substantivum, není vlastní jméno.",
+        "zálivka": "Známé zahradnické i kuchyňské slovo."
+      }
+    },
+    {
+      "ordinal": 99,
+      "wordsetHash": "86d0796f7c763a88d9420795919561a3ff5d92fa4bff81d748fb66eb5d337fbf",
+      "verdict": "accept",
+      "profile": "main",
+      "words": [
+        "bludička",
+        "blízkost",
+        "holubice",
+        "kakadu",
+        "křemen",
+        "losos",
+        "ornice",
+        "poledne",
+        "pšenice",
+        "vykřičník",
+        "výlevka",
+        "založení",
+        "záplata",
+        "úšklebek"
+      ],
+      "character": "Papír, zvířata a pohádkový tón",
+      "whyIncluded": "BLUDIČKA, KAKADU a HOLUBICE dávají obrazovou pestrost, VYKŘIČNÍK a ZÁPLATA konkrétní drobné cíle.",
+      "risks": [
+        "VÝLEVKA je vědomě jeden méně aktivní instalatérský/domácí výraz. ORNICE a KŘEMEN jsou základní školní krajinné/minerální pojmy. Tři zvířata jsou běžně kulturně známá, není zde řada úzkých zoologických názvů."
+      ],
+      "polarizingWords": [
+        "výlevka"
+      ],
+      "individualNotes": {
+        "výlevka": "Platný konkrétní odpadní/domácí prvek; znalost není univerzální.",
+        "ornice": "Základní známá část půdy, nikoli specialistický zemědělský taxon.",
+        "kakadu": "Běžně známý pták.",
+        "úšklebek": "Přirozené expresivní substantivum."
+      }
+    },
+    {
+      "ordinal": 100,
+      "wordsetHash": "f7534aeb1c0536d44d887e4f2640ca63b3614a63a9043e180531cfcf6c954152",
+      "verdict": "accept",
+      "profile": "summit",
+      "words": [
+        "genetika",
+        "hnojivo",
+        "hřebec",
+        "krajkářka",
+        "mistryně",
+        "puklina",
+        "skříňka",
+        "slovíčko",
+        "třpytivý",
+        "varhany",
+        "vlečka",
+        "volán",
+        "vyslanec",
+        "ústava"
+      ],
+      "character": "Závěr s řemeslem, kulturou a veřejným světem",
+      "whyIncluded": "KRAJKÁŘKA, VARHANY a TŘPYTIVÝ dávají poslední desce osobnost; MISTRYNĚ, ÚSTAVA a VYSLANEC přidávají společenský rozměr.",
+      "risks": [
+        "KRAJKÁŘKA je vědomě méně aktivní tradiční řemeslo; jiná úzká rarita není nutná. VOLÁN má menší aktivní znalost, ale běžné oděvní použití. Vrchol i poslední trojice musí stát na konstrukční evidenci, nikoli na vydávání C tierů za vzácnost."
+      ],
+      "polarizingWords": [
+        "krajkářka"
+      ],
+      "individualNotes": {
+        "krajkářka": "Přirozený průhledný název tradičního řemesla, vědomé menší znalostní riziko.",
+        "volán": "Běžný oděvní prvek, bez nutnosti textilní odborné definice.",
+        "varhany": "Kulturně široce známý pomnožný nástroj.",
+        "slovíčko": "Přirozené zdrobnělé substantivum."
+      }
+    }
+  ],
+  "wordsetHashBasis": "SHA-256 of NFC existing target words sorted, JSON ensure_ascii=false, sort_keys=true, compact separators (tools.gen5.catalog.digest(sorted(words)))",
+  "unverified": "Lexical/editorial acceptance is not measured human difficulty or fun; grid/path/solver/endgame proofs are separately required and must bind these hashes."
+}
