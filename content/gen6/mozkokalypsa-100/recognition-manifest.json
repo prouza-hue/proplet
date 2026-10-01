@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "version": "mk100-recognition-20261001-v1",
+  "runtimeRecognitionVersion": 6,
+  "currentCheckoutShaAtSnapshot": "a9e5bd9dfde0524312fd610118f3bcbcedc16ee8",
+  "currentMainShaAtSnapshot": "174e0fa2a3e8befd0fe01ac8ba7771f4ece25558",
+  "referenceInputDeltas": [
+    {
+      "path": "server.py",
+      "oldSha256": "f592547b06e01510a070be344867d37f8dbe1854332210a38ad737734e86835b",
+      "newSha256": "bf6f7d04ed50505b4de6ed77279b8d5495cde24f2b225aac96aa61c6902114c5",
+      "oldCommit": "a9e5bd9dfde0524312fd610118f3bcbcedc16ee8",
+      "newCommit": "174e0fa2a3e8befd0fe01ac8ba7771f4ece25558",
+      "basis": "exact Git main blob; integration update, no lexicon regeneration"
+    }
+  ],
+  "immutableWorkingLexiconSha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+  "sourceSha256": {
+    "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+    "requirements.txt": "2a69a1c3756240a505c6028d773a2ffbf41f73657d06bc0f5452710ce55f3451",
+    "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+    "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+    "content/lexicon-v3/working/manifest.json": "a8a333e598d3f7a195dc59a03b6226c1cc719fbe77594c91b9cb00f2b638e99a",
+    "content/lexicon-v3/working/lexicon.json": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "content/lexicon-v3/working/recognition-words.txt": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+    "content/lexicon-v3/working/variant-groups.json": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a"
+  },
+  "sourceCounts": {
+    "workingV3Static": 26893,
+    "currentRuntimeStatic": 26093,
+    "workingV3Targets": 4290,
+    "orthographicVariants": 18,
+    "currentRuntimeOverlay": 10,
+    "wordfreqAccepted": 94208
+  },
+  "runtimeOverlay": [
+    "bruska",
+    "bígl",
+    "hrubka",
+    "jilm",
+    "labrador",
+    "padnutí",
+    "pnutí",
+    "setr",
+    "starost",
+    "stáj"
+  ],
+  "wordfreq": {
+    "package": "wordfreq",
+    "version": "3.1.1",
+    "language": "cs",
+    "tableEntries": 606360,
+    "frequencySourceFile": "large_cs.msgpack.gz",
+    "frequencySourceSha256": "3971d2ea15c0d0218fb31cdf4f109dfa4027d8f4ea52bd7b574a2b7678f1e60f",
+    "acceptedEntries": 94208,
+    "sha256": "bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610",
+    "thresholds": {
+      "diacritic": 2.45,
+      "plain": 2.85
+    },
+    "nonSingleTokenAlphabeticEntries": [],
+    "historicalExportReproduced": true
+  },
+  "acceptedEntries": 103836,
+  "sha256": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+  "blocklist": [
+    "negr"
+  ],
+  "minimumLength": 4,
+  "maximumLength": 24,
+  "alphabet": "a-záčďéěíňóřšťúůýž",
+  "recognitionOnly": true,
+  "productionChanged": false,
+  "limitations": [
+    "Frozen offline snapshot of current static and single-token frequency recognition; no production endpoint queried.",
+    "Working v3 targets and spelling variants are included for unpublished candidate validation; this does not add them to runtime.",
+    "Recognition presence is not lexical editorial approval and does not make a word a generation target.",
+    "Existing v3 source-depth limitations remain preserved; inherited legacy-v2 approvals are not newly re-certified.",
+    "Future runtime/library/input changes require a new snapshot and complete revalidation."
+  ],
+  "historicalV3InputDeltas": [],
+  "historicalV3OutputsVerified": {
+    "lexicon.json": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "inventory.json": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+    "capacity.json": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+    "recognition-words.txt": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+    "source-limitations.json": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+    "README.md": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32"
+  },
+  "capacity": {
+    "asOf": "2026-10-01",
+    "selectionScope": "all-working-v3-eligible-A-B-C-D-5-to-9",
+    "lexiconHash": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "workingEntries": 4290,
+    "mk100Eligible": {
+      "total": 3615,
+      "byLength": {
+        "5": 948,
+        "6": 962,
+        "7": 817,
+        "8": 595,
+        "9": 293
+      },
+      "byTier": {
+        "A": 976,
+        "B": 1035,
+        "C": 1354,
+        "D": 250
+      },
+      "byLengthAndTier": {
+        "5": {
+          "A": 316,
+          "B": 295,
+          "C": 310,
+          "D": 27
+        },
+        "6": {
+          "A": 301,
+          "B": 288,
+          "C": 330,
+          "D": 43
+        },
+        "7": {
+          "A": 211,
+          "B": 250,
+          "C": 302,
+          "D": 54
+        },
+        "8": {
+          "A": 109,
+          "B": 149,
+          "C": 268,
+          "D": 69
+        },
+        "9": {
+          "A": 39,
+          "B": 53,
+          "C": 144,
+          "D": 57
+        }
+      },
+      "byTopic": {
+        "domov, stavby a sídla": 99,
+        "doprava, cesty a cestování": 86,
+        "dílna, řemesla a materiály": 80,
+        "historická smíšená témata": 1992,
+        "hry, hračky a sport": 16,
+        "hudba, zvuky a divadlo": 61,
+        "krajina, voda a geologie": 83,
+        "kuchyně, jídlo a stolování": 108,
+        "kultura a výtvarná tvorba": 54,
+        "lidé, vztahy a povolání": 19,
+        "myšlení, společnost a abstrakce": 147,
+        "oděv, textil a doplňky": 62,
+        "pohádky, fantazie a dobrodružství": 106,
+        "počasí, obloha a světlo": 30,
+        "rostliny, zahrada a pěstování": 115,
+        "technika a mechanismy": 63,
+        "vlastnosti, pocity a chování": 64,
+        "věda, vesmír, matematika a měření": 121,
+        "zvířata a péče o ně": 209,
+        "činnosti a pohyb": 37,
+        "škola, jazyk, knihy a papír": 63
+      }
+    },
+    "mk100EligibleOutsidePlaytests": {
+      "total": 3237,
+      "byLength": {
+        "5": 918,
+        "6": 873,
+        "7": 711,
+        "8": 469,
+        "9": 266
+      },
+      "byTier": {
+        "A": 927,
+        "B": 871,
+        "C": 1190,
+        "D": 249
+      },
+      "byLengthAndTier": {
+        "5": {
+          "A": 311,
+          "B": 281,
+          "C": 299,
+          "D": 27
+        },
+        "6": {
+          "A": 284,
+          "B": 256,
+          "C": 291,
+          "D": 42
+        },
+        "7": {
+          "A": 199,
+          "B": 203,
+          "C": 255,
+          "D": 54
+        },
+        "8": {
+          "A": 98,
+          "B": 88,
+          "C": 214,
+          "D": 69
+        },
+        "9": {
+          "A": 35,
+          "B": 43,
+          "C": 131,
+          "D": 57
+        }
+      },
+      "byTopic": {
+        "domov, stavby a sídla": 90,
+        "doprava, cesty a cestování": 79,
+        "dílna, řemesla a materiály": 72,
+        "historická smíšená témata": 1826,
+        "hry, hračky a sport": 15,
+        "hudba, zvuky a divadlo": 57,
+        "krajina, voda a geologie": 67,
+        "kuchyně, jídlo a stolování": 102,
+        "kultura a výtvarná tvorba": 29,
+        "lidé, vztahy a povolání": 17,
+        "myšlení, společnost a abstrakce": 137,
+        "oděv, textil a doplňky": 58,
+        "pohádky, fantazie a dobrodružství": 88,
+        "počasí, obloha a světlo": 27,
+        "rostliny, zahrada a pěstování": 104,
+        "technika a mechanismy": 49,
+        "vlastnosti, pocity a chování": 61,
+        "věda, vesmír, matematika a měření": 98,
+        "zvířata a péče o ně": 167,
+        "činnosti a pohyb": 36,
+        "škola, jazyk, knihy a papír": 58
+      }
+    },
+    "newApproved": {
+      "total": 1143,
+      "byLength": {
+        "4": 86,
+        "5": 220,
+        "6": 289,
+        "7": 283,
+        "8": 183,
+        "9": 59,
+        "10": 23
+      },
+      "byTier": {
+        "A": 668,
+        "B": 434,
+        "C": 41
+      },
+      "byLengthAndTier": {
+        "5": {
+          "A": 126,
+          "B": 86,
+          "C": 8,
+          "D": 0
+        },
+        "6": {
+          "A": 170,
+          "B": 113,
+          "C": 6,
+          "D": 0
+        },
+        "7": {
+          "A": 168,
+          "B": 104,
+          "C": 11,
+          "D": 0
+        },
+        "8": {
+          "A": 101,
+          "B": 72,
+          "C": 10,
+          "D": 0
+        },
+        "9": {
+          "A": 36,
+          "B": 22,
+          "C": 1,
+          "D": 0
+        }
+      },
+      "byTopic": {
+        "domov, stavby a sídla": 106,
+        "doprava, cesty a cestování": 94,
+        "dílna, řemesla a materiály": 92,
+        "hry, hračky a sport": 20,
+        "hudba, zvuky a divadlo": 65,
+        "krajina, voda a geologie": 25,
+        "kuchyně, jídlo a stolování": 122,
+        "kultura a výtvarná tvorba": 17,
+        "lidé, vztahy a povolání": 21,
+        "myšlení, společnost a abstrakce": 8,
+        "oděv, textil a doplňky": 65,
+        "pohádky, fantazie a dobrodružství": 22,
+        "počasí, obloha a světlo": 33,
+        "rostliny, zahrada a pěstování": 130,
+        "technika a mechanismy": 1,
+        "vlastnosti, pocity a chování": 72,
+        "věda, vesmír, matematika a měření": 25,
+        "zvířata a péče o ně": 118,
+        "činnosti a pohyb": 38,
+        "škola, jazyk, knihy a papír": 69
+      }
+    },
+    "historyBoards": 2619,
+    "historySources": [
+      "public/puzzles.json",
+      "data/puzzles.json",
+      "data/rolling_content_v1.json",
+      "data/tajenka_weekend_v1.json",
+      "data/tajenka_weekend_v2.json",
+      "data/playtests/mozkokalypsa-v1.json",
+      "data/playtests/mozkokalypsa-v2.json",
+      "data/legacy_daily_gen1.json",
+      "data/legacy_daily_gen2.json",
+      "data/playtests/mozkokalypsa-v3.json"
+    ],
+    "personalExposure": "unknown-not-inferred",
+    "policyDelta": {
+      "old": "round3 additions or limited legacy_c_pool; tiers A/B/C",
+      "new": "all approved target-eligible v3; tiers A/B/C/D; lengths5–9",
+      "reason": "100-board manufacture explicitly expands the pilot scope; board-level rarity review still required"
+    },
+    "inventoryStatusCounts": {
+      "released-or-available": 2903,
+      "reserved-future": 721,
+      "retired-snapshot-not-personal-exposure": 731,
+      "retired-snapshot-date-unresolved": 10
+    }
+  }
+}
