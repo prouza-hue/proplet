@@ -1,0 +1,21 @@
+{
+  "status": "stage-complete",
+  "stage": "representative",
+  "boardCount": 12,
+  "bankContentHash": "793380e7fe20ad3a9792ab3a27be5dc942908a64696b245b98705fa40962bc79",
+  "completedOrdinals": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    20
+  ],
+  "open": "internal editorial review before manufacturing remaining88"
+}

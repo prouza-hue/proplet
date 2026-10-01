@@ -1,0 +1,9 @@
+{
+  "status": "complete-representative-pool-checkpoint",
+  "file": "representative-verified-pools.zip",
+  "sha256": "42e3ec04326ad6c0256b95358d4ae619b8a58b284ef383357f8f641400708004",
+  "bytes": 119415,
+  "boardPoolCount": 12,
+  "selectedBoardCount": 12,
+  "note": "Complete verified options with grids, solutions, exact solver proofs, seeds, metrics and rejection counters. Not a complete new100bank."
+}
