@@ -25,13 +25,18 @@ def update(table, filters, values):
         if all(row.get(k) == v for k, v in filters.items()): row.update(values)
     return []
 
+def auth_rpc(function, body):
+    assert function == 'proplet_auth_player_v1'
+    players = select('players', token_hash=body['p_token_hash'])
+    return {'player': players[0] if players else None, 'expired': False}
+
 body = dict(puzzle_id='starter-v1', challenge_key='starter:starter-v1', mode='starter',
             difficulty='easy', elapsed_ms=12000, moves=3, wrong_attempts=0,
             completed_at='2026-09-28T07:00:00+00:00')
 headers = {'Authorization': 'Bearer '+TOKEN}
 with ExitStack() as stack:
     for attr, value in {'ATOMIC_RESULT_V1_ENABLED': False, 'VERCEL_ENV': 'development',
-        'enforce_rate_limit': lambda *a, **kw: None, 'db_select': select,
+        'enforce_rate_limit': lambda *a, **kw: None, 'db_select': select, 'db_rpc': auth_rpc,
         'db_insert': insert, 'db_update': update, 'rankings_v2_schema_ready': lambda: False,
         'player_stats': lambda _: {'xp': sum(r['points'] for r in rows.get('results', []))}}.items():
         stack.enter_context(patch.object(server, attr, value))
