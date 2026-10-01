@@ -772,19 +772,19 @@
         "džungle",
         "hacker",
         "křupavý",
+        "laser",
         "matice",
         "předsudek",
         "přehoz",
-        "radar",
         "stupačka",
         "zápraží",
         "závlačka",
         "zážitek"
       ],
       "tierCounts": {
-        "A": 2,
+        "C": 6,
         "B": 6,
-        "C": 6
+        "A": 2
       },
       "topicCounts": {
         "sport, hry a odpočinek": 1,
@@ -800,11 +800,11 @@
         "domov, stavby a sídla": 1,
         "dílna, řemesla a materiály": 1
       },
-      "expansionWords": 9,
+      "expansionWords": 6,
       "polarizingWords": [
         "závlačka"
       ],
-      "lexicalSelectionScore": 6.4621
+      "lexicalSelectionScore": 6.7593
     },
     {
       "ordinal": 17,
@@ -4077,9 +4077,9 @@
         "dopoledne",
         "formička",
         "pihovatý",
-        "radar",
         "silnice",
         "slavík",
+        "sloka",
         "strouhat",
         "terapie",
         "traktor",
@@ -4088,26 +4088,25 @@
         "špaček"
       ],
       "tierCounts": {
-        "C": 2,
+        "B": 6,
         "A": 6,
-        "B": 6
+        "C": 2
       },
       "topicCounts": {
         "všední svět — zděděné široké zařazení": 3,
-        "hudba, zvuky a divadlo": 1,
+        "hudba, zvuky a divadlo": 2,
         "počasí, obloha a světlo": 1,
         "dílna, řemesla a materiály": 1,
         "vlastnosti, pocity a chování": 1,
-        "věda, vesmír, matematika a měření": 1,
         "zvířata a péče o ně": 2,
         "kuchyně, jídlo a stolování": 1,
         "tělo, zdraví a péče": 1,
         "pohádky, fantazie a dobrodružství": 1,
         "škola, jazyk, knihy a papír": 1
       },
-      "expansionWords": 6,
+      "expansionWords": 7,
       "polarizingWords": [],
-      "lexicalSelectionScore": 6.9971
+      "lexicalSelectionScore": 6.7143
     },
     {
       "ordinal": 89,
@@ -13078,44 +13077,6 @@
       "topic": "oděv, textil a doplňky",
       "zipfEditorialProxy": 2.6,
       "editorialTopic": "oděv, textil a doplňky",
-      "intentionalPolarizing": false,
-      "polarizingBasis": null
-    },
-    "radar": {
-      "word": "radar",
-      "tier": "B",
-      "familiarity": 3,
-      "complexity": 2,
-      "fun": 4,
-      "theme": "space/science",
-      "register": "neutral",
-      "age_floor": 8,
-      "part_of_speech": "noun",
-      "frequency_evidence": 1192,
-      "origin": "v2_authored_candidate",
-      "review": "approved",
-      "sources": [
-        {
-          "name": "Wikidata Lexemes",
-          "id": "L1353409",
-          "role": "lemma_and_part_of_speech",
-          "license": "CC0-1.0"
-        },
-        {
-          "name": "Proplet editorial review",
-          "role": "target_approval"
-        }
-      ],
-      "source_cohort": "legacy-v2",
-      "lexical_review_basis": "Inherited v2; all original fields preserved; not re-certified by the 2026-09-26 expansion review",
-      "target_eligible": true,
-      "target_exclusion_reason": null,
-      "variant_unit": "radar",
-      "working_v3_runtime_approved": false,
-      "capacity_topic": "věda, vesmír, matematika a měření",
-      "topic": "věda, vesmír, matematika a měření",
-      "zipfEditorialProxy": 3.76,
-      "editorialTopic": "věda, vesmír, matematika a měření",
       "intentionalPolarizing": false,
       "polarizingBasis": null
     },
@@ -42649,10 +42610,95 @@
       "editorialTopic": "všední svět — zděděné široké zařazení",
       "intentionalPolarizing": false,
       "polarizingBasis": null
+    },
+    "laser": {
+      "word": "laser",
+      "tier": "B",
+      "familiarity": 3,
+      "complexity": 2,
+      "fun": 4,
+      "theme": "space/science",
+      "register": "neutral",
+      "age_floor": 8,
+      "part_of_speech": "editorial_lemma",
+      "frequency_evidence": 907,
+      "origin": "v2_authored_candidate",
+      "review": "approved",
+      "sources": [
+        {
+          "name": "Proplet editorial review",
+          "role": "target_approval"
+        }
+      ],
+      "source_cohort": "legacy-v2",
+      "lexical_review_basis": "Inherited v2; all original fields preserved; not re-certified by the 2026-09-26 expansion review",
+      "target_eligible": true,
+      "target_exclusion_reason": null,
+      "variant_unit": "laser",
+      "working_v3_runtime_approved": false,
+      "capacity_topic": "věda, vesmír, matematika a měření",
+      "topic": "věda, vesmír, matematika a měření",
+      "zipfEditorialProxy": 3.72,
+      "editorialTopic": "věda, vesmír, matematika a měření",
+      "intentionalPolarizing": false,
+      "polarizingBasis": null
+    },
+    "sloka": {
+      "candidate_id": "L3-W2-0532",
+      "original_word": "sloka",
+      "wave": 2,
+      "original_theme": "Hudba a zvuky",
+      "tier": "B",
+      "meaning_cs": "Ucelená skupina veršů v básni nebo písni.",
+      "grammar": "Podstatné jméno, rod ženský; počitatelné jméno, základní tvar v 1. pádě jednotného čísla.",
+      "register": "spisovné; neutrální v uvedeném významu",
+      "family": "sloka",
+      "variant_group": null,
+      "number_class": "ordinary",
+      "grammatical_gender": "feminine",
+      "editorial_status": "accepted",
+      "candidate_generation_allowed": true,
+      "user_approval": {
+        "status": "approved-inventory",
+        "decision_url": "https://github.com/prouza-hue/proplet/pull/148#issuecomment-5849652613"
+      },
+      "runtime_approved": false,
+      "evidence_depth": "headword-with-meaning",
+      "word": "sloka",
+      "theme": "hudebni_pojmy",
+      "part_of_speech": "noun",
+      "source_cohort": "approved-expansion-1143",
+      "review_ref": {
+        "file": "editorial-reviews.json",
+        "candidate_id": "L3-W2-0532"
+      },
+      "lexical_review_basis": "Individual AI editorial review with scoped source evidence",
+      "target_eligible": true,
+      "target_exclusion_reason": null,
+      "variant_unit": "sloka",
+      "working_v3_runtime_approved": false,
+      "capacity_topic": "hudba, zvuky a divadlo",
+      "topic": "hudba, zvuky a divadlo",
+      "zipfEditorialProxy": 2.6,
+      "editorialTopic": "hudba, zvuky a divadlo",
+      "intentionalPolarizing": false,
+      "polarizingBasis": null
     }
   },
   "edition": "mozkokalypsa-100-candidate-v2",
   "constructionRevision": {
     "reason": "V1representativegrid topology had narrow structuralspread; retain lexicalselection and immutablev1checkpoint, manufacture v2 with multiple actualgeometryprofiles. Newcontent newIDs."
-  }
+  },
+  "technicalAmendments": [
+    {
+      "date": "2026-10-01",
+      "file": "lexical-plan-amendments-v2.json",
+      "ordinals": [
+        16,
+        88
+      ],
+      "lexiconUnchanged": true,
+      "recognitionUnchanged": true
+    }
+  ]
 }

@@ -220,6 +220,22 @@ def transform_path(path, variant):
     return result
 
 
+def canonical_tiling(board):
+    """Ordered answer paths modulo square symmetries and individual reversal.
+
+    Letters, answer order and reading direction cannot disguise the same path
+    construction. This does not collapse different traversals of equal cells.
+    """
+    variants=[]
+    for variant in range(8):
+        paths=[]
+        for answer in board['answers']:
+            path=tuple(transform_path(answer['path'],variant))
+            paths.append(min(path,path[::-1]))
+        variants.append(tuple(sorted(paths)))
+    return min(variants)
+
+
 def manufacture_one(plan_row):
     ordinal=plan_row['ordinal'];p=plan_row['profile'];rng=random.Random(digest([SEED,'placement',ordinal]));options=[];reject=Counter()
     indexes=[i for i,row in enumerate(_POOL) if row['constructionProfile']==p];rng.shuffle(indexes)
@@ -298,6 +314,9 @@ def load_geometry():
 
 def produce(stage,workers):
     c=catalog();payload=read_json(OUT/'lexical-plan.json');pool,production=load_geometry();words=c.full_dictionary();solver=Solver(words)
+    palindromes=[(row['ordinal'],w) for row in payload['boards'] for w in row['words'] if w==w[::-1]]
+    if palindromes:
+        raise ValueError('Exact unique target orientation is impossible for palindrome targets: '+repr(palindromes))
     frozen=source_hashes(c);p={name:geometry_profile(c,name) for name in PROFILE_TIERS}
     ordinals=REPRESENTATIVE_ORDINALS if stage=='representative' else list(range(1,101))
     todo=[]
@@ -323,16 +342,18 @@ def source_hashes(c):
              'word_recognition_v3330.py','content/gen6/mozkokalypsa-100/recognition-words.txt','content/gen6/mozkokalypsa-100/lexical-plan.json']
     sources.extend(p.relative_to(ROOT).as_posix() for p in (ROOT/'content/lexicon-v3/working').glob('*') if p.is_file())
     sources.extend(p.relative_to(ROOT).as_posix() for p in (ROOT/'data/playtests').glob('mozkokalypsa-v*.json'))
+    sources.extend(['tools/gen6/mk100_amend_plan.py','content/gen6/mozkokalypsa-100/lexical-plan-amendments-v2.json'])
     return {p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in sorted(set(sources)) if (ROOT/p).exists()}
 
 
 def select(stage,payload,c,solver,frozen,production):
     ordinals=sorted(REPRESENTATIVE_ORDINALS if stage=='representative' else range(1,101));boards=[];records=[]
     representatives={}
+    canonical_positions={};novelty_choices=0
     if stage=='full':
         representatives={b['id']:b for b in read_json(OUT/'representative-bank-v2.json')['boards']}
     for ordinal in ordinals:
-        pool=read_json(LAB/f'board-{ordinal:03d}-pool.json');chosen=None
+        pool=read_json(LAB/f'board-{ordinal:03d}-pool.json');eligible=[]
         for candidate in pool['options']:
             b=candidate['board']
             if b['meta']['targetedEndgame'] and not endgame_meets_floor(candidate['endgame']):continue
@@ -341,12 +362,22 @@ def select(stage,payload,c,solver,frozen,production):
             future_reserved=[old for key,old in representatives.items() if key!=b['id'] and old['meta']['level']>ordinal]
             if any(len(shape_signature(b)&shape_signature(old))>=7 for old in boards+future_reserved):continue
             if board_hash(b) in c.historical_board_hashes:continue
-            chosen=candidate;break
-        if chosen is None:raise ValueError('No globally distinct choice for '+str(ordinal))
+            canonical=canonical_tiling(b)
+            if any(abs(ordinal-old)<8 for old in canonical_positions.get(canonical,[])):continue
+            if any(abs(ordinal-old['meta']['level'])<8 and canonical==canonical_tiling(old) for old in future_reserved):continue
+            candidate['canonicalTilingHash']=digest(canonical)
+            eligible.append(candidate)
+        if not eligible:raise ValueError('No globally distinct choice with canonical gap8 for '+str(ordinal))
+        best_score=max(o['selectionScore'] for o in eligible)
+        tie_window=.05*max(1,abs(best_score))
+        equivalent=[o for o in eligible if o['selectionScore']>=best_score-tie_window]
+        chosen=min(equivalent,key=lambda o:(len(canonical_positions.get(canonical_tiling(o['board']),[])),-o['selectionScore'],o['provenance']['attempt']))
+        if chosen['selectionScore']<best_score:novelty_choices+=1
         b=chosen['board'];b['meta'].update(lexiconHash=c.lexicon_hash,contentGeneration=c.free_generation,validation=chosen['proof'])
         final_proof=solver.verify(b,seconds=15,node_limit=2000000)
         if final_proof['status']!='unique' or not final_proof['targetPathsUnique']:raise ValueError('Final exact proof failed'+b['id'])
         chosen['finalProof']=final_proof
+        canonical_positions.setdefault(canonical_tiling(b),[]).append(ordinal)
         boards.append(b);records.append({'id':b['id'],'ordinal':ordinal,'verifiedPool':pool['verifiedCandidates'],'poolAttempts':pool['attempts'],'poolRejections':pool['rejections'],
                                           **{k:v for k,v in chosen.items() if k!='board'}})
     bank={'kind':'gen6-unpublished-preview','schemaVersion':1,'edition':EDITION,'status':'candidate-technically-verified-awaiting-editorial' if stage=='full' else 'representative-internally-verified',
@@ -359,7 +390,11 @@ def select(stage,payload,c,solver,frozen,production):
     verification_filename='representative-v2-verification.json' if stage=='representative' else 'full-verification.json'
     write(OUT/verification_filename,{'status':'exact-proofs-complete','createdAt':datetime.now(timezone.utc).isoformat(),'stage':stage,'boards':records,'bankContentHash':bank['contentHash'],
              'dictionary':bank['validationDictionary'],'frozenInputs':frozen,'geometryProduction':production,
-             'selection':{'verifiedPoolTotal':sum(r['verifiedPool'] for r in records),'targetVerifiedPoolPerBoard':{'ordinary':16,'targetedEndgame':48},'targetedProxyFloor':{'reference':'mk2-10','endgameSelectionScoreMinimum':23.4209,'plausiblePressureMinimum':20,'plausibleAllThreeSimpleChainsMaximum':0},'notFirst100Passes':True,'minimumDistinctPathTilingsAgainstChosen':8},
+             'selection':{'verifiedPoolTotal':sum(r['verifiedPool'] for r in records),'targetVerifiedPoolPerBoard':{'ordinary':16,'targetedEndgame':48},'targetedProxyFloor':{'reference':'mk2-10','endgameSelectionScoreMinimum':23.4209,'plausiblePressureMinimum':20,'plausibleAllThreeSimpleChainsMaximum':0},'notFirst100Passes':True,'minimumDistinctPathTilingsAgainstChosen':8,
+                          'canonicalTilingMinimumGap':8,'canonicalNormalization':'orderedpaths modulo8square symmetries and individual reversal; words andanswerorder ignored',
+                          'novelCanonicalPreferenceScoreWindowFraction':.05,'noveltyTieChoices':novelty_choices,
+                          'canonicalTilingsUsed':len(canonical_positions),'canonicalRepeatMaximum':max(map(len,canonical_positions.values())),
+                          'canonicalRepeatMinimumGap':min((y-x for p in canonical_positions.values() for x,y in zip(p,p[1:])),default=None)},
              'interpretation':'Recognition and exact-cover uniqueness are technically checked. Geometry, pressure and endgame scores are simulation proxies; player enjoyment and persistence of difficulty are unmeasured.'})
     write(OUT/f'{stage}-v2-production-checkpoint.json',{'status':'stage-complete','stage':stage,'boardCount':len(boards),'bankContentHash':bank['contentHash'],'completedOrdinals':ordinals,'open':'individual editorial review and isolated preview verification' if stage=='full' else 'internal editorial review before manufacturing remaining88'})
     if stage=='full':summarize(payload,bank,records,c)
@@ -385,6 +420,15 @@ def summarize(payload,bank,records,c):
              'pressureMedians':{k:statistics.median(r['pressure'][k] for r in records) for k in ('initial','after3Median','halfMedian','selectionScore')},
              'targetedEndgameCount':sum(b['meta']['targetedEndgame'] for b in bank['boards']),'endgameByBoard':{r['id']:r['endgame'] for r in records if r['endgame']},
              'humanValidation':'No newly activated playtest. Human difficulty and enjoyment remain unmeasured. Historicalbank overlap does not imply individual player exposure.'}
+    write(OUT/'summary.json',summary)
+    canonical_positions={}
+    for board in bank['boards']:
+        canonical_positions.setdefault(digest(canonical_tiling(board)),[]).append(board['meta']['level'])
+    summary['canonicalGeometry']={'normalization':'orderedpaths modulo8square symmetries andindividualreversal',
+                                 'uniqueTilings':len(canonical_positions),'minimumRepeatGap':min((b-a for p in canonical_positions.values() for a,b in zip(p,p[1:])),default=None),
+                                 'maximumRepeat':max(map(len,canonical_positions.values())),
+                                 'repeatPositions':{h:p for h,p in canonical_positions.items() if len(p)>1},
+                                 'designLimitation':'Construction templates can recur after at least8boards; newletterplacements andwords do not imply a newcanonicaltiling.'}
     write(OUT/'summary.json',summary)
     manifest={'schemaVersion':1,'edition':bank['edition'],'status':'candidate-unpublished','publicationAuthorized':False,'bankContentHash':bank['contentHash'],
               'generatorGeneration':6,'runtimeFreeGeneration':c.free_generation,'lexiconHash':c.lexicon_hash,'recognitionHash':bank['validationDictionary']['sha256'],

@@ -21,6 +21,12 @@ def reviews():
         for row in payload.get('records',payload.get('boards',[])):
             result[row['ordinal']]=row
     if set(result)!=set(range(1,101)):raise ValueError('Missing individual lexical review')
+    amendments=DIRECTORY/'editorial-amendments-v2.json'
+    if amendments.exists():
+        for row in read_json(amendments)['records']:
+            if result[row['ordinal']]['wordsetHash']!=row['oldReviewWordsetHash']:
+                raise ValueError('Unbound scoped editorial amendment')
+            result[row['ordinal']]=row
     return result
 
 def audit_endgames():
@@ -48,12 +54,19 @@ def audit_endgames():
         print('AFTER11_COMPLETE',board['id'],audit['summary']['endgameSelectionScore'],
               'all364_P25',audit['exhaustive']['pressureP25'],flush=True)
     if len(records)!=20:raise ValueError('Expected20 targeted ending experiments')
+    reference=next(r for r in read_json(ROOT/'docs/mk100-recovery/reference-audit.json')['references'] if r['id']=='mk2-10')
+    reference_p25=reference['exhaustive']['pressureP25']
+    below_reference=sum(r['exhaustive']['pressureP25']<reference_p25 for r in records)
     result={'status':'complete-offline-after11-audit','bankContentHash':bank['contentHash'],
             'recognitionDictionaryHash':solver.hash,'recognitionEntries':len(words),'targetedBoardCount':20,
             'exhaustiveTailCount':20*364,'records':records,
+            'broadOrderComparison':{'reference':'mk2-10','referencePressureP25':reference_p25,
+                'targetedBelowReferenceP25':below_reference,'targetedCount':20,
+                'conclusion':'Broad-order improvement remains unproven; named hypotheses are only selection proxies.'},
             'references':'docs/mk100-recovery/reference-audit.json: ten unchanged historical boards',
             'limitations':['Scores and all orderings are proxies; no synthetic player telemetry.',
                            'A good minimum across named hypotheses does not prove a difficult ending for people.',
+                           f'{below_reference}/20 exhaustive pressureP25 scores remain below reference mk2-10; broad-order improvement is unproven.',
                            'Every one of364 triples is retained; weak sensitivity tails are visible and not omitted.',
                            'Bonus recognition and exact uniqueness use the complete current frozen corpus.']}
     write('endgame-audit-v2.json',result)
@@ -75,10 +88,11 @@ def catalogue():
     records={r['ordinal']:r for r in evidence['boards']}
     summary=read_json(DIRECTORY/'summary.json')
     text=['# Mozkokalypsa — kandidátní stovka v2','',
-          'Dokončená izolovaná kandidátní banka: 100 konkrétních desek 10×10, každá14 cílových slov a všech100 polí bez překryvu. Pořadí je v pěti vlnách; skladba20 úlev /60 hlavních /15 výzev /5 vrcholů.','',
-          f"Lexikon v3 beze změny; uznávání{independent['recognition']['entries']:,} slov. Každá deska má úplný přesný důkaz jednoznačnosti a nezávislou reprodukci. Vybráno z{evidence['selection']['verifiedPoolTotal']:,} plně ověřených kandidátů.", '',
-          f"Celkem1 400 cílových výskytů,{summary['uniqueWords']} různých slov, nejvýše{summary['maximumExactRepeat']} přesné výskyty s odstupem nejméně{summary['minimumExactRepeatGap']} desek. Vůči předchozím playtestům je přiznaná výjimka LAHODNÝ na37; široká historie vydaných a rezervovaných bank má{summary['historyOverlapUnique']} různých shod. Historie bank není osobní historie hráče.",'',
-          'Dvacet cílených závěrů má tři pojmenované hypotézy pořadí, šest kontrol citlivosti a úplných364 posledních trojic na každé desce. Jde o konstrukční experimenty. Náročnost, zábavnost a skutečný účinek závěru nové stovky dosud hráči změřené nejsou.','',
+          'Dokončená izolovaná kandidátní banka: 100 konkrétních desek 10×10, každá má 14 cílových slov a všech 100 polí bez překryvu. Pořadí je v pěti vlnách; skladba 20 úlev / 60 hlavních / 15 výzev / 5 vrcholů.','',
+          f"Lexikon v3 beze změny; uznávání {independent['recognition']['entries']:,} slov. Každá deska má úplný přesný důkaz jednoznačnosti a nezávislou reprodukci. Vybráno z {evidence['selection']['verifiedPoolTotal']:,} plně ověřených kandidátů.", '',
+          f"Celkem 1 400 cílových výskytů, {summary['uniqueWords']} různých slov, nejvýše {summary['maximumExactRepeat']} přesné výskyty s odstupem nejméně {summary['minimumExactRepeatGap']} desek. Vůči předchozím playtestům je přiznaná výjimka LAHODNÝ na desce 37; široká historie vydaných a rezervovaných bank má {summary['historyOverlapUnique']} různých shod. Historie bank není osobní historie hráče.",'',
+          'Dvacet cílených závěrů má tři pojmenované hypotézy pořadí, šest kontrol citlivosti a úplných 364 posledních trojic na každé desce. Jde o konstrukční experimenty. Náročnost, zábavnost a skutečný účinek závěru nové stovky dosud hráči změřené nejsou.','',
+          f"V {endgame['broadOrderComparison']['targetedBelowReferenceP25']} z dvaceti experimentů je dolní kvartil tlaku přes všech 364 trojic nižší než u reference mk2-10. Zlepšení napříč libovolným pořadím proto není prokázané; slabé zbytky jsou v auditu zachovány.",'',
           'Redakce je individuální modelový úsudek o konkrétních slovech a mřížkách; nenahrazuje novou normativní slovníkovou certifikaci ani fyzický test zařízení. Produkční vydání a aktivace testu nejsou povoleny.','']
     bound=[]
     for board in bank['boards']:
@@ -93,7 +107,7 @@ def catalogue():
                      'Slova: '+', '.join(a['word'] for a in board['answers'])+'.','',
                      lex['whyIncluded'],'',grid['assessment'],''])
         if risks:text.extend(['Rizika: '+' '.join(risks),''])
-        text.extend([f"Identita `{board['id']}`; obsahový hash `{board_hash(board)}`; seed `{board['meta']['seed']}`. Zatáčky v průměru{record['geometry']['meanTurns']:.2f}; přesný solver PASS, cesty unikátní. "+('Cílený závěrový experiment.' if board['meta']['targetedEndgame'] else 'Přirozené závěrečné zrychlení přípustné.'),''])
+        text.extend([f"Identita `{board['id']}`; obsahový hash `{board_hash(board)}`; seed `{board['meta']['seed']}`. Zatáčky v průměru {record['geometry']['meanTurns']:.2f}; přesný solver PASS, cesty unikátní. "+('Cílený závěrový experiment.' if board['meta']['targetedEndgame'] else 'Přirozené závěrečné zrychlení přípustné.'),''])
         bound.append({'id':board['id'],'ordinal':ordinal,'contentHash':board_hash(board),
                       'wordsetHash':digest(words),'individualLexicalReview':True,'individualGridReview':True,'risks':risks})
     (DIRECTORY/'CATALOG.md').write_text('\n'.join(text)+'\n',encoding='utf-8')

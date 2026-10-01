@@ -1,0 +1,134 @@
+{
+  "status": "accepted-individual-amendments",
+  "reviewer": "Codex root (AI editorial model)",
+  "reviewedAt": "2026-10-01T20:03:08.351900+00:00",
+  "records": [
+    {
+      "ordinal": 16,
+      "id": "mk100-v2-016",
+      "wordsetHash": "4fe89e1f31b7f8d2893165531fd5dbda96bce039bf7acf503177a746b1e0b7ad",
+      "profile": "challenge",
+      "verdict": "accepted",
+      "character": "Sport, dílna a přesné významy",
+      "whyIncluded": "BASEBALL a HACKER působí současně, BLATOUCH a DŽUNGLE přírodně; ZÁVLAČKA přidává jeden konkrétní odborný předmět. Schválený neutrální LASER stejného tieru B a délky 5 zachovává vědeckou složku desky. V konkrétní sadě BASEBALL, BLATOUCH, DŽUNGLE, HACKER, MATICE a PŘEDSUDEK jsou odlišné významové kotvy; úzce dílenská ZÁVLAČKA zůstává jediným vědomým oborovým rizikem. LASER není vybrán jako rarita.",
+      "risks": [
+        "ZÁVLAČKA má užší mechanický význam; MATICE si hráč může nejprve vybavit v jiném významu než výrobní metadata."
+      ],
+      "polarizingWords": [
+        "závlačka"
+      ],
+      "individualNotes": {
+        "závlačka": "Vědomě méně známá mechanická pomůcka, odůvodněná profilem výzva.",
+        "matice": "Běžné samostatné slovo s matematickým a mechanickým významem; corpus výskyt nerozliší významy.",
+        "křupavý": "Správné běžné adjektivní lemma, nikoli rarita.",
+        "blatouch": "Zavedená luční rostlina s běžnou školní oporou.",
+        "laser": "Schválený neutrální LASER stejného tieru B a délky5 zachovává vědecké téma RADARU. V konkrétní sadě BASEBALL, BLATOUCH, DŽUNGLE, HACKER, MATICE a PŘEDSUDEK jsou odlišné významové kotvy; úzce dílenská ZÁVLAČKA zůstává jediným vědomým oborovým rizikem. LASER není vybrán jako rarita."
+      },
+      "reviewedWords": [
+        "baseball",
+        "blatouch",
+        "chudinka",
+        "džungle",
+        "hacker",
+        "křupavý",
+        "laser",
+        "matice",
+        "předsudek",
+        "přehoz",
+        "stupačka",
+        "zápraží",
+        "závlačka",
+        "zážitek"
+      ],
+      "reviewScope": "Individual scoped replacement after completed solver disproved palindrome path uniqueness; no dictionary re-certification.",
+      "oldReviewWordsetHash": "5fae3a74371230b779ae2ca9f2ce2dff3fa0376a406dc6c3fc96e0eea417cb45",
+      "words": [
+        "baseball",
+        "blatouch",
+        "chudinka",
+        "džungle",
+        "hacker",
+        "křupavý",
+        "laser",
+        "matice",
+        "předsudek",
+        "přehoz",
+        "stupačka",
+        "zápraží",
+        "závlačka",
+        "zážitek"
+      ],
+      "technicalCorrection": {
+        "old": "RADAR",
+        "new": "LASER",
+        "reason": "Palindromic answer has both forward and reversed trace; complete recognition/solver must remain unchanged.",
+        "unchanged": "B5,lengthprofile,14targets,100cells,workingv3bytes,recognizerincludingRADAR",
+        "oldReviewRetained": true
+      }
+    },
+    {
+      "ordinal": 88,
+      "wordsetHash": "598d45c838fab41923b743ea27938a47245d3306ac51ca3b73cc1f84661141fd",
+      "verdict": "accepted",
+      "profile": "relief",
+      "words": [
+        "asteroid",
+        "chrastit",
+        "dopoledne",
+        "formička",
+        "pihovatý",
+        "silnice",
+        "slavík",
+        "sloka",
+        "strouhat",
+        "terapie",
+        "traktor",
+        "truhla",
+        "závorka",
+        "špaček"
+      ],
+      "character": "Úleva s vesmírem, zvuky a běžnými věcmi",
+      "whyIncluded": "FORMIČKA, TRAKTOR a TRUHLA dávají konkrétní cíle; ASTEROID, SLOKA a SLAVÍK obměňují charakter hledání. SLOKA je běžné neutrální pojmenování skupiny veršů písně nebo básně, schválený B5 výraz ze zásoby v3. V úlevové sadě s FORMIČKOU, SLAVÍKEM, STROUHAT a ZÁVORKOU je přirozeným kulturním doplněním; hudební téma vzroste pouze z 1 na 2. ASTEROID zůstává jediným vědeckým jménem, nejde o kumulaci odborností.",
+      "risks": [
+        "ASTEROID má vědecký původ a běžné kulturní použití; nevyžaduje fyzikální znalost. SLAVÍK a ŠPAČEK jsou známí ptáci, nikoli raritní dvojice. Žádná vědomá specialistika pro úlevu."
+      ],
+      "polarizingWords": [],
+      "individualNotes": {
+        "chrastit": "Přirozený infinitiv, nezaměňovat s hromadným substantivem chrastí.",
+        "terapie": "Běžný obecný výraz, ne konkrétní klinická metoda.",
+        "pihovatý": "Přirozené adjektivum.",
+        "závorka": "Běžný školní/jazykový znak.",
+        "sloka": "SLOKA je běžné neutrální pojmenování skupiny veršů písně nebo básně, schválený B5 výraz ze zásobyv3. V úlevové sadě s FORMIČKOU, SLAVÍKEM, STROUHAT a ZÁVORKOU je přirozeným kulturním doplněním; hudební téma vzroste pouze z1 na2. ASTEROID zůstává jediným vědeckým jménem, nejde o kumulaci odborností."
+      },
+      "id": "mk100-v2-088",
+      "oldReviewWordsetHash": "683075cca23180ddb78313e361ba1cee9d061a477006aab465775b663f8b7bf9",
+      "reviewedWords": [
+        "asteroid",
+        "chrastit",
+        "dopoledne",
+        "formička",
+        "pihovatý",
+        "silnice",
+        "slavík",
+        "sloka",
+        "strouhat",
+        "terapie",
+        "traktor",
+        "truhla",
+        "závorka",
+        "špaček"
+      ],
+      "reviewScope": "Individual scoped replacement after completed solver disproved palindrome path uniqueness; no dictionary re-certification.",
+      "technicalCorrection": {
+        "old": "RADAR",
+        "new": "SLOKA",
+        "reason": "Palindromic answer has both forward and reversed trace; complete recognition/solver must remain unchanged.",
+        "unchanged": "B5,lengthprofile,14targets,100cells,workingv3bytes,recognizerincludingRADAR",
+        "oldReviewRetained": true
+      }
+    }
+  ],
+  "immutableLexiconChanged": false,
+  "recognitionReduced": false,
+  "originalReviewBytesRetained": true
+}

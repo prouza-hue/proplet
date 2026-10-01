@@ -144,6 +144,12 @@ def verify_series_editorial(boards, plan, catalog):
     require(len(reviews) == 100 and len({r['ordinal'] for r in reviews}) == 100,
             'Individual lexical reviews do not cover exactly100 ordinals')
     by_ordinal = {r['ordinal']: r for r in reviews}
+    amendments_path = DIRECTORY / 'editorial-amendments-v2.json'
+    if amendments_path.exists():
+        for row in read_json(amendments_path)['records']:
+            require(by_ordinal[row['ordinal']]['wordsetHash'] == row['oldReviewWordsetHash'],
+                    'Editorial amendment does not identify the preserved original review')
+            by_ordinal[row['ordinal']] = row
     entries = plan['entries']
     positions, family_positions = defaultdict(list), defaultdict(list)
     caps = {'relief': 0, 'main': 1, 'challenge': 2, 'summit': 2}
