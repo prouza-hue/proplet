@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-26",
+  "status": "pass",
+  "commit": "59f2ee9d94ca7449bdd4f8efbae5acec6451a052",
+  "deployment": "dpl_AkJkGDG9Nohha34gisV3U9CWjGZZ",
+  "url": "https://proplet-nvaelfcfs-pavel-prouzas-projects.vercel.app/layout-check.html?size=mobile",
+  "viewport": [
+    390,
+    844
+  ],
+  "checks": {
+    "calmLabel": "visible Klid via original CSS",
+    "calmIcon": "original24pxicon loaded naturalWidth>0",
+    "calmToggle": "aria-pressed true + game-clock visibility hidden; second click visible",
+    "firstActualDrag": "HOBLÍK accepted1/14; moves1 tah",
+    "secondActualDrag": "ŠPEJLE accepted2/14; moves2 tahy",
+    "applicationConsoleErrors": 0
+  },
+  "screenshot": "qa/mobile390-fixed-59f2.jpg",
+  "limitations": [
+    "Real iframe dimensions with desktop pointer; no touch emulation or physical Fold test.",
+    "Chrome extension metadata errors excluded from app errors."
+  ],
+  "httpChecks": {
+    "index": 200,
+    "apiMe": 404,
+    "connectSrc": "none",
+    "workerSrc": "none",
+    "note": "Vercel fetch initially returned INVALID_ARGUMENT/access unavailable for apiMe; a second read returned HTTP 404."
+  }
+}

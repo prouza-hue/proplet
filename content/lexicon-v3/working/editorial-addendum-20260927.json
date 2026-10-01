@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-27",
+  "base_lexicon_sha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+  "scope": "Supplemental evidence; no replacement of approved inventory, tiers, spelling or historical reviews. No production change.",
+  "records": [
+    {
+      "word": "ZÁŠEVEK",
+      "status": "independent-usage-confirmed",
+      "source": "Burda Style — Jak na záševky?",
+      "url": "https://www.burdastyle.cz/navody/rady-tipy/jak-na-zasevky/",
+      "published_at": "2019-11-19",
+      "checked_at": "2026-09-27",
+      "method": "Actual public page read; sewing publisher uses exact singular and inflected forms in its instructional text.",
+      "observation": "Návod výslovně používá záševek pro sešitý tvarovací záhyb oděvu. Doložen je zápis i zamýšlený krejčovský význam; nejde o tvrzení o samostatném akademickém slovníkovém hesle.",
+      "resolves": "Independent reference gap recorded in working/source-limitations.json; original historical finding remains retained."
+    }
+  ]
+}

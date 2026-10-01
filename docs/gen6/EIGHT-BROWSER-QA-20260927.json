@@ -1,0 +1,77 @@
+{
+  "environment": "loopback-only-static",
+  "physicalDeviceTested": false,
+  "checks": [
+    "real-mouse-word-and-reload-progress",
+    "all-eight-real-pointer-completions",
+    "all-eight-menu-done",
+    "320-390-768-1440-light-dark-no-overflow",
+    "emulated-touch-drag",
+    "hint",
+    "calm-hide-and-show",
+    "mobile-reload-progress-and-hint",
+    "coarse-fold-layout-and-touch-drag",
+    "touch-hint-close",
+    "keyboard-activation",
+    "no-delayed-double-hint-or-toggle",
+    "zero-gameplay-network-or-result-writes"
+  ],
+  "errors": [],
+  "screenshots": [
+    "board-narrow-light.png",
+    "board-narrow-dark.png",
+    "board-mobile-light.png",
+    "board-mobile-dark.png",
+    "board-fold-light.png",
+    "board-fold-dark.png",
+    "board-desktop-light.png",
+    "board-desktop-dark.png"
+  ],
+  "completedThroughPointer": [
+    "mk3v3-01",
+    "mk3v3-02",
+    "mk3v3-03",
+    "mk3v3-04",
+    "mk3v3-05",
+    "mk3v3-06",
+    "mk3v3-07",
+    "mk3v3-08"
+  ],
+  "afterHintTap": {
+    "events": [
+      {
+        "type": "pointerdown",
+        "id": "",
+        "text": "01"
+      },
+      {
+        "type": "pointerup",
+        "id": "",
+        "text": "01"
+      },
+      {
+        "type": "click",
+        "id": "",
+        "text": "01"
+      },
+      {
+        "type": "pointerdown",
+        "id": "hintBtn",
+        "text": "💡 Nápověda"
+      },
+      {
+        "type": "pointerup",
+        "id": "hintBtn",
+        "text": "💡 Nápověda"
+      }
+    ],
+    "modal": "modal",
+    "found": 1,
+    "dragging": false,
+    "hints": 0
+  },
+  "status": "PASS",
+  "ciRun": "https://github.com/prouza-hue/proplet/actions/runs/36282583649",
+  "bankContentHash": "c21702b15b93f9bfa087b0e6fc6c91a94b8a601f5affc62416520b700a712223",
+  "independentFullSeriesReplayRun": "https://github.com/prouza-hue/proplet/actions/runs/36282086177"
+}

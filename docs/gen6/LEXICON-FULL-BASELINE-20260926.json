@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-09-26T21:12:33.783Z",
+  "repository": "prouza-hue/proplet",
+  "scope": "Read-only live metadata checks; no database queries, deployment, environment mutation, staging or worktree changes.",
+  "main": {
+    "sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "tree_sha": "52646537a04e34282a45abd9cbdd40890dfe756b",
+    "tool": "mcp__codex_apps__github_fetch",
+    "request_url": "https://api.github.com/repos/prouza-hue/proplet/branches/main",
+    "result": "success"
+  },
+  "pull_request": {
+    "number": 148,
+    "url": "https://github.com/prouza-hue/proplet/pull/148",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "head_branch": "preview/gen6-lexicon-v3-20260926",
+    "head_sha": "10a1be264f19653777e49a74d6eceb5f8ccffce4",
+    "base_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "tool": "mcp__codex_apps__github_get_pr_info",
+    "result": "success"
+  },
+  "production": {
+    "deployment_id": "dpl_6hStet3DsXxQzKQVYEs7jyZwKjaw",
+    "project_id": "prj_0XHgnCQhdPS3pPETrxIpoXn0McMG",
+    "team_id": "team_5WMqzMhPV9vWfkNAWCygaeap",
+    "sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "branch": "main",
+    "target": "production",
+    "state": "READY",
+    "alias": "hrajproplet.cz",
+    "deployment_url": "https://proplet-ntvtgrl3z-pavel-prouzas-projects.vercel.app",
+    "tool": "mcp__codex_apps__vercel_get_deployment",
+    "request_id_or_url": "hrajproplet.cz",
+    "result": "success"
+  },
+  "failed_attempts": [
+    {
+      "tool": "mcp__codex_apps__vercel_get_project",
+      "request": {
+        "projectId": "prj_0XHgnCQhdPS3pPETrxIpoXn0McMG",
+        "teamId": "team_5WMqzMhPV9vWfkNAWCygaeap"
+      },
+      "error_code": "INVALID_ARGUMENT",
+      "error": "Input validation error: Invalid arguments for tool get_project: idOrName: Invalid input: expected string, received undefined",
+      "resolution": "Read deployment by current production alias; succeeded without modifying any project settings."
+    }
+  ],
+  "conclusion": {
+    "production_matches_main": true,
+    "pr_remains_draft": true,
+    "remote_writes": 0,
+    "database_queries": 0
+  }
+}

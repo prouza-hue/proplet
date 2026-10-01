@@ -1,0 +1,133 @@
+{
+  "date": "2026-09-26",
+  "status": "passed-with-followup-fixes-verified",
+  "testedPreviewUrl": "https://proplet-dut0khk0v-pavel-prouzas-projects.vercel.app/",
+  "testedCommit": "f5d9eeb00ea98f237f34d5bf3d26b0d9433da0d7",
+  "testedDeployment": "dpl_BkydiE1spPbeAL1Nik7WnqKfaPBK",
+  "browser": "Connected Cloud Chrome, existing documented browser tools; no login",
+  "bankContentHash": "f8b0dcca08dce98df5adb31e752ca76f762a6c2d6b207460be7442ad1c6bf6f9",
+  "checks": [
+    {
+      "name": "menu",
+      "result": "pass",
+      "observed": "12 numbered boards; Proplet Fraunces wordmark, existing Mozkokalypsa icon; clear local-only/no-XP note"
+    },
+    {
+      "name": "desktop-game",
+      "result": "pass",
+      "viewport": [
+        1363,
+        936
+      ],
+      "layout": "desktop-wide",
+      "observed": "100 visible cells, readable letters, side rail and controls fully visible"
+    },
+    {
+      "name": "pointer-drag",
+      "result": "pass",
+      "observed": "Actual CUA drag along HOBLÍK canonical path accepted; progress 1/14, used cell colors and found word visible"
+    },
+    {
+      "name": "hint",
+      "result": "pass",
+      "observed": "Lehká button showed start-letter/length hint and switched clean status to S nápovědou"
+    },
+    {
+      "name": "reload-resume",
+      "result": "pass",
+      "observed": "Back to menu, full reload and reopen retained 1/14, HOBLÍK, and hint status"
+    },
+    {
+      "name": "complete-board",
+      "result": "pass",
+      "observed": "All 14 target paths dragged through actual UI. Dialog Rozpleteno! showed 14/14, 15 moves (one unsuccessful test drag), 1 hint. No account or XP action."
+    },
+    {
+      "name": "next-board",
+      "result": "pass",
+      "observed": "Další deska opened Mozkokalypsa III · 2 at 0/14"
+    },
+    {
+      "name": "mobile-viewport",
+      "result": "pass-with-local-fix",
+      "viewport": [
+        390,
+        844
+      ],
+      "method": "same-origin iframe, real innerWidth/innerHeight",
+      "layout": "standard",
+      "documentScrollWidth": 390,
+      "board": [
+        356,
+        356
+      ],
+      "controlsBottom": 832,
+      "observed": "No horizontal overflow; full board and hint control visible; actual KUŽELKA drag accepted 1/14. Calm button had blank label: fixed locally by restoring production calmRunBtn ID and existing icon."
+    },
+    {
+      "name": "fold-width-viewport",
+      "result": "pass",
+      "viewport": [
+        768,
+        900
+      ],
+      "method": "same-origin iframe, real innerWidth/innerHeight",
+      "layout": "standard",
+      "documentScrollWidth": 768,
+      "board": [
+        577,
+        577
+      ],
+      "controlsBottom": 886,
+      "observed": "No horizontal overflow; all cells and controls visible. Board 2 progress 1/14 restored from mobile viewport."
+    },
+    {
+      "name": "completion-persistence",
+      "result": "pass",
+      "observed": "Menu after later iframe navigation shows board 1 Hotovo, board 2 Pokračovat · 1/14"
+    },
+    {
+      "name": "console",
+      "result": "pass",
+      "applicationErrorsObserved": 0,
+      "otherErrors": "Cloud Chrome extension emitted Error sending browser metadata to extension from chrome-extension://...; separate from application."
+    },
+    {
+      "name": "api-isolation",
+      "result": "pass",
+      "method": "root agent verified live responses with Vercel fetch",
+      "observed": "/api/health and /api/me both HTTP404; static build contains no functions; CSP connect-src none"
+    }
+  ],
+  "localFixes": [
+    {
+      "files": [
+        "preview/gen6/preview.js"
+      ],
+      "reason": "Czech plural forms: 1 tah / 2–4 tahy / 5+ tahů; 1 nápověda / 2–4 nápovědy / 5+ nápověd"
+    },
+    {
+      "files": [
+        "preview/gen6/index.html",
+        "preview/gen6/preview.js",
+        "tools/build_gen6_preview.py"
+      ],
+      "reason": "Use existing production calmRunBtn selector and exact-main public/rewards/printshop/calm.svg, so mobile CSS has its expected label/icon. Existing SVG SHA03daf0bbf1a8d9a6b8319bf20cd40822b8bfac8a unchanged."
+    }
+  ],
+  "limitations": [
+    "390/768 checks are real iframe document widths with desktop pointer, not touch emulation or a physical Samsung Fold. Touch-only magnifier/rail classification not validated.",
+    "Installed primary Playwright package had no browser executable; official chromium-headless-shell download failed as invalid/truncated ZIP. No retry workaround.",
+    "Cloud browser forbids file:// navigation; actual browser QA used the isolated HTTPS Vercel preview.",
+    "Broad recognition in this static preview is the frozen 26190-word validation union, not dynamic production wordfreq fallback."
+  ],
+  "screenshots": {
+    "menu": "qa/menu-f5d9.jpg",
+    "desktop": "qa/desktop-f5d9.jpg",
+    "finish": "qa/finish-f5d9.jpg",
+    "mobileBeforeFix": "qa/mobile390-before-fix-f5d9.jpg",
+    "foldWidth": "qa/fold768-f5d9.jpg",
+    "mobileFixed": "qa/mobile390-fixed-59f2.jpg"
+  },
+  "followupSmokeReport": "PREVIEW-FINAL-SMOKE-20260926.json"
+}

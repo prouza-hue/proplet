@@ -1,0 +1,73 @@
+{
+  "as_of": "2026-09-26",
+  "sources": [
+    {
+      "url": "https://kaikki.org/dictionary/downloads/cs/cs-extract.jsonl.gz",
+      "bytes": 39231427,
+      "sha256": "e98e64fed3c851834d534e20207cc91abee96a9b6008111664155bb7141fe299",
+      "retrieved_at": "2026-09-26T20:51:29.728728+00:00",
+      "source": "Czech Wiktionary via Kaikki/Wiktextract",
+      "license": "CC-BY-SA-4.0; GFDL alternative",
+      "license_source": "https://kaikki.org/cswiktionary/",
+      "copyright_source": "https://en.wiktionary.org/wiki/Wiktionary:Copyrights",
+      "purpose": "Public generic source download; no private candidate words or identifiers sent. Offline consultation only; no raw definitions imported into game."
+    },
+    {
+      "url": "https://kaikki.org/dictionary/Czech/kaikki.org-dictionary-Czech.jsonl",
+      "bytes": 223709241,
+      "sha256": "f5628a4d00f46bb7ea070f6b0c5a3b0b9e764b384288030d3f2477443e8981f5",
+      "retrieved_at": "2026-09-26T20:53:55.531035+00:00",
+      "source": "Czech language, English Wiktionary via Kaikki/Wiktextract",
+      "license": "CC-BY-SA-4.0; GFDL alternative",
+      "copyright_source": "https://en.wiktionary.org/wiki/Wiktionary:Copyrights",
+      "purpose": "Generic public download without private word queries; local evidence consultation only."
+    },
+    {
+      "url": "https://media.githubusercontent.com/media/plin/slovnik/master/generated/k12.txt",
+      "source": "Český tvarotvorný slovník, PLIN FF MU; Grác et al.",
+      "file": "lexicon-full/public-mu-k12.txt",
+      "sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+      "retrieved_at": "2026-09-26T21:03:36.036767+00:00",
+      "bytes": 45544525,
+      "license": "Public Domain",
+      "license_source": "https://github.com/plin/slovnik",
+      "lfs_expected_sha256": "216186bfedee8f58af726e825d070fcbec03ecbdc500e8686dd866c453e32913",
+      "purpose": "Generic public download without candidate words or IDs; offline morphology consultation"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.txt",
+      "file": "public-Czech.txt",
+      "sha256": "6bc1361dd4dd872d54d8fbdf5af01387fd2db76b181e4e76e6b8dd551e24aab5",
+      "bytes": 1290,
+      "retrieved_at": "2026-09-26T20:57:42.236095+00:00",
+      "license": "CC0-1.0 (Czech.txt)",
+      "scope": "spelling/morphological evidence, not a definition or familiarity score"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.dic",
+      "file": "public-Czech.dic",
+      "sha256": "962283319b595e83d1140833f6a1008cea6abfc88634f99cb04c916468dd6831",
+      "bytes": 9229300,
+      "retrieved_at": "2026-09-26T20:57:50.678626+00:00",
+      "license": "CC0-1.0 (Czech.txt)",
+      "scope": "spelling/morphological evidence, not a definition or familiarity score"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/titoBouzout/Dictionaries/master/Czech.aff",
+      "file": "public-Czech.aff",
+      "sha256": "691c4fd753f33277a87b38d21ad75279bf50ab6e313cd0a2c386afc0426062e7",
+      "bytes": 5815,
+      "retrieved_at": "2026-09-26T20:57:57.054437+00:00",
+      "license": "CC0-1.0 (Czech.txt)",
+      "scope": "spelling/morphological evidence, not a definition or familiarity score"
+    }
+  ],
+  "attribution": "Czech and English Wiktionary contributors, via Kaikki/Wiktextract; MU Czech Morphological Dictionary by Grác, Husárová, Ryšavá and Volková; Wikidata contributors; czech-cc0-dictionaries by strepon, distributed by titoBouzout/Dictionaries. Individual Lingea/IJP/SSJČ references are attributed per record.",
+  "usage": "Read-only local consultation of public generic downloads. No raw dictionary dump, definitions or paradigms imported into the game. Original 1,143-word inventory predates these checks. Glosses are original editorial descriptions; retained source notes describe factual observations and scope.",
+  "access_incident": "Automatic approval review rejected external per-word requests because they disclose private-repository candidate words. All such tasks were stopped. Subsequent new retrievals used fixed generic public dataset URLs without private words or IDs; matching and reading happened locally. Completed earlier responses were retained with their actual retrieval timestamps.",
+  "limitations": [
+    "No independent reference was found for ZÁŠEVEK; its individual record explicitly retains an AI editorial judgment and source limitation.",
+    "Public source morphology can contain errors: VĚŠÁK/ZÁPISNÍK/MEZERA discrepancies were individually resolved and noted.",
+    "No MorfFlex data used. No source visit is claimed for failed retrievals or links inspected only through local snapshots."
+  ]
+}

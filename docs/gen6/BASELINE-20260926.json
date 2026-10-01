@@ -1,0 +1,61 @@
+{
+  "date": "2026-09-26",
+  "repository": "prouza-hue/proplet",
+  "handover_branch": "docs/gen6-handover-20260926",
+  "handover_commit": "714d3789d607f785fc41c918768d35e157195b47",
+  "source_main_sha": "6e076bccf2a89d99e003667aa2eed0f6f4e24d51",
+  "source_tree_sha": "121e019089761c4b8cf60c14910a7ea9b0046bed",
+  "working_branch": "preview/gen6-lexicon-v3-20260926",
+  "production_deployment": "dpl_FX9D1aQ9cT2VekuS6G2oQNGqs1uf",
+  "production_alias": "hrajproplet.cz",
+  "production_sha": "6e076bccf2a89d99e003667aa2eed0f6f4e24d51",
+  "production_health": {
+    "version": "4.02.2",
+    "ok": true,
+    "database": true,
+    "vocabularyVersion": 2,
+    "freeGeneration": 4
+  },
+  "production_supabase_ref": "iopyhluayfszskyqqpuc",
+  "preview_data_environment": "static files + namespaced localStorage only; no database, API, account, XP or analytics calls",
+  "historical_restore": {
+    "verified": true,
+    "count": 1143,
+    "input_sha256": {
+      "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+      "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+      "data/source_cs_50k.txt": "1fb0576ef07cf5a543789d394cde1168573fc9e7adf427fd143249fd5547458d",
+      "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "data/target_generation_exclusions_v334.json": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+      "data/puzzles.json": "72471265bfb9c1047710172cb1377a31eb6aa9e1c08c4969ee0b556551e014c0",
+      "data/playtests/mozkokalypsa-v2.json": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "tools/build_lexicon_v2.py": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+      "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+      "tools/gen5/catalog.py": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74",
+      "tools/gen5/package.py": "f0bddf830ff10e7a2f73a62e4f8e20d7486e75b42b271bc074c8851290f4ada3",
+      "public/app/content/free-order-engine.js": "6cb8092fffd3e01cd3c93bcaf769007f8956bb41c4ce2413c882f427b0da51b1",
+      "public/app/content/free-order-store.js": "9ac1a335f37837041ddb16c6696a4d58142984cbf1f331475a3fe2d36d99cb27",
+      "content/gen5/profiles.json": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5"
+    },
+    "output_sha256": {
+      "kandidati-vse-1143.json": "0c53368ca5ba6bcb297581272b457a7a88530a5f956b039c3c67a1015ff81033",
+      "kandidati-varka-2.json": "2f6a883231fe92af04c164373e31b7bbb16b9803935e90109b5e32838b7e5789",
+      "audit-v2.json": "b8250c5b49a0bb60ae823174b96c98ebaae5657a96c6c25cee370db746391b9a"
+    }
+  },
+  "access_limitations": [
+    "Direct git ls-remote to github.com failed: could not read Username. Authenticated connector remained functional.",
+    "Large fetch_file responses lacked content. Git blob endpoint returned exact bytes.",
+    "Working checkout reconstructed from verified signed Git commit, all62tree objects and available exact blobs. Omitted files are a declared sparse/promisor subset; no fabricated baseline commit."
+  ],
+  "mutations_to_production": 0,
+  "decision_source_issue": "https://github.com/prouza-hue/proplet/issues/146#issuecomment-5848867176",
+  "concurrent_main_update": {
+    "current_main_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "production_sha": "f04c99e2477c738a1de1880abcb7eb63388f9d71",
+    "production_deployment": "dpl_6hStet3DsXxQzKQVYEs7jyZwKjaw",
+    "cause": "Separate PR147 onboarding provenance deployment, not this task.",
+    "compatibility": "GitHub compare inspected: none of frozen lexicon/generator/history sources or reused game modules/styles changed. Generated content remains pinned to exact6e076bcc manufacturing inputs; preview branch will be based on currentf04c99e."
+  }
+}
