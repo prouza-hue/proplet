@@ -1,0 +1,94 @@
+{
+  "status": "complete",
+  "engine": "unchanged backbite core with declared profile-specific design preferences",
+  "source": "tools/gen6/mk100_geometry.py",
+  "baseSource": "tools/gen6/interwoven_geometry.cpp",
+  "emittedCppSha256": "c53e5d3a3800f31e5a32af8d260e732cfd269814dbf3d30ead818b4183757f05",
+  "baseSourceSha256": "a26c2d75ceb3c01564eb123b70896addf1fd9987b04865e74aae59b906a10ce8",
+  "profiles": [
+    {
+      "profile": "relief",
+      "seed": 202610010200,
+      "attemptLimit": 30000000,
+      "requested": 64,
+      "completed": 64,
+      "exitCode": 0,
+      "settings": {
+        "minTurns": 1,
+        "totalMin": 42,
+        "totalMax": 54,
+        "cross": 66,
+        "gaps": 1,
+        "near": 2
+      }
+    },
+    {
+      "profile": "main",
+      "seed": 202610010201,
+      "attemptLimit": 30000000,
+      "requested": 64,
+      "completed": 64,
+      "exitCode": 0,
+      "settings": {
+        "minTurns": 1,
+        "totalMin": 52,
+        "totalMax": 66,
+        "cross": 70,
+        "gaps": 2,
+        "near": 2
+      }
+    },
+    {
+      "profile": "challenge",
+      "seed": 202610010202,
+      "attemptLimit": 30000000,
+      "requested": 64,
+      "completed": 64,
+      "exitCode": 0,
+      "settings": {
+        "minTurns": 2,
+        "totalMin": 61,
+        "totalMax": 76,
+        "cross": 74,
+        "gaps": 3,
+        "near": 3
+      }
+    },
+    {
+      "profile": "summit",
+      "seed": 202610010203,
+      "attemptLimit": 30000000,
+      "requested": 32,
+      "completed": 32,
+      "exitCode": 0,
+      "settings": {
+        "minTurns": 2,
+        "totalMin": 66,
+        "totalMax": 82,
+        "cross": 76,
+        "gaps": 4,
+        "near": 3
+      }
+    }
+  ],
+  "poolSize": 224,
+  "poolSha256": "0de9f413408a994e725c58c88f6fc3add8b684247bc83e6c83a421075e3f18e8",
+  "runtimeRulesChanged": false,
+  "previousBoundedAttempt": {
+    "profile": "summit",
+    "requested": 64,
+    "completed": 48,
+    "attemptLimit": 30000000,
+    "exitCode": 3,
+    "status": "FAILED-not-a-complete-pool",
+    "partialTraceRetainedLocally": "work/mk100/geometry/summit-prior-48-entries.jsonl"
+  },
+  "adaptation": {
+    "profile": "summit",
+    "newRequest": 32,
+    "completed": 32,
+    "exitCode": 0,
+    "qualityFloorsUnchanged": true,
+    "reason": "Complete bounded pool sufficient for5summitboards and16verified letter-placement options each; incomplete48 trace not accepted as64"
+  }
+}

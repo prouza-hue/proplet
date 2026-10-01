@@ -5,3 +5,7 @@ supabase/.temp/
 lab-output/
 
 artifacts/
+
+# Local recovery runtimes, compiler, browser evidence and static build output.
+work/
+dist-mk100/

@@ -1,0 +1,4754 @@
+{
+  "status": "exact-proofs-complete",
+  "createdAt": "2026-10-01T19:56:06.098438+00:00",
+  "stage": "representative",
+  "boards": [
+    {
+      "id": "mk100-v2-001",
+      "ordinal": 1,
+      "verifiedPool": 16,
+      "poolAttempts": 424,
+      "poolRejections": {
+        "solver-multiple-nonunique-target": 80,
+        "geometry-straight_share": 28,
+        "geometry-path_straight_share": 46,
+        "solver-unique-nonunique-target": 205,
+        "geometry-path_straight_share,straight_share,curvy_share": 14,
+        "geometry-path_straight_share,curvy_share": 14,
+        "geometry-path_straight_share,straight_share": 21
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 49,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 2976,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 1,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.75,
+        "meanTurns": 3.2857142857142856,
+        "meanStraightShare": 0.36904761904761907,
+        "curvyShare": 0.9285714285714286,
+        "maxCurlRun": 3,
+        "curlPathCount": 9,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-relief",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.0,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.75
+      },
+      "weave": {
+        "crossContacts": 82,
+        "extraSelfContacts": 12,
+        "axisReentries": 2,
+        "interdigitatingWords": 2,
+        "neighborsMean": 4.0,
+        "neighborsMinimum": 2,
+        "minSeamCrossers": 3,
+        "seamCrossers": [
+          5,
+          5,
+          3,
+          3,
+          5,
+          3,
+          4,
+          5,
+          4,
+          4
+        ]
+      },
+      "pressure": {
+        "initial": 49.125,
+        "after3Median": 38.773,
+        "halfMedian": 29.393,
+        "after3Worst": 33.523,
+        "halfWorst": 19.786,
+        "orders": 7,
+        "selectionScore": 38.1266
+      },
+      "endgame": null,
+      "selectionScore": -34.8466,
+      "provenance": {
+        "geometryPoolIndex": 52,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24688,
+        "transform": 6,
+        "attempt": 48,
+        "placementSeed": 9457391736707522165
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 49,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 2976,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-002",
+      "ordinal": 2,
+      "verifiedPool": 16,
+      "poolAttempts": 429,
+      "poolRejections": {
+        "solver-unique-nonunique-target": 135,
+        "geometry-path_straight_share": 228,
+        "solver-multiple-nonunique-target": 50
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 56,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3577,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 1,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.6666666666666666,
+        "meanTurns": 3.7142857142857144,
+        "meanStraightShare": 0.3374149659863946,
+        "curvyShare": 0.9285714285714286,
+        "maxCurlRun": 3,
+        "curlPathCount": 12,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-main",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.67
+      },
+      "weave": {
+        "crossContacts": 80,
+        "extraSelfContacts": 14,
+        "axisReentries": 4,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.142857142857143,
+        "neighborsMinimum": 2,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          2,
+          3,
+          5,
+          4,
+          3,
+          4,
+          5,
+          5,
+          4
+        ]
+      },
+      "pressure": {
+        "initial": 63.429,
+        "after3Median": 52.659,
+        "halfMedian": 29.679,
+        "after3Worst": 41.636,
+        "halfWorst": 20.643,
+        "orders": 7,
+        "selectionScore": 46.698
+      },
+      "endgame": null,
+      "selectionScore": 53.898,
+      "provenance": {
+        "geometryPoolIndex": 126,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43523,
+        "transform": 7,
+        "attempt": 147,
+        "placementSeed": 15203648109812816181
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 56,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3577,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-003",
+      "ordinal": 3,
+      "verifiedPool": 16,
+      "poolAttempts": 722,
+      "poolRejections": {
+        "geometry-path_straight_share,curvy_share": 23,
+        "solver-unique-nonunique-target": 289,
+        "solver-multiple-nonunique-target": 214,
+        "geometry-path_straight_share": 78,
+        "geometry-path_straight_share,straight_share": 34,
+        "geometry-straight_share": 45,
+        "geometry-path_straight_share,straight_share,curvy_share": 22,
+        "solver-multiple": 1
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 49,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3182,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.6,
+        "meanTurns": 3.5,
+        "meanStraightShare": 0.374234693877551,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-relief",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.0,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.75
+      },
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 3,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          4,
+          6,
+          5,
+          3,
+          3,
+          2,
+          2,
+          4,
+          5
+        ]
+      },
+      "pressure": {
+        "initial": 51.518,
+        "after3Median": 38.136,
+        "halfMedian": 28.5,
+        "after3Worst": 32.0,
+        "halfWorst": 21.75,
+        "orders": 7,
+        "selectionScore": 38.2962
+      },
+      "endgame": null,
+      "selectionScore": -35.2562,
+      "provenance": {
+        "geometryPoolIndex": 27,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24020,
+        "transform": 2,
+        "attempt": 718,
+        "placementSeed": 1927093288159910021
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 49,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3182,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-004",
+      "ordinal": 4,
+      "verifiedPool": 16,
+      "poolAttempts": 2072,
+      "poolRejections": {
+        "geometry-path_straight_share": 1101,
+        "solver-unique-nonunique-target": 354,
+        "solver-multiple-nonunique-target": 601
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 80,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3873,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 5,
+        "maxPathStraightShare": 0.5,
+        "meanTurns": 3.857142857142857,
+        "meanStraightShare": 0.3052721088435374,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 13,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-main",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.67
+      },
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 4,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.142857142857143,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          4,
+          4,
+          2,
+          4,
+          3,
+          5,
+          5,
+          4,
+          2
+        ]
+      },
+      "pressure": {
+        "initial": 70.732,
+        "after3Median": 57.568,
+        "halfMedian": 35.321,
+        "after3Worst": 45.455,
+        "halfWorst": 29.5,
+        "orders": 7,
+        "selectionScore": 52.6184
+      },
+      "endgame": null,
+      "selectionScore": 59.5784,
+      "provenance": {
+        "geometryPoolIndex": 124,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43515,
+        "transform": 4,
+        "attempt": 1317,
+        "placementSeed": 6763855930578928237
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 80,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3873,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-005",
+      "ordinal": 5,
+      "verifiedPool": 48,
+      "poolAttempts": 3533,
+      "poolRejections": {
+        "solver-unique-nonunique-target": 1078,
+        "geometry-path_straight_share": 1878,
+        "solver-multiple-nonunique-target": 529
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 58,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3309,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.5,
+        "meanTurns": 4.071428571428571,
+        "meanStraightShare": 0.31292517006802717,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-main",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.67
+      },
+      "weave": {
+        "crossContacts": 73,
+        "extraSelfContacts": 21,
+        "axisReentries": 2,
+        "interdigitatingWords": 2,
+        "neighborsMean": 4.0,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          3,
+          4,
+          4,
+          5,
+          4,
+          4,
+          4,
+          3,
+          2
+        ]
+      },
+      "pressure": {
+        "initial": 58.446,
+        "after3Median": 46.182,
+        "halfMedian": 36.036,
+        "after3Worst": 32.477,
+        "halfWorst": 14.786,
+        "orders": 7,
+        "selectionScore": 45.8028
+      },
+      "endgame": {
+        "metric": "mk100-after11-proxy-v1",
+        "removedWords": 11,
+        "remainingWords": 3,
+        "prefixMaxDepth": 4,
+        "plausible": [
+          {
+            "label": "geometry-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "POLOMĚR",
+              "ODHAD",
+              "PŘÍBOJ",
+              "STĚŽEŇ",
+              "TANČIT",
+              "LOUTKÁŘ",
+              "POPTÁVKA",
+              "PŘEHÁŇKA",
+              "STŘEDNÍK",
+              "POTÁPKA",
+              "VERANDA",
+              "PRŮVODCE",
+              "PROROCTVÍ",
+              "STAŘENKA"
+            ],
+            "remainingIndices": [
+              1,
+              9,
+              11
+            ],
+            "remainingWords": [
+              "PRŮVODCE",
+              "PROROCTVÍ",
+              "STAŘENKA"
+            ],
+            "crossWordContacts": 2,
+            "nonconsecutiveSelfContacts": 10,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              17,
+              8
+            ],
+            "branchCells": 16,
+            "degreeAtMost2Share": 0.36,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 51,
+                "3": 43,
+                "4": 24
+              },
+              "falseStartCells": 23,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 127,
+              "localAmbiguityScore": 27.833
+            }
+          },
+          {
+            "label": "familiarity-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "TANČIT",
+              "PŘEHÁŇKA",
+              "VERANDA",
+              "PRŮVODCE",
+              "POLOMĚR",
+              "PŘÍBOJ",
+              "STĚŽEŇ",
+              "LOUTKÁŘ",
+              "STŘEDNÍK",
+              "POTÁPKA",
+              "ODHAD",
+              "PROROCTVÍ",
+              "POPTÁVKA",
+              "STAŘENKA"
+            ],
+            "remainingIndices": [
+              9,
+              0,
+              11
+            ],
+            "remainingWords": [
+              "PROROCTVÍ",
+              "POPTÁVKA",
+              "STAŘENKA"
+            ],
+            "crossWordContacts": 6,
+            "nonconsecutiveSelfContacts": 8,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              25
+            ],
+            "branchCells": 18,
+            "degreeAtMost2Share": 0.28,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 58,
+                "3": 64,
+                "4": 40
+              },
+              "falseStartCells": 24,
+              "targetAlternativeBranches": 3,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 171,
+              "localAmbiguityScore": 43.0
+            }
+          },
+          {
+            "label": "mixed-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "TANČIT",
+              "PŘEHÁŇKA",
+              "VERANDA",
+              "PRŮVODCE",
+              "POLOMĚR",
+              "PŘÍBOJ",
+              "STĚŽEŇ",
+              "LOUTKÁŘ",
+              "STŘEDNÍK",
+              "POTÁPKA",
+              "ODHAD",
+              "POPTÁVKA",
+              "PROROCTVÍ",
+              "STAŘENKA"
+            ],
+            "remainingIndices": [
+              0,
+              9,
+              11
+            ],
+            "remainingWords": [
+              "POPTÁVKA",
+              "PROROCTVÍ",
+              "STAŘENKA"
+            ],
+            "crossWordContacts": 6,
+            "nonconsecutiveSelfContacts": 8,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              25
+            ],
+            "branchCells": 18,
+            "degreeAtMost2Share": 0.28,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 58,
+                "3": 64,
+                "4": 40
+              },
+              "falseStartCells": 24,
+              "targetAlternativeBranches": 3,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 171,
+              "localAmbiguityScore": 43.0
+            }
+          }
+        ],
+        "sensitivity": [
+          {
+            "label": "sensitivity-1",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PŘEHÁŇKA",
+              "LOUTKÁŘ",
+              "POLOMĚR",
+              "POTÁPKA",
+              "PRŮVODCE",
+              "TANČIT",
+              "STAŘENKA",
+              "STŘEDNÍK",
+              "POPTÁVKA",
+              "PROROCTVÍ",
+              "PŘÍBOJ",
+              "ODHAD",
+              "STĚŽEŇ",
+              "VERANDA"
+            ],
+            "remainingIndices": [
+              4,
+              8,
+              6
+            ],
+            "remainingWords": [
+              "ODHAD",
+              "STĚŽEŇ",
+              "VERANDA"
+            ],
+            "crossWordContacts": 2,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              11,
+              7
+            ],
+            "branchCells": 8,
+            "degreeAtMost2Share": 0.5556,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 28,
+                "3": 26,
+                "4": 16
+              },
+              "falseStartCells": 15,
+              "targetAlternativeBranches": 4,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 79,
+              "localAmbiguityScore": 19.5
+            }
+          },
+          {
+            "label": "sensitivity-2",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PŘEHÁŇKA",
+              "PŘÍBOJ",
+              "POLOMĚR",
+              "VERANDA",
+              "STŘEDNÍK",
+              "PROROCTVÍ",
+              "TANČIT",
+              "ODHAD",
+              "LOUTKÁŘ",
+              "POTÁPKA",
+              "POPTÁVKA",
+              "STĚŽEŇ",
+              "STAŘENKA",
+              "PRŮVODCE"
+            ],
+            "remainingIndices": [
+              8,
+              11,
+              1
+            ],
+            "remainingWords": [
+              "STĚŽEŇ",
+              "STAŘENKA",
+              "PRŮVODCE"
+            ],
+            "crossWordContacts": 3,
+            "nonconsecutiveSelfContacts": 7,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              8
+            ],
+            "branchCells": 11,
+            "degreeAtMost2Share": 0.5,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 31,
+                "3": 21,
+                "4": 13
+              },
+              "falseStartCells": 18,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 74,
+              "localAmbiguityScore": 15.167
+            }
+          },
+          {
+            "label": "sensitivity-3",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "POTÁPKA",
+              "ODHAD",
+              "PRŮVODCE",
+              "PROROCTVÍ",
+              "STAŘENKA",
+              "VERANDA",
+              "PŘEHÁŇKA",
+              "POPTÁVKA",
+              "STŘEDNÍK",
+              "STĚŽEŇ",
+              "TANČIT",
+              "PŘÍBOJ",
+              "POLOMĚR",
+              "LOUTKÁŘ"
+            ],
+            "remainingIndices": [
+              12,
+              10,
+              13
+            ],
+            "remainingWords": [
+              "PŘÍBOJ",
+              "POLOMĚR",
+              "LOUTKÁŘ"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 1,
+            "isolatedChainWords": 2,
+            "isolatedChainWordList": [
+              "PŘÍBOJ",
+              "POLOMĚR"
+            ],
+            "residualComponents": 3,
+            "componentSizes": [
+              7,
+              7,
+              6
+            ],
+            "branchCells": 1,
+            "degreeAtMost2Share": 0.95,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 23,
+                "3": 14,
+                "4": 3
+              },
+              "falseStartCells": 13,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 49,
+              "localAmbiguityScore": 7.083
+            }
+          },
+          {
+            "label": "sensitivity-4",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PROROCTVÍ",
+              "ODHAD",
+              "PŘÍBOJ",
+              "POLOMĚR",
+              "PŘEHÁŇKA",
+              "POPTÁVKA",
+              "STŘEDNÍK",
+              "POTÁPKA",
+              "LOUTKÁŘ",
+              "TANČIT",
+              "PRŮVODCE",
+              "VERANDA",
+              "STAŘENKA",
+              "STĚŽEŇ"
+            ],
+            "remainingIndices": [
+              6,
+              11,
+              8
+            ],
+            "remainingWords": [
+              "VERANDA",
+              "STAŘENKA",
+              "STĚŽEŇ"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 6,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 3,
+            "componentSizes": [
+              8,
+              7,
+              6
+            ],
+            "branchCells": 8,
+            "degreeAtMost2Share": 0.619,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 31,
+                "3": 28,
+                "4": 21
+              },
+              "falseStartCells": 17,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 89,
+              "localAmbiguityScore": 20.917
+            }
+          },
+          {
+            "label": "sensitivity-5",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PRŮVODCE",
+              "PŘÍBOJ",
+              "ODHAD",
+              "POPTÁVKA",
+              "STĚŽEŇ",
+              "STŘEDNÍK",
+              "POTÁPKA",
+              "STAŘENKA",
+              "PŘEHÁŇKA",
+              "VERANDA",
+              "TANČIT",
+              "LOUTKÁŘ",
+              "POLOMĚR",
+              "PROROCTVÍ"
+            ],
+            "remainingIndices": [
+              13,
+              10,
+              9
+            ],
+            "remainingWords": [
+              "LOUTKÁŘ",
+              "POLOMĚR",
+              "PROROCTVÍ"
+            ],
+            "crossWordContacts": 3,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "POLOMĚR"
+            ],
+            "residualComponents": 2,
+            "componentSizes": [
+              16,
+              7
+            ],
+            "branchCells": 9,
+            "degreeAtMost2Share": 0.6087,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 44,
+                "3": 41,
+                "4": 28
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 122,
+              "localAmbiguityScore": 28.75
+            }
+          },
+          {
+            "label": "sensitivity-6",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "STŘEDNÍK",
+              "PROROCTVÍ",
+              "PŘÍBOJ",
+              "STĚŽEŇ",
+              "POTÁPKA",
+              "TANČIT",
+              "PŘEHÁŇKA",
+              "LOUTKÁŘ",
+              "PRŮVODCE",
+              "ODHAD",
+              "VERANDA",
+              "POLOMĚR",
+              "POPTÁVKA",
+              "STAŘENKA"
+            ],
+            "remainingIndices": [
+              10,
+              0,
+              11
+            ],
+            "remainingWords": [
+              "POLOMĚR",
+              "POPTÁVKA",
+              "STAŘENKA"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "POLOMĚR"
+            ],
+            "residualComponents": 2,
+            "componentSizes": [
+              16,
+              7
+            ],
+            "branchCells": 10,
+            "degreeAtMost2Share": 0.5652,
+            "pressure": {
+              "id": "mk100-v2-005",
+              "difficulty": "mozkomor",
+              "level": 5,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 42,
+                "3": 44,
+                "4": 27
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 122,
+              "localAmbiguityScore": 29.5
+            }
+          }
+        ],
+        "summary": {
+          "plausiblePressureMinimum": 27.833,
+          "plausiblePressureMedian": 43.0,
+          "distinctPlausibleTailCount": 2,
+          "distinctEvaluatedOrderTailCount": 8,
+          "sensitivityPressureP25": 16.25,
+          "sensitivityPressureMedian": 20.2085,
+          "plausibleIsolatedChainWordsMean": 0,
+          "plausibleAllThreeSimpleChains": 0,
+          "endgameSelectionScore": 31.5832
+        },
+        "missingEditorialBasis": [],
+        "interpretation": "Static after-eleven prefix/geometry proxy and simulated orders; no measured player difficulty, timing or enjoyment."
+      },
+      "selectionScore": 146.7924,
+      "provenance": {
+        "geometryPoolIndex": 95,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42582,
+        "transform": 0,
+        "attempt": 1517,
+        "placementSeed": 12927957888532108774
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 58,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3309,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-006",
+      "ordinal": 6,
+      "verifiedPool": 48,
+      "poolAttempts": 2698,
+      "poolRejections": {
+        "geometry-path_straight_share": 338,
+        "solver-unique-nonunique-target": 1960,
+        "solver-multiple-nonunique-target": 347,
+        "solver-multiple": 5
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 39,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 2902,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.5,
+        "meanTurns": 4.357142857142857,
+        "meanStraightShare": 0.28273809523809523,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 12,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-challenge",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 4.3,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 2,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.6
+      },
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 3,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          5,
+          6,
+          4,
+          2,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "pressure": {
+        "initial": 46.339,
+        "after3Median": 39.364,
+        "halfMedian": 30.143,
+        "after3Worst": 33.818,
+        "halfWorst": 23.429,
+        "orders": 7,
+        "selectionScore": 37.7681
+      },
+      "endgame": {
+        "metric": "mk100-after11-proxy-v1",
+        "removedWords": 11,
+        "remainingWords": 3,
+        "prefixMaxDepth": 4,
+        "plausible": [
+          {
+            "label": "geometry-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "BALET",
+              "TURBÍNA",
+              "NÁVRŠÍ",
+              "PLÁTEK",
+              "DOSLOV",
+              "KOČÁREK",
+              "VIADUKT",
+              "ZLODĚJKA",
+              "PANIČKA",
+              "ROZBŘESK",
+              "KRUŽNICE",
+              "MOTOCYKL",
+              "REVOLUCE",
+              "KOPRETINA"
+            ],
+            "remainingIndices": [
+              1,
+              6,
+              8
+            ],
+            "remainingWords": [
+              "MOTOCYKL",
+              "REVOLUCE",
+              "KOPRETINA"
+            ],
+            "crossWordContacts": 2,
+            "nonconsecutiveSelfContacts": 7,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              17,
+              8
+            ],
+            "branchCells": 13,
+            "degreeAtMost2Share": 0.48,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 55,
+                "3": 64,
+                "4": 40
+              },
+              "falseStartCells": 23,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 168,
+              "localAmbiguityScore": 41.917
+            }
+          },
+          {
+            "label": "familiarity-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "KOČÁREK",
+              "KOPRETINA",
+              "NÁVRŠÍ",
+              "PLÁTEK",
+              "DOSLOV",
+              "VIADUKT",
+              "ROZBŘESK",
+              "KRUŽNICE",
+              "BALET",
+              "REVOLUCE",
+              "TURBÍNA",
+              "ZLODĚJKA",
+              "PANIČKA",
+              "MOTOCYKL"
+            ],
+            "remainingIndices": [
+              9,
+              5,
+              1
+            ],
+            "remainingWords": [
+              "ZLODĚJKA",
+              "PANIČKA",
+              "MOTOCYKL"
+            ],
+            "crossWordContacts": 10,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              23
+            ],
+            "branchCells": 13,
+            "degreeAtMost2Share": 0.4348,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 43,
+                "3": 49,
+                "4": 34
+              },
+              "falseStartCells": 22,
+              "targetAlternativeBranches": 5,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 135,
+              "localAmbiguityScore": 36.167
+            }
+          },
+          {
+            "label": "mixed-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "KOČÁREK",
+              "NÁVRŠÍ",
+              "PLÁTEK",
+              "KOPRETINA",
+              "DOSLOV",
+              "VIADUKT",
+              "ROZBŘESK",
+              "BALET",
+              "TURBÍNA",
+              "KRUŽNICE",
+              "ZLODĚJKA",
+              "PANIČKA",
+              "MOTOCYKL",
+              "REVOLUCE"
+            ],
+            "remainingIndices": [
+              5,
+              1,
+              6
+            ],
+            "remainingWords": [
+              "PANIČKA",
+              "MOTOCYKL",
+              "REVOLUCE"
+            ],
+            "crossWordContacts": 5,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              15,
+              8
+            ],
+            "branchCells": 11,
+            "degreeAtMost2Share": 0.5217,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 47,
+                "3": 55,
+                "4": 36
+              },
+              "falseStartCells": 23,
+              "targetAlternativeBranches": 3,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 147,
+              "localAmbiguityScore": 37.667
+            }
+          }
+        ],
+        "sensitivity": [
+          {
+            "label": "sensitivity-1",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "TURBÍNA",
+              "NÁVRŠÍ",
+              "KOPRETINA",
+              "BALET",
+              "ROZBŘESK",
+              "REVOLUCE",
+              "ZLODĚJKA",
+              "MOTOCYKL",
+              "PLÁTEK",
+              "KOČÁREK",
+              "DOSLOV",
+              "VIADUKT",
+              "KRUŽNICE",
+              "PANIČKA"
+            ],
+            "remainingIndices": [
+              12,
+              3,
+              5
+            ],
+            "remainingWords": [
+              "VIADUKT",
+              "KRUŽNICE",
+              "PANIČKA"
+            ],
+            "crossWordContacts": 2,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              15,
+              7
+            ],
+            "branchCells": 9,
+            "degreeAtMost2Share": 0.5909,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 39,
+                "3": 33,
+                "4": 17
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 98,
+              "localAmbiguityScore": 20.0
+            }
+          },
+          {
+            "label": "sensitivity-2",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "REVOLUCE",
+              "NÁVRŠÍ",
+              "TURBÍNA",
+              "KRUŽNICE",
+              "PLÁTEK",
+              "DOSLOV",
+              "ROZBŘESK",
+              "VIADUKT",
+              "PANIČKA",
+              "ZLODĚJKA",
+              "BALET",
+              "KOPRETINA",
+              "KOČÁREK",
+              "MOTOCYKL"
+            ],
+            "remainingIndices": [
+              8,
+              0,
+              1
+            ],
+            "remainingWords": [
+              "KOPRETINA",
+              "KOČÁREK",
+              "MOTOCYKL"
+            ],
+            "crossWordContacts": 2,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              16,
+              8
+            ],
+            "branchCells": 9,
+            "degreeAtMost2Share": 0.625,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 47,
+                "3": 50,
+                "4": 22
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 128,
+              "localAmbiguityScore": 28.25
+            }
+          },
+          {
+            "label": "sensitivity-3",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "DOSLOV",
+              "KOPRETINA",
+              "ROZBŘESK",
+              "BALET",
+              "PLÁTEK",
+              "VIADUKT",
+              "PANIČKA",
+              "TURBÍNA",
+              "MOTOCYKL",
+              "NÁVRŠÍ",
+              "REVOLUCE",
+              "KRUŽNICE",
+              "KOČÁREK",
+              "ZLODĚJKA"
+            ],
+            "remainingIndices": [
+              3,
+              0,
+              9
+            ],
+            "remainingWords": [
+              "KRUŽNICE",
+              "KOČÁREK",
+              "ZLODĚJKA"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 3,
+            "componentSizes": [
+              8,
+              8,
+              7
+            ],
+            "branchCells": 7,
+            "degreeAtMost2Share": 0.6957,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 35,
+                "3": 26,
+                "4": 9
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 79,
+              "localAmbiguityScore": 14.083
+            }
+          },
+          {
+            "label": "sensitivity-4",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "KOČÁREK",
+              "PANIČKA",
+              "KOPRETINA",
+              "VIADUKT",
+              "KRUŽNICE",
+              "NÁVRŠÍ",
+              "MOTOCYKL",
+              "ROZBŘESK",
+              "DOSLOV",
+              "BALET",
+              "PLÁTEK",
+              "ZLODĚJKA",
+              "REVOLUCE",
+              "TURBÍNA"
+            ],
+            "remainingIndices": [
+              9,
+              6,
+              13
+            ],
+            "remainingWords": [
+              "ZLODĚJKA",
+              "REVOLUCE",
+              "TURBÍNA"
+            ],
+            "crossWordContacts": 1,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              15,
+              8
+            ],
+            "branchCells": 6,
+            "degreeAtMost2Share": 0.7391,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 38,
+                "3": 37,
+                "4": 22
+              },
+              "falseStartCells": 20,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 106,
+              "localAmbiguityScore": 24.75
+            }
+          },
+          {
+            "label": "sensitivity-5",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "KOČÁREK",
+              "DOSLOV",
+              "PANIČKA",
+              "MOTOCYKL",
+              "BALET",
+              "ZLODĚJKA",
+              "KRUŽNICE",
+              "VIADUKT",
+              "ROZBŘESK",
+              "PLÁTEK",
+              "TURBÍNA",
+              "REVOLUCE",
+              "KOPRETINA",
+              "NÁVRŠÍ"
+            ],
+            "remainingIndices": [
+              6,
+              8,
+              10
+            ],
+            "remainingWords": [
+              "REVOLUCE",
+              "KOPRETINA",
+              "NÁVRŠÍ"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 7,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              23
+            ],
+            "branchCells": 17,
+            "degreeAtMost2Share": 0.2609,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 51,
+                "3": 60,
+                "4": 38
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 158,
+              "localAmbiguityScore": 39.583
+            }
+          },
+          {
+            "label": "sensitivity-6",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PANIČKA",
+              "DOSLOV",
+              "ROZBŘESK",
+              "MOTOCYKL",
+              "ZLODĚJKA",
+              "REVOLUCE",
+              "TURBÍNA",
+              "PLÁTEK",
+              "VIADUKT",
+              "BALET",
+              "KOPRETINA",
+              "NÁVRŠÍ",
+              "KOČÁREK",
+              "KRUŽNICE"
+            ],
+            "remainingIndices": [
+              10,
+              0,
+              3
+            ],
+            "remainingWords": [
+              "NÁVRŠÍ",
+              "KOČÁREK",
+              "KRUŽNICE"
+            ],
+            "crossWordContacts": 3,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              7
+            ],
+            "branchCells": 10,
+            "degreeAtMost2Share": 0.5238,
+            "pressure": {
+              "id": "mk100-v2-006",
+              "difficulty": "mozkomor",
+              "level": 6,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 34,
+                "3": 24,
+                "4": 8
+              },
+              "falseStartCells": 17,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 75,
+              "localAmbiguityScore": 13.0
+            }
+          }
+        ],
+        "summary": {
+          "plausiblePressureMinimum": 36.167,
+          "plausiblePressureMedian": 37.667,
+          "distinctPlausibleTailCount": 3,
+          "distinctEvaluatedOrderTailCount": 9,
+          "sensitivityPressureP25": 15.562,
+          "sensitivityPressureMedian": 22.375,
+          "plausibleIsolatedChainWordsMean": 0,
+          "plausibleAllThreeSimpleChains": 0,
+          "endgameSelectionScore": 32.6461
+        },
+        "missingEditorialBasis": [],
+        "interpretation": "Static after-eleven prefix/geometry proxy and simulated orders; no measured player difficulty, timing or enjoyment."
+      },
+      "selectionScore": 146.1464,
+      "provenance": {
+        "geometryPoolIndex": 183,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1066918,
+        "transform": 7,
+        "attempt": 578,
+        "placementSeed": 16010348553984197691
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 39,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 2902,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-007",
+      "ordinal": 7,
+      "verifiedPool": 16,
+      "poolAttempts": 413,
+      "poolRejections": {
+        "solver-unique-nonunique-target": 169,
+        "geometry-path_straight_share": 216,
+        "solver-multiple-nonunique-target": 12
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 60,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3277,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 1,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.6666666666666666,
+        "meanTurns": 3.7857142857142856,
+        "meanStraightShare": 0.3340136054421769,
+        "curvyShare": 0.9285714285714286,
+        "maxCurlRun": 3,
+        "curlPathCount": 12,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-main",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.67
+      },
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 3.857142857142857,
+        "neighborsMinimum": 2,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          2,
+          2,
+          4,
+          5,
+          4,
+          4,
+          4,
+          5,
+          3,
+          3
+        ]
+      },
+      "pressure": {
+        "initial": 57.643,
+        "after3Median": 48.614,
+        "halfMedian": 33.036,
+        "after3Worst": 43.886,
+        "halfWorst": 16.286,
+        "orders": 7,
+        "selectionScore": 45.0915
+      },
+      "endgame": null,
+      "selectionScore": 52.0515,
+      "provenance": {
+        "geometryPoolIndex": 99,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42701,
+        "transform": 6,
+        "attempt": 82,
+        "placementSeed": 4012598439186755259
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 60,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3277,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-008",
+      "ordinal": 8,
+      "verifiedPool": 16,
+      "poolAttempts": 635,
+      "poolRejections": {
+        "solver-unique-nonunique-target": 405,
+        "solver-multiple-nonunique-target": 32,
+        "geometry-straight_share": 40,
+        "geometry-path_straight_share": 70,
+        "geometry-path_straight_share,straight_share": 30,
+        "geometry-path_straight_share,straight_share,curvy_share": 20,
+        "geometry-path_straight_share,curvy_share": 20,
+        "solver-multiple": 2
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 47,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3076,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.5714285714285714,
+        "meanTurns": 3.5714285714285716,
+        "meanStraightShare": 0.35612244897959183,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-relief",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.0,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.75
+      },
+      "weave": {
+        "crossContacts": 73,
+        "extraSelfContacts": 21,
+        "axisReentries": 3,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.142857142857143,
+        "neighborsMinimum": 2,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          3,
+          5,
+          5,
+          3,
+          3,
+          5,
+          3,
+          2,
+          2,
+          4
+        ]
+      },
+      "pressure": {
+        "initial": 50.054,
+        "after3Median": 39.273,
+        "halfMedian": 26.714,
+        "after3Worst": 37.227,
+        "halfWorst": 18.464,
+        "orders": 7,
+        "selectionScore": 37.4837
+      },
+      "endgame": null,
+      "selectionScore": -34.5637,
+      "provenance": {
+        "geometryPoolIndex": 26,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23994,
+        "transform": 2,
+        "attempt": 634,
+        "placementSeed": 11296474787466358065
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 47,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3076,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-009",
+      "ordinal": 9,
+      "verifiedPool": 48,
+      "poolAttempts": 12487,
+      "poolRejections": {
+        "geometry-path_straight_share": 6632,
+        "solver-multiple-nonunique-target": 4404,
+        "solver-unique-nonunique-target": 1379,
+        "solver-multiple": 24
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 63,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3629,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 1,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.6666666666666666,
+        "meanTurns": 3.7142857142857144,
+        "meanStraightShare": 0.35272108843537414,
+        "curvyShare": 0.9285714285714286,
+        "maxCurlRun": 3,
+        "curlPathCount": 13,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-main",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.67
+      },
+      "weave": {
+        "crossContacts": 72,
+        "extraSelfContacts": 22,
+        "axisReentries": 3,
+        "interdigitatingWords": 3,
+        "neighborsMean": 3.857142857142857,
+        "neighborsMinimum": 2,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          2,
+          3,
+          4,
+          3,
+          4,
+          5,
+          3,
+          5,
+          2,
+          3
+        ]
+      },
+      "pressure": {
+        "initial": 64.946,
+        "after3Median": 61.932,
+        "halfMedian": 42.786,
+        "after3Worst": 51.136,
+        "halfWorst": 24.643,
+        "orders": 7,
+        "selectionScore": 55.1778
+      },
+      "endgame": {
+        "metric": "mk100-after11-proxy-v1",
+        "removedWords": 11,
+        "remainingWords": 3,
+        "prefixMaxDepth": 4,
+        "plausible": [
+          {
+            "label": "geometry-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "TĚŽIŠTĚ",
+              "CHŘEST",
+              "SKICA",
+              "NOVELA",
+              "KALENDÁŘ",
+              "NÁTĚLNÍK",
+              "BRUSKA",
+              "ANGREŠT",
+              "POUTNÍK",
+              "PRASKAT",
+              "ELEKTRON",
+              "LETOKRUH",
+              "ŠLAPADLO",
+              "POPELNICE"
+            ],
+            "remainingIndices": [
+              0,
+              7,
+              9
+            ],
+            "remainingWords": [
+              "LETOKRUH",
+              "ŠLAPADLO",
+              "POPELNICE"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 8,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 3,
+            "componentSizes": [
+              9,
+              8,
+              8
+            ],
+            "branchCells": 10,
+            "degreeAtMost2Share": 0.6,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 53,
+                "3": 56,
+                "4": 32
+              },
+              "falseStartCells": 24,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 150,
+              "localAmbiguityScore": 35.75
+            }
+          },
+          {
+            "label": "familiarity-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "NÁTĚLNÍK",
+              "PRASKAT",
+              "ŠLAPADLO",
+              "POPELNICE",
+              "TĚŽIŠTĚ",
+              "SKICA",
+              "BRUSKA",
+              "ANGREŠT",
+              "POUTNÍK",
+              "LETOKRUH",
+              "KALENDÁŘ",
+              "CHŘEST",
+              "NOVELA",
+              "ELEKTRON"
+            ],
+            "remainingIndices": [
+              11,
+              3,
+              2
+            ],
+            "remainingWords": [
+              "CHŘEST",
+              "NOVELA",
+              "ELEKTRON"
+            ],
+            "crossWordContacts": 9,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              20
+            ],
+            "branchCells": 15,
+            "degreeAtMost2Share": 0.25,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 50,
+                "3": 74,
+                "4": 55
+              },
+              "falseStartCells": 20,
+              "targetAlternativeBranches": 5,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 188,
+              "localAmbiguityScore": 53.5
+            }
+          },
+          {
+            "label": "mixed-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "NÁTĚLNÍK",
+              "PRASKAT",
+              "TĚŽIŠTĚ",
+              "ŠLAPADLO",
+              "POPELNICE",
+              "SKICA",
+              "BRUSKA",
+              "ANGREŠT",
+              "POUTNÍK",
+              "LETOKRUH",
+              "CHŘEST",
+              "NOVELA",
+              "KALENDÁŘ",
+              "ELEKTRON"
+            ],
+            "remainingIndices": [
+              3,
+              1,
+              2
+            ],
+            "remainingWords": [
+              "NOVELA",
+              "KALENDÁŘ",
+              "ELEKTRON"
+            ],
+            "crossWordContacts": 3,
+            "nonconsecutiveSelfContacts": 6,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              8
+            ],
+            "branchCells": 10,
+            "degreeAtMost2Share": 0.5455,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 43,
+                "3": 57,
+                "4": 34
+              },
+              "falseStartCells": 20,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 143,
+              "localAmbiguityScore": 36.167
+            }
+          }
+        ],
+        "sensitivity": [
+          {
+            "label": "sensitivity-1",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "BRUSKA",
+              "LETOKRUH",
+              "ŠLAPADLO",
+              "POPELNICE",
+              "SKICA",
+              "TĚŽIŠTĚ",
+              "NOVELA",
+              "ELEKTRON",
+              "NÁTĚLNÍK",
+              "CHŘEST",
+              "PRASKAT",
+              "POUTNÍK",
+              "KALENDÁŘ",
+              "ANGREŠT"
+            ],
+            "remainingIndices": [
+              12,
+              1,
+              10
+            ],
+            "remainingWords": [
+              "POUTNÍK",
+              "KALENDÁŘ",
+              "ANGREŠT"
+            ],
+            "crossWordContacts": 3,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              22
+            ],
+            "branchCells": 9,
+            "degreeAtMost2Share": 0.5909,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 33,
+                "3": 37,
+                "4": 14
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 4,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 93,
+              "localAmbiguityScore": 21.667
+            }
+          },
+          {
+            "label": "sensitivity-2",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "ANGREŠT",
+              "NOVELA",
+              "ELEKTRON",
+              "POUTNÍK",
+              "NÁTĚLNÍK",
+              "POPELNICE",
+              "KALENDÁŘ",
+              "BRUSKA",
+              "ŠLAPADLO",
+              "LETOKRUH",
+              "SKICA",
+              "CHŘEST",
+              "PRASKAT",
+              "TĚŽIŠTĚ"
+            ],
+            "remainingIndices": [
+              11,
+              5,
+              4
+            ],
+            "remainingWords": [
+              "CHŘEST",
+              "PRASKAT",
+              "TĚŽIŠTĚ"
+            ],
+            "crossWordContacts": 1,
+            "nonconsecutiveSelfContacts": 2,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "CHŘEST"
+            ],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              6
+            ],
+            "branchCells": 4,
+            "degreeAtMost2Share": 0.8,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 24,
+                "3": 20,
+                "4": 6
+              },
+              "falseStartCells": 15,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 59,
+              "localAmbiguityScore": 10.0
+            }
+          },
+          {
+            "label": "sensitivity-3",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "KALENDÁŘ",
+              "POPELNICE",
+              "ANGREŠT",
+              "NÁTĚLNÍK",
+              "POUTNÍK",
+              "CHŘEST",
+              "PRASKAT",
+              "ELEKTRON",
+              "LETOKRUH",
+              "ŠLAPADLO",
+              "BRUSKA",
+              "NOVELA",
+              "SKICA",
+              "TĚŽIŠTĚ"
+            ],
+            "remainingIndices": [
+              3,
+              6,
+              4
+            ],
+            "remainingWords": [
+              "NOVELA",
+              "SKICA",
+              "TĚŽIŠTĚ"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 2,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "TĚŽIŠTĚ"
+            ],
+            "residualComponents": 3,
+            "componentSizes": [
+              7,
+              6,
+              5
+            ],
+            "branchCells": 2,
+            "degreeAtMost2Share": 0.8889,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 24,
+                "3": 20,
+                "4": 5
+              },
+              "falseStartCells": 14,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 58,
+              "localAmbiguityScore": 10.833
+            }
+          },
+          {
+            "label": "sensitivity-4",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "ELEKTRON",
+              "NÁTĚLNÍK",
+              "NOVELA",
+              "LETOKRUH",
+              "POUTNÍK",
+              "KALENDÁŘ",
+              "ANGREŠT",
+              "CHŘEST",
+              "POPELNICE",
+              "PRASKAT",
+              "SKICA",
+              "ŠLAPADLO",
+              "TĚŽIŠTĚ",
+              "BRUSKA"
+            ],
+            "remainingIndices": [
+              7,
+              4,
+              8
+            ],
+            "remainingWords": [
+              "ŠLAPADLO",
+              "TĚŽIŠTĚ",
+              "BRUSKA"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "TĚŽIŠTĚ"
+            ],
+            "residualComponents": 3,
+            "componentSizes": [
+              8,
+              7,
+              6
+            ],
+            "branchCells": 6,
+            "degreeAtMost2Share": 0.7143,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 30,
+                "3": 32,
+                "4": 14
+              },
+              "falseStartCells": 16,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 85,
+              "localAmbiguityScore": 18.167
+            }
+          },
+          {
+            "label": "sensitivity-5",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PRASKAT",
+              "SKICA",
+              "LETOKRUH",
+              "ELEKTRON",
+              "CHŘEST",
+              "TĚŽIŠTĚ",
+              "ANGREŠT",
+              "ŠLAPADLO",
+              "KALENDÁŘ",
+              "POUTNÍK",
+              "BRUSKA",
+              "NÁTĚLNÍK",
+              "NOVELA",
+              "POPELNICE"
+            ],
+            "remainingIndices": [
+              13,
+              3,
+              9
+            ],
+            "remainingWords": [
+              "NÁTĚLNÍK",
+              "NOVELA",
+              "POPELNICE"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              9
+            ],
+            "branchCells": 11,
+            "degreeAtMost2Share": 0.5217,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 40,
+                "3": 41,
+                "4": 28
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 118,
+              "localAmbiguityScore": 28.417
+            }
+          },
+          {
+            "label": "sensitivity-6",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "ELEKTRON",
+              "ŠLAPADLO",
+              "BRUSKA",
+              "POUTNÍK",
+              "POPELNICE",
+              "PRASKAT",
+              "ANGREŠT",
+              "KALENDÁŘ",
+              "NÁTĚLNÍK",
+              "LETOKRUH",
+              "TĚŽIŠTĚ",
+              "SKICA",
+              "CHŘEST",
+              "NOVELA"
+            ],
+            "remainingIndices": [
+              6,
+              11,
+              3
+            ],
+            "remainingWords": [
+              "SKICA",
+              "CHŘEST",
+              "NOVELA"
+            ],
+            "crossWordContacts": 1,
+            "nonconsecutiveSelfContacts": 2,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              12,
+              5
+            ],
+            "branchCells": 2,
+            "degreeAtMost2Share": 0.8824,
+            "pressure": {
+              "id": "mk100-v2-009",
+              "difficulty": "mozkomor",
+              "level": 9,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 28,
+                "3": 25,
+                "4": 8
+              },
+              "falseStartCells": 16,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 70,
+              "localAmbiguityScore": 13.917
+            }
+          }
+        ],
+        "summary": {
+          "plausiblePressureMinimum": 35.75,
+          "plausiblePressureMedian": 36.167,
+          "distinctPlausibleTailCount": 3,
+          "distinctEvaluatedOrderTailCount": 9,
+          "sensitivityPressureP25": 11.604,
+          "sensitivityPressureMedian": 16.042,
+          "plausibleIsolatedChainWordsMean": 0,
+          "plausibleAllThreeSimpleChains": 0,
+          "endgameSelectionScore": 31.0876
+        },
+        "missingEditorialBasis": [],
+        "interpretation": "Static after-eleven prefix/geometry proxy and simulated orders; no measured player difficulty, timing or enjoyment."
+      },
+      "selectionScore": 154.8006,
+      "provenance": {
+        "geometryPoolIndex": 96,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42677,
+        "transform": 6,
+        "attempt": 10542,
+        "placementSeed": 3217185422959029917
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 63,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3629,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-010",
+      "ordinal": 10,
+      "verifiedPool": 16,
+      "poolAttempts": 1592,
+      "poolRejections": {
+        "solver-unique-nonunique-target": 444,
+        "geometry-path_straight_share": 847,
+        "solver-multiple-nonunique-target": 285
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 83,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 4677,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.6666666666666666,
+        "meanTurns": 3.7857142857142856,
+        "meanStraightShare": 0.36607142857142855,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-main",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 3.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 1,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.67
+      },
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.142857142857143,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          5,
+          4,
+          5,
+          3,
+          3,
+          3,
+          3,
+          2,
+          4,
+          5
+        ]
+      },
+      "pressure": {
+        "initial": 86.286,
+        "after3Median": 58.432,
+        "halfMedian": 43.179,
+        "after3Worst": 47.045,
+        "halfWorst": 32.964,
+        "orders": 7,
+        "selectionScore": 60.687
+      },
+      "endgame": null,
+      "selectionScore": 67.647,
+      "provenance": {
+        "geometryPoolIndex": 107,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42923,
+        "transform": 1,
+        "attempt": 1591,
+        "placementSeed": 8885825954817883339
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 83,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 4677,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-011",
+      "ordinal": 11,
+      "verifiedPool": 135,
+      "poolAttempts": 5021,
+      "poolRejections": {
+        "geometry-path_straight_share": 630,
+        "solver-unique-nonunique-target": 3121,
+        "solver-multiple-nonunique-target": 1135
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 49,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3090,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.5714285714285714,
+        "meanTurns": 4.357142857142857,
+        "meanStraightShare": 0.28061224489795916,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 12,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-challenge",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 4.3,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 2,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.6
+      },
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 3,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.0,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          5,
+          4,
+          3,
+          4,
+          4,
+          5,
+          5,
+          2,
+          4
+        ]
+      },
+      "pressure": {
+        "initial": 49.679,
+        "after3Median": 41.75,
+        "halfMedian": 34.25,
+        "after3Worst": 29.841,
+        "halfWorst": 18.536,
+        "orders": 7,
+        "selectionScore": 41.1287
+      },
+      "endgame": {
+        "metric": "mk100-after11-proxy-v1",
+        "removedWords": 11,
+        "remainingWords": 3,
+        "prefixMaxDepth": 4,
+        "plausible": [
+          {
+            "label": "geometry-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "ORNICE",
+              "ZBROJ",
+              "TROFEJ",
+              "NÁHORNÍ",
+              "PODBĚRÁK",
+              "ZÁVADA",
+              "BARVIVO",
+              "LYŽOVAT",
+              "SKŘÍTEK",
+              "PLOŠTICE",
+              "VLÁDKYNĚ",
+              "BAKTERIE",
+              "NOVOLUNÍ",
+              "GEOMETRIE"
+            ],
+            "remainingIndices": [
+              3,
+              8,
+              4
+            ],
+            "remainingWords": [
+              "BAKTERIE",
+              "NOVOLUNÍ",
+              "GEOMETRIE"
+            ],
+            "crossWordContacts": 1,
+            "nonconsecutiveSelfContacts": 7,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              17,
+              8
+            ],
+            "branchCells": 11,
+            "degreeAtMost2Share": 0.56,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 52,
+                "3": 47,
+                "4": 25
+              },
+              "falseStartCells": 23,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 133,
+              "localAmbiguityScore": 29.25
+            }
+          },
+          {
+            "label": "familiarity-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "BARVIVO",
+              "LYŽOVAT",
+              "NÁHORNÍ",
+              "SKŘÍTEK",
+              "ORNICE",
+              "PODBĚRÁK",
+              "PLOŠTICE",
+              "NOVOLUNÍ",
+              "TROFEJ",
+              "BAKTERIE",
+              "ZBROJ",
+              "ZÁVADA",
+              "GEOMETRIE",
+              "VLÁDKYNĚ"
+            ],
+            "remainingIndices": [
+              10,
+              4,
+              6
+            ],
+            "remainingWords": [
+              "ZÁVADA",
+              "GEOMETRIE",
+              "VLÁDKYNĚ"
+            ],
+            "crossWordContacts": 11,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              23
+            ],
+            "branchCells": 16,
+            "degreeAtMost2Share": 0.3043,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 47,
+                "3": 56,
+                "4": 19
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 131,
+              "localAmbiguityScore": 28.083
+            }
+          },
+          {
+            "label": "mixed-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "BARVIVO",
+              "LYŽOVAT",
+              "ORNICE",
+              "NÁHORNÍ",
+              "PODBĚRÁK",
+              "SKŘÍTEK",
+              "PLOŠTICE",
+              "NOVOLUNÍ",
+              "ZBROJ",
+              "TROFEJ",
+              "ZÁVADA",
+              "VLÁDKYNĚ",
+              "BAKTERIE",
+              "GEOMETRIE"
+            ],
+            "remainingIndices": [
+              6,
+              3,
+              4
+            ],
+            "remainingWords": [
+              "VLÁDKYNĚ",
+              "BAKTERIE",
+              "GEOMETRIE"
+            ],
+            "crossWordContacts": 6,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              17,
+              8
+            ],
+            "branchCells": 15,
+            "degreeAtMost2Share": 0.4,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 51,
+                "3": 52,
+                "4": 22
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 134,
+              "localAmbiguityScore": 28.917
+            }
+          }
+        ],
+        "sensitivity": [
+          {
+            "label": "sensitivity-1",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "ZÁVADA",
+              "BAKTERIE",
+              "SKŘÍTEK",
+              "TROFEJ",
+              "BARVIVO",
+              "LYŽOVAT",
+              "VLÁDKYNĚ",
+              "NÁHORNÍ",
+              "ORNICE",
+              "GEOMETRIE",
+              "PLOŠTICE",
+              "NOVOLUNÍ",
+              "ZBROJ",
+              "PODBĚRÁK"
+            ],
+            "remainingIndices": [
+              8,
+              5,
+              13
+            ],
+            "remainingWords": [
+              "NOVOLUNÍ",
+              "ZBROJ",
+              "PODBĚRÁK"
+            ],
+            "crossWordContacts": 2,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              16,
+              5
+            ],
+            "branchCells": 6,
+            "degreeAtMost2Share": 0.7143,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 34,
+                "3": 32,
+                "4": 22
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 97,
+              "localAmbiguityScore": 23.167
+            }
+          },
+          {
+            "label": "sensitivity-2",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "NÁHORNÍ",
+              "ZBROJ",
+              "ZÁVADA",
+              "VLÁDKYNĚ",
+              "BARVIVO",
+              "NOVOLUNÍ",
+              "PLOŠTICE",
+              "ORNICE",
+              "GEOMETRIE",
+              "SKŘÍTEK",
+              "LYŽOVAT",
+              "PODBĚRÁK",
+              "BAKTERIE",
+              "TROFEJ"
+            ],
+            "remainingIndices": [
+              13,
+              3,
+              2
+            ],
+            "remainingWords": [
+              "PODBĚRÁK",
+              "BAKTERIE",
+              "TROFEJ"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              8
+            ],
+            "branchCells": 10,
+            "degreeAtMost2Share": 0.5455,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 39,
+                "3": 31,
+                "4": 14
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 93,
+              "localAmbiguityScore": 18.667
+            }
+          },
+          {
+            "label": "sensitivity-3",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "NÁHORNÍ",
+              "VLÁDKYNĚ",
+              "SKŘÍTEK",
+              "BARVIVO",
+              "ZÁVADA",
+              "PLOŠTICE",
+              "BAKTERIE",
+              "TROFEJ",
+              "ZBROJ",
+              "GEOMETRIE",
+              "ORNICE",
+              "PODBĚRÁK",
+              "NOVOLUNÍ",
+              "LYŽOVAT"
+            ],
+            "remainingIndices": [
+              13,
+              8,
+              9
+            ],
+            "remainingWords": [
+              "PODBĚRÁK",
+              "NOVOLUNÍ",
+              "LYŽOVAT"
+            ],
+            "crossWordContacts": 7,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              23
+            ],
+            "branchCells": 11,
+            "degreeAtMost2Share": 0.5217,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 45,
+                "3": 70,
+                "4": 57
+              },
+              "falseStartCells": 20,
+              "targetAlternativeBranches": 3,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 181,
+              "localAmbiguityScore": 51.75
+            }
+          },
+          {
+            "label": "sensitivity-4",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PLOŠTICE",
+              "BAKTERIE",
+              "SKŘÍTEK",
+              "PODBĚRÁK",
+              "ORNICE",
+              "LYŽOVAT",
+              "BARVIVO",
+              "NÁHORNÍ",
+              "ZBROJ",
+              "GEOMETRIE",
+              "VLÁDKYNĚ",
+              "TROFEJ",
+              "NOVOLUNÍ",
+              "ZÁVADA"
+            ],
+            "remainingIndices": [
+              2,
+              8,
+              10
+            ],
+            "remainingWords": [
+              "TROFEJ",
+              "NOVOLUNÍ",
+              "ZÁVADA"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "ZÁVADA"
+            ],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              6
+            ],
+            "branchCells": 7,
+            "degreeAtMost2Share": 0.65,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 40,
+                "3": 44,
+                "4": 24
+              },
+              "falseStartCells": 18,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 117,
+              "localAmbiguityScore": 27.0
+            }
+          },
+          {
+            "label": "sensitivity-5",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PLOŠTICE",
+              "LYŽOVAT",
+              "NÁHORNÍ",
+              "ORNICE",
+              "SKŘÍTEK",
+              "GEOMETRIE",
+              "VLÁDKYNĚ",
+              "TROFEJ",
+              "PODBĚRÁK",
+              "NOVOLUNÍ",
+              "ZBROJ",
+              "ZÁVADA",
+              "BARVIVO",
+              "BAKTERIE"
+            ],
+            "remainingIndices": [
+              10,
+              11,
+              3
+            ],
+            "remainingWords": [
+              "ZÁVADA",
+              "BARVIVO",
+              "BAKTERIE"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              14,
+              7
+            ],
+            "branchCells": 11,
+            "degreeAtMost2Share": 0.4762,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 46,
+                "3": 33,
+                "4": 14
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 102,
+              "localAmbiguityScore": 20.583
+            }
+          },
+          {
+            "label": "sensitivity-6",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "GEOMETRIE",
+              "NOVOLUNÍ",
+              "TROFEJ",
+              "LYŽOVAT",
+              "ORNICE",
+              "BAKTERIE",
+              "VLÁDKYNĚ",
+              "PODBĚRÁK",
+              "SKŘÍTEK",
+              "PLOŠTICE",
+              "NÁHORNÍ",
+              "ZBROJ",
+              "ZÁVADA",
+              "BARVIVO"
+            ],
+            "remainingIndices": [
+              5,
+              10,
+              11
+            ],
+            "remainingWords": [
+              "ZBROJ",
+              "ZÁVADA",
+              "BARVIVO"
+            ],
+            "crossWordContacts": 1,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "ZÁVADA"
+            ],
+            "residualComponents": 2,
+            "componentSizes": [
+              12,
+              6
+            ],
+            "branchCells": 5,
+            "degreeAtMost2Share": 0.7222,
+            "pressure": {
+              "id": "mk100-v2-011",
+              "difficulty": "mozkomor",
+              "level": 11,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 32,
+                "3": 22,
+                "4": 7
+              },
+              "falseStartCells": 17,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 70,
+              "localAmbiguityScore": 12.5
+            }
+          }
+        ],
+        "summary": {
+          "plausiblePressureMinimum": 28.083,
+          "plausiblePressureMedian": 28.917,
+          "distinctPlausibleTailCount": 3,
+          "distinctEvaluatedOrderTailCount": 9,
+          "sensitivityPressureP25": 19.146,
+          "sensitivityPressureMedian": 21.875,
+          "plausibleIsolatedChainWordsMean": 0,
+          "plausibleAllThreeSimpleChains": 0,
+          "endgameSelectionScore": 26.6292
+        },
+        "missingEditorialBasis": [],
+        "interpretation": "Static after-eleven prefix/geometry proxy and simulated orders; no measured player difficulty, timing or enjoyment."
+      },
+      "selectionScore": 131.4563,
+      "provenance": {
+        "geometryPoolIndex": 160,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1038004,
+        "transform": 4,
+        "attempt": 3597,
+        "placementSeed": 3197391204932985824
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 49,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3090,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "id": "mk100-v2-020",
+      "ordinal": 20,
+      "verifiedPool": 48,
+      "poolAttempts": 1901,
+      "poolRejections": {
+        "solver-multiple-nonunique-target": 534,
+        "solver-unique-nonunique-target": 1080,
+        "geometry-path_straight_share": 239
+      },
+      "proof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 73,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3237,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 2,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.5,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23273809523809524,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 13,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "geometryProfile": {
+        "rows": 10,
+        "cols": 10,
+        "cells": [
+          100,
+          100
+        ],
+        "words": [
+          14,
+          14
+        ],
+        "min_len": 5,
+        "max_len": 10,
+        "turn_bias": 1.55,
+        "min_bbox_rows": 10,
+        "min_bbox_cols": 10,
+        "min_curvy_share": 0.85,
+        "max_mean_straight_share": 0.4,
+        "geometry_profile": "mk100-morphology-v2-summit",
+        "policy": {
+          "allowed": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "weights": {
+            "A": 1,
+            "B": 4,
+            "C": 4,
+            "D": 1
+          },
+          "min_fraction": {
+            "B": 0.3,
+            "C": 0.3
+          },
+          "max_fraction": {
+            "A": 0.2,
+            "D": 0.1
+          }
+        },
+        "max_curl_paths": 14,
+        "max_curl_run": 4,
+        "min_mean_turns": 4.7,
+        "max_mean_turns": 6.0,
+        "max_blank_components": 0,
+        "max_isolated_blanks": 0,
+        "ambiguity": [
+          22,
+          55
+        ],
+        "max_four_words": 0,
+        "cooldown": 12,
+        "new_word_cap": 3,
+        "geometry_restarts": 20,
+        "path_node_limit": 4200,
+        "min_path_turns": 2,
+        "max_path_turns": 8,
+        "max_path_straight_share": 0.55
+      },
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.142857142857143,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 3,
+        "seamCrossers": [
+          5,
+          5,
+          3,
+          5,
+          5,
+          5,
+          3,
+          3,
+          4,
+          4
+        ]
+      },
+      "pressure": {
+        "initial": 52.482,
+        "after3Median": 47.636,
+        "halfMedian": 29.071,
+        "after3Worst": 33.568,
+        "halfWorst": 23.964,
+        "orders": 7,
+        "selectionScore": 41.6638
+      },
+      "endgame": {
+        "metric": "mk100-after11-proxy-v1",
+        "removedWords": 11,
+        "remainingWords": 3,
+        "prefixMaxDepth": 4,
+        "plausible": [
+          {
+            "label": "geometry-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "CÍSAŘ",
+              "MUTACE",
+              "OPTIKA",
+              "SVÍCEN",
+              "HODINKA",
+              "HOBLICE",
+              "KOMEDIE",
+              "SPLÉTAT",
+              "PONÍŽENÍ",
+              "ROZMARÝN",
+              "MIKROFON",
+              "MRHOLENÍ",
+              "ŽEBŘIŇÁK",
+              "NALEZIŠTĚ"
+            ],
+            "remainingIndices": [
+              12,
+              8,
+              10
+            ],
+            "remainingWords": [
+              "MRHOLENÍ",
+              "ŽEBŘIŇÁK",
+              "NALEZIŠTĚ"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              16,
+              9
+            ],
+            "branchCells": 13,
+            "degreeAtMost2Share": 0.48,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 40,
+                "3": 42,
+                "4": 23
+              },
+              "falseStartCells": 20,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 114,
+              "localAmbiguityScore": 26.0
+            }
+          },
+          {
+            "label": "familiarity-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "SVÍCEN",
+              "MRHOLENÍ",
+              "KOMEDIE",
+              "SPLÉTAT",
+              "ROZMARÝN",
+              "ŽEBŘIŇÁK",
+              "CÍSAŘ",
+              "PONÍŽENÍ",
+              "MIKROFON",
+              "MUTACE",
+              "OPTIKA",
+              "HODINKA",
+              "NALEZIŠTĚ",
+              "HOBLICE"
+            ],
+            "remainingIndices": [
+              5,
+              10,
+              1
+            ],
+            "remainingWords": [
+              "HODINKA",
+              "NALEZIŠTĚ",
+              "HOBLICE"
+            ],
+            "crossWordContacts": 11,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              23
+            ],
+            "branchCells": 16,
+            "degreeAtMost2Share": 0.3043,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 55,
+                "3": 58,
+                "4": 51
+              },
+              "falseStartCells": 21,
+              "targetAlternativeBranches": 3,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 173,
+              "localAmbiguityScore": 46.75
+            }
+          },
+          {
+            "label": "mixed-first",
+            "kind": "plausible-hypothesis",
+            "foundOrder": [
+              "SVÍCEN",
+              "MRHOLENÍ",
+              "KOMEDIE",
+              "SPLÉTAT",
+              "ROZMARÝN",
+              "CÍSAŘ",
+              "MUTACE",
+              "ŽEBŘIŇÁK",
+              "OPTIKA",
+              "HODINKA",
+              "HOBLICE",
+              "PONÍŽENÍ",
+              "MIKROFON",
+              "NALEZIŠTĚ"
+            ],
+            "remainingIndices": [
+              3,
+              0,
+              10
+            ],
+            "remainingWords": [
+              "PONÍŽENÍ",
+              "MIKROFON",
+              "NALEZIŠTĚ"
+            ],
+            "crossWordContacts": 5,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              25
+            ],
+            "branchCells": 15,
+            "degreeAtMost2Share": 0.4,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 49,
+                "3": 59,
+                "4": 41
+              },
+              "falseStartCells": 22,
+              "targetAlternativeBranches": 5,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 158,
+              "localAmbiguityScore": 42.667
+            }
+          }
+        ],
+        "sensitivity": [
+          {
+            "label": "sensitivity-1",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "SPLÉTAT",
+              "NALEZIŠTĚ",
+              "MIKROFON",
+              "KOMEDIE",
+              "PONÍŽENÍ",
+              "HOBLICE",
+              "MRHOLENÍ",
+              "MUTACE",
+              "ŽEBŘIŇÁK",
+              "ROZMARÝN",
+              "SVÍCEN",
+              "HODINKA",
+              "OPTIKA",
+              "CÍSAŘ"
+            ],
+            "remainingIndices": [
+              5,
+              7,
+              6
+            ],
+            "remainingWords": [
+              "HODINKA",
+              "OPTIKA",
+              "CÍSAŘ"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 2,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              12,
+              6
+            ],
+            "branchCells": 6,
+            "degreeAtMost2Share": 0.6667,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 32,
+                "3": 22,
+                "4": 7
+              },
+              "falseStartCells": 16,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 70,
+              "localAmbiguityScore": 13.0
+            }
+          },
+          {
+            "label": "sensitivity-2",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "ŽEBŘIŇÁK",
+              "ROZMARÝN",
+              "MRHOLENÍ",
+              "KOMEDIE",
+              "OPTIKA",
+              "CÍSAŘ",
+              "PONÍŽENÍ",
+              "HODINKA",
+              "MIKROFON",
+              "SPLÉTAT",
+              "NALEZIŠTĚ",
+              "MUTACE",
+              "HOBLICE",
+              "SVÍCEN"
+            ],
+            "remainingIndices": [
+              13,
+              1,
+              11
+            ],
+            "remainingWords": [
+              "MUTACE",
+              "HOBLICE",
+              "SVÍCEN"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 3,
+            "isolatedChainWords": 1,
+            "isolatedChainWordList": [
+              "MUTACE"
+            ],
+            "residualComponents": 3,
+            "componentSizes": [
+              7,
+              6,
+              6
+            ],
+            "branchCells": 5,
+            "degreeAtMost2Share": 0.7368,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 32,
+                "3": 24,
+                "4": 13
+              },
+              "falseStartCells": 16,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 78,
+              "localAmbiguityScore": 15.167
+            }
+          },
+          {
+            "label": "sensitivity-3",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "PONÍŽENÍ",
+              "CÍSAŘ",
+              "MUTACE",
+              "NALEZIŠTĚ",
+              "MIKROFON",
+              "HODINKA",
+              "HOBLICE",
+              "ROZMARÝN",
+              "ŽEBŘIŇÁK",
+              "MRHOLENÍ",
+              "OPTIKA",
+              "KOMEDIE",
+              "SVÍCEN",
+              "SPLÉTAT"
+            ],
+            "remainingIndices": [
+              2,
+              11,
+              9
+            ],
+            "remainingWords": [
+              "KOMEDIE",
+              "SVÍCEN",
+              "SPLÉTAT"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 5,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 3,
+            "componentSizes": [
+              7,
+              7,
+              6
+            ],
+            "branchCells": 8,
+            "degreeAtMost2Share": 0.6,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 35,
+                "3": 37,
+                "4": 21
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 1,
+              "matchingShortPaths": 102,
+              "localAmbiguityScore": 23.5
+            }
+          },
+          {
+            "label": "sensitivity-4",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "HODINKA",
+              "MUTACE",
+              "SVÍCEN",
+              "OPTIKA",
+              "CÍSAŘ",
+              "MIKROFON",
+              "NALEZIŠTĚ",
+              "ROZMARÝN",
+              "MRHOLENÍ",
+              "SPLÉTAT",
+              "HOBLICE",
+              "PONÍŽENÍ",
+              "ŽEBŘIŇÁK",
+              "KOMEDIE"
+            ],
+            "remainingIndices": [
+              3,
+              8,
+              2
+            ],
+            "remainingWords": [
+              "PONÍŽENÍ",
+              "ŽEBŘIŇÁK",
+              "KOMEDIE"
+            ],
+            "crossWordContacts": 3,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 2,
+            "componentSizes": [
+              15,
+              8
+            ],
+            "branchCells": 10,
+            "degreeAtMost2Share": 0.5652,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 38,
+                "3": 37,
+                "4": 20
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 0,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 104,
+              "localAmbiguityScore": 22.417
+            }
+          },
+          {
+            "label": "sensitivity-5",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "MIKROFON",
+              "MUTACE",
+              "MRHOLENÍ",
+              "HODINKA",
+              "ŽEBŘIŇÁK",
+              "HOBLICE",
+              "OPTIKA",
+              "SPLÉTAT",
+              "CÍSAŘ",
+              "ROZMARÝN",
+              "KOMEDIE",
+              "PONÍŽENÍ",
+              "SVÍCEN",
+              "NALEZIŠTĚ"
+            ],
+            "remainingIndices": [
+              3,
+              11,
+              10
+            ],
+            "remainingWords": [
+              "PONÍŽENÍ",
+              "SVÍCEN",
+              "NALEZIŠTĚ"
+            ],
+            "crossWordContacts": 0,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 3,
+            "componentSizes": [
+              9,
+              8,
+              6
+            ],
+            "branchCells": 7,
+            "degreeAtMost2Share": 0.6957,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 36,
+                "3": 36,
+                "4": 26
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 1,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 107,
+              "localAmbiguityScore": 25.667
+            }
+          },
+          {
+            "label": "sensitivity-6",
+            "kind": "uniform-sensitivity-order",
+            "foundOrder": [
+              "MIKROFON",
+              "SVÍCEN",
+              "SPLÉTAT",
+              "ROZMARÝN",
+              "HODINKA",
+              "NALEZIŠTĚ",
+              "MRHOLENÍ",
+              "PONÍŽENÍ",
+              "ŽEBŘIŇÁK",
+              "CÍSAŘ",
+              "HOBLICE",
+              "MUTACE",
+              "OPTIKA",
+              "KOMEDIE"
+            ],
+            "remainingIndices": [
+              13,
+              7,
+              2
+            ],
+            "remainingWords": [
+              "MUTACE",
+              "OPTIKA",
+              "KOMEDIE"
+            ],
+            "crossWordContacts": 4,
+            "nonconsecutiveSelfContacts": 4,
+            "isolatedChainWords": 0,
+            "isolatedChainWordList": [],
+            "residualComponents": 1,
+            "componentSizes": [
+              19
+            ],
+            "branchCells": 9,
+            "degreeAtMost2Share": 0.5263,
+            "pressure": {
+              "id": "mk100-v2-020",
+              "difficulty": "mozkomor",
+              "level": 20,
+              "profile": null,
+              "targetCount": 3,
+              "falsePrefixes": {
+                "2": 40,
+                "3": 40,
+                "4": 16
+              },
+              "falseStartCells": 19,
+              "targetAlternativeBranches": 2,
+              "startLetterCollisions": 0,
+              "matchingShortPaths": 105,
+              "localAmbiguityScore": 22.667
+            }
+          }
+        ],
+        "summary": {
+          "plausiblePressureMinimum": 26.0,
+          "plausiblePressureMedian": 42.667,
+          "distinctPlausibleTailCount": 3,
+          "distinctEvaluatedOrderTailCount": 9,
+          "sensitivityPressureP25": 16.98,
+          "sensitivityPressureMedian": 22.542,
+          "plausibleIsolatedChainWordsMean": 0,
+          "plausibleAllThreeSimpleChains": 0,
+          "endgameSelectionScore": 30.8627
+        },
+        "missingEditorialBasis": [],
+        "interpretation": "Static after-eleven prefix/geometry proxy and simulated orders; no measured player difficulty, timing or enjoyment."
+      },
+      "selectionScore": 144.9719,
+      "provenance": {
+        "geometryPoolIndex": 201,
+        "geometrySeed": 202610010203,
+        "geometryStep": 9486616,
+        "transform": 0,
+        "attempt": 895,
+        "placementSeed": 867439357113912718
+      },
+      "finalProof": {
+        "status": "unique",
+        "solutionsLowerBound": 1,
+        "targetPathsUnique": true,
+        "candidateCount": 73,
+        "searchNodes": 15,
+        "enumerationAndSearchNodes": 3237,
+        "forcedNodeShare": 0.9333333333333333,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    }
+  ],
+  "bankContentHash": "b75cac0dc5c2b91645b52531fa6c804110375cd04fc193c388c5c39a7a02ede8",
+  "dictionary": {
+    "sha256": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+    "size": 103836,
+    "snapshot": "recognition-words.txt",
+    "manifest": "recognition-manifest.json"
+  },
+  "frozenInputs": {
+    "content/gen6/mozkokalypsa-100/geometry-pool-v2.jsonl": "0de9f413408a994e725c58c88f6fc3add8b684247bc83e6c83a421075e3f18e8",
+    "content/gen6/mozkokalypsa-100/geometry-production-v2.json": "b3eb5c35e8c81880b1e3b3825f74f0d55fdfae493324e49b762944c858af022e",
+    "content/gen6/mozkokalypsa-100/lexical-plan.json": "250f240faa037b275df18b8c5e108c30e6a392d1f7ffdd5a00338588b82ac618",
+    "content/gen6/mozkokalypsa-100/recognition-manifest.json": "d6e41b9d61edabc94ae619b014c0e734e11e25d0ae579f91682754defe50a6b8",
+    "content/gen6/mozkokalypsa-100/recognition-words.txt": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+    "content/lexicon-v3/working/README.md": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
+    "content/lexicon-v3/working/capacity.json": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+    "content/lexicon-v3/working/editorial-addendum-20260927.json": "0d72fdc1d6e20eafce334c969aa4766dff5b97861235ca313a061e78e1bbc07d",
+    "content/lexicon-v3/working/editorial-reviews.json": "997a1d64632ac278b2b37e17ac3c660726a477cc0cc80e2107cf77c90c688a0e",
+    "content/lexicon-v3/working/inventory.json": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+    "content/lexicon-v3/working/lexicon.json": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "content/lexicon-v3/working/manifest.json": "a8a333e598d3f7a195dc59a03b6226c1cc719fbe77594c91b9cb00f2b638e99a",
+    "content/lexicon-v3/working/recognition-words.txt": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+    "content/lexicon-v3/working/source-limitations.json": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+    "content/lexicon-v3/working/source-manifest.json": "464dda20cab1b672a51ba338637bc1238f2d63d8ed4fe69bb2505a0b5ce02cc9",
+    "content/lexicon-v3/working/topic-map.json": "6c5e05e036317512f42f20d2322960a04e14d516a91b90b8e7887318494b2704",
+    "content/lexicon-v3/working/variant-groups.json": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a",
+    "data/playtests/mozkokalypsa-v1.json": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+    "data/playtests/mozkokalypsa-v2.json": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+    "data/playtests/mozkokalypsa-v3.json": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+    "tools/gen5/catalog.py": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74",
+    "tools/gen5/validation.py": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd",
+    "tools/gen6/catalog.py": "b9819dc9f91381ae585b8555f47c34f2628d17393e4289245078fb2e8a4f10e2",
+    "tools/gen6/eight.py": "f612a03a0eb32d3f412cd920b55b9c846a9bf12d61dc93acb74bba5806ddcf25",
+    "tools/gen6/interwoven.py": "366d221db4ecbb6c619b86fc9e285e854a5e3f341b8f0364688600ad16f1f1db",
+    "tools/gen6/interwoven_geometry.cpp": "a26c2d75ceb3c01564eb123b70896addf1fd9987b04865e74aae59b906a10ce8",
+    "tools/gen6/mk100_catalog.py": "8584bc39cd74fa715c0744d8d6b482c94094954bfc57562a9a7cda3e3aefc72c",
+    "tools/gen6/mk100_endgame.py": "0a3b3106c4a1ff924e09da6a306e43f7071995c0c05d538dc3ff53f41c064c77",
+    "tools/gen6/mk100_geometry.py": "7a94a51e101c1aa9dff0fea4543be52f5c471d574f7a196917abaac6e91a11e1",
+    "tools/gen6/mk100_manufacture.py": "281ad76d4b173f713b8883552b24e25996fa34c193afcdf4dafbe0e140eeb888",
+    "tools/mozkokalypsa_lab.py": "8387806305a833f07bf7a2a69c1af00ef8e5a43a22445ed26980f7f65de8788f",
+    "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15"
+  },
+  "geometryProduction": {
+    "status": "complete",
+    "engine": "unchanged backbite core with declared profile-specific design preferences",
+    "source": "tools/gen6/mk100_geometry.py",
+    "baseSource": "tools/gen6/interwoven_geometry.cpp",
+    "emittedCppSha256": "c53e5d3a3800f31e5a32af8d260e732cfd269814dbf3d30ead818b4183757f05",
+    "baseSourceSha256": "a26c2d75ceb3c01564eb123b70896addf1fd9987b04865e74aae59b906a10ce8",
+    "profiles": [
+      {
+        "profile": "relief",
+        "seed": 202610010200,
+        "attemptLimit": 30000000,
+        "requested": 64,
+        "completed": 64,
+        "exitCode": 0,
+        "settings": {
+          "minTurns": 1,
+          "totalMin": 42,
+          "totalMax": 54,
+          "cross": 66,
+          "gaps": 1,
+          "near": 2
+        }
+      },
+      {
+        "profile": "main",
+        "seed": 202610010201,
+        "attemptLimit": 30000000,
+        "requested": 64,
+        "completed": 64,
+        "exitCode": 0,
+        "settings": {
+          "minTurns": 1,
+          "totalMin": 52,
+          "totalMax": 66,
+          "cross": 70,
+          "gaps": 2,
+          "near": 2
+        }
+      },
+      {
+        "profile": "challenge",
+        "seed": 202610010202,
+        "attemptLimit": 30000000,
+        "requested": 64,
+        "completed": 64,
+        "exitCode": 0,
+        "settings": {
+          "minTurns": 2,
+          "totalMin": 61,
+          "totalMax": 76,
+          "cross": 74,
+          "gaps": 3,
+          "near": 3
+        }
+      },
+      {
+        "profile": "summit",
+        "seed": 202610010203,
+        "attemptLimit": 30000000,
+        "requested": 32,
+        "completed": 32,
+        "exitCode": 0,
+        "settings": {
+          "minTurns": 2,
+          "totalMin": 66,
+          "totalMax": 82,
+          "cross": 76,
+          "gaps": 4,
+          "near": 3
+        }
+      }
+    ],
+    "poolSize": 224,
+    "poolSha256": "0de9f413408a994e725c58c88f6fc3add8b684247bc83e6c83a421075e3f18e8",
+    "runtimeRulesChanged": false
+  },
+  "selection": {
+    "verifiedPoolTotal": 439,
+    "targetVerifiedPoolPerBoard": {
+      "ordinary": 16,
+      "targetedEndgame": 48
+    },
+    "targetedProxyFloor": {
+      "reference": "mk2-10",
+      "endgameSelectionScoreMinimum": 23.4209,
+      "plausiblePressureMinimum": 20,
+      "plausibleAllThreeSimpleChainsMaximum": 0
+    },
+    "notFirst100Passes": true,
+    "minimumDistinctPathTilingsAgainstChosen": 8
+  },
+  "interpretation": "Recognition and exact-cover uniqueness are technically checked. Geometry, pressure and endgame scores are simulation proxies; player enjoyment and persistence of difficulty are unmeasured."
+}

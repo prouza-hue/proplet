@@ -31,6 +31,23 @@ FULL_COUNTS = {'relief': 20, 'main': 60, 'challenge': 15, 'summit': 5}
 REP_COUNTS = {'relief': 3, 'main': 6, 'challenge': 2, 'summit': 1}
 
 
+def candidate_profile(catalog, name):
+    """Independently enforce the declared v2 design floors; runtime is unchanged."""
+    settings = {
+        'relief': (1, 3.0, .75),
+        'main': (1, 3.7, .67),
+        'challenge': (2, 4.3, .60),
+        'summit': (2, 4.7, .55),
+    }
+    require(name in settings, 'Unknown v2 construction profile')
+    minimum, mean, straight = settings[name]
+    result = profile_for(catalog)
+    result.update(min_path_turns=minimum, min_mean_turns=mean,
+                  max_path_straight_share=straight,
+                  geometry_profile='mk100-morphology-v2-' + name)
+    return result
+
+
 class VerificationFailure(ValueError):
     pass
 
@@ -89,8 +106,10 @@ def validate_board(board, catalog, expected_ordinal):
     # Run structural() before identity checks so path corruption cannot hide
     # behind a recomputed content hash in the rejection regression below.
     geometry = structural(board)
-    require(not geometry_errors(geometry, profile_for(catalog)), board['id'] + ': geometry quality floor')
-    require(board['id'] == f'mk100-v1-{expected_ordinal:03d}', 'Unexpected stable candidate ID')
+    require(not geometry_errors(geometry, candidate_profile(catalog, board['meta']['profile'])),
+            board['id'] + ': declared v2 geometry quality floor')
+    require(board['id'] == f'mk100-v2-{expected_ordinal:03d}', 'Unexpected stable candidate ID')
+    require(board['meta']['profileVersion'] == 'mk100-morphology-v2', 'Construction version differs')
     require(board['id'] not in catalog.historical_ids, board['id'] + ': historical identity collision')
     content_hash = board_hash(board)
     require(content_hash == board['meta']['contentHash'], board['id'] + ': corrupt content hash')
@@ -105,7 +124,59 @@ def validate_board(board, catalog, expected_ordinal):
     require(board['meta']['candidateOnly'] is True and board['meta']['playtestOnly'] is True,
             board['id'] + ': candidate isolation flags missing')
     require(catalog.words(board) <= set(catalog.available_for_mk100()), board['id'] + ': unapproved target')
+    import word_recognition_v3330 as runtime
+    # This helper deliberately rejects solution words as bonus discoveries.
+    # Exercise its actual trace invariants without that bonus-only exclusion;
+    # no endpoint, XP handler or discovery record is invoked.
+    trace_geometry = {**board, 'answers': []}
+    for answer in board['answers']:
+        require(runtime._valid_discovery_trace(trace_geometry, norm(answer['word']), answer['path']),
+                board['id'] + ': answer path violates current runtime trace rules')
     return geometry
+
+
+def verify_series_editorial(boards, plan, catalog):
+    """Bind every actual target set to its archived individual language review."""
+    reviews = []
+    for name in ('editorial-review-001-050.json', 'editorial-review-051-100.json'):
+        payload = read_json(DIRECTORY / name)
+        reviews.extend(payload.get('records', payload.get('boards', [])))
+    require(len(reviews) == 100 and len({r['ordinal'] for r in reviews}) == 100,
+            'Individual lexical reviews do not cover exactly100 ordinals')
+    by_ordinal = {r['ordinal']: r for r in reviews}
+    entries = plan['entries']
+    positions, family_positions = defaultdict(list), defaultdict(list)
+    caps = {'relief': 0, 'main': 1, 'challenge': 2, 'summit': 2}
+    for board in boards:
+        ordinal = board['meta']['level']
+        review = by_ordinal[ordinal]
+        words = sorted(catalog.words(board))
+        require(review['wordsetHash'] == digest(words)
+                and sorted(review.get('reviewedWords', review.get('words', []))) == words
+                and review['profile'] == board['meta']['profile'],
+                board['id'] + ': actual targets differ from individual lexical review')
+        require(review['verdict'] in ('accept', 'accepted', 'accepted-with-notes')
+                and bool(review['whyIncluded']), board['id'] + ': no accepted editorial rationale')
+        require(len(review['polarizingWords']) <= caps[board['meta']['profile']],
+                board['id'] + ': unresolved polarizing-word accumulation')
+        for word in words:
+            positions[word].append(ordinal)
+            family = entries[word].get('family')
+            if family:
+                family_positions[family].append((ordinal, word))
+    if len(boards) == 100:
+        require(max(map(len, positions.values())) <= 2, 'Exact repetition exceeds2')
+        require(all(b - a >= 20 for rows in positions.values() for a, b in zip(rows, rows[1:])),
+                'Exact-repeat spacing below20')
+        require(all(b[0] - a[0] >= 8 for rows in family_positions.values()
+                    for a, b in zip(rows, rows[1:])), 'Semantic-family spacing below8')
+        require(sum(b['meta']['targetedEndgame'] for b in boards) == 20,
+                'Expected20 explicit endgame design candidates')
+        require(set(positions) & catalog.playtest_words == {'lahodný'},
+                'Undocumented playtest vocabulary repeat')
+    return {'individuallyBoundReviews': len(boards), 'sourceReviewCount': 100,
+            'editorialType': 'AI model assessment, not player measurement or new dictionary certification',
+            'targetOccurrences': sum(map(len, positions.values())), 'uniqueWords': len(positions)}
 
 
 def reconstruct(board, record, plan, geometry_pool, global_seed):
@@ -117,7 +188,10 @@ def reconstruct(board, record, plan, geometry_pool, global_seed):
     placement_seed = int(digest([global_seed, 'letters', ordinal, attempt])[:16], 16)
     require(placement_seed == provenance['placementSeed'] == board['meta']['seed'], board['id'] + ': unreproducible seed')
     ordering_rng = random.Random(digest([global_seed, 'placement', ordinal]))
-    indexes = list(range(len(geometry_pool)))
+    indexes = [i for i, source in enumerate(geometry_pool)
+               if source['constructionProfile'] == plan['profile']]
+    require(len(indexes) >= (32 if plan['profile'] == 'summit' else 64),
+            'Missing complete profile-specific geometry pool')
     ordering_rng.shuffle(indexes)
     variant = None
     for _ in range(attempt + 1):
@@ -125,6 +199,7 @@ def reconstruct(board, record, plan, geometry_pool, global_seed):
     require(indexes[attempt % len(indexes)] == provenance['geometryPoolIndex'], board['id'] + ': pool index not seed-derived')
     require(variant == provenance['transform'], board['id'] + ': transform not seed-derived')
     source = geometry_pool[provenance['geometryPoolIndex']]
+    require(source['constructionProfile'] == plan['profile'], board['id'] + ': construction profile differs')
     require(source.get('seed') == provenance['geometrySeed'] and source.get('step') == provenance['geometryStep'],
             board['id'] + ': geometry provenance differs')
     # Independently express the eight square symmetries. Do not call the
@@ -231,18 +306,19 @@ def verify(stage='full', output=DIRECTORY / 'independent-verification.json', sec
     recognition_manifest = read_json(DIRECTORY / 'recognition-manifest.json')
     recognition = verify_recognition(catalog, words, recognition_manifest, raw)
     solver = Solver(words)
-    bank_name = 'bank.json' if stage == 'full' else 'representative-bank.json'
+    bank_name = 'bank.json' if stage == 'full' else 'representative-bank-v2.json'
     bank = read_json(DIRECTORY / bank_name)
-    evidence = read_json(DIRECTORY / (stage + '-verification.json'))
-    plan_name = ('lexical-plan-representative.json'
-                 if stage == 'representative' and (DIRECTORY / 'lexical-plan-representative.json').exists()
-                 else 'lexical-plan.json')
+    evidence_name = 'full-verification.json' if stage == 'full' else 'representative-v2-verification.json'
+    evidence = read_json(DIRECTORY / evidence_name)
+    plan_name = 'lexical-plan.json'
     plan = read_json(DIRECTORY / plan_name)
     plans = {row['ordinal']: row for row in plan['boards']}
     selected_records = {row['id']: row for row in evidence['boards']}
-    geometry_path = DIRECTORY / 'geometry-pool.jsonl'
+    geometry_path = DIRECTORY / 'geometry-pool-v2.jsonl'
     geometry_pool = [json.loads(line) for line in geometry_path.read_text(encoding='utf-8').splitlines()]
-    require(len(geometry_pool) >= 128, 'Missing complete newly manufactured geometry pool')
+    require(len(geometry_pool) == 224, 'Missing complete newly manufactured v2 geometry pool')
+    require(dict(Counter(row['constructionProfile'] for row in geometry_pool))
+            == {'relief':64, 'main':64, 'challenge':64, 'summit':32}, 'Incomplete v2 profile pools')
     count = 100 if stage == 'full' else 12
     expected_ordinals = list(range(1, 101)) if stage == 'full' else sorted(plan['representativeOrdinals'])
     expected_counts = FULL_COUNTS if stage == 'full' else REP_COUNTS
@@ -259,10 +335,12 @@ def verify(stage='full', output=DIRECTORY / 'independent-verification.json', sec
     require(bank['runtimeFreeGeneration'] == catalog.free_generation, 'Bank resets runtime generation')
     require(bank['validationDictionary']['sha256'] == solver.hash
             and bank['validationDictionary']['size'] == len(words), 'Bank solver dictionary differs')
+    lexical_review = verify_series_editorial(boards, plan, catalog)
     frozen = evidence['frozenInputs']
     for path, expected_hash in frozen.items():
         require(bytes_hash(ROOT / path) == expected_hash, 'Manufacturing frozen input changed: ' + path)
-    require(str(geometry_path.relative_to(ROOT)) in frozen, 'Tracked geometry pool is absent from frozen inputs')
+    require(geometry_path.relative_to(ROOT).as_posix() in frozen,
+            'Tracked geometry pool is absent from frozen inputs')
     if stage == 'full':
         manifest = read_json(DIRECTORY / 'manifest.json')
         require(manifest['bankContentHash'] == bank['contentHash'], 'Manifest bank hash differs')
@@ -274,7 +352,7 @@ def verify(stage='full', output=DIRECTORY / 'independent-verification.json', sec
             require(row['id'] == board['id'] and row['contentHash'] == board_hash(board)
                     and row['profile'] == board['meta']['profile'] and row['seed'] == board['meta']['seed'],
                     board['id'] + ': manifest row differs')
-        representative = read_json(DIRECTORY / 'representative-bank.json')
+        representative = read_json(DIRECTORY / 'representative-bank-v2.json')
         require(len(representative['boards']) == 12
                 and dict(Counter(b['meta']['profile'] for b in representative['boards'])) == REP_COUNTS,
                 'Prepared representative bank is not3/6/2/1')
@@ -294,6 +372,7 @@ def verify(stage='full', output=DIRECTORY / 'independent-verification.json', sec
               'checkoutSha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'verifiedMainSha': VERIFIED_MAIN_SHA, 'lexiconHash': catalog.lexicon_hash,
               'bankContentHash': bank['contentHash'], 'recognition': recognition,
+              'individualLexicalReviewBindings': lexical_review,
               'profileCounts': expected_counts, 'geometryPoolSha256': bytes_hash(geometry_path),
               'independence': 'No manufacture module imported. All selected paths/seeds/hash identities recomputed; current Gen5 solver rerun against complete snapshot.',
               'solverLimits': {'secondsPerBoard': seconds, 'nodeLimitPerBoard': node_limit,

@@ -1,0 +1,9 @@
+{
+  "stage": "representative-v2-targeted-refinement",
+  "poolCount": 12,
+  "verifiedCandidateCount": 439,
+  "path": "representative-v2-reviewed-pools.zip",
+  "sha256": "f0965d1a172d338c4f2e4f8e9a2e75edd778c9c14fb1079a01a23b475ebc5289",
+  "bytes": 588571,
+  "status": "awaiting-root-editorial-review"
+}

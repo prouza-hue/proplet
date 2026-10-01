@@ -1,0 +1,12 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "purpose": "Offline recognition import and pinned wordfreq dictionary reconstruction; production server not imported or started",
+  "packages": {
+    "wordfreq": "3.1.1",
+    "fastapi": "0.141.1",
+    "pydantic": "2.13.4",
+    "starlette": "1.6.0"
+  },
+  "compiler": "ziglang0.13.0 local tool for unchanged C++ backbite engine extension",
+  "productionDependenciesChanged": false
+}
