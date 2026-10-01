@@ -18,9 +18,8 @@
   global.PROPLET_RUNTIME_META = Object.freeze({...global.PROPLET_RUNTIME_META,
     canonicalOrigin: location.origin, mk100IntegratedPreview: true, gen4CandidatePreview: false, gen5CandidatePreview: false});
   const params = new URLSearchParams(location.search);
-  const requestedCount = params.has('previewHC') ? Number(params.get('previewHC')) :
-    params.get('previewPlayer') === 'new' ? 0 : 200;
-  const initialHardcoreCount = Number.isInteger(requestedCount) && requestedCount >= 0 && requestedCount <= 200 ? requestedCount : 200;
+  const requestedCount = params.has('previewHC') ? Number(params.get('previewHC')) : 0;
+  const initialHardcoreCount = Number.isInteger(requestedCount) && requestedCount >= 0 && requestedCount <= 200 ? requestedCount : 0;
   const bankHash = String(fixtures.build?.bankSha256 || fixtures.build?.bankContentHash || 'mk100');
   const storagePrefix = `proplet-mk100-preview:${bankHash.slice(0, 16)}:hc${initialHardcoreCount}:`;
   const requests = [];

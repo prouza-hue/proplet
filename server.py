@@ -106,7 +106,9 @@ BADGES = [
 FREE_DIFFICULTIES = ("easy", "medium", "hard", "hardcore", "mozkomor")
 ROLLING_DIFFICULTIES = ("easy", "medium", "hard", "hardcore")
 POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100, "mozkomor": 150}
-MOZKOMOR_UNLOCK_BASE_LEVELS = 200
+# Compatibility argument for the existing read-only account snapshot RPC.
+# Difficulty selection no longer depends on completed games.
+MOZKOMOR_UNLOCK_BASE_LEVELS = 0
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
 FAIR_PLAY_HEARTBEAT_MS = 25_000
@@ -682,10 +684,7 @@ def player_stats(
     except HTTPException:
         # During a rolling deploy before the v3.4 migration, normal gameplay remains readable.
         rescue_data = []
-    # Preserve the historical derivation order: streak date is captured before
-    # the unlock projection that used to be evaluated while serializing.
     today = current_prague_date()
-    mozkomor_unlocked = mozkomor_unlocked_from_rows(rows, free_slots)
     return calculate_stats(
         rows,
         today=today,
@@ -693,7 +692,7 @@ def player_stats(
         free_slots=free_slots,
         reward_stats=reward_stats,
         gen4_rewards=gen4_rewards,
-        mozkomor_unlocked=mozkomor_unlocked,
+        mozkomor_unlocked=True,
         badges=BADGES,
         free_difficulties=FREE_DIFFICULTIES,
         daily_dates=daily_dates,
@@ -931,16 +930,8 @@ def free_slot_summary(rows: list[dict]) -> dict[str, dict[str, int]]:
 
 
 def mozkomor_unlocked_from_rows(rows: list[dict], slots: Optional[dict] = None) -> bool:
-    """Unlock after 200 distinct current Mozkožrout slots, including weekly releases."""
-    if any(row.get("mode") == "free" and row.get("difficulty") == "mozkomor" for row in rows):
-        return True
-    summary = slots or free_slot_summary(rows)
-    return domain_content.mozkomor_unlocked_from_rows(rows, summary, MOZKOMOR_UNLOCK_BASE_LEVELS)
-
-
-def enforce_mozkomor_unlock(rows: list[dict], slots: Optional[dict] = None) -> None:
-    if not mozkomor_unlocked_from_rows(rows, slots):
-        raise HTTPException(403, "Mozkomor se odemkne po dokončení 200 různých Mozkožroutů")
+    """Compatibility projection: all released difficulties are available."""
+    return True
 
 
 def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> bool:
@@ -1539,7 +1530,9 @@ def health():
         "rollingContentReservedThrough": load_rolling_content().get("reservedThrough"),
         "rollingContentAvailableCounts": {d: len(released_free_bank(d, current_prague_date())) for d in ROLLING_DIFFICULTIES},
         "freeBaseLevelCounts": {d: len(load_puzzles().get("free", {}).get(d, [])) for d in FREE_DIFFICULTIES},
-        "mozkomorUnlock": load_puzzles().get("mozkomorUnlock"),
+        "mozkomorUnlock": {**(load_puzzles().get("mozkomorUnlock") or {}),
+                           "requiresDifficulty": None, "requiresCurrentBaseLevels": 0,
+                           "persistentOnceEarned": False},
         "notificationsV2Migration": push_preferences_schema_ready(),
         "pushOpenTrackingMigration": push_open_tracking_schema_ready(),
         "freeXp": {key: value for key, value in POINTS.items() if key != "daily"},
@@ -2287,6 +2280,8 @@ def account_snapshot(
     if not isinstance(snapshot, dict) or not isinstance(snapshot.get("completed"), list) or not isinstance(snapshot.get("stats"), dict):
         raise HTTPException(503, "Souhrn účtu není momentálně dostupný")
     stats = dict(snapshot["stats"])
+    # Keep the field readable by older clients even during a rolling deploy.
+    stats["mozkomorUnlocked"] = True
     current_streak = int(stats.get("currentStreak") or 0)
     longest_streak = int(stats.get("longestStreak") or 0)
     stats["earnedBadges"] = [badge for badge in BADGES if longest_streak >= badge["days"]]
@@ -2467,10 +2462,6 @@ def play_session_command(payload: play_sessions.SessionCommand, request: Request
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
         if not info or not is_puzzle_released(info.get("puzzle") or {}, effective_content_date(request)):
             raise HTTPException(400, "Úloha ještě není vydaná")
-        if payload.difficulty == "mozkomor":
-            if not actor.get("player_id"):
-                raise HTTPException(403, "Mozkomora nejprve odemkni ve svém účtu")
-            enforce_mozkomor_unlock(db_select("results", player_id=actor["player_id"]))
     return play_sessions.execute(payload, actor, puzzle, db_rpc)
 
 
@@ -3584,9 +3575,6 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         info = free_puzzle_info(payload.puzzle_id, payload.difficulty)
         if not info or not is_puzzle_released(info.get("puzzle") or {}, effective_content_date(request)):
             raise HTTPException(400, "Neznámá nebo zatím nevydaná úroveň volné hry")
-        if payload.difficulty == "mozkomor":
-            unlock_rows = db_select("results", player_id=player["id"])
-            enforce_mozkomor_unlock(unlock_rows)
         content_generation = int(info.get("generation") or 1)
         free_level = int(info["level"])
         base_points = domain_content.xp_for("free", payload.difficulty, POINTS)

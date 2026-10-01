@@ -1,55 +1,116 @@
-"""Unlock parity: weekly and new boards count, retries/legacy transfers don't."""
+"""Released difficulties work without history; result/session safeguards stay active.
+
+The historical filename remains in the current-suite manifest. All DB and auth
+dependencies in these handler tests are synthetic; no live data is accessed.
+"""
 import sys
-from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
-import server
-
-def row(puzzle):
-    return {'mode':'free','difficulty':'hardcore','puzzle_id':puzzle['id']}
-
-base=server.load_puzzles()['free']['hardcore'][:197]
-weekly=server.load_rolling_content()['puzzles']['hardcore'][:3]
-rows=list(map(row,base+weekly))
-assert server.free_slot_summary(rows)['baseCurrent']['hardcore']==197
-assert server.mozkomor_unlocked_from_rows(rows)
-server.enforce_mozkomor_unlock(rows)  # same guard used by session and result
-assert not server.mozkomor_unlocked_from_rows(rows[:-1])
-assert not server.mozkomor_unlocked_from_rows(rows[:-1]+[rows[0]]*10)
-assert server.mozkomor_unlocked_from_rows(rows+rows)
-new=[p for p in server.load_puzzles()['free']['hardcore'] if p['id'].startswith('g5-r1-')][:3]
-assert server.mozkomor_unlocked_from_rows(list(map(row,base+new)))
-assert server.mozkomor_unlocked_from_rows([{'mode':'free','difficulty':'mozkomor'}])
-print('PASS 197 base + 3 weekly/new boards unlock; 199 and duplicate runs do not')
-
-# Exercise both real HTTP handlers with synthetic dependencies, never a live DB.
 from contextlib import ExitStack
+from datetime import date
+from pathlib import Path
 from unittest.mock import patch
+
+from fastapi import HTTPException
 from starlette.requests import Request
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+import server
+from backend import content, progress
 from backend.contracts import ResultCreate
 from backend.play_sessions import SessionCommand
-from fastapi import HTTPException
-request=Request({'type':'http','method':'POST','path':'/api/result','headers':[], 'client':('127.0.0.1',1)})
-player={'id':'00000000-0000-4000-8000-000000000123'}
-payload=ResultCreate(puzzle_id='g4-z-001',challenge_key='free:g4-z-001',mode='free',difficulty='mozkomor',elapsed_ms=131000,moves=17,attempt_id='synthetic-preserved-attempt')
-with ExitStack() as stack:
-    for name,value in {'enforce_rate_limit':lambda *a,**k:None,'auth_player':lambda *a:player,'db_select':lambda table,**k:rows if table=='results' else [],'rankings_v2_schema_ready':lambda:False,'atomic_result_public_response':lambda p,r,**kwargs:r}.items():
-        stack.enter_context(patch.object(server,name,value))
-    stack.enter_context(patch.object(server,'ATOMIC_RESULT_V1_ENABLED',True))
-    submit=stack.enter_context(patch.object(server.result_domain,'submit_atomic',return_value={'firstCompletion':True,'awardedPoints':150}))
-    result=server.result(payload,request,authorization='synthetic')
-    assert result['awardedPoints']==150
-    command=submit.call_args.args[0]
-    assert command['elapsedMs']==131000 and command['moves']==17 and command['attemptId']==payload.attempt_id
-    stack.enter_context(patch.object(server,'telemetry_actor',return_value={'player_id':player['id']}))
-    stack.enter_context(patch.object(server,'play_session_config',return_value={'enabled':True}))
-    execute=stack.enter_context(patch.object(server.play_sessions,'execute',return_value={'verified':True}))
-    session=SessionCommand(action='open',puzzle_id=payload.puzzle_id,challenge_key=payload.challenge_key,mode='free',difficulty='mozkomor',attempt_id=payload.attempt_id,owner_id=player['id'],sequence=1)
-    assert server.play_session_command(session,request,authorization='synthetic')['verified']
-    execute.assert_called_once()
-    with patch.object(server,'db_select',side_effect=lambda table,**k:rows[:-1] if table=='results' else []):
-        try:
-            server.result(payload,request,authorization='synthetic')
-            raise AssertionError('199 boards must not submit a Mozkomor result')
-        except HTTPException as error:
-            assert error.status_code==403
-print('PASS session/result handlers accept preserved queued completion at 200, reject 199')
+
+request = Request({'type': 'http', 'method': 'POST', 'path': '/api/result',
+                   'headers': [], 'client': ('127.0.0.1', 1)})
+player = {'id': '00000000-0000-4000-8000-000000000123', 'name': 'Nový hráč'}
+anonymous = {'anonymous_id': '00000000-0000-4000-8000-000000000124'}
+
+
+def rejected(call, status):
+    try:
+        call()
+    except HTTPException as error:
+        assert error.status_code == status, error
+    else:
+        raise AssertionError(f'Expected HTTP {status}')
+
+
+# Old consumers may still pass a threshold or a false cached projection.
+for count in (0, 1, 100, 199, 200):
+    slots = {'current': {'hardcore': count}}
+    assert server.mozkomor_unlocked_from_rows([], slots) is True
+    assert content.mozkomor_unlocked_from_rows([], slots, required=200) is True
+assert progress.calculate_stats([], today=date(2026, 10, 2), badges=server.BADGES,
+    free_difficulties=server.FREE_DIFFICULTIES, mozkomor_unlocked=False)['mozkomorUnlocked'] is True
+
+
+def bounded_result_reads(table, **filters):
+    # No completion-history read is allowed solely for opening a difficulty.
+    assert table in ('result_commands', 'puzzle_attempts'), (table, filters)
+    assert filters['player_id'] == player['id']
+    return []
+
+
+for difficulty in server.FREE_DIFFICULTIES:
+    puzzle = server.load_puzzles()['free'][difficulty][0]
+    payload = ResultCreate(puzzle_id=puzzle['id'], challenge_key=f"free:{puzzle['id']}",
+        mode='free', difficulty=difficulty, elapsed_ms=131000, moves=17,
+        attempt_id=f'synthetic-unrestricted-{difficulty}')
+    command = SessionCommand(action='open', puzzle_id=payload.puzzle_id,
+        challenge_key=payload.challenge_key, mode='free', difficulty=difficulty,
+        attempt_id=payload.attempt_id, owner_id=player['id'], sequence=1)
+    with ExitStack() as stack:
+        for name, value in {'enforce_rate_limit': lambda *a, **k: None,
+                            'auth_player': lambda *a: player,
+                            'db_select': bounded_result_reads,
+                            'rankings_v2_schema_ready': lambda: False,
+                            'atomic_result_public_response': lambda p, r, **kwargs: r,
+                            'play_session_config': lambda: {'enabled': True}}.items():
+            stack.enter_context(patch.object(server, name, value))
+        stack.enter_context(patch.object(server, 'ATOMIC_RESULT_V1_ENABLED', True))
+        submit = stack.enter_context(patch.object(server.result_domain, 'submit_atomic',
+            return_value={'firstCompletion': True, 'awardedPoints': server.POINTS[difficulty]}))
+        result = server.result(payload, request, authorization='synthetic')
+        assert result['awardedPoints'] == server.POINTS[difficulty]
+        submitted = submit.call_args.args[0]
+        assert submitted['elapsedMs'] == 131000 and submitted['moves'] == 17
+        assert submitted['attemptId'] == payload.attempt_id
+
+        rpc = stack.enter_context(patch.object(server, 'db_rpc', return_value={'verified': True}))
+        for actor in (anonymous, {'player_id': player['id']}):
+            with patch.object(server, 'telemetry_actor', return_value=actor):
+                assert server.play_session_command(command, request,
+                    authorization='synthetic')['verified'] is True
+                assert rpc.call_args.args[0] == 'proplet_play_session_v1'
+                assert rpc.call_args.args[1]['p_player'] == actor.get('player_id')
+
+        with patch.object(server, 'telemetry_actor', return_value=anonymous):
+            # Availability never bypasses the release calendar or challenge identity.
+            with patch.object(server, 'is_puzzle_released', return_value=False):
+                rejected(lambda: server.result(payload, request, authorization='synthetic'), 400)
+                rejected(lambda: server.play_session_command(command, request, authorization='synthetic'), 400)
+            invalid_key = command.model_copy(update={'challenge_key': 'free:another-board'})
+            rejected(lambda: server.play_session_command(invalid_key, request, authorization='synthetic'), 400)
+            unfinished = command.model_copy(update={'action': 'finish'})
+            rejected(lambda: server.play_session_command(unfinished, request, authorization='synthetic'), 400)
+            invalid_path = command.model_copy(update={'progress': server.play_sessions.Progress(
+                found=[server.play_sessions.FoundWord(answerIndex=0, path=[])])})
+            rejected(lambda: server.play_session_command(invalid_path, request, authorization='synthetic'), 400)
+        with patch.object(server, 'auth_player', side_effect=HTTPException(401, 'missing identity')):
+            rejected(lambda: server.result(payload, request, authorization=None), 401)
+        with patch.object(server, 'telemetry_actor', side_effect=HTTPException(401, 'missing identity')):
+            rejected(lambda: server.play_session_command(command, request, authorization=None), 401)
+        bad_payload = payload.model_copy(update={'challenge_key': 'free:another-board'})
+        rejected(lambda: server.result(bad_payload, request, authorization='synthetic'), 400)
+
+
+# Existing SQL is a projection with a service-only parameter, not enforcement.
+# Zero makes it open even for an empty account; stale payloads stay open.
+with (patch.object(server, 'enforce_rate_limit', lambda *a, **k: None),
+      patch.object(server, 'auth_player', return_value=player),
+      patch.object(server, 'db_rpc', return_value={'completed': [], 'stats': {
+          'mozkomorUnlocked': False, 'currentStreak': 0, 'longestStreak': 0}}) as rpc):
+    snapshot = server.account_snapshot(request, since=None, authorization='synthetic')
+    assert rpc.call_args.args[0] == 'proplet_account_snapshot_v1'
+    assert rpc.call_args.args[1]['p_mozkomor_unlock_base'] == 0
+    assert snapshot['stats']['mozkomorUnlocked'] is True
+
+print('PASS all5 released difficulties: fresh account results, anonymous/account sessions, RPC0 snapshot; auth/release/key/path/finish safeguards preserved')

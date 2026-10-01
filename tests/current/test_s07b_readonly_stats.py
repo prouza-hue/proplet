@@ -148,7 +148,9 @@ assert consistent["resultXp"] == 530
 assert consistent["gen4RewardRepairXp"] == 0
 assert consistent["gen4ReturnBonusXp"] == 500
 assert consistent["gen4ReturnBonusAwardedNow"] == 0
-assert digest(consistent) == "9edb97ea2f2ea2eafb271374e30a8f428a1d6d507dfb6ae897c9057e7dc6e027"
+assert consistent["mozkomorUnlocked"] is True
+# Rewards and all other statistics retain the pre-removal golden projection.
+assert digest({**consistent, "mozkomorUnlocked": False}) == "9edb97ea2f2ea2eafb271374e30a8f428a1d6d507dfb6ae897c9057e7dc6e027"
 
 
 # The explicit command is dry-run by default, reports a deterministic plan,

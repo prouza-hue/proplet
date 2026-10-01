@@ -22,7 +22,7 @@ from build_mk100_preview import CONTENT, ROOT, REPRESENTATIVE_LEVELS, digest, ve
 sys.path.insert(0, str(ROOT))
 from backend.content import released_free_bank
 
-AS_OF = date.fromisoformat(os.environ.get('MK100_PREVIEW_AS_OF', '2026-10-01'))
+AS_OF = date.fromisoformat(os.environ.get('MK100_PREVIEW_AS_OF', '2026-10-02'))
 OUTPUT = ROOT / 'dist-mk100-integrated'
 
 
@@ -55,6 +55,8 @@ def build():
         board['meta']['integratedPreview'] = True
         board['meta']['sourceDifficulty'] = 'mozkomor'
     puzzles['freeLevelCounts']['mozkokalypsa'] = 100
+    # Release history is immutable; the derived runtime has no progression gate.
+    puzzles.pop('mozkomorUnlock', None)
     tajenka_bank = json.loads((ROOT / 'data/tajenka_weekend_v2.json').read_text(encoding='utf-8'))
     offset = (AS_OF - date(2026, 9, 12)).days
     week = 3 + offset // 7 * 2 + (offset % 7 >= 4)
@@ -71,8 +73,10 @@ def build():
         'representativeLevels': list(REPRESENTATIVE_LEVELS),
         'recognitionWords': len(words), 'recognitionDictionaryHash': digest(words),
         'recognitionFileSha256': hashlib.sha256(raw).hexdigest(), 'lexiconHash': lexicon_sha,
-        'existingMozkomorGate': 'unchanged: 200 actual current hardcore completions; earned unlock persists',
-        'newMozkokalypsaGate': None, 'publicationAuthorized': False,
+        'difficultyGating': False, 'difficultyGatingRemovedOn': '2026-10-02',
+        'existingMozkomorGate': None, 'newMozkokalypsaGate': None,
+        'mozkokalypsaArtwork': '/difficulty/printshop/mozkokalypsa-v2.svg',
+        'publicationAuthorized': False,
         'playtest': False, 'serverFunctions': 0, 'productionWrites': False,
         'accounts': False, 'localPreviewProgressOnly': True,
         'launchAnnouncement': 'explicit reviewer-only draft; never automatically displayed',

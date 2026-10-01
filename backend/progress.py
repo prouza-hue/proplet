@@ -183,7 +183,7 @@ def calculate_stats(
     account_rewards_included: bool = True,
     reward_stats: Mapping | None = None,
     gen4_rewards: Mapping | None = None,
-    mozkomor_unlocked: bool = False,
+    mozkomor_unlocked: bool = True,
     daily_dates: Iterable[str] | None = None,
     daily_times: Iterable[int] | None = None,
     clean_daily: int | None = None,
@@ -271,7 +271,8 @@ def calculate_stats(
         "freeTransferred": slots["transferred"],
         "freePlayedCurrent": slots["current"],
         "freeBasePlayedCurrent": slots["baseCurrent"],
-        "mozkomorUnlocked": bool(mozkomor_unlocked),
+        # Compatibility field only: a stale caller cannot restore a difficulty gate.
+        "mozkomorUnlocked": True,
         "freePlayedGen2": slots["current"],
         "freeHistoryCompleted": free_history,
         "currentStreak": current,

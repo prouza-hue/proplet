@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "reviewedActualScreenshots": [
+    "phone-dnes-light.png",
+    "phone-hrat-light.png",
+    "phone-dnes-dark.png",
+    "phone-hrat-dark.png",
+    "phone-launch-light.png",
+    "phone-launch-dark.png",
+    "desktop-dnes-light.png",
+    "desktop-hrat-light.png",
+    "desktop-dnes-dark.png",
+    "desktop-hrat-dark.png",
+    "desktop-launch-light.png",
+    "desktop-launch-dark.png"
+  ],
+  "review": "Inspected all 12 actual native-app viewport screenshots: Dnes, Hrat and launch announcement, light/dark, 390px phone and 1440px desktop. The original purple/coral painted vortex is displayed without recoloring in all surfaces. Text and CTA remain readable, all six difficulty cards are present for the fresh player, and no title overflows. Existing ochre card/button accent is retained. No redesign or new game was performed.",
+  "originalIconSha256": "a598ce93951838be74c6b63a03115a8b85c424e60ee78bb8df529a81f22c0887",
+  "derivativeSvgRemoved": true,
+  "publicCssUnmodifiedByThisCorrection": true,
+  "physicalDeviceTested": false
+}

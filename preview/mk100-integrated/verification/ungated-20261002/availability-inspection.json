@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "method": "Actual image inspection via view_image after the isolated technical smoke",
+  "inspected": ["desktop-dnes.png", "desktop-hrat.png", "phone-dnes.png", "phone-hrat.png", "fold-dnes.png", "fold-mozkokalypsa-game.png", "phone-mozkomor-game.png", "phone-mozkokalypsa-game.png", "phone-announcement.png"],
+  "findings": [
+    "All six difficulties appear from a genuine zero-completion anonymous fixture. Both hard difficulties have native Play buttons.",
+    "The original colorful mozkokalypsa-v2.svg is visibly rendered on the normal menus, game header and announcement; matching URL and natural image dimensions are recorded in report.json.",
+    "Phone and Fold native empty games fit the viewport and render zero target coverage, moves and hints. No board was solved or rated.",
+    "The phone Dnes viewport capture includes a partial last-row card near the fixed bottom nav. Real touchscreen taps on its native Play action succeeded; this is a capture/scroll-position limitation, not a blocked start. Separate complete last-card design evidence was captured by the design agent.",
+    "Desktop captures are full-page; phone/Fold are viewport captures preserving Chromium touch emulation. No physical device was used."
+  ],
+  "limitations": ["Only light theme is included in this availability smoke; original-art light/dark design evidence is independently recorded by the design agent."],
+  "actualNetworkMutations": 0,
+  "actualApiRequests": 0,
+  "pageErrors": 0,
+  "consoleErrors": 0,
+  "completedBoards": 0,
+  "ratings": 0
+}

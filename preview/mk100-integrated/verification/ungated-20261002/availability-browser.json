@@ -1,0 +1,612 @@
+{
+  "status": "PASS",
+  "target": "http://127.0.0.1:8866/",
+  "verificationScope": "availability-only",
+  "browserSurface": "headless installed Chromium / fresh separate contexts",
+  "preferredBrowserRuntimeAttempted": true,
+  "preferredBrowserRuntimeStatus": "available; required isolated-context/network-guard/touch capabilities missing",
+  "isolationReason": "The isolated runner provides empty contexts, network interception and touch emulation without reading real cookies.",
+  "physicalDeviceTested": false,
+  "checks": [
+    "desktop-fresh-zero-all-six-Dnes-Hrat-native-start-reload-resume-original-artwork",
+    "phone-fresh-zero-all-six-Dnes-Hrat-native-start-reload-resume-original-artwork",
+    "fold-fresh-zero-all-six-Dnes-Hrat-native-start-reload-resume-original-artwork",
+    "zero-solutions-zero-ratings-zero-results-zero-server-writes-zero-production-origins-zero-serviceworker-zero-errors"
+  ],
+  "emulations": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 1080,
+      "isMobile": false,
+      "hasTouch": false,
+      "input": "mouse click",
+      "theme": "light",
+      "syntheticHardcoreCompletions": 0,
+      "screenshotCapture": "full page",
+      "storagePrefix": "proplet-mk100-preview:84d32ca0600f27f1:hc0:",
+      "memoryFixtureRequestCount": 9
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "isMobile": true,
+      "hasTouch": true,
+      "input": "Playwright touchscreen tap",
+      "theme": "light",
+      "syntheticHardcoreCompletions": 0,
+      "screenshotCapture": "viewport preserving touch emulation",
+      "storagePrefix": "proplet-mk100-preview:84d32ca0600f27f1:hc0:",
+      "memoryFixtureRequestCount": 9
+    },
+    {
+      "name": "fold",
+      "width": 768,
+      "height": 1024,
+      "isMobile": true,
+      "hasTouch": true,
+      "input": "Playwright touchscreen tap",
+      "theme": "light",
+      "syntheticHardcoreCompletions": 0,
+      "screenshotCapture": "viewport preserving touch emulation",
+      "storagePrefix": "proplet-mk100-preview:84d32ca0600f27f1:hc0:",
+      "memoryFixtureRequestCount": 9
+    }
+  ],
+  "availability": [
+    {
+      "context": "desktop",
+      "screen": "daily",
+      "freshCompletions": 0,
+      "order": [
+        "easy",
+        "medium",
+        "hard",
+        "hardcore",
+        "mozkomor",
+        "mozkokalypsa"
+      ]
+    },
+    {
+      "context": "desktop",
+      "screen": "free",
+      "freshCompletions": 0,
+      "order": [
+        "easy",
+        "medium",
+        "hard",
+        "hardcore",
+        "mozkomor",
+        "mozkokalypsa"
+      ]
+    },
+    {
+      "context": "phone",
+      "screen": "daily",
+      "freshCompletions": 0,
+      "order": [
+        "easy",
+        "medium",
+        "hard",
+        "hardcore",
+        "mozkomor",
+        "mozkokalypsa"
+      ]
+    },
+    {
+      "context": "phone",
+      "screen": "free",
+      "freshCompletions": 0,
+      "order": [
+        "easy",
+        "medium",
+        "hard",
+        "hardcore",
+        "mozkomor",
+        "mozkokalypsa"
+      ]
+    },
+    {
+      "context": "fold",
+      "screen": "daily",
+      "freshCompletions": 0,
+      "order": [
+        "easy",
+        "medium",
+        "hard",
+        "hardcore",
+        "mozkomor",
+        "mozkokalypsa"
+      ]
+    },
+    {
+      "context": "fold",
+      "screen": "free",
+      "freshCompletions": 0,
+      "order": [
+        "easy",
+        "medium",
+        "hard",
+        "hardcore",
+        "mozkomor",
+        "mozkokalypsa"
+      ]
+    }
+  ],
+  "starts": [
+    {
+      "context": "desktop",
+      "source": "Dnes",
+      "id": "g4-z-001",
+      "difficulty": "mozkomor",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "66d922b4-65ce-4ed4-94f5-6bed41c0ff55",
+      "rows": 10,
+      "cols": 10,
+      "layout": "desktop-wide"
+    },
+    {
+      "context": "desktop",
+      "source": "Dnes",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "9e0e57f9-f4d3-43bc-9cd9-57ebfa5161a1",
+      "rows": 10,
+      "cols": 10,
+      "layout": "desktop-wide"
+    },
+    {
+      "context": "desktop",
+      "source": "Hrát",
+      "id": "g4-z-001",
+      "difficulty": "mozkomor",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "66d922b4-65ce-4ed4-94f5-6bed41c0ff55",
+      "rows": 10,
+      "cols": 10,
+      "layout": "desktop-wide"
+    },
+    {
+      "context": "desktop",
+      "source": "Hrát",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "9e0e57f9-f4d3-43bc-9cd9-57ebfa5161a1",
+      "rows": 10,
+      "cols": 10,
+      "layout": "desktop-wide"
+    },
+    {
+      "context": "desktop",
+      "source": "announcement primary CTA",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "9e0e57f9-f4d3-43bc-9cd9-57ebfa5161a1",
+      "rows": 10,
+      "cols": 10,
+      "layout": "desktop-wide"
+    },
+    {
+      "context": "phone",
+      "source": "Dnes",
+      "id": "g4-z-001",
+      "difficulty": "mozkomor",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "0b12a356-9a72-4cd7-aa6c-d7e31fa1eea6",
+      "rows": 10,
+      "cols": 10,
+      "layout": "standard"
+    },
+    {
+      "context": "phone",
+      "source": "Dnes",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "0518179b-19e7-4854-a6b0-ef3f6cf1e2cd",
+      "rows": 10,
+      "cols": 10,
+      "layout": "standard"
+    },
+    {
+      "context": "phone",
+      "source": "Hrát",
+      "id": "g4-z-001",
+      "difficulty": "mozkomor",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "0b12a356-9a72-4cd7-aa6c-d7e31fa1eea6",
+      "rows": 10,
+      "cols": 10,
+      "layout": "standard"
+    },
+    {
+      "context": "phone",
+      "source": "Hrát",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "0518179b-19e7-4854-a6b0-ef3f6cf1e2cd",
+      "rows": 10,
+      "cols": 10,
+      "layout": "standard"
+    },
+    {
+      "context": "phone",
+      "source": "announcement primary CTA",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "0518179b-19e7-4854-a6b0-ef3f6cf1e2cd",
+      "rows": 10,
+      "cols": 10,
+      "layout": "standard"
+    },
+    {
+      "context": "fold",
+      "source": "Dnes",
+      "id": "g4-z-001",
+      "difficulty": "mozkomor",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "64c639ac-2d30-45ad-ab4d-ff7e8f9f0187",
+      "rows": 10,
+      "cols": 10,
+      "layout": "tablet-portrait-rail"
+    },
+    {
+      "context": "fold",
+      "source": "Dnes",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "b191a11a-5870-402d-918b-1c003e00ad57",
+      "rows": 10,
+      "cols": 10,
+      "layout": "tablet-portrait-rail"
+    },
+    {
+      "context": "fold",
+      "source": "Hrát",
+      "id": "g4-z-001",
+      "difficulty": "mozkomor",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "64c639ac-2d30-45ad-ab4d-ff7e8f9f0187",
+      "rows": 10,
+      "cols": 10,
+      "layout": "tablet-portrait-rail"
+    },
+    {
+      "context": "fold",
+      "source": "Hrát",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "b191a11a-5870-402d-918b-1c003e00ad57",
+      "rows": 10,
+      "cols": 10,
+      "layout": "tablet-portrait-rail"
+    },
+    {
+      "context": "fold",
+      "source": "announcement primary CTA",
+      "id": "mk100-v2-001",
+      "difficulty": "mozkokalypsa",
+      "mode": "free",
+      "found": 0,
+      "used": 0,
+      "moves": 0,
+      "hints": 0,
+      "finished": false,
+      "attemptId": "b191a11a-5870-402d-918b-1c003e00ad57",
+      "rows": 10,
+      "cols": 10,
+      "layout": "tablet-portrait-rail"
+    }
+  ],
+  "reloads": [
+    {
+      "context": "desktop",
+      "difficulty": "mozkomor",
+      "before": "g4-z-001",
+      "resumed": "g4-z-001",
+      "found": 0,
+      "moves": 0,
+      "hints": 0
+    },
+    {
+      "context": "desktop",
+      "difficulty": "mozkokalypsa",
+      "before": "mk100-v2-001",
+      "resumed": "mk100-v2-001",
+      "found": 0,
+      "moves": 0,
+      "hints": 0
+    },
+    {
+      "context": "phone",
+      "difficulty": "mozkomor",
+      "before": "g4-z-001",
+      "resumed": "g4-z-001",
+      "found": 0,
+      "moves": 0,
+      "hints": 0
+    },
+    {
+      "context": "phone",
+      "difficulty": "mozkokalypsa",
+      "before": "mk100-v2-001",
+      "resumed": "mk100-v2-001",
+      "found": 0,
+      "moves": 0,
+      "hints": 0
+    },
+    {
+      "context": "fold",
+      "difficulty": "mozkomor",
+      "before": "g4-z-001",
+      "resumed": "g4-z-001",
+      "found": 0,
+      "moves": 0,
+      "hints": 0
+    },
+    {
+      "context": "fold",
+      "difficulty": "mozkokalypsa",
+      "before": "mk100-v2-001",
+      "resumed": "mk100-v2-001",
+      "found": 0,
+      "moves": 0,
+      "hints": 0
+    }
+  ],
+  "artwork": [
+    {
+      "context": "desktop",
+      "surface": "Dnes",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 60,
+      "renderedHeight": 60
+    },
+    {
+      "context": "desktop",
+      "surface": "Hrát",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 60,
+      "renderedHeight": 60
+    },
+    {
+      "context": "desktop",
+      "surface": "game header",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 28,
+      "renderedHeight": 28
+    },
+    {
+      "context": "desktop",
+      "surface": "game header",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 28,
+      "renderedHeight": 28
+    },
+    {
+      "context": "desktop",
+      "surface": "announcement",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 200.5947265625,
+      "renderedHeight": 200.59475708007812
+    },
+    {
+      "context": "phone",
+      "surface": "Dnes",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 40,
+      "renderedHeight": 40
+    },
+    {
+      "context": "phone",
+      "surface": "Hrát",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 44,
+      "renderedHeight": 44
+    },
+    {
+      "context": "phone",
+      "surface": "game header",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 24,
+      "renderedHeight": 24
+    },
+    {
+      "context": "phone",
+      "surface": "game header",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 24,
+      "renderedHeight": 24
+    },
+    {
+      "context": "phone",
+      "surface": "announcement",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 162.70465087890625,
+      "renderedHeight": 162.70465087890625
+    },
+    {
+      "context": "fold",
+      "surface": "Dnes",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 60,
+      "renderedHeight": 60
+    },
+    {
+      "context": "fold",
+      "surface": "Hrát",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 48,
+      "renderedHeight": 48
+    },
+    {
+      "context": "fold",
+      "surface": "game header",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 24,
+      "renderedHeight": 24
+    },
+    {
+      "context": "fold",
+      "surface": "game header",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 24,
+      "renderedHeight": 24
+    },
+    {
+      "context": "fold",
+      "surface": "announcement",
+      "src": "http://127.0.0.1:8866/difficulty/printshop/mozkokalypsa-v2.svg",
+      "width": 150,
+      "height": 150,
+      "renderedWidth": 200.59475708007812,
+      "renderedHeight": 200.59478759765625
+    }
+  ],
+  "screenshots": [
+    "desktop-dnes.png",
+    "desktop-hrat.png",
+    "desktop-mozkomor-game.png",
+    "desktop-mozkokalypsa-game.png",
+    "desktop-announcement.png",
+    "phone-dnes.png",
+    "phone-hrat.png",
+    "phone-mozkomor-game.png",
+    "phone-mozkokalypsa-game.png",
+    "phone-announcement.png",
+    "fold-dnes.png",
+    "fold-hrat.png",
+    "fold-mozkomor-game.png",
+    "fold-mozkokalypsa-game.png",
+    "fold-announcement.png"
+  ],
+  "blockedRequests": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "serviceWorkerRequests": [],
+  "pointerCompletions": [],
+  "startedAt": "2026-10-01T22:59:15.268Z",
+  "browserVersion": "154.0.8037.58",
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "finishedAt": "2026-10-01T22:59:35.867Z",
+  "networkEvidence": {
+    "actualRequestCount": 1941,
+    "allowedFontRequestCount": 75,
+    "requestsByOrigin": {
+      "127.0.0.1:8866": 1866,
+      "fonts.googleapis.com": 30,
+      "fonts.gstatic.com": 45
+    },
+    "methods": {
+      "GET": 1941
+    },
+    "rawReportSha256": "6b73cc544926847f598b957c97a7bd89eccac0b4365a1ac7076f6def156df6bd",
+    "rawReportRetainedAt": "work\\mk100-ungated-local-final\\report.json"
+  }
+}

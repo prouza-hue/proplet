@@ -1,19 +1,19 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const src=fs.readFileSync('public/home-layout.js','utf8');
-let unlocked=false,state={inProgress:{},completed:{}},resumable=new Set();
-const keys=['easy','medium','hard','hardcore','mozkomor'];
-const ctx={DIFF:Object.fromEntries(keys.map(k=>[k,{label:k,xp:150}])),mozkomorUnlockState:()=>({unlocked}),getState:()=>state,freeProgress:k=>({done:0,total:150,pct:0,resume:resumable.has(k)?{meta:{level:7}}:null}),difficultyIconMarkup:()=>'',htmlEsc:x=>x};
+let state={inProgress:{},completed:{}},resumable=new Set();
+const keys=['easy','medium','hard','hardcore','mozkomor','mozkokalypsa'];
+const ctx={DIFF:Object.fromEntries(keys.map(k=>[k,{label:k,xp:150}])),getState:()=>state,freeProgress:k=>({done:0,total:150,pct:0,resume:resumable.has(k)?{meta:{level:7}}:null}),difficultyIconMarkup:()=>'',htmlEsc:x=>x};
 vm.createContext(ctx);vm.runInContext(src.slice(src.indexOf('  function todayDifficultyVisible('),src.indexOf('  function renderHomeQuickPlay(')),ctx);
 const cards=()=>[...ctx.difficultyTiles().matchAll(/data-home-free="([^"]+)"/g)].map(m=>m[1]);
-assert.deepEqual(cards(),keys.slice(0,4));
+assert.deepEqual(cards(),keys,'all difficulties are available with zero completions');
 state.inProgress={m:{mode:'free',difficulty:'mozkomor',savedAt:20},e:{mode:'free',difficulty:'easy',savedAt:10}};resumable=new Set(['easy','mozkomor']);
-assert.equal(ctx.latestFreeResume().difficulty,'easy','locked Mozkomor never leaks into Today');
-unlocked=true;assert.deepEqual(cards(),keys);assert.equal(ctx.latestFreeResume().difficulty,'mozkomor');
+assert.equal(ctx.latestFreeResume().difficulty,'mozkomor','Mozkomor can resume without prerequisite completions');
 state.inProgress.e.savedAt=30;assert.equal(ctx.latestFreeResume().difficulty,'easy','latest valid resume wins');
 resumable.delete('easy');assert.equal(ctx.latestFreeResume().difficulty,'mozkomor','stale completed entry must not hide a valid resume');
 resumable.clear();assert.equal(ctx.latestFreeResume(),null);
-unlocked=false;assert.deepEqual(cards(),keys.slice(0,4),'account change re-evaluates unlock');
-console.log('PASS Today: conditional fifth Mozkomor, latest valid resume, locked/account-change visibility');
+state={inProgress:{},completed:{}};assert.deepEqual(cards(),keys,'a fresh account keeps every difficulty available');
+assert.equal(ctx.todayDifficultyVisible('unknown'),false);
+console.log('PASS Today: all difficulties at zero progress, latest valid resume, fresh-account visibility');
 
 // Both discovery surfaces use one renderer, with independent click targets.
 const app=fs.readFileSync('public/app.js','utf8'),index=fs.readFileSync('public/index.html','utf8');

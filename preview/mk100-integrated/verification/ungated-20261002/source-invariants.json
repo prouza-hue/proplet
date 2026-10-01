@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-10-02",
+  "protectedSourcesByteIdentical": [
+    "content/gen6/mozkokalypsa-100/bank.json",
+    "content/gen6/mozkokalypsa-100/recognition-words.txt",
+    "content/lexicon-v3/working/lexicon.json",
+    "public/puzzles.json",
+    "data/puzzles.json",
+    "public/difficulty/printshop/mozkokalypsa-v2.svg"
+  ],
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "recognitionWords": 103836,
+  "difficultyGating": false,
+  "originalArtworkSha256": "a598ce93951838be74c6b63a03115a8b85c424e60ee78bb8df529a81f22c0887",
+  "sources": {
+    "public/app.js": "f3402425c35e5aeb301ae6143f336de7fba9768e25ed6e25693e53529a43f6c9",
+    "public/home-layout.js": "aedb99469afc1a95c7220f38753da1f6bd3ea5df805723f47c9515871a4d4401",
+    "public/compact-difficulties.css": "f9ed0440b5adaf5be6d5c02d0103d102aca022178d268d427b05f8e112f7d551",
+    "public/app/mk100-integrated-preview.js": "3b7179f06e992e1abf86541a84ceaafd1f4ec032a19d5f9178fd4716c9f94289",
+    "public/app/mk100-launch-preview.js": "815b1852bd9d73d6dc0703fb7aed18180f6847b915c1af88aea9cd7b24bd29c2",
+    "public/mozkokalypsa-difficulty-preview.css": "b6d82f8f5d0be613f6cf5fde421daf4542907ef979062e06cbce4716413880fb",
+    "public/mozkokalypsa-launch-preview.css": "e6902eb71eb44f1fe57166dcff122ac3c4ffd7def39838a9d5b4229c39349a76",
+    "public/difficulty/printshop/mozkokalypsa-v2.svg": "a598ce93951838be74c6b63a03115a8b85c424e60ee78bb8df529a81f22c0887",
+    "server.py": "c544a5b18fa567c97b30bc1e8fb34ea624b3cea17ca678f5d3ca045ec310c46a",
+    "backend/content.py": "4c845c6c500d7dfd5fd8362c00304d9945bf565301ca4210a3ec702b2d9f40cb",
+    "backend/progress.py": "58c9afa28d0857ab851081d19359c6666d0d90a19481ec8057daa51530df9961",
+    "tools/build_mk100_integrated_preview.py": "bbc1c582fd9bc8d81abcab98d84623362a84f805a853bdac1e1fa05d1b93fea5"
+  }
+}

@@ -75,7 +75,7 @@
   }
 
   function todayDifficultyVisible(key){
-    return !!DIFF[key]&&(key!=='mozkomor'||mozkomorUnlockState().unlocked);
+    return !!DIFF[key];
   }
 
   function freeHistory(){

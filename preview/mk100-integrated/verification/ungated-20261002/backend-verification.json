@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-02",
+  "scope": "remove all completion-history difficulty gates",
+  "tests": [
+    {
+      "path": "tests/current/test_mozkomor_any_200.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.28,
+      "output": "PASS all5 released difficulties: fresh account results, anonymous/account sessions, RPC0 snapshot; auth/release/key/path/finish safeguards preserved"
+    },
+    {
+      "path": "tests/current/test_s07a_progress_pure_core.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.19,
+      "output": "PASS: Sprint 07A pure progress core characterization"
+    },
+    {
+      "path": "tests/current/test_s07b_readonly_stats.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.2,
+      "output": "PASS: Sprint 07B read-only stats and explicit repair command"
+    },
+    {
+      "path": "tests/current/test_domain_golden.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.2,
+      "output": "domain golden vectors (Python): 9 PASS"
+    },
+    {
+      "path": "tests/current/test_gen5_production.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.41,
+      "output": "PASS: 450 approved production boards; old payloads, slot numbers and rolling dates unchanged"
+    },
+    {
+      "path": "tests/current/test_s08a_result_contract.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.11,
+      "output": "PASS: Sprint 08A atomic result contract and failure model"
+    },
+    {
+      "path": "tests/current/test_s08b_atomic_result_adapter.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.09,
+      "output": "PASS: Sprint 08B atomic result adapter\nPASS compact commit/replay receipt skips full history; legacy response preserved"
+    },
+    {
+      "path": "tests/current/test_s08b_result_adapter_characterization.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.09,
+      "output": "PASS: Sprint 08B legacy adapter characterization"
+    },
+    {
+      "path": "tests/current/test_migration_manifest.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.14,
+      "output": "PASS: migration manifest validator negative fixtures are deterministic"
+    },
+    {
+      "path": "tools/test_v40132_mozkomor_news_preview.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.19,
+      "output": "v4.01.32 joint preview contract: OK"
+    }
+  ],
+  "allPassed": true,
+  "liveDatabaseWrites": false,
+  "sqlChanged": false,
+  "migrationRequired": false,
+  "sourceSha256": {
+    "server.py": "c544a5b18fa567c97b30bc1e8fb34ea624b3cea17ca678f5d3ca045ec310c46a",
+    "backend/content.py": "4c845c6c500d7dfd5fd8362c00304d9945bf565301ca4210a3ec702b2d9f40cb",
+    "backend/progress.py": "58c9afa28d0857ab851081d19359c6666d0d90a19481ec8057daa51530df9961",
+    "SUPABASE_MIGRATION_V4_01_38_ATOMIC_RESULT.sql": "a566e902b834dc76ac5e9e4cec94a3d17b98a76c9f4d2817a45b9457abe25887",
+    "supabase/migrations/20260917065650_fair_play_sessions.sql": "46e8fa4d4469c07b46fb09d4a3aaacf803b4b2fc3381d3ecb101bf85455ab447",
+    "supabase/migrations/20260928225300_usage_p0_account_snapshot.sql": "d983530946ce50e69a4344f2e0711067ee53a416e101708b0c4d03046883a466"
+  },
+  "audit": [
+    {
+      "source": "server.py:play_session_command",
+      "before": "Mozkomor required an account and 200 distinct current hardcore results",
+      "after": "Released puzzle accepts any authenticated or anonymous telemetry actor; actor identity and canonical paths remain required."
+    },
+    {
+      "source": "server.py:result",
+      "before": "Mozkomor result loaded player completion history and enforced 200 hardcore results",
+      "after": "All released native difficulties accept a valid account result without history; authentication, puzzle/challenge/release/sanity/idempotency safeguards remain."
+    },
+    {
+      "source": "backend/content.py:mozkomor_unlocked_from_rows",
+      "after": "Always true compatibility signature, including explicit legacy required=200."
+    },
+    {
+      "source": "backend/progress.py:calculate_stats",
+      "after": "mozkomorUnlocked always true, including stale false input; completion/XP/streak statistics unchanged."
+    },
+    {
+      "source": "server.py:account_snapshot",
+      "after": "Existing SQL receives p_mozkomor_unlock_base=0 and response compatibility field is forced true."
+    },
+    {
+      "source": "server.py:config",
+      "after": "Current runtime metadata requiresDifficulty=null, requiresCurrentBaseLevels=0; frozen bank artifact is unchanged."
+    },
+    {
+      "source": "supabase/migrations/20260928225300_usage_p0_account_snapshot.sql",
+      "finding": "Only conditional unlock projection, no rejecting gate. Existing service-role-only read-only RPC supports parameter0; no migration required."
+    },
+    {
+      "source": "SUPABASE_MIGRATION_V4_01_38_ATOMIC_RESULT.sql",
+      "finding": "No history/count unlock gate. Preserves non-null player identity, fixed mode/difficulty allowlist, validated result command/digests, atomic idempotency and result/attempt ownership."
+    },
+    {
+      "source": "supabase/migrations/20260917065650_fair_play_sessions.sql",
+      "finding": "No difficulty/count gate. Retains actor/lease/owner locks, server clock and canonical-progress validation; anonymous actors already supported."
+    }
+  ]
+}

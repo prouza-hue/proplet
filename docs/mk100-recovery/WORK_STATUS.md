@@ -2,7 +2,8 @@
 
 **Navazující požadavek Pavla:** další playtest nebude. Aktuální práce je
 náhled v běžném celém Propletu na větvi `work/mk100-proplet-preview-20261001`;
-dosavadní brány se zachovávají a produkce se zatím nenasazuje. Podrobnosti
+rozhodnutí z 2. 10. odstraňuje všechny brány obtížností a vrací původní
+barevnou ilustraci Mozkokalypsy. Produkce se zatím nenasazuje. Podrobnosti
 a pozdější podmínky vydání jsou v [INTEGRATED_PREVIEW_20261001.md](INTEGRATED_PREVIEW_20261001.md).
 
 Finální stav po převzetí nereagujícího chatu „Dokončení stovky Mozkokalypsy“, 1. 10. 2026. Samostatná větev `work/mk100-completion-20261001` navazuje na úplný checkpoint `dc1fd060db70f38f7419f48dc498686faf5e5707`.

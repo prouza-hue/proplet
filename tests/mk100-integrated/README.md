@@ -1,64 +1,57 @@
-# Ověření Mozkokalypsy v celé aplikaci
+# Dostupnost obtížností v běžném náhledu Propletu
 
-Tato kontrola používá běžnou Volnou hru Propletu. Nevytváří další playtest,
-nevyplňuje hodnocení, nepřihlašuje hráče a nezapisuje na server.
+Krátký technický smoke používá normální Dnes, Hrát a Volnou hru. Všechny
+obtížnosti musí být dostupné hned, také Mozkomor a Mozkokalypsa. Test nezačne
+playtest, neřeší slova, nedokončuje desky, nevyplňuje hodnocení ani nezapisuje
+na server. Dřívější odemykací scénáře 0/199/200 a hromadné dohrávání odstraněny.
 
 ## Rozsah
 
-1. Zobrazit normální obrazovku Dnes, poté Hrát; Mozkokalypsa musí být poslední
-   obtížnost a při odemknutém Mozkomoru bezprostředně vedle něj.
-2. V nových samostatných testovacích profilech ověřit Mozkomor při 0, 199 a 200
-   syntetických dokončeních Mozkožroutů. Podmínka 200 i zapamatované odemknutí
-   zůstávají beze změny. Syntetická data dodává izolovaný bootstrap přes
-   `?previewPlayer=new`, `?previewHC=199` a `?previewHC=200`; existují jen v
-   samostatném namespace náhledu.
-3. Porovnat všech 100 integrovaných desek se schválenou bankou: stabilní ID,
-   pořadí, matice, masky, cesty a slova; profily 20/60/15/5. Samostatná obtížnost
-   nesmí přejmenovat ani nahradit dosavadní Mozkomor či nižší banky.
-4. Začít hru přes Dnes i Hrát, skutečně protáhnout slova myší nebo dotykem,
-   ověřit nalezená pole, nápovědu, obnovení rozehrané hry, dokončení, další
-   úroveň a lokální přehled dokončených úrovní. Výsledek používá běžné herní
-   modální okno, nikdy formulář playtestu.
-   Vedlejší slovo AKCI na první desce se ověřuje myší před cílovými slovy:
-   normální rozpoznání, +1 lokální XP, žádná vyplněná cílová pole.
-5. Otevřít odkaz `?review=12` na reprezentativních 12 desek a vstup `?board=20`,
-   ověřit počet i identitu. Výběr používá normální data všech 100 desek.
-6. Pořídit Dnes, Hrát, hru a dokončení při desktopu 1440×1080, telefonu 390×844
-   a rozloženém Foldu 768×1024. Telefon a Fold používají skutečné CDP dotykové
-   události. Jde o emulaci, ne fyzické přístroje.
-   Dotykové snímky zachycují viewport a zvlášť poslední karty po posunu;
-   Chromium 154 při `fullPage` snímku vypíná dotykovou emulaci.
-7. Zachytit síťové požadavky před otevřením stránky. Všechny mutace,
-   `/api/`, cizí adresy a service worker jsou zablokovány a každý takový pokus
-   znamená selhání ověření. Výjimkou jsou původní Google Fonts: pouze GET
-   stylesheet/font z přesných domén fonts.googleapis.com a fonts.gstatic.com.
-   Test nepřidává falešné odpovědi síťovým routám.
+1. V samostatném prázdném profilu `?previewPlayer=new` ověřit skutečnou nulu
+   dokončení u všech šesti obtížností, nulovou frontu výsledků a anonymní fixture.
+   Test nepřidává žádné dokončení ani příznak odemknutí.
+2. Na Dnes i Hrát musí být všech šest aktivních tlačítek v pořadí Snadná,
+   Střední, Těžká, Mozkožrout, Mozkomor, Mozkokalypsa. Žádná zamčená karta.
+3. Skutečným kliknutím či dotykem spustit Mozkomor a Mozkokalypsu z obou
+   nabídek. Obnovit stejnou prázdnou rozehranou desku po reloadu. Počet tahů,
+   nápověd, nalezených polí i dokončení musí zůstat nula.
+4. Ověřit původní barevný artwork `/difficulty/printshop/mozkokalypsa-v2.svg`
+   na Dnes, Hrát a v oznámení: skutečně načtený obrázek a nenulové rozměry.
+   Primární CTA oznámení musí otevřít běžnou Mozkokalypsu. Herní ikonu
+   kontrolujeme také, pokud ji běžný header obsahuje.
+5. Provést tentýž krátký průchod na desktopu 1440×1080, telefonu 390×844 a
+   rozloženém Foldu 768×1024. Telefon a Fold používají touchscreen tap; jde
+   o emulaci, nikoli fyzické přístroje. Dotykové snímky zachycují viewport,
+   protože Chromium154 při fullPage snímku vypíná dotykovou emulaci.
+6. Zachytit skutečnou síť před otevřením stránky. Mutace, `/api/`, produkční
+   a cizí adresy i service worker jsou zablokovány a pokus znamená FAIL.
+   Povolen je pouze původní read-only Google Fonts stylesheet/font GET
+   z přesných domén fonts.googleapis.com a fonts.gstatic.com. Test nikdy
+   nevrací falešné síťové odpovědi; in-memory fixture patří aplikaci.
 
 ## Použití
 
-Před ověřením je nutné přečíst Browser skill a zkusit jeho runtime. Skript je
-izolovaný záložní postup pouze tehdy, pokud runtime není dostupný a záloha byla
-autorizována. Nepoužívá profil ani přihlášení uživatelova prohlížeče.
+Nejprve přečíst Browser skill a zkusit jeho runtime. Zadání ověřit náhled
+zahrnuje izolované reverzibilní technické testy, bez dalšího potvrzení.
+Headless runner používá výhradně nové prázdné kontexty, nikoli existující
+uživatelský profil nebo jeho cookies. Pokud dostupný runtime nenabízí oddělené
+kontexty, síťový guard či potřebnou dotykovou emulaci, runner tyto kontroly
+provede odděleně; existující browser ovládá pouze runtime.
+`--approved-isolated-fallback` je výslovný přepínač tohoto rozsahu, nikoli
+požadavek na nové uživatelské potvrzení.
 
+```text
+node tests/mk100-integrated/verify.cjs --url http://127.0.0.1:8866/ \
+  --approved-isolated-fallback --availability-only --output work/mk100-ungated-local
 ```
-node tests/mk100-integrated/verify.cjs --url http://127.0.0.1:8765/ \
-  --approved-isolated-fallback --output work/mk100-integrated-browser
-```
 
-Skript vyžaduje Playwright na `NODE_PATH` a samostatný headless Chromium.
-Výchozí Windows cesta je instalovaný Chrome; lze změnit pomocí `--chromium`.
-`--bonus-only` provede pouze ověření AKCI a žádnou desku nedohraje.
-`--flows-only` pokračuje pouze ve třech běžných herních průchodech a odkazu na
-dvanáctku, pokud již byly integrita, všechny brány i AKCI prokazatelně ověřeny.
-`--all` rozšíří skutečné desktopové dohrání na všech 100 desek. Výchozí běh
-ověří geometrii a integraci všech 100 a skutečné dohrání jedné desky v každém
-ze tří rozměrů. `--representative-path` nastaví adresu dvanáctky. Náhled musí
-mít výslovný marker `PROPLET_RUNTIME_META.mk100IntegratedPreview === true` a
-`PROPLET_MK100_INTEGRATED_PREVIEW === true`, prostředí `preview`; skript nikdy
-nesmí být spuštěn proti produkčnímu aliasu. Profily pro syntetické brány
-používají uvedené fixture parametry; test nikdy nepřepisuje herní funkci pro
-odemykání.
+`--availability-only` je výchozí a jediný rozsah. Historické `--all`,
+`--flows-only` a `--bonus-only` jsou odmítnuty. Geometrii, zamrazenou banku
+stovky a rozpoznávání slov tento rychlý smoke znovu neověřuje. Na konkrétní
+Vercel Preview URL se spouští stejně s novým adresářem v `work/`.
 
-Záznamy, screenshoty a případná chyba se ukládají výhradně do `work/`.
-Screenshoty je nutné následně prohlédnout; jejich uložení samo nepotvrzuje
-vizuální kvalitu.
+Playwright musí být dostupný na `NODE_PATH`. `--chromium` mění cestu k
+samostatnému Chromium; výchozí Windows cesta je instalovaný Chrome. Náhled
+musí mít oba výslovné markery integrovaného preview a prostředí `preview`.
+Produkční aliasy jsou zakázané. Výstupy zůstávají v `work/`; uložené snímky
+je nutné skutečně prohlédnout před potvrzením vizuální kontroly.
