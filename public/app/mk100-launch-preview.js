@@ -10,18 +10,6 @@
   let background = [];
   let previousOverflow = '';
 
-  // A decorative, fully covered 4×4 board: VÍR, MAPA, SLOVA and HRÁT.
-  function boardArt() {
-    const letters = ['V', 'Í', 'M', 'A', 'S', 'R', 'A', 'P', 'L', 'O', 'H', 'R', 'A', 'V', 'T', 'Á'];
-    const paths = [
-      ['mint', '30,30 70,30 70,70'],
-      ['blue', '110,30 150,30 150,70 110,70'],
-      ['rust', '30,70 30,110 70,110 70,150 30,150'],
-      ['plum', '110,110 150,110 150,150 110,150']
-    ];
-    return `<svg class="mk-launch-board" viewBox="0 0 180 180" aria-hidden="true" focusable="false"><rect class="mk-launch-board-paper" x="5" y="5" width="170" height="170" rx="14"/>${paths.map(([color, points]) => `<polyline class="mk-launch-path ${color}" points="${points}"/>`).join('')}${letters.map((letter, index) => `<text x="${30 + (index % 4) * 40}" y="${30 + Math.floor(index / 4) * 40}">${letter}</text>`).join('')}</svg>`;
-  }
-
   function restoreBackground() {
     for (const [element, inert] of background) element.inert = inert;
     background = [];
@@ -78,7 +66,9 @@
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-labelledby', 'mk100LaunchTitle');
     modal.setAttribute('aria-describedby', 'mk100LaunchCopy');
-    modal.innerHTML = `<section class="modal-card mk-launch-card"><button type="button" class="modal-close" data-mk-launch-close aria-label="Zavřít oznámení"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div class="mk-launch-art" aria-hidden="true"><span class="mk-launch-hundred">100</span><img class="mk-launch-vortex" src="/difficulty/printshop/mozkokalypsa-series-ochre.svg" width="180" height="180" alt="">${boardArt()}</div><h2 id="mk100LaunchTitle">Mozkokalypsa je tady.</h2><p id="mk100LaunchCopy">Sto nových desek. Plná mřížka. Každé políčko patří do řešení.</p><div class="mk-launch-actions"><button type="button" class="primary-btn big" data-mk-launch-play>Jdu do Mozkokalypsy <span aria-hidden="true">→</span></button><button type="button" class="text-btn" data-mk-launch-back>Zpět do náhledu</button></div></section>`;
+    // Frozen mozkokalypsa-100/bank.json: 100 boards, 100 cells each,
+    // 1,008 distinct targets across 1,400 occurrences (not 1,008 newly added lexemes).
+    modal.innerHTML = `<section class="modal-card mk-launch-card"><button type="button" class="modal-close" data-mk-launch-close aria-label="Zavřít oznámení"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div class="mk-launch-art" aria-hidden="true"><img class="mk-launch-vortex" src="/difficulty/printshop/mozkokalypsa-series-ochre.svg" width="180" height="180" alt=""></div><h2 id="mk100LaunchTitle">Troufneš si na<br><span>Mozkokalypsu?</span></h2><div id="mk100LaunchCopy" class="mk-launch-facts"><p><strong>1&nbsp;008</strong><span>různých slov</span></p><p><strong>100</strong><span>nových desek</span></p><p><strong>100</strong><span>písmen na desce</span></p></div><div class="mk-launch-actions"><button type="button" class="primary-btn big" data-mk-launch-play>Troufnu si <span aria-hidden="true">→</span></button><button type="button" class="text-btn" data-mk-launch-back>Teď ne</button></div></section>`;
     document.body.appendChild(modal);
     modal.querySelector('[data-mk-launch-close]').addEventListener('click', () => close());
     modal.querySelector('[data-mk-launch-back]').addEventListener('click', () => close());
