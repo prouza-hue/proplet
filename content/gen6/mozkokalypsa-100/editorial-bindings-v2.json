@@ -1,6 +1,6 @@
 {
   "status": "complete-individual-review100",
-  "createdAt": "2026-10-01T20:16:28.276414+00:00",
+  "createdAt": "2026-10-01T20:19:36.165823+00:00",
   "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
   "records": [
     {
@@ -714,7 +714,7 @@
       "individualGridReview": true,
       "risks": [
         "PELYNĚK může být méně aktivní slovní zásoba; zůstává běžně kulturně známým názvem a nestojí vedle dalšího úzkého botanického cíle. DOLINA má regionální odstín, ale přirozené spisovné použití.",
-        "Tato mřížka byla nově vybrána kvůli odstupu konstrukčních opakování. Její závěrové hodnoty se musejí vázat na aktuální hash, nikoli na původní výpočet; skutečný účinek na poslední trojici zůstává neověřený."
+        "Aktuální P25 všech 364 trojic je 13,167, pod referencí mk2-10. Čtyři ze šesti citlivostních konců mají více komponent; dvě hypotézy dávají stejnou trojici a nejsou nezávislými konstrukčními variantami. Skutečný účinek na poslední trojici zůstává neověřený."
       ]
     },
     {

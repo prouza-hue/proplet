@@ -111,7 +111,7 @@ def catalogue():
         text.extend([f"Identita `{board['id']}`; obsahový hash `{board_hash(board)}`; seed `{board['meta']['seed']}`. Zatáčky v průměru {record['geometry']['meanTurns']:.2f}; přesný solver PASS, cesty unikátní. "+('Cílený závěrový experiment.' if board['meta']['targetedEndgame'] else 'Přirozené závěrečné zrychlení přípustné.'),''])
         bound.append({'id':board['id'],'ordinal':ordinal,'contentHash':board_hash(board),
                       'wordsetHash':digest(words),'individualLexicalReview':True,'individualGridReview':True,'risks':risks})
-    (DIRECTORY/'CATALOG.md').write_text('\n'.join(text)+'\n',encoding='utf-8')
+    (DIRECTORY/'CATALOG.md').write_text('\n'.join(text).rstrip()+'\n',encoding='utf-8')
     write('editorial-bindings-v2.json',{'status':'complete-individual-review100','createdAt':datetime.now(timezone.utc).isoformat(),
                                      'bankContentHash':bank['contentHash'],'records':bound,'reviewerType':'AI editorial model assessments'})
     return bound

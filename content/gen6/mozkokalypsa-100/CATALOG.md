@@ -764,9 +764,9 @@ Slova: ŽEBŘÍK, BARIÉRA, MARATON, PELYNĚK, HÁČKOVAT, MELODIE, DOLINA, NÁS
 
 NÁSTĚNKA, ŽEBŘÍK a SVÍTILNA dávají hmatatelné vstupy. MARATON, MELODIE a DOLINA zabraňují tematickému sevření.
 
-MELODIE vede od horního středu pěti řádky se třemi většími obraty, SVÍTILNA má pět vratných změn ve spodním vodorovném pásu. PODMÍNKA se šestkrát láme v levé horní oblasti; po přeselekci je závěrový experiment opřený o členitost i kontakt různých běžných slov.
+MELODIE vede od horního středu pěti řádky se třemi většími obraty, SVÍTILNA má pět vratných změn ve spodním vodorovném pásu. PODMÍNKA se šestkrát láme vlevo nahoře; dvě odlišné závěrové trojice ji kombinují se ZKUMAVKOU/PŘÍBORNÍKEM nebo MARATONEM/BARIÉROU, bez deklarované raritní bariéry.
 
-Rizika: PELYNĚK může být méně aktivní slovní zásoba; zůstává běžně kulturně známým názvem a nestojí vedle dalšího úzkého botanického cíle. DOLINA má regionální odstín, ale přirozené spisovné použití. Tato mřížka byla nově vybrána kvůli odstupu konstrukčních opakování. Její závěrové hodnoty se musejí vázat na aktuální hash, nikoli na původní výpočet; skutečný účinek na poslední trojici zůstává neověřený.
+Rizika: PELYNĚK může být méně aktivní slovní zásoba; zůstává běžně kulturně známým názvem a nestojí vedle dalšího úzkého botanického cíle. DOLINA má regionální odstín, ale přirozené spisovné použití. Aktuální P25 všech 364 trojic je 13,167, pod referencí mk2-10. Čtyři ze šesti citlivostních konců mají více komponent; dvě hypotézy dávají stejnou trojici a nejsou nezávislými konstrukčními variantami. Skutečný účinek na poslední trojici zůstává neověřený.
 
 Identita `mk100-v2-065`; obsahový hash `d65c7ea0e8bf860cf65eaba75f8b41e31d35d98cad2652e352b828402c56665d`; seed `5740149203378279919`. Zatáčky v průměru 4.14; přesný solver PASS, cesty unikátní. Cílený závěrový experiment.
 
@@ -1189,4 +1189,3 @@ KRAJKÁŘKA skládá sedm vratných změn ve středovém pěti řádkovém pásu
 Rizika: KRAJKÁŘKA je vědomě méně aktivní tradiční řemeslo; jiná úzká rarita není nutná. VOLÁN má menší aktivní znalost, ale běžné oděvní použití. Vrchol i poslední trojice musí stát na konstrukční evidenci, nikoli na vydávání C tierů za vzácnost. KRAJKÁŘKA je přiznaná kulturní znalostní bariéra, nikoli změřená univerzální obtížnost. Exhaustive P25 13,25 a možnost dvou komponent ve mixed-first nechávají slabší pořadí; účinek finálního vrcholu musí potvrdit lidé.
 
 Identita `mk100-v2-100`; obsahový hash `04424808040675280451f74866b3ae46c2eaa46df86990b72fe05e14edeabb9a`; seed `7751655814009383982`. Zatáčky v průměru 4.71; přesný solver PASS, cesty unikátní. Cílený závěrový experiment.
-
