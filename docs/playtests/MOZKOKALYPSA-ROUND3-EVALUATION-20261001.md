@@ -1,6 +1,6 @@
 # Mozkokalypsa III — vyhodnocení playtestu
 
-Datum: 1. 10. 2026. Datový řez ověřen 08:44 Europe/Prague.  
+Datum: 1. 10. 2026. Datový řez ověřen 08:44, doplňující účetní a týmový audit 08:46–08:49 Europe/Prague.  
 Experiment: `mozkokalypsa-round3-interwoven-v2`. Supabase: `iopyhluayfszskyqqpuc`.  
 Start: 29. 9. 2026 00:00; uzávěrka: 1. 10. 2026 00:00 Europe/Prague. Přesně 48 hodin.  
 Ověřený main i produkční SHA: `0c597b980821749fa6d397b04716376aea1aa2e0`.  
@@ -23,7 +23,27 @@ Poslední tři slova se ale ve stejném panelu hledala v mediánu za **19,3 s m�
 - **63 oprávněných odměn = 63 × 200 XP = 12 600 XP.** Žádná duplicita, chybějící odměna, odměna navíc, chybná částka ani odměna po uzávěrce. Neúplné pokusy nemají XP. Účetní stav kola II zůstává 103 odměn / 20 600 XP.
 - Proběhlo pouze čtení produkčních dat a vytvoření dokumentace. Žádné syntetické hraní, změna hráčských výsledků, mapování do finální banky, výroba desek ani nasazení.
 
-Playtestové odměny jsou osobní XP v `account_rewards`. Podle produkční release dokumentace nezvyšují skóre týdenní týmové soutěže, která čerpá herní `results`; tato analýza znovu neauditovala celý týmový výpočet.
+### Doplněný audit 1. 10. v 08:46–08:49 Europe/Prague
+
+Odměny a jejich předpoklady byly znovu ověřeny v **jednom SELECTu a jednom konzistentním MVCC snapshotu `1323418:1323418:`** (06:46:21 UTC). Vedle výše uvedených počtů je výsledek:
+
+| Kontrola | Výsledek |
+|---|---:|
+| Výplata před událostí dokončení nebo před prvními oběma platnými známkami | 0 |
+| Nesoulad reward_points a account_rewards.points / chybějící rewarded_at | 0 / 0 |
+| Chybný reward_type | 0 |
+| Odměněný nedokončený pokus | 0 |
+| Playtestové zápisy v běžných results / puzzle_runs / free_slot_rewards | 0 / 0 / 0 |
+
+Předčasnost byla ověřena pro `account_rewards.granted_at` i `attempts.rewarded_at` proti první události `finish` a první platné `feedback` s oběma známkami 1–5. Maximální rozdíl `granted_at` proti `rewarded_at` činí 177,323 ms; odpovídá následnému zápisu v téže transakci, není chybnou výplatou. Oba nedokončené pokusy mají nula XP a NULL `rewarded_at`.
+
+**Oddělení osobních a týmových XP je nyní ověřeno přímo v produkčních definicích**, nikoli pouze v release dokumentaci. `proplet_rankings_xp_aggregate` zahrnuje `account_rewards` do osobního skóre, ale jeho týmová větev čte jen `results.points`. Totéž platí pro `proplet_finalize_team_victories_v1`, který uzavírá týdenní soutěž. V kombinaci s nulovými běžnými výsledky playtestu se jeho 12 600 XP nezapočítává do týdenního týmového skóre. Žádná z funkcí nebyla za účelem kontroly spuštěna se zápisovým účinkem.
+
+Nezávislé kontrolní SQL v 06:49:01 UTC potvrdilo shodné počty, známky a účast po hráčích a nenašlo chybu monotónnosti časových řad ani pořadí správných nálezů.
+
+### Historické příznaky banky versus skutečný stav
+
+Konfigurace a obsah očekávané osmičky se shodují. Banka na main však stále nese původní `kind=gen6-unpublished-preview`, `status=verified-unpublished`, `publicationAuthorized=false` a `humanDifficulty=unmeasured`. Jsou to historické příznaky schváleného artefaktu; release dokumentace a skutečná produkční data potvrzují autorizovaný playtest. Nepředstavují aktuální měření lidské obtížnosti ani schválení převodu do finální série. Příznaky zůstaly beze změny.
 
 ## Účast
 
@@ -36,6 +56,8 @@ Playtestové odměny jsou osobní XP v `account_rewards`. Podle produkční rele
 | Rozehrané pokusy celkem | 65 |
 | Dokončené desky z pozvané kapacity | 63 / 96 (65,6 %) |
 | Obě hodnocení mezi dokončenými | 63 / 63 (100 %) |
+
+Z 65 vzniklých pokusů má **64 alespoň jeden skutečný tah**. Janakovo otevření čtvrté desky není reálné rozehrání; všichni z devíti aktivních hráčů ale skutečně hráli jiné desky. Podíl 63/64 ani 63/65 není retencí celé pozvané kohorty, protože nezahrnuje neotevřené desky.
 
 Sedm kompletních hráčů: PiettraWal, Michael, Ave, Frau Klein, Kvasmeister, BoltKey a MP. Janak dokončil první tři desky a čtvrtou pouze otevřel (0 nalezených slov, 5,8 s). Pavel dokončil první čtyři a na páté našel jedno slovo (12,0 s). Diss, Umpalump a Petra nezačali. Bez dat o důvodu jejich neúčasti ji nelze vydávat za odmítnutí nové edice.
 
@@ -145,6 +167,27 @@ Dobrovolných textových poznámek je **12 od čtyř hráčů**: BoltKey šest, 
 - **Neznámé není automaticky špatné.** PiettraWal nezná HŘEBELEC a MINCÍŘ, přesto příslušným deskám dává 5. Pavel HŘEBELEC označuje za divný, ale desce dává 4. HŘEBELEC má díky dvěma nezávislým zmínkám prioritu pro jazykovou a produktovou kontrolu; tato analýza sama neověřovala jeho slovníkové postavení.
 - **Kumulace odbornějších pojmů polarizuje.** BoltKey kritizuje CITERA/PLOTICE na `01`, ŠEROSVIT/DEVĚTSIL/PASTOREK na `03`, LOUBÍ/DRTINA na `04` a ODDENEK na `05`. Jeho zábavnost klesla z 3,17 na 2,63. U `03` dává jedinou jedničku; z dalších šesti panelových hráčů pět dává 5 a jeden 4. Desku tedy nelze označit za všeobecný neúspěch.
 - **Psaní feedbacku má tření.** BoltKey na `04` a `05` výslovně píše, že při hodnocení slova nevidí a zapomíná, která mu vadila. Aktuální kód už nabízí „Prohlédnout dohranou desku“ se zpětným návratem k hodnocení. Nejde o potvrzenou chybějící funkci; doporučení je ověřit její viditelnost a případně mít seznam nalezených slov přímo v hodnocení, bez přepínání. Záznamy nedokládají, zda hráč tlačítko přehlédl, nebo měl konkrétní technický problém.
+
+### Vybrané intervaly na slovo
+
+Interval je rozdíl kumulativních herních časů sousedních nálezů; zahrnuje mezilehlé hledání, chyby a případnou nápovědu. Nelze jej beze zbytku připsat znalosti konkrétního slova. Všechna dokončení příslušné desky:
+
+| Slovo | Počet | Medián intervalu | Průměr intervalu |
+|---|---:|---:|---:|
+| PASTOREK | 9 | 36,9 s | 58,1 s |
+| BRLOH | 9 | 29,5 s | 40,1 s |
+| HŘEBELEC | 9 | 14,9 s | 15,3 s |
+| DEVĚTSIL | 9 | 12,9 s | 21,6 s |
+| ŠEROSVIT | 9 | 9,3 s | 31,5 s |
+| CITERA | 9 | 6,9 s | 11,9 s |
+| PLOTICE | 9 | 8,5 s | 13,1 s |
+| ODDENEK | 7 | 7,4 s | 10,2 s |
+| MINCÍŘ | 7 | 5,0 s | 17,6 s |
+| SKALISKO | 7 | 4,4 s | 11,9 s |
+
+HŘEBELEC je posledním slovem u 2/9, nikoli univerzálním závěrečným zásekem. SKALISKO bývá poslední často, ale jeho medián intervalu je krátký. Samotná četnost na posledním místě není mírou obtížnosti.
+
+Medián jednoho intervalu u prvních jedenácti / posledních tří nálezů je ve II **9,37 / 6,30 s**, ve III **11,58 / 4,87 s**. Ve III průměry činí 23,31 / 9,56 s. I po vyloučení tří dokončení s nápovědou je souhrnný poměr závěru jen 0,38×. Výsledek o rychlejším závěru tedy není vysvětlen pouze nápovědami.
 
 ## Pořadí a adaptace
 
