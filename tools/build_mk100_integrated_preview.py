@@ -75,7 +75,7 @@ def build():
         'recognitionFileSha256': hashlib.sha256(raw).hexdigest(), 'lexiconHash': lexicon_sha,
         'difficultyGating': False, 'difficultyGatingRemovedOn': '2026-10-02',
         'existingMozkomorGate': None, 'newMozkokalypsaGate': None,
-        'mozkokalypsaArtwork': '/difficulty/printshop/mozkokalypsa-v2.svg',
+        'mozkokalypsaArtwork': '/difficulty/printshop/mozkokalypsa-series-ochre.svg',
         'publicationAuthorized': False,
         'playtest': False, 'serverFunctions': 0, 'productionWrites': False,
         'accounts': False, 'localPreviewProgressOnly': True,

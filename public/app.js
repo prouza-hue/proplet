@@ -25,7 +25,7 @@ const DIFF={
 };
 // The unpublished series is enabled only by the isolated full-app preview.
 if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true){
- DIFF.mozkokalypsa={label:'Mozkokalypsa',icon:'/difficulty/printshop/mozkokalypsa-v2.svg',desc:'10×10 · stovka nových desek, čtrnáct slov a plná mřížka.',xp:200};
+ DIFF.mozkokalypsa={label:'Mozkokalypsa',icon:'/difficulty/printshop/mozkokalypsa-series-ochre.svg',desc:'10×10 · stovka nových desek, čtrnáct slov a plná mřížka.',xp:200};
  WIN_PRAISE.mozkokalypsa=['Mozkokalypsa rozpletena!','Tohle byla pořádná výzva.','Každé políčko má své místo.','Klobouk dolů!'];
 }
 const MOZKOMOR_QA_PRODUCTION_HOSTS=new Set(['proplet-nine.vercel.app','proplet-pavel-prouzas-projects.vercel.app','proplet-git-main-pavel-prouzas-projects.vercel.app']);
