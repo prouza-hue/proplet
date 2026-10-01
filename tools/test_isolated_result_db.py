@@ -200,6 +200,13 @@ def main():
         assert function == 'proplet_submit_result_v1'
         return submit(body['p_command'])
 
+    def auth_rpc(function, body):
+        assert function == 'proplet_auth_player_v1'
+        with connect() as c:
+            c.execute('set role service_role')
+            return c.execute('select public.proplet_auth_player_v1(%s)',
+                             (body['p_token_hash'],)).fetchone()[0]
+
     board = server.load_puzzles()['free']['easy'][0]
     body = dict(puzzle_id=board['id'], challenge_key='free:'+board['id'], mode='free',
                 difficulty='easy', elapsed_ms=42000, moves=len(board['answers']),
@@ -208,7 +215,7 @@ def main():
         for attribute, value in {
             'ATOMIC_RESULT_V1_ENABLED': True, 'VERCEL_ENV': 'development',
             'enforce_rate_limit': lambda *a, **kw: None,
-            'db_select': select, 'db_atomic_result_rpc': rpc,
+            'db_select': select, 'db_atomic_result_rpc': rpc, 'db_rpc': auth_rpc,
             'rankings_v2_schema_ready': lambda: False,
             'player_stats': lambda player_id: {'playerId': player_id},
         }.items():
