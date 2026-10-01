@@ -1,0 +1,2438 @@
+{
+  "metadata": {
+    "main_sha": "0c597b980821749fa6d397b04716376aea1aa2e0",
+    "experiment": "mozkokalypsa-round3-interwoven-v2",
+    "balanced_players": [
+      "Ave",
+      "BoltKey",
+      "Frau Klein",
+      "Kvasmeister",
+      "MP",
+      "Michael",
+      "PiettraWal"
+    ],
+    "trio": [
+      "Ave",
+      "Michael",
+      "PiettraWal"
+    ],
+    "evaluated_at": "2026-10-01T06:44:12.149627+00:00",
+    "production_deployment": "dpl_9R9ofNzAdQspYpy5BbSk3RZCVLxW",
+    "cohort_invited": 12,
+    "participant_started": 9,
+    "participant_completed_all": 7,
+    "execution": "read-only"
+  },
+  "overall": {
+    "mozkokalypsa-20260922-v1": {
+      "n": 50,
+      "rated": 45,
+      "median_s": 139.404,
+      "mean_s": 181.02798,
+      "difficulty": 2.8222222222222224,
+      "fun": 3.7555555555555555,
+      "difficulty_dist": {
+        "1": 4,
+        "2": 12,
+        "3": 20,
+        "4": 6,
+        "5": 3
+      },
+      "fun_dist": {
+        "2": 2,
+        "3": 14,
+        "4": 22,
+        "5": 7
+      },
+      "wrong": 146,
+      "wrong_per": 2.92,
+      "zero_wrong": 7,
+      "hints": 2,
+      "hint_boards": 2,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 11,
+      "last3_median_s": 22.872500000000002,
+      "last3_share_mean": 0.18836145911604613,
+      "last3_ratio_mean": 0.8253389434798855,
+      "last3_ratio_median": 0.7255993210500631,
+      "last3_ratio_pooled": 0.7113768883078204
+    },
+    "mozkokalypsa-round2-20260925": {
+      "n": 103,
+      "rated": 103,
+      "median_s": 198.928,
+      "mean_s": 221.24226213592232,
+      "difficulty": 3.262135922330097,
+      "fun": 3.8058252427184467,
+      "difficulty_dist": {
+        "1": 3,
+        "2": 17,
+        "3": 44,
+        "4": 28,
+        "5": 11
+      },
+      "fun_dist": {
+        "2": 6,
+        "3": 20,
+        "4": 65,
+        "5": 12
+      },
+      "wrong": 304,
+      "wrong_per": 2.9514563106796117,
+      "zero_wrong": 12,
+      "hints": 1,
+      "hint_boards": 1,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 22,
+      "last3_median_s": 22.48,
+      "last3_share_mean": 0.1625464766107401,
+      "last3_ratio_mean": 0.8046859454168707,
+      "last3_ratio_median": 0.5624301321669413,
+      "last3_ratio_pooled": 0.7332157387198301
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "n": 63,
+      "rated": 63,
+      "median_s": 254.15,
+      "mean_s": 285.07096825396826,
+      "difficulty": 3.888888888888889,
+      "fun": 4.111111111111111,
+      "difficulty_dist": {
+        "2": 4,
+        "3": 15,
+        "4": 28,
+        "5": 16
+      },
+      "fun_dist": {
+        "1": 1,
+        "2": 2,
+        "3": 10,
+        "4": 26,
+        "5": 24
+      },
+      "wrong": 376,
+      "wrong_per": 5.968253968253968,
+      "zero_wrong": 6,
+      "hints": 10,
+      "hint_boards": 3,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 18,
+      "last3_median_s": 21.06,
+      "last3_share_mean": 0.10955483141212509,
+      "last3_ratio_mean": 0.48233383931243323,
+      "last3_ratio_median": 0.3799211375228803,
+      "last3_ratio_pooled": 0.41035509209436727
+    }
+  },
+  "balanced_comparison": {
+    "mozkokalypsa-round2-20260925": {
+      "n": 84,
+      "rated": 84,
+      "median_s": 197.147,
+      "mean_s": 212.86029761904763,
+      "difficulty": 3.1547619047619047,
+      "fun": 3.7261904761904763,
+      "difficulty_dist": {
+        "1": 3,
+        "2": 15,
+        "3": 42,
+        "4": 14,
+        "5": 10
+      },
+      "fun_dist": {
+        "2": 6,
+        "3": 18,
+        "4": 53,
+        "5": 7
+      },
+      "wrong": 238,
+      "wrong_per": 2.8333333333333335,
+      "zero_wrong": 11,
+      "hints": 0,
+      "hint_boards": 0,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 14,
+      "last3_median_s": 21.238,
+      "last3_share_mean": 0.15694582983776306,
+      "last3_ratio_mean": 0.7728760839710683,
+      "last3_ratio_median": 0.5478479247568804,
+      "last3_ratio_pooled": 0.6872259747045059
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "n": 56,
+      "rated": 56,
+      "median_s": 237.1985,
+      "mean_s": 278.48910714285716,
+      "difficulty": 3.8392857142857144,
+      "fun": 4.053571428571429,
+      "difficulty_dist": {
+        "2": 4,
+        "3": 15,
+        "4": 23,
+        "5": 14
+      },
+      "fun_dist": {
+        "1": 1,
+        "2": 2,
+        "3": 10,
+        "4": 23,
+        "5": 20
+      },
+      "wrong": 325,
+      "wrong_per": 5.803571428571429,
+      "zero_wrong": 6,
+      "hints": 5,
+      "hint_boards": 1,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 11,
+      "last3_median_s": 19.332,
+      "last3_share_mean": 0.10818585240206774,
+      "last3_ratio_mean": 0.4768102619110875,
+      "last3_ratio_median": 0.34785680126673146,
+      "last3_ratio_pooled": 0.4025257804065613
+    }
+  },
+  "trio_comparison": {
+    "mozkokalypsa-20260922-v1": {
+      "n": 30,
+      "rated": 25,
+      "median_s": 112.295,
+      "mean_s": 115.7401,
+      "difficulty": 2.64,
+      "fun": 3.72,
+      "difficulty_dist": {
+        "1": 2,
+        "2": 9,
+        "3": 10,
+        "4": 4
+      },
+      "fun_dist": {
+        "3": 9,
+        "4": 14,
+        "5": 2
+      },
+      "wrong": 64,
+      "wrong_per": 2.1333333333333333,
+      "zero_wrong": 6,
+      "hints": 0,
+      "hint_boards": 0,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 2,
+      "last3_median_s": 18.8775,
+      "last3_share_mean": 0.2063536492440019,
+      "last3_ratio_mean": 0.9183751970415673,
+      "last3_ratio_median": 0.8419873311472899,
+      "last3_ratio_pooled": 0.8400846318805976
+    },
+    "mozkokalypsa-round2-20260925": {
+      "n": 36,
+      "rated": 36,
+      "median_s": 180.9475,
+      "mean_s": 206.68325,
+      "difficulty": 3.0555555555555554,
+      "fun": 4.027777777777778,
+      "difficulty_dist": {
+        "1": 2,
+        "2": 5,
+        "3": 20,
+        "4": 7,
+        "5": 2
+      },
+      "fun_dist": {
+        "3": 2,
+        "4": 31,
+        "5": 3
+      },
+      "wrong": 84,
+      "wrong_per": 2.3333333333333335,
+      "zero_wrong": 6,
+      "hints": 0,
+      "hint_boards": 0,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 8,
+      "last3_median_s": 20.9965,
+      "last3_share_mean": 0.16826102981130658,
+      "last3_ratio_mean": 0.8456430456486511,
+      "last3_ratio_median": 0.5483890887571292,
+      "last3_ratio_pooled": 0.7281196144301869
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "n": 24,
+      "rated": 24,
+      "median_s": 251.28,
+      "mean_s": 302.13545833333336,
+      "difficulty": 3.875,
+      "fun": 4.541666666666667,
+      "difficulty_dist": {
+        "2": 2,
+        "3": 6,
+        "4": 9,
+        "5": 7
+      },
+      "fun_dist": {
+        "4": 11,
+        "5": 13
+      },
+      "wrong": 132,
+      "wrong_per": 5.5,
+      "zero_wrong": 4,
+      "hints": 0,
+      "hint_boards": 0,
+      "resets": 0,
+      "calm": 0,
+      "resumes": 5,
+      "last3_median_s": 18.802,
+      "last3_share_mean": 0.08912262238542326,
+      "last3_ratio_mean": 0.37197549592677115,
+      "last3_ratio_median": 0.30879753604242094,
+      "last3_ratio_pooled": 0.29621899739739765
+    }
+  },
+  "players": {
+    "PiettraWal": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 163.58350000000002,
+        "mean_s": 213.894,
+        "difficulty": 4.125,
+        "fun": 4.75,
+        "difficulty_dist": {
+          "3": 2,
+          "4": 3,
+          "5": 3
+        },
+        "fun_dist": {
+          "4": 2,
+          "5": 6
+        },
+        "wrong": 20,
+        "wrong_per": 2.5,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 12.469000000000001,
+        "last3_share_mean": 0.06788750515591427,
+        "last3_ratio_mean": 0.2701864174527632,
+        "last3_ratio_median": 0.2693103158686825,
+        "last3_ratio_pooled": 0.22694598390957257
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 20,
+        "hint": 0,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 5,
+        "resume": 2
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 128.09,
+        "mean_s": 147.44983333333334,
+        "difficulty": 3.25,
+        "fun": 4.083333333333333,
+        "difficulty_dist": {
+          "2": 2,
+          "3": 6,
+          "4": 3,
+          "5": 1
+        },
+        "fun_dist": {
+          "4": 11,
+          "5": 1
+        },
+        "wrong": 16,
+        "wrong_per": 1.3333333333333333,
+        "zero_wrong": 4,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 17.974,
+        "last3_share_mean": 0.18180667455561578,
+        "last3_ratio_mean": 0.9510366455079594,
+        "last3_ratio_median": 0.6358278513851314,
+        "last3_ratio_pooled": 0.8119390454728724
+      },
+      "incomplete": []
+    },
+    "Michael": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 227.815,
+        "mean_s": 224.313375,
+        "difficulty": 3.125,
+        "fun": 4,
+        "difficulty_dist": {
+          "2": 2,
+          "3": 3,
+          "4": 3
+        },
+        "fun_dist": {
+          "4": 8
+        },
+        "wrong": 12,
+        "wrong_per": 1.5,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 3,
+        "last3_median_s": 19.654,
+        "last3_share_mean": 0.11841483321227192,
+        "last3_ratio_mean": 0.5127267429651295,
+        "last3_ratio_median": 0.38817871727801134,
+        "last3_ratio_pooled": 0.428579460954202
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 12,
+        "hint": 0,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 3,
+        "resume": 3
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 241.298,
+        "mean_s": 269.20375,
+        "difficulty": 3.1666666666666665,
+        "fun": 4,
+        "difficulty_dist": {
+          "3": 10,
+          "4": 2
+        },
+        "fun_dist": {
+          "4": 12
+        },
+        "wrong": 24,
+        "wrong_per": 2,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 6,
+        "last3_median_s": 21.432000000000002,
+        "last3_share_mean": 0.16368203363698403,
+        "last3_ratio_mean": 0.8657340239750072,
+        "last3_ratio_median": 0.38812499136272005,
+        "last3_ratio_pooled": 0.7058163082857385
+      },
+      "incomplete": []
+    },
+    "Ave": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 367.1895,
+        "mean_s": 468.199,
+        "difficulty": 4.375,
+        "fun": 4.875,
+        "difficulty_dist": {
+          "3": 1,
+          "4": 3,
+          "5": 4
+        },
+        "fun_dist": {
+          "4": 1,
+          "5": 7
+        },
+        "wrong": 100,
+        "wrong_per": 12.5,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 36.849000000000004,
+        "last3_share_mean": 0.0810655287880836,
+        "last3_ratio_mean": 0.3330133273624207,
+        "last3_ratio_median": 0.34529245381282797,
+        "last3_ratio_pooled": 0.26727936177656375
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 100,
+        "hint": 0,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 1,
+        "resume": 0
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 174.724,
+        "mean_s": 203.39616666666666,
+        "difficulty": 2.75,
+        "fun": 4,
+        "difficulty_dist": {
+          "1": 2,
+          "2": 3,
+          "3": 4,
+          "4": 2,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 2,
+          "4": 8,
+          "5": 2
+        },
+        "wrong": 44,
+        "wrong_per": 3.6666666666666665,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 21.7845,
+        "last3_share_mean": 0.15929438124131992,
+        "last3_ratio_mean": 0.7201584674629866,
+        "last3_ratio_median": 0.6307089213834748,
+        "last3_ratio_pooled": 0.6983700300142104
+      },
+      "incomplete": []
+    },
+    "Frau Klein": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 293.1455,
+        "mean_s": 315.448875,
+        "difficulty": 4.75,
+        "fun": 4,
+        "difficulty_dist": {
+          "4": 2,
+          "5": 6
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 6,
+          "5": 1
+        },
+        "wrong": 31,
+        "wrong_per": 3.875,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 27.643,
+        "last3_share_mean": 0.1027670859829126,
+        "last3_ratio_mean": 0.42787964817518737,
+        "last3_ratio_median": 0.34257270327734685,
+        "last3_ratio_pooled": 0.40152388188303234
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 31,
+        "hint": 0,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 1,
+        "resume": 1
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 228.71699999999998,
+        "mean_s": 235.953,
+        "difficulty": 4.333333333333333,
+        "fun": 2.9166666666666665,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 2,
+          "4": 1,
+          "5": 8
+        },
+        "fun_dist": {
+          "2": 4,
+          "3": 5,
+          "4": 3
+        },
+        "wrong": 27,
+        "wrong_per": 2.25,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 28.945,
+        "last3_share_mean": 0.1375577624032084,
+        "last3_ratio_mean": 0.618611912331513,
+        "last3_ratio_median": 0.5741809486177543,
+        "last3_ratio_pooled": 0.5766904117517938
+      },
+      "incomplete": []
+    },
+    "Kvasmeister": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 247.718,
+        "mean_s": 265.91275,
+        "difficulty": 3.75,
+        "fun": 4.375,
+        "difficulty_dist": {
+          "3": 3,
+          "4": 4,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 3,
+          "5": 4
+        },
+        "wrong": 63,
+        "wrong_per": 7.875,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 4,
+        "last3_median_s": 20.805,
+        "last3_share_mean": 0.09822535323057148,
+        "last3_ratio_mean": 0.4132632958404607,
+        "last3_ratio_median": 0.2836576915172036,
+        "last3_ratio_pooled": 0.34674569935161154
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 63,
+        "hint": 0,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 13,
+        "resume": 4
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 198.17700000000002,
+        "mean_s": 209.02291666666667,
+        "difficulty": 2.75,
+        "fun": 4.333333333333333,
+        "difficulty_dist": {
+          "2": 3,
+          "3": 9
+        },
+        "fun_dist": {
+          "4": 8,
+          "5": 4
+        },
+        "wrong": 50,
+        "wrong_per": 4.166666666666667,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 3,
+        "last3_median_s": 24.366,
+        "last3_share_mean": 0.14354043388754759,
+        "last3_ratio_mean": 0.662886940581257,
+        "last3_ratio_median": 0.5183919587064074,
+        "last3_ratio_pooled": 0.5575982688946134
+      },
+      "incomplete": []
+    },
+    "BoltKey": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 242.5885,
+        "mean_s": 267.7575,
+        "difficulty": 3.375,
+        "fun": 2.625,
+        "difficulty_dist": {
+          "3": 5,
+          "4": 3
+        },
+        "fun_dist": {
+          "1": 1,
+          "2": 2,
+          "3": 4,
+          "4": 1
+        },
+        "wrong": 74,
+        "wrong_per": 9.25,
+        "zero_wrong": 0,
+        "hints": 5,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 12.248000000000001,
+        "last3_share_mean": 0.09065611594026643,
+        "last3_ratio_mean": 0.4029013642100941,
+        "last3_ratio_median": 0.23158849649734653,
+        "last3_ratio_pooled": 0.49392533464429283
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 74,
+        "hint": 5,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 1,
+        "resume": 1
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 198.4095,
+        "mean_s": 216.21558333333334,
+        "difficulty": 3.0833333333333335,
+        "fun": 3.1666666666666665,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 9,
+          "4": 2
+        },
+        "fun_dist": {
+          "2": 2,
+          "3": 6,
+          "4": 4
+        },
+        "wrong": 61,
+        "wrong_per": 5.083333333333333,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 17.3485,
+        "last3_share_mean": 0.17933933326779727,
+        "last3_ratio_mean": 0.9708191687783096,
+        "last3_ratio_median": 0.5211661856497358,
+        "last3_ratio_pooled": 1.0337705497997889
+      },
+      "incomplete": []
+    },
+    "Diss": {
+      "started": 0,
+      "completed": 0,
+      "stats": null,
+      "events": {
+        "correct": 0,
+        "wrong": 0,
+        "hint": 0,
+        "finish": 0,
+        "feedback": 0,
+        "leave": 0,
+        "resume": 0
+      },
+      "round2": null,
+      "incomplete": []
+    },
+    "Umpalump": {
+      "started": 0,
+      "completed": 0,
+      "stats": null,
+      "events": {
+        "correct": 0,
+        "wrong": 0,
+        "hint": 0,
+        "finish": 0,
+        "feedback": 0,
+        "leave": 0,
+        "resume": 0
+      },
+      "round2": null,
+      "incomplete": []
+    },
+    "Janak": {
+      "started": 4,
+      "completed": 3,
+      "stats": {
+        "n": 3,
+        "rated": 3,
+        "median_s": 381.648,
+        "mean_s": 428.90233333333333,
+        "difficulty": 4,
+        "fun": 4.666666666666667,
+        "difficulty_dist": {
+          "4": 3
+        },
+        "fun_dist": {
+          "4": 1,
+          "5": 2
+        },
+        "wrong": 25,
+        "wrong_per": 8.333333333333334,
+        "zero_wrong": 0,
+        "hints": 2,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 44.864,
+        "last3_share_mean": 0.11337814394765405,
+        "last3_ratio_mean": 0.46957179890788714,
+        "last3_ratio_median": 0.4884794998643948,
+        "last3_ratio_pooled": 0.45208228932218864
+      },
+      "events": {
+        "correct": 42,
+        "wrong": 25,
+        "hint": 2,
+        "finish": 3,
+        "feedback": 3,
+        "leave": 4,
+        "resume": 1
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 233.1675,
+        "mean_s": 252.71841666666666,
+        "difficulty": 4,
+        "fun": 4.333333333333333,
+        "difficulty_dist": {
+          "4": 12
+        },
+        "fun_dist": {
+          "4": 8,
+          "5": 4
+        },
+        "wrong": 39,
+        "wrong_per": 3.25,
+        "zero_wrong": 1,
+        "hints": 1,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 4,
+        "last3_median_s": 32.296,
+        "last3_share_mean": 0.189785414060856,
+        "last3_ratio_mean": 1.002768306401799,
+        "last3_ratio_median": 0.6461164099180327,
+        "last3_ratio_pooled": 0.8838752063834927
+      },
+      "incomplete": [
+        {
+          "board": "mk3w2-04",
+          "progress": {
+            "hints": 0,
+            "moves": 0,
+            "calmMode": false,
+            "elapsedMs": 5814,
+            "cleanSolve": true,
+            "foundWords": 0,
+            "resetCount": 0,
+            "firstHintMs": null,
+            "resumeCount": 0,
+            "maxHintLevel": 0,
+            "lastCorrectMs": null,
+            "wrongAttempts": 0,
+            "firstCorrectMs": null
+          }
+        }
+      ]
+    },
+    "MP": {
+      "started": 8,
+      "completed": 8,
+      "stats": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 199.584,
+        "mean_s": 193.89825,
+        "difficulty": 3.375,
+        "fun": 3.75,
+        "difficulty_dist": {
+          "2": 2,
+          "3": 1,
+          "4": 5
+        },
+        "fun_dist": {
+          "3": 4,
+          "4": 2,
+          "5": 2
+        },
+        "wrong": 25,
+        "wrong_per": 3.125,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 35.5125,
+        "last3_share_mean": 0.19828454450445385,
+        "last3_ratio_mean": 0.977701037371557,
+        "last3_ratio_median": 0.9375462136731514,
+        "last3_ratio_pooled": 0.9288734418380016
+      },
+      "events": {
+        "correct": 112,
+        "wrong": 25,
+        "hint": 0,
+        "finish": 8,
+        "feedback": 8,
+        "leave": 3,
+        "resume": 0
+      },
+      "round2": {
+        "n": 12,
+        "rated": 12,
+        "median_s": 218.8785,
+        "mean_s": 208.78083333333333,
+        "difficulty": 2.75,
+        "fun": 3.5833333333333335,
+        "difficulty_dist": {
+          "1": 1,
+          "2": 5,
+          "3": 2,
+          "4": 4
+        },
+        "fun_dist": {
+          "3": 5,
+          "4": 7
+        },
+        "wrong": 16,
+        "wrong_per": 1.3333333333333333,
+        "zero_wrong": 4,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 20.464,
+        "last3_share_mean": 0.13340018987186836,
+        "last3_ratio_mean": 0.6208854291604456,
+        "last3_ratio_median": 0.37531548247481283,
+        "last3_ratio_pooled": 0.5044048542401943
+      },
+      "incomplete": []
+    },
+    "Pavel": {
+      "started": 5,
+      "completed": 4,
+      "stats": {
+        "n": 4,
+        "rated": 4,
+        "median_s": 248.47650000000002,
+        "mean_s": 269.3435,
+        "difficulty": 4.5,
+        "fun": 4.5,
+        "difficulty_dist": {
+          "4": 2,
+          "5": 2
+        },
+        "fun_dist": {
+          "4": 2,
+          "5": 2
+        },
+        "wrong": 26,
+        "wrong_per": 6.5,
+        "zero_wrong": 0,
+        "hints": 3,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 6,
+        "last3_median_s": 29.159999999999997,
+        "last3_share_mean": 0.12585305315128129,
+        "last3_ratio_mean": 0.5692354532346833,
+        "last3_ratio_median": 0.3869758862943109,
+        "last3_ratio_pooled": 0.47560100052570936
+      },
+      "events": {
+        "correct": 57,
+        "wrong": 26,
+        "hint": 3,
+        "finish": 4,
+        "feedback": 4,
+        "leave": 14,
+        "resume": 6
+      },
+      "round2": {
+        "n": 3,
+        "rated": 3,
+        "median_s": 173.132,
+        "mean_s": 171.536,
+        "difficulty": 2.6666666666666665,
+        "fun": 4,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 2
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 1,
+          "5": 1
+        },
+        "wrong": 10,
+        "wrong_per": 3.3333333333333335,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 4,
+        "last3_median_s": 20.729,
+        "last3_share_mean": 0.13612892073425095,
+        "last3_ratio_mean": 0.5795481728261076,
+        "last3_ratio_median": 0.5948776949888339,
+        "last3_ratio_pooled": 0.5806898942624372
+      },
+      "incomplete": [
+        {
+          "board": "mk3w2-05",
+          "progress": {
+            "hints": 0,
+            "moves": 1,
+            "calmMode": false,
+            "elapsedMs": 11989,
+            "cleanSolve": true,
+            "foundWords": 1,
+            "resetCount": 0,
+            "firstHintMs": null,
+            "resumeCount": 0,
+            "maxHintLevel": 0,
+            "lastCorrectMs": 4294,
+            "wrongAttempts": 0,
+            "firstCorrectMs": 4294
+          }
+        }
+      ]
+    },
+    "Petra": {
+      "started": 0,
+      "completed": 0,
+      "stats": null,
+      "events": {
+        "correct": 0,
+        "wrong": 0,
+        "hint": 0,
+        "finish": 0,
+        "feedback": 0,
+        "leave": 0,
+        "resume": 0
+      },
+      "round2": {
+        "n": 4,
+        "rated": 4,
+        "median_s": 306.325,
+        "mean_s": 340.11475,
+        "difficulty": 3.75,
+        "fun": 3.75,
+        "difficulty_dist": {
+          "2": 1,
+          "4": 2,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 3
+        },
+        "wrong": 17,
+        "wrong_per": 4.25,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 63.996,
+        "last3_share_mean": 0.21825641340027727,
+        "last3_ratio_mean": 1.0472992822670069,
+        "last3_ratio_median": 1.0230684133032781,
+        "last3_ratio_pooled": 1.1085581519132515
+      },
+      "incomplete": []
+    }
+  },
+  "boards": {
+    "mk3w2-01": {
+      "all": {
+        "n": 9,
+        "rated": 9,
+        "median_s": 308.295,
+        "mean_s": 353.1117777777778,
+        "difficulty": 4.333333333333333,
+        "fun": 4.222222222222222,
+        "difficulty_dist": {
+          "3": 1,
+          "4": 4,
+          "5": 4
+        },
+        "fun_dist": {
+          "2": 1,
+          "4": 4,
+          "5": 4
+        },
+        "wrong": 57,
+        "wrong_per": 6.333333333333333,
+        "zero_wrong": 0,
+        "hints": 3,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 36.019,
+        "last3_share_mean": 0.09717912977292584,
+        "last3_ratio_mean": 0.41459567968201105,
+        "last3_ratio_median": 0.2928196793617919,
+        "last3_ratio_pooled": 0.3754893954773371
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 308.295,
+        "mean_s": 358.19514285714286,
+        "difficulty": 4.428571428571429,
+        "fun": 4.285714285714286,
+        "difficulty_dist": {
+          "3": 1,
+          "4": 2,
+          "5": 4
+        },
+        "fun_dist": {
+          "2": 1,
+          "4": 2,
+          "5": 4
+        },
+        "wrong": 43,
+        "wrong_per": 6.142857142857143,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 19.21,
+        "last3_share_mean": 0.09362043000800707,
+        "last3_ratio_mean": 0.40371477466900796,
+        "last3_ratio_median": 0.22378360479314555,
+        "last3_ratio_pooled": 0.3580761083785178
+      },
+      "last_words": {
+        "ZÁKULISÍ": 1,
+        "CITERA": 3,
+        "PLOTICE": 2,
+        "RAZNICE": 3
+      },
+      "last_words_balanced": {
+        "ZÁKULISÍ": 1,
+        "CITERA": 2,
+        "PLOTICE": 2,
+        "RAZNICE": 2
+      },
+      "unknown_notes": [
+        {
+          "player": "Michael",
+          "difficulty": 4,
+          "fun": 4,
+          "note": "Jak jsem již psal, plná deska, nový lexikon a kratší slova jsou pro mě těžší."
+        },
+        {
+          "player": "BoltKey",
+          "difficulty": 3,
+          "fun": 2,
+          "note": "Citera a plotice wtf co je to za slova"
+        },
+        {
+          "player": "PiettraWal",
+          "difficulty": 5,
+          "fun": 5,
+          "note": "Chválím nová slova. Zase pořádná challenge"
+        }
+      ],
+      "hint_details": [
+        {
+          "player": "Pavel",
+          "hints": 3,
+          "first_hint_s": 316.006,
+          "max_level": 2
+        }
+      ],
+      "words": [
+        "ZÁKULISÍ",
+        "CITERA",
+        "ZDYMADLO",
+        "PLOTICE",
+        "RAZNICE",
+        "BRLOH",
+        "ZÁCLONA",
+        "STAVIDLO",
+        "TISKAŘ",
+        "SOUHVĚZDÍ",
+        "TRAKAŘ",
+        "REJSTŘÍK",
+        "PODMÁSLÍ",
+        "KRONIKA"
+      ]
+    },
+    "mk3w2-02": {
+      "all": {
+        "n": 9,
+        "rated": 9,
+        "median_s": 215.211,
+        "mean_s": 322.1828888888889,
+        "difficulty": 4.333333333333333,
+        "fun": 4,
+        "difficulty_dist": {
+          "3": 1,
+          "4": 4,
+          "5": 4
+        },
+        "fun_dist": {
+          "3": 3,
+          "4": 3,
+          "5": 3
+        },
+        "wrong": 68,
+        "wrong_per": 7.555555555555555,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 31.697,
+        "last3_share_mean": 0.12144220524642757,
+        "last3_ratio_mean": 0.5463844484375013,
+        "last3_ratio_median": 0.3328274300878495,
+        "last3_ratio_pooled": 0.4033999260874536
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 215.211,
+        "mean_s": 331.31642857142856,
+        "difficulty": 4.285714285714286,
+        "fun": 3.857142857142857,
+        "difficulty_dist": {
+          "3": 1,
+          "4": 3,
+          "5": 3
+        },
+        "fun_dist": {
+          "3": 3,
+          "4": 2,
+          "5": 2
+        },
+        "wrong": 53,
+        "wrong_per": 7.571428571428571,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 0,
+        "last3_median_s": 18.869,
+        "last3_share_mean": 0.10158974924994171,
+        "last3_ratio_mean": 0.4445244884481953,
+        "last3_ratio_median": 0.2949775333076073,
+        "last3_ratio_pooled": 0.32717093991803414
+      },
+      "last_words": {
+        "HŘEBELEC": 2,
+        "PĚNKAVA": 1,
+        "KOSIT": 1,
+        "PATIZON": 1,
+        "PROPUST": 1,
+        "POZNATEK": 1,
+        "ROVNÍK": 1,
+        "SKOŘÁPKA": 1
+      },
+      "last_words_balanced": {
+        "HŘEBELEC": 2,
+        "PĚNKAVA": 1,
+        "KOSIT": 1,
+        "PATIZON": 1,
+        "PROPUST": 1,
+        "ROVNÍK": 1
+      },
+      "unknown_notes": [
+        {
+          "player": "PiettraWal",
+          "difficulty": 5,
+          "fun": 5,
+          "note": "Hřebelec neznám"
+        },
+        {
+          "player": "Pavel",
+          "difficulty": 5,
+          "fun": 4,
+          "note": "Hřebelec je divný slovo :)"
+        }
+      ],
+      "hint_details": [],
+      "words": [
+        "PĚNKAVA",
+        "ROVNÍK",
+        "HŘEBELEC",
+        "DIVOŽENKA",
+        "SKOŘÁPKA",
+        "KOMODA",
+        "PATIZON",
+        "ŠMEJDIT",
+        "KOSIT",
+        "DRÁTENÍK",
+        "POZNATEK",
+        "PROPUST",
+        "JEHELNÍK",
+        "ŠTOČEK"
+      ]
+    },
+    "mk3w2-03": {
+      "all": {
+        "n": 9,
+        "rated": 9,
+        "median_s": 398.518,
+        "mean_s": 400.01744444444444,
+        "difficulty": 4.444444444444445,
+        "fun": 4.444444444444445,
+        "difficulty_dist": {
+          "4": 5,
+          "5": 4
+        },
+        "fun_dist": {
+          "1": 1,
+          "4": 1,
+          "5": 7
+        },
+        "wrong": 64,
+        "wrong_per": 7.111111111111111,
+        "zero_wrong": 0,
+        "hints": 7,
+        "hint_boards": 2,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 5,
+        "last3_median_s": 39.245,
+        "last3_share_mean": 0.11274471810359687,
+        "last3_ratio_mean": 0.4976529665254134,
+        "last3_ratio_median": 0.3922394169520057,
+        "last3_ratio_pooled": 0.503472915492495
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 398.518,
+        "mean_s": 393.356,
+        "difficulty": 4.428571428571429,
+        "fun": 4.285714285714286,
+        "difficulty_dist": {
+          "4": 4,
+          "5": 3
+        },
+        "fun_dist": {
+          "1": 1,
+          "4": 1,
+          "5": 5
+        },
+        "wrong": 47,
+        "wrong_per": 6.714285714285714,
+        "zero_wrong": 0,
+        "hints": 5,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 39.245,
+        "last3_share_mean": 0.11721049519262361,
+        "last3_ratio_mean": 0.527149531962268,
+        "last3_ratio_median": 0.3922394169520057,
+        "last3_ratio_pooled": 0.5376329398477642
+      },
+      "last_words": {
+        "SUŠIT": 3,
+        "CUKROVÍ": 1,
+        "PASTOREK": 2,
+        "KAMENINA": 1,
+        "PODNEBÍ": 1,
+        "STUPNICE": 1
+      },
+      "last_words_balanced": {
+        "SUŠIT": 2,
+        "CUKROVÍ": 1,
+        "PASTOREK": 2,
+        "KAMENINA": 1,
+        "PODNEBÍ": 1
+      },
+      "unknown_notes": [
+        {
+          "player": "BoltKey",
+          "difficulty": 4,
+          "fun": 1,
+          "note": "wtf co to bylo za slova, šerosvit? devětsil? pastorek? 👎👎"
+        }
+      ],
+      "hint_details": [
+        {
+          "player": "BoltKey",
+          "hints": 5,
+          "first_hint_s": 473.992,
+          "max_level": 3
+        },
+        {
+          "player": "Janak",
+          "hints": 2,
+          "first_hint_s": 408.441,
+          "max_level": 2
+        }
+      ],
+      "words": [
+        "PASTOREK",
+        "DEVĚTSIL",
+        "TAJEMSTVÍ",
+        "STUPNICE",
+        "PŘEBAL",
+        "REMÍZEK",
+        "HRABOŠ",
+        "KAMENINA",
+        "ŠEROSVIT",
+        "PODNEBÍ",
+        "CUKROVÍ",
+        "VLÍDNÝ",
+        "SUŠIT",
+        "TRADICE"
+      ]
+    },
+    "mk3w2-04": {
+      "all": {
+        "n": 8,
+        "rated": 8,
+        "median_s": 246.166,
+        "mean_s": 301.402875,
+        "difficulty": 3.75,
+        "fun": 4,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 2,
+          "4": 3,
+          "5": 2
+        },
+        "fun_dist": {
+          "2": 1,
+          "3": 1,
+          "4": 3,
+          "5": 3
+        },
+        "wrong": 56,
+        "wrong_per": 7,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 3,
+        "last3_median_s": 13.266,
+        "last3_share_mean": 0.06782141460757411,
+        "last3_ratio_mean": 0.2687128066307031,
+        "last3_ratio_median": 0.25886085094418043,
+        "last3_ratio_pooled": 0.22787032448247632
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 225.987,
+        "mean_s": 306.41114285714286,
+        "difficulty": 3.7142857142857144,
+        "fun": 3.857142857142857,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
+        "fun_dist": {
+          "2": 1,
+          "3": 1,
+          "4": 3,
+          "5": 2
+        },
+        "wrong": 51,
+        "wrong_per": 7.285714285714286,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 13.695,
+        "last3_share_mean": 0.07062491848072162,
+        "last3_ratio_mean": 0.28057450423303776,
+        "last3_ratio_median": 0.3226175387772346,
+        "last3_ratio_pooled": 0.23317386806021495
+      },
+      "last_words": {
+        "VČELSTVO": 1,
+        "BRUSIVO": 1,
+        "KALAMÁŘ": 3,
+        "LOUBÍ": 3
+      },
+      "last_words_balanced": {
+        "VČELSTVO": 1,
+        "BRUSIVO": 1,
+        "KALAMÁŘ": 3,
+        "LOUBÍ": 2
+      },
+      "unknown_notes": [
+        {
+          "player": "BoltKey",
+          "difficulty": 3,
+          "fun": 2,
+          "note": "loubí, drtina jsou divná. A asi i další, ale už si je nepamatuju a teď je nevidím."
+        }
+      ],
+      "hint_details": [],
+      "words": [
+        "KŠANDY",
+        "ŠPACHTLE",
+        "TRUHLICE",
+        "ÚŽLABINA",
+        "PROSTOR",
+        "BRUSIVO",
+        "KALAMÁŘ",
+        "POBŘEŽÍ",
+        "LOUBÍ",
+        "PROSTŘEDÍ",
+        "DRTINA",
+        "DŘEVORYT",
+        "PODBĚL",
+        "VČELSTVO"
+      ]
+    },
+    "mk3w2-05": {
+      "all": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 248.41,
+        "mean_s": 244.16,
+        "difficulty": 3.7142857142857144,
+        "fun": 4,
+        "difficulty_dist": {
+          "3": 3,
+          "4": 3,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 2,
+          "4": 3,
+          "5": 2
+        },
+        "wrong": 34,
+        "wrong_per": 4.857142857142857,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 34.453,
+        "last3_share_mean": 0.15293002027824917,
+        "last3_ratio_mean": 0.7420669946846413,
+        "last3_ratio_median": 0.4226588777959191,
+        "last3_ratio_pooled": 0.6012769631497848
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 248.41,
+        "mean_s": 244.16,
+        "difficulty": 3.7142857142857144,
+        "fun": 4,
+        "difficulty_dist": {
+          "3": 3,
+          "4": 3,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 2,
+          "4": 3,
+          "5": 2
+        },
+        "wrong": 34,
+        "wrong_per": 4.857142857142857,
+        "zero_wrong": 1,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 1,
+        "last3_median_s": 34.453,
+        "last3_share_mean": 0.15293002027824917,
+        "last3_ratio_mean": 0.7420669946846413,
+        "last3_ratio_median": 0.4226588777959191,
+        "last3_ratio_pooled": 0.6012769631497848
+      },
+      "last_words": {
+        "SKALISKO": 5,
+        "LINORYT": 1,
+        "HUSTILKA": 1
+      },
+      "last_words_balanced": {
+        "SKALISKO": 5,
+        "LINORYT": 1,
+        "HUSTILKA": 1
+      },
+      "unknown_notes": [
+        {
+          "player": "BoltKey",
+          "difficulty": 4,
+          "fun": 3,
+          "note": "oddenek wtf co to je. A chci vidět ta slova a desku při psaní feedbacku, jinak se to nedá psát."
+        },
+        {
+          "player": "PiettraWal",
+          "difficulty": 4,
+          "fun": 5,
+          "note": "Fajn běžná slova"
+        }
+      ],
+      "hint_details": [],
+      "words": [
+        "HMATNÍK",
+        "LINORYT",
+        "PAMÁTKA",
+        "ŠIFRA",
+        "PŘESLIČKA",
+        "SKALISKO",
+        "HUSTILKA",
+        "ŠIŠATÝ",
+        "JEŘABINA",
+        "PODRÁŽKA",
+        "PODRUČKA",
+        "PARŤÁK",
+        "NÁŘEČÍ",
+        "ODDENEK"
+      ]
+    },
+    "mk3w2-06": {
+      "all": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 207.22,
+        "mean_s": 217.50885714285715,
+        "difficulty": 3.4285714285714284,
+        "fun": 4.142857142857143,
+        "difficulty_dist": {
+          "3": 4,
+          "4": 3
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 4,
+          "5": 2
+        },
+        "wrong": 34,
+        "wrong_per": 4.857142857142857,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 13.009,
+        "last3_share_mean": 0.07001830587931339,
+        "last3_ratio_mean": 0.280058621435743,
+        "last3_ratio_median": 0.34319860041351413,
+        "last3_ratio_pooled": 0.23978268055156082
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 207.22,
+        "mean_s": 217.50885714285715,
+        "difficulty": 3.4285714285714284,
+        "fun": 4.142857142857143,
+        "difficulty_dist": {
+          "3": 4,
+          "4": 3
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 4,
+          "5": 2
+        },
+        "wrong": 34,
+        "wrong_per": 4.857142857142857,
+        "zero_wrong": 0,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 13.009,
+        "last3_share_mean": 0.07001830587931339,
+        "last3_ratio_mean": 0.280058621435743,
+        "last3_ratio_median": 0.34319860041351413,
+        "last3_ratio_pooled": 0.23978268055156082
+      },
+      "last_words": {
+        "PERGAMEN": 1,
+        "LYSKA": 3,
+        "DÁLAVA": 1,
+        "OROBINEC": 1,
+        "LAHODNÝ": 1
+      },
+      "last_words_balanced": {
+        "PERGAMEN": 1,
+        "LYSKA": 3,
+        "DÁLAVA": 1,
+        "OROBINEC": 1,
+        "LAHODNÝ": 1
+      },
+      "unknown_notes": [
+        {
+          "player": "BoltKey",
+          "difficulty": 3,
+          "fun": 3,
+          "note": "jedno slovo bylo divné, už nevím které"
+        },
+        {
+          "player": "PiettraWal",
+          "difficulty": 3,
+          "fun": 5,
+          "note": "Mincíř neznám"
+        }
+      ],
+      "hint_details": [],
+      "words": [
+        "SVĚTLÍK",
+        "MYŠLENKA",
+        "PERGAMEN",
+        "OROBINEC",
+        "POLNÍČEK",
+        "LAHODNÝ",
+        "POLEDNICE",
+        "FANTAZIE",
+        "KLEPAT",
+        "DÁLAVA",
+        "LYSKA",
+        "MINCÍŘ",
+        "JIŘIČKA",
+        "PETRŽEL"
+      ]
+    },
+    "mk3w2-07": {
+      "all": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 158.08,
+        "mean_s": 176.00028571428572,
+        "difficulty": 3.142857142857143,
+        "fun": 3.857142857142857,
+        "difficulty_dist": {
+          "2": 2,
+          "3": 3,
+          "4": 1,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 2,
+          "4": 4,
+          "5": 1
+        },
+        "wrong": 28,
+        "wrong_per": 4,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 26.987,
+        "last3_share_mean": 0.15118281219884003,
+        "last3_ratio_mean": 0.6774777790549422,
+        "last3_ratio_median": 0.7549175929669838,
+        "last3_ratio_pooled": 0.5858303136088603
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 158.08,
+        "mean_s": 176.00028571428572,
+        "difficulty": 3.142857142857143,
+        "fun": 3.857142857142857,
+        "difficulty_dist": {
+          "2": 2,
+          "3": 3,
+          "4": 1,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 2,
+          "4": 4,
+          "5": 1
+        },
+        "wrong": 28,
+        "wrong_per": 4,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 26.987,
+        "last3_share_mean": 0.15118281219884003,
+        "last3_ratio_mean": 0.6774777790549422,
+        "last3_ratio_median": 0.7549175929669838,
+        "last3_ratio_pooled": 0.5858303136088603
+      },
+      "last_words": {
+        "PŘEVOD": 1,
+        "ZURČET": 3,
+        "KORMIDLO": 1,
+        "PERMONÍK": 2
+      },
+      "last_words_balanced": {
+        "PŘEVOD": 1,
+        "ZURČET": 3,
+        "KORMIDLO": 1,
+        "PERMONÍK": 2
+      },
+      "unknown_notes": [
+        {
+          "player": "BoltKey",
+          "difficulty": 4,
+          "fun": 4,
+          "note": "zase jedno divné slovo, ale nevím které to bylo. Jedno z těch nahoře myslím."
+        }
+      ],
+      "hint_details": [],
+      "words": [
+        "POHOŘÍ",
+        "SVORNÍK",
+        "PETLICE",
+        "PŘEVOD",
+        "TOBOLKA",
+        "ZURČET",
+        "ZÁPISNÍK",
+        "PERMONÍK",
+        "FUJAVICE",
+        "STŘEVLÍK",
+        "KORMIDLO",
+        "STRUHADLO",
+        "LEZEC",
+        "POZNÁNÍ"
+      ]
+    },
+    "mk3w2-08": {
+      "all": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 215.727,
+        "mean_s": 200.965,
+        "difficulty": 3.5714285714285716,
+        "fun": 4.142857142857143,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 1,
+          "4": 5
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 4,
+          "5": 2
+        },
+        "wrong": 35,
+        "wrong_per": 5,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 19.854,
+        "last3_share_mean": 0.10831008792884529,
+        "last3_ratio_mean": 0.4589154008008644,
+        "last3_ratio_median": 0.3823511934749641,
+        "last3_ratio_pooled": 0.4224137999380024
+      },
+      "balanced": {
+        "n": 7,
+        "rated": 7,
+        "median_s": 215.727,
+        "mean_s": 200.965,
+        "difficulty": 3.5714285714285716,
+        "fun": 4.142857142857143,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 1,
+          "4": 5
+        },
+        "fun_dist": {
+          "3": 1,
+          "4": 4,
+          "5": 2
+        },
+        "wrong": 35,
+        "wrong_per": 5,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 19.854,
+        "last3_share_mean": 0.10831008792884529,
+        "last3_ratio_mean": 0.4589154008008644,
+        "last3_ratio_median": 0.3823511934749641,
+        "last3_ratio_pooled": 0.4224137999380024
+      },
+      "last_words": {
+        "OKVĚTÍ": 2,
+        "JITŘENKA": 1,
+        "POTÁPNÍK": 1,
+        "VODOVOD": 1,
+        "NAPÁJEČKA": 1,
+        "BYSTŘINA": 1
+      },
+      "last_words_balanced": {
+        "OKVĚTÍ": 2,
+        "JITŘENKA": 1,
+        "POTÁPNÍK": 1,
+        "VODOVOD": 1,
+        "NAPÁJEČKA": 1,
+        "BYSTŘINA": 1
+      },
+      "unknown_notes": [],
+      "hint_details": [],
+      "words": [
+        "JITŘENKA",
+        "ŽVÝKAT",
+        "VODOVOD",
+        "POTÁPNÍK",
+        "ŘEZBA",
+        "PŘÍZVUK",
+        "LEZEČKA",
+        "BUKVICE",
+        "DŮVĚRA",
+        "OKVĚTÍ",
+        "SÍTOTISK",
+        "NAPÁJEČKA",
+        "BYSTŘINA",
+        "SYMFONIE"
+      ]
+    }
+  },
+  "notes": [],
+  "order_effect": {
+    "mozkokalypsa-round2-20260925": {
+      "first_half": {
+        "n": 42,
+        "rated": 42,
+        "median_s": 206.5795,
+        "mean_s": 217.6675238095238,
+        "difficulty": 3.3333333333333335,
+        "fun": 3.7857142857142856,
+        "difficulty_dist": {
+          "2": 5,
+          "3": 24,
+          "4": 7,
+          "5": 6
+        },
+        "fun_dist": {
+          "2": 3,
+          "3": 6,
+          "4": 30,
+          "5": 3
+        },
+        "wrong": 127,
+        "wrong_per": 3.0238095238095237,
+        "zero_wrong": 6,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 8,
+        "last3_median_s": 21.009999999999998,
+        "last3_share_mean": 0.14936452326068733,
+        "last3_ratio_mean": 0.7419797901209059,
+        "last3_ratio_median": 0.48236489605818106,
+        "last3_ratio_pooled": 0.6864948480564993
+      },
+      "last_half": {
+        "n": 42,
+        "rated": 42,
+        "median_s": 187.54000000000002,
+        "mean_s": 208.05307142857143,
+        "difficulty": 2.9761904761904763,
+        "fun": 3.6666666666666665,
+        "difficulty_dist": {
+          "1": 3,
+          "2": 10,
+          "3": 18,
+          "4": 7,
+          "5": 4
+        },
+        "fun_dist": {
+          "2": 3,
+          "3": 12,
+          "4": 23,
+          "5": 4
+        },
+        "wrong": 111,
+        "wrong_per": 2.642857142857143,
+        "zero_wrong": 5,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 6,
+        "last3_median_s": 21.432000000000002,
+        "last3_share_mean": 0.1645271364148388,
+        "last3_ratio_mean": 0.8037723778212309,
+        "last3_ratio_median": 0.5976315391824525,
+        "last3_ratio_pooled": 0.6879911680815641
+      },
+      "first3": {
+        "n": 21,
+        "rated": 21,
+        "median_s": 238.107,
+        "mean_s": 253.83042857142857,
+        "difficulty": 3.5238095238095237,
+        "fun": 3.8095238095238093,
+        "difficulty_dist": {
+          "2": 2,
+          "3": 10,
+          "4": 5,
+          "5": 4
+        },
+        "fun_dist": {
+          "2": 2,
+          "3": 3,
+          "4": 13,
+          "5": 3
+        },
+        "wrong": 78,
+        "wrong_per": 3.7142857142857144,
+        "zero_wrong": 2,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 4,
+        "last3_median_s": 21.852,
+        "last3_share_mean": 0.16464119283050996,
+        "last3_ratio_mean": 0.8423349838385369,
+        "last3_ratio_median": 0.496852128011381,
+        "last3_ratio_pooled": 0.7457428439319723
+      },
+      "last3": {
+        "n": 21,
+        "rated": 21,
+        "median_s": 179.902,
+        "mean_s": 185.8004761904762,
+        "difficulty": 2.619047619047619,
+        "fun": 3.5714285714285716,
+        "difficulty_dist": {
+          "1": 2,
+          "2": 6,
+          "3": 11,
+          "4": 2
+        },
+        "fun_dist": {
+          "2": 2,
+          "3": 6,
+          "4": 12,
+          "5": 1
+        },
+        "wrong": 49,
+        "wrong_per": 2.3333333333333335,
+        "zero_wrong": 3,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 3,
+        "last3_median_s": 18.33,
+        "last3_share_mean": 0.16422668165812376,
+        "last3_ratio_mean": 0.8289176837103389,
+        "last3_ratio_median": 0.49494209307222564,
+        "last3_ratio_pooled": 0.7079148248214729
+      }
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "first_half": {
+        "n": 28,
+        "rated": 28,
+        "median_s": 306.30899999999997,
+        "mean_s": 347.3196785714286,
+        "difficulty": 4.214285714285714,
+        "fun": 4.071428571428571,
+        "difficulty_dist": {
+          "2": 1,
+          "3": 4,
+          "4": 11,
+          "5": 12
+        },
+        "fun_dist": {
+          "1": 1,
+          "2": 2,
+          "3": 4,
+          "4": 8,
+          "5": 13
+        },
+        "wrong": 194,
+        "wrong_per": 6.928571428571429,
+        "zero_wrong": 1,
+        "hints": 5,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 4,
+        "last3_median_s": 19.0395,
+        "last3_share_mean": 0.09576139823282351,
+        "last3_ratio_mean": 0.41399082482812727,
+        "last3_ratio_median": 0.29389860633469955,
+        "last3_ratio_pooled": 0.3709280025407302
+      },
+      "last_half": {
+        "n": 28,
+        "rated": 28,
+        "median_s": 211.4735,
+        "mean_s": 209.6585357142857,
+        "difficulty": 3.4642857142857144,
+        "fun": 4.035714285714286,
+        "difficulty_dist": {
+          "2": 3,
+          "3": 11,
+          "4": 12,
+          "5": 2
+        },
+        "fun_dist": {
+          "3": 6,
+          "4": 15,
+          "5": 7
+        },
+        "wrong": 131,
+        "wrong_per": 4.678571428571429,
+        "zero_wrong": 5,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 7,
+        "last3_median_s": 19.654,
+        "last3_share_mean": 0.12061030657131197,
+        "last3_ratio_mean": 0.5396296989940478,
+        "last3_ratio_median": 0.40996942451724117,
+        "last3_ratio_pooled": 0.45597456448635937
+      },
+      "first3": {
+        "n": 21,
+        "rated": 21,
+        "median_s": 318.437,
+        "mean_s": 360.95585714285716,
+        "difficulty": 4.380952380952381,
+        "fun": 4.142857142857143,
+        "difficulty_dist": {
+          "3": 2,
+          "4": 9,
+          "5": 10
+        },
+        "fun_dist": {
+          "1": 1,
+          "2": 1,
+          "3": 3,
+          "4": 5,
+          "5": 11
+        },
+        "wrong": 143,
+        "wrong_per": 6.809523809523809,
+        "zero_wrong": 0,
+        "hints": 5,
+        "hint_boards": 1,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 2,
+        "last3_median_s": 21.06,
+        "last3_share_mean": 0.10414022481685746,
+        "last3_ratio_mean": 0.4584629316931571,
+        "last3_ratio_median": 0.2928196793617919,
+        "last3_ratio_pooled": 0.4116917302832215
+      },
+      "last3": {
+        "n": 21,
+        "rated": 21,
+        "median_s": 196.886,
+        "mean_s": 198.1580476190476,
+        "difficulty": 3.380952380952381,
+        "fun": 4.0476190476190474,
+        "difficulty_dist": {
+          "2": 3,
+          "3": 8,
+          "4": 9,
+          "5": 1
+        },
+        "fun_dist": {
+          "3": 4,
+          "4": 12,
+          "5": 5
+        },
+        "wrong": 97,
+        "wrong_per": 4.619047619047619,
+        "zero_wrong": 4,
+        "hints": 0,
+        "hint_boards": 0,
+        "resets": 0,
+        "calm": 0,
+        "resumes": 6,
+        "last3_median_s": 19.454,
+        "last3_share_mean": 0.10983706866899956,
+        "last3_ratio_mean": 0.47215060043051654,
+        "last3_ratio_median": 0.3823511934749641,
+        "last3_ratio_pooled": 0.39912291571674663
+      }
+    }
+  },
+  "reward_audit": {
+    "mozkokalypsa-round2-20260925": {
+      "eligible": 103,
+      "rewards": 103,
+      "xp": 20600,
+      "duplicates": 0,
+      "missing": 0,
+      "unexpected": 0,
+      "wrong_amount": 0,
+      "after_close": 0,
+      "attempt_reward_mismatches": 0,
+      "uncompleted_rewarded": 0
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "eligible": 63,
+      "rewards": 63,
+      "xp": 12600,
+      "duplicates": 0,
+      "missing": 0,
+      "unexpected": 0,
+      "wrong_amount": 0,
+      "after_close": 0,
+      "attempt_reward_mismatches": 0,
+      "uncompleted_rewarded": 0
+    }
+  },
+  "lexical": {
+    "mozkokalypsa-round2-20260925": {
+      "tokens": 168,
+      "unique": 168,
+      "mean_length": 7.142857142857143,
+      "repeated": {},
+      "hashes_unique": 12,
+      "mapped_final": 0
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "tokens": 112,
+      "unique": 112,
+      "mean_length": 7.142857142857143,
+      "repeated": {},
+      "hashes_unique": 8,
+      "mapped_final": 0
+    }
+  },
+  "events_round3": {
+    "correct": 883,
+    "wrong": 376,
+    "hint": 10,
+    "finish": 63,
+    "feedback": 63,
+    "leave": 45,
+    "resume": 18
+  },
+  "events_affected_round3": {
+    "leave": 24,
+    "resume": 16,
+    "hint": 3
+  },
+  "source_sha256": {
+    "experiments.json": "6ac7b7655cf53b88dbe6b752c94a4e5b7c34a9191ccc96e7ffb5b303c38b3e0c",
+    "attempts.json": "75d3ca8ccaa4b202b5d3126671bedfc19036f339f469acbecaf89e460beafe02",
+    "integrity.json": "e6a005110ac8bd97807d47d41cb3e96adbffa1a94edb4919c4ece1a66adc76a3",
+    "structural.json": "a5a1f5f331b2004d2cfa4448a671614b01fea2bcf59453b40db605d0b5ba83ff",
+    "rewards.json": "e58e18e2fca1b22a119d8ce3f89539425321a64b04518abd5349fd76ce4cd290",
+    "verification.json": "baa62df26d9e6b6ae38ca51d654ca96569e852e291eb446e7f1c19016da523bc",
+    "invites.json": "b2ca740879ee004bb752d1634496f6e6a254ed31e2af9ffd3b2c228d3a03070e",
+    "boards.json": "88328df9ceb8ec9e3e8d2d52fedb3a978321aaa3036bc8f1db8cad124861d5b1"
+  },
+  "sql_verification": {
+    "tail": {
+      "n": 63,
+      "ratio": 0.41035509209436727,
+      "mean_share": 0.10955483141212509,
+      "median_last3_ms": 21060,
+      "bad_correct_counts": 0
+    },
+    "reward": {
+      "sum": 12600,
+      "count": 63,
+      "after_close": 0,
+      "wrong_amount": 0
+    },
+    "read_at": "2026-10-01T06:44:12.149627+00:00",
+    "summary": {
+      "fun": 4.111111111111111,
+      "wrong": 376,
+      "players": 9,
+      "attempts": 65,
+      "completed": 63,
+      "median_ms": 254150,
+      "difficulty": 3.888888888888889
+    },
+    "last_event_at": "2026-09-30T21:05:09.118269+00:00",
+    "missing_rewards": 0,
+    "duplicate_rewards": 0,
+    "unexpected_rewards": 0,
+    "outside_window_events": 0,
+    "out_of_cohort_attempts": 0,
+    "outside_window_attempts": 0,
+    "cohort_symmetric_difference": 0
+  },
+  "structural": {
+    "mozkokalypsa-round2-20260925": {
+      "neighbor_mix": 0.3736111111111111,
+      "bbox_per_cell": 1.2320814436885865,
+      "boards": [
+        {
+          "board_id": "mk2-01",
+          "neighbor_mix": 0.38333333333333336,
+          "bbox_per_cell": 1.1846371882086169
+        },
+        {
+          "board_id": "mk2-02",
+          "neighbor_mix": 0.38333333333333336,
+          "bbox_per_cell": 1.2564909297052154
+        },
+        {
+          "board_id": "mk2-03",
+          "neighbor_mix": 0.36666666666666664,
+          "bbox_per_cell": 1.1694727891156462
+        },
+        {
+          "board_id": "mk2-04",
+          "neighbor_mix": 0.3611111111111111,
+          "bbox_per_cell": 1.1936507936507936
+        },
+        {
+          "board_id": "mk2-05",
+          "neighbor_mix": 0.38333333333333336,
+          "bbox_per_cell": 1.3067460317460318
+        },
+        {
+          "board_id": "mk2-06",
+          "neighbor_mix": 0.3611111111111111,
+          "bbox_per_cell": 1.2034863945578231
+        },
+        {
+          "board_id": "mk2-07",
+          "neighbor_mix": 0.37777777777777777,
+          "bbox_per_cell": 1.283843537414966
+        },
+        {
+          "board_id": "mk2-08",
+          "neighbor_mix": 0.38333333333333336,
+          "bbox_per_cell": 1.2764739229024944
+        },
+        {
+          "board_id": "mk2-09",
+          "neighbor_mix": 0.40555555555555556,
+          "bbox_per_cell": 1.3598072562358277
+        },
+        {
+          "board_id": "mk2-10",
+          "neighbor_mix": 0.35,
+          "bbox_per_cell": 1.151190476190476
+        },
+        {
+          "board_id": "mk2-11",
+          "neighbor_mix": 0.3611111111111111,
+          "bbox_per_cell": 1.207171201814059
+        },
+        {
+          "board_id": "mk2-12",
+          "neighbor_mix": 0.36666666666666664,
+          "bbox_per_cell": 1.1920068027210884
+        }
+      ]
+    },
+    "mozkokalypsa-round3-interwoven-v2": {
+      "neighbor_mix": 0.4236111111111111,
+      "bbox_per_cell": 1.3878047052154194,
+      "boards": [
+        {
+          "board_id": "mk3w2-01",
+          "neighbor_mix": 0.4222222222222222,
+          "bbox_per_cell": 1.3918367346938776
+        },
+        {
+          "board_id": "mk3w2-02",
+          "neighbor_mix": 0.42777777777777776,
+          "bbox_per_cell": 1.4361961451247165
+        },
+        {
+          "board_id": "mk3w2-03",
+          "neighbor_mix": 0.42777777777777776,
+          "bbox_per_cell": 1.4437074829931973
+        },
+        {
+          "board_id": "mk3w2-04",
+          "neighbor_mix": 0.4222222222222222,
+          "bbox_per_cell": 1.3649659863945578
+        },
+        {
+          "board_id": "mk3w2-05",
+          "neighbor_mix": 0.4222222222222222,
+          "bbox_per_cell": 1.364484126984127
+        },
+        {
+          "board_id": "mk3w2-06",
+          "neighbor_mix": 0.4222222222222222,
+          "bbox_per_cell": 1.3257936507936507
+        },
+        {
+          "board_id": "mk3w2-07",
+          "neighbor_mix": 0.4222222222222222,
+          "bbox_per_cell": 1.3816326530612244
+        },
+        {
+          "board_id": "mk3w2-08",
+          "neighbor_mix": 0.4222222222222222,
+          "bbox_per_cell": 1.3938208616780046
+        }
+      ]
+    }
+  },
+  "bank_sha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410"
+}
