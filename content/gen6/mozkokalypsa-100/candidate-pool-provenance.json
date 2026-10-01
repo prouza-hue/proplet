@@ -1,0 +1,1914 @@
+{
+  "status": "complete-new-candidate-pool",
+  "seed": 202610010100,
+  "geometryEngine": "tools/gen6/mk100_geometry.py based on unchanged interwoven_geometry.cpp",
+  "candidateCount": 2406,
+  "selectedCount": 100,
+  "sources": [
+    {
+      "id": "mk100-v2-001",
+      "verifiedCandidates": 16,
+      "attempts": 424,
+      "rejections": {
+        "solver-multiple-nonunique-target": 80,
+        "geometry-straight_share": 28,
+        "geometry-path_straight_share": 46,
+        "solver-unique-nonunique-target": 205,
+        "geometry-path_straight_share,straight_share,curvy_share": 14,
+        "geometry-path_straight_share,curvy_share": 14,
+        "geometry-path_straight_share,straight_share": 21
+      },
+      "selected": {
+        "geometryPoolIndex": 52,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24688,
+        "transform": 6,
+        "attempt": 48,
+        "placementSeed": 9457391736707522165
+      }
+    },
+    {
+      "id": "mk100-v2-002",
+      "verifiedCandidates": 16,
+      "attempts": 429,
+      "rejections": {
+        "solver-unique-nonunique-target": 135,
+        "geometry-path_straight_share": 228,
+        "solver-multiple-nonunique-target": 50
+      },
+      "selected": {
+        "geometryPoolIndex": 126,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43523,
+        "transform": 7,
+        "attempt": 147,
+        "placementSeed": 15203648109812816181
+      }
+    },
+    {
+      "id": "mk100-v2-003",
+      "verifiedCandidates": 16,
+      "attempts": 722,
+      "rejections": {
+        "geometry-path_straight_share,curvy_share": 23,
+        "solver-unique-nonunique-target": 289,
+        "solver-multiple-nonunique-target": 214,
+        "geometry-path_straight_share": 78,
+        "geometry-path_straight_share,straight_share": 34,
+        "geometry-straight_share": 45,
+        "geometry-path_straight_share,straight_share,curvy_share": 22,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 27,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24020,
+        "transform": 2,
+        "attempt": 718,
+        "placementSeed": 1927093288159910021
+      }
+    },
+    {
+      "id": "mk100-v2-004",
+      "verifiedCandidates": 16,
+      "attempts": 2072,
+      "rejections": {
+        "geometry-path_straight_share": 1101,
+        "solver-unique-nonunique-target": 354,
+        "solver-multiple-nonunique-target": 601
+      },
+      "selected": {
+        "geometryPoolIndex": 124,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43515,
+        "transform": 4,
+        "attempt": 1317,
+        "placementSeed": 6763855930578928237
+      }
+    },
+    {
+      "id": "mk100-v2-005",
+      "verifiedCandidates": 48,
+      "attempts": 3533,
+      "rejections": {
+        "solver-unique-nonunique-target": 1078,
+        "geometry-path_straight_share": 1878,
+        "solver-multiple-nonunique-target": 529
+      },
+      "selected": {
+        "geometryPoolIndex": 95,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42582,
+        "transform": 0,
+        "attempt": 1517,
+        "placementSeed": 12927957888532108774
+      }
+    },
+    {
+      "id": "mk100-v2-006",
+      "verifiedCandidates": 48,
+      "attempts": 2698,
+      "rejections": {
+        "geometry-path_straight_share": 338,
+        "solver-unique-nonunique-target": 1960,
+        "solver-multiple-nonunique-target": 347,
+        "solver-multiple": 5
+      },
+      "selected": {
+        "geometryPoolIndex": 183,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1066918,
+        "transform": 7,
+        "attempt": 578,
+        "placementSeed": 16010348553984197691
+      }
+    },
+    {
+      "id": "mk100-v2-007",
+      "verifiedCandidates": 16,
+      "attempts": 413,
+      "rejections": {
+        "solver-unique-nonunique-target": 169,
+        "geometry-path_straight_share": 216,
+        "solver-multiple-nonunique-target": 12
+      },
+      "selected": {
+        "geometryPoolIndex": 99,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42701,
+        "transform": 6,
+        "attempt": 82,
+        "placementSeed": 4012598439186755259
+      }
+    },
+    {
+      "id": "mk100-v2-008",
+      "verifiedCandidates": 16,
+      "attempts": 635,
+      "rejections": {
+        "solver-unique-nonunique-target": 405,
+        "solver-multiple-nonunique-target": 32,
+        "geometry-straight_share": 40,
+        "geometry-path_straight_share": 70,
+        "geometry-path_straight_share,straight_share": 30,
+        "geometry-path_straight_share,straight_share,curvy_share": 20,
+        "geometry-path_straight_share,curvy_share": 20,
+        "solver-multiple": 2
+      },
+      "selected": {
+        "geometryPoolIndex": 26,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23994,
+        "transform": 2,
+        "attempt": 634,
+        "placementSeed": 11296474787466358065
+      }
+    },
+    {
+      "id": "mk100-v2-009",
+      "verifiedCandidates": 48,
+      "attempts": 12487,
+      "rejections": {
+        "geometry-path_straight_share": 6632,
+        "solver-multiple-nonunique-target": 4404,
+        "solver-unique-nonunique-target": 1379,
+        "solver-multiple": 24
+      },
+      "selected": {
+        "geometryPoolIndex": 96,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42677,
+        "transform": 6,
+        "attempt": 10542,
+        "placementSeed": 3217185422959029917
+      }
+    },
+    {
+      "id": "mk100-v2-010",
+      "verifiedCandidates": 16,
+      "attempts": 1592,
+      "rejections": {
+        "solver-unique-nonunique-target": 444,
+        "geometry-path_straight_share": 847,
+        "solver-multiple-nonunique-target": 285
+      },
+      "selected": {
+        "geometryPoolIndex": 107,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42923,
+        "transform": 1,
+        "attempt": 1591,
+        "placementSeed": 8885825954817883339
+      }
+    },
+    {
+      "id": "mk100-v2-011",
+      "verifiedCandidates": 135,
+      "attempts": 5021,
+      "rejections": {
+        "geometry-path_straight_share": 630,
+        "solver-unique-nonunique-target": 3121,
+        "solver-multiple-nonunique-target": 1135
+      },
+      "selected": {
+        "geometryPoolIndex": 160,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1038004,
+        "transform": 4,
+        "attempt": 3597,
+        "placementSeed": 3197391204932985824
+      }
+    },
+    {
+      "id": "mk100-v2-012",
+      "verifiedCandidates": 16,
+      "attempts": 484,
+      "rejections": {
+        "geometry-path_straight_share": 256,
+        "solver-unique-nonunique-target": 206,
+        "solver-multiple-nonunique-target": 6
+      },
+      "selected": {
+        "geometryPoolIndex": 69,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41508,
+        "transform": 2,
+        "attempt": 9,
+        "placementSeed": 7565337651687615277
+      }
+    },
+    {
+      "id": "mk100-v2-013",
+      "verifiedCandidates": 16,
+      "attempts": 660,
+      "rejections": {
+        "geometry-path_straight_share": 348,
+        "solver-unique-nonunique-target": 280,
+        "solver-multiple-nonunique-target": 16
+      },
+      "selected": {
+        "geometryPoolIndex": 105,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42918,
+        "transform": 3,
+        "attempt": 177,
+        "placementSeed": 12431270549121420409
+      }
+    },
+    {
+      "id": "mk100-v2-014",
+      "verifiedCandidates": 16,
+      "attempts": 239,
+      "rejections": {
+        "geometry-straight_share": 15,
+        "solver-unique-nonunique-target": 153,
+        "geometry-path_straight_share,straight_share": 12,
+        "geometry-path_straight_share": 26,
+        "geometry-path_straight_share,curvy_share": 8,
+        "geometry-path_straight_share,straight_share,curvy_share": 6,
+        "solver-multiple-nonunique-target": 3
+      },
+      "selected": {
+        "geometryPoolIndex": 50,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24681,
+        "transform": 5,
+        "attempt": 144,
+        "placementSeed": 2649865532052740745
+      }
+    },
+    {
+      "id": "mk100-v2-015",
+      "verifiedCandidates": 16,
+      "attempts": 2029,
+      "rejections": {
+        "solver-unique-nonunique-target": 587,
+        "geometry-path_straight_share": 1076,
+        "solver-multiple-nonunique-target": 350
+      },
+      "selected": {
+        "geometryPoolIndex": 122,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43467,
+        "transform": 2,
+        "attempt": 1838,
+        "placementSeed": 14594326143738315010
+      }
+    },
+    {
+      "id": "mk100-v2-016",
+      "verifiedCandidates": 48,
+      "attempts": 1649,
+      "rejections": {
+        "solver-unique-nonunique-target": 1342,
+        "solver-multiple-nonunique-target": 51,
+        "geometry-path_straight_share": 208
+      },
+      "selected": {
+        "geometryPoolIndex": 152,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1016561,
+        "transform": 7,
+        "attempt": 1037,
+        "placementSeed": 12563184759564554678
+      }
+    },
+    {
+      "id": "mk100-v2-017",
+      "verifiedCandidates": 16,
+      "attempts": 1628,
+      "rejections": {
+        "solver-unique-nonunique-target": 434,
+        "geometry-path_straight_share": 866,
+        "solver-multiple-nonunique-target": 306,
+        "solver-multiple": 6
+      },
+      "selected": {
+        "geometryPoolIndex": 70,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41570,
+        "transform": 6,
+        "attempt": 1465,
+        "placementSeed": 5442308039666206466
+      }
+    },
+    {
+      "id": "mk100-v2-018",
+      "verifiedCandidates": 16,
+      "attempts": 569,
+      "rejections": {
+        "solver-unique-nonunique-target": 239,
+        "geometry-path_straight_share": 302,
+        "solver-multiple-nonunique-target": 12
+      },
+      "selected": {
+        "geometryPoolIndex": 97,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42678,
+        "transform": 1,
+        "attempt": 449,
+        "placementSeed": 10989674953853539948
+      }
+    },
+    {
+      "id": "mk100-v2-019",
+      "verifiedCandidates": 16,
+      "attempts": 2261,
+      "rejections": {
+        "geometry-path_straight_share": 1202,
+        "solver-unique-nonunique-target": 945,
+        "solver-multiple-nonunique-target": 98
+      },
+      "selected": {
+        "geometryPoolIndex": 99,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42701,
+        "transform": 2,
+        "attempt": 473,
+        "placementSeed": 637744351469516829
+      }
+    },
+    {
+      "id": "mk100-v2-020",
+      "verifiedCandidates": 48,
+      "attempts": 1901,
+      "rejections": {
+        "solver-multiple-nonunique-target": 534,
+        "solver-unique-nonunique-target": 1080,
+        "geometry-path_straight_share": 239
+      },
+      "selected": {
+        "geometryPoolIndex": 201,
+        "geometrySeed": 202610010203,
+        "geometryStep": 9486616,
+        "transform": 0,
+        "attempt": 895,
+        "placementSeed": 867439357113912718
+      }
+    },
+    {
+      "id": "mk100-v2-021",
+      "verifiedCandidates": 16,
+      "attempts": 706,
+      "rejections": {
+        "solver-unique-nonunique-target": 432,
+        "geometry-straight_share": 44,
+        "solver-multiple-nonunique-target": 60,
+        "geometry-path_straight_share,curvy_share": 22,
+        "geometry-path_straight_share": 77,
+        "geometry-path_straight_share,straight_share,curvy_share": 22,
+        "geometry-path_straight_share,straight_share": 33
+      },
+      "selected": {
+        "geometryPoolIndex": 44,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24629,
+        "transform": 5,
+        "attempt": 28,
+        "placementSeed": 1651676303465918149
+      }
+    },
+    {
+      "id": "mk100-v2-022",
+      "verifiedCandidates": 16,
+      "attempts": 294,
+      "rejections": {
+        "geometry-path_straight_share": 153,
+        "solver-unique-nonunique-target": 115,
+        "solver-multiple-nonunique-target": 10
+      },
+      "selected": {
+        "geometryPoolIndex": 74,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41763,
+        "transform": 5,
+        "attempt": 103,
+        "placementSeed": 16797902144771585940
+      }
+    },
+    {
+      "id": "mk100-v2-023",
+      "verifiedCandidates": 16,
+      "attempts": 430,
+      "rejections": {
+        "solver-unique-nonunique-target": 270,
+        "geometry-path_straight_share,straight_share,curvy_share": 13,
+        "geometry-path_straight_share,straight_share": 21,
+        "geometry-straight_share": 28,
+        "geometry-path_straight_share": 48,
+        "solver-multiple-nonunique-target": 21,
+        "geometry-path_straight_share,curvy_share": 13
+      },
+      "selected": {
+        "geometryPoolIndex": 61,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24777,
+        "transform": 3,
+        "attempt": 174,
+        "placementSeed": 17028381435586112502
+      }
+    },
+    {
+      "id": "mk100-v2-024",
+      "verifiedCandidates": 16,
+      "attempts": 563,
+      "rejections": {
+        "solver-unique-nonunique-target": 235,
+        "geometry-path_straight_share": 298,
+        "solver-multiple-nonunique-target": 14
+      },
+      "selected": {
+        "geometryPoolIndex": 98,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42687,
+        "transform": 5,
+        "attempt": 476,
+        "placementSeed": 5055133845316778933
+      }
+    },
+    {
+      "id": "mk100-v2-025",
+      "verifiedCandidates": 16,
+      "attempts": 4015,
+      "rejections": {
+        "geometry-path_straight_share": 2135,
+        "solver-multiple-nonunique-target": 1536,
+        "solver-unique-nonunique-target": 328
+      },
+      "selected": {
+        "geometryPoolIndex": 94,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42495,
+        "transform": 4,
+        "attempt": 4014,
+        "placementSeed": 2376565029130389898
+      }
+    },
+    {
+      "id": "mk100-v2-026",
+      "verifiedCandidates": 48,
+      "attempts": 1680,
+      "rejections": {
+        "geometry-path_straight_share": 210,
+        "solver-unique-nonunique-target": 949,
+        "solver-multiple-nonunique-target": 473
+      },
+      "selected": {
+        "geometryPoolIndex": 153,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1016850,
+        "transform": 6,
+        "attempt": 180,
+        "placementSeed": 646554383814656894
+      }
+    },
+    {
+      "id": "mk100-v2-027",
+      "verifiedCandidates": 16,
+      "attempts": 776,
+      "rejections": {
+        "geometry-path_straight_share": 413,
+        "solver-multiple-nonunique-target": 57,
+        "solver-unique-nonunique-target": 285,
+        "solver-multiple": 5
+      },
+      "selected": {
+        "geometryPoolIndex": 68,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41495,
+        "transform": 3,
+        "attempt": 419,
+        "placementSeed": 1970047227638661853
+      }
+    },
+    {
+      "id": "mk100-v2-028",
+      "verifiedCandidates": 16,
+      "attempts": 341,
+      "rejections": {
+        "solver-unique-nonunique-target": 111,
+        "solver-multiple-nonunique-target": 116,
+        "geometry-path_straight_share,straight_share": 16,
+        "geometry-path_straight_share": 40,
+        "geometry-straight_share": 21,
+        "geometry-path_straight_share,curvy_share": 11,
+        "geometry-path_straight_share,straight_share,curvy_share": 10
+      },
+      "selected": {
+        "geometryPoolIndex": 62,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24780,
+        "transform": 0,
+        "attempt": 170,
+        "placementSeed": 1649717930565732977
+      }
+    },
+    {
+      "id": "mk100-v2-029",
+      "verifiedCandidates": 16,
+      "attempts": 2241,
+      "rejections": {
+        "solver-multiple-nonunique-target": 276,
+        "geometry-path_straight_share": 1190,
+        "solver-unique-nonunique-target": 759
+      },
+      "selected": {
+        "geometryPoolIndex": 75,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41766,
+        "transform": 4,
+        "attempt": 2195,
+        "placementSeed": 7264251918395298578
+      }
+    },
+    {
+      "id": "mk100-v2-030",
+      "verifiedCandidates": 16,
+      "attempts": 1801,
+      "rejections": {
+        "geometry-path_straight_share": 956,
+        "solver-unique-nonunique-target": 489,
+        "solver-multiple-nonunique-target": 340
+      },
+      "selected": {
+        "geometryPoolIndex": 67,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41434,
+        "transform": 6,
+        "attempt": 1058,
+        "placementSeed": 8604406487436565235
+      }
+    },
+    {
+      "id": "mk100-v2-031",
+      "verifiedCandidates": 48,
+      "attempts": 1773,
+      "rejections": {
+        "solver-unique-nonunique-target": 730,
+        "solver-multiple-nonunique-target": 777,
+        "geometry-path_straight_share": 218
+      },
+      "selected": {
+        "geometryPoolIndex": 152,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1016561,
+        "transform": 5,
+        "attempt": 909,
+        "placementSeed": 18295968490075950757
+      }
+    },
+    {
+      "id": "mk100-v2-032",
+      "verifiedCandidates": 16,
+      "attempts": 548,
+      "rejections": {
+        "geometry-path_straight_share": 290,
+        "solver-unique-nonunique-target": 146,
+        "solver-multiple-nonunique-target": 96
+      },
+      "selected": {
+        "geometryPoolIndex": 69,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41508,
+        "transform": 1,
+        "attempt": 111,
+        "placementSeed": 1508576641668156553
+      }
+    },
+    {
+      "id": "mk100-v2-033",
+      "verifiedCandidates": 16,
+      "attempts": 671,
+      "rejections": {
+        "solver-unique-nonunique-target": 169,
+        "solver-multiple-nonunique-target": 129,
+        "geometry-path_straight_share": 357
+      },
+      "selected": {
+        "geometryPoolIndex": 127,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43525,
+        "transform": 2,
+        "attempt": 479,
+        "placementSeed": 3197802037631266135
+      }
+    },
+    {
+      "id": "mk100-v2-034",
+      "verifiedCandidates": 16,
+      "attempts": 252,
+      "rejections": {
+        "solver-unique-nonunique-target": 127,
+        "geometry-path_straight_share,curvy_share": 8,
+        "geometry-path_straight_share": 28,
+        "solver-multiple-nonunique-target": 37,
+        "geometry-path_straight_share,straight_share": 11,
+        "solver-multiple": 3,
+        "geometry-path_straight_share,straight_share,curvy_share": 8,
+        "geometry-straight_share": 14
+      },
+      "selected": {
+        "geometryPoolIndex": 19,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23815,
+        "transform": 4,
+        "attempt": 59,
+        "placementSeed": 4500547392660274784
+      }
+    },
+    {
+      "id": "mk100-v2-035",
+      "verifiedCandidates": 16,
+      "attempts": 414,
+      "rejections": {
+        "geometry-path_straight_share": 219,
+        "solver-multiple-nonunique-target": 52,
+        "solver-unique-nonunique-target": 127
+      },
+      "selected": {
+        "geometryPoolIndex": 101,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42870,
+        "transform": 7,
+        "attempt": 413,
+        "placementSeed": 13062799641552342895
+      }
+    },
+    {
+      "id": "mk100-v2-036",
+      "verifiedCandidates": 16,
+      "attempts": 630,
+      "rejections": {
+        "solver-unique-nonunique-target": 480,
+        "geometry-path_straight_share": 80,
+        "solver-multiple-nonunique-target": 54
+      },
+      "selected": {
+        "geometryPoolIndex": 143,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1004332,
+        "transform": 3,
+        "attempt": 119,
+        "placementSeed": 5589049385579225240
+      }
+    },
+    {
+      "id": "mk100-v2-037",
+      "verifiedCandidates": 16,
+      "attempts": 454,
+      "rejections": {
+        "solver-unique-nonunique-target": 181,
+        "geometry-path_straight_share": 240,
+        "solver-multiple-nonunique-target": 17
+      },
+      "selected": {
+        "geometryPoolIndex": 108,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42948,
+        "transform": 6,
+        "attempt": 148,
+        "placementSeed": 424723342587831568
+      }
+    },
+    {
+      "id": "mk100-v2-038",
+      "verifiedCandidates": 16,
+      "attempts": 2018,
+      "rejections": {
+        "geometry-path_straight_share": 1076,
+        "solver-unique-nonunique-target": 644,
+        "solver-multiple-nonunique-target": 282
+      },
+      "selected": {
+        "geometryPoolIndex": 102,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42883,
+        "transform": 2,
+        "attempt": 1397,
+        "placementSeed": 4192398453636229250
+      }
+    },
+    {
+      "id": "mk100-v2-039",
+      "verifiedCandidates": 16,
+      "attempts": 1152,
+      "rejections": {
+        "solver-unique-nonunique-target": 374,
+        "geometry-path_straight_share": 612,
+        "solver-multiple-nonunique-target": 150
+      },
+      "selected": {
+        "geometryPoolIndex": 103,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42904,
+        "transform": 4,
+        "attempt": 970,
+        "placementSeed": 13522631289788824392
+      }
+    },
+    {
+      "id": "mk100-v2-040",
+      "verifiedCandidates": 16,
+      "attempts": 287,
+      "rejections": {
+        "geometry-path_straight_share": 36,
+        "solver-unique-nonunique-target": 218,
+        "solver-multiple-nonunique-target": 17
+      },
+      "selected": {
+        "geometryPoolIndex": 222,
+        "geometrySeed": 202610010203,
+        "geometryStep": 22226537,
+        "transform": 6,
+        "attempt": 261,
+        "placementSeed": 11229459872173282549
+      }
+    },
+    {
+      "id": "mk100-v2-041",
+      "verifiedCandidates": 16,
+      "attempts": 833,
+      "rejections": {
+        "solver-unique-nonunique-target": 485,
+        "solver-multiple-nonunique-target": 98,
+        "geometry-path_straight_share,curvy_share": 26,
+        "geometry-straight_share": 52,
+        "geometry-path_straight_share,straight_share": 39,
+        "geometry-path_straight_share": 91,
+        "geometry-path_straight_share,straight_share,curvy_share": 26
+      },
+      "selected": {
+        "geometryPoolIndex": 55,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24712,
+        "transform": 2,
+        "attempt": 575,
+        "placementSeed": 9632865013237176246
+      }
+    },
+    {
+      "id": "mk100-v2-042",
+      "verifiedCandidates": 16,
+      "attempts": 680,
+      "rejections": {
+        "geometry-path_straight_share": 361,
+        "solver-unique-nonunique-target": 267,
+        "solver-multiple-nonunique-target": 36
+      },
+      "selected": {
+        "geometryPoolIndex": 122,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43467,
+        "transform": 5,
+        "attempt": 651,
+        "placementSeed": 13162572046959563789
+      }
+    },
+    {
+      "id": "mk100-v2-043",
+      "verifiedCandidates": 16,
+      "attempts": 2126,
+      "rejections": {
+        "solver-multiple-nonunique-target": 770,
+        "geometry-path_straight_share,straight_share": 100,
+        "geometry-straight_share": 134,
+        "geometry-path_straight_share": 232,
+        "solver-unique-nonunique-target": 742,
+        "geometry-path_straight_share,curvy_share": 66,
+        "geometry-path_straight_share,straight_share,curvy_share": 66
+      },
+      "selected": {
+        "geometryPoolIndex": 5,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23374,
+        "transform": 1,
+        "attempt": 126,
+        "placementSeed": 8715466414461672967
+      }
+    },
+    {
+      "id": "mk100-v2-044",
+      "verifiedCandidates": 16,
+      "attempts": 703,
+      "rejections": {
+        "geometry-path_straight_share": 373,
+        "solver-multiple-nonunique-target": 138,
+        "solver-unique-nonunique-target": 175,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 94,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42495,
+        "transform": 2,
+        "attempt": 475,
+        "placementSeed": 2738802130041860769
+      }
+    },
+    {
+      "id": "mk100-v2-045",
+      "verifiedCandidates": 48,
+      "attempts": 4242,
+      "rejections": {
+        "geometry-path_straight_share": 2255,
+        "solver-multiple-nonunique-target": 813,
+        "solver-unique-nonunique-target": 1126
+      },
+      "selected": {
+        "geometryPoolIndex": 105,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42918,
+        "transform": 7,
+        "attempt": 3564,
+        "placementSeed": 15151032110002119919
+      }
+    },
+    {
+      "id": "mk100-v2-046",
+      "verifiedCandidates": 48,
+      "attempts": 1192,
+      "rejections": {
+        "geometry-path_straight_share": 150,
+        "solver-multiple-nonunique-target": 364,
+        "solver-unique-nonunique-target": 630
+      },
+      "selected": {
+        "geometryPoolIndex": 178,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1057337,
+        "transform": 4,
+        "attempt": 167,
+        "placementSeed": 13042305493713223088
+      }
+    },
+    {
+      "id": "mk100-v2-047",
+      "verifiedCandidates": 16,
+      "attempts": 591,
+      "rejections": {
+        "geometry-path_straight_share": 315,
+        "solver-unique-nonunique-target": 171,
+        "solver-multiple-nonunique-target": 82,
+        "solver-multiple": 7
+      },
+      "selected": {
+        "geometryPoolIndex": 67,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41434,
+        "transform": 4,
+        "attempt": 412,
+        "placementSeed": 12738589254728537122
+      }
+    },
+    {
+      "id": "mk100-v2-048",
+      "verifiedCandidates": 16,
+      "attempts": 689,
+      "rejections": {
+        "solver-unique-nonunique-target": 336,
+        "geometry-path_straight_share": 77,
+        "geometry-straight_share": 44,
+        "geometry-path_straight_share,curvy_share": 21,
+        "solver-multiple-nonunique-target": 141,
+        "geometry-path_straight_share,straight_share": 33,
+        "geometry-path_straight_share,straight_share,curvy_share": 21
+      },
+      "selected": {
+        "geometryPoolIndex": 56,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24729,
+        "transform": 1,
+        "attempt": 652,
+        "placementSeed": 16564239510664255004
+      }
+    },
+    {
+      "id": "mk100-v2-049",
+      "verifiedCandidates": 16,
+      "attempts": 377,
+      "rejections": {
+        "solver-unique-nonunique-target": 144,
+        "geometry-path_straight_share": 199,
+        "solver-multiple-nonunique-target": 18
+      },
+      "selected": {
+        "geometryPoolIndex": 72,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41623,
+        "transform": 4,
+        "attempt": 272,
+        "placementSeed": 5476307575903517905
+      }
+    },
+    {
+      "id": "mk100-v2-050",
+      "verifiedCandidates": 16,
+      "attempts": 374,
+      "rejections": {
+        "geometry-path_straight_share": 199,
+        "solver-unique-nonunique-target": 157,
+        "solver-multiple-nonunique-target": 2
+      },
+      "selected": {
+        "geometryPoolIndex": 74,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41763,
+        "transform": 2,
+        "attempt": 273,
+        "placementSeed": 4080925052656606429
+      }
+    },
+    {
+      "id": "mk100-v2-051",
+      "verifiedCandidates": 48,
+      "attempts": 3501,
+      "rejections": {
+        "solver-unique-nonunique-target": 2268,
+        "solver-multiple-nonunique-target": 749,
+        "geometry-path_straight_share": 436
+      },
+      "selected": {
+        "geometryPoolIndex": 151,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1010345,
+        "transform": 4,
+        "attempt": 575,
+        "placementSeed": 3493755182627392968
+      }
+    },
+    {
+      "id": "mk100-v2-052",
+      "verifiedCandidates": 16,
+      "attempts": 1164,
+      "rejections": {
+        "geometry-path_straight_share": 621,
+        "solver-multiple-nonunique-target": 151,
+        "solver-unique-nonunique-target": 376
+      },
+      "selected": {
+        "geometryPoolIndex": 123,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43471,
+        "transform": 3,
+        "attempt": 253,
+        "placementSeed": 3146886869996627338
+      }
+    },
+    {
+      "id": "mk100-v2-053",
+      "verifiedCandidates": 16,
+      "attempts": 399,
+      "rejections": {
+        "solver-unique-nonunique-target": 152,
+        "geometry-path_straight_share": 214,
+        "solver-multiple-nonunique-target": 17
+      },
+      "selected": {
+        "geometryPoolIndex": 98,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42687,
+        "transform": 4,
+        "attempt": 38,
+        "placementSeed": 7019301354232300750
+      }
+    },
+    {
+      "id": "mk100-v2-054",
+      "verifiedCandidates": 16,
+      "attempts": 303,
+      "rejections": {
+        "solver-unique-nonunique-target": 182,
+        "geometry-path_straight_share": 34,
+        "geometry-path_straight_share,straight_share": 15,
+        "geometry-straight_share": 19,
+        "solver-multiple-nonunique-target": 19,
+        "geometry-path_straight_share,curvy_share": 9,
+        "geometry-path_straight_share,straight_share,curvy_share": 9
+      },
+      "selected": {
+        "geometryPoolIndex": 27,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24020,
+        "transform": 5,
+        "attempt": 131,
+        "placementSeed": 16965617909017761885
+      }
+    },
+    {
+      "id": "mk100-v2-055",
+      "verifiedCandidates": 16,
+      "attempts": 530,
+      "rejections": {
+        "solver-unique-nonunique-target": 225,
+        "geometry-path_straight_share": 280,
+        "solver-multiple-nonunique-target": 9
+      },
+      "selected": {
+        "geometryPoolIndex": 86,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41913,
+        "transform": 0,
+        "attempt": 349,
+        "placementSeed": 18005345520097536419
+      }
+    },
+    {
+      "id": "mk100-v2-056",
+      "verifiedCandidates": 48,
+      "attempts": 9193,
+      "rejections": {
+        "solver-unique-nonunique-target": 6013,
+        "solver-multiple-nonunique-target": 1983,
+        "geometry-path_straight_share": 1149
+      },
+      "selected": {
+        "geometryPoolIndex": 150,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1007051,
+        "transform": 6,
+        "attempt": 4950,
+        "placementSeed": 12423976570407644497
+      }
+    },
+    {
+      "id": "mk100-v2-057",
+      "verifiedCandidates": 16,
+      "attempts": 357,
+      "rejections": {
+        "solver-unique-nonunique-target": 145,
+        "geometry-path_straight_share": 189,
+        "solver-multiple-nonunique-target": 7
+      },
+      "selected": {
+        "geometryPoolIndex": 96,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42677,
+        "transform": 5,
+        "attempt": 95,
+        "placementSeed": 16181538539261762296
+      }
+    },
+    {
+      "id": "mk100-v2-058",
+      "verifiedCandidates": 16,
+      "attempts": 1128,
+      "rejections": {
+        "solver-unique-nonunique-target": 451,
+        "geometry-path_straight_share": 603,
+        "solver-multiple-nonunique-target": 56,
+        "solver-multiple": 2
+      },
+      "selected": {
+        "geometryPoolIndex": 70,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41570,
+        "transform": 4,
+        "attempt": 735,
+        "placementSeed": 9366038127010071916
+      }
+    },
+    {
+      "id": "mk100-v2-059",
+      "verifiedCandidates": 16,
+      "attempts": 551,
+      "rejections": {
+        "solver-unique-nonunique-target": 170,
+        "geometry-path_straight_share": 289,
+        "solver-multiple-nonunique-target": 76
+      },
+      "selected": {
+        "geometryPoolIndex": 100,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42712,
+        "transform": 5,
+        "attempt": 382,
+        "placementSeed": 16477226268874977580
+      }
+    },
+    {
+      "id": "mk100-v2-060",
+      "verifiedCandidates": 48,
+      "attempts": 2558,
+      "rejections": {
+        "solver-unique-nonunique-target": 1021,
+        "solver-multiple-nonunique-target": 1169,
+        "geometry-path_straight_share": 320
+      },
+      "selected": {
+        "geometryPoolIndex": 214,
+        "geometrySeed": 202610010203,
+        "geometryStep": 20353773,
+        "transform": 0,
+        "attempt": 2075,
+        "placementSeed": 14722355863471723716
+      }
+    },
+    {
+      "id": "mk100-v2-061",
+      "verifiedCandidates": 16,
+      "attempts": 404,
+      "rejections": {
+        "geometry-straight_share": 27,
+        "solver-unique-nonunique-target": 260,
+        "geometry-path_straight_share,straight_share": 20,
+        "geometry-path_straight_share,straight_share,curvy_share": 13,
+        "geometry-path_straight_share": 43,
+        "solver-multiple-nonunique-target": 13,
+        "geometry-path_straight_share,curvy_share": 12
+      },
+      "selected": {
+        "geometryPoolIndex": 12,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23792,
+        "transform": 1,
+        "attempt": 102,
+        "placementSeed": 7222044271683766264
+      }
+    },
+    {
+      "id": "mk100-v2-062",
+      "verifiedCandidates": 16,
+      "attempts": 2455,
+      "rejections": {
+        "solver-unique-nonunique-target": 720,
+        "geometry-path_straight_share": 1303,
+        "solver-multiple-nonunique-target": 415,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 68,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41495,
+        "transform": 0,
+        "attempt": 2206,
+        "placementSeed": 1673250840558002886
+      }
+    },
+    {
+      "id": "mk100-v2-063",
+      "verifiedCandidates": 16,
+      "attempts": 322,
+      "rejections": {
+        "solver-unique-nonunique-target": 196,
+        "solver-multiple-nonunique-target": 20,
+        "geometry-path_straight_share,straight_share": 15,
+        "geometry-path_straight_share": 35,
+        "geometry-straight_share": 20,
+        "geometry-path_straight_share,curvy_share": 10,
+        "geometry-path_straight_share,straight_share,curvy_share": 10
+      },
+      "selected": {
+        "geometryPoolIndex": 63,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24787,
+        "transform": 6,
+        "attempt": 135,
+        "placementSeed": 2163899013561252688
+      }
+    },
+    {
+      "id": "mk100-v2-064",
+      "verifiedCandidates": 16,
+      "attempts": 769,
+      "rejections": {
+        "solver-unique-nonunique-target": 304,
+        "geometry-path_straight_share": 408,
+        "solver-multiple-nonunique-target": 40,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 95,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42582,
+        "transform": 7,
+        "attempt": 632,
+        "placementSeed": 2217172772262457902
+      }
+    },
+    {
+      "id": "mk100-v2-065",
+      "verifiedCandidates": 48,
+      "attempts": 7466,
+      "rejections": {
+        "solver-unique-nonunique-target": 3198,
+        "geometry-path_straight_share": 3969,
+        "solver-multiple-nonunique-target": 251
+      },
+      "selected": {
+        "geometryPoolIndex": 74,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41763,
+        "transform": 3,
+        "attempt": 7332,
+        "placementSeed": 5740149203378279919
+      }
+    },
+    {
+      "id": "mk100-v2-066",
+      "verifiedCandidates": 48,
+      "attempts": 4697,
+      "rejections": {
+        "solver-multiple-nonunique-target": 1595,
+        "geometry-path_straight_share": 586,
+        "solver-unique-nonunique-target": 2461,
+        "solver-multiple": 7
+      },
+      "selected": {
+        "geometryPoolIndex": 178,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1057337,
+        "transform": 1,
+        "attempt": 2660,
+        "placementSeed": 16220599541610797560
+      }
+    },
+    {
+      "id": "mk100-v2-067",
+      "verifiedCandidates": 16,
+      "attempts": 1979,
+      "rejections": {
+        "geometry-path_straight_share": 1052,
+        "solver-unique-nonunique-target": 543,
+        "solver-multiple-nonunique-target": 365,
+        "solver-multiple": 3
+      },
+      "selected": {
+        "geometryPoolIndex": 71,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41586,
+        "transform": 6,
+        "attempt": 1527,
+        "placementSeed": 5735821926219791357
+      }
+    },
+    {
+      "id": "mk100-v2-068",
+      "verifiedCandidates": 16,
+      "attempts": 312,
+      "rejections": {
+        "solver-unique-nonunique-target": 183,
+        "geometry-path_straight_share": 33,
+        "geometry-path_straight_share,curvy_share": 10,
+        "geometry-path_straight_share,straight_share": 15,
+        "solver-multiple-nonunique-target": 26,
+        "geometry-straight_share": 20,
+        "geometry-path_straight_share,straight_share,curvy_share": 9
+      },
+      "selected": {
+        "geometryPoolIndex": 13,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23798,
+        "transform": 7,
+        "attempt": 118,
+        "placementSeed": 7136083901628814740
+      }
+    },
+    {
+      "id": "mk100-v2-069",
+      "verifiedCandidates": 16,
+      "attempts": 1311,
+      "rejections": {
+        "geometry-path_straight_share": 696,
+        "solver-multiple-nonunique-target": 205,
+        "solver-unique-nonunique-target": 394
+      },
+      "selected": {
+        "geometryPoolIndex": 103,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42904,
+        "transform": 0,
+        "attempt": 782,
+        "placementSeed": 16410149345373726495
+      }
+    },
+    {
+      "id": "mk100-v2-070",
+      "verifiedCandidates": 16,
+      "attempts": 1416,
+      "rejections": {
+        "geometry-path_straight_share": 752,
+        "solver-multiple-nonunique-target": 262,
+        "solver-unique-nonunique-target": 386
+      },
+      "selected": {
+        "geometryPoolIndex": 123,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43471,
+        "transform": 6,
+        "attempt": 1353,
+        "placementSeed": 4631707251186733781
+      }
+    },
+    {
+      "id": "mk100-v2-071",
+      "verifiedCandidates": 48,
+      "attempts": 5123,
+      "rejections": {
+        "solver-unique-nonunique-target": 3564,
+        "solver-multiple-nonunique-target": 861,
+        "geometry-path_straight_share": 640,
+        "solver-multiple": 10
+      },
+      "selected": {
+        "geometryPoolIndex": 172,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1040289,
+        "transform": 3,
+        "attempt": 659,
+        "placementSeed": 15099052559523366862
+      }
+    },
+    {
+      "id": "mk100-v2-072",
+      "verifiedCandidates": 16,
+      "attempts": 1790,
+      "rejections": {
+        "geometry-path_straight_share": 951,
+        "solver-unique-nonunique-target": 718,
+        "solver-multiple-nonunique-target": 105
+      },
+      "selected": {
+        "geometryPoolIndex": 99,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42701,
+        "transform": 0,
+        "attempt": 1108,
+        "placementSeed": 11692615315735373014
+      }
+    },
+    {
+      "id": "mk100-v2-073",
+      "verifiedCandidates": 16,
+      "attempts": 2400,
+      "rejections": {
+        "geometry-path_straight_share": 1275,
+        "solver-multiple-nonunique-target": 707,
+        "solver-unique-nonunique-target": 402
+      },
+      "selected": {
+        "geometryPoolIndex": 100,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42712,
+        "transform": 2,
+        "attempt": 1594,
+        "placementSeed": 1411968573224809815
+      }
+    },
+    {
+      "id": "mk100-v2-074",
+      "verifiedCandidates": 16,
+      "attempts": 417,
+      "rejections": {
+        "solver-unique-nonunique-target": 218,
+        "solver-multiple-nonunique-target": 66,
+        "geometry-straight_share": 28,
+        "geometry-path_straight_share,curvy_share": 14,
+        "geometry-path_straight_share": 44,
+        "geometry-path_straight_share,straight_share": 19,
+        "geometry-path_straight_share,straight_share,curvy_share": 12
+      },
+      "selected": {
+        "geometryPoolIndex": 19,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23815,
+        "transform": 6,
+        "attempt": 195,
+        "placementSeed": 11837160881554273682
+      }
+    },
+    {
+      "id": "mk100-v2-075",
+      "verifiedCandidates": 16,
+      "attempts": 881,
+      "rejections": {
+        "geometry-path_straight_share": 469,
+        "solver-unique-nonunique-target": 240,
+        "solver-multiple-nonunique-target": 155,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 75,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41766,
+        "transform": 6,
+        "attempt": 756,
+        "placementSeed": 6711162635181150378
+      }
+    },
+    {
+      "id": "mk100-v2-076",
+      "verifiedCandidates": 16,
+      "attempts": 477,
+      "rejections": {
+        "solver-unique-nonunique-target": 268,
+        "solver-multiple-nonunique-target": 133,
+        "geometry-path_straight_share": 60
+      },
+      "selected": {
+        "geometryPoolIndex": 177,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1057334,
+        "transform": 7,
+        "attempt": 134,
+        "placementSeed": 1214899079647656257
+      }
+    },
+    {
+      "id": "mk100-v2-077",
+      "verifiedCandidates": 16,
+      "attempts": 1768,
+      "rejections": {
+        "geometry-path_straight_share": 939,
+        "solver-unique-nonunique-target": 761,
+        "solver-multiple-nonunique-target": 52
+      },
+      "selected": {
+        "geometryPoolIndex": 67,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41434,
+        "transform": 7,
+        "attempt": 1397,
+        "placementSeed": 7270616823765318354
+      }
+    },
+    {
+      "id": "mk100-v2-078",
+      "verifiedCandidates": 16,
+      "attempts": 1137,
+      "rejections": {
+        "geometry-path_straight_share": 601,
+        "solver-multiple-nonunique-target": 152,
+        "solver-unique-nonunique-target": 368
+      },
+      "selected": {
+        "geometryPoolIndex": 74,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41763,
+        "transform": 7,
+        "attempt": 1070,
+        "placementSeed": 3941349940634707131
+      }
+    },
+    {
+      "id": "mk100-v2-079",
+      "verifiedCandidates": 16,
+      "attempts": 1099,
+      "rejections": {
+        "geometry-path_straight_share": 584,
+        "solver-unique-nonunique-target": 413,
+        "solver-multiple-nonunique-target": 85,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 107,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42923,
+        "transform": 5,
+        "attempt": 289,
+        "placementSeed": 17516242995086994935
+      }
+    },
+    {
+      "id": "mk100-v2-080",
+      "verifiedCandidates": 16,
+      "attempts": 605,
+      "rejections": {
+        "solver-unique-nonunique-target": 503,
+        "geometry-path_straight_share": 76,
+        "solver-multiple-nonunique-target": 10
+      },
+      "selected": {
+        "geometryPoolIndex": 195,
+        "geometrySeed": 202610010203,
+        "geometryStep": 4591129,
+        "transform": 1,
+        "attempt": 495,
+        "placementSeed": 14688724579808770992
+      }
+    },
+    {
+      "id": "mk100-v2-081",
+      "verifiedCandidates": 16,
+      "attempts": 257,
+      "rejections": {
+        "solver-multiple-nonunique-target": 28,
+        "solver-unique-nonunique-target": 141,
+        "geometry-path_straight_share,straight_share": 12,
+        "geometry-path_straight_share": 28,
+        "geometry-straight_share": 16,
+        "geometry-path_straight_share,curvy_share": 8,
+        "geometry-path_straight_share,straight_share,curvy_share": 8
+      },
+      "selected": {
+        "geometryPoolIndex": 28,
+        "geometrySeed": 202610010200,
+        "geometryStep": 24029,
+        "transform": 4,
+        "attempt": 138,
+        "placementSeed": 13923248886770187865
+      }
+    },
+    {
+      "id": "mk100-v2-082",
+      "verifiedCandidates": 16,
+      "attempts": 909,
+      "rejections": {
+        "solver-multiple-nonunique-target": 187,
+        "solver-unique-nonunique-target": 223,
+        "geometry-path_straight_share": 483
+      },
+      "selected": {
+        "geometryPoolIndex": 86,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41913,
+        "transform": 5,
+        "attempt": 874,
+        "placementSeed": 3299165156747751273
+      }
+    },
+    {
+      "id": "mk100-v2-083",
+      "verifiedCandidates": 16,
+      "attempts": 308,
+      "rejections": {
+        "solver-unique-nonunique-target": 165,
+        "solver-multiple-nonunique-target": 38,
+        "geometry-path_straight_share": 33,
+        "geometry-path_straight_share,straight_share": 15,
+        "geometry-path_straight_share,straight_share,curvy_share": 10,
+        "geometry-straight_share": 18,
+        "geometry-path_straight_share,curvy_share": 10,
+        "solver-multiple": 3
+      },
+      "selected": {
+        "geometryPoolIndex": 1,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23331,
+        "transform": 7,
+        "attempt": 195,
+        "placementSeed": 13206865687128670883
+      }
+    },
+    {
+      "id": "mk100-v2-084",
+      "verifiedCandidates": 16,
+      "attempts": 1773,
+      "rejections": {
+        "geometry-path_straight_share": 941,
+        "solver-unique-nonunique-target": 476,
+        "solver-multiple-nonunique-target": 339,
+        "solver-multiple": 1
+      },
+      "selected": {
+        "geometryPoolIndex": 101,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42870,
+        "transform": 3,
+        "attempt": 709,
+        "placementSeed": 13708852141673226378
+      }
+    },
+    {
+      "id": "mk100-v2-085",
+      "verifiedCandidates": 48,
+      "attempts": 7029,
+      "rejections": {
+        "solver-multiple-nonunique-target": 2212,
+        "geometry-path_straight_share": 3734,
+        "solver-unique-nonunique-target": 1035
+      },
+      "selected": {
+        "geometryPoolIndex": 100,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42712,
+        "transform": 0,
+        "attempt": 6836,
+        "placementSeed": 6616129137300435271
+      }
+    },
+    {
+      "id": "mk100-v2-086",
+      "verifiedCandidates": 127,
+      "attempts": 5755,
+      "rejections": {
+        "solver-unique-nonunique-target": 4607,
+        "geometry-path_straight_share": 720,
+        "solver-multiple-nonunique-target": 301
+      },
+      "selected": {
+        "geometryPoolIndex": 153,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1016850,
+        "transform": 3,
+        "attempt": 3202,
+        "placementSeed": 7921675219669328281
+      }
+    },
+    {
+      "id": "mk100-v2-087",
+      "verifiedCandidates": 16,
+      "attempts": 2058,
+      "rejections": {
+        "geometry-path_straight_share": 1092,
+        "solver-unique-nonunique-target": 867,
+        "solver-multiple-nonunique-target": 83
+      },
+      "selected": {
+        "geometryPoolIndex": 73,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41759,
+        "transform": 0,
+        "attempt": 1867,
+        "placementSeed": 17090723695886569560
+      }
+    },
+    {
+      "id": "mk100-v2-088",
+      "verifiedCandidates": 16,
+      "attempts": 1184,
+      "rejections": {
+        "solver-multiple-nonunique-target": 249,
+        "solver-unique-nonunique-target": 584,
+        "geometry-path_straight_share": 129,
+        "geometry-path_straight_share,curvy_share": 38,
+        "geometry-path_straight_share,straight_share": 56,
+        "geometry-path_straight_share,straight_share,curvy_share": 38,
+        "geometry-straight_share": 74
+      },
+      "selected": {
+        "geometryPoolIndex": 15,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23800,
+        "transform": 0,
+        "attempt": 383,
+        "placementSeed": 3849280884567380428
+      }
+    },
+    {
+      "id": "mk100-v2-089",
+      "verifiedCandidates": 16,
+      "attempts": 519,
+      "rejections": {
+        "solver-unique-nonunique-target": 183,
+        "geometry-path_straight_share": 275,
+        "solver-multiple-nonunique-target": 42,
+        "solver-multiple": 3
+      },
+      "selected": {
+        "geometryPoolIndex": 71,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41586,
+        "transform": 3,
+        "attempt": 65,
+        "placementSeed": 4023965749100093095
+      }
+    },
+    {
+      "id": "mk100-v2-090",
+      "verifiedCandidates": 16,
+      "attempts": 956,
+      "rejections": {
+        "geometry-path_straight_share": 508,
+        "solver-multiple-nonunique-target": 139,
+        "solver-unique-nonunique-target": 288,
+        "solver-multiple": 5
+      },
+      "selected": {
+        "geometryPoolIndex": 94,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42495,
+        "transform": 3,
+        "attempt": 40,
+        "placementSeed": 11248988725133006810
+      }
+    },
+    {
+      "id": "mk100-v2-091",
+      "verifiedCandidates": 48,
+      "attempts": 2945,
+      "rejections": {
+        "solver-multiple-nonunique-target": 1560,
+        "geometry-path_straight_share": 368,
+        "solver-unique-nonunique-target": 969
+      },
+      "selected": {
+        "geometryPoolIndex": 152,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1016561,
+        "transform": 1,
+        "attempt": 0,
+        "placementSeed": 4454600700096996161
+      }
+    },
+    {
+      "id": "mk100-v2-092",
+      "verifiedCandidates": 16,
+      "attempts": 664,
+      "rejections": {
+        "solver-unique-nonunique-target": 270,
+        "geometry-path_straight_share": 353,
+        "solver-multiple-nonunique-target": 25
+      },
+      "selected": {
+        "geometryPoolIndex": 72,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41623,
+        "transform": 0,
+        "attempt": 571,
+        "placementSeed": 9382843581788138126
+      }
+    },
+    {
+      "id": "mk100-v2-093",
+      "verifiedCandidates": 16,
+      "attempts": 701,
+      "rejections": {
+        "geometry-path_straight_share": 372,
+        "solver-unique-nonunique-target": 302,
+        "solver-multiple-nonunique-target": 11
+      },
+      "selected": {
+        "geometryPoolIndex": 68,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41495,
+        "transform": 5,
+        "attempt": 444,
+        "placementSeed": 7573400887541040640
+      }
+    },
+    {
+      "id": "mk100-v2-094",
+      "verifiedCandidates": 16,
+      "attempts": 214,
+      "rejections": {
+        "solver-unique-nonunique-target": 100,
+        "solver-multiple-nonunique-target": 37,
+        "geometry-path_straight_share,curvy_share": 7,
+        "geometry-straight_share": 13,
+        "geometry-path_straight_share": 22,
+        "geometry-path_straight_share,straight_share": 11,
+        "solver-multiple": 2,
+        "geometry-path_straight_share,straight_share,curvy_share": 6
+      },
+      "selected": {
+        "geometryPoolIndex": 1,
+        "geometrySeed": 202610010200,
+        "geometryStep": 23331,
+        "transform": 1,
+        "attempt": 61,
+        "placementSeed": 13018571904600728376
+      }
+    },
+    {
+      "id": "mk100-v2-095",
+      "verifiedCandidates": 16,
+      "attempts": 2264,
+      "rejections": {
+        "solver-unique-nonunique-target": 436,
+        "solver-multiple-nonunique-target": 601,
+        "geometry-path_straight_share": 1203,
+        "solver-multiple": 8
+      },
+      "selected": {
+        "geometryPoolIndex": 100,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42712,
+        "transform": 7,
+        "attempt": 1673,
+        "placementSeed": 17075121207091860099
+      }
+    },
+    {
+      "id": "mk100-v2-096",
+      "verifiedCandidates": 16,
+      "attempts": 724,
+      "rejections": {
+        "geometry-path_straight_share": 91,
+        "solver-multiple-nonunique-target": 155,
+        "solver-unique-nonunique-target": 462
+      },
+      "selected": {
+        "geometryPoolIndex": 168,
+        "geometrySeed": 202610010202,
+        "geometryStep": 1039522,
+        "transform": 2,
+        "attempt": 71,
+        "placementSeed": 767172414737403236
+      }
+    },
+    {
+      "id": "mk100-v2-097",
+      "verifiedCandidates": 16,
+      "attempts": 2335,
+      "rejections": {
+        "solver-multiple-nonunique-target": 440,
+        "solver-unique-nonunique-target": 637,
+        "geometry-path_straight_share": 1239,
+        "solver-multiple": 3
+      },
+      "selected": {
+        "geometryPoolIndex": 127,
+        "geometrySeed": 202610010201,
+        "geometryStep": 43525,
+        "transform": 0,
+        "attempt": 902,
+        "placementSeed": 12012558984116542667
+      }
+    },
+    {
+      "id": "mk100-v2-098",
+      "verifiedCandidates": 16,
+      "attempts": 306,
+      "rejections": {
+        "solver-unique-nonunique-target": 121,
+        "geometry-path_straight_share": 163,
+        "solver-multiple-nonunique-target": 6
+      },
+      "selected": {
+        "geometryPoolIndex": 86,
+        "geometrySeed": 202610010201,
+        "geometryStep": 41913,
+        "transform": 1,
+        "attempt": 195,
+        "placementSeed": 4502452748023996513
+      }
+    },
+    {
+      "id": "mk100-v2-099",
+      "verifiedCandidates": 16,
+      "attempts": 3127,
+      "rejections": {
+        "geometry-path_straight_share": 1660,
+        "solver-multiple-nonunique-target": 1091,
+        "solver-unique-nonunique-target": 360
+      },
+      "selected": {
+        "geometryPoolIndex": 91,
+        "geometrySeed": 202610010201,
+        "geometryStep": 42298,
+        "transform": 6,
+        "attempt": 2174,
+        "placementSeed": 15242236677109905690
+      }
+    },
+    {
+      "id": "mk100-v2-100",
+      "verifiedCandidates": 48,
+      "attempts": 726,
+      "rejections": {
+        "geometry-path_straight_share": 90,
+        "solver-unique-nonunique-target": 522,
+        "solver-multiple-nonunique-target": 66
+      },
+      "selected": {
+        "geometryPoolIndex": 196,
+        "geometrySeed": 202610010203,
+        "geometryStep": 4594417,
+        "transform": 4,
+        "attempt": 81,
+        "placementSeed": 7751655814009383982
+      }
+    }
+  ],
+  "proof": "Individual candidate pool files retained in candidate-pools-v2.zip; finalselected exact proofs are in full-verification.json. All solver budget exhaustion rejected; no historical board substituted."
+}

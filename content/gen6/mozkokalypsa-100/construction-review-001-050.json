@@ -1,0 +1,578 @@
+{
+  "status": "accepted-individual-model-grid-review",
+  "reviewer": "Codex root (AI editorial judgment)",
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "physicalDeviceTested": false,
+  "records": [
+    {
+      "id": "mk100-v2-001",
+      "ordinal": 1,
+      "contentHash": "d9b09b6dd1b24b33951dc46b863fe081f54bf715ad338684c78c8330e82aaa09",
+      "wordsetHash": "74eeea2778da14e7a4d999c61cbbf83313cf4dc0e824f8c06207c3c456a20587",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "LOUŽE je krátká jednoduchá kotva při kraji, PROHLUBEŇ prochází dvěma řádky a PŘADLENA obrací směr kolem sousedů. Úleva má zřetelně klidnější cesty než vrchol20.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-002",
+      "ordinal": 2,
+      "contentHash": "fb97f17fee7dd1487e7630ca2c57ee56b3732121e889a875699fd5cde07db051",
+      "wordsetHash": "112f97824728cf68cdf8306ddba2441b58492d29b2c41644762101c3b1012c16",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KOTVIŠTĚ má podélnou cestu u pravé strany, NOSTALGIE kombinuje svislý začátek se zpětným obratem. Konkrétní KLEŠTĚ a CHAPADLO vyvažují abstraktní hledání.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-003",
+      "ordinal": 3,
+      "contentHash": "b6c1e7b87d6843d179dfef5a89a2ff339a1ff0b1a67bce94c4f9c539b9ca291f",
+      "wordsetHash": "ad9e14f7e186df81464c5d573afe7d3ffb82b4335e68c069bcd2779f01be74dd",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "DOBRODRUH se vine kolem levého dolního rohu, NAVIJÁK a MYSLET mají různý směrový charakter; dlouhé konkrétní kotvy drží úlevový profil i přes LEDŇÁČKA a NÁPRSTEK.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-004",
+      "ordinal": 4,
+      "contentHash": "63898ab6f6a7ec5c0436de9ac977d24834763182fa28950753d14342f4108a69",
+      "wordsetHash": "c946e4f2d47f209aa764dfd9ecbfbdad20fdc643b93c5af2ad982b22c43db397",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "STEREOTYP stáčí cestu podél pravého okraje, POČÍTAT využívá horní pravý prostor. KRAJKA a KILOMETR nedělají obdobnou konturu; pestré hledání bez slovní kumulace.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-005",
+      "ordinal": 5,
+      "contentHash": "a377ae92d6534919bb1d7b7ba391e335316c5c5964fe86272d650944a6a3d309",
+      "wordsetHash": "2bbb2c85ce74ea6bd46c97e327fd223d5fe04ff11788351939f737c4fd0cdc77",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PŘEHÁŇKA vede podél spodního okraje s návratem, PRŮVODCE obchází pravý střed a LOUTKÁŘ se napojuje do centrálních sousedství. Nová vybraná geometrie zlepšila minimum více závěrových hypotéz; skutečný lidský účinek se neměří.",
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-006",
+      "ordinal": 6,
+      "contentHash": "6e828b6d06adb0c4b6f7f678f82fa3f700cd8f5517c0a6894f0f50a7796c69e1",
+      "wordsetHash": "0d0a754060a848bdfa7f06ae7f119905debdd15434dd950b8ba0674850aa9f42",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KOPRETINA tvoří složenou cestu vlevo nahoře, ROZBŘESK se obrací v horních řádcích a VIADUKT má další vlastní zalomení. Silnější konstrukce má srozumitelné konkrétní opory; PANÍČKA může být stylově výrazná.",
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-007",
+      "ordinal": 7,
+      "contentHash": "5c9f3cc2622c052269c8529e0fe55a1d4e44f7065e1ce3d9b33f39c76c71a72e",
+      "wordsetHash": "0d5e811c6673f47c5fe567d8c4818e1dcc1a770cc4f024a341dcb06d6b152478",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PŘÍBĚH má delší vodorovnou část ve středu, VLKODLAK obraty v levé části, ODMOCNINA střídá pravý střed a spodní okraj. Kulturní a školní slova střídají způsob hledání.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-008",
+      "ordinal": 8,
+      "contentHash": "7ae9b0e77e37ec06346515ca85fb94473f8b2cf179c4647a54c57d1dacd42290",
+      "wordsetHash": "392260512423ccd566ca9756c0512168e47e86af26ff4b997a00ba3462f7d79a",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PODLOŽKA má několik delších přímých úseků, MEZERA se stáčí u pravého spodního kraje a SBORMISTR opírá první řádky. Zřetelná úleva cestami; SBORMISTR je méně všední, ale srozumitelný složený pojem.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-009",
+      "ordinal": 9,
+      "contentHash": "775dfad436ed2aab500cff70d71e90079587273cafe5f7352a2da90e4c0e1022",
+      "wordsetHash": "caf490ffd6dd5f0eff2acbf72d4a2fdabeeb1ed58b41a993d9bfe1ad04a1a434",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "NÁTĚLNÍK má středovou horizontální část, LETOKRUH se zalamuje vlevo a KALENDÁŘ vyplňuje levý horní prostor. Cílená závěrová volba nestojí na raritním slově; více konkrétních počátků má sousední větve.",
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-010",
+      "ordinal": 10,
+      "contentHash": "0403c491bd58599e9e15f030b018f2b42dcb073c23d6df22a4f4cbdb4f87f7cf",
+      "wordsetHash": "fb7bdc70e2637cfd580b93cac40b30f613f35d19a61fad1d6ec1582743474f4e",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "ŠPENDLÍK obrací směr vlevo, KONTRABAS se rozkládá v pravém středu a EPIDEMIE zabírá horní okraj. ANDROID a PROCESOR přidávají současné významy; technické téma netvoří celou desku.",
+      "risks": [],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-011",
+      "ordinal": 11,
+      "contentHash": "29e462730ef789266e7cf5b2b877e189fa1faa37a3c8812ff5ad15f74811f596",
+      "wordsetHash": "fa8352c6ce6342a37e94ac3c2af8e6b72d2f5550429e50227a27cc15a5d012ca",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "GEOMETRIE se stáčí ve střední části, NOVOLUNÍ u spodního levého prostoru a VLÁDKYNĚ obchází horní levý roh. BAKTERIE a ORNICE mají jinou orientaci. Původně slabší závěrové pořadí vedlo k širšímu výběru135 ověřených variant.",
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-012",
+      "ordinal": 12,
+      "contentHash": "1e54996747a46ca7be5a6e1b3b0ce045d2ac1d506a96f96089e80723414a8362",
+      "wordsetHash": "b53d980c497041b3e77ba9050781ee5e5d6198326a13c1008f327f3f9039b116",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci HEJKAL obchází horní levý roh, PŘEDMLUVA má horní levou centrální cestu a STRNIŠTĚ pravé střední obraty. PROTEIN a MONOLOG střídají směr nahoře vpravo; BEDNĚNÍ a KERAMIKA drží spodní konstrukční opory.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-013",
+      "ordinal": 13,
+      "contentHash": "288fbad3055d91ba434ea621d15ee609da8603e82bdb56a5754af58af9c47576",
+      "wordsetHash": "1f4eb75d78330bc5981c0d4d62aeebd55ba3e695be8ded372e2609a9ae502b16",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "JÁDŘINEC tvoří vysokou cestu ve středu, PRÁZDNOTA obrací směr v pravé části a LEDOVKA prochází centrálním prostorem. SOUČIN a FYZIKA mají známé školní opory vedle konkrétních slov.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-014",
+      "ordinal": 14,
+      "contentHash": "df322697d414b9a2f80e2eebd24f65a70dcc5deb865fd456ac5d37b9ac8ae3ff",
+      "wordsetHash": "be7b98457a59f77c11788c1f0212ef7b1eb78d5ea40b29ec2e70f31920ddb51e",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "HÁČKOVAT se rozvíjí vlevo dole, MEDUŇKA při horním pravém okraji a ČERVENKA při spodním pravém. Úlevová skladba kuchyně, ptáků a činností nabízí několik dobře představitelných vstupů.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-015",
+      "ordinal": 15,
+      "contentHash": "032020e5acd57ffe29e2984e259e447301936419a869888e6fdbb502e982761d",
+      "wordsetHash": "401ec5741a1363fa74f73ff71aae19eaa7cdbc86497187051faf8e6b19bfadd0",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PROSINEC má vyšší levou cestu, KVASNICE využívají střed a DĚVČÁTKO spodní smyčku. TESLICE přidává jedinou výrazněji řemeslnou překážku; geometrie nevyžaduje tematické znalosti celé sady.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-016",
+      "ordinal": 16,
+      "contentHash": "7ef9a08eada025c98bf2c0c9620ec24396cdbd1d49dfa89c514c66b750a05faa",
+      "wordsetHash": "4fe89e1f31b7f8d2893165531fd5dbda96bce039bf7acf503177a746b1e0b7ad",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "LASER začíná v horním středu, BASEBALL má spodní zalomení a MATICE vlastní pravou spodní cestu. Náhrada palindromu zachovala délku a oborový charakter; ZÁVLAČKA zůstává vědomou úzkou slovní překážkou.",
+      "risks": [
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-017",
+      "ordinal": 17,
+      "contentHash": "b3b5a4c2d00a06670e21483f1ce695546feca2ce43f7efa9fafa1a0c26c74b30",
+      "wordsetHash": "4552e4207d700e221c44cbdd73ba0441ff8936c6d4b9cad361108246094aacf8",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PROHLÍŽEČ má dlouhou spodní cestu s obratem, LEGIONÁŘ jiné spodní sousedství a POZVÁNÍ se stáčí nahoře. LEOPARD nabízí konkrétní kotvu mezi činnostmi a společenskými slovy.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-018",
+      "ordinal": 18,
+      "contentHash": "40e8dac7bf3f5edf93c676f8dde5efc0b0b3bf397f3d4bca9a8e61e3d3591478",
+      "wordsetHash": "bb757203cabe068690119dd04cc631ac4e848f2f06f0774f092b1ad19805a713",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci VYPÍNAČ využívá horní levou cestu, LÉKAŘKA pravý spodní okraj a SVĚDECTVÍ spodní střední zalomení. ROZPLÉST se obrací nahoře vpravo, RYTINA má svislejší střed; přírodní a pracovní kotvy zůstaly zachované.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-019",
+      "ordinal": 19,
+      "contentHash": "e013b5d9b49221394eb27e362fda2536c23f7d78a288b246a6959ece59fe8582",
+      "wordsetHash": "a1db869365b1bfb19ec15b3916abeff1f48d50f6c0f6bf5a45eb78645acb5910",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "EKOSYSTÉM vede horní levou částí do středu, TORNÁDO se obrací vpravo dole a PÍŠŤALKA v pravém středu. DROBENKA má oddělenou spodní cestu; DRUID může být kulturně méně známý.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-020",
+      "ordinal": 20,
+      "contentHash": "49e5e9002ea15d2c516121dc4f08afd748daf6b4fc9f2b616b15a753a696c6fc",
+      "wordsetHash": "326101569e31b29d15f4deab1098cfa10af9aeff519c19256767f8cced80c711",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "NALEZIŠTĚ a ROZMARÝN mají více obratů v odlišných částech, MUTACE se skládá v horním středu a MIKROFON začíná dole. Vrchol je konstrukční kombinací s MRHOLENÍM a HOBLICÍ; HOBLICE je přiznaný jediný užší řemeslný výraz.",
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ],
+      "view": "PIL mosaic of actual letters and complete disjoint answer paths; both6-board panels inspected."
+    },
+    {
+      "id": "mk100-v2-021",
+      "ordinal": 21,
+      "contentHash": "a5cdca296d297d52cc01b669edd66a021ee0db6cca0a183fb2b157a2b64c7766",
+      "wordsetHash": "54e68c9f55cf45c7252f5fbf51d6759a066e3b5700b0a91c83165efc2ab5b2bd",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "HŘEBÍČEK má horní levou obdélníkovou cestu, KROPÍTKO spodní levou a SOUTĚSKA dlouhé střední zalomení. Za vrcholem20 jde o čitelnější nový začátek vlny, nikoli o nulovou konstrukční složitost.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-022",
+      "ordinal": 22,
+      "contentHash": "9c2e098a274f1b1490b7c2109840a0d5158a9f901498aab809094c58e9a5ac05",
+      "wordsetHash": "cdcf08e9abd5b549bf7ffbb9b144df8fb47a5324342230da8d13468096199814",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "ČERVÁNKY se stáčí mezi spodními sloupci, RAMPOUCH obsazuje pravý střed a LOŽISKO svisle levou část. BLATNÍK a ŠALVĚJ střídají technickou a přírodní konkrétnost.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-023",
+      "ordinal": 23,
+      "contentHash": "6f633a9e822207be4cce0638bf82576c5e6bda5b20dd5ec971fc5372d99d5ad0",
+      "wordsetHash": "38b453aea88cf6f69151594c01017b5acb6be5cb5f2d67019f73f0ecce515f33",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "ŽEMLOVKA se rozvíjí ve spodním středu, KOLÉBKA vlevo dole a CANDÁT využívá delší horní úsek. Kuchyně a pohádka tvoří úlevové kotvy bez kumulace úzkých názvů.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-024",
+      "ordinal": 24,
+      "contentHash": "70419ba264ec1c6a6ce028d6fc479437a40b594192c1ac77f5bdbfd23153bb4f",
+      "wordsetHash": "1cf8efa0afab40b03b50af240f778ace3dc494d6576bc71d532e87a58d157bfc",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PROHLUBEŇ se vine vlevo nahoře, RAMÍNKO v horním středu a PLAZMA vlevo dole. NÁPRSTEK má centrální obraty, ROZVODÍ a NAROZENÍ odlišné spodní cesty.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-025",
+      "ordinal": 25,
+      "contentHash": "b84f7edf196c97cbf5c5b9d09affa1b27991e17cffdaba5e2f438562454ea12e",
+      "wordsetHash": "da96faea1463f09aa5499a6e069bc5868697714dc2a3b1ea1d4e9de88583a5be",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KATEDRÁLA obrací směr v horním pravém prostoru, HOLOGRAM má pravou členitou cestu a CHŘESTÝŠ začíná vlevo. PLETIVO se láme dole, KOLEČKO poskytuje běžnou konkrétní oporu.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-026",
+      "ordinal": 26,
+      "contentHash": "b0629f6805f637462c6e094580eeb9014ab24694131ef0d93f188c767cb47aee",
+      "wordsetHash": "d8d0fa26ae134e5587b03d28c2a4bd6a1e5e0680f4344ff3efed9182c0cc19ee",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KRUŽNICE prochází horní pravou částí, VYSOČINA spodní pravou a ROZPOČET levou spodní. REVOLUCE a SVĚTLUŠKA doplňují vlastní obraty; cílený závěr má přijatelné pojmenované hypotézy, neprokázanou lidskou obtížnost.",
+      "risks": [
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-027",
+      "ordinal": 27,
+      "contentHash": "93740ec70e8e480219ef31c6f0bb2d54098976b804466c7d0e6341fef9c34276",
+      "wordsetHash": "824215e7822fa1665adc727157ccbd518d98991d6159948736de7a0cf446d0c0",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "HRBOLATÝ se stáčí vlevo nahoře, KILOMETR v pravém středu a VLAŠTOVKA nahoře vpravo. BALVAN má vysokou levou cestu a ZÁPĚSTÍ centrální obrat; známá slova střídají tvar.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-028",
+      "ordinal": 28,
+      "contentHash": "2e9f733fba06323fd5deb192d3956413f91172877c1bf4017997fb27c28e5bfa",
+      "wordsetHash": "50e9226b104dc7c8279c9b5987abccae13c71b1ef83f6a07f0cd6d30d7119e91",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "SBORMISTR má delší levou část a AKADEMIE spodní pravou, PAVOUK se obrací vlevo dole. RADNICE a VČELAŘ drží úlevový charakter; kulturní slova nejsou vydávána za záruku lehkosti pro každého.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-029",
+      "ordinal": 29,
+      "contentHash": "b3fbc39f6a08fa4f7fa47dd393a987dc6ce056854ea228748823ea49be12dc32",
+      "wordsetHash": "29dda0cdd1206ca9f606085c18a69766e68126ce6867c2e4e0ea5ced3e6a7d0e",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci KAPITOLA prochází levou střední částí s návratem, NOSTALGIE pravým horním prostorem a KŘIŠŤÁL pravým spodním. PŘÍPRAVA má centrální obraty a ANGREŠT střední dlouhý úsek; HADICE a BLEDULE nabízejí další konkrétní vstupy.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-030",
+      "ordinal": 30,
+      "contentHash": "9a488b623e888e9d52c92c974aa9a82e0d58f5d5cf9779a9831df70b33f4c7ff",
+      "wordsetHash": "408f89184252ce7dbfb8176927e842720ac1a2acbe3becae49aa6a774fac5903",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "ZKUMAVKA využívá horní střed, HASTRMAN horní levou část a VALNÍK spodní zalomení. ZVĚDAVOST se stáčí dole, HOSTITEL nahoře vpravo; botanická a pohádková textura není jediným principem desky.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-031",
+      "ordinal": 31,
+      "contentHash": "9407f0a6d075f85ccab46864e97509cd7522b8ed4d427e434db201f4292093c4",
+      "wordsetHash": "94506cc9137b5576ec397644ae22b361f09040b34dc93ecd784ffc6041d3da5c",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KLARINET se několikrát stáčí v horním středu, VYPRÁVĚT má levou horní konturu a POTVRZENÍ propojuje pravý střed. MĚŘIDLO a SOUVĚTÍ nabízí jiné spodní obraty; výzva stojí i na konstrukci.",
+      "risks": [
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-032",
+      "ordinal": 32,
+      "contentHash": "92b9324e8dc18985b1116748d450e1ef4386840bab6ddae7c62c47d5c1021a8b",
+      "wordsetHash": "fce8bbcf3e8b2d36f2909ec76459ab2fb929abf31da464689cabf568a83f333f",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "TURBÍNA obrací směr v horním středu, KVĚTINÁČ kolem pravého horního prostoru a PŘEDMLUVA vpravo dole. LEDŇÁČEK na levé straně a PODPATEK uprostřed brání jednotnému pásovému hledání.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-033",
+      "ordinal": 33,
+      "contentHash": "c67354bbc317e473e424932784b0b0fbf262115e2f6066d7ded612f84427964f",
+      "wordsetHash": "ed9666b1412dba7dbdf6c65959c4edcb61410c422b3ba4e5b0a60efad71288dd",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "TROLEJBUS obchází levý horní prostor, POŠTOLKA levou spodní část a PODŠÍVKA se vrací v pravé spodní. KOUŘENÍ a AMULET mají střední obraty; konkrétní předměty vyvažují abstraktnější slova.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-034",
+      "ordinal": 34,
+      "contentHash": "28bbba332e28aa8960cd28cc8057e4c1b47812a42d5e5e62ed40395b8eb29943",
+      "wordsetHash": "9770eea6dcc651e4384321f8789a3220371470084b39be0dd5be3e42c7ca8d34",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "SKLÍZET má delší horní úsek s návratem, PRADLENA levé horní obraty a ČERVENKA střední smyčku. PŘERUŠENÍ a PARTNER využívají různé spodní okraje; přijatelné úlevové střídání.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-035",
+      "ordinal": 35,
+      "contentHash": "57322805313b6bd8828286d164676a8baa2b42afad957be68725b4bce60477e0",
+      "wordsetHash": "558db0bf3d904a51c662dabd5a098824b72c24937e55ab331dc3064f1314e765",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PAŘENIŠTĚ se stáčí přes spodní střed, PRŮVODCE má pravou cestu a PANTOFEL horní klikatou. PODKROVÍ a SOUČIN se dotýkají středu vlastními obraty; řemeslnou texturu ukotvuje CHLAPEC.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-036",
+      "ordinal": 36,
+      "contentHash": "b3232b9b634976d6f4bf910d68dba25908e9c96d266e31d23f27cb077cf5c433",
+      "wordsetHash": "c36004192432c51885fa105d844f67536e70f35944d5ae43a662f33934f2e6b6",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KRUŽÍTKO obrací směr nahoře vpravo, INSPIRACE nahoře vlevo a VLKODLAK dole vpravo. PUKLINA má spodní zalomení a POEZIE střední; silnější kontury doprovázejí známé kulturní kotvy.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-037",
+      "ordinal": 37,
+      "contentHash": "caa2a6ce3f75a02fa77969fc9e7093d1bfd50b356b0801df9e09e8e73d623b5a",
+      "wordsetHash": "a7eed92fe73f19b859f35ad251671ba6a6450225e2703db814edd28d5c47c922",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "LAHODNÝ se vine nahoře vpravo, REPORTÁŽ vlevo nahoře a PŘEHLED po pravém spodním okraji. TRÍKOLKA a HYDRANT dělají jiné návraty; LAHODNÝ je výslovná výjimka vůči předchozím playtestům.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-038",
+      "ordinal": 38,
+      "contentHash": "da75b4d0d068e2f6aae7ca80f30408ea4fb27dfb56a5e1d056515cdef5726c98",
+      "wordsetHash": "e511963eb44e20e0312c5dd6feb49b7663b526478ad15c6df8465ee3afbda157",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "LASKAVOST obchází spodní levou část, LEGRACE horní levou a KLÍČENKA horní střed. KAPSÁŘ a NÁRAMEK mají horní pravé obraty; drobné konkrétní věci poskytují opory delším slovům.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-039",
+      "ordinal": 39,
+      "contentHash": "9b179a76f12db35b64a7270984414c85a4bbd11311b6efd44ab3521c516387c0",
+      "wordsetHash": "f76fe3bfbdf7f26d7bbd6ed182223a4b92df1e3a2f39ad7c2e2905c913b69977",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci CHAPADLO obchází spodní střed, ZVÍDAVÝ pravý horní okraj a JÁDŘINEC levý horní prostor. UKLÍZENÍ a HYBRID se stáčí uprostřed a vpravo dole; RYCHLOST má centrální svislou cestu.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-040",
+      "ordinal": 40,
+      "contentHash": "9e5cd3177e7c041cd3bf73c3381243522c96fc9eefc2703174df1ee7f3aa2fb3",
+      "wordsetHash": "7bb72f8357a8f794a90fff40413742c8b5b325cf87455cf2dbef0621ccbc77f3",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "ŠUSTOT se láme v horním středu, MANGOLD při levém spodním okraji a SÁŇKOVAT v pravém spodním prostoru. ČEJKA a STEREOTYP mají vlastní návraty; vrchol má složené cesty, jeho hráčská náročnost je nezměřená.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-041",
+      "ordinal": 41,
+      "contentHash": "ba71ac3f99161602154eb4324f7732a35667c7e82f897cc1a355ffd177b69fc1",
+      "wordsetHash": "c7203c102b3130f08205a82d83207a454b356dd32eb0823e9f2e746295d57bd8",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci ROLNIČKA využívá levé střední obraty, TORNÁDO horní levou cestu a ŠVIHADLO pravý spodní okraj. ODMOCNINA má pravé horní zalomení, TRUMPETA pravé spodní; konkrétní předměty drží úlevový začátek vlny.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-042",
+      "ordinal": 42,
+      "contentHash": "60c0ec56b214bf59af609991034eab805792398baeae8233a850c6a2089e2682",
+      "wordsetHash": "d56d5363f5a7dd60be7557b74b6dd16e025547f70ffe6f0558fb2f992045fcb8",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci PRŮZKUM se vrací ve spodním středu, PŘIJETÍ obchází spodní pravý prostor a RAKYTNÍK levý střed. MONOLOG má spodní levou konturu, PŘÍVĚSEK horní střed; podobnost sousedních kontur nevytváří totožnou konstrukci s41.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-043",
+      "ordinal": 43,
+      "contentHash": "167b6e262e2eb04b782cffe79258b6714ca9567598474d918c3d1a9806a4e542",
+      "wordsetHash": "80d7605d324ffee1c90ab9a6d161df2b1186cc1bd19b014be4b43ee625d6e860",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "MATRACE obchází horní levý prostor, VIADUKT levý střed a TISKÁRNA horní pravý okraj. KOMUNISTA má delší horní cestu, KLOPÝTAT spodní střední obrat; úleva může mít kulturně výrazné jednotlivé slovo.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-044",
+      "ordinal": 44,
+      "contentHash": "5d32e9a15453aacac736dee55f633bacddbe9f9895fdeb793b35eebca87a00f0",
+      "wordsetHash": "47c718d87a64038f8dbc5a1ed203488d8ca983a24e522b576e30852acb7239cd",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "SKLEPENÍ se stáčí v horním pravém prostoru, ŠINDEL v horním středu a ŘEBŘÍČEK vlevo uprostřed. PROVEDENÍ a TÁBORNÍK mají odlišné cesty; stavební a přírodní slovník se nekumuluje do jedné specialistické hádanky.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-045",
+      "ordinal": 45,
+      "contentHash": "48f462fab628154e4f9b38360c956418f7066f2c6c97f9419ee913f57d529381",
+      "wordsetHash": "59178b7d3bc624057537d1fdb2bef4a3544fe171c3385612c03f3b3e8077c14e",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "KONTRABAS se několikrát vrací dole vlevo, HOUBLICE má horní střední cestu a HOLOGRAM svislou spodní. GEPARD a DENÍK poskytují konkrétní kotvy k BACULATÝ a technické textuře.",
+      "risks": [
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-046",
+      "ordinal": 46,
+      "contentHash": "0a1a1e70fa6cba5223bb179d78b80ca4b0df8be4046615e8bf479948b3273f9a",
+      "wordsetHash": "cb63996356e240ae76c75b94f2568774d3aad536c6c66f6cbc2f00d34b78a498",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PROHLÍŽEČ se stáčí v pravé střední části, DOBÝVÁNÍ uprostřed a LEGIONÁŘ v horní levé. SOUTĚSKA má levou okrajovou cestu, TELEVIZE spodní; výzva obsahuje několik zřetelně různých návratů.",
+      "risks": [
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-047",
+      "ordinal": 47,
+      "contentHash": "4eb20662f1df5a45f725e1a69e32047da98b305672604c5de59267fae596f8c9",
+      "wordsetHash": "9d31cff24d282dad8ddc17ce0f105c5c571a434e27a03ba09f0c21d670a5d6f4",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "Po přeselekci DOBYTEK se stáčí ve středu doleva, ZAVAZADLO nahoře vpravo a VIDLICE nahoře vlevo. BRUSINKA má spodní centrální zalomení a OTÁČÁREK pravou spodní cestu; PODNOŽKA vede spodním levým prostorem.",
+      "risks": [],
+      "view": "Actual final reselected letters and answer paths inspected in two new mosaics; same word set."
+    },
+    {
+      "id": "mk100-v2-048",
+      "ordinal": 48,
+      "contentHash": "1b4c837238ce84216d0188d6b178a8da1dde82169345cc770a93eb0438624115",
+      "wordsetHash": "c5b742f434288c7cee05368666a923571f41934c9f8355e5aa341f668297addc",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PAMĚTNÍK obrací směr nahoře vlevo, HOUSENKA prochází středem a CHRASTIT má pravou svislou cestu. LEKTVAR nahoře vpravo a VÝSADBA dole tvoří další rozdílné kotvy úlevy.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-049",
+      "ordinal": 49,
+      "contentHash": "b0aaa1d99af8a6b50b9e0d499250e387309dc0b034d6d5b81e0a799a30d65e43",
+      "wordsetHash": "ec677b51ffc463bc1711bf6a8522cbd3cdbf5371ac1d06f7361d25c5f50261a8",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "PODÍVANÁ vede spodní levou částí do středu, KEJKLÍŘ obchází horní střed a ETIKETA se vrací v pravém středu. GEJZÍR při pravém spodním okraji a EKOSYSTÉM nahoře vpravo střídají dlouhé a krátké segmenty.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    },
+    {
+      "id": "mk100-v2-050",
+      "ordinal": 50,
+      "contentHash": "a6060c05cd203bf548db025f0750088601d8fc076868c514273a4a9aeb292f1e",
+      "wordsetHash": "fa3b55b87e7a149db496d23e2842367a32f792be65e3c053370416a2c4bcb7db",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted",
+      "assessment": "POVÍDKA má horní střední klikatou cestu, PREMIÉR svislé centrální obraty a CHOVATEL spodní pravý návrat. ZÁPRAŽÍ prochází pravou střední částí; PODBĚRÁK dole vlevo má jinou konturu.",
+      "risks": [],
+      "view": "Seven actual-letter/path mosaics inspected; representative twelve retained from individually inspected two mosaics."
+    }
+  ]
+}

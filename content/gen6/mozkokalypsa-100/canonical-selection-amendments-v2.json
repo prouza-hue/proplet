@@ -1,0 +1,237 @@
+{
+  "status": "PASS",
+  "previousBankContentHash": "dca5850a0d500265d2d78c8ec9015ce47cc93d3e7bcaa2f16af389714ecf85f0",
+  "finalBankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "checkpoint": "checkpoints/complete100-before-canonical-spacing.zip",
+  "changedBoardCount": 27,
+  "changedBoards": [
+    {
+      "ordinal": 12,
+      "id": "mk100-v2-012",
+      "oldContentHash": "056ac1db822f369f6ad7faa76cbe5110c1e14b5b9e2c22894da0574ad1075bf2",
+      "newContentHash": "1e54996747a46ca7be5a6e1b3b0ce045d2ac1d506a96f96089e80723414a8362",
+      "oldCanonicalTilingHash": "92a5448bce7ac4af603a7d77a322cf7a24e4ebe90dfedab2f0dfbe699d72f105",
+      "newCanonicalTilingHash": "3dc913249e358e8b9fbb8064f090ce95199a2a381f24db34b269414d98caf060"
+    },
+    {
+      "ordinal": 18,
+      "id": "mk100-v2-018",
+      "oldContentHash": "8e6b1af72eb20d31b6bc0a37b8febf8130ec4a2aa3e258711d4e1cbffb37c485",
+      "newContentHash": "40e8dac7bf3f5edf93c676f8dde5efc0b0b3bf397f3d4bca9a8e61e3d3591478",
+      "oldCanonicalTilingHash": "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d",
+      "newCanonicalTilingHash": "398db88e52d91f4d9f3b7eecead47aecc3c7331efe25875c5efccaf365f80011"
+    },
+    {
+      "ordinal": 29,
+      "id": "mk100-v2-029",
+      "oldContentHash": "1ab234615454f401a947cf9c9fbdd6a090af279cd2c172809609080b059b63ad",
+      "newContentHash": "b3fbc39f6a08fa4f7fa47dd393a987dc6ce056854ea228748823ea49be12dc32",
+      "oldCanonicalTilingHash": "b6a7ab5ad34cbf751a7500cb686f7afc8eebfc0d7010a9ee9b14ca808f30e63c",
+      "newCanonicalTilingHash": "1736c0766ff5cf4e6f321bd6b0d14ec07b2e52d3d518c9ea5bcef78b51380fc6"
+    },
+    {
+      "ordinal": 39,
+      "id": "mk100-v2-039",
+      "oldContentHash": "7b1a226db69ccc64efac89bf5f9f939debc9858c87d8047a76b19f95a67eebd9",
+      "newContentHash": "9b179a76f12db35b64a7270984414c85a4bbd11311b6efd44ab3521c516387c0",
+      "oldCanonicalTilingHash": "ec73ba762ec9007b1c36a573c48a1803a6996906115d41b28668fd67d02419cd",
+      "newCanonicalTilingHash": "08d23cd82ab0ab04de748c1cf86940642a93ad854138281a431d6e73433691ec"
+    },
+    {
+      "ordinal": 41,
+      "id": "mk100-v2-041",
+      "oldContentHash": "b8f3fcd45dc2f070377c109577dc330669ec91065bd09bdd2e0899fd835b6d01",
+      "newContentHash": "ba71ac3f99161602154eb4324f7732a35667c7e82f897cc1a355ffd177b69fc1",
+      "oldCanonicalTilingHash": "b8485f22ffe3c5335b5e36f7d027b59e0b7da7de5f756db3dc992a6e18db34f1",
+      "newCanonicalTilingHash": "63f55d2a65836ea303d7c0017c679e959ba4011f6617e40f4bb22a0c74bedbf2"
+    },
+    {
+      "ordinal": 42,
+      "id": "mk100-v2-042",
+      "oldContentHash": "dc7c73b8b31770c7a5a272d2a131207864ba481032d89e4708b18c8bad114383",
+      "newContentHash": "60c0ec56b214bf59af609991034eab805792398baeae8233a850c6a2089e2682",
+      "oldCanonicalTilingHash": "df84dd49327b1884b0a79e6b9942aec3f61d33039b6912cc8ea11500668a9acc",
+      "newCanonicalTilingHash": "6e262b2df4765457b0844f782d842fac9e8fbf2e4cc32409e829319f39e3a4e0"
+    },
+    {
+      "ordinal": 47,
+      "id": "mk100-v2-047",
+      "oldContentHash": "bab5ee8b753e6e1d73e52f2e45e0113106f667317632655c6a651bd63c472d42",
+      "newContentHash": "4eb20662f1df5a45f725e1a69e32047da98b305672604c5de59267fae596f8c9",
+      "oldCanonicalTilingHash": "1736c0766ff5cf4e6f321bd6b0d14ec07b2e52d3d518c9ea5bcef78b51380fc6",
+      "newCanonicalTilingHash": "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d"
+    },
+    {
+      "ordinal": 52,
+      "id": "mk100-v2-052",
+      "oldContentHash": "3acd90604fa73feb3b542fcbef837cc1e669aaab11f563fa1ee3be411cbcd783",
+      "newContentHash": "0c6ec39b24a05d0934e93200690db94fd3e4d55171855a91a04c22271cd2f79e",
+      "oldCanonicalTilingHash": "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d",
+      "newCanonicalTilingHash": "c375004ec4af62184f9e9277e869246b85927369939c49ae138c22b005118787"
+    },
+    {
+      "ordinal": 53,
+      "id": "mk100-v2-053",
+      "oldContentHash": "6202264e33660223eaad9a0c87e81c2d0c8def0931223f6d13302e26ee9f7f31",
+      "newContentHash": "3dd18fe41807e0ccd6efd6848cb357f72fd3da6a8d025f86e959293438975566",
+      "oldCanonicalTilingHash": "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d",
+      "newCanonicalTilingHash": "e4540c6b235ac0929e0d4bee63f1b8c4a75106b206bed72c7699c916ea9953ea"
+    },
+    {
+      "ordinal": 55,
+      "id": "mk100-v2-055",
+      "oldContentHash": "c6f116facb9e56f30e147546f870848d52a55027183083e3a01adffa2de8bda2",
+      "newContentHash": "8461dcc333df5a6899e27260e2564ae02c257a197cb985bd3e3e19432adb1084",
+      "oldCanonicalTilingHash": "750fe878a2001c20a83bcb0f31efdb58787d155237515f597f7bc18627c426c7",
+      "newCanonicalTilingHash": "a50912f6a8162ce90d4a97633f15b178374d5c41990f72dd7d9d8bb3e45a6092"
+    },
+    {
+      "ordinal": 62,
+      "id": "mk100-v2-062",
+      "oldContentHash": "405bf30f99ded9e33c69c88d481505b87e93450a682190e88b6813e1673a6639",
+      "newContentHash": "20dad3af11115497fe498c3d7ba8ef58debb88caf41270970f72bb6c1ebfc2bb",
+      "oldCanonicalTilingHash": "a50912f6a8162ce90d4a97633f15b178374d5c41990f72dd7d9d8bb3e45a6092",
+      "newCanonicalTilingHash": "2cfe4f77c4ac3ace50b6137c195becbfec45ff8b941e5aa9487d79d8082ac069"
+    },
+    {
+      "ordinal": 65,
+      "id": "mk100-v2-065",
+      "oldContentHash": "a3384ab8b71e4437c84c187b1900f703531bc10116dc6437d4105c4df8237312",
+      "newContentHash": "d65c7ea0e8bf860cf65eaba75f8b41e31d35d98cad2652e352b828402c56665d",
+      "oldCanonicalTilingHash": "9cda50d855afbda79854f77adbaf8166ab95e6fa957250762fc91e89fa469e7b",
+      "newCanonicalTilingHash": "b6a7ab5ad34cbf751a7500cb686f7afc8eebfc0d7010a9ee9b14ca808f30e63c"
+    },
+    {
+      "ordinal": 67,
+      "id": "mk100-v2-067",
+      "oldContentHash": "ffcbb179a3e9284d6df0e94b0df7d05c252ec5fa384be95ce353836c910b867e",
+      "newContentHash": "4aa99d301a59b5c40393a93d5517373967ddcc230bc92c747a334ab36d546136",
+      "oldCanonicalTilingHash": "b6a7ab5ad34cbf751a7500cb686f7afc8eebfc0d7010a9ee9b14ca808f30e63c",
+      "newCanonicalTilingHash": "0356c095a1e2b6cd0ff30b4c6d5f5a3e85dc387696651b35df9aff08e5119377"
+    },
+    {
+      "ordinal": 68,
+      "id": "mk100-v2-068",
+      "oldContentHash": "45ea8b962ed8ec5b84bc41a7939ac7e51c54bc94f2bd71ae5e1f8926d8f52bec",
+      "newContentHash": "e8a2ad0ae64a91e15ec193d5577787889e0f5b8234623465549095e87270bb5c",
+      "oldCanonicalTilingHash": "2977559013a6d9ff048097f1621540fd60d775aad5e594d44cd199f919dc02c5",
+      "newCanonicalTilingHash": "6a2d73498c197bbe9504b49cbb7d8647e73ae29907f631a04cdf3b6c895bba6b"
+    },
+    {
+      "ordinal": 69,
+      "id": "mk100-v2-069",
+      "oldContentHash": "3ceeb441021513bc3b386f2509496c5ed74f01877a4396077188900f4cc1f67e",
+      "newContentHash": "22c74947d7c4ce1bd401876de243d3b4a889bcd5a12f65b6f155531bede555fa",
+      "oldCanonicalTilingHash": "29ea03c0f30ec786ba132818d82c26a42d13ec329790ee746e34ee8dae99b487",
+      "newCanonicalTilingHash": "08d23cd82ab0ab04de748c1cf86940642a93ad854138281a431d6e73433691ec"
+    },
+    {
+      "ordinal": 70,
+      "id": "mk100-v2-070",
+      "oldContentHash": "fa83eb809c8d30af78a1705904a487dbcb598b78f887aece115d64c13fe3046e",
+      "newContentHash": "368f50919120ef2668022321c5864f443dc2282b738558d2f2053688acaaf37a",
+      "oldCanonicalTilingHash": "6e262b2df4765457b0844f782d842fac9e8fbf2e4cc32409e829319f39e3a4e0",
+      "newCanonicalTilingHash": "c375004ec4af62184f9e9277e869246b85927369939c49ae138c22b005118787"
+    },
+    {
+      "ordinal": 75,
+      "id": "mk100-v2-075",
+      "oldContentHash": "8c94b77acd6212ade2f783cc04404dcf9f6f360f62ef64756c18128c81696ebf",
+      "newContentHash": "3dbd4bfde4490524918dd8b169ea62312bf5274333bfa863dc22f9d747382810",
+      "oldCanonicalTilingHash": "37a141aa6848762c66c133ea8c634c62e5d33eee67d59931ae22adb2142fc0be",
+      "newCanonicalTilingHash": "1736c0766ff5cf4e6f321bd6b0d14ec07b2e52d3d518c9ea5bcef78b51380fc6"
+    },
+    {
+      "ordinal": 77,
+      "id": "mk100-v2-077",
+      "oldContentHash": "d62d084f7ca1eb141df2d538d11b58639183cebe1828dad4a98681406d9e55e6",
+      "newContentHash": "146b30b77c5980abead8d2336724367cccf9fabe303bb3abe29ab7f543c47103",
+      "oldCanonicalTilingHash": "946750722949d49b2b047fffca519fadbc977b1a600d65fae5fd5d460ef58b65",
+      "newCanonicalTilingHash": "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d"
+    },
+    {
+      "ordinal": 78,
+      "id": "mk100-v2-078",
+      "oldContentHash": "69018936ac65ab1c45c35d3e4cf95d9bec38c5c9d570c78f522a23460db26f87",
+      "newContentHash": "87da54e648842c66487e8461721b7da2bff0ad34c9a50d2320bc35ccf4caa5c6",
+      "oldCanonicalTilingHash": "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d",
+      "newCanonicalTilingHash": "b6a7ab5ad34cbf751a7500cb686f7afc8eebfc0d7010a9ee9b14ca808f30e63c"
+    },
+    {
+      "ordinal": 82,
+      "id": "mk100-v2-082",
+      "oldContentHash": "0905d5149dd3c770a063513b2e589df83050f13a436a07c99d4b256e64932ba4",
+      "newContentHash": "4cc8f0569bc80ebda2238a951a9a1ad36a3c5e6d94f899bf94d65fc62e533aae",
+      "oldCanonicalTilingHash": "9e9d22ab37ef38a9e6ba56c3646cc29cd4498d9e272230b687e15ae897c13848",
+      "newCanonicalTilingHash": "a50912f6a8162ce90d4a97633f15b178374d5c41990f72dd7d9d8bb3e45a6092"
+    },
+    {
+      "ordinal": 84,
+      "id": "mk100-v2-084",
+      "oldContentHash": "94cbe8bdbb995972fd88e313f7ae3a78a86c5e672ecf9a9597032bec01119273",
+      "newContentHash": "9329e74de71e19355de2255df5d6ee214c9a6b2c33ea2ed3ac60b2c6351c0800",
+      "oldCanonicalTilingHash": "aa640995d4632835a7b723b314e2cc95fbe494e860032c598d24670a94bc7367",
+      "newCanonicalTilingHash": "df84dd49327b1884b0a79e6b9942aec3f61d33039b6912cc8ea11500668a9acc"
+    },
+    {
+      "ordinal": 87,
+      "id": "mk100-v2-087",
+      "oldContentHash": "bb51fe5a7214465e487daefccdcb28367f6ceb8748e4dbed83ceae6b03fe65ff",
+      "newContentHash": "23dd800507c3a5547ca6ccc48d20680973c455682f078efcc1479251350f5189",
+      "oldCanonicalTilingHash": "e4540c6b235ac0929e0d4bee63f1b8c4a75106b206bed72c7699c916ea9953ea",
+      "newCanonicalTilingHash": "b7a71b102297efcb4564bfc4df85554218e618d93968a596c055e23ee52b41d2"
+    },
+    {
+      "ordinal": 88,
+      "id": "mk100-v2-088",
+      "oldContentHash": "51673636bc6624cff41e237ba102c8001a6702dfa91b9abafa59c4562f407250",
+      "newContentHash": "bcf7452e786451cab12cada5aea766dd014a3cd5b03470056c724319083fb5d0",
+      "oldCanonicalTilingHash": "09b874a4c15a3695cae5367e9e43d5992366caec2abed4cdc872f58712e3855b",
+      "newCanonicalTilingHash": "dab712251b6206265eb34f2ff68e97de27bacd814bdcbe3bfd145173e07d5115"
+    },
+    {
+      "ordinal": 89,
+      "id": "mk100-v2-089",
+      "oldContentHash": "195a5e85a9bc7d0bdd40c05fab0777a24d0195b06da82bfd8f8310b1eaa69646",
+      "newContentHash": "9168001cb53fc1e2cbdf27a1c4e02a014b98eb38a72d41001a1e673c3102f7da",
+      "oldCanonicalTilingHash": "92a5448bce7ac4af603a7d77a322cf7a24e4ebe90dfedab2f0dfbe699d72f105",
+      "newCanonicalTilingHash": "0356c095a1e2b6cd0ff30b4c6d5f5a3e85dc387696651b35df9aff08e5119377"
+    },
+    {
+      "ordinal": 92,
+      "id": "mk100-v2-092",
+      "oldContentHash": "35c1554b2e67d9b64265660311da45cb4e942b4d31ed942db980e2ab728af5bb",
+      "newContentHash": "951ce9a1056e07b3d06178ede0d36707d5662ecf2e955c5bfec8c93d8cc63299",
+      "oldCanonicalTilingHash": "0356c095a1e2b6cd0ff30b4c6d5f5a3e85dc387696651b35df9aff08e5119377",
+      "newCanonicalTilingHash": "946750722949d49b2b047fffca519fadbc977b1a600d65fae5fd5d460ef58b65"
+    },
+    {
+      "ordinal": 93,
+      "id": "mk100-v2-093",
+      "oldContentHash": "0fb7c979805306015ca873f8f81e2f6968b2ff387678bee4c64b29103099d414",
+      "newContentHash": "6fdef7802ab54060f77508d78cddcba81cecf1d72da870cafb2dea6779179640",
+      "oldCanonicalTilingHash": "946750722949d49b2b047fffca519fadbc977b1a600d65fae5fd5d460ef58b65",
+      "newCanonicalTilingHash": "2cfe4f77c4ac3ace50b6137c195becbfec45ff8b941e5aa9487d79d8082ac069"
+    },
+    {
+      "ordinal": 95,
+      "id": "mk100-v2-095",
+      "oldContentHash": "78ce74fbf7bd028367c1a7b155afafe6aad0d92993e7d77fdc824477c7e08596",
+      "newContentHash": "e1d417b69523861f44b1f5f4bcac1c0a479482ecfbffb8c1ac183f8e11fa4c48",
+      "oldCanonicalTilingHash": "2cfe4f77c4ac3ace50b6137c195becbfec45ff8b941e5aa9487d79d8082ac069",
+      "newCanonicalTilingHash": "9e9d22ab37ef38a9e6ba56c3646cc29cd4498d9e272230b687e15ae897c13848"
+    }
+  ],
+  "representative12ContentsPreserved": true,
+  "all100WordSetsPreserved": true,
+  "newCandidatesGenerated": 0,
+  "solverAndMorphologyUnchanged": true,
+  "minimumCanonicalRepeatGapRequired": 8,
+  "minimumCanonicalRepeatGapActual": 10,
+  "canonicalTilingsBefore": 55,
+  "canonicalTilingsAfter": 62,
+  "maximumCanonicalReuseBefore": 5,
+  "maximumCanonicalReuseAfter": 4,
+  "adjacent52and53NowDifferent": true,
+  "selection": "Canonical novelty preferred within 5 percent of best available proxy score; declared endgame floor and exact solver unchanged"
+}

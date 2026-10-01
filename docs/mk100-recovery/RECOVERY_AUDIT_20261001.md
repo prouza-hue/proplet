@@ -24,7 +24,7 @@ Issue #146 původně řešilo opakování známých slov napříč režimy. Neop
 
 Zdrojový archiv `content/gen6/mozkokalypsa-100/checkpoints/lexical-100-20261001.zip` je přesný checkpoint ze vzdálené revize `dc1fd060`. Má 163 156 bajtů a SHA-256 `d5284b13bffb10922d6fa57ca837755c82d2766571a0c80e61941f231b6c59be`.
 
-Před obnovením byly zkontrolovány všechny **pětice souborů/hashů** manifestu `CHECKPOINT.json` uvnitř ZIPu, bez chyby. Ze ZIPu byly do jejich původního obsahového adresáře obnoveny pouze dva chybějící redakční soubory, beze změny bajtů:
+Před obnovením byly zkontrolovány hashe všech **pěti souborů** manifestu `CHECKPOINT.json` uvnitř ZIPu, bez chyby. Ze ZIPu byly do jejich původního obsahového adresáře obnoveny pouze dva chybějící redakční soubory, beze změny bajtů:
 
 | Soubor | SHA-256 |
 |---|---|
@@ -40,7 +40,7 @@ Autorství a meze původních záznamů zůstávají přesné: první padesátka
 
 ## Nezávisle přepočtená pestrost a kumulace
 
-| Kontrola aktuálního slovního plánu | Výsledek |
+| Kontrola slovního plánu checkpointu dc1fd060 před dvěma technickými náhradami | Výsledek |
 |---|---|
 | Desky / cílové výskyty / odlišná slova | 100 / 1 400 / 1 007 |
 | Slova použitá jednou / dvakrát / více než dvakrát | 614 / 393 / 0 |
@@ -64,3 +64,33 @@ Přepočet uložený v pracovním `work/mk100/remote-lexical-audit.json` obsahuj
 ## Co při převzetí nebylo hotové
 
 Samotný checkpoint uváděl nehotovou banku. Ověřená dvanáctka v1 byla uchována, ale její podobná morfologie cest vyžadovala konstrukční rozšíření; nesmí se vydávat za finální v2. Zbývající práce: finální mřížky a výběr celé stovky, nezávislý solver, konkrétní geometrická redakce všech 100, katalog, manifestační evidence a skutečně hratelné izolované preview s ověřeným tokem mobil/Fold/desktop. Emulace zařízení není fyzický test. Výroba pokračuje z doloženého slovního checkpointu, bez opakování hotové hromadné revize Lexikonu.
+
+## Dodatek k dokončeným finálním mřížkám v2
+
+Dodatek je navázán na `bank.contentHash=84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab`. Předchozí části výslovně popisují stav při převzetí. Následná výroba vytvořila 100 skutečných desek; původní checkpoint, původní dvanáctka v1 a oba archivní individuální slovní posudky se zachovaly.
+
+Úplný solver prokázal, že palindromický RADAR nemůže mít právě jednu směrovou cestu: její obrácení čte totéž slovo. Oprava je úzká a doložená v `editorial-amendments-v2.json`: na 16 LASER, na 88 SLOKA, obojí ze schválené zásoby, stejného tieru B a délky 5. Samostatný individuální modelový posudek uvádí celých 14 slov a nový wordsetHash každé změněné desky. Rozpoznávací množina ani neměnný Lexikon se nezmenšily; RADAR zůstává rozpoznávaný. Původní posudky se nepřepisují a nesmějí být samy použity jako souhlas se změněnou sadou.
+
+Nezávislý přepočet finálního plánu potvrdil 100 záznamů a nulovou neshodu slov nebo wordsetHashů po použití těchto dvou výslovných náhrad. Finální plán má **1 008 odlišných slov na 1 400 pozicích: 616 jednou a 392 dvakrát**. Nejmenší odstup přesného opakování zůstává 20, uložené rodiny 9; žádná rodinná mezera pod 8. Profily zůstávají 20/60/15/5, cílených závěrových desek je 20. Individuálně přiznaná znalostní rizika se náhradami nehromadí.
+
+Překryv se třemi starými Mozkokalypsami zůstává pouze LAHODNÝ na 37. Přepočet celé širší historické unie nově dává 417 odlišných sdílených slov / 526 nových pozic; vůči ní je nových 591 zápisů / 874 pozic. Toto číslo nadále zahrnuje rezervované a vyřazené banky a nedokládá osobní historii hraní.
+
+Všechny skutečné mřížky 51–100 byly samostatně prohlédnuty s jejich písmeny, očíslovanými začátky a všemi 14 barevnými cestami. Přímé kontrolní čtení každé cesty nezávisle potvrdilo pravopis cíle, ortogonální návaznost, absenci opakované buňky a přesné pokrytí 100 buněk bez překryvu. Soubor `construction-review-051-100.json` obsahuje **50 jednotlivých posudků** s konkrétními cestami, významovými a konstrukčními riziky, contentHashem a wordsetHashem; všechny jsou přijaty s uvedenými omezeními. To je vizuální redakce modelu, nikoli fyzické hraní nebo měření zábavy a náročnosti.
+
+Redakce odhalila sousední 52/53 se stejnou kanonickou konstrukcí v původním výběru. Kanonizace zahrnuje osm rotací/zrcadlení celé mřížky, každou cestu bez rozlišení směru a pořadí slov. Následná přeselekce z již úplně ověřených poolů problém opravila a zároveň zvýšila pestrost celé stovky. Všech 20 dotčených mřížek ve druhé polovině bylo znovu vykresleno a prohlédnuto; jejich posudky jsou navázané na nové hashe. Úplná banka má nezávisle potvrzeno **62 odlišných kanonických forem, nejmenší odstup opakování 10 a nejvyšší použití jedné formy čtyřikrát**. Nejde tedy o 100 úplně různých tvarových dělení; ani tento přepočet neměří, zda si lidé morfologii osvojí.
+
+`full-verification.json` je navázán na stejný finální bankovní hash a u všech 100 desek uvádí dokončený důkaz `unique` i jedinečné cílové cesty nad 103 836 rozpoznávanými slovy. Vlastní kontrola této redakce přezkoušela konkrétní konzistenci písmen/cest druhé poloviny; úplný solver a nezávislé celobankovní ověření jsou samostatná evidence.
+
+## Závěrové pokusy a jejich skutečné meze
+
+Byly přečteny všechny konkrétní trojice tří plausibilních a šesti citlivostních pořadí u cílených desek 51, 56, 60, 65, 66, 71, 85, 86, 91 a 100, spolu s komponentami zbytku a jednotlivými izolovanými řetízky. Pro změněnou 65 byly načteny nové výsledky na hashi `d65c7ea0e8bf860cf65eaba75f8b41e31d35d98cad2652e352b828402c56665d`; původní čísla se nepřevzala. Její aktuální P25 všech trojic je 13,167, dva různé plausibilní konce dávají dva nebo jeden propojený zbytek a čtyři ze šesti citlivostních konců více komponent.
+
+Finální `endgame-audit-v2.json` se shoduje s hashem banky a konkrétním hashem všech 20 cílených desek. Obsahuje všech **20 × 364 = 7 280 trojic** po nalezení libovolných 11 slov. P25 prefixového tlaku těchto desek je v rozsahu **11,792–18,562; všech 20 je pod referenční mk2-10 s P25 20,167**. Vyšší tlak několika vybraných konců nedokládá odolné ztížení ve všech pořadích, natož lidský účinek. Některé plausibilní hypotézy dávají stejnou trojici a nesmějí se počítat jako nezávislé konstrukční varianty.
+
+Mechanismus se při redakci rozlišuje podle konkrétní evidence: 60, 65 a 86 mají deklarovanou primárně konstrukční hypotézu bez vědomé raritní bariéry. HROUZEK, CEPÍN, KALOUS, PASTINÁK, MELASA, TUŘÍN a KRAJKÁŘKA na příslušných jiných deskách zůstávají výslovná znalostní rizika; nesmějí být vydávána za nově změřenou obtížnost. Vždy se uvádí příslušná konkrétní trojice. Účinek finálního vrcholu i celé cílené pětiny nadále potřebuje lidi.
+
+## Závěrečná kontrola vzdálených hranic
+
+Po finální konstrukční přeselekci byly 1. 10. 2026 přibližně 20:16 UTC znovu čteny [GitHub main](https://github.com/prouza-hue/proplet/tree/main) a přesný Vercel alias `hrajproplet.cz`. Oba zůstávají na **174e0fa2a3e8befd0fe01ac8ba7771f4ece25558**, produkční deployment `dpl_AiLrqzQwahpqrFRwowAn96XYrTQ8`, `READY`, `target=production`, projekt `prj_0XHgnCQhdPS3pPETrxIpoXn0McMG`. Tento audit neprovedl žádnou vzdálenou mutaci ani databázový zápis. Výroba nové banky neaktivovala další playtest ani nezměnila výsledky a postup hráčů.
+
+Reprodukční přepočet finální slovní a tvarové evidence je v pracovním `work/mk100/final-lexical-and-geometry-audit.json`; konkrétní redakční závěry jsou v obsahovém souboru `construction-review-051-100.json`. Neuzavřené otázky lidské známosti, konstrukčního učení a skutečné závěrové náročnosti jsou omezení kandidátů, nikoli skryté technické PASS.

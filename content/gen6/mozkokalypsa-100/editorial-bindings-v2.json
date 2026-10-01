@@ -1,0 +1,1142 @@
+{
+  "status": "complete-individual-review100",
+  "createdAt": "2026-10-01T20:16:28.276414+00:00",
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "records": [
+    {
+      "id": "mk100-v2-001",
+      "ordinal": 1,
+      "contentHash": "d9b09b6dd1b24b33951dc46b863fe081f54bf715ad338684c78c8330e82aaa09",
+      "wordsetHash": "74eeea2778da14e7a4d999c61cbbf83313cf4dc0e824f8c06207c3c456a20587",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "OTAKÁREK a INICIÁLA mohou být méně samozřejmé pro hráče mimo přírodopis a psaní; úleva je relativní k Mozkokalypse."
+      ]
+    },
+    {
+      "id": "mk100-v2-002",
+      "ordinal": 2,
+      "contentHash": "fb97f17fee7dd1487e7630ca2c57ee56b3732121e889a875699fd5cde07db051",
+      "wordsetHash": "112f97824728cf68cdf8306ddba2441b58492d29b2c41644762101c3b1012c16",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-003",
+      "ordinal": 3,
+      "contentHash": "b6c1e7b87d6843d179dfef5a89a2ff339a1ff0b1a67bce94c4f9c539b9ca291f",
+      "wordsetHash": "ad9e14f7e186df81464c5d573afe7d3ffb82b4335e68c069bcd2779f01be74dd",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-004",
+      "ordinal": 4,
+      "contentHash": "63898ab6f6a7ec5c0436de9ac977d24834763182fa28950753d14342f4108a69",
+      "wordsetHash": "c946e4f2d47f209aa764dfd9ecbfbdad20fdc643b93c5af2ad982b22c43db397",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KUŇKA je konkrétní zoologické jméno, které může menší část hráčů neznat."
+      ]
+    },
+    {
+      "id": "mk100-v2-005",
+      "ordinal": 5,
+      "contentHash": "a377ae92d6534919bb1d7b7ba391e335316c5c5964fe86272d650944a6a3d309",
+      "wordsetHash": "2bbb2c85ce74ea6bd46c97e327fd223d5fe04ff11788351939f737c4fd0cdc77",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "POTÁPKA má užší přírodopisný význam; STĚŽEŇ je školně a příběhově známý, přesto méně každodenní.",
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ]
+    },
+    {
+      "id": "mk100-v2-006",
+      "ordinal": 6,
+      "contentHash": "6e828b6d06adb0c4b6f7f678f82fa3f700cd8f5517c0a6894f0f50a7796c69e1",
+      "wordsetHash": "0d0a754060a848bdfa7f06ae7f119905debdd15434dd950b8ba0674850aa9f42",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ]
+    },
+    {
+      "id": "mk100-v2-007",
+      "ordinal": 7,
+      "contentHash": "5c9f3cc2622c052269c8529e0fe55a1d4e44f7065e1ce3d9b33f39c76c71a72e",
+      "wordsetHash": "0d5e811c6673f47c5fe567d8c4818e1dcc1a770cc4f024a341dcb06d6b152478",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ODMOCNINA a PRŮČELÍ mohou více záviset na školní zkušenosti; nevytváří to samo dvě cílené rarity."
+      ]
+    },
+    {
+      "id": "mk100-v2-008",
+      "ordinal": 8,
+      "contentHash": "7ae9b0e77e37ec06346515ca85fb94473f8b2cf179c4647a54c57d1dacd42290",
+      "wordsetHash": "392260512423ccd566ca9756c0512168e47e86af26ff4b997a00ba3462f7d79a",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "DOŽIVOTÍ je významově těžší než ostatní slova, i když jazykově běžné; nevyvozovat z profilu úleva výhradně veselý obsah."
+      ]
+    },
+    {
+      "id": "mk100-v2-009",
+      "ordinal": 9,
+      "contentHash": "775dfad436ed2aab500cff70d71e90079587273cafe5f7352a2da90e4c0e1022",
+      "wordsetHash": "caf490ffd6dd5f0eff2acbf72d4a2fdabeeb1ed58b41a993d9bfe1ad04a1a434",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ]
+    },
+    {
+      "id": "mk100-v2-010",
+      "ordinal": 10,
+      "contentHash": "0403c491bd58599e9e15f030b018f2b42dcb073c23d6df22a4f4cbdb4f87f7cf",
+      "wordsetHash": "fb7bdc70e2637cfd580b93cac40b30f613f35d19a61fad1d6ec1582743474f4e",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "FRESKA a KONTRABAS vyžadují kulturní zkušenost; dvojice ANDROID/PROCESOR není návod vydávat tuto sadu za oborově neutrální."
+      ]
+    },
+    {
+      "id": "mk100-v2-011",
+      "ordinal": 11,
+      "contentHash": "29e462730ef789266e7cf5b2b877e189fa1faa37a3c8812ff5ad15f74811f596",
+      "wordsetHash": "fa8352c6ce6342a37e94ac3c2af8e6b72d2f5550429e50227a27cc15a5d012ca",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "NÁHORNÍ je vztahové adjektivum, které si část hráčů vybaví především ve spojení náhorní plošina.",
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ]
+    },
+    {
+      "id": "mk100-v2-012",
+      "ordinal": 12,
+      "contentHash": "1e54996747a46ca7be5a6e1b3b0ce045d2ac1d506a96f96089e80723414a8362",
+      "wordsetHash": "b53d980c497041b3e77ba9050781ee5e5d6198326a13c1008f327f3f9039b116",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "BEDNĚNÍ a STRNIŠTĚ jsou pro čistě městského hráče méně samozřejmé; oba mají obecné konkrétní významy."
+      ]
+    },
+    {
+      "id": "mk100-v2-013",
+      "ordinal": 13,
+      "contentHash": "288fbad3055d91ba434ea621d15ee609da8603e82bdb56a5754af58af9c47576",
+      "wordsetHash": "1f4eb75d78330bc5981c0d4d62aeebd55ba3e695be8ded372e2609a9ae502b16",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "OCHRNUTÍ je zdravotně těžší význam, nikoli technická nebo raritní výplň."
+      ]
+    },
+    {
+      "id": "mk100-v2-014",
+      "ordinal": 14,
+      "contentHash": "df322697d414b9a2f80e2eebd24f65a70dcc5deb865fd456ac5d37b9ac8ae3ff",
+      "wordsetHash": "be7b98457a59f77c11788c1f0212ef7b1eb78d5ea40b29ec2e70f31920ddb51e",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-015",
+      "ordinal": 15,
+      "contentHash": "032020e5acd57ffe29e2984e259e447301936419a869888e6fdbb502e982761d",
+      "wordsetHash": "401ec5741a1363fa74f73ff71aae19eaa7cdbc86497187051faf8e6b19bfadd0",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "TESLICE může být pro část hráčů nový nástroj; nesmí sama představovat údajný konstrukčně obtížný konec."
+      ]
+    },
+    {
+      "id": "mk100-v2-016",
+      "ordinal": 16,
+      "contentHash": "7ef9a08eada025c98bf2c0c9620ec24396cdbd1d49dfa89c514c66b750a05faa",
+      "wordsetHash": "4fe89e1f31b7f8d2893165531fd5dbda96bce039bf7acf503177a746b1e0b7ad",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ZÁVLAČKA má užší mechanický význam; MATICE si hráč může nejprve vybavit v jiném významu než výrobní metadata.",
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ]
+    },
+    {
+      "id": "mk100-v2-017",
+      "ordinal": 17,
+      "contentHash": "b3b5a4c2d00a06670e21483f1ce695546feca2ce43f7efa9fafa1a0c26c74b30",
+      "wordsetHash": "4552e4207d700e221c44cbdd73ba0441ff8936c6d4b9cad361108246094aacf8",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-018",
+      "ordinal": 18,
+      "contentHash": "40e8dac7bf3f5edf93c676f8dde5efc0b0b3bf397f3d4bca9a8e61e3d3591478",
+      "wordsetHash": "bb757203cabe068690119dd04cc631ac4e848f2f06f0774f092b1ad19805a713",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ŘEBŘÍČEK, STRNAD a LIŠEJNÍK dávají větší přírodopisný nárok; nejde o široce naměřenou znalost. STRNAD v korpusu může být i příjmení."
+      ]
+    },
+    {
+      "id": "mk100-v2-019",
+      "ordinal": 19,
+      "contentHash": "e013b5d9b49221394eb27e362fda2536c23f7d78a288b246a6959ece59fe8582",
+      "wordsetHash": "a1db869365b1bfb19ec15b3916abeff1f48d50f6c0f6bf5a45eb78645acb5910",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "DRUID má užší fantasy a historický kulturní kontext; STEHLÍK může čerpat část korpusové četnosti z příjmení. VRAŽDA mění tón na temnější."
+      ]
+    },
+    {
+      "id": "mk100-v2-020",
+      "ordinal": 20,
+      "contentHash": "49e5e9002ea15d2c516121dc4f08afd748daf6b4fc9f2b616b15a753a696c6fc",
+      "wordsetHash": "326101569e31b29d15f4deab1098cfa10af9aeff519c19256767f8cced80c711",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "HOBLICE není univerzálně známá; lexikon tohoto vrcholu je jinak spíše civilní, profil proto potřebuje oporu v konstrukci.",
+        "Závěrové simulace nejsou hráčskou telemetrií."
+      ]
+    },
+    {
+      "id": "mk100-v2-021",
+      "ordinal": 21,
+      "contentHash": "a5cdca296d297d52cc01b669edd66a021ee0db6cca0a183fb2b157a2b64c7766",
+      "wordsetHash": "54e68c9f55cf45c7252f5fbf51d6759a066e3b5700b0a91c83165efc2ab5b2bd",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-022",
+      "ordinal": 22,
+      "contentHash": "9c2e098a274f1b1490b7c2109840a0d5158a9f901498aab809094c58e9a5ac05",
+      "wordsetHash": "cdcf08e9abd5b549bf7ffbb9b144df8fb47a5324342230da8d13468096199814",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-023",
+      "ordinal": 23,
+      "contentHash": "6f633a9e822207be4cce0638bf82576c5e6bda5b20dd5ec971fc5372d99d5ad0",
+      "wordsetHash": "38b453aea88cf6f69151594c01017b5acb6be5cb5f2d67019f73f0ecce515f33",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "CANDÁT, DANĚK, JALOVEC a PELYNĚK vyžadují více přírodní zkušenosti, ale netvoří dávku úzce technických termínů."
+      ]
+    },
+    {
+      "id": "mk100-v2-024",
+      "ordinal": 24,
+      "contentHash": "70419ba264ec1c6a6ce028d6fc479437a40b594192c1ac77f5bdbfd23153bb4f",
+      "wordsetHash": "1cf8efa0afab40b03b50af240f778ace3dc494d6576bc71d532e87a58d157bfc",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PASTINÁK není pro všechny běžná zelenina; PLAZMA má více vědeckých a běžných mediálních významů."
+      ]
+    },
+    {
+      "id": "mk100-v2-025",
+      "ordinal": 25,
+      "contentHash": "b84f7edf196c97cbf5c5b9d09affa1b27991e17cffdaba5e2f438562454ea12e",
+      "wordsetHash": "da96faea1463f09aa5499a6e069bc5868697714dc2a3b1ea1d4e9de88583a5be",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PESTÍK stojí na školní botanice; STROUHA a PODNOŽKA mohou být méně samozřejmé, nejde však o další cílené rarity."
+      ]
+    },
+    {
+      "id": "mk100-v2-026",
+      "ordinal": 26,
+      "contentHash": "b0629f6805f637462c6e094580eeb9014ab24694131ef0d93f188c767cb47aee",
+      "wordsetHash": "d8d0fa26ae134e5587b03d28c2a4bd6a1e5e0680f4344ff3efed9182c0cc19ee",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ŠPRÝM je živé, ale méně každodenní expresivní slovo; nevyžaduje druhou raritu v MOTOUZU.",
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ]
+    },
+    {
+      "id": "mk100-v2-027",
+      "ordinal": 27,
+      "contentHash": "93740ec70e8e480219ef31c6f0bb2d54098976b804466c7d0e6341fef9c34276",
+      "wordsetHash": "824215e7822fa1665adc727157ccbd518d98991d6159948736de7a0cf446d0c0",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-028",
+      "ordinal": 28,
+      "contentHash": "2e9f733fba06323fd5deb192d3956413f91172877c1bf4017997fb27c28e5bfa",
+      "wordsetHash": "50e9226b104dc7c8279c9b5987abccae13c71b1ef83f6a07f0cd6d30d7119e91",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-029",
+      "ordinal": 29,
+      "contentHash": "b3fbc39f6a08fa4f7fa47dd393a987dc6ce056854ea228748823ea49be12dc32",
+      "wordsetHash": "29dda0cdd1206ca9f606085c18a69766e68126ce6867c2e4e0ea5ced3e6a7d0e",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-030",
+      "ordinal": 30,
+      "contentHash": "9a488b623e888e9d52c92c974aa9a82e0d58f5d5cf9779a9831df70b33f4c7ff",
+      "wordsetHash": "408f89184252ce7dbfb8176927e842720ac1a2acbe3becae49aa6a774fac5903",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "LAZURA má užší řemeslný význam a KRAHUJEC méně všeobecnou přírodopisnou znalost; tato kombinace vyžaduje pozornost v budoucím hráčském testu."
+      ]
+    },
+    {
+      "id": "mk100-v2-031",
+      "ordinal": 31,
+      "contentHash": "9407f0a6d075f85ccab46864e97509cd7522b8ed4d427e434db201f4292093c4",
+      "wordsetHash": "94506cc9137b5576ec397644ae22b361f09040b34dc93ecd784ffc6041d3da5c",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KOUDEL může být pro část hráčů nová; KLARINET a KOZOROH jsou kulturně a přírodně konkrétnější, ale známá běžná pojmenování.",
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ]
+    },
+    {
+      "id": "mk100-v2-032",
+      "ordinal": 32,
+      "contentHash": "92b9324e8dc18985b1116748d450e1ef4386840bab6ddae7c62c47d5c1021a8b",
+      "wordsetHash": "fce8bbcf3e8b2d36f2909ec76459ab2fb929abf31da464689cabf568a83f333f",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ČUTORA má užší turistické a historické užití; hráčská znalost není doložená četností."
+      ]
+    },
+    {
+      "id": "mk100-v2-033",
+      "ordinal": 33,
+      "contentHash": "c67354bbc317e473e424932784b0b0fbf262115e2f6066d7ded612f84427964f",
+      "wordsetHash": "ed9666b1412dba7dbdf6c65959c4edcb61410c422b3ba4e5b0a60efad71288dd",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "HOBOJ není univerzálně známý; POŠTOLKA je další přírodopisné pojmenování, u kterého čtenost nezaručuje znalost druhu."
+      ]
+    },
+    {
+      "id": "mk100-v2-034",
+      "ordinal": 34,
+      "contentHash": "28bbba332e28aa8960cd28cc8057e4c1b47812a42d5e5e62ed40395b8eb29943",
+      "wordsetHash": "9770eea6dcc651e4384321f8789a3220371470084b39be0dd5be3e42c7ca8d34",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-035",
+      "ordinal": 35,
+      "contentHash": "57322805313b6bd8828286d164676a8baa2b42afad957be68725b4bce60477e0",
+      "wordsetHash": "558db0bf3d904a51c662dabd5a098824b72c24937e55ab331dc3064f1314e765",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "TESAŘÍK může být znám především jako příjmení nebo odvozenina od tesaře; obecný název brouka má užší známost."
+      ]
+    },
+    {
+      "id": "mk100-v2-036",
+      "ordinal": 36,
+      "contentHash": "b3232b9b634976d6f4bf910d68dba25908e9c96d266e31d23f27cb077cf5c433",
+      "wordsetHash": "c36004192432c51885fa105d844f67536e70f35944d5ae43a662f33934f2e6b6",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-037",
+      "ordinal": 37,
+      "contentHash": "caa2a6ce3f75a02fa77969fc9e7093d1bfd50b356b0801df9e09e8e73d623b5a",
+      "wordsetHash": "a7eed92fe73f19b859f35ad251671ba6a6450225e2703db814edd28d5c47c922",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ZÁVITNÍK má úzký řemeslný význam. LAHODNÝ se vrací z mk3w2-06; jde o vědomě přiznané historické opakování bez stejné mřížky."
+      ]
+    },
+    {
+      "id": "mk100-v2-038",
+      "ordinal": 38,
+      "contentHash": "da75b4d0d068e2f6aae7ca80f30408ea4fb27dfb56a5e1d056515cdef5726c98",
+      "wordsetHash": "e511963eb44e20e0312c5dd6feb49b7663b526478ad15c6df8465ee3afbda157",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ENZYM je školní a populárně zdravotní termín; jeho znalost zůstává odhad, nikoli měření."
+      ]
+    },
+    {
+      "id": "mk100-v2-039",
+      "ordinal": 39,
+      "contentHash": "9b179a76f12db35b64a7270984414c85a4bbd11311b6efd44ab3521c516387c0",
+      "wordsetHash": "f76fe3bfbdf7f26d7bbd6ed182223a4b92df1e3a2f39ad7c2e2905c913b69977",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": []
+    },
+    {
+      "id": "mk100-v2-040",
+      "ordinal": 40,
+      "contentHash": "9e5cd3177e7c041cd3bf73c3381243522c96fc9eefc2703174df1ee7f3aa2fb3",
+      "wordsetHash": "7bb72f8357a8f794a90fff40413742c8b5b325cf87455cf2dbef0621ccbc77f3",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "MANGOLD a ČEJKA mohou být pro hráče nové zároveň; dvojice je výjimkou dovolenou vrcholovému profilu, nikoli náhradou konstrukční kvality."
+      ]
+    },
+    {
+      "id": "mk100-v2-041",
+      "ordinal": 41,
+      "contentHash": "ba71ac3f99161602154eb4324f7732a35667c7e82f897cc1a355ffd177b69fc1",
+      "wordsetHash": "c7203c102b3130f08205a82d83207a454b356dd32eb0823e9f2e746295d57bd8",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ODMOCNINA je známý školní termín, přesto devítipísmenný cíl; úleva se musí doložit celou konstrukcí, nikoli tématem."
+      ]
+    },
+    {
+      "id": "mk100-v2-042",
+      "ordinal": 42,
+      "contentHash": "60c0ec56b214bf59af609991034eab805792398baeae8233a850c6a2089e2682",
+      "wordsetHash": "d56d5363f5a7dd60be7557b74b6dd16e025547f70ffe6f0558fb2f992045fcb8",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ZÁVLAČKA je jeden cíleně užší mechanický předmět; RAKYTNÍK je méně univerzální zahradní název, který má smysl sledovat v testu."
+      ]
+    },
+    {
+      "id": "mk100-v2-043",
+      "ordinal": 43,
+      "contentHash": "167b6e262e2eb04b782cffe79258b6714ca9567598474d918c3d1a9806a4e542",
+      "wordsetHash": "80d7605d324ffee1c90ab9a6d161df2b1186cc1bd19b014be4b43ee625d6e860",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KOMUNISTA a VĚZENÍ mají vážnější významový tón; jsou jazykově běžné a jejich použití samo není politické stanovisko."
+      ]
+    },
+    {
+      "id": "mk100-v2-044",
+      "ordinal": 44,
+      "contentHash": "5d32e9a15453aacac736dee55f633bacddbe9f9895fdeb793b35eebca87a00f0",
+      "wordsetHash": "47c718d87a64038f8dbc5a1ed203488d8ca983a24e522b576e30852acb7239cd",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ŘEBŘÍČEK je konkrétnější botanický cíl; ŠINDEL má historický a venkovský stavební kontext."
+      ]
+    },
+    {
+      "id": "mk100-v2-045",
+      "ordinal": 45,
+      "contentHash": "48f462fab628154e4f9b38360c956418f7066f2c6c97f9419ee913f57d529381",
+      "wordsetHash": "59178b7d3bc624057537d1fdb2bef4a3544fe171c3385612c03f3b3e8077c14e",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "HOBLICE má užší řemeslný význam; KONTRABAS a TĚŽIŠTĚ přidávají školní znalost, ale další rarity nevynucujeme.",
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ]
+    },
+    {
+      "id": "mk100-v2-046",
+      "ordinal": 46,
+      "contentHash": "0a1a1e70fa6cba5223bb179d78b80ca4b0df8be4046615e8bf479948b3273f9a",
+      "wordsetHash": "cb63996356e240ae76c75b94f2568774d3aad536c6c66f6cbc2f00d34b78a498",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KAMAŠE mohou být pro část hráčů nové. KÁDINKA závisí na školní a laboratorní zkušenosti; širší znalost pouze odhadujeme, stejně jako u ZKUMAVKY.",
+        "Konstrukční simulace neprokazuje obtížnost pro hráče."
+      ]
+    },
+    {
+      "id": "mk100-v2-047",
+      "ordinal": 47,
+      "contentHash": "4eb20662f1df5a45f725e1a69e32047da98b305672604c5de59267fae596f8c9",
+      "wordsetHash": "9d31cff24d282dad8ddc17ce0f105c5c571a434e27a03ba09f0c21d670a5d6f4",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "OTAKÁREK je méně obecné jméno motýla; znalost části hráčů může být omezená i při správném slovníkovém postavení."
+      ]
+    },
+    {
+      "id": "mk100-v2-048",
+      "ordinal": 48,
+      "contentHash": "1b4c837238ce84216d0188d6b178a8da1dde82169345cc770a93eb0438624115",
+      "wordsetHash": "c5b742f434288c7cee05368666a923571f41934c9f8355e5aa341f668297addc",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "SYROVÁTKA je běžný potravinový termín, ale ne každému známý; tento odhad nepřebíjí budoucí hráčský test."
+      ]
+    },
+    {
+      "id": "mk100-v2-049",
+      "ordinal": 49,
+      "contentHash": "b0aaa1d99af8a6b50b9e0d499250e387309dc0b034d6d5b81e0a799a30d65e43",
+      "wordsetHash": "ec677b51ffc463bc1711bf6a8522cbd3cdbf5371ac1d06f7361d25c5f50261a8",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KEJKLÍŘ je kulturně specifičtější, avšak zavedený příběhový výraz; nejde o cílené hromadění odborných slov."
+      ]
+    },
+    {
+      "id": "mk100-v2-050",
+      "ordinal": 50,
+      "contentHash": "a6060c05cd203bf548db025f0750088601d8fc076868c514273a4a9aeb292f1e",
+      "wordsetHash": "fa3b55b87e7a149db496d23e2842367a32f792be65e3c053370416a2c4bcb7db",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PODBĚRÁK může být méně známý hráčům bez rybářské zkušenosti; ve směsi běžných cílů netvoří další technický blok."
+      ]
+    },
+    {
+      "id": "mk100-v2-051",
+      "ordinal": 51,
+      "contentHash": "73633403b0b45d67f477dfec0dc47d1f805ba1ce90441b872572eed100366a00",
+      "wordsetHash": "86a2d0f9bcdfecb6e219d59a88db722a7c3572214d46113d2e51d458219ca9dc",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "HROUZEK je ryba, jejíž jméno nemusí znát ani jinak jazykově zdatný hráč. LIŠEJNÍK a STRNIŠTĚ jsou běžná školní a krajinná slova, nedělají z kombinace taxonomický kvíz.",
+        "HROUZEK je vědomé rybářské znalostní riziko; familiarity-first ho ponechává do konce. Jedna ze všech 364 trojic jsou tři prosté izolované řetízky, takže zajímavý závěr není robustní pro každé pořadí."
+      ]
+    },
+    {
+      "id": "mk100-v2-052",
+      "ordinal": 52,
+      "contentHash": "0c6ec39b24a05d0934e93200690db94fd3e4d55171855a91a04c22271cd2f79e",
+      "wordsetHash": "e75a0eca7be336c1b11031a0726c46f87c082b9551365acbc79cd7ac181a1c59",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "MORUŠE a ŽEBŘIŇÁK mohou být méně aktivní slovní zásobou mladších hráčů; oba jsou konkrétní, srozumitelné české výrazy, nikoli vynucené rarity.",
+        "MORUŠE a ŽEBŘIŇÁK jsou přiznaná znalostní rizika. Prefixový tlak není naměřená lidská náročnost; oprava původního opakování řeší konkrétní konstrukční nedostatek."
+      ]
+    },
+    {
+      "id": "mk100-v2-053",
+      "ordinal": 53,
+      "contentHash": "3dd18fe41807e0ccd6efd6848cb357f72fd3da6a8d025f86e959293438975566",
+      "wordsetHash": "367e479bfd8ff8da8335404d140e8613a96dd65217bba943d22ae858571fd186",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ŠÍDLO má více běžných významů; hra potřebuje rozpoznání tvaru, ne taxonomické znalosti. Nezaznamenána kumulace vědomých úzce oborových hesel.",
+        "ŘÍDÍTKA jsou výrazný a přímější vstup; po jejich nálezu zůstává členitější práce v GEOMETRII a CHŘESTÝŠI. Náprava sousední repetice byla znovu prohlédnuta na aktuální mřížce."
+      ]
+    },
+    {
+      "id": "mk100-v2-054",
+      "ordinal": 54,
+      "contentHash": "2dd6514948c5c49577984429255388de203da9da6b802573255b0f37d08df3aa",
+      "wordsetHash": "ea0d170d5f079da5717bcba8322d0610f1a48275d123517f34b7df7a7bd2e6c5",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "MĚŘIDLO je obecný název, nikoli úzce technická součástka. Žádný vědomě polarizující cíl pro úlevu.",
+        "Úzké vratky HOTOVOSTI mohou podporovat naučený způsob hledání; zde jsou vyvážené delšími přímějšími úseky."
+      ]
+    },
+    {
+      "id": "mk100-v2-055",
+      "ordinal": 55,
+      "contentHash": "8461dcc333df5a6899e27260e2564ae02c257a197cb985bd3e3e19432adb1084",
+      "wordsetHash": "f4d6c8159eee63743b09b99eb16383519a7932cc79b6df87134e70ad689dcab2",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "BLATOUCH je běžně uváděná jarní rostlina; může být méně známý, ale vedle něj nestojí botanický seznam. ZATYKAČ může mít vyšší jazykovou salienci než konstrukční obtížnost.",
+        "Vysoký tlak v půlce je jen offline prefixový signál. Žádný cílený důkaz těžké poslední trojice zde není a přirozené dočištění je přijatelné."
+      ]
+    },
+    {
+      "id": "mk100-v2-056",
+      "ordinal": 56,
+      "contentHash": "1fad7fa736b17c920478f774e312863d1fc8e9dd125c23762fd6056f9c762e78",
+      "wordsetHash": "c1ea28e76870b9176329978a94dab85d372da554c25652b5ae96e69f0a0ee016",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "CEPÍN může být méně známý mimo turistiku a sport; zbytek nepřidává další vědomě úzkou terminologii. FYZIKA/GENETIKA/MATICE jsou trojice školních pojmů, ne tři rarity.",
+        "CEPÍN může tvořit individuální lexikální bariéru ve familiarity-first. Dolní kvartil všech 364 trojic je 17,855, stále pod referencí mk2-10; účinek na lidský závěr zůstává neověřený."
+      ]
+    },
+    {
+      "id": "mk100-v2-057",
+      "ordinal": 57,
+      "contentHash": "832b098ba920aea1f228e93f1409036a3c9e890ddf4213531c36f22c8f03a82b",
+      "wordsetHash": "69c1d3ede636ca35fee1e1f4d94bd519a2e1e8eb625b007615c5bf49e95a186c",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KRAHUJEC není univerzálně aktivní slovní zásoba; mírné konkrétní riziko přírodovědné znalosti, nikoli záměrně specialistické heslo. KARABINA, VODIČ a ÚSEČKA jsou běžné sportovní/školní výrazy.",
+        "Jednoduchý obvodový vstup se může najít rychle; to je záměrně ponechaná část hlavního profilu, nikoli závěrový experiment."
+      ]
+    },
+    {
+      "id": "mk100-v2-058",
+      "ordinal": 58,
+      "contentHash": "ac150a4bdcfec5423440179b51c546846c3128b2f04123978484d481110611e7",
+      "wordsetHash": "3b7161fcc399a8b1e8fe74422c750faf04bd04b1bb555c8ffbc4930518bf4404",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "SUPERNOVA je odborného původu, ale v obecné kultuře běžně rozpoznatelná. Současně jen KRÁTER ze stejné oblasti; nejde o kumulaci úzkých astronomických hesel.",
+        "Rozpoznání slova SUPERNOVA není měřeno. Tento kandidát nemá deklarované udržení obtížnosti po jedenáctém slově."
+      ]
+    },
+    {
+      "id": "mk100-v2-059",
+      "ordinal": 59,
+      "contentHash": "24678a0eae44336cac38d74678d96535e46d4b74c730c839ce0de5e3361324ce",
+      "wordsetHash": "ef85c8c85811f775f8719db3deabeff137aa4356c27bb20807dd2e2296bacf3f",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "STRNAD má mírné riziko menší aktivní znalosti, kulturní český název ptáka ale neoznačujeme automaticky za záměrnou raritu. DŘÍMOTA a BÁRKA jsou méně aktivní, srozumitelná kulturní slova.",
+        "STRNAD je konkrétní přírodopisné riziko z lexical review; ze samotné cesty nelze odvodit, že jej všichni hráči bezpečně poznají."
+      ]
+    },
+    {
+      "id": "mk100-v2-060",
+      "ordinal": 60,
+      "contentHash": "ed989929e7621e39f0827552653d52ce827104e4d37c42472599cce901f4591b",
+      "wordsetHash": "b6bdc0438e40a527dc531d877347fe93d979bd7d534a05d27c8f016214091a43",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "Označení summit musí doložit konstrukční výběr; samo těchto čtrnáct slov není mimořádně vzácné. HMOŽDÍŘ a POPĚVEK mají menší aktivní četnost, ale jsou konkrétní a běžně srozumitelné.",
+        "Geometry-first ponechává jinou trojici se dvěma komponentami. P25 všech pořadí 15,146 je slabší než mk2-10, a dvě shodné plausibilní trojice nejsou dva nezávislé důkazy."
+      ]
+    },
+    {
+      "id": "mk100-v2-061",
+      "ordinal": 61,
+      "contentHash": "0b36014e0229d87dbb9b8901998ecfdf87c17301c0b0b6c49b1d6682a2e97ea0",
+      "wordsetHash": "1f23bc51cdef1b119d2f2645636a413d440de6df5d3ba5922a058140f0b42b6c",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "BITCOIN i BASEBALL jsou přejaté výrazy, ale obecně známé názvy; nenesou požadavek finanční nebo sportovní odbornosti. OSTROH a PRŮRVA jsou méně aktivní, srozumitelné krajinné výrazy.",
+        "BITCOIN a BASEBALL mají přijatý současný charakter, ale jejich znalost není fyzickým hraním potvrzená; konstrukční úleva sama nevyřeší slovní známost."
+      ]
+    },
+    {
+      "id": "mk100-v2-062",
+      "ordinal": 62,
+      "contentHash": "20dad3af11115497fe498c3d7ba8ef58debb88caf41270970f72bb6c1ebfc2bb",
+      "wordsetHash": "6ea12a2b7965f37161e35df1035c057f945a02e60405380d473fc99c4eb25504",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "STEHLÍK má mírné riziko menší aktivní znalosti, nejde však automaticky o záměrně specialistické heslo. ČEKANKA a KLEKÁNICE jsou kulturně známé cíle; přírodní dvojice musí být přiznaná, není důvod mechanicky ji odmítnout.",
+        "KLEKÁNICE je kulturní pojmenování, nikoli slovníkově nově potvrzená banalita. Bez cíleného závěrového auditu může konec přirozeně zrychlit."
+      ]
+    },
+    {
+      "id": "mk100-v2-063",
+      "ordinal": 63,
+      "contentHash": "b14141d06a562bc6120f6ba1029fb31fe2385a3e90de7f6bcccce430e4b5571d",
+      "wordsetHash": "42b77540c5104d8c131fac7efe2d41207838d3c29259ca0a8580b9171fa75050",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "NAVIJÁK je obecný konkrétní nástroj. PRŮCHOD a PRŮTRŽ sdílejí prefix, ale významově nejsou odvozená rodina téhož cíle; podobnost může pomoci rozjezdu. Žádný vědomě raritní výraz pro úlevu.",
+        "RAKYTNÍK může být méně aktivní slovo; geometrický průměr 3,143 není naměřená hráčská snadnost."
+      ]
+    },
+    {
+      "id": "mk100-v2-064",
+      "ordinal": 64,
+      "contentHash": "c03521431f685f397aae908ee8c3b5f76b127415edc0a3fb85cc7047775de07d",
+      "wordsetHash": "f4ad200f121f9267fc4683645c6b50ffdb6fa541d3a55594b60078377875aa92",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KOROPTEV a OSIKA jsou běžná česká přírodní slova; mohou být méně aktivní, ale v této směsi nevytvářejí řadu úzce odborných názvů.",
+        "KOROPTEV zůstává konkrétním znalostním rizikem; užití stejné geometrie jako starší 5 je měřená konstrukční repetice, nikoli nová samostatná šablona."
+      ]
+    },
+    {
+      "id": "mk100-v2-065",
+      "ordinal": 65,
+      "contentHash": "d65c7ea0e8bf860cf65eaba75f8b41e31d35d98cad2652e352b828402c56665d",
+      "wordsetHash": "fbf46ea50e9f36bc3b1b20b8daf2ec65206669f873d1b6951119d19fac214507",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PELYNĚK může být méně aktivní slovní zásoba; zůstává běžně kulturně známým názvem a nestojí vedle dalšího úzkého botanického cíle. DOLINA má regionální odstín, ale přirozené spisovné použití.",
+        "Tato mřížka byla nově vybrána kvůli odstupu konstrukčních opakování. Její závěrové hodnoty se musejí vázat na aktuální hash, nikoli na původní výpočet; skutečný účinek na poslední trojici zůstává neověřený."
+      ]
+    },
+    {
+      "id": "mk100-v2-066",
+      "ordinal": 66,
+      "contentHash": "95dd5e32fc048b24cd675fe3216d7f047da388d8989342555c0d36e308a64b16",
+      "wordsetHash": "caf1f4e0960273b8ebad246ca23ffc949384c6f10d050a4c8655152147f1dc86",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KALOUS je vědomě méně aktivní název sovy. KORMORÁN je školně a veřejně známý pták s přiznaným mírným znalostním rizikem; dvě jména nevydáváme za dva automaticky specialistické výrazy. JAHODNÍK a MEDUŇKA jsou běžné rostliny; konkrétní přírodní shluk je přijatelný v profilu výzva.",
+        "KALOUS je vědomá znalostní bariéra, KORMORÁN se s ním může sejít při jiném pořadí. Vysoký vybraný proxy neodstraňuje nízké minimum ani P25 16,729 napříč všemi trojicemi."
+      ]
+    },
+    {
+      "id": "mk100-v2-067",
+      "ordinal": 67,
+      "contentHash": "4aa99d301a59b5c40393a93d5517373967ddcc230bc92c747a334ab36d546136",
+      "wordsetHash": "9d560eee704ef34acf5d73d8c4169f5d8a8ba057bf879f355012141391a968ba",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "TESAŘÍK může být chápán jako zdrobnělé povolání, ale cílový tvar je současně platný známý název brouka. PAŽITKA a ŘEŘICHA jsou běžné kuchyňské rostliny, ne další taxonomické rarity.",
+        "TESAŘÍK zůstává jediným výslovně raritním výrazem, ŘEŘICHA je další doménově citlivé běžné české slovo. Jejich známost nelze prohlásit za ověřenou podle tvaru cest."
+      ]
+    },
+    {
+      "id": "mk100-v2-068",
+      "ordinal": 68,
+      "contentHash": "e8a2ad0ae64a91e15ec193d5577787889e0f5b8234623465549095e87270bb5c",
+      "wordsetHash": "2a368a5249f7002b2261aad1f15845495bc22b97bd798c1e9ee97f7b7cf80853",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "RŮŽOVÁ je běžné samostatné barevné označení; ženský tvar zde funguje jako substantivizované adjektivum, nikoli jako nejasná půlka spojení. CHRASTÍ a DOVĚTEK jsou méně aktivní, stále běžně srozumitelné.",
+        "RŮŽOVÁ je schválený samostatný tvar z uložené zásoby, její jazykové použití nebylo tímto geometrickým auditem znovu certifikováno."
+      ]
+    },
+    {
+      "id": "mk100-v2-069",
+      "ordinal": 69,
+      "contentHash": "22c74947d7c4ce1bd401876de243d3b4a889bcd5a12f65b6f155531bede555fa",
+      "wordsetHash": "db23d69a38dcacda8995f63d52b8114726b313dd2f8d0e14161861be173d5e62",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "HOBOJ může být méně známý nástroj; vědomě jedna oborová bariéra. TRUMPETA je obecně známá, takže dvě hudební hesla nejsou automaticky dvojice rarit.",
+        "HOBOJ je jediný vědomý hudební znalostní práh. Přímější umístění nezaručuje, že méně známý název nepřevezme celý subjektivní závěr."
+      ]
+    },
+    {
+      "id": "mk100-v2-070",
+      "ordinal": 70,
+      "contentHash": "368f50919120ef2668022321c5864f443dc2282b738558d2f2053688acaaf37a",
+      "wordsetHash": "3ef11e95adf92512c53a2511f9236ef368af9f942fd128fb18e44114e9412988",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "POŠTOLKA má mírné riziko menší aktivní znalosti, jde o školně/kulturně známý název. ZMIJE je kulturně široce známá, MALINÍK průhledný název rostliny. Dvě základní gramatická slova nevytvářejí odborný seznam.",
+        "SLOVESO, PŘEDLOŽKA a POČÍTÁNÍ tvoří školní podskupinu, přestože metadata rozdělují některé významy; nejde o výhradně mluvnicky tematickou desku díky ostatním konkrétním cílům."
+      ]
+    },
+    {
+      "id": "mk100-v2-071",
+      "ordinal": 71,
+      "contentHash": "15a21b08607dfadf36bc3844d476f9fcb3ed6f68de98fe24037fe35c43a629f9",
+      "wordsetHash": "11b4aad14887840cfa40527965283f39d1c1fe66df926733c2aa4e84477c6707",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PASTINÁK je vědomě méně aktivní zeleninový název. KÁDINKA je základní školní laboratorní pomůcka s mírným znalostním rizikem, její odborný původ není automatická rarita. Zbytek se opírá o běžné kulturní a praktické výrazy.",
+        "PASTINÁK je přiznaná lexikální bariéra, byť ve všech pojmenovaných koncích nezůstává. Exhaustive P25 15,333 nedokládá univerzálně obtížný konec."
+      ]
+    },
+    {
+      "id": "mk100-v2-072",
+      "ordinal": 72,
+      "contentHash": "2d3d06e5e59b28f0d623dd5a85443308b5395dc14b5f920b798e6e0bd69fc1d2",
+      "wordsetHash": "2ef5277ab0c5ffa2797e3ab02d9dd5aa28941dc369d1896e089ec854c44de927",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "SKŘIVAN může být méně aktivní než TUČŇÁK, ale kulturně známé české jméno; spolu netvoří úzce taxonomickou kumulaci. BRUSINKA je běžně známé ovoce, nikoli povinná rarita z korpusového flagu.",
+        "Konstrukční šablona se ve stovce vrací vícekrát; zde je dostatečný odstup, ale bez hráčského testu není jisté, zda se zkušený hráč naučí její obecnou morfologii."
+      ]
+    },
+    {
+      "id": "mk100-v2-073",
+      "ordinal": 73,
+      "contentHash": "4fe2b187157affec2bcf78d564da1a25dbbb50512fa28d3edcdb7ce2ab2df93e",
+      "wordsetHash": "92cce23c4c4966e1b3ffe23e13b968406812c31ee28c3ac1a616502b9e0ad003",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "MOCNINA je základní školní pojem, ne automatická technická rarita. PIRÁTI jsou přirozené množné číslo; lexikon tento tvar schválil a hra obecně nevyžaduje všechna substantiva v singuláru.",
+        "Výběrový prefixový tlak přetrvává do půlky, avšak žádné měření zajímavosti poslední trojice zde není."
+      ]
+    },
+    {
+      "id": "mk100-v2-074",
+      "ordinal": 74,
+      "contentHash": "938449de50d2bbc5e694daf803cf75e7a079a7e76ece14a7bbc612cfcb83594a",
+      "wordsetHash": "606c0851fec87c588c2aa0041d3f94154d8ea80192301c6eab3ea9ae4024272b",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "MATEMATIK je delší, ale běžné povolání. TRUBICE je obecný tvar/předmět; neoznačuji ji za raritní technický díl. Žádný vědomě polarizující výraz pro úlevu.",
+        "Počáteční prefixový tlak 64,179 je vyšší než u řady hlavních desek, proto označení úleva stojí na kombinaci slov a tvarů, nikoli na všestranně nižším skóre."
+      ]
+    },
+    {
+      "id": "mk100-v2-075",
+      "ordinal": 75,
+      "contentHash": "3dbd4bfde4490524918dd8b169ea62312bf5274333bfa863dc22f9d747382810",
+      "wordsetHash": "fee0b01e60e213dde362d5e781c776e5b713c93e5390e50e1bd08819eed14627",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "OBRACEČKA je běžná kuchyňská pomůcka, nikoli odborný název z nízkofrekvenčního flagu. HOLUBNÍK a ŠALVĚJ jsou méně aktivní slova, ale zde nevytvářejí specialistickou kumulaci.",
+        "SAXOFON a ŠALVĚJ mají oborový původ, ale nebyly automaticky překlasifikovány jako rarity. Jejich souběh může ovlivnit osobní známost bez změny technické platnosti."
+      ]
+    },
+    {
+      "id": "mk100-v2-076",
+      "ordinal": 76,
+      "contentHash": "36355022da1cfadcf82ad73e1d02d369c5e3cdb30791a8fa9620b74785e239d4",
+      "wordsetHash": "fc74c45e5e63813b75f5fa115ce4875cf2a502b6c72220a3f389d0c99ebfc968",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ORGASMUS je přirozené schválené slovo, nikoli odborná rarita. Se slovem PŘEDEHRA vzniká nápadný dospělý dvojsmysl; je to konkrétní tón této desky, ne náhrada konstrukční náročnosti ani tvrzení o rodinné vhodnosti. ŠKRABOŠKA je běžné kulturní slovo.",
+        "ORGASMUS je obsahově výrazný cíl, jeho komfort pro celé hráčské publikum není technickou validací prověřen. Deska není označená jako závěrový experiment."
+      ]
+    },
+    {
+      "id": "mk100-v2-077",
+      "ordinal": 77,
+      "contentHash": "146b30b77c5980abead8d2336724367cccf9fabe303bb3abe29ab7f543c47103",
+      "wordsetHash": "b427fd2a2f24eb3a4e46d34c4672af81c7d8e408ea8c93883e46b373298e9d32",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KONIPAS je vědomě užší název ptáka; jediná skutečně cílená přírodovědná bariéra. Trojice rostlin je běžná a nepřidává další úzce odborné názvy; tematický shluk je přiznaný.",
+        "KONIPAS je přiznaná jediná vědomá rarita. Jeho délka a spodní umístění nevypovídají o tom, zda se stane subjektivním posledním slovem."
+      ]
+    },
+    {
+      "id": "mk100-v2-078",
+      "ordinal": 78,
+      "contentHash": "87da54e648842c66487e8461721b7da2bff0ad34c9a50d2320bc35ccf4caa5c6",
+      "wordsetHash": "abc0bb9f68844212901f20e24fc7ec192a577ea7ecfc0e2edd934ee943bcad2e",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KOŠÍKÁŘ je starší povolání, ale sémanticky průhledné. KŘEMEN je základní školní minerál; není potřeba jeho odborná definice. Není záměrná kumulace specialistiky.",
+        "UČEBNICE, ILUSTRACE a TELEVIZE tvoří kulturně školní podskupinu; celá sada ale není pouhým přebarvením jedné tematiky."
+      ]
+    },
+    {
+      "id": "mk100-v2-079",
+      "ordinal": 79,
+      "contentHash": "ee3378719c238686dcd17dd490258187ebbfc60757361e201e2e1bdb1c4f9f3c",
+      "wordsetHash": "5820c33fd12b497019378be153d158067b7de78136157bf378d24fe8a2bae613",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "FÁBOREK má nízkou psanou četnost, ale běžné konkrétní použití v dekoracích a dětských slavnostech. ORIGAMI je zavedené kulturní slovo; nepočítat každé přejaté slovo jako raritu.",
+        "ORIGAMI je přijatý přejatý výraz s rizikem individuální známosti. Vyšší průběžný prefixový tlak není doložená zábavnost."
+      ]
+    },
+    {
+      "id": "mk100-v2-080",
+      "ordinal": 80,
+      "contentHash": "d48c47714315cc8e938a2255bf2880abbea14d2e1de9995bcfc605af45434e0b",
+      "wordsetHash": "2f97399e3ee84e54b2a3179e0d47341bcd07f70d4e07c3734ccfb1f9770e63d2",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "POZOUN je vědomě jeden méně aktivní hudební nástroj. NÁLEVKA a LASTURA jsou obecné školní/přírodní výrazy. Profil vrchol musí obstát konstrukcí a zbytkovou evidencí; běžné cíle samy neprokazují vysokou obtížnost.",
+        "POZOUN je vědomá znalostní bariéra, TRENÝRKY mají familiárnější tón. Tento vrchol není jedním z cílených závěrových experimentů."
+      ]
+    },
+    {
+      "id": "mk100-v2-081",
+      "ordinal": 81,
+      "contentHash": "006f8232f814c7ad9fc83c3508ce38e00e4a9ab8770cd43a7fdf194429a5ce8b",
+      "wordsetHash": "0fa7a82ae9b3d6b7b96036ae3b3943ea887eeacc724ca0e1d707c8b5620bde59",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PAMĚTNÍK a POSTAVENÍ jsou delší, ale běžná česká slova. PSTRUH je známý i mimo rybářství; PRUŽINA běžný předmět, nikoli záměrná technická rarita.",
+        "VIKING je kulturní pojem se znalostní složkou; jazyková i konstrukční úleva nejsou nové lidské měření."
+      ]
+    },
+    {
+      "id": "mk100-v2-082",
+      "ordinal": 82,
+      "contentHash": "4cc8f0569bc80ebda2238a951a9a1ad36a3c5e6d94f899bf94d65fc62e533aae",
+      "wordsetHash": "ac295cea38bd336edd9aa21bc57621601a7a0839419d2e1560c6765377d2f085",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "DOBROMYSL jako název rostliny je jediný vědomě méně známý botanický výraz. LESBIČKA je schválené hovorové/zdrobnělé označení, jehož tón může některým hráčům znít patronizujícím způsobem; tvar není označen za neplatný ani za nadávku. Kandidátní katalog toto konkrétní riziko přiznává.",
+        "DOBROMYSL zůstává jediné výslovné bylinkové znalostní riziko; její cesta není důkazem všeobecné znalosti názvu."
+      ]
+    },
+    {
+      "id": "mk100-v2-083",
+      "ordinal": 83,
+      "contentHash": "01c6a2f7f0d6a6d1ad3fe136bb9139289cef4691b24a905c439c822af2576853",
+      "wordsetHash": "2867502bc0a24079266291b851f8e5a202e222aeb73ef27e3232a70002485a0e",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ÚSTŘICE je méně každodenní jídlo, ale obecně známý živočich; nepovažuji ji za úzce odborný název. ŠERMÍŘ je průhledné a kulturně známé povolání/sportovec. Žádná vědomá rarita pro úlevu.",
+        "LEKTVAR a ÚSTŘICE mohou být osobně méně aktivní pojmy. Tematická pestrost neprokazuje totožnou snadnost pro různě zkušené hráče."
+      ]
+    },
+    {
+      "id": "mk100-v2-084",
+      "ordinal": 84,
+      "contentHash": "9329e74de71e19355de2255df5d6ee214c9a6b2c33ea2ed3ac60b2c6351c0800",
+      "wordsetHash": "27361858ff2da120e64794c1c8212f976c887ead698b6b2cadb1360d8e5e3472",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PLAZMA je vědecké slovo, ale má široké školní i zdravotní použití; nejde o úzký odborný pojem vedle dalších podobných rarit. KOROPTEV je méně aktivní, kulturně známý název.",
+        "PLAZMA a KOROPTEV přidávají různá znalostní pole, přestože individuální redakce je neoznačila za dvě vědomé rarity. Jejich osobní souběh se musí posoudit hraním."
+      ]
+    },
+    {
+      "id": "mk100-v2-085",
+      "ordinal": 85,
+      "contentHash": "847263213179bd614b80c93531b2d2114bd1ecdd6befd459194ff79b443ee38c",
+      "wordsetHash": "7c3bf74ab9b79016a124174f3a8ef4e7efac386f00aec4330d8c8c8cd7bec4ea",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "MELASA je konkrétní méně známý potravinářský výraz; jediná vědomá oborová bariéra. DOLINA má regionální odstín, ale není vynucenou raritou.",
+        "Geometry-first ponechává tři oddělené komponenty. Exhaustive P25 18,562 je blíže mk2-10, stále jej však nedosahuje; konstrukční hypotéza není hráčský důkaz."
+      ]
+    },
+    {
+      "id": "mk100-v2-086",
+      "ordinal": 86,
+      "contentHash": "45119a5ac669fcfc31460effac225185f822bd8c0971699f087ee45ffc900e39",
+      "wordsetHash": "aee0ece5acefedbf90542bfce4d3f0e081bf2473e62ed9d2622a756701d21cc1",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KORMORÁN je méně aktivní, široce školně a veřejně známý pták; zároveň JAHODNÍK a MERUŇKA jsou běžné rostliny, ne taxonomický seznam. VČEREJŠEK a POVOZ mají kulturně běžný tvar.",
+        "Každá vybraná plausibilní trojice má dvě komponenty; vyšší citlivostní P25 neodstraňuje exhaustive P25 15,667 a 14,1% podíl izolovaných jednotlivých cest."
+      ]
+    },
+    {
+      "id": "mk100-v2-087",
+      "ordinal": 87,
+      "contentHash": "23dd800507c3a5547ca6ccc48d20680973c455682f078efcc1479251350f5189",
+      "wordsetHash": "b9d6b607344340a7681adce71773fa3712dccd834d992014f45de924a9f96c3b",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "PAŘENIŠTĚ je konkrétní běžný zahradnický výraz; může být méně aktivní, ale vedle SNĚŽENKY nepřidává úzkou taxonomii. HEJKAL je kulturně známá pohádková bytost.",
+        "PAŘENIŠTĚ a VĚTŠINA mají odlišnou konkrétnost; jedna redakční kategorie tématu sama nepopisuje způsob, jakým je bude člověk hledat."
+      ]
+    },
+    {
+      "id": "mk100-v2-088",
+      "ordinal": 88,
+      "contentHash": "bcf7452e786451cab12cada5aea766dd014a3cd5b03470056c724319083fb5d0",
+      "wordsetHash": "598d45c838fab41923b743ea27938a47245d3306ac51ca3b73cc1f84661141fd",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ASTEROID má vědecký původ a běžné kulturní použití; nevyžaduje fyzikální znalost. SLAVÍK a ŠPAČEK jsou známí ptáci, nikoli raritní dvojice. Žádná vědomá specialistika pro úlevu.",
+        "Schválení je vázáno na samostatný lexical amendment pro 88 a aktuální wordsetHash, nikoli na původní archivní sadu s RADAREM."
+      ]
+    },
+    {
+      "id": "mk100-v2-089",
+      "ordinal": 89,
+      "contentHash": "9168001cb53fc1e2cbdf27a1c4e02a014b98eb38a72d41001a1e673c3102f7da",
+      "wordsetHash": "a4e417681dac43c373cc608ae2f36f99cd28bdb344b76110ca7a6a95f43ef3b1",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KALOUS je vědomě jeden méně aktivní název sovy. KAUČUK je obecně známý materiál a KROKODÝL široce známé zvíře; nevzniká kumulace dvou úzkých odborných názvů. UZLOVAT je schválený přirozený infinitiv, nízká psaná četnost není sama redakční výhrada.",
+        "KALOUS je jediná výslovná rarita, ale vedle KROKODÝLA působí přírodopisný podtón. Tento hlavní kandidát neslibuje ztížený konec."
+      ]
+    },
+    {
+      "id": "mk100-v2-090",
+      "ordinal": 90,
+      "contentHash": "9e220f44d9d421280e21876bad1786b5f5a73506fd0855439c524735bab190e5",
+      "wordsetHash": "99c3c0bbab3a78486133145d22becb5506196eb295eb1d9784397410a1e92146",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "HADRY a MASÍČKO mají hovorový/zdrobnělý tón, který je v hravé české směsi záměrný. KYSELINA a KRÁTER jsou základní školní pojmy, nikoli další raritní odborná vrstva.",
+        "Původní krátké opakování konstrukce s 84 bylo její přeselekcí odstraněno. Vrácení obecné morfologie v celé stovce zůstává přiznané; technická pestrost nenahrazuje hráčský test."
+      ]
+    },
+    {
+      "id": "mk100-v2-091",
+      "ordinal": 91,
+      "contentHash": "2a2b7838bde6b09fa47221b96aaed11d635eed8d43345ef0e73cd63a3512bfd5",
+      "wordsetHash": "2659449ed0a12dc91ba02269bcc56f1ba8c07f102137f50579d20d3bfad2c31f",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "TUŘÍN je vědomě jeden méně aktivní zeleninový název. BEZINKA je běžně kulturně a potravinově známá rostlina; nepovažuji dvojici automaticky za botanickou zkoušku. HYPOTÉKA je běžná současná čeština, ne finanční specializace.",
+        "TUŘÍN je přiznané méně známé slovo, ale vybrané závěry ho nevyžadují. Dvě stejné hypotetické trojice se nesmějí počítat jako dvě konstrukční varianty; exhaustive P25 15,979 zůstává nižší než mk2-10."
+      ]
+    },
+    {
+      "id": "mk100-v2-092",
+      "ordinal": 92,
+      "contentHash": "951ce9a1056e07b3d06178ede0d36707d5662ecf2e955c5bfec8c93d8cc63299",
+      "wordsetHash": "29781e7e1ba0f913896962218b4f855e1d9573beb2a3265342e141f0b7eedd19",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "ZÁŠEVEK je vědomě jedno úzké krejčovské heslo, přijatelná hlavní deska s jednotlivým aha momentem. SYROVÁTKA je běžně známá potravinová/supplementová surovina; její znalost také nemusí být univerzální, ale nejde o další vynucený odborný cíl.",
+        "ZÁŠEVEK je vědomý oděvní znalostní práh, SYROVÁTKA může přidat osobně méně známou potravinovou složku, aniž je automaticky druhou raritou."
+      ]
+    },
+    {
+      "id": "mk100-v2-093",
+      "ordinal": 93,
+      "contentHash": "6fdef7802ab54060f77508d78cddcba81cecf1d72da870cafb2dea6779179640",
+      "wordsetHash": "74df7daff84e1e80120961eeefeb84a785d574b95fa24820f0479d342a7a289c",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "STŘÍDKA je vědomě menší potravinová bariéra. CANDÁT je kulturně a gastronomicky známá ryba, ULTRAZVUK běžný diagnostický výraz; neřadím je mechanicky k úzkým raritám. PIRÁTI opakuje73 přesně po20 deskách.",
+        "STŘÍDKA je přiznaná méně aktivní potravinová složka. Odborný původ ULTRAZVUKU nezaručuje, že jej celý panel bude vnímat jako jednoduchý cíl."
+      ]
+    },
+    {
+      "id": "mk100-v2-094",
+      "ordinal": 94,
+      "contentHash": "3150202301e9e2e544eb608e596ee8ad4cf0461929860b4289e01a44a4c514d0",
+      "wordsetHash": "160c50ea4c20397af4e6c039e8d529f0ffcd6eb8df091d9c361374888dff92bc",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "BUČINA je přirozené české lesní slovo, významově průhledné vůči buku; mírné znalostní riziko nevydávám za specialistickou raritu. Délka REPORTÁŽ a ZÁSTUPCE nesmí nahrazovat konstrukční obtížnost.",
+        "JAGUÁR a BUČINA mohou být individuálně rozdílně známé. Opakovaná kanonická konstrukce z 83 má přiznaný odstup 11 desek."
+      ]
+    },
+    {
+      "id": "mk100-v2-095",
+      "ordinal": 95,
+      "contentHash": "e1d417b69523861f44b1f5f4bcac1c0a479482ecfbffb8c1ac183f8e11fa4c48",
+      "wordsetHash": "8a7a8528bd1cc83995870c6b22e12c9b7d9915582146d50b2f95566ef97a3e35",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "TETŘEV a OSTRUHA mohou být méně aktivní; jde o školní/kulturně známé výrazy, nikoli záměrné nahromadění taxonomických a technických rarit.",
+        "Počáteční proxy 72,714 a půlkový 40,321 mohou signalizovat větší hledání, nikoli automatickou vyšší kvalitu nebo lidský čas."
+      ]
+    },
+    {
+      "id": "mk100-v2-096",
+      "ordinal": 96,
+      "contentHash": "a8062453f0553baa78572d17833927851a0f6ee5e8cc554e0c32ffba2d0bc757",
+      "wordsetHash": "2e266977149a096b9391bbc7beeacc0b47462fadfc86a4970376dee1926d8207",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "FÓLIOVNÍK je vědomě jeden konkrétní zahradnický termín. FENYKL je běžně potravinově/bylinkářsky známý, PIANINO kulturně známý nástroj; jejich souběh není skrytá trojice úzkých rarit.",
+        "FÓLIOVNÍK je vědomý zahradnický výraz. Tento kandidát nepatří do cílené závěrové pětiny, takže vyšší profil nemá být vydáván za důkaz těžkých posledních tří slov."
+      ]
+    },
+    {
+      "id": "mk100-v2-097",
+      "ordinal": 97,
+      "contentHash": "c3486c77deb4748c9c28bcadbd03dd058431b72e56cee3bd98c2714f0e0daa0a",
+      "wordsetHash": "b7ba77ad666cff4a4d9cf8ef7df8c2bd4e9167150a272787d3bebec4126f277c",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "LIBEČEK je méně aktivní, ale běžná kuchyňská bylina. OŘEŠÁK je transparentní název stromu; dvojice nemá působit jako specializovaný herbář.",
+        "LIBEČEK je běžné české bylinkové slovo s doménovou složkou; jeho samostatná znalost nebyla měřena a nezaměňuje se za čerstvou slovníkovou certifikaci."
+      ]
+    },
+    {
+      "id": "mk100-v2-098",
+      "ordinal": 98,
+      "contentHash": "411f5ff3db9dba4270b97c20eb295aca46fab2299e0c0f491aeaad35e36140c1",
+      "wordsetHash": "33c8be580ff150444bf4c100844ef4c04f55a705d6704645ecdc6c477cd906ce",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "GEJZÍR a DUŽINA jsou školní a každodenní přírodní výrazy, nikoli specialistické taxony. KROPIT a SKŘÍPAT mají méně psané četnosti, ale živou přirozenou činnost.",
+        "GEJZÍR a dužina ovoce mají odlišná obrazová opěrná místa. Samotné skóre 74,589 na začátku neprokazuje příjemnou náročnost."
+      ]
+    },
+    {
+      "id": "mk100-v2-099",
+      "ordinal": 99,
+      "contentHash": "17b35e7cbb6bddd192a4908734bef509d7a367478829483a0803c479f6a3aecc",
+      "wordsetHash": "86d0796f7c763a88d9420795919561a3ff5d92fa4bff81d748fb66eb5d337fbf",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "VÝLEVKA je vědomě jeden méně aktivní instalatérský/domácí výraz. ORNICE a KŘEMEN jsou základní školní krajinné/minerální pojmy. Tři zvířata jsou běžně kulturně známá, není zde řada úzkých zoologických názvů.",
+        "VÝLEVKA je explicitní domácí/doménové znalostní riziko; mimo cílenou pětinu se od této desky neslibuje odolný těžký závěr."
+      ]
+    },
+    {
+      "id": "mk100-v2-100",
+      "ordinal": 100,
+      "contentHash": "04424808040675280451f74866b3ae46c2eaa46df86990b72fe05e14edeabb9a",
+      "wordsetHash": "f7534aeb1c0536d44d887e4f2640ca63b3614a63a9043e180531cfcf6c954152",
+      "individualLexicalReview": true,
+      "individualGridReview": true,
+      "risks": [
+        "KRAJKÁŘKA je vědomě méně aktivní tradiční řemeslo; jiná úzká rarita není nutná. VOLÁN má menší aktivní znalost, ale běžné oděvní použití. Vrchol i poslední trojice musí stát na konstrukční evidenci, nikoli na vydávání C tierů za vzácnost.",
+        "KRAJKÁŘKA je přiznaná kulturní znalostní bariéra, nikoli změřená univerzální obtížnost. Exhaustive P25 13,25 a možnost dvou komponent ve mixed-first nechávají slabší pořadí; účinek finálního vrcholu musí potvrdit lidé."
+      ]
+    }
+  ],
+  "reviewerType": "AI editorial model assessments"
+}

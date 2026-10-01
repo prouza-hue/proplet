@@ -1,0 +1,134 @@
+{
+  "status": "PASS",
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "boardCount": 100,
+  "uniqueCanonicalTilings": 62,
+  "minimumRepeatGap": 10,
+  "maximumReuse": 4,
+  "normalization": "all8square symmetries; answer order and words ignored; each path reversal normalized",
+  "independentImplementation": "Codex root; no manufacture module imported",
+  "repeatPositions": {
+    "2977559013a6d9ff048097f1621540fd60d775aad5e594d44cd199f919dc02c5": [
+      3,
+      54
+    ],
+    "1a1e67774b31d2c9e31db24c7fedac305294bd45dadd09922d712b477973118d": [
+      5,
+      64
+    ],
+    "92a5448bce7ac4af603a7d77a322cf7a24e4ebe90dfedab2f0dfbe699d72f105": [
+      7,
+      19,
+      72
+    ],
+    "ec73ba762ec9007b1c36a573c48a1803a6996906115d41b28668fd67d02419cd": [
+      9,
+      57
+    ],
+    "d0054521b520cb7dfed1e9c1df769a9f711355e921de0d7e87a36c6d55360c0c": [
+      10,
+      79
+    ],
+    "3dc913249e358e8b9fbb8064f090ce95199a2a381f24db34b269414d98caf060": [
+      12,
+      32
+    ],
+    "37a141aa6848762c66c133ea8c634c62e5d33eee67d59931ae22adb2142fc0be": [
+      13,
+      45
+    ],
+    "6e262b2df4765457b0844f782d842fac9e8fbf2e4cc32409e829319f39e3a4e0": [
+      15,
+      42
+    ],
+    "53d4a37cd58b92c6c5e420234ba6a9b8ae8efbf020c9cefeb84a866594636d98": [
+      16,
+      31,
+      91
+    ],
+    "29ea03c0f30ec786ba132818d82c26a42d13ec329790ee746e34ee8dae99b487": [
+      17,
+      58
+    ],
+    "b6a7ab5ad34cbf751a7500cb686f7afc8eebfc0d7010a9ee9b14ca808f30e63c": [
+      22,
+      50,
+      65,
+      78
+    ],
+    "e4540c6b235ac0929e0d4bee63f1b8c4a75106b206bed72c7699c916ea9953ea": [
+      24,
+      53
+    ],
+    "aa640995d4632835a7b723b314e2cc95fbe494e860032c598d24670a94bc7367": [
+      25,
+      44,
+      90
+    ],
+    "1cb74bf00b92701c4c8982c61de49e9a60b8a7ab74373ce3ea3e2f623abfe7bd": [
+      26,
+      86
+    ],
+    "2cfe4f77c4ac3ace50b6137c195becbfec45ff8b941e5aa9487d79d8082ac069": [
+      27,
+      62,
+      93
+    ],
+    "1736c0766ff5cf4e6f321bd6b0d14ec07b2e52d3d518c9ea5bcef78b51380fc6": [
+      29,
+      75
+    ],
+    "e54158fffceaeb51babf005f4952d76e5c1fc047e9716d78108d6afc5136cc5d": [
+      30,
+      47,
+      77
+    ],
+    "f905b1d698cd4ab63562b2efc68838aa366e17947fb100095f7de124abf0fcd8": [
+      33,
+      97
+    ],
+    "8bf32aeeddb146e5e4972113fbcc9af631428f35b459a40a604c32ca48f0700e": [
+      34,
+      74
+    ],
+    "df84dd49327b1884b0a79e6b9942aec3f61d33039b6912cc8ea11500668a9acc": [
+      35,
+      84
+    ],
+    "08d23cd82ab0ab04de748c1cf86940642a93ad854138281a431d6e73433691ec": [
+      39,
+      69
+    ],
+    "ccc4a5bcd9aa852d165662cd91d31eacfdc5234353dfa2c3ecb41b51c86c880a": [
+      46,
+      66
+    ],
+    "946750722949d49b2b047fffca519fadbc977b1a600d65fae5fd5d460ef58b65": [
+      49,
+      92
+    ],
+    "c375004ec4af62184f9e9277e869246b85927369939c49ae138c22b005118787": [
+      52,
+      70
+    ],
+    "a50912f6a8162ce90d4a97633f15b178374d5c41990f72dd7d9d8bb3e45a6092": [
+      55,
+      82,
+      98
+    ],
+    "9e9d22ab37ef38a9e6ba56c3646cc29cd4498d9e272230b687e15ae897c13848": [
+      59,
+      73,
+      85,
+      95
+    ],
+    "0356c095a1e2b6cd0ff30b4c6d5f5a3e85dc387696651b35df9aff08e5119377": [
+      67,
+      89
+    ],
+    "f5b4af89a7eba769574d8a9e80df07546dc1a7c644946797452f7b716729a3a3": [
+      83,
+      94
+    ]
+  }
+}

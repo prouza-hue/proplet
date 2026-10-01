@@ -1,0 +1,48 @@
+{
+  "status": "rejected-before-amendment",
+  "originalPlanSha256": "250f240faa037b275df18b8c5e108c30e6a392d1f7ffdd5a00338588b82ac618",
+  "fullManufactureRun": {
+    "completedOtherBoardPools": 98,
+    "failedOrdinal": 16,
+    "attempts": 65536,
+    "fullyUniqueTargetPathOptions": 0,
+    "rejections": {
+      "solver-multiple-nonunique-target": 57344,
+      "geometry-path_straight_share": 8192
+    }
+  },
+  "mathematicalCause": "RADAR equals its reverse; both target orientations are always valid distinct paths. Current solver was preserved and recognition kept RADAR.",
+  "independentExampleProofs": [
+    {
+      "ordinal": 16,
+      "oldWord": "RADAR",
+      "representativeProof": {
+        "status": "multiple",
+        "solutionsLowerBound": 2,
+        "targetPathsUnique": false,
+        "candidateCount": 36,
+        "searchNodes": 16,
+        "enumerationAndSearchNodes": 2852,
+        "forcedNodeShare": 0.8125,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    },
+    {
+      "ordinal": 88,
+      "oldWord": "RADAR",
+      "representativeProof": {
+        "status": "multiple",
+        "solutionsLowerBound": 2,
+        "targetPathsUnique": false,
+        "candidateCount": 81,
+        "searchNodes": 20,
+        "enumerationAndSearchNodes": 3929,
+        "forcedNodeShare": 0.5,
+        "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+        "dictionarySize": 103836
+      }
+    }
+  ],
+  "recognitionStillContainsRadar": true
+}

@@ -91,6 +91,7 @@ def catalogue():
           'Dokončená izolovaná kandidátní banka: 100 konkrétních desek 10×10, každá má 14 cílových slov a všech 100 polí bez překryvu. Pořadí je v pěti vlnách; skladba 20 úlev / 60 hlavních / 15 výzev / 5 vrcholů.','',
           f"Lexikon v3 beze změny; uznávání {independent['recognition']['entries']:,} slov. Každá deska má úplný přesný důkaz jednoznačnosti a nezávislou reprodukci. Vybráno z {evidence['selection']['verifiedPoolTotal']:,} plně ověřených kandidátů.", '',
           f"Celkem 1 400 cílových výskytů, {summary['uniqueWords']} různých slov, nejvýše {summary['maximumExactRepeat']} přesné výskyty s odstupem nejméně {summary['minimumExactRepeatGap']} desek. Vůči předchozím playtestům je přiznaná výjimka LAHODNÝ na desce 37; široká historie vydaných a rezervovaných bank má {summary['historyOverlapUnique']} různých shod. Historie bank není osobní historie hráče.",'',
+          f"Konstrukce mají {summary['canonicalGeometry']['uniqueTilings']} odlišných kanonických tvarů po sjednocení otočení, zrcadlení a obrácení jednotlivých cest. Stejná konstrukce se vrací nejdříve po {summary['canonicalGeometry']['minimumRepeatGap']} deskách a nejvýše {summary['canonicalGeometry']['maximumRepeat']}krát. Nová písmena a slova sama o sobě nejsou novou konstrukcí.",'',
           'Dvacet cílených závěrů má tři pojmenované hypotézy pořadí, šest kontrol citlivosti a úplných 364 posledních trojic na každé desce. Jde o konstrukční experimenty. Náročnost, zábavnost a skutečný účinek závěru nové stovky dosud hráči změřené nejsou.','',
           f"V {endgame['broadOrderComparison']['targetedBelowReferenceP25']} z dvaceti experimentů je dolní kvartil tlaku přes všech 364 trojic nižší než u reference mk2-10. Zlepšení napříč libovolným pořadím proto není prokázané; slabé zbytky jsou v auditu zachovány.",'',
           'Redakce je individuální modelový úsudek o konkrétních slovech a mřížkách; nenahrazuje novou normativní slovníkovou certifikaci ani fyzický test zařízení. Produkční vydání a aktivace testu nejsou povoleny.','']
@@ -100,7 +101,7 @@ def catalogue():
         words=sorted(norm(a['word']) for a in board['answers'])
         if grid['contentHash']!=board_hash(board) or grid['wordsetHash']!=digest(words) or not grid['reviewedActualGridAndAnswerPaths']:
             raise ValueError('Grid review does not bind actual final content: '+board['id'])
-        if grid['verdict'] not in ('accepted','accept'):raise ValueError('Unresolved grid editorial decision')
+        if grid['verdict'] not in ('accepted','accept','accepted-with-notes'):raise ValueError('Unresolved grid editorial decision')
         if lex['wordsetHash']!=digest(words):raise ValueError('Lexical review differs')
         risks=list(dict.fromkeys(lex.get('risks',[])+grid.get('risks',[])))
         text.extend([f"## {ordinal:03d} · {LABELS[board['meta']['profile']]} · {lex['character']}",'',

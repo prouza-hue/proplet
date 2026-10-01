@@ -1,6 +1,6 @@
 {
   "status": "exact-proofs-complete",
-  "createdAt": "2026-10-01T19:56:06.098438+00:00",
+  "createdAt": "2026-10-01T20:11:11.866408+00:00",
   "stage": "representative",
   "boards": [
     {
@@ -150,6 +150,7 @@
         "attempt": 48,
         "placementSeed": 9457391736707522165
       },
+      "canonicalTilingHash": "c18ca40c1302b3b354495cd625cea23ef8a9cb01e0ba8ced3d489edd797697bc",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -305,6 +306,7 @@
         "attempt": 147,
         "placementSeed": 15203648109812816181
       },
+      "canonicalTilingHash": "08e1b0c090a6c28e115008c7ad8e9d514386abcee5459e0b0a2c901fe68a7bf6",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -465,6 +467,7 @@
         "attempt": 718,
         "placementSeed": 1927093288159910021
       },
+      "canonicalTilingHash": "2977559013a6d9ff048097f1621540fd60d775aad5e594d44cd199f919dc02c5",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -620,6 +623,7 @@
         "attempt": 1317,
         "placementSeed": 6763855930578928237
       },
+      "canonicalTilingHash": "9cda50d855afbda79854f77adbaf8166ab95e6fa957250762fc91e89fa469e7b",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -1326,6 +1330,7 @@
         "attempt": 1517,
         "placementSeed": 12927957888532108774
       },
+      "canonicalTilingHash": "1a1e67774b31d2c9e31db24c7fedac305294bd45dadd09922d712b477973118d",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -2025,6 +2030,7 @@
         "attempt": 578,
         "placementSeed": 16010348553984197691
       },
+      "canonicalTilingHash": "f5d2925c32d58ecacbf0fa6c8b8161dc2c7c6bcbac68f7d5aba6d32ef6e0f4ed",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -2180,6 +2186,7 @@
         "attempt": 82,
         "placementSeed": 4012598439186755259
       },
+      "canonicalTilingHash": "92a5448bce7ac4af603a7d77a322cf7a24e4ebe90dfedab2f0dfbe699d72f105",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -2340,6 +2347,7 @@
         "attempt": 634,
         "placementSeed": 11296474787466358065
       },
+      "canonicalTilingHash": "b8485f22ffe3c5335b5e36f7d027b59e0b7da7de5f756db3dc992a6e18db34f1",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -3047,6 +3055,7 @@
         "attempt": 10542,
         "placementSeed": 3217185422959029917
       },
+      "canonicalTilingHash": "ec73ba762ec9007b1c36a573c48a1803a6996906115d41b28668fd67d02419cd",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -3202,6 +3211,7 @@
         "attempt": 1591,
         "placementSeed": 8885825954817883339
       },
+      "canonicalTilingHash": "d0054521b520cb7dfed1e9c1df769a9f711355e921de0d7e87a36c6d55360c0c",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -3903,6 +3913,7 @@
         "attempt": 3597,
         "placementSeed": 3197391204932985824
       },
+      "canonicalTilingHash": "bdd4f92f49b598c818cfd0ef48a6046291cb27e419e02057a1c1b9fa96bf003c",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -4604,6 +4615,7 @@
         "attempt": 895,
         "placementSeed": 867439357113912718
       },
+      "canonicalTilingHash": "7069f6d036dc290f79ea627092b57ed92ebe7cac6bf187770861ea4b89d5087b",
       "finalProof": {
         "status": "unique",
         "solutionsLowerBound": 1,
@@ -4627,7 +4639,8 @@
   "frozenInputs": {
     "content/gen6/mozkokalypsa-100/geometry-pool-v2.jsonl": "0de9f413408a994e725c58c88f6fc3add8b684247bc83e6c83a421075e3f18e8",
     "content/gen6/mozkokalypsa-100/geometry-production-v2.json": "b3eb5c35e8c81880b1e3b3825f74f0d55fdfae493324e49b762944c858af022e",
-    "content/gen6/mozkokalypsa-100/lexical-plan.json": "250f240faa037b275df18b8c5e108c30e6a392d1f7ffdd5a00338588b82ac618",
+    "content/gen6/mozkokalypsa-100/lexical-plan-amendments-v2.json": "4538de8934a6231280e80a6a3799406b8f5412bda7ade45ca1a173420659dd63",
+    "content/gen6/mozkokalypsa-100/lexical-plan.json": "b88f28536ca2d4b4e640fd9eaedbc86344a7bfd068c4e6739f164eae7d628e86",
     "content/gen6/mozkokalypsa-100/recognition-manifest.json": "d6e41b9d61edabc94ae619b014c0e734e11e25d0ae579f91682754defe50a6b8",
     "content/gen6/mozkokalypsa-100/recognition-words.txt": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
     "content/lexicon-v3/working/README.md": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
@@ -4651,10 +4664,11 @@
     "tools/gen6/eight.py": "f612a03a0eb32d3f412cd920b55b9c846a9bf12d61dc93acb74bba5806ddcf25",
     "tools/gen6/interwoven.py": "366d221db4ecbb6c619b86fc9e285e854a5e3f341b8f0364688600ad16f1f1db",
     "tools/gen6/interwoven_geometry.cpp": "a26c2d75ceb3c01564eb123b70896addf1fd9987b04865e74aae59b906a10ce8",
+    "tools/gen6/mk100_amend_plan.py": "a44c49f611891eda8217ac8f1143a53406af6b57bd8e548c96dbde75ddd07494",
     "tools/gen6/mk100_catalog.py": "8584bc39cd74fa715c0744d8d6b482c94094954bfc57562a9a7cda3e3aefc72c",
     "tools/gen6/mk100_endgame.py": "0a3b3106c4a1ff924e09da6a306e43f7071995c0c05d538dc3ff53f41c064c77",
     "tools/gen6/mk100_geometry.py": "7a94a51e101c1aa9dff0fea4543be52f5c471d574f7a196917abaac6e91a11e1",
-    "tools/gen6/mk100_manufacture.py": "281ad76d4b173f713b8883552b24e25996fa34c193afcdf4dafbe0e140eeb888",
+    "tools/gen6/mk100_manufacture.py": "ff7993e910c8c6546895941550aedb082f9ad0abb9725bc3e233c514a3cd25b7",
     "tools/mozkokalypsa_lab.py": "8387806305a833f07bf7a2a69c1af00ef8e5a43a22445ed26980f7f65de8788f",
     "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15"
   },
@@ -4748,7 +4762,14 @@
       "plausibleAllThreeSimpleChainsMaximum": 0
     },
     "notFirst100Passes": true,
-    "minimumDistinctPathTilingsAgainstChosen": 8
+    "minimumDistinctPathTilingsAgainstChosen": 8,
+    "canonicalTilingMinimumGap": 8,
+    "canonicalNormalization": "orderedpaths modulo8square symmetries and individual reversal; words andanswerorder ignored",
+    "novelCanonicalPreferenceScoreWindowFraction": 0.05,
+    "noveltyTieChoices": 0,
+    "canonicalTilingsUsed": 12,
+    "canonicalRepeatMaximum": 1,
+    "canonicalRepeatMinimumGap": null
   },
   "interpretation": "Recognition and exact-cover uniqueness are technically checked. Geometry, pressure and endgame scores are simulation proxies; player enjoyment and persistence of difficulty are unmeasured."
 }

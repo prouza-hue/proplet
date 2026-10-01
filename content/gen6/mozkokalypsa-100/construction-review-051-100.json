@@ -1,0 +1,914 @@
+{
+  "status": "complete-individual-actual-grid-editorial-review",
+  "reviewer": "Codex remote_audit (AI editorial model)",
+  "reviewedAt": "2026-10-01T20:16:33.410520+00:00",
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "physicalDeviceTested": false,
+  "limitations": [
+    "Visual editorial assessment and independent consistency checks, not physical playtesting.",
+    "Human word recognition, difficulty, enjoyment and after-eleven effect are unmeasured.",
+    "Original archived lexical reviews are preserved; scoped amendments override only 16 and 88."
+  ],
+  "records": [
+    {
+      "id": "mk100-v2-051",
+      "ordinal": 51,
+      "contentHash": "73633403b0b45d67f477dfec0dc47d1f805ba1ce90441b872572eed100366a00",
+      "wordsetHash": "86a2d0f9bcdfecb6e219d59a88db722a7c3572214d46113d2e51d458219ca9dc",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "HMOŽDINKA vede sedmi zatáčkami přes pět řádků středu, zatímco MLYNÁŘ opisuje otevřenější horní oblouk. ZAVEDENÍ a INTERIÉR zůstávají v různých hypotézách závěru; proměnlivá třetí cesta brání závislosti pouze na jednom autorském pořadí.",
+      "risks": [
+        "HROUZEK je vědomé rybářské znalostní riziko; familiarity-first ho ponechává do konce. Jedna ze všech 364 trojic jsou tři prosté izolované řetízky, takže zajímavý závěr není robustní pro každé pořadí."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-052",
+      "ordinal": 52,
+      "contentHash": "0c6ec39b24a05d0934e93200690db94fd3e4d55171855a91a04c22271cd2f79e",
+      "wordsetHash": "e75a0eca7be336c1b11031a0726c46f87c082b9551365acbc79cd7ac181a1c59",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KATEDRÁLA zabírá široký horní pravý pruh se čtyřmi zatáčkami, PŘEHÁŇKA naopak šestkrát střídá směr v úzkém levém pásu přes pět řádků. Nové dělení cest se liší od sousední 53; písmena stále dávají vyšší počáteční prefixový tlak než její aktuální mřížka.",
+      "risks": [
+        "MORUŠE a ŽEBŘIŇÁK jsou přiznaná znalostní rizika. Prefixový tlak není naměřená lidská náročnost; oprava původního opakování řeší konkrétní konstrukční nedostatek."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-053",
+      "ordinal": 53,
+      "contentHash": "3dd18fe41807e0ccd6efd6848cb357f72fd3da6a8d025f86e959293438975566",
+      "wordsetHash": "367e479bfd8ff8da8335404d140e8613a96dd65217bba943d22ae858571fd186",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "ŘÍDÍTKA vedou po pravém horním okraji dlouhým L s jediným ohybem, GEOMETRIE se šestkrát vrací přes pět řádků pod nimi. SFINGA skládá širší středový oblouk; finální přeselekce odstranila původní totožné dělení cest se sousední 52.",
+      "risks": [
+        "ŘÍDÍTKA jsou výrazný a přímější vstup; po jejich nálezu zůstává členitější práce v GEOMETRII a CHŘESTÝŠI. Náprava sousední repetice byla znovu prohlédnuta na aktuální mřížce."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-054",
+      "ordinal": 54,
+      "contentHash": "2dd6514948c5c49577984429255388de203da9da6b802573255b0f37d08df3aa",
+      "wordsetHash": "ea0d170d5f079da5717bcba8322d0610f1a48275d123517f34b7df7a7bd2e6c5",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PŘÍVAL nabízí delší sestup s pouhými dvěma zatáčkami, HOTOVOST naopak úzký šestkrát lomený pás u levé hrany. Kombinace přístupných vstupů se složitějšími kotvami odpovídá úlevě uvnitř Mozkokalypsy, nikoli snadné obtížnosti běžné hry.",
+      "risks": [
+        "Úzké vratky HOTOVOSTI mohou podporovat naučený způsob hledání; zde jsou vyvážené delšími přímějšími úseky."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-055",
+      "ordinal": 55,
+      "contentHash": "8461dcc333df5a6899e27260e2564ae02c257a197cb985bd3e3e19432adb1084",
+      "wordsetHash": "f4d6c8159eee63743b09b99eb16383519a7932cc79b6df87134e70ad689dcab2",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KAPITOLA vede otevřenějším dvakrát lomeným tvarem z horní pravé oblasti do středu, ZVĚDAVOST skládá šest vratných změn dole vlevo. ZÁLESÁK tvoří spodní vodorovnější kličku; odlišné rozsahy cest umožňují několik různých vstupů.",
+      "risks": [
+        "Vysoký tlak v půlce je jen offline prefixový signál. Žádný cílený důkaz těžké poslední trojice zde není a přirozené dočištění je přijatelné."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-056",
+      "ordinal": 56,
+      "contentHash": "1fad7fa736b17c920478f774e312863d1fc8e9dd125c23762fd6056f9c762e78",
+      "wordsetHash": "c1ea28e76870b9176329978a94dab85d372da554c25652b5ae96e69f0a0ee016",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "DALAMÁNEK se šesti zatáčkami pracuje v dolní oblasti, CEPÍN je kratší třízatáčková cesta blízko středu. Tři hypotézy nechávají odlišné trojice: zahradní, kulturní i vědeckou; MEDVÍDEK/GENETIKA proto nejsou závislé pouze na znalosti CEPÍNU.",
+      "risks": [
+        "CEPÍN může tvořit individuální lexikální bariéru ve familiarity-first. Dolní kvartil všech 364 trojic je 17,855, stále pod referencí mk2-10; účinek na lidský závěr zůstává neověřený."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-057",
+      "ordinal": 57,
+      "contentHash": "832b098ba920aea1f228e93f1409036a3c9e890ddf4213531c36f22c8f03a82b",
+      "wordsetHash": "69c1d3ede636ca35fee1e1f4d94bd519a2e1e8eb625b007615c5bf49e95a186c",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KUTÁLET obchází horní levý roh jedinou změnou směru, SVĚDECTVÍ těsně pod ním prochází pět řádků s více vratkami. LYŽOVAT a KARABINA nabízejí konkrétní pohybové cíle, ale mřížka není složená jen z lehce čitelných okrajových pásů.",
+      "risks": [
+        "Jednoduchý obvodový vstup se může najít rychle; to je záměrně ponechaná část hlavního profilu, nikoli závěrový experiment."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-058",
+      "ordinal": 58,
+      "contentHash": "ac150a4bdcfec5423440179b51c546846c3128b2f04123978484d481110611e7",
+      "wordsetHash": "3b7161fcc399a8b1e8fe74422c750faf04bd04b1bb555c8ffbc4930518bf4404",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "CÍSAŘ začíná v horním levém rohu a jednou se stáčí dolů, kdežto KANDIDÁT vytváří šest vratných směrových změn při spodním kraji. HYDRANT a SUPERNOVA dávají rozdílné písmenové kotvy a s delšími cestami střídanou práci v celé ploše.",
+      "risks": [
+        "Rozpoznání slova SUPERNOVA není měřeno. Tento kandidát nemá deklarované udržení obtížnosti po jedenáctém slově."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-059",
+      "ordinal": 59,
+      "contentHash": "24678a0eae44336cac38d74678d96535e46d4b74c730c839ce0de5e3361324ce",
+      "wordsetHash": "ef85c8c85811f775f8719db3deabeff137aa4356c27bb20807dd2e2296bacf3f",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "DŘÍMOTA vytváří dlouhé L v horní levé části, zatímco TŘÍKOLKA má spodní klikatou cestu se šesti zatáčkami. Vedlejšími směry postupují ROZPLÉST a PROROCTVÍ; hledání se neopírá o jediný typ krátké zatáčky.",
+      "risks": [
+        "STRNAD je konkrétní přírodopisné riziko z lexical review; ze samotné cesty nelze odvodit, že jej všichni hráči bezpečně poznají."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-060",
+      "ordinal": 60,
+      "contentHash": "ed989929e7621e39f0827552653d52ce827104e4d37c42472599cce901f4591b",
+      "wordsetHash": "b6bdc0438e40a527dc531d877347fe93d979bd7d534a05d27c8f016214091a43",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PARLAMENT tvoří sedm zatáček v centrálním pěti sloupcovém pásu; i TRNKA má tři změny směru, takže vrchol neobsahuje jednoduché jednou lomené kotvy. LEDNIČKA/ZÁSTĚRKA/PARLAMENT zůstávají pohromadě v jedné komponentě dvou hypotéz, bez vědomě raritního závěrového slova.",
+      "risks": [
+        "Geometry-first ponechává jinou trojici se dvěma komponentami. P25 všech pořadí 15,146 je slabší než mk2-10, a dvě shodné plausibilní trojice nejsou dva nezávislé důkazy."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-061",
+      "ordinal": 61,
+      "contentHash": "0b36014e0229d87dbb9b8901998ecfdf87c17301c0b0b6c49b1d6682a2e97ea0",
+      "wordsetHash": "1f23bc51cdef1b119d2f2645636a413d440de6df5d3ba5922a058140f0b42b6c",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "BASEBALL otevírá horní hranu dlouhým přímým úsekem a jediným ohybem; ROLNIČKA uprostřed vpravo přidává pět změn směru. Vedle PAVUČINY a PŘEZŮVKY tak zůstává prostor pro rozjezd po předchozím vrcholu.",
+      "risks": [
+        "BITCOIN a BASEBALL mají přijatý současný charakter, ale jejich znalost není fyzickým hraním potvrzená; konstrukční úleva sama nevyřeší slovní známost."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-062",
+      "ordinal": 62,
+      "contentHash": "20dad3af11115497fe498c3d7ba8ef58debb88caf41270970f72bb6c1ebfc2bb",
+      "wordsetHash": "6ea12a2b7965f37161e35df1035c057f945a02e60405380d473fc99c4eb25504",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KAPALINA má čtyři změny směru ve spodním levém svislém pásu, KLEKÁNICE pět změn v širší střední levé oblasti. POVSTÁNÍ přidává šest vratných obratů na pravé straně; hlavní mřížka není pouze obvodová ani rozdělená na stejné úzké kličky.",
+      "risks": [
+        "KLEKÁNICE je kulturní pojmenování, nikoli slovníkově nově potvrzená banalita. Bez cíleného závěrového auditu může konec přirozeně zrychlit."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-063",
+      "ordinal": 63,
+      "contentHash": "b14141d06a562bc6120f6ba1029fb31fe2385a3e90de7f6bcccce430e4b5571d",
+      "wordsetHash": "42b77540c5104d8c131fac7efe2d41207838d3c29259ca0a8580b9171fa75050",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "TÁCEK je přehledný horní sestup s jednou zatáčkou, ZÁSTRČKA nabízí obtížnější šestkrát lomený pruh u pravé hrany. Střídání mezi krátkou konkrétní kotvou a delšími MISTRYNĚ/VYŘEZÁVAT drží úlevový profil, aniž by všechny cesty měly shodnou členitost.",
+      "risks": [
+        "RAKYTNÍK může být méně aktivní slovo; geometrický průměr 3,143 není naměřená hráčská snadnost."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-064",
+      "ordinal": 64,
+      "contentHash": "c03521431f685f397aae908ee8c3b5f76b127415edc0a3fb85cc7047775de07d",
+      "wordsetHash": "f4ad200f121f9267fc4683645c6b50ffdb6fa541d3a55594b60078377875aa92",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "SAMURAJ využívá dva delší přímější úseky u horní pravé hrany, KOROPTEV skládá šest změn směru dole. KREMROLE a PRSKAVKA dávají jiné délkové a tematické kotvy, takže náročnost nevytváří jen jedna dlouhá cesta.",
+      "risks": [
+        "KOROPTEV zůstává konkrétním znalostním rizikem; užití stejné geometrie jako starší 5 je měřená konstrukční repetice, nikoli nová samostatná šablona."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-065",
+      "ordinal": 65,
+      "contentHash": "d65c7ea0e8bf860cf65eaba75f8b41e31d35d98cad2652e352b828402c56665d",
+      "wordsetHash": "fbf46ea50e9f36bc3b1b20b8daf2ec65206669f873d1b6951119d19fac214507",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "MELODIE vede od horního středu pěti řádky se třemi většími obraty, SVÍTILNA má pět vratných změn ve spodním vodorovném pásu. PODMÍNKA se šestkrát láme vlevo nahoře; dvě odlišné závěrové trojice ji kombinují se ZKUMAVKOU/PŘÍBORNÍKEM nebo MARATONEM/BARIÉROU, bez deklarované raritní bariéry.",
+      "risks": [
+        "Aktuální P25 všech 364 trojic je 13,167, pod referencí mk2-10. Čtyři ze šesti citlivostních konců mají více komponent; dvě hypotézy dávají stejnou trojici a nejsou nezávislými konstrukčními variantami. Skutečný účinek na poslední trojici zůstává neověřený."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-066",
+      "ordinal": 66,
+      "contentHash": "95dd5e32fc048b24cd675fe3216d7f047da388d8989342555c0d36e308a64b16",
+      "wordsetHash": "caf1f4e0960273b8ebad246ca23ffc949384c6f10d050a4c8655152147f1dc86",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "VYDAVATEL má sedm vratných zatáček napříč spodním středem, kratší KBELÍK není jen přímý segment. KLADIVO/ČERVENEC/VYDAVATEL tvoří v dvou hypotézách propojený zbytek a vysoký prefixový tlak; zbývající geometry-first pracuje s KORMORÁNEM místo KLADIVA.",
+      "risks": [
+        "KALOUS je vědomá znalostní bariéra, KORMORÁN se s ním může sejít při jiném pořadí. Vysoký vybraný proxy neodstraňuje nízké minimum ani P25 16,729 napříč všemi trojicemi."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-067",
+      "ordinal": 67,
+      "contentHash": "4aa99d301a59b5c40393a93d5517373967ddcc230bc92c747a334ab36d546136",
+      "wordsetHash": "9d560eee704ef34acf5d73d8c4169f5d8a8ba057bf879f355012141391a968ba",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PLÉST otevírá dolní levý roh dlouhým L s jediným obratem, PODLOŽKA se šestkrát vrací u horní hrany. INSTITUCE překonává spodní pravou oblast pěti změnami směru; konkrétní KULIČKA nabízí další vstup k abstraktnějším delším cílům.",
+      "risks": [
+        "TESAŘÍK zůstává jediným výslovně raritním výrazem, ŘEŘICHA je další doménově citlivé běžné české slovo. Jejich známost nelze prohlásit za ověřenou podle tvaru cest."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-068",
+      "ordinal": 68,
+      "contentHash": "e8a2ad0ae64a91e15ec193d5577787889e0f5b8234623465549095e87270bb5c",
+      "wordsetHash": "2a368a5249f7002b2261aad1f15845495bc22b97bd798c1e9ee97f7b7cf80853",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PŘEVIS tvoří dlouhé levé L s jediným ohybem, SLUNÍČKO překonává šest řádků po pravé straně dvěma většími obraty. STONOŽKA se pětkrát vrací dole vpravo; úleva zde přichází většími čitelnými úseky vedle několika drobnějších kliček.",
+      "risks": [
+        "RŮŽOVÁ je schválený samostatný tvar z uložené zásoby, její jazykové použití nebylo tímto geometrickým auditem znovu certifikováno."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-069",
+      "ordinal": 69,
+      "contentHash": "22c74947d7c4ce1bd401876de243d3b4a889bcd5a12f65b6f155531bede555fa",
+      "wordsetHash": "db23d69a38dcacda8995f63d52b8114726b313dd2f8d0e14161861be173d5e62",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "STŘÍHAT nabízí širší spodní levý průchod s dvěma ohyby, NÁRAZNÍK se šestkrát vrací v úzkém horním středovém pásu. HOBOJ má nyní tři zatáčky v malé horní oblasti; méně známá hudební kotva není nejčlenitější cestou desky.",
+      "risks": [
+        "HOBOJ je jediný vědomý hudební znalostní práh. Přímější umístění nezaručuje, že méně známý název nepřevezme celý subjektivní závěr."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-070",
+      "ordinal": 70,
+      "contentHash": "368f50919120ef2668022321c5864f443dc2282b738558d2f2053688acaaf37a",
+      "wordsetHash": "3ef11e95adf92512c53a2511f9236ef368af9f942fd128fb18e44114e9412988",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "ŠLAPADLO má otevřenější dvakrát lomený tvar ve spodním středu, SKÁKÁNÍ pět změn směru v pravém horním pruhu. PŘEDLOŽKA prochází šesti řádky na pravé straně, zatímco PLAVIDLO zasahuje spodní levou oblast; delší cíle se nehledají v jediné části.",
+      "risks": [
+        "SLOVESO, PŘEDLOŽKA a POČÍTÁNÍ tvoří školní podskupinu, přestože metadata rozdělují některé významy; nejde o výhradně mluvnicky tematickou desku díky ostatním konkrétním cílům."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-071",
+      "ordinal": 71,
+      "contentHash": "15a21b08607dfadf36bc3844d476f9fcb3ed6f68de98fe24037fe35c43a629f9",
+      "wordsetHash": "11b4aad14887840cfa40527965283f39d1c1fe66df926733c2aa4e84477c6707",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "POSTROJ nabízí čitelnější spodní L, ZÁSOBNÍK je šestkrát lomená cesta nahoře uprostřed. Všechny tři hypotézy drží ZÁSOBNÍK a GYMNASTKU, ale třetí člen se mění mezi STOLIČKOU, OPASKEM a POLITIKEM; struktura je zkoušená ve třech různých zbytcích.",
+      "risks": [
+        "PASTINÁK je přiznaná lexikální bariéra, byť ve všech pojmenovaných koncích nezůstává. Exhaustive P25 15,333 nedokládá univerzálně obtížný konec."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-072",
+      "ordinal": 72,
+      "contentHash": "2d3d06e5e59b28f0d623dd5a85443308b5395dc14b5f920b798e6e0bd69fc1d2",
+      "wordsetHash": "2ef5277ab0c5ffa2797e3ab02d9dd5aa28941dc369d1896e089ec854c44de927",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "HODINKY vytvářejí otevřený dolní levý oblouk s jednou změnou směru, NÁTĚLNÍK se šestkrát láme nad ním. KONTINENT a ZAMĚŘENÍ přidávají širší slova mimo konkrétní domácí předměty; snadnější obvodový vstup je vyvážený členitým středem.",
+      "risks": [
+        "Konstrukční šablona se ve stovce vrací vícekrát; zde je dostatečný odstup, ale bez hráčského testu není jisté, zda se zkušený hráč naučí její obecnou morfologii."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-073",
+      "ordinal": 73,
+      "contentHash": "4fe2b187157affec2bcf78d564da1a25dbbb50512fa28d3edcdb7ce2ab2df93e",
+      "wordsetHash": "92cce23c4c4966e1b3ffe23e13b968406812c31ee28c3ac1a616502b9e0ad003",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "MOCNINA vede téměř celou horní hranu a jednou se obrací dolů, PROVÁZEK vykresluje vratky po pravé straně. KAPRADÍ a BUBENÍK hledání přenášejí do odlišných významových polí; matematické slovo není jediná velká kotva.",
+      "risks": [
+        "Výběrový prefixový tlak přetrvává do půlky, avšak žádné měření zajímavosti poslední trojice zde není."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-074",
+      "ordinal": 74,
+      "contentHash": "938449de50d2bbc5e694daf803cf75e7a079a7e76ece14a7bbc612cfcb83594a",
+      "wordsetHash": "606c0851fec87c588c2aa0041d3f94154d8ea80192301c6eab3ea9ae4024272b",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "SLIMÁK otevírá pravou hranu dlouhým sestupem s jedním ohybem, SÁŇKOVAT ve spodním levém rohu tvoří pěti zatáčkový detail. HOUSÁTKO a JEHLIČÍ podporují konkrétní obrazy po dvou hlavních deskách; relativní úleva zůstává konstrukčně různorodá.",
+      "risks": [
+        "Počáteční prefixový tlak 64,179 je vyšší než u řady hlavních desek, proto označení úleva stojí na kombinaci slov a tvarů, nikoli na všestranně nižším skóre."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-075",
+      "ordinal": 75,
+      "contentHash": "3dbd4bfde4490524918dd8b169ea62312bf5274333bfa863dc22f9d747382810",
+      "wordsetHash": "fee0b01e60e213dde362d5e781c776e5b713c93e5390e50e1bd08819eed14627",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "ŽÁROVKA se pětkrát stáčí při pravé hraně, OBRACEČKA má šest vratných obratů pod ní a ve spodním středu. STAROSTA vytváří jiný šestkrát lomený pruh podél horní hrany; konkrétní domácí a kulturní kotvy nejsou všechny soustředěné v jedné části.",
+      "risks": [
+        "SAXOFON a ŠALVĚJ mají oborový původ, ale nebyly automaticky překlasifikovány jako rarity. Jejich souběh může ovlivnit osobní známost bez změny technické platnosti."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-076",
+      "ordinal": 76,
+      "contentHash": "36355022da1cfadcf82ad73e1d02d369c5e3cdb30791a8fa9620b74785e239d4",
+      "wordsetHash": "fc74c45e5e63813b75f5fa115ce4875cf2a502b6c72220a3f389d0c99ebfc968",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "NÁMĚSTÍ má otevřenější horní oblouk, ŠKRABOŠKA střídá sedm směrů v úzkém levém středovém pásu. ŠKRABOŠKA, UMYVADLO a PŘEDEHRA dávají více cest do výzvy než samotné nejvíce lomené slovo.",
+      "risks": [
+        "ORGASMUS je obsahově výrazný cíl, jeho komfort pro celé hráčské publikum není technickou validací prověřen. Deska není označená jako závěrový experiment."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-077",
+      "ordinal": 77,
+      "contentHash": "146b30b77c5980abead8d2336724367cccf9fabe303bb3abe29ab7f543c47103",
+      "wordsetHash": "b427fd2a2f24eb3a4e46d34c4672af81c7d8e408ea8c93883e46b373298e9d32",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PARTNERKA se sedmi zatáčkami vrací v dolním levém prostoru, PORCELÁN nabízí otevřenější pět řádků vysoký oblouk u levé hrany. KONIPAS má tři změny směru dole vpravo; SNĚHULÁK se šestkrát láme při horním okraji a rozkládá náročnější hledání po ploše.",
+      "risks": [
+        "KONIPAS je přiznaná jediná vědomá rarita. Jeho délka a spodní umístění nevypovídají o tom, zda se stane subjektivním posledním slovem."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-078",
+      "ordinal": 78,
+      "contentHash": "87da54e648842c66487e8461721b7da2bff0ad34c9a50d2320bc35ccf4caa5c6",
+      "wordsetHash": "abc0bb9f68844212901f20e24fc7ec192a577ea7ecfc0e2edd934ee943bcad2e",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "LOUPAT má tři změny směru v dolním pravém rohu, ILUSTRACE se šestkrát vrací vlevo dole. PODŠÍVKA vytváří další šestkrát lomený pás nahoře; TELEVIZE pracuje v prostřední ploše a přesouvá hledání od dvou výrazných okrajových kliček.",
+      "risks": [
+        "UČEBNICE, ILUSTRACE a TELEVIZE tvoří kulturně školní podskupinu; celá sada ale není pouhým přebarvením jedné tematiky."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-079",
+      "ordinal": 79,
+      "contentHash": "ee3378719c238686dcd17dd490258187ebbfc60757361e201e2e1bdb1c4f9f3c",
+      "wordsetHash": "5820c33fd12b497019378be153d158067b7de78136157bf378d24fe8a2bae613",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "ROSTLINA vede při pravé horní hraně přes pět řádků, ČERVÁNKY tvoří drobnější spodní zigzag se šesti zatáčkami. ORIGAMI a KARAVAN přidávají výrazné slovní obrazy a cesty různého rozsahu; pokračování před vrcholem není monotónní geometrické přitvrzování.",
+      "risks": [
+        "ORIGAMI je přijatý přejatý výraz s rizikem individuální známosti. Vyšší průběžný prefixový tlak není doložená zábavnost."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-080",
+      "ordinal": 80,
+      "contentHash": "d48c47714315cc8e938a2255bf2880abbea14d2e1de9995bcfc605af45434e0b",
+      "wordsetHash": "2f97399e3ee84e54b2a3179e0d47341bcd07f70d4e07c3734ccfb1f9770e63d2",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "ŽIVOTOPIS se sedmi změnami směru zabírá střední pěti sloupcovou oblast; i JEMNÝ má tři zatáčky v horním středu. Vrchol se od hlavních liší hustotou směrových změn a absencí jednou lomených cest, nikoli povinným slovem mimo schválenou zásobu.",
+      "risks": [
+        "POZOUN je vědomá znalostní bariéra, TRENÝRKY mají familiárnější tón. Tento vrchol není jedním z cílených závěrových experimentů."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-081",
+      "ordinal": 81,
+      "contentHash": "006f8232f814c7ad9fc83c3508ce38e00e4a9ab8770cd43a7fdf194429a5ce8b",
+      "wordsetHash": "0fa7a82ae9b3d6b7b96036ae3b3943ea887eeacc724ca0e1d707c8b5620bde59",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KŮRKA nabízí jednoduchý spodní sestup s jedním ohybem, PANTOFEL se šestkrát vrací v pravém svislém pásu. Rozdílné rozsahy těchto domácích cest a kulturní HERECTVÍ vytvářejí úlevu po vrcholu 80 bez kompletního narovnání mřížky.",
+      "risks": [
+        "VIKING je kulturní pojem se znalostní složkou; jazyková i konstrukční úleva nejsou nové lidské měření."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-082",
+      "ordinal": 82,
+      "contentHash": "4cc8f0569bc80ebda2238a951a9a1ad36a3c5e6d94f899bf94d65fc62e533aae",
+      "wordsetHash": "ac295cea38bd336edd9aa21bc57621601a7a0839419d2e1560c6765377d2f085",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PAVUČINA tvoří široké spodní pravé U jen se dvěma obraty, DOBROMYSL se šestkrát vrací přes čtyři řádky vlevo nahoře. POVÍDKA má pět zatáček v levém dolním pásu; známá konkrétní cesta nabízí vstup, zatímco bylinková a kulturní slova drží drobnější členitost.",
+      "risks": [
+        "DOBROMYSL zůstává jediné výslovné bylinkové znalostní riziko; její cesta není důkazem všeobecné znalosti názvu."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-083",
+      "ordinal": 83,
+      "contentHash": "01c6a2f7f0d6a6d1ad3fe136bb9139289cef4691b24a905c439c822af2576853",
+      "wordsetHash": "2867502bc0a24079266291b851f8e5a202e222aeb73ef27e3232a70002485a0e",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "TULÁK obchází spodní střed jen jednou změnou směru, MĚSTEČKO se šestkrát láme nahoře. Návrat k konkrétním nájezdům, HOUSENCE a OBLEČENÍ rozvolňuje hledání; část dlouhých cest přesto zůstává dost členitá pro Mozkokalypsu.",
+      "risks": [
+        "LEKTVAR a ÚSTŘICE mohou být osobně méně aktivní pojmy. Tematická pestrost neprokazuje totožnou snadnost pro různě zkušené hráče."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-084",
+      "ordinal": 84,
+      "contentHash": "9329e74de71e19355de2255df5d6ee214c9a6b2c33ea2ed3ac60b2c6351c0800",
+      "wordsetHash": "27361858ff2da120e64794c1c8212f976c887ead698b6b2cadb1360d8e5e3472",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "VELETRH přechází širokým pravým páskem dvěma ohyby, SPOLUŽÁK skládá šest vratných změn dole vlevo. LEVANDULE zaujímá střední pravou oblast třemi většími obraty; oproti původní variantě je zde náročnost méně svázaná s jedinou dlouhou klikatou cestou.",
+      "risks": [
+        "PLAZMA a KOROPTEV přidávají různá znalostní pole, přestože individuální redakce je neoznačila za dvě vědomé rarity. Jejich osobní souběh se musí posoudit hraním."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-085",
+      "ordinal": 85,
+      "contentHash": "847263213179bd614b80c93531b2d2114bd1ecdd6befd459194ff79b443ee38c",
+      "wordsetHash": "7c3bf74ab9b79016a124174f3a8ef4e7efac386f00aec4330d8c8c8cd7bec4ea",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "DOVÁDĚT jde po dolní hraně přes otevřenější L, KUDRNATÝ kličkuje šestkrát u pravého kraje. Závěrové hypotézy mění trojici z KUDRNATÝ/MEDAILON/PASTVINA na PŘEDSTAVA/KUCHAŘKA/MEDAILON, takže MELASA nemusí být autorský povinný poslední cíl.",
+      "risks": [
+        "Geometry-first ponechává tři oddělené komponenty. Exhaustive P25 18,562 je blíže mk2-10, stále jej však nedosahuje; konstrukční hypotéza není hráčský důkaz."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-086",
+      "ordinal": 86,
+      "contentHash": "45119a5ac669fcfc31460effac225185f822bd8c0971699f087ee45ffc900e39",
+      "wordsetHash": "aee0ece5acefedbf90542bfce4d3f0e081bf2473e62ed9d2622a756701d21cc1",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "VČEREJŠEK tvoří sedm směrových změn v pravém středovém pásu, TRUBKA nabízí kratší dvakrát lomenou horní cestu. Tři závěrové hypotézy mají odlišné trojice se STÍHAČKOU a různými kulturními/časovými kotvami; žádná deklarovaná vědomá rarita nenese celý experiment.",
+      "risks": [
+        "Každá vybraná plausibilní trojice má dvě komponenty; vyšší citlivostní P25 neodstraňuje exhaustive P25 15,667 a 14,1% podíl izolovaných jednotlivých cest."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-087",
+      "ordinal": 87,
+      "contentHash": "23dd800507c3a5547ca6ccc48d20680973c455682f078efcc1479251350f5189",
+      "wordsetHash": "b9d6b607344340a7681adce71773fa3712dccd834d992014f45de924a9f96c3b",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PAŘENIŠTĚ se šestkrát vrací ve spodním levém prostoru, NEPOSEDA má šest dalších zatáček při pravém kraji. PLETIVO nabízí otevřenější pět řádků vysoký průchod mezi nimi, zatímco LEDVINA se čtyřikrát stáčí dole vpravo; složitější práce je rozložená.",
+      "risks": [
+        "PAŘENIŠTĚ a VĚTŠINA mají odlišnou konkrétnost; jedna redakční kategorie tématu sama nepopisuje způsob, jakým je bude člověk hledat."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-088",
+      "ordinal": 88,
+      "contentHash": "bcf7452e786451cab12cada5aea766dd014a3cd5b03470056c724319083fb5d0",
+      "wordsetHash": "598d45c838fab41923b743ea27938a47245d3306ac51ca3b73cc1f84661141fd",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "Aktuální náhradní SLOKA má tři obraty při pravé hraně, SLAVÍK vytváří široké spodní L s jedinou zatáčkou. CHRASTIT otevírá horní plochu dvěma ohyby přes šest sloupců, zatímco STROUHAT se pětkrát vrací vlevo nahoře; úleva má více tvarových vstupů.",
+      "risks": [
+        "Schválení je vázáno na samostatný lexical amendment pro 88 a aktuální wordsetHash, nikoli na původní archivní sadu s RADAREM."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-089",
+      "ordinal": 89,
+      "contentHash": "9168001cb53fc1e2cbdf27a1c4e02a014b98eb38a72d41001a1e673c3102f7da",
+      "wordsetHash": "a4e417681dac43c373cc608ae2f36f99cd28bdb344b76110ca7a6a95f43ef3b1",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "VĚDĚT nabízí spodní pravé L s jediným obratem, PRECLÍK se pětkrát vrací v horním středovém pruhu. PONÍŽENÍ má šest dalších obratů v levé spodní oblasti; BOROVICE uprostřed a KRÁLOVNA vpravo dělí zbývající konkrétní hledání po ploše.",
+      "risks": [
+        "KALOUS je jediná výslovná rarita, ale vedle KROKODÝLA působí přírodopisný podtón. Tento hlavní kandidát neslibuje ztížený konec."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-090",
+      "ordinal": 90,
+      "contentHash": "9e220f44d9d421280e21876bad1786b5f5a73506fd0855439c524735bab190e5",
+      "wordsetHash": "99c3c0bbab3a78486133145d22becb5506196eb295eb1d9784397410a1e92146",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PŘÍBORNÍK má sedm vratných změn na pravé straně, HADRY otevírají střední vodorovnější část dvěma ohyby. HRANOLKY a KLÍČENKA doplňují dlouhé konkrétní kotvy, takže složitější hledání není založené na úzce odborném slovu.",
+      "risks": [
+        "Původní krátké opakování konstrukce s 84 bylo její přeselekcí odstraněno. Vrácení obecné morfologie v celé stovce zůstává přiznané; technická pestrost nenahrazuje hráčský test."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-091",
+      "ordinal": 91,
+      "contentHash": "2a2b7838bde6b09fa47221b96aaed11d635eed8d43345ef0e73cd63a3512bfd5",
+      "wordsetHash": "2659449ed0a12dc91ba02269bcc56f1ba8c07f102137f50579d20d3bfad2c31f",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "POVLEČENÍ vede sedmi vratkami přes pět řádků pravého středu, ŽÍŽALA je kratší dvakrát lomený spodní oblouk. ZADRŽENÍ/HYPOTÉKA/POVLEČENÍ drží ve dvou hypotézách jednu propojenou komponentu; familiarity-first ji obměňuje HOSTINCEM a dvěma komponentami.",
+      "risks": [
+        "TUŘÍN je přiznané méně známé slovo, ale vybrané závěry ho nevyžadují. Dvě stejné hypotetické trojice se nesmějí počítat jako dvě konstrukční varianty; exhaustive P25 15,979 zůstává nižší než mk2-10."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-092",
+      "ordinal": 92,
+      "contentHash": "951ce9a1056e07b3d06178ede0d36707d5662ecf2e955c5bfec8c93d8cc63299",
+      "wordsetHash": "29781e7e1ba0f913896962218b4f855e1d9573beb2a3265342e141f0b7eedd19",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "BACULATÝ má šest vratných změn v úzkém pravém pásu, SYROVÁTKA se sedmkrát láme vlevo dole. NÁMOŘNÍK překonává šest řádků třemi většími obraty ve vrchní pravé oblasti; hlavní profil obsahuje otevřenější i velmi členité cesty na různých místech.",
+      "risks": [
+        "ZÁŠEVEK je vědomý oděvní znalostní práh, SYROVÁTKA může přidat osobně méně známou potravinovou složku, aniž je automaticky druhou raritou."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-093",
+      "ordinal": 93,
+      "contentHash": "6fdef7802ab54060f77508d78cddcba81cecf1d72da870cafb2dea6779179640",
+      "wordsetHash": "74df7daff84e1e80120961eeefeb84a785d574b95fa24820f0479d342a7a289c",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "PIRÁTI přecházejí dolní pravou oblast dvěma většími ohyby, ZLODĚJKA tvoří šest vratných změn podél spodního okraje. ULTRAZVUK má nyní pět obratů v horní levé oblasti; členitější dohledávání se přesunuje mezi různými délkami a významy.",
+      "risks": [
+        "STŘÍDKA je přiznaná méně aktivní potravinová složka. Odborný původ ULTRAZVUKU nezaručuje, že jej celý panel bude vnímat jako jednoduchý cíl."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-094",
+      "ordinal": 94,
+      "contentHash": "3150202301e9e2e544eb608e596ee8ad4cf0461929860b4289e01a44a4c514d0",
+      "wordsetHash": "160c50ea4c20397af4e6c039e8d529f0ffcd6eb8df091d9c361374888dff92bc",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KROUŽIT tvoří velké horní levé L s jedinou zatáčkou, ZÁSTUPCE se šestkrát vrací pod ním. POKLEP a LEPIDLO doplňují konkrétní vstupy, zatímco DOBRODRUH nabízí dlouhou společenskou kotvu; úleva nepřepisuje všechny cesty do stejného tvaru.",
+      "risks": [
+        "JAGUÁR a BUČINA mohou být individuálně rozdílně známé. Opakovaná kanonická konstrukce z 83 má přiznaný odstup 11 desek."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-095",
+      "ordinal": 95,
+      "contentHash": "e1d417b69523861f44b1f5f4bcac1c0a479482ecfbffb8c1ac183f8e11fa4c48",
+      "wordsetHash": "8a7a8528bd1cc83995870c6b22e12c9b7d9915582146d50b2f95566ef97a3e35",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "OSTRUHA otevírá levý horní okraj dlouhým L s jediným obratem, INTERIÉR se šestkrát vrací v úzkém levém prostředním pásu. KRESLENÍ a POLOVINA přidávají jiné šestkrát lomené vodorovné cesty; TROLEJBUS představuje delší, otevřenější středovou kotvu.",
+      "risks": [
+        "Počáteční proxy 72,714 a půlkový 40,321 mohou signalizovat větší hledání, nikoli automatickou vyšší kvalitu nebo lidský čas."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-096",
+      "ordinal": 96,
+      "contentHash": "a8062453f0553baa78572d17833927851a0f6ee5e8cc554e0c32ffba2d0bc757",
+      "wordsetHash": "2e266977149a096b9391bbc7beeacc0b47462fadfc86a4970376dee1926d8207",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "POVOLENÍ má šestkrát lomený svislý pás u levé hrany, PIANINO je otevřenější spodní levá cesta se dvěma ohyby. FÓLIOVNÍK a ŠVAGROVÁ procházejí jinými oblastmi, takže výzva stojí také na prostorové práci s běžnějšími cíli.",
+      "risks": [
+        "FÓLIOVNÍK je vědomý zahradnický výraz. Tento kandidát nepatří do cílené závěrové pětiny, takže vyšší profil nemá být vydáván za důkaz těžkých posledních tří slov."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-097",
+      "ordinal": 97,
+      "contentHash": "c3486c77deb4748c9c28bcadbd03dd058431b72e56cee3bd98c2714f0e0daa0a",
+      "wordsetHash": "b7ba77ad666cff4a4d9cf8ef7df8c2bd4e9167150a272787d3bebec4126f277c",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "LIBEČEK má pět změn směru na pravé straně, PATNÍK tři obraty ve středovém svislém prostoru. TKANIČKA, SNĚHULÁK a UMYVADLO nabízejí konkrétní hledání z více stran; mřížka má menší horní limit zatáček než sousední výzva 96.",
+      "risks": [
+        "LIBEČEK je běžné české bylinkové slovo s doménovou složkou; jeho samostatná znalost nebyla měřena a nezaměňuje se za čerstvou slovníkovou certifikaci."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-098",
+      "ordinal": 98,
+      "contentHash": "411f5ff3db9dba4270b97c20eb295aca46fab2299e0c0f491aeaad35e36140c1",
+      "wordsetHash": "33c8be580ff150444bf4c100844ef4c04f55a705d6704645ecdc6c477cd906ce",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "CHOVATEL vytváří dlouhé horní levé L s dvěma ohyby, PENĚŽENKA šestkrát mění směr v pravém dolním rohu. MRAVENEC a DOVOLENÁ vytvářejí další vzdálené kotvy; písmenový tlak do poloviny je výrazný, přesto jsou první cesty různého charakteru.",
+      "risks": [
+        "GEJZÍR a dužina ovoce mají odlišná obrazová opěrná místa. Samotné skóre 74,589 na začátku neprokazuje příjemnou náročnost."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-099",
+      "ordinal": 99,
+      "contentHash": "17b35e7cbb6bddd192a4908734bef509d7a367478829483a0803c479f6a3aecc",
+      "wordsetHash": "86d0796f7c763a88d9420795919561a3ff5d92fa4bff81d748fb66eb5d337fbf",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "VÝLEVKA nabízí delší levý sestup se dvěma změnami směru, VYKŘIČNÍK se šestkrát vrací v horní pravé oblasti. BLUDIČKA a ÚŠKLEBEK přenášejí hledání do pohádkového a lidského světa; poslední hlavní deska není jen příprava na úzce odborný vrchol.",
+      "risks": [
+        "VÝLEVKA je explicitní domácí/doménové znalostní riziko; mimo cílenou pětinu se od této desky neslibuje odolný těžký závěr."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    },
+    {
+      "id": "mk100-v2-100",
+      "ordinal": 100,
+      "contentHash": "04424808040675280451f74866b3ae46c2eaa46df86990b72fe05e14edeabb9a",
+      "wordsetHash": "f7534aeb1c0536d44d887e4f2640ca63b3614a63a9043e180531cfcf6c954152",
+      "reviewedActualGridAndAnswerPaths": true,
+      "verdict": "accepted-with-notes",
+      "assessment": "KRAJKÁŘKA skládá sedm vratných změn ve středovém pěti řádkovém pásu, ale i kratší VLEČKA má tři zatáčky. Poslední trojice střídají KRAJKÁŘKU s VARHANAMI nebo SLOVÍČKEM při stálých MISTRYNI/VYSLANCI; vrchol tedy není navržený jen jako neznámé řemeslo na konci.",
+      "risks": [
+        "KRAJKÁŘKA je přiznaná kulturní znalostní bariéra, nikoli změřená univerzální obtížnost. Exhaustive P25 13,25 a možnost dvou komponent ve mixed-first nechávají slabší pořadí; účinek finálního vrcholu musí potvrdit lidé."
+      ],
+      "view": "PIL scientific path mosaic of actual letters and all 14 disjoint answer paths; personally inspected in this model turn, then re-inspected all 20 reselected grids.",
+      "independentPathConsistency": {
+        "targetSpelling": true,
+        "orthogonalSimplePaths": true,
+        "exact100CellCover": true
+      }
+    }
+  ]
+}

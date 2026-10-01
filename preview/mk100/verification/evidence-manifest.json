@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "savedAtUTC": "2026-10-01T20:16:57.796663+00:00",
+  "bankContentHash": "84d32ca0600f27f13cc57bd497bd553af41c1b1cd68023379f26997e92c58dab",
+  "bankSourceSha": "ae0ba92c7a154eaca97a18c08e5dbdc20a6ded5a",
+  "independentProofSha256": "86ee2a2e5574da995ad145c2e7242dcc3609f0276f81985c579da0c4b8a72706",
+  "physicalDeviceTested": false,
+  "screenshotInspection": {
+    "method": "Actual screenshot pixels viewed by preview agent",
+    "files": [
+      "catalog-desktop.png",
+      "board-desktop.png",
+      "first-win-desktop.png",
+      "board-touch-mobile.png",
+      "board-touch-fold-portrait.png",
+      "board-touch-fold-landscape.png"
+    ],
+    "findings": "Readable letters, full board and controls within viewport; original paper palette, difficulty icon, calm icon and game control shapes preserved. No duplicate title above game heading. No horizontal overflow in tested widths."
+  },
+  "guardTests": {
+    "status": "PASS",
+    "tests": 4,
+    "command": "python -m unittest tests.mk100.test_preview -v"
+  },
+  "files": {
+    "board-desktop.png": "a8efe738d520ec9863dc5f6a2a1221394c8210b091e62620c58cd8f08ddc88ce",
+    "board-fold-mouse.png": "b3533ba84152b3ab95a964bf8a9257bd8a40e645dc3d976d7c842e569395f5c5",
+    "board-mobile-mouse.png": "cac5719ce8fde8471d5af474c7e809247d33248bde9c33f01d18cc06ca31698c",
+    "board-narrow.png": "cbe2171e682257cdd2bbb1a758ba587c2c5c14980aed4fbd3506fcc01dda4adb",
+    "board-touch-fold-landscape.png": "6d422b9bf246b69a144584a7a4fc328b79fe46ad0ce5efacda0063f78fa619b8",
+    "board-touch-fold-portrait.png": "a8ca1d736932087b3771896580f9f9b75570bc3618d0c664ff99494c3ab9449c",
+    "board-touch-mobile.png": "07d1d4b919d79f66f7ccbe641a2d69dedd56a7c45c114278d6fc1264d3dd5bcd",
+    "catalog-desktop.png": "3cf8b19f69a91160d97f42f5a532777e37d8d46ac73de6fcf35d32b61c2d9d68",
+    "first-win-desktop.png": "9eb28e1d3d66be4502457dce6b8b2029ced1902e9e5c335059612fa32cad3625",
+    "preview-build.json": "90683950a4419a3d3df8f2d1da4d5b9739f44b234dca18639259940656e9a385",
+    "report.json": "565267ce518601f4ddf9e12d0beb2175c03a1e443d5d201bc33921a5c01c3a26",
+    "win-touch-fold-landscape.png": "1b8824c27e4b64c40c4a91b0aa4afba993b31a1c851ba811ee30165a191a45ad",
+    "win-touch-fold-portrait.png": "18ddd318544a05b9149f31ed29dd22883be3405ed3a0b321c80e59c324688676",
+    "win-touch-mobile.png": "3c03798c5b2cb02dbde8fb98c8d2ef3e30f9065e174e5adc0525686a46814d65"
+  }
+}
