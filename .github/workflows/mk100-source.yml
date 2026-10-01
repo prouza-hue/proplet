@@ -1,0 +1,43 @@
+name: Mozkokalypsa candidate source snapshot
+on:
+  push:
+    branches: ['preview/mozkokalypsa-100-candidates-20261001']
+    paths: ['.github/workflows/mk100-source.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Export pinned source, prior generator and completed evaluations
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mk100-source/git/objects /tmp/mk100-source/git/refs
+          git archive --format=zip 0c597b980821749fa6d397b04716376aea1aa2e0 -o /tmp/mk100-source/main.zip
+          git ls-tree -r 0c597b980821749fa6d397b04716376aea1aa2e0 > /tmp/mk100-source/MAIN_TREE.txt
+          git fetch --depth=1 --no-tags origin 553fb3578c958004b831068dfd268dbcb2a423ab
+          git archive --format=zip 553fb3578c958004b831068dfd268dbcb2a423ab tools/gen6 content/gen6 content/lexicon-v3 preview/gen6 tools/build_gen6_preview.py tools/build_gen6_eight_preview.py tools/build_gen6_interwoven_preview.py tools/test_gen6_eight_browser.py tests/gen6 tests/interwoven -o /tmp/mk100-source/gen6-proven.zip
+          git fetch --depth=1 --no-tags origin docs/mozkokalypsa-round2-evaluation-20260929
+          git archive --format=zip FETCH_HEAD docs/playtests -o /tmp/mk100-source/evaluation-II.zip
+          git rev-parse FETCH_HEAD > /tmp/mk100-source/EVALUATION_II_SHA.txt
+          git fetch --depth=1 --no-tags origin docs/mozkokalypsa-round3-evaluation-20261001
+          git archive --format=zip FETCH_HEAD docs/playtests -o /tmp/mk100-source/evaluation-III.zip
+          git rev-parse FETCH_HEAD > /tmp/mk100-source/EVALUATION_III_SHA.txt
+          # Minimal object database for exact local checkout. No config, tokens,
+          # hooks, credentials, environment files or user data enter artifact.
+          cp -a .git/objects/. /tmp/mk100-source/git/objects/
+          cp -a .git/refs/. /tmp/mk100-source/git/refs/
+          cp .git/HEAD /tmp/mk100-source/git/HEAD
+          if test -f .git/shallow; then cp .git/shallow /tmp/mk100-source/git/shallow; fi
+          if test -f .git/packed-refs; then cp .git/packed-refs /tmp/mk100-source/git/packed-refs; fi
+          git rev-parse HEAD > /tmp/mk100-source/CANDIDATE_BRANCH_SHA.txt
+          sha256sum /tmp/mk100-source/*.zip > /tmp/mk100-source/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mk100-source
+          path: /tmp/mk100-source
+          retention-days: 7
