@@ -2,7 +2,7 @@
   "public/app.js": "044ba7b51c83d1547bc3b259066d96144c0552b2ab3765078ae4298bce751817",
   "public/home-layout.js": "0423872920c189221ddb888a3623883ab85ef05fe8455beb098c2f4a40064b3f",
   "public/app/game/input.js": "db917e5b2176c4dee88bdcd20fe3069ff190551aa3b872ed970c95f4511360a5",
-  "public/app/mk100-integrated-preview.js": "a2a7d4ae456279e9b50c48a5160a2d969d95c909d75001ee2f1cc1a50a0014bb",
+  "public/app/mk100-integrated-preview.js": "d489fb32c051efc3132251c535b4d03a1ba2e44482430a5a10e7c6d19ac91fbf",
   "public/app/mk100-launch-preview.js": "1589c3b2d6fe4887dd7ae27abaa2f2bbde51f1e8d0b60cf65addee4e1797a18f",
   "public/mozkokalypsa-difficulty-preview.css": "b6d82f8f5d0be613f6cf5fde421daf4542907ef979062e06cbce4716413880fb",
   "public/mozkokalypsa-launch-preview.css": "e6902eb71eb44f1fe57166dcff122ac3c4ffd7def39838a9d5b4229c39349a76",
@@ -10,5 +10,6 @@
   "tools/build_mk100_integrated_preview.py": "3502652f384fdc49335956b1fdfc7d604f9a063ef25b1a7da2592caffa74334f",
   "vercel.json": "90fc1415195880b8f30777aa3211c0fc014720f01e677b91d6ba3976686ffaf4",
   "content/gen6/mozkokalypsa-100/bank.json": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
-  "content/gen6/mozkokalypsa-100/recognition-words.txt": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7"
+  "content/gen6/mozkokalypsa-100/recognition-words.txt": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+  "tests/mk100-integrated/verify.cjs": "f54c94921c4b34660baa86c3bcb6d63b2ff206940e6060d1d8deb79951509f9f"
 }

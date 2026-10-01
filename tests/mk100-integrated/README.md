@@ -48,6 +48,8 @@ node tests/mk100-integrated/verify.cjs --url http://127.0.0.1:8765/ \
 Skript vyžaduje Playwright na `NODE_PATH` a samostatný headless Chromium.
 Výchozí Windows cesta je instalovaný Chrome; lze změnit pomocí `--chromium`.
 `--bonus-only` provede pouze ověření AKCI a žádnou desku nedohraje.
+`--flows-only` pokračuje pouze ve třech běžných herních průchodech a odkazu na
+dvanáctku, pokud již byly integrita, všechny brány i AKCI prokazatelně ověřeny.
 `--all` rozšíří skutečné desktopové dohrání na všech 100 desek. Výchozí běh
 ověří geometrii a integraci všech 100 a skutečné dohrání jedné desky v každém
 ze tří rozměrů. `--representative-path` nastaví adresu dvanáctky. Náhled musí

@@ -26,7 +26,9 @@ const sourceBank=JSON.parse(fs.readFileSync(path.join(root,'content/gen6/mozkoka
 const sourceDB=JSON.parse(fs.readFileSync(path.join(root,'public/puzzles.json'),'utf8'));
 const representativePath=option('--representative-path','?review=12');
 const representativeIds=sourceBank.boards.filter(b=>Number(b.meta.level)<=11||Number(b.meta.level)===20).map(b=>b.id);
+const flowsOnly=args.includes('--flows-only');
 const report={status:'RUNNING',target:target.href,bankContentHash:sourceBank.contentHash,
+  verificationScope:flowsOnly?'remaining-native-flows-only':'full-integration',
   browserSurface:'headless installed Chromium / new separate test contexts',preferredBrowserUnavailable:true,
   physicalDeviceTested:false,checks:[],emulations:[],screenshots:[],gating:[],pointerCompletions:[],
   requests:[],fontRequests:[],blockedRequests:[],pageErrors:[],consoleErrors:[],serviceWorkerRequests:[],startedAt:new Date().toISOString()};
@@ -138,6 +140,10 @@ async function main(){
     await page.waitForFunction(()=>document.querySelector('#gameMessage').textContent.includes('AKCI')&&document.querySelector('#gameMessage').textContent.includes('+1 XP'));
     const after=await page.evaluate(()=>({found:currentGame.found.length,used:currentGame.used.size,finished:currentGame.finished,bonusXp:currentGame.wordDiscoveryXpAwarded,points:effectiveStats().points,message:document.querySelector('#gameMessage').textContent,localEntries:Object.values(JSON.parse(localStorage.getItem('proplet-v4-word-discovery-v1:guest')||'{}').entries||{}).filter(r=>r.word==='AKCI')}));
     assert.equal(after.found,0);assert.equal(after.used,0);assert.equal(after.finished,false);assert.equal(after.bonusXp,1);assert.equal(after.points-before.points,1);assert.equal(after.localEntries.length,1);assert.equal(after.localEntries[0].status,'local');
+    // Native input blocks pointerDown while its 210ms wrong-path feedback is
+    // visible. A recognized side word keeps that ordinary feedback; await the
+    // actual state change before sending the next physical pointer gesture.
+    await page.waitForFunction(()=>currentGame.wrongPath.length===0&&!currentGame.dragging);
     report.sideWord={word:'AKCI',path:route,board:before.id,found:after.found,used:after.used,finished:after.finished,bonusXp:after.bonusXp,localPointsDelta:after.points-before.points,message:after.message,localStatus:after.localEntries[0].status};
     mark('native-side-word-AKCI-recognized-local-1XP-zero-target-coverage');
   }
@@ -146,6 +152,7 @@ async function main(){
       const {context,page}=await contextFor({name:'desktop-sideword',completed:200});await start(page,'daily');await sideWord(page);await screenshot(page,'desktop-sideword.png');await context.close();
       assert.equal(report.blockedRequests.length,0);assert.equal(report.pageErrors.length,0);assert.equal(report.consoleErrors.length,0);mark('zero-server-writes-zero-production-origins-zero-serviceworker-zero-errors');report.status='PASS';return;
     }
+    if(!flowsOnly){
     const {context:emptyContext,page:empty}=await contextFor({name:'gate-0'});
     assert(await empty.evaluate(()=>sortedFreeBank('hardcore').length>=200));
     const integrated=await empty.evaluate(()=>({boards:sortedFreeBank('mozkokalypsa'),diffKeys:Object.keys(DIFF),banks:Object.fromEntries(['easy','medium','hard','hardcore','mozkomor'].map(key=>[key,sortedFreeBank(key)]))}));
@@ -163,12 +170,13 @@ async function main(){
       await context.close();
     }
     mark('normal-Mozkomor-gate-0-199-200-remembered-no-QA-bypass');
+    }
     for(const [name,width,height,touch] of [['desktop',1440,1080,false],['phone',390,844,true],['fold',768,1024,true]]){
       const {context,page,cdp}=await contextFor({name,width,height,touch,completed:200});
       await menuOrder(page,true,cdp);if(touch)await page.locator('#difficultyCards [data-diff="mozkokalypsa"]').scrollIntoViewIfNeeded();await screenshot(page,`${name}-hrat.png`);await noOverflow(page);
       await nav(page,'daily',cdp);await screenshot(page,`${name}-dnes.png`);if(touch){await page.locator('#quickPlayGrid [data-home-free="mozkokalypsa"]').scrollIntoViewIfNeeded();await screenshot(page,`${name}-dnes-last-cards.png`)}await noOverflow(page);
       await start(page,'daily',cdp);
-      if(name==='desktop')await sideWord(page);
+      if(name==='desktop'&&!flowsOnly)await sideWord(page);
       const first=await page.evaluate(()=>currentGame.puzzle.answers[0]);await draw(page,first.path,cdp);await page.waitForFunction(()=>currentGame.found.length===1);
       assert.equal(await page.locator('#board .cell.used').count(),first.path.length);
       const before=await page.evaluate(()=>currentGame.moves);await draw(page,[first.path[0]],cdp);assert.equal(await page.evaluate(()=>currentGame.moves),before);

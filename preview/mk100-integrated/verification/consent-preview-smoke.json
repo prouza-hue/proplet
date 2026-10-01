@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "scope": "Completed fresh zero-completion profile smoke after at least 8 seconds; 200-completion profile is independently covered by preview agent",
+  "source": "consent-preview-smoke.json",
+  "additionalParallelContextNotCovered": true,
+  "additionalContextFailureRetainedInRawTrace": true,
+  "adapterSha256": "d489fb32c051efc3132251c535b4d03a1ba2e44482430a5a10e7c6d19ac91fbf",
+  "servedAdapterExactlyMatchesSource": true,
+  "checks": [
+    {
+      "hardcoreCount": 0,
+      "observedAfterMs": 10254,
+      "initial": {
+        "consent": {
+          "value": "denied",
+          "at": 1790889224082
+        },
+        "controllerConsent": "denied",
+        "marketingBannerVisible": false,
+        "integrated": true,
+        "environment": "preview",
+        "fixtureOnly": true,
+        "qaUnlockFlag": false,
+        "actualHardcore": 0
+      },
+      "gate": {
+        "locked": true,
+        "mozkomorPlay": false,
+        "mozkokalypsaPlay": true,
+        "mozkokalypsaTotal": "100"
+      },
+      "game": {
+        "id": "mk100-v2-001",
+        "cells": 100,
+        "answers": 14,
+        "mode": "free",
+        "integrated": true
+      }
+    }
+  ],
+  "blockedRequests": [],
+  "errors": []
+}

@@ -109,6 +109,7 @@
   }
   const now = new Date().toISOString();
   const defaults = {'proplet-v3-7-required-onboarding': 'done', 'proplet-v3-16-2-helper-onboarding': 'done',
+    'proplet-marketing-consent-v1': JSON.stringify({value: 'denied', at: Date.now()}),
     'proplet-v3-32-8-rule-principle-seen': '1', 'proplet-v3-16-2-helper-mode': 'none',
     'proplet-v3-5-account-nudge': JSON.stringify({shown: [1, 2, 3], lastShownAt: now}),
     'proplet-v4-01-4-progress-guard': JSON.stringify({lastShownAt: now}),
