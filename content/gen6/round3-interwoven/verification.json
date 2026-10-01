@@ -1,0 +1,2195 @@
+{
+  "asOf": "2026-09-27",
+  "sourceSha": "a91a4bd0a63476f711c50ce863df22a72b034cff",
+  "productionShaAtStart": "f07a43d1a8a841ea1ef095a161fda5e47a511238",
+  "status": "verified-unpublished",
+  "bankContentHash": "b6bfe8034861ad3cad0d3d9057658b046ea85ef172579229da60ab5dd7cdc42f",
+  "lexiconHash": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+  "frozenInputs": {
+    "content/gen5/profiles.json": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5",
+    "content/gen6/recognition-words.txt": "f46893e253df5cf155980e172160aa5f906eebb059f89ddcf0faa1b26d33661b",
+    "content/gen6/round3-eight/selection-policy.json": "0cd410c21f0db8063c46670d9b809dffc535d78b3db57fea94bfaeb765cdb370",
+    "content/gen6/round3-eight/wordfreq-manifest.json": "1b1a748c0607b855cab5cc4db2dd8c692f3fbb35066e5a98979ac617c8f84367",
+    "content/lexicon-v3/candidate-seeds.json": "0575ded2372981d0b7c34235259984e12b20b0be990d06187ff583a7d4170f38",
+    "content/lexicon-v3/editorial-batch-001.json": "d1113708c39c416ad5a694874f7746e2e3850d0ba0b2e36b6274ba224fffcd74",
+    "content/lexicon-v3/working/README.md": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
+    "content/lexicon-v3/working/capacity.json": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+    "content/lexicon-v3/working/editorial-addendum-20260927.json": "0d72fdc1d6e20eafce334c969aa4766dff5b97861235ca313a061e78e1bbc07d",
+    "content/lexicon-v3/working/editorial-reviews.json": "997a1d64632ac278b2b37e17ac3c660726a477cc0cc80e2107cf77c90c688a0e",
+    "content/lexicon-v3/working/inventory.json": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+    "content/lexicon-v3/working/lexicon.json": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "content/lexicon-v3/working/manifest.json": "a8a333e598d3f7a195dc59a03b6226c1cc719fbe77594c91b9cb00f2b638e99a",
+    "content/lexicon-v3/working/recognition-words.txt": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+    "content/lexicon-v3/working/source-limitations.json": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+    "content/lexicon-v3/working/source-manifest.json": "464dda20cab1b672a51ba338637bc1238f2d63d8ed4fe69bb2505a0b5ce02cc9",
+    "content/lexicon-v3/working/topic-map.json": "6c5e05e036317512f42f20d2322960a04e14d516a91b90b8e7887318494b2704",
+    "content/lexicon-v3/working/variant-groups.json": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a",
+    "data/legacy_daily_gen1.json": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+    "data/legacy_daily_gen2.json": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+    "data/lexicon_v2.json": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+    "data/lexicon_v2_wikidata_raw.json": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+    "data/playtests/mozkokalypsa-v1.json": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+    "data/playtests/mozkokalypsa-v2.json": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+    "data/puzzles.json": "72471265bfb9c1047710172cb1377a31eb6aa9e1c08c4969ee0b556551e014c0",
+    "data/rolling_content_v1.json": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+    "data/tajenka_weekend_v1.json": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+    "data/tajenka_weekend_v2.json": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+    "data/target_generation_exclusions_v334.json": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+    "data/words.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "public/puzzles.json": "57a5ea6e3e69e01f2093e0225f763a75e47734a6815f097fcdc7da47d63e8173",
+    "public/valid-words-v3328.txt": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+    "server.py": "a603fec6546662a4381444c89e58557c90045a4db91cf2c1750adf16830e118c",
+    "tools/build_lexicon_v2.py": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+    "tools/build_lexicon_v3_working.py": "bceb009a271935077f64df3a14c956c9a749e8344e0c6f89fae64469c2894607",
+    "tools/gen5/__init__.py": "1e88b45d825b3427e88b43806ae730008b1bb2df972085b36960c83ffd5d7269",
+    "tools/gen5/catalog.py": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74",
+    "tools/gen5/geometry.py": "ec3e2182484d9c7f0273e1d3af31b3845cea3256f6d2596292294e218d416837",
+    "tools/gen5/package.py": "f0bddf830ff10e7a2f73a62e4f8e20d7486e75b42b271bc074c8851290f4ada3",
+    "tools/gen5/runner.py": "c36babf9654d78b8c2e3ed9607ccd37e41ab708939796345e1171c47b55916b3",
+    "tools/gen5/series.py": "9af9edfe68b8f5420d1ec521671c2fc72fa140ad30e9ee995c4343ed1f3cb897",
+    "tools/gen5/validation.py": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd",
+    "tools/gen6/__init__.py": "19d430f7af912845a5d87e9bb6dcd8b9edd6b2fa299887731f1abd710ac2e05a",
+    "tools/gen6/catalog.py": "b9819dc9f91381ae585b8555f47c34f2628d17393e4289245078fb2e8a4f10e2",
+    "tools/gen6/eight.py": "f612a03a0eb32d3f412cd920b55b9c846a9bf12d61dc93acb74bba5806ddcf25",
+    "tools/gen6/full_catalog.py": "dcfc24f6470d7305599010d14c4699fb1b686795ecf585b97bf5651db93ef515",
+    "tools/gen6/interwoven.py": "366d221db4ecbb6c619b86fc9e285e854a5e3f341b8f0364688600ad16f1f1db",
+    "tools/gen6/recognition_snapshot.py": "fda67a1c6576f6aab5b10e9e1fdf1ce66c9c18722c25f9b71f9c1b55aa272b5d",
+    "tools/gen6/round3.py": "23f00c605d5d5b88cb9516537ac86e6e8b7a70e543f951ebfbaf647227a466f5",
+    "tools/measure_gen4_ambiguity.py": "fc09c4fd65fde73f13c8afb219e6d9673300613c01c4e95e58b7b4092e1126b0",
+    "tools/mozkokalypsa_lab.py": "8387806305a833f07bf7a2a69c1af00ef8e5a43a22445ed26980f7f65de8788f",
+    "word_recognition_v3330.py": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+    "content/gen6/round3-interwoven/geometry-pool.jsonl": "4dea0c78bbb325ae3855f42965416e88cb50ebf55f91e4dac8d6d9f54fba0e5a",
+    "tools/gen6/interwoven_geometry.cpp": "a26c2d75ceb3c01564eb123b70896addf1fd9987b04865e74aae59b906a10ce8",
+    "content/gen6/round3-eight/bank.json": "84da5382afd48ca6b2a0b13096c68b2cccfa3dc33c9773c7daca0b3581441b66"
+  },
+  "dictionary": {
+    "scope": "full-v3-static-union-plus-pinned-runtime-wordfreq-and-orthographic-variants",
+    "sha256": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+    "size": 103836,
+    "wordfreqVersion": "3.1.1",
+    "runtimeFrequencyTableCovered": true,
+    "limitation": "Pinned acceptable Czech alphabetic frequency-table entries; future runtime/data changes invalidate this snapshot."
+  },
+  "boards": [
+    {
+      "id": "mk3w2-01",
+      "verifiedCandidates": 78,
+      "rejections": {
+        "solver-unique": 1889,
+        "solver-multiple": 81
+      },
+      "geometryPoolIndex": 29,
+      "placement": 46,
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 5,
+        "interdigitatingWords": 5,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          4,
+          2,
+          3,
+          4,
+          4,
+          5,
+          4,
+          4,
+          3
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 601,
+        "helpedOtherWordsMean": 4.928571428571429,
+        "helpedOtherWordsMinimum": 3,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-01",
+        "replacements": {
+          "GENETIKA": "ZÁKULISÍ"
+        },
+        "words": [
+          {
+            "word": "BRLOH",
+            "tier": "A",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "CITERA",
+            "tier": "C",
+            "topic": "hudba, zvuky a divadlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": true,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KRONIKA",
+            "tier": "C",
+            "topic": "pohádky, fantazie a dobrodružství",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PLOTICE",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PODMÁSLÍ",
+            "tier": "B",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "RAZNICE",
+            "tier": "C",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "REJSTŘÍK",
+            "tier": "B",
+            "topic": "škola, jazyk, knihy a papír",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SOUHVĚZDÍ",
+            "tier": "C",
+            "topic": "věda, vesmír, matematika a měření",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "STAVIDLO",
+            "tier": "B",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "TISKAŘ",
+            "tier": "B",
+            "topic": "kultura a výtvarná tvorba",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "TRAKAŘ",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ZDYMADLO",
+            "tier": "B",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ZÁCLONA",
+            "tier": "A",
+            "topic": "oděv, textil a doplňky",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ZÁKULISÍ",
+            "tier": "C",
+            "topic": "hudba, zvuky a divadlo",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.4,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.2380952380952381,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 59.625,
+        "after3Median": 47.364,
+        "halfMedian": 32.964,
+        "after3Worst": 35.614,
+        "halfWorst": 23.179,
+        "orders": 7,
+        "selectionScore": 45.2823
+      }
+    },
+    {
+      "id": "mk3w2-02",
+      "verifiedCandidates": 18,
+      "rejections": {
+        "solver-unique": 1250,
+        "solver-multiple": 716,
+        "spatial-repetition": 64
+      },
+      "geometryPoolIndex": 20,
+      "placement": 59,
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.0,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          2,
+          4,
+          4,
+          4,
+          5,
+          5,
+          6,
+          4,
+          3
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 563,
+        "helpedOtherWordsMean": 4.428571428571429,
+        "helpedOtherWordsMinimum": 3,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-02",
+        "replacements": {
+          "HMOTNOST": "SKOŘÁPKA"
+        },
+        "words": [
+          {
+            "word": "DIVOŽENKA",
+            "tier": "B",
+            "topic": "pohádky, fantazie a dobrodružství",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "DRÁTENÍK",
+            "tier": "B",
+            "topic": "lidé, vztahy a povolání",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "HŘEBELEC",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "JEHELNÍK",
+            "tier": "B",
+            "topic": "oděv, textil a doplňky",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KOMODA",
+            "tier": "A",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KOSIT",
+            "tier": "A",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PATIZON",
+            "tier": "B",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POZNATEK",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PROPUST",
+            "tier": "C",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PĚNKAVA",
+            "tier": "B",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ROVNÍK",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SKOŘÁPKA",
+            "tier": "C",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŠMEJDIT",
+            "tier": "B",
+            "topic": "činnosti a pohyb",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŠTOČEK",
+            "tier": "C",
+            "topic": "kultura a výtvarná tvorba",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.4,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23401360544217686,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 56.536,
+        "after3Median": 51.727,
+        "halfMedian": 34.286,
+        "after3Worst": 36.795,
+        "halfWorst": 28.25,
+        "orders": 7,
+        "selectionScore": 46.1933
+      }
+    },
+    {
+      "id": "mk3w2-03",
+      "verifiedCandidates": 76,
+      "rejections": {
+        "solver-unique": 1290,
+        "solver-multiple": 170,
+        "spatial-repetition": 512
+      },
+      "geometryPoolIndex": 6,
+      "placement": 53,
+      "weave": {
+        "crossContacts": 77,
+        "extraSelfContacts": 17,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 3,
+        "seamCrossers": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          3,
+          5
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 542,
+        "helpedOtherWordsMean": 4.214285714285714,
+        "helpedOtherWordsMinimum": 2,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-03",
+        "replacements": {
+          "ALGEBRA": "PODNEBÍ",
+          "NOSTALGIE": "TAJEMSTVÍ"
+        },
+        "words": [
+          {
+            "word": "CUKROVÍ",
+            "tier": "A",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "DEVĚTSIL",
+            "tier": "C",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "HRABOŠ",
+            "tier": "B",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KAMENINA",
+            "tier": "C",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PASTOREK",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PODNEBÍ",
+            "tier": "C",
+            "topic": "počasí, obloha a světlo",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PŘEBAL",
+            "tier": "B",
+            "topic": "škola, jazyk, knihy a papír",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "REMÍZEK",
+            "tier": "B",
+            "topic": "krajina, voda a geologie",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "STUPNICE",
+            "tier": "B",
+            "topic": "hudba, zvuky a divadlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SUŠIT",
+            "tier": "A",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "TAJEMSTVÍ",
+            "tier": "C",
+            "topic": "myšlení, společnost a abstrakce",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "TRADICE",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "VLÍDNÝ",
+            "tier": "B",
+            "topic": "vlastnosti, pocity a chování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŠEROSVIT",
+            "tier": "C",
+            "topic": "počasí, obloha a světlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 6,
+        "maxPathStraightShare": 0.4,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23741496598639453,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 13,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 59.036,
+        "after3Median": 46.614,
+        "halfMedian": 28.536,
+        "after3Worst": 37.205,
+        "halfWorst": 25.429,
+        "orders": 7,
+        "selectionScore": 43.1094
+      }
+    },
+    {
+      "id": "mk3w2-04",
+      "verifiedCandidates": 102,
+      "rejections": {
+        "solver-unique": 974,
+        "solver-multiple": 76,
+        "spatial-repetition": 896
+      },
+      "geometryPoolIndex": 10,
+      "placement": 12,
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 3,
+        "seamCrossers": [
+          5,
+          5,
+          4,
+          4,
+          4,
+          3,
+          3,
+          4,
+          4,
+          4
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 641,
+        "helpedOtherWordsMean": 5.0,
+        "helpedOtherWordsMinimum": 3,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-04",
+        "replacements": {
+          "GALEONA": "POBŘEŽÍ"
+        },
+        "words": [
+          {
+            "word": "BRUSIVO",
+            "tier": "B",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "DRTINA",
+            "tier": "C",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "DŘEVORYT",
+            "tier": "C",
+            "topic": "kultura a výtvarná tvorba",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KALAMÁŘ",
+            "tier": "B",
+            "topic": "škola, jazyk, knihy a papír",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KŠANDY",
+            "tier": "A",
+            "topic": "oděv, textil a doplňky",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "LOUBÍ",
+            "tier": "B",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POBŘEŽÍ",
+            "tier": "C",
+            "topic": "krajina, voda a geologie",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PODBĚL",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PROSTOR",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PROSTŘEDÍ",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "TRUHLICE",
+            "tier": "A",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "VČELSTVO",
+            "tier": "B",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ÚŽLABINA",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŠPACHTLE",
+            "tier": "B",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.3333333333333333,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23460884353741496,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 13,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 64.768,
+        "after3Median": 53.409,
+        "halfMedian": 42.75,
+        "after3Worst": 48.977,
+        "halfWorst": 40.786,
+        "orders": 7,
+        "selectionScore": 52.5531
+      }
+    },
+    {
+      "id": "mk3w2-05",
+      "verifiedCandidates": 33,
+      "rejections": {
+        "solver-unique": 853,
+        "solver-multiple": 138,
+        "spatial-repetition": 1024
+      },
+      "geometryPoolIndex": 27,
+      "placement": 18,
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 3,
+        "seamCrossers": [
+          5,
+          3,
+          4,
+          3,
+          4,
+          5,
+          4,
+          3,
+          4,
+          4
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 568,
+        "helpedOtherWordsMean": 4.857142857142857,
+        "helpedOtherWordsMinimum": 3,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-05",
+        "replacements": {
+          "DRUID": "ŠIFRA"
+        },
+        "words": [
+          {
+            "word": "HMATNÍK",
+            "tier": "C",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "HUSTILKA",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "JEŘABINA",
+            "tier": "B",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "LINORYT",
+            "tier": "C",
+            "topic": "škola, jazyk, knihy a papír",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "NÁŘEČÍ",
+            "tier": "C",
+            "topic": "kultura a výtvarná tvorba",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ODDENEK",
+            "tier": "B",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PAMÁTKA",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PARŤÁK",
+            "tier": "A",
+            "topic": "lidé, vztahy a povolání",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PODRUČKA",
+            "tier": "B",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PODRÁŽKA",
+            "tier": "A",
+            "topic": "oděv, textil a doplňky",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PŘESLIČKA",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SKALISKO",
+            "tier": "B",
+            "topic": "krajina, voda a geologie",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŠIFRA",
+            "tier": "C",
+            "topic": "myšlení, společnost a abstrakce",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŠIŠATÝ",
+            "tier": "B",
+            "topic": "vlastnosti, pocity a chování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.4,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.2451530612244898,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 55.804,
+        "after3Median": 54.659,
+        "halfMedian": 33.643,
+        "after3Worst": 38.159,
+        "halfWorst": 21.0,
+        "orders": 7,
+        "selectionScore": 46.5961
+      }
+    },
+    {
+      "id": "mk3w2-06",
+      "verifiedCandidates": 20,
+      "rejections": {
+        "solver-unique": 657,
+        "solver-multiple": 155,
+        "spatial-repetition": 1216
+      },
+      "geometryPoolIndex": 22,
+      "placement": 18,
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.428571428571429,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 3,
+        "seamCrossers": [
+          5,
+          5,
+          5,
+          5,
+          4,
+          4,
+          4,
+          4,
+          3,
+          3
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 564,
+        "helpedOtherWordsMean": 4.642857142857143,
+        "helpedOtherWordsMinimum": 3,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-06",
+        "replacements": {},
+        "words": [
+          {
+            "word": "DÁLAVA",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "FANTAZIE",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "JIŘIČKA",
+            "tier": "B",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KLEPAT",
+            "tier": "A",
+            "topic": "hudba, zvuky a divadlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "LAHODNÝ",
+            "tier": "B",
+            "topic": "vlastnosti, pocity a chování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "LYSKA",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "MINCÍŘ",
+            "tier": "C",
+            "topic": "věda, vesmír, matematika a měření",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "MYŠLENKA",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "OROBINEC",
+            "tier": "C",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PERGAMEN",
+            "tier": "C",
+            "topic": "pohádky, fantazie a dobrodružství",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": true,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PETRŽEL",
+            "tier": "A",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POLEDNICE",
+            "tier": "B",
+            "topic": "pohádky, fantazie a dobrodružství",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POLNÍČEK",
+            "tier": "B",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SVĚTLÍK",
+            "tier": "B",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.4,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23698979591836733,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 59.893,
+        "after3Median": 49.205,
+        "halfMedian": 36.964,
+        "after3Worst": 47.182,
+        "halfWorst": 27.464,
+        "orders": 7,
+        "selectionScore": 47.515
+      }
+    },
+    {
+      "id": "mk3w2-07",
+      "verifiedCandidates": 13,
+      "rejections": {
+        "solver-unique": 446,
+        "solver-multiple": 309,
+        "spatial-repetition": 1280
+      },
+      "geometryPoolIndex": 3,
+      "placement": 35,
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 4,
+        "interdigitatingWords": 4,
+        "neighborsMean": 4.428571428571429,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 4,
+        "seamCrossers": [
+          5,
+          4,
+          5,
+          4,
+          4,
+          4,
+          5,
+          4,
+          4,
+          4
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 514,
+        "helpedOtherWordsMean": 4.928571428571429,
+        "helpedOtherWordsMinimum": 3,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-07",
+        "replacements": {
+          "MATICE": "POHOŘÍ",
+          "BAKTERIE": "KORMIDLO"
+        },
+        "words": [
+          {
+            "word": "FUJAVICE",
+            "tier": "B",
+            "topic": "počasí, obloha a světlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "KORMIDLO",
+            "tier": "C",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "LEZEC",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PERMONÍK",
+            "tier": "B",
+            "topic": "pohádky, fantazie a dobrodružství",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PETLICE",
+            "tier": "B",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POHOŘÍ",
+            "tier": "C",
+            "topic": "krajina, voda a geologie",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POZNÁNÍ",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PŘEVOD",
+            "tier": "B",
+            "topic": "doprava, cesty a cestování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "STRUHADLO",
+            "tier": "A",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "STŘEVLÍK",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SVORNÍK",
+            "tier": "C",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "TOBOLKA",
+            "tier": "C",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ZURČET",
+            "tier": "B",
+            "topic": "hudba, zvuky a divadlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ZÁPISNÍK",
+            "tier": "A",
+            "topic": "škola, jazyk, knihy a papír",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.4,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23767006802721088,
+        "curvyShare": 1.0,
+        "maxCurlRun": 2,
+        "curlPathCount": 14,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 52.089,
+        "after3Median": 43.045,
+        "halfMedian": 36.071,
+        "after3Worst": 38.523,
+        "halfWorst": 21.071,
+        "orders": 7,
+        "selectionScore": 42.9686
+      }
+    },
+    {
+      "id": "mk3w2-08",
+      "verifiedCandidates": 24,
+      "rejections": {
+        "solver-unique": 550,
+        "solver-multiple": 66,
+        "spatial-repetition": 1408
+      },
+      "geometryPoolIndex": 13,
+      "placement": 42,
+      "weave": {
+        "crossContacts": 76,
+        "extraSelfContacts": 18,
+        "axisReentries": 4,
+        "interdigitatingWords": 3,
+        "neighborsMean": 4.142857142857143,
+        "neighborsMinimum": 3,
+        "minSeamCrossers": 2,
+        "seamCrossers": [
+          4,
+          4,
+          3,
+          2,
+          5,
+          5,
+          5,
+          6,
+          3,
+          3
+        ]
+      },
+      "unlock": {
+        "crossWordPrefixPaths": 509,
+        "helpedOtherWordsMean": 4.428571428571429,
+        "helpedOtherWordsMinimum": 2,
+        "interpretation": "Potential elimination of false prefix paths in other words, not measured human unlocking."
+      },
+      "lexicalReview": {
+        "previousId": "mk3v3-08",
+        "replacements": {
+          "MINOTAUR": "POTÁPNÍK",
+          "KENTAUR": "PŘÍZVUK"
+        },
+        "words": [
+          {
+            "word": "BUKVICE",
+            "tier": "B",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "BYSTŘINA",
+            "tier": "B",
+            "topic": "krajina, voda a geologie",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "DŮVĚRA",
+            "tier": "C",
+            "topic": "historická smíšená témata",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "JITŘENKA",
+            "tier": "B",
+            "topic": "počasí, obloha a světlo",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "LEZEČKA",
+            "tier": "B",
+            "topic": "hry, hračky a sport",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "NAPÁJEČKA",
+            "tier": "B",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "OKVĚTÍ",
+            "tier": "C",
+            "topic": "rostliny, zahrada a pěstování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "POTÁPNÍK",
+            "tier": "C",
+            "topic": "zvířata a péče o ně",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "PŘÍZVUK",
+            "tier": "C",
+            "topic": "škola, jazyk, knihy a papír",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SYMFONIE",
+            "tier": "C",
+            "topic": "kultura a výtvarná tvorba",
+            "sourceCohort": "legacy-v2",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": true,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "SÍTOTISK",
+            "tier": "C",
+            "topic": "kultura a výtvarná tvorba",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": true,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "VODOVOD",
+            "tier": "A",
+            "topic": "domov, stavby a sídla",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŘEZBA",
+            "tier": "B",
+            "topic": "dílna, řemesla a materiály",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          },
+          {
+            "word": "ŽVÝKAT",
+            "tier": "A",
+            "topic": "kuchyně, jídlo a stolování",
+            "sourceCohort": "approved-expansion-1143",
+            "specialistNaturalVocabulary": false,
+            "establishedBorrowedTexture": false,
+            "editorialAssessment": "Přirozené české užití; konkrétní věc, činnost nebo srozumitelný pojem. Užší odborná slova jsou označena zvlášť."
+          }
+        ]
+      },
+      "geometry": {
+        "rows": 10,
+        "cols": 10,
+        "cells": 100,
+        "wordCount": 14,
+        "fourWords": 0,
+        "minLength": 5,
+        "maxLength": 9,
+        "minPathTurns": 3,
+        "maxPathTurns": 7,
+        "maxPathStraightShare": 0.42857142857142855,
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.22508503401360544,
+        "curvyShare": 1.0,
+        "maxCurlRun": 3,
+        "curlPathCount": 12,
+        "endpointStartPairs": 0,
+        "blankComponents": 0,
+        "isolatedBlanks": 0,
+        "bboxRows": 10,
+        "bboxCols": 10
+      },
+      "pressure": {
+        "initial": 48.714,
+        "after3Median": 40.25,
+        "halfMedian": 32.321,
+        "after3Worst": 35.023,
+        "halfWorst": 21.929,
+        "orders": 7,
+        "selectionScore": 39.6176
+      }
+    }
+  ],
+  "finalProofs": [
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 57,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3463,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 47,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3319,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 66,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3446,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 70,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3707,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 52,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3312,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 69,
+      "searchNodes": 16,
+      "enumerationAndSearchNodes": 3361,
+      "forcedNodeShare": 0.8125,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 60,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3148,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    },
+    {
+      "status": "unique",
+      "solutionsLowerBound": 1,
+      "targetPathsUnique": true,
+      "candidateCount": 51,
+      "searchNodes": 15,
+      "enumerationAndSearchNodes": 3036,
+      "forcedNodeShare": 0.9333333333333333,
+      "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+      "dictionarySize": 103836
+    }
+  ],
+  "comparison": {
+    "round2": {
+      "boardCount": 12,
+      "targetOccurrences": 168,
+      "uniqueWords": 168,
+      "tiers": {
+        "B": 73,
+        "A": 24,
+        "C": 68,
+        "outside-v3": 3
+      },
+      "lengths": {
+        "5": 12,
+        "8": 60,
+        "7": 48,
+        "6": 36,
+        "9": 12
+      },
+      "newExpansionWords": 1,
+      "absentFromAllRecordedBanks": 0,
+      "geometryMedian": {
+        "meanTurns": 4.642857142857143,
+        "meanStraightShare": 0.2482568027210884,
+        "minPathTurns": 3.0
+      },
+      "pressureMedian": {
+        "initial": 60.75,
+        "after3Median": 49.9435,
+        "halfMedian": 37.107,
+        "selectionScore": 47.961650000000006
+      },
+      "pressureByBoard": {
+        "mk2-01": {
+          "initial": 58.143,
+          "after3Median": 50.159,
+          "halfMedian": 34.179,
+          "after3Worst": 39.886,
+          "halfWorst": 25.964,
+          "orders": 7,
+          "selectionScore": 46.1622
+        },
+        "mk2-02": {
+          "initial": 57.339,
+          "after3Median": 47.114,
+          "halfMedian": 42.607,
+          "after3Worst": 42.386,
+          "halfWorst": 22.786,
+          "orders": 7,
+          "selectionScore": 48.3787
+        },
+        "mk2-03": {
+          "initial": 60.429,
+          "after3Median": 48.273,
+          "halfMedian": 31.75,
+          "after3Worst": 43.364,
+          "halfWorst": 25.393,
+          "orders": 7,
+          "selectionScore": 45.3106
+        },
+        "mk2-04": {
+          "initial": 63.036,
+          "after3Median": 56.068,
+          "halfMedian": 36.857,
+          "after3Worst": 41.977,
+          "halfWorst": 27.429,
+          "orders": 7,
+          "selectionScore": 50.474
+        },
+        "mk2-05": {
+          "initial": 64.411,
+          "after3Median": 50.023,
+          "halfMedian": 33.036,
+          "after3Worst": 41.977,
+          "halfWorst": 24.429,
+          "orders": 7,
+          "selectionScore": 47.5446
+        },
+        "mk2-06": {
+          "initial": 64.107,
+          "after3Median": 54.523,
+          "halfMedian": 44.643,
+          "after3Worst": 43.182,
+          "halfWorst": 37.393,
+          "orders": 7,
+          "selectionScore": 53.4462
+        },
+        "mk2-07": {
+          "initial": 61.071,
+          "after3Median": 49.864,
+          "halfMedian": 39.214,
+          "after3Worst": 46.409,
+          "halfWorst": 34.893,
+          "orders": 7,
+          "selectionScore": 48.9661
+        },
+        "mk2-08": {
+          "initial": 57.393,
+          "after3Median": 47.386,
+          "halfMedian": 32.25,
+          "after3Worst": 38.568,
+          "halfWorst": 24.0,
+          "orders": 7,
+          "selectionScore": 44.3337
+        },
+        "mk2-09": {
+          "initial": 62.482,
+          "after3Median": 52.409,
+          "halfMedian": 39.679,
+          "after3Worst": 37.023,
+          "halfWorst": 26.393,
+          "orders": 7,
+          "selectionScore": 50.3389
+        },
+        "mk2-10": {
+          "initial": 48.946,
+          "after3Median": 45.727,
+          "halfMedian": 35.893,
+          "after3Worst": 34.864,
+          "halfWorst": 31.321,
+          "orders": 7,
+          "selectionScore": 42.7591
+        },
+        "mk2-11": {
+          "initial": 62.089,
+          "after3Median": 53.795,
+          "halfMedian": 42.286,
+          "after3Worst": 50.955,
+          "halfWorst": 35.179,
+          "orders": 7,
+          "selectionScore": 51.6796
+        },
+        "mk2-12": {
+          "initial": 59.268,
+          "after3Median": 49.341,
+          "halfMedian": 37.357,
+          "after3Worst": 41.523,
+          "halfWorst": 24.393,
+          "orders": 7,
+          "selectionScore": 47.5255
+        }
+      },
+      "humanDifficulty": "unmeasured",
+      "personalExposure": "unknown-not-inferred",
+      "weaveMedian": {
+        "crossContacts": 67.0,
+        "extraSelfContacts": 27.0,
+        "axisReentries": 1.0,
+        "interdigitatingWords": 1.0,
+        "neighborsMean": 4.0,
+        "neighborsMinimum": 2.0,
+        "minSeamCrossers": 1.0
+      },
+      "unlockMean": {
+        "crossWordPrefixPaths": 518.5,
+        "helpedOtherWordsMean": 4.494047619047619,
+        "helpedOtherWordsMinimum": 2.4166666666666665
+      }
+    },
+    "previousPreview": {
+      "boardCount": 8,
+      "targetOccurrences": 112,
+      "uniqueWords": 112,
+      "tiers": {
+        "C": 48,
+        "B": 48,
+        "A": 16
+      },
+      "lengths": {
+        "9": 8,
+        "6": 24,
+        "8": 40,
+        "5": 8,
+        "7": 32
+      },
+      "newExpansionWords": 87,
+      "absentFromAllRecordedBanks": 92,
+      "geometryMedian": {
+        "meanTurns": 4.785714285714286,
+        "meanStraightShare": 0.22529761904761905,
+        "minPathTurns": 3.0
+      },
+      "pressureMedian": {
+        "initial": 61.0715,
+        "after3Median": 52.125,
+        "halfMedian": 41.5895,
+        "selectionScore": 50.08185
+      },
+      "pressureByBoard": {
+        "mk3v3-01": {
+          "initial": 63.714,
+          "after3Median": 56.432,
+          "halfMedian": 41.25,
+          "after3Worst": 50.023,
+          "halfWorst": 27.75,
+          "orders": 7,
+          "selectionScore": 52.5438
+        },
+        "mk3v3-02": {
+          "initial": 71.875,
+          "after3Median": 58.864,
+          "halfMedian": 44.964,
+          "after3Worst": 47.341,
+          "halfWorst": 25.25,
+          "orders": 7,
+          "selectionScore": 57.2073
+        },
+        "mk3v3-03": {
+          "initial": 67.179,
+          "after3Median": 55.523,
+          "halfMedian": 42.036,
+          "after3Worst": 46.955,
+          "halfWorst": 31.286,
+          "orders": 7,
+          "selectionScore": 53.625
+        },
+        "mk3v3-04": {
+          "initial": 62.643,
+          "after3Median": 50.5,
+          "halfMedian": 41.929,
+          "after3Worst": 37.068,
+          "halfWorst": 27.214,
+          "orders": 7,
+          "selectionScore": 50.7145
+        },
+        "mk3v3-05": {
+          "initial": 59.5,
+          "after3Median": 51.295,
+          "halfMedian": 35.5,
+          "after3Worst": 38.75,
+          "halfWorst": 25.179,
+          "orders": 7,
+          "selectionScore": 47.4385
+        },
+        "mk3v3-06": {
+          "initial": 59.161,
+          "after3Median": 52.955,
+          "halfMedian": 39.536,
+          "after3Worst": 45.273,
+          "halfWorst": 28.071,
+          "orders": 7,
+          "selectionScore": 49.4492
+        },
+        "mk3v3-07": {
+          "initial": 58.286,
+          "after3Median": 47.455,
+          "halfMedian": 42.393,
+          "after3Worst": 35.659,
+          "halfWorst": 24.107,
+          "orders": 7,
+          "selectionScore": 48.6795
+        },
+        "mk3v3-08": {
+          "initial": 58.536,
+          "after3Median": 48.455,
+          "halfMedian": 38.393,
+          "after3Worst": 40.909,
+          "halfWorst": 27.821,
+          "orders": 7,
+          "selectionScore": 47.4545
+        }
+      },
+      "humanDifficulty": "unmeasured",
+      "personalExposure": "unknown-not-inferred",
+      "weaveMedian": {
+        "crossContacts": 67.5,
+        "extraSelfContacts": 26.5,
+        "axisReentries": 0.0,
+        "interdigitatingWords": 0.0,
+        "neighborsMean": 4.071428571428571,
+        "neighborsMinimum": 2.5,
+        "minSeamCrossers": 1.0
+      },
+      "unlockMean": {
+        "crossWordPrefixPaths": 576,
+        "helpedOtherWordsMean": 4.705357142857142,
+        "helpedOtherWordsMinimum": 2.5
+      }
+    },
+    "interwoven": {
+      "boardCount": 8,
+      "targetOccurrences": 112,
+      "uniqueWords": 112,
+      "tiers": {
+        "C": 48,
+        "B": 48,
+        "A": 16
+      },
+      "lengths": {
+        "8": 40,
+        "6": 24,
+        "7": 32,
+        "5": 8,
+        "9": 8
+      },
+      "newExpansionWords": 88,
+      "absentFromAllRecordedBanks": 93,
+      "geometryMedian": {
+        "meanTurns": 4.714285714285714,
+        "meanStraightShare": 0.23720238095238094,
+        "minPathTurns": 3.0
+      },
+      "pressureMedian": {
+        "initial": 57.786,
+        "after3Median": 48.284499999999994,
+        "halfMedian": 33.9645,
+        "selectionScore": 45.7378
+      },
+      "pressureByBoard": {
+        "mk3w2-01": {
+          "initial": 59.625,
+          "after3Median": 47.364,
+          "halfMedian": 32.964,
+          "after3Worst": 35.614,
+          "halfWorst": 23.179,
+          "orders": 7,
+          "selectionScore": 45.2823
+        },
+        "mk3w2-02": {
+          "initial": 56.536,
+          "after3Median": 51.727,
+          "halfMedian": 34.286,
+          "after3Worst": 36.795,
+          "halfWorst": 28.25,
+          "orders": 7,
+          "selectionScore": 46.1933
+        },
+        "mk3w2-03": {
+          "initial": 59.036,
+          "after3Median": 46.614,
+          "halfMedian": 28.536,
+          "after3Worst": 37.205,
+          "halfWorst": 25.429,
+          "orders": 7,
+          "selectionScore": 43.1094
+        },
+        "mk3w2-04": {
+          "initial": 64.768,
+          "after3Median": 53.409,
+          "halfMedian": 42.75,
+          "after3Worst": 48.977,
+          "halfWorst": 40.786,
+          "orders": 7,
+          "selectionScore": 52.5531
+        },
+        "mk3w2-05": {
+          "initial": 55.804,
+          "after3Median": 54.659,
+          "halfMedian": 33.643,
+          "after3Worst": 38.159,
+          "halfWorst": 21.0,
+          "orders": 7,
+          "selectionScore": 46.5961
+        },
+        "mk3w2-06": {
+          "initial": 59.893,
+          "after3Median": 49.205,
+          "halfMedian": 36.964,
+          "after3Worst": 47.182,
+          "halfWorst": 27.464,
+          "orders": 7,
+          "selectionScore": 47.515
+        },
+        "mk3w2-07": {
+          "initial": 52.089,
+          "after3Median": 43.045,
+          "halfMedian": 36.071,
+          "after3Worst": 38.523,
+          "halfWorst": 21.071,
+          "orders": 7,
+          "selectionScore": 42.9686
+        },
+        "mk3w2-08": {
+          "initial": 48.714,
+          "after3Median": 40.25,
+          "halfMedian": 32.321,
+          "after3Worst": 35.023,
+          "halfWorst": 21.929,
+          "orders": 7,
+          "selectionScore": 39.6176
+        }
+      },
+      "humanDifficulty": "unmeasured",
+      "personalExposure": "unknown-not-inferred",
+      "weaveMedian": {
+        "crossContacts": 76.0,
+        "extraSelfContacts": 18.0,
+        "axisReentries": 4.0,
+        "interdigitatingWords": 4.0,
+        "neighborsMean": 4.285714285714286,
+        "neighborsMinimum": 3.0,
+        "minSeamCrossers": 3.0
+      },
+      "unlockMean": {
+        "crossWordPrefixPaths": 562.75,
+        "helpedOtherWordsMean": 4.678571428571429,
+        "helpedOtherWordsMinimum": 2.75
+      }
+    }
+  },
+  "geometrySearch": {
+    "seed": 92720262,
+    "maxAttempts": 30000000,
+    "requiredPool": 32,
+    "engine": "interwoven_geometry.cpp; deterministic xorshift, bounded annealing"
+  },
+  "interpretation": "Weave and unlocking metrics are design proxies. No measured claim of player difficulty, novelty, or enjoyment. User feedback is the product basis, not new telemetry."
+}

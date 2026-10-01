@@ -1,0 +1,14 @@
+{
+  "package": "wordfreq",
+  "version": "3.1.1",
+  "sourceRuntimeSha256": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+  "thresholds": {
+    "WORDFREQ_ZIPF_THRESHOLD_DIACRITIC": 2.45,
+    "WORDFREQ_ZIPF_THRESHOLD_PLAIN": 2.85
+  },
+  "tableEntries": 606360,
+  "acceptedEntries": 94208,
+  "nonSingleTokenAlphabeticEntries": [],
+  "sha256": "bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610",
+  "scope": "All acceptable entries in the pinned cs frequency table, tested by actual runtime zipf thresholds. Not a change to runtime recognition."
+}

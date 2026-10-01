@@ -1,0 +1,101 @@
+{
+  "provenance": {
+    "source_main_sha": "6e076bccf2a89d99e003667aa2eed0f6f4e24d51",
+    "date": "2026-09-26",
+    "seeds_sha256": "0575ded2372981d0b7c34235259984e12b20b0be990d06187ff583a7d4170f38",
+    "review_sha256": "d1113708c39c416ad5a694874f7746e2e3850d0ba0b2e36b6274ba224fffcd74",
+    "legacy_v2_sha256": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a"
+  },
+  "total_original_candidates": 1143,
+  "reviewed": 156,
+  "states": {
+    "accepted": 155,
+    "pending": 987,
+    "deferred": 1
+  },
+  "accepted_for_candidate_generation": 155,
+  "production_approved": 0,
+  "accepted_breakdown": {
+    "length": {
+      "10": 5,
+      "4": 19,
+      "5": 42,
+      "6": 39,
+      "7": 28,
+      "8": 12,
+      "9": 10
+    },
+    "tier": {
+      "A": 93,
+      "B": 53,
+      "C": 9
+    },
+    "pos": {
+      "adjective": 12,
+      "noun": 131,
+      "verb": 12
+    },
+    "topic": {
+      "Hry a pohádky": 11,
+      "Pohyb a činnosti": 12,
+      "Vlastnosti a vjemy": 12,
+      "cesty_a_pohyb": 27,
+      "dům_a_dílna": 15,
+      "jídlo_a_zahrada": 16,
+      "kuchyně_a_stolování": 19,
+      "příroda_a_zvířata": 31,
+      "Škola, papír a tvoření": 12
+    }
+  },
+  "length_tier": {
+    "4": {
+      "A": 13,
+      "B": 3,
+      "C": 3,
+      "D": 0
+    },
+    "5": {
+      "A": 28,
+      "B": 13,
+      "C": 1,
+      "D": 0
+    },
+    "6": {
+      "A": 25,
+      "B": 13,
+      "C": 1,
+      "D": 0
+    },
+    "7": {
+      "A": 15,
+      "B": 12,
+      "C": 1,
+      "D": 0
+    },
+    "8": {
+      "A": 5,
+      "B": 6,
+      "C": 1,
+      "D": 0
+    },
+    "9": {
+      "A": 6,
+      "B": 3,
+      "C": 1,
+      "D": 0
+    },
+    "10": {
+      "A": 1,
+      "B": 3,
+      "C": 1,
+      "D": 0
+    }
+  },
+  "scope": "Capacity of the new individually reviewed additions only; legacy v2 is not re-certified.",
+  "limitations": [
+    "A dictionary headword is not a measurement of fun or familiarity.",
+    "Pending entries are unreviewed, not linguistically rejected.",
+    "Deferred source access does not prove invalid Czech.",
+    "No production recognizer, bank, generation ID or player data is modified."
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "asOf": "2026-09-26",
+  "newApproved": {
+    "total": 155,
+    "byLength": {
+      "4": 19,
+      "5": 42,
+      "6": 39,
+      "7": 28,
+      "8": 12,
+      "9": 10,
+      "10": 5
+    },
+    "byTier": {
+      "A": 93,
+      "B": 53,
+      "C": 9
+    },
+    "byTopic": {
+      "Hry a pohádky": 11,
+      "Pohyb a činnosti": 12,
+      "Vlastnosti a vjemy": 12,
+      "cesty_a_pohyb": 27,
+      "dům_a_dílna": 15,
+      "jídlo_a_zahrada": 16,
+      "kuchyně_a_stolování": 19,
+      "příroda_a_zvířata": 31,
+      "Škola, papír a tvoření": 12
+    }
+  },
+  "round3Eligible": {
+    "total": 1296,
+    "byLength": {
+      "5": 454,
+      "6": 388,
+      "7": 249,
+      "8": 140,
+      "9": 65
+    },
+    "byTier": {
+      "A": 454,
+      "B": 528,
+      "C": 314
+    },
+    "byTopic": {
+      "Hry a pohádky": 9,
+      "Pohyb a činnosti": 12,
+      "Vlastnosti a vjemy": 11,
+      "abstract/intellectual/fun D": 17,
+      "animals": 70,
+      "birds/reptiles": 32,
+      "cesty_a_pohyb": 24,
+      "culture/art/language": 40,
+      "dům_a_dílna": 11,
+      "fantasy/history/adventure": 56,
+      "jídlo_a_zahrada": 12,
+      "kuchyně_a_stolování": 17,
+      "nature/earth": 50,
+      "objects/food/everyday fun": 53,
+      "people/everyday/world": 762,
+      "příroda_a_zvířata": 26,
+      "science/technology": 11,
+      "space/science": 45,
+      "space/science/future": 1,
+      "tech/game/modern": 28,
+      "Škola, papír a tvoření": 9
+    }
+  },
+  "round3EligibleOutsidePlaytests": {
+    "total": 1038,
+    "byLength": {
+      "5": 432,
+      "6": 327,
+      "7": 177,
+      "8": 56,
+      "9": 46
+    },
+    "byTier": {
+      "A": 421,
+      "B": 415,
+      "C": 202
+    },
+    "byTopic": {
+      "Hry a pohádky": 9,
+      "Pohyb a činnosti": 12,
+      "Vlastnosti a vjemy": 11,
+      "abstract/intellectual/fun D": 10,
+      "animals": 54,
+      "birds/reptiles": 19,
+      "cesty_a_pohyb": 24,
+      "culture/art/language": 21,
+      "dům_a_dílna": 11,
+      "fantasy/history/adventure": 43,
+      "jídlo_a_zahrada": 12,
+      "kuchyně_a_stolování": 17,
+      "nature/earth": 37,
+      "objects/food/everyday fun": 35,
+      "people/everyday/world": 638,
+      "příroda_a_zvířata": 26,
+      "science/technology": 8,
+      "space/science": 25,
+      "tech/game/modern": 17,
+      "Škola, papír a tvoření": 9
+    }
+  },
+  "historyBoards": 2611,
+  "personalExposure": "unknown-not-inferred",
+  "historySources": [
+    "public/puzzles.json",
+    "data/puzzles.json",
+    "data/rolling_content_v1.json",
+    "data/tajenka_weekend_v1.json",
+    "data/tajenka_weekend_v2.json",
+    "data/playtests/mozkokalypsa-v1.json",
+    "data/playtests/mozkokalypsa-v2.json",
+    "data/legacy_daily_gen1.json",
+    "data/legacy_daily_gen2.json"
+  ],
+  "inventoryStatusCounts": {
+    "released-or-available": 2879,
+    "reserved-future": 737,
+    "retired-snapshot-not-personal-exposure": 731,
+    "retired-snapshot-date-unresolved": 10
+  }
+}
