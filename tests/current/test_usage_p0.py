@@ -57,7 +57,7 @@ assert rpc_calls == [("proplet_account_snapshot_v1", {
     "p_since": "2026-09-28T13:00:00+02:00",
     "p_active_generation": 4,
     "p_base_levels": {"easy": 200, "hardcore": 200},
-    "p_mozkomor_unlock_base": 200,
+    "p_mozkomor_unlock_base": 0,
 })]
 
 

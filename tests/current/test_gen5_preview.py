@@ -42,7 +42,7 @@ class Gen5PreviewTests(unittest.TestCase):
         for d in DIFFICULTIES:
             history=[p for p in source['free'][d] if not p['id'].startswith('g5-r1-')]+rolling['puzzles'].get(d,[])
             self.assertEqual(preview['free'][d][:len(history)],history,d)
-        for key in source.keys()-{'free','freeLevelsPerDifficulty','freeLevelCounts','release'}:
+        for key in source.keys()-{'free','freeLevelsPerDifficulty','freeLevelCounts','release','mozkokalypsaRelease','mozkomorUnlock'}:
             self.assertEqual(preview[key],source[key],key)
 
     def test_all_450_new_boards_are_ordered_and_keep_progress_generation(self):
@@ -69,11 +69,11 @@ class Gen5PreviewTests(unittest.TestCase):
         self.assertEqual(response.headers['cache-control'],'no-store')
         data=response.json()
         self.assertEqual({d:len(bs) for d,bs in data['free'].items()},
-                         {'easy':317,'medium':316,'hard':316,'hardcore':316,'mozkomor':150})
+                         {'easy':317,'medium':316,'hard':316,'hardcore':316,'mozkomor':150,'mozkokalypsa':0})
         self.assertEqual(len({b['id'] for bs in data['free'].values() for b in bs}),1415)
         self.assertEqual(delta.status_code,200)
         self.assertTrue(all(not bs for bs in delta.json()['puzzles'].values()))
-        self.assertEqual(data['contentStatus']['availableFreeCounts'],data['freeLevelCounts'])
+        self.assertEqual(data['contentStatus']['availableFreeCounts'],{**data['freeLevelCounts'],'mozkokalypsa':0})
 
     def test_preview_results_and_other_mutations_never_reach_database(self):
         with patch.object(server,'db_request',side_effect=AssertionError('Preview reached DB')):

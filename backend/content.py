@@ -189,10 +189,9 @@ def competition_ranks(rows: list[dict]) -> list[int]:
     return ranks
 
 
-def mozkomor_unlocked_from_rows(rows: list[dict], slots: dict, required: int = 200) -> bool:
-    if any(row.get("mode") == "free" and row.get("difficulty") == "mozkomor" for row in rows):
-        return True
-    return int((slots.get("current") or {}).get("hardcore") or 0) >= required
+def mozkomor_unlocked_from_rows(rows: list[dict], slots: dict, required: int = 0) -> bool:
+    """Retain the old projection signature; difficulty gates have been removed."""
+    return True
 
 
 def challenge_key(mode: str, puzzle_id: str, daily_date: Optional[str] = None) -> str:

@@ -13,7 +13,8 @@
 
     const version=document.createElement('small');
     version.className='app-version footer-version';
-    version.textContent='Proplet v5.0.0';
+    version.id='appVersionFooter';
+    version.textContent=`Proplet v${window.PROPLET_RUNTIME_META?.version||window.PROPLET_VERSION}`;
 
     const links=document.createElement('small');
     links.className='footer-links';

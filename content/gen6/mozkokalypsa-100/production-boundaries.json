@@ -1,0 +1,18 @@
+{
+  "sourceSha": "174e0fa2a3e8befd0fe01ac8ba7771f4ece25558",
+  "free": {
+    "easy": "47d4fc9843273f8cde30794427a93fc189f998a267d074b805f1a875f69d9483",
+    "medium": "a58f6368b0a16818da655d2ad52d2fadce93deaa2a4bec33dbdd8a75e6ed2243",
+    "hard": "ebf68c2b525ec0e9ec896b5580b8be60b2f059339155ef6e3b9b6a92a99b8de6",
+    "hardcore": "29ea1051a0006c9e87930110ab90e65a5d24632d25c7fbd3c6f741d9d973b1eb",
+    "mozkomor": "8faefbe111af3120760bfee88691bd6f1f8c3fd5d17ec21870808cbcf246529c"
+  },
+  "preserved": {
+    "daily": "a750109dc89b6656917f1a83c42d0c308b4bb8e5aaffe93b7f2b29b40a54edc4",
+    "legacyFree": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "previousDaily": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "legacyDaily": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "rescue": "282cbeaed79f68af922f8dde76a8712249c0a417799fb96d5c73efa7dc27e00a",
+    "release": "c011e61573a8a219ea54d128ba506f1ad0203ea175ca08dac2da1f7bd59b7e1d"
+  }
+}

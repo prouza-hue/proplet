@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import sys
-from fastapi import HTTPException
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -40,7 +39,8 @@ assert notes.count("Jdu hrát") == 1
 assert "release-notes-v3331-art" in notes
 assert all(token in css for token in ("tile-p", "feature-tajenka", "feature-mozkomor", "feature-xp"))
 
-# Final bank is bound unchanged and exposes the approved 200/200 unlock contract.
+# The released bank and its historical metadata remain unchanged. Availability
+# policy now belongs to the current runtime, not the frozen release artifact.
 for payload in (puzzles, public_puzzles):
     assert len(payload["free"]["mozkomor"]) == 150
     bank = payload["free"]["mozkomor"][:100]
@@ -49,26 +49,27 @@ for payload in (puzzles, public_puzzles):
     assert all(p["difficulty"] == "mozkomor" for p in bank)
     assert all(int(p["meta"]["targetCooldown"]) == 8 for p in bank)
     assert payload["mozkomorUnlock"] == {
-        "requiresDifficulty": "hardcore",
-        "requiresCurrentBaseLevels": 200,
-        "persistentOnceEarned": True,
+        "requiresDifficulty": None,
+        "requiresCurrentBaseLevels": 0,
+        "persistentOnceEarned": False,
         "levels": 150,
         "xpPerFirstCompletion": 150,
     }
 
-# Hrát shows a gated fifth card, while the four existing cards never regain the old X z 200 eyebrow.
+# Every Hrát card offers play immediately and retains completion history.
 assert "mozkomor:{label:'Mozkomor'" in app
 assert "xp:150" in app
-assert "const MOZKOMOR_UNLOCK_BASE=200" in app
-assert "a vypusť Mozkomora" in app
-assert "${unlock.done} / ${unlock.required} dokončeno" in app
-assert 'class="cp-lock-message"' in app
-assert 'aria-label="Dokončení Mozkožroutů"' in app
+assert "MOZKOMOR_UNLOCK_BASE" not in app
+assert "a vypusť Mozkomora" not in app
+assert "${unlock.done} / ${unlock.required} dokončeno" not in app
+assert 'class="cp-lock-message"' not in app
+assert 'data-play-free="${key}"' in app
 assert "ÚROVEŇ ${nextLevel||1} Z ${total}" not in app
 
-# Dnes never exposes Mozkomor, including quick play, resume, or local recent history.
-assert "key!=='mozkomor'||mozkomorUnlockState().unlocked" in app
-assert "['easy','medium','hard','hardcore','mozkomor'].filter(todayDifficultyVisible)" in home
+# Dnes exposes every registered difficulty, including resume and history.
+assert "mozkomorUnlockState" not in app
+assert "Object.keys(DIFF).filter(todayDifficultyVisible)" in home
+assert "return !!DIFF[key]" in home
 assert "r?.mode==='free'&&todayDifficultyVisible(r.difficulty)" in home
 
 # QA bypass is preview-only, excludes known production aliases, and never syncs test runs.
@@ -84,25 +85,19 @@ assert "MOZKOMOR_QA_PARAM==='final'" in app
 assert "MOZKOMOR_QA_PARAM==='unlocked'" not in app
 assert app.count("isMozkomorQaDifficulty(") >= 5
 
-# Server-authoritative gate and persistent unlock semantics.
-assert server.FREE_DIFFICULTIES == ("easy", "medium", "hard", "hardcore", "mozkomor")
+# Server has no completion prerequisites; old projection fields stay compatible.
+assert server.FREE_DIFFICULTIES == ("easy", "medium", "hard", "hardcore", "mozkomor", "mozkokalypsa")
 assert server.POINTS["mozkomor"] == 150
-assert server.MOZKOMOR_UNLOCK_BASE_LEVELS == 200
+assert server.MOZKOMOR_UNLOCK_BASE_LEVELS == 0
 empty = {key: 0 for key in server.FREE_DIFFICULTIES}
 summary = {"current": {**empty, "hardcore": 199}}
-assert server.mozkomor_unlocked_from_rows([], summary) is False
-try:
-    server.enforce_mozkomor_unlock([], summary)
-    raise AssertionError("locked Mozkomor must return HTTP 403")
-except HTTPException as exc:
-    assert exc.status_code == 403
+assert server.mozkomor_unlocked_from_rows([], summary) is True
 summary["current"]["hardcore"] = 200
 assert server.mozkomor_unlocked_from_rows([], summary) is True
-server.enforce_mozkomor_unlock([], summary)
 assert server.mozkomor_unlocked_from_rows([{"mode": "free", "difficulty": "mozkomor"}], {"baseCurrent": empty}) is True
 assert '"freeBasePlayedCurrent": free_slots["baseCurrent"]' in server_source
-assert 'if payload.difficulty == "mozkomor":' in server_source
-assert "enforce_mozkomor_unlock(unlock_rows)" in server_source
+assert "enforce_mozkomor_unlock" not in server_source
+assert "Mozkomora nejprve odemkni" not in server_source
 
 # Migration is prepared for release but this test does not execute it.
 for table in ("results", "puzzle_attempts", "free_slot_rewards"):

@@ -362,9 +362,9 @@ def validate_manifest(
                 unlock = mozkomor.get("unlock") or {}
                 runtime_unlock = source.get("mozkomorUnlock") or {}
                 if (
-                    unlock.get("difficulty") != runtime_unlock.get("requiresDifficulty")
-                    or int(unlock.get("baseLevels") or 0)
-                    != int(runtime_unlock.get("requiresCurrentBaseLevels") or 0)
+                    runtime_unlock.get("requiresDifficulty") is not None
+                    or int(runtime_unlock.get("requiresCurrentBaseLevels") or 0) != 0
+                    or runtime_unlock.get("persistentOnceEarned") is not False
                     or len(runtime_puzzles) != int(runtime_unlock.get("levels") or 0)
                     or len(runtime_puzzles) != int(manifest.generation.get("mozkomorLevels") or 0)
                 ):

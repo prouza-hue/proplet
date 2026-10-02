@@ -16,8 +16,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 EXPECTED_FILES = {
-    "data/puzzles.json": (3750888, "72471265bfb9c1047710172cb1377a31eb6aa9e1c08c4969ee0b556551e014c0"),
-    "public/puzzles.json": (3752427, "57a5ea6e3e69e01f2093e0225f763a75e47734a6815f097fcdc7da47d63e8173"),
+    "data/puzzles.json": (3983660, "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937"),
+    "public/puzzles.json": (3985199, "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e"),
     "data/archive/v3.33.5/puzzles.json.gz": (719_689, "b1754c1714827654cf308c3e4042fda119396fba2ebdb3439ca68c9bc670e5d0"),
     "data/words.txt": (112_068, "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423"),
     "public/valid-words-v3328.txt": (112_068, "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423"),

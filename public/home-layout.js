@@ -75,7 +75,7 @@
   }
 
   function todayDifficultyVisible(key){
-    return !!DIFF[key]&&(key!=='mozkomor'||mozkomorUnlockState().unlocked);
+    return !!DIFF[key];
   }
 
   function freeHistory(){
@@ -96,7 +96,7 @@
   }
 
   function difficultyTiles(){
-    return ['easy','medium','hard','hardcore','mozkomor'].filter(todayDifficultyVisible).map(key=>[key,DIFF[key]]).map(([key,info])=>{
+    return Object.keys(DIFF).filter(todayDifficultyVisible).map(key=>[key,DIFF[key]]).map(([key,info])=>{
       const q=freeProgress(key),pct=Number.isFinite(q.pct)?q.pct:0,action=q.resume?'Pokračovat':q.done>=q.total&&q.total?'Zahrát znovu':'Hrát';
       return `<button class="today-card ${key}" type="button" data-home-free="${key}" data-diff="${key}" aria-label="${action}: ${htmlEsc(info.label)}, ${q.done} z ${q.total} dokončeno, +${info.xp} XP za novou úroveň">${difficultyIconMarkup(key,'today-art')}<span class="today-title"><strong>${htmlEsc(info.label)}</strong><span class="today-xp">+${info.xp} XP</span></span><span class="today-progress"><span class="today-count"><b>${q.done}</b> / ${q.total}</span><span class="today-track" aria-hidden="true"><span style="width:${pct}%"></span></span></span><span class="today-action">${action} <span class="today-arrow" aria-hidden="true">→</span></span></button>`;
     }).join('');

@@ -119,14 +119,14 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   await scenario('manual-account-and-sync',async page=>{
    await firstWin(page);await page.locator('#firstStepsManual').click();await eventOnce('first_steps_v1_manual');await page.locator('#playerNameInput').fill('New Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
-   assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await assertAccountFlow('manual');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
+   assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);await assertAccountFlow('manual');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#mk100LaunchPreview:not(.hidden)').count(),0);
    await page.getByRole('button',{name:'Hrát další Proplet',exact:true}).click();await page.waitForFunction(()=>currentGame?.mode==='free'&&!currentGame.finished);await eventOnce('first_steps_v1_continue');assert.equal((await events()).find(e=>e.event==='first_steps_v1_continue').headers['x-proplet-onboarding'],'board-v3-short');
   });
   await scenario('google-direct-round-trip',async page=>{
    await firstWin(page);await page.locator('#firstStepsGoogle').click();await eventOnce('first_steps_v1_google');
    await page.getByText('Postup je uložený v účtu. Můžeš hrát dál.',{exact:true}).waitFor({state:'visible',timeout:20000});
    assert.equal(await page.locator('#profileModal').isVisible(),false);assert.equal(await page.evaluate(()=>getQueue().length),0);
-   assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await assertAccountFlow('google');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#contentReleaseModal[open]').count(),0);
+   assert((await recording()).requests.some(r=>r.path==='/api/auth/google/start'));await assertAccountFlow('google');assert.equal(await page.locator('#rankingPrivacyModal').isVisible(),false);assert.equal(await page.locator('#mk100LaunchPreview:not(.hidden)').count(),0);
    assert.equal(await page.locator('#installNudgeModal').isVisible(),false);
   });
   await scenario('google-cancel-return',async page=>{

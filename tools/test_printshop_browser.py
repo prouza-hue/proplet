@@ -34,6 +34,7 @@ def settle_returning_player(page):
         sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
       }catch(e){}
       try{if(typeof closeOnboarding==='function')closeOnboarding(true)}catch(e){}
+      window.PropletContentRelease?.close();
       document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
       document.querySelector('.release-notes-v3331-backdrop')?.remove();
       document.body.classList.remove('release-notes-v3331-open');
@@ -58,6 +59,7 @@ with sync_playwright() as p:
             localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
             sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
             localStorage.setItem('proplet:content-release:g5-r1','1');
+            localStorage.setItem('proplet:content-release:mk100-v2','1');
           }catch(e){}
         })()""")
         page=ctx.new_page(); errors=[]
@@ -68,6 +70,8 @@ with sync_playwright() as p:
         # populated difficulty grid means bottom-nav listeners are attached.
         page.wait_for_function("()=>typeof startGame==='function' && !!puzzleDB?.free?.medium?.[0] && document.querySelectorAll('#difficultyCards [data-play-free]').length>=4",timeout=15000)
         settle_returning_player(page)
+        consent=page.get_by_role('button',name='Ne, díky',exact=True)
+        if consent.is_visible(): consent.click()
         page.wait_for_timeout(250)
 
         base=page.evaluate("""()=>({
@@ -120,7 +124,7 @@ with sync_playwright() as p:
           mozkomorCounter:!!document.querySelector('[data-diff="mozkomor"] [role="progressbar"][aria-valuemax="200"]'),
           oldLockNote:!!document.querySelector('.mozkomor-lock-note'),
         })""")
-        assert not free['calmQuick'] and free['cards']>=4 and free['mozkomorCopy'] and free['mozkomorCounter'] and not free['oldLockNote'],free
+        assert not free['calmQuick'] and free['cards']==6 and not free['mozkomorCopy'] and not free['mozkomorCounter'] and not free['oldLockNote'],free
 
         page.evaluate("()=>startGame(puzzleDB.free.medium[0],'free')")
         page.wait_for_function("()=>document.body.classList.contains('playing') && document.querySelectorAll('#board .cell').length>0",timeout=8000)

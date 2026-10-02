@@ -36,7 +36,7 @@ function create(deps={}){
     return touchCapable&&width<=1280;
   }
 
-  function magnifierAvailable(game=getGame()){return !!game&&!game.finished&&['hard','hardcore','mozkomor'].includes(game.puzzle?.difficulty)&&magnifierDeviceSupported()}
+  function magnifierAvailable(game=getGame()){return !!game&&!game.finished&&['hard','hardcore','mozkomor','mozkokalypsa'].includes(game.puzzle?.difficulty)&&magnifierDeviceSupported()}
   function magnifierEnabled(game=getGame()){return magnifierAvailable(game)&&getSettings().magnifier!==false}
 
   function ensureMagnifier(){

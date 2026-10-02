@@ -7,7 +7,7 @@ const {execFileSync}=require('node:child_process');
  const c=await b.newContext({viewport:{width:1440,height:1000}}),p=await c.newPage();
  // Match the committed slot-3 Tajenka fixture without changing running timers.
  await p.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
- await c.addInitScript(()=>localStorage.setItem('proplet:content-release:g5-r1','1'));
+ await c.addInitScript(()=>{localStorage.setItem('proplet:content-release:g5-r1','1');localStorage.setItem('proplet:content-release:mk100-v2','1')});
  const url=process.env.TEST_URL||'http://127.0.0.1:8765';
  assert(['127.0.0.1','localhost','[::1]'].includes(new URL(url).hostname),'use an isolated loopback fixture server');
  const repo=path.resolve(__dirname,'..');
