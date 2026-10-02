@@ -22,7 +22,8 @@
     {"today": "2026-08-30", "dates": [], "current": 0, "longest": 0}
   ],
   "unlock": [
-    {"rows": [], "currentHardcore": 199, "expected": false},
+    {"rows": [], "currentHardcore": 0, "expected": true},
+    {"rows": [], "currentHardcore": 199, "expected": true},
     {"rows": [], "currentHardcore": 200, "expected": true},
     {"rows": [{"mode": "free", "difficulty": "mozkomor"}], "currentHardcore": 0, "expected": true}
   ],

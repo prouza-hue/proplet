@@ -341,6 +341,12 @@ with (
     for fixture in (config_fixture, health_fixture):
         if isinstance(fixture, dict) and "version" in fixture:
             fixture["version"] = "4.01.40"
+    # The new edition adds its own counts/XP and intentionally removes gating.
+    assert config_fixture['points'].pop('mozkokalypsa') == 200
+    assert health_fixture['freeXp'].pop('mozkokalypsa') == 200
+    assert health_fixture['freeBaseLevelCounts'].pop('mozkokalypsa') == 100
+    assert health_fixture['mozkomorUnlock']['requiresCurrentBaseLevels'] == 0
+    health_fixture['mozkomorUnlock'].update(requiresDifficulty='hardcore', requiresCurrentBaseLevels=200, persistentOnceEarned=True)
     response_fixtures = json.dumps(
         {
             "config": config_fixture,

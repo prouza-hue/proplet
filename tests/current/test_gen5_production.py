@@ -25,12 +25,13 @@ assert hashlib.sha256((ROOT/'data/rolling_content_v1.json').read_bytes()).hexdig
 assert data['freeGeneration']==data['contentGeneration']==4
 assert data['release']['productionApproved'] and not data['release']['previewOnly']
 assert data['release']['totalNewLevels']==450
-assert data['mozkomorUnlock']['requiresCurrentBaseLevels']==200
+assert data['mozkomorUnlock']['requiresCurrentBaseLevels']==0
 assert data['mozkomorUnlock']['levels']==150
 new_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'] if p['id'].startswith('g5-r1-')]
 assert server.free_slot_summary(new_hardcore)['current']['hardcore']==100
 assert server.free_slot_summary(new_hardcore)['baseCurrent']['hardcore']==0
-assert not server.mozkomor_unlocked_from_rows(new_hardcore)
+assert server.mozkomor_unlocked_from_rows(new_hardcore)
+assert server.mozkomor_unlocked_from_rows([])
 old_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'][:200]]
 assert server.mozkomor_unlocked_from_rows(old_hardcore)
 for d in DIFFICULTIES:

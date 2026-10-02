@@ -30,13 +30,15 @@ const context = {
     hardcore: {xp: 100}, mozkomor: {xp: 150},
   },
   TAJENKA_REWARD_XP: 200,
-  MOZKOMOR_UNLOCK_BASE: 200,
-  MOZKOMOR_QA_PREVIEW: false,
-  MOZKOMOR_UNLOCK_KEY: 'golden-unlock',
   testToday: '2026-08-30',
   testTajenkaCompleted: false,
   testSlots: {actual: new Set()},
   testRemote: {},
+  started: null,
+  allowAccountGameStart() { return true; },
+  freeOrder() { return {enabled: () => false}; },
+  freeProgress(difficulty) { return {list: [{id: difficulty + '-1', difficulty}]}; },
+  startGame(puzzle, mode) { context.started = {difficulty: puzzle.difficulty, mode}; },
   puzzleDB: null,
   pragueDateISO() { return context.testToday; },
   tajenkaCompletion() { return context.testTajenkaCompleted; },
@@ -59,10 +61,9 @@ const runtimeFunctions = [
   between('streakEndingOn', 'localRescueStatus'),
   between('calcStreak', 'calcLongest'),
   between('calcLongest', 'levelFor'),
-  between('localMozkomorBaseDone', 'mozkomorUnlockState'),
-  between('mozkomorUnlockState', 'renderQuickPlay'),
+  appSource.slice(appSource.indexOf('async function startFree('), appSource.indexOf('function showStarterDailyNudge(')),
 ].join('\n');
-vm.runInContext(`${runtimeFunctions}\nthis.runtime = {resultRankTuple, freePuzzleSlot, challengeKey, pointsFor, streakEndingOn, calcStreak, calcLongest, mozkomorUnlockState};`, context);
+vm.runInContext(`${runtimeFunctions}\nthis.runtime = {resultRankTuple, freePuzzleSlot, challengeKey, pointsFor, streakEndingOn, calcStreak, calcLongest, startFree};`, context);
 const runtime = context.runtime;
 const progression=require(path.join(root,'public/app/content/progression.js')).create({
   getPuzzleDB:()=>context.puzzleDB,
@@ -103,7 +104,10 @@ for (const vector of fixture.unlock) {
     mozkomorUnlocked: vector.rows.some(row => row.mode === 'free' && row.difficulty === 'mozkomor'),
   };
   context.testSlots = {actual: new Set()};
-  assert.equal(runtime.mozkomorUnlockState().unlocked, vector.expected);
+  context.started = null;
+  runtime.startFree('mozkomor');
+  assert.equal(context.started?.difficulty === 'mozkomor', vector.expected);
+  assert.equal(context.started?.mode, 'free');
 }
 
 assert.deepEqual(

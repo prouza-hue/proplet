@@ -41,7 +41,9 @@ empty = calculate_stats(
     [], today=TODAY, free_slots=slots(), badges=server.BADGES,
     free_difficulties=DIFFICULTIES,
 )
-assert digest(empty) == "9a9c622c72a080758b211d6f6e2734572e1eb0d6a059aaa29da95a8e96f5ed69"
+assert empty["mozkomorUnlocked"] is True
+# The removed gate is the only intentional delta from the old full stats vector.
+assert digest({**empty, "mozkomorUnlocked": False}) == "9a9c622c72a080758b211d6f6e2734572e1eb0d6a059aaa29da95a8e96f5ed69"
 
 
 # Account profile fixture covers Daily, every Free compatibility difficulty,
@@ -132,7 +134,7 @@ with (
 ):
     projected = server.player_stats("p1")
 
-assert events == ["results", "repair-plan", "slots:0", "rewards", "rescue", "clock", "mozko:0"]
+assert events == ["results", "repair-plan", "slots:0", "rewards", "rescue", "clock"]
 assert repair_rows[0]["points"] == 0
 assert projected["resultXp"] == 0 and projected["gen4RewardRepairXp"] == 0
 
@@ -198,7 +200,7 @@ with (
 
 assert adapter_events == [
     "select:results", "repair-plan", "slots", "select:account_rewards",
-    "select:streak_rescues", "clock", "mozko",
+    "select:streak_rescues", "clock",
 ]
 assert [warning[0] for warning in warnings] == [
     "Ignoring malformed daily_date for result %s: %r",

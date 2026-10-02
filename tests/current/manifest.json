@@ -464,6 +464,14 @@
       {
         "path": "tests/current/test_usage_p1_client.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_mk100_production.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_mk100_launch.js",
+        "runner": "node"
       }
     ]
   },
