@@ -230,6 +230,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_content_launch_push.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_tajenka_weekly_availability.py",
         "runner": "python"
       },
