@@ -13,7 +13,7 @@ theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.04.0"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 assert "version:'4.04.0'" in runtime
-assert "proplet-v4.04.0-mozkokalypsa1" in sw
+assert "proplet-v4.04.0-mozkokalypsa2" in sw
 assert 'theme-init.js?v=mk100' in html and 'theme-init.js?v=mk100' in sw
 assert "app-profile-settings.css?v=privacyflow1" in theme
 
