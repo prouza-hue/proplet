@@ -1,0 +1,177 @@
+{
+  "date": "2026-10-02",
+  "status": "online-preview-verified",
+  "branch": "work/free-refresh-300-20261002",
+  "verifiedProductionMain": "8daff27ecfe5598b32aacde158f7c72cbee165dc",
+  "productionChanged": false,
+  "databaseWritesPerformed": false,
+  "gameSourceCommit": "719b8a1383fe71be369a4fe531bdc3d90be1bad2",
+  "verificationCommit": "c8c9db2e77c1d8cd72c8bf9e7582122c6dd344ef",
+  "verifiedDeploymentId": "dpl_AUvsjNNcBGc3Hs8GdLU3CQhubuSD",
+  "verifiedPublicUrl": "https://proplet-c09tq18ls-pavel-prouzas-projects.vercel.app/",
+  "bankContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+  "bankFileSha256": "55cae68a3cbf12d2b9813ba62d22c70dedd15471869a6aa2646910922a55147f",
+  "counts": {
+    "easy": 100,
+    "medium": 100,
+    "hard": 100
+  },
+  "browserVerification": {
+    "checks": [
+      {
+        "name": "native startup and 300 catalog entries",
+        "pass": true
+      },
+      {
+        "name": "route version comes from manifest",
+        "pass": true
+      },
+      {
+        "name": "prior release does not obscure proposed CTA",
+        "pass": true
+      },
+      {
+        "name": "CTA reaches native difficulty selection",
+        "pass": true
+      },
+      {
+        "name": "all 300 boards render through native game",
+        "pass": true
+      },
+      {
+        "name": "shared route starts easy",
+        "pass": true
+      },
+      {
+        "name": "native pointer input recognizes target",
+        "pass": true
+      },
+      {
+        "name": "resume keeps found word and stable ID",
+        "pass": true
+      },
+      {
+        "name": "native completion preserves identity and XP easy",
+        "pass": true
+      },
+      {
+        "name": "native next action follows shared route easy",
+        "pass": true
+      },
+      {
+        "name": "shared route starts medium",
+        "pass": true
+      },
+      {
+        "name": "native completion preserves identity and XP medium",
+        "pass": true
+      },
+      {
+        "name": "native next action follows shared route medium",
+        "pass": true
+      },
+      {
+        "name": "shared route starts hard",
+        "pass": true
+      },
+      {
+        "name": "native completion preserves identity and XP hard",
+        "pass": true
+      },
+      {
+        "name": "native next action follows shared route hard",
+        "pass": true
+      },
+      {
+        "name": "replay does not duplicate XP or first result",
+        "pass": true
+      },
+      {
+        "name": "numeric option and shared default preserve existing results",
+        "pass": true
+      },
+      {
+        "name": "old unfinished game takes priority over new release",
+        "pass": true
+      },
+      {
+        "name": "proposed announcement opens manually",
+        "pass": true
+      },
+      {
+        "name": "today no horizontal overflow 320",
+        "pass": true
+      },
+      {
+        "name": "hub no horizontal overflow 320",
+        "pass": true
+      },
+      {
+        "name": "announcement fits viewport 320",
+        "pass": true
+      },
+      {
+        "name": "today no horizontal overflow 390",
+        "pass": true
+      },
+      {
+        "name": "hub no horizontal overflow 390",
+        "pass": true
+      },
+      {
+        "name": "announcement fits viewport 390",
+        "pass": true
+      },
+      {
+        "name": "onboarding starts original 9-cell training control_e001",
+        "pass": true
+      },
+      {
+        "name": "first-board AB identity preserved control_e001",
+        "pass": true
+      },
+      {
+        "name": "onboarding starts original 9-cell training challenger_e009",
+        "pass": true
+      },
+      {
+        "name": "first-board AB identity preserved challenger_e009",
+        "pass": true
+      },
+      {
+        "name": "no external or API request reaches network",
+        "pass": true
+      },
+      {
+        "name": "no console, page or HTTP errors",
+        "pass": true
+      }
+    ],
+    "errors": [],
+    "coverage": 300,
+    "bankHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e"
+  },
+  "workflowRun": {
+    "id": 37018077342,
+    "url": "https://github.com/prouza-hue/proplet/actions/runs/37018077342",
+    "conclusion": "success",
+    "artifactId": 11232405547
+  },
+  "liveBrowserChecks": {
+    "publicWithoutLogin": true,
+    "nativePointerRecognizedSnit": true,
+    "resumePreservesFoundWord": true,
+    "catalogButtons": 300,
+    "guideAvailable": true
+  },
+  "isolation": {
+    "staticBuildsOnly": true,
+    "realApiConfigStatus": 404,
+    "connectSrc": "none",
+    "progress": "namespaced local browser storage",
+    "serverResults": false
+  },
+  "humanPlaytestAllBoards": false,
+  "productionBoardApproval": false,
+  "nextStage": "Review these boards and proposed copy/order; implement the production varied-play settings and migration separately. Do not merge this static preview branch into main."
+}
