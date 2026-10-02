@@ -1,0 +1,59 @@
+/* Mozkokalypsa: an ochre sixth difficulty within the native paper palette.
+   Load after compact-difficulties.css. This file does not enable the edition. */
+:root {
+  --mk-series-accent: #806018;
+  --mk-series-soft: #f3e8ca;
+  --mk-series-on-accent: #fff9ec;
+}
+
+html[data-theme="dark"] {
+  --mk-series-accent: #e0bd63;
+  --mk-series-soft: #433a26;
+  --mk-series-on-accent: #292313;
+}
+
+.cp-card[data-diff="mozkokalypsa"],
+.today-card.mozkokalypsa,
+html[data-theme="light"] .today-card.mozkokalypsa {
+  --accent: var(--mk-series-accent);
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-play {
+  background: var(--mk-series-accent);
+  color: var(--mk-series-on-accent);
+  line-height: 1.35;
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-xp,
+html[data-theme="dark"] .cp-card[data-diff="mozkokalypsa"] .cp-xp {
+  color: var(--mk-series-accent);
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-history {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.cp-card[data-diff="mozkokalypsa"] .cp-top h2 {
+  line-height: 1.2;
+}
+
+/* Support the older native quick-card surface without changing other levels. */
+.quick-game[data-diff="mozkokalypsa"],
+.difficulty-card[data-diff="mozkokalypsa"] {
+  --diff: var(--mk-series-accent);
+  --diff-soft: var(--mk-series-soft);
+}
+
+/* Keep the native Today layout; only fit the longer name on narrow phones. */
+@container (max-width: 450px) {
+  .today-card.mozkokalypsa .today-title strong {
+    font-size: clamp(12px, 3.8cqw, 17px);
+  }
+}
+
+@media (max-width: 600px) {
+  .cp-card[data-diff="mozkokalypsa"] .cp-history {
+    font-size: 15px;
+  }
+}

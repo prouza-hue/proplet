@@ -1,0 +1,32 @@
+{
+  "sourceManufacturedContentHash": "d77ce7977e6160b268420d3665d5122bbce64fbf5cba5cab795bd509f89576f5",
+  "finalCandidateContentHash": "62fff268e17bc8afa8583a809b2ac6f1aad46eb45e0db7f9ff70148a9f4f4c5e",
+  "repairs": [
+    {
+      "id": "g6-refresh-hard-045",
+      "originalWords": [
+        "SPERMA",
+        "SYROVÁTKA",
+        "HABR",
+        "PODBĚRÁK",
+        "ŽLUČNÍK",
+        "OPÁL",
+        "POŠTA",
+        "MAŇÁSEK"
+      ],
+      "replacementWords": [
+        "VYMÝŠLET",
+        "KŘIŽNÍK",
+        "KÁDINKA",
+        "POVOZ",
+        "PASEKA",
+        "KOTVIŠTĚ",
+        "NÁBYTEK",
+        "VÝLEVKA"
+      ],
+      "seed": 202610029002,
+      "originalHash": "4d6f8b9591a708cf4cd42eab93a592b6750cf3b423ba1299474dfc8a9d8fd4a9",
+      "replacementHash": "cdca44847a780f2e625f1998c681c639e73d2109b814482f0aabf62aeae84738"
+    }
+  ]
+}

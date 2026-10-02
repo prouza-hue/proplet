@@ -1,0 +1,23 @@
+{
+  "kind": "free-refresh-300-static-preview",
+  "sourceMain": "202899e93c8298207a9d33cce1d9cee442a3009e",
+  "asOf": "2026-10-02",
+  "boards": 300,
+  "counts": {
+    "easy": 100,
+    "medium": 100,
+    "hard": 100
+  },
+  "bankContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+  "routeVersion": "shared-refresh-v1",
+  "routesHash": "f4d40f72ba736fe2c5f5a90b9149756e0393fa9135489451cbb149e5c83b8ad6",
+  "nativeSourceUnchanged": true,
+  "productionWrites": false,
+  "serverFunctions": 0,
+  "accounts": false,
+  "playtest": false,
+  "localPreviewProgressOnly": true,
+  "firstBoardExperimentChanged": false,
+  "publicationAuthorized": false,
+  "recognitionWords": 103836
+}

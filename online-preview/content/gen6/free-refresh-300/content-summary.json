@@ -1,0 +1,107 @@
+{
+  "asOf": "2026-10-02",
+  "bankContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+  "counts": {
+    "easy": 100,
+    "medium": 100,
+    "hard": 100
+  },
+  "difficulty": {
+    "easy": {
+      "boards": 100,
+      "runtimeLevels": [
+        318,
+        417
+      ],
+      "wordOccurrences": 420,
+      "uniqueWords": 311,
+      "maxWordUses": 3,
+      "newV3Occurrences": 344,
+      "newV3Share": 0.819,
+      "neverInDatedHistoryOccurrences": 286,
+      "neverInDatedHistoryShare": 0.681,
+      "dimensions": {
+        "5x5": 75,
+        "6x6": 25
+      },
+      "medianTurns": 0.75,
+      "medianAmbiguity": 7.25,
+      "boardTopicCounts": {
+        "4": 68,
+        "5": 10,
+        "3": 22
+      },
+      "tierOccurrences": {
+        "A": 420
+      }
+    },
+    "medium": {
+      "boards": 100,
+      "runtimeLevels": [
+        317,
+        416
+      ],
+      "wordOccurrences": 617,
+      "uniqueWords": 529,
+      "maxWordUses": 3,
+      "newV3Occurrences": 468,
+      "newV3Share": 0.7585,
+      "neverInDatedHistoryOccurrences": 341,
+      "neverInDatedHistoryShare": 0.5527,
+      "dimensions": {
+        "7x7": 100
+      },
+      "medianTurns": 1.3333333333333333,
+      "medianAmbiguity": 8.8125,
+      "boardTopicCounts": {
+        "6": 37,
+        "5": 43,
+        "7": 4,
+        "4": 13,
+        "3": 3
+      },
+      "tierOccurrences": {
+        "A": 367,
+        "B": 250
+      }
+    },
+    "hard": {
+      "boards": 100,
+      "runtimeLevels": [
+        317,
+        416
+      ],
+      "wordOccurrences": 841,
+      "uniqueWords": 727,
+      "maxWordUses": 3,
+      "newV3Occurrences": 554,
+      "newV3Share": 0.6587,
+      "neverInDatedHistoryOccurrences": 274,
+      "neverInDatedHistoryShare": 0.3258,
+      "dimensions": {
+        "9x9": 100
+      },
+      "medianTurns": 3.25,
+      "medianAmbiguity": 14.309,
+      "boardTopicCounts": {
+        "8": 13,
+        "6": 45,
+        "7": 25,
+        "3": 1,
+        "4": 3,
+        "5": 13
+      },
+      "tierOccurrences": {
+        "B": 497,
+        "C": 215,
+        "A": 129
+      }
+    }
+  },
+  "uniqueWordsAcross300": 1284,
+  "maxWordUsesAcross300": 3,
+  "recognitionWords": 103836,
+  "lexiconSha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+  "datedHistoricalBoards": 2797,
+  "personalExposure": "unknown-not-inferred"
+}

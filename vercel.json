@@ -1,7 +1,65 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": null,
   "git": {
-    "deploymentEnabled": false
+    "deploymentEnabled": true
   },
-  "ignoreCommand": "exit 0"
+  "ignoreCommand": "exit 1",
+  "builds": [
+    {
+      "src": "online-preview/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow",
+        "X-Proplet-Preview": "free-refresh-300-static"
+      },
+      "continue": true
+    },
+    {
+      "src": "/api(?:/.*)?",
+      "status": 404
+    },
+    {
+      "src": "/free-refresh-fixtures.js",
+      "dest": "/online-preview/free-refresh-fixtures.js.gz",
+      "headers": {
+        "Content-Type": "application/javascript; charset=utf-8",
+        "Content-Encoding": "gzip",
+        "Cache-Control": "no-cache"
+      }
+    },
+    {
+      "src": "/puzzles.json",
+      "dest": "/online-preview/puzzles.json.gz",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Encoding": "gzip"
+      }
+    },
+    {
+      "src": "/content/gen6/free-refresh-300/bank.json",
+      "dest": "/online-preview/content/gen6/free-refresh-300/bank.json.gz",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Encoding": "gzip"
+      }
+    },
+    {
+      "src": "/",
+      "dest": "/online-preview/index.html",
+      "headers": {
+        "Cache-Control": "no-store"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/online-preview/$1"
+    }
+  ]
 }
