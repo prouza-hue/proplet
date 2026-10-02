@@ -1,0 +1,396 @@
+{
+  "at": "2026-10-02T14:54:00.496Z",
+  "branch": "work/free-refresh-300-20261002",
+  "stableUrl": "https://proplet-git-work-free-refresh-300-83f39d-pavel-prouzas-projects.vercel.app/",
+  "applicationCommit": "b9375e05839ddafea33a96ae83ee6ab585466cc4",
+  "workflowCommit": "7d29a066afc6ab081ffb3dfef241521bd72fc274",
+  "testedDeployment": {
+    "id": "dpl_EuHJcYB6F8r7JWfrmGiawvnZSja5",
+    "name": "proplet",
+    "url": "proplet-gcoymucyc-pavel-prouzas-projects.vercel.app",
+    "created": 1790952617190,
+    "state": "READY",
+    "target": null,
+    "creator": {
+      "uid": "N8cbNRRwwABtRbxO5V7BpsFM",
+      "username": "prouza-5025"
+    },
+    "meta": {
+      "githubCommitRef": "work/free-refresh-300-20261002",
+      "githubCommitSha": "b9375e05839ddafea33a96ae83ee6ab585466cc4",
+      "githubCommitMessage": "Integrate shared varied ordering in the 300-board preview; retain endgame order",
+      "githubRepo": "proplet",
+      "githubOrg": "prouza-hue"
+    },
+    "inspectorUrl": "https://vercel.com/pavel-prouzas-projects/proplet/EuHJcYB6F8r7JWfrmGiawvnZSja5",
+    "isRollbackCandidate": false
+  },
+  "workflow": {
+    "id": 37022805780,
+    "url": "https://github.com/prouza-hue/proplet/actions/runs/37022805780",
+    "conclusion": "success",
+    "job": 110889854726
+  },
+  "artifacts": [
+    {
+      "id": 11233718762,
+      "name": "free-refresh-300-online-verification",
+      "size_in_bytes": 5011999,
+      "url": "https://api.github.com/repos/prouza-hue/proplet/actions/artifacts/11233718762",
+      "archive_download_url": "https://api.github.com/repos/prouza-hue/proplet/actions/artifacts/11233718762/zip",
+      "expired": false,
+      "created_at": "2026-10-02T14:52:57Z",
+      "expires_at": "2026-10-16T14:52:55Z",
+      "updated_at": "2026-10-02T14:52:57Z",
+      "digest": "sha256:b844fa1085864d2037c94b2c0005b09cf1e3d24ee567f98518f4044ebf421ee9",
+      "workflow_run": {
+        "id": 37022805780,
+        "repository_id": 1330932386,
+        "head_repository_id": 1330932386,
+        "head_branch": "work/free-refresh-300-20261002",
+        "head_sha": "7d29a066afc6ab081ffb3dfef241521bd72fc274"
+      }
+    }
+  ],
+  "reports": [
+    {
+      "checks": [
+        {
+          "name": "native startup and 300 catalog entries",
+          "pass": true
+        },
+        {
+          "name": "route version comes from manifest",
+          "pass": true
+        },
+        {
+          "name": "prior release does not obscure proposed CTA",
+          "pass": true
+        },
+        {
+          "name": "CTA reaches native difficulty selection",
+          "pass": true
+        },
+        {
+          "name": "all 300 boards render through native game",
+          "pass": true
+        },
+        {
+          "name": "shared route starts easy",
+          "pass": true
+        },
+        {
+          "name": "native pointer input recognizes target",
+          "pass": true
+        },
+        {
+          "name": "resume keeps found word and stable ID",
+          "pass": true
+        },
+        {
+          "name": "native completion preserves identity and XP easy",
+          "pass": true
+        },
+        {
+          "name": "native next action follows shared route easy",
+          "pass": true
+        },
+        {
+          "name": "shared route starts medium",
+          "pass": true
+        },
+        {
+          "name": "native completion preserves identity and XP medium",
+          "pass": true
+        },
+        {
+          "name": "native next action follows shared route medium",
+          "pass": true
+        },
+        {
+          "name": "shared route starts hard",
+          "pass": true
+        },
+        {
+          "name": "native completion preserves identity and XP hard",
+          "pass": true
+        },
+        {
+          "name": "native next action follows shared route hard",
+          "pass": true
+        },
+        {
+          "name": "replay does not duplicate XP or first result",
+          "pass": true
+        },
+        {
+          "name": "numeric option and shared default preserve existing results",
+          "pass": true
+        },
+        {
+          "name": "old unfinished game takes priority over new release",
+          "pass": true
+        },
+        {
+          "name": "proposed announcement opens manually",
+          "pass": true
+        },
+        {
+          "name": "today no horizontal overflow 320",
+          "pass": true
+        },
+        {
+          "name": "hub no horizontal overflow 320",
+          "pass": true
+        },
+        {
+          "name": "announcement fits viewport 320",
+          "pass": true
+        },
+        {
+          "name": "today no horizontal overflow 390",
+          "pass": true
+        },
+        {
+          "name": "hub no horizontal overflow 390",
+          "pass": true
+        },
+        {
+          "name": "announcement fits viewport 390",
+          "pass": true
+        },
+        {
+          "name": "onboarding starts original 9-cell training control_e001",
+          "pass": true
+        },
+        {
+          "name": "first-board AB identity preserved control_e001",
+          "pass": true
+        },
+        {
+          "name": "onboarding starts original 9-cell training challenger_e009",
+          "pass": true
+        },
+        {
+          "name": "first-board AB identity preserved challenger_e009",
+          "pass": true
+        },
+        {
+          "name": "no external or API request reaches network",
+          "pass": true
+        },
+        {
+          "name": "no console, page or HTTP errors",
+          "pass": true
+        }
+      ],
+      "errors": [],
+      "coverage": 300,
+      "bankHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e"
+    },
+    {
+      "version": "shared-pestre-preview-v2",
+      "contentHash": "8e877abbef28a5cdf599f47822b0355a4f82dc2935e65198606a3296551f1ec1",
+      "checks": [
+        {
+          "difficulty": "easy",
+          "count": 400,
+          "first": "g6-refresh-easy-001",
+          "numericFirst": "g4-e-001",
+          "pass": true
+        },
+        {
+          "difficulty": "medium",
+          "count": 400,
+          "first": "g6-refresh-medium-001",
+          "numericFirst": "g4-m-001",
+          "pass": true
+        },
+        {
+          "difficulty": "hard",
+          "count": 400,
+          "first": "g6-refresh-hard-001",
+          "numericFirst": "g4-h-001",
+          "pass": true
+        },
+        {
+          "difficulty": "hardcore",
+          "count": 300,
+          "first": "g5-r1-hardcore-001",
+          "numericFirst": "g4-x-001",
+          "pass": true
+        },
+        {
+          "difficulty": "mozkomor",
+          "count": 150,
+          "first": "g4-z-001",
+          "numericFirst": "g4-z-001",
+          "pass": true
+        },
+        {
+          "difficulty": "mozkokalypsa",
+          "count": 100,
+          "first": "mk100-v2-001",
+          "numericFirst": "mk100-v2-001",
+          "pass": true
+        }
+      ],
+      "all1750IDsUniqueWithinDifficulty": true,
+      "originalBankUnchanged": true
+    },
+    {
+      "checks": [
+        {
+          "name": "shared switches appear in exactly the four mixed-content difficulties",
+          "pass": true
+        },
+        {
+          "name": "Mozkomor and Mozkokalypsa keep their order and have no switch",
+          "pass": true
+        },
+        {
+          "name": "all source bank bodies match the immutable manifest digest",
+          "pass": true
+        },
+        {
+          "name": "switching keeps progress and uses the selected route: easy",
+          "pass": true
+        },
+        {
+          "name": "switching keeps progress and uses the selected route: medium",
+          "pass": true
+        },
+        {
+          "name": "switching keeps progress and uses the selected route: hard",
+          "pass": true
+        },
+        {
+          "name": "switching keeps progress and uses the selected route: hardcore",
+          "pass": true
+        },
+        {
+          "name": "invalid and dormant choices cannot overwrite stored preferences",
+          "pass": true
+        },
+        {
+          "name": "full numeric catalogue preserves original ID and number: easy",
+          "pass": true
+        },
+        {
+          "name": "full numeric catalogue preserves original ID and number: medium",
+          "pass": true
+        },
+        {
+          "name": "full numeric catalogue preserves original ID and number: hard",
+          "pass": true
+        },
+        {
+          "name": "full numeric catalogue preserves original ID and number: hardcore",
+          "pass": true
+        },
+        {
+          "name": "full numeric catalogue preserves original ID and number: mozkomor",
+          "pass": true
+        },
+        {
+          "name": "full numeric catalogue preserves original ID and number: mozkokalypsa",
+          "pass": true
+        },
+        {
+          "name": "all 1750 active boards are directly available with no reserved slots",
+          "pass": true
+        },
+        {
+          "name": "numeric catalogue opens an old board and native pointer input works",
+          "pass": true
+        },
+        {
+          "name": "route update, switches and reload preserve the original unfinished board and found path",
+          "pass": true
+        },
+        {
+          "name": "native play button selects correct higher-difficulty route: hardcore",
+          "pass": true
+        },
+        {
+          "name": "native completion keeps ID, generation and single XP reward: hardcore",
+          "pass": true
+        },
+        {
+          "name": "native next button skips completed board in correct route: hardcore",
+          "pass": true
+        },
+        {
+          "name": "native play button selects correct higher-difficulty route: mozkomor",
+          "pass": true
+        },
+        {
+          "name": "native completion keeps ID, generation and single XP reward: mozkomor",
+          "pass": true
+        },
+        {
+          "name": "native next button skips completed board in correct route: mozkomor",
+          "pass": true
+        },
+        {
+          "name": "native play button selects correct higher-difficulty route: mozkokalypsa",
+          "pass": true
+        },
+        {
+          "name": "native completion keeps ID, generation and single XP reward: mozkokalypsa",
+          "pass": true
+        },
+        {
+          "name": "native next button skips completed board in correct route: mozkokalypsa",
+          "pass": true
+        },
+        {
+          "name": "shared switches and expanded catalogues fit mobile width 320",
+          "pass": true
+        },
+        {
+          "name": "shared switches and expanded catalogues fit mobile width 390",
+          "pass": true
+        },
+        {
+          "name": "explicit existing preview choice wins and legacy numeric preference is retained",
+          "pass": true
+        },
+        {
+          "name": "old personal plan, revision and pending record remain untouched for rollback",
+          "pass": true
+        },
+        {
+          "name": "different player histories cannot manufacture different relative shared orders",
+          "pass": true
+        },
+        {
+          "name": "no external or production API request reaches network",
+          "pass": true
+        },
+        {
+          "name": "no browser, console or HTTP errors",
+          "pass": true
+        }
+      ],
+      "errors": [],
+      "manifestHash": "8e877abbef28a5cdf599f47822b0355a4f82dc2935e65198606a3296551f1ec1",
+      "catalogueTotal": 1750
+    }
+  ],
+  "productionMainUnchanged": "8daff27ecfe5598b32aacde158f7c72cbee165dc",
+  "productionChanged": false,
+  "databaseWrites": false,
+  "visibleSwitches": [
+    "easy",
+    "medium",
+    "hard",
+    "hardcore"
+  ],
+  "dormantUntilNewContent": [
+    "mozkomor",
+    "mozkokalypsa"
+  ],
+  "sourceBanksSha256": "96a5171bc3dad1c06a9f6b471514f10ca18feff6196e8a46e55c42d47a469178",
+  "manifestContentHash": "8e877abbef28a5cdf599f47822b0355a4f82dc2935e65198606a3296551f1ec1"
+}
