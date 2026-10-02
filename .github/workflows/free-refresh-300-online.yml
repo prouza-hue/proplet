@@ -26,7 +26,7 @@ jobs:
       - name: Verify all boards, real input, completion and network isolation online
         env:
           NODE_PATH: /tmp/refresh-browser/node_modules
-          FREE_REFRESH_PREVIEW_URL: https://proplet-jnrv8wv0b-pavel-prouzas-projects.vercel.app
+          FREE_REFRESH_PREVIEW_URL: https://proplet-g5mma1oht-pavel-prouzas-projects.vercel.app
           FREE_REFRESH_QA_OUTPUT: qa-free-refresh-300-online
         run: node tools/verify_free_refresh_preview_online.cjs
       - name: Validate immutable shared routes and numeric catalogues
@@ -34,7 +34,7 @@ jobs:
       - name: Verify shared ordering, preserved choices and dormant endgame online
         env:
           NODE_PATH: /tmp/refresh-browser/node_modules
-          FREE_REFRESH_PREVIEW_URL: https://proplet-jnrv8wv0b-pavel-prouzas-projects.vercel.app
+          FREE_REFRESH_PREVIEW_URL: https://proplet-g5mma1oht-pavel-prouzas-projects.vercel.app
           FREE_REFRESH_QA_OUTPUT: qa-free-refresh-300-online
         run: node tools/verify_shared_pestre_preview_online.cjs
       - name: Preserve report and screenshots
