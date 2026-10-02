@@ -29,19 +29,12 @@ html[data-theme="dark"] .cp-card[data-diff="mozkokalypsa"] .cp-xp {
   color: var(--mk-series-accent);
 }
 
-.cp-card[data-diff="mozkokalypsa"] .cp-history,
-.today-card.mozkokalypsa .today-count {
+.cp-card[data-diff="mozkokalypsa"] .cp-history {
   font-size: 14px;
   line-height: 1.35;
 }
 
-.today-card.mozkokalypsa .today-action {
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-.cp-card[data-diff="mozkokalypsa"] .cp-top h2,
-.today-card.mozkokalypsa .today-title strong {
+.cp-card[data-diff="mozkokalypsa"] .cp-top h2 {
   line-height: 1.2;
 }
 
@@ -52,28 +45,15 @@ html[data-theme="dark"] .cp-card[data-diff="mozkokalypsa"] .cp-xp {
   --diff-soft: var(--mk-series-soft);
 }
 
-/* The name stays readable in a two-column Today grid on narrow phones. */
+/* Keep the native Today layout; only fit the longer name on narrow phones. */
 @container (max-width: 450px) {
-  .today-card.mozkokalypsa {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 10px;
-  }
-
-  .today-card.mozkokalypsa .today-art,
-  .today-card.mozkokalypsa .today-title {
-    grid-column: 1;
-  }
-
-  .today-card.mozkokalypsa .today-art {
-    width: 40px;
-    height: 40px;
+  .today-card.mozkokalypsa .today-title strong {
+    font-size: clamp(12px, 3.8cqw, 17px);
   }
 }
 
 @media (max-width: 600px) {
-  .cp-card[data-diff="mozkokalypsa"] .cp-history,
-  .today-card.mozkokalypsa .today-count,
-  .today-card.mozkokalypsa .today-action {
+  .cp-card[data-diff="mozkokalypsa"] .cp-history {
     font-size: 15px;
   }
 }
