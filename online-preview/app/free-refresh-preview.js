@@ -144,12 +144,17 @@
   const sharedOrder = global.PropletSharedFreeOrder.create(manifest, puzzles.free);
   const newIds = new Set(bank.map(p=>p.id));
   const routeRecordsKey = 'shared-refresh-preview-choice';
+  const releaseDismissKey = 'free-refresh-300-dismissed';
+  const reviewMode = params.get('review') === '1';
   function choices(){try{return JSON.parse(storage.getItem(routeRecordsKey)||'{}')}catch{return {}}}
   function modeFor(diff){
     if(!sharedOrder.supports(diff))return 'numeric';
     const explicit=choices()[diff];if(['varied','numeric'].includes(explicit))return explicit;
-    // Reading the old preference does not erase its plan, revision or rollback state.
-    try{const old=JSON.parse(storage.getItem('proplet-free-order-v1:guest')||'{}')[diff]?.mode;if(['varied','numeric'].includes(old))return old}catch{}
+    // Keep deliberate opt-outs, but do not mistake the old numeric default for a choice.
+    // Never rewrite the old plan, revision or pending request.
+    try{const old=JSON.parse(storage.getItem('proplet-free-order-v1:guest')||'{}')[diff];
+      if(old?.mode==='varied'||(old?.mode==='numeric'&&(old.offered===true||old.revision>0||old.pending)))return old.mode;
+    }catch{}
     return 'varied';
   }
   function completed(id){return !!getState().completed?.['free:'+id]}
@@ -171,6 +176,7 @@
       storage.setItem(routeRecordsKey,JSON.stringify({...choices(),[diff]:mode}));
       if(typeof renderFree==='function')renderFree();
       if(typeof renderQuickPlay==='function')renderQuickPlay();
+      updateOrderSettings();
     }
   };
   function openBoard(id) {
@@ -187,39 +193,60 @@
   function newEntry(id){
     let root=document.getElementById(id);
     if(!root){root=document.createElement('aside');root.id=id;root.className='card refresh-entry';
-      const anchor=id==='freeRefreshToday'?document.getElementById('todayNewContentBanner'):document.getElementById('newContentBanner');
+      const anchor=document.getElementById('todayNewContentBanner');
       anchor?.before(root);
     }
     const done=bank.filter(p=>completed(p.id)).length,left=300-done;
-    root.hidden=id==='freeRefreshToday'&&!left;
+    root.hidden=!left||storage.getItem(releaseDismissKey)==='1';
     root.innerHTML='<div class="refresh-entry-art" aria-hidden="true">'+
       '<img src="/difficulty/printshop/easy.webp" width="52" height="52" alt="">'+
       '<img src="/difficulty/printshop/medium.webp" width="52" height="52" alt="">'+
       '<img src="/difficulty/printshop/hard.webp" width="52" height="52" alt=""></div>'+
-      '<div class="refresh-entry-copy"><h2>'+(left?'300 nových Propletů':'Nové desky dohrané')+'</h2><p>'+
-      (done?left+' nových desek ještě čeká.':'100 nových desek v každé ze tří obtížností.')+'</p></div>'+
-      '<button class="primary-btn" type="button">'+(left?'Vybrat hru':'Prohlédnout desky')+'</button>';
-    root.querySelector('button').onclick=chooseGame;
+      '<div class="refresh-entry-copy"><h2>300 nových Propletů</h2><p>Čerstvá slova ve Snadné, Střední i Těžké.</p>'+
+      '<button class="refresh-entry-link" type="button" data-refresh-choose>Vybrat hru <span aria-hidden="true">→</span></button></div>'+
+      '<button class="refresh-entry-dismiss" type="button" data-refresh-dismiss aria-label="Skrýt pozvánku na nové desky">×</button>';
+    root.querySelector('[data-refresh-choose]').onclick=chooseGame;
+    root.querySelector('[data-refresh-dismiss]').onclick=()=>{storage.setItem(releaseDismissKey,'1');root.hidden=true};
   }
   function decorateCards(){
     for(const diff of orderDifficulties){
       const card=document.querySelector('#difficultyCards .cp-card[data-diff="'+diff+'"]');if(!card)continue;
       if(difficulties.includes(diff)){
-        let counter=card.querySelector('.refresh-count');
-        if(!counter){counter=document.createElement('p');counter.className='refresh-count';card.querySelector('.cp-track')?.after(counter)}
-        counter.textContent='Nové desky: '+completedNew(diff)+' / 100';
+        const left=100-completedNew(diff);
+        if(left){const counter=document.createElement('span');counter.className='refresh-count';counter.textContent=left+' nových';card.querySelector('.cp-xp')?.append(counter)}
       }
-      if(sharedOrder.supports(diff)){
-        let hint=card.querySelector('.order-hint');
-        if(!hint){hint=document.createElement('p');hint.className='order-hint';card.querySelector('.order-controls')?.append(hint)}
-        hint.textContent=modeFor(diff)==='numeric'?'Úrovně jdou podle čísel. Rozehraná hra má přednost.':'Společné pestré pořadí pro všechny. Dohrané desky přeskakujeme.';
-      }
-      const catalogue=document.createElement('button');catalogue.type='button';catalogue.className='order-catalogue';catalogue.dataset.orderCatalogue=diff;
-      catalogue.textContent='Katalog podle čísel';catalogue.setAttribute('aria-label',labels[diff]+': katalog podle čísel');
-      catalogue.onclick=()=>{const details=document.querySelector('[data-shared-catalogue="'+diff+'"]');if(details){details.open=true;populateNumericCatalogue(details,diff);details.scrollIntoView({block:'start',behavior:'smooth'});details.querySelector('summary')?.focus()}};
-      (card.querySelector('.order-controls')||card).append(catalogue);
     }
-    newEntry('freeRefreshHub');
+  }
+  function updateOrderSettings(){
+    const root=document.getElementById('freeOrderSettings');if(!root)return;
+    const allVaried=manifest.variedDifficulties.every(diff=>modeFor(diff)==='varied');
+    const status=root.querySelector('[data-order-status]'),text=allVaried?'Pestrá hra':'Vlastní volba';
+    if(status.textContent!==text)status.textContent=text;
+    for(const select of root.querySelectorAll('[data-order-setting]'))select.value=modeFor(select.dataset.orderSetting);
+  }
+  function installOrderSettings(){
+    if(document.getElementById('freeOrderSettings'))return;
+    const root=document.createElement('section');root.id='freeOrderSettings';root.className='card settings-card free-order-settings';
+    root.innerHTML='<details><summary><span>Pořadí desek</span><span data-order-status></span></summary>'+
+      '<p>Pestrá hra střídá různé desky a ty z novějších sérií nabízí dřív. Rozehranou hru vždy nejdřív dokončíš.</p>'+
+      '<p class="order-settings-note">Pokud chceš postupovat od nejnižšího čísla, změň pořadí u vybrané obtížnosti. Tvůj postup zůstane zachovaný.</p>'+
+      manifest.variedDifficulties.map(diff=>'<label class="order-setting-row" for="freeOrder-'+diff+'"><span>'+labels[diff]+'</span>'+
+        '<select id="freeOrder-'+diff+'" data-order-setting="'+diff+'"><option value="varied">Pestře</option><option value="numeric">Podle čísel</option></select></label>').join('')+'</details>';
+    for(const select of root.querySelectorAll('select'))select.onchange=()=>global.changeFreeOrder(select.dataset.orderSetting,select.value);
+    document.getElementById('screen-profile')?.append(root);updateOrderSettings();
+  }
+  function installHistoryCatalogue(){
+    const original=global.openPlayedLevels;
+    global.openPlayedLevels=async function(diff){
+      document.getElementById('historyNumericCatalogue')?.remove();
+      await original(diff);
+      const list=document.getElementById('playedLevelsList');
+      if(!list||document.getElementById('playedLevelsModal').classList.contains('hidden'))return;
+      const details=document.createElement('details');details.id='historyNumericCatalogue';details.className='history-numeric-catalogue';details.dataset.sharedCatalogue=diff;
+      const summary=document.createElement('summary');summary.textContent='Všechny úrovně podle čísel';details.append(summary);
+      details.addEventListener('toggle',()=>{if(details.open)populateNumericCatalogue(details,diff)});
+      list.after(details);
+    };
   }
   function populateNumericCatalogue(details,diff){
     if(details.querySelector('.refresh-catalogue-grid'))return;
@@ -229,7 +256,7 @@
       const p=byId.get(id),button=document.createElement('button');button.type='button';button.dataset.sharedBoard=id;
       button.textContent=String(p.meta.level);button.title=labels[diff]+' · úroveň '+p.meta.level;
       button.setAttribute('aria-label',labels[diff]+', úroveň '+p.meta.level);
-      button.onclick=()=>openBoard(id);grid.append(button);
+      button.onclick=()=>{document.getElementById('playedLevelsModal')?.classList.add('hidden');openBoard(id)};grid.append(button);
     }
     details.append(grid);updateCatalogue();
   }
@@ -292,13 +319,15 @@
     const originalDaily=global.renderDaily;
     global.renderDaily=function(){originalDaily();newEntry('freeRefreshToday')};
     const notice=document.createElement('aside');notice.id='freeRefreshPreviewNotice';notice.className='refresh-preview-notice';
-    notice.innerHTML='<p>Náhled 300 nových desek a pestré hry · společná cesta ve čtyřech obtížnostech. Hraní a volba pořadí se ukládají jen v tomto prohlížeči.</p>'+
+    notice.innerHTML='<p>Preview · postup se ukládá jen v tomto prohlížeči.</p>'+(reviewMode?
       '<nav aria-label="Prohlížení návrhu"><button type="button" data-review-announcement>Návrh oznámení</button>'+
-      '<button type="button" data-review-catalogue>Všech 300 desek</button><a href="?onboarding=1">Původní onboarding</a></nav>';
-    notice.querySelector('[data-review-announcement]').onclick=showAnnouncement;
-    notice.querySelector('[data-review-catalogue]').onclick=()=>{chooseGame();document.getElementById('refreshCatalogue')?.scrollIntoView({block:'start',behavior:'smooth'})};
+      '<button type="button" data-review-catalogue>Všech 300 desek</button><a href="?onboarding=1">Původní onboarding</a></nav>':'');
+    if(reviewMode){notice.querySelector('[data-review-announcement]').onclick=showAnnouncement;
+      notice.querySelector('[data-review-catalogue]').onclick=()=>{chooseGame();document.getElementById('refreshCatalogue')?.scrollIntoView({block:'start',behavior:'smooth'})};
+      installCatalogue();installNumericCatalogue();
+    }
     document.querySelector('.app-footer')?.before(notice);
-    installCatalogue();installNumericCatalogue();renderFree();renderDaily();renderQuickPlay();updateCatalogue();
+    installOrderSettings();installHistoryCatalogue();renderFree();renderDaily();renderQuickPlay();updateCatalogue();
     if(params.get('announcement')==='refresh')showAnnouncement();
     if(params.has('board'))openBoard(params.get('board'));
     document.addEventListener('keydown',event=>{if(event.key==='Escape')document.getElementById('freeRefreshAnnouncement')?.classList.add('hidden')});

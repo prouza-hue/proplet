@@ -12,38 +12,38 @@ const screenshot=(page,name)=>page.screenshot({path:path.join(out,name+'.png'),f
   const browser=await chromium.launch(launch);let coverage=[],bankHash=null,onboarding=[];
   try{
     const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});monitor(page);
-    await page.goto(base+'/',{waitUntil:'networkidle'});await page.waitForFunction(()=>document.querySelectorAll('[data-refresh-board]').length===300);
+    await page.goto(base+'/?review=1',{waitUntil:'networkidle'});await page.waitForFunction(()=>document.querySelectorAll('[data-refresh-board]').length===300);
     bankHash=await page.evaluate(()=>PROPLET_FREE_REFRESH_PREVIEW.bankHash);
     check('native startup and 300 catalog entries',await page.evaluate(()=>!!window.PROPLET_FREE_REFRESH_PREVIEW&&!!document.querySelector('#freeRefreshToday')));
     check('route version comes from manifest',await page.evaluate(()=>freeOrder().record('easy').plan.version===PROPLET_SHARED_FREE_ORDER_MANIFEST.version));
     check('prior release does not obscure proposed CTA',await page.evaluate(()=>!document.querySelector('#mk100LaunchPreview:not(.hidden)')));
-    await screenshot(page,'desktop');await page.locator('#freeRefreshToday button').click();check('CTA reaches native difficulty selection',await page.locator('#screen-free').isVisible());await screenshot(page,'hub-desktop');
+    await screenshot(page,'desktop');await page.locator('#freeRefreshToday [data-refresh-choose]').click();check('CTA reaches native difficulty selection',await page.locator('#screen-free').isVisible());await screenshot(page,'hub-desktop');
     coverage=await page.evaluate(async()=>{const rows=[];for(const p of PROPLET_FREE_REFRESH_FIXTURES.refreshBoards){await startGame(p,'free',null);rows.push({id:p.id,ok:currentGame?.puzzle?.id===p.id&&document.querySelectorAll('#board .cell').length===p.mask.length})}return rows});
     check('all 300 boards render through native game',coverage.length===300&&coverage.every(r=>r.ok));
     await page.evaluate(()=>{const s=getState();s.completed={};s.inProgress={};saveState(s);currentGame=null});
     for(const diff of ['easy','medium','hard']){
-      await page.evaluate(async d=>{await startFree(d)},diff);check('shared route starts '+diff,await page.evaluate(d=>currentGame.puzzle.id===PROPLET_FREE_REFRESH_FIXTURES.routes[d][0],diff));
+      await page.evaluate(async d=>{await startFree(d)},diff);check('shared route starts '+diff,await page.evaluate(d=>currentGame.puzzle.id===PROPLET_SHARED_FREE_ORDER_MANIFEST.routes[d][0],diff));
       if(diff==='easy'){
         const route=await page.evaluate(()=>currentGame.puzzle.answers[0].path),first=await page.locator('.cell[data-index="'+route[0]+'"]').boundingBox();
         await page.mouse.move(first.x+first.width/2,first.y+first.height/2);await page.mouse.down();
         for(const index of route.slice(1)){const box=await page.locator('.cell[data-index="'+index+'"]').boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2,{steps:2})}
         await page.mouse.up();check('native pointer input recognizes target',await page.evaluate(()=>currentGame.found.length===1));
         await page.evaluate(()=>{saveGameProgress();nav('free')});await page.evaluate(async()=>{await startFree('easy')});
-        check('resume keeps found word and stable ID',await page.evaluate(()=>currentGame.found.length===1&&currentGame.puzzle.id===PROPLET_FREE_REFRESH_FIXTURES.routes.easy[0]));
+        check('resume keeps found word and stable ID',await page.evaluate(()=>currentGame.found.length===1&&currentGame.puzzle.id===PROPLET_SHARED_FREE_ORDER_MANIFEST.routes.easy[0]));
       }
       await page.evaluate(()=>{for(const [i,a]of currentGame.puzzle.answers.entries())if(!currentGame.found.some(f=>f.answerIndex===i)){currentGame.path=[...a.path];submitPath()}});
-      await page.waitForFunction(d=>!!getState().completed['free:'+PROPLET_FREE_REFRESH_FIXTURES.routes[d][0]],diff);
-      check('native completion preserves identity and XP '+diff,await page.evaluate(d=>{const r=getState().completed['free:'+PROPLET_FREE_REFRESH_FIXTURES.routes[d][0]];return r.mode==='free'&&r.contentGeneration===4&&r.points===({easy:15,medium:25,hard:50})[d]},diff));
-      await page.locator('#winPrimaryBtn').click();await page.waitForFunction(d=>currentGame.puzzle.id===PROPLET_FREE_REFRESH_FIXTURES.routes[d][1],diff);check('native next action follows shared route '+diff,true);
+      await page.waitForFunction(d=>!!getState().completed['free:'+PROPLET_SHARED_FREE_ORDER_MANIFEST.routes[d][0]],diff);
+      check('native completion preserves identity and XP '+diff,await page.evaluate(d=>{const r=getState().completed['free:'+PROPLET_SHARED_FREE_ORDER_MANIFEST.routes[d][0]];return r.mode==='free'&&r.contentGeneration===4&&r.points===({easy:15,medium:25,hard:50})[d]},diff));
+      await page.locator('#winPrimaryBtn').click();await page.waitForFunction(d=>currentGame.puzzle.id===PROPLET_SHARED_FREE_ORDER_MANIFEST.routes[d][1],diff);check('native next action follows shared route '+diff,true);
       await page.evaluate(()=>{document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));const s=getState();s.inProgress={};saveState(s);nav('free')});
     }
     const beforeReplay=await page.evaluate(()=>({records:JSON.stringify(getState().completed),xp:Object.values(getState().completed).reduce((n,r)=>n+(r.points||0),0)}));
-    await page.evaluate(async()=>{const p=puzzleDB.free.easy.find(p=>p.id===PROPLET_FREE_REFRESH_FIXTURES.routes.easy[0]);await startGame(p,'free',null);for(const a of currentGame.puzzle.answers){currentGame.path=[...a.path];submitPath()}});
+    await page.evaluate(async()=>{const p=puzzleDB.free.easy.find(p=>p.id===PROPLET_SHARED_FREE_ORDER_MANIFEST.routes.easy[0]);await startGame(p,'free',null);for(const a of currentGame.puzzle.answers){currentGame.path=[...a.path];submitPath()}});
     await page.waitForFunction(()=>!document.querySelector('#winModal').classList.contains('hidden')&&currentGame.finished);
     check('replay does not duplicate XP or first result',await page.evaluate(before=>JSON.stringify(getState().completed)===before.records&&Object.values(getState().completed).reduce((n,r)=>n+(r.points||0),0)===before.xp&&currentGame.winBaseXpAwarded===0,beforeReplay));
     await page.evaluate(()=>{document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));const s=getState();s.inProgress={};saveState(s);nav('free')});
     const preserved=await page.evaluate(async()=>{const before=JSON.stringify(getState().completed);await PROPLET_FREE_REFRESH_PREVIEW.controller.change('easy','numeric');const numeric=freeProgress('easy').nextUnsolved.id;await PROPLET_FREE_REFRESH_PREVIEW.controller.change('easy','varied');return {same:before===JSON.stringify(getState().completed),numeric,shared:freeProgress('easy').nextUnsolved.id}});
-    check('numeric option and shared default preserve existing results',preserved.same&&preserved.numeric==='g4-e-001'&&preserved.shared===await page.evaluate(()=>PROPLET_FREE_REFRESH_FIXTURES.routes.easy[1]));
+    check('numeric option and shared default preserve existing results',preserved.same&&preserved.numeric==='g4-e-001'&&preserved.shared===await page.evaluate(()=>PROPLET_SHARED_FREE_ORDER_MANIFEST.routes.easy[1]));
     await page.evaluate(async()=>{const old=puzzleDB.free.easy.find(p=>p.id==='g4-e-001');await startGame(old,'free',null);currentGame.path=[...old.answers[0].path];submitPath();nav('free');await startFree('easy')});
     check('old unfinished game takes priority over new release',await page.evaluate(()=>currentGame.puzzle.id==='g4-e-001'&&currentGame.found.length===1));
     await page.evaluate(()=>{nav('daily');PROPLET_FREE_REFRESH_PREVIEW.showAnnouncement()});await screenshot(page,'announcement-desktop');check('proposed announcement opens manually',await page.locator('#freeRefreshAnnouncement').isVisible());await page.locator('#freeRefreshAnnouncement [data-refresh-close]').first().click();

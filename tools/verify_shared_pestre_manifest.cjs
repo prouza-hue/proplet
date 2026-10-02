@@ -4,7 +4,7 @@ const fs = require('node:fs'), path = require('node:path'), vm = require('node:v
 const root = path.resolve(__dirname, '..'), seed = {window: {}};
 vm.runInNewContext(zlib.gunzipSync(fs.readFileSync(path.join(root, 'online-preview/free-refresh-fixtures.js.gz'))).toString(), seed);
 const fixtures = seed.window.PROPLET_FREE_REFRESH_FIXTURES;
-const manifest = JSON.parse(fs.readFileSync(path.join(root, 'online-preview/content/free-order/shared-pestre-preview-v2.json')));
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'online-preview/content/free-order/shared-pestre-preview-v3.json')));
 const engine = require('../online-preview/app/content/shared-free-order.js').create(manifest, fixtures.puzzles.free);
 const hash = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const {contentHash, ...body} = manifest;
@@ -34,7 +34,20 @@ for (const [diff, bank] of Object.entries(fixtures.puzzles.free)) {
   assert.equal(engine.next(diff, {completedIds: ids, resumeId: ids[0]}), null);
   assert.equal(engine.next(diff, {resumeId: 'retired-id'}).id, ids[0]);
   assert.equal(JSON.stringify(bank), before);
-  if (['easy', 'medium', 'hard'].includes(diff)) assert.deepEqual([...ids.slice(0, 100)], [...fixtures.routes[diff].slice(0, 100)]);
+  if (['easy', 'medium', 'hard'].includes(diff)) {
+    const first = ids.slice(0, 100);
+    assert.equal(first.filter(id => id.startsWith('g6-refresh-')).length, 50);
+    assert.equal(first.filter(id => id.startsWith('g5-r1-')).length, 30);
+    assert.equal(first.filter(id => id.startsWith('g4-')).length, 20);
+    assert.ok(ids[0].startsWith('g6-refresh-'));
+    assert.ok(ids.slice(0, 10).some(id => id.startsWith('g5-r1-')));
+    assert.ok(ids.slice(0, 10).some(id => id.startsWith('g4-')));
+    assert.ok(ids.slice(350).some(id => id.startsWith('g6-refresh-')));
+  }
+  if (diff === 'hardcore') {
+    assert.equal(ids.slice(0, 75).filter(id => id.startsWith('g5-r1-')).length, 50);
+    assert.ok(ids[0].startsWith('g5-r1-'));
+  }
   if (['mozkomor', 'mozkokalypsa'].includes(diff)) {
     assert.deepEqual([...ids], canonical);
     assert.equal(engine.supports(diff), false);
