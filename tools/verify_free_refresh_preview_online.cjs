@@ -15,7 +15,7 @@ const screenshot=(page,name)=>page.screenshot({path:path.join(out,name+'.png'),f
     await page.goto(base+'/',{waitUntil:'networkidle'});await page.waitForFunction(()=>document.querySelectorAll('[data-refresh-board]').length===300);
     bankHash=await page.evaluate(()=>PROPLET_FREE_REFRESH_PREVIEW.bankHash);
     check('native startup and 300 catalog entries',await page.evaluate(()=>!!window.PROPLET_FREE_REFRESH_PREVIEW&&!!document.querySelector('#freeRefreshToday')));
-    check('route version comes from manifest',await page.evaluate(()=>freeOrder().record('easy').plan.version===PROPLET_FREE_REFRESH_FIXTURES.build.routeVersion));
+    check('route version comes from manifest',await page.evaluate(()=>freeOrder().record('easy').plan.version===PROPLET_SHARED_FREE_ORDER_MANIFEST.version));
     check('prior release does not obscure proposed CTA',await page.evaluate(()=>!document.querySelector('#mk100LaunchPreview:not(.hidden)')));
     await screenshot(page,'desktop');await page.locator('#freeRefreshToday button').click();check('CTA reaches native difficulty selection',await page.locator('#screen-free').isVisible());await screenshot(page,'hub-desktop');
     coverage=await page.evaluate(async()=>{const rows=[];for(const p of PROPLET_FREE_REFRESH_FIXTURES.refreshBoards){await startGame(p,'free',null);rows.push({id:p.id,ok:currentGame?.puzzle?.id===p.id&&document.querySelectorAll('#board .cell').length===p.mask.length})}return rows});

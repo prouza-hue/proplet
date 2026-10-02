@@ -155,6 +155,7 @@
 <p class="small">Připraveno 2. října 2026. Obsah je kandidát k prohlédnutí; produkční hra nebyla touto prací změněna.</p>
 <nav aria-label="Obsah dokumentu"><a href="#obsah">Nové desky</a><a href="#cta">Návrhy CTA</a><a href="#pruchod">Společný průchod</a><a href="#katalog">Všech 300 mřížek</a><a href="#overeni">Ověření a podklady</a></nav>
 <div class="notice"><strong>Jak si balíček prohlédnout</strong><br><a href="/">Otevřít hratelné preview</a>. Hra funguje rovnou v prohlížeči a bez přihlášení. Všech 300 nových desek můžeš otevřít přímo z katalogu. Postup v náhledu se ukládá jen v tomto prohlížeči.</div>
+<div class="notice"><strong>Doplněná pestrá hra</strong><br>Snadná, Střední, Těžká a Mozkožrout nyní používají společnou pestrou cestu. Přepínač „Podle čísel“ i uložená volba zůstávají. Mozkomor a Mozkokalypsa zachovávají současné pořadí bez přepínače; jeho podpora je připravená pro budoucí obsahovou řadu. Ve hře je také úplný přímý číselný katalog všech šesti obtížností.</div>
 
 <section id="obsah"><h2>Co přibylo</h2>
 <div class="table-wrap"><table><caption>100 nových desek v každé ze tří obtížností</caption><thead><tr><th>Obtížnost</th><th>Rozměry</th><th>Slov na desce</th><th>Různých slov</th><th>Výskyty z doplnění v3</th><th>Nové úrovně</th></tr></thead><tbody id="statistics"></tbody></table></div>
@@ -174,7 +175,8 @@
 <p>Povinná první deska a stávající onboardingový experiment zůstávají před touto cestou. Uložená offline deska se dokončí na původním ID a verzi; další výslovně vydaný manifest určí následný průchod.</p>
 <div class="notice"><strong>Co je schválené a co je nový návrh</strong><br>Společná cesta, přednost rozehrané hry a zachování ID, postupu a XP jsou dříve schválené základy. Pořadí „nových 100, potom dosavadních 300“ a zdejší CTA jsou konkrétní nový návrh. V preview jsou předvedené; produkční přechod ze současného <code>pestre-v1</code> ještě potřebuje samostatnou implementaci.</div>
 <p class="small">Žebříček se váže na ID desky. Společná cesta může soustředit účast hráčů; novým deskám sama nezaručí zaplněné žebříčky. Preview neposílá skutečné výsledky na server.</p>
-<p><a href="content/gen6/free-refresh-300/shared-route-manifest.json">Přesná posloupnost všech 400 ID na obtížnost</a></p></section>
+<p>Po nové stovce pokračuje Snadná, Střední a Těžká společným pestrým střídáním dosavadního obsahu. U Mozkožrouta platí společné pestré pořadí celé dostupné banky. Pořadí nezávisí na osobní historii; ta určuje přeskakování hotových desek a přednost rozehrané hry.</p>
+<p><a href="content/free-order/shared-pestre-preview-v2.json">Aktuální manifest společné cesty a všech číselných katalogů</a></p></section>
 
 <section id="katalog"><h2>Všech 300 nových mřížek</h2><p>Rozbal konkrétní desku pro prohlédnutí mřížky. <strong>Cílová slova jsou řešení:</strong> zobrazí se až po rozbalení označeného řádku. Kliknutí na slovo ukáže jeho skutečnou cestu. Tento katalog je obsahový přehled; samotnou hru spouští preview.</p>
 <div class="filters"><label for="difficulty">Obtížnost<select id="difficulty"><option value="all">Všechny obtížnosti</option><option value="easy">Snadná</option><option value="medium">Střední</option><option value="hard">Těžká</option></select></label><label for="search">Hledat ID, úroveň nebo cílové slovo<input id="search" type="search" placeholder="Např. easy-001, 318 nebo DLAŽBA" autocomplete="off"></label></div>

@@ -2,7 +2,8 @@
 (function(root){'use strict';
 root.PropletFreeOrderUI={mount({store,progress,labels,change}){
  if(!store.enabled())return;
- for(const diff of ['easy','medium','hard','hardcore']){
+ for(const diff of Object.keys(labels)){
+  if(store.supports?!store.supports(diff):!root.PropletFreeOrder?.SUPPORTED.includes(diff))continue;
   const card=document.querySelector('#difficultyCards .cp-card[data-diff="'+diff+'"]');if(!card)continue;
   const r=store.record(diff),q=progress(diff),node=document.createElement('div');node.className='order-controls';
   node.innerHTML='<div class="order-switch" role="group" aria-label="Pořadí: '+labels[diff].label+'"><button type="button" data-order-mode="varied" aria-pressed="'+(r.mode==='varied')+'">Pestře</button><button type="button" data-order-mode="numeric" aria-pressed="'+(r.mode==='numeric')+'">Podle čísel</button></div>';

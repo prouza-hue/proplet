@@ -137,32 +137,44 @@
 
 
   const difficulties = ['easy','medium','hard'];
-  const labels = {easy:'Snadná',medium:'Střední',hard:'Těžká'};
+  const orderDifficulties = Object.keys(puzzles.free);
+  const labels = {easy:'Snadná',medium:'Střední',hard:'Těžká',hardcore:'Mozkožrout',mozkomor:'Mozkomor',mozkokalypsa:'Mozkokalypsa'};
+  const manifest = global.PROPLET_SHARED_FREE_ORDER_MANIFEST;
+  if (manifest?.bankContentHash !== fixtures.build?.bankContentHash) throw new Error('Shared route uses a different refresh bank.');
+  const sharedOrder = global.PropletSharedFreeOrder.create(manifest, puzzles.free);
   const newIds = new Set(bank.map(p=>p.id));
   const routeRecordsKey = 'shared-refresh-preview-choice';
   function choices(){try{return JSON.parse(storage.getItem(routeRecordsKey)||'{}')}catch{return {}}}
+  function modeFor(diff){
+    if(!sharedOrder.supports(diff))return 'numeric';
+    const explicit=choices()[diff];if(['varied','numeric'].includes(explicit))return explicit;
+    // Reading the old preference does not erase its plan, revision or rollback state.
+    try{const old=JSON.parse(storage.getItem('proplet-free-order-v1:guest')||'{}')[diff]?.mode;if(['varied','numeric'].includes(old))return old}catch{}
+    return 'varied';
+  }
   function completed(id){return !!getState().completed?.['free:'+id]}
   function newBoards(diff){return bank.filter(p=>p.difficulty===diff)}
   function completedNew(diff){return newBoards(diff).filter(p=>completed(p.id)).length}
   function nextShared(diff,fallback){
-    if(!difficulties.includes(diff)||choices()[diff]==='numeric')return fallback;
-    const route=fixtures.routes?.[diff]||[];
-    const map=new Map((puzzles.free[diff]||[]).map(p=>[p.id,p]));
-    return map.get(route.find(id=>map.has(id)&&!completed(id)))||null;
+    if(!sharedOrder.supports(diff)||modeFor(diff)==='numeric')return fallback;
+    const state=getState(),completedIds=Object.keys(state.completed||{}).filter(key=>key.startsWith('free:')).map(key=>key.slice(5));
+    const resume=Object.values(state.inProgress||{}).filter(row=>row?.mode==='free'&&row.difficulty===diff&&!completed(row.puzzleId)).sort((a,b)=>(b.savedAt||0)-(a.savedAt||0)).find(row=>(puzzles.free[diff]||[]).some(p=>p.id===row.puzzleId));
+    return sharedOrder.next(diff,{completedIds,resumeId:resume?.puzzleId});
   }
   const controller = {
     enabled:()=>true,ready:()=>true,configure:async()=>true,sync:async()=>{},
+    supports:sharedOrder.supports,
     next:nextShared,adopt:()=>{},newAccount:async()=>{},
-    record:diff=>({mode:choices()[diff]||'varied',offered:true,plan:{version:fixtures.build?.routeVersion||'shared-refresh-v1',ids:fixtures.routes?.[diff]||[]}}),
+    record:diff=>({mode:modeFor(diff),offered:true,plan:{version:sharedOrder.version,ids:sharedOrder.ids(diff)}}),
     change:async(diff,mode)=>{
-      if(!difficulties.includes(diff))return;
+      if(!sharedOrder.supports(diff)||!['varied','numeric'].includes(mode))return;
       storage.setItem(routeRecordsKey,JSON.stringify({...choices(),[diff]:mode}));
       if(typeof renderFree==='function')renderFree();
       if(typeof renderQuickPlay==='function')renderQuickPlay();
     }
   };
   function openBoard(id) {
-    const puzzle=bank.find(row=>row.id===id);
+    const puzzle=Object.values(puzzles.free).flat().find(row=>row.id===id);
     if(!puzzle||typeof startGame!=='function')return false;
     if(typeof saveGameProgress==='function')saveGameProgress();
     startGame(puzzle,'free',null);
@@ -190,17 +202,47 @@
     root.querySelector('button').onclick=chooseGame;
   }
   function decorateCards(){
-    for(const diff of difficulties){
+    for(const diff of orderDifficulties){
       const card=document.querySelector('#difficultyCards .cp-card[data-diff="'+diff+'"]');if(!card)continue;
-      let counter=card.querySelector('.refresh-count');
-      if(!counter){counter=document.createElement('p');counter.className='refresh-count';card.querySelector('.cp-track')?.after(counter)}
-      counter.textContent='Nové desky: '+completedNew(diff)+' / 100';
-      let hint=card.querySelector('.order-hint');
-      if(!hint){hint=document.createElement('p');hint.className='order-hint';card.querySelector('.order-controls')?.append(hint)}
-      hint.textContent='Společné pořadí pro všechny. Dohrané desky přeskakujeme.';
+      if(difficulties.includes(diff)){
+        let counter=card.querySelector('.refresh-count');
+        if(!counter){counter=document.createElement('p');counter.className='refresh-count';card.querySelector('.cp-track')?.after(counter)}
+        counter.textContent='Nové desky: '+completedNew(diff)+' / 100';
+      }
+      if(sharedOrder.supports(diff)){
+        let hint=card.querySelector('.order-hint');
+        if(!hint){hint=document.createElement('p');hint.className='order-hint';card.querySelector('.order-controls')?.append(hint)}
+        hint.textContent=modeFor(diff)==='numeric'?'Úrovně jdou podle čísel. Rozehraná hra má přednost.':'Společné pestré pořadí pro všechny. Dohrané desky přeskakujeme.';
+      }
+      const catalogue=document.createElement('button');catalogue.type='button';catalogue.className='order-catalogue';catalogue.dataset.orderCatalogue=diff;
+      catalogue.textContent='Katalog podle čísel';catalogue.setAttribute('aria-label',labels[diff]+': katalog podle čísel');
+      catalogue.onclick=()=>{const details=document.querySelector('[data-shared-catalogue="'+diff+'"]');if(details){details.open=true;populateNumericCatalogue(details,diff);details.scrollIntoView({block:'start',behavior:'smooth'});details.querySelector('summary')?.focus()}};
+      (card.querySelector('.order-controls')||card).append(catalogue);
     }
-    document.querySelector('#difficultyCards .cp-card[data-diff="hardcore"] .order-controls')?.remove();
     newEntry('freeRefreshHub');
+  }
+  function populateNumericCatalogue(details,diff){
+    if(details.querySelector('.refresh-catalogue-grid'))return;
+    const grid=document.createElement('div');grid.className='refresh-catalogue-grid';
+    const byId=new Map((puzzles.free[diff]||[]).map(p=>[p.id,p]));
+    for(const id of sharedOrder.ids(diff,'numeric')){
+      const p=byId.get(id),button=document.createElement('button');button.type='button';button.dataset.sharedBoard=id;
+      button.textContent=String(p.meta.level);button.title=labels[diff]+' · úroveň '+p.meta.level;
+      button.setAttribute('aria-label',labels[diff]+', úroveň '+p.meta.level);
+      button.onclick=()=>openBoard(id);grid.append(button);
+    }
+    details.append(grid);updateCatalogue();
+  }
+  function installNumericCatalogue(){
+    if(document.getElementById('sharedOrderCatalogue'))return;
+    const section=document.createElement('section');section.id='sharedOrderCatalogue';section.className='card refresh-catalogue';
+    section.innerHTML='<h2>Úrovně podle čísel</h2><p>Celý dostupný katalog. Čísla desek i tvůj postup zůstávají stejné; každou desku můžeš otevřít přímo.</p>';
+    for(const diff of orderDifficulties){
+      const details=document.createElement('details');details.dataset.sharedCatalogue=diff;
+      const summary=document.createElement('summary');summary.textContent=labels[diff]+' · '+sharedOrder.ids(diff).length+' desek';details.append(summary);
+      details.addEventListener('toggle',()=>{if(details.open)populateNumericCatalogue(details,diff)});section.append(details);
+    }
+    document.getElementById('screen-free')?.append(section);
   }
   function installCatalogue(){
     const root=document.getElementById('refreshCatalogue');if(root)return;
@@ -222,8 +264,8 @@
     document.getElementById('screen-free')?.append(section);
   }
   function updateCatalogue(){
-    document.querySelectorAll('[data-refresh-board]').forEach(button=>{
-      const done=completed(button.dataset.refreshBoard);button.classList.toggle('is-done',done);
+    document.querySelectorAll('[data-refresh-board],[data-shared-board]').forEach(button=>{
+      const done=completed(button.dataset.refreshBoard||button.dataset.sharedBoard);button.classList.toggle('is-done',done);
       button.setAttribute('aria-description',done?'Dohráno. Opakování zůstává tréninkem.':'Dosud nedohráno.');
     });
   }
@@ -250,17 +292,17 @@
     const originalDaily=global.renderDaily;
     global.renderDaily=function(){originalDaily();newEntry('freeRefreshToday')};
     const notice=document.createElement('aside');notice.id='freeRefreshPreviewNotice';notice.className='refresh-preview-notice';
-    notice.innerHTML='<p>Náhled 300 nových desek · hraní a návrh společné cesty jsou uložené jen v tomto prohlížeči.</p>'+
+    notice.innerHTML='<p>Náhled 300 nových desek a pestré hry · společná cesta ve čtyřech obtížnostech. Hraní a volba pořadí se ukládají jen v tomto prohlížeči.</p>'+
       '<nav aria-label="Prohlížení návrhu"><button type="button" data-review-announcement>Návrh oznámení</button>'+
       '<button type="button" data-review-catalogue>Všech 300 desek</button><a href="?onboarding=1">Původní onboarding</a></nav>';
     notice.querySelector('[data-review-announcement]').onclick=showAnnouncement;
     notice.querySelector('[data-review-catalogue]').onclick=()=>{chooseGame();document.getElementById('refreshCatalogue')?.scrollIntoView({block:'start',behavior:'smooth'})};
     document.querySelector('.app-footer')?.before(notice);
-    installCatalogue();renderFree();renderDaily();renderQuickPlay();updateCatalogue();
+    installCatalogue();installNumericCatalogue();renderFree();renderDaily();renderQuickPlay();updateCatalogue();
     if(params.get('announcement')==='refresh')showAnnouncement();
     if(params.has('board'))openBoard(params.get('board'));
     document.addEventListener('keydown',event=>{if(event.key==='Escape')document.getElementById('freeRefreshAnnouncement')?.classList.add('hidden')});
   }
-  global.PROPLET_FREE_REFRESH_PREVIEW={fixtureOnly:true,storagePrefix,bankHash,requests,openBoard,nextShared,showAnnouncement,controller};
+  global.PROPLET_FREE_REFRESH_PREVIEW={fixtureOnly:true,storagePrefix,bankHash,requests,openBoard,nextShared,showAnnouncement,controller,sharedOrder,manifest};
   document.addEventListener('proplet:ready',installPreviewControls,{once:true});
 })(window);

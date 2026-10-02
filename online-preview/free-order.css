@@ -2,3 +2,4 @@
 #difficultyCards .cp-card{height:auto;min-width:0}#difficultyCards .cp-card .order-controls{grid-column:1 / -1;width:100%;min-width:0}.order-controls{min-width:0}
 
 .order-controls button:disabled{opacity:.6;cursor:wait}
+.order-controls .order-catalogue,.cp-card>.order-catalogue{display:block;width:100%;margin-top:10px;min-height:38px;border:1px solid var(--line,#c9bba4);border-radius:9px;padding:7px 12px;font:inherit;font-size:13px;color:inherit;background:transparent;cursor:pointer;grid-column:1 / -1}.order-catalogue:focus-visible{outline:3px solid currentColor;outline-offset:2px}
