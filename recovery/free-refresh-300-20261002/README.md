@@ -4,11 +4,11 @@ Připraveno 2. října 2026 pro Pavla a navazující práci místního Codexu. B
 
 **Stav: hotový kandidátní obsah a hratelný návrh k prohlédnutí. Produkční nasazení ani migrace hráčských nastavení nejsou součástí této práce.**
 
-Hratelné preview je v místním souboru `_free_preview_slim_trial.zip` (23 567 731 bytů), který byl vytvořený a ověřený před odpojením místního prostředí. Obsahuje všechny nové desky, výběr obtížnosti, přímý katalog i ukázku společné cesty. Vyzkoušet lze konkrétní desku bez postupného dohrání předchozích. Texty a chování CTA jsou návrh pro uvedení balíčku.
+Hratelné preview je v místním souboru `_free_preview_slim_trial.zip` (23 567 731 bytů), který byl vytvořený před odpojením místního prostředí. Jeho zdrojový export prošel 27 browser kontrolami; rozbalený ZIP nebyl následně znovu otestovaný. Obsahuje všechny nové desky, výběr obtížnosti, přímý katalog i ukázku společné cesty. Vyzkoušet lze konkrétní desku bez postupného dohrání předchozích. Texty a chování CTA jsou návrh pro uvedení balíčku.
 
 ZIP rozbal a v jeho kořenové složce spusť místní HTTP server, například `python -m http.server 8874 --bind 127.0.0.1`. Pak v prohlížeči otevři `http://127.0.0.1:8874/`. Dvojklik na index.html nestačí kvůli absolutním cestám původního Propletu. Na originální produkci se tento statický export nepřipojuje; postup je pouze místní.
 
-**Omezení předání po výpadku:** Git archiv zachraňuje tento přehled, původní redakční poznámky a rekonstruované zdroje preview. Banka, katalog CSV, manifest cesty a úplné reporty zůstávají ve složce `work-free-refresh/content/gen6/free-refresh-300/` v odpojeném místním prostředí. V této Git větvi tyto datové soubory nejsou. ZIP nebyl po odpojení znovu zpřístupněný ani nahraný a hostovaný hratelný odkaz není připravený. Nový cloudový replay ani nová cloudová kontrola neproběhly. Původní lokální ověření se vztahuje na původní ZIP, ne na zrekonstruované zdroje.
+**Omezení předání po výpadku:** Git archiv zachraňuje tento přehled, původní redakční poznámky a rekonstruované zdroje preview. Banka, katalog CSV, manifest cesty a úplné reporty zůstávají ve složce `work-free-refresh/content/gen6/free-refresh-300/` v odpojeném místním prostředí. V této Git větvi tyto datové soubory nejsou. ZIP nebyl po odpojení znovu zpřístupněný ani nahraný a hostovaný hratelný odkaz není připravený. Nový cloudový replay ani nová cloudová kontrola neproběhly. Původní lokální ověření se vztahuje na zdrojový statický export použitý pro původní ZIP, ne na zrekonstruované zdroje.
 
 ## Nové desky
 

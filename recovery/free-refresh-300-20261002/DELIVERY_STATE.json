@@ -28,7 +28,8 @@
     },
     "checks": 27,
     "realServerLeaderboardTested": false,
-    "newReconstructedSourceQaPerformed": false
+    "newReconstructedSourceQaPerformed": false,
+    "scope": "Original static export used to create ZIP; extracted ZIP was not retested."
   },
   "originalZip": {
     "absolutePath": "C:/Users/prouz/.codex/.chatgpt-projects/g-p-6aac5023adc48191bd66be037edff741/_free_preview_slim_trial.zip",
@@ -36,7 +37,12 @@
     "files": 329,
     "createdBeforeRuntimeDisconnect": true,
     "postDisconnectAvailabilityVerified": false,
-    "libraryUploadSucceeded": false
+    "libraryUploadSucceeded": false,
+    "extractedZipVerified": false,
+    "includesContentCsv": false,
+    "includesSeparateContentReports": false,
+    "containsAll300BoardsInFixtures": true,
+    "sharedRouteIdsPerDifficulty": 400
   },
   "localDataRoot": "C:/Users/prouz/.codex/.chatgpt-projects/g-p-6aac5023adc48191bd66be037edff741/work-free-refresh/content/gen6/free-refresh-300/",
   "remoteArchiveContainsOriginalBank": false,
