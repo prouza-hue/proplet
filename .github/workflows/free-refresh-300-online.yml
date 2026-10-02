@@ -1,0 +1,38 @@
+name: Refresh 300 online preview verification
+on:
+  push:
+    branches:
+      - work/free-refresh-300-20261002
+    paths:
+      - .github/workflows/free-refresh-300-online.yml
+permissions:
+  contents: read
+jobs:
+  online-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser dependencies
+        run: |
+          mkdir -p /tmp/refresh-browser
+          cd /tmp/refresh-browser
+          npm init -y
+          npm install --save-exact playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: Verify all boards, real input, completion and network isolation online
+        env:
+          NODE_PATH: /tmp/refresh-browser/node_modules
+          FREE_REFRESH_PREVIEW_URL: https://proplet-c09tq18ls-pavel-prouzas-projects.vercel.app
+          FREE_REFRESH_QA_OUTPUT: qa-free-refresh-300-online
+        run: node tools/verify_free_refresh_preview_online.cjs
+      - name: Preserve report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-refresh-300-online-verification
+          path: qa-free-refresh-300-online/
+          retention-days: 14
