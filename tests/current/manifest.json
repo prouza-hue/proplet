@@ -230,7 +230,7 @@
         "runner": "python"
       },
       {
-        "path": "tests/current/test_mozkokalypsa_launch_push.py",
+        "path": "tests/current/test_content_launch_push.py",
         "runner": "python"
       },
       {

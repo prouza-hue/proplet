@@ -87,7 +87,7 @@ route_snapshot = sorted(
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
 assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cdedfdeb020cd32f25c6e4b"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
-# The one-off authenticated campaign is covered by test_mozkokalypsa_launch_push.
+# The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
 openapi_contract["paths"].pop("/api/cron/mozkokalypsa-launch-push")
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]

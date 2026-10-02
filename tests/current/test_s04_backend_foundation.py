@@ -53,7 +53,7 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # every path, method, component and field remains covered. Tajenka v2
 # intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
-# The one-off authenticated campaign is covered by test_mozkokalypsa_launch_push.
+# The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
 openapi_contract["paths"].pop("/api/cron/mozkokalypsa-launch-push")
 openapi_contract["info"]["version"] = "4.01.35-cloud"
