@@ -20,17 +20,17 @@
  #difficultyCards .cp-xp{font-size:12px}
  .order-next strong{font-size:14px}
 }
-#screen-profile .free-order-settings{order:22;padding:0;overflow:hidden}
+#screen-profile.settings-open .free-order-settings{order:22;padding:0;overflow:hidden}
 .free-order-settings summary{display:flex;align-items:center;gap:12px;min-height:62px;padding:16px 20px;cursor:pointer;list-style:none;font-weight:650}
 .free-order-settings summary::-webkit-details-marker{display:none}
 .free-order-settings [data-order-status]{margin-left:auto;font-size:13px;font-weight:400;color:var(--td-muted,#586576)}
 .free-order-settings summary::after{content:'+';font-size:22px;font-weight:400;color:var(--td-muted,#586576)}
 .free-order-settings details[open] summary::after{content:'−'}
-.free-order-settings p{font-size:14px;line-height:1.5;margin:0 20px 12px;color:var(--td-ink,#202b39)}
+#freeOrderSettings p{font-weight:400;font-size:14px;line-height:1.5;margin:0 20px 12px;color:var(--td-ink,#202b39)}
 .free-order-settings p.order-settings-note{color:var(--td-muted,#586576);font-size:13px}
 .order-setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 20px;padding:12px 0;border-top:1px solid var(--td-line,#ddd7cc);font-size:14px}
 .order-setting-row:last-child{margin-bottom:6px}
-.order-setting-row select{font:inherit;min-height:44px;max-width:60%;padding:8px 28px 8px 10px;border:1px solid var(--td-line,#ddd7cc);border-radius:8px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#202b39)}
+#freeOrderSettings .order-setting-row select{width:160px;font:inherit;min-height:44px;max-width:60%;padding:8px 28px 8px 10px;border:1px solid var(--td-line,#ddd7cc);border-radius:8px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#202b39)}
 .free-order-settings summary:focus-visible,.order-setting-row select:focus-visible,.history-numeric-catalogue summary:focus-visible{outline:3px solid var(--td-blue,#315da8);outline-offset:-3px}
 .history-numeric-catalogue{margin-top:18px;border-top:1px solid var(--td-line,#ddd7cc)}
 .history-numeric-catalogue summary{padding:14px 0;min-height:48px;cursor:pointer;font-size:14px;font-weight:600}

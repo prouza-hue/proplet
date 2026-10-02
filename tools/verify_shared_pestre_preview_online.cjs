@@ -78,7 +78,7 @@ const shot=(page,name)=>page.screenshot({path:path.join(out,'ui-v3-'+name+'.png'
    await page.setViewportSize({width,height:900});await page.evaluate(()=>nav('free'));
    const layout=await page.evaluate(()=>({width:innerWidth,overflow:document.documentElement.scrollWidth>innerWidth+1,cards:[...document.querySelectorAll('#difficultyCards .cp-card')].map(c=>{const b=c.getBoundingClientRect(),title=c.querySelector('h2'),button=c.querySelector('.cp-play').getBoundingClientRect();return{diff:c.dataset.diff,height:b.height,titleFits:title.scrollWidth<=title.clientWidth+1,buttonFits:button.right<=b.right&&button.left>=b.left}})}));layouts.push(layout);
    check('compact Play cards fit width '+width,!layout.overflow&&layout.cards.every(c=>c.height<=185&&c.titleFits&&c.buttonFits));await shot(page,'play-'+width);
-   await page.evaluate(()=>nav('daily'));check('Today and compact CTA fit width '+width,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1&&document.querySelector('#freeRefreshToday').getBoundingClientRect().height<=185));await shot(page,'today-'+width);
+   await page.evaluate(()=>nav('daily'));const today=await page.evaluate(()=>({width:innerWidth,overflow:document.documentElement.scrollWidth>innerWidth+1,ctaHeight:document.querySelector('#freeRefreshToday').getBoundingClientRect().height}));layouts.push(today);check('Today and compact CTA fit width '+width,!today.overflow&&today.ctaHeight<=185);await shot(page,'today-'+width);
   }
   await page.setViewportSize({width:390,height:900});await page.locator('#settingsHeaderBtn').click();await page.waitForSelector('#screen-profile.settings-open');
   await page.locator('#freeOrderSettings summary').click();await shot(page,'settings-390');
@@ -97,6 +97,6 @@ const shot=(page,name)=>page.screenshot({path:path.join(out,'ui-v3-'+name+'.png'
   check('no external or API request reaches network',!requests.some(r=>!r.url.startsWith(base+'/')||new URL(r.url).pathname.startsWith('/api/')));
   check('no browser, console or HTTP errors',errors.length===0);
   console.log(JSON.stringify({checks,errors,manifestHash,catalogueTotal,layouts},null,2));
- }catch(error){errors.push(String(error));throw error}
+ }catch(error){errors.push(String(error));console.log(JSON.stringify({checks,errors,layouts},null,2));throw error}
  finally{fs.writeFileSync(path.join(out,'shared-order-verification.json'),JSON.stringify({at:new Date().toISOString(),checks,errors,requests,manifestHash,layouts},null,2));await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});
