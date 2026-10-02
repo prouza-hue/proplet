@@ -8,6 +8,7 @@ report={'nativeGame':True,'syntheticOnly':True,'checks':[],'errors':[]}
 with sync_playwright() as pw:
  browser=pw.chromium.launch(headless=True)
  context=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=1)
+ context.add_init_script("localStorage.setItem('proplet:content-release:mk100-v2','1')")
  page=context.new_page();page.set_default_timeout(15000)
  page.on('pageerror',lambda e:report['errors'].append(str(e)))
  requests=[];page.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
