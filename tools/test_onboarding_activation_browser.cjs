@@ -123,7 +123,7 @@ async function solve(page,touch=false){
     await control({rolling:'fail'});await page.goto(url);await ready(page);await draw(page,await page.evaluate(()=>currentGame.puzzle.answers[0].path));await page.waitForFunction(()=>currentGame.found.length===1);await eventOnce('starter_started');
    });
    await scenario('observable-startup-failure',async page=>{
-    await control({failDatabase:true});await page.goto(url);await page.getByText('Nepodařilo se načíst databázi úloh.',{exact:false}).waitFor({state:'visible'});await eventOnce('starter_v1_failed');
+    await control({failDatabase:true});await page.goto(url);await page.getByRole('alert').filter({hasText:'Hru se zatím nepodařilo načíst.'}).waitFor({state:'visible'});await eventOnce('starter_v1_failed');
    });
    if(health.baseline)await scenario('service-worker-upgrade',async(page,context)=>{
     await control({release:'baseline'});
