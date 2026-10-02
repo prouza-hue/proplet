@@ -1,0 +1,630 @@
+{
+  "status": "verified-preview-ready-for-user-approval",
+  "verifiedAt": "2026-10-02T18:15:17.725Z",
+  "previewURL": "https://proplet-git-work-free-refresh-300-83f39d-pavel-prouzas-projects.vercel.app/",
+  "testedDeploymentURL": "https://proplet-g5mma1oht-pavel-prouzas-projects.vercel.app",
+  "testedProductCommit": "e99b4db718ade9c548f8808d20757a50a5ad24a0",
+  "verificationCommit": "fe08f565352886646d1191bbe2aedc3b9da6d50b",
+  "workflowRun": 37046022204,
+  "workflowJob": 110967534808,
+  "workflowConclusion": "success",
+  "artifact": {
+    "id": 11244099509,
+    "sha256": "a2c45729ce424c13515e479c52bde867aa7e02696a2dda534428c8fe0f4734a4",
+    "expiresAt": "2026-10-16T18:15:18Z"
+  },
+  "manifestVersion": "shared-pestre-preview-v3",
+  "manifestHash": "76f610ec34f64dde3f2931c8a56a44b7337f5636e63de9df98eb37a593396cd6",
+  "sourceBanksSha256": "96a5171bc3dad1c06a9f6b471514f10ca18feff6196e8a46e55c42d47a469178",
+  "bankContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+  "openingMix": {
+    "easy": {
+      "10": {
+        "4": 2,
+        "5": 3,
+        "6": 5
+      },
+      "30": {
+        "4": 6,
+        "5": 9,
+        "6": 15
+      },
+      "100": {
+        "4": 20,
+        "5": 30,
+        "6": 50
+      }
+    },
+    "medium": {
+      "10": {
+        "4": 2,
+        "5": 3,
+        "6": 5
+      },
+      "30": {
+        "4": 6,
+        "5": 9,
+        "6": 15
+      },
+      "100": {
+        "4": 20,
+        "5": 30,
+        "6": 50
+      }
+    },
+    "hard": {
+      "10": {
+        "4": 2,
+        "5": 3,
+        "6": 5
+      },
+      "30": {
+        "4": 6,
+        "5": 9,
+        "6": 15
+      },
+      "100": {
+        "4": 20,
+        "5": 30,
+        "6": 50
+      }
+    },
+    "hardcore": {
+      "10": {
+        "4": 3,
+        "5": 7,
+        "6": 0
+      },
+      "30": {
+        "4": 10,
+        "5": 20,
+        "6": 0
+      },
+      "100": {
+        "4": 44,
+        "5": 56,
+        "6": 0
+      }
+    }
+  },
+  "newBoardsRendered": 300,
+  "nativeBrowserChecks": [
+    {
+      "name": "native startup and 300 catalog entries",
+      "pass": true
+    },
+    {
+      "name": "route version comes from manifest",
+      "pass": true
+    },
+    {
+      "name": "prior release does not obscure proposed CTA",
+      "pass": true
+    },
+    {
+      "name": "CTA reaches native difficulty selection",
+      "pass": true
+    },
+    {
+      "name": "all 300 boards render through native game",
+      "pass": true
+    },
+    {
+      "name": "shared route starts easy",
+      "pass": true
+    },
+    {
+      "name": "native pointer input recognizes target",
+      "pass": true
+    },
+    {
+      "name": "resume keeps found word and stable ID",
+      "pass": true
+    },
+    {
+      "name": "native completion preserves identity and XP easy",
+      "pass": true
+    },
+    {
+      "name": "native next action follows shared route easy",
+      "pass": true
+    },
+    {
+      "name": "shared route starts medium",
+      "pass": true
+    },
+    {
+      "name": "native completion preserves identity and XP medium",
+      "pass": true
+    },
+    {
+      "name": "native next action follows shared route medium",
+      "pass": true
+    },
+    {
+      "name": "shared route starts hard",
+      "pass": true
+    },
+    {
+      "name": "native completion preserves identity and XP hard",
+      "pass": true
+    },
+    {
+      "name": "native next action follows shared route hard",
+      "pass": true
+    },
+    {
+      "name": "replay does not duplicate XP or first result",
+      "pass": true
+    },
+    {
+      "name": "numeric option and shared default preserve existing results",
+      "pass": true
+    },
+    {
+      "name": "old unfinished game takes priority over new release",
+      "pass": true
+    },
+    {
+      "name": "proposed announcement opens manually",
+      "pass": true
+    },
+    {
+      "name": "today no horizontal overflow 320",
+      "pass": true
+    },
+    {
+      "name": "hub no horizontal overflow 320",
+      "pass": true
+    },
+    {
+      "name": "announcement fits viewport 320",
+      "pass": true
+    },
+    {
+      "name": "today no horizontal overflow 390",
+      "pass": true
+    },
+    {
+      "name": "hub no horizontal overflow 390",
+      "pass": true
+    },
+    {
+      "name": "announcement fits viewport 390",
+      "pass": true
+    },
+    {
+      "name": "onboarding starts original 9-cell training control_e001",
+      "pass": true
+    },
+    {
+      "name": "first-board AB identity preserved control_e001",
+      "pass": true
+    },
+    {
+      "name": "onboarding starts original 9-cell training challenger_e009",
+      "pass": true
+    },
+    {
+      "name": "first-board AB identity preserved challenger_e009",
+      "pass": true
+    },
+    {
+      "name": "no external or API request reaches network",
+      "pass": true
+    },
+    {
+      "name": "no console, page or HTTP errors",
+      "pass": true
+    }
+  ],
+  "uiBrowserChecks": [
+    {
+      "name": "normal preview contains no reviewer catalogues, announcement controls or duplicate hub banner",
+      "pass": true
+    },
+    {
+      "name": "mixed-content difficulties default to varied; endgame retains original order",
+      "pass": true
+    },
+    {
+      "name": "release invitation opens native Play screen",
+      "pass": true
+    },
+    {
+      "name": "all six cards show their actual next level without ordering controls",
+      "pass": true
+    },
+    {
+      "name": "bank identity and all original board bodies remain unchanged",
+      "pass": true
+    },
+    {
+      "name": "ordering choices start collapsed inside native Settings",
+      "pass": true
+    },
+    {
+      "name": "only four mixed-content difficulties have an opt-out",
+      "pass": true
+    },
+    {
+      "name": "settings opt-out uses numeric route: easy",
+      "pass": true
+    },
+    {
+      "name": "return to varied uses fixed shared route: easy",
+      "pass": true
+    },
+    {
+      "name": "settings opt-out uses numeric route: medium",
+      "pass": true
+    },
+    {
+      "name": "return to varied uses fixed shared route: medium",
+      "pass": true
+    },
+    {
+      "name": "settings opt-out uses numeric route: hard",
+      "pass": true
+    },
+    {
+      "name": "return to varied uses fixed shared route: hard",
+      "pass": true
+    },
+    {
+      "name": "settings opt-out uses numeric route: hardcore",
+      "pass": true
+    },
+    {
+      "name": "return to varied uses fixed shared route: hardcore",
+      "pass": true
+    },
+    {
+      "name": "changing order leaves results, XP and attempts untouched",
+      "pass": true
+    },
+    {
+      "name": "deliberate opt-out survives reload",
+      "pass": true
+    },
+    {
+      "name": "history catalogue preserves every ID and level: easy",
+      "pass": true
+    },
+    {
+      "name": "history catalogue preserves every ID and level: medium",
+      "pass": true
+    },
+    {
+      "name": "history catalogue preserves every ID and level: hard",
+      "pass": true
+    },
+    {
+      "name": "history catalogue preserves every ID and level: hardcore",
+      "pass": true
+    },
+    {
+      "name": "history catalogue preserves every ID and level: mozkomor",
+      "pass": true
+    },
+    {
+      "name": "history catalogue preserves every ID and level: mozkokalypsa",
+      "pass": true
+    },
+    {
+      "name": "all 1750 active boards remain accessible without reserved empty slots",
+      "pass": true
+    },
+    {
+      "name": "catalogue launches old board and native pointer input works",
+      "pass": true
+    },
+    {
+      "name": "play card distinguishes saved game from next board",
+      "pass": true
+    },
+    {
+      "name": "order changes and reload preserve original unfinished board and found word",
+      "pass": true
+    },
+    {
+      "name": "higher-difficulty Play follows the intended route: hardcore",
+      "pass": true
+    },
+    {
+      "name": "completion keeps ID, generation and single XP reward: hardcore",
+      "pass": true
+    },
+    {
+      "name": "next button advances in the same route: hardcore",
+      "pass": true
+    },
+    {
+      "name": "higher-difficulty Play follows the intended route: mozkomor",
+      "pass": true
+    },
+    {
+      "name": "completion keeps ID, generation and single XP reward: mozkomor",
+      "pass": true
+    },
+    {
+      "name": "next button advances in the same route: mozkomor",
+      "pass": true
+    },
+    {
+      "name": "higher-difficulty Play follows the intended route: mozkokalypsa",
+      "pass": true
+    },
+    {
+      "name": "completion keeps ID, generation and single XP reward: mozkokalypsa",
+      "pass": true
+    },
+    {
+      "name": "next button advances in the same route: mozkokalypsa",
+      "pass": true
+    },
+    {
+      "name": "compact Play cards fit width 320",
+      "pass": true
+    },
+    {
+      "name": "Today and compact CTA fit width 320",
+      "pass": true
+    },
+    {
+      "name": "compact Play cards fit width 390",
+      "pass": true
+    },
+    {
+      "name": "Today and compact CTA fit width 390",
+      "pass": true
+    },
+    {
+      "name": "compact Play cards fit width 840",
+      "pass": true
+    },
+    {
+      "name": "Today and compact CTA fit width 840",
+      "pass": true
+    },
+    {
+      "name": "compact Play cards fit width 1440",
+      "pass": true
+    },
+    {
+      "name": "Today and compact CTA fit width 1440",
+      "pass": true
+    },
+    {
+      "name": "dark theme keeps compact cards inside viewport",
+      "pass": true
+    },
+    {
+      "name": "dismissed release CTA stays dismissed after reload",
+      "pass": true
+    },
+    {
+      "name": "explicit preview choice wins; bare legacy numeric default becomes varied; real legacy opt-out survives",
+      "pass": true
+    },
+    {
+      "name": "legacy plan, revision and pending request remain intact for rollback",
+      "pass": true
+    },
+    {
+      "name": "different completion histories only skip IDs in the same shared sequence",
+      "pass": true
+    },
+    {
+      "name": "no external or API request reaches network",
+      "pass": true
+    },
+    {
+      "name": "no browser, console or HTTP errors",
+      "pass": true
+    }
+  ],
+  "layoutMeasurements": [
+    {
+      "width": 320,
+      "overflow": false,
+      "cards": [
+        {
+          "diff": "easy",
+          "height": 143.484375,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "medium",
+          "height": 143.484375,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hard",
+          "height": 143.484375,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hardcore",
+          "height": 143.484375,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkomor",
+          "height": 143.484375,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkokalypsa",
+          "height": 143.484375,
+          "titleFits": true,
+          "buttonFits": true
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "overflow": false,
+      "ctaHeight": 142.3125
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "cards": [
+        {
+          "diff": "easy",
+          "height": 148.15625,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "medium",
+          "height": 148.15625,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hard",
+          "height": 148.15625,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hardcore",
+          "height": 148.15625,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkomor",
+          "height": 148.15625,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkokalypsa",
+          "height": 148.15625,
+          "titleFits": true,
+          "buttonFits": true
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "ctaHeight": 142.3125
+    },
+    {
+      "width": 840,
+      "overflow": false,
+      "cards": [
+        {
+          "diff": "easy",
+          "height": 150,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "medium",
+          "height": 150,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hard",
+          "height": 150,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hardcore",
+          "height": 150,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkomor",
+          "height": 150,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkokalypsa",
+          "height": 150,
+          "titleFits": true,
+          "buttonFits": true
+        }
+      ]
+    },
+    {
+      "width": 840,
+      "overflow": false,
+      "ctaHeight": 122.515625
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "cards": [
+        {
+          "diff": "easy",
+          "height": 157.21875,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "medium",
+          "height": 157.21875,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hard",
+          "height": 157.21875,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "hardcore",
+          "height": 157.21875,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkomor",
+          "height": 157.21875,
+          "titleFits": true,
+          "buttonFits": true
+        },
+        {
+          "diff": "mozkokalypsa",
+          "height": 157.21875,
+          "titleFits": true,
+          "buttonFits": true
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "ctaHeight": 122.515625
+    }
+  ],
+  "browserErrors": [],
+  "productionMainUnchanged": "8daff27ecfe5598b32aacde158f7c72cbee165dc",
+  "productionDeploymentPerformed": false,
+  "supabaseWrites": false,
+  "previewAccountSync": false,
+  "visualReview": [
+    "Today CTA at 320/390 px",
+    "Play at 390/840/1440 px",
+    "Settings at 390 px",
+    "Dark Play at 390 px"
+  ],
+  "scope": "Product-shaped isolated static preview. Local guest progress. Authentication, production account sync and live leaderboards excluded.",
+  "allChecksPassed": true
+}
