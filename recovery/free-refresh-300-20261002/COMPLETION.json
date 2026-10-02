@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "kind": "completed-free-refresh-300-package-delivery",
+  "completedAt": "2026-10-02",
+  "status": "complete-awaiting-user-content-review",
+  "originalLocalRuntimeRecovered": true,
+  "previousRuntimeBlockResolved": true,
+  "bankContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+  "bankFileSha256": "55cae68a3cbf12d2b9813ba62d22c70dedd15471869a6aa2646910922a55147f",
+  "counts": {
+    "easy": 100,
+    "medium": 100,
+    "hard": 100
+  },
+  "package": {
+    "name": "Proplet_osvezeni_300_20261002.zip",
+    "bytes": 32047419,
+    "sha256": "56ce8b9fe48f85d7180736aa0ba3745b55be53ad3b94ce61da9114721918457d",
+    "files": 461,
+    "allArchivedFileHashesVerified": true,
+    "zipCrcVerified": true,
+    "libraryFileId": "libfile_04d7e9cd428481919a0be079c404a9e8",
+    "fileId": "file_0000000069e08210ba1a0fe4018cc4b0"
+  },
+  "guide": {
+    "name": "BALICEK.html",
+    "libraryFileId": "libfile_d0b368c96e64819184400b1b8b0b0c45",
+    "fileId": "file_00000000ae1482108229cbf9235c79d0",
+    "all300BoardsEmbedded": true
+  },
+  "readme": {
+    "name": "README.md",
+    "libraryFileId": "libfile_74195971e3908191a94fc61fc2ae8f4a",
+    "fileId": "file_00000000dff881f482f7fde6b760c89e"
+  },
+  "verification": {
+    "restoredOriginalContentChecks": 111,
+    "nativeBrowserChecks": 32,
+    "nativeBoardsOpened": 300,
+    "completeBoardsPlayed": {
+      "easy": 1,
+      "medium": 1,
+      "hard": 1
+    },
+    "sharedRouteScenarios": 14,
+    "launcherHttpChecks": 8,
+    "offlineGuideChecks": 7,
+    "recognitionWords": 103836,
+    "allPassed": true,
+    "solver": "Original completed solver proof with all300 frozen bindings revalidated; solver not rerun."
+  },
+  "previewCorrections": [
+    "Recognition set matches exact frozen103836 words",
+    "Shared-route version read from manifest",
+    "Required native welcome-book avatar retained",
+    "Offline guide uses relative local fonts"
+  ],
+  "productionMain": "202899e93c8298207a9d33cce1d9cee442a3009e",
+  "productionDeployment": "dpl_HHKVQ32mLGv4kCzbnQFFQ3a4y2oe",
+  "productionModified": false,
+  "databaseModified": false,
+  "humanPlaytest": false,
+  "userApprovedNewBoards": false,
+  "sourceSnapshot": "Original exact manufacturing tools, original46 inputs plus v3 guards and final reports are included under work-free-refresh/ in the delivered ZIP; reconstructed emergency sources in this recovery directory remain historical.",
+  "nextStepsForRelease": [
+    "User review of boards, CTA and proposed route",
+    "Human playtest",
+    "Separate production shared-route migration implementation and approved deployment"
+  ]
+}
