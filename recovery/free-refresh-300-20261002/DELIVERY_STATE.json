@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-02",
+  "kind": "free-refresh-300-recovery-archive",
+  "productionModified": false,
+  "databaseModified": false,
+  "workflowExecuted": false,
+  "cloudReplayExecuted": false,
+  "content": {
+    "manufactured": 300,
+    "counts": {
+      "easy": 100,
+      "medium": 100,
+      "hard": 100
+    },
+    "canonicalContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+    "bankFileSha256": "55cae68a3cbf12d2b9813ba62d22c70dedd15471869a6aa2646910922a55147f",
+    "aiEditorialReviewed": 300,
+    "humanPlaytest": false,
+    "userApprovedTheseBoards": false
+  },
+  "localOriginalVerification": {
+    "technicalAll300Pass": true,
+    "renderedAll300": true,
+    "fullBoardsPlayed": {
+      "easy": 1,
+      "medium": 1,
+      "hard": 1
+    },
+    "checks": 27,
+    "realServerLeaderboardTested": false,
+    "newReconstructedSourceQaPerformed": false
+  },
+  "originalZip": {
+    "absolutePath": "C:/Users/prouz/.codex/.chatgpt-projects/g-p-6aac5023adc48191bd66be037edff741/_free_preview_slim_trial.zip",
+    "bytes": 23567731,
+    "files": 329,
+    "createdBeforeRuntimeDisconnect": true,
+    "postDisconnectAvailabilityVerified": false,
+    "libraryUploadSucceeded": false
+  },
+  "localDataRoot": "C:/Users/prouz/.codex/.chatgpt-projects/g-p-6aac5023adc48191bd66be037edff741/work-free-refresh/content/gen6/free-refresh-300/",
+  "remoteArchiveContainsOriginalBank": false,
+  "blockedReason": "Local execution environment disconnected; original bank, full report, manufacturing source and ZIP bytes could not be read or transferred afterward.",
+  "nextAction": "Reconnect the same local environment; verify original bank and ZIP bytes, append original complete content/reports and this overview, save and deliver; rerun verification only for subsequently changed sources.",
+  "baseline": {
+    "main": "202899e93c8298207a9d33cce1d9cee442a3009e",
+    "content": "5fc234e8e481950a68a25bf77f0103fab936532f",
+    "tooling": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+    "productionDeployment": "dpl_HHKVQ32mLGv4kCzbnQFFQ3a4y2oe"
+  },
+  "reconstructedSourceNotice": "Files reconstructed from last observed readbacks. They are preserved for comparison and have not been run after reconstruction. No newly manufactured or unreviewed replacement content is included."
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "historical-local-independent-audit-receipt-reconstructed-from-session",
+  "asOf": "2026-10-02",
+  "originalFullAuditReportRecovered": false,
+  "originalFullAuditScriptRecovered": false,
+  "cloudManufacturingReplayExecuted": false,
+  "observedLocalAuditBeforeExecutorDisconnect": {
+    "reportPath": "content/gen6/free-refresh-300/independent-verification.json",
+    "allPassed": true,
+    "issues": 0,
+    "counts": {
+      "easy": 100,
+      "medium": 100,
+      "hard": 100
+    },
+    "sourceFilesVerified": 46,
+    "immutableV3OutputsVerified": 6,
+    "bankFileSha256": "55cae68a3cbf12d2b9813ba62d22c70dedd15471869a6aa2646910922a55147f",
+    "contentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+    "dictionarySize": 103836,
+    "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+    "recognitionPlaintextSha256": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+    "lexiconSha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+    "seconds": 1.219
+  },
+  "recoveredArtifacts": {
+    "reconstructedSourceGuardBlob": "8b68a3893d6227978a4c8bc22420d3a44971b123",
+    "reconstructedIndependentAuditScriptBlob": "6d998e01d2bbb9a89781ffb39dceb67f074a7dbe",
+    "sharedRouteVerifierScriptBlob": "32aea792d83c3924bcdcf25b13c67c6cd940e2a8"
+  },
+  "rawHistoryRecoveryCheck": {
+    "records": 2797,
+    "geometries": 2731,
+    "sourceCounts": {
+      "public/puzzles.json": 1847,
+      "data/puzzles.json": 1846,
+      "data/rolling_content_v1.json": 65,
+      "data/tajenka_weekend_v1.json": 10,
+      "data/tajenka_weekend_v2.json": 37,
+      "data/tajenka_v2_approved.json": 37,
+      "data/tajenka_v2_board_candidates.json": 41,
+      "data/playtests/mozkokalypsa-v1.json": 10,
+      "data/playtests/mozkokalypsa-v2.json": 12,
+      "data/playtests/mozkokalypsa-v3.json": 8,
+      "data/legacy_daily_gen1.json": 365,
+      "data/legacy_daily_gen2.json": 365,
+      "content/gen6/mozkokalypsa-100/bank.json": 100
+    },
+    "conflicts": []
+  },
+  "limitations": [
+    "This receipt preserves only facts actually observed in the earlier local run; it cannot replace its missing full per-board report.",
+    "The reconstructed audit script must be executed against the cloud-replayed bank, and its exact required content hash and all checks must pass before a replay is claimed."
+  ]
+}

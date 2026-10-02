@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "kind": "reconstructed-source-inputs-verified",
+  "asOf": "2026-10-02",
+  "repository": "prouza-hue/proplet",
+  "contentSourceMain": "5fc234e8e481950a68a25bf77f0103fab936532f",
+  "toolingSource": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+  "recovery": {
+    "originalSerializationRecovered": false,
+    "originalLocalGuardFileNotAccessible": true,
+    "sourceRecordsReconstructedFromExactGitSnapshots": true,
+    "allByteCountGitBlobSha1AndSha256CheckedAgain": true,
+    "manufacturingReplayExecuted": false
+  },
+  "files": [
+    {
+      "path": "content/gen5/profiles.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "fd19693fa23f26118b48626536fdf94995e0d840",
+      "bytes": 6476,
+      "sha256": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5",
+      "gitSha1": "fd19693fa23f26118b48626536fdf94995e0d840"
+    },
+    {
+      "path": "content/gen6/mozkokalypsa-100/bank.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "b30263a61570bf9709a91faa6e69cf028d13da8f",
+      "bytes": 703825,
+      "sha256": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
+      "gitSha1": "b30263a61570bf9709a91faa6e69cf028d13da8f"
+    },
+    {
+      "path": "content/gen6/recognition-words.txt",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "cfb1c8d89313b8ccbfaf97f148534a71ac36f8a0",
+      "bytes": 249748,
+      "sha256": "f46893e253df5cf155980e172160aa5f906eebb059f89ddcf0faa1b26d33661b",
+      "gitSha1": "cfb1c8d89313b8ccbfaf97f148534a71ac36f8a0"
+    },
+    {
+      "path": "content/gen6/round3-eight/selection-policy.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "27e8456bcd3ee28bd8ba1cdd1796030f8fe03072",
+      "bytes": 1872,
+      "sha256": "0cd410c21f0db8063c46670d9b809dffc535d78b3db57fea94bfaeb765cdb370",
+      "gitSha1": "27e8456bcd3ee28bd8ba1cdd1796030f8fe03072"
+    },
+    {
+      "path": "content/gen6/round3-eight/wordfreq-cs-runtime.txt",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "3208ebc94f17871dd5564e36d8ba01b66d65b0b5",
+      "bytes": 946640,
+      "sha256": "bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610",
+      "gitSha1": "3208ebc94f17871dd5564e36d8ba01b66d65b0b5"
+    },
+    {
+      "path": "content/gen6/round3-eight/wordfreq-manifest.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "f7fefc62a3b0ee9fd12daac77c296a5620748054",
+      "bytes": 580,
+      "sha256": "1b1a748c0607b855cab5cc4db2dd8c692f3fbb35066e5a98979ac617c8f84367",
+      "gitSha1": "f7fefc62a3b0ee9fd12daac77c296a5620748054"
+    },
+    {
+      "path": "content/generation-manifest.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "03427f87cee4e8a2a8de080a15d81fe684cea1c8",
+      "bytes": 6789,
+      "sha256": "d8d1b5b96a2980c6c4e07276c15f95642868817babdec954eef14844f675075b",
+      "gitSha1": "03427f87cee4e8a2a8de080a15d81fe684cea1c8"
+    },
+    {
+      "path": "content/lexicon-v3/candidate-lexicon.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "33688d0f3055545b93898922481ff50973fc1b9b",
+      "bytes": 249209,
+      "sha256": "0c2e29c8a7a4982e5b895ff1d69ea428aa44df2a4e5d1717f88faba866a753d8",
+      "gitSha1": "33688d0f3055545b93898922481ff50973fc1b9b"
+    },
+    {
+      "path": "content/lexicon-v3/candidate-seeds.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "e36136cdc6345532c4d96f4b57ddd4c9800d7416",
+      "bytes": 10266,
+      "sha256": "0575ded2372981d0b7c34235259984e12b20b0be990d06187ff583a7d4170f38",
+      "gitSha1": "e36136cdc6345532c4d96f4b57ddd4c9800d7416"
+    },
+    {
+      "path": "content/lexicon-v3/editorial-batch-001.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "3fcff290254a7effda7d511b5fa680fc194f7807",
+      "bytes": 238568,
+      "sha256": "d1113708c39c416ad5a694874f7746e2e3850d0ba0b2e36b6274ba224fffcd74",
+      "gitSha1": "3fcff290254a7effda7d511b5fa680fc194f7807"
+    },
+    {
+      "path": "content/lexicon-v3/working/capacity.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "0b562b41dd73ccb1c0d3c2b9193d5cf87096d190",
+      "bytes": 422521,
+      "sha256": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+      "gitSha1": "0b562b41dd73ccb1c0d3c2b9193d5cf87096d190"
+    },
+    {
+      "path": "content/lexicon-v3/working/editorial-addendum-20260927.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "f2a35a0323959964182d2bbd73aaa102a34dffee",
+      "bytes": 1049,
+      "sha256": "0d72fdc1d6e20eafce334c969aa4766dff5b97861235ca313a061e78e1bbc07d",
+      "gitSha1": "f2a35a0323959964182d2bbd73aaa102a34dffee"
+    },
+    {
+      "path": "content/lexicon-v3/working/editorial-reviews.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "dc18ca511544d74c5383a9be7aaa260d6063b8ed",
+      "bytes": 2954092,
+      "sha256": "997a1d64632ac278b2b37e17ac3c660726a477cc0cc80e2107cf77c90c688a0e",
+      "gitSha1": "dc18ca511544d74c5383a9be7aaa260d6063b8ed"
+    },
+    {
+      "path": "content/lexicon-v3/working/inventory.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "b821ff4cdab9ef43943ef90bd02024b6afd6d679",
+      "bytes": 919085,
+      "sha256": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+      "gitSha1": "b821ff4cdab9ef43943ef90bd02024b6afd6d679"
+    },
+    {
+      "path": "content/lexicon-v3/working/lexicon.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "ccd79a80ad39dac43ca7586a126497ebbf994709",
+      "bytes": 4546447,
+      "sha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+      "gitSha1": "ccd79a80ad39dac43ca7586a126497ebbf994709"
+    },
+    {
+      "path": "content/lexicon-v3/working/manifest.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "a6d2021994b4aae1fe947e91ddd7a3473e0268a9",
+      "bytes": 3989,
+      "sha256": "a8a333e598d3f7a195dc59a03b6226c1cc719fbe77594c91b9cb00f2b638e99a",
+      "gitSha1": "a6d2021994b4aae1fe947e91ddd7a3473e0268a9"
+    },
+    {
+      "path": "content/lexicon-v3/working/README.md",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "70497b6f570c986132dbf2b404d1841bfd63863c",
+      "bytes": 3768,
+      "sha256": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
+      "gitSha1": "70497b6f570c986132dbf2b404d1841bfd63863c"
+    },
+    {
+      "path": "content/lexicon-v3/working/recognition-words.txt",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "ff27a8928817aead69d2aa0d4d379823e34a9491",
+      "bytes": 255734,
+      "sha256": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+      "gitSha1": "ff27a8928817aead69d2aa0d4d379823e34a9491"
+    },
+    {
+      "path": "content/lexicon-v3/working/source-limitations.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "0de73ed50822cad3c6546f30159c116aa9fc065e",
+      "bytes": 165450,
+      "sha256": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+      "gitSha1": "0de73ed50822cad3c6546f30159c116aa9fc065e"
+    },
+    {
+      "path": "content/lexicon-v3/working/source-manifest.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "828f11589d3670d2f99f5fe0ead332cdc60c973e",
+      "bytes": 4750,
+      "sha256": "464dda20cab1b672a51ba338637bc1238f2d63d8ed4fe69bb2505a0b5ce02cc9",
+      "gitSha1": "828f11589d3670d2f99f5fe0ead332cdc60c973e"
+    },
+    {
+      "path": "content/lexicon-v3/working/topic-map.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "ef274deb3f512c518834f30aa1ba1e7dc856ad86",
+      "bytes": 14129,
+      "sha256": "6c5e05e036317512f42f20d2322960a04e14d516a91b90b8e7887318494b2704",
+      "gitSha1": "ef274deb3f512c518834f30aa1ba1e7dc856ad86"
+    },
+    {
+      "path": "content/lexicon-v3/working/variant-groups.json",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "133f79b31bbf1e3e8f2dda305277e452f72c0113",
+      "bytes": 2987,
+      "sha256": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a",
+      "gitSha1": "133f79b31bbf1e3e8f2dda305277e452f72c0113"
+    },
+    {
+      "path": "data/answer_tiers.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "54c0959f5bca7c42ab45a8f1372b8169305edf0f",
+      "bytes": 726697,
+      "sha256": "3088dbe03fb2a0ac4d441f9338595be79a0138e2b35a3d9d7101d58a0532a799",
+      "gitSha1": "54c0959f5bca7c42ab45a8f1372b8169305edf0f"
+    },
+    {
+      "path": "data/legacy_daily_gen1.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "e9232740f284f3c90cae33e3f420b31a99819b79",
+      "bytes": 388950,
+      "sha256": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+      "gitSha1": "e9232740f284f3c90cae33e3f420b31a99819b79"
+    },
+    {
+      "path": "data/legacy_daily_gen2.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "d2291ab9708b15f6111db14252af009a15d6bbcc",
+      "bytes": 1438750,
+      "sha256": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+      "gitSha1": "d2291ab9708b15f6111db14252af009a15d6bbcc"
+    },
+    {
+      "path": "data/lexicon_v2_wikidata_raw.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "2556255384d061d4238ae1c3c080046d1aa0eef6",
+      "bytes": 2168800,
+      "sha256": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+      "gitSha1": "2556255384d061d4238ae1c3c080046d1aa0eef6"
+    },
+    {
+      "path": "data/lexicon_v2.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "ca4a898d83bf9551ee1fd8d959da50664f42e2b1",
+      "bytes": 1716041,
+      "sha256": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+      "gitSha1": "ca4a898d83bf9551ee1fd8d959da50664f42e2b1"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v1.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "6d05e1824110c7d0fcf7d989412312481c9c77b7",
+      "bytes": 55939,
+      "sha256": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+      "gitSha1": "6d05e1824110c7d0fcf7d989412312481c9c77b7"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v2.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "3e5bb1c3d23079eb5163e3642ed03ae678e79220",
+      "bytes": 69717,
+      "sha256": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "gitSha1": "3e5bb1c3d23079eb5163e3642ed03ae678e79220"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v3.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "52c11b2d8d8cad520938a7bcabee98b5cfbb3909",
+      "bytes": 52879,
+      "sha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+      "gitSha1": "52c11b2d8d8cad520938a7bcabee98b5cfbb3909"
+    },
+    {
+      "path": "data/puzzles.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "78d46516754f3dc1c02285cc8f749989a9448dad",
+      "bytes": 3983660,
+      "sha256": "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937",
+      "gitSha1": "78d46516754f3dc1c02285cc8f749989a9448dad"
+    },
+    {
+      "path": "data/rolling_content_v1.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "1c33da18a66a3e09eeee5e63e62309bd46eaa804",
+      "bytes": 374393,
+      "sha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "gitSha1": "1c33da18a66a3e09eeee5e63e62309bd46eaa804"
+    },
+    {
+      "path": "data/tajenka_v2_approved.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "bb398d51b3b6c94ba575c1c01ecb3f6e99a9a971",
+      "bytes": 138307,
+      "sha256": "16f7758b5d1c1c1d84ef21f23e0ca3f6490dedc5f66ae0afa96924e2b633f6bb",
+      "gitSha1": "bb398d51b3b6c94ba575c1c01ecb3f6e99a9a971"
+    },
+    {
+      "path": "data/tajenka_v2_board_candidates.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "89895dd44060b16847a917e1cd9e6352e8c792df",
+      "bytes": 150518,
+      "sha256": "0bd8b6842ca914315c9fadc01d39a6d70493b5f11b203fab41ca208a2051134f",
+      "gitSha1": "89895dd44060b16847a917e1cd9e6352e8c792df"
+    },
+    {
+      "path": "data/tajenka_weekend_v1.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "08e9d1974939152794f4f2503186417469ea815e",
+      "bytes": 40393,
+      "sha256": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "gitSha1": "08e9d1974939152794f4f2503186417469ea815e"
+    },
+    {
+      "path": "data/tajenka_weekend_v2.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "b9a4a099c6e880ed55b0fb8d4f51b890cc17605c",
+      "bytes": 169995,
+      "sha256": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+      "gitSha1": "b9a4a099c6e880ed55b0fb8d4f51b890cc17605c"
+    },
+    {
+      "path": "data/target_generation_exclusions_v334.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "84b931fda33ccba3a84b9193a6e78831540c7d4d",
+      "bytes": 1694,
+      "sha256": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+      "gitSha1": "84b931fda33ccba3a84b9193a6e78831540c7d4d"
+    },
+    {
+      "path": "data/words.txt",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "4df37d2cd946127e8971a3dd013657fc86abec96",
+      "bytes": 112068,
+      "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "gitSha1": "4df37d2cd946127e8971a3dd013657fc86abec96"
+    },
+    {
+      "path": "public/puzzles.json",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "b2d1f3f9f264e6f35eb74af081ccbc976e1ee4ea",
+      "bytes": 3985199,
+      "sha256": "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e",
+      "gitSha1": "b2d1f3f9f264e6f35eb74af081ccbc976e1ee4ea"
+    },
+    {
+      "path": "public/valid-words-v3328.txt",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "4df37d2cd946127e8971a3dd013657fc86abec96",
+      "bytes": 112068,
+      "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "gitSha1": "4df37d2cd946127e8971a3dd013657fc86abec96"
+    },
+    {
+      "path": "requirements.txt",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "a74b76282a4712ad9ad93811f0e4fccc53e3ae81",
+      "bytes": 446,
+      "sha256": "2a69a1c3756240a505c6028d773a2ffbf41f73657d06bc0f5452710ce55f3451",
+      "gitSha1": "a74b76282a4712ad9ad93811f0e4fccc53e3ae81"
+    },
+    {
+      "path": "server.py",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "ff51c633421007be0870e214f359d2d25372a513",
+      "bytes": 245753,
+      "sha256": "50924a7008b205b8cdc4ef8d1ac29241d6152738880898190a2cdb0d82d66099",
+      "gitSha1": "ff51c633421007be0870e214f359d2d25372a513"
+    },
+    {
+      "path": "tools/build_lexicon_v2.py",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "294dfa5c620c446fa618bf5ec2b0359add4ef531",
+      "bytes": 12890,
+      "sha256": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+      "gitSha1": "294dfa5c620c446fa618bf5ec2b0359add4ef531"
+    },
+    {
+      "path": "tools/build_lexicon_v3_working.py",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "aa1303385dce9ce50178b19b8d9ca27f45ec39c8",
+      "bytes": 23391,
+      "sha256": "bceb009a271935077f64df3a14c956c9a749e8344e0c6f89fae64469c2894607",
+      "gitSha1": "aa1303385dce9ce50178b19b8d9ca27f45ec39c8"
+    },
+    {
+      "path": "tools/gen6/catalog.py",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "36fb8f0454bd0d02e1e5fa5fedf1f9a31e89a408",
+      "bytes": 14290,
+      "sha256": "b9819dc9f91381ae585b8555f47c34f2628d17393e4289245078fb2e8a4f10e2",
+      "gitSha1": "36fb8f0454bd0d02e1e5fa5fedf1f9a31e89a408"
+    },
+    {
+      "path": "word_recognition_v3330.py",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "fb6da85e93384df89a8818bc214e701d26a9a2fc",
+      "bytes": 18037,
+      "sha256": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+      "gitSha1": "fb6da85e93384df89a8818bc214e701d26a9a2fc"
+    }
+  ],
+  "additionalOriginalV3GuardFiles": [
+    {
+      "path": "tools/gen5/catalog.py",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "82d440a82ada58e71c86e7dd6d67f06bc2e00a49",
+      "gitSha1": "82d440a82ada58e71c86e7dd6d67f06bc2e00a49",
+      "bytes": 10986,
+      "sha256": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74"
+    },
+    {
+      "path": "tools/gen5/validation.py",
+      "sourceRef": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+      "blobSha": "5980373daa19bb3058ff9f47e7eaa6d64fb73b08",
+      "gitSha1": "5980373daa19bb3058ff9f47e7eaa6d64fb73b08",
+      "bytes": 11387,
+      "sha256": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd"
+    }
+  ],
+  "v3GuardPathsChecked": 28,
+  "explicitInputDeltas": [
+    {
+      "path": "data/puzzles.json",
+      "originalSha256": "72471265bfb9c1047710172cb1377a31eb6aa9e1c08c4969ee0b556551e014c0",
+      "currentSha256": "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "78d46516754f3dc1c02285cc8f749989a9448dad",
+      "reason": "Production MK100 content present in frozen main snapshot 5fc234e8; explicitly verified before manufacturing."
+    },
+    {
+      "path": "public/puzzles.json",
+      "originalSha256": "57a5ea6e3e69e01f2093e0225f763a75e47734a6815f097fcdc7da47d63e8173",
+      "currentSha256": "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e",
+      "sourceRef": "5fc234e8e481950a68a25bf77f0103fab936532f",
+      "blobSha": "b2d1f3f9f264e6f35eb74af081ccbc976e1ee4ea",
+      "reason": "Production MK100 content present in frozen main snapshot 5fc234e8; explicitly verified before manufacturing."
+    }
+  ],
+  "immutableV3Outputs": [
+    {
+      "path": "content/lexicon-v3/working/lexicon.json",
+      "sha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+      "blobSha": "ccd79a80ad39dac43ca7586a126497ebbf994709",
+      "bytes": 4546447
+    },
+    {
+      "path": "content/lexicon-v3/working/inventory.json",
+      "sha256": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+      "blobSha": "b821ff4cdab9ef43943ef90bd02024b6afd6d679",
+      "bytes": 919085
+    },
+    {
+      "path": "content/lexicon-v3/working/capacity.json",
+      "sha256": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+      "blobSha": "0b562b41dd73ccb1c0d3c2b9193d5cf87096d190",
+      "bytes": 422521
+    },
+    {
+      "path": "content/lexicon-v3/working/recognition-words.txt",
+      "sha256": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+      "blobSha": "ff27a8928817aead69d2aa0d4d379823e34a9491",
+      "bytes": 255734
+    },
+    {
+      "path": "content/lexicon-v3/working/source-limitations.json",
+      "sha256": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+      "blobSha": "0de73ed50822cad3c6546f30159c116aa9fc065e",
+      "bytes": 165450
+    },
+    {
+      "path": "content/lexicon-v3/working/README.md",
+      "sha256": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
+      "blobSha": "70497b6f570c986132dbf2b404d1841bfd63863c",
+      "bytes": 3768
+    }
+  ],
+  "totalFiles": 46,
+  "totalBytes": 27708849
+}
