@@ -1378,6 +1378,15 @@ def _reserve_push_delivery(sub: dict, event_key: str, category: str) -> Optional
         raise
 
 
+from mozkokalypsa_launch_push import install_launch_push
+
+install_launch_push(
+    app, tz=TZ, push_ready=push_ready, db_select_bounded=db_select_bounded,
+    reserve_delivery=_reserve_push_delivery, db_update=db_update, webpush=webpush,
+    vapid_private=VAPID_PRIVATE_KEY, vapid_subject=VAPID_SUBJECT, logger=logger,
+)
+
+
 @app.get("/api/cron/content-push")
 def cron_content_push(request: Request, authorization: Optional[str] = Header(default=None)):
     if not CRON_SECRET or authorization != f"Bearer {CRON_SECRET}":
