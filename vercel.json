@@ -1,62 +1,36 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python tools/generate_puzzles_bootstrap.py",
-  "regions": [
-    "arn1"
-  ],
-  "env": {
-    "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true",
-    "PROPLET_FREE_ORDER_ENABLED": "true",
-    "PROPLET_MOZKOKALYPSA_ENABLED": "true"
-  },
-  "crons": [
+  "framework": null,
+  "git": {"deploymentEnabled": {"preview/support-20261003": false}},
+  "builds": [
     {
-      "path": "/api/cron/daily-push-v2",
-      "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/mozkokalypsa-launch-push",
-      "schedule": "0 8 2 10 *"
+      "use": "@vercel/static",
+      "src": "support-dist/**"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
+      "src": "/(.*)",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "X-Robots-Tag": "noindex, nofollow",
+        "Content-Security-Policy": "default-src 'self'; connect-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'",
+        "Cache-Control": "no-store",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+        "Referrer-Policy": "no-referrer"
+      },
+      "continue": true
     },
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://hrajproplet.cz https://iopyhluayfszskyqqpuc.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), payment=()"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000"
-        }
-      ]
+      "status": 404,
+      "src": "/api(?:/.*)?"
+    },
+    {
+      "dest": "/support-dist/index.html",
+      "src": "/"
+    },
+    {
+      "dest": "/support-dist/$1",
+      "src": "/(.*)"
     }
   ]
 }

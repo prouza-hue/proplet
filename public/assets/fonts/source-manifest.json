@@ -1,0 +1,32 @@
+[
+  {
+    "family": "Fraunces",
+    "file": "fraunces-f87675d4d91d.woff2",
+    "sha256": "f87675d4d91d0a6a06c11705c56bc0a58738c390ed15f618a4b71e5ea252d575",
+    "source": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc7qv8.woff2"
+  },
+  {
+    "family": "Fraunces",
+    "file": "fraunces-a8013c85f5db.woff2",
+    "sha256": "a8013c85f5db6b94b25985584f57e70b81d59ea52e3166ee9358161257087df5",
+    "source": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc1qv86Rg.woff2"
+  },
+  {
+    "family": "Fraunces",
+    "file": "fraunces-98279e343ecb.woff2",
+    "sha256": "98279e343ecb1085f7488e38998f4b3b3adc18591682210ccdaf87601b7408a1",
+    "source": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7iQcIfJD58niz0oc0qv86Rg.woff2"
+  },
+  {
+    "family": "Outfit",
+    "file": "outfit-6c18d579fd87.woff2",
+    "sha256": "6c18d579fd87c3776be068b762cbc83fde3acb543d49eabd3ade842eb987e887",
+    "source": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtq.woff2"
+  },
+  {
+    "family": "Outfit",
+    "file": "outfit-0f53d1c03b39.woff2",
+    "sha256": "0f53d1c03b3918d744a843b5039001ee31695ca1e255e3914188df81beb461e9",
+    "source": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqQ4E.woff2"
+  }
+]
