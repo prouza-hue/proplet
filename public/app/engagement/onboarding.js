@@ -110,6 +110,7 @@
         setAuthIntent(false);
         hideOnboarding();
         document.querySelector('#starterReturningActions')?.classList.add('hidden');
+        document.dispatchEvent(new CustomEvent('proplet:returning-player'));
         nav('daily');
         window.PropletSharing?.resumeInvitation?.();
       }
@@ -242,3 +243,4 @@
   const api={install,shouldOfferStarterHint,advancePesTapPath,completeTutorial};
   return api;
 });
+

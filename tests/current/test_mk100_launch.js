@@ -2,15 +2,15 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync('public/app/mozkokalypsa-launch.js','utf8');
 const seen='proplet:content-release:mk100-v2';
-function setup({local=new Map([['onboard','done']]),session=new Map(),screen='daily',blocked=false,quiet=false,missing=false,denied=false}={}){
+function setup({local=new Map([['onboard','done']]),session=new Map(),screen='daily',blocked=false,quiet=false,missing=false,denied=false,profile=null,prior=false}={}){
  const events=new Map(),nodes=new Map(),timers=[],games=[];
  const storage=map=>({getItem:k=>{if(denied)throw Error('blocked');return map.get(k)},setItem:(k,v)=>{if(denied)throw Error('blocked');map.set(k,v)},removeItem:k=>map.delete(k)});
  function node(){const classes=new Set(),handlers=new Map(),children=new Map();return {inert:false,isConnected:true,style:{},classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x)},set className(s){s.split(' ').forEach(x=>classes.add(x))},setAttribute(){},focus(){},contains(){return false},querySelector(s){if(!children.has(s))children.set(s,node());return children.get(s)},querySelectorAll(){return [...children.values()]},addEventListener:(e,f)=>handlers.set(e,f),emit:(e,v={})=>handlers.get(e)?.(v)}};
  const main=node();main.tagName='MAIN';const body={children:[main],style:{overflow:'auto'},appendChild:n=>{body.children.push(n);nodes.set(n.id,n)}};
  const document={body,hidden:false,activeElement:main,createElement:node,querySelector:()=>blocked?{}:null,addEventListener:(e,f)=>events.set(e,f)};
- const context={document,localStorage:storage(local),sessionStorage:storage(session),ONBOARD_KEY:'onboard',currentScreen:screen,onboardingMandatory:false,puzzleDB:{free:{mozkokalypsa:Array.from({length:missing?99:100},(_,i)=>({id:`mk100-v2-${i}`}))}},openTransientModal:()=>blocked?{}:null,setTimeout:f=>timers.push(f),window:{startFree:d=>games.push(d),PropletFirstSteps:{quiet:()=>quiet}}};
+ const context={getProfile:()=>profile,getState:()=>({completed:prior?{old:true}:{}}),document,localStorage:storage(local),sessionStorage:storage(session),ONBOARD_KEY:'onboard',currentScreen:screen,onboardingMandatory:false,puzzleDB:{free:{mozkokalypsa:Array.from({length:missing?99:100},(_,i)=>({id:`mk100-v2-${i}`}))}},openTransientModal:()=>blocked?{}:null,setTimeout:f=>timers.push(f),window:{startFree:d=>games.push(d),PropletFirstSteps:{quiet:()=>quiet}}};
  vm.createContext(context);vm.runInContext(source,context);
- return {context,main,local,session,games,document,emit:e=>events.get(e)?.(),flush(){while(timers.length)timers.shift()()},modal:()=>nodes.get('mk100LaunchPreview')};
+ return {context,main,local,session,games,document,setProfile:p=>{profile=p},emit:e=>events.get(e)?.(),flush(){while(timers.length)timers.shift()()},modal:()=>nodes.get('mk100LaunchPreview')};
 }
 // Completing onboarding, navigation, reload and OAuth return remain quiet in visit one.
 const first=setup({local:new Map()});first.emit('proplet:ready');assert(!first.modal());
@@ -25,3 +25,25 @@ const defer=setup({screen:'game'});defer.emit('proplet:ready');defer.context.cur
 defer.context.window.PropletContentRelease.close();assert(defer.modal().classList.contains('hidden'));assert(!defer.main.inert);
 const play=setup();play.emit('proplet:ready');play.modal().querySelector('[data-mk-launch-play]').emit('click');assert.deepEqual(play.games,['mozkokalypsa']);assert.equal(play.local.get(seen),'1');
 console.log('PASS: onboarding first visit/reload/OAuth suppression, next visit, once dismissal, safe screens, content availability, storage failures and play action');
+
+
+// Existing accounts must not inherit another player's browser-wide dismissal.
+const shared=setup({local:new Map([['onboard','done'],[seen,'1']]),profile:{id:'tester',token:'test'}});
+shared.emit('proplet:ready');assert(shared.modal(),'existing account inherited browser dismissal');
+shared.modal().querySelector('[data-mk-launch-back]').emit('click');
+assert.equal(shared.local.get(seen+':account:tester'),'1');
+const same=setup({local:shared.local,profile:{id:'tester',token:'test'}});same.emit('proplet:ready');assert(!same.modal());
+const returning=setup({local:new Map(),quiet:true});returning.emit('proplet:ready');
+returning.setProfile({id:'returner',token:'test'});returning.local.set('onboard','done');
+returning.emit('proplet:returning-player');returning.flush();assert(returning.modal(),'returning login remained first visit');
+const registered=setup({local:new Map(),quiet:true});registered.emit('proplet:ready');
+registered.setProfile({id:'new',token:'test'});registered.local.set('onboard','done');
+registered.emit('proplet:account-changed');registered.flush();assert(!registered.modal(),'new registration interrupted');
+
+const switched=setup({profile:{id:'a',token:'test'}});switched.emit('proplet:ready');
+switched.setProfile({id:'b',token:'test'});switched.emit('proplet:account-changed');switched.flush();
+assert(!switched.modal().classList.contains('hidden'));assert(!switched.local.has(seen+':account:a'));
+switched.modal().querySelector('[data-mk-launch-back]').emit('click');assert.equal(switched.local.get(seen+':account:b'),'1');
+const existing=setup({local:new Map(),profile:{id:'old',token:'test'}});existing.local.set('onboard','done');existing.emit('proplet:ready');assert(existing.modal());
+const loginReload=setup({local:returning.local,session:returning.session,quiet:true,profile:{id:'returner',token:'test'}});loginReload.emit('proplet:ready');assert(loginReload.modal());
+console.log('PASS: account-scoped dismissal, account switching, existing login and reload, new signup stays quiet');
