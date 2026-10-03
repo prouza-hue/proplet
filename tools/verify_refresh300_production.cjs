@@ -15,9 +15,12 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  });
  await page.goto(base,{waitUntil:'domcontentloaded'});
  await page.locator('#freeRefreshAnnouncement').waitFor({state:'visible'});
+ await page.waitForFunction(()=>window.__PROPLET_PRINTSHOP_RELEASE_POLISH_V2__===true);
+ await page.evaluate(()=>document.fonts.ready);
  check('automatic announcement, no autofocus outline',await page.locator('[data-refresh-play]').evaluate(n=>getComputedStyle(n).outlineStyle==='none'||getComputedStyle(n).outlineWidth==='0px'));
  for(const width of [320,390,840,1440]){
   await page.setViewportSize({width,height:900});
+  await page.waitForFunction(()=>{const r=document.querySelector('.refresh-announcement').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.documentElement.scrollWidth<=innerWidth+1});
   check('modal fits '+width,await page.evaluate(()=>{const r=document.querySelector('.refresh-announcement').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.documentElement.scrollWidth<=innerWidth+1}));
   await page.screenshot({path:`${out}/modal-${width}.png`});
  }

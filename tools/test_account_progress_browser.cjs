@@ -10,6 +10,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
  const report={sha:health.sha,started:new Date().toISOString(),browser:browser.version(),synthetic:true,checks:[]};
  try{
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width:1104,height:884}});
+  context.setDefaultTimeout(15000);
   const page=await context.newPage();let release,fail=false,requests=0,completed=[];
   const waitForRequests=async target=>{for(let i=0;i<80&&requests<target;i++)await page.waitForTimeout(50);assert(requests>=target,`expected ${target} progress reads, got ${requests}`)};
   // The committed Tajenka fixture is release slot 3; keep the test on that date.
