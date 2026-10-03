@@ -12,7 +12,7 @@
   const gen5CandidatePreview=previewHost&&(location.hostname.startsWith('proplet-git-feat-gen5-lab-')||new URLSearchParams(location.search).get('releasePreview')==='1');
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'4.04.0',
+    version:'4.05.0',
     canonicalOrigin,
     gen4CandidatePreview,
     gen5CandidatePreview,
@@ -187,4 +187,5 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',bootRuntimeExtras,{once:true});
   else bootRuntimeExtras();
 })();
+
 

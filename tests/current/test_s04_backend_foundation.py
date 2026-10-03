@@ -350,6 +350,11 @@ with (
     assert health_fixture['freeBaseLevelCounts'].pop('mozkokalypsa') == 100
     assert health_fixture['mozkomorUnlock']['requiresCurrentBaseLevels'] == 0
     health_fixture['mozkomorUnlock'].update(requiresDifficulty='hardcore', requiresCurrentBaseLevels=200, persistentOnceEarned=True)
+    # Approved refresh appends exactly 100 boards in each of these banks.
+    for difficulty in ('easy', 'medium', 'hard'):
+        assert health_fixture['freeBaseLevelCounts'][difficulty] == 400
+        health_fixture['freeBaseLevelCounts'][difficulty] -= 100
+        health_fixture['rollingContentAvailableCounts'][difficulty] -= 100
     response_fixtures = json.dumps(
         {
             "config": config_fixture,
@@ -369,3 +374,4 @@ assert response_fixture_digest == (
 
 
 print("Sprint 04 characterization contracts: PASS")
+

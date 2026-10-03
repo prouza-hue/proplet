@@ -496,6 +496,18 @@
       {
         "path": "tests/current/test_mk100_launch.js",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_refresh300_production.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_shared_refresh_order.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_refresh_release.cjs",
+        "runner": "node"
       }
     ]
   },

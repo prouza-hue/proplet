@@ -12,7 +12,7 @@ baseline = read('content/gen6/mozkokalypsa-100/production-boundaries.json')
 digest = lambda value: hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 assert data['freeGeneration'] == 4
 for difficulty, expected in baseline['free'].items():
-    assert digest(data['free'][difficulty]) == expected, difficulty
+    assert digest([p for p in data['free'][difficulty] if not p['id'].startswith('g6-refresh-')]) == expected, difficulty
 for key,expected in baseline['preserved'].items():
     assert digest(data.get(key)) == expected, key
 boards = data['free']['mozkokalypsa']
@@ -30,6 +30,7 @@ assert server.POINTS['mozkokalypsa'] == 200
 assert len(server.FREE_DIFFICULTIES) == 6
 assert hashlib.sha256((ROOT/'public/difficulty/printshop/mozkokalypsa-series-ochre.svg').read_bytes()).hexdigest() == '6db1291690c7add519a578b6c614a5841097580273621e27db2b0f8acf02d07c'
 html=(ROOT/'public/index.html').read_text()
-assert 'mk100-integrated-preview.js' not in html and '/app/mozkokalypsa-launch.js?v=mk100' in html
+assert 'mk100-integrated-preview.js' not in html and '/app/mozkokalypsa-launch.js?v=refresh300' in html
 assert 'build_mk100_integrated_preview' not in (ROOT/'vercel.json').read_text()
 print('PASS: frozen hundred, unchanged old banks/slots, verified CTA counts, ochre artwork and normal production integration')
+

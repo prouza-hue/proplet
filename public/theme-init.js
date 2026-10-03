@@ -129,7 +129,7 @@
     window.__PROPLET_COLD_BOOTSTRAP_PREFETCH=coldBootstrapFetch;
 
     const hydrator=document.createElement('script');
-    hydrator.src='/bootstrap-hydrator.js?v=auditphase2-2';
+    hydrator.src='/bootstrap-hydrator.js?v=refresh300';
     hydrator.async=false;
     hydrator.dataset.propletBootstrapHydrator='1';
     document.head.appendChild(hydrator);
@@ -228,7 +228,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=mk100','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=refresh300','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=mk100','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
@@ -273,4 +273,3 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
-

@@ -34,6 +34,7 @@ def settle_returning_player(page):
         sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
       }catch(e){}
       try{if(typeof closeOnboarding==='function')closeOnboarding(true)}catch(e){}
+      window.PropletRefreshRelease?.close();
       window.PropletContentRelease?.close();
       document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
       document.querySelector('.release-notes-v3331-backdrop')?.remove();
@@ -60,6 +61,7 @@ with sync_playwright() as p:
             sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
             localStorage.setItem('proplet:content-release:g5-r1','1');
             localStorage.setItem('proplet:content-release:mk100-v2','1');
+            localStorage.setItem('proplet:content-release:refresh300-v1','1');
           }catch(e){}
         })()""")
         page=ctx.new_page(); errors=[]
@@ -92,7 +94,7 @@ with sync_playwright() as p:
         news=page.evaluate("""()=>{
           const today=document.querySelector('#todayNewContentBanner'),free=document.querySelector('#newContentBanner');
           return {
-            directlyBelowDaily:document.querySelector('.daily-hero').nextElementSibling===document.querySelector('#mozkokalypsaInvite') && document.querySelector('#mozkokalypsaInvite').nextElementSibling===today,
+            directlyBelowDaily:document.querySelector('.daily-hero').nextElementSibling===document.querySelector('#mozkokalypsaInvite') && document.querySelector('#mozkokalypsaInvite').nextElementSibling===document.querySelector('#freeRefreshToday') && document.querySelector('#freeRefreshToday').nextElementSibling===today,
             pilotHidden:document.querySelector('#mozkokalypsaInvite').classList.contains('hidden'),
             separated:today.classList.contains('hidden') || today.getBoundingClientRect().top-document.querySelector('.daily-hero').getBoundingClientRect().bottom>=12,
             sameVisibility:today.classList.contains('hidden')===free.classList.contains('hidden'),
@@ -136,3 +138,4 @@ with sync_playwright() as p:
 
 with open(f'{OUT}/summary.json','w',encoding='utf-8') as f: json.dump(result,f,ensure_ascii=False,indent=2)
 print(json.dumps(result,ensure_ascii=False,indent=2))
+

@@ -69,6 +69,7 @@
     if(content)puzzleDB.contentStatus=content;
 
     window.__PROPLET_BOOTSTRAP_HYDRATED__=true;
+    document.dispatchEvent(new CustomEvent('proplet:content-ready'));
     try{typeof renderDaily==='function'&&renderDaily()}catch{}
     try{typeof renderFree==='function'&&renderFree()}catch{}
     return puzzleDB;
@@ -126,3 +127,4 @@
 
   installStartGate();
 })();
+
