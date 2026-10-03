@@ -296,22 +296,7 @@
       button.setAttribute('aria-description',done?'Dohráno. Opakování zůstává tréninkem.':'Dosud nedohráno.');
     });
   }
-  function showAnnouncement(){
-    let modal=document.getElementById('freeRefreshAnnouncement');
-    if(!modal){modal=document.createElement('div');modal.id='freeRefreshAnnouncement';modal.className='modal hidden';
-      modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','freeRefreshAnnouncementTitle');
-      modal.innerHTML='<section class="modal-card refresh-announcement"><button type="button" class="modal-close" data-refresh-close aria-label="Zavřít">×</button>'+
-        '<div class="refresh-announcement-art" aria-hidden="true"><img src="/difficulty/printshop/easy.webp" alt=""><img src="/difficulty/printshop/medium.webp" alt=""><img src="/difficulty/printshop/hard.webp" alt=""></div>'+
-        '<h2 id="freeRefreshAnnouncementTitle">300 nových Propletů</h2><p>Snadná, Střední a Těžká. V každé 100 nových desek s pestřejšími slovy.</p>'+
-        '<button type="button" class="primary-btn big" data-refresh-play>Vybrat obtížnost</button>'+
-        '<button type="button" class="text-btn" data-refresh-close>Teď ne</button></section>';
-      document.body.append(modal);
-      modal.querySelectorAll('[data-refresh-close]').forEach(button=>button.onclick=()=>modal.classList.add('hidden'));
-      modal.querySelector('[data-refresh-play]').onclick=()=>{modal.classList.add('hidden');chooseGame()};
-      modal.addEventListener('click',event=>{if(event.target===modal)modal.classList.add('hidden')});
-    }
-    modal.classList.remove('hidden');modal.querySelector('[data-refresh-play]').focus();
-  }
+  function showAnnouncement(){return global.PropletRefreshRelease?.showPreview()}
   function installPreviewControls(){
     global.freeOrder=()=>controller;
     const originalFree=global.renderFree;
@@ -330,7 +315,6 @@
     installOrderSettings();installHistoryCatalogue();renderFree();renderDaily();renderQuickPlay();updateCatalogue();
     if(params.get('announcement')==='refresh')showAnnouncement();
     if(params.has('board'))openBoard(params.get('board'));
-    document.addEventListener('keydown',event=>{if(event.key==='Escape')document.getElementById('freeRefreshAnnouncement')?.classList.add('hidden')});
   }
   global.PROPLET_FREE_REFRESH_PREVIEW={fixtureOnly:true,storagePrefix,bankHash,requests,openBoard,nextShared,showAnnouncement,controller,sharedOrder,manifest};
   document.addEventListener('proplet:ready',installPreviewControls,{once:true});

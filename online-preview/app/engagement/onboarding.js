@@ -110,6 +110,7 @@
         setAuthIntent(false);
         hideOnboarding();
         document.querySelector('#starterReturningActions')?.classList.add('hidden');
+        document.dispatchEvent(new CustomEvent('proplet:returning-player'));
         nav('daily');
         window.PropletSharing?.resumeInvitation?.();
       }

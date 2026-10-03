@@ -10,7 +10,7 @@ const monitor=page=>{
  page.on('request',r=>requests.push({url:r.url(),method:r.method()}));
  page.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url())});
 };
-const ready=page=>page.waitForFunction(()=>document.querySelectorAll('#freeOrderSettings select').length===4);
+const ready=async page=>{await page.waitForFunction(()=>document.querySelectorAll('#freeOrderSettings select').length===4);if(await page.locator('#freeRefreshAnnouncement').isVisible())await page.locator('[data-refresh-back]').click()};
 const closeGame=page=>page.evaluate(()=>{document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));const s=getState();s.inProgress={};saveState(s);currentGame=null;nav('free')});
 const shot=(page,name)=>page.screenshot({path:path.join(out,'ui-v3-'+name+'.png'),fullPage:true});
 (async()=>{

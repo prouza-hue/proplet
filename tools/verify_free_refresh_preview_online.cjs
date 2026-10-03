@@ -13,6 +13,7 @@ const screenshot=(page,name)=>page.screenshot({path:path.join(out,name+'.png'),f
   try{
     const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});monitor(page);
     await page.goto(base+'/?review=1',{waitUntil:'networkidle'});await page.waitForFunction(()=>document.querySelectorAll('[data-refresh-board]').length===300);
+    if(await page.locator('#freeRefreshAnnouncement').isVisible())await page.locator('[data-refresh-back]').click();
     bankHash=await page.evaluate(()=>PROPLET_FREE_REFRESH_PREVIEW.bankHash);
     check('native startup and 300 catalog entries',await page.evaluate(()=>!!window.PROPLET_FREE_REFRESH_PREVIEW&&!!document.querySelector('#freeRefreshToday')));
     check('route version comes from manifest',await page.evaluate(()=>freeOrder().record('easy').plan.version===PROPLET_SHARED_FREE_ORDER_MANIFEST.version));
