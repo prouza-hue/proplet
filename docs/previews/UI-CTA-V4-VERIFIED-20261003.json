@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-03",
+  "scope": "isolated preview only",
+  "stableUrl": "https://proplet-git-work-free-refresh-300-83f39d-pavel-prouzas-projects.vercel.app/",
+  "reviewUrl": "https://proplet-git-work-free-refresh-300-83f39d-pavel-prouzas-projects.vercel.app/?announcement=refresh",
+  "testedProductCommit": "1d774274f0f5ed80fed71159a03cb2eeb8f2459a",
+  "testedImmutableUrl": "https://proplet-7ksvx0vdn-pavel-prouzas-projects.vercel.app",
+  "mainObserved": "be480ca29a0c966175bd80ee5872cfa4c9b6e053",
+  "productionWrites": false,
+  "supabaseWrites": false,
+  "verification": {
+    "gameFlow": {
+      "run": 37111343965,
+      "checks": 32,
+      "passed": true
+    },
+    "sharedOrdering": {
+      "run": 37111343965,
+      "checks": 51,
+      "passed": true
+    },
+    "ctaResponsive": {
+      "run": 37111535990,
+      "checks": 34,
+      "passed": true
+    },
+    "releaseEligibilityUnit": "PASS; first visit, returning account, per-account local dismissal, blocked screens, missing content, storage failure",
+    "viewports": [
+      320,
+      360,
+      390,
+      840,
+      1440
+    ],
+    "shortViewport": "320x480",
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "runtimeErrors": [],
+    "externalOrApiRequests": 0,
+    "nativeBack": "PASS"
+  },
+  "limitation": "Account eligibility is unit-tested; isolated preview does not connect to real auth backend.",
+  "visualInspection": [
+    "Dnes 320, 840",
+    "Modal 320, desktop",
+    "Dark modal and Dnes 390"
+  ],
+  "unchanged": {
+    "bankContentHash": "7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e",
+    "sharedManifestHash": "76f610ec34f64dde3f2931c8a56a44b7337f5636e63de9df98eb37a593396cd6",
+    "counts": [
+      400,
+      400,
+      400,
+      300,
+      150,
+      100
+    ]
+  },
+  "notes": [
+    "Full suite run 37111343965 has failure only in initial over-broad assertion expecting late-mounted hidden dialogs to be inert. All 83 game checks passed. Corrected visible-background assertion and all 34 CTA checks passed in 37111535990. No product changes between these runs."
+  ]
+}
