@@ -1,5 +1,5 @@
 /* A small release card stays visible after the entrance announcement closes. */
-#freeRefreshToday{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:18px;padding:20px 42px 20px 20px;margin:16px 0;border:1px solid #abc4b2;background:linear-gradient(115deg,#dcebd7,#e9f0dd 72%,#f4efd8);box-shadow:0 3px 0 #b6cbb3;color:#173d32}
+#freeRefreshToday{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:18px;padding:20px 42px 20px 20px;margin:16px 0;border:1px solid #abc4b2!important;background:linear-gradient(115deg,#dcebd7,#e9f0dd 72%,#f4efd8)!important;box-shadow:0 3px 0 #b6cbb3!important;color:#173d32!important}
 #freeRefreshToday[hidden]{display:none!important}
 #freeRefreshToday .refresh-entry-art{display:flex;align-items:center;justify-content:center;gap:8px;width:auto}
 #freeRefreshToday .refresh-entry-art img{display:block;width:44px;height:44px;object-fit:contain;margin:0;transform:none}
@@ -17,7 +17,7 @@
  #freeRefreshToday .refresh-entry-art img{width:32px;height:32px}
  #freeRefreshToday h2{font-size:23px!important}
 }
-html[data-theme=dark] #freeRefreshToday{background:linear-gradient(115deg,#263f36,#304839);border-color:#56745f;box-shadow:0 3px 0 #162c24;color:#f1f2d9}
+html[data-theme=dark] #freeRefreshToday{background:linear-gradient(115deg,#263f36,#304839)!important;border-color:#56745f!important;box-shadow:0 3px 0 #162c24!important;color:#f1f2d9!important}
 html[data-theme=dark] #freeRefreshToday h2{color:#f1f2d9!important}
 html[data-theme=dark] #freeRefreshToday p,html[data-theme=dark] #freeRefreshToday .refresh-entry-dismiss{color:#c6d9c6!important}
 html[data-theme=dark] #freeRefreshToday .refresh-entry-link{color:#c3e7b9}
@@ -40,8 +40,8 @@ html[data-theme=dark] #freeRefreshToday .refresh-entry-link{color:#c3e7b9}
 .refresh-catalogue-grid button.is-done::after{content:'✓';position:absolute;top:0;right:3px;font-size:10px;color:#47775f}
 
 /* New-release invitation: three distinct printed cards, one clear action. */
-#freeRefreshAnnouncement{padding:18px;background:rgba(15,31,29,.6);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);overscroll-behavior:contain}
-#freeRefreshAnnouncement .refresh-announcement{position:relative;isolation:isolate;box-sizing:border-box;width:min(100%,460px);max-width:460px;max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;margin:auto;padding:48px 30px 18px;border:1px solid #a5b5a0;border-radius:24px;background:radial-gradient(ellipse at 15% 0%,#dcecd0 0,transparent 58%),radial-gradient(ellipse at 100% 5%,#f7e8bb 0,transparent 55%),#fff9ee;color:#243b31;text-align:center;box-shadow:0 6px 0 #69816a,0 26px 65px #071d304a}
+#freeRefreshAnnouncement{padding:18px;background:rgba(15,31,29,.6)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);overscroll-behavior:contain}
+#freeRefreshAnnouncement .refresh-announcement{position:relative;isolation:isolate;box-sizing:border-box;width:min(100%,460px);max-width:460px;max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;margin:auto;padding:48px 30px 18px;border:1px solid #a5b5a0!important;border-radius:24px;background:radial-gradient(ellipse at 15% 0%,#dcecd0 0,transparent 58%),radial-gradient(ellipse at 100% 5%,#f7e8bb 0,transparent 55%),#fff9ee!important;color:#243b31!important;text-align:center;box-shadow:0 6px 0 #69816a,0 26px 65px #071d304a!important}
 #freeRefreshAnnouncement .modal-close{position:absolute;right:10px;top:10px;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:#fffaf17d;color:#42624f;box-shadow:none}
 #freeRefreshAnnouncement .modal-close svg{width:20px;height:20px}
 #freeRefreshAnnouncement h2{font-family:Fraunces,Georgia,serif!important;font-size:44px!important;font-weight:750!important;line-height:1.05!important;letter-spacing:-1.2px!important;margin:0 0 16px!important;color:#254535!important}
@@ -54,8 +54,8 @@ html[data-theme=dark] #freeRefreshToday .refresh-entry-link{color:#c3e7b9}
 #freeRefreshAnnouncement .refresh-release-series img{width:64px;height:64px;object-fit:contain;margin:0 0 5px;flex-shrink:0}
 #freeRefreshAnnouncement .refresh-release-series strong{font:650 15px/1.2 Outfit,system-ui,sans-serif}
 #freeRefreshAnnouncement .refresh-release-series span{font:400 13px/1.3 Outfit,system-ui,sans-serif}
-#freeRefreshAnnouncement [data-refresh-play]{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:52px;padding:12px 16px;border:1px solid #154d40;border-radius:12px;background:#246b54;color:#fffaf0;box-shadow:0 4px 0 #154d40;font:650 17px/1.3 Outfit,system-ui,sans-serif!important;cursor:pointer}
-#freeRefreshAnnouncement [data-refresh-play]:hover{background:#1d604a}
+#freeRefreshAnnouncement [data-refresh-play]{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:52px;padding:12px 16px;border:1px solid #154d40!important;border-radius:12px;background:#246b54!important;color:#fffaf0!important;box-shadow:0 4px 0 #154d40!important;font:650 17px/1.3 Outfit,system-ui,sans-serif!important;cursor:pointer}
+#freeRefreshAnnouncement [data-refresh-play]:hover{background:#1d604a!important}
 #freeRefreshAnnouncement [data-refresh-back]{display:block;min-height:44px;margin:12px auto 0;padding:8px 16px;border:0;background:none;color:#55675a;font:500 14px/1.3 Outfit,system-ui,sans-serif;cursor:pointer;text-decoration:none}
 #freeRefreshAnnouncement button:focus-visible{outline:3px solid #3b7055;outline-offset:4px}
 @media(max-width:380px),(max-height:650px){
@@ -70,7 +70,7 @@ html[data-theme=dark] #freeRefreshToday .refresh-entry-link{color:#c3e7b9}
  #freeRefreshAnnouncement .refresh-release-series span{font-size:12px}
  #freeRefreshAnnouncement [data-refresh-play]{min-height:48px;font-size:16px!important}
 }
-html[data-theme=dark] #freeRefreshAnnouncement .refresh-announcement{background:radial-gradient(ellipse at 20% 0%,#375947,transparent 60%),#23362e;border-color:#75866b;box-shadow:0 6px 0 #14281f,0 26px 65px #0008}
+html[data-theme=dark] #freeRefreshAnnouncement .refresh-announcement{background:radial-gradient(ellipse at 20% 0%,#375947,transparent 60%),#23362e!important;border-color:#75866b!important;box-shadow:0 6px 0 #14281f,0 26px 65px #0008!important}
 html[data-theme=dark] #freeRefreshAnnouncement h2,html[data-theme=dark] #freeRefreshAnnouncement #freeRefreshAnnouncementCopy strong{color:#f9f1d6!important}
 html[data-theme=dark] #freeRefreshAnnouncement #freeRefreshAnnouncementCopy,html[data-theme=dark] #freeRefreshAnnouncement [data-refresh-back]{color:#d0dbc8!important}
 html[data-theme=dark] #freeRefreshAnnouncement .modal-close{background:#ffffff12;color:#e3ead5}

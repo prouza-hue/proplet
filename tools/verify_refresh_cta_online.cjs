@@ -37,6 +37,8 @@ const ready=p=>p.waitForFunction(()=>!!window.PropletRefreshRelease&&document.qu
  await page.evaluate(()=>PROPLET_FREE_REFRESH_PREVIEW.showAnnouncement());await shot(page,'modal-dark-390');await page.locator('[data-refresh-back]').click();
  check('secondary dismissal works in dark mode',!(await page.locator('#freeRefreshAnnouncement').isVisible()));
  await page.evaluate(()=>PROPLET_FREE_REFRESH_PREVIEW.showAnnouncement());await page.locator('#freeRefreshAnnouncement').click({position:{x:4,y:4}});check('backdrop dismissal restores background',!(await page.locator('#freeRefreshAnnouncement').isVisible())&&await page.evaluate(()=>document.body.style.overflow!=='hidden'));
+ await page.evaluate(()=>{nav('free');nav('daily');PROPLET_FREE_REFRESH_PREVIEW.showAnnouncement()});await page.goBack();
+ check('native Back closes modal and restores interactive background',await page.evaluate(()=>document.querySelector('#freeRefreshAnnouncement').classList.contains('hidden')&&document.body.style.overflow!=='hidden'&&![...document.body.children].some(n=>n.inert)));
  await page.locator('[data-refresh-dismiss]').click();await page.reload({waitUntil:'networkidle'});await ready(page);await page.locator('[data-refresh-close]').click();
  check('box dismissal is independent and persists',!(await page.locator('#freeRefreshToday').isVisible()));
  const newcomer=await browser.newPage({viewport:{width:390,height:844}});await newcomer.goto(base+'/?onboarding=1',{waitUntil:'networkidle'});await ready(newcomer);
