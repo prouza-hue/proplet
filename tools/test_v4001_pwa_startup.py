@@ -11,8 +11,8 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (root / "proplet_version.py").read_text(encoding="utf-8")
 vercel = json.loads((root / "vercel.json").read_text(encoding="utf-8"))
 
-assert 'APP_VERSION = "4.04.0"' in version
-assert "version:'4.04.0'" in runtime
+assert 'APP_VERSION = "4.05.0"' in version
+assert "version:'4.05.0'" in runtime
 assert "pwaStartupHotfixV4001:true" in runtime
 
 shell_release = re.search(r"const SHELL_CACHE='([^']+)'", sw)
@@ -22,7 +22,7 @@ assert shell_release.group(1) == app_release.group(1), (
     "Service-worker shell and app release marker must stay identical; a mismatch "
     "causes the runtime-update reload loop."
 )
-assert shell_release.group(1) == "proplet-v4.04.0-mozkokalypsa-cta2"
+assert shell_release.group(1) == "proplet-v4.05.0-refresh300"
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)
@@ -63,6 +63,7 @@ cache_control = [h["value"] for h in sw_headers[0]["headers"] if h["key"].lower(
 assert cache_control == ["no-cache, no-store, must-revalidate"]
 
 print("PASS: current PWA startup/update contract")
+
 
 
 

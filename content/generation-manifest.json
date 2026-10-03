@@ -2,7 +2,7 @@
   "$schema": "./generation-manifest.schema.json",
   "schemaVersion": 1,
   "manifestId": "proplet-runtime-content",
-  "manifestVersion": 2,
+  "manifestVersion": 3,
   "validatorVersion": "proplet-content-s14-v1",
   "provenance": {
     "baselineCommit": "b8de402ad676b823f72a905289945eff6f6b3e6c",
@@ -32,9 +32,9 @@
     "source": {
       "path": "data/puzzles.json",
       "role": "canonical-server-puzzle-source",
-      "sha256": "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937",
-      "sizeBytes": 3983660,
-      "gitBlob": "78d46516754f3dc1c02285cc8f749989a9448dad"
+      "sha256": "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6",
+      "sizeBytes": 4679338,
+      "gitBlob": "500522874270670f9f14963474ee07671645654d"
     },
     "compatibilitySource": {
       "path": "data/archive/v3.33.5/puzzles.json.gz",
@@ -66,9 +66,9 @@
     "output": {
       "path": "public/puzzles.json",
       "role": "public-puzzle-runtime",
-      "sha256": "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e",
-      "sizeBytes": 3985199,
-      "gitBlob": "b2d1f3f9f264e6f35eb74af081ccbc976e1ee4ea"
+      "sha256": "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3",
+      "sizeBytes": 4680877,
+      "gitBlob": "b0a23e6e4d997df8b595da4c0bbba25ffb5d0838"
     }
   },
   "identityBuilds": [
