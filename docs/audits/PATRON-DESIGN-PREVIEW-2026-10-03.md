@@ -24,3 +24,12 @@ Kliknutí na označení otevře dialog s poděkováním, vlastní ukázkovou zna
 Nezávislá vizuální revize doporučila tento směr; zapracováno zjemnění štítku a sjednocení modrého CTA. Pořadí týmové a globální lze přepnout; v rozbaleném globálním pořadí je explicitně popsáno, že jde o ukázku prvních šesti hráčů.
 
 Build: nejprve existující `tools/build_support_preview.py`, potom `tools/build_patron_preview.py`. Browser kontrola `tools/patron_verify.cjs`; galerie `tools/patron_gallery.py`; pouze preview nasazení `tools/deploy_patron_preview.cjs`.
+
+## Publikovaný výsledek
+
+- Preview: https://proplet-dfdb6tmdg-pavel-prouzas-projects.vercel.app/patron.html
+- Galerie: https://proplet-dfdb6tmdg-pavel-prouzas-projects.vercel.app/patron-gallery.html
+- Deployment `dpl_6kwHCEo6nCGboSawfuzr13meFCD6`, READY, target null, žádné aliasy.
+- Publikovaný zdrojový commit `cce6492e29d90920d7fe1441d7ce637e994a370a`.
+- Všech 16 browser kontrol prošlo také na veřejném URL, bez JS výjimek a bez požadavků na produkci/databázi/platební API. Online screenshot vizuálně zkontrolován.
+- Expirované lokální Vercel přihlášení obnoveno standardním `vercel@48 whoami` (aktuální CLI 62 mělo chybu závislosti). Poté publikování přes explicitní statický preview skript.

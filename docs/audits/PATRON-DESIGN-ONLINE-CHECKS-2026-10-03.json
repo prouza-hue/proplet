@@ -1,0 +1,23 @@
+{
+  "base": "https://proplet-dfdb6tmdg-pavel-prouzas-projects.vercel.app",
+  "date": "2026-10-03T20:08:18.457Z",
+  "checks": [
+    "Six synthetic players",
+    "Honour dialog visible",
+    "QR is nonpayment",
+    "Amount updates",
+    "Escape closes dialog",
+    "Result support badge visible",
+    "Result retained",
+    "Public mark can be hidden",
+    "05-narrow-ranking no document overflow",
+    "06-narrow-result no document overflow",
+    "07-dark-ranking no document overflow",
+    "08-dark-result no document overflow",
+    "09-fold-ranking no document overflow",
+    "10-desktop-ranking no document overflow",
+    "No JS errors",
+    "No production/database/payment requests"
+  ],
+  "errors": []
+}
