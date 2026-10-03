@@ -12,9 +12,10 @@
   const returningLogin = () => !!accountId() && sessionStorage.getItem(RETURNING) === accountId();
   let ready = false, shown = false, firstVisit = true, displayedKey = null;
   let ownerKey = seenKey();
-  // Capture BEFORE onboarding can finish. Keep suppression across reloads and
-  // OAuth returns in this visit; a subsequent browser visit can show the CTA.
-  try {
+  function captureVisit() {
+    // Runs at native readiness, before a new visitor can complete the tutorial.
+    // Subscribe before app.js so fast fixture boot cannot outrun the listener.
+    try {
     const prior = typeof getState === 'function' ? getState() : null;
     const known = !!accountId() || Object.keys(prior?.completed || {}).length > 0 || Object.keys(prior?.inProgress || {}).length > 0;
     if (localStorage.getItem(ONBOARD_KEY) !== 'done' && !known) sessionStorage.setItem(FIRST_VISIT, '1');
@@ -22,6 +23,8 @@
     localStorage.setItem(SEEN + ':storage-check', '1');
     localStorage.removeItem(SEEN + ':storage-check');
   } catch { firstVisit = true; }
+    ownerKey = seenKey();
+  }
   function eligible() {
     try {
       return (!firstVisit || returningLogin()) && localStorage.getItem(ONBOARD_KEY) === 'done'
@@ -140,7 +143,7 @@
   document.addEventListener('proplet:profile-refreshed', () => { if (ready) setTimeout(maybeShow, 0); });
   // Retry after a blocking dialog closes, without a polling loop.
   document.addEventListener('click', () => { if (ready && !shown) setTimeout(maybeShow, 0); });
-  document.addEventListener('proplet:ready', () => { ready = true; maybeShow(); });
+  document.addEventListener('proplet:ready', () => { captureVisit(); ready = true; maybeShow(); });
   document.addEventListener('proplet:screen-changed', () => { if (ready) setTimeout(maybeShow, 0); });
   document.addEventListener('visibilitychange', maybeShow);
   function showPreview() {

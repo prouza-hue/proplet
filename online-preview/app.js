@@ -692,6 +692,7 @@ function initNavigation(){
    else if(modal.id==='profileModal'&&profileModalFromWin){modal.classList.add('hidden');restoreWinAfterAccountModal()}
    else if(modal.id==='profileModal'&&profileModalFromNudge){modal.classList.add('hidden');resumeAfterAccountNudge()}
    else if(modal.id==='contentReleaseModal')window.PropletContentRelease?.close();
+   else if(modal.id==='freeRefreshAnnouncement')window.PropletRefreshRelease?.close();
    else if(modal.id==='tajenkaRulesModal')closeTajenkaRules();
    else if(modal.id==='helperOfferModal')dismissHelperOffer();
    else modal.classList.add('hidden');
@@ -702,7 +703,7 @@ function initNavigation(){
 }
 function transientModals(){return ['tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
-function closeTransientModals(){window.PropletContentRelease?.close();transientModals().forEach(el=>el.classList.add('hidden'))}
+function closeTransientModals(){window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
  if(currentScreen!=='game')return;
  if(currentGame?.mode!=='rescue')saveGameProgress();hideGameUndo();stopTimer();
