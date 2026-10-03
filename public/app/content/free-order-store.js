@@ -9,10 +9,11 @@ function create(d){
  const identity=p=>p?.id&&p?.token?p.id+':'+p.token:'guest';
  const read=s=>{try{return JSON.parse(d.storage.getItem(prefix+s)||'{}')}catch{return {}}};
  const write=(s,v)=>{d.storage.setItem(prefix+s,JSON.stringify(v));return v};
- const empty=()=>({mode:'numeric',revision:0,offered:false,newcomer:false,plan:null});
- const record=diff=>({...empty(),...read(scope())[diff]});
+ const empty=()=>({mode:d.shared?'varied':'numeric',revision:0,offered:false,newcomer:false,plan:null});
+ const record=diff=>{const r=read(scope())[diff];const deliberate=r&&(r.mode==='varied'||r.offered===true||r.revision>0||r.pending);return {...empty(),...r,mode:d.shared&&!deliberate?'varied':r?.mode||empty().mode}};
  const changed=()=>d.changed?.();
  function plan(diff,r){
+  if(d.shared)return r.plan||{version:E.VERSION,difficulty:diff,kind:'varied',ids:[]};
   if(r.plan?.ids?.length)return E.reconcilePlan(r.plan,{bank:d.bank(diff),difficulty:diff});
   const bank=d.bank(diff),intro=bank.filter(E.isGen5).slice(0,25).sort((a,b)=>(Number(a.meta?.difficultyScore)||0)-(Number(b.meta?.difficultyScore)||0)).map(p=>p.id);
   return E.buildPlan({bank,difficulty:diff,completedIds:d.completed(diff),recentIds:d.completed(diff).slice(-2),newcomer:r.newcomer,introIds:intro});
@@ -57,7 +58,7 @@ function create(d){
      if(result.conflict)d.notice?.('Pořadí se mezitím změnilo na jiném zařízení. Načetli jsme aktuální volbu.');
     }else if(server){r=server;save(diff,r,p.id)}
     else if(local[diff]?.importGuest){queue(diff,r,{importGuest:true});continue}
-    if(r.plan?.ids?.length){
+    if(!d.shared&&r.plan?.ids?.length){
      const updated=plan(diff,r);
      if(JSON.stringify(updated.ids)!==JSON.stringify(r.plan.ids))queue(diff,{...r,plan:updated});
     }
@@ -77,7 +78,13 @@ function create(d){
  function next(diff,fallback){
   if(!enabled||!E.SUPPORTED.includes(diff))return fallback;
   const r=record(diff);const remote=loadedIdentity===identity(d.profile())&&d.bank(diff).find(p=>p.id===resumeIds[diff]&&!d.completed(diff).includes(p.id));if(remote)return remote;
-  if(r.mode!=='varied'||!r.plan)return fallback;
+  if(r.mode!=='varied')return fallback;
+  if(d.shared){
+   const bank=E.canonicalBank(d.bank(diff),diff),byId=new Map(bank.map(p=>[p.id,p])),done=new Set(d.completed(diff));
+   const ids=d.shared.routes[diff]||[],known=new Set(ids);
+   return [...ids,...bank.filter(p=>!known.has(p.id)).map(p=>p.id)].map(id=>byId.get(id)).find(p=>p&&!done.has(p.id))||null;
+  }
+  if(!r.plan)return fallback;
   const stable=plan(diff,r);
   if(scope()==='guest'&&JSON.stringify(stable.ids)!==JSON.stringify(r.plan.ids))queue(diff,{...r,plan:stable});
   return E.next({bank:d.bank(diff),difficulty:diff,completedIds:d.completed(diff),mode:r.mode,plan:stable}).puzzle;
@@ -98,8 +105,9 @@ function create(d){
   if(d.hasHistory(p.id)||Object.keys(all).length)return;
   for(const diff of E.SUPPORTED)queue(diff,{...empty(),mode:'varied',newcomer:['easy','medium'].includes(diff)},{importGuest:true});
  }
- return {configure,sync,change,next,record,adopt,newAccount,enabled:()=>enabled,
+ return {configure,sync,change,next,record,adopt,newAccount,supports:diff=>(d.shared?.variedDifficulties||E.SUPPORTED).includes(diff),enabled:()=>enabled,
   ready:()=>!d.profile()?.token||loadedIdentity===identity(d.profile())};
 }
 return {create};
 });
+

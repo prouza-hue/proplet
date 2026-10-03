@@ -1,6 +1,7 @@
 """Canonical release/runtime metadata shared by the Proplet backend and release checks."""
 
-APP_VERSION = "4.04.0"
+APP_VERSION = "4.05.0"
 PHONE_LANDSCAPE_BLOCKING = True
 TABLET_LANDSCAPE_BREAKPOINT_PX = 600
+
 

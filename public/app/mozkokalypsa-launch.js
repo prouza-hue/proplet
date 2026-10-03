@@ -32,11 +32,11 @@
     } catch { return false; }
   }
   function maybeShow() {
-    if (!ready || shown || !eligible() || document.hidden) return;
+    if (!ready || shown || global.PropletContentAnnouncementShown === (accountId() || 'guest') || !eligible() || document.hidden) return;
     if (!['daily', 'free'].includes(currentScreen) || openTransientModal()
         || document.querySelector('dialog[open],.modal:not(.hidden),.quality-modal:not(.hidden)')) return;
     if (typeof global.startFree !== 'function') return;
-    shown = true;
+    shown = true; global.PropletContentAnnouncementShown = accountId() || 'guest';
     displayedKey = seenKey();
     if (modal) open(); else mount();
   }
@@ -135,4 +135,5 @@
   document.addEventListener('visibilitychange', maybeShow);
   global.PropletContentRelease = Object.freeze({close});
 })(window);
+
 
