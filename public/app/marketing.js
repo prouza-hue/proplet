@@ -5,9 +5,21 @@
   const MAX_AGE = 180 * 86400000;
   // Dedicated Proplet dataset; never reuse the historical client pixel.
   const PIXEL_ID = '1379409957596561';
+  const MARKETING_GATES = new Set(['eligible', 'unknown_parameter', 'auth_url', 'nonproduction', 'non_game_path']);
 
-  function create({storage, now = Date.now, enabled = () => false, load, send, revoke}) {
-    let loaded = false, pageViewed = false;
+  function pixelGate(href, {environment, candidatePreview, pixelId = PIXEL_ID} = {}) {
+    try {
+      const url = new URL(href);
+      if (!/^\d+$/.test(pixelId) || url.protocol !== 'https:' || url.hostname !== 'hrajproplet.cz' || environment === 'preview' || candidatePreview) return 'nonproduction';
+      if (!['/', '/index.html'].includes(url.pathname)) return 'non_game_path';
+      if (url.hash || ['auth', 'challenge', 'access_token', 'token', 'code', 'state', 'password'].some(key => url.searchParams.has(key))) return 'auth_url';
+      if ([...url.searchParams.keys()].some(key => !['fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'open'].includes(key))) return 'unknown_parameter';
+      return 'eligible';
+    } catch {return 'nonproduction';}
+  }
+
+  function create({storage, now = Date.now, enabled = () => false, gate = () => enabled() ? 'eligible' : 'nonproduction', diagnose = () => {}, load, send, revoke}) {
+    let loaded = false, pageViewed = false, measurementNoted = false;
     const sentRegistrations = new Set();
     const read = key => {try {return JSON.parse(storage.getItem(key));} catch {return null;}};
     const write = (key, value) => {try {storage.setItem(key, JSON.stringify(value));} catch {}};
@@ -15,7 +27,13 @@
     if (!consent || !Number.isFinite(consent.at) || !['granted', 'denied'].includes(consent.value) || now() - consent.at >= MAX_AGE || consent.at > now()) consent = null;
     function consented() {return consent?.value === 'granted' && now() - consent.at < MAX_AGE;}
     function allowed() {return consented() && enabled();}
+    function diagnostic(name) {
+      if (!consented()) return;
+      try {const state = gate(); diagnose(name, MARKETING_GATES.has(state) ? state : 'nonproduction');} catch {}
+    }
     function start() {
+      // This first-party signal records an opted-in visit, not Meta receipt.
+      if (consented() && !measurementNoted) {measurementNoted = true; diagnostic('marketing_measurement_ready');}
       if (!allowed()) return;
       try {
         load(); loaded = true;
@@ -64,16 +82,22 @@
     return {start, choose, event, registration, allowed, consented, status: () => consent?.value || null};
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = {create, CONSENT_KEY, EVENTS_KEY};
+  if (typeof module !== 'undefined' && module.exports) module.exports = {create, pixelGate, CONSENT_KEY, EVENTS_KEY};
   if (!global?.document) return;
   const doc = global.document;
   let storage;
   try {storage = global.localStorage;} catch {storage = {getItem: () => null, setItem() {}, removeItem() {}};}
-  function enabled() {
-    const url = new URL(global.location.href);
-    return /^\d+$/.test(PIXEL_ID) && url.hostname === 'hrajproplet.cz' && ['/', '/index.html'].includes(url.pathname) && !url.hash &&
-      [...url.searchParams.keys()].every(key => ['fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'open'].includes(key)) &&
-      global.PROPLET_RUNTIME_ENV !== 'preview' && !global.PROPLET_RUNTIME_META?.gen5CandidatePreview;
+  function gate() {
+    return pixelGate(global.location.href, {environment:global.PROPLET_RUNTIME_ENV, candidatePreview:global.PROPLET_RUNTIME_META?.gen5CandidatePreview});
+  }
+  function enabled() {return gate() === 'eligible';}
+  function diagnose(name, state) {
+    try {if (typeof global.trackProductEvent === 'function') global.trackProductEvent(name, {marketingGate:state});} catch {}
+  }
+  const sdkDiagnostics = new Set();
+  function sdkDiagnostic(name) {
+    if (!controller.consented() || sdkDiagnostics.has(name)) return;
+    sdkDiagnostics.add(name); diagnose(name, gate());
   }
   function load() {
     if (!global.fbq) {
@@ -82,6 +106,8 @@
       global.fbq = fbq; global._fbq = fbq;
       const script = doc.createElement('script'); script.async = true;
       script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+      script.onload = () => sdkDiagnostic('marketing_sdk_loaded');
+      script.onerror = () => sdkDiagnostic('marketing_sdk_failed');
       doc.head.appendChild(script);
       fbq('set', 'autoConfig', false, PIXEL_ID);
       fbq('init', PIXEL_ID);
@@ -96,7 +122,7 @@
       }
     }
   }
-  const controller = create({storage, enabled, load, revoke,
+  const controller = create({storage, enabled, gate, diagnose, load, revoke,
     send: (name, data, standard) => {
       // Re-grant handles an explicit opt-in after a previous revocation.
       global.fbq('consent', 'grant');
@@ -131,10 +157,15 @@
     if (global.currentGame && !global.currentGame.finished) controller.event('GameStarted', global.currentGame);
   }
   else if (['/', '/index.html'].includes(global.location.pathname)) {
-    // Let the player see the game first. This notice never locks play or moves focus.
-    const schedule = () => {showTimer = global.setTimeout(show, 6000);};
-    if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', schedule, {once: true});
-    else schedule();
+    // Let the player see the real UI first. The banner never locks play or moves focus.
+    let noticeScheduled = false;
+    const schedule = () => {if (noticeScheduled) return; noticeScheduled = true; showTimer = global.setTimeout(show, 800);};
+    const waitForUi = () => {
+      if (global.__PROPLET_CURRENT_UI_READY) schedule();
+      else global.addEventListener('proplet-ui-ready', schedule, {once:true});
+    };
+    if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', waitForUi, {once: true});
+    else waitForUi();
   }
   global.addEventListener('storage', event => {
     if (event.key === CONSENT_KEY) global.location.reload();

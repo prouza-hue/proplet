@@ -70,6 +70,22 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_marketing_diagnostics.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_marketing_diagnostics.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_client_error_privacy.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_client_error_privacy.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_result_confirmation_latency.js",
         "runner": "node"
       },

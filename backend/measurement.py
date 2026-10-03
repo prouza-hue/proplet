@@ -24,6 +24,9 @@ def request_context(request, environment):
         if value.tzinfo and now-timedelta(days=7)<=value<=now+timedelta(minutes=5):event_time=min(now,value).isoformat()
     except (ValueError,TypeError):pass
     details = {}
+    marketing_gate = request.headers.get('x-proplet-marketing-gate', '')
+    if marketing_gate in {'eligible', 'unknown_parameter', 'auth_url', 'nonproduction', 'non_game_path'}:
+        details['marketing_gate'] = marketing_gate
     # Opt-in campaign metadata is an analytic declaration, never authorization.
     source = request.headers.get('x-proplet-acquisition-source', '')
     ids = {key: request.headers.get(f'x-proplet-acquisition-{key}', '') for key in ('campaign', 'ad', 'adset')}
@@ -110,4 +113,3 @@ def pages(request, table, *, filters, columns='*'):
         if next_cursor == cursor:
             raise ValueError('Analytics cursor did not advance')
         cursor = next_cursor
-

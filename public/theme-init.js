@@ -54,6 +54,14 @@
       },280);
     };
 
+    // A visual fallback can also reveal an error screen; only successful app boot
+    // makes the consent notice eligible. Keep the flag for late-loaded modules.
+    document.addEventListener('proplet:ready',()=>{
+      if(window.__PROPLET_CURRENT_UI_READY)return;
+      window.__PROPLET_CURRENT_UI_READY=true;
+      window.dispatchEvent(new Event('proplet-ui-ready'));
+    },{once:true});
+
     let readyChecks=0;
     const revealWhenCanonicalHomeReady=()=>{
       if(revealed)return;

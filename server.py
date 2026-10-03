@@ -13,6 +13,7 @@ import uuid
 from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from typing import Optional
+from urllib.parse import urlsplit
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Query, Request
@@ -350,6 +351,20 @@ def _rate_actor_hash(request: Request, discriminator: Optional[str] = None) -> s
     return hmac.new(key, material.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
+def sanitized_operational_route(route: Optional[str]) -> Optional[str]:
+    """Keep a diagnostic pathname; never persist URL queries or fragments."""
+    try:
+        parsed = urlsplit(str(route or ""))
+    except ValueError:
+        return None
+    if parsed.scheme and (parsed.scheme not in {"http", "https"} or not parsed.netloc):
+        return None
+    path = parsed.path
+    if not path.startswith("/") or path.startswith("//") or "\\" in path or any(ord(char) < 32 for char in path):
+        return None
+    return path[:120]
+
+
 def record_operational_event(
     event_type: str,
     *,
@@ -371,7 +386,7 @@ def record_operational_event(
         "event_type": event_type,
         "severity": severity,
         "request_id": str(request_id or "")[:80] or None,
-        "route": str(route or "")[:120] or None,
+        "route": sanitized_operational_route(route),
         "app_version": APP_VERSION,
         "actor_kind": actor_kind,
         "code": str(code or "")[:80] or None,
@@ -2408,7 +2423,7 @@ def client_error(
         "client_error",
         severity="error",
         request_id=getattr(request.state, "request_id", None),
-        route=(payload.route or request.url.path)[:120],
+        route=sanitized_operational_route(payload.route) or request.url.path,
         actor_kind=actor_kind,
         code=message_code,
         metadata={"message": str(payload.message or "")[:200]},

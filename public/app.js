@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.04.0-mozkokalypsa-cta2-inappauth1';
+const APP_PREVIEW_RELEASE='proplet-v4.04.0-mozkokalypsa-cta2-inappauth1-measurement1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1331,12 +1331,13 @@ function analyticsHeaders(eventType,properties){
  const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
  const experimentKey=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentKey||'')?properties.experimentKey:null,experimentVariant=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentVariant||'')?properties.experimentVariant:null,experimentBucket=Number.isInteger(properties?.experimentBucket)&&properties.experimentBucket>=0&&properties.experimentBucket<100?properties.experimentBucket:null;
  const experimentHeaders=experimentKey&&experimentVariant&&experimentBucket!==null?{'X-Proplet-Experiment':experimentKey,'X-Proplet-Experiment-Variant':experimentVariant,'X-Proplet-Experiment-Bucket':String(experimentBucket)}:{};
- return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...experimentHeaders,...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ const marketingGate=eventType?.startsWith('marketing_')&&['eligible','unknown_parameter','auth_url','nonproduction','non_game_path'].includes(properties?.marketingGate)?properties.marketingGate:null;
+ return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
  const factory=window.PropletAnalytics;if(!factory?.create)return null;
- productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,request:(path,opts)=>api(path,{...opts,headers:window.PropletAcquisition?.filterHeaders(opts.headers)||opts.headers}),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview')});
+ productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,shouldSend:eventType=>!eventType.startsWith('marketing_')?true:window.PropletMarketing?window.PropletMarketing.consented():null,request:(path,opts)=>api(path,{...opts,headers:window.PropletAcquisition?.filterHeaders(opts.headers)||opts.headers}),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview')});
  return productAnalyticsController;
 }
 function trackProductEvent(eventType,properties){
@@ -1469,7 +1470,7 @@ async function deleteAccount(){
 let reportingClientError=false;
 function reportClientError(code,message){
  if(reportingClientError||!navigator.onLine)return;reportingClientError=true;const p=getProfile(),headers={'Content-Type':'application/json'};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();
- fetch('/api/client-error',{method:'POST',headers,body:JSON.stringify({code:String(code||'client_error').slice(0,80),message:String(message||'').slice(0,200),route:`${location.pathname}${location.search}`.slice(0,120)}),keepalive:true,cache:'no-store'}).catch(()=>{}).finally(()=>{reportingClientError=false});
+ fetch('/api/client-error',{method:'POST',headers,body:JSON.stringify({code:String(code||'client_error').slice(0,80),message:String(message||'').slice(0,200),route:location.pathname.slice(0,120)}),keepalive:true,cache:'no-store'}).catch(()=>{}).finally(()=>{reportingClientError=false});
 }
 function bindClientErrorReporting(){
  window.addEventListener('error',e=>reportClientError('window_error',e?.message||'JavaScript error'));window.addEventListener('unhandledrejection',e=>{const r=e?.reason;reportClientError('unhandled_rejection',r?.message||String(r||'Promise rejection'))});
