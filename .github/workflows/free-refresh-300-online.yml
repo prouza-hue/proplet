@@ -1,4 +1,4 @@
-name: Preview UI v3 and varied-play verification
+name: Preview CTA v4 and varied-play verification
 on:
   push:
     branches:
@@ -26,7 +26,7 @@ jobs:
       - name: Verify all boards, real input, completion and network isolation online
         env:
           NODE_PATH: /tmp/refresh-browser/node_modules
-          FREE_REFRESH_PREVIEW_URL: https://proplet-g5mma1oht-pavel-prouzas-projects.vercel.app
+          FREE_REFRESH_PREVIEW_URL: https://proplet-cc6l419cj-pavel-prouzas-projects.vercel.app
           FREE_REFRESH_QA_OUTPUT: qa-free-refresh-300-online
         run: node tools/verify_free_refresh_preview_online.cjs
       - name: Validate immutable shared routes and numeric catalogues
@@ -34,9 +34,17 @@ jobs:
       - name: Verify shared ordering, preserved choices and dormant endgame online
         env:
           NODE_PATH: /tmp/refresh-browser/node_modules
-          FREE_REFRESH_PREVIEW_URL: https://proplet-g5mma1oht-pavel-prouzas-projects.vercel.app
+          FREE_REFRESH_PREVIEW_URL: https://proplet-cc6l419cj-pavel-prouzas-projects.vercel.app
           FREE_REFRESH_QA_OUTPUT: qa-free-refresh-300-online
         run: node tools/verify_shared_pestre_preview_online.cjs
+      - name: Verify release eligibility including returning accounts
+        run: node tools/test_refresh_release.cjs
+      - name: Verify entrance modal, responsive illustrations and daily hero
+        env:
+          NODE_PATH: /tmp/refresh-browser/node_modules
+          FREE_REFRESH_PREVIEW_URL: https://proplet-cc6l419cj-pavel-prouzas-projects.vercel.app
+          FREE_REFRESH_QA_OUTPUT: qa-free-refresh-300-online
+        run: node tools/verify_refresh_cta_online.cjs
       - name: Preserve report and screenshots
         if: always()
         uses: actions/upload-artifact@v4
