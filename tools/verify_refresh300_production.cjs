@@ -5,6 +5,7 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
 (async()=>{const browser=await chromium.launch();try{
  const page=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block',reducedMotion:'reduce'});
  await page.route('**/*',route=>new URL(route.request().url()).origin!==base?route.abort():route.continue());
+ page.setDefaultTimeout(15000);
  page.on('pageerror',e=>errors.push(String(e)));
  await page.addInitScript(()=>{if(localStorage.getItem('qa-seeded'))return;localStorage.setItem('qa-seeded','1');
   for(const key of ['proplet-v3-7-required-onboarding','proplet-v3-16-2-helper-onboarding'])localStorage.setItem(key,'done');
@@ -29,11 +30,14 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
   check('all three banner illustrations fit '+width,await page.locator('#freeRefreshToday').evaluate(root=>{const a=[...root.querySelectorAll('img')].map(n=>n.getBoundingClientRect());return a.length===3&&a.every(r=>r.width>=32)&&a.slice(1).every((r,i)=>r.left>=a[i].right&&Math.abs(r.top-a[i].top)<1)}));
   await page.screenshot({path:`${out}/today-${width}.png`,fullPage:true});
  }
- await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));check('dismissal remembered and no second promo',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));
+ check('no second campaign in same page visit',await page.evaluate(()=>!document.querySelector('#mk100LaunchPreview:not(.hidden)')));
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));check('refresh dismissal remembered after reload',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));
  await page.evaluate(()=>nav('free'));
  await page.waitForFunction(()=>freeOrder().enabled());
  check('400 levels and varied next board',await page.evaluate(()=>puzzleDB.free.easy.filter(p=>!p.meta?.rollingContent).length===400&&freeOrder().record('easy').mode==='varied'&&freeOrder().next('easy',null).id==='g6-refresh-easy-001'));
  check('compact next-board information; no card switch',await page.evaluate(()=>document.querySelectorAll('#difficultyCards .order-next').length===6&&!document.querySelector('#difficultyCards select')));
+ // A reload begins the next page visit: acknowledge the older eligible campaign.
+ await page.evaluate(()=>window.PropletContentRelease?.close());
  await page.locator('#settingsHeaderBtn').click();await page.locator('#freeOrderSettings summary').click();
  check('four opt-outs, endgames excluded',await page.locator('#freeOrderSettings select').count()===4);
  await page.locator('#freeOrder-easy').selectOption('numeric');await page.waitForFunction(()=>freeOrder().record('easy').mode==='numeric');check('explicit numeric preference takes effect',await page.evaluate(()=>freeOrder().record('easy').mode==='numeric'));

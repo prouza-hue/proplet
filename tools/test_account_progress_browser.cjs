@@ -41,8 +41,18 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   assert.equal(await page.locator('#todayNewContentBanner').textContent(),'');
   assert(await page.locator('#tajenkaPreviewCard.completed [data-tajenka-recap]').count());
   assert.equal(await page.locator('#quickPlayCard').getAttribute('aria-busy'),'false');
-  await page.evaluate(()=>startFree('hardcore'));await page.waitForFunction(()=>currentGame?.puzzle.meta.level===4);
-  report.checks.push('history, completed Tajenka and weekly batch rerender without reload; next game is level 4');
+  // The default is now the shared varied route, not the next numeric slot.
+  // Completing historical slots 1–3 must preserve those results while offering
+  // the first unplayed board of the approved shared route (Gen5, level 217).
+  const expectedNext='g5-r1-hardcore-001';
+  assert(!completed.some(result=>result.puzzleId===expectedNext));
+  assert.equal(await page.evaluate(()=>freeOrder().record('hardcore').mode),'varied');
+  assert.equal(await page.evaluate(()=>freeProgress('hardcore').nextUnsolved.id),expectedNext);
+  await page.evaluate(()=>startFree('hardcore'));
+  await page.waitForFunction(id=>currentGame?.puzzle.id===id,expectedNext,{timeout:15000});
+  assert.equal(await page.evaluate(()=>currentGame.puzzle.meta.level),217);
+  assert.equal(await page.evaluate(()=>freeProgress('hardcore').done),3,'starting the shared next board preserves completed historical slots');
+  report.checks.push('history, completed Tajenka and weekly batch rerender without reload; shared next game is g5-r1-hardcore-001 (level 217)');
   const beforeFailure=requests;
   await page.evaluate(()=>{nav('daily');currentGame=null;stopTimer();acceptAccountProfile({publicRankings:false,id:'synthetic-b',token:'synthetic-b-token',name:'Other synthetic player'})});
   await page.waitForTimeout(300);fail=true;release();
