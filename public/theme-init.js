@@ -220,7 +220,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=mk100','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=refresh300','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=mk100','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
