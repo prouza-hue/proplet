@@ -86,13 +86,16 @@ const root=path.resolve(__dirname,'../../public');
  const bankReady=new Promise(resolve=>resolveBank=resolve);
  const descriptor={id:'synthetic-free',difficulty:'easy',meta:{level:1,contentGeneration:4}};
  const canonical={...descriptor,rows:1,cols:4,letters:['T','E','S','T'],mask:[0,1,2,3],answers:[{word:'TEST',path:[0,1,2,3]}]};
- const demand={window:{__PROPLET_BOOTSTRAP_DELIVERED__:true,__PROPLET_FETCH_FULL_PUZZLE_DATA:()=>{fetches++;return bankReady}},puzzleDB:{bootstrapSchema:1,free:{easy:[descriptor]}},startGame:puzzle=>started.push(puzzle),compatiblePuzzleDatabase:()=>true,setTimeout:()=>{throw Error('unexpected readiness timer')},console};
+ const hydrationEvents=[];
+ const demand={document:{dispatchEvent:e=>hydrationEvents.push(e.type)},CustomEvent:class{constructor(type){this.type=type}},window:{__PROPLET_BOOTSTRAP_DELIVERED__:true,__PROPLET_FETCH_FULL_PUZZLE_DATA:()=>{fetches++;return bankReady}},puzzleDB:{bootstrapSchema:1,free:{easy:[descriptor]}},startGame:puzzle=>started.push(puzzle),compatiblePuzzleDatabase:()=>true,setTimeout:()=>{throw Error('unexpected readiness timer')},console};
  vm.runInNewContext(hydrator,demand);
  assert.equal(fetches,0);
  demand.startGame(descriptor,'free');demand.startGame(descriptor,'free');
  assert.equal(fetches,1);assert.equal(started.length,0);
  resolveBank({free:{easy:[canonical]}});await new Promise(resolve=>setImmediate(resolve));
+ assert.deepEqual(hydrationEvents,['proplet:content-ready']);
  assert.equal(started.length,1);assert.equal(started[0].answers[0].word,'TEST');
  console.log('PASS offline response ownership, atomic SW installation, full-bank readiness');
 })().catch(e=>{console.error(e);process.exitCode=1});
+
 

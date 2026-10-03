@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.04.0-mozkokalypsa-cta2';
+const APP_PREVIEW_RELEASE='proplet-v4.05.0-refresh300';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -555,7 +555,7 @@ function dayOffsetISO(iso,base){const [y,m,d]=iso.split('-').map(Number),[by,bm,
 function dailyBankFor(iso){return progression().dailyBankFor(iso)}
 function dailyPuzzleFor(iso){return progression().dailyPuzzleFor(iso)}
 function mondayWeekdayIndex(iso){const [y,m,d]=iso.split('-').map(Number),day=new Date(Date.UTC(y,m-1,d,12)).getUTCDay();return (day+6)%7}
-function renderDailyWeekRhythm(iso){const root=$('#dailyWeekRhythm');if(!root)return;const cadence=puzzleDB.dailyCadence||{},pattern=cadence.pattern||['easy','easy','medium','medium','medium','hard','hard'],labels=cadence.labels||['Po','Út','St','Čt','Pá','So','Ne'],activeFrom=cadence.activeFrom||puzzleDB.dailyGeneration3From||null,active=!activeFrom||iso>=activeFrom,today=active?mondayWeekdayIndex(iso):-1;root.classList.toggle('pending',!active);root.innerHTML=`<div class="daily-week-rhythm-head"><strong>${active?'Týdenní rytmus':'Od pondělí 17. 8.'}</strong><span>2 snadné · 3 střední · 2 těžké</span></div><div class="daily-week-days">${pattern.map((diff,i)=>`<span class="daily-week-day ${diff} ${i===today?'active':''}" title="${labels[i]} · ${DIFF[diff]?.label||diff}"><b>${labels[i]}</b><i>${difficultyIconMarkup(diff,'daily-week-icon')}</i></span>`).join('')}</div>`}
+function renderDailyWeekRhythm(iso){const root=$('#dailyWeekRhythm');if(!root)return;const cadence=puzzleDB.dailyCadence||{},pattern=cadence.pattern||['easy','easy','medium','medium','medium','hard','hard'],labels=cadence.labels||['Po','Út','St','Čt','Pá','So','Ne'],activeFrom=cadence.activeFrom||puzzleDB.dailyGeneration3From||null,active=!activeFrom||iso>=activeFrom,today=active?mondayWeekdayIndex(iso):-1;root.classList.toggle('pending',!active);root.innerHTML=`<div class="daily-week-days">${pattern.map((diff,i)=>`<span class="daily-week-day ${diff} ${i===today?'active':''}" ${i===today?'aria-current="date"':''} aria-label="${labels[i]} · ${DIFF[diff]?.label||diff}${i===today?' · dnes':''}" title="${labels[i]} · ${DIFF[diff]?.label||diff}"><b>${labels[i]}</b><i aria-hidden="true">${difficultyIconMarkup(diff,'daily-week-icon')}</i></span>`).join('')}</div>`}
 function dailyResultState(iso){return progression().dailyResultState(iso)}
 function challengeKey(mode,puzzle,date){return mode==='daily'?`daily:${date}`:mode==='starter'?`starter:${puzzle.id}`:mode==='tajenka'?`tajenka:${puzzle.id}`:`free:${puzzle.id}`}
 function pointsFor(mode,difficulty,puzzle=null){
@@ -691,6 +691,7 @@ function initNavigation(){
    else if(modal.id==='installNudgeModal')dismissInstallNudge();
    else if(modal.id==='profileModal'&&profileModalFromWin){modal.classList.add('hidden');restoreWinAfterAccountModal()}
    else if(modal.id==='profileModal'&&profileModalFromNudge){modal.classList.add('hidden');resumeAfterAccountNudge()}
+   else if(modal.id==='freeRefreshAnnouncement')window.PropletRefreshRelease?.close();
    else if(modal.id==='contentReleaseModal')window.PropletContentRelease?.close();
    else if(modal.id==='tajenkaRulesModal')closeTajenkaRules();
    else if(modal.id==='helperOfferModal')dismissHelperOffer();
@@ -700,9 +701,9 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
-function closeTransientModals(){window.PropletContentRelease?.close();transientModals().forEach(el=>el.classList.add('hidden'))}
+function closeTransientModals(){window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
  if(currentScreen!=='game')return;
  if(currentGame?.mode!=='rescue')saveGameProgress();hideGameUndo();stopTimer();
@@ -771,7 +772,7 @@ function failRescue(){finishRescue(false)}
 let freeOrderController=null;
 function freeOrder(){
  if(freeOrderController)return freeOrderController;
- freeOrderController=window.PropletFreeOrderStore.create({engine:window.PropletFreeOrder,storage:localStorage,
+ freeOrderController=window.PropletFreeOrderStore.create({engine:window.PropletFreeOrder,shared:window.PROPLET_SHARED_FREE_ORDER_MANIFEST,storage:localStorage,
   profile:getProfile,api,uuid:newAttemptId,bank:sortedFreeBank,
   prepare:async()=>{await window.__PROPLET_ENSURE_FULL_PUZZLE_DB?.();await refreshRollingContent()},
   completed:diff=>{const slots=localFreeSlotState(diff);return sortedFreeBank(diff).filter(p=>slots.actual.has(Number(p.meta?.level))).map(p=>p.id)},
@@ -2313,7 +2314,7 @@ async function loadPuzzleDatabase(){
   const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('candidate-preview-db');const data=await r.json();if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('candidate-preview-db-version');if(GEN5_CANDIDATE_PREVIEW&&(data?.release?.seriesId!=='g5-r1'||Number(data?.release?.totalNewLevels)!==450))throw new Error('gen5-preview-content-missing');return data;
  }
  if('caches' in window){
-  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree()}}).catch(()=>{});return data}}}catch{}
+  try{const cached=await caches.match(url,{ignoreSearch:true});if(cached){const data=await cached.clone().json();if(compatiblePuzzleDatabase(data)){fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(fresh=>{if(compatiblePuzzleDatabase(fresh)){const content=puzzleDB?.contentStatus,rolling=puzzleDB?.rollingContent,extras=Object.fromEntries(Object.keys(DIFF).map(d=>[d,(puzzleDB?.free?.[d]||[]).filter(p=>p.meta?.rollingContent)]));puzzleDB=fresh;for(const d of Object.keys(DIFF)){const seen=new Set((puzzleDB.free?.[d]||[]).map(p=>p.id));for(const p of extras[d]||[])if(!seen.has(p.id)){puzzleDB.free[d].push(p);seen.add(p.id)}}if(rolling)puzzleDB.rollingContent=rolling;if(content)puzzleDB.contentStatus=content;renderDaily();renderFree();document.dispatchEvent(new CustomEvent('proplet:content-ready'))}}).catch(()=>{});return data}}}catch{}
  }
  const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(`puzzle-db-http-${r.status}`);const data=await r.json();if(!compatiblePuzzleDatabase(data))throw new Error('puzzle-db-version');return data;
 }
@@ -2398,3 +2399,4 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+

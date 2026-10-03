@@ -1,14 +1,15 @@
-/* Called from app.js with explicit dependencies; no preview profiles or test shortcuts. */
+/* The play card answers only: which board is next? Ordering belongs in Settings. */
 (function(root){'use strict';
-root.PropletFreeOrderUI={mount({store,progress,labels,change}){
+root.PropletFreeOrderUI={mount({store,progress,labels}){
  if(!store.enabled())return;
- for(const diff of ['easy','medium','hard','hardcore']){
+ for(const diff of Object.keys(labels)){
   const card=document.querySelector('#difficultyCards .cp-card[data-diff="'+diff+'"]');if(!card)continue;
-  const r=store.record(diff),q=progress(diff),node=document.createElement('div');node.className='order-controls';
-  node.innerHTML='<div class="order-switch" role="group" aria-label="Pořadí: '+labels[diff].label+'"><button type="button" data-order-mode="varied" aria-pressed="'+(r.mode==='varied')+'">Pestře</button><button type="button" data-order-mode="numeric" aria-pressed="'+(r.mode==='numeric')+'">Podle čísel</button></div>';
-  if(!r.offered){const hint=document.createElement('p');hint.className='order-hint';hint.textContent='Pestře střídá nové a starší desky.';node.append(hint)}
-  const next=q.resume||q.nextUnsolved,summary=document.createElement('small');summary.className='order-next';summary.textContent='Vyřešeno '+q.done+' z '+q.total+(next?' · '+(q.resume?'Rozehráno':'Další')+': č. '+next.meta.level:' · Všechno hotovo');node.append(summary);card.append(node);
-  for(const button of node.querySelectorAll('[data-order-mode]'))button.onclick=e=>{e.stopPropagation();button.disabled=true;change(diff,button.dataset.orderMode).finally(()=>button.disabled=false)};
+  const play=card.querySelector('.cp-play');if(!play)continue;
+  const q=progress(diff),next=q.resume||q.nextUnsolved,row=document.createElement('div');row.className='cp-action-row';
+  const summary=document.createElement('p');summary.className='order-next';
+  const label=document.createElement('span');label.textContent=next?(q.resume?'Rozehráno':'Další deska'):'Všechno hotovo';
+  const value=document.createElement('strong');value.textContent=next?'Úroveň '+next.meta.level:'Můžeš si zahrát znovu';
+  summary.append(label,value);row.append(summary,play);card.append(row);
  }
 }};
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -16,8 +16,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 EXPECTED_FILES = {
-    "data/puzzles.json": (3983660, "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937"),
-    "public/puzzles.json": (3985199, "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e"),
+    "data/puzzles.json": (4679338, "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6"),
+    "public/puzzles.json": (4680877, "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3"),
     "data/archive/v3.33.5/puzzles.json.gz": (719_689, "b1754c1714827654cf308c3e4042fda119396fba2ebdb3439ca68c9bc670e5d0"),
     "data/words.txt": (112_068, "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423"),
     "public/valid-words-v3328.txt": (112_068, "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423"),
@@ -74,3 +74,4 @@ assert canonical_json(rebuilt) == public_raw
 assert (ROOT / "data/words.txt").read_bytes() == (ROOT / "public/valid-words-v3328.txt").read_bytes()
 
 print("Sprint 14 content characterization: PASS")
+

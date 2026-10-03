@@ -35,7 +35,7 @@ assert server.mozkomor_unlocked_from_rows([])
 old_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'][:200]]
 assert server.mozkomor_unlocked_from_rows(old_hardcore)
 for d in DIFFICULTIES:
-    old=[p for p in data['free'][d] if not p['id'].startswith('g5-r1-')]
+    old=[p for p in data['free'][d] if not p['id'].startswith(('g5-r1-', 'g6-refresh-'))]
     additions=[p for p in data['free'][d] if p['id'].startswith('g5-r1-')]
     assert digest(old)==package['manifest']['boundaries'][d]['baseHash'],d
     assert digest(old+rolling['puzzles'].get(d,[]))==package['manifest']['boundaries'][d]['historyHash'],d
@@ -52,3 +52,4 @@ for d in DIFFICULTIES:
         info=free_puzzle_info(data,rolling,p['id'],DIFFICULTIES,d)
         assert info['puzzle']==p and info['level']==p['meta']['level'] and info['generation']==4
 print('PASS: 450 approved production boards; old payloads, slot numbers and rolling dates unchanged')
+
