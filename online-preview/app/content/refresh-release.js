@@ -65,6 +65,7 @@
 
   function onKeyDown(event) {
     if (!modal || modal.classList.contains('hidden')) return;
+    modal.classList.remove('refresh-initial-focus');
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -93,6 +94,7 @@
       .map(element => [element, element.inert]);
     for (const [element] of background) element.inert = true;
     document.body.style.overflow = 'hidden';
+    modal.classList.add('refresh-initial-focus');
     modal.classList.remove('hidden');
     modal.querySelector('[data-refresh-play]').focus();
   }
