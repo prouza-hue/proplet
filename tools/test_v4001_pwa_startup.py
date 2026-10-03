@@ -22,7 +22,7 @@ assert shell_release.group(1) == app_release.group(1), (
     "Service-worker shell and app release marker must stay identical; a mismatch "
     "causes the runtime-update reload loop."
 )
-assert shell_release.group(1) == "proplet-v4.04.0-mozkokalypsa2"
+assert shell_release.group(1) == "proplet-v4.04.0-mozkokalypsa-cta2"
 assert "const DATA_CACHE='proplet-data-v11'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)
@@ -63,6 +63,7 @@ cache_control = [h["value"] for h in sw_headers[0]["headers"] if h["key"].lower(
 assert cache_control == ["no-cache, no-store, must-revalidate"]
 
 print("PASS: current PWA startup/update contract")
+
 
 
 
