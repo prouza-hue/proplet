@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-03",
+  "baseline": "5ac821081a64d3b106aff997a5aa5d2b36986f05",
+  "branch": "preview/support-20261003",
+  "deployment": {
+    "id": "dpl_2Qgnmef3UrnR6THwJJByk14kfrEM",
+    "url": "https://proplet-kj1sa27qd-pavel-prouzas-projects.vercel.app",
+    "target": null,
+    "state": "INITIALIZING",
+    "commit": "09ed5b6cd97c8afec500dd65a20cf242e5e00e36",
+    "files": 461
+  },
+  "finalVerification": {
+    "date": "2026-10-03T18:59:21.359Z",
+    "base": "https://proplet-kj1sa27qd-pavel-prouzas-projects.vercel.app",
+    "pageErrors": [],
+    "serviceWorkers": 0,
+    "allRequestsStayOnPreview": true,
+    "gameOrPaymentApiRequests": 0,
+    "apiStatus": 404,
+    "nonApplicationTransportRequests": [
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 591
+      },
+      {
+        "status": 200,
+        "path": 591
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      },
+      {
+        "status": 200,
+        "path": 108
+      }
+    ],
+    "checks": [
+      "heading no decorative outline",
+      "keyboard focus preserved across frequency",
+      "one-time success remains one-time",
+      "no JavaScript exceptions",
+      "no external or game/payment API requests",
+      "no service worker",
+      "preview API 404",
+      "no Vercel toolbar in source"
+    ],
+    "note": "Online browser transport inserts a non-artifact script and modifies CSP with self; its opaque HEAD/POST paths are absent from published source. Local pristine browser test passed all 46 checks. Online full UI passed 43 checks; strict zero-request tail flagged this transport injection. No production origin or payment API was contacted."
+  },
+  "productionUnchanged": {
+    "id": "dpl_3VHfzz2tygVryBey64395PuXcM6j",
+    "sha": "5ac821081a64d3b106aff997a5aa5d2b36986f05"
+  },
+  "gallery": "https://proplet-kj1sa27qd-pavel-prouzas-projects.vercel.app/support-gallery.html",
+  "report": "https://proplet-kj1sa27qd-pavel-prouzas-projects.vercel.app/support-report.html"
+}
