@@ -31,13 +31,15 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  }
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));check('dismissal remembered and no second promo',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));
  await page.evaluate(()=>nav('free'));
- check('400 levels and varied next board',await page.evaluate(()=>puzzleDB.free.easy.length===400&&freeOrder().record('easy').mode==='varied'&&freeOrder().next('easy',null).id==='g6-refresh-easy-001'));
+ await page.waitForFunction(()=>freeOrder().enabled());
+ check('400 levels and varied next board',await page.evaluate(()=>puzzleDB.free.easy.filter(p=>!p.meta?.rollingContent).length===400&&freeOrder().record('easy').mode==='varied'&&freeOrder().next('easy',null).id==='g6-refresh-easy-001'));
  check('compact next-board information; no card switch',await page.evaluate(()=>document.querySelectorAll('#difficultyCards .order-next').length===6&&!document.querySelector('#difficultyCards select')));
  await page.locator('#settingsHeaderBtn').click();await page.locator('#freeOrderSettings summary').click();
  check('four opt-outs, endgames excluded',await page.locator('#freeOrderSettings select').count()===4);
- await page.locator('#freeOrder-easy').selectOption('numeric');check('explicit numeric preference takes effect',await page.evaluate(()=>freeOrder().record('easy').mode==='numeric'));
- await page.locator('#freeOrder-easy').selectOption('varied');
+ await page.locator('#freeOrder-easy').selectOption('numeric');await page.waitForFunction(()=>freeOrder().record('easy').mode==='numeric');check('explicit numeric preference takes effect',await page.evaluate(()=>freeOrder().record('easy').mode==='numeric'));
+ await page.locator('#freeOrder-easy').selectOption('varied');await page.waitForFunction(()=>freeOrder().record('easy').mode==='varied');
  await page.evaluate(()=>nav('free'));await page.locator('#difficultyCards [data-diff="easy"] [data-play-free]').click();
+ await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='free');
  check('native game starts approved new board',await page.evaluate(()=>currentGame?.puzzle?.id==='g6-refresh-easy-001'&&currentGame.mode==='free'));
  await page.screenshot({path:`${out}/new-board.png`});
  const newcomer=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});await newcomer.route('**/*',route=>new URL(route.request().url()).origin!==base?route.abort():route.continue());await newcomer.goto(base,{waitUntil:'domcontentloaded'});
