@@ -89,6 +89,9 @@ EMBEDDED_EVENT_NAMES = (
     "helper_onboarding_started",
     "legacy_origin_update_opened",
     "legacy_origin_update_shown",
+    "marketing_measurement_ready",
+    "marketing_sdk_loaded",
+    "marketing_sdk_failed",
     "onboarding_completed",
     "onboarding_login_authenticated",
     "onboarding_login_clicked",
@@ -224,5 +227,4 @@ def record_product_event(
     }
     insert_fn("product_events", row)
     return row
-
 

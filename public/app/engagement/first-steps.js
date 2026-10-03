@@ -122,11 +122,10 @@
     $('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Hrát dál';
     $('#winPrimaryBtn').onclick=startFirst;
   }
-  function embeddedBrowser(){return /FBAN|FBAV|Instagram|\bwv\b/i.test(navigator.userAgent)}
   function ensureAccount(){
     if($('#firstStepsAccount'))return;
     const section=document.createElement('section');section.id='firstStepsAccount';section.className='first-steps-account hidden';
-    section.innerHTML='<p id="firstStepsSaveCopy">Vytvoř si účet a pokračuj se svým postupem i na jiném zařízení.</p><button id="firstStepsGoogle" class="google-auth-btn first-steps-google" type="button"><img src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button><button id="firstStepsManual" class="text-btn first-steps-manual" type="button">Jiný způsob vytvoření účtu</button><p id="firstStepsBrowserNote" class="first-steps-note hidden">Google se v prohlížeči této aplikace nemusí otevřít. Účet si můžeš založit přezdívkou a heslem přímo tady.</p><p id="firstStepsSyncStatus" class="first-steps-note" role="status" aria-live="polite"></p><button id="firstStepsRetry" type="button" class="secondary-btn hidden">Zkusit uložit znovu</button><button id="firstStepsContinue" class="text-btn first-steps-continue" type="button">Hrát dál bez účtu</button><small id="firstStepsLocalNote" class="first-steps-note">Zatím máš postup uložený na tomto zařízení.</small>';
+    section.innerHTML='<p id="firstStepsSaveCopy">Vytvoř si účet a pokračuj se svým postupem i na jiném zařízení.</p><button id="firstStepsGoogle" class="google-auth-btn first-steps-google" type="button"><img src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button><button id="firstStepsManual" class="text-btn first-steps-manual" type="button">Jiný způsob vytvoření účtu</button><p id="firstStepsSyncStatus" class="first-steps-note" role="status" aria-live="polite"></p><button id="firstStepsRetry" type="button" class="secondary-btn hidden">Zkusit uložit znovu</button><button id="firstStepsContinue" class="text-btn first-steps-continue" type="button">Hrát dál bez účtu</button><small id="firstStepsLocalNote" class="first-steps-note">Zatím máš postup uložený na tomto zařízení.</small>';
     $('#winModal .win-summary').insertAdjacentElement('afterend',section);
     $('#firstStepsGoogle').onclick=()=>beginAuth('google');$('#firstStepsManual').onclick=()=>beginAuth('manual');
     $('#firstStepsContinue').onclick=continuePlaying;$('#firstStepsRetry').onclick=()=>resumeAfterAuth();
@@ -142,7 +141,7 @@
     $('#firstStepsContinue').textContent=signed?'Hrát další Proplet':'Hrát dál bez účtu';
     $('#firstStepsContinue').classList.toggle('primary-btn',signed);
     $('#firstStepsContinue').classList.toggle('big',signed);
-    $('#firstStepsBrowserNote').classList.toggle('hidden',signed||!embeddedBrowser());
+    global.PropletInAppBrowserHelp?.mount($('#firstStepsGoogle'),{id:'firstStepsBrowserNote',hidden:signed});
     $('#firstStepsLocalNote').classList.toggle('hidden',signed);
     $('#firstStepsRetry').classList.add('hidden');$('#firstStepsSyncStatus').textContent='';
     $('#firstStepsSaveCopy').textContent=signed?'Účet je připravený. Kontroluji uložení výsledku…':'Vytvoř si účet a pokračuj se svým postupem i na jiném zařízení.';
@@ -241,4 +240,3 @@
   global.PropletFirstSteps=facade;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })(window);
-

@@ -54,6 +54,14 @@
       },280);
     };
 
+    // A visual fallback can also reveal an error screen; only successful app boot
+    // makes the consent notice eligible. Keep the flag for late-loaded modules.
+    document.addEventListener('proplet:ready',()=>{
+      if(window.__PROPLET_CURRENT_UI_READY)return;
+      window.__PROPLET_CURRENT_UI_READY=true;
+      window.dispatchEvent(new Event('proplet-ui-ready'));
+    },{once:true});
+
     let readyChecks=0;
     const revealWhenCanonicalHomeReady=()=>{
       if(revealed)return;
@@ -224,7 +232,7 @@
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=mk100','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
-    await loadScript('/account-auth.js?v=flowcontext1','propletAccountAuth',{wait:true});
+    await loadScript('/account-auth.js?v=flowcontext1-inappauth1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=style-recovery1','propletGameLayout');
     loadScript('/gesture-guard-v3325.js?v=fixsep8c','propletGestureGuard');
@@ -236,7 +244,7 @@
     loadScript('/challenge-cta-v3333.js?v=resultdock1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=sessionrecovery1','propletAccountBonusV3331',{wait:true});
-    await loadScript('/account-conversion-v3331.js?v=firststeps1','propletAccountConversionV3331',{wait:true});
+    await loadScript('/account-conversion-v3331.js?v=firststeps1-inappauth1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=privacyflow1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=auditphase2-2','propletPrintshopReleasePolish',{wait:true});
@@ -265,6 +273,3 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
-
-
-

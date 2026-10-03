@@ -9,6 +9,8 @@
   function create(options = {}) {
     const request = typeof options.request === 'function' ? options.request : null;
     const isDisabled = typeof options.isDisabled === 'function' ? options.isDisabled : () => false;
+    // true sends, false discards, null/undefined waits for policy initialization.
+    const shouldSend = typeof options.shouldSend === 'function' ? options.shouldSend : () => true;
     const endpoint = String(options.endpoint || DEFAULT_ENDPOINT);
     const storage = options.storage;
     const now = options.now || (() => Date.now());
@@ -16,15 +18,32 @@
     const key = scope => `proplet-events-v2:${scope}`;
     const read = scope => {try{return JSON.parse(storage.getItem(key(scope)) || '[]').filter(e=>now()-e.at<7*86400000)}catch{return []}};
     const save = (scope,rows) => {try{storage.setItem(key(scope),JSON.stringify(rows))}catch{}};
+    const pendingRows = scope => {
+      const rows=read(scope), permitted=rows.filter(row=>shouldSend(row.event)!==false);
+      if(permitted.length!==rows.length)save(scope,permitted);
+      return permitted;
+    };
     let pendingFlush = null;
     let retryAt = 0;
+    let deferredWithoutStorage = [];
     function adoptGuest(anonymousId, playerId) {
       if(!storage)return;
       const from=`a:${anonymousId}`,to=`p:${playerId}`,rows=read(from);
       save(to,[...read(to),...rows]);save(from,[]);
     }
     function flush(){
-      if(!storage || !request || isDisabled() || now()<retryAt)return Promise.resolve();
+      if(!request || isDisabled() || now()<retryAt)return Promise.resolve();
+      if(!storage){
+        const ready=[],waiting=[];
+        for(const row of deferredWithoutStorage){
+          const decision=shouldSend(row.event);
+          if(decision===true)ready.push(row);else if(decision!==false)waiting.push(row);
+        }
+        deferredWithoutStorage=waiting;
+        return Promise.all(ready.map(row=>{
+          try{return Promise.resolve(request(row.endpoint,{method:'POST',body:JSON.stringify({event_type:row.event})})).catch(()=>{})}catch{return Promise.resolve()}
+        }));
+      }
       if(pendingFlush)return pendingFlush;
       const scope=getScope(),authProfile=options.getProfile?.() || null;
       pendingFlush=(async()=>{
@@ -32,13 +51,13 @@
         // Bound the drain and remember IDs so failed storage writes cannot cause a loop.
         const attempted=new Set();
         while(attempted.size<MAX_EVENTS_PER_FLUSH){
-          const row=read(scope).find(e=>!attempted.has(e.id));
+          const row=pendingRows(scope).find(e=>!attempted.has(e.id)&&shouldSend(e.event)===true);
           if(!row)break;
           const target=row.endpoint||endpoint;
           const headerKey=JSON.stringify(row.headers||{});
           const batch=[];
           const compatible=target===DEFAULT_ENDPOINT
-            ?read(scope).filter(e=>!attempted.has(e.id)&&(e.endpoint||endpoint)===target&&JSON.stringify(e.headers||{})===headerKey)
+            ?pendingRows(scope).filter(e=>!attempted.has(e.id)&&shouldSend(e.event)===true&&(e.endpoint||endpoint)===target&&JSON.stringify(e.headers||{})===headerKey)
             :[row];
           const batchIds=new Set();
           for(const event of compatible){
@@ -67,19 +86,13 @@
     }
 
     function track(eventType, _properties, targetEndpoint=endpoint) {
-      if (!request || isDisabled()) return;
+      if (!request || isDisabled() || shouldSend(eventType)===false) return;
       if(storage){
         const scope=getScope(),rows=read(scope);
         rows.push({id:global.crypto.randomUUID(),event:eventType,endpoint:targetEndpoint,at:now(),headers:options.getHeaders?.(eventType,_properties) || {}});
         save(scope,rows);flush();return;
       }
-      try {
-        const pending = request(targetEndpoint, {
-          method: 'POST',
-          body: JSON.stringify({event_type: eventType}),
-        });
-        Promise.resolve(pending).catch(() => {});
-      } catch (_) {}
+      deferredWithoutStorage.push({event:eventType,endpoint:targetEndpoint});flush();
     }
 
     return {track,flush,adoptGuest,trackChallenge:(event,properties)=>track(event,properties,'/api/challenge-event')};
