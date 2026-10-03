@@ -170,6 +170,10 @@
         "runner": "node"
       },
       {
+        "path": "tests/current/test_in_app_browser_auth.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_auth_title_convergence.js",
         "runner": "node"
       },

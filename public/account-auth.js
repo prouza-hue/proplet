@@ -114,6 +114,7 @@ function ensureLoginEnhancements(){
  };
  $('#forgotPasswordBtn').onclick=()=>{closeModal('#profileModal');openModal('#forgotPasswordModal');$('#forgotPasswordMessage').textContent='';setTimeout(()=>$('#forgotEmailInput')?.focus(),80)};
  $('#googleLoginBtn').onclick=()=>{location.href='/api/auth/google/start'};
+ window.PropletInAppBrowserHelp?.mount($('#googleLoginBtn'));
  syncLoginMode();new MutationObserver(syncLoginMode).observe($('#profileModeCreate'),{attributes:true,attributeFilter:['class']});
 }
 function syncLoginMode(){
@@ -161,6 +162,7 @@ async function refreshSecurityCard(){
    const d=await call('/api/account/auth-status'),badge=hub.querySelector('#profileAccountBadge');if(badge){const strong=!!(d.recoveryReady||d.googleLinked);badge.textContent=strong?'Zabezpečeno':'Doplnit';badge.classList.toggle('ok',strong)}
    body.innerHTML=`<div class="account-hub-row ${d.recoveryReady?'ok':'warn'}"><span>${d.recoveryReady?'✉️':'⚠️'}</span><div><strong>${d.recoveryReady?'E-mail pro obnovu':'Chybí záchranný e-mail'}</strong><small>${d.recoveryReady?esc(d.email):'Bez něj zapomenuté heslo neobnovíš.'}</small></div>${d.recoveryReady?'':`<button id="addRecoveryEmailBtn" class="secondary-btn">Přidat</button>`}</div><div class="account-hub-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'<img class="google-g google-g-small" src="/google-g.svg" alt="" aria-hidden="true">'}</span><div><strong>${d.googleLinked?'Google propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Příště se přihlásíš jedním klepnutím.':d.googleAvailable?'Propoj účet a nemusíš řešit heslo.':'Google přihlášení teď není dostupné.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>${p.hasPassword?'':`<div class="account-hub-row neutral"><span>🔑</span><div><strong>Heslo je volitelné</strong><small>Google stačí. Heslo můžeš přidat jako další možnost přihlášení.</small></div><button id="setPasswordFromHub" class="secondary-btn">Nastavit</button></div>`}`;
    $('#addRecoveryEmailBtn')?.addEventListener('click',openRecoveryEmailModal);$('#linkGoogleBtn')?.addEventListener('click',()=>{location.href='/api/auth/google/start'});$('#setPasswordFromHub')?.addEventListener('click',()=>{if(typeof openPasswordModal==='function')openPasswordModal()});
+   window.PropletInAppBrowserHelp?.mount($('#linkGoogleBtn'));
   }catch(e){body.innerHTML=`<p class="account-auth-error">${esc(e.message)}</p>`}
  })().finally(()=>{securityRefreshPromise=null});
  return securityRefreshPromise;
@@ -209,6 +211,7 @@ async function handleAuthReturn(){
 
 function init(){
  ensureModals();ensureLoginEnhancements();
+ window.PropletInAppBrowserHelp?.mount($('#progressGuardGoogleBtn'));
  const card=$('#profileCard');if(card)new MutationObserver(scheduleEnhance).observe(card,{childList:true});
  document.querySelectorAll('[data-nav="profile"]').forEach(el=>el.addEventListener('click',()=>setTimeout(enhanceProfileArchitecture,100)));
  const stored=sessionStorage.getItem('proplet-recovery-context');if(stored)try{recoveryContext=JSON.parse(stored)}catch{}
@@ -216,4 +219,3 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,0),{once:true});else setTimeout(init,0);
 })();
-

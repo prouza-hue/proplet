@@ -5,7 +5,7 @@ const first=a.slice(a.indexOf('  function polishAuthModal(){'),a.indexOf('  func
 const second=b.slice(b.indexOf('  function polishProfileCopy(){'),b.indexOf('  function resetTajenkaResultMode(){'));
 let value='',writes=0,create=true;const title={get textContent(){return value},set textContent(v){value=v;writes++}};
 const q=s=>s==='#profileModalTitle'?title:null;
-const ctx={q,$:q,getProfile:()=>null,positionGoogleFirst:()=>true,isCreateMode:()=>create,setText:(el,v)=>{if(el&&el.textContent!==v)el.textContent=v}};
+const ctx={window:{},q,$:q,getProfile:()=>null,positionGoogleFirst:()=>true,isCreateMode:()=>create,setText:(el,v)=>{if(el&&el.textContent!==v)el.textContent=v}};
 vm.createContext(ctx);vm.runInContext(first+second,ctx);
 for(let i=0;i<100;i++)vm.runInContext('polishAuthModal();polishProfileCopy();',ctx);
 assert.equal(value,'Nepřijď o své výsledky');assert.equal(writes,1);

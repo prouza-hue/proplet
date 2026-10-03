@@ -22,6 +22,7 @@
     }
     const slot=block.querySelector('.google-primary-slot');
     if(slot&&button.parentElement!==slot)slot.appendChild(button);
+    window.PropletInAppBrowserHelp?.mount(button);
     if(desc.nextElementSibling!==block)desc.insertAdjacentElement('afterend',block);
 
     let divider=$('#googleManualDivider');
@@ -43,6 +44,9 @@
     const create=isCreateMode();
     const title=$('#profileModalTitle'),desc=$('#profileModalDesc'),save=$('#saveProfileBtn');
     const divider=$('#googleManualDivider span'),head=$('#googlePrimaryBlock .google-primary-head span'),note=$('#googlePrimaryBlock .google-primary-note');
+    const inApp=!!window.PropletInAppBrowserHelp?.context();
+    const speed=$('#googlePrimaryBlock .google-primary-head small');
+    if(speed)speed.hidden=inApp;
 
     if(create&&$('#profileModal')?.classList.contains('first-steps-auth')){
       setText(title,'Ulož si postup');
@@ -54,15 +58,15 @@
       setText(desc,'Založ si účet, trvá to pár vteřin. Uložíme XP, výsledky i sérii — a přidáme ti +500 XP.');
       setText(save,'Založit jménem a heslem · +500 XP');
       setText(divider,'nebo přezdívkou a heslem');
-      setText(head,'NEJRYCHLEJŠÍ ZPŮSOB');
+      setText(head,inApp?'PŘIHLÁŠENÍ PŘES GOOGLE':'NEJRYCHLEJŠÍ ZPŮSOB');
       setText(note,'Bez vytváření nového hesla · +500 XP po založení.');
     }else{
       setText(title,'Přihlásit se');
-      setText(desc,'Nejrychleji přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.');
+      setText(desc,inApp?'Přihlas se přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.':'Nejrychleji přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.');
       setText(save,'Přihlásit se');
       setText(divider,'nebo jménem a heslem');
-      setText(head,'NEJRYCHLEJŠÍ PŘIHLÁŠENÍ');
-      setText(note,'Bez vyplňování jména a hesla.');
+      setText(head,inApp?'PŘIHLÁŠENÍ PŘES GOOGLE':'NEJRYCHLEJŠÍ PŘIHLÁŠENÍ');
+      setText(note,inApp?'Použij svůj Google účet.':'Bez vyplňování jména a hesla.');
     }
   }
 
