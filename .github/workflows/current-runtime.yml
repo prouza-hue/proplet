@@ -115,6 +115,7 @@ jobs:
           set -euo pipefail
           python -c "from pathlib import Path; Path('/tmp/proplet-test-password').write_text('local-test-only')"
           python tools/test_isolated_result_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-isolated-results.json --database-name proplet_test_ci_cron
+          python tools/test_historical_free_rewards_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-historical-rewards.json
           python tools/test_mk3_release_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_mk3_release_http_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_account_created_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-account-created.json
