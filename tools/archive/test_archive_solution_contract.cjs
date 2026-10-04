@@ -1,6 +1,6 @@
 'use strict';
 
-function run({helper, manifest, approvals, originalPuzzles, catalog}) {
+function run({helper, manifest, approvals, originalPuzzles, catalog, editorialDecisions}) {
   let checks = 0;
   function assert(condition, label) {
     checks++;
@@ -105,6 +105,38 @@ function run({helper, manifest, approvals, originalPuzzles, catalog}) {
       'revealed alternative-compatible target accepted: ' + id);
   }
 
+
+  if (editorialDecisions) {
+    const signature = solution => solution.map(trace => trace.word.normalize('NFC').toUpperCase() +
+      ':' + trace.path.join(',')).sort().join('|');
+    const acceptedAlternatives = new Map();
+    for (const [id, entry] of Object.entries(approvals.boards)) {
+      acceptedAlternatives.set(id, new Set(entry.solutionSets.slice(1).map(signature)));
+    }
+    assert(editorialDecisions.decisions.length === 100, 'all one hundred broad noncanonical covers individually recorded');
+    const decisionKeys = new Set();
+    const counts = {approve: 0, reject: 0, pending: 0};
+    for (const decision of editorialDecisions.decisions) {
+      const key = decision.puzzleId + ':' + decision.broadSolutionIndex;
+      assert(!decisionKeys.has(key), 'each editorial decision has one exact candidate identity');
+      decisionKeys.add(key);
+      counts[decision.projectPreparationDecision]++;
+      const included = acceptedAlternatives.get(decision.puzzleId)?.has(signature(decision.completeSolution)) || false;
+      assert(included === (decision.projectPreparationDecision === 'approve'),
+        'only approved exact complete candidates enter playable solution data: ' + key);
+    }
+    assert(counts.approve === 64 && counts.reject === 21 && counts.pending === 15,
+      'reconciled language policy has sixty four approvals, twenty one rejections and fifteen pending cases');
+    assert(Array.from(acceptedAlternatives.values()).reduce((sum, set) => sum + set.size, 0) === 64,
+      'no additional or missing complete alternatives in prepared data');
+    assert(manifest.boards.filter(entry => entry.quality.pendingBroadAlternativeCount > 0).length === 12,
+      'all twelve unresolved boards remain recorded');
+    assert(manifest.boards.filter(entry => entry.quality.pendingBroadAlternativeCount > 0)
+      .every(entry => entry.publicationState === 'editorial-review-required'),
+      'pending candidate policy is an explicit publication gate');
+    assert(manifest.status === 'prepared-not-enabled', 'Archive remains disabled during preparation');
+  }
+
   const e100 = helper.create(byId.get('g3-e-100'), approvals.boards['g3-e-100']);
   const canonical = approvals.boards['g3-e-100'].solutionSets[0];
   const alternative = approvals.boards['g3-e-100'].solutionSets[1];
@@ -178,6 +210,7 @@ if (typeof require === 'function' && require.main === module) {
     helper, manifest, approvals: readJson('content/archives/free-gen3-v1/approved-solutions.json'),
     originalPuzzles: Object.values(archive.free).flat(),
     catalog: readJson(manifest.catalog.path),
+    editorialDecisions: readJson('content/archives/free-gen3-v1/editorial-decisions.json'),
   });
   console.log(JSON.stringify(result, null, 2));
 }
