@@ -1,0 +1,39 @@
+name: Mozkokalypsa achievements
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - 'tools/verify_mozkokalypsa_achievements.cjs'
+      - 'tests/current/test_mozkokalypsa_achievements.js'
+      - '.github/workflows/mozkokalypsa-achievements.yml'
+permissions:
+  contents: read
+jobs:
+  achievements:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/current/test_mozkokalypsa_achievements.js
+      - run: python -m pip install -r requirements-dev.txt
+      - run: npm install --no-save playwright@1.58.2 && npx playwright install --with-deps chromium
+      - name: Native app and visual checks without production credentials
+        run: |
+          python tools/generate_puzzles_bootstrap.py
+          PROPLET_FREE_ORDER_ENABLED=true python -m uvicorn server:app --port 8000 > /tmp/mk-achievements.log 2>&1 &
+          for i in {1..30}; do curl -sf http://127.0.0.1:8000/api/config && break; sleep 1; done
+          node tools/verify_mozkokalypsa_achievements.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mozkokalypsa-achievements
+          path: |
+            qa-mk-achievements/
+            /tmp/mk-achievements.log

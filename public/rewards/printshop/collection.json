@@ -1275,6 +1275,62 @@
       "group": null,
       "stage": 0,
       "key": "symbol-secret"
+    },
+    {
+      "id": "achievement-mozkokalypsa-1",
+      "name": "První trhlina",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 0,
+      "key": "achievement-mozkokalypsa-1"
+    },
+    {
+      "id": "achievement-mozkokalypsa-5",
+      "name": "Za bodem zlomu",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 1,
+      "key": "achievement-mozkokalypsa-5"
+    },
+    {
+      "id": "achievement-mozkokalypsa-10",
+      "name": "Oko bouře",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 2,
+      "key": "achievement-mozkokalypsa-10"
+    },
+    {
+      "id": "achievement-mozkokalypsa-25",
+      "name": "Krotitel pohromy",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 3,
+      "key": "achievement-mozkokalypsa-25"
+    },
+    {
+      "id": "achievement-mozkokalypsa-50",
+      "name": "Nezlomná mysl",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 4,
+      "key": "achievement-mozkokalypsa-50"
+    },
+    {
+      "id": "achievement-mozkokalypsa-75",
+      "name": "Vládce epicentra",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 5,
+      "key": "achievement-mozkokalypsa-75"
+    },
+    {
+      "id": "achievement-mozkokalypsa-100",
+      "name": "Poslední slovo",
+      "category": "achievement",
+      "group": "Mozkokalypsa",
+      "stage": 6,
+      "key": "achievement-mozkokalypsa-100"
     }
   ]
 }

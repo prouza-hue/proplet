@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.05.0-refresh300-inappauth1-measurement1-mobilefix1';
+const APP_PREVIEW_RELEASE='proplet-v4.05.0-refresh300-inappauth1-measurement1-mobilefix1-mkach1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -94,7 +94,7 @@ const LEVELS=[
 ];
 const ACHIEVEMENT_GROUPS=[
  ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],
- ['daily','Denní výzva'],['tajenka','Tajenka'],['mozkomor','Mozkomor'],['discovery','Objevená slova'],
+ ['daily','Denní výzva'],['tajenka','Tajenka'],['mozkomor','Mozkomor'],['mozkokalypsa','Mozkokalypsa'],['discovery','Objevená slova'],
  ['clean','Čistá řešení'],['cleanDaily','Čisté Daily'],['xp','XP'],['speed','Rychlost'],['rescue','Záchrana série']
 ];
 const ACHIEVEMENTS=[
@@ -160,6 +160,14 @@ const ACHIEVEMENTS=[
  {id:'mozkomor-50',group:'mozkomor',icon:'⚙️',name:'Neuron z ocele',desc:'Dokonči 50 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:50},
  {id:'mozkomor-100',group:'mozkomor',icon:'👁️',name:'Mozkomorova Nemesis',desc:'Dokonči všech 100 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:100},
 
+ {id:'mozkokalypsa-1',group:'mozkokalypsa',icon:'🌀',name:'První trhlina',desc:'Dokonči první desku Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:1},
+ {id:'mozkokalypsa-5',group:'mozkokalypsa',icon:'🌀',name:'Za bodem zlomu',desc:'Dokonči 5 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:5},
+ {id:'mozkokalypsa-10',group:'mozkokalypsa',icon:'🌀',name:'Oko bouře',desc:'Dokonči 10 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:10},
+ {id:'mozkokalypsa-25',group:'mozkokalypsa',icon:'🌀',name:'Krotitel pohromy',desc:'Dokonči 25 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:25},
+ {id:'mozkokalypsa-50',group:'mozkokalypsa',icon:'🌀',name:'Nezlomná mysl',desc:'Dokonči 50 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:50},
+ {id:'mozkokalypsa-75',group:'mozkokalypsa',icon:'🌀',name:'Vládce epicentra',desc:'Dokonči 75 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:75},
+ {id:'mozkokalypsa-100',group:'mozkokalypsa',icon:'👑',name:'Poslední slovo',desc:'Dokonči 100 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:100},
+
  {id:'discovery-1',group:'discovery',icon:'👍',name:'Slovo navíc',desc:'Objev první platné vedlejší slovo',value:s=>s.discoveredWords||0,target:1},
  {id:'discovery-10',group:'discovery',icon:'🌿',name:'Boční stezka',desc:'Objev 10 různých vedlejších slov',value:s=>s.discoveredWords||0,target:10},
  {id:'discovery-50',group:'discovery',icon:'🔦',name:'Lovec skrytých slov',desc:'Objev 50 různých vedlejších slov',value:s=>s.discoveredWords||0,target:50},
@@ -203,7 +211,11 @@ const ACHIEVEMENTS=[
  {id:'rescue-10',group:'rescue',icon:'🧯',name:'Hasící přístroj',desc:'Zachraň sérii 10×',value:s=>s.rescuedDays||0,target:10}
 ];
 ACHIEVEMENTS.forEach(a=>a.test=s=>a.value(s)>=a.target);
-function achievementCard(a,stats){const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}
+function completionAchievements(before,after,game,announced=[]){
+ const seen=new Set(Array.isArray(announced)?announced:[]),mozkokalypsa=game?.mode==='free'&&game.puzzle?.difficulty==='mozkokalypsa'&&!game.postStarterWarmup;
+ return ACHIEVEMENTS.filter(a=>a.group==='mozkokalypsa'?mozkokalypsa&&a.test(after)&&!seen.has(a.id):!a.test(before)&&a.test(after));
+}
+function achievementCard(a,stats){const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div data-achievement="${a.id}" class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}
 function renderAchievements(stats){return ACHIEVEMENT_GROUPS.map(([id,label])=>{const list=ACHIEVEMENTS.filter(a=>a.group===id);if(!list.length)return '';const earned=list.filter(a=>a.test(stats)).length;return `<section class="achievement-group"><div class="achievement-group-head"><strong>${label}</strong><span>${earned}/${list.length}</span></div><div class="achievement-grid">${list.map(a=>achievementCard(a,stats)).join('')}</div></section>`}).join('')}
 let profileAchievementsExpanded=false;
 function achievementProgressState(a,stats){const value=Math.max(0,a.value(stats)||0),done=a.test(stats),pct=Math.min(100,Math.round(value/a.target*100));return {a,value,done,pct}}
@@ -1086,10 +1098,13 @@ async function finishGame(){
  const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,level:g.mode==='free'?Number(g.puzzle.meta?.level)||null:null,contentGeneration:g.mode==='free'?Number(g.puzzle.meta?.contentGeneration)||Number(puzzleDB.freeGeneration)||2:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty,g.puzzle),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString()};
  rec.timingUnverified=!!g.timingUnverified;renderTimingStatus(g);if(dailyGenerationUpgrade)rec.points=old.points??rec.points;if(!old||dailyGenerationUpgrade)state.completed[key]=rec;if(state.inProgress?.[key])delete state.inProgress[key];saveState(state);queueResult(rec);g.finishTelemetryPromise=finishAttemptTelemetry(rec);
  $('#winModal').classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');winDailyGlobalData=null;const winBoard=$('#levelLeaderboardBox');if(winBoard){winBoard.classList.remove('daily-global-board','free-level-board');if(g.mode==='free'&&!g.postStarterWarmup){winBoard.classList.remove('hidden');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Aktualizuji pořadí…</strong><small>Započítávám právě dohraný výsledek.</small></div>'}else if(g.postStarterWarmup){winBoard.classList.add('hidden')}else if(g.mode==='daily'){winBoard.classList.remove('hidden');winBoard.classList.add('daily-global-board');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Hledám tvoje místo ve světě…</strong><small>Nejdřív bezpečně ukládám výsledek.</small></div>'}else winBoard.classList.add('hidden')}
- const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=ACHIEVEMENTS.filter(a=>!a.test(statsBefore)&&a.test(stats));
+ const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=completionAchievements(statsBefore,stats,g,getState().mozkokalypsaCelebrated);
  $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';renderCompletionPraise(g.puzzle.difficulty,rec);if(g.postStarterWarmup){trackProductEvent('starter_easy_warmup_completed');$('#winTitle').textContent='Paráda. Teď už jsi rozehřátý.';}const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
  g.winBaseXpAwarded=(dailyGenerationUpgrade||dailyReplay||(old&&g.mode==='free')||(g.mode==='free'&&rec.points===0))?0:Math.max(0,Number(rec.points)||0);g.winXpFallbackText=dailyGenerationUpgrade?'✓ Nová Daily započítaná · 100 XP už máš':dailyReplay?'Tréninkový pokus · 100 XP už máš':old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':g.mode==='free'&&rec.points===0?'Tréninkový pokus · XP už máš':`+${rec.points} XP`;renderRunWinXp(g);const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':(g.helperHintUsed?`💛 S Pomocníkem · ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`:`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`);if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
  const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}$('#newBadgeBox').classList.toggle('hidden',!celebrations.length);$('#newBadgeBox').innerHTML=celebrations.join('');
+ const celebratedMk=newAchievements.filter(a=>a.group==='mozkokalypsa').map(a=>a.id);
+ const badgeBox=$('#newBadgeBox'),badgeAnchor=celebratedMk.length?$('#winPrimaryBtn'):$('#starterHardActions');if(badgeBox&&badgeAnchor)badgeAnchor.before(badgeBox);
+ if(celebratedMk.length&&!g.postStarterWarmup){const latest=getState();latest.mozkokalypsaCelebrated=[...new Set([...(Array.isArray(latest.mozkokalypsaCelebrated)?latest.mozkokalypsaCelebrated:[]),...celebratedMk])];saveState(latest)}
  configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':g.mode==='daily'?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hrát další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.mode==='free'&&!g.postStarterWarmup){
  if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(currentGame!==g)return;if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
@@ -2400,3 +2415,4 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+

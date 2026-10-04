@@ -1,0 +1,9 @@
+/* Seven static emblems; scoped to the new series, no observers or motion. */
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"] .ribbon-art{width:58px;height:58px}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"]{border-color:color-mix(in srgb,#bf7050 35%,var(--r-edge));background:var(--r-paper)}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"].earned{background:color-mix(in srgb,#e3b85e 9%,var(--r-paper))}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"] .achievement-progress>span{background:#ad6a35!important}
+html.ribbon-ui #screen-profile .achievement[data-achievement="mozkokalypsa-100"].earned{border-color:#b48336;box-shadow:inset 0 0 0 1px #e3b85e55}
+
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"]>.emoji.bespoke-ready{width:58px;height:58px;margin-bottom:6px}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"]{grid-template-columns:58px minmax(0,1fr) auto}
