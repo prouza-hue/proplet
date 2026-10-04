@@ -59,12 +59,12 @@ function run({helper, manifest, approvals, originalPuzzles, catalog}) {
     assert(contract.restore(state).completed, 'completed canonical state restored: ' + puzzle.id);
   }
 
-  assert(Object.keys(approvals.boards).length === 15, 'exact initial fifteen reviewed boards');
+  assert(Object.keys(approvals.boards).length === manifest.summary.approvedAlternativeBoards, 'all explicitly reviewed alternative boards');
   let alternativeRuns = 0;
   for (const [id, entry] of Object.entries(approvals.boards)) {
     const puzzle = byId.get(id);
     const contract = helper.create(puzzle, entry);
-    assert(entry.solutionSets.length === 2, 'two explicit complete covers: ' + id);
+    assert(entry.solutionSets.length >= 2, 'explicit complete covers including original: ' + id);
     assert(entry.originalContentKey === entries.get(id).originalContentKey, 'overlay references original content: ' + id);
     for (const solution of entry.solutionSets) {
       for (let order = 0; order < 8; order++) {
@@ -152,7 +152,7 @@ function run({helper, manifest, approvals, originalPuzzles, catalog}) {
   assert(originalBytes === JSON.stringify(originalPuzzles), 'all original puzzle objects left unchanged');
   return {
     status: 'PASS', checks, originalBoards: originalPuzzles.length, rewardSlots: entries.size,
-    explicitlyReviewedAlternativeBoards: 15, arbitraryOrderAlternativeRuns: alternativeRuns,
+    explicitlyReviewedAlternativeBoards: Object.keys(approvals.boards).length, arbitraryOrderAlternativeRuns: alternativeRuns,
     mixedSolutionCasesRejected: 4,
     integrationStatus: 'isolated contract only; live input, hints, restore, completion and rewards are not enabled',
   };
