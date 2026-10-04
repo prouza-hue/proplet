@@ -12,17 +12,18 @@
  const view=incoming?(q.get('view')||'new'):'inviter';
  const model={view,incoming,accepted:incoming&&view!=='new',paid:incoming&&view==='reward',count:incoming?(view==='four'?4:view==='reward'?5:0):0,seen:new Set(),inviterName:'Katka',name:incoming?'Eliška':'Katka',base:incoming?500:2150,weeklyBase:incoming?0:230,gameXp:0,referrals:[{name:'Eliška',count:3,accepted:true,paid:false},{name:'Honza',count:0,accepted:false,paid:false},{name:'Petr',count:5,accepted:true,paid:true}]};
  const audit={fixtureReads:[],fixtureWrites:[],blockedExternal:[],staticRequests:[]};
- const api=window.PropletReferralPreview={model,audit,database:false,productionApi:false};
+ const api=window.PropletReferralPreview={model,audit,database:false,productionApi:false,revision:3};
  const ownBonus=()=>incoming?(model.paid?1000:0):model.referrals.filter(r=>r.paid).length*1000;
  api.stats=()=>{
    let rows=[];try{rows=Object.values(JSON.parse(localStorage.getItem('proplet-v2-state:'+api.profile().id)||'{}').completed||{})}catch{}
-   const gameXp=rows.reduce((n,r)=>n+(Number(r.points)||0),0);
-   return {points:model.base+gameXp+ownBonus(),totalCompleted:rows.length,dailyCompleted:rows.filter(r=>r.mode==='daily').length,freeCompleted:{easy:rows.filter(r=>r.mode==='free'&&r.difficulty==='easy').length},currentStreak:0,longestStreak:0,cleanSolves:rows.length,accountCreationBonusXp:incoming?500:0,referralBonusXp:ownBonus(),weeklyXp:model.weeklyBase+gameXp,weeklyTeamXp:model.weeklyBase+gameXp};
+   const tajenkas=typeof window.tajenkaState==='function'?Object.values(window.tajenkaState()?.completions||{}):[];
+   const gameXp=rows.reduce((n,r)=>n+(Number(r.points)||0),0)+tajenkas.reduce((n,r)=>n+(Number(r.rewardXp)||0),0);
+   return {points:model.base+gameXp+ownBonus(),totalCompleted:rows.length+tajenkas.length,dailyCompleted:rows.filter(r=>r.mode==='daily').length,freeCompleted:{easy:rows.filter(r=>r.mode==='free'&&r.difficulty==='easy').length},currentStreak:0,longestStreak:0,cleanSolves:rows.length,accountCreationBonusXp:incoming?500:0,referralBonusXp:ownBonus(),weeklyXp:model.weeklyBase+gameXp,weeklyTeamXp:model.weeklyBase+gameXp};
  };
  api.profile=()=>({id:incoming?'preview-elis':'preview-katka',token:'PREVIEW-LOCAL-ONLY',name:model.name,avatar:incoming?'🦊':'🦉',familyCode:null,leagueName:null,hasPassword:true,publicRankings:true,supportMode:'none'});
  api.snapshot=()=>({...api.profile(),stats:api.stats(),completed:[],cursor:new Date().toISOString()});
  api.complete=(game)=>{
-   if(!incoming||!model.accepted||game.isReplay||!['daily','free','tajenka'].includes(game.mode)||!(Number(game.winBaseXpAwarded)>0))return false;
+   if(!incoming||!model.accepted||game.isReplay||!['daily','free','tajenka'].includes(game.mode)||!(Number(game.winBaseXpAwarded)>0||game.mode==='tajenka'&&game.justCompleted))return false;
    const id=game.puzzle.id;if(model.seen.has(id))return false;model.seen.add(id);model.count=Math.min(5,model.count+1);
    const newlyPaid=model.count===5&&!model.paid;if(newlyPaid)model.paid=true;return newlyPaid;
  };

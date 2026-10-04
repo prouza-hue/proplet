@@ -13,11 +13,11 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome'));
+ await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===3);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
-async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.png',fullPage:true});report.screenshots.push(name)}
+async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.png',fullPage:true});report.screenshots.push(name);if(!process.env.PREVIEW_URL&&['01-native-home','02-invitation'].includes(name))console.log('PREVIEW_IMAGE:'+name+':'+fs.readFileSync(out+'/'+name+'.png').toString('base64'))}
 (async()=>{
  const config=JSON.parse(fs.readFileSync('vercel.json','utf8'));
  assert.deepEqual(config.builds,[{use:'@vercel/static',src:'public/**'}]);
@@ -73,10 +73,22 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(await page.evaluate(()=>PropletReferralPreview.stats().referralBonusXp),1000);
   check('Drawing actual native board '+puzzleId+' pays both sides once; bonus excluded from weekly player/team XP');
   await page.locator('#winMenuBtn').click();await page.locator('.bottom-nav [data-nav="leaderboard"]').click();
-  await page.locator('[data-ranking-period="all"]').click();await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList')?.textContent.includes('1 575'));
+  await page.locator('[data-ranking-period="all"]').click();await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList')?.textContent.replace(/\s/g,'').includes('1575'));
   await screenshot(page,'05-total-ranking');
   await page.locator('[data-ranking-period="week"]').click();await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList .me .leader-score strong')?.textContent.includes('75'));
-  check('Native total and weekly rankings show separated amounts');
+  const inviterPoints=await page.evaluate(async()=>{const r=await fetch('/api/rankings/xp?period=all');return (await r.json()).players.find(p=>p.name==='Katka').xp});
+  assert.equal(inviterPoints,4150);
+  check('Native total and weekly rankings show separated amounts; inviter receives the same bonus');
+  await ready(page,'?view=four');
+  await page.evaluate(()=>startTajenka());
+  await page.waitForFunction(()=>currentGame?.mode==='tajenka');
+  const tajenkaPaths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
+  for(let i=0;i<tajenkaPaths.length;i++){await draw(page,tajenkaPaths[i]);await page.waitForFunction(n=>currentGame.found.length===n,i+1)}
+  await page.waitForFunction(()=>PropletReferralPreview.model.paid===true);
+  assert.equal(await page.evaluate(()=>PropletReferralPreview.model.count),5);
+  assert.equal(await page.evaluate(()=>PropletReferralPreview.stats().referralBonusXp),1000);
+  check('Native Tajenka completion counts toward the same five-board reward');
+
   await ready(page,'?view=four&theme=dark');await screenshot(page,'06-dark-mobile');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await page.setViewportSize({width:320,height:740});await page.locator('#refPreviewControls summary').click();await screenshot(page,'07-narrow');

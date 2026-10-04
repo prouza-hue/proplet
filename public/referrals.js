@@ -14,7 +14,7 @@
  function incomingCopy(){
   if(!m.accepted)return '<h2>Katka tě zve do Propletu.</h2><p>Pět desek. Tisíc pro každého.</p><button class="primary-btn" data-ref-accept>Přijmout pozvánku</button><small>'+rule+'</small>';
   if(m.paid)return '<h2>Tisíc pro tebe. Tisíc pro Katku.</h2><p>Všech 5 desek je hotových. Oba jste získali <strong>+1 000 XP</strong>.</p>'+steps(5)+'<small>'+rule+'</small>';
-  return '<h2>Ke společnému bonusu zbývá '+(5-m.count)+' '+(5-m.count===1?'deska':'desek')+'.</h2><p>Hraj cokoli: Dnešní výzvu, Tajenku nebo Volnou hru.</p>'+steps(m.count)+'<div class="ref-progress-caption"><strong>'+m.count+' / 5 desek</strong><span>+1 000 XP pro každého</span></div><button class="secondary-btn" data-ref-play>Pokračovat ve hře</button><small>'+rule+'</small>';
+  return '<h2>Ke společnému bonusu zbývá '+(5-m.count)+' '+(5-m.count===1?'deska':5-m.count<5?'desky':'desek')+'.</h2><p>Hraj cokoli: Dnešní výzvu, Tajenku nebo Volnou hru.</p>'+steps(m.count)+'<div class="ref-progress-caption"><strong>'+m.count+' / 5 desek</strong><span>+1 000 XP pro každého</span></div><button class="secondary-btn" data-ref-play>Pokračovat ve hře</button><small>'+rule+'</small>';
  }
  function renderHome(){
   let card=$('#referralHome');if(!card){card=document.createElement('aside');card.id='referralHome';card.className='card ref-home';$('#quickPlayCard')?.after(card)}

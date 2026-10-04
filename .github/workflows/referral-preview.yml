@@ -9,8 +9,6 @@ on:
       - 'tools/referral_preview*'
       - '.github/workflows/referral-preview.yml'
       - 'vercel.json'
-  push:
-    branches: ['preview/referrals-integrated-20261004']
 permissions:
   contents: read
 jobs:
@@ -37,6 +35,16 @@ jobs:
           for attempt in {1..30}; do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep 1
+          done
+          node tools/referral_preview_verify.cjs
+      - name: Verify deployed Vercel preview with the same native browser flow
+        env:
+          NODE_PATH: /tmp/proplet-preview-tools/node_modules
+          PREVIEW_URL: https://proplet-git-preview-referrals-int-696ee2-pavel-prouzas-projects.vercel.app
+        run: |
+          for attempt in {1..30}; do
+            if curl -fsS "$PREVIEW_URL/referral-preview-isolation.js" | grep -q 'revision:3'; then break; fi
+            sleep 2
           done
           node tools/referral_preview_verify.cjs
       - name: Upload browser evidence
