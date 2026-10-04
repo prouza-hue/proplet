@@ -74,6 +74,11 @@ def load(page, view="today", theme="light", suffix=""):
     page.goto(f"{BASE}?view={view}&theme={theme}{suffix}", wait_until="networkidle")
     page.locator('html[data-preview-ready="true"]').wait_for()
     page.evaluate("document.fonts.ready")
+    faces = page.evaluate("""async () => ({
+        fraunces: (await document.fonts.load('750 30px Fraunces', 'měsíční soutěž')).map(f => ({family: f.family, status: f.status})),
+        outfit: (await document.fonts.load('400 15px Outfit', 'historická odměna')).map(f => ({family: f.family, status: f.status}))
+    })""")
+    assert_that(faces["fraunces"] and faces["outfit"], f"Actual font faces missing: {faces}")
 
 
 def screenshot(page, name, full_page=True):
