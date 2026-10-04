@@ -508,6 +508,14 @@
       {
         "path": "tests/current/test_refresh_release.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_refresh_ui_performance.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_mobile_resume_navigation.cjs",
+        "runner": "node"
       }
     ]
   },
