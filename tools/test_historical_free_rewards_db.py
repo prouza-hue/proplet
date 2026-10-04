@@ -77,18 +77,26 @@ def main():
         c.execute("insert into results(id,player_id,puzzle_id,challenge_key,mode,difficulty,best_elapsed_ms,best_moves,points,completed_at,content_generation,content_level,content_lineage_confidence) values(gen_random_uuid(),%s,'x-014','free:x-014','free','hardcore',42000,12,100,'2026-08-12T10:00:00+00:00',1,10,'exact')",(PLAYER,))
         # Preserve the exact oldest metadata shape, including unknown generation.
         c.execute("update results set content_generation=null,content_level=10,content_lineage_confidence='exact' where player_id=%s and puzzle_id='x-014'",(PLAYER,))
+        c.execute("insert into results(id,player_id,puzzle_id,challenge_key,mode,difficulty,best_elapsed_ms,best_moves,points,completed_at,content_generation,content_level) values(gen_random_uuid(),%s,'historical-synthetic-g1-paid-045','free:historical-synthetic-g1-paid-045','free','hardcore',42000,12,100,'2026-08-12T10:00:00+00:00',1,45)",(PLAYER,))
+        c.execute("insert into results(id,player_id,puzzle_id,challenge_key,mode,difficulty,best_elapsed_ms,best_moves,points,completed_at,content_generation,content_level) values(gen_random_uuid(),%s,'historical-synthetic-g2-zero-045','free:historical-synthetic-g2-zero-045','free','hardcore',42000,12,0,'2026-08-20T10:00:00+00:00',2,45)",(PLAYER,))
+        c.execute("insert into free_slot_rewards(id,player_id,difficulty,level,source_puzzle_id,content_generation,points,earned_at) values('41040000-0000-4000-8000-000000000045',%s,'hardcore',45,'historical-synthetic-g2-zero-045',2,0,'2026-08-20T10:00:00+00:00')",(PLAYER,))
         before_results=c.execute("select count(*),sum(points) from results where player_id=%s",(PLAYER,)).fetchone()
         before_claims=c.execute("select jsonb_agg(to_jsonb(f) order by f.id) from free_slot_rewards f").fetchone()[0]
         c.execute((ROOT/"supabase/prepared/historical_free_rewards.sql").read_text())
         assert c.execute("select count(*),sum(points) from results where player_id=%s",(PLAYER,)).fetchone()==before_results
         assert c.execute("select jsonb_agg(to_jsonb(f) order by f.id) from free_slot_rewards f").fetchone()[0]==before_claims
         assert c.execute("select content_generation,source_puzzle_id from historical_free_slot_rewards where player_id=%s and level=10",(PLAYER,)).fetchone()==(None,"x-014")
-    checks.append("seed/reconcile preserves results XP, old claims, and unknown-generation exact levels")
+        assert c.execute("select id::text,points,source_puzzle_id from historical_free_slot_rewards where player_id=%s and level=45",(PLAYER,)).fetchone()==("41040000-0000-4000-8000-000000000045",0,"historical-synthetic-g2-zero-045")
+        first_seed=c.execute("select jsonb_agg(to_jsonb(h) order by h.id) from historical_free_slot_rewards h").fetchone()[0]
+        c.execute((ROOT/"supabase/prepared/historical_free_rewards.sql").read_text())
+        assert c.execute("select jsonb_agg(to_jsonb(h) order by h.id) from historical_free_slot_rewards h").fetchone()[0]==first_seed
+    checks.append("seed/reconcile twice preserves XP, old claims, NULL generations, and copied zero-claim identities")
     archive = command("historical-synthetic-g3-h-029",29,points=50,difficulty="hard")
     assert submit(archive)["awardedPoints"]==50
     assert result_points(archive["puzzleId"])==50
     assert submit(command("historical-synthetic-g3-x-010",10))["awardedPoints"]==0
-    checks.append("G4 result/claim never blocks new historical XP; paid G1 exact slot blocks G3")
+    assert submit(command("historical-synthetic-g3-x-045",45))["awardedPoints"]==0
+    checks.append("G4 never blocks historical XP; paid G1 and copied zero legacy claim both block a G3 repeat")
     with connect() as c:
         assert c.execute("select jsonb_agg(to_jsonb(f) order by f.id) from free_slot_rewards f").fetchone()[0]==before_claims
 

@@ -35,6 +35,7 @@ from backend.config import (
     CRON_SECRET,
     GEN4_CANDIDATE_PREVIEW,
     GEN5_CANDIDATE_PREVIEW,
+    HISTORICAL_FREE_REWARDS_ENABLED,
     GEN4_PREVIEW_BRANCH,
     PUZZLES_PATH,
     PHONE_LANDSCAPE_BLOCKING,
@@ -3595,6 +3596,13 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             raise HTTPException(400, "Neznámá nebo zatím nevydaná úroveň volné hry")
         content_generation = int(info.get("generation") or 1)
         free_level = int(info["level"])
+        if 1 <= content_generation <= 3 and (
+            not HISTORICAL_FREE_REWARDS_ENABLED or not ATOMIC_RESULT_V1_ENABLED
+        ):
+            raise HTTPException(
+                503,
+                "Historické úrovně jsou dočasně zavřené. Zkus synchronizaci později.",
+            )
         base_points = domain_content.xp_for("free", payload.difficulty, POINTS)
         if ATOMIC_RESULT_V1_ENABLED:
             # The database decides whether a historical slot is still payable.

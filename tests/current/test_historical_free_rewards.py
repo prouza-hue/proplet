@@ -61,6 +61,7 @@ def rpc(name, body):
 with ExitStack() as stack:
     for item in (
         patch.object(server, "ATOMIC_RESULT_V1_ENABLED", True),
+        patch.object(server, "HISTORICAL_FREE_REWARDS_ENABLED", True),
         patch.object(server, "enforce_rate_limit"),
         patch.object(server, "auth_player", return_value=player),
         patch.object(server, "puzzle_exists", return_value=True),
@@ -79,6 +80,14 @@ with ExitStack() as stack:
     ):
         stack.enter_context(item)
     result = server.result(payload, request, "Bearer test")
+    server.HISTORICAL_FREE_REWARDS_ENABLED = False
+    try:
+        server.result(payload, request, "Bearer test")
+    except HTTPException as exc:
+        assert exc.status_code == 503
+    else:
+        raise AssertionError("closed historical gate unexpectedly accepted")
+    assert len(calls) == 1
 assert result["awardedPoints"] == 0 and result["transferredSlot"] is True
 assert len(calls) == 1
 command = calls[0][1]["p_command"]
@@ -86,3 +95,10 @@ assert command["points"] == 50
 assert command["legacyRewardSlot"] == {"difficulty": "hard", "level": 29}
 assert command["contentGeneration"] == 3
 print("PASS historical pool: G4 separate, legacy fallback denied, atomic claim owns XP without history read")
+
+# Preparation defaults closed; opt-in never makes non-atomic writing safe.
+from backend.config import load_settings
+with patch.dict("os.environ", {"PROPLET_HISTORICAL_FREE_REWARDS_ENABLED": "false"}):
+    assert load_settings().historical_free_rewards_enabled is False
+with patch.dict("os.environ", {"PROPLET_HISTORICAL_FREE_REWARDS_ENABLED": "true"}):
+    assert load_settings().historical_free_rewards_enabled is True

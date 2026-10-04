@@ -254,7 +254,8 @@ begin
     if v_reward_slot is not null then
       -- Only a newly inserted result can acquire a reward. An existing
       -- challenge cannot consume a slot without receiving its XP.
-      -- The paid-history guard also covers old in-flight writers during rollout.
+      -- Paid history also consumes a slot. Old writers must be stopped/drained
+      -- before rollout; this lookup alone does not serialize their later commit.
       if exists (
         select 1 from public.results r
         where r.player_id = p_player_id and r.mode = 'free'
