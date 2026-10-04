@@ -1,5 +1,5 @@
 {
-  "tested_sha": "e0e7ccd54d98932f25ef5878f3b1a722cbc3511f",
+  "tested_sha": "27855d928ef31e03061cd6fe6a10895169af878f",
   "production_csp": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://hrajproplet.cz https://iopyhluayfszskyqqpuc.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests",
   "checks": [
     {
