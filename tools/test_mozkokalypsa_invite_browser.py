@@ -8,6 +8,8 @@ report={'syntheticOnly':True,'checks':[],'errors':[],'sizes':[]}
 with sync_playwright() as pw:
  browser=pw.chromium.launch(headless=True)
  context=browser.new_context(viewport={'width':390,'height':844})
+ # Historical playtest fixture is an existing visitor who dismissed newer campaigns.
+ context.add_init_script("""localStorage.setItem('proplet:content-release:refresh300-v1','1');localStorage.setItem('proplet:content-release:mk100-v2','1');localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));""")
  page=context.new_page();page.set_default_timeout(15000)
  page.on('pageerror',lambda e:report['errors'].append(str(e)))
  requests=[];page.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
@@ -77,3 +79,4 @@ with sync_playwright() as pw:
   (args.output/'invite-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
   browser.close()
 print(json.dumps(report,ensure_ascii=False));assert report['status']=='PASS'
+
