@@ -59,12 +59,15 @@ def check_layout(page, label):
         documentWidth: document.documentElement.scrollWidth,
         bodyWidth: document.body.scrollWidth,
         brokenImages: [...document.images].filter(i => !i.complete || !i.naturalWidth).map(i => i.src),
+        clippedDifficultyTitles: [...document.querySelectorAll('#view-free .diff-card h2')]
+            .filter(n => n.getClientRects().length && n.scrollWidth > n.clientWidth + 1).map(n => n.textContent),
         fraunces: document.fonts.check('750 30px Fraunces'),
         outfit: document.fonts.check('400 15px Outfit')
     })""")
     assert_that(size["documentWidth"] <= size["width"] + 1, f"{label}: document overflow {size}")
     assert_that(size["bodyWidth"] <= size["width"] + 1, f"{label}: body overflow {size}")
     assert_that(not size["brokenImages"], f"{label}: broken images {size}")
+    assert_that(not size["clippedDifficultyTitles"], f"{label}: clipped difficulty names {size}")
     assert_that(size["fraunces"] and size["outfit"], f"{label}: fonts unavailable {size}")
     report["checks"].append({"case": label, "layout": size})
 
