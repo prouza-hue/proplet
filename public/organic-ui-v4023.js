@@ -288,6 +288,7 @@ const ACHIEVEMENT_SERIES={
  ]
 };
 const ACHIEVEMENT_NAMES={
+ mozkokalypsa:["První trhlina", "Za bodem zlomu", "Oko bouře", "Krotitel pohromy", "Nezlomná mysl", "Vládce epicentra", "Poslední slovo"],
  general:['První Proplet','Pětka v kapse','Rozjezd','Čtvrtsto','Půl stovky','Stovka úloh','Nezastavitelný','Propletový maratonec','Nekonečný propletač'],
  easy:['První klíček','Rozcvička','Lehká váha','Půlka zahrady','Zelený velmistr','Vládce zelené banky'],
  medium:['Hlavička','Mozkovna','Přemýšlivec','Šedá kůra','Mistr středu','Dvojitá mozkovna'],
@@ -303,7 +304,7 @@ const ACHIEVEMENT_NAMES={
  speed:['Pohodový sprint','Svižník','Rychlík','Blesk'],
  rescue:['Ne dnes, série!','Záchranář','Devět životů','Hasící přístroj']
 };
-const GROUP_ID_BY_LABEL={'Celkový postup':'general','Snadná':'easy','Střední':'medium','Těžká':'hard','Mozkožrout':'hardcore','Denní výzva':'daily','Tajenka':'tajenka','Mozkomor':'mozkomor','Objevená slova':'discovery','Čistá řešení':'clean','Čisté Daily':'cleanDaily','XP':'xp','Rychlost':'speed','Záchrana série':'rescue'};
+const GROUP_ID_BY_LABEL={'Celkový postup':'general','Snadná':'easy','Střední':'medium','Těžká':'hard','Mozkožrout':'hardcore','Denní výzva':'daily','Tajenka':'tajenka','Mozkomor':'mozkomor','Mozkokalypsa':'mozkokalypsa','Objevená slova':'discovery','Čistá řešení':'clean','Čisté Daily':'cleanDaily','XP':'xp','Rychlost':'speed','Záchrana série':'rescue'};
 const GROUP_TONE={general:'mauve',easy:'sage',medium:'blue',hard:'coral',hardcore:'clay',daily:'amber',tajenka:'mauve',mozkomor:'blue',discovery:'sage',clean:'blue',cleanDaily:'amber',xp:'clay',speed:'coral',rescue:'sage'};
 function bespokeSvg(body,label=''){
  return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'+body+'</svg>';
@@ -527,3 +528,4 @@ function flush(){
 function start(){observer.disconnect();try{decorate(document.body)}finally{observe()}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
+

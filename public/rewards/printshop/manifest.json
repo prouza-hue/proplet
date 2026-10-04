@@ -1124,5 +1124,68 @@
     "source_sha256": "62b6bca1129669451115419878815d5f04792894f1bddeccc2b320db2b5dead8",
     "source": "design/action-icons-2026-09-08",
     "revision": "icons1"
+  },
+  "achievement-mozkokalypsa-1": {
+    "name": "První trhlina",
+    "file": "achievement-mozkokalypsa-1.svg",
+    "source_sha256": "e5774af78e78a0d1d3ba18f6a9cf046a79ac284877112bd0bf92e4d137f7444a",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 0,
+    "source": "original-vector-20261004"
+  },
+  "achievement-mozkokalypsa-5": {
+    "name": "Za bodem zlomu",
+    "file": "achievement-mozkokalypsa-5.svg",
+    "source_sha256": "26cf53092142f5a3c480ec2b879a7ba94cef70aa88770de43994260553bfb97b",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 1,
+    "source": "original-vector-20261004"
+  },
+  "achievement-mozkokalypsa-10": {
+    "name": "Oko bouře",
+    "file": "achievement-mozkokalypsa-10.svg",
+    "source_sha256": "20361a21e8565ad00768036e31d16c19df488b494c92803e2f6ee0bdd2e71b6e",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 2,
+    "source": "original-vector-20261004"
+  },
+  "achievement-mozkokalypsa-25": {
+    "name": "Krotitel pohromy",
+    "file": "achievement-mozkokalypsa-25.svg",
+    "source_sha256": "9d36f0fa3d2a5d0f5242e9748f9ea5b5b961b2a06ba90d1febf591b461d4a4c6",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 3,
+    "source": "original-vector-20261004"
+  },
+  "achievement-mozkokalypsa-50": {
+    "name": "Nezlomná mysl",
+    "file": "achievement-mozkokalypsa-50.svg",
+    "source_sha256": "113bc1031c70cc779e7f3b04950e0abb8804394fc16b28d1bdd07b5d42805a31",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 4,
+    "source": "original-vector-20261004"
+  },
+  "achievement-mozkokalypsa-75": {
+    "name": "Vládce epicentra",
+    "file": "achievement-mozkokalypsa-75.svg",
+    "source_sha256": "084472dbb2a373668844d71933e09c3573d8234c0b01bdf2e5e50f734dbfc31a",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 5,
+    "source": "original-vector-20261004"
+  },
+  "achievement-mozkokalypsa-100": {
+    "name": "Poslední slovo",
+    "file": "achievement-mozkokalypsa-100.svg",
+    "source_sha256": "277d8576e119ba22b90ed9665914fb453682c2e952e3820eafe86d44f5260c72",
+    "category": "achievement",
+    "group": "mozkokalypsa",
+    "stage": 6,
+    "source": "original-vector-20261004"
   }
 }

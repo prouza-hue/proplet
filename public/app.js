@@ -94,7 +94,7 @@ const LEVELS=[
 ];
 const ACHIEVEMENT_GROUPS=[
  ['general','Celkový postup'],['easy','Snadná'],['medium','Střední'],['hard','Těžká'],['hardcore','Mozkožrout'],
- ['daily','Denní výzva'],['tajenka','Tajenka'],['mozkomor','Mozkomor'],['discovery','Objevená slova'],
+ ['daily','Denní výzva'],['tajenka','Tajenka'],['mozkomor','Mozkomor'],['mozkokalypsa','Mozkokalypsa'],['discovery','Objevená slova'],
  ['clean','Čistá řešení'],['cleanDaily','Čisté Daily'],['xp','XP'],['speed','Rychlost'],['rescue','Záchrana série']
 ];
 const ACHIEVEMENTS=[
@@ -160,6 +160,14 @@ const ACHIEVEMENTS=[
  {id:'mozkomor-50',group:'mozkomor',icon:'⚙️',name:'Neuron z ocele',desc:'Dokonči 50 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:50},
  {id:'mozkomor-100',group:'mozkomor',icon:'👁️',name:'Mozkomorova Nemesis',desc:'Dokonči všech 100 Mozkomorů',value:s=>s.mozkomorCompleted||0,target:100},
 
+ {id:'mozkokalypsa-1',group:'mozkokalypsa',icon:'🌀',name:'První trhlina',desc:'Dokonči první desku Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:1},
+ {id:'mozkokalypsa-5',group:'mozkokalypsa',icon:'🌀',name:'Za bodem zlomu',desc:'Dokonči 5 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:5},
+ {id:'mozkokalypsa-10',group:'mozkokalypsa',icon:'🌀',name:'Oko bouře',desc:'Dokonči 10 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:10},
+ {id:'mozkokalypsa-25',group:'mozkokalypsa',icon:'🌀',name:'Krotitel pohromy',desc:'Dokonči 25 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:25},
+ {id:'mozkokalypsa-50',group:'mozkokalypsa',icon:'🌀',name:'Nezlomná mysl',desc:'Dokonči 50 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:50},
+ {id:'mozkokalypsa-75',group:'mozkokalypsa',icon:'🌀',name:'Vládce epicentra',desc:'Dokonči 75 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:75},
+ {id:'mozkokalypsa-100',group:'mozkokalypsa',icon:'👑',name:'Poslední slovo',desc:'Dokonči 100 různých desek Mozkokalypsy',value:s=>s.freeCompleted?.mozkokalypsa||0,target:100},
+
  {id:'discovery-1',group:'discovery',icon:'👍',name:'Slovo navíc',desc:'Objev první platné vedlejší slovo',value:s=>s.discoveredWords||0,target:1},
  {id:'discovery-10',group:'discovery',icon:'🌿',name:'Boční stezka',desc:'Objev 10 různých vedlejších slov',value:s=>s.discoveredWords||0,target:10},
  {id:'discovery-50',group:'discovery',icon:'🔦',name:'Lovec skrytých slov',desc:'Objev 50 různých vedlejších slov',value:s=>s.discoveredWords||0,target:50},
@@ -203,7 +211,7 @@ const ACHIEVEMENTS=[
  {id:'rescue-10',group:'rescue',icon:'🧯',name:'Hasící přístroj',desc:'Zachraň sérii 10×',value:s=>s.rescuedDays||0,target:10}
 ];
 ACHIEVEMENTS.forEach(a=>a.test=s=>a.value(s)>=a.target);
-function achievementCard(a,stats){const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}
+function achievementCard(a,stats){const v=Math.max(0,a.value(stats)||0),pct=Math.min(100,Math.round(v/a.target*100)),done=a.test(stats);return `<div data-achievement="${a.id}" class="achievement ${done?'earned':''}"><span class="emoji">${a.icon}</span><strong>${a.name}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${pct}%"></span></div><em>${done?'Splněno ✓':`${Math.min(v,a.target)}/${a.target}`}</em></div>`}
 function renderAchievements(stats){return ACHIEVEMENT_GROUPS.map(([id,label])=>{const list=ACHIEVEMENTS.filter(a=>a.group===id);if(!list.length)return '';const earned=list.filter(a=>a.test(stats)).length;return `<section class="achievement-group"><div class="achievement-group-head"><strong>${label}</strong><span>${earned}/${list.length}</span></div><div class="achievement-grid">${list.map(a=>achievementCard(a,stats)).join('')}</div></section>`}).join('')}
 let profileAchievementsExpanded=false;
 function achievementProgressState(a,stats){const value=Math.max(0,a.value(stats)||0),done=a.test(stats),pct=Math.min(100,Math.round(value/a.target*100));return {a,value,done,pct}}
@@ -2400,3 +2408,4 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+
