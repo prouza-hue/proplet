@@ -3,13 +3,13 @@
   "preparedAt": "2026-10-04",
   "contract": {
     "runAt": "2026-10-04",
-    "executionEnvironment": "functions.exec V8 isolate; exact committed module source executed with original pinned GitHub data; Node/GitHub Actions verification also configured",
+    "executionEnvironment": "functions.exec V8 isolate; exact prepared module source executed with original pinned GitHub data; Node/GitHub Actions verification also configured",
     "status": "PASS",
-    "checks": 22404,
+    "checks": 43532,
     "originalBoards": 800,
     "rewardSlots": 800,
-    "explicitlyReviewedAlternativeBoards": 15,
-    "arbitraryOrderAlternativeRuns": 240,
+    "explicitlyReviewedAlternativeBoards": 57,
+    "arbitraryOrderAlternativeRuns": 968,
     "mixedSolutionCasesRejected": 4,
     "integrationStatus": "isolated contract only; live input, hints, restore, completion and rewards are not enabled"
   },
@@ -38,11 +38,27 @@
     "scope": "Fixed original target count and length multiset; orthogonal unique-cell paths, distinct words and complete active-mask coverage.",
     "snapshotRef": "553fb3578c958004b831068dfd268dbcb2a423ab"
   },
-  "independentReview": {
+  "editorialReview": {
+    "candidateSolutions": 100,
+    "approved": 64,
+    "rejected": 21,
+    "pending": 15,
+    "approvedAlternativeBoards": 57,
+    "pendingBoards": 12,
+    "scope": "Two independent language review streams plus project preparation reconciliation; does not declare individual playtesting or full language PASS for all 800."
+  },
+  "independentContractReview": {
     "reviewedHelperRef": "f40a9db16fb5d21161845f751935ac7e3b5c02ad",
     "targetedE100Checks": 10,
     "result": "PASS",
-    "scope": "Independent policy and actual helper execution, including weak and strong hints, NFC/NFD, mixed restore, and mutation protection."
+    "scope": "Independent actual helper execution, including weak and strong hints, NFC/NFD, mixed restore, and mutation protection."
+  },
+  "nodeCiBeforeExpandedCovers": {
+    "headSha": "56d37e1195f92e96e7b720c33e9e5598d4462a57",
+    "runId": 37237906307,
+    "jobId": 111540612309,
+    "result": "PASS",
+    "scope": "Initial fifteen-board approval set; expanded cover set requires new head CI."
   },
   "activation": "disabled"
 }
