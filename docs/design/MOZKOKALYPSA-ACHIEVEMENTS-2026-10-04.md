@@ -21,3 +21,5 @@ Integrace: profil, souhrn achievementů, oznámení po dohrání a offline shell
 Interaktivní galerie: /design/mozkokalypsa-achievements.html. Má vlastní simulovaný počet, světlý/tmavý režim a skutečné malé velikosti 24/34/58 px; nečte ani nepřepisuje herní postup.
 
 Ověření: tests/current/test_mozkokalypsa_achievements.js a tools/verify_mozkokalypsa_achievements.cjs. Prohlížeč běží nad izolovaným serverem bez produkčních credentials a pořizuje důkazy pro 320, 390, 840 a 1440 px. Emulace není testem fyzického Samsungu Fold.
+
+Dodatek dle Pavla: po příštím dohrání produkční Mozkokalypsy (i opakování) se společně oslaví všechny dosažené, dosud neukázané odznaky. Záznam mozkokalypsaCelebrated v lokálním stavu konkrétního hráče brání opakování; další milníky se oslaví jednotlivě. Tento prezentační záznam se nesynchronizuje mezi zařízeními, samotný postup a nároky vycházejí ze synchronizovaných dokončení.

@@ -11,3 +11,11 @@ const manifest=JSON.parse(fs.readFileSync('public/rewards/printshop/manifest.jso
 for(const a of list){const key=ctx.window.PropletRibbonCatalog.achievement[a.name];assert(key,a.name);assert.equal(manifest[key].name,a.name);assert(collection.items.some(x=>x.key===key));const svg=fs.readFileSync('public/rewards/printshop/'+manifest[key].file,'utf8');assert(svg.includes('viewBox="0 0 320 320"'));assert(svg.includes('<title'));assert(!/<(?:image|script|animate|filter)\b/.test(svg));assert(Buffer.byteLength(svg)<16000);}
 const sw=fs.readFileSync('public/sw.js','utf8');for(const a of list)assert(sw.includes('achievement-'+a.id+'.svg?v=3'));
 console.log('PASS: seven boundaries, retroactive stats, separate difficulty, unique IDs, original static SVG assets and offline precache');
+
+const game={mode:'free',puzzle:{difficulty:'mozkokalypsa'}},stats=n=>({freeCompleted:{mozkokalypsa:n}});
+const batch=ctx.completionAchievements(stats(75),stats(76),game);assert.equal(batch.filter(a=>a.group==='mozkokalypsa').length,6);
+const seen=Array.from(batch,a=>a.id);assert.equal(ctx.completionAchievements(stats(76),stats(77),game,seen).filter(a=>a.group==='mozkokalypsa').length,0);
+assert.deepEqual(Array.from(ctx.completionAchievements(stats(99),stats(100),game,seen).filter(a=>a.group==='mozkokalypsa'),a=>a.id),['mozkokalypsa-100']);
+for(const mode of ['daily','playtest'])assert.equal(ctx.completionAchievements(stats(75),stats(76),{...game,mode}).filter(a=>a.group==='mozkokalypsa').length,0);
+assert.equal(ctx.completionAchievements(stats(100),stats(100),game).filter(a=>a.group==='mozkokalypsa').length,7,'replay celebrates existing full completion');
+console.log('PASS: all retroactive badges together on next Mozkokalypsa, once per saved player state, then only future milestones');
