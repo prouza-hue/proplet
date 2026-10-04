@@ -4,7 +4,6 @@ from __future__ import annotations
 import functools
 import http.server
 import json
-import os
 import subprocess
 import threading
 from pathlib import Path
@@ -37,7 +36,7 @@ server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
 threading.Thread(target=server.serve_forever, daemon=True).start()
 BASE = f"http://127.0.0.1:{server.server_port}/previews/archive-season-20261004.html"
 report = {
-    "tested_sha": os.environ.get("GITHUB_SHA") or subprocess.check_output(
+    "tested_sha": subprocess.check_output(
         ["git", "rev-parse", "HEAD"], text=True
     ).strip(),
     "production_csp": CSP,
