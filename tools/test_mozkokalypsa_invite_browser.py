@@ -13,6 +13,14 @@ with sync_playwright() as pw:
  page=context.new_page();page.set_default_timeout(15000)
  page.on('pageerror',lambda e:report['errors'].append(str(e)))
  requests=[];page.on('request',lambda r:requests.append({'url':r.url,'method':r.method}))
+ # Keep the historical round-two clock fixture in the future as calendar time advances.
+ def active_deadline(route):
+  response=route.fetch();data=response.json()
+  from datetime import datetime,timezone,timedelta
+  now=datetime.now(timezone.utc)
+  data.update(serverNow=now.isoformat(),closesAt=(now+timedelta(days=2)).isoformat())
+  route.fulfill(response=response,json=data)
+ page.route('**/api/mozkokalypsa/status*',active_deadline)
  try:
   page.goto(origin+'/?mozkokalypsa=preview',wait_until='domcontentloaded')
   page.locator('#mozkokalypsaInvite:not(.hidden)').wait_for()
