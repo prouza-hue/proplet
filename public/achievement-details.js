@@ -27,7 +27,9 @@
  }
  function open(id,source){
   const achievement=ACHIEVEMENTS.find(a=>a.id===id);if(!achievement)return;
-  mount();
+  mount();dialog.dataset.artOnly='false';
+  dialog.setAttribute('aria-labelledby','achievementDetailTitle');dialog.removeAttribute('aria-label');
+  dialog.setAttribute('aria-describedby','achievementDetailStory achievementDetailCondition achievementDetailStatus');
   // One stats snapshot per explicit open, never per icon or scroll event.
   const stats=effectiveStats(),value=Math.max(0,Number(achievement.value(stats))||0),earned=achievement.test(stats);
   dialog.querySelector('#achievementDetailTitle').textContent=achievement.name;
@@ -44,7 +46,23 @@
   if(!dialog.open){opener=source||document.activeElement;previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal()}
   dialog.scrollTop=0;dialog.querySelector('.achievement-detail-done').focus({preventScroll:true});
  }
- document.addEventListener('click',event=>{const trigger=event.target.closest('[data-achievement-detail]');if(trigger)open(trigger.dataset.achievementDetail,trigger)});
+
+ function openStreak(name,source){
+  const art=global.PropletRibbonArt?.art(name,{category:'streak',size:240});if(!art)return;
+  mount();dialog.dataset.artOnly='true';delete dialog.dataset.achievementId;delete dialog.dataset.earned;
+  dialog.removeAttribute('aria-labelledby');dialog.removeAttribute('aria-describedby');
+  dialog.setAttribute('aria-label',name);
+  art.removeAttribute('role');art.removeAttribute('aria-label');
+  const img=art.querySelector('img');if(img){img.loading='eager';img.decoding='async'}
+  dialog.querySelector('#achievementDetailArt').replaceChildren(art);
+  if(!dialog.open){opener=source||document.activeElement;previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal()}
+  dialog.scrollTop=0;dialog.querySelector('.achievement-detail-done').focus({preventScroll:true});
+ }
+ function activate(trigger){
+  if(trigger.hasAttribute('data-streak-detail'))openStreak(trigger.dataset.streakDetail,trigger);
+  else open(trigger.dataset.achievementDetail,trigger);
+ }
+ document.addEventListener('click',event=>{const trigger=event.target.closest('[data-achievement-detail],[data-streak-detail]');if(trigger)activate(trigger)});
  document.addEventListener('keydown',event=>{
   if(dialog?.open&&event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close();return}
   if(dialog?.open&&event.key==='Tab'){
@@ -53,9 +71,9 @@
    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
    return;
   }
-  const trigger=event.target.closest('[data-achievement-detail]');if(trigger&&(event.key==='Enter'||event.key===' ')){event.preventDefault();if(!event.repeat)open(trigger.dataset.achievementDetail,trigger)}
+  const trigger=event.target.closest('[data-achievement-detail],[data-streak-detail]');if(trigger&&(event.key==='Enter'||event.key===' ')){event.preventDefault();if(!event.repeat)activate(trigger)}
  },true);
  document.addEventListener('proplet:account-changed',close);
  document.addEventListener('proplet:screen-changed',close);
- global.PropletAchievementDetails=Object.freeze({open,close});
+ global.PropletAchievementDetails=Object.freeze({open,openStreak,close});
 })(window);

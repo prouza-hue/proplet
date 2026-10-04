@@ -183,7 +183,7 @@
       const points = stats.points || 0;
       const longest = stats.longestStreak ?? local.longestStreak;
       d.$('#levelRoadmap').innerHTML = d.LEVELS.map((entry, index) => `<div class="level-step ${points >= entry.xp ? 'earned' : ''} ${index === level.index - 1 ? 'current' : ''}"><span class="level-num">${index + 1}</span><span class="level-step-icon">${entry.icon}</span><strong>${entry.name}</strong><small>${entry.xp.toLocaleString('cs-CZ')} XP</small></div>`).join('');
-      d.$('#profileBadges').innerHTML = d.BADGES.map(badge => `<div class="profile-badge ${longest >= badge.days ? 'earned' : ''}"><span class="emoji">${badge.icon}</span><strong>${badge.name}</strong><small>${d.countCz(badge.days, 'den', 'dny', 'dní')} v řadě</small></div>`).join('');
+      d.$('#profileBadges').innerHTML = d.BADGES.map(badge => `<div role="button" tabindex="0" aria-haspopup="dialog" aria-label="${badge.name}: detail odznaku" data-streak-detail="${badge.name}" class="profile-badge ${longest >= badge.days ? 'earned' : ''}"><span class="emoji">${badge.icon}</span><strong>${badge.name}</strong><small>${d.countCz(badge.days, 'den', 'dny', 'dní')} v řadě</small></div>`).join('');
       d.updatePushUI();
       const achievementSummary = d.$('#achievementSummary');
       const achievementGrid = d.$('#achievementGrid');
