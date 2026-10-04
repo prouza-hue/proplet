@@ -1,6 +1,18 @@
 /* On-demand reward detail: native modal focus/inert handling, no observer or polling. */
 (function(global){
  'use strict';
+ const streakStories=Object.freeze({
+  "První zářez": "Dnes první zářez. Zítra bude na co navázat.",
+  "Srdcař": "Třetí den. Tady už to nebude jen ze zvědavosti.",
+  "Pětka": "Pět dní v řadě. Tahle pětka se doma ukazuje.",
+  "Týden v plamenech": "Celý týden. Ani jeden den nevyhasl.",
+  "Desítka": "Deset dní, deset návratů. Už znáš cestu.",
+  "Půlměsíc": "Dva týdny po chvilkách. Pěkný kus času pro sebe.",
+  "Mistr slov": "Tři týdny schůzek s písmeny. Už si tykáte.",
+  "Koruna": "Každý den kousek. Až z toho byla koruna.",
+  "Diamant": "Padesát dní. Tenhle kousek má vybroušenou každou hranu.",
+  "Legenda": "Sto dní v řadě. Tohle se jedním šťastným tahem neuhraje."
+});
  let dialog,opener,previousOverflow='';
  function restore(){if(!opener)return;document.body.style.overflow=previousOverflow;if(opener.isConnected&&opener.getClientRects().length)opener.focus({preventScroll:true});opener=null;}
  function close(){if(dialog?.open){dialog.close();restore()}}
@@ -27,7 +39,7 @@
  }
  function open(id,source){
   const achievement=ACHIEVEMENTS.find(a=>a.id===id);if(!achievement)return;
-  mount();dialog.dataset.artOnly='false';
+  mount();dialog.dataset.loyalty='false';
   dialog.setAttribute('aria-labelledby','achievementDetailTitle');dialog.removeAttribute('aria-label');
   dialog.setAttribute('aria-describedby','achievementDetailStory achievementDetailCondition achievementDetailStatus');
   // One stats snapshot per explicit open, never per icon or scroll event.
@@ -49,9 +61,11 @@
 
  function openStreak(name,source){
   const art=global.PropletRibbonArt?.art(name,{category:'streak',size:240});if(!art)return;
-  mount();dialog.dataset.artOnly='true';delete dialog.dataset.achievementId;delete dialog.dataset.earned;
-  dialog.removeAttribute('aria-labelledby');dialog.removeAttribute('aria-describedby');
-  dialog.setAttribute('aria-label',name);
+  mount();dialog.dataset.loyalty='true';delete dialog.dataset.achievementId;delete dialog.dataset.earned;
+  dialog.setAttribute('aria-labelledby','achievementDetailTitle');dialog.removeAttribute('aria-label');
+  dialog.setAttribute('aria-describedby','achievementDetailStory');
+  dialog.querySelector('#achievementDetailTitle').textContent=name;
+  dialog.querySelector('#achievementDetailStory').textContent=streakStories[name]||'';
   art.removeAttribute('role');art.removeAttribute('aria-label');
   const img=art.querySelector('img');if(img){img.loading='eager';img.decoding='async'}
   dialog.querySelector('#achievementDetailArt').replaceChildren(art);

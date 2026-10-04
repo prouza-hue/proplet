@@ -24,5 +24,5 @@ vm.runInContext(fs.readFileSync('public/achievement-stories.js','utf8'),ctx);con
 assert.equal(Object.keys(stories).length,ctx.ach.length);assert.equal(new Set(Object.values(stories)).size,ctx.ach.length);
 for(const a of ctx.ach){assert(stories[a.id]?.length>15,a.id);assert(stories[a.id].length<150,a.id)}
 const ordered=Array.from(ctx.groups,g=>g[0]);assert.deepEqual(ordered.slice(ordered.indexOf('hardcore'),ordered.indexOf('hardcore')+3),['hardcore','mozkomor','mozkokalypsa']);
-for(const asset of ['achievement-stories.js?v=1','achievement-details.js?v=2','achievement-details.css?v=2'])assert(sw.includes(asset));
+for(const asset of ['achievement-stories.js?v=1','achievement-details.js?v=3','achievement-details.css?v=3'])assert(sw.includes(asset));
 console.log('PASS: all 97 unique stories, adjacent endgame difficulties and offline detail assets');

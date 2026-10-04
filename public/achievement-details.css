@@ -38,10 +38,10 @@ html[data-theme=dark] #achievementDetail button:focus-visible,html[data-theme=da
  #achievementDetail .achievement-detail-progress{padding:10px 12px;margin-bottom:14px}
 }
 
-/* Loyalty badges intentionally show artwork only, with no caption or progress. */
+/* Loyalty shares the achievement title and story typography. */
 [data-streak-detail]{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 [data-streak-detail]:focus-visible{outline:3px solid #246b54!important;outline-offset:3px}
-#achievementDetail[data-art-only="true"] :is(h2,#achievementDetailStory,.achievement-detail-progress){display:none}
-#achievementDetail[data-art-only="true"] #achievementDetailArt{margin:8px auto 24px;min-height:0}
-html #achievementDetail[data-art-only="true"] #achievementDetailArt .ribbon-art{width:min(240px,60vw);height:min(240px,60vw)}
+#achievementDetail[data-loyalty="true"] .achievement-detail-progress{display:none}
+#achievementDetail[data-loyalty="true"] #achievementDetailArt{margin:8px auto 10px;min-height:0}
+html #achievementDetail[data-loyalty="true"] #achievementDetailArt .ribbon-art{width:min(240px,60vw);height:min(240px,60vw)}
 html[data-theme=dark] [data-streak-detail]:focus-visible{outline-color:#b5d5ac!important}

@@ -37,12 +37,12 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   for(const a of all){await page.evaluate(id=>PropletAchievementDetails.open(id),a.id);assert.equal(await page.locator('#achievementDetailTitle').textContent(),a.name);assert.equal(await page.locator('#achievementDetailCondition').textContent(),a.desc);assert((await page.locator('#achievementDetailStory').textContent()).length>15);await page.waitForFunction(()=>document.querySelector('#achievementDetailArt img')?.naturalWidth>0);assert.equal(await page.locator('#achievementDetailProgress').isHidden(),a.group==='speed');await page.keyboard.press('Escape')}
   assert.equal(await page.evaluate(()=>JSON.stringify(getState())),baseline,'opening details is read-only');
   await tamer.tap();await page.evaluate(()=>closeTransientModals());assert.equal(await page.locator('#achievementDetail[open]').count(),0);assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
-  // Loyalty uses the same dialog, but only displays art and never computes stats.
+  // Loyalty uses the same title and story typography without computing stats.
   const loyalty=page.locator('#profileBadges [data-streak-detail]');
   assert.equal(await loyalty.count(),10);
   for(let i=0;i<10;i++){
    await loyalty.nth(i).tap();await page.waitForFunction(()=>document.querySelector('#achievementDetailArt img')?.naturalWidth>0);
-   assert(await page.locator('#achievementDetailTitle').isHidden());assert(await page.locator('#achievementDetailStory').isHidden());assert(await page.locator('.achievement-detail-progress').isHidden());
+   assert.equal(await page.locator('#achievementDetailTitle').textContent(),await loyalty.nth(i).getAttribute('data-streak-detail'));assert(await page.locator('#achievementDetailTitle').isVisible());assert(await page.locator('#achievementDetailStory').isVisible());assert((await page.locator('#achievementDetailStory').textContent()).length>20);assert(await page.locator('.achievement-detail-progress').isHidden());
    if(i===0){await page.screenshot({path:out+'/loyalty-detail.png'});await page.setViewportSize({width:320,height:640});assert(await dialog.evaluate(d=>d.scrollWidth<=d.clientWidth));await page.screenshot({path:out+'/loyalty-detail-320.png'})}
    await page.keyboard.press('Escape');assert(await loyalty.nth(i).evaluate(e=>e===document.activeElement));
   }
