@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.05.0-refresh300-inappauth1-measurement1';
+const APP_PREVIEW_RELEASE='proplet-v4.05.0-refresh300-inappauth1-measurement1-mobilefix1-mkach1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -700,7 +700,7 @@ function initNavigation(){
    else if(modal.id==='profileModal'&&profileModalFromWin){modal.classList.add('hidden');restoreWinAfterAccountModal()}
    else if(modal.id==='profileModal'&&profileModalFromNudge){modal.classList.add('hidden');resumeAfterAccountNudge()}
    else if(modal.id==='freeRefreshAnnouncement')window.PropletRefreshRelease?.close();
-   else if(modal.id==='contentReleaseModal')window.PropletContentRelease?.close();
+   else if(modal.id==='contentReleaseModal'||modal.id==='mk100LaunchPreview')window.PropletContentRelease?.close();
    else if(modal.id==='tajenkaRulesModal')closeTajenkaRules();
    else if(modal.id==='helperOfferModal')dismissHelperOffer();
    else modal.classList.add('hidden');

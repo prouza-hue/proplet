@@ -6,9 +6,9 @@
   let bank=[];
   const modeFor=diff=>freeOrder().record(diff).mode;
   const releaseDismissKey=()=> 'proplet:refresh300:box:'+ (getProfile()?.id||'guest');
-  function completed(id){return !!getState().completed?.['free:'+id]}
+  function completed(id,completions){return !!completions['free:'+id]}
   function newBoards(diff){return bank.filter(p=>p.difficulty===diff)}
-  function completedNew(diff){return newBoards(diff).filter(p=>completed(p.id)).length}
+  function completedNew(diff,completions){return newBoards(diff).filter(p=>completed(p.id,completions)).length}
   function openBoard(id) {
     const puzzle=Object.values(puzzleDB.free).flat().find(row=>row.id===id);
     if(!puzzle||typeof startGame!=='function')return false;
@@ -21,13 +21,13 @@
     if(typeof nav==='function')nav('free',{replace:true});
     document.getElementById('difficultyCards')?.scrollIntoView({block:'start',behavior:'smooth'});
   }
-  function newEntry(id){
+  function newEntry(id,completions){
     let root=document.getElementById(id);
     if(!root){root=document.createElement('aside');root.id=id;root.className='card refresh-entry';
       const anchor=document.getElementById('todayNewContentBanner');
       anchor?.before(root);
     }
-    const done=bank.filter(p=>completed(p.id)).length,left=300-done;
+    const done=bank.filter(p=>completed(p.id,completions)).length,left=300-done;
     root.hidden=bank.length!==300||!left||localStorage.getItem(releaseDismissKey())==='1';
     root.innerHTML='<div class="refresh-entry-art" aria-hidden="true">'+
       '<img src="/difficulty/printshop/easy.webp" width="52" height="52" alt="">'+
@@ -39,12 +39,12 @@
     root.querySelector('[data-refresh-choose]').onclick=chooseGame;
     root.querySelector('[data-refresh-dismiss]').onclick=()=>{localStorage.setItem(releaseDismissKey(),'1');root.hidden=true};
   }
-  function decorateCards(){
+  function decorateCards(completions){
     for(const diff of orderDifficulties){
       const card=document.querySelector('#difficultyCards .cp-card[data-diff="'+diff+'"]');if(!card)continue;
       card.querySelector('.refresh-count')?.remove();
       if(bank.length===300&&difficulties.includes(diff)){
-        const left=100-completedNew(diff);
+        const left=100-completedNew(diff,completions);
         if(left){const counter=document.createElement('span');counter.className='refresh-count';counter.textContent=left+' nových';card.querySelector('.cp-xp')?.append(counter)}
       }
     }
@@ -92,16 +92,18 @@
     }
     details.append(grid);updateCatalogue();
   }
-  function updateCatalogue(){
+  function updateCatalogue(completions=getState().completed||{}){
     document.querySelectorAll('[data-refresh-board],[data-shared-board]').forEach(button=>{
-      const done=completed(button.dataset.refreshBoard||button.dataset.sharedBoard);button.classList.toggle('is-done',done);
+      const done=completed(button.dataset.refreshBoard||button.dataset.sharedBoard,completions);button.classList.toggle('is-done',done);
       button.setAttribute('aria-description',done?'Dohráno. Opakování zůstává tréninkem.':'Dosud nedohráno.');
     });
   }
 
   function refresh(){
     bank=Object.values(puzzleDB.free||{}).flat().filter(p=>p.id.startsWith('g6-refresh-'));
-    decorateCards();newEntry('freeRefreshToday');updateOrderSettings();updateCatalogue();
+    // Parse the account history once per render, not once for each of 600 board checks.
+    const completions=getState().completed||{};
+    decorateCards(completions);newEntry('freeRefreshToday',completions);updateOrderSettings();updateCatalogue(completions);
   }
   function install(){
     const originalFree=global.renderFree;
@@ -113,3 +115,4 @@
   document.addEventListener('proplet:ready',install,{once:true});
   document.addEventListener('proplet:account-changed',()=>{if(document.getElementById('freeOrderSettings'))refresh()});
 })(window);
+

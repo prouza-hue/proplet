@@ -62,6 +62,8 @@ with sync_playwright() as p:
             localStorage.setItem('proplet:content-release:g5-r1','1');
             localStorage.setItem('proplet:content-release:mk100-v2','1');
             localStorage.setItem('proplet:content-release:refresh300-v1','1');
+            // Returning-player navigation must not race the delayed consent banner.
+            localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
           }catch(e){}
         })()""")
         page=ctx.new_page(); errors=[]
