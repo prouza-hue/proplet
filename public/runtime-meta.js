@@ -1,6 +1,6 @@
 (()=>{
   'use strict';
-  const canonicalOrigin='https://hrajproplet.cz';
+  const canonicalOrigin=location.origin;
   const productionAliases=new Set([
     'www.hrajproplet.cz',
     'proplet-nine.vercel.app',
@@ -174,7 +174,7 @@
 
   const loadQualityHotfix=()=>loadStyle('/quality-hotfix-v334.css','proplet-quality-hotfix-v334');
 
-  const loadPushOriginGuard=()=>{
+  const loadPushOriginGuard=()=>{ return;
     if(legacyOriginSession)return;
     if(document.querySelector('script[data-proplet-push-origin]'))return;
     const script=document.createElement('script');

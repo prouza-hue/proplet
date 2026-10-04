@@ -40,17 +40,18 @@
       if(footer)footer.remove();
     }
     setClass(modal,'result-action-docked',docked);
-    if(win.parentElement!==secondary)secondary.prepend(win);
+    const shareTarget=modal.querySelector('#referralWin:not([hidden]) #referralWinShareSlot')||secondary;
+    if(win.parentElement!==shareTarget)shareTarget.prepend(win);
     modal.querySelector('.win-main-actions')?.remove();
   }
 
   function setChallengeContent(el){
-    if(el.querySelector(':scope > .painted-action-icon')&&el.textContent.trim()==='Vyzvat kamaráda')return;
+    if(el.querySelector(':scope > .painted-action-icon')&&el.textContent.trim()==='Pojď si zahrát Proplet')return;
     const icon=document.createElement('img');
     icon.src='/rewards/printshop/challenge.svg?v=icons1';
     icon.className='painted-action-icon';icon.alt='';icon.width=24;icon.height=24;
     icon.setAttribute('aria-hidden','true');
-    el.replaceChildren(icon,document.createTextNode(' Vyzvat kamaráda'));
+    el.replaceChildren(icon,document.createTextNode(' Pojď si zahrát Proplet'));
     el.classList.add('painted-action-control');
   }
 
@@ -90,7 +91,7 @@
       if(challengeMode){
         setChallengeContent(win);
         setClass(win,'challenge-share-cta',true);
-        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Vyzvat kamaráda na tuto Tajenku':dailyGame?'Vyzvat kamaráda na tuto Denní výzvu':'Vyzvat kamaráda na stejný Proplet');
+        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet tuto Tajenku: Pojď si zahrát Proplet':dailyGame?'Sdílet tuto Denní výzvu: Pojď si zahrát Proplet':'Sdílet tuto desku: Pojď si zahrát Proplet');
       }else{
         if(win.classList.contains('challenge-share-cta'))setText(win,'↗ Sdílet');
         setClass(win,'challenge-share-cta',false);
@@ -102,7 +103,7 @@
     if(daily){
       setChallengeContent(daily);
       setClass(daily,'daily-challenge-cta',true);
-      setAriaLabel(daily,'Vyzvat kamaráda na dnešní Proplet');
+      setAriaLabel(daily,'Sdílet dnešní výzvu: Pojď si zahrát Proplet');
       syncDailyLayout(daily);
     }
 
@@ -110,7 +111,7 @@
       setChallengeContent(detail);
       setClass(detail,'challenge-share-cta',true);
       setClass(detail,'challenge-share-detail-cta',true);
-      setAriaLabel(detail,'Vyzvat kamaráda na tuto úroveň');
+      setAriaLabel(detail,'Sdílet tuto úroveň: Pojď si zahrát Proplet');
     }
   }
 
