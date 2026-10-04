@@ -1,4 +1,6 @@
--- first-board-v1: production experiment readout
+-- first-board-v1: original hash50_v1 cohort ONLY; operational catch-up excluded.
+-- Missing historical allocation policy means hash50_v1. Catch-up is described
+-- separately in FIRST-BOARD-CATCHUP-READOUT.sql; pooled balance does not repair SRM.
 --
 -- READ ONLY: every executable statement in this file is SELECT-only.
 -- Cohort contract:
@@ -66,6 +68,15 @@ events AS MATERIALIZED (
   CROSS JOIN params p
   WHERE pe.environment = 'production'
     AND pe.is_test = false
+    AND coalesce(pe.context ->> 'experiment_allocation_policy', 'hash50_v1') = 'hash50_v1'
+    AND NOT EXISTS (
+      SELECT 1 FROM public.product_events ca
+      WHERE ca.environment = 'production' AND ca.is_test = false
+        AND ca.event_type = 'first_board_experiment_assigned'
+        AND ca.context ->> 'experiment_key' = 'first-board-v1'
+        AND ca.context ->> 'experiment_allocation_policy' = 'catchup_20261004'
+        AND ca.context ->> 'first_steps_run_id' = pe.context ->> 'first_steps_run_id'
+    )
     AND pe.created_at >= p.rollout_at
     AND pe.created_at < p.analysis_as_of
     AND pe.event_type IN (
@@ -280,6 +291,15 @@ raw_assignments AS MATERIALIZED (
   CROSS JOIN params p
   WHERE pe.environment = 'production'
     AND pe.is_test = false
+    AND coalesce(pe.context ->> 'experiment_allocation_policy', 'hash50_v1') = 'hash50_v1'
+    AND NOT EXISTS (
+      SELECT 1 FROM public.product_events ca
+      WHERE ca.environment = 'production' AND ca.is_test = false
+        AND ca.event_type = 'first_board_experiment_assigned'
+        AND ca.context ->> 'experiment_key' = 'first-board-v1'
+        AND ca.context ->> 'experiment_allocation_policy' = 'catchup_20261004'
+        AND ca.context ->> 'first_steps_run_id' = pe.context ->> 'first_steps_run_id'
+    )
     AND pe.created_at >= p.rollout_at
     AND pe.created_at < p.analysis_as_of
     AND pe.event_type = 'first_board_experiment_assigned'
@@ -398,6 +418,15 @@ events AS MATERIALIZED (
   CROSS JOIN params p
   WHERE pe.environment = 'production'
     AND pe.is_test = false
+    AND coalesce(pe.context ->> 'experiment_allocation_policy', 'hash50_v1') = 'hash50_v1'
+    AND NOT EXISTS (
+      SELECT 1 FROM public.product_events ca
+      WHERE ca.environment = 'production' AND ca.is_test = false
+        AND ca.event_type = 'first_board_experiment_assigned'
+        AND ca.context ->> 'experiment_key' = 'first-board-v1'
+        AND ca.context ->> 'experiment_allocation_policy' = 'catchup_20261004'
+        AND ca.context ->> 'first_steps_run_id' = pe.context ->> 'first_steps_run_id'
+    )
     AND pe.created_at >= p.rollout_at
     AND pe.created_at < p.analysis_as_of
     AND pe.event_type IN (
@@ -650,6 +679,15 @@ assignments AS (
   CROSS JOIN params p
   WHERE pe.environment = 'production'
     AND pe.is_test = false
+    AND coalesce(pe.context ->> 'experiment_allocation_policy', 'hash50_v1') = 'hash50_v1'
+    AND NOT EXISTS (
+      SELECT 1 FROM public.product_events ca
+      WHERE ca.environment = 'production' AND ca.is_test = false
+        AND ca.event_type = 'first_board_experiment_assigned'
+        AND ca.context ->> 'experiment_key' = 'first-board-v1'
+        AND ca.context ->> 'experiment_allocation_policy' = 'catchup_20261004'
+        AND ca.context ->> 'first_steps_run_id' = pe.context ->> 'first_steps_run_id'
+    )
     AND pe.created_at >= p.rollout_at
     AND pe.created_at < p.analysis_as_of
     AND pe.event_type = 'first_board_experiment_assigned'

@@ -5207,5 +5207,10 @@ team_victories.install(app, auth_player=auth_player, db_rpc=db_rpc,
                        enforce_rate_limit=enforce_rate_limit)
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
+from backend import first_board
+first_board.install(app, telemetry_actor=telemetry_actor, db_rpc=db_rpc,
+                    enforce_rate_limit=enforce_rate_limit, environment=VERCEL_ENV,
+                    app_version=APP_VERSION)
+
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")

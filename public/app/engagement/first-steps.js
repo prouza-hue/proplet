@@ -34,20 +34,21 @@
     for(const char of `${FIRST_BOARD_EXPERIMENT.key}:${identity}`){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619)}
     return (hash>>>0)%100;
   }
-  function validAssignment(value){return value?.key===FIRST_BOARD_EXPERIMENT.key&&Object.hasOwn(FIRST_BOARD_EXPERIMENT.variants,value.variant)&&FIRST_BOARD_EXPERIMENT.variants[value.variant]===value.boardId&&Number.isInteger(value.bucket)&&value.bucket>=0&&value.bucket<100}
-  function firstBoardAssignment(){
+  function validAssignment(value){return value?.key===FIRST_BOARD_EXPERIMENT.key&&Object.hasOwn(FIRST_BOARD_EXPERIMENT.variants,value.variant)&&FIRST_BOARD_EXPERIMENT.variants[value.variant]===value.boardId&&Number.isInteger(value.bucket)&&value.bucket>=0&&value.bucket<100&&(value.bucket<50)===(value.variant==='control_e001')}
+  async function firstBoardAssignment(){
     const existing=state().firstBoardExperiment;if(validAssignment(existing))return existing;
     // Existing accounts and already-started historical first games stay outside this experiment.
     if(profile()?.token||state().firstBoardId)return null;
-    const identity=typeof getAnonymousId==='function'?getAnonymousId():'guest',bucket=experimentBucket(identity),variant=bucket<50?'control_e001':'challenger_e009';
-    const assignment={key:FIRST_BOARD_EXPERIMENT.key,variant,bucket,boardId:FIRST_BOARD_EXPERIMENT.variants[variant],assignedAt:new Date().toISOString()};
-    update({firstBoardExperiment:assignment,firstBoardId:assignment.boardId});return assignment;
+    const assignment=await api('/api/first-board/assignment',{method:'POST',headers:eventHeaders(),body:JSON.stringify({first_steps_run_id:state().firstStepsRunId})});
+    if(!validAssignment(assignment)||!assignment.assignmentRecorded||!assignment.firstStepsRunId)throw Error('První hru se nepodařilo přiřadit. Zkus to znovu.');
+    // Server allocation and assigned telemetry are atomic. Do not double-send assigned on the client.
+    if(!update({firstStepsRunId:assignment.firstStepsRunId,firstBoardExperiment:assignment,firstBoardId:assignment.boardId,events:[...(state().events||[]),'first_board_experiment_assigned']}))throw Error('První hru se nepodařilo uložit na zařízení. Zkus to znovu.');return assignment;
   }
-  function experimentProperties(assignment=state().firstBoardExperiment){return validAssignment(assignment)?{experimentKey:assignment.key,experimentVariant:assignment.variant,experimentBucket:assignment.bucket,puzzleId:assignment.boardId}:{} }
+  function experimentProperties(assignment=state().firstBoardExperiment){return validAssignment(assignment)?{experimentKey:assignment.key,experimentVariant:assignment.variant,experimentBucket:assignment.bucket,puzzleId:assignment.boardId,experimentAllocationPolicy:assignment.allocationPolicy||'hash50_v1',experimentIdentityBucket:assignment.identityBucket??assignment.bucket}:{} }
   function eventHeaders(properties={}){
     const s=state();if(!s.firstStepsRunId)return {};
     const experiment=experimentProperties(s.firstBoardExperiment);
-    return {'X-Proplet-First-Steps-Run':s.firstStepsRunId,'X-Proplet-Onboarding':s.onboardingVersion,'X-Proplet-Client-Release':s.clientRelease,...(s.isTest?{'X-Proplet-Test':'1'}:{}),...(experiment.experimentKey?{'X-Proplet-Experiment':experiment.experimentKey,'X-Proplet-Experiment-Variant':experiment.experimentVariant,'X-Proplet-Experiment-Bucket':String(experiment.experimentBucket)}:{}),...(properties.reason?{'X-Proplet-First-Steps-Reason':properties.reason}:{}),...(properties.outcome?{'X-Proplet-First-Steps-Outcome':properties.outcome}:{})};
+    return {'X-Proplet-First-Steps-Run':s.firstStepsRunId,'X-Proplet-Onboarding':s.onboardingVersion,'X-Proplet-Client-Release':s.clientRelease,...(s.isTest?{'X-Proplet-Test':'1'}:{}),...(experiment.experimentKey?{'X-Proplet-Experiment':experiment.experimentKey,'X-Proplet-Experiment-Variant':experiment.experimentVariant,'X-Proplet-Experiment-Bucket':String(experiment.experimentBucket),'X-Proplet-Experiment-Policy':experiment.experimentAllocationPolicy,'X-Proplet-Experiment-Identity-Bucket':String(experiment.experimentIdentityBucket)}:{}),...(properties.reason?{'X-Proplet-First-Steps-Reason':properties.reason}:{}),...(properties.outcome?{'X-Proplet-First-Steps-Outcome':properties.outcome}:{})};
   }
   function authHeaders(){return intent()?{...eventHeaders(),'X-Proplet-Creation-Source':'first_steps_v1'}:{}}
   function captureAccount(owner){
@@ -99,7 +100,7 @@
     const button=$('#winPrimaryBtn');button.disabled=true;button.textContent='Načítám první hru…';
     try{
       if(global.PropletSharing?.resumeInvitation?.())return;
-      ensureFlow();const assignment=firstBoardAssignment();
+      ensureFlow();const assignment=await firstBoardAssignment();
       const boardId=assignment?.boardId||state().firstBoardId||'g4-e-001';
       const p=puzzleDB?.free?.easy?.find(p=>p.id===boardId);
       if(!p)throw Error('První hru se nepodařilo načíst. Zkus to znovu.');
