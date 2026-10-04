@@ -954,7 +954,11 @@ def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> b
         if row.get("mode") != "free" or row.get("difficulty") != difficulty or int(row.get("points") or 0) <= 0:
             continue
         info = free_puzzle_info(str(row.get("puzzle_id") or ""), difficulty)
-        if info and int(info["level"]) == int(level):
+        if (
+            info
+            and 1 <= int(info.get("generation") or 1) <= 3
+            and int(info["level"]) == int(level)
+        ):
             return True
     return False
 
@@ -1043,37 +1047,18 @@ def repair_gen4_free_rewards(player_id: str, *, dry_run: bool = True) -> dict:
 
 
 def claim_free_slot_points(player_id: str, info: dict, points: int, puzzle_id: str) -> tuple[int, bool]:
-    """Award Gen4 once per concrete board; preserve the legacy slot policy before Gen4.
+    """Keep per-board rewards; historical claims require the atomic RPC.
 
-    The v3.16 table supplies a concurrency-safe unique constraint. During a
-    rolling deployment without that migration, result-history lookup remains a
-    safe compatibility fallback (apart from a very narrow simultaneous race).
+    Generation 4 and later never consume the shared G1-G3 reward pool, even
+    when a board is no longer in the active generation. There is deliberately
+    no claim-before-result or history-only fallback for historical rewards.
     """
-    difficulty, level = info["difficulty"], int(info["level"])
-    active_generation = int(load_puzzles().get("freeGeneration") or 1)
-    is_current = int(info.get("generation") or 1) == active_generation and info.get("legacy") is not True
-    if active_generation >= 4 and is_current:
-        # Result.challenge_key (free:<puzzle id>) is the concurrency-safe claim.
-        # The result endpoint awards this value only when that row is first inserted.
+    if int(info.get("generation") or 1) >= 4:
         return int(points), False
-    historical_reward = free_slot_already_rewarded(player_id, difficulty, level)
-    try:
-        claimed = db_select("free_slot_rewards", player_id=player_id, difficulty=difficulty, level=level)
-        if claimed:
-            return 0, True
-        db_insert("free_slot_rewards", {
-            "id": str(uuid.uuid4()), "player_id": player_id, "difficulty": difficulty,
-            "level": level, "source_puzzle_id": puzzle_id,
-            "content_generation": int(info.get("generation") or 1),
-            "points": 0 if historical_reward else int(points),
-            "earned_at": datetime.now(TZ).isoformat(),
-        })
-        return (0, True) if historical_reward else (int(points), False)
-    except HTTPException as exc:
-        if exc.status_code == 409:
-            return 0, True
-        logger.warning("free_slot_rewards unavailable; using result-history fallback: %s", exc.detail)
-        return (0, True) if historical_reward else (int(points), False)
+    raise HTTPException(
+        503,
+        "Historické odměny vyžadují bezpečné ukládání. Zkus synchronizaci znovu.",
+    )
 
 
 def daily_rotation_index(daily_date: str, bank_size: int, base_date: str = "2026-01-01") -> int:
@@ -3612,16 +3597,11 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         free_level = int(info["level"])
         base_points = domain_content.xp_for("free", payload.difficulty, POINTS)
         if ATOMIC_RESULT_V1_ENABLED:
-            active_generation = int(load_puzzles().get("freeGeneration") or 1)
-            is_current = content_generation == active_generation and info.get("legacy") is not True
-            if active_generation >= 4 and is_current:
-                points = int(base_points)
-            else:
-                historical_reward = free_slot_already_rewarded(
-                    player["id"], payload.difficulty, free_level,
-                )
-                points = 0 if historical_reward else int(base_points)
-                transferred_reward = historical_reward
+            # The database decides whether a historical slot is still payable.
+            # Always sending base XP avoids history-dependent command digests
+            # and a full result-history read for every archive completion.
+            points = int(base_points)
+            if 1 <= content_generation <= 3:
                 legacy_reward_slot = {
                     "difficulty": payload.difficulty,
                     "level": free_level,
