@@ -108,6 +108,26 @@ Upřesnění proti `ONBOARDING-ACTIVATION-20260924.md`,
 
 Kanonický read-only dotaz: `docs/audits/FIRST-BOARD-V1-READOUT.sql`.
 
+## Provozní dorovnávání — 4. 10. 2026
+
+Na výslovný požadavek provozovatele dnes nové způsobilé identity přiděluje server
+variantě s menším kumulativním počtem přiřazení od spuštění testu. Při shodě
+rozhodne původní hash; další přidělení znovu doplní menší větev. Starší varianty
+zůstávají beze změny. Režim končí automaticky 5. 10. 00:00 Europe/Prague
+(4. 10. 22:00 UTC); nové identity pak opět používají hash 50/50.
+
+Nové assignmenty nesou `experiment_allocation_policy=catchup_20261004`;
+historické chybějící policy znamená `hash50_v1`. Policy patří k assignmentu
+a stejnému flow se nemění ani po půlnoci. Původní bucket identity je samostatně
+v `experiment_identity_bucket`; `experiment_bucket` odpovídá přidělené větvi.
+
+`FIRST-BOARD-V1-READOUT.sql` nyní analyzuje pouze původní hash50_v1 kohortu.
+`FIRST-BOARD-CATCHUP-READOUT.sql` ukazuje obě fáze odděleně, pouze popisně.
+Celkový dorovnaný poměr nesmí být vydáván za opravenou randomizaci ani rušit
+historický SRM warning. Zítřejší jednorázový pětidení přehled zůstává naplánovaný;
+není automaticky finálním statistickým rozhodnutím. Nezralé 24h běhy dorovnávání
+se musí označit a nesmějí vstoupit do zralé konverze.
+
 ## Oprava 24h okna — 29. 9. 2026
 
 Readout nyní pro `mature_24h` započítává všechny fáze funnelu pouze v intervalu

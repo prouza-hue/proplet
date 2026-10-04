@@ -1,0 +1,142 @@
+-- One-day operational catch-up. Existing assignments and historical rows stay intact.
+create schema if not exists proplet_experiment_internal;
+revoke all on schema proplet_experiment_internal from public, anon, authenticated;
+grant usage on schema proplet_experiment_internal to service_role;
+
+create table proplet_experiment_internal.first_board_assignments (
+  environment text not null check (environment in ('production','preview','local')),
+  is_test boolean not null,
+  anonymous_id text not null check (anonymous_id ~ '^[a-f0-9]{64}$'),
+  first_steps_run_id uuid not null,
+  variant text not null check (variant in ('control_e001','challenger_e009')),
+  bucket integer not null check (bucket between 0 and 99),
+  identity_bucket integer not null check (identity_bucket between 0 and 99),
+  policy text not null check (policy in ('hash50_v1','catchup_20261004')),
+  assigned_at timestamptz not null default clock_timestamp(),
+  event_id uuid not null default gen_random_uuid(),
+  primary key (environment,is_test,anonymous_id),
+  unique (environment,is_test,first_steps_run_id),
+  check ((variant='control_e001' and bucket<50) or (variant='challenger_e009' and bucket>=50))
+);
+alter table proplet_experiment_internal.first_board_assignments enable row level security;
+revoke all on proplet_experiment_internal.first_board_assignments from public, anon, authenticated;
+grant select,insert on proplet_experiment_internal.first_board_assignments to service_role;
+
+create index if not exists product_events_first_board_assignment_idx
+  on public.product_events (environment,is_test,(context->>'first_steps_run_id'),created_at)
+  where event_type='first_board_experiment_assigned' and context->>'experiment_key'='first-board-v1';
+
+create function public.proplet_first_board_assign(
+  p_environment text, p_is_test boolean, p_anonymous_id text, p_flow uuid,
+  p_identity_bucket integer, p_client_release text, p_release text, p_app_version text
+) returns jsonb
+language plpgsql security invoker
+set search_path = pg_catalog, proplet_experiment_internal
+set statement_timeout = '5s'
+as $$
+declare
+  a proplet_experiment_internal.first_board_assignments%rowtype;
+  historic record;
+  n_control integer;
+  n_challenger integer;
+  chosen text;
+  policy_name text;
+  assigned_bucket integer;
+begin
+  if p_environment not in ('production','preview','local') or p_is_test is null
+     or p_anonymous_id is null or p_anonymous_id !~ '^[a-f0-9]{64}$'
+     or p_flow is null or p_identity_bucket is null or p_identity_bucket not between 0 and 99
+     or coalesce(length(p_client_release),0) not between 1 and 80 then
+    raise exception 'Invalid first-board assignment request' using errcode='22023';
+  end if;
+  -- One short transaction per environment/test namespace; concurrent requests cannot overshoot.
+  perform pg_advisory_xact_lock(hashtextextended('first-board-v1:'||p_environment||':'||p_is_test::text,0));
+  select * into a from proplet_experiment_internal.first_board_assignments
+    where environment=p_environment and is_test=p_is_test and anonymous_id=p_anonymous_id;
+  if not found then
+    -- Never repurpose a flow belonging to another identity.
+    if exists(select 1 from proplet_experiment_internal.first_board_assignments
+      where environment=p_environment and is_test=p_is_test and first_steps_run_id=p_flow) then
+      raise exception 'First-board flow belongs to another identity' using errcode='22023';
+    end if;
+    select e.* into historic from public.product_events e
+      where e.environment=p_environment and e.is_test=p_is_test
+        and e.event_type='first_board_experiment_assigned'
+        and e.context->>'experiment_key'='first-board-v1'
+        and e.created_at>=timestamptz '2026-09-29 07:51:55+00'
+        and e.anonymous_id=p_anonymous_id
+        and e.context->>'first_steps_run_id' ~ '^[a-f0-9-]{36}$'
+        and e.context->>'experiment_bucket' ~ '^[0-9]{1,2}$'
+        and ((e.context->>'experiment_variant'='control_e001' and e.context->>'puzzle_id'='g4-e-001'
+              and (e.context->>'experiment_bucket')::int<50)
+          or (e.context->>'experiment_variant'='challenger_e009' and e.context->>'puzzle_id'='g4-e-009'
+              and (e.context->>'experiment_bucket')::int>=50))
+      order by e.created_at,e.id limit 1;
+    if found then
+      insert into proplet_experiment_internal.first_board_assignments
+        (environment,is_test,anonymous_id,first_steps_run_id,variant,bucket,identity_bucket,policy,assigned_at,event_id)
+        values(p_environment,p_is_test,p_anonymous_id,(historic.context->>'first_steps_run_id')::uuid,
+          historic.context->>'experiment_variant',(historic.context->>'experiment_bucket')::int,
+          (historic.context->>'experiment_bucket')::int,
+          coalesce(historic.context->>'experiment_allocation_policy','hash50_v1'),historic.created_at,historic.id)
+        returning * into a;
+    else
+      if exists(select 1 from public.product_events e
+        where e.environment=p_environment and e.is_test=p_is_test
+          and e.event_type='first_board_experiment_assigned'
+          and e.context->>'experiment_key'='first-board-v1'
+          and e.context->>'first_steps_run_id'=p_flow::text) then
+        raise exception 'First-board flow already assigned' using errcode='22023';
+      end if;
+      chosen=case when p_identity_bucket<50 then 'control_e001' else 'challenger_e009' end;
+      policy_name='hash50_v1';
+      -- Europe/Prague midnight ending 4 October = 22:00 UTC. No manual rollback needed.
+      if p_environment='production' and clock_timestamp()<timestamptz '2026-10-04 22:00:00+00' then
+        policy_name='catchup_20261004';
+        with assigned as (
+          select e.context->>'first_steps_run_id' flow,min(e.context->>'experiment_variant') variant
+          from public.product_events e
+          where e.environment=p_environment and e.is_test=p_is_test
+            and e.event_type='first_board_experiment_assigned'
+            and e.context->>'experiment_key'='first-board-v1'
+            and e.context->>'first_steps_run_id' is not null
+            and e.context->>'experiment_variant' in ('control_e001','challenger_e009')
+            and e.created_at>=timestamptz '2026-09-29 07:51:55+00'
+          group by e.context->>'first_steps_run_id'
+          having count(distinct e.context->>'experiment_variant')=1
+        )
+        select count(*) filter(where variant='control_e001'),count(*) filter(where variant='challenger_e009')
+          into n_control,n_challenger from assigned;
+        if n_control<n_challenger then chosen='control_e001';
+        elsif n_challenger<n_control then chosen='challenger_e009'; end if;
+      end if;
+      -- experiment_bucket remains the allocated arm bucket; identity_bucket retains the original hash.
+      assigned_bucket=(p_identity_bucket%50)+case when chosen='challenger_e009' then 50 else 0 end;
+      insert into proplet_experiment_internal.first_board_assignments
+        (environment,is_test,anonymous_id,first_steps_run_id,variant,bucket,identity_bucket,policy)
+        values(p_environment,p_is_test,p_anonymous_id,p_flow,chosen,assigned_bucket,p_identity_bucket,policy_name)
+        returning * into a;
+      -- Authoritative assignment is stored atomically with allocation, exactly once.
+      insert into public.product_events
+        (id,anonymous_id,event_type,app_version,created_at,client_release,environment,release,
+         measurement_version,onboarding_version,is_test,context)
+        values(a.event_id,p_anonymous_id,'first_board_experiment_assigned',left(p_app_version,30),
+          a.assigned_at,p_client_release,p_environment,left(p_release,64),2,'board-v3-short',p_is_test,
+          jsonb_build_object('first_steps_run_id',a.first_steps_run_id,'experiment_key','first-board-v1',
+            'experiment_variant',a.variant,'experiment_bucket',a.bucket,
+            'experiment_identity_bucket',a.identity_bucket,'experiment_allocation_policy',a.policy,
+            'puzzle_id',case when a.variant='control_e001' then 'g4-e-001' else 'g4-e-009' end,
+            'auth_at_event','anonymous','assignment_origin','server'));
+    end if;
+  end if;
+  return jsonb_build_object('key','first-board-v1','variant',a.variant,'bucket',a.bucket,
+    'identityBucket',a.identity_bucket,'allocationPolicy',a.policy,
+    'boardId',case when a.variant='control_e001' then 'g4-e-001' else 'g4-e-009' end,
+    'assignedAt',a.assigned_at,'firstStepsRunId',a.first_steps_run_id,'assignmentRecorded',true);
+end;
+$$;
+revoke all on function public.proplet_first_board_assign(text,boolean,text,uuid,integer,text,text,text)
+  from public,anon,authenticated;
+grant execute on function public.proplet_first_board_assign(text,boolean,text,uuid,integer,text,text,text)
+  to service_role;
+notify pgrst,'reload schema';

@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {'/api/cron/mozkokalypsa-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+        if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -101,6 +101,11 @@ for path in ("/api/play-session", "/api/play-session/config"):
     openapi_contract["paths"].pop(path)
 for model in ("SessionCommand", "Progress", "FoundWord"):
     openapi_contract["components"]["schemas"].pop(model)
+
+# Additive allocator has its own isolated HTTP contract in test_first_board_catchup.
+assert set(openapi_contract["paths"]["/api/first-board/assignment"]) == {"post"}
+openapi_contract["paths"].pop("/api/first-board/assignment")
+openapi_contract["components"]["schemas"].pop("AssignmentRequest")
 
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
@@ -374,4 +379,3 @@ assert response_fixture_digest == (
 
 
 print("Sprint 04 characterization contracts: PASS")
-

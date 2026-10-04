@@ -66,6 +66,10 @@ def request_context(request, environment):
         details['experiment_key']=experiment
         details['experiment_variant']=variant
         details['experiment_bucket']=int(bucket)
+        policy=request.headers.get('x-proplet-experiment-policy','')
+        identity_bucket=request.headers.get('x-proplet-experiment-identity-bucket','')
+        if policy in {'hash50_v1','catchup_20261004'}:details['experiment_allocation_policy']=policy
+        if identity_bucket.isdigit() and 0<=int(identity_bucket)<100:details['experiment_identity_bucket']=int(identity_bucket)
     return {
         '_event_context':details,
         '_event_id':event_id,
