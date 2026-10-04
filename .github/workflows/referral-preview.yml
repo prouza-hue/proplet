@@ -1,0 +1,47 @@
+name: Isolated integrated referral preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'public/referral*'
+      - 'public/index.html'
+      - 'public/runtime-meta.js'
+      - 'tools/referral_preview*'
+      - '.github/workflows/referral-preview.yml'
+      - 'vercel.json'
+  push:
+    branches: ['preview/referrals-integrated-20261004']
+permissions:
+  contents: read
+jobs:
+  native-browser-and-isolation:
+    if: github.head_ref == 'preview/referrals-integrated-20261004' || github.ref_name == 'preview/referrals-integrated-20261004'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test tools in temporary directory
+        run: |
+          npm install --prefix /tmp/proplet-preview-tools --no-save --package-lock=false playwright@1.56.1
+          /tmp/proplet-preview-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Test native flow and network isolation with no database credentials
+        env:
+          NODE_PATH: /tmp/proplet-preview-tools/node_modules
+        run: |
+          node --check public/referral-preview-isolation.js
+          node --check public/referrals.js
+          node tools/referral_preview_server.cjs > /tmp/referral-server.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node tools/referral_preview_verify.cjs
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integrated-referral-preview
+          path: referral-preview-evidence
