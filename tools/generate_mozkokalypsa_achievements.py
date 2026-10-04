@@ -3,7 +3,7 @@ from pathlib import Path
 import math,json,hashlib
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'public/rewards/printshop'
-SERIES=[(1,'První trhlina','První deska. První puklina v nemožném.'),(5,'Za bodem zlomu','Pětkrát dovnitř. Pětkrát ven.'),(10,'Oko bouře','Kolem zuří chaos. Ty vidíš cestu.'),(25,'Krotitel pohromy','I pohroma se dá rozplést.'),(50,'Nezlomná mysl','Padesát desek. Hlava stále drží.'),(75,'Vládce epicentra','Uprostřed největšího zmatku máš jasno.'),(100,'Poslední slovo','Mozkokalypsa skončila. Poslední slovo máš ty.')]
+SERIES=[(1,'První trhlina','První deska. První puklina v nemožném.'),(5,'Za bodem zlomu','Pětkrát dovnitř. Pětkrát ven.'),(10,'Oko bouře','Kolem zuří chaos. Ty vidíš cestu.'),(25,'Krotitel pohromy','Bouře má sílu. Ty ji máš v hrsti.'),(50,'Nezlomná mysl','Padesát desek. Hlava stále drží.'),(75,'Vládce epicentra','Uprostřed největšího zmatku máš jasno.'),(100,'Poslední slovo','Mozkokalypsa skončila. Poslední slovo máš ty.')]
 INK='#30283e'; COPPER='#bf7050'; GOLD='#e3b85e'; LIGHT='#fff0c9'
 def path(d,fill,stroke=INK,w=4,extra=''):
  return f'<path d="{d}" fill="{fill}" stroke="{stroke}" stroke-width="{w}" stroke-linejoin="round" stroke-linecap="round" {extra}/>'
@@ -56,13 +56,23 @@ def art(stage,n,name):
   out+=path('M77 153Q160 72 243 153Q160 234 77 153Z',LIGHT,w=6)
   out+=spiral(r=34)+hatch(105,98,-15)+star(160,286,11)
  elif stage==3:
-  out+=ring(107,10,stage)
-  out+=circle(160,153,94,'#704759',INK,6)+circle(160,153,78,COPPER,GOLD,5)
-  out+=spiral(r=43)
-  for k in range(4):
-   out+=f'<g transform="rotate({45+k*90} 160 153)">'+path('M135 69l8-23h34l8 23-13 19h-24Z',GOLD,w=5)+path('M147 53h24l5 10h-34Z',LIGHT,w=0)+'</g>'
-  out+=path('M93 235l-12 36 36-13 43 20 43-20 36 13-12-36','none',INK,5)
-  out+=hatch(89,134,25)
+  # A copper gauntlet catches a lightning bolt: readable action, not an abstract seal.
+  out+=path('M91 96Q61 94 69 70Q74 53 92 57Q97 27 126 36Q147 13 173 36Q205 22 218 53Q245 52 251 75Q257 100 227 101H91Z','#514057',INK,6)
+  out+=path('M89 62Q105 67 110 53M135 40Q153 32 167 47M220 61q17 0 20 15','none',COPPER,5)
+  out+=path('M168 64L119 142H151L136 194L216 108H181L199 64Z',GOLD,INK,6)
+  out+=path('M175 76l-36 53h26l-9 30 43-40h-33l18-43Z',LIGHT,'none',0)
+  out+=path('M190 173L238 191L216 219H241L193 273L205 235H181Z',GOLD,INK,6)
+  # Four knuckles, folded fingers and a crossing thumb make a single unmistakable fist.
+  out+=path('M113 232L107 212Q91 202 90 185L86 153Q84 133 98 128Q110 124 117 136Q117 118 130 117Q143 116 148 130Q151 113 165 117Q179 118 181 134Q188 123 199 129Q211 135 210 153L208 178Q223 180 220 196Q216 211 201 224L197 249Z',COPPER,INK,6)
+  out+=path('M99 135l6 41M128 127l6 43M161 128l3 38M195 139l-2 31','none',INK,4)
+  out+=path('M111 145l3 22M140 138l3 26M173 140v23','none','#e8aa72',5)
+  out+=path('M208 179L160 161Q147 155 140 166Q135 177 148 184L178 199Q164 209 155 225', '#d99065',INK,5)
+  out+=path('M150 171l27 11','none',LIGHT,3)
+  out+=path('M107 226l94 6-6 45-88-7Z',INK,INK,6)
+  out+=path('M108 232l91 6-3 14-87-7Z',GOLD,INK,4)
+  out+=path('M119 252l64 6','none',COPPER,4)
+  out+=circle(122,260,3,GOLD,'none',0)+circle(181,264,3,GOLD,'none',0)
+  out+=star(57,172,12)+star(258,143,12)+path('M65 116l-10 15M247 209l13 10','none',GOLD,5)
  elif stage==4:
   out+=path('M160 26L254 68V147Q251 226 160 286Q69 226 66 147V68Z',GOLD,w=7)
   out+=path('M160 45L236 79V146Q232 207 160 264Q88 207 84 146V79Z',INK,COPPER,5)

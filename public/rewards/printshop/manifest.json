@@ -1155,11 +1155,11 @@
   "achievement-mozkokalypsa-25": {
     "name": "Krotitel pohromy",
     "file": "achievement-mozkokalypsa-25.svg",
-    "source_sha256": "9d36f0fa3d2a5d0f5242e9748f9ea5b5b961b2a06ba90d1febf591b461d4a4c6",
+    "source_sha256": "32456d25570ce2611979bfe8b6661e70eb165ec170a6df7362ed15fa4deac9e2",
     "category": "achievement",
     "group": "mozkokalypsa",
     "stage": 3,
-    "source": "original-vector-20261004"
+    "source": "original-vector-20261004-v2"
   },
   "achievement-mozkokalypsa-50": {
     "name": "Nezlomná mysl",
