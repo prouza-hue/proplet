@@ -66,7 +66,7 @@ def main():
                 (PLAYER,level)).fetchone()[0]
 
     with connect() as c:
-        c.execute("insert into players(id,name,family_code,token_hash) values(%s,'Historical synthetic','SOLO_TEST','historical-fixture')",(PLAYER,))
+        c.execute("insert into players(id,name,family_code,token_hash) values(%s,'Historical synthetic','SOLO_TEST','historical-reward-isolation-fixture')",(PLAYER,))
     # Reproduce a valid G4 transition claim. It must remain unchanged and
     # must not reserve the unpaid historical hard level 29.
     g4 = command("historical-synthetic-g4-h-029",29,generation=4,points=550,difficulty="hard")
