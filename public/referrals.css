@@ -66,3 +66,7 @@
 .ref-earned-xp{font-family:Fraunces,Georgia,serif;font-size:34px;color:var(--accent,#7a3b32);margin:10px 0}
 #profileCard .account-banner,#profileCard .sync-status{display:none!important}
 @media(max-width:360px){.ref-sheet{padding:22px!important}.ref-sheet h2{font-size:30px!important}.ref-home{gap:10px;padding:17px!important}.ref-home-symbol{width:32px;flex-basis:32px}.ref-progress-caption{align-items:flex-start;flex-direction:column;gap:3px}}
+
+#referralDialog .ref-link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+#referralDialog #refLink{display:block;width:100%!important;min-width:0!important;max-width:100%;box-sizing:border-box}
+#referralDialog #refCopy{width:auto!important;min-width:0!important;max-width:100%;margin:0!important}

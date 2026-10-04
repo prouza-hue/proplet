@@ -35,6 +35,7 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);check('No unsolicited promotional modal');
   await page.locator('#referralHome [data-ref-open]').click();
   assert.match(await page.locator('#referralDialog').innerText(),/týdenních XP hráče ani týmu/);
+  assert((await page.locator('#refLink').boundingBox()).width>100,'invitation link remains readable on mobile');
   const referralLink=await page.locator('#refLink').inputValue();assert.equal(new URL(referralLink).origin,new URL(base).origin);
   await screenshot(page,'02-invitation');
   await page.keyboard.press('Escape');assert.equal(await page.locator('#referralDialog').isVisible(),false);
