@@ -17,10 +17,6 @@
     {
       "path": "/api/cron/mozkokalypsa-launch-push",
       "schedule": "0 8 2 10 *"
-    },
-    {
-      "path": "/api/cron/refresh300-launch-push",
-      "schedule": "0 9 4 10 *"
     }
   ],
   "headers": [
