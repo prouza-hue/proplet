@@ -13,7 +13,7 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===3);
+ await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
@@ -82,6 +82,8 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   await ready(page,'?view=four');
   await page.evaluate(()=>startTajenka());
   await page.waitForFunction(()=>currentGame?.mode==='tajenka');
+  if(await page.locator('#tajenkaRulesModal').isVisible())await page.locator('#tajenkaRulesDone').click();
+  await page.waitForFunction(()=>currentGame?.pausedAt==null);
   const tajenkaPaths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
   for(let i=0;i<tajenkaPaths.length;i++){await draw(page,tajenkaPaths[i]);await page.waitForFunction(n=>currentGame.found.length===n,i+1)}
   await page.waitForFunction(()=>PropletReferralPreview.model.paid===true);

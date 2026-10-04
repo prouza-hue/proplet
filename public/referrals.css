@@ -1,5 +1,5 @@
 
-.ref-preview{max-width:900px;margin:12px auto 0;padding:0 18px;color:var(--muted);font:12px/1.5 var(--font-body,Outfit,sans-serif)}
+.ref-preview{max-width:900px;width:100%;margin:0 0 8px;padding:0;color:var(--muted);font:12px/1.5 var(--font-body,Outfit,sans-serif)}
 .ref-preview summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;border:1px dashed var(--line,#ded4c6);border-radius:10px;padding:6px 12px;background:var(--surface,#fffdf8);list-style:none}
 .ref-preview-label{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .ref-preview-options{display:flex;gap:10px;flex-wrap:wrap;padding:12px;border:1px solid var(--line,#ded4c6);border-radius:10px;margin-top:6px;background:var(--surface,#fffdf8)}
@@ -47,7 +47,7 @@
 .ref-sheet>.text-btn{width:100%;margin-top:10px}
 .ref-link-row{display:flex;gap:8px;margin-top:12px}
 .ref-link-row input{min-width:0;flex:1;border:1px solid var(--line,#ded4c6);background:var(--surface,#fffdf8);color:var(--muted);border-radius:10px;padding:10px;font:12px Outfit,sans-serif}
-.ref-link-row button{font-size:12px;padding:10px 12px!important}
+.ref-link-row button{width:auto;flex:0 0 auto;font-size:12px;padding:10px 12px!important}
 .ref-status{font-size:12px;color:var(--muted);min-height:18px;text-align:center;margin:12px 0 0}
 .ref-steps{display:flex;gap:8px;margin:16px 0 8px}
 .ref-steps span{flex:1;max-width:52px;aspect-ratio:1;border:1px solid var(--line,#ded4c6);border-radius:10px;display:grid;place-items:center;font-size:15px;color:var(--muted)}

@@ -12,7 +12,7 @@
  const view=incoming?(q.get('view')||'new'):'inviter';
  const model={view,incoming,accepted:incoming&&view!=='new',paid:incoming&&view==='reward',count:incoming?(view==='four'?4:view==='reward'?5:0):0,seen:new Set(),inviterName:'Katka',name:incoming?'Eliška':'Katka',base:incoming?500:2150,weeklyBase:incoming?0:230,gameXp:0,referrals:[{name:'Eliška',count:3,accepted:true,paid:false},{name:'Honza',count:0,accepted:false,paid:false},{name:'Petr',count:5,accepted:true,paid:true}]};
  const audit={fixtureReads:[],fixtureWrites:[],blockedExternal:[],staticRequests:[]};
- const api=window.PropletReferralPreview={model,audit,database:false,productionApi:false,revision:3};
+ const api=window.PropletReferralPreview={model,audit,database:false,productionApi:false,revision:4};
  const ownBonus=()=>incoming?(model.paid?1000:0):model.referrals.filter(r=>r.paid).length*1000;
  api.stats=()=>{
    let rows=[];try{rows=Object.values(JSON.parse(localStorage.getItem('proplet-v2-state:'+api.profile().id)||'{}').completed||{})}catch{}
