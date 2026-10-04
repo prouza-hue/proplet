@@ -1,0 +1,417 @@
+{
+  "tested_sha": "580243dc4988c6f50368a7959d9e021fd588fce7",
+  "production_csp": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://hrajproplet.cz https://iopyhluayfszskyqqpuc.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests",
+  "checks": [
+    {
+      "case": "today/light/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/light/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/light/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/light/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/light/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/light/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/light/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/light/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/light/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/light/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/light/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/light/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/light/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/light/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/light/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/light/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/dark/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/dark/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/dark/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/dark/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/dark/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/dark/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/dark/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/dark/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/dark/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/dark/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/dark/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/dark/768",
+      "layout": {
+        "width": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "today/dark/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "play/dark/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "archive/dark/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season/dark/1440",
+      "layout": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "direct-board-88",
+      "result": "PASS; no sequential unlocking"
+    },
+    {
+      "case": "season-modal/light/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season-modal/dark/390",
+      "layout": {
+        "width": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "season-modal/light/320",
+      "layout": {
+        "width": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "brokenImages": [],
+        "fraunces": true,
+        "outfit": true
+      }
+    },
+    {
+      "case": "navigation-and-season-variants",
+      "result": "PASS"
+    }
+  ],
+  "screenshots": [
+    "today-390.png",
+    "play-390.png",
+    "archive-390.png",
+    "season-390.png",
+    "archive-768.png",
+    "season-1440.png",
+    "archive-board-88-390.png",
+    "season-modal-light-390.png",
+    "season-modal-dark-390.png",
+    "season-modal-light-320.png",
+    "today-january-competition-390.png"
+  ],
+  "source": "isolated Chromium; static prototype only; synthetic account",
+  "result": "PASS",
+  "browser_version": "153.0.8010.12",
+  "console_errors": [],
+  "failed_requests": []
+}
