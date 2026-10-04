@@ -1,0 +1,41 @@
+name: archive-content-preparation
+
+on:
+  pull_request:
+    paths:
+      - 'content/archives/free-gen3-v1/**'
+      - 'tools/archive/**'
+      - '.github/workflows/archive-content-preparation.yml'
+      - 'data/archive/v3.33.5/puzzles.json.gz'
+      - 'data/content_catalog_v334.json'
+      - 'data/words.txt'
+      - 'data/lexicon_v2.json'
+      - 'word_recognition_v3330.py'
+  push:
+    branches:
+      - 'feat/archive-content-preparation-20261004'
+    paths:
+      - 'content/archives/free-gen3-v1/**'
+      - 'tools/archive/**'
+      - '.github/workflows/archive-content-preparation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify every original reward slot and approved complete solution
+        run: node tools/archive/test_archive_solution_contract.cjs
+      - name: Reproduce production static recognition exact-cover audit
+        run: node tools/archive/audit_exact_covers.cjs
+      - name: Fetch immutable wider recognition source
+        run: git fetch --depth=1 origin 553fb3578c958004b831068dfd268dbcb2a423ab
+      - name: Reproduce wider recognition exact-cover audit
+        run: node tools/archive/audit_exact_covers.cjs --broad-ref 553fb3578c958004b831068dfd268dbcb2a423ab
