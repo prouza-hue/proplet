@@ -44,6 +44,8 @@
  localStorage.setItem('proplet-v3-8-2-push-nudge',JSON.stringify({done:true,dismissedAt:Date.now()}));
  localStorage.setItem('proplet-v3-5-account-nudge',JSON.stringify({shown:[1,2,3]}));
  api.seed();
+ for(const id of ['preview-katka','preview-elis'])localStorage.setItem('proplet:content-release:refresh300-v1:account:'+id,'1');
+ window.PropletContentAnnouncementShown=api.profile().id;
  window.PROPLET_RUNTIME_ENV='preview';window.PROPLET_MK100_INTEGRATED_PREVIEW=true;window.PROPLET_FIRST_STEPS_ENABLED=false;
  const json=(value,status=200)=>Promise.resolve(new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}}));
  window.fetch=(input,options={})=>{
