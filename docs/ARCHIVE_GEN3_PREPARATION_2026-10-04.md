@@ -18,7 +18,7 @@ První přesný audit nad 13 441 statickými slovy (data/words.txt + schválený
 
 Rozšířený audit nad reprodukovaným Gen6 snapshotem 103 836 slov mění obraz: 714 desek má jedno řešení, 75 dvě, 8 tři a 3 čtyři. Přibylo 71 nově označených desek a 3 z původních 15 mají další kandidáty. Všechny úplné kandidáty, cesty, původní slova, náhrady a vrstvy slovníku eviduje broad-review.json.
 
-Část dodatečných kandidátů jsou skutečná česká slova či tvary; část tvoří cizí výrazy, názvy a frekvenční šum. Přítomnost v recognition/wordfreq není redakčním schválením cílového slova. Publikační brána proto zůstává uzavřená do konkrétního posouzení všech dodatečných úplných řešení. Kvůli nejasnosti se žádný historický odměnový slot nezahazuje.
+Část dodatečných kandidátů jsou skutečná česká slova či tvary; část tvoří cizí výrazy, názvy a frekvenční šum. Přítomnost v recognition/wordfreq není redakčním schválením cílového slova. Dvě nezávislá jazyková review a následné sjednocení projektového rozhodnutí posoudily všech 100 nekanonických úplných variant: 64 jsou přijaté, 21 odmítnutých a 15 zůstává podmíněných jazykovou politikou nebo doložením tvaru. Přijaté varianty jsou konkrétně doplněné do 57 desek jako celé řešení; celkem je připravených 864 coverů včetně 800 originálů. Všech 15 podmíněných variant na 12 deskách zůstává publikační bránou, zejména GAMMA, ŠLAK, HŮRA, FAKE, KALAŠ, NĚMA, SOLE a LHOTY. Jazykové doporučení a projektové rozhodnutí jsou samostatně uvedené v editorial-decisions.json. Žádná přijatá forma tím nerozšiřuje globální generační lexikon. Kvůli nejasnosti se žádný historický odměnový slot nezahazuje.
 
 Oba exact-cover audity zachovávají původní počet cílových slov a multiset jejich délek. Hledají úplná řešení v rámci této hráči zobrazené šablony; netvrdí unikátnost proti libovolnému počtu slov jiné délky. Širší snapshot je konkrétní reprodukovatelný slovník, nikoli automatický důkaz rovnosti s každou dnešní živou Wikidata položkou nebo každým budoucím wordfreq výsledkem.
 
@@ -49,4 +49,4 @@ Pro širší snapshot nejprve načíst připnutý historický commit, který pou
 
     node tools/archive/audit_exact_covers.cjs --broad-ref 553fb3578c958004b831068dfd268dbcb2a423ab
 
-Workflow archive-content-preparation spouští stejný kontrakt a oba audity v Node. Stav testů se posuzuje až pro poslední SHA PR. Produkční spuštění vyžaduje dokončenou širší redakci, integrační adaptér, samostatnou odměnovou opravu a vizuální ověření.
+Workflow archive-content-preparation spouští stejný kontrakt a oba audity v Node. Stav testů se posuzuje až pro poslední SHA PR. Produkční spuštění vyžaduje vyřešené zbývající podmíněné jazykové případy, integrační adaptér, samostatnou odměnovou opravu a vizuální ověření.
