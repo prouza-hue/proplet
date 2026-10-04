@@ -35,7 +35,7 @@
   dialog.querySelector('#achievementDetailCondition').textContent=achievement.desc;
   const progress=dialog.querySelector('progress');progress.max=achievement.target;progress.value=Math.min(value,achievement.target);progress.hidden=achievement.group==='speed';
   const count=new Intl.NumberFormat('cs-CZ');
-  dialog.querySelector('#achievementDetailStatus').textContent=earned?'Získáno ✓':achievement.group==='speed'?'Zatím nezískáno':`${count.format(Math.min(value,achievement.target))} / ${count.format(achievement.target)} · Zatím nezískáno`;
+  dialog.querySelector('#achievementDetailStatus').textContent=earned?'Získáno':achievement.group==='speed'?'Zatím nezískáno':`${count.format(Math.min(value,achievement.target))} / ${count.format(achievement.target)} · Zatím nezískáno`;
   dialog.dataset.earned=String(earned);dialog.dataset.achievementId=id;
   // Detail deliberately reveals the full-colour drawing even for a locked achievement.
   const art=global.PropletRibbonArt?.art(achievement.name,{category:'achievement',size:192});

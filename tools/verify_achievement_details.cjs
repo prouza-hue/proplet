@@ -15,7 +15,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   const groups=await page.locator('.achievement-group-head>strong').allTextContents();assert.equal(groups[groups.indexOf('Mozkožrout')+1],'Mozkomor');assert.equal(groups[groups.indexOf('Mozkožrout')+2],'Mozkokalypsa');
   const tamer=page.locator('.achievement[data-achievement="mozkokalypsa-25"]');await tamer.tap();
   const dialog=page.locator('#achievementDetail');await page.waitForFunction(()=>document.querySelector('#achievementDetailArt img')?.naturalWidth>0);
-  assert.equal(await page.locator('#achievementDetailTitle').textContent(),'Krotitel pohromy');assert.match(await page.locator('#achievementDetailArt img').getAttribute('src'),/tamer2/);assert.equal(await page.locator('#achievementDetailStatus').textContent(),'Získáno ✓');
+  assert.equal(await page.locator('#achievementDetailTitle').textContent(),'Krotitel pohromy');assert.match(await page.locator('#achievementDetailArt img').getAttribute('src'),/tamer2/);assert.equal(await page.locator('#achievementDetailStatus').textContent(),'Získáno');
   for(const [width,height] of [[320,700],[390,844],[768,1024],[1440,1000]]){
    await page.setViewportSize({width,height});
    assert(await dialog.evaluate(d=>d.scrollWidth<=d.clientWidth+1),'no horizontal overflow');
