@@ -117,6 +117,14 @@ $('navVariant').addEventListener('click',()=>setName(!competitionName));
 $('seasonPrimary').addEventListener('click',()=>{$('seasonDialog').close();nav('daily');$('view-daily').querySelector('[data-demo-daily]').focus();});
 $('playArchiveBoard').addEventListener('click',()=>{$('boardDialog').close();info('Deska '+selectedBoard+' je vybraná.','<p>Tohle potvrzuje přímý výběr archivní desky. V nasazené hře se otevře její mřížka, bez podmínky dohrát předchozí čísla.</p>');});
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const box=d.getBoundingClientRect();if(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom)d.close();}}));
+document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('keydown',event=>{
+ if(event.key!=='Tab')return;
+ const controls=Array.from(dialog.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')).filter(node=>node.getClientRects().length);
+ if(!controls.length){event.preventDefault();return;}
+ const first=controls[0],last=controls[controls.length-1],active=document.activeElement;
+ if(event.shiftKey&&(active===first||!dialog.contains(active))){event.preventDefault();last.focus();}
+ else if(!event.shiftKey&&(active===last||!dialog.contains(active))){event.preventDefault();first.focus();}
+}));
 applyTone(query.get('tone'));setName(['competition','souteze'].includes(query.get('navLabel')||query.get('nav')));selectDifficulty(query.get('difficulty'));nav(query.get('view'));
 if(['announcement','modal'].includes(query.get('view'))||query.get('modal')==='season')$('seasonDialog').showModal();
 if(query.get('modal')==='rules'){$('seasonDetails').open=true;$('seasonDialog').showModal();}
