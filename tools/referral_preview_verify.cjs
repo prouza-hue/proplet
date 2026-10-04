@@ -13,11 +13,11 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===5);
+ await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===6);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
-async function visual(page,selector,name){const bytes=await page.locator(selector).screenshot({type:'jpeg',quality:65});fs.writeFileSync(out+'/'+name+'.jpg',bytes);console.log('PREVIEW_IMAGE:'+name+':'+bytes.toString('base64'))}
+async function visual(page,selector,name){await page.locator(selector).evaluate(el=>el.scrollIntoView({block:'center',behavior:'instant'}));const bytes=await page.locator(selector).screenshot({type:'jpeg',quality:65});fs.writeFileSync(out+'/'+name+'.jpg',bytes);console.log('PREVIEW_IMAGE:'+name+':'+bytes.toString('base64'))}
 async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.png',fullPage:true});report.screenshots.push(name);}
 (async()=>{
  const config=JSON.parse(fs.readFileSync('vercel.json','utf8'));

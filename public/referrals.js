@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const preview=window.PropletReferralPreview;if(!preview)return;
- window.PropletReferralUiRevision=5;
+ window.PropletReferralUiRevision=6;
  const m=preview.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -32,7 +32,7 @@
   if(anchor.nextElementSibling!==card)anchor.after(card);
   card.classList.toggle('ref-incoming',m.incoming);card.classList.toggle('ref-paid',m.paid);
   card.hidden=m.incoming&&rewardHidden();
-  card.innerHTML=m.incoming?(m.paid?dismissReward:'')+incomingCopy():heading('Proplet je lepší ve dvou.','Pozvi kamaráda. Založí si účet, dohraje pět desek a oba máte tisíc XP.')+'<div class="ref-action-row">'+reward+'<button class="primary-btn" data-ref-open>Pozvat kamaráda <span aria-hidden="true">↗</span></button></div><small class="ref-rule">Do celkového pořadí · bez týdenních XP hráče i týmu</small>';
+  card.innerHTML=m.incoming?(m.paid?dismissReward:'')+incomingCopy():heading('Proplet je lepší ve dvou.','Pozvi kamaráda. Založí si účet, dohraje pět desek a oba máte tisíc XP.')+'<div class="ref-action-row">'+reward+'<button class="primary-btn" data-ref-open>Pozvat kamaráda</button></div><small class="ref-rule">Do celkového pořadí · bez týdenních XP hráče i týmu</small>';
   wire(card);
  }
  function renderProfile(){
@@ -56,7 +56,7 @@
   if(m.incoming){
    card.innerHTML=lastReward?dismissReward+artwork+'<h3>Pět desek je doma!</h3><p>Tisíc pro tebe. Tisíc pro '+esc(inviterAccusative)+'.</p>'+steps(5)+reward+'<small class="ref-rule">'+rule+'</small>':artwork+'<h3>Ke společnému bonusu o desku blíž.</h3>'+steps(m.count)+'<div class="ref-progress-caption"><strong>'+m.count+' / 5 desek hotovo</strong><span>+1 000 XP pro každého</span></div><small class="ref-rule">'+rule+'</small>';
   }else{
-   card.innerHTML=artwork+'<h3>Pošli tu radost dál.</h3><p>Kamarád si založí účet a dohraje pět desek.<br><strong>Tisíc XP pro něj. Tisíc pro tebe.</strong></p><div class="ref-action-row">'+reward+'<button class="primary-btn" data-ref-open>Pozvat kamaráda <span aria-hidden="true">↗</span></button></div><small class="ref-rule">'+rule+'</small>';
+   card.innerHTML=artwork+'<h3>Pošli tu radost dál.</h3><p>Kamarád si založí účet a dohraje pět desek.<br><strong>Tisíc XP pro něj. Tisíc pro tebe.</strong></p><div class="ref-action-row">'+reward+'<button class="primary-btn" data-ref-open>Pozvat kamaráda</button></div><small class="ref-rule">'+rule+'</small>';
   }
   const challenge=document.createElement('div');challenge.className='ref-challenge';
   challenge.innerHTML='<p>Nebo pošli tuhle desku jako výzvu.</p><div id="referralWinShareSlot"></div>';
