@@ -119,6 +119,12 @@ def install_push_diagnostics(
             pass
 
     def send_one(sub: dict, payload: dict, *, event_key: str, category: str, ttl: int):
+        # Do not let a delayed/retried Daily cron double-notify release recipients.
+        if event_key == "daily:2026-10-04" and db_select(
+            "push_delivery_log", subscription_id=sub["id"],
+            event_key="content:refresh300-gen6-20261004",
+        ):
+            return "duplicate"
         delivery_id, reservation = reserve_delivery(sub, event_key, category)
         if reservation == "duplicate":
             return "duplicate"
