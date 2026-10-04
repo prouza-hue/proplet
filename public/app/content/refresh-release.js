@@ -26,6 +26,7 @@
     ownerKey = seenKey();
   }
   function eligible() {
+    if(global.PropletReferralPreview?.model.incoming===true)return false;
     try {
       return (!firstVisit || returningLogin()) && localStorage.getItem(ONBOARD_KEY) === 'done'
         && localStorage.getItem(seenKey()) !== '1'

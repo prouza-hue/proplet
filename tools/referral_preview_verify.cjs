@@ -13,11 +13,12 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4);
+ await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===5);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
-async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.png',fullPage:true});report.screenshots.push(name);if(!process.env.PREVIEW_URL&&['01-native-home','02-invitation'].includes(name))console.log('PREVIEW_IMAGE:'+name+':'+fs.readFileSync(out+'/'+name+'.png').toString('base64'))}
+async function visual(page,selector,name){const bytes=await page.locator(selector).screenshot({type:'jpeg',quality:65});fs.writeFileSync(out+'/'+name+'.jpg',bytes);console.log('PREVIEW_IMAGE:'+name+':'+bytes.toString('base64'))}
+async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.png',fullPage:true});report.screenshots.push(name);}
 (async()=>{
  const config=JSON.parse(fs.readFileSync('vercel.json','utf8'));
  assert.deepEqual(config.builds,[{use:'@vercel/static',src:'public/**'}]);
@@ -31,7 +32,7 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   const page=await context.newPage(),errors=[],requests=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>requests.push({url:r.url(),method:r.method()}));
-  await ready(page);await screenshot(page,'01-native-home');
+  await ready(page);await screenshot(page,'01-native-home');await visual(page,'#referralHome','home-inviter');
   assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);check('No unsolicited promotional modal');
   await page.locator('#referralHome [data-ref-open]').click();
   assert.match(await page.locator('#referralDialog').innerText(),/týdenních XP hráče ani týmu/);
@@ -44,6 +45,10 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   check('Invitation and progress are integrated into native Dnes and Já');
   await ready(page,'?view=new&invite=KATKA');
   assert.equal(await page.evaluate(()=>getProfile()),null);
+  assert.equal(await page.evaluate(()=>document.querySelector('#referralHome').previousElementSibling.classList.contains('daily-hero')),true);
+  assert.equal(await page.locator('#freeRefreshToday').isVisible(),false);
+  await visual(page,'#referralHome','home-new-invitee');
+  check('New invitee sees invitation directly below Daily, with no 300-board promotion');
   await page.locator('#referralHome [data-ref-accept]').click();
   await page.locator('#refCreateAccount').click();
   await page.locator('#playerNameInput').fill('Testovací Eliška');
@@ -70,10 +75,20 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(after.weeklyTeamXp-before.weeklyTeamXp,15);
   assert.match(await page.locator('#referralWin').innerText(),/Týden|týdenních/);
   await screenshot(page,'04-real-fifth-board-reward');
+  assert.equal(await page.locator('#referralHome .ref-steps .done').count(),5);
+  assert.equal(await page.locator('#referralWin #winShareBtn').count(),1);
+  await page.locator('#referralWin [data-ref-reward-close]').click();
+  await page.locator('#winMenuBtn').click();
+  assert.equal(await page.locator('#referralHome').isVisible(),false);
+  await page.locator('.bottom-nav [data-nav="profile"]').click();
+  assert.match(await page.locator('#referralProfile').innerText(),/Tisíc pro tebe/);
+  await page.locator('.bottom-nav [data-nav="daily"]').click();
+  assert.equal(await page.locator('#referralHome').isVisible(),false);
+  check('Paid reward can be dismissed; it stays hidden through navigation and remains in Já');
   assert.equal(await page.evaluate(()=>PropletReferralPreview.complete(currentGame)),false);
   assert.equal(await page.evaluate(()=>PropletReferralPreview.stats().referralBonusXp),1000);
   check('Drawing actual native board '+puzzleId+' pays both sides once; bonus excluded from weekly player/team XP');
-  await page.locator('#winMenuBtn').click();await page.locator('.bottom-nav [data-nav="leaderboard"]').click();
+  await page.locator('.bottom-nav [data-nav="leaderboard"]').click();
   await page.locator('[data-ranking-period="all"]').click();await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList')?.textContent.replace(/\s/g,'').includes('1575'));
   await screenshot(page,'05-total-ranking');
   await page.locator('[data-ranking-period="week"]').click();await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList .me .leader-score strong')?.textContent.includes('75'));
@@ -92,12 +107,38 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(await page.evaluate(()=>PropletReferralPreview.stats().referralBonusXp),1000);
   check('Native Tajenka completion counts toward the same five-board reward');
 
-  await ready(page,'?view=four&theme=dark');await screenshot(page,'06-dark-mobile');
+  await ready(page,'?view=four&theme=dark');await visual(page,'#referralHome','home-progress-dark');await screenshot(page,'06-dark-mobile');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await page.setViewportSize({width:320,height:740});await page.locator('#refPreviewControls summary').click();await screenshot(page,'07-narrow');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await page.setViewportSize({width:1440,height:1000});await ready(page);await screenshot(page,'08-desktop');
   check('Native layout supports 320px, mobile dark and desktop');
+  // Check the real result card at desktop size and preserve native challenge sharing.
+  await page.evaluate(()=>startFree('easy'));
+  await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.answers?.length);
+  const inviterPaths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
+  for(let i=0;i<inviterPaths.length;i++){await draw(page,inviterPaths[i]);await page.waitForFunction(n=>currentGame.found.length===n,i+1)}
+  await page.locator('#winModal').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelector('#referralWin #winShareBtn')?.textContent.includes('Pojď si zahrát Proplet'));
+  const box=await page.locator('#referralWin').boundingBox(),parent=await page.locator('#referralWin').evaluate(el=>el.parentElement.getBoundingClientRect().toJSON());
+  assert(box.width<=542&&Math.abs(box.x+box.width/2-parent.x-parent.width/2)<3,'result invitation is centered and constrained');
+  assert.equal(await page.locator('.win-secondary-actions #winShareBtn').count(),0);
+  await page.evaluate(()=>{window.__refNativeShare=null;Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__refNativeShare=data}})});
+  await page.locator('#referralWin #winShareBtn').click();
+  await page.waitForFunction(()=>window.__refNativeShare);
+  assert(!new URL(await page.evaluate(()=>window.__refNativeShare.url)).searchParams.has('invite'),'challenge keeps native board link rather than bonus invite');
+  assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);
+  await visual(page,'#referralWin','result-desktop');
+  await page.locator('#referralWin [data-ref-open]').click();
+  assert.equal(await page.locator('#referralDialog').isVisible(),true);
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({width:390,height:844});
+  await visual(page,'#referralWin','result-mobile');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+  await page.locator('#winMenuBtn').click();
+  await ready(page,'?view=reward');
+  await visual(page,'#referralHome','home-paid');
+  check('Both sharing routes remain distinct inside a centered illustrated result card on desktop and mobile');
   const blocked=await page.evaluate(async()=>{const r=await fetch('https://iopyhluayfszskyqqpuc.supabase.co/rest/v1/players',{method:'POST',body:'{}'});return {status:r.status,audit:PropletReferralPreview.audit}});
   assert.equal(blocked.status,403);
   const production=requests.filter(r=>/supabase\.co|hrajproplet\.cz|facebook|google-analytics/.test(new URL(r.url).hostname));

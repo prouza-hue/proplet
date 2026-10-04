@@ -43,7 +43,7 @@ jobs:
           PREVIEW_URL: https://proplet-git-preview-referrals-int-696ee2-pavel-prouzas-projects.vercel.app
         run: |
           for attempt in {1..30}; do
-            if curl -fsS "$PREVIEW_URL/referral-preview-isolation.js" | grep -q 'revision:4'; then break; fi
+            if curl -fsS "$PREVIEW_URL/referrals.js" | grep -q 'PropletReferralUiRevision=5'; then break; fi
             sleep 2
           done
           node tools/referral_preview_verify.cjs

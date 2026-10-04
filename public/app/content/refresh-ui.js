@@ -28,7 +28,7 @@
       anchor?.before(root);
     }
     const done=bank.filter(p=>completed(p.id,completions)).length,left=300-done;
-    root.hidden=bank.length!==300||!left||localStorage.getItem(releaseDismissKey())==='1';
+    root.hidden=global.PropletReferralPreview?.model.incoming===true||bank.length!==300||!left||localStorage.getItem(releaseDismissKey())==='1';
     root.innerHTML='<div class="refresh-entry-art" aria-hidden="true">'+
       '<img src="/difficulty/printshop/easy.webp" width="52" height="52" alt="">'+
       '<img src="/difficulty/printshop/medium.webp" width="52" height="52" alt="">'+
