@@ -120,7 +120,9 @@
                 5
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -191,7 +193,9 @@
                 10
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -348,7 +352,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -437,7 +443,9 @@
                 29
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -608,7 +616,9 @@
                 6
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -673,7 +683,9 @@
                 13
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -866,7 +878,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": false,
@@ -997,7 +1011,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": true,
@@ -1068,7 +1084,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -1159,7 +1177,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -1333,7 +1353,9 @@
                 33
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -1399,7 +1421,9 @@
                 30
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -1590,7 +1614,9 @@
                 24
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -1656,7 +1682,9 @@
                 26
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -1803,7 +1831,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -1888,7 +1918,9 @@
                 29
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -2036,7 +2068,9 @@
                 31
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -2144,7 +2178,9 @@
                 31
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -2337,7 +2373,9 @@
                 2
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -2406,7 +2444,9 @@
                 7
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -2577,7 +2617,9 @@
                 7
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": true,
@@ -2642,7 +2684,9 @@
                 13
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -2793,7 +2837,9 @@
                 6
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -2901,7 +2947,9 @@
                 6
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": false,
@@ -3012,7 +3060,9 @@
                 13
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": false,
@@ -3123,7 +3173,9 @@
                 6
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -3276,7 +3328,9 @@
                 10
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -3359,7 +3413,9 @@
                 10
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -3505,7 +3561,9 @@
                 3
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -3589,7 +3647,9 @@
                 0
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -3781,7 +3841,9 @@
                 32
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -3851,7 +3913,9 @@
                 27
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -4011,7 +4075,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -4101,7 +4167,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -4258,7 +4326,9 @@
                 10
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -4345,7 +4415,9 @@
                 4
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -4499,7 +4571,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -4587,7 +4661,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -4744,7 +4820,9 @@
                 21
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -4833,7 +4911,9 @@
                 15
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -4992,7 +5072,9 @@
                 3
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -5085,7 +5167,9 @@
                 0
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -5239,7 +5323,9 @@
                 26
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -5341,7 +5427,9 @@
                 26
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -5493,7 +5581,9 @@
                 7
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -5607,7 +5697,9 @@
                 14
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -5807,7 +5899,9 @@
                 23
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -5877,7 +5971,9 @@
                 21
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -6029,7 +6125,9 @@
                 28
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -6135,7 +6233,9 @@
                 28
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -6289,7 +6389,9 @@
                 12
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -6404,7 +6506,9 @@
                 12
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -6565,7 +6669,9 @@
                 31
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -6656,7 +6762,9 @@
                 31
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -6836,7 +6944,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -6949,7 +7059,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -7173,7 +7285,9 @@
                 49
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -7267,7 +7381,9 @@
                 49
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -7381,7 +7497,9 @@
                 49
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -7614,7 +7732,9 @@
                 7
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -7715,7 +7835,9 @@
                 14
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -7927,7 +8049,9 @@
                 4
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -8039,7 +8163,9 @@
                 1
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -8287,7 +8413,9 @@
                 58
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -8380,7 +8508,9 @@
                 53
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -8611,7 +8741,9 @@
                 24
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -8711,7 +8843,9 @@
                 32
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -8831,7 +8965,9 @@
                 32
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -9077,7 +9213,9 @@
                 5
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -9185,7 +9323,9 @@
                 13
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -9313,7 +9453,9 @@
                 13
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -9599,7 +9741,9 @@
                 70
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -9712,7 +9856,9 @@
                 67
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -9974,7 +10120,9 @@
                 60
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -10084,7 +10232,9 @@
                 68
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -10328,7 +10478,9 @@
                 56
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -10463,7 +10615,9 @@
                 56
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -10707,7 +10861,9 @@
                 80
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -10836,7 +10992,9 @@
                 80
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -11122,7 +11280,9 @@
                 79
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": false,
@@ -11277,7 +11437,9 @@
                 79
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -11394,7 +11556,9 @@
                 79
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -11683,7 +11847,9 @@
                 52
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -11797,7 +11963,9 @@
                 48
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -12040,7 +12208,9 @@
                 21
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -12169,7 +12339,9 @@
                 21
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -12424,7 +12596,9 @@
                 74
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -12571,7 +12745,9 @@
                 74
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -12842,7 +13018,9 @@
                 67
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -13009,7 +13187,9 @@
                 67
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -13273,7 +13453,9 @@
                 57
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -13415,7 +13597,9 @@
                 57
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -13699,7 +13883,9 @@
                 67
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -13825,7 +14011,9 @@
                 76
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -14099,7 +14287,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -14248,7 +14438,9 @@
                 34
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -14537,7 +14729,9 @@
                 51
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -14657,7 +14851,9 @@
                 51
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -14958,7 +15154,9 @@
                 61
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -15080,7 +15278,9 @@
                 61
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -15394,7 +15594,9 @@
                 58
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": false,
@@ -15541,7 +15743,9 @@
                 67
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -15671,7 +15875,9 @@
                 76
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -15969,7 +16175,9 @@
                 22
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -16095,7 +16303,9 @@
                 24
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -16372,7 +16582,9 @@
                 14
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -16519,7 +16731,9 @@
                 6
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -16801,7 +17015,9 @@
                 41
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -16975,7 +17191,9 @@
                 65
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -17260,7 +17478,9 @@
                 62
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -17414,7 +17634,9 @@
                 62
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -17701,7 +17923,9 @@
                 70
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -17854,7 +18078,9 @@
                 70
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -18161,7 +18387,9 @@
                 74
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": true,
@@ -18294,7 +18522,9 @@
                 47
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -18597,7 +18827,9 @@
                 49
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": false,
@@ -18745,7 +18977,9 @@
                 59
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -18873,7 +19107,9 @@
                 49
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -19177,7 +19413,9 @@
                 23
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": true,
@@ -19313,7 +19551,9 @@
                 23
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -19604,7 +19844,9 @@
                 54
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -19759,7 +20001,9 @@
                 55
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -20088,7 +20332,9 @@
                 53
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": false,
@@ -20242,7 +20488,9 @@
                 35
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": false,
@@ -20395,7 +20643,9 @@
                 53
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": true,
@@ -20527,7 +20777,9 @@
                 35
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -20811,7 +21063,9 @@
                 52
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -20959,7 +21213,9 @@
                 52
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -21247,7 +21503,9 @@
                 66
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -21404,7 +21662,9 @@
                 66
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -21744,7 +22004,9 @@
                 25
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": false,
@@ -21926,7 +22188,9 @@
                 35
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -22066,7 +22330,9 @@
                 21
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -22380,7 +22646,9 @@
                 59
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": true,
@@ -22512,7 +22780,9 @@
                 59
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -22820,7 +23090,9 @@
                 98
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": true,
@@ -22955,7 +23227,9 @@
                 98
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -23270,7 +23544,9 @@
                 95
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -23407,7 +23683,9 @@
                 93
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -23724,7 +24002,9 @@
                 75
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": true,
@@ -23863,7 +24143,9 @@
                 75
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -24158,7 +24440,9 @@
                 68
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -24314,7 +24598,9 @@
                 68
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -24611,7 +24897,9 @@
                 48
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -24772,7 +25060,9 @@
                 48
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -25079,7 +25369,9 @@
                 9
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -25244,7 +25536,9 @@
                 9
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -25569,7 +25863,9 @@
                 96
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -25710,7 +26006,9 @@
                 86
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -26012,7 +26310,9 @@
                 48
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -26171,7 +26471,9 @@
                 48
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -26492,7 +26794,9 @@
                 96
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -26635,7 +26939,9 @@
                 96
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -26956,7 +27262,9 @@
                 60
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         },
         {
           "canonical": true,
@@ -27092,7 +27400,9 @@
                 60
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -27408,7 +27718,9 @@
                 84
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -27547,7 +27859,9 @@
                 84
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -27703,7 +28017,9 @@
                 84
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -28022,7 +28338,9 @@
                 80
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -28159,7 +28477,9 @@
                 80
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -28481,7 +28801,9 @@
                 91
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -28623,7 +28945,9 @@
                 91
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -28921,7 +29245,9 @@
                 5
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -29077,7 +29403,9 @@
                 5
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -29394,7 +29722,9 @@
                 65
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -29536,7 +29866,9 @@
                 76
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -29853,7 +30185,9 @@
                 2
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -29989,7 +30323,9 @@
                 2
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -30290,7 +30626,9 @@
                 76
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -30454,7 +30792,9 @@
                 86
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -30770,7 +31110,9 @@
                 77
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -30903,7 +31245,9 @@
                 78
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -31216,7 +31560,9 @@
                 64
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": true,
@@ -31355,7 +31701,9 @@
                 64
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -31654,7 +32002,9 @@
                 83
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -31813,7 +32163,9 @@
                 83
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -32128,7 +32480,9 @@
                 76
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         },
         {
           "canonical": true,
@@ -32262,7 +32616,9 @@
                 76
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -32550,7 +32906,9 @@
                 72
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -32703,7 +33061,9 @@
                 72
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -33000,7 +33360,9 @@
                 69
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -33163,7 +33525,9 @@
                 69
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "needs-review",
+          "projectPreparationDecision": "pending"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -33463,7 +33827,9 @@
                 0
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         },
         {
           "canonical": false,
@@ -33617,7 +33983,9 @@
                 0
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "approve",
+          "projectPreparationDecision": "approve"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
@@ -33936,7 +34304,9 @@
                 89
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "reject",
+          "projectPreparationDecision": "reject"
         },
         {
           "canonical": true,
@@ -34079,7 +34449,9 @@
                 89
               ]
             }
-          ]
+          ],
+          "editorialRecommendation": "canonical-retained",
+          "projectPreparationDecision": "canonical-retained"
         }
       ],
       "decision": "Only explicitly published approved solutionSets may be accepted. All broad candidates remain recorded for review; do not silently replace or drop reward slot.",
