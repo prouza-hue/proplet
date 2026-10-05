@@ -126,3 +126,16 @@ new/stored/denied/expired consent, fail-closed URL gates, SDK load/error callbac
 withdrawal, UI readiness, and no historical registration replay. Production receipt and
 conversion attribution remain checks against genuine new players after deployment;
 no synthetic production accounts or advertising events are created for this check.
+
+## Paid landing URL repair, 6 October 2026
+
+After valid marketing consent, ordinary production game landings now remove unknown
+query parameters using `history.replaceState` before the Pixel SDK is inserted.
+The existing UTM fields, `fbclid`, `open`, navigation history state and a bounded
+numeric `styleRetry` counter are preserved. No reload is required. If URL cleanup
+fails, the Pixel remains disabled; unknown parameter names or values are not logged.
+OAuth URLs/fragments, previews, QA controls and application deep links retain their
+existing fail-closed behavior and are not rewritten. Registration semantics and
+deduplication remain unchanged; there is no replay of missed historical events.
+The repair is covered by the existing isolated marketing/attribution contracts.
+Future genuine Meta receipt and attribution are verified separately from SDK load.

@@ -6,16 +6,30 @@
   // Dedicated Proplet dataset; never reuse the historical client pixel.
   const PIXEL_ID = '1379409957596561';
   const MARKETING_GATES = new Set(['eligible', 'unknown_parameter', 'auth_url', 'nonproduction', 'non_game_path']);
+  const PIXEL_URL_PARAMS = new Set(['fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'open', 'styleRetry']);
+  // Leave application deep links and QA controls intact rather than stripping them.
+  const APP_URL_PARAMS = new Set(['play', 'kind', 'date', 't', 'h', 'm', 'via', 'tutorial', 'qa', 'content_preview', 'releasePreview']);
 
   function pixelGate(href, {environment, candidatePreview, pixelId = PIXEL_ID} = {}) {
     try {
       const url = new URL(href);
       if (!/^\d+$/.test(pixelId) || url.protocol !== 'https:' || url.hostname !== 'hrajproplet.cz' || environment === 'preview' || candidatePreview) return 'nonproduction';
       if (!['/', '/index.html'].includes(url.pathname)) return 'non_game_path';
-      if (url.hash || ['auth', 'challenge', 'access_token', 'token', 'code', 'state', 'password'].some(key => url.searchParams.has(key))) return 'auth_url';
-      if ([...url.searchParams.keys()].some(key => !['fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'open'].includes(key))) return 'unknown_parameter';
+      if (url.hash || [...url.searchParams.keys()].some(key => ['auth', 'challenge', 'access_token', 'refresh_token', 'id_token', 'token', 'code', 'state', 'password'].includes(key.toLowerCase()))) return 'auth_url';
+      if (url.searchParams.getAll('styleRetry').some(value => !/^[1-9]\d{0,2}$/.test(value))) return 'unknown_parameter';
+      if ([...url.searchParams.keys()].some(key => !PIXEL_URL_PARAMS.has(key))) return 'unknown_parameter';
       return 'eligible';
     } catch {return 'nonproduction';}
+  }
+
+  function cleanPixelLanding(href, options) {
+    const state = pixelGate(href, options);
+    if (!['eligible', 'unknown_parameter'].includes(state)) return null;
+    const url = new URL(href);
+    if (url.searchParams.getAll('styleRetry').some(value => !/^[1-9]\d{0,2}$/.test(value))) return null;
+    if ([...url.searchParams.keys()].some(key => APP_URL_PARAMS.has(key))) return null;
+    for (const key of [...url.searchParams.keys()]) if (!PIXEL_URL_PARAMS.has(key)) url.searchParams.delete(key);
+    return url.href;
   }
 
   function create({storage, now = Date.now, enabled = () => false, gate = () => enabled() ? 'eligible' : 'nonproduction', diagnose = () => {}, load, send, revoke}) {
@@ -32,9 +46,11 @@
       try {const state = gate(); diagnose(name, MARKETING_GATES.has(state) ? state : 'nonproduction');} catch {}
     }
     function start() {
+      // Prepare the public landing URL only after consent, before diagnostics/SDK.
+      const isAllowed = allowed();
       // This first-party signal records an opted-in visit, not Meta receipt.
       if (consented() && !measurementNoted) {measurementNoted = true; diagnostic('marketing_measurement_ready');}
-      if (!allowed()) return;
+      if (!isAllowed) return;
       try {
         load(); loaded = true;
         if (!pageViewed) {send('PageView', {}, true); pageViewed = true;}
@@ -82,7 +98,7 @@
     return {start, choose, event, registration, allowed, consented, status: () => consent?.value || null};
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = {create, pixelGate, CONSENT_KEY, EVENTS_KEY};
+  if (typeof module !== 'undefined' && module.exports) module.exports = {create, pixelGate, cleanPixelLanding, CONSENT_KEY, EVENTS_KEY};
   if (!global?.document) return;
   const doc = global.document;
   let storage;
@@ -90,7 +106,16 @@
   function gate() {
     return pixelGate(global.location.href, {environment:global.PROPLET_RUNTIME_ENV, candidatePreview:global.PROPLET_RUNTIME_META?.gen5CandidatePreview});
   }
-  function enabled() {return gate() === 'eligible';}
+  function enabled() {
+    if (gate() === 'eligible') return true;
+    const clean = cleanPixelLanding(global.location.href, {environment:global.PROPLET_RUNTIME_ENV, candidatePreview:global.PROPLET_RUNTIME_META?.gen5CandidatePreview});
+    if (!clean) return false;
+    try {
+      // Pixel reads location itself. Never enable it against the unfiltered URL.
+      global.history.replaceState(global.history.state, '', clean);
+      return gate() === 'eligible';
+    } catch {return false;}
+  }
   function diagnose(name, state) {
     try {if (typeof global.trackProductEvent === 'function') global.trackProductEvent(name, {marketingGate:state});} catch {}
   }

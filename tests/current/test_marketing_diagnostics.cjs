@@ -24,12 +24,13 @@ for(const [url,expected] of [
 assert.equal(pixelGate('https://hrajproplet.cz/',{environment:'preview'}),'nonproduction');
 
 const source=fs.readFileSync('public/app/marketing.js','utf8').replace(/const PIXEL_ID = '[^']*';/,"const PIXEL_ID = '12345';");
-function browser({consent,ready=false,url='https://hrajproplet.cz/',telemetryThrows=false}={}){
+function browser({consent,ready=false,url='https://hrajproplet.cz/',telemetryThrows=false,historyThrows=false}={}){
  const store=memory();if(consent)store.setItem(CONSENT_KEY,JSON.stringify({value:consent,at:Date.now()}));
  const scripts=[],notices=[],events=[],timers=[],listeners=new Map();
  const document={readyState:'complete',head:{appendChild:script=>scripts.push(script)},body:{appendChild:notice=>notices.push(notice)},createElement:()=>({setAttribute(){},addEventListener(){},hidden:false}),querySelectorAll:()=>[]};
  const window={document,location:new URL(url),localStorage:store,__PROPLET_CURRENT_UI_READY:ready,
   trackProductEvent:(name,properties)=>{if(telemetryThrows)throw Error('storage unavailable');events.push({name,properties})},addEventListener:(name,fn)=>listeners.set(name,fn),setTimeout:(fn,delay)=>{timers.push({fn,delay});return timers.length},clearTimeout(){}};
+ window.history={state:{screen:'daily'},replaceState(state,title,href){if(historyThrows)throw Error('history unavailable');assert.equal(state,this.state);window.location=new URL(href)}};
  vm.runInNewContext(source,{window,URL,Date});return {window,scripts,notices,events,timers,listeners};
 }
 const waiting=browser();assert.equal(waiting.timers.length,0,'banner waits for actual UI readiness');assert.equal(waiting.scripts.length,0);assert.equal(waiting.events.length,0);
@@ -44,7 +45,13 @@ assert(!opted.events.some(row=>/received|receipt|delivered/.test(row.name)),'scr
 const failed=browser({consent:'granted'});failed.scripts[0].onerror();assert.equal(failed.events.at(-1).name,'marketing_sdk_failed');
 const noTelemetry=browser({consent:'granted',telemetryThrows:true});assert.equal(noTelemetry.scripts.length,1,'a diagnostic failure must not suppress the opted-in Pixel');assert.doesNotThrow(()=>noTelemetry.scripts[0].onload());assert.doesNotThrow(()=>noTelemetry.scripts[0].onerror());
 const revoked=browser({consent:'granted'});revoked.window.PropletMarketing.choose('denied');revoked.scripts[0].onload();revoked.scripts[0].onerror();assert.equal(revoked.events.length,1,'SDK callbacks after withdrawal cannot create marketing diagnostics');
-const blocked=browser({consent:'granted',url:'https://hrajproplet.cz/?igsh=private'});assert.equal(blocked.scripts.length,0);assert.equal(blocked.events[0].properties.marketingGate,'unknown_parameter');assert(!JSON.stringify(blocked.events).includes('private'));
+const landing='https://hrajproplet.cz/?utm_source=ig&utm_medium=paid_social&utm_campaign=52561604329109&utm_content=52562644428109&utm_term=52561604328909&fbclid=opaque&igsh=private&extra=private';
+const repaired=browser({consent:'granted',url:landing});assert.equal(repaired.scripts.length,1);assert.equal(repaired.events[0].properties.marketingGate,'eligible');assert(!repaired.window.location.href.includes('private'));assert.equal(repaired.window.location.searchParams.get('fbclid'),'opaque');assert.equal(repaired.window.location.searchParams.get('utm_content'),'52562644428109');
+const bootRetry=browser({consent:'granted',url:landing+'&styleRetry=1'});assert.equal(bootRetry.scripts.length,1);assert.equal(bootRetry.window.location.searchParams.get('styleRetry'),'1','retain the genuine boot retry counter');
+repaired.window.PropletMarketing.registration({id:'actual-new-fixture',accountCreated:true});repaired.window.PropletMarketing.registration({id:'actual-new-fixture',accountCreated:true});assert.equal(repaired.window.fbq.queue.filter(args=>args[2]==='CompleteRegistration').length,1,'cleaned landing retains real-new-account deduplication');
+for(const consent of [undefined,'denied']){const untouched=browser({consent,url:landing});assert.equal(untouched.window.location.href,landing);assert.equal(untouched.scripts.length,0);assert.equal(untouched.events.length,0);}
+for(const suffix of ['&auth=google#access_token=private','&Token=private','&refresh_token=private','&tutorial=1','&play=shared-board']){const protectedUrl=landing+suffix;const protectedPage=browser({consent:'granted',url:protectedUrl});assert.equal(protectedPage.scripts.length,0);assert.equal(protectedPage.window.location.href,protectedUrl);}
+const blocked=browser({consent:'granted',url:landing,historyThrows:true});assert.equal(blocked.scripts.length,0);assert.equal(blocked.events[0].properties.marketingGate,'unknown_parameter');assert(!JSON.stringify(blocked.events).includes('private'));
 assert.equal(browser({consent:'denied'}).events.length,0);
 
 const theme=fs.readFileSync('public/theme-init.js','utf8');const fragment=theme.slice(theme.indexOf('    window.__PROPLET_REVEAL_CURRENT_UI=()=>{'),theme.indexOf('    let readyChecks='));
