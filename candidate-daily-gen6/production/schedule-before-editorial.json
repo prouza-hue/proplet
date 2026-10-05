@@ -1,0 +1,907 @@
+{
+  "schemaVersion": 1,
+  "bankVersion": "daily-gen6-20261007-v1",
+  "timeZone": "Europe/Prague",
+  "bindings": [
+    {
+      "dailyDate": "2026-10-07",
+      "difficulty": "medium",
+      "profileOrdinal": 19,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261007",
+      "challengeKey": "daily:2026-10-07",
+      "contentHash": "6abbda2b62fb1a2dc2fc609aca7322c1e9ef24a60e77a0b486ca8385c2f72996"
+    },
+    {
+      "dailyDate": "2026-10-08",
+      "difficulty": "medium",
+      "profileOrdinal": 20,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261008",
+      "challengeKey": "daily:2026-10-08",
+      "contentHash": "e29f7da8bebbcb4312303ae601f06d6a1b6462ebb10c63e76709dc0aac2c52bc"
+    },
+    {
+      "dailyDate": "2026-10-09",
+      "difficulty": "medium",
+      "profileOrdinal": 21,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261009",
+      "challengeKey": "daily:2026-10-09",
+      "contentHash": "1ec31d5a556e56c5fb435ad852d53af0cf1b635972c58a193bf4bc8c1b17fd97"
+    },
+    {
+      "dailyDate": "2026-10-10",
+      "difficulty": "hard",
+      "profileOrdinal": 13,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261010",
+      "challengeKey": "daily:2026-10-10",
+      "contentHash": "10ac6ee77e9b604c931421717831bde0ef893771c2c91b670de479ac5f51cd7d"
+    },
+    {
+      "dailyDate": "2026-10-11",
+      "difficulty": "hard",
+      "profileOrdinal": 14,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261011",
+      "challengeKey": "daily:2026-10-11",
+      "contentHash": "a62e7782e90a7c55974756836b75362a196ef12c095140f93fd6d7ecd811a631"
+    },
+    {
+      "dailyDate": "2026-10-12",
+      "difficulty": "easy",
+      "profileOrdinal": 15,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261012",
+      "challengeKey": "daily:2026-10-12",
+      "contentHash": "1a0316f50458ebb8977a2903c5db6fbd56813d98789079f85375df6791ccb5ef"
+    },
+    {
+      "dailyDate": "2026-10-13",
+      "difficulty": "easy",
+      "profileOrdinal": 16,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261013",
+      "challengeKey": "daily:2026-10-13",
+      "contentHash": "fecdf96c5dc57ba3ed6972c2e5bf73d956b48e97c5271b79f0811ce4499a11b9"
+    },
+    {
+      "dailyDate": "2026-10-14",
+      "difficulty": "medium",
+      "profileOrdinal": 22,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261014",
+      "challengeKey": "daily:2026-10-14",
+      "contentHash": "0d5e6c9693763063fd9139e74a7e963a91f97e1a3cc8e3e5f62e67e7711abefd"
+    },
+    {
+      "dailyDate": "2026-10-15",
+      "difficulty": "medium",
+      "profileOrdinal": 23,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261015",
+      "challengeKey": "daily:2026-10-15",
+      "contentHash": "5e438899c39e4cdf70ae75b0262b1907f6591fafed582eb03ff4d00082247232"
+    },
+    {
+      "dailyDate": "2026-10-16",
+      "difficulty": "medium",
+      "profileOrdinal": 24,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261016",
+      "challengeKey": "daily:2026-10-16",
+      "contentHash": "ef0175942e7bc90df77a21c990c4ca93ddcb01e6e6428c0a754cadb259e2aac4"
+    },
+    {
+      "dailyDate": "2026-10-17",
+      "difficulty": "hard",
+      "profileOrdinal": 15,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261017",
+      "challengeKey": "daily:2026-10-17",
+      "contentHash": "02778d9edbdb7483aac4cd2a499422bfeb4175c31604b0f985ddc98529a432af"
+    },
+    {
+      "dailyDate": "2026-10-18",
+      "difficulty": "hard",
+      "profileOrdinal": 16,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261018",
+      "challengeKey": "daily:2026-10-18",
+      "contentHash": "5280605f2b51bdb90ffc25c0ed35e4a2a74f5b9e4edfbfe85b122f11f3525564"
+    },
+    {
+      "dailyDate": "2026-10-19",
+      "difficulty": "easy",
+      "profileOrdinal": 17,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261019",
+      "challengeKey": "daily:2026-10-19",
+      "contentHash": "1852262d7fa7f7cb5013bdee3791908ab612fed1920c94585c1a69eea5f3c435"
+    },
+    {
+      "dailyDate": "2026-10-20",
+      "difficulty": "easy",
+      "profileOrdinal": 18,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261020",
+      "challengeKey": "daily:2026-10-20",
+      "contentHash": "7ebaee17db58abce1ff35e3e7393355c0f76ee356dc99cec3e4622f11577dffe"
+    },
+    {
+      "dailyDate": "2026-10-21",
+      "difficulty": "medium",
+      "profileOrdinal": 25,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261021",
+      "challengeKey": "daily:2026-10-21",
+      "contentHash": "1652387204f03a0739d8562f540dee4e8bce672ad962731e8c1a3d85b04a94b3"
+    },
+    {
+      "dailyDate": "2026-10-22",
+      "difficulty": "medium",
+      "profileOrdinal": 26,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261022",
+      "challengeKey": "daily:2026-10-22",
+      "contentHash": "04f02f81696dfa6504930fcd00b7b988231d06b1d1da92bc95366aa173f71152"
+    },
+    {
+      "dailyDate": "2026-10-23",
+      "difficulty": "medium",
+      "profileOrdinal": 27,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261023",
+      "challengeKey": "daily:2026-10-23",
+      "contentHash": "1c38c7445454e48ca8845d2ba9357fdc2a476469fd8e2a9f222d086411861ef0"
+    },
+    {
+      "dailyDate": "2026-10-24",
+      "difficulty": "hard",
+      "profileOrdinal": 17,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261024",
+      "challengeKey": "daily:2026-10-24",
+      "contentHash": "18073242edf0fee2e9047ebd49f839a7bcc7a29dd05f7e876f06e3f793456e0d"
+    },
+    {
+      "dailyDate": "2026-10-25",
+      "difficulty": "hard",
+      "profileOrdinal": 18,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261025",
+      "challengeKey": "daily:2026-10-25",
+      "contentHash": "d0707c4416f833e7df8f93bf96d03831f9341d3a4a9f678024da3598fdc52f5d"
+    },
+    {
+      "dailyDate": "2026-10-26",
+      "difficulty": "easy",
+      "profileOrdinal": 19,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261026",
+      "challengeKey": "daily:2026-10-26",
+      "contentHash": "adc28cf5db7f6f4eed9f7d15ff019bd2cc9ec76b64417461e53ff0419d506d9c"
+    },
+    {
+      "dailyDate": "2026-10-27",
+      "difficulty": "easy",
+      "profileOrdinal": 20,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261027",
+      "challengeKey": "daily:2026-10-27",
+      "contentHash": "d050b87a3d0f542a7e59f478f5ac9c72fbee024fc6081d1e398a1dfc8c3c74e1"
+    },
+    {
+      "dailyDate": "2026-10-28",
+      "difficulty": "medium",
+      "profileOrdinal": 28,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261028",
+      "challengeKey": "daily:2026-10-28",
+      "contentHash": "13833bad3f57fcb222d57193924998832f347dbd5c169ac86167e34475584f3e"
+    },
+    {
+      "dailyDate": "2026-10-29",
+      "difficulty": "medium",
+      "profileOrdinal": 29,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261029",
+      "challengeKey": "daily:2026-10-29",
+      "contentHash": "aad28577fbd3f2dc0612c249e72d8d62deb555f323aaedc6ee0f9379c0524100"
+    },
+    {
+      "dailyDate": "2026-10-30",
+      "difficulty": "medium",
+      "profileOrdinal": 30,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261030",
+      "challengeKey": "daily:2026-10-30",
+      "contentHash": "a69fdac122594e745808452dbb9050b4b928c18ab7eb2cd430c5fb7e7faac94f"
+    },
+    {
+      "dailyDate": "2026-10-31",
+      "difficulty": "hard",
+      "profileOrdinal": 19,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261031",
+      "challengeKey": "daily:2026-10-31",
+      "contentHash": "5daf628d0f613486fd38642caeba6f81375cb72de8b93bd245019230066ada93"
+    },
+    {
+      "dailyDate": "2026-11-01",
+      "difficulty": "hard",
+      "profileOrdinal": 20,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261101",
+      "challengeKey": "daily:2026-11-01",
+      "contentHash": "1c05306828be38d86a9c94f5a112b22f9bfadc98363288c9dd304e92f5bcdb60"
+    },
+    {
+      "dailyDate": "2026-11-02",
+      "difficulty": "easy",
+      "profileOrdinal": 21,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261102",
+      "challengeKey": "daily:2026-11-02",
+      "contentHash": "8f3801d5886aed813350cc84d078f9e315baf462d628b9bf54d04c42f14a064b"
+    },
+    {
+      "dailyDate": "2026-11-03",
+      "difficulty": "easy",
+      "profileOrdinal": 22,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261103",
+      "challengeKey": "daily:2026-11-03",
+      "contentHash": "64113e3dd1b4e05683a0334c91305c21a388167768c03b450cfec35503f01cfd"
+    },
+    {
+      "dailyDate": "2026-11-04",
+      "difficulty": "medium",
+      "profileOrdinal": 31,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261104",
+      "challengeKey": "daily:2026-11-04",
+      "contentHash": "5c69197361d262e77a7e97e827c21b549e8b9e4b32833f2b3b5932c5b7000e0a"
+    },
+    {
+      "dailyDate": "2026-11-05",
+      "difficulty": "medium",
+      "profileOrdinal": 32,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261105",
+      "challengeKey": "daily:2026-11-05",
+      "contentHash": "1059252b2daad3e985458c5948821d8cfc8990d19fdf7590b5d0935b8a985e83"
+    },
+    {
+      "dailyDate": "2026-11-06",
+      "difficulty": "medium",
+      "profileOrdinal": 33,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261106",
+      "challengeKey": "daily:2026-11-06",
+      "contentHash": "c31fd17cf1022a77b33bc1efffd8bf76165087c5407d9e1d3ebaba224c6dcf37"
+    },
+    {
+      "dailyDate": "2026-11-07",
+      "difficulty": "hard",
+      "profileOrdinal": 21,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261107",
+      "challengeKey": "daily:2026-11-07",
+      "contentHash": "01eb859397128c3b6de9f90086c43efc0f64d64ed8e68cba25cf048b521d6b5b"
+    },
+    {
+      "dailyDate": "2026-11-08",
+      "difficulty": "hard",
+      "profileOrdinal": 22,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261108",
+      "challengeKey": "daily:2026-11-08",
+      "contentHash": "d2d965f62e870d57697437b572911f8d451e9de13dffb8201b66faf402d92a45"
+    },
+    {
+      "dailyDate": "2026-11-09",
+      "difficulty": "easy",
+      "profileOrdinal": 23,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261109",
+      "challengeKey": "daily:2026-11-09",
+      "contentHash": "6d77d1ab4204cad0c2d9c7af8ff1dd0870fd44931c04c563d790a3b320d871d5"
+    },
+    {
+      "dailyDate": "2026-11-10",
+      "difficulty": "easy",
+      "profileOrdinal": 24,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261110",
+      "challengeKey": "daily:2026-11-10",
+      "contentHash": "21c8d19f138d9fa98ac0f84d489f8183f1e894f79f84b239f399109aa3843e4f"
+    },
+    {
+      "dailyDate": "2026-11-11",
+      "difficulty": "medium",
+      "profileOrdinal": 34,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261111",
+      "challengeKey": "daily:2026-11-11",
+      "contentHash": "8cd7b243e2b0ee7bb4b32297c77703f2efde09de3b438afcfa0a4a6e7d3a8e2b"
+    },
+    {
+      "dailyDate": "2026-11-12",
+      "difficulty": "medium",
+      "profileOrdinal": 35,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261112",
+      "challengeKey": "daily:2026-11-12",
+      "contentHash": "1043fde2419b54b68693d95959c248d76c3c537d01cfbc7798255bd74d4edd5c"
+    },
+    {
+      "dailyDate": "2026-11-13",
+      "difficulty": "medium",
+      "profileOrdinal": 36,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261113",
+      "challengeKey": "daily:2026-11-13",
+      "contentHash": "6521cef19aa5bb813b24e4af65f79f98def937f6cc2921b4a5aa6100b7704540"
+    },
+    {
+      "dailyDate": "2026-11-14",
+      "difficulty": "hard",
+      "profileOrdinal": 23,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261114",
+      "challengeKey": "daily:2026-11-14",
+      "contentHash": "022a2c9a89abdcee02c971aa5015ef21f6894d45dcb72dda26eb1838617da3ce"
+    },
+    {
+      "dailyDate": "2026-11-15",
+      "difficulty": "hard",
+      "profileOrdinal": 24,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261115",
+      "challengeKey": "daily:2026-11-15",
+      "contentHash": "b9494e3902a3429ab5efa27b273ab7e2763c14c99592de12227f1caa3218c984"
+    },
+    {
+      "dailyDate": "2026-11-16",
+      "difficulty": "easy",
+      "profileOrdinal": 25,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261116",
+      "challengeKey": "daily:2026-11-16",
+      "contentHash": "36ffcb0c77b0cfdbf5ab258ebbb99f722efa8ab3077b08d4fde5107fd69659c3"
+    },
+    {
+      "dailyDate": "2026-11-17",
+      "difficulty": "easy",
+      "profileOrdinal": 26,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261117",
+      "challengeKey": "daily:2026-11-17",
+      "contentHash": "220b172e2a27b3066c0d0353a245a56fcfec3db81899c1a33b1301020c84eace"
+    },
+    {
+      "dailyDate": "2026-11-18",
+      "difficulty": "medium",
+      "profileOrdinal": 37,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261118",
+      "challengeKey": "daily:2026-11-18",
+      "contentHash": "3b7426c8c6717500305ba966e40ae062fdcc1a71ca6785ff83174c873b8d42eb"
+    },
+    {
+      "dailyDate": "2026-11-19",
+      "difficulty": "medium",
+      "profileOrdinal": 38,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261119",
+      "challengeKey": "daily:2026-11-19",
+      "contentHash": "7ce6f2e9483da1b61e33d8053ea023ebf7d6fd6af0f13f69479a6f81ee3b51a0"
+    },
+    {
+      "dailyDate": "2026-11-20",
+      "difficulty": "medium",
+      "profileOrdinal": 39,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261120",
+      "challengeKey": "daily:2026-11-20",
+      "contentHash": "d1db9443fa41b950d4e0dc5b27f07743533523591fa50374f955caddb9016c51"
+    },
+    {
+      "dailyDate": "2026-11-21",
+      "difficulty": "hard",
+      "profileOrdinal": 25,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261121",
+      "challengeKey": "daily:2026-11-21",
+      "contentHash": "1bcbba08a4c92a047d69ac03701c46bcf634da7c15bd1c3b50719daf2707cd71"
+    },
+    {
+      "dailyDate": "2026-11-22",
+      "difficulty": "hard",
+      "profileOrdinal": 26,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261122",
+      "challengeKey": "daily:2026-11-22",
+      "contentHash": "a157a8843028bc3c4cfcb0ddde2b5b7dea4ac08219de685abb50852a7ab3e183"
+    },
+    {
+      "dailyDate": "2026-11-23",
+      "difficulty": "easy",
+      "profileOrdinal": 27,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261123",
+      "challengeKey": "daily:2026-11-23",
+      "contentHash": "ebbb0e7ced30294945c499c203e038ed6f65bf9d8b5e55d4615b684382c35455"
+    },
+    {
+      "dailyDate": "2026-11-24",
+      "difficulty": "easy",
+      "profileOrdinal": 28,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261124",
+      "challengeKey": "daily:2026-11-24",
+      "contentHash": "f63fda34cf2b57c2e065fedf7f961b9441cdd1a3f3b51e81801eb5c8b33e655b"
+    },
+    {
+      "dailyDate": "2026-11-25",
+      "difficulty": "medium",
+      "profileOrdinal": 40,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261125",
+      "challengeKey": "daily:2026-11-25",
+      "contentHash": "9c0efa14a6a863102191a837139f201b3d35c0660748b075f89759adb1c2f94e"
+    },
+    {
+      "dailyDate": "2026-11-26",
+      "difficulty": "medium",
+      "profileOrdinal": 41,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261126",
+      "challengeKey": "daily:2026-11-26",
+      "contentHash": "9360f40be6802ae99933510cd7d28a1e7e5190f098d83565865f26d759467548"
+    },
+    {
+      "dailyDate": "2026-11-27",
+      "difficulty": "medium",
+      "profileOrdinal": 42,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261127",
+      "challengeKey": "daily:2026-11-27",
+      "contentHash": "a0e971e43091ad67a0a41ea934ff1ed80e9a8860e5dd5f35b6ac1c4fb5d517e4"
+    },
+    {
+      "dailyDate": "2026-11-28",
+      "difficulty": "hard",
+      "profileOrdinal": 27,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261128",
+      "challengeKey": "daily:2026-11-28",
+      "contentHash": "895c782dc8bc6530f71e0c555c1c64fa15e0485db2f17e248fb49bf47f7a0d74"
+    },
+    {
+      "dailyDate": "2026-11-29",
+      "difficulty": "hard",
+      "profileOrdinal": 28,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261129",
+      "challengeKey": "daily:2026-11-29",
+      "contentHash": "6b1e358f427cc21d0cc0bd0f4f26521f747d1c54cef362f6277daddd2efd902a"
+    },
+    {
+      "dailyDate": "2026-11-30",
+      "difficulty": "easy",
+      "profileOrdinal": 29,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261130",
+      "challengeKey": "daily:2026-11-30",
+      "contentHash": "4b7cab0ae944ab0584ae55fc06b49e141b6a99ccfb062893b76fa326bc375821"
+    },
+    {
+      "dailyDate": "2026-12-01",
+      "difficulty": "easy",
+      "profileOrdinal": 30,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261201",
+      "challengeKey": "daily:2026-12-01",
+      "contentHash": "d300e21343a24274d31a70c9a006d73545a4ca6ec4752e3ab4b3c71714661bfc"
+    },
+    {
+      "dailyDate": "2026-12-02",
+      "difficulty": "medium",
+      "profileOrdinal": 43,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261202",
+      "challengeKey": "daily:2026-12-02",
+      "contentHash": "f30012138487f012860caaea97277b9ba4f51bca8de5f88c6009f047100534b7"
+    },
+    {
+      "dailyDate": "2026-12-03",
+      "difficulty": "medium",
+      "profileOrdinal": 44,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261203",
+      "challengeKey": "daily:2026-12-03",
+      "contentHash": "b03b1c188004b634b946208c3923c1d14ab1104beeb4013eb44b48bf5893defd"
+    },
+    {
+      "dailyDate": "2026-12-04",
+      "difficulty": "medium",
+      "profileOrdinal": 45,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261204",
+      "challengeKey": "daily:2026-12-04",
+      "contentHash": "fb764de3b3f9bd06db6267411bb9c7b6ec593a40e20189b310dc34d0d315365b"
+    },
+    {
+      "dailyDate": "2026-12-05",
+      "difficulty": "hard",
+      "profileOrdinal": 29,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261205",
+      "challengeKey": "daily:2026-12-05",
+      "contentHash": "e4cb1d5c1272a986b5cae83b4b082891f4357130cf515a71b610b6683c4234c4"
+    },
+    {
+      "dailyDate": "2026-12-06",
+      "difficulty": "hard",
+      "profileOrdinal": 30,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261206",
+      "challengeKey": "daily:2026-12-06",
+      "contentHash": "e0d28f24c2e6bf1cdb34b3ba804939328c4157b1ca0d7a6b82791a4e65c33cf8"
+    },
+    {
+      "dailyDate": "2026-12-07",
+      "difficulty": "easy",
+      "profileOrdinal": 31,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261207",
+      "challengeKey": "daily:2026-12-07",
+      "contentHash": "10ece5c38215d5c17711320e1414cca270180448f3db7a1563225ed812e944ee"
+    },
+    {
+      "dailyDate": "2026-12-08",
+      "difficulty": "easy",
+      "profileOrdinal": 32,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261208",
+      "challengeKey": "daily:2026-12-08",
+      "contentHash": "4bb256a46ff363d484be40fc78697d2a374dbc29c425b16e4865c5c2cfef3ee2"
+    },
+    {
+      "dailyDate": "2026-12-09",
+      "difficulty": "medium",
+      "profileOrdinal": 46,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261209",
+      "challengeKey": "daily:2026-12-09",
+      "contentHash": "ded16a689cc41f1063acf946efa731cfeb67cb8332374b0357e14b2ddc8dba3e"
+    },
+    {
+      "dailyDate": "2026-12-10",
+      "difficulty": "medium",
+      "profileOrdinal": 47,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261210",
+      "challengeKey": "daily:2026-12-10",
+      "contentHash": "5f573500b123e7df9692f822d565227ec4010ca252f0eb11a9593e43c77e7571"
+    },
+    {
+      "dailyDate": "2026-12-11",
+      "difficulty": "medium",
+      "profileOrdinal": 48,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261211",
+      "challengeKey": "daily:2026-12-11",
+      "contentHash": "590fc514ae8b8532e68f040cd8a3d60a67a96ec88f15292841d173399c8bf2cd"
+    },
+    {
+      "dailyDate": "2026-12-12",
+      "difficulty": "hard",
+      "profileOrdinal": 31,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261212",
+      "challengeKey": "daily:2026-12-12",
+      "contentHash": "7bed9abd05a53410af70e7d194aab4e487b95c4422b1c7ecb60996ef791e27be"
+    },
+    {
+      "dailyDate": "2026-12-13",
+      "difficulty": "hard",
+      "profileOrdinal": 32,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261213",
+      "challengeKey": "daily:2026-12-13",
+      "contentHash": "20cfd10d2c1cdc9152355759cd357e41b030ae6269f5bc8634315b81f69e4b8c"
+    },
+    {
+      "dailyDate": "2026-12-14",
+      "difficulty": "easy",
+      "profileOrdinal": 33,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261214",
+      "challengeKey": "daily:2026-12-14",
+      "contentHash": "5f2547472e85582c3fb7d94609f83c8f5bdcaa9911cd067f271430d20a0fb3a8"
+    },
+    {
+      "dailyDate": "2026-12-15",
+      "difficulty": "easy",
+      "profileOrdinal": 34,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261215",
+      "challengeKey": "daily:2026-12-15",
+      "contentHash": "945b3da850850ba57958842e865114cd3ea3eda2d107a164d5f12a98c12c77b7"
+    },
+    {
+      "dailyDate": "2026-12-16",
+      "difficulty": "medium",
+      "profileOrdinal": 49,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261216",
+      "challengeKey": "daily:2026-12-16",
+      "contentHash": "e64e6c52fed17b23760d595a6f76ac5556144b00c66921e6b72429ed648bd18f"
+    },
+    {
+      "dailyDate": "2026-12-17",
+      "difficulty": "medium",
+      "profileOrdinal": 50,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261217",
+      "challengeKey": "daily:2026-12-17",
+      "contentHash": "ddaf8c103c5a611f276f4c1bc2d14f578d0f6ab66b9a04781a516f02dac5f03c"
+    },
+    {
+      "dailyDate": "2026-12-18",
+      "difficulty": "medium",
+      "profileOrdinal": 51,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261218",
+      "challengeKey": "daily:2026-12-18",
+      "contentHash": "73a75de71efb8ad2e6faf9aaa1d5c2cc1f844624bba8496d18331805e1fc7825"
+    },
+    {
+      "dailyDate": "2026-12-19",
+      "difficulty": "hard",
+      "profileOrdinal": 33,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261219",
+      "challengeKey": "daily:2026-12-19",
+      "contentHash": "edeb4d6c5cc75d35ded44cd0e9aac06097a116973b63d713018c1503c70112e1"
+    },
+    {
+      "dailyDate": "2026-12-20",
+      "difficulty": "hard",
+      "profileOrdinal": 34,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261220",
+      "challengeKey": "daily:2026-12-20",
+      "contentHash": "8af62727d39e3e0599101aeedf60e36c42e6cfd4bbdaea6f160da9b91c0776fd"
+    },
+    {
+      "dailyDate": "2026-12-21",
+      "difficulty": "easy",
+      "profileOrdinal": 35,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261221",
+      "challengeKey": "daily:2026-12-21",
+      "contentHash": "ff8c979086a060aa1b4fe03f672ee78375ff15790700a51e927baaebb8874f68"
+    },
+    {
+      "dailyDate": "2026-12-22",
+      "difficulty": "easy",
+      "profileOrdinal": 36,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261222",
+      "challengeKey": "daily:2026-12-22",
+      "contentHash": "c2a2104d279f91d1dc90b76519419156f089c471a0725276879ee61afe1b6e47"
+    },
+    {
+      "dailyDate": "2026-12-23",
+      "difficulty": "medium",
+      "profileOrdinal": 52,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261223",
+      "challengeKey": "daily:2026-12-23",
+      "contentHash": "dcabe3f6c9ffbd1f5a1dd02b37c578683fdf42fae2c547a12b5013dd4a77d0fd"
+    },
+    {
+      "dailyDate": "2026-12-24",
+      "difficulty": "medium",
+      "profileOrdinal": 53,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261224",
+      "challengeKey": "daily:2026-12-24",
+      "contentHash": "258d4edfaa353bc8afece0e8558f6d2cd4dd1b25eb5fbc310ce4caeb1cd90e9d"
+    },
+    {
+      "dailyDate": "2026-12-25",
+      "difficulty": "medium",
+      "profileOrdinal": 54,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261225",
+      "challengeKey": "daily:2026-12-25",
+      "contentHash": "35a1e20172705b878fd5aa188a3f2c00883a885cf9e30626847a05c8cc12016c"
+    },
+    {
+      "dailyDate": "2026-12-26",
+      "difficulty": "hard",
+      "profileOrdinal": 35,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261226",
+      "challengeKey": "daily:2026-12-26",
+      "contentHash": "f3c9475086572c848409c4b6a63a89fff2702c0eaf4e1e6c4ee6cc3272c4e569"
+    },
+    {
+      "dailyDate": "2026-12-27",
+      "difficulty": "hard",
+      "profileOrdinal": 36,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261227",
+      "challengeKey": "daily:2026-12-27",
+      "contentHash": "7a5a145988c5103a6f6273b5c897e38ef71b11196571bfc4eabe9cfa79edd275"
+    },
+    {
+      "dailyDate": "2026-12-28",
+      "difficulty": "easy",
+      "profileOrdinal": 37,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261228",
+      "challengeKey": "daily:2026-12-28",
+      "contentHash": "4538bb31cb537c88c1e88df6c0cf8e5791ed444ce467908f0d2f0467807b6e47"
+    },
+    {
+      "dailyDate": "2026-12-29",
+      "difficulty": "easy",
+      "profileOrdinal": 38,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261229",
+      "challengeKey": "daily:2026-12-29",
+      "contentHash": "065d6b7ca02307c81f44f8eeb1780dd2947e8545279630ab9262aa231e952588"
+    },
+    {
+      "dailyDate": "2026-12-30",
+      "difficulty": "medium",
+      "profileOrdinal": 55,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261230",
+      "challengeKey": "daily:2026-12-30",
+      "contentHash": "9cfcb50403c134f4574073576db1fbc7c17379930c5341a24eb944a091f15de7"
+    },
+    {
+      "dailyDate": "2026-12-31",
+      "difficulty": "medium",
+      "profileOrdinal": 56,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20261231",
+      "challengeKey": "daily:2026-12-31",
+      "contentHash": "295294d70f62417cd6a41ae49af7941b44425bf6f1d53cf1d08dcc9e446d8486"
+    },
+    {
+      "dailyDate": "2027-01-01",
+      "difficulty": "medium",
+      "profileOrdinal": 57,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270101",
+      "challengeKey": "daily:2027-01-01",
+      "contentHash": "2f8f3293c1fef1893721a5f2ab3064bb5d01ac6f8a55a4ec3e02c90107cad585"
+    },
+    {
+      "dailyDate": "2027-01-02",
+      "difficulty": "hard",
+      "profileOrdinal": 37,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270102",
+      "challengeKey": "daily:2027-01-02",
+      "contentHash": "b9e0880389b04068a39169a1b07b43fa3716af5935aa492b4fc5d6141c8a6965"
+    },
+    {
+      "dailyDate": "2027-01-03",
+      "difficulty": "hard",
+      "profileOrdinal": 38,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270103",
+      "challengeKey": "daily:2027-01-03",
+      "contentHash": "addd24806893f0447c227b1977ddc292664a531583adbd7ce6f184b9b4974db3"
+    },
+    {
+      "dailyDate": "2027-01-04",
+      "difficulty": "easy",
+      "profileOrdinal": 39,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270104",
+      "challengeKey": "daily:2027-01-04",
+      "contentHash": "aa8c8dc82fabbf5fc4725ec26aee4b6e9a16789b89c02d2b059851fdbece39b2"
+    },
+    {
+      "dailyDate": "2027-01-05",
+      "difficulty": "easy",
+      "profileOrdinal": 40,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270105",
+      "challengeKey": "daily:2027-01-05",
+      "contentHash": "42c4fd2921ff36818212369c0ace39d85f07f4c83311060eb68872a8bf3f0a24"
+    },
+    {
+      "dailyDate": "2027-01-06",
+      "difficulty": "medium",
+      "profileOrdinal": 58,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270106",
+      "challengeKey": "daily:2027-01-06",
+      "contentHash": "d9ea49d6eb032d28bf1e772e801585f89a748acad0782278e58d505aa6294d9b"
+    },
+    {
+      "dailyDate": "2027-01-07",
+      "difficulty": "medium",
+      "profileOrdinal": 59,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270107",
+      "challengeKey": "daily:2027-01-07",
+      "contentHash": "3c294f115115903892900251bd4f4ab01d7905e367409ec81ff3b0cd2bf55222"
+    },
+    {
+      "dailyDate": "2027-01-08",
+      "difficulty": "medium",
+      "profileOrdinal": 60,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270108",
+      "challengeKey": "daily:2027-01-08",
+      "contentHash": "f198b7495b2a77a4f230daed7c6abfd8ed2cbd656bbeb06da89df85376444ee4"
+    },
+    {
+      "dailyDate": "2027-01-09",
+      "difficulty": "hard",
+      "profileOrdinal": 39,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270109",
+      "challengeKey": "daily:2027-01-09",
+      "contentHash": "88bca590f09cfc0ff922032b49385174fec3eeb53b3a55001ca7cad547bb4d0d"
+    },
+    {
+      "dailyDate": "2027-01-10",
+      "difficulty": "hard",
+      "profileOrdinal": 40,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270110",
+      "challengeKey": "daily:2027-01-10",
+      "contentHash": "3804cc78a16eac87262ddf148da72ca1b04d660253967108563bb2205e430e80"
+    },
+    {
+      "dailyDate": "2027-01-11",
+      "difficulty": "easy",
+      "profileOrdinal": 41,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270111",
+      "challengeKey": "daily:2027-01-11",
+      "contentHash": "93dafad187a802b80a407a4aeb02fb5a889996b0e2ae2c5934eb57448b135d8a"
+    },
+    {
+      "dailyDate": "2027-01-12",
+      "difficulty": "easy",
+      "profileOrdinal": 42,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270112",
+      "challengeKey": "daily:2027-01-12",
+      "contentHash": "9e142c094a694e9853dda4e8947ddc3cf765e781d36d07434da24b58c207e1fd"
+    },
+    {
+      "dailyDate": "2027-01-13",
+      "difficulty": "medium",
+      "profileOrdinal": 61,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270113",
+      "challengeKey": "daily:2027-01-13",
+      "contentHash": "aa354d6f4c0818d0f145ba6640dd7823a881be3c05e4a018f6e4e1900602d7bc"
+    },
+    {
+      "dailyDate": "2027-01-14",
+      "difficulty": "medium",
+      "profileOrdinal": 62,
+      "bankVersion": "daily-gen6-20261007-v1",
+      "puzzleId": "g6-d-20270114",
+      "challengeKey": "daily:2027-01-14",
+      "contentHash": "339727921210199b0c6483a6a07ce5f0a3068e328eebfccb10cab871ebc69171"
+    }
+  ]
+}

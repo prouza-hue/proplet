@@ -1,0 +1,396 @@
+{
+  "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db",
+  "prodDeployment": "dpl_jT3q2z4oRHEdUAgCuAeRPEJm4Jo6",
+  "sourceTooling": "75b177320ffaa6726aa62c0f5d84ee04255349b2",
+  "originalSourceManifestSha256": "841ae06372e0b1889e9a87ff3131b56fcfeb36db318e8af4169dc1ec190f46ff",
+  "files": [
+    {
+      "path": "content/lexicon-v3/working/README.md",
+      "sha256": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
+      "originalSha256": "48f4bccf8daff85fef1f078be2cb43176624d46977d1202280b718d549744b32",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/capacity.json",
+      "sha256": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+      "originalSha256": "b69e1a8b9811b9aa34a126a1954986c42269cfb59818916d4cfda36a16cac7bd",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/editorial-addendum-20260927.json",
+      "sha256": "0d72fdc1d6e20eafce334c969aa4766dff5b97861235ca313a061e78e1bbc07d",
+      "originalSha256": "0d72fdc1d6e20eafce334c969aa4766dff5b97861235ca313a061e78e1bbc07d",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/editorial-reviews.json",
+      "sha256": "997a1d64632ac278b2b37e17ac3c660726a477cc0cc80e2107cf77c90c688a0e",
+      "originalSha256": "997a1d64632ac278b2b37e17ac3c660726a477cc0cc80e2107cf77c90c688a0e",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/inventory.json",
+      "sha256": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+      "originalSha256": "3fe8178d57a657f7c21525b9ab4df7085f3c107395bf4cb41b8e22eff0d959c0",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/lexicon.json",
+      "sha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+      "originalSha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/manifest.json",
+      "sha256": "a8a333e598d3f7a195dc59a03b6226c1cc719fbe77594c91b9cb00f2b638e99a",
+      "originalSha256": "a8a333e598d3f7a195dc59a03b6226c1cc719fbe77594c91b9cb00f2b638e99a",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/recognition-words.txt",
+      "sha256": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+      "originalSha256": "4c7de2102bd2f09823a946e2b77bd9ca36766cbeb3fae38eed47e97a05a83215",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/source-limitations.json",
+      "sha256": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+      "originalSha256": "c4a07b76a7678bf49a34007c6a58a794046f3285c3b4379f30f8a449f05009d3",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/source-manifest.json",
+      "sha256": "464dda20cab1b672a51ba338637bc1238f2d63d8ed4fe69bb2505a0b5ce02cc9",
+      "originalSha256": "464dda20cab1b672a51ba338637bc1238f2d63d8ed4fe69bb2505a0b5ce02cc9",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/topic-map.json",
+      "sha256": "6c5e05e036317512f42f20d2322960a04e14d516a91b90b8e7887318494b2704",
+      "originalSha256": "6c5e05e036317512f42f20d2322960a04e14d516a91b90b8e7887318494b2704",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/working/variant-groups.json",
+      "sha256": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a",
+      "originalSha256": "39b8f08b72f97fa06f8878b65d25a7d9eabaaa2ddf011e0ce802118a35e0a89a",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/candidate-lexicon.json",
+      "sha256": "0c2e29c8a7a4982e5b895ff1d69ea428aa44df2a4e5d1717f88faba866a753d8",
+      "originalSha256": "0c2e29c8a7a4982e5b895ff1d69ea428aa44df2a4e5d1717f88faba866a753d8",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/candidate-seeds.json",
+      "sha256": "0575ded2372981d0b7c34235259984e12b20b0be990d06187ff583a7d4170f38",
+      "originalSha256": "0575ded2372981d0b7c34235259984e12b20b0be990d06187ff583a7d4170f38",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/lexicon-v3/editorial-batch-001.json",
+      "sha256": "d1113708c39c416ad5a694874f7746e2e3850d0ba0b2e36b6274ba224fffcd74",
+      "originalSha256": "d1113708c39c416ad5a694874f7746e2e3850d0ba0b2e36b6274ba224fffcd74",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/gen6/recognition-words.txt",
+      "sha256": "f46893e253df5cf155980e172160aa5f906eebb059f89ddcf0faa1b26d33661b",
+      "originalSha256": "f46893e253df5cf155980e172160aa5f906eebb059f89ddcf0faa1b26d33661b",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/gen6/round3-eight/wordfreq-manifest.json",
+      "sha256": "1b1a748c0607b855cab5cc4db2dd8c692f3fbb35066e5a98979ac617c8f84367",
+      "originalSha256": "1b1a748c0607b855cab5cc4db2dd8c692f3fbb35066e5a98979ac617c8f84367",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/gen6/round3-eight/wordfreq-cs-runtime.txt",
+      "sha256": "bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610",
+      "originalSha256": "bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/gen6/round3-eight/selection-policy.json",
+      "sha256": "0cd410c21f0db8063c46670d9b809dffc535d78b3db57fea94bfaeb765cdb370",
+      "originalSha256": "0cd410c21f0db8063c46670d9b809dffc535d78b3db57fea94bfaeb765cdb370",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "content/gen5/profiles.json",
+      "sha256": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5",
+      "originalSha256": "8dfc273e1e94f3546a0e397c2f1939e91e97c0cce2c19ec58c738dfe27155ba5",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "data/puzzles.json",
+      "sha256": "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6",
+      "originalSha256": "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937",
+      "changed": true,
+      "source": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "public/puzzles.json",
+      "sha256": "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3",
+      "originalSha256": "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e",
+      "changed": true,
+      "source": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/rolling_content_v1.json",
+      "sha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "originalSha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/tajenka_weekend_v1.json",
+      "sha256": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "originalSha256": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/tajenka_weekend_v2.json",
+      "sha256": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+      "originalSha256": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v1.json",
+      "sha256": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+      "originalSha256": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v2.json",
+      "sha256": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "originalSha256": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v3.json",
+      "sha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+      "originalSha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/legacy_daily_gen1.json",
+      "sha256": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+      "originalSha256": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/legacy_daily_gen2.json",
+      "sha256": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+      "originalSha256": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/lexicon_v2.json",
+      "sha256": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+      "originalSha256": "19c62e239ca91ff2499cde549e196c5b0e3e559e9905da79770e66bec18e045a",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/lexicon_v2_wikidata_raw.json",
+      "sha256": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+      "originalSha256": "cad467b83980fd5ee2da4535d7686bd41b573c99fa5c38e64ff596deb366eded",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/target_generation_exclusions_v334.json",
+      "sha256": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+      "originalSha256": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/words.txt",
+      "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "originalSha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "public/valid-words-v3328.txt",
+      "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "originalSha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "word_recognition_v3330.py",
+      "sha256": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+      "originalSha256": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "2a69a1c3756240a505c6028d773a2ffbf41f73657d06bc0f5452710ce55f3451",
+      "originalSha256": "2a69a1c3756240a505c6028d773a2ffbf41f73657d06bc0f5452710ce55f3451",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/answer_tiers.json",
+      "sha256": "3088dbe03fb2a0ac4d441f9338595be79a0138e2b35a3d9d7101d58a0532a799",
+      "originalSha256": "3088dbe03fb2a0ac4d441f9338595be79a0138e2b35a3d9d7101d58a0532a799",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "content/generation-manifest.json",
+      "sha256": "d09581a78435c24c8ffbcc9ec1e41a1780f32d2893d1b46d98fb4a8cb8f7ac56",
+      "originalSha256": "d8d1b5b96a2980c6c4e07276c15f95642868817babdec954eef14844f675075b",
+      "changed": true,
+      "source": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "server.py",
+      "sha256": "50924a7008b205b8cdc4ef8d1ac29241d6152738880898190a2cdb0d82d66099",
+      "originalSha256": "50924a7008b205b8cdc4ef8d1ac29241d6152738880898190a2cdb0d82d66099",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "tools/build_lexicon_v2.py",
+      "sha256": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+      "originalSha256": "5f58c001bec0b4703f4a75e59cc2a508392755ab4f037119c0f9e3ff4c56ae81",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "tools/build_lexicon_v3_working.py",
+      "sha256": "bceb009a271935077f64df3a14c956c9a749e8344e0c6f89fae64469c2894607",
+      "originalSha256": "bceb009a271935077f64df3a14c956c9a749e8344e0c6f89fae64469c2894607",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "tools/gen6/catalog.py",
+      "sha256": "b9819dc9f91381ae585b8555f47c34f2628d17393e4289245078fb2e8a4f10e2",
+      "originalSha256": "b9819dc9f91381ae585b8555f47c34f2628d17393e4289245078fb2e8a4f10e2",
+      "changed": false,
+      "source": "75b177320ffaa6726aa62c0f5d84ee04255349b2"
+    },
+    {
+      "path": "data/tajenka_v2_approved.json",
+      "sha256": "16f7758b5d1c1c1d84ef21f23e0ca3f6490dedc5f66ae0afa96924e2b633f6bb",
+      "originalSha256": "16f7758b5d1c1c1d84ef21f23e0ca3f6490dedc5f66ae0afa96924e2b633f6bb",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "data/tajenka_v2_board_candidates.json",
+      "sha256": "0bd8b6842ca914315c9fadc01d39a6d70493b5f11b203fab41ca208a2051134f",
+      "originalSha256": "0bd8b6842ca914315c9fadc01d39a6d70493b5f11b203fab41ca208a2051134f",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "content/gen6/mozkokalypsa-100/bank.json",
+      "sha256": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
+      "originalSha256": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
+      "changed": false,
+      "source": "5fc234e8e481950a68a25bf77f0103fab936532f"
+    },
+    {
+      "path": "tools/gen5/geometry.py",
+      "sha256": "ec3e2182484d9c7f0273e1d3af31b3845cea3256f6d2596292294e218d416837",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    },
+    {
+      "path": "tools/gen5/catalog.py",
+      "sha256": "b18a3f12d915aa55c6d0add1e617f189a711d5567854ee522dde432860e62e74",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    },
+    {
+      "path": "tools/gen5/validation.py",
+      "sha256": "132c3ce99831a376509d8eada4720e7770a96c625bedb0d4cc2f77759d5e5dcd",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    },
+    {
+      "path": "tools/gen5/package.py",
+      "sha256": "f0bddf830ff10e7a2f73a62e4f8e20d7486e75b42b271bc074c8851290f4ada3",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    },
+    {
+      "path": "tools/gen5/runner.py",
+      "sha256": "c36babf9654d78b8c2e3ed9607ccd37e41ab708939796345e1171c47b55916b3",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    },
+    {
+      "path": "tools/gen5/__init__.py",
+      "sha256": "1fafa88c4ccd1cbf557276b84d60423b43bb77f84f6460f8f74da599c1aa672a",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    },
+    {
+      "path": "tools/measure_gen4_ambiguity.py",
+      "sha256": "fc09c4fd65fde73f13c8afb219e6d9673300613c01c4e95e58b7b4092e1126b0",
+      "changed": false,
+      "source": "exact restored production tool snapshot"
+    }
+  ],
+  "inputDeltas": [
+    {
+      "path": "data/puzzles.json",
+      "sha256": "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6",
+      "originalSha256": "1b21a4ed8b32603c9b93b6bf1eac2ac271144a838fa3bf1dccbc866d693b2937",
+      "changed": true,
+      "source": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "public/puzzles.json",
+      "sha256": "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3",
+      "originalSha256": "40b26607df1a236fbc9090edf5e34c1294693ab2887e02483cdef3e21b49827e",
+      "changed": true,
+      "source": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "content/generation-manifest.json",
+      "sha256": "d09581a78435c24c8ffbcc9ec1e41a1780f32d2893d1b46d98fb4a8cb8f7ac56",
+      "originalSha256": "d8d1b5b96a2980c6c4e07276c15f95642868817babdec954eef14844f675075b",
+      "changed": true,
+      "source": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    }
+  ],
+  "reason": "Current published banks include the released free-refresh-300 batch; refresh history/freshness only. Original verified snapshot and full v3 immutable bytes remain untouched in source/free-refresh."
+}

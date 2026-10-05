@@ -1,0 +1,99 @@
+{"stage": "start", "recognition": 103836, "resumed": 3, "capacity": {"easy": {"eligible": 805, "initialAvailable": 731, "byTierLength": {"A-4": 188, "A-6": 301, "A-5": 316}}, "medium": {"eligible": 1967, "initialAvailable": 1826, "byTierLength": {"B-4": 121, "B-5": 295, "B-7": 247, "A-4": 188, "B-6": 288, "A-6": 301, "A-5": 316, "A-7": 211}}, "hard": {"eligible": 3760, "initialAvailable": 3595, "byTierLength": {"C-7": 282, "C-9": 118, "C-6": 328, "C-8": 247, "B-4": 121, "B-5": 295, "C-4": 161, "B-7": 247, "B-8": 148, "C-5": 309, "A-4": 188, "B-6": 288, "A-6": 301, "A-5": 316, "A-7": 211, "A-8": 109, "A-9": 39, "B-9": 52}}}}
+{"accepted": "2026-10-10", "count": 4, "seconds": 0.606, "words": ["SVORNÍK", "ŠALVĚJ", "NOTA", "SROVNÁNÍ", "LOUPAT", "VALNÍK", "ŠALOTKA", "KLADKA"]}
+{"accepted": "2026-10-11", "count": 5, "seconds": 2.343, "words": ["SCHODY", "BUZOLA", "UHEL", "POBYT", "TÁCEK", "BLEDULE", "MORUŠE", "DRTINA", "DŮVTIP"]}
+{"accepted": "2026-10-12", "count": 6, "seconds": 0.013, "words": ["ŠIBAL", "HRÁBĚ", "SOLIT", "MÁSLO"]}
+{"accepted": "2026-10-13", "count": 7, "seconds": 0.022, "words": ["KYNOUT", "HEZKÝ", "PÁDIT", "KAŠNA"]}
+{"accepted": "2026-10-14", "count": 8, "seconds": 0.077, "words": ["PIŠKOT", "KULICH", "ŠUMĚT", "BÓJKA", "DNEŠEK", "TROLEJ"]}
+{"accepted": "2026-10-15", "count": 9, "seconds": 0.091, "words": ["OSOBA", "KRŮPĚJ", "LOUŽE", "SBOR", "LARVA", "PUMPA"]}
+{"accepted": "2026-10-16", "count": 10, "seconds": 0.059, "words": ["KOPAT", "ZALÉVAT", "VĚTŠINA", "BROD", "LIJÁK", "DŽBÁN"]}
+{"accepted": "2026-10-17", "count": 11, "seconds": 3.087, "words": ["KROPÍTKO", "MISKA", "SMIREK", "EVOLUCE", "PŘÍBOJ", "OSTRUHA", "RELIKVIE", "PŮDA"]}
+{"accepted": "2026-10-18", "count": 12, "seconds": 0.237, "words": ["PAŘÁT", "MOLO", "POPĚVEK", "ČÍŽEK", "KOLÍK", "BLÁZEN", "MOCNINA", "ZÁVITNÍK", "VIOLA"]}
+{"accepted": "2026-10-19", "count": 13, "seconds": 0.03, "words": ["KACHNĚ", "PŘÍVĚS", "SRUB", "ÚCTA", "ÚDIV"]}
+{"accepted": "2026-10-20", "count": 14, "seconds": 0.056, "words": ["SEKANÁ", "HRUŠEŇ", "SMETÁK", "VDĚK"]}
+{"accepted": "2026-10-21", "count": 15, "seconds": 0.032, "words": ["KEJKLÍŘ", "VÁHA", "PRKÉNKO", "ZURČET", "MAPA", "LOPATKA"]}
+{"accepted": "2026-10-22", "count": 16, "seconds": 0.145, "words": ["PELÁŠIT", "ANGREŠT", "ŘEKA", "MŘÍŽ", "ČILÝ", "ŘEŘICHA"]}
+{"accepted": "2026-10-23", "count": 17, "seconds": 0.021, "words": ["KONEV", "KOŽENKA", "VEKA", "MOZEK", "FRÉZKA", "JIŘIČKA"]}
+{"accepted": "2026-10-24", "count": 18, "seconds": 0.434, "words": ["NÁVĚTŘÍ", "RAZNICE", "TKADLEC", "SVĚTLÍK", "KÁNĚ", "NÁHUBEK", "SPLÁVEK", "OCHRNUTÍ"]}
+{"accepted": "2026-10-25", "count": 19, "seconds": 0.116, "words": ["PEKÁČ", "KRESBA", "FUJARA", "VLÁSENKA", "SALÓN", "PRŮTRŽ", "PAVOUK", "HEJKAL", "KONÁNÍ"]}
+{"accepted": "2026-10-26", "count": 20, "seconds": 0.028, "words": ["OSADA", "SEDĚT", "MLSAT", "ŠŇŮRA"]}
+{"accepted": "2026-10-27", "count": 21, "seconds": 0.021, "words": ["DUSNO", "UTĚRKA", "VRBA", "LEHKÝ"]}
+{"accepted": "2026-10-28", "count": 22, "seconds": 0.029, "words": ["MLÁZÍ", "ZÍVAT", "PUPEN", "KŘEČEK", "ZÍTRA", "LOUČ", "SEKÁČ"]}
+{"accepted": "2026-10-29", "count": 23, "seconds": 0.196, "words": ["KÁČA", "VAZBA", "BRZY", "KNOT", "SLOUP", "SIRUP", "CHRASTÍ"]}
+{"accepted": "2026-10-30", "count": 24, "seconds": 0.073, "words": ["LEDOVKA", "PRKNO", "KNOFLÍK", "TŮNĚ", "PRÁT", "MULČ"]}
+{"accepted": "2026-10-31", "count": 25, "seconds": 0.165, "words": ["OBVOD", "DUDY", "SVĚŽÍ", "DRÁTENÍK", "MOŠNA", "ZINEK", "HAMBURGER", "VZKAZ", "LITR"]}
+{"accepted": "2026-11-01", "count": 26, "seconds": 1.417, "words": ["ZÁKON", "PLÍCE", "LOUTKÁŘ", "HYDRANT", "STUPNICE", "MAGMA", "REJSTŘÍK", "JAVOR", "TRPKÝ"]}
+{"accepted": "2026-11-02", "count": 27, "seconds": 0.301, "words": ["DÝNĚ", "LUSK", "KMÍN", "VEDRO", "JMELÍ"]}
+{"accepted": "2026-11-03", "count": 28, "seconds": 0.076, "words": ["BRLOH", "POUPĚ", "LEPIT", "TUNEL"]}
+{"accepted": "2026-11-04", "count": 29, "seconds": 0.045, "words": ["VPUST", "PRECLÍK", "TISK", "NĚHA", "LÁVA", "PŘILBA"]}
+{"accepted": "2026-11-05", "count": 30, "seconds": 0.128, "words": ["OLŠE", "LEKCE", "VIŠEŇ", "VOLAT", "PÍLE", "SMÍCH", "HŘÍVA"]}
+{"accepted": "2026-11-06", "count": 31, "seconds": 0.099, "words": ["NUDA", "PAVLAČ", "PASEKA", "VRUT", "ZÁMEK", "MUSET", "PÁDLO"]}
+{"accepted": "2026-11-07", "count": 32, "seconds": 0.144, "words": ["POSTAVA", "PÍSKOVNA", "VICHR", "CEJN", "SKLÁDAČKA", "KLOPA", "UHEL", "VYMAZÁNÍ"]}
+{"accepted": "2026-11-08", "count": 33, "seconds": 0.67, "words": ["LÉTÁNÍ", "KROUPA", "STATEK", "OSNOVA", "PŘADLENA", "STEHLÍK", "STĚŽEŇ", "KLAPOT"]}
+{"accepted": "2026-11-09", "count": 34, "seconds": 0.014, "words": ["DUŠE", "TLAČIT", "RYCHLÝ", "LÍPA"]}
+{"accepted": "2026-11-10", "count": 35, "seconds": 0.037, "words": ["JEDLE", "CUKETA", "KLÍN", "STEH", "ŠPUNT"]}
+{"accepted": "2026-11-11", "count": 36, "seconds": 0.03, "words": ["OTISK", "DLAŽBA", "MĚCH", "ŽIRAFA", "HLOH", "HOBLÍK"]}
+{"accepted": "2026-11-12", "count": 37, "seconds": 0.031, "words": ["FLÉTNA", "FOUKAT", "KINO", "MÁTA", "RÉVA", "DŘEPĚT"]}
+{"accepted": "2026-11-13", "count": 38, "seconds": 0.063, "words": ["LÁVKA", "KOVÁŘ", "ODNOŽ", "DLÁTO", "SAZBA", "PENÁL"]}
+{"accepted": "2026-11-14", "count": 39, "seconds": 0.258, "words": ["TROLEJ", "CHAPADLO", "OBLEŽENÍ", "POCHOP", "POMLKA", "DROŽKA", "ČRTA", "KROUŽIT"]}
+{"accepted": "2026-11-15", "count": 40, "seconds": 1.467, "words": ["ZŘÍZENÍ", "PŘEHRÁVAČ", "DOBROTA", "ETIKETA", "BAČKORA", "HROB", "SYROVÁTKA", "OTĚŽ"]}
+{"accepted": "2026-11-16", "count": 41, "seconds": 0.048, "words": ["ZEDNÍK", "SVÍCEN", "VINICE", "KŘEN"]}
+{"accepted": "2026-11-17", "count": 42, "seconds": 0.044, "words": ["KRÁVA", "ŠIŠKA", "ŘEPA", "SMETÁK"]}
+{"accepted": "2026-11-18", "count": 43, "seconds": 0.2, "words": ["MOTÝL", "KUTIL", "KRTEK", "NÁVĚTŘÍ", "NUDLE", "FENEK"]}
+{"accepted": "2026-11-19", "count": 44, "seconds": 0.068, "words": ["CHÁPAT", "JABLOŇ", "KRÁČET", "SMYČEC", "TMEL", "VÍLA"]}
+{"accepted": "2026-11-20", "count": 45, "seconds": 0.108, "words": ["ŽEHLIT", "SEDADLO", "BUKVICE", "CÍVKA", "FOŠNA", "KŠILT"]}
+{"accepted": "2026-11-21", "count": 46, "seconds": 0.224, "words": ["ZÁTOKA", "STRNAD", "FUJAVICE", "BYSTRÝ", "LINIE", "EKOSYSTÉM", "LIBEČEK", "SÁZET"]}
+{"accepted": "2026-11-22", "count": 47, "seconds": 0.332, "words": ["BEDNĚNÍ", "NÁDOBÍ", "KVĚT", "TAKT", "BRATRSTVO", "RAŠPLE", "ŘÍDÍTKA", "ČENICHAT"]}
+{"accepted": "2026-11-23", "count": 48, "seconds": 0.237, "words": ["ŽELVA", "SRNEC", "ZLATÁ", "HARFA"]}
+{"accepted": "2026-11-24", "count": 49, "seconds": 0.036, "words": ["TOPOL", "VÝVAR", "HVĚZDA", "ZÁVĚS"]}
+{"accepted": "2026-11-25", "count": 50, "seconds": 0.063, "words": ["ŽÍNKA", "BŘÍZA", "PRÁM", "ČINEL", "PRYŽ", "ZIMA", "TCHOŘ"]}
+{"accepted": "2026-11-26", "count": 51, "seconds": 0.064, "words": ["TĚŽIŠTĚ", "KEFÍR", "KLUBKO", "KŮLNA", "VÝMOL", "OKAP"]}
+{"accepted": "2026-11-27", "count": 52, "seconds": 0.061, "words": ["HABR", "KLIKA", "PADÁK", "ŘÍKAT", "MRAK", "PRASKOT"]}
+{"accepted": "2026-11-28", "count": 53, "seconds": 0.546, "words": ["BRADA", "KROPÍTKO", "STREJDA", "ZÁPADKA", "SLABIKÁŘ", "FÁBOREK", "TĚSNĚNÍ", "KEJKLÍŘ"]}
+{"accepted": "2026-11-29", "count": 54, "seconds": 0.078, "words": ["NÁLEVKA", "ZAMETAT", "ŠTĚNICE", "NAPÁJEČKA", "LEZEČKA", "POHYB", "HOLIČ", "HLÍZA"]}
+{"accepted": "2026-11-30", "count": 55, "seconds": 0.265, "words": ["ZÍTRA", "NÁČRT", "SNÍT", "LOUPAT"]}
+{"accepted": "2026-12-01", "count": 56, "seconds": 0.13, "words": ["ČILÝ", "PEČIVO", "PŘEZKA", "NAHOŘE"]}
+{"accepted": "2026-12-02", "count": 57, "seconds": 0.032, "words": ["PRÁVO", "SÝČEK", "KŮRKA", "POUŤ", "PŘEHOZ", "NÁLEPKA"]}
+{"accepted": "2026-12-03", "count": 58, "seconds": 0.114, "words": ["HŮLKA", "BOMBA", "DUDEK", "STROM", "PANDA", "TOPINKA"]}
+{"accepted": "2026-12-04", "count": 59, "seconds": 0.065, "words": ["PRÁT", "ŠPRÝM", "OBZOR", "MULČ", "MUDRC", "LÍMEC", "ČTYŘI"]}
+{"accepted": "2026-12-05", "count": 60, "seconds": 0.208, "words": ["ÚBOČÍ", "ZÁVAN", "CVÁLAT", "KNIHAŘ", "TKÁT", "KOMPAS", "ZÁVIN", "GENERACE", "TVORBA"]}
+{"accepted": "2026-12-06", "count": 61, "seconds": 0.037, "words": ["PÁDLOVAT", "ŘEZBA", "RAMPA", "KRAJINA", "KRYPTON", "TUKAN", "BLIZNA", "BRČKO", "DŮVTIP"]}
+{"accepted": "2026-12-07", "count": 62, "seconds": 0.035, "words": ["MŠICE", "VAZBA", "ŠPENÁT", "RÁDIO"]}
+{"accepted": "2026-12-08", "count": 63, "seconds": 0.021, "words": ["NÁJEZD", "KVÁSEK", "OSPALÝ", "RAKETA"]}
+{"accepted": "2026-12-09", "count": 64, "seconds": 0.064, "words": ["STĚŽEŇ", "MŘÍŽ", "BUČINA", "HRANOL", "KLEPAT", "SLIMÁK"]}
+{"accepted": "2026-12-10", "count": 65, "seconds": 0.234, "words": ["TYMIÁN", "BRANKA", "LYŽOVAT", "DRSNÝ", "BROD", "LEPENKA"]}
+{"accepted": "2026-12-11", "count": 66, "seconds": 0.079, "words": ["ŠKRABKA", "PLNÝ", "BROUSEK", "KUFR", "TESAŘ", "DŘEŇ"]}
+{"accepted": "2026-12-12", "count": 67, "seconds": 0.906, "words": ["ŠINDEL", "DOBROMYSL", "SVĚT", "PROVEDENÍ", "ROLE", "HEJNO", "PŘEDMLUVA", "KOLÁČ"]}
+{"accepted": "2026-12-13", "count": 68, "seconds": 0.409, "words": ["ÚHOR", "SUŠÁK", "ŠRAMOT", "DUNĚNÍ", "DOBRO", "CHLÉV", "ALEGORIE", "KAPUCE", "BETON"]}
+{"accepted": "2026-12-14", "count": 69, "seconds": 0.123, "words": ["SLABÝ", "PEKÁČ", "ZÁPAD", "CHLAD"]}
+{"accepted": "2026-12-15", "count": 70, "seconds": 0.076, "words": ["PÁDLO", "ÚŽAS", "UHÝBAT", "TAPETA"]}
+{"accepted": "2026-12-16", "count": 71, "seconds": 0.356, "words": ["NÁKYP", "HLADKÝ", "PLST", "DOLE", "ŠÁLEK", "BRLOH", "ČRTA"]}
+{"accepted": "2026-12-17", "count": 72, "seconds": 0.154, "words": ["TUBA", "BŘEH", "ZEDNÍK", "JEMNÝ", "SUCHÝ", "RÉVA", "SYPAT"]}
+{"accepted": "2026-12-18", "count": 73, "seconds": 0.027, "words": ["BROUSIT", "VERŠ", "DÓZA", "HROZEN", "NÁVRŠÍ", "DVŮR"]}
+{"accepted": "2026-12-19", "count": 74, "seconds": 0.773, "words": ["FILOZOFIE", "ÚROVEŇ", "ŘEDKEV", "POZOUN", "TABULE", "OBRACEČKA", "ČESNEK", "PLYŠÁK"]}
+{"accepted": "2026-12-20", "count": 75, "seconds": 0.157, "words": ["POUTNÍK", "ÚTES", "POKRYTÍ", "ANÝZ", "SPERMIE", "ZBROJ", "ONDATRA", "DEVĚT", "FÓLIOVNÍK"]}
+{"accepted": "2026-12-21", "count": 76, "seconds": 0.164, "words": ["SVAH", "DUPAT", "HNÍZDO", "DŘÍMAT"]}
+{"accepted": "2026-12-22", "count": 77, "seconds": 0.083, "words": ["HRÁBĚ", "KOPR", "CHÁPAT", "KARTY"]}
+{"accepted": "2026-12-23", "count": 78, "seconds": 0.074, "words": ["FAGOT", "ATLAS", "VÝHON", "SLOVO", "TAPÍR", "PLÉST"]}
+{"accepted": "2026-12-24", "count": 79, "seconds": 0.043, "words": ["ROLÁK", "PLYN", "PÍSKOT", "KLOUZAT", "PLCH", "OLŠE"]}
+{"accepted": "2026-12-25", "count": 80, "seconds": 0.093, "words": ["SVĚŽÍ", "NAVIJÁK", "TVÁŘ", "OKOUN", "SÍTKO", "MOŠT"]}
+{"accepted": "2026-12-26", "count": 81, "seconds": 1.09, "words": ["CEPÍN", "PÍŠŤALA", "KEDLUBEN", "PODKROVÍ", "OBRUBA", "SLOUPEC", "VAFLE", "ČLUN"]}
+{"accepted": "2026-12-27", "count": 82, "seconds": 0.273, "words": ["MLYNÁŘ", "TETŘEV", "ŠPRÝMAŘ", "PLAZMA", "MEANDR", "VSTUPNÉ", "RUKOLA", "PÁTRAT"]}
+{"accepted": "2026-12-28", "count": 83, "seconds": 0.096, "words": ["PULEC", "PLECH", "CIHLA", "ŠŇŮRA"]}
+{"accepted": "2026-12-29", "count": 84, "seconds": 0.151, "words": ["BRAŠNA", "VÁPNO", "HOUSKA", "ŠKROB"]}
+{"accepted": "2026-12-30", "count": 85, "seconds": 0.078, "words": ["ČILÝ", "ŠPEJLE", "ŠERO", "SPÍNAČ", "MOTOUZ", "NADCHOD"]}
+{"accepted": "2026-12-31", "count": 86, "seconds": 0.1, "words": ["TUŘÍN", "VPUST", "BALÓN", "PŘÁNÍ", "HLÍNA", "OBZOR"]}
+{"accepted": "2027-01-01", "count": 87, "seconds": 0.158, "words": ["ZÁVORA", "LAGUNA", "AKCE", "SPONKA", "OBLEVA", "VOŇAVÝ"]}
+{"accepted": "2027-01-02", "count": 88, "seconds": 0.097, "words": ["UZLOVAT", "BÁBOVIČKA", "SMLOUVA", "MEDUŇKA", "PECH", "BEDNĚNÍ", "DANĚK", "ŠÍDLO"]}
+{"accepted": "2027-01-03", "count": 89, "seconds": 0.563, "words": ["ŠKRABOŠKA", "TRASA", "PEDIATR", "KŘÍDA", "VANDR", "TYKADLO", "VODIČ", "HŘEJIVÝ"]}
+{"accepted": "2027-01-04", "count": 90, "seconds": 0.409, "words": ["BOTNÍK", "DOBRÝ", "KOSIT", "KŘEN"]}
+{"accepted": "2027-01-05", "count": 91, "seconds": 0.035, "words": ["SLOUP", "KOPEC", "DRÁT", "ŠKOLNÍ"]}
+{"accepted": "2027-01-06", "count": 92, "seconds": 0.095, "words": ["PÍLE", "SMETÍ", "MULČ", "KVÁSEK", "SOKOL", "DOMOV", "ÚDIV"]}
+{"accepted": "2027-01-07", "count": 93, "seconds": 0.128, "words": ["VLÍDNÝ", "KOVÁŘ", "MĚŠEC", "VĚŠÁK", "POŠTA", "SELE", "SNÍT"]}
+{"accepted": "2027-01-08", "count": 94, "seconds": 0.037, "words": ["HLOH", "TÚRA", "BRHLÍK", "TANČIT", "CHRÁM", "PEDÁL"]}
+{"accepted": "2027-01-09", "count": 95, "seconds": 0.809, "words": ["ÚTOK", "KALAMÁŘ", "ODMOCNINA", "LUŇÁK", "DŽÍNY", "OBJÍŽĎKA", "VIKÝŘ", "KOBRA", "ZÁJEM"]}
+{"accepted": "2027-01-10", "count": 96, "seconds": 0.329, "words": ["STAVIDLO", "NOVOLUNÍ", "UHEL", "OBOR", "MOSAZ", "JEPTIŠKA", "ČENICHAT", "FIXKA"]}
+{"accepted": "2027-01-11", "count": 97, "seconds": 0.307, "words": ["PLETÍ", "TŘÍDIT", "VDĚK", "KBELÍK"]}
+{"accepted": "2027-01-12", "count": 98, "seconds": 0.277, "words": ["SKŘÍŇ", "ČLOVĚK", "DROŽDÍ", "KŮZLE"]}
+{"accepted": "2027-01-13", "count": 99, "seconds": 0.038, "words": ["TRUHLA", "CEJN", "VALOUN", "TROLL", "UVNITŘ", "HADICE"]}
+{"accepted": "2027-01-14", "count": 100, "seconds": 0.019, "words": ["VIDĚT", "PILNÍK", "DÓZA", "ŠLAPAT", "SLUPKA", "OTĚŽ"]}
+{"stage": "manufactured", "count": 100, "hash": "cf2d79675ed7cbebd3337b0da4e496997ddea3fb484daf8675d70f8c66fc726c"}

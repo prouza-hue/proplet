@@ -1,0 +1,20 @@
+{
+  "acceptedEntries": 103836,
+  "sha256": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+  "runtimeSha256": "93df3c460292422cf786aa628c37cfa918e62c716199113a146da31353f92f15",
+  "runtimeOverlay": [
+    "bruska",
+    "bígl",
+    "hrubka",
+    "jilm",
+    "labrador",
+    "padnutí",
+    "pnutí",
+    "setr",
+    "starost",
+    "stáj"
+  ],
+  "pinnedFrequencySha256": "bfc1eb49c6959a7ebbfa5ee9beff74e377e55f59e783445f99447ef8a8e34610",
+  "previousRecognitionSha256": "5d747a525609f648296297850223f3b01a8e628f75e1ca6ec9e1da9d919002f7",
+  "derivation": "union of exact pinned frequency acceptance, current static runtime, full V3 and variants; never narrowed"
+}

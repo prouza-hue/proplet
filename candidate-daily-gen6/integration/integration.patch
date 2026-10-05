@@ -1,0 +1,502 @@
+--- /dev/null
++++ b/backend/daily_runtime.py
+@@ -0,0 +1,125 @@
++"""Narrow HTTP integration of the dated bank; opt-in and approved-pack only."""
++from __future__ import annotations
++
++from datetime import datetime
++from functools import lru_cache
++import os
++from typing import Optional
++
++from fastapi import HTTPException, Query, Request
++from fastapi.responses import JSONResponse
++
++from backend.dated_daily import DatedDaily, DailyPackInvalid, DailyUnavailable, iso_date, puzzle_digest
++
++
++def install(namespace: dict) -> None:
++    enabled = os.environ.get("PROPLET_DATED_DAILY_ENABLED", "false").strip().lower() == "true"
++    if not enabled:
++        return
++    root = namespace["ROOT"]
++    pack_path = root / "data" / "daily_gen6_private.json"
++    today = namespace["current_prague_date"]
++
++    @lru_cache(maxsize=1)
++    def pack() -> DatedDaily:
++        try:
++            return DatedDaily.load(pack_path)
++        except (OSError, ValueError, KeyError, TypeError) as exc:
++            # A candidate pack does not become approved by setting the env flag.
++            raise HTTPException(503, "Denní výzva teď není dostupná") from exc
++
++    original = {name: namespace[name] for name in (
++        "expected_daily_puzzle_id", "valid_daily_puzzle_ids", "resolved_puzzle",
++        "puzzle_exists", "puzzle_info",
++    )}
++
++    def expected(daily_date: str) -> str:
++        try:
++            bank = pack()
++            if bank.handles(daily_date):
++                return bank.published_binding(daily_date).puzzle_id
++            return original["expected_daily_puzzle_id"](daily_date)
++        except ValueError as exc:
++            raise HTTPException(400, "Neplatné datum") from exc
++        except DailyUnavailable as exc:
++            raise HTTPException(503, str(exc)) from exc
++
++    def valid(daily_date: str) -> set[str]:
++        try:
++            bank = pack()
++            if iso_date(daily_date) > today():
++                return set()
++            if bank.handles(daily_date):
++                # New official completions must use the existing atomic command
++                # transaction. A flag-off release must never reach legacy writes.
++                if not namespace["ATOMIC_RESULT_V1_ENABLED"]:
++                    raise HTTPException(503, "Atomické ukládání Daily není připravené")
++                try:
++                    return bank.valid_ids(daily_date, today=today())
++                except DailyUnavailable:
++                    return set()
++            return original["valid_daily_puzzle_ids"](daily_date)
++        except ValueError as exc:
++            raise HTTPException(400, "Neplatné datum") from exc
++
++    def resolved(puzzle_id: str, mode: str, difficulty: str):
++        if mode == "daily":
++            puzzle = pack().puzzle_by_id(puzzle_id, today=today())
++            if puzzle is not None:
++                return puzzle if puzzle.get("difficulty") == difficulty else None
++        return original["resolved_puzzle"](puzzle_id, mode, difficulty)
++
++    def exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
++        if mode == "daily":
++            puzzle = pack().puzzle_by_id(puzzle_id, today=today())
++            if puzzle is not None:
++                return puzzle.get("difficulty") == difficulty
++        return original["puzzle_exists"](puzzle_id, mode, difficulty)
++
++    def info(puzzle_id: str):
++        puzzle = pack().puzzle_by_id(puzzle_id, today=today())
++        if puzzle is not None:
++            return {"puzzle": puzzle, "difficulty": puzzle.get("difficulty"), "mode": "daily",
++                    "level": None, "legacy": False, "generation": 6}
++        return original["puzzle_info"](puzzle_id)
++
++    def shared_body(puzzle_id: str):
++        return pack().puzzle_by_id(puzzle_id, today=today())
++
++    namespace.update({"expected_daily_puzzle_id": expected, "valid_daily_puzzle_ids": valid,
++                      "resolved_puzzle": resolved, "puzzle_exists": exists, "puzzle_info": info,
++                      "dated_daily_shared_body": shared_body})
++
++    @namespace["app"].get("/api/daily")
++    def daily(request: Request, daily_date: Optional[str] = Query(default=None),
++              puzzle_id: Optional[str] = Query(default=None)):
++        # No list, preview-as-of or client clock switches on this endpoint.
++        if set(request.query_params) - {"daily_date", "puzzle_id"}:
++            raise HTTPException(404, "Tato Denní výzva není dostupná")
++        namespace["enforce_rate_limit"](request, "dated_daily_read", limit=300, window_seconds=3600)
++        selected = daily_date or today().isoformat()
++        try:
++            if iso_date(selected) > today():
++                raise DailyUnavailable("Tato Denní výzva ještě není dostupná")
++            bank = pack()
++            if bank.handles(selected):
++                payload = bank.public_payload(now=datetime.now(namespace["TZ"]), daily_date=selected, puzzle_id=puzzle_id)
++            else:
++                official = expected(selected)
++                if puzzle_id is not None and puzzle_id not in valid(selected):
++                    raise DailyUnavailable("Tato úloha nepatří k vydané Daily výzvě")
++                selected_id = puzzle_id or official
++                old_info = original["puzzle_info"](selected_id) or {}
++                body = old_info.get("puzzle")
++                if not body or (body.get("meta") or {}).get("archiveSummaryOnly"):
++                    raise DailyUnavailable("Tahle historická Daily není dostupná")
++                payload = {"schemaVersion": 1, "dailyDate": selected, "bankVersion": "legacy-daily",
++                           "puzzleId": selected_id, "contentHash": puzzle_digest(body),
++                           "challengeKey": f"daily:{selected}", "serverToday": today().isoformat(),
++                           "cacheKey": f"daily:{selected}:legacy-daily", "puzzle": body}
++        except ValueError as exc:
++            raise HTTPException(400, "Neplatné datum") from exc
++        except DailyUnavailable as exc:
++            raise HTTPException(404, "Tato Denní výzva není dostupná") from exc
++        return JSONResponse(payload, headers={"Cache-Control": "private, no-store",
++                            "Vercel-CDN-Cache-Control": "no-store", "CDN-Cache-Control": "no-store"})
+--- /dev/null
++++ b/backend/dated_daily.py
+@@ -0,0 +1,203 @@
++"""Finite, server-only Daily bindings. This module never mutates player data."""
++from __future__ import annotations
++
++from copy import deepcopy
++from dataclasses import dataclass
++from datetime import date, datetime, time, timedelta, timezone
++import hashlib
++import json
++from pathlib import Path
++import re
++from typing import Callable
++from zoneinfo import ZoneInfo
++
++PRAGUE = ZoneInfo("Europe/Prague")
++GEOMETRY_KEYS = ("rows", "cols", "letters", "mask", "answers", "lengths")
++
++
++class DailyUnavailable(RuntimeError):
++    """No scheduled/released content. Never fall back to a modulo bank."""
++
++
++class DailyNotReleased(DailyUnavailable):
++    pass
++
++
++class DailyPackInvalid(ValueError):
++    pass
++
++
++def iso_date(value: str) -> date:
++    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
++        raise ValueError("Daily datum musí mít tvar YYYY-MM-DD")
++    return date.fromisoformat(value)
++
++
++def puzzle_digest(puzzle: dict) -> str:
++    material = {key: puzzle.get(key) for key in GEOMETRY_KEYS}
++    encoded = json.dumps(material, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
++    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
++
++
++def prague_today(now: datetime | None = None) -> date:
++    now = now or datetime.now(timezone.utc)
++    if now.tzinfo is None:
++        raise ValueError("Serverový čas musí být timezone-aware")
++    return now.astimezone(PRAGUE).date()
++
++
++def next_midnight(now: datetime) -> datetime:
++    """Calendar midnight, including 25h/23h Prague days."""
++    day = prague_today(now)
++    return datetime.combine(day + timedelta(days=1), time.min, PRAGUE)
++
++
++@dataclass(frozen=True, slots=True)
++class Binding:
++    daily_date: str
++    bank_version: str
++    puzzle_id: str
++    content_hash: str
++
++
++class DatedDaily:
++    def __init__(self, payload: dict, *, allow_candidate: bool = False):
++        if payload.get("schemaVersion") != 1 or payload.get("timeZone") != "Europe/Prague":
++            raise DailyPackInvalid("Nepodporovaný datovaný Daily manifest")
++        if payload.get("status") != "approved" and not (allow_candidate and payload.get("status") == "candidate"):
++            raise DailyPackInvalid("Daily banka nemá schválený stav")
++        self.cutover = iso_date(payload["cutover"])
++        self.active_until = iso_date(payload["activeUntil"])
++        if self.active_until < self.cutover:
++            raise DailyPackInvalid("Neplatné okno Daily banky")
++        self.bank_version = str(payload.get("bankVersion") or "")
++        if not self.bank_version:
++            raise DailyPackInvalid("Chybí bankVersion")
++        self._puzzles = deepcopy(payload.get("puzzles") or {})
++        self._bindings: dict[str, Binding] = {}
++        self._by_id: dict[str, Binding] = {}
++        for row in payload.get("bindings") or []:
++            day = iso_date(row["dailyDate"])
++            binding = Binding(day.isoformat(), str(row["bankVersion"]), str(row["puzzleId"]), str(row["contentHash"]))
++            if not self.cutover <= day <= self.active_until or binding.bank_version != self.bank_version:
++                raise DailyPackInvalid("Binding leží mimo schválené okno/verzi")
++            if binding.daily_date in self._bindings or binding.puzzle_id in self._by_id:
++                raise DailyPackInvalid("Duplicitní datum nebo puzzleId")
++            puzzle = self._puzzles.get(binding.puzzle_id)
++            if not isinstance(puzzle, dict) or puzzle.get("id") != binding.puzzle_id:
++                raise DailyPackInvalid("Chybí přesné puzzle body")
++            if not re.fullmatch(r"[0-9a-f]{64}", binding.content_hash) or puzzle_digest(puzzle) != binding.content_hash:
++                raise DailyPackInvalid("Nesouhlasí contentHash Daily desky")
++            self._bindings[binding.daily_date] = binding
++            self._by_id[binding.puzzle_id] = binding
++        expected = {(self.cutover + timedelta(days=i)).isoformat() for i in range((self.active_until-self.cutover).days+1)}
++        if set(self._bindings) != expected or set(self._puzzles) != set(self._by_id):
++            raise DailyPackInvalid("Daily banka má mezeru nebo nepřiřazený obsah")
++
++    @classmethod
++    def load(cls, path: Path, *, allow_candidate: bool = False) -> "DatedDaily":
++        return cls(json.loads(path.read_text(encoding="utf-8")), allow_candidate=allow_candidate)
++
++    def handles(self, daily_date: str) -> bool:
++        # Every post-cutover date belongs to dated resolution, including gaps/end.
++        # Returning False after the end would accidentally reactivate legacy modulo.
++        return iso_date(daily_date) >= self.cutover
++
++    def binding(self, daily_date: str, *, today: date) -> Binding:
++        selected = iso_date(daily_date)
++        if selected > today:
++            raise DailyNotReleased("Daily výzva ještě není vydaná")
++        binding = self._bindings.get(daily_date)
++        if binding is None:
++            raise DailyUnavailable("Pro tento den chybí schválená Daily výzva")
++        return binding
++
++    def published_binding(self, daily_date: str) -> Binding:
++        """Internal identity lookup for history/ranking; never a public list API."""
++        binding = self._bindings.get(daily_date)
++        if binding is None:
++            raise DailyUnavailable("Pro tento den chybí schválená Daily výzva")
++        return binding
++
++    def valid_ids(self, daily_date: str, *, today: date) -> set[str]:
++        return {self.binding(daily_date, today=today).puzzle_id}
++
++    def puzzle_by_id(self, puzzle_id: str, *, today: date) -> dict | None:
++        binding = self._by_id.get(puzzle_id)
++        if binding is None or iso_date(binding.daily_date) > today:
++            return None
++        return deepcopy(self._puzzles[puzzle_id])
++
++    def public_payload(self, *, now: datetime, daily_date: str | None = None, puzzle_id: str | None = None) -> dict:
++        today = prague_today(now)
++        selected = daily_date or today.isoformat()
++        binding = self.binding(selected, today=today)
++        if puzzle_id is not None and puzzle_id != binding.puzzle_id:
++            raise DailyUnavailable("Tato úloha nepatří k vydané Daily výzvě")
++        return {
++            "schemaVersion": 1,
++            "dailyDate": binding.daily_date,
++            "bankVersion": binding.bank_version,
++            "puzzleId": binding.puzzle_id,
++            "contentHash": binding.content_hash,
++            "challengeKey": f"daily:{binding.daily_date}",
++            "serverToday": today.isoformat(),
++            "validUntil": next_midnight(now).astimezone(timezone.utc).isoformat(),
++            "cacheKey": f"daily:{binding.daily_date}:{binding.bank_version}",
++            "puzzle": deepcopy(self._puzzles[binding.puzzle_id]),
++        }
++
++
++def public_runtime_projection(source: dict, *, cutover: str, active_until: str) -> dict:
++    """Keep old ordering/history, remove all new Daily and old future bodies.
++
++    This assumes the verified finite first Gen4 cycle and deliberately fails if
++    the runtime baseline differs. New private bodies are never passed here.
++    """
++    cut = iso_date(cutover)
++    end = iso_date(active_until)
++    base = iso_date(str(source.get("dailyRotationBaseDate") or ""))
++    if int(source.get("dailyGeneration") or 0) != 4 or base != date(2026, 8, 24):
++        raise DailyPackInvalid("Veřejná projekce vyžaduje ověřenou Gen4 baseline")
++    projected = deepcopy(source)
++    projected.pop("datedDailyPrivate", None)
++    for i, puzzle in enumerate(projected.get("daily") or []):
++        # g3-d-007 is the verified compatibility Sunday, outside the Gen4 cycle.
++        if puzzle.get("id") == "g3-d-007":
++            continue
++        if not str(puzzle.get("id") or "").startswith("g4-d-"):
++            raise DailyPackInvalid("Neočekávaná Daily identita v baseline")
++        if base + timedelta(days=i) >= cut:
++            projected["daily"][i] = {
++                "id": puzzle["id"], "difficulty": puzzle["difficulty"],
++                "meta": {"contentGeneration": 4, "retiredFutureDaily": True},
++            }
++    projected["datedDaily"] = {
++        "schemaVersion": 1, "cutover": cut.isoformat(), "activeUntil": end.isoformat(),
++        "timeZone": "Europe/Prague", "endpoint": "/api/daily",
++    }
++    return projected
++
++
++def assert_no_private_payload(root: Path, pack: DatedDaily) -> dict:
++    """Scan every static output, including sourcemaps; fail on ID/hash/geometry.
++
++    This detects copied/content-shaped leaks; route probing remains a release gate.
++    """
++    needles: list[tuple[str, bytes]] = []
++    for puzzle_id, binding in pack._by_id.items():
++        needles.extend([(puzzle_id, puzzle_id.encode()), (puzzle_id, binding.content_hash.encode())])
++        letters = pack._puzzles[puzzle_id]["letters"]
++        for ascii_json in (False, True):
++            for separators in ((",", ":"), (", ", ": ")):
++                needles.append((puzzle_id, json.dumps(letters, ensure_ascii=ascii_json, separators=separators).encode()))
++    checked = 0
++    for path in sorted(root.rglob("*")):
++        if not path.is_file():
++            continue
++        checked += 1
++        data = path.read_bytes()
++        for puzzle_id, needle in needles:
++            if needle in data:
++                raise DailyPackInvalid(f"Neveřejný Daily obsah ve veřejném výstupu: {path.relative_to(root)} ({puzzle_id})")
++    return {"filesChecked": checked, "futurePuzzleCount": len(pack._by_id), "result": "PASS"}
+--- /dev/null
++++ b/public/app/content/daily-dated.js
+@@ -0,0 +1,54 @@
++(function(root,factory){
++  const api=factory();
++  if(typeof module==='object'&&module.exports)module.exports=api;
++  if(root)root.PropletDatedDaily=api;
++})(typeof globalThis!=='undefined'?globalThis:this,function(){
++  'use strict';
++  function create({fetchFn=fetch,storage=null,dateISO,now=Date.now}={}){
++    const entries=new Map();
++    let latest=null,pending=null;
++    const storageKey='proplet-dated-daily-v1';
++    try{for(const row of JSON.parse(storage?.getItem(storageKey)||'[]')){
++      if(valid(row)){entries.set(row.dailyDate,row);if(!latest||row.serverToday>latest.serverToday)latest=row}
++    }}catch{}
++    function valid(row){return row?.schemaVersion===1&&/^\d{4}-\d{2}-\d{2}$/.test(row.dailyDate||'')&&row.dailyDate<=row.serverToday&&row.puzzleId===row.puzzle?.id&&typeof row.bankVersion==='string'&&/^[0-9a-f]{64}$/.test(row.contentHash||'')&&Array.isArray(row.puzzle?.letters)&&Array.isArray(row.puzzle?.answers)&&row.challengeKey===`daily:${row.dailyDate}`}
++    function remember(row){
++      if(!valid(row))throw new Error('daily-binding-invalid');
++      const old=entries.get(row.dailyDate);
++      if(old&&(old.puzzleId!==row.puzzleId||old.contentHash!==row.contentHash||old.bankVersion!==row.bankVersion))throw new Error('daily-binding-conflict');
++      entries.set(row.dailyDate,row);latest=row;
++      try{storage?.setItem(storageKey,JSON.stringify([...entries.values()].sort((a,b)=>a.dailyDate.localeCompare(b.dailyDate)).slice(-110)))}catch{}
++      return row;
++    }
++    function today(){return latest?.serverToday||dateISO()}
++    function cached(iso){return entries.get(iso)||null}
++    async function refresh(){
++      if(pending)return pending;
++      pending=(async()=>{
++        try{
++          const response=await fetchFn('/api/daily',{cache:'no-store'});
++          if(!response.ok)throw new Error(`daily-http-${response.status}`);
++          return remember(await response.json());
++        }catch(error){
++          const row=entries.get(dateISO());
++          // Date+bankVersion cache is a restore mechanism. It cannot turn an
++          // expired yesterday payload into today's newly scheduled challenge.
++          if(row&&row.dailyDate===row.serverToday&&Date.parse(row.validUntil)>now())return row;
++          throw error;
++        }
++      })().finally(()=>{pending=null});
++      return pending;
++    }
++    async function historical(iso,puzzleId){
++      const old=entries.get(iso);
++      if(old&&(!puzzleId||old.puzzleId===puzzleId))return old;
++      const query=new URLSearchParams({daily_date:iso});if(puzzleId)query.set('puzzle_id',puzzleId);
++      const response=await fetchFn(`/api/daily?${query}`,{cache:'no-store'});
++      if(!response.ok)throw new Error(`daily-history-http-${response.status}`);
++      const row=await response.json();if(row.dailyDate!==iso||(puzzleId&&row.puzzleId!==puzzleId))throw new Error('daily-history-binding-invalid');
++      return remember(row);
++    }
++    return {refresh,historical,today,cached,remember};
++  }
++  return {create};
++});
+--- a/public/app/content/progression.js
++++ b/public/app/content/progression.js
+@@ -28,7 +28,15 @@
+       return {bank:active,base:puzzleDB.dailyRotationBaseDate||switchDate||'2026-01-01'};
+     }
+ 
+-    function dailyPuzzleFor(iso){const source=dailyBankFor(iso),n=source.bank.length;if(!n)throw new Error('Daily banka je prázdná');const i=((dayOffsetISO(iso,source.base)%n)+n)%n;return source.bank[i]}
++    function dailyPuzzleFor(iso){
++      const dated=getPuzzleDB()?.datedDaily;
++      if(dated?.cutover&&iso>=dated.cutover){
++        const released=deps.datedDaily?.cached(iso);
++        if(!released)throw new Error('Daily výzva pro toto datum se musí načíst ze serveru');
++        return released.puzzle;
++      }
++      const source=dailyBankFor(iso),n=source.bank.length;if(!n)throw new Error('Daily banka je prázdná');const i=((dayOffsetISO(iso,source.base)%n)+n)%n;return source.bank[i];
++    }
+     function dailyResultState(iso){const puzzle=dailyPuzzleFor(iso),stored=readState().completed?.[`daily:${iso}`]||null;return {puzzle,stored,active:stored?.puzzleId===puzzle.id?stored:null,legacy:stored&&stored.puzzleId!==puzzle.id?stored:null}}
+ 
+     function freeProgress(diff){
+--- a/server.py
++++ b/server.py
+@@ -1329,6 +1329,8 @@
+         banks = [data.get("daily", []), (data.get("previousDaily") or {}).get("puzzles", [])]
+         banks.extend(bank.get("puzzles", []) for bank in domain_content.legacy_daily_banks(data))
+         puzzle = next((p for bank in banks for p in bank if p.get("id") == puzzle_id), None)
++        if puzzle is None and "dated_daily_shared_body" in globals():
++            puzzle = dated_daily_shared_body(puzzle_id)
+     elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or VERCEL_ENV == "preview"):
+         slot = tajenka_week_for(today)
+         latest = slot or 0
+@@ -5149,6 +5151,9 @@
+ 
+ 
+ # v3.31.8 — additive identity bridge. Existing Proplet sessions/passwords stay canonical.
++from backend.daily_runtime import install as install_dated_daily
++install_dated_daily(globals())
++
+ from account_auth import AppServices, install_account_auth
+ install_account_auth(
+     app,
+--- a/tools/generate_puzzles_bootstrap.py
++++ b/tools/generate_puzzles_bootstrap.py
+@@ -93,13 +93,18 @@
+     today = today or datetime.now(ZoneInfo("Europe/Prague")).date()
+     valid_from = today - timedelta(days=BOOTSTRAP_DAYS_BEHIND)
+     valid_through = today + timedelta(days=BOOTSTRAP_DAYS_AHEAD)
++    dated_cutover = (source.get("datedDaily") or {}).get("cutover")
+     full_daily_ids = {
+-        daily_puzzle_id(source, (valid_from + timedelta(days=offset)).isoformat())
++        daily_puzzle_id(source, selected)
+         for offset in range((valid_through - valid_from).days + 1)
++        for selected in [(valid_from + timedelta(days=offset)).isoformat()]
++        if not dated_cutover or (selected < dated_cutover and selected <= today.isoformat())
+     }
+ 
+     bootstrap = {key: value for key, value in source.items() if key not in HEAVY_KEYS}
+     bootstrap["bootstrapSchema"] = 1
++    if dated_cutover:
++        bootstrap["bootstrapPublishedThrough"] = today.isoformat()
+     bootstrap["bootstrapValidFrom"] = valid_from.isoformat()
+     bootstrap["bootstrapValidThrough"] = valid_through.isoformat()
+     bootstrap["bootstrapSource"] = {
+@@ -148,7 +153,12 @@
+     cursor = parse_iso(valid_from)
+     end = parse_iso(valid_through)
+     by_id = {puzzle.get("id"): puzzle for puzzle in daily}
++    dated_cutover = (source.get("datedDaily") or {}).get("cutover")
++    published_through = parse_iso(bootstrap["bootstrapPublishedThrough"]) if dated_cutover else None
+     while cursor <= end:
++        if dated_cutover and (cursor.isoformat() >= dated_cutover or cursor > published_through):
++            cursor += timedelta(days=1)
++            continue
+         puzzle_id = daily_puzzle_id(source, cursor.isoformat())
+         if not is_playable_puzzle(by_id.get(puzzle_id)):
+             raise ValueError(f"Bootstrap Daily is not playable for {cursor.isoformat()}: {puzzle_id}")
+--- /dev/null
++++ b/tools/project_dated_daily_public.py
+@@ -0,0 +1,33 @@
++"""Explicit-output public projection and private-content static scan."""
++from __future__ import annotations
++import argparse
++import json
++from pathlib import Path
++import sys
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT))
++from backend.dated_daily import DatedDaily, assert_no_private_payload, public_runtime_projection
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--source", type=Path, required=True)
++    parser.add_argument("--pack", type=Path, required=True)
++    parser.add_argument("--output", type=Path, required=True)
++    parser.add_argument("--scan-root", type=Path, required=True)
++    parser.add_argument("--candidate", action="store_true", help="Local candidate QA only")
++    args = parser.parse_args()
++    if args.source.resolve() == args.output.resolve():
++        raise ValueError("Výstup nesmí přepsat zdroj")
++    pack = DatedDaily.load(args.pack, allow_candidate=args.candidate)
++    source = json.loads(args.source.read_text(encoding="utf-8"))
++    projected = public_runtime_projection(source, cutover=pack.cutover.isoformat(), active_until=pack.active_until.isoformat())
++    encoded = json.dumps(projected, ensure_ascii=False, separators=(",", ":"))
++    args.output.parent.mkdir(parents=True, exist_ok=True)
++    args.output.write_text(encoded, encoding="utf-8")
++    print(json.dumps(assert_no_private_payload(args.scan_root, pack), sort_keys=True))
++
++
++if __name__ == "__main__":
++    main()

@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "independent_qa AI editorial",
+  "dailyDate": "2026-11-23",
+  "originalBoard": {
+    "difficulty": "easy",
+    "rows": 5,
+    "cols": 5,
+    "mask": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      13,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ],
+    "letters": [
+      "A",
+      "L",
+      "A",
+      "T",
+      "Á",
+      "F",
+      "Z",
+      "",
+      "A",
+      "",
+      "R",
+      "",
+      "",
+      "V",
+      "",
+      "A",
+      "Ž",
+      "E",
+      "L",
+      "C",
+      "H",
+      "S",
+      "R",
+      "N",
+      "E"
+    ],
+    "answers": [
+      {
+        "word": "ŽELVA",
+        "path": [
+          16,
+          17,
+          18,
+          13,
+          8
+        ]
+      },
+      {
+        "word": "SRNEC",
+        "path": [
+          21,
+          22,
+          23,
+          24,
+          19
+        ]
+      },
+      {
+        "word": "ZLATÁ",
+        "path": [
+          6,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "word": "HARFA",
+        "path": [
+          20,
+          15,
+          10,
+          5,
+          0
+        ]
+      }
+    ],
+    "lengths": [
+      5,
+      5,
+      5,
+      5
+    ],
+    "id": "g6-d-20261123",
+    "meta": {
+      "dailyDate": "2026-11-23",
+      "bankVersion": "daily-gen6-20261007-v1",
+      "generatorGeneration": 6,
+      "geometryProfile": "gen5-easy-pilot-v2",
+      "releaseCandidate": true,
+      "editorialStatus": "pending",
+      "manufacture": {
+        "seed": 13102821062026745289,
+        "attempt": 47,
+        "profileOrdinal": 27,
+        "geometry": {
+          "rows": 5,
+          "cols": 5,
+          "cells": 20,
+          "wordCount": 4,
+          "fourWords": 0,
+          "minLength": 5,
+          "maxLength": 5,
+          "minPathTurns": 0,
+          "maxPathTurns": 1,
+          "maxPathStraightShare": 1.0,
+          "meanTurns": 0.75,
+          "meanStraightShare": 0.75,
+          "curvyShare": 0.0,
+          "maxCurlRun": 1,
+          "curlPathCount": 0,
+          "endpointStartPairs": 0,
+          "blankComponents": 2,
+          "isolatedBlanks": 0,
+          "bboxRows": 5,
+          "bboxCols": 5
+        },
+        "ambiguity": {
+          "id": null,
+          "difficulty": "easy",
+          "level": null,
+          "profile": null,
+          "targetCount": 4,
+          "falsePrefixes": {
+            "2": 31,
+            "3": 21,
+            "4": 2
+          },
+          "falseStartCells": 18,
+          "targetAlternativeBranches": 2,
+          "startLetterCollisions": 0,
+          "matchingShortPaths": 66,
+          "localAmbiguityScore": 7.625
+        },
+        "verification": {
+          "status": "unique",
+          "solutionsLowerBound": 1,
+          "targetPathsUnique": true,
+          "candidateCount": 5,
+          "searchNodes": 5,
+          "enumerationAndSearchNodes": 217,
+          "forcedNodeShare": 0.8,
+          "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+          "dictionarySize": 103836
+        },
+        "lexiconSha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+        "centralVerification": {
+          "status": "unique",
+          "solutionsLowerBound": 1,
+          "targetPathsUnique": true,
+          "candidateCount": 5,
+          "searchNodes": 5,
+          "enumerationAndSearchNodes": 217,
+          "forcedNodeShare": 0.8,
+          "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+          "dictionarySize": 103836
+        }
+      }
+    }
+  },
+  "originalContentHash": "ebbb0e7ced30294945c499c203e038ed6f65bf9d8b5e55d4615b684382c35455",
+  "replacementContentHash": "1080f9993fcedf8c150f99d8149f4d616b3cde2dd80c41b3644f211ffb589824",
+  "replacementBoard": {
+    "difficulty": "easy",
+    "rows": 5,
+    "cols": 5,
+    "mask": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      19,
+      20,
+      21,
+      22
+    ],
+    "letters": [
+      "D",
+      "E",
+      "N",
+      "Í",
+      "K",
+      "V",
+      "A",
+      "Ř",
+      "I",
+      "T",
+      "P",
+      "T",
+      "Á",
+      "C",
+      "E",
+      "A",
+      "",
+      "",
+      "",
+      "K",
+      "Ř",
+      "E",
+      "Z",
+      "",
+      ""
+    ],
+    "answers": [
+      {
+        "word": "VAŘIT",
+        "path": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "word": "PAŘEZ",
+        "path": [
+          10,
+          15,
+          20,
+          21,
+          22
+        ]
+      },
+      {
+        "word": "DENÍK",
+        "path": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "word": "TÁCEK",
+        "path": [
+          11,
+          12,
+          13,
+          14,
+          19
+        ]
+      }
+    ],
+    "lengths": [
+      5,
+      5,
+      5,
+      5
+    ],
+    "id": "g6-d-20261123",
+    "meta": {
+      "dailyDate": "2026-11-23",
+      "bankVersion": "daily-gen6-20261007-v1",
+      "generatorGeneration": 6,
+      "geometryProfile": "gen5-easy-pilot-v2",
+      "releaseCandidate": true,
+      "editorialStatus": "pending",
+      "manufacture": {
+        "seed": 18210611654063214277,
+        "attempt": 27,
+        "profileOrdinal": 27,
+        "geometry": {
+          "rows": 5,
+          "cols": 5,
+          "cells": 20,
+          "wordCount": 4,
+          "fourWords": 0,
+          "minLength": 5,
+          "maxLength": 5,
+          "minPathTurns": 0,
+          "maxPathTurns": 1,
+          "maxPathStraightShare": 1.0,
+          "meanTurns": 0.5,
+          "meanStraightShare": 0.8125,
+          "curvyShare": 0.0,
+          "maxCurlRun": 1,
+          "curlPathCount": 0,
+          "endpointStartPairs": 0,
+          "blankComponents": 1,
+          "isolatedBlanks": 0,
+          "bboxRows": 5,
+          "bboxCols": 5
+        },
+        "ambiguity": {
+          "id": null,
+          "difficulty": "easy",
+          "level": null,
+          "profile": null,
+          "targetCount": 4,
+          "falsePrefixes": {
+            "2": 31,
+            "3": 18,
+            "4": 3
+          },
+          "falseStartCells": 17,
+          "targetAlternativeBranches": 5,
+          "startLetterCollisions": 0,
+          "matchingShortPaths": 64,
+          "localAmbiguityScore": 8.938
+        },
+        "verification": {
+          "status": "unique",
+          "solutionsLowerBound": 1,
+          "targetPathsUnique": true,
+          "candidateCount": 5,
+          "searchNodes": 5,
+          "enumerationAndSearchNodes": 231,
+          "forcedNodeShare": 0.8,
+          "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+          "dictionarySize": 103836
+        },
+        "lexiconSha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+        "centralVerification": {
+          "status": "unique",
+          "solutionsLowerBound": 1,
+          "targetPathsUnique": true,
+          "candidateCount": 5,
+          "searchNodes": 5,
+          "enumerationAndSearchNodes": 231,
+          "forcedNodeShare": 0.8,
+          "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+          "dictionarySize": 103836
+        }
+      },
+      "editorialRepair": {
+        "rejectedContentHash": "ebbb0e7ced30294945c499c203e038ed6f65bf9d8b5e55d4615b684382c35455",
+        "reason": "Concrete Easy composition contains context-dependent feminine form ZLATÁ; select a clearer composition without changing approved V3."
+      }
+    }
+  },
+  "repairCodeSha256": "2f76052923d9897b4932ac863a3c345ede5abe1df0d6673f870c3a8104302a02",
+  "diagnostics": [
+    {
+      "attempt": 0,
+      "seed": 18210611654063214277,
+      "seconds": 0.165,
+      "rejections": {
+        "packing": 258,
+        "ambiguity": 16,
+        "geometry": 8,
+        "composition": 1,
+        "isolated_cutouts": 4,
+        "solver_multiple": 1
+      }
+    }
+  ],
+  "originalBankContentHash": "cf2d79675ed7cbebd3337b0da4e496997ddea3fb484daf8675d70f8c66fc726c",
+  "finalBankContentHash": "3abe6feda3e25262ed07aa25aa02687338a41ab6382e018760a13961f2ada104",
+  "policyChanged": false,
+  "currentBankUnchanged": true,
+  "status": "technical-manufacture-passed-awaiting-independent-reacceptance"
+}

@@ -1,0 +1,19 @@
+{
+  "fixtureSafety": [
+    {
+      "id": "g6-refresh-easy-001",
+      "matchesCurrentPublishedGeometry": true
+    },
+    {
+      "id": "g6-refresh-medium-001",
+      "matchesCurrentPublishedGeometry": true
+    },
+    {
+      "id": "g6-refresh-hard-001",
+      "matchesCurrentPublishedGeometry": true
+    }
+  ],
+  "browserVerification": "not-run: local Chromium executable unavailable",
+  "observedBrowserFailure": "Playwright executable does not exist at /root/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell",
+  "productionBrowserVerification": false
+}

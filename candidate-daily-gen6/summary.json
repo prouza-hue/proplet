@@ -1,0 +1,204 @@
+{
+  "asOf": "2026-10-05",
+  "bankVersion": "daily-gen6-20261007-v1",
+  "dateFrom": "2026-10-07",
+  "dateUntil": "2027-01-14",
+  "count": 100,
+  "counts": {
+    "easy": 28,
+    "medium": 44,
+    "hard": 28
+  },
+  "wordTokens": 625,
+  "uniqueWords": 572,
+  "maxOccurrences": 3,
+  "months": {
+    "2026-10": {
+      "medium": 12,
+      "hard": 7,
+      "easy": 6
+    },
+    "2026-11": {
+      "hard": 9,
+      "easy": 9,
+      "medium": 12
+    },
+    "2026-12": {
+      "easy": 9,
+      "medium": 14,
+      "hard": 8
+    },
+    "2027-01": {
+      "medium": 6,
+      "hard": 4,
+      "easy": 4
+    }
+  },
+  "byDifficulty": {
+    "easy": {
+      "boards": 28,
+      "wordTokens": 115,
+      "expansionWords": 91,
+      "expansionShare": 79.1,
+      "uniqueWords": 110,
+      "tierCounts": {
+        "A": 115
+      },
+      "boardSizes": {
+        "5×5": 21,
+        "6×6": 7
+      }
+    },
+    "medium": {
+      "boards": 44,
+      "wordTokens": 276,
+      "expansionWords": 219,
+      "expansionShare": 79.3,
+      "uniqueWords": 258,
+      "tierCounts": {
+        "A": 168,
+        "B": 108
+      },
+      "boardSizes": {
+        "7×7": 44
+      }
+    },
+    "hard": {
+      "boards": 28,
+      "wordTokens": 234,
+      "expansionWords": 152,
+      "expansionShare": 65.0,
+      "uniqueWords": 228,
+      "tierCounts": {
+        "C": 60,
+        "B": 135,
+        "A": 39
+      },
+      "boardSizes": {
+        "9×9": 28
+      }
+    }
+  },
+  "lengths": {
+    "easy": {
+      "4": 22,
+      "5": 56,
+      "6": 37
+    },
+    "medium": {
+      "4": 74,
+      "5": 115,
+      "6": 58,
+      "7": 29
+    },
+    "hard": {
+      "4": 25,
+      "5": 57,
+      "6": 56,
+      "7": 52,
+      "8": 28,
+      "9": 16
+    }
+  },
+  "topics": {
+    "easy": {
+      "vlastnosti, pocity a chování": 7,
+      "dílna, řemesla a materiály": 4,
+      "kuchyně, jídlo a stolování": 21,
+      "historická smíšená témata": 24,
+      "činnosti a pohyb": 7,
+      "domov, stavby a sídla": 13,
+      "zvířata a péče o ně": 8,
+      "doprava, cesty a cestování": 4,
+      "lidé, vztahy a povolání": 2,
+      "rostliny, zahrada a pěstování": 12,
+      "oděv, textil a doplňky": 6,
+      "počasí, obloha a světlo": 3,
+      "škola, jazyk, knihy a papír": 3,
+      "krajina, voda a geologie": 1
+    },
+    "medium": {
+      "vlastnosti, pocity a chování": 17,
+      "zvířata a péče o ně": 21,
+      "dílna, řemesla a materiály": 22,
+      "domov, stavby a sídla": 21,
+      "oděv, textil a doplňky": 13,
+      "kuchyně, jídlo a stolování": 26,
+      "hudba, zvuky a divadlo": 13,
+      "rostliny, zahrada a pěstování": 31,
+      "historická smíšená témata": 47,
+      "doprava, cesty a cestování": 16,
+      "lidé, vztahy a povolání": 5,
+      "počasí, obloha a světlo": 5,
+      "krajina, voda a geologie": 8,
+      "věda, vesmír, matematika a měření": 4,
+      "činnosti a pohyb": 8,
+      "pohádky, fantazie a dobrodružství": 6,
+      "škola, jazyk, knihy a papír": 8,
+      "kultura a výtvarná tvorba": 3,
+      "myšlení, společnost a abstrakce": 1,
+      "hry, hračky a sport": 1
+    },
+    "hard": {
+      "dílna, řemesla a materiály": 15,
+      "rostliny, zahrada a pěstování": 16,
+      "hudba, zvuky a divadlo": 15,
+      "historická smíšená témata": 72,
+      "kuchyně, jídlo a stolování": 9,
+      "doprava, cesty a cestování": 14,
+      "kultura a výtvarná tvorba": 8,
+      "zvířata a péče o ně": 20,
+      "myšlení, společnost a abstrakce": 4,
+      "krajina, voda a geologie": 6,
+      "pohádky, fantazie a dobrodružství": 2,
+      "věda, vesmír, matematika a měření": 6,
+      "domov, stavby a sídla": 12,
+      "oděv, textil a doplňky": 5,
+      "počasí, obloha a světlo": 5,
+      "vlastnosti, pocity a chování": 5,
+      "lidé, vztahy a povolání": 4,
+      "škola, jazyk, knihy a papír": 9,
+      "činnosti a pohyb": 3,
+      "hry, hračky a sport": 4
+    }
+  },
+  "technicalPass": true,
+  "editorialAccepted": 100,
+  "bankContentHash": "3abe6feda3e25262ed07aa25aa02687338a41ab6382e018760a13961f2ada104",
+  "bankFileSha256": "49fbdb9d95aa007911f0d7bde5522127adac01d51728109315f84d51741a558e",
+  "recognitionWords": 103836,
+  "humanPlaytest": false,
+  "userApproval": false,
+  "productionChanged": false,
+  "plannedCutoverPrague": "2026-10-07T00:00:00+02:00",
+  "plannedCutoverUTC": "2026-10-06T22:00:00Z",
+  "reminder": {
+    "date": "2026-12-31",
+    "timeZone": "Europe/Prague",
+    "timing": "morning-flexible",
+    "created": true
+  },
+  "state": {
+    "manufacture": "complete",
+    "independentTechnicalQA": "passed-100",
+    "AIEditorial": "accepted-100",
+    "runtimeDistribution": "candidate-partial-integration",
+    "release": "not-authorized-by-content-approval-yet"
+  },
+  "pendingRelease": [
+    "Pavel approves final content batch",
+    "finish client boot/history/serverDate and SW migration",
+    "actual full build/HTTP/DB/browser gates"
+  ],
+  "editorialRepair": {
+    "date": "2026-11-23",
+    "rejectedReason": "ZLATÁ is context-dependent for this Easy composition",
+    "acceptedWords": [
+      "VAŘIT",
+      "PAŘEZ",
+      "DENÍK",
+      "TÁCEK"
+    ],
+    "globalLexiconChanged": false
+  }
+}

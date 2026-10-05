@@ -1,0 +1,112 @@
+{
+  "status": "candidate-not-deployed",
+  "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db",
+  "privatePackSha256": "761315d2a8fde6fbe6a8d0feba429d4ef313a5cb10de3a5e4697986ed1b56c92",
+  "tests": [
+    {
+      "name": "python-contract",
+      "command": [
+        "python",
+        "daily-integration/tests/test_dated_daily.py"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "python-contract.log"
+    },
+    {
+      "name": "node-contract",
+      "command": [
+        "node",
+        "daily-integration/tests/test_dated_client.cjs"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "node-contract.log"
+    },
+    {
+      "name": "python-syntax",
+      "command": [
+        "python",
+        "-m",
+        "compileall",
+        "-q",
+        "daily-integration/candidate/backend",
+        "daily-integration/candidate/server.py",
+        "daily-integration/candidate/tools"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "python-syntax.log"
+    },
+    {
+      "name": "node-syntax-store",
+      "command": [
+        "node",
+        "--check",
+        "daily-integration/candidate/public/app/content/daily-dated.js"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "node-syntax-store.log"
+    },
+    {
+      "name": "node-syntax-progression",
+      "command": [
+        "node",
+        "--check",
+        "daily-integration/candidate/public/app/content/progression.js"
+      ],
+      "exitCode": 0,
+      "result": "PASS",
+      "log": "node-syntax-progression.log"
+    }
+  ],
+  "pythonContractTestCount": 11,
+  "historicalDatesCompared": 279,
+  "pending": [
+    "complete-app.js-async-integration",
+    "index-and-SW-cache-migration",
+    "actual-ASGI-framework-endpoints",
+    "full-current-runtime-gate",
+    "actual-Vercel-static-output-and-route-probes",
+    "test-database-concurrency-and-no-second-XP",
+    "browser-mobile-Fold-desktop-flow"
+  ],
+  "observedBlocker": "ModuleNotFoundError: httpx; fastapi/starlette unavailable in normal and primary runtime Python",
+  "files": [
+    {
+      "path": "candidate/backend/daily_runtime.py",
+      "sha256": "a54a4dd05e5811f2e82c47821dcc49b452a6d6b753255a667c8604664088c4af"
+    },
+    {
+      "path": "candidate/backend/dated_daily.py",
+      "sha256": "93a029e5106233aa28e19aed25735dce6a7e60e406ba03d877024c386a588d6f"
+    },
+    {
+      "path": "candidate/public/app/content/daily-dated.js",
+      "sha256": "d8bbc4b293289f6a9564fedb6802771dc9f8f2b7898e2f490541a37baceff08a"
+    },
+    {
+      "path": "candidate/public/app/content/progression.js",
+      "sha256": "e236b7844deaf01e29606fe96d9dba5a67fd6c636041b395443b1e3f311f38ec"
+    },
+    {
+      "path": "candidate/server.py",
+      "sha256": "d4a7186c45895cab8cd368cd5da7148dae8c3f47803f2faa18a581e028e58de4"
+    },
+    {
+      "path": "candidate/tools/generate_puzzles_bootstrap.py",
+      "sha256": "7842feb792aae68d8b2e7c4eeddcd0d721c6d362392cd2cbe89200b5c3cf5872"
+    },
+    {
+      "path": "candidate/tools/project_dated_daily_public.py",
+      "sha256": "f385e2f0dd809db6da20351cb7f261c7051a0a3e8bc9dba7bb84a2aef36dd92d"
+    }
+  ],
+  "patchApplyCheck": {
+    "result": "PASS",
+    "command": "git apply --check ../integration.patch",
+    "scope": "read-only partial upstream snapshot pinned to production main SHA"
+  },
+  "patchSha256": "8f9fcd06dd2003789f0e638b8e4c88032ecce684cf4da3f6c2bd81192138a7c1"
+}

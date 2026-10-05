@@ -1,0 +1,71 @@
+{
+  "sources": [
+    {
+      "path": "public/puzzles.json",
+      "sha256": "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/puzzles.json",
+      "sha256": "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/rolling_content_v1.json",
+      "sha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/legacy_daily_gen1.json",
+      "sha256": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/legacy_daily_gen2.json",
+      "sha256": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/tajenka_weekend_v1.json",
+      "sha256": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/tajenka_weekend_v2.json",
+      "sha256": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/tajenka_v2_approved.json",
+      "sha256": "16f7758b5d1c1c1d84ef21f23e0ca3f6490dedc5f66ae0afa96924e2b633f6bb",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/tajenka_v2_board_candidates.json",
+      "sha256": "0bd8b6842ca914315c9fadc01d39a6d70493b5f11b203fab41ca208a2051134f",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v1.json",
+      "sha256": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v2.json",
+      "sha256": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v3.json",
+      "sha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    },
+    {
+      "path": "content/gen6/mozkokalypsa-100/bank.json",
+      "sha256": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
+      "sourceMain": "a41c9e3b1ca55b86e3b6cf7935c30b6190e0e1db"
+    }
+  ],
+  "boards": 3097,
+  "personalExposure": "unknown; static history only"
+}
