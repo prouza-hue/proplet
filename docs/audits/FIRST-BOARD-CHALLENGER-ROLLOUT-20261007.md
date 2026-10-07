@@ -15,9 +15,9 @@ Jde o praktický produktový rollout, nikoli vyhlášení statistického vítěz
   Vynechání první fáze by ztratilo policy na downstream eventech.
 - Historický first-board-v1 test zůstává uzavřený k 6. 10. 00:00 Prague.
   Nová policy není randomizace 50/50 a nesmí vstoupit do původního SRM.
-- PR180 Generování Daily desek nebyl mergován ani změněn; před tímto releasem
-  ověřit znovu jeho head a produkční main. Rozšíření Daily může nadále použít
-  vlastní navazující release.
+- Daily PR182 se mezitím dostal do mainu (17e0d3f). Tento rollout je rebased
+  na něj; obsah Daily od 8. 10. do 31. 12. ani dnešní desku nemění.
+  Soukromý draft PR180 není tímto releasem mergován ani změněn.
 
 Ověření: izolovaný API a cached-client kontrakt; kandidátní migrace a rollback
 test na skutečném Postgresu s is_test=true (buckety0/49/50/99, sticky retry,

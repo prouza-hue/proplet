@@ -18,8 +18,19 @@ const policy='challenger_rollout_20261007';
    await page.goto(url);await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter'&&document.querySelectorAll('#board .cell').length===9);
    async function solve(){
     const paths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
+    const isStarter=await page.evaluate(()=>currentGame.mode==='starter');
     for(let i=0;i<paths.length;i++){
-     for(const index of paths[i])await page.locator('#board .cell[data-index="'+index+'"]').click();
+     if(isStarter){for(const index of paths[i])await page.locator('#board .cell[data-index="'+index+'"]').click();}
+     else{
+      const points=[];
+      for(const index of paths[i]){const b=await page.locator('#board .cell[data-index="'+index+'"]').boundingBox();points.push({x:b.x+b.width/2,y:b.y+b.height/2});}
+      if(mobile){
+       const cdp=await ctx.newCDPSession(page);
+       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...points[0],id:1,radiusX:3,radiusY:3,force:1}]});
+       for(const p of points.slice(1)){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{...p,id:1,radiusX:3,radiusY:3,force:1}]});await page.waitForTimeout(45);}
+       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+      }else{await page.mouse.move(points[0].x,points[0].y);await page.mouse.down();for(const p of points.slice(1)){await page.mouse.move(p.x,p.y,{steps:3});await page.waitForTimeout(45);}await page.mouse.up();}
+     }
      await page.waitForFunction(n=>currentGame.found.length===n,i+1);
     }
     await page.locator('#winModal').waitFor({state:'visible'});
