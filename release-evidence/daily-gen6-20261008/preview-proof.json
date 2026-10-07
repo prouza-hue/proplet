@@ -1,0 +1,53 @@
+{
+  "deployment": "dpl_EbCYFRnp73coZJYcKYUaArm7zJRy",
+  "sourceSha": "4861a31ac82e8ab5a33f2576a93409f2c22f398b",
+  "rows": [
+    {
+      "path": "/api/daily",
+      "status": 200,
+      "sha256": "e55e4c9b9c6a3c20d05f6bb5e29109ff3a6a1ce6c1af786adb03c40bf036e1e8",
+      "cacheControl": "no-store",
+      "puzzleId": "g4-d-045",
+      "dailyDate": "2026-10-07",
+      "unchangedToday": true
+    },
+    {
+      "path": "/api/shared-puzzle?kind=daily&daily_date=2026-10-07&puzzle_id=g4-d-045",
+      "status": 200,
+      "sha256": "30b02e314ffe5c7e9c155b00fe4b1803bc33da7fa38d27b86e6e14166eb9bdc0",
+      "cacheControl": "no-store"
+    },
+    {
+      "path": "/api/daily?daily_date=2026-10-08",
+      "status": 404
+    },
+    {
+      "path": "/api/daily?list=1",
+      "status": 404
+    },
+    {
+      "path": "/data/daily_gen6_private.json",
+      "status": 404
+    },
+    {
+      "path": "/release-evidence/daily-gen6-20261008/content-release.json",
+      "status": 404
+    },
+    {
+      "path": "/candidate-daily-gen6/bank.json",
+      "status": 404
+    },
+    {
+      "path": "/puzzles.json",
+      "status": 200,
+      "sha256": "376a1f0f4dd10053fb872e533649bb2a45ec2d24b72425861282ccd2a69de91c",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/sw.js",
+      "status": 200,
+      "sha256": "80182de70f4336812b8054dd51731346e393310a1444da479034c24741915d55",
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    }
+  ]
+}

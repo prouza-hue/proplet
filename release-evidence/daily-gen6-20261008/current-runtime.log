@@ -1,0 +1,500 @@
+PASS current tests/current/test_first_board_catchup.py (0.30s)
+PASS current tests/current/test_first_board_catchup.cjs (0.06s)
+PASS current tests/current/test_usage_auth.py (0.52s)
+PASS current tests/current/test_puzzle_boot_recovery.cjs (0.09s)
+PASS current tests/current/test_starter_result_validation.py (0.75s)
+PASS current tests/current/test_funnel_context.cjs (0.06s)
+PASS current tests/current/test_starter_tap_input.cjs (0.06s)
+PASS current tests/current/test_onboarding_provenance.py (0.60s)
+PASS current tests/current/test_meta_acquisition.cjs (0.07s)
+PASS current tests/current/test_meta_acquisition.py (0.02s)
+PASS current tests/current/test_mozkokalypsa_adapter.js (0.06s)
+PASS current tests/current/test_mozkokalypsa.py (1.46s)
+PASS current tests/current/test_mozkokalypsa.js (0.06s)
+PASS current tests/current/test_today_mozkomor.js (0.06s)
+PASS current tests/current/test_free_order_api.py (0.58s)
+PASS current tests/current/test_free_order.js (0.07s)
+PASS current tests/current/test_sparse_free_slots.js (0.15s)
+PASS current tests/current/test_marketing_consent.js (0.07s)
+PASS current tests/current/test_marketing_diagnostics.cjs (0.07s)
+PASS current tests/current/test_marketing_diagnostics.py (0.04s)
+PASS current tests/current/test_client_error_privacy.cjs (0.05s)
+PASS current tests/current/test_client_error_privacy.py (0.11s)
+PASS current tests/current/test_result_confirmation_latency.js (0.07s)
+PASS current tests/current/test_mozkomor_any_200.py (0.64s)
+PASS current tests/current/test_fair_play.js (0.06s)
+PASS current tests/current/test_account_created_authority.py (0.31s)
+PASS current tests/current/test_result_action_dock.js (0.05s)
+PASS current tests/current/test_account_progress_cache.js (0.07s)
+PASS current tests/current/test_bonus_retry.js (0.06s)
+PASS current tests/current/test_gen5_release_cta.js (0.08s)
+PASS current tests/current/test_gen5_preview.py (0.87s)
+PASS current tests/current/test_gen5_production.py (1.13s)
+PASS current tests/current/test_account_identity_boundary.py (0.44s)
+PASS current tests/current/test_preview_path_boundary.py (0.60s)
+PASS current tests/current/test_browser_fixture.cjs (0.19s)
+PASS current tests/current/test_idle_offline.js (0.08s)
+PASS current tests/current/test_recognition_retry.js (0.06s)
+PASS current tests/current/test_recognition_overlay.py (0.79s)
+PASS current tests/current/test_tajenka_rules.js (0.06s)
+PASS current tests/current/test_avatar_editor.js (0.06s)
+PASS current tests/current/test_rank_titles.js (0.07s)
+PASS current tests/current/test_lock_copy_convergence.js (0.06s)
+PASS current tests/current/test_privacy_icon_convergence.js (0.06s)
+PASS current tests/current/test_registration_destination.js (0.06s)
+PASS current tests/current/test_welcome_claim.py (0.54s)
+PASS current tests/current/test_organic_idle.js (0.06s)
+PASS current tests/current/test_settings_controls.js (0.06s)
+PASS current tests/current/test_in_app_browser_auth.cjs (0.06s)
+PASS current tests/current/test_auth_title_convergence.js (0.06s)
+PASS current tools/test_v4001_pwa_startup.py (0.03s)
+PASS current tools/test_v4002_daily_sync_p0.py (0.75s)
+PASS current tools/test_v4004_rank_order.py (0.70s)
+PASS current tools/test_v4007_fresh_free_progression.py (0.02s)
+PASS current tools/test_v4010_gen4_xp_rewards.py (0.56s)
+PASS current tools/test_v4012_pwa_resume_update.py (0.02s)
+PASS current tools/test_v40114_retention_funnel.py (0.02s)
+PASS current tools/test_v40124_supabase_rpc_auth.py (0.53s)
+PASS current tools/test_v40126_push_retention_p0.py (0.03s)
+PASS current tools/test_v40132_mozkomor_news_preview.py (0.85s)
+PASS current tools/test_v40133_sync_quarantine.py (0.02s)
+PASS current tools/test_v40134_retention_claim_fix.py (0.02s)
+PASS current tools/test_tajenka_preview.py (0.04s)
+PASS current tools/test_tajenka_push_runtime.py (0.35s)
+PASS current tests/current/test_content_launch_push.py (0.23s)
+PASS current tests/current/test_tajenka_weekly_availability.py (0.51s)
+PASS current tests/current/test_tajenka_result_validation.py (0.62s)
+PASS current tools/test_word_discovery_xp.py (0.21s)
+PASS current tools/test_v40135_profile_wide_layout.py (0.02s)
+PASS current tests/current/test_s04_backend_foundation.py (0.72s)
+PASS current tests/current/test_s06_backend_dependencies.py (0.68s)
+PASS current tests/current/test_s07a_progress_pure_core.py (0.53s)
+PASS current tests/current/test_s07b_readonly_stats.py (0.51s)
+PASS current tests/current/test_s08a_result_contract.py (0.03s)
+PASS current tests/current/test_s08b_result_adapter_characterization.py (0.53s)
+PASS current tests/current/test_s08b_atomic_result_adapter.py (0.53s)
+PASS current tests/current/test_s09_ranking_query_bounds.py (0.52s)
+PASS current tests/current/test_domain_golden.py (0.18s)
+PASS current tests/current/test_s10_frontend_core.js (0.07s)
+PASS current tests/current/test_s11a_completion_characterization.js (0.05s)
+PASS current tests/current/test_s11b1_game_session.js (0.07s)
+PASS current tests/current/test_s11b2_game_interaction.js (0.06s)
+PASS current tests/current/test_s12a_account_session.js (0.06s)
+PASS current tests/current/test_s12a2_tajenka_storage.js (0.05s)
+PASS current tests/current/test_s12a2_profile_team_ui.js (0.06s)
+PASS current tests/current/test_s12b_engagement.js (0.06s)
+PASS current tests/current/test_s12b2_daily_progression.js (0.06s)
+PASS current tests/current/test_s12b3_rankings_characterization.js (0.07s)
+PASS current tests/current/test_s12a_account_backend.py (0.02s)
+PASS current tools/test_v319_focus_pause.js (0.06s)
+PASS current tools/test_v40114_share_runtime.js (0.06s)
+PASS current tests/current/test_result_queue.js (0.05s)
+PASS current tests/current/test_domain_golden.js (0.14s)
+PASS current tests/current/test_sw_lifecycle.js (0.05s)
+PASS current tests/current/test_sw_update_handshake.js (0.06s)
+PASS current tests/current/test_automatic_updates.js (0.06s)
+PASS current tests/current/test_board_onboarding.js (0.06s)
+PASS current tests/current/test_s13a_css_characterization.py (0.02s)
+PASS current tests/current/test_s13b_css_characterization.py (0.02s)
+PASS current tests/current/test_avatar_optical_sizing.py (0.28s)
+PASS current tests/current/test_s14_content_characterization.py (0.48s)
+PASS current tests/current/test_s14_content_pipeline.py (4.96s)
+PASS current tests/current/test_s15_analytics_characterization.py (0.54s)
+PASS current tests/current/test_s15_analytics_adapter.js (0.06s)
+PASS current tests/current/test_s16_legacy_reachability.py (0.03s)
+PASS current tests/current/test_migration_manifest.py (0.05s)
+PASS current tools/validate_migration_manifest.py (0.04s)
+PASS current tests/current/test_final_debt_account_lookup_characterization.py (0.27s)
+PASS current tests/current/test_final_debt_push_diagnostics_characterization.py (0.39s)
+PASS current tests/current/test_final_debt_query_bounds.py (0.02s)
+PASS current tests/current/test_runtime_resilience.py (0.50s)
+PASS current tests/current/test_push_preference_cache.js (0.05s)
+PASS current tests/current/test_shared_invitations.js (0.07s)
+PASS current tests/current/test_shared_puzzle.py (0.80s)
+PASS current tests/current/test_analytics_v2.py (0.68s)
+PASS current tests/current/test_sync_backoff.js (0.06s)
+PASS current tests/current/test_analytics_queue_drain.cjs (0.08s)
+PASS current tests/current/test_starter_measurement.py (0.04s)
+PASS current tests/current/test_starter_capture.cjs (0.05s)
+PASS current tests/current/test_first_steps.cjs (0.06s)
+PASS current tests/current/test_usage_p0.py (0.63s)
+PASS current tests/current/test_usage_p0_client.cjs (0.05s)
+PASS current tests/current/test_usage_p1.py (0.63s)
+PASS current tests/current/test_usage_p1_client.cjs (0.08s)
+PASS current tests/current/test_mk100_production.py (0.94s)
+PASS current tests/current/test_mk100_launch.js (0.08s)
+PASS current tests/current/test_refresh300_production.py (1.10s)
+PASS current tests/current/test_shared_refresh_order.cjs (0.10s)
+PASS current tests/current/test_refresh_release.cjs (0.07s)
+PASS current tests/current/test_refresh_ui_performance.cjs (0.07s)
+PASS current tests/current/test_mobile_resume_navigation.cjs (0.07s)
+PASS current tests/current/test_mozkokalypsa_achievements.js (0.06s)
+PASS current tests/current/test_dated_daily_release.py (1.24s)
+PASS current tests/current/test_dated_daily_store.cjs (0.09s)
+Current tests: 133 PASS / 0 FAIL
+PASS asset public/index.html
+PASS asset public/sw.js
+PASS asset public/runtime-meta.js
+PASS asset public/manifest.webmanifest
+PASS asset public/puzzles.json
+PASS asset public/valid-words-v3328.txt
+PASS asset public/icon-512.png
+PASS asset public/favicon.svg
+PASS asset reference /account-auth.js
+PASS asset reference /account-bonus-v3331.js
+PASS asset reference /account-conversion-v3331.css
+PASS asset reference /account-conversion-v3331.js
+PASS asset reference /account-team-v33210.js
+PASS asset reference /achievement-details.css
+PASS asset reference /achievement-details.js
+PASS asset reference /achievement-stories.js
+PASS asset reference /analytics-init.js
+PASS asset reference /app-onboarding.css
+PASS asset reference /app-play.css
+PASS asset reference /app-profile-settings.css
+PASS asset reference /app.js
+PASS asset reference /app/account/account.js
+PASS asset reference /app/account/in-app-browser-help.js
+PASS asset reference /app/account/session.js
+PASS asset reference /app/account/tajenka-storage.js
+PASS asset reference /app/acquisition.js
+PASS asset reference /app/analytics.js
+PASS asset reference /app/content/daily-dated.js
+PASS asset reference /app/content/daily.js
+PASS asset reference /app/content/free-order-engine.js
+PASS asset reference /app/content/free-order-store.js
+PASS asset reference /app/content/free-order-ui.js
+PASS asset reference /app/content/progression.js
+PASS asset reference /app/content/refresh-release.js
+PASS asset reference /app/content/refresh-ui.js
+PASS asset reference /app/core/api-client.js
+PASS asset reference /app/core/completion-pipeline.js
+PASS asset reference /app/core/result-queue.js
+PASS asset reference /app/core/storage.js
+PASS asset reference /app/engagement/first-steps.js
+PASS asset reference /app/engagement/nudges.js
+PASS asset reference /app/engagement/onboarding.js
+PASS asset reference /app/game/board.js
+PASS asset reference /app/game/fair-play.js
+PASS asset reference /app/game/hints.js
+PASS asset reference /app/game/input.js
+PASS asset reference /app/game/state.js
+PASS asset reference /app/marketing.js
+PASS asset reference /app/mozkokalypsa-launch.js
+PASS asset reference /app/mozkokalypsa.js
+PASS asset reference /app/rankings/rankings.js
+PASS asset reference /apple-touch-icon.png
+PASS asset reference /assets/avatars/v3/20-kniha-s-copem.svg
+PASS asset reference /auth-recovery-guard-v3326.js
+PASS asset reference /bootstrap-hydrator.js
+PASS asset reference /brand-wordmark-fraunces.css
+PASS asset reference /brand/mark-16.png
+PASS asset reference /brand/mark.svg
+PASS asset reference /brand/wordmark.svg
+PASS asset reference /challenge-cta-v3333.css
+PASS asset reference /challenge-cta-v3333.js
+PASS asset reference /compact-difficulties.css
+PASS asset reference /competitive-sharing-v3331.css
+PASS asset reference /competitive-sharing-v3331.js
+PASS asset reference /content/free-order/shared-pestre-v3.js
+PASS asset reference /copy-density-v3327.css
+PASS asset reference /copy-density-v3327.js
+PASS asset reference /desktop-layout-v3330.css
+PASS asset reference /difficulty-nudge.css
+PASS asset reference /difficulty/printshop/mozkokalypsa-series-ochre.svg
+PASS asset reference /difficulty/printshop/mozkokalypsa-v2.svg
+PASS asset reference /engagement-polish.css
+PASS asset reference /favicon-32.png
+PASS asset reference /favicon.ico
+PASS asset reference /favicon.svg
+PASS asset reference /first-steps.css
+PASS asset reference /footer-hotfix-v40120.js
+PASS asset reference /free-order.css
+PASS asset reference /game-layout-v3330.js
+PASS asset reference /game-release-polish.css
+PASS asset reference /game.css
+PASS asset reference /gesture-guard-v3325.css
+PASS asset reference /gesture-guard-v3325.js
+PASS asset reference /google-g.svg
+PASS asset reference /home-layout.js
+PASS asset reference /icon-192.png
+PASS asset reference /icon-512.png
+PASS asset reference /icon-maskable-192.png
+PASS asset reference /icon-maskable-512.png
+PASS asset reference /icon.svg
+PASS asset reference /in-app-browser-help.css
+PASS asset reference /manifest.webmanifest
+PASS asset reference /marketing-consent.css
+PASS asset reference /mozkokalypsa-achievements.css
+PASS asset reference /mozkokalypsa-difficulty-preview.css
+PASS asset reference /mozkokalypsa-launch-preview.css
+PASS asset reference /mozkokalypsa.css
+PASS asset reference /onboarding-return-v3332.css
+PASS asset reference /organic-ui-v4023.css
+PASS asset reference /organic-ui-v4023.js
+PASS asset reference /printshop-release-polish.js
+PASS asset reference /printshop-ui.css
+PASS asset reference /privacy.html
+PASS asset reference /push-retention-v3329.css
+PASS asset reference /push-retention-v3329.js
+PASS asset reference /puzzles-bootstrap.json
+PASS asset reference /puzzles.json
+PASS asset reference /quality-v334-core-v40114.js
+PASS asset reference /quality-v334.css
+PASS asset reference /quality-v334.js
+PASS asset reference /rank-spotlight.css
+PASS asset reference /ranking-polish.css
+PASS asset reference /ranking-polish.js
+PASS asset reference /refresh-release.css
+PASS asset reference /results.css
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-1.svg
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-10.svg
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-100.svg
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-25.svg
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-5.svg
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-50.svg
+PASS asset reference /rewards/printshop/achievement-mozkokalypsa-75.svg
+PASS asset reference /rewards/printshop/calm.svg
+PASS asset reference /rewards/printshop/challenge.svg
+PASS asset reference /rewards/printshop/pulmesic.svg
+PASS asset reference /ribbon-catalog.js
+PASS asset reference /ribbon-ui.css
+PASS asset reference /ribbon-ui.js
+PASS asset reference /runtime-meta.js
+PASS asset reference /settings-ia-v40122.js
+PASS asset reference /settings-polish-v40122.js
+PASS asset reference /styles.css
+PASS asset reference /tajenka-cadence-copy.js
+PASS asset reference /tajenka-card-polish.css
+PASS asset reference /tajenka-card-polish.js
+PASS asset reference /tajenka-release-fix.css
+PASS asset reference /tajenka-release-fix.js
+PASS asset reference /tajenka-rules.css
+PASS asset reference /tajenka-runtime-polish.css
+PASS asset reference /tajenka-runtime-polish.js
+PASS asset reference /team-victories.css
+PASS asset reference /team-victories.js
+PASS asset reference /terms.html
+PASS asset reference /theme-init.js
+PASS asset reference /training-layout.css
+PASS asset reference /typography-readability-v1.css
+PASS asset reference /valid-word-feedback-v3330.js
+PASS asset reference /version.js
+Assets: 148 PASS / 0 FAIL (140 local references checked)
+PASS python syntax account_auth.py (0.04s)
+PASS python syntax account_auth_core.py (0.03s)
+PASS python syntax account_bonus_v3331.py (0.03s)
+PASS python syntax account_integrity_v33210.py (0.03s)
+PASS python syntax backend/__init__.py (0.02s)
+PASS python syntax backend/analytics.py (0.03s)
+PASS python syntax backend/config.py (0.02s)
+PASS python syntax backend/content.py (0.02s)
+PASS python syntax backend/contracts.py (0.06s)
+PASS python syntax backend/daily_runtime.py (0.02s)
+PASS python syntax backend/dated_daily.py (0.02s)
+PASS python syntax backend/db.py (0.03s)
+PASS python syntax backend/first_board.py (0.02s)
+PASS python syntax backend/free_order.py (0.02s)
+PASS python syntax backend/launch_report.py (0.02s)
+PASS python syntax backend/measurement.py (0.02s)
+PASS python syntax backend/mozkokalypsa.py (0.02s)
+PASS python syntax backend/mozkokalypsa_round3.py (0.02s)
+PASS python syntax backend/play_sessions.py (0.02s)
+PASS python syntax backend/progress.py (0.03s)
+PASS python syntax backend/rankings.py (0.02s)
+PASS python syntax backend/results.py (0.02s)
+PASS python syntax backend/team_victories.py (0.02s)
+PASS python syntax competitive_sharing_v3331.py (0.03s)
+PASS python syntax content_archive.py (0.02s)
+PASS python syntax mozkokalypsa_launch_push.py (0.02s)
+PASS python syntax preview_auth_v334.py (0.02s)
+PASS python syntax proplet_content/__init__.py (0.02s)
+PASS python syntax proplet_content/io.py (0.02s)
+PASS python syntax proplet_content/models.py (0.02s)
+PASS python syntax proplet_content/validator.py (0.03s)
+PASS python syntax proplet_version.py (0.02s)
+PASS python syntax push_diagnostics_v3329.py (0.02s)
+PASS python syntax refresh300_launch_push.py (0.02s)
+PASS python syntax release-evidence/daily-gen6-20261008/independent_verify_release.py (0.03s)
+PASS python syntax rescue_limit_v40115.py (0.02s)
+PASS python syntax server.py (0.08s)
+PASS python syntax tests/current/test_account_created_authority.py (0.02s)
+PASS python syntax tests/current/test_account_history_pagination.py (0.02s)
+PASS python syntax tests/current/test_account_identity_boundary.py (0.03s)
+PASS python syntax tests/current/test_analytics_v2.py (0.02s)
+PASS python syntax tests/current/test_avatar_optical_sizing.py (0.03s)
+PASS python syntax tests/current/test_client_error_privacy.py (0.02s)
+PASS python syntax tests/current/test_content_launch_push.py (0.02s)
+PASS python syntax tests/current/test_dated_daily_release.py (0.02s)
+PASS python syntax tests/current/test_domain_golden.py (0.02s)
+PASS python syntax tests/current/test_final_debt_account_lookup_characterization.py (0.02s)
+PASS python syntax tests/current/test_final_debt_push_diagnostics_characterization.py (0.02s)
+PASS python syntax tests/current/test_final_debt_query_bounds.py (0.02s)
+PASS python syntax tests/current/test_first_board_catchup.py (0.02s)
+PASS python syntax tests/current/test_free_order_api.py (0.02s)
+PASS python syntax tests/current/test_gen5_preview.py (0.02s)
+PASS python syntax tests/current/test_gen5_production.py (0.02s)
+PASS python syntax tests/current/test_marketing_diagnostics.py (0.02s)
+PASS python syntax tests/current/test_meta_acquisition.py (0.02s)
+PASS python syntax tests/current/test_migration_manifest.py (0.02s)
+PASS python syntax tests/current/test_mk100_production.py (0.02s)
+PASS python syntax tests/current/test_mozkokalypsa.py (0.02s)
+PASS python syntax tests/current/test_mozkomor_any_200.py (0.02s)
+PASS python syntax tests/current/test_onboarding_provenance.py (0.02s)
+PASS python syntax tests/current/test_preview_feedback.py (0.02s)
+PASS python syntax tests/current/test_preview_path_boundary.py (0.02s)
+PASS python syntax tests/current/test_printshop_board_clarity.py (0.02s)
+PASS python syntax tests/current/test_puzzle_bootstrap.py (0.02s)
+PASS python syntax tests/current/test_recognition_overlay.py (0.02s)
+PASS python syntax tests/current/test_refresh300_launch_push.py (0.02s)
+PASS python syntax tests/current/test_refresh300_production.py (0.02s)
+PASS python syntax tests/current/test_ribbon_assets.py (0.03s)
+PASS python syntax tests/current/test_runtime_resilience.py (0.02s)
+PASS python syntax tests/current/test_s04_backend_foundation.py (0.02s)
+PASS python syntax tests/current/test_s06_backend_dependencies.py (0.03s)
+PASS python syntax tests/current/test_s07a_progress_pure_core.py (0.02s)
+PASS python syntax tests/current/test_s07b_readonly_stats.py (0.02s)
+PASS python syntax tests/current/test_s08a_result_contract.py (0.02s)
+PASS python syntax tests/current/test_s08b_atomic_result_adapter.py (0.02s)
+PASS python syntax tests/current/test_s08b_result_adapter_characterization.py (0.02s)
+PASS python syntax tests/current/test_s09_ranking_query_bounds.py (0.02s)
+PASS python syntax tests/current/test_s12a_account_backend.py (0.02s)
+PASS python syntax tests/current/test_s13a_css_characterization.py (0.02s)
+PASS python syntax tests/current/test_s13b_css_characterization.py (0.02s)
+PASS python syntax tests/current/test_s14_content_characterization.py (0.03s)
+PASS python syntax tests/current/test_s14_content_pipeline.py (0.03s)
+PASS python syntax tests/current/test_s15_analytics_characterization.py (0.02s)
+PASS python syntax tests/current/test_s16_legacy_reachability.py (0.02s)
+PASS python syntax tests/current/test_shared_puzzle.py (0.02s)
+PASS python syntax tests/current/test_starter_measurement.py (0.02s)
+PASS python syntax tests/current/test_starter_result_validation.py (0.02s)
+PASS python syntax tests/current/test_tajenka_result_validation.py (0.02s)
+PASS python syntax tests/current/test_tajenka_weekly_availability.py (0.02s)
+PASS python syntax tests/current/test_usage_auth.py (0.02s)
+PASS python syntax tests/current/test_usage_p0.py (0.02s)
+PASS python syntax tests/current/test_usage_p1.py (0.03s)
+PASS python syntax tests/current/test_welcome_claim.py (0.02s)
+PASS python syntax tests/round3/test_release.py (0.02s)
+PASS python syntax tools/build_gen5_preview.py (0.02s)
+PASS python syntax tools/build_lexicon_v2.py (0.03s)
+PASS python syntax tools/build_runtime_content.py (0.03s)
+PASS python syntax tools/check_dated_daily_release.py (0.03s)
+PASS python syntax tools/gen5/catalog.py (0.03s)
+PASS python syntax tools/gen5/geometry.py (0.03s)
+PASS python syntax tools/gen5/package.py (0.02s)
+PASS python syntax tools/gen5/runner.py (0.03s)
+PASS python syntax tools/gen5/validation.py (0.03s)
+PASS python syntax tools/generate_puzzles.py (0.03s)
+PASS python syntax tools/generate_puzzles_bootstrap.py (0.03s)
+PASS python syntax tools/measure_gen4_ambiguity.py (0.03s)
+PASS python syntax tools/mozkokalypsa_lab.py (0.03s)
+PASS python syntax tools/project_dated_daily_public.py (0.02s)
+PASS python syntax tools/test_current.py (0.02s)
+PASS python syntax tools/test_isolated_result_db.py (0.03s)
+PASS python syntax tools/test_tajenka_preview.py (0.02s)
+PASS python syntax tools/test_tajenka_push_runtime.py (0.02s)
+PASS python syntax tools/test_tajenka_v2_production.py (0.02s)
+PASS python syntax tools/test_v4001_pwa_startup.py (0.02s)
+PASS python syntax tools/test_v4002_daily_sync_p0.py (0.02s)
+PASS python syntax tools/test_v4004_rank_order.py (0.02s)
+PASS python syntax tools/test_v4007_fresh_free_progression.py (0.02s)
+PASS python syntax tools/test_v4010_gen4_xp_rewards.py (0.02s)
+PASS python syntax tools/test_v40114_retention_funnel.py (0.02s)
+PASS python syntax tools/test_v40124_supabase_rpc_auth.py (0.02s)
+PASS python syntax tools/test_v40126_push_retention_p0.py (0.02s)
+PASS python syntax tools/test_v4012_pwa_resume_update.py (0.02s)
+PASS python syntax tools/test_v40132_mozkomor_news_preview.py (0.02s)
+PASS python syntax tools/test_v40133_sync_quarantine.py (0.02s)
+PASS python syntax tools/test_v40134_retention_claim_fix.py (0.03s)
+PASS python syntax tools/test_v40135_profile_wide_layout.py (0.02s)
+PASS python syntax tools/test_word_discovery_xp.py (0.04s)
+PASS python syntax tools/validate_migration_manifest.py (0.03s)
+PASS python syntax word_recognition_v3330.py (0.03s)
+PASS node syntax public/account-auth.js (0.06s)
+PASS node syntax public/account-bonus-v3331.js (0.05s)
+PASS node syntax public/account-conversion-v3331.js (0.05s)
+PASS node syntax public/account-team-v33210.js (0.05s)
+PASS node syntax public/achievement-details.js (0.05s)
+PASS node syntax public/achievement-stories.js (0.06s)
+PASS node syntax public/admin.js (0.05s)
+PASS node syntax public/analytics-init.js (0.06s)
+PASS node syntax public/app/account/account.js (0.07s)
+PASS node syntax public/app/account/in-app-browser-help.js (0.05s)
+PASS node syntax public/app/account/session.js (0.05s)
+PASS node syntax public/app/account/tajenka-storage.js (0.05s)
+PASS node syntax public/app/acquisition.js (0.06s)
+PASS node syntax public/app/analytics.js (0.05s)
+PASS node syntax public/app/content/daily-dated.js (0.05s)
+PASS node syntax public/app/content/daily.js (0.05s)
+PASS node syntax public/app/content/free-order-engine.js (0.05s)
+PASS node syntax public/app/content/free-order-store.js (0.05s)
+PASS node syntax public/app/content/free-order-ui.js (0.05s)
+PASS node syntax public/app/content/progression.js (0.05s)
+PASS node syntax public/app/content/refresh-release.js (0.05s)
+PASS node syntax public/app/content/refresh-ui.js (0.05s)
+PASS node syntax public/app/core/api-client.js (0.06s)
+PASS node syntax public/app/core/completion-pipeline.js (0.05s)
+PASS node syntax public/app/core/result-queue.js (0.05s)
+PASS node syntax public/app/core/storage.js (0.06s)
+PASS node syntax public/app/engagement/first-steps.js (0.06s)
+PASS node syntax public/app/engagement/nudges.js (0.05s)
+PASS node syntax public/app/engagement/onboarding.js (0.06s)
+PASS node syntax public/app/game/board.js (0.05s)
+PASS node syntax public/app/game/fair-play.js (0.06s)
+PASS node syntax public/app/game/hints.js (0.05s)
+PASS node syntax public/app/game/input.js (0.05s)
+PASS node syntax public/app/game/state.js (0.05s)
+PASS node syntax public/app/marketing.js (0.05s)
+PASS node syntax public/app/mozkokalypsa-launch.js (0.05s)
+PASS node syntax public/app/mozkokalypsa.js (0.06s)
+PASS node syntax public/app/rankings/rankings.js (0.06s)
+PASS node syntax public/app.js (0.06s)
+PASS node syntax public/auth-recovery-guard-v3326.js (0.05s)
+PASS node syntax public/bootstrap-hydrator.js (0.05s)
+PASS node syntax public/calibration-v334.js (0.05s)
+PASS node syntax public/challenge-cta-v3333.js (0.06s)
+PASS node syntax public/competitive-sharing-v3331.js (0.05s)
+PASS node syntax public/content/free-order/shared-pestre-v3.js (0.05s)
+PASS node syntax public/content-release.js (0.05s)
+PASS node syntax public/copy-density-v3327.js (0.05s)
+PASS node syntax public/daily-win-menu-v40123.js (0.05s)
+PASS node syntax public/difficulty-nudge.js (0.06s)
+PASS node syntax public/footer-hotfix-v40120.js (0.05s)
+PASS node syntax public/game-layout-v3323.js (0.05s)
+PASS node syntax public/game-layout-v3330.js (0.05s)
+PASS node syntax public/gesture-guard-v3325.js (0.05s)
+PASS node syntax public/home-layout.js (0.05s)
+PASS node syntax public/onboarding-model-v3328.js (0.05s)
+PASS node syntax public/onboarding-return-v3332.js (0.05s)
+PASS node syntax public/organic-ui-v4023.js (0.06s)
+PASS node syntax public/p0-hotfix-v3336.js (0.05s)
+PASS node syntax public/printshop-release-polish.js (0.05s)
+PASS node syntax public/push-origin-v3325.js (0.05s)
+PASS node syntax public/push-retention-v3329.js (0.05s)
+PASS node syntax public/quality-v334-core-v40114.js (0.05s)
+PASS node syntax public/quality-v334.js (0.05s)
+PASS node syntax public/ranking-polish.js (0.05s)
+PASS node syntax public/release-notes-v3331.js (0.05s)
+PASS node syntax public/release-notes.js (0.05s)
+PASS node syntax public/ribbon-catalog.js (0.05s)
+PASS node syntax public/ribbon-ui.js (0.05s)
+PASS node syntax public/runtime-meta.js (0.05s)
+PASS node syntax public/settings-ia-v40122.js (0.05s)
+PASS node syntax public/settings-polish-v40122.js (0.05s)
+PASS node syntax public/starter-copy-hotfix.js (0.05s)
+PASS node syntax public/sw.js (0.05s)
+PASS node syntax public/tajenka-cadence-copy.js (0.05s)
+PASS node syntax public/tajenka-card-polish.js (0.05s)
+PASS node syntax public/tajenka-release-fix.js (0.05s)
+PASS node syntax public/tajenka-runtime-polish.js (0.05s)
+PASS node syntax public/team-victories.js (0.05s)
+PASS node syntax public/theme-init.js (0.05s)
+PASS node syntax public/valid-word-feedback-v3328.js (0.05s)
+PASS node syntax public/valid-word-feedback-v3330.js (0.06s)
+PASS node syntax public/version.js (0.06s)
+PASS node syntax public/welcome-feedback.js (0.05s)
+PASS node syntax tools/browser_fixture_server.cjs (0.05s)
+PASS node syntax tools/test_v319_focus_pause.js (0.05s)
+PASS node syntax tools/test_v40114_share_runtime.js (0.05s)
+Syntax: 215 PASS / 0 FAIL
+CURRENT GATE: PASS
