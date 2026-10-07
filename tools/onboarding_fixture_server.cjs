@@ -49,6 +49,20 @@ const server=http.createServer(async(req,res)=>{
     return setTimeout(()=>json(res,200,{ok:true,synthetic:true}),controls.eventDelayMs);
    }
    if(p==='/api/config')return json(res,200,config);
+   if(p==='/api/daily'&&req.method==='GET'){
+    // The Gen6 release reads dated Daily through HTTP. Model the published
+    // legacy date used by this fixture; do not contact production or disclose futures.
+    const selected=u.searchParams.get('daily_date')||config.date;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(selected)||selected>config.date)return json(res,404,{detail:'fixture Daily not available'});
+    const db=JSON.parse(fs.readFileSync(path.join(repo,'data/puzzles.json'),'utf8'));
+    const bank=db.daily,base=db.dailyRotationBaseDate||db.dailyGeneration4From;
+    const days=Math.floor((Date.parse(selected+'T00:00:00Z')-Date.parse(base+'T00:00:00Z'))/86400000);
+    const puzzle=bank[((days%bank.length)+bank.length)%bank.length];
+    const contentHash=require('node:crypto').createHash('sha256').update(JSON.stringify(puzzle)).digest('hex');
+    return json(res,200,{schemaVersion:1,dailyDate:selected,bankVersion:'legacy-daily',puzzleId:puzzle.id,contentHash,
+     challengeKey:'daily:'+selected,serverToday:config.date,validUntil:config.date+'T23:59:59+02:00',official:true,
+     cacheKey:'daily:'+selected+':legacy-daily',puzzle});
+   }
    if(p==='/api/first-board/assignment'&&req.method==='POST'){
     const identity=req.headers['x-proplet-anon-id']||'',key='first-board-v1';let hash=2166136261;
     for(const char of key+':'+identity){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619)}
