@@ -48,7 +48,17 @@ def test_contract():
     assert enriched["_event_context"]["experiment_allocation_policy"]=="catchup_20261004"
     assert enriched["_event_context"]["experiment_identity_bucket"]==53
     assert enriched["is_test"] is True
+    rollout_headers={k.lower():v for k,v in {**headers,
+        "X-Proplet-Experiment":"first-board-v1",
+        "X-Proplet-Experiment-Variant":"challenger_e009",
+        "X-Proplet-Experiment-Bucket":"53",
+        "X-Proplet-Experiment-Identity-Bucket":"3",
+        "X-Proplet-Experiment-Policy":"challenger_rollout_20261007"}.items()}
+    rollout=measurement.request_context(SimpleNamespace(headers=rollout_headers),"production")
+    assert rollout["_event_context"]["experiment_allocation_policy"]=="challenger_rollout_20261007"
+    assert rollout["_event_context"]["experiment_identity_bucket"]==3
+    assert rollout["_event_context"]["experiment_bucket"]==53
+    assert rollout["is_test"] is True
     print("PASS catch-up API: validated flow, anonymous-only, server environment/test isolation, bounded provenance")
 
 if __name__=="__main__":test_contract()
-

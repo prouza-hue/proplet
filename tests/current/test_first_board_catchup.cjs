@@ -19,6 +19,12 @@ vm.runInContext(fs.readFileSync('public/app/engagement/first-steps.js','utf8').r
  assert.equal(h['X-Proplet-Experiment-Bucket'],'3');assert.equal(h['X-Proplet-First-Steps-Run'],flow);
  assert.equal((await ctx.window.__assignmentTest.firstBoardAssignment()).variant,'control_e001');assert.equal(calls.length,1,'sticky local assignment does not allocate twice');
  assert.equal(events.length,0,'assigned is server-owned, never duplicated on client');
+ // The rollout works in cached clients; the server still owns assignment telemetry.
+ ctx.localStorage.setItem('proplet-first-steps-v1:synthetic-guest-identity',JSON.stringify({enrolled:true,firstStepsRunId:flow,onboardingVersion:'board-v3-short'}));
+ ctx.api=async()=>({...result,variant:'challenger_e009',bucket:53,identityBucket:3,allocationPolicy:'challenger_rollout_20261007',boardId:'g4-e-009'});
+ const selected=await ctx.window.__assignmentTest.firstBoardAssignment();
+ assert.equal(selected.boardId,'g4-e-009');assert.equal(selected.identityBucket,3);
+ assert.equal(ctx.window.PropletFirstSteps.eventHeaders()['X-Proplet-Experiment-Policy'],'challenger_rollout_20261007');
  // Pre-existing hash assignment is not reallocated during the catch-up day.
  ctx.localStorage.setItem('proplet-first-steps-v1:synthetic-guest-identity',JSON.stringify({enrolled:true,firstBoardId:'g4-e-009',firstBoardExperiment:{key:'first-board-v1',variant:'challenger_e009',bucket:58,boardId:'g4-e-009'}}));
  assert.equal((await ctx.window.__assignmentTest.firstBoardAssignment()).variant,'challenger_e009');assert.equal(calls.length,1);
@@ -34,4 +40,3 @@ vm.runInContext(fs.readFileSync('public/app/engagement/first-steps.js','utf8').r
  await assert.rejects(()=>ctx.window.__assignmentTest.firstBoardAssignment(),/přiřadit/);
  console.log('PASS catch-up client: server allocation, sticky existing assignments, provenance, no duplicates, no silent fallback');
 })().catch(e=>{console.error(e);process.exitCode=1});
-
