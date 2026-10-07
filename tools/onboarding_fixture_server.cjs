@@ -35,7 +35,7 @@ const server=http.createServer(async(req,res)=>{
   if(p==='/__fixture/events'&&req.method==='GET')return json(res,200,{events,requests});
   if(p==='/__fixture/control'&&req.method==='POST'){
    const value=await body(req);if(value.reset){events=[];requests=[];controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,failDatabaseRequests:0,progress:[],firstSteps:false,auth:'ok',result:'ok'}}
-   for(const key of ['release','rolling','eventDelayMs','failDatabase','failDatabaseRequests','progress','firstSteps','auth','result'])if(Object.hasOwn(value,key))controls[key]=value[key];
+   for(const key of ['release','rolling','eventDelayMs','failDatabase','failDatabaseRequests','progress','firstSteps','auth','result','firstBoardPolicy'])if(Object.hasOwn(value,key))controls[key]=value[key];
    if(!['current','baseline'].includes(controls.release)||!['ok','hold','fail'].includes(controls.rolling))return json(res,400,{detail:'invalid control'});
    if(controls.rolling!=='hold'){for(const pending of heldRolling)rolling(pending);heldRolling=[]}
    return json(res,200,{ok:true,controls});
@@ -52,9 +52,10 @@ const server=http.createServer(async(req,res)=>{
    if(p==='/api/first-board/assignment'&&req.method==='POST'){
     const identity=req.headers['x-proplet-anon-id']||'',key='first-board-v1';let hash=2166136261;
     for(const char of key+':'+identity){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619)}
-    const bucket=(hash>>>0)%100,variant=bucket<50?'control_e001':'challenger_e009',boardId=variant==='control_e001'?'g4-e-001':'g4-e-009';
-    events.push({endpoint:p,event:'first_board_experiment_assigned',authoritative:true,headers:{...req.headers,'x-proplet-experiment':key,'x-proplet-experiment-variant':variant,'x-proplet-experiment-bucket':String(bucket),'x-proplet-experiment-policy':'hash50_v1'},at:Date.now()});
-    return json(res,200,{key,variant,bucket,identityBucket:bucket,allocationPolicy:'hash50_v1',boardId,firstStepsRunId:data.first_steps_run_id,assignmentRecorded:true});
+    const identityBucket=(hash>>>0)%100,rollout=controls.firstBoardPolicy==='challenger_rollout_20261007';
+    const bucket=rollout?50+(identityBucket%50):identityBucket,variant=bucket<50?'control_e001':'challenger_e009',boardId=variant==='control_e001'?'g4-e-001':'g4-e-009',allocationPolicy=rollout?'challenger_rollout_20261007':'hash50_v1';
+    events.push({endpoint:p,event:'first_board_experiment_assigned',authoritative:true,headers:{...req.headers,'x-proplet-puzzle':boardId,'x-proplet-experiment':key,'x-proplet-experiment-variant':variant,'x-proplet-experiment-bucket':String(bucket),'x-proplet-experiment-policy':allocationPolicy},at:Date.now()});
+    return json(res,200,{key,variant,bucket,identityBucket,allocationPolicy,boardId,firstStepsRunId:data.first_steps_run_id,assignmentRecorded:true});
    }
    if(p==='/api/tajenka')return json(res,200,JSON.parse(fs.readFileSync(path.join(fixtureDir,'tajenka.json'))));
    if(p==='/api/rolling-content'){if(controls.rolling==='hold'){heldRolling.push(res);return}return rolling(res)}
