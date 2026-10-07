@@ -40,6 +40,7 @@ const policy='challenger_rollout_20261007';
    await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-009'&&!currentGame.finished);
    await page.locator('#winModal').waitFor({state:'hidden'});await solve();
    await page.locator('#firstStepsGoogle').waitFor({state:'visible'});
+   await page.waitForFunction(async()=>{const r=await fetch('/__fixture/events').then(r=>r.json());return r.events.some(e=>e.event==='first_steps_v1_offer');},null,{timeout:15000});
    const ev=(await fetch(url+'/__fixture/events').then(r=>r.json())).events;
    const phases=ev.filter(e=>e.event.startsWith('first_board_experiment_'));
    assert.equal(phases.length,3);assert(phases.every(e=>e.headers['x-proplet-puzzle']==='g4-e-009'&&e.headers['x-proplet-experiment-variant']==='challenger_e009'&&e.headers['x-proplet-experiment-policy']===policy));
