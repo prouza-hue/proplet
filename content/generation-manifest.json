@@ -2,7 +2,7 @@
   "$schema": "./generation-manifest.schema.json",
   "schemaVersion": 1,
   "manifestId": "proplet-runtime-content",
-  "manifestVersion": 3,
+  "manifestVersion": 4,
   "validatorVersion": "proplet-content-s14-v1",
   "provenance": {
     "baselineCommit": "b8de402ad676b823f72a905289945eff6f6b3e6c",
@@ -17,7 +17,11 @@
     "mozkomorSource": "data/mozkomor_final_v40132.json",
     "compatibilitySourceCommit": "a1904574324c714526a5303f6584f3174a789f8e",
     "compatibilitySourcePublicBlob": "d95dc7e285c23abcdd5333ef9950690025b72737",
-    "note": "Released banks are frozen inputs. Sprint 14 declares and verifies their lineage; it does not regenerate them."
+    "note": "Released banks are frozen inputs. Sprint 14 declares and verifies their lineage; it does not regenerate them.",
+    "dailyGen6ReleaseBaselineCommit": "13b9843f9d19c3fb13b53eeb971208da530f8dc8",
+    "dailyGen6ManufacturedContentHash": "3abe6feda3e25262ed07aa25aa02687338a41ab6382e018760a13961f2ada104",
+    "dailyGen6Cutover": "2026-10-08",
+    "dailyRecognition": "103836 frozen acceptable manufacturing forms plus all 507 prior short forms; no prior recognition removed."
   },
   "generation": {
     "contentGeneration": 4,
@@ -66,9 +70,13 @@
     "output": {
       "path": "public/puzzles.json",
       "role": "public-puzzle-runtime",
-      "sha256": "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3",
-      "sizeBytes": 4680877,
-      "gitBlob": "b0a23e6e4d997df8b595da4c0bbba25ffb5d0838"
+      "sha256": "376a1f0f4dd10053fb872e533649bb2a45ec2d24b72425861282ccd2a69de91c",
+      "sizeBytes": 4095212,
+      "gitBlob": "a4a394e726b37fdd34a87282b69c8235b572d7fa"
+    },
+    "dailyProjection": {
+      "cutover": "2026-10-08",
+      "activeUntil": "2027-01-14"
     }
   },
   "identityBuilds": [
@@ -76,16 +84,16 @@
       "source": {
         "path": "data/words.txt",
         "role": "canonical-validator-lexicon",
-        "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
-        "sizeBytes": 112068,
-        "gitBlob": "4df37d2cd946127e8971a3dd013657fc86abec96"
+        "sha256": "2548973544b5a3b9ab691804635546fdf4733a464e86614e86fbd62f9d07a456",
+        "sizeBytes": 1052497,
+        "gitBlob": "671c193f0daa40e2f24d4c96f935bb174cf3866d"
       },
       "output": {
         "path": "public/valid-words-v3328.txt",
         "role": "public-validator-lexicon",
-        "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
-        "sizeBytes": 112068,
-        "gitBlob": "4df37d2cd946127e8971a3dd013657fc86abec96"
+        "sha256": "2548973544b5a3b9ab691804635546fdf4733a464e86614e86fbd62f9d07a456",
+        "sizeBytes": 1052497,
+        "gitBlob": "671c193f0daa40e2f24d4c96f935bb174cf3866d"
       }
     }
   ],
@@ -117,6 +125,12 @@
       "sha256": "9d71afd437300528904739a868111738a0835e0d0fe8b0138d3f3af24afdfd9b",
       "sizeBytes": 819,
       "gitBlob": "1061c0b9b6b4f8f3c0de486add36ac905ee86882"
+    },
+    {
+      "path": "data/daily_gen6_private.json",
+      "role": "server-only-approved-dated-daily-gen6",
+      "sha256": "e70408ef8f05791c8080d0284a471800d39f2f939070430bffdf8994590b9f45",
+      "sizeBytes": 527719
     }
   ],
   "generationInputs": [
@@ -170,6 +184,13 @@
       "sha256": "eeba12024f24abca2f02c203e0136e1e57a648c112c4a0027823a38a9ba9061f",
       "sizeBytes": 680218,
       "gitBlob": "267e7b6aad875b3afa1a1d2e50bd1c23c76cb84d"
+    },
+    {
+      "path": "content/gen5/recognition-before-daily-gen6.txt",
+      "role": "historical-playtest-recognition-before-daily-gen6",
+      "sha256": "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423",
+      "sizeBytes": 112068,
+      "gitBlob": "4df37d2cd946127e8971a3dd013657fc86abec96"
     }
   ]
 }

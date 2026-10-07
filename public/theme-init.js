@@ -118,9 +118,9 @@
         try{
           const data=await response.clone().json();
           const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-          const valid=data?.bootstrapSchema===1&&[9,10,11].includes(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4&&Array.isArray(data?.daily)&&data.daily.length>0&&typeof data?.bootstrapSource?.sha256==='string'&&data.bootstrapSource.sha256.length===64&&typeof data?.bootstrapValidFrom==='string'&&typeof data?.bootstrapValidThrough==='string'&&today>=data.bootstrapValidFrom&&today<=data.bootstrapValidThrough;
+          const valid=(!window.PROPLET_RUNTIME_META?.datedDailyCutover||data?.datedDaily?.cutover===window.PROPLET_RUNTIME_META.datedDailyCutover)&&data?.bootstrapSchema===1&&[9,10,11].includes(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4&&Array.isArray(data?.daily)&&data.daily.length>0&&typeof data?.bootstrapSource?.sha256==='string'&&data.bootstrapSource.sha256.length===64&&typeof data?.bootstrapValidFrom==='string'&&typeof data?.bootstrapValidThrough==='string'&&today>=data.bootstrapValidFrom&&today<=data.bootstrapValidThrough;
           if(valid&&'caches' in window){
-            try{await (await caches.open('proplet-data-v11')).put('/puzzles-bootstrap.json',response.clone())}catch{}
+            try{await (await caches.open('proplet-data-v12-dated-daily')).put('/puzzles-bootstrap.json',response.clone())}catch{}
           }
           return valid?response:null;
         }catch{return null}
@@ -129,7 +129,7 @@
     window.__PROPLET_COLD_BOOTSTRAP_PREFETCH=coldBootstrapFetch;
 
     const hydrator=document.createElement('script');
-    hydrator.src='/bootstrap-hydrator.js?v=refresh300';
+    hydrator.src='/bootstrap-hydrator.js?v=dailygen6-20261008';
     hydrator.async=false;
     hydrator.dataset.propletBootstrapHydrator='1';
     document.head.appendChild(hydrator);
@@ -150,7 +150,7 @@
               window.__PROPLET_FULL_PUZZLE_DATA_PROMISE=baseFetch('/puzzles.json',{cache:'no-store'}).then(fullResponse=>{
                 if(!fullResponse?.ok)throw new Error(`canonical-puzzle-db-${fullResponse?.status||'fetch'}`);
                 if('caches' in window){
-                  try{const cachedResponse=fullResponse.clone();caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
+                  try{const cachedResponse=fullResponse.clone();caches.open('proplet-data-v12-dated-daily').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
                 }
                 return fullResponse.json();
               }).catch(error=>{window.__PROPLET_FULL_PUZZLE_DATA_PROMISE=null;throw error});
@@ -228,7 +228,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=refresh300','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=dailygen6-20261008','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=mk100','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');

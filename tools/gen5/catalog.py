@@ -69,6 +69,7 @@ class Catalog:
         self.exclusions |= {'červodíra', 'blockchain', 'pulsar', 'tensor'}  # Existing MUST_REVIEW.
         self.profiles = read_json(ROOT / 'content/gen5/profiles.json')['profiles']
         bank = read_json(ROOT / 'public/puzzles.json')
+        daily_history = read_json(ROOT / 'data/puzzles.json')['daily'] if bank.get('datedDaily') else bank['daily']
         self.free_generation=bank['freeGeneration']
         rolling = read_json(ROOT / 'data/rolling_content_v1.json')['puzzles']
         # All reserved rolling boards precede Gen5 conservatively; release ordering must
@@ -87,12 +88,12 @@ class Catalog:
                     self.counts[d].update(words)
                     self.global_counts.update(words)
                     seen[b['id']] = digest(b)
-        for b in bank['daily'] + bank['rescue'] + [bank['starter']]:
+        for b in daily_history + bank['rescue'] + [bank['starter']]:
             if b['id'] not in seen:
                 self.global_counts.update(self.words(b))
                 seen[b['id']] = digest(b)
         self.historical_ids = set(seen)
-        historical_boards=[b for bs in self.history.values() for b in bs]+bank['daily']+bank['rescue']+[bank['starter']]
+        historical_boards=[b for bs in self.history.values() for b in bs]+daily_history+bank['rescue']+[bank['starter']]
         self.historical_words_hashes = {digest(sorted(self.words(b))) for b in historical_boards}
 
     @staticmethod

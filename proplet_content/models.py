@@ -206,6 +206,7 @@ class CanonicalBuild:
     output: FileRecord
     serialization: JsonSerialization
     append: CompatibilityAppend
+    daily_projection: Optional[Mapping[str, Any]] = None
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any]) -> "CanonicalBuild":
@@ -218,6 +219,7 @@ class CanonicalBuild:
                 "serialization",
                 "append",
             },
+            optional={"dailyProjection"},
             location="canonicalBuild",
         )
         try:
@@ -229,6 +231,7 @@ class CanonicalBuild:
                 output=FileRecord.from_mapping(value["output"], "canonicalBuild.output"),
                 serialization=JsonSerialization.from_mapping(value["serialization"]),
                 append=CompatibilityAppend.from_mapping(value["append"]),
+                daily_projection=value.get("dailyProjection"),
             )
         except KeyError as exc:
             raise ManifestFormatError(f"canonicalBuild missing field: {exc}") from exc

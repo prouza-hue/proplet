@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.05.0-refresh300-firstboardcatchup1';
+const APP_PREVIEW_RELEASE='proplet-v4.05.1-dailygen6-20261008';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -314,13 +314,34 @@ let gameBoardController=null;
 let gameInputController=null;
 let gameHintsController=null;
 let progressionController=null;
+let datedDailyController=null;
+function datedDaily(){
+ if(!datedDailyController)datedDailyController=window.PropletDatedDaily.create({storage:localStorage,dateISO:devicePragueDateISO,fetchFn:(url,options)=>fetch(url,{...options,...(typeof AbortSignal?.timeout==='function'?{signal:AbortSignal.timeout(8000)}:{})})});
+ return datedDailyController;
+}
+async function refreshDatedDaily(){if(!puzzleDB?.datedDaily)return null;return datedDaily().refresh()}
+function renderPreviousDailyResume(){
+ const hero=document.querySelector('.daily-hero');if(!hero||!puzzleDB?.datedDaily)return;
+ let button=document.querySelector('#resumePreviousDailyBtn');const today=pragueDateISO(),cutover=puzzleDB.datedDaily.cutover,state=getState();
+ const row=Object.values(state.inProgress||{}).filter(r=>r.mode==='daily'&&r.dailyDate<today&&r.dailyDate<cutover&&r.dailyDate>=addDaysISO(today,-3)&&!state.completed?.[`daily:${r.dailyDate}`]).sort((a,b)=>b.dailyDate.localeCompare(a.dailyDate))[0];
+ if(!row){button?.remove();return}
+ if(!button){button=document.createElement('button');button.id='resumePreviousDailyBtn';button.className='hero-secondary';button.type='button';hero.appendChild(button)}
+ button.textContent=`Pokračovat v rozehrané výzvě z ${formatDateCZ(row.dailyDate)}`;
+ button.onclick=async()=>{button.disabled=true;try{const puzzle=await historicalDailyPuzzle(row.dailyDate,row.puzzleId);await startGame(puzzle,'daily',row.dailyDate)}catch{showToast('Rozehranou výzvu se nepodařilo načíst. Zkus to prosím znovu.')}finally{button.disabled=false}};
+}
+async function historicalDailyPuzzle(iso,puzzleId){
+ try{return (await datedDaily().historical(iso,puzzleId)).puzzle}catch(error){
+  const local=[...(puzzleDB?.daily||[]),...(puzzleDB?.previousDaily?.puzzles||[])].find(p=>p.id===puzzleId&&Array.isArray(p.answers)&&Array.isArray(p.letters));
+  if(local)return local;throw error;
+ }
+}
 let dailyOrchestrationController=null;
 let rankingsOrchestrationController=null;
 
 function progression(){
  if(progressionController)return progressionController;
  const factory=window.PropletContentProgression;if(!factory?.create)throw new Error('Progression modul není dostupný.');
- progressionController=factory.create({getPuzzleDB:()=>puzzleDB,getState,dayOffsetISO,sortedFreeBank,localFreeSlotState,resumableFreePuzzle,pragueDateISO,addDaysISO,getContentPreviewDate:()=>CONTENT_PREVIEW_DATE});
+ progressionController=factory.create({getPuzzleDB:()=>puzzleDB,datedDaily:datedDaily(),getState,dayOffsetISO,sortedFreeBank,localFreeSlotState,resumableFreePuzzle,pragueDateISO,addDaysISO,getContentPreviewDate:()=>CONTENT_PREVIEW_DATE});
  return progressionController;
 }
 function dailyOrchestration(){
@@ -331,7 +352,7 @@ function dailyOrchestration(){
   renderDailyWeekRhythm,renderLevelCard,getProfile,getQueue,getSyncState:()=>syncState,
   renderRescueCard:(...args)=>renderRescueCard(...args),renderQuickPlay:(...args)=>renderQuickPlay(...args),renderTajenkaEntry:(...args)=>renderTajenkaEntry(...args),
   showDailyResult:(...args)=>showDailyResult(...args),startGame:(...args)=>startGame(...args),showToast,
-  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus();window.PropletPlaytest?.render()},
+  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');renderPreviousDailyResume();window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus();window.PropletPlaytest?.render()},
  });
  return dailyOrchestrationController;
 }
@@ -517,7 +538,7 @@ function completionPraise(difficulty,rec={}){
  return {title:pool[stableTextIndex(seed,pool.length)],line:''};
 }
 function renderCompletionPraise(difficulty,rec){const praise=completionPraise(difficulty,rec);$('#winTitle').textContent=praise.title;$('#winPraise').textContent='';$('#winPraise').classList.add('hidden')}
-function configureWinReplay(mode,date,rec){const button=$('#winReplayBtn');if(!button)return;if(mode!=='daily'){button.classList.add('hidden');return}const active=dailyPuzzleFor(date),upgrade=!!rec?.puzzleId&&rec.puzzleId!==active.id;button.classList.remove('hidden');button.textContent=upgrade?'↻ Nová výzva':'↻ Znovu';button.dataset.dailyDate=date;button.dataset.dailyUpgrade=upgrade?'1':'0'}
+function configureWinReplay(mode,date,rec){const button=$('#winReplayBtn');if(!button)return;if(mode!=='daily'){button.classList.add('hidden');return}let active;try{active=dailyPuzzleFor(date)}catch{}const upgrade=!!active&&!!rec?.puzzleId&&rec.puzzleId!==active.id;button.classList.remove('hidden');button.textContent=upgrade?'↻ Nová výzva':'↻ Znovu';button.dataset.dailyDate=date;button.dataset.dailyUpgrade=upgrade?'1':'0'}
 function resultRankTuple(r){const elapsed=Number(r?.elapsedMs??1e15);return [r?.cleanSolve===true?0:1,Number(r?.hintsUsed??99),Math.floor(elapsed/1000),Number(r?.moves??1e9)]}
 function betterResult(a,b){if(!a)return b;if(!b)return a;const x=resultRankTuple(a),y=resultRankTuple(b);for(let i=0;i<x.length;i++){if(x[i]!==y[i])return y[i]<x[i]?b:a}return a}
 function firstResult(a,b){
@@ -561,7 +582,8 @@ function normalizeLeagueCode(v){return accountUI().normalizeLeagueCode(v)}
 function selectedLeague(){return accountUI().selectedLeague()}
 function togglePassword(inputIds,btn){const ids=Array.isArray(inputIds)?inputIds:[inputIds],show=ids.some(id=>$('#'+id)?.type==='password');ids.forEach(id=>{const el=$('#'+id);if(el)el.type=show?'text':'password'});if(btn)btn.textContent=show?'🙈 Skrýt heslo':'👁 Zobrazit heslo'}
 function formatDateCZ(iso){const [y,m,d]=iso.split('-').map(Number);return new Intl.DateTimeFormat('cs-CZ',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Prague'}).format(new Date(Date.UTC(y,m-1,d,12)))}
-function pragueDateISO(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+function pragueDateISO(){return datedDailyController?.today()||devicePragueDateISO()}
+function devicePragueDateISO(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
 function addDaysISO(iso,days){const [y,m,d]=iso.split('-').map(Number),dt=new Date(Date.UTC(y,m-1,d+days,12));return dt.toISOString().slice(0,10)}
 function dayOffsetISO(iso,base){const [y,m,d]=iso.split('-').map(Number),[by,bm,bd]=base.split('-').map(Number);return Math.floor((Date.UTC(y,m-1,d)-Date.UTC(by,bm-1,bd))/86400000)}
 function dailyBankFor(iso){return progression().dailyBankFor(iso)}
@@ -854,7 +876,10 @@ async function startFree(diff){
  const q=freeProgress(diff),p=q.resume||q.nextUnsolved||q.list[0];if(p)startGame(p,'free',null);
 }
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
-function startDaily(options={}){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;return dailyOrchestration().startDaily(options)}
+async function startDaily(options={}){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;
+ const button=$('#playDailyBtn');if(button?.disabled)return;const original=button?.textContent;if(button){button.disabled=true;button.textContent='Načítám dnešní výzvu…'}
+ try{await refreshDatedDaily();renderDaily();return dailyOrchestration().startDaily(options)}catch{showToast('Dnešní výzvu se nepodařilo načíst. Zkus to prosím znovu.');renderDaily()}finally{if(button){button.disabled=false;if(!puzzleDB?.datedDaily)button.textContent=original}}
+}
 function startStarterWarmup(){if(currentGame?.mode==='starter'&&currentGame.finished&&window.PropletSharing?.resumeInvitation?.())return;const q=freeProgress('easy'),p=q.resume||q.nextUnsolved||q.list[0];if(!p){nav('free',{replace:true});return}startGame(p,'free',null,{postStarterWarmup:true})}
 function startTajenka(){if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){showToast('Tajenka není na této verzi dostupná.');return}startGame(tajenkaPuzzle,'tajenka',null);trackProductEvent('tajenka_started',{puzzleId:tajenkaPuzzle.id})}
 
@@ -1066,7 +1091,7 @@ async function finishAttemptTelemetry(rec){
 async function finishStarterGame(g){
  window.PropletEngagementOnboarding?.completeTutorial();
  $('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];hideStarterHintNudge();renderGameBoard();renderGameHUD();updateGameFeel();
- const starterDaily=dailyPuzzleFor(pragueDateISO()),hardNext=starterDaily?.difficulty==='hard';g.starterNextHard=hardNext;if(hardNext)trackProductEvent('starter_hard_choice_shown');
+ let starterDaily;try{starterDaily=dailyPuzzleFor(pragueDateISO())}catch{}const hardNext=starterDaily?.difficulty==='hard';g.starterNextHard=hardNext;if(hardNext)trackProductEvent('starter_hard_choice_shown');
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
  const key=challengeKey('starter',g.puzzle,null),state=getState(),old=state.completed[key],rec={puzzleId:g.puzzle.id,challengeKey:key,mode:'starter',difficulty:'easy',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:old?0:pointsFor('starter','easy',g.puzzle),hintsUsed:0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:0,attemptId:null,cleanSolve:true,completedAt:new Date().toISOString()};
  if(!old)state.completed[key]=rec;saveState(state);if(!old)queueResult(rec);trackProductEvent('starter_completed');trackStarterPhase(g.starterTrace,'completed');
@@ -1209,9 +1234,9 @@ async function runPostWinEngagement(action){
 }
 async function closeWinAndContinue(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');return}await runPostWinEngagement('continue')}
 async function closeWinToMenu(){await runPostWinEngagement('menu')}
-function showDailyResult(date,rec){
+async function showDailyResult(date,rec){
  renderTimingStatus({...rec,mode:"daily"});
- const p=dailyPuzzleFor(date);stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,hints:rec.hintsUsed||0,finished:true};
+ let p;try{p=await historicalDailyPuzzle(date,rec.puzzleId)}catch{showToast('Tuto uloženou výzvu se nepodařilo načíst. Zkus to prosím znovu.');return}stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,hints:rec.hintsUsed||0,finished:true};
  const tajenkaWin=$('#tajenkaWinPhrase');if(tajenkaWin){tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''}$('#screen-game')?.classList.remove('tajenka-mode','starter-mode','rescue-mode');$('#winModal')?.classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');
  $('#winBadge').textContent='☀️';renderCompletionPraise(p.difficulty,rec);$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[p.difficulty].label}`;setWinXpDisplay('+100 XP');const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Čistě · bez nápovědy':(hints?`💡 ${countCz(hints,'nápověda','nápovědy','nápověd')}`:'Výsledek z předchozího postupu');if(!knownClean)wc.classList.add('hinted');
  $('#winWords').innerHTML=p.answers.map((a,i)=>`<span class="win-word" style="--word-color:${COLORS[i%COLORS.length]};background:color-mix(in srgb,${COLORS[i%COLORS.length]} 55%,white)">${a.word}</span>`).join('');
@@ -1234,7 +1259,9 @@ Zahraj si taky: ${SHARE_URL}`;
 }
 async function shareProplet(text){try{if(navigator.share){const body=text.split('\n\nZahraj si taky:')[0];await navigator.share({title:'Proplet – česká slovní hra',text:body,url:SHARE_URL})}else{await navigator.clipboard.writeText(text);showToast('Výsledek i odkaz jsou ve schránce ✓')}}catch(e){if(e?.name!=='AbortError')showToast('Sdílení se nepovedlo. Zkus to znovu.')}}
 async function shareDaily(){await shareProplet(shareText())}
-function replayDailyFromWin(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');startTajenka();return}const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO(),puzzle=dailyPuzzleFor(date);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}
+async function replayDailyFromWin(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');startTajenka();return}const date=$('#winReplayBtn')?.dataset.dailyDate||currentGame?.dailyDate||pragueDateISO();
+ try{const puzzle=await historicalDailyPuzzle(date,currentGame?.puzzle?.id);$('#winModal').classList.add('hidden');startGame(puzzle,'daily',date)}catch{showToast('Tuto výzvu se nepodařilo načíst. Zkus to prosím znovu.')}
+}
 
 function queueResult(rec){
  if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true)return;
@@ -1404,7 +1431,7 @@ function mergeRemoteProgress(rows,scope=playerScope()){
   const old=state.completed[r.challengeKey];
   if(!old){state.completed[r.challengeKey]=r;if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];continue}
   // Aktivní Daily nesmí přepsat opožděná synchronizace archivované desky.
-  if(r.mode==='daily'&&r.dailyDate){const activeId=dailyPuzzleFor(r.dailyDate).id;if(old.puzzleId===activeId&&r.puzzleId!==activeId)continue}
+  if(r.mode==='daily'&&r.dailyDate){let activeId=datedDailyController?.cached(r.dailyDate)?.puzzleId;try{activeId=activeId||dailyPuzzleFor(r.dailyDate).id}catch{}if(activeId&&old.puzzleId===activeId&&r.puzzleId!==activeId)continue}
   // Server drží první oficiální dokončení pro Daily i volné úrovně.
   state.completed[r.challengeKey]={...old,...r};
   if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];
@@ -2200,7 +2227,7 @@ function bind(){
 
 const EXPECTED_PUZZLE_DB_VERSION=11;
 const COMPATIBLE_PUZZLE_DB_VERSIONS=new Set([9,10,EXPECTED_PUZZLE_DB_VERSION]);
-function compatiblePuzzleDatabase(data){return COMPATIBLE_PUZZLE_DB_VERSIONS.has(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4}
+function compatiblePuzzleDatabase(data){const cutover=window.PROPLET_RUNTIME_META?.datedDailyCutover;return (!cutover||data?.datedDaily?.cutover===cutover)&&COMPATIBLE_PUZZLE_DB_VERSIONS.has(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4}
 const requestedContentPreview=new URLSearchParams(location.search).get('content_preview')||'';
 const CONTENT_PREVIEW_DATE=location.hostname.endsWith('.vercel.app')&&/^\d{4}-\d{2}-\d{2}$/.test(requestedContentPreview)?requestedContentPreview:'';
 const TAJENKA_PRODUCTION_HOSTS=new Set(['hrajproplet.cz','www.hrajproplet.cz','proplet-nine.vercel.app','proplet-pavel-prouzas-projects.vercel.app','proplet-git-main-pavel-prouzas-projects.vercel.app']);
@@ -2392,9 +2419,13 @@ async function boot(){
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();
  if(freshStarterVisit()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
  try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
+ try{await refreshDatedDaily()}catch{}
  await loadTajenkaFixture();
  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
  document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{if(!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'))},80);
+ const refreshDailyAfterResume=()=>refreshDatedDaily().then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
+ window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});
  const refreshFreeOrderAfterResume=()=>refreshFreeOrder({forceConfig:true});
  window.addEventListener('online',()=>refreshFreeOrder({forceConfig:true,minAgeMs:0}));
  window.addEventListener('focus',refreshFreeOrderAfterResume);
@@ -2402,7 +2433,7 @@ async function boot(){
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshFreeOrderAfterResume()});
  window.addEventListener('storage',()=>{renderFree();renderQuickPlay()});
  registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
- let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;if(currentScreen==='daily')renderDaily();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(navigator.onLine){productAnalytics()?.flush();if(getQueue().length)syncQueue({announce:false})}},60000);
+ let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;refreshDailyAfterResume();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(navigator.onLine){productAnalytics()?.flush();if(getQueue().length)syncQueue({announce:false})}},60000);
 }
 function installEngagementModules(){
  window.PropletEngagementOnboarding?.install();

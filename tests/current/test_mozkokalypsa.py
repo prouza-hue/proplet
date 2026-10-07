@@ -10,8 +10,10 @@ from backend import mozkokalypsa as m
 from tools.gen5.catalog import Catalog,digest
 from tools.gen5.validation import Solver,validation_words,structural
 
+# Historical uniqueness receipts bind their original finite dictionary.
+# New Daily separately proves uniqueness over the full 103836-form recognizer.
 bank=json.loads((m.ROOT/'data/playtests/mozkokalypsa-v1.json').read_text());assert len(bank['boards'])==10
-solver=Solver(validation_words(Catalog()));allwords=[]
+solver=Solver(validation_words(Catalog(), recognition_path=m.ROOT/'content/gen5/recognition-before-daily-gen6.txt'));allwords=[]
 for i,b in enumerate(bank['boards']):
  stats=structural(b);v=solver.verify(b)
  assert v['status']=='unique' and v['targetPathsUnique'],(b['id'],v)
@@ -26,7 +28,7 @@ assert report['dictionary']['sha256']==solver.hash
 
 # Preserve the pilot evidence and independently validate the exact new bank.
 old=bank;bank=m.bank();assert len(bank['boards'])==12
-words=set(validation_words(Catalog()))|{'bonviván','šprýmař','erotoman','furiant'}
+words=set(validation_words(Catalog(), recognition_path=m.ROOT/'content/gen5/recognition-before-daily-gen6.txt'))|{'bonviván','šprýmař','erotoman','furiant'}
 solver=Solver(words)
 for b in bank['boards']:
  assert structural(b)['cells']==100

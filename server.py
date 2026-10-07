@@ -1329,6 +1329,8 @@ def shared_puzzle(
         banks = [data.get("daily", []), (data.get("previousDaily") or {}).get("puzzles", [])]
         banks.extend(bank.get("puzzles", []) for bank in domain_content.legacy_daily_banks(data))
         puzzle = next((p for bank in banks for p in bank if p.get("id") == puzzle_id), None)
+        if puzzle is None and "dated_daily_shared_body" in globals():
+            puzzle = dated_daily_shared_body(puzzle_id)
     elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or VERCEL_ENV == "preview"):
         slot = tajenka_week_for(today)
         latest = slot or 0
@@ -5149,6 +5151,9 @@ def leaderboard(
 
 
 # v3.31.8 — additive identity bridge. Existing Proplet sessions/passwords stay canonical.
+from backend.daily_runtime import install as install_dated_daily
+install_dated_daily(globals())
+
 from account_auth import AppServices, install_account_auth
 install_account_auth(
     app,

@@ -528,6 +528,14 @@
       {
         "path": "tests/current/test_mozkokalypsa_achievements.js",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_dated_daily_release.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_dated_daily_store.cjs",
+        "runner": "node"
       }
     ]
   },
