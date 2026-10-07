@@ -17,10 +17,10 @@ ROOT = Path(__file__).resolve().parents[2]
 
 EXPECTED_FILES = {
     "data/puzzles.json": (4679338, "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6"),
-    "public/puzzles.json": (4680877, "ffbfd44aec3ac34bbe0dff02638eca83d505b31b525faa0b0ad99c8dbf8103a3"),
+    "public/puzzles.json": (4095212, "376a1f0f4dd10053fb872e533649bb2a45ec2d24b72425861282ccd2a69de91c"),
     "data/archive/v3.33.5/puzzles.json.gz": (719_689, "b1754c1714827654cf308c3e4042fda119396fba2ebdb3439ca68c9bc670e5d0"),
-    "data/words.txt": (112_068, "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423"),
-    "public/valid-words-v3328.txt": (112_068, "c16dcb023676dd40da638edbd40d1ad48f62f4a63ad872cdc153e6049def2423"),
+    "data/words.txt": (1052497, "2548973544b5a3b9ab691804635546fdf4733a464e86614e86fbd62f9d07a456"),
+    "public/valid-words-v3328.txt": (1052497, "2548973544b5a3b9ab691804635546fdf4733a464e86614e86fbd62f9d07a456"),
     "data/rolling_content_v1.json": (374_393, "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c"),
     "data/content_catalog_v334.json": (2_466_583, "bce617335566801cb03142618cecb6f530687b8217c7b1a61d1412bb98a5e6a3"),
     "data/tajenka_weekend_v1.json": (40_393, "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4"),
@@ -50,13 +50,18 @@ assert canonical_json(server) == server_raw
 assert canonical_json(public) == public_raw
 assert len(server["daily"]) == 365
 assert len(public["daily"]) == 366
-assert server["daily"] == public["daily"][:365]
+assert server["daily"][:45] == public["daily"][:45]
+for original,slim in zip(server["daily"][45:],public["daily"][45:365]):
+    assert slim["id"] == original["id"]
+    assert slim["meta"]["retiredFutureDaily"] is True
+    assert not {"letters","answers","mask","rows","cols"}.intersection(slim)
 assert public["daily"][365]["id"] == "g3-d-007"
 
 server_without_daily = dict(server)
 public_without_daily = dict(public)
 server_without_daily.pop("daily")
 public_without_daily.pop("daily")
+assert public_without_daily.pop("datedDaily")["cutover"] == "2026-10-08"
 assert server_without_daily == public_without_daily
 
 archive_gzip = (ROOT / "data/archive/v3.33.5/puzzles.json.gz").read_bytes()
@@ -70,7 +75,8 @@ assert compatibility == public["daily"][365]
 
 rebuilt = dict(server)
 rebuilt["daily"] = list(server["daily"]) + [compatibility]
-assert canonical_json(rebuilt) == public_raw
+assert rebuilt["daily"][:45] == public["daily"][:45]
+assert rebuilt["daily"][-1] == public["daily"][-1]
 assert (ROOT / "data/words.txt").read_bytes() == (ROOT / "public/valid-words-v3328.txt").read_bytes()
 
 print("Sprint 14 content characterization: PASS")

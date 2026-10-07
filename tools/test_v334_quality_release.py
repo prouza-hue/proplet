@@ -155,7 +155,7 @@ assert "border-radius:14px" in challenge_css
 assert "self.skipWaiting()" in sw
 assert "client.navigate(target)" in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)
-assert "const DATA_CACHE='proplet-data-v11'" in sw
+assert "const DATA_CACHE='proplet-data-v12-dated-daily'" in sw
 assert "preserveExistingPuzzleDatabase" in sw
 assert "forcedClientUpdateV400:true" in runtime
 assert "pwaStartupHotfixV4001:true" in runtime

@@ -13,7 +13,16 @@
     let installed=false,menuObserver=null;
 
     function renderDaily(){
-      const date=deps.pragueDateISO(),daily=deps.dailyResultState(date),p=daily.puzzle,stats=deps.effectiveStats(),done=daily.active,upgrade=daily.legacy;
+      const date=deps.pragueDateISO();let daily;
+      try{daily=deps.dailyResultState(date)}catch{
+        $('#dailyDate').textContent=deps.formatDateCZ(date);
+        $('#dailyMeta').textContent='Dnešní výzvu se zatím nepodařilo načíst.';
+        $('#playDailyBtn').textContent='Zkusit načíst dnešní výzvu';
+        $('#shareDailyBtn').classList.add('hidden');$('#dailySyncStatus').classList.add('hidden');
+        deps.renderDailyWeekRhythm(date);deps.renderLevelCard(deps.effectiveStats());deps.renderRescueCard();deps.renderQuickPlay();deps.renderTajenkaEntry();deps.afterRender?.();
+        return {date,daily:null};
+      }
+      const p=daily.puzzle,stats=deps.effectiveStats(),done=daily.active,upgrade=daily.legacy;
       $('#dailyDate').textContent=deps.formatDateCZ(date);
       $('#dailyMeta').textContent=`${deps.DIFF[p.difficulty].label} · ${deps.countCz(p.meta.cells,'políčko','políčka','políček')} · ${deps.countCz(p.answers.length,'slovo','slova','slov')}`;
       deps.renderDailyWeekRhythm(date);

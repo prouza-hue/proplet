@@ -130,6 +130,12 @@ def build_public_runtime_bytes(root: Path, manifest: GenerationManifest) -> byte
         )
     rebuilt = dict(source)
     rebuilt[rule.target_collection] = list(source_items) + [compatibility]
+    if build.daily_projection is not None:
+        from backend.dated_daily import public_runtime_projection
+        projection = build.daily_projection
+        if not isinstance(projection, dict) or set(projection) != {"cutover", "activeUntil"}:
+            raise ManifestFormatError("Daily projection requires cutover and activeUntil")
+        rebuilt = public_runtime_projection(rebuilt, cutover=projection["cutover"], active_until=projection["activeUntil"])
     output = render_json(rebuilt, manifest)
     actual_hash = sha256_bytes(output)
     if len(output) != build.output.size_bytes or actual_hash != build.output.sha256:

@@ -28,7 +28,17 @@
       return {bank:active,base:puzzleDB.dailyRotationBaseDate||switchDate||'2026-01-01'};
     }
 
-    function dailyPuzzleFor(iso){const source=dailyBankFor(iso),n=source.bank.length;if(!n)throw new Error('Daily banka je prázdná');const i=((dayOffsetISO(iso,source.base)%n)+n)%n;return source.bank[i]}
+    function dailyPuzzleFor(iso){
+      const cached=deps.datedDaily?.cached(iso);
+      if(cached)return cached.puzzle;
+      const dated=getPuzzleDB()?.datedDaily;
+      if(dated?.cutover&&iso>=dated.cutover){
+        const released=deps.datedDaily?.cached(iso);
+        if(!released)throw new Error('Daily výzva pro toto datum se musí načíst ze serveru');
+        return released.puzzle;
+      }
+      const source=dailyBankFor(iso),n=source.bank.length;if(!n)throw new Error('Daily banka je prázdná');const i=((dayOffsetISO(iso,source.base)%n)+n)%n;return source.bank[i];
+    }
     function dailyResultState(iso){const puzzle=dailyPuzzleFor(iso),stored=readState().completed?.[`daily:${iso}`]||null;return {puzzle,stored,active:stored?.puzzleId===puzzle.id?stored:null,legacy:stored&&stored.puzzleId!==puzzle.id?stored:null}}
 
     function freeProgress(diff){

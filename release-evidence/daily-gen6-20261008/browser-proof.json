@@ -1,0 +1,37 @@
+{
+  "type": "Chromium emulation, not physical device",
+  "clock": "2026-10-08T12:00 Europe/Prague",
+  "backend": "Actual FastAPI, isolated local clock and rate-limit stub. Guest local results; database atomicity tested separately.",
+  "results": [
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844,
+      "id": "g6-d-20261008",
+      "solvedWords": 7,
+      "realPointerDrag": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "name": "fold",
+      "width": 690,
+      "height": 829,
+      "id": "g6-d-20261008",
+      "solvedWords": 7,
+      "realPointerDrag": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "name": "desktop",
+      "width": 1280,
+      "height": 900,
+      "id": "g6-d-20261008",
+      "solvedWords": 7,
+      "realPointerDrag": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    }
+  ]
+}

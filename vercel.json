@@ -1,13 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python tools/generate_puzzles_bootstrap.py",
+  "buildCommand": "python tools/build_runtime_content.py --check && python tools/generate_puzzles_bootstrap.py && python tools/check_dated_daily_release.py",
   "regions": [
     "arn1"
   ],
   "env": {
     "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true",
     "PROPLET_FREE_ORDER_ENABLED": "true",
-    "PROPLET_MOZKOKALYPSA_ENABLED": "true"
+    "PROPLET_MOZKOKALYPSA_ENABLED": "true",
+    "PROPLET_DATED_DAILY_ENABLED": "true"
   },
   "crons": [
     {
