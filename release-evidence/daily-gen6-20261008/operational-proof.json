@@ -1,0 +1,110 @@
+{
+  "productionSha": "17e0d3f6a40631cc6889ed28ab174c4a19b11e8f",
+  "releaseHeadSha": "592337f40639c97fd947747b2d2bb896bf6fb092",
+  "ci": [
+    {
+      "name": "version-alignment",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37554266754/job/112576764024"
+    },
+    {
+      "name": "Vercel Preview Comments",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://vercel.com/github"
+    },
+    {
+      "name": "version-alignment",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951266/job/112575752021"
+    },
+    {
+      "name": "gen4-smoke",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951217/job/112575747514"
+    },
+    {
+      "name": "contract",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951187/job/112575710071"
+    },
+    {
+      "name": "calibration",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951217/job/112575709329"
+    },
+    {
+      "name": "gen4-contract",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951217/job/112575708315"
+    },
+    {
+      "name": "achievements",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951244/job/112575708178"
+    },
+    {
+      "name": "printshop-ui",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951277/job/112575708160"
+    },
+    {
+      "name": "browser",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951188/job/112575707925"
+    },
+    {
+      "name": "isolated-result-database",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951133/job/112575707630"
+    },
+    {
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951143/job/112575707458"
+    },
+    {
+      "name": "current-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951133/job/112575707400"
+    },
+    {
+      "name": "browser",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/prouza-hue/proplet/actions/runs/37553951141/job/112575707254"
+    }
+  ],
+  "knownBaselineFailure": {
+    "name": "onboarding browser",
+    "assertion": "challenger_e009 experiment headers",
+    "baselineHead": "707c29cf35208e1ed135d50dc5070141adaddf15",
+    "baselineJob": 112016181705,
+    "releaseJob": 112575707925,
+    "sameAssertion": true
+  },
+  "productionAtomicFunctionMd5": "5416291ab8011d718cff6a4262a4df29",
+  "productionFunctionUnchanged": true,
+  "testSchemaDropped": true,
+  "testProjectPaused": true,
+  "productionErrorFatalLogs": "No matching error/fatal log groups returned for the new production deployment at verification time.",
+  "reminder": {
+    "id": "6ac300aeeff0819190efe5a9ee01d306",
+    "date": "2026-12-31",
+    "time": "09:00",
+    "timeZone": "Europe/Prague",
+    "coversThrough": "2027-01-14"
+  }
+}

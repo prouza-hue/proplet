@@ -1,0 +1,104 @@
+{
+  "deployment": "dpl_5mBf3ePPBLspwXt6bZ1z7svjSRmF",
+  "productionSha": "17e0d3f6a40631cc6889ed28ab174c4a19b11e8f",
+  "version": "4.05.1",
+  "cutover": "2026-10-08",
+  "activeUntil": "2027-01-14",
+  "count": 99,
+  "productionPlayerDataWrites": false,
+  "rows": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "sha256": "920e34e28f61a529ab53c7b84b08e292f8d0e33ef28a0626fda7a460cb20019f",
+      "cacheControl": "no-store",
+      "release": "4.05.1",
+      "health": {
+        "version": "4.05.1",
+        "database": true,
+        "date": "2026-10-07",
+        "pushConfigured": true,
+        "cronConfigured": true
+      }
+    },
+    {
+      "path": "/api/daily",
+      "status": 200,
+      "sha256": "e55e4c9b9c6a3c20d05f6bb5e29109ff3a6a1ce6c1af786adb03c40bf036e1e8",
+      "cacheControl": "no-store",
+      "release": "4.05.1",
+      "puzzleId": "g4-d-045",
+      "dailyDate": "2026-10-07",
+      "unchangedToday": true
+    },
+    {
+      "path": "/api/shared-puzzle?kind=daily&daily_date=2026-10-07&puzzle_id=g4-d-045",
+      "status": 200,
+      "sha256": "30b02e314ffe5c7e9c155b00fe4b1803bc33da7fa38d27b86e6e14166eb9bdc0",
+      "cacheControl": "no-store",
+      "release": "4.05.1"
+    },
+    {
+      "path": "/api/daily?daily_date=2026-10-08",
+      "status": 404
+    },
+    {
+      "path": "/api/daily?list=1",
+      "status": 404
+    },
+    {
+      "path": "/data/daily_gen6_private.json",
+      "status": 404
+    },
+    {
+      "path": "/release-evidence/daily-gen6-20261008/content-release.json",
+      "status": 404
+    },
+    {
+      "path": "/candidate-daily-gen6/bank.json",
+      "status": 404
+    },
+    {
+      "path": "/puzzles.json",
+      "status": 200,
+      "sha256": "376a1f0f4dd10053fb872e533649bb2a45ec2d24b72425861282ccd2a69de91c",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "release": null
+    },
+    {
+      "path": "/puzzles-bootstrap.json",
+      "status": 200,
+      "sha256": "44982b9d9d2735f947a2f1d04191bb20c8883673f0a60f6358cb0ca7b7636ad2",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "release": null
+    },
+    {
+      "path": "/sw.js",
+      "status": 200,
+      "sha256": "80182de70f4336812b8054dd51731346e393310a1444da479034c24741915d55",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "release": null
+    },
+    {
+      "path": "/app.js",
+      "status": 200,
+      "sha256": "57528d9dabc11d565f8ea78b8eeb0e83288c1cb6e80323b8d74bde5179af4d3b",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "release": null
+    },
+    {
+      "path": "/app/content/daily-dated.js",
+      "status": 200,
+      "sha256": "70529497e0e9f6a93aeda29a56ca567e229fc7319649bd746fc74c21ea832507",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "release": null
+    },
+    {
+      "path": "/valid-words-v3328.txt",
+      "status": 200,
+      "sha256": "2548973544b5a3b9ab691804635546fdf4733a464e86614e86fbd62f9d07a456",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "release": null
+    }
+  ]
+}
