@@ -1534,6 +1534,7 @@ def health():
     puzzle_file = PUZZLES_PATH.exists()
     pdata = load_puzzles() if puzzle_file else {}
     base = {
+        "rpcTransport": backend_db.postgres_rpc.transport_status(),
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": str(PUZZLES_PATH.relative_to(ROOT)),

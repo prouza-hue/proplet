@@ -14,7 +14,7 @@ import httpx
 from fastapi import HTTPException
 
 from .config import settings
-from . import measurement
+from . import measurement, postgres_rpc
 
 
 logger = logging.getLogger("proplet")
@@ -321,6 +321,21 @@ def db_rpc(
     url_base, secret_key = _values(supabase_url, supabase_secret_key)
     if not supabase_ready(url_base, secret_key):
         raise HTTPException(503, "Supabase ještě není připojený")
+    try:
+        direct = postgres_rpc.try_execute(function, body or {}, url_base)
+    except Exception as exc:
+        status, payload = postgres_rpc.error_payload(exc)
+        if payload.get("code") == "PT410":
+            raise HTTPException(410, "Playtest skončil nebo není otevřený.") from exc
+        if payload.get("code") == "PT422":
+            raise HTTPException(422, "Nejdřív dokonči desku a vyplň obě hodnocení.") from exc
+        if error_mapper:
+            mapped = error_mapper(status, payload)
+            if mapped is not None:
+                raise mapped from exc
+        raise HTTPException(503 if status >= 500 else 400, "Bezpečnostní služba databáze není připravená") from exc
+    if direct is not postgres_rpc.UNAVAILABLE:
+        return direct
     headers = supabase_headers(secret_key)
     url = f"{url_base}/rest/v1/rpc/{function}"
     client = http_client or DEFAULT_HTTP_CLIENT

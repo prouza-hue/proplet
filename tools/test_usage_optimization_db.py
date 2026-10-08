@@ -7,11 +7,12 @@ import sys
 import uuid
 from unittest.mock import patch
 import psycopg
-from psycopg.rows import dict_row
+from psycopg.rows import dict_row, tuple_row
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 import server
+from backend import postgres_rpc
 
 
 def main():
@@ -64,6 +65,31 @@ def main():
                 previous = server.player_stats(player,prefetched_results=rows,prefetched_rewards=rewards,prefetched_rescues=rescues)
             actual = server._stats_from_db_summary(compact)
             assert actual == previous, {key:(previous.get(key),actual.get(key)) for key in previous if previous.get(key)!=actual.get(key)}
+            # Exercise the same typed SQL transport against real PostgreSQL,
+            # including UUID arrays, JSONB, table/scalar/void results and defaults.
+            c.row_factory = tuple_row
+            c.execute("""create function public.proplet_synthetic_transport(p_id uuid,p_ids uuid[],p_payload jsonb)
+                         returns jsonb language sql as $$select jsonb_build_object('id',p_id,'ids',p_ids,'payload',p_payload)$$""")
+            c.execute("""create function public.proplet_synthetic_rows() returns table(value int)
+                         language sql as $$values(1),(2)$$""")
+            c.execute("""create function public.proplet_synthetic_void() returns void
+                         language sql as $$select null::void$$""")
+            c.execute('set local role service_role')
+            def direct(name,body):
+                signature = postgres_rpc._signature(c,name,body)
+                assert signature is not None, name
+                return postgres_rpc.execute_on_connection(c,name,body,signature)
+            assert direct('proplet_player_stats_v1',{'p_player':player}) == compact
+            ranking = direct('proplet_ranking_context_v1',{'p_player_ids':[player]})
+            assert ranking['players'][0]['id'] == player
+            echo = direct('proplet_synthetic_transport',{'p_id':player,'p_ids':[player], 'p_payload':{'text':'ČÁP','count':3}})
+            assert echo == {'id':player,'ids':[player],'payload':{'text':'ČÁP','count':3}}
+            assert direct('proplet_synthetic_rows',{}) == [{'value':1},{'value':2}]
+            assert direct('proplet_synthetic_void',{}) is None
+            guard = {'p_scope':'synthetic-direct','p_actor_hash':'synthetic','p_window_seconds':60,'p_limit':1}
+            assert direct('proplet_request_guard_v1',guard)['allowed'] is True
+            assert direct('proplet_request_guard_v1',guard)['allowed'] is False
+            c.execute('reset role')
             print('PASS guard quotas, revocation, service-only grants, ranking privacy and all statistics fields')
         finally:
             c.execute('rollback')

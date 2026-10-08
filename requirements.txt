@@ -5,6 +5,8 @@ starlette==1.6.0
 uvicorn[standard]==0.48.0
 pydantic==2.13.4
 httpx==0.28.1
+psycopg[binary]==3.3.5
+psycopg_pool==3.3.0
 pywebpush==2.3.0
 # v3.33.0 recognition hotfix: broad Czech frequency evidence, used only after
 # the strict/static recognition sources miss. Generation Lexicon V2 is unchanged.
