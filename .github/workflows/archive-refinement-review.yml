@@ -30,6 +30,7 @@ jobs:
           name: archive-refinement-review
           path: public/previews/archive-20261008/evidence/
       - name: Save review evidence on the preview branch
+        if: always() && !cancelled()
         env:
           PREVIEW_BRANCH: ${{ github.head_ref }}
           TESTED_SHA: ${{ github.event.pull_request.head.sha }}

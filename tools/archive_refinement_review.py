@@ -11,7 +11,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 server=http.server.ThreadingHTTPServer(("127.0.0.1",8765),functools.partial(Handler,directory=str(ROOT/"public")))
 threading.Thread(target=server.serve_forever,daemon=True).start()
-report={"testedSha":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),"checks":[],"screenshots":[]}
+report={"testedSha":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),"checks":[],"screenshots":[],"layoutIssues":[]}
 # Independent production read without Vercel tooling's extra query parameters.
 try:
     with urllib.request.urlopen("https://hrajproplet.cz/api/daily",timeout=25) as r:
@@ -52,7 +52,8 @@ with sync_playwright() as p:
         assert all(font_sizes),("fonts missing",font_sizes)
         for view in ["archive","play","today","season"]:
             page.select_option("#view-select",view)
-            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"),(view,width)
+            if not page.evaluate("document.documentElement.scrollWidth <= innerWidth"):
+                report["layoutIssues"].append({"view":view,"width":width,"elements":page.evaluate("[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,cls:e.className,right:e.getBoundingClientRect().right})).slice(0,12)")})
             name=f"{view}-{width}.png"
             page.screenshot(path=str(OUT/name),full_page=True)
             report["screenshots"].append(name)
@@ -77,3 +78,4 @@ with sync_playwright() as p:
 server.shutdown()
 (OUT/"report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(report,ensure_ascii=False))
+assert not report["layoutIssues"], report["layoutIssues"]
