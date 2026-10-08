@@ -45,7 +45,7 @@ const server=http.createServer(async(req,res)=>{
    requests.push({method:req.method,path:p,headers:req.headers,at:Date.now()});
    if(['/api/product-event','/api/product-events','/api/challenge-event'].includes(p)&&req.method==='POST'){
     const batch=p==='/api/product-events'?(Array.isArray(data.events)?data.events:[]):[data];
-    for(const item of batch)if(item.event_type!=='account_created')events.push({endpoint:p,event:item.event_type,headers:req.headers,at:Date.now()});
+    for(const item of batch)if(item.event_type!=='account_created')events.push({endpoint:p,event:item.event_type,headers:{...req.headers,...(item.id?{'x-proplet-event-id':item.id}:{}),...(item.created_at?{'x-proplet-event-time':item.created_at}:{})},at:Date.now()});
     return setTimeout(()=>json(res,200,{ok:true,synthetic:true}),controls.eventDelayMs);
    }
    if(p==='/api/config')return json(res,200,config);
@@ -101,5 +101,6 @@ const server=http.createServer(async(req,res)=>{
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });
 server.listen(Number(process.env.PORT||8765),'127.0.0.1',()=>console.log(`Synthetic onboarding fixture ${sha} on ${server.address().port}`));
+
 
 
