@@ -172,7 +172,7 @@ async function onClick(e){
  if(action==='open'||action==='enter'||action==='retry'){nav('archive');return}
  if(action==='free'){nav('free');return}if(action==='season'){nav('season');return}if(action==='daily'){nav('daily');return}
  if(action==='rankings'){nav('leaderboard');return}
- if(action==='team'){nav('leaderboard');setTimeout(()=>{q('[data-ranking-xp-scope="teams"]')?.click();q('[data-ranking-period="week"]')?.click();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});},50);}
+ if(action==='team'){nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}
 }
 window.PropletArchiveExperience={install,home,free,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
 })();

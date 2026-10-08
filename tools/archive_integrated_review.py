@@ -145,7 +145,7 @@ try:
                 page.wait_for_function("freeOrder().record('easy').mode==='varied'")
                 page.locator('[data-played-levels="easy"]').click()
                 page.wait_for_selector("#playedLevelsModal:not(.hidden)")
-                page.keyboard.press("Escape")
+                page.locator("#closePlayedLevelsModal").click()
                 go(page,"daily")
                 page.locator('[data-archive-action="team"]').click()
                 page.wait_for_timeout(250)

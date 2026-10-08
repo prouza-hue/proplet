@@ -9,7 +9,7 @@
   "summary": {
     "boardsWithApprovedAlternatives": 66,
     "approvedAlternativeCompleteSolutions": 79,
-    "pendingCandidateSolutions": 15,
+    "pendingCandidateSolutions": 0,
     "rejectedCandidateSolutions": 21
   },
   "boards": {
