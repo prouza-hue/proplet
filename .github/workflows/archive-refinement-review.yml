@@ -1,0 +1,47 @@
+name: Archive refinement visual review
+on:
+  pull_request:
+    paths:
+      - 'public/previews/archive-20261008/**'
+      - 'tools/archive_refinement_review.py'
+      - '.github/workflows/archive-refinement-review.yml'
+permissions:
+  contents: read
+jobs:
+  review:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'preview/archive-refinement-20261008'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright==1.63.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python tools/archive_refinement_review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: archive-refinement-review
+          path: public/previews/archive-20261008/evidence/
+      - name: Save review evidence on the preview branch
+        env:
+          PREVIEW_BRANCH: ${{ github.head_ref }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          REMOTE_SHA=$(git ls-remote origin "refs/heads/$PREVIEW_BRANCH" | cut -f1)
+          if [ "$REMOTE_SHA" != "$TESTED_SHA" ]; then
+            echo "Branch advanced; evidence kept as artifact."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/previews/archive-20261008/evidence/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "docs: capture Archive refinement visual review evidence"
+          git push origin "HEAD:refs/heads/$PREVIEW_BRANCH"
