@@ -8,7 +8,8 @@ const output=process.env.RESULT_PATH||'onboarding-browser-results.json';
 fs.mkdirSync(path.dirname(output),{recursive:true});
 const report={started:new Date().toISOString(),synthetic:true,checks:[]};
 const control=async value=>{const response=await fetch(url+'/__fixture/control',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(value)});assert(response.ok);return response.json()};
-const recording=()=>fetch(url+'/__fixture/events').then(r=>r.json());
+let fixtureRun='';
+const recording=()=>fetch(url+'/__fixture/events').then(r=>r.json()).then(data=>({...data,events:data.events.filter(e=>e.headers['x-proplet-fixture-run']===fixtureRun),requests:data.requests.filter(r=>r.headers['x-proplet-fixture-run']===fixtureRun)}));
 const events=async()=> (await recording()).events;
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function eventually(fn,message,timeout=10000){const end=Date.now()+timeout;do{if(await fn())return;await delay(100)}while(Date.now()<end);throw Error(message)}
@@ -60,9 +61,12 @@ async function assertAccountFlow(method){
  assert(rows.every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'));
  const measured=[rows[0],rows[1],rows[3]];assert.equal(new Set(measured.map(e=>e.headers['x-proplet-experiment'])).size,1);assert.equal(new Set(measured.map(e=>e.headers['x-proplet-experiment-variant'])).size,1);
  const times=rows.map(e=>Date.parse(e.headers['x-proplet-event-time'])||e.at);
- // Fixture clock is fixed; arrival ordering verifies branch before signup,
- // while capture timestamps are exercised by HTTP/database tests.
- assert(ev.indexOf(rows[0])<ev.indexOf(rows[1])&&ev.indexOf(rows[1])<ev.indexOf(rows[2])&&ev.indexOf(rows[2])<ev.indexOf(rows[3]));
+ // Batches may arrive after the authoritative signup event. Compare captured
+ // client event times and retain the server-signup-before-saved assertion.
+ const captured=measured.map(e=>Date.parse(e.headers['x-proplet-event-time'])||e.at);
+ assert.deepEqual(captured,[...captured].sort((a,b)=>a-b));
+ assert.equal(rows[1].headers['x-proplet-auth-at-event'],'anonymous');
+ assert(ev.indexOf(rows[2])<ev.indexOf(rows[3]));
  assert((await recording()).requests.some(r=>r.path==='/api/anonymous/claim'));
 }
 async function ready(page){await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter'&&currentGame.puzzle.meta.starterVersion===3&&document.querySelectorAll('#board .cell').length===9,null,{timeout:15000});await page.locator('#starterCoach').waitFor({state:'visible'});}
@@ -73,14 +77,15 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
  async function scenario(name,fn,options={}){
   await control({reset:true,firstSteps:true});
-  const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:'block',...(options.userAgent?{userAgent:options.userAgent}:{})});
+  fixtureRun=crypto.randomUUID();
+  const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:'block',extraHTTPHeaders:{'X-Proplet-Fixture-Run':fixtureRun},...(options.userAgent?{userAgent:options.userAgent}:{})});
   await context.addInitScript(identity=>localStorage.setItem('proplet-v3-15-anonymous-id',identity),options.experimentIdentity||'synthetic-2');
   await context.route('**/*',route=>['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname)?route.continue():route.abort());
   const page=await context.newPage(),errors=[],warnings=[],network=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))warnings.push({type:m.type(),text:m.text()})});page.on('requestfailed',r=>network.push({url:r.url(),error:r.failure()?.errorText}));page.on('response',r=>{if(r.status()>=500)network.push({url:r.url(),status:r.status()})});await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
   console.log('SCENARIO '+name);
   try{await fn(page,context);assert.deepEqual(errors,[]);await page.screenshot({path:output+'.'+name+'.png',fullPage:true});const localFailures=network.filter(r=>['127.0.0.1','localhost'].includes(new URL(r.url).hostname)&&r.error!=='net::ERR_ABORTED');if(name.startsWith('short-'))assert.deepEqual(localFailures,[],'no failed local request or 5xx');report.checks.push({name,ok:true,events:await events(),warnings,network});}
   catch(error){report.checks.push({name,ok:false,error:error.stack,errors});await page.screenshot({path:output+'.'+name+'.failed.png',fullPage:true}).catch(()=>{});console.error(name+': '+error.message);}
-  finally{fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close();}
+  finally{await page.evaluate(()=>productAnalytics()?.flush()).catch(()=>{});fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close();}
  }
  try{
   for(const [mobile,style] of [[false,'drag'],[true,'drag'],[false,'tap'],[true,'tap'],[false,'mixed']])await scenario('short-'+(mobile?'touch':'mouse')+'-'+style+'-first-win',async page=>{
@@ -165,5 +170,6 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   assert(report.checks.every(c=>c.ok),'All first-step browser scenarios must pass; see report');report.finished=new Date().toISOString();fs.writeFileSync(output,JSON.stringify(report,null,2));console.log(JSON.stringify({sha:report.sha,passed:report.checks.map(c=>c.name)}));
  }finally{await browser.close();}
 })().catch(error=>{fs.writeFileSync(output,JSON.stringify(report,null,2));console.error(error);process.exitCode=1});
+
 
 

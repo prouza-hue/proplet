@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "isolatedProject": "eanzztstmwlamwfdskbf",
+  "schema": "daily_gen6_qa_20261007",
+  "productionWrites": false,
+  "productionFunctionMd5": "5416291ab8011d718cff6a4262a4df29",
+  "method": "Exact deployed function copied into a private schema with matching column types and unique indexes; no player data copied. Two concurrent connector SQL transactions.",
+  "limitations": "Foreign keys/RLS/triggers are not cloned; this checks function atomicity and XP uniqueness, separate from HTTP date/ID validation.",
+  "race": [
+    [
+      {
+        "receipt": {
+          "commandId": "b1c34f58-d740-4ee1-9362-5447aa1e35eb",
+          "attemptStatus": "created_offline",
+          "awardedPoints": 100,
+          "firstCompletion": true,
+          "transferredSlot": false,
+          "dailyGenerationUpgrade": false
+        }
+      }
+    ],
+    [
+      {
+        "receipt": {
+          "commandId": "b1c34f58-d740-4ee1-9362-5447aa1e35eb",
+          "attemptStatus": "created_offline",
+          "awardedPoints": 100,
+          "firstCompletion": true,
+          "transferredSlot": false,
+          "dailyGenerationUpgrade": false
+        }
+      }
+    ]
+  ],
+  "lostResponseReplay": [
+    {
+      "receipt": {
+        "commandId": "b1c34f58-d740-4ee1-9362-5447aa1e35eb",
+        "attemptStatus": "created_offline",
+        "awardedPoints": 100,
+        "firstCompletion": true,
+        "transferredSlot": false,
+        "dailyGenerationUpgrade": false
+      }
+    }
+  ],
+  "upgradeReceipts": [
+    {
+      "receipt": {
+        "commandId": "fcced8bd-852f-4df4-bf37-cf2a8301beca",
+        "attemptStatus": "created_offline",
+        "awardedPoints": 100,
+        "firstCompletion": true,
+        "transferredSlot": false,
+        "dailyGenerationUpgrade": false
+      }
+    },
+    {
+      "receipt": {
+        "commandId": "b2741b7a-367b-44f5-a226-1ec54922d697",
+        "attemptStatus": "created_offline",
+        "awardedPoints": 0,
+        "firstCompletion": false,
+        "transferredSlot": false,
+        "dailyGenerationUpgrade": true
+      }
+    }
+  ],
+  "counts": [
+    {
+      "player_id": "00000000-0000-4000-8000-000020261009",
+      "completions": 1,
+      "points": 100,
+      "generation": 6
+    },
+    {
+      "player_id": "00000000-0000-4000-8000-000020261008",
+      "completions": 1,
+      "points": 100,
+      "generation": 6
+    }
+  ]
+}

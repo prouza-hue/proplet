@@ -93,13 +93,18 @@ def build_bootstrap(source: dict, source_bytes: bytes, today: date | None = None
     today = today or datetime.now(ZoneInfo("Europe/Prague")).date()
     valid_from = today - timedelta(days=BOOTSTRAP_DAYS_BEHIND)
     valid_through = today + timedelta(days=BOOTSTRAP_DAYS_AHEAD)
+    dated_cutover = (source.get("datedDaily") or {}).get("cutover")
     full_daily_ids = {
-        daily_puzzle_id(source, (valid_from + timedelta(days=offset)).isoformat())
+        daily_puzzle_id(source, selected)
         for offset in range((valid_through - valid_from).days + 1)
+        for selected in [(valid_from + timedelta(days=offset)).isoformat()]
+        if not dated_cutover or (selected < dated_cutover and selected <= today.isoformat())
     }
 
     bootstrap = {key: value for key, value in source.items() if key not in HEAVY_KEYS}
     bootstrap["bootstrapSchema"] = 1
+    if dated_cutover:
+        bootstrap["bootstrapPublishedThrough"] = today.isoformat()
     bootstrap["bootstrapValidFrom"] = valid_from.isoformat()
     bootstrap["bootstrapValidThrough"] = valid_through.isoformat()
     bootstrap["bootstrapSource"] = {
@@ -148,7 +153,12 @@ def validate(source: dict, bootstrap: dict, full_size: int, bootstrap_size: int)
     cursor = parse_iso(valid_from)
     end = parse_iso(valid_through)
     by_id = {puzzle.get("id"): puzzle for puzzle in daily}
+    dated_cutover = (source.get("datedDaily") or {}).get("cutover")
+    published_through = parse_iso(bootstrap["bootstrapPublishedThrough"]) if dated_cutover else None
     while cursor <= end:
+        if dated_cutover and (cursor.isoformat() >= dated_cutover or cursor > published_through):
+            cursor += timedelta(days=1)
+            continue
         puzzle_id = daily_puzzle_id(source, cursor.isoformat())
         if not is_playable_puzzle(by_id.get(puzzle_id)):
             raise ValueError(f"Bootstrap Daily is not playable for {cursor.isoformat()}: {puzzle_id}")

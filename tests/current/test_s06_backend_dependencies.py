@@ -72,7 +72,7 @@ EXPECTED_INSTALLER_ROUTES = (
 route_keys = [
     (method, route.path)
     for route in server.app.routes
-    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
     for method in (route.methods or ())
 ]
 for expected in EXPECTED_INSTALLER_ROUTES:
@@ -81,7 +81,7 @@ for expected in EXPECTED_INSTALLER_ROUTES:
 route_snapshot = sorted(
     (route.path, tuple(sorted(route.methods or ())), route.name)
     for route in server.app.routes
-    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
 )
 # Round III adds exactly four /api/mozkokalypsa3 routes. Removing those
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
@@ -90,6 +90,8 @@ openapi_contract = json.loads(json.dumps(server.app.openapi()))
 # The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
 openapi_contract["paths"].pop("/api/cron/mozkokalypsa-launch-push")
+assert set(openapi_contract["paths"]["/api/cron/refresh300-launch-push"]) == {"get"}
+openapi_contract["paths"].pop("/api/cron/refresh300-launch-push")
 assert "/api/admin/quality-snapshot" in openapi_contract["paths"]
 openapi_contract["paths"].pop("/api/admin/quality-snapshot")
 assert "/api/account/welcome" in openapi_contract["paths"]

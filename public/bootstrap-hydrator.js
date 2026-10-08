@@ -13,7 +13,7 @@
 
   const cacheCanonicalResponse=response=>{
     if(!response?.ok||!('caches' in window))return;
-    try{const cachedResponse=response.clone();caches.open('proplet-data-v11').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
+    try{const cachedResponse=response.clone();caches.open('proplet-data-v12-dated-daily').then(cache=>cache.put('/puzzles.json',cachedResponse)).catch(()=>{})}catch{}
   };
 
   const fetchCanonical=()=>fetch('/puzzles.json',{cache:'no-store'}).then(response=>{

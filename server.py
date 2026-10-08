@@ -12,6 +12,7 @@ import time
 import uuid
 from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
+from contextvars import ContextVar
 from typing import Optional
 from urllib.parse import urlsplit
 
@@ -134,6 +135,9 @@ app = FastAPI(
     openapi_url=None,
 )
 logger = logging.getLogger("proplet")
+# A fresh mutable container per HTTP request crosses FastAPI's worker-thread
+# boundary. Never retain authentication or rate decisions across requests.
+request_guard_context = ContextVar("proplet_request_guard", default=None)
 
 
 def isolated_fair_play_preview():
@@ -180,10 +184,12 @@ async def launch_safety_middleware(request: Request, call_next):
                 headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
             )
     measurement_token = measurement.context.set(measurement.request_context(request, VERCEL_ENV))
+    guard_token = request_guard_context.set({})
     try:
         response = await call_next(request)
     finally:
         measurement.context.reset(measurement_token)
+        request_guard_context.reset(guard_token)
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Proplet-Version"] = APP_VERSION
     if response.status_code >= 500:
@@ -413,17 +419,28 @@ def enforce_rate_limit(
     discriminator: Optional[str] = None,
 ) -> None:
     actor_hash = _rate_actor_hash(request, discriminator)
+    context = request_guard_context.get()
+    authorization = request.headers.get("authorization") or ""
+    token_hash = hashlib.sha256(authorization[7:].strip().encode()).hexdigest() if authorization.startswith("Bearer ") else None
+    params = {
+        "p_scope": scope, "p_actor_hash": actor_hash,
+        "p_window_seconds": int(window_seconds), "p_limit": int(limit),
+    }
+    if context is not None:
+        params["p_token_hash"] = token_hash if token_hash and context.get("token_hash") != token_hash else None
     try:
-        result = db_rpc("proplet_rate_limit", {
-            "p_scope": scope,
-            "p_actor_hash": actor_hash,
-            "p_window_seconds": int(window_seconds),
-            "p_limit": int(limit),
-        })
+        result = db_rpc("proplet_request_guard_v1" if context is not None else "proplet_rate_limit", params)
     except HTTPException:
         # Auth/abuse-sensitive endpoints should not silently lose their launch protection.
         raise HTTPException(503, "Bezpečnostní ochrana serveru není připravená. Zkus to za chvíli.")
     row = result[0] if isinstance(result, list) and result else (result or {})
+    if not isinstance(row, dict) or type(row.get("allowed")) is not bool:
+        raise HTTPException(503, "Bezpečnostní ochrana serveru není připravená. Zkus to za chvíli.")
+    if context is not None and row["allowed"]:
+        if params.get("p_token_hash"):
+            context.update(token_hash=token_hash, auth=row.get("auth"))
+        if isinstance(row.get("fairPlay"), dict):
+            context["fair_play_policy"] = row["fairPlay"]
     if not bool(row.get("allowed")):
         request_id = getattr(request.state, "request_id", None)
         try:
@@ -464,7 +481,7 @@ def public_team_name(code: Optional[str], team_joined_at: Optional[str] = None) 
 def league_name_for(code: str) -> str:
     normalized = norm_family(code)
     try:
-        rows = db_select("leagues", code=normalized)
+        rows = db_select("leagues", columns="name", code=normalized)
         return rows[0].get("name") or normalized if rows else normalized
     except HTTPException:
         return normalized
@@ -525,9 +542,11 @@ def auth_player(authorization: Optional[str]) -> dict:
     token_hash = hashlib.sha256(token.encode()).hexdigest()
 
     # Resolve legacy and independent-device tokens in one server-only database
-    # call. The RPC checks expiry/revocation on every request; no auth is cached.
+    # call. Reuse only an identical token resolved by this request's guard.
+    # The database still checks expiry/revocation afresh on every HTTP request.
+    context = request_guard_context.get()
     try:
-        result = db_rpc("proplet_auth_player_v1", {"p_token_hash": token_hash})
+        result = context["auth"] if context is not None and context.get("token_hash") == token_hash else db_rpc("proplet_auth_player_v1", {"p_token_hash": token_hash})
     except HTTPException as exc:
         # Missing/unavailable RPC is infrastructure failure, never a reason for
         # the client to discard a valid login token.
@@ -636,6 +655,35 @@ def player_reward_stats(player_id: str) -> dict:
     return reward_stats_from_rows(rewards, account_rewards_included=included)
 
 
+def _stats_from_db_summary(payload: dict) -> dict:
+    if (not isinstance(payload, dict) or type(payload.get("currentStreak")) is not int
+            or type(payload.get("longestStreak")) is not int
+            or not isinstance(payload.get("freeResults"), list)
+            or any(not isinstance(row, list) or len(row) != 2
+                   or not all(isinstance(value, str) for value in row)
+                   for row in payload["freeResults"])):
+        raise HTTPException(503, "Statistiky hráče nejsou momentálně dostupné")
+    stats = dict(payload)
+    free_rows = [{"mode": "free", "puzzle_id": row[0], "difficulty": row[1]} for row in stats.pop("freeResults")]
+    slots = free_slot_summary(free_rows)
+    stats.update(freeCompleted=slots["effective"], freeTransferred=slots["transferred"],
+                 freePlayedCurrent=slots["current"], freePlayedGen2=slots["current"],
+                 freeBasePlayedCurrent=slots["baseCurrent"], mozkomorUnlocked=True)
+    puzzle_data = load_puzzles()
+    active_ids = {difficulty: {str(p["id"]) for p in [
+        *puzzle_data.get("free", {}).get(difficulty, []),
+        *load_rolling_content().get("puzzles", {}).get(difficulty, [])]} for difficulty in FREE_DIFFICULTIES}
+    eligible = [row for row in free_rows if row["difficulty"] in POINTS]
+    stats["gen4ReturnBonusXp"] = GEN4_RETURNING_BONUS_XP if (
+        int(puzzle_data.get("freeGeneration") or 1) >= 4
+        and any(row["puzzle_id"] in active_ids.get(row["difficulty"], set()) for row in eligible)
+        and any(row["puzzle_id"] not in active_ids.get(row["difficulty"], set()) for row in eligible)
+    ) else 0
+    stats["earnedBadges"] = [badge for badge in BADGES if stats["longestStreak"] >= badge["days"]]
+    stats["nextBadge"] = next((badge for badge in BADGES if stats["currentStreak"] < badge["days"]), None)
+    return stats
+
+
 def player_stats(
     player_id: str,
     *,
@@ -644,6 +692,8 @@ def player_stats(
     prefetched_rescues: Optional[list[dict]] = None,
 ) -> dict:
     """Statistiky včetně ochráněných streak dnů a clean solve metrik."""
+    if SUPABASE_URL and SUPABASE_SECRET_KEY and all(value is None for value in (prefetched_results, prefetched_rewards, prefetched_rescues)):
+        return _stats_from_db_summary(db_rpc("proplet_player_stats_v1", {"p_player": player_id}))
     # Public stats keys remain owned by the core: "xpAuthoritative",
     # "resultXp", "accountBonusXp", "wordDiscoveryXp", "discoveredWords".
     # Serialization aliases remain: "freeBasePlayedCurrent": free_slots["baseCurrent"].
@@ -721,7 +771,7 @@ def rescue_status_for(player_id: str) -> dict:
     today = current_prague_date()
     missed = today - timedelta(days=1)
     before = missed - timedelta(days=1)
-    rows = db_select("results", player_id=player_id)
+    rows = db_select("results", columns="id,mode,daily_date", player_id=player_id)
     daily_dates = {str(r.get("daily_date"))[:10] for r in rows if r.get("mode") == "daily" and r.get("daily_date")}
     rescues = rescue_rows(player_id)
     passed = {str(r.get("missed_date"))[:10] for r in rescues if r.get("status") == "passed" and r.get("missed_date")}
@@ -951,7 +1001,7 @@ def mozkomor_unlocked_from_rows(rows: list[dict], slots: Optional[dict] = None) 
 
 
 def free_slot_already_rewarded(player_id: str, difficulty: str, level: int) -> bool:
-    for row in db_select("results", player_id=player_id):
+    for row in db_select("results", columns="id,mode,difficulty,puzzle_id,points", player_id=player_id):
         if row.get("mode") != "free" or row.get("difficulty") != difficulty or int(row.get("points") or 0) <= 0:
             continue
         info = free_puzzle_info(str(row.get("puzzle_id") or ""), difficulty)
@@ -1168,7 +1218,7 @@ def daily_leaderboard_puzzle_id(daily_date: str, player_id: Optional[str] = None
     if not player_id:
         return primary
     valid_ids = valid_daily_puzzle_ids(daily_date)
-    rows = db_select("results", player_id=player_id, mode="daily", daily_date=daily_date)
+    rows = db_select("results", columns="puzzle_id", player_id=player_id, mode="daily", daily_date=daily_date)
     own = next((row.get("puzzle_id") for row in rows if row.get("puzzle_id") in valid_ids), None)
     return str(own or primary)
 
@@ -1315,6 +1365,8 @@ def shared_puzzle(
         banks = [data.get("daily", []), (data.get("previousDaily") or {}).get("puzzles", [])]
         banks.extend(bank.get("puzzles", []) for bank in domain_content.legacy_daily_banks(data))
         puzzle = next((p for bank in banks for p in bank if p.get("id") == puzzle_id), None)
+        if puzzle is None and "dated_daily_shared_body" in globals():
+            puzzle = dated_daily_shared_body(puzzle_id)
     elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or VERCEL_ENV == "preview"):
         slot = tajenka_week_for(today)
         latest = slot or 0
@@ -1468,6 +1520,9 @@ def health():
     puzzle_file = PUZZLES_PATH.exists()
     pdata = load_puzzles() if puzzle_file else {}
     base = {
+        "rpcTransport": backend_db.postgres_rpc.transport_status(),
+        "historicalFreeRewardsEnabled": HISTORICAL_FREE_REWARDS_ENABLED,
+        "atomicResultEnabled": ATOMIC_RESULT_V1_ENABLED,
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
         "puzzleSource": str(PUZZLES_PATH.relative_to(ROOT)),
@@ -2187,7 +2242,7 @@ def set_team_membership(payload: TeamMembershipSet, request: Request, authorizat
         if not verify_password(payload.league_pin.strip(), rows[0].get("pin_hash")):
             raise HTTPException(401, "PIN týmu nesedí")
 
-    target_players = db_select("players", family_code=family)
+    target_players = db_select("players", columns="id,name", family_code=family)
     if any(p.get("id") != player.get("id") and p.get("name", "").casefold() == player.get("name", "").casefold() for p in target_players):
         raise HTTPException(409, "V tomto týmu už je hráč se stejným jménem")
     joined_at = datetime.now(TZ).isoformat()
@@ -2441,6 +2496,9 @@ def _fair_play_policy_for_bucket(_bucket: int) -> dict:
 
 
 def _fair_play_policy() -> dict:
+    context = request_guard_context.get()
+    if context is not None and "fair_play_policy" in context:
+        return context["fair_play_policy"]
     return _fair_play_policy_for_bucket(int(time.time() // 60))
 
 
@@ -3109,6 +3167,7 @@ def admin_support(
     player_rows, _ = ranking_queries.entity_context(
         db_select_bounded,
         (row.get("player_id") for row in rows),
+        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
     players = {row["id"]: row for row in player_rows if row.get("id")}
     out = []
@@ -3261,6 +3320,7 @@ def admin_reports(
     player_rows, league_rows = ranking_queries.entity_context(
         db_select_bounded,
         (row.get("player_id") for row in reports),
+        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
     players = {row["id"]: row for row in player_rows if row.get("id")}
     league_names = {
@@ -3344,6 +3404,7 @@ def admin_audit(
     player_rows, _ = ranking_queries.entity_context(
         db_select_bounded,
         (row.get("admin_player_id") for row in rows),
+        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
     players = {row["id"]: row for row in player_rows if row.get("id")}
     rows.sort(key=lambda row: parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
@@ -4021,7 +4082,7 @@ def family_league(
             if is_solo_player(player):
                 raise HTTPException(404, "Hráč zatím není v týmu")
             league_rows = db_select("leagues", code=family)
-            members = db_select("players", family_code=family)
+            members = db_select("players", columns="id", family_code=family)
             league = league_rows[0] if league_rows else {}
             mine = next((r for r in data["standings"] if r["familyCode"] == family), None)
             my_family = {
@@ -4088,7 +4149,7 @@ def puzzle_leaderboard(
     viewer_family = norm_family(str(viewer.get("family_code") or ""))
     if is_solo_player(viewer) or viewer_family != family:
         raise HTTPException(403, "Týmové pořadí je dostupné jen členům tohoto týmu")
-    players = db_select("players", family_code=family)
+    players = db_select("players", columns="id,name,avatar", family_code=family)
     pmap = {p["id"]: p for p in players}
     rows = [r for r in db_select("puzzle_runs", puzzle_id=puzzle_id) if r.get("player_id") in pmap and competitive_row(r)]
     first: dict[str, dict] = {}
@@ -4174,6 +4235,7 @@ def free_global_leaderboard(
     players, _ = ranking_queries.entity_context(
         db_select_bounded,
         (row.get("player_id") for row in ranked),
+        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
     players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
@@ -4281,6 +4343,7 @@ def daily_global_leaderboard(
     players, _ = ranking_queries.entity_context(
         db_select_bounded,
         (row.get("player_id") for row in ranked),
+        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
     players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
@@ -4487,6 +4550,7 @@ def _ranking_context(player_ids: set[str], team_codes: set[str]):
         player_ids,
         team_codes,
         include_team_members=True,
+        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
     player_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     league_by_code = {norm_family(str(l.get("code") or "")): l for l in leagues if l.get("code")}
@@ -4828,7 +4892,7 @@ def played_levels(
     data = load_puzzles()
     bank = sorted(released_free_bank(difficulty, effective_content_date(request)), key=lambda p: int((p.get("meta") or {}).get("level") or 9999))
     active = {p["id"]: p for p in bank}
-    results = [r for r in db_select("results", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty]
+    results = [r for r in db_select("results", columns="id,puzzle_id,mode,difficulty,best_elapsed_ms,best_moves,hints_used,wrong_attempts,clean_solve,calm_mode,completed_at", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty]
     active_generation = int(data.get("freeGeneration") or 1)
     prior_slots: set[int] = set()
     prior_history: list[dict] = []
@@ -4851,7 +4915,7 @@ def played_levels(
                 "cleanSolve": row.get("clean_solve") is True, "calmMode": row.get("calm_mode") is True,
                 "completedAt": row.get("completed_at"),
             })
-    runs = [r for r in db_select("puzzle_runs", player_id=player["id"]) if r.get("mode") == "free" and r.get("difficulty") == difficulty and r.get("puzzle_id") in active]
+    runs = [r for r in db_select("puzzle_runs", columns="id,attempt_id,puzzle_id,mode,difficulty,elapsed_ms,moves,hints_used,wrong_attempts,clean_solve,calm_mode,completed_at", player_id=player["id"], mode="free", difficulty=difficulty) if r.get("mode") == "free" and r.get("difficulty") == difficulty and r.get("puzzle_id") in active]
     grouped: dict[str, list[dict]] = {}
     for r in runs:
         grouped.setdefault(r["puzzle_id"], []).append(r)
@@ -5137,6 +5201,9 @@ def leaderboard(
 
 
 # v3.31.8 — additive identity bridge. Existing Proplet sessions/passwords stay canonical.
+from backend.daily_runtime import install as install_dated_daily
+install_dated_daily(globals())
+
 from account_auth import AppServices, install_account_auth
 install_account_auth(
     app,

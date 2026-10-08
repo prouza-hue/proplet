@@ -55,8 +55,9 @@ def main():
             return [r[0] for r in cur.fetchall()] if cur.description else []
     def where(filters):
         return sql.SQL(' and ').join(sql.SQL('{} = %s').format(sql.Identifier(k)) for k in filters) or sql.SQL('true')
-    def select(table,**filters):
-        return query(sql.SQL('select to_jsonb(t) from {} t where {}').format(sql.Identifier(table),where(filters)),list(filters.values()))
+    def select(table,*,columns="*",**filters):
+        fields = sql.SQL('*') if columns == '*' else sql.SQL(',').join(sql.Identifier(column) for column in columns.split(','))
+        return query(sql.SQL('select to_jsonb(t) from (select {} from {} where {}) t').format(fields,sql.Identifier(table),where(filters)),list(filters.values()))
     def bounded(table,*,filters,**kw):
         clauses=[];values=[]
         for k,v in filters.items():

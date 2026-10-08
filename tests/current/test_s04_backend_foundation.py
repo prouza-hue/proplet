@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+        if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -56,6 +56,8 @@ openapi_contract = json.loads(json.dumps(openapi_contract))
 # The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
 openapi_contract["paths"].pop("/api/cron/mozkokalypsa-launch-push")
+assert set(openapi_contract["paths"]["/api/cron/refresh300-launch-push"]) == {"get"}
+openapi_contract["paths"].pop("/api/cron/refresh300-launch-push")
 openapi_contract["info"]["version"] = "4.01.35-cloud"
 # New order API is covered independently; retain the historical API digest.
 for order_path in ("/api/free-order", "/api/free-order/config"):
@@ -341,6 +343,8 @@ with (
 ):
     config_fixture = server.config()
     health_fixture = server.health()
+    # Additive transport diagnostics do not change the historical health fields.
+    assert health_fixture.pop('rpcTransport') == 'postgrest'
     # Keep the Linux production fixture portable to Windows development.
     health_fixture["puzzleSource"] = health_fixture["puzzleSource"].replace("\\", "/")
     # Release publication changes APP_VERSION without changing these response

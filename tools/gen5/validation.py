@@ -146,10 +146,10 @@ def geometry_errors(m, p):
     return [name for name, ok in checks.items() if not ok]
 
 
-def validation_words(catalog):
+def validation_words(catalog, *, recognition_path=None):
     # Finite, explicit recognizer union; frequency fallback is intentionally not
     # claimed enumerable. No truncation after appending targets.
-    words = {norm(w) for w in (ROOT/'data/words.txt').read_text(encoding='utf-8').splitlines()}
+    words = {norm(w) for w in (recognition_path or ROOT/'data/words.txt').read_text(encoding='utf-8').splitlines()}
     words |= set(catalog.entries)
     for e in read_json(ROOT/'data/lexicon_v2_wikidata_raw.json')['entries']:
         raw = str(e.get('lemma') or '').strip()

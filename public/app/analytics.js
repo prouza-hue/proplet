@@ -24,6 +24,12 @@
       return permitted;
     };
     let pendingFlush = null;
+    let flushTimer = null;
+    const schedule = options.setTimeout || global.setTimeout.bind(global);
+    const cancel = options.clearTimeout || global.clearTimeout.bind(global);
+    function scheduleFlush(){
+      if(flushTimer===null)flushTimer=schedule(()=>{flushTimer=null;flush();},1000);
+    }
     let retryAt = 0;
     let deferredWithoutStorage = [];
     function adoptGuest(anonymousId, playerId) {
@@ -32,6 +38,7 @@
       save(to,[...read(to),...rows]);save(from,[]);
     }
     function flush(){
+      if(flushTimer!==null){cancel(flushTimer);flushTimer=null;}
       if(!request || isDisabled() || now()<retryAt)return Promise.resolve();
       if(!storage){
         const ready=[],waiting=[];
@@ -90,7 +97,7 @@
       if(storage){
         const scope=getScope(),rows=read(scope);
         rows.push({id:global.crypto.randomUUID(),event:eventType,endpoint:targetEndpoint,at:now(),headers:options.getHeaders?.(eventType,_properties) || {}});
-        save(scope,rows);flush();return;
+        save(scope,rows);scheduleFlush();return;
       }
       deferredWithoutStorage.push({event:eventType,endpoint:targetEndpoint});flush();
     }

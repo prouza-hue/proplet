@@ -8,13 +8,14 @@ actual HTTP transport is isolated and directly characterizable.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any, Callable, Optional
 
 import httpx
 from fastapi import HTTPException
 
 from .config import settings
-from . import measurement
+from . import measurement, postgres_rpc
 
 
 logger = logging.getLogger("proplet")
@@ -89,6 +90,7 @@ def db_request(
     def send():
         return client.request(method, url, params=params, json=body, headers=headers)
 
+    retried = False
     try:
         response = send()
     except httpx.HTTPError as exc:
@@ -97,16 +99,39 @@ def db_request(
         # Reads are idempotent. One immediate retry covers a dropped pooled
         # connection without risking a duplicated write or RPC side effect.
         logger.warning("Supabase read transport retry table=%s", table)
+        retried = True
         try:
             response = send()
         except httpx.HTTPError as retry_exc:
             raise HTTPException(503, "Databáze je momentálně nedostupná") from retry_exc
-    if method == "GET" and response.status_code >= 500:
+    if method == "GET" and not retried and response.status_code >= 500:
         logger.warning("Supabase read status retry table=%s status=%s", table, response.status_code)
+        retried = True
         try:
             response = send()
         except httpx.HTTPError as exc:
             raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+    if method == "GET" and not retried and response.status_code == 401:
+        try:
+            auth_error = response.json()
+        except Exception:
+            auth_error = {}
+        if (
+            isinstance(auth_error, dict)
+            and isinstance(auth_error.get("code"), str)
+            and auth_error.get("code") in {"PGRST301", "PGRST303"}
+            and auth_error.get("message") == "JWT issued at future"
+        ):
+            # Opaque secret keys are exchanged for a JWT by Supabase's gateway.
+            # PostgREST can briefly validate that token against a stale clock.
+            # Retry this rejected read once, without modifying credentials or
+            # replaying writes. Keep the pooled connection that reached it.
+            logger.warning("Supabase read JWT timing retry table=%s status=401", table)
+            time.sleep(1.0)
+            try:
+                response = send()
+            except httpx.HTTPError as exc:
+                raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if response.status_code >= 400:
         internal_detail = "database error"
         try:
@@ -321,6 +346,21 @@ def db_rpc(
     url_base, secret_key = _values(supabase_url, supabase_secret_key)
     if not supabase_ready(url_base, secret_key):
         raise HTTPException(503, "Supabase ještě není připojený")
+    try:
+        direct = postgres_rpc.try_execute(function, body or {}, url_base)
+    except Exception as exc:
+        status, payload = postgres_rpc.error_payload(exc)
+        if payload.get("code") == "PT410":
+            raise HTTPException(410, "Playtest skončil nebo není otevřený.") from exc
+        if payload.get("code") == "PT422":
+            raise HTTPException(422, "Nejdřív dokonči desku a vyplň obě hodnocení.") from exc
+        if error_mapper:
+            mapped = error_mapper(status, payload)
+            if mapped is not None:
+                raise mapped from exc
+        raise HTTPException(503 if status >= 500 else 400, "Bezpečnostní služba databáze není připravená") from exc
+    if direct is not postgres_rpc.UNAVAILABLE:
+        return direct
     headers = supabase_headers(secret_key)
     url = f"{url_base}/rest/v1/rpc/{function}"
     client = http_client or DEFAULT_HTTP_CLIENT
