@@ -119,6 +119,7 @@ jobs:
           python tools/test_mk3_release_http_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_account_created_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-account-created.json
           python tools/test_usage_auth_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password --output /tmp/proplet-usage-auth.json
+          python tools/test_usage_optimization_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_funnel_sql.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_fair_play_http.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password

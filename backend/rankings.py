@@ -50,10 +50,20 @@ def entity_context(
     team_codes: Iterable[Any] = (),
     *,
     include_team_members: bool = False,
+    rpc: Optional[Callable] = None,
 ) -> tuple[list[dict], list[dict]]:
     """Load only players and leagues referenced by an aggregate or scoped run."""
     ids = _safe_values(player_ids)
     codes = _safe_values(team_codes)
+    if rpc is not None and (ids or codes):
+        result = rpc("proplet_ranking_context_v1", {
+            "p_player_ids": ids, "p_team_codes": codes,
+            "p_include_team_members": include_team_members,
+        })
+        if (not isinstance(result, dict) or not isinstance(result.get("players"), list)
+                or not isinstance(result.get("leagues"), list)):
+            raise HTTPException(503, "Databázový souhrn není dostupný")
+        return result["players"], result["leagues"]
     players = [] if not ids else select_bounded(
         "players",
         columns="id,name,avatar,family_code,team_joined_at,public_rankings",

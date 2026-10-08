@@ -10,7 +10,8 @@ const policy='challenger_rollout_20261007';
  try{
   for(const mobile of [false,true]){
    await fetch(url+'/__fixture/control',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({reset:true,firstSteps:true,firstBoardPolicy:policy})});
-   const ctx=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:mobile,hasTouch:mobile,serviceWorkers:'block'});
+   const fixtureRun=crypto.randomUUID();
+   const ctx=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:mobile,hasTouch:mobile,serviceWorkers:'block',extraHTTPHeaders:{'X-Proplet-Fixture-Run':fixtureRun}});
    await ctx.addInitScript(()=>localStorage.setItem('proplet-v3-15-anonymous-id','synthetic-2'));
    await ctx.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.abort());
    const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -40,8 +41,14 @@ const policy='challenger_rollout_20261007';
    await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-009'&&!currentGame.finished);
    await page.locator('#winModal').waitFor({state:'hidden'});await solve();
    await page.locator('#firstStepsGoogle').waitFor({state:'visible'});
-   await page.waitForFunction(async()=>{const r=await fetch('/__fixture/events').then(r=>r.json());return r.events.some(e=>e.event==='first_steps_v1_offer');},null,{timeout:15000});
-   const ev=(await fetch(url+'/__fixture/events').then(r=>r.json())).events;
+   // Poll the awaited server response: async predicates passed to browser
+   // waitForFunction can appear truthy before their HTTP result is available.
+   const deadline=Date.now()+15000;let ev=[];
+   do{
+    ev=(await fetch(url+'/__fixture/events').then(r=>r.json())).events.filter(e=>e.headers['x-proplet-fixture-run']===fixtureRun);
+    if(ev.some(e=>e.event==='first_steps_v1_offer')&&ev.filter(e=>e.event.startsWith('first_board_experiment_')).length===3)break;
+    await new Promise(resolve=>setTimeout(resolve,100));
+   }while(Date.now()<deadline);
    const phases=ev.filter(e=>e.event.startsWith('first_board_experiment_'));
    assert.equal(phases.length,3);assert(phases.every(e=>e.headers['x-proplet-puzzle']==='g4-e-009'&&e.headers['x-proplet-experiment-variant']==='challenger_e009'&&e.headers['x-proplet-experiment-policy']===policy));
    assert.equal(new Set(phases.map(e=>e.headers['x-proplet-first-steps-run'])).size,1);
@@ -51,3 +58,4 @@ const policy='challenger_rollout_20261007';
   }
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});
+
