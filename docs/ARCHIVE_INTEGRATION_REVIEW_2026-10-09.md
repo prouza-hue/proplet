@@ -25,3 +25,8 @@ Měsíční pravidla: 100 bodů za první platné dokončení Denní výzvy v de
 
 ## Ověření
 Cílený workflow archive-integrated-review.yml: reálný Chromium na 320 / 390 / 690 / 1440 px, canonical UI, archivní celá hra a návrat, přerušení/obnova, přechod Fold viewportu, XP jednou, historická odměna i při moderním dokončení, schválená alternativa VRTÍ + nápověda + obnova, všech 879 pokrytí. Výsledky a snímky public/review-evidence/report.json. Emulovaný Fold není ověření na fyzickém zařízení.
+
+## Vizuální reference pro další práci
+Pavelova schválená preference: CTA pro 300 nových Gen6 úrovní. Zachovat výrazný Fraunces, Outfit v běžném UI, jemné papírové barevné podbarvení, vlastní ilustrace/odznaky a jedno výrazné hlavní tlačítko. Archiv má teplou archivní barevnost, ukázkový listopad švestkovou. Integrace vždy přímo do kanonické aplikace; samostatný mockup nesplňuje zadání.
+
+Lokální běh: integrovaný náhled se zapíná parametrem ?archive-preview=1, aby běžné lokální regresní testy nadále ověřovaly původní nové návštěvníky. Na samostatné Vercel preview adrese se zapíná automaticky. PWA se v tomto náhledu neregistruje; před ostrým vydáním bude potřeba samostatně ověřit offline chování Archivu.

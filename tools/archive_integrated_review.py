@@ -139,10 +139,10 @@ try:
                 go(page,"free")
                 page.locator('[data-archive-order="easy"]').click()
                 page.locator('[data-archive-order-mode="numeric"]').click()
-                assert page.evaluate("freeOrder().record('easy').mode")=="numeric"
+                page.wait_for_function("freeOrder().record('easy').mode==='numeric'")
                 page.locator('[data-archive-order="easy"]').click()
                 page.locator('[data-archive-order-mode="varied"]').click()
-                assert page.evaluate("freeOrder().record('easy').mode")=="varied"
+                page.wait_for_function("freeOrder().record('easy').mode==='varied'")
                 page.locator('[data-played-levels="easy"]').click()
                 page.wait_for_selector("#playedLevelsModal:not(.hidden)")
                 page.keyboard.press("Escape")
