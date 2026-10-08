@@ -1,10 +1,89 @@
 {
-  "testedSha": "b5cf41955955162d92fb54a87065dd50cbc5279c",
-  "checks": [],
-  "screenshots": [],
+  "testedSha": "b3f5415e316aea8b45ecd9eeeac2bf68ad1be1c0",
+  "checks": [
+    {
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "width": 690,
+      "result": "PASS"
+    },
+    {
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "approvedCovers": 879
+    }
+  ],
+  "screenshots": [
+    "initial-390.png",
+    "daily-390.png",
+    "free-390.png",
+    "archive-390.png",
+    "season-390.png",
+    "announcement-390.png",
+    "season-announcement-390.png",
+    "daily-dark-390.png",
+    "archive-dark-390.png",
+    "season-dark-390.png",
+    "initial-690.png",
+    "daily-690.png",
+    "free-690.png",
+    "archive-690.png",
+    "season-690.png",
+    "announcement-690.png",
+    "season-announcement-690.png",
+    "daily-dark-690.png",
+    "archive-dark-690.png",
+    "season-dark-690.png",
+    "initial-1440.png",
+    "daily-1440.png",
+    "free-1440.png",
+    "archive-1440.png",
+    "season-1440.png",
+    "announcement-1440.png",
+    "season-announcement-1440.png",
+    "daily-dark-1440.png",
+    "archive-dark-1440.png",
+    "season-dark-1440.png",
+    "initial-320.png",
+    "daily-320.png",
+    "free-320.png",
+    "archive-320.png",
+    "season-320.png",
+    "announcement-320.png",
+    "season-announcement-320.png"
+  ],
   "pageErrors": [],
   "networkWrites": [],
-  "layoutIssues": [],
+  "layoutIssues": [
+    {
+      "view": "archive",
+      "width": 390,
+      "elements": [
+        {
+          "tag": "svg",
+          "id": "",
+          "cls": "[object SVGAnimatedString]",
+          "right": 402
+        }
+      ]
+    },
+    {
+      "view": "archive",
+      "width": 320,
+      "elements": [
+        {
+          "tag": "svg",
+          "id": "",
+          "cls": "[object SVGAnimatedString]",
+          "right": 328
+        }
+      ]
+    }
+  ],
   "publishedReads": {
     "/api/daily": {
       "status": 200
@@ -17,6 +96,6 @@
     }
   },
   "result": "FAIL",
-  "error": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=\\\"daily\\\"]\")\n    - locator resolved to <button class=\"active\" data-nav=\"daily\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <section role=\"region\" class=\"marketing-consent\" aria-label=\"Reklamní cookies\">…</section> intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <section role=\"region\" class=\"marketing-consent\" aria-label=\"Reklamní cookies\">…</section> intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    58 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <section role=\"region\" class=\"marketing-consent\" aria-label=\"Reklamní cookies\">…</section> intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 64, in <module>\n    go(page,view);overflow(page,view,width);shot(page,view+\"-\"+str(width))\n    ^^^^^^^^^^^^^\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 30, in go\n    if view in [\"daily\",\"free\",\"leaderboard\",\"profile\"]:page.locator('.bottom-nav [data-nav=\"'+view+'\"]').click()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 18032, in click\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_locator.py\", line 165, in click\n    return await self._frame._click(self._selector, strict=True, **params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 594, in _click\n    await self._channel.send(\"click\", self._timeout, locals_to_params(locals()))\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=\\\"daily\\\"]\")\n    - locator resolved to <button class=\"active\" data-nav=\"daily\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <section role=\"region\" class=\"marketing-consent\" aria-label=\"Reklamní cookies\">…</section> intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <section role=\"region\" class=\"marketing-consent\" aria-label=\"Reklamní cookies\">…</section> intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    58 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <section role=\"region\" class=\"marketing-consent\" aria-label=\"Reklamní cookies\">…</section> intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n\n"
+  "error": "Page.wait_for_selector: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"#screen-game.active\") to be visible\n",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 97, in <module>\n    page.wait_for_selector(\"#screen-game.active\")\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 9061, in wait_for_selector\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_page.py\", line 429, in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 395, in wait_for_selector\n    await self._channel.send(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"#screen-game.active\") to be visible\n\n"
 }
