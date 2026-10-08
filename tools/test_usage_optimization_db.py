@@ -72,6 +72,8 @@ def main():
                          returns jsonb language sql as $$select jsonb_build_object('id',p_id,'ids',p_ids,'payload',p_payload)$$""")
             c.execute("""create function public.proplet_synthetic_rows() returns table(value int)
                          language sql as $$values(1),(2)$$""")
+            c.execute("""create function public.proplet_synthetic_json_set() returns setof jsonb
+                         language sql as $$values('{"value":1}'::jsonb),('{"value":2}'::jsonb)$$""")
             c.execute("""create function public.proplet_synthetic_void() returns void
                          language sql as $$select null::void$$""")
             c.execute('set local role service_role')
@@ -85,6 +87,7 @@ def main():
             echo = direct('proplet_synthetic_transport',{'p_id':player,'p_ids':[player], 'p_payload':{'text':'ČÁP','count':3}})
             assert echo == {'id':player,'ids':[player],'payload':{'text':'ČÁP','count':3}}
             assert direct('proplet_synthetic_rows',{}) == [{'value':1},{'value':2}]
+            assert direct('proplet_synthetic_json_set',{}) == [{'value':1},{'value':2}]
             assert direct('proplet_synthetic_void',{}) is None
             guard = {'p_scope':'synthetic-direct','p_actor_hash':'synthetic','p_window_seconds':60,'p_limit':1}
             assert direct('proplet_request_guard_v1',guard)['allowed'] is True

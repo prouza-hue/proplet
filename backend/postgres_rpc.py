@@ -79,7 +79,7 @@ def _signature(connection, function, body):
         select p.proargnames[1:p.pronargs],
                array(select pg_catalog.format_type(t,null) from unnest(p.proargtypes::oid[]) t),
                p.pronargs-p.pronargdefaults, p.proretset,
-               rt.typname, rt.typtype
+               rt.typname, rt.typtype, p.proargmodes
         from pg_catalog.pg_proc p
         join pg_catalog.pg_namespace n on n.oid=p.pronamespace
         join pg_catalog.pg_type rt on rt.oid=p.prorettype
@@ -87,10 +87,12 @@ def _signature(connection, function, body):
           and p.prokind='f' and p.provariadic=0
     """, (function,)).fetchall()
     matches = []
-    for names, types, required, returns_set, result_type, type_kind in rows:
+    for names, types, required, returns_set, result_type, type_kind, modes in rows:
         names = names or []
         if set(body).issubset(names) and set(names[:required]).issubset(body):
-            matches.append((names, types, returns_set or type_kind == 'c' or result_type == 'record', result_type))
+            record = type_kind == 'c' or result_type == 'record' or any(m in {'o','b','t'} for m in (modes or []))
+            shape = 'rows' if record else 'scalar_set' if returns_set else False
+            matches.append((names, types, shape, result_type))
     if len(matches) != 1:
         return None
     with _lock:
@@ -112,7 +114,11 @@ def execute_on_connection(connection, function, body, signature):
         arguments.append(sql.SQL("{} => %s::{}").format(sql.Identifier(name), sql.SQL(arg_type)))
         params.append(value)
     call = sql.SQL("public.{}({})").format(sql.Identifier(function), sql.SQL(", ").join(arguments))
-    if returns_rows:
+    if returns_rows == 'rows':
+        # A one-column RETURNS TABLE otherwise aliases the scalar, losing its
+        # column name. The derived relation preserves the PostgREST row shape.
+        statement = sql.SQL("select pg_catalog.to_jsonb(t) from (select * from {}) as t").format(call)
+    elif returns_rows:
         statement = sql.SQL("select pg_catalog.to_jsonb(t) from {} as t").format(call)
     elif result_type == "void":
         statement = sql.SQL("select {} is null").format(call)
