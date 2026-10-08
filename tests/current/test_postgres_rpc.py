@@ -12,7 +12,7 @@ from backend import db, postgres_rpc as rpc
 
 URL = 'https://syntheticproject.supabase.co'
 ENV = {'VERCEL_ENV':'production','PROPLET_DB_RPC_TRANSPORT':'postgres',
-       'POSTGRES_URL':'postgresql://postgres.syntheticproject:synthetic@aws-0-eu-north-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=disable'}
+       'POSTGRES_URL':'postgresql://postgres.syntheticproject:synthetic@aws-0-eu-north-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=disable&supa=integration-metadata&workaround=supabase-pooler.vercel'}
 
 
 class PostgresRpcTests(unittest.TestCase):
@@ -28,6 +28,8 @@ class PostgresRpcTests(unittest.TestCase):
         dsn = rpc.configured_dsn(URL)
         self.assertIn('sslmode=require',dsn)
         self.assertNotIn('pgbouncer',dsn)
+        self.assertNotIn('supa=',dsn)
+        self.assertNotIn('workaround=',dsn)
         for overrides in ({'VERCEL_ENV':'preview'}, {'PROPLET_DB_RPC_TRANSPORT':'postgrest'},
                           {'POSTGRES_URL':ENV['POSTGRES_URL'].replace('postgres.syntheticproject','postgres.wrong')},
                           {'POSTGRES_URL':ENV['POSTGRES_URL'].replace('pooler.supabase.com','attacker.example')}):
