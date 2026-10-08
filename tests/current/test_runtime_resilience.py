@@ -119,6 +119,8 @@ def test_supabase_read_jwt_timing_retry_is_specific_and_bounded():
         {"code": "PGRST303", "message": "JWT expired"},
         {"code": "OTHER", "message": "JWT issued at future"},
         {"message": "JWT issued at future"},
+        {"code": [], "message": "JWT issued at future"},
+        {"code": {}, "message": "JWT issued at future"},
         ["JWT issued at future"],
         None,
     )
@@ -133,6 +135,21 @@ def test_supabase_read_jwt_timing_retry_is_specific_and_bounded():
                 raise AssertionError("Unrelated auth failures must not be retried")
         assert client.calls == 1
         pause.assert_not_called()
+
+    invalid_json = Response(401, None)
+    client = FlakyReadClient([invalid_json])
+    with (
+        patch.object(invalid_json, "json", side_effect=ValueError("invalid provider JSON")),
+        patch.object(backend_db.time, "sleep") as pause,
+    ):
+        try:
+            request(client)
+        except HTTPException as exc:
+            assert exc.status_code == 400
+        else:
+            raise AssertionError("Malformed provider JSON must remain an auth failure")
+    assert client.calls == 1
+    pause.assert_not_called()
 
     for method in ("POST", "PATCH", "DELETE"):
         client = FlakyReadClient([
