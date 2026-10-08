@@ -30,3 +30,5 @@ Cílený workflow archive-integrated-review.yml: reálný Chromium na 320 / 390 
 Pavelova schválená preference: CTA pro 300 nových Gen6 úrovní. Zachovat výrazný Fraunces, Outfit v běžném UI, jemné papírové barevné podbarvení, vlastní ilustrace/odznaky a jedno výrazné hlavní tlačítko. Archiv má teplou archivní barevnost, ukázkový listopad švestkovou. Integrace vždy přímo do kanonické aplikace; samostatný mockup nesplňuje zadání.
 
 Lokální běh: integrovaný náhled se zapíná parametrem ?archive-preview=1, aby běžné lokální regresní testy nadále ověřovaly původní nové návštěvníky. Na samostatné Vercel preview adrese se zapíná automaticky. PWA se v tomto náhledu neregistruje; před ostrým vydáním bude potřeba samostatně ověřit offline chování Archivu.
+
+Vercel FastAPI balí veřejné soubory ze zdrojového snapshotu. Generovaný boards.json proto cílený workflow ukládá spolu s důkazy do preview větve. Builder jej při každém sestavení znovu deterministicky vytvoří z neměnného zdroje; jde pouze o historickou banku. Po nasazení se samostatně kontroluje dostupnost tohoto souboru, nikoli jen úspěch buildu.
