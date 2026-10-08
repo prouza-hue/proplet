@@ -1,81 +1,12 @@
 {
-  "testedSha": "2a22a4f622ba626d4bd523f401a78c6c8e3b1589",
-  "checks": [
-    {
-      "width": 390,
-      "result": "PASS"
-    },
-    {
-      "width": 690,
-      "result": "PASS"
-    },
-    {
-      "width": 1440,
-      "result": "PASS"
-    },
-    {
-      "approvedCovers": 879
-    },
-    {
-      "catalogueOrder": "PASS",
-      "levels": "PASS",
-      "weeklyTeamEntry": "PASS",
-      "monthlyFromRankings": "PASS"
-    },
-    {
-      "actualGame": "PASS",
-      "resume": "PASS",
-      "foldResize": "PASS",
-      "xpOnce": "PASS",
-      "newerDoesNotBlockHistorical": "PASS",
-      "alternativeAndHintRestore": "PASS",
-      "modernProgressUnchanged": 27
-    },
-    {
-      "width": 320,
-      "result": "PASS"
-    }
-  ],
+  "testedSha": "5684f879b441ed7c4c25172ef86b563c8a68f180",
+  "checks": [],
   "screenshots": [
     "initial-390.png",
     "daily-390.png",
     "free-390.png",
     "archive-390.png",
-    "season-390.png",
-    "announcement-390.png",
-    "season-announcement-390.png",
-    "daily-dark-390.png",
-    "archive-dark-390.png",
-    "season-dark-390.png",
-    "initial-690.png",
-    "daily-690.png",
-    "free-690.png",
-    "archive-690.png",
-    "season-690.png",
-    "announcement-690.png",
-    "season-announcement-690.png",
-    "daily-dark-690.png",
-    "archive-dark-690.png",
-    "season-dark-690.png",
-    "initial-1440.png",
-    "daily-1440.png",
-    "free-1440.png",
-    "archive-1440.png",
-    "season-1440.png",
-    "announcement-1440.png",
-    "season-announcement-1440.png",
-    "daily-dark-1440.png",
-    "archive-dark-1440.png",
-    "season-dark-1440.png",
-    "initial-320.png",
-    "daily-320.png",
-    "free-320.png",
-    "archive-320.png",
-    "season-320.png",
-    "announcement-320.png",
-    "season-announcement-320.png",
-    "archive-game-390.png",
-    "archive-result-390.png"
+    "season-390.png"
   ],
   "pageErrors": [],
   "networkWrites": [],
@@ -91,5 +22,7 @@
       "status": 200
     }
   },
-  "result": "PASS"
+  "result": "FAIL",
+  "error": "[{'selector': '#axPlayArchive h2', 'font': 'Outfit, sans-serif', 'size': '21px', 'weight': '700'}, {'selector': '#newContentBanner h2', 'font': 'Outfit, sans-serif', 'size': '21px', 'weight': '700'}, {'selector': '.cp-heading h2', 'font': 'Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif', 'size': '23px', 'weight': '700'}]",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 68, in <module>\n    assert len({t[\"font\"] for t in typography})==1,typography\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: [{'selector': '#axPlayArchive h2', 'font': 'Outfit, sans-serif', 'size': '21px', 'weight': '700'}, {'selector': '#newContentBanner h2', 'font': 'Outfit, sans-serif', 'size': '21px', 'weight': '700'}, {'selector': '.cp-heading h2', 'font': 'Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif', 'size': '23px', 'weight': '700'}]\n"
 }
