@@ -118,6 +118,7 @@ def db_request(
             auth_error = {}
         if (
             isinstance(auth_error, dict)
+            and isinstance(auth_error.get("code"), str)
             and auth_error.get("code") in {"PGRST301", "PGRST303"}
             and auth_error.get("message") == "JWT issued at future"
         ):
