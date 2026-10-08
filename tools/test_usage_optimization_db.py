@@ -89,7 +89,7 @@ def main():
             assert direct('proplet_synthetic_rows',{}) == [{'value':1},{'value':2}]
             assert direct('proplet_synthetic_json_set',{}) == [{'value':1},{'value':2}]
             assert direct('proplet_synthetic_void',{}) is None
-            guard = {'p_scope':'synthetic-direct','p_actor_hash':'synthetic','p_window_seconds':60,'p_limit':1}
+            guard = {'p_scope':'synthetic-direct','p_actor_hash':'synthetic-direct-actor','p_window_seconds':60,'p_limit':1}
             assert direct('proplet_request_guard_v1',guard)['allowed'] is True
             assert direct('proplet_request_guard_v1',guard)['allowed'] is False
             c.execute('reset role')
