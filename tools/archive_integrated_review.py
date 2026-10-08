@@ -59,6 +59,7 @@ try:
             page.wait_for_selector('html[data-archive-ready="1"]',timeout=35000)
             page.evaluate("document.fonts.ready")
             page.wait_for_timeout(300)
+            shot(page,"initial-"+str(width))
             assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
             for view in ["daily","free","archive","season"]:
                 go(page,view);overflow(page,view,width);shot(page,view+"-"+str(width))
@@ -83,7 +84,8 @@ try:
             assert "+100 XP" in page.locator("#axBoardResults").inner_text()
             page.locator('[data-archive-filter="reward"]').click();assert page.locator(".ax-board.ax-paid").count()==0
             page.locator('[data-archive-filter="all"]').click();page.locator('[data-archive-diff="easy"]').click()
-            if width==390:
+            if width==320:
+                page.set_viewport_size({"width":390,"height":950})
                 bank=page.evaluate("PropletArchiveExperience.loadBank()")
                 assert len(bank["boards"])==800 and bank["completeCovers"]==879
                 contract=page.evaluate("""async()=>{const bank=await PropletArchiveExperience.loadBank();let count=0;for(const r of bank.boards){const c=PropletArchiveSolutions.create(r.puzzle,r.solutions);for(const cover of r.solutions.solutionSets){let s=c.emptyState();for(const a of cover){const out=c.submit(s,a.word,a.path);if(!out.accepted)throw Error(r.puzzle.id+': '+out.reason);s=out.state;}if(!c.evaluate(s).completed)throw Error('incomplete');count++;}}return count;}""")

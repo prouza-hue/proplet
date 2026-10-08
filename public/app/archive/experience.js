@@ -41,8 +41,13 @@ function home(){
  const root=q('#screen-daily');if(!root)return;
  let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry(true)+'</div><button class="ax-free-entry" data-archive-action="free">'+ico('grid')+'<span><strong>Hraj podle obtížnosti</strong><small>Vyber si hru, konkrétní úroveň i pořadí.</small></span>'+ico('arrow')+'</button>';root.append(games);}
  let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.innerHTML='<div class="ax-section-head"><h2>Ve hře jste spolu.</h2><span>Dvě soutěže. Dvě nové šance.</span></div><div class="ax-competition-grid"><button class="ax-month-entry" data-archive-action="season"><span><small>Jednotlivci · každý měsíc</small><h3>Měsíční soutěž</h3><p>Začíná se od nuly.<br>Tvých 20 nejlepších dní.</p><b>Prohlédnout soutěž '+ico('arrow')+'</b></span>'+medal(1)+'</button><button class="ax-team-entry" data-archive-action="team"><span class="ax-team-emblem">'+ico('team')+'</span><span><small>Týmy · každý týden</small><h3>Týdenní soutěž</h3><p>Každá odehraná deska<br>může pomoct tvému týmu.</p><b>Pořadí týmů '+ico('arrow')+'</b></span></button></div>';root.append(competition);}
+ const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
+ const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
+ if(archiveResume){if(!resume){resume=document.createElement('button');resume.id='axArchiveResume';resume.className='home-resume-card';root.prepend(resume);}
+ const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>ROZEHRANÝ ARCHIV</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
+ }else{resume?.remove();q('#homeResumeCard')?.classList.remove('hidden');}
  // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
- const ordered=[q('#homeResumeCard'),root.querySelector('.daily-hero'),q('#rescueCard'),q('#todayNewContentBanner'),q('#tajenkaPreviewCard'),games,competition,q('#levelCard')].filter(Boolean);
+ const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),q('#rescueCard'),q('#todayNewContentBanner'),q('#tajenkaPreviewCard'),games,competition,q('#levelCard')].filter(Boolean);
  let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
 }
 function free(){
@@ -93,7 +98,7 @@ function install(){
  document.addEventListener('click',onClick);
  document.addEventListener('input',e=>{if(e.target.id==='axSearch'){archiveState.query=e.target.value.replace(/[^0-9]/g,'');archiveState.page=0;renderGrid();}});
  document.addEventListener('keydown',e=>{if(q('#archiveExperienceModal').classList.contains('hidden'))return;if(e.key==='Escape'){e.stopImmediatePropagation();closeModal();}if(e.key==='Tab'){const nodes=all('#archiveExperienceModal button,#archiveExperienceModal select,#archiveExperienceModal input');const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}},true);
- document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(open==='archive')nav('archive');else if(open==='season')nav('season');else if(open==='free')nav('free');},{once:true});
+ document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(open==='archive')nav('archive');else if(open==='season')nav('season');else if(open==='free')nav('free');else if(open==='announcement')announcement();else if(open==='season-announcement')seasonAnnouncement();},{once:true});
 }
 function screen(name){
  if(!installed)return;

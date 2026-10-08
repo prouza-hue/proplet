@@ -6,6 +6,7 @@ window.PROPLET_ARCHIVE_PREVIEW=true;
 const native=window.localStorage,prefix='proplet:archive-integration-review:v1:';
 const store={getItem:k=>native.getItem(prefix+k),setItem:(k,v)=>native.setItem(prefix+k,String(v)),removeItem:k=>native.removeItem(prefix+k),clear:()=>Object.keys(native).filter(k=>k.startsWith(prefix)).forEach(k=>native.removeItem(k)),key:i=>Object.keys(native).filter(k=>k.startsWith(prefix))[i]?.slice(prefix.length)??null,get length(){return Object.keys(native).filter(k=>k.startsWith(prefix)).length}};
 Object.defineProperty(window,'localStorage',{configurable:true,value:store});
+store.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
 const json=data=>new Response(JSON.stringify(data),{status:200,headers:{'content-type':'application/json','cache-control':'no-store'}});
 const net=window.fetch.bind(window);
 window.PROPLET_REVIEW_REQUESTS=[];
