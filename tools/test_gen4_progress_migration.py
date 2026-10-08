@@ -14,6 +14,7 @@ os.environ["VERCEL_ENV"] = "preview"
 os.environ["VERCEL_GIT_COMMIT_REF"] = "agent/v3340-medium-calibration-v3"
 
 import server
+from fastapi import HTTPException
 
 
 def result_payload(puzzle_id: str, difficulty: str, daily_date: str, puzzle: dict) -> server.ResultCreate:
@@ -97,12 +98,16 @@ def main() -> None:
             [old_result] if table == "results" else []
         )
         server.db_insert = lambda table, payload: inserted.append({"table": table, **payload})
-        points, transferred = server.claim_free_slot_points(
-            "player-1", legacy_info, 15, legacy_id,
-        )
-        assert (points, transferred) == (0, True)
-        assert inserted and inserted[0]["table"] == "free_slot_rewards"
-        assert inserted[0]["points"] == 0
+        assert server.free_slot_already_rewarded("player-1", "easy", 1)
+        # Historical reward persistence now requires the atomic result RPC.
+        # Progress transfer stays intact; no claim-before-result fallback remains.
+        try:
+            server.claim_free_slot_points("player-1", legacy_info, 15, legacy_id)
+        except HTTPException as exc:
+            assert exc.status_code == 503
+        else:
+            raise AssertionError("historical non-atomic writer unexpectedly accepted")
+        assert inserted == []
     finally:
         server.load_puzzles = original_load_puzzles
         server.db_select = original_db_select

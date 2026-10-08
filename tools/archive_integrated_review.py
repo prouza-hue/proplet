@@ -63,6 +63,15 @@ try:
             assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
             for view in ["daily","free","archive","season"]:
                 go(page,view);overflow(page,view,width);shot(page,view+"-"+str(width))
+            go(page,"free")
+            typography=page.evaluate("""()=>['#axPlayArchive h2','#newContentBanner h2','.cp-heading h2'].map(s=>{const e=document.querySelector(s),c=getComputedStyle(e);return {selector:s,font:c.fontFamily,size:c.fontSize,weight:c.fontWeight}})""")
+            assert len({t["font"] for t in typography})==1,typography
+            assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
+            go(page,"daily")
+            assert page.locator("#axHomeFree .ax-free-difficulty").count()==4
+            assert "Ve hře jste spolu" not in page.locator("#screen-daily").inner_text()
+            report["checks"].append({"width":width,"typography":typography,"fourCanonicalIcons":"PASS","noDuplicateCardControls":"PASS"})
+            go(page,"season")
             assert page.locator('#screen-season .ax-prize-grid button').count()==3
             page.locator('[data-archive-badge="1"]').click()
             assert "Vládce listopadu" in page.locator("#axModalTitle").inner_text()
@@ -82,6 +91,9 @@ try:
             page.locator("#axSearch").fill("")
             page.locator('[data-archive-diff="hardcore"]').click()
             assert "+100 XP" in page.locator("#axBoardResults").inner_text()
+            assert page.locator('[data-archive-diff="hardcore"] strong').inner_text()=="Mozkožrout"
+            assert "Hardcore" not in page.locator("#screen-archive").inner_text()
+            shot(page,"archive-mozkozrout-"+str(width))
             page.locator('[data-archive-filter="reward"]').click();assert page.locator(".ax-board.ax-paid").count()==0
             page.locator('[data-archive-filter="all"]').click();page.locator('[data-archive-diff="easy"]').click()
             if width==320:
@@ -137,11 +149,11 @@ try:
                 page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
                 # Verify current catalogue controls and both competitive entry points.
                 go(page,"free")
-                page.locator('[data-archive-order="easy"]').click()
-                page.locator('[data-archive-order-mode="numeric"]').click()
+                assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
+                # Ordering still uses the canonical store/settings, without another modal on Hrát.
+                page.evaluate("changeFreeOrder('easy','numeric')")
                 page.wait_for_function("freeOrder().record('easy').mode==='numeric'")
-                page.locator('[data-archive-order="easy"]').click()
-                page.locator('[data-archive-order-mode="varied"]').click()
+                page.evaluate("changeFreeOrder('easy','varied')")
                 page.wait_for_function("freeOrder().record('easy').mode==='varied'")
                 page.locator('[data-played-levels="easy"]').click()
                 page.wait_for_selector("#playedLevelsModal:not(.hidden)")
@@ -161,6 +173,34 @@ try:
             assert page.evaluate("navigator.serviceWorker.getRegistrations().then(r=>r.length)")==0
             report["checks"].append({"width":width,"result":"PASS"})
             context.close()
+        # Capture the actual production frontend with a synthetic local profile.
+        # Intercept every write before the network; no production account is used.
+        for width in [390,1440]:
+            baseline=browser.new_context(viewport={"width":width,"height":950},device_scale_factor=1,reduced_motion="reduce")
+            bp=baseline.new_page();bp.set_default_timeout(12000)
+            isolation=(ROOT/"public/app/archive/preview-isolation.js").read_text()
+            def production_route(route):
+                req=route.request
+                if req.method not in ["GET","HEAD"]:
+                    route.fulfill(status=403,body="Read-only visual reference");return
+                if req.is_navigation_request() and req.url.rstrip("/")=="https://hrajproplet.cz":
+                    response=route.fetch()
+                    html=response.text().replace("<head>","<head><script>document.documentElement.setAttribute('data-archive-preview','');"+isolation+"</script>",1)
+                    route.fulfill(response=response,body=html);return
+                route.continue_()
+            baseline.route("**/*",production_route)
+            try:
+                bp.goto("https://hrajproplet.cz/",wait_until="networkidle",timeout=30000)
+                bp.wait_for_selector(".bottom-nav [data-nav=free]")
+                bp.locator(".bottom-nav [data-nav=free]").click()
+                bp.wait_for_selector("#difficultyCards .cp-card")
+                bp.evaluate("document.fonts.ready")
+                bp.wait_for_timeout(500)
+                shot(bp,"production-free-"+str(width))
+                report["checks"].append({"productionVisualReference":width,"version":bp.evaluate("window.PROPLET_RUNTIME_META?.version")})
+            except Exception as e:
+                report.setdefault("productionReferenceErrors",[]).append(str(e))
+            baseline.close()
         browser.close()
     assert not report["layoutIssues"],report["layoutIssues"]
     assert not report["pageErrors"],report["pageErrors"]

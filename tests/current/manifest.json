@@ -9,6 +9,10 @@
       {"path":"tests/current/test_usage_optimization.py","runner":"python"},
       {"path":"tests/current/test_usage_optimization.cjs","runner":"node"},
       {
+        "path": "tests/current/test_historical_free_rewards.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_first_board_catchup.py",
         "runner": "python"
       },
