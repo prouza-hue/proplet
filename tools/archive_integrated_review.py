@@ -71,7 +71,7 @@ try:
             assert page.locator("#axHomeFree .ax-free-difficulty").count()==4
             assert "Ve hře jste spolu" not in page.locator("#screen-daily").inner_text()
             report["checks"].append({"width":width,"typography":typography,"fourCanonicalIcons":"PASS","noDuplicateCardControls":"PASS"})
-            page.locator("#axHomeFree").scroll_into_view_if_needed()
+            page.evaluate("window.scrollTo(0,document.querySelector(\'#axHomeFree\').getBoundingClientRect().top+scrollY-500)")
             page.screenshot(path=str(OUT/("daily-more-"+str(width)+".png")))
             report["screenshots"].append("daily-more-"+str(width)+".png")
             go(page,"season")
@@ -198,15 +198,16 @@ try:
             baseline.route("**/*",production_route)
             try:
                 bp.goto("https://hrajproplet.cz/",wait_until="networkidle",timeout=30000)
-                bp.wait_for_selector(".bottom-nav [data-nav=free]")
-                bp.locator(".bottom-nav [data-nav=free]").click()
+                bp.wait_for_function("typeof nav==='function' && typeof puzzleDB!=='undefined' && Boolean(puzzleDB?.free)",timeout=20000)
+                bp.evaluate("window.__PROPLET_REVEAL_CURRENT_UI?.();nav('free',{replace:true})")
+                bp.wait_for_timeout(500)
                 bp.wait_for_selector("#difficultyCards .cp-card")
                 bp.evaluate("document.fonts.ready")
                 bp.wait_for_timeout(500)
                 shot(bp,"production-free-"+str(width))
                 report["checks"].append({"productionVisualReference":width,"version":bp.evaluate("window.PROPLET_RUNTIME_META?.version")})
             except Exception as e:
-                report.setdefault("productionReferenceErrors",[]).append(str(e))
+                report.setdefault("productionReferenceErrors",[]).append({"error":str(e),"text":bp.locator("body").inner_text()[:2000]})
             baseline.close()
         browser.close()
     assert not report["layoutIssues"],report["layoutIssues"]
