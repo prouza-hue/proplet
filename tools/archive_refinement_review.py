@@ -16,7 +16,7 @@ report={"testedSha":subprocess.check_output(["git","rev-parse","HEAD"],text=True
 try:
     with urllib.request.urlopen("https://hrajproplet.cz/api/daily",timeout=25) as r:
         data=json.load(r)
-        report["productionDaily"]={"status":r.status,"dailyDate":data.get("dailyDate"),"puzzleId":data.get("puzzleId"),"bankVersion":data.get("bankVersion"),"serverToday":data.get("serverToday")}
+        report["productionDaily"]={"status":r.status,"dailyDate":data.get("dailyDate"),"generation":6 if str(data.get("puzzleId","")).startswith("g6-d-") else None,"bankVersion":data.get("bankVersion"),"serverToday":data.get("serverToday")}
 except Exception as e: report["productionDaily"]={"error":str(e)}
 with sync_playwright() as p:
     browser=p.chromium.launch()

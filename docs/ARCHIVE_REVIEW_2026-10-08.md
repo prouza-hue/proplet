@@ -14,7 +14,7 @@ Produkce hrajproplet.cz: READY, commit 5a08f2c24efec2daedd3dee42f65062ec394c5ef 
 - #182: merged 7. října. Schválená Daily Gen6 banka 99 dní, 8. 10. 2026–14. 1. 2027. Serverový kalendář, soukromá budoucí zadání, atomické uložení výsledku. Původní 100denní kandidát v #180 není aktuální vydaná banka.
 - #183–186 přinesly onboarding a úspory/odolnost Supabase; nový preview se staví na jejich aktuálním základu.
 - Historické chyby digest baseline S04/S06 odstranil #182. Nejsou nynějším důvodem blokace.
-- Přímé čtení dnešní Daily bez parametrů doplněných Vercel nástrojem je součástí evidence/report.json. Vercel fetch vracel 404, protože endpoint odmítá dodatečné query parametry; samotná tato kontrola není důkaz výpadku. Rozhodující je nezávislý HTTP výsledek v evidenci.
+- Nezávislé produkční GET /api/daily z 8. října: HTTP 200, dailyDate i serverToday 2026-10-08, správná vydaná deska Gen6. Vercel fetch přidával query parametry, které přísný resolver odmítal; tento kontrolní 404 nebyl výpadek hry. Ověřeno v evidence/report.json.
 
 ## Vizuální změna
 Archiv dostává vlastní ilustraci původních papírových desek, teplou barevnost, velkou typografii Fraunces a klidný přehled čísel. Hlavní nabídka nepřekrývá každou desku odstavcem textu. Čtyři obtížnosti jsou vždy viditelné, v mobilu ve dvou řadách.
@@ -35,7 +35,7 @@ Při skutečné integraci převzít i chování Gen6 oznámení: návratoví hr�
 2. Uzavřít redakční rozhodnutí nad GAMMA, ŠLAK, HŮRA, FAKE, KALAŠ, NĚMA, SOLE a LHOTY podle dokumentace #179. Původní platná řešení zachovat. Alternativní řešení přijímat jako celé sady slov a cest; nemíchat části různých řešení. Stejnou smlouvu musí používat nápověda i obnovení rozehrané hry.
 3. Zapojit tento kontrakt do skutečného klienta/serveru. Alternativní cílová slova nesmějí současně vydělávat objevitelské XP. Neprovádět plošnou změnu současného lexikonu.
 4. #177 řeší jednu historickou odměnu unikátním klíčem hráč/obtížnost/úroveň pro G1–3 a databázovou transakcí. G4+ je samostatná odměna. Novější dokončení tedy nezablokuje dosud nevybranou historickou odměnu.
-5. Při spuštění nejdřív uzavřený runtime, odvodit/dokončit staré zapisovače, migrace, čerstvá kontrola a sladění ledgeru, teprve následné otevření. Nikdy nezapnout přidělování přes neatomický fallback. Předchozí izolované testy souběhu, rollbacku a opakovaných požadavků prošly; po integraci je nutné cílené ověření nové konkrétní verze.
+5. Při spuštění nejdřív uzavřený runtime, pozastavit staré cesty zápisu a nechat doběhnout již přijaté požadavky, migrace, čerstvá kontrola a sladění ledgeru, teprve následné otevření. Nikdy nezapnout přidělování přes neatomický fallback. Předchozí izolované testy souběhu, rollbacku a opakovaných požadavků prošly; po integraci je nutné cílené ověření nové konkrétní verze.
 6. Samostatná oprava 21 záznamů / 12 hráčů / 3 185 XP už byla provedena 4. října. Neprovádět ji znovu. Netýkala se Michaela a PiettraWal.
 7. Přehled/deska v tomto návrhu jsou záměrně modelové. Po výběru „Hrát“ se ověří přímý výběr, nespouští se syntetická herní deska. Kompletní hratelnost bude před ostrým otevřením vyžadovat napojení výše.
 
@@ -48,6 +48,6 @@ Zbývá: serverový záznam způsobilosti a nápověd, skórování s idempotenc
 Listopad 2026 je v návrhu pouze vzor barevnosti a copy; nejde o ohlášený termín. Zahájení až prvním celým měsícem po ověření pravidel a banky. Pro každý další měsíc navrhnout schválenou paletu a titul odznaku. Exkluzivita znamená vazbu na daný měsíc a rok, ne umělé omezení počtu vítězů při remízách.
 
 ## Ověření tohoto návrhu
-Cílená Chromium kontrola 320/390/690/1440 px, čtyř obrazovek, modalů, tmavého režimu, skutečně načtených fontů, filtru, libovolné desky 88, oddělení hraní/XP, Escape a návratu focusu, přetečení. Žádný localStorage ani service worker, žádné zápisy do hráčských dat. Výsledky a obrázky: public/previews/archive-20261008/evidence/.
+Cílená Chromium kontrola 320/390/690/1440 px, čtyř obrazovek, modalů, tmavého režimu, skutečně načtených fontů, filtru, libovolné desky 88, oddělení hraní/XP, Escape a návratu focusu, přetečení. Žádný localStorage ani service worker, žádné zápisy do hráčských dat. První úplný běh na 01438d6 prošel ve všech čtyřech šířkách: skutečné fonty 1/1, žádné JS chyby ani přetečení. Vizuálně prohlédnut mobil/desktop/Fold, obě CTA a tmavý režim. Z obrázků následně odstraněn výchozí focus rámeček neinteraktivního hlavního landmarku; fokus klávesnice na ovládacích prvcích zachován. Výsledky a obrázky: public/previews/archive-20261008/evidence/.
 
 Po Pavlově schválení návrhu připravit konkrétní integrační a provozní plán otevření Archivu. Měsíční soutěž může pokračovat souběžně samostatně.

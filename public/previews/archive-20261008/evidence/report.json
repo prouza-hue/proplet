@@ -60,8 +60,8 @@
   "productionDaily": {
     "status": 200,
     "dailyDate": "2026-10-08",
-    "puzzleId": "g6-d-20261008",
     "bankVersion": "daily-gen6-20261007-v1",
-    "serverToday": "2026-10-08"
+    "serverToday": "2026-10-08",
+    "generation": 6
   }
 }
