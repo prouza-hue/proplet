@@ -47,8 +47,9 @@ function home(){
 }
 function free(){
  if(!installed)return;
- const root=q('#screen-free'),head=root.querySelector('.screen-title');
- if(head){head.querySelector('h1').textContent='Na co máš dnes chuť?';head.querySelector('p').textContent='Vyber si obtížnost, úroveň i vlastní tempo.';}
+ const root=q('#screen-free');if(!root)return;let head=root.querySelector('.screen-title');
+ if(!head){head=document.createElement('div');head.className='screen-title ax-play-title';head.innerHTML='<h1>Na co máš dnes chuť?</h1><p class="muted">Vyber si obtížnost, úroveň i vlastní tempo.</p>';root.prepend(head);}
+ if(head.querySelector('h1'))head.querySelector('h1').textContent='Na co máš dnes chuť?';if(head.querySelector('p'))head.querySelector('p').textContent='Vyber si obtížnost, úroveň i vlastní tempo.';
  if(!q('#axPlayArchive')){const el=document.createElement('div');el.id='axPlayArchive';el.innerHTML=archiveEntry();head.after(el);}
  all('#difficultyCards .cp-history').forEach(b=>{if(!b.querySelector('.ax-level-link'))b.insertAdjacentHTML('beforeend','<span class="ax-level-link">Úrovně</span>');});
  all('#difficultyCards .cp-card').forEach(card=>{if(card.querySelector('.ax-order-link'))return;const diff=card.dataset.diff;if(!freeOrder().supports(diff))return;const button=document.createElement('button');button.type='button';button.className='ax-order-link';button.dataset.archiveOrder=diff;button.textContent='Pořadí desek';card.append(button);});
@@ -67,6 +68,7 @@ function seed(){
 }
 function install(){
  if(installed)return;installed=true;document.body.classList.add('archive-experience');
+ if(!q('#screen-free'))throw Error('Archive mount: canonical free screen missing');
  for(const id of ['archive','season']){const section=document.createElement('section');section.id='screen-'+id;section.className='screen ax-screen';q('#screen-free').after(section);}
  const modal=document.createElement('div');modal.id='archiveExperienceModal';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','axModalTitle');document.body.append(modal);
  seed();home();free();
@@ -96,7 +98,7 @@ function install(){
 function screen(name){
  if(!installed)return;
  if(name==='archive')renderArchive();if(name==='season')renderSeason();
- if(name==='leaderboard'&&!q('#axRankingSeason')){const root=q('#screen-leaderboard'),entry=document.createElement('button');entry.id='axRankingSeason';entry.className='ax-ranking-season';entry.dataset.archiveAction='season';entry.innerHTML=medal(1)+'<span><strong>Měsíční soutěž</strong><small>Nový začátek každý měsíc · 20 nejlepších denních her</small></span>'+ico('arrow');root.querySelector('.screen-title').after(entry);}
+ if(name==='leaderboard'&&!q('#axRankingSeason')){const root=q('#screen-leaderboard'),entry=document.createElement('button');entry.id='axRankingSeason';entry.className='ax-ranking-season';entry.dataset.archiveAction='season';entry.innerHTML=medal(1)+'<span><strong>Měsíční soutěž</strong><small>Nový začátek každý měsíc · 20 nejlepších denních her</small></span>'+ico('arrow');const head=root.querySelector('.screen-title');if(head)head.after(entry);else root.prepend(entry);}
 }
 async function renderArchive(){
  const root=q('#screen-archive');

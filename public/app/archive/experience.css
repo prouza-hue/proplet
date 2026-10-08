@@ -271,3 +271,9 @@ html.tiskarna-ui .archive-experience button:focus-visible{outline:3px solid var(
 @media(prefers-reduced-motion:reduce){html.tiskarna-ui .archive-experience .ax-board{transition:none}}
 
 html.tiskarna-ui body.archive-experience{display:block}html.tiskarna-ui .archive-experience .app-shell{margin-inline:auto}html.tiskarna-ui #archiveExperienceModal .ax-modal{text-align:left}html.tiskarna-ui #archiveExperienceModal .ax-announcement{text-align:center}
+
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-announcement{background:radial-gradient(ellipse at 20% 0%,#375947,transparent 60%),#23362e!important;border-color:#75866b!important}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-announcement h2,html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-cta-copy strong{color:#f9f1d6}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal :is(.ax-cta-copy,.ax-cta-note,.ax-cta-difficulties strong,.ax-cta-difficulties span,.ax-cta-secondary){color:#d0dbc8!important}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement{background:radial-gradient(ellipse at 20% 0%,#594153,transparent 60%),#352c37!important;border-color:#8d7187!important}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement .ax-cta-facts,html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement .ax-cta-facts b{color:#e6cce0}
