@@ -345,6 +345,9 @@ with (
     health_fixture = server.health()
     # Additive transport diagnostics do not change the historical health fields.
     assert health_fixture.pop('rpcTransport') == 'postgrest'
+    # Reward preparation adds diagnostics only; retain the original fixture digest.
+    assert health_fixture.pop('historicalFreeRewardsEnabled') is False
+    assert health_fixture.pop('atomicResultEnabled') == server.ATOMIC_RESULT_V1_ENABLED
     # Keep the Linux production fixture portable to Windows development.
     health_fixture["puzzleSource"] = health_fixture["puzzleSource"].replace("\\", "/")
     # Release publication changes APP_VERSION without changing these response

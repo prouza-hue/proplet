@@ -39,7 +39,7 @@ as $$
     'calmMode', false,
     'attemptId', 's08b-attempt-' || p_suffix::text,
     'points', 15,
-    'contentGeneration', 4,
+    'contentGeneration', case when p_with_reward then 3 else 4 end,
     'freeLevel', 700 + p_suffix,
     'legacyRewardSlot', case when p_with_reward then
       pg_catalog.jsonb_build_object('difficulty', 'easy', 'level', 700 + p_suffix)
@@ -129,7 +129,7 @@ $$;
 
 create trigger s08b_fail_ledger after insert on public.result_commands
 for each row execute function pg_temp.s08b_fail_phase('ledger');
-create trigger s08b_fail_reward after insert on public.free_slot_rewards
+create trigger s08b_fail_reward after insert on public.historical_free_slot_rewards
 for each row execute function pg_temp.s08b_fail_phase('reward');
 create trigger s08b_fail_run after insert on public.puzzle_runs
 for each row execute function pg_temp.s08b_fail_phase('run');
@@ -185,7 +185,7 @@ begin
          select 1 from public.puzzle_attempts where id = v_command ->> 'attemptId'
        )
        or exists (
-         select 1 from public.free_slot_rewards
+         select 1 from public.historical_free_slot_rewards
          where player_id = '080b0000-0000-4000-8000-000000000001'::uuid
            and level = (v_command ->> 'freeLevel')::integer
        )

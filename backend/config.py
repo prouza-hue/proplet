@@ -47,6 +47,7 @@ class Settings:
     tajenka_bank_path: Path
     tajenka_release_enabled: bool
     atomic_result_v1_enabled: bool
+    historical_free_rewards_enabled: bool
 
 
 def load_settings() -> Settings:
@@ -94,6 +95,10 @@ def load_settings() -> Settings:
         atomic_result_v1_enabled=(
             _env("PROPLET_ATOMIC_RESULT_V1_ENABLED", "false").lower() in {"1", "true", "yes"}
         ),
+        # Closed by default until content and reward acceptance are complete.
+        historical_free_rewards_enabled=(
+            _env("PROPLET_HISTORICAL_FREE_REWARDS_ENABLED", "false").lower() in {"1", "true", "yes"}
+        ),
     )
 
 
@@ -122,3 +127,4 @@ CONTENT_CATALOG_PATH = settings.content_catalog_path
 TAJENKA_BANK_PATH = settings.tajenka_bank_path
 TAJENKA_RELEASE_ENABLED = settings.tajenka_release_enabled
 ATOMIC_RESULT_V1_ENABLED = settings.atomic_result_v1_enabled
+HISTORICAL_FREE_REWARDS_ENABLED = settings.historical_free_rewards_enabled

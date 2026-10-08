@@ -65,3 +65,11 @@ jobs:
             echo "::error file=server.py::Health Fold breakpoint must use canonical runtime metadata"
             exit 1
           }
+
+          node - <<'JS'
+          const fs=require('node:fs');
+          const marker=(p,k)=>fs.readFileSync(p,'utf8').match(new RegExp(k+"\\s*=\\s*['\"]([^'\"]+)['\"]"))?.[1];
+          const app=marker('public/app.js','APP_PREVIEW_RELEASE');
+          const sw=marker('public/sw.js','SHELL_CACHE');
+          if(!app||app!==sw)throw Error('App release marker must equal service worker shell cache');
+          JS

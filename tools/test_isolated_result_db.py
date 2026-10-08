@@ -67,6 +67,9 @@ def main():
         files = [ROOT/f['path'] for f in sorted(manifest['files'], key=lambda f:f['order'])
                  if f['type'] != 'verify']
         files += sorted((ROOT/'supabase/migrations').glob('*.sql'))
+        # Prepared archive hotfix must follow all existing timestamp migrations.
+        # This is a standalone review file, not an applied production migration.
+        files += [ROOT/'supabase/prepared/historical_free_rewards.sql']
         for path in files:
             if path.name.endswith('_account_created_authoritative.sql'):
                 c.execute("insert into players(id,name,family_code,token_hash) values ('20000000-0000-4000-8000-000000000001','Historical fixture','SOLO_HISTORY','historical-fixture')")
