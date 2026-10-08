@@ -46,7 +46,7 @@ try:
         browser=p.chromium.launch()
         for width in [390,690,1440,320]:
             context=browser.new_context(viewport={"width":width,"height":950},device_scale_factor=1,reduced_motion="reduce")
-            page=context.new_page()
+            page=context.new_page();page.set_default_timeout(12000)
             def capture_error(err):
                 report["pageErrors"].append(err.stack or str(err))
                 try:
@@ -55,7 +55,7 @@ try:
                 except:pass
             page.on("pageerror",capture_error)
             page.on("request",lambda req:report["networkWrites"].append({"url":req.url,"method":req.method}) if req.method not in ["GET","HEAD"] else None)
-            page.goto("http://127.0.0.1:8765/",wait_until="networkidle")
+            page.goto("http://127.0.0.1:8765/?archive-preview=1",wait_until="networkidle")
             page.wait_for_selector('html[data-archive-ready="1"]',timeout=35000)
             page.evaluate("document.fonts.ready")
             page.wait_for_timeout(300)

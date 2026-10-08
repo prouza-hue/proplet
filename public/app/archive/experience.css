@@ -277,3 +277,44 @@ html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-announcement h2,ht
 html.tiskarna-ui[data-theme=dark] #archiveExperienceModal :is(.ax-cta-copy,.ax-cta-note,.ax-cta-difficulties strong,.ax-cta-difficulties span,.ax-cta-secondary){color:#d0dbc8!important}
 html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement{background:radial-gradient(ellipse at 20% 0%,#594153,transparent 60%),#352c37!important;border-color:#8d7187!important}
 html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement .ax-cta-facts,html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement .ax-cta-facts b{color:#e6cce0}
+
+/* Keep Dnes focused on the six destinations; content releases remain in Hrát. */
+html.tiskarna-ui body.archive-experience #screen-daily :is(#todayNewContentBanner,#freeRefreshToday){display:none!important}
+html.tiskarna-ui body.archive-experience #axHomeGames{margin-top:12px}
+html.tiskarna-ui body.archive-experience #axHomeFree{margin-top:13px}
+html.tiskarna-ui body.archive-experience .ax-competitions{margin-top:19px}
+html.tiskarna-ui body.archive-experience #screen-free>.ax-play-title{display:block!important;margin:6px 0 19px!important}
+html.tiskarna-ui body.archive-experience #screen-free>.ax-play-title h1{font:700 29px/1.15 Outfit,sans-serif!important;margin:0 0 7px}
+html.tiskarna-ui body.archive-experience #screen-free>.ax-play-title p{font-size:13px!important}
+html.tiskarna-ui body.archive-experience .ax-archive-entry p{font-size:14px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience :is(.ax-month-entry,.ax-team-entry) p{font-size:13px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience :is(.ax-month-entry,.ax-team-entry) h3{font-size:18px!important;line-height:1.2!important}
+html.tiskarna-ui body.archive-experience .ax-season-stats p{font-size:11px!important;line-height:1.4!important}
+html.tiskarna-ui body.archive-experience .ax-review-caption{font-size:11px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-legend{font-size:11px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-history-note p{font-size:13px!important;line-height:1.6!important}
+html.tiskarna-ui body.archive-experience .ax-archive-note p{font-size:13px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-archive-heading p{font-size:14px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-season-heading p{font-size:14px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-prizes>p{font-size:13px!important;line-height:1.6!important}
+html.tiskarna-ui body.archive-experience .ax-rank-row [data-player-avatar]{display:grid;place-items:center;width:30px;height:30px}
+html.tiskarna-ui body.archive-experience .ax-rank-row .organic-avatar{width:30px;height:30px}
+@media(max-width:520px){
+ html.tiskarna-ui body.archive-experience .ax-archive-entry h2{font-size:25px!important;white-space:nowrap}
+ html.tiskarna-ui body.archive-experience .ax-archive-entry .archive-art{width:116px;max-width:34%;margin-right:-4px}
+ html.tiskarna-ui body.archive-experience .ax-compact{min-height:143px}
+ html.tiskarna-ui body.archive-experience :is(.ax-month-entry,.ax-team-entry){min-height:170px;padding:17px 13px}
+ html.tiskarna-ui body.archive-experience :is(.ax-month-entry,.ax-team-entry) small{font-size:10px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading{padding-right:106px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading>div{min-width:0}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading .archive-art{right:0;margin-right:0;width:115px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading h1{font-size:31px!important}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading p{font-size:13px!important}
+}
+@media(max-width:355px){
+ html.tiskarna-ui body.archive-experience .ax-archive-entry h2{font-size:22px!important}
+ html.tiskarna-ui body.archive-experience .ax-archive-entry .archive-art{width:96px;max-width:31%}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading{padding-right:85px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading .archive-art{right:0;width:94px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading h1{font-size:28px!important}
+}

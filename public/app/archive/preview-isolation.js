@@ -2,6 +2,8 @@
 (()=>{
 'use strict';
 if(!document.documentElement.hasAttribute('data-archive-preview'))return;
+// Native local regression fixtures keep their original visitor state; opt in explicitly for the integrated review.
+if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).get('archive-preview')!=='1')return;
 window.PROPLET_ARCHIVE_PREVIEW=true;
 const native=window.localStorage,prefix='proplet:archive-integration-review:v1:';
 const store={getItem:k=>native.getItem(prefix+k),setItem:(k,v)=>native.setItem(prefix+k,String(v)),removeItem:k=>native.removeItem(prefix+k),clear:()=>Object.keys(native).filter(k=>k.startsWith(prefix)).forEach(k=>native.removeItem(k)),key:i=>Object.keys(native).filter(k=>k.startsWith(prefix))[i]?.slice(prefix.length)??null,get length(){return Object.keys(native).filter(k=>k.startsWith(prefix)).length}};
