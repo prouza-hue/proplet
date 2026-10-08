@@ -24,6 +24,11 @@ _pool_url = None
 _retry_after = 0.0
 _signatures = {}
 _status = "postgrest"
+TRANSACTION_SETUP = (
+    "set local role service_role; set local search_path = ''; "
+    "set local statement_timeout = '10s'; "
+    "set local request.jwt.claims = '{\"role\":\"service_role\"}'"
+)
 
 
 def configured_dsn(supabase_url):
@@ -146,10 +151,9 @@ def try_execute(function, body, supabase_url):
             return UNAVAILABLE
         with pool.connection() as connection:
             with connection.transaction():
-                connection.execute("set local role service_role")
-                connection.execute("set local search_path = ''")
-                connection.execute("set local statement_timeout = '10s'")
-                connection.execute("select pg_catalog.set_config('request.jwt.claims', %s, true)", ('{"role":"service_role"}',))
+                # Static setup in one round trip; no prepared statements or
+                # pipeline mode, which transaction poolers do not support.
+                connection.execute(TRANSACTION_SETUP)
                 signature = _signature(connection, function, body)
                 if signature is None:
                     return UNAVAILABLE

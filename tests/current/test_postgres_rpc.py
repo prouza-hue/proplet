@@ -59,7 +59,7 @@ class PostgresRpcTests(unittest.TestCase):
         self.assertEqual(raised.exception.status_code,503)
         self.assertEqual(execute.call_count,1)
         http.post.assert_not_called()
-        connection.execute.assert_any_call('set local role service_role')
+        connection.execute.assert_any_call(rpc.TRANSACTION_SETUP)
 
     def test_domain_errors_and_json_result_preserve_rpc_contract(self):
         error = Mock(sqlstate='P0001',diag=Mock(message_primary='IDEMPOTENCY_CONFLICT',message_detail=None,message_hint=None))

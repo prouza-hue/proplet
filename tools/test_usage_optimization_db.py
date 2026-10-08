@@ -1,11 +1,13 @@
 """Usage SQL acceptance and exact statistics parity in a disposable local DB."""
 import argparse
+from contextlib import contextmanager
 import json
 from pathlib import Path
 import re
 import sys
 import uuid
 from unittest.mock import patch
+from unittest.mock import Mock
 import psycopg
 from psycopg.rows import dict_row, tuple_row
 
@@ -92,6 +94,16 @@ def main():
             guard = {'p_scope':'synthetic-direct','p_actor_hash':'synthetic-direct-actor','p_window_seconds':60,'p_limit':1}
             assert direct('proplet_request_guard_v1',guard)['allowed'] is True
             assert direct('proplet_request_guard_v1',guard)['allowed'] is False
+            c.execute('reset role')
+            @contextmanager
+            def existing_connection():
+                yield c
+            pool = Mock()
+            pool.connection.side_effect = existing_connection
+            env = {'VERCEL_ENV':'production','PROPLET_DB_RPC_TRANSPORT':'postgres',
+                   'POSTGRES_URL':'postgres://postgres:synthetic@db.syntheticproject.supabase.co:5432/postgres'}
+            with patch.dict('os.environ',env), patch.object(postgres_rpc,'_connection_pool',return_value=pool), patch.object(postgres_rpc,'_retry_after',0.0):
+                assert postgres_rpc.try_execute('proplet_player_stats_v1',{'p_player':player},'https://syntheticproject.supabase.co') == compact
             c.execute('reset role')
             print('PASS guard quotas, revocation, service-only grants, ranking privacy and all statistics fields')
         finally:
