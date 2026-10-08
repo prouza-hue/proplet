@@ -4,6 +4,11 @@ from playwright.sync_api import sync_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "public/previews/archive-20261008/evidence"
 OUT.mkdir(exist_ok=True)
+# Saving screenshots must not recursively create fresh screenshot commits.
+changed = subprocess.check_output(["git","diff-tree","--no-commit-id","--name-only","-r","HEAD"],text=True).splitlines()
+if changed and all(p.startswith("public/previews/archive-20261008/evidence/") for p in changed):
+    print("Evidence-only commit: the reviewed UI source is unchanged.")
+    raise SystemExit(0)
 class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args): pass
     def end_headers(self):
