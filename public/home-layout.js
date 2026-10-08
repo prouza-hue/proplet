@@ -202,7 +202,7 @@
     placeMetaProgress();
     const tajenka=document.querySelector('#tajenkaPreviewCard');
     if(tajenka)document.querySelector('#screen-daily')?.appendChild(tajenka);
-    loadCompetition();
+    if(window.PROPLET_ARCHIVE_PREVIEW)window.PropletArchiveExperience?.home();else loadCompetition();
   }
 
   function install(){
