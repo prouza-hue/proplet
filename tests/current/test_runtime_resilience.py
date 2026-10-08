@@ -79,6 +79,115 @@ def test_idempotent_supabase_reads_retry_once():
     assert write_client.calls == 1
 
 
+def test_supabase_read_jwt_timing_retry_is_specific_and_bounded():
+    def request(client, method="GET"):
+        return backend_db.db_request(
+            method,
+            "result_commands",
+            supabase_url="https://example.supabase.co",
+            supabase_secret_key="sb_secret_synthetic",
+            http_client=client,
+        )
+
+    for code in ("PGRST301", "PGRST303"):
+        timing_error = {"code": code, "message": "JWT issued at future"}
+        client = FlakyReadClient([
+            Response(401, timing_error),
+            Response(200, [{"id": "synthetic-receipt"}]),
+        ])
+        with patch.object(backend_db.time, "sleep") as pause:
+            assert request(client) == [{"id": "synthetic-receipt"}]
+        assert client.calls == 2
+        pause.assert_called_once_with(1.0)
+
+        persistent = FlakyReadClient([
+            Response(401, timing_error),
+            Response(401, timing_error),
+        ])
+        with patch.object(backend_db.time, "sleep") as pause:
+            try:
+                request(persistent)
+            except HTTPException as exc:
+                assert exc.status_code == 400
+            else:
+                raise AssertionError("Persistent provider auth failures must remain failures")
+        assert persistent.calls == 2
+        pause.assert_called_once_with(1.0)
+
+    unrelated_errors = (
+        {"code": "PGRST301", "message": "JWT expired"},
+        {"code": "PGRST303", "message": "JWT expired"},
+        {"code": "OTHER", "message": "JWT issued at future"},
+        {"message": "JWT issued at future"},
+        ["JWT issued at future"],
+        None,
+    )
+    for payload in unrelated_errors:
+        client = FlakyReadClient([Response(401, payload)])
+        with patch.object(backend_db.time, "sleep") as pause:
+            try:
+                request(client)
+            except HTTPException as exc:
+                assert exc.status_code == 400
+            else:
+                raise AssertionError("Unrelated auth failures must not be retried")
+        assert client.calls == 1
+        pause.assert_not_called()
+
+    for method in ("POST", "PATCH", "DELETE"):
+        client = FlakyReadClient([
+            Response(401, {"code": "PGRST303", "message": "JWT issued at future"}),
+        ])
+        with patch.object(backend_db.time, "sleep") as pause:
+            try:
+                request(client, method)
+            except HTTPException as exc:
+                assert exc.status_code == 400
+            else:
+                raise AssertionError("Writes must not use the read JWT retry")
+        assert client.calls == 1
+        pause.assert_not_called()
+
+    status_client = FlakyReadClient([
+        Response(501, {"message": "temporary"}),
+        Response(200, []),
+    ])
+    with patch.object(backend_db.time, "sleep") as pause:
+        assert request(status_client) == []
+    assert status_client.calls == 2
+    pause.assert_not_called()
+
+
+def test_supabase_read_retry_budget_is_shared_across_failure_kinds():
+    timing_error = {"code": "PGRST303", "message": "JWT issued at future"}
+    cases = (
+        ([httpx.ConnectError("dropped read connection"), Response(401, timing_error)], 400),
+        ([httpx.ConnectError("dropped read connection"), Response(503, {"message": "temporary"})], 503),
+        ([Response(503, {"message": "temporary"}), Response(401, timing_error)], 400),
+        ([Response(401, timing_error), Response(501, {"message": "temporary"})], 503),
+    )
+    for responses, expected_status in cases:
+        client = FlakyReadClient(responses)
+        with patch.object(backend_db.time, "sleep") as pause:
+            try:
+                backend_db.db_request(
+                    "GET",
+                    "result_commands",
+                    supabase_url="https://example.supabase.co",
+                    supabase_secret_key="sb_secret_synthetic",
+                    http_client=client,
+                )
+            except HTTPException as exc:
+                assert exc.status_code == expected_status
+            else:
+                raise AssertionError("A second failed attempt must not create a third request")
+        assert client.calls == 2
+        if isinstance(responses[0], Response) and responses[0].status_code == 401:
+            pause.assert_called_once_with(1.0)
+        else:
+            pause.assert_not_called()
+
+
 def test_product_event_smoke_works_without_public_registry_bundle():
     inserted = []
     product_analytics.load_registry.cache_clear()
@@ -121,6 +230,8 @@ def test_progress_endpoint_smoke_returns_completed_rows():
 
 if __name__ == "__main__":
     test_idempotent_supabase_reads_retry_once()
+    test_supabase_read_jwt_timing_retry_is_specific_and_bounded()
+    test_supabase_read_retry_budget_is_shared_across_failure_kinds()
     test_product_event_smoke_works_without_public_registry_bundle()
     test_progress_endpoint_smoke_returns_completed_rows()
     print("PASS: runtime resilience for product-event, progress and Supabase reads")
