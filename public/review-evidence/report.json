@@ -1,5 +1,5 @@
 {
-  "testedSha": "c35b7b455a29f3d1168cc638f60c973edf4def37",
+  "testedSha": "1a9ada8fdd31de3b8f08996e8f2c043b56a36674",
   "checks": [
     {
       "width": 390,
@@ -134,6 +134,14 @@
     {
       "width": 320,
       "result": "PASS"
+    },
+    {
+      "productionVisualReference": 390,
+      "version": "4.05.2"
+    },
+    {
+      "productionVisualReference": 1440,
+      "version": "4.05.2"
     }
   ],
   "screenshots": [
@@ -184,96 +192,13 @@
     "season-announcement-320.png",
     "archive-mozkozrout-320.png",
     "archive-game-390.png",
-    "archive-result-390.png"
+    "archive-result-390.png",
+    "production-free-390.png",
+    "production-free-1440.png"
   ],
   "pageErrors": [],
   "networkWrites": [],
-  "layoutIssues": [
-    {
-      "view": "season",
-      "width": 390,
-      "elements": [
-        {
-          "tag": "BUTTON",
-          "id": "",
-          "cls": "",
-          "right": 435
-        },
-        {
-          "tag": "SPAN",
-          "id": "",
-          "cls": "medal ax-season-medal",
-          "right": 432
-        },
-        {
-          "tag": "IMG",
-          "id": "",
-          "cls": "",
-          "right": 432
-        },
-        {
-          "tag": "SPAN",
-          "id": "",
-          "cls": "ax-medal-edition",
-          "right": 409.5625
-        },
-        {
-          "tag": "STRONG",
-          "id": "",
-          "cls": "",
-          "right": 420.625
-        },
-        {
-          "tag": "SPAN",
-          "id": "",
-          "cls": "",
-          "right": 404.03125
-        }
-      ]
-    },
-    {
-      "view": "season",
-      "width": 320,
-      "elements": [
-        {
-          "tag": "BUTTON",
-          "id": "",
-          "cls": "",
-          "right": 435
-        },
-        {
-          "tag": "SPAN",
-          "id": "",
-          "cls": "medal ax-season-medal",
-          "right": 432
-        },
-        {
-          "tag": "IMG",
-          "id": "",
-          "cls": "",
-          "right": 432
-        },
-        {
-          "tag": "SPAN",
-          "id": "",
-          "cls": "ax-medal-edition",
-          "right": 409.5625
-        },
-        {
-          "tag": "STRONG",
-          "id": "",
-          "cls": "",
-          "right": 420.625
-        },
-        {
-          "tag": "SPAN",
-          "id": "",
-          "cls": "",
-          "right": 404.03125
-        }
-      ]
-    }
-  ],
+  "layoutIssues": [],
   "publishedReads": {
     "/api/daily": {
       "status": 200
@@ -285,11 +210,5 @@
       "status": 200
     }
   },
-  "productionReferenceErrors": [
-    "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=free]\") to be visible\n    28 × locator resolved to hidden <button data-nav=\"free\">…</button>\n",
-    "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=free]\") to be visible\n    28 × locator resolved to hidden <button data-nav=\"free\">…</button>\n"
-  ],
-  "result": "FAIL",
-  "error": "[{'view': 'season', 'width': 390, 'elements': [{'tag': 'BUTTON', 'id': '', 'cls': '', 'right': 435}, {'tag': 'SPAN', 'id': '', 'cls': 'medal ax-season-medal', 'right': 432}, {'tag': 'IMG', 'id': '', 'cls': '', 'right': 432}, {'tag': 'SPAN', 'id': '', 'cls': 'ax-medal-edition', 'right': 409.5625}, {'tag': 'STRONG', 'id': '', 'cls': '', 'right': 420.625}, {'tag': 'SPAN', 'id': '', 'cls': '', 'right': 404.03125}]}, {'view': 'season', 'width': 320, 'elements': [{'tag': 'BUTTON', 'id': '', 'cls': '', 'right': 435}, {'tag': 'SPAN', 'id': '', 'cls': 'medal ax-season-medal', 'right': 432}, {'tag': 'IMG', 'id': '', 'cls': '', 'right': 432}, {'tag': 'SPAN', 'id': '', 'cls': 'ax-medal-edition', 'right': 409.5625}, {'tag': 'STRONG', 'id': '', 'cls': '', 'right': 420.625}, {'tag': 'SPAN', 'id': '', 'cls': '', 'right': 404.03125}]}]",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 212, in <module>\n    assert not report[\"layoutIssues\"],report[\"layoutIssues\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: [{'view': 'season', 'width': 390, 'elements': [{'tag': 'BUTTON', 'id': '', 'cls': '', 'right': 435}, {'tag': 'SPAN', 'id': '', 'cls': 'medal ax-season-medal', 'right': 432}, {'tag': 'IMG', 'id': '', 'cls': '', 'right': 432}, {'tag': 'SPAN', 'id': '', 'cls': 'ax-medal-edition', 'right': 409.5625}, {'tag': 'STRONG', 'id': '', 'cls': '', 'right': 420.625}, {'tag': 'SPAN', 'id': '', 'cls': '', 'right': 404.03125}]}, {'view': 'season', 'width': 320, 'elements': [{'tag': 'BUTTON', 'id': '', 'cls': '', 'right': 435}, {'tag': 'SPAN', 'id': '', 'cls': 'medal ax-season-medal', 'right': 432}, {'tag': 'IMG', 'id': '', 'cls': '', 'right': 432}, {'tag': 'SPAN', 'id': '', 'cls': 'ax-medal-edition', 'right': 409.5625}, {'tag': 'STRONG', 'id': '', 'cls': '', 'right': 420.625}, {'tag': 'SPAN', 'id': '', 'cls': '', 'right': 404.03125}]}]\n"
+  "result": "PASS"
 }
