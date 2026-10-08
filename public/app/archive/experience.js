@@ -85,7 +85,7 @@ function install(){
   q('#gameDifficulty').insertAdjacentHTML('beforeend','<span class="ax-game-origin">Původní deska</span>');
  },afterPersist:({game:g,saved})=>{
   if(!saved||!g?.puzzle?.meta?.archiveExperience)return;
-  const s=read();s.progress[g.puzzle.id]=snapshot(g);write(s);
+  const s=read();g.archiveHints??=s.progress[g.puzzle.id]?.revealed||[];s.progress[g.puzzle.id]=snapshot(g);write(s);
  }});
  registerGameCompletionHook({id:'archive-experience',priority:200,after:({game:g})=>{
   if(!g?.puzzle?.meta?.archiveExperience)return;

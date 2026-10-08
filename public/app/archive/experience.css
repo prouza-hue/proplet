@@ -318,3 +318,7 @@ html.tiskarna-ui body.archive-experience .ax-rank-row .organic-avatar{width:30px
  html.tiskarna-ui body.archive-experience .ax-archive-heading .archive-art{right:0;width:94px}
  html.tiskarna-ui body.archive-experience .ax-archive-heading h1{font-size:28px!important}
 }
+
+html.tiskarna-ui body.archive-experience #axHomeGames{grid-template-columns:minmax(0,1fr)}
+html.tiskarna-ui body.archive-experience #axHomeArchive,html.tiskarna-ui body.archive-experience .ax-archive-entry>span{min-width:0}
+@media(max-width:355px){html.tiskarna-ui body.archive-experience .ax-archive-entry h2{white-space:normal}}

@@ -22,7 +22,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 server=http.server.ThreadingHTTPServer(("127.0.0.1",8765),functools.partial(Handler,directory=str(ROOT/"public")))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 def shot(page,name):
-    page.screenshot(path=str(OUT/(name+".png")),full_page=True);report["screenshots"].append(name+".png")
+    page.screenshot(path=str(OUT/(name+".png")),full_page="announcement" not in name);report["screenshots"].append(name+".png")
 def overflow(page,view,width):
     issue=page.evaluate("""()=>document.documentElement.scrollWidth>innerWidth+1?[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1&&e.getBoundingClientRect().width).map(e=>({tag:e.tagName,id:e.id,cls:String(e.className),right:e.getBoundingClientRect().right})).slice(0,15):null""")
     if issue:report["layoutIssues"].append({"view":view,"width":width,"elements":issue})
@@ -135,6 +135,25 @@ try:
                 page.wait_for_selector("#winModal:not(.hidden)")
                 assert "už získána" in page.locator("#winXp").inner_text()
                 page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
+                # Verify current catalogue controls and both competitive entry points.
+                go(page,"free")
+                page.locator('[data-archive-order="easy"]').click()
+                page.locator('[data-archive-order-mode="numeric"]').click()
+                assert page.evaluate("freeOrder().record('easy').mode")=="numeric"
+                page.locator('[data-archive-order="easy"]').click()
+                page.locator('[data-archive-order-mode="varied"]').click()
+                assert page.evaluate("freeOrder().record('easy').mode")=="varied"
+                page.locator('[data-played-levels="easy"]').click()
+                page.wait_for_selector("#playedLevelsModal:not(.hidden)")
+                page.keyboard.press("Escape")
+                go(page,"daily")
+                page.locator('[data-archive-action="team"]').click()
+                page.wait_for_timeout(250)
+                assert page.locator('[data-ranking-xp-scope="teams"]').get_attribute("class").find("active")>=0
+                assert page.locator('[data-ranking-period="week"]').get_attribute("class").find("active")>=0
+                page.locator('#axRankingSeason').click()
+                page.wait_for_selector("#screen-season.active")
+                report["checks"].append({"catalogueOrder":"PASS","levels":"PASS","weeklyTeamEntry":"PASS","monthlyFromRankings":"PASS"})
                 report["checks"].append({"actualGame":"PASS","resume":"PASS","foldResize":"PASS","xpOnce":"PASS","newerDoesNotBlockHistorical":"PASS","alternativeAndHintRestore":"PASS","modernProgressUnchanged":before})
             if width in [390,690,1440]:
                 page.locator('#archiveReviewNotice button').click();page.locator('[data-archive-action="theme"]').click();page.keyboard.press("Escape")
