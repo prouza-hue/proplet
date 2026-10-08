@@ -12,7 +12,7 @@ import threading
 import time
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode, unquote
 
-from psycopg import sql
+from psycopg import sql, pq
 from psycopg.types.json import Json, Jsonb
 from psycopg_pool import ConnectionPool
 
@@ -50,7 +50,12 @@ def configured_dsn(supabase_url):
         if not (direct or pooled):
             return None
         # Integration/Prisma URIs sometimes include client-only query options.
-        query = [(k,v) for k,v in parse_qsl(parsed.query) if k not in {"pgbouncer", "connection_limit", "pool_timeout", "schema", "sslmode", "connect_timeout"}]
+        supported = {item.keyword.decode() for item in pq.Conninfo.get_defaults()}
+        # URI metadata such as `supa` and `workaround` is for the integration's
+        # JS drivers. libpq rejects it. Do not let query parameters override the
+        # database identity that was validated from the URI authority either.
+        excluded = {"sslmode", "connect_timeout", "host", "hostaddr", "port", "user", "password", "dbname", "service"}
+        query = [(k,v) for k,v in parse_qsl(parsed.query) if k in supported and k not in excluded]
         query += [("sslmode", "require"), ("connect_timeout", "3")]
         return urlunsplit(parsed._replace(query=urlencode(query)))
     except (ValueError, TypeError):
@@ -67,8 +72,9 @@ def _connection_pool(dsn):
         if _pool is None:
             _pool = ConnectionPool(dsn, min_size=0, max_size=3, max_idle=20,
                                    timeout=4, reconnect_timeout=4, name="proplet-rpc",
-                                   kwargs={"autocommit": True, "prepare_threshold": None})
+                                   kwargs={"autocommit": True, "prepare_threshold": None, "application_name":"proplet-rpc"})
             _pool_url = dsn
+            logger.info("Postgres RPC connection=%s", "pooler" if (urlsplit(dsn).hostname or '').endswith('.pooler.supabase.com') else "direct")
         if _pool_url != dsn:
             return None
         return _pool
