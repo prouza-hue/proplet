@@ -71,8 +71,15 @@ try:
             assert page.locator("#axHomeFree .ax-free-difficulty").count()==4
             assert "Ve hře jste spolu" not in page.locator("#screen-daily").inner_text()
             report["checks"].append({"width":width,"typography":typography,"fourCanonicalIcons":"PASS","noDuplicateCardControls":"PASS"})
+            page.locator("#axHomeFree").scroll_into_view_if_needed()
+            page.screenshot(path=str(OUT/("daily-more-"+str(width)+".png")))
+            report["screenshots"].append("daily-more-"+str(width)+".png")
             go(page,"season")
             assert page.locator('#screen-season .ax-prize-grid button').count()==3
+            assert page.locator('#screen-season .ax-prize-grid img').evaluate_all("(imgs)=>imgs.every(i=>i.complete&&i.naturalWidth>0&&i.src.includes('/rewards/printshop/'))")
+            if width==390:
+                page.locator(".ax-prizes").screenshot(path=str(OUT/"monthly-printshop-rewards.png"))
+                report["screenshots"].append("monthly-printshop-rewards.png")
             page.locator('[data-archive-badge="1"]').click()
             assert "Vládce listopadu" in page.locator("#axModalTitle").inner_text()
             page.keyboard.press("Escape")
