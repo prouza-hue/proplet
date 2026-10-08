@@ -16,3 +16,5 @@ dialog{padding:0;width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 36
 
 /* Focus lands on the page landmark after navigation; controls keep visible keyboard focus. */
 #main:focus{outline:none}
+
+.board.earned .reward{font-size:11px}@media(max-width:370px){.board.earned .reward{font-size:10px}}
