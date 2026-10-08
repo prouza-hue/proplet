@@ -8,6 +8,7 @@ actual HTTP transport is isolated and directly characterizable.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any, Callable, Optional
 
 import httpx
@@ -89,6 +90,7 @@ def db_request(
     def send():
         return client.request(method, url, params=params, json=body, headers=headers)
 
+    retried = False
     try:
         response = send()
     except httpx.HTTPError as exc:
@@ -97,16 +99,38 @@ def db_request(
         # Reads are idempotent. One immediate retry covers a dropped pooled
         # connection without risking a duplicated write or RPC side effect.
         logger.warning("Supabase read transport retry table=%s", table)
+        retried = True
         try:
             response = send()
         except httpx.HTTPError as retry_exc:
             raise HTTPException(503, "Databáze je momentálně nedostupná") from retry_exc
-    if method == "GET" and response.status_code >= 500:
+    if method == "GET" and not retried and response.status_code >= 500:
         logger.warning("Supabase read status retry table=%s status=%s", table, response.status_code)
+        retried = True
         try:
             response = send()
         except httpx.HTTPError as exc:
             raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
+    if method == "GET" and not retried and response.status_code == 401:
+        try:
+            auth_error = response.json()
+        except Exception:
+            auth_error = {}
+        if (
+            isinstance(auth_error, dict)
+            and auth_error.get("code") in {"PGRST301", "PGRST303"}
+            and auth_error.get("message") == "JWT issued at future"
+        ):
+            # Opaque secret keys are exchanged for a JWT by Supabase's gateway.
+            # PostgREST can briefly validate that token against a stale clock.
+            # Retry this rejected read once, without modifying credentials or
+            # replaying writes. Keep the pooled connection that reached it.
+            logger.warning("Supabase read JWT timing retry table=%s status=401", table)
+            time.sleep(1.0)
+            try:
+                response = send()
+            except httpx.HTTPError as exc:
+                raise HTTPException(503, "Databáze je momentálně nedostupná") from exc
     if response.status_code >= 400:
         internal_detail = "database error"
         try:
