@@ -1,5 +1,5 @@
 {
-  "testedSha": "01438d63f186129539fd950600833057f3634d74",
+  "testedSha": "bcb8f3fe2e62bff08ca7d4f4014ed7b23ddf782b",
   "checks": [
     {
       "width": 320,
@@ -60,8 +60,8 @@
   "productionDaily": {
     "status": 200,
     "dailyDate": "2026-10-08",
+    "generation": 6,
     "bankVersion": "daily-gen6-20261007-v1",
-    "serverToday": "2026-10-08",
-    "generation": 6
+    "serverToday": "2026-10-08"
   }
 }
