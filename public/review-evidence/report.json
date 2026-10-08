@@ -1,5 +1,5 @@
 {
-  "testedSha": "af7e2c15800f3b514221887d6be40507616ac3de",
+  "testedSha": "cf3216162a7d0a179ced88c74d28bf707af770f6",
   "checks": [
     {
       "width": 390,
@@ -60,26 +60,7 @@
   ],
   "pageErrors": [],
   "networkWrites": [],
-  "layoutIssues": [
-    {
-      "view": "daily",
-      "width": 320,
-      "elements": [
-        {
-          "tag": "DIV",
-          "id": "axHomeArchive",
-          "cls": "",
-          "right": 327
-        },
-        {
-          "tag": "BUTTON",
-          "id": "",
-          "cls": "ax-archive-entry ax-compact",
-          "right": 327
-        }
-      ]
-    }
-  ],
+  "layoutIssues": [],
   "publishedReads": {
     "/api/daily": {
       "status": 200
@@ -93,5 +74,5 @@
   },
   "result": "FAIL",
   "error": "",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 132, in <module>\n    assert page.evaluate(\"currentGame.archiveHints.length\")==1\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 142, in <module>\n    assert page.evaluate(\"freeOrder().record('easy').mode\")==\"numeric\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
 }
