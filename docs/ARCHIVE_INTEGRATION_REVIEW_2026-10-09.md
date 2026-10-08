@@ -41,4 +41,6 @@ Vercel FastAPI balí veřejné soubory ze zdrojového snapshotu. Generovaný boa
 - Archiv: volný výběr všech desek, čitelnější mobilní přepínače a odměny, větší dotykové plochy.
 - Měsíční odznaky: odstraněny provizorní ploché SVG medaile. Používají skutečné ilustrace medaile / medal-2 / medal-3 z produkční Tiskařské dílny s označením XI · 2026. V malých navigačních ikonách se označení skrývá, aby zůstaly čitelné. Listopad je nadále model.
 - Týmová karta používá existující ilustraci first-imprint z týmových vítězství.
-- Vizuální reference produkce se pořizuje z hrajproplet.cz s lokálním ukázkovým profilem a zablokovanými zápisy. Nepoužívá hráčský účet.
+- Vizuální reference produkce se pořizuje z hrajproplet.cz v anonymním prohlížeči a se zablokovanými zápisy. Nepoužívá hráčský účet.
+
+Závěrečné ověření revize: zdrojový commit 1a9ada8fdd31de3b8f08996e8f2c043b56a36674. Integrovaný Chromium PASS, 50 snímků včetně produkční reference 4.05.2, 320/390/690/1440 px, žádné horizontální přetékání, chyby JavaScriptu ani síťové zápisy. Current runtime gate a isolated-result-database PASS. Náhledové JS/CSS se po nasazení přesně shodují s ověřenými soubory.
