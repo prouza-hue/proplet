@@ -59,6 +59,11 @@ function home(){
  const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),q('#rescueCard'),q('#todayNewContentBanner'),q('#tajenkaPreviewCard'),games,competition,q('#axHomeFree'),q('#levelCard')].filter(Boolean);
  let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
 }
+function placePlayExtra(card){
+ const archive=q('#axPlayArchive');if(!archive)return false;
+ if(card.nextElementSibling!==archive)archive.before(card);
+ return true;
+}
 function free(){
  if(!installed)return;
  const root=q('#screen-free');if(!root)return;
@@ -178,6 +183,6 @@ async function onClick(e){
  if(action==='rankings'){nav('leaderboard');return}
  if(action==='team'){nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}
 }
-window.PropletArchiveExperience={install,home,free,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
+window.PropletArchiveExperience={install,home,free,placePlayExtra,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
 })();
 

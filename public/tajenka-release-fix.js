@@ -80,13 +80,15 @@
       clone.classList.remove('hidden');
       clone.dataset.signature=legacyCardSignature(source);
       clone.dataset.exactCloneSignature=exactSignature;
-      clone.querySelectorAll('[id]').forEach(el=>{if(el!==clone)el.removeAttribute('id')});
       bindClonedCardActions(clone,source);
+      clone.querySelectorAll('[id]').forEach(el=>{if(el!==clone)el.removeAttribute('id')});
       if(current)current.replaceWith(clone);else screen.appendChild(clone);
       current=clone;
     }
     current.classList.remove('hidden');
-    if(screen.lastElementChild!==current)screen.appendChild(current);
+    // Share placement with printshop-release-polish; two observers must not
+    // move the same card to competing positions around the Archive.
+    if(!window.PropletArchiveExperience?.placePlayExtra(current)&&screen.lastElementChild!==current)screen.appendChild(current);
   }
 
   function rowMarkup(rows){
@@ -274,3 +276,4 @@
   setTimeout(install,300);
   setTimeout(install,1200);
 })();
+

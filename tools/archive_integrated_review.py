@@ -37,7 +37,7 @@ def discovery_audit(page,view,width):
     cards=page.evaluate("""view=>{
       const root=document.querySelector('#screen-'+view),near=(a,b)=>Math.abs(a-b)<=2;
       return [...root.querySelectorAll('.ax-destination,#difficultyCards .cp-card,#newContentBanner,#tajenkaPreviewCard,#tajenkaPlayCard')].filter(card=>card.getBoundingClientRect().height>0).map(card=>{
-        const title=card.querySelector('h2'),copy=card.querySelector('.ax-entry-copy,.cp-heading,.tajenka-entry-copy,.new-content-main>div:last-child'),art=card.querySelector('.ax-entry-art,.cp-art,.tajenka-entry-icon,.new-content-spark'),action=card.querySelector('.ax-card-action,.cp-play,#tajenkaPreviewBtn,[data-tajenka-play-action],.new-content-actions .primary-btn,.tajenka-home-actions');
+        const title=card.querySelector('h2'),copy=card.querySelector('.ax-entry-copy,.cp-heading,.tajenka-entry-copy,.new-content-main>div:last-child'),art=card.querySelector('.ax-entry-art,.cp-art,.tajenka-entry-icon,.new-content-spark'),action=card.querySelector('.ax-card-action,.cp-play,#tajenkaPreviewBtn,[data-tajenka-play-action],[data-tajenka-clone-play],:scope>.primary-btn,.new-content-actions .primary-btn,.tajenka-home-actions');
         const id=card.id||card.dataset.diff||card.className;
         if(!title||!copy||!art||!action)return {id,error:'missing shared card element'};
         const box=card.getBoundingClientRect(),c=getComputedStyle(card),t=getComputedStyle(title),text=copy.getBoundingClientRect(),a=art.getBoundingClientRect(),b=action.getBoundingClientRect();
@@ -162,6 +162,15 @@ try:
                     report["checks"].append({"completedTajenkaPresentation":"PASS"})
                 else:report["checks"].append({"completedTajenkaPresentation":"SKIP: published Tajenka unavailable"})
                 page.evaluate("state=>{saveTajenkaState(state);renderTajenkaEntry();renderFree();}",tajenka_before)
+                if seeded:
+                    # The exact-clone adapter must forward its real play button after IDs are removed.
+                    go(page,"free")
+                    page.locator('#tajenkaPlayCard [data-tajenka-clone-play]').click()
+                    page.wait_for_selector('#screen-game.active')
+                    assert page.evaluate("currentGame.mode==='tajenka' && currentGame.puzzle.id===tajenkaPuzzle.id")
+                    page.evaluate("goBackFromGame()")
+                    page.wait_for_function("currentScreen!=='game'")
+                    report["checks"].append({"clonedTajenkaPlayAndBack":"PASS"})
             go(page,"archive")
             page.locator("#axSearch").fill("88");assert page.locator('[data-archive-board="g3-e-088"]').count()==1
             page.locator('[data-archive-board="g3-e-088"]').click()
