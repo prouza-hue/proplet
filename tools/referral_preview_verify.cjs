@@ -13,7 +13,7 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===6);
+ await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===7);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
@@ -148,3 +148,4 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   report.requests=requests;check('Browser sends zero API or production requests; external fetch blocked; no JS errors');
  }finally{await browser.close();fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2))}
 })().catch(e=>{console.error(e);fs.writeFileSync(out+'/failure.txt',e.stack);process.exit(1)});
+
