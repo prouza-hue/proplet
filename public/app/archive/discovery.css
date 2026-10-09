@@ -4,12 +4,12 @@
 html.tiskarna-ui body.archive-experience{
  --pg-card-radius:18px;--pg-card-pad:18px;--pg-gap:14px;--pg-art:80px;
  --pg-title:22px;--pg-text:15px;--pg-action-height:48px;
- --pg-blue:#315da8;--pg-blue-fill:#315da8;--pg-green:#257966;--pg-rust:#985635;--pg-plum:#76516e;
+ --pg-blue:#315da8;--pg-blue-fill:#315da8;--pg-accent:var(--pg-blue);--pg-green:#257966;--pg-rust:#985635;--pg-plum:#76516e;
 }
 html.tiskarna-ui[data-theme=dark] body.archive-experience{--pg-blue:#9cbafb;--pg-green:#8ed5b4;--pg-rust:#e3b18a;--pg-plum:#debeda}
 /* These selectors are one shared component; existing IDs keep their game handlers. */
-html.tiskarna-ui body.archive-experience :is(.ax-destination,#difficultyCards .cp-card,#newContentBanner,#tajenkaPreviewCard,#tajenkaPlayCard){
- --pg-accent:var(--pg-blue);box-sizing:border-box;display:grid!important;
+html.tiskarna-ui body.archive-experience :is(.ax-destination,#difficultyCards .cp-card,#newContentBanner,#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard){
+ box-sizing:border-box;display:grid!important;
  grid-template-columns:minmax(0,1fr) var(--pg-art)!important;
  grid-auto-rows:auto;align-items:center;gap:14px 12px!important;
  min-width:0;width:100%;padding:var(--pg-card-pad)!important;margin:0!important;
@@ -40,20 +40,20 @@ html.tiskarna-ui body.archive-experience :is(.ax-entry-art,#difficultyCards .cp-
 html.tiskarna-ui body.archive-experience .ax-entry-art>:is(img,.archive-art,.medal){display:block;width:100%!important;max-width:100%!important;height:auto!important;max-height:100%;margin:0!important;object-fit:contain}
 html.tiskarna-ui body.archive-experience :is(.tajenka-entry-icon,#newContentBanner .new-content-spark)>img{width:100%!important;height:100%!important;object-fit:contain}
 /* Equal-size controls communicate the same action everywhere. */
-html.tiskarna-ui body.archive-experience :is(.ax-card-action,#difficultyCards .cp-play,#tajenkaPreviewCard>.primary-btn,#tajenkaPreviewCard>.secondary-btn,#tajenkaPlayCard>button,#newContentBanner .primary-btn,#tajenkaPreviewCard #tajenkaPreviewBtn,:is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions>button){
- box-sizing:border-box;grid-column:1/-1!important;grid-row:auto;
+html.tiskarna-ui body.archive-experience :is(.ax-card-action,#difficultyCards .cp-play,#screen-daily #tajenkaPreviewCard button,#screen-free #tajenkaPlayCard button,#tajenkaPreviewCard>.primary-btn,#tajenkaPreviewCard>.secondary-btn,#tajenkaPlayCard>button,#newContentBanner .primary-btn,:is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions>button){
+ box-sizing:border-box;grid-column:var(--pg-action-column,1/-1)!important;
  display:flex!important;align-items:center;justify-content:center;gap:10px;
  width:100%!important;min-width:0!important;min-height:var(--pg-action-height)!important;
  padding:11px 16px!important;margin:0!important;border-radius:11px!important;
  font-family:inherit!important;font-size:16px!important;font-weight:600!important;
  line-height:1.35!important;letter-spacing:0!important;text-align:center;cursor:pointer;
- border:1px solid transparent!important;box-shadow:0 3px 0 #00000020!important;
- background:var(--pg-blue-fill)!important;color:#fff!important;
+ border:1px solid var(--pg-action-border,transparent)!important;box-shadow:var(--pg-action-shadow,0 3px 0 #00000020)!important;
+ background:var(--pg-action-bg,var(--pg-blue-fill))!important;color:var(--pg-action-fg,#fff)!important;
 }
 html.tiskarna-ui body.archive-experience :is(.ax-card-action.ax-browse-action,#tajenkaPreviewCard.completed button,#tajenkaPlayCard.completed button){
- background:color-mix(in srgb,var(--pg-accent) 5%,var(--td-paper))!important;
- color:var(--pg-accent)!important;border-color:color-mix(in srgb,var(--pg-accent) 48%,var(--td-line))!important;
- box-shadow:0 2px 0 color-mix(in srgb,var(--pg-accent) 12%,transparent)!important;
+ --pg-action-bg:color-mix(in srgb,var(--pg-accent) 5%,var(--td-paper));
+ --pg-action-fg:var(--pg-accent);--pg-action-border:color-mix(in srgb,var(--pg-accent) 48%,var(--td-line));
+ --pg-action-shadow:0 2px 0 color-mix(in srgb,var(--pg-accent) 12%,transparent);
 }
 html.tiskarna-ui body.archive-experience :is(.ax-card-action,.cp-play):hover{filter:brightness(1.05)}
 html.tiskarna-ui body.archive-experience :is(.ax-card-action,.cp-play):focus-visible{outline:3px solid var(--td-blue);outline-offset:3px}
@@ -74,7 +74,7 @@ html.tiskarna-ui body.archive-experience #difficultyCards .cp-history{
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-history::after{content:'odehráno';font-weight:400;margin-left:2px}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-history svg{order:1;width:16px;height:16px;margin-left:4px}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-track{grid-column:1/-1;grid-row:3;width:100%;height:4px;margin:-7px 0 0!important}
-html.tiskarna-ui body.archive-experience #difficultyCards .cp-play{grid-row:4;background:var(--accent)!important}
+html.tiskarna-ui body.archive-experience #difficultyCards .cp-play{grid-row:4;--pg-action-bg:var(--accent)}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-xp{font-size:14px!important;line-height:1.4!important;margin:0!important}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-card[data-diff=easy]{--pg-accent:#257966}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-card[data-diff=medium]{--pg-accent:#315da8}
@@ -112,7 +112,15 @@ html.tiskarna-ui body.archive-experience :is(#screen-daily,#screen-free)>.hidden
 }
 
 /* A finished game keeps its title and navigational controls. */
-html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0!important}
-html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions>button{grid-column:auto!important;min-height:48px!important;font-size:15px!important}
+html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions{grid-column:1/-1;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0!important}
+html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions>button{--pg-action-column:auto;grid-column:auto!important;min-height:48px!important;font-size:15px!important}
 html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions .painted-action-icon{width:22px!important;height:22px!important;flex-shrink:0}
 @media(max-width:399px){html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-home-actions{grid-template-columns:minmax(0,1fr)}}
+
+/* The old completed-card layout used a narrow left icon column. Reset it at
+   the native screen IDs; this component owns both unfinished and finished cards. */
+html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-entry-copy{padding:0!important;width:100%!important;max-width:none!important;min-width:0!important}
+html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-home-actions{grid-column:1/-1!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important;margin:0!important}
+html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-revealed-phrase{width:100%;max-width:none;font-size:18px!important;font-weight:500;line-height:1.4!important;margin:8px 0!important}
+html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-entry-copy small{font-size:13px!important;line-height:1.4!important;color:var(--td-muted)}
+@media(max-width:399px){html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-home-actions{grid-template-columns:minmax(0,1fr)}}

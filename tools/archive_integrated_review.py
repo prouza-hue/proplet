@@ -34,22 +34,23 @@ def go(page,view):
         go(page,"daily");page.locator('#axHomeCompetitions [data-archive-action="season"]').click()
     page.wait_for_timeout(180)
 def discovery_audit(page,view,width):
-    cards=page.evaluate("""view=>{
+    cards=page.evaluate("""({view,width})=>{
       const root=document.querySelector('#screen-'+view),near=(a,b)=>Math.abs(a-b)<=2;
       return [...root.querySelectorAll('.ax-destination,#difficultyCards .cp-card,#newContentBanner,#tajenkaPreviewCard,#tajenkaPlayCard')].filter(card=>card.getBoundingClientRect().height>0).map(card=>{
         const title=card.querySelector('h2'),copy=card.querySelector('.ax-entry-copy,.cp-heading,.tajenka-entry-copy,.new-content-main>div:last-child'),art=card.querySelector('.ax-entry-art,.cp-art,.tajenka-entry-icon,.new-content-spark'),action=card.querySelector('.ax-card-action,.cp-play,#tajenkaPreviewBtn,[data-tajenka-play-action],[data-tajenka-clone-play],:scope>.primary-btn,.new-content-actions .primary-btn,.tajenka-home-actions');
         const id=card.id||card.dataset.diff||card.className;
         if(!title||!copy||!art||!action)return {id,error:'missing shared card element'};
-        const box=card.getBoundingClientRect(),c=getComputedStyle(card),t=getComputedStyle(title),text=copy.getBoundingClientRect(),a=art.getBoundingClientRect(),b=action.getBoundingClientRect();
+        const box=card.getBoundingClientRect(),c=getComputedStyle(card),t=getComputedStyle(title),text=copy.getBoundingClientRect(),a=art.getBoundingClientRect(),b=action.getBoundingClientRect(),titleBox=title.getBoundingClientRect(),phrase=card.querySelector('.tajenka-revealed-phrase'),completed=card.classList.contains('completed');
         const left=box.left+parseFloat(c.borderLeftWidth)+parseFloat(c.paddingLeft),right=box.right-parseFloat(c.borderRightWidth)-parseFloat(c.paddingRight);
         const buttons=action.matches('button')?[action]:[...action.querySelectorAll('button')];
-        return {id,font:t.fontFamily,size:t.fontSize,weight:t.fontWeight,textLeft:near(text.left,left),artRight:near(a.right,right),noHeaderOverlap:text.right<=a.left+1,actionFullWidth:near(b.left,left)&&near(b.right,right),actionBelow:b.top>=Math.max(text.bottom,a.bottom)-1,actionHeight:buttons.every(button=>button.getBoundingClientRect().height>=46)};
+        const availableLeft=right-left-a.width-(parseFloat(c.columnGap)||0);
+        return {id,font:t.fontFamily,size:t.fontSize,weight:t.fontWeight,textLeft:near(titleBox.left,left),titleFits:title.scrollWidth<=title.clientWidth+1,completedCopyFillsColumn:!completed||text.width>=availableLeft-2,phraseFits:!phrase||phrase.scrollWidth<=phrase.clientWidth+1,phraseHeight:!completed||!phrase||width!==390||phrase.getBoundingClientRect().height<=160,artRight:near(a.right,right),noHeaderOverlap:text.right<=a.left+1,actionFullWidth:near(b.left,left)&&near(b.right,right),actionBelow:b.top>=Math.max(text.bottom,a.bottom)-1,actionHeight:buttons.every(button=>button.getBoundingClientRect().height>=46)};
       });
-    }""",view)
+    }""",{"view":view,"width":width})
     assert cards,(view,width,"no discovery cards")
     for card in cards:
         assert not card.get("error"),(view,width,card)
-        assert all(card[key] for key in ["textLeft","artRight","noHeaderOverlap","actionFullWidth","actionBelow","actionHeight"]),(view,width,card)
+        assert all(card[key] for key in ["textLeft","titleFits","completedCopyFillsColumn","phraseFits","phraseHeight","artRight","noHeaderOverlap","actionFullWidth","actionBelow","actionHeight"]),(view,width,card)
     assert len({(card["font"],card["size"],card["weight"]) for card in cards})==1,(view,width,cards)
     report["checks"].append({"view":view,"width":width,"discoveryAnatomy":cards})
     return cards
@@ -168,7 +169,9 @@ try:
                     page.locator('#tajenkaPlayCard [data-tajenka-clone-play]').click()
                     page.wait_for_selector('#screen-game.active')
                     assert page.evaluate("currentGame.mode==='tajenka' && currentGame.puzzle.id===tajenkaPuzzle.id")
-                    page.evaluate("goBackFromGame()")
+                    # First entry opens native rules. Back would dismiss that modal first.
+                    if page.locator('#tajenkaRulesModal').is_visible():page.locator('#tajenkaRulesDone').click()
+                    page.locator('#backFromGame').click()
                     page.wait_for_function("currentScreen!=='game'")
                     report["checks"].append({"clonedTajenkaPlayAndBack":"PASS"})
             go(page,"archive")

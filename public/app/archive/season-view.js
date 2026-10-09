@@ -11,7 +11,7 @@
     lukas:{name:'Lukáš',avatar:'🦊'},
     klara:{name:'Klára',avatar:'🌺'},
     matej:{name:'Matěj',avatar:'🐉'},
-    alex:{name:'Alex',avatar:'🦌'},
+    alex:{get name(){return typeof getProfile==='function'?(getProfile()?.name||'Alex'):'Alex'},get avatar(){return typeof getProfile==='function'?(getProfile()?.avatar||'🦊'):'🦊'}},
     eliska:{name:'Eliška',avatar:'🦉'},
     anna:{name:'Anna Marie Novotná',avatar:'🌺'}
   };
@@ -57,7 +57,7 @@
   }
 
   function prizeGrid(){
-    return `<div class="ax-prize-grid sv-prize-grid">${[1,2,3].map(rank=>`<button type="button" data-archive-badge="${rank}" aria-label="${escape(badgeNames[rank-1])}, listopad 2026. Zobrazit odznak.">${medal(rank,{label:badgeNames[rank-1]+' 2026'})}<strong>${badgeNames[rank-1]}</strong><span>${rank}. místo</span></button>`).join('')}</div>`;
+    return `<div class="ax-prize-grid sv-prize-grid">${[1,2,3].map(rank=>`<button type="button" data-archive-badge="${rank}" aria-label="${escape(badgeNames[rank-1])}, listopad 2026. Zobrazit odznak.">${medal(rank,{label:badgeNames[rank-1]+' 2026'})}<strong>${escape(badgeNames[rank-1].split(' ')[0])}<br>${escape(badgeNames[rank-1].split(' ').slice(1).join(' '))}</strong><span>${rank}. místo</span></button>`).join('')}</div>`;
   }
 
   function podium(){
