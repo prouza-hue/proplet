@@ -1,5 +1,5 @@
 {
-  "testedSha": "073e503f3b15ae7b41e977c33cf1656eef34e5bd",
+  "testedSha": "7da8b6898343924245003943b79bbc7fff817043",
   "checks": [
     {
       "view": "daily",
@@ -606,6 +606,35 @@
     },
     {
       "width": 390,
+      "darkButtonContrast": [
+        {
+          "difficulty": "easy",
+          "ratio": 5.242825635829608
+        },
+        {
+          "difficulty": "medium",
+          "ratio": 6.438232986034723
+        },
+        {
+          "difficulty": "hard",
+          "ratio": 5.657758364923373
+        },
+        {
+          "difficulty": "hardcore",
+          "ratio": 6.276440682213539
+        },
+        {
+          "difficulty": "mozkomor",
+          "ratio": 6.226870833879443
+        },
+        {
+          "difficulty": "mozkokalypsa",
+          "ratio": 7.931985345017134
+        }
+      ]
+    },
+    {
+      "width": 390,
       "result": "PASS"
     },
     {
@@ -949,6 +978,35 @@
     },
     {
       "width": 690,
+      "darkButtonContrast": [
+        {
+          "difficulty": "easy",
+          "ratio": 5.242825635829608
+        },
+        {
+          "difficulty": "medium",
+          "ratio": 6.438232986034723
+        },
+        {
+          "difficulty": "hard",
+          "ratio": 5.657758364923373
+        },
+        {
+          "difficulty": "hardcore",
+          "ratio": 6.276440682213539
+        },
+        {
+          "difficulty": "mozkomor",
+          "ratio": 6.226870833879443
+        },
+        {
+          "difficulty": "mozkokalypsa",
+          "ratio": 7.931985345017134
+        }
+      ]
+    },
+    {
+      "width": 690,
       "result": "PASS"
     },
     {
@@ -1289,6 +1347,35 @@
       ],
       "fourCanonicalIcons": "PASS",
       "noDuplicateCardControls": "PASS"
+    },
+    {
+      "width": 1440,
+      "darkButtonContrast": [
+        {
+          "difficulty": "easy",
+          "ratio": 5.242825635829608
+        },
+        {
+          "difficulty": "medium",
+          "ratio": 6.438232986034723
+        },
+        {
+          "difficulty": "hard",
+          "ratio": 5.657758364923373
+        },
+        {
+          "difficulty": "hardcore",
+          "ratio": 6.276440682213539
+        },
+        {
+          "difficulty": "mozkomor",
+          "ratio": 6.226870833879443
+        },
+        {
+          "difficulty": "mozkokalypsa",
+          "ratio": 7.931985345017134
+        }
+      ]
     },
     {
       "width": 1440,
