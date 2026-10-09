@@ -33,6 +33,44 @@ def go(page,view):
     elif view=="season":
         go(page,"daily");page.locator('#axHomeCompetitions [data-archive-action="season"]').click()
     page.wait_for_timeout(180)
+def discovery_audit(page,view,width):
+    cards=page.evaluate("""view=>{
+      const root=document.querySelector('#screen-'+view),near=(a,b)=>Math.abs(a-b)<=2;
+      return [...root.querySelectorAll('.ax-destination,#difficultyCards .cp-card,#newContentBanner,#tajenkaPreviewCard,#tajenkaPlayCard')].filter(card=>card.getBoundingClientRect().height>0).map(card=>{
+        const title=card.querySelector('h2'),copy=card.querySelector('.ax-entry-copy,.cp-heading,.tajenka-entry-copy,.new-content-main>div:last-child'),art=card.querySelector('.ax-entry-art,.cp-art,.tajenka-entry-icon,.new-content-spark'),action=card.querySelector('.ax-card-action,.cp-play,#tajenkaPreviewBtn,[data-tajenka-play-action],.new-content-actions .primary-btn,.tajenka-home-actions');
+        const id=card.id||card.dataset.diff||card.className;
+        if(!title||!copy||!art||!action)return {id,error:'missing shared card element'};
+        const box=card.getBoundingClientRect(),c=getComputedStyle(card),t=getComputedStyle(title),text=copy.getBoundingClientRect(),a=art.getBoundingClientRect(),b=action.getBoundingClientRect();
+        const left=box.left+parseFloat(c.borderLeftWidth)+parseFloat(c.paddingLeft),right=box.right-parseFloat(c.borderRightWidth)-parseFloat(c.paddingRight);
+        const buttons=action.matches('button')?[action]:[...action.querySelectorAll('button')];
+        return {id,font:t.fontFamily,size:t.fontSize,weight:t.fontWeight,textLeft:near(text.left,left),artRight:near(a.right,right),noHeaderOverlap:text.right<=a.left+1,actionFullWidth:near(b.left,left)&&near(b.right,right),actionBelow:b.top>=Math.max(text.bottom,a.bottom)-1,actionHeight:buttons.every(button=>button.getBoundingClientRect().height>=46)};
+      });
+    }""",view)
+    assert cards,(view,width,"no discovery cards")
+    for card in cards:
+        assert not card.get("error"),(view,width,card)
+        assert all(card[key] for key in ["textLeft","artRight","noHeaderOverlap","actionFullWidth","actionBelow","actionHeight"]),(view,width,card)
+    assert len({(card["font"],card["size"],card["weight"]) for card in cards})==1,(view,width,cards)
+    report["checks"].append({"view":view,"width":width,"discoveryAnatomy":cards})
+    return cards
+def free_order_audit(page,width):
+    order=page.evaluate("""()=>{
+      const archive=document.querySelector('#axPlayArchive'),difficulties=document.querySelector('#difficultyCards'),tajenka=document.querySelector('#tajenkaPlayCard');
+      const after=element=>!element||element.getBoundingClientRect().height===0||(Boolean(element.compareDocumentPosition(archive)&Node.DOCUMENT_POSITION_FOLLOWING)&&archive.getBoundingClientRect().top>=element.getBoundingClientRect().bottom-1);
+      return {afterDifficulties:after(difficulties),afterTajenka:after(tajenka)};
+    }""")
+    assert all(order.values()),(width,order)
+    page.wait_for_timeout(300)
+    mutations=page.evaluate("""()=>new Promise(resolve=>{
+      const started=performance.now();let records=0,batches=0,finished=false;
+      const finish=()=>{if(finished)return;finished=true;observer.disconnect();resolve({records,batches,elapsedMs:Math.round(performance.now()-started)});};
+      const observer=new MutationObserver(changes=>{records+=changes.length;batches++;if(records>60||batches>20)finish();});
+      observer.observe(document.querySelector('#screen-free'),{childList:true,subtree:true,characterData:true});
+      setTimeout(finish,500);
+    })""")
+    report["checks"].append({"width":width,"archiveOrder":order,"freeIdleMutations":mutations})
+    # Permit incidental native settling; reject sustained render/observer churn.
+    assert mutations["records"]<=60 and mutations["batches"]<=20,("free observer churn",width,mutations)
 def solve_word(page,answer):
     cells=page.locator("#board .cell")
     boxes=[page.locator('#board .cell[data-index="'+str(i)+'"]').bounding_box() for i in answer["path"]]
@@ -61,11 +99,14 @@ try:
             page.wait_for_timeout(300)
             shot(page,"initial-"+str(width))
             assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
+            discovery={}
             for view in ["daily","free","archive","season"]:
                 go(page,view);overflow(page,view,width);shot(page,view+"-"+str(width))
+                if view in ["daily","free"]:discovery[view]=discovery_audit(page,view,width)
             go(page,"free")
-            typography=page.evaluate("""()=>['#axPlayArchive h2','#newContentBanner h2','.cp-heading h2'].map(s=>{const e=document.querySelector(s),c=getComputedStyle(e);return {selector:s,font:c.fontFamily,size:c.fontSize,weight:c.fontWeight}})""")
-            assert len({t["font"] for t in typography})==1,typography
+            typography=[{key:card[key] for key in ["id","font","size","weight"]} for cards in discovery.values() for card in cards]
+            assert len({(t["font"],t["size"],t["weight"]) for t in typography})==1,typography
+            free_order_audit(page,width)
             assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
             go(page,"daily")
             assert page.locator("#axHomeFree .ax-free-difficulty").count()==4
@@ -76,19 +117,51 @@ try:
             report["screenshots"].append("daily-more-"+str(width)+".png")
             go(page,"season")
             assert page.locator('#screen-season .ax-prize-grid button').count()==3
-            assert page.locator('#screen-season .ax-prize-grid img').evaluate_all("(imgs)=>imgs.every(i=>i.complete&&i.naturalWidth>0&&i.src.includes('/rewards/printshop/'))")
+            medal_images=page.locator('#screen-season .ax-prize-grid image')
+            assert medal_images.count()==3
+            assert medal_images.evaluate_all("""async images=>(await Promise.all(images.map(async image=>{const src=image.getAttribute('href'),probe=new Image();probe.src=src;await probe.decode();return src.startsWith('/rewards/printshop/')&&probe.naturalWidth>0;}))).every(Boolean)""")
             if width==390:
-                page.locator(".ax-prizes").screenshot(path=str(OUT/"monthly-printshop-rewards.png"))
+                page.locator(".sv-prizes").screenshot(path=str(OUT/"monthly-printshop-rewards.png"))
                 report["screenshots"].append("monthly-printshop-rewards.png")
             page.locator('[data-archive-badge="1"]').click()
             assert "Vládce listopadu" in page.locator("#axModalTitle").inner_text()
             page.keyboard.press("Escape")
+            if width==390:
+                for scenario in ["normal","tie","first","pending"]:
+                    page.evaluate("scenario=>{PropletSeasonView.setScenario(scenario);PropletArchiveExperience.screen('season');}",scenario)
+                    assert page.locator('.sv-page').get_attribute('data-season-scenario')==scenario
+                    overflow(page,"season-"+scenario,width);shot(page,"season-"+scenario+"-390")
+                page.evaluate("PropletSeasonView.setScenario('normal');PropletArchiveExperience.screen('season')")
+                page.locator('.sv-rules-link').click()
+                rules=page.locator('#archiveExperienceModal').inner_text()
+                assert "středoevropského času" in rules and "Praze" not in rules
+                shot(page,"season-rules-390");page.keyboard.press("Escape")
+                page.locator('.sv-winner--1').click()
+                assert "Říjen 2026" in page.locator('#archiveExperienceModal').inner_text()
+                shot(page,"season-winner-detail-390");page.keyboard.press("Escape")
+                report["checks"].append({"seasonScenarios":["normal","tie","first","pending"],"seasonRules":"PASS","winnerDetail":"PASS"})
             for action in ["announcement","season-announcement"]:
                 page.locator('#archiveReviewNotice button').click()
                 page.locator('[data-archive-action="'+action+'"]').click()
                 shot(page,action+"-"+str(width))
                 assert page.locator("#archiveExperienceModal .ax-modal").evaluate("(e)=>e.scrollWidth<=e.clientWidth")
                 page.keyboard.press("Escape")
+            if width==390:
+                # A local presentation fixture through the real Tajenka store; no result submission.
+                tajenka_before=page.evaluate("structuredClone(tajenkaState())")
+                seeded=page.evaluate("""()=>{
+                  if(!tajenkaPuzzle)return false;
+                  const state=tajenkaState(),puzzle=tajenkaPuzzle,completion={puzzleId:puzzle.id,found:puzzle.answers.map((answer,index)=>({answerIndex:index,word:answer.word,path:[...answer.path],colorIndex:index%COLORS.length})),moves:puzzle.answers.length,hints:0,elapsedMs:180000,completedAt:new Date().toISOString(),rewarded:true,rewardXp:Number(puzzle.meta?.rewardXp)||200};
+                  state.version=2;state.completions={...(state.completions||{}),[puzzle.id]:completion};state.completed=completion;delete state.inProgress;saveTajenkaState(state);renderTajenkaEntry();renderFree();return true;
+                }""")
+                if seeded:
+                    for view in ["daily","free"]:
+                        go(page,view);page.wait_for_timeout(250);overflow(page,view+"-tajenka-completed",width)
+                        discovery_audit(page,view,width);shot(page,view+"-tajenka-completed-390")
+                    free_order_audit(page,width)
+                    report["checks"].append({"completedTajenkaPresentation":"PASS"})
+                else:report["checks"].append({"completedTajenkaPresentation":"SKIP: published Tajenka unavailable"})
+                page.evaluate("state=>{saveTajenkaState(state);renderTajenkaEntry();renderFree();}",tajenka_before)
             go(page,"archive")
             page.locator("#axSearch").fill("88");assert page.locator('[data-archive-board="g3-e-088"]').count()==1
             page.locator('[data-archive-board="g3-e-088"]').click()
@@ -176,7 +249,7 @@ try:
                 report["checks"].append({"actualGame":"PASS","resume":"PASS","foldResize":"PASS","xpOnce":"PASS","newerDoesNotBlockHistorical":"PASS","alternativeAndHintRestore":"PASS","modernProgressUnchanged":before})
             if width in [390,690,1440]:
                 page.locator('#archiveReviewNotice button').click();page.locator('[data-archive-action="theme"]').click();page.keyboard.press("Escape")
-                go(page,"daily");shot(page,"daily-dark-"+str(width));go(page,"archive");shot(page,"archive-dark-"+str(width));go(page,"season");shot(page,"season-dark-"+str(width))
+                go(page,"daily");shot(page,"daily-dark-"+str(width));go(page,"free");shot(page,"free-dark-"+str(width));go(page,"archive");shot(page,"archive-dark-"+str(width));go(page,"season");shot(page,"season-dark-"+str(width))
             assert page.evaluate("navigator.serviceWorker.getRegistrations().then(r=>r.length)")==0
             report["checks"].append({"width":width,"result":"PASS"})
             context.close()
@@ -223,3 +296,4 @@ finally:
     (OUT/"report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
     print(json.dumps(report,ensure_ascii=False))
 assert report["result"]=="PASS",report.get("error")
+

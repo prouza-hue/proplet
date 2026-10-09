@@ -248,94 +248,21 @@ html.tiskarna-ui body.archive-experience .ax-rank-row .organic-avatar{width:30px
  html.tiskarna-ui body.archive-experience .ax-archive-heading .archive-art{right:0;width:94px}
  html.tiskarna-ui body.archive-experience .ax-archive-heading h1{font-size:28px!important}
 }
-
-
-/* Discovery cards share the live compact cards' Outfit type, paper, borders and
-   18px corners. One owner for these rules; no modifications to cp-* typography. */
-html.tiskarna-ui .archive-experience .ax-destination{
- --entry-accent:var(--td-blue,#315da8);
- display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;
- gap:12px;width:100%;min-width:0;padding:16px;text-align:left;
- border:1px solid var(--td-line);border-radius:18px;color:var(--td-ink);
- background:linear-gradient(120deg,color-mix(in srgb,var(--entry-accent) 7%,var(--td-paper)),var(--td-paper) 80%);
- font-family:inherit;cursor:pointer;box-shadow:none;
- transition:border-color .15s,background .15s;
-}
-html.tiskarna-ui .archive-experience .ax-destination:hover{border-color:var(--entry-accent)}
-html.tiskarna-ui .archive-experience .ax-destination:active{transform:translateY(1px)}
-html.tiskarna-ui .archive-experience .ax-entry-art{display:grid;place-items:center;width:52px;height:58px;object-fit:contain;min-width:0}
-html.tiskarna-ui .archive-experience .ax-entry-art :is(.archive-art,.medal){width:100%;max-width:100%;height:auto;margin:0}
-html.tiskarna-ui .archive-experience .ax-entry-art .archive-art{width:58px;max-width:none}
-html.tiskarna-ui .archive-experience .ax-entry-copy{min-width:0}
-html.tiskarna-ui .archive-experience .ax-entry-copy h2{font-family:inherit;font-weight:700;font-size:23px;line-height:1.15;margin:0 0 5px;color:var(--td-ink)}
-html.tiskarna-ui .archive-experience .ax-entry-description{display:block;font-size:14px;line-height:1.45;font-weight:500;color:var(--td-muted)}
-html.tiskarna-ui .archive-experience .ax-entry-action{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:32px;font-size:14px;line-height:1.3;font-weight:600;color:var(--entry-accent);white-space:nowrap}
-html.tiskarna-ui .archive-experience .ax-entry-action .ax-icon{width:18px;height:18px}
-html.tiskarna-ui .archive-experience .ax-archive-entry{--entry-accent:var(--ax-rust)}
-html.tiskarna-ui .archive-experience .ax-team-entry{--entry-accent:var(--ax-green)}
-html.tiskarna-ui .archive-experience .ax-month-entry{--entry-accent:var(--ax-plum)}
-html.tiskarna-ui .archive-experience #axHomeGames{margin-top:12px}
-html.tiskarna-ui .archive-experience #axPlayArchive{margin:0 0 14px}
-html.tiskarna-ui .archive-experience .ax-competitions{margin:12px 0}
-html.tiskarna-ui .archive-experience .ax-competition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-html.tiskarna-ui .archive-experience .ax-competition-grid .ax-destination{grid-template-columns:52px minmax(0,1fr);gap:10px 12px}
-html.tiskarna-ui .archive-experience .ax-competition-grid .ax-entry-action{grid-column:2}
-html.tiskarna-ui .archive-experience .ax-competition-grid .ax-entry-art{grid-row:1/3}
-html.tiskarna-ui .archive-experience .ax-competition-grid h2{font-size:21px}
-html.tiskarna-ui .archive-experience .ax-free-entry{grid-template-columns:minmax(0,1fr) auto}
-html.tiskarna-ui .archive-experience .ax-free-art{display:flex;align-items:center;gap:8px}
-html.tiskarna-ui .archive-experience .ax-free-difficulty{display:block;width:40px;height:44px;object-fit:contain}
-html.tiskarna-ui .archive-experience .ax-free-entry .ax-entry-action{grid-column:1/-1;border-top:1px solid var(--td-line);padding-top:10px}
-html.tiskarna-ui .archive-experience #axHomeFree{margin:0}
-/* The weekly release and Archive use the same title baseline on Hrát. */
-html.tiskarna-ui .archive-experience #screen-free .new-content-banner{border-radius:18px;padding:16px;box-shadow:none}
-html.tiskarna-ui .archive-experience #screen-free .new-content-banner h2{font-family:inherit;font-weight:700;font-size:23px;line-height:1.15;margin:0 0 5px}
-html.tiskarna-ui .archive-experience #screen-free .new-content-banner p{font-size:14px!important;line-height:1.45!important}
-html.tiskarna-ui .archive-experience #screen-free .new-content-spark{width:52px;min-width:52px}
 html.tiskarna-ui .archive-experience .ax-back{font-size:14px;min-height:40px;margin-bottom:12px}
 html.tiskarna-ui .archive-experience .ax-filters button{font-size:13px;min-height:44px}
 html.tiskarna-ui .archive-experience .ax-search{min-height:44px}
 html.tiskarna-ui .archive-experience .ax-search input{font-size:14px}
 html.tiskarna-ui .archive-experience .ax-grid-foot button{width:44px;height:44px}
 @media(max-width:599px){
- html.tiskarna-ui .archive-experience .ax-destination{grid-template-columns:46px minmax(0,1fr);padding:14px;gap:10px}
- html.tiskarna-ui .archive-experience .ax-entry-art{width:46px;height:50px}
- html.tiskarna-ui .archive-experience .ax-entry-copy h2{font-size:23px}
- html.tiskarna-ui .archive-experience .ax-entry-description{font-size:14px}
- html.tiskarna-ui .archive-experience .ax-entry-action{grid-column:2}
- html.tiskarna-ui .archive-experience .ax-archive-entry .ax-entry-art{align-self:start}
- html.tiskarna-ui .archive-experience .ax-competition-grid{grid-template-columns:minmax(0,1fr)}
- html.tiskarna-ui .archive-experience .ax-competition-grid .ax-destination{grid-template-columns:46px minmax(0,1fr);gap:8px 10px}
- html.tiskarna-ui .archive-experience .ax-free-entry{grid-template-columns:minmax(0,1fr) auto}
- html.tiskarna-ui .archive-experience .ax-free-art{gap:3px}
- html.tiskarna-ui .archive-experience .ax-free-difficulty{width:29px;height:36px}
- html.tiskarna-ui .archive-experience .ax-free-entry .ax-entry-description{max-width:160px}
- html.tiskarna-ui .archive-experience #screen-free .new-content-banner{padding:14px}
- html.tiskarna-ui .archive-experience #screen-free .new-content-banner h2{font-size:23px}
- html.tiskarna-ui .archive-experience #screen-free .new-content-spark{width:46px;min-width:46px}
 }
-
-html.tiskarna-ui .archive-experience #screen-free .new-content-main{gap:10px}
-html.tiskarna-ui .archive-experience #screen-free .new-content-spark{background:none;padding:0;box-shadow:none}
-html.tiskarna-ui .archive-experience .ax-free-entry .ax-entry-copy{align-self:center}
 html.tiskarna-ui .archive-experience .ax-search{width:150px}
 @media(min-width:521px) and (max-width:767px){
  html.tiskarna-ui .archive-experience .ax-difficulty-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:350px){
- html.tiskarna-ui .archive-experience .ax-entry-copy h2,
- html.tiskarna-ui .archive-experience #screen-free .new-content-banner h2{font-size:19px}
- html.tiskarna-ui .archive-experience .ax-free-difficulty{width:26px}
 }
-
-/* Actual reward art from the production Printshop collection. */
-html.tiskarna-ui .archive-experience .ax-season-medal{position:relative;aspect-ratio:1;isolation:isolate}
-html.tiskarna-ui .archive-experience .ax-season-medal>img{display:block;width:100%;height:100%;object-fit:contain}
-html.tiskarna-ui .archive-experience .ax-medal-edition{position:absolute;left:17%;right:17%;bottom:0;display:block;text-align:center;white-space:nowrap;padding:3px 1px;border:1px solid #ac8746;border-radius:3px;background:#fff0c9;color:#62411e;font:700 clamp(9px,1.3vw,12px)/1.2 Outfit,sans-serif;letter-spacing:.05em;box-shadow:0 2px 3px #30231620}
-html.tiskarna-ui .archive-experience [data-place="2"] .ax-medal-edition{background:#edf0ed;border-color:#929e9a;color:#374744}
-html.tiskarna-ui .archive-experience [data-place="3"] .ax-medal-edition{background:#f5dec9;border-color:#a56d4b;color:#683c27}
-html.tiskarna-ui .archive-experience :is(.ax-entry-art,.ax-ranking-season) .ax-medal-edition{display:none}
 html.tiskarna-ui .archive-experience .ax-prize-grid .medal{width:132px;max-width:100%}
 html.tiskarna-ui .archive-experience .ax-badge-detail .medal{width:200px;margin-bottom:22px}
 html.tiskarna-ui .archive-experience .ax-prize-grid button{padding:10px 3px;gap:12px;border-radius:14px}
 html.tiskarna-ui .archive-experience .ax-prize-grid button:hover{background:color-mix(in srgb,var(--ax-plum-soft) 55%,transparent)}
+

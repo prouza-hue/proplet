@@ -37,6 +37,7 @@ jobs:
           python tools/build_archive_experience.py
           python tools/generate_puzzles_bootstrap.py
           node --check public/app/archive/experience.js
+          node --check public/app/archive/season-view.js
           node --check public/app/archive/solution-contract.js
           node --check public/app/archive/preview-isolation.js
           node --check public/app.js
@@ -65,3 +66,4 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "docs: capture integrated Proplet review"
           git push origin "HEAD:refs/heads/$PREVIEW_BRANCH"
+

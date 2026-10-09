@@ -177,7 +177,9 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
       card.className='card tajenka-preview-card tajenka-play-card hidden';
       screen.appendChild(card);
     }
-    if(screen.lastElementChild!==card)screen.appendChild(card);
+    const archive=window.PROPLET_ARCHIVE_PREVIEW?q('#axPlayArchive'):null;
+    if(archive){if(card.nextElementSibling!==archive)archive.before(card);}
+    else if(screen.lastElementChild!==card)screen.appendChild(card);
     const completed=source.classList.contains('completed'),signature=tajenkaPlaySignature(source);
     if(card.dataset.signature!==signature){
       const phrase=(source.querySelector('.tajenka-revealed-phrase')?.textContent||'').trim();
@@ -360,3 +362,4 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   setTimeout(install,300);
   setTimeout(install,1200);
 })();
+

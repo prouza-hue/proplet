@@ -18,10 +18,7 @@ function archiveArt(){return '<svg class="archive-art" viewBox="0 0 360 260" ari
 
 // Use the production Printshop illustrations, including their original texture,
 // material, lighting and outlines. Month/year is a typeset edition mark.
-function medal(place=1){
- const asset=['medaile','medal-2','medal-3'][place-1];
- return '<span class="medal ax-season-medal" data-place="'+place+'"><img src="/rewards/printshop/'+asset+'.svg" alt="" decoding="async"><span class="ax-medal-edition">XI · 2026</span></span>';
-}
+function medal(place=1,options={}){return window.PropletSeasonView.medal(place,options);}
 
 let installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
 const STORE='archive-experience-v1';
@@ -41,12 +38,18 @@ async function loadBank(){
  if(!loading)loading=fetch('/app/archive/boards.json').then(r=>{if(!r.ok)throw Error('Archiv se nepodařilo načíst.');return r.json()}).then(data=>{bank=data;return data}).catch(e=>{loading=null;throw e});
  return loading;
 }
-function archiveEntry(){return '<button type="button" class="ax-destination ax-archive-entry" data-archive-action="open"><span class="ax-entry-art">'+archiveArt()+'</span><span class="ax-entry-copy"><h2>Archiv Propletu</h2><span class="ax-entry-description">800 původních desek na výběr</span></span><span class="ax-entry-action">Otevřít Archiv '+ico('arrow')+'</span></button>';}
+// One structure for every discovery destination. The action is an actual button;
+// the surrounding article is never a second, ambiguous hit target.
+function destination({id='',kind,title,description,art,action,label}){
+ return '<article '+(id?'id="'+id+'" ':'')+'class="ax-destination ax-'+kind+'-entry"><div class="ax-entry-copy"><h2>'+title+'</h2><p class="ax-entry-description">'+description+'</p></div><div class="ax-entry-art" aria-hidden="true">'+art+'</div><button type="button" class="ax-card-action ax-browse-action" data-archive-action="'+action+'">'+label+' '+ico('arrow')+'</button></article>';
+}
+function archiveEntry(){return destination({kind:'archive',title:'Archiv Propletu',description:'800 původních desek',art:archiveArt(),action:'open',label:'Vybrat archivní desku'});}
 function home(){
  if(!installed)return;
  const root=q('#screen-daily');if(!root)return;
- let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div><button id="axHomeFree" class="ax-destination ax-free-entry" data-archive-action="free"><span class="ax-entry-copy"><h2>Volná hra</h2><span class="ax-entry-description">Všechny obtížnosti a úrovně</span></span><span class="ax-free-art" aria-hidden="true">'+Object.keys(labels).map(diff=>difficultyIconMarkup(diff,'ax-free-difficulty')).join('')+'</span><span class="ax-entry-action">Vybrat hru '+ico('arrow')+'</span></button>';root.append(games);}
- let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid"><button class="ax-destination ax-team-entry" data-archive-action="team"><img class="ax-entry-art" src="/rewards/team-victories/first-imprint.webp" alt=""><span class="ax-entry-copy"><h2>Týdenní soutěž</h2><span class="ax-entry-description">Týmy · společné skóre za tento týden</span></span><span class="ax-entry-action">Pořadí týmů '+ico('arrow')+'</span></button><button class="ax-destination ax-month-entry" data-archive-action="season"><span class="ax-entry-art">'+medal(1)+'</span><span class="ax-entry-copy"><h2>Měsíční soutěž</h2><span class="ax-entry-description">Jednotlivci · 20 nejlepších denních her</span></span><span class="ax-entry-action">Prohlédnout soutěž '+ico('arrow')+'</span></button></div>';root.append(competition);}
+ let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div>';root.append(games);}
+ if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(labels).map(diff=>difficultyIconMarkup(diff,'ax-free-difficulty')).join('')+'</div>',action:'free',label:'Vybrat hru'}));}
+ let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Týmy · společné skóre',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Zobrazit pořadí týmů'})+destination({kind:'month',title:'Měsíční soutěž',description:'Jednotlivci · denní výsledky',art:medal(1,{edition:false}),action:'season',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
  if(archiveResume){if(!resume){resume=document.createElement('button');resume.id='axArchiveResume';resume.className='home-resume-card';root.prepend(resume);}
@@ -59,9 +62,8 @@ function home(){
 function free(){
  if(!installed)return;
  const root=q('#screen-free');if(!root)return;
- // Discovery additions do not add headings, history labels or ordering controls
- // to the canonical difficulty cards. Ordering remains in Settings.
- if(!q('#axPlayArchive')){const el=document.createElement('div');el.id='axPlayArchive';el.innerHTML=archiveEntry();root.prepend(el);}
+ // Order is intentional: fresh content, current difficulties, Tajenka, Archive.
+ if(!q('#axPlayArchive')){const el=document.createElement('div');el.id='axPlayArchive';el.innerHTML=archiveEntry();root.append(el);}
  all('#difficultyCards .cp-action-row').forEach(row=>{const play=row.querySelector('.cp-play');if(play)row.replaceWith(play);});
 }
 function seed(){
@@ -151,11 +153,9 @@ function announcement(){
 }
 function rewardRules(){modal('<h2 id="axModalTitle">Staré desky.<br>Férové odměny.</h2><ol class="ax-rules"><li><b>Odměna patří k historické úrovni.</b> Starší verze stejného čísla a obtížnosti sdílejí jednu odměnu.</li><li><b>Novější desky ji neblokují.</b> Pokud jsi starou odměnu nezískal, v Archivu na tebe pořád čeká.</li><li><b>Už připsané XP dostaneš jen jednou.</b> Fajfka u čísla zvlášť označuje, že jsi hrál právě tuto desku.</li></ol><button class="primary-btn big" data-archive-action="close">Rozumím</button>');}
 function seasonAnnouncement(){modal('<h2 id="axModalTitle">Nový měsíc.<br>Nová šance.</h2><p class="ax-cta-copy">V měsíční soutěži <strong>začínáme od nuly.</strong><br>Tvůj měsíc může přijít právě teď.</p><div class="ax-medal-trio">'+medal(2)+medal(1)+medal(3)+'</div><div class="ax-cta-facts"><span><b>20</b>nejlepších denních her</span><span><b>3</b>vítězné příčky</span><span><b>1</b>nový začátek každý měsíc</span></div><p class="ax-cta-note">100 bodů za Denní výzvu, dalších 20 bez nápovědy.<br>Rozhodují body, ne rychlost.</p><button class="primary-btn big ax-cta-primary" data-archive-action="season">Prohlédnout soutěž →</button><button class="text-btn ax-cta-secondary" data-archive-action="season-rules">Nejdřív si přečtu pravidla</button>','ax-announcement ax-season-announcement');}
-function renderSeason(){
- q('#screen-season').innerHTML='<button class="ax-back" data-archive-action="rankings">'+ico('back')+' Zpět do Pořadí</button><div class="ax-season-heading"><div><h1>Měsíční soutěž</h1><p>Listopad 2026</p><span>20 nejlepších denních her · ukázkové výsledky</span></div>'+medal(1)+'</div><div class="ax-season-stats"><div><small>Tvoje příčka</small><strong>4.<span> místo</span></strong><p>120 bodů od bronzu</p></div><div><small>Tvoje skóre</small><strong>1 360<span> b.</span></strong><p>Maximum 2 400 bodů</p></div><div><small>Započtené dny</small><strong>12<span> / 20</span></strong><div class="ax-season-track"><i></i></div></div></div><div class="ax-season-next"><div><b>Další šance je v Denní výzvě.</b><span>Započítá se tvých 20 nejlepších dní. Vynechaný den tě nemusí vyřadit.</span></div><button class="primary-btn" data-archive-action="daily">Na Denní výzvu →</button></div><section class="ax-season-table"><div class="ax-section-head"><h2>Pořadí</h2><button data-archive-action="season-rules">'+ico('info')+' Pravidla</button></div>'+[['1','🦊','Lukáš','1 660'],['2','🌺','Klára','1 580'],['3','🐉','Matěj','1 480'],['4','🦊','Alex','1 360'],['5','🦉','Eliška','1 320']].map(([pos,av,name,pts])=>'<div class="ax-rank-row '+(pos==='4'?'ax-mine':'')+'"><span>'+pos+'.</span><i data-player-avatar="'+av+'">'+av+'</i><strong>'+name+(pos==='4'?'<small>ty</small>':'')+'</strong><b>'+pts+' <small>b.</small></b></div>').join('')+'</section><section class="ax-prizes"><h2>Odznaky za listopad</h2><p>Odznak s měsícem a rokem zůstane v tvém profilu. Při shodě bodů se o příčku podělíte.</p><div class="ax-prize-grid">'+[1,2,3].map(p=>'<button data-archive-badge="'+p+'">'+medal(p)+'<strong>'+['Vládce listopadu','Stříbrný listopad','Bronzový listopad'][p-1]+'</strong><span>2026 · '+p+'. příčka</span></button>').join('')+'</div></section><p class="ax-review-caption">Ukázka vzhledu a pravidel. Měsíční soutěž zatím nebyla spuštěna.</p>';
-}
-function seasonRules(){modal('<h2 id="axModalTitle">Stejná šance.<br>Každý měsíc.</h2><ol class="ax-rules"><li><b>Denní výzva v den zveřejnění.</b> Jedna stejná deska pro všechny. Archiv ani celkové XP měsíční pořadí neovlivní.</li><li><b>100 bodů za dokončení, +20 bez nápovědy.</b> Rozhoduje první platné dokončení. Rychlost není součást skóre.</li><li><b>Nejlepších 20 dní.</b> Maximum 2 400 bodů. Další povedený den může nahradit slabší výsledek.</li><li><b>Stejné body znamenají stejné místo.</b> Například 1., 1., 3. Odznak získá každý na příčce 1–3, bez dalších XP.</li><li><b>Kalendářní měsíc podle času v Praze.</b> Po skončení ještě 48 hodin na kontrolu a reklamace, pak trvalé odznaky do profilu.</li></ol><button class="primary-btn big" data-archive-action="close">Rozumím</button>');}
-function review(){modal('<h2 id="axModalTitle">Vyzkoušej celý Proplet.</h2><p class="muted">Tohle je skutečná aplikace z main s integrovaným návrhem. Hraní i pokračování fungují. Postup a výsledky zůstávají v tomto testovacím zařízení.</p><div class="ax-review-buttons"><button class="secondary-btn" data-archive-action="announcement">Úvodní CTA Archivu</button><button class="secondary-btn" data-archive-action="season-announcement">Úvodní CTA soutěže</button><button class="secondary-btn" data-archive-action="theme">Světlý / tmavý vzhled</button><button class="secondary-btn" data-archive-action="demo-resume">Ukázat rozehranou hru</button><button class="secondary-btn" data-archive-action="demo-clear-resume">Skrýt rozehrané ukázky</button></div><p class="ax-review-caption">Archiv: 800 původních desek. Soutěž: modelový listopad, bez určeného termínu spuštění.</p>');}
+function renderSeason(){q('#screen-season').innerHTML=window.PropletSeasonView.markup();}
+function seasonRules(){modal(window.PropletSeasonView.rules(),'sv-rules-modal');}
+function review(){modal('<h2 id="axModalTitle">Vyzkoušej celý Proplet.</h2><p class="muted">Tohle je skutečná aplikace z main s integrovaným návrhem. Hraní i pokračování fungují. Postup a výsledky zůstávají v tomto testovacím zařízení.</p><div class="ax-review-buttons"><button class="secondary-btn" data-archive-action="announcement">Úvodní CTA Archivu</button><button class="secondary-btn" data-archive-action="season-announcement">Úvodní CTA soutěže</button><button class="secondary-btn" data-archive-action="theme">Světlý / tmavý vzhled</button><button class="secondary-btn" data-archive-action="demo-resume">Ukázat rozehranou hru</button><button class="secondary-btn" data-archive-action="demo-clear-resume">Skrýt rozehrané ukázky</button><button class="secondary-btn" data-season-scenario="normal">Pódium: běžný měsíc</button><button class="secondary-btn" data-season-scenario="tie">Pódium: společné první místo</button><button class="secondary-btn" data-season-scenario="first">Pódium: první sezóna</button><button class="secondary-btn" data-season-scenario="pending">Pódium: kontrola výsledků</button></div><p class="ax-review-caption">Archiv: 800 původních desek. Soutěž: modelový listopad, bez určeného termínu spuštění.</p>');}
 async function onClick(e){
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.archiveDiff){archiveState.diff=b.dataset.archiveDiff;archiveState.page=0;renderArchive();return;}
@@ -163,6 +163,8 @@ async function onClick(e){
  if(b.dataset.archivePage){archiveState.page+=Number(b.dataset.archivePage);renderGrid();return;}
  if(b.dataset.archiveBoard){detail(b.dataset.archiveBoard);return;}
  if(b.dataset.archiveStart){start(b.dataset.archiveStart).catch(e=>showToast(e.message));return;}
+ if(b.dataset.seasonWinners){modal(window.PropletSeasonView.winnerDetail(Number(b.dataset.seasonWinners)),'sv-winners-modal');return;}
+ if(b.dataset.seasonScenario){window.PropletSeasonView.setScenario(b.dataset.seasonScenario);closeModal();nav('season');renderSeason();return;}
  if(b.dataset.archiveBadge){const p=Number(b.dataset.archiveBadge);modal('<div class="ax-badge-detail">'+medal(p)+'<h2 id="axModalTitle">'+['Vládce listopadu','Stříbrný listopad','Bronzový listopad'][p-1]+'</h2><p>Listopad 2026 · '+p+'. příčka</p><p class="muted">Trvalý odznak za umístění v měsíční soutěži.</p></div><button class="primary-btn big" data-archive-action="close">Zpět do soutěže</button>');return;}
  const action=b.dataset.archiveAction;if(!action)return;e.preventDefault();
  if(action==='close'){closeModal();return}
@@ -178,3 +180,4 @@ async function onClick(e){
 }
 window.PropletArchiveExperience={install,home,free,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
 })();
+
