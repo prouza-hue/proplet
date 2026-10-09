@@ -1,0 +1,131 @@
+/* One printshop visual vocabulary, from the podium to the smallest edition mark. */
+html.tiskarna-ui body.archive-experience .sv-medal.medal{display:block;flex:none;width:100px;max-width:100%;height:auto;overflow:visible;aspect-ratio:8/9}
+html.tiskarna-ui body.archive-experience .ax-medal-trio .sv-medal.medal{width:min(27%,92px)}
+html.tiskarna-ui body.archive-experience .ax-medal-trio .sv-medal.medal:nth-child(2){width:min(34%,116px)}
+html.tiskarna-ui body.archive-experience .ax-badge-detail .sv-medal.medal{width:190px;margin:0 auto 20px}
+html.tiskarna-ui body.archive-experience .sv-page{--sv-surface:var(--td-paper,#fffaf0);--sv-edge:var(--td-line,#ded7c5);--sv-gold:#9b7429;--sv-bronze:#a56b43;--sv-silver:#708075;color:var(--td-ink,#253326)}
+html.tiskarna-ui body.archive-experience .sv-page-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px}
+html.tiskarna-ui body.archive-experience :is(.sv-back,.sv-rules-link){min-height:44px;padding:6px 0;border:0;background:none;color:var(--td-muted,#696f61);font:600 14px/1.3 Outfit,sans-serif;cursor:pointer}
+html.tiskarna-ui body.archive-experience .sv-back{display:flex;align-items:center;gap:8px;text-align:left}
+html.tiskarna-ui body.archive-experience .sv-back>span{font-size:21px;line-height:1}
+html.tiskarna-ui body.archive-experience .sv-rules-link{text-decoration:underline;text-underline-offset:4px}
+html.tiskarna-ui body.archive-experience .sv-page-title{margin:0 0 22px;font:700 clamp(25px,5vw,32px)/1.15 Outfit,sans-serif;color:var(--td-ink)}
+html.tiskarna-ui body.archive-experience .sv-honours{position:relative;margin:0 0 24px;padding:24px 20px 0;overflow:hidden;border:1px solid var(--sv-edge);border-radius:20px;background:linear-gradient(160deg,color-mix(in srgb,var(--sv-surface) 77%,#dcb872 23%),var(--sv-surface) 57%);box-shadow:0 3px 0 color-mix(in srgb,var(--sv-edge) 55%,transparent)}
+html.tiskarna-ui body.archive-experience .sv-honours-heading{text-align:center;margin:0 0 24px}
+html.tiskarna-ui body.archive-experience .sv-period{margin:0 0 7px;font:600 15px/1.4 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-honours-heading h2{margin:0;font:650 clamp(27px,5.5vw,38px)/1.12 Fraunces,Georgia,serif;color:var(--td-ink)}
+html.tiskarna-ui body.archive-experience .sv-preview-label{margin:9px 0 0;font:500 12px/1.4 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-podium{display:grid;grid-template-columns:1fr 1.16fr 1fr;align-items:end;gap:10px;max-width:580px;margin:0 auto}
+html.tiskarna-ui body.archive-experience .sv-winner{--sv-tone:var(--sv-gold);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0;margin:0;padding:0;border:0;background:none;color:var(--td-ink);font-family:Outfit,sans-serif;text-align:center;cursor:pointer;transition:filter .15s}
+html.tiskarna-ui body.archive-experience .sv-winner--2{--sv-tone:var(--sv-silver)}
+html.tiskarna-ui body.archive-experience .sv-winner--3{--sv-tone:var(--sv-bronze)}
+html.tiskarna-ui body.archive-experience .sv-winner:hover{filter:brightness(1.04)}
+html.tiskarna-ui body.archive-experience .sv-winner-portraits{display:flex;justify-content:center;align-items:center;min-height:56px;margin-bottom:10px}
+html.tiskarna-ui body.archive-experience .sv-avatar{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;line-height:1;font-size:28px;font-style:normal;vertical-align:middle;overflow:hidden}
+html.tiskarna-ui body.archive-experience .sv-avatar :is(img,.organic-avatar){display:block;width:100%;height:100%;object-fit:contain}
+html.tiskarna-ui body.archive-experience .sv-winner-portraits>.sv-avatar{width:54px;height:54px;font-size:42px;outline:2px solid var(--sv-surface);box-shadow:0 2px 7px #25332616}
+html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-winner-portraits>.sv-avatar{width:66px;height:66px;font-size:52px}
+html.tiskarna-ui body.archive-experience .sv-winner-name{display:block;max-width:100%;min-width:0;margin:0;font:700 18px/1.22 Outfit,sans-serif;overflow-wrap:anywhere}
+html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-winner-name{font-size:21px}
+html.tiskarna-ui body.archive-experience .sv-winner-score{display:block;margin:5px 0 13px;font:500 13px/1.35 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:var(--td-muted);white-space:nowrap}
+html.tiskarna-ui body.archive-experience .sv-plinth{display:flex;align-items:center;justify-content:flex-start;flex-direction:column;gap:3px;width:100%;min-height:140px;padding:10px 5px 13px;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--sv-tone) 28%,var(--sv-surface));border-bottom:0;border-radius:12px 12px 0 0;background:linear-gradient(180deg,color-mix(in srgb,var(--sv-tone) 14%,var(--sv-surface)),color-mix(in srgb,var(--sv-tone) 5%,var(--sv-surface)));box-shadow:inset 0 2px #ffffff65}
+html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-plinth{min-height:168px;padding-top:13px}
+html.tiskarna-ui body.archive-experience .sv-winner--3 .sv-plinth{min-height:128px}
+html.tiskarna-ui body.archive-experience .sv-plinth .sv-medal{width:87px}
+html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-plinth .sv-medal{width:102px}
+html.tiskarna-ui body.archive-experience .sv-place{font:650 13px/1.3 Outfit,sans-serif;color:var(--td-ink)}
+html.tiskarna-ui body.archive-experience .sv-podium--two{grid-template-columns:1.1fr 1fr;max-width:450px;gap:18px}
+html.tiskarna-ui body.archive-experience .sv-winner--shared .sv-winner-portraits>.sv-avatar{width:52px;height:52px;font-size:40px}
+html.tiskarna-ui body.archive-experience .sv-winner--shared .sv-winner-portraits>.sv-avatar+.sv-avatar{margin-left:-8px}
+html.tiskarna-ui body.archive-experience .sv-winner--shared .sv-winner-name{font-size:17px;max-width:190px}
+html.tiskarna-ui body.archive-experience .sv-name-divider{font-weight:500}
+html.tiskarna-ui body.archive-experience :is(.sv-tie-note,.sv-pending-note){margin:0 -20px;padding:13px 18px;border-top:1px solid var(--sv-edge);background:var(--sv-surface);text-align:center;color:var(--td-muted);font:500 14px/1.4 Outfit,sans-serif}
+html.tiskarna-ui body.archive-experience .sv-current{margin:0 0 30px;padding:20px;border:1px solid var(--sv-edge);border-radius:18px;background:var(--sv-surface)}
+html.tiskarna-ui body.archive-experience .sv-section-heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0}
+html.tiskarna-ui body.archive-experience .sv-section-heading h2{margin:0;font:700 21px/1.2 Outfit,sans-serif;color:var(--td-ink)}
+html.tiskarna-ui body.archive-experience .sv-section-heading>span{flex:none;font:500 13px/1.35 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:21px 0 20px}
+html.tiskarna-ui body.archive-experience .sv-stats>div{min-width:0;padding-left:15px;border-left:1px solid var(--sv-edge)}
+html.tiskarna-ui body.archive-experience .sv-stats>div:first-child{padding-left:0;border:0}
+html.tiskarna-ui body.archive-experience .sv-stats dt{margin:0 0 5px;font:500 14px/1.35 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-stats dd{margin:0;font:700 clamp(23px,4vw,29px)/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ax-plum,#644362)}
+html.tiskarna-ui body.archive-experience .sv-stats dd small{font:500 12px/1.2 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-play{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:48px;padding:11px 16px;font:600 16px/1.35 Outfit,sans-serif;border-radius:11px}
+html.tiskarna-ui body.archive-experience .sv-ranking{margin-bottom:32px}
+html.tiskarna-ui body.archive-experience .sv-ranking-note{margin:9px 0 17px;font:500 14px/1.5 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-rank-list{list-style:none;padding:0;margin:0}
+html.tiskarna-ui body.archive-experience .sv-rank-row{display:grid;grid-template-columns:25px 38px minmax(0,1fr) auto;align-items:center;gap:12px;min-height:69px;padding:11px 12px;box-sizing:border-box;border-bottom:1px solid var(--sv-edge)}
+html.tiskarna-ui body.archive-experience .sv-rank-position{font:500 15px/1.3 Outfit,sans-serif;color:var(--td-muted);font-variant-numeric:tabular-nums}
+html.tiskarna-ui body.archive-experience .sv-rank-row>strong{font:600 17px/1.35 Outfit,sans-serif;min-width:0;overflow-wrap:anywhere}
+html.tiskarna-ui body.archive-experience .sv-rank-score{font:700 17px/1.3 Outfit,sans-serif;white-space:nowrap;font-variant-numeric:tabular-nums}
+html.tiskarna-ui body.archive-experience .sv-rank-score small{font-size:12px;font-weight:500;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-rank-row--mine{border:1px solid color-mix(in srgb,var(--ax-plum) 30%,var(--sv-surface));border-radius:12px;background:var(--ax-plum-soft,#eee5ed);margin:5px 0}
+html.tiskarna-ui body.archive-experience .sv-you{display:inline-block;margin-left:7px;padding:2px 5px;border-radius:4px;background:var(--sv-surface);font:500 11px/1.2 Outfit,sans-serif;color:var(--td-muted);vertical-align:middle}
+html.tiskarna-ui body.archive-experience .sv-prizes{padding:23px 0 0;border-top:1px solid var(--sv-edge)}
+html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:17px 0 0}
+html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid>button{min-width:0;padding:8px 4px 12px;gap:8px;border-radius:12px}
+html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid .sv-medal{width:112px;max-width:100%;margin:0}
+html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid strong{display:block;font:650 16px/1.25 Outfit,sans-serif;color:var(--td-ink);overflow-wrap:anywhere}
+html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid button>span{font:500 12px/1.35 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience :is(.sv-prize-note,.sv-first-note){margin:12px 0 0;text-align:center;font:500 14px/1.5 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-honours--first{padding-bottom:23px}
+html.tiskarna-ui body.archive-experience .sv-honours--first .sv-prize-grid{margin-top:0}
+html.tiskarna-ui body.archive-experience .sv-demo-note{margin:28px 0 6px;text-align:center;font:500 12px/1.5 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience #archiveExperienceModal .sv-rules h2{margin:0 28px 25px 0;font:700 25px/1.15 Outfit,sans-serif}
+html.tiskarna-ui body.archive-experience .sv-rules ol{padding-left:23px;margin:0 0 22px}
+html.tiskarna-ui body.archive-experience .sv-rules li{padding-left:4px;margin:0 0 22px;font:500 16px/1.5 Outfit,sans-serif}
+html.tiskarna-ui body.archive-experience .sv-rules li::marker{color:var(--td-muted);font-weight:500}
+html.tiskarna-ui body.archive-experience .sv-rules li strong{font-weight:700}
+html.tiskarna-ui body.archive-experience .sv-rules li p{margin:5px 0 0;font:500 15px/1.5 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-rules-note{margin:0 0 24px;padding-top:15px;border-top:1px solid var(--td-line);font:500 14px/1.5 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-winner-detail{text-align:center}
+html.tiskarna-ui body.archive-experience .sv-winner-detail>.sv-medal{width:180px;margin:0 auto 18px}
+html.tiskarna-ui body.archive-experience #archiveExperienceModal .sv-winner-detail h2{margin:0;font:700 27px/1.2 Outfit,sans-serif}
+html.tiskarna-ui body.archive-experience .sv-detail-period{margin:8px 0 23px;font:500 15px/1.4 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-detail-players{list-style:none;padding:0;margin:0;text-align:left}
+html.tiskarna-ui body.archive-experience .sv-detail-players li{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--td-line)}
+html.tiskarna-ui body.archive-experience .sv-detail-players strong{font:600 17px/1.3 Outfit,sans-serif;overflow-wrap:anywhere}
+html.tiskarna-ui body.archive-experience .sv-detail-players li>span:last-child{font:600 15px/1.3 Outfit,sans-serif;white-space:nowrap}
+html.tiskarna-ui body.archive-experience .sv-detail-note{font:500 15px/1.5 Outfit,sans-serif;color:var(--td-muted)}
+html.tiskarna-ui body.archive-experience .sv-winner-detail>.sv-preview-label{margin-bottom:24px}
+html[data-theme="dark"].tiskarna-ui body.archive-experience .sv-page{--sv-gold:#c6a768;--sv-silver:#a4b6a9;--sv-bronze:#c49878}
+html[data-theme="dark"].tiskarna-ui body.archive-experience .sv-plinth{box-shadow:inset 0 2px #ffffff12}
+@media(max-width:420px){
+ html.tiskarna-ui body.archive-experience .sv-page-nav{margin-bottom:13px}
+ html.tiskarna-ui body.archive-experience .sv-page-title{margin-bottom:18px}
+ html.tiskarna-ui body.archive-experience .sv-honours{padding:21px 13px 0}
+ html.tiskarna-ui body.archive-experience .sv-honours-heading{margin-bottom:21px}
+ html.tiskarna-ui body.archive-experience .sv-podium{gap:7px}
+ html.tiskarna-ui body.archive-experience .sv-winner-portraits>.sv-avatar{width:44px;height:44px;font-size:36px}
+ html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-winner-portraits>.sv-avatar{width:56px;height:56px;font-size:44px}
+ html.tiskarna-ui body.archive-experience .sv-winner-name{font-size:16px}
+ html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-winner-name{font-size:18px}
+ html.tiskarna-ui body.archive-experience .sv-winner-score{font-size:12px}
+ html.tiskarna-ui body.archive-experience .sv-plinth{min-height:124px;padding:9px 4px 12px}
+ html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-plinth{min-height:151px;padding-top:12px}
+ html.tiskarna-ui body.archive-experience .sv-winner--3 .sv-plinth{min-height:113px}
+ html.tiskarna-ui body.archive-experience .sv-plinth .sv-medal{width:72px}
+ html.tiskarna-ui body.archive-experience .sv-winner--1 .sv-plinth .sv-medal{width:86px}
+ html.tiskarna-ui body.archive-experience .sv-place{font-size:12px}
+ html.tiskarna-ui body.archive-experience :is(.sv-tie-note,.sv-pending-note){margin-inline:-13px}
+ html.tiskarna-ui body.archive-experience .sv-current{padding:18px 15px}
+ html.tiskarna-ui body.archive-experience .sv-section-heading h2{font-size:20px}
+ html.tiskarna-ui body.archive-experience .sv-section-heading>span{font-size:12px}
+ html.tiskarna-ui body.archive-experience .sv-stats{gap:8px}
+ html.tiskarna-ui body.archive-experience .sv-stats>div{padding-left:9px}
+ html.tiskarna-ui body.archive-experience .sv-stats dt{font-size:13px}
+ html.tiskarna-ui body.archive-experience .sv-stats dd{font-size:24px}
+ html.tiskarna-ui body.archive-experience .sv-stats dd small{font-size:11px}
+ html.tiskarna-ui body.archive-experience .sv-rank-row{gap:9px;padding-inline:7px;grid-template-columns:21px 36px minmax(0,1fr) auto}
+ html.tiskarna-ui body.archive-experience .sv-rank-row>.sv-avatar{width:36px;height:36px}
+ html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid strong{font-size:14px}
+ html.tiskarna-ui body.archive-experience .sv-honours--first{padding-bottom:21px}
+ html.tiskarna-ui body.archive-experience .sv-podium--two{gap:15px}
+ html.tiskarna-ui body.archive-experience .sv-winner--shared .sv-winner-name{font-size:16px}
+ html.tiskarna-ui body.archive-experience .sv-winner--shared .sv-winner-portraits>.sv-avatar{width:45px;height:45px;font-size:36px}
+}
+@media(prefers-reduced-motion:reduce){html.tiskarna-ui body.archive-experience .sv-winner{transition:none}}
+
+html.tiskarna-ui body.archive-experience .ax-season-announcement .ax-cta-facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+html.tiskarna-ui body.archive-experience .ax-season-announcement .ax-cta-facts>span{font-size:13px;line-height:1.4}
+html.tiskarna-ui body.archive-experience .sv-prize-grid.ax-prize-grid strong{min-height:2.5em}

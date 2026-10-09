@@ -391,7 +391,7 @@
             const exact=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word&&samePath(a.path,g.path));
             const sameWord=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word);
             const foundAlready=g.found.some(f=>f.word===word);
-            if(exact<0&&sameWord<0&&!foundAlready&&!explainedWords.has(normalize(word))){
+            if(exact<0&&sameWord<0&&!foundAlready&&!window.PropletArchiveExperience?.isTarget(g,word)&&!explainedWords.has(normalize(word))){
               candidate={
                 game:g,
                 word,

@@ -1,0 +1,268 @@
+/* Integrated with Proplet's canonical printshop tokens. */
+html[data-archive-preview]{--ax-rust:#8d4d31;--ax-rust-soft:#f3e8d6;--ax-plum:#644362;--ax-plum-soft:#eee5ed;--ax-green:#365e4a}
+html[data-archive-preview][data-theme="dark"]{--ax-rust:#dfb28d;--ax-rust-soft:#3b342c;--ax-plum:#debfdf;--ax-plum-soft:#383043;--ax-green:#a8c8af}
+#archiveReviewNotice{display:flex;justify-content:center;align-items:center;gap:12px;padding:6px 14px;background:var(--td-ink,#202b39);color:var(--td-paper,#fffcf5);font:11px/1.4 Outfit,sans-serif;position:relative;z-index:2}
+#archiveReviewNotice button{font:inherit;color:inherit;background:none;border:0;padding:3px 0;border-bottom:1px solid currentColor;cursor:pointer;white-space:nowrap}
+body.playing #archiveReviewNotice{display:none}
+html.tiskarna-ui .archive-experience .ax-icon{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+html.tiskarna-ui .archive-experience .archive-art{display:block;width:230px;max-width:42%;height:auto;flex:none}
+html.tiskarna-ui .archive-experience .medal{display:block;width:100px;height:auto;flex:none}
+html.tiskarna-ui .archive-experience #quickPlayCard,html.tiskarna-ui .archive-experience #homeCompetitionCard{display:none!important}
+html.tiskarna-ui .archive-experience #screen-daily>*,html.tiskarna-ui .archive-experience #screen-free>*{min-width:0}
+html.tiskarna-ui .archive-experience .ax-section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 12px}
+html.tiskarna-ui .archive-experience .ax-section-head h2{font:650 20px/1.2 Outfit,sans-serif;letter-spacing:-.35px;margin:0}
+html.tiskarna-ui .archive-experience .ax-section-head>span{font-size:11px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience #screen-free .screen-title{margin-bottom:16px}
+html.tiskarna-ui .archive-experience .ax-back{display:flex;align-items:center;gap:7px;border:0;background:none;color:var(--td-muted);font:500 12px Outfit,sans-serif;padding:0;margin:6px 0 20px;cursor:pointer}
+html.tiskarna-ui .archive-experience .ax-back .ax-icon{width:16px;height:16px}
+html.tiskarna-ui .archive-experience .ax-archive-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
+html.tiskarna-ui .archive-experience .ax-archive-heading h1{font:700 clamp(32px,5vw,43px)/1.05 Outfit,sans-serif;letter-spacing:-1.25px;color:var(--ax-rust);margin:0 0 12px}
+html.tiskarna-ui .archive-experience .ax-archive-heading p{font-size:15px;line-height:1.55;max-width:315px;margin:0 0 12px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-archive-heading span{font-size:10px;font-weight:600;letter-spacing:.4px;color:var(--ax-rust)}
+html.tiskarna-ui .archive-experience .ax-archive-heading .archive-art{width:220px;max-width:40%;margin-right:-10px}
+html.tiskarna-ui .archive-experience .ax-archive-note{display:flex;justify-content:space-between;align-items:center;gap:14px;border-block:1px solid var(--td-line);padding:14px 0;margin:0 0 22px}
+html.tiskarna-ui .archive-experience .ax-archive-note p{font-size:12px;line-height:1.5;color:var(--td-muted);margin:0;max-width:355px}
+html.tiskarna-ui .archive-experience .ax-archive-note button{display:flex;align-items:center;gap:6px;font:600 11px Outfit,sans-serif;white-space:nowrap;background:none;border:0;color:var(--ax-rust);cursor:pointer;padding:5px 0}
+html.tiskarna-ui .archive-experience .ax-archive-note .ax-icon{width:15px;height:15px}
+html.tiskarna-ui .archive-experience .ax-difficulty-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:25px}
+html.tiskarna-ui .archive-experience .ax-difficulty-tabs button{display:flex;align-items:center;justify-content:center;gap:8px;text-align:left;padding:13px 7px;background:var(--td-paper);border:1px solid var(--td-line);border-radius:10px;cursor:pointer;color:var(--td-ink)}
+html.tiskarna-ui .archive-experience .ax-difficulty-tabs button[aria-pressed="true"]{background:var(--ax-rust-soft);border-color:var(--ax-rust);box-shadow:inset 0 -2px var(--ax-rust)}
+html.tiskarna-ui .archive-experience .ax-difficulty-art{width:30px;height:30px;object-fit:contain}
+html.tiskarna-ui .archive-experience .ax-difficulty-tabs strong{font-size:14px;display:block}
+html.tiskarna-ui .archive-experience .ax-difficulty-tabs small{font-size:12px;color:var(--td-muted);display:block;margin-top:4px;white-space:nowrap}
+html.tiskarna-ui .archive-experience .ax-collection-title{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;gap:10px}
+html.tiskarna-ui .archive-experience .ax-collection-title h2{font:650 22px Outfit,sans-serif;letter-spacing:-.5px;margin:0}
+html.tiskarna-ui .archive-experience .ax-collection-title>span{font-size:11px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-filter-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}
+html.tiskarna-ui .archive-experience .ax-filters{display:flex;gap:3px}
+html.tiskarna-ui .archive-experience .ax-filters button{border:0;background:none;border-radius:6px;padding:7px 9px;font:500 11px Outfit,sans-serif;color:var(--td-muted);cursor:pointer;white-space:nowrap}
+html.tiskarna-ui .archive-experience .ax-filters button[aria-pressed="true"]{background:var(--td-ink);color:var(--td-paper)}
+html.tiskarna-ui .archive-experience .ax-search{display:flex;align-items:center;gap:6px;border:1px solid var(--td-line);background:var(--td-paper);border-radius:7px;padding:6px 8px;width:132px;margin:0}
+html.tiskarna-ui .archive-experience .ax-search .ax-icon{width:15px;height:15px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-search input{min-width:0;width:100%;border:0!important;background:transparent!important;padding:0!important;color:var(--td-ink);font:12px Outfit,sans-serif;outline:none}
+html.tiskarna-ui .archive-experience .ax-board-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+html.tiskarna-ui .archive-experience .ax-board{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:73px;padding:12px 4px;background:var(--td-paper);border:1px solid #d8bfa2;border-bottom-width:3px;border-radius:9px;color:var(--td-ink);cursor:pointer;transition:transform .15s,border-color .15s}
+html.tiskarna-ui .archive-experience .ax-board strong{font:650 22px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums}
+html.tiskarna-ui .archive-experience .ax-board>span{font-size:11px;color:var(--ax-rust);white-space:nowrap}
+html.tiskarna-ui .archive-experience .ax-board.ax-paid{background:color-mix(in srgb,var(--td-paper) 60%,var(--td-line));border-color:var(--td-line)}
+html.tiskarna-ui .archive-experience .ax-board.ax-paid>span{color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-board:hover{transform:translateY(-2px);border-color:var(--ax-rust)}
+html.tiskarna-ui .archive-experience .ax-board i{position:absolute;top:4px;right:4px;color:var(--ax-green)}
+html.tiskarna-ui .archive-experience .ax-board i .ax-icon{width:13px;height:13px}
+html.tiskarna-ui .archive-experience .ax-progress-dot{width:6px;height:6px;background:var(--td-blue);border-radius:50%}
+html.tiskarna-ui .archive-experience .ax-grid-foot{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--td-muted);padding:17px 0 12px}
+html.tiskarna-ui .archive-experience .ax-grid-foot>div{display:flex;gap:12px;align-items:center}
+html.tiskarna-ui .archive-experience .ax-grid-foot button{width:31px;height:31px;display:grid;place-items:center;color:var(--td-ink);background:var(--td-paper);border:1px solid var(--td-line);border-radius:7px;cursor:pointer}
+html.tiskarna-ui .archive-experience .ax-grid-foot button:disabled{opacity:.3;cursor:default}
+html.tiskarna-ui .archive-experience .ax-grid-foot .ax-icon{width:15px;height:15px}
+html.tiskarna-ui .archive-experience .ax-legend{font-size:10px;line-height:1.5;color:var(--td-muted);margin:0 0 25px}
+html.tiskarna-ui .archive-experience .ax-legend span{margin:0 8px}
+html.tiskarna-ui .archive-experience .ax-history-note{border-top:1px solid var(--td-line);padding:19px 0 10px}
+html.tiskarna-ui .archive-experience .ax-history-note h3{font:600 16px Outfit,sans-serif;color:var(--ax-rust);margin:0 0 6px}
+html.tiskarna-ui .archive-experience .ax-history-note p{font-size:12px;line-height:1.6;color:var(--td-muted);max-width:510px;margin:0}
+html.tiskarna-ui .archive-experience .ax-empty{grid-column:1/-1;text-align:center;padding:25px;color:var(--td-muted)}
+html.tiskarna-ui #archiveExperienceModal{z-index:1200;padding:20px;background:#15212691;backdrop-filter:blur(5px)}
+html.tiskarna-ui #archiveExperienceModal .ax-modal{position:relative;max-width:450px;width:100%;max-height:calc(100dvh - 40px);overflow:auto;border-radius:20px!important;padding:34px 27px 25px!important;background:var(--td-paper)!important;color:var(--td-ink);border:1px solid var(--td-line)!important;box-shadow:0 18px 80px #0b172336!important}
+html.tiskarna-ui #archiveExperienceModal .modal-close{position:absolute;right:13px;top:13px;background:transparent!important;border:0!important;box-shadow:none!important;width:29px;height:29px;padding:4px;color:var(--td-muted);display:grid;place-items:center}
+html.tiskarna-ui #archiveExperienceModal h2{font:650 30px/1.1 Fraunces,Georgia,serif;letter-spacing:-.75px;margin:6px 0 18px}
+html.tiskarna-ui #archiveExperienceModal .primary-btn.big{width:100%;margin-top:10px}
+html.tiskarna-ui .archive-experience .ax-rules{padding-left:20px;margin:0 0 22px;display:grid;gap:14px;font-size:13px;line-height:1.6;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-rules b{display:block;color:var(--td-ink);font-weight:600}
+html.tiskarna-ui .archive-experience .ax-detail-heading{display:flex;gap:14px;align-items:center;margin:9px 0 23px}
+html.tiskarna-ui .archive-experience .ax-detail-art{width:55px;height:55px}
+html.tiskarna-ui #archiveExperienceModal .ax-detail-heading h2{margin:0 0 5px;font:650 29px Outfit,sans-serif;letter-spacing:-.7px}
+html.tiskarna-ui .archive-experience .ax-detail-heading p{font-size:13px;color:var(--td-muted);margin:0}
+html.tiskarna-ui .archive-experience .ax-detail-reward{padding:17px;background:var(--ax-rust-soft);border-radius:10px}
+html.tiskarna-ui .archive-experience .ax-detail-reward strong{font-size:16px;color:var(--ax-rust)}
+html.tiskarna-ui .archive-experience .ax-detail-reward p{font-size:13px;line-height:1.55;margin:7px 0 0;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-detail-state{font-size:12px;margin:18px 0 8px;color:var(--td-muted)}
+html.tiskarna-ui #archiveExperienceModal .ax-announcement{max-width:460px;text-align:center;padding:46px 28px 23px!important;background:radial-gradient(ellipse at 15% 0%,#dce9d777,transparent 65%),radial-gradient(ellipse at 95% 5%,#f1dca155,transparent 65%),#fffcf2!important;border:1px solid #cbd8c2!important}
+html.tiskarna-ui #archiveExperienceModal .ax-announcement h2{font:750 clamp(34px,7vw,46px)/1.03 Fraunces,Georgia,serif;letter-spacing:-1.7px;color:#283e31;margin:0 0 21px}
+html.tiskarna-ui .archive-experience .ax-cta-copy{font:400 15px/1.6 Outfit,sans-serif;color:#5d695e;margin:0 0 24px}
+html.tiskarna-ui .archive-experience .ax-cta-copy strong{font-weight:600;color:#314b36}
+html.tiskarna-ui .archive-experience .ax-cta-difficulties{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:5px 0 22px}
+html.tiskarna-ui .archive-experience .ax-cta-difficulties>div{display:flex;align-items:center;flex-direction:column;gap:7px}
+html.tiskarna-ui .archive-experience .ax-cta-art{width:53px;height:53px;object-fit:contain}
+html.tiskarna-ui .archive-experience .ax-cta-difficulties strong{font-size:12px;color:#354536}
+html.tiskarna-ui .archive-experience .ax-cta-difficulties span{font-size:10px;color:#6b7569}
+html.tiskarna-ui .archive-experience .ax-cta-note{font-size:12px;line-height:1.65;color:#707767;margin:0 0 20px}
+html.tiskarna-ui #archiveExperienceModal .ax-cta-primary{background:#365e42!important;border:1px solid #2f5039!important;box-shadow:0 3px 0 #233e2b!important;color:#fffbea!important;padding:14px 12px;font-size:16px;border-radius:10px}
+html.tiskarna-ui #archiveExperienceModal .ax-cta-secondary{margin:17px auto 0;display:block;color:#63725f!important;font:500 12px Outfit,sans-serif;background:none;border:0;padding:4px;box-shadow:none}
+html.tiskarna-ui #archiveExperienceModal .ax-season-announcement{background:radial-gradient(ellipse at 15% 0%,#dfcbdc88,transparent 65%),radial-gradient(ellipse at 95% 5%,#e8d6ae66,transparent 65%),#fffaf1!important;border-color:#d1c0cc!important}
+html.tiskarna-ui #archiveExperienceModal .ax-season-announcement h2{color:#543c50}
+html.tiskarna-ui .archive-experience .ax-season-announcement .ax-cta-copy{color:#796a75}
+html.tiskarna-ui .archive-experience .ax-season-announcement .ax-cta-copy strong{color:#60475c}
+html.tiskarna-ui #archiveExperienceModal .ax-season-announcement .ax-cta-primary{background:#684960!important;border-color:#54374e!important;box-shadow:0 3px 0 #432b3e!important}
+html.tiskarna-ui .archive-experience .ax-medal-trio{display:flex;justify-content:center;align-items:flex-end;gap:7px;margin:-4px 0 15px}
+html.tiskarna-ui .archive-experience .ax-medal-trio .medal{width:81px}
+html.tiskarna-ui .archive-experience .ax-medal-trio .medal:nth-child(2){width:105px;margin-bottom:8px}
+html.tiskarna-ui .archive-experience .ax-cta-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 21px;color:#796a75;font-size:10px;line-height:1.35}
+html.tiskarna-ui .archive-experience .ax-cta-facts b{display:block;font:650 28px Fraunces,Georgia,serif;color:#684960;margin-bottom:6px}
+html.tiskarna-ui .archive-experience .ax-season-heading{border:1px solid #d1bfd0;border-radius:16px;background:linear-gradient(115deg,var(--td-paper),var(--ax-plum-soft));padding:27px 30px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+html.tiskarna-ui .archive-experience .ax-season-heading h1{font:700 clamp(31px,5vw,43px)/1.06 Outfit,sans-serif;letter-spacing:-1.2px;color:var(--ax-plum);margin:0 0 13px}
+html.tiskarna-ui .archive-experience .ax-season-heading p{font-size:14px;line-height:1.5;margin:0 0 15px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-season-heading span{font-size:10px;letter-spacing:.3px;font-weight:500;color:var(--ax-plum)}
+html.tiskarna-ui .archive-experience .ax-season-heading .medal{width:130px;max-width:28%}
+html.tiskarna-ui .archive-experience .ax-season-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--td-line);padding:22px 0;gap:12px}
+html.tiskarna-ui .archive-experience .ax-season-stats>div{padding:0 15px;border-right:1px solid var(--td-line)}
+html.tiskarna-ui .archive-experience .ax-season-stats>div:first-child{padding-left:3px}
+html.tiskarna-ui .archive-experience .ax-season-stats>div:last-child{border:0}
+html.tiskarna-ui .archive-experience .ax-season-stats small{font-size:11px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-season-stats strong{display:block;font:650 29px/1.25 Outfit,sans-serif;letter-spacing:-.6px;color:var(--ax-plum);margin-top:5px}
+html.tiskarna-ui .archive-experience .ax-season-stats strong span{font-size:13px;font-weight:400;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-season-stats p{font-size:10px;color:var(--td-muted);margin:7px 0 0}
+html.tiskarna-ui .archive-experience .ax-season-track{height:4px;background:var(--td-line);margin-top:12px;border-radius:4px;overflow:hidden}
+html.tiskarna-ui .archive-experience .ax-season-track i{display:block;height:100%;width:60%;background:var(--ax-plum)}
+html.tiskarna-ui .archive-experience .ax-season-next{display:flex;align-items:center;gap:17px;margin:19px 0 29px}
+html.tiskarna-ui .archive-experience .ax-season-next>div{flex:1}
+html.tiskarna-ui .archive-experience .ax-season-next b{font-size:13px;display:block;margin-bottom:5px}
+html.tiskarna-ui .archive-experience .ax-season-next span{font-size:11px;line-height:1.5;display:block;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-season-next button{white-space:nowrap;font-size:12px}
+html.tiskarna-ui .archive-experience .ax-season-table{margin-bottom:28px}
+html.tiskarna-ui .archive-experience .ax-section-head>button{font:500 11px Outfit,sans-serif;border:0;background:none;color:var(--td-muted);cursor:pointer}
+html.tiskarna-ui .archive-experience .ax-section-head>button .ax-icon{width:15px;height:15px;margin-right:4px}
+html.tiskarna-ui .archive-experience .ax-rank-row{display:grid;grid-template-columns:25px 36px 1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--td-line);padding:13px 14px;font-size:14px}
+html.tiskarna-ui .archive-experience .ax-rank-row>span{font-variant-numeric:tabular-nums;color:var(--td-muted);font-size:12px}
+html.tiskarna-ui .archive-experience .ax-rank-row i{font-style:normal;font-size:22px}
+html.tiskarna-ui .archive-experience .ax-rank-row strong{font-weight:500}
+html.tiskarna-ui .archive-experience .ax-rank-row small{font-size:10px;font-weight:400;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-rank-row strong small{margin-left:7px;padding:2px 5px;background:var(--td-paper);border-radius:4px}
+html.tiskarna-ui .archive-experience .ax-rank-row b{font-weight:600;font-variant-numeric:tabular-nums}
+html.tiskarna-ui .archive-experience .ax-rank-row.ax-mine{background:var(--ax-plum-soft);border:1px solid #cbb7c8;border-radius:9px;margin:3px 0}
+html.tiskarna-ui .archive-experience .ax-prizes{text-align:center;border-top:1px solid var(--td-line);padding-top:22px}
+html.tiskarna-ui .archive-experience .ax-prizes h2{font:600 24px/1.15 Outfit,sans-serif;letter-spacing:-.5px;color:var(--ax-plum);margin:0 0 9px}
+html.tiskarna-ui .archive-experience .ax-prizes>p{font-size:12px;line-height:1.6;color:var(--td-muted);max-width:420px;margin:0 auto 18px}
+html.tiskarna-ui .archive-experience .ax-prize-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+html.tiskarna-ui .archive-experience .ax-prize-grid button{min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:0;cursor:pointer;padding:0 3px;color:var(--td-ink)}
+html.tiskarna-ui .archive-experience .ax-prize-grid .medal{width:86px;max-width:100%}
+html.tiskarna-ui .archive-experience .ax-prize-grid strong{font-size:12px;font-weight:600}
+html.tiskarna-ui .archive-experience .ax-prize-grid span{font-size:10px;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience .ax-review-caption{font-size:10px;line-height:1.6;color:var(--td-muted);text-align:center;margin:23px 0 6px}
+html.tiskarna-ui .archive-experience .ax-review-buttons{display:grid;gap:10px;margin:22px 0}
+html.tiskarna-ui .archive-experience .ax-ranking-season{display:flex;align-items:center;gap:14px;text-align:left;width:100%;padding:10px 17px;margin:0 0 18px;border:1px solid #ccb9c9;border-radius:13px;background:var(--ax-plum-soft);color:var(--td-ink);cursor:pointer}
+html.tiskarna-ui .archive-experience .ax-ranking-season .medal{width:43px}
+html.tiskarna-ui .archive-experience .ax-ranking-season>span{flex:1}
+html.tiskarna-ui .archive-experience .ax-ranking-season strong{display:block;font-size:16px}
+html.tiskarna-ui .archive-experience .ax-ranking-season small{display:block;font-size:11px;line-height:1.4;color:var(--td-muted);margin-top:4px}
+html.tiskarna-ui .archive-experience .ax-badge-detail{text-align:center}
+html.tiskarna-ui .archive-experience .ax-badge-detail .medal{width:130px;margin:0 auto 10px}
+html.tiskarna-ui .archive-experience .ax-badge-detail p{font-size:13px}
+html.tiskarna-ui .archive-experience .ax-game-origin{font-size:10px;color:var(--ax-rust);margin-left:5px}
+html.tiskarna-ui .archive-experience .ax-loading{text-align:center;padding:70px 0;color:var(--td-muted)}
+html.tiskarna-ui .archive-experience button:focus-visible{outline:3px solid var(--td-blue);outline-offset:3px}
+
+@media(max-width:520px){
+ #archiveReviewNotice{font-size:9px;gap:7px;padding:5px 9px}
+ #archiveReviewNotice span{max-width:230px}
+ html.tiskarna-ui .archive-experience .ax-section-head>span{display:none}
+ html.tiskarna-ui .archive-experience .ax-archive-heading{position:relative;padding-right:91px;min-height:140px;margin-bottom:15px}
+ html.tiskarna-ui .archive-experience .ax-archive-heading h1{font-size:32px;max-width:230px}
+ html.tiskarna-ui .archive-experience .ax-archive-heading p{font-size:13px}
+ html.tiskarna-ui .archive-experience .ax-archive-heading span{font-size:12px;display:block;line-height:1.5}
+ html.tiskarna-ui .archive-experience .ax-archive-heading .archive-art{position:absolute;width:130px;max-width:none;right:-13px;top:15px;opacity:.9}
+ html.tiskarna-ui .archive-experience .ax-archive-note{align-items:flex-start;gap:9px}
+ html.tiskarna-ui .archive-experience .ax-archive-note p{font-size:11px}
+ html.tiskarna-ui .archive-experience .ax-archive-note button{font-size:10px;margin-top:1px}
+ html.tiskarna-ui .archive-experience .ax-archive-note .ax-icon{display:none}
+ html.tiskarna-ui .archive-experience .ax-difficulty-tabs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:22px}
+ html.tiskarna-ui .archive-experience .ax-difficulty-tabs button{justify-content:flex-start;padding:12px 9px;gap:8px}
+ html.tiskarna-ui .archive-experience .ax-difficulty-art{width:32px;height:32px}
+ html.tiskarna-ui .archive-experience .ax-difficulty-tabs strong{font-size:14px}
+ html.tiskarna-ui .archive-experience .ax-difficulty-tabs small{font-size:11px}
+ html.tiskarna-ui .archive-experience .ax-collection-title h2{font-size:20px}
+ html.tiskarna-ui .archive-experience .ax-collection-title>span{font-size:10px}
+ html.tiskarna-ui .archive-experience .ax-filter-row{flex-wrap:wrap;gap:10px}
+ html.tiskarna-ui .archive-experience .ax-filters{gap:0}
+ html.tiskarna-ui .archive-experience .ax-filters button{font-size:10px;padding:7px}
+ html.tiskarna-ui .archive-experience .ax-search{width:108px;padding:6px}
+ html.tiskarna-ui .archive-experience .ax-search input{font-size:10px}
+ html.tiskarna-ui .archive-experience .ax-board-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ html.tiskarna-ui .archive-experience .ax-board{min-height:66px;gap:5px}
+ html.tiskarna-ui .archive-experience .ax-board strong{font-size:21px}
+ html.tiskarna-ui .archive-experience .ax-board>span{font-size:10px}
+ html.tiskarna-ui .archive-experience .ax-legend{font-size:9px}
+ html.tiskarna-ui .archive-experience .ax-legend span{margin:0 3px}
+ html.tiskarna-ui .archive-experience .ax-season-heading{padding:25px 20px}
+ html.tiskarna-ui .archive-experience .ax-season-heading h1{font-size:32px}
+ html.tiskarna-ui .archive-experience .ax-season-heading p{font-size:12px}
+ html.tiskarna-ui .archive-experience .ax-season-heading span{font-size:12px}
+ html.tiskarna-ui .archive-experience .ax-season-heading .medal{max-width:25%;margin-right:-5px}
+ html.tiskarna-ui .archive-experience .ax-season-stats{gap:0;padding:19px 0}
+ html.tiskarna-ui .archive-experience .ax-season-stats>div{padding:0 10px}
+ html.tiskarna-ui .archive-experience .ax-season-stats small{font-size:12px}
+ html.tiskarna-ui .archive-experience .ax-season-stats strong{font-size:25px}
+ html.tiskarna-ui .archive-experience .ax-season-stats strong span{font-size:10px}
+ html.tiskarna-ui .archive-experience .ax-season-stats p{font-size:9px;line-height:1.4}
+ html.tiskarna-ui .archive-experience .ax-season-next{align-items:flex-start;flex-direction:column;gap:11px}
+ html.tiskarna-ui .archive-experience .ax-season-next button{width:100%}
+ html.tiskarna-ui .archive-experience .ax-prizes h2{font-size:22px}
+ html.tiskarna-ui .archive-experience .ax-prize-grid{gap:5px}
+ html.tiskarna-ui .archive-experience .ax-prize-grid strong{font-size:13px}
+ html.tiskarna-ui .archive-experience .ax-prize-grid span{font-size:11px}
+ html.tiskarna-ui #archiveExperienceModal{padding:14px}
+ html.tiskarna-ui #archiveExperienceModal .ax-modal{max-height:calc(100dvh - 28px);padding:33px 22px 22px!important}
+ html.tiskarna-ui #archiveExperienceModal .ax-announcement{padding:42px 21px 21px!important}
+}
+@media(max-width:355px){
+ html.tiskarna-ui .archive-experience .ax-filter-row{display:grid;grid-template-columns:1fr}
+ html.tiskarna-ui .archive-experience .ax-search{width:100%;box-sizing:border-box}
+ html.tiskarna-ui .archive-experience .ax-archive-heading{padding-right:71px}
+ html.tiskarna-ui .archive-experience .ax-archive-heading .archive-art{width:109px;right:-9px;top:30px}
+ html.tiskarna-ui .archive-experience .ax-archive-heading h1{font-size:29px}
+ html.tiskarna-ui .archive-experience .ax-season-heading{padding:23px 17px}
+ html.tiskarna-ui .archive-experience .ax-season-heading h1{font-size:29px}
+ html.tiskarna-ui .archive-experience .ax-season-stats strong{font-size:22px}
+ html.tiskarna-ui .archive-experience .ax-rank-row{gap:7px;padding-inline:9px}
+}
+@media(prefers-reduced-motion:reduce){html.tiskarna-ui .archive-experience .ax-board{transition:none}}
+
+html.tiskarna-ui body.archive-experience{display:block}html.tiskarna-ui .archive-experience .app-shell{margin-inline:auto}html.tiskarna-ui #archiveExperienceModal .ax-modal{text-align:left}html.tiskarna-ui #archiveExperienceModal .ax-announcement{text-align:center}
+
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-announcement{background:radial-gradient(ellipse at 20% 0%,#375947,transparent 60%),#23362e!important;border-color:#75866b!important}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-announcement h2,html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-cta-copy strong{color:#f9f1d6}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal :is(.ax-cta-copy,.ax-cta-note,.ax-cta-difficulties strong,.ax-cta-difficulties span,.ax-cta-secondary){color:#d0dbc8!important}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement{background:radial-gradient(ellipse at 20% 0%,#594153,transparent 60%),#352c37!important;border-color:#8d7187!important}
+html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement .ax-cta-facts,html.tiskarna-ui[data-theme=dark] #archiveExperienceModal .ax-season-announcement .ax-cta-facts b{color:#e6cce0}
+
+/* Keep Dnes focused on the six destinations; content releases remain in Hrát. */
+html.tiskarna-ui body.archive-experience #screen-daily :is(#todayNewContentBanner,#freeRefreshToday){display:none!important}
+html.tiskarna-ui body.archive-experience .ax-season-stats p{font-size:11px!important;line-height:1.4!important}
+html.tiskarna-ui body.archive-experience .ax-review-caption{font-size:11px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-legend{font-size:11px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-history-note p{font-size:13px!important;line-height:1.6!important}
+html.tiskarna-ui body.archive-experience .ax-archive-note p{font-size:13px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-archive-heading p{font-size:14px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-season-heading p{font-size:14px!important;line-height:1.5!important}
+html.tiskarna-ui body.archive-experience .ax-prizes>p{font-size:13px!important;line-height:1.6!important}
+html.tiskarna-ui body.archive-experience .ax-rank-row [data-player-avatar]{display:grid;place-items:center;width:30px;height:30px}
+html.tiskarna-ui body.archive-experience .ax-rank-row .organic-avatar{width:30px;height:30px}
+@media(max-width:520px){
+ html.tiskarna-ui body.archive-experience .ax-archive-heading{padding-right:106px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading>div{min-width:0}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading .archive-art{right:0;margin-right:0;width:115px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading h1{font-size:31px!important}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading p{font-size:13px!important}
+}
+@media(max-width:355px){
+ html.tiskarna-ui body.archive-experience .ax-archive-heading{padding-right:85px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading .archive-art{right:0;width:94px}
+ html.tiskarna-ui body.archive-experience .ax-archive-heading h1{font-size:28px!important}
+}
+html.tiskarna-ui .archive-experience .ax-back{font-size:14px;min-height:40px;margin-bottom:12px}
+html.tiskarna-ui .archive-experience .ax-filters button{font-size:13px;min-height:44px}
+html.tiskarna-ui .archive-experience .ax-search{min-height:44px}
+html.tiskarna-ui .archive-experience .ax-search input{font-size:14px}
+html.tiskarna-ui .archive-experience .ax-grid-foot button{width:44px;height:44px}
+@media(max-width:599px){
+}
+html.tiskarna-ui .archive-experience .ax-search{width:150px}
+@media(min-width:521px) and (max-width:767px){
+ html.tiskarna-ui .archive-experience .ax-difficulty-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:350px){
+}
+html.tiskarna-ui .archive-experience .ax-prize-grid .medal{width:132px;max-width:100%}
+html.tiskarna-ui .archive-experience .ax-badge-detail .medal{width:200px;margin-bottom:22px}
+html.tiskarna-ui .archive-experience .ax-prize-grid button{padding:10px 3px;gap:12px;border-radius:14px}
+html.tiskarna-ui .archive-experience .ax-prize-grid button:hover{background:color-mix(in srgb,var(--ax-plum-soft) 55%,transparent)}
+

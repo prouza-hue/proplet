@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python tools/build_runtime_content.py --check && python tools/generate_puzzles_bootstrap.py && python tools/check_dated_daily_release.py",
+  "buildCommand": "python tools/build_runtime_content.py --check && python tools/generate_puzzles_bootstrap.py && python tools/check_dated_daily_release.py && python tools/build_archive_experience.py",
   "regions": [
     "arn1"
   ],

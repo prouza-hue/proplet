@@ -100,7 +100,7 @@
         const request=++pendingStart;
         const requestedProfile=typeof getProfile==='function'?getProfile():null;
         const requestedScreen=typeof currentScreen==='undefined'?null:currentScreen;
-        const needsFull=(mode==='free'||mode==='rescue')&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1;
+        const needsFull=!puzzle?.meta?.archiveExperience&&(mode==='free'||mode==='rescue')&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1;
         if(!needsFull)return canonicalStartGame(puzzle,mode,dailyDate,options);
         ensureFullDatabase().then(full=>{
           if(request!==pendingStart)return;
