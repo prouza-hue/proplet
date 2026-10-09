@@ -124,3 +124,6 @@ html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#
 html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-revealed-phrase{width:100%;max-width:none;font-size:18px!important;font-weight:500;line-height:1.4!important;margin:8px 0!important}
 html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-entry-copy small{font-size:13px!important;line-height:1.4!important;color:var(--td-muted)}
 @media(max-width:399px){html.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard) .tajenka-home-actions{grid-template-columns:minmax(0,1fr)}}
+/* The native dark theme uses a light gold accent for Mozkokalypsa. */
+html.tiskarna-ui[data-theme=dark] body.archive-experience #difficultyCards .cp-card[data-diff=mozkokalypsa] .cp-play{--pg-action-fg:#202b39}
+html.tiskarna-ui[data-theme=dark] body.archive-experience .app-footer :is(span,strong){color:var(--td-muted)!important}

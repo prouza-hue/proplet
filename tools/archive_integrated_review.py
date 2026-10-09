@@ -261,7 +261,13 @@ try:
                 report["checks"].append({"actualGame":"PASS","resume":"PASS","foldResize":"PASS","xpOnce":"PASS","newerDoesNotBlockHistorical":"PASS","alternativeAndHintRestore":"PASS","modernProgressUnchanged":before})
             if width in [390,690,1440]:
                 page.locator('#archiveReviewNotice button').click();page.locator('[data-archive-action="theme"]').click();page.keyboard.press("Escape")
-                go(page,"daily");shot(page,"daily-dark-"+str(width));go(page,"free");shot(page,"free-dark-"+str(width));go(page,"archive");shot(page,"archive-dark-"+str(width));go(page,"season");shot(page,"season-dark-"+str(width))
+                go(page,"daily");shot(page,"daily-dark-"+str(width));go(page,"free");shot(page,"free-dark-"+str(width))
+                contrast=page.locator('#difficultyCards .cp-play').evaluate_all("""buttons=>{
+                  const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
+                  return buttons.map(button=>{const c=getComputedStyle(button),a=luminance(c.color),b=luminance(c.backgroundColor);return {difficulty:button.closest('[data-diff]').dataset.diff,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};});
+                }""")
+                assert all(item['ratio']>=4.5 for item in contrast),contrast
+                report['checks'].append({'width':width,'darkButtonContrast':contrast});go(page,"archive");shot(page,"archive-dark-"+str(width));go(page,"season");shot(page,"season-dark-"+str(width))
             assert page.evaluate("navigator.serviceWorker.getRegistrations().then(r=>r.length)")==0
             report["checks"].append({"width":width,"result":"PASS"})
             context.close()
