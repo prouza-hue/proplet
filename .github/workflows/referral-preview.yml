@@ -1,5 +1,7 @@
 name: Isolated integrated referral preview
 on:
+  push:
+    branches: ['preview/referrals-integrated-20261004']
   pull_request:
     branches: [main]
     paths:

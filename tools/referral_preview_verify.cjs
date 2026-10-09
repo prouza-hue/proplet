@@ -38,11 +38,29 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.match(await page.locator('#referralDialog').innerText(),/týdenních XP hráče ani týmu/);
   assert((await page.locator('#refLink').boundingBox()).width>100,'invitation link remains readable on mobile');
   const referralLink=await page.locator('#refLink').inputValue();assert.equal(new URL(referralLink).origin,new URL(base).origin);
-  await screenshot(page,'02-invitation');
+  await screenshot(page,'02-invitation');await visual(page,'#referralDialog .ref-sheet','intro');
   await page.keyboard.press('Escape');assert.equal(await page.locator('#referralDialog').isVisible(),false);
   await page.locator('.bottom-nav [data-nav="profile"]').click();
   assert.match(await page.locator('#referralProfile').innerText(),/Eliška/);await screenshot(page,'03-native-profile');
   check('Invitation and progress are integrated into native Dnes and Já');
+  await page.locator('.bottom-nav [data-nav="daily"]').click();
+  await page.locator('#referralHome [data-ref-home-close]').click();
+  assert.equal(await page.locator('#referralHome').isVisible(),false);
+  await page.locator('.bottom-nav [data-nav="profile"]').click();
+  await page.locator('#referralProfile [data-ref-open]').click();
+  assert.equal(await page.locator('#referralDialog').isVisible(),true);
+  await page.keyboard.press('Escape');
+  check('Dismissed announcement leaves invitation available in profile');
+  for(const width of [320,390,690,1440]){
+   await page.setViewportSize({width,height:950});
+   for(const theme of ['light','dark']){
+    await ready(page,'?theme='+theme);
+    await visual(page,'#referralHome','discovery-'+width+'-'+theme);
+    await screenshot(page,'discovery-full-'+width+'-'+theme);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+   }
+  }
+  await page.setViewportSize({width:390,height:844});
   await ready(page,'?view=new&invite=KATKA');
   assert.equal(await page.evaluate(()=>getProfile()),null);
   assert.equal(await page.evaluate(()=>document.querySelector('#referralHome').previousElementSibling.classList.contains('daily-hero')),true);
