@@ -13,7 +13,7 @@ Oprava řeší chybějící události první přiřazené hry, mizení výsledko
 
 | Oblast | Požadavek | Důkaz |
 |---|---|---|
-| Původní chyba délky | Na origin/main oba konzumenti historického výsledku selžou; na opravě oba projdou | TEST_SOURCE_REF=origin/main node tests/current/test_first_game_measurement.cjs a totéž bez proměnné |
+| Původní chyba délky | Na původním SHA 1627610426894e16044396a05a348cb1cf26e7bf oba konzumenti historického výsledku selžou; na opravě oba projdou | TEST_SOURCE_REF=1627610426894e16044396a05a348cb1cf26e7bf node tests/current/test_first_game_measurement.cjs a totéž bez proměnné |
 | Identita událostí | Start i dokončení mají původní first_steps_run_id, správnou variantu/bucket/desku, client_release, onboarding_version a is_test; odkazují na skutečný attempt_id | test_first_game_measurement.cjs a serverem přijaté hlavičky v browser důkazu |
 | Počet událostí | Jedno přiřazení, nejvýše jeden start, nejvýše jedno dokončení a jedna zobrazená nabídka na flow; žádná duplicita při opakovaném callbacku | Jednotkové testy a skutečný klient proti izolovanému HTTP serveru |
 | Skutečný průchod | Desktop i dotykový mobil: PES/LES/ČAJ → g4-e-009 → dokončení → nabídka účtu | tools/test_first_game_safety_browser.cjs, screenshoty a přijaté události |
