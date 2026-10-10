@@ -20,7 +20,7 @@ async function characterizeGoogleRoutes(){
   assert.equal(location.href,'/api/auth/google/start');
   const flow=first.slice(first.indexOf('  async function beginAuth(method){'),first.indexOf('  function dismissAuth(){'));
   const button={disabled:false};
-  Object.assign(ctx,{authBusy:false,ensureFlow(){},state:()=>({firstBoardId:'fixture-board'}),write:()=>true,sessionStorage:{},RETURN:'fixture',once(){},$:()=>button,productAnalytics:()=>({flush:async()=>{}})});
+  Object.assign(ctx,{authBusy:false,restoreGameFlow(){},game:()=>null,ensureFlow(){},state:()=>({firstBoardId:'fixture-board'}),write:()=>true,sessionStorage:{},RETURN:'fixture',once(){},$:()=>button,productAnalytics:()=>({flush:async()=>{}})});
   vm.runInContext(flow,ctx);location.href='';await ctx.beginAuth('google');
   assert.equal(location.href,'/api/auth/google/start');assert.equal(button.disabled,true,'duplicate-tap guard stays active');
   console.log('PASS all four Google entry points retain same-origin OAuth and onboarding tap guard');
