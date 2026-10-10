@@ -10,7 +10,7 @@ if(process.env.EXPECTED_SHA&&process.env.EXPECTED_SHA!==sha)throw Error('checkou
 if(baseline&&!/^[a-f0-9]{40}$/.test(baseline))throw Error('TEST_BASELINE_SHA must be a full commit SHA');
 if(baseline)execFileSync('git',['cat-file','-e',baseline+'^{commit}'],{cwd:repo});
 const fixtureDir=path.join(repo,'tests/fixtures/browser');
-const config={...JSON.parse(fs.readFileSync(path.join(fixtureDir,'config.json'))),environment:'production',pushAvailable:false};
+const config={...JSON.parse(fs.readFileSync(path.join(fixtureDir,'config.json'))),date:'2026-09-15',environment:'production',pushAvailable:false};
 const syntheticProfile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'🙂',supportMode:'younger',publicRankings:false,hasPassword:true,stats:{points:125,completed:1}};
 let controls={release:'current',rolling:'ok',eventDelayMs:40,failDatabase:false,failDatabaseRequests:0,progress:[],firstSteps:false,auth:'ok',result:'ok'};
 let events=[],requests=[],heldRolling=[];

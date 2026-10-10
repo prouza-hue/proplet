@@ -9,6 +9,7 @@ async function verify(){
   for(const loggedIn of [false,true]){
     const calls=[];
     const context={navigator:{onLine:true},location:{pathname:'/index.html',search:'?fbclid=click-secret&utm_source=instagram&auth=google&challenge=challenge-secret',hash:'#access_token=oauth-secret'},
+      APP_VERSION:'candidate',analyticsHeaders:()=>({'X-Proplet-Test':'1','X-Proplet-Client-Release':'candidate'}),
       getProfile:()=>loggedIn?{token:'synthetic-session'}:null,getAnonymousId:()=>'synthetic-installation',
       fetch:(url,options)=>{calls.push({url,options});return Promise.resolve({ok:true});}};
     vm.createContext(context);vm.runInContext(reporter,context);
@@ -20,6 +21,8 @@ async function verify(){
     assert.equal(body.code,'puzzle_boot_failed');assert.equal(body.message,'both-attempts-failed');
     for(const secret of ['click-secret','challenge-secret','oauth-secret','fbclid','utm_source','access_token'])assert(!options.body.includes(secret),'client error body must not export URL context: '+secret);
     assert.equal(options.keepalive,true,'boot diagnostics must retain their reliable transport');
+    assert.equal(options.headers['X-Proplet-Test'],'1','technical errors retain the test exclusion');
+    assert.equal(options.headers['X-Proplet-Client-Release'],'candidate');
     assert.equal(loggedIn?options.headers.Authorization:options.headers['X-Proplet-Anon-ID'],loggedIn?'Bearer synthetic-session':'synthetic-installation');
     await Promise.resolve();
   }
