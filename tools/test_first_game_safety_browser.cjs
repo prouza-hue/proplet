@@ -33,6 +33,9 @@ const report={checks:[],synthetic:true};
    }
    await solve();await page.getByRole('button',{name:'Hrát dál',exact:true}).click();
    await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-009');
+   await page.locator('#winModal').waitFor({state:'hidden'});
+   await page.waitForFunction(()=>document.querySelectorAll('#board .cell').length===currentGame.puzzle.mask.length);
+   await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
    const attemptId=await page.evaluate(()=>currentGame.attemptId);
    // The optional award slot may already be absent in an old live DOM.
    await page.evaluate(()=>document.querySelector('#newBadgeBox').remove());
