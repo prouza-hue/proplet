@@ -17,6 +17,7 @@ const g={mode:'free',puzzle:{id:'g4-e-009'},attemptId:attempt,isReplay:false};ct
 if(!baseline){
  g.firstStepsTelemetry=first.captureFirstGame(g.puzzle,{firstSteps:true});
  assert(g.firstStepsTelemetry&&Object.isFrozen(g.firstStepsTelemetry.provenance));
+ assert(Object.isFrozen(g.firstStepsTelemetry.provenance.assignment));
  first.recordStarted(g);first.recordStarted(g);
  ctx.getAnonymousId=()=> 'rotated-guest';ctx.APP_PREVIEW_RELEASE='unrelated-release';
  first.recordCompleted(g);first.recordCompleted(g);
@@ -24,6 +25,10 @@ if(!baseline){
  assert(events.every(e=>e.headers['X-Proplet-First-Steps-Run']===flow&&e.headers['X-Proplet-Experiment-Variant']==='challenger_e009'&&e.headers['X-Proplet-Onboarding']==='board-v3-short'&&e.headers['X-Proplet-Client-Release']==='candidate-release'&&e.headers['X-Proplet-Test']==='1'&&e.props.attemptId===attempt));
  assert.equal(first.isFirstGame({...g,isReplay:true}),false);
  assert.equal(first.isFirstGame({...g,puzzle:{id:'g4-e-001'}}),false);
+ const restoreSource=source('public/app/engagement/first-steps.js');let restored;
+ const restore={game:()=>g,state:()=>({firstStepsRunId:flow,clientRelease:'older-release'}),update:patch=>{restored=patch}};
+ vm.createContext(restore);vm.runInContext(restoreSource.slice(restoreSource.indexOf('  function restoreGameFlow('),restoreSource.indexOf('  function eventHeaders(')),restore);
+ restore.restoreGameFlow(g);assert.equal(restored.clientRelease,'candidate-release','same pending flow upgraded from older client retains the actual producer version');
  console.log('PASS immutable per-game flow/assignment/release/test provenance, attempt link, once-only events and replay isolation');
 }
 // Actual historical-result constructor must create a complete game snapshot.

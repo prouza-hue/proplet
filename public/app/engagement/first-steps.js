@@ -51,7 +51,7 @@
     // Bind provenance to this actual game, not mutable storage/profile state.
     // Resuming the same pending, enrolled assignment retains its once-only
     // markers. Ordinary games outside that assignment never acquire context.
-    return {provenance:Object.freeze({firstStepsRunId:s.firstStepsRunId,onboardingVersion:s.onboardingVersion,clientRelease:typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:s.clientRelease,isTest:!!s.isTest,assignment:{...s.firstBoardExperiment}}),events:[...(s.events||[])]};
+return {provenance:Object.freeze({firstStepsRunId:s.firstStepsRunId,onboardingVersion:s.onboardingVersion,clientRelease:typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:s.clientRelease,isTest:!!s.isTest,assignment:Object.freeze({...s.firstBoardExperiment})}),events:[...(s.events||[])]};
   }
   function gameEvent(g,name){
     const trace=g?.firstStepsTelemetry;if(!trace||trace.events.includes(name))return;
@@ -64,7 +64,8 @@
   function recordCompleted(g){if(isFirstGame(g))gameEvent(g,'first_board_experiment_completed');}
   function restoreGameFlow(g){
     const p=g?.firstStepsTelemetry?.provenance;
-    if(!p||g!==game()||state().firstStepsRunId===p.firstStepsRunId)return;
+    if(!p||g!==game())return;
+    const s=state();if(s.firstStepsRunId===p.firstStepsRunId&&s.clientRelease===p.clientRelease)return;
     update({enrolled:true,firstStepsRunId:p.firstStepsRunId,onboardingVersion:p.onboardingVersion,clientRelease:p.clientRelease,isTest:p.isTest,firstBoardId:p.assignment.boardId,firstBoardExperiment:p.assignment,events:[...g.firstStepsTelemetry.events]});
   }
   function eventHeaders(properties={}){
