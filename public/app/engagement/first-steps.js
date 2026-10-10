@@ -45,8 +45,32 @@
     if(!update({firstStepsRunId:assignment.firstStepsRunId,firstBoardExperiment:assignment,firstBoardId:assignment.boardId,events:[...(state().events||[]),'first_board_experiment_assigned']}))throw Error('První hru se nepodařilo uložit na zařízení. Zkus to znovu.');return assignment;
   }
   function experimentProperties(assignment=state().firstBoardExperiment){return validAssignment(assignment)?{experimentKey:assignment.key,experimentVariant:assignment.variant,experimentBucket:assignment.bucket,puzzleId:assignment.boardId,experimentAllocationPolicy:assignment.allocationPolicy||'hash50_v1',experimentIdentityBucket:assignment.identityBucket??assignment.bucket}:{} }
+  function captureFirstGame(puzzle,options={}){
+    const s=state();
+    if(!enabled()||!s.enrolled||s.finished||puzzle?.id!==s.firstBoardId||!validAssignment(s.firstBoardExperiment)||!s.firstStepsRunId)return null;
+    // Bind provenance to this actual game, not mutable storage/profile state.
+    // Resuming the same pending, enrolled assignment retains its once-only
+    // markers. Ordinary games outside that assignment never acquire context.
+return {provenance:Object.freeze({firstStepsRunId:s.firstStepsRunId,onboardingVersion:s.onboardingVersion,clientRelease:typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:s.clientRelease,isTest:!!s.isTest,assignment:Object.freeze({...s.firstBoardExperiment})}),events:[...(s.events||[])]};
+  }
+  function gameEvent(g,name){
+    const trace=g?.firstStepsTelemetry;if(!trace||trace.events.includes(name))return;
+    const properties={...experimentProperties(trace.provenance.assignment),firstStepsProvenance:trace.provenance,attemptId:g.attemptId};
+    try{trackProductEvent(name,properties)}catch{return;}
+    trace.events.push(name);
+    if(state().firstStepsRunId===trace.provenance.firstStepsRunId)update({events:[...new Set([...(state().events||[]),name])]});
+  }
+  function recordStarted(g){if(isFirstGame(g))gameEvent(g,'first_board_experiment_started');}
+  function recordCompleted(g){if(isFirstGame(g))gameEvent(g,'first_board_experiment_completed');}
+  function restoreGameFlow(g){
+    const p=g?.firstStepsTelemetry?.provenance;
+    if(!p||g!==game())return;
+    const s=state();if(s.firstStepsRunId===p.firstStepsRunId&&s.clientRelease===p.clientRelease)return;
+    update({enrolled:true,firstStepsRunId:p.firstStepsRunId,onboardingVersion:p.onboardingVersion,clientRelease:p.clientRelease,isTest:p.isTest,firstBoardId:p.assignment.boardId,firstBoardExperiment:p.assignment,events:[...g.firstStepsTelemetry.events]});
+  }
   function eventHeaders(properties={}){
-    const s=state();if(!s.firstStepsRunId)return {};
+    const snapshot=properties.firstStepsProvenance;
+    const s=snapshot?.firstStepsRunId&&validAssignment(snapshot.assignment)?{...snapshot,firstBoardExperiment:snapshot.assignment}:state();if(!s.firstStepsRunId)return {};
     const experiment=experimentProperties(s.firstBoardExperiment);
     return {'X-Proplet-First-Steps-Run':s.firstStepsRunId,'X-Proplet-Onboarding':s.onboardingVersion,'X-Proplet-Client-Release':s.clientRelease,...(s.isTest?{'X-Proplet-Test':'1'}:{}),...(experiment.experimentKey?{'X-Proplet-Experiment':experiment.experimentKey,'X-Proplet-Experiment-Variant':experiment.experimentVariant,'X-Proplet-Experiment-Bucket':String(experiment.experimentBucket),'X-Proplet-Experiment-Policy':experiment.experimentAllocationPolicy,'X-Proplet-Experiment-Identity-Bucket':String(experiment.experimentIdentityBucket)}:{}),...(properties.reason?{'X-Proplet-First-Steps-Reason':properties.reason}:{}),...(properties.outcome?{'X-Proplet-First-Steps-Outcome':properties.outcome}:{})};
   }
@@ -150,6 +174,7 @@
   function returnIntent(){const r=intent();return r?.boardId===r?.flow?.firstBoardId?r:null}
   async function beginAuth(method){
     if(authBusy)return;
+    restoreGameFlow(game());
     ensureFlow();const intent={at:Date.now(),boardId:state().firstBoardId,method,flow:state()};
     if(!write(sessionStorage,RETURN,intent)){showToast('Pro návrat k výsledku potřebujeme úložiště prohlížeče. Zkus jiný způsob přihlášení.');return;}
     once(method==='google'?'first_steps_v1_google':'first_steps_v1_manual');
@@ -193,16 +218,21 @@
     return true;
   }
   function continuePlaying(){
-    once('first_steps_v1_continue');
+    if(game()?.firstStepsTelemetry)gameEvent(game(),'first_steps_v1_continue');else once('first_steps_v1_continue');
     update({finished:true});sessionStorage.removeItem(RETURN);$('#winModal').classList.add('hidden');
     $('#winModal').classList.remove('first-steps-win');$('#firstStepsAccount')?.classList.add('hidden');
     startFree('easy');
   }
-  function isFirstGame(g){return enabled()&&state().enrolled&&!state().finished&&g?.mode==='free'&&g.puzzle?.id===state().firstBoardId&&!g.isReplay}
+  function isFirstGame(g){
+    if(!enabled()||g?.mode!=='free'||g.isReplay)return false;
+    const trace=g.firstStepsTelemetry;
+    if(trace)return validAssignment(trace.provenance.assignment)&&g.puzzle?.id===trace.provenance.assignment.boardId;
+    return state().enrolled&&!state().finished&&g.puzzle?.id===state().firstBoardId;
+  }
   function afterStart(g){
     // Legacy presentation wrappers may not return startGame's promise. Close
     // the training result only when the requested board actually starts.
-    if(isFirstGame(g)){$('#winModal').classList.add('hidden');once('first_board_experiment_started',experimentProperties())}
+    if(isFirstGame(g)){$('#winModal').classList.add('hidden');if(g.firstStepsTelemetry)recordStarted(g);else once('first_board_experiment_started',experimentProperties())}
     $('#screen-game').classList.toggle('first-steps-training',short(g));
     $('#winModal').classList.remove('first-steps-win');$('#firstStepsAccount')?.classList.add('hidden');
     $('#winPrimaryBtn').onclick=closeWinAndContinue;
@@ -211,7 +241,10 @@
   function finish(g){
     if(short(g)){trainingWin(g);return;}
     if(!isFirstGame(g))return;
-    ensureFlow();update({summary:{words:g.found.length,xp:g.winBaseXpAwarded||0}});once('first_board_experiment_completed',experimentProperties());accountWin();once('first_steps_v1_offer');
+    if(g.firstStepsTelemetry){recordCompleted(g);if(g!==game())return;restoreGameFlow(g);}
+    ensureFlow();update({summary:{words:Array.isArray(g.found)?g.found.length:0,xp:g.winBaseXpAwarded||0}});
+    if(g.firstStepsTelemetry)recordCompleted(g);else once('first_board_experiment_completed',experimentProperties());
+    accountWin();if(g.firstStepsTelemetry)gameEvent(g,'first_steps_v1_offer');else once('first_steps_v1_offer');
   }
   function cancelledAuthReturn(outcome='cancelled'){
     if(!enabled()||!returnIntent()||profile()?.token)return false;
@@ -233,7 +266,7 @@
     },{once:true});
     global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;if(returnIntent()?.method==='google'&&!profile()?.token)cancelledAuthReturn();});
   }
-  const facade={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,
+  const facade={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,captureFirstGame,recordStarted,recordCompleted,
     firstBoardExperiment:()=>state().firstBoardExperiment||null,
     quiet:()=>enabled()&&read(sessionStorage,QUIET)===true,
     analyticsVersion:()=>enabled()&&(state().enrolled||(typeof freshStarterVisit==='function'&&freshStarterVisit()))?VERSION:null,

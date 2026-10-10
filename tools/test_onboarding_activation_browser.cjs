@@ -8,7 +8,8 @@ const output=process.env.RESULT_PATH||'onboarding-browser-results.json';
 fs.mkdirSync(path.dirname(output),{recursive:true});
 const report={started:new Date().toISOString(),synthetic:true,checks:[]};
 const control=async value=>{const response=await fetch(url+'/__fixture/control',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(value)});assert(response.ok);return response.json()};
-const recording=()=>fetch(url+'/__fixture/events').then(r=>r.json());
+let fixtureRun=null;
+const recording=async()=>{const value=await fetch(url+'/__fixture/events').then(r=>r.json());return fixtureRun?{events:value.events.filter(e=>e.headers['x-proplet-fixture-run']===fixtureRun),requests:value.requests.filter(e=>e.headers['x-proplet-fixture-run']===fixtureRun)}:value;};
 const events=async()=> (await recording()).events;
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function eventually(fn,message,timeout=10000){const end=Date.now()+timeout;do{if(await fn())return;await delay(100)}while(Date.now()<end);throw Error(message)}
@@ -39,7 +40,8 @@ async function solve(page,touch=false){
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});report.browser=browser.version();
  async function scenario(name,fn,options={}){
   await control({reset:true});
-  const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:options.serviceWorkers?'allow':'block'});
+  fixtureRun=crypto.randomUUID();
+  const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:options.serviceWorkers?'allow':'block',extraHTTPHeaders:{'X-Proplet-Fixture-Run':fixtureRun}});
   // Block every non-loopback request (analytics tags/fonts included).
   await context.route('**/*',route=>{const target=new URL(route.request().url());return ['127.0.0.1','localhost','[::1]'].includes(target.hostname)?route.continue():route.abort()});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -47,7 +49,7 @@ async function solve(page,touch=false){
   const start=Date.now();console.log('SCENARIO '+name);
   try{await fn(page,context);assert.deepEqual(errors,[],'uncaught browser errors');await page.screenshot({path:output+'.'+name+'.png',fullPage:true});report.checks.push({name,ok:true,ms:Date.now()-start,events:await events()})}
   catch(error){report.checks.push({name,ok:false,error:error.stack,errors,events:await events()});await page.screenshot({path:output+'.'+name+'.failed.png',fullPage:true}).catch(()=>{});throw error}
-  finally{fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close()}
+  finally{await page.evaluate(()=>productAnalytics()?.flush()).catch(()=>{});fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close()}
  }
  try{
   if(process.env.TEST_EXPECT_BASELINE==='1'){

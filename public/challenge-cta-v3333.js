@@ -37,7 +37,10 @@
     }else{
       if(scroll){for(const child of [...scroll.children])card.insertBefore(child,scroll);scroll.remove()}
       if(summary.nextElementSibling!==primary)summary.after(primary);
-      if(footer)footer.remove();
+      // Completion celebrations can be moved before the docked primary action.
+      // Preserve those nodes when undocking instead of deleting the badge box
+      // with the footer (the next completion still needs that same element).
+      if(footer){for(const child of [...footer.childNodes])primary.before(child);footer.remove();}
     }
     setClass(modal,'result-action-docked',docked);
     if(win.parentElement!==secondary)secondary.prepend(win);
