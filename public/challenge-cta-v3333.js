@@ -35,7 +35,7 @@
     if(starter){
       const oldHeader=card.querySelector('.win-result-heading');
       if(oldHeader){oldHeader.before(title);summary.querySelector('.win-summary-chips')?.prepend(xp);oldHeader.remove()}
-      xp.classList.remove('xp-sticker');
+      setClass(xp,'xp-sticker',false);
       if(summary.nextElementSibling!==primary)summary.after(primary);
       if(win.parentElement!==secondary)secondary.prepend(win);
       const oldActions=$('#winResultActions');if(oldActions){for(const child of [...oldActions.children])oldActions.before(child);oldActions.remove()}
@@ -45,7 +45,7 @@
     if(!header){header=document.createElement('div');header.className='win-result-heading';title.before(header)}
     if(title.parentElement!==header)header.append(title);
     if(xp.parentElement!==header)header.append(xp);
-    xp.classList.add('xp-sticker');
+    setClass(xp,'xp-sticker',true);
     let actions=$('#winResultActions');
     if(!actions){actions=document.createElement('div');actions.id='winResultActions';actions.className='win-result-actions'}
     const ranking=$('#levelLeaderboardBox');
@@ -57,9 +57,9 @@
   }
 
   function setChallengeContent(el){
-    el.dataset.plainInvite='true';
+    if(el.dataset.plainInvite!=='true')el.dataset.plainInvite='true';
     setText(el,'Pozvi kamaráda');
-    el.classList.remove('painted-action-control');
+    setClass(el,'painted-action-control',false);
   }
 
   function syncDailyLayout(daily){
