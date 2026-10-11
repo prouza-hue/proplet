@@ -57,6 +57,7 @@
   }
 
   function setChallengeContent(el){
+    el.dataset.plainInvite='true';
     setText(el,'Pozvi kamaráda');
     el.classList.remove('painted-action-control');
   }
