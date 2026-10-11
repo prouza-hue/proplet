@@ -1,0 +1,281 @@
+{
+  "seed": 6112026,
+  "rejections": {
+    "cutouts": 10542,
+    "isolated_cutouts": 10963,
+    "packing": 397,
+    "solver_unique": 334,
+    "solver_multiple": 140,
+    "mean_turns": 2926,
+    "ambiguity_band": 253,
+    "curvy_share": 191
+  },
+  "profiles": {
+    "hardcore": {
+      "rows": 10,
+      "cols": 10,
+      "cells": [
+        62,
+        72
+      ],
+      "words": [
+        9,
+        11
+      ],
+      "min_len": 4,
+      "max_len": 10,
+      "turn_bias": 1.15,
+      "min_bbox_rows": 8,
+      "min_bbox_cols": 8,
+      "min_curvy_share": 0.52,
+      "max_mean_straight_share": 0.56,
+      "geometry_profile": "gen6-specials-hardcore-v1",
+      "policy": {
+        "allowed": [
+          "A",
+          "B",
+          "C"
+        ],
+        "weights": {
+          "A": 1,
+          "B": 4,
+          "C": 3,
+          "D": 1
+        },
+        "min_fraction": {
+          "B": 0.35,
+          "C": 0.18
+        },
+        "max_fraction": {
+          "C": 0.38,
+          "D": 0
+        }
+      },
+      "max_curl_paths": 7,
+      "max_curl_run": 4,
+      "min_mean_turns": 2.35,
+      "max_mean_turns": 4.6,
+      "max_blank_components": 6,
+      "max_isolated_blanks": 1,
+      "ambiguity": [
+        0.0,
+        50.0
+      ],
+      "max_four_words": 2,
+      "cooldown": 12,
+      "new_word_cap": 3,
+      "geometry_restarts": 20,
+      "path_node_limit": 4200,
+      "min_path_turns": 1,
+      "max_path_turns": 8,
+      "max_path_straight_share": 0.76
+    },
+    "mozkomor": {
+      "rows": 10,
+      "cols": 10,
+      "cells": [
+        70,
+        76
+      ],
+      "words": [
+        10,
+        11
+      ],
+      "min_len": 5,
+      "max_len": 10,
+      "turn_bias": 1.55,
+      "min_bbox_rows": 8,
+      "min_bbox_cols": 8,
+      "min_curvy_share": 0.85,
+      "max_mean_straight_share": 0.4,
+      "geometry_profile": "gen6-specials-mozkomor-v1",
+      "policy": {
+        "allowed": [
+          "A",
+          "B",
+          "C"
+        ],
+        "weights": {
+          "A": 1,
+          "B": 4,
+          "C": 4,
+          "D": 1
+        },
+        "min_fraction": {
+          "B": 0.3,
+          "C": 0.3
+        },
+        "max_fraction": {
+          "A": 0.2,
+          "D": 0
+        }
+      },
+      "max_curl_paths": 10,
+      "max_curl_run": 4,
+      "min_mean_turns": 4.5,
+      "max_mean_turns": 6.0,
+      "max_blank_components": 6,
+      "max_isolated_blanks": 1,
+      "ambiguity": [
+        22,
+        55
+      ],
+      "max_four_words": 0,
+      "cooldown": 12,
+      "new_word_cap": 3,
+      "geometry_restarts": 20,
+      "path_node_limit": 4200,
+      "min_path_turns": 1,
+      "max_path_turns": 8,
+      "max_path_straight_share": 0.76
+    },
+    "mozkokalypsa": {
+      "rows": 10,
+      "cols": 10,
+      "cells": [
+        100,
+        100
+      ],
+      "words": [
+        14,
+        14
+      ],
+      "min_len": 5,
+      "max_len": 9,
+      "max_four_words": 0,
+      "min_bbox_rows": 10,
+      "min_bbox_cols": 10,
+      "min_curvy_share": 1,
+      "max_mean_straight_share": 0.42,
+      "min_mean_turns": 3.857142857142857,
+      "max_mean_turns": 5.4,
+      "min_path_turns": 2,
+      "max_path_turns": 7,
+      "max_path_straight_share": 0.75,
+      "max_curl_paths": 14,
+      "max_curl_run": 4,
+      "max_blank_components": 0,
+      "max_isolated_blanks": 0,
+      "geometry_profile": "gen6-specials-full-interwoven-v1",
+      "ambiguity": [
+        18,
+        60
+      ],
+      "policy": {
+        "allowed": [
+          "A",
+          "B",
+          "C"
+        ],
+        "weights": {
+          "A": 3,
+          "B": 3,
+          "C": 1
+        },
+        "min_fraction": {
+          "A": 0.35,
+          "B": 0.35
+        },
+        "max_fraction": {
+          "C": 0.22
+        }
+      }
+    }
+  },
+  "history": [
+    {
+      "path": "content/gen6/free-refresh-300/bank.json",
+      "sha256": "d03015b6079968bf552e26f45ba26eb38096ea42a8f7e03043ab0049a4959d68",
+      "boards": 300
+    },
+    {
+      "path": "content/gen6/mozkokalypsa-100/bank.json",
+      "sha256": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
+      "boards": 100
+    },
+    {
+      "path": "data/daily_gen6_private.json",
+      "sha256": "e70408ef8f05791c8080d0284a471800d39f2f939070430bffdf8994590b9f45",
+      "boards": 99
+    },
+    {
+      "path": "data/gen5_preview_puzzles.json",
+      "sha256": "2788e2afc40f358243b0e671ca44431c4138b452b0e88ecd9653a235a1e5fa9f",
+      "boards": 1811
+    },
+    {
+      "path": "data/legacy_daily_gen1.json",
+      "sha256": "36a853dd128ae2b0128dbc04fece9431b717b2414fe0048333bd0d538868c903",
+      "boards": 365
+    },
+    {
+      "path": "data/legacy_daily_gen2.json",
+      "sha256": "0a1ac4a75e5e435c002c7f61bbc858f553a0e58a5e70d05126c917fe9270ce61",
+      "boards": 365
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v1.json",
+      "sha256": "5850599df102b79471865326eb5b40fb24e69a6fdc4453e607adee5b364a2298",
+      "boards": 10
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v2.json",
+      "sha256": "e054f027262a1300199a81a6532bce707e769bbf57cf58538fc955ea98ffe610",
+      "boards": 12
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v3.json",
+      "sha256": "c412ad3ccb8dc0a651387046389aff055c34ada15c5cf75398c8440c1ce22410",
+      "boards": 8
+    },
+    {
+      "path": "data/puzzles.json",
+      "sha256": "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6",
+      "boards": 2146
+    },
+    {
+      "path": "data/puzzles_gen4_candidate_v334.json",
+      "sha256": "13d0eb0be5d7095f03fc95db0085497b04f03d4157b1b2a207e6da44a63603a5",
+      "boards": 1196
+    },
+    {
+      "path": "data/rolling_content_gen4_candidate_v334.json",
+      "sha256": "7b13ca502b94d16561d9d0ead202d53f9726a9e1b665838e0304657f735af894",
+      "boards": 65
+    },
+    {
+      "path": "data/rolling_content_v1.json",
+      "sha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c",
+      "boards": 65
+    },
+    {
+      "path": "data/tajenka_v2_approved.json",
+      "sha256": "16f7758b5d1c1c1d84ef21f23e0ca3f6490dedc5f66ae0afa96924e2b633f6bb",
+      "boards": 37
+    },
+    {
+      "path": "data/tajenka_v2_board_candidates.json",
+      "sha256": "0bd8b6842ca914315c9fadc01d39a6d70493b5f11b203fab41ca208a2051134f",
+      "boards": 41
+    },
+    {
+      "path": "data/tajenka_weekend_v1.json",
+      "sha256": "bf0b473149330fb882ba1bd0ad1e2b92e34b109c8ff3eed0aca779688fbce0c4",
+      "boards": 10
+    },
+    {
+      "path": "data/tajenka_weekend_v2.json",
+      "sha256": "ca289998729a355a9f6ab5ce4731a1b11ec1af809c8d757fb5bf84e3a873d33b",
+      "boards": 37
+    },
+    {
+      "path": "public/puzzles.json",
+      "sha256": "376a1f0f4dd10053fb872e533649bb2a45ec2d24b72425861282ccd2a69de91c",
+      "boards": 1827
+    }
+  ],
+  "historyDistinctContent": 3267,
+  "lexiconSHA256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
+  "dictionaryHash": "eaf808cd425024e1f84df62498abb8f7de9a39257b70dc0d069ac6f4d0cd05c1",
+  "dictionarySize": 103836
+}

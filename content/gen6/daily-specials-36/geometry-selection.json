@@ -1,0 +1,77 @@
+{
+  "maximumSharedPathCellSetsUnderSymmetry": 6,
+  "selection": [
+    {
+      "id": "g6-ds-mozkokalypsa-w01",
+      "attempt": 54,
+      "geometrySeed": 7103,
+      "geometryStep": 44096
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w02",
+      "attempt": 29,
+      "geometrySeed": 6112026,
+      "geometryStep": 233173
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w03",
+      "attempt": 15,
+      "geometrySeed": 6112026,
+      "geometryStep": 219345
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w04",
+      "attempt": 14,
+      "geometrySeed": 6142026,
+      "geometryStep": 7116572
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w05",
+      "attempt": 9,
+      "geometrySeed": 6112026,
+      "geometryStep": 226924
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w06",
+      "attempt": 10,
+      "geometrySeed": 6112026,
+      "geometryStep": 214605
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w07",
+      "attempt": 67,
+      "geometrySeed": 6112026,
+      "geometryStep": 233806
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w08",
+      "attempt": 4,
+      "geometrySeed": 6142026,
+      "geometryStep": 7116376
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w09",
+      "attempt": 167,
+      "geometrySeed": 8107,
+      "geometryStep": 103251
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w10",
+      "attempt": 125,
+      "geometrySeed": 6112026,
+      "geometryStep": 214181
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w11",
+      "attempt": 34,
+      "geometrySeed": 6112026,
+      "geometryStep": 216273
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w12",
+      "attempt": 3,
+      "geometrySeed": 9109,
+      "geometryStep": 3808337
+    }
+  ]
+}

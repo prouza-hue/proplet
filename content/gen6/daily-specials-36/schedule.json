@@ -1,0 +1,255 @@
+{
+  "timeZone": "Europe/Prague",
+  "launchDate": null,
+  "baseDailyCadence": [
+    "easy",
+    "easy",
+    "medium",
+    "medium",
+    "medium",
+    "hard",
+    "hard"
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w01"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w01"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w01"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w02"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w02"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w02"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w03"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w03"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w03"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w04"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w04"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w04"
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w05"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w05"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w05"
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w06"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w06"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w06"
+        }
+      ]
+    },
+    {
+      "week": 7,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w07"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w07"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w07"
+        }
+      ]
+    },
+    {
+      "week": 8,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w08"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w08"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w08"
+        }
+      ]
+    },
+    {
+      "week": 9,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w09"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w09"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w09"
+        }
+      ]
+    },
+    {
+      "week": 10,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w10"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w10"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w10"
+        }
+      ]
+    },
+    {
+      "week": 11,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w11"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w11"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w11"
+        }
+      ]
+    },
+    {
+      "week": 12,
+      "specials": [
+        {
+          "weekday": 3,
+          "difficulty": "hardcore",
+          "puzzleId": "g6-ds-hardcore-w12"
+        },
+        {
+          "weekday": 5,
+          "difficulty": "mozkomor",
+          "puzzleId": "g6-ds-mozkomor-w12"
+        },
+        {
+          "weekday": 7,
+          "difficulty": "mozkokalypsa",
+          "puzzleId": "g6-ds-mozkokalypsa-w12"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "previewPuzzleIds": [
+    "g6-ds-hardcore-w06",
+    "g6-ds-hardcore-w07",
+    "g6-ds-mozkomor-w12",
+    "g6-ds-mozkomor-w05",
+    "g6-ds-mozkokalypsa-w01",
+    "g6-ds-mozkokalypsa-w12"
+  ],
+  "files": {
+    "analyses.json": "a116eb122302c70852af4e9a29b4220a0ad889c8d3926057fb1b21248dcf3e0c",
+    "analysis.js": "f84ab26581cb7cd2af8c5e58a788992efb5d861d203b7e3feaba3d7a68be6383",
+    "assets/board.js": "6200b2b4f93dad28928ce3982fd24ec24370e7db9655b68bff96f46ca09c4b6e",
+    "assets/font-0.ttf": "ff7cf63717c27756df857ca12045a83522569f7b561bedaff813a25274eb263f",
+    "assets/font-1.ttf": "f0a9d39b9f14079c55070189562da36c794f824cbcf514b50a0ad0ef20c69379",
+    "assets/font-2.ttf": "6a8c9be856a6b9e09c66615634904616152c9de5e44db343a3ced240479c586a",
+    "assets/font-3.ttf": "9a9f465776e653cd6175661d844555e08684d432518f1d2c621bcb3006598f9c",
+    "assets/font-4.ttf": "8900df5726b5a6f23e723594f11d5ea27e695bd85c884f18d88ed080544fe205",
+    "assets/font-5.ttf": "49dcdf653a004a2575b3de649f5e4c549d774fecddf317812330edd0ad70685a",
+    "assets/fonts.css": "de93ea5b2e8d5664f1ecc2dfaa5e2dd97603196b79a4ca4e72f7764ad9529090",
+    "assets/hardcore.webp": "1d11e3119657c8e32b896363daf6127db53f59f6875c8287637451eab4b4c208",
+    "assets/input.js": "db917e5b2176c4dee88bdcd20fe3069ff190551aa3b872ed970c95f4511360a5",
+    "assets/mozkokalypsa.svg": "6db1291690c7add519a578b6c614a5841097580273621e27db2b0f8acf02d07c",
+    "assets/mozkomor.webp": "eea2bdf05bd3dee2a845ce68c3476014cca17b39503e6d229a25fc9af221c931",
+    "assets/recognition.txt": "2548973544b5a3b9ab691804635546fdf4733a464e86614e86fbd62f9d07a456",
+    "assets/ribbon-ui.css": "341601f4957a4bb02b06b3e22d56b05ac4b025fbbbca96ef99dcdf9814929938",
+    "boards.json": "ce3c1777229296ec1b81ed127191765ee5892fbe5488e079f66d5409a989292b",
+    "index.html": "8e473fc08f6caf2c0ccc197f70590a8fba01131e3c62b0d480b082d0c4f08b16",
+    "playtest.js": "639f07b4fa142cabb17f8e758f458002cb7cd5e3baa8801ad9f582d2f947b71c",
+    "rozbor.html": "302a7b7014d14c242be634ac13bc14f5a2f83281c17340c6ab0146579480f28c",
+    "style.css": "d423067ed0cc761e7e4279d76f6b7b9df9687d1e5cef83d49af79d3cdcd98956"
+  },
+  "privateBankExposed": false,
+  "databaseWrites": false,
+  "productionAuthorized": false
+}
