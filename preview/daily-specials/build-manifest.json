@@ -10,6 +10,8 @@
   "files": {
     "analyses.json": "a116eb122302c70852af4e9a29b4220a0ad889c8d3926057fb1b21248dcf3e0c",
     "analysis.js": "f84ab26581cb7cd2af8c5e58a788992efb5d861d203b7e3feaba3d7a68be6383",
+    "assets/Fraunces-OFL.txt": "bdf4c22802eaf804f998195871c6b8938aac2ac14b2d78a8bd66a6f1eced833b",
+    "assets/Outfit-OFL.txt": "c676351bf8576b9aba743cd5eaa8c0e7ee0d51f805d720447b4df4ddb6a2e416",
     "assets/board.js": "6200b2b4f93dad28928ce3982fd24ec24370e7db9655b68bff96f46ca09c4b6e",
     "assets/font-0.ttf": "ff7cf63717c27756df857ca12045a83522569f7b561bedaff813a25274eb263f",
     "assets/font-1.ttf": "f0a9d39b9f14079c55070189562da36c794f824cbcf514b50a0ad0ef20c69379",

@@ -22,7 +22,9 @@ jobs:
         with:
           node-version: '22'
       - name: Independently validate all 36 boards
-        run: python -m tools.daily_specials.verify
+        run: |
+          python -m unittest tools.daily_specials.test_validation
+          python -m tools.daily_specials.verify
       - name: Build six-board static preview
         run: python -m tools.daily_specials.build_preview
       - name: Install browser driver
