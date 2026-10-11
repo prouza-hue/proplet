@@ -2,7 +2,7 @@
 
 Připraveno 11. 10. 2026. Stav: **technicky ověřeno, čeká na lidský playtest a následné schválení integrace**. Žádné datum spuštění. Žádné produkční vazby na data. PR [#192](https://github.com/prouza-hue/proplet/pull/192).
 
-[Hratelný playtest](https://proplet-garbzwk7d-pavel-prouzas-projects.vercel.app/) · [oddělená řešení a rozbory](https://proplet-garbzwk7d-pavel-prouzas-projects.vercel.app/rozbor.html) · [integrační předání](INTEGRATION.md).
+[Hratelný playtest](https://proplet-5rrsniy1g-pavel-prouzas-projects.vercel.app/) · [oddělená řešení a rozbory](https://proplet-5rrsniy1g-pavel-prouzas-projects.vercel.app/rozbor.html) · [integrační předání](INTEGRATION.md).
 
 ## Obsah
 
@@ -84,7 +84,7 @@ Benchmark byl přepočten stejnou prefixovou množinou pro nové i stávající 
 
 Výběr kombinuje relativní pořadí geometrie, počátečního větvení a zbytků; MK náročnější reprezentuje jednu ze tří výraznějších plných konstrukcí. Nálepky nejsou před hraním zobrazené, řešení jsou až na oddělené spoilerové stránce. Zabránit pořadovému efektu: část testerů nejdřív 1, část nejdřív 2; střídat i pořadí obtížností. Cílem jsou náročnost/zábavnost 1–5, neznámá či rušivá slova, nápovědy a tempo posledních tří nálezů. Export JSON obsahuje průběh nálezů i hodnocení; nic automaticky neodesílá.
 
-Preview používá původní `public/app/game/board.js` a `input.js`, původní tři ikony, Outfit/Fraunces a Tiskařskou dílnu. Vlastní lokální namespace obsahuje ID i obsahový hash. Nemá účet, XP, veřejné výsledky ani Supabase klienta. Na web jde pouze šest ukázek; úplná banka/kalendář mimo static root. Stav Vercelu READY, target null (=preview), Git SHA `b769afb798b059e37a42ea8c62eebf3d936cbc90`, deployment `dpl_29d46qnE6atnvERiEMaJwWoHPzdu`. Kořenové `vercel.json` ani project settings produkce nejsou změněny; pouze deployment-specific root `preview/daily-specials`.
+Preview používá původní `public/app/game/board.js` a `input.js`, původní tři ikony, Outfit/Fraunces a Tiskařskou dílnu. Vlastní lokální namespace obsahuje ID i obsahový hash. Nemá účet, XP, veřejné výsledky ani Supabase klienta. Na web jde pouze šest ukázek; úplná banka/kalendář mimo static root. Stav Vercelu READY, target null (=preview), Git SHA `e6d836db9bff5195f6c00b76bce1e70e4d60e8de`, deployment `dpl_CziE7kySVJ8K3W4NjvFpXRRyqyZb`. Kořenové `vercel.json` ani project settings produkce nejsou změněny; pouze deployment-specific root `preview/daily-specials`.
 
 [CI 38160948220](https://github.com/prouza-hue/proplet/actions/runs/38160948220): oba řešiči 36/36 a skutečné tahy **12/12** (všech šest myší při 1280px i dotykem při 390px); obnova po reloadu, undo, pauza, dokončení celé plochy, uložení zpětné vazby, chybné cesty, nápověda a oddělené spoilery. Žádné JS chyby, externí požadavky ani zapisující HTTP metody v preview. Artifact obsahuje report a snímky. Current runtime gate stejného commitu prošel. Live `/boards.json` odpovídá vybraným šesti bitově po parsování; private bank a `/api/daily` mají 404. Nasazené preview bylo také vizuálně otevřeno v prohlížeči. Toto je automatická/funkční QA, **nikoli dokončený lidský playtest**.
 
@@ -105,3 +105,7 @@ Pro browser QA: Playwright 1.57, Chrome, `PROPLET_PREVIEW_ORIGIN` případně na
 ## Hotovo / čeká
 
 **Hotovo:** banka, šest ukázek, podpora a dva validátory vyšších obtížností, lexikální/strukturální kontrola, relativní rozvrh, oddělený statický playtest, dokumentované integrační změny. **Čeká:** lidský playtest, finální ekonomické a archivační volby, implementace nového výsledkového kontraktu a UI Dnes, Supabase migrace, datum spuštění a produkční schválení. PR je obsahová příprava; sloučení není pokyn k aktivaci speciálů.
+
+## Vizuální doklad
+
+![Ověřený hratelný playtest, konečné preview](preview-hub.jpg)
