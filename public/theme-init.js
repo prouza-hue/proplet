@@ -228,14 +228,15 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=dailygen6-20261008-telemetry1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=dailygen6-20261008-clienterrors2','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=mk100','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=flowcontext1-inappauth1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=style-recovery1','propletGameLayout');
-    loadScript('/gesture-guard-v3325.js?v=fixsep8c','propletGestureGuard');
+    await loadScript('/app/client-diagnostics.js?v=2','propletClientDiagnostics',{wait:true});
+    loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     loadScript('/valid-word-feedback-v3330.js?v=mkpilot4','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');

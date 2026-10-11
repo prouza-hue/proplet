@@ -381,6 +381,7 @@ def record_operational_event(
     actor_kind: Optional[str] = None,
     code: Optional[str] = None,
     metadata: Optional[dict] = None,
+    app_version: Optional[str] = None,
 ) -> None:
     safe_metadata = {}
     for key, value in (metadata or {}).items():
@@ -394,7 +395,7 @@ def record_operational_event(
         "severity": severity,
         "request_id": str(request_id or "")[:80] or None,
         "route": sanitized_operational_route(route),
-        "app_version": APP_VERSION,
+        "app_version": app_version or APP_VERSION,
         "actor_kind": actor_kind,
         "code": str(code or "")[:80] or None,
         "metadata": safe_metadata,
@@ -2469,15 +2470,39 @@ def client_error(
         pass
     # Message is intentionally truncated; never accept client-supplied stack traces or tokens.
     message_code = re.sub(r"[^a-zA-Z0-9_.:-]+", "_", str(payload.code or "client_error"))[:80]
-    record_operational_event(
-        "client_error",
-        severity="error",
-        request_id=getattr(request.state, "request_id", None),
-        route=sanitized_operational_route(payload.route) or request.url.path,
-        actor_kind=actor_kind,
-        code=message_code,
-        metadata={"message": str(payload.message or "")[:200]},
-    )
+    provenance = dict(measurement.context.get() or measurement.request_context(request, VERCEL_ENV))
+    header_release = request.headers.get('x-proplet-client-release', '')
+    body_release = getattr(payload, 'client_release', None)
+    explicit_header = bool(re.fullmatch(r'proplet-v\d+\.\d+\.\d+-[A-Za-z0-9_.-]+', header_release))
+    explicit_body = bool(re.fullmatch(r'proplet-v\d+\.\d+\.\d+-[A-Za-z0-9_.-]+', body_release or ''))
+    source = 'header' if explicit_header else 'body' if explicit_body else 'unreported'
+    if explicit_body and not explicit_header:
+        provenance['client_release'] = body_release
+        provenance['measurement_version'] = 2
+    provenance['is_test'] = bool(provenance.get('is_test') or getattr(payload, 'is_test', False))
+    measured_release = provenance.get('client_release', 'legacy')
+    match = re.match(r'^proplet-v(\d+\.\d+\.\d+)-', measured_release)
+    client_version = match.group(1) if match else client_app_version(request)
+    safe_metadata = {"message": str(payload.message or "")[:200], 'client_provenance': source, 'server_version': APP_VERSION}
+    if explicit_header and explicit_body and header_release != body_release:
+        safe_metadata['client_provenance_conflict'] = True
+    source_file = getattr(payload, 'source_file', None)
+    if source_file and '..' not in source_file and re.fullmatch(r'/(?:app/)?[A-Za-z0-9_./-]+\.js', source_file):
+        safe_metadata.update({key: getattr(payload, key, None) for key in ('source_file', 'source_line', 'source_column')})
+    token = measurement.context.set(provenance)
+    try:
+        record_operational_event(
+            "client_error",
+            severity="error",
+            request_id=getattr(request.state, "request_id", None),
+            route=sanitized_operational_route(payload.route) or request.url.path,
+            actor_kind=actor_kind,
+            code=message_code,
+            metadata=safe_metadata,
+            app_version=client_version,
+        )
+    finally:
+        measurement.context.reset(token)
     return {"ok": True}
 
 

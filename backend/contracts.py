@@ -170,6 +170,12 @@ class ClientErrorCreate(BaseModel):
     code: str = Field(default="client_error", min_length=2, max_length=80)
     message: Optional[str] = Field(default=None, max_length=240)
     route: Optional[str] = Field(default=None, max_length=120)
+    client_release: Optional[str] = Field(default=None, max_length=80, pattern=r'^[A-Za-z0-9_.-]+$')
+    client_version: Optional[str] = Field(default=None, max_length=40, pattern=r'^\d+\.\d+\.\d+$')
+    is_test: bool = False
+    source_file: Optional[str] = Field(default=None, max_length=120, pattern=r'^/(?:app/)?[A-Za-z0-9_./-]+\.js$')
+    source_line: Optional[int] = Field(default=None, ge=1, le=1000000)
+    source_column: Optional[int] = Field(default=None, ge=1, le=1000000)
 
 
 class AccountDeleteConfirm(BaseModel):

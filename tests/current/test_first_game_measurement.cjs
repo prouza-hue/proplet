@@ -35,6 +35,7 @@ if(!baseline){
 const puzzle={id:'g6-d-test',difficulty:'easy',answers:[{word:'PES',path:[0,1,2]},{word:'LES',path:[3,4,5]}]};
 const view={currentGame:null,winDailyGlobalData:null,COLORS:['red','blue'],DIFF:{easy:{label:'Snadná'}},renderTimingStatus(){},historicalDailyPuzzle:async()=>puzzle,stopTimer(){},renderCompletionPraise(){},setWinXpDisplay(){},configureWinReplay(){},updateWinAccountCta(){},renderWinFeedback(){},loadWinDailyGlobalLeaderboard(){},renderWinBadges(){},getState:()=>({completed:{}}),$:query,fmtTime:String,countCz:String,esc:String,renderTajenkaPhrase(){},renderMagnifierControls(){}};
 vm.createContext(view);
+if(!baseline)vm.runInContext(app.slice(app.indexOf('function dailyResultSnapshot('),app.indexOf('async function showDailyResult(')),view);
 vm.runInContext(app.slice(app.indexOf('async function showDailyResult('),app.indexOf('function shareText()')),view);
 vm.runInContext(app.slice(app.indexOf('function updateGameFeel(){'),app.indexOf('function sleep(')),view);
 vm.runInContext(app.slice(app.indexOf('function renderGameHUD(){'),app.indexOf('function fitGameBoard(')),view);

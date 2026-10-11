@@ -35,9 +35,14 @@
     if(conflictReported)return;
     conflictReported=true;
     try{
+      if(typeof reportClientError==='function'){
+        reportClientError('gesture_conflict',active?.kind==='tutorial'?'pointercancel_tutorial':'pointercancel_game');return;
+      }
+      // Before app.js is ready the producing client is genuinely unknown.
+      // Never infer its version from a newer runtime-meta.js in a mixed cache.
       fetch('/api/client-error',{
         method:'POST',
-        headers:{'Content-Type':'application/json'},
+        headers:{'Content-Type':'application/json',...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})},
         body:JSON.stringify({
           code:'gesture_conflict',
           message:active?.kind==='tutorial'?'pointercancel_tutorial':'pointercancel_game',

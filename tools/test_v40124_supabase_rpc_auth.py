@@ -18,10 +18,10 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 service_worker = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.05.3"' in version
-assert "version:'4.05.3'" in runtime
+assert 'APP_VERSION = "4.05.4"' in version
+assert "version:'4.05.4'" in runtime
 assert "supabaseRpcAuthRetryV40124:true" in runtime
-assert "proplet-v4.05.3-firstgame-telemetry1" in service_worker
+assert "proplet-v4.05.4-clienterrors2" in service_worker
 
 
 with patch.object(server, "SUPABASE_SECRET_KEY", "sb_secret_opaque"):
