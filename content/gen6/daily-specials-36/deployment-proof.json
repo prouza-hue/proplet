@@ -14,5 +14,7 @@
   "qaVerifiedDocsSourceSHA": "e6d836db9bff5195f6c00b76bce1e70e4d60e8de",
   "qaRun2": "https://github.com/prouza-hue/proplet/actions/runs/38161699743",
   "qaRun2Status": "success",
-  "negativeFixturesPassed": 8
+  "negativeFixturesPassed": 7,
+  "validationFixturesPassed": 8,
+  "positiveFixturesPassed": 1
 }
