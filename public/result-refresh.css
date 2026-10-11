@@ -1,0 +1,60 @@
+/* Shared printed XP sticker; compact native result, same nodes and handlers. */
+html body .xp-sticker,html.tiskarna-ui body #winModal #winXp.xp-sticker{position:relative;display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;flex:0 0 auto;min-height:38px!important;width:auto!important;max-width:150px;padding:9px 13px!important;border:1px solid #aa7a28!important;border-radius:7px 7px 11px 7px!important;background:#f5d98c!important;color:#4b3718!important;box-shadow:2px 3px 0 #bf974654!important;font:750 18px/1.15 Outfit,system-ui,sans-serif!important;letter-spacing:-.2px;white-space:nowrap;transform:rotate(-3deg);margin:0!important}
+html body .xp-sticker:after{content:"";position:absolute;right:0;bottom:0;width:9px;height:9px;background:#d1aa59;clip-path:polygon(100% 0,0 100%,100% 100%);border-bottom-right-radius:8px}
+html.tiskarna-ui body #winModal #winXp.xp-sticker strong{font:inherit!important}
+html.tiskarna-ui body #winModal #winXp.xp-sticker small{font:500 10px/1.3 Outfit,sans-serif!important;white-space:normal;max-width:130px;margin-top:3px}
+.ref-visual{display:flex;flex-direction:column;align-items:center;gap:15px;min-width:0}.ref-reward{display:flex;flex-direction:column;gap:5px;align-items:center}.ref-reward small{font:500 11px/1.3 Outfit,sans-serif;color:var(--ref-muted)}
+html body #referralHome:not(.ref-incoming) .ref-story{min-height:0;grid-template-columns:minmax(0,1fr) 160px;align-items:center}
+html body #referralHome:not(.ref-incoming) .ref-wide{margin-top:20px!important}
+html body :is(#referralHome,#referralProfile) .ref-wide,html body :is(#referralHome,#referralProfile) [data-ref-open]{background:#27694f!important;color:#fffaf0!important;border:1px solid #174c38!important;box-shadow:0 3px 0 #174c38!important;min-height:48px!important;cursor:pointer}
+html body :is(#referralHome,#referralProfile) .ref-wide:hover{background:#205b44!important}
+html body :is(#referralHome,#referralProfile) .ref-action-row{margin-top:14px}
+html body #referralHome .ref-story .ref-art{transform:none;margin:0}
+html.tiskarna-ui body #winModal.result-compact .win-card{display:flex!important;flex-direction:column!important;gap:0!important;width:min(100%,680px)!important;max-height:calc(100dvh - 32px)!important;padding:22px!important;overflow-y:auto!important;scrollbar-gutter:stable;scroll-padding-block:16px}
+html.tiskarna-ui body #winModal.result-compact .win-card>*{order:initial!important;flex-shrink:0}
+html.tiskarna-ui body #winModal.result-compact .win-result-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;margin:0 0 15px}
+html.tiskarna-ui body #winModal.result-compact #winTitle{min-width:0;flex:1;text-align:left!important;margin:0!important;font:650 clamp(24px,3.2vw,32px)/1.15 Outfit,sans-serif!important;letter-spacing:-.6px!important}
+html.tiskarna-ui body #winModal.result-compact :is(#winBadge,#winClean,.win-summary-chips){display:none!important}
+html.tiskarna-ui body #winModal.result-compact .win-summary{display:contents!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+html.tiskarna-ui body #winModal.result-compact #winText{display:none!important}
+html.tiskarna-ui body #winModal.result-compact #winTimingNotice:not([hidden]){display:block!important;margin:0 0 12px!important;font-size:12px!important}
+html.tiskarna-ui body #winModal.result-compact .win-praise:empty{display:none!important}
+html.tiskarna-ui body #winModal.result-compact .level-leaderboard-box{width:100%!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+html.tiskarna-ui body #winModal.result-compact .free-board-tabs{display:none!important}
+html.tiskarna-ui body #winModal.result-compact .level-board-head{margin-bottom:8px!important}
+html.tiskarna-ui body #winModal.result-compact .daily-world-neighbours{gap:5px!important}
+html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:43px!important;padding:7px 9px!important}
+html.tiskarna-ui body #winModal.result-compact #winResultActions{display:flex!important;flex-direction:column!important;gap:10px!important;align-self:center;width:100%!important;max-width:540px;margin:16px auto 6px!important}
+html.tiskarna-ui body #winModal.result-compact #winResultActions :is(#winPrimaryBtn,#winShareBtn){display:flex;align-items:center;justify-content:center;width:100%!important;max-width:none!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;border-radius:12px!important;font:650 15px/1.2 Outfit,sans-serif!important}
+html.tiskarna-ui body :is(#winModal #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#b84835!important;color:#fffaf0!important;border:1px solid #8f3426!important;box-shadow:0 3px 0 #8f3426!important}
+html.tiskarna-ui body #winModal #winShareBtn.challenge-share-cta img{display:none!important}
+html.tiskarna-ui body #winModal.result-compact #winResultActions .hidden{display:none!important}
+html.tiskarna-ui body #winModal.result-compact :is(.win-secondary-actions,.win-details){margin-top:10px!important}
+html body #winModal #referralWin{max-width:540px;margin:12px auto!important;padding:16px!important}
+html body #winModal #referralWin .ref-result-progress{display:flex;align-items:center;justify-content:space-between;gap:10px}
+html body #winModal #referralWin .ref-steps{margin:12px auto 0}
+html body #winModal #referralWin.ref-earned h3{font:650 22px/1.2 Outfit,sans-serif!important;margin:0 25px 5px!important}
+html body #winModal #referralWin.ref-earned .ref-reward{margin-top:10px}
+.ref-choice{margin-top:24px}
+html body #referralDialog .ref-choice .primary-btn{width:100%;min-height:48px;background:#b84835!important;border-color:#8f3426!important;color:#fffaf0!important;box-shadow:0 3px 0 #8f3426!important}
+html body #referralDialog .ref-choice [data-ref-open]{background:#27694f!important;border-color:#174c38!important;box-shadow:0 3px 0 #174c38!important}
+.ref-choice p{font:400 13px/1.5 Outfit,sans-serif;color:var(--ref-muted);text-align:center;margin:12px 0 0}
+.ref-choice-bonus{display:flex;align-items:center;justify-content:center;gap:12px;border-top:1px solid var(--ref-line);margin:20px 0 16px;padding-top:20px}.ref-choice-bonus .ref-art{margin:0}
+html[data-theme=dark] body :is(#referralHome,#referralProfile) .ref-wide{background:#2b7457!important;border-color:#559074!important;box-shadow:0 3px 0 #183f30!important}
+html[data-theme=dark].tiskarna-ui body :is(#winModal #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#a53e30!important;border-color:#cc7968!important;box-shadow:0 3px 0 #66271e!important}
+@media(max-width:580px){
+html body #referralHome:not(.ref-incoming) .ref-story{grid-template-columns:minmax(0,1fr) 115px;gap:12px}
+html body #referralHome .ref-visual .ref-art{width:120px;transform:scale(.9);transform-origin:center center}
+html body #referralHome .ref-visual .xp-sticker{font-size:16px!important;padding:8px 9px!important}.ref-visual{gap:8px}
+html.tiskarna-ui body #winModal.result-compact .win-card{padding:18px 16px!important}
+html.tiskarna-ui body #winModal.result-compact .win-result-heading{gap:10px;margin-bottom:12px}
+html.tiskarna-ui body #winModal.result-compact #winXp.xp-sticker{font-size:16px!important;padding:8px 10px!important;max-width:118px}
+}
+@media(max-width:380px){
+html body #referralHome:not(.ref-incoming) .ref-story{grid-template-columns:minmax(0,1fr) 95px;gap:10px}
+html body #referralHome .ref-visual .ref-art{width:120px;transform:scale(.75);transform-origin:center center;margin:0 -12px}
+html body #referralHome:not(.ref-incoming) h2{font-size:24px!important}
+html body #referralHome .ref-visual .xp-sticker{font-size:14px!important;padding:7px 8px!important}
+html.tiskarna-ui body #winModal.result-compact #winTitle{font-size:23px!important}
+html.tiskarna-ui body #winModal.result-compact #winXp.xp-sticker{font-size:14px!important}
+}

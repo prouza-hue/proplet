@@ -13,7 +13,7 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===7);
+ await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===8);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
@@ -91,10 +91,10 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(after.points-before.points,1015);
   assert.equal(after.weeklyXp-before.weeklyXp,15);
   assert.equal(after.weeklyTeamXp-before.weeklyTeamXp,15);
-  assert.match(await page.locator('#referralWin').innerText(),/Týden|týdenních/);
+  assert.equal(await page.locator('#winClean').isVisible(),false);
   await screenshot(page,'04-real-fifth-board-reward');
   assert.equal(await page.locator('#referralHome .ref-steps .done').count(),5);
-  assert.equal(await page.locator('#referralWin #winShareBtn').count(),1);
+  assert.equal(await page.locator('#winResultActions #winShareBtn').count(),1);
   await page.locator('#referralWin [data-ref-reward-close]').click();
   await page.locator('#winMenuBtn').click();
   assert.equal(await page.locator('#referralHome').isVisible(),false);
@@ -137,26 +137,49 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   const inviterPaths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
   for(let i=0;i<inviterPaths.length;i++){await draw(page,inviterPaths[i]);await page.waitForFunction(n=>currentGame.found.length===n,i+1)}
   await page.locator('#winModal').waitFor({state:'visible'});
-  await page.waitForFunction(()=>document.querySelector('#referralWin #winShareBtn')?.textContent.includes('Pojď si zahrát Proplet'));
-  const box=await page.locator('#referralWin').boundingBox(),parent=await page.locator('#referralWin').evaluate(el=>el.parentElement.getBoundingClientRect().toJSON());
+  await page.waitForFunction(()=>document.querySelector('#winResultActions #winShareBtn')?.textContent.includes('Pozvi kamaráda'));
+  const box=await page.locator('#winResultActions').boundingBox(),parent=await page.locator('#winResultActions').evaluate(el=>el.parentElement.getBoundingClientRect().toJSON());
   assert(box.width<=542&&Math.abs(box.x+box.width/2-parent.x-parent.width/2)<3,'result invitation is centered and constrained');
   assert.equal(await page.locator('.win-secondary-actions #winShareBtn').count(),0);
   await page.evaluate(()=>{window.__refNativeShare=null;Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__refNativeShare=data}})});
-  await page.locator('#referralWin #winShareBtn').click();
+  await page.locator('#winResultActions #winShareBtn').click();
+  await page.locator('#refShareBoard').click();
   await page.waitForFunction(()=>window.__refNativeShare);
   assert(!new URL(await page.evaluate(()=>window.__refNativeShare.url)).searchParams.has('invite'),'challenge keeps native board link rather than bonus invite');
   assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);
-  await visual(page,'#referralWin','result-desktop');
-  await page.locator('#referralWin [data-ref-open]').click();
+  await visual(page,'#winModal .win-card','result-desktop');
+  await page.locator('#winShareBtn').click();
+  await page.locator('#referralDialog [data-ref-open]').click();
   assert.equal(await page.locator('#referralDialog').isVisible(),true);
   await page.keyboard.press('Escape');
   await page.setViewportSize({width:390,height:844});
-  await visual(page,'#referralWin','result-mobile');
+  await visual(page,'#winModal .win-card','result-mobile');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
-  await page.locator('#winMenuBtn').click();
+  
+  assert.equal(await page.locator('#levelLeaderboardBox [role="tablist"]').count(),0);
+  assert.equal(await page.locator('#winClean').isVisible(),false);
+  assert.equal(await page.locator('#winShareBtn img').count(),0);
+  for(const width of [320,390,690,1440]){
+   await page.setViewportSize({width,height:950});
+   for(const theme of ['light','dark']){
+    await page.evaluate(t=>applyTheme(t),theme);
+    const layout=await page.evaluate(()=>{
+     const rect=id=>document.getElementById(id).getBoundingClientRect().toJSON();
+     return {rank:rect('levelLeaderboardBox'),next:rect('winPrimaryBtn'),invite:rect('winShareBtn'),xp:rect('winXp'),title:rect('winTitle'),overflow:document.documentElement.scrollWidth>innerWidth+1};
+    });
+    assert(layout.rank.bottom<=layout.next.top+2&&layout.next.bottom<=layout.invite.top+2,'ranking, next game, invitation order');
+    assert(!layout.overflow);
+    assert(layout.xp.top<layout.rank.top,'XP stays with the result title');
+    await visual(page,'#winModal .win-card','result-'+width+'-'+theme);
+   }
+  }
+  await page.locator('#winPrimaryBtn').click();
+  await page.waitForFunction(()=>currentGame&&!currentGame.finished&&document.querySelector('#winModal').classList.contains('hidden'));
+  check('Continue action starts next real board; compact result order verified at four widths in both themes');
+
   await ready(page,'?view=reward');
   await visual(page,'#referralHome','home-paid');
-  check('Both sharing routes remain distinct inside a centered illustrated result card on desktop and mobile');
+  check('Single result invitation opens distinct board and bonus routes; original native sharing preserved');
   const blocked=await page.evaluate(async()=>{const r=await fetch('https://iopyhluayfszskyqqpuc.supabase.co/rest/v1/players',{method:'POST',body:'{}'});return {status:r.status,audit:PropletReferralPreview.audit}});
   assert.equal(blocked.status,403);
   const production=requests.filter(r=>/supabase\.co|hrajproplet\.cz|facebook|google-analytics/.test(new URL(r.url).hostname));
