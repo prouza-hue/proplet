@@ -114,7 +114,7 @@ const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=dailygen6-20261008')&&sw.includes('/theme-init.js?v=dailygen6-20261008'),'theme-init cache boundary drifted');
+assert(index.includes('/theme-init.js?v=profile-statistics1')&&sw.includes('/theme-init.js?v=profile-statistics1'),'theme-init cache boundary drifted');
 assert(themeInit.includes("loadScript('/home-layout.js?v=mk100'"),'home layout cache boundary drifted');
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
@@ -140,3 +140,4 @@ assert(sw.includes('/app/account/session.js'),'account session missing from PWA 
 assert(sw.includes('/app/account/tajenka-storage.js'),'account-scoped Tajenka storage missing from PWA shell');
 assert(sw.includes('/app/account/account.js'),'account UI owner missing from PWA shell');
 console.log('PASS: Sprint 12A.1 account session owns profile persistence and auth acceptance contracts');
+
