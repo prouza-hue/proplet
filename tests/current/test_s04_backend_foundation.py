@@ -109,6 +109,19 @@ assert set(openapi_contract["paths"]["/api/first-board/assignment"]) == {"post"}
 openapi_contract["paths"].pop("/api/first-board/assignment")
 openapi_contract["components"]["schemas"].pop("AssignmentRequest")
 
+# Diagnostic provenance adds only optional fields; the actual route/model boundary
+# is covered by test_client_error_contract (including rejection and test exclusion).
+diag = openapi_contract['components']['schemas']['ClientErrorCreate']
+added = {'client_release','client_version','is_test','source_file','source_line','source_column'}
+assert set(diag['properties']) == {'code','message','route'} | added
+assert not (set(diag.get('required', [])) & added)
+assert diag['properties']['is_test']['default'] is False
+for field in ('source_line','source_column'):
+    bounded = next(v for v in diag['properties'][field]['anyOf'] if v.get('type') == 'integer')
+    assert bounded['minimum'] == 1 and bounded['maximum'] == 1000000
+for field in added:
+    diag['properties'].pop(field)
+
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )
