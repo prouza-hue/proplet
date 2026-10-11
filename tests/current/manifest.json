@@ -5,13 +5,34 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
-      {"path":"tests/current/test_client_diagnostic_transport.cjs","runner":"node"},
-      {"path":"tests/current/test_client_error_contract.py","runner":"python"},
-      {"path":"tests/current/test_daily_share_snapshot.cjs","runner":"node"},
-      {"path":"tests/current/test_first_game_measurement.cjs","runner":"node"},
-      {"path":"tests/current/test_postgres_rpc.py","runner":"python"},
-      {"path":"tests/current/test_usage_optimization.py","runner":"python"},
-      {"path":"tests/current/test_usage_optimization.cjs","runner":"node"},
+      {
+        "path": "tests/current/test_client_diagnostic_transport.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_client_error_contract.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_daily_share_snapshot.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_first_game_measurement.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_postgres_rpc.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_usage_optimization.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_usage_optimization.cjs",
+        "runner": "node"
+      },
       {
         "path": "tests/current/test_historical_free_rewards.py",
         "runner": "python"
@@ -546,6 +567,10 @@
       },
       {
         "path": "tests/current/test_dated_daily_store.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_profile_statistics.js",
         "runner": "node"
       }
     ]

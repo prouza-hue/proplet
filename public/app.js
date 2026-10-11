@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.05.4-clienterrors2';
+const APP_PREVIEW_RELEASE='proplet-v4.05.5-profile-statistics1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1553,7 +1553,7 @@ function accountUI(){
  if(accountUIController)return accountUIController;
  const factory=window.PropletAccountUI;if(!factory?.create)throw new Error('Account UI modul není dostupný.');
  accountUIController=factory.create({
-  $,$$,api,getProfile,updateAccountProfile,esc,countCz,czPlural,fmtTime,currentLocalStats,effectiveStats,levelFor,getQueue,
+  $,$,api,getProfile,getState,accountProgressAvailable,updateAccountProfile,esc,countCz,czPlural,fmtTime,currentLocalStats,effectiveStats,levelFor,getQueue,
   AVATARS,LEVELS,BADGES,SUPPORT_MODES,renderInstallUI,renderAchievementSummary,renderAchievements,syncAchievementDisclosure,
   toggleProfileAchievementsExpanded:()=>{profileAchievementsExpanded=!profileAchievementsExpanded},focusProfileRoadmap,updatePushUI,
   renderSettings,renderPrivacyActions,getSyncState:()=>syncState,getCurrentScreen:()=>currentScreen,showToast,
