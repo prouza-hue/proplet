@@ -10,7 +10,7 @@ html body :is(#referralHome,#referralProfile) .ref-wide,html body :is(#referralH
 html body :is(#referralHome,#referralProfile) .ref-wide:hover{background:#205b44!important}
 html body :is(#referralHome,#referralProfile) .ref-action-row{margin-top:14px}
 html body #referralHome .ref-story .ref-art{transform:none;margin:0}
-html.tiskarna-ui body #winModal.result-compact .win-card{display:flex!important;flex-direction:column!important;gap:0!important;width:min(100%,680px)!important;max-height:calc(100dvh - 32px)!important;padding:22px!important;overflow-y:auto!important;scrollbar-gutter:stable;scroll-padding-block:16px}
+html.tiskarna-ui body #winModal.result-compact .win-card{display:flex!important;flex-direction:column!important;gap:0!important;width:min(100%,680px)!important;max-height:calc(100dvh - 32px)!important;padding:22px!important;overflow-y:auto!important;scroll-padding-block:16px}
 html.tiskarna-ui body #winModal.result-compact .win-card>*{order:initial!important;flex-shrink:0}
 html.tiskarna-ui body #winModal.result-compact .win-result-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;margin:0 0 15px}
 html.tiskarna-ui body #winModal.result-compact #winTitle{min-width:0;flex:1;text-align:left!important;margin:0!important;font:650 clamp(24px,3.2vw,32px)/1.15 Outfit,sans-serif!important;letter-spacing:-.6px!important}

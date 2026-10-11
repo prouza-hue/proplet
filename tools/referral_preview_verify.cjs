@@ -13,7 +13,7 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===8);
+ try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===8)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
@@ -30,7 +30,7 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
  try{
   const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const page=await context.newPage(),errors=[],requests=[];
-  page.on('pageerror',e=>errors.push(e.message));
+  page.on('pageerror',e=>{errors.push(e.message);console.error('BROWSER_ERROR '+e.message)});
   page.on('request',r=>requests.push({url:r.url(),method:r.method()}));
   await ready(page);await screenshot(page,'01-native-home');await visual(page,'#referralHome','home-inviter');
   assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);check('No unsolicited promotional modal');
