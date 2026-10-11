@@ -63,6 +63,10 @@ jobs:
         env:
           RESULT_PATH: browser-results/first-game-safety.json
         run: node tools/test_first_game_safety_browser.cjs
+      - name: Verify client error provenance and cached clients
+        env:
+          RESULT_PATH: browser-results/client-diagnostics.json
+        run: node tools/test_client_diagnostics_browser.cjs
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4

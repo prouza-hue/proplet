@@ -42,7 +42,8 @@ const server=http.createServer(async(req,res)=>{
   }
   if(p.startsWith('/api/')){
    const data=['GET','HEAD'].includes(req.method)?null:await body(req);
-   requests.push({method:req.method,path:p,headers:req.headers,at:Date.now()});
+   requests.push({method:req.method,path:p,headers:req.headers,at:Date.now(),...(p==='/api/client-error'?{body:data}:{})});
+   if(p==='/api/client-error'&&req.method==='POST')return json(res,200,{ok:true,synthetic:true});
    if(['/api/product-event','/api/product-events','/api/challenge-event'].includes(p)&&req.method==='POST'){
     const batch=p==='/api/product-events'?(Array.isArray(data.events)?data.events:[]):[data];
     for(const item of batch)if(item.event_type!=='account_created')events.push({endpoint:p,event:item.event_type,headers:{...req.headers,...(item.id?{'x-proplet-event-id':item.id}:{}),...(item.created_at?{'x-proplet-event-time':item.created_at}:{})},at:Date.now()});

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.05.3-firstgame-telemetry1';
+const APP_PREVIEW_RELEASE='proplet-v4.05.4-clienterrors2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1243,9 +1243,12 @@ async function runPostWinEngagement(action){
 }
 async function closeWinAndContinue(){if(tajenkaRecapOpen){tajenkaRecapOpen=false;$('#winModal').classList.add('hidden');return}await runPostWinEngagement('continue')}
 async function closeWinToMenu(){await runPostWinEngagement('menu')}
+function dailyResultSnapshot(p,date,rec){
+ return {puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true,isReplay:true,found:(p.answers||[]).map((a,i)=>({answerIndex:i,word:a.word,path:[...(a.path||[])],colorIndex:i%COLORS.length})),path:[],wrongPath:[],lastFound:[],used:new Map(),hints:rec.hintsUsed||0};
+}
 async function showDailyResult(date,rec){
  renderTimingStatus({...rec,mode:"daily"});
-let p;try{p=await historicalDailyPuzzle(date,rec.puzzleId)}catch{showToast('Tuto uloženou výzvu se nepodařilo načíst. Zkus to prosím znovu.');return}stopTimer();winDailyGlobalData=null;currentGame={puzzle:p,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true,isReplay:true,found:(p.answers||[]).map((a,i)=>({answerIndex:i,word:a.word,path:[...(a.path||[])],colorIndex:i%COLORS.length})),path:[],wrongPath:[],lastFound:[],used:new Map(),hints:rec.hintsUsed||0};
+let p;try{p=await historicalDailyPuzzle(date,rec.puzzleId)}catch{showToast('Tuto uloženou výzvu se nepodařilo načíst. Zkus to prosím znovu.');return}stopTimer();winDailyGlobalData=null;currentGame=dailyResultSnapshot(p,date,rec);
  $('#winModal').classList.remove('first-steps-win');$('#firstStepsAccount')?.classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');
  const tajenkaWin=$('#tajenkaWinPhrase');if(tajenkaWin){tajenkaWin.classList.add('hidden');tajenkaWin.innerHTML=''}$('#screen-game')?.classList.remove('tajenka-mode','starter-mode','rescue-mode');$('#winModal')?.classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');
  $('#winBadge').textContent='☀️';renderCompletionPraise(p.difficulty,rec);$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[p.difficulty].label}`;setWinXpDisplay('+100 XP');const wc=$('#winClean');const knownClean=rec.cleanSolve===true;const hints=rec.hintsUsed||0;wc.classList.remove('hidden','hinted');wc.textContent=knownClean?'✨ Čistě · bez nápovědy':(hints?`💡 ${countCz(hints,'nápověda','nápovědy','nápověd')}`:'Výsledek z předchozího postupu');if(!knownClean)wc.classList.add('hinted');
@@ -1522,12 +1525,27 @@ async function deleteAccount(){
  }catch(e){$('#deleteAccountError').textContent=e.message}finally{button.disabled=false;button.textContent='Trvale smazat účet'}
 }
 let reportingClientError=false;
-function reportClientError(code,message){
-if(reportingClientError||!navigator.onLine)return;reportingClientError=true;const p=getProfile(),headers={'Content-Type':'application/json','X-Proplet-Version':APP_VERSION,...analyticsHeaders()};if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId();
- fetch('/api/client-error',{method:'POST',headers,body:JSON.stringify({code:String(code||'client_error').slice(0,80),message:String(message||'').slice(0,200),route:location.pathname.slice(0,120)}),keepalive:true,cache:'no-store'}).catch(()=>{}).finally(()=>{reportingClientError=false});
+function clientErrorSource(detail){
+ const candidates=[];if(detail?.filename)candidates.push([detail.filename,detail.lineno,detail.colno]);
+ const stack=String(detail?.stack||detail?.error?.stack||'');
+ for(const m of stack.matchAll(/(https?:\/\/[^\s)]+):([0-9]+):([0-9]+)/g))candidates.push([m[1],m[2],m[3]]);
+ for(const [file,line,column]of candidates){try{const u=new URL(file,location.origin);if(u.origin!==location.origin||!/^\/(?:app\/)?[A-Za-z0-9_./-]+\.js$/.test(u.pathname)||u.pathname.includes('..'))continue;const l=Number(line),c=Number(column);if(Number.isInteger(l)&&l>0&&l<=1000000&&Number.isInteger(c)&&c>0&&c<=1000000)return {source_file:u.pathname,source_line:l,source_column:c}}catch{}}
+ return {};
+}
+function clientErrorHeaders(){
+ let captured={};try{captured=analyticsHeaders()}catch{}
+ const release=typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:'legacy',version=release.match(/^proplet-v(\d+\.\d+\.\d+)-/)?.[1]||APP_VERSION;
+ const test=captured['X-Proplet-Test']==='1'||new URLSearchParams(location.search).get('tutorial')==='1'||(typeof CONTENT_PREVIEW_DATE!=='undefined'&&!!CONTENT_PREVIEW_DATE)||window.PROPLET_RUNTIME_ENV==='preview';
+ return {...captured,'Content-Type':'application/json','X-Proplet-Version':version,'X-Proplet-Client-Release':release,'X-Proplet-Analytics':'2',...(test?{'X-Proplet-Test':'1'}:{})};
+}
+function reportClientError(code,message,detail){
+ if(reportingClientError||!navigator.onLine)return;reportingClientError=true;
+ const headers=clientErrorHeaders();let p;try{p=getProfile();if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId()}catch{}
+ const body={code:String(code||'client_error').slice(0,80),message:String(message||'').slice(0,200),route:location.pathname.slice(0,120),client_release:headers['X-Proplet-Client-Release'],client_version:headers['X-Proplet-Version'],is_test:headers['X-Proplet-Test']==='1',...clientErrorSource(detail)};
+ try{return fetch('/api/client-error',{method:'POST',headers,body:JSON.stringify(body),keepalive:true,cache:'no-store'}).catch(()=>{}).finally(()=>{reportingClientError=false})}catch{reportingClientError=false}
 }
 function bindClientErrorReporting(){
- window.addEventListener('error',e=>reportClientError('window_error',e?.message||'JavaScript error'));window.addEventListener('unhandledrejection',e=>{const r=e?.reason;reportClientError('unhandled_rejection',r?.message||String(r||'Promise rejection'))});
+ window.addEventListener('error',e=>reportClientError('window_error',e?.message||'JavaScript error',e));window.addEventListener('unhandledrejection',e=>{const r=e?.reason;reportClientError('unhandled_rejection',r?.message||String(r||'Promise rejection'),r)});
 }
 
 let accountUIController=null;
@@ -2206,7 +2224,7 @@ function bind(){
  const starterModalObserver=new MutationObserver(()=>{if(currentGame?.mode==='starter'&&currentGame.path?.length)gameInputController?.resetStarter()});
  $$('.modal').forEach(modal=>starterModalObserver.observe(modal,{attributes:true,attributeFilter:['class']}));
  $('#board').addEventListener('pointerdown',e=>{const g=currentGame;if(g?.mode==='starter'&&!g.finished&&g.pausedAt==null&&e.target.closest('.cell'))trackStarterPhase(g.starterTrace,'interaction')},{capture:true});
- $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));$('#playDailyBtn').onclick=startDaily;$('#shareDailyBtn').onclick=()=>{const date=pragueDateISO(),daily=dailyResultState(date),rec=daily.active;if(!rec)return;currentGame={puzzle:daily.puzzle,mode:'daily',dailyDate:date,elapsedMs:rec.elapsedMs,moves:rec.moves,finished:true};shareDaily()};
+ $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));$('#playDailyBtn').onclick=startDaily;$('#shareDailyBtn').onclick=()=>{const date=pragueDateISO(),daily=dailyResultState(date),rec=daily.active;if(!rec)return;currentGame=dailyResultSnapshot(daily.puzzle,date,rec);shareDaily()};
  $('#backFromGame').onclick=goBackFromGame;$('#hintBtn').onclick=openHintModal;$('#starterHintNudgeBtn').onclick=acceptStarterHintNudge;$('#starterHintNudgeDismiss').onclick=dismissStarterHintNudge;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winAccountBtn').onclick=openAccountFromWin;$('#winReplayBtn').onclick=replayDailyFromWin;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;$('#starterWarmupBtn').onclick=()=>{trackProductEvent('starter_easy_warmup_selected');startStarterWarmup()};$('#starterHardDailyBtn').onclick=()=>{trackProductEvent('starter_hard_direct_selected');startDaily({starterHardDirect:true})};
  $('#closeProfileModal').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#skipProfileBtn').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');$('#legacyTeamLoginToggle').onclick=toggleLegacyTeamLogin;$('#joinLeagueModeBtn').onclick=()=>setLeagueCreateMode('join');$('#newLeagueModeBtn').onclick=()=>setLeagueCreateMode('new');$('#leagueSelect').onchange=renderLeaguePinField;$('#profilePasswordToggle').onclick=()=>togglePassword('playerPasswordInput',$('#profilePasswordToggle'));
  $('#nudgeCreateBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeBonusBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeLoginBtn').onclick=()=>openAccountFromNudge('login');$('#nudgeSkipBtn').onclick=dismissAccountNudge;
