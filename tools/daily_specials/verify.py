@@ -5,6 +5,7 @@ import statistics
 from .core import *
 from .independent import check
 from .diversify_full import shared, cellsets
+from backend.dated_daily import puzzle_digest
 
 def summary(values):
     return {'minimum':min(values),'median':statistics.median(values),'maximum':max(values)}
@@ -31,7 +32,7 @@ def main():
               'family':cat.entries[x].get('family',x),'variantUnit':cat.entries[x].get('variant_unit',x),
               'sourceCohort':cat.entries[x]['source_cohort'],'specialistFlag':x in SPECIALIST,
               'previousBoardUses':cat.counts[x],'meaning':cat.entries[x].get('meaning_cs')} for x in sorted(ws)]
-        rows.append({'id':b['id'],'contentHash':content_hash(b),'geometry':m,'weave':w,
+        rows.append({'id':b['id'],'contentHash':content_hash(b),'runtimeContentHash':puzzle_digest(b),'geometry':m,'weave':w,
                      'residual':residual(b,solver.prefixes),'solver':first,'independent':second,'lexicon':lex})
         ids.add(b['id']);seenwords|=ws;variants|=vs;shapes.add(transformed_hash(b));wordsets.add(digest(sorted(ws)))
         print('VERIFIED',b['id'],flush=True)
@@ -77,6 +78,7 @@ def main():
             'playtest':selected,'humanDifficulty':'unmeasured','productionAuthorized':False}
     write(OUT/'validation.json',report);write(OUT/'playtest-selection.json',{'boards':selected})
     write(OUT/'schedule.json',{'timeZone':'Europe/Prague','launchDate':None,'baseDailyCadence':['easy','easy','medium','medium','medium','hard','hard'],
-            'weeks':[{'week':w,'specials':[{'weekday':{'hardcore':3,'mozkomor':5,'mozkokalypsa':7}[d],'difficulty':d,'puzzleId':f'g6-ds-{d}-w{w:02d}'} for d in DIFFICULTIES]} for w in range(1,13)]})
+            'weeks':[{'week':w,'specials':[{'weekday':{'hardcore':3,'mozkomor':5,'mozkokalypsa':7}[d],'difficulty':d,'puzzleId':f'g6-ds-{d}-w{w:02d}',
+                      'contentHash':puzzle_digest(next(b for b in boards if b['id']==f'g6-ds-{d}-w{w:02d}'))} for d in DIFFICULTIES]} for w in range(1,13)]})
     print('PASS',len(boards),'boards',len(seenwords),'words; maximum identical word-cell sets',report['maximumSharedWordCellSets'])
 if __name__=='__main__':main()

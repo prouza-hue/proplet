@@ -15,6 +15,8 @@ Připraveno 11. 10. 2026. Stav: **technicky ověřeno, čeká na lidský playtes
 
 `bank.json` je soukromá kompletní banka včetně odpovědních cest. `schedule.json` přiřazuje stabilní ID k relativním týdnům 1–12, středa/pátek/neděle; `launchDate=null`. `validation.json` obsahuje oba řešiče, slovní původ, geometrické a zbytkové metriky každé desky, referenční banky a výběr ukázek. `editorial-review.json` eviduje tři konkrétní slovní úpravy a zbývající hráčské otázky. `geometry-selection.json` dokládá výběr pestřejších celoplošných půdorysů. `manufacture-log.json` je výrobní log před redakčními úpravami a diverzifikací; konečná autoritativní čísla jsou ve validačním reportu.
 
+Rozvrh obsahuje pro každé ID také hash kompatibilní se současným datumovým resolverem. Pro bindingy se používá `schedule.contentHash` = `validation.runtimeContentHash` (současný backend `puzzle_digest`); interní preview/validační `contentHash` je jiný výrobní checksum včetně obtížnosti. Podrobnosti a přesné mapování jsou v předání.
+
 ## Ověřený výchozí stav
 
 Main i skutečná produkce: `d1f5f7825e07d7e8a1751de7075914278d3de8bb`, v4.05.5 / PR #191. Vercel deployment `dpl_5dnWAq2LzDTEivLJHhoLdXxkKE3G`, projekt `prj_0XHgnCQhdPS3pPETrxIpoXn0McMG`, tým `team_5WMqzMhPV9vWfkNAWCygaeap`. Dnešní `/api/daily` skutečně vrátil `g6-d-20261011` (Těžká), hash `a62e7782e90a7c55974756836b75362a196ef12c095140f93fd6d7ecd811a631`.

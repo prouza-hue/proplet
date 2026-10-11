@@ -6,6 +6,8 @@ Stav 11. 10. 2026, nad mainem `d1f5f7825e07d7e8a1751de7075914278d3de8bb`. **Náv
 
 Naivní přidání druhé desky pod `daily:<datum>` by bylo chybné. Zachovat starou základní Daily úplně a zavést nový režim **`daily_special`**, nový klíč a samostatné datumové bindingy. `challengeKind=special` ve vstupním descriptoru je pro UI; server odvozuje autoritativní typ z kalendáře a validovaného režimu, nikdy z libovolného příznaku klienta.
 
+Pro kalendářové bindingy použít **`contentHash` z `schedule.json` / `runtimeContentHash` z validačního reportu**: je vypočten přímo současným `backend.dated_daily.puzzle_digest` nad rows/cols/letters/mask/answers/lengths. Interní `contentHash` validačního reportu a preview zahrnuje navíc difficulty a slouží k výrobní identitě/lokální cache; není zaměnitelný s runtime binding hashem. ID a obtížnost se v resolveru ověřují samostatně. Tím není třeba měnit stávající hashing algoritmus základní Daily.
+
 | Vlastnost | Základní Daily | Speciál |
 |---|---|---|
 | mode | `daily` (beze změny) | `daily_special` |

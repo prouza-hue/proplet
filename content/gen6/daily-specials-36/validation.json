@@ -5,6 +5,7 @@
     {
       "id": "g6-ds-hardcore-w01",
       "contentHash": "f8209fd2b07fa91c6897a489d357b232135cc2f6bc9cb559f787b16b456f8735",
+      "runtimeContentHash": "e1c580ae66e5338e28bfc58cbba4d49c0c31ea6ca75c53ee6288415fa7ba5b3e",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -189,6 +190,7 @@
     {
       "id": "g6-ds-mozkomor-w01",
       "contentHash": "47febd29d2f1f261bf90dd57b3e1034d6bfbd65092d8e9c03d9b5d1cb3d5dbcd",
+      "runtimeContentHash": "a131f02ee2e9a93be8f633d1d57a5ed3849b26e9b0a665478b157d49a6c3232c",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -362,6 +364,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w01",
       "contentHash": "9c2b09954cb7d9106a87742defdefc93ac0552e531059f0dc163a7dd7861bc4d",
+      "runtimeContentHash": "eae0ae35a90fcc48a0d93b818189e114fe8dd29cabd4dbc74bab01a59581d664",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -579,6 +582,7 @@
     {
       "id": "g6-ds-hardcore-w02",
       "contentHash": "7c9a0e6f601080157830d386a7be3ec814b7b037f9edace7e0c0434c7e2f40df",
+      "runtimeContentHash": "8ac87cf983df3f23483fa9419d632194e79f35818201702d2e29e4e328c2d859",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -741,6 +745,7 @@
     {
       "id": "g6-ds-mozkomor-w02",
       "contentHash": "26912872a80e2be7738bdb5a2e3902e31f34ff80b7031c4117622ae0b5a4d312",
+      "runtimeContentHash": "8c72ef562110f16029e2eb9d33b518d0bba8f9fef341e153ae8b5475f014dcd4",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -914,6 +919,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w02",
       "contentHash": "6bbbf3df087e35cfecff4ba1163fcee70082be68c6faf71fbc958342d132d7ce",
+      "runtimeContentHash": "7aab79b3868600e84c5b4b5ea44d90f6b74c167060354dfc537a92abf7bef782",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -1131,6 +1137,7 @@
     {
       "id": "g6-ds-hardcore-w03",
       "contentHash": "9230407f0b8941886cd09f0619a7077f2d204ac84218c5e92d73318c6b99cffe",
+      "runtimeContentHash": "fcdefec357b3983423b4e9a5dd09da09517a2618c625b9fba4800454cc80c302",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -1293,6 +1300,7 @@
     {
       "id": "g6-ds-mozkomor-w03",
       "contentHash": "2fbc7da727fc4fd3ca35415ba855e6f6fe54f57bb8f1b4b3c3d74977977b0ad3",
+      "runtimeContentHash": "682e383696c20cacc0f74b28a9b2e3beecf7892672fe68e5810783e54f8bb803",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -1466,6 +1474,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w03",
       "contentHash": "4f7cc0f72d6e4b42cab4f1b3f219f6756ad17f383e09a68432ed5898e4d98a4a",
+      "runtimeContentHash": "5f17bdc50c76fe363651ef2b2c6aa69570918680fb01fdb30a95df372aa17fae",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -1683,6 +1692,7 @@
     {
       "id": "g6-ds-hardcore-w04",
       "contentHash": "997f4b639d807861372abf0f7c8a2ab6fd00a3dbc383650498ac4b6371015d7c",
+      "runtimeContentHash": "14f61a9940660c0659aa19884e92faccc6a7f9c3a90dbec081499b322d3a3f67",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -1856,6 +1866,7 @@
     {
       "id": "g6-ds-mozkomor-w04",
       "contentHash": "06a79c6768a7b5dfc9feea83c33fe980ba76dfd411446a29b45ef403e9f99d36",
+      "runtimeContentHash": "66caa52ed351325273597c83c526735d38a4faf397e02cd6856361178e229c2d",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -2029,6 +2040,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w04",
       "contentHash": "084d1d8735c1e6adcd20606fdab9f62d3538de50473855621146064fa08ad38e",
+      "runtimeContentHash": "f498940510c3e8617502fedab7206de0656c0b6d3dc63671584bd5e9b0c7bae2",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -2246,6 +2258,7 @@
     {
       "id": "g6-ds-hardcore-w05",
       "contentHash": "0f316e55c3b3418d951ba4ccdea2cb08dfaa06d59370be46859dbfcabbac31fa",
+      "runtimeContentHash": "ef07d24c9671245b8516cb5b8dc3f414cbcd3db25eef0d7fa9c57cf088425ae1",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -2408,6 +2421,7 @@
     {
       "id": "g6-ds-mozkomor-w05",
       "contentHash": "09a48971a2cb729ee0d8442278ae73452c8caa43d370ce6af071578e0cbce31c",
+      "runtimeContentHash": "7b3543124e66531a23a4f8a34b2eca65b78d0d8136bd8ab082b70b1557f22364",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -2581,6 +2595,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w05",
       "contentHash": "5f9fadf6ac0a9d517ef9a28f132961bef3b0205231673bc3ab04134bd220242a",
+      "runtimeContentHash": "3d48c03b029f15b1f9ee76a7933f0036831138a1ffc9239cf5dd6f5e05be255f",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -2798,6 +2813,7 @@
     {
       "id": "g6-ds-hardcore-w06",
       "contentHash": "fca8a954bbc5539b6b546af0a9dcbb2f8577153713641a6e30b5e35c93134d58",
+      "runtimeContentHash": "bae96dffb660d9085d1d066b7650b054177d9c483fab58d26123d1e17ab359c8",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -2971,6 +2987,7 @@
     {
       "id": "g6-ds-mozkomor-w06",
       "contentHash": "72e839b195c6d302a44001d174457e41806bb377ab43259135626b4a1d0986ca",
+      "runtimeContentHash": "821eafa0170437e3de8a57724dd9fd1209e4a3d2b7e1fadf721f987171715af9",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -3144,6 +3161,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w06",
       "contentHash": "5e5941467b128eb139d8d762936bb4aeabdb5373e25b6cc42e3307b51ace533a",
+      "runtimeContentHash": "44a772397bb8a769286fb321b517602192ce6e6e5ea1b965fbb625d6f8408847",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -3361,6 +3379,7 @@
     {
       "id": "g6-ds-hardcore-w07",
       "contentHash": "9108b3bc5ff7187b76fc547b192e76f16425eeeb6aa3daf05cec3d19d4c370ed",
+      "runtimeContentHash": "82dc41e74d23b0d743fa0461b1af88fb62e38d15c04981366c4234b4c7dea644",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -3523,6 +3542,7 @@
     {
       "id": "g6-ds-mozkomor-w07",
       "contentHash": "4d6f6d2a3582f9fcfc3503f117aef0f0073aa27ebe70b3debb5fc6e2ab51cbf0",
+      "runtimeContentHash": "e762b655f6fb711611cdba8153e586e2107a20acebf080fc974a586b63e16ae1",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -3696,6 +3716,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w07",
       "contentHash": "6266fb9ef9a9b240951a9e4f6bf14681fa77c2255770a1351762b4ca675d24f2",
+      "runtimeContentHash": "5f36580641829104a312df393b63a6d62c6803c588371cd99f8490f33585270c",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -3913,6 +3934,7 @@
     {
       "id": "g6-ds-hardcore-w08",
       "contentHash": "2abc0cee12ff545b8d601a1a2e7fa319b5e4d06d1387fe8b2be48c3b8dd03d59",
+      "runtimeContentHash": "85ff9f27a842ab160f9dba325948bd70d600511b73f72f88fcec16bca5320769",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -4075,6 +4097,7 @@
     {
       "id": "g6-ds-mozkomor-w08",
       "contentHash": "836d4dd1a334c96895d1207bde15f5f2801766a861509420da60a655f556d0ff",
+      "runtimeContentHash": "ff30a7f1c3eb2f182c096b316fe849b0b53396efad8c18f2a096fde7059a93aa",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -4248,6 +4271,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w08",
       "contentHash": "6e9f735338cea6cce11c26c9c76329ee664bc3c2735d15903ab3b4c2176c43d3",
+      "runtimeContentHash": "0f3a55ee991604dd5ce2360b0bcf4cc7bca7bd1ae735307dc1d246a1b8bea32a",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -4465,6 +4489,7 @@
     {
       "id": "g6-ds-hardcore-w09",
       "contentHash": "3a21df3ab55de982bafc134bb420576c95e1eb31d2c57fefd62d49d474ce0745",
+      "runtimeContentHash": "d8e0af00c6d854d874394c33ff1ae025bcd16e05bacd21f3e18e34ed0e8cb182",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -4627,6 +4652,7 @@
     {
       "id": "g6-ds-mozkomor-w09",
       "contentHash": "5cb08e0c2219e531a836504bfe5e69310293e55e4b93b9599c5bd899145f9f1a",
+      "runtimeContentHash": "abee7c5631d187582716a4000a6d42d3efdd9650bb234d23514bf0d9f4e5bd7d",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -4800,6 +4826,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w09",
       "contentHash": "d552d610742ea2a5410170997d83ffb459baf0d572a3dfda56ff49ae170f0b3b",
+      "runtimeContentHash": "209abf2733a2f74bfcb05f26af0c147dd842416e100ac3882623a915d2ff6de1",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -5017,6 +5044,7 @@
     {
       "id": "g6-ds-hardcore-w10",
       "contentHash": "576c10511016fa45f879f6c9644d41b11b1b0f3651d989259b960e9043919ea4",
+      "runtimeContentHash": "e06d5165831320718f8bc1c22ce44c677bd6b57bc07e4b9c74a8f26d25115282",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -5201,6 +5229,7 @@
     {
       "id": "g6-ds-mozkomor-w10",
       "contentHash": "0c5ba81458f45de19bc5a8c30eac9f5623b68d9682b7993eca11823049c31084",
+      "runtimeContentHash": "c15cf8d6c8012ef6265afe01c0f3a6633a64533da6c486a391106aef2a9adabc",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -5374,6 +5403,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w10",
       "contentHash": "e2c1ce413f96f59033d185b9317d52e50e79da09e290b663d151a49908703a69",
+      "runtimeContentHash": "0cab64c168a38ab2cab9240f940223207ea138a46c92efca45589048be95fa3b",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -5591,6 +5621,7 @@
     {
       "id": "g6-ds-hardcore-w11",
       "contentHash": "a124faf3c702e78ca038a32bed57e091b4550b65e76f5779eefc2a4532a1529c",
+      "runtimeContentHash": "51f3031b5434f4f3eeae941ea1a3e1279d88e228d442e1853407a8a2e72d9b54",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -5753,6 +5784,7 @@
     {
       "id": "g6-ds-mozkomor-w11",
       "contentHash": "e04a1ad5237086efc55be423259830cd35eb58ccc7f251e04f45917a700f422f",
+      "runtimeContentHash": "74da443f674b6fb9a9b1f6c2a78c22c457f8f6df1ee807cab248a47f24ebd273",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -5926,6 +5958,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w11",
       "contentHash": "188cb8c036788ff0cfa06451e5c5e4947f1de3009dfe4fca6ddc05bb1fd8e822",
+      "runtimeContentHash": "1bc0de28617e662e8f166428fa7d6e91c3c9053d47352cfa2e4978af016b0f9e",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -6143,6 +6176,7 @@
     {
       "id": "g6-ds-hardcore-w12",
       "contentHash": "9822df5ab31260fd44532222c5abd6e22762bd75d8e6d491b1ae64dfb1fa3940",
+      "runtimeContentHash": "c6056a5c836f67ae1980536abfe052c31ef52c6f5c627a5ed5e043414e230581",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -6327,6 +6361,7 @@
     {
       "id": "g6-ds-mozkomor-w12",
       "contentHash": "6f5b63a5e45fac5b9909ff99f4cd0a297d76c1aa8fae4be4d7d0df368a735368",
+      "runtimeContentHash": "b4464a29fbaf4d569c1d28c1114cfbbcb0ee4f848f594190911c1ae86ed35fb6",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -6500,6 +6535,7 @@
     {
       "id": "g6-ds-mozkokalypsa-w12",
       "contentHash": "5ad7a56899df155b39f5ce835adcfe5747fc95db4c032abbad24fdfa107e2cae",
+      "runtimeContentHash": "26600c2a3001e620630f24aac79131a1efb1ce0e527ecb84ef4fe15cd1834ff4",
       "geometry": {
         "rows": 10,
         "cols": 10,
@@ -6735,9 +6771,9 @@
     "approvedExpansion": 1143,
     "sha256": "7baff6af094af0331d379050a680980e9b4f880428efd0c9ea620ce80c1fc277",
     "tierCounts": {
+      "B": 192,
       "A": 103,
-      "C": 109,
-      "B": 192
+      "C": 109
     }
   },
   "historySources": [
