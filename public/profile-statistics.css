@@ -10,13 +10,13 @@
 #profileCard .profile-ledger-switch button{font:600 14px/1.2 Outfit,system-ui,sans-serif;min-height:42px;padding:10px 6px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--td-muted,var(--muted));cursor:pointer}
 #profileCard .profile-ledger-switch button[aria-pressed=true]{background:var(--td-paper,var(--paper));border-color:var(--td-line,var(--line));color:var(--td-blue,#204fab);box-shadow:0 2px 3px #202b3908}
 #profileCard .profile-ledger-total{display:flex;align-items:baseline;gap:8px;margin:15px 0 11px;line-height:1.2}
-#profileCard .profile-ledger-total>strong{font-size:27px;font-weight:750;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+#profileCard .profile-ledger-total>strong{font-size:22px;font-weight:750;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
 #profileCard .profile-ledger-total>span{font-size:14px;color:var(--td-muted,var(--muted))}
 #profileCard .profile-ledger-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #profileCard .profile-ledger-tile{min-width:0;display:flex;flex-direction:column;align-items:center;padding:8px 3px 7px;border:1px solid color-mix(in srgb,var(--difficulty-color) 27%,var(--td-line,var(--line)));border-radius:11px;background:color-mix(in srgb,var(--difficulty-color) 6%,var(--td-paper,var(--paper)));position:relative}
 #profileCard .profile-ledger-tile img{display:block;width:44px;height:44px;object-fit:contain;margin:0 0 3px}
 #profileCard .profile-ledger-name{font-size:11px;font-weight:600;line-height:1.25;color:var(--td-muted,var(--muted));white-space:nowrap}
-#profileCard .profile-ledger-count{font-size:27px;font-weight:750;line-height:1.2;letter-spacing:-.03em;margin:1px 0 4px;font-variant-numeric:tabular-nums}
+#profileCard .profile-ledger-count{font-size:22px;font-weight:750;line-height:1.2;letter-spacing:-.03em;margin:1px 0 4px;font-variant-numeric:tabular-nums}
 #profileCard .profile-ledger-time{display:flex;align-items:center;justify-content:center;gap:4px;min-height:25px;width:calc(100% - 10px);border-top:1px solid color-mix(in srgb,var(--difficulty-color) 18%,transparent);padding-top:6px;color:var(--td-ink,var(--ink));font-size:14px;font-variant-numeric:tabular-nums}
 #profileCard .profile-ledger-time b{font-size:inherit;font-weight:550}
 #profileCard .profile-ledger svg{width:15px;height:15px;flex:0 0 15px}
@@ -25,7 +25,7 @@
 #profileCard .profile-ledger-daily>div{display:flex;align-items:center;gap:9px;justify-content:center;min-width:0}
 #profileCard .profile-ledger-daily>div+div{border-left:1px solid var(--td-line,var(--line))}
 #profileCard .profile-ledger-daily img{object-fit:contain;flex:0 0 30px}
-#profileCard .profile-ledger-daily strong{display:block;font-size:21px;line-height:1.1;font-variant-numeric:tabular-nums}
+#profileCard .profile-ledger-daily strong{display:block;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
 #profileCard .profile-ledger-daily em{font-size:13px;font-weight:500;font-style:normal}
 #profileCard .profile-ledger-daily small{display:block;color:var(--td-muted,var(--muted));font-size:12px;margin-top:4px;line-height:1.2}
 #profileCard .profile-ledger :is(button,summary):focus-visible{outline:3px solid var(--td-blue,#204fab);outline-offset:3px}
@@ -33,3 +33,7 @@
 @media(max-width:350px){#profileCard .profile-ledger-grid{gap:5px}#profileCard .profile-ledger-name{font-size:10px}#profileCard .profile-ledger-time{font-size:13px}#profileCard .profile-ledger-daily{gap:5px}#profileCard .profile-ledger-daily>div{gap:5px}}
 
 #profileCard .profile-ledger-head>.profile-ledger-switch{flex:1;max-width:none}
+
+/* One restrained scale for the primary numeric values throughout the profile. */
+#profileCard .profile-grid>.profile-stat:not(.profile-rank-stat)>strong,
+#profileCard .streak-bubble>strong{font-size:22px!important;font-weight:750;line-height:1.2;font-variant-numeric:tabular-nums}
