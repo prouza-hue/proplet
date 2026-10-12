@@ -69,3 +69,13 @@ Finální výsledek je **PASS**: 146 aktuálních testů, izolované PostgreSQL 
 | 1280 px | 245 px | 245 px | 245 px | 0 px |
 
 Produkční `main` při dokončení preview stále ukazuje na `d1f5f7825e07d7e8a1751de7075914278d3de8bb`; produkční tabulka politiky speciálů dosud neexistuje. Uživatel 12. 10. 2026 schválil textaci a výslovně požádal o produkční nasazení. Dolní odstavec v týdenním přehledu je odstraněný; zbývající odstavec končí „dobrovolně a za 100 XP.“
+
+## Ověřené ostré nasazení 12. 10. 2026
+
+- Produkce **4.06.0**, commit `cf16817aadfa9cb991630bf99d04aeb62860f6fd`, deployment `dpl_BtNKiMR3q9SHAswXnmuwuc5Ygb81`; PR #193 sloučen.
+- Produkční policy `enabled=true`, `preview_date=null`; 36 bindingů od 14. 10. do 3. 1. JSON a SQL shodné.
+- Oba agregátní RPC porovnány s aktuálními živými definicemi; rozdíl jen v nových počítadlech a explicitním preview hooku. Původní XP/série/postup zachované.
+- Po chybách klientského requestState v apply_migration proběhla migrace přes execute_sql; aktivace provedena v přímém Supabase SQL editoru. Nepovažovat to za automaticky zapsaný migration history entry.
+- Všech 146 testů a release CI prošly. Produkční API i browser používají skutečné pondělí 12. 10.; budoucí desky a preview date override jsou zavřené. Základní Daily funguje a upravené týdenní vysvětlení je ověřené na produkci.
+- První Extra: **středa 14. 10.**; poslední: **neděle 3. 1.** Základní banka do **14. 1.** Další výrobu plánovat pro obě banky podle dřívějšího konce Extra.
+- Důkazy: `docs/daily-specials-preview/production-release.json` a produkční screenshot.

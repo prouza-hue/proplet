@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-12T09:35:58.681633+00:00",
+  "status": "production_verified",
+  "version": "4.06.0",
+  "productionUrl": "https://hrajproplet.cz/",
+  "productionSha": "cf16817aadfa9cb991630bf99d04aeb62860f6fd",
+  "deploymentId": "dpl_BtNKiMR3q9SHAswXnmuwuc5Ygb81",
+  "pr": 193,
+  "firstExtra": "2026-10-14",
+  "lastExtra": "2027-01-03",
+  "extraBoards": 36,
+  "extraWeeks": 12,
+  "baseDailyUntil": "2027-01-14",
+  "productionPolicy": {
+    "enabled": true,
+    "previewDate": null
+  },
+  "migrationSource": "SUPABASE_MIGRATION_DAILY_SPECIALS_20261012.sql",
+  "migrationAppliedVia": "execute_sql; apply_migration connector returned invalid_or_expired_requestState",
+  "approvedPuzzlePayloadSha256": "24cbc6845f6459c124f1b8cb5317acfca0b2a557ca2b09fa45625b1923a3ff83",
+  "checks": [
+    "146 runtime tests",
+    "all release CI checks passed",
+    "36 identical JSON/SQL bindings",
+    "production UI module bytes equal approved source",
+    "live weekly dialog contains exactly one copy paragraph ending dobrovolně a za100XP",
+    "real Prague date2026-10-12; Extra absent until first release day",
+    "future Extra, date override, sharing and private bank URLs404",
+    "new tables RLS enabled; anon/authenticated have no direct read grant",
+    "old300-card absent; base Daily available"
+  ],
+  "remaining": [
+    "Extend Extra continuously from2027-01-04; extend base Daily after2027-01-14",
+    "Use earlier Extra exhaustion date for next combined generation planning"
+  ],
+  "screenshot": "proplet-production-week-1791797635796.jpg"
+}
