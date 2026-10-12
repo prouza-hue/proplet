@@ -87,7 +87,8 @@ async function shot(page,selector,name){
   s=await boot(browser);
   await s.page.evaluate(()=>{
    Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}});
-   const date=pragueDateISO(),p=dailyPuzzleFor(date),state=getState();
+   const date=pragueDateISO(),p={...sortedFreeBank('easy')[0],id:'test-daily-share'},state=getState();
+   datedDaily().remember({schemaVersion:1,dailyDate:date,serverToday:date,puzzleId:p.id,puzzle:p,bankVersion:'test-daily',contentHash:'a'.repeat(64),challengeKey:'daily:'+date,validUntil:new Date(Date.now()+86400000).toISOString()});
    state.completed['daily:'+date]={puzzleId:p.id,mode:'daily',dailyDate:date,elapsedMs:45000,moves:7,cleanSolve:true,completedAt:new Date().toISOString()};
    saveState(state);
    const ts=tajenkaState();ts.completions=ts.completions||{};
