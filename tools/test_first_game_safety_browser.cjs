@@ -55,13 +55,21 @@ const report={checks:[],synthetic:true};
    assert.equal(await page.evaluate(()=>Array.isArray(currentGame.found)&&Array.isArray(currentGame.path)&&currentGame.isReplay),true);
    report.checks.push({name:(mobile?'mobile':'desktop')+' historical result with complete snapshot',ok:true});
    if(mobile){
-    await page.waitForSelector('#winModal .win-result-footer');
-    await page.evaluate(()=>{window.__originalBadgeSlot=document.querySelector('#newBadgeBox');document.querySelector('#winPrimaryBtn').before(window.__originalBadgeSlot);});
+    await page.waitForSelector('#winModal #winResultActions');
+    // A cached client can leave an old footer behind; simulate that legacy DOM
+    // without expecting newly rendered mobile results to use the retired dock.
+    await page.evaluate(()=>{
+     window.__originalBadgeSlot=document.querySelector('#newBadgeBox');
+     const card=document.querySelector('#winModal .win-card'),footer=document.createElement('div');
+     footer.className='win-result-footer';card.append(footer);
+     footer.append(window.__originalBadgeSlot,document.querySelector('#winPrimaryBtn'));
+     window.dispatchEvent(new Event('pageshow'));
+    });
     await page.setViewportSize({width:1440,height:1000});
     await page.waitForFunction(()=>!document.querySelector('#winModal .win-result-footer'));
-    assert.equal(await page.evaluate(()=>window.__originalBadgeSlot.isConnected&&document.querySelector('#newBadgeBox')===window.__originalBadgeSlot),true,'undocking preserves original award slot');
+    assert.equal(await page.evaluate(()=>window.__originalBadgeSlot.isConnected&&document.querySelector('#newBadgeBox')===window.__originalBadgeSlot),true,'legacy footer migration preserves original award slot');
     await page.evaluate(()=>renderWinBadges('synthetic award'));
-    report.checks.push({name:'mobile footer undocking preserves moved badge element',ok:true});
+    report.checks.push({name:'inline results preserve moved badge from legacy cached footer',ok:true});
    }
    assert.deepEqual(errors,[],'no uncaught browser errors');await context.close();
    fs.writeFileSync(output,JSON.stringify(report,null,2));

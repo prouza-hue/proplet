@@ -1,0 +1,36 @@
+name: Referral backend acceptance
+on:
+  push:
+    branches: ['release/referrals-*', 'release/referral-*']
+    paths: ['backend/referrals.py', 'backend/db.py', 'backend/contracts.py', 'account_auth*.py', 'server.py', 'supabase/prepared/referral_v1.sql', 'tests/current/*referral*', 'tools/test_referral_database.py', '.github/workflows/referral-backend.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: referral_qa
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d referral_qa"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install pinned production dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Behavioral signup/auth/preview tests
+        run: python -m unittest discover -s tests/current -p test_referral_backend.py -v
+      - name: Real PostgreSQL transactions and concurrency
+        run: python tools/test_referral_database.py
+        env:
+          PROPLET_REFERRAL_TEST_DSN: postgresql://postgres:postgres@127.0.0.1:5432/referral_qa

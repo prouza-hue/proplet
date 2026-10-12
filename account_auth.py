@@ -79,6 +79,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         app,
         supabase_url=services.supabase_url,
         supabase_key=services.supabase_key,
+        db_rpc=services.db_rpc,
         tz=services.tz,
         db_select=services.db_select,
         db_select_bounded=services.db_select_bounded,

@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        if route.path and route.path not in {"/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -53,6 +53,28 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # every path, method, component and field remains covered. Tajenka v2
 # intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
+# Referral release is additive; keep every historical route/schema in the digest.
+# New routes and optional signup attribution have dedicated ASGI/SQL tests.
+referral_paths = {
+    "/api/referrals": {"get"},
+    "/api/referrals/invite": {"post"},
+    "/api/referrals/invite/{code}": {"get"},
+    "/api/referrals/dismiss": {"post"},
+}
+assert {p for p in openapi_contract["paths"] if p.startswith("/api/referrals")} == set(referral_paths)
+for referral_path, methods in referral_paths.items():
+    assert set(openapi_contract["paths"][referral_path]) == methods
+    openapi_contract["paths"].pop(referral_path)
+# RecoveryReset inherits AuthCallback; the additive optional field is inert there.
+for signup_model in ("PlayerCreate", "AuthCallback", "RecoveryReset"):
+    schema = openapi_contract["components"]["schemas"][signup_model]
+    assert "inviteCode" not in schema.get("required", [])
+    code_schema = schema["properties"].pop("inviteCode")
+    assert code_schema.get("default") is None
+    assert {"type": "null"} in code_schema["anyOf"]
+    string_schema = next(item for item in code_schema["anyOf"] if item.get("type") == "string")
+    assert string_schema == {"type": "string", "minLength": 8, "maxLength": 80, "pattern": "^[A-Za-z0-9_-]+$"}
+
 # Additive optional Daily routes have dedicated ASGI/identity/timing tests.
 for special_path in ("/api/daily-special", "/api/rankings/daily-special"):
     assert set(openapi_contract["paths"][special_path]) == {"get"}
@@ -169,6 +191,7 @@ def _dump(model, **kwargs):
 
 
 assert _dump(server.PlayerCreate, name=" Pavel ") == {
+    "inviteCode": None,
     "name": " Pavel ",
     "family_code": None,
     "password": None,

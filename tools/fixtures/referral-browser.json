@@ -1,0 +1,321 @@
+{
+  "config": {
+    "badges": [
+      {
+        "days": 1,
+        "icon": "🥉",
+        "name": "První zářez"
+      },
+      {
+        "days": 3,
+        "icon": "❤️",
+        "name": "Srdcař"
+      },
+      {
+        "days": 5,
+        "icon": "⭐",
+        "name": "Pětka"
+      },
+      {
+        "days": 7,
+        "icon": "🔥",
+        "name": "Týden v plamenech"
+      },
+      {
+        "days": 10,
+        "icon": "🏆",
+        "name": "Desítka"
+      },
+      {
+        "days": 14,
+        "icon": "⚡",
+        "name": "Blesk"
+      },
+      {
+        "days": 21,
+        "icon": "🦉",
+        "name": "Mistr slov"
+      },
+      {
+        "days": 30,
+        "icon": "👑",
+        "name": "Koruna"
+      },
+      {
+        "days": 50,
+        "icon": "💎",
+        "name": "Diamant"
+      },
+      {
+        "days": 100,
+        "icon": "🚀",
+        "name": "Legenda"
+      }
+    ],
+    "points": {
+      "daily": 100,
+      "easy": 15,
+      "medium": 25,
+      "hard": 50,
+      "hardcore": 100,
+      "mozkomor": 150,
+      "starter": 10,
+      "mozkokalypsa": 200
+    },
+    "dictionarySize": 13939,
+    "dailyRotationSize": 365,
+    "dailyGeneration": 4,
+    "dailyGeneration3From": "2026-08-17",
+    "dailyCadence": {
+      "weekdays": [
+        "easy",
+        "easy",
+        "medium",
+        "medium",
+        "medium",
+        "hard",
+        "hard"
+      ],
+      "counts": {
+        "easy": 105,
+        "medium": 156,
+        "hard": 104
+      }
+    },
+    "rescueBankSize": 30,
+    "pushAvailable": false,
+    "environment": "preview",
+    "version": "4.05.0"
+  },
+  "tajenka": {
+    "version": 2,
+    "id": "tajenka-v2-week-03",
+    "sourceId": "tajenka-v2-c04",
+    "kind": "weekend_bonus",
+    "week": 9,
+    "title": "Tajenka",
+    "description": "Najdi propletená slova mezi falešnými odbočkami. Každé odhalí další část tajenky.",
+    "difficulty": "medium",
+    "category": "observation",
+    "source": null,
+    "rows": 6,
+    "cols": 6,
+    "mask": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      32,
+      33,
+      34
+    ],
+    "letters": [
+      "",
+      "Á",
+      "O",
+      "D",
+      "Z",
+      "",
+      "Ř",
+      "Š",
+      "J",
+      "E",
+      "T",
+      "A",
+      "P",
+      "E",
+      "D",
+      "O",
+      "N",
+      "D",
+      "O",
+      "H",
+      "F",
+      "R",
+      "N",
+      "E",
+      "E",
+      "N",
+      "L",
+      "D",
+      "H",
+      "C",
+      "T",
+      "",
+      "E",
+      "E",
+      "V",
+      ""
+    ],
+    "lengths": [
+      6,
+      5,
+      4,
+      7,
+      5
+    ],
+    "answers": [
+      {
+        "word": "FRONTA",
+        "path": [
+          20,
+          21,
+          15,
+          16,
+          10,
+          11
+        ],
+        "turns": 4,
+        "curlRun": 1,
+        "clue": "Řada čekajících lidí."
+      },
+      {
+        "word": "POHNE",
+        "path": [
+          12,
+          18,
+          19,
+          25,
+          24
+        ],
+        "turns": 3,
+        "curlRun": 1,
+        "clue": "Dá do pohybu."
+      },
+      {
+        "word": "HNED",
+        "path": [
+          28,
+          22,
+          23,
+          17
+        ],
+        "turns": 2,
+        "curlRun": 1,
+        "clue": "Bez čekání."
+      },
+      {
+        "word": "ODEJDEŠ",
+        "path": [
+          2,
+          3,
+          9,
+          8,
+          14,
+          13,
+          7
+        ],
+        "turns": 5,
+        "curlRun": 1,
+        "clue": "Přestaneš být na místě."
+      },
+      {
+        "word": "VEDLE",
+        "path": [
+          34,
+          33,
+          27,
+          26,
+          32
+        ],
+        "turns": 3,
+        "curlRun": 1,
+        "clue": "Na sousedním místě."
+      }
+    ],
+    "tajenka": {
+      "phrase": "Fronta se pohne hned, když odejdeš vedle.",
+      "displayText": "Fronta se pohne hned, když odejdeš vedle.",
+      "answerOrder": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "companions": [
+        {
+          "text": "se",
+          "revealWith": "POHNE",
+          "significant": false
+        },
+        {
+          "text": "když",
+          "revealWith": "ODEJDEŠ",
+          "significant": false
+        }
+      ]
+    },
+    "meta": {
+      "targetLetters": 27,
+      "cells": 32,
+      "decoyCells": 5,
+      "holes": 4,
+      "crossWordEdges": 16,
+      "crossWordPairs": 7,
+      "nonSequentialEdges": 15,
+      "sequentialBoundaries": 0,
+      "quadrantCrossers": 5,
+      "minWordContacts": 2,
+      "wordContactDegrees": [
+        4,
+        3,
+        2,
+        2,
+        3
+      ],
+      "falsePrefixes2": 48,
+      "falsePrefixes3": 35,
+      "falsePrefixStartCells": 28,
+      "falsePrefixFamilies": 74,
+      "meaningfulDecoys": 5,
+      "alternativeFullPaths": 0,
+      "alternativeWords": {
+        "FRONTA": 0,
+        "POHNE": 0,
+        "HNED": 0,
+        "ODEJDEŠ": 0,
+        "VEDLE": 0
+      },
+      "holeQuadrants": 4,
+      "decoyQuadrants": 4,
+      "decoyAdjacencyEdges": 0,
+      "minRowFill": 4,
+      "minColFill": 4,
+      "qualityScore": 213.2,
+      "pathStyle": "v2-independent-interleaved-adaptive-density",
+      "previewOnly": true,
+      "runtimeEnabled": true,
+      "week": 3,
+      "phraseCells": 27,
+      "rewardXp": 200,
+      "geometrySha256": "c3bd02441a84eca0430ce20e68427a2a75a912daea48aada97f009b37a642e80",
+      "sourceCandidateId": "tajenka-v2-c04"
+    }
+  }
+}

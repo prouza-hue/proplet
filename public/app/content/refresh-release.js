@@ -27,6 +27,7 @@
   }
   function eligible() {
     try {
+      if(global.PropletReferrals?.pendingCode()||global.PropletReferrals?.model.incoming)return false;
       return (!firstVisit || returningLogin()) && localStorage.getItem(ONBOARD_KEY) === 'done'
         && localStorage.getItem(seenKey()) !== '1'
         && !(typeof onboardingMandatory !== 'undefined' && onboardingMandatory)

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.06.0-daily-specials1';
+const APP_PREVIEW_RELEASE='proplet-v4.07.0-referrals1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1217,7 +1217,7 @@ async function finishGame(){
  const celebratedMk=newAchievements.filter(a=>a.group==='mozkokalypsa').map(a=>a.id);
  const badgeBox=$('#newBadgeBox'),badgeAnchor=celebratedMk.length?$('#winPrimaryBtn'):$('#starterHardActions');if(badgeBox&&badgeAnchor)badgeAnchor.before(badgeBox);
  if(celebratedMk.length&&!g.postStarterWarmup){const latest=getState();latest.mozkokalypsaCelebrated=[...new Set([...(Array.isArray(latest.mozkokalypsaCelebrated)?latest.mozkokalypsaCelebrated:[]),...celebratedMk])];saveState(latest)}
- configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':(g.mode==='daily'||g.mode==='daily_special')?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily_special'?'Zpět na Dnes':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hrát další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
+ configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':(g.mode==='daily'||g.mode==='daily_special')?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily_special'?'Zpět na Dnes':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hraj další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.mode==='free'&&!g.postStarterWarmup){
  if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(currentGame!==g)return;if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
   else loadWinLevelLeaderboard(g.puzzle,rec);
@@ -1676,7 +1676,7 @@ async function saveNewProfile(){
  const authAction=accountMode,offerInstallAfterCreate=authAction==='create'&&!profileModalFromNudge&&!profileModalFromWin;
  const name=$('#playerNameInput').value.trim(),password=$('#playerPasswordInput').value;$('#profileFormError').textContent='';if(!name||!password){$('#profileFormError').textContent='Vyplň jméno a heslo.';return}if(password.length<8){$('#profileFormError').textContent='Heslo musí mít alespoň 8 znaků.';return}
  try{
-  const endpoint=accountMode==='create'?'/api/player':'/api/login-integrity',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body),headers:authAction==='create'?window.PropletFirstSteps?.authHeaders():{}});
+  const endpoint=accountMode==='create'?'/api/player':'/api/login-integrity',family_code=accountMode==='login'&&legacyTeamLogin?normalizeLeagueCode($('#leagueSelect').value):null,body=accountMode==='create'?{name,password,inviteCode:window.PropletReferrals?.pendingCode()||undefined}:{name,password,family_code},selectedBeforeAuth=localSupportMode(),anonId=getAnonymousId(),profile=await api(endpoint,{method:'POST',body:JSON.stringify(body),headers:authAction==='create'?window.PropletFirstSteps?.authHeaders():{}});
   window.PropletFirstSteps?.captureAccount(profile.id);
   window.PropletMarketing?.registration({id:profile.id,accountCreated:authAction==='create'&&profile.accountCreated===true});
   try{await currentGame?.finishTelemetryPromise}catch{}
@@ -2090,7 +2090,7 @@ function rankBadge(rank){
  return medal?`<span class="result-medal result-medal-${value}" role="img" aria-label="${medal[1]}">${medal[0]}</span>`:`<span class="result-rank-number">${value}.</span>`;
 }
 function rankingExpandMarkup(data){
- const total=Number(data?.total||0);if(total<=1)return '';
+ const total=Number(data?.total||0);if(total<=1||(data?.rows?.length>=total&&data.rows.every((r,i)=>Number(r.rank)===i+1)))return '';
  const rank=Number(data?.myRank||0);
  return `<details class="ranking-expand"><summary>Zobrazit pořadí · ${countCz(total,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${rank?`Tvoje pozice: ${rank}. z ${total}.`:'Celkové pořadí hráčů.'}</p><div class="ranking-expanded-rows"></div><button type="button" class="secondary-btn ranking-more">Načíst pořadí</button></details>`;
 }
@@ -2104,7 +2104,7 @@ function bindRankingExpansion(container,data){
  const endpoint=data?.challengeKind==='special'&&data?.challengeKey?`/api/rankings/daily-special?challenge_key=${encodeURIComponent(data.challengeKey)}`:data?.date?`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(data.date)}`:data?.puzzleId?`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(data.puzzleId)}`:null;
  let firstOffset=Math.max(0,(Number(data?.myRank)||1)-26),offset=firstOffset,loading=false,loaded=!!rows?.children.length;
  const before=document.createElement('button');before.type='button';before.className='secondary-btn ranking-before hidden';before.textContent='Předchozí hráči';rows?.before(before);
- const focusMine=()=>requestAnimationFrame(()=>{if(details.open)(rows?.querySelector('.me')||rows?.firstElementChild)?.scrollIntoView({block:'center',behavior:'instant'})});
+ const focusMine=()=>requestAnimationFrame(()=>{if(details.open&&rows?.getBoundingClientRect().height>Math.max(240,(details.closest('.modal-card')?.clientHeight||innerHeight)*.65))(rows?.querySelector('.me')||rows?.firstElementChild)?.scrollIntoView({block:'center',behavior:'instant'})});
  const load=async(previous=false)=>{
   if(loading||(!previous&&offset===null)||!endpoint)return;
   const initial=!loaded,anchor=previous?rows.firstElementChild:null,top=anchor?.getBoundingClientRect().top;
@@ -2143,8 +2143,9 @@ function renderFreeTeamBoard(data,error,myId){
 
 }
 function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
+ const resultOnly=container.id==='levelLeaderboardBox';
  const globalRank=Number(data?.world?.myRank||0)||null,teamRank=(data?.team?.rows||[]).find(r=>r.id===myId)?.rank||null;
- const render=tab=>{const active=tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div><div class="free-board-content">${data?.[active+'Pending']?'<div class="leaderboard-empty">Načítám pořadí…</div>':active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;bindRankingExpansion(container,active==='world'?data?.world:null);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
+ const render=tab=>{const active=!resultOnly&&tab==='team'?'team':'world';container.classList.add('free-level-board');container.classList.remove('daily-global-board','hidden');container.innerHTML=`${resultOnly?'':`<div class="free-board-tabs" role="tablist" aria-label="Rozsah pořadí"><button type="button" class="free-board-tab ${active==='world'?'active':''}" data-free-board-tab="world" role="tab" aria-selected="${active==='world'}">🌍 Globálně</button><button type="button" class="free-board-tab ${active==='team'?'active':''}" data-free-board-tab="team" role="tab" aria-selected="${active==='team'}">👥 Můj tým</button></div>`}<div class="free-board-content">${data?.[active+'Pending']?'<div class="leaderboard-empty">Načítám pořadí…</div>':active==='world'?renderFreeWorldBoard(data?.world,data?.worldError):renderFreeTeamBoard(data?.team,data?.teamError,myId)}</div>`;bindRankingExpansion(container,active==='world'?data?.world:null);container.querySelectorAll('[data-free-board-tab]').forEach(button=>button.onclick=()=>render(button.dataset.freeBoardTab))};
  render(initialTab);return {globalRank,teamRank};
 }
 async function loadWinLevelLeaderboard(puzzle,rec){

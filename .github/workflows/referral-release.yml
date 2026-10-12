@@ -1,0 +1,40 @@
+name: Referral release browser contract
+on:
+  push:
+    branches: ['release/referrals-*', 'release/referral-*']
+  pull_request:
+    branches: [main]
+    paths: ['public/referral*', 'tools/referral_release*', '.github/workflows/referral-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mocked-api-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser
+        run: |
+          npm install --prefix /tmp/referral-tools --no-save --package-lock=false playwright@1.56.1
+          /tmp/referral-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Test real release UI against intercepted API (no database)
+        env:
+          NODE_PATH: /tmp/referral-tools/node_modules
+        run: |
+          node --check public/referrals.js
+          node --check public/referral-transport.js
+          node tools/referral_release_server.cjs > /tmp/referral-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node tools/referral_release_verify.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: referral-release-browser
+          path: referral-release-evidence

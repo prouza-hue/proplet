@@ -21,40 +21,45 @@
     }
   }
 
-  function syncWinLayout(win,canDock=true){
+  function syncWinLayout(win){
     const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
     if(!primary||!summary||!secondary)return;
-    const card=modal.querySelector('.win-card');
-    const docked=canDock&&window.matchMedia('(max-width:999px)').matches&&!modal.classList.contains('starter-win')&&!primary.classList.contains('hidden');
-    let scroll=card.querySelector(':scope > .win-result-scroll'),footer=card.querySelector(':scope > .win-result-footer');
-    if(docked){
-      if(!scroll){
-        scroll=document.createElement('div');scroll.className='win-result-scroll';
-        footer=document.createElement('div');footer.className='win-result-footer';
-        for(const child of [...card.children])if(child!==primary&&child.id!=='confettiLayer')scroll.appendChild(child);
-        footer.appendChild(primary);card.append(scroll,footer);
-      }else if(primary.parentElement!==footer)footer.appendChild(primary);
-    }else{
-      if(scroll){for(const child of [...scroll.children])card.insertBefore(child,scroll);scroll.remove()}
+    const card=modal.querySelector('.win-card'),starter=modal.classList.contains('starter-win');
+    const scroll=card.querySelector(':scope > .win-result-scroll'),footer=card.querySelector(':scope > .win-result-footer');
+    // Preserve every child (including achievements) when leaving the old docked layout.
+    if(scroll){for(const child of [...scroll.childNodes])card.insertBefore(child,scroll);scroll.remove()}
+    if(footer){for(const child of [...footer.childNodes])card.insertBefore(child,footer);footer.remove()}
+    setClass(modal,'result-action-docked',false);
+    setClass(modal,'result-compact',!starter);
+    const title=$('#winTitle'),xp=$('#winXp');
+    if(starter){
+      const oldHeader=card.querySelector('.win-result-heading');
+      if(oldHeader){oldHeader.before(title);summary.querySelector('.win-summary-chips')?.prepend(xp);oldHeader.remove()}
+      setClass(xp,'xp-sticker',false);
       if(summary.nextElementSibling!==primary)summary.after(primary);
-      // Completion celebrations can be moved before the docked primary action.
-      // Preserve those nodes when undocking instead of deleting the badge box
-      // with the footer (the next completion still needs that same element).
-      if(footer){for(const child of [...footer.childNodes])primary.before(child);footer.remove();}
+      if(win.parentElement!==secondary)secondary.prepend(win);
+      const oldActions=$('#winResultActions');if(oldActions){for(const child of [...oldActions.children])oldActions.before(child);oldActions.remove()}
+      return;
     }
-    setClass(modal,'result-action-docked',docked);
-    if(win.parentElement!==secondary)secondary.prepend(win);
+    let header=card.querySelector('.win-result-heading');
+    if(!header){header=document.createElement('div');header.className='win-result-heading';title.before(header)}
+    if(title.parentElement!==header)header.append(title);
+    if(xp.parentElement!==header)header.append(xp);
+    setClass(xp,'xp-sticker',true);
+    let actions=$('#winResultActions');
+    if(!actions){actions=document.createElement('div');actions.id='winResultActions';actions.className='win-result-actions'}
+    const ranking=$('#levelLeaderboardBox');
+    const anchor=starter?summary:ranking||summary;
+    if(anchor.nextElementSibling!==actions)anchor.after(actions);
+    if(primary.parentElement!==actions)actions.append(primary);
+    if(win.parentElement!==actions||primary.nextElementSibling!==win)primary.after(win);
     modal.querySelector('.win-main-actions')?.remove();
   }
 
   function setChallengeContent(el){
-    if(el.querySelector(':scope > .painted-action-icon')&&el.textContent.trim()==='Vyzvat kamaráda')return;
-    const icon=document.createElement('img');
-    icon.src='/rewards/printshop/challenge.svg?v=icons1';
-    icon.className='painted-action-icon';icon.alt='';icon.width=24;icon.height=24;
-    icon.setAttribute('aria-hidden','true');
-    el.replaceChildren(icon,document.createTextNode(' Vyzvat kamaráda'));
-    el.classList.add('painted-action-control');
+    if(el.dataset.plainInvite!=='true')el.dataset.plainInvite='true';
+    setText(el,'Pozvi kamaráda');
+    setClass(el,'painted-action-control',false);
   }
 
   function syncDailyLayout(daily){
@@ -93,7 +98,7 @@
       if(challengeMode){
         setChallengeContent(win);
         setClass(win,'challenge-share-cta',true);
-        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Vyzvat kamaráda na tuto Tajenku':dailyGame?'Vyzvat kamaráda na tuto Denní výzvu':'Vyzvat kamaráda na stejný Proplet');
+        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet tuto Tajenku: Pozvi kamaráda':dailyGame?'Sdílet tuto Denní výzvu: Pozvi kamaráda':'Sdílet tuto desku: Pozvi kamaráda');
       }else{
         if(win.classList.contains('challenge-share-cta'))setText(win,'↗ Sdílet');
         setClass(win,'challenge-share-cta',false);
@@ -105,7 +110,7 @@
     if(daily){
       setChallengeContent(daily);
       setClass(daily,'daily-challenge-cta',true);
-      setAriaLabel(daily,'Vyzvat kamaráda na dnešní Proplet');
+      setAriaLabel(daily,'Sdílet dnešní výzvu: Pozvi kamaráda');
       syncDailyLayout(daily);
     }
 
@@ -113,7 +118,7 @@
       setChallengeContent(detail);
       setClass(detail,'challenge-share-cta',true);
       setClass(detail,'challenge-share-detail-cta',true);
-      setAriaLabel(detail,'Vyzvat kamaráda na tuto úroveň');
+      setAriaLabel(detail,'Sdílet tuto úroveň: Pozvi kamaráda');
     }
   }
 
