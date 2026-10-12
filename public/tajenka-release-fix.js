@@ -80,13 +80,14 @@
       clone.classList.remove('hidden');
       clone.dataset.signature=legacyCardSignature(source);
       clone.dataset.exactCloneSignature=exactSignature;
-      clone.querySelectorAll('[id]').forEach(el=>{if(el!==clone)el.removeAttribute('id')});
       bindClonedCardActions(clone,source);
+      clone.querySelectorAll('[id]').forEach(el=>{if(el!==clone)el.removeAttribute('id')});
       if(current)current.replaceWith(clone);else screen.appendChild(clone);
       current=clone;
     }
     current.classList.remove('hidden');
-    if(screen.lastElementChild!==current)screen.appendChild(current);
+    // Share placement with printshop-release-polish to avoid observer loops.
+    if(!window.PropletArchiveExperience?.placePlayExtra(current)&&screen.lastElementChild!==current)screen.appendChild(current);
   }
 
   function rowMarkup(rows){
