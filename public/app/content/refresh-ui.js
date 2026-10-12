@@ -5,7 +5,6 @@
   const orderDifficulties=Object.keys(labels),difficulties=['easy','medium','hard'];
   let bank=[];
   const modeFor=diff=>freeOrder().record(diff).mode;
-  const releaseDismissKey=()=> 'proplet:refresh300:box:'+ (getProfile()?.id||'guest');
   function completed(id,completions){return !!completions['free:'+id]}
   function newBoards(diff){return bank.filter(p=>p.difficulty===diff)}
   function completedNew(diff,completions){return newBoards(diff).filter(p=>completed(p.id,completions)).length}
@@ -16,28 +15,6 @@
     if(typeof saveGameProgress==='function')saveGameProgress();
     startGame(puzzle,'free',null);
     return true;
-  }
-  function chooseGame(){
-    if(typeof nav==='function')nav('free',{replace:true});
-    document.getElementById('difficultyCards')?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
-  function newEntry(id,completions){
-    let root=document.getElementById(id);
-    if(!root){root=document.createElement('aside');root.id=id;root.className='card refresh-entry';
-      const anchor=document.getElementById('todayNewContentBanner');
-      anchor?.before(root);
-    }
-    const done=bank.filter(p=>completed(p.id,completions)).length,left=300-done;
-    root.hidden=bank.length!==300||!left||localStorage.getItem(releaseDismissKey())==='1';
-    root.innerHTML='<div class="refresh-entry-art" aria-hidden="true">'+
-      '<img src="/difficulty/printshop/easy.webp" width="52" height="52" alt="">'+
-      '<img src="/difficulty/printshop/medium.webp" width="52" height="52" alt="">'+
-      '<img src="/difficulty/printshop/hard.webp" width="52" height="52" alt=""></div>'+
-      '<div class="refresh-entry-copy"><h2>300 nových Propletů</h2><p>Čerstvá slova ve Snadné, Střední i Těžké.</p>'+
-      '<button class="refresh-entry-link" type="button" data-refresh-choose>Vybrat hru <span aria-hidden="true">→</span></button></div>'+
-      '<button class="refresh-entry-dismiss" type="button" data-refresh-dismiss aria-label="Skrýt pozvánku na nové desky">×</button>';
-    root.querySelector('[data-refresh-choose]').onclick=chooseGame;
-    root.querySelector('[data-refresh-dismiss]').onclick=()=>{localStorage.setItem(releaseDismissKey(),'1');root.hidden=true};
   }
   function decorateCards(completions){
     for(const diff of orderDifficulties){
@@ -103,7 +80,7 @@
     bank=Object.values(puzzleDB.free||{}).flat().filter(p=>p.id.startsWith('g6-refresh-'));
     // Parse the account history once per render, not once for each of 600 board checks.
     const completions=getState().completed||{};
-    decorateCards(completions);newEntry('freeRefreshToday',completions);updateOrderSettings();updateCatalogue(completions);
+    decorateCards(completions);updateOrderSettings();updateCatalogue(completions);
   }
   function install(){
     const originalFree=global.renderFree;

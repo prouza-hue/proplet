@@ -35,6 +35,7 @@
     } catch { return false; }
   }
   function maybeShow() {
+    if (global.dailyExtraIntroPending?.()) return;
     if (!ready || shown || global.PropletContentAnnouncementShown === (accountId() || 'guest') || !eligible() || document.hidden) return;
     if (!['daily', 'free'].includes(currentScreen) || openTransientModal()
         || document.querySelector('dialog[open],.modal:not(.hidden),.quality-modal:not(.hidden)')) return;

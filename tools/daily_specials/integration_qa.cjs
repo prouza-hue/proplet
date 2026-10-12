@@ -40,24 +40,40 @@ async function seed(context,profile=null){
   window.__QA_PROPLET_READY=false;document.addEventListener('proplet:ready',()=>window.__QA_PROPLET_READY=true);
  },{profile,origins:[previewOrigin,productionOrigin]});
 }
-async function dismissAnnouncements(page){
+async function dismissAnnouncements(page,{expectExtraIntro=false}={}){
  const controls=[
+  '#dailyExtraIntro:not(.hidden) [data-extra-later]',
   '#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]',
   '#mk100LaunchPreview:not(.hidden) [data-mk-launch-back]',
   '#contentReleaseModal[open] .content-release-close',
   '.release-notes-v3331-backdrop .release-notes-v3331-close',
  ];
- let quiet=0;
+ let quiet=0,sawExtraIntro=false;
  for(let pass=0;pass<8;pass++){
   let closed=false;
   for(const selector of controls){
-   const button=page.locator(selector).first();
+   let button=page.locator(selector).first();
    if(!await button.isVisible())continue;
+   let testExtraEntry=false;
+   if(selector.startsWith('#dailyExtraIntro')){
+    sawExtraIntro=true;
+    const details=await page.locator('#dailyExtraIntro .modal-card').evaluate(card=>({width:card.getBoundingClientRect().width,scrollWidth:card.scrollWidth,clientWidth:card.clientWidth,title:card.querySelector('h2').textContent,eyebrows:card.querySelectorAll('.eyebrow').length}));
+    assert.equal(details.title,'Dnes je tu i Extra');assert.equal(details.eyebrows,0);assert(details.scrollWidth<=details.clientWidth+1,'Extra intro must fit on mobile');
+    if(page.viewportSize().width===390&&!report.extraEntryChecked){
+     await screenshot(page,'390-extra-intro');button=page.locator('#dailyExtraIntro [data-extra-show]');testExtraEntry=true;
+    }
+    report.extraIntroductions??=[];report.extraIntroductions.push({width:page.viewportSize().width,...details});
+   }
    await button.click();await button.waitFor({state:'hidden',timeout:5000});
+   if(testExtraEntry){
+    assert.equal(await page.locator('#dailyChallengeSwitch button').getAttribute('aria-pressed'),'true','intro CTA selects Extra without starting a game');
+    assert(await page.locator('#screen-daily.active').isVisible());
+    await page.locator('#dailyHeroTitle [data-daily-kind="base"]').click();report.extraEntryChecked=true;
+   }
    report.dismissedAnnouncements??=[];report.dismissedAnnouncements.push({origin:new URL(page.url()).origin,selector});
    closed=true;break;
   }
-  quiet=closed?0:quiet+1;if(quiet>=2)return;
+  quiet=closed?0:quiet+1;if(quiet>=2){if(expectExtraIntro)assert(sawExtraIntro,'first eligible Extra visit must explain the new challenge');return;}
   await page.waitForTimeout(100);
  }
  throw Error('Release announcements did not settle after their normal dismissal controls');
@@ -91,7 +107,13 @@ async function open(context,origin){
  await page.waitForFunction(()=>typeof accountProgressAvailable==='function'&&accountProgressAvailable(),{},{timeout:60000});
  await page.locator('#screen-daily.active .daily-hero').waitFor({timeout:30000});
  await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(250);
- await dismissAnnouncements(page);
+ await dismissAnnouncements(page,{expectExtraIntro:origin===previewOrigin});
+ if(origin===previewOrigin){
+  assert.equal(await page.locator('#freeRefreshToday').count(),0,'retired300-board card must not return');
+  assert.equal(await page.locator('#dailyChallengeSwitch button>span').first().textContent(),'Extra');
+  const colors=await page.locator('#dailyChallengeSwitch button').evaluate(button=>({background:getComputedStyle(button).backgroundColor,color:getComputedStyle(button).color}));
+  assert.equal(colors.background,'rgb(255, 248, 233)');assert.equal(colors.color,'rgb(33, 79, 174)');
+ }
  return page;
 }
 async function screenshot(page,name){
@@ -185,6 +207,13 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
   assert(baseBounds.hero.height<=productionBounds.hero.height+2,`base card grew at${viewport.width}: ${baseBounds.hero.height} vs production ${productionBounds.hero.height}`);
   assert(specialBounds.hero.height<=productionBounds.hero.height+2,`special card grew at${viewport.width}: ${specialBounds.hero.height} vs production ${productionBounds.hero.height}`);
   assert(Math.abs(specialBounds.hero.height-baseBounds.hero.height)<=1,`switch changes Daily card height at${viewport.width}`);
+  if(viewport.width===390){
+   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.__QA_PROPLET_READY===true);
+   await page.waitForTimeout(350);
+   assert.equal(await page.locator('#dailyExtraIntro:not(.hidden)').count(),0,'Extra explanation is shown once, not after reload');
+   assert.equal(await page.evaluate(()=>document.body.style.overflow),'','dismissal restores scrolling');
+   report.checks.push('Extra introduction once on first available visit, mobile fit, CTA selection, reload persistence, retired300-card absent and inverse Extra label');
+  }
   await page.locator('.daily-week-day.has-daily-special').first().click();await page.locator('#dailyWeekDialog:not(.hidden)').waitFor();
   const clippedWeek=await page.locator('#dailyWeekDialog .daily-week-dialog-day>span').evaluateAll(cells=>cells.filter(cell=>cell.scrollWidth>cell.clientWidth+1).map(cell=>cell.textContent));
   assert.deepEqual(clippedWeek,[],`weekly overview labels clip at${viewport.width}`);

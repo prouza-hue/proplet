@@ -338,7 +338,8 @@ async function refreshDatedSpecial(){return datedSpecial()?.refresh()||null}
 function dailySpecialResultState(iso=pragueDateISO()){return progression().dailySpecialResultState(iso)}
 function dailySpecialUI(){
  if(!dailySpecialUIController&&window.PropletDailySpecialUI?.create)dailySpecialUIController=window.PropletDailySpecialUI.create({
-  $,$$,DIFF,pragueDateISO,formatDateCZ,countCz,getProfile,getQueue,getSyncState:()=>syncState,dailyResultState,
+  $,$$,DIFF,pragueDateISO,formatDateCZ,countCz,getProfile,getAnonymousId,getQueue,getSyncState:()=>syncState,dailyResultState,
+  canShowIntro:()=>currentScreen==='daily'&&!onboardingMandatory&&localStorage.getItem(ONBOARD_KEY)==='done'&&!window.PropletFirstSteps?.quiet()&&!openTransientModal(),
   dailySpecialResultState:()=>dailySpecialResultState(),getSchedule:()=>datedSpecial()?.schedule()||[],
   startGame,showDailyResult,showSpecialResult,startDaily,startSpecial,refreshSpecial:refreshDatedSpecial,showToast,
   renderBase:()=>dailyOrchestration().renderDaily(),
@@ -346,6 +347,7 @@ function dailySpecialUI(){
  return dailySpecialUIController;
 }
 function renderDailySpecialUI(){dailySpecialUI()?.render()}
+function dailyExtraIntroPending(){return !!dailySpecialUI()?.introPending()}
 function isSpecialDailySelected(){return dailySpecialUI()?.getState()?.selected==='special'}
 function startSelectedDaily(){const ui=dailySpecialUI();return ui?ui.start():startDaily()}
 function shareSelectedDaily(){
@@ -794,6 +796,7 @@ function initNavigation(){
    else if(modal.id==='profileModal'&&profileModalFromNudge){modal.classList.add('hidden');resumeAfterAccountNudge()}
    else if(modal.id==='achievementDetail')window.PropletAchievementDetails?.close();
    else if(modal.id==='freeRefreshAnnouncement')window.PropletRefreshRelease?.close();
+   else if(modal.id==='dailyExtraIntro')dailySpecialUI()?.closeIntro();
    else if(modal.id==='contentReleaseModal'||modal.id==='mk100LaunchPreview')window.PropletContentRelease?.close();
    else if(modal.id==='tajenkaRulesModal')closeTajenkaRules();
    else if(modal.id==='helperOfferModal')dismissHelperOffer();
@@ -803,9 +806,9 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
-function closeTransientModals(){window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();transientModals().forEach(el=>el.classList.add('hidden'))}
+function closeTransientModals(){window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();dailySpecialUIController?.closeIntro();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
  if(currentScreen!=='game')return;
  if(currentGame?.mode!=='rescue')saveGameProgress();hideGameUndo();stopTimer();
