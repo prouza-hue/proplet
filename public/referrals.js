@@ -2,46 +2,64 @@
 (() => {
  'use strict';
  const preview=window.PropletReferralPreview;if(!preview)return;
- window.PropletReferralUiRevision=11;
+ window.PropletReferralUiRevision=12;
  const m=preview.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const artwork='<div class="ref-art" aria-hidden="true"><div class="ref-art-card ref-art-katka"><img src="/assets/avatars/v3/03-jezek.svg" width="76" height="76" alt=""></div><div class="ref-art-card ref-art-friend"><img src="/assets/avatars/v3/01-liska.svg" width="76" height="76" alt=""></div><span class="ref-art-thread"></span><span class="ref-art-word"><i>S</i><i>P</i><i>O</i><i>L</i><i>U</i></span></div>';
 
+ const earnedReward='<div class="ref-reward"><span class="xp-sticker">+1 000 XP</span></div>';
  const reward='<div class="ref-reward"><span class="xp-sticker">+1 000 XP</span><small>pro každého</small></div>';
  const heading=(title,copy)=>'<div class="ref-story"><div class="ref-story-copy"><h2>'+title+'</h2><p>'+copy+'</p></div>'+ '<div class="ref-visual">'+artwork+reward+'</div></div>';
  const dismissReward='<button class="ref-card-close" type="button" data-ref-reward-close aria-label="Skrýt připsaný bonus">×</button>';
- const rewardKey=()=> 'proplet:referral-reward-dismissed:'+preview.profile().id+':KATKA';
- const rewardHidden=()=>m.paid&&localStorage.getItem(rewardKey())==='1';
+ const rewardKey=()=> 'proplet:referral-reward-dismissed:'+preview.profile().id+':'+(m.inviterCode||'KATKA');
+ const preferences=preview.preferences||localStorage;
+ const rewardHidden=()=>m.paid&&preferences.getItem(rewardKey())==='1';
+ const canInvite=()=>!m.incoming||m.paid;
+ const announcementKey=()=> 'proplet:referral-announcement-seen:v1:'+preview.profile().id;
  const steps=n=>'<div class="ref-steps" role="img" aria-label="Dokončeno '+n+' z 5 desek">'+Array.from({length:5},(_,i)=>'<span class="ref-step ref-step-'+i+(i<n?' done':i===n?' next':'')+'"><b>'+(i<n?'✓':i+1)+'</b></span>').join('')+'</div>';
- let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false;
- function link(view){const u=new URL(location.origin+'/');if(view)u.searchParams.set('view',view);if(view==='new')u.searchParams.set('invite','KATKA');if(document.documentElement.dataset.theme==='dark')u.searchParams.set('theme','dark');return u.href}
+ let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false,announcementTimer=null;
+ function link(view){const u=new URL(location.origin+'/');if(view)u.searchParams.set('view',view);if(view==='new')u.searchParams.set('invite',preview.profile().id==='preview-elis'?'ELISKA':'KATKA');if(document.documentElement.dataset.theme==='dark')u.searchParams.set('theme','dark');return u.href}
  function inviteUrl(){return link('new')}
  function updateStats(){if(typeof getProfile==='function'&&getProfile())updateAccountProfile({stats:preview.stats()});}
- const incomingHeading=(title,copy,n)=>'<div class="ref-incoming-layout"><div class="ref-incoming-main"><h2>'+title+'</h2>'+(copy?'<p>'+copy+'</p>':'')+(n===null?'':steps(n)+'<div class="ref-progress-caption"><strong>'+n+' / 5 desek hotovo</strong></div>')+'</div><div class="ref-visual">'+artwork+reward+'</div></div>';
+ const incomingHeading=(title,copy,n)=>'<div class="ref-incoming-layout"><div class="ref-incoming-main"><h2>'+title+'</h2>'+(copy?'<p>'+copy+'</p>':'')+(n===null?'':steps(n)+'<div class="ref-progress-caption"><strong>'+n+' / 5 desek hotovo</strong></div>')+'</div><div class="ref-visual">'+artwork+(m.paid?earnedReward:reward)+'</div></div>';
  function incomingCopy(){
   if(!m.accepted)return incomingHeading(esc(m.inviterName)+' tě zve do Propletu.','Dohraj 5 desek a získejte bonus oba.',null)+'<div class="ref-action-row">'+'<button class="secondary-btn ref-wide" data-ref-accept>Přijmout pozvánku</button></div><small class="ref-rule">'+rule+'</small>';
-  if(m.paid)return incomingHeading('Bonus máte oba!','Ty i '+esc(m.inviterName)+'.',5)+'<div class="ref-action-row"><span class="ref-paid-note">✓ Připsáno do celkových XP</span></div><small class="ref-rule">'+rule+'</small>';
+  if(m.paid)return incomingHeading('Bonus máš ty i '+esc(m.inviterName)+'.','',5)+'<div class="ref-action-row"><span class="ref-paid-note">✓ Připsáno do celkových XP</span></div><small class="ref-rule">'+rule+'</small>';
   const left=5-m.count,title='Ještě '+left+' '+(left===1?'deska':left<5?'desky':'desek')+'.';
   return incomingHeading(title,'Bonus získáte oba: ty i '+esc(m.inviterName)+'.',m.count)+'<div class="ref-action-row">'+'<button class="secondary-btn ref-wide" data-ref-play>Vybrat další hru <span aria-hidden="true">→</span></button></div><small class="ref-rule">'+rule+'</small>';
  }
+ const invitationOffer=()=>'<button class="ref-card-close" data-ref-home-close aria-label="Skrýt nabídku pozvání">×</button>'+heading('Pozvi někoho<br>do Propletu.','Sdílejte radost z hraní. Za prvních 5 desek kamaráda získáte oba bonus.')+'<button class="secondary-btn ref-wide" data-ref-open>Pozvi kamaráda <span aria-hidden="true">→</span></button>';
  function renderHome(){
   let card=$('#referralHome');
   if(!card){card=document.createElement('aside');card.id='referralHome';card.className='card ref-home'}
-  const anchor=m.incoming?$('#screen-daily .daily-hero'):($('#tajenkaPreviewCard')||$('#quickPlayCard'));
+  const showIncoming=m.incoming&&(!m.paid||!rewardHidden());
+  const anchor=showIncoming?$('#screen-daily .daily-hero'):($('#tajenkaPreviewCard')||$('#quickPlayCard'));
   if(!anchor)return;
   if(anchor.nextElementSibling!==card)anchor.after(card);
-  card.classList.toggle('ref-incoming',m.incoming);card.classList.toggle('ref-paid',m.paid);
-  card.hidden=m.incoming?rewardHidden():sessionStorage.getItem('ref:announcement-hidden')==='1';
-  card.innerHTML=m.incoming?(m.paid?dismissReward:'')+incomingCopy():'<button class="ref-card-close" data-ref-home-close aria-label="Skrýt nabídku pozvání">×</button>'+heading('Pozvi někoho<br>do Propletu.','Sdílejte radost z hraní. Za prvních pět desek kamaráda získáte oba bonus.')+'<button class="secondary-btn ref-wide" data-ref-open>Pozvat kamaráda <span aria-hidden="true">→</span></button>';
+  card.classList.toggle('ref-incoming',showIncoming);card.classList.toggle('ref-paid',showIncoming&&m.paid);
+  card.hidden=!showIncoming&&sessionStorage.getItem('ref:announcement-hidden')==='1';
+  card.innerHTML=showIncoming?(m.paid?dismissReward:'')+incomingCopy():invitationOffer();
   wire(card);
+  let own=$('#referralInviteHome');
+  if(showIncoming&&canInvite()){
+   if(!own){own=document.createElement('aside');own.id='referralInviteHome';own.className='card ref-home ref-own-invite'}
+   ($('#tajenkaPreviewCard')||$('#quickPlayCard')).after(own);
+   own.hidden=sessionStorage.getItem('ref:announcement-hidden')==='1';own.innerHTML=invitationOffer();wire(own);
+  }else own?.remove();
  }
  function renderProfile(){
   let card=$('#referralProfile');if(!card){card=document.createElement('section');card.id='referralProfile';card.className='card ref-profile';$('#profileCard')?.after(card)}
   if(!card)return;
-  const rows=m.referrals.map(r=>'<div class="ref-person"><div class="ref-avatar">'+(r.name==='Eliška'?'🦊':r.name==='Honza'?'🐻':'🐱')+'</div><div><strong>'+r.name+'</strong><small>'+(r.paid?'Bonus připsán oběma':r.accepted?r.count+' / 5 desek':'Čeká na přijetí')+'</small></div><span class="ref-person-state">'+(r.paid?'+1 000 XP':r.accepted?r.count+'/5':'Čeká')+'</span></div>').join('');
+  const rows=(m.incoming?[]:m.referrals).map(r=>'<div class="ref-person"><div class="ref-avatar">'+(r.name==='Eliška'?'🦊':r.name==='Honza'?'🐻':'🐱')+'</div><div><strong>'+r.name+'</strong><small>'+(r.paid?'Bonus připsán oběma':r.accepted?r.count+' / 5 desek':'Čeká na přijetí')+'</small></div><span class="ref-person-state">'+(r.paid?'+1 000 XP':r.accepted?r.count+'/5':'Čeká')+'</span></div>').join('');
   card.classList.toggle('ref-incoming',m.incoming);card.classList.toggle('ref-paid',m.paid);
-  card.innerHTML=m.incoming?incomingCopy():'<div class="ref-profile-head"><div><h2>Pozvaní kamarádi</h2><p>Pět desek. Tisíc pro každého.</p></div><span class="xp-sticker">+1 000 XP</span></div><button class="primary-btn" data-ref-open>Pozvat dalšího kamaráda</button><p class="ref-policy">'+rule+'</p><div class="ref-people">'+rows+'</div><details class="ref-rules"><summary>Jak se počítá pět desek?</summary><p>Kamarád přijme tvůj odkaz a vytvoří si nový účet. Potom dohraje 5 různých desek v libovolné kombinaci: Dnešní výzva, Tajenka i Volná hra. Není potřeba hrát pět dní.</p><p>Nápověda ani klidný režim bonusu nebrání. Opakování stejné desky a úvodní trénink se nepočítají. Bonus se přidělí oběma jednou.</p></details>';
+  let earned=$('#referralProfileReward');
+  if(m.incoming&&m.paid&&!rewardHidden()){
+   if(!earned){earned=document.createElement('section');earned.id='referralProfileReward';earned.className='card ref-profile ref-incoming ref-paid'}
+   card.before(earned);earned.innerHTML=dismissReward+incomingCopy();wire(earned);
+  }else earned?.remove();
+  card.classList.toggle('ref-incoming',m.incoming&&!m.paid);card.classList.remove('ref-paid');
+  card.innerHTML=m.incoming&&!m.paid?incomingCopy():'<div class="ref-profile-head"><div><h2>Pozvaní kamarádi</h2><p>Pět desek. Tisíc pro každého.</p></div><span class="xp-sticker">+1 000 XP</span></div><button class="primary-btn" data-ref-open>Pozvat dalšího kamaráda</button><p class="ref-policy">'+rule+'</p><div class="ref-people">'+rows+'</div><details class="ref-rules"><summary>Jak se počítá pět desek?</summary><p>Kamarád přijme tvůj odkaz a vytvoří si nový účet. Potom dohraje 5 různých desek v libovolné kombinaci: Dnešní výzva, Tajenka i Volná hra. Není potřeba hrát pět dní.</p><p>Nápověda ani klidný režim bonusu nebrání. Opakování stejné desky a úvodní trénink se nepočítají. Bonus se přidělí oběma jednou.</p></details>';
   wire(card);
  }
  function offer(){
@@ -52,7 +70,7 @@
   card.hidden=!m.incoming||!g||!g.finished||['starter','rescue'].includes(g.mode)||g.isReplay||offerDismissed||(m.paid&&(!lastReward||rewardHidden()));
   if(card.hidden)return;
   card.classList.toggle('ref-earned',lastReward);
-  card.innerHTML=lastReward?dismissReward+'<h3>Bonus máte oba!</h3><p>Ty i '+esc(m.inviterName)+'.</p>'+reward:'<div class="ref-result-progress"><strong>'+m.count+' / 5 desek k bonusu</strong>'+reward+'</div>'+steps(m.count);
+  card.innerHTML=lastReward?dismissReward+'<h3>Bonus máš ty i '+esc(m.inviterName)+'.</h3>'+earnedReward:'<div class="ref-result-progress"><strong>'+m.count+' / 5 desek k bonusu</strong>'+reward+'</div>'+steps(m.count);
   wire(card);
  }
  function wire(root){
@@ -60,7 +78,7 @@
   root.querySelectorAll('[data-ref-open]').forEach(b=>b.onclick=()=>open('invite'));
   root.querySelectorAll('[data-ref-accept]').forEach(b=>b.onclick=()=>open('accept'));
   root.querySelectorAll('[data-ref-play]').forEach(b=>b.onclick=()=>{close();if(typeof closeTransientModals==='function')closeTransientModals();nav('free')});
-  root.querySelectorAll('[data-ref-reward-close]').forEach(b=>b.onclick=()=>{localStorage.setItem(rewardKey(),'1');renderHome();offer()});
+  root.querySelectorAll('[data-ref-reward-close]').forEach(b=>b.onclick=()=>{preferences.setItem(rewardKey(),'1');renderHome();renderProfile();offer()});
   root.querySelectorAll('[data-ref-dismiss]').forEach(b=>b.onclick=()=>{offerDismissed=true;root.hidden=true});
  }
  function open(kind){
@@ -69,6 +87,14 @@
    modal.addEventListener('click',e=>{if(e.target===modal)close()});
   }
   if($('#referralDialog').classList.contains('hidden'))originFocus=document.activeElement;
+  if(kind==='announcement'){
+   const sheet=$('#referralDialog .ref-sheet');sheet.classList.add('ref-announcement');
+   sheet.innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít nabídku pozvání">×</button>'+heading('Pozvi někoho<br>do Propletu.','Za prvních 5 desek kamaráda získáte oba bonus.')+'<button class="primary-btn" data-ref-open>Pozvi kamaráda do Propletu</button>';
+   sheet.querySelector('h2').id='refDialogTitle';sheet.querySelector('h2').tabIndex=-1;
+   $('#referralDialog').classList.remove('hidden');wire(sheet);sheet.querySelector('[data-ref-close]').onclick=close;
+   preferences.setItem(announcementKey(),'1');$('#refDialogTitle').focus();return;
+  }
+  $('#referralDialog .ref-sheet').classList.remove('ref-announcement');
   if(kind==='choice'){
    $('#referralDialog .ref-sheet').innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít pozvánku">×</button><h2 id="refDialogTitle" tabindex="-1">Pozvi kamaráda</h2><div class="ref-choice"><button class="primary-btn" id="refShareBoard">Poslat tuhle desku</button><p>Kamarád si zahraje stejnou desku a porovnáte výsledky.</p><div class="ref-choice-bonus">'+artwork+reward+'</div><button class="primary-btn" data-ref-open>Pozvat nového hráče</button><p>Po jeho prvních pěti deskách získáte oba bonus.</p></div>';
    $('#referralDialog').classList.remove('hidden');wire($('#referralDialog'));
@@ -117,9 +143,17 @@
   $('#refPreviewFifth').onclick=()=>location.assign(link('four')+'&open=free');
   $('#refPreviewTheme').onchange=e=>{applyTheme(e.target.value);saveSettings({...getSettings(),theme:e.target.value})};
  }
- function refresh(){updateStats();renderHome();renderProfile();offer()}
+ function scheduleAnnouncement(){
+  clearTimeout(announcementTimer);
+  if(!canInvite()||preferences.getItem(announcementKey())==='1'||(m.incoming&&!rewardHidden()))return;
+  announcementTimer=setTimeout(()=>{
+   if(!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
+   open('announcement');
+  },1200);
+ }
+ function refresh(){updateStats();renderHome();renderProfile();offer();scheduleAnnouncement()}
  function boot(){
-  if(booted)return;booted=true;review();refresh();$('#winShareBtn').addEventListener('click',e=>{if(!forwardingShare&&!m.incoming&&$('#winShareBtn').classList.contains('challenge-share-cta')){e.preventDefault();e.stopImmediatePropagation();open('choice')}},true);if(new URLSearchParams(location.search).get('intro')==='1')open('invite');
+  if(booted)return;booted=true;review();refresh();$('#winShareBtn').addEventListener('click',e=>{if(!forwardingShare&&canInvite()&&$('#winShareBtn').classList.contains('challenge-share-cta')){e.preventDefault();e.stopImmediatePropagation();open('choice')}},true);if(new URLSearchParams(location.search).get('intro')==='1')open('invite');
   registerGameCompletionHook({id:'referral-preview',priority:250,after:({game})=>{
    lastReward=preview.complete(game);updateStats();renderDaily();renderHome();renderProfile();if(typeof window.renderProfile==='function')window.renderProfile();offer();
   }});

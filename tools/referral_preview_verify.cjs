@@ -11,9 +11,15 @@ async function draw(page,indices){
  for(const p of coords.slice(1)){await page.mouse.move(p.x,p.y,{steps:3});await page.waitForTimeout(45)}
  await page.mouse.up();
 }
-async function ready(page,query=''){
+async function ready(page,query='',announce=false){
  await page.goto(base+'/'+query);
- try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===11)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
+ try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===12)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
+ await page.evaluate(show=>{
+   const p=PropletReferralPreview.preferences,id=PropletReferralPreview.profile().id;
+   p.removeItem('proplet:referral-reward-dismissed:'+id+':KATKA');
+   if(show)p.removeItem('proplet:referral-announcement-seen:v1:'+id);else p.setItem('proplet:referral-announcement-seen:v1:'+id,'1');
+   document.dispatchEvent(new Event('proplet:screen-changed'));
+  },announce);
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
@@ -32,8 +38,16 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   const page=await context.newPage(),errors=[],requests=[];
   page.on('pageerror',e=>{errors.push(e.message);console.error('BROWSER_ERROR '+e.message)});
   page.on('request',r=>requests.push({url:r.url(),method:r.method()}));
-  await ready(page);await screenshot(page,'01-native-home');await visual(page,'#referralHome','home-inviter');
-  assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);check('No unsolicited promotional modal');
+  await ready(page,'',true);
+  await page.locator('#referralDialog .ref-announcement').waitFor({state:'visible'});
+  await visual(page,'#referralDialog .ref-sheet','one-time-cta');
+  await page.keyboard.press('Escape');
+  await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===12);
+  await page.waitForTimeout(1500);
+  assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);
+  check('One-time CTA appears for eligible player and stays dismissed across reload');
+  await screenshot(page,'01-native-home');await visual(page,'#referralHome','home-inviter');
+  assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);check('No repeated promotional modal');
   await page.locator('#referralHome [data-ref-open]').click();
   assert.match(await page.locator('#referralDialog').innerText(),/týdenních XP hráče ani týmu/);
   assert((await page.locator('#refLink').boundingBox()).width>100,'invitation link remains readable on mobile');
@@ -100,12 +114,16 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(await page.locator('#winResultActions #winShareBtn').count(),1);
   await page.locator('#referralWin [data-ref-reward-close]').click();
   await page.locator('#winMenuBtn').click();
-  assert.equal(await page.locator('#referralHome').isVisible(),false);
   await page.locator('.bottom-nav [data-nav="profile"]').click();
-  assert.match(await page.locator('#referralProfile').innerText(),/Bonus máte oba/);
+  assert.equal(await page.locator('#referralProfileReward').count(),0);
+  assert.equal(await page.locator('#referralProfile [data-ref-open]').isVisible(),true);
+  await page.locator('#settingsHeaderBtn').click();
+  await page.waitForFunction(()=>document.querySelector('#screen-profile').classList.contains('settings-open'));
+  assert.equal(await page.locator('#referralProfile').isVisible(),false);
   await page.locator('.bottom-nav [data-nav="daily"]').click();
-  assert.equal(await page.locator('#referralHome').isVisible(),false);
-  check('Paid reward can be dismissed; it stays hidden through navigation and remains in Já');
+  assert.equal(await page.locator('#referralHome [data-ref-open]').isVisible(),true);
+  assert.equal(await page.locator('#referralHome [data-ref-reward-close]').count(),0);
+  check('Reward dismissal applies across surfaces; completed invitee can invite; settings has no referrals');
   assert.equal(await page.evaluate(()=>PropletReferralPreview.complete(currentGame)),false);
   assert.equal(await page.evaluate(()=>PropletReferralPreview.stats().referralBonusXp),1000);
   check('Drawing actual native board '+puzzleId+' pays both sides once; bonus excluded from weekly player/team XP');
@@ -206,6 +224,24 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   await ready(page,'?view=reward');
   assert((await page.locator('#referralHome').boundingBox()).height<310);
   await visual(page,'#referralHome','home-paid');
+  assert.equal(await page.locator('#referralHome h2').innerText(),'Bonus máš ty i Katka.');
+  assert.equal(await page.locator('#referralHome .ref-reward small').count(),0);
+  assert.equal(await page.locator('#referralInviteHome [data-ref-open]').isVisible(),true);
+  await page.locator('#referralInviteHome [data-ref-open]').click();
+  assert.equal(new URL(await page.locator('#refLink').inputValue()).searchParams.get('invite'),'ELISKA');
+  await page.keyboard.press('Escape');
+  await page.locator('.bottom-nav [data-nav="profile"]').click();
+  await visual(page,'#referralProfileReward','profile-paid');
+  await page.locator('#settingsHeaderBtn').click();
+  await page.waitForFunction(()=>document.querySelector('#screen-profile').classList.contains('settings-open'));
+  assert.equal(await page.locator('#referralProfileReward').isVisible(),false);
+  assert.equal(await page.locator('#referralProfile').isVisible(),false);
+  await page.locator('#profileSettingsBack').click();
+  await page.locator('#referralProfileReward [data-ref-reward-close]').click();
+  await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===12);
+  assert.equal(await page.locator('#referralProfileReward').count(),0);
+  assert.equal(await page.locator('#referralHome [data-ref-reward-close]').count(),0);
+  check('Reward closes from profile and stays dismissed after reload; outgoing link belongs to the invitee');
   check('Single result invitation opens distinct board and bonus routes; original native sharing preserved');
   const blocked=await page.evaluate(async()=>{const r=await fetch('https://iopyhluayfszskyqqpuc.supabase.co/rest/v1/players',{method:'POST',body:'{}'});return {status:r.status,audit:PropletReferralPreview.audit}});
   assert.equal(blocked.status,403);

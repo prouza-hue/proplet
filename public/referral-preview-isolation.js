@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const q=new URLSearchParams(location.search), fixture=window.PROPLET_REFERRAL_FIXTURES;
- const nativeFetch=window.fetch.bind(window);
+ const nativeFetch=window.fetch.bind(window),preferences=window.localStorage;
  const memory=()=>{const m=new Map();return {getItem:k=>m.get(String(k))??null,setItem:(k,v)=>m.set(String(k),String(v)),removeItem:k=>m.delete(String(k)),clear:()=>m.clear(),key:i=>[...m.keys()][i]??null,get length(){return m.size}}};
  Object.defineProperty(window,'localStorage',{value:memory()});
  Object.defineProperty(window,'sessionStorage',{value:memory()});
@@ -10,9 +10,9 @@
  window.Date=class extends NativeDate{constructor(...a){super(...(a.length?a:[fixed+NativeDate.now()-started]))}static now(){return fixed+NativeDate.now()-started}};
  const incoming=q.has('invite')||['new','four','reward'].includes(q.get('view'));
  const view=incoming?(q.get('view')||'new'):'inviter';
- const model={view,incoming,accepted:incoming&&view!=='new',paid:incoming&&view==='reward',count:incoming?(view==='four'?4:view==='reward'?5:0):0,seen:new Set(),inviterName:'Katka',name:incoming?'Eliška':'Katka',base:incoming?500:2150,weeklyBase:incoming?0:230,gameXp:0,referrals:[{name:'Eliška',count:3,accepted:true,paid:false},{name:'Honza',count:0,accepted:false,paid:false},{name:'Petr',count:5,accepted:true,paid:true}]};
+ const model={view,incoming,accepted:incoming&&view!=='new',paid:incoming&&view==='reward',count:incoming?(view==='four'?4:view==='reward'?5:0):0,seen:new Set(),inviterCode:q.get('invite')||'KATKA',inviterName:q.get('invite')==='ELISKA'?'Eliška':'Katka',name:incoming?'Eliška':'Katka',base:incoming?500:2150,weeklyBase:incoming?0:230,gameXp:0,referrals:[{name:'Eliška',count:3,accepted:true,paid:false},{name:'Honza',count:0,accepted:false,paid:false},{name:'Petr',count:5,accepted:true,paid:true}]};
  const audit={fixtureReads:[],fixtureWrites:[],blockedExternal:[],staticRequests:[]};
- const api=window.PropletReferralPreview={model,audit,database:false,productionApi:false,revision:4};
+ const api=window.PropletReferralPreview={model,audit,preferences,database:false,productionApi:false,revision:4};
  const ownBonus=()=>incoming?(model.paid?1000:0):model.referrals.filter(r=>r.paid).length*1000;
  api.stats=()=>{
    let rows=[];try{rows=Object.values(JSON.parse(localStorage.getItem('proplet-v2-state:'+api.profile().id)||'{}').completed||{})}catch{}
