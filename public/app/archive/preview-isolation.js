@@ -144,6 +144,34 @@ function referralIncoming(){
   paid,rewardDismissed:local.getItem('referralDismissed')==='1',reviewOnly:true};
 }
 const referralStatus=()=>({enabled:true,invite:ownInvite(),incoming:referralIncoming(),referrals:[],referralCount:0,reviewOnly:true});
+
+function freeOrderReview(method,body){
+ const key='review-free-order-server:'+(profile()?.id||'guest');
+ const ledger=read(key,{records:{},requests:{}});
+ ledger.records??={};ledger.requests??={};
+ if(method==='GET')return {enabled:true,records:ledger.records,resumeIds:{},reviewOnly:true};
+ if(!['easy','medium','hard','hardcore'].includes(body.difficulty)
+  ||!['numeric','varied'].includes(body.mode)||!Number.isInteger(body.expected_revision)||body.expected_revision<0
+  ||typeof body.request_id!=='string'||!Array.isArray(body.ids)
+  ||body.ids.some(id=>typeof id!=='string')||new Set(body.ids).size!==body.ids.length)
+  return {reviewError:'Neplatná testovací volba pořadí'};
+ if(ledger.requests[body.request_id])return ledger.requests[body.request_id];
+ const current=ledger.records[body.difficulty]||{difficulty:body.difficulty,mode:'varied',revision:0,
+  offered:true,newcomer:false,plan:{version:'pestre-v1',difficulty:body.difficulty,kind:'varied',ids:[]}};
+ const conflict=body.expected_revision!==current.revision;
+ const record=conflict?current:{difficulty:body.difficulty,mode:body.mode,revision:current.revision+1,
+  offered:true,newcomer:body.newcomer===true,
+  plan:{version:'pestre-v1',difficulty:body.difficulty,kind:'varied',ids:[...body.ids]}};
+ const response={enabled:true,record,conflict,reviewOnly:true};
+ if(!conflict)ledger.records[body.difficulty]=record;
+ ledger.requests[body.request_id]=response;
+ // Bound only the fixture command receipts; actual choices survive reloads.
+ const keys=Object.keys(ledger.requests);
+ for(const old of keys.slice(0,Math.max(0,keys.length-80)))delete ledger.requests[old];
+ save(key,ledger);
+ return response;
+}
+
 function boardRanking(url){
  const mine=profile()?.id||profileId;
  const rows=[{id:'review-klara',name:'Klára',avatar:'🌺',rank:1,elapsedMs:42000,moves:8,hintsUsed:0,cleanSolve:true},
@@ -189,6 +217,10 @@ window.fetch=async(input,init={})=>{
  if(path==='/api/team-victories')return json({enabled:false,team:null,intro:{eligible:false,seen:true},pendingAward:null,history:[],reviewOnly:true});
  if(method==='GET'&&path==='/api/progress')return json({completed:[],rescues:[],inProgress:[],dailyDates:[],reviewOnly:true});
  if(path==='/api/free-order/config')return json({enabled:true,isolatedPreview:true,reviewOnly:true});
+ if(path==='/api/free-order'&&['GET','POST'].includes(method)){
+  const result=freeOrderReview(method,body);
+  return result.reviewError?json({detail:result.reviewError,reviewOnly:true},400):json(result);
+ }
  if(path==='/api/play-session/config')return json({enabled:false,isolatedPreview:false,reviewOnly:true});
  if(path==='/api/rescue/status'||path==='/api/rescue-status')return json({state:'unavailable',reviewOnly:true});
  if(method==='GET'&&(path.includes('global-leaderboard')||path==='/api/rankings/daily-special'))return json(boardRanking(url));
