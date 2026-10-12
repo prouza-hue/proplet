@@ -2,12 +2,12 @@
 (() => {
  'use strict';
  const preview=window.PropletReferralPreview;if(!preview)return;
- window.PropletReferralUiRevision=9;
+ window.PropletReferralUiRevision=10;
  const m=preview.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const artwork='<div class="ref-art" aria-hidden="true"><div class="ref-art-card ref-art-katka"><img src="/assets/avatars/v3/02-sova.svg" width="76" height="76" alt=""></div><div class="ref-art-card ref-art-friend"><img src="/assets/avatars/v3/01-liska.svg" width="76" height="76" alt=""></div><span class="ref-art-spark">✦</span><span class="ref-art-thread"></span><span class="ref-art-word"><i>S</i><i>P</i><i>O</i><i>L</i><i>U</i></span></div>';
- const inviterAccusative='Katku';
+ const artwork='<div class="ref-art" aria-hidden="true"><div class="ref-art-card ref-art-katka"><img src="/assets/avatars/v3/03-jezek.svg" width="76" height="76" alt=""></div><div class="ref-art-card ref-art-friend"><img src="/assets/avatars/v3/01-liska.svg" width="76" height="76" alt=""></div><span class="ref-art-thread"></span><span class="ref-art-word"><i>S</i><i>P</i><i>O</i><i>L</i><i>U</i></span></div>';
+
  const reward='<div class="ref-reward"><span class="xp-sticker">+1 000 XP</span><small>pro každého</small></div>';
  const heading=(title,copy)=>'<div class="ref-story"><div class="ref-story-copy"><h2>'+title+'</h2><p>'+copy+'</p></div>'+ '<div class="ref-visual">'+artwork+reward+'</div></div>';
  const dismissReward='<button class="ref-card-close" type="button" data-ref-reward-close aria-label="Skrýt připsaný bonus">×</button>';
@@ -18,11 +18,12 @@
  function link(view){const u=new URL(location.origin+'/');if(view)u.searchParams.set('view',view);if(view==='new')u.searchParams.set('invite','KATKA');if(document.documentElement.dataset.theme==='dark')u.searchParams.set('theme','dark');return u.href}
  function inviteUrl(){return link('new')}
  function updateStats(){if(typeof getProfile==='function'&&getProfile())updateAccountProfile({stats:preview.stats()});}
+ const incomingHeading=(title,copy,n)=>'<div class="ref-incoming-layout"><div class="ref-incoming-main"><h2>'+title+'</h2>'+(copy?'<p>'+copy+'</p>':'')+(n===null?'':steps(n)+'<div class="ref-progress-caption"><strong>'+n+' / 5 desek hotovo</strong></div>')+'</div><div class="ref-visual">'+artwork+reward+'</div></div>';
  function incomingCopy(){
-  if(!m.accepted)return heading(esc(m.inviterName)+' tě zve do Propletu.','Pět desek. Tisíc pro každého.')+'<div class="ref-action-row">'+'<button class="secondary-btn ref-wide" data-ref-accept>Přijmout pozvánku</button></div><small class="ref-rule">'+rule+'</small>';
-  if(m.paid)return heading('Tisíc pro tebe.<br>Tisíc pro '+esc(inviterAccusative)+'.','Všech pět desek je hotových. Bonus už máte oba.')+steps(5)+'<div class="ref-action-row">'+'<span class="ref-paid-note">✓ Připsáno do celkových XP</span></div><small class="ref-rule">'+rule+'</small>';
-  const left=5-m.count,title=m.count===0?'Pět desek ke společnému bonusu.':left===1?'Ještě jedna.<br>A tisíc pro každého.':'Ještě '+left+' desky.<br>A tisíc pro každého.';
-  return heading(title,'Denní výzva, Tajenka i volná hra. Každá různá dohraná deska se počítá.')+steps(m.count)+'<div class="ref-progress-caption"><strong>'+m.count+' / 5 desek hotovo</strong><span>Hraj vlastním tempem</span></div><div class="ref-action-row">'+'<button class="secondary-btn ref-wide" data-ref-play>Vybrat další hru <span aria-hidden="true">→</span></button></div><small class="ref-rule">'+rule+'</small>';
+  if(!m.accepted)return incomingHeading(esc(m.inviterName)+' tě zve do Propletu.','Dohraj 5 desek a získejte bonus oba.',null)+'<div class="ref-action-row">'+'<button class="secondary-btn ref-wide" data-ref-accept>Přijmout pozvánku</button></div><small class="ref-rule">'+rule+'</small>';
+  if(m.paid)return incomingHeading('Bonus máte oba!','Ty i '+esc(m.inviterName)+'.',5)+'<div class="ref-action-row"><span class="ref-paid-note">✓ Připsáno do celkových XP</span></div><small class="ref-rule">'+rule+'</small>';
+  const left=5-m.count,title='Ještě '+left+' '+(left===1?'deska':left<5?'desky':'desek')+'.';
+  return incomingHeading(title,'Bonus získáte oba: ty i '+esc(m.inviterName)+'.',m.count)+'<div class="ref-action-row">'+'<button class="secondary-btn ref-wide" data-ref-play>Vybrat další hru <span aria-hidden="true">→</span></button></div><small class="ref-rule">'+rule+'</small>';
  }
  function renderHome(){
   let card=$('#referralHome');
@@ -51,7 +52,7 @@
   card.hidden=!m.incoming||!g||!g.finished||['starter','rescue'].includes(g.mode)||g.isReplay||offerDismissed||(m.paid&&(!lastReward||rewardHidden()));
   if(card.hidden)return;
   card.classList.toggle('ref-earned',lastReward);
-  card.innerHTML=lastReward?dismissReward+'<h3>Pět desek je doma!</h3><p>Tisíc pro tebe. Tisíc pro '+esc(inviterAccusative)+'.</p>'+reward:'<div class="ref-result-progress"><strong>'+m.count+' / 5 desek k bonusu</strong>'+reward+'</div>'+steps(m.count);
+  card.innerHTML=lastReward?dismissReward+'<h3>Bonus máte oba!</h3><p>Ty i '+esc(m.inviterName)+'.</p>'+reward:'<div class="ref-result-progress"><strong>'+m.count+' / 5 desek k bonusu</strong>'+reward+'</div>'+steps(m.count);
   wire(card);
  }
  function wire(root){
@@ -76,12 +77,12 @@
    $('#refDialogTitle').focus();return;
   }
   const accept=kind==='accept';
-  $('#referralDialog .ref-sheet').innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít pozvánku">×</button><div class="ref-sheet-art">'+artwork+'</div><h2 id="refDialogTitle" tabindex="-1">'+(accept?'Katka tě zve do Propletu.':'Pozvi kamaráda.<br>Tisíc XP pro každého.')+'</h2><p class="ref-sheet-intro">'+(accept?'Propleť si hlavu spolu s Katkou. A získejte společný bonus.':'Kamarád si založí účet, dohraje pět desek a oba získáte tisíc XP.')+'</p><ol class="ref-how"><li><span>1</span><div><strong>'+(accept?'Vytvoř si účet':'Pošli pozvánku')+'</strong><small>'+(accept?'Nový hráč přijme pozvánku při registraci.':'Odkaz je tvůj. Můžeš ho poslat více kamarádům.')+'</small></div></li><li><span>2</span><div><strong>'+(accept?'Dohraj 5 různých desek':'Kamarád dohraje 5 desek')+'</strong><small>Dnešní výzva, Tajenka i Volná hra. Klidně v jediný den.</small></div></li><li><span>3</span><div><strong>Oba dostanete +1 000 XP</strong><small>Odměna se připíše po páté dokončené desce.</small></div></li></ol><div class="ref-policy">'+rule+'</div>'+(accept?'<button id="refCreateAccount" class="primary-btn big">Vytvořit účet a přijmout</button><button class="text-btn" data-ref-close>Zatím si jen zahrát</button>':'<button id="refShare" class="primary-btn big">Pojď si zahrát Proplet · poslat pozvánku</button><div class="ref-link-row"><input id="refLink" aria-label="Odkaz na pozvánku" readonly value="'+esc(inviteUrl())+'"><button id="refCopy" class="secondary-btn">Kopírovat</button></div>')+'<p id="refStatus" class="ref-status" role="status"></p>';
+  $('#referralDialog .ref-sheet').innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít pozvánku">×</button><div class="ref-sheet-art">'+artwork+'</div><h2 id="refDialogTitle" tabindex="-1">'+(accept?esc(m.inviterName)+' tě zve do Propletu.':'Pozvi kamaráda.<br>Tisíc XP pro každého.')+'</h2><ol class="ref-how"><li><span>1</span><div><strong>'+(accept?'Vytvoř si účet':'Pošli pozvánku')+'</strong><small>'+(accept?'Nový hráč přijme pozvánku při registraci.':'Odkaz je tvůj. Můžeš ho poslat více kamarádům.')+'</small></div></li><li><span>2</span><div><strong>'+(accept?'Dohraj 5 různých desek':'Kamarád dohraje 5 desek')+'</strong><small>Dnešní výzva, Tajenka i Volná hra. Klidně v jediný den.</small></div></li><li><span>3</span><div><strong>Oba dostanete +1 000 XP</strong><small>Odměna se připíše po páté dokončené desce.</small></div></li></ol><div class="ref-policy">'+rule+'</div>'+(accept?'<button id="refCreateAccount" class="primary-btn big">Vytvořit účet a přijmout</button><button class="text-btn" data-ref-close>Zatím si jen zahrát</button>':'<button id="refShare" class="primary-btn big">Pozvi kamaráda do Propletu</button><div class="ref-link-row"><input id="refLink" aria-label="Odkaz na pozvánku" readonly value="'+esc(inviteUrl())+'"><button id="refCopy" class="secondary-btn">Kopírovat</button></div>')+'<p id="refStatus" class="ref-status" role="status"></p>';
   $('#referralDialog').classList.remove('hidden');
   $('#referralDialog').querySelectorAll('[data-ref-close]').forEach(b=>b.onclick=close);
   if(accept)$('#refCreateAccount').onclick=()=>{
    close();openProfileModal('create');
-   $('#profileModalTitle').textContent='Přijmi pozvánku od Katky';
+   $('#profileModalTitle').textContent='Pozvánka: '+m.inviterName;
    $('#profileModalDesc').textContent='Po 5 deskách získáte oba +1 000 XP. Bonus je pouze do celkového pořadí, bez týdenních XP.';
    $('#saveProfileBtn').textContent='Vytvořit účet a přijmout';
    let note=$('#refTestAccount');if(!note){note=document.createElement('p');note.id='refTestAccount';note.className='ref-policy';$('#playerNameInput').closest('label').before(note)}
@@ -106,9 +107,9 @@
   bar.innerHTML='<summary><span>Testovací náhled · pozvánky</span><span class="ref-preview-label">Změnit pohled</span></summary><div class="ref-preview-options"><label>Pohled<select id="refPreviewView"><option value="inviter">Pozývající · Katka</option><option value="new">Pozvaný · nový účet</option><option value="four">Pozvaný · 4 z 5 desek</option><option value="reward">Pozvaný · bonus připsán</option></select></label><button id="refPreviewResult" class="secondary-btn">Ukázat výsledkovku</button><button id="refPreviewFifth" class="secondary-btn">Zahrát pátou desku</button><label>Vzhled<select id="refPreviewTheme"><option value="light">Světlý</option><option value="dark">Tmavý</option></select></label><p>Skutečná hra, ukázkové účty a pořadí. Údaje a XP platí jen do obnovení náhledu.</p></div>';
   $('.app-header').before(bar);$('#refPreviewView').value=m.view;$('#refPreviewTheme').value=document.documentElement.dataset.theme||'light';
   $('#refPreviewView').onchange=e=>location.assign(link(e.target.value));
-  $('#refPreviewResult').onclick=()=>{
+  $('#refPreviewResult').onclick=async()=>{
    if(typeof closeTransientModals==='function')closeTransientModals();
-   startFree('easy');
+   await startFree('easy');
    const g=window.currentGame;if(!g)return;
    g.found=g.puzzle.answers.map((a,i)=>({answerIndex:i,word:a.word,colorIndex:i}));
    g.moves=g.puzzle.answers.length;finishGame();

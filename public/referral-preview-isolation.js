@@ -84,7 +84,8 @@
     {id:mine.id,rank:2,name:mine.name,avatar:mine.avatar,isMine:true,elapsedMs:elapsed,moves:g?.moves||11,cleanSolve:!(g?.hintsUsed),hintsUsed:g?.hintsUsed||0},
     {id:'preview-neighbour-after',rank:3,name:'Tereza',avatar:'🦊',elapsedMs:elapsed+14000,moves:13,cleanSolve:true,hintsUsed:0}
    ];
-   return json({rows,total:14,myRank:2,topPercent:15,percentileMinimum:10,puzzleId:url.searchParams.get('puzzle_id'),date:url.searchParams.get('daily_date'),nextOffset:null});
+   const visibleRows=url.searchParams.has('offset')?Array.from({length:14},(_,i)=>rows[i]||{id:'preview-player-'+i,rank:i+1,name:'Hráč '+(i+1),avatar:'🐻',elapsedMs:elapsed+14000+i*3000,moves:14+i,cleanSolve:true,hintsUsed:0}):rows;
+   return json({rows:visibleRows,total:14,myRank:2,topPercent:15,percentileMinimum:10,puzzleId:url.searchParams.get('puzzle_id'),date:url.searchParams.get('daily_date'),nextOffset:null});
   }
   if(url.pathname.includes('rankings')||url.pathname.includes('leaderboard'))return json({players:[],teams:[],rows:[],total:0,myRank:null});
   if(url.pathname==='/api/rolling-content')return json({version:2,asOf:'2026-10-04',puzzles:{},latestBatch:null,nextRelease:null,availableFreeCounts:{}});

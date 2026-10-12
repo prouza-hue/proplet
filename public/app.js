@@ -1106,7 +1106,7 @@ async function finishGame(){
  const celebratedMk=newAchievements.filter(a=>a.group==='mozkokalypsa').map(a=>a.id);
  const badgeBox=$('#newBadgeBox'),badgeAnchor=celebratedMk.length?$('#winPrimaryBtn'):$('#starterHardActions');if(badgeBox&&badgeAnchor)badgeAnchor.before(badgeBox);
  if(celebratedMk.length&&!g.postStarterWarmup){const latest=getState();latest.mozkokalypsaCelebrated=[...new Set([...(Array.isArray(latest.mozkokalypsaCelebrated)?latest.mozkokalypsaCelebrated:[]),...celebratedMk])];saveState(latest)}
- configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':g.mode==='daily'?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hrát další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
+ configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':g.mode==='daily'?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hraj další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.mode==='free'&&!g.postStarterWarmup){
  if(getProfile()?.token){syncQueue({announce:false,waitForProfile:false}).then(r=>{if(currentGame!==g)return;if(r.ok||!r.failedKeys?.includes(rec.challengeKey))return loadWinLevelLeaderboard(g.puzzle,rec);const box=$('#levelLeaderboardBox');if(box)box.innerHTML='<div class="leaderboard-empty"><strong>Výsledek čeká na synchronizaci.</strong><small>Pořadí ukážeme, jakmile ho server potvrdí.</small></div>'}).catch(()=>{});}
   else loadWinLevelLeaderboard(g.puzzle,rec);
@@ -1945,7 +1945,7 @@ function rankBadge(rank){
  return medal?`<span class="result-medal result-medal-${value}" role="img" aria-label="${medal[1]}">${medal[0]}</span>`:`<span class="result-rank-number">${value}.</span>`;
 }
 function rankingExpandMarkup(data){
- const total=Number(data?.total||0);if(total<=1)return '';
+ const total=Number(data?.total||0);if(total<=1||(data?.rows?.length>=total&&data.rows.every((r,i)=>Number(r.rank)===i+1)))return '';
  const rank=Number(data?.myRank||0);
  return `<details class="ranking-expand"><summary>Zobrazit pořadí · ${countCz(total,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${rank?`Tvoje pozice: ${rank}. z ${total}.`:'Celkové pořadí hráčů.'}</p><div class="ranking-expanded-rows"></div><button type="button" class="secondary-btn ranking-more">Načíst pořadí</button></details>`;
 }
@@ -1959,7 +1959,7 @@ function bindRankingExpansion(container,data){
  const endpoint=data?.date?`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(data.date)}`:data?.puzzleId?`/api/free-global-leaderboard?puzzle_id=${encodeURIComponent(data.puzzleId)}`:null;
  let firstOffset=Math.max(0,(Number(data?.myRank)||1)-26),offset=firstOffset,loading=false,loaded=!!rows?.children.length;
  const before=document.createElement('button');before.type='button';before.className='secondary-btn ranking-before hidden';before.textContent='Předchozí hráči';rows?.before(before);
- const focusMine=()=>requestAnimationFrame(()=>{if(details.open)(rows?.querySelector('.me')||rows?.firstElementChild)?.scrollIntoView({block:'center',behavior:'instant'})});
+ const focusMine=()=>requestAnimationFrame(()=>{if(details.open&&rows?.getBoundingClientRect().height>Math.max(240,(details.closest('.modal-card')?.clientHeight||innerHeight)*.65))(rows?.querySelector('.me')||rows?.firstElementChild)?.scrollIntoView({block:'center',behavior:'instant'})});
  const load=async(previous=false)=>{
   if(loading||(!previous&&offset===null)||!endpoint)return;
   const initial=!loaded,anchor=previous?rows.firstElementChild:null,top=anchor?.getBoundingClientRect().top;

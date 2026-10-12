@@ -13,7 +13,7 @@ async function draw(page,indices){
 }
 async function ready(page,query=''){
  await page.goto(base+'/'+query);
- try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===9)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
+ try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===10)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
  assert.equal(await page.locator('#puzzleBootError').count(),0);
  await page.waitForFunction(()=>document.querySelector('#difficultyCards')?.children.length>0);
 }
@@ -38,6 +38,9 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.match(await page.locator('#referralDialog').innerText(),/týdenních XP hráče ani týmu/);
   assert((await page.locator('#refLink').boundingBox()).width>100,'invitation link remains readable on mobile');
   const referralLink=await page.locator('#refLink').inputValue();assert.equal(new URL(referralLink).origin,new URL(base).origin);
+  assert.equal(await page.locator('.ref-sheet-intro').count(),0);
+  assert.equal(await page.locator('#refShare').innerText(),'Pozvi kamaráda do Propletu');
+  assert.equal(await page.locator('#refShare').evaluate(el=>getComputedStyle(el).fontWeight),'400');
   await screenshot(page,'02-invitation');await visual(page,'#referralDialog .ref-sheet','intro');
   await page.keyboard.press('Escape');assert.equal(await page.locator('#referralDialog').isVisible(),false);
   await page.locator('.bottom-nav [data-nav="profile"]').click();
@@ -99,7 +102,7 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   await page.locator('#winMenuBtn').click();
   assert.equal(await page.locator('#referralHome').isVisible(),false);
   await page.locator('.bottom-nav [data-nav="profile"]').click();
-  assert.match(await page.locator('#referralProfile').innerText(),/Tisíc pro tebe/);
+  assert.match(await page.locator('#referralProfile').innerText(),/Bonus máte oba/);
   await page.locator('.bottom-nav [data-nav="daily"]').click();
   assert.equal(await page.locator('#referralHome').isVisible(),false);
   check('Paid reward can be dismissed; it stays hidden through navigation and remains in Já');
@@ -159,6 +162,19 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(await page.locator('#levelLeaderboardBox [role="tablist"]').count(),0);
   assert.equal(await page.locator('#winClean').isVisible(),false);
   assert.equal(await page.locator('#winShareBtn img').count(),0);
+  assert.equal(await page.locator('#winPrimaryBtn').innerText(),'Hraj další úroveň');
+  const shortBoard=await page.evaluate(()=>{
+   const box=document.getElementById('levelLeaderboardBox'),data=box.postWinData;
+   window.__originalBoard=data;
+   renderFreeLeaderboardPanel(box,{world:{...data.world,total:3}},getProfile().id);
+   return box.querySelectorAll('.ranking-expand').length;
+  });
+  assert.equal(shortBoard,0,'complete three-player ranking needs no expansion');
+  await page.evaluate(()=>renderFreeLeaderboardPanel(document.getElementById('levelLeaderboardBox'),window.__originalBoard,getProfile().id));
+  await page.locator('#levelLeaderboardBox .ranking-expand summary').click();
+  await page.waitForFunction(()=>document.querySelectorAll('#levelLeaderboardBox .ranking-expanded-rows .mini-leader-row').length===14);
+  await page.locator('#levelLeaderboardBox .ranking-expand summary').click();
+  check('Short complete ranking has no redundant toggle; expanded ranking shows all 14 fixture players');
   for(const width of [320,390,690,1440]){
    await page.setViewportSize({width,height:950});
    for(const theme of ['light','dark']){
@@ -170,6 +186,10 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
     assert(layout.rank.bottom<=layout.next.top+2&&layout.next.bottom<=layout.invite.top+2,'ranking, next game, invitation order');
     assert(!layout.overflow);
     assert(layout.xp.top<layout.rank.top,'XP stays with the result title');
+    const header=await page.locator('.win-result-heading').boundingBox();
+    assert(Math.abs(layout.title.x+layout.title.width/2-header.x-header.width/2)<2,'victory title centered');
+    const share=await page.locator('#winShareBtn').evaluate(el=>({weight:getComputedStyle(el).fontWeight,fill:getComputedStyle(el).backgroundImage}));
+    assert.equal(share.weight,'400');assert(share.fill.includes('169, 50, 98'));
     await visual(page,'#winModal .win-card','result-'+width+'-'+theme);
    }
   }
@@ -177,7 +197,14 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   await page.waitForFunction(()=>currentGame&&!currentGame.finished&&document.querySelector('#winModal').classList.contains('hidden'));
   check('Continue action starts next real board; compact result order verified at four widths in both themes');
 
+  await ready(page,'?view=four');
+  await page.evaluate(()=>{PropletReferralPreview.model.inviterName='SuperPropletač_2026';document.dispatchEvent(new Event('proplet:screen-changed'))});
+  assert.match(await page.locator('#referralHome').innerText(),/ty i SuperPropletač_2026/);
+  assert(!(await page.locator('#referralHome').innerText()).includes('Hraj vlastním tempem'));
+  assert((await page.locator('#referralHome').boundingBox()).height<340);
+  await visual(page,'#referralHome','progress-wide');
   await ready(page,'?view=reward');
+  assert((await page.locator('#referralHome').boundingBox()).height<310);
   await visual(page,'#referralHome','home-paid');
   check('Single result invitation opens distinct board and bonus routes; original native sharing preserved');
   const blocked=await page.evaluate(async()=>{const r=await fetch('https://iopyhluayfszskyqqpuc.supabase.co/rest/v1/players',{method:'POST',body:'{}'});return {status:r.status,audit:PropletReferralPreview.audit}});
