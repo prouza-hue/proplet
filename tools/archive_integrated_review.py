@@ -75,6 +75,8 @@ def scenario(page,values):
         page.evaluate("next=>PropletArchiveReview.setScenario(next)",values)
     ready(page)
     no_monthly(page)
+    # Native navigation survives reload; fixture controls live on Dnes.
+    go(page,"daily")
 def free_order_audit(page,width):
     order=page.evaluate("""()=>{
       const archive=document.querySelector('#axPlayArchive'),difficulties=document.querySelector('#difficultyCards'),tajenka=document.querySelector('#tajenkaPlayCard');
