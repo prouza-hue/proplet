@@ -28,6 +28,7 @@ from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
 from backend import results as result_domain
+from backend import referrals as referral_domain
 from backend import play_sessions, free_order
 from backend.config import (
     APP_VERSION,
@@ -1869,7 +1870,8 @@ def create_player(payload: PlayerCreate, request: Request):
         row["password_hash"] = hash_password(payload.password)
 
     try:
-        db_insert("players", row)
+        with referral_domain.signup_context(payload.inviteCode, db_rpc):
+            db_insert("players", row)
     except HTTPException as exc:
         if exc.status_code == 409:
             raise HTTPException(409, "Takový hráč už existuje")
@@ -5336,3 +5338,6 @@ first_board.install(app, telemetry_actor=telemetry_actor, db_rpc=db_rpc,
 
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
+
+# Server attribution and progress; fixtures are never part of this installer.
+referral_domain.install(app, auth_player=auth_player, db_rpc=db_rpc, enforce_rate_limit=enforce_rate_limit)

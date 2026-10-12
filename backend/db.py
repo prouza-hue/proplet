@@ -16,6 +16,7 @@ from fastapi import HTTPException
 
 from .config import settings
 from . import measurement, postgres_rpc
+from .referrals import signup_invite
 
 
 logger = logging.getLogger("proplet")
@@ -73,6 +74,9 @@ def db_request(
         # Never forward arbitrary browser headers or OAuth/user profile data.
         headers["X-Proplet-Signup-Environment"] = settings.vercel_env or "local"
         headers["X-Proplet-Signup-Version"] = settings.app_version
+        referral_code = signup_invite.get()
+        if referral_code:
+            headers["X-Proplet-Referral-Invite"] = referral_code
         provenance=measurement.context.get() or {}
         details=provenance.get('_event_context',{})
         headers['X-Proplet-Signup-Test']='1' if provenance.get('is_test') else '0'

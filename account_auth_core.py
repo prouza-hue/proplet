@@ -10,6 +10,8 @@ from typing import Optional
 from urllib.parse import urlencode, urlparse
 
 import httpx
+from backend.referrals import signup_context
+
 from fastapi import Header, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
@@ -31,6 +33,7 @@ class DisplayNameUpdate(BaseModel):
 
 
 class AuthCallback(BaseModel):
+    inviteCode: Optional[str] = Field(default=None, min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     challenge: Optional[str] = Field(default=None, min_length=24, max_length=160)
     accessToken: str = Field(min_length=40, max_length=8192)
 
@@ -59,6 +62,7 @@ def install_account_auth(
     public_family_code,
     league_name_for,
     db_select_bounded=None,
+    db_rpc=None,
 ):
     """Install the additive v3.31.8 identity bridge.
 
@@ -438,21 +442,22 @@ def install_account_auth(
                 name = " ".join(raw_name.split())[:24] or "Hráč"
                 player_id = str(uuid.uuid4())
                 now = datetime.now(tz).isoformat()
-                db_insert("players", {
-                    "id": player_id,
-                    "name": name,
-                    "family_code": f"SOLO_{secrets.token_hex(6).upper()}",
-                    "avatar": "🙂",
-                    "google_avatar_url": google_avatar_url,
-                    "use_google_avatar": False,
-                    "support_mode": "none",
-                    # Primary legacy token is intentionally unreachable; OAuth uses player_sessions.
-                    "token_hash": hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest(),
-                    "created_at": now,
-                    "email": email,
-                    "email_verified_at": now,
-                    "auth_user_id": uid,
-                })
+                with signup_context(payload.inviteCode, db_rpc):
+                    db_insert("players", {
+                        "id": player_id,
+                        "name": name,
+                        "family_code": f"SOLO_{secrets.token_hex(6).upper()}",
+                        "avatar": "🙂",
+                        "google_avatar_url": google_avatar_url,
+                        "use_google_avatar": False,
+                        "support_mode": "none",
+                        # Primary legacy token is intentionally unreachable; OAuth uses player_sessions.
+                        "token_hash": hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest(),
+                        "created_at": now,
+                        "email": email,
+                        "email_verified_at": now,
+                        "auth_user_id": uid,
+                    })
                 player = db_select("players", id=player_id)[0]
                 created_for_order = True
 
