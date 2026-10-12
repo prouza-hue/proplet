@@ -2388,7 +2388,7 @@ function tajenkaReleaseSlotForISO(iso=pragueDateISO()){
  if(cadenceOffset<0)return Math.floor(initialOffset/7)+1;
  return 3+Math.floor(cadenceOffset/7)*2+(cadenceOffset%7>=4?1:0);
 }
-function refreshTajenkaAvailability(iso=pragueDateISO()){
+function refreshTajenkaAvailability(iso=window.PropletArchiveReview?.contentDate?.()||pragueDateISO()){
  const week=tajenkaReleaseSlotForISO(iso);
  activeTajenkaWeek=TAJENKA_PREVIEW?requestedTajenkaWeek:(week>=1&&week<=TAJENKA_PREPARED_WEEKS?week:null);
  TAJENKA_AVAILABLE=TAJENKA_PREVIEW||Boolean(TAJENKA_RELEASE_ENABLED&&activeTajenkaWeek);

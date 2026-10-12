@@ -147,3 +147,19 @@ html:root.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewC
 }
 
 html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-entry-copy>.eyebrow{display:none!important}
+
+/* One decorative arrow geometry, shared with archive destination SVGs. */
+html.tiskarna-ui body.archive-experience{
+ --pg-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14m-5-5 5 5-5 5' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+html.tiskarna-ui body.archive-experience :is([data-ref-open],[data-ref-play])>span[aria-hidden=true],
+html.tiskarna-ui body.archive-experience #playDailyBtn:not(.daily-special-action)::after,
+html.tiskarna-ui body.archive-experience #playDailyBtn.daily-special-action>span::after{
+ content:"";display:inline-block;width:20px;height:20px;flex:none;
+ background:currentColor;-webkit-mask:var(--pg-arrow) center/contain no-repeat;mask:var(--pg-arrow) center/contain no-repeat;
+ vertical-align:-4px;
+}
+html.tiskarna-ui body.archive-experience :is([data-ref-open],[data-ref-play])>span[aria-hidden=true]{font-size:0!important;line-height:0}
+html.tiskarna-ui body.archive-experience #playDailyBtn::after,
+html.tiskarna-ui body.archive-experience #playDailyBtn.daily-special-action>span::after{margin-left:10px}
+html.tiskarna-ui body.archive-experience #playDailyBtn:disabled::after{display:none}

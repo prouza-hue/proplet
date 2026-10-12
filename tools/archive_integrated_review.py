@@ -85,6 +85,10 @@ def scenario(page,values):
     no_monthly(page)
     # Keep the actual navigation control in the test flow.
     go(page,"daily")
+    assert page.locator("#tajenkaPreviewCard").is_visible(), "Published Tajenka lost after model-date switch"
+    go(page,"free")
+    assert page.locator("#tajenkaPlayCard").is_visible(), "Published Tajenka missing on Hrat"
+    go(page,"daily")
 def free_order_audit(page,width):
     order=page.evaluate("""()=>{
       const archive=document.querySelector('#axPlayArchive'),difficulties=document.querySelector('#difficultyCards'),tajenka=document.querySelector('#tajenkaPlayCard');
@@ -158,6 +162,10 @@ try:
         page.goto("http://127.0.0.1:8765/?archive-preview=1",wait_until="networkidle")
         ready(page)
         no_monthly(page)
+        go(page,"daily")
+        assert page.locator("#tajenkaPreviewCard").is_visible()
+        assert page.locator("#playDailyBtn").evaluate("(e)=>getComputedStyle(e,'::after').maskImage.includes('svg')"), "Daily arrow missing"
+        assert page.locator("#referralHome [data-ref-open]>span[aria-hidden=true]").evaluate("(e)=>getComputedStyle(e).maskImage.includes('svg')"), "Invitation arrow missing"
         shot(page,"initial-"+str(width))
         assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
         discovery={}
@@ -307,6 +315,7 @@ try:
                 page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').click()
                 page.wait_for_timeout(200)
                 assert page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').get_attribute('aria-pressed')=="true"
+                assert page.locator("#playDailyBtn>span").evaluate("(e)=>getComputedStyle(e,'::after').maskImage.includes('svg')"), "Extra arrow missing"
                 overflow(page,"extra-"+extra,390);shot(page,"daily-extra-"+extra+"-390")
                 if extra=="hardcore":
                     page.locator("#playDailyBtn").click()

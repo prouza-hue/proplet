@@ -257,6 +257,8 @@ if(window.XMLHttpRequest){
  };
 }
 const api={
+ // Extra's model date must not move the publication slot of real Tajenka content.
+ contentDate:liveDate,
  getScenario:()=>({...scenario,modelDate:extras[scenario.extra]||null,version:'4.07.1',scope:prefix}),
  setScenario(next={}){
   const change=next.reset?{extra:'live',referral:'member',announcement:'none'}:{...scenario,...next};
