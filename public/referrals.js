@@ -12,7 +12,7 @@
  const reward='<div class="ref-reward"><span class="xp-sticker">+1 000 XP</span><small>pro každého</small></div>';
  const heading=(title,copy)=>'<div class="ref-story"><div class="ref-story-copy"><h2>'+title+'</h2><p>'+copy+'</p></div>'+ '<div class="ref-visual">'+artwork+reward+'</div></div>';
  const dismissReward='<button class="ref-card-close" type="button" data-ref-reward-close aria-label="Skrýt připsaný bonus">×</button>';
- const rewardKey=()=> 'proplet:referral-reward-dismissed:'+(transport.profile()?.id||'guest')+':'+(m.inviterCode||'KATKA');
+ const rewardKey=()=> 'proplet:referral-reward-dismissed:'+(transport.profile()?.id||'guest')+':'+m.inviterCode;
  const preferences=transport.preferences||localStorage;
  const rewardHidden=()=>m.paid&&(m.rewardDismissed||preferences.getItem(rewardKey())==='1');
  const canInvite=()=>!!transport.profile()?.id&&(!m.incoming||m.paid);
@@ -67,7 +67,7 @@
   let card=$('#referralWin');
   if(!card){card=document.createElement('aside');card.id='referralWin';card.className='ref-win';secondary.before(card)}
   const g=typeof currentGame!=='undefined'?currentGame:null;
-  card.hidden=!m.incoming||!g||!g.finished||['starter','rescue'].includes(g.mode)||g.isReplay||offerDismissed||(m.paid&&(!lastReward||rewardHidden()));
+  card.hidden=!m.ready||!m.incoming||!g||!g.finished||['starter','rescue'].includes(g.mode)||g.isReplay||offerDismissed||(m.paid&&(!lastReward||rewardHidden()));
   if(card.hidden)return;
   card.classList.toggle('ref-earned',lastReward);
   card.innerHTML=lastReward?dismissReward+'<h3>Bonus máš ty i '+esc(m.inviterName)+'.</h3>'+earnedReward:'<div class="ref-result-progress"><strong>'+m.count+' / 5 desek k bonusu</strong>'+reward+'</div>'+steps(m.count);
@@ -84,7 +84,10 @@
  async function open(kind){
   if(kind==='invite'&&!transport.profile()?.id){close();openProfileModal('create');return}
   if(kind==='invite'){try{await transport.ensureInvite()}catch(e){if(typeof showToast==='function')showToast(e.message);return}}
-  if(kind==='announcement'&&!await artworkReady())return;
+  if(kind==='announcement'){
+   const account=transport.profile()?.id;if(!await artworkReady())return;
+   if(announcementBlocked()||account!==transport.profile()?.id||!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
+  }
   if(!$('#referralDialog')){
    const modal=document.createElement('div');modal.id='referralDialog';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','refDialogTitle');modal.innerHTML='<div class="modal-card left ref-sheet"></div>';document.body.append(modal);
    modal.addEventListener('click',e=>{if(e.target===modal)close()});
@@ -131,12 +134,13 @@
  function close(){const modal=$('#referralDialog');if(!modal||modal.classList.contains('hidden'))return;modal.classList.add('hidden');originFocus?.focus({preventScroll:true})}
  let artworkPromise;
  function artworkReady(){
-  if(!artworkPromise)artworkPromise=Promise.all(['/assets/avatars/referral-jezek.webp','/assets/avatars/referral-liska.webp'].map(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.naturalWidth>0);img.onerror=()=>resolve(false);img.src=src}))).then(results=>results.every(Boolean));
+  if(!artworkPromise)artworkPromise=Promise.all(['/assets/avatars/referral-jezek.webp','/assets/avatars/referral-liska.webp'].map(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.naturalWidth>0);img.onerror=()=>resolve(false);img.src=src}))).then(results=>{const ok=results.every(Boolean);if(!ok)artworkPromise=null;return ok});
   return artworkPromise;
  }
+ function announcementBlocked(){return (typeof onboardingMandatory!=='undefined'&&onboardingMandatory)||(typeof dailyExtraIntroPending==='function'&&dailyExtraIntroPending())||!!window.PropletFirstSteps?.quiet()}
  function scheduleAnnouncement(){
   clearTimeout(announcementTimer);
-  if(!m.ready||!canInvite()||preferences.getItem(announcementKey())==='1'||(m.incoming&&!rewardHidden()))return;
+  if(announcementBlocked()||!m.ready||!canInvite()||preferences.getItem(announcementKey())==='1'||(m.incoming&&!rewardHidden()))return;
   announcementTimer=setTimeout(()=>{
    if(!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
    open('announcement');
@@ -146,7 +150,8 @@
  async function reload(force=false){await transport.load(force);refresh()}
  function boot(){
   if(booted)return;booted=true;reload(true);artworkReady();$('#winShareBtn')?.addEventListener('click',e=>{if(!forwardingShare&&canInvite()&&$('#winShareBtn').classList.contains('challenge-share-cta')){e.preventDefault();e.stopImmediatePropagation();open('choice')}},true);
-  registerGameCompletionHook({id:'referrals',priority:250,after:async()=>{
+  registerGameCompletionHook({id:'referrals',priority:250,after:async({game})=>{
+   if(!transport.profile()?.id||!game||['starter','rescue'].includes(game.mode)||game.isReplay)return;
    offerDismissed=false;const wasPaid=m.paid;
    if(typeof syncQueue==='function')await syncQueue({announce:false});
    await transport.load(true);lastReward=!wasPaid&&m.paid;refresh();

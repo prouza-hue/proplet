@@ -14,12 +14,14 @@ async function load(force=false){
  const identity=profile()?.id||null;
  if(flight&&owner===identity)return flight;
  if(!force&&owner===identity&&Date.now()-loadedAt<30000)return model;
+ if(owner!==identity)Object.assign(model,{ready:false,incoming:false,accepted:false,paid:false,count:0,inviterName:'',inviterCode:'',referrals:[],inviteUrl:'',rewardDismissed:false});
  owner=identity;
  const requestOwner=identity;
  flight=(async()=>{
   try{
    let d;
    if(identity){d=await api('/api/referrals');if((profile()?.id||null)!==requestOwner)return model;
+    if(d.enabled===false){model.ready=false;return model}
     const i=d.incoming;
     Object.assign(model,{ready:true,incoming:!!i,accepted:!!i,paid:!!i?.paid,count:i?.completedBoards||0,inviterName:i?.inviter?.name||'',inviterCode:i?.id||'',rewardDismissed:!!i?.rewardDismissed,inviteUrl:d.invite?.url||'',referrals:(d.referrals||[]).map(r=>({...r,count:r.completedBoards||0,accepted:true}))});
     try{sessionStorage.removeItem(key)}catch{}
