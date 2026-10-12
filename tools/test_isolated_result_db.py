@@ -65,7 +65,9 @@ def main():
                       ' to anon, authenticated, service_role')
         manifest = json.loads((ROOT/'supabase/migrations/manifest.json').read_text())
         files = [ROOT/f['path'] for f in sorted(manifest['files'], key=lambda f:f['order'])
-                 if f['type'] != 'verify']
+                 if f['type'] != 'verify' and not f.get('timestamp_migration')]
+        # Root review mirrors are installed once via their dated CLI migration,
+        # after dependencies such as play_sessions exist.
         files += sorted((ROOT/'supabase/migrations').glob('*.sql'))
         # Prepared archive hotfix must follow all existing timestamp migrations.
         # This is a standalone review file, not an applied production migration.

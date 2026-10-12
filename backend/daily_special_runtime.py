@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from functools import lru_cache
+import math
 import os
 from typing import Optional
 
@@ -133,7 +134,8 @@ def install(namespace):
 
     @namespace["app"].get("/api/rankings/daily-special")
     def rankings_daily_special(request: Request, challenge_key: str = Query(min_length=20, max_length=100),
-                               authorization: Optional[str] = Header(default=None)):
+                               authorization: Optional[str] = Header(default=None),
+                               offset: Optional[int] = Query(default=None, ge=0)):
         namespace["enforce_rate_limit"](request, "special_ranking_read", limit=300, window_seconds=3600)
         bank = pack()
         candidates = [binding for binding in bank._bindings.values() if binding.challenge_key == challenge_key
@@ -143,11 +145,23 @@ def install(namespace):
         binding = candidates[0]
         viewer = namespace["_ranking_viewer"](authorization)
         viewer_id = str(viewer["id"]) if viewer else None
-        rows = namespace["db_select_bounded"]("results", columns="player_id,best_elapsed_ms,best_moves,hints_used,wrong_attempts,clean_solve,completed_at,timing_verified,calm_mode",
+        rows = namespace["db_select_bounded"]("results", columns="player_id,mode,challenge_key,puzzle_id,best_elapsed_ms,best_moves,hints_used,wrong_attempts,clean_solve,completed_at,timing_verified,calm_mode",
             filters={"mode": "eq.daily_special", "challenge_key": f"eq.{binding.challenge_key}", "puzzle_id": f"eq.{binding.puzzle_id}",
                      "calm_mode": "eq.false", "timing_verified": "eq.true"}, max_rows=5000)
+        rows = [row for row in rows if row.get("mode") == "daily_special" and row.get("challenge_key") == binding.challenge_key
+                and row.get("puzzle_id") == binding.puzzle_id and row.get("timing_verified") is True and row.get("calm_mode") is not True]
         rows = sorted(rows, key=lambda row: (*namespace["run_rank_tuple"](row), str(row.get("completed_at")), str(row["player_id"])))
         ranks = namespace["competition_ranks"](rows)
+        my_index = next((index for index, row in enumerate(rows) if str(row.get("player_id")) == viewer_id), None)
+        total = len(rows)
+        page_offset = offset if isinstance(offset, int) else None
+        if page_offset is not None:
+            visible = set(range(page_offset, min(total, page_offset + 50)))
+        elif my_index is None:
+            visible = set(range(min(total, 3)))
+        else:
+            first = max(0, min(my_index - 1, total - 3))
+            visible = set(range(first, min(total, first + 3)))
         ids = {str(row["player_id"]) for row in rows}
         if viewer_id:
             ids.add(viewer_id)
@@ -160,12 +174,20 @@ def install(namespace):
             if not player:
                 continue
             display = namespace["_ranking_display_identity"](player, viewer_id, binding.challenge_key, used_aliases)
+            if index not in visible:
+                continue
             team = namespace["public_family_code"](player.get("family_code"), player.get("team_joined_at"))
             output.append({"name": display["name"], "avatar": display["avatar"], "anonymous": display["anonymous"],
                            "teamName": team_names.get(team or "") if not display["anonymous"] else None,
                            "elapsedMs": row["best_elapsed_ms"], "moves": row["best_moves"],
                            "hintsUsed": row.get("hints_used") or 0, "cleanSolve": row.get("clean_solve") is True,
                            "isMine": pid == viewer_id, "rank": ranks[index]})
+        my_rank = ranks[my_index] if my_index is not None else None
         return {"kind": "daily_special", "date": binding.daily_date, "challengeKey": binding.challenge_key,
                 "puzzleId": binding.puzzle_id, "difficulty": binding.difficulty, "players": output, "teams": [],
+                "rows": output, "total": total, "myRank": my_rank,
+                "topPercent": max(1, math.ceil(my_rank / total * 100)) if my_rank and total else None,
+                "percentileMinimum": 10,
+                "nextOffset": page_offset + 50 if page_offset is not None and page_offset + 50 < total else None,
+                "privacy": "opt-in-identity-otherwise-alias", "attemptPolicy": "first-completed-only",
                 "playerScoring": "clean-hints-time-moves", "officialFirstOnly": True}

@@ -33,9 +33,9 @@ Začátek týdne je navržen na pondělí **19. října 2026**. První bonus je 
 
 1. Ověřit aktuální produkční SHA a proti němu připravený PR, aktuální zálohu a shodu nových 36 bindingů v JSON/SQL. Pokud se termín schválení posune za první datum, před aktivací znovu sestavit celý dosud nezveřejněný kalendář; nesmějí se měnit už publikované bindingy.
 2. Aplikovat `SUPABASE_MIGRATION_DAILY_SPECIALS_20261012.sql` (totožná CLI migrace `supabase/migrations/20261012000339_daily_specials.sql`). Je aditivní a sama feature nezapne. Základní atomické result/session funkce se nepřepisují.
-3. Po schválení obsahu nastavit privátní manifest na `approved`, aktualizovat bankovní hash podle jeho existujícího formátu, dokončit release commit a přepnout `PROPLET_DAILY_SPECIALS_ENABLED=true` v produkčním prostředí.
+3. Po schválení obsahu nastavit pouze stav privátního manifestu na `approved` (desky, jejich hashe a datumové bindingy zůstávají shodné), dokončit release commit a přepnout `PROPLET_DAILY_SPECIALS_ENABLED=true` v produkčním prostředí.
 4. V produkční SQL politice musí být `preview_date=null`; teprve po ověření připravených bindingů nastavit `enabled=true`. Datumové preview proměnné do produkce nepatří.
-5. Nasadit schválený commit jako verzi 4.06.0. Ověřit `/api/health`, denní API, zavřený přístup k budoucím des­kám, Dnes na mobilu a základní Daily. Před prvním datem musí bonus zůstat nedostupný.
+5. Nasadit schválený commit jako verzi 4.06.0. Ověřit `/api/health`, denní API, zavřený přístup k budoucím deskám, Dnes na mobilu a základní Daily. Před prvním datem musí bonus zůstat nedostupný.
 
 Vypnutí `PROPLET_DAILY_SPECIALS_ENABLED` a SQL politiky uzavře nové speciály, aniž se smažou výsledky či bindingy. Historické identity a 36 připravených desek se při rollbacku nepřepisují.
 

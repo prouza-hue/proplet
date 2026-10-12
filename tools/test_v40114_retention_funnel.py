@@ -38,7 +38,7 @@ assert "daily_share_native_completed" in sharing_js
 assert "daily_share_clipboard_completed" in sharing_js
 assert "level_share_native_completed" in sharing_js
 assert "level_share_clipboard_completed" in sharing_js
-assert "if(playDaily)playDaily.onclick=startDaily" in sharing_js
+assert "if(playDaily)playDaily.onclick=typeof startSelectedDaily==='function'?startSelectedDaily:startDaily" in sharing_js
 
 assert "trackInboundCampaign()" in app
 assert '"push-weekly":"push_weekly_opened"' in app

@@ -31,6 +31,10 @@ def slots(**overrides):
 
 
 def digest(value):
+    # Bonus Daily adds explicit UI counters; the historical badge/streak vector
+    # below remains byte-for-byte stable. Their new values have separate tests.
+    value = {key: item for key, item in value.items() if key not in
+             {"dailySpecialCompleted", "dailyChallengeCompleted", "totalChallengeCompleted"}}
     payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 

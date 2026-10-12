@@ -517,7 +517,8 @@
       "supersedes": [],
       "replaced_rpc_definitions": [
         "public.proplet_account_snapshot_v1"
-      ]
+      ],
+      "timestamp_migration": "supabase/migrations/20261012000339_daily_specials.sql"
     },
     {
       "id": "verify-v3.23",

@@ -57,6 +57,31 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
     practice=client.post("/api/result",json={**payload,"challenge_key":special["practiceChallengeKey"],"attempt_id":"practice-asgi-001"})
     assert practice.status_code==200,practice.text
     assert practice.json()["practice"] is True and practice.json()["awardedPoints"]==0
+    # Rank derives from the exact official cohort and authenticated actor;
+    # assistance/privacy rules still apply to the newly compatible envelope.
+    ranking_row={"mode":"daily_special","challenge_key":special["challengeKey"],"puzzle_id":special["puzzleId"],
+                 "best_moves":30,"hints_used":0,"wrong_attempts":0,"clean_solve":True,
+                 "timing_verified":True,"calm_mode":False,"completed_at":"2026-10-21T12:00:00+02:00"}
+    other_id="00000000-0000-4000-8000-000000000322"
+    ranking_rows=[{**ranking_row,"player_id":other_id,"best_elapsed_ms":60000},
+                  {**ranking_row,"player_id":player["id"],"best_elapsed_ms":70000},
+                  {**ranking_row,"player_id":"unverified","best_elapsed_ms":40000,"timing_verified":False},
+                  {**ranking_row,"player_id":"calm","best_elapsed_ms":40000,"calm_mode":True}]
+    people={other_id:{"id":other_id,"name":"Private real name","avatar":"A","public_rankings":False},
+            player["id"]:{**player,"name":"My real name","avatar":"B","public_rankings":False}}
+    def ranking_select(table,**kwargs):
+        assert table=="results" and kwargs["filters"]["challenge_key"]=="eq."+special["challengeKey"]
+        assert kwargs["filters"]["timing_verified"]=="eq.true"
+        return ranking_rows
+    with patch.object(server,"db_select_bounded",ranking_select),patch.object(server,"_ranking_viewer",lambda authorization:player if authorization else None),\
+         patch.object(server,"_ranking_context",lambda ids,teams:(list(people.values()),people,{},{})):
+        ranking=client.get("/api/rankings/daily-special?challenge_key="+special["challengeKey"],headers={"Authorization":"Bearer own"})
+        assert ranking.status_code==200,ranking.text
+        body=ranking.json()
+        assert (body["total"],body["myRank"],body["topPercent"],body["percentileMinimum"])==(2,2,100,10)
+        assert len(body["rows"])==2 and body["rows"][1]["isMine"] is True
+        assert body["rows"][0]["anonymous"] is True and body["rows"][0]["name"]!="Private real name"
+        assert client.get("/api/rankings/daily-special?challenge_key="+special["challengeKey"]).json()["myRank"] is None
     os.environ["PROPLET_DAILY_SPECIALS_PREVIEW_DATE"]="2026-10-22"
     archive=client.get("/api/daily-special?daily_date=2026-10-21").json()["special"]
     assert archive["official"] is False and archive["rewardEligible"] is False
