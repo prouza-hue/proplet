@@ -42,15 +42,13 @@ jobs:
             sleep 1
           done
           node tools/referral_preview_verify.cjs
-          npm install --prefix /tmp/proplet-preview-tools --no-save --package-lock=false sharp@0.34.4
-          node -e "const sharp=require('sharp'); Promise.all(['01-liska','03-jezek'].map(async name=>{const b=await sharp('public/assets/avatars/v3/'+name+'.svg').resize(192,192).webp({quality:88}).toBuffer(); console.log('AVATAR_WEBP:'+name+':'+b.toString('base64'))}))"
       - name: Verify deployed Vercel preview with the same native browser flow
         env:
           NODE_PATH: /tmp/proplet-preview-tools/node_modules
           PREVIEW_URL: https://proplet-git-preview-referrals-int-696ee2-pavel-prouzas-projects.vercel.app
         run: |
           for attempt in {1..30}; do
-            if curl -fsS "$PREVIEW_URL/referrals.js" | grep -q 'PropletReferralUiRevision=13'; then break; fi
+            if curl -fsS "$PREVIEW_URL/referrals.js" | grep -q 'PropletReferralUiRevision=14'; then break; fi
             sleep 2
           done
           node tools/referral_preview_verify.cjs

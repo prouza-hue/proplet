@@ -2,11 +2,11 @@
 (() => {
  'use strict';
  const preview=window.PropletReferralPreview;if(!preview)return;
- window.PropletReferralUiRevision=13;
+ window.PropletReferralUiRevision=14;
  const m=preview.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const artwork='<div class="ref-art" aria-hidden="true"><div class="ref-art-card ref-art-katka"><img src="/assets/avatars/v3/03-jezek.svg" width="76" height="76" alt=""></div><div class="ref-art-card ref-art-friend"><img src="/assets/avatars/v3/01-liska.svg" width="76" height="76" alt=""></div><span class="ref-art-thread"></span><span class="ref-art-word"><i>S</i><i>P</i><i>O</i><i>L</i><i>U</i></span></div>';
+ const artwork='<div class="ref-art" aria-hidden="true"><div class="ref-art-card ref-art-katka"><img src="/assets/avatars/referral-jezek.webp" width="76" height="76" alt=""></div><div class="ref-art-card ref-art-friend"><img src="/assets/avatars/referral-liska.webp" width="76" height="76" alt=""></div><span class="ref-art-thread"></span><span class="ref-art-word"><i>S</i><i>P</i><i>O</i><i>L</i><i>U</i></span></div>';
 
  const earnedReward='<div class="ref-reward"><span class="xp-sticker">+1 000 XP</span></div>';
  const reward='<div class="ref-reward"><span class="xp-sticker">+1 000 XP</span><small>pro každého</small></div>';
@@ -81,7 +81,11 @@
   root.querySelectorAll('[data-ref-reward-close]').forEach(b=>b.onclick=()=>{preferences.setItem(rewardKey(),'1');renderHome();renderProfile();offer()});
   root.querySelectorAll('[data-ref-dismiss]').forEach(b=>b.onclick=()=>{offerDismissed=true;root.hidden=true});
  }
- function open(kind){
+ async function open(kind){
+  if(kind==='announcement'){
+   const loaded=await Promise.all(['/assets/avatars/referral-jezek.webp','/assets/avatars/referral-liska.webp'].map(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.naturalWidth>0);img.onerror=()=>resolve(false);img.src=src})));
+   if(!loaded.every(Boolean)||!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
+  }
   if(!$('#referralDialog')){
    const modal=document.createElement('div');modal.id='referralDialog';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','refDialogTitle');modal.innerHTML='<div class="modal-card left ref-sheet"></div>';document.body.append(modal);
    modal.addEventListener('click',e=>{if(e.target===modal)close()});

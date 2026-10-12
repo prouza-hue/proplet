@@ -13,7 +13,7 @@ async function draw(page,indices){
 }
 async function ready(page,query='',announce=false){
  await page.goto(base+'/'+query);
- try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===13)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
+ try{await page.waitForFunction(()=>window.PropletReferralPreview&&document.querySelector('#referralHome')&&PropletReferralPreview.revision===4&&window.PropletReferralUiRevision===14)}catch(e){console.error('BOOT_STATE '+JSON.stringify(await page.evaluate(()=>({ref:window.PropletReferralUiRevision,preview:window.PropletReferralPreview?.revision,body:document.body.innerText.slice(0,3000)}))));throw e}
  await page.evaluate(show=>{
    const p=PropletReferralPreview.preferences,id=PropletReferralPreview.profile().id;
    p.removeItem('proplet:referral-reward-dismissed:'+id+':KATKA');
@@ -41,11 +41,10 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   await ready(page,'',true);
   await page.locator('#referralDialog .ref-announcement').waitFor({state:'visible'});
   await page.locator('#referralDialog .ref-art img').evaluateAll(async imgs=>{await Promise.all(imgs.map(img=>img.decode())); if(imgs.some(img=>!img.naturalWidth))throw new Error('CTA avatar failed');});
-  console.log('AVATAR_CTA_STATE '+JSON.stringify(await page.locator('#referralDialog .ref-art img').evaluateAll(imgs=>imgs.map(i=>({src:i.src,width:i.naturalWidth,rect:i.getBoundingClientRect().toJSON(),display:getComputedStyle(i).display})))));
   await visual(page,'#referralDialog .ref-sheet','one-time-cta');
   await page.keyboard.press('Escape');
 
-  await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===13);
+  await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===14);
   await page.waitForTimeout(1500);
 
   assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);
@@ -242,7 +241,7 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   assert.equal(await page.locator('#referralProfile').isVisible(),false);
   await page.locator('#profileSettingsBack').click();
   await page.locator('#referralProfileReward [data-ref-reward-close]').click();
-  await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===13);
+  await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===14);
   assert.equal(await page.locator('#referralProfileReward').count(),0);
   assert.equal(await page.locator('#referralHome [data-ref-reward-close]').count(),0);
   check('Reward closes from profile and stays dismissed after reload; outgoing link belongs to the invitee');
