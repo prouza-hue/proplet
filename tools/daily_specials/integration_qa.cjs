@@ -174,7 +174,7 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
  assert.equal(config.environment,'preview');assert.equal(config.version,expectedVersion);assert.equal(isolation.isolatedPreview,true);assert.equal(isolation.databaseRef,'eanzztstmwlamwfdskbf');assert.equal(sessions.enabled,true);assert.equal(sessions.isolatedPreview,true);assert.equal(base.serverToday,expectedDate);assert.equal(specials.serverToday,expectedDate);assert.equal(specials.special?.mode,'daily_special');assert.equal(specials.special?.dailyDate,expectedDate);assert.equal(specials.special?.rewardEligible,true);assert.equal(specials.special?.difficulty,'hardcore');assert.equal(specials.special?.challengeKey,`daily-special:${expectedDate}:hardcore`);
  report.guard={environment:config.environment,version:config.version,databaseRef:isolation.databaseRef,isolatedPreview:isolation.isolatedPreview,playSessionsEnabled:sessions.enabled,date:base.serverToday,special:specials.special.puzzleId};save();
  const {chromium}=require(process.env.PROPLET_PLAYWRIGHT_MODULE||'playwright');browser=await chromium.launch({executablePath:process.env.PROPLET_CHROME||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
- for(const viewport of [{width:320,height:740},{width:390,height:844},{width:768,height:1024},{width:1280,height:960}]){
+ for(const viewport of [{width:320,height:740},{width:360,height:800},{width:390,height:844},{width:768,height:1024},{width:1280,height:960}]){
   const options={viewport,isMobile:viewport.width<1000,hasTouch:viewport.width<1000};
   const production=await guardedContext(options,{readOnly:true}),productionPage=await open(production,productionOrigin),productionBounds=await bounds(productionPage);
   validateBounds(productionBounds,'production '+viewport.width);await screenshot(productionPage,`${viewport.width}-production`);await production.close();
@@ -185,10 +185,13 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
   assert(baseBounds.hero.height<=productionBounds.hero.height+2,`base card grew at${viewport.width}: ${baseBounds.hero.height} vs production ${productionBounds.hero.height}`);
   assert(specialBounds.hero.height<=productionBounds.hero.height+2,`special card grew at${viewport.width}: ${specialBounds.hero.height} vs production ${productionBounds.hero.height}`);
   assert(Math.abs(specialBounds.hero.height-baseBounds.hero.height)<=1,`switch changes Daily card height at${viewport.width}`);
-  await page.locator('.daily-week-day.has-daily-special').first().click();await page.locator('#dailyWeekDialog:not(.hidden)').waitFor();await screenshot(page,`${viewport.width}-week-dialog`);await page.locator('[data-close-daily-week]').click();
+  await page.locator('.daily-week-day.has-daily-special').first().click();await page.locator('#dailyWeekDialog:not(.hidden)').waitFor();
+  const clippedWeek=await page.locator('#dailyWeekDialog .daily-week-dialog-day>span').evaluateAll(cells=>cells.filter(cell=>cell.scrollWidth>cell.clientWidth+1).map(cell=>cell.textContent));
+  assert.deepEqual(clippedWeek,[],`weekly overview labels clip at${viewport.width}`);
+  await screenshot(page,`${viewport.width}-week-dialog`);await page.locator('[data-close-daily-week]').click();
   await preview.close();save();
  }
- report.checks.push('production/base/special heights, clipping, title overlap and week dialog at320/390/768/1280');
+ report.checks.push('production/base/special heights, clipping, title overlap and week dialog at320/360/390/768/1280');
  const mobile=await guardedContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await open(mobile,previewOrigin);
  await start(page,'special');await gesture(page,specials.special.puzzle.answers[0],true);
  await page.locator('#hintBtn').click();await page.locator('#hintModal:not(.hidden)').waitFor();await page.locator('[data-hint-level="2"]').click();assert.equal((await gameInfo(page)).hints,1);await screenshot(page,'390-special-hint');
