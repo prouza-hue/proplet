@@ -7,5 +7,5 @@ http.createServer((req,res)=>{
  if(name.startsWith('/api/')){res.writeHead(503);res.end('API must be intercepted in browser test');return}
  const file=path.resolve(root,'.'+(name==='/'?'/index.html':name));
  if(!file.startsWith(root+path.sep)){res.writeHead(404);res.end();return}
- try{res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(fs.readFileSync(file))}catch{res.writeHead(404);res.end()}
+ try{const data=fs.readFileSync(file);res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(data)}catch{res.writeHead(404);res.end()}
 }).listen(4173,'127.0.0.1');
