@@ -31,7 +31,7 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
   let body={};try{body=req.postDataJSON()||{}}catch{}
   apiCalls.push({path:u.pathname,method:req.method(),body});
   const reply=d=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(d)});
-  if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.06.0',environment:'preview'});
+  if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.07.0',environment:'preview'});
   if(u.pathname==='/api/tajenka')return reply(fixture.tajenka);
   if(u.pathname==='/api/referrals')return reply({enabled:true,invite:{url:base+'/?invite=OWNCODE123',code:'OWNCODE123'},incoming:paid?{id:'reward-test',inviter:{name:'Katka',avatar:'🦊'},completedBoards:5,paid:true,rewardDismissed:dismissed}:guest&&registered?{id:'incoming-test',inviter:{name:'Katka'},completedBoards:0,paid:false}:null,referrals:[]});
   if(u.pathname==='/api/referrals/invite/'+inviteCode)return reply({enabled:true,inviter:{name:'Katka',avatar:'🦊'}});
@@ -41,6 +41,7 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
   if(u.pathname==='/api/auth/google/complete'){registered=true;return reply({profile:{...profile,stats},accountCreated:true})}
   if(['/api/account/snapshot','/api/me'].includes(u.pathname))return reply({...profile,stats,completed:[],cursor:new Date().toISOString()});
   if(u.pathname==='/api/progress')return reply({completed:[],rescues:[],inProgress:[],dailyDates:[]});
+  if(['/api/free-global-leaderboard','/api/daily-global-leaderboard'].includes(u.pathname))return reply({rows:[{id:'test-other',name:'Honza',avatar:'🐻',rank:1,elapsedMs:20000,moves:8,cleanSolve:true},{id:profile.id,name:profile.name,avatar:profile.avatar,rank:2,elapsedMs:40000,moves:10,cleanSolve:true,isMine:true},{id:'test-third',name:'Tereza',avatar:'🦊',rank:3,elapsedMs:60000,moves:15,cleanSolve:true}],total:3,myRank:2,puzzleId:u.searchParams.get('puzzle_id'),nextOffset:null});
   if(u.pathname.includes('leaderboard')||u.pathname.includes('rankings'))return reply({rows:[],players:[],teams:[],total:0,myRank:null,visibilityReady:true});
   if(u.pathname==='/api/rolling-content')return reply({version:2,asOf:'2026-10-12',puzzles:{},latestBatch:null,nextRelease:null,availableFreeCounts:{}});
   if(u.pathname==='/api/team-victories')return reply({enabled:false,team:null,intro:{eligible:false,seen:true},pendingAward:null,history:[]});
@@ -53,6 +54,12 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
  assert.equal(await page.evaluate(()=>!!window.PropletReferralPreview),false);
  assert.equal(await page.locator('#refPreviewControls').count(),0);
  return {ctx,page,apiCalls,errors};
+}
+async function draw(page,indices){
+ const coords=[];for(const i of indices){const b=await page.locator('#screen-game .cell[data-index="'+i+'"]').boundingBox();assert(b);coords.push({x:b.x+b.width/2,y:b.y+b.height/2})}
+ await page.mouse.move(coords[0].x,coords[0].y);await page.mouse.down();
+ for(const p of coords.slice(1)){await page.mouse.move(p.x,p.y,{steps:3});await page.waitForTimeout(45)}
+ await page.mouse.up();
 }
 async function avatars(page,selector){
  const imgs=page.locator(selector+' .ref-art img');assert.equal(await imgs.count(),2);
@@ -76,6 +83,37 @@ async function shot(page,selector,name){
   assert(s.apiCalls.some(c=>c.path==='/api/referrals/invite'&&c.method==='POST'));
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Real invitation transport creates own invite URL');
+  s=await boot(browser);
+  await s.page.evaluate(()=>startFree('easy'));
+  await s.page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.answers?.length);
+  await s.page.locator('#screen-game .cell').first().waitFor();
+  const paths=await s.page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
+  for(let i=0;i<paths.length;i++){await draw(s.page,paths[i]);await s.page.waitForFunction(n=>currentGame.found.length===n,i+1)}
+  await s.page.locator('#winModal').waitFor({state:'visible'});
+  await s.page.waitForFunction(()=>document.querySelector('#winResultActions #winShareBtn')?.textContent.includes('Pozvi kamaráda'));
+  assert.equal(await s.page.locator('#winPrimaryBtn').innerText(),'Hraj další úroveň');
+  assert.equal(await s.page.locator('#winClean').isVisible(),false);
+  assert.equal(await s.page.locator('#levelLeaderboardBox [role="tablist"]').count(),0);
+  assert.equal(await s.page.locator('#levelLeaderboardBox .ranking-expand').count(),0);
+  for(const width of [320,690,1440]){
+   await s.page.setViewportSize({width,height:950});
+   const layout=await s.page.evaluate(()=>{
+    const rect=id=>document.getElementById(id).getBoundingClientRect().toJSON();
+    return {rank:rect('levelLeaderboardBox'),next:rect('winPrimaryBtn'),invite:rect('winShareBtn'),xp:rect('winXp'),title:rect('winTitle'),heading:document.querySelector('.win-result-heading').getBoundingClientRect().toJSON(),overflow:document.documentElement.scrollWidth>innerWidth+1};
+   });
+   assert(layout.rank.bottom<=layout.next.top+2&&layout.next.bottom<=layout.invite.top+2);
+   assert(layout.xp.top<layout.rank.top);assert(!layout.overflow);
+   assert(Math.abs(layout.title.x+layout.title.width/2-layout.heading.x-layout.heading.width/2)<2);
+  }
+  await shot(s.page,'#winModal .win-card','native-result');
+  await s.page.evaluate(()=>{window.__nativeShare=null;Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}})});
+  await s.page.locator('#winShareBtn').click();await s.page.locator('#refShareBoard').click();
+  await s.page.waitForFunction(()=>window.__nativeShare);
+  assert(!new URL(await s.page.evaluate(()=>window.__nativeShare.url)).searchParams.has('invite'));
+  await s.page.locator('#winPrimaryBtn').click();
+  await s.page.waitForFunction(()=>currentGame&&!currentGame.finished&&document.querySelector('#winModal').classList.contains('hidden'));
+  assert.deepEqual(s.errors,[]);await s.ctx.close();
+  pass('Actual board drawing preserves native result layout, earned XP, board sharing and next level');
   s=await boot(browser,{paid:true});
   assert.equal(await s.page.locator('#referralHome h2').innerText(),'Bonus máš ty i Katka.');
   assert.equal(await s.page.locator('#referralHome .ref-reward small').count(),0);
@@ -100,6 +138,9 @@ async function shot(page,selector,name){
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Paid invitee can invite; real dismissal API called; server dismissal survives reload; Settings empty');
   s=await boot(browser,{guest:true,query:'?invite='+inviteCode});
+  assert.equal(await s.page.locator('#freeRefreshToday').isVisible(),false);
+  assert.equal(await s.page.locator('#freeRefreshAnnouncement:not(.hidden)').count(),0);
+  pass('New incoming player has no 300-board promo or announcement');
   await s.page.locator('#referralHome [data-ref-accept]').click();
   await s.page.locator('#refCreateAccount').click();
   await s.page.locator('#playerNameInput').fill('Eliška');
