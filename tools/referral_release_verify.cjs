@@ -17,7 +17,8 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
   if(!guest&&!localStorage.getItem('proplet-v2-profile'))localStorage.setItem('proplet-v2-profile',JSON.stringify({...profile,stats}));
   localStorage.setItem('proplet-v3-settings',JSON.stringify({theme:'light',sound:false,haptics:false}));
   for(const k of ['proplet-v3-7-required-onboarding','proplet-v3-16-2-helper-onboarding'])localStorage.setItem(k,'done');
-  for(const k of ['proplet-v3-32-8-rule-principle-seen','proplet:content-release:g5-r1','proplet:content-release:mk100-v2','proplet:content-release:refresh300-v1','proplet:content-release:refresh300-v1:account:'+profile.id])localStorage.setItem(k,'1');
+  for(const k of ['proplet-v3-32-8-rule-principle-seen','proplet:content-release:g5-r1','proplet:content-release:mk100-v2','proplet:content-release:mk100-v2:account:'+profile.id])localStorage.setItem(k,'1');
+  if(!guest)for(const k of ['proplet:content-release:refresh300-v1','proplet:content-release:refresh300-v1:account:'+profile.id])localStorage.setItem(k,'1');
   localStorage.setItem('proplet-v3-16-2-helper-mode','none');
   localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
   localStorage.setItem('proplet-v3-26-install-nudge',JSON.stringify({done:true,installed:true}));
