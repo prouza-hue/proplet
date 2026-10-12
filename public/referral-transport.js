@@ -9,14 +9,14 @@ const inbound=new URLSearchParams(location.search).get('invite');
 if(valid(inbound)){try{sessionStorage.setItem(key,JSON.stringify({code:inbound,at:Date.now()}))}catch{}}
 function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
 const model={ready:false,incoming:false,accepted:false,paid:false,count:0,inviterName:'',inviterCode:'',referrals:[],inviteUrl:'',rewardDismissed:false};
-let flight=null,loadedAt=0,owner=null;
+let flight=null,loadedAt=0,owner=null,invalidNoticeShown=false;
 async function load(force=false){
  const identity=profile()?.id||null;
  if(flight&&owner===identity)return flight;
  if(!force&&owner===identity&&Date.now()-loadedAt<30000)return model;
  if(owner!==identity)Object.assign(model,{ready:false,incoming:false,accepted:false,paid:false,count:0,inviterName:'',inviterCode:'',referrals:[],inviteUrl:'',rewardDismissed:false});
  owner=identity;
- const requestOwner=identity;
+ const requestOwner=identity,requestCode=identity?null:pendingCode();
  flight=(async()=>{
   try{
    let d;
@@ -26,14 +26,25 @@ async function load(force=false){
     Object.assign(model,{ready:true,incoming:!!i,accepted:!!i,paid:!!i?.paid,count:i?.completedBoards||0,inviterName:i?.inviter?.name||'',inviterCode:i?.id||'',rewardDismissed:!!i?.rewardDismissed,inviteUrl:d.invite?.url||'',referrals:(d.referrals||[]).map(r=>({...r,count:r.completedBoards||0,accepted:true}))});
     try{sessionStorage.removeItem(key)}catch{}
    }else{
-    const code=pendingCode();
+    const code=requestCode;
     if(!code){Object.assign(model,{ready:false,incoming:false,referrals:[],inviteUrl:''});return model}
     d=await api('/api/referrals/invite/'+encodeURIComponent(code));
     if((profile()?.id||null)!==requestOwner)return model;
     Object.assign(model,{ready:true,incoming:true,accepted:false,paid:false,count:0,inviterName:d.inviter?.name||'Kamarád',inviterCode:code,referrals:[],inviteUrl:'',rewardDismissed:false});
    }
    loadedAt=Date.now();
-  }catch(e){if(owner===requestOwner&&e.status===404)model.ready=false}
+  }catch(e){
+   if(owner===requestOwner&&Number(e.status)===404){
+    model.ready=false;
+    if(!requestOwner&&requestCode&&pendingCode()===requestCode){
+     try{sessionStorage.removeItem(key)}catch{}
+     model.incoming=false;
+     if(inbound===requestCode&&!invalidNoticeShown&&typeof showToast==='function'){
+      invalidNoticeShown=true;showToast('Tahle pozvánka už není dostupná. Proplet si můžeš zahrát i bez ní.');
+     }
+    }
+   }
+  }
   return model;
  })().finally(()=>{if(owner===requestOwner)flight=null});
  return flight;
