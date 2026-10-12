@@ -205,3 +205,5 @@ html body #referralDialog .ref-announcement .ref-story-copy p{font:400 14px/1.45
  html body #referralDialog .ref-announcement h2{font-size:26px!important}
  html body #referralDialog .ref-announcement .xp-sticker{font-size:15px!important;padding:8px!important}
 }
+
+html body #referralDialog #refDialogTitle:focus{outline:none}
