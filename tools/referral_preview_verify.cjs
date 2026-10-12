@@ -40,6 +40,8 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   page.on('request',r=>requests.push({url:r.url(),method:r.method()}));
   await ready(page,'',true);
   await page.locator('#referralDialog .ref-announcement').waitFor({state:'visible'});
+  await page.locator('#referralDialog .ref-art img').evaluateAll(async imgs=>{await Promise.all(imgs.map(img=>img.decode())); if(imgs.some(img=>!img.naturalWidth))throw new Error('CTA avatar failed');});
+  console.log('AVATAR_CTA_STATE '+JSON.stringify(await page.locator('#referralDialog .ref-art img').evaluateAll(imgs=>imgs.map(i=>({src:i.src,width:i.naturalWidth,rect:i.getBoundingClientRect().toJSON(),display:getComputedStyle(i).display})))));
   await visual(page,'#referralDialog .ref-sheet','one-time-cta');
   await page.keyboard.press('Escape');
 
