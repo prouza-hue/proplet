@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "previewUrl": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+  "applicationSourceSha": "b292bfc2d1a67dab59281c2445a52d4ceffca4cf",
+  "qaCommit": "390aa81ce387c95652e44716d683f4e4a6752e98",
+  "qaRun": "https://github.com/prouza-hue/proplet/actions/runs/38221010704",
+  "guard": {
+    "environment": "preview",
+    "version": "4.06.0",
+    "databaseRef": "eanzztstmwlamwfdskbf",
+    "isolatedPreview": true,
+    "playSessionsEnabled": true,
+    "date": "2026-10-21",
+    "special": "g6-ds-hardcore-w01"
+  },
+  "humanPlaytest": false,
+  "checks": [
+    "Extra introduction once on first available visit, mobile fit, CTA selection, reload persistence, retired300-card absent and inverse Extra label",
+    "production/base/special heights, clipping, title overlap and week dialog at320/360/390/768/1280",
+    "real touch/mouse solves, hints, runtime reset/undo, pause, simultaneous base/special progress, reload, anonymous claim, second-device session resume, two100XP receipts, base-only streak, special ranking and0XP practice replay"
+  ],
+  "extraEntryChecked": true,
+  "layout": [
+    {
+      "width": 320,
+      "productionHeight": 220,
+      "baseHeight": 217,
+      "specialHeight": 217
+    },
+    {
+      "width": 360,
+      "productionHeight": 220,
+      "baseHeight": 220,
+      "specialHeight": 220
+    },
+    {
+      "width": 390,
+      "productionHeight": 220,
+      "baseHeight": 220,
+      "specialHeight": 220
+    },
+    {
+      "width": 768,
+      "productionHeight": 217.015625,
+      "baseHeight": 217.015625,
+      "specialHeight": 217.015625
+    },
+    {
+      "width": 1280,
+      "productionHeight": 245,
+      "baseHeight": 245,
+      "specialHeight": 245
+    }
+  ],
+  "officialResults": [
+    {
+      "challengeKey": "daily-special:2026-10-21:hardcore",
+      "puzzleId": "g6-ds-hardcore-w01",
+      "points": 100,
+      "mode": "daily_special",
+      "timingVerified": true,
+      "hintsUsed": 1
+    },
+    {
+      "challengeKey": "daily:2026-10-21",
+      "puzzleId": "g6-d-20261021",
+      "points": 100,
+      "mode": "daily",
+      "timingVerified": true,
+      "hintsUsed": 0
+    }
+  ],
+  "browserErrors": 0,
+  "unexpectedApiFailures": 0,
+  "noProductionHttpWrites": true,
+  "syntheticAccountRemoved": true
+}

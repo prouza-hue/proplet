@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+        if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -53,6 +53,21 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # every path, method, component and field remains covered. Tajenka v2
 # intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
+# Additive optional Daily routes have dedicated ASGI/identity/timing tests.
+for special_path in ("/api/daily-special", "/api/rankings/daily-special"):
+    assert set(openapi_contract["paths"][special_path]) == {"get"}
+    openapi_contract["paths"].pop(special_path)
+shared_kind = next(item for item in openapi_contract["paths"]["/api/shared-puzzle"]["get"]["parameters"] if item["name"] == "kind")
+assert shared_kind["schema"]["pattern"] == "^(daily|daily_special|tajenka)$"
+shared_kind["schema"]["pattern"] = "^(daily|tajenka)$"
+# Declared special hashes are optional for cached legacy result clients.
+result_schema = openapi_contract["components"]["schemas"]["ResultCreate"]
+assert "content_hash" not in result_schema.get("required", [])
+hash_schema = next(item for item in result_schema["properties"]["content_hash"]["anyOf"] if item.get("type") == "string")
+assert hash_schema == {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"}
+result_schema["properties"].pop("content_hash")
+
+
 # The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
 openapi_contract["paths"].pop("/api/cron/mozkokalypsa-launch-push")
@@ -174,6 +189,7 @@ assert _dump(server.ResultCreate, puzzle_id="p-1", challenge_key="free:p-1", mod
     "elapsed_ms": 1000,
     "moves": 1,
     "daily_date": None,
+    "content_hash": None,
     "hints_used": 0,
     "wrong_attempts": 0,
     "max_hint_level": 0,

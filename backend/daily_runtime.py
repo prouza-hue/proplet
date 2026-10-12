@@ -19,6 +19,7 @@ def install(namespace: dict) -> None:
     root = namespace["ROOT"]
     pack_path = root / "data" / "daily_gen6_private.json"
     today = namespace["current_prague_date"]
+    runtime_now = namespace.get("current_prague_datetime", lambda: datetime.now(namespace["TZ"]))
 
     @lru_cache(maxsize=1)
     def pack() -> DatedDaily:
@@ -103,7 +104,7 @@ def install(namespace: dict) -> None:
                 raise DailyUnavailable("Tato Denní výzva ještě není dostupná")
             bank = pack()
             if bank.handles(selected):
-                payload = bank.public_payload(now=datetime.now(namespace["TZ"]), daily_date=selected, puzzle_id=puzzle_id)
+                payload = bank.public_payload(now=runtime_now(), daily_date=selected, puzzle_id=puzzle_id)
             else:
                 official = expected(selected)
                 if puzzle_id is not None and puzzle_id not in valid(selected):
@@ -116,7 +117,7 @@ def install(namespace: dict) -> None:
                 payload = {"schemaVersion": 1, "dailyDate": selected, "bankVersion": "legacy-daily",
                            "puzzleId": selected_id, "contentHash": puzzle_digest(body),
                            "challengeKey": f"daily:{selected}", "serverToday": today().isoformat(),
-                           "validUntil": next_midnight(datetime.now(namespace["TZ"])).isoformat(),
+                           "validUntil": next_midnight(runtime_now()).isoformat(),
                            "official": selected_id == official,
                            "cacheKey": f"daily:{selected}:legacy-daily", "puzzle": body}
         except ValueError as exc:

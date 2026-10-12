@@ -34,6 +34,8 @@ EMPTY_REWARDS = {
 
 
 def digest(value):
+    value = {key: item for key, item in value.items() if key not in
+             {"dailySpecialCompleted", "dailyChallengeCompleted", "totalChallengeCompleted"}}
     payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 PUZZLES = {
@@ -142,6 +144,9 @@ consistent_rows = copy.deepcopy(inconsistent_rows)
 consistent_rows[1]["points"] = 515
 writes = []
 consistent = read_stats(consistent_rows, writes)
+assert consistent["dailySpecialCompleted"] == 0
+assert consistent["dailyChallengeCompleted"] == consistent["dailyCompleted"]
+assert consistent["totalChallengeCompleted"] == consistent["totalCompleted"]
 
 assert writes == []
 assert consistent["resultXp"] == 530

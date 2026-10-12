@@ -30,7 +30,7 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  for(const width of [320,390,840]){
   await page.setViewportSize({width,height:900});
   check('Daily title and gap '+width,await page.evaluate(()=>{const h=document.querySelector('.daily-hero h1'),strip=document.querySelector('#dailyWeekRhythm');return getComputedStyle(h).fontFamily.includes('Fraunces')&&strip.getBoundingClientRect().top-h.getBoundingClientRect().bottom<=25&&!document.querySelector('.daily-week-rhythm-head')}));
-  check('all three banner illustrations fit '+width,await page.locator('#freeRefreshToday').evaluate(root=>{const a=[...root.querySelectorAll('img')].map(n=>n.getBoundingClientRect());return a.length===3&&a.every(r=>r.width>=32)&&a.slice(1).every((r,i)=>r.left>=a[i].right&&Math.abs(r.top-a[i].top)<1)}));
+  check('retired300-board card stays absent '+width,await page.locator('#freeRefreshToday').count()===0);
   await page.screenshot({path:`${out}/today-${width}.png`,fullPage:true});
  }
  check('no second campaign in same page visit',await page.evaluate(()=>!document.querySelector('#mk100LaunchPreview:not(.hidden)')));
@@ -55,3 +55,4 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  check('no browser runtime errors',errors.length===0);
  }finally{fs.writeFileSync(`${out}/report.json`,JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});
+

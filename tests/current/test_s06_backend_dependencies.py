@@ -72,7 +72,7 @@ EXPECTED_INSTALLER_ROUTES = (
 route_keys = [
     (method, route.path)
     for route in server.app.routes
-    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     for method in (route.methods or ())
 ]
 for expected in EXPECTED_INSTALLER_ROUTES:
@@ -81,12 +81,27 @@ for expected in EXPECTED_INSTALLER_ROUTES:
 route_snapshot = sorted(
     (route.path, tuple(sorted(route.methods or ())), route.name)
     for route in server.app.routes
-    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events"}
+    if route.path and route.path not in {'/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
 )
 # Round III adds exactly four /api/mozkokalypsa3 routes. Removing those
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
 assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cdedfdeb020cd32f25c6e4b"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
+# Additive optional Daily routes have dedicated ASGI/identity/timing tests.
+for special_path in ("/api/daily-special", "/api/rankings/daily-special"):
+    assert set(openapi_contract["paths"][special_path]) == {"get"}
+    openapi_contract["paths"].pop(special_path)
+shared_kind = next(item for item in openapi_contract["paths"]["/api/shared-puzzle"]["get"]["parameters"] if item["name"] == "kind")
+assert shared_kind["schema"]["pattern"] == "^(daily|daily_special|tajenka)$"
+shared_kind["schema"]["pattern"] = "^(daily|tajenka)$"
+# Declared special hashes are optional for cached legacy result clients.
+result_schema = openapi_contract["components"]["schemas"]["ResultCreate"]
+assert "content_hash" not in result_schema.get("required", [])
+hash_schema = next(item for item in result_schema["properties"]["content_hash"]["anyOf"] if item.get("type") == "string")
+assert hash_schema == {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"}
+result_schema["properties"].pop("content_hash")
+
+
 # The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
 openapi_contract["paths"].pop("/api/cron/mozkokalypsa-launch-push")

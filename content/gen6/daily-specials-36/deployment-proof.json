@@ -1,0 +1,41 @@
+{
+  "productionBaselineSHA": "d1f5f7825e07d7e8a1751de7075914278d3de8bb",
+  "previewSourceSHA": "2dbd30a87b5c2e312a8798c2826111d57660d272",
+  "previewDeployment": "dpl_621Qx7LbdF2ZhpqxJwPPSm6g8oKC",
+  "previewURL": "https://proplet-gqlj747hn-pavel-prouzas-projects.vercel.app/",
+  "state": "READY",
+  "target": null,
+  "scope": "preview deployment-specific static root; production project settings unchanged",
+  "qaBaselineSourceSHA": "b769afb798b059e37a42ea8c62eebf3d936cbc90",
+  "qaWorkflow": "https://github.com/prouza-hue/proplet/actions/runs/38162796664",
+  "qaArtifactId": 11711040142,
+  "productionWrites": false,
+  "humanPlaytest": "pending",
+  "qaVerifiedDocsSourceSHA": "e6d836db9bff5195f6c00b76bce1e70e4d60e8de",
+  "qaRun2": "https://github.com/prouza-hue/proplet/actions/runs/38161699743",
+  "qaRun2Status": "success",
+  "negativeFixturesPassed": 7,
+  "validationFixturesPassed": 8,
+  "positiveFixturesPassed": 1,
+  "previousPreview": {
+    "previewSourceSHA": "e6d836db9bff5195f6c00b76bce1e70e4d60e8de",
+    "previewDeployment": "dpl_CziE7kySVJ8K3W4NjvFpXRRyqyZb",
+    "previewURL": "https://proplet-5rrsniy1g-pavel-prouzas-projects.vercel.app/"
+  },
+  "qaFinalContentSourceSHA": "2dbd30a87b5c2e312a8798c2826111d57660d272",
+  "recoveryVerifiedAtUTC": "2026-10-11T21:58:24.010681+00:00",
+  "recoveryUIVerified": true,
+  "recoveredGitBlobsVerified": 65,
+  "liveExactTextParity": [
+    "boards.json",
+    "analyses.json",
+    "playtest.js"
+  ],
+  "live404": [
+    "/api/daily",
+    "/content/gen6/daily-specials-36/bank.json"
+  ],
+  "productionStillAtBaseline": true,
+  "automatedPRPreviewIsNotContentPlaytest": true,
+  "recoveryScreenshot": "recovery-preview-hub.jpg"
+}

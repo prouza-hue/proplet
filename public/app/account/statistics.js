@@ -18,8 +18,10 @@
   function calculate(completed={}){
     const output={free:empty(),daily:empty()},unique=new Map();
     for(const row of Object.values(completed)){
-      if(!row||!['free','daily'].includes(row.mode)||!ids.has(row.difficulty)||!row.puzzleId)continue;
-      const identity=row.mode==='daily'?(row.dailyDate||row.challengeKey):row.puzzleId;
+      if(!row||!['free','daily','daily_special'].includes(row.mode)||!ids.has(row.difficulty)||!row.puzzleId)continue;
+      if(row.mode==='daily_special'&&(row.rewardEligible===false||row.official===false
+        ||row.challengeKey!==`daily-special:${row.dailyDate}:${row.difficulty}`))continue;
+      const identity=row.mode==='daily'?(row.dailyDate||row.challengeKey):row.mode==='daily_special'?row.challengeKey:row.puzzleId;
       if(!identity)continue;
       const key=`${row.mode}:${identity}`,old=unique.get(key);
       // A Daily replacement for the same date is still one completed daily challenge.
@@ -28,7 +30,7 @@
         : String(row.completedAt||'')<String(old.completedAt||'')))unique.set(key,row);
     }
     for(const row of unique.values()){
-      const stat=output[row.mode][row.difficulty];stat.completed++;
+      const stat=output[row.mode==='daily_special'?'daily':row.mode][row.difficulty];stat.completed++;
       const ms=row.elapsedMs;
       if(typeof ms!=='number'||!Number.isFinite(ms)||ms<1000||row.timingVerified===false||row.mergedAttempts===true||(row.timingUnverified===true&&row.timingVerified!==true))continue;
       if(stat.fastestMs===null||ms<stat.fastestMs)stat.fastestMs=ms;
@@ -50,8 +52,9 @@
       return `<div class="profile-ledger-tile" style="--difficulty-color:${color}"><img src="/difficulty/printshop/${icon}" width="48" height="48" alt="${label}" title="${label}"><strong class="profile-ledger-count" aria-label="Dokončeno: ${ready?number(row.completed):'načítá se'}">${ready?number(row.completed):'—'}</strong><span class="profile-ledger-time" aria-label="Nejrychleji: ${time}" title="${row.fastestMs===null?'Zatím bez zaznamenaného času':'Nejrychlejší první dokončení'}">${clock}<b>${time}</b></span></div>`;
     }).join('')}</div><p class="profile-ledger-key">${ready?`${clock} Nejrychlejší čas v každé obtížnosti`:'Načítám uložené výsledky…'}</p>`;
   }
-  function markup({data,mode='free',ready=true,dailyCompleted=0,longestStreak=0}){
-    return `<section class="profile-ledger" aria-label="Dohrané úrovně a osobní časy"><div class="profile-ledger-head"><div class="profile-ledger-switch" role="group" aria-label="Typ hry"><button type="button" data-stat-mode="free" aria-pressed="${mode==='free'}">Úrovně</button><button type="button" data-stat-mode="daily" aria-pressed="${mode==='daily'}">Denní výzvy</button></div><details class="profile-ledger-help"><summary aria-label="Jak se počítají statistiky">?</summary><p>Každá dohraná úroveň se počítá jednou, včetně starších desek. Převod postupu ani opakované hraní počet nezvyšuje. Denní výzvy počítáme podle dnů.<br><br>Čas je nejrychlejší z uložených prvních dokončení. Zahrnuje i hru s nápovědou a klidný režim; desky stejné obtížnosti se mohou lišit. Neplatné a výslovně neověřené časy vynecháváme. Pomlčka znamená, že čas zatím nemáme.</p></details></div><div class="profile-ledger-panel" aria-live="polite" aria-atomic="true">${panel(data,mode,ready)}</div><div class="profile-ledger-daily"><div><img src="/rewards/printshop/symbol-daily.svg" width="30" height="30" alt=""><span><strong>${number(dailyCompleted)}</strong><small>${plural(dailyCompleted,'denní výzva','denní výzvy','denních výzev')}</small></span></div><div><img src="/rewards/printshop/symbol-streak.svg" width="30" height="30" alt=""><span><strong>${number(longestStreak)} <em>${plural(longestStreak,'den','dny','dní')}</em></strong><small>nejdelší série</small></span></div></div></section>`;
+  function markup({data,mode='free',ready=true,dailyCompleted=0,dailyChallengeCompleted=null,longestStreak=0}){
+    const challenges=dailyChallengeCompleted??(data?.daily?Object.values(data.daily).reduce((sum,row)=>sum+row.completed,0):dailyCompleted);
+    return `<section class="profile-ledger" aria-label="Dohrané úrovně a osobní časy"><div class="profile-ledger-head"><div class="profile-ledger-switch" role="group" aria-label="Typ hry"><button type="button" data-stat-mode="free" aria-pressed="${mode==='free'}">Úrovně</button><button type="button" data-stat-mode="daily" aria-pressed="${mode==='daily'}">Denní výzvy</button></div><details class="profile-ledger-help"><summary aria-label="Jak se počítají statistiky">?</summary><p>Každá dohraná úroveň se počítá jednou, včetně starších desek. Převod postupu ani opakované hraní počet nezvyšuje. Každou denní výzvu počítáme jednou, včetně dobrovolných speciálů. Sérii udržuje jen základní výzva.<br><br>Čas je nejrychlejší z uložených prvních dokončení. Zahrnuje i hru s nápovědou a klidný režim; desky stejné obtížnosti se mohou lišit. Neplatné a výslovně neověřené časy vynecháváme. Pomlčka znamená, že čas zatím nemáme.</p></details></div><div class="profile-ledger-panel" aria-live="polite" aria-atomic="true">${panel(data,mode,ready)}</div><div class="profile-ledger-daily"><div><img src="/rewards/printshop/symbol-daily.svg" width="30" height="30" alt=""><span><strong>${number(challenges)}</strong><small>${plural(challenges,'denní výzva','denní výzvy','denních výzev')}</small></span></div><div><img src="/rewards/printshop/symbol-streak.svg" width="30" height="30" alt=""><span><strong>${number(longestStreak)} <em>${plural(longestStreak,'den','dny','dní')}</em></strong><small>nejdelší série</small></span></div></div></section>`;
   }
   function bind(element,options,onModeChange){
     if(!element)return;

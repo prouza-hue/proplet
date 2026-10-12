@@ -149,6 +149,7 @@
         data: statistics.calculate(d.getState?.().completed || {}),
         mode: statisticsMode, ready: d.accountProgressAvailable?.() ?? true,
         dailyCompleted: stats.dailyCompleted ?? local.dailyCompleted ?? 0,
+        dailyChallengeCompleted: stats.dailyChallengeCompleted ?? local.dailyChallengeCompleted ?? stats.dailyCompleted ?? local.dailyCompleted ?? 0,
         longestStreak: stats.longestStreak ?? local.longestStreak ?? 0,
       };
       const queue = d.getQueue();

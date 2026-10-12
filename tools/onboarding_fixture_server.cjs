@@ -50,6 +50,7 @@ const server=http.createServer(async(req,res)=>{
     return setTimeout(()=>json(res,200,{ok:true,synthetic:true}),controls.eventDelayMs);
    }
    if(p==='/api/config')return json(res,200,config);
+   if(p==='/api/daily-special'&&req.method==='GET')return json(res,200,{schemaVersion:1,serverToday:config.date,validUntil:config.date+'T23:59:59+02:00',special:null,schedule:[]});
    if(p==='/api/daily'&&req.method==='GET'){
     // The Gen6 release reads dated Daily through HTTP. Model the published
     // legacy date used by this fixture; do not contact production or disclose futures.
@@ -102,6 +103,7 @@ const server=http.createServer(async(req,res)=>{
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });
 server.listen(Number(process.env.PORT||8765),'127.0.0.1',()=>console.log(`Synthetic onboarding fixture ${sha} on ${server.address().port}`));
+
 
 
 

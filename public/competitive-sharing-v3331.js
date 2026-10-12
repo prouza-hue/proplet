@@ -308,8 +308,8 @@
     const win=document.querySelector('#winShareBtn'),detail=document.querySelector('#levelDetailShareBtn'),daily=document.querySelector('#shareDailyBtn'),playDaily=document.querySelector('#playDailyBtn');
     if(win)win.onclick=shareCurrent;
     if(detail)detail.onclick=shareDetail;
-    if(daily)daily.onclick=()=>shareDailyChallenge(false);
-    if(playDaily)playDaily.onclick=startDaily;
+    if(daily)daily.onclick=()=>typeof isSpecialDailySelected==='function'&&isSpecialDailySelected()?shareSelectedDaily():shareDailyChallenge(false);
+    if(playDaily)playDaily.onclick=typeof startSelectedDaily==='function'?startSelectedDaily:startDaily;
   };
 
   const resolveIncoming=async()=>{

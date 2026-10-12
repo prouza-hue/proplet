@@ -10,7 +10,7 @@ function create(deps={}){
   const writeState=deps.writeState||(()=>{});
   const readTajenkaProgress=deps.readTajenkaProgress||(()=>null);
   const writeTajenkaProgress=deps.writeTajenkaProgress||(()=>false);
-  const challengeKey=deps.challengeKey||((mode,puzzle,date)=>mode==='daily'?'daily:'+date:'free:'+puzzle?.id);
+  const challengeKey=deps.challengeKey||((mode,puzzle,date)=>mode==='daily'?'daily:'+date:mode==='daily_special'?(puzzle?.meta?.dailySpecialBinding?.challengeKey||`daily-special:${date}:${puzzle?.difficulty}`):'free:'+puzzle?.id);
   const samePath=deps.samePath||((a,b)=>Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((v,i)=>v===b[i]));
   const colorCount=Math.max(1,Number(deps.colorCount)||1);
 
@@ -50,8 +50,14 @@ function create(deps={}){
     if(mode==='rescue'||mode==='starter')return null;
     const state=readState(),key=challengeKey(mode,puzzle,dailyDate),completed=state.completed?.[key];
     if(completed&&!(mode==='daily'&&completed.puzzleId!==puzzle.id))return null;
-    const row=state.inProgress?.[key];
+    const binding=mode==='daily_special'?puzzle.meta?.dailySpecialBinding:null;
+    const practice=!!binding&&binding.rewardEligible===false;
+    const sourceKey=practice&&!state.inProgress?.[key]?binding.officialChallengeKey:key;
+    const row=state.inProgress?.[sourceKey];
     if(!row||row.puzzleId!==puzzle.id||row.mode!==mode)return null;
+    if(mode==='daily_special'){
+      if(!binding||row.challengeKey!==sourceKey||row.dailyDate!==binding.dailyDate||row.contentHash!==binding.contentHash)return null;
+    }
     const seen=new Set(),found=[];
     for(const item of row.found||[]){
       const answer=puzzle.answers?.[item.answerIndex];
@@ -66,6 +72,7 @@ function create(deps={}){
     }
     return {
       ...row,
+      ...(practice&&sourceKey!==key?{challengeKey:key,attemptId:null,timingUnverified:true,restoredFromOfficial:true}:{}),
       found,
       moves:Math.max(0,Number(row.moves)||0),
       hints:Math.max(0,Number(row.hints)||0),
@@ -98,6 +105,7 @@ function create(deps={}){
       mode:game.mode,
       difficulty:game.puzzle.difficulty,
       dailyDate:game.dailyDate||null,
+      ...(game.mode==='daily_special'?{challengeKey:key,contentHash:game.puzzle.meta?.dailySpecialBinding?.contentHash||null,officialChallengeKey:game.puzzle.meta?.dailySpecialBinding?.officialChallengeKey||null}:{}),
       found:game.found.map(item=>({answerIndex:item.answerIndex,word:item.word,colorIndex:item.colorIndex,path:[...item.path]})),
       moves:game.moves||0,
       hints:game.hints||0,
@@ -108,6 +116,7 @@ function create(deps={}){
       attemptId:game.attemptId||null,
       timingUnverified:!!game.timingUnverified,
       mergedAttempts:!!game.mergedAttempts,
+      calmMode:!!game.calmMode,
       wordDiscoveryXpAwarded:Math.max(0,Number(game.wordDiscoveryXpAwarded)||0),
       helperOffered:!!game.helperOffered,
       helperHintUsed:!!game.helperHintUsed,

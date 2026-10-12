@@ -1,0 +1,48 @@
+name: Daily specials bank and playable preview
+on:
+  pull_request:
+    paths:
+      - 'tools/daily_specials/**'
+      - 'content/gen6/daily-specials-36/**'
+      - 'preview/daily-specials/**'
+      - '.github/workflows/daily-specials-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-play:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Independently validate all 36 boards
+        run: |
+          python -m unittest tools.daily_specials.test_validation
+          python -m tools.daily_specials.verify
+      - name: Build six-board static preview
+        run: python -m tools.daily_specials.build_preview
+      - name: Install browser driver
+        run: npm install --prefix "$RUNNER_TEMP/proplet-browser" playwright@1.57.0
+      - name: Complete every selected board by mouse and touch
+        shell: bash
+        run: |
+          python -m http.server 8765 --directory preview/daily-specials/public > "$RUNNER_TEMP/proplet-http.log" 2>&1 &
+          node preview/daily-specials/qa.cjs
+        env:
+          PROPLET_PLAYWRIGHT_MODULE: ${{ runner.temp }}/proplet-browser/node_modules/playwright
+          PROPLET_CHROME: /usr/bin/google-chrome
+          PROPLET_QA_OUT: ${{ runner.temp }}/proplet-specials-qa
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-specials-validation-and-browser-qa
+          path: |
+            content/gen6/daily-specials-36/validation.json
+            ${{ runner.temp }}/proplet-specials-qa
+            ${{ runner.temp }}/proplet-http.log

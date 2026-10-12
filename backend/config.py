@@ -61,6 +61,10 @@ def load_settings() -> Settings:
     if vercel_git_commit_ref == "feat/pestre-poradi-production" or _env("PROPLET_ORDER_TEST_ONLY") == "true":
         if vercel_env != "preview" or _env("SUPABASE_URL").rstrip("/") != "https://eanzztstmwlamwfdskbf.supabase.co":
             raise RuntimeError("Order preview requires the existing isolated test database")
+    if vercel_git_commit_ref == "work/daily-specials-integrated-20261012" or _env("PROPLET_DAILY_SPECIALS_PREVIEW_DATE"):
+        if (vercel_env != "preview" or vercel_git_commit_ref != "work/daily-specials-integrated-20261012"
+                or _env("SUPABASE_URL").rstrip("/") != "https://eanzztstmwlamwfdskbf.supabase.co"):
+            raise RuntimeError("Daily specials preview requires its exact branch and isolated test database")
     playtest_preview = vercel_env == "preview" and vercel_git_commit_ref in {"feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release", "feat/mozkokalypsa-round2-invite", "feat/mozkokalypsa-round3-release"}
     data_root = root / "data"
     return Settings(

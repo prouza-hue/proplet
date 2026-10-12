@@ -1,0 +1,70 @@
+name: Daily specials integrated browser QA
+
+on:
+  push:
+    branches: [work/daily-specials-integrated-20261012]
+    paths: ['tests/current/daily-specials-preview.json', 'tools/daily_specials/integration_qa.cjs', '.github/workflows/daily-specials-integration.yml']
+  workflow_dispatch:
+    inputs:
+      preview_url:
+        description: Immutable Vercel deployment URL for the isolated Daily specials preview
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-specials-integration-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  browser:
+    if: github.ref == 'refs/heads/work/daily-specials-integrated-20261012'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Resolve explicitly pinned preview
+        id: preview
+        env:
+          INPUT_PREVIEW_URL: ${{ inputs.preview_url }}
+        run: |
+          node - <<'JS'
+          const fs=require('node:fs');
+          const pin=JSON.parse(fs.readFileSync('tests/current/daily-specials-preview.json','utf8'));
+          const value=(process.env.INPUT_PREVIEW_URL||pin.preview_url||'').trim();
+          if(!value){fs.appendFileSync(process.env.GITHUB_OUTPUT,'ready=false\n');console.log('No deployment URL pinned yet; browser QA waits for the URL commit.');process.exit(0);}
+          const url=new URL(value);
+          if(url.protocol!=='https:'||url.pathname!=='/'||url.search||url.hash||url.port||url.username||url.password||!/^proplet-[a-z0-9]+-pavel-prouzas-projects\.vercel\.app$/.test(url.hostname)||url.hostname.includes('-git-'))throw Error('Use a bare immutable Proplet deployment URL.');
+          if(pin.source_sha&&!/^[0-9a-f]{40}$/.test(pin.source_sha))throw Error('source_sha must be a full deployed Git commit SHA');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`ready=true\nurl=${url.origin}\nsource_sha=${pin.source_sha||''}\n`);
+          JS
+      - uses: actions/setup-node@v4
+        if: steps.preview.outputs.ready == 'true'
+        with:
+          node-version: '22'
+      - name: Install pinned browser driver
+        if: steps.preview.outputs.ready == 'true'
+        run: npm install --prefix "$RUNNER_TEMP/proplet-browser" playwright@1.57.0
+      - name: Check deployed preview, real gestures and read-only production layout
+        if: steps.preview.outputs.ready == 'true'
+        run: node tools/daily_specials/integration_qa.cjs
+        env:
+          PROPLET_PREVIEW_ORIGIN: ${{ steps.preview.outputs.url }}
+          PROPLET_DEPLOYED_SOURCE_SHA: ${{ steps.preview.outputs.source_sha }}
+          PROPLET_PLAYWRIGHT_MODULE: ${{ runner.temp }}/proplet-browser/node_modules/playwright
+          PROPLET_CHROME: /usr/bin/google-chrome
+          PROPLET_QA_OUT: ${{ runner.temp }}/proplet-specials-integration-qa
+          PROPLET_EXPECTED_BRANCH: work/daily-specials-integrated-20261012
+          PROPLET_EXPECTED_DATE: '2026-10-21'
+          PROPLET_EXPECTED_VERSION: '4.06.0'
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.preview.outputs.ready == 'true'
+        with:
+          name: daily-specials-integrated-browser-qa
+          path: ${{ runner.temp }}/proplet-specials-integration-qa
+          retention-days: 14
+          if-no-files-found: error

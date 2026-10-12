@@ -1,0 +1,40 @@
+{
+  "boards": [
+    {
+      "id": "g6-ds-hardcore-w06",
+      "difficulty": "hardcore",
+      "kind": "typical",
+      "relativeScore": 0.6875
+    },
+    {
+      "id": "g6-ds-hardcore-w07",
+      "difficulty": "hardcore",
+      "kind": "challenging",
+      "relativeScore": 0.875
+    },
+    {
+      "id": "g6-ds-mozkomor-w12",
+      "difficulty": "mozkomor",
+      "kind": "typical",
+      "relativeScore": 0.4792
+    },
+    {
+      "id": "g6-ds-mozkomor-w05",
+      "difficulty": "mozkomor",
+      "kind": "challenging",
+      "relativeScore": 0.7917
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w01",
+      "difficulty": "mozkokalypsa",
+      "kind": "typical",
+      "relativeScore": 0.5833
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w12",
+      "difficulty": "mozkokalypsa",
+      "kind": "challenging",
+      "relativeScore": 0.6458
+    }
+  ]
+}

@@ -22,14 +22,15 @@ function create(deps){
    });
  }
  async function prepare(puzzle,mode,dailyDate,restored){
-   if(!['daily','free','tajenka'].includes(mode)||(await config()).enabled!==true)return {restored};
+   if(!['daily','daily_special','free','tajenka'].includes(mode)||(await config()).enabled!==true)return {restored};
    const g={puzzle,mode,dailyDate,...restored,found:restored?.found||[],attemptId:restored?.attemptId||global.crypto.randomUUID(),fairPlay:true,timingUnverified:restored?.timingUnverified};
    const progress={...snapshot(g),elapsedMs:restored?.elapsedMs||0};
    try{
      await chain;
      const profile=deps.profile();
      const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile});
-     if(row.finished&&deps.completed?.(puzzle,mode,dailyDate))return {restored:null,fairPlay:false,replay:true};
+     const practice=mode==='daily_special'&&puzzle?.meta?.dailySpecialBinding?.rewardEligible===false;
+     if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)))return {restored:null,fairPlay:false,replay:true};
      return {restored:{...restored,...row.progress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,timingUnverified:row.verified===false},fairPlay:true};
    }catch(error){
      if(error.status===409)throw error;

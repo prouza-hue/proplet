@@ -16,7 +16,7 @@ function has(source,pattern,label){assert(pattern.test(source),label)}
 
 // Baseline: finishGame owns persistence, queueing, telemetry, win UI and leaderboard scheduling.
 has(app,/async function finishGame\(\)/,'finishGame entry missing');
-has(app,/saveState\(state\);queueResult\(rec\);g\.finishTelemetryPromise=finishAttemptTelemetry\(rec\)/,'completion persistence order drifted');
+has(app,/saveState\(state\);g\.resultRecord=rec;queueResult\(rec\);g\.finishTelemetryPromise=finishAttemptTelemetry\(rec\)/,'completion persistence order drifted');
 has(app,/renderRunWinXp\(g\)/,'win XP render missing');
 has(app,/renderWinFeedback\(\);confetti\(\);fx\('win'\);renderDaily\(\);renderFree\(\);renderProfile\(\)/,'win render sequence drifted');
 has(app,/syncQueue\(\{announce:false,waitForProfile:false\}\)\.then/,'post-win sync scheduling missing');

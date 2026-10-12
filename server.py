@@ -141,7 +141,7 @@ request_guard_context = ContextVar("proplet_request_guard", default=None)
 
 
 def isolated_fair_play_preview():
-    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH}
+    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH, "work/daily-specials-integrated-20261012"}
             and SUPABASE_URL.rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co")
 
 
@@ -151,7 +151,7 @@ async def launch_safety_middleware(request: Request, call_next):
     path = request.scope["path"]
     if VERCEL_ENV == "preview" and not isolated_fair_play_preview() and request.method == "POST" and path == "/api/play-session":
         return JSONResponse({"detail":"Preview nemá oddělené herní úložiště."},status_code=409)
-    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and path == "/api/anonymous/claim") and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012")) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
     if ((VERCEL_ENV == "preview" and not isolated_fair_play_preview()) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
@@ -626,8 +626,18 @@ def actor_filters(actor: dict) -> dict:
     return {"player_id": actor["player_id"]} if actor.get("player_id") else {"anonymous_id": actor["anonymous_id"]}
 
 
+def current_prague_datetime() -> datetime:
+    now = datetime.now(TZ)
+    preview_day = os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE", "").strip()
+    if preview_day:
+        # backend.config already fails closed before constructing any DB client.
+        selected = date.fromisoformat(preview_day)
+        return now.replace(year=selected.year, month=selected.month, day=selected.day)
+    return now
+
+
 def current_prague_date() -> date:
-    return datetime.now(TZ).date()
+    return current_prague_datetime().date()
 
 
 def streaks(dates: list[str]) -> tuple[int, int]:
@@ -1347,7 +1357,7 @@ def puzzle_database_preview(request: Request):
 @app.get("/api/shared-puzzle")
 def shared_puzzle(
     request: Request,
-    kind: str = Query(pattern="^(daily|tajenka)$"),
+    kind: str = Query(pattern="^(daily|daily_special|tajenka)$"),
     puzzle_id: str = Query(min_length=2, max_length=100),
     daily_date: Optional[str] = Query(default=None),
 ):
@@ -1355,7 +1365,9 @@ def shared_puzzle(
     enforce_rate_limit(request, "shared_puzzle_read", limit=120, window_seconds=3600)
     today = current_prague_date()
     puzzle = None
-    if kind == "daily":
+    if kind == "daily_special":
+        puzzle = daily_special_shared_body(puzzle_id, daily_date)
+    elif kind == "daily":
         try:
             selected = date.fromisoformat(daily_date or "")
         except ValueError:
@@ -2551,7 +2563,9 @@ def play_session_command(payload: play_sessions.SessionCommand, request: Request
     puzzle = resolved_puzzle(payload.puzzle_id, payload.mode, payload.difficulty)
     if not puzzle:
         raise HTTPException(400, "Neznámá úloha")
-    if payload.mode == "daily":
+    if payload.mode == "daily_special":
+        daily_special_session_identity(payload, actor)
+    elif payload.mode == "daily":
         try:
             date.fromisoformat(payload.challenge_key[6:])
         except ValueError:
@@ -2576,10 +2590,12 @@ def attempt_start(
 ):
     enforce_rate_limit(request, "attempt_start", limit=180, window_seconds=3600)
     actor = telemetry_actor(authorization, x_proplet_anon_id)
-    if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS:
+    if payload.mode not in ("daily", "daily_special", "free") or payload.difficulty not in POINTS:
         raise HTTPException(400, "Neplatný pokus")
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
+    if payload.mode == "daily_special":
+        daily_special_attempt_identity(payload, actor, starting=True)
     if payload.mode == "free" and payload.challenge_key != f"free:{payload.puzzle_id}":
         raise HTTPException(400, "Neplatný klíč pokusu")
     if payload.mode == "daily":
@@ -2653,8 +2669,10 @@ def attempt_finish(
     if row and (row.get("mode") != payload.mode or row.get("difficulty") != payload.difficulty):
         raise HTTPException(400, "Telemetry neodpovídá režimu pokusu")
     if not row:
-        if payload.mode not in ("daily", "free") or payload.difficulty not in POINTS or not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
+        if payload.mode not in ("daily", "daily_special", "free") or payload.difficulty not in POINTS or not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
             raise HTTPException(400, "Neplatný dokončený pokus")
+        if payload.mode == "daily_special":
+            daily_special_attempt_identity(payload, actor, starting=False)
         if payload.mode == "free" and payload.challenge_key != f"free:{payload.puzzle_id}":
             raise HTTPException(400, "Neplatný klíč dokončeného pokusu")
         if payload.mode == "daily":
@@ -3498,10 +3516,13 @@ def payload_completed_at(value: Optional[str]) -> str:
             # Reject absurd timestamps; device clocks can occasionally be wrong.
             now = datetime.now(TZ)
             if datetime(2025, 1, 1, tzinfo=TZ) <= dt.astimezone(TZ) <= now + timedelta(days=1):
+                if os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE"):
+                    selected = current_prague_date()
+                    dt = dt.astimezone(TZ).replace(year=selected.year, month=selected.month, day=selected.day)
                 return dt.astimezone(TZ).isoformat()
         except (TypeError, ValueError):
             pass
-    return datetime.now(TZ).isoformat()
+    return current_prague_datetime().isoformat()
 
 def completion_time(r: dict) -> datetime:
     raw = r.get("completed_at")
@@ -3604,10 +3625,12 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     enforce_rate_limit(request, "result_network", limit=1200, window_seconds=3600)
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
-    if payload.mode not in ("daily", "free", "starter", "tajenka"):
+    if payload.mode not in ("daily", "daily_special", "free", "starter", "tajenka"):
         raise HTTPException(400, "Neplatný režim")
     if payload.difficulty not in FREE_DIFFICULTIES:
         raise HTTPException(400, "Neplatná obtížnost")
+    if payload.mode == "daily_special" and not ATOMIC_RESULT_V1_ENABLED:
+        raise HTTPException(503, "Atomické ukládání speciálů není připravené")
     atomic_identity = None
     if ATOMIC_RESULT_V1_ENABLED:
         atomic_identity = result_domain.result_identity(player["id"], payload)
@@ -3644,7 +3667,12 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
     content_generation = None
     free_level = None
     legacy_reward_slot = None
-    if payload.mode == "tajenka":
+    special_context = None
+    if payload.mode == "daily_special":
+        special_context = daily_special_result_context(payload, player)
+        points = special_context["points"]
+        content_generation = 6
+    elif payload.mode == "tajenka":
         if not TAJENKA_RELEASE_ENABLED:
             raise HTTPException(404, "Tajenka zatím není vydaná")
         if payload.challenge_key != domain_content.challenge_key("tajenka", payload.puzzle_id):
@@ -3724,7 +3752,16 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             legacy_reward_slot=legacy_reward_slot,
             team_code_at_completion=team_code,
         )
-        receipt = result_domain.submit_atomic(command, db_atomic_result_rpc)
+        if special_context is not None:
+            command.update({"contentHash": special_context["binding"].content_hash,
+                            "specialPractice": special_context["practice"],
+                            "specialPreviewDate": os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE") or None})
+            command["commandDigest"] = result_domain.canonical_digest({key: value for key, value in command.items() if key != "commandDigest"})
+            receipt = result_domain.validate_receipt(db_atomic_result_rpc("proplet_submit_daily_special_v1", {
+                "p_player_id": command["playerId"], "p_idempotency_key": command["idempotencyKey"],
+                "p_request_digest": command["requestDigest"], "p_command_digest": command["commandDigest"], "p_command": command}))
+        else:
+            receipt = result_domain.submit_atomic(command, db_atomic_result_rpc)
         logger.info(
             "atomic_result_v1 status=committed first=%s attempt_status=%s",
             bool(receipt.get("firstCompletion")),
@@ -4409,7 +4446,7 @@ def daily_global_leaderboard(
 
 
 def _ranking_period_start(period: str) -> datetime | None:
-    now = datetime.now(TZ)
+    now = current_prague_datetime()
     if period == "today":
         return now.replace(hour=0, minute=0, second=0, microsecond=0)
     if period == "week":
@@ -5228,6 +5265,8 @@ def leaderboard(
 # v3.31.8 — additive identity bridge. Existing Proplet sessions/passwords stay canonical.
 from backend.daily_runtime import install as install_dated_daily
 install_dated_daily(globals())
+from backend.daily_special_runtime import install as install_daily_specials
+install_daily_specials(globals())
 
 from account_auth import AppServices, install_account_auth
 install_account_auth(

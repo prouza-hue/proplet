@@ -1,0 +1,118 @@
+{
+  "origin": "http://127.0.0.1:8765",
+  "records": [
+    {
+      "id": "g6-ds-hardcore-w06",
+      "device": "mouse-1280",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-hardcore-w07",
+      "device": "mouse-1280",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkomor-w12",
+      "device": "mouse-1280",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkomor-w05",
+      "device": "mouse-1280",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w01",
+      "device": "mouse-1280",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w12",
+      "device": "mouse-1280",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-hardcore-w06",
+      "device": "touch-390",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-hardcore-w07",
+      "device": "touch-390",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkomor-w12",
+      "device": "touch-390",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkomor-w05",
+      "device": "touch-390",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w01",
+      "device": "touch-390",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    },
+    {
+      "id": "g6-ds-mozkokalypsa-w12",
+      "device": "touch-390",
+      "complete": true,
+      "resume": true,
+      "undo": true,
+      "pause": true,
+      "feedback": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "completedByRealGestures": 12,
+  "status": "passed",
+  "humanPlaytest": false
+}

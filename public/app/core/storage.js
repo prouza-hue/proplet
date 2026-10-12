@@ -6,6 +6,8 @@
     if (!current) return incoming;
     if (!incoming) return current;
     if (current.puzzleId !== incoming.puzzleId || current.mode !== incoming.mode) return current;
+    if (current.mode === 'daily_special' && (current.challengeKey !== incoming.challengeKey
+      || current.dailyDate !== incoming.dailyDate || current.contentHash !== incoming.contentHash)) return current;
     const number = value => Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;
     const preferred = number(incoming.elapsedMs) > number(current.elapsedMs) ? incoming : current;
     const other = preferred === current ? incoming : current;
@@ -87,6 +89,10 @@
         const guest = {...blankState(), ...JSON.parse(storage.getItem(guestStateKey) || '{}')};
         const player = {...blankState(), ...JSON.parse(storage.getItem(playerStateKey) || '{}')};
         for (const [key, result] of Object.entries(guest.completed || {})) {
+          const existing = player.completed[key];
+          if (existing && (existing.mode === 'daily_special' || result.mode === 'daily_special')
+            && (existing.mode !== result.mode || existing.puzzleId !== result.puzzleId
+              || existing.dailyDate !== result.dailyDate || existing.contentHash !== result.contentHash)) continue;
           player.completed[key] = player.completed[key] ? firstResult(player.completed[key], result) : result;
         }
         for (const [key, progress] of Object.entries(guest.inProgress || {})) {
@@ -99,9 +105,10 @@
       try {
         const guestQueue = JSON.parse(storage.getItem(guestQueueKey) || '[]');
         const playerQueue = JSON.parse(storage.getItem(playerQueueKey) || '[]');
-        const ids = new Set(playerQueue.map(row => row.attemptId || `${row.challengeKey}:${row.completedAt}`));
+        const identity = row => `${row.mode || ''}:${row.challengeKey || ''}:${row.attemptId || row.completedAt || ''}`;
+        const ids = new Set(playerQueue.map(identity));
         for (const row of guestQueue) {
-          const id = row.attemptId || `${row.challengeKey}:${row.completedAt}`;
+          const id = identity(row);
           if (!ids.has(id)) {
             playerQueue.push(row);
             ids.add(id);

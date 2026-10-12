@@ -37,16 +37,18 @@
     const hero=document.querySelector('#screen-daily .daily-hero'),main=hero?.querySelector('.hero-main>div'),date=document.querySelector('#dailyDate'),meta=document.querySelector('#dailyMeta');
     if(!hero||!main||!date||!meta)return;
     const title=main.querySelector('h1');
-    if(title)title.textContent='Denní výzva';
+    const titleRow=title?.closest('.daily-title-choice-row')||title;
+    if(title&&!title.dataset.dailySpecialTitle)title.textContent='Denní výzva';
     let line=main.querySelector('.daily-title-meta');
     if(!line){
       line=document.createElement('div');
       line.className='daily-title-meta';
-      title?.insertAdjacentElement('afterend',line);
+      titleRow?.insertAdjacentElement('afterend',line);
       date.classList.remove('date-pill','light-pill');
       date.classList.add('daily-inline-date');
       line.append(date,meta);
     }
+    if(titleRow&&line.parentElement!==main)titleRow.insertAdjacentElement('afterend',line);
   }
 
   function dailyProgressExists(date,daily){
@@ -203,6 +205,7 @@
     const tajenka=document.querySelector('#tajenkaPreviewCard');
     if(tajenka)document.querySelector('#screen-daily')?.appendChild(tajenka);
     loadCompetition();
+    if(typeof renderDailySpecialUI==='function')renderDailySpecialUI();
   }
 
   function install(){

@@ -211,9 +211,12 @@ def calculate_stats(
     free_history = {key: 0 for key in difficulties}
     tajenka_completed = 0
     mozkomor_completed = 0
+    special_keys = set()
 
     for row in rows:
         mode = row.get("mode")
+        if mode == "daily_special":
+            special_keys.add(str(row.get("challenge_key") or ""))
         difficulty = row.get("difficulty")
         total_points += int(row.get("points") or 0)
         is_clean = row.get("clean_solve") is True
@@ -267,6 +270,9 @@ def calculate_stats(
         **rewards,
         "totalCompleted": sum(1 for row in rows if row.get("mode") in ("daily", "free")),
         "dailyCompleted": len(set(selected_daily_dates)),
+        "dailySpecialCompleted": len(special_keys),
+        "dailyChallengeCompleted": len(set(selected_daily_dates)) + len(special_keys),
+        "totalChallengeCompleted": sum(1 for row in rows if row.get("mode") in ("daily", "free")) + len(special_keys),
         "freeCompleted": slots["effective"],
         "freeTransferred": slots["transferred"],
         "freePlayedCurrent": slots["current"],

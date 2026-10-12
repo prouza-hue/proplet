@@ -40,6 +40,7 @@
       const source=dailyBankFor(iso),n=source.bank.length;if(!n)throw new Error('Daily banka je prázdná');const i=((dayOffsetISO(iso,source.base)%n)+n)%n;return source.bank[i];
     }
     function dailyResultState(iso){const puzzle=dailyPuzzleFor(iso),stored=readState().completed?.[`daily:${iso}`]||null;return {puzzle,stored,active:stored?.puzzleId===puzzle.id?stored:null,legacy:stored&&stored.puzzleId!==puzzle.id?stored:null}}
+    function dailySpecialResultState(iso){return deps.datedSpecial?.resultState(iso,readState())||{descriptor:null,puzzle:null,stored:null,active:null,progress:null}}
 
     function freeProgress(diff){
       const list=sortedFreeBank(diff),total=list.length,slots=localFreeSlotState(diff),done=slots.actual.size,resume=resumableFreePuzzle(diff,list),nextUnsolved=list.find(p=>!slots.actual.has(Number(p.meta?.level)))||null,pct=total?Math.round(done/total*100):0;
@@ -55,7 +56,7 @@
     function latestContentUnplayed(){const state=readState();return latestContentPuzzles().filter(p=>!state.completed?.[`free:${p.id}`])}
     function newContentCount(diff){return latestContentUnplayed().filter(p=>p.difficulty===diff).length}
 
-    return {dailyBankFor,dailyPuzzleFor,dailyResultState,freeProgress,latestContentBatch,latestContentIsFresh,latestContentPuzzles,latestContentUnplayed,newContentCount};
+    return {dailyBankFor,dailyPuzzleFor,dailyResultState,dailySpecialResultState,freeProgress,latestContentBatch,latestContentIsFresh,latestContentPuzzles,latestContentUnplayed,newContentCount};
   }
 
   return {create};

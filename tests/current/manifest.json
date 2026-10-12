@@ -572,6 +572,22 @@
       {
         "path": "tests/current/test_profile_statistics.js",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_daily_specials.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_daily_special_client.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_daily_special_app.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_daily_special_runtime.py",
+        "runner": "python"
       }
     ]
   },
