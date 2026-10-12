@@ -232,7 +232,9 @@ const api={
   delete change.reset;
   if(!['live',...Object.keys(extras)].includes(change.extra)||!referralStates.has(change.referral)
     ||!['none','extra','referral'].includes(change.announcement))throw Error('Unknown review scenario');
-  nativeStorage.setItem(settingsKey,JSON.stringify(change));location.reload();
+  nativeStorage.setItem(settingsKey,JSON.stringify(change));
+  const destination=new URL(location.href);destination.searchParams.set('review','daily');
+  if(destination.href===location.href)location.reload();else location.replace(destination.href);
  },
  requests,
  reset(){local.clear();session.clear();location.reload();}

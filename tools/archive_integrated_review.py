@@ -23,7 +23,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 server=http.server.ThreadingHTTPServer(("127.0.0.1",8765),functools.partial(Handler,directory=str(ROOT/"public")))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 def shot(page,name):
-    page.screenshot(path=str(OUT/(name+".png")),full_page="announcement" not in name);report["screenshots"].append(name+".png")
+    page.screenshot(path=str(OUT/(name+".png")),full_page="announcement" not in name,animations="disabled");report["screenshots"].append(name+".png")
 def overflow(page,view,width):
     issue=page.evaluate("""()=>document.documentElement.scrollWidth>innerWidth+1?[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1&&e.getBoundingClientRect().width).map(e=>({tag:e.tagName,id:e.id,cls:String(e.className),right:e.getBoundingClientRect().right})).slice(0,15):null""")
     if issue:report["layoutIssues"].append({"view":view,"width":width,"elements":issue})
@@ -66,6 +66,12 @@ def no_monthly(page):
     assert page.evaluate("typeof window.PropletSeasonView==='undefined'")
     assert not page.locator('script[src*="season-view"],link[href*="season-view"]').count()
     assert "Měsíční soutěž" not in page.locator("#screen-daily").inner_text()
+def hidden_card_audit(page):
+    cards=page.locator("#tajenkaPreviewCard.hidden,#tajenkaPlayCard.hidden,#newContentBanner.hidden").evaluate_all("""cards=>cards.map(e=>{
+        const b=e.getBoundingClientRect();return {id:e.id,width:b.width,height:b.height};
+    })""")
+    assert all(card["width"]==0 and card["height"]==0 for card in cards),("Hidden cards must not leave empty pills",cards)
+    report["checks"].append({"hiddenCards":cards,"result":"PASS"})
 def ready(page):
     page.wait_for_selector('html[data-archive-ready="1"]',timeout=35000)
     page.evaluate("document.fonts.ready")
@@ -74,8 +80,10 @@ def scenario(page,values):
     with page.expect_navigation(wait_until="networkidle"):
         page.evaluate("next=>PropletArchiveReview.setScenario(next)",values)
     ready(page)
+    assert page.evaluate("currentScreen==='daily'"),"Review scenarios must open Dnes for the player"
+    hidden_card_audit(page)
     no_monthly(page)
-    # Native navigation survives reload; fixture controls live on Dnes.
+    # Keep the actual navigation control in the test flow.
     go(page,"daily")
 def free_order_audit(page,width):
     order=page.evaluate("""()=>{
@@ -95,9 +103,16 @@ def free_order_audit(page,width):
     report["checks"].append({"width":width,"archiveOrder":order,"freeIdleMutations":mutations})
     # Permit incidental native settling; reject sustained render/observer churn.
     assert mutations["records"]<=60 and mutations["batches"]<=20,("free observer churn",width,mutations)
-def compact_result(page,label):
+def compact_result(page,label,invite=True):
     page.wait_for_selector("#winModal:not(.hidden)")
-    page.wait_for_function("document.querySelector('#winResultActions #winShareBtn')?.textContent.includes('Pozvi kamaráda')")
+    page.wait_for_selector("#winResultActions #winShareBtn")
+    if invite:
+        page.wait_for_function("document.querySelector('#winResultActions #winShareBtn')?.textContent.includes('Pozvi kamaráda')")
+    else:
+        # Current production intentionally uses generic sharing for daily_special.
+        # challenge-cta-v3333.js only promotes free/daily/Tajenka to invitation choices.
+        assert "Sdílet" in page.locator("#winShareBtn").inner_text()
+        assert "challenge-share-cta" not in (page.locator("#winShareBtn").get_attribute("class") or "")
     assert not page.locator("#winClean").is_visible()
     assert page.locator('#levelLeaderboardBox [role="tablist"],#levelLeaderboardBox .ranking-expand').count()==0
     layout=page.evaluate("""()=>{
@@ -108,14 +123,16 @@ def compact_result(page,label):
     assert layout["xp"]["top"]<layout["rank"]["top"],(label,layout)
     overflow(page,label,page.viewport_size["width"])
     shot(page,label)
-    page.locator("#winShareBtn").click()
-    page.wait_for_selector("#refShareBoard")
-    assert page.locator('#referralDialog [data-ref-open]').is_visible()
-    page.locator('#referralDialog [data-ref-open]').click()
-    page.wait_for_selector('#refLink')
-    assert "invite=REVIEWONLYALEX" in page.locator('#refLink').input_value()
-    page.keyboard.press("Escape")
-    report["checks"].append({"compactResult":label,"invitationChoiceAndLocalLink":"PASS"})
+    if invite:
+        page.locator("#winShareBtn").click()
+        page.wait_for_selector("#refShareBoard")
+        assert page.locator('#referralDialog [data-ref-open]').is_visible()
+        page.locator('#referralDialog [data-ref-open]').click()
+        page.wait_for_selector('#refLink')
+        assert "invite=REVIEWONLYALEX" in page.locator('#refLink').input_value()
+        page.keyboard.press("Escape")
+        report["checks"].append({"compactResult":label,"invitationChoiceAndLocalLink":"PASS"})
+    else:report["checks"].append({"compactResult":label,"nativeExtraGenericShare":"PASS"})
 def solve_word(page,answer):
     cells=page.locator("#board .cell")
     boxes=[page.locator('#board .cell[data-index="'+str(i)+'"]').bounding_box() for i in answer["path"]]
@@ -161,6 +178,15 @@ try:
         report["screenshots"].append("daily-more-"+str(width)+".png")
         page.locator('#archiveReviewNotice button').click()
         page.locator('[data-archive-action="announcement"]').click()
+        page.wait_for_function("""()=>{
+            const card=document.querySelector('#archiveExperienceModal .ax-announcement');
+            return card&&Number(getComputedStyle(card).opacity)>=.99;
+        }""")
+        cta=page.locator("#archiveExperienceModal .ax-announcement").evaluate("""e=>{
+            const b=e.getBoundingClientRect();return {top:b.top,left:b.left,right:b.right,bottom:b.bottom,width:innerWidth,height:innerHeight,opacity:Number(getComputedStyle(e).opacity)};
+        }""")
+        assert cta["top"]>=-1 and cta["left"]>=-1 and cta["right"]<=cta["width"]+1 and cta["bottom"]<=cta["height"]+1 and cta["opacity"]>=.99,cta
+        report["checks"].append({"width":width,"archiveCtaViewport":cta})
         shot(page,"announcement-"+str(width))
         assert page.locator("#archiveExperienceModal .ax-modal").evaluate("(e)=>e.scrollWidth<=e.clientWidth")
         page.keyboard.press("Escape")
@@ -287,7 +313,7 @@ try:
                     page.wait_for_selector("#screen-game.active")
                     assert page.evaluate("currentGame.mode==='daily_special' && currentGame.puzzle.difficulty==='hardcore'")
                     for answer in page.evaluate("currentGame.puzzle.answers"):solve_word(page,answer)
-                    compact_result(page,"extra-compact-result-390")
+                    compact_result(page,"extra-compact-result-390",invite=False)
                     assert "+100 XP" in page.locator("#winXp").inner_text()
                     page.locator("#winMenuBtn").click()
                 report["checks"].append({"nativeExtraScenario":extra,"result":"PASS"})

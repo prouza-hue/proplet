@@ -18,6 +18,8 @@ html.tiskarna-ui body.archive-experience :is(.ax-destination,#difficultyCards .c
  box-shadow:0 2px 0 color-mix(in srgb,var(--td-line) 24%,transparent)!important;
  text-align:left;position:relative;overflow:visible;font-family:inherit;cursor:default;
 }
+/* Availability remains owned by the native renderer, including model days. */
+html.tiskarna-ui body.archive-experience :is(.ax-destination,#difficultyCards .cp-card,#newContentBanner,#screen-daily #tajenkaPreviewCard,#screen-free #tajenkaPlayCard).hidden{display:none!important}
 html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard)::before,
 html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard)::after{display:none!important}
 html.tiskarna-ui body.archive-experience :is(.ax-entry-copy,.cp-heading,.tajenka-entry-copy,#newContentBanner .new-content-main>div:last-child){grid-column:2;grid-row:1;min-width:0;margin:0!important;align-self:center}

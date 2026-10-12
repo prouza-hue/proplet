@@ -108,7 +108,7 @@ function install(){
  document.addEventListener('click',onClick);
  document.addEventListener('input',e=>{if(e.target.id==='axSearch'){archiveState.query=e.target.value.replace(/[^0-9]/g,'');archiveState.page=0;renderGrid();}});
  document.addEventListener('keydown',e=>{if(q('#archiveExperienceModal').classList.contains('hidden'))return;if(e.key==='Escape'){e.stopImmediatePropagation();closeModal();}if(e.key==='Tab'){const nodes=all('#archiveExperienceModal button,#archiveExperienceModal select,#archiveExperienceModal input');const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}},true);
- document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(open==='archive')nav('archive');else if(open==='free')nav('free');else if(open==='announcement')announcement();},{once:true});
+ document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(['archive','free','daily'].includes(open))nav(open);else if(open==='announcement')announcement();},{once:true});
 }
 function screen(name){if(installed&&name==='archive')renderArchive();}
 async function renderArchive(){
