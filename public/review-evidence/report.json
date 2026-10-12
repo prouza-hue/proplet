@@ -1,5 +1,5 @@
 {
-  "testedSha": "edfcf8ed2aa4e39b7bf5550875dad5ee7de36acf",
+  "testedSha": "f161363e45b79a857100516e8d3bbad549d23af6",
   "checks": [
     {
       "view": "daily",
@@ -2486,6 +2486,306 @@
     },
     {
       "approvedCovers": 879
+    },
+    {
+      "catalogueOrder": "PASS",
+      "levels": "PASS",
+      "weeklyTeamEntry": "PASS"
+    },
+    {
+      "actualGame": "PASS",
+      "resume": "PASS",
+      "foldResize": "PASS",
+      "xpOnce": "PASS",
+      "newerDoesNotBlockHistorical": "PASS",
+      "alternativeAndHintRestore": "PASS",
+      "modernProgressUnchanged": 27
+    },
+    {
+      "compactResult": "free-compact-result-390",
+      "invitationChoiceAndLocalLink": "PASS"
+    },
+    {
+      "view": "daily",
+      "width": 320,
+      "discoveryAnatomy": [
+        {
+          "id": "tajenkaPreviewCard",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "ax-destination ax-archive-entry",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "ax-destination ax-team-entry",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "axHomeFree",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        }
+      ]
+    },
+    {
+      "view": "free",
+      "width": 320,
+      "discoveryAnatomy": [
+        {
+          "id": "newContentBanner",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "easy",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "medium",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "hard",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "hardcore",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "mozkomor",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "mozkokalypsa",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "tajenkaPlayCard",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "ax-destination ax-archive-entry",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "19px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "darkButtonContrast": [
+        {
+          "difficulty": "easy",
+          "ratio": 5.242825635829608
+        },
+        {
+          "difficulty": "medium",
+          "ratio": 6.438232986034723
+        },
+        {
+          "difficulty": "hard",
+          "ratio": 5.657758364923373
+        },
+        {
+          "difficulty": "hardcore",
+          "ratio": 6.276440682213539
+        },
+        {
+          "difficulty": "mozkomor",
+          "ratio": 6.226870833879443
+        },
+        {
+          "difficulty": "mozkokalypsa",
+          "ratio": 7.931985345017134
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "productionVisualReference": 320,
+      "version": "4.07.1"
+    },
+    {
+      "productionVisualReference": 390,
+      "version": "4.07.1"
+    },
+    {
+      "productionVisualReference": 690,
+      "version": "4.07.1"
+    },
+    {
+      "productionVisualReference": 1440,
+      "version": "4.07.1"
     }
   ],
   "screenshots": [
@@ -2536,14 +2836,33 @@
     "archive-mozkozrout-320.png",
     "archive-game-390.png",
     "archive-result-390.png",
-    "failure.png"
+    "free-compact-result-390.png",
+    "daily-dark-320.png",
+    "free-dark-320.png",
+    "archive-dark-320.png",
+    "production-daily-light-320.png",
+    "production-free-light-320.png",
+    "production-daily-dark-320.png",
+    "production-free-dark-320.png",
+    "production-daily-light-390.png",
+    "production-free-light-390.png",
+    "production-daily-dark-390.png",
+    "production-free-dark-390.png",
+    "production-daily-light-690.png",
+    "production-free-light-690.png",
+    "production-daily-dark-690.png",
+    "production-free-dark-690.png",
+    "production-daily-light-1440.png",
+    "production-free-light-1440.png",
+    "production-daily-dark-1440.png",
+    "production-free-dark-1440.png"
   ],
   "pageErrors": [],
   "networkWrites": [],
   "layoutIssues": [],
   "productionParity": {
     "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
-    "headSha": "edfcf8ed2aa4e39b7bf5550875dad5ee7de36acf",
+    "headSha": "f161363e45b79a857100516e8d3bbad549d23af6",
     "result": "PASS",
     "unchangedExistingFiles": 1280,
     "reviewedIntegrationSeams": {
@@ -2576,8 +2895,5 @@
       "status": 200
     }
   },
-  "result": "FAIL",
-  "error": "Page.wait_for_function: Timeout 12000ms exceeded.",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 290, in <module>\n    page.wait_for_function(\"freeOrder().record('easy').mode==='numeric'\")\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 12809, in wait_for_function\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_page.py\", line 1153, in wait_for_function\n    return await self._main_frame.wait_for_function(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 941, in wait_for_function\n    await self._channel.send(\"waitForFunction\", self._timeout, params)\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 12000ms exceeded.\n",
-  "failureText": "Testovací Proplet · postup a pozvánky zůstávají v tomto náhledu\nOvládání náhledu\nProplet\nAlex\n5 nových Propletů je tady\n\n5 ještě čeká.\n\nHrát novinky\nSnadná\n+15 XP100 nových\n27\n/ 409\nHrát\n→\nStřední\n+25 XP100 nových\n18\n/ 409\nHrát\n→\nTěžká\n+50 XP100 nových\n11\n/ 409\nHrát\n→\nMozkožrout\n+100 XP\n6\n/ 308\nHrát\n→\nMozkomor\n+150 XP\n2\n/ 150\nHrát\n→\nMozkokalypsa\n+200 XP\n1\n/ 100\nHrát\n→\nTajenka\n\nNajdi 5 slov a odhal frázi.\n\n+200 XP\nHrát\nArchiv Propletu\n\n800 původních desek\n\nProplet\nStaré dobré\nrozplétání.\nA\nR\nC\nV\nI\nH\n800\nDESEK\nVybrat archivní desku\n© 2026 Proplet · Česká slovní hra\nPavel Prouza\nProplet v4.07.1\nSoukromí · Podmínky · Nahlásit chybu\nDnes\nHrát\nPořadí\nJá"
+  "result": "PASS"
 }
