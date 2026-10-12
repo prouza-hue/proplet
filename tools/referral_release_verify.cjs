@@ -135,6 +135,8 @@ async function shot(page,selector,name){
   assert(s.apiCalls.some(c=>c.path==='/api/referrals/dismiss'&&c.method==='POST'));
   await s.page.reload();await s.page.waitForFunction(()=>window.PropletReferrals?.model.ready);
   assert.equal(await s.page.locator('#referralProfileReward').count(),0);
+  await s.page.locator('.bottom-nav [data-nav="daily"]').click();
+  await s.page.locator('#referralHome [data-ref-open]').waitFor({state:'visible'});
   assert(await s.page.locator('#referralHome [data-ref-open]').isVisible());
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Paid invitee can invite; real dismissal API called; server dismissal survives reload; Settings empty');
