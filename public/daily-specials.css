@@ -31,3 +31,4 @@ html.tiskarna-ui body #screen-daily .daily-hero .daily-title-choice-row .daily-b
 .daily-week-dialog .modal-card>h2{margin:0;font-size:27px}
 .daily-week-dialog .modal-card>.primary-btn{width:100%;margin-top:10px}
 @media(max-width:350px){.daily-challenge-switch button{padding:0 6px;gap:3px}.daily-challenge-switch img{width:21px;height:21px}.daily-title-choice-row{gap:5px}html.tiskarna-ui body #screen-daily.home-layout-active .daily-hero .hero-main .daily-title-choice-row>h1:first-child{font-size:26px!important}.daily-week-dialog-day{grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:4px;padding:8px 6px}}
+@media(max-width:350px){.daily-week-dialog-day>span:last-child img{display:none}}
