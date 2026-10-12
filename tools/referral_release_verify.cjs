@@ -85,16 +85,17 @@ async function shot(page,selector,name){
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Real invitation transport creates own invite URL');
   s=await boot(browser);
-  await s.page.evaluate(()=>{
+  await s.page.waitForFunction(()=>tajenkaPuzzle?.id);
+  await s.page.evaluate(fixturePuzzle=>{
    Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}});
-   const date=pragueDateISO(),p={...sortedFreeBank('easy')[0],id:'test-daily-share'},state=getState();
+   const date=pragueDateISO(),p={id:'test-daily-share',difficulty:'easy',rows:fixturePuzzle.rows,cols:fixturePuzzle.cols,letters:fixturePuzzle.letters,answers:fixturePuzzle.answers,meta:{}},state=getState();
    datedDaily().remember({schemaVersion:1,dailyDate:date,serverToday:date,puzzleId:p.id,puzzle:p,bankVersion:'test-daily',contentHash:'a'.repeat(64),challengeKey:'daily:'+date,validUntil:new Date(Date.now()+86400000).toISOString()});
    state.completed['daily:'+date]={puzzleId:p.id,mode:'daily',dailyDate:date,elapsedMs:45000,moves:7,cleanSolve:true,completedAt:new Date().toISOString()};
    saveState(state);
    const ts=tajenkaState();ts.completions=ts.completions||{};
    ts.completions[tajenkaPuzzle.id]={puzzleId:tajenkaPuzzle.id,elapsedMs:60000,moves:8,cleanSolve:true,completedAt:new Date().toISOString()};
    saveTajenkaState(ts);renderDaily();renderTajenkaEntry();
-  });
+  },fixture.tajenka);
   for(const selector of ['#shareDailyBtn','#screen-daily [data-tajenka-share]']){
    await s.page.locator(selector).waitFor({state:'visible'});
    // Compare with the source button's own original handler, not the last result.
