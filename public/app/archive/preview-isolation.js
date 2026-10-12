@@ -115,7 +115,12 @@ async function specialResponse(){
   bankVersion:'review-public-free-v1',contentHash:await digest(puzzle),official:true,rewardEligible:true,reviewOnly:true}};
 }
 let ready=false;
-function completionIds(){return [...new Set(Object.values(state().completed||{}).filter(r=>['free','daily','daily_special','tajenka'].includes(r.mode)).map(r=>r.puzzleId).filter(Boolean))];}
+function completionIds(){
+ const rows=Object.values(state().completed||{}).filter(r=>['free','daily','daily_special','tajenka'].includes(r.mode)
+  &&r.rewardEligible!==false&&r.official!==false);
+ try{if(typeof tajenkaState==='function')rows.push(...Object.values(tajenkaState().completions||{}));}catch{}
+ return [...new Set(rows.map(r=>r.puzzleId).filter(Boolean))];
+}
 function referralIncoming(){
  if(!['incoming','paid','guest'].includes(scenario.referral))return null;
  if(scenario.referral==='guest'&&!profile()?.id)return null;

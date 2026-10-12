@@ -53,7 +53,8 @@ function home(){
  const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>ROZEHRANÝ ARCHIV</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
  }else{resume?.remove();q('#homeResumeCard')?.classList.remove('hidden');}
  // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
- const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),q('#referralHome'),q('#rescueCard'),q('#todayNewContentBanner'),q('#tajenkaPreviewCard'),q('#referralInviteHome'),games,competition,q('#axHomeFree'),q('#levelCard')].filter(Boolean);
+ const referral=q('#referralHome'),incoming=referral?.classList.contains('ref-incoming');
+ const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),incoming?referral:null,q('#rescueCard'),q('#todayNewContentBanner'),q('#tajenkaPreviewCard'),incoming?null:referral,q('#referralInviteHome'),games,competition,q('#axHomeFree'),q('#levelCard')].filter(Boolean);
  let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
 }
 function placePlayExtra(card){
@@ -128,7 +129,7 @@ function modal(html,kind=''){
  m.innerHTML='<div class="modal-card ax-modal '+kind+'"><button class="modal-close" data-archive-action="close" aria-label="Zavřít">'+ico('close')+'</button>'+html+'</div>';m.classList.remove('hidden');q('.app-shell').inert=true;q('.bottom-nav').inert=true;
  m.querySelector('.modal-close').focus({preventScroll:true});
 }
-function closeModal(){q('#archiveExperienceModal').classList.add('hidden');q('.app-shell').inert=false;q('.bottom-nav').inert=false;if(document.body.dataset.axOldOverflow!==undefined){document.body.style.overflow=document.body.dataset.axOldOverflow;delete document.body.dataset.axOldOverflow;}if(modalFocus?.isConnected)modalFocus.focus({preventScroll:true});}
+function closeModal(){const active=q('#archiveExperienceModal');if(!active||active.classList.contains('hidden'))return;active.classList.add('hidden');q('.app-shell').inert=false;q('.bottom-nav').inert=false;if(document.body.dataset.axOldOverflow!==undefined){document.body.style.overflow=document.body.dataset.axOldOverflow;delete document.body.dataset.axOldOverflow;}if(modalFocus?.isConnected)modalFocus.focus({preventScroll:true});}
 function detail(id){
  const r=row(id);if(!r)return;const p=freshPuzzle(r),done=completion(p),progress=getState().inProgress['free:'+id],earned=paid(p);
  modal('<div class="ax-detail-heading">'+difficultyIconMarkup(r.difficulty,'ax-detail-art')+'<div><h2 id="axModalTitle">Deska '+r.level+'</h2><p>'+labels[r.difficulty]+' · Archiv</p></div></div><div class="ax-detail-reward"><strong>'+(earned?'Odměna už je tvoje':'Čeká na tebe '+r.rewardXp+' XP')+'</strong><p>'+(earned?'Historickou odměnu za tuto úroveň už máš získanou. Desku si přesto můžeš zahrát kdykoli.':'Tohle je dosud nezískaná historická odměna. Dokončené novější desky ji neblokují.')+'</p></div><p class="ax-detail-state">'+(progress?'Rozehráno · '+progress.found.length+' / '+p.answers.length+' slov':done?'Tuto desku už máš odehranou.':'Tuto desku jsi ještě nehrál.')+'</p><button class="primary-btn big" data-archive-start="'+id+'">'+(progress?'Pokračovat':done?'Zahrát znovu':'Hrát desku '+r.level)+' →</button>','ax-detail');
