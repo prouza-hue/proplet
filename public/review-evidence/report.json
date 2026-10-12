@@ -1,5 +1,5 @@
 {
-  "testedSha": "ede313b6312a7b868d217ab3f4848c62303c4f93",
+  "testedSha": "b36663c959e1a18a06c72e700d857549c925f8ab",
   "checks": [
     {
       "view": "daily",
@@ -243,7 +243,7 @@
       "freeIdleMutations": {
         "records": 0,
         "batches": 0,
-        "elapsedMs": 503
+        "elapsedMs": 500
       }
     },
     {
@@ -593,6 +593,7 @@
     "daily-tajenka-completed-390.png",
     "free-tajenka-completed-390.png",
     "archive-mozkozrout-390.png",
+    "daily-extra-hardcore-390.png",
     "failure.png"
   ],
   "pageErrors": [],
@@ -600,7 +601,7 @@
   "layoutIssues": [],
   "productionParity": {
     "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
-    "headSha": "ede313b6312a7b868d217ab3f4848c62303c4f93",
+    "headSha": "b36663c959e1a18a06c72e700d857549c925f8ab",
     "result": "PASS",
     "unchangedExistingFiles": 1280,
     "reviewedIntegrationSeams": {
@@ -634,7 +635,7 @@
     }
   },
   "result": "FAIL",
-  "error": "Locator.click: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#dailyChallengeSwitch [data-daily-kind=\\\"special\\\"]\")\n    - locator resolved to <button type=\"button\" aria-pressed=\"false\" data-daily-kind=\"special\" aria-label=\"Přepnout na Mozkožrout · dobrovolně, sérii neovlivní\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n      - waiting 100ms\n    23 × waiting for element to be visible, enabled and stable\n       - element is not visible\n     - retrying click action\n       - waiting 500ms\n",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 279, in <module>\n    page.locator('#dailyChallengeSwitch [data-daily-kind=\"special\"]').click()\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 18032, in click\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_locator.py\", line 165, in click\n    return await self._frame._click(self._selector, strict=True, **params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 594, in _click\n    await self._channel.send(\"click\", self._timeout, locals_to_params(locals()))\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.click: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#dailyChallengeSwitch [data-daily-kind=\\\"special\\\"]\")\n    - locator resolved to <button type=\"button\" aria-pressed=\"false\" data-daily-kind=\"special\" aria-label=\"Přepnout na Mozkožrout · dobrovolně, sérii neovlivní\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n      - waiting 100ms\n    23 × waiting for element to be visible, enabled and stable\n       - element is not visible\n     - retrying click action\n       - waiting 500ms\n\n",
-  "failureText": "Testovací Proplet · postup a pozvánky zůstávají v tomto náhledu · modelový den 2026-10-14, Extra používá ukázkovou volnou desku\nOvládání náhledu\nProplet\nAlex\nZpět na Hrát\nArchiv Propletu\n\nPůvodní desky z prvních verzí hry. Vyber si kteroukoli.\n\n800 desek · čtyři obtížnosti · vlastní pořadí\nProplet\nStaré dobré\nrozplétání.\nA\nR\nC\nV\nI\nH\n800\nDESEK\n\nZa historické odměny, které jsi ještě nezískal, na tebe pořád čekají XP.\n\nJak to funguje\nSnadná\n200 desek · 15 XP\nStřední\n200 desek · 25 XP\nTěžká\n200 desek · 50 XP\nMozkožrout\n200 desek · 100 XP\nSnadné desky\nVyber si kteroukoli.\nVšechny\nNehrané\nS odměnou XP\n1\nXP získány\n2\nXP získány\n3\nXP získány\n4\nXP získány\n5\nXP získány\n6\nXP získány\n7\nXP získány\n8\nXP získány\n9\nXP získány\n10\nXP získány\n11\nXP získány\n12\nXP získány\n13\nXP získány\n14\nXP získány\n15\n+15 XP\n16\n+15 XP\n17\n+15 XP\n18\n+15 XP\n19\n+15 XP\n20\n+15 XP\n21\n+15 XP\n22\n+15 XP\n23\n+15 XP\n24\n+15 XP\n25\n+15 XP\n26\n+15 XP\n27\n+15 XP\n28\n+15 XP\n29\n+15 XP\n30\n+15 XP\n31\n+15 XP\n32\n+15 XP\n33\n+15 XP\n34\n+15 XP\n35\n+15 XP\n36\n+15 XP\n37\n+15 XP\n38\n+15 XP\n39\n+15 XP\n40\n+15 XP\n1–40 z 200\n1 / 5\n\n Odehraná deska · XP získány = jednou připsaná historická odměna\n\nMalý výlet do historie\n\nNěkterá slova i obtížnost jsou trochu po svém. Původní desky jsme zachovali a prověřili jejich řešení. Žádné odemykání, žádné povinné pořadí.\n\n© 2026 Proplet · Česká slovní hra\nPavel Prouza\nProplet v4.07.1\nSoukromí · Podmínky · Nahlásit chybu\nDnes\nHrát\nPořadí\nJá"
+  "error": "Page.wait_for_function: Timeout 12000ms exceeded.",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 290, in <module>\n    compact_result(page,\"extra-compact-result-390\")\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 100, in compact_result\n    page.wait_for_function(\"document.querySelector('#winResultActions #winShareBtn')?.textContent.includes('Pozvi kamaráda')\")\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 12809, in wait_for_function\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_page.py\", line 1153, in wait_for_function\n    return await self._main_frame.wait_for_function(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 941, in wait_for_function\n    await self._channel.send(\"waitForFunction\", self._timeout, params)\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 12000ms exceeded.\n",
+  "failureText": "←\nDENNÍ SPECIÁL\nMozkožrout\n00:03\n11 tahů\nZBÝVÁ\n nic\nNALEZENO\nČÁRA\nMÍSA\nKATAPULT\nMISE\nMOTORKA\nSASANKA\nBŘEH\nBICÍ\nZVĚDAVOST\nÚHOŘ\nSNOWBOARD\n11/11\nSKLÁDÁŠ\n—\n Čistě\n SNOWBOARD\nŘ\nO\nA\nT\nM\nO\nT\nÚ\nH\nK\nA\nP\nO\nR\nA\nR\nN\nS\nS\nO\nU\nL\nK\nA\nÁ\nO\nW\nT\nV\nA\nT\nS\nA\nČ\nO\nB\nD\nĚ\nS\nA\nN\nK\nA\nR\nB\nZ\nV\nM\nM\nI\nA\nD\nŘ\nE\nB\nI\nÍ\nS\nS\nE\nH\nC\nÍ\nA\nNápověda\nTvůj mozek odolal.\n+100 XP\nKlára\nČistě · 8 tahů\n00:42\nAlex\nČistě · 9 tahů\n01:05\nMatěj\nČistě · 10 tahů\n01:12\nⓘ Pravidla pořadí\nZpět na Dnes\nSdílet\n↻ Znovu\n← Menu\nDetaily výsledku\nJak ti seděla obtížnost?\nMoc lehká\nAkorát\nMoc těžká"
 }
