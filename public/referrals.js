@@ -16,6 +16,7 @@
  const preferences=transport.preferences||localStorage;
  const rewardHidden=()=>m.paid&&(m.rewardDismissed||preferences.getItem(rewardKey())==='1');
  const canInvite=()=>m.ready&&!!transport.profile()?.id&&(!m.incoming||m.paid);
+ const offerKey=()=> 'proplet:referral-offer-hidden:v1:'+(transport.profile()?.id||'guest');
  const announcementKey=()=> 'proplet:referral-announcement-seen:v1:'+transport.profile().id;
  const steps=n=>'<div class="ref-steps" role="img" aria-label="Dokončeno '+n+' z 5 desek">'+Array.from({length:5},(_,i)=>'<span class="ref-step ref-step-'+i+(i<n?' done':i===n?' next':'')+'"><b>'+(i<n?'✓':i+1)+'</b></span>').join('')+'</div>';
  let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false,announcementTimer=null;
@@ -37,14 +38,14 @@
   if(!anchor)return;
   if(anchor.nextElementSibling!==card)anchor.after(card);
   card.classList.toggle('ref-incoming',showIncoming);card.classList.toggle('ref-paid',showIncoming&&m.paid);
-  card.hidden=!showIncoming&&sessionStorage.getItem('ref:announcement-hidden')==='1';
+  card.hidden=!showIncoming&&sessionStorage.getItem(offerKey())==='1';
   card.innerHTML=showIncoming?(m.paid?dismissReward:'')+incomingCopy():invitationOffer();
   wire(card);
   let own=$('#referralInviteHome');
   if(showIncoming&&canInvite()){
    if(!own){own=document.createElement('aside');own.id='referralInviteHome';own.className='card ref-home ref-own-invite'}
    ($('#tajenkaPreviewCard')||$('#quickPlayCard')).after(own);
-   own.hidden=sessionStorage.getItem('ref:announcement-hidden')==='1';own.innerHTML=invitationOffer();wire(own);
+   own.hidden=sessionStorage.getItem(offerKey())==='1';own.innerHTML=invitationOffer();wire(own);
   }else own?.remove();
  }
  function renderProfile(){
@@ -74,7 +75,7 @@
   wire(card);
  }
  function wire(root){
-  root.querySelectorAll('[data-ref-home-close]').forEach(b=>b.onclick=()=>{sessionStorage.setItem('ref:announcement-hidden','1');renderHome()});
+  root.querySelectorAll('[data-ref-home-close]').forEach(b=>b.onclick=()=>{sessionStorage.setItem(offerKey(),'1');renderHome()});
   root.querySelectorAll('[data-ref-open]').forEach(b=>b.onclick=()=>open('invite'));
   root.querySelectorAll('[data-ref-accept]').forEach(b=>b.onclick=()=>open('accept'));
   root.querySelectorAll('[data-ref-play]').forEach(b=>b.onclick=()=>{close();if(typeof closeTransientModals==='function')closeTransientModals();nav('free')});

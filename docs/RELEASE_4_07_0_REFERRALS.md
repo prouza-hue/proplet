@@ -18,3 +18,6 @@ Základ: main a0e3b622 (4.06.0), zachovává Denní Extra a opravy databázovéh
 Browser testy používají skutečné produkční skripty a obrázky s explicitně mockovaným API, bez zápisů do produkce.
 Databázové testy používají samostatné testovací schéma s rollbackem a izolovaný PostgreSQL v CI. Nejsou to simulované odměny z původního preview.
 Finální SHA, běhy a produkční deployment jsou uvedeny v release PR.
+
+## Databázová příprava
+12. 10. 2026 19:15 UTC: migrace 20261012191530 referral_v1_atomic_shared_rewards aplikována a ověřena v produkci. RLS a omezení přístupu potvrzeny; nové tabulky prázdné, produkční aplikace se aktivuje až schváleným vydáním.

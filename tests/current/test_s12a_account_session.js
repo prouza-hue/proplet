@@ -110,11 +110,11 @@ has(accountTeam,/if\(!window\.PROPLET_ACCOUNT_SESSION_ACTIVE\)\{\s*window\.fetch
 has(recoveryGuard,/if\(!window\.PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE\)\{[\s\S]*window\.fetch=/,'recovery mixed-cache fallback is not gated by explicit callback persistence');
 has(accountAuth,/PROPLET_ACCOUNT_CALLBACK_PERSISTENCE_ACTIVE=true/,'account callback ownership marker missing');
 has(accountAuth,/PROFILE_RESPONSE_ENDPOINTS\.has\(path\)[\s\S]*persistAccountResponseProfile\(d\.profile\)/,'callback response persistence is not explicit');
-const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?v=flowcontext1-inappauth1'");
+const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?v=referrals1'");
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=daily-specials1')&&sw.includes('/theme-init.js?v=daily-specials1'),'theme-init cache boundary drifted');
+assert(index.includes('/theme-init.js?v=referrals1')&&sw.includes('/theme-init.js?v=referrals1'),'theme-init cache boundary drifted');
 assert(themeInit.includes("loadScript('/home-layout.js?v=mk100'"),'home layout cache boundary drifted');
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');

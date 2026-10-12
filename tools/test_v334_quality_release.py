@@ -127,7 +127,7 @@ assert "tento pokus se nebude počítat do žebříčku" in client
 assert "ranking-privacy-mini-icon" in client and "ranking-privacy-mini-label" in client
 assert "label:'Anonymní'" in client
 assert "transform:none" in hotfix_css
-assert "Hrát další úroveň" in app
+assert "Hraj další úroveň" in app
 
 # v4.01.x keeps the approved CTA colour and the primary interaction contracts.
 assert f"version:'{expected_version}'" in runtime
