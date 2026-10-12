@@ -65,7 +65,8 @@ assert {p for p in openapi_contract["paths"] if p.startswith("/api/referrals")} 
 for referral_path, methods in referral_paths.items():
     assert set(openapi_contract["paths"][referral_path]) == methods
     openapi_contract["paths"].pop(referral_path)
-for signup_model in ("PlayerCreate", "AuthCallback"):
+# RecoveryReset inherits AuthCallback; the additive optional field is inert there.
+for signup_model in ("PlayerCreate", "AuthCallback", "RecoveryReset"):
     schema = openapi_contract["components"]["schemas"][signup_model]
     assert "inviteCode" not in schema.get("required", [])
     code_schema = schema["properties"].pop("inviteCode")
