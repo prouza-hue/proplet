@@ -240,7 +240,7 @@ try:
             # Newer completion at easy slot 20 must not suppress this historical award.
             assert page.evaluate("freeProgress('easy').done")>=20
             before=page.evaluate("freeProgress('easy').done")
-            page.locator('[data-archive-board="g3-e-020"]').click();page.locator('[data-archive-start="g3-e-020"]').click()
+            page.locator('[data-archive-board="g3-e-020"]').click();page.locator('#archiveExperienceModal [data-archive-start="g3-e-020"]').click()
             page.wait_for_selector("#screen-game.active")
             page.wait_for_timeout(350)
             shot(page,"archive-game-390")
@@ -249,7 +249,7 @@ try:
             assert page.evaluate("currentGame.found.length")==1
             page.evaluate("goBackFromGame()");page.wait_for_selector("#screen-archive.active")
             page.locator('[data-archive-board="g3-e-020"]').click();assert "Rozehráno" in page.locator("#archiveExperienceModal").inner_text()
-            page.locator('[data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
+            page.locator('#archiveExperienceModal [data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
             assert page.evaluate("currentGame.found.length")==1
             # Fold viewport changes only presentation.
             page.set_viewport_size({"width":690,"height":950});page.wait_for_timeout(150)
@@ -262,19 +262,19 @@ try:
             shot(page,"archive-result-390")
             page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
             page.locator('[data-archive-board="g3-e-020"]').click();assert "Odměna už je tvoje" in page.locator("#archiveExperienceModal").inner_text()
-            page.locator('[data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
+            page.locator('#archiveExperienceModal [data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
             for a in answers:solve_word(page,a)
             page.wait_for_selector("#winModal:not(.hidden)")
             assert "+0 XP" in page.locator("#winXp").inner_text()
             page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
             # Approved VRTÍ alternative goes through actual input and restore.
-            page.locator('[data-archive-board="g3-e-009"]').click();page.locator('[data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
+            page.locator('[data-archive-board="g3-e-009"]').click();page.locator('#archiveExperienceModal [data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
             alt=next(r for r in bank["boards"] if r["puzzle"]["id"]=="g3-e-009")["solutions"]["solutionSets"][1]
             solve_word(page,next(a for a in alt if a["word"]=="VRTÍ"))
             assert page.evaluate("currentGame.found[0].word")=="VRTÍ"
             page.evaluate("applySmartHint(2)")
             page.evaluate("goBackFromGame()");page.wait_for_selector("#screen-archive.active")
-            page.locator('[data-archive-board="g3-e-009"]').click();page.locator('[data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
+            page.locator('[data-archive-board="g3-e-009"]').click();page.locator('#archiveExperienceModal [data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
             assert page.evaluate("currentGame.found[0].word")=="VRTÍ"
             assert page.evaluate("currentGame.archiveHints.length")==1
             for a in alt:
