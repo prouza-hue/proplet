@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "status": "passed",
-  "previewUrl": "https://proplet-5pt4zgbht-pavel-prouzas-projects.vercel.app",
-  "applicationSourceSha": "f0f232d84aadcc8385fea1023c45de58d0e963e8",
-  "qaCommit": "dfbbfa93cca8b9ef16acfbe804387e7e92b8bc3d",
-  "qaRun": "https://github.com/prouza-hue/proplet/actions/runs/38215105093",
+  "previewUrl": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+  "applicationSourceSha": "b292bfc2d1a67dab59281c2445a52d4ceffca4cf",
+  "qaCommit": "390aa81ce387c95652e44716d683f4e4a6752e98",
+  "qaRun": "https://github.com/prouza-hue/proplet/actions/runs/38221010704",
   "guard": {
     "environment": "preview",
     "version": "4.06.0",
@@ -16,9 +16,11 @@
   },
   "humanPlaytest": false,
   "checks": [
+    "Extra introduction once on first available visit, mobile fit, CTA selection, reload persistence, retired300-card absent and inverse Extra label",
     "production/base/special heights, clipping, title overlap and week dialog at320/360/390/768/1280",
     "real touch/mouse solves, hints, runtime reset/undo, pause, simultaneous base/special progress, reload, anonymous claim, second-device session resume, two100XP receipts, base-only streak, special ranking and0XP practice replay"
   ],
+  "extraEntryChecked": true,
   "layout": [
     {
       "width": 320,

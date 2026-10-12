@@ -1,0 +1,1570 @@
+{
+  "status": "passed",
+  "startedAt": "2026-10-12T08:01:37.630Z",
+  "layout": [
+    {
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "production": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 298,
+          "height": 220,
+          "right": 309,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 264,
+            "height": 47,
+            "right": 292,
+            "bottom": 301,
+            "clientWidth": 262,
+            "scrollWidth": 262
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 264,
+            "height": 72,
+            "right": 292,
+            "bottom": 238,
+            "clientWidth": 262,
+            "scrollWidth": 262
+          }
+        ],
+        "documentWidth": 320,
+        "documentScrollWidth": 320,
+        "choice": null
+      },
+      "base": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 298,
+          "height": 217,
+          "right": 309,
+          "bottom": 314
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 28,
+            "y": 113.703125,
+            "width": 150.125,
+            "height": 28.59375,
+            "right": 178.125,
+            "bottom": 142.296875,
+            "clientWidth": 150,
+            "scrollWidth": 150
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 251,
+            "width": 264,
+            "height": 47,
+            "right": 292,
+            "bottom": 298,
+            "clientWidth": 262,
+            "scrollWidth": 262
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 163,
+            "width": 264,
+            "height": 72,
+            "right": 292,
+            "bottom": 235,
+            "clientWidth": 262,
+            "scrollWidth": 262
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 215.75,
+            "y": 113,
+            "width": 76.25,
+            "height": 30,
+            "right": 292,
+            "bottom": 143,
+            "clientWidth": 76,
+            "scrollWidth": 77
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 28,
+            "y": 113,
+            "width": 264,
+            "height": 30,
+            "right": 292,
+            "bottom": 143,
+            "clientWidth": 264,
+            "scrollWidth": 265
+          }
+        ],
+        "documentWidth": 320,
+        "documentScrollWidth": 320,
+        "choice": {
+          "base": {
+            "x": 28,
+            "y": 113.703125,
+            "width": 150.125,
+            "height": 28.59375,
+            "right": 178.125,
+            "bottom": 142.296875
+          },
+          "special": {
+            "x": 215.75,
+            "y": 113,
+            "width": 76.25,
+            "height": 30,
+            "right": 292,
+            "bottom": 143
+          }
+        }
+      },
+      "special": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 298,
+          "height": 217,
+          "right": 309,
+          "bottom": 314
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 28,
+            "y": 113.703125,
+            "width": 150.125,
+            "height": 28.59375,
+            "right": 178.125,
+            "bottom": 142.296875,
+            "clientWidth": 150,
+            "scrollWidth": 150
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 251,
+            "width": 264,
+            "height": 47,
+            "right": 292,
+            "bottom": 298,
+            "clientWidth": 262,
+            "scrollWidth": 262
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 163,
+            "width": 264,
+            "height": 72,
+            "right": 292,
+            "bottom": 235,
+            "clientWidth": 262,
+            "scrollWidth": 262
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 215.75,
+            "y": 113,
+            "width": 76.25,
+            "height": 30,
+            "right": 292,
+            "bottom": 143,
+            "clientWidth": 76,
+            "scrollWidth": 77
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 28,
+            "y": 113,
+            "width": 264,
+            "height": 30,
+            "right": 292,
+            "bottom": 143,
+            "clientWidth": 264,
+            "scrollWidth": 265
+          }
+        ],
+        "documentWidth": 320,
+        "documentScrollWidth": 320,
+        "choice": {
+          "base": {
+            "x": 28,
+            "y": 113.703125,
+            "width": 150.125,
+            "height": 28.59375,
+            "right": 178.125,
+            "bottom": 142.296875
+          },
+          "special": {
+            "x": 215.75,
+            "y": 113,
+            "width": 76.25,
+            "height": 30,
+            "right": 292,
+            "bottom": 143
+          }
+        }
+      },
+      "extraBaseHeight": -3,
+      "extraSpecialHeight": -3
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "production": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 338,
+          "height": 220,
+          "right": 349,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 304,
+            "height": 47,
+            "right": 332,
+            "bottom": 301,
+            "clientWidth": 302,
+            "scrollWidth": 302
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 304,
+            "height": 72,
+            "right": 332,
+            "bottom": 238,
+            "clientWidth": 302,
+            "scrollWidth": 302
+          }
+        ],
+        "documentWidth": 360,
+        "documentScrollWidth": 360,
+        "choice": null
+      },
+      "base": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 338,
+          "height": 220,
+          "right": 349,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146,
+            "clientWidth": 174,
+            "scrollWidth": 174
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 304,
+            "height": 47,
+            "right": 332,
+            "bottom": 301,
+            "clientWidth": 302,
+            "scrollWidth": 302
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 304,
+            "height": 72,
+            "right": 332,
+            "bottom": 238,
+            "clientWidth": 302,
+            "scrollWidth": 302
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 246.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 31,
+            "right": 332,
+            "bottom": 145,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 28,
+            "y": 113,
+            "width": 304,
+            "height": 33,
+            "right": 332,
+            "bottom": 146,
+            "clientWidth": 304,
+            "scrollWidth": 305
+          }
+        ],
+        "documentWidth": 360,
+        "documentScrollWidth": 360,
+        "choice": {
+          "base": {
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146
+          },
+          "special": {
+            "x": 246.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 30,
+            "right": 332,
+            "bottom": 144
+          }
+        }
+      },
+      "special": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 338,
+          "height": 220,
+          "right": 349,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146,
+            "clientWidth": 174,
+            "scrollWidth": 174
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 304,
+            "height": 47,
+            "right": 332,
+            "bottom": 301,
+            "clientWidth": 302,
+            "scrollWidth": 302
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 304,
+            "height": 72,
+            "right": 332,
+            "bottom": 238,
+            "clientWidth": 302,
+            "scrollWidth": 302
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 246.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 31,
+            "right": 332,
+            "bottom": 145,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 28,
+            "y": 113,
+            "width": 304,
+            "height": 33,
+            "right": 332,
+            "bottom": 146,
+            "clientWidth": 304,
+            "scrollWidth": 305
+          }
+        ],
+        "documentWidth": 360,
+        "documentScrollWidth": 360,
+        "choice": {
+          "base": {
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146
+          },
+          "special": {
+            "x": 246.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 30,
+            "right": 332,
+            "bottom": 144
+          }
+        }
+      },
+      "extraBaseHeight": 0,
+      "extraSpecialHeight": 0
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "production": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 368,
+          "height": 220,
+          "right": 379,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 334,
+            "height": 47,
+            "right": 362,
+            "bottom": 301,
+            "clientWidth": 332,
+            "scrollWidth": 332
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 334,
+            "height": 72,
+            "right": 362,
+            "bottom": 238,
+            "clientWidth": 332,
+            "scrollWidth": 332
+          }
+        ],
+        "documentWidth": 390,
+        "documentScrollWidth": 390,
+        "choice": null
+      },
+      "base": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 368,
+          "height": 220,
+          "right": 379,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146,
+            "clientWidth": 174,
+            "scrollWidth": 174
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 334,
+            "height": 47,
+            "right": 362,
+            "bottom": 301,
+            "clientWidth": 332,
+            "scrollWidth": 332
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 334,
+            "height": 72,
+            "right": 362,
+            "bottom": 238,
+            "clientWidth": 332,
+            "scrollWidth": 332
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 276.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 31,
+            "right": 362,
+            "bottom": 145,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 28,
+            "y": 113,
+            "width": 334,
+            "height": 33,
+            "right": 362,
+            "bottom": 146,
+            "clientWidth": 334,
+            "scrollWidth": 335
+          }
+        ],
+        "documentWidth": 390,
+        "documentScrollWidth": 390,
+        "choice": {
+          "base": {
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146
+          },
+          "special": {
+            "x": 276.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 30,
+            "right": 362,
+            "bottom": 144
+          }
+        }
+      },
+      "special": {
+        "hero": {
+          "x": 11,
+          "y": 97,
+          "width": 368,
+          "height": 220,
+          "right": 379,
+          "bottom": 317
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146,
+            "clientWidth": 174,
+            "scrollWidth": 174
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 28,
+            "y": 254,
+            "width": 334,
+            "height": 47,
+            "right": 362,
+            "bottom": 301,
+            "clientWidth": 332,
+            "scrollWidth": 332
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 28,
+            "y": 166,
+            "width": 334,
+            "height": 72,
+            "right": 362,
+            "bottom": 238,
+            "clientWidth": 332,
+            "scrollWidth": 332
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 276.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 31,
+            "right": 362,
+            "bottom": 145,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 28,
+            "y": 113,
+            "width": 334,
+            "height": 33,
+            "right": 362,
+            "bottom": 146,
+            "clientWidth": 334,
+            "scrollWidth": 335
+          }
+        ],
+        "documentWidth": 390,
+        "documentScrollWidth": 390,
+        "choice": {
+          "base": {
+            "x": 28,
+            "y": 113,
+            "width": 173.65625,
+            "height": 33,
+            "right": 201.65625,
+            "bottom": 146
+          },
+          "special": {
+            "x": 276.75,
+            "y": 114,
+            "width": 85.25,
+            "height": 30,
+            "right": 362,
+            "bottom": 144
+          }
+        }
+      },
+      "extraBaseHeight": 0,
+      "extraSpecialHeight": 0
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "production": {
+        "hero": {
+          "x": 18,
+          "y": 104,
+          "width": 732,
+          "height": 217.015625,
+          "right": 750,
+          "bottom": 321.015625
+        },
+        "children": [
+          {
+            "selector": "#playDailyBtn",
+            "x": 35,
+            "y": 258.015625,
+            "width": 698,
+            "height": 47,
+            "right": 733,
+            "bottom": 305.015625,
+            "clientWidth": 696,
+            "scrollWidth": 696
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 35,
+            "y": 178.015625,
+            "width": 698,
+            "height": 64,
+            "right": 733,
+            "bottom": 242.015625,
+            "clientWidth": 696,
+            "scrollWidth": 696
+          }
+        ],
+        "documentWidth": 768,
+        "documentScrollWidth": 768,
+        "choice": null
+      },
+      "base": {
+        "hero": {
+          "x": 18,
+          "y": 104,
+          "width": 732,
+          "height": 217.015625,
+          "right": 750,
+          "bottom": 321.015625
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 35,
+            "y": 120,
+            "width": 200.125,
+            "height": 38.015625,
+            "right": 235.125,
+            "bottom": 158.015625,
+            "clientWidth": 200,
+            "scrollWidth": 200
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 35,
+            "y": 258.015625,
+            "width": 698,
+            "height": 47,
+            "right": 733,
+            "bottom": 305.015625,
+            "clientWidth": 696,
+            "scrollWidth": 696
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 35,
+            "y": 178.015625,
+            "width": 698,
+            "height": 64,
+            "right": 733,
+            "bottom": 242.015625,
+            "clientWidth": 696,
+            "scrollWidth": 696
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 647.75,
+            "y": 123.5,
+            "width": 85.25,
+            "height": 31,
+            "right": 733,
+            "bottom": 154.5,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 35,
+            "y": 120,
+            "width": 698,
+            "height": 38.015625,
+            "right": 733,
+            "bottom": 158.015625,
+            "clientWidth": 698,
+            "scrollWidth": 699
+          }
+        ],
+        "documentWidth": 768,
+        "documentScrollWidth": 768,
+        "choice": {
+          "base": {
+            "x": 35,
+            "y": 120,
+            "width": 200.125,
+            "height": 38.015625,
+            "right": 235.125,
+            "bottom": 158.015625
+          },
+          "special": {
+            "x": 647.75,
+            "y": 123.5,
+            "width": 85.25,
+            "height": 30,
+            "right": 733,
+            "bottom": 153.5
+          }
+        }
+      },
+      "special": {
+        "hero": {
+          "x": 18,
+          "y": 104,
+          "width": 732,
+          "height": 217.015625,
+          "right": 750,
+          "bottom": 321.015625
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 35,
+            "y": 120,
+            "width": 200.125,
+            "height": 38.015625,
+            "right": 235.125,
+            "bottom": 158.015625,
+            "clientWidth": 200,
+            "scrollWidth": 200
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 35,
+            "y": 258.015625,
+            "width": 698,
+            "height": 47,
+            "right": 733,
+            "bottom": 305.015625,
+            "clientWidth": 696,
+            "scrollWidth": 696
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 35,
+            "y": 178.015625,
+            "width": 698,
+            "height": 64,
+            "right": 733,
+            "bottom": 242.015625,
+            "clientWidth": 696,
+            "scrollWidth": 696
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 647.75,
+            "y": 123.5,
+            "width": 85.25,
+            "height": 31,
+            "right": 733,
+            "bottom": 154.5,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 35,
+            "y": 120,
+            "width": 698,
+            "height": 38.015625,
+            "right": 733,
+            "bottom": 158.015625,
+            "clientWidth": 698,
+            "scrollWidth": 699
+          }
+        ],
+        "documentWidth": 768,
+        "documentScrollWidth": 768,
+        "choice": {
+          "base": {
+            "x": 35,
+            "y": 120,
+            "width": 200.125,
+            "height": 38.015625,
+            "right": 235.125,
+            "bottom": 158.015625
+          },
+          "special": {
+            "x": 647.75,
+            "y": 123.5,
+            "width": 85.25,
+            "height": 30,
+            "right": 733,
+            "bottom": 153.5
+          }
+        }
+      },
+      "extraBaseHeight": 0,
+      "extraSpecialHeight": 0
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "production": {
+        "hero": {
+          "x": 228,
+          "y": 106,
+          "width": 824,
+          "height": 245,
+          "right": 1052,
+          "bottom": 351
+        },
+        "children": [
+          {
+            "selector": "#playDailyBtn",
+            "x": 253,
+            "y": 273,
+            "width": 774,
+            "height": 55,
+            "right": 1027,
+            "bottom": 328,
+            "clientWidth": 772,
+            "scrollWidth": 772
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 253,
+            "y": 193,
+            "width": 774,
+            "height": 64,
+            "right": 1027,
+            "bottom": 257,
+            "clientWidth": 772,
+            "scrollWidth": 772
+          }
+        ],
+        "documentWidth": 1280,
+        "documentScrollWidth": 1280,
+        "choice": null
+      },
+      "base": {
+        "hero": {
+          "x": 228,
+          "y": 106,
+          "width": 824,
+          "height": 245,
+          "right": 1052,
+          "bottom": 351
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 253,
+            "y": 129,
+            "width": 231.640625,
+            "height": 44,
+            "right": 484.640625,
+            "bottom": 173,
+            "clientWidth": 232,
+            "scrollWidth": 232
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 253,
+            "y": 273,
+            "width": 774,
+            "height": 55,
+            "right": 1027,
+            "bottom": 328,
+            "clientWidth": 772,
+            "scrollWidth": 772
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 253,
+            "y": 193,
+            "width": 774,
+            "height": 64,
+            "right": 1027,
+            "bottom": 257,
+            "clientWidth": 772,
+            "scrollWidth": 772
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 941.75,
+            "y": 135.5,
+            "width": 85.25,
+            "height": 31,
+            "right": 1027,
+            "bottom": 166.5,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 253,
+            "y": 129,
+            "width": 774,
+            "height": 44,
+            "right": 1027,
+            "bottom": 173,
+            "clientWidth": 774,
+            "scrollWidth": 775
+          }
+        ],
+        "documentWidth": 1280,
+        "documentScrollWidth": 1280,
+        "choice": {
+          "base": {
+            "x": 253,
+            "y": 129,
+            "width": 231.640625,
+            "height": 44,
+            "right": 484.640625,
+            "bottom": 173
+          },
+          "special": {
+            "x": 941.75,
+            "y": 135.5,
+            "width": 85.25,
+            "height": 30,
+            "right": 1027,
+            "bottom": 165.5
+          }
+        }
+      },
+      "special": {
+        "hero": {
+          "x": 228,
+          "y": 106,
+          "width": 824,
+          "height": 245,
+          "right": 1052,
+          "bottom": 351
+        },
+        "children": [
+          {
+            "selector": "#dailyHeroTitle",
+            "x": 253,
+            "y": 129,
+            "width": 231.640625,
+            "height": 44,
+            "right": 484.640625,
+            "bottom": 173,
+            "clientWidth": 232,
+            "scrollWidth": 232
+          },
+          {
+            "selector": "#playDailyBtn",
+            "x": 253,
+            "y": 273,
+            "width": 774,
+            "height": 55,
+            "right": 1027,
+            "bottom": 328,
+            "clientWidth": 772,
+            "scrollWidth": 772
+          },
+          {
+            "selector": "#dailyWeekRhythm",
+            "x": 253,
+            "y": 193,
+            "width": 774,
+            "height": 64,
+            "right": 1027,
+            "bottom": 257,
+            "clientWidth": 772,
+            "scrollWidth": 772
+          },
+          {
+            "selector": "#dailyChallengeSwitch",
+            "x": 941.75,
+            "y": 135.5,
+            "width": 85.25,
+            "height": 31,
+            "right": 1027,
+            "bottom": 166.5,
+            "clientWidth": 85,
+            "scrollWidth": 86
+          },
+          {
+            "selector": ".daily-title-choice-row",
+            "x": 253,
+            "y": 129,
+            "width": 774,
+            "height": 44,
+            "right": 1027,
+            "bottom": 173,
+            "clientWidth": 774,
+            "scrollWidth": 775
+          }
+        ],
+        "documentWidth": 1280,
+        "documentScrollWidth": 1280,
+        "choice": {
+          "base": {
+            "x": 253,
+            "y": 129,
+            "width": 231.640625,
+            "height": 44,
+            "right": 484.640625,
+            "bottom": 173
+          },
+          "special": {
+            "x": 941.75,
+            "y": 135.5,
+            "width": 85.25,
+            "height": 30,
+            "right": 1027,
+            "bottom": 165.5
+          }
+        }
+      },
+      "extraBaseHeight": 0,
+      "extraSpecialHeight": 0
+    }
+  ],
+  "checks": [
+    "Extra introduction once on first available visit, mobile fit, CTA selection, reload persistence, retired300-card absent and inverse Extra label",
+    "production/base/special heights, clipping, title overlap and week dialog at320/360/390/768/1280",
+    "real touch/mouse solves, hints, runtime reset/undo, pause, simultaneous base/special progress, reload, anonymous claim, second-device session resume, two100XP receipts, base-only streak, special ranking and0XP practice replay"
+  ],
+  "errors": [],
+  "network": {
+    "allowedWrites": [
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/start",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/hint-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/start",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/start",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/player",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/anonymous/claim",
+        "method": "POST"
+      },
+      {
+        "path": "/api/account-bonus/claim",
+        "method": "POST"
+      },
+      {
+        "path": "/api/account-bonus-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/login",
+        "method": "POST"
+      },
+      {
+        "path": "/api/account-bonus/claim",
+        "method": "POST"
+      },
+      {
+        "path": "/api/account-bonus-event",
+        "method": "POST"
+      },
+      {
+        "path": "/api/product-events",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/start",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/finish",
+        "method": "POST"
+      },
+      {
+        "path": "/api/result",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/start",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/finish",
+        "method": "POST"
+      },
+      {
+        "path": "/api/result",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/start",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/checkpoint",
+        "method": "POST"
+      },
+      {
+        "path": "/api/play-session",
+        "method": "POST"
+      },
+      {
+        "path": "/api/attempt/finish",
+        "method": "POST"
+      },
+      {
+        "path": "/api/result",
+        "method": "POST"
+      }
+    ],
+    "blockedWrites": [
+      {
+        "origin": "https://hrajproplet.cz",
+        "path": "/api/product-events",
+        "method": "POST",
+        "readOnly": true
+      },
+      {
+        "origin": "https://hrajproplet.cz",
+        "path": "/api/product-events",
+        "method": "POST",
+        "readOnly": true
+      },
+      {
+        "origin": "https://hrajproplet.cz",
+        "path": "/api/product-events",
+        "method": "POST",
+        "readOnly": true
+      },
+      {
+        "origin": "https://hrajproplet.cz",
+        "path": "/api/product-events",
+        "method": "POST",
+        "readOnly": true
+      },
+      {
+        "origin": "https://hrajproplet.cz",
+        "path": "/api/product-events",
+        "method": "POST",
+        "readOnly": true
+      }
+    ],
+    "failedApi": [],
+    "noProductionWrites": true
+  },
+  "humanPlaytest": false,
+  "previewOrigin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+  "productionOrigin": "https://hrajproplet.cz",
+  "deployedSourceSha": "b292bfc2d1a67dab59281c2445a52d4ceffca4cf",
+  "guard": {
+    "environment": "preview",
+    "version": "4.06.0",
+    "databaseRef": "eanzztstmwlamwfdskbf",
+    "isolatedPreview": true,
+    "playSessionsEnabled": true,
+    "date": "2026-10-21",
+    "special": "g6-ds-hardcore-w01"
+  },
+  "dismissedAnnouncements": [
+    {
+      "origin": "https://hrajproplet.cz",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://hrajproplet.cz",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://hrajproplet.cz",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://hrajproplet.cz",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://hrajproplet.cz",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    },
+    {
+      "origin": "https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app",
+      "selector": "#dailyExtraIntro:not(.hidden) [data-extra-later]"
+    }
+  ],
+  "extraIntroductions": [
+    {
+      "width": 288,
+      "scrollWidth": 286,
+      "clientWidth": 286,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 328,
+      "scrollWidth": 326,
+      "clientWidth": 326,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 358,
+      "scrollWidth": 356,
+      "clientWidth": 356,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 420,
+      "scrollWidth": 418,
+      "clientWidth": 418,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 420,
+      "scrollWidth": 418,
+      "clientWidth": 418,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 358,
+      "scrollWidth": 356,
+      "clientWidth": 356,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 420,
+      "scrollWidth": 418,
+      "clientWidth": 418,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    },
+    {
+      "width": 358,
+      "scrollWidth": 356,
+      "clientWidth": 356,
+      "title": "Dnes je tu i Extra",
+      "eyebrows": 0
+    }
+  ],
+  "extraEntryChecked": true,
+  "resumeBeforeReload": [
+    {
+      "mode": "daily_special",
+      "key": "daily-special:2026-10-21:hardcore",
+      "puzzleId": "g6-ds-hardcore-w01",
+      "found": 1,
+      "contentHash": "e1c580ae66e5338e28bfc58cbba4d49c0c31ea6ca75c53ee6288415fa7ba5b3e"
+    },
+    {
+      "mode": "daily",
+      "puzzleId": "g6-d-20261021",
+      "found": 1
+    }
+  ],
+  "syntheticPlayerId": "882a1ddf-0d27-4781-8f6e-6b29482acef9",
+  "officialResults": [
+    {
+      "challengeKey": "daily-special:2026-10-21:hardcore",
+      "puzzleId": "g6-ds-hardcore-w01",
+      "points": 100,
+      "mode": "daily_special",
+      "timingVerified": true,
+      "hintsUsed": 1
+    },
+    {
+      "challengeKey": "daily:2026-10-21",
+      "puzzleId": "g6-d-20261021",
+      "points": 100,
+      "mode": "daily",
+      "timingVerified": true,
+      "hintsUsed": 0
+    }
+  ],
+  "finishedAt": "2026-10-12T08:03:19.671Z",
+  "cleanup": {
+    "syntheticPlayerId": "882a1ddf-0d27-4781-8f6e-6b29482acef9",
+    "deleted": true,
+    "status": 200
+  }
+}

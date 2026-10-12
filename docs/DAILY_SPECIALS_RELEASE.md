@@ -1,6 +1,13 @@
 # Proplet 4.06.0 — bonusové Daily výzvy
 
-Bonusové výzvy jsou součástí celé aplikace. Na Dnes se přepínají tlačítkem **Navíc** ve stávajícím nadpisu Denní výzvy. Datum, obtížnost, týdenní rytmus a hlavní tlačítko používají stejné řádky jako dosud. Přehled týdne se otevře až po klepnutí na označený den. Výsledek a sdílení speciálu jsou v jeho výsledkovém dialogu.
+Bonusové výzvy jsou součástí celé aplikace. Na Dnes se přepínají tlačítkem **Extra** ve stávajícím nadpisu Denní výzvy. Datum, obtížnost, týdenní rytmus a hlavní tlačítko používají stejné řádky jako dosud. Přehled týdne se otevře až po klepnutí na označený den. Výsledek a sdílení speciálu jsou v jeho výsledkovém dialogu.
+
+## Úpravy podle připomínek 12. 10. 2026
+
+- Z Dnes je odstraněná karta „300 nových Propletů“.
+- Přepínač **Extra** má světlý papírový podklad a tmavé modré písmo i před vybráním. Při přepnutí zůstává výška karty stejná.
+- Při prvním vhodném otevření Dnes s dostupnou extra deskou se jednou zobrazí krátké vysvětlení. Tlačítko **Ukázat Extra** pouze přepne stávající kartu.
+- Vysvětlení počká na konec onboardingových kroků a ostatních dialogů; má přednost před staršími oznámeními. Potvrzení je uložené v prohlížeči pro daný účet/hosta.
 
 ## Rozsah a pravidla
 
@@ -23,10 +30,10 @@ Banka má 36 desek (12 na obtížnost), dvě nezávislá ověření jedinečnéh
 - Datum: středa `2026-10-21`, shodně na základní Daily, bonusu i serverových výsledcích. Herní čas používá skutečné hodiny.
 - Změna data funguje pouze na této větvi, ve Vercel preview a s přesnou testovací databází. Ostatní kombinace při startu selžou.
 - Manifest banky je stále `candidate`; produkční runtime ho nepřijme. SQL politika vzniká vypnutá.
-- Plné preview: <https://proplet-5pt4zgbht-pavel-prouzas-projects.vercel.app/>. Na prvním vstupu lze přeskočit trénink; na Dnes se bonus vybere přes **Navíc**.
-- Ověřený aplikační commit: `f0f232d84aadcc8385fea1023c45de58d0e963e8`, deployment `dpl_2F5zVupowwRd4QEdg9CyVEm5Puek`.
+- Plné preview: <https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app/>. Na prvním vstupu lze přeskočit trénink; na Dnes se bonus vybere přes **Extra**.
+- Ověřený aplikační commit: `b292bfc2d1a67dab59281c2445a52d4ceffca4cf`, deployment `dpl_2KAphwgY1MegNhUsfEgRdbwxWMia`.
 - PR: <https://github.com/prouza-hue/proplet/pull/193>. Navazuje na obsahové PR #192; všechny nové desky jsou součástí integrované větve.
-- Finální browser QA: <https://github.com/prouza-hue/proplet/actions/runs/38215105093>. Souhrn a skutečné screenshoty jsou v `docs/daily-specials-preview/`.
+- Finální browser QA: <https://github.com/prouza-hue/proplet/actions/runs/38221010704>. Souhrn a skutečné screenshoty jsou v `docs/daily-specials-preview/`.
 
 ## Kandidátní kalendář
 
