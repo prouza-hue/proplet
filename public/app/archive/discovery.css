@@ -60,7 +60,6 @@ html.tiskarna-ui body.archive-experience :is(.ax-card-action,.cp-play):focus-vis
 html.tiskarna-ui body.archive-experience .ax-card-action .ax-icon{width:19px;height:19px}
 html.tiskarna-ui body.archive-experience .ax-archive-entry{--pg-accent:var(--pg-rust)}
 html.tiskarna-ui body.archive-experience .ax-team-entry{--pg-accent:var(--pg-green)}
-html.tiskarna-ui body.archive-experience .ax-month-entry{--pg-accent:var(--pg-plum)}
 html.tiskarna-ui body.archive-experience .ax-entry-art .ax-free-art{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:4px;width:100%;padding:0}
 html.tiskarna-ui body.archive-experience .ax-free-difficulty{width:100%;height:22px;object-fit:contain;min-width:0}
 /* Native difficulty renderer: retain title, XP, history and progress semantics. */

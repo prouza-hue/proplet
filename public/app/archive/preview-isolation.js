@@ -41,7 +41,7 @@ const read=(key,fallback)=>{try{return JSON.parse(local.getItem(key)||'null')??f
 const save=(key,value)=>local.setItem(key,JSON.stringify(value));
 const profileId='archive-review', token='REVIEW-ONLY-NOT-A-PRODUCTION-TOKEN';
 const fixtureProfile={id:profileId,name:'Alex',avatar:'🦊',token,hasPassword:true,supportMode:'none',
- familyCode:null,leagueName:null,googleLinked:false,useGoogleAvatar:false};
+ familyCode:null,leagueName:null,googleLinked:false,useGoogleAvatar:false,publicRankings:true};
 if (!local.getItem('initialized')) {
  local.setItem('initialized','1');
  local.setItem('proplet-v3-7-required-onboarding','done');
@@ -51,6 +51,17 @@ if (!local.getItem('initialized')) {
  local.setItem('proplet:content-release:mk100-v2','1');
  if (scenario.referral!=='guest') save('proplet-v2-profile',fixtureProfile);
 }
+// Returning-player preferences use the same fields and receipts as the release
+// browser fixture. Backfill existing review storage without resetting game state.
+const existingProfile=read('proplet-v2-profile',null);
+if(existingProfile?.id===profileId&&existingProfile.publicRankings==null)
+ save('proplet-v2-profile',{...existingProfile,publicRankings:true});
+for(const key of ['proplet-v3-32-8-rule-principle-seen','proplet:content-release:g5-r1',
+ 'proplet:content-release:mk100-v2:account:'+profileId,
+ 'proplet:content-release:refresh300-v1:account:'+profileId])local.setItem(key,'1');
+local.setItem('proplet-v3-16-2-helper-mode','none');
+save('proplet-v3-26-install-nudge',{done:true,installed:true});
+save('proplet-v3-8-2-push-nudge',{done:true,dismissedAt:Date.now()});
 save('proplet-marketing-consent-v1',{value:'denied',at:Date.now()});
 if(scenario.announcement!=='referral')local.setItem('proplet:referral-announcement-seen:v1:'+profileId,'1');
 else local.removeItem('proplet:referral-announcement-seen:v1:'+profileId);
@@ -157,7 +168,7 @@ window.fetch=async(input,init={})=>{
  if(method==='GET'&&path==='/api/config'){
   let config={"badges":[{"days":1,"icon":"🥉","name":"První zářez"},{"days":3,"icon":"❤️","name":"Srdcař"},{"days":5,"icon":"⭐","name":"Pětka"},{"days":7,"icon":"🔥","name":"Týden v plamenech"},{"days":10,"icon":"🏆","name":"Desítka"},{"days":14,"icon":"⚡","name":"Blesk"},{"days":21,"icon":"🦉","name":"Mistr slov"},{"days":30,"icon":"👑","name":"Koruna"},{"days":50,"icon":"💎","name":"Diamant"},{"days":100,"icon":"🚀","name":"Legenda"}],"points":{"daily":100,"easy":15,"medium":25,"hard":50,"hardcore":100,"mozkomor":150,"starter":10,"mozkokalypsa":200},"dictionarySize":13939,"dailyRotationSize":365,"dailyGeneration":4,"dailyGeneration3From":"2026-08-17","dailyCadence":{"weekdays":["easy","easy","medium","medium","medium","hard","hard"],"counts":{"easy":105,"medium":156,"hard":104}},"rescueBankSize":30,"pushAvailable":false,"environment":"preview","version":"4.07.1","historicalFreeWriteEnabled":false,"referralsEnabled":true,"dailySpecialsEnabled":true};
   try{const response=await fetchPublished('/api/config');if(response.ok)config={...config,...await response.json()};}catch{}
-  return json({...config,environment:'preview',version:'4.07.1',historicalFreeWriteEnabled:false,reviewOnly:true});
+  return json({...config,environment:'preview',version:'4.07.1',historicalFreeWriteEnabled:false,pushAvailable:false,reviewOnly:true});
  }
  if(method==='GET'&&path==='/api/daily'){
   if(scenario.extra!=='live')return json(await modelDaily());
@@ -170,16 +181,23 @@ window.fetch=async(input,init={})=>{
  if(path.startsWith('/api/referrals/invite/')&&method==='GET')return json({enabled:true,inviter:{name:'Katka',avatar:'🦊'},reviewOnly:true});
  if(path==='/api/referrals/dismiss'&&method==='POST'){local.setItem('referralDismissed','1');return json({ok:true,reviewOnly:true});}
  if(method==='GET'&&['/api/account/snapshot','/api/me'].includes(path))return json(snapshot());
+ if(path==='/api/rankings/visibility'&&method==='POST'){
+  const enabled=body.enabled===true,storedProfile=profile();
+  if(storedProfile)save('proplet-v2-profile',{...storedProfile,publicRankings:enabled});
+  return json({publicRankings:enabled,reviewOnly:true});
+ }
+ if(path==='/api/team-victories')return json({enabled:false,team:null,intro:{eligible:false,seen:true},pendingAward:null,history:[],reviewOnly:true});
  if(method==='GET'&&path==='/api/progress')return json({completed:[],rescues:[],inProgress:[],dailyDates:[],reviewOnly:true});
  if(path==='/api/free-order/config')return json({enabled:true,isolatedPreview:true,reviewOnly:true});
  if(path==='/api/play-session/config')return json({enabled:false,isolatedPreview:false,reviewOnly:true});
- if(path==='/api/rescue/status')return json({state:'unavailable',reviewOnly:true});
+ if(path==='/api/rescue/status'||path==='/api/rescue-status')return json({state:'unavailable',reviewOnly:true});
  if(method==='GET'&&(path.includes('global-leaderboard')||path==='/api/rankings/daily-special'))return json(boardRanking(url));
  if(method==='GET'&&(path.includes('rankings')||path.includes('leaderboard')))return json({
   players:[{id:'review-1',name:'Lukáš',avatar:'🦊',xp:32400,rank:1},{id:'review-2',name:'Klára',avatar:'🌺',xp:29600,rank:2},{id:profileId,name:'Alex',avatar:'🦊',xp:stats().points,rank:3}],
   teams:[{id:'review-team',code:'review-team',name:'Sazeči',xp:4820,rank:1}],rows:[],period:url.searchParams.get('period')||'all',reviewOnly:true});
  if(['POST','PUT','PATCH','DELETE'].includes(method)){
-  if(path==='/api/player'||path==='/api/auth/google/complete')return json({...snapshot(),name:String(body.name||'Alex'),accountCreated:true,reviewOnly:true});
+  if(path==='/api/player')return json({...snapshot(),name:String(body.name||'Alex'),accountCreated:true,reviewOnly:true});
+  if(path==='/api/auth/google/complete')return json({profile:{...snapshot(),name:String(body.name||'Alex')},accountCreated:true,reviewOnly:true});
   if(path==='/api/result')return json({ok:true,accepted:true,awardedXp:0,wordDiscoveryXp:0,reviewOnly:true});
   if(path==='/api/support-report'||path==='/api/account')return json({detail:'Tato akce je dostupná pouze v ostrém Propletu; náhled nic neodesílá.'},409);
   return json({...emptyResult,ok:true,accepted:[],reviewOnly:true,wordDiscoveryXp:0,awardedXp:0});

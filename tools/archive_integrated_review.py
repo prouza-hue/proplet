@@ -123,244 +123,244 @@ def solve_word(page,answer):
     for b in boxes[1:]:page.mouse.move(b["x"]+b["width"]/2,b["y"]+b["height"]/2,steps=3)
     page.mouse.up();page.wait_for_timeout(90)
 try:
-    with sync_playwright() as p:
-        browser=p.chromium.launch()
-        for width in [390,690,1440,320]:
-            context=browser.new_context(viewport={"width":width,"height":950},device_scale_factor=1,reduced_motion="reduce")
-            page=context.new_page();page.set_default_timeout(12000)
-            def capture_error(err):
-                report["pageErrors"].append(err.stack or str(err))
-                try:
-                    report["failureText"]=page.locator("body").inner_text()[:9000]
-                    shot(page,"runtime-error")
-                except:pass
-            page.on("pageerror",capture_error)
-            page.on("request",lambda req:report["networkWrites"].append({"url":req.url,"method":req.method}) if req.method not in ["GET","HEAD"] else None)
-            page.goto("http://127.0.0.1:8765/?archive-preview=1",wait_until="networkidle")
-            ready(page)
-            no_monthly(page)
-            shot(page,"initial-"+str(width))
-            assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
-            discovery={}
-            for view in ["daily","free","archive"]:
-                go(page,view);overflow(page,view,width);shot(page,view+"-"+str(width))
-                if view in ["daily","free"]:discovery[view]=discovery_audit(page,view,width)
-            go(page,"free")
-            typography=[{key:card[key] for key in ["id","font","size","weight"]} for cards in discovery.values() for card in cards]
-            assert len({(t["font"],t["weight"]) for t in typography})==1,typography
-            free_order_audit(page,width)
-            assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
-            go(page,"daily")
-            assert page.locator("#axHomeFree .ax-free-difficulty").count()==4
-            assert "Ve hře jste spolu" not in page.locator("#screen-daily").inner_text()
-            report["checks"].append({"width":width,"typography":typography,"fourCanonicalIcons":"PASS","noDuplicateCardControls":"PASS"})
-            page.evaluate("window.scrollTo(0,document.querySelector(\'#axHomeFree\').getBoundingClientRect().top+scrollY-500)")
-            page.screenshot(path=str(OUT/("daily-more-"+str(width)+".png")))
-            report["screenshots"].append("daily-more-"+str(width)+".png")
-            page.locator('#archiveReviewNotice button').click()
-            page.locator('[data-archive-action="announcement"]').click()
-            shot(page,"announcement-"+str(width))
-            assert page.locator("#archiveExperienceModal .ax-modal").evaluate("(e)=>e.scrollWidth<=e.clientWidth")
-            page.keyboard.press("Escape")
-            if width==390:
-                # A local presentation fixture through the real Tajenka store; no result submission.
-                tajenka_before=page.evaluate("structuredClone(tajenkaState())")
-                seeded=page.evaluate("""()=>{
-                  if(!tajenkaPuzzle)return false;
-                  const state=tajenkaState(),puzzle=tajenkaPuzzle,completion={puzzleId:puzzle.id,found:puzzle.answers.map((answer,index)=>({answerIndex:index,word:answer.word,path:[...answer.path],colorIndex:index%COLORS.length})),moves:puzzle.answers.length,hints:0,elapsedMs:180000,completedAt:new Date().toISOString(),rewarded:true,rewardXp:Number(puzzle.meta?.rewardXp)||200};
-                  state.version=2;state.completions={...(state.completions||{}),[puzzle.id]:completion};state.completed=completion;delete state.inProgress;saveTajenkaState(state);renderTajenkaEntry();renderFree();return true;
-                }""")
-                if seeded:
-                    for view in ["daily","free"]:
-                        go(page,view);page.wait_for_timeout(250);overflow(page,view+"-tajenka-completed",width)
-                        discovery_audit(page,view,width);shot(page,view+"-tajenka-completed-390")
-                    free_order_audit(page,width)
-                    report["checks"].append({"completedTajenkaPresentation":"PASS"})
-                else:report["checks"].append({"completedTajenkaPresentation":"SKIP: published Tajenka unavailable"})
-                page.evaluate("state=>{saveTajenkaState(state);renderTajenkaEntry();renderFree();}",tajenka_before)
-                if seeded:
-                    # The exact-clone adapter must forward its real play button after IDs are removed.
-                    go(page,"free")
-                    page.locator('#tajenkaPlayCard [data-tajenka-clone-play]').click()
-                    page.wait_for_selector('#screen-game.active')
-                    assert page.evaluate("currentGame.mode==='tajenka' && currentGame.puzzle.id===tajenkaPuzzle.id")
-                    # First entry opens native rules. Back would dismiss that modal first.
-                    if page.locator('#tajenkaRulesModal').is_visible():page.locator('#tajenkaRulesDone').click()
-                    page.locator('#backFromGame').click()
-                    page.wait_for_function("currentScreen!=='game'")
-                    report["checks"].append({"clonedTajenkaPlayAndBack":"PASS"})
-            go(page,"archive")
-            page.locator("#axSearch").fill("88");assert page.locator('[data-archive-board="g3-e-088"]').count()==1
-            page.locator('[data-archive-board="g3-e-088"]').click()
-            assert "Čeká na tebe 15 XP" in page.locator("#archiveExperienceModal").inner_text()
-            page.keyboard.press("Escape")
-            assert page.locator('[data-archive-board="g3-e-088"]').evaluate("(e)=>document.activeElement===e")
-            page.locator("#axSearch").fill("")
-            page.locator('[data-archive-diff="hardcore"]').click()
-            assert "+100 XP" in page.locator("#axBoardResults").inner_text()
-            assert page.locator('[data-archive-diff="hardcore"] strong').inner_text()=="Mozkožrout"
-            assert "Hardcore" not in page.locator("#screen-archive").inner_text()
-            shot(page,"archive-mozkozrout-"+str(width))
-            page.locator('[data-archive-filter="reward"]').click();assert page.locator(".ax-board.ax-paid").count()==0
-            page.locator('[data-archive-filter="all"]').click();page.locator('[data-archive-diff="easy"]').click()
-            if width==320:
-                page.set_viewport_size({"width":390,"height":950})
-                bank=page.evaluate("PropletArchiveExperience.loadBank()")
-                assert len(bank["boards"])==800 and bank["completeCovers"]==879
-                contract=page.evaluate("""async()=>{const bank=await PropletArchiveExperience.loadBank();let count=0;for(const r of bank.boards){const c=PropletArchiveSolutions.create(r.puzzle,r.solutions);for(const cover of r.solutions.solutionSets){let s=c.emptyState();for(const a of cover){const out=c.submit(s,a.word,a.path);if(!out.accepted)throw Error(r.puzzle.id+': '+out.reason);s=out.state;}if(!c.evaluate(s).completed)throw Error('incomplete');count++;}}return count;}""")
-                report["checks"].append({"approvedCovers":contract})
-                # Newer completion at easy slot 20 must not suppress this historical award.
-                assert page.evaluate("freeProgress('easy').done")>=20
-                before=page.evaluate("freeProgress('easy').done")
-                page.locator('[data-archive-board="g3-e-020"]').click();page.locator('[data-archive-start="g3-e-020"]').click()
-                page.wait_for_selector("#screen-game.active")
-                page.wait_for_timeout(350)
-                shot(page,"archive-game-390")
-                answers=page.evaluate("currentGame.puzzle.answers")
-                solve_word(page,answers[0])
-                assert page.evaluate("currentGame.found.length")==1
-                page.evaluate("goBackFromGame()");page.wait_for_selector("#screen-archive.active")
-                page.locator('[data-archive-board="g3-e-020"]').click();assert "Rozehráno" in page.locator("#archiveExperienceModal").inner_text()
-                page.locator('[data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
-                assert page.evaluate("currentGame.found.length")==1
-                # Fold viewport changes only presentation.
-                page.set_viewport_size({"width":690,"height":950});page.wait_for_timeout(150)
-                assert page.evaluate("currentGame.puzzle.id")=="g3-e-020" and page.evaluate("currentGame.found.length")==1
-                page.set_viewport_size({"width":390,"height":950});page.wait_for_timeout(150)
-                for a in answers[1:]:solve_word(page,a)
-                page.wait_for_selector("#winModal:not(.hidden)",timeout=10000)
-                assert "+15 XP" in page.locator("#winXp").inner_text()
-                assert page.evaluate("freeProgress('easy').done")==before
-                shot(page,"archive-result-390")
-                page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
-                page.locator('[data-archive-board="g3-e-020"]').click();assert "Odměna už je tvoje" in page.locator("#archiveExperienceModal").inner_text()
-                page.locator('[data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
-                for a in answers:solve_word(page,a)
-                page.wait_for_selector("#winModal:not(.hidden)")
-                assert "+0 XP" in page.locator("#winXp").inner_text()
-                page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
-                # Approved VRTÍ alternative goes through actual input and restore.
-                page.locator('[data-archive-board="g3-e-009"]').click();page.locator('[data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
-                alt=next(r for r in bank["boards"] if r["puzzle"]["id"]=="g3-e-009")["solutions"]["solutionSets"][1]
-                solve_word(page,next(a for a in alt if a["word"]=="VRTÍ"))
-                assert page.evaluate("currentGame.found[0].word")=="VRTÍ"
-                page.evaluate("applySmartHint(2)")
-                page.evaluate("goBackFromGame()");page.wait_for_selector("#screen-archive.active")
-                page.locator('[data-archive-board="g3-e-009"]').click();page.locator('[data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
-                assert page.evaluate("currentGame.found[0].word")=="VRTÍ"
-                assert page.evaluate("currentGame.archiveHints.length")==1
-                for a in alt:
-                    if a["word"]!="VRTÍ":solve_word(page,a)
-                page.wait_for_selector("#winModal:not(.hidden)")
-                assert "+0 XP" in page.locator("#winXp").inner_text()
-                page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
-                # Verify canonical history/order controls and the weekly team entry.
-                go(page,"free")
-                assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
-                # Ordering still uses the canonical store/settings, without another modal on Hrát.
-                page.evaluate("changeFreeOrder('easy','numeric')")
-                page.wait_for_function("freeOrder().record('easy').mode==='numeric'")
-                page.evaluate("changeFreeOrder('easy','varied')")
-                page.wait_for_function("freeOrder().record('easy').mode==='varied'")
-                page.locator('[data-played-levels="easy"]').click()
-                page.wait_for_selector("#playedLevelsModal:not(.hidden)")
-                page.locator("#closePlayedLevelsModal").click()
-                go(page,"daily")
-                page.locator('[data-archive-action="team"]').click()
-                page.wait_for_timeout(250)
-                assert page.locator('[data-ranking-xp-scope="teams"]').get_attribute("class").find("active")>=0
-                assert page.locator('[data-ranking-period="week"]').get_attribute("class").find("active")>=0
-                report["checks"].append({"catalogueOrder":"PASS","levels":"PASS","weeklyTeamEntry":"PASS"})
-                report["checks"].append({"actualGame":"PASS","resume":"PASS","foldResize":"PASS","xpOnce":"PASS","newerDoesNotBlockHistorical":"PASS","alternativeAndHintRestore":"PASS","modernProgressUnchanged":before})
-            if width==390:
-                # Separate local namespaces; native handlers. No server reward assertion.
-                for extra in ["hardcore","mozkomor","mozkokalypsa"]:
-                    scenario(page,{"extra":extra,"referral":"invite"})
-                    page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').click()
-                    page.wait_for_timeout(200)
-                    assert page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').get_attribute('aria-pressed')=="true"
-                    overflow(page,"extra-"+extra,390);shot(page,"daily-extra-"+extra+"-390")
-                    if extra=="hardcore":
-                        page.locator("#playDailyBtn").click()
-                        page.wait_for_selector("#screen-game.active")
-                        assert page.evaluate("currentGame.mode==='daily_special' && currentGame.puzzle.difficulty==='hardcore'")
-                        for answer in page.evaluate("currentGame.puzzle.answers"):solve_word(page,answer)
-                        compact_result(page,"extra-compact-result-390")
-                        assert "+100 XP" in page.locator("#winXp").inner_text()
-                        page.locator("#winMenuBtn").click()
-                    report["checks"].append({"nativeExtraScenario":extra,"result":"PASS"})
-                for referral in ["progress","earned"]:
-                    scenario(page,{"extra":"live","referral":referral})
-                    page.wait_for_selector("#referralHome")
-                    page.wait_for_function("PropletReferrals.model.ready")
-                    text=page.locator("#referralHome").inner_text()
-                    assert "1 000 XP" in text
-                    if referral=="earned":
-                        assert page.locator("#referralHome .ref-reward small").count()==0
-                        assert page.locator("#referralInviteHome [data-ref-open]").is_visible()
-                    overflow(page,"referral-"+referral,390);shot(page,"daily-referral-"+referral+"-390")
-                    report["checks"].append({"nativeReferralScenario":referral,"result":"PASS"})
-                scenario(page,{"reset":True})
-            if width==320:
-                # Actual native free-game result; archive completion override is absent.
-                page.set_viewport_size({"width":390,"height":950})
-                go(page,"free")
-                page.locator('#difficultyCards .cp-card[data-diff="easy"] .cp-play').click()
-                page.wait_for_selector("#screen-game.active")
-                assert page.evaluate("currentGame.mode==='free' && !currentGame.puzzle.meta?.archiveExperience")
-                for answer in page.evaluate("currentGame.puzzle.answers"):solve_word(page,answer)
-                compact_result(page,"free-compact-result-390")
-                assert page.locator("#winPrimaryBtn").inner_text()=="Hraj další úroveň"
-                page.locator("#winMenuBtn").click()
-                page.set_viewport_size({"width":320,"height":950})
-            if width in [320,390,690,1440]:
-                page.set_viewport_size({"width":width,"height":950})
-                page.locator('#archiveReviewNotice button').click();page.locator('[data-archive-action="theme"]').click();page.keyboard.press("Escape")
-                go(page,"daily");discovery_audit(page,"daily",width);overflow(page,"daily-dark",width);shot(page,"daily-dark-"+str(width));go(page,"free");discovery_audit(page,"free",width);overflow(page,"free-dark",width);shot(page,"free-dark-"+str(width))
-                contrast=page.locator('#difficultyCards .cp-play').evaluate_all("""buttons=>{
-                  const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
-                  return buttons.map(button=>{const c=getComputedStyle(button),a=luminance(c.color),b=luminance(c.backgroundColor);return {difficulty:button.closest('[data-diff]').dataset.diff,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};});
-                }""")
-                assert all(item['ratio']>=4.5 for item in contrast),contrast
-                report['checks'].append({'width':width,'darkButtonContrast':contrast});go(page,"archive");shot(page,"archive-dark-"+str(width))
-            assert page.evaluate("navigator.serviceWorker.getRegistrations().then(r=>r.length)")==0
-            report["checks"].append({"width":width,"result":"PASS"})
-            context.close()
-        # Capture the actual production frontend with a synthetic local profile.
-        # Intercept every write before the network; no production account is used.
-        for width in [320,390,690,1440]:
-            baseline=browser.new_context(viewport={"width":width,"height":950},device_scale_factor=1,reduced_motion="reduce")
-            bp=baseline.new_page();bp.set_default_timeout(12000)
-            isolation=(ROOT/"public/app/archive/preview-isolation.js").read_text()
-            def production_route(route):
-                req=route.request
-                if req.method not in ["GET","HEAD"]:
-                    route.fulfill(status=403,body="Read-only visual reference");return
-                if req.is_navigation_request() and req.url.rstrip("/")=="https://hrajproplet.cz":
-                    response=route.fetch()
-                    html=response.text().replace("<head>","<head><script>document.documentElement.setAttribute('data-archive-preview','');"+isolation+"</script>",1)
-                    route.fulfill(response=response,body=html);return
-                route.continue_()
-            baseline.route("**/*",production_route)
+    p=sync_playwright().start()
+    browser=p.chromium.launch()
+    for width in [390,690,1440,320]:
+        context=browser.new_context(viewport={"width":width,"height":950},device_scale_factor=1,reduced_motion="reduce")
+        page=context.new_page();page.set_default_timeout(12000)
+        def capture_error(err):
+            report["pageErrors"].append(err.stack or str(err))
             try:
-                bp.goto("https://hrajproplet.cz/",wait_until="networkidle",timeout=30000)
-                bp.wait_for_function("typeof nav==='function' && typeof puzzleDB!=='undefined' && Boolean(puzzleDB?.free)",timeout=20000)
-                bp.evaluate("window.__PROPLET_REVEAL_CURRENT_UI?.();nav('free',{replace:true})")
-                bp.wait_for_timeout(500)
-                bp.wait_for_selector("#difficultyCards .cp-card")
-                bp.evaluate("document.fonts.ready")
-                bp.wait_for_timeout(500)
-                for theme in ["light","dark"]:
-                    bp.evaluate("theme=>applyTheme(theme,{persist:true})",theme)
-                    for view in ["daily","free"]:
-                        bp.evaluate("view=>nav(view,{replace:true})",view)
-                        bp.wait_for_timeout(200)
-                        shot(bp,"production-"+view+"-"+theme+"-"+str(width))
-                report["checks"].append({"productionVisualReference":width,"version":bp.evaluate("window.PROPLET_RUNTIME_META?.version")})
-            except Exception as e:
-                report.setdefault("productionReferenceErrors",[]).append({"error":str(e),"text":bp.locator("body").inner_text()[:2000]})
-            baseline.close()
-        browser.close()
+                report["failureText"]=page.locator("body").inner_text()[:9000]
+                shot(page,"runtime-error")
+            except:pass
+        page.on("pageerror",capture_error)
+        page.on("request",lambda req:report["networkWrites"].append({"url":req.url,"method":req.method}) if req.method not in ["GET","HEAD"] else None)
+        page.goto("http://127.0.0.1:8765/?archive-preview=1",wait_until="networkidle")
+        ready(page)
+        no_monthly(page)
+        shot(page,"initial-"+str(width))
+        assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
+        discovery={}
+        for view in ["daily","free","archive"]:
+            go(page,view);overflow(page,view,width);shot(page,view+"-"+str(width))
+            if view in ["daily","free"]:discovery[view]=discovery_audit(page,view,width)
+        go(page,"free")
+        typography=[{key:card[key] for key in ["id","font","size","weight"]} for cards in discovery.values() for card in cards]
+        assert len({(t["font"],t["weight"]) for t in typography})==1,typography
+        free_order_audit(page,width)
+        assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
+        go(page,"daily")
+        assert page.locator("#axHomeFree .ax-free-difficulty").count()==4
+        assert "Ve hře jste spolu" not in page.locator("#screen-daily").inner_text()
+        report["checks"].append({"width":width,"typography":typography,"fourCanonicalIcons":"PASS","noDuplicateCardControls":"PASS"})
+        page.evaluate("window.scrollTo(0,document.querySelector(\'#axHomeFree\').getBoundingClientRect().top+scrollY-500)")
+        page.screenshot(path=str(OUT/("daily-more-"+str(width)+".png")))
+        report["screenshots"].append("daily-more-"+str(width)+".png")
+        page.locator('#archiveReviewNotice button').click()
+        page.locator('[data-archive-action="announcement"]').click()
+        shot(page,"announcement-"+str(width))
+        assert page.locator("#archiveExperienceModal .ax-modal").evaluate("(e)=>e.scrollWidth<=e.clientWidth")
+        page.keyboard.press("Escape")
+        if width==390:
+            # A local presentation fixture through the real Tajenka store; no result submission.
+            tajenka_before=page.evaluate("structuredClone(tajenkaState())")
+            seeded=page.evaluate("""()=>{
+              if(!tajenkaPuzzle)return false;
+              const state=tajenkaState(),puzzle=tajenkaPuzzle,completion={puzzleId:puzzle.id,found:puzzle.answers.map((answer,index)=>({answerIndex:index,word:answer.word,path:[...answer.path],colorIndex:index%COLORS.length})),moves:puzzle.answers.length,hints:0,elapsedMs:180000,completedAt:new Date().toISOString(),rewarded:true,rewardXp:Number(puzzle.meta?.rewardXp)||200};
+              state.version=2;state.completions={...(state.completions||{}),[puzzle.id]:completion};state.completed=completion;delete state.inProgress;saveTajenkaState(state);renderTajenkaEntry();renderFree();return true;
+            }""")
+            if seeded:
+                for view in ["daily","free"]:
+                    go(page,view);page.wait_for_timeout(250);overflow(page,view+"-tajenka-completed",width)
+                    discovery_audit(page,view,width);shot(page,view+"-tajenka-completed-390")
+                free_order_audit(page,width)
+                report["checks"].append({"completedTajenkaPresentation":"PASS"})
+            else:report["checks"].append({"completedTajenkaPresentation":"SKIP: published Tajenka unavailable"})
+            page.evaluate("state=>{saveTajenkaState(state);renderTajenkaEntry();renderFree();}",tajenka_before)
+            if seeded:
+                # The exact-clone adapter must forward its real play button after IDs are removed.
+                go(page,"free")
+                page.locator('#tajenkaPlayCard [data-tajenka-clone-play]').click()
+                page.wait_for_selector('#screen-game.active')
+                assert page.evaluate("currentGame.mode==='tajenka' && currentGame.puzzle.id===tajenkaPuzzle.id")
+                # First entry opens native rules. Back would dismiss that modal first.
+                if page.locator('#tajenkaRulesModal').is_visible():page.locator('#tajenkaRulesDone').click()
+                page.locator('#backFromGame').click()
+                page.wait_for_function("currentScreen!=='game'")
+                report["checks"].append({"clonedTajenkaPlayAndBack":"PASS"})
+        go(page,"archive")
+        page.locator("#axSearch").fill("88");assert page.locator('[data-archive-board="g3-e-088"]').count()==1
+        page.locator('[data-archive-board="g3-e-088"]').click()
+        assert "Čeká na tebe 15 XP" in page.locator("#archiveExperienceModal").inner_text()
+        page.keyboard.press("Escape")
+        assert page.locator('[data-archive-board="g3-e-088"]').evaluate("(e)=>document.activeElement===e")
+        page.locator("#axSearch").fill("")
+        page.locator('[data-archive-diff="hardcore"]').click()
+        assert "+100 XP" in page.locator("#axBoardResults").inner_text()
+        assert page.locator('[data-archive-diff="hardcore"] strong').inner_text()=="Mozkožrout"
+        assert "Hardcore" not in page.locator("#screen-archive").inner_text()
+        shot(page,"archive-mozkozrout-"+str(width))
+        page.locator('[data-archive-filter="reward"]').click();assert page.locator(".ax-board.ax-paid").count()==0
+        page.locator('[data-archive-filter="all"]').click();page.locator('[data-archive-diff="easy"]').click()
+        if width==320:
+            page.set_viewport_size({"width":390,"height":950})
+            bank=page.evaluate("PropletArchiveExperience.loadBank()")
+            assert len(bank["boards"])==800 and bank["completeCovers"]==879
+            contract=page.evaluate("""async()=>{const bank=await PropletArchiveExperience.loadBank();let count=0;for(const r of bank.boards){const c=PropletArchiveSolutions.create(r.puzzle,r.solutions);for(const cover of r.solutions.solutionSets){let s=c.emptyState();for(const a of cover){const out=c.submit(s,a.word,a.path);if(!out.accepted)throw Error(r.puzzle.id+': '+out.reason);s=out.state;}if(!c.evaluate(s).completed)throw Error('incomplete');count++;}}return count;}""")
+            report["checks"].append({"approvedCovers":contract})
+            # Newer completion at easy slot 20 must not suppress this historical award.
+            assert page.evaluate("freeProgress('easy').done")>=20
+            before=page.evaluate("freeProgress('easy').done")
+            page.locator('[data-archive-board="g3-e-020"]').click();page.locator('[data-archive-start="g3-e-020"]').click()
+            page.wait_for_selector("#screen-game.active")
+            page.wait_for_timeout(350)
+            shot(page,"archive-game-390")
+            answers=page.evaluate("currentGame.puzzle.answers")
+            solve_word(page,answers[0])
+            assert page.evaluate("currentGame.found.length")==1
+            page.evaluate("goBackFromGame()");page.wait_for_selector("#screen-archive.active")
+            page.locator('[data-archive-board="g3-e-020"]').click();assert "Rozehráno" in page.locator("#archiveExperienceModal").inner_text()
+            page.locator('[data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
+            assert page.evaluate("currentGame.found.length")==1
+            # Fold viewport changes only presentation.
+            page.set_viewport_size({"width":690,"height":950});page.wait_for_timeout(150)
+            assert page.evaluate("currentGame.puzzle.id")=="g3-e-020" and page.evaluate("currentGame.found.length")==1
+            page.set_viewport_size({"width":390,"height":950});page.wait_for_timeout(150)
+            for a in answers[1:]:solve_word(page,a)
+            page.wait_for_selector("#winModal:not(.hidden)",timeout=10000)
+            assert "+15 XP" in page.locator("#winXp").inner_text()
+            assert page.evaluate("freeProgress('easy').done")==before
+            shot(page,"archive-result-390")
+            page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
+            page.locator('[data-archive-board="g3-e-020"]').click();assert "Odměna už je tvoje" in page.locator("#archiveExperienceModal").inner_text()
+            page.locator('[data-archive-start="g3-e-020"]').click();page.wait_for_selector("#screen-game.active")
+            for a in answers:solve_word(page,a)
+            page.wait_for_selector("#winModal:not(.hidden)")
+            assert "+0 XP" in page.locator("#winXp").inner_text()
+            page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
+            # Approved VRTÍ alternative goes through actual input and restore.
+            page.locator('[data-archive-board="g3-e-009"]').click();page.locator('[data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
+            alt=next(r for r in bank["boards"] if r["puzzle"]["id"]=="g3-e-009")["solutions"]["solutionSets"][1]
+            solve_word(page,next(a for a in alt if a["word"]=="VRTÍ"))
+            assert page.evaluate("currentGame.found[0].word")=="VRTÍ"
+            page.evaluate("applySmartHint(2)")
+            page.evaluate("goBackFromGame()");page.wait_for_selector("#screen-archive.active")
+            page.locator('[data-archive-board="g3-e-009"]').click();page.locator('[data-archive-start="g3-e-009"]').click();page.wait_for_selector("#screen-game.active")
+            assert page.evaluate("currentGame.found[0].word")=="VRTÍ"
+            assert page.evaluate("currentGame.archiveHints.length")==1
+            for a in alt:
+                if a["word"]!="VRTÍ":solve_word(page,a)
+            page.wait_for_selector("#winModal:not(.hidden)")
+            assert "+0 XP" in page.locator("#winXp").inner_text()
+            page.locator("#winMenuBtn").click();page.wait_for_selector("#screen-archive.active")
+            # Verify canonical history/order controls and the weekly team entry.
+            go(page,"free")
+            assert page.locator(".ax-order-link,.ax-level-link,.order-next").count()==0
+            # Ordering still uses the canonical store/settings, without another modal on Hrát.
+            page.evaluate("changeFreeOrder('easy','numeric')")
+            page.wait_for_function("freeOrder().record('easy').mode==='numeric'")
+            page.evaluate("changeFreeOrder('easy','varied')")
+            page.wait_for_function("freeOrder().record('easy').mode==='varied'")
+            page.locator('[data-played-levels="easy"]').click()
+            page.wait_for_selector("#playedLevelsModal:not(.hidden)")
+            page.locator("#closePlayedLevelsModal").click()
+            go(page,"daily")
+            page.locator('[data-archive-action="team"]').click()
+            page.wait_for_timeout(250)
+            assert page.locator('[data-ranking-xp-scope="teams"]').get_attribute("class").find("active")>=0
+            assert page.locator('[data-ranking-period="week"]').get_attribute("class").find("active")>=0
+            report["checks"].append({"catalogueOrder":"PASS","levels":"PASS","weeklyTeamEntry":"PASS"})
+            report["checks"].append({"actualGame":"PASS","resume":"PASS","foldResize":"PASS","xpOnce":"PASS","newerDoesNotBlockHistorical":"PASS","alternativeAndHintRestore":"PASS","modernProgressUnchanged":before})
+        if width==390:
+            # Separate local namespaces; native handlers. No server reward assertion.
+            for extra in ["hardcore","mozkomor","mozkokalypsa"]:
+                scenario(page,{"extra":extra,"referral":"invite"})
+                page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').click()
+                page.wait_for_timeout(200)
+                assert page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').get_attribute('aria-pressed')=="true"
+                overflow(page,"extra-"+extra,390);shot(page,"daily-extra-"+extra+"-390")
+                if extra=="hardcore":
+                    page.locator("#playDailyBtn").click()
+                    page.wait_for_selector("#screen-game.active")
+                    assert page.evaluate("currentGame.mode==='daily_special' && currentGame.puzzle.difficulty==='hardcore'")
+                    for answer in page.evaluate("currentGame.puzzle.answers"):solve_word(page,answer)
+                    compact_result(page,"extra-compact-result-390")
+                    assert "+100 XP" in page.locator("#winXp").inner_text()
+                    page.locator("#winMenuBtn").click()
+                report["checks"].append({"nativeExtraScenario":extra,"result":"PASS"})
+            for referral in ["progress","earned"]:
+                scenario(page,{"extra":"live","referral":referral})
+                page.wait_for_selector("#referralHome")
+                page.wait_for_function("PropletReferrals.model.ready")
+                text=page.locator("#referralHome").inner_text()
+                assert "1 000 XP" in text
+                if referral=="earned":
+                    assert page.locator("#referralHome .ref-reward small").count()==0
+                    assert page.locator("#referralInviteHome [data-ref-open]").is_visible()
+                overflow(page,"referral-"+referral,390);shot(page,"daily-referral-"+referral+"-390")
+                report["checks"].append({"nativeReferralScenario":referral,"result":"PASS"})
+            scenario(page,{"reset":True})
+        if width==320:
+            # Actual native free-game result; archive completion override is absent.
+            page.set_viewport_size({"width":390,"height":950})
+            go(page,"free")
+            page.locator('#difficultyCards .cp-card[data-diff="easy"] .cp-play').click()
+            page.wait_for_selector("#screen-game.active")
+            assert page.evaluate("currentGame.mode==='free' && !currentGame.puzzle.meta?.archiveExperience")
+            for answer in page.evaluate("currentGame.puzzle.answers"):solve_word(page,answer)
+            compact_result(page,"free-compact-result-390")
+            assert page.locator("#winPrimaryBtn").inner_text()=="Hraj další úroveň"
+            page.locator("#winMenuBtn").click()
+            page.set_viewport_size({"width":320,"height":950})
+        if width in [320,390,690,1440]:
+            page.set_viewport_size({"width":width,"height":950})
+            page.locator('#archiveReviewNotice button').click();page.locator('[data-archive-action="theme"]').click();page.keyboard.press("Escape")
+            go(page,"daily");discovery_audit(page,"daily",width);overflow(page,"daily-dark",width);shot(page,"daily-dark-"+str(width));go(page,"free");discovery_audit(page,"free",width);overflow(page,"free-dark",width);shot(page,"free-dark-"+str(width))
+            contrast=page.locator('#difficultyCards .cp-play').evaluate_all("""buttons=>{
+              const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
+              return buttons.map(button=>{const c=getComputedStyle(button),a=luminance(c.color),b=luminance(c.backgroundColor);return {difficulty:button.closest('[data-diff]').dataset.diff,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};});
+            }""")
+            assert all(item['ratio']>=4.5 for item in contrast),contrast
+            report['checks'].append({'width':width,'darkButtonContrast':contrast});go(page,"archive");shot(page,"archive-dark-"+str(width))
+        assert page.evaluate("navigator.serviceWorker.getRegistrations().then(r=>r.length)")==0
+        report["checks"].append({"width":width,"result":"PASS"})
+        context.close()
+    # Capture the actual production frontend with a synthetic local profile.
+    # Intercept every write before the network; no production account is used.
+    for width in [320,390,690,1440]:
+        baseline=browser.new_context(viewport={"width":width,"height":950},device_scale_factor=1,reduced_motion="reduce")
+        bp=baseline.new_page();bp.set_default_timeout(12000)
+        isolation=(ROOT/"public/app/archive/preview-isolation.js").read_text()
+        def production_route(route):
+            req=route.request
+            if req.method not in ["GET","HEAD"]:
+                route.fulfill(status=403,body="Read-only visual reference");return
+            if req.is_navigation_request() and req.url.rstrip("/")=="https://hrajproplet.cz":
+                response=route.fetch()
+                html=response.text().replace("<head>","<head><script>document.documentElement.setAttribute('data-archive-preview','');"+isolation+"</script>",1)
+                route.fulfill(response=response,body=html);return
+            route.continue_()
+        baseline.route("**/*",production_route)
+        try:
+            bp.goto("https://hrajproplet.cz/",wait_until="networkidle",timeout=30000)
+            bp.wait_for_function("typeof nav==='function' && typeof puzzleDB!=='undefined' && Boolean(puzzleDB?.free)",timeout=20000)
+            bp.evaluate("window.__PROPLET_REVEAL_CURRENT_UI?.();nav('free',{replace:true})")
+            bp.wait_for_timeout(500)
+            bp.wait_for_selector("#difficultyCards .cp-card")
+            bp.evaluate("document.fonts.ready")
+            bp.wait_for_timeout(500)
+            for theme in ["light","dark"]:
+                bp.evaluate("theme=>applyTheme(theme,{persist:true})",theme)
+                for view in ["daily","free"]:
+                    bp.evaluate("view=>nav(view,{replace:true})",view)
+                    bp.wait_for_timeout(200)
+                    shot(bp,"production-"+view+"-"+theme+"-"+str(width))
+            report["checks"].append({"productionVisualReference":width,"version":bp.evaluate("window.PROPLET_RUNTIME_META?.version")})
+        except Exception as e:
+            report.setdefault("productionReferenceErrors",[]).append({"error":str(e),"text":bp.locator("body").inner_text()[:2000]})
+        baseline.close()
+    browser.close()
     assert not report["layoutIssues"],report["layoutIssues"]
     assert not report["pageErrors"],report["pageErrors"]
     assert not report["networkWrites"],report["networkWrites"]
@@ -370,6 +370,8 @@ except Exception as e:
     try:shot(page,"failure");report["failureText"]=page.locator("body").inner_text()[:9000]
     except:pass
 finally:
+    try: browser.close(); p.stop()
+    except: pass
     server.shutdown()
     (OUT/"report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
     print(json.dumps(report,ensure_ascii=False))
