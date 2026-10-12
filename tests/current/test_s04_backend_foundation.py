@@ -191,6 +191,7 @@ def _dump(model, **kwargs):
 
 
 assert _dump(server.PlayerCreate, name=" Pavel ") == {
+    "inviteCode": None,
     "name": " Pavel ",
     "family_code": None,
     "password": None,
