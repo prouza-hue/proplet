@@ -29,21 +29,23 @@ Banka má 36 desek (12 na obtížnost), dvě nezávislá ověření jedinečnéh
 - Databáze: existující testovací projekt `eanzztstmwlamwfdskbf`; žádné produkční zápisy.
 - Datum: středa `2026-10-21`, shodně na základní Daily, bonusu i serverových výsledcích. Herní čas používá skutečné hodiny.
 - Změna data funguje pouze na této větvi, ve Vercel preview a s přesnou testovací databází. Ostatní kombinace při startu selžou.
-- Manifest banky je stále `candidate`; produkční runtime ho nepřijme. SQL politika vzniká vypnutá.
+- Historické preview používalo candidate banku a zmrazený kalendář od 21. října. Schválená produkční banka je `approved` a začíná 14. října. SQL politika vzniká vypnutá.
 - Plné preview: <https://proplet-fhqnx09ix-pavel-prouzas-projects.vercel.app/>. Na prvním vstupu lze přeskočit trénink; na Dnes se bonus vybere přes **Extra**.
 - Ověřený aplikační commit: `b292bfc2d1a67dab59281c2445a52d4ceffca4cf`, deployment `dpl_2KAphwgY1MegNhUsfEgRdbwxWMia`.
 - PR: <https://github.com/prouza-hue/proplet/pull/193>. Navazuje na obsahové PR #192; všechny nové desky jsou součástí integrované větve.
 - Finální browser QA: <https://github.com/prouza-hue/proplet/actions/runs/38221010704>. Souhrn a skutečné screenshoty jsou v `docs/daily-specials-preview/`.
 
-## Kandidátní kalendář
+## Schválený produkční kalendář
 
-Začátek týdne je navržen na pondělí **19. října 2026**. První bonus je ve středu 21. října. Poslední z 36 výzev vychází na neděli **10. ledna 2027**. Aktivní základní Daily banka pokrývá tento interval až do 14. ledna. Kalendář je v privátní bance a SQL shodný; zveřejněná identita se později nesmí posunout ani znovu použít.
+Začátek produkčního kalendáře je pondělí **12. října 2026**. První Extra je ve středu **14. října** (Mozkožrout). Poslední z 36 výzev vychází na neděli **3. ledna 2027**. Aktivní základní Daily banka pokrývá tento interval až do 14. ledna. Dosud nezveřejněný produkční kalendář byl při schválení posunut o týden dříve. Desky, puzzle ID a obsahové hashe se nezměnily. Kalendář je v privátní bance a SQL shodný; zveřejněná identita se později nesmí posunout ani znovu použít.
 
-## Nasazení po závěrečném pokynu uživatele
+Další výroba musí zahrnout základní i Extra banku. Extra navázat bez mezery od týdne 4. ledna; základní Daily končí 14. ledna. Pracovní připomínka pro doplnění má vycházet z dřívějšího konce Extra, ideálně nejpozději 20. prosince.
+
+## Postup schváleného nasazení
 
 1. Ověřit aktuální produkční SHA a proti němu připravený PR, aktuální zálohu a shodu nových 36 bindingů v JSON/SQL. Pokud se termín schválení posune za první datum, před aktivací znovu sestavit celý dosud nezveřejněný kalendář; nesmějí se měnit už publikované bindingy.
 2. Aplikovat `SUPABASE_MIGRATION_DAILY_SPECIALS_20261012.sql` (totožná CLI migrace `supabase/migrations/20261012000339_daily_specials.sql`). Je aditivní a sama feature nezapne. Základní atomické result/session funkce se nepřepisují.
-3. Po schválení obsahu nastavit pouze stav privátního manifestu na `approved` (desky, jejich hashe a datumové bindingy zůstávají shodné), dokončit release commit a přepnout `PROPLET_DAILY_SPECIALS_ENABLED=true` v produkčním prostředí.
+3. Schválený privátní manifest je `approved`. Obsah a hashe desek zůstávají beze změn; před vydáním byly pouze přepočítány datumové bindingy na týden od 12. října. Dokončit release commit a přepnout `PROPLET_DAILY_SPECIALS_ENABLED=true` v produkčním prostředí.
 4. V produkční SQL politice musí být `preview_date=null`; teprve po ověření připravených bindingů nastavit `enabled=true`. Datumové preview proměnné do produkce nepatří.
 5. Sloučit schválený release do `main` a sestavit produkční deployment jako verzi 4.06.0. Izolovaný preview deployment se přímo nepromuje: jeho větev a datum mají výslovnou bezpečnostní závoru. Ověřit `/api/health`, denní API, zavřený přístup k budoucím deskám, Dnes na mobilu a základní Daily. Před prvním datem musí bonus zůstat nedostupný.
 
@@ -66,4 +68,4 @@ Finální výsledek je **PASS**: 146 aktuálních testů, izolované PostgreSQL 
 | 768 px | 217,016 px | 217,016 px | 217,016 px | 0 px |
 | 1280 px | 245 px | 245 px | 245 px | 0 px |
 
-Produkční `main` při dokončení preview stále ukazuje na `d1f5f7825e07d7e8a1751de7075914278d3de8bb`; produkční tabulka politiky speciálů dosud neexistuje. Verze 4.06.0, její schválení banky a aktivace produkční SQL politiky čekají na závěrečný pokyn uživatele.
+Produkční `main` při dokončení preview stále ukazuje na `d1f5f7825e07d7e8a1751de7075914278d3de8bb`; produkční tabulka politiky speciálů dosud neexistuje. Uživatel 12. 10. 2026 schválil textaci a výslovně požádal o produkční nasazení. Dolní odstavec v týdenním přehledu je odstraněný; zbývající odstavec končí „dobrovolně a za 100 XP.“

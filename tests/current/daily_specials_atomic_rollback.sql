@@ -8,8 +8,8 @@ declare
  cmd jsonb; base_cmd jsonb; response jsonb; retry jsonb; stats jsonb; aggregate_stats jsonb; stats_key text;
  stamp timestamptz:=clock_timestamp(); failed boolean;
 begin
- update public.daily_specials_policy set enabled=true,preview_date='2026-10-21' where singleton;
- select * into b from public.daily_special_bindings where daily_date='2026-10-21';
+ update public.daily_specials_policy set enabled=true,preview_date='2026-10-14' where singleton;
+ select * into b from public.daily_special_bindings where daily_date='2026-10-14';
  insert into public.players(id,name,family_code,token_hash,public_rankings)
  values(p,'Special SQL rollback','SOLO_SPECIAL_QA',repeat('0',64),false);
  perform public.proplet_play_session_v1('p:'||p::text,p,b.challenge_key,b.puzzle_id,'daily_special',attempt,owner_id,1,'open',
@@ -22,7 +22,7 @@ begin
    'dailyDate',b.daily_date::text,'completedAt',stamp,'elapsedMs',60000,'moves',30,'hintsUsed',0,
    'wrongAttempts',0,'maxHintLevel',0,'cleanSolve',true,'calmMode',false,'attemptId',attempt,'points',100,
    'contentGeneration',6,'freeLevel',null,'legacyRewardSlot',null,'teamCodeAtCompletion',null,
-   'contentHash',b.content_hash,'specialPractice',false,'specialPreviewDate','2026-10-21');
+   'contentHash',b.content_hash,'specialPractice',false,'specialPreviewDate','2026-10-14');
  response:=public.proplet_submit_daily_special_v1(p,'attempt:'||attempt,repeat('a',64),repeat('b',64),cmd);
  if response->>'firstCompletion'<>'true' or (response->>'awardedPoints')::int<>100 then raise exception 'special first reward failed'; end if;
  retry:=public.proplet_submit_daily_special_v1(p,'attempt:'||attempt,repeat('a',64),repeat('b',64),cmd);
@@ -44,12 +44,12 @@ begin
  if (stats->>'dailyCompleted')::int<>0 or (stats->>'currentStreak')::int<>0 or (stats->>'dailySpecialCompleted')::int<>1 then
    raise exception 'special altered base streak'; end if;
  -- Base result on the same date has its independent once-only identity.
- perform public.proplet_play_session_v1('p:'||p::text,p,'daily:2026-10-21','g6-d-20261021','daily','base-'||attempt,owner_id,1,'open',
+ perform public.proplet_play_session_v1('p:'||p::text,p,'daily:2026-10-14','g6-d-20261014','daily','base-'||attempt,owner_id,1,'open',
    '{"elapsedMs":0,"hints":0,"maxHintLevel":0,"calmMode":false,"found":[]}');
- perform public.proplet_play_session_v1('p:'||p::text,p,'daily:2026-10-21','g6-d-20261021','daily','base-'||attempt,owner_id,2,'finish',
+ perform public.proplet_play_session_v1('p:'||p::text,p,'daily:2026-10-14','g6-d-20261014','daily','base-'||attempt,owner_id,2,'finish',
    '{"elapsedMs":60000,"hints":0,"maxHintLevel":0,"calmMode":false,"found":[]}');
  base_cmd:=cmd||jsonb_build_object('idempotencyKey','legacy:qa-base-'||p::text,'requestDigest',repeat('e',64),'commandDigest',repeat('f',64),
-   'puzzleId','g6-d-20261021','challengeKey','daily:2026-10-21','mode','daily','difficulty','medium','attemptId','base-'||attempt);
+   'puzzleId','g6-d-20261014','challengeKey','daily:2026-10-14','mode','daily','difficulty','medium','attemptId','base-'||attempt);
  retry:=public.proplet_submit_result_v1(p,'legacy:qa-base-'||p::text,repeat('e',64),repeat('f',64),base_cmd);
  if (retry->>'awardedPoints')::int<>100 then raise exception 'base first reward missing'; end if;
  if not (select timing_verified from public.results where player_id=p and mode='daily') then raise exception 'base timing unverified'; end if;

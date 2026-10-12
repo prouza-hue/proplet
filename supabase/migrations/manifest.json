@@ -513,7 +513,7 @@
       "path": "SUPABASE_MIGRATION_DAILY_SPECIALS_20261012.sql",
       "type": "migration",
       "status": "prepared-preview-only-production-disabled",
-      "sha256": "1573489b238baa01094c6f662c5440c4934271b07ce662165364071f53612e60",
+      "sha256": "d42e045d9824a4a99789037f18ce1d51851da36dd4add583d4ae44091b1694f1",
       "supersedes": [],
       "replaced_rpc_definitions": [
         "public.proplet_account_snapshot_v1",

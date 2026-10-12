@@ -17,19 +17,19 @@ class SpecialInvariants(unittest.TestCase):
     def setUp(self):
         self.source = json.loads((ROOT / "data/daily_specials_private.json").read_text())
         self.bank = DailySpecials(self.source, allow_candidate=True)
-        self.today = date(2026, 10, 21)
+        self.today = date(2026, 10, 14)
         self.binding = self.bank.binding(self.today.isoformat(), today=self.today)
 
     def test_candidate_cannot_become_production_by_flag(self):
         with self.assertRaises(DailyPackInvalid):
-            DailySpecials(self.source)
+            DailySpecials({**self.source, "status": "candidate"})
 
     def test_finite_calendar_has_no_modulo_fallback(self):
         self.assertEqual(len(self.bank._bindings), 36)
         self.assertIsNone(self.bank.binding("2027-01-13", today=date(2027,1,13)))
-        self.assertIsNone(self.bank.binding("2026-10-20", today=self.today))
+        self.assertIsNone(self.bank.binding("2026-10-13", today=self.today))
         with self.assertRaises(DailyUnavailable):
-            self.bank.binding("2026-10-23", today=self.today)
+            self.bank.binding("2026-10-16", today=self.today)
         self.assertIsNone(self.bank.puzzle_by_id("g6-ds-mozkomor-w01", today=self.today))
 
     def test_binding_rejects_content_and_difficulty_tampering(self):
@@ -41,7 +41,7 @@ class SpecialInvariants(unittest.TestCase):
             mutate(source)
             with self.assertRaises(DailyPackInvalid):
                 DailySpecials(source,allow_candidate=True)
-        for wrong in (f"daily:{self.today}",self.binding.challenge_key+":x","daily-special:2026-10-21:mozkomor"):
+        for wrong in (f"daily:{self.today}",self.binding.challenge_key+":x","daily-special:2026-10-14:mozkomor"):
             with self.assertRaises(DailyUnavailable):
                 self.bank.identity(challenge_key=wrong,puzzle_id=self.binding.puzzle_id,difficulty="hardcore",today=self.today)
 
@@ -65,15 +65,15 @@ class SpecialInvariants(unittest.TestCase):
             self.assertEqual(set(row),{"dailyDate","difficulty","status","challengeKind"})
 
     def test_offline_grace_needs_server_finished_release_day(self):
-        session={"created_at":"2026-10-21T18:00:00+02:00","last_seen":"2026-10-21T18:12:00+02:00",
+        session={"created_at":"2026-10-14T18:00:00+02:00","last_seen":"2026-10-14T18:12:00+02:00",
                  "finished":True,"verified":True}
-        now=datetime(2026,10,22,18,0,tzinfo=PRAGUE)
+        now=datetime(2026,10,15,18,0,tzinfo=PRAGUE)
         self.assertTrue(official_completion_allowed(self.binding,now=now,session=session))
         for changed in (None,{**session,"verified":False},{**session,"finished":False},
-                        {**session,"last_seen":"2026-10-22T00:01:00+02:00"},
-                        {**session,"created_at":"2026-10-20T23:00:00+02:00"}):
+                        {**session,"last_seen":"2026-10-15T00:01:00+02:00"},
+                        {**session,"created_at":"2026-10-13T23:00:00+02:00"}):
             self.assertFalse(official_completion_allowed(self.binding,now=now,session=changed))
-        self.assertFalse(official_completion_allowed(self.binding,now=datetime(2026,10,23,0,0,1,tzinfo=PRAGUE),session=session))
+        self.assertFalse(official_completion_allowed(self.binding,now=datetime(2026,10,16,0,0,1,tzinfo=PRAGUE),session=session))
 
     def test_midnight_and_dst_are_prague_calendar_exact(self):
         binding=self.bank.binding("2026-10-25",today=date(2026,10,25))
@@ -82,8 +82,8 @@ class SpecialInvariants(unittest.TestCase):
         self.assertEqual(binding.expires_at.hour,0)
 
     def test_special_and_base_same_day_are_two_challenges_one_streak(self):
-        base={"mode":"daily","daily_date":"2026-10-21","challenge_key":"daily:2026-10-21","points":100,"clean_solve":True}
-        special={"mode":"daily_special","daily_date":"2026-10-21","challenge_key":self.binding.challenge_key,"points":100,"clean_solve":True}
+        base={"mode":"daily","daily_date":"2026-10-14","challenge_key":"daily:2026-10-14","points":100,"clean_solve":True}
+        special={"mode":"daily_special","daily_date":"2026-10-14","challenge_key":self.binding.challenge_key,"points":100,"clean_solve":True}
         calculate=lambda rows: calculate_stats(rows,today=self.today,badges=[{"days":1,"name":"base"}],free_difficulties=("hardcore",))
         only=calculate([special])
         self.assertEqual((only["dailyCompleted"],only["currentStreak"],only["cleanDaily"],only["rescuedDays"]),(0,0,0,0))

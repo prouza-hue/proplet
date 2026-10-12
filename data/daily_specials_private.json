@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "status": "candidate",
+  "status": "approved",
   "timeZone": "Europe/Prague",
   "bankVersion": "daily-specials-gen6-36-v1",
-  "launchDate": "2026-10-19",
-  "activeUntil": "2027-01-10",
+  "launchDate": "2026-10-12",
+  "activeUntil": "2027-01-03",
   "puzzles": {
     "g6-ds-hardcore-w01": {
       "difficulty": "hardcore",
@@ -12661,13 +12661,40 @@
   },
   "bindings": [
     {
+      "dailyDate": "2026-10-14",
+      "bankVersion": "daily-specials-gen6-36-v1",
+      "challengeKey": "daily-special:2026-10-14:hardcore",
+      "weekday": 3,
+      "difficulty": "hardcore",
+      "puzzleId": "g6-ds-hardcore-w01",
+      "contentHash": "e1c580ae66e5338e28bfc58cbba4d49c0c31ea6ca75c53ee6288415fa7ba5b3e"
+    },
+    {
+      "dailyDate": "2026-10-16",
+      "bankVersion": "daily-specials-gen6-36-v1",
+      "challengeKey": "daily-special:2026-10-16:mozkomor",
+      "weekday": 5,
+      "difficulty": "mozkomor",
+      "puzzleId": "g6-ds-mozkomor-w01",
+      "contentHash": "a131f02ee2e9a93be8f633d1d57a5ed3849b26e9b0a665478b157d49a6c3232c"
+    },
+    {
+      "dailyDate": "2026-10-18",
+      "bankVersion": "daily-specials-gen6-36-v1",
+      "challengeKey": "daily-special:2026-10-18:mozkokalypsa",
+      "weekday": 7,
+      "difficulty": "mozkokalypsa",
+      "puzzleId": "g6-ds-mozkokalypsa-w01",
+      "contentHash": "eae0ae35a90fcc48a0d93b818189e114fe8dd29cabd4dbc74bab01a59581d664"
+    },
+    {
       "dailyDate": "2026-10-21",
       "bankVersion": "daily-specials-gen6-36-v1",
       "challengeKey": "daily-special:2026-10-21:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w01",
-      "contentHash": "e1c580ae66e5338e28bfc58cbba4d49c0c31ea6ca75c53ee6288415fa7ba5b3e"
+      "puzzleId": "g6-ds-hardcore-w02",
+      "contentHash": "8ac87cf983df3f23483fa9419d632194e79f35818201702d2e29e4e328c2d859"
     },
     {
       "dailyDate": "2026-10-23",
@@ -12675,8 +12702,8 @@
       "challengeKey": "daily-special:2026-10-23:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w01",
-      "contentHash": "a131f02ee2e9a93be8f633d1d57a5ed3849b26e9b0a665478b157d49a6c3232c"
+      "puzzleId": "g6-ds-mozkomor-w02",
+      "contentHash": "8c72ef562110f16029e2eb9d33b518d0bba8f9fef341e153ae8b5475f014dcd4"
     },
     {
       "dailyDate": "2026-10-25",
@@ -12684,8 +12711,8 @@
       "challengeKey": "daily-special:2026-10-25:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w01",
-      "contentHash": "eae0ae35a90fcc48a0d93b818189e114fe8dd29cabd4dbc74bab01a59581d664"
+      "puzzleId": "g6-ds-mozkokalypsa-w02",
+      "contentHash": "7aab79b3868600e84c5b4b5ea44d90f6b74c167060354dfc537a92abf7bef782"
     },
     {
       "dailyDate": "2026-10-28",
@@ -12693,8 +12720,8 @@
       "challengeKey": "daily-special:2026-10-28:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w02",
-      "contentHash": "8ac87cf983df3f23483fa9419d632194e79f35818201702d2e29e4e328c2d859"
+      "puzzleId": "g6-ds-hardcore-w03",
+      "contentHash": "fcdefec357b3983423b4e9a5dd09da09517a2618c625b9fba4800454cc80c302"
     },
     {
       "dailyDate": "2026-10-30",
@@ -12702,8 +12729,8 @@
       "challengeKey": "daily-special:2026-10-30:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w02",
-      "contentHash": "8c72ef562110f16029e2eb9d33b518d0bba8f9fef341e153ae8b5475f014dcd4"
+      "puzzleId": "g6-ds-mozkomor-w03",
+      "contentHash": "682e383696c20cacc0f74b28a9b2e3beecf7892672fe68e5810783e54f8bb803"
     },
     {
       "dailyDate": "2026-11-01",
@@ -12711,8 +12738,8 @@
       "challengeKey": "daily-special:2026-11-01:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w02",
-      "contentHash": "7aab79b3868600e84c5b4b5ea44d90f6b74c167060354dfc537a92abf7bef782"
+      "puzzleId": "g6-ds-mozkokalypsa-w03",
+      "contentHash": "5f17bdc50c76fe363651ef2b2c6aa69570918680fb01fdb30a95df372aa17fae"
     },
     {
       "dailyDate": "2026-11-04",
@@ -12720,8 +12747,8 @@
       "challengeKey": "daily-special:2026-11-04:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w03",
-      "contentHash": "fcdefec357b3983423b4e9a5dd09da09517a2618c625b9fba4800454cc80c302"
+      "puzzleId": "g6-ds-hardcore-w04",
+      "contentHash": "14f61a9940660c0659aa19884e92faccc6a7f9c3a90dbec081499b322d3a3f67"
     },
     {
       "dailyDate": "2026-11-06",
@@ -12729,8 +12756,8 @@
       "challengeKey": "daily-special:2026-11-06:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w03",
-      "contentHash": "682e383696c20cacc0f74b28a9b2e3beecf7892672fe68e5810783e54f8bb803"
+      "puzzleId": "g6-ds-mozkomor-w04",
+      "contentHash": "66caa52ed351325273597c83c526735d38a4faf397e02cd6856361178e229c2d"
     },
     {
       "dailyDate": "2026-11-08",
@@ -12738,8 +12765,8 @@
       "challengeKey": "daily-special:2026-11-08:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w03",
-      "contentHash": "5f17bdc50c76fe363651ef2b2c6aa69570918680fb01fdb30a95df372aa17fae"
+      "puzzleId": "g6-ds-mozkokalypsa-w04",
+      "contentHash": "f498940510c3e8617502fedab7206de0656c0b6d3dc63671584bd5e9b0c7bae2"
     },
     {
       "dailyDate": "2026-11-11",
@@ -12747,8 +12774,8 @@
       "challengeKey": "daily-special:2026-11-11:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w04",
-      "contentHash": "14f61a9940660c0659aa19884e92faccc6a7f9c3a90dbec081499b322d3a3f67"
+      "puzzleId": "g6-ds-hardcore-w05",
+      "contentHash": "ef07d24c9671245b8516cb5b8dc3f414cbcd3db25eef0d7fa9c57cf088425ae1"
     },
     {
       "dailyDate": "2026-11-13",
@@ -12756,8 +12783,8 @@
       "challengeKey": "daily-special:2026-11-13:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w04",
-      "contentHash": "66caa52ed351325273597c83c526735d38a4faf397e02cd6856361178e229c2d"
+      "puzzleId": "g6-ds-mozkomor-w05",
+      "contentHash": "7b3543124e66531a23a4f8a34b2eca65b78d0d8136bd8ab082b70b1557f22364"
     },
     {
       "dailyDate": "2026-11-15",
@@ -12765,8 +12792,8 @@
       "challengeKey": "daily-special:2026-11-15:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w04",
-      "contentHash": "f498940510c3e8617502fedab7206de0656c0b6d3dc63671584bd5e9b0c7bae2"
+      "puzzleId": "g6-ds-mozkokalypsa-w05",
+      "contentHash": "3d48c03b029f15b1f9ee76a7933f0036831138a1ffc9239cf5dd6f5e05be255f"
     },
     {
       "dailyDate": "2026-11-18",
@@ -12774,8 +12801,8 @@
       "challengeKey": "daily-special:2026-11-18:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w05",
-      "contentHash": "ef07d24c9671245b8516cb5b8dc3f414cbcd3db25eef0d7fa9c57cf088425ae1"
+      "puzzleId": "g6-ds-hardcore-w06",
+      "contentHash": "bae96dffb660d9085d1d066b7650b054177d9c483fab58d26123d1e17ab359c8"
     },
     {
       "dailyDate": "2026-11-20",
@@ -12783,8 +12810,8 @@
       "challengeKey": "daily-special:2026-11-20:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w05",
-      "contentHash": "7b3543124e66531a23a4f8a34b2eca65b78d0d8136bd8ab082b70b1557f22364"
+      "puzzleId": "g6-ds-mozkomor-w06",
+      "contentHash": "821eafa0170437e3de8a57724dd9fd1209e4a3d2b7e1fadf721f987171715af9"
     },
     {
       "dailyDate": "2026-11-22",
@@ -12792,8 +12819,8 @@
       "challengeKey": "daily-special:2026-11-22:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w05",
-      "contentHash": "3d48c03b029f15b1f9ee76a7933f0036831138a1ffc9239cf5dd6f5e05be255f"
+      "puzzleId": "g6-ds-mozkokalypsa-w06",
+      "contentHash": "44a772397bb8a769286fb321b517602192ce6e6e5ea1b965fbb625d6f8408847"
     },
     {
       "dailyDate": "2026-11-25",
@@ -12801,8 +12828,8 @@
       "challengeKey": "daily-special:2026-11-25:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w06",
-      "contentHash": "bae96dffb660d9085d1d066b7650b054177d9c483fab58d26123d1e17ab359c8"
+      "puzzleId": "g6-ds-hardcore-w07",
+      "contentHash": "82dc41e74d23b0d743fa0461b1af88fb62e38d15c04981366c4234b4c7dea644"
     },
     {
       "dailyDate": "2026-11-27",
@@ -12810,8 +12837,8 @@
       "challengeKey": "daily-special:2026-11-27:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w06",
-      "contentHash": "821eafa0170437e3de8a57724dd9fd1209e4a3d2b7e1fadf721f987171715af9"
+      "puzzleId": "g6-ds-mozkomor-w07",
+      "contentHash": "e762b655f6fb711611cdba8153e586e2107a20acebf080fc974a586b63e16ae1"
     },
     {
       "dailyDate": "2026-11-29",
@@ -12819,8 +12846,8 @@
       "challengeKey": "daily-special:2026-11-29:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w06",
-      "contentHash": "44a772397bb8a769286fb321b517602192ce6e6e5ea1b965fbb625d6f8408847"
+      "puzzleId": "g6-ds-mozkokalypsa-w07",
+      "contentHash": "5f36580641829104a312df393b63a6d62c6803c588371cd99f8490f33585270c"
     },
     {
       "dailyDate": "2026-12-02",
@@ -12828,8 +12855,8 @@
       "challengeKey": "daily-special:2026-12-02:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w07",
-      "contentHash": "82dc41e74d23b0d743fa0461b1af88fb62e38d15c04981366c4234b4c7dea644"
+      "puzzleId": "g6-ds-hardcore-w08",
+      "contentHash": "85ff9f27a842ab160f9dba325948bd70d600511b73f72f88fcec16bca5320769"
     },
     {
       "dailyDate": "2026-12-04",
@@ -12837,8 +12864,8 @@
       "challengeKey": "daily-special:2026-12-04:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w07",
-      "contentHash": "e762b655f6fb711611cdba8153e586e2107a20acebf080fc974a586b63e16ae1"
+      "puzzleId": "g6-ds-mozkomor-w08",
+      "contentHash": "ff30a7f1c3eb2f182c096b316fe849b0b53396efad8c18f2a096fde7059a93aa"
     },
     {
       "dailyDate": "2026-12-06",
@@ -12846,8 +12873,8 @@
       "challengeKey": "daily-special:2026-12-06:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w07",
-      "contentHash": "5f36580641829104a312df393b63a6d62c6803c588371cd99f8490f33585270c"
+      "puzzleId": "g6-ds-mozkokalypsa-w08",
+      "contentHash": "0f3a55ee991604dd5ce2360b0bcf4cc7bca7bd1ae735307dc1d246a1b8bea32a"
     },
     {
       "dailyDate": "2026-12-09",
@@ -12855,8 +12882,8 @@
       "challengeKey": "daily-special:2026-12-09:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w08",
-      "contentHash": "85ff9f27a842ab160f9dba325948bd70d600511b73f72f88fcec16bca5320769"
+      "puzzleId": "g6-ds-hardcore-w09",
+      "contentHash": "d8e0af00c6d854d874394c33ff1ae025bcd16e05bacd21f3e18e34ed0e8cb182"
     },
     {
       "dailyDate": "2026-12-11",
@@ -12864,8 +12891,8 @@
       "challengeKey": "daily-special:2026-12-11:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w08",
-      "contentHash": "ff30a7f1c3eb2f182c096b316fe849b0b53396efad8c18f2a096fde7059a93aa"
+      "puzzleId": "g6-ds-mozkomor-w09",
+      "contentHash": "abee7c5631d187582716a4000a6d42d3efdd9650bb234d23514bf0d9f4e5bd7d"
     },
     {
       "dailyDate": "2026-12-13",
@@ -12873,8 +12900,8 @@
       "challengeKey": "daily-special:2026-12-13:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w08",
-      "contentHash": "0f3a55ee991604dd5ce2360b0bcf4cc7bca7bd1ae735307dc1d246a1b8bea32a"
+      "puzzleId": "g6-ds-mozkokalypsa-w09",
+      "contentHash": "209abf2733a2f74bfcb05f26af0c147dd842416e100ac3882623a915d2ff6de1"
     },
     {
       "dailyDate": "2026-12-16",
@@ -12882,8 +12909,8 @@
       "challengeKey": "daily-special:2026-12-16:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w09",
-      "contentHash": "d8e0af00c6d854d874394c33ff1ae025bcd16e05bacd21f3e18e34ed0e8cb182"
+      "puzzleId": "g6-ds-hardcore-w10",
+      "contentHash": "e06d5165831320718f8bc1c22ce44c677bd6b57bc07e4b9c74a8f26d25115282"
     },
     {
       "dailyDate": "2026-12-18",
@@ -12891,8 +12918,8 @@
       "challengeKey": "daily-special:2026-12-18:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w09",
-      "contentHash": "abee7c5631d187582716a4000a6d42d3efdd9650bb234d23514bf0d9f4e5bd7d"
+      "puzzleId": "g6-ds-mozkomor-w10",
+      "contentHash": "c15cf8d6c8012ef6265afe01c0f3a6633a64533da6c486a391106aef2a9adabc"
     },
     {
       "dailyDate": "2026-12-20",
@@ -12900,8 +12927,8 @@
       "challengeKey": "daily-special:2026-12-20:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w09",
-      "contentHash": "209abf2733a2f74bfcb05f26af0c147dd842416e100ac3882623a915d2ff6de1"
+      "puzzleId": "g6-ds-mozkokalypsa-w10",
+      "contentHash": "0cab64c168a38ab2cab9240f940223207ea138a46c92efca45589048be95fa3b"
     },
     {
       "dailyDate": "2026-12-23",
@@ -12909,8 +12936,8 @@
       "challengeKey": "daily-special:2026-12-23:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w10",
-      "contentHash": "e06d5165831320718f8bc1c22ce44c677bd6b57bc07e4b9c74a8f26d25115282"
+      "puzzleId": "g6-ds-hardcore-w11",
+      "contentHash": "51f3031b5434f4f3eeae941ea1a3e1279d88e228d442e1853407a8a2e72d9b54"
     },
     {
       "dailyDate": "2026-12-25",
@@ -12918,8 +12945,8 @@
       "challengeKey": "daily-special:2026-12-25:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w10",
-      "contentHash": "c15cf8d6c8012ef6265afe01c0f3a6633a64533da6c486a391106aef2a9adabc"
+      "puzzleId": "g6-ds-mozkomor-w11",
+      "contentHash": "74da443f674b6fb9a9b1f6c2a78c22c457f8f6df1ee807cab248a47f24ebd273"
     },
     {
       "dailyDate": "2026-12-27",
@@ -12927,8 +12954,8 @@
       "challengeKey": "daily-special:2026-12-27:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w10",
-      "contentHash": "0cab64c168a38ab2cab9240f940223207ea138a46c92efca45589048be95fa3b"
+      "puzzleId": "g6-ds-mozkokalypsa-w11",
+      "contentHash": "1bc0de28617e662e8f166428fa7d6e91c3c9053d47352cfa2e4978af016b0f9e"
     },
     {
       "dailyDate": "2026-12-30",
@@ -12936,8 +12963,8 @@
       "challengeKey": "daily-special:2026-12-30:hardcore",
       "weekday": 3,
       "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w11",
-      "contentHash": "51f3031b5434f4f3eeae941ea1a3e1279d88e228d442e1853407a8a2e72d9b54"
+      "puzzleId": "g6-ds-hardcore-w12",
+      "contentHash": "c6056a5c836f67ae1980536abfe052c31ef52c6f5c627a5ed5e043414e230581"
     },
     {
       "dailyDate": "2027-01-01",
@@ -12945,40 +12972,13 @@
       "challengeKey": "daily-special:2027-01-01:mozkomor",
       "weekday": 5,
       "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w11",
-      "contentHash": "74da443f674b6fb9a9b1f6c2a78c22c457f8f6df1ee807cab248a47f24ebd273"
+      "puzzleId": "g6-ds-mozkomor-w12",
+      "contentHash": "b4464a29fbaf4d569c1d28c1114cfbbcb0ee4f848f594190911c1ae86ed35fb6"
     },
     {
       "dailyDate": "2027-01-03",
       "bankVersion": "daily-specials-gen6-36-v1",
       "challengeKey": "daily-special:2027-01-03:mozkokalypsa",
-      "weekday": 7,
-      "difficulty": "mozkokalypsa",
-      "puzzleId": "g6-ds-mozkokalypsa-w11",
-      "contentHash": "1bc0de28617e662e8f166428fa7d6e91c3c9053d47352cfa2e4978af016b0f9e"
-    },
-    {
-      "dailyDate": "2027-01-06",
-      "bankVersion": "daily-specials-gen6-36-v1",
-      "challengeKey": "daily-special:2027-01-06:hardcore",
-      "weekday": 3,
-      "difficulty": "hardcore",
-      "puzzleId": "g6-ds-hardcore-w12",
-      "contentHash": "c6056a5c836f67ae1980536abfe052c31ef52c6f5c627a5ed5e043414e230581"
-    },
-    {
-      "dailyDate": "2027-01-08",
-      "bankVersion": "daily-specials-gen6-36-v1",
-      "challengeKey": "daily-special:2027-01-08:mozkomor",
-      "weekday": 5,
-      "difficulty": "mozkomor",
-      "puzzleId": "g6-ds-mozkomor-w12",
-      "contentHash": "b4464a29fbaf4d569c1d28c1114cfbbcb0ee4f848f594190911c1ae86ed35fb6"
-    },
-    {
-      "dailyDate": "2027-01-10",
-      "bankVersion": "daily-specials-gen6-36-v1",
-      "challengeKey": "daily-special:2027-01-10:mozkokalypsa",
       "weekday": 7,
       "difficulty": "mozkokalypsa",
       "puzzleId": "g6-ds-mozkokalypsa-w12",

@@ -111,7 +111,7 @@
     function openWeek(from){
       if(!dialog){
         dialog=document.createElement('div');dialog.id='dailyWeekDialog';dialog.className='modal daily-week-dialog hidden';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','dailyWeekDialogTitle');
-        dialog.innerHTML='<div class="modal-card"><h2 id="dailyWeekDialogTitle">Tento týden</h2><div class="daily-week-dialog-list"></div><p class="daily-week-dialog-copy">Základní výzva každý den udržuje sérii. Ve středu, v pátek a v neděli si můžeš přidat ještě jednu — dobrovolně.</p><p class="daily-week-dialog-copy">Za první dokončení speciálu získáš 100 XP. Další hraní a archiv slouží k procvičení.</p><button type="button" class="primary-btn" data-close-daily-week>Zpět ke hře</button></div>';
+        dialog.innerHTML='<div class="modal-card"><h2 id="dailyWeekDialogTitle">Tento týden</h2><div class="daily-week-dialog-list"></div><p class="daily-week-dialog-copy">Základní výzva každý den udržuje sérii. Ve středu, v pátek a v neděli si můžeš přidat ještě jednu — dobrovolně a za 100 XP.</p><button type="button" class="primary-btn" data-close-daily-week>Zpět ke hře</button></div>';
         document.body.append(dialog);dialog.querySelector('[data-close-daily-week]').onclick=closeWeek;
         dialog.onclick=e=>{if(e.target===dialog)closeWeek()};
         dialog.addEventListener('keydown',e=>{

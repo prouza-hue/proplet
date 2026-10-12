@@ -9,7 +9,7 @@ sys.path.insert(0,str(ROOT))
 os.environ.update(VERCEL_ENV="preview", VERCEL_GIT_COMMIT_REF="work/daily-specials-integrated-20261012",
                   SUPABASE_URL="https://eanzztstmwlamwfdskbf.supabase.co", PROPLET_DAILY_SPECIALS_ENABLED="true",
                   PROPLET_DATED_DAILY_ENABLED="true", PROPLET_ATOMIC_RESULT_V1_ENABLED="true",
-                  PROPLET_DAILY_SPECIALS_PREVIEW_DATE="2026-10-21")
+                  PROPLET_DAILY_SPECIALS_PREVIEW_DATE="2026-10-14")
 import server
 from fastapi.testclient import TestClient
 
@@ -35,16 +35,16 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
     base=client.get("/api/daily").json()
     envelope=client.get("/api/daily-special").json()
     special=envelope["special"]
-    assert base["serverToday"]==envelope["serverToday"]=="2026-10-21"
-    assert base["challengeKey"]=="daily:2026-10-21" and special["challengeKey"]=="daily-special:2026-10-21:hardcore"
-    for url in ("/api/daily-special?daily_date=2026-10-23", "/api/daily-special?daily_date=2026-10-21&puzzle_id=g6-ds-mozkomor-w01",
-                "/api/daily-special?as_of=2027-01-10", "/api/shared-puzzle?kind=daily_special&daily_date=2026-10-23&puzzle_id=g6-ds-mozkomor-w01",
+    assert base["serverToday"]==envelope["serverToday"]=="2026-10-14"
+    assert base["challengeKey"]=="daily:2026-10-14" and special["challengeKey"]=="daily-special:2026-10-14:hardcore"
+    for url in ("/api/daily-special?daily_date=2026-10-16", "/api/daily-special?daily_date=2026-10-14&puzzle_id=g6-ds-mozkomor-w01",
+                "/api/daily-special?as_of=2027-01-03", "/api/shared-puzzle?kind=daily_special&daily_date=2026-10-16&puzzle_id=g6-ds-mozkomor-w01",
                 "/data/daily_specials_private.json", "/content/gen6/daily-specials-36/bank.json"):
         assert client.get(url).status_code==404,url
-    assert client.get("/api/shared-puzzle?kind=daily_special&daily_date=2026-10-21&puzzle_id="+special["puzzleId"]).status_code==200
+    assert client.get("/api/shared-puzzle?kind=daily_special&daily_date=2026-10-14&puzzle_id="+special["puzzleId"]).status_code==200
     assert 'no-store' in client.get("/api/daily-special").headers['cache-control']
     payload={"puzzle_id":special["puzzleId"],"challenge_key":special["challengeKey"],"mode":"daily_special",
-             "difficulty":"hardcore","daily_date":"2026-10-21","elapsed_ms":60_000,"moves":30,
+             "difficulty":"hardcore","daily_date":"2026-10-14","elapsed_ms":60_000,"moves":30,
              "attempt_id":"special-asgi-001","clean_solve":True,"content_hash":special["contentHash"]}
     declared=server.result_domain.canonical_request(server.ResultCreate(**payload))
     assert declared["content_hash"]==special["contentHash"]
@@ -58,7 +58,7 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
     assert response.json()["awardedPoints"]==100
     assert commands[-1][1]["p_command"]["contentHash"]==special["contentHash"]
     assert commands[-1][1]["p_command"]["freeLevel"] is None and commands[-1][1]["p_command"]["legacyRewardSlot"] is None
-    for modified in ({**payload,"challenge_key":base["challengeKey"]},{**payload,"daily_date":"2026-10-20"},
+    for modified in ({**payload,"challenge_key":base["challengeKey"]},{**payload,"daily_date":"2026-10-13"},
                      {**payload,"attempt_id":"other-asgi-attempt"},{**payload,"puzzle_id":"g6-ds-mozkomor-w01"},
                      {**payload,"content_hash":"0"*64}):
         assert client.post("/api/result",json=modified).status_code in(400,409)
@@ -69,7 +69,7 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
     # assistance/privacy rules still apply to the newly compatible envelope.
     ranking_row={"mode":"daily_special","challenge_key":special["challengeKey"],"puzzle_id":special["puzzleId"],
                  "best_moves":30,"hints_used":0,"wrong_attempts":0,"clean_solve":True,
-                 "timing_verified":True,"calm_mode":False,"completed_at":"2026-10-21T12:00:00+02:00"}
+                 "timing_verified":True,"calm_mode":False,"completed_at":"2026-10-14T12:00:00+02:00"}
     other_id="00000000-0000-4000-8000-000000000322"
     ranking_rows=[{**ranking_row,"player_id":other_id,"best_elapsed_ms":60000},
                   {**ranking_row,"player_id":player["id"],"best_elapsed_ms":70000},
@@ -90,8 +90,8 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
         assert len(body["rows"])==2 and body["rows"][1]["isMine"] is True
         assert body["rows"][0]["anonymous"] is True and body["rows"][0]["name"]!="Private real name"
         assert client.get("/api/rankings/daily-special?challenge_key="+special["challengeKey"]).json()["myRank"] is None
-    os.environ["PROPLET_DAILY_SPECIALS_PREVIEW_DATE"]="2026-10-22"
-    archive=client.get("/api/daily-special?daily_date=2026-10-21").json()["special"]
+    os.environ["PROPLET_DAILY_SPECIALS_PREVIEW_DATE"]="2026-10-15"
+    archive=client.get("/api/daily-special?daily_date=2026-10-14").json()["special"]
     assert archive["official"] is False and archive["rewardEligible"] is False
     assert client.get("/api/daily-special").json()["special"] is None
     assert client.post("/api/result",json=payload).status_code==409
