@@ -211,6 +211,7 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
    await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.__QA_PROPLET_READY===true);
    await page.waitForTimeout(350);
    assert.equal(await page.locator('#dailyExtraIntro:not(.hidden)').count(),0,'Extra explanation is shown once, not after reload');
+   await dismissAnnouncements(page);
    assert.equal(await page.evaluate(()=>document.body.style.overflow),'','dismissal restores scrolling');
    report.checks.push('Extra introduction once on first available visit, mobile fit, CTA selection, reload persistence, retired300-card absent and inverse Extra label');
   }

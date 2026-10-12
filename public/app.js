@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.06.0-daily-extra2';
+const APP_PREVIEW_RELEASE='proplet-v4.06.0-daily-specials1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -808,7 +808,7 @@ function initNavigation(){
 }
 function transientModals(){return ['tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
-function closeTransientModals(){window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();dailySpecialUIController?.closeIntro();transientModals().forEach(el=>el.classList.add('hidden'))}
+function closeTransientModals(){window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();if(typeof dailySpecialUIController!=='undefined')dailySpecialUIController?.closeIntro();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
  if(currentScreen!=='game')return;
  if(currentGame?.mode!=='rescue')saveGameProgress();hideGameUndo();stopTimer();
