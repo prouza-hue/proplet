@@ -1,15 +1,93 @@
 {
-  "testedSha": "b117439af0ccf9c7e4e77b6eaff8873d23682372",
-  "checks": [],
+  "testedSha": "87f2ed666cf73390cb0c3928e356b1c60025cfab",
+  "checks": [
+    {
+      "view": "daily",
+      "width": 390,
+      "discoveryAnatomy": [
+        {
+          "id": "tajenkaPreviewCard",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "22px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "ax-destination ax-archive-entry",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "22px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "ax-destination ax-team-entry",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "22px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        },
+        {
+          "id": "axHomeFree",
+          "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          "size": "22px",
+          "weight": "700",
+          "artLeft": true,
+          "titleFits": true,
+          "phraseFits": true,
+          "textAfterArt": true,
+          "noHeaderOverlap": true,
+          "historyRight": true,
+          "historyBesideTitle": true,
+          "historyTap": true,
+          "actionFullWidth": true,
+          "actionBelow": true,
+          "actionHeight": true
+        }
+      ]
+    }
+  ],
   "screenshots": [
-    "initial-390.png"
+    "initial-390.png",
+    "daily-390.png",
+    "free-390.png",
+    "failure.png"
   ],
   "pageErrors": [],
   "networkWrites": [],
   "layoutIssues": [],
   "productionParity": {
     "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
-    "headSha": "b117439af0ccf9c7e4e77b6eaff8873d23682372",
+    "headSha": "87f2ed666cf73390cb0c3928e356b1c60025cfab",
     "result": "PASS",
     "unchangedExistingFiles": 1280,
     "reviewedIntegrationSeams": {
@@ -43,6 +121,7 @@
     }
   },
   "result": "FAIL",
-  "error": "Locator.click: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=\\\"daily\\\"]\")\n    - locator resolved to <button class=\"active\" data-nav=\"daily\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    23 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 146, in <module>\n    go(page,view);overflow(page,view,width);shot(page,view+\"-\"+str(width))\n    ^^^^^^^^^^^^^\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 31, in go\n    if view in [\"daily\",\"free\",\"leaderboard\",\"profile\"]:page.locator('.bottom-nav [data-nav=\"'+view+'\"]').click()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 18032, in click\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_locator.py\", line 165, in click\n    return await self._frame._click(self._selector, strict=True, **params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 594, in _click\n    await self._channel.send(\"click\", self._timeout, locals_to_params(locals()))\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.click: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=\\\"daily\\\"]\")\n    - locator resolved to <button class=\"active\" data-nav=\"daily\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    23 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n\n"
+  "error": "('free', 390, {'id': 'easy', 'font': 'Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif', 'size': '22px', 'weight': '700', 'artLeft': True, 'titleFits': True, 'phraseFits': True, 'textAfterArt': True, 'noHeaderOverlap': True, 'historyRight': True, 'historyBesideTitle': True, 'historyTap': True, 'actionFullWidth': False, 'actionBelow': True, 'actionHeight': True})",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 147, in <module>\n    if view in [\"daily\",\"free\"]:discovery[view]=discovery_audit(page,view,width)\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 59, in discovery_audit\n    assert all(card[key] for key in [\"artLeft\",\"titleFits\",\"phraseFits\",\"textAfterArt\",\"noHeaderOverlap\",\"historyRight\",\"historyBesideTitle\",\"historyTap\",\"actionFullWidth\",\"actionBelow\",\"actionHeight\"]),(view,width,card)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('free', 390, {'id': 'easy', 'font': 'Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif', 'size': '22px', 'weight': '700', 'artLeft': True, 'titleFits': True, 'phraseFits': True, 'textAfterArt': True, 'noHeaderOverlap': True, 'historyRight': True, 'historyBesideTitle': True, 'historyTap': True, 'actionFullWidth': False, 'actionBelow': True, 'actionHeight': True})\n",
+  "failureText": "Testovací Proplet · postup a pozvánky zůstávají v tomto náhledu\nOvládání náhledu\nProplet\nAlex\n5 nových Propletů je tady\n\n5 ještě čeká.\n\nHrát novinky\nSnadná\n+15 XP100 nových\n27\n/ 409\nHrát\n→\nStřední\n+25 XP100 nových\n18\n/ 409\nHrát\n→\nTěžká\n+50 XP100 nových\n11\n/ 409\nHrát\n→\nMozkožrout\n+100 XP\n6\n/ 308\nHrát\n→\nMozkomor\n+150 XP\n2\n/ 150\nHrát\n→\nMozkokalypsa\n+200 XP\n1\n/ 100\nHrát\n→\nVÍKENDOVÝ BONUS\nTajenka\n\nNajdi 5 slov a odhal frázi.\n\n+200 XP\nHrát\nArchiv Propletu\n\n800 původních desek\n\nProplet\nStaré dobré\nrozplétání.\nA\nR\nC\nV\nI\nH\n800\nDESEK\nVybrat archivní desku\n© 2026 Proplet · Česká slovní hra\nPavel Prouza\nProplet v4.07.1\nSoukromí · Podmínky · Nahlásit chybu\nDnes\nHrát\nPořadí\nJá"
 }
