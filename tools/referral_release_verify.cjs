@@ -33,7 +33,7 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
   apiCalls.push({path:u.pathname,method:req.method(),body});
   const reply=d=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(d)});
   if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.07.1',environment:'preview'});
-  if(u.pathname==='/api/tajenka')return reply(fixture.tajenka);
+  if(u.pathname==='/api/tajenka')return reply({...fixture.tajenka,week:await req.frame().evaluate(()=>activeTajenkaWeek)});
   if(u.pathname==='/api/referrals')return reply({enabled:true,invite:{url:base+'/?invite=OWNCODE123',code:'OWNCODE123'},incoming:paid?{id:'reward-test',inviter:{name:'Katka',avatar:'🦊'},completedBoards:5,paid:true,rewardDismissed:dismissed}:guest&&registered?{id:'incoming-test',inviter:{name:'Katka'},completedBoards:0,paid:false}:null,referrals:[]});
   if(u.pathname==='/api/referrals/invite/'+inviteCode)return reply({enabled:true,inviter:{name:'Katka',avatar:'🦊'}});
   if(u.pathname==='/api/referrals/invite')return reply({url:base+'/?invite=OWNCODE123',code:'OWNCODE123'});
