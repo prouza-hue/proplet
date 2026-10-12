@@ -103,7 +103,8 @@ for signup_model in ("PlayerCreate", "AuthCallback"):
     schema = openapi_contract["components"]["schemas"][signup_model]
     assert "inviteCode" not in schema.get("required", [])
     code_schema = schema["properties"].pop("inviteCode")
-    assert code_schema["default"] is None
+    assert code_schema.get("default") is None
+    assert {"type": "null"} in code_schema["anyOf"]
     string_schema = next(item for item in code_schema["anyOf"] if item.get("type") == "string")
     assert string_schema == {"type": "string", "minLength": 8, "maxLength": 80, "pattern": "^[A-Za-z0-9_-]+$"}
 
