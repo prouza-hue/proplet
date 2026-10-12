@@ -3,6 +3,7 @@
 .daily-title-choice-row{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0}
 .daily-title-choice-row>h1{min-width:0;white-space:nowrap}
 .daily-base-title{display:block;border:0;padding:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left;cursor:pointer;border-radius:4px}
+html.tiskarna-ui body #screen-daily .daily-hero .daily-title-choice-row .daily-base-title{font:inherit!important;line-height:inherit!important;letter-spacing:inherit!important}
 .daily-base-title:focus-visible{outline:2px solid currentColor;outline-offset:4px}
 .daily-challenge-switch{flex:none;position:relative;align-self:center;margin:0}
 .daily-challenge-switch button{display:inline-flex;align-items:center;gap:5px;height:30px;min-height:0;padding:0 8px;border:1px solid rgba(255,248,233,.5);border-radius:999px;background:rgba(255,248,233,.08);color:#FFF8E9;font-family:inherit;font-size:15px;line-height:1;font-weight:600;position:relative;cursor:pointer;white-space:nowrap}
@@ -14,7 +15,7 @@
 #dailySpecialTabStatus:empty{display:none}
 #dailySpecialTabStatus{font-size:14px;line-height:1;font-weight:700}
 .daily-special-selected .daily-base-title{opacity:.78}
-#screen-daily .daily-hero #playDailyBtn.daily-special-action{display:flex;flex-direction:column;justify-content:center;gap:0;padding-top:4px!important;padding-bottom:4px!important}
+#screen-daily .daily-hero #playDailyBtn.daily-special-action{display:flex;flex-direction:column;justify-content:center;gap:0;padding-top:3px!important;padding-bottom:3px!important}
 #playDailyBtn.daily-special-action>span{font-size:inherit;line-height:1.25}
 #playDailyBtn.daily-special-action>small{font-family:inherit;font-size:15px;line-height:1.25;font-weight:400;opacity:.83}
 .daily-week-day.has-daily-special{position:relative;cursor:pointer}

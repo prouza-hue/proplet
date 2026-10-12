@@ -513,10 +513,11 @@
       "path": "SUPABASE_MIGRATION_DAILY_SPECIALS_20261012.sql",
       "type": "migration",
       "status": "prepared-preview-only-production-disabled",
-      "sha256": "769b2e4389dcf34157977e2bba1b4d67b3a782d6667301a1ab3c39a432444619",
+      "sha256": "1573489b238baa01094c6f662c5440c4934271b07ce662165364071f53612e60",
       "supersedes": [],
       "replaced_rpc_definitions": [
-        "public.proplet_account_snapshot_v1"
+        "public.proplet_account_snapshot_v1",
+        "public.proplet_player_stats_v1"
       ],
       "timestamp_migration": "supabase/migrations/20261012000339_daily_specials.sql"
     },

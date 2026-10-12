@@ -5,7 +5,7 @@ do $test$
 declare
  p uuid:=gen_random_uuid(); owner_id uuid:=gen_random_uuid(); b public.daily_special_bindings;
  attempt text:='special-sql-'||p::text;
- cmd jsonb; base_cmd jsonb; response jsonb; retry jsonb; stats jsonb;
+ cmd jsonb; base_cmd jsonb; response jsonb; retry jsonb; stats jsonb; aggregate_stats jsonb; stats_key text;
  stamp timestamptz:=clock_timestamp(); failed boolean;
 begin
  update public.daily_specials_policy set enabled=true,preview_date='2026-10-21' where singleton;
@@ -35,6 +35,12 @@ begin
  if (select sum(points) from public.results where player_id=p)<>100 then raise exception 'special XP duplicated'; end if;
  if not (select timing_verified from public.results where player_id=p and mode='daily_special') then raise exception 'special timing unverified'; end if;
  stats:=public.proplet_account_snapshot_v1(p)->'stats';
+ aggregate_stats:=public.proplet_player_stats_v1(p);
+ foreach stats_key in array array['dailySpecialCompleted','dailyChallengeCompleted','totalChallengeCompleted','dailyCompleted','currentStreak','longestStreak','totalCompleted','cleanDaily','points'] loop
+   if stats->stats_key is distinct from aggregate_stats->stats_key then
+     raise exception 'snapshot/player_stats parity mismatch: %', stats_key;
+   end if;
+ end loop;
  if (stats->>'dailyCompleted')::int<>0 or (stats->>'currentStreak')::int<>0 or (stats->>'dailySpecialCompleted')::int<>1 then
    raise exception 'special altered base streak'; end if;
  -- Base result on the same date has its independent once-only identity.
@@ -79,6 +85,13 @@ begin
  exception when others then failed:=sqlerrm='RESULT_COMMAND_INVALID'; end;
  if not failed then raise exception 'tampered binding accepted'; end if;
  if (select count(*) from public.result_commands where player_id=p)<>4 then raise exception 'failed transaction left ledger'; end if;
+ stats:=public.proplet_account_snapshot_v1(p)->'stats';
+ aggregate_stats:=public.proplet_player_stats_v1(p);
+ foreach stats_key in array array['dailySpecialCompleted','dailyChallengeCompleted','totalChallengeCompleted','dailyCompleted','currentStreak','longestStreak','totalCompleted','cleanDaily','points'] loop
+   if stats->stats_key is distinct from aggregate_stats->stats_key then
+     raise exception 'snapshot/player_stats parity mismatch after base/practice: %', stats_key;
+   end if;
+ end loop;
  raise notice 'PASS special100 once, retry receipt, distinct-command0, base+special two results/one streak, practice0 no result, tamper rollback';
 end $test$;
 rollback;
