@@ -169,11 +169,12 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
   const preview=await guardedContext(options),page=await open(preview,previewOrigin),baseBounds=await bounds(page);
   validateBounds(baseBounds,'base '+viewport.width);await screenshot(page,`${viewport.width}-base`);
   await page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').click();const specialBounds=await bounds(page);validateBounds(specialBounds,'special '+viewport.width);await screenshot(page,`${viewport.width}-special`);
+  report.layout.push({viewport,production:productionBounds,base:baseBounds,special:specialBounds,extraBaseHeight:baseBounds.hero.height-productionBounds.hero.height,extraSpecialHeight:specialBounds.hero.height-productionBounds.hero.height});save();
   assert(baseBounds.hero.height<=productionBounds.hero.height+2,`base card grew at${viewport.width}: ${baseBounds.hero.height} vs production ${productionBounds.hero.height}`);
   assert(specialBounds.hero.height<=productionBounds.hero.height+2,`special card grew at${viewport.width}: ${specialBounds.hero.height} vs production ${productionBounds.hero.height}`);
   assert(Math.abs(specialBounds.hero.height-baseBounds.hero.height)<=1,`switch changes Daily card height at${viewport.width}`);
   await page.locator('.daily-week-day.has-daily-special').first().click();await page.locator('#dailyWeekDialog:not(.hidden)').waitFor();await screenshot(page,`${viewport.width}-week-dialog`);await page.locator('[data-close-daily-week]').click();
-  report.layout.push({viewport,production:productionBounds,base:baseBounds,special:specialBounds,extraBaseHeight:baseBounds.hero.height-productionBounds.hero.height,extraSpecialHeight:specialBounds.hero.height-productionBounds.hero.height});await preview.close();save();
+  await preview.close();save();
  }
  report.checks.push('production/base/special heights, clipping, title overlap and week dialog at320/390/768/1280');
  const mobile=await guardedContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await open(mobile,previewOrigin);
