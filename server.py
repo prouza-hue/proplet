@@ -4723,7 +4723,10 @@ def rankings_xp(
     viewer_team = public_family_code(viewer.get("family_code"), viewer.get("team_joined_at")) if viewer else None
     period_start = _ranking_period_start(period)
     period_points, lifetime_points, badge_counts, team_points = _ranking_xp_aggregates(period_start)
-    player_ids = set(period_points) | set(lifetime_points)
+    # Zero-score profiles cannot appear in this period's player ranking.
+    # Keep the viewer even when inactive and let the context RPC still load
+    # every member of the scored teams for exact membership counts.
+    player_ids = {pid for pid, score in period_points.items() if score > 0}
     if viewer_id:
         player_ids.add(viewer_id)
     team_codes = set(team_points)

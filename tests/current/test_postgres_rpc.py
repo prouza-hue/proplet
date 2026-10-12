@@ -76,6 +76,29 @@ class PostgresRpcTests(unittest.TestCase):
             self.assertEqual(db.db_rpc('proplet_request_guard_v1',{},supabase_url=URL,supabase_secret_key='synthetic',http_client=http),{'allowed':False})
         http.post.assert_not_called()
 
+    def test_compact_xp_preserves_all_rows_types_and_single_execution(self):
+        rows = [['player', 'inactive', 0, 90210, 8], ['player', 'active', 100, 9007199254740993, 3],
+                ['team', 'OLD-TEAM', 200, 0, 0]]
+        connection = Mock()
+        connection.execute.return_value.fetchall.return_value = [(row,) for row in rows]
+        signature = (['p_period_start'], ['timestamp with time zone'], 'rows', 'record')
+        actual = rpc.execute_on_connection(connection, 'proplet_rankings_xp_aggregate', {'p_period_start':None}, signature)
+        self.assertEqual(actual, [
+            {'row_kind':'player','entity_id':'inactive','period_xp':0,'lifetime_xp':90210,'badge_count':8},
+            {'row_kind':'player','entity_id':'active','period_xp':100,'lifetime_xp':9007199254740993,'badge_count':3},
+            {'row_kind':'team','entity_id':'OLD-TEAM','period_xp':200,'lifetime_xp':0,'badge_count':0},
+        ])
+        self.assertEqual(connection.execute.call_count, 1)
+        self.assertEqual(connection.execute.call_args.args[1], [None])
+
+    def test_malformed_compact_xp_is_rejected_without_reexecution(self):
+        for value in ({'entity_id':'wrong-shape'}, ['player', 'truncated']):
+            connection = Mock()
+            connection.execute.return_value.fetchall.return_value = [(value,)]
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                rpc.execute_on_connection(connection, 'proplet_rankings_xp_aggregate', {}, ([],[], 'rows','record'))
+            self.assertEqual(connection.execute.call_count, 1)
+
 
 if __name__=='__main__':
     unittest.main()
