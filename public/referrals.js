@@ -15,7 +15,7 @@
  const rewardKey=()=> 'proplet:referral-reward-dismissed:'+(transport.profile()?.id||'guest')+':'+m.inviterCode;
  const preferences=transport.preferences||localStorage;
  const rewardHidden=()=>m.paid&&(m.rewardDismissed||preferences.getItem(rewardKey())==='1');
- const canInvite=()=>!!transport.profile()?.id&&(!m.incoming||m.paid);
+ const canInvite=()=>m.ready&&!!transport.profile()?.id&&(!m.incoming||m.paid);
  const announcementKey=()=> 'proplet:referral-announcement-seen:v1:'+transport.profile().id;
  const steps=n=>'<div class="ref-steps" role="img" aria-label="Dokončeno '+n+' z 5 desek">'+Array.from({length:5},(_,i)=>'<span class="ref-step ref-step-'+i+(i<n?' done':i===n?' next':'')+'"><b>'+(i<n?'✓':i+1)+'</b></span>').join('')+'</div>';
  let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false,announcementTimer=null;
@@ -157,7 +157,7 @@
    await transport.load(true);lastReward=!wasPaid&&m.paid;refresh();
   }});
   document.addEventListener('proplet:screen-changed',()=>reload());
-  document.addEventListener('proplet:account-changed',()=>{m.ready=false;lastReward=false;refresh();reload(true)});
+  document.addEventListener('proplet:account-changed',()=>{close();m.ready=false;lastReward=false;refresh();reload(true)});
   document.addEventListener('proplet:profile-refreshed',()=>reload(true));
   window.addEventListener('online',()=>reload(true));
   new MutationObserver(offer).observe($('#winModal'),{attributes:true,attributeFilter:['class']});
