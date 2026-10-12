@@ -1,5 +1,5 @@
 {
-  "testedSha": "f161363e45b79a857100516e8d3bbad549d23af6",
+  "testedSha": "b4d0c763ecd29eb992582ff40ab28f4c36517a27",
   "checks": [
     {
       "view": "daily",
@@ -595,13 +595,7 @@
       "clonedTajenkaPlayAndBack": "PASS"
     },
     {
-      "hiddenCards": [
-        {
-          "id": "tajenkaPreviewCard",
-          "width": 0,
-          "height": 0
-        }
-      ],
+      "hiddenCards": [],
       "result": "PASS"
     },
     {
@@ -613,13 +607,7 @@
       "result": "PASS"
     },
     {
-      "hiddenCards": [
-        {
-          "id": "tajenkaPreviewCard",
-          "width": 0,
-          "height": 0
-        }
-      ],
+      "hiddenCards": [],
       "result": "PASS"
     },
     {
@@ -627,13 +615,7 @@
       "result": "PASS"
     },
     {
-      "hiddenCards": [
-        {
-          "id": "tajenkaPreviewCard",
-          "width": 0,
-          "height": 0
-        }
-      ],
+      "hiddenCards": [],
       "result": "PASS"
     },
     {
@@ -1776,7 +1758,7 @@
       "freeIdleMutations": {
         "records": 0,
         "batches": 0,
-        "elapsedMs": 500
+        "elapsedMs": 501
       }
     },
     {
@@ -2862,7 +2844,7 @@
   "layoutIssues": [],
   "productionParity": {
     "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
-    "headSha": "f161363e45b79a857100516e8d3bbad549d23af6",
+    "headSha": "b4d0c763ecd29eb992582ff40ab28f4c36517a27",
     "result": "PASS",
     "unchangedExistingFiles": 1280,
     "reviewedIntegrationSeams": {
