@@ -84,6 +84,15 @@ def main():
                 assert signature is not None, name
                 return postgres_rpc.execute_on_connection(c,name,body,signature)
             assert direct('proplet_player_stats_v1',{'p_player':player}) == compact
+            # The pooler carries arrays; consumers must receive the exact
+            # original table contract, including zero-score and team rows.
+            for period_start in (None, '2100-01-01T00:00:00Z'):
+                expected_xp = [row[0] for row in c.execute(
+                    'select to_jsonb(t) from public.proplet_rankings_xp_aggregate(%s::timestamptz) t',
+                    (period_start,)).fetchall()]
+                actual_xp = direct('proplet_rankings_xp_aggregate', {'p_period_start':period_start})
+                ordered = lambda rows: sorted(rows, key=lambda row:(row['row_kind'],row['entity_id']))
+                assert ordered(actual_xp) == ordered(expected_xp)
             ranking = direct('proplet_ranking_context_v1',{'p_player_ids':[player]})
             assert ranking['players'][0]['id'] == player
             echo = direct('proplet_synthetic_transport',{'p_id':player,'p_ids':[player], 'p_payload':{'text':'ČÁP','count':3}})

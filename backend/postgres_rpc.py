@@ -29,6 +29,7 @@ TRANSACTION_SETUP = (
     "set local statement_timeout = '10s'; "
     "set local request.jwt.claims = '{\"role\":\"service_role\"}'"
 )
+XP_AGGREGATE_COLUMNS = ("row_kind", "entity_id", "period_xp", "lifetime_xp", "badge_count")
 
 
 def configured_dsn(supabase_url):
@@ -125,7 +126,16 @@ def execute_on_connection(connection, function, body, signature):
         arguments.append(sql.SQL("{} => %s::{}").format(sql.Identifier(name), sql.SQL(arg_type)))
         params.append(value)
     call = sql.SQL("public.{}({})").format(sql.Identifier(function), sql.SQL(", ").join(arguments))
-    if returns_rows == 'rows':
+    compact_xp = function == "proplet_rankings_xp_aggregate" and returns_rows == 'rows'
+    if compact_xp:
+        # Preserve all scores, including inactive viewers' lifetime XP, but
+        # avoid repeating five JSON field names in every row over the pooler.
+        # The server restores the original RPC contract before any consumer.
+        statement = sql.SQL(
+            "select pg_catalog.jsonb_build_array(t.row_kind, t.entity_id, "
+            "t.period_xp, t.lifetime_xp, t.badge_count) from (select * from {}) as t"
+        ).format(call)
+    elif returns_rows == 'rows':
         # A one-column RETURNS TABLE otherwise aliases the scalar, losing its
         # column name. The derived relation preserves the PostgREST row shape.
         statement = sql.SQL("select pg_catalog.to_jsonb(t) from (select * from {}) as t").format(call)
@@ -136,6 +146,11 @@ def execute_on_connection(connection, function, body, signature):
     else:
         statement = sql.SQL("select pg_catalog.to_jsonb({})").format(call)
     rows = connection.execute(statement, params).fetchall()
+    if compact_xp:
+        values = [row[0] for row in rows]
+        if any(not isinstance(value, list) or len(value) != len(XP_AGGREGATE_COLUMNS) for value in values):
+            raise ValueError("Invalid compact XP aggregate response")
+        return [dict(zip(XP_AGGREGATE_COLUMNS, value)) for value in values]
     if result_type == "void":
         return None
     if returns_rows:
