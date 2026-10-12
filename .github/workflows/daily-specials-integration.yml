@@ -3,7 +3,7 @@ name: Daily specials integrated browser QA
 on:
   push:
     branches: [work/daily-specials-integrated-20261012]
-    paths: ['tests/current/daily-specials-preview.json']
+    paths: ['tests/current/daily-specials-preview.json', 'tools/daily_specials/integration_qa.cjs', '.github/workflows/daily-specials-integration.yml']
   workflow_dispatch:
     inputs:
       preview_url:

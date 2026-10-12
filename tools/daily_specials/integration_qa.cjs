@@ -94,7 +94,10 @@ async function open(context,origin){
  await dismissAnnouncements(page);
  return page;
 }
-async function screenshot(page,name){await page.screenshot({path:path.join(out,name+'.png'),fullPage:true})}
+async function screenshot(page,name){
+ await page.screenshot({path:path.join(out,name+'.png'),fullPage:true});
+ if(/^\d+-(base|special)$/.test(name))await page.screenshot({path:path.join(out,name+'-viewport.png'),fullPage:false});
+}
 async function bounds(page){
  return page.evaluate(()=>{
   const hero=document.querySelector('#screen-daily .daily-hero'),rect=element=>{const r=element.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}};
@@ -138,7 +141,16 @@ async function returnToday(page){
 }
 async function finishByGestures(page,puzzle,touch){
  const found=new Set((await gameInfo(page)).found);
- for(let index=0;index<puzzle.answers.length;index++)if(!found.has(index))await gesture(page,puzzle.answers[index],touch);
+ const remaining=puzzle.answers.map((_,index)=>index).filter(index=>!found.has(index));
+ for(const index of remaining){
+  if(index===remaining.at(-1)){
+   // Real gestures can be faster than a human. Let the unmodified running
+   // clock reach the production anti-forgery floor before the final word.
+   const minimum=Math.max(2500,puzzle.mask.length*90)+300;
+   await page.waitForFunction(ms=>gameElapsed(currentGame)>=ms,minimum,{timeout:30000,polling:100});
+  }
+  await gesture(page,puzzle.answers[index],touch);
+ }
  await page.locator('#winModal:not(.hidden)').waitFor({timeout:30000});
  await page.evaluate(()=>fairPlay().drain());
  assert.equal((await gameInfo(page)).found.length,puzzle.answers.length,'all words solved by actual gestures');
