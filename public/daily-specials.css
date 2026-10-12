@@ -1,0 +1,32 @@
+/* The optional challenge shares the existing Daily heading, metadata and CTA.
+   Its controls add no row, card, vertical padding or height to the hero. */
+.daily-title-choice-row{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0}
+.daily-title-choice-row>h1{min-width:0}
+.daily-base-title{border:0;padding:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left;cursor:pointer;border-radius:4px}
+.daily-base-title:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.daily-challenge-switch{flex:none;position:relative;align-self:center;margin:0}
+.daily-challenge-switch button{display:inline-flex;align-items:center;gap:5px;height:30px;min-height:0;padding:0 8px;border:1px solid rgba(255,248,233,.5);border-radius:999px;background:rgba(255,248,233,.08);color:#FFF8E9;font-family:inherit;font-size:15px;line-height:1;font-weight:600;position:relative;cursor:pointer;white-space:nowrap}
+.daily-challenge-switch button:before{content:"";position:absolute;inset:-7px -2px;border-radius:inherit}
+.daily-challenge-switch button:hover{background:rgba(255,248,233,.17)}
+.daily-challenge-switch button:focus-visible{outline:2px solid #FFF8E9;outline-offset:3px}
+.daily-challenge-switch button[aria-pressed="true"]{background:#FFF8E9;color:#214FAE;border-color:#FFF8E9;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.daily-challenge-switch img{display:block;width:24px;height:24px;object-fit:contain;pointer-events:none}
+#dailySpecialTabStatus:empty{display:none}
+#dailySpecialTabStatus{font-size:14px;line-height:1;font-weight:700}
+.daily-special-selected .daily-base-title{opacity:.78}
+#screen-daily .daily-hero #playDailyBtn.daily-special-action{display:flex;flex-direction:column;justify-content:center;gap:0;padding-top:4px!important;padding-bottom:4px!important}
+#playDailyBtn.daily-special-action>span{font-size:inherit;line-height:1.25}
+#playDailyBtn.daily-special-action>small{font-family:inherit;font-size:15px;line-height:1.25;font-weight:400;opacity:.83}
+.daily-week-day.has-daily-special{position:relative;cursor:pointer}
+.daily-week-special-mark{display:block;position:absolute;right:2px;bottom:2px;width:14px;height:14px;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2));pointer-events:none}
+.daily-week-day.has-daily-special:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.daily-week-dialog-list{display:grid;gap:6px;margin:18px 0}
+.daily-week-dialog-day{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(0,1fr);align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);font-size:15px;line-height:1.35}
+.daily-week-dialog-day.today{background:color-mix(in srgb,#214FAE 8%,var(--paper));border-color:color-mix(in srgb,#214FAE 35%,var(--line))}
+.daily-week-dialog-day>span{display:flex;align-items:center;gap:5px;min-width:0}
+.daily-week-dialog-day img{width:24px;height:24px;object-fit:contain;flex:none}
+.daily-week-dialog-day .daily-week-none{color:var(--muted)}
+.daily-week-dialog-copy{font-size:15px;line-height:1.4;margin:12px 0}
+.daily-week-dialog .modal-card>h2{margin:0;font-size:27px}
+.daily-week-dialog .modal-card>.primary-btn{width:100%;margin-top:10px}
+@media(max-width:350px){.daily-challenge-switch button{padding:0 6px;gap:3px}.daily-challenge-switch img{width:21px;height:21px}.daily-title-choice-row{gap:5px}.daily-title-choice-row>h1{font-size:26px!important}.daily-week-dialog-day{grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:4px;padding:8px 6px}}

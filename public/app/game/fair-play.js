@@ -22,7 +22,7 @@ function create(deps){
    });
  }
  async function prepare(puzzle,mode,dailyDate,restored){
-   if(!['daily','free','tajenka'].includes(mode)||(await config()).enabled!==true)return {restored};
+   if(!['daily','daily_special','free','tajenka'].includes(mode)||(await config()).enabled!==true)return {restored};
    const g={puzzle,mode,dailyDate,...restored,found:restored?.found||[],attemptId:restored?.attemptId||global.crypto.randomUUID(),fairPlay:true,timingUnverified:restored?.timingUnverified};
    const progress={...snapshot(g),elapsedMs:restored?.elapsedMs||0};
    try{

@@ -12,13 +12,14 @@
   const gen5CandidatePreview=previewHost&&(location.hostname.startsWith('proplet-git-feat-gen5-lab-')||new URLSearchParams(location.search).get('releasePreview')==='1');
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'4.05.5',
+    version:'4.06.0',
     datedDailyCutover:'2026-10-08',
     canonicalOrigin,
     gen4CandidatePreview,
     gen5CandidatePreview,
     capabilities:Object.freeze({
       weeklyTeamVictories:true,
+      optionalDailySpecials:true,
       phoneLandscapeBlocking:true,
       tabletLandscapeReflow:true,
       desktopWideLayout:true,

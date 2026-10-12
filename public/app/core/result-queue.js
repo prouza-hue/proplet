@@ -9,8 +9,8 @@
   }
 
   function legacyId(item) {
-    if (item?.attemptId) return String(item.attemptId);
     const challengeKey = String(item?.challengeKey || '').trim();
+    if (item?.attemptId) return `${item.mode || ''}:${challengeKey}:${item.attemptId}`;
     const completedAt = String(item?.completedAt || '').trim();
     return challengeKey || completedAt ? `${challengeKey}:${completedAt}` : '';
   }
@@ -31,10 +31,14 @@
       try { queue = read(); } catch (_) { queue = []; }
       if (!Array.isArray(queue)) queue = [];
       let changed = false;
+      const seenIds = new Set();
       const normalized = queue.filter(item => item && typeof item === 'object').map(item => {
-        if (item.queueId) return item;
+        if (item.queueId && !seenIds.has(item.queueId)) { seenIds.add(item.queueId); return item; }
         changed = true;
-        return {...item, queueId: legacyId(item) || fallbackId()};
+        let queueId = legacyId(item) || fallbackId();
+        if (seenIds.has(queueId)) queueId = fallbackId();
+        seenIds.add(queueId);
+        return {...item, queueId};
       });
       if (changed || normalized.length !== queue.length) write(normalized);
       return normalized;
@@ -53,8 +57,9 @@
         if (index < 0) queue.push(next);
         else if (queue[index].puzzleId !== record.puzzleId) queue[index] = next;
       } else {
-        const recordId = record.attemptId || `${record.challengeKey || ''}:${record.completedAt || ''}`;
-        if (!queue.some(item => (item.attemptId || `${item.challengeKey || ''}:${item.completedAt || ''}`) === recordId)) queue.push(next);
+        const identity = item => `${item.mode || ''}:${item.challengeKey || ''}:${item.attemptId || item.completedAt || ''}`;
+        const recordId = identity(record);
+        if (!queue.some(item => identity(item) === recordId)) queue.push(next);
       }
       write(queue);
       return queue;

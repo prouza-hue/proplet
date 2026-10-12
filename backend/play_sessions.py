@@ -26,7 +26,7 @@ class SessionCommand(BaseModel):
     action: Literal['open', 'pulse', 'pause', 'finish']
     puzzle_id: str = Field(min_length=1, max_length=100)
     challenge_key: str = Field(min_length=1, max_length=140)
-    mode: Literal['daily', 'free', 'tajenka']
+    mode: Literal['daily', 'daily_special', 'free', 'tajenka']
     difficulty: str = Field(max_length=20)
     attempt_id: str = Field(min_length=8, max_length=80)
     owner_id: UUID

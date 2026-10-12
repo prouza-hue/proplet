@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#FDFBF7" data-light-color="#FDFBF7" />
   <meta name="color-scheme" content="light dark" />
-  <script src="/runtime-meta.js?v=profile-statistics1" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=profile-statistics1"></script>
+  <script src="/runtime-meta.js?v=daily-specials1" data-proplet-runtime-meta="1" data-loaded="1"></script>
+  <script src="/theme-init.js?v=daily-specials1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -53,6 +53,7 @@
   <link rel="stylesheet" href="/mozkokalypsa-achievements.css?v=1" />
   <link rel="stylesheet" href="/achievement-details.css?v=3" />
   <link rel="stylesheet" href="/profile-statistics.css?v=1" />
+  <link rel="stylesheet" href="/daily-specials.css?v=1" />
 </head>
 <body>
   <div class="ambient ambient-one"></div>
@@ -76,7 +77,10 @@
         </div>
         <div class="hero-main">
           <div>
-            <h1>Denní výzva</h1>
+            <h1 id="dailyHeroTitle">Denní výzva</h1>
+            <div id="dailyChallengeSwitch" class="daily-challenge-switch hidden" aria-label="Dnešní výzvy">
+              <button type="button" data-daily-kind="special" aria-pressed="false" aria-label="Přepnout na dobrovolný speciál"><img id="dailySpecialTabIcon" width="24" height="24" alt=""><span>Navíc</span><span id="dailySpecialTabStatus" aria-hidden="true"></span></button>
+            </div>
             <p id="dailyMeta" class="hero-muted"></p>
             <div id="dailyWeekRhythm" class="daily-week-rhythm" aria-label="Týdenní rytmus obtížnosti"></div>
           </div>
@@ -751,6 +755,8 @@
   <script src="/app/content/free-order-store.js?v=shared3"></script>
   <script src="/app/content/free-order-ui.js?v=shared3"></script>
   <script src="/app/content/daily-dated.js?v=dailygen6-20261008"></script>
+  <script src="/app/content/daily-special.js?v=daily-specials1"></script>
+  <script src="/app/content/daily-special-ui.js?v=daily-specials1"></script>
   <script src="/app/content/progression.js?v=dailygen6-20261008"></script>
   <script src="/app/content/daily.js?v=dailygen6-20261008"></script>
   <script src="/app/rankings/rankings.js?v=weekly3"></script>
@@ -764,7 +770,7 @@
   <script src="/app/content/refresh-ui.js?v=mobilefix1"></script>
   <script src="/app/content/refresh-release.js?v=refresh300"></script>
   <script src="/app/client-diagnostics.js?v=2"></script>
-  <script src="/app.js?v=profile-statistics1"></script>
+  <script src="/app.js?v=daily-specials1"></script>
   <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
   <script src="/app/marketing.js?v=5"></script>

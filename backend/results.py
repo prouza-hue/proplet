@@ -211,6 +211,7 @@ def public_response(receipt: dict[str, Any], stats: Any, stats_warning: Optional
     checked = validate_receipt(receipt)
     return {
         "ok": True,
+        **({"practice": True} if checked.get("practice") is True else {}),
         "firstCompletion": checked["firstCompletion"],
         "awardedPoints": checked["awardedPoints"],
         "dailyGenerationUpgrade": checked["dailyGenerationUpgrade"],
