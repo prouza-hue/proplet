@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const transport=window.PropletReferrals;if(!transport)return;
- window.PropletReferralUiRevision=14;
+ window.PropletReferralUiRevision=15;
  const m=transport.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -82,7 +82,7 @@
   root.querySelectorAll('[data-ref-reward-close]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await transport.dismiss();preferences.setItem(rewardKey(),'1');refresh()}catch(e){b.disabled=false;if(typeof showToast==='function')showToast(e.message)}});
   root.querySelectorAll('[data-ref-dismiss]').forEach(b=>b.onclick=()=>{offerDismissed=true;root.hidden=true});
  }
- async function open(kind){
+ async function open(kind,shareSource=null){
   if(kind==='invite'&&!transport.profile()?.id){close();openProfileModal('create');return}
   if(kind==='invite'){try{await transport.ensureInvite()}catch(e){if(typeof showToast==='function')showToast(e.message);return}}
   if(kind==='announcement'){
@@ -106,7 +106,7 @@
    $('#referralDialog .ref-sheet').innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít pozvánku">×</button><h2 id="refDialogTitle" tabindex="-1">Pozvi kamaráda</h2><div class="ref-choice"><button class="primary-btn" id="refShareBoard">Poslat tuhle desku</button><p>Kamarád si zahraje stejnou desku a porovnáte výsledky.</p><div class="ref-choice-bonus">'+artwork+reward+'</div><button class="primary-btn" data-ref-open>Pozvat nového hráče</button><p>Po jeho prvních pěti deskách získáte oba bonus.</p></div>';
    $('#referralDialog').classList.remove('hidden');wire($('#referralDialog'));
    $('#referralDialog [data-ref-close]').onclick=close;
-   $('#refShareBoard').onclick=()=>{close();forwardingShare=true;try{$('#winShareBtn').click()}finally{forwardingShare=false}};
+   $('#refShareBoard').onclick=()=>{close();forwardingShare=true;try{shareSource?.click()}finally{forwardingShare=false}};
    $('#refDialogTitle').focus();return;
   }
   const accept=kind==='accept';
@@ -150,7 +150,7 @@
  function refresh(){document.body.classList.toggle('referral-incoming',m.ready&&m.incoming);renderHome();renderProfile();offer();scheduleAnnouncement()}
  async function reload(force=false){await transport.load(force);refresh()}
  function boot(){
-  if(booted)return;booted=true;reload(true);artworkReady();$('#winShareBtn')?.addEventListener('click',e=>{if(!forwardingShare&&canInvite()&&$('#winShareBtn').classList.contains('challenge-share-cta')){e.preventDefault();e.stopImmediatePropagation();open('choice')}},true);
+  if(booted)return;booted=true;reload(true);artworkReady();document.addEventListener('click',e=>{const source=e.target.closest?.('#winShareBtn.challenge-share-cta, #shareDailyBtn, #screen-daily [data-tajenka-share]');if(source&&!source.disabled&&!forwardingShare&&canInvite()){e.preventDefault();e.stopImmediatePropagation();open('choice',source)}},true);
   registerGameCompletionHook({id:'referrals',priority:250,after:async({game})=>{
    if(!transport.profile()?.id||!game||['starter','rescue'].includes(game.mode)||game.isReplay)return;
    offerDismissed=false;const wasPaid=m.paid;

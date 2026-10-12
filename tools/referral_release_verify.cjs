@@ -32,7 +32,7 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
   let body={};try{body=req.postDataJSON()||{}}catch{}
   apiCalls.push({path:u.pathname,method:req.method(),body});
   const reply=d=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(d)});
-  if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.07.0',environment:'preview'});
+  if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.07.1',environment:'preview'});
   if(u.pathname==='/api/tajenka')return reply(fixture.tajenka);
   if(u.pathname==='/api/referrals')return reply({enabled:true,invite:{url:base+'/?invite=OWNCODE123',code:'OWNCODE123'},incoming:paid?{id:'reward-test',inviter:{name:'Katka',avatar:'🦊'},completedBoards:5,paid:true,rewardDismissed:dismissed}:guest&&registered?{id:'incoming-test',inviter:{name:'Katka'},completedBoards:0,paid:false}:null,referrals:[]});
   if(u.pathname==='/api/referrals/invite/'+inviteCode)return reply({enabled:true,inviter:{name:'Katka',avatar:'🦊'}});
@@ -84,6 +84,38 @@ async function shot(page,selector,name){
   assert(s.apiCalls.some(c=>c.path==='/api/referrals/invite'&&c.method==='POST'));
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Real invitation transport creates own invite URL');
+  s=await boot(browser);
+  await s.page.evaluate(()=>{
+   Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}});
+   const date=pragueDateISO(),p=dailyPuzzleFor(date),state=getState();
+   state.completed['daily:'+date]={puzzleId:p.id,mode:'daily',dailyDate:date,elapsedMs:45000,moves:7,cleanSolve:true,completedAt:new Date().toISOString()};
+   saveState(state);
+   const ts=tajenkaState();ts.completions=ts.completions||{};
+   ts.completions[tajenkaPuzzle.id]={puzzleId:tajenkaPuzzle.id,elapsedMs:60000,moves:8,cleanSolve:true,completedAt:new Date().toISOString()};
+   saveTajenkaState(ts);renderDaily();renderTajenkaEntry();
+  });
+  for(const selector of ['#shareDailyBtn','#screen-daily [data-tajenka-share]']){
+   await s.page.locator(selector).waitFor({state:'visible'});
+   // Compare with the source button's own original handler, not the last result.
+   await s.page.evaluate(sel=>{PropletReferrals.model.ready=false;window.__nativeShare=null;document.querySelector(sel).click()},selector);
+   await s.page.waitForFunction(()=>window.__nativeShare);
+   const baseline=await s.page.evaluate(()=>window.__nativeShare);
+   await s.page.evaluate(()=>{PropletReferrals.model.ready=true;window.__nativeShare=null;currentGame={mode:'free',puzzle:{id:'wrong-stale-result',difficulty:'easy',meta:{level:999}},finished:true}});
+   await s.page.locator(selector).click();
+   assert.equal(await s.page.evaluate(()=>window.__nativeShare),null);
+   await s.page.locator('#refShareBoard').click();
+   await s.page.waitForFunction(()=>window.__nativeShare);
+   assert.deepEqual(await s.page.evaluate(()=>window.__nativeShare),baseline);
+   await s.page.locator(selector).click();
+   await s.page.locator('#referralDialog [data-ref-open]').click();
+   await s.page.locator('#refLink').waitFor({state:'visible'});
+   assert.equal(new URL(await s.page.locator('#refLink').inputValue()).searchParams.get('invite'),'OWNCODE123');
+   await s.page.keyboard.press('Escape');
+   // Tajenka's button is rebuilt by renderDaily; delegation must survive that.
+   await s.page.evaluate(()=>renderDaily());
+  }
+  assert.deepEqual(s.errors,[]);await s.ctx.close();
+  pass('Dnes Daily and rebuilt Tajenka offer both choices and preserve original board share despite stale result');
   s=await boot(browser);
   await s.page.evaluate(()=>startFree('easy'));
   await s.page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.answers?.length);
