@@ -57,6 +57,6 @@ async function ensureInvite(){
  if(!d.url)throw new Error('Pozvánku se nepodařilo připravit.');
  model.inviteUrl=d.url;return d.url;
 }
-async function dismiss(){await api('/api/referrals/dismiss',{method:'POST',body:'{}'});model.rewardDismissed=true}
+async function dismiss(){const identity=profile()?.id;if(!identity)throw new Error('Nejdřív se přihlas.');await api('/api/referrals/dismiss',{method:'POST',body:'{}'});if(profile()?.id!==identity)throw new Error('Účet se mezitím změnil.');model.rewardDismissed=true}
 window.PropletReferrals={model,profile,preferences,pendingCode,load,ensureInvite,dismiss};
 })();
