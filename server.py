@@ -5336,8 +5336,8 @@ first_board.install(app, telemetry_actor=telemetry_actor, db_rpc=db_rpc,
                     enforce_rate_limit=enforce_rate_limit, environment=VERCEL_ENV,
                     app_version=APP_VERSION)
 
-if not os.environ.get("VERCEL"):
-    app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
-
 # Server attribution and progress; fixtures are never part of this installer.
 referral_domain.install(app, auth_player=auth_player, db_rpc=db_rpc, enforce_rate_limit=enforce_rate_limit)
+
+if not os.environ.get("VERCEL"):
+    app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")

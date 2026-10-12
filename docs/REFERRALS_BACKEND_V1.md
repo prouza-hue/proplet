@@ -32,3 +32,5 @@ A real test in eanzztstmwlamwfdskbf remapped this SQL into a unique disposable s
 immutable attribution, modes, puzzle identity, post-signup window, injected partial-grant failure, retry, period/lifetime XP, dismissal all passed.
 Permanent public tables/accounts were untouched.
 GitHub PostgreSQL service acceptance adds simultaneous fifth/sixth boards and retry races with no production secrets.
+
+Cache freshness: /api/me and /api/account/snapshot read authoritative DB stats for both users. Ranking aggregates are bounded by the existing 30-second cache bucket; no long-lived referral XP cache is added.

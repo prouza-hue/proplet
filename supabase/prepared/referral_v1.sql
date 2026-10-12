@@ -147,21 +147,12 @@ grant execute on function public.proplet_referral_public_v1(text), public.prople
   public.proplet_referral_status_v1(uuid), public.proplet_referral_dismiss_v1(uuid) to service_role;
 
 -- Referral rewards remain in lifetime XP, outside every timed XP leaderboard.
-create or replace function public.proplet_rankings_xp_aggregate(
-  p_period_start timestamptz default null
-)
-returns table (
-  row_kind text,
-  entity_id text,
-  period_xp bigint,
-  lifetime_xp bigint,
-  badge_count integer
-)
-language sql
-stable
-security invoker
-set search_path = ''
-as $function$
+CREATE OR REPLACE FUNCTION public.proplet_rankings_xp_aggregate(p_period_start timestamp with time zone DEFAULT NULL::timestamp with time zone)
+ RETURNS TABLE(row_kind text, entity_id text, period_xp bigint, lifetime_xp bigint, badge_count integer)
+ LANGUAGE sql
+ STABLE
+ SET search_path TO ''
+AS $function$
   with result_points as (
     select
       r.player_id,
@@ -287,13 +278,7 @@ as $function$
     0::integer as badge_count
   from team_totals t;
 $function$;
-
-revoke all on function public.proplet_rankings_xp_aggregate(timestamptz) from public;
-revoke all on function public.proplet_rankings_xp_aggregate(timestamptz) from anon, authenticated;
+revoke all on function public.proplet_rankings_xp_aggregate(timestamptz) from public, anon, authenticated;
 grant execute on function public.proplet_rankings_xp_aggregate(timestamptz) to service_role;
-
-comment on function public.proplet_rankings_xp_aggregate(timestamptz) is
-  'Aggregates personal and team XP plus badge counts for the Proplet leaderboard without transferring raw result history.';
-
-
+notify pgrst, 'reload schema';
 commit;
