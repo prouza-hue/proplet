@@ -66,6 +66,8 @@ def install(namespace):
 
     def result_context(payload, player):
         binding, practice = identity(payload)
+        if payload.content_hash is not None and payload.content_hash != binding.content_hash:
+            raise HTTPException(400, "Obsah speciálu neodpovídá vydané desce")
         if payload.daily_date != binding.daily_date or not payload.attempt_id:
             raise HTTPException(400, "Speciál musí mít přesné datum a identitu pokusu")
         session = session_for(payload, {"player_id": player["id"]})

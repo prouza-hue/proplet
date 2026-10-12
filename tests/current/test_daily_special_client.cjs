@@ -78,5 +78,11 @@ const descriptor={schemaVersion:1,serverToday:iso,validUntil:'2026-10-21T22:00:0
   await fair.prepare(bound.puzzle,'daily_special',iso,{attemptId:'official-session'});
   await fair.prepare(archive.puzzle,'daily_special',iso,{attemptId:'practice-session'});
   assert.equal(commands.length,2);assert.equal(commands[0].challenge_key,descriptor.challengeKey);assert.equal(commands[1].challenge_key,archive.challengeKey);
+  const finishedPractice=FairPlay.create({owner:'tab',api:async url=>url.endsWith('config')?{enabled:true}:{finished:true,attempt_id:'old-practice',verified:true,progress:{found:[answer]}},profile:()=>null,completed:()=>false,elapsed:()=>0,key:()=>archive.challengeKey});
+  for(let repeat=0;repeat<2;repeat++){
+    const replay=await finishedPractice.prepare(archive.puzzle,'daily_special',iso,null);
+    assert.equal(replay.restored,null,'finished practice starts with an empty board on every repeat');
+    assert.equal(replay.replay,true);assert.equal(replay.fairPlay,false);
+  }
   console.log('PASS: special/base cache isolation, immutable bindings, midnight, practice restore, queue race, guest merge, statistics and fair-play sessions');
 })().catch(error=>{console.error(error);process.exit(1)});

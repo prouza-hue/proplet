@@ -57,14 +57,14 @@ def canonical_digest(value: Mapping[str, Any]) -> str:
 
 
 def canonical_request(payload: Any) -> dict[str, Any]:
-    """Return every accepted ResultCreate field including explicit null/defaults."""
+    """Stable legacy fields and, for special commands only, the declared hash."""
     if hasattr(payload, "model_dump"):
         value = payload.model_dump()
     elif isinstance(payload, Mapping):
         value = dict(payload)
     else:
         raise TypeError("payload must be ResultCreate-compatible")
-    return {
+    request = {
         "puzzle_id": value["puzzle_id"],
         "challenge_key": value["challenge_key"],
         "mode": value["mode"],
@@ -80,6 +80,11 @@ def canonical_request(payload: Any) -> dict[str, Any]:
         "completed_at": value.get("completed_at"),
         "calm_mode": value.get("calm_mode", False),
     }
+    # Preserve every historical Daily/Free request digest exactly. New special
+    # commands bind the client's declared hash into their idempotency identity.
+    if value["mode"] == "daily_special":
+        request["content_hash"] = value.get("content_hash")
+    return request
 
 
 def result_identity(player_id: str, payload: Any) -> ResultIdentity:

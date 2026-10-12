@@ -25,15 +25,42 @@ async function readJson(origin,endpoint){
  return response.json();
 }
 async function seed(context,profile=null){
- await context.addInitScript(profile=>{
-  localStorage.setItem('proplet-v3-7-required-onboarding','done');
-  localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
-  localStorage.setItem('proplet-v3-settings',JSON.stringify({theme:'light',sound:false,haptics:false,wakeLock:false,magnifier:true}));
-  localStorage.setItem('proplet-calm-mode-v1','0');
-  localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
-  if(profile&&!localStorage.getItem('proplet-v2-profile'))localStorage.setItem('proplet-v2-profile',JSON.stringify(profile));
+ await context.addInitScript(({profile,origins})=>{
+  // Playwright also runs init scripts in the opaque initial about:blank page.
+  // Only the actual app document may read preferences or the synthetic profile.
+  if(window!==window.top||!['http:','https:'].includes(location.protocol)||!origins.includes(location.origin))return;
+  try{
+   localStorage.setItem('proplet-v3-7-required-onboarding','done');
+   localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
+   localStorage.setItem('proplet-v3-settings',JSON.stringify({theme:'light',sound:false,haptics:false,wakeLock:false,magnifier:true}));
+   localStorage.setItem('proplet-calm-mode-v1','0');
+   localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
+   if(profile&&!localStorage.getItem('proplet-v2-profile'))localStorage.setItem('proplet-v2-profile',JSON.stringify(profile));
+  }catch(error){window.__QA_SEED_ERROR=error.message;}
   window.__QA_PROPLET_READY=false;document.addEventListener('proplet:ready',()=>window.__QA_PROPLET_READY=true);
- },profile);
+ },{profile,origins:[previewOrigin,productionOrigin]});
+}
+async function dismissAnnouncements(page){
+ const controls=[
+  '#freeRefreshAnnouncement:not(.hidden) [data-refresh-back]',
+  '#mk100LaunchPreview:not(.hidden) [data-mk-launch-back]',
+  '#contentReleaseModal[open] .content-release-close',
+  '.release-notes-v3331-backdrop .release-notes-v3331-close',
+ ];
+ let quiet=0;
+ for(let pass=0;pass<8;pass++){
+  let closed=false;
+  for(const selector of controls){
+   const button=page.locator(selector).first();
+   if(!await button.isVisible())continue;
+   await button.click();await button.waitFor({state:'hidden',timeout:5000});
+   report.dismissedAnnouncements??=[];report.dismissedAnnouncements.push({origin:new URL(page.url()).origin,selector});
+   closed=true;break;
+  }
+  quiet=closed?0:quiet+1;if(quiet>=2)return;
+  await page.waitForTimeout(100);
+ }
+ throw Error('Release announcements did not settle after their normal dismissal controls');
 }
 async function guardedContext(options,{readOnly=false,profile=null}={}){
  const context=await browser.newContext({...options,serviceWorkers:'block'});
@@ -60,9 +87,11 @@ async function open(context,origin){
  const page=await context.newPage();activePage=page;
  await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:60000});
  await page.waitForFunction(()=>window.__QA_PROPLET_READY===true,{},{timeout:60000});
+ assert.equal(await page.evaluate(()=>window.__QA_SEED_ERROR||null),null,'app-origin preferences must be writable');
  await page.waitForFunction(()=>typeof accountProgressAvailable==='function'&&accountProgressAvailable(),{},{timeout:60000});
  await page.locator('#screen-daily.active .daily-hero').waitFor({timeout:30000});
  await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(250);
+ await dismissAnnouncements(page);
  return page;
 }
 async function screenshot(page,name){await page.screenshot({path:path.join(out,name+'.png'),fullPage:true})}
@@ -83,6 +112,7 @@ function validateBounds(measurement,label){
 async function gameInfo(page){return page.evaluate(()=>({mode:currentGame?.mode,id:currentGame?.puzzle?.id,key:currentGame?challengeKey(currentGame.mode,currentGame.puzzle,currentGame.dailyDate):null,found:currentGame?.found.map(row=>row.answerIndex)||[],hints:currentGame?.hints||0,attempt:currentGame?.attemptId,elapsed:currentGame?gameElapsed(currentGame):0,paused:currentGame?.pausedAt!=null,finished:!!currentGame?.finished,record:currentGame?.resultRecord||null}))}
 async function start(page,kind){
  await page.bringToFront();
+ await dismissAnnouncements(page);
  await page.locator(kind==='special'?'#dailyChallengeSwitch [data-daily-kind="special"]':'#dailyHeroTitle [data-daily-kind="base"]').click();
  await page.locator('#playDailyBtn').click();
  await page.locator('#screen-game.active #board .cell').first().waitFor({timeout:30000});

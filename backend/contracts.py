@@ -96,6 +96,9 @@ class ResultCreate(BaseModel):
     elapsed_ms: int = Field(ge=1000, le=86_400_000)
     moves: int = Field(ge=1, le=10000)
     daily_date: Optional[str] = None
+    # Optional for cached legacy clients; a supplied special hash must match
+    # the server's immutable date/ID binding.
+    content_hash: Optional[str] = Field(default=None, min_length=64, max_length=64, pattern=r'^[0-9a-f]{64}$')
     hints_used: int = Field(default=0, ge=0, le=99)
     wrong_attempts: int = Field(default=0, ge=0, le=999)
     max_hint_level: int = Field(default=0, ge=0, le=3)

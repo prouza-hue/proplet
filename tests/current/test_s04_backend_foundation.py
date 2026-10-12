@@ -60,6 +60,13 @@ for special_path in ("/api/daily-special", "/api/rankings/daily-special"):
 shared_kind = next(item for item in openapi_contract["paths"]["/api/shared-puzzle"]["get"]["parameters"] if item["name"] == "kind")
 assert shared_kind["schema"]["pattern"] == "^(daily|daily_special|tajenka)$"
 shared_kind["schema"]["pattern"] = "^(daily|tajenka)$"
+# Declared special hashes are optional for cached legacy result clients.
+result_schema = openapi_contract["components"]["schemas"]["ResultCreate"]
+assert "content_hash" not in result_schema.get("required", [])
+hash_schema = next(item for item in result_schema["properties"]["content_hash"]["anyOf"] if item.get("type") == "string")
+assert hash_schema == {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"}
+result_schema["properties"].pop("content_hash")
+
 
 # The one-off authenticated campaign is covered by test_content_launch_push.
 assert set(openapi_contract["paths"]["/api/cron/mozkokalypsa-launch-push"]) == {"get"}
@@ -182,6 +189,7 @@ assert _dump(server.ResultCreate, puzzle_id="p-1", challenge_key="free:p-1", mod
     "elapsed_ms": 1000,
     "moves": 1,
     "daily_date": None,
+    "content_hash": None,
     "hints_used": 0,
     "wrong_attempts": 0,
     "max_hint_level": 0,

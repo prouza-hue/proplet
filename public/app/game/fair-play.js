@@ -29,7 +29,8 @@ function create(deps){
      await chain;
      const profile=deps.profile();
      const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile});
-     if(row.finished&&deps.completed?.(puzzle,mode,dailyDate))return {restored:null,fairPlay:false,replay:true};
+     const practice=mode==='daily_special'&&puzzle?.meta?.dailySpecialBinding?.rewardEligible===false;
+     if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)))return {restored:null,fairPlay:false,replay:true};
      return {restored:{...restored,...row.progress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,timingUnverified:row.verified===false},fairPlay:true};
    }catch(error){
      if(error.status===409)throw error;

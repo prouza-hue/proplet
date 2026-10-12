@@ -45,14 +45,22 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
     assert 'no-store' in client.get("/api/daily-special").headers['cache-control']
     payload={"puzzle_id":special["puzzleId"],"challenge_key":special["challengeKey"],"mode":"daily_special",
              "difficulty":"hardcore","daily_date":"2026-10-21","elapsed_ms":60_000,"moves":30,
-             "attempt_id":"special-asgi-001","clean_solve":True}
+             "attempt_id":"special-asgi-001","clean_solve":True,"content_hash":special["contentHash"]}
+    declared=server.result_domain.canonical_request(server.ResultCreate(**payload))
+    assert declared["content_hash"]==special["contentHash"]
+    legacy={**payload,"mode":"daily","challenge_key":base["challengeKey"],"puzzle_id":base["puzzleId"],"difficulty":"medium"}
+    legacy_hashed=server.result_domain.canonical_request(server.ResultCreate(**legacy))
+    legacy.pop("content_hash")
+    assert legacy_hashed==server.result_domain.canonical_request(server.ResultCreate(**legacy))
+    assert "content_hash" not in legacy_hashed
     response=client.post("/api/result",json=payload,headers={"X-Proplet-Result-Receipt":"1"})
     assert response.status_code==200,response.text
     assert response.json()["awardedPoints"]==100
     assert commands[-1][1]["p_command"]["contentHash"]==special["contentHash"]
     assert commands[-1][1]["p_command"]["freeLevel"] is None and commands[-1][1]["p_command"]["legacyRewardSlot"] is None
     for modified in ({**payload,"challenge_key":base["challengeKey"]},{**payload,"daily_date":"2026-10-20"},
-                     {**payload,"attempt_id":"other-asgi-attempt"},{**payload,"puzzle_id":"g6-ds-mozkomor-w01"}):
+                     {**payload,"attempt_id":"other-asgi-attempt"},{**payload,"puzzle_id":"g6-ds-mozkomor-w01"},
+                     {**payload,"content_hash":"0"*64}):
         assert client.post("/api/result",json=modified).status_code in(400,409)
     practice=client.post("/api/result",json={**payload,"challenge_key":special["practiceChallengeKey"],"attempt_id":"practice-asgi-001"})
     assert practice.status_code==200,practice.text
