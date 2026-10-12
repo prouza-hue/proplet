@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const preview=window.PropletReferralPreview;if(!preview)return;
- window.PropletReferralUiRevision=10;
+ window.PropletReferralUiRevision=11;
  const m=preview.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

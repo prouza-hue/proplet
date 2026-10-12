@@ -26,8 +26,8 @@ html.tiskarna-ui body #winModal.result-compact .daily-world-neighbours{gap:5px!i
 html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:43px!important;padding:7px 9px!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions{display:flex!important;flex-direction:column!important;gap:10px!important;align-self:center;width:100%!important;max-width:540px;margin:16px auto 6px!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions :is(#winPrimaryBtn,#winShareBtn){display:flex;align-items:center;justify-content:center;width:100%!important;max-width:none!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;border-radius:12px!important;font:650 15px/1.2 Outfit,sans-serif!important}
-html.tiskarna-ui body :is(#winModal #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#b84835!important;color:#fffaf0!important;border:1px solid #8f3426!important;box-shadow:0 3px 0 #8f3426!important}
-html.tiskarna-ui body #winModal #winShareBtn.challenge-share-cta img{display:none!important}
+html.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#b84835!important;color:#fffaf0!important;border:1px solid #8f3426!important;box-shadow:0 3px 0 #8f3426!important}
+html.tiskarna-ui body #winModal #winResultActions #winShareBtn.challenge-share-cta img{display:none!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions .hidden{display:none!important}
 html.tiskarna-ui body #winModal.result-compact :is(.win-secondary-actions,.win-details){margin-top:10px!important}
 html body #winModal #referralWin{max-width:540px;margin:12px auto!important;padding:16px!important}
@@ -41,7 +41,7 @@ html body #referralDialog .ref-choice [data-ref-open]{background:#27694f!importa
 .ref-choice p{font:400 13px/1.5 Outfit,sans-serif;color:var(--ref-muted);text-align:center;margin:12px 0 0}
 .ref-choice-bonus{display:flex;align-items:center;justify-content:center;gap:12px;border-top:1px solid var(--ref-line);margin:20px 0 16px;padding-top:20px}.ref-choice-bonus .ref-art{margin:0}
 html[data-theme=dark] body :is(#referralHome,#referralProfile) .ref-wide{background:#2b7457!important;border-color:#559074!important;box-shadow:0 3px 0 #183f30!important}
-html[data-theme=dark].tiskarna-ui body :is(#winModal #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#a53e30!important;border-color:#cc7968!important;box-shadow:0 3px 0 #66271e!important}
+html[data-theme=dark].tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#a53e30!important;border-color:#cc7968!important;box-shadow:0 3px 0 #66271e!important}
 @media(max-width:580px){
 html body #referralHome:not(.ref-incoming) .ref-story{grid-template-columns:minmax(0,1fr) 115px;gap:12px}
 html body #referralHome .ref-visual .ref-art{width:120px;transform:scale(.9);transform-origin:center center}
@@ -61,10 +61,10 @@ html.tiskarna-ui body #winModal.result-compact #winXp.xp-sticker{font-size:14px!
 
 /* Review 12 October: one invitation treatment, compact reward, centered praise. */
 :root{--invite-fill:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);--invite-hover:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%)}
-html:root.tiskarna-ui body :is(#winModal #winShareBtn.challenge-share-cta,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],#referralHome [data-ref-open],#referralProfile [data-ref-open]){
+html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],#referralHome [data-ref-open],#referralProfile [data-ref-open]){
  background:var(--invite-fill)!important;color:#fff!important;border:1px solid #d05677!important;box-shadow:0 4px 12px #8b244626,inset 0 1px 0 #ffffff2e!important;font-family:Outfit,system-ui,sans-serif!important;font-weight:400!important;text-shadow:none!important;
 }
-html:root.tiskarna-ui body :is(#winModal #winShareBtn.challenge-share-cta,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],#referralHome [data-ref-open],#referralProfile [data-ref-open]):hover{background:var(--invite-hover)!important}
+html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],#referralHome [data-ref-open],#referralProfile [data-ref-open]):hover{background:var(--invite-hover)!important}
 html:root.tiskarna-ui body :is(#winModal #winShareBtn,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,[data-ref-open]):focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 html.tiskarna-ui body #winModal.result-compact .win-result-heading{display:grid;grid-template-columns:minmax(72px,1fr) minmax(0,4fr) minmax(72px,1fr);gap:8px;align-items:center}
 html.tiskarna-ui body #winModal.result-compact #winTitle{grid-column:2;grid-row:1;text-align:center!important;text-wrap:balance;overflow-wrap:anywhere}
