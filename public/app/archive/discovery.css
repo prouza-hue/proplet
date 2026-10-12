@@ -63,7 +63,7 @@ html.tiskarna-ui body.archive-experience .ax-team-entry{--pg-accent:var(--pg-gre
 html.tiskarna-ui body.archive-experience .ax-entry-art .ax-free-art{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:4px;width:100%;padding:0}
 html.tiskarna-ui body.archive-experience .ax-free-difficulty{width:100%;height:22px;object-fit:contain;min-width:0}
 /* Native difficulty renderer: retain title, XP, history and progress semantics. */
-html.tiskarna-ui body.archive-experience #difficultyCards .cp-card{grid-template-columns:var(--pg-art) minmax(0,1fr) auto!important;column-gap:10px!important}
+html.tiskarna-ui body.archive-experience #screen-free #difficultyCards .cp-card{grid-template-columns:var(--pg-art) minmax(0,1fr) auto!important;column-gap:10px!important}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-top{display:contents!important}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-heading{margin:0!important}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-history{
@@ -143,3 +143,5 @@ html:root.tiskarna-ui body.archive-experience :is(#screen-daily #tajenkaPreviewC
  --pg-action-bg:var(--invite-fill);--pg-action-fg:#fff;--pg-action-border:#d05677;
  --pg-action-shadow:0 4px 12px #8b244626,inset 0 1px 0 #ffffff2e;font-weight:400!important;
 }
+
+html.tiskarna-ui body.archive-experience :is(#tajenkaPreviewCard,#tajenkaPlayCard) .tajenka-entry-copy>.eyebrow{display:none!important}
