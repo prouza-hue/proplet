@@ -1640,7 +1640,7 @@ function accountUI(){
  if(accountUIController)return accountUIController;
  const factory=window.PropletAccountUI;if(!factory?.create)throw new Error('Account UI modul není dostupný.');
  accountUIController=factory.create({
-  $,$,api,getProfile,getState,accountProgressAvailable,updateAccountProfile,esc,countCz,czPlural,fmtTime,currentLocalStats,effectiveStats,levelFor,getQueue,
+  $,$$,api,getProfile,getState,accountProgressAvailable,updateAccountProfile,esc,countCz,czPlural,fmtTime,currentLocalStats,effectiveStats,levelFor,getQueue,
   AVATARS,LEVELS,BADGES,SUPPORT_MODES,renderInstallUI,renderAchievementSummary,renderAchievements,syncAchievementDisclosure,
   toggleProfileAchievementsExpanded:()=>{profileAchievementsExpanded=!profileAchievementsExpanded},focusProfileRoadmap,updatePushUI,
   renderSettings,renderPrivacyActions,getSyncState:()=>syncState,getCurrentScreen:()=>currentScreen,showToast,
