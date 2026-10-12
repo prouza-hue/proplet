@@ -42,8 +42,10 @@ async function screenshot(page,name){await page.screenshot({path:out+'/'+name+'.
   await page.locator('#referralDialog .ref-announcement').waitFor({state:'visible'});
   await visual(page,'#referralDialog .ref-sheet','one-time-cta');
   await page.keyboard.press('Escape');
+  console.log('ANNOUNCEMENT_BEFORE '+JSON.stringify(await page.evaluate(()=>({prefs:Object.entries(PropletReferralPreview.preferences),native:PropletReferralPreview.preferences.constructor.name,dialog:document.querySelector('#referralDialog').className}))));
   await page.reload();await page.waitForFunction(()=>window.PropletReferralUiRevision===12);
   await page.waitForTimeout(1500);
+  console.log('ANNOUNCEMENT_AFTER '+JSON.stringify(await page.evaluate(()=>({prefs:Object.entries(PropletReferralPreview.preferences),native:PropletReferralPreview.preferences.constructor.name,dialog:document.querySelector('#referralDialog')?.innerText.slice(0,100)}))));
   assert.equal(await page.locator('#referralDialog:not(.hidden)').count(),0);
   check('One-time CTA appears for eligible player and stays dismissed across reload');
   await screenshot(page,'01-native-home');await visual(page,'#referralHome','home-inviter');
