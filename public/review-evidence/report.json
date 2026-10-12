@@ -1,0 +1,48 @@
+{
+  "testedSha": "b117439af0ccf9c7e4e77b6eaff8873d23682372",
+  "checks": [],
+  "screenshots": [
+    "initial-390.png"
+  ],
+  "pageErrors": [],
+  "networkWrites": [],
+  "layoutIssues": [],
+  "productionParity": {
+    "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
+    "headSha": "b117439af0ccf9c7e4e77b6eaff8873d23682372",
+    "result": "PASS",
+    "unchangedExistingFiles": 1280,
+    "reviewedIntegrationSeams": {
+      "public/app.js": "add guarded archive lifecycle/reward hooks",
+      "public/bootstrap-hydrator.js": "include the archive custom route",
+      "public/home-layout.js": "delegate preview placement without losing native nodes",
+      "public/index.html": "load isolated archive assets",
+      "public/printshop-release-polish.js": "one Tajenka placement owner",
+      "public/sw.js": "match preview asset references",
+      "public/tajenka-card-polish.js": "keep the completed Tajenka title in preview",
+      "public/tajenka-release-fix.js": "bind native clone handlers before removing IDs",
+      "public/valid-word-feedback-v3330.js": "approved historical solution adapter",
+      "vercel.json": "explicitly isolate this preview build"
+    }
+  },
+  "publishedReads": {
+    "/api/config": {
+      "status": 200
+    },
+    "/api/daily": {
+      "status": 200
+    },
+    "/api/daily-special": {
+      "status": 200
+    },
+    "/api/tajenka": {
+      "status": 200
+    },
+    "/api/rolling-content": {
+      "status": 200
+    }
+  },
+  "result": "FAIL",
+  "error": "Locator.click: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=\\\"daily\\\"]\")\n    - locator resolved to <button class=\"active\" data-nav=\"daily\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    23 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 146, in <module>\n    go(page,view);overflow(page,view,width);shot(page,view+\"-\"+str(width))\n    ^^^^^^^^^^^^^\n  File \"/home/runner/work/proplet/proplet/tools/archive_integrated_review.py\", line 31, in go\n    if view in [\"daily\",\"free\",\"leaderboard\",\"profile\"]:page.locator('.bottom-nav [data-nav=\"'+view+'\"]').click()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/sync_api/_generated.py\", line 18032, in click\n    self._sync(\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_sync_base.py\", line 115, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_locator.py\", line 165, in click\n    return await self._frame._click(self._selector, strict=True, **params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_frame.py\", line 594, in _click\n    await self._channel.send(\"click\", self._timeout, locals_to_params(locals()))\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.click: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".bottom-nav [data-nav=\\\"daily\\\"]\")\n    - locator resolved to <button class=\"active\" data-nav=\"daily\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    23 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <button id=\"hideRankingPrivacyBtn\" class=\"secondary-btn bigish\">Zůstat anonymně</button> from <div class=\"modal\" role=\"dialog\" aria-modal=\"true\" id=\"rankingPrivacyModal\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n\n"
+}

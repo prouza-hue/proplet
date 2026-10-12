@@ -1,0 +1,18 @@
+{
+  "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
+  "headSha": "b117439af0ccf9c7e4e77b6eaff8873d23682372",
+  "result": "PASS",
+  "unchangedExistingFiles": 1280,
+  "reviewedIntegrationSeams": {
+    "public/app.js": "add guarded archive lifecycle/reward hooks",
+    "public/bootstrap-hydrator.js": "include the archive custom route",
+    "public/home-layout.js": "delegate preview placement without losing native nodes",
+    "public/index.html": "load isolated archive assets",
+    "public/printshop-release-polish.js": "one Tajenka placement owner",
+    "public/sw.js": "match preview asset references",
+    "public/tajenka-card-polish.js": "keep the completed Tajenka title in preview",
+    "public/tajenka-release-fix.js": "bind native clone handlers before removing IDs",
+    "public/valid-word-feedback-v3330.js": "approved historical solution adapter",
+    "vercel.json": "explicitly isolate this preview build"
+  }
+}
