@@ -10,3 +10,43 @@
 @media(max-width:360px){main{padding-inline:11px}.profile-card{padding:17px 15px}.rank-main{gap:10px}.rank-icon{width:76px;height:76px}.rank-copy h3{font-size:21px}.controls button{padding-inline:10px;font-size:13px}.xp-total strong{font-size:23px}.avatar{width:43px;height:43px}.card-top{gap:10px}.milestone strong{font-size:12px}.milestone .number-art{font-size:23px}.milestone img{width:65px;height:65px}.review-label{font-size:12px}.principle img{width:48px;height:48px}.progress-label{font-size:12px}.chapter{font-size:14px;padding:5px 8px}}
 
 .chapter span{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border:1px solid currentColor;border-radius:50%;font:500 11px/1 Outfit,sans-serif}
+
+/* Collectible art and chapter ceremony; the 51 original ranks remain intact. */
+.has-chapter .rank-main{flex-direction:column;gap:5px;text-align:center;padding:19px 0 17px}
+.chapter-art{position:relative;width:190px;height:176px;flex-shrink:0;margin:0 auto}
+.chapter-art img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 9px #6c522a16)}
+.chapter-seal{position:absolute;right:9px;bottom:3px;display:flex;align-items:center;justify-content:center;min-width:57px;height:57px;padding:0 6px;border-radius:50%;border:3px double #e3c989;background:radial-gradient(circle at 40% 30%,#467b54,#1f4c39);box-shadow:0 2px 0 #a27c3a,0 4px 9px #28352533;color:#fff1c5;font:600 25px/1 Fraunces,Georgia,serif;letter-spacing:-1px}
+.chapter-art-large{width:245px;height:225px;margin:0 auto 21px;max-width:100%}
+.chapter-art-large .chapter-seal{width:68px;height:68px;right:9px;bottom:6px;font-size:29px}
+.has-chapter .rank-copy h3{font-size:25px}
+.has-chapter .chapter{margin-top:11px;background:#f3f1e7;border-color:#d6d6bf}
+.chapter-trail{display:flex;position:relative;justify-content:space-around;max-width:300px;margin:0 auto 23px;gap:15px}
+.chapter-trail::before{content:'';position:absolute;top:21px;left:16%;right:16%;height:1px;background:#d6d7c9}
+.chapter-mark{position:relative;display:flex;flex:1;align-items:center;flex-direction:column;gap:7px;min-width:0}
+.chapter-mark>span{display:flex;align-items:center;justify-content:center;width:43px;height:43px;border:1px solid #c5cbbb;border-radius:50%;background:var(--paper);color:#67715f;font-size:17px;font-weight:500}
+.chapter-mark.current>span{background:#245c48;color:#fff3ce;border:3px double #d4be81;box-shadow:0 2px 5px #245c4822}
+.chapter-mark.past>span{background:#edf1e7;color:#315c42}
+.chapter-mark.future>span{border-style:dashed;color:#82867b}
+.chapter-mark small{font-size:11px;color:#67715f;white-space:nowrap}
+.chapter-mark.current small{font-weight:600;color:#245c48}
+.has-chapter .progress>span{background:#397454}
+.has-chapter .next-goal strong{color:#245c48}
+.controls #celebrateChapter{background:#245c48;color:#fff9e8;border-color:#245c48}
+.controls #celebrateChapter:disabled{background:transparent;border-color:#c8c5ba;color:#8a8a82}
+.milestone{padding:14px 5px 13px;background:#fffcf5}
+.milestone img[src*='/continuation/']{width:120px;height:120px;max-width:100%;filter:none;opacity:1}
+.milestone.pending img[src*='/continuation/']{filter:saturate(.82);opacity:.88}
+.milestone strong{min-height:0;margin:10px 0 4px;font-size:15px}
+.milestone-name{font-size:13px;line-height:1.3;color:#3f5045;min-height:17px;margin:0 0 7px}
+.milestone>small{font-size:11px}
+.milestone.done{border-color:#b3cbb2;background:linear-gradient(#fffdf7,#f0f4e9)}
+.illustrated-detail{width:220px;height:220px;max-width:100%;margin-bottom:19px}
+.achievement-copy{text-align:center;max-width:320px;margin:0 auto 17px!important}
+.celebration{background:radial-gradient(ellipse at 50% 30%,#fff5d8 0,#fffcf5 70%)}
+.celebration h2{font-size:32px;max-width:300px;margin-inline:auto}
+.celebration-copy{text-align:center;color:#4a614f!important;font-size:17px!important}
+.celebration-note{text-align:center;font-size:12px!important}
+.celebration .primary{background:#245c48}
+@media(prefers-reduced-motion:no-preference){.celebration[open] .chapter-art{animation:chapter-arrives .65s cubic-bezier(.2,.8,.3,1) both}@keyframes chapter-arrives{from{transform:translateY(18px) scale(.88);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}}
+@media(max-width:480px){.milestone img[src*='/continuation/']{height:95px}.milestone strong{font-size:13px}.milestone-name{font-size:12px}.controls #celebrateChapter{flex:1 1 100%}.chapter-art{width:180px;height:166px}.chapter-art-large{width:230px;height:210px}.has-chapter .rank-copy h3{font-size:24px}}
+@media(max-width:360px){.milestone img[src*='/continuation/']{height:80px}.milestone-name{font-size:11px}.milestone>small{font-size:10px}.chapter-trail{gap:9px}.chapter-art{width:164px;height:151px}.chapter-art-large{width:210px;height:197px}.chapter-seal{min-width:52px;height:52px;font-size:24px}}

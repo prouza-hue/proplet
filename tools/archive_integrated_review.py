@@ -212,7 +212,13 @@ try:
         report["checks"].append({"width":width,"archiveCtaViewport":cta})
         shot(page,"announcement-"+str(width))
         assert page.locator("#archiveExperienceModal .ax-modal").evaluate("(e)=>e.scrollWidth<=e.clientWidth")
-        page.keyboard.press("Escape")
+        assert page.locator('#archiveExperienceModal [data-archive-action="enter"]').is_visible()
+        page.locator('#archiveExperienceModal [data-archive-action="extra"]').click()
+        assert page.evaluate("currentScreen==='daily' && dailySpecialUI().getState().selected==='special'")
+        page.evaluate("PropletArchiveExperience.announcement()")
+        page.locator('#archiveExperienceModal [data-archive-action="enter"]').click()
+        page.wait_for_selector("#screen-archive.active .ax-board")
+        report["checks"].append({"width":width,"twoAnnouncementDestinations":"PASS"})
         if width==390:
             # A local presentation fixture through the real Tajenka store; no result submission.
             tajenka_before=page.evaluate("structuredClone(tajenkaState())")

@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>Proplet · Cesta pokračuje</title>
-  <link rel="stylesheet" href="/design/progression-continuation.css">
-  <script defer src="/design/progression-continuation.js"></script>
+  <link rel="stylesheet" href="/design/progression-continuation.css?v=art2">
+  <script defer src="/design/progression-continuation.js?v=art2"></script>
 </head>
 <body>
 <main>
   <header class="page-header"><a href="/" class="brand" aria-label="Proplet, otevřít hru"><img src="/brand/mark.svg" alt=""><span>Proplet</span></a><span class="review-label">Návrh k posouzení</span></header>
   <div class="intro"><h1>Cesta pokračuje.</h1><p>Dosažená hodnost zůstává. Po 120 000 XP začínají další kapitoly.</p></div>
   <section class="controls" aria-label="Ovládání modelových dat">
-    <label for="sample">Vyzkoušet stav <select id="sample"><option value="55474">55 474 XP · běžný postup</option><option value="119999">119 999 XP · těsně před legendou</option><option value="120000">120 000 XP · začátek legendy</option><option value="124999">124 999 XP · před další kapitolou</option><option value="125000">125 000 XP · kapitola 2</option><option value="149999">149 999 XP · před milníkem</option><option value="150000">150 000 XP · nový milník</option><option value="158000" selected>158 000 XP · zkušený hráč</option><option value="250000">250 000 XP · delší cesta</option></select></label>
+    <label for="sample">Vyzkoušet stav <select id="sample"><option value="55474">55 474 XP · běžný postup</option><option value="119999">119 999 XP · těsně před legendou</option><option value="120000">120 000 XP · začátek legendy</option><option value="124999">124 999 XP · před další kapitolou</option><option value="125000">125 000 XP · kapitola 2</option><option value="149999">149 999 XP · před milníkem</option><option value="150000">150 000 XP · nový milník</option><option value="158000" selected>158 000 XP · zkušený hráč</option><option value="250000">250 000 XP · delší cesta</option><option value="300000">300 000 XP · další obzor</option></select></label>
     <label for="xp">Vlastní XP <input id="xp" type="number" inputmode="numeric" min="0" max="999999999" step="1" value="158000"></label>
     <button type="button" id="compare" aria-pressed="false">Porovnat s dneškem</button>
+    <button type="button" id="celebrateChapter">Ukázat oslavu kapitoly</button>
   </section>
   <p class="data-note" id="modelNote">Modelová data. Žádný účet se nemění.</p>
   <div id="comparison" class="comparison">
@@ -25,8 +26,8 @@
       <section class="milestones" aria-labelledby="milestoneHeading"><div class="section-head"><h3 id="milestoneHeading">XP úspěchy</h3><span id="milestoneCount"></span></div><div id="milestoneList" class="milestone-list"></div><button class="text-button" id="allAchievements" type="button">Dosavadní XP úspěchy</button></section>
     </section>
   </div>
-  <section class="principle"><img src="/rewards/printshop/legenda.svg" alt=""><div><h2>Legenda bez konce. Doslova.</h2><p>Každých dalších 5 000 XP nová kapitola. Každý nový velký milník do sbírky. Všechno, co už máš za sebou, platí dál.</p></div></section>
-  <details class="review-notes"><summary>Co přesně návrh ukazuje</summary><p>Zachovává všech 51 hodností a 13 dosavadních XP úspěchů. Nové kapitoly a milníky čekají na schválení; do hry nejsou zapojené.</p><p>Nové milníky mají zatím číselné názvy. Jejich značkou v náhledu je samotná hodnota XP; stávající ilustrace ponecháváme jejich původním úspěchům a hodnostem.</p><p>Kapitola 1 začíná na 120 000 XP, kapitola 2 na 125 000 XP. Nový XP úspěch následuje na 150 000 XP a potom každých dalších 50 000 XP.</p></details>
+  <section class="principle"><img src="/rewards/continuation/chapter-chronicle.webp" alt=""><div><h2>Legenda bez konce. Doslova.</h2><p>Každých dalších 5 000 XP nová kapitola. Každý nový velký milník do sbírky. Všechno, co už máš za sebou, platí dál.</p></div></section>
+  <details class="review-notes"><summary>Co přesně návrh ukazuje</summary><p>Zachovává všech 51 hodností a 13 dosavadních XP úspěchů. Nové kapitoly a milníky čekají na schválení; do hry nejsou zapojené.</p><p>Nové milníky mají vlastní ilustrovanou řadu: kompas, astroláb, maják a od 300 000 XP bránu dalších obzorů. Kapitoly mají otevřenou kroniku, číslovanou pečeť a krátkou oslavu. Stávající hodnosti a úspěchy ponecháváme beze změny.</p><p>Kapitola 1 začíná na 120 000 XP, kapitola 2 na 125 000 XP. Nový XP úspěch následuje na 150 000 XP a potom každých dalších 50 000 XP.</p></details>
   <footer>Samostatný náhled · 13. října 2026 · neobsahuje skutečná hráčská data</footer>
 </main>
 <dialog id="detail" aria-labelledby="detailTitle"><form method="dialog"><button class="close" aria-label="Zavřít detail">×</button></form><div id="detailContent"></div><form method="dialog"><button class="primary">Rozumím</button></form></dialog>

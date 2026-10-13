@@ -25,10 +25,25 @@ function newMilestoneCount(points) {
   return points < MILESTONE_START ? 0 : Math.floor((points - MILESTONE_START) / MILESTONE_STEP) + 1;
 }
 
+const NEW_ART = {
+  150000: {asset:'xp-compass', title:'Vlastní směr', copy:'Tolik cest už znáš. A pořád tě láká ta další.'},
+  200000: {asset:'xp-astrolabe', title:'Mezi hvězdami', copy:'Kdysi pár písmen. Dneska už celé souhvězdí.'},
+  250000: {asset:'xp-lighthouse', title:'Světlo v dálce', copy:'Čtvrt milionu. Na takovou cestu už je vidět z dálky.'},
+};
 function milestoneFor(target) {
   return XP_ACHIEVEMENTS.find(item => item.xp === target) || {
     id: `xp-${target}`, xp: target, name: `${fmt(target)} XP`, asset: null,
+    illustration:NEW_ART[target]?.asset||'xp-gateway',
+    title:NEW_ART[target]?.title||'Další obzor',
+    copy:NEW_ART[target]?.copy||'Tohle není poslední brána. Jen další, kterou jsi otevřel.',
   };
+}
+function chapterArt(chapter, large=false) {
+ return `<div class="chapter-art ${large?'chapter-art-large':''}"><img src="/rewards/continuation/chapter-chronicle.webp" alt=""><span class="chapter-seal" aria-label="Kapitola ${fmt(chapter)}">${fmt(chapter)}</span></div>`;
+}
+function chapterTrail(chapter) {
+ const first=Math.max(1,chapter-1);
+ return `<div class="chapter-trail" aria-label="Tvoje kapitoly">${[first,first+1,first+2].map(n=>`<div class="chapter-mark ${n<chapter?'past':n===chapter?'current':'future'}"><span>${fmt(n)}</span><small>${n<chapter?'Uzavřena':n===chapter?'Právě píšeš':'Příští'}</small></div>`).join('')}</div>`;
 }
 
 function milestoneWindow(points) {
@@ -50,9 +65,10 @@ function rankCard(points, continuation) {
   const progress = next ? Math.max(0, Math.min(100, (points - start) / (next - start) * 100)) : 100;
   const progressText = next ? `${fmt(points - start)} / ${fmt(next - start)} XP` : 'Všechny hodnosti dosaženy';
   const nextLabel = chapterActive ? `Kapitola ${fmt(r.chapter + 1)}` : r.next?.name;
-  return `<div class="profile-card">
+  return `<div class="profile-card ${chapterActive?'has-chapter':''}">
     <div class="card-top"><img class="avatar" src="/assets/avatars/v3/01-liska.svg" alt=""><div><h3>Alex</h3><p>Moje cesta Propletem</p></div><div class="xp-total"><strong>${fmt(points)}</strong><span>XP celkem</span></div></div>
-    <div class="rank-main"><img class="rank-icon" src="/rewards/printshop/${r.current.asset}.svg" alt=""><div class="rank-copy"><h3>${r.current.name}</h3><p>Hodnost ${r.index} · od ${fmt(r.current.xp)} XP</p>${chapterActive ? `<button type="button" class="chapter" data-detail="chapter">Kapitola ${fmt(r.chapter)} <span aria-hidden="true">?</span></button>` : ''}</div></div>
+    <div class="rank-main">${chapterActive?chapterArt(r.chapter):`<img class="rank-icon" src="/rewards/printshop/${r.current.asset}.svg" alt="">`}<div class="rank-copy"><h3>${r.current.name}</h3><p>Hodnost ${r.index} · od ${fmt(r.current.xp)} XP</p>${chapterActive ? `<button type="button" class="chapter" data-detail="chapter">Kapitola ${fmt(r.chapter)} <span aria-hidden="true">?</span></button>` : ''}</div></div>
+    ${chapterActive?chapterTrail(r.chapter):''}
     <div class="progress-label"><strong>${chapterActive ? 'Tahle kapitola' : next ? 'K další hodnosti' : 'Tvoje cesta'}</strong><span>${next ? progressText : '51 / 51'}</span></div>
     <div class="progress ${next ? '' : 'complete'}" role="progressbar" aria-label="${chapterActive ? 'Postup v kapitole' : 'Postup k další hodnosti'}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Number(progress.toFixed(2))}" aria-valuetext="${progressText}"><span style="width:${progress}%"></span></div>
     <p class="next-goal">${next ? `<strong>${nextLabel}</strong><br>Za ${fmt(next - points)} XP · při ${fmt(next)} XP` : 'Jsi na nejvyšší hodnosti. Další cíl chybí.'}</p>
@@ -61,7 +77,7 @@ function rankCard(points, continuation) {
 }
 
 function art(item, large = false) {
-  return item.asset
+  return item.illustration ? `<img class="${large?'detail-image illustrated-detail':''}" src="/rewards/continuation/${item.illustration}.webp" alt="">` : item.asset
     ? `<img class="${large ? 'detail-image' : ''}" src="/rewards/printshop/${item.asset}.svg" alt="">`
     : `<div class="${large ? 'detail-number' : 'number-art'}">${fmt(item.xp)}${large ? '' : '<small>XP</small>'}</div>`;
 }
@@ -70,9 +86,10 @@ function render() {
   $('newCard').innerHTML = rankCard(xp, true);
   $('oldCard').innerHTML = rankCard(xp, false);
   const milestones = milestoneWindow(xp);
-  $('milestoneList').innerHTML = milestones.map(item => `<button type="button" class="milestone ${xp >= item.xp ? 'done' : 'pending'}" data-milestone="${item.xp}" aria-label="${item.name}, ${xp >= item.xp ? 'splněno' : `zbývá ${fmt(item.xp - xp)} XP`}, zobrazit detail">${art(item)}<strong>${item.name}</strong><small>${xp >= item.xp ? 'Splněno ✓' : `Chybí ${fmt(item.xp - xp)} XP`}</small></button>`).join('');
+  $('milestoneList').innerHTML = milestones.map(item => `<button type="button" class="milestone ${xp >= item.xp ? 'done' : 'pending'}" data-milestone="${item.xp}" aria-label="${item.name}, ${xp >= item.xp ? 'splněno' : `zbývá ${fmt(item.xp - xp)} XP`}, zobrazit detail">${art(item)}<strong>${item.name}</strong>${item.title?`<span class="milestone-name">${item.title}</span>`:''}<small>${xp >= item.xp ? 'Splněno ✓' : `Chybí ${fmt(item.xp - xp)} XP`}</small></button>`).join('');
   const count = XP_ACHIEVEMENTS.filter(item => xp >= item.xp).length + newMilestoneCount(xp);
   $('milestoneCount').textContent = `${fmt(count)} získáno`;
+  $('celebrateChapter').disabled=rankState(xp).chapter===null;
   $('xp').value = String(xp);
   $('sample').value = [...$('sample').options].some(option => Number(option.value) === xp) ? String(xp) : '';
 }
@@ -80,8 +97,10 @@ function render() {
 function openDetail(kind, value) {
   const r = rankState(xp);
   let html = '';
-  if (kind === 'chapter') {
-    html = `<img class="detail-image" src="/rewards/printshop/legenda.svg" alt=""><h2 id="detailTitle">Legenda bez konce</h2><p class="detail-status">Kapitola ${fmt(r.chapter)} · od ${fmt(r.chapterStart)} XP</p><p>Titul už ti patří. Každých dalších 5 000 XP otevíráš další kapitolu své legendy.</p><p>První začíná na 120 000 XP. Žádný restart a žádné nové sbírání od nuly — počítají se všechny tvoje dosavadní XP.</p><p>Do kapitoly ${fmt(r.chapter + 1)} ti chybí <strong>${fmt(r.chapterStart + CHAPTER_STEP - xp)} XP</strong>.</p>`;
+  if (kind === 'celebration') {
+    const next=r.chapter+1;html=`${chapterArt(next,true)}<h2 id="detailTitle">Kapitola ${fmt(next)} otevřena.</h2><p class="celebration-copy">Dalších pět tisíc. Další stránka, která patří tobě.</p><p class="detail-status">${fmt(r.chapterStart+CHAPTER_STEP)} XP · Legenda bez konce</p><p class="celebration-note">Ukázka oslavy. Tvoje modelová XP se nemění.</p>`;
+  } else if (kind === 'chapter') {
+    html = `${chapterArt(r.chapter,true)}<h2 id="detailTitle">Legenda bez konce</h2><p class="detail-status">Kapitola ${fmt(r.chapter)} · od ${fmt(r.chapterStart)} XP</p><p>Titul už ti patří. Každých dalších 5 000 XP otevíráš další kapitolu své legendy.</p><p>První začíná na 120 000 XP. Žádný restart a žádné nové sbírání od nuly — počítají se všechny tvoje dosavadní XP.</p><p>Do kapitoly ${fmt(r.chapter + 1)} ti chybí <strong>${fmt(r.chapterStart + CHAPTER_STEP - xp)} XP</strong>.</p>`;
   } else if (kind === 'transition') {
     const count = newMilestoneCount(xp);
     html = `<img class="detail-image" src="/rewards/printshop/${r.current.asset}.svg" alt=""><h2 id="detailTitle">Tvoje cesta má pokračování</h2><p>Všech <strong>${fmt(xp)} XP</strong> se počítá i do nového pokračování. Hodnost <strong>${r.current.name}</strong> a získané úspěchy zůstávají.</p><p class="detail-status">${r.chapter !== null ? `Rovnou pokračuješ v kapitole ${fmt(r.chapter)}.` : 'Ke své další hodnosti pokračuješ jako dosud.'}${count > 0 ? `<br>${count === 1 ? 'Ve sbírce přibude 1 nový XP úspěch.' : `Ve sbírce přibudou nové XP úspěchy: ${fmt(count)}.`}` : ''}</p><p>Nic se znovu neodehrává a není potřeba nic vyzvedávat. Kapitoly a odznaky samy o sobě další XP nepřidávají.</p>`;
@@ -89,9 +108,10 @@ function openDetail(kind, value) {
     html = `<h2 id="detailTitle">Dosavadní XP úspěchy</h2><p>Všech třináct zůstává se stejným názvem, obrázkem i hranicí.</p><ul class="legacy-list">${XP_ACHIEVEMENTS.map(item => `<li><img src="/rewards/printshop/${item.asset}.svg" alt=""><div><strong>${item.name}</strong><small>${fmt(item.xp)} XP</small></div>${xp >= item.xp ? '<span class="check" aria-label="Splněno">✓</span>' : ''}</li>`).join('')}</ul>`;
   } else {
     const item = milestoneFor(value);
-    html = `${art(item, true)}<h2 id="detailTitle">${item.name}</h2><p style="text-align:center">Nasbírej ${fmt(item.xp)} XP.</p><p class="detail-status">${xp >= item.xp ? 'Splněno. Patří do tvé sbírky.' : `Zbývá ${fmt(item.xp - xp)} XP.`}</p><p>Započítávají se celoživotní XP. Tento úspěch žádné další XP nepřidává.</p>`;
+    html = `${art(item, true)}<h2 id="detailTitle">${item.title||item.name}</h2>${item.copy?`<p class="achievement-copy">${item.copy}</p>`:''}<p style="text-align:center">Nasbírej ${fmt(item.xp)} XP.</p><p class="detail-status">${xp >= item.xp ? 'Splněno. Patří do tvé sbírky.' : `Zbývá ${fmt(item.xp - xp)} XP.`}</p><p>Započítávají se celoživotní XP. Tento úspěch žádné další XP nepřidává.</p>`;
   }
   $('detailContent').innerHTML = html;
+  $('detail').classList.toggle('celebration',kind==='celebration');
   $('detail').showModal();
 }
 
@@ -108,6 +128,7 @@ $('compare').addEventListener('click', () => {
   $('comparison').classList.toggle('is-comparing', comparing);
   $('oldPanel').hidden = !comparing;
 });
+$('celebrateChapter').addEventListener('click',()=>openDetail('celebration'));
 $('allAchievements').addEventListener('click', () => openDetail('legacy'));
 document.addEventListener('click', event => {
   const detail = event.target.closest('[data-detail]');

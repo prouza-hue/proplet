@@ -4,7 +4,7 @@ Datum: 13. října 2026. Ověřený obsah registrů: produkční main `f31c89593
 
 ## Stav a doporučení
 
-Schválený problém: Archiv výrazně rozšiřuje dostupný obsah; dosavadní konce hodností a XP úspěchů přestanou být dlouhodobým cílem. Návrh ze zaseknutého vlákna: zachovat dosažené hodnosti i hranice, pokračovat kapitolami po 5 000 XP a přidat další velké XP úspěchy. Toto řešení **dosud není schválené k produkci**.
+Schválený problém: Archiv výrazně rozšiřuje dostupný obsah; dosavadní konce hodností a XP úspěchů přestanou být dlouhodobým cílem. Návrh ze zaseknutého vlákna: zachovat dosažené hodnosti i hranice, pokračovat kapitolami po 5 000 XP a přidat další velké XP úspěchy. Pavel 13. října návrh XP úspěchů přijal jako směr a vyžádal si kvalitní ilustrace a odměňující vizuál kapitol. Finální vizuální preview ještě posoudí; zapojení do produkčního účtu se tímto dokumentem nespouští.
 
 Doporučení: ponechat všech 51 hodností přesně beze změny. Legenda bez konce od 120 000 XP dostane vedle titulu vlastní číslo kapitoly. Navazující XP úspěchy začnou na 150 000 XP a pokračují po 50 000 XP. Získání kapitoly ani úspěchu nevyplácí další XP, nemění pořadí a nevytváří soutěžní body.
 
@@ -17,7 +17,7 @@ Zdroj je stejné autoritativní celoživotní `stats.points` jako nyní. Zahrnuj
 Pro nezáporné celé XP `p`:
 
 - `p < 120000`: dosavadní `levelFor(p)` beze změny, kapitola neexistuje.
-- `p >= 120000`: stále hodnost **51 · Legenda bez konce**, stejná ilustrace `legenda.svg`.
+- `p >= 120000`: stále hodnost **51 · Legenda bez konce**, registr hodnosti a její původní ilustrace `legenda.svg` se nemění; kapitoly v novém profilovém náhledu mají vlastní kroniku.
 - `chapter = floor((p - 120000) / 5000) + 1`.
 - `chapterStart = 120000 + (chapter - 1) * 5000`.
 - `nextChapterAt = chapterStart + 5000`.
@@ -41,7 +41,7 @@ Na přelomu se plný průběh předchozí kapitoly změní na nulu nové kapitol
 
 Všech 13 dosavadních XP úspěchů zůstává. Nová série: 150 000, 200 000, 250 000, 300 000 XP a dál po 50 000. ID může navázat na současný vzor `xp-150000`, `xp-200000` atd., definice se odvozuje matematicky. Počet nových splněných úspěchů je `max(0, floor((p - 150000) / 50000) + 1)`.
 
-Pro nový milník je splnění `p >= threshold` včetně přesné hranice. V náhledu používáme **číselné názvy** „150 000 XP“ atd. Jde o návrh, nikoli údajný existující registr. Nové vlastní ilustrace ani literární názvy nejsou vyrobené či schválené. Náhled používá číslo pro nové milníky a původní ilustrace pouze pro jejich původní významy.
+Pro nový milník je splnění `p >= threshold` včetně přesné hranice. V náhledu používáme **číselné názvy** „150 000 XP“ atd. Jde o návrh, nikoli údajný existující registr. Po připomínce z 13. října mají nové milníky vlastní barevné ilustrace: 150 000 XP kompas „Vlastní směr“, 200 000 XP astroláb „Mezi hvězdami“, 250 000 XP maják „Světlo v dálce“ a od 300 000 XP bránu „Další obzor“. Číselný práh zůstává hlavní identitou a rozlišuje i další milníky se společným motivem brány. Nová výtvarná řada čeká na finální vizuální posouzení.
 
 Nekonečná řada se nesmí přidat do jmenovatele současného procenta úspěchů (`renderAchievementSummary`). U základní sbírky zachovat její konečný počet a získané položky. Pokračování má samostatný údaj „N získáno“, poslední splněný + dva následující cíle a vlastní rozbalení historie po dávkách, například 12. Nikdy „13 / ∞“ ani kilometrový seznam zamčených odznaků. V tomto jednoduchém preview se ukazují poslední splněný a dva následující, a v rozkliku všech 13 původních.
 
@@ -61,7 +61,7 @@ Toto je implementační kontrakt pro příští schválenou změnu; v této vět
 
 ## UX v existující hře
 
-- **Já:** zůstává současná karta, titul, číslo hodnosti a původní ilustrace. Pod titul přibude malý údaj „Kapitola 8“ s rozklikem. Stávající pruh nahradí po dosažení poslední hodnosti postup kapitoly a konkrétní další cíl.
+- **Já:** zůstává profil, titul a číslo hodnosti. V rozpracovaném vizuálním náhledu doprovází kapitoly otevřená kronika s číslovanou pečetí, tři nejbližší kapitoly a údaj „Kapitola 8“ s rozklikem. Původní ilustrace hodnosti zůstává v registru a přehledu hodností. Stávající pruh nahradí po dosažení poslední hodnosti postup kapitoly a konkrétní další cíl.
 - **Dnes:** v již existujícím shrnutí postupu stačí „Legenda bez konce · 8. kapitola“; žádná nová velká karta ani promo při každém návratu.
 - **Po dokončení:** běžně aktualizovat XP a průběh, při překročení prahu jedna stručná oslava. Při současné kapitole i XP úspěchu spojit do jedné výsledkovky.
 - **Žebříček:** pořadí, dosavadní XP a titul zůstávají. Kapitolu případně zobrazit jako malé doplnění u titulu, ne jako nový veřejný skórovací systém.
@@ -74,18 +74,18 @@ Toto je implementační kontrakt pro příští schválenou změnu; v této vět
 2. Velké milníky 150 000 XP a dále po 50 000 XP bez dalšího bonusu XP.
 3. Ponechat pokračování jako vlastní sbírku bez konečného procenta splnění.
 4. Přiznat již dosažené kapitoly a milníky automaticky, jednorázově oznámit souhrn bez modalové fronty.
-5. Pro nové XP úspěchy schválit číselná jména, nebo zadat novou sadu názvů/ilustrací Tiskařské dílny. Preview pro ně neslibuje hotové odznaky.
+5. Posoudit doplněnou řadu pěti ilustrací (čtyři XP motivy a kronika), číslovanou pečeť a ukázku oslavy kapitoly. Vyřešení detailu ani ukázka nepřidává modelová či skutečná XP.
 
 Není důvod čekáním na tuto volbu blokovat technicky samostatný release Archivu. Před samotným zavedením pokračování změřit anonymní agregáty počtu účtů v pásmech 110–120k, 120–150k, 150–200k, 200k+ a maximální XP; podle nich ověřit tempo +5k/+50k. Bez tohoto měření netvrdit, kolika hráčů se změna týká.
 
 ## Společná push zpráva Extra + Archiv — pouze návrh
 
-Nic se neodesílá ani neplánuje. Extra podle schváleného plánu začíná ve středu 14. října 2026; dostupnost Archivu závisí na samostatně schváleném nasazení. Společnou launch push odeslat až po ověření obou funkcí v produkci a samostatném pokynu k odeslání. Samotný preview ani zítřejší start Extra takové podmínky nesplňují.
+Pavel potvrdil jednu společnou push pro Archiv i Extra. Je připraven jeden koncept a jeden deduplikační klíč; zatím nic nebylo odesláno. Extra podle schváleného plánu začíná ve středu 14. října 2026; dostupnost Archivu závisí na samostatně schváleném nasazení. Společnou launch push odeslat až po ověření obou funkcí v produkci a finálním schválení vydání včetně konkrétního okamžiku kampaně. Samotný preview ani zítřejší start Extra takové podmínky nesplňují.
 
 **Finální text pro chvíli, kdy jsou obě funkce venku:**
 
-- Titulek: **Dnes jednu navíc?**
-- Text: **Extra výzvy třikrát týdně. A v Archivu desky, ke kterým ses ještě nedostal. Kolik jich rozpleteš?**
+- Titulek: **Extra výzvy a Archiv jsou tady**
+- Text: **Třikrát týdně těžší výzva navíc. A 800 původních desek v Archivu. Co rozpleteš jako první?**
 
 Text neříká, že je Extra právě dnes, takže obstojí i v jiný den než středa/pátek/neděle. Před spuštěním Archivu tento text nepoužít. Pokud bude zapotřebí samostatná předpremiérová informace 13. října: „První Extra výzva přijde zítra. Archiv starších desek chystáme.“ — není to náhrada společné launch kampaně a bez pokynu se neposílá.
 
