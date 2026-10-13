@@ -1,6 +1,10 @@
 {
-  "testedSha": "cbdfe4acf6c999bfe12b498b60c1f76fbbb00358",
+  "testedSha": "49f6896fa4df54095bc19ca1f2a31d8a005ead38",
   "checks": [
+    {
+      "width": 320,
+      "nativeConfirmedXpBoundariesFocusPagination": "PASS"
+    },
     {
       "width": 320,
       "height": 720,
@@ -8,6 +12,10 @@
       "archiveDensityAndSearch": "PASS",
       "chapterBoundariesAndCelebration": "PASS",
       "artAndLegacyCollection": "PASS"
+    },
+    {
+      "width": 390,
+      "nativeConfirmedXpBoundariesFocusPagination": "PASS"
     },
     {
       "width": 390,
@@ -19,11 +27,19 @@
     },
     {
       "width": 690,
+      "nativeConfirmedXpBoundariesFocusPagination": "PASS"
+    },
+    {
+      "width": 690,
       "height": 950,
       "announcementDestinations": "PASS",
       "archiveDensityAndSearch": "PASS",
       "chapterBoundariesAndCelebration": "PASS",
       "artAndLegacyCollection": "PASS"
+    },
+    {
+      "width": 1440,
+      "nativeConfirmedXpBoundariesFocusPagination": "PASS"
     },
     {
       "width": 1440,

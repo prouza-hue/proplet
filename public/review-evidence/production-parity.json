@@ -1,9 +1,14 @@
 {
   "baseSha": "f31c8959323b8edae75e01ccd6b04ded168cf982",
-  "headSha": "cbdfe4acf6c999bfe12b498b60c1f76fbbb00358",
+  "headSha": "49f6896fa4df54095bc19ca1f2a31d8a005ead38",
   "result": "PASS",
-  "unchangedExistingFiles": 1251,
+  "unchangedExistingFiles": 1246,
   "reviewedIntegrationSeams": {
+    "tools/test_v40134_retention_claim_fix.py": "pin v4.08.0 metadata; preserve consent and retention checks",
+    "public/app/account/account.js": "integrate confirmed-XP illustrated continuation without altering existing achievements",
+    "public/runtime-meta.js": "approved v4.08.0 release version",
+    "proplet_version.py": "approved v4.08.0 release version",
+    "push_diagnostics_v3329.py": "suppress regular October14 push after shared campaign reservation",
     "tools/verify_refresh300_production.cjs": "verify retired promo and counters stay absent for guests; retain approved bank, varied-order settings, native gameplay and onboarding browser contracts",
     "tools/verify_achievement_details.cjs": "verify reviewed WebP Krotitel artwork and decoded 512px geometry; preserve achievement dialog behavior",
     "public/theme-init.js": "invalidate lazy-loaded Archive production layout hooks in existing clients",
@@ -32,7 +37,7 @@
     "public/rewards/printshop/manifest.json": "seven reviewed illustration assets",
     "public/ribbon-ui.js": "render the seven new WebP illustrations",
     "supabase/prepared/historical_free_rewards.sql": "read-only service-role claim-state RPC",
-    "supabase/migrations/manifest.json": "prepared SQL checksum; not marked applied",
+    "supabase/migrations/manifest.json": "applied production migration 20261013210718 and exact SQL checksum",
     "tests/current/manifest.json": "register archive and CTA behavior checks",
     "tests/current/test_s04_backend_foundation.py": "characterize additive archive contracts",
     "tests/current/test_s06_backend_dependencies.py": "add default-off archive config field",
@@ -50,6 +55,6 @@
     "public/tajenka-card-polish.js": "keep the completed Tajenka title in preview",
     "public/tajenka-release-fix.js": "bind native clone handlers before removing IDs",
     "public/valid-word-feedback-v3330.js": "approved historical solution adapter",
-    "vercel.json": "explicitly isolate this preview build"
+    "vercel.json": "production Archive gates after verified migration; one shared morning campaign"
   }
 }
