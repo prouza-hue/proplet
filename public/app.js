@@ -768,8 +768,8 @@ if(globalThis.PROPLET_ARCHIVE_PREVIEW)ROUTE_SCREENS.add('archive');
 function applyScreen(screen){
  screen=ROUTE_SCREENS.has(screen)?screen:'daily';const prev=currentScreen;
  if(prev==='game'&&screen!=='game'){if(!currentGame?.finished)trackStarterPhase(currentGame?.starterTrace,'left','navigation');releaseGameWakeLock();pauseGameClock('menu');if(currentGame?.mode!=='rescue'){saveGameProgress();sendAttemptCheckpoint('leave')}trackTajenkaAbandon();stopTimer()}
- currentScreen=screen;$('.screen').forEach(x=>x.classList.remove('active'));$(`#screen-${screen}`).classList.add('active');
- document.body.classList.toggle('playing',screen==='game');$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===(screen==='archive'?'free':screen)));$('.bottom-nav').classList.toggle('hidden',screen==='game');
+ currentScreen=screen;$$('.screen').forEach(x=>x.classList.remove('active'));$(`#screen-${screen}`).classList.add('active');
+ document.body.classList.toggle('playing',screen==='game');$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===(screen==='archive'?'free':screen)));$('.bottom-nav').classList.toggle('hidden',screen==='game');
  if(screen==='daily'){renderDaily();refreshRescueStatus()}if(screen==='free'){renderFree();if(prev!==screen)refreshFreeOrder()}if(screen==='leaderboard')renderLeaderboard();if(screen==='profile')renderProfile({focusRoadmap:prev!=='profile'});if(screen==='game')requestAnimationFrame(fitGameBoard);else window.scrollTo({top:0,behavior:'instant'});
  globalThis.PropletArchiveExperience?.screen(screen,prev);
  if(screen!==prev&&screen!=='game')trackProductEvent(`screen_${screen}_viewed`);
@@ -940,8 +940,8 @@ function renderFree(){
   const {total,done,pct,resume}=freeProgress(key),action=resume?'Pokračovat':done===total&&total?'Zahrát znovu':'Hrát';
   return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="${esc(d.label)}: ${done} z ${total} hotovo, otevřít přehled úrovní"><strong>${done}</strong> / ${total}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
  }).join('');
- $('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
- $('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
+ $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
+ $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
  window.PropletFreeOrderUI?.mount({store:freeOrder(),progress:freeProgress,labels:DIFF,change:changeFreeOrder});
  globalThis.PropletArchiveExperience?.free();
 }
