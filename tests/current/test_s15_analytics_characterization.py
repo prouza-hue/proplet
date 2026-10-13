@@ -31,7 +31,9 @@ assert "class ProductEventCreate(BaseModel):\n    event_type: str = Field(min_le
 
 if implemented:
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
-    assert registry["events"] == FIXTURE["events"]
+    # Keep all historical names unchanged; the reviewed referral extension is additive.
+    from backend.analytics import REFERRAL_EVENT_NAMES
+    assert registry["events"] == FIXTURE["events"] + list(REFERRAL_EVENT_NAMES)
     assert registry["request_fields"] == ["event_type"]
     assert registry["pii_policy"]["custom_properties_sent"] is False
     assert '/app/analytics.js?v=usage20261008' in INDEX
@@ -65,8 +67,9 @@ for endpoint in FIXTURE["out_of_scope_telemetry"][:5]:
 import server
 from backend import analytics as product_analytics
 
-events = FIXTURE["events"]
-assert len(events) == 157
+events = product_analytics.load_registry()["events"]
+assert len(FIXTURE["events"]) == 157
+assert len(events) == 157 + len(product_analytics.REFERRAL_EVENT_NAMES)
 assert len(events) == len(set(events))
 inserted = []
 
@@ -105,4 +108,4 @@ for (table, row), expected in zip(inserted, events):
     assert row["anonymous_id"] == "anon-hash"
     assert row["app_version"] == "4.01.40"
 
-print("PASS Sprint 15 analytics characterization: 157 events, transport, dedup and PII parity")
+print(f"PASS analytics characterization: {len(events)} events, legacy transport/dedup and bounded provenance parity")

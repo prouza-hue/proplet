@@ -8,6 +8,8 @@ import re
 context = ContextVar('measurement', default=None)
 TABLES = {'product_events', 'puzzle_attempts', 'hint_events', 'helper_events', 'operational_events', 'puzzle_feedback'}
 ONBOARDING_VERSIONS = frozenset({'board-v2', 'board-v3-short'})
+REFERRAL_SOURCES = frozenset({'daily', 'tajenka', 'win', 'home', 'profile', 'announcement', 'landing'})
+REFERRAL_COPY_METHODS = frozenset({'copy_button', 'share_fallback', 'no_native'})
 
 
 def onboarding_version(value):
@@ -24,6 +26,11 @@ def request_context(request, environment):
         if value.tzinfo and now-timedelta(days=7)<=value<=now+timedelta(minutes=5):event_time=min(now,value).isoformat()
     except (ValueError,TypeError):pass
     details = {}
+    # Finite UI declarations only. Never capture the referral code, URL or recipient.
+    referral_source = request.headers.get('x-proplet-referral-source', '')
+    referral_copy = request.headers.get('x-proplet-referral-copy-method', '')
+    if referral_source in REFERRAL_SOURCES: details['referral_entry_source'] = referral_source
+    if referral_copy in REFERRAL_COPY_METHODS: details['referral_copy_method'] = referral_copy
     marketing_gate = request.headers.get('x-proplet-marketing-gate', '')
     if marketing_gate in {'eligible', 'unknown_parameter', 'auth_url', 'nonproduction', 'non_game_path'}:
         details['marketing_gate'] = marketing_gate
@@ -87,6 +94,11 @@ def enrich(table, row):
     provenance = context.get()
     if table not in TABLES or not provenance:return row
     details={**provenance.get('_event_context',{})}
+    if table != 'product_events' or not str(row.get('event_type', '')).startswith('referral_'):
+        details.pop('referral_entry_source', None)
+        details.pop('referral_copy_method', None)
+    elif row.get('event_type') not in {'referral_copy_succeeded', 'referral_copy_failed'}:
+        details.pop('referral_copy_method', None)
     if table=='product_events' and row.get('event_type') in {'starter_v1_left','starter_v1_hidden','starter_v1_cancelled','starter_v1_failed'}:
         details.setdefault('reason','unknown')
     result={**row, **{k:v for k,v in provenance.items() if not k.startswith('_')}, **({'context':details} if table=='product_events' else {})}
