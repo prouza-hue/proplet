@@ -1,6 +1,6 @@
 # Obnovení Archivu a navazujícího zadání — 13. října 2026
 
-Stav: pracovní kandidát k dokončení ověření a posouzení. Tento záznam není potvrzení produkčního vydání. Finální testovaný SHA, CI výsledky a adresu nového preview doplní hlavní agent po dokončení kontrol.
+Stav: dokončený kódový kandidát k posouzení; produkční aktivace není provedena. Níže je připnutý runtime kandidát, ověřený preview deployment a samostatně evidované kontrolní běhy.
 
 ## Odkud navazujeme
 
@@ -40,7 +40,7 @@ Tato pravidla jsou nyní konkrétním kandidátem k posouzení; neslibují glob�
 
 ## Místa k posouzení
 
-Nová základní URL preview: **doplnit po nasazení a ověření přesného kandidáta**. K ní připojit:
+Nová základní URL preview: **https://proplet-exbmc15o5-pavel-prouzas-projects.vercel.app**. READY deployment `dpl_5KTPt6gFrhBp94T9UmFG8dzVoiVJ`, commit `ae4c773db607ac20226385c25572a63acb2a5459`. HTTP 200 a přesná shoda s lokálními bajty byly ověřeny pro index, app.js, experience.js, oba návrhové přehledy a ilustraci Krotitele. K adrese připojit:
 
 | Obsah | Cesta |
 |---|---|
@@ -92,13 +92,16 @@ Pokračování hodností a XP je jen návrh. Produkční `LEVELS`, dosavadní hr
 
 Společný push Extra + Archiv se odešle až po ověření dostupnosti obou funkcí a konkrétním pokynu k odeslání. Příprava textu nezakládá automatizaci ani souhlas s dnešním/zítřejším rozesláním.
 
-## Doplnit po dokončení kontrol
+## Ověření a hranice vydání
 
-- Finální kandidátní SHA:
+- Runtime kandidát: `ae4c773db607ac20226385c25572a63acb2a5459`. Navazující změny pouze upravují regresní testy po záměrném odstranění starého promo a náhradě SVG ilustrace WebP; nemění dodaný runtime.
 - Lokální current gate: **151 testů PASS, 157 kontrol assets PASS, 272 kontrol syntaxe PASS**, bez selhání. Cílené browser ověření: skutečné tažení slov, 879 schválených pokrytí, pokračování, alternativy a nápovědy, odměna jednou, host → účet, změna účtu i během dokončovací animace.
-- CI a izolované PostgreSQL reporty, s výsledkem a případnými omezeními:
-- Browser/vizuální kontrola a přezkoumané snímky:
-- Preview URL a ověřený deployment/SHA:
-- Schválení vzhledu, pravidel CTA a konkrétního produkčního release:
-- Případná následná produkční migrace/deployment, datum a důkaz:
+- CI [Current runtime gate 38454807102](https://github.com/prouza-hue/proplet/actions/runs/38454807102): **SUCCESS**; 151 testů, 157 kontrol assets, 462 syntaxí bez selhání. PostgreSQL 17.11: atomicita, souběh, replay, rollback, nezávislost G4, autentizace a nový service-only Archive RPC PASS. Skutečný pg_cron/background test i scheduled playtest PASS.
+- Browser: lokální integrovaný test **PASS, 61 kontrol, 0 JS chyb, 0 přetečení, 0 síťových zápisů**; 320/390/690/1440 px a obě témata. Samostatný production-form test PASS při archiveEnabled true i false bez preview adaptéru. Prohlédnuty úzký Archiv, společné CTA, result, galerie odznaků/detail Krotitele a návrh hodností. Čtení živé produkce pro volitelné srovnávací screenshoty nebylo v lokálním Chromium dostupné přes síť; tento limit neomezuje hlavní test.
+- CI [Archive review 38454807609](https://github.com/prouza-hue/proplet/actions/runs/38454807609): **SUCCESS**, production-form true/false i integrovaných 61 kontrol PASS. Parity guard: 1253 existujících produkčních souborů přesně beze změny, ostatní jednotlivě zdůvodněny. Evidence commit `63e2798b54487c89df153b4402cb4b47508412aa`. Volitelné srovnávací snímky živé produkce se nepodařilo zachytit ani v CI (prvky existovaly, ale nebyly viditelné); nejsou vydávány za hotový důkaz.
+- Verified client update, Gen4 contract, referral release (10 scénářů) a Mozkokalypsa acceptance: SUCCESS.
+- Dva historické browser asserts aktualizovány dle zadání: absence starého promo300 a nová ilustrace Krotitele WebP. Původní regresní požadavky zachované; lokálně kompletní refresh browser 25 kontrol PASS a achievement-details včetně 97 úspěchů, ovládání/focusu, čtyř šířek a dark/locked stavu PASS.
+- Preview URL a ověřený deployment/SHA: viz připnutá adresa výše.
+- Schválení vzhledu, pravidel CTA a konkrétního produkčního release: čeká na posouzení uživatele.
+- Produkční migrace/deployment: neprovedeno. Push: neodeslán, nenaplánován.
 

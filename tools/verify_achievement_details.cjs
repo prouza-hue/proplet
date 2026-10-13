@@ -15,7 +15,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   const groups=await page.locator('.achievement-group-head>strong').allTextContents();assert.equal(groups[groups.indexOf('Mozkožrout')+1],'Mozkomor');assert.equal(groups[groups.indexOf('Mozkožrout')+2],'Mozkokalypsa');
   const tamer=page.locator('.achievement[data-achievement="mozkokalypsa-25"]');await tamer.tap();
   const dialog=page.locator('#achievementDetail');await page.waitForFunction(()=>document.querySelector('#achievementDetailArt img')?.naturalWidth>0);
-  assert.equal(await page.locator('#achievementDetailTitle').textContent(),'Krotitel pohromy');assert.match(await page.locator('#achievementDetailArt img').getAttribute('src'),/tamer2/);assert.equal(await page.locator('#achievementDetailStatus').textContent(),'Získáno');
+  assert.equal(await page.locator('#achievementDetailTitle').textContent(),'Krotitel pohromy');assert.match(await page.locator('#achievementDetailArt img').getAttribute('src'),/achievement-mozkokalypsa-25\.webp(?:\?|$)/);assert.equal(await page.locator('#achievementDetailArt img').evaluate(img=>img.naturalWidth),512,'current illustrated asset is decoded');assert.equal(await page.locator('#achievementDetailStatus').textContent(),'Získáno');
   for(const [width,height] of [[320,700],[390,844],[768,1024],[1440,1000]]){
    await page.setViewportSize({width,height});
    assert(await dialog.evaluate(d=>d.scrollWidth<=d.clientWidth+1),'no horizontal overflow');
@@ -54,3 +54,4 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   assert.deepEqual(errors,[]);fs.writeFileSync(`${out}/achievement-details-report.json`,JSON.stringify({status:'PASS',count:all.length,checks:['97 unique stories and decoded illustrations','touch, Enter, Space, focus containment and return','Escape, close buttons, backdrop, Android Back, global close','320/390/768/1440, dark and locked','read-only state, difficulty order']},null,2));
  }catch(error){await page.screenshot({path:`out/failure.png`.replace('out/',out+'/'),fullPage:true});throw error}finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
+

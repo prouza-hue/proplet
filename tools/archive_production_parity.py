@@ -6,6 +6,8 @@ import json,pathlib,subprocess
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 BASE="f31c8959323b8edae75e01ccd6b04ded168cf982"
 ALLOWED={
+ "tools/verify_refresh300_production.cjs":"verify retired promo and counters stay absent for guests; retain approved bank, varied-order settings, native gameplay and onboarding browser contracts",
+ "tools/verify_achievement_details.cjs":"verify reviewed WebP Krotitel artwork and decoded 512px geometry; preserve achievement dialog behavior",
  "public/theme-init.js":"invalidate lazy-loaded Archive production layout hooks in existing clients",
  "tests/current/test_s12a_account_session.js":"pin initializer/home cache revisions; preserve account flow assertions",
  ".github/workflows/archive-integrated-review.yml":"verify actual production-form HTML with archive enabled and disabled",
