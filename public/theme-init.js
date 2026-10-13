@@ -242,7 +242,7 @@
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=tajenka-loop-fix1','propletChallengeCtaV3333');
+    loadScript('/challenge-cta-v3333.js?v=weekly-complete1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=sessionrecovery1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=firststeps1-inappauth1','propletAccountConversionV3331',{wait:true});
