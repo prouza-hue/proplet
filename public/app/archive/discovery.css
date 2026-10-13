@@ -179,6 +179,21 @@ html.tiskarna-ui body.archive-experience .quality-header-actions,
 html.tiskarna-ui body.archive-experience #profileChip{min-width:0}
 html.tiskarna-ui body.archive-experience .quality-header-actions>:not(#profileChip){flex-shrink:0}
 html.tiskarna-ui body.archive-experience #profileChipText{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Give the six difficulty illustrations a readable row of their own. */
+html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree{grid-template-columns:minmax(0,1fr)!important}
+html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-entry-copy{grid-column:1!important;grid-row:1!important}
+html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-entry-art{grid-column:1!important;grid-row:2!important;width:100%!important;height:auto!important;padding:4px 0!important}
+html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-free-art{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px!important}
+html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-free-difficulty{display:block;width:100%;height:clamp(38px,10vw,64px);object-fit:contain}
+html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-card-action{grid-row:3!important}
+/* A single print card replaces the unreadable archive collage. */
+html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry{grid-template-columns:minmax(0,1fr) clamp(128px,22vw,160px)!important}
+html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry .ax-entry-copy{grid-column:1!important;grid-row:1!important}
+html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry .ax-entry-art{grid-column:2!important;grid-row:1!important;width:100%!important;height:auto!important;padding:0!important}
+html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry .ax-card-action{grid-row:2!important}
+html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading{display:grid;grid-template-columns:minmax(0,1fr) clamp(128px,22vw,180px);align-items:center;gap:16px}
+html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading .archive-art{width:100%;max-width:none;height:auto}
+html.tiskarna-ui body.archive-experience #homeCompetitionCard{margin:0 0 var(--pg-gap)!important}
 @media(max-width:359px){
  html.tiskarna-ui body.archive-experience .app-header>.brand{gap:6px}
  html.tiskarna-ui body.archive-experience .quality-header-actions{gap:4px}
