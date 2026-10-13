@@ -97,8 +97,14 @@ def enrich(table, row):
     if table != 'product_events' or not str(row.get('event_type', '')).startswith('referral_'):
         details.pop('referral_entry_source', None)
         details.pop('referral_copy_method', None)
-    elif row.get('event_type') not in {'referral_copy_succeeded', 'referral_copy_failed'}:
-        details.pop('referral_copy_method', None)
+    else:
+        # The generic API client may also attach current-game default headers.
+        # A referral outcome must not be attributed to that unrelated board/run.
+        for key in ('puzzle_id', 'run_id', 'hint_level', 'hints', 'elapsed_ms',
+                    'starter_run_id', 'starter_ms', 'starter_reason'):
+            details.pop(key, None)
+        if row.get('event_type') not in {'referral_copy_succeeded', 'referral_copy_failed'}:
+            details.pop('referral_copy_method', None)
     if table=='product_events' and row.get('event_type') in {'starter_v1_left','starter_v1_hidden','starter_v1_cancelled','starter_v1_failed'}:
         details.setdefault('reason','unknown')
     result={**row, **{k:v for k,v in provenance.items() if not k.startswith('_')}, **({'context':details} if table=='product_events' else {})}

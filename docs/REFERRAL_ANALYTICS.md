@@ -62,14 +62,14 @@ GROUP BY 1,2,3 ORDER BY 1,2,3;
 
 Přijetí a výplata jsou **serverová data**, nikoli klientské eventy.
 referral_claims nemá vlastní environment/is_test; produkční kohortu určuje autoritativní account_created
-vzniklý triggerem players_insert. Neznámá nebo testovací signup provenance se do této kohorty nezapočítá.
+vzniklý triggerem players_insert. Neznámá nebo testovací signup provenance se do této kohorty nezapočítá; jejich počty report ukazuje samostatně, nikoli potichu.
 
 ```sql
 WITH bounds AS (
   SELECT date_trunc('day', now() AT TIME ZONE 'Europe/Prague')
            AT TIME ZONE 'Europe/Prague' AS from_utc, now() AS until_utc
 ), production_invitees AS (
-  SELECT player_id FROM public.product_events
+  SELECT DISTINCT player_id FROM public.product_events
   WHERE event_type='account_created' AND environment='production' AND is_test=false
     AND context->>'origin'='players_insert'
 ), cohort AS (
@@ -78,8 +78,18 @@ WITH bounds AS (
 )
 SELECT count(*) FILTER (WHERE c.accepted_at>=b.from_utc AND c.accepted_at<b.until_utc) AS new_acceptances,
        count(DISTINCT c.inviter_id) FILTER (WHERE c.accepted_at>=b.from_utc AND c.accepted_at<b.until_utc) AS inviters,
-       count(*) FILTER (WHERE c.paid_at>=b.from_utc AND c.paid_at<b.until_utc) AS paid_pairs
-FROM cohort c CROSS JOIN bounds b;
+       count(*) FILTER (WHERE c.paid_at>=b.from_utc AND c.paid_at<b.until_utc) AS paid_pairs,
+       (SELECT count(*) FROM public.referral_claims x
+        WHERE x.accepted_at>=b.from_utc AND x.accepted_at<b.until_utc
+          AND NOT EXISTS (SELECT 1 FROM public.product_events a WHERE a.player_id=x.invitee_id
+                          AND a.event_type='account_created' AND a.context->>'origin'='players_insert')) AS unknown_signup_provenance,
+       (SELECT count(*) FROM public.referral_claims x
+        WHERE x.accepted_at>=b.from_utc AND x.accepted_at<b.until_utc
+          AND EXISTS (SELECT 1 FROM public.product_events a WHERE a.player_id=x.invitee_id
+                      AND a.event_type='account_created' AND a.context->>'origin'='players_insert')
+          AND NOT EXISTS (SELECT 1 FROM production_invitees p WHERE p.player_id=x.invitee_id)) AS excluded_test_or_nonproduction
+FROM bounds b LEFT JOIN cohort c ON true
+GROUP BY b.from_utc,b.until_utc;
 ```
 
 accepted_at je neměnné přiřazení nového účtu. paid_at znamená dokončených pět unikátních desek a
