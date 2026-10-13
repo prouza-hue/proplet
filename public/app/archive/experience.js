@@ -7,17 +7,14 @@ const labels=Object.fromEntries(['easy','medium','hard','hardcore'].map(key=>[ke
 const rewards={easy:15,medium:25,hard:50,hardcore:100};
 const glyph={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',check:'m5 12 4 4L19 6',archive:'M4 8h16v12H4zM3 4h18v4H3zm6 8h6',trophy:'M8 3h8v6c0 7-8 7-8 0V3Zm0 2H4v3c0 3 2 4 5 4m7-7h4v3c0 3-2 4-5 4m-3 2v6m-4 0h8',team:'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 9v-2c0-6 12-6 12 0v2m0-15a3 3 0 0 1 0 6m3 3c3 0 4 2 4 4v2',grid:'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z',search:'M20 20l-5-5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',info:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 8v6m0-10v1',close:'m6 6 12 12M18 6 6 18'};
 const ico=n=>'<svg class="ax-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+glyph[n]+'"/></svg>';
-function archiveArt(){return '<svg class="archive-art" viewBox="0 0 220 226" aria-hidden="true">'+
-'<rect x="12" y="12" width="198" height="210" rx="15" fill="#513820" opacity=".16"/>'+
-'<rect x="6" y="4" width="204" height="212" rx="12" fill="#fff3d6" stroke="#956c46" stroke-width="2.5"/>'+
-'<rect x="13" y="11" width="190" height="198" rx="7" fill="none" stroke="#d6bc8e"/>'+
-'<path d="M26 28h35m94 0h35" stroke="#b08b5e" stroke-width="2"/>'+
-'<path d="m108 21 5 7-5 7-5-7Z" fill="#a45232"/>'+
-'<g text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="27" font-weight="750" fill="#763d27"><text x="108" y="65">Staré dobré</text><text x="108" y="95">rozplétání.</text></g>'+
-'<g transform="translate(32 113)"><rect width="152" height="80" rx="8" fill="#e9e7cd" stroke="#b5b38e"/>'+
-'<path d="M51 0v80m50-80v80M0 40h152" stroke="#b5b38e"/>'+
-'<path d="M25 20h101v40H25" fill="none" stroke="#b4c3a1" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>'+
-'<g font-family="Outfit,sans-serif" font-size="25" font-weight="650" fill="#36513b" text-anchor="middle"><text x="25" y="29">A</text><text x="76" y="29">R</text><text x="127" y="29">C</text><text x="25" y="69">V</text><text x="76" y="69">I</text><text x="127" y="69">H</text></g></g></svg>';}
+function archiveArt(){return '<svg class="archive-art" viewBox="0 0 360 260" aria-hidden="true">'+
+'<ellipse cx="183" cy="232" rx="137" ry="11" fill="#7d5736" opacity=".08"/>'+
+'<g transform="translate(54 40) rotate(-12 95 90)"><rect x="0" y="8" width="184" height="176" rx="10" fill="#b89469"/><rect width="184" height="176" rx="10" fill="#d7c5a2" stroke="#866c4c" stroke-width="2"/><path d="M15 16h154M15 158h154" stroke="#9f8865"/><text x="20" y="45" font-family="Fraunces,Georgia,serif" font-size="17" font-weight="600" fill="#6c5639">Proplet</text><path d="M20 62h118m-118 8h86" stroke="#a18b66" stroke-width="2"/><rect x="20" y="88" width="141" height="49" rx="3" fill="#bdba91" stroke="#969468"/><path d="M44 88v49m24-49v49m24-49v49m24-49v49m24-49v49M20 112h141" stroke="#969468"/></g>'+
+'<g transform="translate(135 29) rotate(9 83 90)"><rect x="1" y="7" width="167" height="190" rx="9" fill="#b69974"/><rect width="167" height="190" rx="9" fill="#fff5dc" stroke="#a68660" stroke-width="2"/><path d="M15 21h137" stroke="#cbbb9d"/><text x="83" y="49" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="22" font-weight="750" fill="#8c4a2c">Staré dobré</text><text x="83" y="72" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="22" font-weight="750" fill="#8c4a2c">rozplétání.</text><g transform="translate(25 87)"><rect width="117" height="78" rx="5" fill="#e9e5cb" stroke="#afa88a"/><path d="M39 0v78m39-78v78M0 39h117" stroke="#afa88a"/><path d="M20 19h77v40H20" fill="none" stroke="#a4b29a" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/><g font-family="Outfit,sans-serif" font-size="20" font-weight="600" fill="#405943" text-anchor="middle"><text x="20" y="27">A</text><text x="59" y="27">R</text><text x="98" y="27">C</text><text x="20" y="66">V</text><text x="59" y="66">I</text><text x="98" y="66">H</text></g></g><path d="M39 178h89" stroke="#c7b997"/></g>'+
+'<g transform="translate(46 158) rotate(-9 41 34)"><path d="m43-6 7 7 10-3 4 10 11 1v10l9 6-5 9 5 10-10 5v11l-11 1-4 10-10-3-7 7-7-7-10 3-4-10-11-1V50l-10-5 5-10-5-9 9-6V9l11-1 4-10 10 3Z" fill="#ac4e32" stroke="#7b3824" stroke-width="1.5"/><circle cx="43" cy="33" r="29" fill="none" stroke="#e4b48b" stroke-width="1.2"/><text x="43" y="34" text-anchor="middle" fill="#fff0d2" font-family="Fraunces,Georgia,serif" font-size="27" font-weight="750">800</text><text x="43" y="49" text-anchor="middle" fill="#fff0d2" font-family="Outfit,sans-serif" font-size="9" letter-spacing="1">DESEK</text></g>'+
+'<path d="m285 55 7-9m2 20 13-1m-2 115 9 5M36 119l-10-4" stroke="#ad7d51" stroke-width="2" stroke-linecap="round"/>'+
+'</svg>';}
+
 
 let configuration=null,installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
 const STORE='proplet:archive-progress:v2',entries=new Map();
@@ -110,7 +107,7 @@ function home(){
  if(!installed)return;
  const root=q('#screen-daily');if(!root)return;
  let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div>';root.append(games);}
- if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(DIFF).map(diff=>difficultyIconMarkup(diff,'ax-free-difficulty')).join('')+'</div>',action:'free',label:'Vybrat hru'}));}
+ if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(labels).map(diff=>difficultyIconMarkup(diff,'ax-free-difficulty')).join('')+'</div>',action:'free',label:'Vybrat hru'}));}
  let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Týmy · společné skóre',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Zobrazit pořadí týmů'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
@@ -118,17 +115,11 @@ function home(){
  const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>Archiv · rozehráno</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
  }else{resume?.remove();q('#homeResumeCard')?.classList.remove('hidden');}
  // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
- const referral=q('#referralHome');
+ const referral=q('#referralHome'),incoming=referral?.classList.contains('ref-incoming');
  const tajenka=q('#tajenkaPreviewCard'),tajenkaSolved=tajenka?.classList.contains('completed');
- const progress=q('#homeCompetitionCard');
- const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),referral,q('#referralInviteHome'),q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,q('#axHomeFree'),competition,games,q('#levelCard')].filter(Boolean);
+ const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),incoming?referral:null,q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,incoming?null:referral,q('#referralInviteHome'),games,competition,q('#axHomeFree'),q('#levelCard')].filter(Boolean);
  let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
- // Tail nodes have one owner and are never also moved within the ordered prefix.
- if(progress&&root.lastElementChild!==progress)root.append(progress);
- if(tajenkaSolved){
-  if(progress){if(tajenka.nextElementSibling!==progress)progress.before(tajenka);}
-  else if(root.lastElementChild!==tajenka)root.append(tajenka);
- }
+ if(tajenkaSolved&&root.lastElementChild!==tajenka)root.append(tajenka);
 }
 function placePlayExtra(card){
  const archive=q('#axPlayArchive');if(!archive)return false;
@@ -203,7 +194,7 @@ async function renderArchive(){
  if(!bank){root.innerHTML='<div class="ax-loading">Otevírám Archiv…</div>';try{await loadBank()}catch(e){root.innerHTML='<h1>Archiv počká.</h1><p>Nepodařilo se načíst desky. Tvůj postup zůstává uložený.</p><button class="primary-btn" data-archive-action="retry">Zkusit znovu</button>';return;}}
  refreshClaims();
  const d=archiveState.diff;
- root.innerHTML='<div class="ax-catalogue-nav"><button class="ax-back" data-archive-action="free">'+ico('back')+' Hrát</button><button class="ax-help" data-archive-action="rewards" aria-label="Jak fungují odměny v Archivu">'+ico('info')+'</button></div><header class="ax-catalogue-heading"><div><h1>Archiv</h1><p>800 původních desek. Vyber si kteroukoli.</p></div>'+archiveArt()+'</header><div class="ax-difficulty-tabs" aria-label="Obtížnost">'+Object.keys(labels).map(diff=>'<button data-archive-diff="'+diff+'" aria-pressed="'+(diff===d)+'">'+difficultyIconMarkup(diff,'ax-difficulty-art')+'<strong>'+labels[diff]+'</strong></button>').join('')+'</div><div class="ax-filter-row"><div class="ax-filters" aria-label="Zobrazené desky">'+[['all','Všechny'],['unplayed','Nehrané'],['reward','S XP']].map(([v,l])=>'<button data-archive-filter="'+v+'" aria-pressed="'+(archiveState.filter===v)+'">'+l+'</button>').join('')+'</div><label class="ax-search">'+ico('search')+'<input id="axSearch" aria-label="Číslo archivní desky" type="search" inputmode="numeric" placeholder="Číslo" maxlength="3" value="'+archiveState.query+'"></label></div><div id="axBoardResults"></div>';
+ root.innerHTML='<div class="ax-catalogue-nav"><button class="ax-back" data-archive-action="free">'+ico('back')+' Hrát</button><button class="ax-help" data-archive-action="rewards" aria-label="Jak fungují odměny v Archivu">'+ico('info')+'</button></div><header class="ax-catalogue-heading"><h1>Archiv</h1><p>800 původních desek. Vyber si kteroukoli.</p></header><div class="ax-difficulty-tabs" aria-label="Obtížnost">'+Object.keys(labels).map(diff=>'<button data-archive-diff="'+diff+'" aria-pressed="'+(diff===d)+'">'+difficultyIconMarkup(diff,'ax-difficulty-art')+'<strong>'+labels[diff]+'</strong></button>').join('')+'</div><div class="ax-filter-row"><div class="ax-filters" aria-label="Zobrazené desky">'+[['all','Všechny'],['unplayed','Nehrané'],['reward','S XP']].map(([v,l])=>'<button data-archive-filter="'+v+'" aria-pressed="'+(archiveState.filter===v)+'">'+l+'</button>').join('')+'</div><label class="ax-search">'+ico('search')+'<input id="axSearch" aria-label="Číslo archivní desky" type="search" inputmode="numeric" placeholder="Číslo" maxlength="3" value="'+archiveState.query+'"></label></div><div id="axBoardResults"></div>';
 
  renderGrid();
 }

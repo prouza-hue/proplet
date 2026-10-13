@@ -145,9 +145,7 @@
       card.innerHTML=`<div class="home-competition-head"><h2>Tvůj postup</h2><button type="button" id="homeLeaderboardBtn">Celkové pořadí <b>→</b></button></div><div id="homeCompetitionSelf" class="home-competition-self"></div><div id="homeCompetitionRows" class="home-competition-rows"><div class="home-ranking-loading">Načítám pořadí…</div></div>`;
       card.querySelector('#homeLeaderboardBtn').onclick=()=>nav('leaderboard');
     }
-    if(window.PropletArchiveExperience?.isEnabled?.()){
-      if(card.parentElement!==screen)screen.append(card);
-    }else if(quick.nextElementSibling!==card)quick.insertAdjacentElement('afterend',card);
+    if(quick.nextElementSibling!==card)quick.insertAdjacentElement('afterend',card);
     return card;
   }
 
@@ -206,8 +204,7 @@
     placeMetaProgress();
     const tajenka=document.querySelector('#tajenkaPreviewCard');
     if(tajenka)document.querySelector('#screen-daily')?.appendChild(tajenka);
-    loadCompetition();
-    if(window.PropletArchiveExperience?.isEnabled?.())window.PropletArchiveExperience.home();
+    if(window.PropletArchiveExperience?.isEnabled?.())window.PropletArchiveExperience.home();else loadCompetition();
     if(typeof renderDailySpecialUI==='function')renderDailySpecialUI();
   }
 
