@@ -6,7 +6,7 @@ html[data-archive-enabled][data-theme="dark"]{--ax-rust:#dfb28d;--ax-rust-soft:#
 body.playing #archiveReviewNotice{display:none}
 html.tiskarna-ui .archive-experience .ax-icon{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
 html.tiskarna-ui .archive-experience .archive-art{display:block;width:230px;max-width:42%;height:auto;flex:none}
-html.tiskarna-ui .archive-experience #quickPlayCard,html.tiskarna-ui .archive-experience #homeCompetitionCard{display:none!important}
+html.tiskarna-ui .archive-experience #quickPlayCard{display:none!important}
 html.tiskarna-ui .archive-experience #screen-daily>*,html.tiskarna-ui .archive-experience #screen-free>*{min-width:0}
 html.tiskarna-ui .archive-experience .ax-section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 12px}
 html.tiskarna-ui .archive-experience .ax-section-head h2{font:650 20px/1.2 Outfit,sans-serif;letter-spacing:-.35px;margin:0}

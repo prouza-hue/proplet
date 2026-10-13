@@ -228,9 +228,9 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=release4083','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=release4087','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=archive-release1','propletHomeLayout');
+    loadScript('/home-layout.js?v=home-stable1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=referrals1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
@@ -242,14 +242,14 @@
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=weekly-complete1','propletChallengeCtaV3333');
+    loadScript('/challenge-cta-v3333.js?v=home-stable1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=sessionrecovery1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=firststeps1-inappauth1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=privacyflow1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=archive-release1','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=invitations1','propletTajenkaReleaseFix',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=archive-layout2','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=archive-release1','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');

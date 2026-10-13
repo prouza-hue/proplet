@@ -113,8 +113,11 @@ html body #referralDialog .ref-status:empty{display:none}
 
 
 /* Invitations share the same drawn arrow as the primary forward actions. */
-html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta){font-weight:650!important;gap:18px}
-html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta)::after{
+html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta,#referralHome [data-ref-open],#referralInviteHome [data-ref-open]){font-weight:650!important;gap:18px}
+html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta,#referralHome [data-ref-open],#referralInviteHome [data-ref-open])::after{
  content:"";display:inline-block!important;position:static;width:20px;height:20px;flex:0 0 20px;
  background:currentColor;-webkit-mask:var(--pg-arrow) center/contain no-repeat;mask:var(--pg-arrow) center/contain no-repeat;
 }
+
+
+html:root.tiskarna-ui body :is(#referralHome,#referralInviteHome) [data-ref-open]>span[aria-hidden="true"]{display:none!important}
