@@ -1,7 +1,6 @@
 /* Archive embedded in the canonical Proplet runtime. */
 (()=>{
 'use strict';
-if(!window.PROPLET_ARCHIVE_PREVIEW)return;
 const q=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
 // Resolve names from the live game's single difficulty registry.
 const labels=Object.fromEntries(['easy','medium','hard','hardcore'].map(key=>[key,'']));
@@ -17,23 +16,86 @@ function archiveArt(){return '<svg class="archive-art" viewBox="0 0 360 260" ari
 '</svg>';}
 
 
-let installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
-const STORE='archive-experience-v1';
-function read(){try{return {claims:{},progress:{},...JSON.parse(localStorage.getItem(STORE)||'{}')}}catch{return {claims:{},progress:{}}}}
-function write(s){localStorage.setItem(STORE,JSON.stringify(s))}
-const slot=p=>'legacy-free:'+p.difficulty+':'+p.meta.level;
-const row=p=>bank?.boards.find(b=>b.puzzle.id===(typeof p==='string'?p:p.id));
-const completion=p=>getState().completed['free:'+p.id];
-const paid=p=>!!read().claims[slot(p)];
-function reward(p){if(currentGame?.puzzle?.id===p.id&&Number.isFinite(currentGame.archiveAward))return currentGame.archiveAward;return paid(p)?0:rewards[p.difficulty]}
+let configuration=null,installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
+const STORE='proplet:archive-progress:v2',entries=new Map();
+let claimsState={identity:'',status:'unknown',claims:{},completed:new Set()},claimsFlight=null;
+const identity=()=>{const p=getProfile();return p?.id&&p?.token?p.id+':'+p.token:'guest';};
+function read(scope=playerScope()){try{return {progress:{},...JSON.parse(localStorage.getItem(STORE+':'+scope)||'{}')}}catch{return {progress:{}}}}
+function write(s,scope=playerScope()){localStorage.setItem(STORE+':'+scope,JSON.stringify(s))}
+const puzzleId=p=>typeof p==='string'?p:p.puzzleId||p.id||p.puzzle?.id;
+const row=p=>entries.get(puzzleId(p))||bank?.boards.find(b=>b.puzzleId===puzzleId(p));
+const slot=p=>row(p)?.rewardSlotKey;
+const completion=(p,state=getState(),claims=currentClaims())=>state.completed['free:'+puzzleId(p)]||(claims.completed.has(puzzleId(p))?{}:null);
+function currentClaims(){const id=identity();if(claimsState.identity!==id)claimsState={identity:id,status:id==='guest'?'guest':'unknown',claims:{},completed:new Set()};return claimsState;}
+const paid=p=>{const state=currentClaims();return state.status==='ready'?!!state.claims[slot(p)]:null;};
+// No speculative XP enters local statistics. Only a server result receipt credits it.
+function reward(){return 0;}
 function freshPuzzle(entry){
  const p=structuredClone(entry.puzzle);p.meta={...p.meta,level:entry.level,contentGeneration:3,archiveExperience:true};
  return p;
 }
 async function loadBank(){
  if(bank)return bank;
- if(!loading)loading=fetch('/app/archive/boards.json').then(r=>{if(!r.ok)throw Error('Archiv se nepodařilo načíst.');return r.json()}).then(data=>{bank=data;return data}).catch(e=>{loading=null;throw e});
+ if(!loading)loading=api('/api/archive').then(data=>{
+  if(!data?.editionId||!Array.isArray(data.boards))throw Error('Archiv se nepodařilo načíst.');
+  bank=data;return data;
+ }).catch(e=>{loading=null;throw e});
  return loading;
+}
+async function loadEntry(id){
+ await loadBank();if(entries.has(id))return entries.get(id);
+ const data=await api('/api/archive/puzzle?puzzle_id='+encodeURIComponent(id));
+ if(data?.editionId!==bank.editionId||data?.puzzle?.id!==id||data?.solutions?.solutionPolicyRevision!==bank.solutionPolicyRevision)throw Error('Archivní desku se nepodařilo ověřit.');
+ window.PropletArchiveSolutions.create(data.puzzle,data.solutions);
+ entries.set(id,data);return data;
+}
+async function refreshClaims({force=false}={}){
+ const owner=getProfile(),id=identity(),state=currentClaims();
+ if(!owner?.id||!owner?.token)return state;
+ if(claimsFlight?.identity===id)return claimsFlight.promise;
+ if(!force&&state.status==='ready')return state;
+ state.status='loading';
+ const flight={identity:id,promise:null};claimsFlight=flight;
+ flight.promise=api('/api/archive/claims',{authProfile:owner}).then(data=>{
+  if(identity()!==id)return currentClaims();
+  if(data?.editionId!==(bank?.editionId||'free-gen3-v1')||!data?.claims||!Array.isArray(data.completedPuzzleIds))throw Error('Neúplný přehled odměn');
+  claimsState={identity:id,status:'ready',claims:data.claims,completed:new Set(data.completedPuzzleIds)};return claimsState;
+ }).catch(()=>{if(identity()===id)claimsState={identity:id,status:'unavailable',claims:{},completed:new Set()};return currentClaims();})
+ .finally(()=>{if(claimsFlight===flight)claimsFlight=null;if(installed&&currentScreen==='archive')renderGrid();});
+ return flight.promise;
+}
+function adoptGuest(scope){
+ const guest=read('guest'),target=read(scope);target.progress={...guest.progress,...target.progress};write(target,scope);localStorage.removeItem(STORE+':guest');
+ if(currentGame?.puzzle?.meta?.archiveExperience&&currentGame.archiveScope==='guest')currentGame.archiveScope=scope;
+}
+function renderResult(g){
+ if(!g?.puzzle?.meta?.archiveExperience){q('#axResultStatus')?.remove();return false;}
+ const confirmed=Number.isInteger(g.archiveAward);
+ if(confirmed)setWinXpDisplay(g.archiveAward?'+'+g.archiveAward+' XP':'0 XP',g.archiveAward?'Připsáno':'Už získáno');
+ else setWinXpDisplay('XP',getProfile()?.token?'Ověřujeme':'S účtem');
+ let note=q('#axResultStatus');
+ if(confirmed)note?.remove();
+ else{
+  if(!note){const anchor=q('#winTitle')?.closest('.win-result-heading')||q('#winTitle');if(anchor){note=document.createElement('p');note.id='axResultStatus';note.className='ax-result-status';note.setAttribute('role','status');anchor.after(note);}}
+  if(note)note.textContent=getProfile()?.token?'Výsledek je uložen. Odměnu ověříme po spojení se serverem.':'Výsledek je uložen v tomto zařízení. Pro ověření XP si ulož hráčský účet.';
+ }
+ return true;
+}
+function configure(){return configuration||(configuration=api('/api/config',{timeoutMs:2000}).catch(()=>null));}
+
+function resultConfirmed(rec,receipt,owner){
+ if(!rec?.archiveSolution)return;
+ if(!owner?.id||!Number.isInteger(receipt?.awardedPoints)||receipt.awardedPoints<0||typeof receipt.firstCompletion!=='boolean')throw Error('Server zatím nepotvrdil archivní odměnu.');
+ const state=getState(owner.id),saved=state.completed[rec.challengeKey];
+ if(saved){saved.points=Math.max(Number(saved.points)||0,receipt.awardedPoints);saved.archiveConfirmed=true;saveState(state,owner.id);}
+ if(!accountProfileMatches(owner))return;
+ const claims=currentClaims(),rewardSlot='legacy-free:'+rec.difficulty+':'+rec.level;
+ claims.claims[rewardSlot]={sourcePuzzleId:rec.puzzleId,points:receipt.awardedPoints};claims.completed.add(rec.puzzleId);
+ // A single confirmed result cannot establish the rest of an unavailable claims ledger.
+ const g=currentGame;
+ if(g?.puzzle?.id===rec.puzzleId&&g?.resultRecord?.attemptId===rec.attemptId&&g.archiveScope===owner.id){g.archiveAward=receipt.awardedPoints;renderResult(g);}
+ if(installed&&currentScreen==='archive')renderGrid();
+ refreshClaims({force:true}).catch(()=>{});
 }
 // One structure for every discovery destination. The action is an actual button;
 // the surrounding article is never a second, ambiguous hit target.
@@ -50,7 +112,7 @@ function home(){
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
  if(archiveResume){if(!resume){resume=document.createElement('button');resume.id='axArchiveResume';resume.className='home-resume-card';root.prepend(resume);}
- const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>ROZEHRANÝ ARCHIV</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
+ const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>Archiv · rozehráno</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
  }else{resume?.remove();q('#homeResumeCard')?.classList.remove('hidden');}
  // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
  const referral=q('#referralHome'),incoming=referral?.classList.contains('ref-incoming');
@@ -70,6 +132,7 @@ function free(){
  all('#difficultyCards .cp-action-row').forEach(row=>{const play=row.querySelector('.cp-play');if(play)row.replaceWith(play);});
 }
 function seed(){
+ if(!window.PROPLET_ARCHIVE_PREVIEW)return;
  const state=getState();if(localStorage.getItem('ax-seeded'))return;
  localStorage.setItem('ax-seeded','1');
  for(const [diff,count] of Object.entries({easy:27,medium:18,hard:11,hardcore:6,mozkomor:2,mozkokalypsa:1})){
@@ -78,18 +141,20 @@ function seed(){
   }
  }
  saveState(state);
- const s=read();for(const diff of Object.keys(labels))for(let i=1;i<=14;i++)s.claims['legacy-free:'+diff+':'+i]={source:'historical-example',xp:rewards[diff]};write(s);
  localStorage.setItem('proplet-v3-5-account-nudge',JSON.stringify({shown:[1,2,3]}));
 }
-function install(){
- if(installed)return;installed=true;for(const key of Object.keys(labels))labels[key]=DIFF[key].label;document.body.classList.add('archive-experience');
+async function install(){
+ if(installed)return true;
+ const config=await configure();
+ if(config?.archiveEnabled!==true)return false;
+ installed=true;ROUTE_SCREENS.add('archive');document.documentElement.dataset.archiveEnabled='1';for(const key of Object.keys(labels))labels[key]=DIFF[key].label;document.body.classList.add('archive-experience');
  if(!q('#screen-free'))throw Error('Archive mount: canonical free screen missing');
  for(const id of ['archive']){const section=document.createElement('section');section.id='screen-'+id;section.className='screen ax-screen';q('#screen-free').after(section);}
  const modal=document.createElement('div');modal.id='archiveExperienceModal';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','axModalTitle');document.body.append(modal);
  seed();home();free();
  registerGameSessionHook({id:'archive-experience',priority:40,afterStart:({game:g})=>{
   if(!g?.puzzle?.meta?.archiveExperience)return;
-  const saved=read().progress[g.puzzle.id];g.archiveHints=saved?.revealed||[];
+  const saved=read().progress[g.puzzle.id];g.archiveHints=saved?.revealed||[];g.archiveScope=playerScope();
   q('#gameModeLabel').textContent='Archiv Propletu';
   q('#gameDifficulty').insertAdjacentHTML('beforeend','<span class="ax-game-origin">Původní deska</span>');
  },afterPersist:({game:g,saved})=>{
@@ -98,31 +163,46 @@ function install(){
  }});
  registerGameCompletionHook({id:'archive-experience',priority:200,after:({game:g})=>{
   if(!g?.puzzle?.meta?.archiveExperience)return;
-  const s=read();s.claims[slot(g.puzzle)]||={source:g.puzzle.id,xp:g.archiveAward};delete s.progress[g.puzzle.id];write(s);
+  const s=read(g.archiveScope);delete s.progress[g.puzzle.id];write(s,g.archiveScope);
   q('#winMenuBtn').textContent='Zpět do Archivu';q('#winPrimaryBtn').textContent='Vybrat jinou desku';
   q('#winText').textContent=labels[g.puzzle.difficulty]+' · archivní deska '+g.puzzle.meta.level+' · '+fmtTime(g.elapsedMs);
   q('#levelLeaderboardBox').classList.add('hidden');
-  setWinXpDisplay('+'+g.archiveAward+' XP',g.archiveAward?'':'Už získáno');
+  renderResult(g);
   q('#winModal').classList.add('ax-archive-result');
  }});
  document.addEventListener('click',onClick);
+ document.addEventListener('proplet:account-changed',()=>{
+  currentClaims();closeModal();
+  if(currentGame?.puzzle?.meta?.archiveExperience&&currentGame.archiveScope!==playerScope()){
+   stopTimer();currentGame=null;q('#winModal')?.classList.add('hidden');q('#axResultStatus')?.remove();
+   if(currentScreen==='game')nav('archive',{replace:true});
+  }
+  refreshClaims({force:true});home();if(currentScreen==='archive')renderArchive();
+ });
+ window.addEventListener('online',()=>{refreshClaims({force:true});});
+ refreshClaims();
  document.addEventListener('input',e=>{if(e.target.id==='axSearch'){archiveState.query=e.target.value.replace(/[^0-9]/g,'');archiveState.page=0;renderGrid();}});
  document.addEventListener('keydown',e=>{if(q('#archiveExperienceModal').classList.contains('hidden'))return;if(e.key==='Escape'){e.stopImmediatePropagation();closeModal();}if(e.key==='Tab'){const nodes=all('#archiveExperienceModal button,#archiveExperienceModal select,#archiveExperienceModal input');const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}},true);
  document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(['archive','free','daily'].includes(open))nav(open);else if(open==='announcement')announcement();},{once:true});
+ return true;
 }
-function screen(name){if(installed&&name==='archive')renderArchive();}
+function screen(name,previous){if(installed&&name==='archive'){if(previous!=='archive')refreshClaims({force:true});renderArchive();}}
 async function renderArchive(){
  const root=q('#screen-archive');
  if(!bank){root.innerHTML='<div class="ax-loading">Otevírám Archiv…</div>';try{await loadBank()}catch(e){root.innerHTML='<h1>Archiv počká.</h1><p>Nepodařilo se načíst desky. Tvůj postup zůstává uložený.</p><button class="primary-btn" data-archive-action="retry">Zkusit znovu</button>';return;}}
+ refreshClaims();
  const d=archiveState.diff;
- root.innerHTML='<button class="ax-back" data-archive-action="free">'+ico('back')+' Zpět na Hrát</button><div class="ax-archive-heading"><div><h1>Archiv Propletu</h1><p>Původní desky z prvních verzí hry. Vyber si kteroukoli.</p><span>800 desek · čtyři obtížnosti · vlastní pořadí</span></div>'+archiveArt()+'</div><div class="ax-archive-note"><p>Za historické odměny, které jsi ještě nezískal, na tebe pořád čekají XP.</p><button data-archive-action="rewards">Jak to funguje '+ico('info')+'</button></div><div class="ax-difficulty-tabs">'+Object.keys(labels).map(diff=>'<button data-archive-diff="'+diff+'" aria-pressed="'+(diff===d)+'">'+difficultyIconMarkup(diff,'ax-difficulty-art')+'<span><strong>'+labels[diff]+'</strong><small>200 desek · '+rewards[diff]+' XP</small></span></button>').join('')+'</div><div class="ax-collection-title"><h2>'+({easy:'Snadné desky',medium:'Středně těžké desky',hard:'Těžké desky',hardcore:labels.hardcore}[d])+'</h2><span>Vyber si kteroukoli.</span></div><div class="ax-filter-row"><div class="ax-filters">'+[['all','Všechny'],['unplayed','Nehrané'],['reward','S odměnou XP']].map(([v,l])=>'<button data-archive-filter="'+v+'" aria-pressed="'+(archiveState.filter===v)+'">'+l+'</button>').join('')+'</div><label class="ax-search">'+ico('search')+'<input id="axSearch" aria-label="Číslo archivní desky" type="search" inputmode="numeric" placeholder="Číslo desky" maxlength="3" value="'+archiveState.query+'"></label></div><div id="axBoardResults"></div><div class="ax-history-note"><h3>Malý výlet do historie</h3><p>Některá slova i obtížnost jsou trochu po svém. Původní desky jsme zachovali a prověřili jejich řešení. Žádné odemykání, žádné povinné pořadí.</p></div>';
+ root.innerHTML='<button class="ax-back" data-archive-action="free">'+ico('back')+' Zpět na Hrát</button><div class="ax-archive-heading"><div><h1>Archiv Propletu</h1><p>Původní desky z prvních verzí hry. Vyber si kteroukoli.</p><span>800 desek · čtyři obtížnosti · vlastní pořadí</span></div>'+archiveArt()+'</div><div class="ax-archive-note"><p>Historická odměna se připisuje jednou. Její dostupnost ověřujeme podle účtu.</p><button data-archive-action="rewards">Jak to funguje '+ico('info')+'</button></div><div class="ax-difficulty-tabs">'+Object.keys(labels).map(diff=>'<button data-archive-diff="'+diff+'" aria-pressed="'+(diff===d)+'">'+difficultyIconMarkup(diff,'ax-difficulty-art')+'<span><strong>'+labels[diff]+'</strong><small>200 desek · '+rewards[diff]+' XP</small></span></button>').join('')+'</div><div class="ax-collection-title"><h2>'+({easy:'Snadné desky',medium:'Středně těžké desky',hard:'Těžké desky',hardcore:labels.hardcore}[d])+'</h2><span>Vyber si kteroukoli.</span></div><div class="ax-filter-row"><div class="ax-filters">'+[['all','Všechny'],['unplayed','Nehrané'],['reward','S odměnou XP']].map(([v,l])=>'<button data-archive-filter="'+v+'" aria-pressed="'+(archiveState.filter===v)+'">'+l+'</button>').join('')+'</div><label class="ax-search">'+ico('search')+'<input id="axSearch" aria-label="Číslo archivní desky" type="search" inputmode="numeric" placeholder="Číslo desky" maxlength="3" value="'+archiveState.query+'"></label></div><div id="axBoardResults"></div><div class="ax-history-note"><h3>Malý výlet do historie</h3><p>Některá slova i obtížnost jsou trochu po svém. Původní desky jsme zachovali a prověřili jejich řešení. Žádné odemykání, žádné povinné pořadí.</p></div>';
  renderGrid();
 }
 function renderGrid(){
  if(!q('#axBoardResults')||!bank)return;
- const {diff,filter,query}=archiveState,list=bank.boards.filter(r=>r.difficulty===diff&&(!query||String(r.level).includes(query))).filter(r=>{const p=freshPuzzle(r);return filter==='unplayed'?!completion(p):filter==='reward'?!paid(p):true;});
+ const claims=currentClaims(),localState=getState(),{diff,filter,query}=archiveState;
+ const rewardFilter=q('[data-archive-filter="reward"]');if(rewardFilter){rewardFilter.disabled=claims.status!=='ready';rewardFilter.title=claims.status==='ready'?'':'Dostupnost odměn ověříme po připojení k účtu.';}
+ const list=bank.boards.filter(r=>r.difficulty===diff&&(!query||String(r.level).includes(query))).filter(r=>filter==='unplayed'?!completion(r,localState,claims):filter==='reward'?paid(r)===false:true);
  const pages=Math.max(1,Math.ceil(list.length/40));archiveState.page=Math.min(archiveState.page,pages-1);const offset=archiveState.page*40;
- q('#axBoardResults').innerHTML='<div class="ax-board-grid">'+list.slice(offset,offset+40).map(r=>{const p=freshPuzzle(r),done=!!completion(p),claimed=paid(p),progress=getState().inProgress['free:'+p.id];return '<button class="ax-board '+(claimed?'ax-paid':'')+'" data-archive-board="'+p.id+'" aria-label="'+labels[diff]+' deska '+r.level+', '+(done?'odehráno':progress?'rozehráno':'nehráno')+', '+(claimed?'odměna už získána':rewards[diff]+' XP k získání')+'">'+(done?'<i>'+ico('check')+'</i>':progress?'<i class="ax-progress-dot"></i>':'')+'<strong>'+r.level+'</strong><span>'+(progress?'Rozehráno':claimed?'XP získány':'+'+rewards[diff]+' XP')+'</span></button>';}).join('')+(list.length?'':'<p class="ax-empty">Zkus jiné číslo nebo filtr.</p>')+'</div><div class="ax-grid-foot"><span>'+(list.length?(offset+1)+'–'+Math.min(offset+40,list.length)+' z '+list.length:'Žádné desky')+'</span><div><button data-archive-page="-1" aria-label="Předchozí desky" '+(archiveState.page===0?'disabled':'')+'>'+ico('back')+'</button><span>'+(archiveState.page+1)+' / '+pages+'</span><button data-archive-page="1" aria-label="Další desky" '+(archiveState.page===pages-1?'disabled':'')+'>'+ico('arrow')+'</button></div></div><p class="ax-legend">✓ Odehraná deska <span>·</span> XP získány = jednou připsaná historická odměna</p>';
+ const notice=claims.status==='ready'?'':claims.status==='guest'?'Hrát můžeš i bez účtu. Dostupnost XP ověříme po přihlášení.':claims.status==='loading'?'Ověřuji historické odměny…':'Odměny teď nelze ověřit. Hrát můžeš dál; XP potvrdí server po připojení.';
+ q('#axBoardResults').innerHTML=(notice?'<p class="ax-legend" role="status">'+notice+'</p>':'')+'<div class="ax-board-grid">'+list.slice(offset,offset+40).map(r=>{const done=!!completion(r,localState,claims),claimed=paid(r),progress=localState.inProgress['free:'+r.puzzleId],xp=claimed===true?'XP získány':claimed===false?'+'+r.rewardXp+' XP':claims.status==='guest'?'Hrát':'XP neověřeny';return '<button class="ax-board '+(claimed===true?'ax-paid':'')+'" data-archive-board="'+r.puzzleId+'" aria-label="'+labels[diff]+' deska '+r.level+', '+(done?'odehráno':progress?'rozehráno':'nehráno')+', '+xp+'">'+(done?'<i>'+ico('check')+'</i>':progress?'<i class="ax-progress-dot"></i>':'')+'<strong>'+r.level+'</strong><span>'+(progress?'Rozehráno':xp)+'</span></button>';}).join('')+(list.length?'':'<p class="ax-empty">'+(filter==='reward'&&claims.status!=='ready'?'Odměny nejdřív potřebujeme ověřit. Vyber zatím filtr Všechny.':'Zkus jiné číslo nebo filtr.')+'</p>')+'</div><div class="ax-grid-foot"><span>'+(list.length?(offset+1)+'–'+Math.min(offset+40,list.length)+' z '+list.length:'Žádné desky')+'</span><div><button data-archive-page="-1" aria-label="Předchozí desky" '+(archiveState.page===0?'disabled':'')+'>'+ico('back')+'</button><span>'+(archiveState.page+1)+' / '+pages+'</span><button data-archive-page="1" aria-label="Další desky" '+(archiveState.page===pages-1?'disabled':'')+'>'+ico('arrow')+'</button></div></div><p class="ax-legend">✓ Odehraná deska <span>·</span> XP získány = jednou připsaná historická odměna</p>';
 }
 function modal(html,kind=''){
  const m=q('#archiveExperienceModal');if(m.classList.contains('hidden')){modalFocus=document.activeElement;document.body.dataset.axOldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';}
@@ -131,8 +211,10 @@ function modal(html,kind=''){
 }
 function closeModal(){const active=q('#archiveExperienceModal');if(!active||active.classList.contains('hidden'))return;active.classList.add('hidden');q('.app-shell').inert=false;q('.bottom-nav').inert=false;if(document.body.dataset.axOldOverflow!==undefined){document.body.style.overflow=document.body.dataset.axOldOverflow;delete document.body.dataset.axOldOverflow;}if(modalFocus?.isConnected)modalFocus.focus({preventScroll:true});}
 function detail(id){
- const r=row(id);if(!r)return;const p=freshPuzzle(r),done=completion(p),progress=getState().inProgress['free:'+id],earned=paid(p);
- modal('<div class="ax-detail-heading">'+difficultyIconMarkup(r.difficulty,'ax-detail-art')+'<div><h2 id="axModalTitle">Deska '+r.level+'</h2><p>'+labels[r.difficulty]+' · Archiv</p></div></div><div class="ax-detail-reward"><strong>'+(earned?'Odměna už je tvoje':'Čeká na tebe '+r.rewardXp+' XP')+'</strong><p>'+(earned?'Historickou odměnu za tuto úroveň už máš získanou. Desku si přesto můžeš zahrát kdykoli.':'Tohle je dosud nezískaná historická odměna. Dokončené novější desky ji neblokují.')+'</p></div><p class="ax-detail-state">'+(progress?'Rozehráno · '+progress.found.length+' / '+p.answers.length+' slov':done?'Tuto desku už máš odehranou.':'Tuto desku jsi ještě nehrál.')+'</p><button class="primary-btn big" data-archive-start="'+id+'">'+(progress?'Pokračovat':done?'Zahrát znovu':'Hrát desku '+r.level)+' →</button>','ax-detail');
+ const r=row(id);if(!r)return;const done=completion(r),progress=getState().inProgress['free:'+id],earned=paid(r),guest=!getProfile()?.token;
+ const heading=earned===true?'Odměna už je tvoje':earned===false?'Čeká na tebe '+r.rewardXp+' XP':guest?'Zahraj si i bez účtu':'Odměna zatím není ověřená';
+ const copy=earned===true?'Historickou odměnu za tuto úroveň už máš získanou. Desku si přesto můžeš zahrát kdykoli.':earned===false?'Tohle je dosud nezískaná historická odměna. Dokončené novější desky ji neblokují.':guest?'Výsledek uložíme v tomto zařízení. Dostupnost historické odměny ověříme po přihlášení.':'Přehled odměn se nepodařilo načíst. Hrát můžeš; XP potvrdí server po připojení.';
+ modal('<div class="ax-detail-heading">'+difficultyIconMarkup(r.difficulty,'ax-detail-art')+'<div><h2 id="axModalTitle">Deska '+r.level+'</h2><p>'+labels[r.difficulty]+' · Archiv</p></div></div><div class="ax-detail-reward"><strong>'+heading+'</strong><p>'+copy+'</p></div><p class="ax-detail-state">'+(progress?'Rozehráno · '+progress.found.length+' slov nalezeno':done?'Tuto desku už máš odehranou.':'Tuto desku jsi ještě nehrál.')+'</p><button class="primary-btn big" data-archive-start="'+id+'">'+(progress?'Pokračovat':done?'Zahrát znovu':'Hrát desku '+r.level)+' →</button>','ax-detail');
 }
 function snapshot(g){const r=row(g.puzzle);return {solutionPolicyRevision:r.solutions.solutionPolicyRevision,found:g.found.map(f=>({word:f.word,path:[...f.path]})),revealed:g.archiveHints||[]};}
 function contract(g){return window.PropletArchiveSolutions.create(row(g.puzzle).puzzle,row(g.puzzle).solutions);}
@@ -140,15 +222,18 @@ function choose(g,solutionId){g.puzzle.answers=structuredClone(row(g.puzzle).sol
 function beforeSubmit(g,word,path){if(!g?.puzzle?.meta?.archiveExperience)return;const out=contract(g).submit(snapshot(g),word,path);if(out.accepted)choose(g,out.solutionIds[0]);}
 function hintUsed(g,pick,level){if(!g?.puzzle?.meta?.archiveExperience)return;g.archiveHints||=[];const hint={level,targetLength:pick.a.word.length,shownPath:pick.a.path.slice(0,level===1?1:level===2?3:pick.a.path.length)};if(level===3)hint.shownWord=pick.a.word;g.archiveHints.push(hint);}
 async function start(id){
- await loadBank();const r=row(id);if(!r)return;const p=freshPuzzle(r),saved=read().progress[id];
+ const owner=identity(),r=await loadEntry(id);if(owner!==identity())return;const p=freshPuzzle(r),saved=read().progress[id];
  if(saved){const c=window.PropletArchiveSolutions.create(r.puzzle,r.solutions),status=c.restore(saved);if(status.ok){p.answers=structuredClone(r.solutions.solutionSets[status.solutionIds[0]]);const state=getState(),progress=state.inProgress['free:'+id];if(progress){progress.found.forEach(f=>{f.answerIndex=p.answers.findIndex(a=>a.word===f.word&&samePath(a.path,f.path))});saveState(state);}}}
  closeModal();await startGame(p,'free',null,{archive:true});
 }
-function prepareCompletion(g){const result=contract(g).evaluate(snapshot(g));if(!result.ok||!result.completed)throw Error('Archive solution is not a complete approved cover');g.archiveAward=paid(g.puzzle)?0:rewards[g.puzzle.difficulty];}
+function prepareCompletion(g){const result=contract(g).evaluate(snapshot(g));if(!result.ok||!result.completed)throw Error('Archive solution is not a complete approved cover');g.archiveSolution={editionId:bank.editionId,solutionPolicyRevision:bank.solutionPolicyRevision,found:result.state.found};}
 function postWin(){q('#winModal').classList.add('hidden');q('#winModal').classList.remove('ax-archive-result');nav('archive',{replace:true});}
 function isTarget(g,word){return !!g?.puzzle?.meta?.archiveExperience&&contract(g).isSolutionWord(word);}
-function announcement(){
- modal('<h2 id="axModalTitle">Dobré desky<br>nestárnou.</h2><p class="ax-cta-copy"><strong>800 původních desek</strong> se vrací do hry.<br>Vyber si kteroukoli. Pořadí je na tobě.</p><div class="ax-cta-difficulties">'+Object.keys(labels).map(d=>'<div>'+difficultyIconMarkup(d,'ax-cta-art')+'<strong>'+labels[d]+'</strong><span>200 desek</span></div>').join('')+'</div><p class="ax-cta-note">Je to výlet do začátků Propletu.<br>Některá slova i obtížnost jsou trochu po svém.</p><button class="primary-btn big ax-cta-primary" data-archive-action="enter">Prozkoumat Archiv →</button><button class="text-btn ax-cta-secondary" data-archive-action="close">Nechám si na později</button>','ax-announcement');
+function announcement({includeExtra=true}={}){
+ if(!installed)return false;
+ modal('<h2 id="axModalTitle">Dobré desky<br>nestárnou.</h2><p class="ax-cta-copy"><strong>800 původních desek</strong> se vrací do hry.<br>Vyber si kteroukoli. Pořadí je na tobě.</p><div class="ax-cta-difficulties">'+Object.keys(labels).map(d=>'<div>'+difficultyIconMarkup(d,'ax-cta-art')+'<strong>'+labels[d]+'</strong><span>200 desek</span></div>').join('')+'</div><p class="ax-cta-note">Je to výlet do začátků Propletu.<br>Některá slova i obtížnost jsou trochu po svém.</p>'+(includeExtra?'<p class="ax-cta-note">A ve středu, v pátek a v neděli najdeš na Dnes ještě Extra — dobrovolnou těžší výzvu za 100 XP.</p>':'')+'<button class="primary-btn big ax-cta-primary" data-archive-action="enter">Prozkoumat Archiv →</button><button class="text-btn ax-cta-secondary" data-archive-action="close">Nechám si na později</button>','ax-announcement');
+ window.PropletAnnouncements?.acknowledge('archive-extra-v1');
+ return true;
 }
 function rewardRules(){modal('<h2 id="axModalTitle">Staré desky.<br>Férové odměny.</h2><ol class="ax-rules"><li><b>Odměna patří k historické úrovni.</b> Starší verze stejného čísla a obtížnosti sdílejí jednu odměnu.</li><li><b>Novější desky ji neblokují.</b> Pokud jsi starou odměnu nezískal, v Archivu na tebe pořád čeká.</li><li><b>Už připsané XP dostaneš jen jednou.</b> Fajfka u čísla zvlášť označuje, že jsi hrál právě tuto desku.</li></ol><button class="primary-btn big" data-archive-action="close">Rozumím</button>');}
 function review(){
@@ -176,6 +261,6 @@ async function onClick(e){
  if(action==='rankings'){nav('leaderboard');return}
  if(action==='team'){nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}
 }
-window.PropletArchiveExperience={install,home,free,placePlayExtra,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
+window.PropletArchiveExperience={configure,isEnabled:()=>installed,announcement,refreshClaims,resultConfirmed,renderResult,adoptGuest,install,home,free,placePlayExtra,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
 })();
 

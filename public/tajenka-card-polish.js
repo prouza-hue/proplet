@@ -32,7 +32,7 @@
   function polishCard(card){
     if(!card?.classList.contains('completed'))return;
     const copy=q('.tajenka-entry-copy',card);
-    if(!window.PROPLET_ARCHIVE_PREVIEW)q('h2',copy)?.remove();
+    if(!window.PropletArchiveExperience?.isEnabled?.())q('h2',copy)?.remove();
     const phrase=q('.tajenka-revealed-phrase',copy);
     if(phrase){
       const quoted=quotePhrase(phrase.textContent);

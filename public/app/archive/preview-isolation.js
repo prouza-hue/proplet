@@ -97,6 +97,38 @@ async function publicBank(){
  if(!publicBankPromise)publicBankPromise=fetchPublished('/puzzles.json').then(async r=>{if(!r.ok)throw Error('review-public-bank-unavailable');return r.json();});
  return publicBankPromise;
 }
+let archiveBankPromise=null;
+async function archiveBank(){
+ if(!archiveBankPromise)archiveBankPromise=fetchPublished('/app/archive/boards.json').then(r=>{if(!r.ok)throw Error('review-archive-unavailable');return r.json();});
+ return archiveBankPromise;
+}
+const archiveRevision=bank=>bank.boards[0].solutions.solutionPolicyRevision;
+function archiveLedger(){
+ const key='review-archive-server:'+(profile()?.id||'guest');
+ let ledger=read(key,null);
+ if(!ledger){
+  const claims={};
+  // Model historical G1/G2 claims independently of which G3 board was played.
+  if(profile()?.id)for(const [difficulty,points] of Object.entries({easy:15,medium:25,hard:50,hardcore:100}))for(let level=1;level<=14;level++)claims['legacy-free:'+difficulty+':'+level]={sourcePuzzleId:'historical-example-'+difficulty+'-'+level,points};
+  ledger={claims,completedPuzzleIds:[],receipts:{}};save(key,ledger);
+ }
+ return {key,ledger};
+}
+async function archiveResult(body){
+ if(!profile()?.id||!profile()?.token)return json({detail:'Přihlas se pro uložení odměny.'},401);
+ const bank=await archiveBank(),entry=bank.boards.find(row=>row.puzzle.id===body.puzzle_id);
+ if(!entry||body.archive_solution?.editionId!==bank.editionId||body.archive_solution?.solutionPolicyRevision!==archiveRevision(bank))return json({detail:'Neplatné archivní řešení.'},400);
+ const status=window.PropletArchiveSolutions.create(entry.puzzle,entry.solutions).evaluate({...body.archive_solution,revealed:[]});
+ if(!status.ok||!status.completed)return json({detail:'Archiv potřebuje úplné schválené řešení.'},400);
+ const {key,ledger}=archiveLedger(),receiptId=body.attempt_id||body.challenge_key+':'+body.completed_at;
+ if(ledger.receipts[receiptId])return json(ledger.receipts[receiptId]);
+ const firstCompletion=!ledger.completedPuzzleIds.includes(entry.puzzle.id),alreadyClaimed=!!ledger.claims[entry.rewardSlotKey];
+ const awardedPoints=alreadyClaimed?0:entry.rewardXp;
+ ledger.claims[entry.rewardSlotKey]||={sourcePuzzleId:entry.puzzle.id,points:awardedPoints};
+ if(firstCompletion)ledger.completedPuzzleIds.push(entry.puzzle.id);
+ const receipt={ok:true,firstCompletion,awardedPoints,dailyGenerationUpgrade:false,transferredSlot:alreadyClaimed,wordDiscoveryXp:0,reviewOnly:true};
+ ledger.receipts[receiptId]=receipt;save(key,ledger);return json(receipt);
+}
 async function digest(puzzle){
  const text=JSON.stringify({rows:puzzle.rows,cols:puzzle.cols,letters:puzzle.letters,mask:puzzle.mask,answers:puzzle.answers,lengths:puzzle.lengths});
  const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
@@ -203,7 +235,20 @@ window.fetch=async(input,init={})=>{
  if(method==='GET'&&path==='/api/config'){
   let config={"badges":[{"days":1,"icon":"🥉","name":"První zářez"},{"days":3,"icon":"❤️","name":"Srdcař"},{"days":5,"icon":"⭐","name":"Pětka"},{"days":7,"icon":"🔥","name":"Týden v plamenech"},{"days":10,"icon":"🏆","name":"Desítka"},{"days":14,"icon":"⚡","name":"Blesk"},{"days":21,"icon":"🦉","name":"Mistr slov"},{"days":30,"icon":"👑","name":"Koruna"},{"days":50,"icon":"💎","name":"Diamant"},{"days":100,"icon":"🚀","name":"Legenda"}],"points":{"daily":100,"easy":15,"medium":25,"hard":50,"hardcore":100,"mozkomor":150,"starter":10,"mozkokalypsa":200},"dictionarySize":13939,"dailyRotationSize":365,"dailyGeneration":4,"dailyGeneration3From":"2026-08-17","dailyCadence":{"weekdays":["easy","easy","medium","medium","medium","hard","hard"],"counts":{"easy":105,"medium":156,"hard":104}},"rescueBankSize":30,"pushAvailable":false,"environment":"preview","version":"4.07.3","historicalFreeWriteEnabled":false,"referralsEnabled":true,"dailySpecialsEnabled":true};
   try{const response=await fetchPublished('/api/config');if(response.ok)config={...config,...await response.json()};}catch{}
-  return json({...config,environment:'preview',version:'4.07.3',historicalFreeWriteEnabled:false,pushAvailable:false,reviewOnly:true});
+  return json({...config,environment:'preview',version:'4.07.3',archiveEnabled:true,historicalFreeWriteEnabled:true,pushAvailable:false,reviewOnly:true});
+ }
+ if(method==='GET'&&path==='/api/archive'){
+  const bank=await archiveBank();
+  return json({editionId:bank.editionId,solutionPolicyRevision:archiveRevision(bank),completeCovers:bank.completeCovers,
+   boards:bank.boards.map(({puzzle,level,difficulty,rewardXp,rewardSlotKey})=>({puzzleId:puzzle.id,level,difficulty:difficulty||puzzle.difficulty,rewardXp,rewardSlotKey}))});
+ }
+ if(method==='GET'&&path==='/api/archive/puzzle'){
+  const bank=await archiveBank(),entry=bank.boards.find(row=>row.puzzle.id===url.searchParams.get('puzzle_id'));
+  return entry?json({editionId:bank.editionId,...entry,difficulty:entry.difficulty||entry.puzzle.difficulty}):json({detail:'Neznámá archivní deska'},404);
+ }
+ if(method==='GET'&&path==='/api/archive/claims'){
+  if(!profile()?.token)return json({detail:'Přihlas se pro načtení odměn.'},401);
+  const bank=await archiveBank(),{ledger}=archiveLedger();return json({editionId:bank.editionId,claims:ledger.claims,completedPuzzleIds:ledger.completedPuzzleIds});
  }
  if(method==='GET'&&path==='/api/daily'){
   if(scenario.extra!=='live')return json(await modelDaily());
@@ -237,7 +282,7 @@ window.fetch=async(input,init={})=>{
  if(['POST','PUT','PATCH','DELETE'].includes(method)){
   if(path==='/api/player')return json({...snapshot(),name:String(body.name||'Alex'),accountCreated:true,reviewOnly:true});
   if(path==='/api/auth/google/complete')return json({profile:{...snapshot(),name:String(body.name||'Alex')},accountCreated:true,reviewOnly:true});
-  if(path==='/api/result')return json({ok:true,accepted:true,awardedXp:0,wordDiscoveryXp:0,reviewOnly:true});
+  if(path==='/api/result')return body.archive_solution?archiveResult(body):json({ok:true,accepted:true,firstCompletion:true,awardedPoints:0,wordDiscoveryXp:0,reviewOnly:true});
   if(path==='/api/support-report'||path==='/api/account')return json({detail:'Tato akce je dostupná pouze v ostrém Propletu; náhled nic neodesílá.'},409);
   return json({...emptyResult,ok:true,accepted:[],reviewOnly:true,wordDiscoveryXp:0,awardedXp:0});
  }

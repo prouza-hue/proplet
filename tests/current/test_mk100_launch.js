@@ -2,48 +2,37 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync('public/app/mozkokalypsa-launch.js','utf8');
 const seen='proplet:content-release:mk100-v2';
-function setup({local=new Map([['onboard','done']]),session=new Map(),screen='daily',blocked=false,quiet=false,missing=false,denied=false,profile=null,prior=false}={}){
+const {create}=require('../../public/app/engagement/announcements.js');
+function setup({local=new Map([['onboard','done']]),session=new Map(),screen='daily',blocked=false,quiet=false,missing=false,denied=false,profile={id:'tester',token:'test'},prior=false,completed=10}={}){
  const events=new Map(),nodes=new Map(),timers=[],games=[];
  const storage=map=>({getItem:k=>{if(denied)throw Error('blocked');return map.get(k)},setItem:(k,v)=>{if(denied)throw Error('blocked');map.set(k,v)},removeItem:k=>map.delete(k)});
  function node(){const classes=new Set(),handlers=new Map(),children=new Map();return {inert:false,isConnected:true,style:{},classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x)},set className(s){s.split(' ').forEach(x=>classes.add(x))},setAttribute(){},focus(){},contains(){return false},querySelector(s){if(!children.has(s))children.set(s,node());return children.get(s)},querySelectorAll(){return [...children.values()]},addEventListener:(e,f)=>handlers.set(e,f),emit:(e,v={})=>handlers.get(e)?.(v)}};
  const main=node();main.tagName='MAIN';const body={children:[main],style:{overflow:'auto'},appendChild:n=>{body.children.push(n);nodes.set(n.id,n)}};
  const document={body,hidden:false,activeElement:main,createElement:node,querySelector:()=>blocked?{}:null,addEventListener:(e,f)=>events.set(e,f)};
  const context={getProfile:()=>profile,getState:()=>({completed:prior?{old:true}:{}}),document,localStorage:storage(local),sessionStorage:storage(session),ONBOARD_KEY:'onboard',currentScreen:screen,onboardingMandatory:false,puzzleDB:{free:{mozkokalypsa:Array.from({length:missing?99:100},(_,i)=>({id:`mk100-v2-${i}`}))}},openTransientModal:()=>blocked?{}:null,setTimeout:f=>timers.push(f),window:{startFree:d=>games.push(d),PropletFirstSteps:{quiet:()=>quiet}}};
+ const queue=create({context:()=>({ready:true,account:profile?.id||'',authenticated:!!profile?.token,completed,onboarded:local.get('onboard')==='done',screen:context.currentScreen,blocked,quiet}),storage:context.localStorage,sessionStorage:context.sessionStorage});
+ context.window.PropletAnnouncements=queue;
  vm.createContext(context);vm.runInContext(source,context);
- return {context,main,local,session,games,document,setProfile:p=>{profile=p},emit:e=>events.get(e)?.(),flush(){while(timers.length)timers.shift()()},modal:()=>nodes.get('mk100LaunchPreview')};
+ return {queue,context,main,local,session,games,document,setProfile:p=>{profile=p},emit:e=>events.get(e)?.(),flush(){while(timers.length)timers.shift()()},modal:()=>nodes.get('mk100LaunchPreview')};
 }
-// Completing onboarding, navigation, reload and OAuth return remain quiet in visit one.
-const first=setup({local:new Map()});first.emit('proplet:ready');assert(!first.modal());
-first.local.set('onboard','done');first.emit('proplet:screen-changed');first.flush();assert(!first.modal());
-const reload=setup({local:first.local,session:first.session});reload.emit('proplet:ready');assert(!reload.modal());
-const next=setup({local:first.local,session:new Map()});next.emit('proplet:ready');assert(next.modal());assert(next.main.inert);
-next.modal().querySelector('[data-mk-launch-back]').emit('click');assert.equal(next.local.get(seen),'1');assert(!next.main.inert);
-next.emit('visibilitychange');assert(next.modal().classList.contains('hidden'));
-const dismissed=setup({local:next.local});dismissed.emit('proplet:ready');assert(!dismissed.modal());
-for(const options of [{denied:true},{quiet:true},{missing:true},{blocked:true},{screen:'game'}]){const x=setup(options);x.emit('proplet:ready');assert(!x.modal())}
-const defer=setup({screen:'game'});defer.emit('proplet:ready');defer.context.currentScreen='free';defer.emit('proplet:screen-changed');defer.flush();assert(defer.modal());
-defer.context.window.PropletContentRelease.close();assert(defer.modal().classList.contains('hidden'));assert(!defer.main.inert);
-const play=setup();play.emit('proplet:ready');play.modal().querySelector('[data-mk-launch-play]').emit('click');assert.deepEqual(play.games,['mozkokalypsa']);assert.equal(play.local.get(seen),'1');
-console.log('PASS: onboarding first visit/reload/OAuth suppression, next visit, once dismissal, safe screens, content availability, storage failures and play action');
-
-
-// Existing accounts must not inherit another player's browser-wide dismissal.
-const shared=setup({local:new Map([['onboard','done'],[seen,'1']]),profile:{id:'tester',token:'test'}});
-shared.emit('proplet:ready');assert(shared.modal(),'existing account inherited browser dismissal');
-shared.modal().querySelector('[data-mk-launch-back]').emit('click');
-assert.equal(shared.local.get(seen+':account:tester'),'1');
-const same=setup({local:shared.local,profile:{id:'tester',token:'test'}});same.emit('proplet:ready');assert(!same.modal());
-const returning=setup({local:new Map(),quiet:true});returning.emit('proplet:ready');
-returning.setProfile({id:'returner',token:'test'});returning.local.set('onboard','done');
-returning.emit('proplet:returning-player');returning.flush();assert(returning.modal(),'returning login remained first visit');
-const registered=setup({local:new Map(),quiet:true});registered.emit('proplet:ready');
-registered.setProfile({id:'new',token:'test'});registered.local.set('onboard','done');
-registered.emit('proplet:account-changed');registered.flush();assert(!registered.modal(),'new registration interrupted');
-
-const switched=setup({profile:{id:'a',token:'test'}});switched.emit('proplet:ready');
-switched.setProfile({id:'b',token:'test'});switched.emit('proplet:account-changed');switched.flush();
-assert(!switched.modal().classList.contains('hidden'));assert(!switched.local.has(seen+':account:a'));
-switched.modal().querySelector('[data-mk-launch-back]').emit('click');assert.equal(switched.local.get(seen+':account:b'),'1');
-const existing=setup({local:new Map(),profile:{id:'old',token:'test'}});existing.local.set('onboard','done');existing.emit('proplet:ready');assert(existing.modal());
-const loginReload=setup({local:returning.local,session:returning.session,quiet:true,profile:{id:'returner',token:'test'}});loginReload.emit('proplet:ready');assert(loginReload.modal());
-console.log('PASS: account-scoped dismissal, account switching, existing login and reload, new signup stays quiet');
+(async()=>{
+ // Shared automatic gates supersede the old guest/first-visit heuristics.
+ for(const options of [{profile:null},{completed:4},{local:new Map()},{denied:true},{quiet:true},{missing:true},{blocked:true},{screen:'game'}]){
+  const x=setup(options);await x.queue.kick();assert(!x.modal());
+ }
+ const returning=setup();await returning.queue.kick();assert(returning.modal());assert(returning.main.inert);
+ assert.equal(returning.local.get(seen+':account:tester'),'1','receipt saved only after a real display');
+ returning.modal().querySelector('[data-mk-launch-back]').emit('click');assert(!returning.main.inert);
+ await returning.queue.kick();assert(returning.modal().classList.contains('hidden'));
+ const dismissed=setup({local:returning.local});await dismissed.queue.kick();assert(!dismissed.modal());
+ const defer=setup({screen:'game'});await defer.queue.kick();defer.context.currentScreen='free';await defer.queue.kick();assert(defer.modal());
+ defer.context.window.PropletContentRelease.close();assert(defer.modal().classList.contains('hidden'));assert(!defer.main.inert);
+ const play=setup();await play.queue.kick();play.modal().querySelector('[data-mk-launch-play]').emit('click');assert.deepEqual(play.games,['mozkokalypsa']);
+ // Old unscoped dismissals never belong to a different signed-in player.
+ const shared=setup({local:new Map([['onboard','done'],[seen,'1']])});await shared.queue.kick();assert(shared.modal());
+ const switched=setup({profile:{id:'a',token:'test'}});await switched.queue.kick();switched.setProfile({id:'b',token:'test'});await switched.queue.kick();
+ assert(switched.modal().classList.contains('hidden'),'account switch closes old dialog');
+ assert(!switched.local.has(seen+':account:b'),'one session budget does not transfer a receipt');
+ const higher=setup();let news=0;higher.queue.register({id:'archive',priority:100,eligible:()=>true,show:()=>{news++;return true}});await higher.queue.kick();assert.equal(news,1);assert(!higher.modal());
+ console.log('PASS: Mozkokalypsa uses shared account/session gates, legacy receipts, deferred display, accessible close, play action and current-news priority');
+})().catch(error=>{console.error(error);process.exit(1)});

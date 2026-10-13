@@ -1,6 +1,6 @@
 /* Integrated with Proplet's canonical printshop tokens. */
-html[data-archive-preview]{--ax-rust:#8d4d31;--ax-rust-soft:#f3e8d6;--ax-plum:#644362;--ax-plum-soft:#eee5ed;--ax-green:#365e4a}
-html[data-archive-preview][data-theme="dark"]{--ax-rust:#dfb28d;--ax-rust-soft:#3b342c;--ax-plum:#debfdf;--ax-plum-soft:#383043;--ax-green:#a8c8af}
+html[data-archive-enabled]{--ax-rust:#8d4d31;--ax-rust-soft:#f3e8d6;--ax-plum:#644362;--ax-plum-soft:#eee5ed;--ax-green:#365e4a}
+html[data-archive-enabled][data-theme="dark"]{--ax-rust:#dfb28d;--ax-rust-soft:#3b342c;--ax-plum:#debfdf;--ax-plum-soft:#383043;--ax-green:#a8c8af}
 #archiveReviewNotice{display:flex;justify-content:center;align-items:center;gap:12px;padding:6px 14px;background:var(--td-ink,#202b39);color:var(--td-paper,#fffcf5);font:11px/1.4 Outfit,sans-serif;position:relative;z-index:2}
 #archiveReviewNotice button{font:inherit;color:inherit;background:none;border:0;padding:3px 0;border-bottom:1px solid currentColor;cursor:pointer;white-space:nowrap}
 body.playing #archiveReviewNotice{display:none}
@@ -178,3 +178,7 @@ html.tiskarna-ui .archive-experience .ax-search{width:150px}
 @media(max-width:350px){
 }
 
+
+html.tiskarna-ui .archive-experience #axArchiveResume .home-resume-copy>span{text-transform:none;letter-spacing:normal;font-size:12px}
+
+html.tiskarna-ui #winModal .ax-result-status{font:400 12px/1.5 Outfit,sans-serif;color:var(--td-muted);text-align:center;margin:0 0 16px}

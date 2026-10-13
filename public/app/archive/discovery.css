@@ -104,10 +104,10 @@ html.tiskarna-ui body.archive-experience :is(#screen-daily,#screen-free)>.hidden
  html.tiskarna-ui body.archive-experience .ax-competition-grid{grid-template-columns:minmax(0,1fr)}
 }
 @media(min-width:600px) and (max-width:779px){
- html.tiskarna-ui body.archive-experience{--pg-card-pad:16px;--pg-art:44px;--pg-title:20px}
+ html.tiskarna-ui body.archive-experience{--pg-card-pad:14px;--pg-art:32px;--pg-title:18px}
 }
 @media(max-width:359px){
- html.tiskarna-ui body.archive-experience{--pg-art:40px;--pg-title:19px;--pg-card-pad:14px}
+ html.tiskarna-ui body.archive-experience{--pg-art:32px;--pg-title:19px;--pg-card-pad:14px}
  html.tiskarna-ui body.archive-experience .ax-free-art{gap:0!important}
  html.tiskarna-ui body.archive-experience .ax-free-difficulty{width:100%;height:20px}
 }
@@ -132,7 +132,7 @@ html.tiskarna-ui[data-theme=dark] body.archive-experience .app-footer :is(span,s
 /* Keep the information control in the production top-right position, including Fold columns. */
 @container difficulty-card (max-width:310px){
  html.tiskarna-ui body.archive-experience #difficultyCards .cp-card{column-gap:8px!important}
- html.tiskarna-ui body.archive-experience #difficultyCards .cp-top h2{font-size:19px!important}
+ html.tiskarna-ui body.archive-experience #difficultyCards .cp-top h2{font-size:18px!important}
  html.tiskarna-ui body.archive-experience #difficultyCards .cp-history{font-size:12px;gap:3px}
  html.tiskarna-ui body.archive-experience #difficultyCards .cp-xp{font-size:12px!important}
 }
@@ -172,3 +172,19 @@ html.tiskarna-ui body.archive-experience #difficultyCards .cp-play>span[aria-hid
 }
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-play>span[aria-hidden=true]{font-size:0!important;line-height:0}
 html.tiskarna-ui body.archive-experience #winPrimaryBtn::after{margin-left:10px}
+
+/* A long account name must yield space to the wordmark and settings control. */
+html.tiskarna-ui body.archive-experience .app-header>.brand{flex-shrink:0}
+html.tiskarna-ui body.archive-experience .quality-header-actions,
+html.tiskarna-ui body.archive-experience #profileChip{min-width:0}
+html.tiskarna-ui body.archive-experience .quality-header-actions>:not(#profileChip){flex-shrink:0}
+html.tiskarna-ui body.archive-experience #profileChipText{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:359px){
+ html.tiskarna-ui body.archive-experience .app-header>.brand{gap:6px}
+ html.tiskarna-ui body.archive-experience .quality-header-actions{gap:4px}
+ html.tiskarna-ui body.archive-experience #profileChip{gap:4px;padding-left:5px;padding-right:5px}
+ /* Two compact columns keep every difficulty name and reward legible. */
+ html.tiskarna-ui body.archive-experience .ax-difficulty-tabs button{flex-direction:column;justify-content:flex-start;text-align:center;min-width:0;padding:10px 6px;gap:6px}
+ html.tiskarna-ui body.archive-experience .ax-difficulty-tabs button>span{min-width:0;max-width:100%}
+ html.tiskarna-ui body.archive-experience .ax-difficulty-tabs small{white-space:normal;line-height:1.3}
+}

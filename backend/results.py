@@ -84,6 +84,10 @@ def canonical_request(payload: Any) -> dict[str, Any]:
     # commands bind the client's declared hash into their idempotency identity.
     if value["mode"] == "daily_special":
         request["content_hash"] = value.get("content_hash")
+    # Optional Archive evidence changes only new Archive identities. Preserve
+    # every pre-Archive retry digest (including an explicit null field).
+    if value.get("archive_solution") is not None:
+        request["archive_solution"] = value["archive_solution"]
     return request
 
 

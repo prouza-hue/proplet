@@ -6,6 +6,18 @@
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
       {
+        "path": "tests/current/test_archive_build.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_archive_frontend.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_announcement_queue.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_client_diagnostic_transport.cjs",
         "runner": "node"
       },
@@ -35,6 +47,10 @@
       },
       {
         "path": "tests/current/test_historical_free_rewards.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_archive_runtime.py",
         "runner": "python"
       },
       {

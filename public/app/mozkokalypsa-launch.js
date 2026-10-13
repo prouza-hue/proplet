@@ -1,45 +1,15 @@
-/* Approved launch artwork with once-only, returning-visit eligibility. */
+/* Approved launch artwork, scheduled below current news by the shared queue. */
 (function (global) {
   'use strict';
 
   const SEEN = 'proplet:content-release:mk100-v2';
-  const FIRST_VISIT = 'proplet:mk100-onboarding-visit';
-  const RETURNING = FIRST_VISIT + ':returning-account';
   const accountId = () => { try { const p = typeof getProfile === 'function' ? getProfile() : null; return p?.token && p?.id ? String(p.id) : ''; } catch { return ''; } };
-  // The historical key has no owner. Preserve it for guests only; it cannot
-  // safely tell us which signed-in player dismissed the announcement.
-  const seenKey = () => accountId() ? SEEN + ':account:' + accountId() : SEEN;
-  const returningLogin = () => !!accountId() && sessionStorage.getItem(RETURNING) === accountId();
-  let ready = false, shown = false, firstVisit = true, displayedKey = null;
-  let ownerKey = seenKey();
-  // Capture BEFORE onboarding can finish. Keep suppression across reloads and
-  // OAuth returns in this visit; a subsequent browser visit can show the CTA.
-  try {
-    const prior = typeof getState === 'function' ? getState() : null;
-    const known = !!accountId() || Object.keys(prior?.completed || {}).length > 0 || Object.keys(prior?.inProgress || {}).length > 0;
-    if (localStorage.getItem(ONBOARD_KEY) !== 'done' && !known) sessionStorage.setItem(FIRST_VISIT, '1');
-    firstVisit = sessionStorage.getItem(FIRST_VISIT) === '1';
-    localStorage.setItem(SEEN + ':storage-check', '1');
-    localStorage.removeItem(SEEN + ':storage-check');
-  } catch { firstVisit = true; }
+  const seenKey = () => SEEN + ':account:' + accountId();
+  let displayedKey = null;
   function eligible() {
-    try {
-      return (!firstVisit || returningLogin()) && localStorage.getItem(ONBOARD_KEY) === 'done'
-        && localStorage.getItem(seenKey()) !== '1'
-        && !(typeof onboardingMandatory !== 'undefined' && onboardingMandatory)
-        && (!global.PropletFirstSteps?.quiet() || returningLogin())
-        && (puzzleDB.free?.mozkokalypsa || []).filter(p => p.id?.startsWith('mk100-v2-')).length === 100;
-    } catch { return false; }
-  }
-  function maybeShow() {
-    if (global.dailyExtraIntroPending?.()) return;
-    if (!ready || shown || global.PropletContentAnnouncementShown === (accountId() || 'guest') || !eligible() || document.hidden) return;
-    if (!['daily', 'free'].includes(currentScreen) || openTransientModal()
-        || document.querySelector('dialog[open],.modal:not(.hidden),.quality-modal:not(.hidden)')) return;
-    if (typeof global.startFree !== 'function') return;
-    shown = true; global.PropletContentAnnouncementShown = accountId() || 'guest';
-    displayedKey = seenKey();
-    if (modal) open(); else mount();
+    try { return localStorage.getItem(seenKey()) !== '1'
+      && (puzzleDB.free?.mozkokalypsa || []).filter(p => p.id?.startsWith('mk100-v2-')).length === 100; }
+    catch { return false; }
   }
 
   let modal = null;
@@ -119,21 +89,17 @@
     open();
   }
 
-  document.addEventListener('proplet:returning-player', () => {
-    try { if (accountId()) sessionStorage.setItem(RETURNING, accountId()); } catch {}
-    if (ready) setTimeout(maybeShow, 0);
+  global.PropletAnnouncements?.register({
+    id:'mozkokalypsa-100-v2',priority:10,eligible,
+    show:({isCurrent})=>{
+      if(!isCurrent()||typeof global.startFree!=='function')return false;
+      displayedKey=seenKey();
+      if(modal)open();else mount();
+      return !!modal&&!modal.classList.contains('hidden');
+    },
+    onShown:()=>{try{localStorage.setItem(displayedKey,'1')}catch{}},
+    close:()=>close(false,false)
   });
-  document.addEventListener('proplet:account-changed', () => {
-    const next = seenKey();
-    if (next !== ownerKey) { close(false, false); shown = false; ownerKey = next; }
-    if (ready) setTimeout(maybeShow, 0);
-  });
-  document.addEventListener('proplet:profile-refreshed', () => { if (ready) setTimeout(maybeShow, 0); });
-  // Retry after a blocking dialog closes, without a polling loop.
-  document.addEventListener('click', () => { if (ready && !shown) setTimeout(maybeShow, 0); });
-  document.addEventListener('proplet:ready', () => { ready = true; maybeShow(); });
-  document.addEventListener('proplet:screen-changed', () => { if (ready) setTimeout(maybeShow, 0); });
-  document.addEventListener('visibilitychange', maybeShow);
   global.PropletContentRelease = Object.freeze({close});
 })(window);
 

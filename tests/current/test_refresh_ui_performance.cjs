@@ -14,7 +14,7 @@ function measure(source){
   // Expose the existing closures only in this isolated harness; shipping code stays private.
   vm.runInContext(source.replace('  function install(){','  global.__test={refresh,updateCatalogue};\n  function install(){'),context);
   const started=performance.now();context.window.__test.refresh();const elapsed=performance.now()-started,refreshReads=reads;
-  assert.equal(counters.hard,'99 nových');assert.equal(counters.easy,'100 nových');assert.equal(buttons[0].classList.done,true);assert.equal(buttons[1].classList.done,false);
+  assert.deepEqual(counters,{},'retired new-board counts must not be recreated');assert.equal(buttons[0].classList.done,true);assert.equal(buttons[1].classList.done,false);
   // Account/history changes must be reflected by a new standalone catalogue pass.
   serialized=JSON.stringify({completed:{'free:g6-refresh-hard-1':{mode:'free'}}});reads=0;context.window.__test.updateCatalogue();
   assert.equal(buttons[0].classList.done,false);assert.equal(buttons[1].classList.done,true);

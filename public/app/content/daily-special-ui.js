@@ -16,7 +16,7 @@
     let selected='base',day=null,scope=null,dialog=null,dialogReturn=null;
     const introVersion='proplet:daily-extra-intro:v1';
     const introReceipts=new Set();
-    let ready=false,intro=null,introKey=null,introReturn=null,introBackground=[],introOverflow='',introScheduled=false;
+    let intro=null,introKey=null,introReturn=null,introBackground=[],introOverflow='';
     function current(){try{return deps.dailySpecialResultState?.(deps.pragueDateISO())||{}}catch{return {}}}
     function receiptKey(){const profile=deps.getProfile?.();return introVersion+':'+(profile?.token&&profile?.id?'account:'+profile.id:'guest:'+deps.getAnonymousId?.())}
     function introPending(){
@@ -34,8 +34,8 @@
       if(restoreFocus&&introReturn?.isConnected)introReturn.focus({preventScroll:true});
       introKey=null;
     }
-    function maybeShowIntro(){
-      if(!ready||document.hidden||!deps.canShowIntro?.()||!introPending())return;
+    function showIntro({isCurrent}){
+      if(!isCurrent()||document.hidden||!deps.canShowIntro?.()||!introPending())return false;
       if(document.querySelector('dialog[open],.modal:not(.hidden),.quality-modal:not(.hidden)'))return;
       if(!intro){
         intro=document.createElement('div');intro.id='dailyExtraIntro';intro.className='modal daily-extra-intro hidden';
@@ -59,18 +59,17 @@
       introBackground=Array.from(document.body.children).filter(el=>el!==intro&&!['SCRIPT','STYLE','LINK'].includes(el.tagName)).map(el=>[el,el.inert]);
       for(const [element] of introBackground)element.inert=true;
       document.body.style.overflow='hidden';intro.classList.remove('hidden');
-      // One content announcement per visit: older launch messages can wait.
-      const profile=deps.getProfile?.();window.PropletContentAnnouncementShown=profile?.token&&profile?.id?String(profile.id):'guest';
+      introReceipts.add(introKey);try{localStorage.setItem(introKey,'1')}catch{}
       intro.querySelector('[data-extra-show]').focus({preventScroll:true});
+      return true;
     }
-    function scheduleIntro(){
-      if(introScheduled)return;introScheduled=true;
-      setTimeout(()=>{introScheduled=false;maybeShowIntro()},0);
-    }
-    document.addEventListener('proplet:ready',()=>{ready=true;scheduleIntro()},{once:true});
-    for(const event of ['proplet:screen-changed','proplet:content-ready','proplet:profile-refreshed','visibilitychange','click'])document.addEventListener(event,scheduleIntro);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')scheduleIntro()});
-    document.addEventListener('proplet:account-changed',()=>{if(introKey&&introKey!==receiptKey())closeIntro(false,false);scheduleIntro()});
+    const announcements=globalThis.PropletAnnouncements;
+    announcements?.register({
+      id:'daily-extra-v1',priority:80,
+      eligible:()=>!globalThis.PropletArchiveExperience?.isEnabled?.()&&!!deps.canShowIntro?.()&&introPending(),
+      show:showIntro,close:()=>closeIntro(false,false)
+    });
+    function scheduleIntro(){announcements?.kick()}
     function select(kind){
       const special=current();
       selected=kind==='special'&&special.descriptor&&special.puzzle?'special':'base';

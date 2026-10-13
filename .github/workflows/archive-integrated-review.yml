@@ -6,6 +6,7 @@ on:
       - 'content/archives/**'
       - 'tools/build_archive_experience.py'
       - 'tools/archive_integrated_review.py'
+      - 'tools/test_archive_production_hooks.py'
       - 'tools/archive_production_parity.py'
       - '.github/workflows/archive-integrated-review.yml'
 permissions:
@@ -46,6 +47,8 @@ jobs:
           node --check public/app.js
           pip install playwright==1.63.0
           python -m playwright install --with-deps chromium
+      - run: python tools/test_archive_production_hooks.py
+        if: steps.scope.outputs.run == 'true'
       - run: python tools/archive_integrated_review.py
         if: steps.scope.outputs.run == 'true'
       - uses: actions/upload-artifact@v4

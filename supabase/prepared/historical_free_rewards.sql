@@ -407,6 +407,37 @@ revoke all on function public.proplet_submit_result_v1(uuid,text,text,text,jsonb
   from public, anon, authenticated;
 grant execute on function public.proplet_submit_result_v1(uuid,text,text,text,jsonb) to service_role;
 
+-- Compact account-scoped authoritative Archive state. One SQL statement sees
+-- claims and official completions at the same snapshot; the ledger is never
+-- added to XP totals. Backend passes only the pinned edition's 800 IDs.
+create or replace function public.proplet_archive_state_v1(
+  p_player_id uuid, p_puzzle_ids text[]
+) returns jsonb
+language sql stable security invoker
+set search_path = ''
+as $archive_state$
+  select pg_catalog.jsonb_build_object(
+    'claims', (
+      select coalesce(pg_catalog.jsonb_object_agg(
+        'legacy-free:' || h.difficulty || ':' || h.level::text,
+        pg_catalog.jsonb_build_object('sourcePuzzleId', h.source_puzzle_id, 'points', h.points)
+      ), '{}'::jsonb)
+      from public.historical_free_slot_rewards h
+      where h.player_id = p_player_id and h.level between 1 and 200
+    ),
+    'completedPuzzleIds', (
+      select coalesce(pg_catalog.jsonb_agg(r.puzzle_id order by r.puzzle_id), '[]'::jsonb)
+      from public.results r
+      where r.player_id = p_player_id and r.mode = 'free'
+        and r.puzzle_id = any(p_puzzle_ids)
+    )
+  );
+$archive_state$;
+revoke all on function public.proplet_archive_state_v1(uuid,text[]) from public, anon, authenticated;
+grant execute on function public.proplet_archive_state_v1(uuid,text[]) to service_role;
+comment on function public.proplet_archive_state_v1(uuid,text[]) is
+  'Service-only read; request player is verified by Proplet auth, never caller-supplied client identity.';
+
 do $verify$
 declare
   v_baseline record;

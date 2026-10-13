@@ -10,7 +10,7 @@ version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
 assert 'APP_VERSION = "4.07.3"' in version
 assert "version:'4.07.3'" in runtime
-assert "proplet-v4.07.3-verified-update1" in sw
+assert "proplet-v4.07.3-archive-release1" in sw
 assert "const REJECTED_QUEUE_KEY='proplet-v4-rejected-sync-queue'" in app
 assert "Number(error?.status)===400&&error?.message==='Neznámá úloha'" in app
 assert "obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)" in app
@@ -23,9 +23,3 @@ assert "Synchronizace opravena" in app
 assert "scopedStorageKey(REJECTED_QUEUE_KEY,deletedId)" in app
 
 print("v4.01.33 sync quarantine contract: PASS")
-
-
-
-
-
-

@@ -8,9 +8,15 @@ assert.equal(new Set(ctx.ach.map(a=>a.id)).size,ctx.ach.length);
 for(const a of list){assert(!a.test({}));assert(!a.test({mozkomorCompleted:100,freeCompleted:{hardcore:100}}));assert(!a.test({freeCompleted:{mozkokalypsa:a.target-1}}));assert(a.test({freeCompleted:{mozkokalypsa:a.target}}));assert(a.test({freeCompleted:{mozkokalypsa:100}}));}
 ctx.window={};vm.runInContext(fs.readFileSync('public/ribbon-catalog.js','utf8'),ctx);
 const manifest=JSON.parse(fs.readFileSync('public/rewards/printshop/manifest.json')),collection=JSON.parse(fs.readFileSync('public/rewards/printshop/collection.json'));
-for(const a of list){const key=ctx.window.PropletRibbonCatalog.achievement[a.name];assert(key,a.name);assert.equal(manifest[key].name,a.name);assert(collection.items.some(x=>x.key===key));const svg=fs.readFileSync('public/rewards/printshop/'+manifest[key].file,'utf8');assert(svg.includes('viewBox="0 0 320 320"'));assert(svg.includes('<title'));assert(!/<(?:image|script|animate|filter)\b/.test(svg));assert(Buffer.byteLength(svg)<16000);}
-const sw=fs.readFileSync('public/sw.js','utf8');for(const a of list)assert(sw.includes('achievement-'+a.id+'.svg?v='+(a.target===25?'tamer2':'3')));
-console.log('PASS: seven boundaries, retroactive stats, separate difficulty, unique IDs, original static SVG assets and offline precache');
+for(const a of list){
+ const key=ctx.window.PropletRibbonCatalog.achievement[a.name];assert(key,a.name);assert.equal(manifest[key].name,a.name);assert(collection.items.some(x=>x.key===key));
+ const image=fs.readFileSync('public/rewards/printshop/'+manifest[key].file);
+ assert.equal(image.toString('ascii',0,4),'RIFF');assert.equal(image.toString('ascii',8,12),'WEBP');assert.equal(image.toString('ascii',12,16),'VP8X');
+ assert(image[20]&0x10,'transparent illustration');assert.equal(image.readUIntLE(24,3)+1,512);assert.equal(image.readUIntLE(27,3)+1,512);assert(image.length<80000,'mobile asset budget');
+ assert.equal(require('crypto').createHash('sha256').update(image).digest('hex'),manifest[key].source_sha256);
+}
+const sw=fs.readFileSync('public/sw.js','utf8');for(const a of list)assert(sw.includes('achievement-'+a.id+'.webp?v=4'));
+console.log('PASS: seven boundaries, retroactive stats, separate difficulty, unique IDs, transparent illustration integrity and offline precache');
 
 const game={mode:'free',puzzle:{difficulty:'mozkokalypsa'}},stats=n=>({freeCompleted:{mozkokalypsa:n}});
 const batch=ctx.completionAchievements(stats(75),stats(76),game);assert.equal(batch.filter(a=>a.group==='mozkokalypsa').length,6);
