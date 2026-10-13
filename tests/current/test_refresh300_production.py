@@ -30,6 +30,6 @@ for original in source['boards']:
 assert [len(data['free'][d]) for d in ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']]==[400,400,400,300,150,100]
 html=(R/'public/index.html').read_text();assert 'free-refresh-preview' not in html and 'free-refresh-fixtures' not in html
 assert 'connect-src \'none\'' not in html
-assert 'proplet-v4.07.1-referral-choice' in (R/'public/sw.js').read_text()
+assert 'proplet-v4.07.2-referral-analytics' in (R/'public/sw.js').read_text()
 print('PASS 300 approved boards, path integrity, old bank hashes, all historical fields, runtime identities and production boundary')
 

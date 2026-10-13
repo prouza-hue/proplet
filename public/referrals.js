@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const transport=window.PropletReferrals;if(!transport)return;
- window.PropletReferralUiRevision=15;
+ window.PropletReferralUiRevision=16;
  const m=transport.model,$=s=>document.querySelector(s);
  const rule='Bonus patří do celkových XP a celkového pořadí. Do týdenních XP hráče ani týmu se nepočítá.';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -20,6 +20,19 @@
  const announcementKey=()=> 'proplet:referral-announcement-seen:v1:'+transport.profile().id;
  const steps=n=>'<div class="ref-steps" role="img" aria-label="Dokončeno '+n+' z 5 desek">'+Array.from({length:5},(_,i)=>'<span class="ref-step ref-step-'+i+(i<n?' done':i===n?' next':'')+'"><b>'+(i<n?'✓':i+1)+'</b></span>').join('')+'</div>';
  let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false,announcementTimer=null;
+ const entrySources=new Set(['daily','tajenka','win','home','profile','announcement']);
+ function sourceFor(element){
+  if(element?.closest('#referralDialog'))return $('#referralDialog').dataset.entrySource;
+  if(element?.closest('#referralProfile'))return 'profile';
+  if(element?.id==='winShareBtn')return 'win';
+  if(element?.id==='shareDailyBtn')return 'daily';
+  if(element?.matches('[data-tajenka-share]'))return 'tajenka';
+  return 'home';
+ }
+ function track(event,entrySource,copyMethod){
+  if(typeof trackProductEvent!=='function')return;
+  try{trackProductEvent(event,{entry_source:entrySources.has(entrySource)?entrySource:'home',...(copyMethod?{copy_method:copyMethod}:{})})}catch{}
+ }
  function inviteUrl(){return m.inviteUrl||''}
  const incomingHeading=(title,copy,n)=>'<div class="ref-incoming-layout"><div class="ref-incoming-main"><h2>'+title+'</h2>'+(copy?'<p>'+copy+'</p>':'')+(n===null?'':steps(n)+'<div class="ref-progress-caption"><strong>'+n+' / 5 desek hotovo</strong></div>')+'</div><div class="ref-visual">'+artwork+(m.paid?earnedReward:reward)+'</div></div>';
  function incomingCopy(){
@@ -76,13 +89,13 @@
  }
  function wire(root){
   root.querySelectorAll('[data-ref-home-close]').forEach(b=>b.onclick=()=>{sessionStorage.setItem(offerKey(),'1');renderHome()});
-  root.querySelectorAll('[data-ref-open]').forEach(b=>b.onclick=()=>open('invite'));
+  root.querySelectorAll('[data-ref-open]').forEach(b=>b.onclick=()=>open('invite',null,sourceFor(b)));
   root.querySelectorAll('[data-ref-accept]').forEach(b=>b.onclick=()=>open('accept'));
   root.querySelectorAll('[data-ref-play]').forEach(b=>b.onclick=()=>{close();if(typeof closeTransientModals==='function')closeTransientModals();nav('free')});
   root.querySelectorAll('[data-ref-reward-close]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await transport.dismiss();preferences.setItem(rewardKey(),'1');refresh()}catch(e){b.disabled=false;if(typeof showToast==='function')showToast(e.message)}});
   root.querySelectorAll('[data-ref-dismiss]').forEach(b=>b.onclick=()=>{offerDismissed=true;root.hidden=true});
  }
- async function open(kind,shareSource=null){
+ async function open(kind,shareSource=null,entrySource=shareSource?sourceFor(shareSource):'home'){
   if(kind==='invite'&&!transport.profile()?.id){close();openProfileModal('create');return}
   if(kind==='invite'){try{await transport.ensureInvite()}catch(e){if(typeof showToast==='function')showToast(e.message);return}}
   if(kind==='announcement'){
@@ -94,6 +107,7 @@
    modal.addEventListener('click',e=>{if(e.target===modal)close()});
   }
   if($('#referralDialog').classList.contains('hidden'))originFocus=document.activeElement;
+  $('#referralDialog').dataset.entrySource=kind==='announcement'?'announcement':entrySource;
   if(kind==='announcement'){
    const sheet=$('#referralDialog .ref-sheet');sheet.classList.add('ref-announcement');
    sheet.innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít nabídku pozvání">×</button>'+heading('Pozvi někoho<br>do Propletu.','Za prvních 5 desek kamaráda získáte oba bonus.')+'<button class="primary-btn" data-ref-open>Pozvi kamaráda do Propletu</button>';
@@ -120,17 +134,30 @@
    $('#saveProfileBtn').textContent='Vytvořit účet a přijmout';
   };
   else{
-   $('#refCopy').onclick=copy;
-   $('#refShare').onclick=async()=>{
-    const data={title:'Pojď si zahrát Proplet',text:'Pět desek. Tisíc pro každého. Přidej se přes mou pozvánku a oba získáme +1 000 XP do celkového pořadí.',url:inviteUrl()};
-    if(navigator.share){try{await navigator.share(data);$('#refStatus').textContent='Pozvánka předána ke sdílení.'}catch(e){if(e.name!=='AbortError')await copy()}}else await copy();
+   track('referral_invite_dialog_opened',entrySource);
+   const actor=transport.profile()?.id,status=$('#refStatus'),input=$('#refLink');
+   let pending=false;
+   const current=()=>transport.profile()?.id===actor;
+   const emit=(event,method)=>{if(current())track(event,entrySource,method)};
+   const copy=async method=>{
+    try{await navigator.clipboard.writeText(input.value);emit('referral_copy_succeeded',method);if(current())status.textContent='Odkaz zkopírován. Pošli ho kamarádovi.'}
+    catch{emit('referral_copy_failed',method);if(current()){input.focus();input.select();status.textContent='Označený odkaz zkopíruj ručně.'}}
    };
+   const perform=async action=>{
+    if(pending)return;pending=true;
+    try{await action()}finally{pending=false}
+   };
+   $('#refCopy').onclick=()=>perform(()=>copy('copy_button'));
+   $('#refShare').onclick=()=>perform(async()=>{
+    emit('referral_share_requested');
+    const data={title:'Pojď si zahrát Proplet',text:'Pět desek. Tisíc pro každého. Přidej se přes mou pozvánku a oba získáme +1 000 XP do celkového pořadí.',url:input.value};
+    if(navigator.share){
+     try{await navigator.share(data);emit('referral_share_native_resolved');if(current())status.textContent='Pozvánka předána ke sdílení.'}
+     catch(e){if(e.name==='AbortError')emit('referral_share_native_cancelled');else{emit('referral_share_native_failed');if(current())await copy('share_fallback')}}
+    }else await copy('no_native');
+   });
   }
   $('#refDialogTitle').focus();
- }
- async function copy(){
-  try{await navigator.clipboard.writeText(inviteUrl());$('#refStatus').textContent='Odkaz zkopírován. Pošli ho kamarádovi.'}
-  catch{$('#refLink').focus();$('#refLink').select();$('#refStatus').textContent='Označený odkaz zkopíruj ručně.'}
  }
  function close(){const modal=$('#referralDialog');if(!modal||modal.classList.contains('hidden'))return;modal.classList.add('hidden');originFocus?.focus({preventScroll:true})}
  let artworkPromise;
