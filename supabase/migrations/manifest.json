@@ -499,12 +499,13 @@
       "version": "2026.10.04",
       "path": "supabase/prepared/historical_free_rewards.sql",
       "type": "hotfix",
-      "status": "prepared-not-applied-archive-only",
+      "status": "applied-production",
       "sha256": "59c8d4fddb4466181463e32fce585b405d289cd146704719bbd1332c5bee3295",
       "supersedes": [],
       "replaced_rpc_definitions": [
         "public.proplet_submit_result_v1"
-      ]
+      ],
+      "applied_migration_version": "20261013210718"
     },
     {
       "id": "20261012-daily-specials",

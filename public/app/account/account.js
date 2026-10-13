@@ -201,6 +201,7 @@
       const achievementGrid = d.$('#achievementGrid');
       if (achievementSummary) achievementSummary.innerHTML = d.renderAchievementSummary(stats);
       if (achievementGrid) achievementGrid.innerHTML = d.renderAchievements(stats);
+      global.PropletContinuation?.renderProfile(profile, stats);
       d.syncAchievementDisclosure();
       const achievementToggle = d.$('#achievementToggleBtn');
       if (achievementToggle) achievementToggle.onclick = () => {

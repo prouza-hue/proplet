@@ -1463,6 +1463,43 @@ install_refresh300_push(
     vapid_subject=VAPID_SUBJECT, logger=logger,
 )
 
+from archive_launch_push import install_archive_launch_push
+
+
+def archive_launch_ready():
+    # Validate the actual published catalogue and today's official Extra binding.
+    if not archive_release_enabled() or os.environ.get("PROPLET_DAILY_SPECIALS_ENABLED", "false").lower() != "true":
+        return False
+    from backend.daily_specials import DailySpecials
+    bank = DailySpecials.load(ROOT / "data" / "daily_specials_private.json")
+    binding = bank.binding(current_prague_date().isoformat(), today=current_prague_date())
+    return len(archive_edition()["byId"]) == 800 and binding is not None
+
+
+def archive_launch_audience(sub):
+    from urllib.parse import urlparse
+    endpoint = urlparse(str(sub.get("endpoint") or ""))
+    host = (endpoint.hostname or "").lower()
+    # An opted-in owner must have actually played; guests are eligible too.
+    if endpoint.scheme != "https" or not host or host in {"localhost", "127.0.0.1", "::1"} or host.endswith((".invalid", ".test", ".example")):
+        return False
+    if sub.get("player_id"):
+        rows = db_request("GET", "results", params={"select":"id", "limit":"1", "player_id": "eq." + str(sub["player_id"])})
+    elif sub.get("anonymous_id"):
+        rows = db_request("GET", "puzzle_attempts", params={"select":"id", "limit":"1", "anonymous_id": "eq." + str(sub["anonymous_id"]), "completed_at": "not.is.null"})
+    else:
+        return False
+    return bool(rows)
+
+
+install_archive_launch_push(
+    app, tz=TZ, push_ready=push_ready, db_select_bounded=db_select_bounded,
+    reserve_delivery=_reserve_push_delivery, db_update=db_update, webpush=webpush,
+    release_ready=archive_launch_ready, audience_eligible=archive_launch_audience,
+    vapid_private=VAPID_PRIVATE_KEY, vapid_subject=VAPID_SUBJECT, logger=logger,
+)
+
+
 from mozkokalypsa_launch_push import install_launch_push
 
 install_launch_push(

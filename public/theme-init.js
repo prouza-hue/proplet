@@ -228,7 +228,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=verified-update1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=release4080','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=archive-release1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');

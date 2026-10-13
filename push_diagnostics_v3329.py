@@ -125,6 +125,11 @@ def install_push_diagnostics(
             event_key="content:refresh300-gen6-20261004",
         ):
             return "duplicate"
+        if today_iso() == "2026-10-14" and category != "test" and db_select(
+            "push_delivery_log", subscription_id=sub["id"],
+            event_key="content:extra-archive-launch-v1",
+        ):
+            return "duplicate"
         delivery_id, reservation = reserve_delivery(sub, event_key, category)
         if reservation == "duplicate":
             return "duplicate"
