@@ -30,6 +30,7 @@
   return 'home';
  }
  function track(event,entrySource,copyMethod){
+  if((window.PROPLET_RUNTIME_ENV||window.PROPLET_RUNTIME_META?.environment)!=='production')return;
   if(typeof trackProductEvent!=='function')return;
   try{trackProductEvent(event,{entry_source:entrySources.has(entrySource)?entrySource:'home',...(copyMethod?{copy_method:copyMethod}:{})})}catch{}
  }

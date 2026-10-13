@@ -229,6 +229,7 @@ async function shot(page,selector,name){
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Native Google return sends preserved inviteCode');
   s=await boot(browser,{guest:true,query:'?invite='+inviteCode});
+  assert.equal(await s.page.evaluate(()=>Object.keys(localStorage).filter(key=>key.startsWith('proplet-events-v2:')).some(key=>JSON.parse(localStorage.getItem(key)||'[]').some(row=>row.event==='referral_landing_validated'))),false,'preview must not even enqueue initial landing telemetry');
   await s.page.evaluate(code=>{
    window.PROPLET_RUNTIME_ENV='production';
    // The first load intentionally exercised disabled preview telemetry.

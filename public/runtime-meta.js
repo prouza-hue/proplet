@@ -13,6 +13,7 @@
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
     version:'4.07.2',
+    environment:previewHost?'preview':'production',
     datedDailyCutover:'2026-10-08',
     canonicalOrigin,
     gen4CandidatePreview,
