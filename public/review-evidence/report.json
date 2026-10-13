@@ -1,5 +1,5 @@
 {
-  "testedSha": "abfd0da1f2b17084e3628fdfce1785d704781a9c",
+  "testedSha": "ae4c773db607ac20226385c25572a63acb2a5459",
   "checks": [
     {
       "width": 390,
@@ -338,10 +338,10 @@
     {
       "width": 390,
       "archiveCtaViewport": {
-        "top": 223.90625,
+        "top": 196.515625,
         "left": 14,
         "right": 376,
-        "bottom": 726.078125,
+        "bottom": 753.46875,
         "width": 390,
         "height": 950,
         "opacity": 1
@@ -923,7 +923,7 @@
         {
           "id": "tajenkaPreviewCard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -940,7 +940,7 @@
         {
           "id": "ax-destination ax-archive-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -957,7 +957,7 @@
         {
           "id": "ax-destination ax-team-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -974,7 +974,7 @@
         {
           "id": "axHomeFree",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -997,7 +997,7 @@
         {
           "id": "newContentBanner",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1014,7 +1014,7 @@
         {
           "id": "easy",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1031,7 +1031,7 @@
         {
           "id": "medium",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1048,7 +1048,7 @@
         {
           "id": "hard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1065,7 +1065,7 @@
         {
           "id": "hardcore",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1082,7 +1082,7 @@
         {
           "id": "mozkomor",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1099,7 +1099,7 @@
         {
           "id": "mozkokalypsa",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1116,7 +1116,7 @@
         {
           "id": "tajenkaPlayCard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1133,7 +1133,7 @@
         {
           "id": "ax-destination ax-archive-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1167,79 +1167,79 @@
         {
           "id": "tajenkaPreviewCard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "ax-destination ax-archive-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "ax-destination ax-team-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "axHomeFree",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "newContentBanner",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "easy",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "medium",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "hard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "hardcore",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "mozkomor",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "mozkokalypsa",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "tajenkaPlayCard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "ax-destination ax-archive-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700"
         }
       ],
@@ -1249,10 +1249,10 @@
     {
       "width": 690,
       "archiveCtaViewport": {
-        "top": 207.21875,
+        "top": 179.828125,
         "left": 115,
         "right": 575,
-        "bottom": 742.765625,
+        "bottom": 770.15625,
         "width": 690,
         "height": 950,
         "opacity": 1
@@ -1265,7 +1265,7 @@
         {
           "id": "tajenkaPreviewCard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1282,7 +1282,7 @@
         {
           "id": "ax-destination ax-archive-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1299,7 +1299,7 @@
         {
           "id": "ax-destination ax-team-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1316,7 +1316,7 @@
         {
           "id": "axHomeFree",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1339,7 +1339,7 @@
         {
           "id": "newContentBanner",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1356,7 +1356,7 @@
         {
           "id": "easy",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1373,7 +1373,7 @@
         {
           "id": "medium",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1390,7 +1390,7 @@
         {
           "id": "hard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1407,7 +1407,7 @@
         {
           "id": "hardcore",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1424,7 +1424,7 @@
         {
           "id": "mozkomor",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1441,7 +1441,7 @@
         {
           "id": "mozkokalypsa",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1458,7 +1458,7 @@
         {
           "id": "tajenkaPlayCard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1475,7 +1475,7 @@
         {
           "id": "ax-destination ax-archive-entry",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "20px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -1861,10 +1861,10 @@
     {
       "width": 1440,
       "archiveCtaViewport": {
-        "top": 204.21875,
+        "top": 176.828125,
         "left": 490,
         "right": 950,
-        "bottom": 745.765625,
+        "bottom": 773.15625,
         "width": 1440,
         "height": 950,
         "opacity": 1
@@ -2238,7 +2238,7 @@
         {
           "id": "easy",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2255,7 +2255,7 @@
         {
           "id": "medium",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2272,7 +2272,7 @@
         {
           "id": "hard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2289,7 +2289,7 @@
         {
           "id": "hardcore",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2306,7 +2306,7 @@
         {
           "id": "mozkomor",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2323,7 +2323,7 @@
         {
           "id": "mozkokalypsa",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2421,37 +2421,37 @@
         {
           "id": "easy",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "medium",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "hard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "hardcore",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "mozkomor",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
           "id": "mozkokalypsa",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700"
         },
         {
@@ -2473,10 +2473,10 @@
     {
       "width": 320,
       "archiveCtaViewport": {
-        "top": 202.15625,
+        "top": 166.078125,
         "left": 14,
         "right": 306,
-        "bottom": 747.828125,
+        "bottom": 783.921875,
         "width": 320,
         "height": 950,
         "opacity": 1
@@ -2601,7 +2601,7 @@
         {
           "id": "easy",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2618,7 +2618,7 @@
         {
           "id": "medium",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2635,7 +2635,7 @@
         {
           "id": "hard",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2652,7 +2652,7 @@
         {
           "id": "hardcore",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2669,7 +2669,7 @@
         {
           "id": "mozkomor",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2686,7 +2686,7 @@
         {
           "id": "mozkokalypsa",
           "font": "Outfit, \"Avenir Next\", \"Avenir Next Rounded\", \"Segoe UI\", system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-          "size": "19px",
+          "size": "18px",
           "weight": "700",
           "artLeft": true,
           "titleFits": true,
@@ -2768,22 +2768,6 @@
     {
       "width": 320,
       "result": "PASS"
-    },
-    {
-      "productionVisualReference": 320,
-      "version": "4.07.3"
-    },
-    {
-      "productionVisualReference": 390,
-      "version": "4.07.3"
-    },
-    {
-      "productionVisualReference": 690,
-      "version": "4.07.3"
-    },
-    {
-      "productionVisualReference": 1440,
-      "version": "4.07.3"
     }
   ],
   "screenshots": [
@@ -2837,34 +2821,53 @@
     "free-compact-result-390.png",
     "daily-dark-320.png",
     "free-dark-320.png",
-    "archive-dark-320.png",
-    "production-daily-light-320.png",
-    "production-free-light-320.png",
-    "production-daily-dark-320.png",
-    "production-free-dark-320.png",
-    "production-daily-light-390.png",
-    "production-free-light-390.png",
-    "production-daily-dark-390.png",
-    "production-free-dark-390.png",
-    "production-daily-light-690.png",
-    "production-free-light-690.png",
-    "production-daily-dark-690.png",
-    "production-free-dark-690.png",
-    "production-daily-light-1440.png",
-    "production-free-light-1440.png",
-    "production-daily-dark-1440.png",
-    "production-free-dark-1440.png"
+    "archive-dark-320.png"
   ],
   "pageErrors": [],
   "networkWrites": [],
   "layoutIssues": [],
   "productionParity": {
     "baseSha": "f31c8959323b8edae75e01ccd6b04ded168cf982",
-    "headSha": "abfd0da1f2b17084e3628fdfce1785d704781a9c",
+    "headSha": "ae4c773db607ac20226385c25572a63acb2a5459",
     "result": "PASS",
-    "unchangedExistingFiles": 1284,
+    "unchangedExistingFiles": 1253,
     "reviewedIntegrationSeams": {
-      "public/app.js": "add guarded archive lifecycle/reward hooks",
+      "public/theme-init.js": "invalidate lazy-loaded Archive production layout hooks in existing clients",
+      "tests/current/test_s12a_account_session.js": "pin initializer/home cache revisions; preserve account flow assertions",
+      ".github/workflows/archive-integrated-review.yml": "verify actual production-form HTML with archive enabled and disabled",
+      "tools/test_v4001_pwa_startup.py": "pin Archive shell release while preserving app/SW marker equality and startup checks",
+      "tools/test_v40124_supabase_rpc_auth.py": "pin current Archive shell; retain RPC credential and retry assertions",
+      "tools/test_v40126_push_retention_p0.py": "pin current Archive shell; retain push retention and update behavior assertions",
+      "tools/test_v40133_sync_quarantine.py": "pin current Archive shell; retain account-scoped quarantine assertions",
+      "tools/test_v40135_profile_wide_layout.py": "pin current Archive shell; retain profile layout and existing theme asset revision",
+      "tests/current/test_mk100_production.py": "script cache key independent release boundary",
+      "tests/current/test_refresh300_production.py": "current release shell cache revision",
+      "tests/current/test_mozkokalypsa_achievements.js": "new image-format integrity without changing reward predicates",
+      "backend/config.py": "default-off archive capability",
+      "backend/contracts.py": "optional bounded archive completion evidence",
+      "backend/results.py": "validate archive admission before result mutation",
+      "server.py": "read-only archive APIs and full-cover authority",
+      "public/app/archive/experience.js": "production authority and isolated preview integration",
+      "public/app/archive/experience.css": "production tokens and ordinary resume label",
+      "public/app/archive/preview-isolation.js": "local API fixture for archive authority and claims",
+      "public/app/content/daily-special-ui.js": "unified deferred announcement queue",
+      "public/app/content/refresh-release.js": "retire old300; introduce combined Archive+Extra",
+      "public/app/content/refresh-ui.js": "remove obsolete new-board counters",
+      "public/app/mozkokalypsa-launch.js": "defer old announcement through shared queue",
+      "public/referrals.js": "shared queue with async-avatar eligibility recheck",
+      "public/rewards/printshop/manifest.json": "seven reviewed illustration assets",
+      "public/ribbon-ui.js": "render the seven new WebP illustrations",
+      "supabase/prepared/historical_free_rewards.sql": "read-only service-role claim-state RPC",
+      "supabase/migrations/manifest.json": "prepared SQL checksum; not marked applied",
+      "tests/current/manifest.json": "register archive and CTA behavior checks",
+      "tests/current/test_s04_backend_foundation.py": "characterize additive archive contracts",
+      "tests/current/test_s06_backend_dependencies.py": "add default-off archive config field",
+      "tests/current/test_mk100_launch.js": "shared announcement behavior",
+      "tests/current/test_refresh_release.cjs": "combined release behavior and retirement",
+      "tests/current/test_refresh_ui_performance.cjs": "counter removal preserves history caching",
+      "tools/generate_mozkokalypsa_achievements.py": "retire old flat vector draft generator",
+      "tools/test_historical_free_rewards_db.py": "exercise service-only authoritative state RPC",
+      "public/app.js": "add guarded archive lifecycle/reward hooks and match the Archive service-worker release marker",
       "public/bootstrap-hydrator.js": "include the archive custom route",
       "public/home-layout.js": "delegate preview placement without losing native nodes",
       "public/index.html": "load isolated archive assets",
@@ -2893,5 +2896,19 @@
       "status": 200
     }
   },
+  "productionReferenceErrors": [
+    {
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    28 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+    },
+    {
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+    },
+    {
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+    },
+    {
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+    }
+  ],
   "result": "PASS"
 }
