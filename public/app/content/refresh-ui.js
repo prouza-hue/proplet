@@ -2,12 +2,9 @@
 (function(global){'use strict';
   const manifest=global.PROPLET_SHARED_FREE_ORDER_MANIFEST;
   const labels={easy:'Snadná',medium:'Střední',hard:'Těžká',hardcore:'Mozkožrout',mozkomor:'Mozkomor',mozkokalypsa:'Mozkokalypsa'};
-  const orderDifficulties=Object.keys(labels),difficulties=['easy','medium','hard'];
-  let bank=[];
+  const orderDifficulties=Object.keys(labels);
   const modeFor=diff=>freeOrder().record(diff).mode;
   function completed(id,completions){return !!completions['free:'+id]}
-  function newBoards(diff){return bank.filter(p=>p.difficulty===diff)}
-  function completedNew(diff,completions){return newBoards(diff).filter(p=>completed(p.id,completions)).length}
   function openBoard(id) {
     const puzzle=Object.values(puzzleDB.free).flat().find(row=>row.id===id);
     if(!puzzle||typeof startGame!=='function')return false;
@@ -16,14 +13,10 @@
     startGame(puzzle,'free',null);
     return true;
   }
-  function decorateCards(completions){
+  function decorateCards(){
     for(const diff of orderDifficulties){
       const card=document.querySelector('#difficultyCards .cp-card[data-diff="'+diff+'"]');if(!card)continue;
       card.querySelector('.refresh-count')?.remove();
-      if(bank.length===300&&difficulties.includes(diff)){
-        const left=100-completedNew(diff,completions);
-        if(left){const counter=document.createElement('span');counter.className='refresh-count';counter.textContent=left+' nových';card.querySelector('.cp-xp')?.append(counter)}
-      }
     }
   }
   function updateOrderSettings(){
@@ -77,10 +70,9 @@
   }
 
   function refresh(){
-    bank=Object.values(puzzleDB.free||{}).flat().filter(p=>p.id.startsWith('g6-refresh-'));
     // Parse the account history once per render, not once for each of 600 board checks.
     const completions=getState().completed||{};
-    decorateCards(completions);updateOrderSettings();updateCatalogue(completions);
+    decorateCards();updateOrderSettings();updateCatalogue(completions);
   }
   function install(){
     const originalFree=global.renderFree;

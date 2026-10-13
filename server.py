@@ -28,10 +28,12 @@ from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
 from backend import results as result_domain
+from backend import archive as archive_domain
 from backend import referrals as referral_domain
 from backend import play_sessions, free_order
 from backend.config import (
     APP_VERSION,
+    ARCHIVE_ENABLED,
     ATOMIC_RESULT_V1_ENABLED,
     CONTENT_CATALOG_PATH,
     CRON_SECRET,
@@ -973,6 +975,12 @@ def push_open_tracking_schema_ready() -> bool:
 
 def free_puzzle_info(puzzle_id: str, difficulty: Optional[str] = None) -> Optional[dict]:
     """Resolve a Free puzzle to its generation and stable difficulty/level slot."""
+    if archive_release_enabled():
+        entry = archive_edition()["byId"].get(puzzle_id)
+        if entry and (difficulty is None or entry["difficulty"] == difficulty):
+            return {"puzzle": entry["puzzle"], "difficulty": entry["difficulty"],
+                    "mode": "free", "level": entry["level"], "generation": 3,
+                    "legacy": True, "archived": True, "lineageConfidence": "exact"}
     return domain_content.free_puzzle_info(
         load_puzzles(), load_rolling_content(), puzzle_id, FREE_DIFFICULTIES, difficulty,
     )
@@ -1318,6 +1326,7 @@ def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict
 
 
 def validate_result_sanity(payload: ResultCreate) -> None:
+    validate_archive_result(payload)
     puzzle = resolved_puzzle(payload.puzzle_id, payload.mode, payload.difficulty)
     if not puzzle:
         raise HTTPException(400, "Neznámá úloha")
@@ -1454,6 +1463,43 @@ install_refresh300_push(
     vapid_subject=VAPID_SUBJECT, logger=logger,
 )
 
+from archive_launch_push import install_archive_launch_push
+
+
+def archive_launch_ready():
+    # Validate the actual published catalogue and today's official Extra binding.
+    if not archive_release_enabled() or os.environ.get("PROPLET_DAILY_SPECIALS_ENABLED", "false").lower() != "true":
+        return False
+    from backend.daily_specials import DailySpecials
+    bank = DailySpecials.load(ROOT / "data" / "daily_specials_private.json")
+    binding = bank.binding(current_prague_date().isoformat(), today=current_prague_date())
+    return len(archive_edition()["byId"]) == 800 and binding is not None
+
+
+def archive_launch_audience(sub):
+    from urllib.parse import urlparse
+    endpoint = urlparse(str(sub.get("endpoint") or ""))
+    host = (endpoint.hostname or "").lower()
+    # An opted-in owner must have actually played; guests are eligible too.
+    if endpoint.scheme != "https" or not host or host in {"localhost", "127.0.0.1", "::1"} or host.endswith((".invalid", ".test", ".example")):
+        return False
+    if sub.get("player_id"):
+        rows = db_request("GET", "results", params={"select":"id", "limit":"1", "player_id": "eq." + str(sub["player_id"])})
+    elif sub.get("anonymous_id"):
+        rows = db_request("GET", "puzzle_attempts", params={"select":"id", "limit":"1", "anonymous_id": "eq." + str(sub["anonymous_id"]), "completed_at": "not.is.null"})
+    else:
+        return False
+    return bool(rows)
+
+
+install_archive_launch_push(
+    app, tz=TZ, push_ready=push_ready, db_select_bounded=db_select_bounded,
+    reserve_delivery=_reserve_push_delivery, db_update=db_update, webpush=webpush,
+    release_ready=archive_launch_ready, audience_eligible=archive_launch_audience,
+    vapid_private=VAPID_PRIVATE_KEY, vapid_subject=VAPID_SUBJECT, logger=logger,
+)
+
+
 from mozkokalypsa_launch_push import install_launch_push
 
 install_launch_push(
@@ -1536,6 +1582,7 @@ def health():
     base = {
         "rpcTransport": backend_db.postgres_rpc.transport_status(),
         "historicalFreeRewardsEnabled": HISTORICAL_FREE_REWARDS_ENABLED,
+        "archiveEnabled": archive_release_enabled(),
         "atomicResultEnabled": ATOMIC_RESULT_V1_ENABLED,
         "date": current_prague_date().isoformat(),
         "puzzleFile": puzzle_file,
@@ -1791,6 +1838,7 @@ def config():
         "pushAvailable": push_ready(),
         "environment": VERCEL_ENV or "local",
         "version": APP_VERSION,
+        "archiveEnabled": archive_release_enabled(),
     }
 
 
@@ -4921,6 +4969,80 @@ def rankings_daily(
         selected_date, len(player_rows), len(team_rows), round((time.perf_counter() - started) * 1000),
     )
     return response
+
+
+def archive_release_enabled() -> bool:
+    # The UI can never advertise playable rewards before both write gates.
+    return bool(ARCHIVE_ENABLED and HISTORICAL_FREE_REWARDS_ENABLED and ATOMIC_RESULT_V1_ENABLED)
+
+
+def archive_edition() -> dict:
+    try:
+        return archive_domain.load_edition(str(ROOT))
+    except (ValueError, KeyError, OSError, TypeError) as exc:
+        logger.error("Archive catalogue validation failed: %s", type(exc).__name__)
+        raise HTTPException(503, "Archiv se nepodařilo bezpečně načíst. Zkus to později.") from exc
+
+
+def require_archive() -> dict:
+    if not archive_release_enabled():
+        raise HTTPException(404, "Archiv zatím není otevřený")
+    return archive_edition()
+
+
+def validate_archive_result(payload: ResultCreate) -> None:
+    evidence = payload.archive_solution
+    if evidence is not None and not archive_release_enabled():
+        raise HTTPException(503, "Archiv je dočasně zavřený. Výsledek zůstává k synchronizaci.")
+    if not archive_release_enabled():
+        return
+    entry = archive_edition()["byId"].get(payload.puzzle_id)
+    if evidence is None and not entry:
+        return
+    if not entry or payload.mode != "free" or payload.difficulty != entry["difficulty"]:
+        raise HTTPException(400, "Výsledek nepatří k této archivní desce")
+    if evidence is None:
+        raise HTTPException(400, "Archivní výsledek neobsahuje úplné řešení")
+    try:
+        archive_domain.validate_completion(entry, evidence.model_dump())
+    except (ValueError, KeyError, TypeError) as exc:
+        raise HTTPException(400, "Archivní řešení neodpovídá schválené úplné variantě") from exc
+
+
+@app.get("/api/archive")
+def archive_catalogue(request: Request):
+    edition = require_archive()
+    enforce_rate_limit(request, "archive_catalogue", limit=120, window_seconds=3600)
+    return JSONResponse(archive_domain.catalogue(edition), headers={"Cache-Control": "private, no-store"})
+
+
+@app.get("/api/archive/puzzle")
+def archive_puzzle(request: Request, puzzle_id: str = Query(min_length=2, max_length=80)):
+    edition = require_archive()
+    enforce_rate_limit(request, "archive_puzzle", limit=240, window_seconds=3600)
+    entry = edition["byId"].get(puzzle_id)
+    if not entry:
+        raise HTTPException(404, "Archivovaná deska nebyla nalezena")
+    return JSONResponse({"editionId": edition["editionId"], **entry}, headers={"Cache-Control": "private, no-store"})
+
+
+@app.get("/api/archive/claims")
+def archive_claims(request: Request, authorization: Optional[str] = Header(default=None)):
+    edition = require_archive()
+    player = auth_player(authorization)
+    enforce_rate_limit(request, "archive_claims", limit=120, window_seconds=3600, discriminator=player["id"])
+    # A single read-only statement returns a consistent compact snapshot, not
+    # a client's local completion flags or the player's entire result history.
+    try:
+        state = db_rpc("proplet_archive_state_v1", {
+            "p_player_id": player["id"], "p_puzzle_ids": list(edition["byId"]),
+        })
+        if not isinstance(state, dict) or not isinstance(state.get("claims"), dict) or not isinstance(state.get("completedPuzzleIds"), list):
+            raise ValueError("archive-invalid-state")
+    except (HTTPException, ValueError, TypeError) as exc:
+        # A missing migration/read failure must never look like 800 unpaid slots.
+        raise HTTPException(503, "Historické odměny se nepodařilo ověřit. Zkus to za chvíli.") from exc
+    return JSONResponse({"editionId": edition["editionId"], **state}, headers={"Cache-Control": "private, no-store"})
 
 
 @app.get("/api/free-archive")

@@ -1,0 +1,78 @@
+name: Archive first release review
+on:
+  pull_request:
+    paths:
+      - 'public/**'
+      - 'content/archives/**'
+      - 'tools/build_archive_experience.py'
+      - 'tools/archive_integrated_review.py'
+      - 'tools/archive_design_review.py'
+      - 'tools/test_archive_production_hooks.py'
+      - 'tools/archive_production_parity.py'
+      - '.github/workflows/archive-integrated-review.yml'
+permissions:
+  contents: read
+jobs:
+  review:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'preview/archive-first-20261013'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Skip evidence-only commit
+        id: scope
+        run: |
+          git fetch --depth=50 origin "${{ github.event.pull_request.head.sha }}"
+          if git diff --name-only HEAD^ HEAD | grep -qvE '^public/(review-evidence/|app/archive/boards\.json$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        if: steps.scope.outputs.run == 'true'
+        with:
+          python-version: '3.12'
+      - name: Build immutable preview data and check syntax
+        if: steps.scope.outputs.run == 'true'
+        run: |
+          git fetch --depth=1 origin f31c8959323b8edae75e01ccd6b04ded168cf982
+          python tools/archive_production_parity.py
+          python -m py_compile tools/archive_integrated_review.py
+          python tools/build_archive_experience.py
+          python tools/generate_puzzles_bootstrap.py
+          node --check public/app/archive/experience.js
+          node --check public/app/archive/solution-contract.js
+          node --check public/app/archive/preview-isolation.js
+          node --check public/app.js
+          pip install playwright==1.63.0
+          python -m playwright install --with-deps chromium
+      - run: python tools/test_archive_production_hooks.py
+        if: steps.scope.outputs.run == 'true'
+      - run: python tools/archive_design_review.py
+        if: steps.scope.outputs.run == 'true'
+      - run: python tools/archive_integrated_review.py
+        if: steps.scope.outputs.run == 'true'
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.scope.outputs.run == 'true'
+        with:
+          name: archive-first-release-review
+          path: public/review-evidence/
+      - name: Save review evidence
+        if: always() && !cancelled() && steps.scope.outputs.run == 'true'
+        env:
+          PREVIEW_BRANCH: ${{ github.head_ref }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ ! -d public/review-evidence ]; then exit 0; fi
+          REMOTE_SHA=$(git ls-remote origin "refs/heads/$PREVIEW_BRANCH" | cut -f1)
+          if [ "$REMOTE_SHA" != "$TESTED_SHA" ]; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/review-evidence/
+          git add -f public/app/archive/boards.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "docs: capture archive-first release review"
+          git push origin "HEAD:refs/heads/$PREVIEW_BRANCH"
+

@@ -109,6 +109,7 @@ def art(stage,n,name):
  out+=''.join(circle(160+(k-(min(stage+1,7)-1)/2)*9,301,2.2,GOLD,'none',0) for k in range(stage+1))
  return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title"><title id="title">{name} — Mozkokalypsa, {n} dokončených desek</title>{out}</svg>\n'
 if __name__=='__main__':
+ raise SystemExit('Deprecated: the approved 2026-10-13 illustrated WebP collection replaces these historical flat SVG drafts. Do not regenerate production assets.')
  OUT.mkdir(parents=True,exist_ok=True)
  for i,(n,name,copy) in enumerate(SERIES):
   (OUT/f'achievement-mozkokalypsa-{n}.svg').write_text(art(i,n,name))

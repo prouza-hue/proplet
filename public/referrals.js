@@ -19,7 +19,7 @@
  const offerKey=()=> 'proplet:referral-offer-hidden:v1:'+(transport.profile()?.id||'guest');
  const announcementKey=()=> 'proplet:referral-announcement-seen:v1:'+transport.profile().id;
  const steps=n=>'<div class="ref-steps" role="img" aria-label="Dokončeno '+n+' z 5 desek">'+Array.from({length:5},(_,i)=>'<span class="ref-step ref-step-'+i+(i<n?' done':i===n?' next':'')+'"><b>'+(i<n?'✓':i+1)+'</b></span>').join('')+'</div>';
- let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false,announcementTimer=null;
+ let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false;
  const entrySources=new Set(['daily','tajenka','win','home','profile','announcement']);
  function sourceFor(element){
   if(element?.closest('#referralDialog'))return $('#referralDialog').dataset.entrySource;
@@ -96,12 +96,12 @@
   root.querySelectorAll('[data-ref-reward-close]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await transport.dismiss();preferences.setItem(rewardKey(),'1');refresh()}catch(e){b.disabled=false;if(typeof showToast==='function')showToast(e.message)}});
   root.querySelectorAll('[data-ref-dismiss]').forEach(b=>b.onclick=()=>{offerDismissed=true;root.hidden=true});
  }
- async function open(kind,shareSource=null,entrySource=shareSource?sourceFor(shareSource):'home'){
+ async function open(kind,shareSource=null,entrySource=shareSource?sourceFor(shareSource):'home',permit=null){
   if(kind==='invite'&&!transport.profile()?.id){close();openProfileModal('create');return}
   if(kind==='invite'){try{await transport.ensureInvite()}catch(e){if(typeof showToast==='function')showToast(e.message);return}}
   if(kind==='announcement'){
-   const account=transport.profile()?.id;if(!await artworkReady())return;
-   if(announcementBlocked()||account!==transport.profile()?.id||!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
+   const account=transport.profile()?.id;if(!permit?.isCurrent()||!await artworkReady())return false;
+   if(!permit.isCurrent()||account!==transport.profile()?.id||!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
   }
   if(!$('#referralDialog')){
    const modal=document.createElement('div');modal.id='referralDialog';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','refDialogTitle');modal.innerHTML='<div class="modal-card left ref-sheet"></div>';document.body.append(modal);
@@ -114,7 +114,7 @@
    sheet.innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít nabídku pozvání">×</button>'+heading('Pozvi někoho<br>do Propletu.','Za prvních 5 desek kamaráda získáte oba bonus.')+'<button class="primary-btn" data-ref-open>Pozvi kamaráda do Propletu</button>';
    sheet.querySelector('h2').id='refDialogTitle';sheet.querySelector('h2').tabIndex=-1;
    $('#referralDialog').classList.remove('hidden');wire(sheet);sheet.querySelector('[data-ref-close]').onclick=close;
-   preferences.setItem(announcementKey(),'1');$('#refDialogTitle').focus();return;
+   preferences.setItem(announcementKey(),'1');$('#refDialogTitle').focus();return true;
   }
   $('#referralDialog .ref-sheet').classList.remove('ref-announcement');
   if(kind==='choice'){
@@ -166,19 +166,17 @@
   if(!artworkPromise)artworkPromise=Promise.all(['/assets/avatars/referral-jezek.webp','/assets/avatars/referral-liska.webp'].map(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.naturalWidth>0);img.onerror=()=>resolve(false);img.src=src}))).then(results=>{const ok=results.every(Boolean);if(!ok)artworkPromise=null;return ok});
   return artworkPromise;
  }
- function announcementBlocked(){return (typeof onboardingMandatory!=='undefined'&&onboardingMandatory)||(typeof dailyExtraIntroPending==='function'&&dailyExtraIntroPending())||!!window.PropletFirstSteps?.quiet()}
- function scheduleAnnouncement(){
-  clearTimeout(announcementTimer);
-  if(announcementBlocked()||!m.ready||!canInvite()||preferences.getItem(announcementKey())==='1'||(m.incoming&&!rewardHidden()))return;
-  announcementTimer=setTimeout(()=>{
-   if(!canInvite()||preferences.getItem(announcementKey())==='1'||!$('#screen-daily')?.classList.contains('active')||document.querySelector('.modal:not(.hidden)')||document.body.classList.contains('playing'))return;
-   open('announcement');
-  },1200);
- }
+ function scheduleAnnouncement(){window.PropletAnnouncements?.kick()}
  function refresh(){document.body.classList.toggle('referral-incoming',m.ready&&m.incoming);renderHome();renderProfile();offer();scheduleAnnouncement()}
  async function reload(force=false){await transport.load(force);refresh()}
  function boot(){
-  if(booted)return;booted=true;reload(true);artworkReady();document.addEventListener('click',e=>{const source=e.target.closest?.('#winShareBtn.challenge-share-cta, #shareDailyBtn, #screen-daily [data-tajenka-share]');if(source&&!source.disabled&&!forwardingShare&&canInvite()){e.preventDefault();e.stopImmediatePropagation();open('choice',source)}},true);
+  if(booted)return;booted=true;
+  window.PropletAnnouncements?.register({
+   id:'referrals-v1',priority:20,
+   eligible:()=>canInvite()&&preferences.getItem(announcementKey())!=='1'&&(!m.incoming||rewardHidden())&&!!$('#screen-daily')?.classList.contains('active'),
+   show:permit=>open('announcement',null,'announcement',permit),close
+  });
+  reload(true);artworkReady();document.addEventListener('click',e=>{const source=e.target.closest?.('#winShareBtn.challenge-share-cta, #shareDailyBtn, #screen-daily [data-tajenka-share]');if(source&&!source.disabled&&!forwardingShare&&canInvite()){e.preventDefault();e.stopImmediatePropagation();open('choice',source)}},true);
   registerGameCompletionHook({id:'referrals',priority:250,after:async({game})=>{
    if(!transport.profile()?.id||!game||['starter','rescue'].includes(game.mode)||game.isReplay)return;
    offerDismissed=false;const wasPaid=m.paid;

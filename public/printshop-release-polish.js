@@ -148,6 +148,8 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   function syncTajenkaDailyPlacement(){
+    // Enabled Archive owns ordering, including live referral cards.
+    if(window.PropletArchiveExperience?.isEnabled?.()){window.PropletArchiveExperience.home();return}
     const card=q('#tajenkaPreviewCard'),screen=q('#screen-daily'),anchor=q('#todayNewContentBanner')||q('#screen-daily .daily-hero');
     if(!card||!screen)return;
     card.querySelector('.tajenka-entry-copy>.eyebrow')?.remove();
@@ -177,7 +179,8 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
       card.className='card tajenka-preview-card tajenka-play-card hidden';
       screen.appendChild(card);
     }
-    if(screen.lastElementChild!==card)screen.appendChild(card);
+    // Enabled Archive has one shared layout owner for both Tajenka renderers.
+    if(!window.PropletArchiveExperience?.placePlayExtra(card)&&screen.lastElementChild!==card)screen.appendChild(card);
     const completed=source.classList.contains('completed'),signature=tajenkaPlaySignature(source);
     if(card.dataset.signature!==signature){
       const phrase=(source.querySelector('.tajenka-revealed-phrase')?.textContent||'').trim();

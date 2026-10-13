@@ -2,7 +2,7 @@
 const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('node:assert/strict');
 const base='http://127.0.0.1:8000',out='qa-refresh300';fs.mkdirSync(out,{recursive:true});
 const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pass});assert(pass,name)}
-(async()=>{const browser=await chromium.launch();try{
+(async()=>{const browser=await chromium.launch(process.env.PROPLET_BROWSER_EXECUTABLE?{executablePath:process.env.PROPLET_BROWSER_EXECUTABLE,args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-zygote']} : {});try{
  const page=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block',reducedMotion:'reduce'});
  await page.route('**/*',route=>new URL(route.request().url()).origin!==base?route.abort():route.continue());
  page.setDefaultTimeout(15000);
@@ -14,18 +14,18 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
   localStorage.setItem('proplet-v2-state:guest',JSON.stringify({completed:{'free:g4-e-001':{puzzleId:'g4-e-001',mode:'free',difficulty:'easy',level:1,contentGeneration:4,completedAt:'2026-10-01T08:00:00Z',points:15}},rescues:{},inProgress:{},dailyDates:[],statsVersion:5}));
  });
  await page.goto(base,{waitUntil:'domcontentloaded'});
- await page.locator('#freeRefreshAnnouncement').waitFor({state:'visible'});
- await page.waitForFunction(()=>window.__PROPLET_PRINTSHOP_RELEASE_POLISH_V2__===true);
+ await page.waitForFunction(()=>window.__PROPLET_PRINTSHOP_RELEASE_POLISH_V2__===true&&document.querySelector('#freeOrderSettings'));
  await page.evaluate(()=>document.fonts.ready);
- check('automatic announcement, no autofocus outline',await page.locator('[data-refresh-play]').evaluate(n=>getComputedStyle(n).outlineStyle==='none'||getComputedStyle(n).outlineWidth==='0px'));
+ // The 300-board campaign is retired. Its immutable boards and the native
+ // difficulty selection remain supported, but guests must never get a promo.
  for(const width of [320,390,840,1440]){
   await page.setViewportSize({width,height:900});
-  await page.waitForFunction(()=>{const r=document.querySelector('.refresh-announcement').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.documentElement.scrollWidth<=innerWidth+1});
-  check('modal fits '+width,await page.evaluate(()=>{const r=document.querySelector('.refresh-announcement').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.documentElement.scrollWidth<=innerWidth+1}));
-  await page.screenshot({path:`${out}/modal-${width}.png`});
+  check('retired 300 announcement is never mounted '+width,await page.locator('#freeRefreshAnnouncement').count()===0);
+  check('guest has no automatic discovery dialog '+width,await page.locator('#mk100LaunchPreview:not(.hidden),#dailyExtraIntro:not(.hidden),#referralDialog:not(.hidden),#archiveExperienceModal:not(.hidden)').count()===0);
  }
- await page.keyboard.press('Tab');check('keyboard focus restored',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement').classList.contains('refresh-initial-focus')&&document.activeElement.matches('[data-refresh-back]')));
- await page.locator('[data-refresh-play]').click();check('CTA opens real difficulty selection',await page.locator('#screen-free').isVisible());
+ await page.locator('.bottom-nav [data-nav="free"]').click();
+ check('native navigation opens real difficulty selection',await page.locator('#screen-free').isVisible());
+ check('retired new-board counters stay absent',await page.locator('#difficultyCards .refresh-count').count()===0);
  await page.evaluate(()=>nav('daily'));
  for(const width of [320,390,840]){
   await page.setViewportSize({width,height:900});
@@ -34,13 +34,12 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
   await page.screenshot({path:`${out}/today-${width}.png`,fullPage:true});
  }
  check('no second campaign in same page visit',await page.evaluate(()=>!document.querySelector('#mk100LaunchPreview:not(.hidden)')));
- await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));check('refresh dismissal remembered after reload',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));check('retired campaign stays absent after reload',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));
  await page.evaluate(()=>nav('free'));
  await page.waitForFunction(()=>freeOrder().enabled());
  check('400 levels and varied next board',await page.evaluate(()=>puzzleDB.free.easy.filter(p=>!p.meta?.rollingContent).length===400&&freeOrder().record('easy').mode==='varied'&&freeOrder().next('easy',null).id==='g6-refresh-easy-001'));
  check('compact next-board information; no card switch',await page.evaluate(()=>document.querySelectorAll('#difficultyCards .order-next').length===6&&!document.querySelector('#difficultyCards select')));
- // A reload begins the next page visit: acknowledge the older eligible campaign.
- await page.evaluate(()=>window.PropletContentRelease?.close());
+ // A guest remains quiet after a reload; settings stay explicitly accessible.
  await page.locator('#settingsHeaderBtn').click();await page.locator('#freeOrderSettings summary').click();
  check('four opt-outs, endgames excluded',await page.locator('#freeOrderSettings select').count()===4);
  await page.locator('#freeOrder-easy').selectOption('numeric');await page.waitForFunction(()=>freeOrder().record('easy').mode==='numeric');check('explicit numeric preference takes effect',await page.evaluate(()=>freeOrder().record('easy').mode==='numeric'));

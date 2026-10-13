@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictInt
 
 
 class PlayerCreate(BaseModel):
@@ -89,6 +89,17 @@ class TeamMembershipSet(BaseModel):
     league_name: Optional[str] = Field(default=None, max_length=40)
 
 
+class ArchiveTrace(BaseModel):
+    word: str = Field(min_length=1, max_length=40)
+    path: list[StrictInt] = Field(min_length=1, max_length=40)
+
+
+class ArchiveSolution(BaseModel):
+    editionId: str = Field(min_length=1, max_length=60)
+    solutionPolicyRevision: str = Field(min_length=1, max_length=100)
+    found: list[ArchiveTrace] = Field(min_length=1, max_length=40)
+
+
 class ResultCreate(BaseModel):
     puzzle_id: str
     challenge_key: str
@@ -100,6 +111,7 @@ class ResultCreate(BaseModel):
     # Optional for cached legacy clients; a supplied special hash must match
     # the server's immutable date/ID binding.
     content_hash: Optional[str] = Field(default=None, min_length=64, max_length=64, pattern=r'^[0-9a-f]{64}$')
+    archive_solution: Optional[ArchiveSolution] = None
     hints_used: int = Field(default=0, ge=0, le=99)
     wrong_attempts: int = Field(default=0, ge=0, le=999)
     max_hint_level: int = Field(default=0, ge=0, le=3)

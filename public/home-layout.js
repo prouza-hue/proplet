@@ -204,7 +204,7 @@
     placeMetaProgress();
     const tajenka=document.querySelector('#tajenkaPreviewCard');
     if(tajenka)document.querySelector('#screen-daily')?.appendChild(tajenka);
-    loadCompetition();
+    if(window.PropletArchiveExperience?.isEnabled?.())window.PropletArchiveExperience.home();else loadCompetition();
     if(typeof renderDailySpecialUI==='function')renderDailySpecialUI();
   }
 

@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "checks": [
+    {
+      "archiveEnabled": true,
+      "productionHtml": true,
+      "previewAdapterLoaded": false,
+      "nativeHomeOrdering": "PASS",
+      "completedTajenkaHeadings": "PASS"
+    },
+    {
+      "archiveEnabled": false,
+      "productionHtml": true,
+      "previewAdapterLoaded": false,
+      "nativeHomeOrdering": "PASS",
+      "completedTajenkaHeadings": "PASS"
+    }
+  ]
+}

@@ -163,11 +163,37 @@ def main():
     assert submit(command("historical-synthetic-g6-x-041",41,generation=6))["awardedPoints"]==100
     checks.append("different difficulty and all G4+ concrete boards remain independent")
 
+    # Compact UI state must agree with the same persisted claim winner. A
+    # zero-point copied claim is consumed, while G4-only slots remain payable.
+    only_modern = command("historical-synthetic-g4-h-031",31,generation=4,points=50,difficulty="hard")
+    submit(only_modern)
+    with connect() as c:
+        c.execute("set role service_role")
+        ids = [archive["puzzleId"], one["puzzleId"], "historical-unplayed", "historical-synthetic-g3-x-045"]
+        state = c.execute("select public.proplet_archive_state_v1(%s,%s)", (PLAYER, ids)).fetchone()[0]
+        assert state["claims"]["legacy-free:hard:29"]["points"] == 50
+        assert state["claims"]["legacy-free:hardcore:45"] == {"sourcePuzzleId":"historical-synthetic-g2-zero-045", "points":0}
+        assert "legacy-free:hard:31" not in state["claims"]
+        assert set(state["completedPuzzleIds"]) == {archive["puzzleId"], one["puzzleId"], "historical-synthetic-g3-x-045"}
+        other = c.execute("select public.proplet_archive_state_v1(%s,%s)",
+            ("41040000-0000-4000-8000-000000000099", ids)).fetchone()[0]
+        assert other == {"claims":{}, "completedPuzzleIds":[]}
+    checks.append("authoritative Archive read: zero claims consumed, G4 independent, exact board completions, isolated player")
+
     with connect() as c:
         assert c.execute("select relrowsecurity from pg_class where oid='public.historical_free_slot_rewards'::regclass").fetchone()[0]
         for role in ("anon","authenticated"):
             assert not c.execute("select has_table_privilege(%s,'public.historical_free_slot_rewards','select')",(role,)).fetchone()[0]
             assert not c.execute("select has_function_privilege(%s,'public.proplet_submit_result_v1(uuid,text,text,text,jsonb)','execute')",(role,)).fetchone()[0]
+            assert not c.execute("select has_function_privilege(%s,'public.proplet_archive_state_v1(uuid,text[])','execute')",(role,)).fetchone()[0]
+            c.execute("set role " + role)
+            try:
+                c.execute("select public.proplet_archive_state_v1(%s,%s)", (PLAYER, ids))
+                raise AssertionError("public role read private Archive state")
+            except psycopg.errors.InsufficientPrivilege:
+                pass
+            finally:
+                c.execute("reset role")
         assert c.execute("select has_table_privilege('service_role','public.historical_free_slot_rewards','select')").fetchone()[0]
         assert not c.execute("select has_table_privilege('service_role','public.historical_free_slot_rewards','insert')").fetchone()[0]
     checks.append("RLS enabled, anon/authenticated denied, service reads ledger only; RPC remains service-only")
