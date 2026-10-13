@@ -1,0 +1,40 @@
+{
+  "testedSha": "cbdfe4acf6c999bfe12b498b60c1f76fbbb00358",
+  "checks": [
+    {
+      "width": 320,
+      "height": 720,
+      "announcementDestinations": "PASS",
+      "archiveDensityAndSearch": "PASS",
+      "chapterBoundariesAndCelebration": "PASS",
+      "artAndLegacyCollection": "PASS"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "announcementDestinations": "PASS",
+      "archiveDensityAndSearch": "PASS",
+      "chapterBoundariesAndCelebration": "PASS",
+      "artAndLegacyCollection": "PASS"
+    },
+    {
+      "width": 690,
+      "height": 950,
+      "announcementDestinations": "PASS",
+      "archiveDensityAndSearch": "PASS",
+      "chapterBoundariesAndCelebration": "PASS",
+      "artAndLegacyCollection": "PASS"
+    },
+    {
+      "width": 1440,
+      "height": 950,
+      "announcementDestinations": "PASS",
+      "archiveDensityAndSearch": "PASS",
+      "chapterBoundariesAndCelebration": "PASS",
+      "artAndLegacyCollection": "PASS"
+    }
+  ],
+  "pageErrors": [],
+  "writes": [],
+  "result": "PASS"
+}

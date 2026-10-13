@@ -1,5 +1,5 @@
 {
-  "testedSha": "b6ab614d0b751f66d71fce58446a085a94d12704",
+  "testedSha": "cbdfe4acf6c999bfe12b498b60c1f76fbbb00358",
   "checks": [
     {
       "width": 390,
@@ -338,14 +338,18 @@
     {
       "width": 390,
       "archiveCtaViewport": {
-        "top": 196.515625,
+        "top": 153.671875,
         "left": 14,
         "right": 376,
-        "bottom": 753.46875,
+        "bottom": 796.3125,
         "width": 390,
         "height": 950,
         "opacity": 1
       }
+    },
+    {
+      "width": 390,
+      "twoAnnouncementDestinations": "PASS"
     },
     {
       "view": "daily",
@@ -1249,16 +1253,20 @@
     {
       "width": 690,
       "archiveCtaViewport": {
-        "top": 179.828125,
-        "left": 115,
-        "right": 575,
-        "bottom": 770.15625,
+        "top": 153.671875,
+        "left": 135,
+        "right": 555,
+        "bottom": 796.3125,
         "width": 690,
         "height": 950,
         "opacity": 1
       }
     },
     {
+      "width": 690,
+      "twoAnnouncementDestinations": "PASS"
+    },
+    {
       "view": "daily",
       "width": 690,
       "discoveryAnatomy": [
@@ -1861,16 +1869,20 @@
     {
       "width": 1440,
       "archiveCtaViewport": {
-        "top": 176.828125,
-        "left": 490,
-        "right": 950,
-        "bottom": 773.15625,
+        "top": 260.890625,
+        "left": 340,
+        "right": 1100,
+        "bottom": 689.109375,
         "width": 1440,
         "height": 950,
         "opacity": 1
       }
     },
     {
+      "width": 1440,
+      "twoAnnouncementDestinations": "PASS"
+    },
+    {
       "view": "daily",
       "width": 1440,
       "discoveryAnatomy": [
@@ -2473,14 +2485,18 @@
     {
       "width": 320,
       "archiveCtaViewport": {
-        "top": 166.078125,
+        "top": 129.203125,
         "left": 14,
         "right": 306,
-        "bottom": 783.921875,
+        "bottom": 820.78125,
         "width": 320,
         "height": 950,
         "opacity": 1
       }
+    },
+    {
+      "width": 320,
+      "twoAnnouncementDestinations": "PASS"
     },
     {
       "approvedCovers": 879
@@ -2768,10 +2784,6 @@
     {
       "width": 320,
       "result": "PASS"
-    },
-    {
-      "productionVisualReference": 690,
-      "version": "4.07.3"
     }
   ],
   "screenshots": [
@@ -2825,18 +2837,14 @@
     "free-compact-result-390.png",
     "daily-dark-320.png",
     "free-dark-320.png",
-    "archive-dark-320.png",
-    "production-daily-light-690.png",
-    "production-free-light-690.png",
-    "production-daily-dark-690.png",
-    "production-free-dark-690.png"
+    "archive-dark-320.png"
   ],
   "pageErrors": [],
   "networkWrites": [],
   "layoutIssues": [],
   "productionParity": {
     "baseSha": "f31c8959323b8edae75e01ccd6b04ded168cf982",
-    "headSha": "b6ab614d0b751f66d71fce58446a085a94d12704",
+    "headSha": "cbdfe4acf6c999bfe12b498b60c1f76fbbb00358",
     "result": "PASS",
     "unchangedExistingFiles": 1251,
     "reviewedIntegrationSeams": {
@@ -2908,13 +2916,16 @@
   },
   "productionReferenceErrors": [
     {
-      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    28 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+    },
+    {
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
     },
     {
       "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
     },
     {
-      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    27 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
+      "error": "Page.wait_for_selector: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"#difficultyCards .cp-card\") to be visible\n    26 × locator resolved to 6 elements. Proceeding with the first one: <article class=\"cp-card\" data-diff=\"easy\">…</article>\n"
     }
   ],
   "result": "PASS"
