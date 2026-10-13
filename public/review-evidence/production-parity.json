@@ -1,9 +1,11 @@
 {
   "baseSha": "f31c8959323b8edae75e01ccd6b04ded168cf982",
-  "headSha": "ae4c773db607ac20226385c25572a63acb2a5459",
+  "headSha": "b6ab614d0b751f66d71fce58446a085a94d12704",
   "result": "PASS",
-  "unchangedExistingFiles": 1253,
+  "unchangedExistingFiles": 1251,
   "reviewedIntegrationSeams": {
+    "tools/verify_refresh300_production.cjs": "verify retired promo and counters stay absent for guests; retain approved bank, varied-order settings, native gameplay and onboarding browser contracts",
+    "tools/verify_achievement_details.cjs": "verify reviewed WebP Krotitel artwork and decoded 512px geometry; preserve achievement dialog behavior",
     "public/theme-init.js": "invalidate lazy-loaded Archive production layout hooks in existing clients",
     "tests/current/test_s12a_account_session.js": "pin initializer/home cache revisions; preserve account flow assertions",
     ".github/workflows/archive-integrated-review.yml": "verify actual production-form HTML with archive enabled and disabled",
