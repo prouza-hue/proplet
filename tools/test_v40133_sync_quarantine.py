@@ -8,9 +8,9 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.07.2"' in version
-assert "version:'4.07.2'" in runtime
-assert "proplet-v4.07.2-referral-analytics" in sw
+assert 'APP_VERSION = "4.07.3"' in version
+assert "version:'4.07.3'" in runtime
+assert "proplet-v4.07.3-verified-update1" in sw
 assert "const REJECTED_QUEUE_KEY='proplet-v4-rejected-sync-queue'" in app
 assert "Number(error?.status)===400&&error?.message==='Neznámá úloha'" in app
 assert "obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)" in app
