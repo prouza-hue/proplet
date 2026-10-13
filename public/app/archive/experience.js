@@ -117,7 +117,7 @@ function home(){
  // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
  const referral=q('#referralHome'),incoming=referral?.classList.contains('ref-incoming');
  const tajenka=q('#tajenkaPreviewCard'),tajenkaSolved=tajenka?.classList.contains('completed');
- const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),incoming?referral:null,q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,incoming?null:referral,q('#referralInviteHome'),games,competition,q('#axHomeFree'),q('#levelCard'),tajenkaSolved?tajenka:null].filter(Boolean);
+ const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),incoming?referral:null,q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,incoming?null:referral,q('#referralInviteHome'),games,competition,q('#axHomeFree'),q('#levelCard')].filter(Boolean);
  let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
  if(tajenkaSolved&&root.lastElementChild!==tajenka)root.append(tajenka);
 }
