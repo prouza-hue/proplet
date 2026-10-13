@@ -27,7 +27,9 @@ with tempfile.TemporaryDirectory(prefix="proplet-archive-build-") as directory:
     html = (target / "public/index.html").read_text()
     assert "data-archive-preview" not in html and "preview-isolation" not in html
     assert "preview-isolation" not in (target / "public/sw.js").read_text()
-    assert not (target / "public/app/archive/preview-isolation.js").exists()
+    # Packaging may reopen every original input path after buildCommand.
+    adapter = target / "public/app/archive/preview-isolation.js"
+    assert adapter.read_text().strip() == "// Preview adapter disabled in production."
     assert "/app/archive/experience.js" in html and "/app/engagement/announcements.js" in html
     bank = json.loads((target / "public/app/archive/boards.json").read_text())
     assert len(bank["boards"]) == 800 and bank["completeCovers"] == 879
