@@ -228,5 +228,27 @@ async function shot(page,selector,name){
   assert.equal(google?.body.inviteCode,inviteCode);
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Native Google return sends preserved inviteCode');
+  s=await boot(browser,{guest:true,query:'?invite='+inviteCode});
+  await s.page.evaluate(code=>{
+   window.PROPLET_RUNTIME_ENV='production';
+   // The first load intentionally exercised disabled preview telemetry.
+   sessionStorage.removeItem('proplet:referral-landing-seen:v1:'+code);
+  },inviteCode);
+  await s.page.evaluate(async()=>{await PropletReferrals.load(true);await productAnalytics().flush();await PropletReferrals.load(true);await productAnalytics().flush()});
+  const landingEvents=()=>s.apiCalls.filter(c=>c.path==='/api/product-event'||c.path==='/api/product-events').flatMap(c=>(c.body.events||[c.body]).map(e=>({event:e.event_type,headers:c.headers}))).filter(e=>e.event==='referral_landing_validated');
+  assert.equal(landingEvents().length,1);assert.equal(landingEvents()[0].headers['x-proplet-referral-source'],'landing');
+  let landingFailure=503;
+  await s.ctx.route('**/api/referrals/invite/'+inviteCode,route=>landingFailure===0?route.abort():route.fulfill({status:landingFailure,contentType:'application/json',body:JSON.stringify({detail:'Test-only unavailable invitation'})}));
+  await s.page.evaluate(async code=>{sessionStorage.removeItem('proplet:referral-landing-seen:v1:'+code);await PropletReferrals.load(true);await productAnalytics().flush()},inviteCode);
+  assert.equal(landingEvents().length,1,'unavailable invitation must not count a landing');
+  landingFailure=0;
+  await s.page.evaluate(async()=>{await PropletReferrals.load(true);await productAnalytics().flush()});
+  assert.equal(landingEvents().length,1,'offline request must not count a landing');
+  landingFailure=404;
+  await s.page.evaluate(async()=>{await PropletReferrals.load(true);await productAnalytics().flush()});
+  assert.equal(landingEvents().length,1,'invalid invitation must not count a landing');
+  assert.equal(await s.page.evaluate(()=>PropletReferrals.pendingCode()),null);
+  assert.deepEqual(s.errors,[]);await s.ctx.close();
+  pass('Valid landing counts once per session/code; unavailable and invalid links do not emit landing events');
  }finally{await browser.close();fs.writeFileSync(out+'/report.json',JSON.stringify({type:'real frontend / mocked API (not database verification)',checks},null,2))}
 })().catch(e=>{console.error(e);fs.writeFileSync(out+'/failure.txt',e.stack);process.exitCode=1});
