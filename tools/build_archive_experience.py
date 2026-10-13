@@ -20,7 +20,9 @@ if os.environ.get("VERCEL_ENV") == "production":
     index.write_text(html)
     sw = ROOT / "public/sw.js"
     sw.write_text(re.sub(r"'/app/archive/preview-isolation\.js(?:\?[^']*)?',?", '', sw.read_text()))
-    (ROOT / "public/app/archive/preview-isolation.js").unlink(missing_ok=True)
+    # Vercel snapshots source paths before running buildCommand. Keep an inert
+    # file for its packager; production HTML and SW never load this adapter.
+    (ROOT / "public/app/archive/preview-isolation.js").write_text("// Preview adapter disabled in production.\n")
     assert "data-archive-preview" not in html and "preview-isolation" not in html
     assert "preview-isolation" not in sw.read_text()
     print("Production shell: no fixture identity, API adapter or review controls")
