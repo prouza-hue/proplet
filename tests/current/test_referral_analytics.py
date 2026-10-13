@@ -51,7 +51,7 @@ token = measurement.context.set(captured)
 try:
     with patch.object(server, "enforce_rate_limit"), patch.object(
         server, "telemetry_actor", return_value={"anonymous_id": "existing-anon"}
-    ), patch.object(server, "client_app_version", return_value="4.07.2"), patch.object(
+    ), patch.object(server, "client_app_version", return_value="4.07.3"), patch.object(
         server, "db_request", side_effect=insert
     ):
         # One request per accepted name goes through the real single-event endpoint.

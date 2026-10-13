@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.07.2-referral-analytics';
+const APP_PREVIEW_RELEASE='proplet-v4.07.3-verified-update1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1881,6 +1881,29 @@ async function maybeOpenQaDashboard(){
 function canAutomaticallyUpdate(){
  return currentScreen!=='game'&&document.visibilityState==='visible'&&navigator.onLine!==false&&!openTransientModal()&&!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
 }
+function automaticUpdateAttempt(targetVersion){
+ try{
+  const raw=sessionStorage.getItem(`proplet-auto-update-${targetVersion}`);
+  // The previous marker recorded a reload attempt, not a confirmed update.
+  if(raw==='1')return {attempts:1,nextAttemptAt:0};
+  const state=JSON.parse(raw||'null');
+  if(Number.isInteger(state?.attempts)&&state.attempts>=1&&state.attempts<=3&&Number.isFinite(state.nextAttemptAt)&&state.nextAttemptAt>=0)return state;
+ }catch{}
+ return {attempts:0,nextAttemptAt:0};
+}
+function confirmAutomaticUpdate(targetVersion=APP_PREVIEW_RELEASE){
+ // Use the release embedded in the executing app, never freshly fetched metadata.
+ if(!targetVersion||targetVersion!==APP_PREVIEW_RELEASE)return false;
+ try{sessionStorage.removeItem(`proplet-auto-update-${targetVersion}`)}catch{}
+ runtimeUpdateRequired=false;automaticUpdateTarget='';
+ return true;
+}
+function showAutomaticUpdateFailure(){
+ const banner=$('#updateBanner'),label=banner?.querySelector('span'),button=$('#applyUpdateBtn');
+ if(label)label.textContent='Automatická aktualizace se nezdařila. Zkus ji prosím znovu.';
+ if(button){button.disabled=false;button.textContent='Aktualizovat'}
+ banner?.classList.remove('hidden');
+}
 function scheduleAutomaticUpdate(targetVersion='',delay=1500){
  runtimeUpdateRequired=true;
  if(targetVersion)automaticUpdateTarget=targetVersion;
@@ -1906,15 +1929,24 @@ async function recoverRuntimeUpdate({automatic=false,targetVersion=''}={}){
    const response=await fetch(`/sw.js?auto_update=${Date.now()}`,{cache:'no-store'});
    if(!response.ok)throw new Error('Update unavailable');
    const source=await response.text();
-   targetVersion=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1]||targetVersion;
+   targetVersion=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
+   if(!targetVersion)throw new Error('Update release missing');
   }catch{runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,15000);return}
  }
  const button=$('#applyUpdateBtn');if(button){button.disabled=true;button.textContent='Aktualizuji…'}
  const automaticKey=targetVersion?`proplet-auto-update-${targetVersion}`:'';
- if(automatic&&automaticKey){try{if(sessionStorage.getItem(automaticKey)==='1'){runtimeRecoveryBusy=false;return}}catch{}}
+ if(automatic&&confirmAutomaticUpdate(targetVersion)){runtimeRecoveryBusy=false;return}
+ const attempt=automaticUpdateAttempt(targetVersion);
+ if(automatic&&attempt.attempts>=3){runtimeRecoveryBusy=false;showAutomaticUpdateFailure();return}
+ if(automatic&&attempt.nextAttemptAt>Date.now()){
+  runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,Math.min(attempt.nextAttemptAt-Date.now(),60000));return;
+ }
  const reloadSafely=()=>{
   if(automatic&&!canAutomaticallyUpdate()){runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion);return}
-  if(automatic&&automaticKey){try{sessionStorage.setItem(automaticKey,'1')}catch{}}
+  if(automatic&&automaticKey){
+   try{sessionStorage.setItem(automaticKey,JSON.stringify({attempts:attempt.attempts+1,nextAttemptAt:Date.now()+15000*2**attempt.attempts}))}
+   catch{runtimeRecoveryBusy=false;showAutomaticUpdateFailure();return}
+  }
   location.reload();
  };
  trackProductEvent('pwa_update_applied');
@@ -1979,6 +2011,7 @@ function consumeServiceWorkerUpdateMessage(){
  serviceWorkerFirstInstallMessagePending=false;return true;
 }
 function registerServiceWorker(){
+ confirmAutomaticUpdate();
  if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true)return;
  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
  serviceWorkerFirstInstallMessagePending=!navigator.serviceWorker.controller;
