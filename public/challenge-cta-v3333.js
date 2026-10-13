@@ -92,13 +92,14 @@
     try{mode=typeof currentGame!=='undefined'?currentGame?.mode:null}catch{}
     const free=mode==='free';
     const dailyGame=mode==='daily';
-    const challengeMode=free||dailyGame||mode==='tajenka'||$('#winModal')?.classList.contains('tajenka-daily-result');
+    const extraGame=mode==='daily_special';
+    const challengeMode=free||dailyGame||extraGame||mode==='tajenka'||$('#winModal')?.classList.contains('tajenka-daily-result');
 
     if(win){
       if(challengeMode){
         setChallengeContent(win);
         setClass(win,'challenge-share-cta',true);
-        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet tuto Tajenku: Pozvi kamaráda':dailyGame?'Sdílet tuto Denní výzvu: Pozvi kamaráda':'Sdílet tuto desku: Pozvi kamaráda');
+        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet tuto Tajenku: Pozvi kamaráda':extraGame?'Sdílet tuto Extra výzvu: Pozvi kamaráda':dailyGame?'Sdílet tuto Denní výzvu: Pozvi kamaráda':'Sdílet tuto desku: Pozvi kamaráda');
       }else{
         if(win.classList.contains('challenge-share-cta'))setText(win,'↗ Sdílet');
         setClass(win,'challenge-share-cta',false);

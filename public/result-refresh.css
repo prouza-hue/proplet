@@ -110,5 +110,11 @@ html body #referralDialog .ref-status:empty{display:none}
  html.tiskarna-ui body #winModal.result-compact #winTitle{grid-column:1;grid-row:1;width:100%;max-width:none;justify-self:center}
  html.tiskarna-ui body #winModal.result-compact #winXp.xp-sticker{grid-column:1;grid-row:2;justify-self:center;max-width:150px}
 }
-html:root.tiskarna-ui body #winModal #winResultActions #winShareBtn.challenge-share-cta{font-weight:650!important;gap:18px}
-html:root.tiskarna-ui body #winModal #winResultActions #winShareBtn.challenge-share-cta::after{content:"→";display:inline-block!important;position:static;font:inherit;flex:0 0 auto}
+
+
+/* Invitations share the same drawn arrow as the primary forward actions. */
+html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta){font-weight:650!important;gap:18px}
+html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta)::after{
+ content:"";display:inline-block!important;position:static;width:20px;height:20px;flex:0 0 20px;
+ background:currentColor;-webkit-mask:var(--pg-arrow) center/contain no-repeat;mask:var(--pg-arrow) center/contain no-repeat;
+}
