@@ -67,7 +67,7 @@ html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challeng
 html:root.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],:is(#referralHome,#referralInviteHome) [data-ref-open],:is(#referralProfile,#referralProfileReward) [data-ref-open]):hover{background:var(--invite-hover)!important}
 html:root.tiskarna-ui body :is(#winModal #winShareBtn,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,[data-ref-open]):focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 html.tiskarna-ui body #winModal.result-compact .win-result-heading{display:grid;grid-template-columns:minmax(72px,1fr) minmax(0,4fr) minmax(72px,1fr);gap:8px;align-items:center}
-html.tiskarna-ui body #winModal.result-compact #winTitle{grid-column:2;grid-row:1;text-align:center!important;text-wrap:balance;overflow-wrap:anywhere}
+html.tiskarna-ui body #winModal.result-compact #winTitle{grid-column:2;grid-row:1;text-align:center!important;text-wrap:balance;overflow-wrap:normal;word-break:normal;hyphens:none}
 html.tiskarna-ui body #winModal.result-compact #winXp.xp-sticker{grid-column:3;grid-row:1;justify-self:end;max-width:100%;box-sizing:border-box}
 html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-layout{display:grid;grid-template-columns:minmax(0,1fr) 145px;gap:18px;align-items:center}
 .ref-incoming-main{min-width:0}
@@ -103,3 +103,12 @@ html body #referralDialog .ref-status:empty{display:none}
  html body .ref-incoming-layout .xp-sticker{font-size:15px!important;padding:8px!important}
  html.tiskarna-ui body #winModal.result-compact #winTitle{font-size:23px!important}
 }
+
+/* Mobile results: give whole words the full card width, keep praise centered. */
+@media(max-width:580px){
+ html.tiskarna-ui body #winModal.result-compact .win-result-heading{grid-template-columns:minmax(0,1fr);row-gap:12px}
+ html.tiskarna-ui body #winModal.result-compact #winTitle{grid-column:1;grid-row:1;width:100%;max-width:none;justify-self:center}
+ html.tiskarna-ui body #winModal.result-compact #winXp.xp-sticker{grid-column:1;grid-row:2;justify-self:center;max-width:150px}
+}
+html:root.tiskarna-ui body #winModal #winResultActions #winShareBtn.challenge-share-cta{font-weight:650!important;gap:18px}
+html:root.tiskarna-ui body #winModal #winResultActions #winShareBtn.challenge-share-cta::after{content:"→";display:inline-block!important;position:static;font:inherit;flex:0 0 auto}
