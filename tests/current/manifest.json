@@ -588,6 +588,10 @@
       {
         "path": "tests/current/test_daily_special_runtime.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_referral_analytics.py",
+        "runner": "python"
       }
     ]
   },

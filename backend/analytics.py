@@ -17,6 +17,17 @@ from backend.config import ROOT
 
 REGISTRY_PATH = ROOT / "public" / "analytics-event-registry.json"
 
+REFERRAL_EVENT_NAMES = (
+    "referral_invite_dialog_opened",
+    "referral_share_requested",
+    "referral_share_native_resolved",
+    "referral_share_native_cancelled",
+    "referral_share_native_failed",
+    "referral_copy_succeeded",
+    "referral_copy_failed",
+    "referral_landing_validated",
+)
+
 EMBEDDED_EVENT_NAMES = (
     "account_authenticated",
     "account_created",
@@ -175,6 +186,7 @@ EMBEDDED_EVENT_NAMES = (
     "win_account_cta_create",
     "win_account_cta_shown",
     "word_discovery_claim_rejected",
+    *REFERRAL_EVENT_NAMES,
 )
 
 

@@ -1,4 +1,4 @@
-/* Archive release review on the native 4.07.1 application.
+/* Archive release review on the native 4.07.3 application.
  * This is a local API adapter, not a server reward implementation.
  * Production database writes, production credentials and unpublished Daily
  * content are never used. Optional Extra scenarios reuse public free boards.
@@ -17,6 +17,10 @@ const referralStates = new Set(['member','incoming','paid','guest']);
 const referralAliases = {invite:'member',progress:'incoming',earned:'paid'};
 let stored = {};
 try { stored = JSON.parse(nativeStorage.getItem(settingsKey) || '{}'); } catch {}
+const reviewParams = new URLSearchParams(location.search);
+const linkedExtra=reviewParams.get('reviewExtra'),linkedReferral=reviewParams.get('reviewReferral');
+if(['live',...Object.keys(extras)].includes(linkedExtra))stored.extra=linkedExtra;
+if(referralStates.has(linkedReferral))stored.referral=linkedReferral;
 const scenario = {
  extra: extras[stored.extra] ? stored.extra : 'live',
  referral: referralStates.has(stored.referral) ? stored.referral : 'member',
@@ -35,6 +39,9 @@ function scopedStorage(storage) {
  };
 }
 const local = scopedStorage(nativeStorage), session = scopedStorage(nativeSession);
+// An explicit invitation review link opens the visible offer; native dismissal
+// remains intact for normal navigation and all production sessions.
+if(linkedReferral==='member')session.removeItem('proplet:referral-offer-hidden:v1:archive-review');
 Object.defineProperty(window,'localStorage',{configurable:true,value:local});
 Object.defineProperty(window,'sessionStorage',{configurable:true,value:session});
 const read=(key,fallback)=>{try{return JSON.parse(local.getItem(key)||'null')??fallback;}catch{return fallback;}};
@@ -194,9 +201,9 @@ window.fetch=async(input,init={})=>{
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
  if(method==='GET'&&path==='/api/config'){
-  let config={"badges":[{"days":1,"icon":"🥉","name":"První zářez"},{"days":3,"icon":"❤️","name":"Srdcař"},{"days":5,"icon":"⭐","name":"Pětka"},{"days":7,"icon":"🔥","name":"Týden v plamenech"},{"days":10,"icon":"🏆","name":"Desítka"},{"days":14,"icon":"⚡","name":"Blesk"},{"days":21,"icon":"🦉","name":"Mistr slov"},{"days":30,"icon":"👑","name":"Koruna"},{"days":50,"icon":"💎","name":"Diamant"},{"days":100,"icon":"🚀","name":"Legenda"}],"points":{"daily":100,"easy":15,"medium":25,"hard":50,"hardcore":100,"mozkomor":150,"starter":10,"mozkokalypsa":200},"dictionarySize":13939,"dailyRotationSize":365,"dailyGeneration":4,"dailyGeneration3From":"2026-08-17","dailyCadence":{"weekdays":["easy","easy","medium","medium","medium","hard","hard"],"counts":{"easy":105,"medium":156,"hard":104}},"rescueBankSize":30,"pushAvailable":false,"environment":"preview","version":"4.07.1","historicalFreeWriteEnabled":false,"referralsEnabled":true,"dailySpecialsEnabled":true};
+  let config={"badges":[{"days":1,"icon":"🥉","name":"První zářez"},{"days":3,"icon":"❤️","name":"Srdcař"},{"days":5,"icon":"⭐","name":"Pětka"},{"days":7,"icon":"🔥","name":"Týden v plamenech"},{"days":10,"icon":"🏆","name":"Desítka"},{"days":14,"icon":"⚡","name":"Blesk"},{"days":21,"icon":"🦉","name":"Mistr slov"},{"days":30,"icon":"👑","name":"Koruna"},{"days":50,"icon":"💎","name":"Diamant"},{"days":100,"icon":"🚀","name":"Legenda"}],"points":{"daily":100,"easy":15,"medium":25,"hard":50,"hardcore":100,"mozkomor":150,"starter":10,"mozkokalypsa":200},"dictionarySize":13939,"dailyRotationSize":365,"dailyGeneration":4,"dailyGeneration3From":"2026-08-17","dailyCadence":{"weekdays":["easy","easy","medium","medium","medium","hard","hard"],"counts":{"easy":105,"medium":156,"hard":104}},"rescueBankSize":30,"pushAvailable":false,"environment":"preview","version":"4.07.3","historicalFreeWriteEnabled":false,"referralsEnabled":true,"dailySpecialsEnabled":true};
   try{const response=await fetchPublished('/api/config');if(response.ok)config={...config,...await response.json()};}catch{}
-  return json({...config,environment:'preview',version:'4.07.1',historicalFreeWriteEnabled:false,pushAvailable:false,reviewOnly:true});
+  return json({...config,environment:'preview',version:'4.07.3',historicalFreeWriteEnabled:false,pushAvailable:false,reviewOnly:true});
  }
  if(method==='GET'&&path==='/api/daily'){
   if(scenario.extra!=='live')return json(await modelDaily());
@@ -259,7 +266,7 @@ if(window.XMLHttpRequest){
 const api={
  // Extra's model date must not move the publication slot of real Tajenka content.
  contentDate:liveDate,
- getScenario:()=>({...scenario,modelDate:extras[scenario.extra]||null,version:'4.07.1',scope:prefix}),
+ getScenario:()=>({...scenario,modelDate:extras[scenario.extra]||null,version:'4.07.3',scope:prefix}),
  setScenario(next={}){
   const change=next.reset?{extra:'live',referral:'member',announcement:'none'}:{...scenario,...next};
   change.referral=referralAliases[change.referral]||change.referral;
@@ -268,6 +275,7 @@ const api={
     ||!['none','extra','referral'].includes(change.announcement))throw Error('Unknown review scenario');
   nativeStorage.setItem(settingsKey,JSON.stringify(change));
   const destination=new URL(location.href);destination.searchParams.set('review','daily');
+  destination.searchParams.delete('reviewExtra');destination.searchParams.delete('reviewReferral');
   if(destination.href===location.href)location.reload();else location.replace(destination.href);
  },
  requests,

@@ -1,4 +1,4 @@
-"""Focused real-browser proof: archive-first integration on production 4.07.1; local API fixtures."""
+"""Focused real-browser proof: archive-first integration on production 4.07.3; local API fixtures."""
 import functools,http.server,json,pathlib,subprocess,threading,urllib.request,urllib.error,traceback
 from playwright.sync_api import sync_playwright
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -159,13 +159,17 @@ try:
             except:pass
         page.on("pageerror",capture_error)
         page.on("request",lambda req:report["networkWrites"].append({"url":req.url,"method":req.method}) if req.method not in ["GET","HEAD"] else None)
-        page.goto("http://127.0.0.1:8765/?archive-preview=1",wait_until="networkidle")
+        page.goto("http://127.0.0.1:8765/?archive-preview=1&reviewExtra=mozkokalypsa&reviewReferral=member",wait_until="networkidle")
         ready(page)
         no_monthly(page)
         go(page,"daily")
         assert page.locator("#tajenkaPreviewCard").is_visible()
         assert page.locator("#playDailyBtn").evaluate("(e)=>getComputedStyle(e,'::after').maskImage.includes('svg')"), "Daily arrow missing"
         assert page.locator("#referralHome [data-ref-open]>span[aria-hidden=true]").evaluate("(e)=>getComputedStyle(e).maskImage.includes('svg')"), "Invitation arrow missing"
+        assert page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').is_visible(), "Linked review must show Extra"
+        assert page.locator('#referralHome .ref-art-card img').count()==2
+        assert page.locator('#referralHome .ref-art-card img').evaluate_all("(imgs)=>imgs.every(i=>i.complete&&i.naturalWidth>0&&i.getBoundingClientRect().width>0)"), "Both invitation avatars must load"
+        report["checks"].append({"width":width,"linkedExtraAndTwoAvatars":"PASS"})
         shot(page,"initial-"+str(width))
         assert page.locator(".bottom-nav [data-nav]").all_text_contents()==["Dnes","Hrát","Pořadí","Já"] or page.locator(".bottom-nav [data-nav]").count()==4
         discovery={}
@@ -173,6 +177,15 @@ try:
             go(page,view);overflow(page,view,width);shot(page,view+"-"+str(width))
             if view in ["daily","free"]:discovery[view]=discovery_audit(page,view,width)
         go(page,"free")
+        assert "Najdi 5 slov a odhal frázi" not in page.locator("#tajenkaPlayCard").inner_text()
+        for selector in ["#tajenkaPreviewBtn","#tajenkaPlayCard [data-tajenka-clone-play]","#playNewContentBtn"]:
+            button=page.locator(selector)
+            if button.count():
+                assert button.evaluate("(e)=>getComputedStyle(e,'::after').maskImage.includes('svg')"), selector
+        for selector in ['#axPlayArchive .ax-card-action','#tajenkaPlayCard button','#newContentBanner button']:
+            button=page.locator(selector).first
+            if button.count():
+                assert button.evaluate("(e)=>getComputedStyle(e).backgroundImage.includes('linear-gradient')"), selector
         typography=[{key:card[key] for key in ["id","font","size","weight"]} for cards in discovery.values() for card in cards]
         assert len({(t["font"],t["weight"]) for t in typography})==1,typography
         free_order_audit(page,width)

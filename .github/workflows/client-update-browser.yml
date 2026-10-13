@@ -1,0 +1,38 @@
+name: Verified client update browser
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'public/app.js'
+      - 'public/sw.js'
+      - 'tools/test_verified_client_updates.cjs'
+      - 'tests/current/test_automatic_updates.js'
+      - '.github/workflows/client-update-browser.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'public/app.js'
+      - 'public/sw.js'
+      - 'tools/test_verified_client_updates.cjs'
+      - '.github/workflows/client-update-browser.yml'
+permissions:
+  contents: read
+jobs:
+  local-pwa-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser
+        run: |
+          npm install --prefix /tmp/update-tools --no-save --package-lock=false playwright@1.56.1
+          /tmp/update-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Verify retries and safe reload with local data only
+        env:
+          NODE_PATH: /tmp/update-tools/node_modules
+        run: |
+          node tests/current/test_automatic_updates.js
+          node tools/test_verified_client_updates.cjs

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.07.1-referral-choice';
+const APP_PREVIEW_RELEASE='proplet-v4.07.3-verified-update1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -768,8 +768,8 @@ if(globalThis.PROPLET_ARCHIVE_PREVIEW)ROUTE_SCREENS.add('archive');
 function applyScreen(screen){
  screen=ROUTE_SCREENS.has(screen)?screen:'daily';const prev=currentScreen;
  if(prev==='game'&&screen!=='game'){if(!currentGame?.finished)trackStarterPhase(currentGame?.starterTrace,'left','navigation');releaseGameWakeLock();pauseGameClock('menu');if(currentGame?.mode!=='rescue'){saveGameProgress();sendAttemptCheckpoint('leave')}trackTajenkaAbandon();stopTimer()}
- currentScreen=screen;$$('.screen').forEach(x=>x.classList.remove('active'));$(`#screen-${screen}`).classList.add('active');
- document.body.classList.toggle('playing',screen==='game');$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===(screen==='archive'?'free':screen)));$('.bottom-nav').classList.toggle('hidden',screen==='game');
+ currentScreen=screen;$('.screen').forEach(x=>x.classList.remove('active'));$(`#screen-${screen}`).classList.add('active');
+ document.body.classList.toggle('playing',screen==='game');$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===(screen==='archive'?'free':screen)));$('.bottom-nav').classList.toggle('hidden',screen==='game');
  if(screen==='daily'){renderDaily();refreshRescueStatus()}if(screen==='free'){renderFree();if(prev!==screen)refreshFreeOrder()}if(screen==='leaderboard')renderLeaderboard();if(screen==='profile')renderProfile({focusRoadmap:prev!=='profile'});if(screen==='game')requestAnimationFrame(fitGameBoard);else window.scrollTo({top:0,behavior:'instant'});
  globalThis.PropletArchiveExperience?.screen(screen,prev);
  if(screen!==prev&&screen!=='game')trackProductEvent(`screen_${screen}_viewed`);
@@ -929,7 +929,7 @@ function renderNewContentBanner(selector='#newContentBanner'){
  const batch=latestContentBatch();if(!batch||!latestContentIsFresh())return;
  const all=latestContentPuzzles(),left=latestContentUnplayed(),done=Math.max(0,all.length-left.length),count=Number(batch.count)||all.length||5;
  if(root.id==='todayNewContentBanner'&&!left.length)return;
- root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>${left.length?`${count} nových Propletů je tady`:'Týdenní várka dohraná'}</h2><p>${left.length?`${done?`${done} hotovo · `:''}${left.length} ještě čeká.`:`Všech ${count} nových úrovní máš hotových.`}</p></div></div><div class="new-content-actions"><button id="${root.id==='newContentBanner'?'playNewContentBtn':'playTodayNewContentBtn'}" class="primary-btn">${left.length?'Hrát novinky':'Zahrát znovu'}</button></div>`;
+ root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>${left.length?`Pondělní pětka je tady`:'Týdenní várka dohraná'}</h2>${left.length?'':`<p>Všech ${count} nových úrovní máš hotových.</p>`}</div></div><div class="new-content-actions"><button id="${root.id==='newContentBanner'?'playNewContentBtn':'playTodayNewContentBtn'}" class="primary-btn">${left.length?'Hrát novinky':'Zahrát znovu'}</button></div>`;
  root.classList.remove('hidden');root.querySelector('.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
 }
 
@@ -940,8 +940,8 @@ function renderFree(){
   const {total,done,pct,resume}=freeProgress(key),action=resume?'Pokračovat':done===total&&total?'Zahrát znovu':'Hrát';
   return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="${esc(d.label)}: ${done} z ${total} hotovo, otevřít přehled úrovní"><strong>${done}</strong> / ${total}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
  }).join('');
- $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
- $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
+ $('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
+ $('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
  window.PropletFreeOrderUI?.mount({store:freeOrder(),progress:freeProgress,labels:DIFF,change:changeFreeOrder});
  globalThis.PropletArchiveExperience?.free();
 }
@@ -1476,7 +1476,11 @@ async function claimTelemetryAfterAuth(anonymousId){
  return flight.promise;
 }
 function analyticsHeaders(eventType,properties){
- const g=currentGame,puzzleId=properties?.puzzleId||g?.puzzle?.id;
+ const referralEvent=eventType?.startsWith('referral_')===true;
+ const g=referralEvent?null:currentGame,puzzleId=referralEvent?null:properties?.puzzleId||g?.puzzle?.id;
+ const referralHeaders={};
+ if(referralEvent&&['daily','tajenka','win','home','profile','announcement','landing'].includes(properties?.entry_source))referralHeaders['X-Proplet-Referral-Source']=properties.entry_source;
+ if(referralEvent&&['referral_copy_succeeded','referral_copy_failed'].includes(eventType)&&['copy_button','share_fallback','no_native'].includes(properties?.copy_method))referralHeaders['X-Proplet-Referral-Copy-Method']=properties.copy_method;
  const starterTrace=g?.starterTrace,starterRun=properties?.starterRunId||starterTrace?.id;
  const provenance=properties?.starterProvenance||(eventType&&starterRun===starterTrace?.id?starterTrace?.provenance:null);
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
@@ -1485,7 +1489,7 @@ function analyticsHeaders(eventType,properties){
  const experimentKey=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentKey||'')?properties.experimentKey:null,experimentVariant=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentVariant||'')?properties.experimentVariant:null,experimentBucket=Number.isInteger(properties?.experimentBucket)&&properties.experimentBucket>=0&&properties.experimentBucket<100?properties.experimentBucket:null;
  const experimentHeaders=experimentKey&&experimentVariant&&experimentBucket!==null?{'X-Proplet-Experiment':experimentKey,'X-Proplet-Experiment-Variant':experimentVariant,'X-Proplet-Experiment-Bucket':String(experimentBucket)}:{};
  const marketingGate=eventType?.startsWith('marketing_')&&['eligible','unknown_parameter','auth_url','nonproduction','non_game_path'].includes(properties?.marketingGate)?properties.marketingGate:null;
- return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...referralHeaders,...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
@@ -1885,6 +1889,29 @@ async function maybeOpenQaDashboard(){
 function canAutomaticallyUpdate(){
  return currentScreen!=='game'&&document.visibilityState==='visible'&&navigator.onLine!==false&&!openTransientModal()&&!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
 }
+function automaticUpdateAttempt(targetVersion){
+ try{
+  const raw=sessionStorage.getItem(`proplet-auto-update-${targetVersion}`);
+  // The previous marker recorded a reload attempt, not a confirmed update.
+  if(raw==='1')return {attempts:1,nextAttemptAt:0};
+  const state=JSON.parse(raw||'null');
+  if(Number.isInteger(state?.attempts)&&state.attempts>=1&&state.attempts<=3&&Number.isFinite(state.nextAttemptAt)&&state.nextAttemptAt>=0)return state;
+ }catch{}
+ return {attempts:0,nextAttemptAt:0};
+}
+function confirmAutomaticUpdate(targetVersion=APP_PREVIEW_RELEASE){
+ // Use the release embedded in the executing app, never freshly fetched metadata.
+ if(!targetVersion||targetVersion!==APP_PREVIEW_RELEASE)return false;
+ try{sessionStorage.removeItem(`proplet-auto-update-${targetVersion}`)}catch{}
+ runtimeUpdateRequired=false;automaticUpdateTarget='';
+ return true;
+}
+function showAutomaticUpdateFailure(){
+ const banner=$('#updateBanner'),label=banner?.querySelector('span'),button=$('#applyUpdateBtn');
+ if(label)label.textContent='Automatická aktualizace se nezdařila. Zkus ji prosím znovu.';
+ if(button){button.disabled=false;button.textContent='Aktualizovat'}
+ banner?.classList.remove('hidden');
+}
 function scheduleAutomaticUpdate(targetVersion='',delay=1500){
  runtimeUpdateRequired=true;
  if(targetVersion)automaticUpdateTarget=targetVersion;
@@ -1910,15 +1937,24 @@ async function recoverRuntimeUpdate({automatic=false,targetVersion=''}={}){
    const response=await fetch(`/sw.js?auto_update=${Date.now()}`,{cache:'no-store'});
    if(!response.ok)throw new Error('Update unavailable');
    const source=await response.text();
-   targetVersion=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1]||targetVersion;
+   targetVersion=source.match(/SHELL_CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
+   if(!targetVersion)throw new Error('Update release missing');
   }catch{runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,15000);return}
  }
  const button=$('#applyUpdateBtn');if(button){button.disabled=true;button.textContent='Aktualizuji…'}
  const automaticKey=targetVersion?`proplet-auto-update-${targetVersion}`:'';
- if(automatic&&automaticKey){try{if(sessionStorage.getItem(automaticKey)==='1'){runtimeRecoveryBusy=false;return}}catch{}}
+ if(automatic&&confirmAutomaticUpdate(targetVersion)){runtimeRecoveryBusy=false;return}
+ const attempt=automaticUpdateAttempt(targetVersion);
+ if(automatic&&attempt.attempts>=3){runtimeRecoveryBusy=false;showAutomaticUpdateFailure();return}
+ if(automatic&&attempt.nextAttemptAt>Date.now()){
+  runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion,Math.min(attempt.nextAttemptAt-Date.now(),60000));return;
+ }
  const reloadSafely=()=>{
   if(automatic&&!canAutomaticallyUpdate()){runtimeRecoveryBusy=false;scheduleAutomaticUpdate(targetVersion);return}
-  if(automatic&&automaticKey){try{sessionStorage.setItem(automaticKey,'1')}catch{}}
+  if(automatic&&automaticKey){
+   try{sessionStorage.setItem(automaticKey,JSON.stringify({attempts:attempt.attempts+1,nextAttemptAt:Date.now()+15000*2**attempt.attempts}))}
+   catch{runtimeRecoveryBusy=false;showAutomaticUpdateFailure();return}
+  }
   location.reload();
  };
  trackProductEvent('pwa_update_applied');
@@ -1984,6 +2020,7 @@ function consumeServiceWorkerUpdateMessage(){
 }
 function registerServiceWorker(){
  if(window.PROPLET_ARCHIVE_PREVIEW)return;
+ confirmAutomaticUpdate();
  if(window.PROPLET_MK100_INTEGRATED_PREVIEW===true)return;
  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
  serviceWorkerFirstInstallMessagePending=!navigator.serviceWorker.controller;
@@ -2474,7 +2511,7 @@ function renderTajenkaEntry(){
  }
  root.removeAttribute('role');root.removeAttribute('tabindex');root.removeAttribute('aria-label');root.onclick=null;root.onkeydown=null;
  const progress=inProgress?tajenkaFoundFromState(tajenkaPuzzle,state.inProgress).length:0,total=tajenkaPhraseWords(tajenkaPuzzle).length,reward=Number(tajenkaPuzzle.meta?.rewardXp)||TAJENKA_REWARD_XP;
- root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✦</div><div class="tajenka-entry-copy"><span class="eyebrow">VÍKENDOVÝ BONUS</span><h2>Tajenka</h2><p>${inProgress?`${progress}/${total} slov · pokračuj v hledání.`:`Najdi ${total} slov a odhal frázi.`}</p><span class="tajenka-entry-reward">+${reward} XP</span></div><button id="tajenkaPreviewBtn" class="primary-btn">${inProgress?'Pokračovat':'Hrát'}</button>`;
+ root.innerHTML=`<div class="tajenka-entry-icon" aria-hidden="true">✦</div><div class="tajenka-entry-copy"><span class="eyebrow">VÍKENDOVÝ BONUS</span><h2>Tajenka</h2>${inProgress?`<p>${progress}/${total} slov · pokračuj v hledání.</p>`:''}<span class="tajenka-entry-reward">+${reward} XP</span></div><button id="tajenkaPreviewBtn" class="primary-btn">${inProgress?'Pokračovat':'Hrát'}</button>`;
  root.classList.remove('hidden');root.querySelector('#tajenkaPreviewBtn').onclick=startTajenka;trackTajenkaView();
 }
 async function loadTajenkaFixture(){

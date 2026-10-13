@@ -35,7 +35,7 @@ jobs:
       - name: Build immutable preview data and check syntax
         if: steps.scope.outputs.run == 'true'
         run: |
-          git fetch --depth=1 origin 7a4338f10d89ae21680cd133e1725260f5231856
+          git fetch --depth=1 origin f31c8959323b8edae75e01ccd6b04ded168cf982
           python tools/archive_production_parity.py
           python -m py_compile tools/archive_integrated_review.py
           python tools/build_archive_experience.py

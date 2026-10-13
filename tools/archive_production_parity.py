@@ -4,7 +4,7 @@ files (including referrals, Extra, result UI, API, migrations and banks) match.
 """
 import json,pathlib,subprocess
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-BASE="7a4338f10d89ae21680cd133e1725260f5231856"
+BASE="f31c8959323b8edae75e01ccd6b04ded168cf982"
 ALLOWED={
  "public/app.js":"add guarded archive lifecycle/reward hooks",
  "public/bootstrap-hydrator.js":"include the archive custom route",
