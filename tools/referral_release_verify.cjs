@@ -30,9 +30,9 @@ async function boot(browser,{guest=false,paid=false,announcement=false,query=''}
   if(u.origin!==base){await route.abort();return}
   if(!u.pathname.startsWith('/api/'))return route.continue();
   let body={};try{body=req.postDataJSON()||{}}catch{}
-  apiCalls.push({path:u.pathname,method:req.method(),body});
+  apiCalls.push({path:u.pathname,method:req.method(),body,headers:req.headers()});
   const reply=d=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(d)});
-  if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.07.1',environment:'preview'});
+  if(u.pathname==='/api/config')return reply({...fixture.config,version:'4.07.2',environment:'preview'});
   if(u.pathname==='/api/tajenka')return reply({...fixture.tajenka,week:await req.frame().evaluate(()=>activeTajenkaWeek)});
   if(u.pathname==='/api/referrals')return reply({enabled:true,invite:{url:base+'/?invite=OWNCODE123',code:'OWNCODE123'},incoming:paid?{id:'reward-test',inviter:{name:'Katka',avatar:'🦊'},completedBoards:5,paid:true,rewardDismissed:dismissed}:guest&&registered?{id:'incoming-test',inviter:{name:'Katka'},completedBoards:0,paid:false}:null,referrals:[]});
   if(u.pathname==='/api/referrals/invite/'+inviteCode)return reply({enabled:true,inviter:{name:'Katka',avatar:'🦊'}});
@@ -78,15 +78,46 @@ async function shot(page,selector,name){
   await s.page.keyboard.press('Escape');await s.page.reload();await s.page.waitForTimeout(2000);
   assert.equal(await s.page.locator('#referralDialog:not(.hidden)').count(),0);
   pass('Both actual CTA avatar assets decode and are visible; announcement does not repeat');
+  assert(!s.apiCalls.some(c=>(c.body.events||[c.body]).some(e=>e.event_type?.startsWith('referral_'))),'preview must not send referral telemetry');
+  await s.page.evaluate(()=>{window.PROPLET_RUNTIME_ENV='production'});
   await s.page.locator('#referralHome [data-ref-open]').click();
   await s.page.locator('#refLink').waitFor();
   assert.equal(new URL(await s.page.locator('#refLink').inputValue()).searchParams.get('invite'),'OWNCODE123');
   assert(s.apiCalls.some(c=>c.path==='/api/referrals/invite'&&c.method==='POST'));
+  for(const scenario of ['resolved','cancelled','failed','no_native','copy_ok','copy_error']){
+   await s.page.evaluate(scenario=>{
+    Object.defineProperty(navigator,'share',{configurable:true,value:scenario==='no_native'?undefined:async()=>{
+     if(scenario==='cancelled')throw new DOMException('cancelled','AbortError');
+     if(scenario==='failed')throw new Error('test-only native failure');
+     if(scenario==='resolved')return new Promise(resolve=>{window.__resolveReferralShare=resolve});
+    }});
+    Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{if(scenario==='copy_error')throw new Error('test-only clipboard failure')}}});
+   },scenario);
+   await s.page.locator(scenario.startsWith('copy_')?'#refCopy':'#refShare').click();
+   if(scenario==='resolved'){await s.page.locator('#refShare').click();await s.page.evaluate(()=>window.__resolveReferralShare())}
+   await s.page.evaluate(()=>productAnalytics().flush());
+  }
+  const telemetry=s.apiCalls.filter(c=>c.path==='/api/product-event'||c.path==='/api/product-events').flatMap(c=>(c.body.events||[c.body]).map(event=>({event:event.event_type,headers:c.headers,body:event}))).filter(e=>e.event?.startsWith('referral_'));
+  const counts=Object.fromEntries([...new Set(telemetry.map(e=>e.event))].map(event=>[event,telemetry.filter(e=>e.event===event).length]));
+  assert.deepEqual(counts,{
+   referral_invite_dialog_opened:1,referral_share_requested:4,
+   referral_share_native_resolved:1,referral_share_native_cancelled:1,referral_share_native_failed:1,
+   referral_copy_succeeded:3,referral_copy_failed:1
+  });
+  for(const event of telemetry){
+   assert.equal(event.headers['x-proplet-referral-source'],'home');
+   assert(!JSON.stringify(event).includes('OWNCODE123'));
+   assert(!JSON.stringify(event).includes('Katka'));
+   assert(!JSON.stringify(event).includes('Eliška'));
+  }
+  assert.deepEqual(telemetry.filter(e=>e.event==='referral_copy_succeeded').map(e=>e.headers['x-proplet-referral-copy-method']).sort(),['copy_button','no_native','share_fallback']);
+  pass('Real analytics queue distinguishes native handoff, cancel, failure and clipboard outcomes once without invite PII');
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Real invitation transport creates own invite URL');
   s=await boot(browser);
   await s.page.waitForFunction(()=>tajenkaPuzzle?.id);
   await s.page.evaluate(fixturePuzzle=>{
+   window.PROPLET_RUNTIME_ENV='production';
    Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}});
    const date=pragueDateISO(),p={id:'test-daily-share',difficulty:'easy',rows:fixturePuzzle.rows,cols:fixturePuzzle.cols,letters:fixturePuzzle.letters,answers:fixturePuzzle.answers,meta:{}},state=getState();
    datedDaily().remember({schemaVersion:1,dailyDate:date,serverToday:date,puzzleId:p.id,puzzle:p,bankVersion:'test-daily',contentHash:'a'.repeat(64),challengeKey:'daily:'+date,validUntil:new Date(Date.now()+86400000).toISOString()});
@@ -113,6 +144,9 @@ async function shot(page,selector,name){
    await s.page.locator('#refLink').waitFor({state:'visible'});
    assert.equal(new URL(await s.page.locator('#refLink').inputValue()).searchParams.get('invite'),'OWNCODE123');
    await s.page.keyboard.press('Escape');
+   await s.page.evaluate(()=>productAnalytics().flush());
+   const dialogEvents=s.apiCalls.filter(c=>c.path==='/api/product-event'||c.path==='/api/product-events').flatMap(c=>(c.body.events||[c.body]).map(e=>({event:e.event_type,headers:c.headers}))).filter(e=>e.event==='referral_invite_dialog_opened');
+   assert.equal(dialogEvents.at(-1).headers['x-proplet-referral-source'],selector==='#shareDailyBtn'?'daily':'tajenka');
    // Tajenka's button is rebuilt by renderDaily; delegation must survive that.
    await s.page.evaluate(()=>renderDaily());
   }
@@ -194,5 +228,28 @@ async function shot(page,selector,name){
   assert.equal(google?.body.inviteCode,inviteCode);
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Native Google return sends preserved inviteCode');
+  s=await boot(browser,{guest:true,query:'?invite='+inviteCode});
+  assert.equal(await s.page.evaluate(()=>Object.keys(localStorage).filter(key=>key.startsWith('proplet-events-v2:')).some(key=>JSON.parse(localStorage.getItem(key)||'[]').some(row=>row.event==='referral_landing_validated'))),false,'preview must not even enqueue initial landing telemetry');
+  await s.page.evaluate(code=>{
+   window.PROPLET_RUNTIME_ENV='production';
+   // The first load intentionally exercised disabled preview telemetry.
+   sessionStorage.removeItem('proplet:referral-landing-seen:v1:'+code);
+  },inviteCode);
+  await s.page.evaluate(async()=>{await PropletReferrals.load(true);await productAnalytics().flush();await PropletReferrals.load(true);await productAnalytics().flush()});
+  const landingEvents=()=>s.apiCalls.filter(c=>c.path==='/api/product-event'||c.path==='/api/product-events').flatMap(c=>(c.body.events||[c.body]).map(e=>({event:e.event_type,headers:c.headers}))).filter(e=>e.event==='referral_landing_validated');
+  assert.equal(landingEvents().length,1);assert.equal(landingEvents()[0].headers['x-proplet-referral-source'],'landing');
+  let landingFailure=503;
+  await s.ctx.route('**/api/referrals/invite/'+inviteCode,route=>landingFailure===0?route.abort():route.fulfill({status:landingFailure,contentType:'application/json',body:JSON.stringify({detail:'Test-only unavailable invitation'})}));
+  await s.page.evaluate(async code=>{sessionStorage.removeItem('proplet:referral-landing-seen:v1:'+code);await PropletReferrals.load(true);await productAnalytics().flush()},inviteCode);
+  assert.equal(landingEvents().length,1,'unavailable invitation must not count a landing');
+  landingFailure=0;
+  await s.page.evaluate(async()=>{await PropletReferrals.load(true);await productAnalytics().flush()});
+  assert.equal(landingEvents().length,1,'offline request must not count a landing');
+  landingFailure=404;
+  await s.page.evaluate(async()=>{await PropletReferrals.load(true);await productAnalytics().flush()});
+  assert.equal(landingEvents().length,1,'invalid invitation must not count a landing');
+  assert.equal(await s.page.evaluate(()=>PropletReferrals.pendingCode()),null);
+  assert.deepEqual(s.errors,[]);await s.ctx.close();
+  pass('Valid landing counts once per session/code; unavailable and invalid links do not emit landing events');
  }finally{await browser.close();fs.writeFileSync(out+'/report.json',JSON.stringify({type:'real frontend / mocked API (not database verification)',checks},null,2))}
 })().catch(e=>{console.error(e);fs.writeFileSync(out+'/failure.txt',e.stack);process.exitCode=1});

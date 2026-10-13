@@ -14,7 +14,7 @@
     "request_body": "event_type_only",
     "custom_properties_sent": false,
     "new_pii_allowed": false,
-    "note": "Actor identity continues to come only from existing auth/anonymous headers."
+    "note": "Actor identity comes only from existing auth/anonymous headers. Referral source and copy method use finite provenance-header enums; no arbitrary properties, invitation code, URL or recipient data are collected."
   },
   "events": [
     "account_authenticated",
@@ -173,6 +173,30 @@
     "win_account_cta_authenticated",
     "win_account_cta_create",
     "win_account_cta_shown",
-    "word_discovery_claim_rejected"
-  ]
+    "word_discovery_claim_rejected",
+    "referral_invite_dialog_opened",
+    "referral_share_requested",
+    "referral_share_native_resolved",
+    "referral_share_native_cancelled",
+    "referral_share_native_failed",
+    "referral_copy_succeeded",
+    "referral_copy_failed",
+    "referral_landing_validated"
+  ],
+  "bounded_provenance_headers": {
+    "X-Proplet-Referral-Source": [
+      "daily",
+      "tajenka",
+      "win",
+      "home",
+      "profile",
+      "announcement",
+      "landing"
+    ],
+    "X-Proplet-Referral-Copy-Method": [
+      "copy_button",
+      "share_fallback",
+      "no_native"
+    ]
+  }
 }

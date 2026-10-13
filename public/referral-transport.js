@@ -31,6 +31,11 @@ async function load(force=false){
     d=await api('/api/referrals/invite/'+encodeURIComponent(code));
     if((profile()?.id||null)!==requestOwner)return model;
     Object.assign(model,{ready:true,incoming:true,accepted:false,paid:false,count:0,inviterName:d.inviter?.name||'Kamarád',inviterCode:code,referrals:[],inviteUrl:'',rewardDismissed:false});
+    // Local deduplication only: the invitation code is never part of telemetry.
+    const landingKey='proplet:referral-landing-seen:v1:'+code;
+    try{if((window.PROPLET_RUNTIME_ENV||window.PROPLET_RUNTIME_META?.environment)==='production'&&!sessionStorage.getItem(landingKey)&&typeof trackProductEvent==='function'){
+     sessionStorage.setItem(landingKey,'1');trackProductEvent('referral_landing_validated',{entry_source:'landing'});
+    }}catch{}
    }
    loadedAt=Date.now();
   }catch(e){

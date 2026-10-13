@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.07.1-referral-choice';
+const APP_PREVIEW_RELEASE='proplet-v4.07.2-referral-analytics';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1468,7 +1468,11 @@ async function claimTelemetryAfterAuth(anonymousId){
  return flight.promise;
 }
 function analyticsHeaders(eventType,properties){
- const g=currentGame,puzzleId=properties?.puzzleId||g?.puzzle?.id;
+ const referralEvent=eventType?.startsWith('referral_')===true;
+ const g=referralEvent?null:currentGame,puzzleId=referralEvent?null:properties?.puzzleId||g?.puzzle?.id;
+ const referralHeaders={};
+ if(referralEvent&&['daily','tajenka','win','home','profile','announcement','landing'].includes(properties?.entry_source))referralHeaders['X-Proplet-Referral-Source']=properties.entry_source;
+ if(referralEvent&&['referral_copy_succeeded','referral_copy_failed'].includes(eventType)&&['copy_button','share_fallback','no_native'].includes(properties?.copy_method))referralHeaders['X-Proplet-Referral-Copy-Method']=properties.copy_method;
  const starterTrace=g?.starterTrace,starterRun=properties?.starterRunId||starterTrace?.id;
  const provenance=properties?.starterProvenance||(eventType&&starterRun===starterTrace?.id?starterTrace?.provenance:null);
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
@@ -1477,7 +1481,7 @@ function analyticsHeaders(eventType,properties){
  const experimentKey=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentKey||'')?properties.experimentKey:null,experimentVariant=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentVariant||'')?properties.experimentVariant:null,experimentBucket=Number.isInteger(properties?.experimentBucket)&&properties.experimentBucket>=0&&properties.experimentBucket<100?properties.experimentBucket:null;
  const experimentHeaders=experimentKey&&experimentVariant&&experimentBucket!==null?{'X-Proplet-Experiment':experimentKey,'X-Proplet-Experiment-Variant':experimentVariant,'X-Proplet-Experiment-Bucket':String(experimentBucket)}:{};
  const marketingGate=eventType?.startsWith('marketing_')&&['eligible','unknown_parameter','auth_url','nonproduction','non_game_path'].includes(properties?.marketingGate)?properties.marketingGate:null;
- return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...referralHeaders,...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
