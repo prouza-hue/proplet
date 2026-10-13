@@ -1,8 +1,8 @@
 {
-  "baseSha": "7a4338f10d89ae21680cd133e1725260f5231856",
-  "headSha": "b4d0c763ecd29eb992582ff40ab28f4c36517a27",
+  "baseSha": "f31c8959323b8edae75e01ccd6b04ded168cf982",
+  "headSha": "9f8725889f2135006bf4f7229ce4c75cb3234abb",
   "result": "PASS",
-  "unchangedExistingFiles": 1280,
+  "unchangedExistingFiles": 1284,
   "reviewedIntegrationSeams": {
     "public/app.js": "add guarded archive lifecycle/reward hooks",
     "public/bootstrap-hydrator.js": "include the archive custom route",
