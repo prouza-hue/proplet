@@ -121,6 +121,9 @@ async function omitStatistics(ctx){
    await control({release:'current'});
    await page.evaluate(async()=>{const r=await navigator.serviceWorker.getRegistration();await r.update();});
    await page.waitForFunction(old=>APP_PREVIEW_RELEASE!==old,old,{timeout:45000});
+   // The new script marker exists before boot finishes. Wait for the actual
+   // ready boundary so initNavigation cannot race the profile click in CI.
+   await page.waitForFunction(()=>window.__profileTestReady&&!document.documentElement.classList.contains('proplet-current-ui-booting'));
    await openProfile(page);await page.locator('.profile-ledger-count').first().waitFor();
    assert.equal(await page.evaluate(()=>localStorage.getItem('proplet-v2-profile')),stored);
    assert.equal(await page.evaluate(()=>localStorage.getItem('profile-repair-preserve')),'keep-progress');
