@@ -2,7 +2,7 @@
    Printshop art left; titles/information beside it; full-width action below.
    Deliberately scoped to the isolated, approved-for-review integration. */
 html.tiskarna-ui body.archive-experience{
- --pg-card-radius:18px;--pg-card-pad:18px;--pg-gap:14px;--pg-art:52px;
+ --pg-card-radius:18px;--pg-card-pad:18px;--pg-gap:14px;--pg-art:64px;
  --pg-title:22px;--pg-text:15px;--pg-action-height:48px;
  --pg-blue:#315da8;--pg-blue-fill:#315da8;--pg-fill:#315da8;--pg-accent:var(--pg-blue);--pg-green:#257966;--pg-rust:#985635;--pg-plum:#76516e;
 }
@@ -36,7 +36,7 @@ html.tiskarna-ui body.archive-experience :is(.ax-entry-art,#difficultyCards .cp-
  box-sizing:border-box;grid-column:1!important;grid-row:1!important;
  width:var(--pg-art)!important;height:var(--pg-art)!important;min-width:0!important;max-width:none!important;
  display:grid!important;place-items:center;justify-self:start;align-self:center;
- margin:0!important;padding:4px!important;border:0!important;border-radius:0!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
  background:none!important;box-shadow:none!important;object-fit:contain;transform:none!important;
 }
 html.tiskarna-ui body.archive-experience .ax-entry-art>:is(img,.archive-art,.medal){display:block;width:100%!important;max-width:100%!important;height:auto!important;max-height:100%;margin:0!important;object-fit:contain}
@@ -100,14 +100,14 @@ html.tiskarna-ui body.archive-experience .ax-competition-grid{display:grid;grid-
 html.tiskarna-ui body.archive-experience #difficultyCards{gap:var(--pg-gap)!important}
 html.tiskarna-ui body.archive-experience :is(#screen-daily,#screen-free)>.hidden{display:none!important}
 @media(max-width:599px){
- html.tiskarna-ui body.archive-experience{--pg-card-pad:16px;--pg-art:52px;--pg-title:22px;--pg-text:15px}
+ html.tiskarna-ui body.archive-experience{--pg-card-pad:16px;--pg-art:64px;--pg-title:22px;--pg-text:15px}
  html.tiskarna-ui body.archive-experience .ax-competition-grid{grid-template-columns:minmax(0,1fr)}
 }
 @media(min-width:600px) and (max-width:779px){
- html.tiskarna-ui body.archive-experience{--pg-card-pad:14px;--pg-art:32px;--pg-title:18px}
+ html.tiskarna-ui body.archive-experience{--pg-card-pad:14px;--pg-art:56px;--pg-title:18px}
 }
 @media(max-width:359px){
- html.tiskarna-ui body.archive-experience{--pg-art:32px;--pg-title:19px;--pg-card-pad:14px}
+ html.tiskarna-ui body.archive-experience{--pg-art:56px;--pg-title:19px;--pg-card-pad:14px}
  html.tiskarna-ui body.archive-experience .ax-free-art{gap:0!important}
  html.tiskarna-ui body.archive-experience .ax-free-difficulty{width:100%;height:20px}
 }
@@ -186,13 +186,10 @@ html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-entr
 html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-free-art{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px!important}
 html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-free-difficulty{display:block;width:100%;height:clamp(38px,10vw,64px);object-fit:contain}
 html:root.tiskarna-ui body.archive-experience #screen-daily #axHomeFree .ax-card-action{grid-row:3!important}
-/* A single print card replaces the unreadable archive collage. */
-html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry{grid-template-columns:minmax(0,1fr) clamp(128px,22vw,160px)!important}
-html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry .ax-entry-copy{grid-column:1!important;grid-row:1!important}
-html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry .ax-entry-art{grid-column:2!important;grid-row:1!important;width:100%!important;height:auto!important;padding:0!important}
-html:root.tiskarna-ui body.archive-experience :is(#screen-daily #axHomeArchive,#screen-free #axPlayArchive) .ax-archive-entry .ax-card-action{grid-row:2!important}
-html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading{display:grid;grid-template-columns:minmax(0,1fr) clamp(128px,22vw,180px);align-items:center;gap:16px}
-html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading .archive-art{width:100%;max-width:none;height:auto}
+/* Archive uses the same left-hand illustration as the other destinations. */
+html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading{display:grid;grid-template-columns:80px minmax(0,1fr);align-items:center;gap:16px}
+html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading .archive-art{grid-column:1;grid-row:1;width:80px;height:80px;object-fit:contain}
+html.tiskarna-ui body.archive-experience #screen-archive .ax-catalogue-heading>div{grid-column:2;grid-row:1;min-width:0}
 html.tiskarna-ui body.archive-experience #homeCompetitionCard{margin:0 0 var(--pg-gap)!important}
 @media(max-width:359px){
  html.tiskarna-ui body.archive-experience .app-header>.brand{gap:6px}

@@ -228,7 +228,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=release4087','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=release4088','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=home-stable1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
@@ -251,7 +251,7 @@
     await loadScript('/printshop-release-polish.js?v=archive-release1','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=archive-layout2','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
-    loadScript('/tajenka-card-polish.js?v=archive-release1','propletTajenkaCardPolish');
+    loadScript('/tajenka-card-polish.js?v=result-heading2','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');
 
     // The Hrát card is an exact clone of Dnes. Its child IDs are removed to keep

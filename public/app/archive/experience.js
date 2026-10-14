@@ -7,17 +7,7 @@ const labels=Object.fromEntries(['easy','medium','hard','hardcore'].map(key=>[ke
 const rewards={easy:15,medium:25,hard:50,hardcore:100};
 const glyph={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',check:'m5 12 4 4L19 6',archive:'M4 8h16v12H4zM3 4h18v4H3zm6 8h6',trophy:'M8 3h8v6c0 7-8 7-8 0V3Zm0 2H4v3c0 3 2 4 5 4m7-7h4v3c0 3-2 4-5 4m-3 2v6m-4 0h8',team:'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 9v-2c0-6 12-6 12 0v2m0-15a3 3 0 0 1 0 6m3 3c3 0 4 2 4 4v2',grid:'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z',search:'M20 20l-5-5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',info:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 8v6m0-10v1',close:'m6 6 12 12M18 6 6 18'};
 const ico=n=>'<svg class="ax-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+glyph[n]+'"/></svg>';
-function archiveArt(){return '<svg class="archive-art" viewBox="0 0 220 226" aria-hidden="true">'+
-'<rect x="12" y="12" width="198" height="210" rx="15" fill="#513820" opacity=".16"/>'+
-'<rect x="6" y="4" width="204" height="212" rx="12" fill="#fff3d6" stroke="#956c46" stroke-width="2.5"/>'+
-'<rect x="13" y="11" width="190" height="198" rx="7" fill="none" stroke="#d6bc8e"/>'+
-'<path d="M26 28h35m94 0h35" stroke="#b08b5e" stroke-width="2"/>'+
-'<path d="m108 21 5 7-5 7-5-7Z" fill="#a45232"/>'+
-'<g text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="27" font-weight="750" fill="#763d27"><text x="108" y="65">Staré dobré</text><text x="108" y="95">rozplétání.</text></g>'+
-'<g transform="translate(32 113)"><rect width="152" height="80" rx="8" fill="#e9e7cd" stroke="#b5b38e"/>'+
-'<path d="M51 0v80m50-80v80M0 40h152" stroke="#b5b38e"/>'+
-'<path d="M25 20h101v40H25" fill="none" stroke="#b4c3a1" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>'+
-'<g font-family="Outfit,sans-serif" font-size="25" font-weight="650" fill="#36513b" text-anchor="middle"><text x="25" y="29">A</text><text x="76" y="29">R</text><text x="127" y="29">C</text><text x="25" y="69">V</text><text x="76" y="69">I</text><text x="127" y="69">H</text></g></g></svg>';}
+function archiveArt(){return '<img class="archive-art" src="/assets/archive/archive-letterpress-v2.webp" width="512" height="512" alt="" decoding="async">';}
 
 let configuration=null,installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
 const STORE='proplet:archive-progress:v2',entries=new Map();
