@@ -7,6 +7,7 @@ on:
       - 'public/**'
       - 'tools/test_onboarding_activation_browser.cjs'
       - 'tools/test_first_steps_browser.cjs'
+      - 'tools/test_profile_statistics_browser.cjs'
       - 'tools/onboarding_fixture_server.cjs'
       - '.github/workflows/onboarding-activation-browser.yml'
   workflow_dispatch:
@@ -73,4 +74,28 @@ jobs:
         with:
           name: onboarding-browser-${{ github.sha }}
           path: browser-results/
+          retention-days: 14
+
+  profile-statistics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser driver
+        run: |
+          npm install --prefix "$RUNNER_TEMP/profile-browser" --no-save --no-package-lock playwright@1.57.0
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/profile-browser/node_modules/playwright" >> "$GITHUB_ENV"
+          echo "CHROME_PATH=$(command -v google-chrome || command -v google-chrome-stable)" >> "$GITHUB_ENV"
+      - name: Verify profile dependency recovery and historical PWA upgrade
+        run: node tools/test_profile_statistics_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: profile-statistics-${{ github.sha }}
+          path: browser-results/profile-statistics.json
           retention-days: 14

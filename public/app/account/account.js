@@ -7,6 +7,53 @@
     let teamMembershipMode = 'join';
     let statisticsMode = 'free';
     let statisticsScope = null;
+    let statisticsRequest = null;
+    let statisticsFailed = false;
+
+    function profileStatistics() {
+      const api = global.PropletProfileStatistics;
+      return api && ['calculate', 'markup', 'bind'].every(key => typeof api[key] === 'function') ? api : null;
+    }
+
+    function requestProfileStatistics() {
+      if (profileStatistics() || statisticsRequest) return;
+      statisticsFailed = false;
+      // A cached older document can load the new account UI without its new
+      // dependency. Recover that dependency, never reset the player's storage.
+      statisticsRequest = new Promise(resolve => {
+        const script = document.createElement('script');
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          script.remove();
+          statisticsFailed = !profileStatistics();
+          resolve();
+        };
+        const timer = setTimeout(finish, 10000);
+        script.src = '/app/account/statistics.js?v=profile-recovery1';
+        script.onload = finish;
+        script.onerror = finish;
+        try {
+          if (!document.querySelector('link[href^="/profile-statistics.css"]')) {
+            const style = document.createElement('link');
+            style.rel = 'stylesheet'; style.href = '/profile-statistics.css?v=1';
+            document.head.appendChild(style);
+          }
+          document.head.appendChild(script);
+        } catch (_) { finish(); }
+      }).then(() => {
+        statisticsRequest = null;
+        // Render from the current account snapshot; the player may have logged
+        // out or changed accounts while the script was in flight.
+        if (d.$('#profileCard [data-profile-statistics-status]')) d.renderProfile();
+      });
+    }
+
+    function statisticsPlaceholder() {
+      return `<section class="profile-ledger" data-profile-statistics-status role="status"><p>${statisticsFailed ? 'Statistiky se teď nepodařilo načíst. Tvůj uložený postup zůstává beze změny.' : 'Načítám přehled statistik…'}</p><button id="retryProfileStatistics" type="button" class="secondary-btn" ${statisticsFailed ? '' : 'disabled'}>Zkusit znovu</button></section>`;
+    }
 
     function safeGoogleAvatarUrl(value) {
       try {
@@ -144,14 +191,14 @@
       const stats = d.effectiveStats();
       const level = d.levelFor(stats.points || 0);
       if (statisticsScope !== profile?.id) { statisticsMode = 'free'; statisticsScope = profile?.id; }
-      const statistics = global.PropletProfileStatistics;
-      const statisticsOptions = {
+      const statistics = profileStatistics();
+      const statisticsOptions = statistics ? {
         data: statistics.calculate(d.getState?.().completed || {}),
         mode: statisticsMode, ready: d.accountProgressAvailable?.() ?? true,
         dailyCompleted: stats.dailyCompleted ?? local.dailyCompleted ?? 0,
         dailyChallengeCompleted: stats.dailyChallengeCompleted ?? local.dailyChallengeCompleted ?? stats.dailyCompleted ?? local.dailyCompleted ?? 0,
         longestStreak: stats.longestStreak ?? local.longestStreak ?? 0,
-      };
+      } : null;
       const queue = d.getQueue();
       if (!profile) {
         d.$('#profileCard').innerHTML = '<h2>Založ si účet a ulož výsledky + bonus 500 XP</h2><div class="account-actions"><button id="profileCreateBtn" class="primary-btn">Registrace</button><button id="profileLoginBtn" class="secondary-btn">Přihlášení</button></div>';
@@ -177,8 +224,16 @@
         const teamAccess = inTeam
           ? `<div class="team-access-card"><div><strong>👥 ${d.esc(profile.leagueName || profile.familyCode)}</strong><span>Týmové pořadí je aktivní. PIN slouží jen jako pozvánka pro další hráče.</span></div><button id="teamPinBtn" class="secondary-btn">Nastavit PIN</button></div>`
           : '<div class="team-access-card team-empty"><div><strong>👥 Tým je volitelný</strong><span>Účet funguje i bez něj. Přidej rodinu nebo partu, až budeš chtít společné pořadí.</span></div><button id="joinTeamBtn" class="secondary-btn">Přidat tým</button></div>';
-        d.$('#profileCard').innerHTML = `<div class="profile-summary"><div class="profile-identity"><div class="profile-avatar-control"><button type="button" id="editAvatarBtn" class="profile-avatar-big" aria-label="Změnit avatara">${d.esc(profile.avatar || '🙂')}</button><span aria-hidden="true">Změnit avatar</span></div><div><div class="profile-name">${d.esc(profile.name)}</div><div class="profile-family">${inTeam ? `Tým: ${d.esc(profile.leagueName || profile.familyCode)}` : 'Bez týmu · účet je uložený'}</div></div></div><div class="streak-bubble"><span class="streak-icon">🔥</span><strong>${stats.currentStreak || 0}</strong><small>${d.czPlural(stats.currentStreak || 0, 'den', 'dny', 'dní')}</small></div></div><div class="avatar-picker"><span class="stat-label">TVŮJ AVATAR</span><div class="avatar-grid">${avatars}</div></div><div class="profile-grid"><div class="profile-stat"><span class="stat-label">XP</span><strong>${stats.points ?? local.points}</strong></div><div class="profile-stat profile-rank-stat"><span class="stat-label">Hodnost</span><div class="profile-rank-value"><span class="profile-rank-icon">${level.current.icon}</span><strong>${level.index} · ${d.esc(level.current.name)}</strong></div></div>${statistics.markup(statisticsOptions)}</div>${account}<div class="support-mode-card"><div><span class="stat-label">POMOCNÍK</span><strong>${d.SUPPORT_MODES[profile.supportMode || 'none']?.icon || '🧠'} ${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.label || 'Nenabízet')}</strong><small>${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.desc || '')}</small></div><button id="supportModeBtn" class="secondary-btn">Nastavit</button></div>${teamAccess}<a id="adminEntryBtn" class="admin-entry hidden" href="/admin"><span>🛠</span><div><strong>Proplet Admin</strong><small>Quality, hlášení a uživatelé</small></div><b>→</b></a><div class="sync-panel"><div class="sync-status ${statusClass}"><div><strong>${d.esc(status[0])}</strong><div>${d.esc(status[1])}</div></div><span>${syncState.status === 'syncing' ? '↻' : queue.length ? '☁️' : '✓'}</span></div><button id="syncBtn" class="secondary-btn" ${syncState.status === 'syncing' ? 'disabled' : ''}>${syncState.status === 'syncing' ? 'Synchronizuji…' : `Synchronizovat${queue.length ? ` (${queue.length})` : ''}`}</button></div><button id="logoutBtn" class="logout-btn">Odhlásit hráče z tohoto zařízení</button>`;
-        statistics.bind(d.$('#profileCard .profile-ledger'), statisticsOptions, mode => { statisticsMode = mode; });
+        d.$('#profileCard').innerHTML = `<div class="profile-summary"><div class="profile-identity"><div class="profile-avatar-control"><button type="button" id="editAvatarBtn" class="profile-avatar-big" aria-label="Změnit avatara">${d.esc(profile.avatar || '🙂')}</button><span aria-hidden="true">Změnit avatar</span></div><div><div class="profile-name">${d.esc(profile.name)}</div><div class="profile-family">${inTeam ? `Tým: ${d.esc(profile.leagueName || profile.familyCode)}` : 'Bez týmu · účet je uložený'}</div></div></div><div class="streak-bubble"><span class="streak-icon">🔥</span><strong>${stats.currentStreak || 0}</strong><small>${d.czPlural(stats.currentStreak || 0, 'den', 'dny', 'dní')}</small></div></div><div class="avatar-picker"><span class="stat-label">TVŮJ AVATAR</span><div class="avatar-grid">${avatars}</div></div><div class="profile-grid"><div class="profile-stat"><span class="stat-label">XP</span><strong>${stats.points ?? local.points}</strong></div><div class="profile-stat profile-rank-stat"><span class="stat-label">Hodnost</span><div class="profile-rank-value"><span class="profile-rank-icon">${level.current.icon}</span><strong>${level.index} · ${d.esc(level.current.name)}</strong></div></div>${statistics ? statistics.markup(statisticsOptions) : statisticsPlaceholder()}</div>${account}<div class="support-mode-card"><div><span class="stat-label">POMOCNÍK</span><strong>${d.SUPPORT_MODES[profile.supportMode || 'none']?.icon || '🧠'} ${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.label || 'Nenabízet')}</strong><small>${d.esc(d.SUPPORT_MODES[profile.supportMode || 'none']?.desc || '')}</small></div><button id="supportModeBtn" class="secondary-btn">Nastavit</button></div>${teamAccess}<a id="adminEntryBtn" class="admin-entry hidden" href="/admin"><span>🛠</span><div><strong>Proplet Admin</strong><small>Quality, hlášení a uživatelé</small></div><b>→</b></a><div class="sync-panel"><div class="sync-status ${statusClass}"><div><strong>${d.esc(status[0])}</strong><div>${d.esc(status[1])}</div></div><span>${syncState.status === 'syncing' ? '↻' : queue.length ? '☁️' : '✓'}</span></div><button id="syncBtn" class="secondary-btn" ${syncState.status === 'syncing' ? 'disabled' : ''}>${syncState.status === 'syncing' ? 'Synchronizuji…' : `Synchronizovat${queue.length ? ` (${queue.length})` : ''}`}</button></div><button id="logoutBtn" class="logout-btn">Odhlásit hráče z tohoto zařízení</button>`;
+        if (statistics) {
+          statistics.bind(d.$('#profileCard .profile-ledger'), statisticsOptions, mode => { statisticsMode = mode; });
+        } else {
+          d.$('#retryProfileStatistics').onclick = () => {
+            requestProfileStatistics();
+            d.renderProfile();
+          };
+          if (!statisticsFailed) requestProfileStatistics();
+        }
         const mainAvatar = d.$('#profileCard .profile-avatar-big');
         if (mainAvatar) mainAvatar.innerHTML = profileAvatarMarkup(profile);
         setTimeout(() => {
