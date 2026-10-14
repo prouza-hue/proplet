@@ -115,7 +115,7 @@ async function omitStatistics(ctx){
    const old=await page.evaluate(()=>APP_PREVIEW_RELEASE);
    assert.equal(old,'proplet-v4.05.3-firstgame-telemetry1');
    await openProfile(page);
-   await page.evaluate(()=>{const s=getState();s.completed['free:g4-e-001']={puzzleId:'g4-e-001',mode:'free',difficulty:'easy',elapsedMs:30000,completedAt:'2026-09-15T09:00:00Z'};saveState(s);});
+   await page.evaluate(()=>{const s=getState();s.completed['free:g4-e-001']={puzzleId:'g4-e-001',mode:'free',difficulty:'easy',elapsedMs:30000,points:15,completedAt:'2026-09-15T09:00:00Z'};saveState(s);});
    const completed=await page.evaluate(()=>getState().completed['free:g4-e-001']);
    const stored=await page.evaluate(()=>localStorage.getItem('proplet-v2-profile'));
    await control({release:'current'});
