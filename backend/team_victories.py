@@ -16,7 +16,7 @@ MILESTONES = (
     ('first-print', 'První otisk', 1),
     ('golden-crew', 'Zlatá parta', 3),
     ('masters', 'Mistři dílny', 10),
-    ('legend', 'Legenda Propletu', 25),
+    ('legend', 'Legendy Propletu', 25),
 )
 
 
@@ -49,7 +49,7 @@ def enrich_state(payload: dict) -> dict:
                       for key, name, threshold in MILESTONES if threshold > gold), None)
     if following is None:
         level = gold // 25 + 1
-        following = dict(id='legend', name=f'Legenda Propletu {_roman(level)}', threshold=level * 25)
+        following = dict(id='legend', name=f'Legendy Propletu {_roman(level)}', threshold=level * 25)
     team['nextMilestone'] = following
     return payload
 
@@ -89,3 +89,4 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit):
         if not result.get('ok'):
             raise HTTPException(403, 'Toto ocenění není dostupné pro tvůj účet.')
         return result
+

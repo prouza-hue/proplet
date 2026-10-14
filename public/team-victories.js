@@ -4,7 +4,7 @@
   const assets='/rewards/team-victories/';
   const medal=`${assets}weekly-gold.svg`;
   const badges={'first-print':'first-imprint','golden-crew':'golden-party',masters:'workshop-masters',legend:'proplet-legend'};
-  const fallbackMilestones=[{id:'first-print',name:'První otisk',threshold:1},{id:'golden-crew',name:'Zlatá parta',threshold:3},{id:'masters',name:'Mistři dílny',threshold:10},{id:'legend',name:'Legenda Propletu',threshold:25}];
+  const fallbackMilestones=[{id:'first-print',name:'První otisk',threshold:1},{id:'golden-crew',name:'Zlatá parta',threshold:3},{id:'masters',name:'Mistři dílny',threshold:10},{id:'legend',name:'Legendy Propletu',threshold:25}];
   const $=selector=>document.querySelector(selector);
   const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const profile=()=>typeof getProfile==='function'?getProfile():null;
@@ -46,8 +46,8 @@
     b.innerHTML=`<img src="${medal}" alt=""><span>Vítězové minulého týdne · ${escape(state.team.name)}</span><span aria-hidden="true">›</span>`;
     b.onclick=openCabinet;$('#screen-daily')?.prepend(b);
   }
-  function nextMilestone(total){return fallbackMilestones.find(m=>m.threshold>total)||{id:'legend',name:`Legenda Propletu ${roman(Math.floor(total/25)+1)}`,threshold:(Math.floor(total/25)+1)*25};}
-  function earnedMilestone(award){const n=number(award.totalGold),previous=number(award.previousGold);return [...fallbackMilestones,...(n>=50?[{id:'legend',name:`Legenda Propletu ${roman(Math.floor(n/25))}`,threshold:Math.floor(n/25)*25}]:[])].filter(m=>m.threshold>previous&&m.threshold<=n).pop();}
+  function nextMilestone(total){return fallbackMilestones.find(m=>m.threshold>total)||{id:'legend',name:`Legendy Propletu ${roman(Math.floor(total/25)+1)}`,threshold:(Math.floor(total/25)+1)*25};}
+  function earnedMilestone(award){const n=number(award.totalGold),previous=number(award.previousGold);return [...fallbackMilestones,...(n>=50?[{id:'legend',name:`Legendy Propletu ${roman(Math.floor(n/25))}`,threshold:Math.floor(n/25)*25}]:[])].filter(m=>m.threshold>previous&&m.threshold<=n).pop();}
   function celebration(award){
     const n=number(award.totalGold),milestone=earnedMilestone(award),goal=nextMilestone(n),remaining=goal.threshold-n;
     return `<section class="tv-celebration"><button class="tv-close" data-tv-close aria-label="Zavřít oslavu">×</button><div class="tv-kicker"><img src="${medal}" alt="">1. místo v týdenních týmových XP</div><h1 id="tvTitle">${escape(award.teamName)}<br><span>Týdenní zlato je vaše!</span></h1><p class="tv-week">${escape(week(award))}${award.sharedFirst?' · Sdílené 1. místo':''}</p><div class="tv-stage"><img class="tv-badge-hero" src="${milestone?badge(milestone.id):medal}" alt="${milestone?escape(milestone.name):'Týdenní týmové zlato'}" width="184" height="184"></div><h2 class="tv-award-name">${milestone?escape(milestone.name):'Další společné zlato'}</h2><p class="tv-subline">${n===1?'První zlato do vaší vitríny.':'Vaše výhra zůstává ve vitríně.'}</p><div class="tv-score"><img src="${medal}" alt=""><span class="tv-number" aria-hidden="true">${n}</span><span class="tv-score-label">${n===1?'zlatá':n>=2&&n<=4?'zlaté':'zlatých'} ve společné vitríně</span><span id="tvCountStatus" class="sr-only" role="status" aria-live="polite"></span></div><div class="tv-goal"><img src="${badge(goal.id)}" alt=""><div class="tv-goal-body"><p>Ještě <strong>${remaining} vítězství</strong> do trofeje<br><strong>${escape(goal.name)}.</strong></p><div class="tv-progress" role="progressbar" aria-label="${escape(goal.name)}" aria-valuemin="0" aria-valuemax="${goal.threshold}" aria-valuenow="${n}"><span style="width:${n/goal.threshold*100}%"></span></div></div></div><div class="tv-actions"><button class="tv-primary" data-tv-action="continue">Jdeme pro další</button><button class="tv-secondary" data-tv-action="cabinet">Vitrína týmu</button></div></section>`;
@@ -63,7 +63,7 @@
     dialog.innerHTML=kind==='cabinet'?cabinet():celebration(award);
     dialog.setAttribute('aria-labelledby',kind==='cabinet'?'tvCabinetTitle':'tvTitle');
     dialog.querySelector('[data-tv-close]').onclick=close;
-    dialog.querySelectorAll('[data-tv-action]').forEach(b=>b.onclick=()=>{if(b.dataset.tvAction==='cabinet')show('cabinet');else if(b.dataset.tvAction==='competition')openCompetition();else if(b.dataset.tvAction==='settings'){close();if(typeof openFamilyLeagueModal==='function')openFamilyLeagueModal();}else close();});
+    dialog.querySelectorAll('[data-tv-action]').forEach(b=>b.onclick=()=>{if(b.dataset.tvAction==='cabinet')openCabinet();else if(b.dataset.tvAction==='competition')openCompetition();else if(b.dataset.tvAction==='settings'){close();if(typeof openFamilyLeagueModal==='function')openFamilyLeagueModal();}else close();});
     dialog.showModal();dialog.querySelector('[data-tv-close]').focus({preventScroll:true});
     if(kind!=='celebration')return;
     openedAward=award.id;
@@ -81,12 +81,14 @@
     const p=profile();api('/api/team-victories/seen',{method:'POST',body:JSON.stringify({kind:'award',awardId:award.id}),authProfile:p}).catch(()=>{});
   }
   async function openCabinet(){
+    if(window.PropletWeeklyCompetition){close();return window.PropletWeeklyCompetition.open("cabinet");}
     const data=await refresh(true);
     if(!data?.enabled||!data.team){if(typeof showToast==='function')showToast('Vitrína se teď nepodařila načíst. Zkus to prosím za chvíli.');return;}
     show('cabinet');
   }
   function openCompetition(){
     close();$('#tvIntro')?.remove();$('#winModal')?.classList.add('hidden');
+    if(window.PropletWeeklyCompetition)return window.PropletWeeklyCompetition.open();
     if(typeof rankingsOrchestration==='function')rankingsOrchestration().openWeeklyTeams({render:false});
     if(typeof nav==='function')nav('leaderboard');
     requestAnimationFrame(()=>$('#xpLeaderboardList')?.closest('.card')?.scrollIntoView({block:'start',behavior:'instant'}));
@@ -153,3 +155,4 @@
   window.PropletTeamVictories={resultConfirmed,openCabinet,openCompetition};
   document.addEventListener('proplet:ready',setup,{once:true});
 })();
+

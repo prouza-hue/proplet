@@ -101,7 +101,7 @@ function home(){
  const root=q('#screen-daily');if(!root)return;
  let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div>';root.append(games);}
  if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(DIFF).map(diff=>difficultyIconMarkup(diff,'ax-free-difficulty')).join('')+'</div>',action:'free',label:'Vybrat hru'}));}
- let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Týmy · společné skóre',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Zobrazit pořadí týmů'})+'</div>';root.append(competition);}
+ let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Hraj s týmem o zlatou trofej',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
  if(archiveResume){if(!resume){resume=document.createElement('button');resume.id='axArchiveResume';resume.className='home-resume-card';root.prepend(resume);}
@@ -264,8 +264,9 @@ async function onClick(e){
  if(action==='extra'){nav('daily');const ui=dailySpecialUI();ui?.select('special');if(ui?.getState().selected==='special'){q('#dailyChallengeSwitch')?.scrollIntoView({block:'center',behavior:'smooth'});q('#dailyChallengeSwitch [data-daily-kind="special"]')?.focus({preventScroll:true});}else ui?.openWeek(q('#dailyHeroTitle [data-daily-kind="base"]'));return}
  if(action==='free'){nav('free');return}if(action==='daily'){nav('daily');return}
  if(action==='rankings'){nav('leaderboard');return}
- if(action==='team'){nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}
+ if(action==='team'){if(window.PropletWeeklyCompetition){window.PropletWeeklyCompetition.open();return;}nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}
 }
 window.PropletArchiveExperience={configure,isEnabled:()=>installed,announcement,refreshClaims,resultConfirmed,renderResult,adoptGuest,install,home,free,placePlayExtra,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
 })();
+
 
