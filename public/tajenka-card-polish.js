@@ -41,16 +41,7 @@
     polishShareButton(q('[data-tajenka-share]',card));
   }
 
-  function polishResult(){
-    const modal=q('#winModal');
-    if(!modal?.classList.contains('tajenka-daily-result'))return;
-    const title=q('#winTitle',modal);
-    if(title){
-      const quoted=quotePhrase(title.textContent);
-      if(quoted&&title.textContent!==quoted)title.textContent=quoted;
-    }
-  }
-
+  // Result headings belong to the game renderer. Never quote or recase them.
   function polishWeeklyBanner(){
     q('#newContentBanner .eyebrow')?.remove();
   }
@@ -129,7 +120,6 @@
     polishWeeklyBanner();
     polishCard(q('#tajenkaPreviewCard'));
     polishCard(q('#tajenkaPlayCard'));
-    polishResult();
     polishHintBanner();
   }
 
