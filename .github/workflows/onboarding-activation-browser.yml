@@ -7,6 +7,7 @@ on:
       - 'public/**'
       - 'tools/test_onboarding_activation_browser.cjs'
       - 'tools/test_first_steps_browser.cjs'
+      - 'tools/test_profile_statistics_browser.cjs'
       - 'tools/onboarding_fixture_server.cjs'
       - '.github/workflows/onboarding-activation-browser.yml'
   workflow_dispatch:
@@ -67,6 +68,8 @@ jobs:
         env:
           RESULT_PATH: browser-results/client-diagnostics.json
         run: node tools/test_client_diagnostics_browser.cjs
+      - name: Verify profile dependency recovery and historical PWA upgrade
+        run: node tools/test_profile_statistics_browser.cjs
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
