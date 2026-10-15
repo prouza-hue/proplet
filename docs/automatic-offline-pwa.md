@@ -1,7 +1,15 @@
 # Automatic offline play — 2026-10-15
 
-Implementation candidate 4.09.0, based on production/main
-`e6f44759c424a5c882d5e538403fd6477deafda8`. Production has not been changed.
+Released as **4.09.0** on 2026-10-15 from commit
+`6230c72e9fb57ff7417d412868f7f64aa04edcdb`, based on the previous production/main
+`e6f44759c424a5c882d5e538403fd6477deafda8`.
+
+Production migration `offline_result_timing` is applied as `20261015172945`.
+All six timing functions, service-role-only execution and invalid-command rejection
+were verified in production before the app release. The live site serves 4.09.0,
+the new icon and offline module; a Free board opens successfully. The production
+offline manifest reports 4.09.0, enabled Archive and versioned bank/rolling hashes.
+The post-release runtime error query returned no error/fatal groups.
 
 ## Product decision
 
