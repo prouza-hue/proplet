@@ -523,6 +523,24 @@
       "timestamp_migration": "supabase/migrations/20261012000339_daily_specials.sql"
     },
     {
+      "id": "20261015-offline-result-timing",
+      "order": 490,
+      "version": "2026.10.15",
+      "path": "supabase/migrations/20261015070626_offline_result_timing.sql",
+      "type": "migration",
+      "status": "prepared-review-only",
+      "sha256": "df23d5bcab7b04ebb1d67b47cf615a89b5ff7150ab182e69c4d9c8a6318035c9",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_result_v1",
+        "public.proplet_submit_daily_special_v1",
+        "public.proplet_submit_offline_result_v1",
+        "public.proplet_submit_offline_daily_special_v1",
+        "public.proplet_result_timing_guard",
+        "public.proplet_daily_special_timing_guard"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",
@@ -590,3 +608,4 @@
     }
   ]
 }
+

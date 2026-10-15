@@ -5,6 +5,7 @@ const q=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
 // Resolve names from the live game's single difficulty registry.
 const labels=Object.fromEntries(['easy','medium','hard','hardcore'].map(key=>[key,'']));
 const rewards={easy:15,medium:25,hard:50,hardcore:100};
+const EDITION='free-gen3-v1',REVISION='g3-reviewed-covers-20261008-r3';
 const glyph={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',check:'m5 12 4 4L19 6',archive:'M4 8h16v12H4zM3 4h18v4H3zm6 8h6',trophy:'M8 3h8v6c0 7-8 7-8 0V3Zm0 2H4v3c0 3 2 4 5 4m7-7h4v3c0 3-2 4-5 4m-3 2v6m-4 0h8',team:'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 9v-2c0-6 12-6 12 0v2m0-15a3 3 0 0 1 0 6m3 3c3 0 4 2 4 4v2',grid:'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z',search:'M20 20l-5-5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',info:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 8v6m0-10v1',close:'m6 6 12 12M18 6 6 18'};
 const ico=n=>'<svg class="ax-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+glyph[n]+'"/></svg>';
 function archiveArt(){return '<img class="archive-art" src="/assets/archive/archive-letterpress-v2.webp" width="512" height="512" alt="" decoding="async">';}
@@ -27,24 +28,47 @@ function freshPuzzle(entry){
  const p=structuredClone(entry.puzzle);p.meta={...p.meta,level:entry.level,contentGeneration:3,archiveExperience:true};
  return p;
 }
+async function offlineRead(method,...args){
+ try{return await window.PropletOffline?.[method]?.(...args)||null;}catch{return null;}
+}
+function validateBank(data){
+ if(data?.editionId!==EDITION||data?.solutionPolicyRevision!==REVISION||data?.completeCovers!==879||!Array.isArray(data.boards)||data.boards.length!==800)throw Error('Archiv se nepodařilo ověřit.');
+ const ids=new Set(),slots=new Set(),counts={easy:0,medium:0,hard:0,hardcore:0};
+ for(const r of data.boards){
+  if(!r||typeof r.puzzleId!=='string'||!r.puzzleId||!Object.hasOwn(rewards,r.difficulty)||!Number.isInteger(r.level)||r.level<1||r.level>200||r.rewardXp!==rewards[r.difficulty]||r.rewardSlotKey!=='legacy-free:'+r.difficulty+':'+r.level||ids.has(r.puzzleId)||slots.has(r.rewardSlotKey))throw Error('Archiv se nepodařilo ověřit.');
+  ids.add(r.puzzleId);slots.add(r.rewardSlotKey);counts[r.difficulty]++;
+ }
+ if(Object.values(counts).some(count=>count!==200))throw Error('Archiv není úplný.');
+ return data;
+}
+function validateEntry(data,id){
+ const expected=bank.boards.find(r=>r.puzzleId===id),p=data?.puzzle,s=data?.solutions;
+ if(!expected||data?.editionId!==bank.editionId||p?.id!==id||p?.difficulty!==expected.difficulty||p?.meta?.contentGeneration!==3||p?.meta?.level!==expected.level||data.level!==expected.level||data.difficulty!==expected.difficulty||data.rewardXp!==expected.rewardXp||data.rewardSlotKey!==expected.rewardSlotKey||s?.puzzleId!==id||s?.gameplayScope!=='archive'||s?.solutionPolicyRevision!==bank.solutionPolicyRevision)throw Error('Archivní desku se nepodařilo ověřit.');
+ window.PropletArchiveSolutions.create(p,s);return data;
+}
 async function loadBank(){
  if(bank)return bank;
- if(!loading)loading=api('/api/archive').then(data=>{
-  if(!data?.editionId||!Array.isArray(data.boards))throw Error('Archiv se nepodařilo načíst.');
+ if(!loading)loading=(async()=>{
+  let data;
+  try{data=validateBank(await offlineRead('getArchiveCatalogue'));}catch{}
+  if(!data&&window.navigator?.onLine!==false)data=validateBank(await api('/api/archive'));
+  if(!data)throw Error('Archiv zatím není stažený. Připoj se k internetu a zkus to znovu.');
   bank=data;return data;
- }).catch(e=>{loading=null;throw e});
+ })().catch(e=>{loading=null;throw e});
  return loading;
 }
 async function loadEntry(id){
  await loadBank();if(entries.has(id))return entries.get(id);
- const data=await api('/api/archive/puzzle?puzzle_id='+encodeURIComponent(id));
- if(data?.editionId!==bank.editionId||data?.puzzle?.id!==id||data?.solutions?.solutionPolicyRevision!==bank.solutionPolicyRevision)throw Error('Archivní desku se nepodařilo ověřit.');
- window.PropletArchiveSolutions.create(data.puzzle,data.solutions);
+ let data;
+ try{data=validateEntry(await offlineRead('getArchiveEntry',id),id);}catch{}
+ if(!data&&window.navigator?.onLine!==false)data=validateEntry(await api('/api/archive/puzzle?puzzle_id='+encodeURIComponent(id)),id);
+ if(!data)throw Error('Tato archivní deska zatím není stažená. Připoj se k internetu a zkus to znovu.');
  entries.set(id,data);return data;
 }
 async function refreshClaims({force=false}={}){
  const owner=getProfile(),id=identity(),state=currentClaims();
  if(!owner?.id||!owner?.token)return state;
+ if(window.navigator?.onLine===false){state.status='unavailable';return state;}
  if(claimsFlight?.identity===id)return claimsFlight.promise;
  if(!force&&state.status==='ready')return state;
  state.status='loading';
@@ -74,7 +98,17 @@ function renderResult(g){
  }
  return true;
 }
-function configure(){return configuration||(configuration=api('/api/config',{timeoutMs:2000}).catch(()=>null));}
+function configure(){
+ return configuration||(configuration=(async()=>{
+  if(window.navigator?.onLine!==false){
+   try{const config=await api('/api/config',{timeoutMs:2000});if(typeof config?.archiveEnabled==='boolean')return config;}catch{}
+  }
+  // Only a previously successful public configuration can open the Archive.
+  // Cached content alone does not grant a release gate, and claims stay private.
+  const config=await offlineRead('getPublicConfig');
+  return typeof config?.archiveEnabled==='boolean'?config:null;
+ })());
+}
 
 function resultConfirmed(rec,receipt,owner){
  if(!rec?.archiveSolution)return;
@@ -268,5 +302,6 @@ async function onClick(e){
 }
 window.PropletArchiveExperience={configure,isEnabled:()=>installed,announcement,refreshClaims,resultConfirmed,renderResult,adoptGuest,install,home,free,placePlayExtra,screen,reward,beforeSubmit,hintUsed,prepareCompletion,postWin,isTarget,loadBank,start,renderArchive,closeModal};
 })();
+
 
 

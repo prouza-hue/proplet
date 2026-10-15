@@ -1,15 +1,14 @@
 <!doctype html>
-<html lang="cs" data-archive-preview>
+<html lang="cs">
 <head>
   <meta name="robots" content="noindex,nofollow">
-  <script src="/app/archive/preview-isolation.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#FDFBF7" data-light-color="#FDFBF7" />
   <meta name="color-scheme" content="light dark" />
   <script src="/referral-transport.js?v=16"></script>
-<script src="/runtime-meta.js?v=release40810" data-proplet-runtime-meta="1" data-loaded="1"></script>
-  <script src="/theme-init.js?v=profile-recovery1"></script>
+<script src="/runtime-meta.js?v=offline1" data-proplet-runtime-meta="1" data-loaded="1"></script>
+  <script src="/theme-init.js?v=offline1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -40,7 +39,7 @@
   <link rel="stylesheet" href="/styles.css?v=todaynews2" />
   <link rel="stylesheet" href="/in-app-browser-help.css?v=1" />
   <link rel="stylesheet" href="/quality-v334.css?v=4" />
-  <link rel="stylesheet" href="/organic-ui-v4023.css?v=uipolish1" />
+  <link rel="stylesheet" href="/organic-ui-v4023.css?v=offline1" />
   <link rel="stylesheet" href="/ribbon-ui.css?v=boardcontrast1" />
   <link rel="stylesheet" href="/printshop-ui.css?v=weekly3" />
   <link rel="stylesheet" href="/tajenka-rules.css?v=2">
@@ -245,8 +244,8 @@
       </div>
 
       <div id="installAppCard" class="card settings-card install-app-card hidden">
-        <div class="section-head"><div><span class="eyebrow">APLIKACE</span><h2>Proplet na plochu</h2></div><span class="install-mini-icon" aria-hidden="true">📲</span></div>
-        <p class="muted">Přidej si Proplet na telefon nebo počítač. Otevře se pak jako samostatná aplikace a k Daily se dostaneš jedním klepnutím.</p>
+        <div class="section-head"><div><h2>Hraj i bez internetu</h2></div><span class="install-mini-icon" aria-hidden="true">📲</span></div>
+        <p class="muted">Nainstaluj si Proplet. Volné desky i Archiv se připraví automaticky při prvním spuštění s připojením.</p>
         <button id="installAppBtn" class="secondary-btn">📲 Nainstalovat Proplet</button>
         <div id="installAppStatus" class="install-app-status muted"></div>
       </div>
@@ -435,8 +434,8 @@
   <div id="installNudgeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="installNudgeTitle" aria-describedby="installNudgeCopy">
     <div class="modal-card install-nudge-card reminder-card">
       <div class="reminder-art" aria-hidden="true"><img src="/brand/mark.svg?v=brand1" width="80" height="80" alt=""></div>
-      <h2 id="installNudgeTitle">Měj Proplet vždy po ruce</h2>
-      <p id="installNudgeCopy" class="muted">Přidej si ho na plochu a k Denní výzvě se dostaneš jedním klepnutím.</p>
+      <h2 id="installNudgeTitle">Chceš hrát i offline?</h2>
+      <p id="installNudgeCopy" class="muted">Nainstaluj si Proplet. Při prvním spuštění s internetem ti automaticky připraví volné desky i Archiv na hraní bez připojení.</p>
       <div id="installIosSteps" class="install-steps hidden">
         <div class="install-step"><b>1</b><span>Otevři v prohlížeči nabídku <strong>Sdílet</strong>.</span></div>
         <div class="install-step"><b>2</b><span>Zvol <strong>Přidat na plochu</strong> a potvrď.</span></div>
@@ -740,6 +739,8 @@
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="/app/offline.js?v=1"></script>
+  <link rel="stylesheet" href="/offline.css?v=1">
   <script src="/app/core/api-client.js?v=analytics2"></script>
   <script src="/app/analytics.js?v=usage20261008"></script>
   <script src="/app/core/storage.js"></script>
@@ -748,12 +749,12 @@
   <script src="/app/account/statistics.js?v=profile-recovery1"></script>
   <script src="/app/account/account.js?v=profile-recovery1"></script>
   <script src="/app/game/state.js?v=mkpilot4"></script>
-  <script src="/app/game/fair-play.js?v=usagep0"></script>
+  <script src="/app/game/fair-play.js?v=offline1"></script>
   <script src="/app/game/board.js?v=starterguide3"></script>
   <script src="/app/game/input.js?v=mk100"></script>
   <script src="/app/game/hints.js?v=boardintro2"></script>
   <script src="/app/core/completion-pipeline.js"></script>
-  <script src="/app/core/result-queue.js?v=archive-release1"></script>
+  <script src="/app/core/result-queue.js?v=offline1"></script>
   <script src="/app/engagement/onboarding.js?v=boardintro3"></script>
   <script src="/app/engagement/nudges.js?v=idleoffline1"></script>
   <link rel="stylesheet" href="/free-order.css?v=shared3">
@@ -778,8 +779,8 @@
   <script src="/app/content/refresh-release.js?v=archive-release1"></script>
   <script src="/app/client-diagnostics.js?v=2"></script>
   <script src="/app/archive/solution-contract.js"></script>
-  <script src="/app/archive/experience.js?v=weekly-live1"></script>
-  <script src="/app.js?v=profile-recovery1"></script>
+  <script src="/app/archive/experience.js?v=offline1"></script>
+  <script src="/app.js?v=offline1"></script>
   <script src="/app/weekly/competition.js?v=weekly-live1"></script>
   <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
@@ -792,6 +793,7 @@
 <script src="/referrals.js?v=archive-release1"></script>
 </body>
 </html>
+
 
 
 

@@ -3672,6 +3672,8 @@ def atomic_result_public_response(player_id: str, receipt: dict, *, include_stat
 
 @app.post("/api/result")
 def result(payload: ResultCreate, request: Request, authorization: Optional[str] = Header(default=None)):
+    if payload.timing_unverified and not ATOMIC_RESULT_V1_ENABLED:
+        raise HTTPException(503, "Offline výsledek čeká na bezpečné uložení. Zkusíme to znovu po připojení.")
     enforce_rate_limit(request, "result_network", limit=1200, window_seconds=3600)
     player = auth_player(authorization)
     effective_clean = bool(payload.clean_solve and payload.hints_used == 0)
@@ -3807,9 +3809,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
                             "specialPractice": special_context["practice"],
                             "specialPreviewDate": os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE") or None})
             command["commandDigest"] = result_domain.canonical_digest({key: value for key, value in command.items() if key != "commandDigest"})
-            receipt = result_domain.validate_receipt(db_atomic_result_rpc("proplet_submit_daily_special_v1", {
-                "p_player_id": command["playerId"], "p_idempotency_key": command["idempotencyKey"],
-                "p_request_digest": command["requestDigest"], "p_command_digest": command["commandDigest"], "p_command": command}))
+            receipt = result_domain.submit_atomic(command, db_atomic_result_rpc)
         else:
             receipt = result_domain.submit_atomic(command, db_atomic_result_rpc)
         logger.info(
@@ -5016,6 +5016,50 @@ def archive_catalogue(request: Request):
     return JSONResponse(archive_domain.catalogue(edition), headers={"Cache-Control": "private, no-store"})
 
 
+@lru_cache(maxsize=1)
+def offline_bank_version() -> str:
+    # Public immutable content only. Player identity, history and rewards never
+    # enter the shared offline package or its manifest.
+    # Static public assets are served by Vercel's CDN and need not be present
+    # inside a Python function. The canonical build manifest pins their bytes.
+    manifest = json.loads((ROOT / "content/generation-manifest.json").read_text())
+    digest = manifest.get("canonicalBuild", {}).get("output", {}).get("sha256", "")
+    if not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise HTTPException(503, "Příprava offline obsahu zatím není dostupná.")
+    public_bank = ROOT / "public/puzzles.json"
+    if public_bank.exists() and hashlib.sha256(public_bank.read_bytes()).hexdigest() != digest:
+        raise HTTPException(503, "Offline obsah čeká na ověření.")
+    return digest
+
+
+@app.get("/api/offline-manifest")
+def offline_manifest():
+    today = datetime.now(TZ).date()
+    monday = today - timedelta(days=today.weekday())
+    return JSONResponse({
+        "schemaVersion": 1,
+        "version": APP_VERSION,
+        "bankVersion": offline_bank_version(),
+        "archiveEnabled": archive_release_enabled(),
+        "archiveEdition": archive_domain.EDITION,
+        "archiveRevision": archive_domain.REVISION,
+        "rollingUrl": "/api/rolling-content?week=" + monday.isoformat(),
+        "rollingVersion": hashlib.sha256(json.dumps(released_rolling_payload(today), ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+    }, headers={"Cache-Control": "public, max-age=60, s-maxage=300"})
+
+
+@app.get("/api/archive/offline")
+def archive_offline(request: Request):
+    edition = require_archive()
+    # One validated bundle replaces 800 individual requests. No account/claims
+    # data, and no unpublished Daily content, is included.
+    enforce_rate_limit(request, "archive_offline", limit=30, window_seconds=3600)
+    return JSONResponse(archive_domain.offline_payload(edition), headers={
+        "Cache-Control": "public, max-age=3600, s-maxage=86400",
+        "ETag": '"' + edition["solutionPolicyRevision"] + '"',
+    })
+
+
 @app.get("/api/archive/puzzle")
 def archive_puzzle(request: Request, puzzle_id: str = Query(min_length=2, max_length=80)):
     edition = require_archive()
@@ -5368,7 +5412,7 @@ def leaderboard(
         if row.get("mode") == "daily" and str(row.get("daily_date") or "")[:10] == daily_date
     ]
     primary_daily_id = expected_daily_puzzle_id(daily_date)
-    daily_rows = [r for r in daily_rows if r["player_id"] in player_map and r.get("puzzle_id") == primary_daily_id]
+    daily_rows = [r for r in daily_rows if r["player_id"] in player_map and r.get("puzzle_id") == primary_daily_id and competitive_row(r)]
     daily_rows.sort(key=lambda r: (*run_rank_tuple(r), player_map[r["player_id"]]["name"].casefold()))
     daily_ranks = competition_ranks(daily_rows)
     daily = [
@@ -5463,3 +5507,4 @@ referral_domain.install(app, auth_player=auth_player, db_rpc=db_rpc, enforce_rat
 
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
+

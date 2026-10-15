@@ -182,7 +182,7 @@
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
     ['/app-profile-settings.css?v=privacyflow1','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=uipolish1','propletTypographyReadabilityV1Css'],
-    ['/brand-wordmark-fraunces.css?v=uipolish1','propletBrandWordmarkFrauncesCss'],
+    ['/brand-wordmark-fraunces.css?v=offline1','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=uipolish1','propletTajenkaReleaseFixCss'],
     ['/tajenka-card-polish.css?v=2','propletTajenkaCardPolishCss'],
     ['/game-release-polish.css?v=3','propletGameReleasePolishCss'],
@@ -228,7 +228,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=release40810','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=offline1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=home-stable1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
@@ -247,7 +247,7 @@
     await loadScript('/account-bonus-v3331.js?v=sessionrecovery1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=firststeps1-inappauth1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=privacyflow1','propletSettingsIaV40122');
-    loadScript('/settings-polish-v40122.js?v=settingssimple1','propletSettingsPolishV40122');
+    loadScript('/settings-polish-v40122.js?v=offline1','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=archive-release1','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=archive-layout2','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
@@ -274,4 +274,5 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
+
 

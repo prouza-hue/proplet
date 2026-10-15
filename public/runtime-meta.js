@@ -12,13 +12,14 @@
   const gen5CandidatePreview=previewHost&&(location.hostname.startsWith('proplet-git-feat-gen5-lab-')||new URLSearchParams(location.search).get('releasePreview')==='1');
   if(gen4CandidatePreview)document.documentElement?.classList?.add('gen4-preview-booting');
   const META=Object.freeze({
-    version:'4.08.10',
+    version:'4.09.0',
     environment:previewHost?'preview':'production',
     datedDailyCutover:'2026-10-08',
     canonicalOrigin,
     gen4CandidatePreview,
     gen5CandidatePreview,
     capabilities:Object.freeze({
+      automaticOfflinePlay:true,
       weeklyTeamVictories:true,
       optionalDailySpecials:true,
       phoneLandscapeBlocking:true,
@@ -190,6 +191,7 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',bootRuntimeExtras,{once:true});
   else bootRuntimeExtras();
 })();
+
 
 
 

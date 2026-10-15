@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&display=swap');
+@import url('/fonts/proplet-fonts.css?v=1');
 
 /* Proplet header wordmark — approved Fraunces direction. */
 html.tiskarna-ui body:not(.playing) .app-header .brand.home-brand .brand-copy,
@@ -52,3 +52,4 @@ html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy small{
   html.tiskarna-ui body:not(.playing) .app-header .brand .brand-copy strong,
   .legal-brand .legal-wordmark{font-size:31px!important}
 }
+
