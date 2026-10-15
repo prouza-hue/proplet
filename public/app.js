@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.0-offline3';
+const APP_PREVIEW_RELEASE='proplet-v4.09.0-offline4';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -239,6 +239,7 @@ const PROGRESS_GUARD_KEY='proplet-v4-01-4-progress-guard';
 const ANALYTICS_SESSION_KEY='proplet-analytics-session-v1';
 const PUSH_NUDGE_KEY='proplet-v3-8-2-push-nudge';
 const INSTALL_NUDGE_KEY='proplet-v3-26-install-nudge';
+const INSTALL_NUDGE_CAMPAIGN='offline-v1';
 const ANON_ID_KEY='proplet-v3-15-anonymous-id';
 const RESCUE_OFFER_KEY='proplet-v3-19-2-rescue-offer';
 const TAJENKA_STATE_KEY='proplet-tajenka-test-v1';
@@ -2241,7 +2242,16 @@ async function shareLevelDetail(){const c=levelDetailContext;if(!c)return;const 
 }
 function urlBase64ToUint8Array(base64String){const padding='='.repeat((4-base64String.length%4)%4),base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base64),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
 async function getPushRegistration(){if(!('serviceWorker' in navigator))throw new Error('Tento prohlížeč neumí oznámení PWA.');return navigator.serviceWorker.ready}
-function getInstallNudgeState(){try{return JSON.parse(localStorage.getItem(INSTALL_NUDGE_KEY)||'{}')}catch{return {}}}
+function getInstallNudgeState(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(INSTALL_NUDGE_KEY)||'{}'),st=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+  if(st.campaign===INSTALL_NUDGE_CAMPAIGN)return st;
+  // A new benefit earns a fresh offer, while accepted/installed apps stay opted out.
+  const next=st.installed||st.accepted||st.iosHintSeen?{...st,campaign:INSTALL_NUDGE_CAMPAIGN}:{campaign:INSTALL_NUDGE_CAMPAIGN,shown:0,declines:0};
+  try{saveInstallNudgeState(next)}catch{}
+  return next;
+ }catch{return {}}
+}
 function saveInstallNudgeState(v){localStorage.setItem(INSTALL_NUDGE_KEY,JSON.stringify(v))}
 function isIosDevice(){if(typeof navigator==='undefined')return false;return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
 function isStandaloneApp(){if(typeof window==='undefined')return false;return window.matchMedia?.('(display-mode: standalone)')?.matches===true||window.navigator?.standalone===true}

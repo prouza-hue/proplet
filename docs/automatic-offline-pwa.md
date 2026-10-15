@@ -11,6 +11,8 @@ Implementation candidate 4.09.0, based on production/main
 - The install offer says **Chceš hrát i offline?** and explains that the app needs its first connected launch to prepare content. Readiness is displayed only after the content, current shell and account snapshot are complete.
 - Future Daily/Extra boards are not downloaded. An already cached Daily can use its existing validity rules. Official Extra requires a connection; a connection loss preserves all found words until a finished play-session receipt is confirmed. Existing date/practice rules still apply.
 
+The `offline-v1` install campaign resets former dismissals once per browser. Existing accepted installations and acknowledged iOS instructions stay excluded. The offer retains a seven-day cooldown after the first decline and stops after the second decline in this campaign. The campaign marker prevents subsequent launches from resetting the count again.
+
 ## Content and storage
 
 Public content uses a versioned candidate Cache API store. A single index write commits a fully checked pack; failed transfer, hash validation, quota write or shell validation preserves the previous pack. Personal account history and queues retain their separate account-scoped stores and never enter public caches.
