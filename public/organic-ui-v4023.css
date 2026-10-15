@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('/fonts/proplet-fonts.css?v=1');
 /* Proplet warm-paper UI refactor — visual-only layer. Core gameplay/audio/haptics untouched. */
 :root{
   --bg:#FDFBF7;
@@ -459,3 +459,4 @@ html:not([data-theme="dark"]) .bottom-nav button.active svg{stroke:currentColor!
 .starter-returning-actions button:focus-visible{outline:3px solid #d78c26;outline-offset:2px}
 html[data-theme="dark"] .starter-returning-actions button{background:#30294d;color:#f5edff;border-color:#a99acb}
 html[data-theme="dark"] .starter-returning-actions .onboarding-return-login{background:#c7b1f1;color:#281b3f}
+

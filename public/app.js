@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.08.10-profile-recovery1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.0-offline4';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -239,6 +239,7 @@ const PROGRESS_GUARD_KEY='proplet-v4-01-4-progress-guard';
 const ANALYTICS_SESSION_KEY='proplet-analytics-session-v1';
 const PUSH_NUDGE_KEY='proplet-v3-8-2-push-nudge';
 const INSTALL_NUDGE_KEY='proplet-v3-26-install-nudge';
+const INSTALL_NUDGE_CAMPAIGN='offline-v1';
 const ANON_ID_KEY='proplet-v3-15-anonymous-id';
 const RESCUE_OFFER_KEY='proplet-v3-19-2-rescue-offer';
 const TAJENKA_STATE_KEY='proplet-tajenka-test-v1';
@@ -450,7 +451,7 @@ function accountProgressAvailable(){
 function renderAccountProgressStatus(){
  const blocked=!accountProgressAvailable(),p=getProfile();
  // A verified local history stays playable while it refreshes silently.
- const showNotice=blocked||accountProgressAuthRequired||(accountProgressError&&hasCachedAccountProgress(p));
+ const showNotice=blocked||(navigator.onLine!==false&&(accountProgressAuthRequired||(accountProgressError&&hasCachedAccountProgress(p))));
  if(document.body.classList.contains('account-progress-pending')!==blocked)document.body.classList.toggle('account-progress-pending',blocked);
  for(const selector of ['#quickPlayCard','#difficultyCards','#tajenkaPreviewCard','#tajenkaPlayCard','#newContentBanner','#todayNewContentBanner','#screen-daily .daily-hero']){
   const element=$(selector);if(element){if(element.inert!==blocked)element.inert=blocked;if(element.getAttribute('aria-busy')!==String(blocked))element.setAttribute('aria-busy',String(blocked))}
@@ -477,6 +478,7 @@ function accountSession(){
  accountSessionController=factory.create({storage:localStorage,profileKey:PROFILE_KEY,adoptGuestData,onChange:(next,previous)=>{
   if(next?.id!==previous?.id||next?.token!==previous?.token||next?.familyCode!==previous?.familyCode)document.dispatchEvent(new CustomEvent('proplet:account-changed'));
   if(next?.id===previous?.id&&next?.token===previous?.token)return;
+  if(next?.id&&next.id===previous?.id&&next.token&&next.token!==previous?.token)resultQueue(next,next.id)?.resetAuthRetry?.();
   accountProgressReady=null;accountProgressError=false;accountProgressAuthRequired=false;
   if(typeof puzzleDB!=='undefined'&&puzzleDB){renderAccountProgressStatus();if(next?.token)queueMicrotask(()=>refreshRemoteProfile());else{renderDaily();renderFree()}}
  }});return accountSessionController;
@@ -514,14 +516,14 @@ function validSupportMode(mode){return Object.prototype.hasOwnProperty.call(SUPP
 function localSupportMode(){try{const mode=localStorage.getItem(SUPPORT_MODE_KEY);return validSupportMode(mode)?mode:null}catch{return null}}
 function rememberSupportMode(mode){if(validSupportMode(mode))try{localStorage.setItem(SUPPORT_MODE_KEY,mode)}catch{}}
 function getQueue(scope=playerScope()){const core=scopedStorage();if(core)return core.readQueue(QUEUE_KEY,scope);try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY,scope))||'[]')}catch{return []}}
-function saveQueue(q,scope=playerScope()){const core=scopedStorage();if(core)return core.writeQueue(QUEUE_KEY,q,scope);localStorage.setItem(scopedStorageKey(QUEUE_KEY,scope),JSON.stringify(q))}
-function queuedResultPayload(r){return {puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null,calm_mode:r.calmMode===true,...(r.mode==='daily_special'?{content_hash:r.contentHash||null}:{}),...(r.archiveSolution?{archive_solution:r.archiveSolution}:{})}}
+function saveQueue(q,scope=playerScope()){const core=scopedStorage();const saved=core?core.writeQueue(QUEUE_KEY,q,scope):localStorage.setItem(scopedStorageKey(QUEUE_KEY,scope),JSON.stringify(q));document.dispatchEvent(new CustomEvent('proplet:queue-changed'));return saved}
+function queuedResultPayload(r){return {puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null,calm_mode:r.calmMode===true,timing_unverified:r.timingUnverified===true,...(r.mode==='daily_special'?{content_hash:r.contentHash||null}:{}),...(r.archiveSolution?{archive_solution:r.archiveSolution}:{})}}
 function resultQueue(profile=getProfile(),scope=profile?.id||playerScope()){
  const identity=`${scope}:${profile?.token||''}`;if(resultQueueController&&resultQueueControllerIdentity===identity)return resultQueueController;
  const factory=window.PropletResultQueue;
  if(!factory?.create)return null;
  resultQueueControllerIdentity=identity;
- resultQueueController=factory.create({getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}).then(receipt=>{try{window.PropletTeamVictories?.resultConfirmed(r,receipt,profile)}catch{}window.PropletArchiveExperience?.resultConfirmed(r,receipt,profile);return receipt}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
+ resultQueueController=factory.create({isActive:()=>accountProfileMatches(profile),getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}).then(receipt=>{try{window.PropletTeamVictories?.resultConfirmed(r,receipt,profile)}catch{}window.PropletArchiveExperience?.resultConfirmed(r,receipt,profile);return receipt}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
  return resultQueueController;
 }
 function quarantineRejectedResult(row,reason,scope=playerScope()){
@@ -986,6 +988,7 @@ function freshStarterVisit(){
 }
 let gameLaunchSequence=0;
 async function startGame(puzzle,mode,dailyDate,options={}){
+ if(mode==='daily_special'&&navigator.onLine===false&&puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false){showToast('Extra výzva potřebuje připojení. Offline si můžeš zahrát volnou hru nebo Archiv.');return}
  if(mode==='daily_special'){
   const binding=puzzle?.meta?.dailySpecialBinding;
   if(!binding||binding.dailyDate!==dailyDate||!binding.contentHash){showToast('Vazbu speciálu se nepodařilo ověřit. Načti ho prosím znovu.');return false}
@@ -1191,6 +1194,7 @@ async function finishTajenkaGame(g){
 }
 async function finishGame(){
  if(!currentGame||currentGame.finished||currentGame.finishing)return;
+ if(currentGame.mode==='daily_special'&&currentGame.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false&&navigator.onLine===false){saveGameProgress();message('Všechna slova jsou uložená. Dokončení Extra výzvy potvrdíme po připojení.');return}
  currentGame.finishing=true;
  const finishing=currentGame;
  if(finishing.mode==='playtest')return window.PropletPlaytest.finish(finishing);
@@ -1203,10 +1207,14 @@ async function finishGame(){
   if(currentGame!==finishing)return;
   finishing.puzzle=practice.puzzle;finishing.attemptId=prepared.restored?.attemptId||restored.attemptId;finishing.fairPlay=!!prepared.fairPlay;finishing.timingUnverified=true;
  }
+ let finishReceipt=null;
  if(finishing.fairPlay){
   finishing.elapsedMs=gameElapsed(finishing);finishing.baseElapsedMs=finishing.elapsedMs;finishing.start=performance.now();finishing.pausedAt=finishing.start;
-  stopTimer();await fairPlay().finish(finishing);
+  stopTimer();finishReceipt=await fairPlay().finish(finishing);
   if(currentGame!==finishing)return;
+ }
+ if(finishing.mode==='daily_special'&&finishing.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false&&finishReceipt?.finished!==true){
+  finishing.finishing=false;saveGameProgress();message('Všechna slova jsou uložená. Ještě čekám na potvrzení Extra výzvy ze serveru.');return;
  }
  const g=currentGame,completion={game:g,data:Object.create(null)};await runGameCompletionHooks('before',completion);if(g?.puzzle?.meta?.archiveExperience)globalThis.PropletArchiveExperience.prepareCompletion(g);if(g?.mode==='starter'){const out=await finishStarterGame(g);await runGameCompletionHooks('after',completion);return out}if(g?.mode==='tajenka'){const out=await finishTajenkaGame(g);await runGameCompletionHooks('after',completion);return out}postWinEngagementNudgeShown=false;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];$('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);if(g.puzzle?.meta?.archiveExperience&&(currentGame!==g||g.archiveScope!==playerScope()))return;const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
  const dailyGenerationUpgrade=g.mode==='daily'&&!!old&&old.puzzleId!==g.puzzle.id;
@@ -1393,7 +1401,7 @@ function completionPipeline(){
 function registerGameCompletionHook(hook){const pipeline=completionPipeline();return pipeline?pipeline.register(hook):false}
 async function runGameCompletionHooks(phase,context){const pipeline=completionPipeline();if(!pipeline)return;if(phase==='before')return pipeline.runBefore(context);return pipeline.runAfter(context)}
 function renderTimingStatus(g){
- const unverified=!!g&&(g.mode==='daily'||(g.mode==='daily_special'&&(g.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false||g.resultRecord?.challengeKey?.startsWith('daily-special:'))))&&(g.timingUnverified===true||g.timingVerified===false);
+ const unverified=!!g&&['daily','daily_special','free'].includes(g.mode)&&(g.timingUnverified===true||g.timingVerified===false);
  if($('#gameTimingNotice'))$('#gameTimingNotice').hidden=!unverified;
  if($('#winTimingNotice'))$('#winTimingNotice').hidden=!unverified;
 }
@@ -1515,6 +1523,7 @@ function trackAppSession(){
 }
 
 async function syncQueue({announce=false,waitForProfile=true}={}){
+ if(navigator.onLine===false){renderOfflineStatus();return {ok:false,left:getQueue().length,offline:true,error:'Výsledky odešleme po připojení.'}}
  if(await claimTelemetryAfterAuth()===false)return {ok:false,left:getQueue().length,error:"Převod postupu čeká na spojení se serverem."};
  if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||(window.PROPLET_RUNTIME_ENV==='preview'&&!window.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW&&!window.PROPLET_ARCHIVE_PREVIEW)||new URLSearchParams(location.search).get('tutorial')==='1'){if(getProfile()?.token)await refreshRemoteProfile();syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
@@ -2233,7 +2242,16 @@ async function shareLevelDetail(){const c=levelDetailContext;if(!c)return;const 
 }
 function urlBase64ToUint8Array(base64String){const padding='='.repeat((4-base64String.length%4)%4),base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base64),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
 async function getPushRegistration(){if(!('serviceWorker' in navigator))throw new Error('Tento prohlížeč neumí oznámení PWA.');return navigator.serviceWorker.ready}
-function getInstallNudgeState(){try{return JSON.parse(localStorage.getItem(INSTALL_NUDGE_KEY)||'{}')}catch{return {}}}
+function getInstallNudgeState(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(INSTALL_NUDGE_KEY)||'{}'),st=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+  if(st.campaign===INSTALL_NUDGE_CAMPAIGN)return st;
+  // A new benefit earns a fresh offer, while accepted/installed apps stay opted out.
+  const next=st.installed||st.accepted||st.iosHintSeen?{...st,campaign:INSTALL_NUDGE_CAMPAIGN}:{campaign:INSTALL_NUDGE_CAMPAIGN,shown:0,declines:0};
+  try{saveInstallNudgeState(next)}catch{}
+  return next;
+ }catch{return {}}
+}
 function saveInstallNudgeState(v){localStorage.setItem(INSTALL_NUDGE_KEY,JSON.stringify(v))}
 function isIosDevice(){if(typeof navigator==='undefined')return false;return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
 function isStandaloneApp(){if(typeof window==='undefined')return false;return window.matchMedia?.('(display-mode: standalone)')?.matches===true||window.navigator?.standalone===true}
@@ -2246,16 +2264,16 @@ function renderInstallUI(){
  btn.disabled=false;
  if(ios&&!getProfile()?.token){btn.textContent='☁️ Nejdřív uložit postup';status.textContent='Na iPhonu je bezpečnější přidat Proplet na plochu až po uložení postupu do účtu.';return}
  btn.textContent=ios?'📲 Přidat Proplet na plochu':'📲 Nainstalovat Proplet';
- status.textContent=ios?'Otevře se pak jako samostatná aplikace. Kdyby se po prvním spuštění zeptal, přihlas se stejným účtem.':'Otevře se jako běžná aplikace bez adresního řádku a zůstane po ruce na ploše.';
+ status.textContent=ios?'Otevře se pak jako samostatná aplikace. Kdyby se po prvním spuštění zeptal, přihlas se stejným účtem.':'Po instalaci ho jednou otevři s internetem. Až uvidíš „Připraveno na hraní offline“, můžeš hrát i bez připojení.';
 }
 function renderInstallModal(source='daily'){
  const ios=isIosDevice();
- $('#installNudgeTitle').textContent='Proplet na jedno klepnutí';
- $('#installNudgeCopy').textContent='Přidej si ho na plochu a hraj rovnou.';
+ $('#installNudgeTitle').textContent='Chceš hrát i offline?';
+ $('#installNudgeCopy').textContent='Nainstaluj si Proplet. Při prvním spuštění s internetem ti automaticky připraví volné desky i Archiv na hraní bez připojení.';
  $('#installIosSteps').classList.toggle('hidden',!ios);
  $('#installNudgeNote').classList.add('hidden');
  $('#installNudgeNote').textContent='';
- const primary=$('#installNudgePrimary');primary.textContent=ios?'Rozumím':'Přidat na plochu';primary.disabled=false;
+ const primary=$('#installNudgePrimary');primary.textContent=ios?'Rozumím':'Nainstalovat Proplet';primary.disabled=false;
 }
 
 function shouldOfferInstallNudge(source='daily'){
@@ -2294,6 +2312,47 @@ function openInstallFromProfile(){
  if(isIosDevice()&&!getProfile()?.token){openProfileModal('create');return}
  if(!installOfferAvailable()){showToast('Instalaci teď tento prohlížeč nenabízí.');return}
  installModalManual=true;pendingInstallPostWinAction=null;trackProductEvent('pwa_install_profile_opened');renderInstallModal('profile');$('#installNudgeModal').classList.remove('hidden');
+}
+
+// Explicit review link: show the real offer without changing install eligibility or cooldowns.
+function openInstallPreview(){
+ if(window.PROPLET_RUNTIME_META?.environment!=='preview'||new URLSearchParams(location.search).get('review')!=='install')return false;
+ transientModals().forEach(modal=>modal.classList.add('hidden'));
+ installModalManual=true;pendingInstallPostWinAction=null;renderInstallModal('preview');
+ $('#installNudgeModal').classList.remove('hidden');$('#installNudgePrimary').focus();return true;
+}
+
+function renderOfflineStatus(value=window.PropletOffline?.getState?.()){
+ if(!value)return;
+ const installed=isStandaloneApp()||(window.PROPLET_RUNTIME_META?.environment==='preview'&&new URLSearchParams(location.search).get('offline-preview')==='1');
+ let strip=$('#offlineConnectionStatus');
+ if(!strip){strip=document.createElement('div');strip.id='offlineConnectionStatus';strip.className='offline-connection-status';strip.setAttribute('role','status');strip.setAttribute('aria-live','polite');$('.app-header')?.after(strip);}
+ const pending=getQueue().length,offline=navigator.onLine===false;
+ const pendingText=getProfile()?.token?`${countCz(pending,'výsledek čeká','výsledky čekají','výsledků čeká')} na odeslání`:`${countCz(pending,'výsledek uložený','výsledky uložené','výsledků uložených')} v tomto zařízení`;
+ const count=pending?' · '+pendingText:'';
+ const text=offline?`Offline${count}`:value.preparing?'Připravuji hraní offline…':pending?pendingText:'';
+ strip.textContent=text;strip.hidden=!text||(!installed&&!offline&&!pending);
+ let note=$('#offlineAvailability');
+ if(!note){note=document.createElement('div');note.id='offlineAvailability';note.className='card settings-card offline-availability';$('#installAppCard')?.after(note);}
+ note.hidden=!installed;
+ if(!installed)return;
+ const label=value.ready?'Připraveno na hraní offline':value.preparing?'Připravuji volné desky a Archiv…':value.contentReady?'Desky jsou stažené. Ještě ověřuji připravenost hry.':offline?'Offline obsah zatím není připravený. Otevři Proplet s připojením.':'Příprava offline hraní se nedokončila.';
+ note.replaceChildren();const heading=document.createElement('strong');heading.textContent=label;note.append(heading);
+ const detail=document.createElement('span');detail.textContent=value.ready?'Volná hra i Archiv fungují bez internetu. Výsledky odešleme po připojení.':'Příprava probíhá automaticky při připojení k internetu.';note.append(detail);
+ if(!offline&&!value.preparing&&!value.ready){const retry=document.createElement('button');retry.className='text-btn';retry.type='button';retry.textContent='Zkusit znovu';retry.onclick=()=>window.PropletOffline?.prepare?.({force:true});note.append(retry);}
+}
+function installOfflineSupport(){
+ window.PropletOffline?.install?.({
+  isInstalled:()=>isStandaloneApp()||(window.PROPLET_RUNTIME_META?.environment==='preview'&&new URLSearchParams(location.search).get('offline-preview')==='1'),
+  getProfile,hasCachedProgress:hasCachedAccountProgress,getPendingCount:()=>getQueue().length,onChange:renderOfflineStatus,
+ });
+ window.addEventListener('offline',()=>{
+  const g=currentGame;if(g&&!g.finished){g.timingUnverified=true;renderTimingStatus(g);saveGameProgress();}
+  renderOfflineStatus();
+ });
+ window.addEventListener('online',()=>{const g=currentGame;if(g?.mode==='daily_special'&&!g.finished&&g.found?.length===g.puzzle?.answers?.length)fairPlay().resume(g).then(row=>{if(row&&currentGame===g)finishGame()}).catch(()=>{});});
+ document.addEventListener('proplet:queue-changed',()=>renderOfflineStatus());
+ renderOfflineStatus();
 }
 function getPushNudgeState(){try{return JSON.parse(localStorage.getItem(PUSH_NUDGE_KEY)||'{}')}catch{return {}}}
 function savePushNudgeState(v){localStorage.setItem(PUSH_NUDGE_KEY,JSON.stringify(v))}
@@ -2526,6 +2585,7 @@ function showPuzzleBootLoading(){
  const grid=$('#difficultyCards');if(grid&&!grid.children.length)grid.innerHTML='<div class="card" style="grid-column:1/-1;padding:24px"><strong>Načítám úrovně…</strong><p class="muted" style="margin:6px 0 0">Připravuju herní banku.</p></div>';
 }
 async function loadPuzzleDatabase(){
+ if(navigator.onLine===false){const cached=await window.PropletOffline?.getPuzzleDatabase?.();if(compatiblePuzzleDatabase(cached))return cached;}
  let url='/puzzles.json';
  GEN4_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
  GEN5_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen5CandidatePreview===true;
@@ -2598,7 +2658,7 @@ async function boot(){
  await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
  await loadTajenkaFixture();
  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{if(!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));openSpecialInvitation().catch(()=>{})},80);
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{const installPreview=openInstallPreview();if(!installPreview&&!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));if(!installPreview)openSpecialInvitation().catch(()=>{})},80);
  const refreshDailyAfterResume=()=>Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]).then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});
@@ -2608,7 +2668,7 @@ async function boot(){
  window.addEventListener('pageshow',refreshFreeOrderAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshFreeOrderAfterResume()});
  window.addEventListener('storage',()=>{renderFree();renderQuickPlay();if(currentScreen!=='game'){renderDaily();renderProfile()}});
- registerServiceWorker();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
+ registerServiceWorker();installOfflineSupport();setTimeout(updatePushUI,700);setTimeout(maybeOpenQaDashboard,900);
  let lastKnownDate=pragueDateISO();setInterval(()=>{const now=pragueDateISO();if(now!==lastKnownDate){lastKnownDate=now;refreshDailyAfterResume();refreshRollingContent().catch(()=>{});loadTajenkaFixture().finally(renderTajenkaEntry)}if(navigator.onLine){productAnalytics()?.flush();if(getQueue().length)syncQueue({announce:false})}},60000);
 }
 function installEngagementModules(){
@@ -2623,5 +2683,6 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+
 
 

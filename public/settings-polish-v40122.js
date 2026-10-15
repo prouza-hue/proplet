@@ -50,10 +50,10 @@
   function polishInstallCard(){
     const card=q('#installAppCard');if(!card)return;
     q('.section-head .eyebrow',card)?.remove();
-    setText(q('.section-head h2',card),'Aplikace Proplet');
-    setText(q(':scope>p.muted',card),'Nainstaluj si Proplet na plochu telefonu nebo počítače jako aplikaci. Budeš ho mít vždycky snadno po ruce.');
+    setText(q('.section-head h2',card),'Hraj i bez internetu');
+    setText(q(':scope>p.muted',card),'Nainstaluj si Proplet. Volné desky i Archiv se připraví automaticky při prvním spuštění s připojením.');
     const status=q('#installAppStatus',card),text=(status?.textContent||'').trim();
-    const redundant=/^(Otevře se jako|Přidej si Proplet|Po instalaci|Budeš ho mít)/i.test(text);
+    const redundant=/^(Otevře se jako|Přidej si Proplet|Budeš ho mít)/i.test(text);
     status?.classList.toggle('settings-install-status-redundant',redundant);
   }
 
@@ -69,3 +69,4 @@
   const boot=()=>{ensure();setTimeout(ensure,120);setTimeout(ensure,500)};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
+

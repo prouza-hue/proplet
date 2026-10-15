@@ -17,6 +17,9 @@ from fastapi import HTTPException
 
 CONTRACT_VERSION = 1
 RPC_NAME = "proplet_submit_result_v1"
+SPECIAL_RPC_NAME = "proplet_submit_daily_special_v1"
+OFFLINE_RPC_NAME = "proplet_submit_offline_result_v1"
+OFFLINE_SPECIAL_RPC_NAME = "proplet_submit_offline_daily_special_v1"
 RECEIPT_PUBLIC_FIELDS = (
     "firstCompletion",
     "awardedPoints",
@@ -88,6 +91,10 @@ def canonical_request(payload: Any) -> dict[str, Any]:
     # every pre-Archive retry digest (including an explicit null field).
     if value.get("archive_solution") is not None:
         request["archive_solution"] = value["archive_solution"]
+    # Absent/false keeps every previously queued identity byte-for-byte. True
+    # is immutable evidence of lower trust and cannot share an online digest.
+    if value.get("timing_unverified") is True:
+        request["timing_unverified"] = True
     return request
 
 
@@ -174,6 +181,8 @@ def build_command(
         "legacyRewardSlot": legacy_reward_slot,
         "teamCodeAtCompletion": team_code_at_completion,
     }
+    if getattr(payload, "timing_unverified", False) is True:
+        command["timingUnverified"] = True
     command["commandDigest"] = canonical_digest(command)
     return command
 
@@ -204,13 +213,22 @@ def validate_receipt(value: Any) -> dict[str, Any]:
 
 
 def submit_atomic(command: dict[str, Any], rpc_fn: Callable[[str, dict], Any]) -> dict[str, Any]:
-    raw = rpc_fn(RPC_NAME, {
-        "p_player_id": command["playerId"],
-        "p_idempotency_key": command["idempotencyKey"],
-        "p_request_digest": command["requestDigest"],
-        "p_command_digest": command["commandDigest"],
-        "p_command": command,
-    })
+    special = command.get("mode") == "daily_special"
+    if command.get("timingUnverified") is True:
+        # This new entry point exists only with the timing-safe migration.
+        # Never fall back to the older writer, which silently ignores trust.
+        routine = OFFLINE_SPECIAL_RPC_NAME if special else OFFLINE_RPC_NAME
+        body = {"p_command": command}
+    else:
+        routine = SPECIAL_RPC_NAME if special else RPC_NAME
+        body = {
+            "p_player_id": command["playerId"],
+            "p_idempotency_key": command["idempotencyKey"],
+            "p_request_digest": command["requestDigest"],
+            "p_command_digest": command["commandDigest"],
+            "p_command": command,
+        }
+    raw = rpc_fn(routine, body)
     if isinstance(raw, list):
         raw = raw[0] if raw else None
     return validate_receipt(raw)
@@ -228,3 +246,4 @@ def public_response(receipt: dict[str, Any], stats: Any, stats_warning: Optional
         "stats": stats,
         "statsWarning": stats_warning,
     }
+

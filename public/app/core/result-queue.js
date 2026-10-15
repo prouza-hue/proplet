@@ -20,6 +20,7 @@
     const write = typeof options.saveQueue === 'function' ? options.saveQueue : () => {};
     const post = typeof options.post === 'function' ? options.post : async () => {};
     const quarantine = typeof options.quarantine === 'function' ? options.quarantine : () => false;
+    const isActive = typeof options.isActive === 'function' ? options.isActive : () => true;
     let syncPromise = null;
     const now = options.now || (() => Date.now());
     const readRetry = options.getRetry || (() => null);
@@ -67,6 +68,15 @@
 
     function current() { return normalize(); }
 
+    // A renewed session should not inherit the wait caused by its expired
+    // predecessor. Keep rate-limit/server backoff, and never persist tokens.
+    function resetAuthRetry() {
+      retry = readRetry() || retry;
+      if (Number(retry.status) !== 401) return false;
+      retry = {}; writeRetry(retry);
+      return true;
+    }
+
     function sync() {
       if (syncPromise) return syncPromise;
       retry = readRetry() || retry;
@@ -78,14 +88,19 @@
         let sent = 0;
         let quarantined = 0;
         let firstError = null;
+        let stale = false;
         for (const item of snapshot) {
+          if (!isActive()) { stale = true; break; }
           const itemId = id(item);
           try {
             await post(item);
             confirmed.add(itemId);
             sent++;
-            retry = {}; writeRetry(retry);
+            if (isActive()) { retry = {}; writeRetry(retry); }
           } catch (error) {
+            // The response belongs to the captured session. Do not let its
+            // late 401 overwrite backoff belonging to a renewed session.
+            if (!isActive()) { stale = true; break; }
             if (Number(error?.status) === 400 && error?.message === 'Neznámá úloha' && quarantine(item, error.message)) {
               confirmed.add(itemId);
               quarantined++;
@@ -95,7 +110,7 @@
               if (!error?.status || Number(error.status) === 429 || Number(error.status) >= 500 || Number(error.status) === 401) {
                 const failures = Math.min(7, (Number(retry.failures) || 0) + 1);
                 const delay = Math.max(Number(error.retryAfterMs) || 0, Math.min(3600000, 60000 * 2 ** (failures - 1)));
-                retry = {failures, until:now() + delay}; writeRetry(retry);
+                retry = {failures, until:now() + delay, status:Number(error.status) || 0}; writeRetry(retry);
                 break;
               }
             }
@@ -112,6 +127,7 @@
           left: remaining.length,
           sent,
           quarantined,
+          ...(stale ? {stale:true} : {}),
           error: firstError,
           failedKeys: [...failedKeys],
         };
@@ -120,10 +136,11 @@
       return syncPromise;
     }
 
-    return {enqueue, getQueue: current, sync, isSyncing: () => !!syncPromise};
+    return {enqueue, getQueue: current, sync, resetAuthRetry, isSyncing: () => !!syncPromise};
   }
 
   const api = {create, legacyId};
   if (global) global.PropletResultQueue = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : globalThis);
+

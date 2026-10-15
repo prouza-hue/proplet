@@ -2,6 +2,7 @@
 'use strict';
 function create(deps){
  const owner=deps.owner||global.crypto.randomUUID();
+ const online=()=>typeof deps.isOnline==='function'?deps.isOnline()!==false:global.navigator?.onLine!==false;
  let sequence=0,configPromise=null,active=null,chain=Promise.resolve(),timer=null,heartbeatMs=25000;
  const rememberConfig=value=>{const configured=Number(value?.heartbeatMs);if(configured>=10000&&configured<=30000)heartbeatMs=configured;return value};
  const config=()=>configPromise||(configPromise=deps.api('/api/play-session/config',{timeoutMs:2000}).then(value=>{global.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=value.isolatedPreview===true;try{global.localStorage?.setItem('proplet:fair-play-config',JSON.stringify(value))}catch{}return rememberConfig(value)}).catch(()=>{configPromise=null;try{return rememberConfig(JSON.parse(global.localStorage?.getItem('proplet:fair-play-config')||'{}'))}catch{return {enabled:false}}}));
@@ -10,6 +11,7 @@ function create(deps){
  function stop(){if(timer!=null){deps.clearInterval(timer);timer=null}}
  function send(g,action){
    if(!g?.fairPlay)return Promise.resolve(null);
+   if(!online()){g.timingUnverified=true;deps.status?.(g);return Promise.resolve(null)}
    const body=command(g,action,snapshot(g)),profile=deps.profile();
    const operation=()=>deps.api('/api/play-session',{method:'POST',body:JSON.stringify(body),authProfile:profile,keepalive:action==='pause'});
    const work=chain.then(operation,operation);chain=work.catch(()=>{});
@@ -22,7 +24,11 @@ function create(deps){
    });
  }
  async function prepare(puzzle,mode,dailyDate,restored){
-   if(!['daily','daily_special','free','tajenka'].includes(mode)||(await config()).enabled!==true)return {restored};
+   if(!['daily','daily_special','free','tajenka'].includes(mode))return {restored};
+   // A first offline launch may have no cached server policy at all. Keep the
+   // local attempt playable, but never manufacture verified competitive time.
+   if(!online())return {restored:{...restored,timingUnverified:true},fairPlay:false};
+   if((await config()).enabled!==true)return {restored};
    const g={puzzle,mode,dailyDate,...restored,found:restored?.found||[],attemptId:restored?.attemptId||global.crypto.randomUUID(),fairPlay:true,timingUnverified:restored?.timingUnverified};
    const progress={...snapshot(g),elapsedMs:restored?.elapsedMs||0};
    try{
@@ -31,7 +37,7 @@ function create(deps){
      const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile});
      const practice=mode==='daily_special'&&puzzle?.meta?.dailySpecialBinding?.rewardEligible===false;
      if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)))return {restored:null,fairPlay:false,replay:true};
-     return {restored:{...restored,...row.progress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,timingUnverified:row.verified===false},fairPlay:true};
+     return {restored:{...restored,...row.progress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,timingUnverified:!!restored?.timingUnverified||row.verified===false},fairPlay:true};
    }catch(error){
      if(error.status===409)throw error;
      return {restored:{...restored,timingUnverified:true,attemptId:g.attemptId},fairPlay:true};
@@ -59,3 +65,4 @@ function create(deps){
 }
 const api={create};if(global)global.PropletFairPlay=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
+

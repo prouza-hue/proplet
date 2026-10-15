@@ -151,3 +151,65 @@ def catalogue(edition: dict) -> dict:
     return {key: edition[key] for key in ("editionId", "solutionPolicyRevision", "completeCovers")} | {
         "boards": [{"puzzleId": row["puzzle"]["id"], **{key: row[key] for key in
                     ("level", "difficulty", "rewardXp", "rewardSlotKey")}} for row in edition["boards"]]}
+
+
+
+def offline_payload(edition: dict) -> dict:
+    """Public, finite Archive download; personal reward claims never enter it.
+
+    ``load_edition`` verifies the original bytes and the editorial allowlist.
+    Bind the aggregate to that edition again before publishing it so an
+    incomplete/mixed download can never be advertised as offline ready.
+    """
+    if (edition.get("editionId") != EDITION
+            or edition.get("solutionPolicyRevision") != REVISION
+            or edition.get("completeCovers") != 879):
+        raise ValueError("archive-offline-revision-mismatch")
+    rows = edition.get("boards")
+    if (not isinstance(rows, list) or len(rows) != 800
+            or Counter(row.get("difficulty") for row in rows) != Counter({key: 200 for key in REWARDS})):
+        raise ValueError("archive-offline-count-mismatch")
+    entries, ids, slots, covers = [], set(), set(), 0
+    for row in rows:
+        puzzle, solutions = row["puzzle"], row["solutions"]
+        puzzle_id, difficulty, level = puzzle["id"], row["difficulty"], row["level"]
+        reward_slot = f"legacy-free:{difficulty}:{level}"
+        if (type(level) is not int or not 1 <= level <= 200
+                or puzzle_id in ids or reward_slot in slots
+                or puzzle.get("difficulty") != difficulty
+                or puzzle.get("meta", {}).get("contentGeneration") != 3
+                or puzzle.get("meta", {}).get("level") != level
+                or row.get("rewardSlotKey") != reward_slot
+                or row.get("rewardXp") != REWARDS[difficulty]
+                or solutions.get("puzzleId") != puzzle_id
+                or solutions.get("gameplayScope") != "archive"
+                or solutions.get("solutionPolicyRevision") != REVISION):
+            raise ValueError("archive-offline-entry-mismatch")
+        solution_sets = solutions.get("solutionSets")
+        if not isinstance(solution_sets, list) or not solution_sets:
+            raise ValueError("archive-offline-solutions-required")
+        if cover_key(solution_sets[0]) != cover_key(puzzle["answers"]):
+            raise ValueError("archive-offline-canonical-mismatch")
+        seen = set()
+        for cover in solution_sets:
+            validate_cover(puzzle, cover)
+            key = cover_key(cover)
+            if key in seen:
+                raise ValueError("archive-offline-duplicate-cover")
+            seen.add(key)
+        # Explicit fields keep the public download independent of future
+        # per-player state which may be added to another Archive response.
+        public_solutions = {key: deepcopy(solutions[key]) for key in
+                            ("puzzleId", "gameplayScope", "solutionPolicyRevision", "solutionSets")}
+        if solutions.get("originalContentKey"):
+            public_solutions["originalContentKey"] = solutions["originalContentKey"]
+        entries.append({"editionId": EDITION, "puzzle": deepcopy(puzzle),
+                        "level": level, "difficulty": difficulty,
+                        "rewardXp": REWARDS[difficulty], "rewardSlotKey": reward_slot,
+                        "solutions": public_solutions})
+        ids.add(puzzle_id)
+        slots.add(reward_slot)
+        covers += len(solution_sets)
+    if covers != edition["completeCovers"]:
+        raise ValueError("archive-offline-cover-count-mismatch")
+    return {"formatVersion": 1, "boardCount": len(entries), **catalogue(edition), "entries": entries}

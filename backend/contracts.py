@@ -123,6 +123,9 @@ class ResultCreate(BaseModel):
     # Klidny rezim keeps XP/progress but is excluded from competitive standings.
     calm_mode: bool = False
 
+    # A client may demote trust after offline play, never grant verified time.
+    timing_unverified: bool = False
+
 
 class AttemptStart(BaseModel):
     attempt_id: str = Field(min_length=8, max_length=80)
@@ -232,3 +235,4 @@ class FamilyLeagueSettings(BaseModel):
 
 class PublicRankingsSet(BaseModel):
     enabled: bool
+
