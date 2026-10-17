@@ -12,7 +12,8 @@ const policy='challenger_rollout_20261007';
    await fetch(url+'/__fixture/control',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({reset:true,firstSteps:true,firstBoardPolicy:policy})});
    const fixtureRun=crypto.randomUUID();
    const ctx=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:mobile,hasTouch:mobile,serviceWorkers:'block',extraHTTPHeaders:{'X-Proplet-Fixture-Run':fixtureRun}});
-   await ctx.addInitScript(()=>localStorage.setItem('proplet-v3-15-anonymous-id','synthetic-2'));
+   // Keep consent UI out of pointer scenarios, using a date before the fixed fixture clock.
+   await ctx.addInitScript(()=>{localStorage.setItem('proplet-v3-15-anonymous-id','synthetic-2');localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.parse('2026-09-15T09:00:00Z')}));});
    await ctx.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.abort());
    const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.clock.setFixedTime(new Date('2026-10-07T00:00:00Z'));

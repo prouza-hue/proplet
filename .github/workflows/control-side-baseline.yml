@@ -1,7 +1,6 @@
 name: Control side baseline investigation
 on:
-  pull_request:
-    paths: ['.github/workflows/control-side-baseline.yml']
+  workflow_dispatch:
 permissions: {contents: read}
 jobs:
   printshop-ui:
