@@ -92,7 +92,7 @@ function avatarNode(index,label='Herní avatar'){
  const n=document.createElement('span'),safe=Number(index);
  n.className='organic-avatar';n.dataset.avatarIndex=String(safe);n.setAttribute('role','img');n.setAttribute('aria-label',label);
  if(safe>=0&&safe<AVATAR_COUNT){
-   const meta=AVATAR_MANIFEST[safe],img=document.createElement('img'),url=AVATAR_BASE_PATH+meta.file+'?v=artcutout1';
+   const meta=AVATAR_MANIFEST[safe],img=document.createElement('img'),url=AVATAR_BASE_PATH+meta.file+'?v=artcutout2';
    n.dataset.avatarFile=meta.file;n.dataset.avatarCategory=meta.category;
    img.src=url;img.alt='';img.width=64;img.height=64;img.decoding='async';img.loading='lazy';img.draggable=false;img.className='organic-avatar-print';
    // Display the exact approved artwork as a shared sprite; never regenerate a player's motif.

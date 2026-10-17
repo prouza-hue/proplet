@@ -16,7 +16,7 @@ function art(label,{locked=false,size=40,category}={}){
  for(const theme of ['print']){
   const img=document.createElement('img');img.className='ribbon-'+theme;img.alt='';img.setAttribute('aria-hidden','true');img.width=size;img.height=size;img.draggable=false;img.loading='lazy';img.decoding='async';
   const isMozkokalypsa=/^achievement-mozkokalypsa-(1|5|10|25|50|75|100)$/.test(printKey);
-  const revision=isMozkokalypsa?'4':'artcutout1';
+  const revision=isMozkokalypsa?'4':'artcutout2';
   img.src='/rewards/printshop/'+printKey+(isMozkokalypsa?'.webp':'.svg')+'?v='+revision;wrap.appendChild(img);
  }
  return wrap;
