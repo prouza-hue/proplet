@@ -82,15 +82,28 @@ def main():
         c.execute("insert into free_slot_rewards(id,player_id,difficulty,level,source_puzzle_id,content_generation,points,earned_at) values('41040000-0000-4000-8000-000000000045',%s,'hardcore',45,'historical-synthetic-g2-zero-045',2,0,'2026-08-20T10:00:00+00:00')",(PLAYER,))
         before_results=c.execute("select count(*),sum(points) from results where player_id=%s",(PLAYER,)).fetchone()
         before_claims=c.execute("select jsonb_agg(to_jsonb(f) order by f.id) from free_slot_rewards f").fetchone()[0]
-        c.execute((ROOT/"supabase/prepared/historical_free_rewards.sql").read_text())
-        assert c.execute("select count(*),sum(points) from results where player_id=%s",(PLAYER,)).fetchone()==before_results
-        assert c.execute("select jsonb_agg(to_jsonb(f) order by f.id) from free_slot_rewards f").fetchone()[0]==before_claims
-        assert c.execute("select content_generation,source_puzzle_id from historical_free_slot_rewards where player_id=%s and level=10",(PLAYER,)).fetchone()==(None,"x-014")
-        assert c.execute("select id::text,points,source_puzzle_id from historical_free_slot_rewards where player_id=%s and level=45",(PLAYER,)).fetchone()==("41040000-0000-4000-8000-000000000045",0,"historical-synthetic-g2-zero-045")
-        first_seed=c.execute("select jsonb_agg(to_jsonb(h) order by h.id) from historical_free_slot_rewards h").fetchone()[0]
-        c.execute((ROOT/"supabase/prepared/historical_free_rewards.sql").read_text())
-        assert c.execute("select jsonb_agg(to_jsonb(h) order by h.id) from historical_free_slot_rewards h").fetchone()[0]==first_seed
-    checks.append("seed/reconcile twice preserves XP, old claims, NULL generations, and copied zero-claim identities")
+        # Seed replay deliberately executes the historical migration twice, but
+        # its older RPC definitions must not leak into current reward/race tests.
+        signatures = ("public.proplet_submit_result_v1(uuid,text,text,text,jsonb)",
+                      "public.proplet_archive_state_v1(uuid,text[])")
+        definitions = {signature: c.execute("select pg_get_functiondef(%s::regprocedure)",
+                       (signature,)).fetchone()[0] for signature in signatures}
+        try:
+            c.execute((ROOT/"supabase/prepared/historical_free_rewards.sql").read_text())
+            assert c.execute("select count(*),sum(points) from results where player_id=%s",(PLAYER,)).fetchone()==before_results
+            assert c.execute("select jsonb_agg(to_jsonb(f) order by f.id) from free_slot_rewards f").fetchone()[0]==before_claims
+            assert c.execute("select content_generation,source_puzzle_id from historical_free_slot_rewards where player_id=%s and level=10",(PLAYER,)).fetchone()==(None,"x-014")
+            assert c.execute("select id::text,points,source_puzzle_id from historical_free_slot_rewards where player_id=%s and level=45",(PLAYER,)).fetchone()==("41040000-0000-4000-8000-000000000045",0,"historical-synthetic-g2-zero-045")
+            first_seed=c.execute("select jsonb_agg(to_jsonb(h) order by h.id) from historical_free_slot_rewards h").fetchone()[0]
+            c.execute((ROOT/"supabase/prepared/historical_free_rewards.sql").read_text())
+            assert c.execute("select jsonb_agg(to_jsonb(h) order by h.id) from historical_free_slot_rewards h").fetchone()[0]==first_seed
+        finally:
+            for definition in definitions.values():
+                c.execute(definition)
+        for signature, definition in definitions.items():
+            assert c.execute("select pg_get_functiondef(%s::regprocedure)",
+                             (signature,)).fetchone()[0] == definition
+    checks.append("seed/reconcile twice preserves XP, old claims, NULL generations, copied zero-claim identities; current RPCs restored")
     archive = command("historical-synthetic-g3-h-029",29,points=50,difficulty="hard")
     assert submit(archive)["awardedPoints"]==50
     assert result_points(archive["puzzleId"])==50

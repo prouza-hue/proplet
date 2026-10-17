@@ -11,8 +11,9 @@ runtime = (root / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (root / "proplet_version.py").read_text(encoding="utf-8")
 vercel = json.loads((root / "vercel.json").read_text(encoding="utf-8"))
 
-assert 'APP_VERSION = "4.08.0"' in version
-assert "version:'4.08.0'" in runtime
+# Release identity is shared, never pinned to the version that introduced this feature.
+import runpy
+runpy.run_path(str(root / "tools/release_contract.py"))["assert_release_contract"](root)
 assert "pwaStartupHotfixV4001:true" in runtime
 
 shell_release = re.search(r"const SHELL_CACHE='([^']+)'", sw)
@@ -22,7 +23,6 @@ assert shell_release.group(1) == app_release.group(1), (
     "Service-worker shell and app release marker must stay identical; a mismatch "
     "causes the runtime-update reload loop."
 )
-assert shell_release.group(1) == "proplet-v4.08.0-archive-release2"
 assert "const DATA_CACHE='proplet-data-v12-dated-daily'" in sw
 
 shell_match = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)
@@ -44,7 +44,7 @@ assert "/app/rankings/rankings.js" in shell
 assert "/app/game/state.js" in shell
 assert "/app/game/board.js" in shell
 assert "/app/game/input.js" in shell
-assert "/app/game/hints.js?v=boardintro2" in shell
+# The shared release contract checks this asset against its current shell URL.
 assert "/app/core/completion-pipeline.js" in shell
 for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.png", "/privacy.html", "/terms.html"):
     assert heavy_or_lazy not in shell

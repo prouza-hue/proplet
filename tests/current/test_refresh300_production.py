@@ -30,6 +30,8 @@ for original in source['boards']:
 assert [len(data['free'][d]) for d in ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']]==[400,400,400,300,150,100]
 html=(R/'public/index.html').read_text();assert 'free-refresh-preview' not in html and 'free-refresh-fixtures' not in html
 assert 'connect-src \'none\'' not in html
-assert 'proplet-v4.08.0-archive-release2' in (R/'public/sw.js').read_text()
+# Release identity is shared, never pinned to the version that introduced this feature.
+import runpy
+runpy.run_path(str(R / "tools/release_contract.py"))["assert_release_contract"](R)
 print('PASS 300 approved boards, path integrity, old bank hashes, all historical fields, runtime identities and production boundary')
 

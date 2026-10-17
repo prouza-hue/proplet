@@ -72,7 +72,7 @@ EXPECTED_INSTALLER_ROUTES = (
 route_keys = [
     (method, route.path)
     for route in server.app.routes
-    if route.path and route.path not in {"/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+    if route.path and route.path not in {"/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     for method in (route.methods or ())
 ]
 for expected in EXPECTED_INSTALLER_ROUTES:
@@ -81,12 +81,16 @@ for expected in EXPECTED_INSTALLER_ROUTES:
 route_snapshot = sorted(
     (route.path, tuple(sorted(route.methods or ())), route.name)
     for route in server.app.routes
-    if route.path and route.path not in {"/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+    if route.path and route.path not in {"/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
 )
 # Round III adds exactly four /api/mozkokalypsa3 routes. Removing those
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
 assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cdedfdeb020cd32f25c6e4b"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
+# Offline publication adds read-only routes; preserve the original API digest.
+for offline_path in ("/api/offline-manifest", "/api/archive/offline"):
+    assert set(openapi_contract["paths"][offline_path]) == {"get"}
+    openapi_contract["paths"].pop(offline_path)
 # Referral release is additive; keep every historical route/schema in the digest.
 # New routes and optional signup attribution have dedicated ASGI/SQL tests.
 referral_paths = {
@@ -132,6 +136,13 @@ assert "content_hash" not in result_schema.get("required", [])
 hash_schema = next(item for item in result_schema["properties"]["content_hash"]["anyOf"] if item.get("type") == "string")
 assert hash_schema == {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"}
 result_schema["properties"].pop("content_hash")
+# Offline clients may only lower timing trust. This optional boolean preserves
+# compatibility with older cached clients; all pre-existing fields stay hashed.
+assert "timing_unverified" not in result_schema.get("required", [])
+assert result_schema["properties"].pop("timing_unverified") == {
+    "type": "boolean", "title": "Timing Unverified", "default": False,
+}
+
 
 
 # The one-off authenticated campaign is covered by test_content_launch_push.

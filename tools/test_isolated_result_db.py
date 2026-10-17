@@ -27,6 +27,28 @@ from backend.contracts import ResultCreate
 from backend.results import result_identity, build_command
 
 
+def migration_plan(root):
+    """Legacy roots first, then each dated migration once in dependency order."""
+    manifest = json.loads((root/'supabase/migrations/manifest.json').read_text())
+    entries = sorted(manifest['files'], key=lambda f: f['order'])
+    files = [root/f['path'] for f in entries
+             if f['type'] != 'verify' and not f.get('timestamp_migration')
+             and not f.get('applied_migration_version')
+             and not f['path'].startswith('supabase/migrations/')]
+    # Review mirrors are installed via their dated CLI migration. Standalone
+    # applied hotfixes belong at their recorded production date, not at the end:
+    # replaying an older RPC after a newer migration would silently undo it.
+    dated = [(path.stem.split('_', 1)[0], path)
+             for path in (root/'supabase/migrations').glob('*.sql')]
+    dated += [(f['applied_migration_version'], root/f['path']) for f in entries
+              if f['type'] != 'verify' and f.get('applied_migration_version')
+              and not f.get('timestamp_migration')
+              and not f['path'].startswith('supabase/migrations/')]
+    files += [path for _, path in sorted(dated)]
+    assert len(files) == len(set(files)), 'Migration plan must not execute a file twice'
+    return files
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--password-file', type=Path, required=True)
@@ -63,15 +85,7 @@ def main():
         for objects in ('tables', 'sequences', 'functions'):
             c.execute('alter default privileges in schema public grant all on '+objects+
                       ' to anon, authenticated, service_role')
-        manifest = json.loads((ROOT/'supabase/migrations/manifest.json').read_text())
-        files = [ROOT/f['path'] for f in sorted(manifest['files'], key=lambda f:f['order'])
-                 if f['type'] != 'verify' and not f.get('timestamp_migration')]
-        # Root review mirrors are installed once via their dated CLI migration,
-        # after dependencies such as play_sessions exist.
-        files += sorted((ROOT/'supabase/migrations').glob('*.sql'))
-        # Prepared archive hotfix must follow all existing timestamp migrations.
-        # This is a standalone review file, not an applied production migration.
-        files += [ROOT/'supabase/prepared/historical_free_rewards.sql']
+        files = migration_plan(ROOT)
         for path in files:
             if path.name.endswith('_account_created_authoritative.sql'):
                 c.execute("insert into players(id,name,family_code,token_hash) values ('20000000-0000-4000-8000-000000000001','Historical fixture','SOLO_HISTORY','historical-fixture')")

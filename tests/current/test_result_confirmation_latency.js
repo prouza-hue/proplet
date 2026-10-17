@@ -6,7 +6,7 @@ async function scenario(waitForProfile){
  const profile={id:'synthetic',token:'synthetic'};
  const refresh=new Promise(resolve=>release=resolve);
  const result={ok:true,left:0,sent:1};
- const context={claimTelemetryAfterAuth:async()=>true,GEN4_CANDIDATE_PREVIEW:false,GEN5_CANDIDATE_PREVIEW:false,window:{},location:{search:''},URLSearchParams,
+ const context={navigator:{onLine:true},claimTelemetryAfterAuth:async()=>true,GEN4_CANDIDATE_PREVIEW:false,GEN5_CANDIDATE_PREVIEW:false,window:{},location:{search:''},URLSearchParams,
  getProfile:()=>profile,resultQueue:()=>({getQueue:()=>[{}],sync:async()=>result}),accountProfileMatches:()=>true,
  refreshRemoteProfile:()=>{refreshed++;return refresh},syncState:{},renderProfile(){},renderDaily(){},currentScreen:'game'};
  vm.createContext(context);vm.runInContext(code,context);
@@ -44,4 +44,14 @@ const fetchCode=source.slice(source.indexOf('async function fetchFreeLevelLeader
   const result=await work;assert.equal(result.world.myRank,2);assert.equal(result.teamPending,false);assert.equal(!!result.teamError,teamFails);
  }
  console.log('PASS world ranking paints before slow team; team failure preserves world');
+})().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
+ let rendered=0;
+ const c={navigator:{onLine:false},renderOfflineStatus:()=>rendered++,getQueue:()=>[{},{}],
+   claimTelemetryAfterAuth:()=>{throw Error('offline sync must not contact the server')}};
+ vm.createContext(c);vm.runInContext(code,c);
+ const result=await c.syncQueue();
+ assert.equal(result.ok,false);assert.equal(result.offline,true);assert.equal(result.left,2);assert.equal(rendered,1);
+ console.log('PASS offline sync retains both pending results without network access');
 })().catch(e=>{console.error(e);process.exitCode=1});

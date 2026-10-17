@@ -8,6 +8,7 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
+originals = {name: (ROOT / name).read_bytes() for name in ("public/index.html", "public/sw.js", "public/app/archive/preview-isolation.js")}
 with tempfile.TemporaryDirectory(prefix="proplet-archive-build-") as directory:
     target = Path(directory)
     paths = ["tools/build_archive_experience.py", "backend/archive.py", "backend/__init__.py",
@@ -20,6 +21,11 @@ with tempfile.TemporaryDirectory(prefix="proplet-archive-build-") as directory:
         destination = target / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / name, destination)
+    # Exercise removal even when the checked-in production HTML has no adapter.
+    index = target / "public/index.html"
+    index.write_text(index.read_text().replace('<html', '<html data-archive-preview', 1).replace('</body>', '<script src="/app/archive/preview-isolation.js"></script></body>'))
+    worker = target / "public/sw.js"
+    worker.write_text(worker.read_text().replace('const SHELL=[', "const SHELL=['/app/archive/preview-isolation.js',", 1))
     result = subprocess.run([sys.executable, str(target / "tools/build_archive_experience.py")],
                             env={**os.environ, "VERCEL_ENV": "production"},
                             capture_output=True, text=True)
@@ -33,5 +39,6 @@ with tempfile.TemporaryDirectory(prefix="proplet-archive-build-") as directory:
     assert "/app/archive/experience.js" in html and "/app/engagement/announcements.js" in html
     bank = json.loads((target / "public/app/archive/boards.json").read_text())
     assert len(bank["boards"]) == 800 and bank["completeCovers"] == 879
-assert "data-archive-preview" in (ROOT / "public/index.html").read_text(), "test modified source tree"
+for name, before in originals.items():
+    assert (ROOT / name).read_bytes() == before, f"test modified source tree: {name}"
 print("PASS production distribution: validated bank, real runtime, no synthetic identity or API adapter")
