@@ -8,7 +8,26 @@ const root=path.resolve(__dirname,'..'),base=process.env.TEST_URL||'http://127.0
 assert(['localhost','127.0.0.1'].includes(new URL(base).hostname),'loopback required');
 const errors=[],checks=[];let server,browser;
 const artifacts=path.join(root,'artifacts/control-side');fs.mkdirSync(artifacts,{recursive:true});
-const settle=page=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+const settle=page=>page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
+const ready=page=>page.waitForFunction(()=>window.__sideBootReady===true&&typeof puzzleDB!=='undefined'&&puzzleDB?.free?.hard?.[0]&&document.querySelector('#gameSideToggle'));
+async function gesture(page,points,duringDrag){
+  const touch=await page.evaluate(()=>navigator.maxTouchPoints>0);
+  const cdp=touch?await page.context().newCDPSession(page):null;
+  try{
+    if(touch)await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...points[0],id:1}]});
+    else{await page.mouse.move(points[0].x,points[0].y);await page.mouse.down();}
+    assert(await page.evaluate(()=>currentGame.dragging),'pointerdown must reach a playable cell');
+    if(duringDrag)await duringDrag();
+    for(const p of points.slice(1)){
+      if(touch)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{...p,id:1}]});
+      else await page.mouse.move(p.x,p.y,{steps:5});
+      await page.waitForTimeout(40);
+    }
+  }finally{
+    if(touch){await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();}
+    else await page.mouse.up();
+  }
+}
 async function start(page,mode='free'){
   await page.evaluate(async mode=>{
     if(typeof closeOnboarding==='function')closeOnboarding(true);
@@ -32,13 +51,12 @@ async function geometry(page,left){
   return g;
 }
 async function dragNext(page){
+  await settle(page);
   const before=await page.evaluate(()=>currentGame.found.length);
   const points=await page.evaluate(()=>currentGame.puzzle.answers.find((a,i)=>!currentGame.found.some(f=>f.answerIndex===i)).path.map(i=>{
     const r=document.querySelector(`.cell[data-index="${i}"]`).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};
   }));
-  await page.mouse.move(points[0].x,points[0].y);await page.mouse.down();
-  for(const p of points.slice(1))await page.mouse.move(p.x,p.y,{steps:5});
-  await page.mouse.up();await page.waitForFunction(n=>currentGame.found.length===n+1,before);
+  await gesture(page,points);await page.waitForFunction(n=>currentGame.found.length===n+1,before);
   await settle(page);
   assert(await page.locator('#pathLayer .path-found').count()>0,'found path drawn');
 }
@@ -61,13 +79,16 @@ async function boot(context){
     return route.continue();
   });
   await page.goto(base,{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>typeof startGame==='function'&&typeof puzzleDB!=='undefined'&&puzzleDB?.free?.hard?.[0]&&document.querySelector('#gameSideToggle'));
+  await ready(page);
   await page.evaluate(p=>window.__sideTajenka=p,JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/browser/tajenka.json'),'utf8')));
   return page;
 }
 async function context(options){
   const ctx=await browser.newContext({...options,serviceWorkers:'block',reducedMotion:'reduce'});
   await ctx.addInitScript(()=>{
+    // puzzleDB is assigned before boot awaits content and installs pointer listeners.
+    // Do not start a synthetic game until the application's actual ready event.
+    document.addEventListener('proplet:ready',()=>{window.__sideBootReady=true},{once:true});
     localStorage.setItem('proplet-v3-7-required-onboarding','done');localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');
     localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');sessionStorage.setItem('proplet-gen4-release-modal-v1','1');
     for(const key of ['g5-r1','mk100-v2','refresh300-v1'])localStorage.setItem('proplet:content-release:'+key,'1');
@@ -85,9 +106,11 @@ async function context(options){
   const page=await boot(ctx);await start(page);await geometry(page,false);await dragNext(page);
   await swapPreserving(page,true);await dragNext(page);checks.push('actual word gestures before and after swap; game and DOM identity preserved');
   // A second pointer / keyboard activation must not move a board during a gesture.
-  const cell=await page.locator('#board .cell:not(.used)').first().boundingBox();await page.mouse.move(cell.x+cell.width/2,cell.y+cell.height/2);await page.mouse.down();
-  await page.evaluate(()=>document.querySelector('#gameSideToggle').click());await geometry(page,true);await page.mouse.up();
-  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB?.free?.hard?.[0]&&document.querySelector('#gameSideToggle'));
+  const cell=await page.locator('#board .cell:not(.used)').first().boundingBox();
+  await gesture(page,[{x:cell.x+cell.width/2,y:cell.y+cell.height/2}],async()=>{
+    await page.evaluate(()=>document.querySelector('#gameSideToggle').click());await geometry(page,true);
+  });
+  await page.reload({waitUntil:'domcontentloaded'});await ready(page);
   await start(page);await geometry(page,true);checks.push('preference survives reload; gesture guard');
   await page.setViewportSize({width:390,height:844});await page.waitForFunction(()=>!document.body.classList.contains('game-tablet-landscape'));
   assert.equal(await page.locator('#gameSideToggle').isVisible(),false);assert.equal(await page.locator('.game-main').evaluate(el=>el.classList.contains('game-controls-left')),false);

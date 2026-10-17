@@ -1,9 +1,7 @@
 name: Game control side regression
 on:
-  push:
-    branches: [feat/game-control-side-preview]
   pull_request:
-    paths: ['public/game.css', 'public/game-layout-v3330.js', 'tools/test_control_side_browser.cjs']
+    paths: ['public/game.css', 'public/game-layout-v3330.js', 'tools/test_control_side_browser.cjs', '.github/workflows/game-control-side.yml']
 permissions:
   contents: read
 jobs:
