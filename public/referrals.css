@@ -203,3 +203,6 @@ html body #referralDialog #refDialogTitle:focus{outline:none}
 
 /* Incoming players see their invitation instead of the older board-pack campaign. */
 body.referral-incoming #freeRefreshToday{display:none!important}
+
+/* Trim the pale source fringe of the two circular referral illustrations. */
+.ref-art-card img{clip-path:circle(49% at 50% 50%)}

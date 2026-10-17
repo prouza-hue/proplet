@@ -1,0 +1,8000 @@
+{
+  "version": "4.09.2",
+  "baseline": "4832cecd5e263eb9eeacafd1bf9100d95ba4e59e",
+  "scope": "278 icon/illustration source files, including legacy variants; all seven live sprite frames additionally inspected. Marketing screenshots/share cards excluded.",
+  "correctsPriorAudit": "The 4.09.1 audit incorrectly accepted pale floor remnants as shadows. Those findings are superseded by this pass.",
+  "reviewedFiles": [
+    "public/apple-touch-icon.png",
+    "public/assets/archive/archive-letterpress-v2.webp",
+    "public/assets/avatars/referral-jezek.webp",
+    "public/assets/avatars/referral-liska.webp",
+    "public/assets/avatars/v2/01-liska.svg",
+    "public/assets/avatars/v2/02-sova.svg",
+    "public/assets/avatars/v2/03-jezek.svg",
+    "public/assets/avatars/v2/04-medved.svg",
+    "public/assets/avatars/v2/05-jelen.svg",
+    "public/assets/avatars/v2/06-srna.svg",
+    "public/assets/avatars/v2/07-jezevec.svg",
+    "public/assets/avatars/v2/08-veverka.svg",
+    "public/assets/avatars/v2/09-myval.svg",
+    "public/assets/avatars/v2/10-kocka.svg",
+    "public/assets/avatars/v2/11-vlk.svg",
+    "public/assets/avatars/v2/12-mourek.svg",
+    "public/assets/avatars/v2/13-zajic.svg",
+    "public/assets/avatars/v2/14-kralik.svg",
+    "public/assets/avatars/v2/15-myska.svg",
+    "public/assets/avatars/v2/16-klubko.svg",
+    "public/assets/avatars/v2/17-hacek.svg",
+    "public/assets/avatars/v2/18-pismeno-p.svg",
+    "public/assets/avatars/v2/19-pletene-bryle.svg",
+    "public/assets/avatars/v2/20-kniha-s-copem.svg",
+    "public/assets/avatars/v2/21-kniha-se-stehem.svg",
+    "public/assets/avatars/v2/22-hrnek-v-svetru.svg",
+    "public/assets/avatars/v2/23-brk-a-inkoust.svg",
+    "public/assets/avatars/v2/24-civka.svg",
+    "public/assets/avatars/v2/25-papirovy-ptak.svg",
+    "public/assets/avatars/v2/26-papirova-vlastovka.svg",
+    "public/assets/avatars/v2/27-presypacky-modre.svg",
+    "public/assets/avatars/v2/28-presypacky-zlate.svg",
+    "public/assets/avatars/v2/29-clunek.svg",
+    "public/assets/avatars/v2/30-tkalcovsky-stav.svg",
+    "public/assets/avatars/v3/01-liska.svg",
+    "public/assets/avatars/v3/02-sova.svg",
+    "public/assets/avatars/v3/03-jezek.svg",
+    "public/assets/avatars/v3/04-medved.svg",
+    "public/assets/avatars/v3/05-jelen.svg",
+    "public/assets/avatars/v3/06-srna.svg",
+    "public/assets/avatars/v3/07-jezevec.svg",
+    "public/assets/avatars/v3/08-veverka.svg",
+    "public/assets/avatars/v3/09-myval.svg",
+    "public/assets/avatars/v3/10-kocka.svg",
+    "public/assets/avatars/v3/11-vlk.svg",
+    "public/assets/avatars/v3/12-mourek.svg",
+    "public/assets/avatars/v3/13-zajic.svg",
+    "public/assets/avatars/v3/14-kralik.svg",
+    "public/assets/avatars/v3/15-myska.svg",
+    "public/assets/avatars/v3/16-klubko.svg",
+    "public/assets/avatars/v3/17-hacek.svg",
+    "public/assets/avatars/v3/18-pismeno-p.svg",
+    "public/assets/avatars/v3/19-pletene-bryle.svg",
+    "public/assets/avatars/v3/20-kniha-s-copem.svg",
+    "public/assets/avatars/v3/21-kniha-se-stehem.svg",
+    "public/assets/avatars/v3/22-hrnek-v-svetru.svg",
+    "public/assets/avatars/v3/23-brk-a-inkoust.svg",
+    "public/assets/avatars/v3/24-civka.svg",
+    "public/assets/avatars/v3/25-papirovy-ptak.svg",
+    "public/assets/avatars/v3/26-papirova-vlastovka.svg",
+    "public/assets/avatars/v3/27-presypacky-modre.svg",
+    "public/assets/avatars/v3/28-presypacky-zlate.svg",
+    "public/assets/avatars/v3/29-clunek.svg",
+    "public/assets/avatars/v3/30-tkalcovsky-stav.svg",
+    "public/assets/avatars/v3/31-jednorozec.svg",
+    "public/assets/avatars/v3/32-lebka.svg",
+    "public/assets/avatars/v3/33-radioaktivita.svg",
+    "public/assets/avatars/v3/34-kyticka.svg",
+    "public/assets/avatars/v3/35-ufo.svg",
+    "public/assets/avatars/v3/36-mimozemstan.svg",
+    "public/assets/avatars/v3/37-bomba.svg",
+    "public/assets/avatars/v3/38-dablik.svg",
+    "public/assets/avatars/v3/39-robot.svg",
+    "public/assets/avatars/v3/40-blesk.svg",
+    "public/assets/avatars/v3/approved-expansion.png",
+    "public/brand/mark-16.png",
+    "public/brand/mark-180.png",
+    "public/brand/mark-192.png",
+    "public/brand/mark-32.png",
+    "public/brand/mark-512.png",
+    "public/brand/mark-master.png",
+    "public/brand/mark.svg",
+    "public/brand/wordmark.svg",
+    "public/calm-mode.svg",
+    "public/difficulty/easy.svg",
+    "public/difficulty/hard.svg",
+    "public/difficulty/hardcore.svg",
+    "public/difficulty/medium.svg",
+    "public/difficulty/mozkomor.svg",
+    "public/difficulty/printshop/easy.webp",
+    "public/difficulty/printshop/hard.webp",
+    "public/difficulty/printshop/hardcore.webp",
+    "public/difficulty/printshop/medium.webp",
+    "public/difficulty/printshop/mozkokalypsa-series-ochre.svg",
+    "public/difficulty/printshop/mozkokalypsa-v2.svg",
+    "public/difficulty/printshop/mozkokalypsa.svg",
+    "public/difficulty/printshop/mozkomor.webp",
+    "public/favicon-32.png",
+    "public/favicon.ico",
+    "public/favicon.svg",
+    "public/google-g.svg",
+    "public/icon-192.png",
+    "public/icon-512.png",
+    "public/icon-maskable-192.png",
+    "public/icon-maskable-512.png",
+    "public/icon.svg",
+    "public/rewards/continuation/chapter-chronicle.webp",
+    "public/rewards/continuation/xp-astrolabe.webp",
+    "public/rewards/continuation/xp-compass.webp",
+    "public/rewards/continuation/xp-gateway.webp",
+    "public/rewards/continuation/xp-lighthouse.webp",
+    "public/rewards/printshop/achievement-all-10.svg",
+    "public/rewards/printshop/achievement-all-100.svg",
+    "public/rewards/printshop/achievement-all-25.svg",
+    "public/rewards/printshop/achievement-all-250.svg",
+    "public/rewards/printshop/achievement-all-400.svg",
+    "public/rewards/printshop/achievement-all-5.svg",
+    "public/rewards/printshop/achievement-all-50.svg",
+    "public/rewards/printshop/achievement-all-800.svg",
+    "public/rewards/printshop/achievement-cd-1.svg",
+    "public/rewards/printshop/achievement-cd-100.svg",
+    "public/rewards/printshop/achievement-cd-30.svg",
+    "public/rewards/printshop/achievement-cd-7.svg",
+    "public/rewards/printshop/achievement-clean-1.svg",
+    "public/rewards/printshop/achievement-clean-10.svg",
+    "public/rewards/printshop/achievement-clean-100.svg",
+    "public/rewards/printshop/achievement-clean-25.svg",
+    "public/rewards/printshop/achievement-clean-250.svg",
+    "public/rewards/printshop/achievement-clean-5.svg",
+    "public/rewards/printshop/achievement-clean-50.svg",
+    "public/rewards/printshop/achievement-daily-1.svg",
+    "public/rewards/printshop/achievement-daily-100.svg",
+    "public/rewards/printshop/achievement-daily-14.svg",
+    "public/rewards/printshop/achievement-daily-200.svg",
+    "public/rewards/printshop/achievement-daily-3.svg",
+    "public/rewards/printshop/achievement-daily-30.svg",
+    "public/rewards/printshop/achievement-daily-365.svg",
+    "public/rewards/printshop/achievement-daily-50.svg",
+    "public/rewards/printshop/achievement-daily-7.svg",
+    "public/rewards/printshop/achievement-discovery-1.svg",
+    "public/rewards/printshop/achievement-discovery-10.svg",
+    "public/rewards/printshop/achievement-discovery-100.svg",
+    "public/rewards/printshop/achievement-discovery-50.svg",
+    "public/rewards/printshop/achievement-easy-1.svg",
+    "public/rewards/printshop/achievement-easy-10.svg",
+    "public/rewards/printshop/achievement-easy-100.svg",
+    "public/rewards/printshop/achievement-easy-200.svg",
+    "public/rewards/printshop/achievement-easy-25.svg",
+    "public/rewards/printshop/achievement-easy-50.svg",
+    "public/rewards/printshop/achievement-hard-1.svg",
+    "public/rewards/printshop/achievement-hard-10.svg",
+    "public/rewards/printshop/achievement-hard-100.svg",
+    "public/rewards/printshop/achievement-hard-200.svg",
+    "public/rewards/printshop/achievement-hard-25.svg",
+    "public/rewards/printshop/achievement-hard-5.svg",
+    "public/rewards/printshop/achievement-hard-50.svg",
+    "public/rewards/printshop/achievement-hc-1.svg",
+    "public/rewards/printshop/achievement-hc-10.svg",
+    "public/rewards/printshop/achievement-hc-100.svg",
+    "public/rewards/printshop/achievement-hc-200.svg",
+    "public/rewards/printshop/achievement-hc-25.svg",
+    "public/rewards/printshop/achievement-hc-5.svg",
+    "public/rewards/printshop/achievement-hc-50.svg",
+    "public/rewards/printshop/achievement-medium-1.svg",
+    "public/rewards/printshop/achievement-medium-10.svg",
+    "public/rewards/printshop/achievement-medium-100.svg",
+    "public/rewards/printshop/achievement-medium-200.svg",
+    "public/rewards/printshop/achievement-medium-25.svg",
+    "public/rewards/printshop/achievement-medium-50.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-1.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-1.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-10.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-10.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-100.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-100.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-25.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-25.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-5.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-5.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-50.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-50.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-75.svg",
+    "public/rewards/printshop/achievement-mozkokalypsa-75.webp",
+    "public/rewards/printshop/achievement-mozkomor-1.svg",
+    "public/rewards/printshop/achievement-mozkomor-10.svg",
+    "public/rewards/printshop/achievement-mozkomor-25.svg",
+    "public/rewards/printshop/achievement-mozkomor-5.svg",
+    "public/rewards/printshop/achievement-mozkomor-50.svg",
+    "public/rewards/printshop/achievement-rescue-1.svg",
+    "public/rewards/printshop/achievement-rescue-10.svg",
+    "public/rewards/printshop/achievement-rescue-3.svg",
+    "public/rewards/printshop/achievement-rescue-5.svg",
+    "public/rewards/printshop/achievement-speed-120.svg",
+    "public/rewards/printshop/achievement-speed-180.svg",
+    "public/rewards/printshop/achievement-speed-300.svg",
+    "public/rewards/printshop/achievement-speed-60.svg",
+    "public/rewards/printshop/achievement-tajenka-1.svg",
+    "public/rewards/printshop/achievement-tajenka-10.svg",
+    "public/rewards/printshop/achievement-tajenka-3.svg",
+    "public/rewards/printshop/achievement-tajenka-5.svg",
+    "public/rewards/printshop/achievement-xp-100.svg",
+    "public/rewards/printshop/achievement-xp-1000.svg",
+    "public/rewards/printshop/achievement-xp-10000.svg",
+    "public/rewards/printshop/achievement-xp-120000.svg",
+    "public/rewards/printshop/achievement-xp-2500.svg",
+    "public/rewards/printshop/achievement-xp-25000.svg",
+    "public/rewards/printshop/achievement-xp-40000.svg",
+    "public/rewards/printshop/achievement-xp-500.svg",
+    "public/rewards/printshop/achievement-xp-5000.svg",
+    "public/rewards/printshop/achievement-xp-50000.svg",
+    "public/rewards/printshop/achievement-xp-61000.svg",
+    "public/rewards/printshop/achievement-xp-75000.svg",
+    "public/rewards/printshop/achievement-xp-95000.svg",
+    "public/rewards/printshop/alchymista.svg",
+    "public/rewards/printshop/calm.svg",
+    "public/rewards/printshop/challenge.svg",
+    "public/rewards/printshop/legenda.svg",
+    "public/rewards/printshop/medaile.svg",
+    "public/rewards/printshop/medal-2.svg",
+    "public/rewards/printshop/medal-3.svg",
+    "public/rewards/printshop/nemesis.svg",
+    "public/rewards/printshop/novacek.svg",
+    "public/rewards/printshop/offline-wifi-v1.webp",
+    "public/rewards/printshop/prvni-proplet.svg",
+    "public/rewards/printshop/pulmesic.svg",
+    "public/rewards/printshop/rank-02.svg",
+    "public/rewards/printshop/rank-03.svg",
+    "public/rewards/printshop/rank-04.svg",
+    "public/rewards/printshop/rank-05.svg",
+    "public/rewards/printshop/rank-06.svg",
+    "public/rewards/printshop/rank-07.svg",
+    "public/rewards/printshop/rank-08.svg",
+    "public/rewards/printshop/rank-09.svg",
+    "public/rewards/printshop/rank-10.svg",
+    "public/rewards/printshop/rank-11.svg",
+    "public/rewards/printshop/rank-12.svg",
+    "public/rewards/printshop/rank-13.svg",
+    "public/rewards/printshop/rank-14.svg",
+    "public/rewards/printshop/rank-15.svg",
+    "public/rewards/printshop/rank-16.svg",
+    "public/rewards/printshop/rank-17.svg",
+    "public/rewards/printshop/rank-19.svg",
+    "public/rewards/printshop/rank-20.svg",
+    "public/rewards/printshop/rank-21.svg",
+    "public/rewards/printshop/rank-22.svg",
+    "public/rewards/printshop/rank-23.svg",
+    "public/rewards/printshop/rank-24.svg",
+    "public/rewards/printshop/rank-25.svg",
+    "public/rewards/printshop/rank-26.svg",
+    "public/rewards/printshop/rank-27.svg",
+    "public/rewards/printshop/rank-28.svg",
+    "public/rewards/printshop/rank-29.svg",
+    "public/rewards/printshop/rank-30.svg",
+    "public/rewards/printshop/rank-31.svg",
+    "public/rewards/printshop/rank-32.svg",
+    "public/rewards/printshop/rank-33.svg",
+    "public/rewards/printshop/rank-34.svg",
+    "public/rewards/printshop/streak-01.svg",
+    "public/rewards/printshop/streak-02.svg",
+    "public/rewards/printshop/streak-03.svg",
+    "public/rewards/printshop/streak-05.svg",
+    "public/rewards/printshop/streak-06.svg",
+    "public/rewards/printshop/streak-07.svg",
+    "public/rewards/printshop/streak-08.svg",
+    "public/rewards/printshop/streak-09.svg",
+    "public/rewards/printshop/streak-10.svg",
+    "public/rewards/printshop/symbol-complete.svg",
+    "public/rewards/printshop/symbol-daily.svg",
+    "public/rewards/printshop/symbol-secret.svg",
+    "public/rewards/printshop/symbol-streak.svg",
+    "public/rewards/printshop/tyden.svg",
+    "public/rewards/team-victories/first-imprint.webp",
+    "public/rewards/team-victories/golden-party.webp",
+    "public/rewards/team-victories/proplet-legend.webp",
+    "public/rewards/team-victories/weekly-gold.svg",
+    "public/rewards/team-victories/workshop-masters.webp",
+    "public/tajenka.svg",
+    "public/weekly-banner-icon-optimized.svg"
+  ],
+  "changedSvgFiles": [
+    "public/rewards/printshop/achievement-all-10.svg",
+    "public/rewards/printshop/achievement-all-100.svg",
+    "public/rewards/printshop/achievement-all-25.svg",
+    "public/rewards/printshop/achievement-all-250.svg",
+    "public/rewards/printshop/achievement-all-400.svg",
+    "public/rewards/printshop/achievement-all-5.svg",
+    "public/rewards/printshop/achievement-all-50.svg",
+    "public/rewards/printshop/achievement-all-800.svg",
+    "public/rewards/printshop/achievement-cd-1.svg",
+    "public/rewards/printshop/achievement-cd-100.svg",
+    "public/rewards/printshop/achievement-cd-30.svg",
+    "public/rewards/printshop/achievement-cd-7.svg",
+    "public/rewards/printshop/achievement-clean-1.svg",
+    "public/rewards/printshop/achievement-clean-10.svg",
+    "public/rewards/printshop/achievement-clean-100.svg",
+    "public/rewards/printshop/achievement-clean-25.svg",
+    "public/rewards/printshop/achievement-clean-250.svg",
+    "public/rewards/printshop/achievement-clean-5.svg",
+    "public/rewards/printshop/achievement-clean-50.svg",
+    "public/rewards/printshop/achievement-daily-1.svg",
+    "public/rewards/printshop/achievement-daily-100.svg",
+    "public/rewards/printshop/achievement-daily-14.svg",
+    "public/rewards/printshop/achievement-daily-200.svg",
+    "public/rewards/printshop/achievement-daily-3.svg",
+    "public/rewards/printshop/achievement-daily-30.svg",
+    "public/rewards/printshop/achievement-daily-365.svg",
+    "public/rewards/printshop/achievement-daily-50.svg",
+    "public/rewards/printshop/achievement-daily-7.svg",
+    "public/rewards/printshop/achievement-discovery-1.svg",
+    "public/rewards/printshop/achievement-discovery-10.svg",
+    "public/rewards/printshop/achievement-discovery-100.svg",
+    "public/rewards/printshop/achievement-discovery-50.svg",
+    "public/rewards/printshop/achievement-easy-1.svg",
+    "public/rewards/printshop/achievement-easy-10.svg",
+    "public/rewards/printshop/achievement-easy-100.svg",
+    "public/rewards/printshop/achievement-easy-200.svg",
+    "public/rewards/printshop/achievement-easy-25.svg",
+    "public/rewards/printshop/achievement-easy-50.svg",
+    "public/rewards/printshop/achievement-hard-1.svg",
+    "public/rewards/printshop/achievement-hard-10.svg",
+    "public/rewards/printshop/achievement-hard-100.svg",
+    "public/rewards/printshop/achievement-hard-200.svg",
+    "public/rewards/printshop/achievement-hard-25.svg",
+    "public/rewards/printshop/achievement-hard-5.svg",
+    "public/rewards/printshop/achievement-hard-50.svg",
+    "public/rewards/printshop/achievement-hc-1.svg",
+    "public/rewards/printshop/achievement-hc-100.svg",
+    "public/rewards/printshop/achievement-hc-200.svg",
+    "public/rewards/printshop/achievement-hc-25.svg",
+    "public/rewards/printshop/achievement-hc-5.svg",
+    "public/rewards/printshop/achievement-hc-50.svg",
+    "public/rewards/printshop/achievement-medium-1.svg",
+    "public/rewards/printshop/achievement-medium-10.svg",
+    "public/rewards/printshop/achievement-medium-100.svg",
+    "public/rewards/printshop/achievement-medium-200.svg",
+    "public/rewards/printshop/achievement-medium-25.svg",
+    "public/rewards/printshop/achievement-medium-50.svg",
+    "public/rewards/printshop/achievement-mozkomor-1.svg",
+    "public/rewards/printshop/achievement-mozkomor-10.svg",
+    "public/rewards/printshop/achievement-mozkomor-25.svg",
+    "public/rewards/printshop/achievement-mozkomor-5.svg",
+    "public/rewards/printshop/achievement-rescue-1.svg",
+    "public/rewards/printshop/achievement-rescue-10.svg",
+    "public/rewards/printshop/achievement-rescue-3.svg",
+    "public/rewards/printshop/achievement-rescue-5.svg",
+    "public/rewards/printshop/achievement-speed-120.svg",
+    "public/rewards/printshop/achievement-speed-180.svg",
+    "public/rewards/printshop/achievement-speed-300.svg",
+    "public/rewards/printshop/achievement-speed-60.svg",
+    "public/rewards/printshop/achievement-tajenka-1.svg",
+    "public/rewards/printshop/achievement-tajenka-10.svg",
+    "public/rewards/printshop/achievement-tajenka-3.svg",
+    "public/rewards/printshop/achievement-tajenka-5.svg",
+    "public/rewards/printshop/achievement-xp-100.svg",
+    "public/rewards/printshop/achievement-xp-1000.svg",
+    "public/rewards/printshop/achievement-xp-10000.svg",
+    "public/rewards/printshop/achievement-xp-120000.svg",
+    "public/rewards/printshop/achievement-xp-2500.svg",
+    "public/rewards/printshop/achievement-xp-25000.svg",
+    "public/rewards/printshop/achievement-xp-40000.svg",
+    "public/rewards/printshop/achievement-xp-500.svg",
+    "public/rewards/printshop/achievement-xp-5000.svg",
+    "public/rewards/printshop/achievement-xp-50000.svg",
+    "public/rewards/printshop/achievement-xp-61000.svg",
+    "public/rewards/printshop/achievement-xp-75000.svg",
+    "public/rewards/printshop/achievement-xp-95000.svg",
+    "public/rewards/printshop/alchymista.svg",
+    "public/rewards/printshop/medaile.svg",
+    "public/rewards/printshop/medal-2.svg",
+    "public/rewards/printshop/medal-3.svg",
+    "public/rewards/printshop/novacek.svg",
+    "public/rewards/printshop/rank-02.svg",
+    "public/rewards/printshop/rank-03.svg",
+    "public/rewards/printshop/rank-04.svg",
+    "public/rewards/printshop/rank-05.svg",
+    "public/rewards/printshop/rank-06.svg",
+    "public/rewards/printshop/rank-07.svg",
+    "public/rewards/printshop/rank-08.svg",
+    "public/rewards/printshop/rank-09.svg",
+    "public/rewards/printshop/rank-10.svg",
+    "public/rewards/printshop/rank-11.svg",
+    "public/rewards/printshop/rank-12.svg",
+    "public/rewards/printshop/rank-13.svg",
+    "public/rewards/printshop/rank-15.svg",
+    "public/rewards/printshop/rank-17.svg",
+    "public/rewards/printshop/rank-19.svg",
+    "public/rewards/printshop/rank-20.svg",
+    "public/rewards/printshop/rank-21.svg",
+    "public/rewards/printshop/rank-22.svg",
+    "public/rewards/printshop/rank-23.svg",
+    "public/rewards/printshop/rank-25.svg",
+    "public/rewards/printshop/rank-26.svg",
+    "public/rewards/printshop/rank-27.svg",
+    "public/rewards/printshop/rank-28.svg",
+    "public/rewards/printshop/rank-29.svg",
+    "public/rewards/printshop/rank-30.svg",
+    "public/rewards/printshop/rank-32.svg",
+    "public/rewards/printshop/rank-33.svg",
+    "public/rewards/printshop/rank-34.svg",
+    "public/rewards/printshop/streak-01.svg",
+    "public/rewards/printshop/streak-03.svg",
+    "public/rewards/printshop/streak-05.svg",
+    "public/rewards/printshop/streak-06.svg",
+    "public/rewards/printshop/streak-07.svg",
+    "public/rewards/printshop/streak-08.svg",
+    "public/rewards/printshop/streak-09.svg",
+    "public/rewards/printshop/streak-10.svg",
+    "public/rewards/printshop/symbol-complete.svg",
+    "public/rewards/printshop/symbol-daily.svg",
+    "public/rewards/printshop/symbol-secret.svg",
+    "public/rewards/printshop/symbol-streak.svg",
+    "public/rewards/printshop/tyden.svg",
+    "public/rewards/team-victories/weekly-gold.svg",
+    "public/assets/avatars/v3/04-medved.svg",
+    "public/assets/avatars/v3/05-jelen.svg",
+    "public/assets/avatars/v3/07-jezevec.svg",
+    "public/assets/avatars/v3/08-veverka.svg",
+    "public/assets/avatars/v3/09-myval.svg",
+    "public/assets/avatars/v3/10-kocka.svg",
+    "public/assets/avatars/v3/11-vlk.svg",
+    "public/assets/avatars/v3/13-zajic.svg",
+    "public/assets/avatars/v3/14-kralik.svg",
+    "public/assets/avatars/v3/15-myska.svg",
+    "public/assets/avatars/v3/18-pismeno-p.svg",
+    "public/assets/avatars/v3/19-pletene-bryle.svg",
+    "public/assets/avatars/v3/20-kniha-s-copem.svg",
+    "public/assets/avatars/v3/24-civka.svg",
+    "public/assets/avatars/v3/26-papirova-vlastovka.svg",
+    "public/assets/avatars/v3/27-presypacky-modre.svg",
+    "public/assets/avatars/v3/28-presypacky-zlate.svg",
+    "public/assets/avatars/v3/29-clunek.svg",
+    "public/assets/avatars/v3/30-tkalcovsky-stav.svg",
+    "public/assets/avatars/v3/31-jednorozec.svg",
+    "public/assets/avatars/v3/32-lebka.svg",
+    "public/assets/avatars/v3/33-radioaktivita.svg",
+    "public/assets/avatars/v3/34-kyticka.svg",
+    "public/assets/avatars/v3/35-ufo.svg",
+    "public/assets/avatars/v3/36-mimozemstan.svg",
+    "public/assets/avatars/v3/37-bomba.svg",
+    "public/assets/avatars/v3/38-dablik.svg",
+    "public/assets/avatars/v3/40-blesk.svg"
+  ],
+  "cssClippedImages": [
+    "public/rewards/printshop/achievement-mozkokalypsa-1.webp",
+    "public/rewards/printshop/achievement-mozkokalypsa-5.webp",
+    "public/assets/avatars/referral-jezek.webp",
+    "public/assets/avatars/referral-liska.webp"
+  ],
+  "retained": "Original artwork, native vector formats, object highlights/materials, avatar identities, game logic, player data and offline content caches.",
+  "methods": [
+    "Native background masks at original paint order, individually reviewed ground contours and bounded neutral edge cleanup.",
+    "Circular avatar clips tightened and normalized to unchanged 512x512 optical bounds.",
+    "CSS silhouettes for two raster achievements and circular clips for two referral images."
+  ],
+  "visualChecks": [
+    "Each reward/rank source and final corrected SVG viewed on contrasting dark green.",
+    "Original material retained: ivory paper, teeth/claws, gray stone/metal, crystal facets.",
+    "28 corrected avatar circles reviewed; seven sprite frames reviewed at runtime crop coordinates.",
+    "CSS raster contours previewed against the same dark background."
+  ],
+  "findings": [
+    {
+      "path": "public/apple-touch-icon.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/archive/archive-letterpress-v2.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/referral-jezek.webp",
+      "status": "corrected-css"
+    },
+    {
+      "path": "public/assets/avatars/referral-liska.webp",
+      "status": "corrected-css"
+    },
+    {
+      "path": "public/assets/avatars/v2/01-liska.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/02-sova.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/03-jezek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/04-medved.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/05-jelen.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/06-srna.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/07-jezevec.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/08-veverka.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/09-myval.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/10-kocka.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/11-vlk.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/12-mourek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/13-zajic.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/14-kralik.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/15-myska.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/16-klubko.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/17-hacek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/18-pismeno-p.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/19-pletene-bryle.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/20-kniha-s-copem.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/21-kniha-se-stehem.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/22-hrnek-v-svetru.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/23-brk-a-inkoust.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/24-civka.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/25-papirovy-ptak.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/26-papirova-vlastovka.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/27-presypacky-modre.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/28-presypacky-zlate.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/29-clunek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v2/30-tkalcovsky-stav.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/01-liska.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/02-sova.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/03-jezek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/04-medved.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/05-jelen.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/06-srna.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/07-jezevec.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/08-veverka.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/09-myval.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/10-kocka.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/11-vlk.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/12-mourek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/13-zajic.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/14-kralik.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/15-myska.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/16-klubko.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/17-hacek.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/18-pismeno-p.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/19-pletene-bryle.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/20-kniha-s-copem.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/21-kniha-se-stehem.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/22-hrnek-v-svetru.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/23-brk-a-inkoust.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/24-civka.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/25-papirovy-ptak.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/26-papirova-vlastovka.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/27-presypacky-modre.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/28-presypacky-zlate.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/29-clunek.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/30-tkalcovsky-stav.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/31-jednorozec.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/32-lebka.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/33-radioaktivita.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/34-kyticka.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/35-ufo.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/36-mimozemstan.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/37-bomba.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/38-dablik.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/39-robot.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/assets/avatars/v3/40-blesk.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/assets/avatars/v3/approved-expansion.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark-16.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark-180.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark-192.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark-32.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark-512.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark-master.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/mark.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/brand/wordmark.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/calm-mode.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/easy.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/hard.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/hardcore.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/medium.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/mozkomor.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/easy.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/hard.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/hardcore.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/medium.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/mozkokalypsa-series-ochre.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/mozkokalypsa-v2.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/mozkokalypsa.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/difficulty/printshop/mozkomor.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/favicon-32.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/favicon.ico",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/favicon.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/google-g.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/icon-192.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/icon-512.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/icon-maskable-192.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/icon-maskable-512.png",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/icon.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/continuation/chapter-chronicle.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/continuation/xp-astrolabe.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/continuation/xp-compass.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/continuation/xp-gateway.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/continuation/xp-lighthouse.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-250.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-400.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-all-800.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-cd-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-cd-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-cd-30.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-cd-7.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-250.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-clean-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-14.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-200.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-3.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-30.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-365.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-daily-7.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-discovery-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-discovery-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-discovery-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-discovery-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-easy-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-easy-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-easy-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-easy-200.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-easy-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-easy-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-200.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hard-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-10.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-200.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-hc-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-medium-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-medium-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-medium-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-medium-200.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-medium-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-medium-50.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-1.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-1.webp",
+      "status": "corrected-css"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-10.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-10.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-100.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-100.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-25.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-25.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-5.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-5.webp",
+      "status": "corrected-css"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-50.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-50.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-75.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkokalypsa-75.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkomor-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkomor-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkomor-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkomor-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-mozkomor-50.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-rescue-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-rescue-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-rescue-3.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-rescue-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-speed-120.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-speed-180.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-speed-300.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-speed-60.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-tajenka-1.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-tajenka-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-tajenka-3.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-tajenka-5.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-100.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-1000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-10000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-120000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-2500.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-25000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-40000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-500.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-5000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-50000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-61000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-75000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/achievement-xp-95000.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/alchymista.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/calm.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/challenge.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/legenda.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/medaile.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/medal-2.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/medal-3.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/nemesis.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/novacek.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/offline-wifi-v1.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/prvni-proplet.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/pulmesic.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/rank-02.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-03.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-04.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-05.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-06.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-07.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-08.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-09.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-11.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-12.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-13.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-14.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/rank-15.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-16.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/rank-17.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-19.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-20.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-21.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-22.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-23.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-24.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/rank-25.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-26.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-27.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-28.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-29.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-30.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-31.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/rank-32.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-33.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/rank-34.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-01.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-02.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/printshop/streak-03.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-05.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-06.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-07.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-08.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-09.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/streak-10.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/symbol-complete.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/symbol-daily.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/symbol-secret.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/symbol-streak.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/printshop/tyden.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/team-victories/first-imprint.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/team-victories/golden-party.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/team-victories/proplet-legend.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/rewards/team-victories/weekly-gold.svg",
+      "status": "corrected-svg"
+    },
+    {
+      "path": "public/rewards/team-victories/workshop-masters.webp",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/tajenka.svg",
+      "status": "reviewed-retained"
+    },
+    {
+      "path": "public/weekly-banner-icon-optimized.svg",
+      "status": "reviewed-retained"
+    }
+  ],
+  "nativeGroundPaths": {
+    "achievement-all-10.svg": [
+      69,
+      114,
+      132
+    ],
+    "achievement-all-100.svg": [
+      30,
+      32
+    ],
+    "achievement-all-25.svg": [
+      32
+    ],
+    "achievement-all-250.svg": [
+      42,
+      134
+    ],
+    "achievement-all-400.svg": [
+      10
+    ],
+    "achievement-all-5.svg": [
+      41,
+      48
+    ],
+    "achievement-all-50.svg": [
+      39
+    ],
+    "achievement-all-800.svg": [
+      20
+    ],
+    "achievement-cd-100.svg": [
+      24,
+      52
+    ],
+    "achievement-cd-30.svg": [
+      16
+    ],
+    "achievement-cd-7.svg": [
+      10
+    ],
+    "achievement-clean-1.svg": [
+      10
+    ],
+    "achievement-clean-10.svg": [
+      69,
+      28,
+      12
+    ],
+    "achievement-clean-100.svg": [
+      36
+    ],
+    "achievement-clean-25.svg": [
+      8
+    ],
+    "achievement-clean-250.svg": [
+      22
+    ],
+    "achievement-clean-5.svg": [
+      25,
+      46,
+      52,
+      70,
+      143,
+      159
+    ],
+    "achievement-clean-50.svg": [
+      32
+    ],
+    "achievement-daily-1.svg": [
+      12
+    ],
+    "achievement-daily-100.svg": [
+      94,
+      137
+    ],
+    "achievement-daily-14.svg": [
+      8,
+      68
+    ],
+    "achievement-daily-200.svg": [
+      77
+    ],
+    "achievement-daily-3.svg": [
+      12
+    ],
+    "achievement-daily-30.svg": [
+      20
+    ],
+    "achievement-daily-365.svg": [
+      20
+    ],
+    "achievement-daily-50.svg": [
+      18
+    ],
+    "achievement-daily-7.svg": [
+      16
+    ],
+    "achievement-discovery-1.svg": [
+      19
+    ],
+    "achievement-discovery-10.svg": [
+      23
+    ],
+    "achievement-discovery-100.svg": [
+      58
+    ],
+    "achievement-discovery-50.svg": [
+      97,
+      81,
+      10,
+      17,
+      30,
+      152
+    ],
+    "achievement-easy-1.svg": [
+      22
+    ],
+    "achievement-easy-10.svg": [
+      22,
+      66
+    ],
+    "achievement-easy-100.svg": [
+      48,
+      210
+    ],
+    "achievement-easy-200.svg": [
+      35
+    ],
+    "achievement-easy-25.svg": [
+      23
+    ],
+    "achievement-easy-50.svg": [
+      86
+    ],
+    "achievement-hard-1.svg": [
+      25
+    ],
+    "achievement-hard-10.svg": [
+      19
+    ],
+    "achievement-hard-100.svg": [
+      13
+    ],
+    "achievement-hard-200.svg": [
+      9,
+      17
+    ],
+    "achievement-hard-25.svg": [
+      36
+    ],
+    "achievement-hard-5.svg": [
+      15
+    ],
+    "achievement-hard-50.svg": [
+      38
+    ],
+    "achievement-hc-1.svg": [
+      9
+    ],
+    "achievement-hc-100.svg": [
+      5,
+      5,
+      15,
+      27,
+      184,
+      220,
+      227,
+      261,
+      336,
+      442,
+      468,
+      551,
+      562,
+      671,
+      674,
+      861,
+      898,
+      960,
+      1018,
+      1154,
+      1158,
+      1211,
+      1376,
+      1378,
+      1442,
+      1505,
+      1554,
+      1610,
+      1618,
+      1684,
+      1694,
+      1723
+    ],
+    "achievement-hc-200.svg": [
+      25,
+      25,
+      87,
+      110,
+      119,
+      180,
+      217,
+      225,
+      264,
+      265,
+      300,
+      307,
+      320,
+      347,
+      350,
+      351,
+      369,
+      380,
+      396,
+      404,
+      415,
+      442,
+      447,
+      451,
+      492,
+      516,
+      533,
+      534,
+      543,
+      578,
+      602,
+      637,
+      681,
+      705,
+      709,
+      710,
+      763,
+      782,
+      809,
+      834,
+      835,
+      852,
+      887,
+      904,
+      944,
+      987,
+      1002,
+      1079,
+      1118,
+      1169,
+      1194,
+      1202,
+      1203,
+      1204,
+      1274,
+      1301,
+      1317,
+      1341,
+      1351,
+      1352,
+      1355,
+      1357,
+      1358,
+      1366,
+      1374,
+      1400,
+      1452,
+      1470,
+      1480,
+      1507,
+      1519,
+      1545,
+      1556,
+      1557,
+      1576,
+      1594,
+      1596,
+      1599,
+      1600,
+      1604,
+      1620,
+      1621,
+      1628,
+      1630,
+      1632,
+      1634,
+      1635,
+      1636,
+      1637,
+      1638,
+      1639,
+      1643,
+      1644,
+      1645,
+      1646,
+      1652,
+      1656,
+      1657,
+      1658,
+      1659,
+      1661,
+      1663,
+      1666,
+      1667,
+      1668,
+      1671,
+      1672,
+      1673,
+      1676,
+      1685,
+      1686,
+      1687,
+      1688,
+      1691,
+      1693,
+      1695,
+      1696,
+      1697,
+      1699,
+      1700,
+      1701,
+      1702,
+      1703,
+      1706,
+      1707,
+      1708,
+      1709,
+      1713,
+      1714,
+      1716,
+      1717,
+      1718,
+      1719,
+      1720,
+      1722,
+      1723,
+      1726,
+      1727,
+      1728,
+      1730,
+      1731,
+      1741,
+      1742,
+      1743,
+      1744
+    ],
+    "achievement-hc-25.svg": [
+      15
+    ],
+    "achievement-hc-5.svg": [
+      10,
+      10,
+      41,
+      94,
+      182,
+      206,
+      207,
+      234,
+      380,
+      467,
+      533,
+      664,
+      736,
+      780,
+      852,
+      941,
+      942,
+      976,
+      977,
+      994,
+      1537,
+      1607,
+      1688,
+      1689,
+      1764,
+      1776
+    ],
+    "achievement-hc-50.svg": [
+      8,
+      8,
+      113,
+      174,
+      179,
+      185,
+      194,
+      196,
+      197,
+      199,
+      218,
+      221,
+      290,
+      317,
+      339,
+      367,
+      384,
+      392,
+      402,
+      408,
+      414,
+      435,
+      529,
+      550,
+      567,
+      584,
+      663,
+      759,
+      764,
+      768,
+      815,
+      822,
+      852,
+      855,
+      865,
+      882,
+      910,
+      970,
+      971,
+      972,
+      975,
+      1022,
+      1075,
+      1152,
+      1155,
+      1225,
+      1277,
+      1335,
+      1428,
+      1433,
+      1437,
+      1440,
+      1441,
+      1449,
+      1450,
+      1466,
+      1497,
+      1505,
+      1518,
+      1553,
+      1557,
+      1569,
+      1575,
+      1579,
+      1600,
+      1607,
+      1609,
+      1639,
+      1646,
+      1648,
+      1649,
+      1650,
+      1651,
+      1652,
+      1653,
+      1654,
+      1655,
+      1656,
+      1657,
+      1658,
+      1663,
+      1664,
+      1667,
+      1668,
+      1669,
+      1670,
+      1671,
+      1674,
+      1675,
+      1676,
+      1677,
+      1678,
+      1680,
+      1681,
+      1682,
+      1684,
+      1688,
+      1689,
+      1691,
+      1692,
+      1693,
+      1694,
+      1695,
+      1696,
+      1697,
+      1698,
+      1699,
+      1700,
+      1701,
+      1702,
+      1703,
+      1706
+    ],
+    "achievement-medium-1.svg": [
+      35
+    ],
+    "achievement-medium-10.svg": [
+      27
+    ],
+    "achievement-medium-100.svg": [
+      29
+    ],
+    "achievement-medium-200.svg": [
+      15
+    ],
+    "achievement-medium-50.svg": [
+      13
+    ],
+    "achievement-mozkomor-1.svg": [
+      92
+    ],
+    "achievement-mozkomor-10.svg": [
+      39
+    ],
+    "achievement-mozkomor-25.svg": [
+      78
+    ],
+    "achievement-mozkomor-5.svg": [
+      33
+    ],
+    "achievement-rescue-1.svg": [
+      55
+    ],
+    "achievement-rescue-10.svg": [
+      86
+    ],
+    "achievement-rescue-5.svg": [
+      33
+    ],
+    "achievement-speed-120.svg": [
+      31
+    ],
+    "achievement-speed-180.svg": [
+      20
+    ],
+    "achievement-speed-300.svg": [
+      31
+    ],
+    "achievement-speed-60.svg": [
+      25
+    ],
+    "achievement-tajenka-1.svg": [
+      46
+    ],
+    "achievement-tajenka-3.svg": [
+      24
+    ],
+    "achievement-tajenka-5.svg": [
+      21
+    ],
+    "achievement-xp-100.svg": [
+      17
+    ],
+    "achievement-xp-1000.svg": [
+      29
+    ],
+    "achievement-xp-120000.svg": [
+      65
+    ],
+    "achievement-xp-25000.svg": [
+      20
+    ],
+    "achievement-xp-40000.svg": [
+      16
+    ],
+    "achievement-xp-500.svg": [
+      48,
+      78,
+      54,
+      23
+    ],
+    "achievement-xp-5000.svg": [
+      4
+    ],
+    "achievement-xp-50000.svg": [
+      8,
+      41
+    ],
+    "achievement-xp-61000.svg": [
+      23
+    ],
+    "achievement-xp-75000.svg": [
+      6,
+      70,
+      9,
+      146,
+      20
+    ],
+    "achievement-xp-95000.svg": [
+      13,
+      38
+    ],
+    "alchymista.svg": [
+      18
+    ],
+    "medal-2.svg": [
+      20
+    ],
+    "medal-3.svg": [
+      13
+    ],
+    "rank-02.svg": [
+      35
+    ],
+    "rank-03.svg": [
+      47
+    ],
+    "rank-06.svg": [
+      20
+    ],
+    "rank-08.svg": [
+      28
+    ],
+    "rank-09.svg": [
+      25
+    ],
+    "rank-10.svg": [
+      13
+    ],
+    "rank-11.svg": [
+      15
+    ],
+    "rank-15.svg": [
+      8,
+      34,
+      13
+    ],
+    "rank-17.svg": [
+      90
+    ],
+    "rank-19.svg": [
+      49
+    ],
+    "rank-20.svg": [
+      56
+    ],
+    "rank-21.svg": [
+      104,
+      73,
+      94
+    ],
+    "rank-22.svg": [
+      13
+    ],
+    "rank-23.svg": [
+      27
+    ],
+    "rank-25.svg": [
+      31
+    ],
+    "rank-26.svg": [
+      22
+    ],
+    "rank-27.svg": [
+      9
+    ],
+    "rank-28.svg": [
+      12
+    ],
+    "rank-29.svg": [
+      26
+    ],
+    "rank-30.svg": [
+      21
+    ],
+    "rank-33.svg": [
+      24
+    ],
+    "rank-34.svg": [
+      32,
+      30,
+      71
+    ],
+    "streak-01.svg": [
+      20
+    ],
+    "streak-03.svg": [
+      48
+    ],
+    "streak-05.svg": [
+      40
+    ],
+    "streak-07.svg": [
+      49
+    ],
+    "streak-08.svg": [
+      17
+    ],
+    "streak-09.svg": [
+      23
+    ],
+    "streak-10.svg": [
+      20
+    ],
+    "symbol-complete.svg": [
+      63
+    ],
+    "symbol-daily.svg": [
+      13
+    ],
+    "symbol-streak.svg": [
+      20
+    ],
+    "tyden.svg": [
+      17
+    ],
+    "achievement-rescue-3.svg": [
+      61,
+      27
+    ],
+    "achievement-xp-10000.svg": [
+      48,
+      97
+    ],
+    "achievement-xp-2500.svg": [
+      15
+    ],
+    "medaile.svg": [
+      21
+    ],
+    "weekly-gold.svg": [
+      21
+    ],
+    "novacek.svg": [
+      10
+    ],
+    "rank-04.svg": [
+      18
+    ],
+    "rank-05.svg": [
+      18,
+      48
+    ],
+    "rank-12.svg": [
+      38
+    ],
+    "rank-13.svg": [
+      41
+    ],
+    "rank-07.svg": [
+      59,
+      71
+    ],
+    "streak-06.svg": [
+      26
+    ],
+    "symbol-secret.svg": [
+      60
+    ],
+    "achievement-medium-25.svg": [
+      59,
+      97
+    ]
+  },
+  "reviewedContours420px": {
+    "achievement-all-10.svg": [
+      [
+        60.0,
+        300.0
+      ],
+      [
+        75.0,
+        323.0
+      ],
+      [
+        96.0,
+        339.0
+      ],
+      [
+        123.0,
+        340.0
+      ],
+      [
+        165.0,
+        330.0
+      ],
+      [
+        190.0,
+        339.0
+      ],
+      [
+        230.0,
+        341.0
+      ],
+      [
+        260.0,
+        330.0
+      ],
+      [
+        284.0,
+        328.0
+      ],
+      [
+        297.0,
+        350.0
+      ],
+      [
+        332.0,
+        344.0
+      ],
+      [
+        364.0,
+        329.0
+      ],
+      [
+        369.0,
+        300.0
+      ]
+    ],
+    "achievement-all-100.svg": [
+      [
+        55.0,
+        310.0
+      ],
+      [
+        92.0,
+        319.0
+      ],
+      [
+        284.0,
+        354.0
+      ],
+      [
+        308.0,
+        354.0
+      ],
+      [
+        361.0,
+        299.0
+      ],
+      [
+        365.0,
+        285.0
+      ]
+    ],
+    "achievement-all-25.svg": [
+      [
+        75.0,
+        322.0
+      ],
+      [
+        87.0,
+        337.0
+      ],
+      [
+        323.0,
+        344.0
+      ],
+      [
+        342.0,
+        336.0
+      ],
+      [
+        346.0,
+        318.0
+      ]
+    ],
+    "achievement-all-250.svg": [
+      [
+        171.0,
+        326.0
+      ],
+      [
+        183.0,
+        346.0
+      ],
+      [
+        210.0,
+        354.0
+      ],
+      [
+        271.0,
+        356.0
+      ],
+      [
+        302.0,
+        345.0
+      ],
+      [
+        326.0,
+        328.0
+      ]
+    ],
+    "achievement-all-400.svg": [
+      [
+        100.0,
+        264.0
+      ],
+      [
+        133.0,
+        282.0
+      ],
+      [
+        161.0,
+        302.0
+      ],
+      [
+        177.0,
+        319.0
+      ],
+      [
+        202.0,
+        334.0
+      ],
+      [
+        226.0,
+        341.0
+      ],
+      [
+        283.0,
+        345.0
+      ],
+      [
+        332.0,
+        341.0
+      ],
+      [
+        358.0,
+        329.0
+      ],
+      [
+        370.0,
+        311.0
+      ]
+    ],
+    "achievement-all-5.svg": [
+      [
+        57.0,
+        301.0
+      ],
+      [
+        68.0,
+        315.0
+      ],
+      [
+        273.0,
+        352.0
+      ],
+      [
+        293.0,
+        354.0
+      ],
+      [
+        357.0,
+        305.0
+      ]
+    ],
+    "achievement-all-50.svg": [
+      [
+        40.0,
+        303.0
+      ],
+      [
+        51.0,
+        311.0
+      ],
+      [
+        351.0,
+        327.0
+      ],
+      [
+        374.0,
+        313.0
+      ]
+    ],
+    "achievement-all-800.svg": [
+      [
+        128.0,
+        314.0
+      ],
+      [
+        149.0,
+        329.0
+      ],
+      [
+        198.0,
+        335.0
+      ],
+      [
+        259.0,
+        334.0
+      ],
+      [
+        308.0,
+        329.0
+      ],
+      [
+        333.0,
+        315.0
+      ],
+      [
+        339.0,
+        301.0
+      ]
+    ],
+    "achievement-cd-100.svg": [
+      [
+        136.0,
+        323.0
+      ],
+      [
+        147.0,
+        335.0
+      ],
+      [
+        159.0,
+        332.0
+      ],
+      [
+        170.0,
+        316.0
+      ],
+      [
+        181.0,
+        345.0
+      ],
+      [
+        201.0,
+        361.0
+      ],
+      [
+        213.0,
+        361.0
+      ],
+      [
+        229.0,
+        341.0
+      ],
+      [
+        237.0,
+        318.0
+      ],
+      [
+        257.0,
+        334.0
+      ],
+      [
+        269.0,
+        336.0
+      ],
+      [
+        276.0,
+        312.0
+      ],
+      [
+        292.0,
+        324.0
+      ],
+      [
+        327.0,
+        326.0
+      ],
+      [
+        331.0,
+        315.0
+      ]
+    ],
+    "achievement-cd-30.svg": [
+      [
+        74.0,
+        305.0
+      ],
+      [
+        90.0,
+        326.0
+      ],
+      [
+        126.0,
+        340.0
+      ],
+      [
+        171.0,
+        347.0
+      ],
+      [
+        227.0,
+        348.0
+      ],
+      [
+        270.0,
+        339.0
+      ],
+      [
+        306.0,
+        322.0
+      ],
+      [
+        323.0,
+        304.0
+      ],
+      [
+        325.0,
+        278.0
+      ]
+    ],
+    "achievement-cd-7.svg": [
+      [
+        81.0,
+        318.0
+      ],
+      [
+        85.0,
+        329.0
+      ],
+      [
+        126.0,
+        330.0
+      ],
+      [
+        142.0,
+        314.0
+      ],
+      [
+        170.0,
+        305.0
+      ],
+      [
+        195.0,
+        302.0
+      ],
+      [
+        222.0,
+        308.0
+      ],
+      [
+        249.0,
+        324.0
+      ],
+      [
+        269.0,
+        334.0
+      ],
+      [
+        326.0,
+        336.0
+      ],
+      [
+        332.0,
+        321.0
+      ],
+      [
+        332.0,
+        306.0
+      ]
+    ],
+    "achievement-clean-1.svg": [
+      [
+        95.0,
+        309.0
+      ],
+      [
+        103.0,
+        326.0
+      ],
+      [
+        137.0,
+        328.0
+      ],
+      [
+        165.0,
+        346.0
+      ],
+      [
+        190.0,
+        354.0
+      ],
+      [
+        248.0,
+        356.0
+      ],
+      [
+        278.0,
+        347.0
+      ],
+      [
+        298.0,
+        332.0
+      ],
+      [
+        308.0,
+        309.0
+      ]
+    ],
+    "achievement-clean-10.svg": [
+      [
+        80.0,
+        306.0
+      ],
+      [
+        99.0,
+        322.0
+      ],
+      [
+        121.0,
+        325.0
+      ],
+      [
+        167.0,
+        317.0
+      ],
+      [
+        210.0,
+        307.0
+      ],
+      [
+        265.0,
+        299.0
+      ],
+      [
+        359.0,
+        275.0
+      ],
+      [
+        365.0,
+        262.0
+      ]
+    ],
+    "achievement-clean-100.svg": [
+      [
+        91.0,
+        327.0
+      ],
+      [
+        93.0,
+        339.0
+      ],
+      [
+        152.0,
+        360.0
+      ],
+      [
+        244.0,
+        351.0
+      ],
+      [
+        296.0,
+        342.0
+      ],
+      [
+        314.0,
+        330.0
+      ],
+      [
+        315.0,
+        316.0
+      ]
+    ],
+    "achievement-clean-25.svg": [
+      [
+        140.0,
+        353.0
+      ],
+      [
+        143.0,
+        364.0
+      ],
+      [
+        148.0,
+        362.0
+      ],
+      [
+        160.0,
+        345.0
+      ],
+      [
+        179.0,
+        330.0
+      ],
+      [
+        185.0,
+        319.0
+      ]
+    ],
+    "achievement-clean-250.svg": [
+      [
+        109.0,
+        333.0
+      ],
+      [
+        108.0,
+        354.0
+      ],
+      [
+        128.0,
+        363.0
+      ],
+      [
+        170.0,
+        367.0
+      ],
+      [
+        222.0,
+        367.0
+      ],
+      [
+        266.0,
+        361.0
+      ],
+      [
+        283.0,
+        350.0
+      ],
+      [
+        284.0,
+        333.0
+      ]
+    ],
+    "achievement-clean-5.svg": [
+      [
+        55.0,
+        260.0
+      ],
+      [
+        65.0,
+        272.0
+      ],
+      [
+        116.0,
+        316.0
+      ],
+      [
+        139.0,
+        324.0
+      ],
+      [
+        156.0,
+        324.0
+      ],
+      [
+        258.0,
+        292.0
+      ],
+      [
+        267.0,
+        301.0
+      ],
+      [
+        278.0,
+        301.0
+      ],
+      [
+        286.0,
+        295.0
+      ],
+      [
+        291.0,
+        291.0
+      ],
+      [
+        312.0,
+        290.0
+      ],
+      [
+        324.0,
+        280.0
+      ],
+      [
+        331.0,
+        267.0
+      ],
+      [
+        332.0,
+        251.0
+      ],
+      [
+        349.0,
+        248.0
+      ],
+      [
+        353.0,
+        237.0
+      ]
+    ],
+    "achievement-clean-50.svg": [
+      [
+        102.0,
+        339.0
+      ],
+      [
+        105.0,
+        349.0
+      ],
+      [
+        121.0,
+        355.0
+      ],
+      [
+        181.0,
+        361.0
+      ],
+      [
+        251.0,
+        360.0
+      ],
+      [
+        287.0,
+        352.0
+      ],
+      [
+        314.0,
+        340.0
+      ],
+      [
+        314.0,
+        321.0
+      ]
+    ],
+    "achievement-daily-1.svg": [
+      [
+        101.0,
+        351.0
+      ],
+      [
+        108.0,
+        365.0
+      ],
+      [
+        117.0,
+        366.0
+      ],
+      [
+        132.0,
+        351.0
+      ],
+      [
+        140.0,
+        342.0
+      ],
+      [
+        165.0,
+        353.0
+      ],
+      [
+        191.0,
+        359.0
+      ],
+      [
+        228.0,
+        359.0
+      ],
+      [
+        256.0,
+        352.0
+      ],
+      [
+        272.0,
+        342.0
+      ],
+      [
+        286.0,
+        363.0
+      ],
+      [
+        295.0,
+        367.0
+      ],
+      [
+        304.0,
+        360.0
+      ],
+      [
+        303.0,
+        349.0
+      ]
+    ],
+    "achievement-daily-100.svg": [
+      [
+        144.0,
+        360.0
+      ],
+      [
+        144.0,
+        375.0
+      ],
+      [
+        172.0,
+        382.0
+      ],
+      [
+        223.0,
+        384.0
+      ],
+      [
+        267.0,
+        380.0
+      ],
+      [
+        298.0,
+        375.0
+      ],
+      [
+        299.0,
+        360.0
+      ]
+    ],
+    "achievement-daily-14.svg": [
+      [
+        80.0,
+        288.0
+      ],
+      [
+        89.0,
+        314.0
+      ],
+      [
+        157.0,
+        292.0
+      ],
+      [
+        164.0,
+        301.0
+      ],
+      [
+        335.0,
+        342.0
+      ],
+      [
+        346.0,
+        333.0
+      ],
+      [
+        349.0,
+        309.0
+      ]
+    ],
+    "achievement-daily-200.svg": [
+      [
+        57.0,
+        326.0
+      ],
+      [
+        62.0,
+        332.0
+      ],
+      [
+        116.0,
+        345.0
+      ],
+      [
+        193.0,
+        345.0
+      ],
+      [
+        209.0,
+        352.0
+      ],
+      [
+        246.0,
+        352.0
+      ],
+      [
+        254.0,
+        343.0
+      ],
+      [
+        340.0,
+        334.0
+      ],
+      [
+        347.0,
+        327.0
+      ]
+    ],
+    "achievement-daily-3.svg": [
+      [
+        90.0,
+        331.0
+      ],
+      [
+        106.0,
+        341.0
+      ],
+      [
+        132.0,
+        346.0
+      ],
+      [
+        163.0,
+        344.0
+      ],
+      [
+        188.0,
+        335.0
+      ],
+      [
+        207.0,
+        319.0
+      ],
+      [
+        222.0,
+        333.0
+      ],
+      [
+        246.0,
+        344.0
+      ],
+      [
+        281.0,
+        346.0
+      ],
+      [
+        310.0,
+        339.0
+      ],
+      [
+        335.0,
+        323.0
+      ]
+    ],
+    "achievement-daily-30.svg": [
+      [
+        135.0,
+        329.0
+      ],
+      [
+        156.0,
+        340.0
+      ],
+      [
+        190.0,
+        348.0
+      ],
+      [
+        222.0,
+        348.0
+      ],
+      [
+        254.0,
+        342.0
+      ],
+      [
+        280.0,
+        330.0
+      ],
+      [
+        302.0,
+        316.0
+      ]
+    ],
+    "achievement-daily-365.svg": [
+      [
+        137.0,
+        344.0
+      ],
+      [
+        161.0,
+        354.0
+      ],
+      [
+        184.0,
+        360.0
+      ],
+      [
+        218.0,
+        364.0
+      ],
+      [
+        241.0,
+        361.0
+      ],
+      [
+        267.0,
+        354.0
+      ],
+      [
+        286.0,
+        343.0
+      ]
+    ],
+    "achievement-daily-50.svg": [
+      [
+        61.0,
+        340.0
+      ],
+      [
+        66.0,
+        351.0
+      ],
+      [
+        80.0,
+        357.0
+      ],
+      [
+        331.0,
+        358.0
+      ],
+      [
+        346.0,
+        352.0
+      ],
+      [
+        351.0,
+        341.0
+      ]
+    ],
+    "achievement-daily-7.svg": [
+      [
+        60.0,
+        343.0
+      ],
+      [
+        65.0,
+        361.0
+      ],
+      [
+        81.0,
+        367.0
+      ],
+      [
+        289.0,
+        377.0
+      ],
+      [
+        299.0,
+        371.0
+      ],
+      [
+        308.0,
+        356.0
+      ],
+      [
+        338.0,
+        357.0
+      ],
+      [
+        349.0,
+        350.0
+      ],
+      [
+        349.0,
+        336.0
+      ]
+    ],
+    "achievement-discovery-1.svg": [
+      [
+        75.0,
+        302.0
+      ],
+      [
+        82.0,
+        318.0
+      ],
+      [
+        254.0,
+        341.0
+      ],
+      [
+        268.0,
+        338.0
+      ],
+      [
+        329.0,
+        309.0
+      ],
+      [
+        330.0,
+        296.0
+      ]
+    ],
+    "achievement-discovery-10.svg": [
+      [
+        159.0,
+        321.0
+      ],
+      [
+        160.0,
+        338.0
+      ],
+      [
+        173.0,
+        344.0
+      ],
+      [
+        202.0,
+        350.0
+      ],
+      [
+        220.0,
+        346.0
+      ],
+      [
+        250.0,
+        338.0
+      ],
+      [
+        254.0,
+        330.0
+      ]
+    ],
+    "achievement-discovery-100.svg": [
+      [
+        62.0,
+        340.0
+      ],
+      [
+        66.0,
+        351.0
+      ],
+      [
+        99.0,
+        357.0
+      ],
+      [
+        106.0,
+        352.0
+      ],
+      [
+        113.0,
+        362.0
+      ],
+      [
+        121.0,
+        359.0
+      ],
+      [
+        125.0,
+        350.0
+      ],
+      [
+        136.0,
+        354.0
+      ],
+      [
+        141.0,
+        345.0
+      ],
+      [
+        132.0,
+        336.0
+      ],
+      [
+        137.0,
+        341.0
+      ],
+      [
+        165.0,
+        348.0
+      ],
+      [
+        201.0,
+        350.0
+      ],
+      [
+        221.0,
+        344.0
+      ],
+      [
+        227.0,
+        350.0
+      ],
+      [
+        259.0,
+        343.0
+      ],
+      [
+        275.0,
+        333.0
+      ],
+      [
+        278.0,
+        329.0
+      ],
+      [
+        282.0,
+        350.0
+      ],
+      [
+        298.0,
+        357.0
+      ],
+      [
+        328.0,
+        359.0
+      ],
+      [
+        343.0,
+        353.0
+      ],
+      [
+        349.0,
+        343.0
+      ]
+    ],
+    "achievement-discovery-50.svg": [
+      [
+        45.0,
+        267.0
+      ],
+      [
+        55.0,
+        286.0
+      ],
+      [
+        74.0,
+        297.0
+      ],
+      [
+        103.0,
+        303.0
+      ],
+      [
+        129.0,
+        302.0
+      ],
+      [
+        149.0,
+        296.0
+      ],
+      [
+        162.0,
+        282.0
+      ],
+      [
+        185.0,
+        281.0
+      ],
+      [
+        202.0,
+        304.0
+      ],
+      [
+        224.0,
+        322.0
+      ],
+      [
+        245.0,
+        329.0
+      ],
+      [
+        274.0,
+        331.0
+      ],
+      [
+        297.0,
+        321.0
+      ],
+      [
+        314.0,
+        302.0
+      ],
+      [
+        331.0,
+        274.0
+      ],
+      [
+        346.0,
+        241.0
+      ],
+      [
+        351.0,
+        220.0
+      ]
+    ],
+    "achievement-easy-1.svg": [
+      [
+        112.0,
+        320.0
+      ],
+      [
+        129.0,
+        337.0
+      ],
+      [
+        161.0,
+        349.0
+      ],
+      [
+        201.0,
+        353.0
+      ],
+      [
+        242.0,
+        350.0
+      ],
+      [
+        270.0,
+        339.0
+      ],
+      [
+        291.0,
+        323.0
+      ],
+      [
+        304.0,
+        303.0
+      ]
+    ],
+    "achievement-easy-10.svg": [
+      [
+        59.0,
+        301.0
+      ],
+      [
+        67.0,
+        315.0
+      ],
+      [
+        92.0,
+        336.0
+      ],
+      [
+        113.0,
+        342.0
+      ],
+      [
+        139.0,
+        342.0
+      ],
+      [
+        148.0,
+        332.0
+      ],
+      [
+        157.0,
+        316.0
+      ],
+      [
+        248.0,
+        316.0
+      ],
+      [
+        258.0,
+        352.0
+      ],
+      [
+        270.0,
+        364.0
+      ],
+      [
+        305.0,
+        365.0
+      ],
+      [
+        343.0,
+        360.0
+      ],
+      [
+        361.0,
+        350.0
+      ],
+      [
+        363.0,
+        336.0
+      ]
+    ],
+    "achievement-easy-100.svg": [
+      [
+        111.0,
+        331.0
+      ],
+      [
+        118.0,
+        339.0
+      ],
+      [
+        161.0,
+        340.0
+      ],
+      [
+        175.0,
+        346.0
+      ],
+      [
+        198.0,
+        344.0
+      ],
+      [
+        208.0,
+        339.0
+      ],
+      [
+        225.0,
+        345.0
+      ],
+      [
+        244.0,
+        343.0
+      ],
+      [
+        254.0,
+        339.0
+      ],
+      [
+        280.0,
+        339.0
+      ],
+      [
+        278.0,
+        332.0
+      ]
+    ],
+    "achievement-easy-200.svg": [
+      [
+        48.0,
+        330.0
+      ],
+      [
+        50.0,
+        350.0
+      ],
+      [
+        183.0,
+        355.0
+      ],
+      [
+        252.0,
+        355.0
+      ],
+      [
+        357.0,
+        339.0
+      ],
+      [
+        360.0,
+        331.0
+      ]
+    ],
+    "achievement-easy-25.svg": [
+      [
+        122.0,
+        326.0
+      ],
+      [
+        126.0,
+        342.0
+      ],
+      [
+        140.0,
+        347.0
+      ],
+      [
+        174.0,
+        350.0
+      ],
+      [
+        228.0,
+        350.0
+      ],
+      [
+        274.0,
+        346.0
+      ],
+      [
+        297.0,
+        336.0
+      ],
+      [
+        299.0,
+        326.0
+      ]
+    ],
+    "achievement-easy-50.svg": [
+      [
+        58.0,
+        285.0
+      ],
+      [
+        77.0,
+        292.0
+      ],
+      [
+        224.0,
+        338.0
+      ],
+      [
+        239.0,
+        340.0
+      ],
+      [
+        354.0,
+        275.0
+      ],
+      [
+        358.0,
+        263.0
+      ]
+    ],
+    "achievement-hard-1.svg": [
+      [
+        156.0,
+        338.0
+      ],
+      [
+        177.0,
+        353.0
+      ],
+      [
+        206.0,
+        358.0
+      ],
+      [
+        238.0,
+        353.0
+      ],
+      [
+        261.0,
+        343.0
+      ],
+      [
+        274.0,
+        326.0
+      ]
+    ],
+    "achievement-hard-10.svg": [
+      [
+        88.0,
+        323.0
+      ],
+      [
+        106.0,
+        334.0
+      ],
+      [
+        132.0,
+        344.0
+      ],
+      [
+        160.0,
+        351.0
+      ],
+      [
+        181.0,
+        352.0
+      ],
+      [
+        198.0,
+        344.0
+      ],
+      [
+        209.0,
+        324.0
+      ]
+    ],
+    "achievement-hard-100.svg": [
+      [
+        126.0,
+        350.0
+      ],
+      [
+        149.0,
+        366.0
+      ],
+      [
+        181.0,
+        374.0
+      ],
+      [
+        213.0,
+        376.0
+      ],
+      [
+        246.0,
+        370.0
+      ],
+      [
+        273.0,
+        356.0
+      ],
+      [
+        284.0,
+        343.0
+      ]
+    ],
+    "achievement-hard-200.svg": [
+      [
+        163.0,
+        311.0
+      ],
+      [
+        174.0,
+        315.0
+      ],
+      [
+        182.0,
+        335.0
+      ],
+      [
+        193.0,
+        343.0
+      ],
+      [
+        210.0,
+        351.0
+      ],
+      [
+        219.0,
+        351.0
+      ],
+      [
+        234.0,
+        342.0
+      ],
+      [
+        239.0,
+        326.0
+      ],
+      [
+        246.0,
+        313.0
+      ],
+      [
+        255.0,
+        331.0
+      ],
+      [
+        285.0,
+        359.0
+      ],
+      [
+        292.0,
+        359.0
+      ],
+      [
+        302.0,
+        345.0
+      ],
+      [
+        313.0,
+        333.0
+      ]
+    ],
+    "achievement-hard-25.svg": [
+      [
+        93.0,
+        350.0
+      ],
+      [
+        104.0,
+        363.0
+      ],
+      [
+        121.0,
+        369.0
+      ],
+      [
+        139.0,
+        367.0
+      ],
+      [
+        152.0,
+        353.0
+      ],
+      [
+        167.0,
+        341.0
+      ],
+      [
+        274.0,
+        344.0
+      ],
+      [
+        289.0,
+        365.0
+      ],
+      [
+        305.0,
+        369.0
+      ],
+      [
+        323.0,
+        359.0
+      ],
+      [
+        338.0,
+        344.0
+      ]
+    ],
+    "achievement-hard-5.svg": [
+      [
+        82.0,
+        359.0
+      ],
+      [
+        102.0,
+        375.0
+      ],
+      [
+        123.0,
+        381.0
+      ],
+      [
+        140.0,
+        381.0
+      ],
+      [
+        159.0,
+        369.0
+      ],
+      [
+        178.0,
+        349.0
+      ]
+    ],
+    "achievement-hard-50.svg": [
+      [
+        85.0,
+        303.0
+      ],
+      [
+        92.0,
+        318.0
+      ],
+      [
+        110.0,
+        334.0
+      ],
+      [
+        126.0,
+        342.0
+      ],
+      [
+        137.0,
+        343.0
+      ],
+      [
+        147.0,
+        332.0
+      ],
+      [
+        157.0,
+        323.0
+      ],
+      [
+        174.0,
+        313.0
+      ],
+      [
+        194.0,
+        308.0
+      ],
+      [
+        214.0,
+        308.0
+      ],
+      [
+        233.0,
+        312.0
+      ],
+      [
+        232.0,
+        348.0
+      ],
+      [
+        240.0,
+        354.0
+      ],
+      [
+        251.0,
+        354.0
+      ],
+      [
+        274.0,
+        348.0
+      ],
+      [
+        296.0,
+        340.0
+      ],
+      [
+        313.0,
+        331.0
+      ],
+      [
+        320.0,
+        322.0
+      ],
+      [
+        321.0,
+        310.0
+      ]
+    ],
+    "achievement-hc-1.svg": [
+      [
+        96.0,
+        322.0
+      ],
+      [
+        97.0,
+        340.0
+      ],
+      [
+        108.0,
+        347.0
+      ],
+      [
+        128.0,
+        347.0
+      ],
+      [
+        145.0,
+        342.0
+      ],
+      [
+        154.0,
+        330.0
+      ],
+      [
+        156.0,
+        307.0
+      ],
+      [
+        175.0,
+        311.0
+      ],
+      [
+        199.0,
+        315.0
+      ],
+      [
+        227.0,
+        313.0
+      ],
+      [
+        251.0,
+        307.0
+      ],
+      [
+        258.0,
+        326.0
+      ],
+      [
+        264.0,
+        341.0
+      ],
+      [
+        282.0,
+        348.0
+      ],
+      [
+        305.0,
+        348.0
+      ],
+      [
+        321.0,
+        340.0
+      ],
+      [
+        320.0,
+        324.0
+      ]
+    ],
+    "achievement-hc-100.svg": [
+      [
+        71.0,
+        321.0
+      ],
+      [
+        73.0,
+        335.0
+      ],
+      [
+        96.0,
+        341.0
+      ],
+      [
+        122.0,
+        339.0
+      ],
+      [
+        134.0,
+        333.0
+      ],
+      [
+        125.0,
+        317.0
+      ],
+      [
+        122.0,
+        300.0
+      ],
+      [
+        132.0,
+        290.0
+      ],
+      [
+        144.0,
+        279.0
+      ],
+      [
+        152.0,
+        305.0
+      ],
+      [
+        165.0,
+        325.0
+      ],
+      [
+        171.0,
+        343.0
+      ],
+      [
+        187.0,
+        352.0
+      ],
+      [
+        217.0,
+        354.0
+      ],
+      [
+        241.0,
+        347.0
+      ],
+      [
+        244.0,
+        329.0
+      ],
+      [
+        233.0,
+        308.0
+      ],
+      [
+        227.0,
+        300.0
+      ],
+      [
+        248.0,
+        302.0
+      ],
+      [
+        265.0,
+        297.0
+      ],
+      [
+        280.0,
+        315.0
+      ],
+      [
+        294.0,
+        338.0
+      ],
+      [
+        318.0,
+        345.0
+      ],
+      [
+        348.0,
+        344.0
+      ],
+      [
+        373.0,
+        336.0
+      ],
+      [
+        371.0,
+        323.0
+      ]
+    ],
+    "achievement-hc-200.svg": [
+      [
+        55.0,
+        346.0
+      ],
+      [
+        66.0,
+        352.0
+      ],
+      [
+        92.0,
+        354.0
+      ],
+      [
+        112.0,
+        348.0
+      ],
+      [
+        128.0,
+        350.0
+      ],
+      [
+        146.0,
+        346.0
+      ],
+      [
+        164.0,
+        334.0
+      ],
+      [
+        179.0,
+        324.0
+      ],
+      [
+        179.0,
+        342.0
+      ],
+      [
+        187.0,
+        351.0
+      ],
+      [
+        199.0,
+        349.0
+      ],
+      [
+        209.0,
+        338.0
+      ],
+      [
+        222.0,
+        336.0
+      ],
+      [
+        236.0,
+        343.0
+      ],
+      [
+        261.0,
+        343.0
+      ],
+      [
+        267.0,
+        348.0
+      ],
+      [
+        278.0,
+        351.0
+      ],
+      [
+        278.0,
+        341.0
+      ],
+      [
+        300.0,
+        339.0
+      ],
+      [
+        303.0,
+        331.0
+      ]
+    ],
+    "achievement-hc-25.svg": [
+      [
+        113.0,
+        327.0
+      ],
+      [
+        130.0,
+        339.0
+      ],
+      [
+        157.0,
+        345.0
+      ],
+      [
+        193.0,
+        348.0
+      ],
+      [
+        223.0,
+        344.0
+      ],
+      [
+        242.0,
+        337.0
+      ],
+      [
+        257.0,
+        344.0
+      ],
+      [
+        275.0,
+        347.0
+      ],
+      [
+        289.0,
+        340.0
+      ],
+      [
+        295.0,
+        321.0
+      ]
+    ],
+    "achievement-hc-5.svg": [
+      [
+        61.0,
+        339.0
+      ],
+      [
+        63.0,
+        354.0
+      ],
+      [
+        80.0,
+        360.0
+      ],
+      [
+        102.0,
+        359.0
+      ],
+      [
+        122.0,
+        353.0
+      ],
+      [
+        158.0,
+        350.0
+      ],
+      [
+        167.0,
+        334.0
+      ],
+      [
+        183.0,
+        338.0
+      ],
+      [
+        208.0,
+        340.0
+      ],
+      [
+        233.0,
+        337.0
+      ],
+      [
+        246.0,
+        332.0
+      ],
+      [
+        247.0,
+        350.0
+      ],
+      [
+        271.0,
+        354.0
+      ],
+      [
+        297.0,
+        360.0
+      ],
+      [
+        322.0,
+        362.0
+      ],
+      [
+        347.0,
+        355.0
+      ],
+      [
+        351.0,
+        341.0
+      ]
+    ],
+    "achievement-hc-50.svg": [
+      [
+        91.0,
+        323.0
+      ],
+      [
+        90.0,
+        338.0
+      ],
+      [
+        104.0,
+        347.0
+      ],
+      [
+        122.0,
+        347.0
+      ],
+      [
+        150.0,
+        339.0
+      ],
+      [
+        161.0,
+        333.0
+      ],
+      [
+        160.0,
+        309.0
+      ],
+      [
+        179.0,
+        300.0
+      ],
+      [
+        199.0,
+        295.0
+      ],
+      [
+        218.0,
+        297.0
+      ],
+      [
+        241.0,
+        307.0
+      ],
+      [
+        253.0,
+        315.0
+      ],
+      [
+        255.0,
+        333.0
+      ],
+      [
+        270.0,
+        341.0
+      ],
+      [
+        293.0,
+        347.0
+      ],
+      [
+        314.0,
+        346.0
+      ],
+      [
+        326.0,
+        338.0
+      ],
+      [
+        321.0,
+        325.0
+      ]
+    ],
+    "achievement-medium-1.svg": [
+      [
+        171.0,
+        338.0
+      ],
+      [
+        179.0,
+        351.0
+      ],
+      [
+        188.0,
+        359.0
+      ],
+      [
+        219.0,
+        362.0
+      ],
+      [
+        237.0,
+        357.0
+      ],
+      [
+        248.0,
+        342.0
+      ]
+    ],
+    "achievement-medium-10.svg": [
+      [
+        73.0,
+        344.0
+      ],
+      [
+        87.0,
+        362.0
+      ],
+      [
+        111.0,
+        377.0
+      ],
+      [
+        151.0,
+        389.0
+      ],
+      [
+        200.0,
+        393.0
+      ],
+      [
+        250.0,
+        391.0
+      ],
+      [
+        294.0,
+        380.0
+      ],
+      [
+        320.0,
+        362.0
+      ],
+      [
+        331.0,
+        343.0
+      ]
+    ],
+    "achievement-medium-100.svg": [
+      [
+        109.0,
+        345.0
+      ],
+      [
+        107.0,
+        360.0
+      ],
+      [
+        122.0,
+        371.0
+      ],
+      [
+        162.0,
+        380.0
+      ],
+      [
+        216.0,
+        383.0
+      ],
+      [
+        265.0,
+        380.0
+      ],
+      [
+        299.0,
+        372.0
+      ],
+      [
+        310.0,
+        360.0
+      ],
+      [
+        308.0,
+        347.0
+      ]
+    ],
+    "achievement-medium-200.svg": [
+      [
+        225.0,
+        323.0
+      ],
+      [
+        236.0,
+        339.0
+      ],
+      [
+        251.0,
+        347.0
+      ],
+      [
+        266.0,
+        349.0
+      ],
+      [
+        277.0,
+        365.0
+      ],
+      [
+        296.0,
+        365.0
+      ],
+      [
+        305.0,
+        354.0
+      ],
+      [
+        320.0,
+        350.0
+      ],
+      [
+        336.0,
+        338.0
+      ],
+      [
+        344.0,
+        325.0
+      ]
+    ],
+    "achievement-medium-25.svg": [
+      [
+        77.0,
+        309.0
+      ],
+      [
+        82.0,
+        319.0
+      ],
+      [
+        108.0,
+        329.0
+      ],
+      [
+        153.0,
+        338.0
+      ],
+      [
+        184.0,
+        341.0
+      ],
+      [
+        219.0,
+        336.0
+      ],
+      [
+        254.0,
+        333.0
+      ],
+      [
+        263.0,
+        337.0
+      ],
+      [
+        293.0,
+        343.0
+      ],
+      [
+        309.0,
+        337.0
+      ],
+      [
+        320.0,
+        325.0
+      ],
+      [
+        325.0,
+        308.0
+      ]
+    ],
+    "achievement-medium-50.svg": [
+      [
+        117.0,
+        304.0
+      ],
+      [
+        138.0,
+        318.0
+      ],
+      [
+        161.0,
+        328.0
+      ],
+      [
+        193.0,
+        333.0
+      ],
+      [
+        232.0,
+        331.0
+      ],
+      [
+        268.0,
+        320.0
+      ],
+      [
+        292.0,
+        306.0
+      ],
+      [
+        305.0,
+        291.0
+      ]
+    ],
+    "achievement-mozkomor-1.svg": [
+      [
+        56.0,
+        317.0
+      ],
+      [
+        57.0,
+        328.0
+      ],
+      [
+        93.0,
+        332.0
+      ],
+      [
+        173.0,
+        335.0
+      ],
+      [
+        253.0,
+        334.0
+      ],
+      [
+        331.0,
+        329.0
+      ],
+      [
+        347.0,
+        326.0
+      ],
+      [
+        347.0,
+        314.0
+      ]
+    ],
+    "achievement-mozkomor-10.svg": [
+      [
+        177.0,
+        343.0
+      ],
+      [
+        180.0,
+        358.0
+      ],
+      [
+        187.0,
+        368.0
+      ],
+      [
+        193.0,
+        368.0
+      ],
+      [
+        202.0,
+        357.0
+      ],
+      [
+        210.0,
+        346.0
+      ]
+    ],
+    "achievement-mozkomor-25.svg": [
+      [
+        128.0,
+        341.0
+      ],
+      [
+        129.0,
+        352.0
+      ],
+      [
+        146.0,
+        358.0
+      ],
+      [
+        172.0,
+        362.0
+      ],
+      [
+        279.0,
+        365.0
+      ],
+      [
+        323.0,
+        348.0
+      ],
+      [
+        325.0,
+        335.0
+      ]
+    ],
+    "achievement-mozkomor-5.svg": [
+      [
+        76.0,
+        335.0
+      ],
+      [
+        84.0,
+        350.0
+      ],
+      [
+        96.0,
+        355.0
+      ],
+      [
+        210.0,
+        352.0
+      ],
+      [
+        315.0,
+        345.0
+      ],
+      [
+        332.0,
+        337.0
+      ],
+      [
+        333.0,
+        327.0
+      ]
+    ],
+    "achievement-rescue-1.svg": [
+      [
+        130.0,
+        322.0
+      ],
+      [
+        146.0,
+        331.0
+      ],
+      [
+        166.0,
+        333.0
+      ],
+      [
+        170.0,
+        339.0
+      ],
+      [
+        189.0,
+        343.0
+      ],
+      [
+        223.0,
+        343.0
+      ],
+      [
+        248.0,
+        340.0
+      ],
+      [
+        257.0,
+        333.0
+      ],
+      [
+        276.0,
+        330.0
+      ],
+      [
+        290.0,
+        321.0
+      ]
+    ],
+    "achievement-rescue-10.svg": [
+      [
+        96.0,
+        334.0
+      ],
+      [
+        101.0,
+        351.0
+      ],
+      [
+        115.0,
+        355.0
+      ],
+      [
+        135.0,
+        353.0
+      ],
+      [
+        153.0,
+        343.0
+      ],
+      [
+        162.0,
+        353.0
+      ],
+      [
+        179.0,
+        363.0
+      ],
+      [
+        205.0,
+        369.0
+      ],
+      [
+        239.0,
+        368.0
+      ],
+      [
+        264.0,
+        361.0
+      ],
+      [
+        280.0,
+        350.0
+      ],
+      [
+        285.0,
+        335.0
+      ]
+    ],
+    "achievement-rescue-3.svg": [
+      [
+        50.0,
+        321.0
+      ],
+      [
+        54.0,
+        332.0
+      ],
+      [
+        72.0,
+        337.0
+      ],
+      [
+        280.0,
+        349.0
+      ],
+      [
+        321.0,
+        348.0
+      ],
+      [
+        332.0,
+        335.0
+      ],
+      [
+        346.0,
+        333.0
+      ],
+      [
+        361.0,
+        324.0
+      ],
+      [
+        365.0,
+        313.0
+      ]
+    ],
+    "achievement-rescue-5.svg": [
+      [
+        86.0,
+        326.0
+      ],
+      [
+        91.0,
+        339.0
+      ],
+      [
+        117.0,
+        346.0
+      ],
+      [
+        170.0,
+        349.0
+      ],
+      [
+        241.0,
+        349.0
+      ],
+      [
+        291.0,
+        344.0
+      ],
+      [
+        322.0,
+        337.0
+      ],
+      [
+        338.0,
+        319.0
+      ]
+    ],
+    "achievement-speed-120.svg": [
+      [
+        26.0,
+        252.0
+      ],
+      [
+        29.0,
+        266.0
+      ],
+      [
+        53.0,
+        272.0
+      ],
+      [
+        72.0,
+        275.0
+      ],
+      [
+        99.0,
+        282.0
+      ],
+      [
+        124.0,
+        290.0
+      ],
+      [
+        152.0,
+        294.0
+      ],
+      [
+        171.0,
+        300.0
+      ],
+      [
+        207.0,
+        307.0
+      ],
+      [
+        272.0,
+        315.0
+      ],
+      [
+        333.0,
+        314.0
+      ],
+      [
+        363.0,
+        309.0
+      ],
+      [
+        361.0,
+        298.0
+      ]
+    ],
+    "achievement-speed-180.svg": [
+      [
+        113.0,
+        353.0
+      ],
+      [
+        116.0,
+        364.0
+      ],
+      [
+        125.0,
+        369.0
+      ],
+      [
+        143.0,
+        366.0
+      ],
+      [
+        173.0,
+        358.0
+      ],
+      [
+        199.0,
+        350.0
+      ],
+      [
+        220.0,
+        340.0
+      ],
+      [
+        233.0,
+        332.0
+      ]
+    ],
+    "achievement-speed-300.svg": [
+      [
+        78.0,
+        346.0
+      ],
+      [
+        82.0,
+        360.0
+      ],
+      [
+        91.0,
+        369.0
+      ],
+      [
+        113.0,
+        368.0
+      ],
+      [
+        124.0,
+        362.0
+      ],
+      [
+        122.0,
+        350.0
+      ],
+      [
+        120.0,
+        342.0
+      ],
+      [
+        126.0,
+        315.0
+      ],
+      [
+        148.0,
+        308.0
+      ],
+      [
+        196.0,
+        307.0
+      ],
+      [
+        246.0,
+        309.0
+      ],
+      [
+        258.0,
+        317.0
+      ],
+      [
+        270.0,
+        337.0
+      ],
+      [
+        279.0,
+        351.0
+      ],
+      [
+        286.0,
+        353.0
+      ],
+      [
+        298.0,
+        339.0
+      ],
+      [
+        310.0,
+        316.0
+      ]
+    ],
+    "achievement-speed-60.svg": [
+      [
+        122.0,
+        353.0
+      ],
+      [
+        125.0,
+        364.0
+      ],
+      [
+        143.0,
+        372.0
+      ],
+      [
+        167.0,
+        370.0
+      ],
+      [
+        183.0,
+        361.0
+      ],
+      [
+        196.0,
+        346.0
+      ]
+    ],
+    "achievement-tajenka-1.svg": [
+      [
+        75.0,
+        307.0
+      ],
+      [
+        78.0,
+        320.0
+      ],
+      [
+        89.0,
+        324.0
+      ],
+      [
+        206.0,
+        316.0
+      ],
+      [
+        210.0,
+        328.0
+      ],
+      [
+        220.0,
+        324.0
+      ],
+      [
+        233.0,
+        313.0
+      ],
+      [
+        249.0,
+        321.0
+      ],
+      [
+        259.0,
+        325.0
+      ],
+      [
+        260.0,
+        313.0
+      ],
+      [
+        343.0,
+        301.0
+      ],
+      [
+        351.0,
+        290.0
+      ]
+    ],
+    "achievement-tajenka-3.svg": [
+      [
+        101.0,
+        303.0
+      ],
+      [
+        147.0,
+        315.0
+      ],
+      [
+        165.0,
+        330.0
+      ],
+      [
+        183.0,
+        335.0
+      ],
+      [
+        186.0,
+        340.0
+      ],
+      [
+        196.0,
+        340.0
+      ],
+      [
+        211.0,
+        330.0
+      ],
+      [
+        232.0,
+        342.0
+      ],
+      [
+        240.0,
+        337.0
+      ],
+      [
+        349.0,
+        348.0
+      ],
+      [
+        353.0,
+        331.0
+      ]
+    ],
+    "achievement-tajenka-5.svg": [
+      [
+        128.0,
+        337.0
+      ],
+      [
+        140.0,
+        351.0
+      ],
+      [
+        167.0,
+        359.0
+      ],
+      [
+        215.0,
+        361.0
+      ],
+      [
+        249.0,
+        358.0
+      ],
+      [
+        275.0,
+        349.0
+      ],
+      [
+        287.0,
+        335.0
+      ]
+    ],
+    "achievement-xp-100.svg": [
+      [
+        137.0,
+        337.0
+      ],
+      [
+        155.0,
+        351.0
+      ],
+      [
+        179.0,
+        360.0
+      ],
+      [
+        211.0,
+        365.0
+      ],
+      [
+        238.0,
+        363.0
+      ],
+      [
+        266.0,
+        354.0
+      ],
+      [
+        291.0,
+        338.0
+      ]
+    ],
+    "achievement-xp-1000.svg": [
+      [
+        107.0,
+        263.0
+      ],
+      [
+        122.0,
+        276.0
+      ],
+      [
+        150.0,
+        284.0
+      ],
+      [
+        193.0,
+        288.0
+      ],
+      [
+        235.0,
+        286.0
+      ],
+      [
+        272.0,
+        278.0
+      ],
+      [
+        293.0,
+        266.0
+      ],
+      [
+        304.0,
+        250.0
+      ]
+    ],
+    "achievement-xp-10000.svg": [
+      [
+        55.0,
+        298.0
+      ],
+      [
+        56.0,
+        311.0
+      ],
+      [
+        169.0,
+        315.0
+      ],
+      [
+        221.0,
+        320.0
+      ],
+      [
+        350.0,
+        312.0
+      ],
+      [
+        352.0,
+        296.0
+      ]
+    ],
+    "achievement-xp-120000.svg": [
+      [
+        54.0,
+        308.0
+      ],
+      [
+        56.0,
+        319.0
+      ],
+      [
+        91.0,
+        324.0
+      ],
+      [
+        119.0,
+        327.0
+      ],
+      [
+        125.0,
+        319.0
+      ],
+      [
+        137.0,
+        322.0
+      ],
+      [
+        120.0,
+        338.0
+      ],
+      [
+        121.0,
+        347.0
+      ],
+      [
+        146.0,
+        350.0
+      ],
+      [
+        157.0,
+        346.0
+      ],
+      [
+        164.0,
+        331.0
+      ],
+      [
+        181.0,
+        331.0
+      ],
+      [
+        179.0,
+        345.0
+      ],
+      [
+        181.0,
+        353.0
+      ],
+      [
+        209.0,
+        356.0
+      ],
+      [
+        218.0,
+        352.0
+      ],
+      [
+        222.0,
+        332.0
+      ],
+      [
+        235.0,
+        330.0
+      ],
+      [
+        242.0,
+        332.0
+      ],
+      [
+        251.0,
+        327.0
+      ],
+      [
+        302.0,
+        335.0
+      ],
+      [
+        313.0,
+        325.0
+      ],
+      [
+        333.0,
+        300.0
+      ],
+      [
+        343.0,
+        291.0
+      ],
+      [
+        352.0,
+        276.0
+      ]
+    ],
+    "achievement-xp-2500.svg": [
+      [
+        57.0,
+        319.0
+      ],
+      [
+        60.0,
+        329.0
+      ],
+      [
+        240.0,
+        364.0
+      ],
+      [
+        258.0,
+        357.0
+      ],
+      [
+        319.0,
+        329.0
+      ],
+      [
+        328.0,
+        311.0
+      ],
+      [
+        329.0,
+        290.0
+      ]
+    ],
+    "achievement-xp-25000.svg": [
+      [
+        126.0,
+        326.0
+      ],
+      [
+        131.0,
+        339.0
+      ],
+      [
+        148.0,
+        347.0
+      ],
+      [
+        177.0,
+        350.0
+      ],
+      [
+        241.0,
+        351.0
+      ],
+      [
+        272.0,
+        348.0
+      ],
+      [
+        290.0,
+        339.0
+      ],
+      [
+        293.0,
+        325.0
+      ]
+    ],
+    "achievement-xp-40000.svg": [
+      [
+        79.0,
+        328.0
+      ],
+      [
+        89.0,
+        341.0
+      ],
+      [
+        110.0,
+        349.0
+      ],
+      [
+        293.0,
+        350.0
+      ],
+      [
+        307.0,
+        341.0
+      ],
+      [
+        328.0,
+        317.0
+      ],
+      [
+        347.0,
+        306.0
+      ],
+      [
+        357.0,
+        294.0
+      ]
+    ],
+    "achievement-xp-500.svg": [
+      [
+        49.0,
+        324.0
+      ],
+      [
+        63.0,
+        331.0
+      ],
+      [
+        113.0,
+        343.0
+      ],
+      [
+        119.0,
+        363.0
+      ],
+      [
+        164.0,
+        377.0
+      ],
+      [
+        177.0,
+        379.0
+      ],
+      [
+        197.0,
+        370.0
+      ],
+      [
+        210.0,
+        359.0
+      ],
+      [
+        223.0,
+        357.0
+      ],
+      [
+        265.0,
+        371.0
+      ],
+      [
+        287.0,
+        366.0
+      ],
+      [
+        313.0,
+        352.0
+      ],
+      [
+        314.0,
+        332.0
+      ],
+      [
+        297.0,
+        322.0
+      ],
+      [
+        315.0,
+        322.0
+      ],
+      [
+        343.0,
+        326.0
+      ],
+      [
+        361.0,
+        324.0
+      ],
+      [
+        369.0,
+        313.0
+      ]
+    ],
+    "achievement-xp-5000.svg": [
+      [
+        50.0,
+        329.0
+      ],
+      [
+        52.0,
+        347.0
+      ],
+      [
+        75.0,
+        360.0
+      ],
+      [
+        96.0,
+        361.0
+      ],
+      [
+        141.0,
+        355.0
+      ],
+      [
+        142.0,
+        325.0
+      ],
+      [
+        305.0,
+        303.0
+      ],
+      [
+        306.0,
+        317.0
+      ],
+      [
+        275.0,
+        318.0
+      ],
+      [
+        265.0,
+        324.0
+      ],
+      [
+        312.0,
+        338.0
+      ],
+      [
+        347.0,
+        337.0
+      ],
+      [
+        359.0,
+        330.0
+      ],
+      [
+        359.0,
+        314.0
+      ]
+    ],
+    "achievement-xp-50000.svg": [
+      [
+        160.0,
+        350.0
+      ],
+      [
+        159.0,
+        357.0
+      ],
+      [
+        171.0,
+        354.0
+      ],
+      [
+        207.0,
+        328.0
+      ],
+      [
+        237.0,
+        303.0
+      ],
+      [
+        258.0,
+        308.0
+      ],
+      [
+        280.0,
+        308.0
+      ],
+      [
+        293.0,
+        302.0
+      ]
+    ],
+    "achievement-xp-61000.svg": [
+      [
+        77.0,
+        340.0
+      ],
+      [
+        80.0,
+        353.0
+      ],
+      [
+        99.0,
+        360.0
+      ],
+      [
+        116.0,
+        358.0
+      ],
+      [
+        126.0,
+        352.0
+      ],
+      [
+        271.0,
+        353.0
+      ],
+      [
+        283.0,
+        360.0
+      ],
+      [
+        304.0,
+        359.0
+      ],
+      [
+        321.0,
+        349.0
+      ],
+      [
+        322.0,
+        333.0
+      ]
+    ],
+    "achievement-xp-75000.svg": [
+      [
+        87.0,
+        341.0
+      ],
+      [
+        91.0,
+        355.0
+      ],
+      [
+        104.0,
+        365.0
+      ],
+      [
+        118.0,
+        366.0
+      ],
+      [
+        129.0,
+        359.0
+      ],
+      [
+        134.0,
+        351.0
+      ],
+      [
+        144.0,
+        351.0
+      ],
+      [
+        148.0,
+        362.0
+      ],
+      [
+        174.0,
+        366.0
+      ],
+      [
+        182.0,
+        352.0
+      ],
+      [
+        183.0,
+        342.0
+      ],
+      [
+        191.0,
+        327.0
+      ],
+      [
+        184.0,
+        325.0
+      ],
+      [
+        194.0,
+        310.0
+      ],
+      [
+        206.0,
+        313.0
+      ],
+      [
+        212.0,
+        296.0
+      ]
+    ],
+    "achievement-xp-95000.svg": [
+      [
+        45.0,
+        290.0
+      ],
+      [
+        62.0,
+        301.0
+      ],
+      [
+        72.0,
+        302.0
+      ],
+      [
+        62.0,
+        319.0
+      ],
+      [
+        62.0,
+        326.0
+      ],
+      [
+        80.0,
+        313.0
+      ],
+      [
+        240.0,
+        341.0
+      ],
+      [
+        304.0,
+        357.0
+      ],
+      [
+        333.0,
+        361.0
+      ],
+      [
+        348.0,
+        356.0
+      ],
+      [
+        359.0,
+        343.0
+      ],
+      [
+        361.0,
+        320.0
+      ]
+    ],
+    "alchymista.svg": [
+      [
+        111.0,
+        365.0
+      ],
+      [
+        117.0,
+        386.0
+      ],
+      [
+        146.0,
+        397.0
+      ],
+      [
+        207.0,
+        402.0
+      ],
+      [
+        258.0,
+        399.0
+      ],
+      [
+        288.0,
+        390.0
+      ],
+      [
+        305.0,
+        375.0
+      ],
+      [
+        306.0,
+        363.0
+      ]
+    ],
+    "medaile.svg": [
+      [
+        124.0,
+        368.0
+      ],
+      [
+        133.0,
+        387.0
+      ],
+      [
+        145.0,
+        393.0
+      ],
+      [
+        276.0,
+        393.0
+      ],
+      [
+        298.0,
+        373.0
+      ],
+      [
+        326.0,
+        343.0
+      ]
+    ],
+    "medal-2.svg": [
+      [
+        131.0,
+        363.0
+      ],
+      [
+        156.0,
+        379.0
+      ],
+      [
+        188.0,
+        391.0
+      ],
+      [
+        216.0,
+        392.0
+      ],
+      [
+        249.0,
+        389.0
+      ],
+      [
+        280.0,
+        376.0
+      ],
+      [
+        308.0,
+        357.0
+      ]
+    ],
+    "medal-3.svg": [
+      [
+        128.0,
+        350.0
+      ],
+      [
+        180.0,
+        382.0
+      ],
+      [
+        197.0,
+        394.0
+      ],
+      [
+        211.0,
+        393.0
+      ],
+      [
+        263.0,
+        365.0
+      ],
+      [
+        291.0,
+        344.0
+      ]
+    ],
+    "novacek.svg": [
+      [
+        51.0,
+        347.0
+      ],
+      [
+        52.0,
+        363.0
+      ],
+      [
+        64.0,
+        373.0
+      ],
+      [
+        266.0,
+        401.0
+      ],
+      [
+        281.0,
+        402.0
+      ],
+      [
+        339.0,
+        359.0
+      ],
+      [
+        343.0,
+        344.0
+      ]
+    ],
+    "rank-02.svg": [
+      [
+        52.0,
+        321.0
+      ],
+      [
+        63.0,
+        346.0
+      ],
+      [
+        79.0,
+        352.0
+      ],
+      [
+        390.0,
+        308.0
+      ],
+      [
+        392.0,
+        294.0
+      ]
+    ],
+    "rank-03.svg": [
+      [
+        40.0,
+        324.0
+      ],
+      [
+        46.0,
+        338.0
+      ],
+      [
+        58.0,
+        343.0
+      ],
+      [
+        73.0,
+        340.0
+      ],
+      [
+        88.0,
+        326.0
+      ],
+      [
+        245.0,
+        326.0
+      ],
+      [
+        265.0,
+        346.0
+      ],
+      [
+        287.0,
+        353.0
+      ],
+      [
+        306.0,
+        349.0
+      ],
+      [
+        319.0,
+        338.0
+      ]
+    ],
+    "rank-04.svg": [
+      [
+        64.0,
+        316.0
+      ],
+      [
+        72.0,
+        329.0
+      ],
+      [
+        103.0,
+        342.0
+      ],
+      [
+        142.0,
+        349.0
+      ],
+      [
+        184.0,
+        351.0
+      ],
+      [
+        214.0,
+        344.0
+      ],
+      [
+        239.0,
+        334.0
+      ],
+      [
+        247.0,
+        324.0
+      ],
+      [
+        247.0,
+        303.0
+      ],
+      [
+        296.0,
+        325.0
+      ],
+      [
+        315.0,
+        331.0
+      ],
+      [
+        344.0,
+        331.0
+      ],
+      [
+        355.0,
+        320.0
+      ]
+    ],
+    "rank-05.svg": [
+      [
+        120.0,
+        326.0
+      ],
+      [
+        140.0,
+        337.0
+      ],
+      [
+        157.0,
+        342.0
+      ],
+      [
+        189.0,
+        333.0
+      ],
+      [
+        190.0,
+        342.0
+      ],
+      [
+        225.0,
+        354.0
+      ],
+      [
+        237.0,
+        353.0
+      ],
+      [
+        269.0,
+        334.0
+      ],
+      [
+        270.0,
+        325.0
+      ],
+      [
+        297.0,
+        333.0
+      ],
+      [
+        310.0,
+        332.0
+      ],
+      [
+        359.0,
+        310.0
+      ],
+      [
+        362.0,
+        297.0
+      ]
+    ],
+    "rank-06.svg": [
+      [
+        32.0,
+        317.0
+      ],
+      [
+        36.0,
+        329.0
+      ],
+      [
+        103.0,
+        365.0
+      ],
+      [
+        117.0,
+        367.0
+      ],
+      [
+        263.0,
+        328.0
+      ],
+      [
+        264.0,
+        307.0
+      ]
+    ],
+    "rank-07.svg": [
+      [
+        29.0,
+        322.0
+      ],
+      [
+        32.0,
+        334.0
+      ],
+      [
+        54.0,
+        342.0
+      ],
+      [
+        88.0,
+        324.0
+      ],
+      [
+        100.0,
+        309.0
+      ],
+      [
+        135.0,
+        303.0
+      ],
+      [
+        165.0,
+        287.0
+      ],
+      [
+        206.0,
+        289.0
+      ],
+      [
+        234.0,
+        309.0
+      ],
+      [
+        237.0,
+        337.0
+      ],
+      [
+        258.0,
+        350.0
+      ],
+      [
+        275.0,
+        342.0
+      ],
+      [
+        275.0,
+        360.0
+      ],
+      [
+        299.0,
+        367.0
+      ],
+      [
+        319.0,
+        362.0
+      ],
+      [
+        323.0,
+        347.0
+      ],
+      [
+        335.0,
+        344.0
+      ],
+      [
+        336.0,
+        362.0
+      ],
+      [
+        356.0,
+        365.0
+      ],
+      [
+        385.0,
+        357.0
+      ],
+      [
+        387.0,
+        344.0
+      ]
+    ],
+    "rank-08.svg": [
+      [
+        106.0,
+        343.0
+      ],
+      [
+        110.0,
+        357.0
+      ],
+      [
+        141.0,
+        368.0
+      ],
+      [
+        184.0,
+        374.0
+      ],
+      [
+        233.0,
+        373.0
+      ],
+      [
+        277.0,
+        366.0
+      ],
+      [
+        304.0,
+        357.0
+      ],
+      [
+        306.0,
+        338.0
+      ]
+    ],
+    "rank-09.svg": [
+      [
+        103.0,
+        338.0
+      ],
+      [
+        115.0,
+        353.0
+      ],
+      [
+        142.0,
+        366.0
+      ],
+      [
+        180.0,
+        374.0
+      ],
+      [
+        221.0,
+        376.0
+      ],
+      [
+        261.0,
+        371.0
+      ],
+      [
+        298.0,
+        358.0
+      ],
+      [
+        323.0,
+        343.0
+      ],
+      [
+        324.0,
+        329.0
+      ]
+    ],
+    "rank-10.svg": [
+      [
+        81.0,
+        328.0
+      ],
+      [
+        99.0,
+        343.0
+      ],
+      [
+        124.0,
+        352.0
+      ],
+      [
+        152.0,
+        358.0
+      ],
+      [
+        181.0,
+        358.0
+      ],
+      [
+        211.0,
+        350.0
+      ],
+      [
+        224.0,
+        341.0
+      ],
+      [
+        238.0,
+        349.0
+      ],
+      [
+        267.0,
+        357.0
+      ],
+      [
+        289.0,
+        355.0
+      ],
+      [
+        314.0,
+        342.0
+      ],
+      [
+        332.0,
+        323.0
+      ]
+    ],
+    "rank-11.svg": [
+      [
+        56.0,
+        346.0
+      ],
+      [
+        59.0,
+        360.0
+      ],
+      [
+        87.0,
+        365.0
+      ],
+      [
+        119.0,
+        358.0
+      ],
+      [
+        122.0,
+        341.0
+      ],
+      [
+        145.0,
+        343.0
+      ],
+      [
+        173.0,
+        354.0
+      ],
+      [
+        175.0,
+        381.0
+      ],
+      [
+        213.0,
+        397.0
+      ],
+      [
+        227.0,
+        397.0
+      ],
+      [
+        246.0,
+        391.0
+      ],
+      [
+        246.0,
+        373.0
+      ],
+      [
+        235.0,
+        365.0
+      ],
+      [
+        231.0,
+        344.0
+      ],
+      [
+        255.0,
+        340.0
+      ],
+      [
+        272.0,
+        338.0
+      ],
+      [
+        283.0,
+        342.0
+      ],
+      [
+        286.0,
+        356.0
+      ],
+      [
+        325.0,
+        369.0
+      ],
+      [
+        362.0,
+        363.0
+      ],
+      [
+        363.0,
+        348.0
+      ]
+    ],
+    "rank-12.svg": [
+      [
+        141.0,
+        335.0
+      ],
+      [
+        144.0,
+        351.0
+      ],
+      [
+        327.0,
+        352.0
+      ],
+      [
+        343.0,
+        333.0
+      ],
+      [
+        350.0,
+        312.0
+      ],
+      [
+        350.0,
+        300.0
+      ]
+    ],
+    "rank-13.svg": [
+      [
+        165.0,
+        335.0
+      ],
+      [
+        186.0,
+        350.0
+      ],
+      [
+        219.0,
+        360.0
+      ],
+      [
+        259.0,
+        362.0
+      ],
+      [
+        300.0,
+        356.0
+      ],
+      [
+        339.0,
+        345.0
+      ],
+      [
+        363.0,
+        331.0
+      ],
+      [
+        372.0,
+        313.0
+      ],
+      [
+        372.0,
+        301.0
+      ]
+    ],
+    "rank-15.svg": [
+      [
+        36.0,
+        337.0
+      ],
+      [
+        39.0,
+        350.0
+      ],
+      [
+        322.0,
+        351.0
+      ],
+      [
+        349.0,
+        345.0
+      ],
+      [
+        357.0,
+        331.0
+      ]
+    ],
+    "rank-17.svg": [
+      [
+        45.0,
+        317.0
+      ],
+      [
+        57.0,
+        331.0
+      ],
+      [
+        84.0,
+        345.0
+      ],
+      [
+        126.0,
+        360.0
+      ],
+      [
+        182.0,
+        373.0
+      ],
+      [
+        197.0,
+        372.0
+      ],
+      [
+        248.0,
+        356.0
+      ],
+      [
+        298.0,
+        336.0
+      ],
+      [
+        323.0,
+        323.0
+      ],
+      [
+        326.0,
+        309.0
+      ]
+    ],
+    "rank-19.svg": [
+      [
+        40.0,
+        324.0
+      ],
+      [
+        40.0,
+        336.0
+      ],
+      [
+        54.0,
+        346.0
+      ],
+      [
+        212.0,
+        359.0
+      ],
+      [
+        243.0,
+        361.0
+      ],
+      [
+        298.0,
+        353.0
+      ],
+      [
+        322.0,
+        342.0
+      ],
+      [
+        335.0,
+        324.0
+      ]
+    ],
+    "rank-20.svg": [
+      [
+        80.0,
+        320.0
+      ],
+      [
+        82.0,
+        334.0
+      ],
+      [
+        187.0,
+        365.0
+      ],
+      [
+        201.0,
+        367.0
+      ],
+      [
+        314.0,
+        334.0
+      ],
+      [
+        317.0,
+        314.0
+      ]
+    ],
+    "rank-21.svg": [
+      [
+        68.0,
+        354.0
+      ],
+      [
+        74.0,
+        370.0
+      ],
+      [
+        100.0,
+        380.0
+      ],
+      [
+        134.0,
+        387.0
+      ],
+      [
+        169.0,
+        389.0
+      ],
+      [
+        190.0,
+        384.0
+      ],
+      [
+        197.0,
+        375.0
+      ],
+      [
+        215.0,
+        386.0
+      ],
+      [
+        227.0,
+        389.0
+      ],
+      [
+        231.0,
+        381.0
+      ],
+      [
+        253.0,
+        374.0
+      ],
+      [
+        254.0,
+        371.0
+      ],
+      [
+        243.0,
+        369.0
+      ],
+      [
+        332.0,
+        337.0
+      ],
+      [
+        335.0,
+        324.0
+      ]
+    ],
+    "rank-22.svg": [
+      [
+        79.0,
+        362.0
+      ],
+      [
+        98.0,
+        377.0
+      ],
+      [
+        120.0,
+        388.0
+      ],
+      [
+        140.0,
+        394.0
+      ],
+      [
+        156.0,
+        392.0
+      ],
+      [
+        177.0,
+        384.0
+      ],
+      [
+        191.0,
+        371.0
+      ],
+      [
+        207.0,
+        362.0
+      ],
+      [
+        231.0,
+        354.0
+      ],
+      [
+        269.0,
+        341.0
+      ],
+      [
+        294.0,
+        327.0
+      ],
+      [
+        302.0,
+        315.0
+      ]
+    ],
+    "rank-23.svg": [
+      [
+        70.0,
+        343.0
+      ],
+      [
+        78.0,
+        356.0
+      ],
+      [
+        108.0,
+        370.0
+      ],
+      [
+        116.0,
+        371.0
+      ],
+      [
+        136.0,
+        364.0
+      ],
+      [
+        153.0,
+        367.0
+      ],
+      [
+        156.0,
+        385.0
+      ],
+      [
+        178.0,
+        394.0
+      ],
+      [
+        194.0,
+        400.0
+      ],
+      [
+        247.0,
+        391.0
+      ],
+      [
+        296.0,
+        380.0
+      ],
+      [
+        328.0,
+        365.0
+      ],
+      [
+        331.0,
+        350.0
+      ]
+    ],
+    "rank-25.svg": [
+      [
+        50.0,
+        307.0
+      ],
+      [
+        75.0,
+        322.0
+      ],
+      [
+        126.0,
+        337.0
+      ],
+      [
+        181.0,
+        346.0
+      ],
+      [
+        230.0,
+        349.0
+      ],
+      [
+        267.0,
+        344.0
+      ],
+      [
+        306.0,
+        333.0
+      ],
+      [
+        341.0,
+        318.0
+      ],
+      [
+        371.0,
+        299.0
+      ],
+      [
+        373.0,
+        286.0
+      ]
+    ],
+    "rank-26.svg": [
+      [
+        54.0,
+        324.0
+      ],
+      [
+        58.0,
+        333.0
+      ],
+      [
+        90.0,
+        342.0
+      ],
+      [
+        119.0,
+        344.0
+      ],
+      [
+        154.0,
+        341.0
+      ],
+      [
+        177.0,
+        335.0
+      ],
+      [
+        209.0,
+        331.0
+      ],
+      [
+        236.0,
+        332.0
+      ],
+      [
+        266.0,
+        336.0
+      ],
+      [
+        300.0,
+        337.0
+      ],
+      [
+        338.0,
+        332.0
+      ],
+      [
+        338.0,
+        314.0
+      ]
+    ],
+    "rank-27.svg": [
+      [
+        75.0,
+        294.0
+      ],
+      [
+        102.0,
+        307.0
+      ],
+      [
+        128.0,
+        313.0
+      ],
+      [
+        160.0,
+        313.0
+      ],
+      [
+        187.0,
+        304.0
+      ],
+      [
+        209.0,
+        288.0
+      ],
+      [
+        221.0,
+        298.0
+      ],
+      [
+        249.0,
+        311.0
+      ],
+      [
+        277.0,
+        316.0
+      ],
+      [
+        306.0,
+        313.0
+      ],
+      [
+        335.0,
+        303.0
+      ],
+      [
+        352.0,
+        287.0
+      ]
+    ],
+    "rank-28.svg": [
+      [
+        69.0,
+        322.0
+      ],
+      [
+        93.0,
+        331.0
+      ],
+      [
+        124.0,
+        339.0
+      ],
+      [
+        149.0,
+        334.0
+      ],
+      [
+        178.0,
+        322.0
+      ],
+      [
+        214.0,
+        306.0
+      ]
+    ],
+    "rank-29.svg": [
+      [
+        152.0,
+        305.0
+      ],
+      [
+        157.0,
+        316.0
+      ],
+      [
+        165.0,
+        318.0
+      ],
+      [
+        174.0,
+        309.0
+      ],
+      [
+        173.0,
+        300.0
+      ],
+      [
+        194.0,
+        299.0
+      ],
+      [
+        209.0,
+        290.0
+      ],
+      [
+        226.0,
+        289.0
+      ],
+      [
+        231.0,
+        281.0
+      ],
+      [
+        332.0,
+        326.0
+      ],
+      [
+        343.0,
+        328.0
+      ],
+      [
+        351.0,
+        313.0
+      ],
+      [
+        361.0,
+        287.0
+      ]
+    ],
+    "rank-30.svg": [
+      [
+        80.0,
+        318.0
+      ],
+      [
+        106.0,
+        334.0
+      ],
+      [
+        137.0,
+        342.0
+      ],
+      [
+        172.0,
+        343.0
+      ],
+      [
+        206.0,
+        339.0
+      ],
+      [
+        234.0,
+        331.0
+      ],
+      [
+        247.0,
+        325.0
+      ],
+      [
+        251.0,
+        330.0
+      ],
+      [
+        263.0,
+        335.0
+      ],
+      [
+        274.0,
+        330.0
+      ],
+      [
+        276.0,
+        321.0
+      ],
+      [
+        285.0,
+        327.0
+      ],
+      [
+        299.0,
+        326.0
+      ],
+      [
+        315.0,
+        320.0
+      ],
+      [
+        331.0,
+        306.0
+      ]
+    ],
+    "rank-33.svg": [
+      [
+        71.0,
+        340.0
+      ],
+      [
+        76.0,
+        359.0
+      ],
+      [
+        131.0,
+        387.0
+      ],
+      [
+        149.0,
+        388.0
+      ],
+      [
+        278.0,
+        384.0
+      ],
+      [
+        298.0,
+        368.0
+      ],
+      [
+        316.0,
+        350.0
+      ],
+      [
+        317.0,
+        336.0
+      ],
+      [
+        328.0,
+        339.0
+      ],
+      [
+        341.0,
+        345.0
+      ],
+      [
+        346.0,
+        343.0
+      ],
+      [
+        345.0,
+        327.0
+      ]
+    ],
+    "rank-34.svg": [
+      [
+        19.0,
+        300.0
+      ],
+      [
+        239.0,
+        375.0
+      ],
+      [
+        253.0,
+        374.0
+      ],
+      [
+        277.0,
+        358.0
+      ],
+      [
+        315.0,
+        324.0
+      ],
+      [
+        345.0,
+        306.0
+      ],
+      [
+        354.0,
+        306.0
+      ],
+      [
+        357.0,
+        318.0
+      ],
+      [
+        366.0,
+        323.0
+      ],
+      [
+        371.0,
+        321.0
+      ],
+      [
+        366.0,
+        307.0
+      ],
+      [
+        358.0,
+        282.0
+      ],
+      [
+        383.0,
+        260.0
+      ],
+      [
+        383.0,
+        248.0
+      ]
+    ],
+    "streak-01.svg": [
+      [
+        124.0,
+        326.0
+      ],
+      [
+        140.0,
+        344.0
+      ],
+      [
+        159.0,
+        349.0
+      ],
+      [
+        230.0,
+        351.0
+      ],
+      [
+        243.0,
+        345.0
+      ],
+      [
+        251.0,
+        330.0
+      ]
+    ],
+    "streak-03.svg": [
+      [
+        144.0,
+        343.0
+      ],
+      [
+        154.0,
+        356.0
+      ],
+      [
+        165.0,
+        359.0
+      ],
+      [
+        258.0,
+        359.0
+      ],
+      [
+        276.0,
+        345.0
+      ],
+      [
+        288.0,
+        327.0
+      ]
+    ],
+    "streak-05.svg": [
+      [
+        91.0,
+        322.0
+      ],
+      [
+        92.0,
+        338.0
+      ],
+      [
+        103.0,
+        347.0
+      ],
+      [
+        126.0,
+        348.0
+      ],
+      [
+        169.0,
+        342.0
+      ],
+      [
+        184.0,
+        333.0
+      ],
+      [
+        184.0,
+        313.0
+      ],
+      [
+        229.0,
+        311.0
+      ],
+      [
+        235.0,
+        335.0
+      ],
+      [
+        249.0,
+        341.0
+      ],
+      [
+        302.0,
+        349.0
+      ],
+      [
+        325.0,
+        345.0
+      ],
+      [
+        326.0,
+        326.0
+      ]
+    ],
+    "streak-06.svg": [
+      [
+        116.0,
+        355.0
+      ],
+      [
+        118.0,
+        368.0
+      ],
+      [
+        127.0,
+        372.0
+      ],
+      [
+        141.0,
+        369.0
+      ],
+      [
+        158.0,
+        354.0
+      ],
+      [
+        175.0,
+        336.0
+      ]
+    ],
+    "streak-07.svg": [
+      [
+        24.0,
+        281.0
+      ],
+      [
+        30.0,
+        296.0
+      ],
+      [
+        38.0,
+        302.0
+      ],
+      [
+        380.0,
+        301.0
+      ],
+      [
+        392.0,
+        294.0
+      ],
+      [
+        391.0,
+        278.0
+      ]
+    ],
+    "streak-08.svg": [
+      [
+        85.0,
+        336.0
+      ],
+      [
+        86.0,
+        349.0
+      ],
+      [
+        119.0,
+        357.0
+      ],
+      [
+        175.0,
+        360.0
+      ],
+      [
+        234.0,
+        360.0
+      ],
+      [
+        292.0,
+        354.0
+      ],
+      [
+        327.0,
+        345.0
+      ],
+      [
+        332.0,
+        333.0
+      ]
+    ],
+    "streak-09.svg": [
+      [
+        174.0,
+        331.0
+      ],
+      [
+        190.0,
+        342.0
+      ],
+      [
+        204.0,
+        351.0
+      ],
+      [
+        211.0,
+        348.0
+      ],
+      [
+        224.0,
+        335.0
+      ],
+      [
+        237.0,
+        318.0
+      ]
+    ],
+    "streak-10.svg": [
+      [
+        141.0,
+        348.0
+      ],
+      [
+        153.0,
+        370.0
+      ],
+      [
+        161.0,
+        377.0
+      ],
+      [
+        175.0,
+        369.0
+      ],
+      [
+        200.0,
+        359.0
+      ],
+      [
+        228.0,
+        350.0
+      ],
+      [
+        257.0,
+        344.0
+      ],
+      [
+        286.0,
+        338.0
+      ],
+      [
+        318.0,
+        338.0
+      ],
+      [
+        355.0,
+        341.0
+      ],
+      [
+        402.0,
+        340.0
+      ]
+    ],
+    "symbol-complete.svg": [
+      [
+        71.0,
+        340.0
+      ],
+      [
+        76.0,
+        350.0
+      ],
+      [
+        85.0,
+        356.0
+      ],
+      [
+        259.0,
+        360.0
+      ],
+      [
+        274.0,
+        351.0
+      ],
+      [
+        290.0,
+        330.0
+      ],
+      [
+        293.0,
+        319.0
+      ]
+    ],
+    "symbol-daily.svg": [
+      [
+        59.0,
+        336.0
+      ],
+      [
+        60.0,
+        348.0
+      ],
+      [
+        72.0,
+        356.0
+      ],
+      [
+        88.0,
+        359.0
+      ],
+      [
+        328.0,
+        359.0
+      ],
+      [
+        342.0,
+        351.0
+      ],
+      [
+        358.0,
+        327.0
+      ],
+      [
+        359.0,
+        311.0
+      ]
+    ],
+    "symbol-secret.svg": [
+      [
+        40.0,
+        329.0
+      ],
+      [
+        43.0,
+        344.0
+      ],
+      [
+        53.0,
+        352.0
+      ],
+      [
+        330.0,
+        359.0
+      ],
+      [
+        344.0,
+        351.0
+      ],
+      [
+        361.0,
+        331.0
+      ],
+      [
+        363.0,
+        314.0
+      ]
+    ],
+    "symbol-streak.svg": [
+      [
+        55.0,
+        365.0
+      ],
+      [
+        60.0,
+        377.0
+      ],
+      [
+        72.0,
+        387.0
+      ],
+      [
+        81.0,
+        388.0
+      ],
+      [
+        99.0,
+        378.0
+      ],
+      [
+        122.0,
+        358.0
+      ]
+    ],
+    "tyden.svg": [
+      [
+        64.0,
+        361.0
+      ],
+      [
+        67.0,
+        368.0
+      ],
+      [
+        136.0,
+        391.0
+      ],
+      [
+        160.0,
+        385.0
+      ],
+      [
+        191.0,
+        398.0
+      ],
+      [
+        235.0,
+        389.0
+      ],
+      [
+        261.0,
+        389.0
+      ],
+      [
+        264.0,
+        385.0
+      ],
+      [
+        308.0,
+        375.0
+      ],
+      [
+        353.0,
+        365.0
+      ],
+      [
+        355.0,
+        354.0
+      ]
+    ],
+    "weekly-gold.svg": [
+      [
+        124.0,
+        368.0
+      ],
+      [
+        133.0,
+        387.0
+      ],
+      [
+        145.0,
+        393.0
+      ],
+      [
+        276.0,
+        393.0
+      ],
+      [
+        298.0,
+        373.0
+      ],
+      [
+        326.0,
+        343.0
+      ]
+    ],
+    "achievement-cd-1.svg": [
+      [
+        90.0,
+        321.0
+      ],
+      [
+        154.0,
+        321.0
+      ],
+      [
+        158.0,
+        303.0
+      ],
+      [
+        169.0,
+        336.0
+      ],
+      [
+        190.0,
+        357.0
+      ],
+      [
+        208.0,
+        366.0
+      ],
+      [
+        228.0,
+        350.0
+      ],
+      [
+        246.0,
+        327.0
+      ],
+      [
+        250.0,
+        313.0
+      ],
+      [
+        259.0,
+        319.0
+      ],
+      [
+        324.0,
+        322.0
+      ]
+    ],
+    "achievement-tajenka-10.svg": [
+      [
+        346.0,
+        360.0
+      ],
+      [
+        356.0,
+        369.0
+      ],
+      [
+        371.0,
+        374.0
+      ],
+      [
+        380.0,
+        372.0
+      ],
+      [
+        392.0,
+        360.0
+      ],
+      [
+        400.0,
+        350.0
+      ]
+    ]
+  },
+  "sha256": {
+    "public/rewards/printshop/achievement-all-10.svg": "69893288e6d303d7e484fa5466a1b04eaf62341be830b5ba071e2108e9c38a8d",
+    "public/rewards/printshop/achievement-all-100.svg": "675c767a9e12fdb939170246126520a4ae7774f28c8af4627dc6abae45b00d5b",
+    "public/rewards/printshop/achievement-all-25.svg": "79d0f046022f9fdb313127f66696761431fa06ab190deb76ba616467b6d9ed76",
+    "public/rewards/printshop/achievement-all-250.svg": "25e72e4f8c8cc3df7a7a69408a0d2a3573a55af52e897b15938736e32b603511",
+    "public/rewards/printshop/achievement-all-400.svg": "51ad502f0e38500d98b6cb45b93d041d98e2ebed2ecc1465e286bfab4df6a34e",
+    "public/rewards/printshop/achievement-all-5.svg": "30ad8eaae91d437497b9904f66b8140b70d7ba2cb00aed355c9df7b5f9247052",
+    "public/rewards/printshop/achievement-all-50.svg": "45311830fcfc14561392f6e5c0e9b01a4084a8d095b54bddf27a6b65ae9a5de5",
+    "public/rewards/printshop/achievement-all-800.svg": "b3ebcc75fbad81003e28060446d27a90f43a0cf6fe285ba034723e6306f9bf39",
+    "public/rewards/printshop/achievement-cd-1.svg": "d5481e3a4a1d35b269c38d2692d1acde0395e5ea85c4290674168051cb7c0c2a",
+    "public/rewards/printshop/achievement-cd-100.svg": "cb101dacea4a76126871207d384e12e47c91f2b2424cf7c2f5968ad8a8954f3d",
+    "public/rewards/printshop/achievement-cd-30.svg": "01bb7e9f7b625a53fe08eb755310815860be44b244ee02f85f0cd0904d54e3bc",
+    "public/rewards/printshop/achievement-cd-7.svg": "6f4c8a2d0cca2b5467195b4b2dea849f8fe97a63c504d962a7bfc5f1425a28d1",
+    "public/rewards/printshop/achievement-clean-1.svg": "fed3fec9ca36fd10bd5f4dd2823e639ccfe2fe53b6b444308587ee89b92ec438",
+    "public/rewards/printshop/achievement-clean-10.svg": "1ce98e91ba24d52718a669e379ecc6d82774db2a681331511df4c058e29deb84",
+    "public/rewards/printshop/achievement-clean-100.svg": "e86bf0025d9df88cc62285c2ed5fafcf80e92d5159e6cd77398703bb19e9eba2",
+    "public/rewards/printshop/achievement-clean-25.svg": "2a373e719705f3625cf62b86e4485333e881344158a831474957db02e15359b4",
+    "public/rewards/printshop/achievement-clean-250.svg": "927c4b345bea10adc80897c6e29b18381870e6a9bf22c3d6d594d177ec7e50a7",
+    "public/rewards/printshop/achievement-clean-5.svg": "53f82ef29db44e2fc2095c0018450477941415b78db7781f61e75b5080bca514",
+    "public/rewards/printshop/achievement-clean-50.svg": "3ed971b5066dd5677479f663b913622164354b6cc5f3944e48223cb0825273fa",
+    "public/rewards/printshop/achievement-daily-1.svg": "542a1c77430f2b9181245db4fb585e9efdb6d2e7a9d1b92c240173971fdf7edd",
+    "public/rewards/printshop/achievement-daily-100.svg": "cc5e7c16706e56b795a26d7470d15b3e9f0633e7be2b64f8f4689841a2f17496",
+    "public/rewards/printshop/achievement-daily-14.svg": "21387ed8bdd7f6adff78a528051a3f060cbcf5114f548e87d40c2595f873432b",
+    "public/rewards/printshop/achievement-daily-200.svg": "aa76dd8e9ef79d8ab7582b41ed80750ebfd9047d4868a11243ee168337138a8d",
+    "public/rewards/printshop/achievement-daily-3.svg": "04f5877612732ad25ee710707b646fb988b10929ae987c7bf7071031734be521",
+    "public/rewards/printshop/achievement-daily-30.svg": "b08a1545275d076dd20b323719794b6d5b779bd0edb52abaf3fcbc73d400994e",
+    "public/rewards/printshop/achievement-daily-365.svg": "bdeb9d7e815e9ec93199cfa87934aa73cf20ae2459134faf142d8d8caa4027f5",
+    "public/rewards/printshop/achievement-daily-50.svg": "1e94cf191b8da624716cd245aa8a98bc4fbf42fe619892c2fbd5fc62c1570381",
+    "public/rewards/printshop/achievement-daily-7.svg": "40dcec0d5706cae46405f2d7470f1a1aacfb6b6117dfcf1a50a2307f8047f769",
+    "public/rewards/printshop/achievement-discovery-1.svg": "bcc044a61dfd8c24eca9e143536d8b6088c9438f8819939776024ac6a2b2b3bd",
+    "public/rewards/printshop/achievement-discovery-10.svg": "61b434556ec47c91301e9bc1dc6023314954a3e14b526310d874e7ee2985e966",
+    "public/rewards/printshop/achievement-discovery-100.svg": "3388f315e66600c16118ebe568463f5bf83847c39d865407d9fe8ec224e143fe",
+    "public/rewards/printshop/achievement-discovery-50.svg": "7c176fb905d34f3b65c38473fa8d1429743482f70f83bf7fc994704c4ab62fff",
+    "public/rewards/printshop/achievement-easy-1.svg": "610eec267367c7142616809bd5761ed9db7690604c6460febdf3904818cf7679",
+    "public/rewards/printshop/achievement-easy-10.svg": "4817e75e6a7fd88f9706fc3788966f047a50acb0a9c4af880ce22c6fab735e2a",
+    "public/rewards/printshop/achievement-easy-100.svg": "693d4b3df20cfb0664365577a1cf943110d9a1074252dd7b86a2777f5a1aa5f8",
+    "public/rewards/printshop/achievement-easy-200.svg": "a91da04916e0457cb471830f21e3662f13289c2824c098c8c9ee8a860e21cdee",
+    "public/rewards/printshop/achievement-easy-25.svg": "289f9645171d0f676b9e2cb13c946b4962ca571ad7a9de0376eba7f9a58327c8",
+    "public/rewards/printshop/achievement-easy-50.svg": "b45dfd0561b3df0ca158cfe286d427a457177ff79a7a86315bb332628d377e37",
+    "public/rewards/printshop/achievement-hard-1.svg": "17b863825d75f5fa267d45cd4db7eff3db6c8ba71346a81c9fc0d74ac48420a6",
+    "public/rewards/printshop/achievement-hard-10.svg": "2ebb27503a3992ae1c23ba23e3be54ab9f99de3cd5ff5472300a41bfc78576c6",
+    "public/rewards/printshop/achievement-hard-100.svg": "ae34326ee76f9d54f73a987b83072aeefe44c65dd544172b2a72cef5bd1fac84",
+    "public/rewards/printshop/achievement-hard-200.svg": "be1493a857f8805f72f6fc093b1f9ab8f186705d9d967f13c8f6b485912d4de9",
+    "public/rewards/printshop/achievement-hard-25.svg": "88ed3c99b9a74f8b49b4f5389f67b71002c4a418f4520866cec78100b7cc23e6",
+    "public/rewards/printshop/achievement-hard-5.svg": "cda966b11abda3386dd48021e177b3180651ef8b4fc8c52d74630e1dd445a5c8",
+    "public/rewards/printshop/achievement-hard-50.svg": "968fa3043617eb400996d7e59afb3651b141898d16e9dc758c431e1e65a6dcf4",
+    "public/rewards/printshop/achievement-hc-1.svg": "148df620f277503ac2ee9b9a5bda74937207841f8aaacc010a8732e9d588d653",
+    "public/rewards/printshop/achievement-hc-100.svg": "88c859480ba136d1beba0cfa6c64fe0bf62fedd43d54422e056a763b8ea896cf",
+    "public/rewards/printshop/achievement-hc-200.svg": "1a1db1f3abbde1a4fba21f201f8234119ee34c365eecca77f6605a89fd3ba1d0",
+    "public/rewards/printshop/achievement-hc-25.svg": "949a18bd6c0512031bb6f9c83b6e97aab1144dd6753ab5f048a5c71a6da4be94",
+    "public/rewards/printshop/achievement-hc-5.svg": "47e46ff710c71ae1eadb8bdb66b6529188672abdee9a3f953d1d130b4a33d01f",
+    "public/rewards/printshop/achievement-hc-50.svg": "b3b89b2db5390975cf3b42cafda06b9e5cc50290545f6438dcefa00a22b9f94c",
+    "public/rewards/printshop/achievement-medium-1.svg": "8089f79a1426fdd32cab75ae9e0410f12f47b0ca5d5c9cec8d39e474d12e7415",
+    "public/rewards/printshop/achievement-medium-10.svg": "d964bb4849b8fd0737719f66e75b20eb506de3513844c9a0a171ab8ece3ca82e",
+    "public/rewards/printshop/achievement-medium-100.svg": "f2cd13451d51f9a26ca68437e3175312045ecf8557674e7148358b38a37775c2",
+    "public/rewards/printshop/achievement-medium-200.svg": "f1e621f23ce2a5dbbead8e64eda2d5827a2d1c86a5da5bbd2c847eace35792c7",
+    "public/rewards/printshop/achievement-medium-25.svg": "e2b27d90e8c27d3bd1026a92d975cd04f625648b5057052da02239e73d6de07d",
+    "public/rewards/printshop/achievement-medium-50.svg": "8394b587877948ede45ee102821efc27dd9a40bec9bca32f9d9fe9f7319fc24e",
+    "public/rewards/printshop/achievement-mozkomor-1.svg": "dc35c424458470987b3a56c83d661f933c4b08dddc4ad02f8547b7060a29129d",
+    "public/rewards/printshop/achievement-mozkomor-10.svg": "e7241674599f2ee131fe6349044849132bfc390f1fc70dc89dfa2100f80f529c",
+    "public/rewards/printshop/achievement-mozkomor-25.svg": "58d84fce1139ee1f802965dffb8da09b2efc8f758e3de24151924b67017c54f0",
+    "public/rewards/printshop/achievement-mozkomor-5.svg": "a0dd192cda44d4a600d493ab7a8cb831c4d3b0e0042477f250df3da854f8ede4",
+    "public/rewards/printshop/achievement-rescue-1.svg": "162c28619788dd0d8309e6f0b68747cbbf79bd5b27fc45a868f2e1d6b782db29",
+    "public/rewards/printshop/achievement-rescue-10.svg": "2249a3b867591e266bac47ceff17f0da6494268b126b5cc2983373e4f28f26bb",
+    "public/rewards/printshop/achievement-rescue-3.svg": "87ce7b916205c17d292c61167178db0a1ca8a19c58e759b416d18c058d4e67c4",
+    "public/rewards/printshop/achievement-rescue-5.svg": "f3ad6fd4ab12242c7962b74d90b5ea648683ecc44126f416425ddcc3d694df07",
+    "public/rewards/printshop/achievement-speed-120.svg": "4415e9fe3b1f2049560650883d9ccf92ebdc08b17e5c8f7a82a9f22fbec0540c",
+    "public/rewards/printshop/achievement-speed-180.svg": "25e11f95ba6e90169ad7490e62ea739c36e1b98d1d0a795173116ce065d8e506",
+    "public/rewards/printshop/achievement-speed-300.svg": "d0511ea8f5e8b87716c2763152f2aa7c3ae6df6eface458b69e4fe9750ff1606",
+    "public/rewards/printshop/achievement-speed-60.svg": "5c188cc2af77cd8ab2220a314d31c752308106bfe5f0d1a9a893698d57977c76",
+    "public/rewards/printshop/achievement-tajenka-1.svg": "529dd102ee8b20b4278d7c092cb889b60004d976ad50cb2a1242440a6a6c0676",
+    "public/rewards/printshop/achievement-tajenka-10.svg": "960fa4f6bbbae971bbfe04d2e10eea076606d32ef1627b496a58caab8b2ce2a8",
+    "public/rewards/printshop/achievement-tajenka-3.svg": "0ad12e728373efa012288fdeb0dc08486fe2c0221de2a483d6c92b443cf7e84a",
+    "public/rewards/printshop/achievement-tajenka-5.svg": "453b43f1c69f5a40fd7f718c23e61bc7dbd8ac94d42b8f1ad8b00cc1ad76e331",
+    "public/rewards/printshop/achievement-xp-100.svg": "a4941af30d53b5c018f5f6d7298795f09093e4383c85890bcda11d2f1694a864",
+    "public/rewards/printshop/achievement-xp-1000.svg": "a7258d268fa5ca7d6f04da9a5162ae71e1de75c410dab6498fc50c04917e6305",
+    "public/rewards/printshop/achievement-xp-10000.svg": "9df1ecf074fdce71856b90550dd6db06c3584144e7e299c92cdacf719080804d",
+    "public/rewards/printshop/achievement-xp-120000.svg": "c8218cbf70109b931f8d418d79076fa64d61335d188fda3ed31c0be1fa72e904",
+    "public/rewards/printshop/achievement-xp-2500.svg": "e6a5e221b61d50723966adcb001d78c857386c58890eaa80068c1a6e4d8eb7c2",
+    "public/rewards/printshop/achievement-xp-25000.svg": "a332f6b204d0d5d7c3718064fe0c099c473ee964b423dd2792c2fca3c2a9ff06",
+    "public/rewards/printshop/achievement-xp-40000.svg": "86385c89571ccd1fcf5200b83b8aec3861db5468f6037acff223f003188aefa5",
+    "public/rewards/printshop/achievement-xp-500.svg": "0bbf4fe3f5832ae39470f623cd7ff6fd7ca45f31d2f56958748242b0b95feb53",
+    "public/rewards/printshop/achievement-xp-5000.svg": "b0b4a2a7a975fc188b817d99685525959af85e30175ab86afe7d1e785d159ea5",
+    "public/rewards/printshop/achievement-xp-50000.svg": "1ad0248277e28f8c3167720b12d04dc4c72b90f77417dad1055ab2dfea0cf359",
+    "public/rewards/printshop/achievement-xp-61000.svg": "ab7cf499875d64cc00f49cae4b8b75a692efb50baa11203b45e6db81433bf379",
+    "public/rewards/printshop/achievement-xp-75000.svg": "c427a5f04ee4c0e19ba94dd4e3195098c6cd64728ebef010b1b15f9b521c3ed8",
+    "public/rewards/printshop/achievement-xp-95000.svg": "2565551484da5c543fbac636855db5c024190f4d90751f63adf67c95c0c71de3",
+    "public/rewards/printshop/alchymista.svg": "20ae8fffb2f93f7516225bf9a954efd033108db3cf08670a1fe4370c82dcd8fc",
+    "public/rewards/printshop/medaile.svg": "baece45d04afab4f8ef23e565ee8d88877f2fed05f7c816be6e8ff0d2d9ae602",
+    "public/rewards/printshop/medal-2.svg": "eab62302fee50c74c116f3941e16bf6deebb1cd14be4999dbe9f00f0cb2a5a0c",
+    "public/rewards/printshop/medal-3.svg": "75c14b3cf9a1e65537a3dc9dc4baf2c52a0828e921194e5af14a1765e6b11b4c",
+    "public/rewards/printshop/novacek.svg": "ce44e648ee0910f3afe767cec91e84db08d7b126b0ea41c9d118e2c8d3df7bbc",
+    "public/rewards/printshop/rank-02.svg": "7a8f0b94bcba4ca6c68d87560b2cd092f9a805a49a3e2e6a6bde6d39c1976b47",
+    "public/rewards/printshop/rank-03.svg": "0b57a5adf0369cb15d3848bc6451ef0e629173759401d0d518c12965157a4ad1",
+    "public/rewards/printshop/rank-04.svg": "62bbc525554263ec2dd03e0ce1508a44ce5289c304222bc522c078e643fd87ce",
+    "public/rewards/printshop/rank-05.svg": "cc34717db17d752d21b17cf8ef5b067731115b9b5c25044686ff4003fe687a48",
+    "public/rewards/printshop/rank-06.svg": "2582c1c6b6d8959daafe3c40ded3bbf79b2e9ce7efc7dee143e6d631596fc080",
+    "public/rewards/printshop/rank-07.svg": "b3dadba9a2b065731a570dc879850e1b3fb3c94442fdd72d12b8b187f02b47a8",
+    "public/rewards/printshop/rank-08.svg": "7980d56e5662669fd1435dc82732e0c2cb63b03018fe26223b8ed0ad3171663d",
+    "public/rewards/printshop/rank-09.svg": "1477d17c80efd836e102aa6ea30ba2bc963114216fafd90ad2b556b73a380b8f",
+    "public/rewards/printshop/rank-10.svg": "26412de36a75a109bda1b113481e7c6278d2ae67b2c4ae87dabea28e0d680c80",
+    "public/rewards/printshop/rank-11.svg": "b9d591666671d3bdbe8ea76b75cbb65458ae9a43bc3e364329ffc0c3a344bea8",
+    "public/rewards/printshop/rank-12.svg": "3077013902456c69442967445528b0790dda8aa6f2f483a54f37e6772f4f5c0d",
+    "public/rewards/printshop/rank-13.svg": "7961c15a7eba6881f2e770e9bbd371a5b942e28736bebcd4f75cc56812eabff4",
+    "public/rewards/printshop/rank-15.svg": "2952c2d7868a984c66e5c0adfedd7d123295ed818700c97c8a1054074d44f497",
+    "public/rewards/printshop/rank-17.svg": "d56285e4379571192578dc102e1ffef7c8bfcb38fd93fb354785b7108e09f3a8",
+    "public/rewards/printshop/rank-19.svg": "cc2ef34e46f961ea628b391271f983f3fb73a1568afc9e6e27a8635eae1f8e3b",
+    "public/rewards/printshop/rank-20.svg": "897e2c890767a5978eaf4c7875e85f77d76fc26537b8c216efefeb607a9a4a31",
+    "public/rewards/printshop/rank-21.svg": "edc31dce656b7c49bba060eaf7a9c2d2ff4fd704bc89fea583602b26c059b9d2",
+    "public/rewards/printshop/rank-22.svg": "97f3b80e7770d8fca554410c9c999ae76b7c60b259613aa63d17e2693c55b899",
+    "public/rewards/printshop/rank-23.svg": "6c64650572599790107e22b892d08286544241ba4bd5da44404df5edc2c6e78e",
+    "public/rewards/printshop/rank-25.svg": "55e1a0cacb7e158f2970ee3c7bea1448384eb7fee83baa2b960f9b755d9197a3",
+    "public/rewards/printshop/rank-26.svg": "d8b70b955e32a3f421a91f6fd37f7f7d473d50207f307d41bf579ade41216c09",
+    "public/rewards/printshop/rank-27.svg": "0054d07fb21d47df32829060b3500f8b6630678b3699715a713e7d17f9362151",
+    "public/rewards/printshop/rank-28.svg": "37e3614e8fd167485ff5baa3233e81db16a4adffe762db692fd6a2cc6d8b968c",
+    "public/rewards/printshop/rank-29.svg": "5f0971fcbb2969adc11954c85f9b66d5d6e81a194a7a8b1a1d01522ac2f45319",
+    "public/rewards/printshop/rank-30.svg": "07c96a5e4c56604fde9ea1d525cd47f4d93dc3e2ce4c7efff88092f929c76474",
+    "public/rewards/printshop/rank-32.svg": "d2f7b2e7575e4bfd5149a71448c3d54a976b72fcab063c52892a3f8a5b068a1b",
+    "public/rewards/printshop/rank-33.svg": "6e35b1684b474769b3fa3993d239905d7592c65a279c1bb44162244c8a300e5f",
+    "public/rewards/printshop/rank-34.svg": "d125a9630d14b0e69932ef2d1f2bf3af4aaf9fc49a483c722701bef19474028c",
+    "public/rewards/printshop/streak-01.svg": "feed3c91b77788974ded1a0004e2758a191b438fcc729751ceb2079e7405dff6",
+    "public/rewards/printshop/streak-03.svg": "d8b7eb58b687a1805449a05df74ae93e58153b970d08ee7010af2b80d9aea050",
+    "public/rewards/printshop/streak-05.svg": "d94d53a40dabefde0b102cf1d8c73a3e96f0d46b7aada3bb357a3aa02d8dd911",
+    "public/rewards/printshop/streak-06.svg": "fb44cf00bde7e94c913baf1cce949c26bb75e3b44f64c172e7297a41596f63c9",
+    "public/rewards/printshop/streak-07.svg": "f20a6bc43913b72c4b4540c21aea24492f3c3b1c51bbb5bc547ff0d9595b5bee",
+    "public/rewards/printshop/streak-08.svg": "10899ae8793b781deb7a7126a288cb926f3beb58b96a3073f59fec33ad7bf174",
+    "public/rewards/printshop/streak-09.svg": "9ed9326f9e76a9032d25af4f15ea5792ae591d2b55f11d3f26c0d18fd56d2d51",
+    "public/rewards/printshop/streak-10.svg": "0e8198557fde2d04b8f00e5e279efa07f0f44d6b06478c0f7cd9ee41c68b352d",
+    "public/rewards/printshop/symbol-complete.svg": "c5144dcd8cd94be1744c40941c8e395e73262675ddd7d162cb65d76f6f277bd9",
+    "public/rewards/printshop/symbol-daily.svg": "1d32ea53f89107606697e10e0a3aa3d652e3dd1459b219554424da028db7b302",
+    "public/rewards/printshop/symbol-secret.svg": "5dda74f91649293fd60515699bfc0c5fbc106823d702ea9c950089c51e1848db",
+    "public/rewards/printshop/symbol-streak.svg": "19ada199c891266fe529156675a84c12a59c4dc22b855b1521f7cb2e887890b2",
+    "public/rewards/printshop/tyden.svg": "d1b067942c5d0503b7e816e986c9d018473abdccf40fcf6a65c4a15d1bcf715a",
+    "public/rewards/team-victories/weekly-gold.svg": "baece45d04afab4f8ef23e565ee8d88877f2fed05f7c816be6e8ff0d2d9ae602",
+    "public/assets/avatars/v3/04-medved.svg": "72811ef195753548b4abfd2bfea7620f4de530ff2974290d0e5fda98f7ab76a0",
+    "public/assets/avatars/v3/05-jelen.svg": "39a575f904332a9260440f23181c2e758ac0d4ffc1aeb1aefa098988bf3c9abe",
+    "public/assets/avatars/v3/07-jezevec.svg": "dae6367a773afaf1c4ca635f1b66a70303e378c8cec7bbe6c5a891afb27d6f6b",
+    "public/assets/avatars/v3/08-veverka.svg": "dd1600fb5b7d54bd6f3daad35ad8ecf8a49af5fb4a10f3349d34ac1f39fd166e",
+    "public/assets/avatars/v3/09-myval.svg": "96dacd32bb470967253428c0eca0d9b515f00659c3109f94983d541d6748ece5",
+    "public/assets/avatars/v3/10-kocka.svg": "12f968d1b1ea2f3c1f8d15777f789376af67413f35d25aba9ee42f5e700a04eb",
+    "public/assets/avatars/v3/11-vlk.svg": "0441bc412f2cf6f882c739e8248a0e290e4b21df8b1968c4ea6ae1da954c4d72",
+    "public/assets/avatars/v3/13-zajic.svg": "e3977855a6a7113c703cf7b74420d50eae7bc689436f3012836f9ebdf67d0d40",
+    "public/assets/avatars/v3/14-kralik.svg": "3fc3cc7b5d0c7670e6669a78562a779457fe0eb803149da483b35af7800b8c4d",
+    "public/assets/avatars/v3/15-myska.svg": "9fcadb1beed544dd96a00f6fbf5e1fd7dd39d90c772d402322ec24d9e6fb7b6d",
+    "public/assets/avatars/v3/18-pismeno-p.svg": "6c379643fea6f114bda693c76218a8921ab4c593f0e4f22a1499e20ef1e52cc0",
+    "public/assets/avatars/v3/19-pletene-bryle.svg": "67418a8225232dbe2f6072ea9124a7b63dba7f2581ed138bb2d8d5218789c7f6",
+    "public/assets/avatars/v3/20-kniha-s-copem.svg": "6b41e11075bab1d24d0dce3967435c27c26f79ba499820018ef80b1756b8e821",
+    "public/assets/avatars/v3/24-civka.svg": "924a287001b86218e62c6712bd461abef577e61c0212fe07a45c25f7131e800d",
+    "public/assets/avatars/v3/26-papirova-vlastovka.svg": "ac9516e33bb1f0687faf4a572cc250c5791f18a51fd2b1274ae6ee770a68d338",
+    "public/assets/avatars/v3/27-presypacky-modre.svg": "2da3cff6e34d550e6702ad9c6c83a1e7d45f6a4f64c8c3a79f4a5901a89c623e",
+    "public/assets/avatars/v3/28-presypacky-zlate.svg": "b92ef240c4fd244feff055b1b491adfb27596e27c557f1ebd43b8b74466229c0",
+    "public/assets/avatars/v3/29-clunek.svg": "642b5cd23e107a518577e875cf8d50f24495f449e1d1bfdc24b217cab8ddd464",
+    "public/assets/avatars/v3/30-tkalcovsky-stav.svg": "0870ff037c98ad015b79f236c7ee51477e1ff9d1b4226171dd929e2f1dceb2c4",
+    "public/assets/avatars/v3/31-jednorozec.svg": "31617d8e29d53aa93099a04027dafabfdb354633f13134591fdae2714aa15b07",
+    "public/assets/avatars/v3/32-lebka.svg": "7f819d66e510c5cb67727996a5c0e9d3ccd79a73a13802d4b5de6f6663a60f7f",
+    "public/assets/avatars/v3/33-radioaktivita.svg": "b03a9ab57fcdabc026b7f7c35897a60b4f1748ee2be9cd8bc6d9838361af8453",
+    "public/assets/avatars/v3/34-kyticka.svg": "4f82ddfdb45a8abb7d36eba66315a465494f6c11e510a6420177f5abe8f6f196",
+    "public/assets/avatars/v3/35-ufo.svg": "7f324ae52a688177d0c16eb9f2ca47c615829d005ccb1b6b75d3586ca9e806d7",
+    "public/assets/avatars/v3/36-mimozemstan.svg": "ab4b67b2d13310ef850baefbeeeda51cbd2fcd1fc2301cc49f5237818fbe34e7",
+    "public/assets/avatars/v3/37-bomba.svg": "09325027a5d2710f85040726a26503530d8c15a29672b7b0c30d23498e4525f3",
+    "public/assets/avatars/v3/38-dablik.svg": "e407c970f5c7983223662e977e689f4d9cb5952be5abe7d51602884d923168f2",
+    "public/assets/avatars/v3/40-blesk.svg": "abf2c90588e8ed6f79f1502951194e38d98dac1a2317b83d16aeccb0e529c32c"
+  }
+}
