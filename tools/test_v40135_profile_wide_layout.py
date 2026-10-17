@@ -11,10 +11,9 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 sw = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.08.0"' in (ROOT / "proplet_version.py").read_text(encoding="utf-8")
-assert "version:'4.08.0'" in runtime
-assert "proplet-v4.08.0-archive-release2" in sw
-assert 'theme-init.js?v=archive-release2' in html and 'theme-init.js?v=archive-release2' in sw
+# Release identity is shared, never pinned to the version that introduced this feature.
+import runpy
+runpy.run_path(str(ROOT / "tools/release_contract.py"))["assert_release_contract"](ROOT)
 assert "app-profile-settings.css?v=privacyflow1" in theme
 
 assert ".profile-grid>.profile-stat:not(.profile-stat-wide){grid-column:span 2" in css
@@ -25,4 +24,4 @@ assert "position=current.getBoundingClientRect().left-rail.getBoundingClientRect
 assert "wide?position-current.offsetWidth-gap" in app
 assert "if(currentScreen==='profile')focusProfileRoadmap()" in app
 
-print("PASS: v4.08.0 preserves wide profile alignment")
+print("PASS: current runtime preserves wide profile alignment")

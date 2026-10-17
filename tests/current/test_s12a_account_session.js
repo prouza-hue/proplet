@@ -114,8 +114,11 @@ const accountAuthAssetPos=themeInit.indexOf("await loadScript('/account-auth.js?
 const recoveryGuardAssetPos=themeInit.indexOf("loadScript('/auth-recovery-guard-v3326.js?v=2'");
 assert(accountAuthAssetPos>=0&&recoveryGuardAssetPos>accountAuthAssetPos,'account callback owner must load before its compatibility guard');
 assert(themeInit.includes("loadScript('/account-team-v33210.js?v=3'"),'account-team cache boundary was not advanced');
-assert(index.includes('/theme-init.js?v=archive-release2')&&sw.includes('/theme-init.js?v=archive-release2'),'theme-init cache boundary drifted');
-assert(themeInit.includes("loadScript('/home-layout.js?v=archive-release1'"),'home layout cache boundary drifted');
+for(const [source,asset] of [[index,'theme-init.js'],[themeInit,'home-layout.js']]){
+ const url=source.match(new RegExp('/'+asset.replaceAll('.','\\.')+'\\?v=[^\"\'\\s]+'))?.[0];
+ assert(url,asset+' must have a versioned load URL');
+ assert(sw.includes("'"+url+"'"),asset+' loaded URL must match its PWA cache entry');
+}
 has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
 has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
 has(homeLayout,/if\(rankingSessionScope\(\)!==scope\)return/,'stale anonymous ranking response can overwrite authenticated UI');

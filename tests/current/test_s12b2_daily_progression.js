@@ -114,7 +114,6 @@ for(const copy of [
   'Zahrát novou dnešní výzvu',
   'Pokračovat v Denní výzvě',
   'Hrát novinky',
-  'Týdenní várka dohraná',
 ])assert(`${app}\n${home}\n${progressionSource}\n${dailySource}`.includes(copy),`Daily/progression copy drifted: ${copy}`);
 assert(`${app}\n${dailySource}`.includes("$('#shareDailyBtn').classList.toggle('hidden',!done)"),'Daily share visibility drifted');
 assert(`${app}\n${dailySource}`.includes("if(daily.active){deps.showDailyResult(date,daily.active);return}")||app.includes("if(daily.active){showDailyResult(date,daily.active);return}"),'completed Daily must open its result');

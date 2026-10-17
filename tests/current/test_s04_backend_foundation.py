@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {"/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        if route.path and route.path not in {"/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -53,6 +53,10 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # every path, method, component and field remains covered. Tajenka v2
 # intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
+# Offline publication adds read-only routes; preserve the original API digest.
+for offline_path in ("/api/offline-manifest", "/api/archive/offline"):
+    assert set(openapi_contract["paths"][offline_path]) == {"get"}
+    openapi_contract["paths"].pop(offline_path)
 # Referral release is additive; keep every historical route/schema in the digest.
 # New routes and optional signup attribution have dedicated ASGI/SQL tests.
 referral_paths = {
@@ -98,6 +102,13 @@ assert "content_hash" not in result_schema.get("required", [])
 hash_schema = next(item for item in result_schema["properties"]["content_hash"]["anyOf"] if item.get("type") == "string")
 assert hash_schema == {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"}
 result_schema["properties"].pop("content_hash")
+# Offline clients may only lower timing trust. This optional boolean preserves
+# compatibility with older cached clients; all pre-existing fields stay hashed.
+assert "timing_unverified" not in result_schema.get("required", [])
+assert result_schema["properties"].pop("timing_unverified") == {
+    "type": "boolean", "title": "Timing Unverified", "default": False,
+}
+
 
 
 # The one-off authenticated campaign is covered by test_content_launch_push.
@@ -233,6 +244,7 @@ assert _dump(server.ResultCreate, puzzle_id="p-1", challenge_key="free:p-1", mod
     "clean_solve": False,
     "completed_at": None,
     "calm_mode": False,
+    "timing_unverified": False,
 }
 assert _dump(server.AttemptStart, attempt_id="attempt-1234", puzzle_id="p-1", challenge_key="free:p-1", mode="free", difficulty="easy") == {
     "attempt_id": "attempt-1234",

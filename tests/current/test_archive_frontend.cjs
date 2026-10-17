@@ -20,7 +20,7 @@ const context={console,structuredClone,Set,Map,URLSearchParams,location:{search:
  api:async (url,options={})=>{
   calls.push({url,owner:options.authProfile?.id});
   if(url==='/api/config')return config;
-  if(url==='/api/archive')return {editionId,solutionPolicyRevision,boards:fixture.boards.map(row=>({puzzleId:row.puzzle.id,level:row.level,difficulty:row.puzzle.difficulty,rewardXp:row.rewardXp,rewardSlotKey:row.rewardSlotKey}))};
+  if(url==='/api/archive')return {editionId,solutionPolicyRevision,completeCovers:fixture.completeCovers,boards:fixture.boards.map(row=>({puzzleId:row.puzzle.id,level:row.level,difficulty:row.puzzle.difficulty,rewardXp:row.rewardXp,rewardSlotKey:row.rewardSlotKey}))};
   if(url.startsWith('/api/archive/puzzle?'))return {editionId,...structuredClone(entry),difficulty:entry.puzzle.difficulty};
   if(url==='/api/archive/claims'){if(claimLoad)return claimLoad;if(claimsFail)throw Error('offline');return {editionId,claims:serverClaims,completedPuzzleIds:[]};}
   throw Error('Unexpected API '+url);

@@ -28,8 +28,8 @@ for(const count of [5,2,0]){
   assert.equal(roots.todayNewContentBanner.hidden,false);
   assert(roots.todayNewContentBanner.innerHTML.includes('Hrát novinky'));
  }else{
-  assert.equal(roots.newContentBanner.hidden,false);
-  assert(roots.newContentBanner.innerHTML.includes('Týdenní várka dohraná'));
+  assert.equal(roots.newContentBanner.hidden,true);
+  assert.equal(roots.newContentBanner.innerHTML,'');
   assert.equal(roots.todayNewContentBanner.hidden,true);
   assert.equal(roots.todayNewContentBanner.innerHTML,'');
  }

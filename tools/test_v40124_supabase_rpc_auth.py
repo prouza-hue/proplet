@@ -18,10 +18,10 @@ runtime = (ROOT / "public" / "runtime-meta.js").read_text(encoding="utf-8")
 version = (ROOT / "proplet_version.py").read_text(encoding="utf-8")
 service_worker = (ROOT / "public" / "sw.js").read_text(encoding="utf-8")
 
-assert 'APP_VERSION = "4.08.0"' in version
-assert "version:'4.08.0'" in runtime
+# Release identity is shared, never pinned to the version that introduced this feature.
+import runpy
+runpy.run_path(str(ROOT / "tools/release_contract.py"))["assert_release_contract"](ROOT)
 assert "supabaseRpcAuthRetryV40124:true" in runtime
-assert "proplet-v4.08.0-archive-release2" in service_worker
 
 
 with patch.object(server, "SUPABASE_SECRET_KEY", "sb_secret_opaque"):
