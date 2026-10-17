@@ -174,7 +174,7 @@
     ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
-    ['/game.css?v=control-side1','propletGameCss'],
+    ['/game.css?v=control-side2','propletGameCss'],
     ['/results.css?v=weekly3','propletResultsCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
     ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
@@ -228,13 +228,13 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=artcutout3','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=control-side2','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=home-stable1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=referrals1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
-    loadScript('/game-layout-v3330.js?v=control-side1','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=control-side2','propletGameLayout');
     await loadScript('/app/client-diagnostics.js?v=2','propletClientDiagnostics',{wait:true});
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     loadScript('/valid-word-feedback-v3330.js?v=mkpilot4','propletValidWordFeedback');
