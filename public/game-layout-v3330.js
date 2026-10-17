@@ -4,6 +4,9 @@
   const TABLET_PORTRAIT_CLASS='game-tablet-portrait';
   const DESKTOP_CLASS='game-desktop-wide';
   const FREE_CLASS='game-free-mode';
+  const SIDE_KEY='proplet-game-control-side';
+  let controlSide='right';
+  try{if(localStorage.getItem(SIDE_KEY)==='left')controlSide='left'}catch{}
   let pausedByGuard=false;
   let currentWord=null;
   let currentWordParent=null;
@@ -12,6 +15,38 @@
   let gameInfoParent=null;
   let gameInfoNext=null;
   let raf=0;
+
+  const syncControlSide=()=>{
+    const sideRail=document.body.classList.contains(TABLET_CLASS)||document.body.classList.contains(DESKTOP_CLASS);
+    document.querySelector('.game-main')?.classList.toggle('game-controls-left',sideRail&&controlSide==='left');
+    const button=document.querySelector('#gameSideToggle');
+    if(button){
+      button.hidden=!sideRail;
+      const label=`Prohodit strany: přesunout ovládání ${controlSide==='left'?'vpravo':'vlevo'}`;
+      button.setAttribute('aria-label',label);
+      button.title=label;
+    }
+  };
+
+  const ensureSideToggle=()=>{
+    const actions=document.querySelector('.game-control-column>.game-actions');
+    if(!actions||document.querySelector('#gameSideToggle'))return;
+    const button=document.createElement('button');
+    button.id='gameSideToggle';
+    button.type='button';
+    button.className='game-side-toggle';
+    button.hidden=true;
+    button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16m-4-4 4 4-4 4M20 16H4m4-4-4 4 4 4"/></svg><span>Prohodit strany</span>';
+    button.addEventListener('click',()=>{
+      // A second finger must not move the board underneath an active word gesture.
+      try{if(typeof currentGame!=='undefined'&&currentGame?.dragging)return}catch{}
+      controlSide=controlSide==='left'?'right':'left';
+      try{localStorage.setItem(SIDE_KEY,controlSide)}catch{}
+      syncControlSide();
+      refit();
+    });
+    actions.prepend(button);
+  };
 
   const coarsePointer=()=>{
     try{return !!window.matchMedia?.('(pointer: coarse)')?.matches||navigator.maxTouchPoints>0}catch{return navigator.maxTouchPoints>0}
@@ -168,6 +203,7 @@
     if(blocked){
       setDebugMode('phone-landscape-blocked',d,landscape,'phone');
       document.body.classList.remove(TABLET_CLASS,TABLET_PORTRAIT_CLASS,DESKTOP_CLASS);
+      syncControlSide();
       restoreGameBoardNodes();
       if(!pausedByGuard){
         try{if(typeof pauseGameClock==='function')pausedByGuard=!!pauseGameClock('landscape')}catch{}
@@ -190,6 +226,7 @@
     document.body.classList.toggle(TABLET_CLASS,largeTouchRail);
     document.body.classList.toggle(TABLET_PORTRAIT_CLASS,portraitRail);
     document.body.classList.toggle(DESKTOP_CLASS,desktopWide);
+    syncControlSide();
 
     if(desktopWide){
       moveDesktopStatusToRail();
@@ -221,6 +258,7 @@
 
   const boot=()=>{
     ensureNodes();
+    ensureSideToggle();
     const observer=new MutationObserver(schedule);
     observer.observe(document.body,{attributes:true,attributeFilter:['class']});
     const modeLabel=document.querySelector('#gameModeLabel');
@@ -237,3 +275,4 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })();
+
