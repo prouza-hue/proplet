@@ -5,6 +5,7 @@ const fixture=JSON.parse(fs.readFileSync(path.join(root,'public/app/archive/boar
 const entry=fixture.boards.find(row=>row.puzzle.id==='g3-e-009');
 const editionId=fixture.editionId,solutionPolicyRevision=entry.solutions.solutionPolicyRevision;
 const ownerA={id:'alice',token:'token-a'},ownerB={id:'bob',token:'token-b'};
+let catalogueCovers=fixture.completeCovers;
 let profile=ownerA,serverClaims={},claimLoad=null,claimsFail=false,xpDisplay=null,config={archiveEnabled:false};
 const states=new Map(),storage=new Map(),calls=[];
 function state(scope=profile?.id||'guest'){if(!states.has(scope))states.set(scope,{completed:{},inProgress:{}});return structuredClone(states.get(scope));}
@@ -20,7 +21,7 @@ const context={console,structuredClone,Set,Map,URLSearchParams,location:{search:
  api:async (url,options={})=>{
   calls.push({url,owner:options.authProfile?.id});
   if(url==='/api/config')return config;
-  if(url==='/api/archive')return {editionId,solutionPolicyRevision,completeCovers:fixture.completeCovers,boards:fixture.boards.map(row=>({puzzleId:row.puzzle.id,level:row.level,difficulty:row.puzzle.difficulty,rewardXp:row.rewardXp,rewardSlotKey:row.rewardSlotKey}))};
+  if(url==='/api/archive')return {editionId,solutionPolicyRevision,completeCovers:catalogueCovers,boards:fixture.boards.map(row=>({puzzleId:row.puzzle.id,level:row.level,difficulty:row.puzzle.difficulty,rewardXp:row.rewardXp,rewardSlotKey:row.rewardSlotKey}))};
   if(url.startsWith('/api/archive/puzzle?'))return {editionId,...structuredClone(entry),difficulty:entry.puzzle.difficulty};
   if(url==='/api/archive/claims'){if(claimLoad)return claimLoad;if(claimsFail)throw Error('offline');return {editionId,claims:serverClaims,completedPuzzleIds:[]};}
   throw Error('Unexpected API '+url);
@@ -42,6 +43,9 @@ vm.runInContext(app.match(/^function queuedResultPayload\(r\)\{.*$/m)[0],context
  release({editionId,claims:{'legacy-free:easy:1':{points:15}},completedPuzzleIds:['g3-e-001']});
  claims=await pending;assert.equal(claims.identity,'bob:token-b');assert.equal(claims.status,'unknown');assert.equal(Object.keys(claims.claims).length,0);claimLoad=null;
  profile=null;claims=await archive.refreshClaims();assert.equal(claims.status,'guest');
+ catalogueCovers=undefined;
+ await assert.rejects(archive.loadBank(),/nepodařilo ověřit/,'Missing authoritative cover count must reject the catalogue');
+ catalogueCovers=fixture.completeCovers;
  profile=ownerA;await archive.start(entry.puzzle.id);
  assert.equal(calls.some(call=>call.url.startsWith('/api/archive/puzzle?')),true);
  assert.equal(archive.reward(context.currentGame.puzzle),0,'Unknown XP must never be credited optimistically');

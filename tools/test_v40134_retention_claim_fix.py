@@ -25,7 +25,7 @@ assert "if(permanentClaimError(error)){rejectClaim(store,key,row,error);changed=
 assert "return 'rejected'" in feedback
 assert "word_discovery_claim_rejected" in feedback and "word_discovery_claim_rejected" in product_registry
 assert "['local','pending','confirmed'].includes(row?.status)" in feedback
-assert "valid-word-feedback-v3330.js?v=mkpilot4" in theme
+# The shared release contract checks this asset against its current shell URL.
 
 assert "firstRealGameJustCompleted" in app
 assert "completedGameCount()===1" in app

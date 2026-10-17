@@ -44,7 +44,7 @@ assert "/app/rankings/rankings.js" in shell
 assert "/app/game/state.js" in shell
 assert "/app/game/board.js" in shell
 assert "/app/game/input.js" in shell
-assert "/app/game/hints.js?v=boardintro2" in shell
+# The shared release contract checks this asset against its current shell URL.
 assert "/app/core/completion-pipeline.js" in shell
 for heavy_or_lazy in ("/puzzles.json", "/valid-words-v3328.txt", "/share-card.png", "/privacy.html", "/terms.html"):
     assert heavy_or_lazy not in shell

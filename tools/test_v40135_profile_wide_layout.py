@@ -14,7 +14,7 @@ theme = (ROOT / "public" / "theme-init.js").read_text(encoding="utf-8")
 # Release identity is shared, never pinned to the version that introduced this feature.
 import runpy
 runpy.run_path(str(ROOT / "tools/release_contract.py"))["assert_release_contract"](ROOT)
-assert "app-profile-settings.css?v=privacyflow1" in theme
+# The shared release contract checks this asset against its current shell URL.
 
 assert ".profile-grid>.profile-stat:not(.profile-stat-wide){grid-column:span 2" in css
 assert "overflow-wrap:normal;word-break:normal;hyphens:none" in css
