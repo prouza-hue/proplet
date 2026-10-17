@@ -16,7 +16,7 @@ function art(label,{locked=false,size=40,category}={}){
  for(const theme of ['print']){
   const img=document.createElement('img');img.className='ribbon-'+theme;img.alt='';img.setAttribute('aria-hidden','true');img.width=size;img.height=size;img.draggable=false;img.loading='lazy';img.decoding='async';
   const isMozkokalypsa=/^achievement-mozkokalypsa-(1|5|10|25|50|75|100)$/.test(printKey);
-  const revision=isMozkokalypsa?'4':printKey==='achievement-mozkokalypsa-25'?'tamer2':printKey==='pulmesic'?'icons1':['rank-14','rank-16','rank-24','rank-31','rank-32'].includes(printKey)?'rankrev1':'3';
+  const revision=isMozkokalypsa?'4':'artcutout1';
   img.src='/rewards/printshop/'+printKey+(isMozkokalypsa?'.webp':'.svg')+'?v='+revision;wrap.appendChild(img);
  }
  return wrap;
