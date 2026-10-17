@@ -114,3 +114,21 @@ body.game-free-mode .game-title .game-difficulty-icon{width:24px;height:24px;fle
 html[data-theme="dark"] body.game-desktop-wide .game-control-column>.current-word{background:linear-gradient(145deg,#262230,#211e2a);border-color:#433c50;box-shadow:0 5px 14px rgba(0,0,0,.24)}
 html[data-theme="dark"] body.game-desktop-wide .game-control-column>.current-word strong{color:#b9adff}
 html[data-theme="dark"] body.game-desktop-wide .game-control-column>.game-info .found-row{border-top-color:#3d3748}
+
+/* Reverse only the outer grid's inline direction: its existing responsive track widths
+   remain attached to the same columns. Text, board coordinates and DOM order stay LTR. */
+body:is(.game-tablet-landscape,.game-desktop-wide) .game-main.game-controls-left{direction:rtl}
+.game-main.game-controls-left>.game-board-column,
+.game-main.game-controls-left>.game-control-column{direction:ltr}
+#gameSideToggle{display:none}
+body:is(.game-tablet-landscape,.game-desktop-wide) #gameSideToggle:not([hidden]){
+  display:flex;align-items:center;justify-content:center;gap:7px;order:-1;
+  width:100%;min-width:0;min-height:44px;padding:8px 4px;
+  border:1px solid transparent;border-radius:12px;background:transparent;
+  color:var(--r-ink-muted,var(--r-ink,currentColor));font:inherit;font-size:15px;line-height:1.35;
+  cursor:pointer;touch-action:manipulation;
+}
+#gameSideToggle svg{width:20px;height:20px;flex:0 0 20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#gameSideToggle:hover{background:color-mix(in srgb,currentColor 7%,transparent)}
+#gameSideToggle:focus-visible{outline:2px solid var(--r-ink,currentColor);outline-offset:2px}
+

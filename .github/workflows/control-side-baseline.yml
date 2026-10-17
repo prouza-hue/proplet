@@ -1,0 +1,118 @@
+name: Control side baseline investigation
+on:
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  printshop-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      EXPECTED_SHA: 60494c91eeb61817c638aa6c812ba528839d2427
+      TEST_URL: http://127.0.0.1:8765
+      RESULT_PATH: artifacts/idle-browser.json
+      SMOKE_OUT: artifacts/printshop-smoke
+      PYTHONUTF8: '1'
+    steps:
+      # For pull_request this is GitHub's merge candidate, not an old preview alias.
+      - uses: actions/checkout@v4
+        with: {ref: 60494c91eeb61817c638aa6c812ba528839d2427}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install pinned browser tooling
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.57.0
+          npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/proplet-browser" playwright@1.57.0
+          python -m playwright install --with-deps chromium
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/proplet-browser/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Build the checked-out frontend
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          # Match the fixed browser date and Tajenka fixture; wall-clock builds age out.
+          python - <<'PY'
+          import json
+          from datetime import date
+          from tools.generate_puzzles_bootstrap import DEFAULT_SOURCE, DEFAULT_OUTPUT, build_bootstrap, validate
+          raw = DEFAULT_SOURCE.read_bytes()
+          source = json.loads(raw)
+          data = build_bootstrap(source, raw, today=date(2026, 9, 15))
+          encoded = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+          validate(source, data, len(raw), len(encoded))
+          DEFAULT_OUTPUT.write_bytes(encoded)
+          PY
+          mkdir -p artifacts
+      - name: Verify layout and idle lifecycle against isolated checkout
+        shell: bash
+        run: |
+          node tools/browser_fixture_server.cjs > artifacts/server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python tools/test_printshop_browser.py
+          RESULT_PATH=artifacts/account-progress.json node tools/test_account_progress_browser.cjs
+          node tools/test_idle_offline_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: baseline-printshop-browser
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 7
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TEST_URL: http://127.0.0.1:8765
+      TEST_BASELINE_SHA: 4c1f72ed95d9d4b969b0f46bd194126c5e554670
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 60494c91eeb61817c638aa6c812ba528839d2427
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver and build generated shell assets
+        run: |
+          npm install --prefix "$RUNNER_TEMP/proplet-browser" --no-save --no-package-lock playwright@1.57.0
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/proplet-browser/node_modules/playwright" >> "$GITHUB_ENV"
+          echo "CHROME_PATH=$(command -v google-chrome || command -v google-chrome-stable)" >> "$GITHUB_ENV"
+          echo "EXPECTED_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          python tools/generate_puzzles_bootstrap.py
+      - name: Start isolated fixture
+        run: |
+          mkdir -p browser-results
+          node tools/onboarding_fixture_server.cjs > browser-results/fixture.log 2>&1 &
+          node -e 'const end=Date.now()+10000; (async()=>{while(Date.now()<end){try{if((await fetch(process.env.TEST_URL+"/api/health")).ok)return}catch{}await new Promise(r=>setTimeout(r,100))}throw Error("fixture failed to start")})().catch(e=>{console.error(e);process.exitCode=1})'
+      - name: Reproduce baseline delayed telemetry with playable intro
+        env:
+          TEST_EXPECT_BASELINE: '1'
+          RESULT_PATH: browser-results/baseline.json
+        run: node tools/test_onboarding_activation_browser.cjs
+      - name: Verify first visit, input, auth, invitation, outages, and SW upgrade
+        env:
+          RESULT_PATH: browser-results/current.json
+        run: node tools/test_onboarding_activation_browser.cjs
+      - name: Verify new first steps and account return
+        env:
+          RESULT_PATH: browser-results/first-steps.json
+        run: node tools/test_first_steps_browser.cjs
+      - name: Verify selected challenger on desktop and mobile
+        run: node tools/test_first_board_challenger_browser.cjs
+      - name: Verify first-game measurement and result rendering safety
+        env:
+          RESULT_PATH: browser-results/first-game-safety.json
+        run: node tools/test_first_game_safety_browser.cjs
+      - name: Verify client error provenance and cached clients
+        env:
+          RESULT_PATH: browser-results/client-diagnostics.json
+        run: node tools/test_client_diagnostics_browser.cjs
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-onboarding-browser
+          path: browser-results/
+          retention-days: 14
+

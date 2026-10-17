@@ -1,0 +1,27 @@
+name: Game control side regression
+on:
+  pull_request:
+    paths: ['public/game.css', 'public/game-layout-v3330.js', 'tools/test_control_side_browser.cjs', '.github/workflows/game-control-side.yml']
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install browser test runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/control-side" --no-save playwright@1.58.2
+          "$RUNNER_TEMP/control-side/node_modules/.bin/playwright" install --with-deps chromium
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/control-side/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Verify game gestures, state and responsive layout
+        run: node tools/test_control_side_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: control-side-browser
+          path: artifacts/control-side/
+          retention-days: 7

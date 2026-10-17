@@ -79,7 +79,8 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   await control({reset:true,firstSteps:true});
   fixtureRun=crypto.randomUUID();
   const context=await browser.newContext({viewport:options.mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:!!options.mobile,hasTouch:!!options.mobile,serviceWorkers:'block',extraHTTPHeaders:{'X-Proplet-Fixture-Run':fixtureRun},...(options.userAgent?{userAgent:options.userAgent}:{})});
-  await context.addInitScript(identity=>localStorage.setItem('proplet-v3-15-anonymous-id',identity),options.experimentIdentity||'synthetic-2');
+  // Consent UI has its own tests; it must not intercept the board gestures here.
+  await context.addInitScript(identity=>{localStorage.setItem('proplet-v3-15-anonymous-id',identity);localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.parse('2026-09-15T09:00:00Z')}));},options.experimentIdentity||'synthetic-2');
   await context.route('**/*',route=>['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname)?route.continue():route.abort());
   const page=await context.newPage(),errors=[],warnings=[],network=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))warnings.push({type:m.type(),text:m.text()})});page.on('requestfailed',r=>network.push({url:r.url(),error:r.failure()?.errorText}));page.on('response',r=>{if(r.status()>=500)network.push({url:r.url(),status:r.status()})});await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
   console.log('SCENARIO '+name);
