@@ -52,7 +52,7 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  // Both tabs must resume the same saved board, without creating another run.
  const saved=await page.evaluate(()=>({id:currentGame.puzzle.id,found:currentGame.found.length}));
  await page.evaluate(()=>nav('free'));
- check('Play resume appears above difficulties',await page.evaluate(()=>document.querySelector('#freeResumeCard')?.nextElementSibling?.id==='difficultyCards'));
+ check('Play resume appears above difficulties',await page.evaluate(()=>(()=>{const card=document.querySelector('#freeResumeCard'),grid=document.querySelector('#difficultyCards');return !!card&&card.getBoundingClientRect().bottom<=grid.getBoundingClientRect().top})()));
  check('both tabs show the same resume',await page.evaluate(()=>document.querySelector('#freeResumeCard').textContent===document.querySelector('#homeResumeCard').textContent));
  await page.locator('#freeResumeCard').click();
  check('Play resume restores the saved board',await page.evaluate(saved=>currentGame.puzzle.id===saved.id&&currentGame.found.length===saved.found,saved));
