@@ -151,9 +151,9 @@
         const title=section.querySelector('h2'),label=kind==='xp'?'Nasbírané XP':'Dnešní výzva';
         section.classList.add('ranking-navigation-section');
         list.setAttribute('role','region');list.setAttribute('aria-labelledby',title.id);
-        const collapse=doc.createElement('button');collapse.type='button';collapse.className='ranking-collapse-toggle';
+        const collapse=doc.createElement('button');collapse.type='button';collapse.className='ranking-collapse-toggle achievement-toggle-btn';
         collapse.setAttribute('aria-controls',list.id);collapse.setAttribute('aria-expanded','true');collapse.setAttribute('aria-label',`Sbalit: ${label}`);
-        collapse.innerHTML='<span aria-hidden="true">⌃</span>';
+        collapse.innerHTML='<span class="ranking-collapse-label" aria-hidden="true">Sbalit</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg>';
         const summary=doc.createElement('small');summary.className='ranking-section-summary';summary.hidden=true;
         head.querySelector('div')?.append(summary);head.append(collapse);
         const more=doc.createElement('button');more.type='button';more.className='ranking-expand-list text-btn';more.hidden=true;more.setAttribute('aria-controls',list.id);
@@ -163,7 +163,7 @@
         sections.set(kind,{section,head,controls,list,collapse,summary,more,back,rows:[]});
         collapse.addEventListener('click',()=>{
           const anchor=rememberAnchor(collapse),collapsed=collapse.getAttribute('aria-expanded')==='true';
-          anchored(anchor,()=>{section.classList.toggle('ranking-navigation-collapsed',collapsed);collapse.setAttribute('aria-expanded',String(!collapsed));collapse.setAttribute('aria-label',`${collapsed?'Rozbalit':'Sbalit'}: ${label}`);summary.hidden=!collapsed;});
+          anchored(anchor,()=>{section.classList.toggle('ranking-navigation-collapsed',collapsed);collapse.setAttribute('aria-expanded',String(!collapsed));collapse.setAttribute('aria-label',`${collapsed?'Rozbalit':'Sbalit'}: ${label}`);collapse.querySelector('.ranking-collapse-label').textContent=collapsed?'Rozbalit':'Sbalit';summary.hidden=!collapsed;});
         });
         const toggle=()=>{
           const anchor=rememberAnchor(more);

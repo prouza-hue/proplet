@@ -6,13 +6,18 @@
   scroll-margin-top:18px;
 }
 #screen-leaderboard .ranking-navigation-section>.ranking-section-head>div{min-width:0}
+#screen-leaderboard .ranking-section-head>.quality-ranking-head{flex-wrap:nowrap}
+#screen-leaderboard .quality-ranking-head h2{min-width:0}
 #screen-leaderboard .ranking-collapse-toggle{
-  flex:0 0 44px;display:grid;place-items:center;width:44px;height:44px;
-  padding:0;border:1px solid var(--line);border-radius:50%;background:transparent;
-  color:var(--ink);cursor:pointer;font:inherit;font-size:29px;line-height:1;
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-width:98px;min-height:44px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:999px;background:var(--r-accent-soft);color:var(--r-accent);
+  cursor:pointer;font:inherit;font-size:14px;font-weight:600;line-height:1.2;
 }
-#screen-leaderboard .ranking-collapse-toggle>span{transform:translateY(4px)}
-#screen-leaderboard .ranking-collapse-toggle[aria-expanded="false"]>span{transform:rotate(180deg) translateY(2px)}
+#screen-leaderboard .ranking-collapse-toggle>.ranking-collapse-label{margin:0;font-size:inherit;line-height:inherit}
+#screen-leaderboard .ranking-collapse-toggle>svg{width:16px;height:16px;flex:0 0 16px;transition:transform .16s ease}
+#screen-leaderboard .ranking-collapse-toggle[aria-expanded="false"]>svg{transform:rotate(180deg)}
+@media(prefers-reduced-motion:reduce){#screen-leaderboard .ranking-collapse-toggle>svg{transition:none}}
 #screen-leaderboard .ranking-collapse-toggle:focus-visible,
 #screen-leaderboard .ranking-expand-list:focus-visible,
 #screen-leaderboard .ranking-back-summary:focus-visible,
@@ -39,5 +44,5 @@
   #screen-leaderboard .ranking-navigation-section>.ranking-section-head{gap:5px}
   #screen-leaderboard .ranking-navigation-section .quality-ranking-head{gap:5px}
   #screen-leaderboard .ranking-navigation-section .ranking-section-head h2{font-size:19px}
-  #screen-leaderboard .ranking-collapse-toggle{flex-basis:42px;width:42px;height:42px}
+  #screen-leaderboard .ranking-collapse-toggle{min-width:82px;padding-inline:7px;gap:4px;font-size:13px}
 }
