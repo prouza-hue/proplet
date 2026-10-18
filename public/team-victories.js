@@ -168,7 +168,7 @@
     if(!identity(p)||safePreview()){host?.remove();return;}
     if(!host){const anchor=$('#profileCard .profile-grid');if(!anchor)return;host=document.createElement('section');host.id='profileTeamVictories';host.className='tv-profile';anchor.after(host);}
     if(personalKey!==identity(p)){personal=null;personalAt=0;personalError=false;personalKey=identity(p);}
-    paintPersonal();if(activeScreen()==='screen-profile')loadPersonal();
+    paintPersonal();if(ready&&activeScreen()==='screen-profile')loadPersonal();
   }
   function check(){
     if(identity(profile())!==stateKey){refresh().then(()=>{maybeCelebrate();maybeIntro();});return;}
@@ -188,12 +188,13 @@
     dialog.addEventListener('click',e=>{if(e.target!==dialog)return;const b=dialog.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)close();});
     const observer=new MutationObserver(()=>{const intro=$('#tvIntro');if(intro?.closest('#winModal')&&$('#winModal')?.classList.contains('hidden'))intro.remove();queueMicrotask(check);});
     document.querySelectorAll('.modal').forEach(el=>observer.observe(el,{attributes:true,attributeFilter:['class']}));
-    document.addEventListener('proplet:screen-changed',()=>{if(activeScreen()==='screen-game'&&!$('#winModal')?.classList.contains('hidden'))return;if(activeScreen()==='screen-game')$('#tvIntro')?.remove();if(activeScreen()==='screen-profile')renderProfile(profile());visit();});
+    document.addEventListener('proplet:screen-changed',()=>{if(activeScreen()==='screen-game'&&!$('#winModal')?.classList.contains('hidden'))return;if(activeScreen()==='screen-game')$('#tvIntro')?.remove();visit();});
     document.addEventListener('proplet:account-changed',()=>{refresh().then(()=>{renderProfile(profile());check();});});
     document.addEventListener('proplet:profile-refreshed',()=>{renderProfile(profile());check();});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)visit();});
     window.addEventListener('storage',()=>{if(identity(profile())!==stateKey)check();});
-    refresh().then(()=>setTimeout(check,1100));
+    document.addEventListener('close',()=>queueMicrotask(check),true);
+    refresh().then(()=>{renderProfile(profile());setTimeout(check,1100);});
   }
   window.PropletTeamVictories={resultConfirmed,openCabinet,openCompetition,renderProfile};
   document.addEventListener('proplet:ready',setup,{once:true});

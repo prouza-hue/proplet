@@ -4,6 +4,8 @@
 if(!window.PROPLET_ARCHIVE_PREVIEW)return;
 const params=new URLSearchParams(location.search),mode=params.get('teamRewards')||'victory';
 const gold=mode==='victory'?1:3;
+localStorage.setItem('proplet:announcement:archive-extra-v1:account:archive-review','1');
+sessionStorage.setItem('proplet:announcements:session:v1','1');
 const history=[{id:'00000000-0000-0000-0000-000000000103',weekStart:'2026-10-12',weekEnd:'2026-10-19',teamName:'Sazeči',totalGold:gold,previousGold:gold-1,xp:27155,sharedFirst:false},
 {id:'00000000-0000-0000-0000-000000000102',weekStart:'2026-10-05',weekEnd:'2026-10-12',teamName:'Sazeči',xp:24390,sharedFirst:true},
 {id:'00000000-0000-0000-0000-000000000101',weekStart:'2026-09-28',weekEnd:'2026-10-05',teamName:'Písmáci',xp:21900,sharedFirst:false}].slice(0,gold);

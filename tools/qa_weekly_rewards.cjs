@@ -20,6 +20,8 @@ const server=http.createServer((req,res)=>{
  page.on('pageerror',e=>errors.push(e.message));
  const base=`http://127.0.0.1:${server.address().port}/design/team-rewards/?archive-preview=1&teamRewards=`;
  await page.goto(base+'victory');
+ await page.locator('#tvRewardDialog[open],#archiveExperienceModal:not(.hidden)').first().waitFor();
+ if(await page.locator('#archiveExperienceModal:not(.hidden)').count())await page.locator('#archiveExperienceModal [data-archive-action=close]').first().click();
  await page.waitForSelector('#tvRewardDialog[open]').catch(async error=>{console.error('Reward startup:',JSON.stringify({errors,body:await page.locator('body').innerText(),runtime:await page.evaluate(()=>({screen:typeof currentScreen==='undefined'?null:currentScreen,env:window.PROPLET_RUNTIME_ENV,preview:window.PROPLET_ARCHIVE_PREVIEW,profile:typeof getProfile==='function'?{id:getProfile()?.id,familyCode:getProfile()?.familyCode}:null,quiet:window.PropletFirstSteps?.quiet()}))}));throw error;});
  assert.match(await page.locator('#tvRewardDialog').innerText(),/Týdenní zlato je vaše!/);
  assert.equal(await page.locator('#tvRewardDialog .tv-number').innerText(),'1');

@@ -72,3 +72,10 @@ test('late personal history cannot populate the next account',async()=>{
  finish({enabled:true,totalGold:1,history:[{teamName:'SECRET OLD TEAM',weekStart:'2026-10-05',weekEnd:'2026-10-12'}]});await tick();
  assert.ok(h.nodes.every(n=>!String(n.innerHTML).includes('SECRET OLD TEAM')));
 });
+
+test('a restored profile opens its personal wins without waiting for another navigation',async()=>{
+ const h=harness({screen:'screen-profile',responder:()=>Promise.resolve({enabled:true,totalGold:0,history:[]})});
+ h.setAccount({id:'a',token:'token-a',familyCode:null});await h.start();await tick();
+ assert.equal(h.calls.length,1);assert.equal(h.calls[0].path,'/api/team-victories/personal');
+ assert.match(h.nodes.find(n=>n.id==='profileTeamVictories').innerHTML,/První zlato čeká/);
+});
