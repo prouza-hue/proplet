@@ -30,5 +30,9 @@ vm.runInContext(fs.readFileSync('public/achievement-stories.js','utf8'),ctx);con
 assert.equal(Object.keys(stories).length,ctx.ach.length);assert.equal(new Set(Object.values(stories)).size,ctx.ach.length);
 for(const a of ctx.ach){assert(stories[a.id]?.length>15,a.id);assert(stories[a.id].length<150,a.id)}
 const ordered=Array.from(ctx.groups,g=>g[0]);assert.deepEqual(ordered.slice(ordered.indexOf('hardcore'),ordered.indexOf('hardcore')+3),['hardcore','mozkomor','mozkokalypsa']);
-for(const asset of ['achievement-stories.js?v=1','achievement-details.js?v=3','achievement-details.css?v=3'])assert(sw.includes(asset));
+const index=fs.readFileSync('public/index.html','utf8');
+for(const name of ['achievement-stories.js','achievement-details.js','achievement-details.css']){
+ const asset=Array.from(index.matchAll(/(?:src|href)="([^"]+)"/g),m=>m[1]).find(url=>url.startsWith('/'+name+'?v='));
+ assert(asset,'versioned detail asset '+name);assert(sw.includes("'"+asset+"'"),'offline shell matches loaded revision '+asset);
+}
 console.log('PASS: all 97 unique stories, adjacent endgame difficulties and offline detail assets');
