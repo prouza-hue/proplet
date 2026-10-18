@@ -165,10 +165,9 @@ async function enrichPlayedLevels(diff){
   const list=q('#playedLevelsList'),meta=q('#playedLevelsMeta');if(!list)return;
   let data=null;try{const p=safeProfile();if(p?.token&&typeof api==='function')data=await api(`/api/played-levels?difficulty=${encodeURIComponent(diff)}`)}catch{}
   const legacy=data?.legacyLevels||[],transferred=Number(data?.transferred||0);
-  if(meta&&data){const actual=Number(data.actual||0),total=Number(data.total||0);setText(meta,actual?`Nový postup ${actual}/${total}`:transferred?'Nový postup začíná od jedničky.':'Zatím tu nic není. Nejdřív něco propleť.')}
   q('.legacy-history-v334',list)?.remove();if(!legacy.length)return;
   const section=document.createElement('section');section.className='legacy-history-v334';
-  section.innerHTML=`<h3>Dříve odehrané</h3><p>Tvoje starší výsledky zůstávají v historii. Původní desky už nemusí být znovu hratelné.</p>${legacy.slice().sort((a,b)=>(a.level||0)-(b.level||0)).map(r=>`<div class="legacy-history-row"><span class="level-index">${Number(r.level)||'–'}.</span><span><strong>${r.elapsedMs&&typeof fmtTime==='function'?fmtTime(r.elapsedMs):'Dokončeno'}</strong><small>${r.cleanSolve?'✨ Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Dokončeno'} · ${Number(r.moves||0)} tahů${r.calmMode?' · 🫧 Klid':''}</small></span><em>archiv</em></div>`).join('')}`;
+  section.innerHTML=`<h3>Dříve odehrané</h3><p>Tvoje starší výsledky zůstávají v historii. Původní desky už nemusí být znovu hratelné.</p>${legacy.slice().sort((a,b)=>(a.level||0)-(b.level||0)).map(r=>`<div class="legacy-history-row"><span class="level-index">${Number(r.level)||'–'}.</span><span><strong>${r.elapsedMs&&typeof fmtTime==='function'?fmtTime(r.elapsedMs):'Dokončeno'}</strong><small>${r.cleanSolve?'Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Dokončeno'} · ${Number(r.moves||0)} tahů${r.calmMode?' · 🫧 Klid':''}</small></span><em>archiv</em></div>`).join('')}`;
   list.appendChild(section);
 }
 function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openPlayedLevels.__qualityWrapped){const base=openPlayedLevels,wrapped=async function(diff){const out=await base(diff);await enrichPlayedLevels(diff);return out};wrapped.__qualityWrapped=true;openPlayedLevels=wrapped}}
@@ -221,3 +220,4 @@ function bootQuality(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootQuality,{once:true});else bootQuality();
 })();
+

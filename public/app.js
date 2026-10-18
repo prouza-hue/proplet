@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.4-rank-details1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.4-play-polish1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -945,6 +945,7 @@ function renderFree(){
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
  window.PropletFreeOrderUI?.mount({store:freeOrder(),progress:freeProgress,labels:DIFF,change:changeFreeOrder});
  globalThis.PropletArchiveExperience?.free();
+ window.PropletHomeLayout?.renderResumeCard();
 }
 async function startFree(diff){
  if(!allowAccountGameStart())return;
@@ -2141,9 +2142,9 @@ async function openPlayedLevels(diff){
  try{if(p?.token){const data=await api(`/api/played-levels?difficulty=${encodeURIComponent(diff)}`);levels=data.levels||[];legacyLevels=data.legacyLevels||[];summary=data}else{const state=getState(),slots=localFreeSlotState(diff),rows=Object.values(state.completed||{}),total=sortedFreeBank(diff).length;levels=sortedFreeBank(diff).map(x=>{const level=Number(x.meta?.level),r=state.completed[`free:${x.id}`];return r?{puzzleId:x.id,level,elapsedMs:r.elapsedMs,moves:r.moves,hintsUsed:r.hintsUsed||0,cleanSolve:r.cleanSolve===true,attempts:1,transferred:false}:slots.transferred.has(level)?{puzzleId:x.id,level,transferred:true,attempts:0}:null}).filter(Boolean);legacyLevels=rows.map(r=>{if(r?.mode!=='free'||r.difficulty!==diff)return null;const info=(Number(r.level)&&Number(r.contentGeneration))?{level:Number(r.level),generation:Number(r.contentGeneration)}:freePuzzleSlot(r.puzzleId,diff);return info&&info.generation<2?{...r,level:info.level,contentGeneration:info.generation}:null}).filter(Boolean).sort((a,b)=>a.level-b.level);summary={actual:slots.actual.size,transferred:slots.transferred.size,total}}}catch(e){$('#playedLevelsMeta').textContent=e.message;return}
  if(p?.token){if(!accountProfileMatches(p))return;levels=mergePendingPlayedLevels(levels,getQueue(p.id),diff)}
  const pendingCount=levels.filter(r=>r.pendingSync).length;
- const actual=summary?.actual??levels.filter(r=>!r.transferred).length,transferred=summary?.transferred??levels.filter(r=>r.transferred).length,total=summary?.total??sortedFreeBank(diff).length;$('#playedLevelsMeta').textContent=actual?`Nový postup ${actual}/${total}`:transferred?'Nový postup začíná od jedničky.':'Zatím tu nic není. Nejdřív něco propleť.';
+ const actual=summary?.actual??levels.filter(r=>!r.transferred).length,transferred=summary?.transferred??levels.filter(r=>r.transferred).length,total=summary?.total??sortedFreeBank(diff).length;$('#playedLevelsMeta').textContent='';
  if(pendingCount)$('#playedLevelsMeta').textContent=`${actual} potvrzeno · ${pendingCount} čeká na synchronizaci`;
- const currentHtml=levels.length?levels.map(r=>`<button class="played-level-row ${r.transferred?'transferred':''}" data-level-puzzle="${esc(r.puzzleId)}" data-level-diff="${diff}"><span class="level-index">${r.transferred?'✦':`${r.level}.`}</span><span class="level-history-main">${r.transferred?`<strong>Nová deska · úroveň ${r.level}</strong><small>Dřívější verzi máš splněnou.</small>`:`<strong>${fmtTime(r.elapsedMs)}</strong><small>${r.pendingSync?'Čeká na synchronizaci · ':''}${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}${r.attempts>1?` · hráno ${r.attempts}×`:''}</small>`}</span><span class="played-arrow">›</span></button>`).join(''):'<div class="empty-history">Tady zatím fouká vítr. 🌬️</div>';$('#playedLevelsList').innerHTML=currentHtml;
+ const currentHtml=levels.length?levels.map(r=>`<button class="played-level-row ${r.transferred?'transferred':''}" data-level-puzzle="${esc(r.puzzleId)}" data-level-diff="${diff}"><span class="level-index">${r.transferred?'✦':`${r.level}.`}</span><span class="level-history-main">${r.transferred?`<strong>Nová deska · úroveň ${r.level}</strong><small>Dřívější verzi máš splněnou.</small>`:`<strong>${fmtTime(r.elapsedMs)}</strong><small>${r.pendingSync?'Čeká na synchronizaci · ':''}${r.cleanSolve?'Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}${r.attempts>1?` · hráno ${r.attempts}×`:''}</small>`}</span><span class="played-arrow">›</span></button>`).join(''):'<div class="empty-history">Tady zatím fouká vítr. 🌬️</div>';$('#playedLevelsList').innerHTML=currentHtml;
  $$('[data-level-puzzle]').forEach(b=>b.onclick=()=>openLevelDetail(b.dataset.levelDiff,b.dataset.levelPuzzle));
 }
 function localLevelResult(puzzleId){return getState().completed[`free:${puzzleId}`]||null}
@@ -2700,6 +2701,7 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+
 
 
 

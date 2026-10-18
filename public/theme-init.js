@@ -171,7 +171,7 @@
     ['/app-onboarding.css?v=40140-s13b','propletAppOnboardingCss'],
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
-    ['/copy-density-v3327.css?v=1','propletCopyDensityCss'],
+    ['/copy-density-v3327.css?v=play-polish1','propletCopyDensityCss'],
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/game.css?v=control-side2','propletGameCss'],
@@ -230,7 +230,7 @@
   const loadExtras=async()=>{
     await loadScript('/runtime-meta.js?v=rank-details1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=rank-details1','propletHomeLayout');
+    loadScript('/home-layout.js?v=play-polish1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=referrals1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
@@ -274,5 +274,6 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
+
 
 
