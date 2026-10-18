@@ -1,7 +1,7 @@
 name: Game control side regression
 on:
   pull_request:
-    paths: ['public/game.css', 'public/game-layout-v3330.js', 'tools/test_control_side_browser.cjs', '.github/workflows/game-control-side.yml']
+    paths: ['public/offline.css', 'public/app.js', 'public/app/core/result-queue.js', 'public/app/game/fair-play.js', 'public/game.css', 'public/game-layout-v3330.js', 'tools/test_control_side_browser.cjs', '.github/workflows/game-control-side.yml']
 permissions:
   contents: read
 jobs:
@@ -25,3 +25,4 @@ jobs:
           name: control-side-browser
           path: artifacts/control-side/
           retention-days: 7
+

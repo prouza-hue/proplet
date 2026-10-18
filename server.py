@@ -2356,34 +2356,37 @@ def me(request: Request, authorization: Optional[str] = Header(default=None)):
     }
 
 
+
+def result_completion_payload(r: dict) -> dict:
+    info = free_puzzle_info(str(r.get("puzzle_id") or ""), str(r.get("difficulty") or "")) if r.get("mode") == "free" else None
+    return {
+        "puzzleId": r.get("puzzle_id"),
+        "challengeKey": r.get("challenge_key"),
+        "mode": r.get("mode"),
+        "difficulty": r.get("difficulty"),
+        "dailyDate": str(r.get("daily_date"))[:10] if r.get("daily_date") else None,
+        "elapsedMs": int(r.get("best_elapsed_ms") or 1000),
+        "moves": int(r.get("best_moves") or 1),
+        "points": int(r.get("points") or 0),
+        "hintsUsed": int(r.get("hints_used") or 0),
+        "wrongAttempts": int(r.get("wrong_attempts") or 0),
+        "maxHintLevel": int(r.get("max_hint_level") or 0),
+        "cleanSolve": r.get("clean_solve") is True,
+        "completedAt": r.get("completed_at"),
+        "level": info.get("level") if info else None,
+        "contentGeneration": info.get("generation") if info else None,
+        "legacy": info.get("legacy") if info else False,
+        **({"timingVerified": r["timing_verified"]} if r.get("timing_verified") is not None else {}),
+    }
+
+
 @app.get("/api/progress")
 def progress(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "progress_read", limit=240, window_seconds=3600)
     player = auth_player(authorization)
     rows = db_select("results", columns=RESULT_PROGRESS_COLUMNS, player_id=player["id"])
-    def completion_payload(r: dict) -> dict:
-        info = free_puzzle_info(str(r.get("puzzle_id") or ""), str(r.get("difficulty") or "")) if r.get("mode") == "free" else None
-        return {
-            "puzzleId": r.get("puzzle_id"),
-            "challengeKey": r.get("challenge_key"),
-            "mode": r.get("mode"),
-            "difficulty": r.get("difficulty"),
-            "dailyDate": str(r.get("daily_date"))[:10] if r.get("daily_date") else None,
-            "elapsedMs": int(r.get("best_elapsed_ms") or 1000),
-            "moves": int(r.get("best_moves") or 1),
-            "points": int(r.get("points") or 0),
-            "hintsUsed": int(r.get("hints_used") or 0),
-            "wrongAttempts": int(r.get("wrong_attempts") or 0),
-            "maxHintLevel": int(r.get("max_hint_level") or 0),
-            "cleanSolve": r.get("clean_solve") is True,
-            "completedAt": r.get("completed_at"),
-            "level": info.get("level") if info else None,
-            "contentGeneration": info.get("generation") if info else None,
-            "legacy": info.get("legacy") if info else False,
-            **({"timingVerified": r["timing_verified"]} if r.get("timing_verified") is not None else {}),
-        }
     return {
-        "completed": [completion_payload(r) for r in rows]
+        "completed": [result_completion_payload(r) for r in rows]
     }
 
 
@@ -3951,6 +3954,26 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         "statsWarning": stats_warning,
     }
 
+@app.get("/api/result-receipt")
+def result_receipt(
+    request: Request,
+    attempt_id: str = Query(min_length=1, max_length=120),
+    puzzle_id: str = Query(min_length=1, max_length=160),
+    challenge_key: str = Query(min_length=3, max_length=180),
+    mode: str = Query(min_length=1, max_length=30),
+    difficulty: str = Query(min_length=1, max_length=30),
+    authorization: Optional[str] = Header(default=None),
+):
+    """Confirm an owned committed attempt without changing its result or XP."""
+    enforce_rate_limit(request, "result_receipt_read", limit=180, window_seconds=3600)
+    player = auth_player(authorization)
+    recorded = result_domain.committed_attempt_result(
+        player["id"], attempt_id, puzzle_id, challenge_key, mode, difficulty, db_select,
+    )
+    return {"committed": recorded is not None, "attemptId": attempt_id,
+            "completed": result_completion_payload(recorded) if recorded else None}
+
+
 @app.get("/api/result-status")
 def result_status(
     request: Request,
@@ -5507,4 +5530,5 @@ referral_domain.install(app, auth_player=auth_player, db_rpc=db_rpc, enforce_rat
 
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
+
 

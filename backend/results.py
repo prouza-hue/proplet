@@ -145,6 +145,28 @@ def existing_receipt(
     return validate_receipt(receipt)
 
 
+def committed_attempt_result(
+    player_id: str, attempt_id: str, puzzle_id: str, challenge_key: str,
+    mode: str, difficulty: str, select_fn: Callable[..., list[dict]],
+) -> Optional[dict[str, Any]]:
+    """Read-only recovery: require both a durable receipt and the owned run.
+
+    A matching challenge alone is not evidence that this queued attempt was
+    committed. Never resubmit, mutate a receipt, or grant rewards here.
+    """
+    commands = select_fn("result_commands", player_id=player_id,
+                         idempotency_key=f"attempt:{attempt_id}")
+    if not commands:
+        return None
+    validate_receipt(commands[0].get("receipt"))
+    binding = dict(player_id=player_id, puzzle_id=puzzle_id,
+                   challenge_key=challenge_key, mode=mode, difficulty=difficulty)
+    if not select_fn("puzzle_runs", attempt_id=attempt_id, **binding):
+        return None
+    rows = select_fn("results", **binding)
+    return rows[0] if rows else None
+
+
 def build_command(
     identity: ResultIdentity,
     payload: Any,
@@ -246,4 +268,5 @@ def public_response(receipt: dict[str, Any], stats: Any, stats_warning: Optional
         "stats": stats,
         "statsWarning": stats_warning,
     }
+
 

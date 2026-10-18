@@ -118,9 +118,27 @@ async function context(options){
   await page.evaluate(p=>window.__sideTajenka=p,JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/browser/tajenka.json'),'utf8')));
   await start(page,'tajenka');await geometry(page,true);await dragNext(page);await swapPreserving(page,false);
   assert(await page.evaluate(()=>document.querySelector('#tajenkaPhrase').previousElementSibling===document.querySelector('.current-word')),'Tajenka phrase remains below current word');checks.push('Tajenka drag and live phrase placement');
+  // A pending sync notification must not consume board height after folding
+  // or rotating, and must remain visible again outside gameplay.
+  await start(page);
+  await page.evaluate(()=>{saveQueue([{queueId:'fold-pending',puzzleId:currentGame.puzzle.id,challengeKey:'free:'+currentGame.puzzle.id,mode:'free'}]);renderOfflineStatus()});
+  for(const viewport of [{width:768,height:1000},{width:1000,height:768},{width:800,height:540},{width:768,height:1000}]){
+    await page.setViewportSize(viewport);await settle(page);
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display==='none');
+    const bounds=await page.locator('#board .cell').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {x:r.left,y:r.top,right:r.right,bottom:r.bottom}}));
+    assert(bounds.length>0);assert(bounds.every(r=>r.x>=-1&&r.y>=-1&&r.right<=viewport.width+1&&r.bottom<=viewport.height+1),'all board rows remain inside rotated Fold viewport');
+  }
+  await page.screenshot({path:path.join(artifacts,'fold-pending-portrait.png')});
+  await page.setViewportSize({width:1000,height:768});await settle(page);
+  await page.screenshot({path:path.join(artifacts,'fold-pending-landscape.png')});
+  await page.evaluate(()=>nav('profile'));
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display!=='none');
+  assert.match(await page.locator('#offlineConnectionStatus').innerText(),/čeká na odeslání/);
+  checks.push('Fold pending sync: full last row after portrait/landscape rotation; notification returns outside game');
   await ctx.close();
   const short=await context({viewport:{width:800,height:540},screen:{width:800,height:540},hasTouch:true}),sp=await boot(short);
   await start(sp,'tajenka');await geometry(sp,false);await swapPreserving(sp,true);checks.push('short landscape tablet Tajenka bounds');await short.close();
   const desktop=await context({viewport:{width:1440,height:900}}),dp=await boot(desktop);await start(dp);await geometry(dp,false);await swapPreserving(dp,true);await dragNext(dp);checks.push('desktop swap and drag');await desktop.close();
   assert.deepEqual(errors,[],'browser errors');console.log(JSON.stringify({passed:true,checks},null,2));
 })().catch(async error=>{console.error(error);for(const context of browser?.contexts()||[])for(const page of context.pages()){console.error(await page.evaluate(()=>({body:document.body.className,text:document.body.innerText.slice(-3000)})).catch(()=>null));await page.screenshot({path:path.join(artifacts,'failure.png')}).catch(()=>{});}process.exitCode=1}).finally(async()=>{fs.writeFileSync(path.join(artifacts,'report.json'),JSON.stringify({checks,errors,passed:!process.exitCode},null,2));await browser?.close();server?.kill()});
+

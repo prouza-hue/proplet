@@ -36,6 +36,14 @@ console.log('PASS guest merge, monotonic clock, retry and quota retention, inten
  fail=false;finished=true;
  assert.equal((await controller.prepare({id:'p'},'daily',null,null)).restored.found.length,1);
  completed=true;assert.equal((await controller.prepare({id:'p'},'daily',null,null)).replay,true);
+ completed=false;let proof=false,proofReads=0;
+ const recovery=fairPlay({owner:'fold',profile:()=>({id:'account'}),elapsed:()=>0,key:()=> 'free:p',now:()=>100,
+  completed:()=>false,completedAttempt:async(p,m,d,attempt,profile)=>{assert.equal(attempt,'committed');assert.equal(profile.id,'account');proofReads++;return proof},
+  setInterval:()=>1,clearInterval:()=>{},api:async path=>path.endsWith('/config')?{enabled:true}:{attempt_id:'committed',finished:true,verified:true,progress:{found:[{answerIndex:0,path:[0]}]},elapsed_ms:42000}});
+ assert.equal((await recovery.prepare({id:'p'},'free',null,null)).restored.attemptId,'committed','finished session alone cannot discard an unsent result');
+ proof=true;assert.equal((await recovery.prepare({id:'p'},'free',null,null)).replay,true,'committed remote completion starts a fresh practice board');
+ const resumed={puzzle:{id:'p'},mode:'free',fairPlay:true,found:[],attemptId:'old'};
+ await recovery.resume(resumed);assert.equal(resumed.remoteCommitted,true);assert.equal(resumed.fairPlay,false);assert.equal(proofReads,3);
  console.log('PASS session restore, single heartbeat, pause cleanup, transient retry, offline finish and receipt recovery');
 })().catch(error=>{console.error(error);process.exitCode=1});
 
@@ -57,3 +65,4 @@ onRestored(restoredGame);assert.equal(pending.length,1);pending.shift()();assert
 onRestored(restoredGame);scope.currentGame={};pending.shift()();assert.equal(finishes,1);
 scope.currentGame=restoredGame;restoredGame.isReplay=true;onRestored(restoredGame);assert.equal(pending.length,0);
 console.log('PASS remote completion recovery and stale-screen/replay guards');
+
