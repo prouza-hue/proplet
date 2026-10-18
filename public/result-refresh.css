@@ -25,7 +25,7 @@ html.tiskarna-ui body #winModal.result-compact .level-board-head{margin-bottom:8
 html.tiskarna-ui body #winModal.result-compact .daily-world-neighbours{gap:5px!important}
 html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:43px!important;padding:7px 9px!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions{display:flex!important;flex-direction:column!important;gap:10px!important;align-self:center;width:100%!important;max-width:540px;margin:16px auto 6px!important}
-html.tiskarna-ui body #winModal.result-compact #winResultActions :is(#winPrimaryBtn,#winShareBtn){display:flex;align-items:center;justify-content:center;width:100%!important;max-width:none!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;border-radius:12px!important;font:650 15px/1.2 Outfit,sans-serif!important}
+html.tiskarna-ui body #winModal.result-compact #winResultActions :is(#winExtraBtn,#winPrimaryBtn,#winShareBtn){display:flex;align-items:center;justify-content:center;width:100%!important;max-width:none!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;border-radius:12px!important;font:650 15px/1.2 Outfit,sans-serif!important}
 html.tiskarna-ui body :is(#winModal #winResultActions #winShareBtn.challenge-share-cta,#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#b84835!important;color:#fffaf0!important;border:1px solid #8f3426!important;box-shadow:0 3px 0 #8f3426!important}
 html.tiskarna-ui body #winModal #winResultActions #winShareBtn.challenge-share-cta img{display:none!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions .hidden{display:none!important}

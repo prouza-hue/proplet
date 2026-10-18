@@ -33,11 +33,11 @@ rows += [reward("board-b", "slovo0", "2026-08-27T12:00:00+02:00")]
 
 summary = _discovery_summary(rows, puzzle_id="board-a", today="2026-08-28", tz=TZ)
 assert WORD_DISCOVERY_BOARD_XP_LIMIT is None
-assert WORD_DISCOVERY_DAILY_XP_LIMIT == 50
+assert WORD_DISCOVERY_DAILY_XP_LIMIT is None
 assert summary["boardDiscoveryXp"] == 5
 assert summary["dailyDiscoveryXp"] == 50
 assert summary["boardRemainingXp"] is None
-assert summary["dailyRemainingXp"] == 0
+assert summary["dailyRemainingXp"] is None
 assert summary["totalDiscoveryXp"] == 51
 assert summary["discoveredWords"] == 50, "same word on another board earns XP again but remains one distinct word"
 
@@ -101,7 +101,7 @@ assert "status:profile()?.token?'pending':'local'" in feedback
 assert "creditRunXp(candidate,1)" in feedback
 assert "creditRunXp(candidate,Math.max(1,Number(data?.awardedPoints)||1))" in feedback
 assert "wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)" in app
-assert "const bonusXp=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)" in app
+assert "bonusXp=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)" in app
 assert "function renderRunWinXp" in app
 assert "g.winBaseXpAwarded=" in app
 assert "renderRunWinXp(g)" in app
@@ -109,7 +109,7 @@ assert "renderRunWinXp(g)" in feedback
 assert "attemptId:candidate.game?.attemptId||null" in feedback
 assert "pg_advisory_xact_lock" in migration
 assert "v_board_xp >= 5" in migration
-assert "v_daily_xp >= 20" in migration  # historical v4.01.32 migration; v4.01.33 overrides it to 50
+assert "v_daily_xp >= 20" in migration  # Historical migration only; current behavior is covered by unlimited API/SQL tests.
 assert "grant execute on function public.proplet_claim_word_discovery" in migration
 assert "on conflict on constraint account_rewards_player_reward_key_unique do nothing" in migration
 assert "on conflict (player_id, reward_key) do nothing" not in migration

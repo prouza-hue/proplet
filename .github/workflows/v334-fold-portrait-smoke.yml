@@ -62,6 +62,7 @@ jobs:
           node tools/browser_fixture_server.cjs > artifacts/server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" || true' EXIT
+          node tools/test_extra_entry_browser.cjs
           python tools/test_printshop_browser.py
           RESULT_PATH=artifacts/account-progress.json node tools/test_account_progress_browser.cjs
           node tools/test_idle_offline_browser.cjs

@@ -6,6 +6,22 @@
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
       {
+        "path": "tools/test_xp_economy_v40132.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_discovery_unlimited.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_discovery_unlimited.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_extra_entry.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_isolated_migration_plan.py",
         "runner": "python"
       },

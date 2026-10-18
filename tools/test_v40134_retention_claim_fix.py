@@ -24,7 +24,7 @@ assert "status:'rejected'" in feedback
 assert "if(permanentClaimError(error)){rejectClaim(store,key,row,error);changed=true}" in feedback
 assert "return 'rejected'" in feedback
 assert "word_discovery_claim_rejected" in feedback and "word_discovery_claim_rejected" in product_registry
-assert "['local','pending','confirmed'].includes(row?.status)" in feedback
+assert "entries.filter(row=>row?.status==='local').length" in feedback  # Rejected/capped guest claims never add XP.
 # The shared release contract checks this asset against its current shell URL.
 
 assert "firstRealGameJustCompleted" in app
