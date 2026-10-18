@@ -93,6 +93,11 @@ async function run(viewport){
  await dailyCollapse.focus();const countBeforeCollapse=calls.length;await page.keyboard.press('Enter');
  assert.equal(await dailyCollapse.getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#dailyLeaderboardList').isVisible(),false);
  assert(await dailyCollapse.evaluate(el=>document.activeElement===el),'collapse keeps keyboard focus');
+ await settle(page);
+ const collapsedTitle=await page.locator('#dailyRankingTitle').boundingBox(),collapsedInfo=await page.locator('#dailyRankingInfoBtn').boundingBox(),collapsedSummary=await dailySection.locator('.ranking-section-summary').boundingBox();
+ assert(Math.abs(collapsedTitle.y+collapsedTitle.height/2-collapsedInfo.y-collapsedInfo.height/2)<=3,'collapsed title and information stay on the same row');
+ assert(collapsedSummary.y>=Math.max(collapsedTitle.y+collapsedTitle.height,collapsedInfo.y+collapsedInfo.height)-1,'collapsed player count stays below the heading');
+ await page.screenshot({path:path.join(artifacts,`${viewport.width}x${viewport.height}-collapsed.png`),fullPage:true});
  await page.keyboard.press('Space');assert.equal(await dailyCollapse.getAttribute('aria-expanded'),'true');
  assert.equal(calls.length,countBeforeCollapse,'collapse/expand never refetches data');
  const initialDaily=await page.locator('#dailyLeaderboardList').innerHTML();

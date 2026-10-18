@@ -7,8 +7,9 @@
 }
 #screen-leaderboard .ranking-navigation-section>.ranking-section-head>div{min-width:0}
 #screen-leaderboard .ranking-section-head>.quality-ranking-head{display:grid;grid-template-columns:minmax(0,1fr) auto}
-#screen-leaderboard .quality-ranking-head h2{min-width:0}
-#screen-leaderboard .quality-ranking-head .ranking-section-summary{grid-column:1/-1}
+#screen-leaderboard .quality-ranking-head h2{min-width:0;grid-column:1;grid-row:1}
+#screen-leaderboard .quality-ranking-head>.quality-info-button{grid-column:2;grid-row:1}
+#screen-leaderboard .quality-ranking-head .ranking-section-summary{grid-column:1/-1;grid-row:2}
 #screen-leaderboard .ranking-collapse-toggle{
   flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;
   min-width:98px;min-height:44px;padding:8px 11px;border:1px solid var(--line);
