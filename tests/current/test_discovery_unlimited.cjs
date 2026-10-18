@@ -1,4 +1,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const runtime={window:{addEventListener(){}},document:{readyState:'loading'},location:{hostname:'hrajproplet.cz',origin:'https://hrajproplet.cz'}};
+vm.runInNewContext(fs.readFileSync('public/runtime-meta.js','utf8'),runtime);
+assert.equal(runtime.window.PROPLET_RUNTIME_META.capabilities.wordDiscoveryBoardXpLimit,null);
+assert.equal(runtime.window.PROPLET_RUNTIME_META.capabilities.wordDiscoveryDailyXpLimit,null);
 const source=fs.readFileSync('public/valid-word-feedback-v3330.js','utf8');
 const code=source.slice(source.indexOf('  const awardDiscovery='),source.indexOf('  const resetForGame='));
 let loggedIn=false,online=true,awarded=0,requests=0;

@@ -420,6 +420,12 @@ with (
 ):
     config_fixture = server.config()
     health_fixture = server.health()
+    # Unlimited discovery rewards are an approved contract change. Check the
+    # current values before normalizing these two historical digest fields.
+    assert health_fixture["wordDiscoveryBoardXpLimit"] is None
+    assert health_fixture["wordDiscoveryDailyXpLimit"] is None
+    health_fixture["wordDiscoveryBoardXpLimit"] = 5
+    health_fixture["wordDiscoveryDailyXpLimit"] = 50
     # Additive transport diagnostics do not change the historical health fields.
     assert health_fixture.pop('rpcTransport') == 'postgrest'
     # Reward preparation adds diagnostics only; retain the original fixture digest.
