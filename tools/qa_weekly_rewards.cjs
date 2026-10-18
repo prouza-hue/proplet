@@ -20,7 +20,7 @@ const server=http.createServer((req,res)=>{
  page.on('pageerror',e=>errors.push(e.message));
  const base=`http://127.0.0.1:${server.address().port}/design/team-rewards/?archive-preview=1&teamRewards=`;
  await page.goto(base+'victory');
- await page.waitForSelector('#tvRewardDialog[open]');
+ await page.waitForSelector('#tvRewardDialog[open]').catch(async error=>{console.error('Reward startup:',JSON.stringify({errors,body:await page.locator('body').innerText(),runtime:await page.evaluate(()=>({screen:typeof currentScreen==='undefined'?null:currentScreen,env:window.PROPLET_RUNTIME_ENV,preview:window.PROPLET_ARCHIVE_PREVIEW,profile:typeof getProfile==='function'?{id:getProfile()?.id,familyCode:getProfile()?.familyCode}:null,quiet:window.PropletFirstSteps?.quiet()}))}));throw error;});
  assert.match(await page.locator('#tvRewardDialog').innerText(),/Týdenní zlato je vaše!/);
  assert.equal(await page.locator('#tvRewardDialog .tv-number').innerText(),'1');
  for(const width of [320,390,768,1280]){
@@ -57,7 +57,7 @@ const server=http.createServer((req,res)=>{
   window.fetch=(input,opts)=>String(input).includes('/api/team-victories/personal')?new Promise(resolve=>finish=resolve):old(input,opts);
   const original=getProfile();window.qaProfile={...original,id:'race-old',familyCode:null};getProfile=()=>qaProfile;
   document.dispatchEvent(new Event('proplet:account-changed'));
-  queueMicrotask(()=>{qaProfile={...qaProfile,id:'race-new'};document.dispatchEvent(new Event('proplet:account-changed'));queueMicrotask(()=>finish?.(new Response(JSON.stringify({enabled:true,totalGold:1,history:[{teamName:'STALE SECRET',weekStart:'2026-10-05',weekEnd:'2026-10-12'}]}),{headers:{'Content-Type':'application/json'}})));});
+  queueMicrotask(()=>{const oldFinish=finish;qaProfile={...qaProfile,id:'race-new'};document.dispatchEvent(new Event('proplet:account-changed'));queueMicrotask(()=>oldFinish?.(new Response(JSON.stringify({enabled:true,totalGold:1,history:[{teamName:'STALE SECRET',weekStart:'2026-10-05',weekEnd:'2026-10-12'}]}),{headers:{'Content-Type':'application/json'}})));});
  });
  await page.waitForTimeout(100);assert.doesNotMatch(await page.locator('#profileTeamVictories').innerText(),/STALE SECRET/);
  assert.deepEqual(errors,[]);
