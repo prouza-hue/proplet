@@ -7,6 +7,7 @@
   const DISCOVERY_STORE_BASE='proplet-v4-word-discovery-v1';
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
   const TRIGGER_STREAK=3;
+  const RECOGNITION_VERSION=7;
   const BLOCKED_DISCOVERY_WORDS=new Set(['NEGR']);
   let localWords=null;
   let localWordsPromise=null;
@@ -21,7 +22,7 @@
   let activeAccountScope=null;
   let discoverySyncInFlight=false;
 
-  const normalize=word=>String(word||'').trim().toLocaleUpperCase('cs-CZ');
+  const normalize=word=>String(word||'').normalize('NFC').trim().toLocaleUpperCase('cs-CZ');
   const canonical=word=>normalize(word).toLocaleLowerCase('cs-CZ');
   const profile=()=>{try{return typeof getProfile==='function'?getProfile():null}catch{return null}};
   const scope=()=>String(profile()?.id||'guest');
@@ -134,7 +135,7 @@
   };
 
   // Recognition only; mirrored in the server editorial overlay and regression-tested.
-  const editorialRecognitionWords=new Set(['setr','bígl','labrador','jilm']);
+  const editorialRecognitionWords=new Set(['setr','bígl','labrador','jilm','bruska','pnutí','padnutí','hrubka','stáj','starost','kancl'].map(normalize));
   const recognizeWord=async word=>{
     const normalized=normalize(word);
     if(BLOCKED_DISCOVERY_WORDS.has(normalized)){const miss={recognized:false,source:'editorial_block'};recognitionCache.set(normalized,miss);return miss;}
@@ -143,9 +144,18 @@
       const hit={recognized:true,source:'editorial_overlay'};
       recognitionCache.set(normalized,hit);return hit;
     }
+    // Both dictionaries are independent optional downloads. A failed or unfinished download
+    // must not turn a genuine word into a permanently cached dictionary miss.
+    const broadPromise=Promise.resolve().then(()=>window.PropletBonusLexicon?.recognizes(normalized)??null).catch(()=>null);
     const local=await loadLocalWords();
     if(local?.has(normalized)){
       const hit={recognized:true,source:'offline_seed'};
+      recognitionCache.set(normalized,hit);
+      return hit;
+    }
+    const broad=await broadPromise;
+    if(broad===true){
+      const hit={recognized:true,source:'hunspell_cs'};
       recognitionCache.set(normalized,hit);
       return hit;
     }
@@ -154,7 +164,7 @@
       if(!response.ok)throw new Error('recognition unavailable');
       const data=await response.json();
       const result={recognized:data?.recognized===true,source:data?.source||null};
-      recognitionCache.set(normalized,result);
+      if(result.recognized||(local&&broad!==null))recognitionCache.set(normalized,result);
       return result;
     }catch{
       // A transport failure is unknown, not a dictionary rejection. Retry next time.
@@ -261,7 +271,11 @@
     const key=discoveryRewardKey(candidate.puzzleId,candidate.word);
     const s=scope();
     const store=readDiscoveryStore(s);
-    if(store.entries[key]&&!(store.entries[key].status==='capped'&&store.entries[key].limitReason==='daily_limit')){
+    const previous=store.entries[key];
+    const dictionaryRetry=previous?.status==='rejected'&&Number(previous.rejectedStatus)===400
+      &&previous.rejectedReason==='Slovo není v recognition lexikonu'
+      &&Number(previous.recognitionVersion||0)<RECOGNITION_VERSION;
+    if(previous&&!dictionaryRetry&&!(previous.status==='capped'&&previous.limitReason==='daily_limit')){
       if(store.entries[key].status==='pending'&&profile()?.token)syncDiscoveries();
       return 'duplicate';
     }
@@ -276,7 +290,8 @@
       path:[...(candidate.path||[])],
       status:profile()?.token?'pending':'local',
       rewardDay:localDay(),
-      createdAt:new Date().toISOString()
+      createdAt:new Date().toISOString(),
+      recognitionVersion:RECOGNITION_VERSION
     };
 
     if(!profile()?.token){
@@ -433,7 +448,7 @@
     };
     wrapped.__validWordFailsafe3330=true;
     submitPath=wrapped;
-    setTimeout(()=>loadLocalWords(),700);
+    setTimeout(()=>{loadLocalWords();window.PropletBonusLexicon?.load().catch(()=>{})},700);
     return true;
   };
 
@@ -456,6 +471,7 @@
   window.PROPLET_WORD_DISCOVERY_API=Object.freeze({
     xp:currentDiscoveryXp,
     sync:syncDiscoveries,
-    rewardKey:discoveryRewardKey
+    rewardKey:discoveryRewardKey,
+    recognize:recognizeWord
   });
 })();

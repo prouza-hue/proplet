@@ -228,7 +228,7 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=4096','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=4097','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=play-polish1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
@@ -237,7 +237,8 @@
     loadScript('/game-layout-v3330.js?v=control-side2','propletGameLayout');
     await loadScript('/app/client-diagnostics.js?v=2','propletClientDiagnostics',{wait:true});
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
-    loadScript('/valid-word-feedback-v3330.js?v=extra-entry1','propletValidWordFeedback');
+    await loadScript('/recognition/lexicon.js?v=bonuscs1','propletBonusLexicon',{wait:true});
+    loadScript('/valid-word-feedback-v3330.js?v=recognition7','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
@@ -274,6 +275,7 @@
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',loadExtras,{once:true});
   else loadExtras();
 })();
+
 
 
 

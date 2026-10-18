@@ -152,11 +152,11 @@ if(hasOwner){
     ...payload.players[0],rank:index+1,name:`Hráč ${index+1}`,isMine:index===11,
   }));
   const allHtml=rankings.xp({players:allRows,teams:[]},'players','all');
-  assert.strictEqual((allHtml.match(/leader-row ranking-row/g)||[]).length,11,'all-time ranking no longer shows top 10 plus own row');
+  assert.strictEqual((allHtml.match(/leader-row ranking-row/g)||[]).length,6,'compact all-time ranking no longer shows top 5 plus own row');
   assert(allHtml.includes('ranking-own-divider')&&allHtml.includes('Hráč 12'),'own all-time position disappeared');
-  assert(allHtml.includes('A dalších <strong>1 hráč</strong>'),'hidden all-time row count drifted');
+  assert(!allHtml.includes('Hráč 6'),'compact all-time ranking includes a hidden row');
   const todayHtml=rankings.xp({players:allRows,teams:[]},'players','today');
-  assert.strictEqual((todayHtml.match(/leader-row ranking-row/g)||[]).length,12,'today ranking was unexpectedly sliced');
+  assert.strictEqual((todayHtml.match(/leader-row ranking-row/g)||[]).length,6,'compact today ranking must show top 5 plus own row');
 
   const bonusSandbox={window:null,setTimeout(){},document:{querySelector(){return null}}};
   bonusSandbox.window=bonusSandbox;
@@ -168,11 +168,12 @@ if(hasOwner){
   assert.strictEqual(adjust(included),included,'server-included account reward was applied twice');
 }
 
-// Both ranking reads are deliberately concurrent. Daily is always today's Prague date;
+// Initial ranking reads stay concurrent. Scope changes reuse one endpoint payload;
+// Daily is always today's Prague date;
 // XP period is the selected today/week/all state, independent of player/team scope.
-assert(rankingSource.includes('const [xpResult,dailyResult]=await Promise.allSettled(['),'ranking reads are no longer concurrent');
-assert(rankingSource.includes('/api/rankings/xp?period=${rankingXpPeriod}'),'XP period API contract drifted');
-assert(rankingSource.includes('/api/rankings/daily?daily_date=${d.pragueDateISO?.()'),'Daily date API contract drifted');
+assert(rankingSource.includes("await Promise.allSettled([loadRanking('xp',{anchor,refresh:true}),loadRanking('daily',{anchor,refresh:true})])"),'initial ranking reads are no longer concurrent');
+assert(rankingSource.includes('/api/rankings/xp?period=${period}'),'XP period API contract drifted');
+assert(rankingSource.includes('/api/rankings/daily?daily_date=${date}')&&rankingSource.includes("date=d.pragueDateISO?.()||''"),'Daily date API contract drifted');
 assert(rankingSource.includes("$('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams')"),'Daily team-method visibility drifted');
 
 const selectorOwners=[
@@ -189,11 +190,11 @@ assert(!polish.includes("querySelectorAll('.ranking-period-tab')"),'ranking poli
 assert(!polish.includes("querySelectorAll('.ranking-daily-tab')"),'ranking polish owns Daily tab lifecycle');
 assert(!/MutationObserver/.test(`${rankingSource}\n${polish}`),'rankings introduced an observer lifecycle');
 
-// The extracted owner absorbs the all-time slice. Account bonus remains an explicit,
+// The extracted owner owns the compact slice in every period. Account bonus remains an explicit,
 // behavior-preserving dependency rather than a second renderer monkey-patch.
 if(hasOwner){
-  assert(rankingSource.includes("if(rankingXpPeriod!=='all'||rows.length<=limit)"),'all-time patch now affects today/week');
-  assert(rankingSource.includes('const sliced=totalXpSlice(rows)'),'all-time top-10/self slice drifted');
+  assert(rankingSource.includes("expandedViews.has(viewKey(kind))||rows.length<=compactLimit"),'compact and expanded view distinction disappeared');
+  assert(rankingSource.includes("const sliced=sectionSlice(rows,'xp')"),'XP compact/self slice drifted');
   assert(bonus.includes('function adjustRankingData(data)'),'account reward adjustment seam disappeared');
   assert(app.includes('adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data'),'account reward dependency is not explicit');
   assert(!bonus.includes('renderXpRanking=function'),'account reward still monkey-patches the extracted renderer');

@@ -57,6 +57,137 @@
     let rankingXpPeriod='today';
     let rankingDailyScope='players';
     let installed=false;
+    const compactLimit=5,cacheLifetimeMs=30000;
+    const sections=new Map(),expandedViews=new Set(),cache=new Map(),inflight=new Map();
+    const requestVersions={xp:0,daily:0};
+    let interactionVersion=0,viewportTail=null,activeAnchor=null;
+    const page=()=>globalThis.window||globalThis;
+    const accountKey=()=>{const p=getProfile();return `${p?.id||''}:${p?.token||''}`};
+    const viewKey=kind=>kind==='xp'?`xp:${rankingXpScope}:${rankingXpPeriod}`:`daily:${rankingDailyScope}`;
+
+    // Keep the actual controls in place. Loading never tears down an unrelated
+    // section, and the browser's automatic scroll anchor is disabled for this
+    // page so it cannot fight this explicit, interaction-scoped anchor.
+    function captureAnchor(element){
+      if(!element?.getBoundingClientRect||!element.isConnected)return null;
+      const rect=element.getBoundingClientRect(),top=rect.top;
+      if(rect.bottom<=0||top>=Number(page().innerHeight||0))return null;
+      return {element,top,interaction:interactionVersion};
+    }
+    function rememberAnchor(element){const anchor=captureAnchor(element);activeAnchor=anchor;return anchor}
+    function visibleAnchor(){
+      const candidates=[...sections.values()].map(section=>section.controls||section.head);
+      const active=globalThis.document?.activeElement;
+      return (candidates.some(element=>element?.contains?.(active))?captureAnchor(active):null)||candidates.map(captureAnchor).find(Boolean)||null;
+    }
+    function anchored(anchor,change){
+      // A second control click renews the shared context. A Daily response that
+      // started earlier must still keep the currently used XP controls in view.
+      anchor=activeAnchor?.interaction===interactionVersion?activeAnchor:anchor;
+      change();
+      const restore=()=>{
+        if(!anchor||anchor.interaction!==interactionVersion||!anchor.element.isConnected)return;
+        const win=page(),doc=globalThis.document;
+        if(!win.scrollBy||!doc?.documentElement)return;
+        const delta=anchor.element.getBoundingClientRect().top-anchor.top;
+        if(Math.abs(delta)<.5)return;
+        // A shorter last section can clamp scrollY before the controls reach
+        // their previous position. Reserve only the missing viewport space.
+        const scrolling=doc.scrollingElement||doc.documentElement;
+        const missing=Number(win.scrollY||0)+delta-Math.max(0,scrolling.scrollHeight-Number(win.innerHeight||0));
+        if(missing>0&&viewportTail)viewportTail.style.height=`${viewportTail.offsetHeight+Math.ceil(missing)}px`;
+        win.scrollBy({top:delta,left:0,behavior:'instant'});
+      };
+      restore();
+      // Chromium can clamp after layout. The shared icon decorator also runs
+      // in the next frame and may change row heights above this anchor. Two
+      // bounded frames include both passes, without an observer or polling.
+      page().requestAnimationFrame?.(()=>{restore();page().requestAnimationFrame?.(restore)});
+    }
+    function setBusy(kind,busy){
+      const list=$(kind==='xp'?'#xpLeaderboardList':'#dailyLeaderboardList');
+      list?.setAttribute?.('aria-busy',String(busy));
+    }
+    function sectionSlice(rows,kind){
+      if(expandedViews.has(viewKey(kind))||rows.length<=compactLimit)return {top:rows,mine:null,hidden:0};
+      const top=rows.slice(0,compactLimit),mine=rows.find(row=>row.isMine),showMine=!!mine&&!top.includes(mine);
+      return {top,mine:showMine?mine:null,hidden:Math.max(0,rows.length-top.length-(showMine?1:0))};
+    }
+    function updateSection(kind,rows){
+      const section=sections.get(kind);if(!section)return;
+      section.rows=rows;
+      const expanded=expandedViews.has(viewKey(kind)),hasMore=rows.length>compactLimit;
+      section.more.hidden=!hasMore;
+      section.more.textContent=expanded?'Zkrátit na přehled':`Zobrazit celé pořadí (${rows.length})`;
+      section.more.setAttribute('aria-expanded',String(expanded));
+      section.back.hidden=!hasMore||!expanded;
+      const scope=kind==='xp'?rankingXpScope:rankingDailyScope;
+      section.summary.textContent=rows.length?(scope==='teams'?countCz(rows.length,'tým','týmy','týmů'):countCz(rows.length,'hráč','hráči','hráčů')):'';
+    }
+    function installSections(){
+      const doc=globalThis.document;if(!doc?.createElement)return;
+      for(const kind of ['daily','xp']){
+        const list=$(kind==='xp'?'#xpLeaderboardList':'#dailyLeaderboardList'),section=list?.closest?.('.ranking-section'),head=section?.querySelector('.ranking-section-head');
+        if(!section||!head||sections.has(kind))continue;
+        section.querySelectorAll('[role="tablist"]').forEach(group=>group.setAttribute('role','group'));
+        const title=section.querySelector('h2'),label=kind==='xp'?'Nasbírané XP':'Dnešní výzva';
+        section.classList.add('ranking-navigation-section');
+        list.setAttribute('role','region');list.setAttribute('aria-labelledby',title.id);
+        const collapse=doc.createElement('button');collapse.type='button';collapse.className='ranking-collapse-toggle';
+        collapse.setAttribute('aria-controls',list.id);collapse.setAttribute('aria-expanded','true');collapse.setAttribute('aria-label',`Sbalit: ${label}`);
+        collapse.innerHTML='<span aria-hidden="true">⌃</span>';
+        const summary=doc.createElement('small');summary.className='ranking-section-summary';summary.hidden=true;
+        head.querySelector('div')?.append(summary);head.append(collapse);
+        const more=doc.createElement('button');more.type='button';more.className='ranking-expand-list text-btn';more.hidden=true;more.setAttribute('aria-controls',list.id);
+        list.before(more);
+        const back=doc.createElement('button');back.type='button';back.className='ranking-back-summary text-btn';back.hidden=true;back.textContent='Zpět na přehled ↑';list.after(back);
+        const controls=section.querySelector(kind==='xp'?'.ranking-control-row':'.ranking-daily-segment');
+        sections.set(kind,{section,head,controls,list,collapse,summary,more,back,rows:[]});
+        collapse.addEventListener('click',()=>{
+          const anchor=rememberAnchor(collapse),collapsed=collapse.getAttribute('aria-expanded')==='true';
+          anchored(anchor,()=>{section.classList.toggle('ranking-navigation-collapsed',collapsed);collapse.setAttribute('aria-expanded',String(!collapsed));collapse.setAttribute('aria-label',`${collapsed?'Rozbalit':'Sbalit'}: ${label}`);summary.hidden=!collapsed;});
+        });
+        const toggle=()=>{
+          const anchor=rememberAnchor(more);
+          if(expandedViews.has(viewKey(kind)))expandedViews.delete(viewKey(kind));else expandedViews.add(viewKey(kind));
+          anchored(anchor,()=>{const state=sections.get(kind);if(state.payload)(kind==='xp'?renderXpRanking:renderDailyRanking)(state.payload)});
+        };
+        more.addEventListener('click',toggle);
+        back.addEventListener('click',()=>{
+          expandedViews.delete(viewKey(kind));const state=sections.get(kind);if(state.payload)(kind==='xp'?renderXpRanking:renderDailyRanking)(state.payload);
+          more.focus({preventScroll:true});head.scrollIntoView({block:'start',behavior:'instant'});rememberAnchor(more);
+        });
+      }
+      const screen=$('#screen-leaderboard');
+      if(screen&&!viewportTail){viewportTail=doc.createElement('div');viewportTail.className='ranking-viewport-tail';viewportTail.setAttribute('aria-hidden','true');screen.append(viewportTail);}
+    }
+    function syncControls(){
+      const groups=[['.ranking-scope-tab','rankingXpScope',rankingXpScope],['.ranking-period-tab','rankingPeriod',rankingXpPeriod],['.ranking-daily-tab','rankingDailyScope',rankingDailyScope]];
+      for(const [selector,key,value] of groups)for(const button of $$(selector)){
+        const selected=button.dataset[key]===value;button.classList.toggle('active',selected);button.setAttribute?.('aria-pressed',String(selected));
+      }
+      $('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams');
+    }
+    function readRanking(url,key){
+      if(inflight.has(key))return inflight.get(key);
+      const pending=Promise.resolve().then(()=>d.api(url)).then(data=>{cache.set(key,{data,at:Date.now()});return data}).finally(()=>{if(inflight.get(key)===pending)inflight.delete(key)});
+      inflight.set(key,pending);return pending;
+    }
+    async function loadRanking(kind,{anchor=null,refresh=false}={}){
+      const version=++requestVersions[kind],identity=accountKey(),period=rankingXpPeriod,date=d.pragueDateISO?.()||'';
+      const url=kind==='xp'?`/api/rankings/xp?period=${period}`:`/api/rankings/daily?daily_date=${date}`;
+      const key=`${identity}:${url}`,cached=cache.get(key),list=$(kind==='xp'?'#xpLeaderboardList':'#dailyLeaderboardList');
+      if(!list)return;
+      const current=()=>version===requestVersions[kind]&&identity===accountKey()&&(kind!=='xp'||period===rankingXpPeriod)&&(kind!=='daily'||date===(d.pragueDateISO?.()||''));
+      const render=data=>anchored(anchor,()=>{(kind==='xp'?renderXpRanking:renderDailyRanking)(data);if(kind==='xp'&&data.visibilityReady===true){const privacy=$('#rankingPrivacyNote');if(privacy)privacy.dataset.visibilityReady='true'}});
+      if(cached){render(cached.data);if(!refresh&&Date.now()-cached.at<cacheLifetimeMs){setBusy(kind,false);return}}
+      else if(!sections.get(kind)?.payload||sections.get(kind)?.identity!==identity)anchored(anchor,()=>{list.innerHTML=`<div class="ranking-loading" role="status">Načítám ${kind==='xp'?'XP':'dnešní'} pořadí…</div>`});
+      setBusy(kind,true);
+      try{const data=await readRanking(url,key);if(current())render(data)}
+      catch(error){if(current())anchored(anchor,()=>{list.innerHTML=`<div class="ranking-empty" role="status"><strong>${kind==='xp'?'XP':'Dnešní'} pořadí se teď nepodařilo načíst.</strong><small>${esc(error?.message||'Zkus to prosím znovu.')}</small><button type="button" class="ranking-retry text-btn">Zkusit znovu</button></div>`;const retry=list.querySelector?.('.ranking-retry');retry?.addEventListener('click',()=>{const state=sections.get(kind),control=state?.controls?.querySelector(kind==='xp'?'.ranking-period-tab.active':'.ranking-daily-tab.active');control?.focus({preventScroll:true});loadRanking(kind,{anchor:rememberAnchor(control||state?.controls),refresh:true})});const state=sections.get(kind);if(state){state.more.hidden=true;state.back.hidden=true;state.payload=null}})}
+      finally{if(current())setBusy(kind,false)}
+    }
+
 
     function rankingRows(data,scope){return scope==='teams'?(data?.teams||[]):(data?.players||[])}
     function rankingRankBadge(rank){return rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':`${rank}.`}
@@ -68,40 +199,34 @@
       catch{return data}
     }
 
-    function totalXpSlice(rows,limit=10){
-      if(rankingXpPeriod!=='all'||rows.length<=limit)return {top:rows,mine:null,hidden:0};
-      const top=rows.slice(0,limit),mine=rows.find(row=>row.isMine),showMine=!!mine&&!top.includes(mine);
-      return {top,mine:showMine?mine:null,hidden:Math.max(0,rows.length-top.length-(showMine?1:0))};
-    }
-    function moreRankingHtml(hidden,scope){
-      if(!hidden)return '';
-      const label=scope==='teams'?countCz(hidden,'tým','týmy','týmů'):countCz(hidden,'hráč','hráči','hráčů');
-      return `<div class="ranking-more"><span>🧗</span><div>A dalších <strong>${label}</strong> si proplétá cestu na vrchol.</div></div>`;
-    }
     function ownRankingDivider(){return '<div class="ranking-own-divider"><span>Tvoje pozice</span></div>'}
 
     function renderXpRanking(input){
       const list=$('#xpLeaderboardList'),data=transformRankingPayload(rankingDataWithBonus(input)),rows=rankingRows(data,rankingXpScope);
       if(!list)return;
+      const section=sections.get('xp');if(section){section.payload=input;section.identity=accountKey()}updateSection('xp',rows);
       if(!rows.length){list.innerHTML=`<div class="ranking-empty"><strong>${rankingXpScope==='teams'?'Týmy':'Hráči'} zatím nemají XP v tomto období.</strong><small>První body tu udělají pořádek velmi rychle. 😄</small></div>`;return}
       const rowHtml=r=>{
         if(rankingXpScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${periodLabel()}</small></div></div>`;
         const level=levelFor(Number(r.lifetimePoints||0)),team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
         return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small><span class="ranking-rank-chip">${level.current.icon} ${esc(level.current.name)}</span>${team}</small></div><div class="leader-score"><strong>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</strong><small>${periodLabel()}</small></div></div>`;
       };
-      const sliced=totalXpSlice(rows);
-      list.innerHTML=sliced.top.map(rowHtml).join('')+(sliced.mine?`${ownRankingDivider()}${rowHtml(sliced.mine)}`:'')+moreRankingHtml(sliced.hidden,rankingXpScope);
+      const sliced=sectionSlice(rows,'xp');
+      list.innerHTML=sliced.top.map(rowHtml).join('')+(sliced.mine?`${ownRankingDivider()}${rowHtml(sliced.mine)}`:'');
     }
 
     function renderDailyRanking(input){
       const list=$('#dailyLeaderboardList'),rows=rankingRows(transformRankingPayload(input),rankingDailyScope);
       if(!list)return;
+      const section=sections.get('daily');if(section){section.payload=input;section.identity=accountKey()}updateSection('daily',rows);
       if(!rows.length){list.innerHTML='<div class="ranking-empty"><strong>Dnešní startovní rošt je zatím prázdný.</strong><small>Stačí dokončit Denní výzvu.</small></div>';return}
-      list.innerHTML=rows.map(r=>{
+      const rowHtml=r=>{
         if(rankingDailyScope==='teams')return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>👥 ${esc(r.name)}</strong><small>${countCz(r.players||0,'výkon','výkony','výkonů')} v dnešním skóre · ${countCz(r.memberCount||0,'člen','členové','členů')}</small></div><div class="leader-score"><strong>${Number(r.score||0).toLocaleString('cs-CZ',{maximumFractionDigits:1})}</strong><small>/ 100</small></div></div>`;
         const quality=r.cleanSolve===true?'Čistě':r.hintsUsed?countCz(r.hintsUsed,'nápověda','nápovědy','nápověd'):'Bez nápovědy',team=r.teamName?` · 👥 ${esc(r.teamName)}`:'';
         return `<div class="leader-row ranking-row ${r.isMine?'me':''}"><div class="leader-rank">${rankingRankBadge(r.rank)}</div><div class="leader-name"><strong>${esc(r.avatar||'🙂')} ${esc(r.name)}${r.isMine?' <span class="ranking-you">Ty</span>':''}</strong><small>${quality} · ${countCz(r.moves||0,'tah','tahy','tahů')}${team}</small></div><div class="leader-score"><strong>${fmtTime(r.elapsedMs)}</strong><small>dnešní výzva</small></div></div>`;
-      }).join('');
+      };
+      const sliced=sectionSlice(rows,'daily');
+      list.innerHTML=sliced.top.map(rowHtml).join('')+(sliced.mine?`${ownRankingDivider()}${rowHtml(sliced.mine)}`:'');
     }
 
     function renderRankingPrivacyNote(){
@@ -125,26 +250,26 @@
       box.innerHTML=`<div><span class="eyebrow">👥 TVŮJ TÝM</span><strong>${esc(p.leagueName||p.familyCode)}</strong><small>Do týmových XP se počítají jen XP získané během členství.</small></div><div class="tv-team-actions"><button id="rankingTeamVictoriesBtn" class="secondary-btn">Týdenní zlato · vitrína</button><button id="rankingTeamSettingsBtn" class="text-btn">Nastavení týmu</button></div>`;const button=$('#rankingTeamSettingsBtn');if(button)button.onclick=()=>d.openFamilyLeagueModal?.();const victories=$('#rankingTeamVictoriesBtn');if(victories)victories.onclick=()=>globalThis.PropletTeamVictories?.openCabinet();
     }
 
+    let renderVersion=0;
     async function renderLeaderboard(){
+      const version=++renderVersion,anchor=visibleAnchor();if(anchor)activeAnchor=anchor;
       const xpList=$('#xpLeaderboardList'),dailyList=$('#dailyLeaderboardList');if(!xpList||!dailyList)return;
-      await ensureProfile();renderRankingPrivacyNote();maybeShowRankingPrivacyNotice();
-      $$('.ranking-scope-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingXpScope===rankingXpScope));
-      $$('.ranking-period-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingPeriod===rankingXpPeriod));
-      $$('.ranking-daily-tab').forEach(b=>b.classList.toggle('active',b.dataset.rankingDailyScope===rankingDailyScope));
-      $('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams');renderRankingTeamCard();
-      xpList.innerHTML='<div class="ranking-loading">Načítám XP pořadí…</div>';dailyList.innerHTML='<div class="ranking-loading">Načítám dnešní pořadí…</div>';
-      const [xpResult,dailyResult]=await Promise.allSettled([d.api(`/api/rankings/xp?period=${rankingXpPeriod}`),d.api(`/api/rankings/daily?daily_date=${d.pragueDateISO?.()||''}`)]);
-      if(xpResult.status==='fulfilled'){renderXpRanking(xpResult.value);const privacy=$('#rankingPrivacyNote');if(privacy&&xpResult.value.visibilityReady===true)privacy.dataset.visibilityReady='true'}else xpList.innerHTML=`<div class="ranking-empty"><strong>XP pořadí se teď nepodařilo načíst.</strong><small>${esc(xpResult.reason?.message||'Zkus to prosím znovu.')}</small></div>`;
-      if(dailyResult.status==='fulfilled')renderDailyRanking(dailyResult.value);else dailyList.innerHTML=`<div class="ranking-empty"><strong>Dnešní pořadí se teď nepodařilo načíst.</strong><small>${esc(dailyResult.reason?.message||'Zkus to prosím znovu.')}</small></div>`;
+      await ensureProfile();if(version!==renderVersion)return;
+      installSections();anchored(anchor,()=>{renderRankingPrivacyNote();syncControls();renderRankingTeamCard()});maybeShowRankingPrivacyNotice();
+      await Promise.allSettled([loadRanking('xp',{anchor,refresh:true}),loadRanking('daily',{anchor,refresh:true})]);
     }
 
     function install(){
       if(installed)return false;
       installed=true;
-      globalThis.document?.addEventListener('proplet:screen-changed',maybeShowRankingPrivacyNotice);
-      $$('.ranking-scope-tab').forEach(button=>button.addEventListener('click',()=>{rankingXpScope=button.dataset.rankingXpScope;renderLeaderboard()}));
-      $$('.ranking-period-tab').forEach(button=>button.addEventListener('click',()=>{rankingXpPeriod=button.dataset.rankingPeriod;renderLeaderboard()}));
-      $$('.ranking-daily-tab').forEach(button=>button.addEventListener('click',()=>{rankingDailyScope=button.dataset.rankingDailyScope;renderLeaderboard()}));
+      installSections();
+      const invalidateAnchor=()=>{interactionVersion++;activeAnchor=null};
+      for(const type of ['wheel','touchmove','pointerdown'])globalThis.document?.addEventListener(type,invalidateAnchor,{passive:true});
+      globalThis.document?.addEventListener('keydown',invalidateAnchor);
+      globalThis.document?.addEventListener('proplet:screen-changed',()=>{invalidateAnchor();if(viewportTail)viewportTail.style.height='0px';maybeShowRankingPrivacyNotice()});
+      $$('.ranking-scope-tab').forEach(button=>button.addEventListener('click',()=>{const anchor=rememberAnchor(button);rankingXpScope=button.dataset.rankingXpScope;syncControls();loadRanking('xp',{anchor})}));
+      $$('.ranking-period-tab').forEach(button=>button.addEventListener('click',()=>{const anchor=rememberAnchor(button);rankingXpPeriod=button.dataset.rankingPeriod;syncControls();loadRanking('xp',{anchor})}));
+      $$('.ranking-daily-tab').forEach(button=>button.addEventListener('click',()=>{const anchor=rememberAnchor(button);rankingDailyScope=button.dataset.rankingDailyScope;anchored(anchor,syncControls);loadRanking('daily',{anchor})}));
       return true;
     }
     function openWeeklyTeams({render=true}={}){rankingXpScope='teams';rankingXpPeriod='week';if(render)return renderLeaderboard()}

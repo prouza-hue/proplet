@@ -1,0 +1,42 @@
+/* A compact overview with explicit expansion; list changes keep controls stable. */
+#screen-leaderboard{overflow-anchor:none}
+#screen-leaderboard .ranking-navigation-section>.ranking-section-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  scroll-margin-top:18px;
+}
+#screen-leaderboard .ranking-navigation-section>.ranking-section-head>div{min-width:0}
+#screen-leaderboard .ranking-collapse-toggle{
+  flex:0 0 44px;display:grid;place-items:center;width:44px;height:44px;
+  padding:0;border:1px solid var(--line);border-radius:50%;background:transparent;
+  color:var(--ink);cursor:pointer;font:inherit;font-size:29px;line-height:1;
+}
+#screen-leaderboard .ranking-collapse-toggle>span{transform:translateY(4px)}
+#screen-leaderboard .ranking-collapse-toggle[aria-expanded="false"]>span{transform:rotate(180deg) translateY(2px)}
+#screen-leaderboard .ranking-collapse-toggle:focus-visible,
+#screen-leaderboard .ranking-expand-list:focus-visible,
+#screen-leaderboard .ranking-back-summary:focus-visible,
+#screen-leaderboard .ranking-retry:focus-visible,
+#screen-leaderboard .ranking-segment>button:focus-visible{
+  outline:3px solid var(--ink);outline-offset:3px;
+}
+#screen-leaderboard .ranking-navigation-collapsed>:not(.ranking-section-head){display:none!important}
+#screen-leaderboard .ranking-navigation-collapsed>.ranking-section-head{margin-bottom:0}
+#screen-leaderboard .ranking-section-summary{display:block;color:var(--muted);font-size:12px;margin-top:3px;flex-basis:100%}
+#screen-leaderboard .ranking-expand-list,
+#screen-leaderboard .ranking-back-summary{
+  display:block;min-height:44px;max-width:100%;padding:9px 0;margin:0 0 8px;
+  color:var(--ink);font-size:13px;line-height:1.35;text-align:left;white-space:normal;
+  text-decoration:underline;text-underline-offset:3px;
+}
+#screen-leaderboard .ranking-back-summary{margin:10px 0 0}
+#screen-leaderboard .ranking-section-summary[hidden],
+#screen-leaderboard .ranking-expand-list[hidden],
+#screen-leaderboard .ranking-back-summary[hidden]{display:none!important}
+#screen-leaderboard .ranking-navigation-section .leaderboard-list[aria-busy="true"]{opacity:.65}
+#screen-leaderboard .ranking-viewport-tail{height:0;pointer-events:none}
+@media(max-width:360px){
+  #screen-leaderboard .ranking-navigation-section>.ranking-section-head{gap:5px}
+  #screen-leaderboard .ranking-navigation-section .quality-ranking-head{gap:5px}
+  #screen-leaderboard .ranking-navigation-section .ranking-section-head h2{font-size:19px}
+  #screen-leaderboard .ranking-collapse-toggle{flex-basis:42px;width:42px;height:42px}
+}

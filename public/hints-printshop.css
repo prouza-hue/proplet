@@ -1,0 +1,54 @@
+/* Hint chooser: restrained printshop paper, three distinct painted tools. */
+html #hintModal{padding:16px;align-content:center}
+html #hintModal .hint-card{
+ display:grid;gap:9px;width:min(100%,460px);padding:21px;
+ max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;
+ border:1px solid var(--td-line,#d8d2c7)!important;border-radius:18px;
+ background:var(--td-paper,#fffcf5)!important;color:var(--td-ink,#202b39)!important;
+ box-shadow:0 18px 64px #101b282e!important;
+}
+html #hintModal #hintTitle{
+ margin:0 48px 11px 0;padding:0;font-size:clamp(23px,4.3vw,29px);
+ line-height:1.12;letter-spacing:-.035em;color:inherit;
+}
+html #hintModal #closeHintModal{
+ top:11px;right:11px;width:40px;height:40px;display:grid;place-items:center;
+ border:1px solid var(--td-line,#d8d2c7);border-radius:11px;background:transparent;
+ color:var(--td-muted,#586576);font-size:27px;line-height:1;padding:0;
+}
+html #hintModal .hint-choice{
+ display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:12px;
+ min-width:0;min-height:85px;padding:10px 14px 10px 8px;margin:0;
+ border:1px solid var(--td-line,#d8d2c7)!important;border-radius:12px;
+ background:color-mix(in srgb,var(--td-paper,#fffcf5) 96%,#009d93)!important;
+ color:inherit!important;box-shadow:none!important;transition:border-color .15s,background .15s;
+}
+html #hintModal .hint-choice>span{display:grid;place-items:center;font-size:inherit;line-height:1}
+html #hintModal .hint-art{display:block;width:64px;height:64px;object-fit:contain;filter:none;background:none}
+html #hintModal .hint-choice>div{min-width:0}
+html #hintModal .hint-choice strong{display:block;font-size:17px!important;line-height:1.2!important;font-weight:850;letter-spacing:-.015em}
+html #hintModal .hint-choice small{display:block;margin-top:4px;font-size:14px!important;line-height:1.35!important;color:var(--td-muted,#586576)}
+html #hintModal .hint-choice:hover{background:var(--td-mint,#e6f3eb)!important;border-color:#268477!important}
+html #hintModal :is(.hint-choice,#closeHintModal):focus-visible{outline:3px solid var(--td-blue,#204fab);outline-offset:3px}
+html #hintModal.starter-hint .hint-choice[data-hint-level="1"]{border-color:#268477!important;background:var(--td-mint,#e6f3eb)!important}
+html #hintModal.starter-hint .hint-choice strong:after{content:none}
+html[data-theme=dark] #hintModal .hint-card{box-shadow:0 18px 64px #0008!important}
+@media(max-width:359px){
+ html #hintModal{padding:12px}
+ html #hintModal .hint-card{padding:18px 14px;max-height:calc(100dvh - 24px)}
+ html #hintModal #hintTitle{font-size:23px;margin-right:42px}
+ html #hintModal .hint-choice{grid-template-columns:54px minmax(0,1fr);gap:9px;padding:9px 10px 9px 5px;min-height:81px}
+ html #hintModal .hint-art{width:54px;height:54px}
+ html #hintModal .hint-choice strong{font-size:16px!important}
+ html #hintModal .hint-choice small{font-size:13px!important}
+}
+@media(max-height:440px){
+ html #hintModal{padding:10px}
+ html #hintModal .hint-card{gap:6px;padding:14px 18px;max-height:calc(100dvh - 20px)}
+ html #hintModal #hintTitle{font-size:24px;margin-bottom:6px}
+ html #hintModal .hint-choice{grid-template-columns:46px minmax(0,1fr);min-height:60px;padding:6px 12px 6px 7px}
+ html #hintModal .hint-art{width:46px;height:46px}
+ html #hintModal .hint-choice strong{font-size:16px!important}
+ html #hintModal .hint-choice small{font-size:13px!important;margin-top:2px}
+}
+@media(prefers-reduced-motion:reduce){html #hintModal .hint-card{animation:none}html #hintModal .hint-choice{transition:none}}

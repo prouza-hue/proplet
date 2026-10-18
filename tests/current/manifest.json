@@ -656,6 +656,30 @@
       {
         "path": "tests/current/test_referral_analytics.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_hint_chooser.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_ranking_navigation.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_refinements_review_build.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_bonus_recognition.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_bonus_recognition.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_ranking_expansion.js",
+        "runner": "node"
       }
     ]
   },
