@@ -108,8 +108,9 @@ q('#winModal').classList.remove('hidden');q('#winAccountBtn')?.classList.add('hi
 installRescue60s();
 
 const core=document.createElement('script');
-core.src='/quality-v334-core-v40114.js?v=mkpilot4';
+core.src='/quality-v334-core-v40114.js?v=play-polish1';
 core.async=false;
 core.onerror=()=>console.error('Proplet quality core se nepodařilo načíst.');
 document.head.appendChild(core);
 })();
+
