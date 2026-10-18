@@ -45,3 +45,14 @@ html[data-theme=dark] #achievementDetail button:focus-visible,html[data-theme=da
 #achievementDetail[data-loyalty="true"] #achievementDetailArt{margin:8px auto 10px;min-height:0}
 html #achievementDetail[data-loyalty="true"] #achievementDetailArt .ribbon-art{width:min(240px,60vw);height:min(240px,60vw)}
 html[data-theme=dark] [data-streak-detail]:focus-visible{outline-color:#b5d5ac!important}
+
+
+/* Rank entry points retain their existing layout and share the reward dialog. */
+[data-rank-detail]{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+[data-rank-detail]:focus-visible{outline:3px solid #246b54!important;outline-offset:3px}
+html[data-theme=dark] [data-rank-detail]:focus-visible{outline-color:#b5d5ac!important}
+#achievementDetail .rank-detail-navigation{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:16px -8px -6px;font:400 12px/1.4 Outfit,system-ui,sans-serif;color:#4c6256}
+#achievementDetail .rank-detail-navigation[hidden]{display:none}
+#achievementDetail .rank-detail-navigation button{min-height:44px;padding:8px;background:transparent;border:0;border-radius:8px;color:#365b46;font:500 13px/1.4 Outfit,system-ui,sans-serif;cursor:pointer}
+#achievementDetail .rank-detail-navigation button:disabled{opacity:.35;cursor:default}
+html[data-theme=dark] #achievementDetail .rank-detail-navigation,html[data-theme=dark] #achievementDetail .rank-detail-navigation button{color:#d0dbc8}

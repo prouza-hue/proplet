@@ -6,6 +6,7 @@ on:
       - 'public/**'
       - 'tools/verify_mozkokalypsa_achievements.cjs'
       - 'tools/verify_achievement_details.cjs'
+      - 'tools/verify_rank_details.cjs'
       - 'tests/current/test_mozkokalypsa_achievements.js'
       - '.github/workflows/mozkokalypsa-achievements.yml'
 permissions:
@@ -32,6 +33,7 @@ jobs:
           for i in {1..30}; do curl -sf http://127.0.0.1:8000/api/config && break; sleep 1; done
           node tools/verify_mozkokalypsa_achievements.cjs
           node tools/verify_achievement_details.cjs
+          node tools/verify_rank_details.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -39,3 +41,4 @@ jobs:
           path: |
             qa-mk-achievements/
             /tmp/mk-achievements.log
+
