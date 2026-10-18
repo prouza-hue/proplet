@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.5-play-polish1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.6-fold-sync1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -518,12 +518,30 @@ function rememberSupportMode(mode){if(validSupportMode(mode))try{localStorage.se
 function getQueue(scope=playerScope()){const core=scopedStorage();if(core)return core.readQueue(QUEUE_KEY,scope);try{return JSON.parse(localStorage.getItem(scopedStorageKey(QUEUE_KEY,scope))||'[]')}catch{return []}}
 function saveQueue(q,scope=playerScope()){const core=scopedStorage();const saved=core?core.writeQueue(QUEUE_KEY,q,scope):localStorage.setItem(scopedStorageKey(QUEUE_KEY,scope),JSON.stringify(q));document.dispatchEvent(new CustomEvent('proplet:queue-changed'));return saved}
 function queuedResultPayload(r){return {puzzle_id:r.puzzleId,challenge_key:r.challengeKey,mode:r.mode,difficulty:r.difficulty,elapsed_ms:Math.max(1000,Math.round(r.elapsedMs)),moves:Math.max(1,r.moves),daily_date:r.dailyDate,hints_used:Math.max(0,r.hintsUsed||0),wrong_attempts:Math.max(0,r.wrongAttempts||0),max_hint_level:Math.max(0,r.maxHintLevel||0),attempt_id:r.attemptId||null,clean_solve:r.cleanSolve===true,completed_at:r.completedAt||null,calm_mode:r.calmMode===true,timing_unverified:r.timingUnverified===true,...(r.mode==='daily_special'?{content_hash:r.contentHash||null}:{}),...(r.archiveSolution?{archive_solution:r.archiveSolution}:{})}}
+async function committedResult(row,profile){
+ if(!row?.attemptId||!accountProfileMatches(profile))return null;
+ const params=new URLSearchParams({attempt_id:row.attemptId,puzzle_id:row.puzzleId,challenge_key:row.challengeKey,mode:row.mode,difficulty:row.difficulty});
+ const response=await api('/api/result-receipt?'+params,{authProfile:profile});
+ return accountProfileMatches(profile)?window.PropletResultQueue?.confirmedResult(row,response):null;
+}
+async function reconcileQueuedResult(row,profile,scope){
+ const canonical=await committedResult(row,profile);
+ if(!canonical||!accountProfileMatches(profile)||!quarantineRejectedResult(row,'ALREADY_COMMITTED',scope))return false;
+ mergeRemoteProgress([canonical],scope);
+ return true;
+}
+async function completedServerAttempt(puzzle,mode,dailyDate,attemptId,profile){
+ const canonical=await committedResult({puzzleId:puzzle.id,challengeKey:challengeKey(mode,puzzle,dailyDate),mode,difficulty:puzzle.difficulty,attemptId},profile);
+ if(!canonical||!accountProfileMatches(profile))return false;
+ mergeRemoteProgress([canonical],profile.id);
+ return true;
+}
 function resultQueue(profile=getProfile(),scope=profile?.id||playerScope()){
  const identity=`${scope}:${profile?.token||''}`;if(resultQueueController&&resultQueueControllerIdentity===identity)return resultQueueController;
  const factory=window.PropletResultQueue;
  if(!factory?.create)return null;
  resultQueueControllerIdentity=identity;
- resultQueueController=factory.create({isActive:()=>accountProfileMatches(profile),getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}).then(receipt=>{try{window.PropletTeamVictories?.resultConfirmed(r,receipt,profile)}catch{}window.PropletArchiveExperience?.resultConfirmed(r,receipt,profile);return receipt}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope)});
+ resultQueueController=factory.create({isActive:()=>accountProfileMatches(profile),getQueue:()=>getQueue(scope),saveQueue:q=>saveQueue(q,scope),getRetry:()=>{try{return JSON.parse(localStorage.getItem(scopedStorageKey("proplet-sync-retry-v2",scope))||"{}")}catch{return {}}},saveRetry:value=>{try{localStorage.setItem(scopedStorageKey("proplet-sync-retry-v2",scope),JSON.stringify(value))}catch{}},post:r=>api('/api/result',{method:'POST',headers:{'X-Proplet-Result-Receipt':'1'},body:JSON.stringify(queuedResultPayload(r)),authProfile:profile}).then(receipt=>{try{window.PropletTeamVictories?.resultConfirmed(r,receipt,profile)}catch{}window.PropletArchiveExperience?.resultConfirmed(r,receipt,profile);return receipt}),quarantine:(row,reason)=>quarantineRejectedResult(row,reason,scope),reconcile:row=>reconcileQueuedResult(row,profile,scope)});
  return resultQueueController;
 }
 function quarantineRejectedResult(row,reason,scope=playerScope()){
@@ -1221,7 +1239,7 @@ async function finishGame(){
  const dailyGenerationUpgrade=g.mode==='daily'&&!!old&&old.puzzleId!==g.puzzle.id;
  const dailyReplay=g.mode==='daily'&&!!old&&!dailyGenerationUpgrade,specialPractice=g.mode==='daily_special'&&g.puzzle.meta?.dailySpecialBinding?.rewardEligible===false,specialReplay=g.mode==='daily_special'&&!!old;
  const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,level:g.mode==='free'?Number(g.puzzle.meta?.level)||null:null,contentGeneration:g.mode==='free'?Number(g.puzzle.meta?.contentGeneration)||Number(puzzleDB.freeGeneration)||2:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty,g.puzzle),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString(),...(g.mode==='daily_special'?{contentHash:g.puzzle.meta.dailySpecialBinding.contentHash,officialChallengeKey:g.puzzle.meta.dailySpecialBinding.officialChallengeKey,official:!specialPractice,rewardEligible:!specialPractice}:{}),calmMode:!!g.calmMode,...(g.archiveSolution?{archiveSolution:g.archiveSolution}:{})};
- rec.timingUnverified=!!g.timingUnverified;rec.mergedAttempts=!!g.mergedAttempts;renderTimingStatus(g);if(dailyGenerationUpgrade)rec.points=old.points??rec.points;if(!specialPractice&&(!old||dailyGenerationUpgrade))state.completed[key]=rec;if(state.inProgress?.[key])delete state.inProgress[key];if(specialPractice&&g.puzzle.meta.dailySpecialBinding.officialChallengeKey&&state.inProgress?.[g.puzzle.meta.dailySpecialBinding.officialChallengeKey])delete state.inProgress[g.puzzle.meta.dailySpecialBinding.officialChallengeKey];saveState(state);g.resultRecord=rec;queueResult(rec);g.finishTelemetryPromise=finishAttemptTelemetry(rec);
+ rec.timingUnverified=!!g.timingUnverified;rec.mergedAttempts=!!g.mergedAttempts;renderTimingStatus(g);if(dailyGenerationUpgrade)rec.points=old.points??rec.points;if(!specialPractice&&(!old||dailyGenerationUpgrade))state.completed[key]=rec;if(state.inProgress?.[key])delete state.inProgress[key];if(specialPractice&&g.puzzle.meta.dailySpecialBinding.officialChallengeKey&&state.inProgress?.[g.puzzle.meta.dailySpecialBinding.officialChallengeKey])delete state.inProgress[g.puzzle.meta.dailySpecialBinding.officialChallengeKey];saveState(state);g.resultRecord=rec;if(!g.remoteCommitted)queueResult(rec);g.finishTelemetryPromise=g.remoteCommitted?Promise.resolve(null):finishAttemptTelemetry(rec);
  window.PropletFirstSteps?.recordCompleted(g);
  $('#winModal').classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');winDailyGlobalData=null;const winBoard=$('#levelLeaderboardBox');if(winBoard){winBoard.classList.remove('daily-global-board','free-level-board');if(g.mode==='free'&&!g.postStarterWarmup){winBoard.classList.remove('hidden');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Aktualizuji pořadí…</strong><small>Započítávám právě dohraný výsledek.</small></div>'}else if(g.postStarterWarmup){winBoard.classList.add('hidden')}else if(g.mode==='daily'||(g.mode==='daily_special'&&!specialPractice)){winBoard.classList.remove('hidden');winBoard.classList.add('daily-global-board');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Hledám tvoje místo ve světě…</strong><small>Nejdřív bezpečně ukládám výsledek.</small></div>'}else winBoard.classList.add('hidden')}
  const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=completionAchievements(statsBefore,stats,g,getState().mozkokalypsaCelebrated);
@@ -1427,7 +1445,7 @@ let fairPlayController=null;
 function fairPlay(){
  if(fairPlayController)return fairPlayController;
  if(!window.PropletFairPlay)return {prepare:async(p,m,d,restored)=>({restored}),pause(){},resume:async()=>null,start(){},stop(){},drain:async()=>{},finish:async()=>null};
- fairPlayController=window.PropletFairPlay.create({api,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,
+ fairPlayController=window.PropletFairPlay.create({api,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],completedAttempt:completedServerAttempt,elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,
  conflict:(g,text)=>{if(g!==currentGame)return;g.fairPlayConflict=true;g.fairPlay=false;pauseGameClock('other-device');showToast(text)}});
  return fairPlayController;
 }
@@ -1557,7 +1575,7 @@ async function syncQueue({announce=false,waitForProfile=true}={}){
  const q=getQueue(scope);syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
  if(!q.length){try{await refreshRemoteProfile({throwOnError:true});if(!accountProfileMatches(p)){syncState={status:'idle',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();return {ok:false,left:0,stale:true}}syncState={status:'success',error:null,lastAt:new Date().toISOString()};if(announce)showToast('Všechno je synchronizované ✓');renderProfile();renderDaily();if(currentScreen==='leaderboard')renderLeaderboard();return {ok:true,left:0}}catch(e){syncState={status:'error',error:e.message,lastAt:syncState.lastAt};if(announce)showToast(`Synchronizace: ${e.message}`);renderProfile();renderDaily();return {ok:false,left:0,error:e.message}}}
  const left=[];let firstError=null,sent=0,quarantined=0;
- for(const r of q){try{const receipt=await api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r)),authProfile:p});window.PropletArchiveExperience?.resultConfirmed(r,receipt,p);sent++}catch(e){if(obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)){quarantined++;continue}left.push(r);if(!firstError)firstError=e.message}}
+ for(const r of q){try{const receipt=await api('/api/result',{method:'POST',body:JSON.stringify(queuedResultPayload(r)),authProfile:p});window.PropletArchiveExperience?.resultConfirmed(r,receipt,p);sent++}catch(e){if(Number(e?.status)===409&&e?.message==='IDEMPOTENCY_CONFLICT'){try{if(await reconcileQueuedResult(r,p,scope))continue}catch{}}if(obsoleteQueuedResultError(e)&&quarantineRejectedResult(r,e.message,scope)){quarantined++;continue}left.push(r);if(!firstError)firstError=e.message}}
  saveQueue(left,scope);
  if(!accountProfileMatches(p)){syncState={status:'idle',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();return {ok:false,left:left.length,error:firstError,stale:true,failedKeys:[...new Set(left.map(r=>r.challengeKey))]}}
  try{await refreshRemoteProfile({throwOnError:left.length===0})}catch(e){if(!firstError)firstError=e.message}
@@ -2701,6 +2719,7 @@ function installEngagementModules(){
 function installContentModules(){dailyOrchestration().install();rankingsOrchestration().install()}
 if(typeof window!=='undefined'&&typeof document!=='undefined'){installEngagementModules();installContentModules();boot()}
 if(typeof module!=='undefined'&&module.exports)module.exports={WIN_PRAISE,stableTextIndex,completionPraise};
+
 
 
 

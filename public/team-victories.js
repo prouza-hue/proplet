@@ -10,6 +10,7 @@
   const profile=()=>typeof getProfile==='function'?getProfile():null;
   const identity=p=>p?.id&&p?.token?`${p.id}:${p.token}:${p.familyCode||''}`:'';
   const activeScreen=()=>$('.screen.active')?.id;
+  const safeScreen=()=>['screen-daily','screen-free','screen-profile','screen-leaderboard'].includes(activeScreen());
   const safePreview=()=>window.PROPLET_RUNTIME_ENV==='preview'||window.PROPLET_RUNTIME_META?.gen5CandidatePreview||new URLSearchParams(location.search).has('tutorial');
   const number=n=>Math.max(0,Number(n)||0);
   const badge=id=>`${assets}${badges[id]||'proplet-legend'}.webp`;
@@ -21,9 +22,10 @@
   let lastReadDay='',lastReadAt=0;
   let state=null,stateKey='',flight=null,dialog=null,returnFocus=null,counterTimer=null,ready=false,introPending=false,introInFlight=false,openedAward=null;
   const shownAwards=new Set();
+  let personal=null,personalKey='',personalFlight=null,personalAt=0,personalError=false;
   function same(key){return !!key&&identity(profile())===key;}
   function close(){clearTimeout(counterTimer);if(dialog?.open)dialog.close();openedAward=null;if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});}
-  function reset(){close();state=null;flight=null;lastReadDay='';lastReadAt=0;introPending=false;introInFlight=false;$('#tvIntro')?.remove();$('#tvReminder')?.remove();}
+  function reset(){close();personal=null;personalKey='';personalFlight=null;personalAt=0;personalError=false;$('#profileTeamVictories')?.remove();state=null;flight=null;lastReadDay='';lastReadAt=0;introPending=false;introInFlight=false;$('#tvIntro')?.remove();$('#tvReminder')?.remove();}
   async function refresh(force=false){
     const p=profile(),key=identity(p);
     if(key!==stateKey){reset();stateKey=key;}
@@ -38,7 +40,7 @@
     return request.promise;
   }
   function available(){return state?.enabled===true&&state?.team&&same(stateKey);}
-  function blocked(){return !ready||!available()||activeScreen()!=='screen-daily'||dialog?.open||document.hidden||window.PropletFirstSteps?.quiet()||!!$('.modal:not(.hidden),dialog[open]');}
+  function blocked(){return !ready||!available()||!safeScreen()||dialog?.open||document.hidden||window.PropletFirstSteps?.quiet()||!!$('.modal:not(.hidden),dialog[open]');}
   function renderReminder(){
     $('#tvReminder')?.remove();
     if(!available()||!state.previousWeekWinner)return;
@@ -58,10 +60,10 @@
     return `<section class="tv-cabinet"><button class="tv-close" data-tv-close aria-label="Zavřít vitrínu">×</button><h2 id="tvCabinetTitle">Vitrína týmu</h2><p class="tv-subline">${escape(team.name)}</p><div class="tv-cabinet-total"><img src="${medal}" alt=""><div><strong>${gold(n)}</strong><small>Za vítězství v týdenních týmových XP</small></div></div><ol class="tv-milestones">${milestones.slice(0,4).map(m=>{const achieved=n>=number(m.threshold);return `<li class="tv-milestone"><img src="${badge(m.id)}" class="${achieved?'':'tv-locked'}" alt=""><div><strong>${escape(m.name)}${m.id==='legend'&&legendLevel>1?` ${roman(legendLevel)}`:''}</strong>${achieved?'<small class="tv-earned">Získáno</small>':`<small>${number(m.threshold)} týmových vítězství</small><div class="tv-progress"><span style="width:${Math.min(100,n/number(m.threshold)*100)}%"></span></div>`}</div><span>${achieved?'<span aria-label="Získáno">✓</span>':`${n} / ${number(m.threshold)}<br><span class="tv-lock" aria-label="Zamčeno"></span>`}</span></li>`}).join('')}</ol>${n>=25?`<p class="tv-rules">Další milník: <strong>${escape(next.name)}</strong> · ${n} / ${next.threshold} vítězství. Zlata zůstávají navždy.</p>`:''}${team.competitionEligible===false?'<p class="tv-rules tv-private-note"><strong>Váš tým je zatím soukromý.</strong><br>O zlato soutěží veřejné týmy. Zapojení můžete povolit v nastavení týmu.</p><button class="tv-secondary" data-tv-action="settings">Nastavení týmu</button>':''}<p class="tv-rules"><strong>Každý týden hrajete o jedno zlato.</strong><br>Rozhoduje součet týmových XP od pondělí do neděle, podle českého času. Při shodě získají zlato všechny týmy na prvním místě. Nový týden nuluje skóre, úspěchy zůstávají.</p><p class="tv-rules">Soutěž běží od ${escape(date(state.launchDate))}. Odměny jsou automatické, bez bonusových XP a bez povinné série.</p><button class="tv-primary" data-tv-action="competition" style="width:100%">Na týdenní soutěž</button>${state.history?.length?`<details class="tv-history"><summary>Vyhrané týdny (${state.history.length})</summary><ol>${state.history.map(a=>`<li><strong>${escape(week(a))}</strong><span>${number(a.xp).toLocaleString('cs-CZ')} XP${a.sharedFirst?' · Sdílené 1. místo':''}</span></li>`).join('')}</ol></details>`:''}</section>`;
   }
   function show(kind,award){
-    if(!available())return;
+    if(kind==='personal'?!personalAvailable():!available())return;
     clearTimeout(counterTimer);if(!dialog.open)returnFocus=document.activeElement;else dialog.close();
-    dialog.innerHTML=kind==='cabinet'?cabinet():celebration(award);
-    dialog.setAttribute('aria-labelledby',kind==='cabinet'?'tvCabinetTitle':'tvTitle');
+    dialog.innerHTML=kind==='personal'?personalCabinet():kind==='cabinet'?cabinet():celebration(award);
+    dialog.setAttribute('aria-labelledby',kind==='personal'?'tvPersonalTitle':kind==='cabinet'?'tvCabinetTitle':'tvTitle');
     dialog.querySelector('[data-tv-close]').onclick=close;
     dialog.querySelectorAll('[data-tv-action]').forEach(b=>b.onclick=()=>{if(b.dataset.tvAction==='cabinet')openCabinet();else if(b.dataset.tvAction==='competition')openCompetition();else if(b.dataset.tvAction==='settings'){close();if(typeof openFamilyLeagueModal==='function')openFamilyLeagueModal();}else close();});
     dialog.showModal();dialog.querySelector('[data-tv-close]').focus({preventScroll:true});
@@ -128,14 +130,55 @@
     const day=pragueDay(completed);if(day!==today)return;
     const key=identity(account);refresh(true).then(data=>{if(!same(key)||!data?.intro?.eligible||data.intro.seen)return;introPending=true;maybeIntro();});
   }
+  function personalAvailable(){return personal?.enabled===true&&same(personalKey);}
+  const wins=n=>`${number(n).toLocaleString('cs-CZ')} vítězství`;
+  function personalCabinet(){
+    const n=number(personal.totalGold),history=personal.history||[];
+    return `<section class="tv-cabinet tv-personal-cabinet"><button class="tv-close" data-tv-close aria-label="Zavřít týmové výhry">×</button><h2 id="tvPersonalTitle">Moje týmové výhry</h2><div class="tv-cabinet-total"><img src="${medal}" alt=""><div><strong>${wins(n)}</strong><small>V týmu, se kterým jsi vyhrál.</small></div></div><p class="tv-rules">Tady máš všechna svá týmová zlata. Zůstanou ti i po změně týmu.</p>${n?`<div class="tv-personal-trophies">${fallbackMilestones.filter(m=>n>=m.threshold).map(m=>`<div><img src="${badge(m.id)}" alt="" width="88" height="88"><strong>${escape(m.name)}${m.id==='legend'&&n>=50?' '+roman(Math.floor(n/25)):''}</strong><span>Za ${m.threshold} vítězství</span></div>`).join('')}</div><ol class="tv-personal-history">${history.map(a=>`<li><img src="${medal}" alt="1. místo" width="40" height="40"><div><strong>${escape(a.teamName)}</strong><span>${escape(week(a))}</span><span>${number(a.xp).toLocaleString('cs-CZ')} týmových XP${a.sharedFirst?' · Sdílené 1. místo':''}</span></div></li>`).join('')}</ol>${n>history.length?'<p class="tv-rules">Zobrazuje se posledních 100 výher. Celkový počet zahrnuje všechny.</p>':''}`:'<p class="tv-rules">Až s týmem vyhrajete týdenní soutěž, první zlato přibude sem.</p>'}<button class="tv-primary" data-tv-action="competition" style="width:100%">Na týdenní soutěž</button></section>`;
+  }
+  function paintPersonal(){
+    const host=$('#profileTeamVictories');if(!host)return;
+    if(safePreview()||!identity(profile())){host.hidden=true;return;}
+    host.hidden=false;
+    if(!personalAvailable()){
+      if(personal?.enabled===false){host.hidden=true;return;}
+      host.innerHTML=`<h3>Týmové výhry</h3><p role="status">${personalError?'Výhry se teď nepodařilo načíst.':'Načítám týmové výhry…'}</p>${personalError?'<button type="button" class="secondary-btn" data-tv-personal-retry>Zkusit znovu</button>':''}`;
+      host.querySelector('[data-tv-personal-retry]')?.addEventListener('click',()=>loadPersonal(true));return;
+    }
+    const n=number(personal.totalGold),last=personal.history?.[0],earned=fallbackMilestones.filter(m=>n>=m.threshold).pop(),goal=nextMilestone(n);
+    host.innerHTML=`<div class="tv-profile-heading"><h3>Týmové výhry</h3>${n?`<span>${wins(n)}</span>`:''}</div><button type="button" class="tv-profile-award" data-tv-personal aria-haspopup="dialog"><img src="${earned?badge(earned.id):medal}" alt="" width="88" height="88"><span><strong>${earned?escape(earned.name)+(earned.id==='legend'&&n>=50?' '+roman(Math.floor(n/25)):''):'První zlato čeká'}</strong><span>${last?escape(last.teamName)+' · '+escape(week(last)):'Vyhrajte s týmem týdenní soutěž.'}</span><span class="tv-profile-link">${n?'Moje výhry a trofeje':'Jak se hraje o zlato'} <span aria-hidden="true">→</span></span></span></button>${n?`<p class="tv-profile-next">${goal.threshold-n===1?'Ještě jedno vítězství':'Ještě '+(goal.threshold-n)+' vítězství'} do trofeje ${escape(goal.name)}.</p>`:''}`;
+    host.querySelector('[data-tv-personal]').onclick=()=>n?show('personal'):openCompetition();
+  }
+  async function loadPersonal(force=false){
+    const p=profile(),key=identity(p);
+    if(personalKey!==key){personal=null;personalAt=0;personalError=false;personalKey=key;}
+    if(!key||safePreview()){paintPersonal();return;}
+    if(personalFlight?.key===key)return personalFlight.promise;
+    if(!force&&((personal&&Date.now()-personalAt<300000)||(personalError&&Date.now()-personalAt<30000))){paintPersonal();return;}
+    personalError=false;personalAt=Date.now();paintPersonal();const request={key,promise:null};personalFlight=request;
+    request.promise=api('/api/team-victories/personal',{authProfile:p}).then(data=>{
+      if(!same(key)||personalKey!==key||personalFlight!==request)return;
+      if(typeof data?.enabled!=='boolean'||(data.enabled&&(!Array.isArray(data.history)||!Number.isInteger(data.totalGold))))throw Error('Invalid victory history');
+      personal=data;personalAt=Date.now();paintPersonal();
+    }).catch(()=>{if(same(key)&&personalKey===key&&personalFlight===request){personal=null;personalError=true;paintPersonal();}}).finally(()=>{if(personalFlight===request)personalFlight=null;});
+    return request.promise;
+  }
+  function renderProfile(p){
+    let host=$('#profileTeamVictories');
+    if(!identity(p)||safePreview()){host?.remove();return;}
+    if(!host){const anchor=$('#profileCard .profile-grid');if(!anchor)return;host=document.createElement('section');host.id='profileTeamVictories';host.className='tv-profile';anchor.after(host);}
+    if(personalKey!==identity(p)){personal=null;personalAt=0;personalError=false;personalKey=identity(p);}
+    paintPersonal();if(ready&&activeScreen()==='screen-profile')loadPersonal();
+  }
   function check(){
     if(identity(profile())!==stateKey){refresh().then(()=>{maybeCelebrate();maybeIntro();});return;}
-    if(!document.hidden&&activeScreen()==='screen-daily'&&lastReadDay&&lastReadDay!==pragueDay()){refresh(true).then(()=>{maybeCelebrate();maybeIntro();});return;}
-    // The announcement follows a result, never an unprompted entry modal.
+    if(!document.hidden&&safeScreen()&&lastReadDay&&lastReadDay!==pragueDay()){refresh(true).then(()=>{maybeCelebrate();maybeIntro();});return;}
+    // Discovery follows a result; an earned victory waits for any safe return screen.
     maybeIntro();maybeCelebrate();
   }
   function visit(){
-    if(!document.hidden&&activeScreen()==='screen-daily'&&!$('.modal:not(.hidden),dialog[open]')&&lastReadAt&&Date.now()-lastReadAt>=300000){refresh(true).then(check);return;}
+    if(activeScreen()==='screen-profile')renderProfile(profile());
+    if(!document.hidden&&safeScreen()&&!$('.modal:not(.hidden),dialog[open]')&&lastReadAt&&Date.now()-lastReadAt>=300000){refresh(true).then(check);return;}
     check();
   }
   function setup(){
@@ -146,13 +189,15 @@
     const observer=new MutationObserver(()=>{const intro=$('#tvIntro');if(intro?.closest('#winModal')&&$('#winModal')?.classList.contains('hidden'))intro.remove();queueMicrotask(check);});
     document.querySelectorAll('.modal').forEach(el=>observer.observe(el,{attributes:true,attributeFilter:['class']}));
     document.addEventListener('proplet:screen-changed',()=>{if(activeScreen()==='screen-game'&&!$('#winModal')?.classList.contains('hidden'))return;if(activeScreen()==='screen-game')$('#tvIntro')?.remove();visit();});
-    document.addEventListener('proplet:account-changed',()=>{refresh().then(check);});
-    document.addEventListener('proplet:profile-refreshed',check);
+    document.addEventListener('proplet:account-changed',()=>{refresh().then(()=>{renderProfile(profile());check();});});
+    document.addEventListener('proplet:profile-refreshed',()=>{renderProfile(profile());check();});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)visit();});
     window.addEventListener('storage',()=>{if(identity(profile())!==stateKey)check();});
-    refresh().then(()=>setTimeout(check,1100));
+    document.addEventListener('close',()=>queueMicrotask(check),true);
+    refresh().then(()=>{renderProfile(profile());setTimeout(check,1100);});
   }
-  window.PropletTeamVictories={resultConfirmed,openCabinet,openCompetition};
+  window.PropletTeamVictories={resultConfirmed,openCabinet,openCompetition,renderProfile};
   document.addEventListener('proplet:ready',setup,{once:true});
 })();
+
 

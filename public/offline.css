@@ -1,6 +1,8 @@
 .offline-connection-status{margin:-5px 2px 14px;padding:7px 11px;border:1px solid var(--td-line,var(--line));border-radius:12px;background:var(--td-paper,var(--paper));color:var(--td-ink,var(--ink));font:inherit;font-size:13px;line-height:1.4}
 .offline-connection-status[hidden],.offline-availability[hidden]{display:none!important}
+body.playing .offline-connection-status{display:none!important}
 .offline-availability{display:grid;gap:5px;margin:14px 0;padding:15px 17px;border:1px solid var(--td-line,var(--line));border-radius:16px;background:var(--td-paper,var(--paper));font:inherit}
 .offline-availability strong{font-size:15px;line-height:1.4}
 .offline-availability span{font-size:14px;line-height:1.45;color:var(--muted)}
 .offline-availability button{justify-self:start;padding:6px 0;font-weight:700}
+

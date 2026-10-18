@@ -9,6 +9,11 @@ on:
       - 'tools/weekly_team_victories_db_cases.sql'
       - 'backend/team_victories.py'
       - 'tests/weekly/**'
+      - 'tools/qa_weekly_rewards.cjs'
+      - 'tools/weekly-rewards-review.js'
+      - 'tools/build_weekly_rewards_review.py'
+      - 'public/team-victories.css'
+      - 'public/app/account/account.js'
       - 'public/team-victories.js'
       - 'tools/test_weekly_team_victories_frontend.cjs'
       - '.github/workflows/weekly-team-victories.yml'
@@ -20,6 +25,11 @@ on:
       - 'tools/weekly_team_victories_db_cases.sql'
       - 'backend/team_victories.py'
       - 'tests/weekly/**'
+      - 'tools/qa_weekly_rewards.cjs'
+      - 'tools/weekly-rewards-review.js'
+      - 'tools/build_weekly_rewards_review.py'
+      - 'public/team-victories.css'
+      - 'public/app/account/account.js'
       - 'public/team-victories.js'
       - 'tools/test_weekly_team_victories_frontend.cjs'
       - '.github/workflows/weekly-team-victories.yml'
@@ -61,3 +71,32 @@ jobs:
         run: >-
           python tools/test_weekly_team_victories_db.py
           --database-url postgresql://proplet_test_admin:local-test-only@127.0.0.1:55432/proplet_weekly_test
+
+  native-rewards-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare native shell and isolated preview
+        env:
+          VERCEL_ENV: preview
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          python tools/build_runtime_content.py --check
+          python tools/generate_puzzles_bootstrap.py
+          python tools/build_archive_experience.py
+          python tools/build_weekly_rewards_review.py
+      - name: Install browser test dependencies
+        run: |
+          npm install --prefix /tmp/proplet-weekly-browser --no-save playwright@1.51.1
+          /tmp/proplet-weekly-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Exercise native celebration and personal trophies
+        env:
+          PROPLET_PLAYWRIGHT: /tmp/proplet-weekly-browser/node_modules/playwright
+        run: node tools/qa_weekly_rewards.cjs

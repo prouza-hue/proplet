@@ -248,6 +248,30 @@ def main():
         response = client.post('/api/result', json=body, headers={'Authorization':'Bearer '+tokens[0]})
         assert response.status_code == 200, response.text
         assert response.json()['awardedPoints'] == 15
+        # Reproduce desktop commit followed by a Fold retry with a changed
+        # completion timestamp. The POST remains a conflict; recovery is read-only.
+        auth_a = {'Authorization': 'Bearer '+tokens[0]}
+        params = {key: body[key] for key in ('attempt_id', 'puzzle_id', 'challenge_key', 'mode', 'difficulty')}
+        with connect() as c:
+            before_recovery = [c.execute(sql.SQL('select count(*) from {} where player_id=%s').format(sql.Identifier(table)), (players[0],)).fetchone()[0] for table in ('result_commands', 'puzzle_runs', 'results')]
+            before_xp = c.execute('select sum(points) from results where player_id=%s', (players[0],)).fetchone()[0]
+        changed = client.post('/api/result', json={**body, 'elapsed_ms': 43000}, headers=auth_a)
+        assert changed.status_code == 409 and changed.json()['detail'] == 'IDEMPOTENCY_CONFLICT'
+        recovered = client.get('/api/result-receipt', params=params, headers=auth_a)
+        assert recovered.status_code == 200, recovered.text
+        assert recovered.json()['committed'] is True
+        assert recovered.json()['completed']['elapsedMs'] == 42000
+        assert recovered.json()['completed']['points'] == 15
+        foreign = client.get('/api/result-receipt', params=params, headers={'Authorization': 'Bearer '+tokens[1]})
+        assert foreign.json()['committed'] is False
+        for key in params:
+            mismatch = client.get('/api/result-receipt', params={**params, key: 'mismatched'}, headers=auth_a)
+            assert mismatch.status_code == 200 and mismatch.json()['committed'] is False
+        with connect() as c:
+            after_recovery = [c.execute(sql.SQL('select count(*) from {} where player_id=%s').format(sql.Identifier(table)), (players[0],)).fetchone()[0] for table in ('result_commands', 'puzzle_runs', 'results')]
+            assert after_recovery == before_recovery
+            assert c.execute('select sum(points) from results where player_id=%s', (players[0],)).fetchone()[0] == before_xp
+        report['checks'].append('desktop/Fold conflict: owned durable proof, canonical history, foreign/mismatched denial, no new rows or XP')
         # Result receipts are player-scoped. An ID collision must never change
         # A's attempt or replay A's receipt to B. Current offline compatibility
         # records B's own result while leaving the collided telemetry untouched.
@@ -294,3 +318,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

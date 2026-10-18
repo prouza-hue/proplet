@@ -36,7 +36,7 @@ function create(deps){
      const profile=deps.profile();
      const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile});
      const practice=mode==='daily_special'&&puzzle?.meta?.dailySpecialBinding?.rewardEligible===false;
-     if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)))return {restored:null,fairPlay:false,replay:true};
+     if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)||await deps.completedAttempt?.(puzzle,mode,dailyDate,row.attempt_id,profile)))return {restored:null,fairPlay:false,replay:true};
      return {restored:{...restored,...row.progress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,timingUnverified:!!restored?.timingUnverified||row.verified===false},fairPlay:true};
    }catch(error){
      if(error.status===409)throw error;
@@ -47,6 +47,7 @@ function create(deps){
  function pause(g){stop();return send(g,'pause')}
  async function resume(g){
    await deps.claim?.();
+   const profile=deps.profile();
    const row=await send(g,'open');
    if(row){
      const progress=row.progress||{},found=new Map();
@@ -56,7 +57,11 @@ function create(deps){
      for(const key of ['moves','hints','wrongAttempts','maxHintLevel'])g[key]=Math.max(g[key]||0,progress[key]||0);
      g.calmMode=!!(g.calmMode||progress.calmMode);
      g.baseElapsedMs=Math.max(deps.elapsed(g),Number(row.elapsed_ms)||0);g.start=deps.now();g.pausedAt=g.start;
-     g.attemptId=row.attempt_id;deps.restored?.(g);
+     g.attemptId=row.attempt_id;
+     if(row.finished){
+       try{if(await deps.completedAttempt?.(g.puzzle,g.mode,g.dailyDate,row.attempt_id,profile)){g.remoteCommitted=true;g.fairPlay=false}}catch{/* A pending result must stay playable and queued until proof arrives. */}
+     }
+     deps.restored?.(g);
    }
    return row;
  }
@@ -65,4 +70,5 @@ function create(deps){
 }
 const api={create};if(global)global.PropletFairPlay=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
+
 

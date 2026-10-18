@@ -16,7 +16,21 @@ function has(source,pattern,label){assert(pattern.test(source),label)}
 
 // Baseline: finishGame owns persistence, queueing, telemetry, win UI and leaderboard scheduling.
 has(app,/async function finishGame\(\)/,'finishGame entry missing');
-has(app,/saveState\(state\);g\.resultRecord=rec;queueResult\(rec\);g\.finishTelemetryPromise=finishAttemptTelemetry\(rec\)/,'completion persistence order drifted');
+has(app,/saveState\(state\);g\.resultRecord=rec;if\(!g\.remoteCommitted\)queueResult\(rec\);g\.finishTelemetryPromise=g\.remoteCommitted\?Promise\.resolve\(null\):finishAttemptTelemetry\(rec\)/,'completion persistence order drifted');
+// A server-confirmed completion still persists before showing its win, but
+// must not enqueue or finish telemetry a second time on the returning device.
+const persistence=app.match(/saveState\(state\);g\.resultRecord=rec;[^\n]+?g\.finishTelemetryPromise=[^;]+;/)[0];
+for(const remoteCommitted of [false,true]){
+  const events=[],g={remoteCommitted},state={},rec={};
+  new Function('saveState','queueResult','finishAttemptTelemetry','state','g','rec',persistence)(
+    value=>{assert.strictEqual(value,state);events.push('save')},
+    value=>{assert.strictEqual(value,rec);events.push('queue')},
+    value=>{assert.strictEqual(value,rec);events.push('telemetry');return Promise.resolve()},state,g,rec);
+  assert.strictEqual(g.resultRecord,rec);
+  assert.deepStrictEqual(events,remoteCommitted?['save']:['save','queue','telemetry']);
+  assert.strictEqual(typeof g.finishTelemetryPromise.then,'function');
+}
+
 has(app,/renderRunWinXp\(g\)/,'win XP render missing');
 has(app,/renderWinFeedback\(\);confetti\(\);fx\('win'\);renderDaily\(\);renderFree\(\);renderProfile\(\)/,'win render sequence drifted');
 has(app,/syncQueue\(\{announce:false,waitForProfile:false\}\)\.then/,'post-win sync scheduling missing');
@@ -61,3 +75,4 @@ assert.strictEqual(core.register({id:'late',priority:1,before:()=>order.push('du
   assert.deepStrictEqual(core.registeredIds(),['early','late']);
   console.log('PASS: Sprint 11A explicit completion pipeline preserves ownership and hook order');
 })().catch(error=>{console.error(error);process.exitCode=1});
+

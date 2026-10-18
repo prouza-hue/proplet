@@ -67,6 +67,9 @@ async function omitStatistics(ctx){
    const ctx=await context(browser,{guest:mode==='guest',touch:mode==='normal-touch'});let requests=0,release;
    if(!mode.startsWith('normal'))await omitStatistics(ctx);
    let retry=false;
+   // Two independent profile sections may both offer recovery. Exercise both
+   // failures and target the statistics control without relying on page-wide text.
+   if(mode==='failed')await ctx.route('**/api/team-victories/personal',route=>route.fulfill({status:503,json:{detail:'synthetic trophy outage'}}));
    if(mode==='delayed'||mode==='failed')await ctx.route('**/app/account/statistics.js*',async route=>{
     requests++;
     if(mode==='delayed')await new Promise(resolve=>release=resolve);
@@ -86,7 +89,8 @@ async function omitStatistics(ctx){
     assert.equal(await page.locator('.profile-ledger-count').count(),0,'unavailable statistics are not displayed as zero');
     release();await page.locator('.profile-ledger-count').first().waitFor();
    }else if(mode==='failed'){
-    await page.getByRole('button',{name:'Zkusit znovu',exact:true}).waitFor();
+    await page.locator('#retryProfileStatistics').waitFor();
+    await page.locator('#profileTeamVictories [data-tv-personal-retry]').waitFor();
     await page.waitForFunction(()=>!document.querySelector('#retryProfileStatistics').disabled);
     assert.match(await page.locator('#profileCard').innerText(),/uložený postup zůstává/);
     await page.evaluate(()=>{renderProfile();renderProfile();});assert.equal(requests,1,'failure does not create an automatic retry loop');
@@ -138,4 +142,5 @@ async function omitStatistics(ctx){
   console.log(JSON.stringify(evidence,null,2));
  }finally{if(browser)await browser.close();fixture.kill();}
 })().catch(e=>{console.error(e);console.error(fixtureLog);fixture.kill();process.exitCode=1});
+
 

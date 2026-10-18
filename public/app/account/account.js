@@ -257,6 +257,7 @@
       if (achievementSummary) achievementSummary.innerHTML = d.renderAchievementSummary(stats);
       if (achievementGrid) achievementGrid.innerHTML = d.renderAchievements(stats);
       global.PropletContinuation?.renderProfile(profile, stats);
+      global.PropletTeamVictories?.renderProfile(profile);
       d.syncAchievementDisclosure();
       const achievementToggle = d.$('#achievementToggleBtn');
       if (achievementToggle) achievementToggle.onclick = () => {
@@ -416,5 +417,6 @@
   if (global) global.PropletAccountUI = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : globalThis);
+
 
 

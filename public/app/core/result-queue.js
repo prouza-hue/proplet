@@ -20,6 +20,7 @@
     const write = typeof options.saveQueue === 'function' ? options.saveQueue : () => {};
     const post = typeof options.post === 'function' ? options.post : async () => {};
     const quarantine = typeof options.quarantine === 'function' ? options.quarantine : () => false;
+    const reconcile = typeof options.reconcile === 'function' ? options.reconcile : async () => false;
     const isActive = typeof options.isActive === 'function' ? options.isActive : () => true;
     let syncPromise = null;
     const now = options.now || (() => Date.now());
@@ -87,6 +88,7 @@
         const failed = [];
         let sent = 0;
         let quarantined = 0;
+        let reconciled = 0;
         let firstError = null;
         let stale = false;
         for (const item of snapshot) {
@@ -101,6 +103,17 @@
             // The response belongs to the captured session. Do not let its
             // late 401 overwrite backoff belonging to a renewed session.
             if (!isActive()) { stale = true; break; }
+            if (Number(error?.status) === 409 && error?.message === 'IDEMPOTENCY_CONFLICT') {
+              let resolved = false;
+              try { resolved = await reconcile(item) === true; } catch (_) { /* Keep the original queued result. */ }
+              if (!isActive()) { stale = true; break; }
+              if (resolved) {
+                confirmed.add(itemId);
+                reconciled++;
+                retry = {}; writeRetry(retry);
+                continue;
+              }
+            }
             if (Number(error?.status) === 400 && error?.message === 'Neznámá úloha' && quarantine(item, error.message)) {
               confirmed.add(itemId);
               quarantined++;
@@ -127,6 +140,7 @@
           left: remaining.length,
           sent,
           quarantined,
+          reconciled,
           ...(stale ? {stale:true} : {}),
           error: firstError,
           failedKeys: [...failedKeys],
@@ -139,8 +153,17 @@
     return {enqueue, getQueue: current, sync, resetAuthRetry, isSyncing: () => !!syncPromise};
   }
 
-  const api = {create, legacyId};
+  function confirmedResult(item, response) {
+    const row = response?.completed;
+    if (!item?.attemptId || response?.committed !== true || response.attemptId !== item.attemptId || !row) return null;
+    if (!['puzzleId','challengeKey','mode','difficulty'].every(key => item[key] && row[key] === item[key])) return null;
+    if (!Number.isFinite(Date.parse(row.completedAt)) || !(row.elapsedMs >= 1000) || !(row.moves >= 1)) return null;
+    return row;
+  }
+
+  const api = {create, legacyId, confirmedResult};
   if (global) global.PropletResultQueue = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : globalThis);
+
 

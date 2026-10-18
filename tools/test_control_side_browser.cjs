@@ -28,15 +28,17 @@ async function gesture(page,points,duringDrag){
     else await page.mouse.up();
   }
 }
-async function start(page,mode='free'){
-  await page.evaluate(async mode=>{
+async function start(page,mode='free',puzzleId=null){
+  await page.evaluate(async ({mode,puzzleId})=>{
     if(typeof closeOnboarding==='function')closeOnboarding(true);
     window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();
     document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
     document.querySelector('.release-notes-v3331-backdrop')?.remove();
-    await startGame(mode==='tajenka'?window.__sideTajenka:puzzleDB.free.hard[0],mode,null);
+    const puzzle=puzzleId?Object.values(puzzleDB.free).flat().find(p=>p.id===puzzleId):mode==='tajenka'?window.__sideTajenka:puzzleDB.free.hard[0];
+    if(!puzzle)throw new Error('Missing fixture board '+puzzleId);
+    await startGame(puzzle,mode,null);
     if(mode==='tajenka')closeTajenkaRules();
-  },mode);
+  },{mode,puzzleId});
   await page.waitForFunction(()=>document.body.classList.contains('playing')&&document.querySelectorAll('#board .cell').length>0);
   await settle(page);
 }
@@ -118,9 +120,53 @@ async function context(options){
   await page.evaluate(p=>window.__sideTajenka=p,JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/browser/tajenka.json'),'utf8')));
   await start(page,'tajenka');await geometry(page,true);await dragNext(page);await swapPreserving(page,false);
   assert(await page.evaluate(()=>document.querySelector('#tajenkaPhrase').previousElementSibling===document.querySelector('.current-word')),'Tajenka phrase remains below current word');checks.push('Tajenka drag and live phrase placement');
+  // A pending sync notification must not consume board height after folding
+  // or rotating, and must remain visible again outside gameplay.
+  await start(page,'free','g4-z-072');
+  assert.equal(await page.evaluate(()=>currentGame.puzzle.meta.geometryProfile),'gen4-mozkomor-endgame-10x10');
+  const pendingRecord=await page.evaluate(()=>{
+    saveProfile({id:'fold-fixture',token:'synthetic-fold',name:'Synthetic Fold'});
+    const row={queueId:'fold-pending',attemptId:'desktop-fold',puzzleId:currentGame.puzzle.id,challengeKey:'free:'+currentGame.puzzle.id,mode:'free',difficulty:currentGame.puzzle.difficulty,elapsedMs:43000,moves:13,completedAt:'2026-10-18T20:31:00Z'};
+    saveQueue([row]);renderOfflineStatus();return row;
+  });
+  let conflictPosts=0,receiptReads=0;
+  await page.route('**/api/result',async route=>{
+    assert.equal(route.request().headers().authorization,'Bearer synthetic-fold');conflictPosts++;
+    await route.fulfill({status:409,json:{detail:'IDEMPOTENCY_CONFLICT'}});
+  });
+  await page.route('**/api/result-receipt?*',async route=>{
+    assert.equal(route.request().headers().authorization,'Bearer synthetic-fold');receiptReads++;
+    const query=new URL(route.request().url()).searchParams;assert.equal(query.get('attempt_id'),'desktop-fold');
+    await route.fulfill({json:{committed:true,attemptId:'desktop-fold',completed:{...pendingRecord,elapsedMs:42000,completedAt:'2026-10-18T20:30:00Z',points:150}}});
+  });
+  for(const viewport of [{width:768,height:1000},{width:1000,height:768},{width:800,height:540},{width:768,height:1000}]){
+    await page.setViewportSize(viewport);await settle(page);
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display==='none');
+    const bounds=await page.locator('#board .cell').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {x:r.left,y:r.top,right:r.right,bottom:r.bottom}}));
+    assert(bounds.length>0);assert(bounds.every(r=>r.x>=-1&&r.y>=-1&&r.right<=viewport.width+1&&r.bottom<=viewport.height+1),'all board rows remain inside rotated Fold viewport');
+  }
+  await page.screenshot({path:path.join(artifacts,'fold-pending-portrait.png')});
+  await page.setViewportSize({width:1000,height:768});await settle(page);
+  await page.screenshot({path:path.join(artifacts,'fold-pending-landscape.png')});
+  await page.evaluate(()=>nav('profile'));
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display!=='none');
+  assert.match(await page.locator('#offlineConnectionStatus').innerText(),/čeká na odeslání/);
+  checks.push('Fold Mozkomor 72 (10×10) pending sync: full last row after portrait/landscape rotation; notification returns outside game');
+  const recovery=await page.evaluate(async()=>{
+    const result=await resultQueue().sync();renderOfflineStatus();
+    return {result,queue:getQueue(),completed:getState().completed,backup:JSON.parse(localStorage.getItem(scopedStorageKey(REJECTED_QUEUE_KEY))||'[]')};
+  });
+  assert.equal(recovery.result.reconciled,1);assert.equal(recovery.queue.length,0);
+  assert.equal(recovery.completed[pendingRecord.challengeKey].elapsedMs,42000);
+  assert.equal(recovery.backup[0].elapsedMs,43000);assert.equal(recovery.backup[0].rejectedReason,'ALREADY_COMMITTED');
+  assert.equal(conflictPosts,1);assert.equal(receiptReads,1);
+  await page.waitForFunction(()=>document.querySelector('#offlineConnectionStatus').hidden);
+  checks.push('native app: authenticated desktop/Fold conflict, canonical history and raw backup, empty queue, no resubmit');
+
   await ctx.close();
   const short=await context({viewport:{width:800,height:540},screen:{width:800,height:540},hasTouch:true}),sp=await boot(short);
   await start(sp,'tajenka');await geometry(sp,false);await swapPreserving(sp,true);checks.push('short landscape tablet Tajenka bounds');await short.close();
   const desktop=await context({viewport:{width:1440,height:900}}),dp=await boot(desktop);await start(dp);await geometry(dp,false);await swapPreserving(dp,true);await dragNext(dp);checks.push('desktop swap and drag');await desktop.close();
   assert.deepEqual(errors,[],'browser errors');console.log(JSON.stringify({passed:true,checks},null,2));
 })().catch(async error=>{console.error(error);for(const context of browser?.contexts()||[])for(const page of context.pages()){console.error(await page.evaluate(()=>({body:document.body.className,text:document.body.innerText.slice(-3000)})).catch(()=>null));await page.screenshot({path:path.join(artifacts,'failure.png')}).catch(()=>{});}process.exitCode=1}).finally(async()=>{fs.writeFileSync(path.join(artifacts,'report.json'),JSON.stringify({checks,errors,passed:!process.exitCode},null,2));await browser?.close();server?.kill()});
+
