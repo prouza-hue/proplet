@@ -24,6 +24,8 @@
   function syncWinLayout(win){
     const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
     if(!primary||!summary||!secondary)return;
+    if(typeof renderWinExtraAction==='function')renderWinExtraAction();
+    const extra=$('#winExtraBtn');
     const card=modal.querySelector('.win-card'),starter=modal.classList.contains('starter-win');
     const scroll=card.querySelector(':scope > .win-result-scroll'),footer=card.querySelector(':scope > .win-result-footer');
     // Preserve every child (including achievements) when leaving the old docked layout.
@@ -52,6 +54,7 @@
     const anchor=starter?summary:ranking||summary;
     if(anchor.nextElementSibling!==actions)anchor.after(actions);
     if(primary.parentElement!==actions)actions.append(primary);
+    if(extra&&(extra.parentElement!==actions||extra.nextElementSibling!==primary))primary.before(extra);
     if(win.parentElement!==actions||primary.nextElementSibling!==win)primary.after(win);
     modal.querySelector('.win-main-actions')?.remove();
   }

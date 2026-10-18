@@ -177,11 +177,12 @@ def main():
     assert sum(row[1] for row in awards) == 1
     with ThreadPoolExecutor(max_workers=10) as pool:
         awards = list(pool.map(lambda i: bonus('syntheticword'+str(i)), range(60)))
-    assert sum(row[1] for row in awards) == 49
-    assert bonus('anotherword')[2] == 'daily_limit'
+    assert sum(row[1] for row in awards) == 60
+    assert bonus('anotherword')[1] == 1
+    assert bonus('anotherword')[2] == 'duplicate'
     assert bonus('anotherword', players[1])[1] == 1
     with connect() as c:
-        assert c.execute('select sum(points) from account_rewards where player_id=%s', (players[0],)).fetchone()[0] == 50
+        assert c.execute('select sum(points) from account_rewards where player_id=%s', (players[0],)).fetchone()[0] == 62
         for role in ('anon', 'authenticated'):
             c.execute(sql.SQL('set role {}').format(sql.Identifier(role)))
             assert c.execute('select count(*) from account_rewards').fetchone()[0] == 0
@@ -193,7 +194,7 @@ def main():
                 pass
             finally:
                 c.execute('reset role')
-    report['checks'].append('concurrent bonus claims: exact deduplication, 50 XP daily cap, no cross-player cap')
+    report['checks'].append('concurrent bonus claims: exact deduplication, all 62 distinct words rewarded beyond 50 XP, no cross-player collision')
     report['checks'].append('rewards RLS hides synthetic rows from anon/authenticated; reward RPC denied')
 
     # Real HTTP result endpoint and real custom-token authentication. Only the

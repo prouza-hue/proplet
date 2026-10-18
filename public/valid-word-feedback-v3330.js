@@ -6,7 +6,6 @@
   const FAILSAFE_SHOWN_KEY='proplet-v3-32-8-valid-nonsolution-failsafe-shown';
   const DISCOVERY_STORE_BASE='proplet-v4-word-discovery-v1';
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
-  const DAILY_XP_LIMIT=50;
   const TRIGGER_STREAK=3;
   const BLOCKED_DISCOVERY_WORDS=new Set(['NEGR']);
   let localWords=null;
@@ -58,13 +57,6 @@
   };
 
   const localDay=()=>{try{return typeof pragueDateISO==='function'?pragueDateISO():new Date().toISOString().slice(0,10)}catch{return new Date().toISOString().slice(0,10)}};
-  const localLimitReason=(candidate,store)=>{
-    const entries=Object.values(store.entries||{}).filter(row=>['local','pending','confirmed'].includes(row?.status));
-    const daily=entries.filter(row=>(row?.rewardDay||String(row?.createdAt||'').slice(0,10))===localDay()).length;
-    if(daily>=DAILY_XP_LIMIT)return 'daily_limit';
-    return null;
-  };
-
   const refreshVisibleUi=()=>{
     try{if(typeof renderDaily==='function')renderDaily()}catch{}
     try{if(typeof renderFree==='function')renderFree()}catch{}
@@ -269,13 +261,10 @@
     const key=discoveryRewardKey(candidate.puzzleId,candidate.word);
     const s=scope();
     const store=readDiscoveryStore(s);
-    if(store.entries[key]){
+    if(store.entries[key]&&!(store.entries[key].status==='capped'&&store.entries[key].limitReason==='daily_limit')){
       if(store.entries[key].status==='pending'&&profile()?.token)syncDiscoveries();
       return 'duplicate';
     }
-
-    const limitReason=localLimitReason(candidate,store);
-    if(limitReason)return limitReason;
 
     const row={
       puzzleId:candidate.puzzleId,
@@ -432,7 +421,7 @@
           const awardState=await awardDiscovery(candidate);
           if(currentGame!==candidate.game||candidate.game.finished)return;
           const suffix=awardState==='awarded'?' · +1 XP'
-            :awardState==='daily_limit'?' · Dnešní limit 50 XP už máš.'
+            :awardState==='daily_limit'?' · Odměna čeká na aktualizaci serveru.'
             :awardState==='pending'?' · XP ověříme po připojení.'
             :awardState==='rejected'?' · Bonus XP se tentokrát nepřipsal.'
             :'';

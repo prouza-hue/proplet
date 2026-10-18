@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.3-control-side2';
+const APP_PREVIEW_RELEASE='proplet-v4.09.4-extra-entry1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -1330,7 +1330,24 @@ function bindProgressGuard(){
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){rememberProgressGuardDeparture();return}const away=consumeProgressGuardAwayTime();if(away>=PROGRESS_GUARD_MOBILE_AWAY_MS)setTimeout(()=>maybeOfferProgressGuard('mobile'),500)});
  if(document.visibilityState==='visible'&&progressGuardHasCoarsePointer()){const away=consumeProgressGuardAwayTime();if(away>=PROGRESS_GUARD_MOBILE_AWAY_MS)setTimeout(()=>maybeOfferProgressGuard('mobile'),900)}
 }
-function updateWinAccountCta(){if(window.PropletFirstSteps?.isFirstGame(currentGame)){ $('#winAccountBtn')?.classList.add('hidden');return; }const button=$('#winAccountBtn'),show=!!button&&!getProfile()?.token&&!!currentGame?.finished&&currentGame.mode!=='rescue'&&currentGame.mode!=='starter'&&!currentGame?.postStarterWarmup;button?.classList.toggle('hidden',!show);if(show&&!button.dataset.impression){button.dataset.impression='1';trackProductEvent('win_account_cta_shown')}else if(!show&&button)delete button.dataset.impression}
+function winExtraAvailable(){
+ if(!currentGame?.finished||currentGame.mode!=='daily'||currentGame.dailyDate!==pragueDateISO())return false;
+ const special=dailySpecialResultState();
+ return !!special.descriptor&&!!special.puzzle&&special.descriptor.dailyDate===pragueDateISO()&&special.descriptor.rewardEligible===true&&!special.active;
+}
+function renderWinExtraAction(){
+ const button=$('#winExtraBtn');if(!button)return;
+ const show=winExtraAvailable();if(button.classList.contains('hidden')===show)button.classList.toggle('hidden',!show);
+ if(button.textContent!=='Hraj Extra')button.textContent='Hraj Extra';
+}
+async function playExtraFromWin(){
+ const button=$('#winExtraBtn');if(button?.disabled)return;
+ if(!winExtraAvailable()){renderWinExtraAction();return}
+ const previous=currentGame;button&&(button.disabled=true);$('#winModal').classList.add('hidden');
+ try{await startSpecial();if(currentGame===previous)$('#winModal').classList.remove('hidden')}
+ finally{if(button)button.disabled=false;renderWinExtraAction()}
+}
+function updateWinAccountCta(){renderWinExtraAction();if(window.PropletFirstSteps?.isFirstGame(currentGame)){ $('#winAccountBtn')?.classList.add('hidden');return; }const button=$('#winAccountBtn'),show=!!button&&!getProfile()?.token&&!!currentGame?.finished&&currentGame.mode!=='rescue'&&currentGame.mode!=='starter'&&!currentGame?.postStarterWarmup;button?.classList.toggle('hidden',!show);if(show&&!button.dataset.impression){button.dataset.impression='1';trackProductEvent('win_account_cta_shown')}else if(!show&&button)delete button.dataset.impression}
 function restoreWinAfterAccountModal(){profileModalFromWin=false;if(!currentGame?.finished)return;$('#winModal').classList.remove('hidden');updateWinAccountCta()}
 function openAccountFromWin(){if(getProfile()?.token)return;trackProductEvent('win_account_cta_create');profileModalFromWin=true;$('#winModal').classList.add('hidden');openProfileModal('create')}
 async function refreshWinLeaderboardAfterAuth(){if(!currentGame?.finished)return;updateWinAccountCta();if(currentGame?.puzzle?.meta?.archiveExperience){window.PropletArchiveExperience?.renderResult(currentGame);return;}if(currentGame.mode==='daily')await loadWinDailyGlobalLeaderboard(currentGame.dailyDate||pragueDateISO(),getState().completed[`daily:${currentGame.dailyDate||pragueDateISO()}`]||currentGame);else if(currentGame.mode==='daily_special')await loadWinSpecialLeaderboard(currentGame.dailyDate,currentGame.resultRecord||getState().completed[currentGame.puzzle.meta?.dailySpecialBinding?.officialChallengeKey]||currentGame);else if(currentGame.mode==='free')await loadWinLevelLeaderboard(currentGame.puzzle,getState().completed[`free:${currentGame.puzzle.id}`]||currentGame)}
@@ -2432,7 +2449,7 @@ function bind(){
  $$('.modal').forEach(modal=>starterModalObserver.observe(modal,{attributes:true,attributeFilter:['class']}));
  $('#board').addEventListener('pointerdown',e=>{const g=currentGame;if(g?.mode==='starter'&&!g.finished&&g.pausedAt==null&&e.target.closest('.cell'))trackStarterPhase(g.starterTrace,'interaction')},{capture:true});
  $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));$('#playDailyBtn').onclick=startSelectedDaily;$('#shareDailyBtn').onclick=()=>{if(typeof isSpecialDailySelected==='function'&&isSpecialDailySelected()){shareSelectedDaily();return}const date=pragueDateISO(),daily=dailyResultState(date),rec=daily.active;if(!rec)return;currentGame=dailyResultSnapshot(daily.puzzle,date,rec);shareDaily()};
- $('#backFromGame').onclick=goBackFromGame;$('#hintBtn').onclick=openHintModal;$('#starterHintNudgeBtn').onclick=acceptStarterHintNudge;$('#starterHintNudgeDismiss').onclick=dismissStarterHintNudge;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winAccountBtn').onclick=openAccountFromWin;$('#winReplayBtn').onclick=replayDailyFromWin;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;$('#starterWarmupBtn').onclick=()=>{trackProductEvent('starter_easy_warmup_selected');startStarterWarmup()};$('#starterHardDailyBtn').onclick=()=>{trackProductEvent('starter_hard_direct_selected');startDaily({starterHardDirect:true})};
+ $('#backFromGame').onclick=goBackFromGame;$('#hintBtn').onclick=openHintModal;$('#starterHintNudgeBtn').onclick=acceptStarterHintNudge;$('#starterHintNudgeDismiss').onclick=dismissStarterHintNudge;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winExtraBtn').onclick=playExtraFromWin;$('#winAccountBtn').onclick=openAccountFromWin;$('#winReplayBtn').onclick=replayDailyFromWin;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;$('#starterWarmupBtn').onclick=()=>{trackProductEvent('starter_easy_warmup_selected');startStarterWarmup()};$('#starterHardDailyBtn').onclick=()=>{trackProductEvent('starter_hard_direct_selected');startDaily({starterHardDirect:true})};
  $('#closeProfileModal').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#skipProfileBtn').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');$('#legacyTeamLoginToggle').onclick=toggleLegacyTeamLogin;$('#joinLeagueModeBtn').onclick=()=>setLeagueCreateMode('join');$('#newLeagueModeBtn').onclick=()=>setLeagueCreateMode('new');$('#leagueSelect').onchange=renderLeaguePinField;$('#profilePasswordToggle').onclick=()=>togglePassword('playerPasswordInput',$('#profilePasswordToggle'));
  $('#nudgeCreateBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeBonusBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeLoginBtn').onclick=()=>openAccountFromNudge('login');$('#nudgeSkipBtn').onclick=dismissAccountNudge;
  $('#progressGuardGoogleBtn').onclick=openProgressGuardGoogle;$('#progressGuardCreateBtn').onclick=openProgressGuardAccount;$('#progressGuardBonusBtn').onclick=openProgressGuardAccount;$('#progressGuardDismissBtn').onclick=dismissProgressGuard;$('#closeProgressGuardModal').onclick=dismissProgressGuard;$('#progressGuardModal').onclick=e=>{if(e.target===$('#progressGuardModal'))dismissProgressGuard()};bindProgressGuard();

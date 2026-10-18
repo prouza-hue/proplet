@@ -139,9 +139,9 @@
       if(button){
         button.setAttribute('aria-pressed',String(selected==='special'));
         const name=deps.DIFF?.[special.puzzle?.difficulty]?.label||'Speciál';
-        button.setAttribute('aria-label',`${selected==='special'?'Přepnout na základní výzvu':'Přepnout na '+name} · dobrovolně, sérii neovlivní`);
+        button.setAttribute('aria-label',`${selected==='special'?'Přepnout na základní výzvu':'Přepnout na '+name} · dobrovolně`);
         const image=$('#dailySpecialTabIcon');if(image&&available)image.src=icon(special.puzzle.difficulty);
-        const status=$('#dailySpecialTabStatus');if(status)status.textContent=special.active?'✓':special.progress?'•':'';
+        const status=$('#dailySpecialTabStatus');if(status)status.textContent=special.active?'✓':'';
       }
       markWeek();
       scheduleIntro();
@@ -152,7 +152,7 @@
       if(action){
         action.classList.add('daily-special-action');
         const verb=done?'Zobrazit výsledek speciálu':progress?'Pokračovat ve speciálu':'Hrát '+(puzzle.difficulty==='hardcore'?'Mozkožrouta':puzzle.difficulty==='mozkomor'?'Mozkomora':'Mozkokalypsu');
-        action.innerHTML=`<span>${escape(verb)}</span><small>Sérii neovlivní</small>`;
+        action.innerHTML=`<span>${escape(verb)}</span>`;
       }
       // Sharing and sync details stay in the result dialog. The optional entry
       // uses precisely the same compact hero rows even after it is completed.

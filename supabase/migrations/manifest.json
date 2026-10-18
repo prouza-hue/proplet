@@ -542,6 +542,19 @@
       "production_migration_version": "20261015172945"
     },
     {
+      "id": "20261017-word-discovery-unlimited",
+      "order": 500,
+      "version": "2026.10.17",
+      "path": "supabase/migrations/20261017235243_word_discovery_unlimited.sql",
+      "type": "migration",
+      "status": "current-history",
+      "sha256": "b5fa25ebf29886a0147e8067302ae795d1aa21437728506a2c03f53c8931f48f",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_claim_word_discovery"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

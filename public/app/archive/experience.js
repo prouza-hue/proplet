@@ -126,15 +126,15 @@ function resultConfirmed(rec,receipt,owner){
 }
 // One structure for every discovery destination. The action is an actual button;
 // the surrounding article is never a second, ambiguous hit target.
-function destination({id='',kind,title,description,art,action,label}){
- return '<article '+(id?'id="'+id+'" ':'')+'class="ax-destination ax-'+kind+'-entry"><div class="ax-entry-copy"><h2>'+title+'</h2><p class="ax-entry-description">'+description+'</p></div><div class="ax-entry-art" aria-hidden="true">'+art+'</div><button type="button" class="ax-card-action ax-browse-action" data-archive-action="'+action+'">'+label+' '+ico('arrow')+'</button></article>';
+function destination({id='',kind,title,description,art,action,label,interactiveArt=false}){
+ return '<article '+(id?'id="'+id+'" ':'')+'class="ax-destination ax-'+kind+'-entry"><div class="ax-entry-copy"><h2>'+title+'</h2><p class="ax-entry-description">'+description+'</p></div><div class="ax-entry-art"'+(interactiveArt?'':' aria-hidden="true"')+'>'+art+'</div><button type="button" class="ax-card-action ax-browse-action" data-archive-action="'+action+'">'+label+' '+ico('arrow')+'</button></article>';
 }
 function archiveEntry(){return destination({kind:'archive',title:'Archiv Propletu',description:'800 původních desek',art:archiveArt(),action:'open',label:'Vybrat archivní desku'});}
 function home(){
  if(!installed)return;
  const root=q('#screen-daily');if(!root)return;
  let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div>';root.append(games);}
- if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(DIFF).map(diff=>difficultyIconMarkup(diff,'ax-free-difficulty')).join('')+'</div>',action:'free',label:'Vybrat hru'}));}
+ if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(DIFF).map(diff=>'<button type="button" class="ax-free-start" data-home-free="'+diff+'" aria-label="Hrát '+esc(DIFF[diff].label)+'" title="'+esc(DIFF[diff].label)+'">'+difficultyIconMarkup(diff,'ax-free-difficulty')+'</button>').join('')+'</div>',action:'free',label:'Vybrat hru',interactiveArt:true}));}
  let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Hraj s týmem o zlatou trofej',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
@@ -279,6 +279,7 @@ function review(){
 }
 async function onClick(e){
  const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.homeFree&&Object.hasOwn(DIFF,b.dataset.homeFree)){e.preventDefault();startFree(b.dataset.homeFree);return;}
  if(b.dataset.reviewExtra){window.PropletArchiveReview.setScenario({extra:b.dataset.reviewExtra});return;}
  if(b.dataset.reviewReferral){window.PropletArchiveReview.setScenario({referral:b.dataset.reviewReferral});return;}
  if(b.dataset.archiveDiff){archiveState.diff=b.dataset.archiveDiff;archiveState.page=0;renderArchive();return;}

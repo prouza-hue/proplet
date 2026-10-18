@@ -38,8 +38,8 @@ WORDFREQ_ZIPF_THRESHOLD_PLAIN = 2.85
 
 WORD_DISCOVERY_REWARD_PREFIX = "word_discovery_v1:"
 WORD_DISCOVERY_XP = 1
-WORD_DISCOVERY_BOARD_XP_LIMIT = None  # No per-board cap; daily cap and deduplication still apply.
-WORD_DISCOVERY_DAILY_XP_LIMIT = 50
+WORD_DISCOVERY_BOARD_XP_LIMIT = None  # No per-board cap; reward-key deduplication still applies.
+WORD_DISCOVERY_DAILY_XP_LIMIT = None
 RECOGNITION_VERSION = 6
 RECOGNITION_BLOCKLIST = frozenset({"negr"})
 
@@ -122,7 +122,7 @@ def _discovery_summary(rows: list[dict], *, puzzle_id: str = "", today: str = ""
         "boardDiscoveryXp": board_xp,
         "dailyDiscoveryXp": daily_xp,
         "boardRemainingXp": None,
-        "dailyRemainingXp": max(0, WORD_DISCOVERY_DAILY_XP_LIMIT - daily_xp),
+        "dailyRemainingXp": None,
     }
 
 
@@ -409,27 +409,6 @@ def install_word_recognition(
             }
 
         now = datetime.now(tz) if tz else datetime.now().astimezone()
-        usage = _discovery_summary(
-            _rows,
-            puzzle_id=payload.puzzle_id,
-            today=now.date().isoformat(),
-            tz=tz,
-        )
-        limit_reason = None
-        if usage["dailyDiscoveryXp"] >= WORD_DISCOVERY_DAILY_XP_LIMIT:
-            limit_reason = "daily_limit"
-        if limit_reason:
-            return {
-                "ok": True,
-                "recognized": True,
-                "source": source,
-                "newlyGranted": False,
-                "awardedPoints": 0,
-                "rewardKey": reward_key,
-                "limitReason": limit_reason,
-                **response_state(player["id"], puzzle_id=payload.puzzle_id),
-            }
-
         # Preview deployments share the production database. QA may exercise the complete UX,
         # but never writes reward rows. The dedicated Mozkomor calibration client disables XP
         # altogether, so this simulation is only for normal preview regression testing.
