@@ -28,15 +28,17 @@ async function gesture(page,points,duringDrag){
     else await page.mouse.up();
   }
 }
-async function start(page,mode='free'){
-  await page.evaluate(async mode=>{
+async function start(page,mode='free',puzzleId=null){
+  await page.evaluate(async ({mode,puzzleId})=>{
     if(typeof closeOnboarding==='function')closeOnboarding(true);
     window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();
     document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
     document.querySelector('.release-notes-v3331-backdrop')?.remove();
-    await startGame(mode==='tajenka'?window.__sideTajenka:puzzleDB.free.hard[0],mode,null);
+    const puzzle=puzzleId?Object.values(puzzleDB.free).flat().find(p=>p.id===puzzleId):mode==='tajenka'?window.__sideTajenka:puzzleDB.free.hard[0];
+    if(!puzzle)throw new Error('Missing fixture board '+puzzleId);
+    await startGame(puzzle,mode,null);
     if(mode==='tajenka')closeTajenkaRules();
-  },mode);
+  },{mode,puzzleId});
   await page.waitForFunction(()=>document.body.classList.contains('playing')&&document.querySelectorAll('#board .cell').length>0);
   await settle(page);
 }
@@ -120,7 +122,8 @@ async function context(options){
   assert(await page.evaluate(()=>document.querySelector('#tajenkaPhrase').previousElementSibling===document.querySelector('.current-word')),'Tajenka phrase remains below current word');checks.push('Tajenka drag and live phrase placement');
   // A pending sync notification must not consume board height after folding
   // or rotating, and must remain visible again outside gameplay.
-  await start(page);
+  await start(page,'free','g4-z-072');
+  assert.equal(await page.evaluate(()=>currentGame.puzzle.meta.geometryProfile),'gen4-mozkomor-endgame-10x10');
   const pendingRecord=await page.evaluate(()=>{
     saveProfile({id:'fold-fixture',token:'synthetic-fold',name:'Synthetic Fold'});
     const row={queueId:'fold-pending',attemptId:'desktop-fold',puzzleId:currentGame.puzzle.id,challengeKey:'free:'+currentGame.puzzle.id,mode:'free',difficulty:currentGame.puzzle.difficulty,elapsedMs:43000,moves:13,completedAt:'2026-10-18T20:31:00Z'};
@@ -148,7 +151,7 @@ async function context(options){
   await page.evaluate(()=>nav('profile'));
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display!=='none');
   assert.match(await page.locator('#offlineConnectionStatus').innerText(),/čeká na odeslání/);
-  checks.push('Fold pending sync: full last row after portrait/landscape rotation; notification returns outside game');
+  checks.push('Fold Mozkomor 72 (10×10) pending sync: full last row after portrait/landscape rotation; notification returns outside game');
   const recovery=await page.evaluate(async()=>{
     const result=await resultQueue().sync();renderOfflineStatus();
     return {result,queue:getQueue(),completed:getState().completed,backup:JSON.parse(localStorage.getItem(scopedStorageKey(REJECTED_QUEUE_KEY))||'[]')};
