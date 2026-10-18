@@ -84,6 +84,8 @@ const server=http.createServer(async(req,res)=>{
     return json(res,200,p==='/api/player'?{...syntheticProfile,accountCreated:true}:{profile:syntheticProfile,linked:false,accountCreated:true});
    }
    if(p==='/api/result'){if(controls.result==='fail')return json(res,503,{detail:'synthetic save outage'});controls.progress.push({...data,puzzleId:data.puzzle_id,challengeKey:data.challenge_key,contentGeneration:data.content_generation,completedAt:data.completed_at});return json(res,200,{ok:true,synthetic:true})}
+   if(p==='/api/team-victories/personal'&&req.method==='GET')return json(res,200,{enabled:true,totalGold:0,history:[]});
+   if(p==='/api/team-victories'&&req.method==='GET')return json(res,200,{enabled:true,team:null,intro:{eligible:false,seen:true},pendingAward:null,history:[],previousWeekWinner:false});
    if(p==='/api/me')return json(res,200,syntheticProfile);
    if(p==='/api/progress')return json(res,200,{completed:controls.progress});
    if(p==='/api/account/snapshot')return json(res,200,{...syntheticProfile,completed:controls.progress,cursor:new Date().toISOString()});
@@ -103,6 +105,7 @@ const server=http.createServer(async(req,res)=>{
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });
 server.listen(Number(process.env.PORT||8765),'127.0.0.1',()=>console.log(`Synthetic onboarding fixture ${sha} on ${server.address().port}`));
+
 
 
 
