@@ -7,7 +7,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||(process.env.CODEX_PRIMA
 const root=path.resolve(__dirname,'..'),base=process.env.TEST_URL||'http://127.0.0.1:8891';
 assert(['127.0.0.1','localhost'].includes(new URL(base).hostname),'isolated loopback fixture required');
 const artifacts=path.join(root,'artifacts/ranking-navigation');fs.mkdirSync(artifacts,{recursive:true});
-let browser,server;const errors=[],checks=[];
+let browser,server;const errors=[],checks=[],missingAssets=new Set();
 const settle=page=>page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
 const rows=(name,count,mine=count-2)=>Array.from({length:count},(_,i)=>({rank:i+1,name:`${name} ${i+1}`,avatar:'🦊',isMine:i===mine,xp:2000-i,lifetimePoints:4000,memberCount:3,players:3,score:100-i/100,moves:10,cleanSolve:true,elapsedMs:27000+i*1000}));
 const data=(name,players,teams=3)=>({players:rows(name,players),teams:rows(`${name} tým`,teams),visibilityReady:true});
@@ -23,13 +23,13 @@ async function placeControls(page,kind,top=68){
 }
 async function stableControls(page,kind,expected,label){
  await settle(page);const actual=await page.locator(control(kind)).evaluate(el=>el.getBoundingClientRect().top);
- if(Math.abs(actual-expected)>3)console.error('Ranking anchor diagnostics',await page.evaluate(()=>({
+ if(Math.abs(actual-expected)>3)console.error('Ranking anchor diagnostics',JSON.stringify(await page.evaluate(()=>({
   scrollY,viewport:{width:innerWidth,height:innerHeight},scrollHeight:document.scrollingElement.scrollHeight,
   focus:document.activeElement?.outerHTML,screen:typeof currentScreen==='undefined'?null:currentScreen,
-  state:rankingsOrchestration().getState(),
+  state:rankingsOrchestration().getState(),trace:window.__rankingViewportTrace||[],
   sections:[...document.querySelectorAll('#screen-leaderboard .ranking-navigation-section')].map(section=>({top:section.getBoundingClientRect().top,height:section.getBoundingClientRect().height,rows:section.querySelectorAll('.ranking-row').length})),
   tail:document.querySelector('.ranking-viewport-tail')?.getBoundingClientRect().height,
- })));
+ })),null,2));
  assert(Math.abs(actual-expected)<=3,`${label}: controls moved from ${expected} to ${actual}`);
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${label}: horizontal overflow`);
 }
@@ -54,6 +54,7 @@ async function run(viewport){
   localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
  });
  const page=await ctx.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
+ page.on('response',response=>{if(response.status()===404)missingAssets.add(new URL(response.url()).pathname)});
  const calls=[],pending=[],waiters=[];let hold=false;
  const next=(kind,period)=>new Promise(resolve=>{const found=pending.find(row=>!row.claimed&&row.kind===kind&&row.period===period);if(found){found.claimed=true;resolve(found)}else waiters.push({kind,period,resolve})});
  await page.route('**/*',async route=>{
@@ -72,6 +73,17 @@ async function run(viewport){
   return route.fulfill({status:answer.status||200,contentType:'application/json',body:JSON.stringify(answer.body)});
  });
  await page.goto(base,{waitUntil:'domcontentloaded'});await ready(page);
+ await page.evaluate(()=>{
+  window.__rankingViewportTrace=[];
+  window.__recordRankingViewport=(phase,target)=>{
+   const group=document.querySelector('.ranking-control-row');
+   window.__rankingViewportTrace.push({phase,scrollY,groupTop:group?.getBoundingClientRect().top,targetTop:target?.getBoundingClientRect?.().top,target:target?.className,state:rankingsOrchestration().getState()});
+   if(window.__rankingViewportTrace.length>24)window.__rankingViewportTrace.shift();
+  };
+  for(const type of ['pointerdown','click'])for(const capture of [true,false])document.addEventListener(type,event=>{
+   if(event.target.closest?.('.ranking-scope-tab,.ranking-period-tab,.ranking-retry'))window.__recordRankingViewport(type+(capture?':capture':':bubble'),event.target);
+  },capture);
+ });
  assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6,'Daily preview shows 5 leaders plus distant own rank');
  assert.equal(await page.locator('#xpLeaderboardList .ranking-row').count(),6,'XP preview shows 5 leaders plus distant own rank');
  assert(await page.locator('#dailyLeaderboardList .ranking-row.me').count()===1,'own Daily place visible');
@@ -115,11 +127,23 @@ async function run(viewport){
  await stableControls(page,'xp',top,'retry');assert(await page.locator('[data-ranking-period="all"]').evaluate(el=>document.activeElement===el),'retry gives focus to selected period control');
  // A new cached control click renews the global viewport context for a
  // Daily request that was already pending before that click.
- await page.evaluate(()=>{void renderLeaderboard()});const supersededXp=await next('xp','all'),renewedDaily=await next('daily','daily');
+ await page.evaluate(()=>{window.__recordRankingViewport('before-renewed-refresh');void renderLeaderboard();window.__recordRankingViewport('after-renewed-refresh-call')});const supersededXp=await next('xp','all'),renewedDaily=await next('daily','daily');
+ await page.evaluate(()=>window.__recordRankingViewport('before-renewed-click'));
  await page.locator('[data-ranking-xp-scope="teams"]').click();
+ await page.evaluate(()=>window.__recordRankingViewport('after-renewed-click'));
  supersededXp.release({body:data('Překonaná obnova XP',24,4)});renewedDaily.release({body:data('Obnovená dlouhá výzva',120,9)});
  await page.waitForFunction(()=>document.querySelector('#dailyLeaderboardList').textContent.includes('Obnovená dlouhá výzva'));await stableControls(page,'xp',top,'pending Daily follows a renewed XP control anchor');
  assert(!(await page.locator('#xpLeaderboardList').textContent()).includes('Překonaná obnova XP'),'superseded XP refresh does not overwrite a newer cached scope switch');
+ // Focus/viewport adjustment can occur after pointerdown and before click.
+ // Dispatch those phases explicitly so the race does not depend on Chromium's
+ // focus-scroll timing or whether the checkout's native art is already cached.
+ await page.evaluate(()=>{
+  const button=document.querySelector('[data-ranking-xp-scope="players"]');
+  button.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));
+  window.scrollBy({top:-120,behavior:'instant'});
+  button.click();
+ });
+ await stableControls(page,'xp',top,'pointerdown position survives focus scroll before click');
  // Native art decoration can settle later than the response's first animation
  // frames. Exercise a genuinely later row-height change above the active
  // controls, independently of machine speed or missing local image assets.
@@ -167,5 +191,6 @@ async function run(viewport){
  browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
  for(const viewport of [{width:320,height:780},{width:390,height:844},{width:768,height:1000},{width:1000,height:768}])await run(viewport);
  assert.deepEqual(errors,[],'browser JavaScript exceptions');
- fs.writeFileSync(path.join(artifacts,'report.json'),JSON.stringify({ok:true,checks,errors},null,2));console.log('PASS ranking navigation browser: '+checks.join('; '));
+ assert.deepEqual([...missingAssets],[],'complete native assets are required for representative ranking geometry');
+ fs.writeFileSync(path.join(artifacts,'report.json'),JSON.stringify({ok:true,checks,errors,missingAssets:[...missingAssets]},null,2));console.log('PASS ranking navigation browser: '+checks.join('; '));
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{await browser?.close();server?.kill()});

@@ -60,7 +60,7 @@
     const compactLimit=5,cacheLifetimeMs=30000;
     const sections=new Map(),expandedViews=new Set(),cache=new Map(),inflight=new Map();
     const requestVersions={xp:0,daily:0};
-    let interactionVersion=0,viewportTail=null,activeAnchor=null,lastAnchorInvalidation=null,layoutObserver=null;
+    let interactionVersion=0,viewportTail=null,activeAnchor=null,pointerAnchor=null,lastAnchorInvalidation=null,layoutObserver=null;
     const page=()=>globalThis.window||globalThis;
     const accountKey=()=>{const p=getProfile();return `${p?.id||''}:${p?.token||''}`};
     const viewKey=kind=>kind==='xp'?`xp:${rankingXpScope}:${rankingXpPeriod}`:`daily:${rankingDailyScope}`;
@@ -82,11 +82,19 @@
       // resize these boxes, so the observer has no feedback loop.
       for(const {section} of sections.values())layoutObserver.observe(section);
     }
-    function rememberAnchor(element){const anchor=captureAnchor(element);activeAnchor=anchor;observeAnchorLayout();return anchor}
+    function rememberAnchor(element){
+      // Pointer focus can scroll between pointerdown and click. Use the position
+      // from the start of that interaction rather than blessing the moved view.
+      const target=controlsFor(element)||element;
+      const anchor=pointerAnchor?.element===target&&pointerAnchor.interaction===interactionVersion&&pointerAnchor.identity===accountKey()?pointerAnchor:captureAnchor(target);
+      pointerAnchor=null;activeAnchor=anchor;observeAnchorLayout();restoreAnchor(anchor);return anchor;
+    }
+    function liveAnchor(){return activeAnchor?.interaction===interactionVersion&&activeAnchor.identity===accountKey()&&activeAnchor.element.isConnected?activeAnchor:null}
+    function controlsFor(element){return [...sections.values()].find(section=>section.controls?.contains(element))?.controls||null}
     function visibleAnchor(){
       const candidates=[...sections.values()].map(section=>section.controls||section.head);
       const active=globalThis.document?.activeElement;
-      return (candidates.some(element=>element?.contains?.(active))?captureAnchor(active):null)||candidates.map(captureAnchor).find(Boolean)||null;
+      return (candidates.some(element=>element?.contains?.(active))?captureAnchor(controlsFor(active)):null)||candidates.map(captureAnchor).find(Boolean)||null;
     }
     function restoreAnchor(anchor){
       if(!anchor||anchor.interaction!==interactionVersion||!anchor.element.isConnected)return;
@@ -262,7 +270,7 @@
 
     let renderVersion=0;
     async function renderLeaderboard(){
-      const version=++renderVersion,anchor=visibleAnchor();if(anchor){activeAnchor=anchor;observeAnchorLayout()}
+      const version=++renderVersion,anchor=liveAnchor()||visibleAnchor();if(anchor){activeAnchor=anchor;observeAnchorLayout()}
       const xpList=$('#xpLeaderboardList'),dailyList=$('#dailyLeaderboardList');if(!xpList||!dailyList)return;
       await ensureProfile();if(version!==renderVersion)return;
       installSections();anchored(anchor,()=>{renderRankingPrivacyNote();syncControls();renderRankingTeamCard()});maybeShowRankingPrivacyNotice();
@@ -273,8 +281,19 @@
       if(installed)return false;
       installed=true;
       installSections();
-      const invalidateAnchor=event=>{interactionVersion++;activeAnchor=null;layoutObserver?.disconnect();lastAnchorInvalidation=event?.type||'navigation'};
-      for(const type of ['wheel','touchmove','pointerdown'])globalThis.document?.addEventListener(type,invalidateAnchor,{passive:true});
+      const invalidateAnchor=event=>{interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();lastAnchorInvalidation=event?.type||'navigation'};
+      for(const type of ['wheel','touchmove'])globalThis.document?.addEventListener(type,invalidateAnchor,{passive:true});
+      globalThis.document?.addEventListener('pointerdown',event=>{
+        const previous=liveAnchor(),button=event.target.closest?.('.ranking-scope-tab,.ranking-period-tab,.ranking-daily-tab');
+        invalidateAnchor(event);
+        if(!button)return;
+        const controls=controlsFor(button),anchor=captureAnchor(controls||button);if(!anchor)return;
+        // Continue an unchanged control group's established viewport position.
+        // A preceding real scroll already invalidated previous, so it always
+        // starts a fresh interaction at the user's chosen position instead.
+        if(previous&&controls&&previous.element===controls)anchor.top=previous.top;
+        pointerAnchor=anchor;
+      },{capture:true,passive:true});
       globalThis.document?.addEventListener('keydown',invalidateAnchor);
       globalThis.document?.addEventListener('proplet:account-changed',invalidateAnchor);
       globalThis.document?.addEventListener('proplet:screen-changed',event=>{invalidateAnchor(event);if(viewportTail)viewportTail.style.height='0px';maybeShowRankingPrivacyNotice()});
