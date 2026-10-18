@@ -121,7 +121,21 @@ async function context(options){
   // A pending sync notification must not consume board height after folding
   // or rotating, and must remain visible again outside gameplay.
   await start(page);
-  await page.evaluate(()=>{saveQueue([{queueId:'fold-pending',puzzleId:currentGame.puzzle.id,challengeKey:'free:'+currentGame.puzzle.id,mode:'free'}]);renderOfflineStatus()});
+  const pendingRecord=await page.evaluate(()=>{
+    saveProfile({id:'fold-fixture',token:'synthetic-fold',name:'Synthetic Fold'});
+    const row={queueId:'fold-pending',attemptId:'desktop-fold',puzzleId:currentGame.puzzle.id,challengeKey:'free:'+currentGame.puzzle.id,mode:'free',difficulty:currentGame.puzzle.difficulty,elapsedMs:43000,moves:13,completedAt:'2026-10-18T20:31:00Z'};
+    saveQueue([row]);renderOfflineStatus();return row;
+  });
+  let conflictPosts=0,receiptReads=0;
+  await page.route('**/api/result',async route=>{
+    assert.equal(route.request().headers().authorization,'Bearer synthetic-fold');conflictPosts++;
+    await route.fulfill({status:409,json:{detail:'IDEMPOTENCY_CONFLICT'}});
+  });
+  await page.route('**/api/result-receipt?*',async route=>{
+    assert.equal(route.request().headers().authorization,'Bearer synthetic-fold');receiptReads++;
+    const query=new URL(route.request().url()).searchParams;assert.equal(query.get('attempt_id'),'desktop-fold');
+    await route.fulfill({json:{committed:true,attemptId:'desktop-fold',completed:{...pendingRecord,elapsedMs:42000,completedAt:'2026-10-18T20:30:00Z',points:150}}});
+  });
   for(const viewport of [{width:768,height:1000},{width:1000,height:768},{width:800,height:540},{width:768,height:1000}]){
     await page.setViewportSize(viewport);await settle(page);
     await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display==='none');
@@ -135,6 +149,17 @@ async function context(options){
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('#offlineConnectionStatus')).display!=='none');
   assert.match(await page.locator('#offlineConnectionStatus').innerText(),/čeká na odeslání/);
   checks.push('Fold pending sync: full last row after portrait/landscape rotation; notification returns outside game');
+  const recovery=await page.evaluate(async()=>{
+    const result=await resultQueue().sync();renderOfflineStatus();
+    return {result,queue:getQueue(),completed:getState().completed,backup:JSON.parse(localStorage.getItem(scopedStorageKey(REJECTED_QUEUE_KEY))||'[]')};
+  });
+  assert.equal(recovery.result.reconciled,1);assert.equal(recovery.queue.length,0);
+  assert.equal(recovery.completed[pendingRecord.challengeKey].elapsedMs,42000);
+  assert.equal(recovery.backup[0].elapsedMs,43000);assert.equal(recovery.backup[0].rejectedReason,'ALREADY_COMMITTED');
+  assert.equal(conflictPosts,1);assert.equal(receiptReads,1);
+  await page.waitForFunction(()=>document.querySelector('#offlineConnectionStatus').hidden);
+  checks.push('native app: authenticated desktop/Fold conflict, canonical history and raw backup, empty queue, no resubmit');
+
   await ctx.close();
   const short=await context({viewport:{width:800,height:540},screen:{width:800,height:540},hasTouch:true}),sp=await boot(short);
   await start(sp,'tajenka');await geometry(sp,false);await swapPreserving(sp,true);checks.push('short landscape tablet Tajenka bounds');await short.close();

@@ -457,8 +457,14 @@
         "path": "tests/current/test_result_queue.js",
         "runner": "node"
       },
-      {"path":"tests/current/test_result_reconciliation.js","runner":"node"},
-      {"path":"tests/current/test_result_reconciliation.py","runner":"python"},
+      {
+        "path": "tests/current/test_result_reconciliation.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_result_reconciliation.py",
+        "runner": "python"
+      },
       {
         "path": "tests/current/test_domain_golden.js",
         "runner": "node"

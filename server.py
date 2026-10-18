@@ -2356,7 +2356,6 @@ def me(request: Request, authorization: Optional[str] = Header(default=None)):
     }
 
 
-
 def result_completion_payload(r: dict) -> dict:
     info = free_puzzle_info(str(r.get("puzzle_id") or ""), str(r.get("difficulty") or "")) if r.get("mode") == "free" else None
     return {
