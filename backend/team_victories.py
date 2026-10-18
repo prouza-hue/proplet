@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 from typing import Literal
 from uuid import UUID
+from datetime import date, timedelta
 
 from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
@@ -60,7 +61,21 @@ class Seen(BaseModel):
     awardId: UUID | None = None
 
 
-def install(app, *, auth_player, db_rpc, enforce_rate_limit):
+def personal_state(rows: list[dict]) -> dict:
+    # Recipients were frozen at closure. Current membership and acknowledgement
+    # cannot grant, remove or transfer an individual player's history.
+    awards = sorted((row['team_victory_awards'] for row in rows),
+                    key=lambda award: (award['week_start'], award['id']), reverse=True)
+    return {'enabled': True, 'totalGold': len(awards), 'history': [
+        {'id': award['id'], 'weekStart': award['week_start'],
+         'weekEnd': (date.fromisoformat(award['week_start']) + timedelta(days=7)).isoformat(),
+         'teamName': award['team_name'], 'xp': award['xp'],
+         'sharedFirst': award['shared_first']}
+        for award in awards[:100]
+    ]}
+
+
+def install(app, *, auth_player, db_rpc, enforce_rate_limit, db_select_bounded=None):
     @app.get('/api/team-victories')
     def state(request: Request, authorization: str | None = Header(default=None)):
         if not production_enabled():
@@ -71,6 +86,26 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit):
         if not isinstance(payload, dict):
             raise HTTPException(503, 'Týmová vitrína teď není dostupná.')
         return enrich_state(payload)
+
+    @app.get('/api/team-victories/personal')
+    def personal(request: Request, authorization: str | None = Header(default=None)):
+        if not production_enabled():
+            return {'enabled': False, 'reason': 'non-production'}
+        enforce_rate_limit(request, 'team_victories_personal', limit=120, window_seconds=3600)
+        player = auth_player(authorization)
+        status = db_rpc('proplet_team_victories_state_v1', {'p_player_id': str(player['id'])})
+        if not isinstance(status, dict):
+            raise HTTPException(503, 'Týmové výhry se teď nepodařilo načíst.')
+        if status.get('enabled') is not True:
+            return {'enabled': False}
+        if db_select_bounded is None:
+            raise HTTPException(503, 'Týmové výhry se teď nepodařilo načíst.')
+        rows = db_select_bounded(
+            'team_victory_recipients',
+            columns='award_id,team_victory_awards!inner(id,week_start,team_name,xp,shared_first)',
+            filters={'player_id': f"eq.{player['id']}"}, order='award_id.asc', max_rows=5000,
+        )
+        return personal_state(rows)
 
     @app.post('/api/team-victories/seen')
     def seen(payload: Seen, request: Request, authorization: str | None = Header(default=None)):
@@ -89,4 +124,5 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit):
         if not result.get('ok'):
             raise HTTPException(403, 'Toto ocenění není dostupné pro tvůj účet.')
         return result
+
 

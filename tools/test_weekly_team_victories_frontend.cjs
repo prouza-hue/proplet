@@ -9,12 +9,14 @@ function harness(options={}){
   const events={},calls=[],nodes=[],timers=[];
   let account={id:'a',token:'token-a',familyCode:'TEAM'};
   let responder=options.responder||(()=>Promise.resolve({enabled:false}));
-  const screen={id:'screen-game'};
-  const document={hidden:false,activeElement:null,body:{append:n=>nodes.push(n)},addEventListener:(name,fn)=>{events[name]=fn;},querySelector:s=>s==='.screen.active'?screen:null,querySelectorAll:()=>[],createElement:tag=>({tag,open:false,addEventListener(){},close(){this.open=false},showModal(){this.open=true},querySelector(){return {focus(){}}},querySelectorAll(){return []},setAttribute(){}})};
+  const screen={id:options.screen||'screen-game'};
+  let blocked=false;
+  const anchor={after:n=>nodes.push(n)};
+  const document={hidden:false,activeElement:null,body:{append:n=>nodes.push(n)},addEventListener:(name,fn)=>{events[name]=fn;},querySelector:s=>s==='.screen.active'?screen:s==='#profileCard .profile-grid'?anchor:s==='#profileTeamVictories'?nodes.find(n=>n.id==='profileTeamVictories'):s==='.modal:not(.hidden),dialog[open]'?(blocked?{}:null):null,querySelectorAll:()=>[],createElement:tag=>({tag,open:false,remove(){const i=nodes.indexOf(this);if(i>=0)nodes.splice(i,1)},addEventListener(){},close(){this.open=false},showModal(){this.open=true},querySelector(){return {focus(){},addEventListener(){},classList:{toggle(){},add(){}}}},querySelectorAll(){return []},setAttribute(){}})};
   const context={document,location:{search:''},URLSearchParams,Intl,Date,Number,String,Set,Promise,Math,queueMicrotask,setTimeout:fn=>timers.push(fn),clearTimeout(){},MutationObserver:class{observe(){}},getProfile:()=>account,api:(path,opts)=>{calls.push({path,opts});return responder(path,opts);},currentGame:{finished:true,mode:'daily',puzzle:{id:'p'},attemptId:'run'},matchMedia:()=>({matches:true})};
   context.window=context;context.window.addEventListener=()=>{};context.PROPLET_RUNTIME_ENV=options.preview?'preview':'production';
   vm.createContext(context);vm.runInContext(source,context);
-  return {context,events,calls,nodes,timers,setAccount:p=>account=p,setResponder:r=>responder=r,profile:()=>account,start:async()=>{events['proplet:ready']();await tick();},result:record=>context.PropletTeamVictories.resultConfirmed({mode:'daily',puzzleId:'p',attemptId:'run',completedAt:new Date().toISOString(),...record},{awardedPoints:100},account)};
+  return {context,events,calls,nodes,timers,screen,setBlocked:b=>blocked=b,setAccount:p=>account=p,setResponder:r=>responder=r,profile:()=>account,start:async()=>{events['proplet:ready']();await tick();},result:record=>context.PropletTeamVictories.resultConfirmed({mode:'daily',puzzleId:'p',attemptId:'run',completedAt:new Date().toISOString(),...record},{awardedPoints:100},account)};
 }
 test('preview boundary makes no rewards or acknowledgement request',async()=>{const h=harness({preview:true});await h.start();h.result();await tick();assert.equal(h.calls.length,0);});
 test('stale account, calm play, old queue, zero XP never trigger rewards refresh',async()=>{
@@ -32,4 +34,41 @@ test('a stale asynchronous response cannot acknowledge or render for another acc
  for(const timer of h.timers)timer();await tick();
  assert.equal(h.calls.filter(c=>c.path.endsWith('/seen')).length,0);
  assert.ok(h.nodes.every(n=>!String(n.innerHTML).includes('PRIVATE OLD TEAM')));
+});
+
+
+const victory={enabled:true,team:{name:'Tým',totalGold:1},intro:{seen:true},pendingAward:{id:'award-1',weekStart:'2026-10-05',weekEnd:'2026-10-12',teamName:'Tým',totalGold:1,previousGold:0,xp:100}};
+test('an earned win appears once on every safe return screen',async()=>{
+ for(const id of ['screen-daily','screen-free','screen-profile','screen-leaderboard']){
+  const h=harness({screen:id,responder:()=>Promise.resolve(victory)});await h.start();
+  for(const t of h.timers)t();await tick();
+  assert.equal(h.nodes.find(n=>n.tag==='dialog').open,true,id);
+  assert.equal(h.calls.filter(c=>c.path.endsWith('/seen')).length,1,id);
+  h.events['proplet:profile-refreshed']();await tick();
+  assert.equal(h.calls.filter(c=>c.path.endsWith('/seen')).length,1,id);
+ }
+});
+test('playing or a blocking modal defers the victory without acknowledging it',async()=>{
+ const h=harness({responder:()=>Promise.resolve(victory)});await h.start();for(const t of h.timers)t();
+ assert.equal(h.calls.filter(c=>c.path.endsWith('/seen')).length,0);
+ h.screen.id='screen-free';h.setBlocked(true);h.events['proplet:screen-changed']();await tick();
+ assert.equal(h.calls.filter(c=>c.path.endsWith('/seen')).length,0);
+ h.setBlocked(false);h.events['proplet:screen-changed']();await tick();
+ assert.equal(h.calls.filter(c=>c.path.endsWith('/seen')).length,1);
+});
+test('personal wins load lazily, deduplicate, and remain visible without a current team',async()=>{
+ const personal={enabled:true,totalGold:1,history:[{id:'a',teamName:'Bývalý <tým>',weekStart:'2026-10-05',weekEnd:'2026-10-12',xp:100}]};
+ const h=harness({responder:()=>Promise.resolve(personal)});h.setAccount({id:'a',token:'token-a',familyCode:null});await h.start();
+ assert.equal(h.calls.length,0);
+ h.screen.id='screen-profile';h.events['proplet:screen-changed']();h.events['proplet:profile-refreshed']();await tick();
+ assert.equal(h.calls.length,1);assert.equal(h.calls[0].path,'/api/team-victories/personal');
+ const card=h.nodes.find(n=>n.id==='profileTeamVictories');assert.match(card.innerHTML,/První otisk/);assert.match(card.innerHTML,/Bývalý &lt;tým&gt;/);
+ h.events['proplet:profile-refreshed']();await tick();assert.equal(h.calls.length,1);
+});
+test('late personal history cannot populate the next account',async()=>{
+ let finish;const h=harness({responder:path=>path.endsWith('/personal')?new Promise(r=>finish=r):Promise.resolve({enabled:false})});await h.start();
+ h.screen.id='screen-profile';h.events['proplet:screen-changed']();
+ h.setAccount({id:'b',token:'token-b',familyCode:null});
+ finish({enabled:true,totalGold:1,history:[{teamName:'SECRET OLD TEAM',weekStart:'2026-10-05',weekEnd:'2026-10-12'}]});await tick();
+ assert.ok(h.nodes.every(n=>!String(n.innerHTML).includes('SECRET OLD TEAM')));
 });
