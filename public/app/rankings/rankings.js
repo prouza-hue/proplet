@@ -60,7 +60,7 @@
     const compactLimit=5,cacheLifetimeMs=30000;
     const sections=new Map(),expandedViews=new Set(),cache=new Map(),inflight=new Map();
     const requestVersions={xp:0,daily:0};
-    let interactionVersion=0,viewportTail=null,activeAnchor=null;
+    let interactionVersion=0,viewportTail=null,activeAnchor=null,lastAnchorInvalidation=null,layoutObserver=null;
     const page=()=>globalThis.window||globalThis;
     const accountKey=()=>{const p=getProfile();return `${p?.id||''}:${p?.token||''}`};
     const viewKey=kind=>kind==='xp'?`xp:${rankingXpScope}:${rankingXpPeriod}`:`daily:${rankingDailyScope}`;
@@ -72,36 +72,46 @@
       if(!element?.getBoundingClientRect||!element.isConnected)return null;
       const rect=element.getBoundingClientRect(),top=rect.top;
       if(rect.bottom<=0||top>=Number(page().innerHeight||0))return null;
-      return {element,top,interaction:interactionVersion};
+      return {element,top,interaction:interactionVersion,identity:accountKey()};
     }
-    function rememberAnchor(element){const anchor=captureAnchor(element);activeAnchor=anchor;return anchor}
+    function observeAnchorLayout(){
+      layoutObserver?.disconnect();
+      if(!activeAnchor||typeof page().ResizeObserver!=='function')return;
+      layoutObserver||=new (page().ResizeObserver)(()=>restoreAnchor(activeAnchor));
+      // Observe content, never the compensating tail. Scroll corrections cannot
+      // resize these boxes, so the observer has no feedback loop.
+      for(const {section} of sections.values())layoutObserver.observe(section);
+    }
+    function rememberAnchor(element){const anchor=captureAnchor(element);activeAnchor=anchor;observeAnchorLayout();return anchor}
     function visibleAnchor(){
       const candidates=[...sections.values()].map(section=>section.controls||section.head);
       const active=globalThis.document?.activeElement;
       return (candidates.some(element=>element?.contains?.(active))?captureAnchor(active):null)||candidates.map(captureAnchor).find(Boolean)||null;
+    }
+    function restoreAnchor(anchor){
+      if(!anchor||anchor.interaction!==interactionVersion||!anchor.element.isConnected)return;
+      if(anchor.identity!==accountKey()){activeAnchor=null;layoutObserver?.disconnect();return}
+      const win=page(),doc=globalThis.document;
+      if(!win.scrollBy||!doc?.documentElement)return;
+      const delta=anchor.element.getBoundingClientRect().top-anchor.top;
+      if(Math.abs(delta)<.5)return;
+      // A shorter last section can clamp scrollY before the controls reach
+      // their previous position. Reserve only the missing viewport space.
+      const scrolling=doc.scrollingElement||doc.documentElement;
+      const missing=Number(win.scrollY||0)+delta-Math.max(0,scrolling.scrollHeight-Number(win.innerHeight||0));
+      if(missing>0&&viewportTail)viewportTail.style.height=`${viewportTail.offsetHeight+Math.ceil(missing)}px`;
+      win.scrollBy({top:delta,left:0,behavior:'instant'});
     }
     function anchored(anchor,change){
       // A second control click renews the shared context. A Daily response that
       // started earlier must still keep the currently used XP controls in view.
       anchor=activeAnchor?.interaction===interactionVersion?activeAnchor:anchor;
       change();
-      const restore=()=>{
-        if(!anchor||anchor.interaction!==interactionVersion||!anchor.element.isConnected)return;
-        const win=page(),doc=globalThis.document;
-        if(!win.scrollBy||!doc?.documentElement)return;
-        const delta=anchor.element.getBoundingClientRect().top-anchor.top;
-        if(Math.abs(delta)<.5)return;
-        // A shorter last section can clamp scrollY before the controls reach
-        // their previous position. Reserve only the missing viewport space.
-        const scrolling=doc.scrollingElement||doc.documentElement;
-        const missing=Number(win.scrollY||0)+delta-Math.max(0,scrolling.scrollHeight-Number(win.innerHeight||0));
-        if(missing>0&&viewportTail)viewportTail.style.height=`${viewportTail.offsetHeight+Math.ceil(missing)}px`;
-        win.scrollBy({top:delta,left:0,behavior:'instant'});
-      };
+      const restore=()=>restoreAnchor(anchor);
       restore();
-      // Chromium can clamp after layout. The shared icon decorator also runs
-      // in the next frame and may change row heights above this anchor. Two
-      // bounded frames include both passes, without an observer or polling.
+      // The bounded passes cover immediate layout. Delayed native decoration,
+      // image or font layout is covered by the section ResizeObserver until the
+      // next user input, account change or navigation invalidates this anchor.
       page().requestAnimationFrame?.(()=>{restore();page().requestAnimationFrame?.(restore)});
     }
     function setBusy(kind,busy){
@@ -252,7 +262,7 @@
 
     let renderVersion=0;
     async function renderLeaderboard(){
-      const version=++renderVersion,anchor=visibleAnchor();if(anchor)activeAnchor=anchor;
+      const version=++renderVersion,anchor=visibleAnchor();if(anchor){activeAnchor=anchor;observeAnchorLayout()}
       const xpList=$('#xpLeaderboardList'),dailyList=$('#dailyLeaderboardList');if(!xpList||!dailyList)return;
       await ensureProfile();if(version!==renderVersion)return;
       installSections();anchored(anchor,()=>{renderRankingPrivacyNote();syncControls();renderRankingTeamCard()});maybeShowRankingPrivacyNotice();
@@ -263,17 +273,18 @@
       if(installed)return false;
       installed=true;
       installSections();
-      const invalidateAnchor=()=>{interactionVersion++;activeAnchor=null};
+      const invalidateAnchor=event=>{interactionVersion++;activeAnchor=null;layoutObserver?.disconnect();lastAnchorInvalidation=event?.type||'navigation'};
       for(const type of ['wheel','touchmove','pointerdown'])globalThis.document?.addEventListener(type,invalidateAnchor,{passive:true});
       globalThis.document?.addEventListener('keydown',invalidateAnchor);
-      globalThis.document?.addEventListener('proplet:screen-changed',()=>{invalidateAnchor();if(viewportTail)viewportTail.style.height='0px';maybeShowRankingPrivacyNotice()});
+      globalThis.document?.addEventListener('proplet:account-changed',invalidateAnchor);
+      globalThis.document?.addEventListener('proplet:screen-changed',event=>{invalidateAnchor(event);if(viewportTail)viewportTail.style.height='0px';maybeShowRankingPrivacyNotice()});
       $$('.ranking-scope-tab').forEach(button=>button.addEventListener('click',()=>{const anchor=rememberAnchor(button);rankingXpScope=button.dataset.rankingXpScope;syncControls();loadRanking('xp',{anchor})}));
       $$('.ranking-period-tab').forEach(button=>button.addEventListener('click',()=>{const anchor=rememberAnchor(button);rankingXpPeriod=button.dataset.rankingPeriod;syncControls();loadRanking('xp',{anchor})}));
       $$('.ranking-daily-tab').forEach(button=>button.addEventListener('click',()=>{const anchor=rememberAnchor(button);rankingDailyScope=button.dataset.rankingDailyScope;anchored(anchor,syncControls);loadRanking('daily',{anchor})}));
       return true;
     }
     function openWeeklyTeams({render=true}={}){rankingXpScope='teams';rankingXpPeriod='week';if(render)return renderLeaderboard()}
-    return {install,openWeeklyTeams,renderLeaderboard,renderXpRanking,renderDailyRanking,renderRankingPrivacyNote,renderRankingTeamCard,openRankingPrivacyModal,saveRankingVisibility,maybeShowRankingPrivacyNotice,rankingRows,rankingRankBadge,transformRankingPayload,getState:()=>({rankingXpScope,rankingXpPeriod,rankingDailyScope})};
+    return {install,openWeeklyTeams,renderLeaderboard,renderXpRanking,renderDailyRanking,renderRankingPrivacyNote,renderRankingTeamCard,openRankingPrivacyModal,saveRankingVisibility,maybeShowRankingPrivacyNotice,rankingRows,rankingRankBadge,transformRankingPayload,getState:()=>({rankingXpScope,rankingXpPeriod,rankingDailyScope,viewportAnchor:activeAnchor?{top:activeAnchor.top,interaction:activeAnchor.interaction,element:activeAnchor.element.className}:null,interactionVersion,lastAnchorInvalidation})};
   }
 
   return {create,transformRankingPayload};

@@ -23,6 +23,13 @@ async function placeControls(page,kind,top=68){
 }
 async function stableControls(page,kind,expected,label){
  await settle(page);const actual=await page.locator(control(kind)).evaluate(el=>el.getBoundingClientRect().top);
+ if(Math.abs(actual-expected)>3)console.error('Ranking anchor diagnostics',await page.evaluate(()=>({
+  scrollY,viewport:{width:innerWidth,height:innerHeight},scrollHeight:document.scrollingElement.scrollHeight,
+  focus:document.activeElement?.outerHTML,screen:typeof currentScreen==='undefined'?null:currentScreen,
+  state:rankingsOrchestration().getState(),
+  sections:[...document.querySelectorAll('#screen-leaderboard .ranking-navigation-section')].map(section=>({top:section.getBoundingClientRect().top,height:section.getBoundingClientRect().height,rows:section.querySelectorAll('.ranking-row').length})),
+  tail:document.querySelector('.ranking-viewport-tail')?.getBoundingClientRect().height,
+ })));
  assert(Math.abs(actual-expected)<=3,`${label}: controls moved from ${expected} to ${actual}`);
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${label}: horizontal overflow`);
 }
@@ -113,6 +120,22 @@ async function run(viewport){
  supersededXp.release({body:data('Překonaná obnova XP',24,4)});renewedDaily.release({body:data('Obnovená dlouhá výzva',120,9)});
  await page.waitForFunction(()=>document.querySelector('#dailyLeaderboardList').textContent.includes('Obnovená dlouhá výzva'));await stableControls(page,'xp',top,'pending Daily follows a renewed XP control anchor');
  assert(!(await page.locator('#xpLeaderboardList').textContent()).includes('Překonaná obnova XP'),'superseded XP refresh does not overwrite a newer cached scope switch');
+ // Native art decoration can settle later than the response's first animation
+ // frames. Exercise a genuinely later row-height change above the active
+ // controls, independently of machine speed or missing local image assets.
+ assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).overflowAnchor),'none','the actual document scroller delegates ranking anchoring to the controller');
+ const heightBeforeLateLayout=await dailySection.evaluate(el=>el.getBoundingClientRect().height);
+ await page.evaluate(async()=>{
+  await new Promise(resolve=>setTimeout(resolve,100));
+  document.querySelectorAll('#dailyLeaderboardList .ranking-row').forEach(row=>row.style.minHeight='180px');
+ });
+ assert((await dailySection.evaluate(el=>el.getBoundingClientRect().height))-heightBeforeLateLayout>200,'late-layout fixture must actually increase the section height');
+ await stableControls(page,'xp',top,'late row layout after response animation frames');
+ await page.evaluate(()=>document.dispatchEvent(new CustomEvent('proplet:account-changed')));
+ assert.equal(await page.evaluate(()=>rankingsOrchestration().getState().viewportAnchor),null,'account changes discard the previous viewport anchor');
+ const accountChangeY=await page.evaluate(()=>scrollY);
+ await page.evaluate(()=>document.querySelectorAll('#dailyLeaderboardList .ranking-row').forEach(row=>row.style.minHeight='220px'));
+ await settle(page);assert(Math.abs((await page.evaluate(()=>scrollY))-accountChangeY)<=3,'account changes disconnect layout restoration');
  // Pending reads must not undo a deliberate subsequent user scroll.
  await page.evaluate(()=>{void renderLeaderboard()});const laterXp=await next('xp','all'),laterDaily=await next('daily','daily');
  await page.mouse.wheel(0,-10000);await page.waitForTimeout(80);const userY=await page.evaluate(()=>scrollY);
@@ -128,7 +151,11 @@ async function run(viewport){
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no horizontal overflow');
  const collapseBox=await dailyCollapse.boundingBox();assert(collapseBox.width>=42&&collapseBox.height>=42,'collapse touch target');
  await page.screenshot({path:path.join(artifacts,`${viewport.width}x${viewport.height}.png`),fullPage:true});
- checks.push(`${viewport.width}x${viewport.height}: compact/self, collapse keyboard, cached scope, racing periods, async height, error/retry, user-scroll cancellation, full list return`);
+ checks.push(`${viewport.width}x${viewport.height}: compact/self, collapse keyboard, cached scope, racing periods, async height and late layout, error/retry, user-scroll cancellation, full list return`);
+ await page.locator('.bottom-nav [data-nav="daily"]').click();
+ assert.equal(await page.evaluate(()=>rankingsOrchestration().getState().viewportAnchor),null,'leaving rankings discards the viewport anchor');
+ assert.equal(await page.evaluate(()=>document.querySelector('.ranking-viewport-tail').style.height),'0px','leaving rankings clears reserved scroll space');
+ assert.notEqual(await page.evaluate(()=>getComputedStyle(document.documentElement).overflowAnchor),'none','other pages retain native document anchoring');
  await ctx.close();
 }
 (async()=>{

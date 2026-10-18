@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
+from types import SimpleNamespace
 import hashlib
 import json
 import shutil
@@ -17,6 +18,7 @@ from fastapi.testclient import TestClient
 
 import word_recognition_v3330 as words
 from bonus_recognition import recognizes
+from tools.gen5 import validation
 
 ROOT = Path(__file__).resolve().parents[2]
 REPORTED = ("OBRNA", "STROFA", "AORTA", "KANCL", "KATION")
@@ -125,4 +127,23 @@ target = {"puzzle_id": "reported-obrna", "mode": "free", "difficulty": "easy",
 assert client.post("/api/word-discovery/claim", headers={"Authorization": "Bearer bob"}, json=target).status_code == 400
 assert rows["bob"] == []
 assert len(rows["alice"]) == len(REPORTED)
+
+# A live bonus overlay may grow without changing a historical uniqueness receipt.
+# Explicit frozen overlays (including an empty one) never read the live module.
+with tempfile.TemporaryDirectory() as temporary:
+    directory = Path(temporary)
+    (directory / "data").mkdir()
+    (directory / "data/words.txt").write_text("bruska\n", encoding="utf-8")
+    (directory / "data/lexicon_v2_wikidata_raw.json").write_text(
+        json.dumps({"entries": [{"lemma": "strofa"}]}), encoding="utf-8")
+    overlay_path = directory / "word_recognition_v3330.py"
+    overlay_path.write_text("RECOGNITION_OVERLAY = {'aorta', 'kancl'}\n", encoding="utf-8")
+    catalog = SimpleNamespace(entries={"obrna": {}})
+    with patch.object(validation, "ROOT", directory):
+        frozen = validation.validation_words(catalog, overlay_words=["AORTA"])
+        assert frozen == ["aorta", "bruska", "obrna", "strofa"]
+        assert "kancl" in validation.validation_words(catalog)
+        overlay_path.write_text("not valid Python!", encoding="utf-8")
+        assert validation.validation_words(catalog, overlay_words=["aorta"]) == frozen
+        assert validation.validation_words(catalog, overlay_words=[]) == ["bruska", "obrna", "strofa"]
 print("PASS broad forms + all five reported words; auth, trace, published board, target and reward-key protection")

@@ -1,4 +1,5 @@
 /* A compact overview with explicit expansion; list changes keep controls stable. */
+:root:has(#screen-leaderboard.active){overflow-anchor:none}
 #screen-leaderboard{overflow-anchor:none}
 #screen-leaderboard .ranking-navigation-section>.ranking-section-head{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
