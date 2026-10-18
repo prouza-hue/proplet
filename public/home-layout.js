@@ -116,22 +116,24 @@
   }
 
   function renderResumeCard(){
-    const screen=document.querySelector('#screen-daily'),hero=screen?.querySelector('.daily-hero');
-    if(!screen||!hero)return;
-    let card=screen.querySelector('#homeResumeCard');
     const resume=latestFreeResume();
-    if(!resume){card?.remove();return}
-    const {difficulty,q}=resume,d=DIFF[difficulty],level=Number(q.resume?.meta?.level)||1;
-    if(!card){
-      card=document.createElement('button');
-      card.id='homeResumeCard';
-      card.type='button';
-      card.className='home-resume-card';
+    for(const [screenId,cardId,anchorSelector] of [['screen-daily','homeResumeCard','.daily-hero'],['screen-free','freeResumeCard','#difficultyCards']]){
+      const screen=document.getElementById(screenId),anchor=screen?.querySelector(anchorSelector);
+      if(!screen||!anchor)continue;
+      let card=document.getElementById(cardId);
+      if(!resume){card?.remove();continue}
+      const {difficulty,q}=resume,d=DIFF[difficulty],level=Number(q.resume?.meta?.level)||1;
+      if(!card){
+        card=document.createElement('button');
+        card.id=cardId;
+        card.type='button';
+        card.className='home-resume-card';
+      }
+      card.dataset.diff=difficulty;
+      card.innerHTML=`<span class="home-resume-icon">${difficultyIconMarkup(difficulty,'home-resume-difficulty-icon')}</span><span class="home-resume-copy"><span>ROZEHRANÁ HRA</span><strong>${htmlEsc(d.label)} · úroveň ${level}</strong></span><b>Pokračovat <i>→</i></b>`;
+      card.onclick=()=>startFree(difficulty);
+      if(anchor.previousElementSibling!==card)screen.insertBefore(card,anchor);
     }
-    card.dataset.diff=difficulty;
-    card.innerHTML=`<span class="home-resume-icon">${difficultyIconMarkup(difficulty,'home-resume-difficulty-icon')}</span><span class="home-resume-copy"><span>ROZEHRANÁ HRA</span><strong>${htmlEsc(d.label)} · úroveň ${level}</strong></span><b>Pokračovat <i>→</i></b>`;
-    card.onclick=()=>startFree(difficulty);
-    if(hero.previousElementSibling!==card)screen.insertBefore(card,hero);
   }
 
   function ensureCompetitionCard(){
@@ -222,7 +224,7 @@
     return true;
   }
 
-  window.PropletHomeLayout={applyDailyLayout:applyLayout,install};
+  window.PropletHomeLayout={applyDailyLayout:applyLayout,renderResumeCard,install};
 
   let tries=0;
   const boot=()=>{

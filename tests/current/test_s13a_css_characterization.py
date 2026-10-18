@@ -119,7 +119,7 @@ else:
         assert old not in theme, old
     for new in ("/game.css", "/results.css"):
         assert new in theme, new
-    assert theme.index("/copy-density-v3327.css?v=1") < theme.index("/desktop-layout-v3330.css?v=3")
+    assert theme.index("/copy-density-v3327.css?v=") < theme.index("/desktop-layout-v3330.css?v=3")
     assert theme.index("/desktop-layout-v3330.css?v=3") < theme.index("/game.css") < theme.index("/results.css")
 
     for needle in (
@@ -157,3 +157,4 @@ assert "@media(max-width:480px)" in results_css
 assert "#winModal .win-main-actions + .win-secondary-actions{margin-top:7px}" in results_css
 
 print("PASS Sprint 13A CSS characterization")
+

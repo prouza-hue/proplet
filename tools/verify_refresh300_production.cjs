@@ -48,10 +48,33 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='free');
  check('native game starts approved new board',await page.evaluate(()=>currentGame?.puzzle?.id==='g6-refresh-easy-001'&&currentGame.mode==='free'));
  await page.screenshot({path:`${out}/new-board.png`});
+
+ // Both tabs must resume the same saved board, without creating another run.
+ const saved=await page.evaluate(()=>({id:currentGame.puzzle.id,found:currentGame.found.length}));
+ await page.evaluate(()=>nav('free'));
+ check('Play resume appears above difficulties',await page.evaluate(()=>(()=>{const card=document.querySelector('#freeResumeCard'),grid=document.querySelector('#difficultyCards');return !!card&&card.getBoundingClientRect().bottom<=grid.getBoundingClientRect().top})()));
+ check('both tabs show the same resume',await page.evaluate(()=>document.querySelector('#freeResumeCard').textContent===document.querySelector('#homeResumeCard').textContent));
+ await page.locator('#freeResumeCard').click();
+ check('Play resume restores the saved board',await page.evaluate(saved=>currentGame.puzzle.id===saved.id&&currentGame.found.length===saved.found,saved));
+ // Fixture: completed results for every difficulty, no unfinished board.
+ await page.evaluate(()=>{const state=getState();state.inProgress={};for(const diff of Object.keys(DIFF)){const p=sortedFreeBank(diff)[0];state.completed['free:'+p.id]={puzzleId:p.id,mode:'free',difficulty:diff,level:p.meta.level,contentGeneration:p.meta.contentGeneration||4,elapsedMs:125000,moves:25,hintsUsed:0,cleanSolve:true,points:DIFF[diff].xp,completedAt:new Date().toISOString()}}saveState(state);currentGame=null;nav('free')});
+ check('finished games leave no stale resume on either tab',await page.locator('#homeResumeCard,#freeResumeCard').count()===0);
+ for(const theme of ['light','dark'])for(const width of [320,390,690,1440]){
+  await page.setViewportSize({width,height:900});await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
+  for(const diff of ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']){
+   await page.evaluate(diff=>openPlayedLevels(diff),diff);
+   check(`history layout ${diff} ${width} ${theme}`,await page.evaluate(()=>{const close=document.querySelector('#closePlayedLevelsModal').getBoundingClientRect(),ring=document.querySelector('#playedLevelsProgress').getBoundingClientRect(),card=document.querySelector('.played-levels-card');return close.bottom+4<=ring.top&&card.scrollWidth<=card.clientWidth+1}));
+   check(`no duplicate progress or clean stars ${diff} ${width} ${theme}`,await page.evaluate(()=>!document.querySelector('#playedLevelsMeta').textContent.trim()&&Array.from(document.querySelectorAll('#playedLevelsList .level-history-main small')).every(el=>!/[✨☆★]/.test(el.textContent)&&!el.querySelector('svg'))));
+  }
+  if((width===390&&theme==='light')||(width===690&&theme==='dark'))await page.screenshot({path:`${out}/history-${theme}-${width}.png`});
+  await page.locator('#closePlayedLevelsModal').click();
+  check('history close works',await page.locator('#playedLevelsModal').isHidden());
+ }
  const newcomer=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});await newcomer.route('**/*',route=>new URL(route.request().url()).origin!==base?route.abort():route.continue());await newcomer.goto(base,{waitUntil:'domcontentloaded'});
  await newcomer.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter');
  check('newcomer retains native onboarding without CTA',await newcomer.evaluate(()=>currentGame?.mode==='starter'&&!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));await newcomer.close();
  check('no browser runtime errors',errors.length===0);
  }finally{fs.writeFileSync(`${out}/report.json`,JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});
+
 

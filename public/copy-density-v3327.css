@@ -37,3 +37,8 @@ html[data-theme="dark"] .played-levels-progress:before{background:#1b1926}
   .played-levels-progress{width:56px;height:56px}
   .played-levels-head{gap:10px}
 }
+
+/* Keep the close button in its own row, above the title and progress ring. */
+#playedLevelsModal .played-levels-head{padding-top:40px;align-items:center}
+#playedLevelsModal .played-levels-heading h2{overflow-wrap:anywhere}
+#playedLevelsModal #closePlayedLevelsModal{width:40px;height:40px;min-width:40px;min-height:40px;top:12px;right:12px}
