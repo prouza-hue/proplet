@@ -228,9 +228,9 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=extra-entry2','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=rank-details1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=home-stable1','propletHomeLayout');
+    loadScript('/home-layout.js?v=rank-details1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=referrals1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');

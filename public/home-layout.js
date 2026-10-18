@@ -158,7 +158,7 @@
     const remaining=l.next?Math.max(0,l.next.xp-points):0;
     const art=window.PropletRibbonArt?.art(l.current.name,{category:'rank',size:160});
     const next=l.next?`<div class="rank-track" role="progressbar" aria-label="Postup k hodnosti ${htmlEsc(l.next.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(l.pct)}" aria-valuetext="Do další hodnosti zbývá ${remaining} XP"><span style="width:${l.pct}%"></span></div><p class="rank-next"><strong>${remaining.toLocaleString('cs-CZ')} XP <span aria-hidden="true">→</span></strong><span>${htmlEsc(l.next.name)}</span></p>`:'<p class="rank-next">Nejvyšší hodnost. Klobouk dolů!</p>';
-    root.innerHTML=`<div class="rank-hero"><div class="rank-art" aria-hidden="true">${art?.outerHTML||l.current.icon}</div><div class="rank-copy"><h3>${htmlEsc(l.current.name)}</h3>${next}</div></div><dl class="rank-metrics"><div><dt>Celkem XP</dt><dd>${points.toLocaleString('cs-CZ')}</dd></div><div><dt>V pořadí</dt><dd>${place}</dd>${!selfRow?.rank&&!p?.token?'<small>po přihlášení</small>':''}</div><div><dt>Denní série</dt><dd><img src="/rewards/printshop/symbol-streak.svg" alt="" width="28" height="32">${streak} <span>${days}</span></dd></div></dl>`;
+    root.innerHTML=`<div class="rank-hero" role="button" tabindex="0" data-rank-detail="${l.index-1}" aria-haspopup="dialog" aria-label="Detail hodnosti ${htmlEsc(l.current.name)}"><div class="rank-art" aria-hidden="true">${art?.outerHTML||l.current.icon}</div><div class="rank-copy"><h3>${htmlEsc(l.current.name)}</h3>${next}</div></div><dl class="rank-metrics"><div><dt>Celkem XP</dt><dd>${points.toLocaleString('cs-CZ')}</dd></div><div><dt>V pořadí</dt><dd>${place}</dd>${!selfRow?.rank&&!p?.token?'<small>po přihlášení</small>':''}</div><div><dt>Denní série</dt><dd><img src="/rewards/printshop/symbol-streak.svg" alt="" width="28" height="32">${streak} <span>${days}</span></dd></div></dl>`;
   }
 
   function renderCompetitionRows(data){
@@ -232,3 +232,4 @@
   if(document.readyState==='complete')boot();
   else window.addEventListener('load',boot,{once:true});
 })();
+
