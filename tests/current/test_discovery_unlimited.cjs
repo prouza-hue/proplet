@@ -7,7 +7,7 @@ const source=fs.readFileSync('public/valid-word-feedback-v3330.js','utf8');
 const code=source.slice(source.indexOf('  const awardDiscovery='),source.indexOf('  const resetForGame='));
 let loggedIn=false,online=true,awarded=0,requests=0;
 const stores={guest:{entries:{}},alice:{entries:{}},bob:{entries:{}}};let owner='alice';
-const c={rewardDisabled:()=>false,patchEffectiveStats(){},discoveryRewardKey:(p,w)=>p+':'+w,scope:()=>loggedIn?owner:'guest',
+const c={RECOGNITION_VERSION:7,rewardDisabled:()=>false,patchEffectiveStats(){},discoveryRewardKey:(p,w)=>p+':'+w,scope:()=>loggedIn?owner:'guest',
  readDiscoveryStore:s=>stores[s],writeDiscoveryStore:(value,s)=>stores[s]=value,profile:()=>loggedIn?{id:owner,token:'synthetic'}:null,
  normalize:w=>w,localDay:()=> '2026-10-21',navigator:{get onLine(){return online}},setTimeout(){},syncDiscoveries(){},
  creditRunXp:(_,n)=>awarded+=n,showXpPop(){},refreshVisibleUi(){},discoveryKnownKeys:new Set(),claimPayload:x=>x,
@@ -22,6 +22,10 @@ const word=n=>({puzzleId:'board',mode:'free',difficulty:'easy',word:'word'+n,pat
  online=false;assert.equal(await c.award(word(66)),'pending');assert.equal(awarded,65,'offline signed-in claim does not invent confirmed XP');assert.equal(stores.alice.entries['board:word66'].status,'pending');
  online=true;stores.alice.entries['board:word67']={status:'capped',limitReason:'daily_limit'};
  assert.equal(await c.award(word(67)),'awarded','a newly rediscovered formerly capped word may now earn XP');
+ stores.alice.entries['board:word68']={status:'rejected',rejectedStatus:400,rejectedReason:'Slovo není v recognition lexikonu',recognitionVersion:6};
+ assert.equal(await c.award(word(68)),'awarded','expanded dictionary can retry an earlier lexicon rejection');
+ stores.alice.entries['board:word69']={status:'rejected',rejectedStatus:400,rejectedReason:'Slovo neodpovídá platné vedlejší cestě této desky',recognitionVersion:6};
+ const beforeInvalid=requests;assert.equal(await c.award(word(69)),'duplicate');assert.equal(requests,beforeInvalid,'invalid trace rejections do not become automatic rewards');
  owner='bob';assert.equal(await c.award(word(0)),'awarded','another account has its own ledger');
  assert.equal(await c.award({...word(99),mode:'playtest'}),'disabled');
  console.log('PASS guest/server >50 XP, exact deduplication, offline pending, former cap rediscovery and account isolation');

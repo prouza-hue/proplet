@@ -2,15 +2,67 @@
 'use strict';
 
 const DEFAULT_CHOICES=[
-  ['Lehká','Ukáže začátek a délku vhodného slova.'],
-  ['Silnější','Ukáže první tři políčka cesty.'],
-  ['Odhalit','Na chvíli ukáže celé slovo i jeho cestu.'],
+  ['Lehká','Začátek a délka slova.'],
+  ['Silnější','První tři políčka cesty.'],
+  ['Odhalit','Na chvíli celé slovo i cestu.'],
 ];
 const TAJENKA_CHOICES=[
-  ['Významová stopa','Napoví význam hledaného slova.'],
-  ['Kde začít','Ukáže první písmeno a délku.'],
-  ['Odhalit cestu','Ukáže celé slovo i jeho cestu.'],
+  ['Významová stopa','Napoví, co slovo znamená.'],
+  ['Kde začít','První písmeno a délka slova.'],
+  ['Odhalit cestu','Na chvíli celé slovo i cestu.'],
 ];
+const MODAL_STATE=new WeakMap();
+const HINT_ART=['gentle','steps','reveal'].map(name=>`/assets/hints/printshop/${name}-v1.webp`);
+
+function modalState(modal){
+  let state=MODAL_STATE.get(modal);
+  if(state)return state;
+  state={opener:null};MODAL_STATE.set(modal,state);
+  modal.addEventListener('keydown',event=>{
+    if(modal.classList.contains('hidden'))return;
+    if(event.key==='Escape'){
+      event.preventDefault();event.stopPropagation();modal.querySelector('#closeHintModal')?.click();return;
+    }
+    if(event.key!=='Tab')return;
+    const focusable=[...modal.querySelectorAll('button:not([disabled])')].filter(button=>!button.hidden);
+    if(!focusable.length)return;
+    const active=modal.ownerDocument.activeElement,first=focusable[0],last=focusable[focusable.length-1];
+    if(event.shiftKey&&(active===first||!modal.contains(active))){event.preventDefault();last.focus({preventScroll:true})}
+    else if(!event.shiftKey&&(active===last||!modal.contains(active))){event.preventDefault();first.focus({preventScroll:true})}
+  });
+  return state;
+}
+
+function renderChoices(modal,mode='default'){
+  if(!modal)return;
+  const rows=mode==='tajenka'?TAJENKA_CHOICES:DEFAULT_CHOICES;
+  modal.querySelectorAll('[data-hint-level]').forEach((button,index)=>{
+    const row=rows[index];if(!row)return;
+    button.querySelector('strong').textContent=row[0];button.querySelector('small').textContent=row[1];
+    const art=button.querySelector('.hint-art');if(art&&art.getAttribute('src')!==HINT_ART[index])art.setAttribute('src',HINT_ART[index]);
+  });
+}
+
+function openModal(modal,{mode='default'}={}){
+  if(!modal)return;
+  const state=modalState(modal);
+  if(modal.classList.contains('hidden'))state.opener=modal.ownerDocument.activeElement;
+  renderChoices(modal,mode);
+  modal.classList.toggle('starter-hint',mode==='starter');modal.dataset.hintMode=mode;
+  modal.setAttribute('aria-labelledby','hintTitle');
+  const title=modal.querySelector('#hintTitle');
+  if(title)title.textContent=mode==='starter'?'Zkus malé postrčení':mode==='tajenka'?'Jak moc napovědět?':'Kolik pomoci chceš?';
+  modal.classList.remove('hidden');
+  modal.querySelector('#closeHintModal')?.focus({preventScroll:true});
+}
+
+function closeModal(modal){
+  if(!modal)return;
+  modal.classList.add('hidden');
+  const opener=MODAL_STATE.get(modal)?.opener;
+  const target=opener?.isConnected&&!opener.disabled?opener:modal.ownerDocument.querySelector('#hintBtn');
+  if(target&&!modal.contains(target))target.focus({preventScroll:true});
+}
 
 function create(deps={}){
   const getGame=deps.getGame||(()=>null);
@@ -48,7 +100,7 @@ function create(deps={}){
   return {choices,pickTarget,applyState};
 }
 
-const api={create};
+const api={create,renderChoices,openModal,closeModal};
 if(global)global.PropletGameHints=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:typeof self!=='undefined'?self:globalThis);

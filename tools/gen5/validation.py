@@ -146,7 +146,7 @@ def geometry_errors(m, p):
     return [name for name, ok in checks.items() if not ok]
 
 
-def validation_words(catalog, *, recognition_path=None):
+def validation_words(catalog, *, recognition_path=None, overlay_words=None):
     # Finite, explicit recognizer union; frequency fallback is intentionally not
     # claimed enumerable. No truncation after appending targets.
     words = {norm(w) for w in (recognition_path or ROOT/'data/words.txt').read_text(encoding='utf-8').splitlines()}
@@ -155,12 +155,17 @@ def validation_words(catalog, *, recognition_path=None):
         raw = str(e.get('lemma') or '').strip()
         if raw == raw.lower():
             words.add(norm(raw))
-    # Read only the literal server overlay; no FastAPI/server import or DB calls.
-    import ast
-    tree = ast.parse((ROOT/'word_recognition_v3330.py').read_text(encoding='utf-8'))
-    for n in tree.body:
-        if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id=='RECOGNITION_OVERLAY' for t in n.targets):
-            words |= {norm(w) for w in ast.literal_eval(n.value)}
+    # Historical receipts must pin this input too: their finite base dictionary
+    # does not imply an editorial overlay from today's bonus-word recognizer.
+    if overlay_words is None:
+        # Read only the literal server overlay; no FastAPI/server import or DB calls.
+        import ast
+        tree = ast.parse((ROOT/'word_recognition_v3330.py').read_text(encoding='utf-8'))
+        overlay_words = set()
+        for n in tree.body:
+            if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id=='RECOGNITION_OVERLAY' for t in n.targets):
+                overlay_words |= set(ast.literal_eval(n.value))
+    words |= {norm(w) for w in overlay_words}
     return sorted(w for w in words if 4 <= len(w) <= 24 and w != 'negr' and re.fullmatch('[a-záčďéěíňóřšťúůýž]+',w))
 
 
@@ -252,3 +257,4 @@ class Solver:
                 'candidateCount':count,'searchNodes':cover_nodes,'enumerationAndSearchNodes':budget.nodes,
                 'forcedNodeShare':forced_nodes/max(1,cover_nodes),'dictionaryHash':self.hash,
                 'dictionarySize':len(self.words)}
+

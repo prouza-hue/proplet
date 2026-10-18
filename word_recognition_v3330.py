@@ -11,6 +11,8 @@ from typing import Callable, Optional
 from fastapi import Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
+from bonus_recognition import metadata as czech_lexicon_metadata, recognizes as recognizes_czech_form
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 
@@ -19,6 +21,7 @@ DATA = ROOT / "data"
 # Verified in Lingea Slovník současné češtiny (2026-09-15):
 # https://www.nechybujte.cz/slovnik-soucasne-cestiny/PSI
 # https://www.nechybujte.cz/slovnik-soucasne-cestiny/jilm
+# KANCL is an approved ordinary colloquial form (not a generated answer), reported 2026-10-18.
 RECOGNITION_OVERLAY = {
     "setr", "bígl", "labrador", "jilm",
     "bruska",
@@ -27,6 +30,7 @@ RECOGNITION_OVERLAY = {
     "hrubka",
     "stáj",
     "starost",
+    "kancl",
 }
 
 # Frequency fallback is deliberately recognition-only. It exists to catch ordinary Czech words
@@ -40,7 +44,7 @@ WORD_DISCOVERY_REWARD_PREFIX = "word_discovery_v1:"
 WORD_DISCOVERY_XP = 1
 WORD_DISCOVERY_BOARD_XP_LIMIT = None  # No per-board cap; reward-key deduplication still applies.
 WORD_DISCOVERY_DAILY_XP_LIMIT = None
-RECOGNITION_VERSION = 6
+RECOGNITION_VERSION = 7
 RECOGNITION_BLOCKLIST = frozenset({"negr"})
 
 _CZECH_WORD = re.compile(r"^[a-záčďéěíňóřšťúůýž]+$", re.IGNORECASE)
@@ -262,9 +266,16 @@ def _wordfreq_source(word: str) -> Optional[str]:
 
 
 def _recognize_source(word: str) -> Optional[str]:
+    word = _normalize(word)
+    if not _acceptable(word):
+        return None
     source = _recognition_index().get(word)
     if source is not None:
         return source
+    # The same compact, exact Hunspell form index is shipped to the offline client. It
+    # contains inflections, not just a handful of base forms or a frequency guess.
+    if recognizes_czech_form(word):
+        return "hunspell_cs"
     return _wordfreq_source(word)
 
 
@@ -336,11 +347,17 @@ def install_word_recognition(
             "hrubka",
             "tlupa",
             "pult",
+            "obrna",
+            "strofa",
+            "aorta",
+            "kancl",
+            "kation",
         )
         return {
             "ok": True,
             "version": RECOGNITION_VERSION,
             "staticEntries": len(index),
+            "expandedOfflineLexicon": czech_lexicon_metadata(),
             "discoveryXp": True,
             "frequencyFallback": {
                 "enabled": _wordfreq_zipf() is not None,
