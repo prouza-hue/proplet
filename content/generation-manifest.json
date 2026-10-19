@@ -2,7 +2,7 @@
   "$schema": "./generation-manifest.schema.json",
   "schemaVersion": 1,
   "manifestId": "proplet-runtime-content",
-  "manifestVersion": 4,
+  "manifestVersion": 5,
   "validatorVersion": "proplet-content-s14-v1",
   "provenance": {
     "baselineCommit": "b8de402ad676b823f72a905289945eff6f6b3e6c",
@@ -21,7 +21,8 @@
     "dailyGen6ReleaseBaselineCommit": "13b9843f9d19c3fb13b53eeb971208da530f8dc8",
     "dailyGen6ManufacturedContentHash": "3abe6feda3e25262ed07aa25aa02687338a41ab6382e018760a13961f2ada104",
     "dailyGen6Cutover": "2026-10-08",
-    "dailyRecognition": "103836 frozen acceptable manufacturing forms plus all 507 prior short forms; no prior recognition removed."
+    "dailyRecognition": "103836 frozen acceptable manufacturing forms plus all 507 prior short forms; no prior recognition removed.",
+    "dailyG4EditorialCorrection": "2026-10-19: g4-d-042 MAMÁ → MÁMA; same paths and ID, one solution under 103837-word dictionary."
   },
   "generation": {
     "contentGeneration": 4,
@@ -36,9 +37,9 @@
     "source": {
       "path": "data/puzzles.json",
       "role": "canonical-server-puzzle-source",
-      "sha256": "736d8a73befd8f0e121b9c1d729e3e30d9c58d67e113bfbd673671d8ac834ee6",
-      "sizeBytes": 4679338,
-      "gitBlob": "500522874270670f9f14963474ee07671645654d"
+      "sha256": "aa787d7acc45d868b79d416647f72b12487790b68f8185f7af77bca7efd6f232",
+      "sizeBytes": 4679666,
+      "gitBlob": "9f671055a9493ce88ff4b34be0c14e93d3b19f9a"
     },
     "compatibilitySource": {
       "path": "data/archive/v3.33.5/puzzles.json.gz",
@@ -70,9 +71,9 @@
     "output": {
       "path": "public/puzzles.json",
       "role": "public-puzzle-runtime",
-      "sha256": "376a1f0f4dd10053fb872e533649bb2a45ec2d24b72425861282ccd2a69de91c",
-      "sizeBytes": 4095212,
-      "gitBlob": "a4a394e726b37fdd34a87282b69c8235b572d7fa"
+      "sha256": "004b623b5f4d506fa10088a46560f625673fa4d97f2ad00c18b32161fe8433d2",
+      "sizeBytes": 4095540,
+      "gitBlob": "adcdd4d63ffe32bb5d3a8f294d258c53c9fb95ff"
     },
     "dailyProjection": {
       "cutover": "2026-10-08",
@@ -161,8 +162,8 @@
     {
       "path": "data/target_generation_exclusions_v334.json",
       "role": "gen4-target-exclusion-input",
-      "sha256": "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3",
-      "sizeBytes": 1694
+      "sha256": "76326e0d1b9a04ad92866226ee86143af44e181bffa07045c82dbc2543844514",
+      "sizeBytes": 1844
     },
     {
       "path": "data/puzzles_gen4_candidate_v334.json",

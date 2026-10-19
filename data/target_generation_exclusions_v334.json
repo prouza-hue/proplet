@@ -77,12 +77,14 @@
     "tensor",
     "teserakt",
     "triréma",
-    "zikkurat"
+    "zikkurat",
+    "mamá"
   ],
   "pending": [],
   "notes": [
     "Removal affects all future target generation (Free, Daily, and rolling content bank).",
     "Recognition vocabulary remains broad and is not reduced by this review.",
-    "Historical Generation 3 puzzles and current production content remain unchanged."
+    "Historical Generation 3 puzzles and current production content remain unchanged.",
+    "2026-10-19: mamá excluded from future targets after reports on g4-d-042; recognition and historical frozen inputs are preserved."
   ]
 }
