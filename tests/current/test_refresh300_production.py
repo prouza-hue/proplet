@@ -8,7 +8,13 @@ h=lambda x:hashlib.sha256(json.dumps(x,ensure_ascii=False,sort_keys=True,separat
 data=read('data/puzzles.json');public=read('public/puzzles.json');boundary=read('content/gen6/free-refresh-300/production-boundaries.json');source=read('content/gen6/free-refresh-300/bank.json')
 assert h(source['boards'])==source['contentHash']=='7048e9bc26c8e7670bab4aad158bb87f73ff1bbf86e6215a7e262d2c3905635e'
 assert public['free']==data['free'];assert data['contentGeneration']==data['freeGeneration']==4
-for k,digest in boundary['preserved'].items():assert h(data[k])==digest,k
+correction=read('content/editorial-corrections/g4-d-042-20261019.json')
+for k,digest in boundary['preserved'].items():
+ actual=data[k]
+ if k=='daily':
+  assert h(next(p for p in actual if p['id']==correction['puzzleId']))==correction['afterHash']
+  actual=[correction['before'] if p['id']==correction['puzzleId'] else p for p in actual]
+ assert h(actual)==digest,k
 for diff,digest in boundary['free'].items():
  bank=data['free'][diff];old=[p for p in bank if not p['id'].startswith('g6-refresh-')]
  assert h(old)==digest,diff
