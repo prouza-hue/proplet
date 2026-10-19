@@ -37,4 +37,20 @@ with patch.object(server,'VERCEL_ENV','production'),patch.object(server,'db_requ
         for field,value in [('source_file','/app.js?access_token=secret'),('source_file','https://evil.test/app.js'),('source_line',0),('source_column',1000001)]:
             stored.clear();res=client.post('/api/client-error',json={**body,field:value})
             assert res.status_code==422 and not stored
+        stored.clear()
+        frames=[{'file':'/app.js','line':123,'column':7},{'file':'/app/account/account.js','line':22,'column':3}]
+        res=client.post('/api/client-error',json={**body,'source_frames':frames,'source_availability':'available','reporter_release':'proplet-v4.09.8-telemetry1','stack':'must never be stored'})
+        assert res.status_code==200 and stored[0]['metadata']['source_frames']==frames
+        assert stored[0]['metadata']['source_availability']=='available' and 'stack' not in stored[0]['metadata']
+        stored.clear()
+        res=client.post('/api/client-error',json={'code':'window_error','message':'Script error.','source_availability':'opaque','unknown_producer_reason':'before_app_release','reporter_release':'proplet-v4.09.8-telemetry1'})
+        assert res.status_code==200 and stored[0]['client_release']=='legacy'
+        assert stored[0]['metadata']['reporter_release']=='proplet-v4.09.8-telemetry1'
+        assert stored[0]['metadata']['unknown_producer_reason']=='before_app_release'
+        for invalid in [frames*2,[{'file':'/app.js?secret=token','line':1,'column':2}],[{'file':'/../app.js','line':1,'column':2}]]:
+            stored.clear();res=client.post('/api/client-error',json={**body,'source_frames':invalid})
+            if invalid[0]['file']=='/../app.js':
+                assert res.status_code==200 and 'source_frames' not in stored[0]['metadata']
+            else:
+                assert res.status_code==422 and not stored
 print('PASS route/model/middleware: header and body provenance, test exclusion, safe source coordinates and explicit unknown cached client')

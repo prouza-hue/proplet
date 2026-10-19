@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, StrictInt
 
@@ -185,6 +185,12 @@ class SupportReportUpdate(BaseModel):
     resolution_note: Optional[str] = Field(default=None, max_length=500)
 
 
+class ClientErrorFrame(BaseModel):
+    file: str = Field(max_length=120, pattern=r'^/(?:app/)?[A-Za-z0-9_./-]+\.js$')
+    line: int = Field(ge=1, le=1000000)
+    column: int = Field(ge=1, le=1000000)
+
+
 class ClientErrorCreate(BaseModel):
     code: str = Field(default="client_error", min_length=2, max_length=80)
     message: Optional[str] = Field(default=None, max_length=240)
@@ -195,6 +201,10 @@ class ClientErrorCreate(BaseModel):
     source_file: Optional[str] = Field(default=None, max_length=120, pattern=r'^/(?:app/)?[A-Za-z0-9_./-]+\.js$')
     source_line: Optional[int] = Field(default=None, ge=1, le=1000000)
     source_column: Optional[int] = Field(default=None, ge=1, le=1000000)
+    source_frames: list[ClientErrorFrame] = Field(default_factory=list, max_length=3)
+    source_availability: Optional[Literal['available', 'opaque', 'missing']] = None
+    reporter_release: Optional[str] = Field(default=None, max_length=80, pattern=r'^proplet-v\d+\.\d+\.\d+-[A-Za-z0-9_.-]+$')
+    unknown_producer_reason: Optional[Literal['before_app_release']] = None
 
 
 class AccountDeleteConfirm(BaseModel):

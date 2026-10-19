@@ -254,7 +254,7 @@ return {provenance:Object.freeze({firstStepsRunId:s.firstStepsRunId,onboardingVe
   }
   function install(){
     if(!enabled())return;
-    registerGameCompletionHook({id:'first-steps-v1',priority:1000,after:({game:g})=>finish(g)});
+    registerGameCompletionHook({id:'first-steps-v1',replace:true,priority:1000,after:({game:g})=>finish(g)});
     ['#closeProfileModal','#skipProfileBtn'].forEach(s=>$(s)?.addEventListener('click',()=>queueMicrotask(dismissAuth)));
     $('#profileModal')?.addEventListener('click',e=>{if(e.target===$('#profileModal'))queueMicrotask(dismissAuth)});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')queueMicrotask(dismissAuth)});
@@ -266,7 +266,7 @@ return {provenance:Object.freeze({firstStepsRunId:s.firstStepsRunId,onboardingVe
     },{once:true});
     global.addEventListener('pageshow',e=>{if(!e.persisted)return;authBusy=false;const button=$('#firstStepsGoogle');if(button)button.disabled=false;if(returnIntent()?.method==='google'&&!profile()?.token)cancelledAuthReturn();});
   }
-  const facade={eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,captureFirstGame,recordStarted,recordCompleted,
+  const facade={contractVersion:2,eventHeaders,authHeaders,captureAccount,authOutcome,enabled,trainingPuzzle,guidance,assist,afterStart,resumeAfterAuth,cancelledAuthReturn,firstPending,isFirstGame,captureFirstGame,recordStarted,recordCompleted,
     firstBoardExperiment:()=>state().firstBoardExperiment||null,
     quiet:()=>enabled()&&read(sessionStorage,QUIET)===true,
     analyticsVersion:()=>enabled()&&(state().enrolled||(typeof freshStarterVisit==='function'&&freshStarterVisit()))?VERSION:null,

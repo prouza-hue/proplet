@@ -206,10 +206,15 @@ openapi_contract["components"]["schemas"].pop("AssignmentRequest")
 # Diagnostic provenance adds only optional fields; the actual route/model boundary
 # is covered by test_client_error_contract (including rejection and test exclusion).
 diag = openapi_contract['components']['schemas']['ClientErrorCreate']
-added = {'client_release','client_version','is_test','source_file','source_line','source_column'}
+added = {'client_release','client_version','is_test','source_file','source_line','source_column','source_frames','source_availability','reporter_release','unknown_producer_reason'}
 assert set(diag['properties']) == {'code','message','route'} | added
 assert not (set(diag.get('required', [])) & added)
 assert diag['properties']['is_test']['default'] is False
+assert diag['properties']['source_frames']['maxItems'] == 3
+frame = openapi_contract['components']['schemas'].pop('ClientErrorFrame')
+assert set(frame['required']) == {'file','line','column'}
+assert frame['properties']['file']['maxLength'] == 120
+assert all(frame['properties'][key]['minimum'] == 1 and frame['properties'][key]['maximum'] == 1000000 for key in ('line','column'))
 for field in ('source_line','source_column'):
     bounded = next(v for v in diag['properties'][field]['anyOf'] if v.get('type') == 'integer')
     assert bounded['minimum'] == 1 and bounded['maximum'] == 1000000

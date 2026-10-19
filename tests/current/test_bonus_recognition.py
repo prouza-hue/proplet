@@ -35,7 +35,7 @@ with zipfile.ZipFile(ROOT / "public/recognition/bonus-cs-v1-source.zip") as arch
     for source in (*sorted((ROOT / "content/recognition/hunspell-cs").iterdir()),
                    ROOT / "content/recognition/README.md", ROOT / "tools/build_bonus_recognition.py"):
         if source.is_file():
-            assert archive.read(str(source.relative_to(ROOT))) == source.read_bytes(), source
+            assert archive.read(source.relative_to(ROOT).as_posix()) == source.read_bytes(), source
 
 # A serverless function must work with the data directory alone. The CDN's public
 # directory is intentionally absent from this isolated import.

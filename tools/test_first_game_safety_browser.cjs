@@ -9,15 +9,22 @@ const report={checks:[],synthetic:true};
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
  try{
-  for(const mobile of [false,true]){
+  for(const scenario of [{name:'desktop',width:1440,height:1000,mobile:false},{name:'mobile',width:390,height:844,mobile:true},{name:'fold',width:768,height:900,mobile:true}]){
+   const {mobile}=scenario;
    await fetch(url+'/__fixture/control',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({reset:true,firstSteps:true,firstBoardPolicy:'challenger_rollout_20261007'})});
-   const run=crypto.randomUUID(),context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1440,height:1000},isMobile:mobile,hasTouch:mobile,serviceWorkers:'block',extraHTTPHeaders:{'X-Proplet-Test':'1','X-Proplet-Fixture-Run':run}});
+   const run=crypto.randomUUID(),context=await browser.newContext({viewport:{width:scenario.width,height:scenario.height},isMobile:mobile,hasTouch:mobile,serviceWorkers:'block',extraHTTPHeaders:{'X-Proplet-Test':'1','X-Proplet-Fixture-Run':run}});
    // Keep consent UI out of pointer scenarios, using a date before the fixed fixture clock.
    await context.addInitScript(()=>{localStorage.setItem('proplet-v3-15-anonymous-id','synthetic-first-game-safety');localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.parse('2026-09-15T09:00:00Z')}));});
    await context.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.abort());
    const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
    await page.goto(url);await page.waitForFunction(()=>currentGame?.mode==='starter'&&document.querySelectorAll('#board .cell').length===9);
+   if(scenario.name==='desktop'){
+    await page.waitForTimeout(10300);await page.evaluate(()=>productAnalytics().flush());
+    const readyRows=(await fetch(url+'/__fixture/events').then(r=>r.json())).events.filter(e=>e.headers['x-proplet-fixture-run']===run);
+    for(const phase of ['starter_v1_presentation_checked','starter_v1_idle']){const rows=readyRows.filter(e=>e.event===phase);assert.equal(rows.length,1);assert(['visible','obscured'].includes(rows[0].headers['x-proplet-starter-reason']),'initial paint may still be obscured, never infer visibility from ready');if(phase==='starter_v1_idle')assert.equal(rows[0].headers['x-proplet-starter-reason'],'visible');assert(rows[0].headers['x-proplet-starter-run']);}
+    report.checks.push({name:'first paint classification and visible idle before any interaction',ok:true,events:readyRows.filter(e=>['starter_v1_presentation_checked','starter_v1_idle'].includes(e.event))});
+   }
    async function solve(){
     const paths=await page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path)),training=await page.evaluate(()=>currentGame.mode==='starter');
     for(let n=0;n<paths.length;n++){
@@ -32,9 +39,16 @@ const report={checks:[],synthetic:true};
     }
     await page.locator('#winModal').waitFor({state:'visible'});
    }
-   await solve();await page.getByRole('button',{name:'Hrát dál',exact:true}).click();
+   await solve();
+   const completedBefore=await page.evaluate(()=>JSON.stringify(getState().completed));
+   // The actual cached-facade fault: object exists but the required method does not.
+   await page.evaluate(()=>{window.PropletFirstSteps={...window.PropletFirstSteps,captureFirstGame:'not-callable'}});
+   const recovery=page.waitForRequest(r=>new URL(r.url()).pathname==='/app/engagement/first-steps.js');
+   await page.getByRole('button',{name:'Hrát dál',exact:true}).click();await recovery;
    await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-009');
    await page.locator('#winModal').waitFor({state:'hidden'});
+   assert.equal(await page.evaluate(()=>JSON.stringify(getState().completed)),completedBefore,'recovery preserves completed progress');
+   assert.equal(await page.evaluate(()=>window.PropletFirstSteps.contractVersion),2);
    await page.waitForFunction(()=>document.querySelectorAll('#board .cell').length===currentGame.puzzle.mask.length);
    await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
    const attemptId=await page.evaluate(()=>currentGame.attemptId);
@@ -49,8 +63,15 @@ const report={checks:[],synthetic:true};
    assert(flow.every(e=>e.headers['x-proplet-onboarding']==='board-v3-short'&&e.headers['x-proplet-puzzle']==='g4-e-009'&&e.headers['x-proplet-experiment-policy']==='challenger_rollout_20261007'&&e.headers['x-proplet-test']==='1'));
    for(const event of flow.filter(e=>e.event!=='first_board_experiment_assigned'))assert.equal(event.headers['x-proplet-run'],attemptId,'same actual game attempt');
    assert.equal(await page.locator('#newBadgeBox').count(),1,'missing slot safely rebuilt');
-   await page.screenshot({path:output+'.'+(mobile?'mobile':'desktop')+'.png',fullPage:true});
-   report.checks.push({name:(mobile?'mobile':'desktop')+' first game, recovered optional badge and exact telemetry',ok:true,attemptId,events:flow});
+   await page.screenshot({path:output+'.'+scenario.name+'.png',fullPage:true});
+   report.checks.push({name:scenario.name+' stale facade recovery, preserved progress, first game and exact telemetry',ok:true,attemptId,events:flow});
+   if(scenario.name==='desktop'){
+    await context.route('**/app/engagement/first-steps.js?*',r=>r.abort());
+    const preserved=await page.evaluate(async()=>{const old=currentGame,completed=JSON.stringify(getState().completed),profile=JSON.stringify(getProfile());window.PropletFirstSteps={captureFirstGame:'broken'};const result=await startGame(old.puzzle,'free');return {result,sameGame:currentGame===old,sameCompleted:JSON.stringify(getState().completed)===completed,sameProfile:JSON.stringify(getProfile())===profile}});
+    assert.deepEqual(preserved,{result:false,sameGame:true,sameCompleted:true,sameProfile:true});
+    await context.unroute('**/app/engagement/first-steps.js?*');await page.evaluate(()=>ensureFirstStepsRuntime());
+    report.checks.push({name:'failed recovery retains game, completed progress and account; explicit retry restores facade',ok:true});
+   }
    // Actual historical-result renderer, followed by both formerly failing consumers.
    await page.evaluate(async()=>{const date=pragueDateISO(),p=await historicalDailyPuzzle(date);await showDailyResult(date,{puzzleId:p.id,elapsedMs:10000,moves:p.answers.length,cleanSolve:true});renderGameHUD();updateGameFeel();});
    assert.equal(await page.evaluate(()=>Array.isArray(currentGame.found)&&Array.isArray(currentGame.path)&&currentGame.isReplay),true);

@@ -1,5 +1,6 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.7-refinements4';
+const APP_PREVIEW_RELEASE='proplet-v4.09.8-telemetry1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
+window.PropletClientDiagnostics?.claimErrorListeners?.();
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
 const AVATARS=["🙂","😎","🤓","🥳","🦊","🐱","🐶","🐼","🐯","🦁","🐸","🐵","🦄","🐲","🦖","🐙","🦉","🐝","🦋","🐧","🚀","⚡","🔥","🌈","🍕","⚽","🎮","🧩","🤯","👑","🦄✨","☠️","☢️","🌺","🛸","👽","💣","😈","🤖","🌩️","🐕","🐕‍🦺","👻","🐉","🍄","🎲","🪐"];
@@ -996,17 +997,54 @@ async function sendAttemptCheckpoint(eventType){
 }
 // Diagnostic phases are additive; legacy funnel events keep their meaning.
 let starterBootTrace=null;
+let firstStepsRuntimeRequest=null;
+function firstStepsRuntimeReady(){return ['analyticsVersion','trainingPuzzle','captureFirstGame','isFirstGame','recordStarted','recordCompleted','afterStart','eventHeaders'].every(key=>typeof window.PropletFirstSteps?.[key]==='function')}
+async function ensureFirstStepsRuntime(){
+ if(firstStepsRuntimeReady())return;
+ if(firstStepsRuntimeRequest)return firstStepsRuntimeRequest;
+ firstStepsRuntimeRequest=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');let settled=false;
+  const finish=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();firstStepsRuntimeReady()?resolve():reject(new Error('first-steps-contract'))};
+  const timer=setTimeout(finish,10000);
+  script.src='/app/engagement/first-steps.js?v=firstgame-recovery2';script.onload=finish;script.onerror=finish;
+  try{document.head.append(script)}catch{finish()}
+ });
+ try{await firstStepsRuntimeRequest}finally{firstStepsRuntimeRequest=null}
+}
 function createStarterTrace(){return {id:newAttemptId(),started:performance.now(),seen:new Set(),provenance:Object.freeze({onboardingVersion:window.PropletFirstSteps?.analyticsVersion()||'board-v2',clientRelease:APP_PREVIEW_RELEASE})}}
 function trackStarterPhase(trace,phase,reason){
  if(!trace||trace.seen.has(phase))return;
  trace.seen.add(phase);
+ if(['interaction','completed','failed','cancelled','left'].includes(phase))clearTimeout(trace.idleTimer);
  try{trackProductEvent('starter_v1_'+phase,{starterRunId:trace.id,starterElapsedMs:Math.round(performance.now()-trace.started),starterReason:reason,starterProvenance:trace.provenance})}catch{}
+}
+function starterPresentationReason(g){
+ if(currentGame!==g||currentScreen!=='game')return 'navigation';
+ if(document.hidden)return 'visibility';
+ if(g.pausedAt!=null)return 'paused';
+ const board=$('#board'),rect=board?.getBoundingClientRect();
+ if(!rect?.width||!rect.height||board.querySelectorAll('.cell').length!==g.puzzle.mask.length)return 'not_visible';
+ const top=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);
+ return top&&board.contains(top)?'visible':'obscured';
+}
+function observeStarterPresentation(g){
+ if(!g?.starterTrace)return;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(currentGame!==g||g.finished)return;
+  trackStarterPhase(g.starterTrace,'presentation_checked',starterPresentationReason(g));
+ }));
+ g.starterTrace.idleTimer=setTimeout(()=>{
+  if(currentGame===g&&!g.finished&&!g.starterTrace.seen.has('interaction'))trackStarterPhase(g.starterTrace,'idle',starterPresentationReason(g));
+ },10000);
 }
 function freshStarterVisit(){
  try{if(window.PROPLET_RUNTIME_META?.gen4CandidatePreview||window.PROPLET_RUNTIME_META?.gen5CandidatePreview)return false;const state=getState();return !getProfile()?.token&&!localStorage.getItem(ONBOARD_KEY)&&!Object.keys(state.completed||{}).length&&!Object.keys(state.inProgress||{}).length}catch{return false}
 }
 let gameLaunchSequence=0;
 async function startGame(puzzle,mode,dailyDate,options={}){
+ // A cached document/module may expose the old facade. Restore its contract
+ // before preparing an attempt or replacing the player's current game.
+ try{await ensureFirstStepsRuntime()}catch{trackStarterPhase(starterBootTrace,'failed','module');reportClientError('first_steps_module_unavailable','first-steps-contract');showToast('Herní modul se nepodařilo načíst. Zkus spustit hru znovu.');return false}
  if(mode==='daily_special'&&navigator.onLine===false&&puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false){showToast('Extra výzva potřebuje připojení. Offline si můžeš zahrát volnou hru nebo Archiv.');return}
  if(mode==='daily_special'){
   const binding=puzzle?.meta?.dailySpecialBinding;
@@ -1040,6 +1078,7 @@ async function startGame(puzzle,mode,dailyDate,options={}){
  $('#screen-game').classList.toggle('rescue-mode',mode==='rescue');$('#screen-game').classList.toggle('starter-mode',mode==='starter');$('#screen-game').classList.toggle('tajenka-mode',mode==='tajenka');$('#gameModeLabel').textContent=mode==='daily'?'Denní výzva':mode==='daily_special'?(puzzle.meta.dailySpecialBinding.rewardEligible?'Denní speciál':'Speciál · trénink'):mode==='rescue'?'Záchrana série':mode==='starter'?'První Proplet':mode==='tajenka'?'Víkendový bonus':mode==='playtest'?'Mozkokalypsa':'Volná hra';const levelNo=Number(puzzle.meta?.level)||null,firstStepsGame=window.PropletFirstSteps?.isFirstGame(currentGame);if(mode==='rescue'||mode==='starter')$('#gameDifficulty').textContent=mode==='rescue'?'🔥 6×6 · jeden pokus':'🎓 Trénink · 5×5';else if(mode==='tajenka')$('#gameDifficulty').innerHTML='<span class="tajenka-game-label">✦ Tajenka</span>';else if(mode==='playtest')$('#gameDifficulty').innerHTML=window.PropletPlaytest.labelMarkup();else $('#gameDifficulty').innerHTML=`${difficultyIconMarkup(puzzle.difficulty,'game-difficulty-icon')}<span>${esc(DIFF[puzzle.difficulty].label)}${firstStepsGame?' · první hra':mode==='free'&&levelNo?` ${levelNo}`:''}</span>`;
  $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);if(mode==='tajenka'&&!tajenkaRulesSeen())openTajenkaRules();else startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});window.PropletFirstSteps?.recordStarted(currentGame);runGameSessionHooks('afterStart',{...sessionEvent,game:currentGame});window.PropletFirstSteps?.afterStart(currentGame);if(!currentGame.isReplay&&currentGame.found.length===puzzle.answers.length)queueMicrotask(()=>{if(currentGame?.puzzle===puzzle)finishGame()});
  trackStarterPhase(starterTrace,'ready');
+ observeStarterPresentation(currentGame);
  return true;
  }catch(error){
   if(!starterTrace)throw error;
@@ -1679,6 +1718,7 @@ async function deleteAccount(){
  }catch(e){$('#deleteAccountError').textContent=e.message}finally{button.disabled=false;button.textContent='Trvale smazat účet'}
 }
 let reportingClientError=false;
+let clientErrorReportingBound=false;
 function clientErrorSource(detail){
  const candidates=[];if(detail?.filename)candidates.push([detail.filename,detail.lineno,detail.colno]);
  const stack=String(detail?.stack||detail?.error?.stack||'');
@@ -1693,12 +1733,15 @@ function clientErrorHeaders(){
  return {...captured,'Content-Type':'application/json','X-Proplet-Version':version,'X-Proplet-Client-Release':release,'X-Proplet-Analytics':'2',...(test?{'X-Proplet-Test':'1'}:{})};
 }
 function reportClientError(code,message,detail){
+ if(window.PropletClientDiagnostics?.report)return window.PropletClientDiagnostics.report(code,message,detail,clientErrorHeaders());
  if(reportingClientError||!navigator.onLine)return;reportingClientError=true;
  const headers=clientErrorHeaders();let p;try{p=getProfile();if(p?.token)headers.Authorization=`Bearer ${p.token}`;else headers['X-Proplet-Anon-ID']=getAnonymousId()}catch{}
  const body={code:String(code||'client_error').slice(0,80),message:String(message||'').slice(0,200),route:location.pathname.slice(0,120),client_release:headers['X-Proplet-Client-Release'],client_version:headers['X-Proplet-Version'],is_test:headers['X-Proplet-Test']==='1',...clientErrorSource(detail)};
  try{return fetch('/api/client-error',{method:'POST',headers,body:JSON.stringify(body),keepalive:true,cache:'no-store'}).catch(()=>{}).finally(()=>{reportingClientError=false})}catch{reportingClientError=false}
 }
 function bindClientErrorReporting(){
+ if(window.PropletClientDiagnostics?.ownsErrorListeners||clientErrorReportingBound)return;
+ clientErrorReportingBound=true;
  window.addEventListener('error',e=>reportClientError('window_error',e?.message||'JavaScript error',e));window.addEventListener('unhandledrejection',e=>{const r=e?.reason;reportClientError('unhandled_rejection',r?.message||String(r||'Promise rejection'),r)});
 }
 
@@ -2694,6 +2737,9 @@ async function refreshRollingContent(){
 }
 
 async function boot(){
+ // Install reporting before boot awaits; errors in startup must retain their producer.
+ bindClientErrorReporting();
+ try{await ensureFirstStepsRuntime()}catch{reportClientError('first_steps_module_unavailable','first-steps-contract')}
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();globalThis.PropletArchiveExperience?.configure();
  if(freshStarterVisit()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
  try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
