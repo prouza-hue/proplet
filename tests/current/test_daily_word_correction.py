@@ -20,7 +20,9 @@ assert hashlib.sha256(json.dumps(board,ensure_ascii=False,sort_keys=True,separat
 assert [(i, a, b) for i, (a, b) in enumerate(zip(correction['before']['letters'], board['letters'])) if a != b] == [(38, 'A', 'Á'), (48, 'Á', 'A')]
 assert [a['path'] for a in board['answers']] == [a['path'] for a in correction['before']['answers']]
 structural(board)  # orthogonal spelling, complete coverage, no overlaps
-words = set(validation_words(Catalog()))
+catalog = Catalog()
+assert 'mamá' in catalog.exclusions
+words = set(validation_words(catalog))
 words.update(norm(a['word']) for a in board['answers'])
 words.add('mamá')  # retain the old spelling as a possible competing word
 assert len(words) >= 100_000
