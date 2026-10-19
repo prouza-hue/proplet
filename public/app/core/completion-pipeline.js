@@ -7,7 +7,7 @@
     function register(hook){
       if(!hook||typeof hook.id!=='string'||!hook.id.trim())throw new Error('Completion hook requires id');
       const id=hook.id.trim();
-      if(hooks.has(id))return true;
+      if(hooks.has(id)&&hook.replace!==true)return true;
       hooks.set(id,{
         id,
         priority:Number.isFinite(Number(hook.priority))?Number(hook.priority):100,

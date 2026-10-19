@@ -55,7 +55,7 @@ def request_context(request, environment):
     starter_ms=request.headers.get('x-proplet-starter-ms','')
     if starter_ms.isdigit() and 0<=int(starter_ms)<=86400000:details['starter_ms']=int(starter_ms)
     reason=request.headers.get('x-proplet-starter-reason','')
-    if reason in {'data','prepare','render','superseded','navigation','visibility'}:details['starter_reason']=reason; details['reason']=reason
+    if reason in {'data','prepare','render','superseded','navigation','visibility','module','paused','not_visible','visible','obscured'}:details['starter_reason']=reason; details['reason']=reason
     first_steps_run=request.headers.get('x-proplet-first-steps-run','')
     try:
         if first_steps_run:details['first_steps_run_id']=str(uuid.UUID(first_steps_run))

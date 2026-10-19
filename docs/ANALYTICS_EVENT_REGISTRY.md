@@ -146,3 +146,17 @@ invariants. `account_created` is joined only by `first_steps_run_id`.
 `saved_any_account` is reported separately because an existing-account login
 can save without creating a new account. Rolling totals are never a causal uplift
 claim.
+
+## Starter presentation diagnostics from 4.09.8
+
+starter_v1_presentation_checked runs once after two animation frames; starter_v1_idle
+runs once after ten seconds without interaction. Both retain starter_run_id and
+capture-time client/onboarding provenance. Reasons are bounded: visible, obscured,
+paused, not_visible, visibility, navigation. They are diagnostic signals, not new
+conversion boundaries; idle or hidden is not abandonment. Older clients do not
+have a comparable history. Module recovery failure uses the bounded reason module.
+
+See docs/audits/TELEMETRY-FOLLOWUP-20261019.md and TELEMETRY-FOLLOWUP-VERIFY.sql
+for exact first-game row counts, attempt links, duplicate diagnostics and separate
+new/old/unknown producer error reporting. Never replace client_release with
+reporter_release or server_version. Raw stacks and URL parameters remain excluded.

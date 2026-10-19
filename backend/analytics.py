@@ -28,6 +28,8 @@ REFERRAL_EVENT_NAMES = (
     "referral_landing_validated",
 )
 
+STARTER_DIAGNOSTIC_EVENT_NAMES = ('starter_v1_presentation_checked', 'starter_v1_idle')
+
 EMBEDDED_EVENT_NAMES = (
     "account_authenticated",
     "account_created",
@@ -187,6 +189,7 @@ EMBEDDED_EVENT_NAMES = (
     "win_account_cta_shown",
     "word_discovery_claim_rejected",
     *REFERRAL_EVENT_NAMES,
+    *STARTER_DIAGNOSTIC_EVENT_NAMES,
 )
 
 

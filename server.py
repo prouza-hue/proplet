@@ -390,6 +390,14 @@ def record_operational_event(
     for key, value in (metadata or {}).items():
         if key in {"token", "authorization", "password", "secret", "ip", "email"}:
             continue
+        if key == 'source_frames' and isinstance(value, list):
+            frames = [f for f in value[:3] if isinstance(f, dict) and set(f) == {'file','line','column'}
+                      and isinstance(f['file'], str) and len(f['file']) <= 120 and '..' not in f['file']
+                      and re.fullmatch(r'/(?:app/)?[A-Za-z0-9_./-]+\.js', f['file'])
+                      and all(type(f[k]) is int and 1 <= f[k] <= 1000000 for k in ('line','column'))]
+            if frames:
+                safe_metadata[key] = frames
+            continue
         if isinstance(value, (str, int, float, bool)) or value is None:
             safe_metadata[str(key)[:40]] = str(value)[:160] if isinstance(value, str) else value
     db_insert("operational_events", {
@@ -2553,6 +2561,13 @@ def client_error(
     source_file = getattr(payload, 'source_file', None)
     if source_file and '..' not in source_file and re.fullmatch(r'/(?:app/)?[A-Za-z0-9_./-]+\.js', source_file):
         safe_metadata.update({key: getattr(payload, key, None) for key in ('source_file', 'source_line', 'source_column')})
+    frames = [f.model_dump() for f in getattr(payload, 'source_frames', []) if '..' not in f.file]
+    if frames:
+        safe_metadata['source_frames'] = frames[:3]
+    for key in ('source_availability', 'reporter_release', 'unknown_producer_reason'):
+        value = getattr(payload, key, None)
+        if value is not None:
+            safe_metadata[key] = value
     token = measurement.context.set(provenance)
     try:
         record_operational_event(

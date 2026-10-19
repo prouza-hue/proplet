@@ -181,7 +181,9 @@
     "referral_share_native_failed",
     "referral_copy_succeeded",
     "referral_copy_failed",
-    "referral_landing_validated"
+    "referral_landing_validated",
+    "starter_v1_presentation_checked",
+    "starter_v1_idle"
   ],
   "bounded_provenance_headers": {
     "X-Proplet-Referral-Source": [

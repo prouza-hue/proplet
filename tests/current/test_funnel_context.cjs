@@ -4,6 +4,7 @@ const app=fs.readFileSync('public/app.js','utf8');
 for(const version of ['board-v3-short','board-v2']){
  let active=version,clock=1;const rows=[];
  const c={window:{PropletFirstSteps:{analyticsVersion:()=>active}},newAttemptId:()=> '00000000-0000-4000-8000-000000000001',performance:{now:()=>clock++},APP_PREVIEW_RELEASE:'release-captured',currentGame:null,getProfile:()=>null,URLSearchParams,location:{search:'?tutorial=1'}};
+ c.clearTimeout=()=>{};
  c.trackProductEvent=(event,props)=>rows.push({event,headers:c.analyticsHeaders(event,props)});
  vm.createContext(c);vm.runInContext(app.slice(app.indexOf('function createStarterTrace()'),app.indexOf('function freshStarterVisit()')),c);vm.runInContext(app.slice(app.indexOf('function analyticsHeaders('),app.indexOf('function productAnalytics()')),c);
  const t=c.createStarterTrace();assert(Object.isFrozen(t.provenance));
