@@ -61,11 +61,12 @@ function create(deps={}){
     const seen=new Set(),found=[];
     for(const item of row.found||[]){
       const answer=puzzle.answers?.[item.answerIndex];
-      if(!answer||seen.has(item.answerIndex)||answer.word!==item.word||!samePath(answer.path,item.path||[]))continue;
+      const corrected=answer&&(puzzle.meta?.answerCorrections||[]).some(c=>c.from===item.word&&c.to===answer.word&&Array.isArray(c.path)&&samePath(c.path,answer.path));
+      if(!answer||seen.has(item.answerIndex)||(!corrected&&answer.word!==item.word)||!samePath(answer.path,item.path||[]))continue;
       seen.add(item.answerIndex);
       found.push({
         answerIndex:item.answerIndex,
-        word:item.word,
+        word:answer.word,
         colorIndex:Number.isFinite(item.colorIndex)?item.colorIndex:found.length%colorCount,
         path:[...item.path],
       });

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.8-telemetry1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.9-mama1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 window.PropletClientDiagnostics?.claimErrorListeners?.();
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
@@ -692,7 +692,7 @@ function savedProgressFor(puzzle,mode,dailyDate){
  if(mode==='rescue'||mode==='starter')return null;const s=getState(),key=challengeKey(mode,puzzle,dailyDate),completed=s.completed?.[key];if(completed&&!(mode==='daily'&&completed.puzzleId!==puzzle.id))return null;const r=s.inProgress?.[key];
  if(!r||r.puzzleId!==puzzle.id||r.mode!==mode)return null;
  const seen=new Set(),found=[];
- for(const f of r.found||[]){const a=puzzle.answers?.[f.answerIndex];if(!a||seen.has(f.answerIndex)||a.word!==f.word||!samePath(a.path,f.path||[]))continue;seen.add(f.answerIndex);found.push({answerIndex:f.answerIndex,word:f.word,colorIndex:Number.isFinite(f.colorIndex)?f.colorIndex:found.length%COLORS.length,path:[...f.path]})}
+ for(const f of r.found||[]){const a=puzzle.answers?.[f.answerIndex],corrected=a&&(puzzle.meta?.answerCorrections||[]).some(c=>c.from===f.word&&c.to===a.word&&Array.isArray(c.path)&&samePath(c.path,a.path));if(!a||seen.has(f.answerIndex)||(!corrected&&a.word!==f.word)||!samePath(a.path,f.path||[]))continue;seen.add(f.answerIndex);found.push({answerIndex:f.answerIndex,word:a.word,colorIndex:Number.isFinite(f.colorIndex)?f.colorIndex:found.length%COLORS.length,path:[...f.path]})}
  return {...r,found,moves:Math.max(0,Number(r.moves)||0),hints:Math.max(0,Number(r.hints)||0),wrongAttempts:Math.max(0,Number(r.wrongAttempts)||0),maxHintLevel:Math.max(0,Number(r.maxHintLevel)||0),elapsedMs:Math.max(0,Number(r.elapsedMs)||0)};
 }
 function gameElapsed(g=currentGame){const session=gameSession();if(session)return session.elapsed(g);if(!g)return 0;const end=g.pausedAt??performance.now();return Math.max(0,(g.baseElapsedMs||0)+(end-g.start))}

@@ -84,4 +84,39 @@ assert.strictEqual([...intervals.values()][0].ms,250);
 session.stopTimer();
 assert.strictEqual(intervals.size,0);
 
+// A published spelling correction must preserve an already found word on its
+// exact path, while the usual forged/duplicate progress filters keep working.
+const correctedPuzzle=JSON.parse(fs.readFileSync(path.join(root,'public/puzzles.json'),'utf8')).daily.find(p=>p.id==='g4-d-042');
+const correction=correctedPuzzle.meta.answerCorrections[0];
+const correctedIndex=correctedPuzzle.answers.findIndex(a=>a.word===correction.to);
+const oldFound={answerIndex:correctedIndex,word:correction.from,path:[...correction.path],colorIndex:3};
+const correctionKey='daily:2026-10-04';
+memory.state.inProgress[correctionKey]={puzzleId:correctedPuzzle.id,mode:'daily',found:[oldFound,oldFound],elapsedMs:12345,moves:7,hints:1,attemptId:'unchanged-attempt'};
+const vm=require('vm');
+const fallbackContext={gameSession:()=>null,getState:()=>memory.state,challengeKey:()=>correctionKey,samePath:(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]),COLORS:Array(8)};
+vm.runInNewContext(app.slice(app.indexOf('function savedProgressFor('),app.indexOf('function gameElapsed(')),fallbackContext);
+for(const restore of [()=>session.restore(correctedPuzzle,'daily','2026-10-04'),()=>fallbackContext.savedProgressFor(correctedPuzzle,'daily','2026-10-04')]){
+  memory.state.completed={};
+  memory.state.inProgress[correctionKey].found=[oldFound,oldFound];
+  const restored=restore();
+  assert.strictEqual(restored.found.length,1,'correction must not duplicate saved words');
+  assert.strictEqual(restored.found[0].word,'MÁMA');
+  assert.deepStrictEqual(Array.from(restored.found[0].path),correction.path);
+  assert.strictEqual(restored.found[0].colorIndex,3);
+  assert.strictEqual(restored.elapsedMs,12345);
+  assert.strictEqual(restored.attemptId,'unchanged-attempt');
+  assert.strictEqual(restored.moves,7);
+  assert.strictEqual(restored.hints,1);
+  memory.state.inProgress[correctionKey].found=[{...oldFound,word:'XXXX'}];
+  assert.strictEqual(restore().found.length,0,'unapproved aliases remain invalid');
+  memory.state.inProgress[correctionKey].found=[{...oldFound,path:[...oldFound.path].reverse()}];
+  assert.strictEqual(restore().found.length,0,'old word on a wrong path remains invalid');
+  memory.state.inProgress[correctionKey].found=[oldFound];
+  const metadata=correctedPuzzle.meta;correctedPuzzle.meta={};
+  assert.strictEqual(restore().found.length,0,'unrelated puzzles cannot inherit the correction');
+  correctedPuzzle.meta=metadata;
+  memory.state.completed[correctionKey]={puzzleId:correctedPuzzle.id};
+  assert.strictEqual(restore(),null,'completed boards stay completed');
+}
+
 console.log('PASS: Sprint 11B.1 GameSession owns state, clock and persistence contracts');

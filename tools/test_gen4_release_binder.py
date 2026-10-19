@@ -2,6 +2,7 @@
 """Rehearse the approval-only date binder and validate the bound release."""
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -17,6 +18,13 @@ def main() -> None:
         target = Path(tmp)
         puzzles = target / "puzzles.json"
         rolling = target / "rolling.json"
+        # Rehearse the frozen August candidate under its original editorial
+        # policy. Later target exclusions must not rewrite historical inputs.
+        correction = json.loads((ROOT / "content/editorial-corrections/g4-d-042-20261019.json").read_text())
+        exclusions = target / "historical-exclusions.json"
+        raw = (json.dumps(correction["generationExclusionsBefore"], ensure_ascii=False, indent=2) + "\n").encode()
+        assert hashlib.sha256(raw).hexdigest() == "926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3"
+        exclusions.write_bytes(raw)
         subprocess.run([
             sys.executable, str(ROOT / "tools/bind_gen4_release.py"),
             "--puzzles", str(ROOT / "data/puzzles_gen4_candidate_v334.json"),
@@ -28,7 +36,7 @@ def main() -> None:
             sys.executable, str(ROOT / "tools/validate_gen4_release.py"), str(puzzles),
             "--rolling", str(rolling),
             "--profiles", str(ROOT / "data/gen4_profiles_v334.json"),
-            "--exclusions", str(ROOT / "data/target_generation_exclusions_v334.json"),
+            "--exclusions", str(exclusions),
             "--strict-counts", "--approved-release",
         ], check=True, capture_output=True, text=True)
         bound = json.loads(puzzles.read_text(encoding="utf-8"))

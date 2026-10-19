@@ -13,8 +13,13 @@ digest = lambda value: hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_k
 assert data['freeGeneration'] == 4
 for difficulty, expected in baseline['free'].items():
     assert digest([p for p in data['free'][difficulty] if not p['id'].startswith('g6-refresh-')]) == expected, difficulty
+correction = read('content/editorial-corrections/g4-d-042-20261019.json')
 for key,expected in baseline['preserved'].items():
-    assert digest(data.get(key)) == expected, key
+    actual = data.get(key)
+    if key == 'daily':
+        assert digest(next(p for p in actual if p['id'] == correction['puzzleId'])) == correction['afterHash']
+        actual = [correction['before'] if p['id'] == correction['puzzleId'] else p for p in actual]
+    assert digest(actual) == expected, key
 boards = data['free']['mozkokalypsa']
 assert len(boards) == 100 and read('public/puzzles.json')['free'] == data['free']
 for index,(source,board) in enumerate(zip(frozen['boards'],boards),1):
