@@ -178,10 +178,19 @@ jobs:
 
       - name: Validate committed complete paused Gen4 candidate
         run: |
+          # Historical replay uses the policy pinned at original generation.
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          correction = json.loads(Path('content/editorial-corrections/g4-d-042-20261019.json').read_text())
+          raw = (json.dumps(correction['generationExclusionsBefore'], ensure_ascii=False, indent=2) + '\n').encode()
+          assert hashlib.sha256(raw).hexdigest() == '926bcdf64796e571c1209ada9feb4e4639ef4113b77d3b1fd1ca7b49cee453a3'
+          Path('/tmp/gen4-contract/historical-exclusions.json').write_bytes(raw)
+          PY
           python tools/validate_gen4_release.py data/puzzles_gen4_candidate_v334.json \
             --rolling data/rolling_content_gen4_candidate_v334.json \
             --profiles data/gen4_profiles_v334.json \
-            --exclusions data/target_generation_exclusions_v334.json \
+            --exclusions /tmp/gen4-contract/historical-exclusions.json \
             --strict-counts \
             --report /tmp/gen4-contract/full-candidate-validation.json
 
