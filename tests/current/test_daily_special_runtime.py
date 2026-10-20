@@ -55,7 +55,7 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
     assert "content_hash" not in legacy_hashed
     response=client.post("/api/result",json=payload,headers={"X-Proplet-Result-Receipt":"1"})
     assert response.status_code==200,response.text
-    assert response.json()["awardedPoints"]==100
+    assert response.json()["awardedPoints"]==200
     assert commands[-1][1]["p_command"]["contentHash"]==special["contentHash"]
     assert commands[-1][1]["p_command"]["freeLevel"] is None and commands[-1][1]["p_command"]["legacyRewardSlot"] is None
     for modified in ({**payload,"challenge_key":base["challengeKey"]},{**payload,"daily_date":"2026-10-13"},

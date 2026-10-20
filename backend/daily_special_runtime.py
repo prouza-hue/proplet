@@ -80,6 +80,12 @@ def install(namespace):
             raise HTTPException(409, "Oficiální speciál už skončil. Archiv je bez XP.")
         return {"binding": binding, "practice": practice, "points": 0 if practice else SPECIAL_XP}
 
+    def discovery_identity(payload):
+        binding, practice = identity(payload)
+        if practice or payload.daily_date != binding.daily_date or iso_date(binding.daily_date) != today():
+            raise HTTPException(400, "Bonusová slova lze odměnit jen v dnešní oficiální Extra výzvě")
+        return binding
+
     original_resolved = namespace["resolved_puzzle"]
     original_exists = namespace["puzzle_exists"]
     original_info = namespace["puzzle_info"]
@@ -111,6 +117,7 @@ def install(namespace):
             return None
 
     namespace.update({"daily_special_result_context": result_context, "daily_special_session_identity": session_identity,
+                      "daily_special_discovery_identity": discovery_identity,
                       "daily_special_attempt_identity": attempt_identity, "resolved_puzzle": resolved,
                       "puzzle_exists": exists, "puzzle_info": info, "daily_special_shared_body": shared_body})
 

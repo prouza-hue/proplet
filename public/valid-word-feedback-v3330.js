@@ -8,6 +8,7 @@
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
   const TRIGGER_STREAK=3;
   const RECOGNITION_VERSION=7;
+  const DISCOVERY_CLAIM_VERSION=2;
   const BLOCKED_DISCOVERY_WORDS=new Set(['NEGR']);
   let localWords=null;
   let localWordsPromise=null;
@@ -202,7 +203,8 @@
     difficulty:row.difficulty,
     word:row.word,
     path:Array.isArray(row.path)?row.path:[],
-    daily_date:row.dailyDate||null
+    daily_date:row.dailyDate||null,
+    ...(row.mode==='daily_special'?{challenge_key:row.challengeKey||`daily-special:${row.dailyDate}:${row.difficulty}`}:{})
   });
 
   const permanentClaimError=error=>[400,404,410,422].includes(Number(error?.status));
@@ -212,7 +214,8 @@
       status:'rejected',
       rejectedStatus:Number(error?.status)||null,
       rejectedReason:String(error?.message||'Claim zamítnut').slice(0,160),
-      rejectedAt:new Date().toISOString()
+      rejectedAt:new Date().toISOString(),
+      claimVersion:DISCOVERY_CLAIM_VERSION
     };
     track('word_discovery_claim_rejected');
   };
@@ -242,7 +245,13 @@
       const store=readDiscoveryStore(id);
       let changed=false;
       for(const [key,row] of Object.entries(store.entries||{})){
-        if(row?.status!=='pending')continue;
+        // Earlier clients kept these valid traces after the API rejected the longer
+        // daily_special mode. Re-submit their original proof once under this contract.
+        const legacySpecial=row?.mode==='daily_special'&&row.status==='rejected'
+          &&Number(row.claimVersion||0)<DISCOVERY_CLAIM_VERSION
+          &&(Number(row.rejectedStatus)===422||(Number(row.rejectedStatus)===400
+            &&row.rejectedReason==='Odměna platí jen v běžné hře'));
+        if(row?.status!=='pending'&&!legacySpecial)continue;
         if(discoveryKnownKeys.has(key)){
           store.entries[key]={...row,status:'confirmed'};changed=true;continue;
         }
@@ -267,6 +276,10 @@
   const awardDiscovery=async candidate=>{
     if(candidate?.mode==='playtest')return 'disabled';
     if(rewardDisabled())return 'disabled';
+    if(candidate?.mode==='daily_special'){
+      const binding=candidate.game?.puzzle?.meta?.dailySpecialBinding;
+      if(binding?.official!==true||binding?.rewardEligible!==true||candidate.dailyDate!==localDay())return 'disabled';
+    }
     patchEffectiveStats();
     const key=discoveryRewardKey(candidate.puzzleId,candidate.word);
     const s=scope();
@@ -285,13 +298,15 @@
       mode:candidate.mode,
       difficulty:candidate.difficulty,
       dailyDate:candidate.dailyDate||null,
+      ...(candidate.mode==='daily_special'?{challengeKey:candidate.game?.puzzle?.meta?.dailySpecialBinding?.challengeKey}:{}),
       attemptId:candidate.game?.attemptId||null,
       word:normalize(candidate.word),
       path:[...(candidate.path||[])],
       status:profile()?.token?'pending':'local',
       rewardDay:localDay(),
       createdAt:new Date().toISOString(),
-      recognitionVersion:RECOGNITION_VERSION
+      recognitionVersion:RECOGNITION_VERSION,
+      claimVersion:DISCOVERY_CLAIM_VERSION
     };
 
     if(!profile()?.token){

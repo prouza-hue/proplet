@@ -49,7 +49,7 @@ class SpecialInvariants(unittest.TestCase):
         current=self.bank.descriptor(self.binding,today=self.today)
         archive=self.bank.descriptor(self.binding,today=self.today+timedelta(days=1))
         self.assertTrue(current["official"])
-        self.assertEqual(current["rewardXp"],100)
+        self.assertEqual(current["rewardXp"],200)
         self.assertFalse(archive["official"])
         self.assertEqual(archive["rewardXp"],0)
         self.assertNotEqual(archive["challengeKey"],current["challengeKey"])
@@ -83,7 +83,7 @@ class SpecialInvariants(unittest.TestCase):
 
     def test_special_and_base_same_day_are_two_challenges_one_streak(self):
         base={"mode":"daily","daily_date":"2026-10-14","challenge_key":"daily:2026-10-14","points":100,"clean_solve":True}
-        special={"mode":"daily_special","daily_date":"2026-10-14","challenge_key":self.binding.challenge_key,"points":100,"clean_solve":True}
+        special={"mode":"daily_special","daily_date":"2026-10-14","challenge_key":self.binding.challenge_key,"points":200,"clean_solve":True}
         calculate=lambda rows: calculate_stats(rows,today=self.today,badges=[{"days":1,"name":"base"}],free_difficulties=("hardcore",))
         only=calculate([special])
         self.assertEqual((only["dailyCompleted"],only["currentStreak"],only["cleanDaily"],only["rescuedDays"]),(0,0,0,0))
@@ -91,7 +91,7 @@ class SpecialInvariants(unittest.TestCase):
         for rows in ([base,special],[special,base]):
             stats=calculate(rows)
             self.assertEqual((stats["dailyCompleted"],stats["dailySpecialCompleted"],stats["dailyChallengeCompleted"],stats["currentStreak"]),(1,1,2,1))
-            self.assertEqual(stats["points"],200)
+            self.assertEqual(stats["points"],300)
             self.assertEqual(stats["totalCompleted"],1) # existing general badges are preserved
 
 

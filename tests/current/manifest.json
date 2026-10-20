@@ -696,6 +696,14 @@
       {
         "path": "tests/current/test_ranking_expansion.js",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_daily_special_discovery.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_daily_special_discovery.cjs",
+        "runner": "node"
       }
     ]
   },

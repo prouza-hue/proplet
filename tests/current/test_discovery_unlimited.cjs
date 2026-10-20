@@ -7,7 +7,7 @@ const source=fs.readFileSync('public/valid-word-feedback-v3330.js','utf8');
 const code=source.slice(source.indexOf('  const awardDiscovery='),source.indexOf('  const resetForGame='));
 let loggedIn=false,online=true,awarded=0,requests=0;
 const stores={guest:{entries:{}},alice:{entries:{}},bob:{entries:{}}};let owner='alice';
-const c={RECOGNITION_VERSION:7,rewardDisabled:()=>false,patchEffectiveStats(){},discoveryRewardKey:(p,w)=>p+':'+w,scope:()=>loggedIn?owner:'guest',
+const c={RECOGNITION_VERSION:7,DISCOVERY_CLAIM_VERSION:2,rewardDisabled:()=>false,patchEffectiveStats(){},discoveryRewardKey:(p,w)=>p+':'+w,scope:()=>loggedIn?owner:'guest',
  readDiscoveryStore:s=>stores[s],writeDiscoveryStore:(value,s)=>stores[s]=value,profile:()=>loggedIn?{id:owner,token:'synthetic'}:null,
  normalize:w=>w,localDay:()=> '2026-10-21',navigator:{get onLine(){return online}},setTimeout(){},syncDiscoveries(){},
  creditRunXp:(_,n)=>awarded+=n,showXpPop(){},refreshVisibleUi(){},discoveryKnownKeys:new Set(),claimPayload:x=>x,

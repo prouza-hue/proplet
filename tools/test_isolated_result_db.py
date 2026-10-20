@@ -309,6 +309,10 @@ def main():
         assert c.execute('select player_id::text from puzzle_attempts where id=%s', (body['attempt_id'],)).fetchone()[0] == players[0]
         assert c.execute('select count(*) from results where puzzle_id=%s', (board['id'],)).fetchone()[0] == 2
     report['checks'].append('HTTP/custom sessions: missing/invalid token rejected; ID collision preserves A attempt and separate B result')
+    for fixture in ('tests/current/daily_specials_atomic_rollback.sql', 'supabase/tests/word_discovery_recovery.sql'):
+        with connect() as c:
+            c.execute((ROOT / fixture).read_text())
+        report['checks'].append('Extra XP acceptance: ' + fixture)
     report['limitations'] = ['Local schema reconstructed from repository, not a production dump.',
         'Exercises real PostgreSQL/RPC and Python command adapter; does not emulate GoTrue or PostgREST.',
         'Player isolation tested through HTTP/custom token auth with a local SQL transport adapter.',
