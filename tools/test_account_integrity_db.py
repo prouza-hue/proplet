@@ -32,7 +32,7 @@ def main():
             ids = [str(uuid.uuid4()), str(uuid.uuid4())]
             for i, pid in enumerate(ids):
                 c.execute("insert into players(id,name,family_code,token_hash,created_at) values(%s,'Synthetic duplicate',%s,%s,'2026-10-19T10:00:00Z'::timestamptz+%s*interval '1 second')",
-                          (pid,'SOLO_'+pid,pid,i))
+                          (pid,'SOLO_'+pid[:8].upper(),pid,i))
             c.execute("""insert into results(id,player_id,puzzle_id,challenge_key,mode,difficulty,best_elapsed_ms,best_moves,points,clean_solve)
                          select gen_random_uuid(),%s,'synthetic-'||i,'free:synthetic-'||i,'free','easy',10000,10,15,true from generate_series(1,20001) i""",(ids[0],))
             c.execute('set local role service_role')
