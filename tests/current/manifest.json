@@ -704,6 +704,10 @@
       {
         "path": "tests/current/test_daily_special_discovery.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_discovery_recovery_balance.py",
+        "runner": "python"
       }
     ]
   },

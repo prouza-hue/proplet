@@ -41,6 +41,7 @@ WORDFREQ_ZIPF_THRESHOLD_DIACRITIC = 2.45
 WORDFREQ_ZIPF_THRESHOLD_PLAIN = 2.85
 
 WORD_DISCOVERY_REWARD_PREFIX = "word_discovery_v1:"
+WORD_DISCOVERY_RECOVERY_PREFIX = "word_discovery_recovery_v1:"
 WORD_DISCOVERY_XP = 1
 WORD_DISCOVERY_BOARD_XP_LIMIT = None  # No per-board cap; reward-key deduplication still applies.
 WORD_DISCOVERY_DAILY_XP_LIMIT = None
@@ -109,16 +110,24 @@ def _reward_day(row: dict, tz) -> Optional[str]:
 
 def _discovery_summary(rows: list[dict], *, puzzle_id: str = "", today: str = "", tz=None) -> dict:
     discovery = _discovery_rows(rows)
-    total_xp = sum(max(0, int(row.get("points") or 0)) for row in discovery)
+    recovery = [row for row in rows
+                if str(row.get("reward_key") or "").startswith(WORD_DISCOVERY_RECOVERY_PREFIX)]
+    balances = [*discovery, *recovery]
+    total_xp = sum(max(0, int(row.get("points") or 0)) for row in balances)
     words = {word for row in discovery for _puzzle, word in [_discovery_metadata(row)] if word}
     board_xp = sum(
         max(0, int(row.get("points") or 0))
         for row in discovery
         if puzzle_id and _discovery_metadata(row)[0] == puzzle_id
     )
+    board_xp += sum(
+        max(0, int(row.get("points") or 0)) for row in recovery
+        if puzzle_id and (str(row.get("puzzle_id") or "").strip()
+                          or str(row["reward_key"])[len(WORD_DISCOVERY_RECOVERY_PREFIX):]) == puzzle_id
+    )
     daily_xp = sum(
         max(0, int(row.get("points") or 0))
-        for row in discovery
+        for row in balances
         if today and _reward_day(row, tz) == today
     )
     return {
@@ -301,8 +310,10 @@ def install_word_recognition(
             raise HTTPException(503, "Odměny za objevená slova ještě nejsou připravené")
 
     def reward_state(player_id: str) -> tuple[list[dict], set[str]]:
-        rows = _discovery_rows(db_select("account_rewards", player_id=player_id))
-        keys = {str(row.get("reward_key") or "") for row in rows if row.get("reward_key")}
+        rows = [row for row in db_select("account_rewards", player_id=player_id)
+                if str(row.get("reward_key") or "").startswith(
+                    (WORD_DISCOVERY_REWARD_PREFIX, WORD_DISCOVERY_RECOVERY_PREFIX))]
+        keys = {str(row["reward_key"]) for row in _discovery_rows(rows)}
         return rows, keys
 
     def response_state(player_id: str, *, puzzle_id: str = "", extra_row: Optional[dict] = None) -> dict:
