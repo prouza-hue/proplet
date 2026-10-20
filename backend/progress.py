@@ -72,6 +72,10 @@ def reward_stats_from_rows(rows: Iterable[Mapping], *, account_rewards_included:
             word = str(reward.get("reward_word") or key.rpartition(":")[2]).strip().casefold()
             if word:
                 discovered_words.add(word)
+        elif key.startswith("word_discovery_recovery_v1:"):
+            # Recovery already paid this XP. Exchanging its remaining balance for
+            # verified word keys must not look like another award in cached stats.
+            word_discovery_xp += points
         else:
             other_reward_xp += points
     return {
