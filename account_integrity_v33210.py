@@ -20,6 +20,7 @@ def install_account_integrity(
     tz,
     db_select,
     db_select_bounded=None,
+    db_rpc=None,
     auth_player,
     new_session,
     verify_password,
@@ -215,18 +216,27 @@ def install_account_integrity(
             if len(current) > 1 and same_creation_burst(current):
                 clusters.append(current)
 
-        result_counts = {}
-        session_counts = {}
-        push_counts = {}
-        for row in bounded_rows("results", columns="player_id", max_rows=20000):
-            pid = str(row.get("player_id") or "")
-            result_counts[pid] = result_counts.get(pid, 0) + 1
-        for row in bounded_rows("player_sessions", columns="player_id", max_rows=20000):
-            pid = str(row.get("player_id") or "")
-            session_counts[pid] = session_counts.get(pid, 0) + 1
-        for row in bounded_rows("push_subscriptions", columns="player_id", max_rows=20000):
-            pid = str(row.get("player_id") or "")
-            push_counts[pid] = push_counts.get(pid, 0) + 1
+        # Only candidate players need activity counts. Aggregate inside Postgres:
+        # the number of historical results must not exhaust the raw-row guard.
+        candidate_ids = sorted({str(player["id"]) for cluster in clusters for player in cluster})
+        counts = {}
+        if candidate_ids:
+            if not callable(db_rpc):
+                raise HTTPException(503, "Kontrola účtů není připravená")
+            activity = db_rpc("proplet_account_integrity_counts", {"p_players": candidate_ids})
+            if not isinstance(activity, list) or len(activity) != len(candidate_ids):
+                raise HTTPException(503, "Neúplná kontrola účtů")
+            for row in activity:
+                if not isinstance(row, dict) or str(row.get("player_id")) not in candidate_ids:
+                    raise HTTPException(503, "Neplatná kontrola účtů")
+                pid = str(row["player_id"])
+                if pid in counts or any(type(row.get(key)) is not int or row[key] < 0
+                                        for key in ("results", "sessions", "pushes")):
+                    raise HTTPException(503, "Neplatná kontrola účtů")
+                counts[pid] = row
+        result_counts = {pid: row["results"] for pid, row in counts.items()}
+        session_counts = {pid: row["sessions"] for pid, row in counts.items()}
+        push_counts = {pid: row["pushes"] for pid, row in counts.items()}
 
         duplicate_rows = 0
         rows = []

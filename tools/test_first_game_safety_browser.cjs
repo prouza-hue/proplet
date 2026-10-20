@@ -1,7 +1,9 @@
 'use strict';
 // Loopback-only real client regression; all synthetic traffic carries X-Proplet-Test.
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const assert=require('node:assert/strict'),fs=require('node:fs');
+const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
+// Exact module from before the additive Daily Special method. No production fetch.
+const oldProgression=execFileSync('git',['show','cf16817aadfa9cb991630bf99d04aeb62860f6fd^:public/app/content/progression.js'],{encoding:'utf8'});
 const url=process.env.TEST_URL||'http://127.0.0.1:18769';
 assert(['127.0.0.1','localhost'].includes(new URL(url).hostname));
 const output=process.env.RESULT_PATH||'browser-results/first-game-safety.json';fs.mkdirSync(require('node:path').dirname(output),{recursive:true});
@@ -72,9 +74,19 @@ const report={checks:[],synthetic:true};
     await context.unroute('**/app/engagement/first-steps.js?*');await page.evaluate(()=>ensureFirstStepsRuntime());
     report.checks.push({name:'failed recovery retains game, completed progress and account; explicit retry restores facade',ok:true});
    }
-   // Actual historical-result renderer, followed by both formerly failing consumers.
+   // Update skew: new app, actual pre-4.06 progression bytes, intact current state.
+   const preserved=await page.evaluate(()=>({profile:JSON.stringify(getProfile()),state:JSON.stringify(getState()),game:currentGame.attemptId}));
+   await page.evaluate(code=>{(0,eval)(code);progressionController=null},oldProgression);
+   assert.equal(await page.evaluate(()=>typeof window.PropletContentProgression.create({}).dailySpecialResultState),'undefined','baseline is genuinely incompatible');
+   const special=await page.evaluate(()=>{const date=pragueDateISO();return {actual:progression().dailySpecialResultState(date),expected:datedSpecial().resultState(date,getState())}});
+   assert.deepEqual(special.actual,special.expected,'compatibility reads authoritative special state, not fabricated empty progress');
+   assert.deepEqual(await page.evaluate(()=>({profile:JSON.stringify(getProfile()),state:JSON.stringify(getState()),game:currentGame.attemptId})),preserved);
+   // Actual historical-result renderer, followed by all previously failing consumers.
    await page.evaluate(async()=>{const date=pragueDateISO(),p=await historicalDailyPuzzle(date);await showDailyResult(date,{puzzleId:p.id,elapsedMs:10000,moves:p.answers.length,cleanSolve:true});renderGameHUD();updateGameFeel();});
    assert.equal(await page.evaluate(()=>Array.isArray(currentGame.found)&&Array.isArray(currentGame.path)&&currentGame.isReplay),true);
+   await page.evaluate(()=>{renderWinExtraAction();renderDaily();renderFree();renderProfile()});
+   assert.equal(await page.locator('body').evaluate(el=>el.scrollWidth<=innerWidth+1),true,'no horizontal overflow on '+scenario.name);
+   report.checks.push({name:scenario.name+' actual old progression + new app: Daily result, Extra CTA, Free, Profile; progress/account/game preserved',ok:true});
    report.checks.push({name:(mobile?'mobile':'desktop')+' historical result with complete snapshot',ok:true});
    if(mobile){
     await page.waitForSelector('#winModal #winResultActions');

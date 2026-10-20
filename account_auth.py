@@ -117,6 +117,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         tz=services.tz,
         db_select=services.db_select,
         db_select_bounded=services.db_select_bounded,
+        db_rpc=services.db_rpc,
         auth_player=services.auth_player,
         new_session=services.new_session,
         verify_password=services.verify_password,

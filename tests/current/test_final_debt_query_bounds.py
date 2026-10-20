@@ -27,8 +27,10 @@ assert integrity_login.count('bounded_rows("players"') == 2
 assert 'bounded_rows(\n                    "players",' in integrity_login
 
 admin_integrity = re.search(r'@app\.get\("/api/admin/account-integrity"\)(.*)', integrity, re.S).group(1)
-for table in ("players", "results", "player_sessions", "push_subscriptions"):
-    assert f'bounded_rows("{table}"' in admin_integrity
+assert 'bounded_rows("players", max_rows=5000)' in admin_integrity
+assert 'db_rpc("proplet_account_integrity_counts", {"p_players": candidate_ids})' in admin_integrity
+for table in ("results", "player_sessions", "push_subscriptions"):
+    assert f'bounded_rows("{table}"' not in admin_integrity, 'raw history must be aggregated, not truncated or given a larger cap'
 
 admin_push = re.search(r'@app\.get\("/api/admin/push-diagnostics"\)(.*)', push, re.S).group(1)
 for table in ("push_subscriptions", "push_delivery_log", "players"):
