@@ -53,11 +53,12 @@ _CZECH_DIACRITICS = frozenset("áčďéěíňóřšťúůýž")
 
 class WordDiscoveryClaim(BaseModel):
     puzzle_id: str = Field(min_length=2, max_length=80)
-    mode: str = Field(min_length=4, max_length=10)
+    mode: str = Field(min_length=4, max_length=13)
     difficulty: str = Field(min_length=3, max_length=20)
     word: str = Field(min_length=4, max_length=24)
     path: list[int] = Field(default_factory=list)
     daily_date: Optional[str] = Field(default=None, max_length=10)
+    challenge_key: Optional[str] = Field(default=None, max_length=100)
 
 
 def _normalize(value: str) -> str:
@@ -291,6 +292,7 @@ def install_word_recognition(
     resolved_puzzle=None,
     puzzle_exists=None,
     daily_puzzle_matches_date=None,
+    daily_special_discovery_identity=None,
     vercel_env: str = "",
     **_kwargs,
 ):
@@ -396,7 +398,7 @@ def install_word_recognition(
         source = _recognize_source(normalized) if _acceptable(normalized) else None
         if source is None:
             raise HTTPException(400, "Slovo není v recognition lexikonu")
-        if payload.mode not in ("daily", "free"):
+        if payload.mode not in ("daily", "daily_special", "free"):
             raise HTTPException(400, "Odměna platí jen v běžné hře")
 
         if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
@@ -406,6 +408,10 @@ def install_word_recognition(
                 raise HTTPException(400, "Daily odměna nemá platné datum")
             if not daily_puzzle_matches_date(payload.puzzle_id, payload.daily_date):
                 raise HTTPException(400, "Tato úloha nepatří k uvedenému dni")
+        elif payload.mode == "daily_special":
+            if not callable(daily_special_discovery_identity):
+                raise HTTPException(503, "Odměny za slova v Extra výzvě ještě nejsou připravené")
+            daily_special_discovery_identity(payload)
 
         puzzle = resolved_puzzle(payload.puzzle_id, payload.mode, payload.difficulty)
         if not puzzle or not _valid_discovery_trace(puzzle, normalized, payload.path):

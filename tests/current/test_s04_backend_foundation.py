@@ -187,6 +187,14 @@ for field in ('source_line','source_column'):
 for field in added:
     diag['properties'].pop(field)
 
+# The Extra word claim extends admission without changing old daily/free fields.
+discovery = openapi_contract["components"]["schemas"]["WordDiscoveryClaim"]
+assert "challenge_key" not in discovery.get("required", [])
+challenge_schema = discovery["properties"].pop("challenge_key")
+assert challenge_schema.get("default") is None and {"type": "null"} in challenge_schema["anyOf"]
+assert next(item for item in challenge_schema["anyOf"] if item.get("type") == "string") == {"type": "string", "maxLength": 100}
+assert discovery["properties"]["mode"]["maxLength"] == 13
+discovery["properties"]["mode"]["maxLength"] = 10
 openapi_snapshot = json.dumps(
     openapi_contract, ensure_ascii=False, sort_keys=True, separators=(",", ":")
 )

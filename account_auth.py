@@ -48,6 +48,7 @@ class AppServices:
     resolved_puzzle: Optional[Callable] = None
     puzzle_exists: Optional[Callable] = None
     daily_puzzle_matches_date: Optional[Callable] = None
+    daily_special_discovery_identity: Optional[Callable] = None
     telemetry_actor: Optional[Callable] = None
     app_version: str = ""
     vercel_env: str = ""
@@ -138,6 +139,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         resolved_puzzle=services.resolved_puzzle,
         puzzle_exists=services.puzzle_exists,
         daily_puzzle_matches_date=services.daily_puzzle_matches_date,
+        daily_special_discovery_identity=services.daily_special_discovery_identity,
         vercel_env=services.vercel_env,
     )
     _install_competitive_sharing(

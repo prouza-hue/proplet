@@ -221,6 +221,15 @@ for field in ('source_line','source_column'):
 for field in added:
     diag['properties'].pop(field)
 
+# Extra discoveries add an optional immutable challenge key and admit the existing
+# daily_special mode. Preserve the earlier schema after reviewing only that delta.
+discovery = openapi_contract["components"]["schemas"]["WordDiscoveryClaim"]
+assert "challenge_key" not in discovery.get("required", [])
+challenge_schema = discovery["properties"].pop("challenge_key")
+assert challenge_schema.get("default") is None and {"type": "null"} in challenge_schema["anyOf"]
+assert next(item for item in challenge_schema["anyOf"] if item.get("type") == "string") == {"type": "string", "maxLength": 100}
+assert discovery["properties"]["mode"]["maxLength"] == 13
+discovery["properties"]["mode"]["maxLength"] = 10
 openapi_digest = _digest(openapi_contract)
 # Weekly trophies add those two paths and the Seen request schema.
 # Removing only these additions reproduces prior OpenAPI digest c0d9ee3b.
@@ -268,6 +277,7 @@ with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names})
     assert tuple(calls) == installer_names
     assert installers["_install_push_diagnostics"].call_args.kwargs["db_rpc"] is None
     assert installers["_install_word_recognition"].call_args.kwargs["resolved_puzzle"] is None
+    assert installers["_install_word_recognition"].call_args.kwargs["daily_special_discovery_identity"] is None
 
 print("PASS: Sprint 06 explicit dependency and route/OpenAPI characterization")
 

@@ -24,8 +24,8 @@ function run(puzzle,mode,attemptId){return {puzzle,mode,fairPlay:mode==='daily_s
  for(const order of [['daily_special','daily'],['daily','daily_special']]){
   state={completed:{},inProgress:{},rescues:{}};records=[];leaderboards=[];
   for(const mode of order){game.replace(run(mode==='daily'?base:descriptor.puzzle,mode,mode+'-attempt'));await context.finishGame();}
-  const stats=context.currentLocalStats();assert.equal(Object.keys(state.completed).length,2);assert.equal(stats.points,200);assert.equal(stats.dailyCompleted,1);assert.equal(stats.dailySpecialCompleted,1);assert.equal(stats.dailyChallengeCompleted,2);assert.equal(stats.totalCompleted,1,'legacy badge total stays base/free');assert.equal(stats.currentStreak,1);assert.equal(stats.cleanDaily,1);assert.equal(stats.cleanSolves,1);
-  assert(records.some(row=>row.challengeKey==='daily:'+date));const special=records.find(row=>row.mode==='daily_special');assert.equal(special.contentHash,hash);assert.equal(special.points,100);assert.equal(special.level,null);assert.equal(special.official,true);assert(leaderboards.includes(descriptor.challengeKey));
+  const stats=context.currentLocalStats();assert.equal(Object.keys(state.completed).length,2);assert.equal(stats.points,300);assert.equal(stats.dailyCompleted,1);assert.equal(stats.dailySpecialCompleted,1);assert.equal(stats.dailyChallengeCompleted,2);assert.equal(stats.totalCompleted,1,'legacy badge total stays base/free');assert.equal(stats.currentStreak,1);assert.equal(stats.cleanDaily,1);assert.equal(stats.cleanSolves,1);
+  assert(records.some(row=>row.challengeKey==='daily:'+date));const special=records.find(row=>row.mode==='daily_special');assert.equal(special.contentHash,hash);assert.equal(special.points,200);assert.equal(special.level,null);assert.equal(special.official,true);assert(leaderboards.includes(descriptor.challengeKey));
   const original=state.completed[descriptor.challengeKey],practice=store.asPractice(descriptor);
   game.replace(run(practice.puzzle,'daily_special','practice-attempt'));await context.finishGame();
   assert.equal(Object.keys(state.completed).length,2,'practice never adds official completion');assert.equal(state.completed[descriptor.challengeKey],original,'practice cannot replace first official result');assert.equal(records.at(-1).points,0);assert.equal(records.at(-1).rewardEligible,false);assert.match(records.at(-1).challengeKey,/^daily-special-practice:/);assert.equal(game.get().winBaseXpAwarded,0);
@@ -34,6 +34,10 @@ function run(puzzle,mode,attemptId){return {puzzle,mode,fairPlay:mode==='daily_s
  const only=context.currentLocalStats();assert.equal(only.dailyCompleted,0);assert.equal(only.currentStreak,0);assert.equal(only.cleanDaily,0);assert.equal(only.totalCompleted,0);assert.equal(only.dailyChallengeCompleted,1);
  const payload=context.queuedResultPayload(records.at(-1));assert.equal(payload.content_hash,hash);assert.equal(payload.mode,'daily_special');assert.equal(payload.daily_date,date);
  const rec=state.completed[descriptor.challengeKey];const snapshot=context.dailyResultSnapshot(descriptor.puzzle,date,rec,'daily_special');game.replace(snapshot);const shared=context.shareText();assert.match(shared,/speciál Mozkožrout/);assert.match(shared,/open=daily-special/);assert.doesNotMatch(shared,/🔥/,'special share does not imply streak credit');
+ // Reopening a saved Extra result shows its stored completion reward.
+ Object.assign(context,{datedSpecial:()=>({historical:async()=>descriptor}),renderTimingStatus(){}});
+ await context.showSpecialResult(date,{...rec,points:200});assert.equal(node('#winXp').textContent,'+200 XP');
+ await context.showSpecialResult(date,{...rec,points:100});assert.equal(node('#winXp').textContent,'+100 XP','historical reward remains truthful');
  // Missing/refused receipt must retain the run without XP or a queued result.
  for(const confirmation of [null,{finished:false}]){
   receipt=confirmation;state={completed:{},inProgress:{},rescues:{}};records=[];leaderboards=[];savedPending=0;
@@ -44,5 +48,5 @@ function run(puzzle,mode,attemptId){return {puzzle,mode,fairPlay:mode==='daily_s
   receipt={finished:true};await context.finishGame();
   assert.equal(Object.keys(state.completed).length,1);assert.equal(records.length,1);
  }
- console.log('PASS actual app finish: base/special in both orders,100XP isolation, unchanged badge/streak counters, practice once-only, payload/hash, result snapshot and share link');
+ console.log('PASS actual app finish: base/special in both orders,200XP isolation, unchanged badge/streak counters, practice once-only, payload/hash, result snapshot and share link');
 })().catch(error=>{console.error(error);process.exit(1)});

@@ -11,7 +11,7 @@ import re
 from backend.dated_daily import PRAGUE, DailyPackInvalid, DailyUnavailable, iso_date, puzzle_digest
 
 DIFFICULTIES = {3: "hardcore", 5: "mozkomor", 7: "mozkokalypsa"}
-SPECIAL_XP = 100
+SPECIAL_XP = 200
 PREVIEW_BRANCH = "work/daily-specials-integrated-20261012"
 PREVIEW_DATABASE = "https://eanzztstmwlamwfdskbf.supabase.co"
 KEY_RE = re.compile(r"^daily-special:(\d{4}-\d{2}-\d{2}):(hardcore|mozkomor|mozkokalypsa)$")

@@ -5505,6 +5505,7 @@ install_account_auth(
         resolved_puzzle=resolved_puzzle,
         puzzle_exists=puzzle_exists,
         daily_puzzle_matches_date=daily_puzzle_matches_date,
+        daily_special_discovery_identity=daily_special_discovery_identity,
         telemetry_actor=telemetry_actor,
         app_version=APP_VERSION,
         vercel_env=VERCEL_ENV,
