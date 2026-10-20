@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.9-mama1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.10-runtime1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 window.PropletClientDiagnostics?.claimErrorListeners?.();
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
@@ -409,8 +409,13 @@ let rankingsOrchestrationController=null;
 
 function progression(){
  if(progressionController)return progressionController;
- const factory=window.PropletContentProgression;if(!factory?.create)throw new Error('Progression modul není dostupný.');
- progressionController=factory.create({getPuzzleDB:()=>puzzleDB,datedDaily:datedDaily(),datedSpecial:datedSpecial(),getState,dayOffsetISO,sortedFreeBank,localFreeSlotState,resumableFreePuzzle,pragueDateISO,addDaysISO,getContentPreviewDate:()=>CONTENT_PREVIEW_DATE});
+ const factory=window.PropletContentProgression;if(typeof factory?.create!=='function')throw new Error('Progression modul není dostupný.');
+ const controller=factory.create({getPuzzleDB:()=>puzzleDB,datedDaily:datedDaily(),datedSpecial:datedSpecial(),getState,dayOffsetISO,sortedFreeBank,localFreeSlotState,resumableFreePuzzle,pragueDateISO,addDaysISO,getContentPreviewDate:()=>CONTENT_PREVIEW_DATE});
+ // The pre-4.06 module used the same cache URL but did not expose this method.
+ // Adapt only that known additive seam, using the same authoritative special
+ // state as the current module. Never invent an empty/completed result, reload
+ // the page, clear storage or interrupt a game to repair the cached facade.
+ progressionController=typeof controller?.dailySpecialResultState==='function'?controller:{...controller,dailySpecialResultState:iso=>datedSpecial().resultState(iso,getState())};
  return progressionController;
 }
 function dailyOrchestration(){

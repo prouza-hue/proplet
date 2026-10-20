@@ -93,6 +93,8 @@ def main():
             c.execute(path.read_text(encoding='utf8'))
             report['schemaFiles'].append({'path': path.relative_to(ROOT).as_posix(),
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        c.execute((ROOT/'supabase/tests/account_integrity_counts.sql').read_text(encoding='utf8'))
+        report['checks'].append('admin integrity: exact 20001 results, bounded IDs, no fanout, service-role only, invoker, rollback')
         c.execute((ROOT/'supabase/tests/account_created.sql').read_text(encoding='utf8'))
         report['checks'].append('account-created: atomic insert, retry, privacy, legacy event suppression, rollback')
         c.execute((ROOT/'supabase/tests/s08b_atomic_result_acceptance.sql').read_text(encoding='utf8'))
