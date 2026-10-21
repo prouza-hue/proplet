@@ -11,7 +11,7 @@ function fixture(query=''){
  const context={Storage,console,URL,URLSearchParams,Headers,Response,TextEncoder,crypto:crypto.webcrypto,Date,JSON,Map,Set,WeakSet,DOMException,structuredClone,setTimeout,clearTimeout,
  location:new URL('https://studio.example/'+query),localStorage:local,sessionStorage:session,navigator:{sendBeacon(){throw Error('native beacon')},serviceWorker:{register(){throw Error('native worker')}}},
  document:{addEventListener:(type,fn)=>{(listeners[type]||=[]).push(fn)},documentElement:{hasAttribute:()=>true}},
- fetch:async(input,init)=>{const url=new URL(input,'https://studio.example');calls.push({url:url.href,method:init?.method||'GET'});const file=path.resolve(output,'.'+url.pathname);assert(file.startsWith(output+path.sep));if(!fs.existsSync(file))return new Response('{}',{status:404});return new Response(fs.readFileSync(file),{status:200});},
+ fetch:async(input,init)=>{const url=new URL(input,'https://studio.example');calls.push({url:url.href,method:init?.method||'GET',credentials:init?.credentials,authorization:new Headers(init?.headers).get('Authorization')});const file=path.resolve(output,'.'+url.pathname);assert(file.startsWith(output+path.sep));if(!fs.existsSync(file))return new Response('{}',{status:404});return new Response(fs.readFileSync(file),{status:200});},
  getState:()=>state,saveState:value=>{state=value},renderDaily(){},renderFree(){},renderProfile(){},currentLocalStats:()=>({points:Object.values(state.completed).reduce((sum,r)=>sum+r.points,0)})};
  context.window=context;vm.createContext(context);
  for(const file of ['guard.js','adapter.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,file),'utf8'),context);
@@ -47,6 +47,8 @@ function fixture(query=''){
  assert.equal((await f.context.fetch('https://hrajproplet.cz/api/config')).status,403);assert.equal((await f.context.fetch('/unlisted-write',{method:'POST',body:'x'})).status,403);
  assert.equal(f.context.navigator.sendBeacon('/api/result','x'),false);assert.throws(()=>new f.context.WebSocket('wss://example.com'));assert.throws(()=>new f.context.XMLHttpRequest());await assert.rejects(f.context.navigator.serviceWorker.register('/sw.js'));
  assert(f.calls.every(row=>new URL(row.url).origin==='https://studio.example'&&!new URL(row.url).pathname.startsWith('/api/')&&row.method==='GET'));
+ assert(f.calls.every(row=>row.credentials==='same-origin'&&row.authorization===null));
+ report.checks.push('Same-origin asset requests retain private-host authentication; Proplet Authorization is stripped');
  report.checks.push('All API handled in memory; external fetch/write/XHR/beacon/socket/service worker blocked');
  for(const file of ['app.js','game.css','game-release-polish.css','ribbon-ui.css','app/game/board.js','app/game/input.js','app/game/hints.js','app/game/state.js','app/game/fair-play.js']){assert(fs.readFileSync(path.join(repo,'public',file)).equals(fs.readFileSync(path.join(output,file))),'Gameplay file differs: '+file);report.sourceFilesExact.push(file);}
  const index=fs.readFileSync(path.join(output,'index.html'),'utf8');assert(index.indexOf('/studio-fixtures/guard.js')<index.indexOf('/runtime-meta.js'));assert(index.includes("connect-src 'self'"));assert(index.includes("worker-src 'none'"));

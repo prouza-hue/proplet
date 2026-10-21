@@ -12,7 +12,9 @@ window.fetch=(input,init={})=>{
  }
  const headers=new Headers(init.headers||input?.headers||{});headers.delete('Authorization');headers.delete('Cookie');
  requests.push({path:target.pathname,method,blocked:false});
- return nativeFetch(target.href,{...init,method,headers,credentials:'omit',redirect:'error'});
+ // Owner-private Sites protects static JSON with its same-origin session cookie.
+ // Only already-validated local GET/HEAD assets reach this line; no Proplet API or external origin can receive credentials.
+ return nativeFetch(target.href,{...init,method,headers,credentials:'same-origin',redirect:'error'});
 };
 try{Object.defineProperty(navigator,'sendBeacon',{value:()=>false,configurable:true})}catch{}
 for(const name of ['WebSocket','EventSource','XMLHttpRequest','Worker','SharedWorker']){
