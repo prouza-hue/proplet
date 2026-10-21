@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.12-extra2';
+const APP_PREVIEW_RELEASE='proplet-v4.09.12-studio1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 window.PropletClientDiagnostics?.claimErrorListeners?.();
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
@@ -343,7 +343,7 @@ function dailySpecialUI(){
   $,$$,DIFF,pragueDateISO,formatDateCZ,countCz,getProfile,getAnonymousId,getQueue,getSyncState:()=>syncState,dailyResultState,
   canShowIntro:()=>currentScreen==='daily'&&!onboardingMandatory&&localStorage.getItem(ONBOARD_KEY)==='done'&&!window.PropletFirstSteps?.quiet()&&!openTransientModal(),
   dailySpecialResultState:()=>dailySpecialResultState(),getSchedule:()=>datedSpecial()?.schedule()||[],
-  startGame,showDailyResult,showSpecialResult,startDaily,startSpecial,refreshSpecial:refreshDatedSpecial,showToast,
+  startGame,showDailyResult,showSpecialResult,startDaily,startSpecial,openFree:()=>nav('free'),refreshSpecial:refreshDatedSpecial,showToast,
   renderBase:()=>dailyOrchestration().renderDaily(),
  });
  return dailySpecialUIController;
@@ -426,7 +426,7 @@ function dailyOrchestration(){
   renderDailyWeekRhythm,renderLevelCard,getProfile,getQueue,getSyncState:()=>syncState,
   renderRescueCard:(...args)=>renderRescueCard(...args),renderQuickPlay:(...args)=>renderQuickPlay(...args),renderTajenkaEntry:(...args)=>renderTajenkaEntry(...args),
   showDailyResult:(...args)=>showDailyResult(...args),startGame:(...args)=>startGame(...args),showToast,
-  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');renderPreviousDailyResume();window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus();window.PropletPlaytest?.render();renderDailySpecialUI();globalThis.PropletArchiveExperience?.home()},
+  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');renderPreviousDailyResume();window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus();window.PropletPlaytest?.render();renderDailySpecialUI();globalThis.PropletArchiveExperience?.home();window.PropletHomeLayout?.orderDailyNodes?.()},
  });
  return dailyOrchestrationController;
 }

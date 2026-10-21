@@ -708,6 +708,10 @@
       {
         "path": "tests/current/test_discovery_recovery_balance.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_studio_daily.js",
+        "runner": "node"
       }
     ]
   },

@@ -4,6 +4,7 @@
 const assert=require('assert');
 const fs=require('fs');
 const path=require('path');
+const vm=require('node:vm');
 
 const root=path.resolve(__dirname,'../..');
 const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8');
@@ -118,9 +119,30 @@ for(const [source,asset] of [[index,'theme-init.js'],[themeInit,'home-layout.js'
  assert(url,asset+' must have a versioned load URL');
  assert(sw.includes("'"+url+"'"),asset+' loaded URL must match its PWA cache entry');
 }
-has(homeLayout,/function rankingSessionScope\(\)/,'home ranking cache is not account-session scoped');
-has(homeLayout,/rankingCacheScope===scope/,'home ranking reuses responses across account sessions');
-has(homeLayout,/if\(rankingSessionScope\(\)!==scope\)return/,'stale anonymous ranking response can overwrite authenticated UI');
+// Today now displays the current player's local/confirmed effective stats only;
+// it no longer loads or caches the top-three ranking. Exercise the actual
+// renderer twice across an account switch rather than retaining a removed cache.
+let todayStats={points:123,currentStreak:2},statsReads=0,rankingRequests=0;
+const todayOutput={innerHTML:''},todayCard={},todayScreen={querySelector:selector=>selector==='#homeCompetitionCard'?todayCard:null};
+const todayContext={
+ window:{addEventListener(){}},
+ document:{readyState:'loading',querySelector:selector=>selector==='#screen-daily'?todayScreen:selector==='#homeCompetitionSelf'?todayOutput:null},
+ effectiveStats:()=>{statsReads++;return todayStats},
+ levelFor:points=>({current:{name:points>=100?'Slovolovec':'Nováček'},next:{name:'Propletač',xp:600}}),
+ api:()=>{rankingRequests++;throw Error('Today must not request rankings')},
+ fetch:()=>{rankingRequests++;throw Error('Today must not request rankings')},
+};
+assert(homeLayout.includes('window.PropletHomeLayout={'),'Today owner export missing');
+vm.runInNewContext(homeLayout.replace('window.PropletHomeLayout={','window.PropletHomeLayout={renderCompetitionSelf,'),todayContext);
+todayContext.window.PropletHomeLayout.renderCompetitionSelf();
+assert(todayOutput.innerHTML.includes('123 XP')&&todayOutput.innerHTML.includes('2 dny v řadě'),'Today did not render the first current account');
+todayStats={points:30,currentStreak:1};
+todayContext.window.PropletHomeLayout.renderCompetitionSelf();
+assert(todayOutput.innerHTML.includes('30 XP')&&todayOutput.innerHTML.includes('1 den v řadě'),'Today did not re-read the new current account');
+assert(!todayOutput.innerHTML.includes('123 XP')&&!todayOutput.innerHTML.includes('Slovolovec'),'previous account stats leaked into Today');
+assert.strictEqual(statsReads,2,'each Today render must read current effective stats');
+assert.strictEqual(rankingRequests,0,'Today must not retain the removed ranking fetch');
+assert(!homeLayout.includes('/api/rankings/xp'),'Today still contains an unused ranking request/cache path');
 
 const passwordAcceptPos=app.indexOf('acceptAccountProfile({id:profile.id');
 const anonymousClaimPos=app.indexOf("claimTelemetryAfterAuth(anonId)",passwordAcceptPos);

@@ -7,7 +7,7 @@ const out=process.env.PROPLET_QA_OUT||'/tmp/proplet-specials-integration-qa';
 fs.mkdirSync(out,{recursive:true});
 const report={status:'running',startedAt:new Date().toISOString(),layout:[],checks:[],errors:[],network:{allowedWrites:[],blockedWrites:[],failedApi:[]},humanPlaytest:false};
 const save=()=>fs.writeFileSync(path.join(out,'integration-qa.json'),JSON.stringify(report,null,2));
-const expectedDate=process.env.PROPLET_EXPECTED_DATE||'2026-10-21',expectedVersion=process.env.PROPLET_EXPECTED_VERSION||'4.06.0';
+const expectedDate=process.env.PROPLET_EXPECTED_DATE||'2026-10-21',expectedVersion=process.env.PROPLET_EXPECTED_VERSION||fs.readFileSync('proplet_version.py','utf8').match(/^APP_VERSION\s*=\s*"([^"]+)"/m)[1];
 const productionOrigin='https://hrajproplet.cz';
 let previewOrigin,browser,activePage,createdAccount;
 const accounts=[];
@@ -66,9 +66,10 @@ async function dismissAnnouncements(page,{expectExtraIntro=false}={}){
    }
    await button.click();await button.waitFor({state:'hidden',timeout:5000});
    if(testExtraEntry){
-    assert.equal(await page.locator('#dailyChallengeSwitch button').getAttribute('aria-pressed'),'true','intro CTA selects Extra without starting a game');
+    assert.equal(await page.locator('.daily-hero').evaluate(el=>el.classList.contains('daily-special-selected')),true,'intro CTA selects Extra without starting a game');
     assert(await page.locator('#screen-daily.active').isVisible());
-    await page.locator('#dailyHeroTitle [data-daily-kind="base"]').click();report.extraEntryChecked=true;
+    assert.equal(await page.locator('#playDailyBtn').evaluate(el=>el===document.activeElement),true,'intro returns focus to the visible game action');
+    await page.locator('#dailyChallengeSwitch button').click();report.extraEntryChecked=true;
    }
    report.dismissedAnnouncements??=[];report.dismissedAnnouncements.push({origin:new URL(page.url()).origin,selector});
    closed=true;break;
@@ -107,12 +108,15 @@ async function open(context,origin){
  await page.waitForFunction(()=>typeof accountProgressAvailable==='function'&&accountProgressAvailable(),{},{timeout:60000});
  await page.locator('#screen-daily.active .daily-hero').waitFor({timeout:30000});
  await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(250);
- await dismissAnnouncements(page,{expectExtraIntro:origin===previewOrigin});
+ // The current archive announcement coordinator suppresses the older standalone Extra intro.
+ const archiveEnabled=await page.evaluate(()=>!!window.PropletArchiveExperience?.isEnabled?.());
+ await dismissAnnouncements(page,{expectExtraIntro:origin===previewOrigin&&!archiveEnabled});
  if(origin===previewOrigin){
   assert.equal(await page.locator('#freeRefreshToday').count(),0,'retired300-board card must not return');
-  assert.equal(await page.locator('#dailyChallengeSwitch button>span').first().textContent(),'Extra');
-  const colors=await page.locator('#dailyChallengeSwitch button').evaluate(button=>({background:getComputedStyle(button).backgroundColor,color:getComputedStyle(button).color}));
-  assert.equal(colors.background,'rgb(255, 248, 233)');assert.equal(colors.color,'rgb(33, 79, 174)');
+  assert.equal(await page.locator('#studioExtraCard').isVisible(),true,'unfinished base keeps Extra as a secondary entry');
+  const expectedExtraAction=await page.evaluate(()=>{const extra=dailySpecialResultState();return extra.active?'Zobrazit výsledek':extra.progress?'Pokračovat v Extra':'Hrát Extra'});
+  assert.equal(await page.locator('#studioExtraCard button').textContent(),expectedExtraAction);
+  assert.equal(await page.locator('#dailyHeroTitle').textContent(),'Denní výzva');
  }
  return page;
 }
@@ -123,23 +127,28 @@ async function screenshot(page,name){
 async function bounds(page){
  return page.evaluate(()=>{
   const hero=document.querySelector('#screen-daily .daily-hero'),rect=element=>{const r=element.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}};
-  const box=rect(hero),selectors=['#dailyHeroTitle','#dailyDate','#dailyMeta','#playDailyBtn','#dailyWeekRhythm','#dailyChallengeSwitch','.daily-title-choice-row'];
+  const box=rect(hero),selectors=['#dailyHeroTitle','#dailyDate','#dailyMeta','#playDailyBtn','#dailyWeekRhythm','#dailyChallengeSwitch','#studioDailyArt'];
   const children=selectors.map(selector=>{const element=document.querySelector(selector);if(!element||!element.getClientRects().length)return null;return{selector,...rect(element),clientWidth:element.clientWidth,scrollWidth:element.scrollWidth}}).filter(Boolean);
-  const base=document.querySelector('.daily-base-title'),special=document.querySelector('#dailyChallengeSwitch button');
-  return {hero:box,children,documentWidth:document.documentElement.clientWidth,documentScrollWidth:document.documentElement.scrollWidth,choice:base&&special&&special.getClientRects().length?{base:rect(base),special:rect(special)}:null};
+  const title=document.querySelector('#dailyHeroTitle'),art=document.querySelector('#studioDailyArt'),nav=document.querySelector('.bottom-nav');
+  return {hero:box,children,documentWidth:document.documentElement.clientWidth,documentScrollWidth:document.documentElement.scrollWidth,viewportHeight:innerHeight,primary:rect(document.querySelector('#playDailyBtn')),bottomNav:nav&&nav.getClientRects().length?rect(nav):null,artPair:title&&art&&art.getClientRects().length?{title:rect(title),art:rect(art)}:null};
  });
 }
 function validateBounds(measurement,label){
  assert(measurement.documentScrollWidth<=measurement.documentWidth+1,label+': page overflows horizontally');
  for(const row of measurement.children){assert(row.x>=measurement.hero.x-1&&row.right<=measurement.hero.right+1,label+': '+row.selector+' exceeds the Daily card');assert(row.scrollWidth<=row.clientWidth+1,label+': '+row.selector+' clips its content');}
- if(measurement.choice)assert(measurement.choice.base.right<=measurement.choice.special.x+1,label+': title and special choice overlap');
+ if(measurement.artPair){const {title,art}=measurement.artPair;assert(title.right<=art.x+1||art.right<=title.x+1||title.bottom<=art.y+1||art.bottom<=title.y+1,label+': hero title and illustration overlap');}
+ assert(measurement.primary.height>=44,label+': primary action touch target is too short');
 }
 async function gameInfo(page){return page.evaluate(()=>({mode:currentGame?.mode,id:currentGame?.puzzle?.id,key:currentGame?challengeKey(currentGame.mode,currentGame.puzzle,currentGame.dailyDate):null,found:currentGame?.found.map(row=>row.answerIndex)||[],hints:currentGame?.hints||0,attempt:currentGame?.attemptId,elapsed:currentGame?gameElapsed(currentGame):0,paused:currentGame?.pausedAt!=null,finished:!!currentGame?.finished,record:currentGame?.resultRecord||null}))}
 async function start(page,kind){
  await page.bringToFront();
  await dismissAnnouncements(page);
- await page.locator(kind==='special'?'#dailyChallengeSwitch [data-daily-kind="special"]':'#dailyHeroTitle [data-daily-kind="base"]').click();
- await page.locator('#playDailyBtn').click();
+ const specialSelected=await page.locator('.daily-hero').evaluate(el=>el.classList.contains('daily-special-selected'));
+ if(kind==='special'&&!specialSelected)await page.locator('#studioExtraCard button').click();
+ else{
+  if(kind==='base'&&specialSelected)await page.locator('#dailyChallengeSwitch button').click();
+  await page.locator('#playDailyBtn').click();
+ }
  await page.locator('#screen-game.active #board .cell').first().waitFor({timeout:30000});
  await page.waitForFunction(()=>currentGame&&currentGame.pausedAt==null&&!currentGame.finished,{},{timeout:30000});
  const info=await gameInfo(page);assert.equal(info.mode,kind==='special'?'daily_special':'daily');return info;
@@ -185,7 +194,7 @@ function counters(snapshot,base,special){
  const rows=snapshot.completed.filter(row=>row.mode==='daily'||row.mode==='daily_special');
  assert.equal(rows.filter(row=>row.mode==='daily').length,base);assert.equal(rows.filter(row=>row.mode==='daily_special').length,special);
  assert.equal(snapshot.stats.dailyCompleted,base);assert.equal(snapshot.stats.dailySpecialCompleted,special);assert.equal(snapshot.stats.dailyChallengeCompleted,base+special);assert.equal(snapshot.stats.currentStreak,base?1:0);
- for(const row of rows)assert.equal(row.points,100,'each official first completion is exactly100XP');
+ for(const row of rows)assert.equal(row.points,row.mode==='daily_special'?200:100,'official base receipt is 100 XP and Extra receipt is 200 XP');
  return rows;
 }
 const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row.challengeKey,attemptId:row.attemptId,elapsedMs:row.elapsedMs,moves:row.moves,points:row.points,completedAt:row.completedAt,contentHash:row.contentHash});
@@ -202,18 +211,24 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
   validateBounds(productionBounds,'production '+viewport.width);await screenshot(productionPage,`${viewport.width}-production`);await production.close();
   const preview=await guardedContext(options),page=await open(preview,previewOrigin),baseBounds=await bounds(page);
   validateBounds(baseBounds,'base '+viewport.width);await screenshot(page,`${viewport.width}-base`);
-  await page.locator('#dailyChallengeSwitch [data-daily-kind="special"]').click();const specialBounds=await bounds(page);validateBounds(specialBounds,'special '+viewport.width);await screenshot(page,`${viewport.width}-special`);
+  // The secondary Extra action now starts the real game. Return through the
+  // real game control to inspect its resume presentation without seeding state.
+  await start(page,'special');await returnToday(page);
+  const specialBounds=await bounds(page);validateBounds(specialBounds,'special '+viewport.width);await screenshot(page,`${viewport.width}-special`);
   report.layout.push({viewport,production:productionBounds,base:baseBounds,special:specialBounds,extraBaseHeight:baseBounds.hero.height-productionBounds.hero.height,extraSpecialHeight:specialBounds.hero.height-productionBounds.hero.height});save();
-  assert(baseBounds.hero.height<=productionBounds.hero.height+2,`base card grew at${viewport.width}: ${baseBounds.hero.height} vs production ${productionBounds.hero.height}`);
-  assert(specialBounds.hero.height<=productionBounds.hero.height+2,`special card grew at${viewport.width}: ${specialBounds.hero.height} vs production ${productionBounds.hero.height}`);
-  assert(Math.abs(specialBounds.hero.height-baseBounds.hero.height)<=1,`switch changes Daily card height at${viewport.width}`);
+  // Studio deliberately changes hero proportions; preserve the useful boundary:
+  // the principal action is reachable in the initial viewport in both states.
+  for(const [kind,measurement] of [['base',baseBounds],['special',specialBounds]]){
+   const nav=measurement.bottomNav,limit=nav&&nav.y>measurement.viewportHeight/2?nav.y:measurement.viewportHeight;
+   assert(measurement.primary.bottom<=limit+1,`${kind} primary action falls below the first viewport at ${viewport.width}`);
+  }
   if(viewport.width===390){
    await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.__QA_PROPLET_READY===true);
    await page.waitForTimeout(350);
    assert.equal(await page.locator('#dailyExtraIntro:not(.hidden)').count(),0,'Extra explanation is shown once, not after reload');
    await dismissAnnouncements(page);
    assert.equal(await page.evaluate(()=>document.body.style.overflow),'','dismissal restores scrolling');
-   report.checks.push('Extra introduction once on first available visit, mobile fit, CTA selection, reload persistence, retired300-card absent and inverse Extra label');
+   report.checks.push('announcement coordination, visible Extra entry, mobile fit, CTA selection, reload persistence and retired300-card absent');
   }
   await page.locator('.daily-week-day.has-daily-special').first().click();await page.locator('#dailyWeekDialog:not(.hidden)').waitFor();
   const clippedWeek=await page.locator('#dailyWeekDialog .daily-week-dialog-day>span').evaluateAll(cells=>cells.filter(cell=>cell.scrollWidth>cell.clientWidth+1).map(cell=>cell.textContent));
@@ -221,7 +236,7 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
   await screenshot(page,`${viewport.width}-week-dialog`);await page.locator('[data-close-daily-week]').click();
   await preview.close();save();
  }
- report.checks.push('production/base/special heights, clipping, title overlap and week dialog at320/360/390/768/1280');
+ report.checks.push('production/base/special geometry, first-screen action, clipping, title/art overlap and week dialog at320/360/390/768/1280');
  const mobile=await guardedContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await open(mobile,previewOrigin);
  await start(page,'special');await gesture(page,specials.special.puzzle.answers[0],true);
  await page.locator('#hintBtn').click();await page.locator('#hintModal:not(.hidden)').waitFor();await page.locator('[data-hint-level="2"]').click();assert.equal((await gameInfo(page)).hints,1);await screenshot(page,'390-special-hint');
@@ -244,7 +259,7 @@ const resultIdentity=row=>JSON.stringify({puzzleId:row.puzzleId,challengeKey:row
  await screenshot(page,'390-base-result-after-special');report.officialResults=officialRows.map(({challengeKey,puzzleId,points,mode,timingVerified,hintsUsed})=>({challengeKey,puzzleId,points,mode,timingVerified,hintsUsed}));
  await second.bringToFront();await second.locator('#winReplayBtn').click();await second.locator('#screen-game.active #board .cell').first().waitFor();await second.waitForFunction(()=>currentGame?.pausedAt==null&&!currentGame?.finished);assert.match((await gameInfo(second)).key,/^daily-special-practice:/);
  await finishByGestures(second,specials.special.puzzle,false);const practice=(await gameInfo(second)).record;assert.equal(practice.points,0);assert.equal(practice.rewardEligible,false);const afterPractice=await sync(second);counters(afterPractice,1,1);assert.equal(resultIdentity(afterPractice.completed.find(row=>row.challengeKey===specials.special.challengeKey)),firstIdentity,'practice never changes first official result');await screenshot(second,'1280-special-practice-result');
- report.checks.push('real touch/mouse solves, hints, runtime reset/undo, pause, simultaneous base/special progress, reload, anonymous claim, second-device session resume, two100XP receipts, base-only streak, special ranking and0XP practice replay');
+ report.checks.push('real touch/mouse solves, hints, runtime reset/undo, pause, simultaneous base/special progress, reload, anonymous claim, second-device session resume, base100XP and Extra200XP receipts, base-only streak, special ranking and0XP practice replay');
  assert.equal(report.errors.length,0,'browser runtime errors: '+JSON.stringify(report.errors));assert.equal(report.network.failedApi.length,0,'unexpected preview API failures: '+JSON.stringify(report.network.failedApi));
  report.network.noProductionWrites=true;report.status='passed';report.finishedAt=new Date().toISOString();save();
  await mobile.close();await desktop.close();

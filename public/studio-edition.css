@@ -1,0 +1,221 @@
+/* Studio Edition: discovery screens only. The playing shell, board, input,
+   hints and tile geometry keep their existing production styles. */
+html{--studio-bg:#f5f0e5;--studio-paper:#fffcf5;--studio-hero:#e9eddf;--studio-extra:#eee1e0;--studio-ink:#292f29;--studio-muted:#62685d;--studio-line:#d5d3c5;--studio-blue:#2d529c;--studio-on-blue:#fffaf0;--studio-soft:#e5e9f1;--studio-green:#35664e;--studio-focus:#85521b}
+html[data-theme=dark]{--studio-bg:#292b27;--studio-paper:#343730;--studio-hero:#41453c;--studio-extra:#49403c;--studio-ink:#f7efdc;--studio-muted:#c1c2b3;--studio-line:#595d50;--studio-blue:#b1c6ff;--studio-on-blue:#202e51;--studio-soft:#3e4a5b;--studio-green:#b8d7ad;--studio-focus:#f0cb7b}
+html.tiskarna-ui:has(body.studio-edition:not(.playing)),html.tiskarna-ui body.studio-edition:not(.playing){background:var(--studio-bg)!important;background-image:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing){--td-paper:var(--studio-paper);--td-line:var(--studio-line);--td-ink:var(--studio-ink);--td-muted:var(--studio-muted);--td-blue:var(--studio-blue);--td-tint:var(--studio-soft);--td-mint:var(--studio-hero);--ink:var(--studio-ink);--muted:var(--studio-muted);color:var(--studio-ink)}
+html.tiskarna-ui body.studio-edition:not(.playing) .app-shell{width:min(100%,1120px)!important;max-width:1120px!important;padding:0 24px 35px!important;margin:auto!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .app-header{display:flex!important;align-items:center;gap:14px;min-height:104px;padding:20px 0!important;margin:0 0 32px!important;border-bottom:1px solid var(--studio-line)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .brand{order:0;flex:none;margin-right:auto}
+html.tiskarna-ui body.studio-edition:not(.playing) .quality-header-actions{order:2;flex:none}
+html.tiskarna-ui body.studio-edition:not(.playing) .profile-chip{order:3;flex:none;background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:var(--studio-ink)!important;min-height:44px;max-width:160px}
+html.tiskarna-ui body.studio-edition:not(.playing) #settingsHeaderBtn{order:2;background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:var(--studio-muted)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav{order:1;position:static!important;transform:none!important;margin:0 auto!important;width:320px!important;max-width:none!important;min-height:48px;flex:0 1 320px;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;gap:4px!important;backdrop-filter:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button{min-height:48px!important;padding:10px 12px!important;color:var(--studio-muted)!important;font:500 16px/1.35 Outfit,sans-serif!important;border-radius:10px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button svg{display:none}
+html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button :is(span,b,small){font:inherit!important;line-height:inherit!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button.active{background:var(--studio-paper)!important;color:var(--studio-ink)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) :is(button,a,[role=button]):focus-visible{outline:3px solid var(--studio-focus)!important;outline-offset:3px}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen .eyebrow{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen :is(h1,h2){font-family:Fraunces,Georgia,serif!important;font-weight:650!important;letter-spacing:-.035em!important;color:var(--studio-ink)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen h1{font-size:44px!important;line-height:1.1!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen h2{font-size:28px!important;line-height:1.15!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen p{color:var(--studio-muted);line-height:1.45}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen .primary-btn{background:var(--studio-blue)!important;color:var(--studio-on-blue)!important;box-shadow:0 3px 0 #15252320!important;border:0!important;border-radius:10px!important;font-weight:600!important;min-height:48px}
+html.tiskarna-ui body.studio-edition:not(.playing) .screen .secondary-btn{background:transparent!important;color:var(--studio-blue)!important;border-color:var(--studio-line)!important;box-shadow:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) :is(.card,.home-resume-card){box-shadow:none!important}
+
+/* Stable direct children: canonical renderers retain node identity and handlers. */
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily.active{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px 36px;align-items:start}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily>*{grid-column:1/-1;min-width:0;margin:0!important;order:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioTodayHeading{display:flex;justify-content:space-between;gap:20px;align-items:baseline;padding:0 0 2px;margin:0!important;grid-row:auto}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioTodayHeading h1{margin:0!important;font-size:48px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioTodayDate{font:500 16px/1.4 Outfit,sans-serif;color:var(--studio-muted);text-align:right}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero{grid-column:1;grid-row:auto/span 2;min-height:360px;padding:32px!important;background:var(--studio-hero)!important;color:var(--studio-ink)!important;border:0!important;border-radius:18px!important;box-shadow:0 4px 0 #15252315!important;overflow:clip}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero.daily-special-selected{background:var(--studio-extra)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero:before{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero .hero-decor,html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-topline{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main{display:grid!important;grid-template-columns:minmax(0,1fr) 138px;gap:18px;align-items:center;margin:0!important;min-height:160px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main>div{min-width:0}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #studioDailyArt{display:block;width:138px;height:148px;max-width:100%;object-fit:contain;filter:drop-shadow(0 7px 5px #111a1518)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyHeroTitle{font:650 47px/1.08 Fraunces,Georgia,serif!important;color:var(--studio-ink)!important;margin:0 0 16px!important;max-width:none}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-base-title{font:inherit!important;color:inherit!important;background:transparent!important;padding:0!important;text-align:left!important;box-shadow:none!important;line-height:inherit!important;min-height:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-title-choice-row{display:block!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-title-meta{display:block!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyDate{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyMeta{display:block!important;color:var(--studio-muted)!important;font:400 16px/1.5 Outfit,sans-serif!important;margin:0!important;max-width:360px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyMeta::before{content:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #playDailyBtn{width:auto!important;max-width:100%;min-width:220px;min-height:54px!important;margin:24px 0 0!important;padding:14px 22px!important;border-radius:10px!important;background:var(--studio-blue)!important;color:var(--studio-on-blue)!important;font:600 17px/1.4 Outfit,sans-serif!important;box-shadow:0 3px 0 #15252320!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #shareDailyBtn{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailySyncStatus:not(.hidden){font-size:14px!important;line-height:1.45!important;color:var(--studio-muted)!important;background:transparent!important;border:0!important;padding:14px 0 0!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyChallengeSwitch:not(.hidden){margin-top:10px!important;width:max-content}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyChallengeSwitch button{background:transparent!important;border:1px solid var(--studio-line)!important;color:var(--studio-blue)!important;min-height:44px;padding:9px 12px!important;font-size:14px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyWeekRhythm{display:block!important;width:100%;margin:26px 0 0!important;padding:17px 0 0!important;border:0!important;border-top:1px solid var(--studio-line)!important;background:none!important;border-radius:0!important;box-shadow:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-days{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:4px!important;width:100%}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-day{display:flex!important;flex-direction:column;align-items:center;gap:7px;min-height:51px!important;padding:0 2px!important;border:0!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;color:var(--studio-muted)!important;position:relative}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-day b{font:500 13px/1.4 Outfit,sans-serif!important;color:inherit!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-day :is(i,.difficulty-icon){font-size:20px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-day.active{background:var(--studio-paper)!important;color:var(--studio-ink)!important;outline:1px solid var(--studio-line)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-special-mark{width:13px!important;height:13px!important;right:0;bottom:0}
+
+/* Secondary entries share typography, not another full panel and filled CTA. */
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard,#tajenkaPreviewCard){grid-column:2!important;display:grid!important;grid-template-columns:minmax(0,1fr) 76px!important;gap:10px 12px!important;padding:20px 0 24px!important;background:none!important;border:0!important;border-bottom:1px solid var(--studio-line)!important;border-radius:0!important;box-shadow:none!important;width:100%;min-height:160px;margin:0!important;align-items:center}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #studioExtraCard{grid-row:auto}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #tajenkaPreviewCard{grid-row:auto!important;order:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard,#tajenkaPreviewCard).hidden{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard,#studioDailyResult)[hidden]{display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(.studio-extra-copy,.tajenka-entry-copy){grid-column:1!important;grid-row:1!important;margin:0!important;min-width:0}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #tajenkaPreviewCard .tajenka-entry-copy{grid-column:1!important;grid-row:1!important;margin:0!important;min-width:0}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard h2,#studioExtraCard h3,#tajenkaPreviewCard h2){font:650 29px/1.12 Fraunces,Georgia,serif!important;letter-spacing:-.025em!important;color:var(--studio-ink)!important;margin:0 0 9px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard p,.tajenka-entry-copy p,.tajenka-entry-reward){font:400 15px/1.45 Outfit,sans-serif!important;color:var(--studio-muted)!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard>img,.tajenka-entry-icon){grid-column:2!important;grid-row:1/span 2!important;width:76px!important;height:82px!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;object-fit:contain}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard>button,#tajenkaPreviewCard button){grid-column:1!important;grid-row:2!important;justify-content:flex-start!important;justify-self:start;width:auto!important;min-height:44px!important;min-width:0!important;background:transparent!important;color:var(--studio-blue)!important;border:0!important;border-radius:5px!important;padding:9px 0!important;box-shadow:none!important;font:600 16px/1.4 Outfit,sans-serif!important;margin:0!important;text-align:left}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .tajenka-home-actions{grid-column:1/-1;display:flex!important;flex-wrap:wrap;gap:16px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .tajenka-revealed-phrase{font-size:20px!important;line-height:1.35!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult{grid-row:auto;display:flex;align-items:center;gap:16px;padding:15px 18px;border:1px solid var(--studio-line);border-radius:12px;color:var(--studio-ink)}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult>img{width:35px;height:38px;object-fit:contain}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult p{font-size:14px!important;line-height:1.45!important;margin:3px 0 0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult button{margin-left:auto;min-height:44px;background:none;border:0;color:var(--studio-blue);font:600 15px/1.4 Outfit,sans-serif}
+html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult .studio-result-sync{color:var(--studio-muted);font-size:14px;line-height:1.45}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#todayNewContentBanner,#axHomeGames,#homeCompetitionRows,#levelCard){display:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,#axHomeCompetitions){grid-column:auto;grid-row:auto;padding:22px 0!important;border:0!important;border-top:1px solid var(--studio-line)!important;border-radius:0!important;background:none!important;box-shadow:none!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry){display:grid!important;grid-template-columns:50px minmax(0,1fr) auto!important;gap:12px!important;align-items:center;min-height:78px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .ax-team-entry{padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #axHomeFree{grid-column:1!important;grid-row:auto!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #axHomeCompetitions{grid-column:2!important;grid-row:auto!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #axHomeCompetitions .ax-team-entry{padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry) .ax-entry-art{grid-column:1!important;grid-row:1!important;width:50px!important;height:54px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry) .ax-entry-copy{grid-column:2!important;grid-row:1!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry) h2{font:600 21px/1.2 Outfit,sans-serif!important;letter-spacing:0!important;margin:0 0 5px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry) p{font:400 15px/1.45 Outfit,sans-serif!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry) .ax-card-action{grid-column:3!important;grid-row:1!important;justify-content:flex-end!important;width:auto!important;background:transparent!important;color:var(--studio-blue)!important;border:0!important;box-shadow:none!important;padding:9px 0!important;font-size:15px!important;min-height:44px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-competition-card{background:none!important;border:0!important;border-top:1px solid var(--studio-line)!important;border-radius:0!important;padding:24px 0 0!important;margin-top:8px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionCard.studio-progress-strip{display:flex;align-items:center;gap:18px;justify-content:space-between;grid-row:auto!important;border-top:1px solid var(--studio-line);padding:22px 0 0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionSelf{display:flex!important;align-items:center;gap:14px;flex:1;min-width:0;background:none!important;padding:0!important;border:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionSelf>img{width:42px;height:48px;object-fit:contain;flex:none}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionSelf>div{display:flex;flex-direction:column;gap:5px;flex:1}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionSelf :is(strong,span){font:400 15px/1.45 Outfit,sans-serif;color:var(--studio-muted)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionSelf strong{font-weight:600;color:var(--studio-ink)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeProgressBtn{min-height:44px;background:none;border:0;padding:10px 0;color:var(--studio-blue);font:600 15px/1.4 Outfit,sans-serif;flex:none}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-competition-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-competition-head h2{font:600 20px/1.3 Outfit,sans-serif!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-competition-head button{font-size:15px!important;color:var(--studio-blue);min-height:44px;padding:8px 0;background:none!important;border:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-competition-self{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:none!important;border:0!important;padding:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-hero{display:flex;align-items:center;gap:14px;flex:1;min-width:180px;background:none!important;border:0!important;padding:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-art{width:50px!important;height:50px!important;flex:none}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-copy{flex:1;max-width:240px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-copy h3{font:600 18px/1.3 Outfit,sans-serif;margin:0 0 8px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-track{height:4px;background:var(--studio-line);border-radius:5px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-track>span{background:var(--studio-green)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-next{font-size:14px!important;margin:7px 0 0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-metrics{display:flex;gap:26px;background:none!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-metrics>div{background:none!important;border:0!important;padding:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-metrics dt{font-size:14px;color:var(--studio-muted)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-metrics dd{font-size:22px;color:var(--studio-ink);margin:3px 0 0}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-resume-card{border:0!important;border-bottom:1px solid var(--studio-line)!important;border-radius:0!important;background:none!important;padding:18px 0!important;color:var(--studio-ink)!important;min-height:72px}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-resume-copy>span{text-transform:none!important;letter-spacing:0!important;font-size:15px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-resume-copy strong{font-size:19px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-resume-card>b{font-size:15px!important;color:var(--studio-blue)!important}
+
+/* Hrát retains the actual progress/history buttons and all six difficulty IDs. */
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free .screen-title{display:block!important;margin:0 0 24px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free .screen-title h1{margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free .screen-title p{margin:12px 0 0!important;font-size:15px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-card{grid-template-columns:minmax(0,1fr) 65px!important;gap:18px 12px!important;padding:24px!important;border:0!important;border-radius:15px!important;background:var(--studio-paper)!important;box-shadow:none!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-heading{grid-column:1!important;grid-row:1!important;margin:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards h2{font:650 27px/1.15 Fraunces,Georgia,serif!important;letter-spacing:-.025em!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-art{grid-column:2!important;grid-row:1!important;width:65px!important;height:70px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-history{grid-column:1!important;grid-row:3!important;justify-self:start;justify-content:flex-start;font-size:14px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-track{grid-column:1/-1!important;grid-row:2!important;background:var(--studio-line);height:3px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-track>span{background:var(--studio-green)}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-xp{color:var(--studio-muted)!important;font:400 14px/1.4 Outfit,sans-serif!important;margin:7px 0 0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-play{grid-column:2!important;grid-row:3!important;justify-content:flex-end!important;width:auto!important;min-width:0!important;background:transparent!important;color:var(--studio-blue)!important;border:0!important;box-shadow:none!important;padding:10px 0!important;font-size:16px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #newContentBanner{background:none!important;border:0!important;border-block:1px solid var(--studio-line)!important;border-radius:0!important;box-shadow:none!important;padding:22px 0!important;margin:0 0 28px!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #newContentBanner .primary-btn{background:transparent!important;color:var(--studio-blue)!important;box-shadow:none!important;justify-content:flex-start!important;padding-left:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free :is(#tajenkaPlayCard,#axPlayArchive .ax-destination){background:none!important;border:0!important;border-top:1px solid var(--studio-line)!important;border-radius:0!important;box-shadow:none!important;padding:22px 0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) #screen-free :is(#tajenkaPlayCard,#axPlayArchive) button{background:transparent!important;color:var(--studio-blue)!important;box-shadow:none!important;border:0!important;justify-content:flex-start!important;padding-inline:0!important}
+html.tiskarna-ui body.studio-edition:not(.playing) :is(#screen-profile,#screen-leaderboard) .card{border-color:var(--studio-line)!important;background:var(--studio-paper)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) :is(#screen-profile,#screen-leaderboard) :is(.field-note,.muted,.rank-next){color:var(--studio-muted)!important}
+html.tiskarna-ui body.studio-edition:not(.playing) .app-footer{margin-top:32px;padding-top:22px;border-top:1px solid var(--studio-line);color:var(--studio-muted)!important}
+
+@media(max-width:1000px){
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily.active{grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);column-gap:25px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero{padding:25px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main{grid-template-columns:minmax(0,1fr) 85px;gap:12px;min-height:150px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #studioDailyArt{width:85px;height:105px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyHeroTitle{font-size:39px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard,#tajenkaPreviewCard){grid-template-columns:minmax(0,1fr) 58px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard>img,.tajenka-entry-icon){width:58px!important;height:70px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard h2,#studioExtraCard h3,#tajenkaPreviewCard h2){font-size:27px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry){grid-template-columns:46px minmax(0,1fr)!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,.ax-team-entry) .ax-card-action{grid-column:2!important;grid-row:2!important;justify-content:flex-start!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav{width:280px!important;flex-basis:280px}
+ html.tiskarna-ui body.studio-edition:not(.playing) .app-header{gap:5px}
+ html.tiskarna-ui body.studio-edition:not(.playing) .profile-chip{max-width:100px}
+}
+@media(max-width:699px){
+ html.tiskarna-ui body.studio-edition:not(.playing) .app-shell{padding:0 20px 100px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) .app-header{min-height:82px;margin-bottom:26px!important;padding:16px 0!important;gap:8px}
+ html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav{position:fixed!important;inset:auto 0 0!important;width:100%!important;max-width:none!important;transform:none!important;min-height:65px;margin:0!important;padding:6px 12px max(8px,env(safe-area-inset-bottom))!important;background:var(--studio-paper)!important;border:0!important;border-top:1px solid var(--studio-line)!important;border-radius:0!important;z-index:100}
+ html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button{font-size:15px!important;padding:5px 10px!important;min-height:48px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button svg{display:block}
+ html.tiskarna-ui body.studio-edition:not(.playing) .bottom-nav button.active{background:var(--studio-soft)!important;color:var(--studio-blue)!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily.active{display:flex!important;flex-direction:column;gap:23px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily>*{width:100%}
+ html.tiskarna-ui body.studio-edition:not(.playing) #studioTodayHeading{padding:0!important;align-items:center;gap:12px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #studioTodayHeading h1{font-size:39px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #studioTodayDate{font-size:14px;max-width:170px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero{min-height:0;padding:25px 24px 22px!important;border-radius:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main{grid-template-columns:minmax(0,1fr) 83px;gap:10px;min-height:124px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyHeroTitle{font-size:36px!important;margin-bottom:12px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyMeta{font-size:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #studioDailyArt{width:83px;height:100px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #playDailyBtn{width:100%!important;min-width:0;margin-top:18px!important;font-size:16px!important;min-height:52px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyWeekRhythm{margin-top:22px!important;gap:2px!important;padding-top:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-day{min-height:49px!important;gap:5px;padding:0!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-week-day b{font-size:12px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard,#tajenkaPreviewCard){grid-template-columns:minmax(0,1fr) 70px!important;min-height:0;padding:0 0 22px!important;gap:8px 15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#studioExtraCard>img,.tajenka-entry-icon){width:70px!important;height:76px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult{flex-wrap:wrap;gap:9px;padding:14px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyResult :is(p,.studio-result-sync){font-size:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailySyncStatus:not(.hidden){font-size:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .home-competition-self{gap:20px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-metrics{gap:24px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .rank-next{font-size:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily :is(#axHomeFree,#axHomeCompetitions){padding-top:20px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards{gap:12px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-card{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;padding:17px 14px!important;gap:8px 5px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-art{grid-column:1/-1!important;grid-row:1!important;width:44px!important;height:48px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-heading{grid-column:1/-1!important;grid-row:2!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards h2{font:600 21px/1.2 Outfit,sans-serif!important;overflow-wrap:anywhere}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-history{grid-column:1!important;grid-row:4!important;justify-self:start;min-height:44px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-track{grid-column:1/-1!important;grid-row:3!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-play{grid-column:2!important;grid-row:4!important;justify-self:end;justify-content:flex-end!important;width:auto!important;min-height:44px!important;font-size:15px!important;gap:5px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-history{font-size:13px!important;gap:3px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-xp{font-size:15px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) .screen h1{font-size:37px!important}
+}
+@media(max-width:359px){
+ html.tiskarna-ui body.studio-edition:not(.playing) #profileChipText{display:none!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) .profile-chip{padding:0!important;width:40px!important;min-width:40px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #homeCompetitionCard.studio-progress-strip{flex-wrap:wrap}
+ html.tiskarna-ui body.studio-edition:not(.playing) .app-shell{padding-inline:16px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero{padding:22px 18px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main{grid-template-columns:minmax(0,1fr) 60px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #studioDailyArt{width:60px;height:80px}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyHeroTitle{font-size:33px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-card{padding:15px 12px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards h2{font-size:19px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards{grid-template-columns:1fr!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-art{grid-column:2!important;grid-row:1!important;width:54px!important;height:60px!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-heading{grid-column:1!important;grid-row:1!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards .cp-track{grid-row:2!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-free #difficultyCards :is(.cp-history,.cp-play){grid-row:3!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-special-selected .hero-main>div{display:contents!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-special-selected #dailyHeroTitle{grid-column:1/-1;grid-row:1;margin-bottom:0!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-special-selected .daily-title-meta{grid-column:1;grid-row:2}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-special-selected #studioDailyArt{grid-column:2;grid-row:2}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-special-selected #dailyChallengeSwitch{grid-column:1/-1;grid-row:3}
+}

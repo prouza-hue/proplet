@@ -10,7 +10,7 @@
 <script src="/runtime-meta.js?v=40912" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=3" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=telemetry1"></script>
-  <script src="/theme-init.js?v=40912extra2"></script>
+  <script src="/theme-init.js?v=40912studio1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -65,7 +65,7 @@
   <link rel="stylesheet" href="/app/archive/experience.css?v=home-stable1">
   <link rel="stylesheet" href="/app/archive/discovery.css?v=extra-entry1">
 </head>
-<body>
+<body class="studio-edition">
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
 
@@ -79,6 +79,7 @@
     </header>
 
     <section id="screen-daily" class="screen active">
+      <header id="studioTodayHeading"><h1>Dnes</h1><time id="studioTodayDate"></time></header>
       <div class="daily-hero card">
         <div class="hero-decor" aria-hidden="true"><span>Ř</span><span>A</span><span>P</span></div>
         <div class="hero-topline">
@@ -87,13 +88,14 @@
         </div>
         <div class="hero-main">
           <div>
-            <h1 id="dailyHeroTitle">Denní výzva</h1>
+            <h2 id="dailyHeroTitle">Denní výzva</h2>
             <div id="dailyChallengeSwitch" class="daily-challenge-switch hidden" aria-label="Dnešní výzvy">
               <button type="button" data-daily-kind="special" aria-pressed="false" aria-label="Přepnout na dobrovolnou Extra výzvu"><img id="dailySpecialTabIcon" width="24" height="24" alt=""><span>Extra</span><span id="dailySpecialTabStatus" aria-hidden="true"></span></button>
             </div>
             <p id="dailyMeta" class="hero-muted"></p>
             <div id="dailyWeekRhythm" class="daily-week-rhythm" aria-label="Týdenní rytmus obtížnosti"></div>
           </div>
+          <img id="studioDailyArt" src="/rewards/printshop/symbol-daily.svg" width="144" height="144" alt="" aria-hidden="true">
         </div>
         <div id="starterDailyNudge" class="starter-daily-nudge hidden">🎓 Trénink hotový · teď je řada na dnešní výzvě</div>
         <button id="playDailyBtn" class="primary-btn hero-btn big">Hrát dnešní výzvu</button>
@@ -144,7 +146,7 @@
     </section>
 
     <section id="screen-free" class="screen">
-      <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Na co si troufáš?</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
+      <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Hrát</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
       <div id="newContentBanner" class="new-content-banner hidden"></div>
       <div id="difficultyCards" class="difficulty-grid"></div>
     </section>
@@ -767,7 +769,7 @@
   <script src="/app/content/daily-dated.js?v=dailygen6-20261008"></script>
   <script src="/app/content/daily-special.js?v=daily-specials1"></script>
   <script src="/app/engagement/announcements.js?v=archive-release1"></script>
-  <script src="/app/content/daily-special-ui.js?v=extra-xp1"></script>
+  <script src="/app/content/daily-special-ui.js?v=studio1"></script>
   <script src="/app/content/progression.js?v=progression-compat1"></script>
   <script src="/app/content/daily.js?v=dailygen6-20261008"></script>
   <script src="/app/rankings/rankings.js?v=navigation2"></script>
@@ -781,8 +783,8 @@
   <script src="/app/content/refresh-ui.js?v=archive-release1"></script>
   <script src="/app/content/refresh-release.js?v=archive-release1"></script>
   <script src="/app/archive/solution-contract.js"></script>
-  <script src="/app/archive/experience.js?v=extra-entry1"></script>
-  <script src="/app.js?v=40912extra2"></script>
+  <script src="/app/archive/experience.js?v=studio1"></script>
+  <script src="/app.js?v=40912studio1"></script>
   <script src="/app/weekly/competition.js?v=weekly-live1"></script>
   <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
@@ -792,7 +794,9 @@
   <script src="/achievement-details.js?v=rank-details1"></script>
   <script src="/organic-ui-v4023.js?v=artcutout3"></script>
   <script src="/app/mozkokalypsa-launch.js?v=archive-release1"></script>
-<script src="/referrals.js?v=archive-release1"></script>
+<script src="/referrals.js?v=studio1"></script>
+  <script src="/studio-shell.js?v=1"></script>
+  <link rel="stylesheet" href="/studio-edition.css?v=1">
 </body>
 </html>
 

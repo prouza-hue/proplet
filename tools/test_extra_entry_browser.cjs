@@ -38,14 +38,17 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
    assert.equal(descriptor.dailyDate,'2026-10-21');
    await page.evaluate(async d=>{datedSpecial().remember(d);await refreshDatedSpecial();nav('daily');renderDaily();closeTransientModals();},descriptor);
    await page.locator('#axHomeFree').scrollIntoViewIfNeeded();
-   const icons=page.locator('#axHomeFree [data-home-free]');assert.equal(await icons.count(),6);
-   assert.equal(await icons.first().evaluate(el=>!!el.closest('[aria-hidden="true"]')),false,'interactive icons accessible');
+   assert.equal(await page.locator('#axHomeFree [data-home-free]').count(),0,'Today does not duplicate the difficulty catalog');
+   assert.equal(await page.locator('#axHomeFree button').count(),1,'one unambiguous entry opens the real Play catalog');
+   assert.equal(await page.locator('#axHomeFree [data-archive-action="free"]').count(),1);
    for(const theme of ['light','dark']){
     await page.evaluate(t=>applyTheme(t,{persist:false}),theme);
     const path=`artifacts/extra-entry/${label}-home-${theme}.png`;await page.locator('#axHomeFree').screenshot({path});report.screenshots.push(path);
    }
    for(const diff of ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']){
-    await page.locator(`#axHomeFree [data-home-free="${diff}"]`).click();
+    await page.locator('#axHomeFree [data-archive-action="free"]').click();
+    await page.waitForFunction(()=>currentScreen==='free');
+    await page.locator(`#difficultyCards [data-play-free="${diff}"]`).click();
     await page.waitForFunction(d=>currentScreen==='game'&&currentGame?.mode==='free'&&currentGame.puzzle.difficulty===d,diff);
     await page.evaluate(()=>{stopTimer();nav('daily');closeTransientModals()});
    }
@@ -62,12 +65,16 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
    const screenshot=`artifacts/extra-entry/${label}-daily-result.png`;await page.locator('#winModal .win-card').screenshot({path:screenshot});report.screenshots.push(screenshot);
    await page.locator('#winExtraBtn').click();await page.waitForFunction(()=>currentScreen==='game'&&currentGame?.mode==='daily_special');
    assert.equal(await page.locator('#winModal').evaluate(el=>el.classList.contains('hidden')),true);
-   await page.evaluate(()=>{saveGameProgress();stopTimer();nav('daily');closeTransientModals();dailySpecialUI().select('special')});
-   assert.equal(await page.locator('#dailySpecialTabStatus').textContent(),'');
+   await page.evaluate(()=>{saveGameProgress();stopTimer();nav('daily');closeTransientModals()});
+   assert.equal(await page.locator('.daily-hero').evaluate(el=>el.classList.contains('daily-special-selected')),true,'completed Daily automatically promotes unfinished Extra');
+   assert.equal(await page.locator('#dailyHeroTitle').textContent(),'Mozkožrout');
+   assert.equal(await page.locator('#playDailyBtn').textContent(),'Pokračovat ve speciálu');
+   assert.match(await page.locator('#dailyMeta').textContent(),/Extra.*200 XP/);
+   assert.equal(await page.locator('#studioDailyResult').isVisible(),true,'completed base result stays accessible');
    assert(!(await page.locator('#playDailyBtn').textContent()).includes('Sérii neovlivní'));
    assert.equal(await page.locator('#playDailyBtn small').count(),0);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-   assert.deepEqual(errors,[]);report.checks.push(label+': six real free starts, browse destination, actual Daily finish -> Extra, progress marker/copy, no overflow/errors');
+   assert.deepEqual(errors,[]);report.checks.push(label+': one Today entry, six real starts from Play, actual Daily finish -> Extra, automatic promotion and resume/result access, no overflow/errors');
    await context.close();
   }
   fs.writeFileSync('artifacts/extra-entry/report.json',JSON.stringify(report,null,2));console.log('PASS '+report.checks.join('; '));

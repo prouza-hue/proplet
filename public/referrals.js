@@ -45,22 +45,20 @@
  const invitationOffer=()=>'<button class="ref-card-close" data-ref-home-close aria-label="Skrýt nabídku pozvání">×</button>'+heading('Pozvi někoho<br>do Propletu.','Sdílejte radost z hraní. Za prvních 5 desek kamaráda získáte oba bonus.')+'<button class="secondary-btn ref-wide" data-ref-open>Pozvi kamaráda <span aria-hidden="true">→</span></button>';
  function renderHome(){
   if(!m.ready){$('#referralHome')?.remove();$('#referralInviteHome')?.remove();return}
+  const showIncoming=m.incoming&&(!m.paid||!rewardHidden());
+  // Today carries an existing invitation or earned reward, never an evergreen advert.
+  $('#referralInviteHome')?.remove();
+  if(!showIncoming){$('#referralHome')?.remove();return}
   let card=$('#referralHome');
   if(!card){card=document.createElement('aside');card.id='referralHome';card.className='card ref-home'}
-  const showIncoming=m.incoming&&(!m.paid||!rewardHidden());
-  const anchor=showIncoming?$('#screen-daily .daily-hero'):($('#tajenkaPreviewCard')||$('#quickPlayCard'));
+  const anchor=$('#screen-daily .daily-hero');
   if(!anchor)return;
-  if(anchor.nextElementSibling!==card)anchor.after(card);
+  if(card.parentElement!==anchor.parentElement)anchor.after(card);
   card.classList.toggle('ref-incoming',showIncoming);card.classList.toggle('ref-paid',showIncoming&&m.paid);
-  card.hidden=!showIncoming&&sessionStorage.getItem(offerKey())==='1';
-  card.innerHTML=showIncoming?(m.paid?dismissReward:'')+incomingCopy():invitationOffer();
+  card.hidden=false;
+  card.innerHTML=(m.paid?dismissReward:'')+incomingCopy();
   wire(card);
-  let own=$('#referralInviteHome');
-  if(showIncoming&&canInvite()){
-   if(!own){own=document.createElement('aside');own.id='referralInviteHome';own.className='card ref-home ref-own-invite'}
-   ($('#tajenkaPreviewCard')||$('#quickPlayCard')).after(own);
-   own.hidden=sessionStorage.getItem(offerKey())==='1';own.innerHTML=invitationOffer();wire(own);
-  }else own?.remove();
+  window.PropletHomeLayout?.orderDailyNodes?.();
  }
  function renderProfile(){
   if(!m.ready||!transport.profile()?.id){$('#referralProfile')?.remove();$('#referralProfileReward')?.remove();return}

@@ -133,26 +133,17 @@ function archiveEntry(){return destination({kind:'archive',title:'Archiv Proplet
 function home(){
  if(!installed)return;
  const root=q('#screen-daily');if(!root)return;
- let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div>';root.append(games);}
- if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(DIFF).map(diff=>'<button type="button" class="ax-free-start" data-home-free="'+diff+'" aria-label="Hrát '+esc(DIFF[diff].label)+'" title="'+esc(DIFF[diff].label)+'">'+difficultyIconMarkup(diff,'ax-free-difficulty')+'</button>').join('')+'</div>',action:'free',label:'Vybrat hru',interactiveArt:true}));}
+  // The complete Archive catalog stays on Play; Today has one compact discovery link.
+  q('#axHomeGames')?.remove();
+  if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Obtížnosti, nové desky i Archiv',art:difficultyIconMarkup('easy','ax-free-difficulty'),action:'free',label:'Vybrat hru'}));}
  let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Hraj s týmem o zlatou trofej',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
  if(archiveResume){if(!resume){resume=document.createElement('button');resume.id='axArchiveResume';resume.className='home-resume-card';root.prepend(resume);}
- const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>Archiv · rozehráno</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
+  const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><strong>Rozehráno v Archivu: '+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
  }else{resume?.remove();q('#homeResumeCard')?.classList.remove('hidden');}
- // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
- const referral=q('#referralHome');
- const tajenka=q('#tajenkaPreviewCard'),tajenkaSolved=tajenka?.classList.contains('completed');
- const progress=q('#homeCompetitionCard');
- const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),referral,q('#referralInviteHome'),q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,q('#axHomeFree'),competition,games,q('#levelCard')].filter(Boolean);
- let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
- // Tail nodes have one owner and are never also moved within the ordered prefix.
- if(progress&&root.lastElementChild!==progress)root.append(progress);
- if(tajenkaSolved){
-  if(progress){if(tajenka.nextElementSibling!==progress)progress.before(tajenka);}
-  else if(root.lastElementChild!==tajenka)root.append(tajenka);
- }
+  // Stable nodes retain their real handlers; the Today owner applies one direct-child order.
+  window.PropletHomeLayout?.orderDailyNodes?.();
 }
 function placePlayExtra(card){
  const archive=q('#axPlayArchive');if(!archive)return false;
@@ -296,7 +287,7 @@ async function onClick(e){
  if(action==='demo-clear-resume'){const state=getState();state.inProgress={};saveState(state);closeModal();renderDaily();renderFree();return}
  closeModal();
  if(action==='open'||action==='enter'||action==='retry'){nav('archive');return}
- if(action==='extra'){nav('daily');const ui=dailySpecialUI();ui?.select('special');if(ui?.getState().selected==='special'){q('#dailyChallengeSwitch')?.scrollIntoView({block:'center',behavior:'smooth'});q('#dailyChallengeSwitch [data-daily-kind="special"]')?.focus({preventScroll:true});}else ui?.openWeek(q('#dailyHeroTitle [data-daily-kind="base"]'));return}
+ if(action==='extra'){nav('daily');const ui=dailySpecialUI();ui?.select('special');const target=q('#playDailyBtn');if(ui?.getState().selected==='special'){target?.scrollIntoView({block:'center',behavior:'smooth'});target?.focus({preventScroll:true});}else ui?.openWeek(target);return}
  if(action==='free'){nav('free');return}if(action==='daily'){nav('daily');return}
  if(action==='rankings'){nav('leaderboard');return}
  if(action==='team'){if(window.PropletWeeklyCompetition){window.PropletWeeklyCompetition.open();return;}nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}
