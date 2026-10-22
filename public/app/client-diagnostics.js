@@ -2,13 +2,15 @@
  'use strict';
  if(global.__PROPLET_DIAGNOSTIC_TRANSPORT__)return;
  global.__PROPLET_DIAGNOSTIC_TRANSPORT__=true;
- const REPORTER_RELEASE='proplet-v4.09.8-telemetry1';
+ const REPORTER_RELEASE='proplet-v4.09.13-module1';
  let appClaimedListeners=false;
  const nativeFetch=global.fetch.bind(global);
  const releasePattern=/^proplet-v\d+\.\d+\.\d+-[A-Za-z0-9_.-]+$/;
  function producer(){try{return typeof APP_PREVIEW_RELEASE==='string'&&releasePattern.test(APP_PREVIEW_RELEASE)?APP_PREVIEW_RELEASE:null}catch{return null}}
  function source(detail){
   const candidates=[];if(detail?.filename)candidates.push([detail.filename,detail.lineno,detail.colno]);
+  if(detail?.source_file)candidates.push([detail.source_file,detail.source_line,detail.source_column]);
+  if(Array.isArray(detail?.source_frames))for(const frame of detail.source_frames.slice(0,3))candidates.push([frame?.file,frame?.line,frame?.column]);
   // Raw stacks, function names and URL parameters never leave this boundary.
   for(const m of String(detail?.stack||detail?.error?.stack||'').matchAll(/(https?:\/\/[^\s)]+):([0-9]+):([0-9]+)/g))candidates.push([m[1],m[2],m[3]]);
   const frames=[];
@@ -45,7 +47,7 @@
  }
  // Repair only the diagnostic boundary, including a cached older app.js.
  // The producing app's immutable release is the source, never runtime-meta.
- global.fetch=function(input,init){
+ global.fetch=async function(input,init){
   try{
    const url=new URL(typeof input==='string'?input:input.url,location.href);
    if(url.origin===location.origin&&url.pathname==='/api/client-error'){
@@ -54,9 +56,23 @@
     const release=producer();
     if(release&&/^proplet-v\d+\.\d+\.\d+-[A-Za-z0-9_.-]+$/.test(release)){
      headers.set('X-Proplet-Client-Release',release);headers.set('X-Proplet-Version',release.match(/^proplet-v(\d+\.\d+\.\d+)-/)[1]);headers.set('X-Proplet-Analytics','2');
-    }
+    }else{headers.delete('X-Proplet-Client-Release');headers.delete('X-Proplet-Version')}
     if(new URLSearchParams(location.search).get('tutorial')==='1'||global.PROPLET_RUNTIME_ENV==='preview')headers.set('X-Proplet-Test','1');
-    return nativeFetch(input,{...init,headers});
+    let body=init?.body;
+    if(body===undefined&&typeof Request!=='undefined'&&input instanceof Request&&input.method==='POST')body=await input.clone().text();
+    if(typeof body==='string'){
+     try{
+      const legacy=JSON.parse(body);
+      if(legacy&&typeof legacy==='object'&&!Array.isArray(legacy)){
+       // Enrich the actual legacy transport request, not a second error event.
+       // An allowlist prevents raw stacks/URLs and arbitrary legacy fields leaking.
+       body=JSON.stringify({code:String(legacy.code||'client_error').slice(0,80),message:String(legacy.message||'').slice(0,200),route:location.pathname.slice(0,120),
+        ...(release?{client_release:release,client_version:headers.get('X-Proplet-Version')}:{unknown_producer_reason:'before_app_release'}),
+        reporter_release:REPORTER_RELEASE,is_test:headers.get('X-Proplet-Test')==='1',...source(legacy)});
+      }
+     }catch{} // Malformed/non-JSON payloads keep their original failure semantics.
+    }
+    return nativeFetch(input,{...init,headers,...(body!==undefined?{body}:{})});
    }
   }catch{} // Bootstrap before app.js declares its release remains honestly unknown.
   return nativeFetch(input,init);

@@ -54,7 +54,7 @@ async function verifyDiagnostics(){
  c.APP_PREVIEW_RELEASE='proplet-v4.05.2-dailygen6-20261008-usage1';listeners.error({message:'legacy listener owns this'});assert.equal(calls.length,1,'do not double-report errors from a cached app with its own listeners');
  c.APP_PREVIEW_RELEASE='proplet-v4.09.8-telemetry1';c.window.PropletClientDiagnostics.claimErrorListeners();
  listeners.unhandledrejection({reason:{message:'synthetic length',stack:'TypeError private\n at https://hrajproplet.cz/app.js?code=private:10:2\n at https://evil.test/private.js:2:1\n at https://hrajproplet.cz/app/account/account.js#secret:12:4'}});
- body=JSON.parse(calls.at(-1).options.body);assert.equal(body.client_release,c.APP_PREVIEW_RELEASE);assert.equal(body.reporter_release,'proplet-v4.09.8-telemetry1');assert.equal(body.is_test,true);assert.equal(body.source_frames.length,2);assert.equal(body.source_file,'/app.js');assert(!/private|secret|evil|stack/.test(JSON.stringify(body)));
+ body=JSON.parse(calls.at(-1).options.body);assert.equal(body.client_release,c.APP_PREVIEW_RELEASE);assert.equal(body.reporter_release,fs.readFileSync('public/app/client-diagnostics.js','utf8').match(/REPORTER_RELEASE='([^']+)'/)[1]);assert.equal(body.is_test,true);assert.equal(body.source_frames.length,2);assert.equal(body.source_file,'/app.js');assert(!/private|secret|evil|stack/.test(JSON.stringify(body)));
  assert.equal(body.source_availability,'available');assert.equal(calls.at(-1).options.headers['X-Proplet-Test'],'1');
  console.log('PASS bootstrap vs producer release, legacy listener isolation, opaque errors and safe frame-only JS diagnostics');
 }

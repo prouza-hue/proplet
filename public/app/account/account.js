@@ -9,6 +9,36 @@
     let statisticsScope = null;
     let statisticsRequest = null;
     let statisticsFailed = false;
+    let teamContractReported = false;
+
+    function renderTeamVictories(profile) {
+      const victories = global.PropletTeamVictories;
+      if (typeof victories?.renderProfile === 'function') {
+        d.$('#profileTeamContractStatus')?.remove();
+        victories.renderProfile(profile);
+        return;
+      }
+      // Old reward listeners also own announcement receipts. Do not re-execute
+      // that module in place or clear account storage to repair a partial shell.
+      d.$('#profileTeamVictories')?.remove();
+      if (!profile) return;
+      if (!teamContractReported) {
+        teamContractReported = true;
+        const report = d.reportClientError || global.PropletClientDiagnostics?.report || global.reportClientError;
+        if (typeof report === 'function') report('team_victories_contract', 'PropletTeamVictories.renderProfile unavailable', new Error('team_victories_contract'));
+      }
+      let status = d.$('#profileTeamContractStatus');
+      if (!status) {
+        status = document.createElement('section');
+        status.id = 'profileTeamContractStatus'; status.setAttribute('role', 'status');
+        d.$('#profileCard .profile-grid')?.after(status);
+      }
+      status.innerHTML = '<h3>Týmové výhry</h3><p>Tato část čeká na aktualizaci aplikace. Účet i výsledky zůstávají uložené.</p><button type="button" class="secondary-btn">Načíst aktuální aplikaci</button>';
+      status.querySelector('button').onclick = () => {
+        if (typeof global.recoverRuntimeUpdate === 'function') global.recoverRuntimeUpdate({automatic: true, forceReload: true});
+        else global.location.reload();
+      };
+    }
 
     function profileStatistics() {
       const api = global.PropletProfileStatistics;
@@ -257,7 +287,7 @@
       if (achievementSummary) achievementSummary.innerHTML = d.renderAchievementSummary(stats);
       if (achievementGrid) achievementGrid.innerHTML = d.renderAchievements(stats);
       global.PropletContinuation?.renderProfile(profile, stats);
-      global.PropletTeamVictories?.renderProfile(profile);
+      renderTeamVictories(profile);
       d.syncAchievementDisclosure();
       const achievementToggle = d.$('#achievementToggleBtn');
       if (achievementToggle) achievementToggle.onclick = () => {
