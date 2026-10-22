@@ -64,6 +64,7 @@
      try{
       const legacy=JSON.parse(body);
       if(legacy&&typeof legacy==='object'&&!Array.isArray(legacy)){
+       if(legacy.is_test===true)headers.set('X-Proplet-Test','1');
        // Enrich the actual legacy transport request, not a second error event.
        // An allowlist prevents raw stacks/URLs and arbitrary legacy fields leaking.
        body=JSON.stringify({code:String(legacy.code||'client_error').slice(0,80),message:String(legacy.message||'').slice(0,200),route:location.pathname.slice(0,120),

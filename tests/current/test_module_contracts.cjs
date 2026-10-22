@@ -35,6 +35,7 @@ async function diagnostics(){
  assert.equal(body.client_release,undefined);assert.equal(body.unknown_producer_reason,'before_app_release');assert.equal(calls[2].init.headers.get('X-Proplet-Client-Release'),null);
  const ordinary={method:'POST',body:'unchanged'};await c.window.fetch('/api/result',ordinary);assert.equal(calls.at(-1).init,ordinary,'other API writes untouched');
  await c.window.fetch('/api/client-error',{method:'POST',body:'not-json'});assert.equal(calls.at(-1).init.body,'not-json');assert.equal(calls.length,5,'one input request means one native fetch');
+ await c.window.fetch('/api/client-error',{method:'POST',body:JSON.stringify({code:'client_error',message:'synthetic legacy',is_test:true})});assert.equal(JSON.parse(calls.at(-1).init.body).is_test,true);assert.equal(calls.at(-1).init.headers.get('X-Proplet-Test'),'1','legacy explicit test marker must never be downgraded');
  // Standalone fallback is truthful when the bootstrap diagnostics asset failed.
  const fallbackCalls=[],f={...c,APP_PREVIEW_RELEASE:reporter,APP_VERSION:'99.0.0',navigator:{onLine:true},analyticsHeaders:()=>({}),getProfile:()=>null,getAnonymousId:()=> 'fixture',fetch:(url,init)=>{fallbackCalls.push(init);return Promise.resolve({ok:true})},window:{}};
  vm.createContext(f);vm.runInContext(app.slice(app.indexOf('let reportingClientError=false;'),app.indexOf('let accountUIController=')),f);
