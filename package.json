@@ -1,0 +1,7 @@
+{
+  "name": "proplet-studio-preview-hosting",
+  "private": true,
+  "version": "1.0.0",
+  "engines": { "node": "22.x" },
+  "scripts": { "vercel-build": "node tools/studio-preview/vercel-build.cjs" }
+}

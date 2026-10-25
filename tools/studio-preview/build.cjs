@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const repo=path.resolve(__dirname,'../..'),source=path.join(repo,'public'),out=path.resolve(process.argv[2]||path.join(repo,'../studio-preview-public'));
 if(out===repo||out.startsWith(repo+path.sep))throw Error('Generated preview must be outside checkout');
 fs.mkdirSync(out,{recursive:true});
-const sha=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();
+const sha=/^[a-f0-9]{40}$/i.test(process.env.VERCEL_GIT_COMMIT_SHA||'')?process.env.VERCEL_GIT_COMMIT_SHA:execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();
 const excluded=new Set(['design','review-evidence']);const files=[];
 function copy(dir,prefix=''){
  for(const entry of fs.readdirSync(dir,{withFileTypes:true})){

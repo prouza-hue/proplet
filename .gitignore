@@ -10,3 +10,6 @@ artifacts/
 work/
 dist-mk100/
 dist-mk100-integrated/
+
+# Generated isolated Vercel preview
+.studio-preview/
