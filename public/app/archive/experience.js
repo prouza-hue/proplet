@@ -10,7 +10,7 @@ const glyph={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',check:'m5
 const ico=n=>'<svg class="ax-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+glyph[n]+'"/></svg>';
 function archiveArt(){return '<img class="archive-art" src="/assets/archive/archive-letterpress-v2.webp" width="512" height="512" alt="" decoding="async">';}
 
-let configuration=null,installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
+let configuration=null,installed=false,appReady=false,recovery=null,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
 const STORE='proplet:archive-progress:v2',entries=new Map();
 let claimsState={identity:'',status:'unknown',claims:{},completed:new Set()},claimsFlight=null;
 const identity=()=>{const p=getProfile();return p?.id&&p?.token?p.id+':'+p.token:'guest';};
@@ -99,7 +99,8 @@ function renderResult(g){
  return true;
 }
 function configure(){
- return configuration||(configuration=(async()=>{
+ if(configuration)return configuration;
+ const request=(async()=>{
   if(window.navigator?.onLine!==false){
    try{const config=await api('/api/config',{timeoutMs:2000});if(typeof config?.archiveEnabled==='boolean')return config;}catch{}
   }
@@ -107,7 +108,13 @@ function configure(){
   // Cached content alone does not grant a release gate, and claims stay private.
   const config=await offlineRead('getPublicConfig');
   return typeof config?.archiveEnabled==='boolean'?config:null;
- })());
+ })();
+ configuration=request;
+ // An unavailable response is not a release decision. Keep explicit true/false,
+ // but let a later boot/connection attempt retry a transient or malformed read.
+ const clearUnknown=()=>{if(configuration===request)configuration=null;};
+ request.then(value=>{if(value===null)clearUnknown();},clearUnknown);
+ return request;
 }
 
 function resultConfirmed(rec,receipt,owner){
@@ -173,8 +180,10 @@ async function install(){
  if(installed)return true;
  const config=await configure();
  if(config?.archiveEnabled!==true)return false;
- installed=true;ROUTE_SCREENS.add('archive');document.documentElement.dataset.archiveEnabled='1';for(const key of Object.keys(labels))labels[key]=DIFF[key].label;document.body.classList.add('archive-experience');
+ if(installed)return true;
+ if(appReady&&typeof currentScreen!=='undefined'&&currentScreen==='game')return false;
  if(!q('#screen-free'))throw Error('Archive mount: canonical free screen missing');
+ installed=true;ROUTE_SCREENS.add('archive');document.documentElement.dataset.archiveEnabled='1';for(const key of Object.keys(labels))labels[key]=DIFF[key].label;document.body.classList.add('archive-experience');
  for(const id of ['archive']){const section=document.createElement('section');section.id='screen-'+id;section.className='screen ax-screen';q('#screen-free').after(section);}
  const modal=document.createElement('div');modal.id='archiveExperienceModal';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','axModalTitle');document.body.append(modal);
  seed();home();free();
@@ -209,9 +218,24 @@ async function install(){
  refreshClaims();
  document.addEventListener('input',e=>{if(e.target.id==='axSearch'){archiveState.query=e.target.value.replace(/[^0-9]/g,'');archiveState.page=0;renderGrid();}});
  document.addEventListener('keydown',e=>{if(q('#archiveExperienceModal').classList.contains('hidden'))return;if(e.key==='Escape'){e.stopImmediatePropagation();closeModal();}if(e.key==='Tab'){const nodes=all('#archiveExperienceModal button,#archiveExperienceModal select,#archiveExperienceModal input');const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}},true);
- document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(['archive','free','daily'].includes(open))nav(open);else if(open==='announcement')announcement();},{once:true});
+ if(appReady)revealReadyArchive();
  return true;
 }
+function revealReadyArchive(){
+ home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';
+ const open=new URLSearchParams(location.search).get('review');if(['archive','free','daily'].includes(open))nav(open);else if(open==='announcement')announcement();
+}
+function recoverInstall(){
+ if(installed||!appReady||(typeof currentScreen!=='undefined'&&currentScreen==='game'))return Promise.resolve(installed);
+ if(recovery)return recovery;
+ const request=install().catch(()=>false);recovery=request;
+ request.finally(()=>{if(recovery===request)recovery=null;});
+ return request;
+}
+// These listeners must exist even when the first configuration read failed.
+document.addEventListener?.('proplet:ready',()=>{appReady=true;if(installed)revealReadyArchive();else return recoverInstall();},{once:true});
+document.addEventListener?.('proplet:screen-changed',recoverInstall);
+window.addEventListener?.('online',recoverInstall);
 function screen(name,previous){if(installed&&name==='archive'){if(previous!=='archive')refreshClaims({force:true});renderArchive();}}
 async function renderArchive(){
  const root=q('#screen-archive');

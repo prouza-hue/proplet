@@ -31,9 +31,62 @@ context.window=context;vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(root,'public/app/archive/solution-contract.js'),'utf8'),context);
 vm.runInContext(fs.readFileSync(path.join(root,'public/app/archive/experience.js'),'utf8'),context);
 const archive=context.PropletArchiveExperience;
+function configurationHarness({responses=[],online=true,cached=null}={}){
+ const elements=new Map(),events=new Map();let requests=0,sessionHooks=0,completionHooks=0,reveals=0;
+ const on=(name,fn)=>events.set(name,[...(events.get(name)||[]),fn]);
+ const add=element=>{if(element.id)elements.set('#'+element.id,element)};
+ const element=()=>({dataset:{},classList:{add(){},remove(){}},setAttribute(){},append:add,after:add,innerHTML:''});
+ const free=element();free.id='screen-free';add(free);
+ const c={console,structuredClone,Set,Map,URLSearchParams,location:{search:''},currentScreen:'daily',currentGame:null,
+  navigator:{onLine:online},ROUTE_SCREENS:new Set(),DIFF:Object.fromEntries(['easy','medium','hard','hardcore'].map(key=>[key,{label:key}])),
+  document:{documentElement:{dataset:{}},body:{classList:{add(){}},append:add},querySelector:selector=>elements.get(selector)||null,querySelectorAll:()=>[],createElement:element,addEventListener:on},
+  localStorage:{getItem:()=>null,setItem(){}},getProfile:()=>null,playerScope:()=> 'guest',getState:()=>({completed:{},inProgress:{}}),
+  registerGameSessionHook(){sessionHooks++},registerGameCompletionHook(){completionHooks++},addEventListener:on,
+  PropletOffline:{getPublicConfig:async()=>cached},__PROPLET_REVEAL_CURRENT_UI(){reveals++},
+  api:async url=>{assert.equal(url,'/api/config');requests++;const response=responses.shift();if(response instanceof Error)throw response;return response},
+ };
+ c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync(path.join(root,'public/app/archive/experience.js'),'utf8'),c);
+ return {context:c,archive:c.PropletArchiveExperience,emit:async name=>{await Promise.all((events.get(name)||[]).map(fn=>fn()))},counts:()=>({requests,sessionHooks,completionHooks,reveals})};
+}
+async function configurationRecoveryChecks(){
+ // Boot starts configure before install. They share the same cold request; a
+ // timeout must not permanently memoize null and prevent the ready-time retry.
+ const cold=configurationHarness({responses:[Error('cold timeout'),{archiveEnabled:true}]});
+ const first=cold.archive.configure(),mount=cold.archive.install();
+ assert.equal(await first,null);assert.equal(await mount,false);assert.equal(cold.counts().requests,1);
+ await cold.emit('online');assert.equal(cold.counts().requests,1,'recovery waits for the ready boundary');
+ await cold.emit('proplet:ready');assert.equal(cold.archive.isEnabled(),true);assert.equal(cold.context.document.documentElement.dataset.archiveReady,'1');
+ assert.deepEqual(cold.counts(),{requests:2,sessionHooks:1,completionHooks:1,reveals:1});
+ await Promise.all([cold.emit('online'),cold.emit('proplet:screen-changed'),cold.archive.install()]);
+ assert.deepEqual(cold.counts(),{requests:2,sessionHooks:1,completionHooks:1,reveals:1},'recovery cannot duplicate mounted hooks or requests');
+
+ const denied=configurationHarness({responses:[{archiveEnabled:false},{archiveEnabled:true}],cached:{archiveEnabled:true}});
+ assert.equal(await denied.archive.install(),false);await denied.emit('proplet:ready');await denied.emit('online');await denied.emit('proplet:screen-changed');
+ assert.equal(denied.archive.isEnabled(),false);assert.equal(denied.counts().requests,1,'explicit false wins over cache and is not retried as an error');
+
+ const offline=configurationHarness({online:false,cached:null,responses:[{archiveEnabled:true}]});
+ assert.equal(await offline.archive.install(),false);await offline.emit('proplet:ready');assert.equal(offline.archive.isEnabled(),false);assert.equal(offline.counts().requests,0,'offline unknown release gate stays closed without API calls');
+ offline.context.navigator.onLine=true;offline.context.currentScreen='game';await offline.emit('online');assert.equal(offline.counts().requests,0,'late recovery does not mount UI during play');
+ offline.context.currentScreen='daily';await offline.emit('proplet:screen-changed');assert.equal(offline.archive.isEnabled(),true);assert.equal(offline.counts().requests,1);
+
+ const racing=configurationHarness({responses:[{archiveEnabled:true}]});
+ await Promise.all([racing.archive.install(),racing.archive.install(),racing.emit('proplet:ready')]);
+ assert.deepEqual(racing.counts(),{requests:1,sessionHooks:1,completionHooks:1,reveals:1},'concurrent successful callers install the real owner once');
+  let release;
+  const navigationRace=configurationHarness({responses:[new Promise(resolve=>{release=resolve})]});
+  const pendingReady=navigationRace.emit('proplet:ready');
+  navigationRace.context.currentScreen='game';release({archiveEnabled:true});await pendingReady;
+  assert.equal(navigationRace.archive.isEnabled(),false,'a game started during configuration must defer late mounting');
+  assert.deepEqual(navigationRace.counts(),{requests:1,sessionHooks:0,completionHooks:0,reveals:0});
+  navigationRace.context.currentScreen='daily';await navigationRace.emit('proplet:screen-changed');
+  assert.equal(navigationRace.archive.isEnabled(),true);
+  assert.deepEqual(navigationRace.counts(),{requests:1,sessionHooks:1,completionHooks:1,reveals:1},'safe return uses the confirmed cached config and mounts once');
+ console.log('PASS Archive cold config recovery, explicit false, offline unknown, ready/game boundaries and single installation');
+}
 const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8');
 vm.runInContext(app.match(/^function queuedResultPayload\(r\)\{.*$/m)[0],context);
 (async()=>{
+ await configurationRecoveryChecks();
  assert.equal(archive.isEnabled(),false);assert.equal(await archive.install(),false);assert.equal(states.size,0);assert.equal(storage.size,0);
  let claims=await archive.refreshClaims();assert.equal(claims.status,'ready');assert.equal(calls.at(-1).owner,'alice');
  claimsFail=true;claims=await archive.refreshClaims({force:true});assert.equal(claims.status,'unavailable');assert.equal(Object.keys(claims.claims).length,0);

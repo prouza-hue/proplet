@@ -44,9 +44,9 @@ přihlášení a propojení preview s reálnými účty se v této úpravě nem�
 - Doplněné behaviorální regrese chrání přesun souhrnu výsledku a smysluplné
   zobrazení přepínače stran. Rozšířená browser regrese je v existujícím CI;
   lokální vizuální kontrola proběhla přes ovládaný prohlížeč.
-- Cache marker následného CSS doplnění: `proplet-v4.09.13-studiorefinement2`;
+- Aktuální cache marker: `proplet-v4.09.13-studiorefinement3`;
   styl `studio-edition.css?v=refinement2`. Odkazy na app/theme-init a service-worker
-  cache jsou sladěné; herní JavaScript se kromě release markeru nemění.
+  cache jsou sladěné; modul Archivu používá `experience.js?v=config-recovery1`.
 
 ## Doplnění podle skutečného pondělí
 
@@ -63,6 +63,24 @@ podložku nedostávají. Jde pouze o CSS úpravy; pravidla, data a herní deska 
 Pro toto doplnění prošel cílený release/cache kontrakt a všech 170 kontrol assetů
 (162 lokálních odkazů). Celý runtime gate se kvůli samotnému CSS neopakoval;
 jeho předchozí výsledek 183/170/521 PASS zůstává doložený výše.
+
+## Obnova po přechodné chybě konfigurace
+
+Skutečný studený příchod v Chrome odhalil, že nedostupná veřejná konfigurace mohla
+zůstat uložená jako dokončený příslib s hodnotou `null`. Archiv se potom nainstaloval
+až po opětovném načtení stránky; Dnes mezitím používalo starší katalogové uspořádání.
+
+Revize `studiorefinement3` ponechává potvrzené `true` i výslovné `false`, ale
+neznámý výsledek dovolí načíst znovu. Obnova je sdílená mezi souběžnými voláními,
+čeká na připravenou aplikaci a kontroluje probíhající hru před požadavkem i po
+jeho dokončení. Pokud hráč během čekání začne hrát, instalace počká na bezpečný
+návrat; již potvrzená konfigurace se nemusí znovu stahovat.
+
+Cílená regrese ověřila první chybu a následné úspěšné načtení bez reloadu,
+výslovné vypnutí navzdory starší cache, neznámý offline stav, souběžné volání
+a přechod do hry během čekání. Prošly také dosavadní kontroly odměn, účtové
+izolace, offline obsahu a release/cache kontrakt. Backend, databáze a herní stav
+se touto opravou nemění.
 
 Snímky a logy jsou u místního úkolu ve `studio-refinement-evidence-20261025/`
 a `studio-refinement-current-gate-20261025.log`. Produkční nasazení není součástí.
