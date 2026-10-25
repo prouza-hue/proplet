@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import sys
 from unittest.mock import MagicMock, patch
+from urllib.parse import parse_qs, urlparse
 import uuid
 
 import psycopg
@@ -111,7 +112,7 @@ def main():
             import uvicorn
             uvicorn.run(app,host='127.0.0.1',port=args.serve,access_log=False)
             return
-        client=TestClient(app);before=counts();tag=uuid.uuid4().hex[:8]
+        client=TestClient(app,base_url='https://hrajproplet.cz',headers={'Origin':'https://hrajproplet.cz'});before=counts();tag=uuid.uuid4().hex[:8]
         flow=str(uuid.uuid4());headers={'X-Proplet-First-Steps-Run':flow,'X-Proplet-Creation-Source':'first_steps_v1','X-Proplet-Onboarding':'board-v3-short','X-Proplet-Client-Release':'flow-contract','X-Proplet-Test':'1'}
         r=client.post('/api/player',headers=headers,json={'name':'Synthetic '+tag,'password':'synthetic-password'})
         assert r.status_code==200,r.text
@@ -127,16 +128,23 @@ def main():
         user={'id':str(uuid.uuid4()),'email':tag+'@example.invalid','email_confirmed_at':'2026-09-16T00:00:00Z',
               'identities':[{'provider':'google','identity_data':{'email_verified':True}}],
               'user_metadata':{'full_name':'Private Google name','picture':'https://example.invalid/private'}}
-        provider.request.return_value=httpx.Response(200,json=user)
         with patch.object(auth.httpx,'Client',return_value=provider):
+            def google_complete():
+                start=client.get('/api/auth/google/start',follow_redirects=False)
+                assert start.status_code==302,start.text
+                query=parse_qs(urlparse(start.headers['location']).query)
+                assert query['code_challenge_method']==['s256']
+                state=parse_qs(urlparse(query['redirect_to'][0]).query)['state'][0]
+                provider.request.side_effect=[httpx.Response(200,json={'access_token':'x'*50}),httpx.Response(200,json=user)]
+                return client.post('/api/auth/google/complete',headers=headers,json={'code':'synthetic-one-time-code','state':state})
             for _ in range(3):
-                r=client.post('/api/auth/google/complete',headers=headers,json={'accessToken':'x'*50})
+                r=google_complete()
                 assert r.status_code==200,r.text
             after_google=counts()
             assert after_google['players']==before['players']+2 and after_google['events']==before['events']+2
             user['email_confirmed_at']=None
-            provider.request.return_value=httpx.Response(200,json=user)
-            assert client.post('/api/auth/google/complete',json={'accessToken':'x'*50}).status_code==401
+            assert google_complete().status_code==401
+            assert client.post('/api/auth/google/complete',json={'accessToken':'x'*50}).status_code==422
         assert client.post('/api/player',json={'name':'Failure','password':''}).status_code in (400,422)
         assert counts()==after_google and after_google['duplicates']==0
         r=client.post('/api/player',json={'name':'Team '+tag,'password':'synthetic-password',

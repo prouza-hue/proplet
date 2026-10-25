@@ -3,6 +3,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {spawn,execFileSync}=require('node:child_process'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),base='http://127.0.0.1:18775',legacy='958706b6286a2dd7099fa8e3ceb097b757b507e7';
+const reporterRelease=fs.readFileSync(path.join(root,'public/app/client-diagnostics.js'),'utf8').match(/REPORTER_RELEASE='([^']+)'/)[1];
 const historical=(sha,file)=>execFileSync('git',['show',sha+':public/'+file],{cwd:root,encoding:'utf8',maxBuffer:1024*1024});
 const oldTeam=historical('c2501bc31fcb5c4da4c8fa3d5932ad910c8f432b','team-victories.js');
 const oldHints=historical('07350e5','app/game/hints.js'),beforeAccount=historical('9f8ae24','app/account/account.js'),beforeApp=historical('9f8ae24','app.js');
@@ -53,7 +54,9 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   });assert.deepEqual(result,{same:true,hints:1,invalidPreserved:true});
   const rows=(await fetch(base+'/__fixture/events').then(r=>r.json())).requests.filter(r=>r.path==='/api/client-error');
   assert.equal(rows.filter(r=>r.body.code==='team_victories_contract').length,1,'re-renders do not spam telemetry');
-  for(const row of rows){assert.equal(row.body.client_release,row.headers['x-proplet-client-release']);assert.equal(row.body.reporter_release,await page.evaluate(()=>APP_PREVIEW_RELEASE));assert.equal(row.body.source_availability,'available');assert.equal(row.body.is_test,true)}
+  // Producer identifies app.js; reporter identifies the independently cached
+  // diagnostic transport. They need not have the same release suffix.
+  for(const row of rows){assert.equal(row.body.client_release,row.headers['x-proplet-client-release']);assert.equal(row.body.client_release,await page.evaluate(()=>APP_PREVIEW_RELEASE));assert.equal(row.body.reporter_release,reporterRelease);assert.equal(row.body.source_availability,'available');assert.equal(row.body.is_test,true)}
   // User-triggered repair uses the existing safe update path, not cache/storage deletion.
   await profilePage(page);stale=false;
   await Promise.all([page.waitForEvent('load'),page.locator('#profileTeamContractStatus button').click()]);
