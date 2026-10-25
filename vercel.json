@@ -12,6 +12,14 @@
   ],
   "routes": [
     {
+      "src": "/(.*)",
+      "status": 307,
+      "headers": {
+        "Location": "https://proplet-git-codex-studio-edition-pavel-prouzas-projects.vercel.app/$1",
+        "Cache-Control": "no-store"
+      }
+    },
+    {
       "src": "/api(?:/.*)?",
       "status": 403
     },
