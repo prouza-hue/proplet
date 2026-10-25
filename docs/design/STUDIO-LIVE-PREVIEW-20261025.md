@@ -4,7 +4,7 @@
 
 ## Rozsah
 
-- Implementační větev zůstává `codex/studio-edition`; přebírá aktuální produkční opravy `d8fbb204` / v4.09.13.
+- Implementační větev zůstává `codex/studio-edition`; přebírá aktuální produkční opravy `cc54c0a` / v4.09.13 včetně vazby Google OAuth callbacku na konkrétní prohlížeč a záměr přihlášení.
 - Adresa: https://proplet-git-codex-studio-edition-pavel-prouzas-projects.vercel.app
 - Běžné přihlášení vytváří standardní Proplet session. Výsledky, XP, série, týmový postup a odměny se ukládají do stejného účtu jako na ostrém webu.
 - Návrhové fixture skripty, testovací účet ani simulované datum se do této aplikace nevkládají. Původní herní deska zůstává zachovaná.

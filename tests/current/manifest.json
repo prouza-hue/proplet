@@ -728,6 +728,14 @@
       {
         "path": "tests/current/test_studio_live_client.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_google_oauth_binding.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_google_oauth_callback.cjs",
+        "runner": "node"
       }
     ]
   },

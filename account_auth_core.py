@@ -11,9 +11,10 @@ from urllib.parse import urlencode, urlparse
 
 import httpx
 from backend.referrals import signup_context
+from backend import google_oauth
 
-from fastapi import Header, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import Header, HTTPException, Request, Response
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 
@@ -40,6 +41,16 @@ class AuthCallback(BaseModel):
 
 class RecoveryReset(AuthCallback):
     challenge: str = Field(min_length=24, max_length=160)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class GoogleCallback(BaseModel):
+    code: str = Field(min_length=1, max_length=2048)
+    state: str = Field(min_length=43, max_length=43, pattern=r"^[A-Za-z0-9_-]+$")
+    inviteCode: Optional[str] = Field(default=None, min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
+
+
+class GoogleLinkStart(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
@@ -378,19 +389,59 @@ def install_account_auth(
         player = db_select("players", id=player["id"])[0]
         return {"ok": True, "profile": player_payload(player, new_session(player["id"])), "message": "Heslo je změněné a ostatní přihlášení byla odpojena."}
 
+    def google_transaction(request: Request, player=None, authorization=""):
+        if not supabase_url:
+            raise HTTPException(503, "Google přihlášení ještě není nakonfigurované")
+        origin = public_origin(request)
+        transaction, cookie = google_oauth.issue(origin, supabase_key,
+            player_id=player["id"] if player else None, authorization=authorization)
+        redirect_to = f"{origin}/?" + urlencode({"auth": "google", "state": transaction["state"]})
+        query = urlencode({"provider": "google", "redirect_to": redirect_to,
+            "code_challenge": google_oauth.b64(hashlib.sha256(transaction["verifier"].encode()).digest()),
+            "code_challenge_method": "s256"})
+        url = f"{supabase_url}/auth/v1/authorize?{query}"
+        response = (JSONResponse({"url": url, "state": transaction["state"]}) if player
+                    else RedirectResponse(url, status_code=302))
+        google_oauth.set_cookie(response, origin, cookie)
+        return response
+
     @app.get("/api/auth/google/start")
     def google_start(request: Request):
         enforce_rate_limit(request, "google_auth_start", limit=30, window_seconds=3600)
-        if not supabase_url:
-            raise HTTPException(503, "Google přihlášení ještě není nakonfigurované")
-        redirect_to = f"{public_origin(request)}/?auth=google"
-        query = urlencode({"provider": "google", "redirect_to": redirect_to})
-        return RedirectResponse(f"{supabase_url}/auth/v1/authorize?{query}", status_code=302)
+        # This navigation is login-only, regardless of an incidental bearer.
+        return google_transaction(request)
+
+    @app.post("/api/auth/google/link/start")
+    def google_link_start(payload: GoogleLinkStart, request: Request, authorization: Optional[str] = Header(default=None)):
+        enforce_rate_limit(request, "google_auth_link", limit=5, window_seconds=3600)
+        if request.headers.get("origin") != public_origin(request):
+            raise HTTPException(403, "Propojení zahaj přímo v Propletu.")
+        player = auth_player(authorization)
+        if not player.get("password_hash") or not verify_password(payload.password, player["password_hash"]):
+            raise HTTPException(401, "Pro propojení potvrď aktuální heslo k Propletu.")
+        return google_transaction(request, player, authorization)
 
     @app.post("/api/auth/google/complete")
-    def google_complete(payload: AuthCallback, request: Request, authorization: Optional[str] = Header(default=None)):
+    def google_complete(payload: GoogleCallback, request: Request, response: Response, authorization: Optional[str] = Header(default=None)):
         enforce_rate_limit(request, "google_auth_complete", limit=20, window_seconds=3600)
-        user = auth_user(payload.accessToken)
+        origin = public_origin(request)
+        if request.headers.get("origin") != origin:
+            raise HTTPException(403, "Přihlášení dokonči přímo v Propletu.")
+        transaction = google_oauth.read(request, payload.state, origin, supabase_key)
+        current = None
+        if transaction["intent"] == "link":
+            current = auth_player(authorization)
+            if (current["id"] != transaction["player_id"] or not authorization
+                    or not secrets.compare_digest(google_oauth.session_hash(authorization), transaction["session"])):
+                raise HTTPException(401, "Propojení patří k jinému přihlášení. Začni znovu.")
+        # Supabase's one-time code redemption is the atomic replay boundary across
+        # workers. The verifier is never returned to JavaScript or put in a URL.
+        exchanged = auth_request("POST", "/auth/v1/token", params={"grant_type": "pkce"},
+            body={"auth_code": payload.code, "code_verifier": transaction["verifier"]})
+        access_token = exchanged.get("access_token")
+        if not isinstance(access_token, str) or not access_token:
+            raise HTTPException(401, "Přihlas se znovu přes Google.")
+        user = auth_user(access_token)
         uid = str(user.get("id"))
         # Identities come from the authenticated Auth API response. A password
         # token or a user_metadata claim must not impersonate a Google identity.
@@ -407,13 +458,6 @@ def install_account_auth(
         google_avatar_url = trusted_google_avatar(user)
 
         created_for_order = False
-        current = None
-        if authorization:
-            try:
-                current = auth_player(authorization)
-            except HTTPException:
-                current = None
-
         mapped = db_select("players", auth_user_id=uid)
         if mapped:
             if current and current["id"] != mapped[0]["id"]:
@@ -468,6 +512,7 @@ def install_account_auth(
             player = db_select("players", id=player["id"])[0]
 
         token = new_session(player["id"])
+        google_oauth.clear_cookie(response, origin)
         return {"ok": True, "accountCreated": created_for_order, "profile": {**player_payload(player, token), "freeOrderNewAccount": created_for_order and os.environ.get("PROPLET_FREE_ORDER_ENABLED", "false").lower() == "true"}, "linked": bool(current), "provider": "google"}
 
     return app
