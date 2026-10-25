@@ -9,7 +9,8 @@ přihlášení a propojení preview s reálnými účty se v této úpravě nem�
 - Odstraněn plošný přepis nadpisů na Fraunces a plošné přebarvování tlačítek.
   Profil, pořadí a katalog znovu používají vlastní funkční typografii a barvy.
 - Dnes začíná přímo Denní výzvou. Duplicitní nadpis Dnes a datum nejsou viditelné.
-  Modrá výzva, žluté XP samolepky a současná ilustrace kalendáře drží identitu hry.
+  Papírová denní karta, modré hlavní tlačítko, žluté XP samolepky a současná
+  ilustrace kalendáře drží identitu hry.
 - Před výzvou je hlavní akce Denní. Po ní se nabídne dostupná Extra s barvou její
   obtížnosti. Po dokončení obou se denní souhrn zmenší a výběr volné hry posune výš.
 - Desktop má hlavní výzvu vlevo a Extra/Tajenku vpravo. Fold pod 900 px má hlavní
@@ -44,8 +45,8 @@ přihlášení a propojení preview s reálnými účty se v této úpravě nem�
 - Doplněné behaviorální regrese chrání přesun souhrnu výsledku a smysluplné
   zobrazení přepínače stran. Rozšířená browser regrese je v existujícím CI;
   lokální vizuální kontrola proběhla přes ovládaný prohlížeč.
-- Aktuální cache marker: `proplet-v4.09.13-studiorefinement3`;
-  styl `studio-edition.css?v=refinement2`. Odkazy na app/theme-init a service-worker
+- Aktuální cache marker: `proplet-v4.09.13-studiorefinement4`;
+  styl `studio-edition.css?v=refinement4`. Odkazy na app/theme-init a service-worker
   cache jsou sladěné; modul Archivu používá `experience.js?v=config-recovery1`.
 
 ## Doplnění podle skutečného pondělí
@@ -56,9 +57,9 @@ zobrazí jako stručný řádek. Na šířkách 600–899 px má samostatná Taj
 řádkové uspořádání. Podmínka vychází ze skutečné dostupnosti Extra, není natvrdo
 vázaná na pondělí ani datum.
 
-Modrá ilustrace denního kalendáře nově leží na malé světlé papírové ploše, aby
-se neztrácela na modrém hero. Původní asset se nepřebarvuje a jiné ilustrace tuto
-podložku nedostávají. Jde pouze o CSS úpravy; pravidla, data a herní deska se nemění.
+V předchozím preview dostala modrá ilustrace kalendáře malou světlou podložku,
+aby se neztrácela na modrém hero. Tuto variantu uživatel následně odmítl;
+nahrazuje ji rozhodnutí níže. Původní asset se nepřebarvuje.
 
 Pro toto doplnění prošel cílený release/cache kontrakt a všech 170 kontrol assetů
 (162 lokálních odkazů). Celý runtime gate se kvůli samotnému CSS neopakoval;
@@ -81,6 +82,17 @@ výslovné vypnutí navzdory starší cache, neznámý offline stav, souběžné
 a přechod do hry během čekání. Prošly také dosavadní kontroly odměn, účtové
 izolace, offline obsahu a release/cache kontrakt. Backend, databáze a herní stav
 se touto opravou nemění.
+
+## Papírová Denní výzva — rozhodnutí 26. 10. 2026
+
+Uživatel odmítl samostatnou světlou podložku pod kalendářem. Celá základní Denní
+výzva proto používá teplý papírový povrch, na kterém má původní modrá ilustrace
+přirozený kontrast. Modrá zůstává na hlavním tlačítku a detailech. Schválené
+rozložení, chování a barevné řešení Extra se zachovávají. Jde pouze o CSS úpravu
+pro preview; produkční nasazení není součástí této změny.
+
+Pro revizi `studiorefinement4` prošel cílený release/cache kontrakt a 170 kontrol
+assetů (162 lokálních odkazů). Celý 183testový gate se pro tuto CSS změnu neopakoval.
 
 Snímky a logy jsou u místního úkolu ve `studio-refinement-evidence-20261025/`
 a `studio-refinement-current-gate-20261025.log`. Produkční nasazení není součástí.
