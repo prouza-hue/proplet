@@ -10,7 +10,7 @@ assert.equal(destination,'daily');assert.equal(ctx.pendingPostWinAction,null);as
 assert(app.includes("if(authAction==='create'){showDailyAfterRegistration();"));
 const callback=auth.slice(auth.indexOf('async function handleAuthReturn(){'),auth.indexOf('function init(){'));
 let linked=false,fail=false;
-Object.assign(ctx,{URLSearchParams,location:{search:'?auth=google'},ensureModals(){},supabaseFragment:()=>({accessToken:'test'}),call:async()=>{if(fail)throw Error('failed');return {profile:{},linked}},acceptProfile(){},cleanAuthUrl(){},toast(){}});
+Object.assign(ctx,{URLSearchParams,location:{search:'?auth=google&code=synthetic-code&state=synthetic-state'},sessionStorage:{getItem:()=>linked?'synthetic-state':null,removeItem(){}},ensureModals(){},supabaseFragment:()=>({}),call:async()=>{if(fail)throw Error('failed');return {profile:{},linked}},acceptProfile(){},cleanAuthUrl(){},toast(){}});
 vm.runInContext(callback,ctx);
 destination='';await ctx.handleAuthReturn();assert.equal(destination,'daily');
 linked=true;destination='';await ctx.handleAuthReturn();assert.equal(destination,'','linking existing account does not navigate');

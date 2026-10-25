@@ -712,6 +712,14 @@
       {
         "path": "tests/current/test_discovery_recovery_balance.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_google_oauth_binding.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_google_oauth_callback.cjs",
+        "runner": "node"
       }
     ]
   },
