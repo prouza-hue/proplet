@@ -222,10 +222,11 @@ async function shot(page,selector,name){
   assert.equal(registration?.body.inviteCode,inviteCode);
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Native password registration sends preserved inviteCode');
-  s=await boot(browser,{guest:true,query:'?invite='+inviteCode+'&auth=google#access_token=TEST-GOOGLE-TOKEN&token_type=bearer'});
+  s=await boot(browser,{guest:true,query:'?invite='+inviteCode+'&auth=google&code=synthetic-google-code&state=sssssssssssssssssssssssssssssssssssssssssss'});
   await s.page.waitForFunction(()=>getProfile()?.id==='test-referral-player');
   const google=s.apiCalls.find(c=>c.path==='/api/auth/google/complete');
   assert.equal(google?.body.inviteCode,inviteCode);
+  assert.equal(google.body.code,'synthetic-google-code');assert.equal(google.body.state,'sssssssssssssssssssssssssssssssssssssssssss');assert.equal(google.body.accessToken,undefined);
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Native Google return sends preserved inviteCode');
   s=await boot(browser,{guest:true,query:'?invite='+inviteCode});

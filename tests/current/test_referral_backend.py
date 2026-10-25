@@ -102,12 +102,19 @@ class ReferralAcceptance(unittest.TestCase):
         fake = httpx.Response(200, json=response, request=httpx.Request("GET", "https://test.supabase.co/auth/v1/user"))
         with patch.object(account_auth_core.httpx, "Client") as provider:
             provider.return_value.__enter__.return_value.request.return_value = fake
-            client = TestClient(app)
-            first = client.post("/api/auth/google/complete", json={"accessToken": "a"*60, "inviteCode": CODE})
+            from urllib.parse import urlparse, parse_qs
+            client = TestClient(app, base_url="https://hrajproplet.cz", headers={"Origin": "https://hrajproplet.cz"})
+            def complete(invite):
+                start = client.get("/api/auth/google/start", follow_redirects=False)
+                redirect = parse_qs(urlparse(start.headers["location"]).query)["redirect_to"][0]
+                state = parse_qs(urlparse(redirect).query)["state"][0]
+                provider.return_value.__enter__.return_value.request.side_effect = [httpx.Response(200, json={"access_token": "a"*60}), fake]
+                return client.post("/api/auth/google/complete", json={"code": "synthetic-code", "state": state, "inviteCode": invite})
+            first = complete(CODE)
             self.assertEqual(first.status_code, 200, first.text)
             self.assertTrue(first.json()["accountCreated"])
             self.assertEqual(provenance, [CODE])
-            second = client.post("/api/auth/google/complete", json={"accessToken": "a"*60, "inviteCode": "missing_valid_code"})
+            second = complete("missing_valid_code")
             self.assertEqual(second.status_code, 200, second.text)
             self.assertFalse(second.json()["accountCreated"])
             self.assertEqual(provenance, [CODE])

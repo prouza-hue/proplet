@@ -29,7 +29,7 @@ async function call(path,{method='GET',body,auth=true}={}){
 }
 function toast(text){try{if(typeof showToast==='function')return showToast(text)}catch{} alert(text)}
 function cleanAuthUrl(){
- try{history.replaceState(history.state,'',location.pathname+location.search.replace(/([?&])auth=[^&]*/,'$1').replace(/([?&])challenge=[^&]*/,'$1').replace(/[?&]$/,''));if(location.hash)history.replaceState(history.state,'',location.pathname+location.search)}catch{}
+ try{const qs=new URLSearchParams(location.search);for(const key of ['auth','challenge','code','state','error','error_description'])qs.delete(key);history.replaceState(history.state,'',location.pathname+(qs.size?'?'+qs.toString():''))}catch{}
 }
 function acceptProfile(p){
  if(!p?.id||!p?.token)return;
@@ -55,6 +55,12 @@ function openModal(id){$(id)?.classList.remove('hidden')}
 function ensureModals(){
  if($('#forgotPasswordModal'))return;
  document.body.insertAdjacentHTML('beforeend',`
+  <div id="linkGoogleModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="linkGoogleTitle"><div class="modal-card left account-recovery-modal">
+   <button id="closeLinkGoogle" class="modal-close" aria-label="Zavřít">×</button><h2 id="linkGoogleTitle">Propojit s Googlem</h2>
+   <p class="muted">Potvrď heslo k tomuto Propletu. Potom vyber svůj Google účet, kterým se chceš příště přihlašovat.</p>
+   <form id="linkGoogleForm"><label>Heslo k Propletu<input id="linkGooglePassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label>
+   <div id="linkGoogleMessage" class="account-auth-message" role="status"></div><button id="confirmLinkGoogle" type="submit" class="primary-btn big">Potvrdit a vybrat Google účet</button></form>
+  </div></div>
   <div id="forgotPasswordModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
    <button id="closeForgotPassword" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Zapomenuté heslo</h2>
    <p class="muted">Zadej <b>ověřený e-mail</b> propojený s Propletem. Pošleme ti jednorázový odkaz pro nastavení nového hesla.</p>
@@ -85,6 +91,8 @@ function ensureModals(){
    <div id="recoveryEmailAddMessage" class="account-auth-message"></div><button id="saveRecoveryEmailBtn" class="primary-btn big">Poslat ověřovací odkaz</button>
   </div></div>`);
  $('#closeForgotPassword').onclick=()=>closeModal('#forgotPasswordModal');
+ $('#closeLinkGoogle').onclick=()=>{$('#linkGooglePassword').value='';closeModal('#linkGoogleModal')};
+ $('#linkGoogleForm').onsubmit=startGoogleLink;
  $('#closeProfileEdit').onclick=()=>closeModal('#profileEditModal');
  $('#closeAvatarEdit').onclick=closeAvatarEditor;
  $('#closeRecoveryEmail').onclick=()=>closeModal('#recoveryEmailModal');
@@ -161,11 +169,20 @@ async function refreshSecurityCard(){
   try{
    const d=await call('/api/account/auth-status'),badge=hub.querySelector('#profileAccountBadge');if(badge){const strong=!!(d.recoveryReady||d.googleLinked);badge.textContent=strong?'Zabezpečeno':'Doplnit';badge.classList.toggle('ok',strong)}
    body.innerHTML=`<div class="account-hub-row ${d.recoveryReady?'ok':'warn'}"><span>${d.recoveryReady?'✉️':'⚠️'}</span><div><strong>${d.recoveryReady?'E-mail pro obnovu':'Chybí záchranný e-mail'}</strong><small>${d.recoveryReady?esc(d.email):'Bez něj zapomenuté heslo neobnovíš.'}</small></div>${d.recoveryReady?'':`<button id="addRecoveryEmailBtn" class="secondary-btn">Přidat</button>`}</div><div class="account-hub-row ${d.googleLinked?'ok':'neutral'}"><span>${d.googleLinked?'✅':'<img class="google-g google-g-small" src="/google-g.svg" alt="" aria-hidden="true">'}</span><div><strong>${d.googleLinked?'Google propojený':'Přihlášení přes Google'}</strong><small>${d.googleLinked?'Příště se přihlásíš jedním klepnutím.':d.googleAvailable?'Propoj účet a nemusíš řešit heslo.':'Google přihlášení teď není dostupné.'}</small></div>${d.googleLinked?'':`<button id="linkGoogleBtn" class="secondary-btn" ${d.googleAvailable?'':'disabled'}>Propojit</button>`}</div>${p.hasPassword?'':`<div class="account-hub-row neutral"><span>🔑</span><div><strong>Heslo je volitelné</strong><small>Google stačí. Heslo můžeš přidat jako další možnost přihlášení.</small></div><button id="setPasswordFromHub" class="secondary-btn">Nastavit</button></div>`}`;
-   $('#addRecoveryEmailBtn')?.addEventListener('click',openRecoveryEmailModal);$('#linkGoogleBtn')?.addEventListener('click',()=>{location.href='/api/auth/google/start'});$('#setPasswordFromHub')?.addEventListener('click',()=>{if(typeof openPasswordModal==='function')openPasswordModal()});
+   $('#addRecoveryEmailBtn')?.addEventListener('click',openRecoveryEmailModal);$('#linkGoogleBtn')?.addEventListener('click',openGoogleLink);$('#setPasswordFromHub')?.addEventListener('click',()=>{if(typeof openPasswordModal==='function')openPasswordModal()});
    window.PropletInAppBrowserHelp?.mount($('#linkGoogleBtn'));
   }catch(e){body.innerHTML=`<p class="account-auth-error">${esc(e.message)}</p>`}
  })().finally(()=>{securityRefreshPromise=null});
  return securityRefreshPromise;
+}
+
+function openGoogleLink(){
+ ensureModals();$('#linkGooglePassword').value='';$('#linkGoogleMessage').textContent='';openModal('#linkGoogleModal');$('#linkGooglePassword').focus({preventScroll:true});
+}
+async function startGoogleLink(event){
+ event.preventDefault();const btn=$('#confirmLinkGoogle'),input=$('#linkGooglePassword'),msg=$('#linkGoogleMessage');if(btn.disabled)return;btn.disabled=true;msg.textContent='';
+ try{const d=await call('/api/auth/google/link/start',{method:'POST',body:{password:input.value}});input.value='';sessionStorage.setItem('proplet-google-link-state',d.state);location.href=d.url}
+ catch(e){input.value='';msg.textContent=e.message;btn.disabled=false}
 }
 
 function openProfileEditor(){
@@ -205,8 +222,8 @@ async function sendRecovery(){const email=$('#forgotEmailInput').value.trim(),ms
 async function completeRecovery(){const p1=$('#recoveryPassword').value,p2=$('#recoveryPassword2').value,msg=$('#resetPasswordMessage'),btn=$('#completeRecoveryBtn');msg.textContent='';if(p1.length<8){msg.textContent='Heslo musí mít alespoň 8 znaků.';return}if(p1!==p2){msg.textContent='Hesla se neshodují.';return}if(!recoveryContext){msg.textContent='Obnovovací odkaz už není aktivní.';return}btn.disabled=true;try{const d=await call('/api/auth/recovery/reset',{method:'POST',body:{challenge:recoveryContext.challenge,accessToken:recoveryContext.accessToken,password:p1},auth:false});acceptProfile(d.profile);recoveryContext=null;sessionStorage.removeItem('proplet-recovery-context');closeModal('#resetPasswordModal');cleanAuthUrl();toast('🔐 Heslo je změněné. Jsi znovu přihlášený.')}catch(e){msg.textContent=e.message}finally{btn.disabled=false}}
 
 async function handleAuthReturn(){
- const qs=new URLSearchParams(location.search),kind=qs.get('auth');if(!kind)return;ensureModals();const frag=supabaseFragment();if(frag.error){toast(`Přihlášení se nepodařilo: ${frag.error}`);cleanAuthUrl();window.PropletFirstSteps?.cancelledAuthReturn(frag.error==='access_denied'?'cancelled':'failed');return}if(!frag.accessToken)return;
- try{if(kind==='google'){const guestId=typeof getAnonymousId==='function'?getAnonymousId():null;const d=await call('/api/auth/google/complete',{method:'POST',body:{accessToken:frag.accessToken,inviteCode:window.PropletReferrals?.pendingCode()||undefined}});acceptProfile(d.profile);if(typeof claimTelemetryAfterAuth==='function')await claimTelemetryAfterAuth(guestId);if(typeof trackProductEvent==='function')trackProductEvent('account_authenticated');cleanAuthUrl();if(typeof window!=='undefined')window.PropletMarketing?.registration({id:d.profile.id,accountCreated:d.accountCreated===true});if(window.PropletFirstSteps?.resumeAfterAuth())return;if(!d.linked&&typeof showDailyAfterRegistration==='function')showDailyAfterRegistration();toast(d.linked?'✅ Google je propojený s tvým Propletem.':'🎉 Přihlášeno přes Google.');return}const challenge=qs.get('challenge')||'';if(kind==='email-link'){const d=await call('/api/account/email/verify',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});acceptProfile(d.profile);cleanAuthUrl();toast('✅ E-mail je ověřený. Zapomenuté heslo už umíme zachránit.');return}if(kind==='recover'){await call('/api/auth/recovery/check',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});recoveryContext={challenge,accessToken:frag.accessToken};sessionStorage.setItem('proplet-recovery-context',JSON.stringify(recoveryContext));openModal('#resetPasswordModal');return}}catch(e){toast(e.message);cleanAuthUrl();window.PropletFirstSteps?.cancelledAuthReturn('failed')}
+ const qs=new URLSearchParams(location.search),kind=qs.get('auth');if(!kind)return;ensureModals();const frag=supabaseFragment();frag.error=frag.error||qs.get('error_description')||qs.get('error')||'';if(frag.error){toast(`Přihlášení se nepodařilo: ${frag.error}`);cleanAuthUrl();sessionStorage.removeItem('proplet-google-link-state');window.PropletFirstSteps?.cancelledAuthReturn(frag.error==='access_denied'?'cancelled':'failed');return}if(kind!=='google'&&!frag.accessToken)return;
+ try{if(kind==='google'){const code=qs.get('code'),state=qs.get('state');const linking=!!state&&sessionStorage.getItem('proplet-google-link-state')===state;sessionStorage.removeItem('proplet-google-link-state');cleanAuthUrl();if(!code||!state)throw new Error('Přihlášení zahaj znovu tlačítkem Google v Propletu.');const guestId=typeof getAnonymousId==='function'?getAnonymousId():null;const d=await call('/api/auth/google/complete',{method:'POST',auth:linking,body:{code,state,inviteCode:window.PropletReferrals?.pendingCode()||undefined}});acceptProfile(d.profile);if(typeof claimTelemetryAfterAuth==='function')await claimTelemetryAfterAuth(guestId);if(typeof trackProductEvent==='function')trackProductEvent('account_authenticated');cleanAuthUrl();if(typeof window!=='undefined')window.PropletMarketing?.registration({id:d.profile.id,accountCreated:d.accountCreated===true});if(window.PropletFirstSteps?.resumeAfterAuth())return;if(!d.linked&&typeof showDailyAfterRegistration==='function')showDailyAfterRegistration();toast(d.linked?'✅ Google je propojený s tvým Propletem.':'🎉 Přihlášeno přes Google.');return}const challenge=qs.get('challenge')||'';if(kind==='email-link'){const d=await call('/api/account/email/verify',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});acceptProfile(d.profile);cleanAuthUrl();toast('✅ E-mail je ověřený. Zapomenuté heslo už umíme zachránit.');return}if(kind==='recover'){await call('/api/auth/recovery/check',{method:'POST',body:{challenge,accessToken:frag.accessToken},auth:false});recoveryContext={challenge,accessToken:frag.accessToken};sessionStorage.setItem('proplet-recovery-context',JSON.stringify(recoveryContext));openModal('#resetPasswordModal');return}}catch(e){toast(e.message);cleanAuthUrl();window.PropletFirstSteps?.cancelledAuthReturn('failed')}
 }
 
 function init(){

@@ -9,12 +9,13 @@ async function characterizeGoogleRoutes(){
   const location={href:'',assign(path){this.href=path}};
   const ctx={location,trackProductEvent(){}};
   vm.createContext(ctx);
-  for(const id of ['googleLoginBtn','linkGoogleBtn']){
+  for(const id of ['googleLoginBtn']){
     const handler=auth.match(new RegExp("\\$\\('#"+id+"'\\).*?(\\(\\)=>\\{location\\.href='[^']+'\\})"));
     assert(handler,'Google action missing: '+id);
     location.href='';vm.runInContext('('+handler[1]+')()',ctx);
     assert.equal(location.href,'/api/auth/google/start',id+' keeps the same-origin OAuth route');
   }
+  assert(auth.includes("$('#linkGoogleBtn')?.addEventListener('click',openGoogleLink)"),'linking requires explicit password confirmation');
   const guard=app.slice(app.indexOf('function openProgressGuardGoogle(){'),app.indexOf('function openProgressGuardAccount(){'));
   vm.runInContext(guard,ctx);location.href='';ctx.openProgressGuardGoogle();
   assert.equal(location.href,'/api/auth/google/start');

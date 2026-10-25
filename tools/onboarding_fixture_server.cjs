@@ -77,8 +77,13 @@ const server=http.createServer(async(req,res)=>{
    if(p==='/api/rolling-content'){if(controls.rolling==='hold'){heldRolling.push(res);return}return rolling(res)}
    if(p==='/api/free-order/config'||p==='/api/play-session/config')return json(res,200,{enabled:false});
    if(p==='/api/login-integrity'&&req.method==='POST')return data.name===syntheticProfile.name&&data.password==='fixture-password'?json(res,200,syntheticProfile):json(res,401,{detail:'synthetic login rejected'});
-   if(p==='/api/auth/google/start'){res.writeHead(302,{location:controls.auth==='cancel'?'/?auth=google#error=access_denied':'/?auth=google#access_token=synthetic-google-token'});return res.end()}
+   if(p==='/api/auth/google/start'){
+    const current=controls.release==='current';
+    const callback=current?'/?auth=google&code=synthetic-google-code&state=sssssssssssssssssssssssssssssssssssssssssss':'/?auth=google#access_token=synthetic-google-token';
+    res.writeHead(302,{location:controls.auth==='cancel'?'/?auth=google#error=access_denied':callback});return res.end()
+   }
    if(p==='/api/auth/google/complete'||p==='/api/player'){
+    if(p==='/api/auth/google/complete'&&controls.release==='current'&&(data.code!=='synthetic-google-code'||data.state!=='sssssssssssssssssssssssssssssssssssssssssss'||data.accessToken))return json(res,400,{detail:'synthetic code callback required'});
     if(controls.auth==='fail')return json(res,503,{detail:'synthetic auth outage'});
     events.push({endpoint:p,event:'account_created',headers:req.headers,authoritative:true,at:Date.now()});
     return json(res,200,p==='/api/player'?{...syntheticProfile,accountCreated:true}:{profile:syntheticProfile,linked:false,accountCreated:true});
