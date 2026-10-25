@@ -230,11 +230,11 @@
   const loadExtras=async()=>{
     await loadScript('/runtime-meta.js?v=40913','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=studio1','propletHomeLayout');
+    loadScript('/home-layout.js?v=studio2','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=oauth1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
-    loadScript('/game-layout-v3330.js?v=control-side2','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=control-side3','propletGameLayout');
     await loadScript('/app/client-diagnostics.js?v=legacy-body1','propletClientDiagnostics',{wait:true});
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     await loadScript('/recognition/lexicon.js?v=bonuscs1','propletBonusLexicon',{wait:true});

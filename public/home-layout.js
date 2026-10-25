@@ -151,8 +151,10 @@
   function orderDailyNodes(){
     const screen=document.querySelector('#screen-daily');if(!screen)return;
     screen.classList.add('home-layout-active');
-    const nodes=['#studioTodayHeading','#studioDailyResult','.daily-hero','#studioExtraCard','#tajenkaPreviewCard','#axArchiveResume','#homeResumeCard','#referralHome','#rescueCard','#mozkokalypsaInvite','#homeCompetitionCard','#axHomeFree','#axHomeCompetitions','#levelCard']
-      .map(selector=>screen.querySelector(selector)).filter(Boolean);
+    const complete=screen.querySelector('.daily-hero')?.dataset.studioState==='complete';
+    const destinations=complete?['#axHomeFree','#axHomeCompetitions','#studioExtraCard','#tajenkaPreviewCard']:['#studioExtraCard','#tajenkaPreviewCard','#axHomeFree','#axHomeCompetitions'];
+    const nodes=['#studioTodayHeading','#studioDailyResult','.daily-hero','#axArchiveResume','#homeResumeCard','#referralHome','#rescueCard','#mozkokalypsaInvite',...destinations,'#homeCompetitionCard','#levelCard']
+      .map(selector=>screen.querySelector(':scope > '+selector)).filter(Boolean);
     let previous=null;
     for(const node of nodes){
       if(previous){if(previous.nextElementSibling!==node)previous.after(node)}

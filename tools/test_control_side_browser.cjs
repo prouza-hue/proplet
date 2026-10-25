@@ -117,6 +117,20 @@ async function context(options){
   await page.setViewportSize({width:390,height:844});await page.waitForFunction(()=>!document.body.classList.contains('game-tablet-landscape'));
   assert.equal(await page.locator('#gameSideToggle').isVisible(),false);assert.equal(await page.locator('.game-main').evaluate(el=>el.classList.contains('game-controls-left')),false);
   await page.setViewportSize({width:768,height:1000});await page.waitForFunction(()=>document.body.classList.contains('game-tablet-landscape'));await settle(page);await geometry(page,true);checks.push('phone hides switch, unfolding restores preference');
+  // Fold training uses one column even though its device class still says rail.
+  await page.evaluate(()=>startStarter());
+  await page.waitForFunction(()=>currentGame?.mode==='starter'&&document.querySelector('#screen-game').classList.contains('starter-mode'));
+  await settle(page);
+  const stacked=await page.evaluate(()=>{
+    const board=document.querySelector('.board-stage').getBoundingClientRect(),actions=document.querySelector('.game-actions').getBoundingClientRect();
+    return {tablet:document.body.classList.contains('game-tablet-landscape'),boardBottom:board.bottom,actionsTop:actions.top,side:localStorage.getItem('proplet-game-control-side')};
+  });
+  assert(stacked.tablet&&stacked.actionsTop>=stacked.boardBottom-1,'fixture must exercise stacked Fold training');
+  assert.equal(await page.locator('#gameSideToggle').isVisible(),false);
+  assert.equal(await page.locator('.game-main').evaluate(el=>el.classList.contains('game-controls-left')),false);
+  await page.evaluate(()=>document.querySelector('#gameSideToggle').click());
+  assert.equal(await page.evaluate(()=>localStorage.getItem('proplet-game-control-side')),stacked.side,'hidden toggle cannot change saved preference');
+  await start(page);await geometry(page,true);checks.push('stacked Fold training hides/disables swap; normal rail restores saved side');
   await page.evaluate(p=>window.__sideTajenka=p,JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/browser/tajenka.json'),'utf8')));
   await start(page,'tajenka');await geometry(page,true);await dragNext(page);await swapPreserving(page,false);
   assert(await page.evaluate(()=>document.querySelector('#tajenkaPhrase').previousElementSibling===document.querySelector('.current-word')),'Tajenka phrase remains below current word');checks.push('Tajenka drag and live phrase placement');
@@ -166,7 +180,11 @@ async function context(options){
   await ctx.close();
   const short=await context({viewport:{width:800,height:540},screen:{width:800,height:540},hasTouch:true}),sp=await boot(short);
   await start(sp,'tajenka');await geometry(sp,false);await swapPreserving(sp,true);checks.push('short landscape tablet Tajenka bounds');await short.close();
-  const desktop=await context({viewport:{width:1440,height:900}}),dp=await boot(desktop);await start(dp);await geometry(dp,false);await swapPreserving(dp,true);await dragNext(dp);checks.push('desktop swap and drag');await desktop.close();
+  const desktop=await context({viewport:{width:1440,height:900}}),dp=await boot(desktop);await start(dp);await geometry(dp,false);await swapPreserving(dp,true);await dragNext(dp);checks.push('desktop swap and drag');
+  await dp.evaluate(()=>startStarter());await dp.waitForFunction(()=>currentGame?.mode==='starter');await settle(dp);
+  assert.equal(await dp.locator('#gameSideToggle').isVisible(),true,'side-by-side desktop training retains swap');
+  assert(await dp.evaluate(()=>{const b=document.querySelector('.board-stage').getBoundingClientRect(),a=document.querySelector('.game-actions').getBoundingClientRect();return a.right<=b.left+1||b.right<=a.left+1}),'desktop training has actual side-by-side controls');
+  checks.push('side-by-side desktop training keeps useful swap');await desktop.close();
   assert.deepEqual(errors,[],'browser errors');console.log(JSON.stringify({passed:true,checks},null,2));
 })().catch(async error=>{console.error(error);for(const context of browser?.contexts()||[])for(const page of context.pages()){console.error(await page.evaluate(()=>({body:document.body.className,text:document.body.innerText.slice(-3000)})).catch(()=>null));await page.screenshot({path:path.join(artifacts,'failure.png')}).catch(()=>{});}process.exitCode=1}).finally(async()=>{fs.writeFileSync(path.join(artifacts,'report.json'),JSON.stringify({checks,errors,passed:!process.exitCode},null,2));await browser?.close();server?.kill()});
 
