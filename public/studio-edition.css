@@ -42,6 +42,8 @@ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main{disp
 html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .hero-main>div{min-width:0}
 html.tiskarna-ui body.studio-edition:not(.playing) #dailyHeroTitle{font:700 clamp(28px,3.2vw,38px)/1.1 Fraunces,Georgia,serif!important;letter-spacing:-.035em!important;margin:0 0 10px!important;color:#fff8e9!important}
 html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyArt{display:block;width:82px;height:88px;object-fit:contain;filter:drop-shadow(0 4px 3px #14274a30)}
+/* The blue calendar sits on a small paper label, with a distinct light edge. */
+html.tiskarna-ui body.studio-edition:not(.playing) #studioDailyArt[src*="symbol-daily"]{box-sizing:border-box;padding:0;background:#fff2cf;border:1px solid #ffedbc;border-radius:10px;box-shadow:0 3px 0 #172c5c40;filter:none;transform:rotate(3deg)}
 html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-title-meta{display:block!important;margin:0!important}
 html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily #dailyMeta{display:flex!important;align-items:center;flex-wrap:wrap;gap:8px;margin:0!important;font:500 15px/1.4 Outfit,sans-serif!important;color:#f7f1e7!important}
 html.tiskarna-ui body.studio-edition:not(.playing) #dailyMeta::before{content:none!important}
@@ -123,6 +125,10 @@ html.tiskarna-ui body.studio-edition:not(.playing) #newContentBanner h2{font-siz
  html.tiskarna-ui body.studio-edition:not(.playing) #newContentBanner{grid-template-columns:52px minmax(0,1fr) auto!important}
  html.tiskarna-ui body.studio-edition:not(.playing) #newContentBanner .new-content-actions{grid-column:3!important;grid-row:1!important;width:auto!important}
 }
+@media(min-width:600px) and (max-width:899px){
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):not(:has(.daily-hero[data-studio-state=complete])) #tajenkaPreviewCard{grid-column:1/-1!important;grid-template-columns:58px minmax(0,1fr) 150px!important;grid-template-rows:auto;align-items:center}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):not(:has(.daily-hero[data-studio-state=complete])) #tajenkaPreviewCard>:is(button,.tajenka-home-actions){grid-column:3!important;grid-row:1!important}
+}
 @media(min-width:900px){
  html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily.active{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px 20px}
  html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero{grid-column:1;grid-row:auto/span 2;padding:24px!important;align-self:stretch;display:flex;flex-direction:column}
@@ -137,6 +143,13 @@ html.tiskarna-ui body.studio-edition:not(.playing) #newContentBanner h2{font-siz
  html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero[data-studio-state=complete] #studioDailyResult{grid-column:1;grid-row:2;margin:0!important}
  html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily .daily-hero[data-studio-state=complete] #dailyWeekRhythm{grid-column:2;grid-row:1/span 2;margin:0!important}
  html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:has(.daily-hero[data-studio-state=complete]) :is(#studioExtraCard,#tajenkaPreviewCard){grid-column:auto!important}
+ /* Without Extra, Free occupies the second slot beside Daily. */
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):has(#tajenkaPreviewCard:not(.hidden)):not(:has(.daily-hero[data-studio-state=complete])) .daily-hero{grid-row:auto/span 2}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):has(#tajenkaPreviewCard:not(.hidden)):not(:has(.daily-hero[data-studio-state=complete])) #axHomeFree{grid-column:2!important}
+ html.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):has(#tajenkaPreviewCard:not(.hidden)):not(:has(.daily-hero[data-studio-state=complete])) #axHomeCompetitions{grid-column:1/-1!important}
+ html:root.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):has(#tajenkaPreviewCard:not(.hidden)):not(:has(.daily-hero[data-studio-state=complete])) #axHomeCompetitions .ax-team-entry{grid-template-columns:48px minmax(0,1fr) auto!important;grid-template-rows:auto!important}
+ html:root.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):has(#tajenkaPreviewCard:not(.hidden)):not(:has(.daily-hero[data-studio-state=complete])) #axHomeCompetitions .ax-entry-art{grid-row:1!important}
+ html:root.tiskarna-ui body.studio-edition:not(.playing) #screen-daily:not(:has(#studioExtraCard:not([hidden]))):has(#tajenkaPreviewCard:not(.hidden)):not(:has(.daily-hero[data-studio-state=complete])) #axHomeCompetitions .ax-card-action{grid-column:3!important;grid-row:1!important}
 }
 @media(max-width:399px){
  html.tiskarna-ui body.studio-edition:not(.playing) .app-shell{padding-inline:12px!important}

@@ -44,7 +44,25 @@ přihlášení a propojení preview s reálnými účty se v této úpravě nem�
 - Doplněné behaviorální regrese chrání přesun souhrnu výsledku a smysluplné
   zobrazení přepínače stran. Rozšířená browser regrese je v existujícím CI;
   lokální vizuální kontrola proběhla přes ovládaný prohlížeč.
-- Cache marker: `proplet-v4.09.13-studiorefinement1`.
+- Cache marker následného CSS doplnění: `proplet-v4.09.13-studiorefinement2`;
+  styl `studio-edition.css?v=refinement2`. Odkazy na app/theme-init a service-worker
+  cache jsou sladěné; herní JavaScript se kromě release markeru nemění.
+
+## Doplnění podle skutečného pondělí
+
+Navazuje na připravené preview commitu `4410574`. Ve dnech bez Extra nezůstává
+vedle Denní výzvy prázdné místo: na desktopu ho využívá Volná hra a soutěž se
+zobrazí jako stručný řádek. Na šířkách 600–899 px má samostatná Tajenka kompaktní
+řádkové uspořádání. Podmínka vychází ze skutečné dostupnosti Extra, není natvrdo
+vázaná na pondělí ani datum.
+
+Modrá ilustrace denního kalendáře nově leží na malé světlé papírové ploše, aby
+se neztrácela na modrém hero. Původní asset se nepřebarvuje a jiné ilustrace tuto
+podložku nedostávají. Jde pouze o CSS úpravy; pravidla, data a herní deska se nemění.
+
+Pro toto doplnění prošel cílený release/cache kontrakt a všech 170 kontrol assetů
+(162 lokálních odkazů). Celý runtime gate se kvůli samotnému CSS neopakoval;
+jeho předchozí výsledek 183/170/521 PASS zůstává doložený výše.
 
 Snímky a logy jsou u místního úkolu ve `studio-refinement-evidence-20261025/`
 a `studio-refinement-current-gate-20261025.log`. Produkční nasazení není součástí.
