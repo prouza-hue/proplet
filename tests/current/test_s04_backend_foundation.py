@@ -446,6 +446,9 @@ with (
     assert health_fixture.pop('atomicResultEnabled') == server.ATOMIC_RESULT_V1_ENABLED
     assert health_fixture.pop('archiveEnabled') is False
     assert config_fixture.pop('archiveEnabled') is False
+    # The explicit live-player preview capability is additive and defaults closed.
+    # Keep every pre-existing response field under the historical digest below.
+    assert config_fixture.pop('livePlayerPreview') is False
     # Keep the Linux production fixture portable to Windows development.
     health_fixture["puzzleSource"] = health_fixture["puzzleSource"].replace("\\", "/")
     # Release publication changes APP_VERSION without changing these response

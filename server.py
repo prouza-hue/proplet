@@ -40,6 +40,7 @@ from backend.config import (
     GEN4_CANDIDATE_PREVIEW,
     GEN5_CANDIDATE_PREVIEW,
     HISTORICAL_FREE_REWARDS_ENABLED,
+    LIVE_PLAYER_PREVIEW,
     GEN4_PREVIEW_BRANCH,
     PUZZLES_PATH,
     PHONE_LANDSCAPE_BLOCKING,
@@ -152,11 +153,11 @@ def isolated_fair_play_preview():
 async def launch_safety_middleware(request: Request, call_next):
     # Use the ASGI routing path, independent of the untrusted Host header.
     path = request.scope["path"]
-    if VERCEL_ENV == "preview" and not isolated_fair_play_preview() and request.method == "POST" and path == "/api/play-session":
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW) and request.method == "POST" and path == "/api/play-session":
         return JSONResponse({"detail":"Preview nemá oddělené herní úložiště."},status_code=409)
-    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012")) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    if VERCEL_ENV == "preview" and not (LIVE_PLAYER_PREVIEW or (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012"))) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
-    if ((VERCEL_ENV == "preview" and not isolated_fair_play_preview()) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
+    if ((VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW)) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
@@ -886,7 +887,7 @@ def _parse_content_date(value: Optional[str]) -> Optional[date]:
 def effective_content_date(request: Optional[Request] = None, requested: Optional[str] = None) -> date:
     """Production always uses Prague today; preview deployments may simulate a release date."""
     actual = current_prague_date()
-    if VERCEL_ENV == "production":
+    if VERCEL_ENV == "production" or LIVE_PLAYER_PREVIEW:
         return actual
     candidate = requested
     if not candidate and request is not None:
@@ -1412,7 +1413,7 @@ def shared_puzzle(
 def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
     """Serve one released board without exposing the remaining weekend bank."""
     today = current_prague_date()
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         selected_week = week or tajenka_week_for(today) or 1
     else:
         if not tajenka_is_live(today):
@@ -1845,6 +1846,7 @@ def config():
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
         "environment": VERCEL_ENV or "local",
+        "livePlayerPreview": LIVE_PLAYER_PREVIEW,
         "version": APP_VERSION,
         "archiveEnabled": archive_release_enabled(),
     }
@@ -2077,7 +2079,7 @@ def set_avatar(payload: AvatarSet, request: Request, authorization: Optional[str
 @app.post("/api/account/welcome")
 def claim_printshop_welcome(request: Request, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         return {"show": False}
     enforce_rate_limit(request, "welcome_claim", limit=30, window_seconds=3600)
     rows = db_request("PATCH", "players", params={
@@ -2284,7 +2286,7 @@ def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[
 def set_team_membership(payload: TeamMembershipSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_membership", limit=15, window_seconds=600, discriminator=payload.family_code or payload.league_name or payload.mode)
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     current_family = norm_family(str(player.get("family_code") or ""))
     if not is_solo_player(player):
@@ -2608,7 +2610,7 @@ def _fair_play_policy() -> dict:
 
 @app.get("/api/play-session/config")
 def play_session_config():
-    if VERCEL_ENV == "preview" and not isolated_fair_play_preview():
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW):
         return {"enabled": False}
     try:
         policy = _fair_play_policy()
@@ -4262,7 +4264,7 @@ def family_league(
 def family_league_settings(payload: FamilyLeagueSettings, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "family_league_settings", limit=20, window_seconds=3600)
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     family = norm_family(str(player.get("family_code") or ""))
     if is_solo_player(player):
@@ -4779,7 +4781,7 @@ def team_settings(request: Request, authorization: Optional[str] = Header(defaul
 def leave_team(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_leave", limit=8, window_seconds=3600)
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
     if not family:
@@ -5509,6 +5511,7 @@ install_account_auth(
         telemetry_actor=telemetry_actor,
         app_version=APP_VERSION,
         vercel_env=VERCEL_ENV,
+        live_player_preview=LIVE_PLAYER_PREVIEW,
     ),
 )
 

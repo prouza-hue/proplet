@@ -23,6 +23,16 @@ def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
 
 
+def live_player_preview_enabled() -> bool:
+    """One explicitly approved branch may serve real players against the live DB."""
+    return (
+        _env("PROPLET_LIVE_PLAYER_PREVIEW_ENABLED").lower() in {"1", "true", "yes"}
+        and _env("VERCEL_ENV").lower() == "preview"
+        and _env("VERCEL_GIT_COMMIT_REF") == "codex/studio-edition"
+        and _env("SUPABASE_URL").rstrip("/") == "https://iopyhluayfszskyqqpuc.supabase.co"
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class Settings:
     root: Path
@@ -38,6 +48,7 @@ class Settings:
     cron_secret: str
     vercel_env: str
     vercel_git_commit_ref: str
+    live_player_preview: bool
     gen4_preview_branch: str
     gen4_candidate_preview: bool
     gen5_candidate_preview: bool
@@ -55,6 +66,7 @@ def load_settings() -> Settings:
     root = Path(__file__).resolve().parents[1]
     vercel_env = _env("VERCEL_ENV").lower()
     vercel_git_commit_ref = _env("VERCEL_GIT_COMMIT_REF")
+    live_player_preview = live_player_preview_enabled()
     gen4_preview_branch = "agent/v3340-medium-calibration-v3"
     gen4_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == gen4_preview_branch
     gen5_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/gen5-lab"
@@ -84,6 +96,7 @@ def load_settings() -> Settings:
         cron_secret="" if playtest_preview else _env("CRON_SECRET"),
         vercel_env=vercel_env,
         vercel_git_commit_ref=vercel_git_commit_ref,
+        live_player_preview=live_player_preview,
         gen4_preview_branch=gen4_preview_branch,
         gen4_candidate_preview=gen4_candidate_preview,
         gen5_candidate_preview=gen5_candidate_preview,
@@ -94,7 +107,7 @@ def load_settings() -> Settings:
         content_catalog_path=data_root / "content_catalog_v334.json",
         tajenka_bank_path=data_root / "tajenka_weekend_v2.json",
         tajenka_release_enabled=(
-            vercel_env == "production"
+            (vercel_env == "production" or live_player_preview)
             and _env("PROPLET_TAJENKA_RELEASE_ENABLED", "true").lower() in {"1", "true", "yes"}
         ),
         atomic_result_v1_enabled=(
@@ -124,6 +137,7 @@ VAPID_SUBJECT = settings.vapid_subject
 CRON_SECRET = settings.cron_secret
 VERCEL_ENV = settings.vercel_env
 VERCEL_GIT_COMMIT_REF = settings.vercel_git_commit_ref
+LIVE_PLAYER_PREVIEW = settings.live_player_preview
 GEN4_PREVIEW_BRANCH = settings.gen4_preview_branch
 GEN4_CANDIDATE_PREVIEW = settings.gen4_candidate_preview
 GEN5_CANDIDATE_PREVIEW = settings.gen5_candidate_preview

@@ -53,6 +53,7 @@ class AppServices:
     app_version: str = ""
     vercel_env: str = ""
     canonical_origin: str = "https://hrajproplet.cz"
+    live_player_preview: bool = False
 
     @classmethod
     def from_legacy_kwargs(cls, values: dict[str, Any]) -> "AppServices":
@@ -141,6 +142,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         daily_puzzle_matches_date=services.daily_puzzle_matches_date,
         daily_special_discovery_identity=services.daily_special_discovery_identity,
         vercel_env=services.vercel_env,
+        live_player_preview=services.live_player_preview,
     )
     _install_competitive_sharing(
         app,
@@ -150,6 +152,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         telemetry_actor=services.telemetry_actor,
         app_version=services.app_version,
         vercel_env=services.vercel_env,
+        live_player_preview=services.live_player_preview,
     )
     _install_account_bonus(
         app,
@@ -161,6 +164,7 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         telemetry_actor=services.telemetry_actor,
         app_version=services.app_version,
         vercel_env=services.vercel_env,
+        live_player_preview=services.live_player_preview,
     )
     _install_rescue_limit_v40115(
         app,

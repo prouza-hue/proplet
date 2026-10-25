@@ -8,6 +8,7 @@ on:
       - 'tools/test_onboarding_activation_browser.cjs'
       - 'tools/test_first_steps_browser.cjs'
       - 'tools/test_profile_statistics_browser.cjs'
+      - 'tools/test_module_contracts_browser.cjs'
       - 'tools/test_first_game_safety_browser.cjs'
       - 'tools/test_client_diagnostics_browser.cjs'
       - 'tools/test_platform_analytics_browser.cjs'
@@ -98,9 +99,13 @@ jobs:
           echo "CHROME_PATH=$(command -v google-chrome || command -v google-chrome-stable)" >> "$GITHUB_ENV"
       - name: Verify profile dependency recovery and historical PWA upgrade
         run: node tools/test_profile_statistics_browser.cjs
+      - name: Verify module contracts and real 4.09.9 PWA upgrade on desktop, mobile and Fold
+        run: node tools/test_module_contracts_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: profile-statistics-${{ github.sha }}
-          path: browser-results/profile-statistics.json
+          path: |
+            browser-results/profile-statistics.json
+            browser-results/module-contracts.json
           retention-days: 14

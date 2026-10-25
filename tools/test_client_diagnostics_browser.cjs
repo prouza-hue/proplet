@@ -35,6 +35,9 @@ const output=process.env.RESULT_PATH||'browser-results/client-diagnostics.json';
   const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/client-error');await page.evaluate(()=>reportClientError('verification_mixed_cache','cached old reporter'));assert.equal((await response).status(),200);
   const rows=(await fetch(url+'/__fixture/events').then(r=>r.json())).requests.filter(r=>r.path==='/api/client-error'&&r.headers['x-proplet-fixture-run']===run);
   assert.equal(rows.length,1);assert.equal(rows[0].headers['x-proplet-client-release'],'proplet-v4.05.2-dailygen6-20261008-usage1');assert.equal(rows[0].headers['x-proplet-version'],'4.05.2');assert.equal(rows[0].headers['x-proplet-test'],'1');
+  assert.equal(rows[0].body.client_release,rows[0].headers['x-proplet-client-release']);
+  assert.equal(rows[0].body.reporter_release,fs.readFileSync('public/app/client-diagnostics.js','utf8').match(/REPORTER_RELEASE='([^']+)'/)[1]);
+  assert.equal(rows[0].body.source_availability,'missing');assert.equal(rows[0].body.is_test,true);
   checks.push({name:'mixed cached older app accurately tagged by new diagnostic adapter',requests:rows});await context.close();
   fs.writeFileSync(output,JSON.stringify({checks,synthetic:true},null,2));console.log('PASS desktop/touch error events, safe coordinates, gesture, Daily share and mixed-cache actual producer');
  }finally{await browser.close()}

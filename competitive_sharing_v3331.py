@@ -56,12 +56,13 @@ def install_competitive_sharing(
     telemetry_actor=None,
     app_version: str = "",
     vercel_env: str = "",
+    live_player_preview: bool = False,
     **_kwargs,
 ):
     """Add narrow telemetry for v3.33.1 shared-level challenges.
 
-    The existing /api/product-event allow-list remains untouched. Preview executions are
-    intentionally ignored so physical QA cannot pollute launch analytics in the production DB.
+    The existing /api/product-event allow-list remains untouched. Ordinary preview events
+    are ignored; explicit live-player preview retains canonical actor resolution and writes.
     """
 
     @app.post("/api/challenge-event")
@@ -74,7 +75,7 @@ def install_competitive_sharing(
         enforce_rate_limit(request, "challenge_event", limit=300, window_seconds=3600)
         if payload.event_type not in ALLOWED_CHALLENGE_EVENTS:
             raise HTTPException(400, "Neplatný challenge event")
-        if str(vercel_env or "").strip().lower() == "preview":
+        if str(vercel_env or "").strip().lower() == "preview" and live_player_preview is not True:
             return {"ok": True, "ignored": True, "preview": True}
 
         if not callable(telemetry_actor):

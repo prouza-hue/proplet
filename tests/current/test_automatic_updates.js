@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const app=fs.readFileSync('public/app.js','utf8');
+const capabilities=app.slice(app.indexOf('let livePlayerPreviewEnabled='),app.indexOf('window.PropletClientDiagnostics?.claimErrorListeners'));
 const source=app.slice(app.indexOf('function canAutomaticallyUpdate('),app.indexOf('function ensureAudio('));
 function harness({store=new Map(),release='old',now=100000}={}){
  const timers=new Map(),events={};let id=0,reloads=0,deletes=0,banners=0,modal=null,editing=false;
@@ -15,7 +16,7 @@ function harness({store=new Map(),release='old',now=100000}={}){
   fetch:async()=>({ok:true,text:async()=>"const SHELL_CACHE='new';",json:async()=>({environment:'production'})})};
  const reg={update:async()=>{},addEventListener:()=>{}};
  ctx.navigator.serviceWorker={controller:{},register:async()=>reg,getRegistration:async()=>reg,addEventListener:(n,f)=>events[n]=f};
- vm.createContext(ctx);vm.runInContext(source,ctx);
+ vm.createContext(ctx);vm.runInContext(capabilities+'\n'+source,ctx);
  return {ctx,reg,events,store,timers,get now(){return now},get reloads(){return reloads},get deletes(){return deletes},get banners(){return banners},set modal(v){modal=v},set editing(v){editing=v},async tick(){const [key,timer]=timers.entries().next().value;timers.delete(key);now+=timer.delay;await timer.fn();for(let i=0;i<20;i++)await Promise.resolve()}};
 }
 (async()=>{
@@ -34,6 +35,7 @@ function harness({store=new Map(),release='old',now=100000}={}){
  const third=harness({store:first.store,now:stillOld.now});third.ctx.scheduleAutomaticUpdate('new');await third.tick();assert.equal(third.reloads,0);await third.tick();assert.equal(third.reloads,1);assert.equal(JSON.parse(first.store.get('proplet-auto-update-new')).attempts,3);
  const exhausted=harness({store:first.store,now:third.now});exhausted.ctx.scheduleAutomaticUpdate('new');await exhausted.tick();assert.equal(exhausted.reloads,0);assert.equal(exhausted.banners,1,'three stale reloads offer manual recovery');assert.equal(exhausted.timers.size,0,'no automatic reload loop');exhausted.ctx.scheduleAutomaticUpdate('new');await exhausted.tick();assert.equal(exhausted.reloads,0,'future probes cannot bypass retry budget');
  const loaded=harness({store:first.store,release:'new'});loaded.ctx.window.PROPLET_RUNTIME_META={version:'new'};assert.equal(loaded.ctx.confirmAutomaticUpdate('other'),false,'fresh metadata does not confirm another app release');assert(first.store.has('proplet-auto-update-new'));loaded.ctx.registerServiceWorker();await Promise.resolve();assert.equal(first.store.has('proplet-auto-update-new'),false,'executing target app confirms success and clears pending attempts');loaded.ctx.scheduleAutomaticUpdate('new');await loaded.tick();assert.equal(loaded.reloads,0,'already-current app does not reload');
+ const partial=harness({release:'new'});await partial.ctx.recoverRuntimeUpdate({automatic:true,forceReload:true});assert.equal(partial.reloads,1,'explicit module repair can reload a partial same-release shell');assert.equal(partial.deletes,0,'module repair preserves offline/data caches');
  const unavailable=harness();unavailable.ctx.sessionStorage.setItem=()=>{throw Error('blocked storage')};unavailable.ctx.scheduleAutomaticUpdate('new');await unavailable.tick();assert.equal(unavailable.reloads,0,'no unbounded reloads when retry state cannot persist');assert.equal(unavailable.banners,1);assert.equal(unavailable.deletes,0);
  const changed=harness({store:first.store});changed.store.set('proplet-auto-update-previous',JSON.stringify({attempts:3,nextAttemptAt:999999}));changed.ctx.scheduleAutomaticUpdate('new');await changed.tick();assert.equal(changed.reloads,1,'older target budget does not block a new release');
  const prod=harness();await prod.ctx.probeCanonicalRelease(true);await prod.tick();assert.equal(prod.reloads,1,'production detects shell changes without product version bump');

@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync(require('node:path').join(__dirname,'../../public/app.js'),'utf8');
+const capabilities=source.slice(source.indexOf('let livePlayerPreviewEnabled='),source.indexOf('window.PropletClientDiagnostics?.claimErrorListeners'));
 const code=source.slice(source.indexOf('async function syncQueue('),source.indexOf('function mergeRemoteProgress('));
 async function scenario(waitForProfile){
  let release,refreshed=0;
@@ -9,7 +10,7 @@ async function scenario(waitForProfile){
  const context={navigator:{onLine:true},claimTelemetryAfterAuth:async()=>true,GEN4_CANDIDATE_PREVIEW:false,GEN5_CANDIDATE_PREVIEW:false,window:{},location:{search:''},URLSearchParams,
  getProfile:()=>profile,resultQueue:()=>({getQueue:()=>[{}],sync:async()=>result}),accountProfileMatches:()=>true,
  refreshRemoteProfile:()=>{refreshed++;return refresh},syncState:{},renderProfile(){},renderDaily(){},currentScreen:'game'};
- vm.createContext(context);vm.runInContext(code,context);
+ vm.createContext(context);vm.runInContext(capabilities+'\n'+code,context);
  let settled=false;const work=context.syncQueue({waitForProfile}).then(r=>{settled=true;return r});
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(refreshed,1,'history still refreshes in the background');
