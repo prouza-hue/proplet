@@ -45,9 +45,10 @@ přihlášení a propojení preview s reálnými účty se v této úpravě nem�
 - Doplněné behaviorální regrese chrání přesun souhrnu výsledku a smysluplné
   zobrazení přepínače stran. Rozšířená browser regrese je v existujícím CI;
   lokální vizuální kontrola proběhla přes ovládaný prohlížeč.
-- Aktuální cache marker: `proplet-v4.09.13-studiorefinement4`;
-  styl `studio-edition.css?v=refinement4`. Odkazy na app/theme-init a service-worker
-  cache jsou sladěné; modul Archivu používá `experience.js?v=config-recovery1`.
+- Aktuální cache marker: `proplet-v4.09.13-studiorefinement5`;
+  styl `studio-edition.css?v=refinement5`. Odkazy na app/theme-init a service-worker
+  cache jsou sladěné; Archiv používá `experience.js?v=studio-archive-shortcut1`
+  a denní rozložení `home-layout.js?v=studio3`.
 
 ## Doplnění podle skutečného pondělí
 
@@ -93,6 +94,18 @@ pro preview; produkční nasazení není součástí této změny.
 
 Pro revizi `studiorefinement4` prošel cílený release/cache kontrakt a 170 kontrol
 assetů (162 lokálních odkazů). Celý 183testový gate se pro tuto CSS změnu neopakoval.
+
+## Archiv vedle Tajenky — rozhodnutí 26. 10. 2026
+
+Po dokončení Denní výzvy, pokud dnes není Extra a je dostupná Tajenka, využije
+desktop od 900 px volné místo vedle Tajenky pro stručný vstup do Archivu.
+Používá stávající ilustraci a skutečnou akci katalogu; nevzniká nová herní cesta
+ani kopie odměnové logiky. Mobilní rozložení zůstává stejné a pozvánková reklama
+se na Dnes nevrací. Úprava je určená pouze pro preview.
+
+Pro revizi `studiorefinement5` prošly cílené kontroly Archivu (včetně obnovy
+konfigurace, účtové izolace a odměn), stavů Dnes, release/cache kontraktu a všech
+170 kontrol assetů (162 lokálních odkazů). Celý gate se znovu nespouštěl.
 
 Snímky a logy jsou u místního úkolu ve `studio-refinement-evidence-20261025/`
 a `studio-refinement-current-gate-20261025.log`. Produkční nasazení není součástí.

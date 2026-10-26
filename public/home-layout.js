@@ -153,7 +153,7 @@
     screen.classList.add('home-layout-active');
     const complete=screen.querySelector('.daily-hero')?.dataset.studioState==='complete';
     const destinations=complete?['#axHomeFree','#axHomeCompetitions','#studioExtraCard','#tajenkaPreviewCard']:['#studioExtraCard','#tajenkaPreviewCard','#axHomeFree','#axHomeCompetitions'];
-    const nodes=['#studioTodayHeading','#studioDailyResult','.daily-hero','#axArchiveResume','#homeResumeCard','#referralHome','#rescueCard','#mozkokalypsaInvite',...destinations,'#homeCompetitionCard','#levelCard']
+    const nodes=['#studioTodayHeading','#studioDailyResult','.daily-hero','#axArchiveResume','#homeResumeCard','#referralHome','#rescueCard','#mozkokalypsaInvite',...destinations,'#studioArchiveShortcut','#homeCompetitionCard','#levelCard']
       .map(selector=>screen.querySelector(':scope > '+selector)).filter(Boolean);
     let previous=null;
     for(const node of nodes){

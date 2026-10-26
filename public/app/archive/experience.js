@@ -140,8 +140,9 @@ function archiveEntry(){return destination({kind:'archive',title:'Archiv Proplet
 function home(){
  if(!installed)return;
  const root=q('#screen-daily');if(!root)return;
-  // The complete Archive catalog stays on Play; Today has one compact discovery link.
+  // The catalogue stays on Play. A contextual desktop shortcut uses the same action.
   q('#axHomeGames')?.remove();
+  if(!q('#studioArchiveShortcut')){const shortcut=document.createElement('div');shortcut.id='studioArchiveShortcut';shortcut.innerHTML=archiveEntry();root.append(shortcut);}
   if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Obtížnosti, nové desky i Archiv',art:difficultyIconMarkup('easy','ax-free-difficulty'),action:'free',label:'Vybrat hru'}));}
  let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Hraj s týmem o zlatou trofej',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
